@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="PhonicsQuest – the phonics learning adventure for early readers. Practice blending, segmenting, and identifying sounds." />
+  <meta name="theme-color" content="#6c63ff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="PhonicsQuest" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="/blending/manifest.json" />
+  <link rel="apple-touch-icon" href="/blending/icons/icon-192.svg" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Lexend:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/src/styles/main.css" />
+
+  <title>PhonicsQuest</title>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <div id="app" role="application" aria-label="PhonicsQuest phonics learning app">
+
+    <!-- APP HEADER -->
+    <header class="app-header" role="banner">
+      <div class="header-left">
+        <button class="mascot-btn" id="mascot-trigger" aria-label="Ollie the owl – tap to cheer!">
+          <div class="mascot-mini" id="mascot-mini" aria-hidden="true"></div>
+        </button>
+        <span class="app-brand">PhonicsQuest</span>
+      </div>
+
+      <div class="header-stats" id="header-stats" aria-label="Your progress">
+        <div class="stat-chip" aria-label="Hearts remaining" aria-live="polite">
+          <span class="stat-icon" aria-hidden="true">❤️</span>
+          <span class="stat-value" id="hearts-val">5</span>
+        </div>
+        <div class="stat-chip" aria-label="Day streak" aria-live="polite">
+          <span class="stat-icon" aria-hidden="true">🔥</span>
+          <span class="stat-value" id="streak-val">0</span>
+        </div>
+        <div class="stat-chip" aria-label="Experience points" aria-live="polite">
+          <span class="stat-icon" aria-hidden="true">⭐</span>
+          <span class="stat-value" id="xp-val">0</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="profile-chip" id="profile-chip" aria-label="Switch player" style="display:none">
+          <span id="profile-chip-avatar"></span>
+          <span id="profile-chip-name"></span>
+        </button>
+        <button class="icon-btn" id="settings-btn" aria-label="Settings" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+          </svg>
+        </button>
+        <button class="icon-btn" id="dashboard-btn" aria-label="Parent dashboard" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Level Bar -->
+    <div class="level-bar-wrapper" aria-label="Level progress" role="complementary">
+      <span class="level-label">Lv <strong id="level-val">1</strong></span>
+      <div class="level-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="level-bar-fill" id="level-bar-fill" style="width:0%"></div>
+      </div>
+      <span class="level-label">Lv <strong id="level-next-val">2</strong></span>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main id="main-content" class="main-content">
+
+      <!-- SCREEN: PROFILE PICKER -->
+      <section class="screen" id="screen-profiles" aria-label="Choose your profile">
+        <div class="profile-screen">
+          <div class="profile-hero" aria-hidden="true">🃏</div>
+          <h1 class="profile-title">Who's playing?</h1>
+          <div class="profile-grid" id="profile-grid" role="list" aria-label="Profiles"></div>
+          <button class="btn btn--primary btn--lg" id="btn-add-profile" aria-label="Add a new player profile">
+            + Add Player
+          </button>
+        </div>
+      </section>
+
+      <!-- SCREEN: HOME -->
+      <section class="screen active" id="screen-home" aria-label="Choose your activity">
+        <div class="home-hero" aria-hidden="true">
+          <div class="mascot-home" id="mascot-home"></div>
+        </div>
+        <h1 class="home-title">Ready to read?</h1>
+        <p class="home-subtitle">Pick your adventure!</p>
+
+        <!-- Spin Wheel -->
+        <div class="wheel-wrapper" id="wheel-wrapper">
+          <canvas id="spin-wheel" width="260" height="260" aria-label="Word category wheel" role="img"></canvas>
+          <button class="spin-btn" id="spin-btn" aria-label="Spin the wheel to pick a word category">
+            SPIN!
+          </button>
+        </div>
+
+        <!-- Mode Grid -->
+        <nav class="mode-grid" aria-label="Activity modes">
+
+          <!-- Blending section -->
+          <p class="mode-section-label">Blending</p>
+          <button class="mode-card mode-card--highlight" data-mode="blend">
+            <span class="mode-icon" aria-hidden="true">🎯</span>
+            <span class="mode-name">Blend It!</span>
+            <span class="mode-desc">Step by step · for beginners</span>
+          </button>
+          <button class="mode-card" data-mode="classicBlend">
+            <span class="mode-icon" aria-hidden="true">🔊</span>
+            <span class="mode-name">Listen &amp; Blend</span>
+            <span class="mode-desc">Free mode · confident learners</span>
+          </button>
+
+          <!-- Phoneme identification section -->
+          <p class="mode-section-label">Phoneme Skills</p>
+          <button class="mode-card" data-mode="hear">
+            <span class="mode-icon" aria-hidden="true">👂</span>
+            <span class="mode-name">Hear &amp; Choose</span>
+            <span class="mode-desc">Listen carefully</span>
+          </button>
+          <button class="mode-card" data-mode="segment">
+            <span class="mode-icon" aria-hidden="true">✂️</span>
+            <span class="mode-name">Segment It</span>
+            <span class="mode-desc">Break it apart</span>
+          </button>
+          <button class="mode-card" data-mode="missing">
+            <span class="mode-icon" aria-hidden="true">🔍</span>
+            <span class="mode-name">Missing Sound</span>
+            <span class="mode-desc">Find the gap</span>
+          </button>
+
+          <!-- Phonemic awareness section -->
+          <p class="mode-section-label">Phonemic Awareness</p>
+          <button class="mode-card" data-mode="first">
+            <span class="mode-icon" aria-hidden="true">🚀</span>
+            <span class="mode-name">First Sound</span>
+            <span class="mode-desc">What starts it?</span>
+          </button>
+          <button class="mode-card" data-mode="last">
+            <span class="mode-icon" aria-hidden="true">🔚</span>
+            <span class="mode-name">Last Sound</span>
+            <span class="mode-desc">What ends it?</span>
+          </button>
+          <button class="mode-card" data-mode="middle">
+            <span class="mode-icon" aria-hidden="true">🎵</span>
+            <span class="mode-name">Middle Sound</span>
+            <span class="mode-desc">Find the vowel!</span>
+          </button>
+
+        </nav>
+
+        <!-- Letter Sounds banner -->
+        <button class="stories-banner stories-banner--green" id="btn-letter-sounds" aria-label="Open letter sounds introduction">
+          <span class="stories-banner-mascot">
+            <img src="/blending/images/mascot/giri-whiteboard.png" alt="Giri" draggable="false" width="52" height="52" style="object-fit:contain"/>
+          </span>
+          <span class="stories-banner-text">
+            <span class="stories-banner-title">🔤 Letter Sounds</span>
+            <span class="stories-banner-sub">Tap any sound to hear it · organised by type</span>
+          </span>
+          <span class="stories-banner-arrow">→</span>
+        </button>
+
+        <!-- Daily Challenge banner -->
+        <button class="stories-banner stories-banner--gold" id="btn-daily-challenge" aria-label="Start today's daily challenge">
+          <span class="stories-banner-mascot">
+            <span style="font-size:2.5rem;line-height:1" aria-hidden="true">📅</span>
+          </span>
+          <span class="stories-banner-text">
+            <span class="stories-banner-title" id="daily-banner-title">⚡ Daily Challenge</span>
+            <span class="stories-banner-sub" id="daily-banner-sub">5 words · earn 50 bonus XP</span>
+          </span>
+          <span class="stories-banner-arrow" id="daily-banner-arrow">→</span>
+        </button>
+
+        <!-- Sight Words banner -->
+        <button class="stories-banner stories-banner--blue" id="btn-sight-words" aria-label="Open sight word matching game">
+          <span class="stories-banner-mascot">
+            <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🃏</span>
+          </span>
+          <span class="stories-banner-text">
+            <span class="stories-banner-title">🔡 Sight Words</span>
+            <span class="stories-banner-sub">35 quests · flip &amp; match Dolch words</span>
+          </span>
+          <span class="stories-banner-arrow">→</span>
+        </button>
+
+        <!-- Stories banner -->
+        <button class="stories-banner" id="btn-stories" aria-label="Open Giri story library">
+          <span class="stories-banner-mascot">
+            <img src="/blending/images/mascot/giri-hold-card.png" alt="Giri" draggable="false" width="52" height="52" style="object-fit:contain"/>
+          </span>
+          <span class="stories-banner-text">
+            <span class="stories-banner-title">📚 Giri Stories</span>
+            <span class="stories-banner-sub">16 decodable phonics stories · Read Aloud &amp; Decode</span>
+          </span>
+          <span class="stories-banner-arrow">→</span>
+        </button>
+
+        <!-- Daily Goal -->
+        <div class="daily-goal" role="status" aria-label="Daily goal progress">
+          <span class="goal-label">Today</span>
+          <div class="goal-track"><div class="goal-fill" id="goal-fill" style="width:0%"></div></div>
+          <span class="goal-count"><span id="goal-done">0</span>/<span id="goal-total">10</span></span>
+        </div>
+      </section>
+
+      <!-- SCREEN: GAME -->
+      <section class="screen" id="screen-game" aria-label="Game" aria-live="polite">
+
+        <!-- Word Stage -->
+        <div class="word-stage" id="word-stage">
+          <div class="word-image-wrap" id="word-image-wrap" aria-hidden="true">
+            <div class="word-emoji" id="word-emoji"></div>
+          </div>
+          <div class="word-display" id="word-display" aria-label="Current word" role="img" aria-live="off"></div>
+          <div class="phoneme-row" id="phoneme-row" role="list" aria-label="Word sounds"></div>
+          <p class="mode-instruction" id="mode-instruction" role="status" aria-live="polite"></p>
+        </div>
+
+        <!-- Mode Area -->
+        <div class="mode-area" id="mode-area" role="group" aria-label="Answer choices"></div>
+
+        <!-- Action Bar -->
+        <div class="action-bar" id="action-bar">
+          <button class="btn btn--ghost" id="btn-say-it" aria-label="Hear the word spoken aloud">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18" aria-hidden="true">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/>
+            </svg>
+            Say It
+          </button>
+          <button class="btn btn--primary" id="btn-check" aria-label="Check my answer">Check ✓</button>
+          <button class="btn btn--ghost" id="btn-skip" aria-label="Skip this word">Skip →</button>
+        </div>
+
+        <!-- Mic Button -->
+        <button class="mic-btn" id="btn-mic" aria-label="Say the word to score yourself" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+            <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>
+          </svg>
+        </button>
+
+        <div class="speech-bubble" id="speech-bubble" aria-live="polite" hidden></div>
+
+        <button class="back-btn" id="btn-back" aria-label="Back to menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          Menu
+        </button>
+
+      </section>
+
+      <!-- SCREEN: STORIES -->
+      <section class="screen" id="screen-stories" aria-label="Giri story library">
+        <div class="stories-screen-header">
+          <button class="icon-btn" id="btn-stories-back" aria-label="Back to home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20" aria-hidden="true">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+          </button>
+          <h2 class="stories-screen-title">Giri Stories</h2>
+          <div class="stories-screen-mascot" aria-hidden="true">
+            <img src="/blending/images/mascot/giri-celebrate.png" alt="" draggable="false" width="38" height="38" style="object-fit:contain"/>
+          </div>
+        </div>
+        <div id="stories-content" class="stories-content"></div>
+      </section>
+
+      <!-- SCREEN: LETTER SOUNDS -->
+      <section class="screen" id="screen-letter-sounds" aria-label="Letter sounds introduction">
+        <div class="stories-screen-header">
+          <button class="icon-btn" id="btn-ls-back" aria-label="Back to home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20" aria-hidden="true">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+          </button>
+          <h2 class="stories-screen-title">Letter Sounds</h2>
+          <div class="stories-screen-mascot" aria-hidden="true">
+            <img src="/blending/images/mascot/giri-whiteboard.png" alt="" draggable="false" width="38" height="38" style="object-fit:contain"/>
+          </div>
+        </div>
+        <div id="ls-content" class="stories-content"></div>
+      </section>
+
+      <!-- SCREEN: SIGHT WORD MATCH -->
+      <section class="screen" id="screen-sight-match" aria-label="Sight word matching game">
+        <div class="stories-screen-header">
+          <button class="icon-btn" id="btn-sm-back" aria-label="Back to home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20" aria-hidden="true">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+          </button>
+          <h2 class="stories-screen-title">Sight Words</h2>
+          <span style="font-size:1.6rem" aria-hidden="true">🃏</span>
+        </div>
+        <div id="sight-match-content" class="stories-content"></div>
+      </section>
+
+      <!-- SCREEN: RESULT -->
+      <section class="screen" id="screen-result" aria-label="Round result" aria-live="assertive">
+        <div class="result-mascot" id="result-mascot" aria-hidden="true"></div>
+        <p class="result-badge" id="result-badge"></p>
+        <h2 class="result-message" id="result-message"></h2>
+        <div class="result-word-display" id="result-word-display"></div>
+        <div class="result-xp" id="result-xp" aria-live="polite"></div>
+        <button class="btn btn--primary btn--xl" id="btn-next">Next Word! →</button>
+      </section>
+
+    </main>
+
+    <!-- Floating mascot -->
+    <div class="mascot-float" id="mascot" aria-hidden="true"></div>
+
+    <!-- Toast notifications -->
+    <div class="toast-container" id="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Confetti canvas -->
+    <canvas id="confetti-canvas" aria-hidden="true"
+            style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999;"></canvas>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal-overlay" id="modal-settings" role="dialog" aria-modal="true" aria-label="Settings" hidden>
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h2 class="modal-title">Settings</h2>
+          <button class="modal-close" aria-label="Close settings" data-close="modal-settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <section class="settings-group">
+            <h3 class="settings-label">Theme</h3>
+            <div class="theme-swatches" role="group" aria-label="Color themes">
+              <button class="theme-swatch active" data-theme="default" aria-label="Default purple" aria-pressed="true">
+                <span class="swatch-dot" style="background:#6c63ff"></span>
+              </button>
+              <button class="theme-swatch" data-theme="ocean" aria-label="Ocean blue" aria-pressed="false">
+                <span class="swatch-dot" style="background:#0ea5e9"></span>
+              </button>
+              <button class="theme-swatch" data-theme="forest" aria-label="Forest green" aria-pressed="false">
+                <span class="swatch-dot" style="background:#22c55e"></span>
+              </button>
+              <button class="theme-swatch" data-theme="sunset" aria-label="Sunset orange" aria-pressed="false">
+                <span class="swatch-dot" style="background:#f97316"></span>
+              </button>
+              <button class="theme-swatch" data-theme="contrast" aria-label="High contrast" aria-pressed="false">
+                <span class="swatch-dot" style="background:#000"></span>
+              </button>
+              <button class="theme-swatch theme-swatch--text" data-theme="dyslexia" aria-label="Dyslexia-friendly (Lexend font)" aria-pressed="false">
+                <span class="swatch-dot swatch-dot--text" style="background:#fdf9f0;border:2px solid #d6c9b0;color:#2b1f0a;font-family:'Lexend',sans-serif;font-size:0.55rem;font-weight:700;display:flex;align-items:center;justify-content:center;">Aa</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="settings-group">
+            <h3 class="settings-label">Audio</h3>
+            <label class="toggle-row">
+              <span>Sound Effects</span>
+              <span class="toggle-wrap">
+                <input type="checkbox" id="sfx-toggle" role="switch" checked />
+                <span class="toggle-track" aria-hidden="true"></span>
+              </span>
+            </label>
+            <label class="toggle-row">
+              <span>Auto-play word</span>
+              <span class="toggle-wrap">
+                <input type="checkbox" id="autoplay-toggle" role="switch" checked />
+                <span class="toggle-track" aria-hidden="true"></span>
+              </span>
+            </label>
+            <div class="slider-row">
+              <label for="voice-speed">Voice Speed</label>
+              <input type="range" id="voice-speed" min="0.5" max="1.5" step="0.1" value="0.8" />
+              <span id="voice-speed-display">0.8×</span>
+            </div>
+          </section>
+
+          <section class="settings-group">
+            <h3 class="settings-label">Difficulty</h3>
+            <div class="diff-group" role="group" aria-label="Difficulty">
+              <button class="diff-btn active" data-diff="1" aria-pressed="true">Starter</button>
+              <button class="diff-btn" data-diff="2" aria-pressed="false">Explorer</button>
+              <button class="diff-btn" data-diff="3" aria-pressed="false">Champion</button>
+            </div>
+          </section>
+
+          <section class="settings-group">
+            <h3 class="settings-label">Daily Goal</h3>
+            <div class="slider-row">
+              <label for="goal-range">Words per day</label>
+              <input type="range" id="goal-range" min="5" max="30" step="5" value="10" />
+              <span id="goal-range-display">10</span>
+            </div>
+          </section>
+
+          <section class="settings-group">
+            <button class="btn btn--danger" id="reset-progress-btn">Reset All Progress</button>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD MODAL -->
+    <div class="modal-overlay" id="modal-dashboard" role="dialog" aria-modal="true" aria-label="Parent Dashboard" hidden>
+      <div class="modal-panel modal-panel--wide">
+        <div class="modal-header">
+          <h2 class="modal-title">Parent Dashboard</h2>
+          <button class="modal-close" aria-label="Close dashboard" data-close="modal-dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body" id="dashboard-content"><!-- Injected by dashboard.js --></div>
+      </div>
+    </div>
+
+    <!-- CREATE PROFILE MODAL -->
+    <div class="modal-overlay" id="modal-create-profile" role="dialog" aria-modal="true" aria-label="Create player profile" hidden>
+      <div class="modal-panel modal-panel--sm">
+        <div class="modal-header">
+          <h2 class="modal-title">New Player</h2>
+          <button class="modal-close" aria-label="Cancel" data-close="modal-create-profile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="cp-avatar-row" role="group" aria-label="Choose an avatar" id="cp-avatar-row"></div>
+          <input type="text" id="cp-name-input" class="cp-name-input" maxlength="20"
+                 placeholder="Name (e.g. Liam)" aria-label="Player name" autocomplete="off" />
+          <button class="btn btn--primary btn--full" id="cp-confirm-btn">Create Profile →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PIN MODAL -->
+    <div class="modal-overlay" id="modal-pin" role="dialog" aria-modal="true" aria-label="Enter PIN" hidden>
+      <div class="modal-panel modal-panel--sm">
+        <div class="modal-header">
+          <h2 class="modal-title">Parent Area</h2>
+        </div>
+        <div class="modal-body pin-body">
+          <p>Enter your 4-digit PIN:</p>
+          <div class="pin-inputs">
+            <input type="password" inputmode="numeric" maxlength="1" class="pin-digit" data-index="0" aria-label="PIN digit 1"/>
+            <input type="password" inputmode="numeric" maxlength="1" class="pin-digit" data-index="1" aria-label="PIN digit 2"/>
+            <input type="password" inputmode="numeric" maxlength="1" class="pin-digit" data-index="2" aria-label="PIN digit 3"/>
+            <input type="password" inputmode="numeric" maxlength="1" class="pin-digit" data-index="3" aria-label="PIN digit 4"/>
+          </div>
+          <p class="pin-hint" id="pin-hint" aria-live="polite"></p>
+          <button class="btn btn--primary" id="pin-confirm-btn">Enter</button>
+          <button class="btn btn--ghost btn--sm" id="pin-cancel-btn">Cancel</button>
+          <p class="pin-setup-hint">First time? Use <strong>1234</strong></p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /#app -->
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
