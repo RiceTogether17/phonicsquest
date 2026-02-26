@@ -28,6 +28,9 @@ import {
   getDailyChallengeWords, isDailyChallengeComplete,
   completeDailyChallenge, DAILY_BONUS_XP,
 } from './modules/dailyChallenge.js';
+import {
+  CURRICULUM, PHASE_LABELS, getUnlockedStages, getRecommendedStage,
+} from './data/curriculum.js';
 
 class App {
   constructor() {
@@ -133,7 +136,15 @@ class App {
       card.addEventListener('click', () => {
         this._mode = card.dataset.mode;
         store.set('currentMode', this._mode);
-        this._startGame();
+        if (this._mode === 'blend') {
+          // Show curriculum stage picker before starting Blend It!
+          this._openBlendPicker();
+        } else {
+          // For Listen & Blend, respect the saved category so the first word
+          // matches the dropdown that is pre-populated from the store.
+          // For all other modes keep the same behaviour as _nextWord().
+          this._startGame(store.get('currentGroup') || undefined);
+        }
       });
     });
 
@@ -862,6 +873,94 @@ class App {
       mascot.setHomeState('holdCard');
     }
     audio.playSfx('correct');
+  }
+
+  // ── Blend Curriculum Picker ──
+
+  /**
+   * Show a modal curriculum stage browser for Blend It!
+   * Groups stages by phase, shows lock/unlock & mastery, highlights recommended.
+   */
+  _openBlendPicker() {
+    const groupMastery = store.get('groupMastery') || {};
+    const unlocked     = getUnlockedStages(groupMastery);
+    const recommended  = getRecommendedStage(groupMastery);
+
+    // Remove stale picker if any
+    document.getElementById('modal-blend-picker')?.remove();
+
+    // Group stages by phase
+    const byPhase = {};
+    for (const stage of CURRICULUM) {
+      (byPhase[stage.phase] ??= []).push(stage);
+    }
+
+    let stagesHtml = '';
+    for (const [phaseNum, stages] of Object.entries(byPhase)) {
+      const phaseLabel = PHASE_LABELS[phaseNum] || `Phase ${phaseNum}`;
+      stagesHtml += `<div class="bp-phase-header">${phaseLabel}</div><div class="bp-phase-stages">`;
+
+      for (const stage of stages) {
+        const isUnlocked = unlocked.includes(stage.id);
+        const isRec      = recommended?.id === stage.id;
+        const mastery    = groupMastery[stage.group] ?? 0;
+        const pct        = Math.round(mastery * 100);
+        const lockedCls  = isUnlocked ? '' : 'bp-stage--locked';
+        const recCls     = isRec      ? 'bp-stage--recommended' : '';
+
+        stagesHtml += `
+          <button class="bp-stage ${lockedCls} ${recCls}"
+                  data-group="${stage.group}"
+                  ${isUnlocked ? '' : 'disabled aria-disabled="true"'}
+                  aria-label="${stage.name}${isRec ? ' – Recommended' : ''}${!isUnlocked ? ' – Locked' : ''}">
+            <span class="bp-stage-icon">${isUnlocked ? stage.icon : '🔒'}</span>
+            <div class="bp-stage-info">
+              <div class="bp-stage-name">
+                ${stage.name}${isRec ? '<span class="bp-rec-badge">★ Next</span>' : ''}
+              </div>
+              <div class="bp-stage-desc">${stage.description}</div>
+              ${isUnlocked ? `
+                <div class="bp-stage-mastery-wrap">
+                  <div class="bp-stage-mastery-bar" style="width:${pct}%"></div>
+                </div>` : ''}
+            </div>
+          </button>`;
+      }
+      stagesHtml += '</div>';
+    }
+
+    const modal = document.createElement('div');
+    modal.id        = 'modal-blend-picker';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-panel bp-panel">
+        <div class="modal-header">
+          <h2 class="modal-title">🎯 Choose Your Stage</h2>
+          <button class="modal-close" id="bp-close-btn" aria-label="Close picker">✕</button>
+        </div>
+        <div class="bp-stages-list">${stagesHtml}</div>
+      </div>`;
+
+    document.body.appendChild(modal);
+
+    // Stage click → start game with that group
+    modal.querySelectorAll('.bp-stage:not([disabled])').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const group = btn.dataset.group;
+        store.set('currentGroup', group);
+        modal.remove();
+        this._startGame(group);
+      });
+    });
+
+    document.getElementById('bp-close-btn')?.addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+
+    // Scroll recommended stage into view
+    setTimeout(() => {
+      modal.querySelector('.bp-stage--recommended')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 120);
   }
 
   // ── Daily Challenge ──

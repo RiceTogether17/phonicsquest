@@ -236,6 +236,36 @@ export const CURRICULUM = [
     icon: '🚀', group: 'blends', level: 3,
     requiredMastery: 0.70, prerequisite: 'digraphs',
   },
+
+  /* ── Phase 8: Suffixes ────────────────────────────────────────────── */
+  {
+    id: 'suffix-ing', phase: 8,
+    name: '-ing Words',
+    description: 'running, jumping, sitting…',
+    icon: '🏃', group: 'suffix-ing', level: 2,
+    requiredMastery: 0.70, prerequisite: 'blends-review',
+  },
+  {
+    id: 'suffix-ed', phase: 8,
+    name: '-ed Words',
+    description: 'jumped, helped, picked…',
+    icon: '✅', group: 'suffix-ed', level: 2,
+    requiredMastery: 0.70, prerequisite: 'suffix-ing',
+  },
+  {
+    id: 'suffix-er', phase: 8,
+    name: '-er Words',
+    description: 'faster, taller, bigger…',
+    icon: '📈', group: 'suffix-er', level: 2,
+    requiredMastery: 0.70, prerequisite: 'suffix-ed',
+  },
+  {
+    id: 'suffix-est', phase: 8,
+    name: '-est Words',
+    description: 'fastest, tallest, biggest…',
+    icon: '🏆', group: 'suffix-est', level: 2,
+    requiredMastery: 0.70, prerequisite: 'suffix-er',
+  },
 ];
 
 /** Phase labels for UI display */
@@ -247,6 +277,7 @@ export const PHASE_LABELS = {
   5: 'Phase 5 – Long Vowels',
   6: 'Phase 6 – Diphthongs',
   7: 'Phase 7 – Advanced',
+  8: 'Phase 8 – Suffixes',
 };
 
 /**
