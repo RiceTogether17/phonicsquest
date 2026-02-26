@@ -490,9 +490,9 @@ class App {
 
       this._showResultScreen(false, word, null);
 
-      if (result.gameOver) {
-        this._showToast('Hearts refilled! Take a break?', 'warning');
-        setTimeout(() => gamification.refillHearts(), 2000);
+      if (result.needsRest) {
+        this._showToast('Take a short break — Giri needs rest! ⭐', 'warning');
+        setTimeout(() => gamification.resetEnergy(), 2000);
       }
     }
   }
@@ -665,6 +665,12 @@ class App {
       document.getElementById('goal-total').textContent = val;
     });
 
+    // Reduced motion toggle
+    document.getElementById('reduced-motion-toggle')?.addEventListener('change', (e) => {
+      store.set('reducedMotion', e.target.checked);
+      document.documentElement.setAttribute('data-reduced-motion', e.target.checked ? 'true' : 'false');
+    });
+
     // Reset progress
     document.getElementById('reset-progress-btn')?.addEventListener('click', () => {
       if (confirm('This will erase all progress. Are you sure?')) {
@@ -701,6 +707,13 @@ class App {
     if (goalRange) goalRange.value = goal;
     const goalDisplay = document.getElementById('goal-range-display');
     if (goalDisplay) goalDisplay.textContent = goal;
+
+    const reducedMotion = document.getElementById('reduced-motion-toggle');
+    if (reducedMotion) reducedMotion.checked = store.get('reducedMotion') ?? false;
+    document.documentElement.setAttribute(
+      'data-reduced-motion',
+      store.get('reducedMotion') ? 'true' : 'false'
+    );
   }
 
   _applyTheme(theme) {

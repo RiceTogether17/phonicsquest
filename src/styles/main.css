@@ -327,6 +327,22 @@ input, select, textarea { font-family: inherit; }
 .stat-icon { font-size: 14px; line-height: 1; }
 .stat-value { color: var(--text); min-width: 18px; text-align: center; }
 
+/* Giri Energy stars */
+.energy-display {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.energy-star {
+  font-size: 16px;
+  line-height: 1;
+  transition: opacity var(--dur-fast);
+}
+.energy-star--empty {
+  opacity: 0.3;
+  filter: grayscale(1);
+}
+
 .header-actions {
   display: flex;
   align-items: center;
@@ -1612,12 +1628,46 @@ input, select, textarea { font-family: inherit; }
   .btn--hint-pulse { animation: none; }
 }
 
+/* Manual reduced-motion override (Settings toggle) */
+[data-reduced-motion="true"] *,
+[data-reduced-motion="true"] *::before,
+[data-reduced-motion="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+[data-reduced-motion="true"] .mascot-home,
+[data-reduced-motion="true"] .word-emoji { animation: none; }
+[data-reduced-motion="true"] .phoneme-tile--pop .phoneme-symbol { animation: none; }
+[data-reduced-motion="true"] .phoneme-row--shake { animation: none; }
+[data-reduced-motion="true"] .stat-chip--bump { animation: none; }
+[data-reduced-motion="true"] .btn--hint-pulse { animation: none; }
+
 /* ── 18. RESPONSIVE ── */
 @media (max-width: 360px) {
   .mode-grid { grid-template-columns: 1fr 1fr; }
   .header-stats .stat-chip:last-child { display: none; }
   .choice-grid { grid-template-columns: 1fr; }
   .letter-tile { min-width: 52px; height: 60px; font-size: var(--font-size-xl); }
+}
+
+/* 7–10" tablets: enlarge touch targets ~30% */
+@media (min-width: 600px) {
+  #app { max-width: 640px; }
+
+  /* Enforce 44px minimum touch targets on interactive elements */
+  .choice-btn,
+  .letter-tile,
+  .mode-card,
+  .diff-btn { min-height: 56px; }
+
+  .action-bar .btn { min-height: 52px; font-size: var(--font-size-md); padding: 14px 24px; }
+
+  .phoneme-tile { padding: 8px 14px; }
+
+  .header-stats .stat-chip { padding: 6px 14px; }
+
+  .icon-btn { width: 48px; height: 48px; }
 }
 
 @media (min-height: 700px) {

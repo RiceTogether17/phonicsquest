@@ -12,7 +12,9 @@ const DEFAULT_STATE = {
   // Gamification
   xp:        0,
   level:     1,
-  hearts:    5,
+  // Giri Energy: 3 stars per session (non-punitive, resets each session)
+  // hearts key kept for backward-compat but ignored by new UI
+  energy:    3,
   streak:    0,
   bestStreak: 0,
   lastPlayDate: null,
@@ -20,12 +22,13 @@ const DEFAULT_STATE = {
   dailyDone: 0,
 
   // Settings
-  theme:        'default',
-  difficulty:   1,          // 1 | 2 | 3
-  sfxEnabled:   true,
-  autoplay:     true,
-  voiceSpeed:   0.8,
-  parentPin:    null,       // hashed PIN
+  theme:          'default',
+  difficulty:     1,        // 1 | 2 | 3
+  sfxEnabled:     true,
+  autoplay:       true,
+  voiceSpeed:     0.8,
+  parentPin:      null,     // hashed PIN
+  reducedMotion:  false,    // manual override for prefers-reduced-motion
 
   // Progress (per-word stats)
   wordStats: {},            // { [wordId]: { attempts, correct, lastSeen } }
@@ -188,6 +191,16 @@ class Store {
   /** Increment daily goal counter. */
   incrementDailyDone() {
     this.set('dailyDone', this._state.dailyDone + 1);
+  }
+
+  /** Reset Giri Energy to full (3 stars) for a new session. */
+  resetEnergy() {
+    this.set('energy', 3);
+  }
+
+  /** Deduct one energy star (min 0). */
+  drainEnergy() {
+    this.set('energy', Math.max(0, this._state.energy - 1));
   }
 }
 
