@@ -63,6 +63,7 @@ export const STORIES = [
     level: 1,
     emoji: '🎩',
     mascotState: 'holdCard',
+    illustration: 'giri_level01_story01_red-hat.png.jpg',
     lines: [
       { type: 'intro',   text: 'Giri sat in the hot pot. The red hat sat on top.' },
       { type: 'label',   text: 'Problem:' },
@@ -86,6 +87,7 @@ export const STORIES = [
     level: 1,
     emoji: '🍲',
     mascotState: 'encourage',
+    illustration: 'giri_level01_story02_pot.png.jpg',
     lines: [
       { type: 'intro',   text: 'Giri had a big pot on the mat.' },
       { type: 'label',   text: 'Problem:' },
@@ -109,6 +111,7 @@ export const STORIES = [
     level: 1,
     emoji: '🍞',
     mascotState: 'neutral',
+    illustration: 'giri_level01_story03_bun.png.jpg',
     lines: [
       { type: 'intro',   text: 'Giri met a fat bun on the rug.' },
       { type: 'label',   text: 'Problem:' },
@@ -132,6 +135,7 @@ export const STORIES = [
     level: 1,
     emoji: '💧',
     mascotState: 'encourage',
+    illustration: 'giri_level01_story04_wet.png.jpg',
     lines: [
       { type: 'intro',   text: 'Giri ran to the sink. The sink had suds.' },
       { type: 'label',   text: 'Problem:' },
@@ -157,6 +161,7 @@ export const STORIES = [
     level: 2,
     emoji: '🎂',
     mascotState: 'holdCard',
+    illustration: 'giri_level02_story01_bake-cake.png.jpg',
     lines: [
       { type: 'intro',   text: 'Giri had a big cake to bake.' },
       { type: 'label',   text: 'Problem:' },
@@ -180,6 +185,7 @@ export const STORIES = [
     level: 2,
     emoji: '⛵',
     mascotState: 'celebrate',
+    illustration: 'giri_level02_story02_speedy-boat.png.jpg',
     lines: [
       { type: 'intro',   text: 'Giri had a speedy boat on the lake.' },
       { type: 'label',   text: 'Problem:' },
@@ -203,6 +209,7 @@ export const STORIES = [
     level: 2,
     emoji: '🐝',
     mascotState: 'pointRight',
+    illustration: 'giri_level02_story03_helps-bee.png.jpg',
     lines: [
       { type: 'intro',   text: 'Giri met a bee by the tree.' },
       { type: 'label',   text: 'Problem:' },
@@ -226,6 +233,7 @@ export const STORIES = [
     level: 2,
     emoji: '🎡',
     mascotState: 'clap',
+    illustration: 'giri_level02_story04_big-day.png.jpg',
     lines: [
       { type: 'intro',   text: 'Giri went to the fair with the big cake.' },
       { type: 'label',   text: 'Problem:' },
@@ -251,6 +259,7 @@ export const STORIES = [
     level: 3,
     emoji: '⛈️',
     mascotState: 'thinking',
+    illustration: 'giri_level03_story01_big-storm.png.jpg',
     lines: [
       { type: 'intro',   text: 'Giri saw a big storm.' },
       { type: 'label',   text: 'Problem:' },
@@ -274,6 +283,7 @@ export const STORIES = [
     level: 3,
     emoji: '⭐',
     mascotState: 'celebrate',
+    illustration: 'giri_level03_story02_finds-star.png.jpg',
     lines: [
       { type: 'intro',   text: 'Giri walked at night.' },
       { type: 'label',   text: 'Problem:' },
@@ -297,6 +307,7 @@ export const STORIES = [
     level: 3,
     emoji: '🐦',
     mascotState: 'pointLeft',
+    illustration: 'giri_level03_story03_clever-bird.png.jpg',
     lines: [
       { type: 'intro',   text: 'A bird sat on the branch.' },
       { type: 'label',   text: 'Problem:' },
@@ -320,6 +331,7 @@ export const STORIES = [
     level: 3,
     emoji: '🏪',
     mascotState: 'whiteboard',
+    illustration: 'giri_level03_story04_market.png.jpg',
     lines: [
       { type: 'intro',   text: 'Giri went to the market.' },
       { type: 'label',   text: 'Problem:' },
@@ -345,6 +357,7 @@ export const STORIES = [
     level: 4,
     emoji: '🎡',
     mascotState: 'celebrate',
+    illustration: 'giri_level04_story01_at-the-fair.png.jpg',
     lines: [
       { type: 'intro',   text: 'Giri saw a pair of chairs at the fair.' },
       { type: 'label',   text: 'Problem:' },
@@ -368,6 +381,7 @@ export const STORIES = [
     level: 4,
     emoji: '🎶',
     mascotState: 'clap',
+    illustration: 'giri_level04_story02_joyful-noise.png.jpg',
     lines: [
       { type: 'intro',   text: 'Giri heard a joyful noise.' },
       { type: 'label',   text: 'Problem:' },
@@ -391,6 +405,7 @@ export const STORIES = [
     level: 4,
     emoji: '🪑',
     mascotState: 'thinking',
+    illustration: 'giri_level04_story03_repairs-chair.png.jpg',
     lines: [
       { type: 'intro',   text: 'The old chair had a big tear.' },
       { type: 'label',   text: 'Problem:' },
@@ -414,6 +429,7 @@ export const STORIES = [
     level: 4,
     emoji: '🎉',
     mascotState: 'confetti',
+    illustration: 'giri_level04_story04_hears-cheer.png.jpg',
     lines: [
       { type: 'intro',   text: 'One clear day Giri sat near the big steamer.' },
       { type: 'label',   text: 'Problem:' },

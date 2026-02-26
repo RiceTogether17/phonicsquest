@@ -19,23 +19,6 @@ const BASE = import.meta.env.BASE_URL;
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
-function mascotSrc(state) {
-  const MAP = {
-    neutral:   'giri-neutral.png',
-    celebrate: 'giri-celebrate.png',
-    confetti:  'giri-celebrate-confetti.png',
-    clap:      'giri-clap-frame.png',
-    encourage: 'giri-encourage.png',
-    holdCard:  'giri-hold-card.png',
-    pointLeft: 'giri-point-left.png',
-    pointRight:'giri-point-right.png',
-    thinking:  'giri-thinking.png',
-    trophy:    'giri-trophy.png',
-    whiteboard:'giri-whiteboard.png',
-  };
-  return `${BASE}images/mascot/${MAP[state] ?? MAP.neutral}`;
-}
-
 /** Look up a word token in the word bank (case/punct insensitive). */
 function lookupWord(token) {
   const clean = token.toLowerCase().replace(/[^a-z]/g, '');
@@ -105,12 +88,11 @@ function _renderBrowser() {
     <button class="story-card" data-story-id="${s.id}">
       <div class="story-card-illo" style="background:${levelMeta.bg}">
         <img
-          src="${mascotSrc(s.mascotState)}"
-          alt="Giri"
+          src="${BASE}images/stories/${s.illustration}"
+          alt="${s.title}"
           class="story-card-mascot"
           draggable="false"
         />
-        <span class="story-card-prop">${s.emoji}</span>
       </div>
       <span class="story-card-title">${s.title}</span>
       <span class="story-card-level" style="color:${levelMeta.color}">Level ${s.level}</span>
@@ -160,9 +142,8 @@ function _renderReader(story) {
 
       <!-- Illustration header -->
       <div class="story-illo" style="--level-color:${levelMeta.color};--level-bg:${levelMeta.bg}">
-        <img src="${mascotSrc(story.mascotState)}" alt="Giri — ${story.title}"
+        <img src="${BASE}images/stories/${story.illustration}" alt="${story.title}"
              class="story-illo-mascot" draggable="false"/>
-        <span class="story-illo-prop">${story.emoji}</span>
         <div class="story-illo-steam"><span></span><span></span><span></span></div>
       </div>
 
