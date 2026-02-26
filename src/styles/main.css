@@ -312,6 +312,17 @@ input, select, textarea { font-family: inherit; }
   padding: 4px 10px;
   font-size: var(--font-size-sm);
   font-weight: 800;
+  transition: background var(--dur-fast), border-color var(--dur-fast);
+}
+
+/* Bump animation when stat value changes */
+.stat-chip--bump {
+  animation: stat-bump 0.35s var(--ease-bounce);
+}
+@keyframes stat-bump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
 }
 .stat-icon { font-size: 14px; line-height: 1; }
 .stat-value { color: var(--text); min-width: 18px; text-align: center; }
@@ -680,6 +691,30 @@ input, select, textarea { font-family: inherit; }
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* Pop-in animation for newly revealed phoneme tiles (Blend It! mode) */
+.phoneme-tile--pop .phoneme-symbol {
+  animation: tile-pop 0.4s var(--ease-bounce) both;
+}
+@keyframes tile-pop {
+  0%   { transform: scale(0.3) translateY(12px); opacity: 0; }
+  65%  { transform: scale(1.2) translateY(-4px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* Shake entire phoneme row on wrong answer */
+.phoneme-row--shake {
+  animation: shake 0.45s ease;
+}
+
+/* Hint button highlight pulse */
+.btn--hint-pulse {
+  animation: hint-pulse 1s ease-in-out 3;
+}
+@keyframes hint-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 4px 0 rgba(0,0,0,0.12); }
+  50%       { transform: scale(1.08); box-shadow: 0 6px 16px rgba(245,158,11,0.5); }
+}
+
 .phoneme-diacritic {
   font-size: var(--font-size-xs);
   color: var(--text-muted);
@@ -936,6 +971,20 @@ input, select, textarea { font-family: inherit; }
   box-shadow: 0 4px 0 #b91c1c;
 }
 .btn--danger:hover { filter: brightness(1.08); }
+
+.btn--hint {
+  background: var(--color-warning);
+  color: var(--text-on-dark);
+  box-shadow: 0 4px 0 #b45309;
+}
+.btn--hint:hover { filter: brightness(1.08); transform: translateY(-2px); box-shadow: 0 6px 0 #b45309; }
+.btn--hint:active { transform: translateY(0); box-shadow: 0 2px 0 #b45309; }
+.btn--hint.used {
+  background: var(--surface-2);
+  color: var(--text-muted);
+  box-shadow: 0 3px 0 var(--border);
+  opacity: 0.7;
+}
 
 .btn--sm { padding: var(--space-2) var(--space-4); font-size: var(--font-size-sm); }
 .btn--xl {
@@ -1557,6 +1606,10 @@ input, select, textarea { font-family: inherit; }
     transition-duration: 0.01ms !important;
   }
   .mascot-home, .word-emoji { animation: none; }
+  .phoneme-tile--pop .phoneme-symbol { animation: none; }
+  .phoneme-row--shake { animation: none; }
+  .stat-chip--bump { animation: none; }
+  .btn--hint-pulse { animation: none; }
 }
 
 /* ── 18. RESPONSIVE ── */

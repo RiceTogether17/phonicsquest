@@ -158,6 +158,17 @@ class Gamification {
     this._sessionWrong   = 0;
   }
 
+  /** Trigger a brief pop/bump on a stat chip element */
+  _bumpChip(el) {
+    if (!el) return;
+    const chip = el.closest('.stat-chip');
+    if (!chip) return;
+    chip.classList.remove('stat-chip--bump');
+    void chip.offsetWidth; // reflow to restart animation
+    chip.classList.add('stat-chip--bump');
+    chip.addEventListener('animationend', () => chip.classList.remove('stat-chip--bump'), { once: true });
+  }
+
   /** Update all header UI elements */
   _updateUI() {
     const heartsEl = document.getElementById('hearts-val');
@@ -170,9 +181,18 @@ class Gamification {
     const goalDone = document.getElementById('goal-done');
     const goalTotal = document.getElementById('goal-total');
 
+    const prevHearts = heartsEl ? Number(heartsEl.textContent) : null;
+    const prevXp     = xpEl     ? Number(xpEl.textContent)     : null;
+    const prevStreak = streakEl  ? Number(streakEl.textContent)  : null;
+
     if (heartsEl) heartsEl.textContent = store.get('hearts');
     if (streakEl) streakEl.textContent = store.get('streak');
     if (xpEl) xpEl.textContent = store.get('xp');
+
+    // Bump chips when values increase
+    if (prevHearts !== null && store.get('hearts') < prevHearts) this._bumpChip(heartsEl);
+    if (prevXp     !== null && store.get('xp')     > prevXp)     this._bumpChip(xpEl);
+    if (prevStreak !== null && store.get('streak')  > prevStreak) this._bumpChip(streakEl);
 
     const { level, progress } = getLevelInfo(store.get('xp'));
     if (levelEl) levelEl.textContent = level;
