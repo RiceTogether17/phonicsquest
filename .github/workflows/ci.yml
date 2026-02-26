@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, 'claude/**', 'feature/**']
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    name: Build & Verify
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify build output
+        run: |
+          echo "--- Build output ---"
+          ls -lh docs/
+          echo "--- Asset check ---"
+          test -f docs/index.html && echo "✓ index.html present"
+          test -d docs/assets     && echo "✓ assets/ dir present"
+          test -f docs/sw.js      && echo "✓ sw.js present"
+          test -f docs/manifest.json && echo "✓ manifest.json present"
+          echo "--- Audio files ---"
+          ls docs/audio/phonemes/*.mp3 | wc -l | xargs echo "Phoneme MP3 count:"
+          echo "--- Image files ---"
+          ls docs/images/mascot/*.png | wc -l | xargs echo "Mascot PNG count:"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: phonicsquest-build
+          path: docs/
+          retention-days: 7

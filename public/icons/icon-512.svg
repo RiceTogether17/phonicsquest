@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6c63ff"/>
+      <stop offset="100%" style="stop-color:#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded rect -->
+  <rect width="512" height="512" rx="100" ry="100" fill="url(#bg)"/>
+  <rect width="512" height="256" rx="100" ry="100" fill="url(#shine)"/>
+
+  <!-- Dumpling body (Giri) -->
+  <ellipse cx="256" cy="316" rx="138" ry="118" fill="#fff5e6"/>
+  <ellipse cx="256" cy="316" rx="138" ry="118" fill="none" stroke="#f59e0b" stroke-width="8"/>
+
+  <!-- Steam wisps -->
+  <path d="M192 192 Q182 160 192 132 Q202 104 192 76" fill="none" stroke="white" stroke-width="10" stroke-linecap="round" opacity="0.8"/>
+  <path d="M256 180 Q246 148 256 120 Q266 92 256 64" fill="none" stroke="white" stroke-width="10" stroke-linecap="round" opacity="0.8"/>
+  <path d="M320 192 Q310 160 320 132 Q330 104 320 76" fill="none" stroke="white" stroke-width="10" stroke-linecap="round" opacity="0.8"/>
+
+  <!-- Eyes -->
+  <circle cx="224" cy="298" r="19" fill="#1f2937"/>
+  <circle cx="288" cy="298" r="19" fill="#1f2937"/>
+  <circle cx="230" cy="292" r="7" fill="white"/>
+  <circle cx="294" cy="292" r="7" fill="white"/>
+
+  <!-- Smile -->
+  <path d="M218 342 Q256 374 294 342" fill="none" stroke="#1f2937" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- Rosy cheeks -->
+  <circle cx="196" cy="328" r="22" fill="#f9a8d4" opacity="0.6"/>
+  <circle cx="316" cy="328" r="22" fill="#f9a8d4" opacity="0.6"/>
+
+  <!-- Folded top -->
+  <path d="M160 268 Q256 232 352 268" fill="none" stroke="#f59e0b" stroke-width="8" stroke-linecap="round"/>
+  <path d="M192 252 Q256 220 320 252" fill="none" stroke="#f59e0b" stroke-width="5" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Text -->
+  <text x="256" y="406" font-family="Arial, sans-serif" font-weight="800" font-size="58" fill="#6c63ff" text-anchor="middle">PQ</text>
+</svg>

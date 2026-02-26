@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6c63ff"/>
+      <stop offset="100%" style="stop-color:#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded rect -->
+  <rect width="192" height="192" rx="40" ry="40" fill="url(#bg)"/>
+  <rect width="192" height="96" rx="40" ry="40" fill="url(#shine)"/>
+
+  <!-- Dumpling body (Giri) -->
+  <ellipse cx="96" cy="118" rx="52" ry="44" fill="#fff5e6"/>
+  <ellipse cx="96" cy="118" rx="52" ry="44" fill="none" stroke="#f59e0b" stroke-width="3"/>
+
+  <!-- Steam wisps -->
+  <path d="M72 72 Q68 60 72 50 Q76 40 72 30" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+  <path d="M96 68 Q92 56 96 46 Q100 36 96 26" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+  <path d="M120 72 Q116 60 120 50 Q124 40 120 30" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+
+  <!-- Eyes -->
+  <circle cx="84" cy="112" r="7" fill="#1f2937"/>
+  <circle cx="108" cy="112" r="7" fill="#1f2937"/>
+  <circle cx="86" cy="110" r="2.5" fill="white"/>
+  <circle cx="110" cy="110" r="2.5" fill="white"/>
+
+  <!-- Smile -->
+  <path d="M82 128 Q96 140 110 128" fill="none" stroke="#1f2937" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- Rosy cheeks -->
+  <circle cx="74" cy="124" r="8" fill="#f9a8d4" opacity="0.6"/>
+  <circle cx="118" cy="124" r="8" fill="#f9a8d4" opacity="0.6"/>
+
+  <!-- Folded top -->
+  <path d="M60 100 Q96 86 132 100" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+  <path d="M72 94 Q96 82 120 94" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Letter P on body -->
+  <text x="96" y="152" font-family="Arial, sans-serif" font-weight="800" font-size="22" fill="#6c63ff" text-anchor="middle">PQ</text>
+</svg>
