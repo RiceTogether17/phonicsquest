@@ -15,6 +15,8 @@ import { SIGHT_QUESTS, TIER_LABELS, getQuestsByTier } from '../data/sightwords.j
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 
+const BASE = import.meta.env.BASE_URL;
+
 // ── Module state ───────────────────────────────────────────────────────────
 
 let _container = null;
@@ -140,7 +142,9 @@ function _renderGame(quest, cards) {
         <div class="sm-card" data-idx="${idx}" data-pair="${card.pairId}" data-word="${card.word}"
              role="gridcell" tabindex="0" aria-label="Card ${idx + 1}, face down">
           <div class="sm-card-inner">
-            <div class="sm-card-front" aria-hidden="true">⭐</div>
+            <div class="sm-card-front" aria-hidden="true">
+            <img src="${BASE}images/mascot/giri-hold-card.png" alt="" class="sm-card-mascot" draggable="false"/>
+          </div>
             <div class="sm-card-back">${card.word}</div>
           </div>
         </div>`;
