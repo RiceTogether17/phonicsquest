@@ -13,16 +13,16 @@ const ASSET_CACHE   = `phonicsquest-assets-${CACHE_VERSION}`;
 
 /** App shell files — always cache on install */
 const SHELL_FILES = [
-  '/blending/',
-  '/blending/index.html',
+  '/phonicsquest/',
+  '/phonicsquest/index.html',
 ];
 
 /** Audio and image prefixes to cache on first fetch */
 const CACHEABLE_PREFIXES = [
-  '/blending/audio/',
-  '/blending/images/',
-  '/blending/icons/',
-  '/blending/assets/',  // Vite-bundled JS/CSS chunks
+  '/phonicsquest/audio/',
+  '/phonicsquest/images/',
+  '/phonicsquest/icons/',
+  '/phonicsquest/assets/',  // Vite-bundled JS/CSS chunks
 ];
 
 // ── Install: pre-cache app shell ────────────────────────────────────────────
@@ -96,8 +96,8 @@ async function networkFirstWithFallback(request) {
     }
     return response;
   } catch (_) {
-    const cached = await caches.match('/blending/') ||
-                   await caches.match('/blending/index.html');
+    const cached = await caches.match('/phonicsquest/') ||
+                   await caches.match('/phonicsquest/index.html');
     return cached || new Response('Offline', { status: 503 });
   }
 }
