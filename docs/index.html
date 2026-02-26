@@ -21,10 +21,10 @@
   <!-- Styles -->
 
   <title>PhonicsQuest</title>
-  <script type="module" crossorigin src="/phonicsquest/assets/index-D87s9w4o.js"></script>
+  <script type="module" crossorigin src="/phonicsquest/assets/index-BFJkvTLT.js"></script>
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/gsap-C8pce-KX.js">
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/chartjs-BR_H7_9u.js">
-  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-BjsCYPWi.css">
+  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-vz50ePeU.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -41,9 +41,12 @@
       </div>
 
       <div class="header-stats" id="header-stats" aria-label="Your progress">
-        <div class="stat-chip" aria-label="Hearts remaining" aria-live="polite">
-          <span class="stat-icon" aria-hidden="true">❤️</span>
-          <span class="stat-value" id="hearts-val">5</span>
+        <div class="stat-chip" id="energy-chip" aria-live="polite">
+          <div id="energy-display" class="energy-display" aria-label="Giri energy: 3 of 3 stars">
+            <span class="energy-star energy-star--full" aria-hidden="true">⭐</span>
+            <span class="energy-star energy-star--full" aria-hidden="true">⭐</span>
+            <span class="energy-star energy-star--full" aria-hidden="true">⭐</span>
+          </div>
         </div>
         <div class="stat-chip" aria-label="Day streak" aria-live="polite">
           <span class="stat-icon" aria-hidden="true">🔥</span>
@@ -252,6 +255,9 @@
             </svg>
             Say It
           </button>
+          <button class="btn btn--hint" id="btn-hint" aria-label="Get a hint — hear the first sound">
+            💡 Hint
+          </button>
           <button class="btn btn--primary" id="btn-check" aria-label="Check my answer">Check ✓</button>
           <button class="btn btn--ghost" id="btn-skip" aria-label="Skip this word">Skip →</button>
         </div>
@@ -417,6 +423,14 @@
               <label for="goal-range">Words per day</label>
               <input type="range" id="goal-range" min="5" max="30" step="5" value="10" />
               <span id="goal-range-display">10</span>
+            </div>
+          </section>
+
+          <section class="settings-group">
+            <h3 class="settings-label">Accessibility</h3>
+            <div class="toggle-row">
+              <label for="reduced-motion-toggle">Reduce animations</label>
+              <input type="checkbox" id="reduced-motion-toggle" role="switch" />
             </div>
           </section>
 

@@ -14,6 +14,7 @@ import { STORIES, LEVEL_META } from '../data/stories.js';
 import { isHFW, extractStoryHFW } from '../data/hfw.js';
 import { WORDS } from '../data/words.js';
 import { audio } from '../modules/audio.js';
+import { runStoryQuest } from './storyQuest.js';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -44,10 +45,16 @@ function tokenise(text) {
 let _container   = null;
 let _onGoHome    = null;
 let _activeLevel = 1;
+let _activeTab   = 'level';   // 'level' | 'singapore' | 'chapter'
 let _readMode    = 'aloud';   // 'aloud' | 'decode'
 let _speaking    = false;
 let _activeWord  = null;      // for decode panel
 let _decodePanelEl = null;    // ref to the decode panel DOM node
+
+// Fluency timer state
+let _fluencyTimer   = null;
+let _fluencyStart   = null;
+let _fluencyRunning = false;
 
 // ── Public API ────────────────────────────────────────────────────────────
 
@@ -63,6 +70,7 @@ export function showBrowser() {
 
 export function cleanupStoryMode() {
   _stopTTS();
+  _stopFluencyTimer();
   _activeWord = null;
   _decodePanelEl = null;
 }
@@ -70,38 +78,37 @@ export function cleanupStoryMode() {
 // ── Browser view ──────────────────────────────────────────────────────────
 
 function _renderBrowser() {
-  const levelMeta = LEVEL_META[_activeLevel - 1];
-  const stories   = STORIES.filter(s => s.level === _activeLevel);
+  // ── Category tabs ──────────────────────────────────────────────────────
+  const categoryTabsHtml = /* html */`
+    <div class="sb-category-tabs" role="tablist" aria-label="Story categories">
+      <button class="sb-cat-tab${_activeTab === 'level'     ? ' active' : ''}" data-cat="level">📖 By Level</button>
+      <button class="sb-cat-tab${_activeTab === 'singapore' ? ' active' : ''}" data-cat="singapore">🇸🇬 Singapore</button>
+      <button class="sb-cat-tab${_activeTab === 'chapter'   ? ' active' : ''}" data-cat="chapter">📚 Chapters</button>
+    </div>
+  `;
 
-  const tabsHtml = LEVEL_META.map(m => /* html */`
-    <button
-      class="story-tab${m.level === _activeLevel ? ' active' : ''}"
-      data-level="${m.level}"
-      style="--tab-color:${m.color}"
-    >
-      <span class="story-tab-num">L${m.level}</span>
-      <span class="story-tab-name">${m.label}</span>
-    </button>
-  `).join('');
+  let innerHtml = '';
 
-  const cardsHtml = stories.map(s => /* html */`
-    <button class="story-card" data-story-id="${s.id}">
-      <div class="story-card-illo" style="background:${levelMeta.bg}">
-        <img
-          src="${BASE}images/stories/${s.illustration}"
-          alt="${s.title}"
-          class="story-card-mascot"
-          draggable="false"
-        />
-      </div>
-      <span class="story-card-title">${s.title}</span>
-      <span class="story-card-level" style="color:${levelMeta.color}">Level ${s.level}</span>
-    </button>
-  `).join('');
+  if (_activeTab === 'level') {
+    // ── Level tabs + cards ────────────────────────────────────────────
+    const levelMeta = LEVEL_META[_activeLevel - 1];
+    const stories = STORIES.filter(s => s.level === _activeLevel && s.category !== 'chapter');
 
-  _container.innerHTML = /* html */`
-    <div class="stories-browser">
-      <div class="stories-tabs" role="tablist" aria-label="Story levels">${tabsHtml}</div>
+    const levelTabsHtml = LEVEL_META.map(m => /* html */`
+      <button
+        class="story-tab${m.level === _activeLevel ? ' active' : ''}"
+        data-level="${m.level}"
+        style="--tab-color:${m.color}"
+      >
+        <span class="story-tab-num">L${m.level}</span>
+        <span class="story-tab-name">${m.label}</span>
+      </button>
+    `).join('');
+
+    const cardsHtml = stories.map(s => _storyCardHtml(s, levelMeta)).join('');
+
+    innerHtml = /* html */`
+      <div class="stories-tabs" role="tablist" aria-label="Story levels">${levelTabsHtml}</div>
       <div class="stories-level-strip"
            style="--level-color:${levelMeta.color};--level-bg:${levelMeta.bg}">
         <span class="slstrip-label">Level ${_activeLevel}</span>
@@ -110,9 +117,57 @@ function _renderBrowser() {
         <span class="slstrip-prop">${levelMeta.prop}</span>
       </div>
       <div class="story-cards-grid">${cardsHtml}</div>
+    `;
+  } else if (_activeTab === 'singapore') {
+    // ── Singapore specials ─────────────────────────────────────────────
+    const sgStories = STORIES.filter(s => s.category === 'nonfiction-sg');
+    const cardsHtml = sgStories.map(s => {
+      const meta = LEVEL_META[s.level - 1];
+      return _storyCardHtml(s, meta);
+    }).join('');
+
+    innerHtml = /* html */`
+      <div class="sb-section-header">
+        <h3 class="sb-section-title">🇸🇬 Singapore Stories</h3>
+        <p class="sb-section-desc">Stories set in Singapore — hawker centres, MRT, festivals & more.</p>
+      </div>
+      <div class="story-cards-grid">${cardsHtml}</div>
+    `;
+  } else {
+    // ── Chapter stories ────────────────────────────────────────────────
+    const chapterStories = STORIES.filter(s => s.category === 'chapter').sort(
+      (a, b) => (a.chapterNum ?? 0) - (b.chapterNum ?? 0),
+    );
+    const cardsHtml = chapterStories.map(s => {
+      const meta = LEVEL_META[s.level - 1];
+      return _storyCardHtml(s, meta, true);
+    }).join('');
+
+    innerHtml = /* html */`
+      <div class="sb-section-header">
+        <h3 class="sb-section-title">📚 The Lost Key</h3>
+        <p class="sb-section-desc">A three-chapter story. Read them in order!</p>
+      </div>
+      <div class="story-cards-grid story-cards-grid--chapters">${cardsHtml}</div>
+    `;
+  }
+
+  _container.innerHTML = /* html */`
+    <div class="stories-browser">
+      ${categoryTabsHtml}
+      ${innerHtml}
     </div>
   `;
 
+  // Category tab listeners
+  _container.querySelectorAll('.sb-cat-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      _activeTab = btn.dataset.cat;
+      _renderBrowser();
+    });
+  });
+
+  // Level tab listeners (only in level tab)
   _container.querySelectorAll('.story-tab').forEach(btn => {
     btn.addEventListener('click', () => {
       _activeLevel = parseInt(btn.dataset.level, 10);
@@ -120,9 +175,38 @@ function _renderBrowser() {
     });
   });
 
+  // Story card click
   _container.querySelectorAll('.story-card').forEach(btn => {
     btn.addEventListener('click', () => _showReader(btn.dataset.storyId));
   });
+}
+
+/** Build a story card button element HTML */
+function _storyCardHtml(story, levelMeta, isChapter = false) {
+  const questBadge = story.comprehension?.length
+    ? '<span class="story-card-quest-badge">⭐ Quest</span>'
+    : '';
+  const chapterBadge = isChapter
+    ? `<span class="story-card-chapter-badge">Ch. ${story.chapterNum}</span>`
+    : '';
+  return /* html */`
+    <button class="story-card${isChapter ? ' story-card--chapter' : ''}" data-story-id="${story.id}">
+      <div class="story-card-illo" style="background:${levelMeta.bg}">
+        <img
+          src="${BASE}images/stories/${story.illustration}"
+          alt="${story.title}"
+          class="story-card-mascot"
+          draggable="false"
+        />
+        ${chapterBadge}
+      </div>
+      <span class="story-card-title">${story.title}</span>
+      <div class="story-card-meta">
+        <span class="story-card-level" style="color:${levelMeta.color}">Level ${story.level}</span>
+        ${questBadge}
+      </div>
+    </button>
+  `;
 }
 
 // ── Reader view ───────────────────────────────────────────────────────────
@@ -207,11 +291,19 @@ function _setModeToggle(mode) {
 
 // ── READ ALOUD mode ───────────────────────────────────────────────────────
 
+/** Count the words in a story's spoken text */
+function _countStoryWords(story) {
+  return story.lines
+    .filter(l => l.type !== 'label' && l.type !== 'chapter')
+    .reduce((acc, l) => acc + l.text.trim().split(/\s+/).length, 0);
+}
+
 function _renderReadAloud(story) {
   const dynamic = document.getElementById('story-dynamic');
   if (!dynamic) return;
 
   const linesHtml = story.lines.map((line, i) => _lineHtml(line, i)).join('');
+  const hasQuest  = !!story.comprehension?.length;
 
   dynamic.innerHTML = /* html */`
     <div class="story-body" id="story-body" aria-live="polite">${linesHtml}</div>
@@ -223,20 +315,63 @@ function _renderReadAloud(story) {
         ⏹ Stop
       </button>
     </div>
+
+    <!-- Fluency timer section -->
+    <div class="fluency-bar" id="fluency-bar">
+      <div class="fluency-bar-header">
+        <span class="fluency-label">⏱ Fluency Read</span>
+        <span class="fluency-hint">Child reads aloud — tap Start, then Done when finished</span>
+      </div>
+      <div class="fluency-controls">
+        <button class="btn btn--ghost" id="btn-fluency-start">▶ Start timer</button>
+        <span class="fluency-clock" id="fluency-clock" aria-live="polite">0:00</span>
+        <button class="btn btn--primary" id="btn-fluency-done" disabled>✓ Done</button>
+      </div>
+      <div class="fluency-result" id="fluency-result" hidden></div>
+    </div>
+
+    <!-- Story Quest CTA (shown after TTS or fluency) -->
+    ${hasQuest ? /* html */`
+      <div class="story-quest-cta" id="story-quest-cta" hidden>
+        <div class="sq-cta-inner">
+          <span class="sq-cta-icon">🌟</span>
+          <div>
+            <strong>Story Quest ready!</strong>
+            <p>Check your understanding with questions, vocab, and grammar.</p>
+          </div>
+          <button class="btn btn--primary" id="btn-launch-quest">Start Quest →</button>
+        </div>
+      </div>
+    ` : ''}
   `;
 
   document.getElementById('btn-story-play')?.addEventListener('click', () => _startTTS(story));
   document.getElementById('btn-story-stop')?.addEventListener('click', () => _stopTTS());
+
+  // Fluency timer controls
+  const wordCount = _countStoryWords(story);
+  document.getElementById('btn-fluency-start')?.addEventListener('click', () => _startFluencyTimer());
+  document.getElementById('btn-fluency-done')?.addEventListener('click', () => _stopFluencyTimer(wordCount));
+
+  // Story Quest launch
+  document.getElementById('btn-launch-quest')?.addEventListener('click', () => {
+    _stopTTS();
+    _stopFluencyTimer();
+    runStoryQuest(_container, story, () => {
+      _renderBrowser();
+    });
+  });
 }
 
 function _lineHtml(line, i) {
   switch (line.type) {
-    case 'label':   return `<div class="sline sline--label" data-line="${i}">${line.text}</div>`;
-    case 'beat':    return `<p class="sline sline--beat"  data-line="${i}">${line.text}</p>`;
-    case 'intro':   return `<p class="sline sline--intro" data-line="${i}">${line.text}</p>`;
+    case 'chapter': return `<div class="sline sline--chapter" data-line="${i}">📚 ${line.text}</div>`;
+    case 'label':   return `<div class="sline sline--label"   data-line="${i}">${line.text}</div>`;
+    case 'beat':    return `<p class="sline sline--beat"      data-line="${i}">${line.text}</p>`;
+    case 'intro':   return `<p class="sline sline--intro"     data-line="${i}">${line.text}</p>`;
     case 'refrain': return `<div class="sline sline--refrain" data-line="${i}">🫧 ${line.text}</div>`;
-    case 'end':     return `<p class="sline sline--end"   data-line="${i}">${line.text}</p>`;
-    default:        return `<p class="sline" data-line="${i}">${line.text}</p>`;
+    case 'end':     return `<p class="sline sline--end"       data-line="${i}">${line.text}</p>`;
+    default:        return `<p class="sline"                  data-line="${i}">${line.text}</p>`;
   }
 }
 
@@ -547,6 +682,9 @@ function _onTTSDone() {
   _speaking = false;
   _container?.querySelectorAll('.sline--active').forEach(el => el.classList.remove('sline--active'));
   _toggleTTSButtons(false);
+  // Reveal Story Quest CTA if story has quest data
+  const cta = document.getElementById('story-quest-cta');
+  if (cta) cta.hidden = false;
 }
 
 function _toggleTTSButtons(playing) {
@@ -557,3 +695,67 @@ function _toggleTTSButtons(playing) {
 }
 
 const _delay = ms => new Promise(r => setTimeout(r, ms));
+
+// ── Fluency Timer ─────────────────────────────────────────────────────────
+
+function _startFluencyTimer() {
+  if (_fluencyRunning) return;
+  _fluencyRunning = true;
+  _fluencyStart   = Date.now();
+  document.getElementById('btn-fluency-start').disabled = true;
+  document.getElementById('btn-fluency-done').disabled  = false;
+
+  _fluencyTimer = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - _fluencyStart) / 1000);
+    const mins  = Math.floor(elapsed / 60);
+    const secs  = elapsed % 60;
+    const clock = document.getElementById('fluency-clock');
+    if (clock) clock.textContent = `${mins}:${String(secs).padStart(2, '0')}`;
+  }, 500);
+}
+
+/**
+ * Stop the fluency timer and display WCPM result.
+ * @param {number} [wordCount] – total words in story; if omitted, skips WCPM display
+ */
+function _stopFluencyTimer(wordCount) {
+  if (!_fluencyRunning && _fluencyTimer === null) return;
+  clearInterval(_fluencyTimer);
+  _fluencyTimer   = null;
+  _fluencyRunning = false;
+
+  document.getElementById('btn-fluency-start').disabled = false;
+  document.getElementById('btn-fluency-done').disabled  = true;
+
+  if (!wordCount || !_fluencyStart) return;
+
+  const elapsedSec = (Date.now() - _fluencyStart) / 1000;
+  _fluencyStart = null;
+  if (elapsedSec < 2) return; // Ignore accidental taps
+
+  const wcpm   = Math.round((wordCount / elapsedSec) * 60);
+  const mins   = Math.floor(elapsedSec / 60);
+  const secs   = Math.round(elapsedSec % 60);
+
+  // Benchmark guidance (Hasbrouck & Tindal norms, Grade 1 Spring ≈ 53 WCPM)
+  let level = '';
+  if (wcpm >= 60)      level = '🌟 Fluent reader!';
+  else if (wcpm >= 40) level = '📈 Building fluency — great progress!';
+  else                  level = '📖 Keep practising — try reading it again!';
+
+  const result = document.getElementById('fluency-result');
+  if (result) {
+    result.hidden = false;
+    result.innerHTML = /* html */`
+      <div class="fluency-result-inner">
+        <span class="fluency-time">Time: ${mins}:${String(secs).padStart(2, '0')}</span>
+        <span class="fluency-wcpm"><strong>${wcpm}</strong> words/min</span>
+        <span class="fluency-level">${level}</span>
+      </div>
+      <p class="fluency-tip">Tip: Read the story again to improve your speed!</p>
+    `;
+    // Show Quest CTA now too
+    const cta = document.getElementById('story-quest-cta');
+    if (cta) cta.hidden = false;
+  }
+}
