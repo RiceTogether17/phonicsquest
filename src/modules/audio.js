@@ -162,11 +162,12 @@ class AudioManager {
       return this._speak(grapheme.replace(/^-/, ''), 0.9);
     }
 
-    // Consolidate blend components (fl, sl, etc.) — speak each letter separately
-    if (type === 'bl' && grapheme.length === 2) {
-      await this._playPhonemeAudio(grapheme[0]);
-      await this._delay(80);
-      await this._playPhonemeAudio(grapheme[1]);
+    // Blend components — speak each letter separately (handles 2- and 3-letter blends)
+    if (type === 'bl') {
+      for (let i = 0; i < grapheme.length; i++) {
+        if (i > 0) await this._delay(80);
+        await this._playPhonemeAudio(grapheme[i]);
+      }
       return;
     }
 
