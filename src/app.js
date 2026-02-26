@@ -48,6 +48,11 @@ class App {
     /** @type {number} correct answers in current daily session */
     this._dailyCorrect = 0;
 
+    /** @type {boolean} hint used for current word (no heart loss on 1st wrong if unused) */
+    this._hintUsed = false;
+    /** @type {number} wrong attempts on current word (for two-strike system) */
+    this._wrongStrikes = 0;
+
     // Cache DOM elements
     this._els = {};
   }
@@ -109,6 +114,7 @@ class App {
       // Buttons
       btnCheck: document.getElementById('btn-check'),
       btnSayIt: document.getElementById('btn-say-it'),
+      btnHint:  document.getElementById('btn-hint'),
       btnSkip:  document.getElementById('btn-skip'),
       btnBack:  document.getElementById('btn-back'),
       btnNext:  document.getElementById('btn-next'),
@@ -257,6 +263,11 @@ class App {
       if (this._currentWord) audio.speakWord(this._currentWord.word);
     });
 
+    // Hint button — play first phoneme sound; no heart penalty on next wrong
+    this._els.btnHint?.addEventListener('click', () => {
+      this._giveHint();
+    });
+
     // Skip button
     this._els.btnSkip?.addEventListener('click', () => {
       this._cleanupMode();
@@ -370,6 +381,12 @@ class App {
     // Preload audio
     audio.preloadWord(this._currentWord);
 
+    // Reset per-word hint / strike state
+    this._hintUsed = false;
+    this._wrongStrikes = 0;
+    this._els.btnHint?.classList.remove('used');
+    this._els.btnHint?.removeAttribute('aria-disabled');
+
     // Switch to game screen
     this._showScreen('screen-game');
     mascot.think();
@@ -441,7 +458,31 @@ class App {
       this._showResultScreen(true, word, reward);
 
     } else {
-      // Wrong
+      // Wrong — shake the phoneme row before transitioning
+      const phonemeRow = document.getElementById('phoneme-row');
+      phonemeRow?.classList.remove('phoneme-row--shake');
+      // Force reflow so animation restarts if already applied
+      void phonemeRow?.offsetWidth;
+      phonemeRow?.classList.add('phoneme-row--shake');
+      setTimeout(() => phonemeRow?.classList.remove('phoneme-row--shake'), 500);
+
+      this._wrongStrikes++;
+
+      // Two-strike system: first wrong with no hint used = gentle nudge, no heart loss
+      if (this._wrongStrikes === 1 && !this._hintUsed) {
+        mascot.encourage();
+        audio.playSfx('wrong');
+        this._showToast('Almost! Try the 💡 Hint to hear the first sound.', 'warning');
+        // Pulse the hint button to draw attention
+        this._els.btnHint?.classList.remove('btn--hint-pulse');
+        void this._els.btnHint?.offsetWidth;
+        this._els.btnHint?.classList.add('btn--hint-pulse');
+        this._els.btnHint?.addEventListener('animationend', () => {
+          this._els.btnHint?.classList.remove('btn--hint-pulse');
+        }, { once: true });
+        return; // Stay on game screen — no result screen yet
+      }
+
       const result = gamification.recordWrong();
       mascot.encourage();
       mascot.setResultState('encourage');
@@ -527,6 +568,36 @@ class App {
       setTimeout(() => this._handleResult(true, 3000), 1200);
     } else {
       this._showSpeechBubble(`I heard "${result.heard}" – ${result.score}% match. Try saying "${this._currentWord.word}" more clearly!`);
+    }
+  }
+
+  /**
+   * Give a hint: play the first phoneme of the current word.
+   * Marks hint as used so the two-strike grace no longer applies.
+   */
+  async _giveHint() {
+    if (!this._currentWord) return;
+    if (this._hintUsed) return; // Only one hint per word
+
+    this._hintUsed = true;
+
+    // Mark button as used
+    const btn = this._els.btnHint;
+    if (btn) {
+      btn.classList.add('used');
+      btn.setAttribute('aria-disabled', 'true');
+    }
+
+    // Play first phoneme sound
+    const firstGrapheme = this._currentWord.graphemes[0];
+    const firstType     = this._currentWord.types[0];
+    await audio.speakPhoneme(firstGrapheme, firstType);
+
+    // Highlight the first phoneme tile briefly
+    const firstTile = document.querySelector('#phoneme-row .phoneme-tile');
+    if (firstTile) {
+      firstTile.classList.add('active');
+      setTimeout(() => firstTile.classList.remove('active'), 600);
     }
   }
 

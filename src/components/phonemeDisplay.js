@@ -107,8 +107,9 @@ export function renderPhonemes(word, container, opts = {}) {
       tile.appendChild(label);
     }
 
-    // Animation class
+    // Pop-in animation for revealed tiles (staggered)
     if (isRevealed && !isHidden) {
+      tile.classList.add('phoneme-tile--pop');
       tile.style.animationDelay = `${i * 100}ms`;
     }
 

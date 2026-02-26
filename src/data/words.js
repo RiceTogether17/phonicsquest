@@ -1041,6 +1041,50 @@ export const WORDS = [
   { id:'boldest', word:'boldest', graphemes:['b','o','ld','-est'],  types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'💪' },
   { id:'kindest', word:'kindest', graphemes:['k','i','nd','-est'],  types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'💛' },
   { id:'oldest',  word:'oldest',  graphemes:['o','ld','-est'],      types:['sv','bl','sf'],     pattern:'suffix', group:'suffix-est', level:3, emoji:'🧓' },
+
+  /* ══════════════════════════════════════
+     EXPANSION PACK — NEW WORDS
+     Verified unique additions with everyday
+     Singapore settings as context.
+  ══════════════════════════════════════ */
+
+  // --- Short-A new ---
+  { id:'ash',  word:'ash',  graphemes:['a','sh'],      types:['sv','d'],     pattern:'CVC',     group:'short-a', level:1, emoji:'🌋' },
+  { id:'gas',  word:'gas',  graphemes:['g','a','s'],   types:['c','sv','c'], pattern:'CVC',     group:'short-a', level:1, emoji:'⛽' },
+  { id:'pal',  word:'pal',  graphemes:['p','a','l'],   types:['c','sv','c'], pattern:'CVC',     group:'short-a', level:1, emoji:'🤝' },
+  { id:'gal',  word:'gal',  graphemes:['g','a','l'],   types:['c','sv','c'], pattern:'CVC',     group:'short-a', level:1, emoji:'👧' },
+  { id:'zap',  word:'zap',  graphemes:['z','a','p'],   types:['c','sv','c'], pattern:'CVC',     group:'short-a', level:1, emoji:'⚡' },
+  { id:'nab',  word:'nab',  graphemes:['n','a','b'],   types:['c','sv','c'], pattern:'CVC',     group:'short-a', level:1, emoji:'🖐️' },
+
+  // --- Short-E new ---
+  { id:'keg',  word:'keg',  graphemes:['k','e','g'],   types:['c','sv','c'], pattern:'CVC',     group:'short-e', level:1, emoji:'🪣' },
+  { id:'yep',  word:'yep',  graphemes:['y','e','p'],   types:['c','sv','c'], pattern:'CVC',     group:'short-e', level:1, emoji:'✅' },
+  { id:'rep',  word:'rep',  graphemes:['r','e','p'],   types:['c','sv','c'], pattern:'CVC',     group:'short-e', level:1, emoji:'🧑‍💼' },
+
+  // --- Short-I new ---
+  { id:'gig',  word:'gig',  graphemes:['g','i','g'],   types:['c','sv','c'], pattern:'CVC',     group:'short-i', level:1, emoji:'🎸' },
+  { id:'kip',  word:'kip',  graphemes:['k','i','p'],   types:['c','sv','c'], pattern:'CVC',     group:'short-i', level:1, emoji:'😴' },
+  { id:'kin',  word:'kin',  graphemes:['k','i','n'],   types:['c','sv','c'], pattern:'CVC',     group:'short-i', level:1, emoji:'👨‍👩‍👧' },
+  { id:'nit',  word:'nit',  graphemes:['n','i','t'],   types:['c','sv','c'], pattern:'CVC',     group:'short-i', level:1, emoji:'🔍' },
+
+  // --- Short-O new ---
+  { id:'bob',  word:'bob',  graphemes:['b','o','b'],   types:['c','sv','c'], pattern:'CVC',     group:'short-o', level:1, emoji:'🪀' },
+  { id:'cog',  word:'cog',  graphemes:['c','o','g'],   types:['c','sv','c'], pattern:'CVC',     group:'short-o', level:1, emoji:'⚙️' },
+  { id:'gob',  word:'gob',  graphemes:['g','o','b'],   types:['c','sv','c'], pattern:'CVC',     group:'short-o', level:1, emoji:'🫦' },
+
+  // --- Short-U new ---
+  { id:'nub',  word:'nub',  graphemes:['n','u','b'],   types:['c','sv','c'], pattern:'CVC',     group:'short-u', level:1, emoji:'📍' },
+  { id:'rub',  word:'rub',  graphemes:['r','u','b'],   types:['c','sv','c'], pattern:'CVC',     group:'short-u', level:1, emoji:'🧹' },
+  { id:'cud',  word:'cud',  graphemes:['c','u','d'],   types:['c','sv','c'], pattern:'CVC',     group:'short-u', level:1, emoji:'🐄' },
+  { id:'dub',  word:'dub',  graphemes:['d','u','b'],   types:['c','sv','c'], pattern:'CVC',     group:'short-u', level:1, emoji:'🎵' },
+
+  // --- New digraphs (verified unique) ---
+  { id:'thud',  word:'thud',  graphemes:['th','u','d'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'💥' },
+  { id:'whim',  word:'whim',  graphemes:['wh','i','m'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'💭' },
+  { id:'shin',  word:'shin',  graphemes:['sh','i','n'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'🦵' },
+  { id:'shag',  word:'shag',  graphemes:['sh','a','g'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'🧶' },
+  { id:'chug',  word:'chug',  graphemes:['ch','u','g'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'🚂' },
+  { id:'thug',  word:'thug',  graphemes:['th','u','g'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'😤' },
 ];
 
 /**
