@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: '/blending/',
+  base: '/phonicsquest/',
   build: {
     outDir: 'docs',
     assetsDir: 'assets',
