@@ -1,0 +1,19 @@
+{
+  "name": "phonicsquest",
+  "version": "2.0.0",
+  "description": "PhonicsQuest – production-grade phonics learning adventure for early readers",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "canvas-confetti": "^1.9.2",
+    "chart.js": "^4.4.2",
+    "gsap": "^3.12.5"
+  },
+  "devDependencies": {
+    "vite": "^5.2.0"
+  }
+}
