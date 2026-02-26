@@ -28,6 +28,14 @@ const PHONEME_FILES = {
   ck: 'c',   // "ck" makes the /k/ sound
   ll: 'l',   // "ll" makes the /l/ sound
   se: 's',   // "se" makes the /s/ sound
+  // R-controlled vowels
+  ar: 'ar', or: 'or', er: 'er',
+  ir: 'er',  // ir = same /ɜr/ sound as er
+  ur: 'er',  // ur = same /ɜr/ sound as er
+  // R-controlled trigraphs
+  air: 'air',
+  ear: 'ear',
+  are: 'air', // 'are' = same /ɛr/ sound as 'air'
   // Short vowels
   a: 'a', e: 'e', i: 'i', o: 'o', u: 'u',
   // Long vowels (canonical keys)
@@ -66,6 +74,11 @@ const PHONEME_TTS = {
   long_ai: 'ay',  long_ay: 'ay',
   long_ea: 'ee',  long_ee: 'ee',
   long_oa: 'oh',  long_ow: 'oh',
+  // R-controlled vowels
+  ar: 'ar',  or: 'or',  er: 'err',
+  ir: 'err', ur: 'err',
+  // R-controlled trigraphs
+  air: 'air', ear: 'ear', are: 'air',
   // Diphthongs
   oi: 'oy',  ow: 'ow',  aw: 'aw',
 };
