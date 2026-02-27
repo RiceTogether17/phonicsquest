@@ -1,6 +1,13 @@
 /**
  * PhonicsQuest – Gamification Engine
- * XP, levels, hearts, streaks, daily goals, celebrations.
+ * XP, levels, Giri Energy stars, streaks, daily goals, celebrations.
+ *
+ * Energy system (replaces punitive hearts):
+ *   • 3 ⭐ stars per session, shown in the header
+ *   • A star drains only on the 2nd wrong attempt on the same word
+ *     (the first wrong triggers the gentle two-strike grace in app.js)
+ *   • 0 stars → tired Giri, but child can still play
+ *   • Energy resets to 3 at the start of each new game session
  */
 
 import { store } from './store.js';
@@ -12,10 +19,11 @@ class Gamification {
     this._sessionWrong   = 0;
   }
 
-  /** Initialize: check daily reset, update streak */
+  /** Initialize: check daily reset, update streak, reset session energy */
   init() {
     store.checkDailyReset();
     this._checkStreak();
+    store.resetEnergy();
     this._updateUI();
   }
 
@@ -115,30 +123,32 @@ class Gamification {
   }
 
   /**
-   * Record a wrong answer. Decrements hearts.
-   * @returns {{ heartsLeft: number, gameOver: boolean }}
+   * Record a wrong answer. Drains one Giri Energy star.
+   * @returns {{ energyLeft: number, needsRest: boolean }}
    */
   recordWrong() {
-    this._sessionCorrect = 0; // reset streak
+    this._sessionCorrect = 0; // reset session streak
     this._sessionWrong++;
 
-    let hearts = store.get('hearts');
-    hearts = Math.max(0, hearts - 1);
-    store.set('hearts', hearts);
+    store.drainEnergy();
+    const energyLeft = store.get('energy');
 
     this._updateUI();
 
     return {
-      heartsLeft: hearts,
-      gameOver: hearts <= 0,
+      energyLeft,
+      needsRest: energyLeft === 0,
     };
   }
 
-  /** Refill hearts (called on timer or new session) */
-  refillHearts() {
-    store.set('hearts', 5);
+  /** Reset energy to 3 stars (new session or break taken) */
+  resetEnergy() {
+    store.resetEnergy();
     this._updateUI();
   }
+
+  /** @deprecated kept for compat – use resetEnergy() */
+  refillHearts() { this.resetEnergy(); }
 
   /** Get current session stats */
   getSessionStats() {
@@ -171,26 +181,35 @@ class Gamification {
 
   /** Update all header UI elements */
   _updateUI() {
-    const heartsEl = document.getElementById('hearts-val');
-    const streakEl = document.getElementById('streak-val');
-    const xpEl     = document.getElementById('xp-val');
-    const levelEl  = document.getElementById('level-val');
-    const nextEl   = document.getElementById('level-next-val');
-    const barEl    = document.getElementById('level-bar-fill');
-    const goalFill = document.getElementById('goal-fill');
-    const goalDone = document.getElementById('goal-done');
+    const energyEl  = document.getElementById('energy-display');
+    const streakEl  = document.getElementById('streak-val');
+    const xpEl      = document.getElementById('xp-val');
+    const levelEl   = document.getElementById('level-val');
+    const nextEl    = document.getElementById('level-next-val');
+    const barEl     = document.getElementById('level-bar-fill');
+    const goalFill  = document.getElementById('goal-fill');
+    const goalDone  = document.getElementById('goal-done');
     const goalTotal = document.getElementById('goal-total');
 
-    const prevHearts = heartsEl ? Number(heartsEl.textContent) : null;
-    const prevXp     = xpEl     ? Number(xpEl.textContent)     : null;
-    const prevStreak = streakEl  ? Number(streakEl.textContent)  : null;
+    const prevEnergy = energyEl ? energyEl.querySelectorAll('.energy-star--full').length : null;
+    const prevXp     = xpEl     ? Number(xpEl.textContent) : null;
+    const prevStreak = streakEl  ? Number(streakEl.textContent) : null;
 
-    if (heartsEl) heartsEl.textContent = store.get('hearts');
+    // Render energy stars
+    const energy = store.get('energy') ?? 3;
+    if (energyEl) {
+      energyEl.innerHTML = [0, 1, 2].map(i =>
+        `<span class="energy-star ${i < energy ? 'energy-star--full' : 'energy-star--empty'}"
+               aria-hidden="true">${i < energy ? '⭐' : '✩'}</span>`
+      ).join('');
+      energyEl.setAttribute('aria-label', `Giri energy: ${energy} of 3 stars`);
+    }
+
     if (streakEl) streakEl.textContent = store.get('streak');
     if (xpEl) xpEl.textContent = store.get('xp');
 
-    // Bump chips when values increase
-    if (prevHearts !== null && store.get('hearts') < prevHearts) this._bumpChip(heartsEl);
+    // Bump chips when values change
+    if (prevEnergy !== null && energy < prevEnergy) this._bumpChip(energyEl);
     if (prevXp     !== null && store.get('xp')     > prevXp)     this._bumpChip(xpEl);
     if (prevStreak !== null && store.get('streak')  > prevStreak) this._bumpChip(streakEl);
 
