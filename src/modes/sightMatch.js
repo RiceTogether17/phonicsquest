@@ -143,8 +143,11 @@ function _renderGame(quest, cards) {
              role="gridcell" tabindex="0" aria-label="Card ${idx + 1}, face down">
           <div class="sm-card-inner">
             <div class="sm-card-front" aria-hidden="true">
-            <img src="${BASE}images/mascot/giri-hold-card.png" alt="" class="sm-card-mascot" draggable="false"/>
-          </div>
+              <img src="${BASE}images/card-front.png" alt="" class="sm-card-mascot" draggable="false"/>
+            </div>
+            <div class="sm-card-mid" aria-hidden="true">
+              <img src="${BASE}images/card-flip.png" alt="" class="sm-card-mascot" draggable="false"/>
+            </div>
             <div class="sm-card-back">${card.word}</div>
           </div>
         </div>`;
