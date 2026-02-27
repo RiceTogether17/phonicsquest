@@ -2731,6 +2731,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 .sm-card-front,
+.sm-card-mid,
 .sm-card-back {
   position: absolute;
   inset: 0;
@@ -2740,6 +2741,12 @@ input, select, textarea { font-family: inherit; }
   border-radius: var(--radius-lg);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+}
+
+/* Mid-flip frame — visible only during the 3D rotation at ~90° */
+.sm-card-mid {
+  overflow: hidden;
+  transform: rotateY(90deg);
 }
 
 .sm-card-front {

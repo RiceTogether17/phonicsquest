@@ -565,7 +565,7 @@ export const STORIES = [
     level: 1,
     emoji: '🚆',
     mascotState: 'neutral',
-    illustration: 'giri_level01_story02_pot.png.jpg',
+    illustration: 'giri_sg_mrt.jpg',
     category: 'nonfiction-sg',
     lines: [
       { type: 'intro',   text: 'Giri got on the big red MRT. The MRT was fast.' },
@@ -606,7 +606,7 @@ export const STORIES = [
     level: 1,
     emoji: '🎒',
     mascotState: 'encourage',
-    illustration: 'giri_level01_story04_wet.png.jpg',
+    illustration: 'giri_sg_school.jpg',
     category: 'nonfiction-sg',
     lines: [
       { type: 'intro',   text: "It was Giri's first day at school. He had a big red bag." },
@@ -647,7 +647,7 @@ export const STORIES = [
     level: 2,
     emoji: '🍜',
     mascotState: 'celebrate',
-    illustration: 'giri_level02_story01_bake-cake.png.jpg',
+    illustration: 'giri_sg_hawker.jpg',
     category: 'nonfiction-sg',
     lines: [
       { type: 'intro',   text: 'Giri came to the hawker centre to get his mum a treat.' },
@@ -688,7 +688,7 @@ export const STORIES = [
     level: 2,
     emoji: '🧧',
     mascotState: 'confetti',
-    illustration: 'giri_level02_story04_big-day.png.jpg',
+    illustration: 'giri_sg_cny.jpg',
     category: 'nonfiction-sg',
     lines: [
       { type: 'intro',   text: 'It was the New Year. The lane was full of red lights and gold flags.' },
@@ -729,7 +729,7 @@ export const STORIES = [
     level: 2,
     emoji: '🪔',
     mascotState: 'celebrate',
-    illustration: 'giri_level02_story03_helps-bee.png.jpg',
+    illustration: 'giri_sg_deepavali.jpg',
     category: 'nonfiction-sg',
     lines: [
       { type: 'intro',   text: 'It was Deepavali. The street had bright oil lamps and gold clay pots.' },
@@ -770,7 +770,7 @@ export const STORIES = [
     level: 3,
     emoji: '🌿',
     mascotState: 'pointRight',
-    illustration: 'giri_level03_story02_finds-star.png.jpg',
+    illustration: 'giri_sg_gardens.jpg',
     category: 'nonfiction-sg',
     lines: [
       { type: 'intro',   text: 'Giri went to the Gardens by the Bay to see the tall Supertrees.' },
