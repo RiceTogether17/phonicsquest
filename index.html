@@ -207,6 +207,42 @@
           <span class="stories-banner-arrow">→</span>
         </button>
 
+        <!-- Sentence Forge Quest banner -->
+        <button class="stories-banner stories-banner--orange" id="btn-sentence-forge" aria-label="Open Sentence Forge Quest">
+          <span class="stories-banner-mascot">
+            <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🔨</span>
+          </span>
+          <span class="stories-banner-text">
+            <span class="stories-banner-title">🔨 Sentence Forge Quest</span>
+            <span class="stories-banner-sub">6 levels · unscramble &amp; build sentences</span>
+          </span>
+          <span class="stories-banner-arrow">→</span>
+        </button>
+
+        <!-- Cloze Castle Quest banner -->
+        <button class="stories-banner stories-banner--purple" id="btn-cloze-castle" aria-label="Open Cloze Castle Quest">
+          <span class="stories-banner-mascot">
+            <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🏰</span>
+          </span>
+          <span class="stories-banner-text">
+            <span class="stories-banner-title">🏰 Cloze Castle Quest</span>
+            <span class="stories-banner-sub">P1–P6 · grammar cloze passages</span>
+          </span>
+          <span class="stories-banner-arrow">→</span>
+        </button>
+
+        <!-- Word Vault Quest banner -->
+        <button class="stories-banner stories-banner--teal" id="btn-word-vault" aria-label="Open Word Vault Quest">
+          <span class="stories-banner-mascot">
+            <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🔑</span>
+          </span>
+          <span class="stories-banner-text">
+            <span class="stories-banner-title">🔑 Word Vault Quest</span>
+            <span class="stories-banner-sub">7 categories · vocabulary cloze passages</span>
+          </span>
+          <span class="stories-banner-arrow">→</span>
+        </button>
+
         <!-- Stories banner -->
         <button class="stories-banner" id="btn-stories" aria-label="Open Giri story library">
           <span class="stories-banner-mascot">
@@ -322,6 +358,48 @@
           <span style="font-size:1.6rem" aria-hidden="true">🃏</span>
         </div>
         <div id="sight-match-content" class="stories-content"></div>
+      </section>
+
+      <!-- SCREEN: SENTENCE FORGE QUEST -->
+      <section class="screen" id="screen-sentence-forge" aria-label="Sentence Forge Quest">
+        <div class="stories-screen-header">
+          <button class="icon-btn" id="btn-sfq-back" aria-label="Back to home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20" aria-hidden="true">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+          </button>
+          <h2 class="stories-screen-title">Sentence Forge Quest</h2>
+          <span style="font-size:1.6rem" aria-hidden="true">🔨</span>
+        </div>
+        <div id="sentence-forge-content" class="stories-content"></div>
+      </section>
+
+      <!-- SCREEN: CLOZE CASTLE QUEST -->
+      <section class="screen" id="screen-cloze-castle" aria-label="Cloze Castle Quest">
+        <div class="stories-screen-header">
+          <button class="icon-btn" id="btn-ccq-back" aria-label="Back to home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20" aria-hidden="true">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+          </button>
+          <h2 class="stories-screen-title">Cloze Castle Quest</h2>
+          <span style="font-size:1.6rem" aria-hidden="true">🏰</span>
+        </div>
+        <div id="cloze-castle-content" class="stories-content"></div>
+      </section>
+
+      <!-- SCREEN: WORD VAULT QUEST -->
+      <section class="screen" id="screen-word-vault" aria-label="Word Vault Quest">
+        <div class="stories-screen-header">
+          <button class="icon-btn" id="btn-wvq-back" aria-label="Back to home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20" aria-hidden="true">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+          </button>
+          <h2 class="stories-screen-title">Word Vault Quest</h2>
+          <span style="font-size:1.6rem" aria-hidden="true">🔑</span>
+        </div>
+        <div id="word-vault-content" class="stories-content"></div>
       </section>
 
       <!-- SCREEN: RESULT -->

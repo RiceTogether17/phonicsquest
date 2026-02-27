@@ -19,6 +19,9 @@ import { MODES } from './modes/index.js';
 import { initStoryMode, showBrowser, cleanupStoryMode } from './modes/storyMode.js';
 import { initLetterSounds, cleanupLetterSounds } from './modes/letterSounds.js';
 import { initSightMatch, showSightBrowser, cleanupSightMatch } from './modes/sightMatch.js';
+import { initSentenceForge, showSentenceBrowser, cleanupSentenceForge } from './modes/sentenceForge.js';
+import { initClozeCastle, showClozeBrowser, cleanupClozeCastle } from './modes/clozeCastle.js';
+import { initWordVault, showVaultBrowser, cleanupWordVault } from './modes/wordVault.js';
 import {
   getProfiles, createProfile, deleteProfile, activateProfile,
   getActiveProfile, needsProfileSelection, restoreActiveProfile,
@@ -249,6 +252,72 @@ class App {
     // Sight Words screen back button (→ home)
     document.getElementById('btn-sm-back')?.addEventListener('click', () => {
       cleanupSightMatch();
+      this._showScreen('screen-home');
+      mascot.setHomeState('holdCard');
+    });
+
+    // Sentence Forge Quest button (home → sentence-forge screen)
+    document.getElementById('btn-sentence-forge')?.addEventListener('click', () => {
+      initSentenceForge(
+        document.getElementById('sentence-forge-content'),
+        () => {
+          cleanupSentenceForge();
+          this._showScreen('screen-home');
+          mascot.setHomeState('holdCard');
+        },
+      );
+      showSentenceBrowser();
+      this._showScreen('screen-sentence-forge');
+      mascot.setState('celebrate');
+    });
+
+    // Sentence Forge screen back button (→ home)
+    document.getElementById('btn-sfq-back')?.addEventListener('click', () => {
+      cleanupSentenceForge();
+      this._showScreen('screen-home');
+      mascot.setHomeState('holdCard');
+    });
+
+    // Cloze Castle Quest button (home → cloze-castle screen)
+    document.getElementById('btn-cloze-castle')?.addEventListener('click', () => {
+      initClozeCastle(
+        document.getElementById('cloze-castle-content'),
+        () => {
+          cleanupClozeCastle();
+          this._showScreen('screen-home');
+          mascot.setHomeState('holdCard');
+        },
+      );
+      showClozeBrowser();
+      this._showScreen('screen-cloze-castle');
+      mascot.setState('celebrate');
+    });
+
+    // Cloze Castle screen back button (→ home)
+    document.getElementById('btn-ccq-back')?.addEventListener('click', () => {
+      cleanupClozeCastle();
+      this._showScreen('screen-home');
+      mascot.setHomeState('holdCard');
+    });
+
+    // Word Vault Quest button (home → word-vault screen)
+    document.getElementById('btn-word-vault')?.addEventListener('click', () => {
+      initWordVault(
+        document.getElementById('word-vault-content'),
+        () => {
+          cleanupWordVault();
+          this._showScreen('screen-home');
+          mascot.setHomeState('holdCard');
+        },
+      );
+      showVaultBrowser();
+      this._showScreen('screen-word-vault');
+      mascot.setState('celebrate');
+    });
+
+    // Word Vault screen back button (→ home)
+    document.getElementById('btn-wvq-back')?.addEventListener('click', () => {
+      cleanupWordVault();
       this._showScreen('screen-home');
       mascot.setHomeState('holdCard');
     });
