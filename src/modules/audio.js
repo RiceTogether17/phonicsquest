@@ -50,6 +50,8 @@ const PHONEME_FILES = {
   long_ow: 'long_o',  // ow (long-O words: blow, snow…) → long O sound
   // Diphthongs  (oi covers oi+oy, ow covers ow+ou, aw covers aw+au)
   oi: 'oi', ow: 'ow', aw: 'aw',
+  // Soft consonants (used only when explicitly tagged in word data)
+  soft_g: 'soft_g', soft_c: 'soft_c',
 };
 
 /**
@@ -81,6 +83,8 @@ const PHONEME_TTS = {
   air: 'air', ear: 'ear', are: 'air',
   // Diphthongs
   oi: 'oy',  ow: 'ow',  aw: 'aw',
+  // Soft consonants
+  soft_g: 'juh', soft_c: 'sss',
 };
 
 /** Sound effect file names */
@@ -140,15 +144,21 @@ class AudioManager {
    * Maps phoneme type + grapheme to the right file.
    * @param {string} grapheme  e.g. 'a', 'sh', 'e'
    * @param {string} type      phoneme type ('sv'|'lv'|'c'|'d'|'bl'|'se')
+   * @param {object} [opts]    optional context
+   * @param {string} [opts.word] the full word (for context-dependent sounds)
    * @returns {Promise<void>}
    */
-  async speakPhoneme(grapheme, type) {
+  async speakPhoneme(grapheme, type, opts = {}) {
     if (!store.get('sfxEnabled')) return;
 
     // Map grapheme + type to audio key
     let key = grapheme.toLowerCase();
     if (type === 'lv') key = `long_${grapheme.toLowerCase().replace('ee','e').replace('ay','a')}`;
     if (type === 'se') return; // silent-e: no sound
+
+    // Ensure hard /g/ for consonant 'g' — always use 'g' (hard g) audio.
+    // Words like get, give, gift, girl use hard g despite preceding e/i.
+    if (key === 'g' && type === 'c') key = 'g';
 
     // Diphthong: normalise oy→oi, ou→ow, au→aw so they share one audio file each
     if (type === 'dp') {

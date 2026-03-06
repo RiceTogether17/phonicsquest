@@ -4,6 +4,8 @@
  * Singapore Primary 1–6 grammar cloze passages.
  * Each passage has a text with ___ blanks, an answers array (in order),
  * and a wordBank array (answers + distractors, shuffled at runtime).
+ *
+ * Each level has 5 passages with 3–4 blanks for sufficient practice.
  */
 
 export const CLOZE_LEVEL_LABELS = {
@@ -45,6 +47,22 @@ export const passages = {
       wordBank: ['are', 'are', 'is', 'was', 'am', 'were', 'be'],
       xp: 20,
     },
+    {
+      id: 'g-p1-04',
+      title: 'My Toys',
+      text: 'I have ___ red ball and ___ blue car. ___ ball is round. I like to ___ with my toys.',
+      answers: ['a', 'a', 'The', 'play'],
+      wordBank: ['a', 'a', 'The', 'play', 'an', 'the', 'A', 'plays'],
+      xp: 20,
+    },
+    {
+      id: 'g-p1-05',
+      title: 'Breakfast Time',
+      text: 'Every morning, I ___ my breakfast. I eat ___ egg and drink ___ glass of milk. Breakfast ___ good for me.',
+      answers: ['eat', 'an', 'a', 'is'],
+      wordBank: ['eat', 'an', 'a', 'is', 'eats', 'a', 'an', 'are'],
+      xp: 20,
+    },
   ],
 
   P2: [
@@ -70,6 +88,22 @@ export const passages = {
       text: 'After dinner, Tom ___ the dishes for his mother. He also ___ the floor clean. His mother ___ very pleased with him.',
       answers: ['washed', 'swept', 'was'],
       wordBank: ['washed', 'swept', 'was', 'washes', 'sweeps', 'is', 'wash'],
+      xp: 25,
+    },
+    {
+      id: 'g-p2-04',
+      title: 'At the Beach',
+      text: 'We ___ to the beach yesterday. The sand ___ warm and soft. My sister ___ a sandcastle. We ___ a great time.',
+      answers: ['went', 'was', 'built', 'had'],
+      wordBank: ['went', 'was', 'built', 'had', 'go', 'is', 'build', 'has'],
+      xp: 25,
+    },
+    {
+      id: 'g-p2-05',
+      title: 'The New Baby',
+      text: 'My mother ___ a baby last week. The baby ___ very small. She ___ a lot at night. We all ___ her very much.',
+      answers: ['had', 'is', 'cries', 'love'],
+      wordBank: ['had', 'is', 'cries', 'love', 'has', 'was', 'cry', 'loves'],
       xp: 25,
     },
   ],
@@ -99,6 +133,22 @@ export const passages = {
       wordBank: ['to', 'bought', 'for', 'was', 'at', 'buys', 'to', 'is'],
       xp: 30,
     },
+    {
+      id: 'g-p3-04',
+      title: 'The School Concert',
+      text: 'The school ___ a concert last Friday. Many students ___ on stage. The audience ___ loudly after each performance. ___ parents said it was the best concert ever.',
+      answers: ['held', 'performed', 'clapped', 'Their'],
+      wordBank: ['held', 'performed', 'clapped', 'Their', 'holds', 'perform', 'clap', 'They'],
+      xp: 30,
+    },
+    {
+      id: 'g-p3-05',
+      title: 'A Rainy Day',
+      text: 'It ___ raining heavily this morning. The children ___ not go out to play. They had to ___ indoors instead. Mother ___ them some hot chocolate to cheer them up.',
+      answers: ['was', 'could', 'stay', 'made'],
+      wordBank: ['was', 'could', 'stay', 'made', 'is', 'can', 'stayed', 'makes'],
+      xp: 30,
+    },
   ],
 
   P4: [
@@ -124,6 +174,22 @@ export const passages = {
       text: 'The school ___ a sports day last Friday. The students ___ hard for many weeks. Tom ___ the 100-metre race and was awarded a gold medal. Everyone ___ very proud of him.',
       answers: ['had', 'trained', 'won', 'was'],
       wordBank: ['had', 'trained', 'won', 'was', 'has', 'train', 'wins', 'were'],
+      xp: 35,
+    },
+    {
+      id: 'g-p4-04',
+      title: 'The Class Monitor',
+      text: 'Ali ___ chosen as the class monitor last term. He ___ responsible for keeping the classroom tidy. ___ he was busy, he never complained. His classmates ___ that he did a great job.',
+      answers: ['was', 'was', 'Although', 'agreed'],
+      wordBank: ['was', 'was', 'Although', 'agreed', 'is', 'is', 'Because', 'agree'],
+      xp: 35,
+    },
+    {
+      id: 'g-p4-05',
+      title: 'The School Garden',
+      text: 'The students ___ been working on the school garden since January. They ___ different types of vegetables. The garden ___ looked after by all the classes. The harvest ___ be shared among the students.',
+      answers: ['have', 'planted', 'is', 'will'],
+      wordBank: ['have', 'planted', 'is', 'will', 'has', 'plant', 'was', 'would'],
       xp: 35,
     },
   ],
@@ -153,6 +219,22 @@ export const passages = {
       wordBank: ['has', 'allows', 'should', 'Without', 'have', 'allow', 'must', 'Despite'],
       xp: 40,
     },
+    {
+      id: 'g-p5-04',
+      title: 'Healthy Eating',
+      text: 'A balanced diet ___ essential for growing children. Parents ___ encourage their children to eat more fruits and vegetables. ___ eating healthily is important, exercise is ___ necessary for good health.',
+      answers: ['is', 'should', 'While', 'equally'],
+      wordBank: ['is', 'should', 'While', 'equally', 'are', 'must', 'Because', 'also'],
+      xp: 40,
+    },
+    {
+      id: 'g-p5-05',
+      title: 'Public Transport',
+      text: 'Public transport ___ become more efficient in recent years. Commuters ___ now travel faster than before. ___, overcrowding during peak hours remains a challenge. The government ___ invest more in upgrading the system.',
+      answers: ['has', 'can', 'Nevertheless', 'must'],
+      wordBank: ['has', 'can', 'Nevertheless', 'must', 'have', 'could', 'Therefore', 'should'],
+      xp: 40,
+    },
   ],
 
   P6: [
@@ -178,6 +260,22 @@ export const passages = {
       text: 'Mental health ___ increasingly recognised as essential to overall wellbeing. Schools ___ now implementing programmes to support students\' emotional health. ___, many young people still hesitate to seek help. Society ___ work collectively to reduce the stigma surrounding mental illness.',
       answers: ['is', 'are', 'Nevertheless', 'must'],
       wordBank: ['is', 'are', 'Nevertheless', 'must', 'are', 'were', 'Therefore', 'should'],
+      xp: 50,
+    },
+    {
+      id: 'g-p6-04',
+      title: 'Urban Planning',
+      text: 'As cities ___ to grow, urban planners face increasing pressure to ___ sustainable solutions. Green spaces ___ been shown to improve residents\' quality of life. ___, balancing development with conservation remains a significant challenge.',
+      answers: ['continue', 'develop', 'have', 'However'],
+      wordBank: ['continue', 'develop', 'have', 'However', 'continues', 'developing', 'has', 'Therefore'],
+      xp: 50,
+    },
+    {
+      id: 'g-p6-05',
+      title: 'Cultural Diversity',
+      text: 'Singapore\'s multicultural society ___ a source of strength and resilience. Citizens of different races ___ harmoniously side by side. ___ occasional tensions, the nation has ___ maintained its commitment to racial harmony.',
+      answers: ['is', 'live', 'Despite', 'consistently'],
+      wordBank: ['is', 'live', 'Despite', 'consistently', 'are', 'lives', 'Because of', 'rarely'],
       xp: 50,
     },
   ],
