@@ -1,8 +1,8 @@
 /**
  * PhonicsQuest – Cloze Castle Quest 🏰
  *
- * Grammar cloze passages (P1–P6). Players tap words from a shared word bank
- * to fill blanks in the passage. Tap a filled blank to return the word.
+ * Grammar cloze passages (P1–P6) organised by grammar category.
+ * Flow: Level picker → Category picker → Passages
  *
  * Public API:
  *   initClozeCastle(container, onGoHome)  – attach to DOM container
@@ -10,7 +10,7 @@
  *   cleanupClozeCastle()                  – teardown
  */
 
-import { passages, CLOZE_LEVEL_LABELS, CLOZE_LEVEL_ICONS } from '../data/passages.js';
+import { passages, CLOZE_LEVEL_LABELS, CLOZE_LEVEL_ICONS, GRAMMAR_CATEGORIES } from '../data/passages.js';
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 import { gamification } from '../modules/gamification.js';
@@ -22,6 +22,7 @@ let _container = null;
 let _onGoHome  = null;
 
 let _currentLevel   = 'P1';
+let _currentCat     = '';
 let _passageIdx     = 0;
 let _levelPassages  = [];
 let _bankWords      = [];   // [{id, word, used}]
@@ -44,7 +45,7 @@ export function cleanupClozeCastle() {
   _blankFills = [];
 }
 
-// ── Browser ────────────────────────────────────────────────────────────────
+// ── Level Browser ─────────────────────────────────────────────────────────
 
 function _renderBrowser() {
   if (!_container) return;
@@ -56,17 +57,18 @@ function _renderBrowser() {
   html += '<div class="cloze-browser-grid">';
 
   for (const lv of levels) {
-    const total   = passages[lv].length;
-    const done    = completed[lv] || 0;
-    const isDone  = done >= total;
-    const icon    = CLOZE_LEVEL_ICONS[lv];
+    const cats  = Object.keys(passages[lv]);
+    const total = cats.reduce((sum, cat) => sum + passages[lv][cat].length, 0);
+    const done  = completed[lv] || 0;
+    const isDone = done >= total;
+    const icon   = CLOZE_LEVEL_ICONS[lv];
 
     html += `
       <button class="cloze-level-btn ${isDone ? 'cloze-level-btn--done' : ''}"
               data-level="${lv}" aria-label="${CLOZE_LEVEL_LABELS[lv]}">
         <span class="cloze-level-icon">${isDone ? '⭐' : icon}</span>
         <span class="cloze-level-name">${CLOZE_LEVEL_LABELS[lv]}</span>
-        <span class="cloze-level-count">${Math.min(done, total)} / ${total} done</span>
+        <span class="cloze-level-count">${cats.length} topics · ${Math.min(done, total)} / ${total} done</span>
       </button>`;
   }
 
@@ -76,15 +78,83 @@ function _renderBrowser() {
   _container.querySelectorAll('.cloze-level-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       _currentLevel = btn.dataset.level;
-      _startLevel(_currentLevel);
+      _renderCategoryPicker(_currentLevel);
     });
+  });
+}
+
+// ── Category Picker ───────────────────────────────────────────────────────
+
+function _renderCategoryPicker(level) {
+  if (!_container) return;
+
+  const cats = Object.keys(passages[level]);
+  const completed = store.get('ccqCatCompleted') || {};
+  const icon = CLOZE_LEVEL_ICONS[level];
+
+  let html = `<div class="cloze-browser">`;
+  html += `<div class="cloze-cat-header">
+    <button class="btn btn--ghost btn--sm" id="cloze-back-levels" aria-label="Back to levels">← Levels</button>
+    <h3 class="cloze-cat-title">${icon} ${CLOZE_LEVEL_LABELS[level]}</h3>
+  </div>`;
+  html += `<p class="cloze-cat-subtitle">Choose a grammar topic:</p>`;
+  html += '<div class="cloze-cat-grid">';
+
+  for (const catKey of cats) {
+    const cat   = GRAMMAR_CATEGORIES[catKey] || { label: catKey, icon: '📝' };
+    const total = passages[level][catKey].length;
+    const doneKey = `${level}-${catKey}`;
+    const done  = completed[doneKey] || 0;
+    const isDone = done >= total;
+
+    html += `
+      <button class="cloze-cat-btn ${isDone ? 'cloze-cat-btn--done' : ''}"
+              data-cat="${catKey}" aria-label="${cat.label}">
+        <span class="cloze-cat-icon">${isDone ? '⭐' : cat.icon}</span>
+        <span class="cloze-cat-label">${cat.label}</span>
+        <span class="cloze-cat-count">${Math.min(done, total)} / ${total}</span>
+      </button>`;
+  }
+
+  html += '</div>';
+
+  // "Play All" button — play all categories for this level
+  const totalAll = cats.reduce((s, c) => s + passages[level][c].length, 0);
+  html += `<div class="cloze-cat-actions">
+    <button class="btn btn--primary btn--lg" id="cloze-play-all">Play All (${totalAll} passages)</button>
+  </div>`;
+
+  html += '</div>';
+  _container.innerHTML = html;
+
+  document.getElementById('cloze-back-levels')?.addEventListener('click', () => _renderBrowser());
+
+  _container.querySelectorAll('.cloze-cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      _currentCat = btn.dataset.cat;
+      _startCategory(_currentLevel, _currentCat);
+    });
+  });
+
+  document.getElementById('cloze-play-all')?.addEventListener('click', () => {
+    _currentCat = '__all__';
+    _startAllCategories(_currentLevel);
   });
 }
 
 // ── Level flow ─────────────────────────────────────────────────────────────
 
-function _startLevel(level) {
-  _levelPassages = [...(passages[level] || [])].sort(() => Math.random() - 0.5);
+function _startCategory(level, catKey) {
+  const raw = passages[level]?.[catKey] || [];
+  _levelPassages = [...raw].sort(() => Math.random() - 0.5);
+  _passageIdx    = 0;
+  _showPassage();
+}
+
+function _startAllCategories(level) {
+  const cats = Object.keys(passages[level] || {});
+  const all = cats.flatMap(c => passages[level][c]);
+  _levelPassages = [...all].sort(() => Math.random() - 0.5);
   _passageIdx    = 0;
   _showPassage();
 }
@@ -100,12 +170,9 @@ function _showPassage() {
 // ── Passage init ───────────────────────────────────────────────────────────
 
 function _initPassage(passage) {
-  // Count blanks
   const blankCount = (passage.text.match(/___/g) || []).length;
 
-  // Build bank words from wordBank, giving each a unique id
   _bankWords = passage.wordBank.map((w, i) => ({ id: i, word: w, used: false }));
-  // Shuffle
   for (let i = _bankWords.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [_bankWords[i], _bankWords[j]] = [_bankWords[j], _bankWords[i]];
@@ -122,11 +189,15 @@ function _renderPassage(passage) {
 
   const icon     = CLOZE_LEVEL_ICONS[_currentLevel];
   const progress = `${_passageIdx + 1} / ${_levelPassages.length}`;
+  const catInfo  = _currentCat !== '__all__' && GRAMMAR_CATEGORIES[_currentCat]
+    ? `${GRAMMAR_CATEGORIES[_currentCat].icon} ${GRAMMAR_CATEGORIES[_currentCat].label}`
+    : 'All Topics';
 
   _container.innerHTML = `
     <div class="cloze-game">
       <div class="cloze-game-header">
         <span class="cloze-badge">${icon} ${CLOZE_LEVEL_LABELS[_currentLevel]}</span>
+        <span class="cloze-badge cloze-badge--cat">${catInfo}</span>
         <span class="cloze-progress">${progress}</span>
         <span class="cloze-xp-badge">+${passage.xp} XP</span>
       </div>
@@ -158,14 +229,16 @@ function _renderPassage(passage) {
   });
 
   document.getElementById('cloze-check')?.addEventListener('click', () => _checkPassage(passage));
-  document.getElementById('cloze-quit')?.addEventListener('click', () => { cleanupClozeCastle(); _onGoHome?.(); });
+  document.getElementById('cloze-quit')?.addEventListener('click', () => {
+    cleanupClozeCastle();
+    _onGoHome?.();
+  });
 }
 
 function _renderPassageText(passage) {
   const container = document.getElementById('cloze-passage');
   if (!container) return;
 
-  // Split text by ___ to get parts
   const parts = passage.text.split('___');
   let html = '';
 
@@ -184,7 +257,6 @@ function _renderPassageText(passage) {
 
   container.innerHTML = html;
 
-  // Tap filled blank → return word to bank
   container.querySelectorAll('.cloze-blank--filled').forEach(blank => {
     blank.addEventListener('click', () => {
       const idx  = parseInt(blank.dataset.blank);
@@ -197,10 +269,8 @@ function _renderPassageText(passage) {
     });
   });
 
-  // Tap empty blank → select it (optional: auto-place next available)
   container.querySelectorAll('.cloze-blank:not(.cloze-blank--filled)').forEach(blank => {
     blank.addEventListener('click', () => {
-      // highlight it for next tap from bank — already handled by tap-word logic
       blank.classList.add('cloze-blank--selected');
       setTimeout(() => blank.classList.remove('cloze-blank--selected'), 800);
     });
@@ -224,7 +294,6 @@ function _renderBankWords() {
       const item = _bankWords.find(w => w.id === id);
       if (!item || item.used) return;
 
-      // Find first empty blank
       const blankIdx = _blankFills.findIndex(f => f === null);
       if (blankIdx === -1) return;
 
@@ -253,13 +322,21 @@ function _checkPassage(passage) {
     celebrateCorrect();
     audio.playSfx('correct');
 
+    // Track per-level completion
     const completed = store.get('ccqCompleted') || {};
     completed[_currentLevel] = (completed[_currentLevel] || 0) + 1;
     store.set('ccqCompleted', completed);
 
+    // Track per-category completion
+    if (_currentCat !== '__all__') {
+      const catCompleted = store.get('ccqCatCompleted') || {};
+      const key = `${_currentLevel}-${_currentCat}`;
+      catCompleted[key] = (catCompleted[key] || 0) + 1;
+      store.set('ccqCatCompleted', catCompleted);
+    }
+
     _showFeedback('✅ Excellent! All correct!', true);
 
-    // Highlight correct blanks green
     document.querySelectorAll('.cloze-blank--filled').forEach(b => b.classList.add('cloze-blank--correct'));
 
     setTimeout(() => {
@@ -269,7 +346,6 @@ function _checkPassage(passage) {
   } else {
     audio.playSfx('wrong');
 
-    // Highlight wrong blanks red
     document.querySelectorAll('.cloze-blank--filled').forEach((b, i) => {
       const userAns = _bankWords.find(w => w.id === _blankFills[i])?.word || '';
       b.classList.toggle('cloze-blank--wrong', userAns !== passage.answers[i]);
@@ -302,27 +378,27 @@ function _showComplete() {
   celebrateCorrect();
   audio.playSfx('levelUp');
 
-  const levels = Object.keys(passages);
-  const nextIdx = levels.indexOf(_currentLevel) + 1;
-  const nextLevel = levels[nextIdx] || null;
+  const catInfo = _currentCat !== '__all__' && GRAMMAR_CATEGORIES[_currentCat]
+    ? `${GRAMMAR_CATEGORIES[_currentCat].icon} ${GRAMMAR_CATEGORIES[_currentCat].label}`
+    : 'All Topics';
 
   _container.innerHTML = `
     <div class="cloze-complete">
       <div class="cloze-complete-icon">${icon}</div>
       <h3 class="cloze-complete-title">Castle Cleared! 🏰</h3>
-      <p class="cloze-complete-sub">${CLOZE_LEVEL_LABELS[_currentLevel]}</p>
+      <p class="cloze-complete-sub">${CLOZE_LEVEL_LABELS[_currentLevel]} · ${catInfo}</p>
       <div class="cloze-stars">⭐⭐⭐</div>
       <div class="cloze-complete-actions">
-        ${nextLevel ? `<button class="btn btn--primary btn--lg" id="cloze-next-level">${CLOZE_LEVEL_LABELS[nextLevel]} →</button>` : ''}
+        <button class="btn btn--primary btn--lg" id="cloze-back-cat">Choose Another Topic</button>
         <button class="btn btn--ghost btn--sm" id="cloze-replay">Play Again ↺</button>
-        <button class="btn btn--ghost btn--sm" id="cloze-back">All Levels</button>
+        <button class="btn btn--ghost btn--sm" id="cloze-back-levels">All Levels</button>
       </div>
     </div>`;
 
-  document.getElementById('cloze-next-level')?.addEventListener('click', () => {
-    _currentLevel = nextLevel;
-    _startLevel(_currentLevel);
+  document.getElementById('cloze-back-cat')?.addEventListener('click', () => _renderCategoryPicker(_currentLevel));
+  document.getElementById('cloze-replay')?.addEventListener('click', () => {
+    if (_currentCat === '__all__') _startAllCategories(_currentLevel);
+    else _startCategory(_currentLevel, _currentCat);
   });
-  document.getElementById('cloze-replay')?.addEventListener('click', () => _startLevel(_currentLevel));
-  document.getElementById('cloze-back')?.addEventListener('click', () => _renderBrowser());
+  document.getElementById('cloze-back-levels')?.addEventListener('click', () => _renderBrowser());
 }
