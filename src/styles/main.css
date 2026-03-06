@@ -1701,6 +1701,7 @@ input, select, textarea { font-family: inherit; }
   .mode-area {
     flex: 1 1 50%;
     min-width: 300px;
+    max-width: 480px;
   }
   .action-bar {
     width: 100%;
@@ -1732,13 +1733,14 @@ input, select, textarea { font-family: inherit; }
   .sm-card-grid {
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-4);
-    max-width: 700px;
+    max-width: 560px;
     margin: 0 auto;
   }
-  .sm-card { height: auto; aspect-ratio: 3 / 4; }
+  .sm-card { height: auto; aspect-ratio: 3 / 4; min-width: 80px; }
   .sm-card-number { font-size: 1rem; top: 6px; left: 8px; }
+  .sm-card-back { font-size: clamp(0.9rem, 2.5vw, 1.3rem); }
   .sm-game-header,
-  .sm-game-actions { max-width: 700px; margin-left: auto; margin-right: auto; }
+  .sm-game-actions { max-width: 560px; margin-left: auto; margin-right: auto; }
 
   /* Stories content wider */
   .stories-content { max-width: 780px; }
