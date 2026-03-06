@@ -1675,6 +1675,81 @@ input, select, textarea { font-family: inherit; }
   .word-emoji { font-size: 6rem; }
 }
 
+/* Desktop: widen the app container and scale up content */
+@media (min-width: 1024px) {
+  #app { max-width: 860px; }
+
+  .app-header { padding: 12px 32px; }
+  .main-content { padding: 24px 32px; }
+
+  /* Larger phoneme tiles on desktop */
+  .phoneme-tile { padding: 12px 20px; font-size: var(--font-size-xl); min-width: 60px; }
+
+  /* Mode grid: 3 columns on desktop */
+  .mode-grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+
+  /* Choice grid: 2 columns */
+  .choice-grid { grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+
+  /* Larger word image */
+  .word-image-wrap { width: 160px; height: 160px; }
+  .word-emoji { font-size: 7rem; }
+
+  /* Buttons scale up */
+  .btn { font-size: var(--font-size-md); padding: 14px 28px; }
+  .btn--xl { padding: 18px 36px; font-size: var(--font-size-lg); }
+  .action-bar .btn { min-height: 56px; font-size: var(--font-size-lg); padding: 16px 28px; }
+  .icon-btn { width: 52px; height: 52px; }
+
+  /* Sight Match card grid: wider cards */
+  .sm-card-grid { grid-template-columns: repeat(5, 1fr); gap: var(--space-3); max-width: 100%; }
+  .sm-card { height: 120px; }
+
+  /* Stories content wider */
+  .stories-content { max-width: 780px; }
+  .stories-banner { max-width: 600px; }
+
+  /* Cloze / Word Vault / Sentence Forge: wider containers */
+  .cloze-game,
+  .wv-game,
+  .sfq-game { max-width: 780px; margin: 0 auto; }
+
+  /* Dashboard: wider */
+  .dashboard-content { max-width: 800px; }
+
+  /* Bigger fonts for heading areas */
+  .mode-title { font-size: var(--font-size-xl); }
+  .section-title { font-size: var(--font-size-lg); }
+
+  /* Modals scale up on desktop */
+  .modal-panel { max-width: 640px; border-radius: var(--radius-xl); }
+
+  /* Stories content wider on desktop */
+  .stories-screen-header { max-width: 780px; }
+
+  /* Comprehension quiz wider */
+  .sq-question-card,
+  .sq-options,
+  .sq-feedback { max-width: 780px; }
+
+  /* Sight match browser */
+  .sm-browser { max-width: 780px; margin: 0 auto; }
+  .sm-quest-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* Cloze browser */
+  .cloze-browser,
+  .wv-browser,
+  .sfq-browser { max-width: 780px; margin: 0 auto; }
+
+  /* Category selector wider */
+  .category-select { max-width: 400px; }
+}
+
+/* Large desktop: cap at reasonable width */
+@media (min-width: 1440px) {
+  #app { max-width: 1024px; }
+}
+
 /* ── 19. UTILITY ── */
 .visually-hidden {
   position: absolute;
@@ -2756,6 +2831,18 @@ input, select, textarea { font-family: inherit; }
   border: 2px solid var(--color-primary-dark);
   overflow: hidden;
   padding: 0;
+}
+.sm-card-number {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.9);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  z-index: 2;
+  pointer-events: none;
+  line-height: 1;
 }
 .sm-card-mascot {
   width: 100%;

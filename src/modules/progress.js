@@ -31,9 +31,13 @@ class Progress {
     if (opts.group) {
       // Legacy struct-* filters
       if (opts.group === 'struct-cvc') {
-        pool = WORDS.filter(w => w.pattern === 'CVC');
+        pool = WORDS.filter(w => w.pattern === 'CVC' && w.types.includes('sv'));
       } else if (opts.group === 'struct-ccvc') {
-        pool = WORDS.filter(w => w.pattern === 'blend');
+        pool = WORDS.filter(w => w.pattern === 'blend' && w.types.includes('sv'));
+      } else if (opts.group === 'struct-cvcc') {
+        pool = WORDS.filter(w => w.group === 'struct-cvcc' || (getWordStructure(w) === 'CVCC' && w.types.includes('sv')));
+      } else if (opts.group === 'struct-ccvcc') {
+        pool = WORDS.filter(w => w.group === 'struct-ccvcc' || (getWordStructure(w) === 'CCVCC' && w.types.includes('sv')));
       } else {
         // Curriculum stage structural-vowel cross-cut: e.g. 'cvc-a', 'ccvc-e', 'cvcc-i', 'ccvcc-u'
         const structMatch = opts.group.match(/^(cvc|ccvc|cvcc|ccvcc)-([aeiou])$/);
