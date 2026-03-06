@@ -1677,16 +1677,43 @@ input, select, textarea { font-family: inherit; }
 
 /* Desktop: widen the app container and scale up content */
 @media (min-width: 1024px) {
-  #app { max-width: 860px; }
+  #app { max-width: 100%; box-shadow: none; }
 
   .app-header { padding: 12px 32px; }
-  .main-content { padding: 24px 32px; }
+  .main-content { padding: 24px 48px; }
+
+  /* ── Landscape game layout: image left, controls right ── */
+  #screen-game {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--space-4);
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  .word-stage {
+    flex: 0 0 40%;
+    max-width: 380px;
+    margin-bottom: 0;
+    position: sticky;
+    top: 80px;
+  }
+  .mode-area {
+    flex: 1 1 50%;
+    min-width: 300px;
+  }
+  .action-bar {
+    width: 100%;
+    flex-basis: 100%;
+    max-width: 960px;
+    justify-content: center;
+  }
 
   /* Larger phoneme tiles on desktop */
   .phoneme-tile { padding: 12px 20px; font-size: var(--font-size-xl); min-width: 60px; }
 
   /* Mode grid: 3 columns on desktop */
-  .mode-grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+  .mode-grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-4); max-width: 960px; margin: 0 auto; }
 
   /* Choice grid: 2 columns */
   .choice-grid { grid-template-columns: 1fr 1fr; gap: var(--space-3); }
@@ -1701,9 +1728,17 @@ input, select, textarea { font-family: inherit; }
   .action-bar .btn { min-height: 56px; font-size: var(--font-size-lg); padding: 16px 28px; }
   .icon-btn { width: 52px; height: 52px; }
 
-  /* Sight Match card grid: wider cards */
-  .sm-card-grid { grid-template-columns: repeat(5, 1fr); gap: var(--space-3); max-width: 100%; }
-  .sm-card { height: 120px; }
+  /* ── Sight Match: relaxed card grid on desktop ── */
+  .sm-card-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-4);
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .sm-card { height: auto; aspect-ratio: 3 / 4; }
+  .sm-card-number { font-size: 1rem; top: 6px; left: 8px; }
+  .sm-game-header,
+  .sm-game-actions { max-width: 700px; margin-left: auto; margin-right: auto; }
 
   /* Stories content wider */
   .stories-content { max-width: 780px; }
@@ -1713,9 +1748,12 @@ input, select, textarea { font-family: inherit; }
   .cloze-game,
   .wv-game,
   .sfq-game { max-width: 780px; margin: 0 auto; }
+  .cloze-browser,
+  .wv-browser,
+  .sfq-browser { max-width: 780px; margin: 0 auto; }
 
   /* Dashboard: wider */
-  .dashboard-content { max-width: 800px; }
+  .dashboard-content { max-width: 860px; }
 
   /* Bigger fonts for heading areas */
   .mode-title { font-size: var(--font-size-xl); }
@@ -1736,18 +1774,22 @@ input, select, textarea { font-family: inherit; }
   .sm-browser { max-width: 780px; margin: 0 auto; }
   .sm-quest-grid { grid-template-columns: repeat(3, 1fr); }
 
-  /* Cloze browser */
-  .cloze-browser,
-  .wv-browser,
-  .sfq-browser { max-width: 780px; margin: 0 auto; }
-
   /* Category selector wider */
   .category-select { max-width: 400px; }
+
+  /* Result screen centered */
+  #screen-result { max-width: 600px; margin: 0 auto; }
+
+  /* Home screen sections */
+  .home-section { max-width: 960px; margin-left: auto; margin-right: auto; }
 }
 
-/* Large desktop: cap at reasonable width */
+/* Large desktop: comfortable max width */
 @media (min-width: 1440px) {
-  #app { max-width: 1024px; }
+  .main-content { padding: 32px 64px; }
+  #screen-game { max-width: 1060px; }
+  .mode-grid { max-width: 1060px; }
+  .home-section { max-width: 1060px; }
 }
 
 /* ── 19. UTILITY ── */
@@ -3926,6 +3968,54 @@ input, select, textarea { font-family: inherit; }
 .cloze-level-name  { font-size: var(--font-size-sm); font-weight: 700; color: var(--text); }
 .cloze-level-count { font-size: var(--font-size-xs); color: var(--text-muted); }
 
+/* Category picker */
+.cloze-cat-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.cloze-cat-title {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--text);
+}
+.cloze-cat-subtitle {
+  font-size: var(--font-size-base);
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: var(--space-3);
+}
+.cloze-cat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+.cloze-cat-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-3);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--dur-base) var(--ease-out);
+  box-shadow: var(--shadow-sm);
+}
+.cloze-cat-btn:hover { border-color: #a855f7; transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.cloze-cat-btn--done { border-color: var(--color-success); background: var(--color-success-light); }
+.cloze-cat-icon  { font-size: 1.6rem; }
+.cloze-cat-label { font-size: var(--font-size-sm); font-weight: 700; color: var(--text); text-align: center; line-height: 1.3; }
+.cloze-cat-count { font-size: var(--font-size-xs); color: var(--text-muted); }
+.cloze-cat-actions { margin-top: var(--space-4); text-align: center; }
+
+.cloze-badge--cat {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
 /* Game header */
 .cloze-game {
   display: flex;
@@ -4281,6 +4371,7 @@ input, select, textarea { font-family: inherit; }
 @media (max-width: 420px) {
   .sfq-browser-grid,
   .cloze-browser-grid,
+  .cloze-cat-grid,
   .wv-cat-grid  { grid-template-columns: 1fr; }
   .wv-level-grid { grid-template-columns: repeat(2, 1fr); }
   .cloze-passage,
