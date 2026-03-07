@@ -1702,9 +1702,21 @@ input, select, textarea { font-family: inherit; }
     align-items: stretch;
   }
 
-  /* Remove max-width caps on shared content wrappers inside game screens */
-  .stories-screen-header { max-width: none; }
-  .stories-content { max-width: none; }
+  /* Remove ALL max-width caps on content wrappers inside game screens */
+  .stories-screen-header,
+  .stories-content,
+  .sfq-browser,
+  .sfq-game,
+  .cloze-browser,
+  .cloze-game,
+  .wv-browser,
+  .wv-level-browser,
+  .wv-game,
+  .sm-browser,
+  .sm-game,
+  .sq-question-card,
+  .sq-options,
+  .sq-feedback { max-width: none; }
 
   /* Larger phoneme tiles on desktop */
   .phoneme-tile { padding: 12px 20px; font-size: var(--font-size-xl); min-width: 60px; }
@@ -1737,7 +1749,6 @@ input, select, textarea { font-family: inherit; }
   .segment-slot { min-width: 80px; height: 64px; font-size: var(--font-size-2xl); }
 
   /* ── Sight Match: full-width card grid on desktop ── */
-  .sm-game { max-width: 100%; }
   .sm-card-grid {
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-5);
@@ -1751,25 +1762,16 @@ input, select, textarea { font-family: inherit; }
   /* Stories banner */
   .stories-banner { max-width: 600px; }
 
-  /* Cloze / Word Vault / Sentence Forge: full-width containers */
-  .cloze-game,
-  .wv-game,
-  .sfq-game { max-width: 100%; }
-  .cloze-browser,
-  .wv-browser,
-  .sfq-browser { max-width: 100%; }
-
   /* Category/level grids: 4 columns on desktop */
+  .sfq-browser-grid { grid-template-columns: repeat(3, 1fr); }
   .cloze-browser-grid,
   .cloze-cat-grid,
   .wv-cat-grid { grid-template-columns: repeat(4, 1fr); }
 
-  /* Sight match browser: full width */
-  .sm-browser { max-width: 100%; }
   .sm-quest-grid { grid-template-columns: repeat(4, 1fr); }
 
   /* Dashboard: wider */
-  .dashboard-content { max-width: 100%; }
+  .dashboard-content { max-width: none; }
 
   /* Bigger fonts for heading areas */
   .mode-title { font-size: var(--font-size-xl); }
@@ -1778,10 +1780,7 @@ input, select, textarea { font-family: inherit; }
   /* Modals scale up on desktop */
   .modal-panel { max-width: 640px; border-radius: var(--radius-xl); }
 
-  /* Comprehension quiz full width */
-  .sq-question-card,
-  .sq-options,
-  .sq-feedback { max-width: 100%; }
+
 
   /* Category selector wider */
   .category-select { max-width: 400px; }
