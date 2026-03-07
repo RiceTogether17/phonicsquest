@@ -308,6 +308,14 @@ function _renderBankWords() {
 
 // ── Checking ───────────────────────────────────────────────────────────────
 
+function _updateClozeMastery(skillKey, correct) {
+  const mastery = store.get('questMastery') || {};
+  const bucket = mastery.clozeCastle || {};
+  const prev = typeof bucket[skillKey] === 'number' ? bucket[skillKey] : 0.5;
+  const next = prev * 0.8 + (correct ? 1 : 0) * 0.2;
+  store.updateQuestMastery('clozeCastle', skillKey, next);
+}
+
 function _checkPassage(passage) {
   if (_blankFills.some(f => f === null)) {
     _showFeedback('Fill in all the blanks first! 🏰', false);
@@ -316,6 +324,16 @@ function _checkPassage(passage) {
 
   const userAnswers = _blankFills.map(id => _bankWords.find(w => w.id === id)?.word || '');
   const allCorrect  = userAnswers.every((ans, i) => ans === passage.answers[i]);
+  const skillKey = _currentCat === '__all__' ? 'mixed' : _currentCat;
+
+  store.recordQuestAttempt({
+    quest: 'clozeCastle',
+    skill: skillKey,
+    correct: allCorrect,
+    responseMs: 2000,
+    level: _currentLevel,
+  });
+  _updateClozeMastery(skillKey, allCorrect);
 
   if (allCorrect) {
     gamification.recordCorrect(2000, false);

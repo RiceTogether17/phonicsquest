@@ -229,6 +229,14 @@ function _renderAnswer() {
 
 // ── Checking ───────────────────────────────────────────────────────────────
 
+function _updateSentenceMastery(skillKey, correct) {
+  const mastery = store.get('questMastery') || {};
+  const bucket = mastery.sentenceForge || {};
+  const prev = typeof bucket[skillKey] === 'number' ? bucket[skillKey] : 0.5;
+  const next = prev * 0.8 + (correct ? 1 : 0) * 0.2;
+  store.updateQuestMastery('sentenceForge', skillKey, next);
+}
+
 function _checkAnswer(entry, punct) {
   if (_answerSlots.length === 0) {
     _showFeedback('Build your sentence first! 🔨', false);
@@ -242,6 +250,14 @@ function _checkAnswer(entry, punct) {
 
   if (correct) {
     _sessionCorrect++;
+    store.recordQuestAttempt({
+      quest: 'sentenceForge',
+      skill: 'word_order',
+      correct: true,
+      responseMs: 1200,
+      level: _currentLevel,
+    });
+    _updateSentenceMastery('word_order', true);
     gamification.recordCorrect(1200, false);
     celebrateCorrect();
     audio.playSfx('correct');
@@ -257,6 +273,14 @@ function _checkAnswer(entry, punct) {
       _showSentence();
     }, 1500);
   } else {
+    store.recordQuestAttempt({
+      quest: 'sentenceForge',
+      skill: 'word_order',
+      correct: false,
+      responseMs: 1200,
+      level: _currentLevel,
+    });
+    _updateSentenceMastery('word_order', false);
     audio.playSfx('wrong');
     _showFeedback('❌ Not quite – try rearranging!', false);
     const area = document.getElementById('sfq-answer-area');

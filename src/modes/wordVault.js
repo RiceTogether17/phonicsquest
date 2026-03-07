@@ -274,6 +274,14 @@ function _renderBank(passage) {
 
 // ── Checking ───────────────────────────────────────────────────────────────
 
+function _updateWordVaultMastery(skillKey, correct) {
+  const mastery = store.get('questMastery') || {};
+  const bucket = mastery.wordVault || {};
+  const prev = typeof bucket[skillKey] === 'number' ? bucket[skillKey] : 0.5;
+  const next = prev * 0.8 + (correct ? 1 : 0) * 0.2;
+  store.updateQuestMastery('wordVault', skillKey, next);
+}
+
 function _checkPassage(passage) {
   if (_blankFills.some(f => f === null)) {
     _showFeedback('Fill all the blanks first! 🔑', false);
@@ -282,6 +290,15 @@ function _checkPassage(passage) {
 
   const userAnswers = _blankFills.map(id => _bankWords.find(w => w.id === id)?.word || '');
   const allCorrect  = userAnswers.every((ans, i) => ans === passage.answers[i]);
+
+  store.recordQuestAttempt({
+    quest: 'wordVault',
+    skill: _currentCat || 'mixed',
+    correct: allCorrect,
+    responseMs: 2000,
+    level: _currentLevel,
+  });
+  _updateWordVaultMastery(_currentCat || 'mixed', allCorrect);
 
   if (allCorrect) {
     gamification.recordCorrect(2000, false);
