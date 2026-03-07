@@ -36,6 +36,15 @@ const DEFAULT_STATE = {
   // Group mastery (per group accuracy)
   groupMastery: {},         // { [group]: accuracy 0-1 }
 
+  // Quest mastery + telemetry
+  questMastery: {
+    sentenceForge: {},
+    clozeCastle: {},
+    wordVault: {},
+    stories: {},
+  },
+  questAttempts: [],        // recent quest attempts (capped)
+
   // Session
   currentMode:  'blend',
   currentGroup: 'short-a',
@@ -178,6 +187,34 @@ class Store {
   updateGroupMastery(group, accuracy) {
     const mastery = { ...this._state.groupMastery, [group]: accuracy };
     this.set('groupMastery', mastery);
+  }
+
+  /** Update one quest-skill mastery value (0..1). */
+  updateQuestMastery(questKey, skillKey, accuracy) {
+    const next = { ...(this._state.questMastery || {}) };
+    const bucket = { ...(next[questKey] || {}) };
+    bucket[skillKey] = Math.max(0, Math.min(1, accuracy));
+    next[questKey] = bucket;
+    this.set('questMastery', next);
+  }
+
+  /**
+   * Record quest attempt telemetry (capped at 300).
+   * @param {{quest: string, skill: string, correct: boolean, responseMs?: number, level?: string|number}} entry
+   */
+  recordQuestAttempt(entry) {
+    const attempts = [
+      {
+        quest: entry.quest,
+        skill: entry.skill,
+        correct: !!entry.correct,
+        responseMs: entry.responseMs ?? null,
+        level: entry.level ?? null,
+        timestamp: new Date().toISOString(),
+      },
+      ...(this._state.questAttempts || []),
+    ].slice(0, 300);
+    this.set('questAttempts', attempts);
   }
 
   /** Check and refresh daily goal (resets at midnight). */

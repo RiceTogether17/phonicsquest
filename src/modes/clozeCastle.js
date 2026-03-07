@@ -14,6 +14,7 @@ import { passages, CLOZE_LEVEL_LABELS, CLOZE_LEVEL_ICONS, GRAMMAR_CATEGORIES } f
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 import { gamification } from '../modules/gamification.js';
+import { questMastery } from '../modules/questMastery.js';
 import { celebrateCorrect } from '../components/confettiHelper.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
@@ -100,19 +101,22 @@ function _renderCategoryPicker(level) {
   html += `<p class="cloze-cat-subtitle">Choose a grammar topic:</p>`;
   html += '<div class="cloze-cat-grid">';
 
+  const recommendedCat = questMastery.getRecommendedSkill('clozeCastle', cats);
+
   for (const catKey of cats) {
     const cat   = GRAMMAR_CATEGORIES[catKey] || { label: catKey, icon: '📝' };
     const total = passages[level][catKey].length;
     const doneKey = `${level}-${catKey}`;
     const done  = completed[doneKey] || 0;
     const isDone = done >= total;
+    const isRecommended = catKey === recommendedCat;
 
     html += `
-      <button class="cloze-cat-btn ${isDone ? 'cloze-cat-btn--done' : ''}"
-              data-cat="${catKey}" aria-label="${cat.label}">
+      <button class="cloze-cat-btn ${isDone ? 'cloze-cat-btn--done' : ''} ${isRecommended ? 'cloze-cat-btn--recommended' : ''}"
+              data-cat="${catKey}" aria-label="${cat.label}${isRecommended ? ' (recommended)' : ''}">
         <span class="cloze-cat-icon">${isDone ? '⭐' : cat.icon}</span>
         <span class="cloze-cat-label">${cat.label}</span>
-        <span class="cloze-cat-count">${Math.min(done, total)} / ${total}</span>
+        <span class="cloze-cat-count">${Math.min(done, total)} / ${total}${isRecommended ? ' · Recommended' : ''}</span>
       </button>`;
   }
 
@@ -316,6 +320,16 @@ function _checkPassage(passage) {
 
   const userAnswers = _blankFills.map(id => _bankWords.find(w => w.id === id)?.word || '');
   const allCorrect  = userAnswers.every((ans, i) => ans === passage.answers[i]);
+  const skillKey = _currentCat === '__all__' ? 'mixed' : _currentCat;
+
+  questMastery.recordAttempt({
+    quest: 'clozeCastle',
+    skill: skillKey,
+    correct: allCorrect,
+    responseMs: 2000,
+    level: _currentLevel,
+  });
+  questMastery.updateSkill('clozeCastle', skillKey, allCorrect);
 
   if (allCorrect) {
     gamification.recordCorrect(2000, false);
