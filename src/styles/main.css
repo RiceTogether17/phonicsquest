@@ -931,6 +931,8 @@ input, select, textarea { font-family: inherit; }
 .action-bar {
   display: flex;
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: var(--space-3);
   width: 100%;
   margin-top: var(--space-4);
@@ -1670,6 +1672,12 @@ input, select, textarea { font-family: inherit; }
   .icon-btn { width: 48px; height: 48px; }
 }
 
+/* Landscape tablets/phones: widen app container */
+@media (min-width: 600px) and (orientation: landscape) {
+  #app { max-width: 100%; box-shadow: none; overflow-x: hidden; }
+  .main-content { padding: 16px 32px; }
+}
+
 @media (min-height: 700px) {
   .word-image-wrap { width: 140px; height: 140px; }
   .word-emoji { font-size: 6rem; }
@@ -1677,10 +1685,10 @@ input, select, textarea { font-family: inherit; }
 
 /* Desktop: widen the app container and scale up content */
 @media (min-width: 1024px) {
-  #app { max-width: 100%; box-shadow: none; }
+  #app { max-width: 100%; box-shadow: none; overflow-x: hidden; }
 
   .app-header { padding: 12px 32px; }
-  .main-content { padding: 24px 48px; }
+  .main-content { padding: 24px 48px; overflow: visible; }
 
   /* ── Landscape game layout: image left, controls right ── */
   #screen-game {
@@ -1706,8 +1714,8 @@ input, select, textarea { font-family: inherit; }
   .action-bar {
     width: 100%;
     flex-basis: 100%;
-    max-width: 960px;
     justify-content: center;
+    flex-wrap: wrap;
   }
 
   /* Larger phoneme tiles on desktop */
@@ -1745,14 +1753,16 @@ input, select, textarea { font-family: inherit; }
   .sm-card-grid {
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-4);
-    max-width: 700px;
+    max-width: 100%;
+    width: 100%;
     margin: 0 auto;
   }
-  .sm-card { height: auto; aspect-ratio: 3 / 4; min-width: 100px; }
+  .sm-card { height: auto; aspect-ratio: 3 / 4; }
   .sm-card-number { font-size: 1rem; top: 6px; left: 8px; }
   .sm-card-back { font-size: clamp(1rem, 2.5vw, 1.4rem); }
+  .sm-game { max-width: 700px; margin: 0 auto; }
   .sm-game-header,
-  .sm-game-actions { max-width: 700px; margin-left: auto; margin-right: auto; }
+  .sm-game-actions { margin-left: auto; margin-right: auto; }
 
   /* Stories content wider */
   .stories-content { max-width: 780px; }
