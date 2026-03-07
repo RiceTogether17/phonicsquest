@@ -17,6 +17,15 @@ import { vocabPassages, VOCAB_CATEGORIES } from '../data/vocabPassages.js';
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 import { gamification } from '../modules/gamification.js';
+import { questMastery } from '../modules/questMastery.js';
+import {
+  buildUserAnswers,
+  clearClozeRound,
+  createClozeRound,
+  fillNextBlank,
+  renderClozeBank,
+  renderClozePassage,
+} from './clozeEngine.js';
 import { celebrateCorrect } from '../components/confettiHelper.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
@@ -61,19 +70,23 @@ function _renderCategoryBrowser() {
   let html = '<div class="wv-browser">';
   html += '<div class="wv-cat-grid">';
 
+  const keys = Object.keys(VOCAB_CATEGORIES);
+  const recommendedCat = questMastery.getRecommendedSkill('wordVault', keys);
+
   for (const [key, meta] of Object.entries(VOCAB_CATEGORIES)) {
     const catCompleted = completed[key] || {};
     const totalPossible = 6; // one per level
     const doneLevels = Object.keys(catCompleted).length;
+    const isRecommended = key === recommendedCat;
 
     html += `
-      <button class="wv-cat-btn" data-cat="${key}"
+      <button class="wv-cat-btn ${isRecommended ? 'wv-cat-btn--recommended' : ''}" data-cat="${key}"
               style="--cat-color:${meta.color}"
-              aria-label="${meta.label}">
+              aria-label="${meta.label}${isRecommended ? ' (recommended)' : ''}">
         <span class="wv-cat-icon">${meta.icon}</span>
         <span class="wv-cat-label">${meta.label}</span>
         <span class="wv-cat-desc">${meta.desc}</span>
-        <span class="wv-cat-progress">${doneLevels} / ${totalPossible}</span>
+        <span class="wv-cat-progress">${doneLevels} / ${totalPossible}${isRecommended ? ' · Recommended' : ''}</span>
       </button>`;
   }
 
@@ -148,14 +161,9 @@ function _startPassage(catKey, level) {
 }
 
 function _initPassage(passage) {
-  const blankCount = (passage.text.match(/___/g) || []).length;
-
-  _bankWords = passage.wordBank.map((w, i) => ({ id: i, word: w, used: false }));
-  for (let i = _bankWords.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [_bankWords[i], _bankWords[j]] = [_bankWords[j], _bankWords[i]];
-  }
-  _blankFills = Array(blankCount).fill(null);
+  const round = createClozeRound(passage);
+  _bankWords = round.bankWords;
+  _blankFills = round.blankFills;
 
   _renderPassage(passage);
 }
@@ -197,8 +205,7 @@ function _renderPassage(passage) {
 
   document.getElementById('wv-back-levels')?.addEventListener('click', () => _renderLevelBrowser(_currentCat));
   document.getElementById('wv-clear')?.addEventListener('click', () => {
-    _bankWords.forEach(w => (w.used = false));
-    _blankFills.fill(null);
+    clearClozeRound(_bankWords, _blankFills);
     _renderText(passage);
     _renderBank(passage);
   });
@@ -210,36 +217,19 @@ function _renderText(passage) {
   const container = document.getElementById('wv-passage-text');
   if (!container) return;
 
-  const parts = passage.text.split('___');
-  let html = '';
-
-  parts.forEach((part, i) => {
-    html += `<span>${part}</span>`;
-    if (i < parts.length - 1) {
-      const fillId = _blankFills[i];
-      const fill   = fillId !== null ? _bankWords.find(w => w.id === fillId) : null;
-      if (fill) {
-        html += `<button class="wv-blank wv-blank--filled" data-blank="${i}"
-                         aria-label="Remove ${fill.word}">${fill.word}</button>`;
-      } else {
-        html += `<button class="wv-blank" data-blank="${i}" aria-label="Blank ${i + 1}"></button>`;
-      }
-    }
-  });
-
-  container.innerHTML = html;
-
-  // Tap filled blank → return word
-  container.querySelectorAll('.wv-blank--filled').forEach(blank => {
-    blank.addEventListener('click', () => {
-      const idx  = parseInt(blank.dataset.blank);
-      const id   = _blankFills[idx];
-      const item = _bankWords.find(w => w.id === id);
-      if (item) item.used = false;
-      _blankFills[idx] = null;
+  renderClozePassage({
+    container,
+    text: passage.text,
+    blankFills: _blankFills,
+    bankWords: _bankWords,
+    blankClass: 'wv-blank',
+    filledClass: 'wv-blank--filled',
+    emptyBlankAria: (i) => `Blank ${i + 1}`,
+    removeBlankAria: (word) => `Remove ${word}`,
+    onRemoveWord: () => {
       _renderText(passage);
       _renderBank(passage);
-    });
+    },
   });
 }
 
@@ -247,28 +237,17 @@ function _renderBank(passage) {
   const bank = document.getElementById('wv-bank');
   if (!bank) return;
 
-  bank.innerHTML = _bankWords.map(w => `
-    <button class="wv-word-chip ${w.used ? 'wv-word-chip--used' : ''}"
-            data-id="${w.id}"
-            ${w.used ? 'disabled aria-disabled="true"' : ''}
-            aria-label="${w.word}">${w.word}</button>
-  `).join('');
-
-  bank.querySelectorAll('.wv-word-chip:not([disabled])').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const id   = parseInt(chip.dataset.id);
-      const item = _bankWords.find(w => w.id === id);
-      if (!item || item.used) return;
-
-      const blankIdx = _blankFills.findIndex(f => f === null);
-      if (blankIdx === -1) return;
-
-      item.used = true;
-      _blankFills[blankIdx] = id;
+  renderClozeBank({
+    container: bank,
+    bankWords: _bankWords,
+    chipClass: 'wv-word-chip',
+    usedClass: 'wv-word-chip--used',
+    onChooseWord: (id) => {
+      if (!fillNextBlank(_bankWords, _blankFills, id)) return;
       audio.playSfx('pop');
       _renderText(passage);
       _renderBank(passage);
-    });
+    },
   });
 }
 
@@ -280,8 +259,17 @@ function _checkPassage(passage) {
     return;
   }
 
-  const userAnswers = _blankFills.map(id => _bankWords.find(w => w.id === id)?.word || '');
+  const userAnswers = buildUserAnswers(_blankFills, _bankWords);
   const allCorrect  = userAnswers.every((ans, i) => ans === passage.answers[i]);
+
+  questMastery.recordAttempt({
+    quest: 'wordVault',
+    skill: _currentCat || 'mixed',
+    correct: allCorrect,
+    responseMs: 2000,
+    level: _currentLevel,
+  });
+  questMastery.updateSkill('wordVault', _currentCat || 'mixed', allCorrect);
 
   if (allCorrect) {
     gamification.recordCorrect(2000, false);
