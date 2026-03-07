@@ -14,6 +14,7 @@ import { allSentences, SENTENCE_LEVEL_LABELS, SENTENCE_LEVEL_ICONS } from '../da
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 import { gamification } from '../modules/gamification.js';
+import { questMastery } from '../modules/questMastery.js';
 import { celebrateCorrect, celebrateLevelUp } from '../components/confettiHelper.js';
 import { mascot } from '../components/mascot.js';
 
@@ -245,6 +246,14 @@ function _checkAnswer(entry, punct) {
 
   if (correct) {
     _sessionCorrect++;
+    questMastery.recordAttempt({
+      quest: 'sentenceForge',
+      skill: 'word_order',
+      correct: true,
+      responseMs: 1200,
+      level: _currentLevel,
+    });
+    questMastery.updateSkill('sentenceForge', 'word_order', true);
     gamification.recordCorrect(1200, false);
     celebrateCorrect();
     audio.playSfx('correct');
@@ -261,6 +270,14 @@ function _checkAnswer(entry, punct) {
       _showSentence();
     }, 1500);
   } else {
+    questMastery.recordAttempt({
+      quest: 'sentenceForge',
+      skill: 'word_order',
+      correct: false,
+      responseMs: 1200,
+      level: _currentLevel,
+    });
+    questMastery.updateSkill('sentenceForge', 'word_order', false);
     audio.playSfx('wrong');
     mascot.encourage();
     _showFeedback('❌ Not quite – try rearranging!', false);

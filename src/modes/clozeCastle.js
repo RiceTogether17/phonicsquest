@@ -14,6 +14,15 @@ import { passages, CLOZE_LEVEL_LABELS, CLOZE_LEVEL_ICONS, GRAMMAR_CATEGORIES } f
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 import { gamification } from '../modules/gamification.js';
+import { questMastery } from '../modules/questMastery.js';
+import {
+  buildUserAnswers,
+  clearClozeRound,
+  createClozeRound,
+  fillNextBlank,
+  renderClozeBank,
+  renderClozePassage,
+} from './clozeEngine.js';
 import { celebrateCorrect } from '../components/confettiHelper.js';
 import { mascot } from '../components/mascot.js';
 
@@ -103,19 +112,22 @@ function _renderCategoryPicker(level) {
   html += `<p class="cloze-cat-subtitle">Choose a grammar topic:</p>`;
   html += '<div class="cloze-cat-grid">';
 
+  const recommendedCat = questMastery.getRecommendedSkill('clozeCastle', cats);
+
   for (const catKey of cats) {
     const cat   = GRAMMAR_CATEGORIES[catKey] || { label: catKey, icon: '📝' };
     const total = passages[level][catKey].length;
     const doneKey = `${level}-${catKey}`;
     const done  = completed[doneKey] || 0;
     const isDone = done >= total;
+    const isRecommended = catKey === recommendedCat;
 
     html += `
-      <button class="cloze-cat-btn ${isDone ? 'cloze-cat-btn--done' : ''}"
-              data-cat="${catKey}" aria-label="${cat.label}">
+      <button class="cloze-cat-btn ${isDone ? 'cloze-cat-btn--done' : ''} ${isRecommended ? 'cloze-cat-btn--recommended' : ''}"
+              data-cat="${catKey}" aria-label="${cat.label}${isRecommended ? ' (recommended)' : ''}">
         <span class="cloze-cat-icon">${isDone ? '⭐' : cat.icon}</span>
         <span class="cloze-cat-label">${cat.label}</span>
-        <span class="cloze-cat-count">${Math.min(done, total)} / ${total}</span>
+        <span class="cloze-cat-count">${Math.min(done, total)} / ${total}${isRecommended ? ' · Recommended' : ''}</span>
       </button>`;
   }
 
@@ -177,14 +189,9 @@ function _showPassage() {
 // ── Passage init ───────────────────────────────────────────────────────────
 
 function _initPassage(passage) {
-  const blankCount = (passage.text.match(/___/g) || []).length;
-
-  _bankWords = passage.wordBank.map((w, i) => ({ id: i, word: w, used: false }));
-  for (let i = _bankWords.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [_bankWords[i], _bankWords[j]] = [_bankWords[j], _bankWords[i]];
-  }
-  _blankFills = Array(blankCount).fill(null);
+  const round = createClozeRound(passage);
+  _bankWords = round.bankWords;
+  _blankFills = round.blankFills;
 
   _renderPassage(passage);
 }
@@ -230,8 +237,7 @@ function _renderPassage(passage) {
   _renderBankWords();
 
   document.getElementById('cloze-clear')?.addEventListener('click', () => {
-    _bankWords.forEach(w => (w.used = false));
-    _blankFills.fill(null);
+    clearClozeRound(_bankWords, _blankFills);
     _renderPassageText(passage);
     _renderBankWords();
   });
@@ -255,41 +261,23 @@ function _renderPassageText(passage) {
   const container = document.getElementById('cloze-passage');
   if (!container) return;
 
-  const parts = passage.text.split('___');
-  let html = '';
-
-  parts.forEach((part, i) => {
-    html += `<span>${part}</span>`;
-    if (i < parts.length - 1) {
-      const fill = _blankFills[i] !== null ? _bankWords.find(w => w.id === _blankFills[i]) : null;
-      if (fill) {
-        html += `<button class="cloze-blank cloze-blank--filled" data-blank="${i}"
-                         aria-label="Remove ${fill.word} from blank">${fill.word}</button>`;
-      } else {
-        html += `<button class="cloze-blank" data-blank="${i}" aria-label="Empty blank ${i + 1}"></button>`;
-      }
-    }
-  });
-
-  container.innerHTML = html;
-
-  container.querySelectorAll('.cloze-blank--filled').forEach(blank => {
-    blank.addEventListener('click', () => {
-      const idx  = parseInt(blank.dataset.blank);
-      const id   = _blankFills[idx];
-      const item = _bankWords.find(w => w.id === id);
-      if (item) item.used = false;
-      _blankFills[idx] = null;
+  renderClozePassage({
+    container,
+    text: passage.text,
+    blankFills: _blankFills,
+    bankWords: _bankWords,
+    blankClass: 'cloze-blank',
+    filledClass: 'cloze-blank--filled',
+    emptyBlankAria: (i) => `Empty blank ${i + 1}`,
+    removeBlankAria: (word) => `Remove ${word} from blank`,
+    onRemoveWord: () => {
       _renderPassageText(passage);
       _renderBankWords();
-    });
-  });
-
-  container.querySelectorAll('.cloze-blank:not(.cloze-blank--filled)').forEach(blank => {
-    blank.addEventListener('click', () => {
+    },
+    onTapEmpty: (blank) => {
       blank.classList.add('cloze-blank--selected');
       setTimeout(() => blank.classList.remove('cloze-blank--selected'), 800);
-    });
+    },
   });
 }
 
@@ -297,28 +285,17 @@ function _renderBankWords() {
   const bank = document.getElementById('cloze-bank');
   if (!bank) return;
 
-  bank.innerHTML = _bankWords.map(w => `
-    <button class="cloze-word-chip ${w.used ? 'cloze-word-chip--used' : ''}"
-            data-id="${w.id}"
-            ${w.used ? 'disabled aria-disabled="true"' : ''}
-            aria-label="${w.word}">${w.word}</button>
-  `).join('');
-
-  bank.querySelectorAll('.cloze-word-chip:not([disabled])').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const id   = parseInt(chip.dataset.id);
-      const item = _bankWords.find(w => w.id === id);
-      if (!item || item.used) return;
-
-      const blankIdx = _blankFills.findIndex(f => f === null);
-      if (blankIdx === -1) return;
-
-      item.used = true;
-      _blankFills[blankIdx] = id;
+  renderClozeBank({
+    container: bank,
+    bankWords: _bankWords,
+    chipClass: 'cloze-word-chip',
+    usedClass: 'cloze-word-chip--used',
+    onChooseWord: (id) => {
+      if (!fillNextBlank(_bankWords, _blankFills, id)) return;
       audio.playSfx('pop');
       _renderPassageText(_levelPassages[_passageIdx]);
       _renderBankWords();
-    });
+    },
   });
 }
 
@@ -330,8 +307,18 @@ function _checkPassage(passage) {
     return;
   }
 
-  const userAnswers = _blankFills.map(id => _bankWords.find(w => w.id === id)?.word || '');
+  const userAnswers = buildUserAnswers(_blankFills, _bankWords);
   const allCorrect  = userAnswers.every((ans, i) => ans === passage.answers[i]);
+  const skillKey = _currentCat === '__all__' ? 'mixed' : _currentCat;
+
+  questMastery.recordAttempt({
+    quest: 'clozeCastle',
+    skill: skillKey,
+    correct: allCorrect,
+    responseMs: 2000,
+    level: _currentLevel,
+  });
+  questMastery.updateSkill('clozeCastle', skillKey, allCorrect);
 
   _sessionTotal++;
 
