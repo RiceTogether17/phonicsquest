@@ -1690,18 +1690,21 @@ input, select, textarea { font-family: inherit; }
   .app-header { padding: 12px 32px; }
   .main-content { padding: 24px 48px; overflow: visible; }
 
-  /* ── Desktop: game & sight match fill full width ── */
+  /* ── Desktop: ALL game screens fill full width ── */
   #screen-game,
-  #screen-sight-match {
+  #screen-sight-match,
+  #screen-stories,
+  #screen-letter-sounds,
+  #screen-sentence-forge,
+  #screen-cloze-castle,
+  #screen-word-vault {
     align-self: stretch;
     align-items: stretch;
   }
-  #screen-sight-match .stories-screen-header {
-    max-width: none;
-  }
-  #screen-sight-match .stories-content {
-    max-width: none;
-  }
+
+  /* Remove max-width caps on shared content wrappers inside game screens */
+  .stories-screen-header { max-width: none; }
+  .stories-content { max-width: none; }
 
   /* Larger phoneme tiles on desktop */
   .phoneme-tile { padding: 12px 20px; font-size: var(--font-size-xl); min-width: 60px; }
@@ -1722,7 +1725,7 @@ input, select, textarea { font-family: inherit; }
   .action-bar .btn { min-height: 56px; font-size: var(--font-size-lg); padding: 16px 28px; }
   .icon-btn { width: 52px; height: 52px; }
 
-  /* ── Classic Blend: tighter controls on desktop ── */
+  /* ── Classic Blend: controls on desktop ── */
   .classic-blend-wrap { gap: var(--space-3); }
   .speed-btn { padding: var(--space-2) var(--space-4); font-size: var(--font-size-base); }
 
@@ -1742,28 +1745,31 @@ input, select, textarea { font-family: inherit; }
     width: 100%;
   }
   .sm-card { height: auto; aspect-ratio: 3 / 4; }
-  .sm-card-number { font-size: 1.1rem; top: 6px; left: 8px; }
-  .sm-card-back { font-size: clamp(1.1rem, 2.5vw, 1.6rem); }
+  .sm-card-number { font-size: 1.3rem; top: 8px; left: 10px; }
+  .sm-card-back { font-size: clamp(1.3rem, 3vw, 2rem); }
 
-  /* Stories content wider */
-  .stories-content { max-width: 780px; }
+  /* Stories banner */
   .stories-banner { max-width: 600px; }
 
-  /* Cloze / Word Vault / Sentence Forge: wider containers */
+  /* Cloze / Word Vault / Sentence Forge: full-width containers */
   .cloze-game,
   .wv-game,
-  .sfq-game { max-width: 780px; margin: 0 auto; }
+  .sfq-game { max-width: 100%; }
   .cloze-browser,
   .wv-browser,
-  .sfq-browser { max-width: 780px; margin: 0 auto; }
+  .sfq-browser { max-width: 100%; }
 
-  /* Category/level grids: 3 columns on desktop */
+  /* Category/level grids: 4 columns on desktop */
   .cloze-browser-grid,
   .cloze-cat-grid,
-  .wv-cat-grid { grid-template-columns: repeat(3, 1fr); }
+  .wv-cat-grid { grid-template-columns: repeat(4, 1fr); }
+
+  /* Sight match browser: full width */
+  .sm-browser { max-width: 100%; }
+  .sm-quest-grid { grid-template-columns: repeat(4, 1fr); }
 
   /* Dashboard: wider */
-  .dashboard-content { max-width: 860px; }
+  .dashboard-content { max-width: 100%; }
 
   /* Bigger fonts for heading areas */
   .mode-title { font-size: var(--font-size-xl); }
@@ -1772,17 +1778,10 @@ input, select, textarea { font-family: inherit; }
   /* Modals scale up on desktop */
   .modal-panel { max-width: 640px; border-radius: var(--radius-xl); }
 
-  /* Stories content wider on desktop */
-  .stories-screen-header { max-width: 780px; }
-
-  /* Comprehension quiz wider */
+  /* Comprehension quiz full width */
   .sq-question-card,
   .sq-options,
-  .sq-feedback { max-width: 780px; }
-
-  /* Sight match browser: full width */
-  .sm-browser { max-width: 100%; }
-  .sm-quest-grid { grid-template-columns: repeat(4, 1fr); }
+  .sq-feedback { max-width: 100%; }
 
   /* Category selector wider */
   .category-select { max-width: 400px; }
@@ -1800,6 +1799,9 @@ input, select, textarea { font-family: inherit; }
   .mode-grid { max-width: 1060px; }
   .home-section { max-width: 1060px; }
   .sm-quest-grid { grid-template-columns: repeat(5, 1fr); }
+  .cloze-browser-grid,
+  .cloze-cat-grid,
+  .wv-cat-grid { grid-template-columns: repeat(5, 1fr); }
 }
 
 /* ── 19. UTILITY ── */
@@ -2821,13 +2823,11 @@ input, select, textarea { font-family: inherit; }
   color: var(--color-primary-dark);
 }
 
-/* Card grid – 2 columns on narrow, 5 columns on wide */
+/* Card grid – 5 columns, constrained on mobile */
 .sm-card-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: var(--space-3);
-  max-width: 420px;
-  margin: 0 auto;
   width: 100%;
 }
 @media (max-width: 400px) {
