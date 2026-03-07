@@ -16,6 +16,7 @@ import { store } from '../modules/store.js';
 import { gamification } from '../modules/gamification.js';
 import { questMastery } from '../modules/questMastery.js';
 import { celebrateCorrect, celebrateLevelUp } from '../components/confettiHelper.js';
+import { mascot } from '../components/mascot.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -29,6 +30,7 @@ let _bankWords = [];       // [{id, word, used}]
 let _answerSlots = [];     // bank word ids in answer order (null = empty never happens; slots grow as words tapped)
 let _sessionCorrect = 0;
 let _sessionTotal = 0;
+let _keyHandler = null;
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
@@ -45,6 +47,7 @@ export function cleanupSentenceForge() {
   if (_container) _container.innerHTML = '';
   _bankWords   = [];
   _answerSlots = [];
+  if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
 }
 
 // ── Browser ────────────────────────────────────────────────────────────────
@@ -149,11 +152,12 @@ function _renderGame(entry, punct) {
 
       <div class="sfq-actions">
         <button class="btn btn--ghost btn--sm" id="sfq-clear">↺ Clear</button>
+        <button class="btn btn--ghost btn--sm" id="sfq-listen" aria-label="Listen to sentence">🔊 Listen</button>
         <button class="btn btn--primary" id="sfq-check">Check ✓</button>
         <button class="btn btn--ghost btn--sm" id="sfq-quit">Menu</button>
       </div>
 
-      <div class="sfq-feedback" id="sfq-feedback" hidden></div>
+      <div class="sfq-feedback" id="sfq-feedback" role="status" aria-live="assertive" hidden></div>
     </div>`;
 
   _renderBank();
@@ -166,8 +170,20 @@ function _renderGame(entry, punct) {
     _renderAnswer();
   });
 
+  document.getElementById('sfq-listen')?.addEventListener('click', () => audio.speakWord(entry.sentence));
   document.getElementById('sfq-check')?.addEventListener('click', () => _checkAnswer(entry, punct));
   document.getElementById('sfq-quit')?.addEventListener('click', () => { cleanupSentenceForge(); _onGoHome?.(); });
+
+  // Keyboard shortcuts
+  if (_keyHandler) document.removeEventListener('keydown', _keyHandler);
+  _keyHandler = (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('sfq-check')?.click(); }
+    if (e.key === 'Escape') { cleanupSentenceForge(); _onGoHome?.(); }
+  };
+  document.addEventListener('keydown', _keyHandler);
+
+  // Focus first word chip for keyboard users
+  setTimeout(() => _container?.querySelector('.sfq-word-chip')?.focus(), 100);
 }
 
 function _renderBank() {
@@ -254,6 +270,7 @@ function _checkAnswer(entry, punct) {
     gamification.recordCorrect(1200, false);
     celebrateCorrect();
     audio.playSfx('correct');
+    mascot.celebrate(false);
 
     // Track per-level progress
     const completed = store.get('sfqCompleted') || {};
@@ -275,6 +292,7 @@ function _checkAnswer(entry, punct) {
     });
     questMastery.updateSkill('sentenceForge', 'word_order', false);
     audio.playSfx('wrong');
+    mascot.encourage();
     _showFeedback('❌ Not quite – try rearranging!', false);
     const area = document.getElementById('sfq-answer-area');
     area?.classList.remove('sfq-shake');
@@ -304,6 +322,7 @@ function _showComplete() {
 
   celebrateCorrect();
   audio.playSfx('levelUp');
+  mascot.celebrate(true);
 
   _container.innerHTML = `
     <div class="sfq-complete">
@@ -327,4 +346,9 @@ function _showComplete() {
   });
   document.getElementById('sfq-replay')?.addEventListener('click', () => _startLevel(_currentLevel));
   document.getElementById('sfq-back-levels')?.addEventListener('click', () => _renderBrowser());
+
+  // Remove game keyboard handler on complete screen
+  if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
+  // Focus primary action
+  setTimeout(() => document.getElementById('sfq-next-level')?.focus(), 200);
 }

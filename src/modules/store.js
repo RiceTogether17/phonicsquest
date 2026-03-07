@@ -49,6 +49,9 @@ const DEFAULT_STATE = {
   currentMode:  'blend',
   currentGroup: 'short-a',
 
+  // Per-mode difficulty (auto-adjusts based on performance)
+  modeDifficulty: {},  // { [modeKey]: 1|2|3 }
+
   // Word history (last 50 words played)
   wordHistory: [],
 

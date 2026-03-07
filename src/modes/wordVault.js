@@ -27,6 +27,7 @@ import {
   renderClozePassage,
 } from './clozeEngine.js';
 import { celebrateCorrect } from '../components/confettiHelper.js';
+import { mascot } from '../components/mascot.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -38,6 +39,9 @@ let _currentLevel  = 'p1';   // 'p1' … 'p6'
 let _bankWords     = [];     // [{id, word, used}]
 let _blankFills    = [];     // null | bankWordId per blank
 let _passage       = null;   // current passage object
+let _sessionCorrect = 0;
+let _sessionTotal   = 0;
+let _keyHandler     = null;
 
 const LEVEL_LABELS = { p1: 'P1', p2: 'P2', p3: 'P3', p4: 'P4', p5: 'P5', p6: 'P6' };
 const LEVEL_ICONS  = { p1: '🌱', p2: '🌿', p3: '🌳', p4: '🔥', p5: '💎', p6: '👑' };
@@ -58,6 +62,7 @@ export function cleanupWordVault() {
   _bankWords  = [];
   _blankFills = [];
   _passage    = null;
+  if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
 }
 
 // ── Category browser ───────────────────────────────────────────────────────
@@ -155,6 +160,9 @@ function _startPassage(catKey, level) {
   const passageList = (vocabPassages[catKey] || {})[level] || [];
   if (!passageList.length) return;
 
+  _sessionCorrect = 0;
+  _sessionTotal   = 0;
+
   // Pick random passage from the list
   _passage = passageList[Math.floor(Math.random() * passageList.length)];
   _initPassage(_passage);
@@ -193,11 +201,12 @@ function _renderPassage(passage) {
 
       <div class="wv-actions">
         <button class="btn btn--ghost btn--sm" id="wv-clear">↺ Clear all</button>
+        <button class="btn btn--ghost btn--sm" id="wv-listen" aria-label="Listen to passage">🔊 Listen</button>
         <button class="btn btn--primary" id="wv-check">Check ✓</button>
         <button class="btn btn--ghost btn--sm" id="wv-quit">Menu</button>
       </div>
 
-      <div class="wv-feedback" id="wv-feedback" hidden></div>
+      <div class="wv-feedback" id="wv-feedback" role="status" aria-live="assertive" hidden></div>
     </div>`;
 
   _renderText(passage);
@@ -209,8 +218,23 @@ function _renderPassage(passage) {
     _renderText(passage);
     _renderBank(passage);
   });
+  document.getElementById('wv-listen')?.addEventListener('click', () => {
+    let readable = passage.text;
+    for (const ans of passage.answers) {
+      readable = readable.replace('___', ans);
+    }
+    audio.speakWord(readable);
+  });
   document.getElementById('wv-check')?.addEventListener('click', () => _checkPassage(passage));
   document.getElementById('wv-quit')?.addEventListener('click', () => { cleanupWordVault(); _onGoHome?.(); });
+
+  // Keyboard shortcuts
+  if (_keyHandler) document.removeEventListener('keydown', _keyHandler);
+  _keyHandler = (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('wv-check')?.click(); }
+    if (e.key === 'Escape') { cleanupWordVault(); _onGoHome?.(); }
+  };
+  document.addEventListener('keydown', _keyHandler);
 }
 
 function _renderText(passage) {
@@ -262,19 +286,14 @@ function _checkPassage(passage) {
   const userAnswers = buildUserAnswers(_blankFills, _bankWords);
   const allCorrect  = userAnswers.every((ans, i) => ans === passage.answers[i]);
 
-  questMastery.recordAttempt({
-    quest: 'wordVault',
-    skill: _currentCat || 'mixed',
-    correct: allCorrect,
-    responseMs: 2000,
-    level: _currentLevel,
-  });
-  questMastery.updateSkill('wordVault', _currentCat || 'mixed', allCorrect);
+  _sessionTotal++;
 
   if (allCorrect) {
+    _sessionCorrect++;
     gamification.recordCorrect(2000, false);
     celebrateCorrect();
     audio.playSfx('correct');
+    mascot.celebrate(false);
 
     // Save completion
     const completed = store.get('wvqCompleted') || {};
@@ -292,6 +311,7 @@ function _checkPassage(passage) {
       const ans = _bankWords.find(w => w.id === _blankFills[i])?.word || '';
       b.classList.toggle('wv-blank--wrong', ans !== passage.answers[i]);
     });
+    mascot.encourage();
     _showFeedback('❌ Some blanks are wrong – check and try again!', false);
     setTimeout(() => {
       document.querySelectorAll('.wv-blank--wrong').forEach(b => b.classList.remove('wv-blank--wrong'));
@@ -321,13 +341,18 @@ function _showComplete() {
 
   celebrateCorrect();
   audio.playSfx('levelUp');
+  mascot.celebrate(true);
+
+  const acc   = _sessionTotal > 0 ? Math.round((_sessionCorrect / _sessionTotal) * 100) : 100;
+  const stars = acc >= 90 ? 3 : acc >= 70 ? 2 : 1;
 
   _container.innerHTML = `
     <div class="wv-complete">
       <div class="wv-complete-icon">${meta.icon}</div>
       <h3 class="wv-complete-title">Vault Opened! 🔑</h3>
       <p class="wv-complete-sub">${meta.label} · ${LEVEL_LABELS[_currentLevel]}</p>
-      <div class="wv-stars">⭐⭐⭐</div>
+      <div class="wv-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+      <p class="wv-complete-score">${_sessionCorrect} / ${_sessionTotal} correct · ${acc}%</p>
       <div class="wv-complete-actions">
         ${nextLv
           ? `<button class="btn btn--primary btn--lg" id="wv-next-level">${LEVEL_LABELS[nextLv]} →</button>`
@@ -345,4 +370,7 @@ function _showComplete() {
   document.getElementById('wv-replay')?.addEventListener('click', () => _startPassage(_currentCat, _currentLevel));
   document.getElementById('wv-back-lvls')?.addEventListener('click', () => _renderLevelBrowser(_currentCat));
   document.getElementById('wv-back-cats2')?.addEventListener('click', () => _renderCategoryBrowser());
+
+  if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
+  setTimeout(() => (document.getElementById('wv-next-level') || document.getElementById('wv-replay'))?.focus(), 200);
 }

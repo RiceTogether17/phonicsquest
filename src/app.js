@@ -95,6 +95,7 @@ class App {
     }
 
     this._updateDailyBanner();
+    this._updateQuestBanners();
 
     console.log('[PhonicsQuest] App initialized');
   }
@@ -258,6 +259,11 @@ class App {
 
     // Sentence Forge Quest button (home → sentence-forge screen)
     document.getElementById('btn-sentence-forge')?.addEventListener('click', () => {
+      const unlock = this._getQuestUnlockStatus();
+      if (!unlock.sentenceForge.unlocked) {
+        this._showToast(`Master ${unlock.sentenceForge.required} words to unlock! (${unlock.sentenceForge.current} so far)`, 'warning');
+        return;
+      }
       initSentenceForge(
         document.getElementById('sentence-forge-content'),
         () => {
@@ -280,6 +286,11 @@ class App {
 
     // Cloze Castle Quest button (home → cloze-castle screen)
     document.getElementById('btn-cloze-castle')?.addEventListener('click', () => {
+      const unlock = this._getQuestUnlockStatus();
+      if (!unlock.clozeCastle.unlocked) {
+        this._showToast(`Master ${unlock.clozeCastle.required} words to unlock! (${unlock.clozeCastle.current} so far)`, 'warning');
+        return;
+      }
       initClozeCastle(
         document.getElementById('cloze-castle-content'),
         () => {
@@ -302,6 +313,11 @@ class App {
 
     // Word Vault Quest button (home → word-vault screen)
     document.getElementById('btn-word-vault')?.addEventListener('click', () => {
+      const unlock = this._getQuestUnlockStatus();
+      if (!unlock.wordVault.unlocked) {
+        this._showToast(`Master ${unlock.wordVault.required} words to unlock! (${unlock.wordVault.current} so far)`, 'warning');
+        return;
+      }
       initWordVault(
         document.getElementById('word-vault-content'),
         () => {
@@ -442,7 +458,10 @@ class App {
       mascot.setHomeState('holdCard');
       return;
     } else {
-      const opts = { maxLevel: store.get('difficulty') || 1 };
+      // Use per-mode difficulty if available, falling back to global setting
+      const modeDiffs = store.get('modeDifficulty') || {};
+      const effectiveDiff = modeDiffs[this._mode] ?? store.get('difficulty') ?? 1;
+      const opts = { maxLevel: effectiveDiff };
       if (group) opts.group = group;
       this._currentWord = progress.getNextWord(opts);
     }
@@ -526,6 +545,9 @@ class App {
       // Show result screen
       this._showResultScreen(true, word, reward);
 
+      // Check if per-mode difficulty should adjust
+      this._adjustModeDifficulty();
+
     } else {
       // Wrong — shake the phoneme row before transitioning
       const phonemeRow = document.getElementById('phoneme-row');
@@ -558,6 +580,7 @@ class App {
       audio.playSfx('wrong');
 
       this._showResultScreen(false, word, null);
+      this._adjustModeDifficulty();
 
       if (result.needsRest) {
         this._showToast('Take a short break — Giri needs rest! ⭐', 'warning');
@@ -600,6 +623,9 @@ class App {
       }
     });
     this._screen = screenId;
+
+    // Refresh quest banners when returning home (mastery may have changed)
+    if (screenId === 'screen-home') this._updateQuestBanners();
   }
 
   /** Cleanup current mode */
@@ -1140,6 +1166,100 @@ class App {
 
     const banner = document.getElementById('btn-daily-challenge');
     if (banner) banner.classList.toggle('stories-banner--done', done);
+  }
+
+  // ── Per-Mode Adaptive Difficulty ──
+
+  /**
+   * Auto-adjust difficulty for the current mode based on recent performance.
+   * Called after each correct/wrong result. Checks the last 10 attempts in
+   * this mode and adjusts the per-mode difficulty level up or down.
+   */
+  _adjustModeDifficulty() {
+    const history = store.get('wordHistory') || [];
+    const modeHistory = history.filter(h => h.mode === this._mode).slice(0, 10);
+    if (modeHistory.length < 10) return; // not enough data yet
+
+    const correct = modeHistory.filter(h => h.correct).length;
+    const accuracy = correct / modeHistory.length;
+
+    const modeDiffs = store.get('modeDifficulty') || {};
+    const current = modeDiffs[this._mode] ?? store.get('difficulty') ?? 1;
+
+    let next = current;
+    if (accuracy >= 0.85 && current < 3) {
+      next = current + 1;
+    } else if (accuracy < 0.50 && current > 1) {
+      next = current - 1;
+    }
+
+    if (next !== current) {
+      modeDiffs[this._mode] = next;
+      store.set('modeDifficulty', modeDiffs);
+      const labels = { 1: 'Starter', 2: 'Explorer', 3: 'Champion' };
+      this._showToast(
+        next > current
+          ? `Level up! ${labels[next]} difficulty for this mode!`
+          : `Easing back to ${labels[next]} for this mode.`,
+        next > current ? 'success' : 'info'
+      );
+    }
+  }
+
+  // ── Quest Unlock Gating ──
+
+  /** Quest unlock thresholds (words mastered) */
+  static QUEST_THRESHOLDS = {
+    sentenceForge: 10,
+    clozeCastle: 25,
+    wordVault: 50,
+  };
+
+  /**
+   * Calculate quest unlock status based on words mastered.
+   * A word is "mastered" when it has >= 6 attempts and >= 80% accuracy.
+   */
+  _getQuestUnlockStatus() {
+    const stats = store.get('wordStats') || {};
+    let mastered = 0;
+    for (const s of Object.values(stats)) {
+      if (s.attempts >= 6 && s.correct / s.attempts >= 0.8) mastered++;
+    }
+
+    const t = App.QUEST_THRESHOLDS;
+    return {
+      mastered,
+      sentenceForge: { unlocked: mastered >= t.sentenceForge, required: t.sentenceForge, current: mastered },
+      clozeCastle:   { unlocked: mastered >= t.clozeCastle,   required: t.clozeCastle,   current: mastered },
+      wordVault:     { unlocked: mastered >= t.wordVault,     required: t.wordVault,     current: mastered },
+    };
+  }
+
+  /** Update quest banner UI to show lock/unlock state */
+  _updateQuestBanners() {
+    const unlock = this._getQuestUnlockStatus();
+
+    const banners = [
+      { id: 'btn-sentence-forge', quest: unlock.sentenceForge, label: '6 levels · unscramble & build sentences' },
+      { id: 'btn-cloze-castle',   quest: unlock.clozeCastle,   label: 'P1–P6 · grammar cloze passages' },
+      { id: 'btn-word-vault',     quest: unlock.wordVault,     label: '7 categories · vocabulary cloze passages' },
+    ];
+
+    for (const b of banners) {
+      const el = document.getElementById(b.id);
+      if (!el) continue;
+      const sub = el.querySelector('.stories-banner-sub');
+      const arrow = el.querySelector('.stories-banner-arrow');
+      if (b.quest.unlocked) {
+        if (sub) sub.textContent = b.label;
+        if (arrow) arrow.textContent = '→';
+        el.classList.remove('stories-banner--locked');
+      } else {
+        if (sub) sub.textContent = `🔒 Master ${b.quest.required} words to unlock (${b.quest.current}/${b.quest.required})`;
+        if (arrow) arrow.textContent = '🔒';
+        el.classList.add('stories-banner--locked');
+      }
+    }
   }
 
   // ── Keyboard Shortcuts ──

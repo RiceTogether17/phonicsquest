@@ -2730,6 +2730,15 @@ input, select, textarea { font-family: inherit; }
 .stories-banner--done .stories-banner-title { color: #15803d; }
 .stories-banner--done .stories-banner-arrow { color: #22c55e; font-size: 1.4rem; }
 
+/* Locked quest banner */
+.stories-banner--locked {
+  opacity: 0.6;
+  filter: grayscale(0.4);
+  cursor: not-allowed;
+}
+.stories-banner--locked:hover { transform: none; box-shadow: var(--shadow-sm); }
+.stories-banner--locked .stories-banner-sub { font-style: italic; }
+
 /* ── Quest browser ─────────────────────────────────────────────────────── */
 .sm-browser {
   display: flex;
@@ -4162,6 +4171,7 @@ input, select, textarea { font-family: inherit; }
 .cloze-complete-title { font-size: var(--font-size-2xl); font-weight: 800; color: var(--text); }
 .cloze-complete-sub   { font-size: var(--font-size-md); color: var(--text-muted); }
 .cloze-stars          { font-size: 2rem; letter-spacing: 4px; }
+.cloze-complete-score { font-size: var(--font-size-md); font-weight: 700; color: var(--text-muted); }
 .cloze-complete-actions { display: flex; flex-direction: column; gap: var(--space-3); align-items: center; width: 100%; max-width: 300px; }
 
 /* ============================================================
@@ -4378,6 +4388,7 @@ input, select, textarea { font-family: inherit; }
 .wv-complete-title { font-size: var(--font-size-2xl); font-weight: 800; color: var(--text); }
 .wv-complete-sub   { font-size: var(--font-size-md); color: var(--text-muted); }
 .wv-stars          { font-size: 2rem; letter-spacing: 4px; }
+.wv-complete-score { font-size: var(--font-size-md); font-weight: 700; color: var(--text-muted); }
 .wv-complete-actions { display: flex; flex-direction: column; gap: var(--space-3); align-items: center; width: 100%; max-width: 300px; }
 
 /* Responsive: single column on small screens */
@@ -4391,39 +4402,24 @@ input, select, textarea { font-family: inherit; }
   .wv-passage-text { font-size: var(--font-size-base); }
 }
 
-/* Desktop-only layout expansion for quest game screens */
-@media (min-width: 1024px) {
-  #screen-sight-match,
-  #screen-sentence-forge,
-  #screen-cloze-castle,
-  #screen-word-vault {
-    align-items: stretch;
-  }
+/* Quest landscape: use horizontal space for passage + bank */
+@media (min-width: 900px) {
+  .sfq-game,
+  .cloze-game,
+  .wv-game { max-width: 960px; }
 
-  #screen-sight-match .stories-screen-header,
-  #screen-sentence-forge .stories-screen-header,
-  #screen-cloze-castle .stories-screen-header,
-  #screen-word-vault .stories-screen-header,
-  #screen-sight-match .stories-content,
-  #screen-sentence-forge .stories-content,
-  #screen-cloze-castle .stories-content,
-  #screen-word-vault .stories-content {
-    max-width: none;
-    width: 100%;
-  }
+  .cloze-passage,
+  .wv-passage-text { font-size: var(--font-size-lg); line-height: 2.6; }
 
-  #screen-sight-match .sm-game,
-  #screen-sentence-forge .sfq-game,
-  #screen-sentence-forge .sfq-browser,
-  #screen-cloze-castle .cloze-game,
-  #screen-cloze-castle .cloze-browser,
-  #screen-word-vault .wv-game,
-  #screen-word-vault .wv-browser {
-    max-width: none;
-    width: 100%;
-  }
+  .cloze-blank { min-width: 100px; height: 40px; font-size: var(--font-size-md); }
+  .wv-blank    { min-width: 100px; height: 40px; font-size: var(--font-size-md); }
 
-  #screen-sight-match .sm-card-grid {
-    gap: var(--space-5);
-  }
+  .sfq-word-chip,
+  .sfq-answer-chip,
+  .cloze-word-chip,
+  .wv-word-chip { font-size: var(--font-size-md); padding: var(--space-2) var(--space-5); }
+
+  .sfq-complete-actions,
+  .cloze-complete-actions,
+  .wv-complete-actions { flex-direction: row; max-width: none; gap: var(--space-4); }
 }
