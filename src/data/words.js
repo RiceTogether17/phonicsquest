@@ -1209,3 +1209,21 @@ export const STRUCT_GROUP_ORDER = [
 export const SUFFIX_GROUP_ORDER = [
   'suffix-ing', 'suffix-ed', 'suffix-er', 'suffix-est',
 ];
+
+/** Load custom words from localStorage and merge into WORDS array */
+export function loadCustomWords() {
+  try {
+    const raw = localStorage.getItem('phonicsquest_v2');
+    if (!raw) return;
+    const state = JSON.parse(raw);
+    const custom = state.customWords;
+    if (!Array.isArray(custom) || custom.length === 0) return;
+    const existingIds = new Set(WORDS.map(w => w.id));
+    for (const w of custom) {
+      if (w && w.id && w.word && !existingIds.has(w.id)) {
+        WORDS.push(w);
+        existingIds.add(w.id);
+      }
+    }
+  } catch (_) { /* ignore */ }
+}

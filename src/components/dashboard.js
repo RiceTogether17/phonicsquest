@@ -74,7 +74,20 @@ export function renderDashboard(container) {
     <!-- Actions -->
     <div class="dash-actions">
       <button class="btn btn--ghost" id="btn-export-csv">Export CSV</button>
-      <button class="btn btn--ghost" id="btn-add-words">Custom Words</button>
+      <button class="btn btn--ghost" id="btn-import-csv">Import Words (CSV)</button>
+    </div>
+
+    <!-- Custom word import panel (hidden by default) -->
+    <div id="csv-import-panel" class="dash-import-panel" hidden>
+      <h4 class="dash-section-title">Import Custom Words</h4>
+      <p class="dash-import-desc">Upload a CSV with columns: <code>word, graphemes, types, group, level, emoji</code><br>
+        Or a simple list with just: <code>word</code> (one per line) — we'll auto-detect phonemes for CVC words.</p>
+      <div class="dash-import-drop" id="csv-drop-zone">
+        <input type="file" id="csv-file-input" accept=".csv,.txt" hidden />
+        <span>Drop CSV file here or <button class="btn btn--ghost btn--sm" id="csv-browse-btn">Browse</button></span>
+      </div>
+      <div id="csv-import-preview" class="dash-import-preview" hidden></div>
+      <div id="csv-import-status" class="dash-import-status" hidden></div>
     </div>
   `;
 
@@ -238,9 +251,196 @@ function _bindActions() {
     URL.revokeObjectURL(url);
   });
 
-  // Custom words — placeholder for now
-  document.getElementById('btn-add-words')?.addEventListener('click', () => {
-    alert('Custom words feature coming soon! You can add words via the browser console:\n\nstore.set("customWords", [...])');
+  // Import CSV toggle
+  document.getElementById('btn-import-csv')?.addEventListener('click', () => {
+    const panel = document.getElementById('csv-import-panel');
+    if (panel) panel.hidden = !panel.hidden;
+  });
+
+  // CSV file browse
+  document.getElementById('csv-browse-btn')?.addEventListener('click', () => {
+    document.getElementById('csv-file-input')?.click();
+  });
+
+  // CSV file input
+  document.getElementById('csv-file-input')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (file) _handleCSVImport(file);
+  });
+
+  // Drag & drop
+  const dropZone = document.getElementById('csv-drop-zone');
+  if (dropZone) {
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dash-import-drop--active'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dash-import-drop--active'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dash-import-drop--active');
+      const file = e.dataTransfer?.files?.[0];
+      if (file) _handleCSVImport(file);
+    });
+  }
+}
+
+// ── CSV Import ──────────────────────────────────────────────────────────────
+
+const VOWELS = new Set(['a', 'e', 'i', 'o', 'u']);
+const CONSONANTS = new Set('bcdfghjklmnpqrstvwxyz'.split(''));
+
+/**
+ * Auto-detect graphemes and types for a simple CVC-style word.
+ * Returns null if the word is too complex to auto-detect.
+ */
+function _autoDetectPhonemes(word) {
+  const lower = word.toLowerCase();
+  const graphemes = lower.split('');
+  const types = graphemes.map(ch => {
+    if (VOWELS.has(ch)) return 'sv';
+    if (CONSONANTS.has(ch)) return 'c';
+    return 'c'; // fallback
+  });
+  return { graphemes, types };
+}
+
+function _detectGroup(word) {
+  const vowel = word.toLowerCase().split('').find(ch => VOWELS.has(ch));
+  if (!vowel) return 'short-a';
+  return `short-${vowel}`;
+}
+
+function _detectPattern(graphemes, types) {
+  const consonantBefore = [];
+  const consonantAfter = [];
+  let foundVowel = false;
+  for (const t of types) {
+    if (t === 'sv' || t === 'lv') { foundVowel = true; continue; }
+    if (!foundVowel) consonantBefore.push(t);
+    else consonantAfter.push(t);
+  }
+  const c1 = consonantBefore.length;
+  const c2 = consonantAfter.length;
+  if (c1 <= 1 && c2 <= 1) return 'CVC';
+  if (c1 >= 2 && c2 <= 1) return 'blend';
+  if (c1 <= 1 && c2 >= 2) return 'CVCC';
+  return 'CCVCC';
+}
+
+async function _handleCSVImport(file) {
+  const preview = document.getElementById('csv-import-preview');
+  const status = document.getElementById('csv-import-status');
+  if (!preview || !status) return;
+
+  const text = await file.text();
+  const lines = text.trim().split('\n').filter(l => l.trim());
+
+  if (lines.length === 0) {
+    status.hidden = false;
+    status.textContent = 'File is empty.';
+    status.className = 'dash-import-status dash-import-status--error';
+    return;
+  }
+
+  // Detect format: full CSV (has commas in first line) or simple word list
+  const firstLine = lines[0].trim();
+  const isFullCSV = firstLine.includes(',');
+
+  let words = [];
+  const existingIds = new Set(WORDS.map(w => w.id));
+
+  if (isFullCSV) {
+    // Parse header
+    const header = firstLine.toLowerCase().split(',').map(h => h.trim());
+    const wordIdx = header.indexOf('word');
+    if (wordIdx < 0) {
+      status.hidden = false;
+      status.textContent = 'CSV must have a "word" column.';
+      status.className = 'dash-import-status dash-import-status--error';
+      return;
+    }
+
+    const graphIdx = header.indexOf('graphemes');
+    const typesIdx = header.indexOf('types');
+    const groupIdx = header.indexOf('group');
+    const levelIdx = header.indexOf('level');
+    const emojiIdx = header.indexOf('emoji');
+
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(',').map(c => c.trim());
+      const w = cols[wordIdx];
+      if (!w || existingIds.has(w.toLowerCase())) continue;
+
+      const graphemes = graphIdx >= 0 && cols[graphIdx]
+        ? cols[graphIdx].split(/[|;]/)
+        : _autoDetectPhonemes(w).graphemes;
+
+      const types = typesIdx >= 0 && cols[typesIdx]
+        ? cols[typesIdx].split(/[|;]/)
+        : _autoDetectPhonemes(w).types;
+
+      words.push({
+        id: w.toLowerCase(),
+        word: w.toLowerCase(),
+        graphemes,
+        types,
+        pattern: _detectPattern(graphemes, types),
+        group: (groupIdx >= 0 && cols[groupIdx]) || _detectGroup(w),
+        level: (levelIdx >= 0 && parseInt(cols[levelIdx])) || 1,
+        emoji: (emojiIdx >= 0 && cols[emojiIdx]) || '',
+      });
+    }
+  } else {
+    // Simple word list: one word per line
+    for (const line of lines) {
+      const w = line.trim().toLowerCase();
+      if (!w || existingIds.has(w)) continue;
+      const { graphemes, types } = _autoDetectPhonemes(w);
+      words.push({
+        id: w,
+        word: w,
+        graphemes,
+        types,
+        pattern: _detectPattern(graphemes, types),
+        group: _detectGroup(w),
+        level: 1,
+        emoji: '',
+      });
+    }
+  }
+
+  if (words.length === 0) {
+    status.hidden = false;
+    status.textContent = 'No new words found (all may already exist).';
+    status.className = 'dash-import-status dash-import-status--error';
+    return;
+  }
+
+  // Show preview
+  preview.hidden = false;
+  preview.innerHTML = `
+    <p><strong>${words.length} new word${words.length > 1 ? 's' : ''}</strong> ready to import:</p>
+    <div class="dash-import-word-list">${words.slice(0, 20).map(w =>
+      `<span class="dash-import-word">${w.emoji ? w.emoji + ' ' : ''}${w.word} <small>(${w.group})</small></span>`
+    ).join('')}${words.length > 20 ? `<span class="dash-import-word">…and ${words.length - 20} more</span>` : ''}</div>
+    <button class="btn btn--primary btn--sm" id="csv-confirm-import">Import ${words.length} Words</button>
+    <button class="btn btn--ghost btn--sm" id="csv-cancel-import">Cancel</button>
+  `;
+
+  document.getElementById('csv-cancel-import')?.addEventListener('click', () => {
+    preview.hidden = true;
+    status.hidden = true;
+  });
+
+  document.getElementById('csv-confirm-import')?.addEventListener('click', () => {
+    // Add to the WORDS array in memory
+    WORDS.push(...words);
+    // Also persist to store so they survive refresh
+    const existing = store.get('customWords') || [];
+    store.set('customWords', [...existing, ...words]);
+
+    preview.hidden = true;
+    status.hidden = false;
+    status.textContent = `Imported ${words.length} word${words.length > 1 ? 's' : ''} successfully!`;
+    status.className = 'dash-import-status dash-import-status--success';
   });
 }
 
