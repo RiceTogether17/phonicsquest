@@ -1690,9 +1690,17 @@ input, select, textarea { font-family: inherit; }
   .app-header { padding: 12px 32px; }
   .main-content { padding: 24px 48px; overflow: visible; }
 
-  /* ── Desktop game layout: use full width ── */
-  #screen-game {
-    max-width: 100%;
+  /* ── Desktop: game & sight match fill full width ── */
+  #screen-game,
+  #screen-sight-match {
+    align-self: stretch;
+    align-items: stretch;
+  }
+  #screen-sight-match .stories-screen-header {
+    max-width: none;
+  }
+  #screen-sight-match .stories-content {
+    max-width: none;
   }
 
   /* Larger phoneme tiles on desktop */
