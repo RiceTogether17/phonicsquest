@@ -15,6 +15,7 @@ import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 import { gamification } from '../modules/gamification.js';
 import { celebrateCorrect } from '../components/confettiHelper.js';
+import { mascot } from '../components/mascot.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -27,6 +28,8 @@ let _passageIdx     = 0;
 let _levelPassages  = [];
 let _bankWords      = [];   // [{id, word, used}]
 let _blankFills     = [];   // null | bankWordId per blank
+let _sessionCorrect = 0;
+let _sessionTotal   = 0;
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
@@ -148,6 +151,8 @@ function _startCategory(level, catKey) {
   const raw = passages[level]?.[catKey] || [];
   _levelPassages = [...raw].sort(() => Math.random() - 0.5);
   _passageIdx    = 0;
+  _sessionCorrect = 0;
+  _sessionTotal   = 0;
   _showPassage();
 }
 
@@ -156,6 +161,8 @@ function _startAllCategories(level) {
   const all = cats.flatMap(c => passages[level][c]);
   _levelPassages = [...all].sort(() => Math.random() - 0.5);
   _passageIdx    = 0;
+  _sessionCorrect = 0;
+  _sessionTotal   = 0;
   _showPassage();
 }
 
@@ -211,6 +218,7 @@ function _renderPassage(passage) {
 
       <div class="cloze-actions">
         <button class="btn btn--ghost btn--sm" id="cloze-clear">↺ Clear all</button>
+        <button class="btn btn--ghost btn--sm" id="cloze-listen" aria-label="Listen to passage">🔊 Listen</button>
         <button class="btn btn--primary" id="cloze-check">Check ✓</button>
         <button class="btn btn--ghost btn--sm" id="cloze-quit">Menu</button>
       </div>
@@ -228,6 +236,14 @@ function _renderPassage(passage) {
     _renderBankWords();
   });
 
+  document.getElementById('cloze-listen')?.addEventListener('click', () => {
+    // Read passage with answers filled in so child hears the complete version
+    let readable = passage.text;
+    for (const ans of passage.answers) {
+      readable = readable.replace('___', ans);
+    }
+    audio.speakWord(readable);
+  });
   document.getElementById('cloze-check')?.addEventListener('click', () => _checkPassage(passage));
   document.getElementById('cloze-quit')?.addEventListener('click', () => {
     cleanupClozeCastle();
@@ -317,10 +333,14 @@ function _checkPassage(passage) {
   const userAnswers = _blankFills.map(id => _bankWords.find(w => w.id === id)?.word || '');
   const allCorrect  = userAnswers.every((ans, i) => ans === passage.answers[i]);
 
+  _sessionTotal++;
+
   if (allCorrect) {
+    _sessionCorrect++;
     gamification.recordCorrect(2000, false);
     celebrateCorrect();
     audio.playSfx('correct');
+    mascot.celebrate(false);
 
     // Track per-level completion
     const completed = store.get('ccqCompleted') || {};
@@ -351,6 +371,7 @@ function _checkPassage(passage) {
       b.classList.toggle('cloze-blank--wrong', userAns !== passage.answers[i]);
     });
 
+    mascot.encourage();
     _showFeedback('❌ Some blanks are wrong – try again!', false);
     setTimeout(() => {
       document.querySelectorAll('.cloze-blank--wrong').forEach(b => b.classList.remove('cloze-blank--wrong'));
@@ -377,17 +398,22 @@ function _showComplete() {
   const icon = CLOZE_LEVEL_ICONS[_currentLevel];
   celebrateCorrect();
   audio.playSfx('levelUp');
+  mascot.celebrate(true);
 
   const catInfo = _currentCat !== '__all__' && GRAMMAR_CATEGORIES[_currentCat]
     ? `${GRAMMAR_CATEGORIES[_currentCat].icon} ${GRAMMAR_CATEGORIES[_currentCat].label}`
     : 'All Topics';
+
+  const acc   = _sessionTotal > 0 ? Math.round((_sessionCorrect / _sessionTotal) * 100) : 100;
+  const stars = acc >= 90 ? 3 : acc >= 70 ? 2 : 1;
 
   _container.innerHTML = `
     <div class="cloze-complete">
       <div class="cloze-complete-icon">${icon}</div>
       <h3 class="cloze-complete-title">Castle Cleared! 🏰</h3>
       <p class="cloze-complete-sub">${CLOZE_LEVEL_LABELS[_currentLevel]} · ${catInfo}</p>
-      <div class="cloze-stars">⭐⭐⭐</div>
+      <div class="cloze-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+      <p class="cloze-complete-score">${_sessionCorrect} / ${_sessionTotal} correct · ${acc}%</p>
       <div class="cloze-complete-actions">
         <button class="btn btn--primary btn--lg" id="cloze-back-cat">Choose Another Topic</button>
         <button class="btn btn--ghost btn--sm" id="cloze-replay">Play Again ↺</button>

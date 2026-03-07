@@ -4159,6 +4159,7 @@ input, select, textarea { font-family: inherit; }
 .cloze-complete-title { font-size: var(--font-size-2xl); font-weight: 800; color: var(--text); }
 .cloze-complete-sub   { font-size: var(--font-size-md); color: var(--text-muted); }
 .cloze-stars          { font-size: 2rem; letter-spacing: 4px; }
+.cloze-complete-score { font-size: var(--font-size-md); font-weight: 700; color: var(--text-muted); }
 .cloze-complete-actions { display: flex; flex-direction: column; gap: var(--space-3); align-items: center; width: 100%; max-width: 300px; }
 
 /* ============================================================
@@ -4374,6 +4375,7 @@ input, select, textarea { font-family: inherit; }
 .wv-complete-title { font-size: var(--font-size-2xl); font-weight: 800; color: var(--text); }
 .wv-complete-sub   { font-size: var(--font-size-md); color: var(--text-muted); }
 .wv-stars          { font-size: 2rem; letter-spacing: 4px; }
+.wv-complete-score { font-size: var(--font-size-md); font-weight: 700; color: var(--text-muted); }
 .wv-complete-actions { display: flex; flex-direction: column; gap: var(--space-3); align-items: center; width: 100%; max-width: 300px; }
 
 /* Responsive: single column on small screens */
@@ -4385,4 +4387,26 @@ input, select, textarea { font-family: inherit; }
   .wv-level-grid { grid-template-columns: repeat(2, 1fr); }
   .cloze-passage,
   .wv-passage-text { font-size: var(--font-size-base); }
+}
+
+/* Quest landscape: use horizontal space for passage + bank */
+@media (min-width: 900px) {
+  .sfq-game,
+  .cloze-game,
+  .wv-game { max-width: 960px; }
+
+  .cloze-passage,
+  .wv-passage-text { font-size: var(--font-size-lg); line-height: 2.6; }
+
+  .cloze-blank { min-width: 100px; height: 40px; font-size: var(--font-size-md); }
+  .wv-blank    { min-width: 100px; height: 40px; font-size: var(--font-size-md); }
+
+  .sfq-word-chip,
+  .sfq-answer-chip,
+  .cloze-word-chip,
+  .wv-word-chip { font-size: var(--font-size-md); padding: var(--space-2) var(--space-5); }
+
+  .sfq-complete-actions,
+  .cloze-complete-actions,
+  .wv-complete-actions { flex-direction: row; max-width: none; gap: var(--space-4); }
 }

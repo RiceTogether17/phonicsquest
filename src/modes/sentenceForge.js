@@ -15,6 +15,7 @@ import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 import { gamification } from '../modules/gamification.js';
 import { celebrateCorrect, celebrateLevelUp } from '../components/confettiHelper.js';
+import { mascot } from '../components/mascot.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -148,6 +149,7 @@ function _renderGame(entry, punct) {
 
       <div class="sfq-actions">
         <button class="btn btn--ghost btn--sm" id="sfq-clear">↺ Clear</button>
+        <button class="btn btn--ghost btn--sm" id="sfq-listen" aria-label="Listen to sentence">🔊 Listen</button>
         <button class="btn btn--primary" id="sfq-check">Check ✓</button>
         <button class="btn btn--ghost btn--sm" id="sfq-quit">Menu</button>
       </div>
@@ -165,6 +167,7 @@ function _renderGame(entry, punct) {
     _renderAnswer();
   });
 
+  document.getElementById('sfq-listen')?.addEventListener('click', () => audio.speakWord(entry.sentence));
   document.getElementById('sfq-check')?.addEventListener('click', () => _checkAnswer(entry, punct));
   document.getElementById('sfq-quit')?.addEventListener('click', () => { cleanupSentenceForge(); _onGoHome?.(); });
 }
@@ -245,6 +248,7 @@ function _checkAnswer(entry, punct) {
     gamification.recordCorrect(1200, false);
     celebrateCorrect();
     audio.playSfx('correct');
+    mascot.celebrate(false);
 
     // Track per-level progress
     const completed = store.get('sfqCompleted') || {};
@@ -258,6 +262,7 @@ function _checkAnswer(entry, punct) {
     }, 1500);
   } else {
     audio.playSfx('wrong');
+    mascot.encourage();
     _showFeedback('❌ Not quite – try rearranging!', false);
     const area = document.getElementById('sfq-answer-area');
     area?.classList.remove('sfq-shake');
@@ -287,6 +292,7 @@ function _showComplete() {
 
   celebrateCorrect();
   audio.playSfx('levelUp');
+  mascot.celebrate(true);
 
   _container.innerHTML = `
     <div class="sfq-complete">
