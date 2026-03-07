@@ -179,16 +179,43 @@ async function _doBlend(word, els) {
     revealedIndices: null,
   });
 
+  // Animated sweep: highlight each phoneme tile in sequence
+  await _animateBlendSweep(els.phonemeRow, word);
+
   // Build word animation
   buildWordAnimation(word, els.wordDisplay);
 
   // Brief pause then say the blended word
-  await _delay(500);
+  await _delay(300);
   await audio.speakWord(word.word);
 
   els.btnSayIt.style.display = '';
 
   _renderControls(els, word, 'assess');
+}
+
+/**
+ * Animate a left-to-right highlight sweep across phoneme tiles.
+ * Each tile lights up in sequence, then all glow together at the end.
+ */
+async function _animateBlendSweep(phonemeRow, word) {
+  const tiles = phonemeRow.querySelectorAll('.phoneme-tile');
+  if (!tiles.length) return;
+
+  const perTile = Math.max(200, Math.min(500, 1200 / tiles.length));
+
+  // Sequential highlight
+  for (let i = 0; i < tiles.length; i++) {
+    tiles[i].classList.add('blend-highlight');
+    await audio.speakPhoneme(word.graphemes[i], word.types[i]);
+    await _delay(perTile);
+    tiles[i].classList.remove('blend-highlight');
+  }
+
+  // Flash all together for the "blend" moment
+  tiles.forEach(t => t.classList.add('blend-highlight-all'));
+  await _delay(400);
+  tiles.forEach(t => t.classList.remove('blend-highlight-all'));
 }
 
 const _delay = ms => new Promise(r => setTimeout(r, ms));

@@ -2365,6 +2365,28 @@ input, select, textarea { font-family: inherit; }
 
 .blend-next-btn { min-width: 180px; }
 
+/* Visual blending guide — animated sweep highlight */
+.phoneme-tile.blend-highlight .phoneme-symbol {
+  transform: scale(1.25) translateY(-6px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3), 0 0 12px var(--color-primary-light);
+  filter: brightness(1.2);
+  transition: transform 0.15s var(--ease-bounce), box-shadow 0.15s ease, filter 0.15s ease;
+}
+.phoneme-tile:not(.blend-highlight) .phoneme-symbol {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.phoneme-tile.blend-highlight-all .phoneme-symbol {
+  transform: scale(1.15);
+  box-shadow: 0 4px 16px rgba(108, 99, 255, 0.4);
+  filter: brightness(1.15);
+  animation: blend-glow-pulse 0.4s ease-in-out;
+}
+@keyframes blend-glow-pulse {
+  0%   { box-shadow: 0 4px 8px rgba(108, 99, 255, 0.2); }
+  50%  { box-shadow: 0 4px 24px rgba(108, 99, 255, 0.6); }
+  100% { box-shadow: 0 4px 16px rgba(108, 99, 255, 0.4); }
+}
+
 .blend-assess-btns {
   display: flex;
   gap: var(--space-4);
