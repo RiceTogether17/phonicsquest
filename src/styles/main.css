@@ -1746,7 +1746,7 @@ input, select, textarea { font-family: inherit; }
   }
   .sm-card { height: auto; aspect-ratio: 3 / 4; }
   .sm-card-number { font-size: 1.3rem; top: 8px; left: 10px; }
-  .sm-card-back { font-size: clamp(1.3rem, 3vw, 2rem); }
+  .sm-card-back { font-size: clamp(1.8rem, 2.2vw, 3rem); }
 
   /* Stories banner */
   .stories-banner { max-width: 600px; }
@@ -2929,12 +2929,14 @@ input, select, textarea { font-family: inherit; }
   justify-content: space-between;
   gap: var(--space-3);
   padding-top: var(--space-2);
+  flex-wrap: wrap;
 }
 .sm-moves {
   font-size: var(--font-size-sm);
   color: var(--text-muted);
   font-weight: 600;
 }
+#sm-btn-fullscreen { white-space: nowrap; }
 
 /* ── Completion overlay ───────────────────────────────────────────────── */
 .sm-complete-overlay {
