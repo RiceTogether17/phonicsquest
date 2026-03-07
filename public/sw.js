@@ -7,7 +7,7 @@
  *   - Navigation: Network-first with offline fallback to cached shell
  */
 
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const SHELL_CACHE   = `phonicsquest-shell-${CACHE_VERSION}`;
 const ASSET_CACHE   = `phonicsquest-assets-${CACHE_VERSION}`;
 
@@ -17,6 +17,14 @@ const SHELL_FILES = [
   '/phonicsquest/index.html',
 ];
 
+/** All phoneme MP3 files — pre-bundled for offline use */
+const PHONEME_FILES = [
+  'a','air','ar','b','c','ch','d','e','ear','er','f','g','h','i','j','k',
+  'l','long_a','long_e','long_i','long_o','long_u','m','n','ng','o','oi',
+  'or','ow','p','q','r','s','sh','soft_c','soft_g','t','th','u','v','w',
+  'x','y','z'
+].map(f => `/phonicsquest/audio/phonemes/${f}.mp3`);
+
 /** Audio and image prefixes to cache on first fetch */
 const CACHEABLE_PREFIXES = [
   '/phonicsquest/audio/',
@@ -25,14 +33,52 @@ const CACHEABLE_PREFIXES = [
   '/phonicsquest/assets/',  // Vite-bundled JS/CSS chunks
 ];
 
-// ── Install: pre-cache app shell ────────────────────────────────────────────
+// ── Install: pre-cache app shell + all phoneme audio ────────────────────────
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(SHELL_CACHE).then(cache => cache.addAll(SHELL_FILES))
-      .then(() => self.skipWaiting())
-      .catch(err => console.warn('[SW] Install failed:', err))
+    (async () => {
+      // Cache app shell first
+      const shellCache = await caches.open(SHELL_CACHE);
+      await shellCache.addAll(SHELL_FILES);
+
+      // Pre-cache all phoneme audio with progress reporting
+      const assetCache = await caches.open(ASSET_CACHE);
+      const total = PHONEME_FILES.length;
+      let cached = 0;
+      let failed = 0;
+
+      await Promise.all(PHONEME_FILES.map(async (url) => {
+        try {
+          const existing = await assetCache.match(url);
+          if (!existing) {
+            const response = await fetch(url);
+            if (response.ok) {
+              await assetCache.put(url, response);
+            } else {
+              failed++;
+            }
+          }
+        } catch (_) {
+          failed++;
+        }
+        cached++;
+        broadcastProgress({ type: 'audio-cache-progress', cached, total, failed });
+      }));
+
+      broadcastProgress({ type: 'audio-cache-complete', total, failed });
+      await self.skipWaiting();
+    })().catch(err => console.warn('[SW] Install failed:', err))
   );
 });
+
+/** Send a message to all connected clients */
+function broadcastProgress(msg) {
+  self.clients.matchAll({ type: 'window' }).then(clients => {
+    for (const client of clients) {
+      client.postMessage(msg);
+    }
+  });
+}
 
 // ── Activate: delete old caches ─────────────────────────────────────────────
 self.addEventListener('activate', event => {

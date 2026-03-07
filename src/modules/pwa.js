@@ -28,6 +28,46 @@ export function registerServiceWorker() {
       console.warn('[PWA] Service worker registration failed:', err);
     }
   });
+
+  // Listen for audio cache progress from service worker
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    const { type, cached, total, failed } = event.data || {};
+    const indicator = document.getElementById('offline-indicator');
+    if (!indicator) return;
+
+    if (type === 'audio-cache-progress') {
+      const pct = Math.round((cached / total) * 100);
+      indicator.hidden = false;
+      indicator.innerHTML = `<span class="offline-indicator__icon">⬇</span> Caching audio… ${pct}%`;
+      indicator.className = 'offline-indicator offline-indicator--loading';
+    } else if (type === 'audio-cache-complete') {
+      indicator.hidden = false;
+      if (failed === 0) {
+        indicator.innerHTML = '<span class="offline-indicator__icon">✓</span> Ready offline';
+        indicator.className = 'offline-indicator offline-indicator--ready';
+      } else {
+        indicator.innerHTML = `<span class="offline-indicator__icon">⚠</span> ${total - failed}/${total} audio cached`;
+        indicator.className = 'offline-indicator offline-indicator--partial';
+      }
+      setTimeout(() => { indicator.hidden = true; }, 4000);
+    }
+  });
+
+  // Show offline/online status
+  window.addEventListener('online', () => _updateNetworkStatus(true));
+  window.addEventListener('offline', () => _updateNetworkStatus(false));
+}
+
+function _updateNetworkStatus(isOnline) {
+  const indicator = document.getElementById('offline-indicator');
+  if (!indicator) return;
+  if (!isOnline) {
+    indicator.hidden = false;
+    indicator.innerHTML = '<span class="offline-indicator__icon">⊘</span> Offline — audio cached';
+    indicator.className = 'offline-indicator offline-indicator--offline';
+  } else {
+    indicator.hidden = true;
+  }
 }
 
 /** Simple toast helper for PWA notifications */
