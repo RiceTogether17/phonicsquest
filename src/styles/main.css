@@ -1746,7 +1746,7 @@ input, select, textarea { font-family: inherit; }
   }
   .sm-card { height: auto; aspect-ratio: 3 / 4; }
   .sm-card-number { font-size: 1.3rem; top: 8px; left: 10px; }
-  .sm-card-back { font-size: clamp(1.3rem, 3vw, 2rem); }
+  .sm-card-back { font-size: clamp(1.8rem, 2.2vw, 3rem); }
 
   /* Stories banner */
   .stories-banner { max-width: 600px; }
@@ -2929,12 +2929,14 @@ input, select, textarea { font-family: inherit; }
   justify-content: space-between;
   gap: var(--space-3);
   padding-top: var(--space-2);
+  flex-wrap: wrap;
 }
 .sm-moves {
   font-size: var(--font-size-sm);
   color: var(--text-muted);
   font-weight: 600;
 }
+#sm-btn-fullscreen { white-space: nowrap; }
 
 /* ── Completion overlay ───────────────────────────────────────────────── */
 .sm-complete-overlay {
@@ -4386,4 +4388,41 @@ input, select, textarea { font-family: inherit; }
   .wv-level-grid { grid-template-columns: repeat(2, 1fr); }
   .cloze-passage,
   .wv-passage-text { font-size: var(--font-size-base); }
+}
+
+/* Desktop-only layout expansion for quest game screens */
+@media (min-width: 1024px) {
+  #screen-sight-match,
+  #screen-sentence-forge,
+  #screen-cloze-castle,
+  #screen-word-vault {
+    align-items: stretch;
+  }
+
+  #screen-sight-match .stories-screen-header,
+  #screen-sentence-forge .stories-screen-header,
+  #screen-cloze-castle .stories-screen-header,
+  #screen-word-vault .stories-screen-header,
+  #screen-sight-match .stories-content,
+  #screen-sentence-forge .stories-content,
+  #screen-cloze-castle .stories-content,
+  #screen-word-vault .stories-content {
+    max-width: none;
+    width: 100%;
+  }
+
+  #screen-sight-match .sm-game,
+  #screen-sentence-forge .sfq-game,
+  #screen-sentence-forge .sfq-browser,
+  #screen-cloze-castle .cloze-game,
+  #screen-cloze-castle .cloze-browser,
+  #screen-word-vault .wv-game,
+  #screen-word-vault .wv-browser {
+    max-width: none;
+    width: 100%;
+  }
+
+  #screen-sight-match .sm-card-grid {
+    gap: var(--space-5);
+  }
 }
