@@ -1567,6 +1567,43 @@ input, select, textarea { font-family: inherit; }
 .dash-import-status--success { background: var(--color-success-light); color: var(--color-success); }
 .dash-import-status--error   { background: var(--color-error-light);   color: var(--color-error); }
 
+/* ── Offline / Audio Cache Indicator ── */
+.offline-indicator {
+  position: fixed;
+  bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  font-family: var(--font-main);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  box-shadow: var(--shadow-md);
+  transition: opacity 0.3s ease;
+}
+.offline-indicator[hidden] { display: none; }
+.offline-indicator__icon { font-size: var(--font-size-base); }
+.offline-indicator--loading {
+  background: var(--color-info);
+  color: var(--text-on-dark);
+}
+.offline-indicator--ready {
+  background: var(--color-success);
+  color: var(--text-on-dark);
+}
+.offline-indicator--partial {
+  background: var(--color-warning);
+  color: var(--text);
+}
+.offline-indicator--offline {
+  background: var(--color-primary);
+  color: var(--text-on-dark);
+}
+
 /* ── Badge Grid (dashboard) ── */
 .badge-grid {
   display: grid;

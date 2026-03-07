@@ -172,13 +172,13 @@ Vanilla JS + ES modules. No UI framework. TypeScript migration is on the roadmap
 
 ## 🗺️ Roadmap
 
+- [x] Adaptive difficulty per-mode (not just per-word)
+- [x] Custom word list import (CSV)
+- [x] Visual blending guide (animated phoneme highlighting)
+- [x] Offline-first audio pre-bundling
 - [ ] Multiple child profiles
 - [ ] TypeScript migration
-- [ ] Visual blending guide (animated mouth shapes)
 - [ ] Sentence builder unlock after word mastery
-- [ ] Adaptive difficulty per-mode (not just per-word)
-- [ ] Custom word list import (CSV)
-- [ ] Offline-first audio pre-bundling
 
 ---
 
