@@ -1746,7 +1746,7 @@ input, select, textarea { font-family: inherit; }
   }
   .sm-card { height: auto; aspect-ratio: 3 / 4; }
   .sm-card-number { font-size: 1.3rem; top: 8px; left: 10px; }
-  .sm-card-back { font-size: clamp(2.5rem, 3vw, 4.4rem); line-height: 1.1; }
+  .sm-card-back { font-size: clamp(1.8rem, 2.2vw, 3rem); }
 
   /* Stories banner */
   .stories-banner { max-width: 600px; }
