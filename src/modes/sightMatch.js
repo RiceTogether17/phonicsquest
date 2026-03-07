@@ -27,6 +27,7 @@ let _flipped       = [];    // indices of currently face-up (unmatched) cards
 let _matched       = new Set(); // indices of matched cards
 let _busy          = false; // prevents double-flip during delay
 let _moveCount     = 0;
+let _fullscreenListener = null;
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
@@ -46,6 +47,10 @@ export function cleanupSightMatch() {
   _flipped = [];
   _matched = new Set();
   _busy = false;
+  if (_fullscreenListener) {
+    document.removeEventListener('fullscreenchange', _fullscreenListener);
+    _fullscreenListener = null;
+  }
 }
 
 // ── Browser (quest picker) ─────────────────────────────────────────────────
@@ -159,6 +164,7 @@ function _renderGame(quest, cards) {
 
       <div class="sm-game-actions">
         <button class="btn btn--ghost btn--sm" id="sm-btn-back-to-quests">← Quests</button>
+        <button class="btn btn--ghost btn--sm" id="sm-btn-fullscreen" aria-pressed="false">⛶ Full Screen</button>
         <span class="sm-moves" id="sm-moves">Moves: 0</span>
         <button class="btn btn--ghost btn--sm" id="sm-btn-quit">Menu</button>
       </div>
@@ -184,6 +190,40 @@ function _renderGame(quest, cards) {
   document.getElementById('sm-btn-quit')?.addEventListener('click', () => {
     cleanupSightMatch();
     _onGoHome?.();
+  });
+
+  _bindFullscreenToggle();
+}
+
+function _bindFullscreenToggle() {
+  const btn = document.getElementById('sm-btn-fullscreen');
+  if (!btn || !document.fullscreenEnabled) {
+    btn?.setAttribute('hidden', '');
+    return;
+  }
+
+  const target = _container?.closest('.screen') || _container || document.documentElement;
+
+  const syncLabel = () => {
+    const active = document.fullscreenElement === target;
+    btn.textContent = active ? '🗗 Exit Full Screen' : '⛶ Full Screen';
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+  };
+
+  _fullscreenListener = syncLabel;
+  document.addEventListener('fullscreenchange', _fullscreenListener);
+  syncLabel();
+
+  btn.addEventListener('click', async () => {
+    try {
+      if (document.fullscreenElement === target) {
+        await document.exitFullscreen();
+      } else {
+        await target.requestFullscreen();
+      }
+    } catch {
+      // Silent fallback when fullscreen is blocked by browser policy.
+    }
   });
 }
 
