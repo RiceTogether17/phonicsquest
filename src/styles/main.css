@@ -4387,3 +4387,40 @@ input, select, textarea { font-family: inherit; }
   .cloze-passage,
   .wv-passage-text { font-size: var(--font-size-base); }
 }
+
+/* Desktop-only layout expansion for quest game screens */
+@media (min-width: 1024px) {
+  #screen-sight-match,
+  #screen-sentence-forge,
+  #screen-cloze-castle,
+  #screen-word-vault {
+    align-items: stretch;
+  }
+
+  #screen-sight-match .stories-screen-header,
+  #screen-sentence-forge .stories-screen-header,
+  #screen-cloze-castle .stories-screen-header,
+  #screen-word-vault .stories-screen-header,
+  #screen-sight-match .stories-content,
+  #screen-sentence-forge .stories-content,
+  #screen-cloze-castle .stories-content,
+  #screen-word-vault .stories-content {
+    max-width: none;
+    width: 100%;
+  }
+
+  #screen-sight-match .sm-game,
+  #screen-sentence-forge .sfq-game,
+  #screen-sentence-forge .sfq-browser,
+  #screen-cloze-castle .cloze-game,
+  #screen-cloze-castle .cloze-browser,
+  #screen-word-vault .wv-game,
+  #screen-word-vault .wv-browser {
+    max-width: none;
+    width: 100%;
+  }
+
+  #screen-sight-match .sm-card-grid {
+    gap: var(--space-5);
+  }
+}
