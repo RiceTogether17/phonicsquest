@@ -39,6 +39,7 @@ let _bankWords      = [];   // [{id, word, used}]
 let _blankFills     = [];   // null | bankWordId per blank
 let _sessionCorrect = 0;
 let _sessionTotal   = 0;
+let _keyHandler     = null;
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
@@ -55,6 +56,7 @@ export function cleanupClozeCastle() {
   if (_container) _container.innerHTML = '';
   _bankWords  = [];
   _blankFills = [];
+  if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
 }
 
 // ── Level Browser ─────────────────────────────────────────────────────────
@@ -230,7 +232,7 @@ function _renderPassage(passage) {
         <button class="btn btn--ghost btn--sm" id="cloze-quit">Menu</button>
       </div>
 
-      <div class="cloze-feedback" id="cloze-feedback" hidden></div>
+      <div class="cloze-feedback" id="cloze-feedback" role="status" aria-live="assertive" hidden></div>
     </div>`;
 
   _renderPassageText(passage);
@@ -255,6 +257,14 @@ function _renderPassage(passage) {
     cleanupClozeCastle();
     _onGoHome?.();
   });
+
+  // Keyboard shortcuts
+  if (_keyHandler) document.removeEventListener('keydown', _keyHandler);
+  _keyHandler = (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('cloze-check')?.click(); }
+    if (e.key === 'Escape') { cleanupClozeCastle(); _onGoHome?.(); }
+  };
+  document.addEventListener('keydown', _keyHandler);
 }
 
 function _renderPassageText(passage) {
@@ -414,4 +424,7 @@ function _showComplete() {
     else _startCategory(_currentLevel, _currentCat);
   });
   document.getElementById('cloze-back-levels')?.addEventListener('click', () => _renderBrowser());
+
+  if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
+  setTimeout(() => document.getElementById('cloze-back-cat')?.focus(), 200);
 }

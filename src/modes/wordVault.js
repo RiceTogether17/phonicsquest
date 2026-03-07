@@ -41,6 +41,7 @@ let _blankFills    = [];     // null | bankWordId per blank
 let _passage       = null;   // current passage object
 let _sessionCorrect = 0;
 let _sessionTotal   = 0;
+let _keyHandler     = null;
 
 const LEVEL_LABELS = { p1: 'P1', p2: 'P2', p3: 'P3', p4: 'P4', p5: 'P5', p6: 'P6' };
 const LEVEL_ICONS  = { p1: '🌱', p2: '🌿', p3: '🌳', p4: '🔥', p5: '💎', p6: '👑' };
@@ -61,6 +62,7 @@ export function cleanupWordVault() {
   _bankWords  = [];
   _blankFills = [];
   _passage    = null;
+  if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
 }
 
 // ── Category browser ───────────────────────────────────────────────────────
@@ -204,7 +206,7 @@ function _renderPassage(passage) {
         <button class="btn btn--ghost btn--sm" id="wv-quit">Menu</button>
       </div>
 
-      <div class="wv-feedback" id="wv-feedback" hidden></div>
+      <div class="wv-feedback" id="wv-feedback" role="status" aria-live="assertive" hidden></div>
     </div>`;
 
   _renderText(passage);
@@ -225,6 +227,14 @@ function _renderPassage(passage) {
   });
   document.getElementById('wv-check')?.addEventListener('click', () => _checkPassage(passage));
   document.getElementById('wv-quit')?.addEventListener('click', () => { cleanupWordVault(); _onGoHome?.(); });
+
+  // Keyboard shortcuts
+  if (_keyHandler) document.removeEventListener('keydown', _keyHandler);
+  _keyHandler = (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('wv-check')?.click(); }
+    if (e.key === 'Escape') { cleanupWordVault(); _onGoHome?.(); }
+  };
+  document.addEventListener('keydown', _keyHandler);
 }
 
 function _renderText(passage) {
@@ -360,4 +370,7 @@ function _showComplete() {
   document.getElementById('wv-replay')?.addEventListener('click', () => _startPassage(_currentCat, _currentLevel));
   document.getElementById('wv-back-lvls')?.addEventListener('click', () => _renderLevelBrowser(_currentCat));
   document.getElementById('wv-back-cats2')?.addEventListener('click', () => _renderCategoryBrowser());
+
+  if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
+  setTimeout(() => (document.getElementById('wv-next-level') || document.getElementById('wv-replay'))?.focus(), 200);
 }

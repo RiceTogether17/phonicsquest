@@ -2730,6 +2730,15 @@ input, select, textarea { font-family: inherit; }
 .stories-banner--done .stories-banner-title { color: #15803d; }
 .stories-banner--done .stories-banner-arrow { color: #22c55e; font-size: 1.4rem; }
 
+/* Locked quest banner */
+.stories-banner--locked {
+  opacity: 0.6;
+  filter: grayscale(0.4);
+  cursor: not-allowed;
+}
+.stories-banner--locked:hover { transform: none; box-shadow: var(--shadow-sm); }
+.stories-banner--locked .stories-banner-sub { font-style: italic; }
+
 /* ── Quest browser ─────────────────────────────────────────────────────── */
 .sm-browser {
   display: flex;
