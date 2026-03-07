@@ -1690,32 +1690,10 @@ input, select, textarea { font-family: inherit; }
   .app-header { padding: 12px 32px; }
   .main-content { padding: 24px 48px; overflow: visible; }
 
-  /* ── Landscape game layout: image left, controls right ── */
+  /* ── Desktop game layout: single column, centered ── */
   #screen-game {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: var(--space-4);
-    max-width: 960px;
+    max-width: 640px;
     margin: 0 auto;
-  }
-  .word-stage {
-    flex: 0 0 40%;
-    max-width: 380px;
-    margin-bottom: 0;
-    position: sticky;
-    top: 80px;
-  }
-  .mode-area {
-    flex: 1 1 50%;
-    min-width: 300px;
-    max-width: 420px;
-  }
-  .action-bar {
-    width: 100%;
-    flex-basis: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
   }
 
   /* Larger phoneme tiles on desktop */
@@ -1724,8 +1702,8 @@ input, select, textarea { font-family: inherit; }
   /* Mode grid: 3 columns on desktop */
   .mode-grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-4); max-width: 960px; margin: 0 auto; }
 
-  /* Choice grid: 2 columns, compact */
-  .choice-grid { grid-template-columns: 1fr 1fr; gap: var(--space-3); max-width: 420px; }
+  /* Choice grid: 2 columns */
+  .choice-grid { grid-template-columns: 1fr 1fr; gap: var(--space-3); }
 
   /* Larger word image */
   .word-image-wrap { width: 160px; height: 160px; }
@@ -1738,31 +1716,27 @@ input, select, textarea { font-family: inherit; }
   .icon-btn { width: 52px; height: 52px; }
 
   /* ── Classic Blend: tighter controls on desktop ── */
-  .classic-blend-wrap { gap: var(--space-3); max-width: 400px; margin: 0 auto; }
+  .classic-blend-wrap { gap: var(--space-3); }
   .speed-btn { padding: var(--space-2) var(--space-4); font-size: var(--font-size-base); }
 
   /* ── Blend It!: larger step dots on desktop ── */
   .step-dot { width: 18px; height: 18px; }
-  .blend-guided-wrap { max-width: 420px; margin: 0 auto; }
 
   /* ── Segment-it: larger tiles on desktop ── */
   .segment-btn { min-width: 64px; padding: var(--space-3) var(--space-5); }
   .segment-slot { min-width: 80px; height: 64px; font-size: var(--font-size-2xl); }
 
-  /* ── Sight Match: bigger card grid on desktop ── */
+  /* ── Sight Match: full-width card grid on desktop ── */
+  .sm-game { max-width: 100%; }
   .sm-card-grid {
     grid-template-columns: repeat(5, 1fr);
-    gap: var(--space-4);
+    gap: var(--space-5);
     max-width: 100%;
     width: 100%;
-    margin: 0 auto;
   }
   .sm-card { height: auto; aspect-ratio: 3 / 4; }
-  .sm-card-number { font-size: 1rem; top: 6px; left: 8px; }
-  .sm-card-back { font-size: clamp(1rem, 2.5vw, 1.4rem); }
-  .sm-game { max-width: 700px; margin: 0 auto; }
-  .sm-game-header,
-  .sm-game-actions { margin-left: auto; margin-right: auto; }
+  .sm-card-number { font-size: 1.1rem; top: 6px; left: 8px; }
+  .sm-card-back { font-size: clamp(1.1rem, 2.5vw, 1.6rem); }
 
   /* Stories content wider */
   .stories-content { max-width: 780px; }
@@ -1816,7 +1790,7 @@ input, select, textarea { font-family: inherit; }
 /* Large desktop: comfortable max width */
 @media (min-width: 1440px) {
   .main-content { padding: 32px 64px; }
-  #screen-game { max-width: 1060px; }
+  #screen-game { max-width: 780px; }
   .mode-grid { max-width: 1060px; }
   .home-section { max-width: 1060px; }
 }
