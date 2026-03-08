@@ -3403,6 +3403,38 @@ input, select, textarea { font-family: inherit; }
   box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
+/* School-level picker inside create-profile modal */
+.cp-level-group {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.cp-level-btn {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-main);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--dur-fast), background var(--dur-fast);
+}
+.cp-level-btn:hover { border-color: var(--color-primary); }
+.cp-level-btn--selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+.cp-level-hint {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 0 var(--space-3);
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    STORY BROWSER — PHASE 2 ADDITIONS
    Category tabs · Singapore section · Chapter cards

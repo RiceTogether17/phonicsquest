@@ -34,13 +34,16 @@ function _saveProfiles(profiles) {
 }
 
 /** Create a new profile and return it. */
-export function createProfile(name, avatar, color) {
+export function createProfile(name, avatar, color, schoolLevel = 'preschool') {
   const id = 'p_' + Date.now().toString(36);
   const profile = {
     id,
     name: name || 'Player',
     avatar: avatar || AVATAR_OPTIONS[0],
     color:  color  || COLOR_OPTIONS[0],
+    // 'primary' bypasses phonics-mastery unlock gates for Sentence Forge,
+    // Cloze Castle and Word Vault. Defaults to 'preschool' (mastery-gated).
+    schoolLevel: schoolLevel === 'primary' ? 'primary' : 'preschool',
     createdAt: new Date().toISOString(),
   };
   const profiles = getProfiles();

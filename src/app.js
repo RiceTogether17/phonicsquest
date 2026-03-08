@@ -971,6 +971,28 @@ class App {
     const input = document.getElementById('cp-name-input');
     if (input) input.value = '';
 
+    // Reset school-level picker to Preschool and wire up toggle
+    const levelGroup = document.getElementById('cp-level-group');
+    const levelHint  = document.getElementById('cp-level-hint');
+    if (levelGroup) {
+      const levelBtns = levelGroup.querySelectorAll('.cp-level-btn');
+      const setLevel = (selected) => {
+        levelBtns.forEach(b => {
+          const active = b === selected;
+          b.classList.toggle('cp-level-btn--selected', active);
+          b.setAttribute('aria-pressed', String(active));
+        });
+        if (levelHint) {
+          levelHint.textContent = selected.dataset.level === 'primary'
+            ? 'Sentence Forge, Cloze Castle & Word Vault unlock immediately'
+            : 'Phonics games unlock as words are mastered';
+        }
+      };
+      // Default to preschool on each open
+      setLevel(levelGroup.querySelector('[data-level="preschool"]'));
+      levelBtns.forEach(btn => btn.addEventListener('click', () => setLevel(btn)));
+    }
+
     this._openModal('modal-create-profile');
     setTimeout(() => input?.focus(), 200);
   }
@@ -986,8 +1008,10 @@ class App {
     const avatar = selectedAvatarBtn?.dataset.avatar || AVATAR_OPTIONS[0];
     const colorIdx = getProfiles().length % COLOR_OPTIONS.length;
     const color = COLOR_OPTIONS[colorIdx];
+    const selectedLevelBtn = document.querySelector('.cp-level-btn--selected');
+    const schoolLevel = selectedLevelBtn?.dataset.level || 'preschool';
 
-    const profile = createProfile(name, avatar, color);
+    const profile = createProfile(name, avatar, color, schoolLevel);
     this._closeModal('modal-create-profile');
 
     activateProfile(profile.id);
@@ -1161,15 +1185,31 @@ class App {
   /**
    * Calculate quest unlock status based on words mastered.
    * A word is "mastered" when it has >= 6 attempts and >= 80% accuracy.
+   *
+   * Primary-school profiles bypass mastery gating: all three quests are
+   * treated as immediately unlocked regardless of word progress.
+   * Preschool profiles (and existing profiles without a schoolLevel field)
+   * continue to use the mastery-threshold unlock path.
    */
   _getQuestUnlockStatus() {
+    const profile = getActiveProfile();
+    const t = QUEST_THRESHOLDS;
+
+    if (profile?.schoolLevel === 'primary') {
+      return {
+        mastered: Infinity,
+        sentenceForge: { unlocked: true, required: t.sentenceForge, current: Infinity },
+        clozeCastle:   { unlocked: true, required: t.clozeCastle,   current: Infinity },
+        wordVault:     { unlocked: true, required: t.wordVault,     current: Infinity },
+      };
+    }
+
     const stats = store.get('wordStats') || {};
     let mastered = 0;
     for (const s of Object.values(stats)) {
       if (s.attempts >= 6 && s.correct / s.attempts >= 0.8) mastered++;
     }
 
-    const t = QUEST_THRESHOLDS;
     return {
       mastered,
       sentenceForge: { unlocked: mastered >= t.sentenceForge, required: t.sentenceForge, current: mastered },
