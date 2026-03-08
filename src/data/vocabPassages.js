@@ -1159,8 +1159,8 @@ export const vocabPassages = {
         id: 'con-p6-02',
         title: 'Nevertheless',
         text: '___ the heavy rain, the school sports day went ahead as planned. ___, a few events had to be moved indoors. ___, students cheered loudly and enjoyed the day.',
-        answers: ['Nevertheless', 'However', 'Subsequently'],
-        wordBank: ['Nevertheless', 'However', 'Subsequently', 'Because of', 'Consequently', 'Previously'],
+        answers: ['Despite', 'However', 'Nevertheless'],
+        wordBank: ['Despite', 'However', 'Nevertheless', 'Because of', 'Consequently', 'Previously'],
         xp: 50,
       },
       {
