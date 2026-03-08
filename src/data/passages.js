@@ -4,6 +4,14 @@
  * Singapore Primary 1–6 grammar cloze passages organised by level → category.
  * Each category tests a specific grammar concept with 3 passages of 3–4 blanks.
  *
+ * SPIRAL PROGRESSION MODEL
+ * ────────────────────────────────────────────────────────────────────────────
+ * Subject-verb agreement recurs: P1 → P2 → P3 → P4 → P5 (increasing complexity)
+ * Conjunctions recur:            P2 → P3 → P5
+ * Passive voice recurs:          P5 → P6
+ * Tense builds:                  P2 (simplePast, presentCont) → P3 (pastCont) → P4 (future)
+ * Conditionals recur:            P5 → P6 (rising complexity)
+ *
  * Structure: passages[level][categoryKey] = [passage, passage, passage]
  */
 
@@ -20,34 +28,26 @@ export const CLOZE_LEVEL_ICONS = {
   P1: '🌱', P2: '🌿', P3: '🌳', P4: '🔥', P5: '💎', P6: '👑',
 };
 
-/**
- * Grammar categories available per level.
- * Not every level has every category — each level focuses on
- * age-appropriate concepts.
- */
 export const GRAMMAR_CATEGORIES = {
-  articles:        { label: 'Articles (a/an/the)',  icon: '📰' },
-  pronouns:        { label: 'Pronouns',             icon: '👤' },
+  articles:        { label: 'Articles (a/an/the)',    icon: '📰' },
+  pronouns:        { label: 'Pronouns',               icon: '👤' },
   svAgreement:     { label: 'Subject-Verb Agreement', icon: '🤝' },
-  simplePast:      { label: 'Simple Past Tense',    icon: '⏪' },
-  presentCont:     { label: 'Present Continuous',    icon: '🔄' },
-  pastCont:        { label: 'Past Continuous',       icon: '⏳' },
-  futureTense:     { label: 'Future Tense',         icon: '🔮' },
-  prepositions:    { label: 'Prepositions',          icon: '📍' },
-  conjunctions:    { label: 'Conjunctions',          icon: '🔗' },
-  modals:          { label: 'Modal Verbs',           icon: '💪' },
-  comparatives:    { label: 'Comparatives',          icon: '📊' },
-  quantifiers:     { label: 'Quantifiers',           icon: '🔢' },
-  passiveVoice:    { label: 'Passive Voice',         icon: '🔄' },
-  conditionals:    { label: 'Conditionals (If)',     icon: '❓' },
-  reportedSpeech:  { label: 'Reported Speech',       icon: '💬' },
-  relativeClauses: { label: 'Relative Clauses',      icon: '🧩' },
+  simplePast:      { label: 'Simple Past Tense',      icon: '⏪' },
+  presentCont:     { label: 'Present Continuous',     icon: '🔄' },
+  pastCont:        { label: 'Past Continuous',        icon: '⏳' },
+  futureTense:     { label: 'Future Tense',           icon: '🔮' },
+  prepositions:    { label: 'Prepositions',           icon: '📍' },
+  conjunctions:    { label: 'Conjunctions',           icon: '🔗' },
+  modals:          { label: 'Modal Verbs',            icon: '💪' },
+  comparatives:    { label: 'Comparatives',           icon: '📊' },
+  quantifiers:     { label: 'Quantifiers',            icon: '🔢' },
+  passiveVoice:    { label: 'Passive Voice',          icon: '🔄' },
+  conditionals:    { label: 'Conditionals (If)',      icon: '❓' },
+  reportedSpeech:  { label: 'Reported Speech',        icon: '💬' },
+  relativeClauses: { label: 'Relative Clauses',       icon: '🧩' },
 };
 
 export const passages = {
-  // ═══════════════════════════════════════════════════════════════════════════
-  // PRIMARY 1
-  // ═══════════════════════════════════════════════════════════════════════════
   P1: {
     articles: [
       {
@@ -143,9 +143,6 @@ export const passages = {
     ],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // PRIMARY 2
-  // ═══════════════════════════════════════════════════════════════════════════
   P2: {
     simplePast: [
       {
@@ -193,26 +190,26 @@ export const passages = {
         xp: 25,
       },
     ],
-    pronouns: [
+    svAgreement: [
       {
-        id: 'g-p2-pro-01', title: 'My Pet Dog',
-        text: 'I have a dog. ___ name is Max. ___ is brown and white. I take ___ for a walk every morning.',
-        answers: ['His', 'He', 'him'],
-        wordBank: ['His', 'He', 'him', 'Its', 'It', 'it'],
+        id: 'g-p2-sva-01', title: 'At the Market',
+        text: 'Mrs Lin ___ at the market every Saturday. She ___ fresh fruit and vegetables. The fruit sellers ___ very friendly to their customers.',
+        answers: ['shops', 'buys', 'are'],
+        wordBank: ['shops', 'buys', 'are', 'shop', 'buy', 'is'],
         xp: 25,
       },
       {
-        id: 'g-p2-pro-02', title: 'The New Baby',
-        text: 'My sister had ___ baby. ___ is very small. ___ all love the baby very much.',
-        answers: ['her', 'He', 'We'],
-        wordBank: ['her', 'He', 'We', 'his', 'She', 'They'],
+        id: 'g-p2-sva-02', title: 'Lunchtime',
+        text: 'The canteen ___ very busy at lunchtime. Ali and Tom ___ rice for lunch. Their teacher ___ a bowl of noodles.',
+        answers: ['is', 'have', 'has'],
+        wordBank: ['is', 'have', 'has', 'are', 'has', 'have'],
         xp: 25,
       },
       {
-        id: 'g-p2-pro-03', title: 'Class Activity',
-        text: 'The teacher told ___ to open our books. ___ asked Ali a question. Ali gave ___ the answer.',
-        answers: ['us', 'She', 'her'],
-        wordBank: ['us', 'She', 'her', 'them', 'He', 'him'],
+        id: 'g-p2-sva-03', title: 'My Classmates',
+        text: 'I ___ in Class 2A. My best friend ___ next to me. We ___ our homework together every afternoon.',
+        answers: ['am', 'sits', 'do'],
+        wordBank: ['am', 'sits', 'do', 'are', 'sit', 'does'],
         xp: 25,
       },
     ],
@@ -241,33 +238,7 @@ export const passages = {
     ],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // PRIMARY 3
-  // ═══════════════════════════════════════════════════════════════════════════
   P3: {
-    simplePast: [
-      {
-        id: 'g-p3-sp-01', title: 'At the Market',
-        text: 'Mrs Tan ___ to the market early in the morning. She ___ fresh vegetables and fruits. She also ___ some fish for her family.',
-        answers: ['went', 'bought', 'bought'],
-        wordBank: ['went', 'bought', 'bought', 'goes', 'buys', 'buys'],
-        xp: 30,
-      },
-      {
-        id: 'g-p3-sp-02', title: 'The School Concert',
-        text: 'The school ___ a concert last Friday. Many students ___ on stage. The audience ___ loudly after each performance.',
-        answers: ['held', 'performed', 'clapped'],
-        wordBank: ['held', 'performed', 'clapped', 'holds', 'perform', 'clap'],
-        xp: 30,
-      },
-      {
-        id: 'g-p3-sp-03', title: 'The Lost Wallet',
-        text: 'John ___ his pocket and found it empty. He ___ when he realised his wallet was missing. He quickly ___ his steps.',
-        answers: ['checked', 'panicked', 'retraced'],
-        wordBank: ['checked', 'panicked', 'retraced', 'checks', 'panics', 'retraces'],
-        xp: 30,
-      },
-    ],
     pastCont: [
       {
         id: 'g-p3-pco-01', title: 'A Rainy Day',
@@ -337,35 +308,32 @@ export const passages = {
         xp: 30,
       },
     ],
-  },
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // PRIMARY 4
-  // ═══════════════════════════════════════════════════════════════════════════
-  P4: {
-    simplePast: [
+    conjunctions: [
       {
-        id: 'g-p4-sp-01', title: 'Sports Day',
-        text: 'The school ___ a sports day last Friday. The students ___ hard for many weeks. Tom ___ the 100-metre race. Everyone ___ very proud.',
-        answers: ['had', 'trained', 'won', 'was'],
-        wordBank: ['had', 'trained', 'won', 'was', 'has', 'train', 'wins', 'were'],
-        xp: 35,
+        id: 'g-p3-conj-01', title: 'After the Match',
+        text: 'The school team played very hard. ___, they did not win the match. They were disappointed ___ they did not give up. They decided to practise even harder the ___ day.',
+        answers: ['However', 'but', 'next'],
+        wordBank: ['However', 'but', 'next', 'Therefore', 'and', 'following'],
+        xp: 30,
       },
       {
-        id: 'g-p4-sp-02', title: 'The Camp',
-        text: 'The scouts ___ to a campsite last weekend. They ___ tents and ___ a campfire. Everyone ___ songs around the fire.',
-        answers: ['went', 'pitched', 'built', 'sang'],
-        wordBank: ['went', 'pitched', 'built', 'sang', 'go', 'pitch', 'build', 'sing'],
-        xp: 35,
+        id: 'g-p3-conj-02', title: 'Helping a Friend',
+        text: 'Wei felt sad ___ she had lost her bottle. Amy saw this ___ decided to help. They searched together ___ found it under the bench.',
+        answers: ['because', 'and', 'and'],
+        wordBank: ['because', 'and', 'and', 'so', 'but', 'then'],
+        xp: 30,
       },
       {
-        id: 'g-p4-sp-03', title: 'The Visit',
-        text: 'Last holiday, we ___ our grandparents. Grandma ___ our favourite dishes. We ___ stories and ___ together.',
-        answers: ['visited', 'cooked', 'shared', 'laughed'],
-        wordBank: ['visited', 'cooked', 'shared', 'laughed', 'visit', 'cooks', 'share', 'laugh'],
-        xp: 35,
+        id: 'g-p3-conj-03', title: 'A Busy Weekend',
+        text: 'Tom wanted to go swimming ___ it was raining. ___ the rain stopped, he went to the playground instead. He had fun ___ was glad he went out.',
+        answers: ['but', 'When', 'and'],
+        wordBank: ['but', 'When', 'and', 'because', 'After', 'so'],
+        xp: 30,
       },
     ],
+  },
+
+  P4: {
     futureTense: [
       {
         id: 'g-p4-ft-01', title: 'The School Garden',
@@ -382,7 +350,7 @@ export const passages = {
         xp: 35,
       },
       {
-        id: 'g-p4-ft-03', title: 'The New Building',
+        id: 'g-p4-ft-03', title: 'The New Library',
         text: 'The new library ___ be completed next year. Students ___ be able to borrow more books. It ___ also have a reading garden.',
         answers: ['will', 'will', 'will'],
         wordBank: ['will', 'will', 'will', 'would', 'can', 'shall'],
@@ -435,30 +403,50 @@ export const passages = {
         xp: 35,
       },
     ],
+    svAgreement: [
+      {
+        id: 'g-p4-sva-01', title: 'The School Team',
+        text: 'The school team ___ been training very hard. Each player ___ a special role. One of the girls ___ the fastest runner in the school.',
+        answers: ['has', 'has', 'is'],
+        wordBank: ['has', 'has', 'is', 'have', 'have', 'are'],
+        xp: 35,
+      },
+      {
+        id: 'g-p4-sva-02', title: 'Our Classroom',
+        text: 'Everyone in the class ___ expected to do their best. Each of the students ___ a reading journal. Neither the teacher nor the pupils ___ absent today.',
+        answers: ['is', 'has', 'were'],
+        wordBank: ['is', 'has', 'were', 'are', 'have', 'was'],
+        xp: 35,
+      },
+      {
+        id: 'g-p4-sva-03', title: 'Community Helpers',
+        text: 'A group of nurses ___ visiting our school today. The team of doctors ___ also joined them. Every child in the hall ___ very excited to meet them.',
+        answers: ['is', 'has', 'was'],
+        wordBank: ['is', 'has', 'was', 'are', 'have', 'were'],
+        xp: 35,
+      },
+    ],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // PRIMARY 5
-  // ═══════════════════════════════════════════════════════════════════════════
   P5: {
     svAgreement: [
       {
-        id: 'g-p5-sva-01', title: 'Technology in Education',
-        text: 'Technology ___ transformed the way students learn. Neither the teachers nor the principal ___ opposed to using it. Each student ___ given a tablet.',
-        answers: ['has', 'is', 'is'],
-        wordBank: ['has', 'is', 'is', 'have', 'are', 'are'],
+        id: 'g-p5-sva-01', title: 'The School Play',
+        text: 'The school play ___ been rehearsed for six weeks. Neither the lead actor nor his classmates ___ willing to give up. Each performer ___ expected to memorise all their lines.',
+        answers: ['has', 'were', 'is'],
+        wordBank: ['has', 'were', 'is', 'have', 'was', 'are'],
         xp: 40,
       },
       {
-        id: 'g-p5-sva-02', title: 'The Committee',
-        text: 'The committee ___ made its decision. The team of doctors ___ arrived. Neither the captain nor the players ___ ready to give up.',
+        id: 'g-p5-sva-02', title: 'The Sports Team',
+        text: 'The team ___ decided to train every day after school. The group of players ___ been working very hard. Neither the captain nor the players ___ ready to give up.',
         answers: ['has', 'has', 'were'],
         wordBank: ['has', 'has', 'were', 'have', 'have', 'was'],
         xp: 40,
       },
       {
-        id: 'g-p5-sva-03', title: 'Community Gardens',
-        text: 'Community gardens ___ springing up worldwide. The number of volunteers ___ increasing. Everyone in the neighbourhood ___ welcome to join.',
+        id: 'g-p5-sva-03', title: 'Community Service',
+        text: 'Community projects ___ becoming more popular in schools. The number of student volunteers ___ increasing every year. Everyone who takes part ___ expected to work as a team.',
         answers: ['are', 'is', 'is'],
         wordBank: ['are', 'is', 'is', 'is', 'are', 'are'],
         xp: 40,
@@ -474,16 +462,16 @@ export const passages = {
       },
       {
         id: 'g-p5-pv-02', title: 'School Events',
-        text: 'The competition ___ organised by the student council. Prizes ___ awarded to the top three teams. The event ___ attended by over 500 students.',
+        text: 'The competition ___ organised by the student council. Prizes ___ awarded to the top three teams. The event ___ attended by over five hundred students.',
         answers: ['was', 'were', 'was'],
         wordBank: ['was', 'were', 'was', 'is', 'are', 'is'],
         xp: 40,
       },
       {
-        id: 'g-p5-pv-03', title: 'Social Media',
-        text: 'Fake news ___ spread quickly on social media. Millions of users ___ affected by misinformation every day. Stronger laws ___ needed to address this problem.',
-        answers: ['is', 'are', 'are'],
-        wordBank: ['is', 'are', 'are', 'was', 'were', 'were'],
+        id: 'g-p5-pv-03', title: 'The Science Exhibition',
+        text: 'The science exhibition ___ organised by the school\'s STEM club. Each entry ___ carefully judged by a team of teachers. The prizes ___ awarded during the school assembly.',
+        answers: ['was', 'was', 'were'],
+        wordBank: ['was', 'was', 'were', 'is', 'is', 'are'],
         xp: 40,
       },
     ],
@@ -503,31 +491,31 @@ export const passages = {
         xp: 40,
       },
       {
-        id: 'g-p5-cond-03', title: 'Environmental Action',
-        text: 'If everyone ___ less plastic, the oceans would be cleaner. Unless we ___ action now, the situation will worsen. If the government ___ new laws, pollution could decrease.',
-        answers: ['used', 'take', 'introduced'],
-        wordBank: ['used', 'take', 'introduced', 'uses', 'took', 'introduces'],
+        id: 'g-p5-cond-03', title: 'Being a Good Friend',
+        text: 'If you ___ more patient with others, friendships will last longer. Unless we ___ kinder to those around us, we will push people away. If they ___ listened more carefully, the misunderstanding would not have happened.',
+        answers: ['are', 'become', 'had'],
+        wordBank: ['are', 'become', 'had', 'were', 'became', 'have'],
         xp: 40,
       },
     ],
     conjunctions: [
       {
-        id: 'g-p5-conj-01', title: 'Public Transport',
-        text: 'Public transport has improved. ___, overcrowding remains a challenge. ___ the government has invested heavily, more needs to be done. Commuters travel faster ___ before.',
+        id: 'g-p5-conj-01', title: 'The School Camp',
+        text: 'The school camp had been a great success. ___, some students felt it was too short. ___ the teachers had planned many activities, there was not enough time. Students today travel further ___ they did in the past.',
         answers: ['Nevertheless', 'Although', 'than'],
         wordBank: ['Nevertheless', 'Although', 'than', 'Therefore', 'Because', 'then'],
         xp: 40,
       },
       {
-        id: 'g-p5-conj-02', title: 'The Debate',
-        text: '___ some students prefer sciences, others favour the arts. The urban campus is modern, ___ the rural one is more traditional. ___ both have strengths, they serve different needs.',
+        id: 'g-p5-conj-02', title: 'Two Schools',
+        text: '___ some students prefer indoor activities, others love outdoor sports. The school library is quiet, ___ the sports hall is always noisy. ___ both places serve different purposes, they are equally important.',
         answers: ['While', 'whereas', 'Although'],
         wordBank: ['While', 'whereas', 'Although', 'Because', 'and', 'Since'],
         xp: 40,
       },
       {
-        id: 'g-p5-conj-03', title: 'Volunteering',
-        text: 'The students volunteered ___ they wanted to help. ___ it was tiring, they found it rewarding. They continued ___ they made a difference.',
+        id: 'g-p5-conj-03', title: 'Helping Others',
+        text: 'The students helped in the canteen ___ they wanted to give back to the school. ___ it was tiring, they found it very rewarding. They continued ___ they had cleared all the trays.',
         answers: ['because', 'Although', 'until'],
         wordBank: ['because', 'Although', 'until', 'so', 'However', 'while'],
         xp: 40,
@@ -535,99 +523,96 @@ export const passages = {
     ],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // PRIMARY 6
-  // ═══════════════════════════════════════════════════════════════════════════
   P6: {
     passiveVoice: [
       {
-        id: 'g-p6-pv-01', title: 'Globalisation',
-        text: 'Economies ___ been interconnected by globalisation. The exchange of goods ___ facilitated by new trade agreements. However, the gap between nations ___ widened considerably.',
-        answers: ['have', 'has been', 'has been'],
-        wordBank: ['have', 'has been', 'has been', 'has', 'was', 'was'],
+        id: 'g-p6-pv-01', title: "The School's Anniversary",
+        text: "The school's anniversary celebrations ___ organised by the parent-teacher committee. A special magazine ___ printed to mark the occasion. Photographs ___ taken of every class and displayed in the hall.",
+        answers: ['were', 'was', 'were'],
+        wordBank: ['were', 'was', 'were', 'are', 'is', 'are'],
         xp: 50,
       },
       {
-        id: 'g-p6-pv-02', title: 'Artificial Intelligence',
-        text: 'Industries ___ being reshaped by AI at an unprecedented pace. Tasks that once ___ performed by humans are now automated. New frameworks ___ be developed to address ethical concerns.',
-        answers: ['are', 'were', 'must'],
-        wordBank: ['are', 'were', 'must', 'is', 'are', 'should'],
+        id: 'g-p6-pv-02', title: 'The Community Garden',
+        text: 'A community garden ___ set up by a group of volunteers last year. Vegetables and herbs ___ planted in the raised garden beds. The garden ___ visited by many residents every weekend.',
+        answers: ['was', 'were', 'is'],
+        wordBank: ['was', 'were', 'is', 'is', 'are', 'was'],
         xp: 50,
       },
       {
-        id: 'g-p6-pv-03', title: 'Conservation Efforts',
-        text: 'Endangered species ___ protected by international laws. New reserves ___ been established in Southeast Asia. These efforts ___ supported by donations from around the world.',
-        answers: ['are', 'have', 'are'],
-        wordBank: ['are', 'have', 'are', 'were', 'has', 'were'],
+        id: 'g-p6-pv-03', title: 'The Book Donation Drive',
+        text: 'Thousands of books ___ donated to the school library last month. Each book ___ carefully sorted and labelled by student volunteers. The new arrivals ___ displayed in the reading corner for all to enjoy.',
+        answers: ['were', 'was', 'were'],
+        wordBank: ['were', 'was', 'were', 'are', 'is', 'are'],
         xp: 50,
       },
     ],
     reportedSpeech: [
       {
-        id: 'g-p6-rs-01', title: 'The Interview',
-        text: 'The minister said that the economy ___ improving. He added that new jobs ___ be created next year. He assured the public that the government ___ working hard.',
-        answers: ['was', 'would', 'was'],
-        wordBank: ['was', 'would', 'was', 'is', 'will', 'is'],
+        id: 'g-p6-rs-01', title: "The Teacher's Announcement",
+        text: 'The teacher announced that the class ___ have a spelling test on Friday. She added that students ___ prepare by reviewing all their notes. She also reminded them that the test ___ cover the words from this term.',
+        answers: ['would', 'should', 'would'],
+        wordBank: ['would', 'should', 'would', 'will', 'must', 'will'],
         xp: 50,
       },
       {
-        id: 'g-p6-rs-02', title: 'School Announcement',
-        text: 'The principal announced that the school ___ be closed the following day. She said that students ___ to stay home. She added that online lessons ___ be provided.',
+        id: 'g-p6-rs-02', title: "The Principal's Speech",
+        text: 'The principal announced that the school ___ hold its open house the following month. She said that all students ___ encouraged to invite their families. She added that a special programme ___ be prepared for visitors.',
         answers: ['would', 'were', 'would'],
         wordBank: ['would', 'were', 'would', 'will', 'are', 'will'],
         xp: 50,
       },
       {
-        id: 'g-p6-rs-03', title: 'The News Report',
-        text: 'The reporter said that the fire ___ started in the kitchen. Witnesses claimed that they ___ smoke coming from the building. Officials stated that no one ___ injured.',
-        answers: ['had', 'had seen', 'had been'],
-        wordBank: ['had', 'had seen', 'had been', 'has', 'saw', 'was'],
+        id: 'g-p6-rs-03', title: 'What Happened in Class',
+        text: 'The students reported that the experiment ___ produced unexpected results. Ali explained that he ___ not understood the instructions at first. The teacher replied that she ___ go through it again in the next lesson.',
+        answers: ['had', 'had', 'would'],
+        wordBank: ['had', 'had', 'would', 'has', 'have', 'will'],
         xp: 50,
       },
     ],
     relativeClauses: [
       {
-        id: 'g-p6-rc-01', title: 'Mental Health Awareness',
-        text: 'Mental health, ___ is essential to wellbeing, deserves more attention. Students ___ struggle with anxiety often hesitate to seek help. Programmes ___ support emotional health are being implemented.',
+        id: 'g-p6-rc-01', title: 'Our School Library',
+        text: 'The school library, ___ was recently renovated, has a much larger collection now. Students ___ love reading often spend their recess there. Books ___ have been donated are sorted and placed on special shelves.',
         answers: ['which', 'who', 'that'],
         wordBank: ['which', 'who', 'that', 'whom', 'whose', 'where'],
         xp: 50,
       },
       {
-        id: 'g-p6-rc-02', title: 'Urban Planning',
-        text: 'Cities ___ prioritise green spaces tend to have happier residents. The architect ___ designed the building won an award. The park, ___ was completed last year, attracts many visitors.',
-        answers: ['that', 'who', 'which'],
-        wordBank: ['that', 'who', 'which', 'whom', 'whose', 'where'],
+        id: 'g-p6-rc-02', title: 'A Good Teacher',
+        text: 'A good teacher is someone ___ understands how different students learn. Mrs Lim, ___ class I was in last year, made lessons very enjoyable. The teaching methods ___ she used helped many students improve greatly.',
+        answers: ['who', 'whose', 'that'],
+        wordBank: ['who', 'whose', 'that', 'whom', 'which', 'where'],
         xp: 50,
       },
       {
-        id: 'g-p6-rc-03', title: 'Cultural Diversity',
-        text: 'Singapore, ___ population is multicultural, celebrates many festivals. Citizens ___ backgrounds are different live harmoniously. The neighbourhood ___ I grew up in is very diverse.',
-        answers: ['whose', 'whose', 'where'],
-        wordBank: ['whose', 'whose', 'where', 'which', 'who', 'that'],
+        id: 'g-p6-rc-03', title: 'Our Neighbourhood',
+        text: 'Singapore, ___ people come from many different backgrounds, is a diverse and vibrant society. Residents ___ have lived here for decades feel a strong sense of belonging. The community centre, ___ our family has been going for years, runs activities for everyone.',
+        answers: ['whose', 'who', 'where'],
+        wordBank: ['whose', 'who', 'where', 'which', 'that', 'whom'],
         xp: 50,
       },
     ],
     conditionals: [
       {
-        id: 'g-p6-cond-01', title: 'Climate Change',
-        text: 'If governments ___ not acted sooner, the damage would have been irreversible. If carbon emissions ___ reduced, global temperatures will stabilise. Had the treaty ___ signed earlier, more species could have been saved.',
+        id: 'g-p6-cond-01', title: 'Being Responsible',
+        text: 'If the students ___ not revised their work, they would have done poorly in the test. If we ___ responsible citizens, our community will be a much better place. Had the team ___ more careful, they would not have lost the match.',
         answers: ['had', 'are', 'been'],
         wordBank: ['had', 'are', 'been', 'have', 'were', 'being'],
         xp: 50,
       },
       {
-        id: 'g-p6-cond-02', title: 'Technology Ethics',
-        text: 'If AI ___ regulated properly, its benefits would outweigh the risks. Unless stricter laws ___ passed, privacy violations will increase. If we ___ to ignore these issues, the consequences would be severe.',
-        answers: ['were', 'are', 'were'],
-        wordBank: ['were', 'are', 'were', 'is', 'was', 'was'],
+        id: 'g-p6-cond-02', title: 'Making Good Choices',
+        text: 'If we ___ our time wisely, we would achieve much more each day. Unless we ___ kinder to one another, conflicts will keep happening. If students ___ to help each other more, everyone in the school would benefit.',
+        answers: ['managed', 'are', 'chose'],
+        wordBank: ['managed', 'are', 'chose', 'manage', 'were', 'choose'],
         xp: 50,
       },
       {
-        id: 'g-p6-cond-03', title: 'Education Reform',
-        text: 'If more resources ___ allocated to schools, outcomes would improve. Had the programme ___ implemented earlier, more students would have benefited. If we ___ to reform the system now, future generations will thank us.',
-        answers: ['were', 'been', 'choose'],
-        wordBank: ['were', 'been', 'choose', 'are', 'being', 'chose'],
+        id: 'g-p6-cond-03', title: 'A Different Outcome',
+        text: 'If more students ___ involved in community service, the neighbourhood would be cleaner. Had the team ___ together better, they would have won the competition. If everyone ___ to do their part, the school would become an even better place.',
+        answers: ['were', 'worked', 'chose'],
+        wordBank: ['were', 'worked', 'chose', 'are', 'work', 'choose'],
         xp: 50,
       },
     ],
