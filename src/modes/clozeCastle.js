@@ -4,6 +4,12 @@
  * Grammar cloze passages (P1–P6) organised by grammar category.
  * Flow: Level picker → Category picker → Passages
  *
+ * Clue Mode (Part A–C)
+ * ─────────────────────
+ * When a passage has a `clues` array, each blank gets a clue-hunt step BEFORE
+ * the word bank is available.  Backwards compatible: passages without `clues`
+ * fall through to the classic tap-to-fill flow unchanged.
+ *
  * Public API:
  *   initClozeCastle(container, onGoHome)  – attach to DOM container
  *   showClozeBrowser()                    – render level picker
@@ -23,6 +29,13 @@ import {
   renderClozeBank,
   renderClozePassage,
 } from './clozeEngine.js';
+import {
+  evaluateClueSelection,
+  renderClueHuntPassage,
+  getClueHint,
+  clueResultFeedback,
+  clueResultToScore,
+} from './clueEngine.js';
 import { celebrateCorrect } from '../components/confettiHelper.js';
 import { mascot } from '../components/mascot.js';
 
@@ -40,6 +53,20 @@ let _blankFills     = [];   // null | bankWordId per blank
 let _sessionCorrect = 0;
 let _sessionTotal   = 0;
 let _keyHandler     = null;
+
+// ── Clue-mode state ────────────────────────────────────────────────────────
+// activeBlankIndex: which blank is in the clue-hunt phase right now (-1 = all done)
+// clueResults: { [blankIndex]: 'strong'|'partial'|'weak' } for scoring
+// hintLevel: 0–4 hint ladder position for current blank
+// bankLocked: true while waiting for a clue selection
+// weakAttempts: number of 'weak' selections in the current blank's clue hunt
+
+let _activeBlankIndex = -1;
+let _clueResults      = {};
+let _hintLevel        = 0;
+let _bankLocked       = false;
+let _weakAttempts     = 0;
+let _sessionClueScore = 0;   // accumulated clue points this session
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
@@ -135,7 +162,6 @@ function _renderCategoryPicker(level) {
 
   html += '</div>';
 
-  // "Play All" button — play all categories for this level
   const totalAll = cats.reduce((s, c) => s + passages[level][c].length, 0);
   html += `<div class="cloze-cat-actions">
     <button class="btn btn--primary btn--lg" id="cloze-play-all">Play All (${totalAll} passages)</button>
@@ -167,6 +193,7 @@ function _startCategory(level, catKey) {
   _passageIdx    = 0;
   _sessionCorrect = 0;
   _sessionTotal   = 0;
+  _sessionClueScore = 0;
   _showPassage();
 }
 
@@ -177,6 +204,7 @@ function _startAllCategories(level) {
   _passageIdx    = 0;
   _sessionCorrect = 0;
   _sessionTotal   = 0;
+  _sessionClueScore = 0;
   _showPassage();
 }
 
@@ -192,8 +220,23 @@ function _showPassage() {
 
 function _initPassage(passage) {
   const round = createClozeRound(passage);
-  _bankWords = round.bankWords;
+  _bankWords  = round.bankWords;
   _blankFills = round.blankFills;
+
+  // Reset clue state
+  _clueResults      = {};
+  _hintLevel        = 0;
+  _weakAttempts     = 0;
+
+  // Determine starting mode
+  if (passage.clues && passage.clues.length > 0) {
+    // Start with the first blank's clue hunt
+    _activeBlankIndex = passage.clues[0].blankIndex;
+    _bankLocked       = true;
+  } else {
+    _activeBlankIndex = -1;
+    _bankLocked       = false;
+  }
 
   _renderPassage(passage);
 }
@@ -209,6 +252,9 @@ function _renderPassage(passage) {
     ? `${GRAMMAR_CATEGORIES[_currentCat].icon} ${GRAMMAR_CATEGORIES[_currentCat].label}`
     : 'All Topics';
 
+  const hasClues = passage.clues && passage.clues.length > 0;
+  const inClueMode = hasClues && _bankLocked;
+
   _container.innerHTML = `
     <div class="cloze-game">
       <div class="cloze-game-header">
@@ -219,16 +265,24 @@ function _renderPassage(passage) {
       </div>
 
       <h3 class="cloze-title">${passage.title}</h3>
-      <p class="cloze-instruction">🏰 Tap a word to fill the next blank!</p>
+
+      ${inClueMode ? _buildClueHuntPanel(passage) : ''}
+
+      <p class="cloze-instruction" id="cloze-instruction">
+        ${inClueMode ? '🔍 Tap the clue word in the passage first!' : '🏰 Tap a word to fill the next blank!'}
+      </p>
 
       <div class="cloze-passage" id="cloze-passage" aria-live="polite"></div>
 
-      <div class="cloze-bank" id="cloze-bank" aria-label="Word choices"></div>
+      <div class="cloze-bank-wrapper ${inClueMode ? 'cloze-bank-wrapper--locked' : ''}" id="cloze-bank-wrapper">
+        ${inClueMode ? '<div class="cloze-bank-lock-msg">🔒 Find the clue first!</div>' : ''}
+        <div class="cloze-bank" id="cloze-bank" aria-label="Word choices"></div>
+      </div>
 
       <div class="cloze-actions">
         <button class="btn btn--ghost btn--sm" id="cloze-clear">↺ Clear all</button>
         <button class="btn btn--ghost btn--sm" id="cloze-listen" aria-label="Listen to passage">🔊 Listen</button>
-        <button class="btn btn--primary" id="cloze-check">Check ✓</button>
+        <button class="btn btn--primary" id="cloze-check" ${inClueMode ? 'disabled' : ''}>Check ✓</button>
         <button class="btn btn--ghost btn--sm" id="cloze-quit">Menu</button>
       </div>
 
@@ -236,23 +290,30 @@ function _renderPassage(passage) {
     </div>`;
 
   _renderPassageText(passage);
-  _renderBankWords();
+  _renderBankWords(passage);
 
+  // ── Clue hunt listeners ──────────────────────────────────────────────────
+  if (inClueMode) {
+    _attachClueHuntListeners(passage);
+  }
+
+  // ── Classic listeners ────────────────────────────────────────────────────
   document.getElementById('cloze-clear')?.addEventListener('click', () => {
     clearClozeRound(_bankWords, _blankFills);
     _renderPassageText(passage);
-    _renderBankWords();
+    _renderBankWords(passage);
   });
 
   document.getElementById('cloze-listen')?.addEventListener('click', () => {
-    // Read passage with answers filled in so child hears the complete version
     let readable = passage.text;
     for (const ans of passage.answers) {
       readable = readable.replace('___', ans);
     }
     audio.speakWord(readable);
   });
+
   document.getElementById('cloze-check')?.addEventListener('click', () => _checkPassage(passage));
+
   document.getElementById('cloze-quit')?.addEventListener('click', () => {
     cleanupClozeCastle();
     _onGoHome?.();
@@ -261,39 +322,186 @@ function _renderPassage(passage) {
   // Keyboard shortcuts
   if (_keyHandler) document.removeEventListener('keydown', _keyHandler);
   _keyHandler = (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('cloze-check')?.click(); }
+    if (e.key === 'Enter' && !_bankLocked) { e.preventDefault(); document.getElementById('cloze-check')?.click(); }
     if (e.key === 'Escape') { cleanupClozeCastle(); _onGoHome?.(); }
   };
   document.addEventListener('keydown', _keyHandler);
 }
 
+// ── Clue Hunt Panel HTML ───────────────────────────────────────────────────
+
+function _buildClueHuntPanel(passage) {
+  const clueData = _getActiveClueData(passage);
+  if (!clueData) return '';
+
+  return `
+    <div class="clue-hunt-panel" id="clue-hunt-panel">
+      <div class="clue-hunt-header">
+        <span class="clue-hunt-icon">🔍</span>
+        <span class="clue-hunt-title">Find the Clue</span>
+        <span class="clue-hunt-sub">Blank ${_activeBlankIndex + 1}</span>
+      </div>
+      <p class="clue-hunt-prompt">${clueData.prompt}</p>
+      <div class="clue-hunt-feedback" id="clue-hunt-feedback" aria-live="polite"></div>
+      <div class="clue-hint-row">
+        <button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-hint-btn" aria-label="Get a hint">💡 Hint</button>
+        <span class="clue-hint-msg" id="clue-hint-msg"></span>
+      </div>
+    </div>`;
+}
+
+// ── Clue Hunt Listeners ────────────────────────────────────────────────────
+
+function _attachClueHuntListeners(passage) {
+  // Hint button
+  document.getElementById('clue-hint-btn')?.addEventListener('click', () => {
+    const clueData = _getActiveClueData(passage);
+    if (!clueData) return;
+    _hintLevel = Math.min(_hintLevel + 1, 4);
+    const { message } = getClueHint(_hintLevel, clueData);
+    const hintMsg = document.getElementById('clue-hint-msg');
+    if (hintMsg) {
+      hintMsg.textContent = message;
+      hintMsg.className = 'clue-hint-msg clue-hint-msg--visible';
+    }
+    // At hint level 4 (reveal), also auto-unlock if weak attempts exhausted
+    if (_hintLevel >= 4) _unlockBankAfterClue(passage, null);
+  });
+}
+
+// ── Clue Hunt — word tap ───────────────────────────────────────────────────
+
+function _handleClueWordTap(tappedWord, passage) {
+  const clueData = _getActiveClueData(passage);
+  if (!clueData) return;
+
+  const result   = evaluateClueSelection(tappedWord, clueData);
+  const feedback = clueResultFeedback(result);
+
+  // Show feedback in clue panel
+  const fbEl = document.getElementById('clue-hunt-feedback');
+  if (fbEl) {
+    fbEl.textContent  = feedback.message;
+    fbEl.className    = `clue-hunt-feedback ${feedback.cssClass}`;
+  }
+
+  // Re-render passage with selected word highlighted
+  const passageEl = document.getElementById('cloze-passage');
+  if (passageEl) {
+    renderClueHuntPassage({
+      container:        passageEl,
+      text:             passage.text,
+      activeBlankIndex: _activeBlankIndex,
+      selectedWord:     tappedWord,
+      selectedResult:   result,
+      filledAnswers:    _blankFills.map((id, i) =>
+        id !== null ? _bankWords.find(w => w.id === id)?.word || '' : ''
+      ),
+      onTapWord: (word) => _handleClueWordTap(word, passage),
+    });
+  }
+
+  // Record analytics
+  store.recordClueAttempt({
+    quest: 'clozeCastle',
+    result,
+    clueType: clueData.clueType,
+  });
+
+  if (result === 'strong' || result === 'partial') {
+    // Good enough — unlock the word bank
+    _clueResults[_activeBlankIndex] = result;
+    audio.playSfx(result === 'strong' ? 'correct' : 'pop');
+    setTimeout(() => _unlockBankAfterClue(passage, result), 800);
+  } else {
+    // Weak — allow one more attempt, then unlock anyway
+    _weakAttempts++;
+    audio.playSfx('wrong');
+    if (_weakAttempts >= 2) {
+      _clueResults[_activeBlankIndex] = 'weak';
+      setTimeout(() => _unlockBankAfterClue(passage, 'weak'), 1000);
+    }
+  }
+}
+
+function _unlockBankAfterClue(passage, result) {
+  if (!_bankLocked) return; // already unlocked
+
+  _bankLocked = false;
+
+  // Accumulate clue score
+  _sessionClueScore += clueResultToScore(result);
+
+  // Update instruction
+  const instr = document.getElementById('cloze-instruction');
+  if (instr) instr.textContent = '🏰 Now tap a word to fill the blank!';
+
+  // Swap bank wrapper state
+  const wrapper = document.getElementById('cloze-bank-wrapper');
+  if (wrapper) wrapper.className = 'cloze-bank-wrapper';
+
+  // Enable the Check button
+  const checkBtn = document.getElementById('cloze-check');
+  if (checkBtn) checkBtn.disabled = false;
+
+  // Re-render bank so chips become interactive
+  _renderBankWords(passage);
+}
+
+// ── Passage Rendering ──────────────────────────────────────────────────────
+
 function _renderPassageText(passage) {
   const container = document.getElementById('cloze-passage');
   if (!container) return;
 
-  renderClozePassage({
-    container,
-    text: passage.text,
-    blankFills: _blankFills,
-    bankWords: _bankWords,
-    blankClass: 'cloze-blank',
-    filledClass: 'cloze-blank--filled',
-    emptyBlankAria: (i) => `Empty blank ${i + 1}`,
-    removeBlankAria: (word) => `Remove ${word} from blank`,
-    onRemoveWord: () => {
-      _renderPassageText(passage);
-      _renderBankWords();
-    },
-    onTapEmpty: (blank) => {
-      blank.classList.add('cloze-blank--selected');
-      setTimeout(() => blank.classList.remove('cloze-blank--selected'), 800);
-    },
-  });
+  if (_bankLocked) {
+    // Clue hunt phase — render tappable tokens
+    const filled = _blankFills.map(id =>
+      id !== null ? _bankWords.find(w => w.id === id)?.word || '' : ''
+    );
+    renderClueHuntPassage({
+      container,
+      text:             passage.text,
+      activeBlankIndex: _activeBlankIndex,
+      filledAnswers:    filled,
+      onTapWord:        (word) => _handleClueWordTap(word, passage),
+    });
+  } else {
+    // Classic fill mode
+    renderClozePassage({
+      container,
+      text: passage.text,
+      blankFills: _blankFills,
+      bankWords: _bankWords,
+      blankClass: 'cloze-blank',
+      filledClass: 'cloze-blank--filled',
+      emptyBlankAria: (i) => `Empty blank ${i + 1}`,
+      removeBlankAria: (word) => `Remove ${word} from blank`,
+      onRemoveWord: () => {
+        _renderPassageText(passage);
+        _renderBankWords(passage);
+      },
+      onTapEmpty: (blank) => {
+        blank.classList.add('cloze-blank--selected');
+        setTimeout(() => blank.classList.remove('cloze-blank--selected'), 800);
+      },
+    });
+  }
 }
 
-function _renderBankWords() {
+function _renderBankWords(passage) {
   const bank = document.getElementById('cloze-bank');
   if (!bank) return;
+
+  if (_bankLocked) {
+    // Show chips but fully disabled
+    bank.innerHTML = _bankWords.map(w => `
+      <button class="cloze-word-chip cloze-word-chip--locked"
+              disabled aria-disabled="true"
+              aria-label="${w.word}">${w.word}</button>
+    `).join('');
+    return;
+  }
 
   renderClozeBank({
     container: bank,
@@ -303,10 +511,36 @@ function _renderBankWords() {
     onChooseWord: (id) => {
       if (!fillNextBlank(_bankWords, _blankFills, id)) return;
       audio.playSfx('pop');
-      _renderPassageText(_levelPassages[_passageIdx]);
-      _renderBankWords();
+
+      // After filling a blank, check if the NEXT blank has clue data
+      const filledCount = _blankFills.filter(f => f !== null).length;
+      const nextClue = _getClueDataForBlank(passage, filledCount);
+
+      if (nextClue && !_clueResults.hasOwnProperty(filledCount)) {
+        // Lock bank again for next blank's clue hunt
+        _activeBlankIndex = nextClue.blankIndex;
+        _bankLocked       = true;
+        _hintLevel        = 0;
+        _weakAttempts     = 0;
+        _renderPassage(passage);
+      } else {
+        _renderPassageText(passage);
+        _renderBankWords(passage);
+      }
     },
   });
+}
+
+// ── Clue data helpers ──────────────────────────────────────────────────────
+
+function _getActiveClueData(passage) {
+  if (!passage.clues) return null;
+  return passage.clues.find(c => c.blankIndex === _activeBlankIndex) || null;
+}
+
+function _getClueDataForBlank(passage, blankIndex) {
+  if (!passage.clues) return null;
+  return passage.clues.find(c => c.blankIndex === blankIndex) || null;
 }
 
 // ── Checking ───────────────────────────────────────────────────────────────
@@ -352,14 +586,17 @@ function _checkPassage(passage) {
       store.set('ccqCatCompleted', catCompleted);
     }
 
-    _showFeedback('✅ Excellent! All correct!', true);
-
     document.querySelectorAll('.cloze-blank--filled').forEach(b => b.classList.add('cloze-blank--correct'));
 
-    setTimeout(() => {
-      _passageIdx++;
-      _showPassage();
-    }, 1800);
+    // Post-answer explanation if clue mode was active
+    if (passage.clues && passage.clues.length > 0) {
+      _showClueExplanation(passage, () => {
+        setTimeout(() => { _passageIdx++; _showPassage(); }, 600);
+      });
+    } else {
+      _showFeedback('✅ Excellent! All correct!', true);
+      setTimeout(() => { _passageIdx++; _showPassage(); }, 1800);
+    }
   } else {
     audio.playSfx('wrong');
 
@@ -377,6 +614,55 @@ function _checkPassage(passage) {
     }, 1800);
   }
 }
+
+// ── Post-answer Clue Explanation ───────────────────────────────────────────
+
+function _showClueExplanation(passage, onContinue) {
+  if (!_container) return;
+
+  // Find the primary clue explanation (first blank's clue)
+  const primaryClue = passage.clues[0];
+  const clueSpan    = (primaryClue.acceptableSpans || [])[0] || '';
+  const playerResult = _clueResults[primaryClue.blankIndex] || 'weak';
+  const { cssClass } = clueResultFeedback(playerResult);
+
+  // Overlay the feedback on top of the current game
+  const existing = document.getElementById('cloze-explanation-overlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id        = 'cloze-explanation-overlay';
+  overlay.className = 'clue-explanation-overlay';
+  overlay.innerHTML = `
+    <div class="clue-explanation-card">
+      <p class="clue-explanation-title">✅ Excellent! All correct!</p>
+      <div class="clue-explanation-body">
+        <p class="clue-explanation-label">Clue you found:</p>
+        <span class="clue-result-badge ${cssClass}">${clueSpan || 'No clue selected'}</span>
+        <p class="clue-explanation-text">${primaryClue.explanation}</p>
+      </div>
+      <button class="btn btn--primary" id="clue-explanation-next">Next →</button>
+    </div>`;
+
+  _container.querySelector('.cloze-game')?.appendChild(overlay);
+
+  audio.playSfx('correct');
+
+  document.getElementById('clue-explanation-next')?.addEventListener('click', () => {
+    overlay.remove();
+    onContinue();
+  });
+
+  // Auto-advance after 4 seconds
+  setTimeout(() => {
+    if (document.getElementById('cloze-explanation-overlay')) {
+      overlay.remove();
+      onContinue();
+    }
+  }, 4000);
+}
+
+// ── Feedback helper ────────────────────────────────────────────────────────
 
 function _showFeedback(msg, success) {
   const el = document.getElementById('cloze-feedback');
@@ -404,6 +690,15 @@ function _showComplete() {
   const acc   = _sessionTotal > 0 ? Math.round((_sessionCorrect / _sessionTotal) * 100) : 100;
   const stars = acc >= 90 ? 3 : acc >= 70 ? 2 : 1;
 
+  // Clue accuracy line (only shown if clue mode was used)
+  const clueTotal = Object.keys(_clueResults).length;
+  const clueAcc   = clueTotal > 0
+    ? Math.round((_sessionClueScore / clueTotal) * 100)
+    : null;
+  const clueAccLine = clueAcc !== null
+    ? `<p class="cloze-complete-clue">🔍 Clue accuracy: ${clueAcc}%</p>`
+    : '';
+
   _container.innerHTML = `
     <div class="cloze-complete">
       <div class="cloze-complete-icon">${icon}</div>
@@ -411,6 +706,7 @@ function _showComplete() {
       <p class="cloze-complete-sub">${CLOZE_LEVEL_LABELS[_currentLevel]} · ${catInfo}</p>
       <div class="cloze-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
       <p class="cloze-complete-score">${_sessionCorrect} / ${_sessionTotal} correct · ${acc}%</p>
+      ${clueAccLine}
       <div class="cloze-complete-actions">
         <button class="btn btn--primary btn--lg" id="cloze-back-cat">Choose Another Topic</button>
         <button class="btn btn--ghost btn--sm" id="cloze-replay">Play Again ↺</button>

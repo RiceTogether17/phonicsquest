@@ -2,7 +2,16 @@
  * PhonicsQuest – Sentence Forge Quest 🔨
  *
  * Word-order game: scrambled words → tap to arrange into a correct sentence.
- * Public API mirrors sightMatch.js pattern.
+ *
+ * Clue Mission Layer (Part E)
+ * ────────────────────────────
+ * Sentences that have a `clueMission` object get an optional pre-build scaffold:
+ *   1. Show all words in a read-only preview (not yet scrambled)
+ *   2. Ask the student to tap a specific word (e.g. the time marker, connector)
+ *   3. Evaluate: correct / incorrect
+ *   4. Proceed to the normal scramble-and-arrange phase
+ *
+ * Backward compatible: sentences without `clueMission` go straight to the arrange phase.
  *
  * Public API:
  *   initSentenceForge(container, onGoHome) – attach to DOM container
@@ -15,7 +24,7 @@ import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 import { gamification } from '../modules/gamification.js';
 import { questMastery } from '../modules/questMastery.js';
-import { celebrateCorrect, celebrateLevelUp } from '../components/confettiHelper.js';
+import { celebrateCorrect } from '../components/confettiHelper.js';
 import { mascot } from '../components/mascot.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
@@ -23,14 +32,21 @@ import { mascot } from '../components/mascot.js';
 let _container = null;
 let _onGoHome  = null;
 
-let _currentLevel = 1;
-let _levelSentences = [];
-let _sentenceIdx = 0;
-let _bankWords = [];       // [{id, word, used}]
-let _answerSlots = [];     // bank word ids in answer order (null = empty never happens; slots grow as words tapped)
-let _sessionCorrect = 0;
-let _sessionTotal = 0;
-let _keyHandler = null;
+let _currentLevel    = 1;
+let _levelSentences  = [];
+let _sentenceIdx     = 0;
+let _bankWords       = [];       // [{id, word, used}]
+let _answerSlots     = [];       // bank word ids in answer order
+let _sessionCorrect  = 0;
+let _sessionTotal    = 0;
+let _keyHandler      = null;
+
+// ── Clue mission state ─────────────────────────────────────────────────────
+
+let _clueMissionDone   = false;  // true once the clue mission is resolved
+let _clueMissionResult = null;   // 'correct' | 'incorrect' | null
+let _sessionClueCorrect = 0;
+let _sessionClueMissionTotal = 0;
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
@@ -90,11 +106,12 @@ function _renderBrowser() {
 
 function _startLevel(level) {
   const raw = allSentences.filter(s => s.level === level);
-  // Shuffle a copy so order varies each play
-  _levelSentences = [...raw].sort(() => Math.random() - 0.5);
-  _sentenceIdx    = 0;
-  _sessionCorrect = 0;
-  _sessionTotal   = 0;
+  _levelSentences  = [...raw].sort(() => Math.random() - 0.5);
+  _sentenceIdx     = 0;
+  _sessionCorrect  = 0;
+  _sessionTotal    = 0;
+  _sessionClueCorrect = 0;
+  _sessionClueMissionTotal = 0;
   _showSentence();
 }
 
@@ -103,16 +120,141 @@ function _showSentence() {
     _showComplete();
     return;
   }
-  const entry   = _levelSentences[_sentenceIdx];
-  // Strip trailing punctuation for the scramble; preserve for checking
-  const clean   = entry.sentence.replace(/[.!?]$/, '');
-  const punct   = entry.sentence.slice(clean.length);
+  const entry = _levelSentences[_sentenceIdx];
+
+  // Reset clue state for this sentence
+  _clueMissionDone   = false;
+  _clueMissionResult = null;
+
+  if (entry.clueMission) {
+    _renderClueMission(entry);
+  } else {
+    _setupArrangePhase(entry);
+  }
+}
+
+// ── Clue Mission Phase ─────────────────────────────────────────────────────
+
+function _renderClueMission(entry) {
+  if (!_container) return;
+
+  const mission = entry.clueMission;
+  const words   = entry.sentence.replace(/[.!?]$/, '').split(' ');
+  const icon    = SENTENCE_LEVEL_ICONS[_currentLevel - 1];
+  const progress = `${_sentenceIdx + 1} / ${_levelSentences.length}`;
+
+  _container.innerHTML = `
+    <div class="sfq-game">
+      <div class="sfq-header">
+        <span class="sfq-badge">${icon} ${SENTENCE_LEVEL_LABELS[_currentLevel]}</span>
+        <span class="sfq-progress">${progress}</span>
+      </div>
+
+      <div class="clue-mission-panel">
+        <div class="clue-mission-header">
+          <span class="clue-mission-icon">🔍</span>
+          <span class="clue-mission-title">Spot the Clue</span>
+        </div>
+        <p class="clue-mission-prompt">${mission.prompt}</p>
+
+        <div class="clue-mission-words" id="clue-mission-words" aria-label="Tap the clue word">
+          ${words.map((w, i) => `
+            <button class="clue-mission-word-btn" data-index="${i}" data-word="${w.replace(/[^a-zA-Z]/g, '')}"
+                    aria-label="Tap ${w}">
+              ${w}
+            </button>`).join('')}
+        </div>
+
+        <div class="clue-mission-feedback" id="clue-mission-feedback" aria-live="polite"></div>
+
+        <button class="btn btn--ghost btn--sm sfq-mission-skip" id="sfq-mission-skip">
+          Skip → Build the sentence
+        </button>
+      </div>
+
+      <div class="sfq-actions">
+        <button class="btn btn--ghost btn--sm" id="sfq-quit">Menu</button>
+      </div>
+    </div>`;
+
+  _container.querySelectorAll('.clue-mission-word-btn').forEach(btn => {
+    btn.addEventListener('click', () => _handleMissionWordTap(btn, entry, words));
+  });
+
+  document.getElementById('sfq-mission-skip')?.addEventListener('click', () => {
+    _clueMissionDone   = true;
+    _clueMissionResult = null;
+    _setupArrangePhase(entry);
+  });
+
+  document.getElementById('sfq-quit')?.addEventListener('click', () => {
+    cleanupSentenceForge();
+    _onGoHome?.();
+  });
+
+  if (_keyHandler) document.removeEventListener('keydown', _keyHandler);
+  _keyHandler = (e) => {
+    if (e.key === 'Escape') { cleanupSentenceForge(); _onGoHome?.(); }
+  };
+  document.addEventListener('keydown', _keyHandler);
+}
+
+function _handleMissionWordTap(btn, entry, words) {
+  const mission     = entry.clueMission;
+  const tappedWord  = btn.dataset.word.toLowerCase();
+  const acceptable  = (mission.acceptableWords || []).map(w => w.toLowerCase());
+  const correct     = acceptable.includes(tappedWord);
+
+  // Highlight the tapped word
+  document.querySelectorAll('.clue-mission-word-btn').forEach(b => b.classList.remove('clue-mission-word-btn--selected'));
+  btn.classList.add(correct ? 'clue-mission-word-btn--correct' : 'clue-mission-word-btn--wrong');
+
+  // Show feedback
+  const fbEl = document.getElementById('clue-mission-feedback');
+  if (fbEl) {
+    if (correct) {
+      fbEl.textContent  = `✨ ${mission.explanation}`;
+      fbEl.className    = 'clue-mission-feedback clue-mission-feedback--correct';
+      // Highlight the correct answer(s) for learning
+      document.querySelectorAll('.clue-mission-word-btn').forEach(b => {
+        if (acceptable.includes(b.dataset.word.toLowerCase())) {
+          b.classList.add('clue-mission-word-btn--correct');
+        }
+      });
+    } else {
+      fbEl.textContent  = `🔴 Not quite! Look for: ${mission.acceptableWords.join(', ')}`;
+      fbEl.className    = 'clue-mission-feedback clue-mission-feedback--wrong';
+    }
+  }
+
+  // Record analytics
+  store.recordClueAttempt({
+    quest: 'sentenceForge',
+    result: correct ? 'correct' : 'incorrect',
+    clueType: mission.clueType,
+  });
+
+  _clueMissionDone   = true;
+  _clueMissionResult = correct ? 'correct' : 'incorrect';
+  _sessionClueMissionTotal++;
+  if (correct) _sessionClueCorrect++;
+
+  audio.playSfx(correct ? 'correct' : 'wrong');
+
+  // Automatically proceed to arrange phase after a short delay
+  setTimeout(() => _setupArrangePhase(entry), correct ? 1400 : 2200);
+}
+
+// ── Arrange Phase ──────────────────────────────────────────────────────────
+
+function _setupArrangePhase(entry) {
+  const clean    = entry.sentence.replace(/[.!?]$/, '');
+  const punct    = entry.sentence.slice(clean.length);
   const rawWords = clean.split(' ');
 
-  // Build bank words with unique ids
   _bankWords = rawWords.map((w, i) => ({ id: i, word: w, used: false }));
 
-  // Shuffle bank
+  // Shuffle
   for (let i = _bankWords.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [_bankWords[i], _bankWords[j]] = [_bankWords[j], _bankWords[i]];
@@ -131,12 +273,20 @@ function _renderGame(entry, punct) {
   const icon     = SENTENCE_LEVEL_ICONS[_currentLevel - 1];
   const xpVal    = 10 + _currentLevel * 5;
 
+  // Show a "clue badge" if the student just completed a clue mission
+  const clueBadge = _clueMissionResult === 'correct'
+    ? `<span class="sfq-clue-badge sfq-clue-badge--correct" title="Clue found!">🔍✨</span>`
+    : _clueMissionResult === 'incorrect'
+    ? `<span class="sfq-clue-badge sfq-clue-badge--missed" title="Clue missed">🔍</span>`
+    : '';
+
   _container.innerHTML = `
     <div class="sfq-game">
       <div class="sfq-header">
         <span class="sfq-badge">${icon} ${SENTENCE_LEVEL_LABELS[_currentLevel]}</span>
         <span class="sfq-progress">${progress}</span>
         <span class="sfq-xp-badge">+${xpVal} XP</span>
+        ${clueBadge}
       </div>
 
       <p class="sfq-instruction">🔨 Tap the words to build the sentence!</p>
@@ -174,7 +324,6 @@ function _renderGame(entry, punct) {
   document.getElementById('sfq-check')?.addEventListener('click', () => _checkAnswer(entry, punct));
   document.getElementById('sfq-quit')?.addEventListener('click', () => { cleanupSentenceForge(); _onGoHome?.(); });
 
-  // Keyboard shortcuts
   if (_keyHandler) document.removeEventListener('keydown', _keyHandler);
   _keyHandler = (e) => {
     if (e.key === 'Enter') { e.preventDefault(); document.getElementById('sfq-check')?.click(); }
@@ -182,7 +331,6 @@ function _renderGame(entry, punct) {
   };
   document.addEventListener('keydown', _keyHandler);
 
-  // Focus first word chip for keyboard users
   setTimeout(() => _container?.querySelector('.sfq-word-chip')?.focus(), 100);
 }
 
@@ -211,14 +359,12 @@ function _renderBank() {
 }
 
 function _renderAnswer() {
-  const area   = document.getElementById('sfq-answer-chips');
-  const ph     = document.getElementById('sfq-placeholder');
+  const area = document.getElementById('sfq-answer-chips');
+  const ph   = document.getElementById('sfq-placeholder');
   if (!area) return;
 
   if (_answerSlots.length === 0) {
-    // show placeholder
     if (ph) ph.hidden = false;
-    // remove any existing chips
     area.querySelectorAll('.sfq-answer-chip').forEach(c => c.remove());
     return;
   }
@@ -230,11 +376,10 @@ function _renderAnswer() {
     const item = _bankWords.find(w => w.id === id);
     if (!item) return;
     const chip = document.createElement('button');
-    chip.className = 'sfq-answer-chip';
+    chip.className   = 'sfq-answer-chip';
     chip.textContent = item.word;
     chip.setAttribute('aria-label', `Remove ${item.word}`);
     chip.addEventListener('click', () => {
-      // Return word to bank
       item.used = false;
       _answerSlots.splice(idx, 1);
       _renderBank();
@@ -272,7 +417,6 @@ function _checkAnswer(entry, punct) {
     audio.playSfx('correct');
     mascot.celebrate(false);
 
-    // Track per-level progress
     const completed = store.get('sfqCompleted') || {};
     completed[_currentLevel] = (completed[_currentLevel] || 0) + 1;
     store.set('sfqCompleted', completed);
@@ -324,6 +468,13 @@ function _showComplete() {
   audio.playSfx('levelUp');
   mascot.celebrate(true);
 
+  const clueAcc = _sessionClueMissionTotal > 0
+    ? Math.round((_sessionClueCorrect / _sessionClueMissionTotal) * 100)
+    : null;
+  const clueAccLine = clueAcc !== null
+    ? `<p class="sfq-complete-clue">🔍 Clue mission accuracy: ${clueAcc}%</p>`
+    : '';
+
   _container.innerHTML = `
     <div class="sfq-complete">
       <div class="sfq-complete-icon">${icon}</div>
@@ -331,6 +482,7 @@ function _showComplete() {
       <p class="sfq-complete-sub">${SENTENCE_LEVEL_LABELS[_currentLevel]}</p>
       <div class="sfq-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
       <p class="sfq-complete-score">${_sessionCorrect} / ${_sessionTotal} correct · ${acc}%</p>
+      ${clueAccLine}
       <div class="sfq-complete-actions">
         <button class="btn btn--primary btn--lg" id="sfq-next-level">
           ${_currentLevel < 6 ? 'Next Level →' : 'Back to Levels'}
@@ -347,8 +499,6 @@ function _showComplete() {
   document.getElementById('sfq-replay')?.addEventListener('click', () => _startLevel(_currentLevel));
   document.getElementById('sfq-back-levels')?.addEventListener('click', () => _renderBrowser());
 
-  // Remove game keyboard handler on complete screen
   if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
-  // Focus primary action
   setTimeout(() => document.getElementById('sfq-next-level')?.focus(), 200);
 }

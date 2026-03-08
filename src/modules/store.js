@@ -45,6 +45,15 @@ const DEFAULT_STATE = {
   },
   questAttempts: [],        // recent quest attempts (capped)
 
+  // Clue detection accuracy (separate from answer accuracy)
+  // { attempted: number, strong: number, partial: number, weak: number }
+  clueStats: {
+    clozeCastle: { attempted: 0, strong: 0, partial: 0, weak: 0 },
+    wordVault:   { attempted: 0, strong: 0, partial: 0, weak: 0 },
+    sentenceForge: { attempted: 0, correct: 0, incorrect: 0 },
+    byType: {},             // { [clueType]: { attempted, strong, partial, weak } }
+  },
+
   // Session
   currentMode:  'blend',
   currentGroup: 'short-a',
@@ -218,6 +227,32 @@ class Store {
       ...(this._state.questAttempts || []),
     ].slice(0, 300);
     this.set('questAttempts', attempts);
+  }
+
+  /**
+   * Record a clue detection attempt for analytics.
+   * @param {Object} opts
+   * @param {'clozeCastle'|'wordVault'|'sentenceForge'} opts.quest
+   * @param {'strong'|'partial'|'weak'|'correct'|'incorrect'} opts.result
+   * @param {string} [opts.clueType]  e.g. 'time-marker', 'connector-clue'
+   */
+  recordClueAttempt({ quest, result, clueType }) {
+    const stats = JSON.parse(JSON.stringify(this._state.clueStats || {}));
+
+    // Per-quest bucket
+    if (!stats[quest]) stats[quest] = { attempted: 0, strong: 0, partial: 0, weak: 0, correct: 0, incorrect: 0 };
+    stats[quest].attempted = (stats[quest].attempted || 0) + 1;
+    if (result in (stats[quest])) stats[quest][result] = (stats[quest][result] || 0) + 1;
+
+    // Per-type bucket
+    if (clueType) {
+      if (!stats.byType) stats.byType = {};
+      if (!stats.byType[clueType]) stats.byType[clueType] = { attempted: 0, strong: 0, partial: 0, weak: 0 };
+      stats.byType[clueType].attempted++;
+      if (result in stats.byType[clueType]) stats.byType[clueType][result]++;
+    }
+
+    this.set('clueStats', stats);
   }
 
   /** Check and refresh daily goal (resets at midnight). */

@@ -58,6 +58,24 @@ export const passages = {
         answers: ['a', 'a', 'a', 'an'],
         wordBank: ['a', 'a', 'a', 'an', 'the', 'an', 'the', 'a'],
         xp: 20,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'Which word comes right after the blank? It tells you which article to use.',
+            acceptableSpans: ['mother'],
+            partialSpans: [],
+            clueType: 'noun-initial-consonant',
+            explanation: '"mother" starts with the consonant sound "m", so we use "a" (not "an").',
+          },
+          {
+            blankIndex: 3,
+            prompt: 'Look at the word just after the blank. Does it start with a vowel or consonant sound?',
+            acceptableSpans: ['older'],
+            partialSpans: ['sister'],
+            clueType: 'noun-initial-vowel',
+            explanation: '"older" starts with the vowel sound "o", so we need "an" instead of "a".',
+          },
+        ],
       },
       {
         id: 'g-p1-art-02', title: 'At the Shop',
@@ -104,6 +122,32 @@ export const passages = {
         answers: ['are', 'is', 'are'],
         wordBank: ['are', 'is', 'are', 'am', 'was', 'were'],
         xp: 20,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'Which word tells you whether the subject is one person or many?',
+            acceptableSpans: ['children'],
+            partialSpans: ['The'],
+            clueType: 'subject-clue',
+            explanation: '"children" is plural (many), so we use "are" not "is".',
+          },
+          {
+            blankIndex: 1,
+            prompt: 'Is the subject one person or more than one person?',
+            acceptableSpans: ['Tom'],
+            partialSpans: [],
+            clueType: 'subject-clue',
+            explanation: '"Tom" is one person (singular), so we use "is".',
+          },
+          {
+            blankIndex: 2,
+            prompt: 'How many girls are there? Find the clue word.',
+            acceptableSpans: ['girls'],
+            partialSpans: ['The'],
+            clueType: 'subject-clue',
+            explanation: '"girls" is plural, so we use "are".',
+          },
+        ],
       },
       {
         id: 'g-p1-sva-02', title: 'Breakfast Time',
@@ -153,6 +197,32 @@ export const passages = {
         answers: ['went', 'saw', 'swung'],
         wordBank: ['went', 'saw', 'swung', 'go', 'see', 'swing'],
         xp: 25,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'Which words tell you when this happened? They show the tense.',
+            acceptableSpans: ['Last Sunday'],
+            partialSpans: ['Sunday'],
+            clueType: 'time-marker',
+            explanation: '"Last Sunday" is a past time marker — it tells us this happened in the past, so all verbs should be in simple past tense.',
+          },
+          {
+            blankIndex: 1,
+            prompt: 'The tense clue from the first sentence still applies. Can you find it?',
+            acceptableSpans: ['Last Sunday'],
+            partialSpans: ['Sunday', 'went'],
+            clueType: 'time-marker',
+            explanation: '"Last Sunday" earlier in the passage tells us to keep using simple past tense throughout.',
+          },
+          {
+            blankIndex: 2,
+            prompt: 'Same passage, same time. Which word earlier gives you the tense clue?',
+            acceptableSpans: ['Last Sunday'],
+            partialSpans: ['went', 'saw'],
+            clueType: 'time-marker',
+            explanation: 'The whole passage is about last Sunday, so "swung" (simple past of "swing") is correct.',
+          },
+        ],
       },
       {
         id: 'g-p2-sp-02', title: 'Helping Mother',
@@ -160,6 +230,24 @@ export const passages = {
         answers: ['washed', 'swept', 'was'],
         wordBank: ['washed', 'swept', 'was', 'washes', 'sweeps', 'is'],
         xp: 25,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'Find the time phrase that tells you when Tom did this.',
+            acceptableSpans: ['After dinner'],
+            partialSpans: ['dinner', 'After'],
+            clueType: 'time-marker',
+            explanation: '"After dinner" is a completed past action — it signals that simple past tense ("washed") is needed.',
+          },
+          {
+            blankIndex: 1,
+            prompt: 'The same time clue from earlier still applies. Where is it?',
+            acceptableSpans: ['After dinner'],
+            partialSpans: ['washed', 'dinner'],
+            clueType: 'time-marker',
+            explanation: 'All actions in this passage happened after dinner (past), so "swept" is correct.',
+          },
+        ],
       },
       {
         id: 'g-p2-sp-03', title: 'The Birthday Party',
@@ -167,6 +255,16 @@ export const passages = {
         answers: ['had', 'brought', 'ate'],
         wordBank: ['had', 'brought', 'ate', 'has', 'bring', 'eat'],
         xp: 25,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'Which two words tell you when the party happened?',
+            acceptableSpans: ['last week'],
+            partialSpans: ['week', 'last'],
+            clueType: 'time-marker',
+            explanation: '"last week" is a past time expression — it tells us to use simple past tense: "had".',
+          },
+        ],
       },
     ],
     presentCont: [
@@ -176,6 +274,24 @@ export const passages = {
         answers: ['are building', 'are', 'is sitting'],
         wordBank: ['are building', 'are', 'is sitting', 'build', 'is', 'sits'],
         xp: 25,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'Which word tells you this is happening right at this moment?',
+            acceptableSpans: ['now'],
+            partialSpans: [],
+            clueType: 'time-marker',
+            explanation: '"now" signals present continuous tense — the action is happening right at this moment, so we use "are building".',
+          },
+          {
+            blankIndex: 2,
+            prompt: 'Is the subject one person or many? Find the name.',
+            acceptableSpans: ['Dad'],
+            partialSpans: [],
+            clueType: 'subject-clue',
+            explanation: '"Dad" is one person (singular), so we use "is sitting" not "are sitting".',
+          },
+        ],
       },
       {
         id: 'g-p2-pc-02', title: 'Recess Time',
@@ -190,6 +306,16 @@ export const passages = {
         answers: ['is cooking', 'is reading', 'am getting'],
         wordBank: ['is cooking', 'is reading', 'am getting', 'cooks', 'reads', 'get'],
         xp: 25,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'Find the exclamation that tells you this is happening right now.',
+            acceptableSpans: ['Look'],
+            partialSpans: [],
+            clueType: 'time-marker',
+            explanation: '"Look!" signals we are describing what is happening right now — this calls for present continuous tense: "is cooking".',
+          },
+        ],
       },
     ],
     svAgreement: [
@@ -199,6 +325,24 @@ export const passages = {
         answers: ['shops', 'buys', 'are'],
         wordBank: ['shops', 'buys', 'are', 'shop', 'buy', 'is'],
         xp: 25,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'Is the subject one person or more than one? Find the name.',
+            acceptableSpans: ['Mrs Lin'],
+            partialSpans: ['Lin'],
+            clueType: 'subject-clue',
+            explanation: '"Mrs Lin" is one person (singular), so we add -s to the verb: "shops".',
+          },
+          {
+            blankIndex: 2,
+            prompt: 'Is this subject singular or plural? Look at the noun.',
+            acceptableSpans: ['sellers'],
+            partialSpans: ['fruit', 'The'],
+            clueType: 'subject-clue',
+            explanation: '"fruit sellers" is plural — more than one person — so we use "are", not "is".',
+          },
+        ],
       },
       {
         id: 'g-p2-sva-02', title: 'Lunchtime',
@@ -236,17 +380,70 @@ export const passages = {
         answers: ['or', 'but', 'because'],
         wordBank: ['or', 'but', 'because', 'and', 'so', 'then'],
         xp: 25,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'The sentence gives you a choice between two things. Which connector shows a choice?',
+            acceptableSpans: ['apple', 'orange'],
+            partialSpans: ['like', 'Would'],
+            clueType: 'connector-clue',
+            explanation: 'Two options (apple and orange) are being presented as a choice — "or" is the connector that shows alternatives.',
+          },
+          {
+            blankIndex: 1,
+            prompt: 'Find the contrast clue: the speaker likes both, yet can only have one.',
+            acceptableSpans: ['both', 'only'],
+            partialSpans: ['like'],
+            clueType: 'contrast-clue',
+            explanation: '"both … but … only one" — "but" shows a contrast between liking both things and being allowed only one.',
+          },
+          {
+            blankIndex: 2,
+            prompt: 'The second part of this sentence gives a reason. Which word signals a reason?',
+            acceptableSpans: ['favourite', 'chose'],
+            partialSpans: ['apple'],
+            clueType: 'cause-clue',
+            explanation: 'The second clause explains the reason for the choice — "because" introduces a reason or cause.',
+          },
+        ],
       },
     ],
   },
 
-  P3:     conditionals: [
+  P3: {
+    conditionals: [
       {
         id: 'g-p3-cond-01', title: 'Healthy Choices',
         text: 'If you ___ your vegetables, you will grow strong and healthy. If it ___ too hot, we will stay indoors at recess. We will be late if we ___ not hurry.',
         answers: ['eat', 'is', 'do'],
         wordBank: ['eat', 'is', 'do', 'ate', 'was', 'did'],
         xp: 30,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'Find the key connector word that tells you this is a conditional sentence.',
+            acceptableSpans: ['If'],
+            partialSpans: ['will'],
+            clueType: 'connector-clue',
+            explanation: '"If" starts a Type 1 conditional: If + present tense, … will + base verb. The blank needs present tense: "eat".',
+          },
+          {
+            blankIndex: 1,
+            prompt: 'Same pattern — find the connector that signals present tense in the condition.',
+            acceptableSpans: ['If'],
+            partialSpans: ['will'],
+            clueType: 'connector-clue',
+            explanation: '"If" + present tense → "is" (not "was"). The result clause has "will stay" confirming this is a real conditional.',
+          },
+          {
+            blankIndex: 2,
+            prompt: 'The result clause contains "will be late". What does that tell you about the if-clause?',
+            acceptableSpans: ['will', 'if'],
+            partialSpans: ['late'],
+            clueType: 'connector-clue',
+            explanation: '"will be late" in the result clause confirms this is Type 1 conditional — the if-clause needs present tense: "do not hurry".',
+          },
+        ],
       },
       {
         id: 'g-p3-cond-02', title: 'At the Playground',
@@ -360,7 +557,8 @@ export const passages = {
     ],
   },
 
-  P5:     modals: [
+  P5: {
+    modals: [
       {
         id: 'g-p5-mod-01', title: 'After the Test',
         text: 'The teacher said the class ___ have reviewed the notes more carefully before the test. Ali felt he ___ have re-read each question twice. He thought the team ___ have scored full marks with better preparation.',
