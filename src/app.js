@@ -3,6 +3,12 @@
  *
  * Manages screens (home → game → result), mode lifecycle,
  * settings/dashboard modals, and keyboard shortcuts.
+ *
+ * Architecture note: domain concerns have been extracted into focused modules:
+ *   - constants.js          → SCREENS enum, QUEST_THRESHOLDS
+ *   - modalManager.js       → open/close lifecycle, Escape-key cleanup
+ *   - keyboardManager.js    → global keyboard shortcuts (fixes 'n' bug)
+ *   - settingsController.js → settings panel binding & value application
  */
 
 import { store } from './modules/store.js';
@@ -34,11 +40,15 @@ import {
 import {
   CURRICULUM, PHASE_LABELS, getUnlockedStages, getRecommendedStage,
 } from './data/curriculum.js';
+import { SCREENS, QUEST_THRESHOLDS } from './constants.js';
+import { modalManager } from './modules/modalManager.js';
+import { keyboardManager } from './modules/keyboardManager.js';
+import { settingsController } from './modules/settingsController.js';
 
 class App {
   constructor() {
     /** @type {string} current screen id */
-    this._screen = 'screen-home';
+    this._screen = SCREENS.HOME;
     /** @type {string} current mode key */
     this._mode = 'blend';
     /** @type {import('./data/words.js').Word|null} */
@@ -56,6 +66,14 @@ class App {
     /** @type {number} wrong attempts on current word (for two-strike system) */
     this._wrongStrikes = 0;
 
+    /**
+     * Guard flag – prevents _handleResult from being called twice for the
+     * same word (e.g. rapid button clicks, or a delayed speech-recognition
+     * timeout firing after the user has already moved to the next word).
+     * @type {boolean}
+     */
+    this._resultProcessing = false;
+
     // Cache DOM elements
     this._els = {};
   }
@@ -64,7 +82,9 @@ class App {
   init() {
     this._cacheElements();
     this._bindEvents();
-    this._applySettings();
+
+    // Apply persisted settings to the UI (uses settingsController).
+    settingsController.apply(store);
 
     // Restore active profile (if any) before any store reads
     restoreActiveProfile();
@@ -84,11 +104,11 @@ class App {
     }
 
     // Apply saved theme
-    this._applyTheme(store.get('theme') || 'default');
+    settingsController.applyTheme(store.get('theme') || 'default');
 
     // Route to profile picker if needed
     if (needsProfileSelection()) {
-      this._showScreen('screen-profiles');
+      this._showScreen(SCREENS.PROFILES);
       this._renderProfileGrid();
     } else {
       this._updateProfileChip();
@@ -177,7 +197,7 @@ class App {
     // Back button
     this._els.btnBack?.addEventListener('click', () => {
       this._cleanupMode();
-      this._showScreen('screen-home');
+      this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
@@ -187,7 +207,7 @@ class App {
         document.getElementById('stories-content'),
         () => {
           cleanupStoryMode();
-          this._showScreen('screen-home');
+          this._showScreen(SCREENS.HOME);
           mascot.setHomeState('holdCard');
         },
       );
@@ -201,7 +221,7 @@ class App {
     // Stories screen back button (→ home)
     document.getElementById('btn-stories-back')?.addEventListener('click', () => {
       cleanupStoryMode();
-      this._showScreen('screen-home');
+      this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
@@ -211,7 +231,7 @@ class App {
         document.getElementById('ls-content'),
         () => {
           cleanupLetterSounds();
-          this._showScreen('screen-home');
+          this._showScreen(SCREENS.HOME);
           mascot.setHomeState('holdCard');
         },
       );
@@ -222,7 +242,7 @@ class App {
     // Letter Sounds screen back button (→ home)
     document.getElementById('btn-ls-back')?.addEventListener('click', () => {
       cleanupLetterSounds();
-      this._showScreen('screen-home');
+      this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
@@ -241,7 +261,7 @@ class App {
         document.getElementById('sight-match-content'),
         () => {
           cleanupSightMatch();
-          this._showScreen('screen-home');
+          this._showScreen(SCREENS.HOME);
           mascot.setHomeState('holdCard');
         },
       );
@@ -253,7 +273,7 @@ class App {
     // Sight Words screen back button (→ home)
     document.getElementById('btn-sm-back')?.addEventListener('click', () => {
       cleanupSightMatch();
-      this._showScreen('screen-home');
+      this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
@@ -268,7 +288,7 @@ class App {
         document.getElementById('sentence-forge-content'),
         () => {
           cleanupSentenceForge();
-          this._showScreen('screen-home');
+          this._showScreen(SCREENS.HOME);
           mascot.setHomeState('holdCard');
         },
       );
@@ -280,7 +300,7 @@ class App {
     // Sentence Forge screen back button (→ home)
     document.getElementById('btn-sfq-back')?.addEventListener('click', () => {
       cleanupSentenceForge();
-      this._showScreen('screen-home');
+      this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
@@ -295,7 +315,7 @@ class App {
         document.getElementById('cloze-castle-content'),
         () => {
           cleanupClozeCastle();
-          this._showScreen('screen-home');
+          this._showScreen(SCREENS.HOME);
           mascot.setHomeState('holdCard');
         },
       );
@@ -307,7 +327,7 @@ class App {
     // Cloze Castle screen back button (→ home)
     document.getElementById('btn-ccq-back')?.addEventListener('click', () => {
       cleanupClozeCastle();
-      this._showScreen('screen-home');
+      this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
@@ -322,7 +342,7 @@ class App {
         document.getElementById('word-vault-content'),
         () => {
           cleanupWordVault();
-          this._showScreen('screen-home');
+          this._showScreen(SCREENS.HOME);
           mascot.setHomeState('holdCard');
         },
       );
@@ -334,7 +354,7 @@ class App {
     // Word Vault screen back button (→ home)
     document.getElementById('btn-wvq-back')?.addEventListener('click', () => {
       cleanupWordVault();
-      this._showScreen('screen-home');
+      this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
@@ -391,14 +411,25 @@ class App {
       });
     });
 
-    // Settings bindings
-    this._bindSettings();
+    // Settings bindings (via settingsController)
+    settingsController.bind({
+      store,
+      badges,
+      gamification,
+      closeModal : (id) => this._closeModal(id),
+      onReset    : () => this._showToast('Progress reset!', 'warning'),
+    });
 
     // PIN gate
     this._bindPinGate();
 
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => this._handleKeyboard(e));
+    // Keyboard shortcuts (via keyboardManager – fixes the 'n' shortcut bug)
+    keyboardManager.init({
+      getScreen   : () => this._screen,
+      els         : this._els,
+      onHome      : () => this._showScreen(SCREENS.HOME),
+      modalManager,
+    });
 
     // Mascot tap (random cheer)
     document.getElementById('mascot-trigger')?.addEventListener('click', () => {
@@ -410,7 +441,7 @@ class App {
     // Profile chip → show profile picker
     document.getElementById('profile-chip')?.addEventListener('click', () => {
       this._renderProfileGrid();
-      this._showScreen('screen-profiles');
+      this._showScreen(SCREENS.PROFILES);
     });
 
     // Add profile button on profile screen
@@ -454,7 +485,7 @@ class App {
         this._showToast('Daily Challenge already claimed today!', 'info');
       }
       this._updateDailyBanner();
-      this._showScreen('screen-home');
+      this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
       return;
     } else {
@@ -469,14 +500,15 @@ class App {
     // Preload audio
     audio.preloadWord(this._currentWord);
 
-    // Reset per-word hint / strike state
+    // Reset per-word state (hint, strikes, and the double-submit guard).
     this._hintUsed = false;
     this._wrongStrikes = 0;
+    this._resultProcessing = false;
     this._els.btnHint?.classList.remove('used');
     this._els.btnHint?.removeAttribute('aria-disabled');
 
     // Switch to game screen
-    this._showScreen('screen-game');
+    this._showScreen(SCREENS.GAME);
     mascot.think();
 
     // Set up the mode
@@ -504,6 +536,11 @@ class App {
   _handleResult(correct, responseTime) {
     const word = this._currentWord;
     if (!word) return;
+
+    // Prevent double-submission: rapid button clicks or a delayed speech-
+    // recognition timeout firing after the word has already been evaluated.
+    if (this._resultProcessing) return;
+    this._resultProcessing = true;
 
     // Record progress
     const isNew = progress.isNewWord(word.id);
@@ -571,6 +608,8 @@ class App {
         this._els.btnHint?.addEventListener('animationend', () => {
           this._els.btnHint?.classList.remove('btn--hint-pulse');
         }, { once: true });
+        // Allow the next wrong attempt to be processed.
+        this._resultProcessing = false;
         return; // Stay on game screen — no result screen yet
       }
 
@@ -587,11 +626,14 @@ class App {
         setTimeout(() => gamification.resetEnergy(), 2000);
       }
     }
+
+    // Reset guard so the next word can be submitted.
+    this._resultProcessing = false;
   }
 
   /** Show the result screen with appropriate content */
   _showResultScreen(correct, word, reward) {
-    this._showScreen('screen-result');
+    this._showScreen(SCREENS.RESULT);
 
     if (correct) {
       this._els.resultBadge.textContent = '🌟';
@@ -625,7 +667,7 @@ class App {
     this._screen = screenId;
 
     // Refresh quest banners when returning home (mastery may have changed)
-    if (screenId === 'screen-home') this._updateQuestBanners();
+    if (screenId === SCREENS.HOME) this._updateQuestBanners();
   }
 
   /** Cleanup current mode */
@@ -648,6 +690,10 @@ class App {
 
     btn.setAttribute('aria-pressed', 'true');
 
+    // Snapshot the word ID *before* the await so we can verify the user
+    // hasn't moved to a different word by the time the timeout fires.
+    const recognisedWordId = this._currentWord.id;
+
     const result = await speech.listen(this._currentWord.word);
 
     btn.setAttribute('aria-pressed', 'false');
@@ -659,8 +705,13 @@ class App {
 
     if (result.correct) {
       this._showSpeechBubble(`I heard "${result.heard}" – ${result.score}% match! Great job!`);
-      // Auto-mark as correct
-      setTimeout(() => this._handleResult(true, 3000), 1200);
+      // Auto-mark as correct — but only if the word hasn't changed while we
+      // were waiting (guards against double-submission on rapid navigation).
+      setTimeout(() => {
+        if (this._currentWord?.id === recognisedWordId) {
+          this._handleResult(true, 3000);
+        }
+      }, 1200);
     } else {
       this._showSpeechBubble(`I heard "${result.heard}" – ${result.score}% match. Try saying "${this._currentWord.word}" more clearly!`);
     }
@@ -706,114 +757,7 @@ class App {
   }
 
   // ── Settings ──
-
-  _bindSettings() {
-    // Theme swatches
-    document.querySelectorAll('.theme-swatch').forEach(swatch => {
-      swatch.addEventListener('click', () => {
-        const theme = swatch.dataset.theme;
-        this._applyTheme(theme);
-        store.set('theme', theme);
-        document.querySelectorAll('.theme-swatch').forEach(s => {
-          s.classList.toggle('active', s.dataset.theme === theme);
-          s.setAttribute('aria-pressed', s.dataset.theme === theme);
-        });
-      });
-    });
-
-    // SFX toggle
-    document.getElementById('sfx-toggle')?.addEventListener('change', (e) => {
-      store.set('sfxEnabled', e.target.checked);
-    });
-
-    // Autoplay toggle
-    document.getElementById('autoplay-toggle')?.addEventListener('change', (e) => {
-      store.set('autoplay', e.target.checked);
-    });
-
-    // Voice speed
-    document.getElementById('voice-speed')?.addEventListener('input', (e) => {
-      const val = parseFloat(e.target.value);
-      store.set('voiceSpeed', val);
-      const display = document.getElementById('voice-speed-display');
-      if (display) display.textContent = `${val}×`;
-    });
-
-    // Difficulty buttons
-    document.querySelectorAll('.diff-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const diff = parseInt(btn.dataset.diff);
-        store.set('difficulty', diff);
-        document.querySelectorAll('.diff-btn').forEach(b => {
-          b.classList.toggle('active', parseInt(b.dataset.diff) === diff);
-          b.setAttribute('aria-pressed', parseInt(b.dataset.diff) === diff);
-        });
-      });
-    });
-
-    // Daily goal slider
-    document.getElementById('goal-range')?.addEventListener('input', (e) => {
-      const val = parseInt(e.target.value);
-      store.set('dailyGoal', val);
-      const display = document.getElementById('goal-range-display');
-      if (display) display.textContent = val;
-      document.getElementById('goal-total').textContent = val;
-    });
-
-    // Reduced motion toggle
-    document.getElementById('reduced-motion-toggle')?.addEventListener('change', (e) => {
-      store.set('reducedMotion', e.target.checked);
-      document.documentElement.setAttribute('data-reduced-motion', e.target.checked ? 'true' : 'false');
-    });
-
-    // Reset progress
-    document.getElementById('reset-progress-btn')?.addEventListener('click', () => {
-      if (confirm('This will erase all progress. Are you sure?')) {
-        store.reset();
-        badges.reset();
-        gamification.init();
-        this._showToast('Progress reset!', 'warning');
-        this._closeModal('modal-settings');
-      }
-    });
-  }
-
-  _applySettings() {
-    // Apply saved settings to UI
-    const sfx = document.getElementById('sfx-toggle');
-    if (sfx) sfx.checked = store.get('sfxEnabled');
-
-    const autoplay = document.getElementById('autoplay-toggle');
-    if (autoplay) autoplay.checked = store.get('autoplay');
-
-    const speed = document.getElementById('voice-speed');
-    if (speed) speed.value = store.get('voiceSpeed');
-    const speedDisplay = document.getElementById('voice-speed-display');
-    if (speedDisplay) speedDisplay.textContent = `${store.get('voiceSpeed')}×`;
-
-    const diff = store.get('difficulty') || 1;
-    document.querySelectorAll('.diff-btn').forEach(b => {
-      b.classList.toggle('active', parseInt(b.dataset.diff) === diff);
-      b.setAttribute('aria-pressed', parseInt(b.dataset.diff) === diff);
-    });
-
-    const goal = store.get('dailyGoal') || 10;
-    const goalRange = document.getElementById('goal-range');
-    if (goalRange) goalRange.value = goal;
-    const goalDisplay = document.getElementById('goal-range-display');
-    if (goalDisplay) goalDisplay.textContent = goal;
-
-    const reducedMotion = document.getElementById('reduced-motion-toggle');
-    if (reducedMotion) reducedMotion.checked = store.get('reducedMotion') ?? false;
-    document.documentElement.setAttribute(
-      'data-reduced-motion',
-      store.get('reducedMotion') ? 'true' : 'false'
-    );
-  }
-
-  _applyTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-  }
+  // Binding and value-application have been extracted to settingsController.js.
 
   // ── PIN Gate ──
 
@@ -879,31 +823,36 @@ class App {
 
   // ── Modals ──
 
+  /**
+   * Open a modal by ID.
+   * Delegates focus-trapping and Escape-key registration to `modalManager`
+   * so that listeners never accumulate across multiple open/close cycles.
+   */
   _openModal(id) {
-    const modal = document.getElementById(id);
-    if (!modal) return;
-    modal.hidden = false;
-
-    // Trap focus
-    const focusable = modal.querySelectorAll('button, input, [tabindex]');
-    if (focusable.length) focusable[0].focus();
-
-    // Escape to close
-    const handler = (e) => {
-      if (e.key === 'Escape') {
-        this._closeModal(id);
-        document.removeEventListener('keydown', handler);
-      }
-    };
-    document.addEventListener('keydown', handler);
+    modalManager.open(id, {
+      onClose: () => {
+        // Run any modal-specific close-side-effects (e.g. chart teardown).
+        this._onModalClosed(id);
+      },
+    });
   }
 
+  /**
+   * Close a modal by ID.
+   * Delegates to `modalManager` (removes the Escape listener) then handles
+   * any modal-specific cleanup.
+   */
   _closeModal(id) {
-    const modal = document.getElementById(id);
-    if (!modal) return;
-    modal.hidden = true;
+    modalManager.close(id);
+    this._onModalClosed(id);
+  }
 
-    // Cleanup dashboard chart
+  /**
+   * Side-effects that must run whenever a modal is dismissed, regardless of
+   * whether it was closed via button, overlay-click, or Escape key.
+   * @param {string} id
+   */
+  _onModalClosed(id) {
     if (id === 'modal-dashboard') destroyDashboard();
   }
 
@@ -956,7 +905,7 @@ class App {
         activateProfile(id);
         gamification.init();
         this._updateProfileChip();
-        this._showScreen('screen-home');
+        this._showScreen(SCREENS.HOME);
         mascot.setHomeState('holdCard');
         audio.playSfx('correct');
       });
@@ -1048,7 +997,7 @@ class App {
 
     // If this is the first profile, go straight to home
     if (getProfiles().length === 1) {
-      this._showScreen('screen-home');
+      this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     }
     audio.playSfx('correct');
@@ -1207,13 +1156,7 @@ class App {
   }
 
   // ── Quest Unlock Gating ──
-
-  /** Quest unlock thresholds (words mastered) */
-  static QUEST_THRESHOLDS = {
-    sentenceForge: 10,
-    clozeCastle: 25,
-    wordVault: 50,
-  };
+  // QUEST_THRESHOLDS have been moved to constants.js.
 
   /**
    * Calculate quest unlock status based on words mastered.
@@ -1226,7 +1169,7 @@ class App {
       if (s.attempts >= 6 && s.correct / s.attempts >= 0.8) mastered++;
     }
 
-    const t = App.QUEST_THRESHOLDS;
+    const t = QUEST_THRESHOLDS;
     return {
       mastered,
       sentenceForge: { unlocked: mastered >= t.sentenceForge, required: t.sentenceForge, current: mastered },
@@ -1263,31 +1206,9 @@ class App {
   }
 
   // ── Keyboard Shortcuts ──
-
-  _handleKeyboard(e) {
-    // Only when on game screen
-    if (this._screen !== 'screen-game') return;
-
-    switch (e.key) {
-      case ' ':
-      case 'Enter':
-        e.preventDefault();
-        // Trigger primary action (reveal / check)
-        document.getElementById('btn-reveal-next')?.click();
-        break;
-      case 's':
-        this._els.btnSayIt?.click();
-        break;
-      case 'Escape':
-        this._els.btnBack?.click();
-        break;
-      case 'n':
-        if (this._screen === 'screen-result') {
-          this._els.btnNext?.click();
-        }
-        break;
-    }
-  }
+  // Handled by keyboardManager (see src/modules/keyboardManager.js).
+  // keyboardManager.init() is called from _bindEvents().
 }
+
 
 export const app = new App();
