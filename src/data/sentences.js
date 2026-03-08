@@ -1,17 +1,24 @@
 /**
  * PhonicsQuest – Sentence Forge Quest Data
  *
- * Sentences organised by level (1 = P1 easiest → 6 = P6 hardest).
- * Each sentence is shuffled word-by-word in the game for the player to re-order.
+ * Sentences are shuffled word-by-word for the player to re-order.
+ * Each level targets specific WORD-ORDER patterns that challenge Singapore
+ * primary students — progressing from core SVO order to complex inversion
+ * and embedding. Contexts are drawn from Singapore school and community life.
  *
- * PROGRESSION MODEL (sentence-pattern focused, not vocabulary-sophistication focused)
- * ──────────────────────────────────────────────────────────────────────────────────
- * P1  Simple SVO / is-am-are / place phrases / basic noun groups
- * P2  Simple past / because-but-and-so / time phrases (yesterday, after school)
- * P3  Adverbs / before-after-when clauses / comparatives / clause expansion
- * P4  Modals / future meaning / cause-result order / longer time phrases
- * P5  Clause ordering / formal connectors / so-that / not only…but also
- * P6  Inverted structures / relative clauses / conditionals / reported speech
+ * WORD-ORDER PROGRESSION
+ * ──────────────────────────────────────────────────────────────────────────────
+ * P1  Core SVO order · Noun + be + Adj/Place · Article placement in noun groups
+ * P2  Fronted time adverbial position · Cause-clause (because) placement ·
+ *     Compound sentence order (and / but / so)
+ * P3  Fronted temporal subordinate (When/After/Before + clause, …) ·
+ *     Mid-sentence adverb placement · Comparative structure (adj + -er + than)
+ * P4  Modal-verb order (must not / should always) · Fronted cause clause
+ *     (Because he…, he…) · So + adj + that result structure
+ * P5  Fronted concessive phrase (Despite / Without + NP, …) ·
+ *     Fronted participial phrase (Having + PP, …) · Not only … but also order
+ * P6  Subject-auxiliary inversion (Not only did …) · Inverted conditional
+ *     (Had she …, she would …) · Embedded relative clause (…, which …, …)
  */
 
 export const SENTENCE_LEVEL_LABELS = {
@@ -26,13 +33,13 @@ export const SENTENCE_LEVEL_LABELS = {
 export const SENTENCE_LEVEL_ICONS = ['🌱', '🌿', '🌳', '🔥', '💎', '👑'];
 
 export const allSentences = [
-  // ── P1: SVO / is-am-are / place phrases / basic noun groups ──────────────
-  { id: 's001', sentence: 'The cat is on the mat.',          level: 1 },
-  { id: 's002', sentence: 'I can see a big dog.',            level: 1 },
-  { id: 's003', sentence: 'She has a red hat.',              level: 1 },
+  // ── P1: Core SVO · Noun + be + Adj/Place · Article in noun groups ─────────────
+  { id: 's001', sentence: 'The canteen is on the first floor.',          level: 1 },
+  { id: 's002', sentence: 'I can see the school bus from here.',         level: 1 },
+  { id: 's003', sentence: 'She has a new pencil case.',                  level: 1 },
   { id: 's004', sentence: 'We play in the park.',            level: 1 },
   { id: 's005', sentence: 'He ran to the bus.',              level: 1 },
-  { id: 's006', sentence: 'The hen has an egg.',             level: 1 },
+  { id: 's006', sentence: 'My class has twenty-five pupils.',            level: 1 },
   { id: 's007', sentence: 'I like to eat rice.',             level: 1 },
   { id: 's008', sentence: 'My bag is on the table.',         level: 1 },
   { id: 's009', sentence: 'The tree is very tall.',          level: 1 },
@@ -44,13 +51,13 @@ export const allSentences = [
   { id: 's013', sentence: 'After school, she helped her mother at home.',  level: 2 },
   { id: 's014', sentence: 'We played games and then went home.',           level: 2 },
   { id: 's015', sentence: 'He stayed at home because he was sick.',        level: 2 },
-  { id: 's016', sentence: 'My father drove me to school yesterday.',       level: 2 },
+  { id: 's016', sentence: 'My father took me to the hawker centre yesterday.',  level: 2 },
   { id: 's017', sentence: 'She washed her hands before she ate lunch.',    level: 2 },
   { id: 's018', sentence: 'The baby cried and her mother came.',           level: 2 },
   { id: 's019', sentence: 'It was raining so we stayed indoors.',          level: 2 },
   { id: 's020', sentence: 'They had a picnic last Saturday morning.',      level: 2 },
 
-  // ── P3: Adverbs / before-after-when / comparatives / clause expansion ────
+  // ── P3: Fronted temporal subordinate · Adverb placement · Comparative ────────
   { id: 's021', sentence: 'When the bell rang, all the students stood up.',         level: 3 },
   { id: 's022', sentence: 'My sister is two years older than me.',                  level: 3 },
   { id: 's023', sentence: 'Before going to bed, Tom brushed his teeth.',            level: 3 },
@@ -62,7 +69,7 @@ export const allSentences = [
   { id: 's029', sentence: 'She whispered so that the baby would not wake up.',     level: 3 },
   { id: 's030', sentence: 'When they arrived at the park, it started to rain.',    level: 3 },
 
-  // ── P4: Modals / future / cause-result order / longer time phrases ────────
+  // ── P4: Modal-verb order · Fronted cause clause · So…that structure ──────────
   { id: 's031', sentence: 'We should always wash our hands before eating.',                 level: 4 },
   { id: 's032', sentence: 'If it rains tomorrow, the match will be cancelled.',             level: 4 },
   { id: 's033', sentence: 'You must not run along the school corridor.',                    level: 4 },
@@ -74,7 +81,7 @@ export const allSentences = [
   { id: 's039', sentence: 'The school will hold its annual sports day next Friday.',        level: 4 },
   { id: 's040', sentence: 'She worked so hard that she finished an hour ahead of time.',   level: 4 },
 
-  // ── P5: Clause ordering / formal-but-primary-friendly structures ──────────
+  // ── P5: Fronted concessive/participial phrases · Not only…but also ─────────
   { id: 's041', sentence: 'Despite the heavy rain, the match continued until the final whistle.', level: 5 },
   { id: 's042', sentence: 'Without enough sleep, students find it hard to concentrate in class.', level: 5 },
   { id: 's043', sentence: 'The more she practised, the more confident she became.',              level: 5 },
@@ -86,7 +93,7 @@ export const allSentences = [
   { id: 's049', sentence: 'She practised every day so that she could improve her results.',     level: 5 },
   { id: 's050', sentence: 'Having saved enough money, she finally bought the book she wanted.', level: 5 },
 
-  // ── P6: Advanced clause structures / conditionals / relative / reported ───
+  // ── P6: Subject-auxiliary inversion · Inverted conditional · Embedded relative ──
   { id: 's051', sentence: 'Although the task was difficult, she persevered and succeeded in the end.',     level: 6 },
   { id: 's052', sentence: 'The book, which was written by a local author, won a national award.',          level: 6 },
   { id: 's053', sentence: 'Not only did he finish the race, but he also helped a fellow runner.',          level: 6 },

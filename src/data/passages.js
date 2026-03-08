@@ -10,7 +10,9 @@
  * Conjunctions recur:            P2 → P3 → P5
  * Passive voice recurs:          P5 → P6
  * Tense builds:                  P2 (simplePast, presentCont) → P3 (pastCont) → P4 (future)
- * Conditionals recur:            P5 → P6 (rising complexity)
+ * Conditionals recur:            P3 (Type 1 intro) → P5 (Types 1/2) → P6 (Types 2/3)
+ * Modals recur:                  P4 (basic: should/must/may) → P5 (perfect: should have / could have)
+ * Quantifiers recur:             P4 (basic: many/few/some) → P6 (complex: a great deal of / most of)
  *
  * Structure: passages[level][categoryKey] = [passage, passage, passage]
  */
@@ -238,96 +240,26 @@ export const passages = {
     ],
   },
 
-  P3: {
-    pastCont: [
+  P3:     conditionals: [
       {
-        id: 'g-p3-pco-01', title: 'A Rainy Day',
-        text: 'It ___ raining heavily when we left school. The children ___ for their parents under the shelter. Some pupils ___ their umbrellas.',
-        answers: ['was', 'were waiting', 'were sharing'],
-        wordBank: ['was', 'were waiting', 'were sharing', 'is', 'waited', 'shared'],
+        id: 'g-p3-cond-01', title: 'Healthy Choices',
+        text: 'If you ___ your vegetables, you will grow strong and healthy. If it ___ too hot, we will stay indoors at recess. We will be late if we ___ not hurry.',
+        answers: ['eat', 'is', 'do'],
+        wordBank: ['eat', 'is', 'do', 'ate', 'was', 'did'],
         xp: 30,
       },
       {
-        id: 'g-p3-pco-02', title: 'The Surprise',
-        text: 'While Mum ___ dinner, we ___ the living room. We ___ a surprise party for her.',
-        answers: ['was cooking', 'were decorating', 'were planning'],
-        wordBank: ['was cooking', 'were decorating', 'were planning', 'cooked', 'decorated', 'planned'],
+        id: 'g-p3-cond-02', title: 'At the Playground',
+        text: 'If we ___ early, we will get a good spot at the playground. You will fall if you ___ not careful on the monkey bars. If the ball ___ over the fence, we will have to fetch it.',
+        answers: ['arrive', 'are', 'goes'],
+        wordBank: ['arrive', 'are', 'goes', 'arrived', 'were', 'went'],
         xp: 30,
       },
       {
-        id: 'g-p3-pco-03', title: 'At the Park',
-        text: 'The birds ___ when we arrived. Children ___ on the grass. An old man ___ on the bench.',
-        answers: ['were singing', 'were playing', 'was sitting'],
-        wordBank: ['were singing', 'were playing', 'was sitting', 'sang', 'played', 'sat'],
-        xp: 30,
-      },
-    ],
-    svAgreement: [
-      {
-        id: 'g-p3-sva-01', title: 'Helping at Home',
-        text: 'Sarah ___ her mother with the housework every Saturday. She ___ the dishes after dinner. Her parents ___ always grateful for her help.',
-        answers: ['helps', 'washes', 'are'],
-        wordBank: ['helps', 'washes', 'are', 'help', 'wash', 'is'],
-        xp: 30,
-      },
-      {
-        id: 'g-p3-sva-02', title: 'The Science Project',
-        text: 'The students ___ working on a science project. Each student ___ a different role. The results ___ very interesting.',
-        answers: ['are', 'has', 'are'],
-        wordBank: ['are', 'has', 'are', 'is', 'have', 'is'],
-        xp: 30,
-      },
-      {
-        id: 'g-p3-sva-03', title: 'Our Neighbourhood',
-        text: 'Mr Lee ___ near the park. The twins ___ to the same school. Everyone in the neighbourhood ___ friendly.',
-        answers: ['lives', 'go', 'is'],
-        wordBank: ['lives', 'go', 'is', 'live', 'goes', 'are'],
-        xp: 30,
-      },
-    ],
-    comparatives: [
-      {
-        id: 'g-p3-comp-01', title: 'Comparing Animals',
-        text: 'An elephant is ___ than a dog. A cheetah is ___ than a turtle. The blue whale is the ___ animal on Earth.',
-        answers: ['bigger', 'faster', 'largest'],
-        wordBank: ['bigger', 'faster', 'largest', 'big', 'fast', 'large'],
-        xp: 30,
-      },
-      {
-        id: 'g-p3-comp-02', title: 'My Family',
-        text: 'My brother is ___ than me. My sister is the ___ in our family. I am ___ than my sister but shorter than my brother.',
-        answers: ['taller', 'shortest', 'taller'],
-        wordBank: ['taller', 'shortest', 'taller', 'tall', 'short', 'tall'],
-        xp: 30,
-      },
-      {
-        id: 'g-p3-comp-03', title: 'School Subjects',
-        text: 'Maths is ___ than art for me. English is the ___ subject I have. Science is ___ interesting than history.',
-        answers: ['harder', 'easiest', 'more'],
-        wordBank: ['harder', 'easiest', 'more', 'hard', 'easy', 'most'],
-        xp: 30,
-      },
-    ],
-    conjunctions: [
-      {
-        id: 'g-p3-conj-01', title: 'After the Match',
-        text: 'The school team played very hard. ___, they did not win the match. They were disappointed ___ they did not give up. They decided to practise even harder the ___ day.',
-        answers: ['However', 'but', 'next'],
-        wordBank: ['However', 'but', 'next', 'Therefore', 'and', 'following'],
-        xp: 30,
-      },
-      {
-        id: 'g-p3-conj-02', title: 'Helping a Friend',
-        text: 'Wei felt sad ___ she had lost her bottle. Amy saw this ___ decided to help. They searched together ___ found it under the bench.',
-        answers: ['because', 'and', 'and'],
-        wordBank: ['because', 'and', 'and', 'so', 'but', 'then'],
-        xp: 30,
-      },
-      {
-        id: 'g-p3-conj-03', title: 'A Busy Weekend',
-        text: 'Tom wanted to go swimming ___ it was raining. ___ the rain stopped, he went to the playground instead. He had fun ___ was glad he went out.',
-        answers: ['but', 'When', 'and'],
-        wordBank: ['but', 'When', 'and', 'because', 'After', 'so'],
+        id: 'g-p3-cond-03', title: 'Being a Good Friend',
+        text: 'If you ___ a friend in need, you will feel very happy inside. You will have many friends if you ___ kind to everyone. If she ___ her work on time, she can join us at the canteen.',
+        answers: ['help', 'are', 'finishes'],
+        wordBank: ['help', 'are', 'finishes', 'helped', 'were', 'finished'],
         xp: 30,
       },
     ],
@@ -428,96 +360,26 @@ export const passages = {
     ],
   },
 
-  P5: {
-    svAgreement: [
+  P5:     modals: [
       {
-        id: 'g-p5-sva-01', title: 'The School Play',
-        text: 'The school play ___ been rehearsed for six weeks. Neither the lead actor nor his classmates ___ willing to give up. Each performer ___ expected to memorise all their lines.',
-        answers: ['has', 'were', 'is'],
-        wordBank: ['has', 'were', 'is', 'have', 'was', 'are'],
+        id: 'g-p5-mod-01', title: 'After the Test',
+        text: 'The teacher said the class ___ have reviewed the notes more carefully before the test. Ali felt he ___ have re-read each question twice. He thought the team ___ have scored full marks with better preparation.',
+        answers: ['should', 'could', 'would'],
+        wordBank: ['should', 'could', 'would', 'must', 'might', 'will'],
         xp: 40,
       },
       {
-        id: 'g-p5-sva-02', title: 'The Sports Team',
-        text: 'The team ___ decided to train every day after school. The group of players ___ been working very hard. Neither the captain nor the players ___ ready to give up.',
-        answers: ['has', 'has', 'were'],
-        wordBank: ['has', 'has', 'were', 'have', 'have', 'was'],
+        id: 'g-p5-mod-02', title: 'The Missing Homework',
+        text: 'The teacher said the assignment ___ have been handed in the day before. Someone ___ have forgotten to pass it to the front. Students ___ not have left their work on their desks overnight.',
+        answers: ['must', 'could', 'should'],
+        wordBank: ['must', 'could', 'should', 'might', 'would', 'will'],
         xp: 40,
       },
       {
-        id: 'g-p5-sva-03', title: 'Community Service',
-        text: 'Community projects ___ becoming more popular in schools. The number of student volunteers ___ increasing every year. Everyone who takes part ___ expected to work as a team.',
-        answers: ['are', 'is', 'is'],
-        wordBank: ['are', 'is', 'is', 'is', 'are', 'are'],
-        xp: 40,
-      },
-    ],
-    passiveVoice: [
-      {
-        id: 'g-p5-pv-01', title: 'The New Bridge',
-        text: 'The new bridge ___ opened by the minister. It ___ designed by a famous architect. The project ___ completed ahead of schedule.',
-        answers: ['was', 'was', 'was'],
-        wordBank: ['was', 'was', 'was', 'is', 'has', 'had'],
-        xp: 40,
-      },
-      {
-        id: 'g-p5-pv-02', title: 'School Events',
-        text: 'The competition ___ organised by the student council. Prizes ___ awarded to the top three teams. The event ___ attended by over five hundred students.',
-        answers: ['was', 'were', 'was'],
-        wordBank: ['was', 'were', 'was', 'is', 'are', 'is'],
-        xp: 40,
-      },
-      {
-        id: 'g-p5-pv-03', title: 'The Science Exhibition',
-        text: 'The science exhibition ___ organised by the school\'s STEM club. Each entry ___ carefully judged by a team of teachers. The prizes ___ awarded during the school assembly.',
-        answers: ['was', 'was', 'were'],
-        wordBank: ['was', 'was', 'were', 'is', 'is', 'are'],
-        xp: 40,
-      },
-    ],
-    conditionals: [
-      {
-        id: 'g-p5-cond-01', title: 'Healthy Eating',
-        text: 'If you ___ more vegetables, you will feel healthier. If we ___ not recycle, the environment will suffer. If it ___ tomorrow, the match will be cancelled.',
-        answers: ['eat', 'do', 'rains'],
-        wordBank: ['eat', 'do', 'rains', 'ate', 'did', 'rained'],
-        xp: 40,
-      },
-      {
-        id: 'g-p5-cond-02', title: 'Studying Hard',
-        text: 'If she ___ harder, she would score better. If I ___ a bird, I would fly around the world. If we ___ earlier, we would not have missed the bus.',
-        answers: ['studied', 'were', 'had left'],
-        wordBank: ['studied', 'were', 'had left', 'studies', 'am', 'left'],
-        xp: 40,
-      },
-      {
-        id: 'g-p5-cond-03', title: 'Being a Good Friend',
-        text: 'If you ___ more patient with others, friendships will last longer. Unless we ___ kinder to those around us, we will push people away. If they ___ listened more carefully, the misunderstanding would not have happened.',
-        answers: ['are', 'become', 'had'],
-        wordBank: ['are', 'become', 'had', 'were', 'became', 'have'],
-        xp: 40,
-      },
-    ],
-    conjunctions: [
-      {
-        id: 'g-p5-conj-01', title: 'The School Camp',
-        text: 'The school camp had been a great success. ___, some students felt it was too short. ___ the teachers had planned many activities, there was not enough time. Students today travel further ___ they did in the past.',
-        answers: ['Nevertheless', 'Although', 'than'],
-        wordBank: ['Nevertheless', 'Although', 'than', 'Therefore', 'Because', 'then'],
-        xp: 40,
-      },
-      {
-        id: 'g-p5-conj-02', title: 'Two Schools',
-        text: '___ some students prefer indoor activities, others love outdoor sports. The school library is quiet, ___ the sports hall is always noisy. ___ both places serve different purposes, they are equally important.',
-        answers: ['While', 'whereas', 'Although'],
-        wordBank: ['While', 'whereas', 'Although', 'Because', 'and', 'Since'],
-        xp: 40,
-      },
-      {
-        id: 'g-p5-conj-03', title: 'Helping Others',
-        text: 'The students helped in the canteen ___ they wanted to give back to the school. ___ it was tiring, they found it very rewarding. They continued ___ they had cleared all the trays.',
-        answers: ['because', 'Although', 'until'],
-        wordBank: ['because', 'Although', 'until', 'so', 'However', 'while'],
+        id: 'g-p5-mod-03', title: 'Sports Day Reflections',
+        text: 'The team captain felt they ___ have trained harder in the weeks before Sports Day. She thought she ___ have chosen different runners for the relay event. Despite finishing second, the team agreed they ___ not have given up and were proud of their effort.',
+        answers: ['should', 'could', 'should'],
+        wordBank: ['should', 'could', 'should', 'would', 'must', 'might'],
         xp: 40,
       },
     ],
@@ -613,6 +475,29 @@ export const passages = {
         text: 'If more students ___ involved in community service, the neighbourhood would be cleaner. Had the team ___ together better, they would have won the competition. If everyone ___ to do their part, the school would become an even better place.',
         answers: ['were', 'worked', 'chose'],
         wordBank: ['were', 'worked', 'chose', 'are', 'work', 'choose'],
+        xp: 50,
+      },
+    ],
+    quantifiers: [
+      {
+        id: 'g-p6-quan-01', title: 'The Book Drive',
+        text: 'There was ___ time left before the book drive ended, so the class rushed to sort the donations. ___ the books collected were in excellent condition. ___ items were damaged and had to be set aside.',
+        answers: ['little', 'Most of', 'A few'],
+        wordBank: ['little', 'Most of', 'A few', 'few', 'Some of', 'Several'],
+        xp: 50,
+      },
+      {
+        id: 'g-p6-quan-02', title: 'Preparing for the Exhibition',
+        text: 'The students had ___ work to complete before the school open house. ___ the classes had already submitted their display boards. ___ students were still adding finishing touches to their projects.',
+        answers: ['a great deal of', 'Most of', 'A number of'],
+        wordBank: ['a great deal of', 'Most of', 'A number of', 'much', 'Several of', 'Several'],
+        xp: 50,
+      },
+      {
+        id: 'g-p6-quan-03', title: 'Volunteering at the Care Centre',
+        text: '___ of the students had visited a care centre before, so they were a little nervous. ___ effort went into planning the activities for the elderly residents. The teachers were delighted that ___ student had taken part with full enthusiasm.',
+        answers: ['Few', 'A great deal of', 'every'],
+        wordBank: ['Few', 'A great deal of', 'every', 'Some', 'Little', 'each'],
         xp: 50,
       },
     ],
