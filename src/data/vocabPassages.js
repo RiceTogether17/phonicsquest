@@ -64,6 +64,32 @@ export const vocabPassages = {
         answers: ['dark', 'raincoat', 'wet'],
         wordBank: ['dark', 'raincoat', 'wet', 'bright', 'sunglasses', 'dry'],
         xp: 20,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'Which phrase tells you what the sky looked like? Find the context clue.',
+            acceptableSpans: ['clouds covered the sun'],
+            partialSpans: ['clouds', 'sun'],
+            clueType: 'description-clue',
+            explanation: '"clouds covered the sun" tells us there was no sunlight — so the sky must be "dark", not "bright".',
+          },
+          {
+            blankIndex: 1,
+            prompt: 'Find the clue that tells you what Anna needed to protect herself from.',
+            acceptableSpans: ['rain'],
+            partialSpans: ['outside', 'going'],
+            clueType: 'action-clue',
+            explanation: '"before going outside" and "in the rain" tell us Anna needed protection from rain — a "raincoat" is what you wear in the rain.',
+          },
+          {
+            blankIndex: 2,
+            prompt: 'What does getting caught in the rain do to you? Find the clue.',
+            acceptableSpans: ['rain'],
+            partialSpans: ['outside'],
+            clueType: 'cause-clue',
+            explanation: 'If you go out in the rain without protection, you get "wet" — the opposite of "dry".',
+          },
+        ],
       },
       {
         id: 'ci-p1-02',
@@ -72,6 +98,24 @@ export const vocabPassages = {
         answers: ['hungry', 'lunchbox', 'yummy'],
         wordBank: ['hungry', 'lunchbox', 'yummy', 'sleepy', 'pencilcase', 'ugly'],
         xp: 20,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'Find the clue that tells you how Tom felt about food at this moment.',
+            acceptableSpans: ['time to eat'],
+            partialSpans: ['eat'],
+            clueType: 'action-clue',
+            explanation: '"It was time to eat" tells us Tom was about to have a meal — when you are ready to eat, you feel "hungry".',
+          },
+          {
+            blankIndex: 1,
+            prompt: 'He opened something and took out a sandwich. What container holds a school lunch?',
+            acceptableSpans: ['sandwich', 'took out'],
+            partialSpans: ['opened'],
+            clueType: 'action-clue',
+            explanation: 'He "opened" a container and found a "sandwich" — this describes opening a "lunchbox", not a pencilcase.',
+          },
+        ],
       },
       {
         id: 'ci-p1-03',
@@ -90,6 +134,24 @@ export const vocabPassages = {
         answers: ['tired', 'lay', 'eyes'],
         wordBank: ['tired', 'lay', 'eyes', 'excited', 'jumped', 'ears'],
         xp: 25,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'Find the phrase that tells you how the puppy felt after its activities.',
+            acceptableSpans: ['running and playing all day'],
+            partialSpans: ['running', 'playing', 'all day'],
+            clueType: 'cause-clue',
+            explanation: '"running and playing all day" is the cause — doing this all day makes a puppy "tired", not "excited".',
+          },
+          {
+            blankIndex: 2,
+            prompt: 'It closed its ___. What body part do you close when you fall asleep?',
+            acceptableSpans: ['asleep', 'fell'],
+            partialSpans: ['closed'],
+            clueType: 'action-clue',
+            explanation: '"fell fast asleep" tells us the puppy was sleeping — when you sleep, you close your "eyes" not your "ears".',
+          },
+        ],
       },
       {
         id: 'ci-p2-02',
@@ -644,7 +706,7 @@ export const vocabPassages = {
       {
         id: 'ma-p5-01',
         title: 'Using mis-',
-        text: 'The class monitor was accused of ___ the teacher's instructions about the homework. She had ___ the due date and told the class it was Friday instead of Thursday. The reminder note had been ___ to the wrong group.',
+        text: "The class monitor was accused of ___ the teacher's instructions about the homework. She had ___ the due date and told the class it was Friday instead of Thursday. The reminder note had been ___ to the wrong group.",
         answers: ['misrepresenting', 'misunderstood', 'misdelivered'],
         wordBank: ['misrepresenting', 'misunderstood', 'misdelivered', 'representing', 'understood', 'delivered'],
         xp: 40,
@@ -1024,6 +1086,24 @@ export const vocabPassages = {
         answers: ['Then', 'After', 'when'],
         wordBank: ['Then', 'After', 'when', 'But', 'Before', 'while'],
         xp: 20,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'What happened just before this blank? Find the event.',
+            acceptableSpans: ['brushed my teeth'],
+            partialSpans: ['brushed', 'teeth'],
+            clueType: 'connector-clue',
+            explanation: '"I brushed my teeth" happened first — the blank connects this to what happened next in sequence, so "Then" fits.',
+          },
+          {
+            blankIndex: 2,
+            prompt: 'Two events are linked — waking up and the sun coming out. Which word shows they happened at the same time?',
+            acceptableSpans: ['sun came out'],
+            partialSpans: ['woke', 'sun'],
+            clueType: 'connector-clue',
+            explanation: '"woke up" and "sun came out" happened at the same time — "when" links simultaneous events.',
+          },
+        ],
       },
       {
         id: 'con-p1-02',
@@ -1040,6 +1120,24 @@ export const vocabPassages = {
         answers: ['so', 'because', 'After'],
         wordBank: ['so', 'because', 'After', 'but', 'although', 'Before'],
         xp: 20,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'Find the cause in the first part of the sentence. The blank introduces the effect.',
+            acceptableSpans: ['hungry'],
+            partialSpans: ['was'],
+            clueType: 'cause-clue',
+            explanation: '"I was hungry" is the cause → "I ate my lunch" is the effect. "so" introduces the result/effect after a comma.',
+          },
+          {
+            blankIndex: 1,
+            prompt: 'The blank introduces the reason for eating. Which connector signals a reason?',
+            acceptableSpans: ['hungry'],
+            partialSpans: ['I was'],
+            clueType: 'cause-clue',
+            explanation: '"I was hungry" is the reason for eating — "because" introduces reasons and causes.',
+          },
+        ],
       },
     ],
     p2: [
@@ -1050,6 +1148,24 @@ export const vocabPassages = {
         answers: ['because', 'Although', 'After'],
         wordBank: ['because', 'Although', 'After', 'although', 'Because', 'Before'],
         xp: 25,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'Staying home and being ill — what is the relationship? Find the key word.',
+            acceptableSpans: ['ill', 'feeling ill'],
+            partialSpans: ['home', 'stayed'],
+            clueType: 'cause-clue',
+            explanation: '"feeling ill" is the reason Sam stayed home — "because" introduces reasons and causes.',
+          },
+          {
+            blankIndex: 1,
+            prompt: 'Find the contrast: sick, yet still wanted to play. Which word signals a contrast?',
+            acceptableSpans: ['still', 'sick'],
+            partialSpans: ['play', 'wanted'],
+            clueType: 'contrast-clue',
+            explanation: '"sick" and "still wanted to play" are contrasting ideas — "Although" signals an unexpected contrast.',
+          },
+        ],
       },
       {
         id: 'con-p2-02',
