@@ -34,20 +34,24 @@ export const SENTENCE_LEVEL_ICONS = ['🌱', '🌿', '🌳', '🔥', '💎', '�
 
 export const allSentences = [
   // ── P1: Core SVO · Noun + be + Adj/Place · Article in noun groups ─────────────
-  { id: 's001', sentence: 'The canteen is on the first floor.',          level: 1 },
-  { id: 's002', sentence: 'I can see the school bus from here.',         level: 1 },
-  { id: 's003', sentence: 'She has a new pencil case.',                  level: 1 },
-  { id: 's004', sentence: 'We play in the park.',            level: 1 },
-  { id: 's005', sentence: 'He ran to the bus.',              level: 1 },
-  { id: 's006', sentence: 'My class has twenty-five pupils.',            level: 1 },
-  { id: 's007', sentence: 'I like to eat rice.',             level: 1 },
-  { id: 's008', sentence: 'My bag is on the table.',         level: 1 },
-  { id: 's009', sentence: 'The tree is very tall.',          level: 1 },
-  { id: 's010', sentence: 'We sit in the classroom.',        level: 1 },
+  { id: 's001', sentence: 'The canteen is on the first floor.',          level: 1, sentenceSkills: ['word_order', 'subject_action_clue'], focusLabel: 'Subject + Verb + Place' },
+  { id: 's002', sentence: 'I can see the school bus from here.',         level: 1, sentenceSkills: ['word_order', 'modal_order'], focusLabel: 'Modal verb order' },
+  { id: 's003', sentence: 'She has a new pencil case.',                  level: 1, sentenceSkills: ['word_order', 'subject_action_clue'], focusLabel: 'Subject + Verb + Object' },
+  { id: 's004', sentence: 'We play in the park.',            level: 1, sentenceSkills: ['word_order'], focusLabel: 'Basic SVO' },
+  { id: 's005', sentence: 'He ran to the bus.',              level: 1, sentenceSkills: ['word_order', 'tense_clue'], focusLabel: 'Past tense', grammarNote: '"ran" is the past tense of "run" — the verb shows the action happened already.' },
+  { id: 's006', sentence: 'My class has twenty-five pupils.',            level: 1, sentenceSkills: ['word_order', 'subject_action_clue'], focusLabel: 'Subject + Verb + Object' },
+  { id: 's007', sentence: 'I like to eat rice.',             level: 1, sentenceSkills: ['word_order'], focusLabel: 'Basic SVO' },
+  { id: 's008', sentence: 'My bag is on the table.',         level: 1, sentenceSkills: ['word_order', 'subject_action_clue'], focusLabel: 'Subject + Place' },
+  { id: 's009', sentence: 'The tree is very tall.',          level: 1, sentenceSkills: ['word_order', 'subject_action_clue'], focusLabel: 'Subject + Adjective' },
+  { id: 's010', sentence: 'We sit in the classroom.',        level: 1, sentenceSkills: ['word_order'], focusLabel: 'Basic SVO' },
 
   // ── P2: Simple past / because-but-and-so / time phrases ──────────────────
   {
     id: 's011', sentence: 'She fell because the floor was wet.', level: 2,
+    sentenceSkills: ['connector_clue', 'tense_clue'],
+    expectedConnector: 'because',
+    grammarNote: '"because" links the cause (wet floor) to the result (she fell). It must come between the two clauses.',
+    focusLabel: 'Cause connector',
     clueMission: {
       prompt: 'Tap the connector word that links the two ideas.',
       acceptableWords: ['because'],
@@ -57,6 +61,10 @@ export const allSentences = [
   },
   {
     id: 's012', sentence: 'I wanted to play but it was raining.', level: 2,
+    sentenceSkills: ['connector_clue', 'tense_clue'],
+    expectedConnector: 'but',
+    grammarNote: '"but" shows contrast — it always connects two opposing ideas.',
+    focusLabel: 'Contrast connector',
     clueMission: {
       prompt: 'Tap the word that shows a contrast between two ideas.',
       acceptableWords: ['but'],
@@ -66,6 +74,12 @@ export const allSentences = [
   },
   {
     id: 's013', sentence: 'After school, she helped her mother at home.', level: 2,
+    sentenceSkills: ['time_order_clue', 'first_word_clue', 'punctuation_clue'],
+    expectedFirstWord: 'After',
+    firstWordHint: '"After school" is a time phrase — start with "After" so the time clause comes first.',
+    punctuationHint: 'The comma after "After school" separates the time phrase from the main clause.',
+    grammarNote: 'When a time phrase begins the sentence, a comma follows it.',
+    focusLabel: 'Fronted time phrase',
     clueMission: {
       prompt: 'Tap the word that tells you when she helped her mother.',
       acceptableWords: ['After'],
@@ -73,9 +87,13 @@ export const allSentences = [
       explanation: '"After school" is a time phrase — it tells us WHEN the event happened. It goes at the start of the sentence.',
     },
   },
-  { id: 's014', sentence: 'We played games and then went home.',           level: 2 },
+  { id: 's014', sentence: 'We played games and then went home.', level: 2, sentenceSkills: ['connector_clue', 'tense_clue'], expectedConnector: 'and', grammarNote: '"and then" joins two past-tense actions in time order.', focusLabel: 'Time sequence' },
   {
     id: 's015', sentence: 'He stayed at home because he was sick.', level: 2,
+    sentenceSkills: ['connector_clue', 'tense_clue'],
+    expectedConnector: 'because',
+    grammarNote: '"because" introduces the reason — being sick is the reason he stayed home.',
+    focusLabel: 'Cause connector',
     clueMission: {
       prompt: 'Tap the word that introduces the reason for staying home.',
       acceptableWords: ['because'],
@@ -85,6 +103,9 @@ export const allSentences = [
   },
   {
     id: 's016', sentence: 'My father took me to the hawker centre yesterday.', level: 2,
+    sentenceSkills: ['tense_clue', 'time_order_clue'],
+    grammarNote: '"yesterday" is a past time marker — it confirms the past tense, so we use "took" not "take".',
+    focusLabel: 'Past tense signal',
     clueMission: {
       prompt: 'Tap the word that tells you when this happened.',
       acceptableWords: ['yesterday'],
@@ -124,6 +145,12 @@ export const allSentences = [
   // ── P3: Fronted temporal subordinate · Adverb placement · Comparative ────────
   {
     id: 's021', sentence: 'When the bell rang, all the students stood up.', level: 3,
+    sentenceSkills: ['time_order_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'],
+    expectedFirstWord: 'When',
+    firstWordHint: '"When" starts the time clause — it must come first, before the comma.',
+    punctuationHint: 'The comma after "When the bell rang" separates the time clause from the result clause.',
+    grammarNote: 'Fronted time clauses (When/After/Before + clause) always come first, followed by a comma.',
+    focusLabel: 'Fronted time clause',
     clueMission: {
       prompt: 'Tap the word that starts the fronted time clause.',
       acceptableWords: ['When'],
@@ -131,9 +158,15 @@ export const allSentences = [
       explanation: '"When" starts a time clause that must come first, followed by a comma, then the main clause.',
     },
   },
-  { id: 's022', sentence: 'My sister is two years older than me.',                  level: 3 },
+  { id: 's022', sentence: 'My sister is two years older than me.', level: 3, sentenceSkills: ['comparison_structure'], grammarNote: '"older than" is the comparative form. Comparative sentences use: adjective + -er + than.', focusLabel: 'Comparative structure' },
   {
     id: 's023', sentence: 'Before going to bed, Tom brushed his teeth.', level: 3,
+    sentenceSkills: ['time_order_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'],
+    expectedFirstWord: 'Before',
+    firstWordHint: '"Before" starts the time phrase — it must come first in the sentence.',
+    punctuationHint: 'A comma follows the fronted time phrase "Before going to bed".',
+    grammarNote: 'Fronted time phrases (Before/After + verb-ing) come at the start, followed by a comma.',
+    focusLabel: 'Fronted time phrase',
     clueMission: {
       prompt: 'Tap the word that should come first to show the earlier event.',
       acceptableWords: ['Before'],
@@ -141,7 +174,7 @@ export const allSentences = [
       explanation: '"Before" is a fronted time word — it comes at the start of the sentence, before the comma.',
     },
   },
-  { id: 's024', sentence: 'The old man walked slowly down the stairs.',             level: 3 },
+  { id: 's024', sentence: 'The old man walked slowly down the stairs.', level: 3, sentenceSkills: ['word_order', 'tense_clue'], grammarNote: '"walked" is past tense. Adverbs like "slowly" usually follow the verb.', focusLabel: 'Adverb placement' },
   {
     id: 's025', sentence: 'After finishing her homework, she watched television.', level: 3,
     clueMission: {
@@ -151,7 +184,7 @@ export const allSentences = [
       explanation: '"After" shows that homework was finished first — it starts the fronted clause, followed by a comma.',
     },
   },
-  { id: 's026', sentence: 'He ran faster than anyone else in the class.',           level: 3 },
+  { id: 's026', sentence: 'He ran faster than anyone else in the class.', level: 3, sentenceSkills: ['comparison_structure'], grammarNote: '"faster than" is a comparative — use adj + -er + than to compare.', focusLabel: 'Comparative structure' },
   {
     id: 's027', sentence: 'Although it was raining, they continued to play.', level: 3,
     clueMission: {
@@ -176,6 +209,9 @@ export const allSentences = [
   // ── P4: Modal-verb order · Fronted cause clause · So…that structure ──────────
   {
     id: 's031', sentence: 'We should always wash our hands before eating.', level: 4,
+    sentenceSkills: ['modal_order', 'connector_clue'],
+    grammarNote: '"should" is a modal verb — it comes directly before "always" and the main verb "wash".',
+    focusLabel: 'Modal verb order',
     clueMission: {
       prompt: 'Tap the modal verb that gives advice or a recommendation.',
       acceptableWords: ['should'],
@@ -185,6 +221,12 @@ export const allSentences = [
   },
   {
     id: 's032', sentence: 'If it rains tomorrow, the match will be cancelled.', level: 4,
+    sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'],
+    expectedFirstWord: 'If',
+    firstWordHint: '"If" starts the condition clause — it must come first, before the comma.',
+    punctuationHint: 'A comma separates the "If" condition clause from the result clause.',
+    grammarNote: '"If" conditionals: If-clause first + comma, then result clause.',
+    focusLabel: 'Conditional clause',
     clueMission: {
       prompt: 'Tap the word that signals this is a conditional sentence.',
       acceptableWords: ['If'],
@@ -194,6 +236,9 @@ export const allSentences = [
   },
   {
     id: 's033', sentence: 'You must not run along the school corridor.', level: 4,
+    sentenceSkills: ['modal_order', 'subject_action_clue'],
+    grammarNote: '"must not" is a modal verb phrase — it expresses prohibition and comes before the base verb "run".',
+    focusLabel: 'Modal prohibition',
     clueMission: {
       prompt: 'Tap the modal verb that shows a strong rule or obligation.',
       acceptableWords: ['must'],
@@ -203,6 +248,13 @@ export const allSentences = [
   },
   {
     id: 's034', sentence: 'Because he studied hard every day, he passed his exam.', level: 4,
+    sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'],
+    expectedFirstWord: 'Because',
+    expectedConnector: 'Because',
+    firstWordHint: '"Because" starts the reason clause — when fronted, it comes first before the comma.',
+    punctuationHint: 'A comma follows the fronted "Because" clause before the result.',
+    grammarNote: 'Fronted cause clauses: Because + reason + comma + result.',
+    focusLabel: 'Fronted cause clause',
     clueMission: {
       prompt: 'Tap the word that starts the cause clause (the reason).',
       acceptableWords: ['Because'],
@@ -226,26 +278,26 @@ export const allSentences = [
   { id: 's040', sentence: 'She worked so hard that she finished an hour ahead of time.',   level: 4 },
 
   // ── P5: Fronted concessive/participial phrases · Not only…but also ─────────
-  { id: 's041', sentence: 'Despite the heavy rain, the match continued until the final whistle.', level: 5 },
-  { id: 's042', sentence: 'Without enough sleep, students find it hard to concentrate in class.', level: 5 },
-  { id: 's043', sentence: 'The more she practised, the more confident she became.',              level: 5 },
-  { id: 's044', sentence: 'After much thought, the class decided to raise money for charity.',   level: 5 },
-  { id: 's045', sentence: 'She not only completed her work on time but also helped others.',     level: 5 },
-  { id: 's046', sentence: 'By the time they arrived, the show had already ended.',              level: 5 },
-  { id: 's047', sentence: 'He worked so carefully that he did not make a single mistake.',      level: 5 },
-  { id: 's048', sentence: 'Both the students and their teacher were proud of the result.',      level: 5 },
-  { id: 's049', sentence: 'She practised every day so that she could improve her results.',     level: 5 },
-  { id: 's050', sentence: 'Having saved enough money, she finally bought the book she wanted.', level: 5 },
+  { id: 's041', sentence: 'Despite the heavy rain, the match continued until the final whistle.', level: 5, sentenceSkills: ['first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Despite', firstWordHint: '"Despite" starts a concessive phrase — it goes first, before the comma.', punctuationHint: 'A comma follows the concessive phrase "Despite the heavy rain".', focusLabel: 'Concessive phrase' },
+  { id: 's042', sentence: 'Without enough sleep, students find it hard to concentrate in class.', level: 5, sentenceSkills: ['first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Without', firstWordHint: '"Without" starts a fronted prepositional phrase — it goes first.', focusLabel: 'Fronted prepositional phrase' },
+  { id: 's043', sentence: 'The more she practised, the more confident she became.', level: 5, sentenceSkills: ['comparison_structure', 'clause_boundary'], grammarNote: '"The more…the more…" is a parallel comparative structure — both halves are needed.', focusLabel: 'Parallel comparative' },
+  { id: 's044', sentence: 'After much thought, the class decided to raise money for charity.', level: 5, sentenceSkills: ['time_order_clue', 'first_word_clue', 'punctuation_clue'], expectedFirstWord: 'After', firstWordHint: '"After" starts a fronted time phrase — it comes before the comma.', focusLabel: 'Fronted time phrase' },
+  { id: 's045', sentence: 'She not only completed her work on time but also helped others.', level: 5, sentenceSkills: ['connector_clue'], expectedConnector: 'only', grammarNote: '"not only…but also" is a paired connector — both parts must be in the sentence.', focusLabel: 'Not only…but also' },
+  { id: 's046', sentence: 'By the time they arrived, the show had already ended.', level: 5, sentenceSkills: ['time_order_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'By', firstWordHint: '"By the time" starts a time clause — it comes first, before the comma.', focusLabel: 'Time reference clause' },
+  { id: 's047', sentence: 'He worked so carefully that he did not make a single mistake.', level: 5, sentenceSkills: ['connector_clue', 'clause_boundary'], grammarNote: '"so…that" is a result structure — so + adverb/adjective + that + result clause.', focusLabel: 'So…that structure' },
+  { id: 's048', sentence: 'Both the students and their teacher were proud of the result.', level: 5, sentenceSkills: ['connector_clue'], expectedConnector: 'and', grammarNote: '"Both…and" links two subjects — they go before the verb.', focusLabel: 'Both…and structure' },
+  { id: 's049', sentence: 'She practised every day so that she could improve her results.', level: 5, sentenceSkills: ['connector_clue', 'tense_clue'], expectedConnector: 'so', grammarNote: '"so that" introduces the purpose clause — it follows the main action.', focusLabel: 'Purpose clause' },
+  { id: 's050', sentence: 'Having saved enough money, she finally bought the book she wanted.', level: 5, sentenceSkills: ['first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Having', firstWordHint: '"Having saved" is a participial phrase — it comes at the start, before the comma.', punctuationHint: 'A comma follows the participial phrase "Having saved enough money".', focusLabel: 'Fronted participial phrase' },
 
   // ── P6: Subject-auxiliary inversion · Inverted conditional · Embedded relative ──
-  { id: 's051', sentence: 'Although the task was difficult, she persevered and succeeded in the end.',     level: 6 },
-  { id: 's052', sentence: 'The book, which was written by a local author, won a national award.',          level: 6 },
-  { id: 's053', sentence: 'Not only did he finish the race, but he also helped a fellow runner.',          level: 6 },
-  { id: 's054', sentence: 'It is important that we take care of the environment around us.',               level: 6 },
-  { id: 's055', sentence: 'Had she left earlier, she would not have missed the morning assembly.',         level: 6 },
-  { id: 's056', sentence: 'The principal praised the students who had shown great kindness and teamwork.', level: 6 },
-  { id: 's057', sentence: 'She told her teacher that she had tried her best on the project.',              level: 6 },
-  { id: 's058', sentence: 'The old library, which had stood for fifty years, was finally renovated.',     level: 6 },
-  { id: 's059', sentence: 'If every student does their part, the school will become a better place.',     level: 6 },
-  { id: 's060', sentence: 'Whether it was raining or sunny, they always arrived at school on time.',      level: 6 },
+  { id: 's051', sentence: 'Although the task was difficult, she persevered and succeeded in the end.', level: 6, sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Although', firstWordHint: '"Although" starts a concessive clause — it comes first, before the comma.', focusLabel: 'Concessive clause' },
+  { id: 's052', sentence: 'The book, which was written by a local author, won a national award.', level: 6, sentenceSkills: ['clause_boundary', 'connector_clue'], grammarNote: '"which was written by a local author" is a relative clause inserted with commas.', focusLabel: 'Embedded relative clause' },
+  { id: 's053', sentence: 'Not only did he finish the race, but he also helped a fellow runner.', level: 6, sentenceSkills: ['inversion_pattern', 'connector_clue', 'first_word_clue'], expectedFirstWord: 'Not', firstWordHint: '"Not only did he…" uses subject-auxiliary inversion — "did" comes before "he".', grammarNote: 'After "Not only", subject and auxiliary are inverted: Not only did + subject + verb.', focusLabel: 'Subject-auxiliary inversion' },
+  { id: 's054', sentence: 'It is important that we take care of the environment around us.', level: 6, sentenceSkills: ['word_order', 'subject_action_clue'], focusLabel: 'It is + adjective + that structure' },
+  { id: 's055', sentence: 'Had she left earlier, she would not have missed the morning assembly.', level: 6, sentenceSkills: ['inversion_pattern', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Had', firstWordHint: '"Had she left" uses inverted conditional structure — "Had" comes before "she".', punctuationHint: 'A comma follows the inverted conditional clause "Had she left earlier".', grammarNote: 'Inverted conditional: Had + subject + past participle + comma + result.', focusLabel: 'Inverted conditional' },
+  { id: 's056', sentence: 'The principal praised the students who had shown great kindness and teamwork.', level: 6, sentenceSkills: ['clause_boundary', 'connector_clue'], grammarNote: '"who had shown" is a relative clause modifying "students" — it follows directly after the noun.', focusLabel: 'Relative clause' },
+  { id: 's057', sentence: 'She told her teacher that she had tried her best on the project.', level: 6, sentenceSkills: ['connector_clue', 'tense_clue'], expectedConnector: 'that', grammarNote: '"that she had tried" is a reported clause — "that" links the reporting verb to the reported speech.', focusLabel: 'Reported speech' },
+  { id: 's058', sentence: 'The old library, which had stood for fifty years, was finally renovated.', level: 6, sentenceSkills: ['clause_boundary', 'connector_clue'], grammarNote: '"which had stood for fifty years" is a non-defining relative clause, inserted with commas.', focusLabel: 'Non-defining relative clause' },
+  { id: 's059', sentence: 'If every student does their part, the school will become a better place.', level: 6, sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'If', firstWordHint: '"If" starts the condition — it must come first, before the comma.', focusLabel: 'Conditional clause' },
+  { id: 's060', sentence: 'Whether it was raining or sunny, they always arrived at school on time.', level: 6, sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Whether', firstWordHint: '"Whether" starts an alternative condition — it comes first, before the comma.', focusLabel: 'Alternative condition' },
 ];
