@@ -115,6 +115,10 @@ export const allSentences = [
   },
   {
     id: 's017', sentence: 'She washed her hands before she ate lunch.', level: 2,
+    sentenceSkills: ['connector_clue', 'tense_clue'],
+    expectedConnector: 'before',
+    grammarNote: '"before" connects two actions and tells us which came first — washing hands, then eating.',
+    focusLabel: 'Time connector',
     clueMission: {
       prompt: 'Tap the word that tells you which action happened first.',
       acceptableWords: ['before'],
@@ -122,9 +126,19 @@ export const allSentences = [
       explanation: '"before" tells us washing hands happened first, then eating lunch.',
     },
   },
-  { id: 's018', sentence: 'The baby cried and her mother came.',           level: 2 },
+  {
+    id: 's018', sentence: 'The baby cried and her mother came.', level: 2,
+    sentenceSkills: ['connector_clue', 'tense_clue'],
+    expectedConnector: 'and',
+    grammarNote: '"and" joins two past-tense actions in sequence. Both verbs are in the simple past.',
+    focusLabel: 'Sequence connector',
+  },
   {
     id: 's019', sentence: 'It was raining so we stayed indoors.', level: 2,
+    sentenceSkills: ['connector_clue', 'tense_clue'],
+    expectedConnector: 'so',
+    grammarNote: '"so" introduces a result — it connects a cause (rain) to its effect (staying indoors).',
+    focusLabel: 'Result connector',
     clueMission: {
       prompt: 'Tap the word that introduces the result of the rain.',
       acceptableWords: ['so'],
@@ -134,6 +148,9 @@ export const allSentences = [
   },
   {
     id: 's020', sentence: 'They had a picnic last Saturday morning.', level: 2,
+    sentenceSkills: ['tense_clue', 'time_order_clue'],
+    grammarNote: '"last Saturday" is a past time expression — it confirms we use "had" (simple past).',
+    focusLabel: 'Past time marker',
     clueMission: {
       prompt: 'Tap the word that tells you when the picnic happened.',
       acceptableWords: ['last'],
@@ -177,6 +194,12 @@ export const allSentences = [
   { id: 's024', sentence: 'The old man walked slowly down the stairs.', level: 3, sentenceSkills: ['word_order', 'tense_clue'], grammarNote: '"walked" is past tense. Adverbs like "slowly" usually follow the verb.', focusLabel: 'Adverb placement' },
   {
     id: 's025', sentence: 'After finishing her homework, she watched television.', level: 3,
+    sentenceSkills: ['time_order_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'],
+    expectedFirstWord: 'After',
+    firstWordHint: '"After" starts the fronted time phrase — it must come first, before the comma.',
+    punctuationHint: 'A comma follows the fronted phrase "After finishing her homework".',
+    grammarNote: 'Fronted time phrases (After + verb-ing) begin the sentence, followed by a comma.',
+    focusLabel: 'Fronted time phrase',
     clueMission: {
       prompt: 'Tap the connector word that shows one event finished before the other started.',
       acceptableWords: ['After'],
@@ -187,6 +210,13 @@ export const allSentences = [
   { id: 's026', sentence: 'He ran faster than anyone else in the class.', level: 3, sentenceSkills: ['comparison_structure'], grammarNote: '"faster than" is a comparative — use adj + -er + than to compare.', focusLabel: 'Comparative structure' },
   {
     id: 's027', sentence: 'Although it was raining, they continued to play.', level: 3,
+    sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'],
+    expectedFirstWord: 'Although',
+    expectedConnector: 'Although',
+    firstWordHint: '"Although" starts a contrast clause — it comes first, before the comma.',
+    punctuationHint: 'A comma follows the "Although" clause before the main clause.',
+    grammarNote: '"Although" introduces an unexpected contrast — it fronts the subordinate clause, followed by a comma.',
+    focusLabel: 'Contrast clause',
     clueMission: {
       prompt: 'Tap the connector that shows a surprising contrast.',
       acceptableWords: ['Although'],
@@ -194,9 +224,18 @@ export const allSentences = [
       explanation: '"Although" starts a contrast clause — rain should stop play, but it did not. This unexpected contrast is the key.',
     },
   },
-  { id: 's028', sentence: 'The new library is much bigger than the old one.',      level: 3 },
+  {
+    id: 's028', sentence: 'The new library is much bigger than the old one.', level: 3,
+    sentenceSkills: ['comparison_structure'],
+    grammarNote: '"bigger than" is the comparative form — adjective + -er + than. "much" intensifies the comparison.',
+    focusLabel: 'Comparative structure',
+  },
   {
     id: 's029', sentence: 'She whispered so that the baby would not wake up.', level: 3,
+    sentenceSkills: ['connector_clue', 'clause_boundary'],
+    expectedConnector: 'so',
+    grammarNote: '"so that" introduces a purpose clause — it follows the main action and explains the reason.',
+    focusLabel: 'Purpose clause',
     clueMission: {
       prompt: 'Tap the action word (verb) that tells you what she did.',
       acceptableWords: ['whispered'],
@@ -204,7 +243,15 @@ export const allSentences = [
       explanation: '"whispered" is the main verb — it tells us the action, and "so that" explains her reason for doing it.',
     },
   },
-  { id: 's030', sentence: 'When they arrived at the park, it started to rain.',    level: 3 },
+  {
+    id: 's030', sentence: 'When they arrived at the park, it started to rain.', level: 3,
+    sentenceSkills: ['time_order_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'],
+    expectedFirstWord: 'When',
+    firstWordHint: '"When" starts the time clause — it comes first, before the comma.',
+    punctuationHint: 'A comma separates the "When" time clause from the main clause.',
+    grammarNote: 'Fronted time clauses (When + clause) come first, followed by a comma, then the main clause.',
+    focusLabel: 'Fronted time clause',
+  },
 
   // ── P4: Modal-verb order · Fronted cause clause · So…that structure ──────────
   {
@@ -262,10 +309,28 @@ export const allSentences = [
       explanation: '"Because" starts the reason clause — when it is fronted, the cause clause comes first, followed by a comma.',
     },
   },
-  { id: 's035', sentence: 'She could not finish her project in time.',                      level: 4 },
-  { id: 's036', sentence: 'The doctor told him to rest and drink plenty of water.',         level: 4 },
+  {
+    id: 's035', sentence: 'She could not finish her project in time.', level: 4,
+    sentenceSkills: ['modal_order', 'tense_clue'],
+    grammarNote: '"could not" is a past modal negative — "could" comes before "not" and the main verb "finish".',
+    focusLabel: 'Modal negative',
+  },
+  {
+    id: 's036', sentence: 'The doctor told him to rest and drink plenty of water.', level: 4,
+    sentenceSkills: ['connector_clue', 'word_order'],
+    expectedConnector: 'and',
+    grammarNote: '"and" links two parallel actions in the doctor\'s instruction — rest AND drink.',
+    focusLabel: 'Parallel commands',
+  },
   {
     id: 's037', sentence: 'Although she was tired, she continued to help her friend.', level: 4,
+    sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'],
+    expectedFirstWord: 'Although',
+    expectedConnector: 'Although',
+    firstWordHint: '"Although" starts a concessive clause — it comes first, before the comma.',
+    punctuationHint: 'A comma follows the "Although" clause before the main action.',
+    grammarNote: '"Although" fronts the concessive clause — the contrast (tired vs. helping) is the key.',
+    focusLabel: 'Concessive clause',
     clueMission: {
       prompt: 'Tap the connector that shows she did something unexpected.',
       acceptableWords: ['Although'],
@@ -273,9 +338,25 @@ export const allSentences = [
       explanation: '"Although" introduces an unexpected contrast — being tired should stop you helping, but it did not.',
     },
   },
-  { id: 's038', sentence: 'We had to leave early to catch the first bus.',                  level: 4 },
-  { id: 's039', sentence: 'The school will hold its annual sports day next Friday.',        level: 4 },
-  { id: 's040', sentence: 'She worked so hard that she finished an hour ahead of time.',   level: 4 },
+  {
+    id: 's038', sentence: 'We had to leave early to catch the first bus.', level: 4,
+    sentenceSkills: ['connector_clue', 'word_order'],
+    grammarNote: '"to catch" is an infinitive of purpose — it explains why they had to leave early.',
+    focusLabel: 'Infinitive of purpose',
+  },
+  {
+    id: 's039', sentence: 'The school will hold its annual sports day next Friday.', level: 4,
+    sentenceSkills: ['tense_clue', 'word_order'],
+    grammarNote: '"will hold" is the future tense — "next Friday" is the future time marker that signals this.',
+    focusLabel: 'Future tense',
+  },
+  {
+    id: 's040', sentence: 'She worked so hard that she finished an hour ahead of time.', level: 4,
+    sentenceSkills: ['connector_clue', 'clause_boundary'],
+    expectedConnector: 'so',
+    grammarNote: '"so hard that" is a result structure — the degree of effort (so hard) causes the result (finished early).',
+    focusLabel: 'So…that result structure',
+  },
 
   // ── P5: Fronted concessive/participial phrases · Not only…but also ─────────
   { id: 's041', sentence: 'Despite the heavy rain, the match continued until the final whistle.', level: 5, sentenceSkills: ['first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Despite', firstWordHint: '"Despite" starts a concessive phrase — it goes first, before the comma.', punctuationHint: 'A comma follows the concessive phrase "Despite the heavy rain".', focusLabel: 'Concessive phrase' },
