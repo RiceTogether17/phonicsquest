@@ -391,9 +391,10 @@ function _renderLearningPath(stats) {
 
   container.innerHTML = CURRICULUM.map(stage => {
     const isUnlocked = unlocked.includes(stage.id);
-    const groupAccuracies = stage.groups.map(g => stats.groupMastery[g] ?? 0);
-    const avgAccuracy = groupAccuracies.length
-      ? Math.round((groupAccuracies.reduce((a, b) => a + b, 0) / groupAccuracies.length) * 100)
+    const stageGroups = stage.groups ?? (stage.group ? [stage.group] : []);
+    const groupAccuracies = stageGroups.map(g => stats.groupMastery[g] ?? 0);
+    const avgAccuracy = stageGroups.length
+      ? Math.round((groupAccuracies.reduce((a, b) => a + b, 0) / stageGroups.length) * 100)
       : 0;
 
     return `

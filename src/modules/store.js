@@ -244,12 +244,13 @@ class Store {
     stats[quest].attempted = (stats[quest].attempted || 0) + 1;
     if (result in (stats[quest])) stats[quest][result] = (stats[quest][result] || 0) + 1;
 
-    // Per-type bucket
+    // Per-type bucket ('correct'/'incorrect' normalised to 'strong'/'weak' for cross-quest consistency)
+    const byTypeResult = result === 'correct' ? 'strong' : result === 'incorrect' ? 'weak' : result;
     if (clueType) {
       if (!stats.byType) stats.byType = {};
       if (!stats.byType[clueType]) stats.byType[clueType] = { attempted: 0, strong: 0, partial: 0, weak: 0 };
       stats.byType[clueType].attempted++;
-      if (result in stats.byType[clueType]) stats.byType[clueType][result]++;
+      if (byTypeResult in stats.byType[clueType]) stats.byType[clueType][byTypeResult]++;
     }
 
     this.set('clueStats', stats);

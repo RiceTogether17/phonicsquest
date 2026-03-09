@@ -163,6 +163,8 @@ export function getLiteracyDomains() {
   if (ccRaw) clueAccuracies.push(ccRaw.accuracy);
   const sfRaw = _clueAccuracyRaw('sentenceForge');
   if (sfRaw) clueAccuracies.push(sfRaw.accuracy);
+  const wvRaw2 = _clueAccuracyRaw('wordVault');
+  if (wvRaw2) clueAccuracies.push(wvRaw2.accuracy);
   const clueDetection = clueAccuracies.length
     ? clueAccuracies.reduce((a, b) => a + b, 0) / clueAccuracies.length
     : null;
