@@ -106,10 +106,12 @@
         <div class="home-hero" aria-hidden="true">
           <div class="mascot-home" id="mascot-home"></div>
         </div>
-        <h1 class="home-title">Ready to read?</h1>
-        <p class="home-subtitle">Pick your adventure!</p>
+
+        <!-- GUIDED LEARNER JOURNEY (rendered by app.js based on profile) -->
+        <div id="guided-journey-section" aria-label="Guided learning path"></div>
 
         <!-- Spin Wheel -->
+        <div id="explore-activities-label" class="home-explore-label" aria-hidden="true">Explore all activities</div>
         <div class="wheel-wrapper" id="wheel-wrapper">
           <canvas id="spin-wheel" width="260" height="260" aria-label="Word category wheel" role="img"></canvas>
           <button class="spin-btn" id="spin-btn" aria-label="Spin the wheel to pick a word category">
@@ -117,7 +119,7 @@
           </button>
         </div>
 
-        <!-- Mode Grid -->
+        <!-- Mode Grid (demoted below guided journey) -->
         <nav class="mode-grid" aria-label="Activity modes">
 
           <!-- Blending section -->

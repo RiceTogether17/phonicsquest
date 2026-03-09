@@ -22,6 +22,7 @@ import { spinWheel, buildWordAnimation } from './components/wheel.js';
 import { renderDashboard, destroyDashboard } from './components/dashboard.js';
 import { celebrateCorrect, celebrateLevelUp, celebrateStreak, celebrateDailyGoal } from './components/confettiHelper.js';
 import { MODES } from './modes/index.js';
+import { getRecommendation, getDailyPlan, getLearnerSummaryChips } from './modules/recommendations.js';
 import { initStoryMode, showBrowser, cleanupStoryMode } from './modes/storyMode.js';
 import { initLetterSounds, cleanupLetterSounds } from './modes/letterSounds.js';
 import { initSightMatch, showSightBrowser, cleanupSightMatch } from './modes/sightMatch.js';
@@ -116,6 +117,7 @@ class App {
 
     this._updateDailyBanner();
     this._updateQuestBanners();
+    this._renderGuidedJourney();
 
     console.log('[PhonicsQuest] App initialized');
   }
@@ -666,8 +668,11 @@ class App {
     });
     this._screen = screenId;
 
-    // Refresh quest banners when returning home (mastery may have changed)
-    if (screenId === SCREENS.HOME) this._updateQuestBanners();
+    // Refresh quest banners and guided journey when returning home
+    if (screenId === SCREENS.HOME) {
+      this._updateQuestBanners();
+      this._renderGuidedJourney();
+    }
   }
 
   /** Cleanup current mode */
@@ -818,7 +823,156 @@ class App {
   _openDashboard() {
     this._openModal('modal-dashboard');
     const container = document.getElementById('dashboard-content');
-    if (container) renderDashboard(container);
+    if (container) {
+      renderDashboard(container, {
+        // Allow dashboard CTAs to close the dashboard and navigate to a quest
+        onNavigate: ({ target, group }) => {
+          this._closeModal('modal-dashboard');
+          this._navigateTo(target, group);
+        },
+      });
+    }
+  }
+
+  /**
+   * Navigate to a named activity from the guided journey or dashboard.
+   * @param {string} target - ctaTarget value from recommendation
+   * @param {string|null} [group]
+   */
+  _navigateTo(target, group = null) {
+    const unlock = this._getQuestUnlockStatus();
+    switch (target) {
+      case 'blend':
+        this._mode = 'blend';
+        store.set('currentMode', 'blend');
+        if (group) {
+          store.set('currentGroup', group);
+          this._startGame(group);
+        } else {
+          this._openBlendPicker();
+        }
+        break;
+      case 'classicBlend':
+        this._mode = 'classicBlend';
+        store.set('currentMode', 'classicBlend');
+        this._startGame(store.get('currentGroup') || undefined);
+        break;
+      case 'first-sound':
+        this._mode = 'first';
+        store.set('currentMode', 'first');
+        this._startGame();
+        break;
+      case 'hear':
+        this._mode = 'hear';
+        store.set('currentMode', 'hear');
+        this._startGame();
+        break;
+      case 'sentence-forge':
+        document.getElementById('btn-sentence-forge')?.click();
+        break;
+      case 'cloze-castle':
+        document.getElementById('btn-cloze-castle')?.click();
+        break;
+      case 'word-vault':
+        document.getElementById('btn-word-vault')?.click();
+        break;
+      case 'sight-words':
+        document.getElementById('btn-sight-words')?.click();
+        break;
+      case 'stories':
+        document.getElementById('btn-stories')?.click();
+        break;
+      default:
+        break;
+    }
+  }
+
+  /**
+   * Render the guided learner journey section on the home screen.
+   * Uses recommendation engine to generate a profile-aware plan.
+   */
+  _renderGuidedJourney() {
+    const section = document.getElementById('guided-journey-section');
+    if (!section) return;
+
+    const profile = getActiveProfile ? getActiveProfile() : null;
+    const isPrimary = profile?.schoolLevel === 'primary';
+
+    let rec, plan, chips;
+    try {
+      rec   = getRecommendation();
+      plan  = getDailyPlan();
+      chips = getLearnerSummaryChips();
+    } catch (_) {
+      section.innerHTML = '';
+      return;
+    }
+
+    const urgencyColor = rec.urgency === 'high'
+      ? 'var(--color-error)'
+      : rec.urgency === 'medium'
+      ? 'var(--color-warning)'
+      : 'var(--color-primary)';
+
+    const heroClass  = isPrimary ? 'gj-hero gj-hero--primary' : 'gj-hero gj-hero--preschool';
+    const heroTitle  = isPrimary ? 'School skills to strengthen' : 'Ready to read?';
+    const heroSub    = isPrimary ? 'Targeted practice for today' : 'Your learning path for today';
+
+    const chipsHtml = chips.length
+      ? `<div class="gj-chips" aria-label="Learner snapshot">
+          ${chips.map(c => `<span class="gj-chip">${c}</span>`).join('')}
+        </div>`
+      : '';
+
+    const planHtml = plan.map(step => `
+      <button class="gj-plan-step" data-target="${step.ctaTarget}" ${step.ctaGroup ? `data-group="${step.ctaGroup}"` : ''}>
+        <span class="gj-plan-num">${step.step}</span>
+        <div class="gj-plan-info">
+          <span class="gj-plan-label">${step.label}</span>
+          <span class="gj-plan-detail">${step.detail}</span>
+        </div>
+        <span class="gj-plan-arrow">→</span>
+      </button>`).join('');
+
+    section.innerHTML = `
+      <div class="${heroClass}">
+        <div class="gj-hero-text">
+          <h2 class="gj-hero-title">${heroTitle}</h2>
+          <p class="gj-hero-sub">${heroSub}</p>
+          ${chipsHtml}
+        </div>
+      </div>
+
+      <div class="gj-rec-block" aria-label="Best next step">
+        <div class="gj-rec-header">
+          <span class="gj-rec-icon" style="color:${urgencyColor}">⭐</span>
+          <span class="gj-rec-domain-badge">${rec.domain}</span>
+          <span class="gj-rec-title">Best Next Step</span>
+        </div>
+        <div class="gj-rec-body">
+          <p class="gj-rec-activity">${rec.title}</p>
+          <p class="gj-rec-reason">${rec.reason}</p>
+        </div>
+        <button class="btn btn--primary gj-rec-cta" data-target="${rec.ctaTarget}" ${rec.ctaGroup ? `data-group="${rec.ctaGroup}"` : ''}>
+          ${rec.ctaLabel}
+        </button>
+      </div>
+
+      <div class="gj-plan-block" aria-label="Today's recommended path">
+        <h3 class="gj-plan-title">📋 Recommended for today</h3>
+        <div class="gj-plan-steps">
+          ${planHtml}
+        </div>
+      </div>`;
+
+    // Wire up CTA buttons
+    section.querySelectorAll('[data-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.target;
+        const group  = btn.dataset.group || null;
+        this._navigateTo(target, group);
+      });
+    });
   }
 
   // ── Modals ──
@@ -908,6 +1062,8 @@ class App {
         this._showScreen(SCREENS.HOME);
         mascot.setHomeState('holdCard');
         audio.playSfx('correct');
+        // Refresh guided journey for the newly activated profile
+        this._renderGuidedJourney();
       });
     });
 
@@ -1023,6 +1179,7 @@ class App {
     if (getProfiles().length === 1) {
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
+      this._renderGuidedJourney();
     }
     audio.playSfx('correct');
   }
