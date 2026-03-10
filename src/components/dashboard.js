@@ -16,6 +16,7 @@ import { Chart, registerables } from 'chart.js';
 import { progress } from '../modules/progress.js';
 import { store } from '../modules/store.js';
 import { badges } from '../modules/badges.js';
+import { getActiveProfile } from '../modules/profiles.js';
 import { WORD_GROUPS, GROUP_ORDER, WORDS } from '../data/words.js';
 import { CURRICULUM, getUnlockedStages } from '../data/curriculum.js';
 import {
@@ -108,6 +109,7 @@ export function renderDashboard(container, opts = {}) {
     <!-- Actions (existing) -->
     <div class="dash-actions">
       <button class="btn btn--ghost" id="btn-export-csv">Export CSV</button>
+      <button class="btn btn--ghost" id="btn-export-report">Export Parent Report (JSON)</button>
       <button class="btn btn--ghost" id="btn-import-csv">Import Words (CSV)</button>
     </div>
 
@@ -457,6 +459,17 @@ function _bindActions() {
     URL.revokeObjectURL(url);
   });
 
+  document.getElementById('btn-export-report')?.addEventListener('click', () => {
+    const report = _buildParentReport();
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `phonicsquest-parent-report-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
   document.getElementById('btn-import-csv')?.addEventListener('click', () => {
     const panel = document.getElementById('csv-import-panel');
     if (panel) panel.hidden = !panel.hidden;
@@ -482,6 +495,30 @@ function _bindActions() {
       if (file) _handleCSVImport(file);
     });
   }
+}
+
+function _buildParentReport() {
+  const stats = progress.getOverallStats();
+  const profile = getActiveProfile();
+  return {
+    generatedAt: new Date().toISOString(),
+    learnerSummary: getLearnerSummary(),
+    literacyDomains: getLiteracyDomains(),
+    clueInsights: getClueInsights(),
+    recommendedActions: getRecommendedActions(),
+    recentPatternInsights: getRecentPatternInsights(),
+    progress: {
+      wordsAttempted: stats.wordsAttempted,
+      wordsMastered: stats.wordsMastered,
+      overallAccuracy: stats.overallAccuracy,
+      bestStreak: stats.bestStreak,
+      totalAttempts: stats.totalAttempts,
+      totalCorrect: stats.totalCorrect,
+      groupMastery: stats.groupMastery,
+      recentHistory: stats.recentHistory.slice(0, 50),
+      profile,
+    },
+  };
 }
 
 // ── CSV Import (unchanged) ────────────────────────────────────────────────────
