@@ -2005,6 +2005,18 @@ input, select, textarea { font-family: inherit; }
   overflow-y: auto;
 }
 
+/* Keep Sight Words content visually centered on wide screens */
+#screen-sight-match {
+  align-items: center;
+}
+
+#screen-sight-match .stories-screen-header,
+#screen-sight-match .stories-content {
+  width: min(100%, 980px);
+  max-width: 980px;
+  margin-inline: auto;
+}
+
 /* ── Browser: tabs ───────────────────────────────────────────────────────── */
 .stories-browser { width: 100%; }
 
