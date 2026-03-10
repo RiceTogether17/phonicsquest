@@ -327,6 +327,22 @@ input, select, textarea { font-family: inherit; }
 .stat-icon { font-size: 14px; line-height: 1; }
 .stat-value { color: var(--text); min-width: 18px; text-align: center; }
 
+.stat-chip--streak[data-streak-tier="warm"] {
+  border-color: #f59e0b;
+  background: color-mix(in srgb, #f59e0b 14%, var(--surface-2));
+}
+.stat-chip--streak[data-streak-tier="hot"] {
+  border-color: #f97316;
+  background: color-mix(in srgb, #f97316 18%, var(--surface-2));
+  box-shadow: 0 0 0 1px color-mix(in srgb, #f97316 30%, transparent), 0 0 14px color-mix(in srgb, #f97316 32%, transparent);
+}
+.stat-chip--streak[data-streak-tier="legend"] {
+  border-color: #ef4444;
+  background: color-mix(in srgb, #ef4444 20%, var(--surface-2));
+  box-shadow: 0 0 0 1px color-mix(in srgb, #ef4444 35%, transparent), 0 0 18px color-mix(in srgb, #ef4444 36%, transparent);
+}
+
+
 /* Giri Energy stars */
 .energy-display {
   display: flex;

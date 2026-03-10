@@ -1088,15 +1088,22 @@ class App {
     const profiles = getProfiles();
 
     if (!chip) return;
-    if (profiles.length <= 1) {
+    if (profiles.length === 0) {
       chip.style.display = 'none';
       return;
     }
 
     const profile = getActiveProfile();
-    if (!profile) { chip.style.display = 'none'; return; }
+    if (!profile) {
+      chip.style.display = '';
+      chip.setAttribute('aria-label', 'Manage players');
+      if (avatar) avatar.textContent = '🧑‍🎓';
+      if (name)   name.textContent   = 'Players';
+      return;
+    }
 
     chip.style.display = '';
+    chip.setAttribute('aria-label', profiles.length > 1 ? 'Switch player' : 'Manage players');
     chip.style.setProperty('--profile-color', profile.color);
     if (avatar) avatar.textContent = profile.avatar;
     if (name)   name.textContent   = profile.name;
