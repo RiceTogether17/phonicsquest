@@ -1800,8 +1800,6 @@ input, select, textarea { font-family: inherit; }
   }
 
   /* Remove ALL max-width caps on content wrappers inside game screens */
-  .stories-screen-header,
-  .stories-content,
   .sfq-browser,
   .sfq-game,
   .cloze-browser,
@@ -1814,6 +1812,15 @@ input, select, textarea { font-family: inherit; }
   .sq-question-card,
   .sq-options,
   .sq-feedback { max-width: none; }
+
+
+  /* Keep Stories content centered on desktop (avoid left-tug layout) */
+  .stories-screen-header,
+  .stories-content {
+    width: min(100%, 980px);
+    max-width: 980px;
+    margin: 0 auto;
+  }
 
   /* Larger phoneme tiles on desktop */
   .phoneme-tile { padding: 12px 20px; font-size: var(--font-size-xl); min-width: 60px; }
