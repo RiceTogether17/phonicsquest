@@ -93,6 +93,30 @@ export const settingsController = {
       if (total) total.textContent = String(val);
     });
 
+
+    // ── Mastery policy sliders ─────────────────────────────────────────────
+    document.getElementById('mastery-min-attempts')?.addEventListener('input', (e) => {
+      const val = parseInt(/** @type {HTMLInputElement} */ (e.target).value, 10);
+      const current = store.get('masteryConfig') || {};
+      store.set('masteryConfig', {
+        ...current,
+        minAttempts: val,
+      });
+      const display = document.getElementById('mastery-min-attempts-display');
+      if (display) display.textContent = String(val);
+    });
+
+    document.getElementById('mastery-accuracy')?.addEventListener('input', (e) => {
+      const val = parseFloat(/** @type {HTMLInputElement} */ (e.target).value);
+      const current = store.get('masteryConfig') || {};
+      store.set('masteryConfig', {
+        ...current,
+        masteryAccuracy: val,
+      });
+      const display = document.getElementById('mastery-accuracy-display');
+      if (display) display.textContent = `${Math.round(val * 100)}%`;
+    });
+
     // ── Reduced-motion toggle ──────────────────────────────────────────────
     document.getElementById('reduced-motion-toggle')?.addEventListener('change', (e) => {
       const checked = /** @type {HTMLInputElement} */ (e.target).checked;
@@ -143,6 +167,21 @@ export const settingsController = {
     if (goalRange) goalRange.value = String(goal);
     const goalDisplay = document.getElementById('goal-range-display');
     if (goalDisplay) goalDisplay.textContent = String(goal);
+
+
+    const masteryConfig = store.get('masteryConfig') || {};
+    const minAttempts = masteryConfig.minAttempts ?? 6;
+    const masteryAccuracy = masteryConfig.masteryAccuracy ?? 0.8;
+
+    const masteryAttemptsRange = /** @type {HTMLInputElement|null} */ (document.getElementById('mastery-min-attempts'));
+    if (masteryAttemptsRange) masteryAttemptsRange.value = String(minAttempts);
+    const masteryAttemptsDisplay = document.getElementById('mastery-min-attempts-display');
+    if (masteryAttemptsDisplay) masteryAttemptsDisplay.textContent = String(minAttempts);
+
+    const masteryAccuracyRange = /** @type {HTMLInputElement|null} */ (document.getElementById('mastery-accuracy'));
+    if (masteryAccuracyRange) masteryAccuracyRange.value = String(masteryAccuracy);
+    const masteryAccuracyDisplay = document.getElementById('mastery-accuracy-display');
+    if (masteryAccuracyDisplay) masteryAccuracyDisplay.textContent = `${Math.round(masteryAccuracy * 100)}%`;
 
     const reducedMotion = /** @type {HTMLInputElement|null} */ (
       document.getElementById('reduced-motion-toggle')

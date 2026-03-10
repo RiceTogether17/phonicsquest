@@ -45,6 +45,7 @@ import { SCREENS, QUEST_THRESHOLDS } from './constants.js';
 import { modalManager } from './modules/modalManager.js';
 import { keyboardManager } from './modules/keyboardManager.js';
 import { settingsController } from './modules/settingsController.js';
+import { getQuestUnlockStatus } from './modules/questUnlocks.js';
 
 class App {
   constructor() {
@@ -1087,15 +1088,22 @@ class App {
     const profiles = getProfiles();
 
     if (!chip) return;
-    if (profiles.length <= 1) {
+    if (profiles.length === 0) {
       chip.style.display = 'none';
       return;
     }
 
     const profile = getActiveProfile();
-    if (!profile) { chip.style.display = 'none'; return; }
+    if (!profile) {
+      chip.style.display = '';
+      chip.setAttribute('aria-label', 'Manage players');
+      if (avatar) avatar.textContent = '🧑‍🎓';
+      if (name)   name.textContent   = 'Players';
+      return;
+    }
 
     chip.style.display = '';
+    chip.setAttribute('aria-label', profiles.length > 1 ? 'Switch player' : 'Manage players');
     chip.style.setProperty('--profile-color', profile.color);
     if (avatar) avatar.textContent = profile.avatar;
     if (name)   name.textContent   = profile.name;
@@ -1350,29 +1358,9 @@ class App {
    */
   _getQuestUnlockStatus() {
     const profile = getActiveProfile();
-    const t = QUEST_THRESHOLDS;
-
-    if (profile?.schoolLevel === 'primary') {
-      return {
-        mastered: Infinity,
-        sentenceForge: { unlocked: true, required: t.sentenceForge, current: Infinity },
-        clozeCastle:   { unlocked: true, required: t.clozeCastle,   current: Infinity },
-        wordVault:     { unlocked: true, required: t.wordVault,     current: Infinity },
-      };
-    }
-
     const stats = store.get('wordStats') || {};
-    let mastered = 0;
-    for (const s of Object.values(stats)) {
-      if (s.attempts >= 6 && s.correct / s.attempts >= 0.8) mastered++;
-    }
-
-    return {
-      mastered,
-      sentenceForge: { unlocked: mastered >= t.sentenceForge, required: t.sentenceForge, current: mastered },
-      clozeCastle:   { unlocked: mastered >= t.clozeCastle,   required: t.clozeCastle,   current: mastered },
-      wordVault:     { unlocked: mastered >= t.wordVault,     required: t.wordVault,     current: mastered },
-    };
+    const masteryConfig = store.get('masteryConfig') || {};
+    return getQuestUnlockStatus(stats, profile, QUEST_THRESHOLDS, masteryConfig);
   }
 
   /** Update quest banner UI to show lock/unlock state */
