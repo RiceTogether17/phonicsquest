@@ -1845,12 +1845,12 @@ input, select, textarea { font-family: inherit; }
   .segment-btn { min-width: 64px; padding: var(--space-3) var(--space-5); }
   .segment-slot { min-width: 80px; height: 64px; font-size: var(--font-size-2xl); }
 
-  /* ── Sight Match: full-width card grid on desktop ── */
+  /* ── Sight Match: centered card grid on desktop ── */
   .sm-card-grid {
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-5);
-    max-width: 100%;
-    width: 100%;
+    width: min(100%, 1100px);
+    margin: 0 auto;
   }
   .sm-card { height: auto; aspect-ratio: 3 / 4; }
   .sm-card-number { font-size: 1.3rem; top: 8px; left: 10px; }
@@ -2950,15 +2950,20 @@ input, select, textarea { font-family: inherit; }
   color: var(--color-primary-dark);
 }
 
-/* Card grid – 5 columns, constrained on mobile */
+/* Card grid – centered with a width cap to keep cards balanced */
 .sm-card-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: var(--space-3);
-  width: 100%;
+  width: min(100%, 980px);
+  margin: 0 auto;
 }
 @media (max-width: 400px) {
-  .sm-card-grid { grid-template-columns: repeat(4, 1fr); gap: var(--space-2); }
+  .sm-card-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-2);
+    width: min(100%, 560px);
+  }
 }
 
 /* ── Flip card ────────────────────────────────────────────────────────── */
