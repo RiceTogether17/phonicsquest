@@ -45,6 +45,7 @@ import { SCREENS, QUEST_THRESHOLDS } from './constants.js';
 import { modalManager } from './modules/modalManager.js';
 import { keyboardManager } from './modules/keyboardManager.js';
 import { settingsController } from './modules/settingsController.js';
+import { getQuestUnlockStatus } from './modules/questUnlocks.js';
 
 class App {
   constructor() {
@@ -1350,29 +1351,8 @@ class App {
    */
   _getQuestUnlockStatus() {
     const profile = getActiveProfile();
-    const t = QUEST_THRESHOLDS;
-
-    if (profile?.schoolLevel === 'primary') {
-      return {
-        mastered: Infinity,
-        sentenceForge: { unlocked: true, required: t.sentenceForge, current: Infinity },
-        clozeCastle:   { unlocked: true, required: t.clozeCastle,   current: Infinity },
-        wordVault:     { unlocked: true, required: t.wordVault,     current: Infinity },
-      };
-    }
-
     const stats = store.get('wordStats') || {};
-    let mastered = 0;
-    for (const s of Object.values(stats)) {
-      if (s.attempts >= 6 && s.correct / s.attempts >= 0.8) mastered++;
-    }
-
-    return {
-      mastered,
-      sentenceForge: { unlocked: mastered >= t.sentenceForge, required: t.sentenceForge, current: mastered },
-      clozeCastle:   { unlocked: mastered >= t.clozeCastle,   required: t.clozeCastle,   current: mastered },
-      wordVault:     { unlocked: mastered >= t.wordVault,     required: t.wordVault,     current: mastered },
-    };
+    return getQuestUnlockStatus(stats, profile, QUEST_THRESHOLDS);
   }
 
   /** Update quest banner UI to show lock/unlock state */
