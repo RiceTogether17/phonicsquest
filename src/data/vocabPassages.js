@@ -247,6 +247,14 @@ export const vocabPassages = {
         wordBank: ['volunteered', 'rewarding', 'fulfilment', 'refused', 'boring', 'regret'],
         xp: 40,
       },
+      {
+        id: 'ci-p5-04',
+        title: 'Exam Week',
+        text: 'Jia Min made a ___ plan for exam week so she could revise every subject. She stayed ___ by ticking each task after completing it. By Friday, she felt ___ instead of panicked.',
+        answers: ['realistic', 'motivated', 'prepared'],
+        wordBank: ['realistic', 'motivated', 'prepared', 'risky', 'confused', 'unready'],
+        xp: 40,
+      },
     ],
     p6: [
       {
@@ -271,6 +279,14 @@ export const vocabPassages = {
         text: 'The school eco-club ___ for an urgent meeting after seeing the results of their energy audit. The ___ amount of electricity wasted each week had shocked everyone. Together, they pledged to introduce ___ habits across the whole school.',
         answers: ['convened', 'devastating', 'sustainable'],
         wordBank: ['convened', 'devastating', 'sustainable', 'scattered', 'minor', 'temporary'],
+        xp: 50,
+      },
+      {
+        id: 'ci-p6-04',
+        title: 'Scholarship Interview',
+        text: 'Before entering the interview room, Nurul took a ___ breath to steady herself. Her answers were clear and ___. The panel was ___ by how thoughtfully she reflected on her learning journey.',
+        answers: ['deep', 'coherent', 'impressed'],
+        wordBank: ['deep', 'coherent', 'impressed', 'shallow', 'confused', 'annoyed'],
         xp: 50,
       },
     ],
@@ -887,6 +903,14 @@ export const vocabPassages = {
         wordBank: ['reached', 'make', 'create', 'found', 'give', 'leave'],
         xp: 40,
       },
+      {
+        id: 'cc-p5-04',
+        title: 'Revision Workshop',
+        text: 'The English department decided to ___ a revision workshop for Primary 5 pupils. Teachers helped students ___ common grammar errors from past papers. By the end, pupils could ___ notes more efficiently during class.',
+        answers: ['run', 'identify', 'take'],
+        wordBank: ['run', 'identify', 'take', 'hold', 'find', 'write'],
+        xp: 40,
+      },
     ],
     p6: [
       {
@@ -911,6 +935,14 @@ export const vocabPassages = {
         text: 'The school canteen ___ a new healthy eating initiative for all students. It was designed to ___ the eating habits of growing children. Canteen stall owners agreed to ___ the updated guidelines and reduce the amount of fried food served.',
         answers: ['launched', 'improve', 'adopt'],
         wordBank: ['launched', 'improve', 'adopt', 'started', 'enhance', 'use'],
+        xp: 50,
+      },
+      {
+        id: 'cc-p6-04',
+        title: 'Prefect Briefing',
+        text: 'The discipline master asked the prefects to ___ attention during the safety briefing. Each team had to ___ a short report after duty. The school hoped this system would ___ a stronger culture of responsibility.',
+        answers: ['pay', 'submit', 'build'],
+        wordBank: ['pay', 'submit', 'build', 'give', 'send', 'make'],
         xp: 50,
       },
     ],
@@ -1047,6 +1079,14 @@ export const vocabPassages = {
         wordBank: ['innovative', 'launched', 'successful', 'innovation', 'launch', 'success'],
         xp: 40,
       },
+      {
+        id: 'gr-p5-04',
+        title: 'Reading Ambassadors',
+        text: 'The reading ambassadors gave a ___ recommendation for each new book. They spoke ___ so younger pupils could follow easily. Their ___ encouraged many children to borrow books weekly.',
+        answers: ['thoughtful', 'clearly', 'guidance'],
+        wordBank: ['thoughtful', 'clearly', 'guidance', 'thought', 'clear', 'guide'],
+        xp: 40,
+      },
     ],
     p6: [
       {
@@ -1071,6 +1111,14 @@ export const vocabPassages = {
         text: 'The ___ advancement was truly ___. Scientists ___ collaborated across borders to achieve this breakthrough.',
         answers: ['technological', 'groundbreaking', 'actively'],
         wordBank: ['technological', 'groundbreaking', 'actively', 'technology', 'remarkable', 'active'],
+        xp: 50,
+      },
+      {
+        id: 'gr-p6-04',
+        title: 'Community Leadership',
+        text: 'The council\'s ___ response to the neighbourhood complaint was widely praised. Members acted ___ to solve the issue before it escalated. Their ___ earned trust from residents and school partners.',
+        answers: ['prompt', 'responsibly', 'professionalism'],
+        wordBank: ['prompt', 'responsibly', 'professionalism', 'promptly', 'responsible', 'profession'],
         xp: 50,
       },
     ],
@@ -1261,6 +1309,14 @@ export const vocabPassages = {
         wordBank: ['In contrast', 'Similarly', 'Ultimately', 'Furthermore', 'However', 'Consequently'],
         xp: 40,
       },
+      {
+        id: 'con-p5-04',
+        title: 'Provided That',
+        text: 'The class could use the hall for rehearsal, ___ they left it clean afterwards. ___ the script was finalised, the drama teacher allowed extra practice time. ___ some scenes were difficult, the cast improved steadily each week.',
+        answers: ['provided that', 'Once', 'Although'],
+        wordBank: ['provided that', 'Once', 'Although', 'because', 'therefore', 'unless'],
+        xp: 40,
+      },
     ],
     p6: [
       {
@@ -1285,6 +1341,14 @@ export const vocabPassages = {
         text: '___ some pupils prefer outdoor activities, others enjoy quiet reading time. ___, both groups agree that free time is important. ___, the school decided to offer both options during recess.',
         answers: ['While', 'Nonetheless', 'However'],
         wordBank: ['While', 'Nonetheless', 'However', 'Because', 'Therefore', 'Furthermore'],
+        xp: 50,
+      },
+      {
+        id: 'con-p6-04',
+        title: 'Formal Argument',
+        text: 'The proposal looked expensive at first. ___, it would save resources over five years. ___ the initial cost, the committee voted to proceed. ___, regular reviews were added to ensure accountability.',
+        answers: ['However', 'Despite', 'In addition'],
+        wordBank: ['However', 'Despite', 'In addition', 'Therefore', 'Because of', 'Meanwhile'],
         xp: 50,
       },
     ],
