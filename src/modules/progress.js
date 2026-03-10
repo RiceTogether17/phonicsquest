@@ -11,6 +11,7 @@
 import { store } from './store.js';
 import { WORDS, shuffleArray, getWordsByLevel, getWordStructure, getShortVowelLetter } from '../data/words.js';
 import { MASTERY_THRESHOLD, MIN_ATTEMPTS_FOR_MASTERY } from '../data/curriculum.js';
+import { normalizeAdaptiveConfig, getWordWeight } from './adaptiveSelection.js';
 
 class Progress {
   /**
@@ -58,15 +59,12 @@ class Progress {
 
     const stats = store.get('wordStats') || {};
 
+    const adaptiveCfg = normalizeAdaptiveConfig(store.get('adaptiveConfig'));
+
     // Calculate weights
     const weighted = pool.map(word => {
       const s = stats[word.id];
-      if (!s || s.attempts === 0) return { word, weight: 3 }; // unseen
-      const accuracy = s.correct / s.attempts;
-      if (accuracy < 0.5) return { word, weight: 5 };
-      if (accuracy < 0.7) return { word, weight: 3 };
-      if (accuracy > 0.9 && s.attempts >= MIN_ATTEMPTS_FOR_MASTERY) return { word, weight: 0.5 };
-      return { word, weight: 1 };
+      return { word, weight: getWordWeight(s, adaptiveCfg) };
     });
 
     return this._weightedSample(weighted, count);
@@ -187,6 +185,9 @@ class Progress {
     const stats = store.get('wordStats') || {};
     const history = store.get('wordHistory') || [];
     const groupMastery = store.get('groupMastery') || {};
+    const masteryConfig = store.get('masteryConfig') || {};
+    const minAttempts = masteryConfig.minAttempts ?? MIN_ATTEMPTS_FOR_MASTERY;
+    const masteryAccuracy = masteryConfig.masteryAccuracy ?? MASTERY_THRESHOLD;
 
     let totalAttempts = 0;
     let totalCorrect  = 0;
@@ -198,7 +199,7 @@ class Progress {
         totalAttempts += s.attempts;
         totalCorrect  += s.correct;
         wordsAttempted++;
-        if (s.attempts >= MIN_ATTEMPTS_FOR_MASTERY && s.correct / s.attempts >= MASTERY_THRESHOLD) {
+        if (s.attempts >= minAttempts && s.correct / s.attempts >= masteryAccuracy) {
           wordsMastered++;
         }
       }

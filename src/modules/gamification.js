@@ -184,6 +184,7 @@ class Gamification {
     const energyEl  = document.getElementById('energy-display');
     const streakEl  = document.getElementById('streak-val');
     const xpEl      = document.getElementById('xp-val');
+    const streakChip = document.getElementById('streak-chip');
     const levelEl   = document.getElementById('level-val');
     const nextEl    = document.getElementById('level-next-val');
     const barEl     = document.getElementById('level-bar-fill');
@@ -207,6 +208,13 @@ class Gamification {
 
     if (streakEl) streakEl.textContent = store.get('streak');
     if (xpEl) xpEl.textContent = store.get('xp');
+
+    const streak = store.get('streak') || 0;
+    if (streakChip) {
+      const tier = streak >= 14 ? 'legend' : streak >= 7 ? 'hot' : streak >= 3 ? 'warm' : 'idle';
+      streakChip.setAttribute('data-streak-tier', tier);
+      streakChip.setAttribute('aria-label', `Day streak: ${streak}`);
+    }
 
     // Bump chips when values change
     if (prevEnergy !== null && energy < prevEnergy) this._bumpChip(energyEl);
