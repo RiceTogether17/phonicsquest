@@ -29,6 +29,21 @@ const DEFAULT_STATE = {
   voiceSpeed:     0.8,
   parentPin:      null,     // hashed PIN
   reducedMotion:  false,    // manual override for prefers-reduced-motion
+  speechEnabled:  true,
+  speechLocale:   'en-SG',
+
+  // Adaptive selection tuning (can be overridden by educator tooling)
+  adaptiveConfig: {
+    unseenWeight: 3,
+    weakWeight: 5,
+    mediumWeight: 3,
+    strongWeight: 0.5,
+    defaultWeight: 1,
+    weakAccuracy: 0.5,
+    mediumAccuracy: 0.7,
+    strongAccuracy: 0.9,
+    masteryMinAttempts: 6,
+  },
 
   // Progress (per-word stats)
   wordStats: {},            // { [wordId]: { attempts, correct, lastSeen } }
