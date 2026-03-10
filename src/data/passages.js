@@ -266,6 +266,9 @@ export const passages = {
           },
         ],
       },
+      { id: 'g-p2-sp-04', title: 'Class Clean-Up', text: 'Yesterday, the class ___ the notice board. Mei ___ old worksheets. The prefect ___ the floor after school.', answers: ['decorated', 'removed', 'swept'], wordBank: ['decorated', 'removed', 'swept', 'decorate', 'remove', 'sweep'], xp: 25 },
+      { id: 'g-p2-sp-05', title: 'Visit to Grandmother', text: 'Last weekend, we ___ Grandma at her flat. She ___ us warm soup. We ___ stories after dinner.', answers: ['visited', 'served', 'shared'], wordBank: ['visited', 'served', 'shared', 'visit', 'serves', 'share'], xp: 25 },
+      { id: 'g-p2-sp-06', title: 'School Excursion', text: 'On Tuesday, our class ___ to the museum. We ___ notes about old photographs. The guide ___ our questions clearly.', answers: ['walked', 'wrote', 'answered'], wordBank: ['walked', 'wrote', 'answered', 'walk', 'write', 'answer'], xp: 25 },
     ],
     presentCont: [
       {
@@ -317,6 +320,9 @@ export const passages = {
           },
         ],
       },
+      { id: 'g-p2-pc-04', title: 'Morning Assembly', text: 'The pupils ___ in straight lines. The teacher ___ the announcements. Two prefects ___ the latecomers.', answers: ['are standing', 'is reading', 'are recording'], wordBank: ['are standing', 'is reading', 'are recording', 'stand', 'reads', 'record'], xp: 25 },
+      { id: 'g-p2-pc-05', title: 'Art Room', text: 'I ___ a poster for Earth Day. My friend ___ the title neatly. We ___ coloured paper on the board.', answers: ['am making', 'is writing', 'are placing'], wordBank: ['am making', 'is writing', 'are placing', 'make', 'writes', 'place'], xp: 25 },
+      { id: 'g-p2-pc-06', title: 'At the Canteen', text: 'The vendor ___ noodle soup now. Parents ___ near the tables. My brother ___ for his drink.', answers: ['is serving', 'are waiting', 'is queuing'], wordBank: ['is serving', 'are waiting', 'is queuing', 'serves', 'wait', 'queue'], xp: 25 },
     ],
     svAgreement: [
       {
@@ -358,6 +364,9 @@ export const passages = {
         wordBank: ['am', 'sits', 'do', 'are', 'sit', 'does'],
         xp: 25,
       },
+      { id: 'g-p2-sva-04', title: 'The Reading Group', text: 'The reading group ___ every Tuesday. Each member ___ a reading log. My friend and I ___ in the same group.', answers: ['meets', 'keeps', 'are'], wordBank: ['meets', 'keeps', 'are', 'meet', 'keep', 'is'], xp: 25 },
+      { id: 'g-p2-sva-05', title: 'Plants in School', text: 'The sunflower ___ very tall. The roses ___ watered daily. Our class monitor ___ the pots every morning.', answers: ['is', 'are', 'checks'], wordBank: ['is', 'are', 'checks', 'am', 'was', 'check'], xp: 25 },
+      { id: 'g-p2-sva-06', title: 'Team Practice', text: 'The boys ___ passing drills after class. Our captain ___ clear instructions. I ___ ready to join them.', answers: ['are', 'gives', 'am'], wordBank: ['are', 'gives', 'am', 'is', 'give', 'are'], xp: 25 },
     ],
     conjunctions: [
       {
@@ -407,6 +416,9 @@ export const passages = {
           },
         ],
       },
+      { id: 'g-p2-conj-04', title: 'After Rain', text: 'It rained heavily, ___ the match was moved indoors. We still played, ___ everyone enjoyed the game. We ended early ___ the hall was booked later.', answers: ['so', 'and', 'because'], wordBank: ['so', 'and', 'because', 'but', 'or', 'then'], xp: 25 },
+      { id: 'g-p2-conj-05', title: 'Canteen Choice', text: 'I wanted noodles, ___ my sister chose rice. We shared fruit juice ___ sat together. We left quickly ___ recess was ending.', answers: ['but', 'and', 'because'], wordBank: ['but', 'and', 'because', 'or', 'so', 'while'], xp: 25 },
+      { id: 'g-p2-conj-06', title: 'Homework Time', text: 'Do your spelling now, ___ check your corrections later. You can ask me ___ ask your partner. I finished early, ___ I helped my brother.', answers: ['then', 'or', 'so'], wordBank: ['then', 'or', 'so', 'but', 'because', 'and'], xp: 25 },
     ],
   },
 
@@ -459,6 +471,71 @@ export const passages = {
         wordBank: ['help', 'are', 'finishes', 'helped', 'were', 'finished'],
         xp: 30,
       },
+      { id: 'g-p3-cond-04', title: 'Library Behaviour', text: 'If you ___ your voice low, others can concentrate. If the printer ___ out of paper, tell the librarian. We will finish quickly if everyone ___ the instructions.', answers: ['keep', 'runs', 'follows'], wordBank: ['keep', 'runs', 'follows', 'kept', 'ran', 'followed'], xp: 30 },
+      { id: 'g-p3-cond-05', title: 'Class Pet', text: 'If we ___ the fish daily, it stays healthy. The water gets dirty if no one ___ the tank. If the class ___ careful, the pet will be safe.', answers: ['feed', 'cleans', 'is'], wordBank: ['feed', 'cleans', 'is', 'fed', 'cleaned', 'was'], xp: 30 },
+      { id: 'g-p3-cond-06', title: 'Group Project', text: 'If each member ___ one task, the poster will be ready on time. We will get better marks if we ___ neat labels. If the glue ___ wet, the chart may tear.', answers: ['does', 'add', 'is'], wordBank: ['does', 'add', 'is', 'did', 'added', 'was'], xp: 30 },
+    ],
+    conjunctions: [
+      {
+        id: 'g-p3-conj-01', title: 'Class Project',
+        text: 'Our group planned the poster, ___ we shared the work fairly. Mei drew the pictures ___ Dan wrote the captions. We finished early ___ everyone stayed focused.',
+        answers: ['so', 'while', 'because'],
+        wordBank: ['so', 'while', 'because', 'but', 'or', 'unless'],
+        xp: 30,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'The second clause shows the result of planning. Which connector shows a result?',
+            acceptableSpans: ['shared the work fairly'],
+            partialSpans: ['planned'],
+            clueType: 'result-clue',
+            explanation: 'Planning led to fair sharing, so "so" is the best connector.',
+          },
+        ],
+      },
+      {
+        id: 'g-p3-conj-02', title: 'After School',
+        text: 'I wanted to stay longer at the library, ___ my father was waiting outside. We packed up quickly ___ we could leave on time. I borrowed one more book ___ I had not finished my series yet.',
+        answers: ['but', 'so', 'because'],
+        wordBank: ['but', 'so', 'because', 'or', 'and', 'unless'],
+        xp: 30,
+      },
+      {
+        id: 'g-p3-conj-03', title: 'Sports Practice',
+        text: 'The coach blew the whistle, ___ the team ran to the court. We listened carefully ___ we did not miss the instructions. You can play in defence ___ attack during drills.',
+        answers: ['and', 'so', 'or'],
+        wordBank: ['and', 'so', 'or', 'but', 'because', 'if'],
+        xp: 30,
+      },
+      { id: 'g-p3-conj-04', title: 'Science Activity', text: 'We read the experiment steps, ___ we began mixing the liquids. Sam measured the water, ___ I recorded the data. We repeated the test ___ the first result looked odd.', answers: ['then', 'while', 'because'], wordBank: ['then', 'while', 'because', 'but', 'or', 'so'], xp: 30 },
+      { id: 'g-p3-conj-05', title: 'Recess Plans', text: 'You can play badminton ___ table tennis today. I wanted to join you, ___ I had duty. We met afterwards ___ walked back together.', answers: ['or', 'but', 'and'], wordBank: ['or', 'but', 'and', 'because', 'so', 'unless'], xp: 30 },
+      { id: 'g-p3-conj-06', title: 'At Home', text: 'I finished my worksheet, ___ I packed my bag. My sister watered the plants ___ fed the rabbit. We stayed indoors ___ thunder was loud.', answers: ['so', 'and', 'because'], wordBank: ['so', 'and', 'because', 'but', 'or', 'then'], xp: 30 },
+    ],
+    prepositions: [
+      {
+        id: 'g-p3-pre-01', title: 'Science Corner',
+        text: 'The seedlings are ___ the tray near the window. We poured water ___ the measuring cup. Our notes were placed ___ the experiment file.',
+        answers: ['in', 'from', 'inside'],
+        wordBank: ['in', 'from', 'inside', 'under', 'during', 'across'],
+        xp: 30,
+      },
+      {
+        id: 'g-p3-pre-02', title: 'Walking to Assembly',
+        text: 'We lined up ___ the classroom door before assembly. The prefect walked ___ the two rows to check uniforms. Our class stopped ___ the hall entrance.',
+        answers: ['outside', 'between', 'at'],
+        wordBank: ['outside', 'between', 'at', 'inside', 'under', 'towards'],
+        xp: 30,
+      },
+      {
+        id: 'g-p3-pre-03', title: 'Art Lesson',
+        text: 'Please stick the photo ___ the centre of your page. Draw a border ___ the picture. Write your name ___ the bottom right corner.',
+        answers: ['in', 'around', 'at'],
+        wordBank: ['in', 'around', 'at', 'during', 'through', 'onto'],
+        xp: 30,
+      },
+      { id: 'g-p3-pre-04', title: 'Sports Hall', text: 'Please place the cones ___ the court lines. The coach stood ___ the players to demonstrate. We returned the balls ___ the storage cage.', answers: ['on', 'in front of', 'to'], wordBank: ['on', 'in front of', 'to', 'under', 'during', 'across'], xp: 30 },
+      { id: 'g-p3-pre-05', title: 'Computer Lab', text: 'Log ___ your account before class starts. Save your file ___ the shared folder. Sit ___ your assigned seat quietly.', answers: ['into', 'in', 'at'], wordBank: ['into', 'in', 'at', 'through', 'beside', 'over'], xp: 30 },
+      { id: 'g-p3-pre-06', title: 'Class Noticeboard', text: 'The schedule is pinned ___ the board near the door. Please write your name ___ the attendance sheet. Put completed forms ___ the blue tray.', answers: ['on', 'on', 'in'], wordBank: ['on', 'on', 'in', 'under', 'between', 'after'], xp: 30 },
     ],
     conjunctions: [
       {
@@ -541,6 +618,9 @@ export const passages = {
         wordBank: ['will', 'will', 'will', 'would', 'can', 'shall'],
         xp: 35,
       },
+      { id: 'g-p4-ft-04', title: 'Camp Schedule', text: 'Tomorrow, we ___ pitch our tents before sunset. The instructors ___ brief us after dinner. We ___ wake up at six for the hike.', answers: ['will', 'will', 'will'], wordBank: ['will', 'will', 'will', 'would', 'can', 'shall'], xp: 35 },
+      { id: 'g-p4-ft-05', title: 'Music Performance', text: 'The choir ___ perform next Thursday. Parents ___ receive an invitation letter soon. The principal ___ give an opening speech.', answers: ['will', 'will', 'will'], wordBank: ['will', 'will', 'will', 'would', 'may', 'can'], xp: 35 },
+      { id: 'g-p4-ft-06', title: 'Class Plan', text: 'Our class ___ going to start a kindness project next month. We ___ collect old storybooks for donation. The library corner ___ be rearranged this week.', answers: ['is', 'will', 'will'], wordBank: ['is', 'will', 'will', 'are', 'would', 'shall'], xp: 35 },
     ],
     modals: [
       {
@@ -564,6 +644,9 @@ export const passages = {
         wordBank: ['must', 'should', 'must', 'can', 'may', 'will'],
         xp: 35,
       },
+      { id: 'g-p4-mod-04', title: 'Online Safety', text: 'You ___ keep your password private. Students ___ not share personal details online. You ___ ask an adult for help if a message feels strange.', answers: ['must', 'should', 'should'], wordBank: ['must', 'should', 'should', 'can', 'will', 'may'], xp: 35 },
+      { id: 'g-p4-mod-05', title: 'Library Conduct', text: 'Pupils ___ return books by Friday. You ___ not write on borrowed books. You ___ borrow another book after returning one.', answers: ['must', 'must', 'may'], wordBank: ['must', 'must', 'may', 'should', 'can', 'will'], xp: 35 },
+      { id: 'g-p4-mod-06', title: 'Healthy Habits', text: 'Children ___ drink enough water each day. You ___ wash your hands before meals. We ___ avoid too many sugary drinks.', answers: ['should', 'must', 'should'], wordBank: ['should', 'must', 'should', 'may', 'will', 'can'], xp: 35 },
     ],
     quantifiers: [
       {
@@ -610,6 +693,9 @@ export const passages = {
         wordBank: ['is', 'has', 'was', 'are', 'have', 'were'],
         xp: 35,
       },
+      { id: 'g-p4-sva-04', title: 'The Debate Team', text: 'Each speaker ___ two minutes to present. The judges ___ listening carefully. One of the teams ___ prepared extra notes.', answers: ['has', 'are', 'has'], wordBank: ['has', 'are', 'has', 'have', 'is', 'were'], xp: 35 },
+      { id: 'g-p4-sva-05', title: 'School Garden', text: 'A row of sunflowers ___ near the fence. Every student ___ a watering schedule. The class monitor ___ the tools after use.', answers: ['grows', 'has', 'checks'], wordBank: ['grows', 'has', 'checks', 'grow', 'have', 'check'], xp: 35 },
+      { id: 'g-p4-sva-06', title: 'Math Competition', text: 'Neither Ben nor Ravi ___ absent today. The team leader ___ ready with the answer sheet. All participants ___ excited for the final round.', answers: ['is', 'is', 'are'], wordBank: ['is', 'is', 'are', 'are', 'am', 'was'], xp: 35 },
     ],
   },
 
@@ -636,6 +722,71 @@ export const passages = {
         wordBank: ['should', 'could', 'should', 'would', 'must', 'might'],
         xp: 40,
       },
+      { id: 'g-p5-mod-04', title: 'Group Reflection', text: 'We ___ have checked the final draft more carefully. I ___ have presented with a steadier voice. The team ___ have practised transitions between speakers.', answers: ['should', 'could', 'should'], wordBank: ['should', 'could', 'should', 'must', 'would', 'might'], xp: 40 },
+      { id: 'g-p5-mod-05', title: 'Camp Debrief', text: 'The patrol ___ have packed the first-aid kit earlier. We ___ have chosen a safer route in the dark. Our leader said everyone ___ have listened more closely.', answers: ['should', 'could', 'should'], wordBank: ['should', 'could', 'should', 'must', 'would', 'can'], xp: 40 },
+      { id: 'g-p5-mod-06', title: 'Presentation Skills', text: 'You ___ have spoken a little louder for the back row. The class ___ have prepared clearer cue cards. We ___ have practised the question-and-answer segment twice.', answers: ['should', 'could', 'should'], wordBank: ['should', 'could', 'should', 'might', 'would', 'must'], xp: 40 },
+    ],
+    conditionals: [
+      {
+        id: 'g-p5-cond-01', title: 'Science Fair Planning',
+        text: 'If our group ___ the model tonight, we will have time to rehearse tomorrow. If I ___ more cardboard, I would build a taller volcano. If we had labelled each wire, we ___ not have wasted so much time.',
+        answers: ['finishes', 'had', 'would'],
+        wordBank: ['finishes', 'had', 'would', 'finished', 'have', 'will'],
+        xp: 40,
+      },
+      {
+        id: 'g-p5-cond-02', title: 'Football Match Review',
+        text: 'If the defenders ___ their positions, the team will stay organised. If Amir ___ faster, he could reach the through ball. If the referee had seen the foul, he ___ have awarded a free kick.',
+        answers: ['keep', 'ran', 'would'],
+        wordBank: ['keep', 'ran', 'would', 'kept', 'runs', 'will'],
+        xp: 40,
+      },
+      {
+        id: 'g-p5-cond-03', title: 'Study Habits',
+        text: 'If I ___ my schedule, I can finish revision by Friday. If my sister ___ less distracted, she would complete her work sooner. If we had started earlier, we ___ have had more time to check our answers.',
+        answers: ['follow', 'were', 'would'],
+        wordBank: ['follow', 'were', 'would', 'followed', 'is', 'will'],
+        xp: 40,
+        clues: [
+          {
+            blankIndex: 1,
+            prompt: 'This sentence imagines an unreal present situation. Which verb form fits?',
+            acceptableSpans: ['would complete'],
+            partialSpans: ['If my sister'],
+            clueType: 'conditional-clue',
+            explanation: 'In a Type 2 conditional, we use "if + were" and "would + base verb".',
+          },
+        ],
+      },
+      { id: 'g-p5-cond-04', title: 'STEM Challenge', text: 'If the design ___ enough support, it will hold more weight. If we ___ more foam board, we would build a wider base. If the glue had dried fully, the frame ___ have stayed firm.', answers: ['has', 'had', 'would'], wordBank: ['has', 'had', 'would', 'have', 'were', 'will'], xp: 40 },
+      { id: 'g-p5-cond-05', title: 'Revision Strategy', text: 'If I ___ key terms daily, I will remember them better. If my notes ___ clearer, I would revise faster. If we had started last week, we ___ have avoided rushing.', answers: ['review', 'were', 'would'], wordBank: ['review', 'were', 'would', 'reviewed', 'are', 'will'], xp: 40 },
+      { id: 'g-p5-cond-06', title: 'Teamwork', text: 'If each member ___ on schedule, the project will stay on track. If Dan ___ more confident, he would lead the discussion. If they had checked the rubric, they ___ have met every requirement.', answers: ['works', 'were', 'would'], wordBank: ['works', 'were', 'would', 'work', 'is', 'will'], xp: 40 },
+    ],
+    passiveVoice: [
+      {
+        id: 'g-p5-pv-01', title: 'Recycling Week',
+        text: 'The recycling bins ___ emptied every afternoon by the Green Team. Old worksheets ___ sorted into paper and plastic groups. A short report ___ written after each collection round.',
+        answers: ['are', 'are', 'is'],
+        wordBank: ['are', 'are', 'is', 'were', 'was', 'be'],
+        xp: 40,
+      },
+      {
+        id: 'g-p5-pv-02', title: 'Library Duty',
+        text: 'The returned books ___ checked for damage at the counter. New labels ___ printed for missing spine tags. The fiction shelf ___ cleaned before dismissal.',
+        answers: ['are', 'are', 'is'],
+        wordBank: ['are', 'are', 'is', 'were', 'was', 'be'],
+        xp: 40,
+      },
+      {
+        id: 'g-p5-pv-03', title: 'Classroom Renovation',
+        text: 'The notice board ___ repainted during the holidays. Fresh charts ___ put up by the class committee. Each desk ___ moved back into neat rows.',
+        answers: ['was', 'were', 'was'],
+        wordBank: ['was', 'were', 'was', 'is', 'are', 'be'],
+        xp: 40,
+      },
+      { id: 'g-p5-pv-04', title: 'Art Exhibition', text: 'The paintings ___ arranged by theme before visitors arrived. Each caption ___ printed in large font. The main display ___ admired by many parents.', answers: ['were', 'was', 'was'], wordBank: ['were', 'was', 'was', 'are', 'is', 'be'], xp: 40 },
+      { id: 'g-p5-pv-05', title: 'Book Drive', text: 'Hundreds of books ___ collected in one week. Every box ___ labelled by student leaders. The donated novels ___ sent to partner schools.', answers: ['were', 'was', 'were'], wordBank: ['were', 'was', 'were', 'are', 'is', 'be'], xp: 40 },
+      { id: 'g-p5-pv-06', title: 'Science Lab Rules', text: 'Safety goggles ___ worn during each experiment. The chemical bottles ___ stored in locked cabinets. A checklist ___ completed before dismissal.', answers: ['are', 'are', 'is'], wordBank: ['are', 'are', 'is', 'were', 'was', 'be'], xp: 40 },
     ],
     conditionals: [
       {
@@ -741,6 +892,9 @@ export const passages = {
         wordBank: ['had', 'had', 'would', 'has', 'have', 'will'],
         xp: 50,
       },
+      { id: 'g-p6-rs-04', title: 'Camp Briefing', text: 'The instructor explained that the campfire ___ start after sunset. She reminded us that we ___ bring our water bottles. She added that everyone ___ follow the safety rules.', answers: ['would', 'should', 'had to'], wordBank: ['would', 'should', 'had to', 'will', 'must', 'have to'], xp: 50 },
+      { id: 'g-p6-rs-05', title: 'Debate Preparation', text: 'Our teacher said that the debate ___ held in the hall. She told us that each speaker ___ have two minutes. She warned that late teams ___ lose marks.', answers: ['would be', 'would', 'would'], wordBank: ['would be', 'would', 'would', 'is', 'will', 'must'], xp: 50 },
+      { id: 'g-p6-rs-06', title: 'Science Reflection', text: 'Mei reported that the test tube ___ cracked during heating. Dan said he ___ not tightened the clamp properly. The teacher replied that she ___ demonstrate the setup again.', answers: ['had', 'had', 'would'], wordBank: ['had', 'had', 'would', 'has', 'have', 'will'], xp: 50 },
     ],
     relativeClauses: [
       {
@@ -764,6 +918,9 @@ export const passages = {
         wordBank: ['whose', 'who', 'where', 'which', 'that', 'whom'],
         xp: 50,
       },
+      { id: 'g-p6-rc-04', title: 'The Robotics Team', text: 'The students ___ designed the robot stayed back for extra practice. Their coach, ___ advice was always practical, guided them patiently. The workshop ___ they trained had limited space but excellent tools.', answers: ['who', 'whose', 'where'], wordBank: ['who', 'whose', 'where', 'which', 'that', 'whom'], xp: 50 },
+      { id: 'g-p6-rc-05', title: 'An Inspiring Author', text: 'The author ___ visited our school wrote stories about resilience. The chapter ___ we discussed most was about friendship. Her notebook, ___ pages were filled with ideas, was shown to the class.', answers: ['who', 'that', 'whose'], wordBank: ['who', 'that', 'whose', 'where', 'whom', 'which'], xp: 50 },
+      { id: 'g-p6-rc-06', title: 'Community Project', text: 'The park ___ we cleaned last Saturday is now much tidier. Volunteers ___ joined the effort came from many schools. The coordinator, ___ organised the schedule, thanked everyone warmly.', answers: ['that', 'who', 'who'], wordBank: ['that', 'who', 'who', 'which', 'whose', 'where'], xp: 50 },
     ],
     conditionals: [
       {
@@ -787,6 +944,9 @@ export const passages = {
         wordBank: ['were', 'worked', 'chose', 'are', 'work', 'choose'],
         xp: 50,
       },
+      { id: 'g-p6-cond-04', title: 'Exam Strategy', text: 'If we ___ enough sleep before exams, we would think more clearly. Had I ___ the question twice, I would not have made that error. If the class ___ to review together, results would improve.', answers: ['got', 'read', 'chose'], wordBank: ['got', 'read', 'chose', 'get', 'reads', 'choose'], xp: 50 },
+      { id: 'g-p6-cond-05', title: 'Emergency Drill', text: 'If the alarm ___ during recess, students should line up calmly. Had the exit route ___ blocked, the wardens would have redirected everyone. If each team ___ instructions carefully, the drill would be smoother.', answers: ['rings', 'been', 'followed'], wordBank: ['rings', 'been', 'followed', 'rang', 'is', 'follow'], xp: 50 },
+      { id: 'g-p6-cond-06', title: 'Service Learning', text: 'If more families ___ reusable bags, less plastic would enter drains. Had the campaign ___ earlier, more residents would have joined. If every block ___ monthly clean-ups, the estate would stay cleaner.', answers: ['used', 'started', 'held'], wordBank: ['used', 'started', 'held', 'use', 'start', 'holds'], xp: 50 },
     ],
     quantifiers: [
       {

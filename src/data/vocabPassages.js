@@ -125,6 +125,7 @@ export const vocabPassages = {
         wordBank: ['ran', 'slide', 'happy', 'slept', 'table', 'angry'],
         xp: 20,
       },
+      { id: 'ci-p1-04', title: 'Classroom Morning', text: 'The bell rang and everyone hurried to their ___. Our teacher smiled and said, "Good ___, class." We felt ready and ___.', answers: ['seats', 'morning', 'alert'], wordBank: ['seats', 'morning', 'alert', 'shoes', 'night', 'sleepy'], xp: 20 },
     ],
     p2: [
       {
@@ -169,6 +170,7 @@ export const vocabPassages = {
         wordBank: ['teddy', 'under', 'behind', 'rubber', 'above', 'beside'],
         xp: 25,
       },
+      { id: 'ci-p2-04', title: 'Before PE', text: 'The class changed into their PE ___. Coach Tan asked everyone to line up ___. The pupils stretched their arms to avoid getting ___.', answers: ['uniform', 'outside', 'injured'], wordBank: ['uniform', 'outside', 'injured', 'slippers', 'inside', 'bored'], xp: 25 },
     ],
     p3: [
       {
@@ -195,6 +197,7 @@ export const vocabPassages = {
         wordBank: ['howled', 'pounded', 'safe', 'whispered', 'dripped', 'lost'],
         xp: 30,
       },
+      { id: 'ci-p3-04', title: 'Library Hunt', text: 'Nora scanned each shelf for the missing atlas. She looked ___ when she saw the empty space. At last, she found it on a ___ trolley near the counter and felt ___.', answers: ['worried', 'return', 'relieved'], wordBank: ['worried', 'return', 'relieved', 'excited', 'broken', 'upset'], xp: 30 },
     ],
     p4: [
       {
@@ -221,6 +224,7 @@ export const vocabPassages = {
         wordBank: ['anxious', 'alone', 'invited', 'excited', 'together', 'forced'],
         xp: 35,
       },
+      { id: 'ci-p4-04', title: 'Project Deadline', text: 'The team worked late to complete their presentation slides. They stayed ___ despite feeling tired. When the file was finally saved, everyone felt deeply ___ and thanked their ___ teacher for guidance.', answers: ['focused', 'relieved', 'supportive'], wordBank: ['focused', 'relieved', 'supportive', 'careless', 'confused', 'strict'], xp: 35 },
     ],
     p5: [
       {
@@ -799,6 +803,7 @@ export const vocabPassages = {
         wordBank: ['wash', 'chew', 'drink', 'clean', 'bite', 'pour'],
         xp: 20,
       },
+      { id: 'cc-p1-04', title: 'In Class', text: 'We ___ attention when the teacher speaks. We ___ notes in our exercise books. We ___ questions politely.', answers: ['pay', 'take', 'ask'], wordBank: ['pay', 'take', 'ask', 'give', 'write', 'tell'], xp: 20 },
     ],
     p2: [
       {
@@ -825,6 +830,7 @@ export const vocabPassages = {
         wordBank: ['asked', 'raised', 'chose', 'said', 'put', 'picked'],
         xp: 25,
       },
+      { id: 'cc-p2-04', title: 'Homework Routine', text: 'I ___ my homework after dinner. My sister ___ mistakes with a red pen. We ___ our bags before bedtime.', answers: ['do', 'corrects', 'pack'], wordBank: ['do', 'corrects', 'pack', 'make', 'fixes', 'fill'], xp: 25 },
     ],
     p3: [
       {
@@ -851,6 +857,7 @@ export const vocabPassages = {
         wordBank: ['preheat', 'mix', 'pour', 'heat', 'stir', 'put'],
         xp: 30,
       },
+      { id: 'cc-p3-04', title: 'Reading Lesson', text: 'The class ___ turns to read aloud. We ___ difficult words in our notebooks. Then we ___ the main idea in pairs.', answers: ['takes', 'write down', 'discuss'], wordBank: ['takes', 'write down', 'discuss', 'does', 'mark', 'talk'], xp: 30 },
     ],
     p4: [
       {
@@ -877,6 +884,7 @@ export const vocabPassages = {
         wordBank: ['conducted', 'took', 'published', 'did', 'made', 'printed'],
         xp: 35,
       },
+      { id: 'cc-p4-04', title: 'Revision Week', text: 'Our teacher asked us to ___ key points from each chapter. We ___ close attention to common mistakes. Finally, we ___ a short quiz to check our understanding.', answers: ['review', 'pay', 'completed'], wordBank: ['review', 'pay', 'completed', 'revise', 'give', 'did'], xp: 35 },
     ],
     p5: [
       {
@@ -975,6 +983,7 @@ export const vocabPassages = {
         wordBank: ['flowers', 'colourful', 'land', 'flowering', 'colour', 'landing'],
         xp: 20,
       },
+      { id: 'gr-p1-04', title: 'My Classroom Buddy', text: 'My ___ sits beside me. She is very ___. We ___ our books before reading time.', answers: ['friend', 'helpful', 'arrange'], wordBank: ['friend', 'helpful', 'arrange', 'friendly', 'help', 'arrangement'], xp: 20 },
     ],
     p2: [
       {
@@ -1001,6 +1010,7 @@ export const vocabPassages = {
         wordBank: ['rain', 'wet', 'stayed', 'rainy', 'wetness', 'staying'],
         xp: 25,
       },
+      { id: 'gr-p2-04', title: 'At Assembly', text: 'The ___ walked to the stage confidently. Her voice was ___. She ___ the class pledge clearly.', answers: ['speaker', 'steady', 'read'], wordBank: ['speaker', 'steady', 'read', 'speaking', 'steadily', 'reader'], xp: 25 },
     ],
     p3: [
       {
@@ -1027,6 +1037,7 @@ export const vocabPassages = {
         wordBank: ['musician', 'beautifully', 'performance', 'musical', 'beautiful', 'perform'],
         xp: 30,
       },
+      { id: 'gr-p3-04', title: 'Science Journal', text: 'Our ___ wrote the observation carefully. She described the colour change ___. Her ___ helped the group draw a conclusion.', answers: ['recorder', 'accurately', 'notes'], wordBank: ['recorder', 'accurately', 'notes', 'record', 'accurate', 'noted'], xp: 30 },
     ],
     p4: [
       {
@@ -1053,6 +1064,7 @@ export const vocabPassages = {
         wordBank: ['competition', 'aggressively', 'result', 'competitive', 'aggressive', 'resulting'],
         xp: 35,
       },
+      { id: 'gr-p4-04', title: 'Class Leadership', text: 'The ___ organised the duty roster fairly. She spoke ___. Her ___ approach earned everyone\'s respect.', answers: ['monitor', 'confidently', 'responsible'], wordBank: ['monitor', 'confidently', 'responsible', 'monitoring', 'confidence', 'responsibly'], xp: 35 },
     ],
     p5: [
       {
@@ -1187,6 +1199,7 @@ export const vocabPassages = {
           },
         ],
       },
+      { id: 'con-p1-04', title: 'Morning Steps', text: 'I packed my bag, ___ I wore my shoes. ___ that, I left for school. I smiled ___ I saw my friends at the gate.', answers: ['then', 'After', 'when'], wordBank: ['then', 'After', 'when', 'but', 'Before', 'because'], xp: 20 },
     ],
     p2: [
       {
@@ -1231,6 +1244,7 @@ export const vocabPassages = {
         wordBank: ['When', 'While', 'when', 'Because', 'After', 'before'],
         xp: 25,
       },
+      { id: 'con-p2-04', title: 'Sports Time', text: '___ the whistle blew, we started running. I was tired, ___ I finished the lap. ___ resting, I drank some water.', answers: ['When', 'but', 'After'], wordBank: ['When', 'but', 'After', 'Because', 'so', 'Before'], xp: 25 },
     ],
     p3: [
       {
@@ -1257,6 +1271,7 @@ export const vocabPassages = {
         wordBank: ['For example', 'In addition', 'Furthermore', 'However', 'Therefore', 'Nevertheless'],
         xp: 30,
       },
+      { id: 'con-p3-04', title: 'Cause and Contrast', text: 'The class practised daily. ___, their pronunciation improved quickly. The test was still challenging; ___, most pupils stayed confident. ___, they celebrated their progress.', answers: ['As a result', 'however', 'In the end'], wordBank: ['As a result', 'however', 'In the end', 'Therefore', 'because', 'Although'], xp: 30 },
     ],
     p4: [
       {
@@ -1283,6 +1298,7 @@ export const vocabPassages = {
         wordBank: ['In addition', 'Furthermore', 'Moreover', 'However', 'Therefore', 'Nevertheless'],
         xp: 35,
       },
+      { id: 'con-p4-04', title: 'Formal Connectors', text: 'The class budget was limited. ___, the committee planned the event carefully. ___ the low budget, the programme was successful. ___, parents praised the team\'s effort.', answers: ['Therefore', 'Despite', 'As a result'], wordBank: ['Therefore', 'Despite', 'As a result', 'Although', 'Because', 'Meanwhile'], xp: 35 },
     ],
     p5: [
       {
