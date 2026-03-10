@@ -537,6 +537,62 @@ export const passages = {
       { id: 'g-p3-pre-05', title: 'Computer Lab', text: 'Log ___ your account before class starts. Save your file ___ the shared folder. Sit ___ your assigned seat quietly.', answers: ['into', 'in', 'at'], wordBank: ['into', 'in', 'at', 'through', 'beside', 'over'], xp: 30 },
       { id: 'g-p3-pre-06', title: 'Class Noticeboard', text: 'The schedule is pinned ___ the board near the door. Please write your name ___ the attendance sheet. Put completed forms ___ the blue tray.', answers: ['on', 'on', 'in'], wordBank: ['on', 'on', 'in', 'under', 'between', 'after'], xp: 30 },
     ],
+    conjunctions: [
+      {
+        id: 'g-p3-conj-01', title: 'Class Project',
+        text: 'Our group planned the poster, ___ we shared the work fairly. Mei drew the pictures ___ Dan wrote the captions. We finished early ___ everyone stayed focused.',
+        answers: ['so', 'while', 'because'],
+        wordBank: ['so', 'while', 'because', 'but', 'or', 'unless'],
+        xp: 30,
+        clues: [
+          {
+            blankIndex: 0,
+            prompt: 'The second clause shows the result of planning. Which connector shows a result?',
+            acceptableSpans: ['shared the work fairly'],
+            partialSpans: ['planned'],
+            clueType: 'result-clue',
+            explanation: 'Planning led to fair sharing, so "so" is the best connector.',
+          },
+        ],
+      },
+      {
+        id: 'g-p3-conj-02', title: 'After School',
+        text: 'I wanted to stay longer at the library, ___ my father was waiting outside. We packed up quickly ___ we could leave on time. I borrowed one more book ___ I had not finished my series yet.',
+        answers: ['but', 'so', 'because'],
+        wordBank: ['but', 'so', 'because', 'or', 'and', 'unless'],
+        xp: 30,
+      },
+      {
+        id: 'g-p3-conj-03', title: 'Sports Practice',
+        text: 'The coach blew the whistle, ___ the team ran to the court. We listened carefully ___ we did not miss the instructions. You can play in defence ___ attack during drills.',
+        answers: ['and', 'so', 'or'],
+        wordBank: ['and', 'so', 'or', 'but', 'because', 'if'],
+        xp: 30,
+      },
+    ],
+    prepositions: [
+      {
+        id: 'g-p3-pre-01', title: 'Science Corner',
+        text: 'The seedlings are ___ the tray near the window. We poured water ___ the measuring cup. Our notes were placed ___ the experiment file.',
+        answers: ['in', 'from', 'inside'],
+        wordBank: ['in', 'from', 'inside', 'under', 'during', 'across'],
+        xp: 30,
+      },
+      {
+        id: 'g-p3-pre-02', title: 'Walking to Assembly',
+        text: 'We lined up ___ the classroom door before assembly. The prefect walked ___ the two rows to check uniforms. Our class stopped ___ the hall entrance.',
+        answers: ['outside', 'between', 'at'],
+        wordBank: ['outside', 'between', 'at', 'inside', 'under', 'towards'],
+        xp: 30,
+      },
+      {
+        id: 'g-p3-pre-03', title: 'Art Lesson',
+        text: 'Please stick the photo ___ the centre of your page. Draw a border ___ the picture. Write your name ___ the bottom right corner.',
+        answers: ['in', 'around', 'at'],
+        wordBank: ['in', 'around', 'at', 'during', 'through', 'onto'],
+        xp: 30,
+      },
+    ],
   },
 
   P4: {
@@ -731,6 +787,62 @@ export const passages = {
       { id: 'g-p5-pv-04', title: 'Art Exhibition', text: 'The paintings ___ arranged by theme before visitors arrived. Each caption ___ printed in large font. The main display ___ admired by many parents.', answers: ['were', 'was', 'was'], wordBank: ['were', 'was', 'was', 'are', 'is', 'be'], xp: 40 },
       { id: 'g-p5-pv-05', title: 'Book Drive', text: 'Hundreds of books ___ collected in one week. Every box ___ labelled by student leaders. The donated novels ___ sent to partner schools.', answers: ['were', 'was', 'were'], wordBank: ['were', 'was', 'were', 'are', 'is', 'be'], xp: 40 },
       { id: 'g-p5-pv-06', title: 'Science Lab Rules', text: 'Safety goggles ___ worn during each experiment. The chemical bottles ___ stored in locked cabinets. A checklist ___ completed before dismissal.', answers: ['are', 'are', 'is'], wordBank: ['are', 'are', 'is', 'were', 'was', 'be'], xp: 40 },
+    ],
+    conditionals: [
+      {
+        id: 'g-p5-cond-01', title: 'Science Fair Planning',
+        text: 'If our group ___ the model tonight, we will have time to rehearse tomorrow. If I ___ more cardboard, I would build a taller volcano. If we had labelled each wire, we ___ not have wasted so much time.',
+        answers: ['finishes', 'had', 'would'],
+        wordBank: ['finishes', 'had', 'would', 'finished', 'have', 'will'],
+        xp: 40,
+      },
+      {
+        id: 'g-p5-cond-02', title: 'Football Match Review',
+        text: 'If the defenders ___ their positions, the team will stay organised. If Amir ___ faster, he could reach the through ball. If the referee had seen the foul, he ___ have awarded a free kick.',
+        answers: ['keep', 'ran', 'would'],
+        wordBank: ['keep', 'ran', 'would', 'kept', 'runs', 'will'],
+        xp: 40,
+      },
+      {
+        id: 'g-p5-cond-03', title: 'Study Habits',
+        text: 'If I ___ my schedule, I can finish revision by Friday. If my sister ___ less distracted, she would complete her work sooner. If we had started earlier, we ___ have had more time to check our answers.',
+        answers: ['follow', 'were', 'would'],
+        wordBank: ['follow', 'were', 'would', 'followed', 'is', 'will'],
+        xp: 40,
+        clues: [
+          {
+            blankIndex: 1,
+            prompt: 'This sentence imagines an unreal present situation. Which verb form fits?',
+            acceptableSpans: ['would complete'],
+            partialSpans: ['If my sister'],
+            clueType: 'conditional-clue',
+            explanation: 'In a Type 2 conditional, we use "if + were" and "would + base verb".',
+          },
+        ],
+      },
+    ],
+    passiveVoice: [
+      {
+        id: 'g-p5-pv-01', title: 'Recycling Week',
+        text: 'The recycling bins ___ emptied every afternoon by the Green Team. Old worksheets ___ sorted into paper and plastic groups. A short report ___ written after each collection round.',
+        answers: ['are', 'are', 'is'],
+        wordBank: ['are', 'are', 'is', 'were', 'was', 'be'],
+        xp: 40,
+      },
+      {
+        id: 'g-p5-pv-02', title: 'Library Duty',
+        text: 'The returned books ___ checked for damage at the counter. New labels ___ printed for missing spine tags. The fiction shelf ___ cleaned before dismissal.',
+        answers: ['are', 'are', 'is'],
+        wordBank: ['are', 'are', 'is', 'were', 'was', 'be'],
+        xp: 40,
+      },
+      {
+        id: 'g-p5-pv-03', title: 'Classroom Renovation',
+        text: 'The notice board ___ repainted during the holidays. Fresh charts ___ put up by the class committee. Each desk ___ moved back into neat rows.',
+        answers: ['was', 'were', 'was'],
+        wordBank: ['was', 'were', 'was', 'is', 'are', 'be'],
+        xp: 40,
+      },
     ],
   },
 
