@@ -327,6 +327,22 @@ input, select, textarea { font-family: inherit; }
 .stat-icon { font-size: 14px; line-height: 1; }
 .stat-value { color: var(--text); min-width: 18px; text-align: center; }
 
+.stat-chip--streak[data-streak-tier="warm"] {
+  border-color: #f59e0b;
+  background: color-mix(in srgb, #f59e0b 14%, var(--surface-2));
+}
+.stat-chip--streak[data-streak-tier="hot"] {
+  border-color: #f97316;
+  background: color-mix(in srgb, #f97316 18%, var(--surface-2));
+  box-shadow: 0 0 0 1px color-mix(in srgb, #f97316 30%, transparent), 0 0 14px color-mix(in srgb, #f97316 32%, transparent);
+}
+.stat-chip--streak[data-streak-tier="legend"] {
+  border-color: #ef4444;
+  background: color-mix(in srgb, #ef4444 20%, var(--surface-2));
+  box-shadow: 0 0 0 1px color-mix(in srgb, #ef4444 35%, transparent), 0 0 18px color-mix(in srgb, #ef4444 36%, transparent);
+}
+
+
 /* Giri Energy stars */
 .energy-display {
   display: flex;
@@ -1800,8 +1816,6 @@ input, select, textarea { font-family: inherit; }
   }
 
   /* Remove ALL max-width caps on content wrappers inside game screens */
-  .stories-screen-header,
-  .stories-content,
   .sfq-browser,
   .sfq-game,
   .cloze-browser,
@@ -1814,6 +1828,15 @@ input, select, textarea { font-family: inherit; }
   .sq-question-card,
   .sq-options,
   .sq-feedback { max-width: none; }
+
+
+  /* Keep Stories content centered on desktop (avoid left-tug layout) */
+  .stories-screen-header,
+  .stories-content {
+    width: min(100%, 980px);
+    max-width: 980px;
+    margin: 0 auto;
+  }
 
   /* Larger phoneme tiles on desktop */
   .phoneme-tile { padding: 12px 20px; font-size: var(--font-size-xl); min-width: 60px; }
@@ -1845,12 +1868,12 @@ input, select, textarea { font-family: inherit; }
   .segment-btn { min-width: 64px; padding: var(--space-3) var(--space-5); }
   .segment-slot { min-width: 80px; height: 64px; font-size: var(--font-size-2xl); }
 
-  /* ── Sight Match: full-width card grid on desktop ── */
+  /* ── Sight Match: centered card grid on desktop ── */
   .sm-card-grid {
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-5);
-    max-width: 100%;
-    width: 100%;
+    width: min(100%, 1100px);
+    margin: 0 auto;
   }
   .sm-card { height: auto; aspect-ratio: 3 / 4; }
   .sm-card-number { font-size: 1.3rem; top: 8px; left: 10px; }
@@ -2950,15 +2973,20 @@ input, select, textarea { font-family: inherit; }
   color: var(--color-primary-dark);
 }
 
-/* Card grid – 5 columns, constrained on mobile */
+/* Card grid – centered with a width cap to keep cards balanced */
 .sm-card-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: var(--space-3);
-  width: 100%;
+  width: min(100%, 980px);
+  margin: 0 auto;
 }
 @media (max-width: 400px) {
-  .sm-card-grid { grid-template-columns: repeat(4, 1fr); gap: var(--space-2); }
+  .sm-card-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-2);
+    width: min(100%, 560px);
+  }
 }
 
 /* ── Flip card ────────────────────────────────────────────────────────── */
