@@ -44,6 +44,9 @@ export const allSentences = [
   { id: 's008', sentence: 'My bag is on the table.',         level: 1, sentenceSkills: ['word_order', 'subject_action_clue'], focusLabel: 'Subject + Place' },
   { id: 's009', sentence: 'The tree is very tall.',          level: 1, sentenceSkills: ['word_order', 'subject_action_clue'], focusLabel: 'Subject + Adjective' },
   { id: 's010', sentence: 'We sit in the classroom.',        level: 1, sentenceSkills: ['word_order'], focusLabel: 'Basic SVO' },
+  { id: 's061', sentence: 'The nurse is in the sick bay.', level: 1, sentenceSkills: ['word_order', 'subject_action_clue'], focusLabel: 'Subject + Verb + Place', grammarNote: 'In simple location sentences, we use subject + "is" + place.' },
+  { id: 's062', sentence: 'I can open the window now.', level: 1, sentenceSkills: ['word_order', 'modal_order'], focusLabel: 'Modal + base verb', grammarNote: 'After modal verbs like "can", the next verb stays in base form: "open".' },
+  { id: 's063', sentence: 'Our art room is very bright.', level: 1, sentenceSkills: ['word_order', 'subject_action_clue'], focusLabel: 'Subject + be + adjective' },
 
   // ── P2: Simple past / because-but-and-so / time phrases ──────────────────
   {
@@ -158,6 +161,30 @@ export const allSentences = [
       explanation: '"last Saturday" is a past time expression — it confirms the picnic happened in the past.',
     },
   },
+  {
+    id: 's064', sentence: 'In the evening, we revised for our spelling test.', level: 2,
+    sentenceSkills: ['time_order_clue', 'first_word_clue', 'punctuation_clue', 'tense_clue'],
+    expectedFirstWord: 'In',
+    firstWordHint: 'The fronted time phrase starts with "In" and comes before the comma.',
+    punctuationHint: 'Place a comma after the fronted phrase "In the evening".',
+    grammarNote: 'Fronted time phrases at the start are followed by a comma.',
+    focusLabel: 'Fronted time phrase',
+  },
+  {
+    id: 's065', sentence: 'He packed his file, so he was ready for class.', level: 2,
+    sentenceSkills: ['connector_clue', 'punctuation_clue', 'clause_boundary'],
+    expectedConnector: 'so',
+    punctuationHint: 'The comma before "so" helps separate the cause from the result.',
+    grammarNote: '"so" links an action to its result in compound sentences.',
+    focusLabel: 'Result connector',
+  },
+  {
+    id: 's066', sentence: 'She was tired, but she still finished her reading.', level: 2,
+    sentenceSkills: ['connector_clue', 'punctuation_clue', 'clause_boundary'],
+    expectedConnector: 'but',
+    grammarNote: '"but" links two contrasting ideas in one sentence.',
+    focusLabel: 'Contrast connector',
+  },
 
   // ── P3: Fronted temporal subordinate · Adverb placement · Comparative ────────
   {
@@ -252,6 +279,16 @@ export const allSentences = [
     grammarNote: 'Fronted time clauses (When + clause) come first, followed by a comma, then the main clause.',
     focusLabel: 'Fronted time clause',
   },
+  {
+    id: 's067', sentence: 'After the lights went out, we waited quietly for help.', level: 3,
+    sentenceSkills: ['time_order_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'],
+    expectedFirstWord: 'After',
+    firstWordHint: '"After" starts the fronted clause and comes before the comma.',
+    punctuationHint: 'Put a comma after "After the lights went out".',
+    focusLabel: 'Fronted time clause',
+  },
+  { id: 's068', sentence: 'The rabbit moved quickly across the garden.', level: 3, sentenceSkills: ['word_order', 'adverb_placement'], grammarNote: 'The adverb "quickly" tells how the action happened and usually follows the verb.', focusLabel: 'Adverb placement' },
+  { id: 's069', sentence: 'This puzzle is easier than the one we did yesterday.', level: 3, sentenceSkills: ['comparison_structure', 'tense_clue'], focusLabel: 'Comparative structure', grammarNote: 'Comparative form: adjective + -er + than.' },
 
   // ── P4: Modal-verb order · Fronted cause clause · So…that structure ──────────
   {
@@ -357,6 +394,24 @@ export const allSentences = [
     grammarNote: '"so hard that" is a result structure — the degree of effort (so hard) causes the result (finished early).',
     focusLabel: 'So…that result structure',
   },
+  {
+    id: 's070', sentence: 'If you revise tonight, you will feel calmer tomorrow.', level: 4,
+    sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'],
+    expectedFirstWord: 'If',
+    expectedConnector: 'If',
+    firstWordHint: 'Start with "If" to place the condition clause before the comma.',
+    punctuationHint: 'A comma separates the condition clause from the result clause.',
+    focusLabel: 'Conditional clause',
+  },
+  {
+    id: 's071', sentence: 'Because the path was slippery, we walked very slowly.', level: 4,
+    sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'],
+    expectedFirstWord: 'Because',
+    expectedConnector: 'Because',
+    punctuationHint: 'A comma follows the fronted cause clause.',
+    focusLabel: 'Fronted cause clause',
+  },
+  { id: 's072', sentence: 'You must always label your files clearly.', level: 4, sentenceSkills: ['modal_order', 'word_order'], grammarNote: 'Order in this sentence: modal + adverb + base verb.', focusLabel: 'Modal order' },
 
   // ── P5: Fronted concessive/participial phrases · Not only…but also ─────────
   { id: 's041', sentence: 'Despite the heavy rain, the match continued until the final whistle.', level: 5, sentenceSkills: ['first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Despite', firstWordHint: '"Despite" starts a concessive phrase — it goes first, before the comma.', punctuationHint: 'A comma follows the concessive phrase "Despite the heavy rain".', focusLabel: 'Concessive phrase' },
@@ -369,6 +424,9 @@ export const allSentences = [
   { id: 's048', sentence: 'Both the students and their teacher were proud of the result.', level: 5, sentenceSkills: ['connector_clue'], expectedConnector: 'and', grammarNote: '"Both…and" links two subjects — they go before the verb.', focusLabel: 'Both…and structure' },
   { id: 's049', sentence: 'She practised every day so that she could improve her results.', level: 5, sentenceSkills: ['connector_clue', 'tense_clue'], expectedConnector: 'so', grammarNote: '"so that" introduces the purpose clause — it follows the main action.', focusLabel: 'Purpose clause' },
   { id: 's050', sentence: 'Having saved enough money, she finally bought the book she wanted.', level: 5, sentenceSkills: ['first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Having', firstWordHint: '"Having saved" is a participial phrase — it comes at the start, before the comma.', punctuationHint: 'A comma follows the participial phrase "Having saved enough money".', focusLabel: 'Fronted participial phrase' },
+  { id: 's073', sentence: 'Despite the heavy rain, the netball training continued.', level: 5, sentenceSkills: ['first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Despite', firstWordHint: '"Despite" starts a fronted concessive phrase before the comma.', punctuationHint: 'Use a comma after the concessive phrase.', focusLabel: 'Fronted concessive phrase' },
+  { id: 's074', sentence: 'Without checking the map, they took the wrong bus home.', level: 5, sentenceSkills: ['first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Without', firstWordHint: '"Without" starts the fronted phrase.', punctuationHint: 'A comma separates the fronted phrase from the main clause.', focusLabel: 'Fronted participial phrase' },
+  { id: 's075', sentence: 'Not only did Mei organise the notes, but she also explained them to her group.', level: 5, sentenceSkills: ['inversion_pattern', 'connector_clue', 'clause_boundary'], expectedConnector: 'only', grammarNote: 'In this paired structure, "Not only" is followed by inversion: did + subject + verb.', focusLabel: 'Paired structure with inversion' },
 
   // ── P6: Subject-auxiliary inversion · Inverted conditional · Embedded relative ──
   { id: 's051', sentence: 'Although the task was difficult, she persevered and succeeded in the end.', level: 6, sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Although', firstWordHint: '"Although" starts a concessive clause — it comes first, before the comma.', focusLabel: 'Concessive clause' },
@@ -381,4 +439,7 @@ export const allSentences = [
   { id: 's058', sentence: 'The old library, which had stood for fifty years, was finally renovated.', level: 6, sentenceSkills: ['clause_boundary', 'connector_clue'], grammarNote: '"which had stood for fifty years" is a non-defining relative clause, inserted with commas.', focusLabel: 'Non-defining relative clause' },
   { id: 's059', sentence: 'If every student does their part, the school will become a better place.', level: 6, sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'If', firstWordHint: '"If" starts the condition — it must come first, before the comma.', focusLabel: 'Conditional clause' },
   { id: 's060', sentence: 'Whether it was raining or sunny, they always arrived at school on time.', level: 6, sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Whether', firstWordHint: '"Whether" starts an alternative condition — it comes first, before the comma.', focusLabel: 'Alternative condition' },
+  { id: 's076', sentence: 'Rarely have we seen the river rise so quickly after a storm.', level: 6, sentenceSkills: ['inversion_pattern', 'first_word_clue'], expectedFirstWord: 'Rarely', firstWordHint: 'Negative adverbs like "Rarely" trigger inversion: auxiliary before subject.', grammarNote: 'After fronted negative adverbs, use subject-auxiliary inversion.', focusLabel: 'Negative adverb inversion' },
+  { id: 's077', sentence: 'Had they checked the timetable, they would have caught the earlier train.', level: 6, sentenceSkills: ['inversion_pattern', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Had', punctuationHint: 'Use a comma after the inverted conditional clause.', focusLabel: 'Inverted conditional' },
+  { id: 's078', sentence: 'The captain, who had trained with discipline, led the team through the final round.', level: 6, sentenceSkills: ['clause_boundary', 'connector_clue'], grammarNote: 'The embedded relative clause "who had trained with discipline" is enclosed by commas.', focusLabel: 'Embedded relative clause' },
 ];
