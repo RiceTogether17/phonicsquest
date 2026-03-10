@@ -11,12 +11,53 @@ import { store } from './store.js';
 const PROFILES_META_KEY = 'phonicsquest_profiles';
 const ACTIVE_PROFILE_KEY = 'phonicsquest_active_profile';
 const PROFILE_STORAGE_KEY = (id) => `phonicsquest_profile_${id}`;
+const LEGACY_STORAGE_KEY = 'phonicsquest_v2';
+const LEGACY_MIGRATION_FLAG = 'phonicsquest_legacy_migrated_to_profiles';
 
 /** Default avatars for new profiles */
 const AVATAR_OPTIONS = ['🦁', '🐯', '🐻', '🦊', '🐼', '🐨', '🦋', '🐸', '🐬', '🦄', '🐧', '🐙'];
 const COLOR_OPTIONS  = ['#6c63ff', '#22c55e', '#f59e0b', '#ef4444', '#0ea5e9', '#ec4899', '#8b5cf6', '#14b8a6'];
 
 // ── Public API ─────────────────────────────────────────────────────────────
+
+
+function _hasProgressData(state) {
+  if (!state || typeof state !== 'object') return false;
+  if ((state.xp || 0) > 0) return true;
+  if ((state.level || 1) > 1) return true;
+  if ((state.dailyDone || 0) > 0) return true;
+  if (Object.keys(state.wordStats || {}).length > 0) return true;
+  if ((state.wordHistory || []).length > 0) return true;
+  return false;
+}
+
+function _maybeMigrateLegacyProgressToProfile(id) {
+  try {
+    const profiles = getProfiles();
+    const isOnlyProfile = profiles.length === 1 && profiles[0]?.id === id;
+    if (!isOnlyProfile) return;
+
+    if (localStorage.getItem(LEGACY_MIGRATION_FLAG) === '1') return;
+
+    const profileKey = PROFILE_STORAGE_KEY(id);
+    if (localStorage.getItem(profileKey)) return;
+
+    const rawLegacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (!rawLegacy) {
+      localStorage.setItem(LEGACY_MIGRATION_FLAG, '1');
+      return;
+    }
+
+    const legacyState = JSON.parse(rawLegacy);
+    if (!_hasProgressData(legacyState)) {
+      localStorage.setItem(LEGACY_MIGRATION_FLAG, '1');
+      return;
+    }
+
+    localStorage.setItem(profileKey, JSON.stringify(legacyState));
+    localStorage.setItem(LEGACY_MIGRATION_FLAG, '1');
+  } catch (_) {}
+}
 
 /** Return all profiles, or [] if none. */
 export function getProfiles() {
@@ -79,6 +120,7 @@ export function getActiveProfile() {
  * progress reads/writes go to that profile's namespace.
  */
 export function activateProfile(id) {
+  _maybeMigrateLegacyProgressToProfile(id);
   localStorage.setItem(ACTIVE_PROFILE_KEY, id);
   store.setStorageKey(PROFILE_STORAGE_KEY(id));
 }
