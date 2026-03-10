@@ -1853,7 +1853,13 @@ input, select, textarea { font-family: inherit; }
     width: 100%;
   }
   .sm-card { height: auto; aspect-ratio: 3 / 4; }
-  .sm-card-number { font-size: 1.3rem; top: 8px; left: 10px; }
+  .sm-card-number {
+    font-size: 1.25rem;
+    min-width: 36px;
+    height: 36px;
+    top: 10px;
+    left: 10px;
+  }
   .sm-card-back { font-size: clamp(2.5rem, 3vw, 4.4rem); line-height: 1.1; }
 
   /* Stories banner */
@@ -1997,6 +2003,18 @@ input, select, textarea { font-family: inherit; }
   width: 100%;
   max-width: 480px;
   overflow-y: auto;
+}
+
+/* Keep Sight Words content visually centered on wide screens */
+#screen-sight-match {
+  align-items: center;
+}
+
+#screen-sight-match .stories-screen-header,
+#screen-sight-match .stories-content {
+  width: min(100%, 980px);
+  max-width: 980px;
+  margin-inline: auto;
 }
 
 /* ── Browser: tabs ───────────────────────────────────────────────────────── */
@@ -2924,6 +2942,8 @@ input, select, textarea { font-family: inherit; }
   flex-direction: column;
   gap: var(--space-4);
   position: relative;
+  width: min(100%, 760px);
+  margin-inline: auto;
 }
 
 .sm-game-header {
@@ -3013,12 +3033,21 @@ input, select, textarea { font-family: inherit; }
 }
 .sm-card-number {
   position: absolute;
-  top: 4px;
-  left: 6px;
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: rgba(255,255,255,0.9);
-  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  top: 8px;
+  left: 8px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 900;
+  color: #fff;
+  background: rgba(18, 18, 18, 0.38);
+  border: 1px solid rgba(255,255,255,0.55);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.45);
   z-index: 2;
   pointer-events: none;
   line-height: 1;
