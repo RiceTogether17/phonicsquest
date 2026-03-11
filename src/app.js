@@ -47,6 +47,18 @@ import { keyboardManager } from './modules/keyboardManager.js';
 import { settingsController } from './modules/settingsController.js';
 import { getQuestUnlockStatus } from './modules/questUnlocks.js';
 
+async function hashPin(pin) {
+  if (!window.crypto?.subtle) return `plain:${pin}`;
+  const data = new TextEncoder().encode(pin);
+  const digest = await window.crypto.subtle.digest('SHA-256', data);
+  const hex = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return `sha256:${hex}`;
+}
+
+function isHashedPin(value) {
+  return typeof value === 'string' && (value.startsWith('sha256:') || value.startsWith('plain:'));
+}
+
 class App {
   constructor() {
     /** @type {string} current screen id */
@@ -786,7 +798,7 @@ class App {
     });
 
     // Confirm PIN
-    document.getElementById('pin-confirm-btn')?.addEventListener('click', () => {
+    document.getElementById('pin-confirm-btn')?.addEventListener('click', async () => {
       const pin = Array.from(digits).map(d => d.value).join('');
       if (pin.length < 4) {
         if (hint) hint.textContent = 'Enter all 4 digits';
@@ -794,14 +806,19 @@ class App {
       }
 
       const savedPin = store.get('parentPin');
+      const candidateHash = await hashPin(pin);
 
       if (!savedPin) {
-        // First time: set the PIN
-        store.set('parentPin', pin);
+        // First time: store hashed PIN
+        store.set('parentPin', candidateHash);
         if (hint) hint.textContent = '';
         this._closeModal('modal-pin');
         this._openDashboard();
-      } else if (pin === savedPin) {
+      } else if (savedPin === pin || savedPin === candidateHash || savedPin === `plain:${pin}`) {
+        // Migrate legacy plaintext pins to hashed format.
+        if (!isHashedPin(savedPin)) {
+          store.set('parentPin', candidateHash);
+        }
         // Correct PIN
         if (hint) hint.textContent = '';
         this._closeModal('modal-pin');
