@@ -25,9 +25,9 @@ class Progress {
    */
   getAdaptivePool(count = 10, opts = {}) {
     const maxLevel = opts.maxLevel ?? store.get('difficulty') ?? 1;
-    // When a specific group is chosen, ignore the level cap so all words in
-    // that group are reachable regardless of the current difficulty setting.
-    let pool = opts.group ? WORDS : getWordsByLevel(maxLevel);
+    // Respect the active level cap even when a specific group is chosen so
+    // learners are not exposed to out-of-sequence words.
+    let pool = getWordsByLevel(maxLevel);
 
     if (opts.group) {
       // Legacy struct-* filters

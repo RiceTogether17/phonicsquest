@@ -262,7 +262,7 @@ export const WORDS = [
   { id:'tug',  word:'tug',  graphemes:['t','u','g'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'🛥️' },
   { id:'bun',  word:'bun',  graphemes:['b','u','n'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'🍞' },
   { id:'fun',  word:'fun',  graphemes:['f','u','n'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'🎉' },
-  { id:'gun',  word:'gun',  graphemes:['g','u','n'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'🔫' },
+  { id:'pug',  word:'pug',  graphemes:['p','u','g'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'🐶' },
   { id:'run',  word:'run',  graphemes:['r','u','n'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'🏃' },
   { id:'sun',  word:'sun',  graphemes:['s','u','n'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'☀️' },
   { id:'but',  word:'but',  graphemes:['b','u','t'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'↕️' },
@@ -636,7 +636,7 @@ export const WORDS = [
   { id:'bill',  word:'bill',  graphemes:['b','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'💵' },
   { id:'fill',  word:'fill',  graphemes:['f','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🧃' },
   { id:'hill',  word:'hill',  graphemes:['h','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'⛰️' },
-  { id:'kill',  word:'kill',  graphemes:['k','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'☠️' },
+  { id:'gill',  word:'gill',  graphemes:['g','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🐟' },
   { id:'mill',  word:'mill',  graphemes:['m','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🏭' },
   { id:'pill',  word:'pill',  graphemes:['p','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'💊' },
   { id:'till',  word:'till',  graphemes:['t','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🏧' },
@@ -717,7 +717,7 @@ export const WORDS = [
   { id:'scrub', word:'scrub', graphemes:['scr','u','b'],  types:['bl','sv','c'],  pattern:'blend', group:'blends', level:3, emoji:'🧼' },
   { id:'strip', word:'strip', graphemes:['str','i','p'],  types:['bl','sv','c'],  pattern:'blend', group:'blends', level:3, emoji:'📏' },
   { id:'drub',  word:'drub',  graphemes:['dr','u','b'],   types:['bl','sv','c'],  pattern:'blend', group:'blends', level:3, emoji:'💥' },
-  { id:'drug',  word:'drug',  graphemes:['dr','u','g'],   types:['bl','sv','c'],  pattern:'blend', group:'blends', level:3, emoji:'💊' },
+  { id:'drag',  word:'drag',  graphemes:['dr','a','g'],   types:['bl','sv','c'],  pattern:'blend', group:'blends', level:3, emoji:'🛷' },
   { id:'drab',  word:'drab',  graphemes:['dr','a','b'],   types:['bl','sv','c'],  pattern:'blend', group:'blends', level:3, emoji:'😑' },
 
   /* ══════════════════════════════════════
@@ -1084,7 +1084,7 @@ export const WORDS = [
   { id:'shin',  word:'shin',  graphemes:['sh','i','n'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'🦵' },
   { id:'shag',  word:'shag',  graphemes:['sh','a','g'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'🧶' },
   { id:'chug',  word:'chug',  graphemes:['ch','u','g'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'🚂' },
-  { id:'thug',  word:'thug',  graphemes:['th','u','g'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'😤' },
+  { id:'than',  word:'than',  graphemes:['th','a','n'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'⚖️' },
 ];
 
 /**
@@ -1114,12 +1114,30 @@ export function getWordsByLevel(level) {
  * @param {number} count  number of distractors
  * @returns {Word[]}
  */
-export function getDistractors(word, count = 3) {
-  // Prefer same-group distractors, fall back to same-level
-  let pool = WORDS.filter(w => w.id !== word.id && w.group === word.group);
+export function getDistractors(word, count = 3, opts = {}) {
+  const maxLevel = Number(opts.maxLevel ?? word.level ?? 3);
+
+  // Prefer same-group + same pattern distractors within the learner's level,
+  // then relax constraints gradually.
+  let pool = WORDS.filter(w =>
+    w.id !== word.id
+    && w.group === word.group
+    && w.pattern === word.pattern
+    && w.level <= maxLevel
+  );
+
   if (pool.length < count) {
-    pool = WORDS.filter(w => w.id !== word.id && w.level === word.level);
+    pool = WORDS.filter(w =>
+      w.id !== word.id
+      && w.group === word.group
+      && w.level <= maxLevel
+    );
   }
+
+  if (pool.length < count) {
+    pool = WORDS.filter(w => w.id !== word.id && w.level <= maxLevel);
+  }
+
   return shuffleArray(pool).slice(0, count);
 }
 
