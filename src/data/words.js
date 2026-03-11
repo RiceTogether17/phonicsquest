@@ -1235,6 +1235,10 @@ export const GROUP_ORDER = [
   'prefixes','suffixes-advanced','multisyllable','sight-highfreq',
 ];
 
+// Decodable categories for blending-focused modes.
+// Sight words are intentionally excluded because they are not phonetically regular.
+export const BLENDING_GROUP_ORDER = GROUP_ORDER.filter(group => group !== 'sight-highfreq');
+
 /**
  * Structural pattern groups — these filter by word.pattern rather than word.group
  * for struct-cvc and struct-ccvc (which reuse existing vowel/blend words),

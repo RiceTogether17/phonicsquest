@@ -560,7 +560,7 @@ class App {
       // Use per-mode difficulty if available, falling back to global setting
       const modeDiffs = store.get('modeDifficulty') || {};
       const effectiveDiff = modeDiffs[this._mode] ?? store.get('difficulty') ?? 1;
-      const opts = { maxLevel: effectiveDiff };
+      const opts = { maxLevel: effectiveDiff, mode: this._mode };
       if (group) opts.group = group;
       this._currentWord = progress.getNextWord(opts);
     }

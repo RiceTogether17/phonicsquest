@@ -43,6 +43,22 @@ describe('progress summary', () => {
   });
 });
 
+
+describe('blending content filters', () => {
+  beforeEach(() => resetState());
+
+  it('excludes high-frequency sight-word group from blending pools', () => {
+    const pool = progress.getAdaptivePool(25, {
+      group: 'sight-highfreq',
+      mode: 'classicBlend',
+      maxLevel: 3,
+    });
+
+    expect(pool.length).toBeGreaterThan(0);
+    expect(pool.every(word => word.group !== 'sight-highfreq' && word.pattern !== 'sight')).toBe(true);
+  });
+});
+
 describe('gamification rewards', () => {
   beforeEach(() => resetState());
 

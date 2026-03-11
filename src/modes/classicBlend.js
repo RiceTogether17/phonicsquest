@@ -16,7 +16,7 @@
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
-import { WORD_GROUPS, GROUP_ORDER, STRUCT_GROUP_ORDER, SUFFIX_GROUP_ORDER } from '../data/words.js';
+import { WORD_GROUPS, BLENDING_GROUP_ORDER, STRUCT_GROUP_ORDER, SUFFIX_GROUP_ORDER } from '../data/words.js';
 
 /** @type {import('../data/words.js').Word|null} */
 let currentWord = null;
@@ -78,7 +78,7 @@ function _buildGroupOptions() {
   return [
     `<option value="" ${allSelected}>🔤 All Words</option>`,
     `<optgroup label="── By Vowel Sound ──">`,
-    ...GROUP_ORDER.map(key => opt(key, WORD_GROUPS[key])),
+    ...BLENDING_GROUP_ORDER.map(key => opt(key, WORD_GROUPS[key])),
     `</optgroup>`,
     `<optgroup label="── By Word Pattern ──">`,
     ...STRUCT_GROUP_ORDER.map(key => opt(key, WORD_GROUPS[key])),
