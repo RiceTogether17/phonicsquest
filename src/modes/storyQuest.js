@@ -23,7 +23,7 @@ export function runStoryQuest(container, story, onDone) {
   }
 
   const state = {
-    phase: 'intro',        // intro | comprehension | vocab | grammar | done
+    phase: 'intro',        // intro | comprehension | openEnded | vocab | grammar | done
     qIndex: 0,             // current comprehension question
     vocabIndex: 0,         // current vocab card
     correct: 0,            // correct comprehension answers
@@ -36,6 +36,7 @@ export function runStoryQuest(container, story, onDone) {
       case 'intro':        return _renderIntro();
       case 'comprehension':return _renderComprehension();
       case 'vocab':        return _renderVocab();
+      case 'openEnded':    return _renderOpenEnded();
       case 'grammar':      return _renderGrammar();
       case 'done':         return _renderDone();
     }
@@ -140,12 +141,43 @@ export function runStoryQuest(container, story, onDone) {
           render();
         } else {
           // Move to vocab or grammar or done
-          state.phase = story.vocab?.length ? 'vocab' : (story.grammarSpotlight?.length ? 'grammar' : 'done');
+          state.phase = story.openEnded?.length
+            ? 'openEnded'
+            : (story.vocab?.length ? 'vocab' : (story.grammarSpotlight?.length ? 'grammar' : 'done'));
           state.vocabIndex = 0;
           render();
         }
       });
     }
+  }
+
+  function _renderOpenEnded() {
+    const prompts = story.openEnded || [];
+    if (!prompts.length) {
+      state.phase = story.vocab?.length ? 'vocab' : (story.grammarSpotlight?.length ? 'grammar' : 'done');
+      render();
+      return;
+    }
+
+    container.innerHTML = /* html */`
+      <div class="sq-screen sq-comprehension">
+        <p class="sq-phase-label">🗣️ Open-ended response</p>
+        ${prompts.map((p, i) => `
+          <div class="sq-question-card" style="margin-bottom:12px">
+            <p class="sq-question-text">${i + 1}. ${p.q}</p>
+            <textarea class="cp-name-input" rows="3" placeholder="Type your answer..."></textarea>
+            <details style="margin-top:8px"><summary>Show sample and marking guide</summary>
+              <p><strong>Sample:</strong> ${p.sampleAnswer}</p>
+              <p><strong>Guide:</strong> ${p.markingGuide}</p>
+            </details>
+          </div>`).join('')}
+        <button class="btn btn--primary btn--xl" id="sq-open-next">Continue →</button>
+      </div>`;
+
+    document.getElementById('sq-open-next')?.addEventListener('click', () => {
+      state.phase = story.vocab?.length ? 'vocab' : (story.grammarSpotlight?.length ? 'grammar' : 'done');
+      render();
+    });
   }
 
   // ── Vocab Explorer ─────────────────────────────────────────────────────

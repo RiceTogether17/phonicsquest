@@ -90,6 +90,13 @@ export const STORIES = [
       { type: 'refrain', text: REFRAIN },
       { type: 'end',     text: 'Giri felt glad.' },
     ],
+    openEnded: [
+      {
+        q: 'Why did the red hat keep sliding off?',
+        sampleAnswer: 'It slid off because it was on top and not held tightly.',
+        markingGuide: 'Award if learner explains cause of slipping with text evidence.',
+      },
+    ],
   },
 
   {
@@ -113,6 +120,13 @@ export const STORIES = [
       { type: 'refrain', text: REFRAIN },
       { type: 'refrain', text: REFRAIN },
       { type: 'end',     text: 'Giri felt glad.' },
+    ],
+    openEnded: [
+      {
+        q: 'What helped solve the problem in this story?',
+        sampleAnswer: 'Giri solved it by sitting in the pot so it stopped tipping around.',
+        markingGuide: 'Award for identifying the solution step and its effect.',
+      },
     ],
   },
 

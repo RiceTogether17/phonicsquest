@@ -41,7 +41,7 @@ export function setupMiddleSound(word, els) {
   const midGrapheme = word.graphemes[midIdx];
   const midType    = word.types[midIdx];
 
-  const distractors = _getVowelDistractors(midGrapheme);
+  const distractors = _getVowelDistractors(midGrapheme, word.level, midType);
   const choices = shuffleArray([
     { grapheme: midGrapheme, type: midType, correct: true },
     ...distractors.slice(0, 3).map(g => ({ ...g, correct: false })),
@@ -106,16 +106,16 @@ function _getMiddleVowelIdx(word) {
 }
 
 /** Build vowel-biased distractor pool. */
-function _getVowelDistractors(correctGrapheme) {
+function _getVowelDistractors(correctGrapheme, maxLevel = 3, targetType = null) {
   const seen = new Set([correctGrapheme]);
   const distractors = [];
 
   // First pass: vowels only
-  for (const word of shuffleArray(WORDS)) {
+  for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
     for (let i = 0; i < word.graphemes.length; i++) {
       const g = word.graphemes[i];
       const t = word.types[i];
-      if (!seen.has(g) && VOWEL_TYPES.has(t)) {
+      if (!seen.has(g) && VOWEL_TYPES.has(t) && (!targetType || t === targetType)) {
         seen.add(g);
         distractors.push({ grapheme: g, type: t });
         if (distractors.length >= 6) break;
@@ -126,7 +126,7 @@ function _getVowelDistractors(correctGrapheme) {
 
   // Fallback: any phoneme
   if (distractors.length < 3) {
-    for (const word of shuffleArray(WORDS)) {
+    for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
       const g = word.graphemes[0];
       const t = word.types[0];
       if (!seen.has(g)) {

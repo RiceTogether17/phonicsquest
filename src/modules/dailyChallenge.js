@@ -8,6 +8,7 @@
 
 import { WORDS } from '../data/words.js';
 import { store } from './store.js';
+import { normalizeAdaptiveConfig, getWordWeight } from './adaptiveSelection.js';
 
 const DAILY_WORD_COUNT = 5;
 const DAILY_BONUS_XP   = 50;
@@ -30,7 +31,23 @@ function dateSeed(dateStr) {
 
 /** Today's date string (YYYY-MM-DD). */
 function todayStr() {
-  return new Date().toISOString().slice(0, 10);
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function pickFrom(pool, count, rng) {
+  if (count <= 0 || pool.length === 0) return [];
+  const copy = [...pool];
+  const picked = [];
+  for (let i = 0; i < count && copy.length > 0; i++) {
+    const idx = Math.floor(rng() * copy.length);
+    picked.push(copy[idx]);
+    copy.splice(idx, 1);
+  }
+  return picked;
 }
 
 // ── Public API ─────────────────────────────────────────────────────────────
@@ -43,9 +60,36 @@ function todayStr() {
 export function getDailyChallengeWords() {
   const seed = dateSeed(todayStr());
   const rng  = mulberry32(seed);
+  const wordStats = store.get('wordStats') || {};
+  const maxLevel = store.get('difficulty') || 1;
+  const adaptiveCfg = normalizeAdaptiveConfig(store.get('adaptiveConfig'));
 
-  // Shuffle a copy of all words using the seeded RNG
-  const pool = [...WORDS];
+  const eligible = WORDS.filter(w => w.level <= maxLevel);
+  const unseen = eligible.filter(w => !wordStats[w.id] || (wordStats[w.id].attempts || 0) === 0);
+
+  const weightedWeak = eligible
+    .filter(w => !unseen.includes(w))
+    .map(word => ({ word, weight: getWordWeight(wordStats[word.id], adaptiveCfg) }))
+    .sort((a, b) => b.weight - a.weight)
+    .map(x => x.word);
+
+  const strongerReview = eligible
+    .filter(w => {
+      const s = wordStats[w.id];
+      return s && s.attempts >= adaptiveCfg.masteryMinAttempts && (s.correct / s.attempts) >= adaptiveCfg.strongAccuracy;
+    });
+
+  const picks = [];
+  picks.push(...pickFrom(weightedWeak, 3, rng));
+  picks.push(...pickFrom(unseen.filter(w => !picks.includes(w)), 1, rng));
+  picks.push(...pickFrom(strongerReview.filter(w => !picks.includes(w)), 1, rng));
+
+  if (picks.length < DAILY_WORD_COUNT) {
+    picks.push(...pickFrom(eligible.filter(w => !picks.includes(w)), DAILY_WORD_COUNT - picks.length, rng));
+  }
+
+  // Deterministic shuffle of selected words to avoid positional bias.
+  const pool = [...picks];
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
