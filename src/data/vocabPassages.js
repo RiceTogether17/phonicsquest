@@ -51,6 +51,24 @@ export const VOCAB_CATEGORIES = {
     color: '#0d9488',
     desc: 'Link ideas with the right connector word',
   },
+  grammarPrepositions: {
+    label: 'Grammar Cloze: Prepositions',
+    icon: '🧭',
+    color: '#0284c7',
+    desc: 'Choose prepositions by meaning and position',
+  },
+  grammarArticles: {
+    label: 'Grammar Cloze: Articles',
+    icon: '📰',
+    color: '#16a34a',
+    desc: 'Choose a/an/the based on noun clues',
+  },
+  grammarSVA: {
+    label: 'Grammar Cloze: S-V Agreement',
+    icon: '⚙️',
+    color: '#b45309',
+    desc: 'Match verbs to singular/plural subjects',
+  },
 };
 
 export const vocabPassages = {
@@ -1366,6 +1384,45 @@ export const vocabPassages = {
         answers: ['However', 'Despite', 'In addition'],
         wordBank: ['However', 'Despite', 'In addition', 'Therefore', 'Because of', 'Meanwhile'],
         xp: 50,
+      },
+    ],
+  },
+
+  grammarPrepositions: {
+    p1: [
+      {
+        id: 'gp-p1-01',
+        title: 'Classroom Objects',
+        text: 'The bag is ___ the table. The ruler is ___ the drawer. We sit ___ our partners.',
+        answers: ['on', 'in', 'beside'],
+        wordBank: ['on', 'in', 'beside', 'over', 'between', 'under'],
+        xp: 20,
+      },
+    ],
+  },
+
+  grammarArticles: {
+    p2: [
+      {
+        id: 'ga-p2-01',
+        title: 'A, An, The',
+        text: 'I saw ___ owl near ___ old tree. ___ owl flew away quickly.',
+        answers: ['an', 'an', 'The'],
+        wordBank: ['an', 'an', 'The', 'a', 'the', 'A'],
+        xp: 25,
+      },
+    ],
+  },
+
+  grammarSVA: {
+    p3: [
+      {
+        id: 'gsva-p3-01',
+        title: 'Subject-Verb Match',
+        text: 'The monitor ___ the class updates. The pupils ___ quietly during reading time.',
+        answers: ['shares', 'work'],
+        wordBank: ['shares', 'work', 'share', 'works'],
+        xp: 30,
       },
     ],
   },

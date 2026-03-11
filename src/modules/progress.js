@@ -13,6 +13,9 @@ import { WORDS, shuffleArray, getWordsByLevel, getWordStructure, getShortVowelLe
 import { MASTERY_THRESHOLD, MIN_ATTEMPTS_FOR_MASTERY } from '../data/curriculum.js';
 import { normalizeAdaptiveConfig, getWordWeight } from './adaptiveSelection.js';
 
+const NON_DECODABLE_GROUPS = new Set(['sight-highfreq']);
+const BLENDING_MODES = new Set(['blend', 'classicBlend']);
+
 class Progress {
   /**
    * Get adaptively-weighted word pool.
@@ -25,37 +28,69 @@ class Progress {
    */
   getAdaptivePool(count = 10, opts = {}) {
     const maxLevel = opts.maxLevel ?? store.get('difficulty') ?? 1;
-    // When a specific group is chosen, ignore the level cap so all words in
-    // that group are reachable regardless of the current difficulty setting.
-    let pool = opts.group ? WORDS : getWordsByLevel(maxLevel);
+    const isBlendingMode = BLENDING_MODES.has(opts.mode);
+    const requestedGroup = isBlendingMode && NON_DECODABLE_GROUPS.has(opts.group) ? null : opts.group;
+    // Respect the active level cap even when a specific group is chosen so
+    // learners are not exposed to out-of-sequence words.
+    let pool = getWordsByLevel(maxLevel);
 
-    if (opts.group) {
+    if (requestedGroup) {
       // Legacy struct-* filters
-      if (opts.group === 'struct-cvc') {
-        pool = WORDS.filter(w => w.pattern === 'CVC' && w.types.includes('sv'));
-      } else if (opts.group === 'struct-ccvc') {
-        pool = WORDS.filter(w => w.pattern === 'blend' && w.types.includes('sv'));
-      } else if (opts.group === 'struct-cvcc') {
-        pool = WORDS.filter(w => w.group === 'struct-cvcc' || (getWordStructure(w) === 'CVCC' && w.types.includes('sv')));
-      } else if (opts.group === 'struct-ccvcc') {
-        pool = WORDS.filter(w => w.group === 'struct-ccvcc' || (getWordStructure(w) === 'CCVCC' && w.types.includes('sv')));
+      if (requestedGroup === 'struct-cvc') {
+        pool = WORDS.filter(w => w.pattern === 'CVC' && w.types.includes('sv') && w.level <= maxLevel);
+      } else if (requestedGroup === 'struct-ccvc') {
+        pool = WORDS.filter(w => w.pattern === 'blend' && w.types.includes('sv') && w.level <= maxLevel);
+      } else if (requestedGroup === 'struct-cvcc') {
+        pool = WORDS.filter(w => (w.group === 'struct-cvcc' || (getWordStructure(w) === 'CVCC' && w.types.includes('sv'))) && w.level <= maxLevel);
+      } else if (requestedGroup === 'struct-ccvcc') {
+        pool = WORDS.filter(w => (w.group === 'struct-ccvcc' || (getWordStructure(w) === 'CCVCC' && w.types.includes('sv'))) && w.level <= maxLevel);
       } else {
         // Curriculum stage structural-vowel cross-cut: e.g. 'cvc-a', 'ccvc-e', 'cvcc-i', 'ccvcc-u'
-        const structMatch = opts.group.match(/^(cvc|ccvc|cvcc|ccvcc)-([aeiou])$/);
+        const structMatch = requestedGroup.match(/^(cvc|ccvc|cvcc|ccvcc)-([aeiou])$/);
         if (structMatch) {
           const struct = structMatch[1].toUpperCase(); // 'CVC', 'CCVC', 'CVCC', 'CCVCC'
           const vowel  = structMatch[2];              // 'a', 'e', 'i', 'o', 'u'
           pool = WORDS.filter(w =>
             getWordStructure(w) === struct &&
-            getShortVowelLetter(w) === vowel
+            getShortVowelLetter(w) === vowel &&
+            w.level <= maxLevel
           );
         } else {
-          pool = pool.filter(w => w.group === opts.group);
+          pool = pool.filter(w => w.group === requestedGroup);
         }
       }
     }
 
-    if (pool.length === 0) pool = WORDS.slice(0, 20);
+    // In free/blend category selection, prioritize honoring the chosen group
+    // even if the current difficulty cap has no matches yet.
+    if (pool.length === 0 && requestedGroup) {
+      const structMatch = requestedGroup.match(/^(cvc|ccvc|cvcc|ccvcc)-([aeiou])$/);
+      if (structMatch) {
+        const struct = structMatch[1].toUpperCase();
+        const vowel = structMatch[2];
+        pool = WORDS.filter(w => getWordStructure(w) === struct && getShortVowelLetter(w) === vowel);
+      } else if (requestedGroup === 'struct-cvc') {
+        pool = WORDS.filter(w => w.pattern === 'CVC' && w.types.includes('sv'));
+      } else if (requestedGroup === 'struct-ccvc') {
+        pool = WORDS.filter(w => w.pattern === 'blend' && w.types.includes('sv'));
+      } else if (requestedGroup === 'struct-cvcc') {
+        pool = WORDS.filter(w => w.group === 'struct-cvcc' || (getWordStructure(w) === 'CVCC' && w.types.includes('sv')));
+      } else if (requestedGroup === 'struct-ccvcc') {
+        pool = WORDS.filter(w => w.group === 'struct-ccvcc' || (getWordStructure(w) === 'CCVCC' && w.types.includes('sv')));
+      } else {
+        pool = WORDS.filter(w => w.group === requestedGroup);
+      }
+    }
+
+    if (isBlendingMode) {
+      pool = pool.filter(word => !NON_DECODABLE_GROUPS.has(word.group) && word.pattern !== 'sight');
+    }
+
+    if (pool.length === 0) {
+      pool = isBlendingMode
+        ? WORDS.filter(word => !NON_DECODABLE_GROUPS.has(word.group) && word.pattern !== 'sight').slice(0, 20)
+        : WORDS.slice(0, 20);
+    }
 
     const stats = store.get('wordStats') || {};
 

@@ -18,6 +18,8 @@ export const SCREENS = Object.freeze({
   SENTENCE_FORGE: 'screen-sentence-forge',
   CLOZE_CASTLE:   'screen-cloze-castle',
   WORD_VAULT:     'screen-word-vault',
+  EDITING_QUEST:  'screen-editing-quest',
+  WRITING_QUEST:  'screen-writing-quest',
 });
 
 /**
@@ -28,4 +30,6 @@ export const QUEST_THRESHOLDS = Object.freeze({
   sentenceForge: 10,
   clozeCastle:   25,
   wordVault:     50,
+  editingQuest:  70,
+  writingQuest:  90,
 });

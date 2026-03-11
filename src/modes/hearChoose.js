@@ -36,7 +36,7 @@ export function setupHearChoose(word, els) {
   els.modeInstruction.textContent = 'Listen to the word, then pick the right one!';
 
   // Generate 4 choices
-  const distractors = getDistractors(word, 3);
+  const distractors = getDistractors(word, 3, { maxLevel: word.level });
   const choices = shuffleArray([word, ...distractors]);
 
   // Render choice buttons

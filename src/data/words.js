@@ -72,6 +72,10 @@ export const WORD_GROUPS = {
   'suffix-ed':    { label: '-ed Words',  color: '#d97706', bg: '#fef3c7', icon: '✅', audioFile: null },
   'suffix-er':    { label: '-er Words',  color: '#dc2626', bg: '#fee2e2', icon: '📈', audioFile: null },
   'suffix-est':   { label: '-est Words', color: '#7c3aed', bg: '#f3e8ff', icon: '🏆', audioFile: null },
+  'prefixes':     { label: 'Prefixes', color: '#0ea5e9', bg: '#e0f2fe', icon: '↩️', audioFile: null },
+  'suffixes-advanced': { label: 'Advanced Suffixes', color: '#7c3aed', bg: '#ede9fe', icon: '🧩', audioFile: null },
+  'multisyllable': { label: 'Multi-syllable', color: '#f43f5e', bg: '#ffe4e6', icon: '🎼', audioFile: null },
+  'sight-highfreq': { label: 'High-frequency Sight Words', color: '#14b8a6', bg: '#ccfbf1', icon: '👀', audioFile: null },
 };
 
 /**
@@ -262,7 +266,7 @@ export const WORDS = [
   { id:'tug',  word:'tug',  graphemes:['t','u','g'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'🛥️' },
   { id:'bun',  word:'bun',  graphemes:['b','u','n'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'🍞' },
   { id:'fun',  word:'fun',  graphemes:['f','u','n'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'🎉' },
-  { id:'gun',  word:'gun',  graphemes:['g','u','n'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'🔫' },
+  { id:'pug',  word:'pug',  graphemes:['p','u','g'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'🐶' },
   { id:'run',  word:'run',  graphemes:['r','u','n'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'🏃' },
   { id:'sun',  word:'sun',  graphemes:['s','u','n'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'☀️' },
   { id:'but',  word:'but',  graphemes:['b','u','t'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'↕️' },
@@ -636,7 +640,7 @@ export const WORDS = [
   { id:'bill',  word:'bill',  graphemes:['b','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'💵' },
   { id:'fill',  word:'fill',  graphemes:['f','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🧃' },
   { id:'hill',  word:'hill',  graphemes:['h','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'⛰️' },
-  { id:'kill',  word:'kill',  graphemes:['k','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'☠️' },
+  { id:'gill',  word:'gill',  graphemes:['g','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🐟' },
   { id:'mill',  word:'mill',  graphemes:['m','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🏭' },
   { id:'pill',  word:'pill',  graphemes:['p','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'💊' },
   { id:'till',  word:'till',  graphemes:['t','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🏧' },
@@ -717,7 +721,7 @@ export const WORDS = [
   { id:'scrub', word:'scrub', graphemes:['scr','u','b'],  types:['bl','sv','c'],  pattern:'blend', group:'blends', level:3, emoji:'🧼' },
   { id:'strip', word:'strip', graphemes:['str','i','p'],  types:['bl','sv','c'],  pattern:'blend', group:'blends', level:3, emoji:'📏' },
   { id:'drub',  word:'drub',  graphemes:['dr','u','b'],   types:['bl','sv','c'],  pattern:'blend', group:'blends', level:3, emoji:'💥' },
-  { id:'drug',  word:'drug',  graphemes:['dr','u','g'],   types:['bl','sv','c'],  pattern:'blend', group:'blends', level:3, emoji:'💊' },
+  { id:'drag',  word:'drag',  graphemes:['dr','a','g'],   types:['bl','sv','c'],  pattern:'blend', group:'blends', level:3, emoji:'🛷' },
   { id:'drab',  word:'drab',  graphemes:['dr','a','b'],   types:['bl','sv','c'],  pattern:'blend', group:'blends', level:3, emoji:'😑' },
 
   /* ══════════════════════════════════════
@@ -1084,7 +1088,23 @@ export const WORDS = [
   { id:'shin',  word:'shin',  graphemes:['sh','i','n'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'🦵' },
   { id:'shag',  word:'shag',  graphemes:['sh','a','g'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'🧶' },
   { id:'chug',  word:'chug',  graphemes:['ch','u','g'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'🚂' },
-  { id:'thug',  word:'thug',  graphemes:['th','u','g'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'😤' },
+  { id:'than',  word:'than',  graphemes:['th','a','n'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'⚖️' },
+
+  // ── Morphology + multisyllabic + high-frequency sight words ─────────────
+  { id:'untie', word:'untie', graphemes:['un','t','ie'], types:['c','c','lv'], pattern:'prefix', group:'prefixes', level:2, emoji:'🎀' },
+  { id:'redo', word:'redo', graphemes:['re','d','o'], types:['c','c','lv'], pattern:'prefix', group:'prefixes', level:2, emoji:'🔁' },
+  { id:'unable', word:'unable', graphemes:['un','a','b','le'], types:['c','sv','c','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🚫' },
+  { id:'readable', word:'readable', graphemes:['r','ea','d','a','ble'], types:['c','lv','c','sv','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'📘' },
+  { id:'action', word:'action', graphemes:['a','c','tion'], types:['sv','c','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🎬' },
+  { id:'nation', word:'nation', graphemes:['n','a','tion'], types:['c','lv','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🇸🇬' },
+  { id:'science', word:'science', graphemes:['sci','en','ce'], types:['c','sv','c'], pattern:'multisyllable', group:'multisyllable', level:3, emoji:'🔬' },
+  { id:'energy', word:'energy', graphemes:['en','er','gy'], types:['sv','rc','c'], pattern:'multisyllable', group:'multisyllable', level:3, emoji:'⚡' },
+  { id:'market', word:'market', graphemes:['mar','k','et'], types:['rc','c','sv'], pattern:'multisyllable', group:'multisyllable', level:2, emoji:'🛍️' },
+  { id:'their', word:'their', graphemes:['th','eir'], types:['d','lv'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'👥' },
+  { id:'because', word:'because', graphemes:['be','cau','se'], types:['sv','dp','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'❓' },
+  { id:'enough', word:'enough', graphemes:['e','nough'], types:['sv','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'✅' },
+  { id:'should', word:'should', graphemes:['sh','ou','ld'], types:['d','dp','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'🧠' },
+  { id:'could', word:'could', graphemes:['c','ou','ld'], types:['c','dp','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'💡' },
 ];
 
 /**
@@ -1114,12 +1134,30 @@ export function getWordsByLevel(level) {
  * @param {number} count  number of distractors
  * @returns {Word[]}
  */
-export function getDistractors(word, count = 3) {
-  // Prefer same-group distractors, fall back to same-level
-  let pool = WORDS.filter(w => w.id !== word.id && w.group === word.group);
+export function getDistractors(word, count = 3, opts = {}) {
+  const maxLevel = Number(opts.maxLevel ?? word.level ?? 3);
+
+  // Prefer same-group + same pattern distractors within the learner's level,
+  // then relax constraints gradually.
+  let pool = WORDS.filter(w =>
+    w.id !== word.id
+    && w.group === word.group
+    && w.pattern === word.pattern
+    && w.level <= maxLevel
+  );
+
   if (pool.length < count) {
-    pool = WORDS.filter(w => w.id !== word.id && w.level === word.level);
+    pool = WORDS.filter(w =>
+      w.id !== word.id
+      && w.group === word.group
+      && w.level <= maxLevel
+    );
   }
+
+  if (pool.length < count) {
+    pool = WORDS.filter(w => w.id !== word.id && w.level <= maxLevel);
+  }
+
   return shuffleArray(pool).slice(0, count);
 }
 
@@ -1194,7 +1232,12 @@ export const GROUP_ORDER = [
   'short-a','short-e','short-i','short-o','short-u',
   'long-a','long-e','long-i','long-o','long-u',
   'digraphs','blends','diphthongs','r-controlled',
+  'prefixes','suffixes-advanced','multisyllable','sight-highfreq',
 ];
+
+// Decodable categories for blending-focused modes.
+// Sight words are intentionally excluded because they are not phonetically regular.
+export const BLENDING_GROUP_ORDER = GROUP_ORDER.filter(group => group !== 'sight-highfreq');
 
 /**
  * Structural pattern groups — these filter by word.pattern rather than word.group
@@ -1209,6 +1252,48 @@ export const STRUCT_GROUP_ORDER = [
 export const SUFFIX_GROUP_ORDER = [
   'suffix-ing', 'suffix-ed', 'suffix-er', 'suffix-est',
 ];
+
+export const ADVANCED_GROUP_ORDER = [
+  'prefixes', 'suffixes-advanced', 'multisyllable', 'sight-highfreq',
+];
+
+const KNOWN_PREFIXES = ['re', 'un', 'dis', 'pre'];
+const KNOWN_SUFFIXES = ['ing', 'ed', 'er', 'est', 'tion', 'able', 'ful', 'less'];
+
+/**
+ * Split a word into morphological parts for prefix/suffix activities.
+ * @param {string} rawWord
+ * @returns {{prefix:string|null, base:string, suffix:string|null}}
+ */
+export function getMorphologyParts(rawWord = '') {
+  const word = String(rawWord || '').toLowerCase();
+  let prefix = null;
+  let suffix = null;
+  let base = word;
+
+  const matchedPrefix = KNOWN_PREFIXES.find(p => word.startsWith(p) && word.length > p.length + 1);
+  if (matchedPrefix) {
+    prefix = matchedPrefix;
+    base = base.slice(matchedPrefix.length);
+  }
+
+  const matchedSuffix = KNOWN_SUFFIXES.find(s => base.endsWith(s) && base.length > s.length + 1);
+  if (matchedSuffix) {
+    suffix = matchedSuffix;
+    base = base.slice(0, -matchedSuffix.length);
+  }
+
+  return { prefix, base, suffix };
+}
+
+export function getBaseWord(rawWord = '') {
+  return getMorphologyParts(rawWord).base;
+}
+
+export function hasKnownAffix(rawWord = '') {
+  const parts = getMorphologyParts(rawWord);
+  return !!(parts.prefix || parts.suffix);
+}
 
 /** Load custom words from localStorage and merge into WORDS array */
 export function loadCustomWords() {

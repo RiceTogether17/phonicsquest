@@ -29,6 +29,8 @@ import { initSightMatch, showSightBrowser, cleanupSightMatch } from './modes/sig
 import { initSentenceForge, showSentenceBrowser, cleanupSentenceForge } from './modes/sentenceForge.js';
 import { initClozeCastle, showClozeBrowser, cleanupClozeCastle } from './modes/clozeCastle.js';
 import { initWordVault, showVaultBrowser, cleanupWordVault } from './modes/wordVault.js';
+import { initEditingQuest, showEditingBrowser, cleanupEditingQuest } from './modes/editingQuest.js';
+import { initWritingQuest, showWritingBrowser, cleanupWritingQuest } from './modes/writingQuest.js';
 import {
   getProfiles, createProfile, deleteProfile, activateProfile,
   getActiveProfile, needsProfileSelection, restoreActiveProfile,
@@ -46,6 +48,18 @@ import { modalManager } from './modules/modalManager.js';
 import { keyboardManager } from './modules/keyboardManager.js';
 import { settingsController } from './modules/settingsController.js';
 import { getQuestUnlockStatus } from './modules/questUnlocks.js';
+
+async function hashPin(pin) {
+  if (!window.crypto?.subtle) return `plain:${pin}`;
+  const data = new TextEncoder().encode(pin);
+  const digest = await window.crypto.subtle.digest('SHA-256', data);
+  const hex = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return `sha256:${hex}`;
+}
+
+function isHashedPin(value) {
+  return typeof value === 'string' && (value.startsWith('sha256:') || value.startsWith('plain:'));
+}
 
 class App {
   constructor() {
@@ -361,6 +375,57 @@ class App {
       mascot.setHomeState('holdCard');
     });
 
+    // Editing Quest button (home → editing quest screen)
+    document.getElementById('btn-editing-quest')?.addEventListener('click', () => {
+      const unlock = this._getQuestUnlockStatus();
+      if (!unlock.editingQuest.unlocked) {
+        this._showToast(`Master ${unlock.editingQuest.required} words to unlock! (${unlock.editingQuest.current} so far)`, 'warning');
+        return;
+      }
+      initEditingQuest(
+        document.getElementById('editing-quest-content'),
+        () => {
+          cleanupEditingQuest();
+          this._showScreen(SCREENS.HOME);
+          mascot.setHomeState('holdCard');
+        },
+      );
+      showEditingBrowser();
+      this._showScreen(SCREENS.EDITING_QUEST);
+      mascot.setState('whiteboard');
+    });
+
+    document.getElementById('btn-eq-back')?.addEventListener('click', () => {
+      cleanupEditingQuest();
+      this._showScreen(SCREENS.HOME);
+      mascot.setHomeState('holdCard');
+    });
+
+    document.getElementById('btn-writing-quest')?.addEventListener('click', () => {
+      const unlock = this._getQuestUnlockStatus();
+      if (!unlock.writingQuest.unlocked) {
+        this._showToast(`Master ${unlock.writingQuest.required} words to unlock! (${unlock.writingQuest.current} so far)`, 'warning');
+        return;
+      }
+      initWritingQuest(
+        document.getElementById('writing-quest-content'),
+        () => {
+          cleanupWritingQuest();
+          this._showScreen(SCREENS.HOME);
+          mascot.setHomeState('holdCard');
+        },
+      );
+      showWritingBrowser();
+      this._showScreen(SCREENS.WRITING_QUEST);
+      mascot.setState('whiteboard');
+    });
+
+    document.getElementById('btn-writing-back')?.addEventListener('click', () => {
+      cleanupWritingQuest();
+      this._showScreen(SCREENS.HOME);
+      mascot.setHomeState('holdCard');
+    });
+
     // Next word button
     this._els.btnNext?.addEventListener('click', () => {
       this._nextWord();
@@ -495,7 +560,7 @@ class App {
       // Use per-mode difficulty if available, falling back to global setting
       const modeDiffs = store.get('modeDifficulty') || {};
       const effectiveDiff = modeDiffs[this._mode] ?? store.get('difficulty') ?? 1;
-      const opts = { maxLevel: effectiveDiff };
+      const opts = { maxLevel: effectiveDiff, mode: this._mode };
       if (group) opts.group = group;
       this._currentWord = progress.getNextWord(opts);
     }
@@ -786,7 +851,7 @@ class App {
     });
 
     // Confirm PIN
-    document.getElementById('pin-confirm-btn')?.addEventListener('click', () => {
+    document.getElementById('pin-confirm-btn')?.addEventListener('click', async () => {
       const pin = Array.from(digits).map(d => d.value).join('');
       if (pin.length < 4) {
         if (hint) hint.textContent = 'Enter all 4 digits';
@@ -794,14 +859,19 @@ class App {
       }
 
       const savedPin = store.get('parentPin');
+      const candidateHash = await hashPin(pin);
 
       if (!savedPin) {
-        // First time: set the PIN
-        store.set('parentPin', pin);
+        // First time: store hashed PIN
+        store.set('parentPin', candidateHash);
         if (hint) hint.textContent = '';
         this._closeModal('modal-pin');
         this._openDashboard();
-      } else if (pin === savedPin) {
+      } else if (savedPin === pin || savedPin === candidateHash || savedPin === `plain:${pin}`) {
+        // Migrate legacy plaintext pins to hashed format.
+        if (!isHashedPin(savedPin)) {
+          store.set('parentPin', candidateHash);
+        }
         // Correct PIN
         if (hint) hint.textContent = '';
         this._closeModal('modal-pin');
@@ -876,6 +946,12 @@ class App {
         break;
       case 'word-vault':
         document.getElementById('btn-word-vault')?.click();
+        break;
+      case 'editing-quest':
+        document.getElementById('btn-editing-quest')?.click();
+        break;
+      case 'writing-quest':
+        document.getElementById('btn-writing-quest')?.click();
         break;
       case 'sight-words':
         document.getElementById('btn-sight-words')?.click();
@@ -1370,6 +1446,8 @@ class App {
       { id: 'btn-sentence-forge', quest: unlock.sentenceForge, label: '6 levels · unscramble & build sentences' },
       { id: 'btn-cloze-castle',   quest: unlock.clozeCastle,   label: 'P1–P6 · grammar cloze passages' },
       { id: 'btn-word-vault',     quest: unlock.wordVault,     label: '7 categories · vocabulary cloze passages' },
+      { id: 'btn-editing-quest',  quest: unlock.editingQuest,  label: 'Editing and grammar correction tasks' },
+      { id: 'btn-writing-quest',  quest: unlock.writingQuest,  label: 'Guided writing with rubric feedback' },
     ];
 
     for (const b of banners) {
