@@ -27,7 +27,7 @@ export function countMasteredWords(wordStats = {}, minAttempts = 6, masteryThres
  * Primary profiles bypass gating.
  * @param {Record<string, ProgressRecord>} wordStats
  * @param {UserProfile|null} profile
- * @param {{ sentenceForge:number, clozeCastle:number, wordVault:number }} [thresholds]
+ * @param {{ sentenceForge:number, clozeCastle:number, wordVault:number, editingQuest:number, writingQuest:number }} [thresholds]
  */
 export function getQuestUnlockStatus(wordStats = {}, profile = null, thresholds = QUEST_THRESHOLDS) {
   if (profile?.schoolLevel === 'primary') {
@@ -36,6 +36,8 @@ export function getQuestUnlockStatus(wordStats = {}, profile = null, thresholds 
       sentenceForge: { unlocked: true, required: thresholds.sentenceForge, current: Infinity },
       clozeCastle:   { unlocked: true, required: thresholds.clozeCastle,   current: Infinity },
       wordVault:     { unlocked: true, required: thresholds.wordVault,     current: Infinity },
+      editingQuest:  { unlocked: true, required: thresholds.editingQuest,  current: Infinity },
+      writingQuest:  { unlocked: true, required: thresholds.writingQuest,  current: Infinity },
     };
   }
 
@@ -45,5 +47,7 @@ export function getQuestUnlockStatus(wordStats = {}, profile = null, thresholds 
     sentenceForge: { unlocked: mastered >= thresholds.sentenceForge, required: thresholds.sentenceForge, current: mastered },
     clozeCastle:   { unlocked: mastered >= thresholds.clozeCastle,   required: thresholds.clozeCastle,   current: mastered },
     wordVault:     { unlocked: mastered >= thresholds.wordVault,     required: thresholds.wordVault,     current: mastered },
+    editingQuest:  { unlocked: mastered >= thresholds.editingQuest,  required: thresholds.editingQuest,  current: mastered },
+    writingQuest:  { unlocked: mastered >= thresholds.writingQuest,  required: thresholds.writingQuest,  current: mastered },
   };
 }

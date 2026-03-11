@@ -478,4 +478,30 @@ export const allSentences = [
   { id: 's112', sentence: 'Not until the final bell did the hall become quiet again.', level: 6, sentenceSkills: ['inversion_pattern', 'first_word_clue'], expectedFirstWord: 'Not', focusLabel: 'Inversion after fronted negative' },
   { id: 's113', sentence: 'Had the warning been shared earlier, fewer students would have panicked.', level: 6, sentenceSkills: ['inversion_pattern', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Had', focusLabel: 'Advanced inverted conditional' },
   { id: 's114', sentence: 'The vice-captain, who was elected last term, coordinated the emergency drill.', level: 6, sentenceSkills: ['clause_boundary', 'connector_clue'], focusLabel: 'Non-defining relative clause' },
+  {
+    id: 's115',
+    sentence: 'The rain started, so we moved the PE lesson indoors.',
+    level: 3,
+    sentenceSkills: ['connector_clue', 'clause_boundary'],
+    focusLabel: 'Synthesis with connector',
+    synthesisTask: {
+      type: 'combine',
+      prompt: 'Combine two ideas into one sentence.',
+      connectors: ['because', 'so', 'although'],
+      punctuationHint: 'Use a comma before the connector when joining full clauses.',
+    },
+  },
+  {
+    id: 's116',
+    sentence: 'Mia said that she was ready then.',
+    level: 5,
+    sentenceSkills: ['connector_clue', 'tense_clue'],
+    focusLabel: 'Direct to indirect speech',
+    synthesisTask: {
+      type: 'transform',
+      prompt: 'Change direct speech to indirect speech.',
+      connectors: ['that'],
+      punctuationHint: 'Remove quotation marks and adjust tense/pronouns.',
+    },
+  },
 ];
