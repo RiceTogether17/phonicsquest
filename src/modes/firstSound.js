@@ -40,7 +40,7 @@ export function setupFirstSound(word, els) {
   const firstType     = word.types[0];
 
   // Get distractors (different first sounds)
-  const distractorGraphemes = getFirstSoundDistractors(firstGrapheme, firstType);
+  const distractorGraphemes = getFirstSoundDistractors(firstGrapheme, firstType, word.level);
   const distractors = shuffleArray(distractorGraphemes).slice(0, 3);
 
   const choices = shuffleArray([
@@ -114,17 +114,30 @@ function handleChoice(choice, btn, word, els, grid) {
 /**
  * Get distractor first-sounds from other words.
  */
-function getFirstSoundDistractors(correctGrapheme, correctType) {
+function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel = 3) {
   const seen = new Set([correctGrapheme]);
   const distractors = [];
 
-  for (const word of shuffleArray(WORDS)) {
+  for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
     const g = word.graphemes[0];
     const t = word.types[0];
-    if (!seen.has(g)) {
+    if (!seen.has(g) && t === correctType) {
       seen.add(g);
       distractors.push({ grapheme: g, type: t });
       if (distractors.length >= 6) break;
+    }
+  }
+
+  // Fallback: allow mixed consonant types at this level.
+  if (distractors.length < 3) {
+    for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
+      const g = word.graphemes[0];
+      const t = word.types[0];
+      if (!seen.has(g)) {
+        seen.add(g);
+        distractors.push({ grapheme: g, type: t });
+        if (distractors.length >= 6) break;
+      }
     }
   }
 

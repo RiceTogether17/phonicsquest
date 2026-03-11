@@ -31,6 +31,8 @@ const DEFAULT_STATE = {
   reducedMotion:  false,    // manual override for prefers-reduced-motion
   speechEnabled:  true,
   speechLocale:   'en-SG',
+  fontScale:      100,
+  bilingualInstructions: false,
 
   // Adaptive selection tuning (can be overridden by educator tooling)
   adaptiveConfig: {
@@ -57,6 +59,8 @@ const DEFAULT_STATE = {
     clozeCastle: {},
     wordVault: {},
     stories: {},
+    editingQuest: {},
+    writingQuest: {},
   },
   questAttempts: [],        // recent quest attempts (capped)
 
@@ -66,6 +70,7 @@ const DEFAULT_STATE = {
     clozeCastle: { attempted: 0, strong: 0, partial: 0, weak: 0 },
     wordVault:   { attempted: 0, strong: 0, partial: 0, weak: 0 },
     sentenceForge: { attempted: 0, correct: 0, incorrect: 0 },
+    editingQuest: { attempted: 0, correct: 0, incorrect: 0 },
     byType: {},             // { [clueType]: { attempted, strong, partial, weak } }
   },
 
