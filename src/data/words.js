@@ -1089,22 +1089,6 @@ export const WORDS = [
   { id:'shag',  word:'shag',  graphemes:['sh','a','g'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'🧶' },
   { id:'chug',  word:'chug',  graphemes:['ch','u','g'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'🚂' },
   { id:'than',  word:'than',  graphemes:['th','a','n'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'⚖️' },
-
-  // ── Morphology + multisyllabic + high-frequency sight words ─────────────
-  { id:'untie', word:'untie', graphemes:['un','t','ie'], types:['c','c','lv'], pattern:'prefix', group:'prefixes', level:2, emoji:'🎀' },
-  { id:'redo', word:'redo', graphemes:['re','d','o'], types:['c','c','lv'], pattern:'prefix', group:'prefixes', level:2, emoji:'🔁' },
-  { id:'unable', word:'unable', graphemes:['un','a','b','le'], types:['c','sv','c','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🚫' },
-  { id:'readable', word:'readable', graphemes:['r','ea','d','a','ble'], types:['c','lv','c','sv','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'📘' },
-  { id:'action', word:'action', graphemes:['a','c','tion'], types:['sv','c','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🎬' },
-  { id:'nation', word:'nation', graphemes:['n','a','tion'], types:['c','lv','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🇸🇬' },
-  { id:'science', word:'science', graphemes:['sci','en','ce'], types:['c','sv','c'], pattern:'multisyllable', group:'multisyllable', level:3, emoji:'🔬' },
-  { id:'energy', word:'energy', graphemes:['en','er','gy'], types:['sv','rc','c'], pattern:'multisyllable', group:'multisyllable', level:3, emoji:'⚡' },
-  { id:'market', word:'market', graphemes:['mar','k','et'], types:['rc','c','sv'], pattern:'multisyllable', group:'multisyllable', level:2, emoji:'🛍️' },
-  { id:'their', word:'their', graphemes:['th','eir'], types:['d','lv'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'👥' },
-  { id:'because', word:'because', graphemes:['be','cau','se'], types:['sv','dp','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'❓' },
-  { id:'enough', word:'enough', graphemes:['e','nough'], types:['sv','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'✅' },
-  { id:'should', word:'should', graphemes:['sh','ou','ld'], types:['d','dp','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'🧠' },
-  { id:'could', word:'could', graphemes:['c','ou','ld'], types:['c','dp','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'💡' },
 ];
 
 /**
