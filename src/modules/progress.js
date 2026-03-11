@@ -56,6 +56,27 @@ class Progress {
       }
     }
 
+    // In free/blend category selection, prioritize honoring the chosen group
+    // even if the current difficulty cap has no matches yet.
+    if (pool.length === 0 && opts.group) {
+      const structMatch = opts.group.match(/^(cvc|ccvc|cvcc|ccvcc)-([aeiou])$/);
+      if (structMatch) {
+        const struct = structMatch[1].toUpperCase();
+        const vowel = structMatch[2];
+        pool = WORDS.filter(w => getWordStructure(w) === struct && getShortVowelLetter(w) === vowel);
+      } else if (opts.group === 'struct-cvc') {
+        pool = WORDS.filter(w => w.pattern === 'CVC' && w.types.includes('sv'));
+      } else if (opts.group === 'struct-ccvc') {
+        pool = WORDS.filter(w => w.pattern === 'blend' && w.types.includes('sv'));
+      } else if (opts.group === 'struct-cvcc') {
+        pool = WORDS.filter(w => w.group === 'struct-cvcc' || (getWordStructure(w) === 'CVCC' && w.types.includes('sv')));
+      } else if (opts.group === 'struct-ccvcc') {
+        pool = WORDS.filter(w => w.group === 'struct-ccvcc' || (getWordStructure(w) === 'CCVCC' && w.types.includes('sv')));
+      } else {
+        pool = WORDS.filter(w => w.group === opts.group);
+      }
+    }
+
     if (pool.length === 0) pool = WORDS.slice(0, 20);
 
     const stats = store.get('wordStats') || {};
