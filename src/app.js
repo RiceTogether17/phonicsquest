@@ -29,6 +29,8 @@ import { initSightMatch, showSightBrowser, cleanupSightMatch } from './modes/sig
 import { initSentenceForge, showSentenceBrowser, cleanupSentenceForge } from './modes/sentenceForge.js';
 import { initClozeCastle, showClozeBrowser, cleanupClozeCastle } from './modes/clozeCastle.js';
 import { initWordVault, showVaultBrowser, cleanupWordVault } from './modes/wordVault.js';
+import { initEditingQuest, showEditingBrowser, cleanupEditingQuest } from './modes/editingQuest.js';
+import { initWritingQuest, showWritingBrowser, cleanupWritingQuest } from './modes/writingQuest.js';
 import {
   getProfiles, createProfile, deleteProfile, activateProfile,
   getActiveProfile, needsProfileSelection, restoreActiveProfile,
@@ -369,6 +371,57 @@ class App {
     // Word Vault screen back button (→ home)
     document.getElementById('btn-wvq-back')?.addEventListener('click', () => {
       cleanupWordVault();
+      this._showScreen(SCREENS.HOME);
+      mascot.setHomeState('holdCard');
+    });
+
+    // Editing Quest button (home → editing quest screen)
+    document.getElementById('btn-editing-quest')?.addEventListener('click', () => {
+      const unlock = this._getQuestUnlockStatus();
+      if (!unlock.editingQuest.unlocked) {
+        this._showToast(`Master ${unlock.editingQuest.required} words to unlock! (${unlock.editingQuest.current} so far)`, 'warning');
+        return;
+      }
+      initEditingQuest(
+        document.getElementById('editing-quest-content'),
+        () => {
+          cleanupEditingQuest();
+          this._showScreen(SCREENS.HOME);
+          mascot.setHomeState('holdCard');
+        },
+      );
+      showEditingBrowser();
+      this._showScreen(SCREENS.EDITING_QUEST);
+      mascot.setState('whiteboard');
+    });
+
+    document.getElementById('btn-eq-back')?.addEventListener('click', () => {
+      cleanupEditingQuest();
+      this._showScreen(SCREENS.HOME);
+      mascot.setHomeState('holdCard');
+    });
+
+    document.getElementById('btn-writing-quest')?.addEventListener('click', () => {
+      const unlock = this._getQuestUnlockStatus();
+      if (!unlock.writingQuest.unlocked) {
+        this._showToast(`Master ${unlock.writingQuest.required} words to unlock! (${unlock.writingQuest.current} so far)`, 'warning');
+        return;
+      }
+      initWritingQuest(
+        document.getElementById('writing-quest-content'),
+        () => {
+          cleanupWritingQuest();
+          this._showScreen(SCREENS.HOME);
+          mascot.setHomeState('holdCard');
+        },
+      );
+      showWritingBrowser();
+      this._showScreen(SCREENS.WRITING_QUEST);
+      mascot.setState('whiteboard');
+    });
+
+    document.getElementById('btn-writing-back')?.addEventListener('click', () => {
+      cleanupWritingQuest();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
@@ -894,6 +947,12 @@ class App {
       case 'word-vault':
         document.getElementById('btn-word-vault')?.click();
         break;
+      case 'editing-quest':
+        document.getElementById('btn-editing-quest')?.click();
+        break;
+      case 'writing-quest':
+        document.getElementById('btn-writing-quest')?.click();
+        break;
       case 'sight-words':
         document.getElementById('btn-sight-words')?.click();
         break;
@@ -1387,6 +1446,8 @@ class App {
       { id: 'btn-sentence-forge', quest: unlock.sentenceForge, label: '6 levels · unscramble & build sentences' },
       { id: 'btn-cloze-castle',   quest: unlock.clozeCastle,   label: 'P1–P6 · grammar cloze passages' },
       { id: 'btn-word-vault',     quest: unlock.wordVault,     label: '7 categories · vocabulary cloze passages' },
+      { id: 'btn-editing-quest',  quest: unlock.editingQuest,  label: 'Editing and grammar correction tasks' },
+      { id: 'btn-writing-quest',  quest: unlock.writingQuest,  label: 'Guided writing with rubric feedback' },
     ];
 
     for (const b of banners) {

@@ -337,6 +337,12 @@ function _renderGame(entry, punct) {
       </div>
 
       <p class="sfq-instruction">🔨 Tap the words to build the sentence!</p>
+      ${entry.synthesisTask ? `
+      <div class="dash-pattern-item" style="margin-bottom:12px">
+        <strong>🧪 Synthesis Task:</strong> ${entry.synthesisTask.prompt}
+        ${entry.synthesisTask.connectors?.length ? `<br><em>Use one connector:</em> ${entry.synthesisTask.connectors.join(', ')}` : ''}
+        ${entry.synthesisTask.punctuationHint ? `<br><em>Punctuation:</em> ${entry.synthesisTask.punctuationHint}` : ''}
+      </div>` : ''}
 
       <div class="sfq-answer-area" id="sfq-answer-area" aria-label="Your sentence">
         <div class="sfq-answer-chips" id="sfq-answer-chips">

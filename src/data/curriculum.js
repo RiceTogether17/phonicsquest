@@ -266,6 +266,36 @@ export const CURRICULUM = [
     icon: '🏆', group: 'suffix-est', level: 2,
     requiredMastery: 0.70, prerequisite: 'suffix-er',
   },
+
+  /* ── Phase 9: Morphology + multisyllabic + sight vocabulary ─────────── */
+  {
+    id: 'prefixes', phase: 9,
+    name: 'Prefixes (re-, un-)',
+    description: 'redo, untie, unwrap…',
+    icon: '↩️', group: 'prefixes', level: 2,
+    requiredMastery: 0.70, prerequisite: 'suffix-est',
+  },
+  {
+    id: 'suffixes-advanced', phase: 9,
+    name: 'Advanced Suffixes (-tion, -able)',
+    description: 'action, nation, readable…',
+    icon: '🧩', group: 'suffixes-advanced', level: 3,
+    requiredMastery: 0.70, prerequisite: 'prefixes',
+  },
+  {
+    id: 'multisyllable', phase: 9,
+    name: 'Multi-syllabic Words',
+    description: 'science, market, energy…',
+    icon: '🎼', group: 'multisyllable', level: 3,
+    requiredMastery: 0.70, prerequisite: 'suffixes-advanced',
+  },
+  {
+    id: 'sight-highfreq', phase: 9,
+    name: 'High-frequency Sight Words',
+    description: 'their, because, enough…',
+    icon: '👀', group: 'sight-highfreq', level: 3,
+    requiredMastery: 0.70, prerequisite: 'multisyllable',
+  },
 ];
 
 /** Phase labels for UI display */
@@ -278,6 +308,7 @@ export const PHASE_LABELS = {
   6: 'Phase 6 – Diphthongs',
   7: 'Phase 7 – Advanced',
   8: 'Phase 8 – Suffixes',
+  9: 'Phase 9 – Morphology & Fluency',
 };
 
 /**

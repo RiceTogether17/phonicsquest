@@ -32,13 +32,13 @@ class Progress {
     if (opts.group) {
       // Legacy struct-* filters
       if (opts.group === 'struct-cvc') {
-        pool = WORDS.filter(w => w.pattern === 'CVC' && w.types.includes('sv'));
+        pool = WORDS.filter(w => w.pattern === 'CVC' && w.types.includes('sv') && w.level <= maxLevel);
       } else if (opts.group === 'struct-ccvc') {
-        pool = WORDS.filter(w => w.pattern === 'blend' && w.types.includes('sv'));
+        pool = WORDS.filter(w => w.pattern === 'blend' && w.types.includes('sv') && w.level <= maxLevel);
       } else if (opts.group === 'struct-cvcc') {
-        pool = WORDS.filter(w => w.group === 'struct-cvcc' || (getWordStructure(w) === 'CVCC' && w.types.includes('sv')));
+        pool = WORDS.filter(w => (w.group === 'struct-cvcc' || (getWordStructure(w) === 'CVCC' && w.types.includes('sv'))) && w.level <= maxLevel);
       } else if (opts.group === 'struct-ccvcc') {
-        pool = WORDS.filter(w => w.group === 'struct-ccvcc' || (getWordStructure(w) === 'CCVCC' && w.types.includes('sv')));
+        pool = WORDS.filter(w => (w.group === 'struct-ccvcc' || (getWordStructure(w) === 'CCVCC' && w.types.includes('sv'))) && w.level <= maxLevel);
       } else {
         // Curriculum stage structural-vowel cross-cut: e.g. 'cvc-a', 'ccvc-e', 'cvcc-i', 'ccvcc-u'
         const structMatch = opts.group.match(/^(cvc|ccvc|cvcc|ccvcc)-([aeiou])$/);
@@ -47,7 +47,8 @@ class Progress {
           const vowel  = structMatch[2];              // 'a', 'e', 'i', 'o', 'u'
           pool = WORDS.filter(w =>
             getWordStructure(w) === struct &&
-            getShortVowelLetter(w) === vowel
+            getShortVowelLetter(w) === vowel &&
+            w.level <= maxLevel
           );
         } else {
           pool = pool.filter(w => w.group === opts.group);

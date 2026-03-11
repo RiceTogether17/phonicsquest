@@ -72,6 +72,10 @@ export const WORD_GROUPS = {
   'suffix-ed':    { label: '-ed Words',  color: '#d97706', bg: '#fef3c7', icon: '✅', audioFile: null },
   'suffix-er':    { label: '-er Words',  color: '#dc2626', bg: '#fee2e2', icon: '📈', audioFile: null },
   'suffix-est':   { label: '-est Words', color: '#7c3aed', bg: '#f3e8ff', icon: '🏆', audioFile: null },
+  'prefixes':     { label: 'Prefixes', color: '#0ea5e9', bg: '#e0f2fe', icon: '↩️', audioFile: null },
+  'suffixes-advanced': { label: 'Advanced Suffixes', color: '#7c3aed', bg: '#ede9fe', icon: '🧩', audioFile: null },
+  'multisyllable': { label: 'Multi-syllable', color: '#f43f5e', bg: '#ffe4e6', icon: '🎼', audioFile: null },
+  'sight-highfreq': { label: 'High-frequency Sight Words', color: '#14b8a6', bg: '#ccfbf1', icon: '👀', audioFile: null },
 };
 
 /**
@@ -1212,6 +1216,7 @@ export const GROUP_ORDER = [
   'short-a','short-e','short-i','short-o','short-u',
   'long-a','long-e','long-i','long-o','long-u',
   'digraphs','blends','diphthongs','r-controlled',
+  'prefixes','suffixes-advanced','multisyllable','sight-highfreq',
 ];
 
 /**
@@ -1227,6 +1232,48 @@ export const STRUCT_GROUP_ORDER = [
 export const SUFFIX_GROUP_ORDER = [
   'suffix-ing', 'suffix-ed', 'suffix-er', 'suffix-est',
 ];
+
+export const ADVANCED_GROUP_ORDER = [
+  'prefixes', 'suffixes-advanced', 'multisyllable', 'sight-highfreq',
+];
+
+const KNOWN_PREFIXES = ['re', 'un', 'dis', 'pre'];
+const KNOWN_SUFFIXES = ['ing', 'ed', 'er', 'est', 'tion', 'able', 'ful', 'less'];
+
+/**
+ * Split a word into morphological parts for prefix/suffix activities.
+ * @param {string} rawWord
+ * @returns {{prefix:string|null, base:string, suffix:string|null}}
+ */
+export function getMorphologyParts(rawWord = '') {
+  const word = String(rawWord || '').toLowerCase();
+  let prefix = null;
+  let suffix = null;
+  let base = word;
+
+  const matchedPrefix = KNOWN_PREFIXES.find(p => word.startsWith(p) && word.length > p.length + 1);
+  if (matchedPrefix) {
+    prefix = matchedPrefix;
+    base = base.slice(matchedPrefix.length);
+  }
+
+  const matchedSuffix = KNOWN_SUFFIXES.find(s => base.endsWith(s) && base.length > s.length + 1);
+  if (matchedSuffix) {
+    suffix = matchedSuffix;
+    base = base.slice(0, -matchedSuffix.length);
+  }
+
+  return { prefix, base, suffix };
+}
+
+export function getBaseWord(rawWord = '') {
+  return getMorphologyParts(rawWord).base;
+}
+
+export function hasKnownAffix(rawWord = '') {
+  const parts = getMorphologyParts(rawWord);
+  return !!(parts.prefix || parts.suffix);
+}
 
 /** Load custom words from localStorage and merge into WORDS array */
 export function loadCustomWords() {

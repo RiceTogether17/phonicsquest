@@ -10,6 +10,7 @@ import { store } from './store.js';
 
 const PROFILES_META_KEY = 'phonicsquest_profiles';
 const ACTIVE_PROFILE_KEY = 'phonicsquest_active_profile';
+const CLASSES_META_KEY = 'phonicsquest_classes_meta';
 const PROFILE_STORAGE_KEY = (id) => `phonicsquest_profile_${id}`;
 const LEGACY_STORAGE_KEY = 'phonicsquest_v2';
 const LEGACY_MIGRATION_FLAG = 'phonicsquest_legacy_migrated_to_profiles';
@@ -75,7 +76,7 @@ function _saveProfiles(profiles) {
 }
 
 /** Create a new profile and return it. */
-export function createProfile(name, avatar, color, schoolLevel = 'preschool') {
+export function createProfile(name, avatar, color, schoolLevel = 'preschool', opts = {}) {
   const id = 'p_' + Date.now().toString(36);
   const profile = {
     id,
@@ -85,12 +86,29 @@ export function createProfile(name, avatar, color, schoolLevel = 'preschool') {
     // 'primary' bypasses phonics-mastery unlock gates for Sentence Forge,
     // Cloze Castle and Word Vault. Defaults to 'preschool' (mastery-gated).
     schoolLevel: schoolLevel === 'primary' ? 'primary' : 'preschool',
+    classId: opts.classId || 'class-a',
     createdAt: new Date().toISOString(),
   };
   const profiles = getProfiles();
   profiles.push(profile);
   _saveProfiles(profiles);
   return profile;
+}
+
+export function getClasses() {
+  try {
+    const raw = localStorage.getItem(CLASSES_META_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    if (Array.isArray(parsed) && parsed.length) return parsed;
+  } catch (_) {}
+  return [{ id: 'class-a', name: 'Class A' }];
+}
+
+export function saveClasses(classes = []) {
+  try {
+    const safe = Array.isArray(classes) ? classes.filter(c => c && c.id && c.name) : [];
+    localStorage.setItem(CLASSES_META_KEY, JSON.stringify(safe.length ? safe : [{ id: 'class-a', name: 'Class A' }]));
+  } catch (_) {}
 }
 
 /** Delete a profile and its progress data. */
@@ -160,4 +178,4 @@ export function restoreActiveProfile() {
   return false;
 }
 
-export { AVATAR_OPTIONS, COLOR_OPTIONS };
+export { AVATAR_OPTIONS, COLOR_OPTIONS, CLASSES_META_KEY };
