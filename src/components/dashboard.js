@@ -176,6 +176,7 @@ function _renderClassManagement() {
   if (!container) return;
   const classes = getClasses();
   const profiles = getProfiles();
+  const assignments = store.get('teacherAssignments') || {};
   container.innerHTML = `
     <h3 class="dash-section-title" style="margin-top:24px">Teacher Class Management</h3>
     <ul class="dash-pattern-list">
@@ -184,7 +185,25 @@ function _renderClassManagement() {
     <div class="dash-actions">
       <input id="class-name-input" class="cp-name-input" placeholder="New class name" />
       <button class="btn btn--ghost" id="btn-add-class">Add Class</button>
-    </div>`;
+    </div>
+    <div class="dash-actions" style="margin-top:8px">
+      <select id="assign-class" class="category-select">
+        ${classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+      </select>
+      <select id="assign-quest" class="category-select">
+        <option value="sentence-forge">Sentence Forge</option>
+        <option value="cloze-castle">Cloze Castle</option>
+        <option value="word-vault">Word Vault</option>
+        <option value="editing-quest">Editing Quest</option>
+        <option value="writing-quest">Writing Quest</option>
+      </select>
+      <select id="assign-level" class="category-select">
+        <option value="1">Level 1</option><option value="2">Level 2</option><option value="3">Level 3</option>
+        <option value="4">Level 4</option><option value="5">Level 5</option><option value="6">Level 6</option>
+      </select>
+      <button class="btn btn--ghost" id="btn-save-assignment">Assign</button>
+    </div>
+    <p class="dash-pattern-item">📌 Current assignments: ${Object.keys(assignments).length ? Object.entries(assignments).map(([k,v]) => `${k}: ${v.quest} L${v.level}`).join(' | ') : 'none'}</p>`;
 
   document.getElementById('btn-add-class')?.addEventListener('click', () => {
     const input = /** @type {HTMLInputElement|null} */ (document.getElementById('class-name-input'));
@@ -192,6 +211,17 @@ function _renderClassManagement() {
     if (!name) return;
     const next = [...classes, { id: `class-${Date.now().toString(36)}`, name }];
     saveClasses(next);
+    _renderClassManagement();
+  });
+
+  document.getElementById('btn-save-assignment')?.addEventListener('click', () => {
+    const classId = /** @type {HTMLSelectElement|null} */ (document.getElementById('assign-class'))?.value;
+    const quest = /** @type {HTMLSelectElement|null} */ (document.getElementById('assign-quest'))?.value;
+    const level = /** @type {HTMLSelectElement|null} */ (document.getElementById('assign-level'))?.value;
+    if (!classId || !quest || !level) return;
+    const next = { ...(store.get('teacherAssignments') || {}) };
+    next[classId] = { quest, level: Number(level), updatedAt: new Date().toISOString() };
+    store.set('teacherAssignments', next);
     _renderClassManagement();
   });
 }

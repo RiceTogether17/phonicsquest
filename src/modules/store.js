@@ -81,6 +81,9 @@ const DEFAULT_STATE = {
   // Per-mode difficulty (auto-adjusts based on performance)
   modeDifficulty: {},  // { [modeKey]: 1|2|3 }
 
+  // Teacher assignment map by class
+  teacherAssignments: {}, // { [classId]: { quest, level, updatedAt } }
+
   // Word history (last 50 words played)
   wordHistory: [],
 
