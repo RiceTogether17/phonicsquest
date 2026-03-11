@@ -20,6 +20,7 @@ describe('SCREENS', () => {
     expect(SCREENS.SENTENCE_FORGE).toBe('screen-sentence-forge');
     expect(SCREENS.CLOZE_CASTLE).toBe('screen-cloze-castle');
     expect(SCREENS.WORD_VAULT).toBe('screen-word-vault');
+    expect(SCREENS.EDITING_QUEST).toBe('screen-editing-quest');
   });
 
   it('is frozen (immutable)', () => {
@@ -32,6 +33,7 @@ describe('QUEST_THRESHOLDS', () => {
     expect(QUEST_THRESHOLDS.sentenceForge).toBe(10);
     expect(QUEST_THRESHOLDS.clozeCastle).toBe(25);
     expect(QUEST_THRESHOLDS.wordVault).toBe(50);
+    expect(QUEST_THRESHOLDS.editingQuest).toBe(70);
   });
 
   it('is frozen (immutable)', () => {

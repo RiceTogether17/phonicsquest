@@ -174,6 +174,7 @@ export function getLiteracyDomains() {
     { id: 'sentenceSkills', label: 'Sentence Skills',      icon: '🔨', score: _avgQuestScore('sentenceForge'), color: '#f97316' },
     { id: 'grammarCloze',   label: 'Grammar Cloze',        icon: '🏰', score: _avgQuestScore('clozeCastle'),  color: '#a855f7' },
     { id: 'vocabCloze',     label: 'Vocabulary Cloze',     icon: '🔑', score: _avgQuestScore('wordVault'),    color: '#0d9488' },
+    { id: 'editingQuest',   label: 'Editing Quest',        icon: '✏️', score: _avgQuestScore('editingQuest'), color: '#0ea5e9' },
     { id: 'clueDetection',  label: 'Clue Detection',       icon: '🔍', score: clueDetection,                  color: '#f59e0b' },
   ];
 }
@@ -191,6 +192,7 @@ export function getClueInsights() {
     { key: 'clozeCastle', label: 'Cloze Castle', icon: '🏰' },
     { key: 'wordVault',   label: 'Word Vault',   icon: '🔑' },
     { key: 'sentenceForge', label: 'Sentence Forge', icon: '🔨' },
+    { key: 'editingQuest', label: 'Editing Quest', icon: '✏️' },
   ];
 
   for (const { key, label, icon } of quests) {
@@ -220,6 +222,14 @@ export function getClueInsights() {
     .sort((a, b) => a.accuracy - b.accuracy);
 
   return { questInsights, byType };
+}
+
+export function getMoeOutcomeMappings() {
+  return [
+    { code: 'LO 3.1', focus: 'Decode and blend multi-syllabic words', target: 'blend' },
+    { code: 'LO 4.2', focus: 'Use grammar in context and editing', target: 'cloze-castle' },
+    { code: 'LO 5.2', focus: 'Synthesis and sentence transformation', target: 'sentence-forge' },
+  ];
 }
 
 /**

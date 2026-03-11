@@ -100,6 +100,20 @@ export const settingsController = {
       document.documentElement.setAttribute('data-reduced-motion', checked ? 'true' : 'false');
     });
 
+    document.getElementById('font-size-scale')?.addEventListener('input', (e) => {
+      const val = parseInt(/** @type {HTMLInputElement} */ (e.target).value, 10);
+      store.set('fontScale', val);
+      const display = document.getElementById('font-size-scale-display');
+      if (display) display.textContent = `${val}%`;
+      document.documentElement.style.fontSize = `${val}%`;
+    });
+
+    document.getElementById('bilingual-toggle')?.addEventListener('change', (e) => {
+      const checked = /** @type {HTMLInputElement} */ (e.target).checked;
+      store.set('bilingualInstructions', checked);
+      document.documentElement.setAttribute('data-bilingual', checked ? 'true' : 'false');
+    });
+
     // ── Reset progress ─────────────────────────────────────────────────────
     document.getElementById('reset-progress-btn')?.addEventListener('click', () => {
       if (confirm('This will erase all progress. Are you sure?')) {
@@ -152,6 +166,18 @@ export const settingsController = {
       'data-reduced-motion',
       store.get('reducedMotion') ? 'true' : 'false',
     );
+
+    const fontScale = Number(store.get('fontScale') || 100);
+    const fontScaleEl = /** @type {HTMLInputElement|null} */ (document.getElementById('font-size-scale'));
+    if (fontScaleEl) fontScaleEl.value = String(fontScale);
+    const fontScaleDisplay = document.getElementById('font-size-scale-display');
+    if (fontScaleDisplay) fontScaleDisplay.textContent = `${fontScale}%`;
+    document.documentElement.style.fontSize = `${fontScale}%`;
+
+    const bilingual = !!store.get('bilingualInstructions');
+    const bilingualToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('bilingual-toggle'));
+    if (bilingualToggle) bilingualToggle.checked = bilingual;
+    document.documentElement.setAttribute('data-bilingual', bilingual ? 'true' : 'false');
   },
 
   /**

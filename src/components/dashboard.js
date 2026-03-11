@@ -25,6 +25,7 @@ import {
   getClueInsights,
   getRecommendedActions,
   getRecentPatternInsights,
+  getMoeOutcomeMappings,
 } from '../modules/dashboardInsights.js';
 
 Chart.register(...registerables);
@@ -60,6 +61,8 @@ export function renderDashboard(container, opts = {}) {
 
     <!-- B5: Recent Pattern Insights -->
     <div id="dash-patterns-section"></div>
+
+    <div id="dash-moe-section"></div>
 
     <!-- Summary Stats (existing) -->
     <h3 class="dash-section-title" style="margin-top:24px">Progress Summary</h3>
@@ -109,8 +112,19 @@ export function renderDashboard(container, opts = {}) {
     <!-- Actions (existing) -->
     <div class="dash-actions">
       <button class="btn btn--ghost" id="btn-export-csv">Export CSV</button>
+      <button class="btn btn--ghost" id="btn-export-csv-anon">Export CSV (Anonymised)</button>
       <button class="btn btn--ghost" id="btn-export-report">Export Parent Report (JSON)</button>
       <button class="btn btn--ghost" id="btn-import-csv">Import Words (CSV)</button>
+    </div>
+
+    <h3 class="dash-section-title" style="margin-top:24px">Adaptive Controls</h3>
+    <div class="dash-stats-grid">
+      <label class="dash-stat-card">Weak-word Weight
+        <input type="range" id="adaptive-weak-weight" min="2" max="8" step="0.5" value="5" />
+      </label>
+      <label class="dash-stat-card">Unseen-word Weight
+        <input type="range" id="adaptive-unseen-weight" min="1" max="6" step="0.5" value="3" />
+      </label>
     </div>
 
     <!-- Custom word import panel (hidden by default) -->
@@ -133,6 +147,7 @@ export function renderDashboard(container, opts = {}) {
   _renderLiteracyDomains();
   _renderClueInsights();
   _renderPatternInsights();
+  _renderMoeOutcomes();
 
   // Render existing sections
   _renderMasteryChart(stats);
@@ -141,6 +156,17 @@ export function renderDashboard(container, opts = {}) {
   _renderWordHistory(stats);
   _renderBadges();
   _bindActions();
+}
+
+function _renderMoeOutcomes() {
+  const container = document.getElementById('dash-moe-section');
+  if (!container) return;
+  const rows = getMoeOutcomeMappings();
+  container.innerHTML = `
+    <h3 class="dash-section-title" style="margin-top:24px">MOE Learning Outcome Mapping</h3>
+    <ul class="dash-pattern-list">
+      ${rows.map(r => `<li class="dash-pattern-item"><strong>${r.code}</strong> · ${r.focus}</li>`).join('')}
+    </ul>`;
 }
 
 // ── B1: Learner Summary ──────────────────────────────────────────────────────
@@ -459,6 +485,20 @@ function _bindActions() {
     URL.revokeObjectURL(url);
   });
 
+  document.getElementById('btn-export-csv-anon')?.addEventListener('click', () => {
+    const csv = progress.exportCSV().split('\n').map((line, idx) => {
+      if (idx === 0 || !line.trim()) return line;
+      const [word, ...rest] = line.split(',');
+      const masked = `${word.slice(0, 1)}***`;
+      return [masked, ...rest].join(',');
+    }).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'phonicsquest-progress-anonymised.csv'; a.click();
+    URL.revokeObjectURL(url);
+  });
+
   document.getElementById('btn-export-report')?.addEventListener('click', () => {
     const report = _buildParentReport();
     const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
@@ -654,6 +694,22 @@ async function _handleCSVImport(file) {
     status.textContent = `Imported ${words.length} word${words.length > 1 ? 's' : ''} successfully!`;
     status.className = 'dash-import-status dash-import-status--success';
   });
+
+  const adaptiveWeak = /** @type {HTMLInputElement|null} */ (document.getElementById('adaptive-weak-weight'));
+  const adaptiveUnseen = /** @type {HTMLInputElement|null} */ (document.getElementById('adaptive-unseen-weight'));
+  const cfg = store.get('adaptiveConfig') || {};
+  if (adaptiveWeak) {
+    adaptiveWeak.value = String(cfg.weakWeight ?? 5);
+    adaptiveWeak.addEventListener('input', () => {
+      store.set('adaptiveConfig', { ...(store.get('adaptiveConfig') || {}), weakWeight: Number(adaptiveWeak.value) });
+    });
+  }
+  if (adaptiveUnseen) {
+    adaptiveUnseen.value = String(cfg.unseenWeight ?? 3);
+    adaptiveUnseen.addEventListener('input', () => {
+      store.set('adaptiveConfig', { ...(store.get('adaptiveConfig') || {}), unseenWeight: Number(adaptiveUnseen.value) });
+    });
+  }
 }
 
 function _timeAgo(timestamp) {

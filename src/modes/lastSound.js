@@ -36,7 +36,7 @@ export function setupLastSound(word, els) {
   const lastGrapheme = word.graphemes[lastIdx];
   const lastType     = word.types[lastIdx];
 
-  const distractors = _getDistractors(lastGrapheme, 'last');
+  const distractors = _getDistractors(lastGrapheme, 'last', word.level, lastType);
   const choices = shuffleArray([
     { grapheme: lastGrapheme, type: lastType, correct: true },
     ...distractors.slice(0, 3).map(g => ({ ...g, correct: false })),
@@ -88,18 +88,31 @@ function _handleChoice(choice, btn, word, els, grid, lastIdx) {
   }, choice.correct ? 800 : 1500);
 }
 
-function _getDistractors(correctGrapheme, position) {
+function _getDistractors(correctGrapheme, position, maxLevel = 3, targetType = null) {
   const seen = new Set([correctGrapheme]);
   const distractors = [];
 
-  for (const word of shuffleArray(WORDS)) {
+  for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
     const idx = position === 'last' ? word.graphemes.length - 1 : 0;
     const g = word.graphemes[idx];
     const t = word.types[idx];
-    if (!seen.has(g)) {
+    if (!seen.has(g) && (!targetType || t === targetType)) {
       seen.add(g);
       distractors.push({ grapheme: g, type: t });
       if (distractors.length >= 6) break;
+    }
+  }
+
+  if (distractors.length < 3) {
+    for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
+      const idx = position === 'last' ? word.graphemes.length - 1 : 0;
+      const g = word.graphemes[idx];
+      const t = word.types[idx];
+      if (!seen.has(g)) {
+        seen.add(g);
+        distractors.push({ grapheme: g, type: t });
+        if (distractors.length >= 6) break;
+      }
     }
   }
   return distractors;
