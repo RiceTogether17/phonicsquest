@@ -1593,28 +1593,6 @@ function _clonePassage(seed, cat, level, idx) {
   };
 }
 
-function _ensureGrammarCategoryCoverage() {
-  const grammarCats = ['grammarPrepositions', 'grammarArticles', 'grammarSVA'];
-  for (const cat of grammarCats) {
-    if (!vocabPassages[cat]) vocabPassages[cat] = {};
-    for (const level of ['p3', 'p4', 'p5', 'p6']) {
-      const arr = vocabPassages[cat][level] || [];
-      const fallback = arr[0]
-        || vocabPassages[cat].p2?.[0]
-        || vocabPassages[cat].p1?.[0]
-        || vocabPassages.contextInference[level]?.[0]
-        || null;
-      if (!fallback) continue;
-
-      const out = [...arr];
-      while (out.length < 3) {
-        out.push(_clonePassage(fallback, cat, level, out.length));
-      }
-      vocabPassages[cat][level] = out;
-    }
-  }
-}
-
 function _ensurePracticeDepth() {
   for (const [cat, levels] of Object.entries(vocabPassages)) {
     for (const [level, passages] of Object.entries(levels || {})) {
@@ -1631,7 +1609,7 @@ function _ensurePracticeDepth() {
 }
 
 function _ensureMinimumPassages() {
-  const needsThree = ['idiomaticExpressions', 'proverbsSayings', 'scienceTechTerms', 'socialStudiesVocab', 'grammarPrepositions', 'grammarArticles', 'grammarSVA'];
+  const needsThree = ['idiomaticExpressions', 'proverbsSayings', 'scienceTechTerms', 'socialStudiesVocab'];
   for (const cat of needsThree) {
     for (const level of ['p3', 'p4', 'p5', 'p6']) {
       const arr = vocabPassages[cat]?.[level] || [];

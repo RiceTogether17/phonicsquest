@@ -125,7 +125,7 @@ function _isAffixMode(passage) {
 }
 
 function _isGrammarGuidanceCategory() {
-  return ['grammaticalRole', 'connectorClue', 'grammarPrepositions', 'grammarArticles', 'grammarSVA'].includes(_currentCat);
+  return ['grammaticalRole', 'connectorClue'].includes(_currentCat);
 }
 
 function _getActiveBlankIndex() {

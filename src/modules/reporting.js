@@ -21,9 +21,6 @@ const LO_CODE_MAP = {
   passiveVoice: 'LO-ENG-GR-09',
   reportedSpeech: 'LO-ENG-GR-10',
   relativeClauses: 'LO-ENG-GR-11',
-  grammarArticles: 'LO-ENG-GR-01',
-  grammarPrepositions: 'LO-ENG-GR-02',
-  grammarSVA: 'LO-ENG-GR-05',
   tenses: 'LO-ENG-GR-06',
   modals: 'LO-ENG-GR-07',
   morphologicalAffix: 'LO-ENG-VOC-04',
@@ -33,9 +30,6 @@ const LO_CODE_MAP = {
 
 const PRIORITY_WEIGHTS = {
   // MOE/PSLE-heavy grammar focus
-  grammarArticles: 1.25,
-  grammarPrepositions: 1.3,
-  grammarSVA: 1.35,
   pronouns: 1.25,
   connectorClue: 1.2,
   conditionals: 1.2,
