@@ -27,6 +27,11 @@ import {
   getRecentPatternInsights,
   getMoeOutcomeMappings,
 } from '../modules/dashboardInsights.js';
+import {
+  getVocabularyCategoryReport,
+  getGrammarCategoryReport,
+  getLatestQuestScoreboards,
+} from '../modules/reporting.js';
 
 Chart.register(...registerables);
 
@@ -62,6 +67,7 @@ export function renderDashboard(container, opts = {}) {
     <!-- B5: Recent Pattern Insights -->
     <div id="dash-patterns-section"></div>
 
+    <div id="dash-reporting-section"></div>
     <div id="dash-moe-section"></div>
     <div id="dash-class-section"></div>
 
@@ -148,6 +154,7 @@ export function renderDashboard(container, opts = {}) {
   _renderLiteracyDomains();
   _renderClueInsights();
   _renderPatternInsights();
+  _renderCategoryReporting();
   _renderMoeOutcomes();
   _renderClassManagement();
 
@@ -158,6 +165,53 @@ export function renderDashboard(container, opts = {}) {
   _renderWordHistory(stats);
   _renderBadges();
   _bindActions();
+}
+
+
+function _renderCategoryReporting() {
+  const container = document.getElementById('dash-reporting-section');
+  if (!container) return;
+
+  const vocabRows = getVocabularyCategoryReport()
+    .sort((a, b) => a.accuracy - b.accuracy)
+    .slice(0, 8);
+  const grammarRows = getGrammarCategoryReport()
+    .sort((a, b) => a.accuracy - b.accuracy)
+    .slice(0, 8);
+  const scoreboards = getLatestQuestScoreboards();
+
+  const rowHtml = (rows) => rows.map(r => {
+    const pct = Math.round((r.accuracy || 0) * 100);
+    const cluePct = Math.round((r.clueSuccess || 0) * 100);
+    return `<div class="dash-category-row" title="${r.tooltip}">
+      <div class="dash-category-head">
+        <span><strong>${r.label}</strong> <small>(${r.loCode})</small></span>
+        <span>${pct}%</span>
+      </div>
+      <div class="dash-mini-track"><div class="dash-mini-fill" style="width:${pct}%"></div></div>
+      <div class="dash-category-meta">Attempts: ${r.attempts} · Clue success: ${cluePct}% · <a href="${r.syllabusLink}" target="_blank" rel="noreferrer">MOE syllabus</a></div>
+    </div>`;
+  }).join('');
+
+  const scoreHtml = scoreboards.map(s => {
+    const pct = Math.round((s.accuracy || 0) * 100);
+    return `<div class="dash-scoreboard-chip"><strong>${s.quest}</strong><br>${s.correct}/${s.total} · ${pct}%</div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <h3 class="dash-section-title" style="margin-top:24px">Quest Category Reporting</h3>
+    <div class="dash-pattern-list" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="dash-pattern-item">
+        <strong>Vocabulary categories</strong>
+        ${rowHtml(vocabRows)}
+      </div>
+      <div class="dash-pattern-item">
+        <strong>Grammar categories</strong>
+        ${rowHtml(grammarRows)}
+      </div>
+    </div>
+    <div class="dash-actions" style="justify-content:flex-start;gap:8px;margin-top:10px;">${scoreHtml}</div>
+  `;
 }
 
 function _renderMoeOutcomes() {

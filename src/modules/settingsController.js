@@ -108,6 +108,37 @@ export const settingsController = {
       document.documentElement.style.fontSize = `${val}%`;
     });
 
+
+    document.getElementById('dyslexia-font-toggle')?.addEventListener('change', (e) => {
+      const checked = /** @type {HTMLInputElement} */ (e.target).checked;
+      store.set('dyslexiaFontEnabled', checked);
+      if (checked) {
+        this.applyTheme('dyslexia');
+        store.set('theme', 'dyslexia');
+      } else if (store.get('theme') === 'dyslexia') {
+        this.applyTheme('default');
+        store.set('theme', 'default');
+      }
+    });
+
+    document.getElementById('high-contrast-toggle')?.addEventListener('change', (e) => {
+      const checked = /** @type {HTMLInputElement} */ (e.target).checked;
+      store.set('highContrastEnabled', checked);
+      document.documentElement.setAttribute('data-high-contrast', checked ? 'true' : 'false');
+      if (checked) {
+        this.applyTheme('contrast');
+        store.set('theme', 'contrast');
+      }
+    });
+
+    document.getElementById('bank-chip-scale')?.addEventListener('input', (e) => {
+      const val = parseInt(/** @type {HTMLInputElement} */ (e.target).value, 10);
+      store.set('bankChipScale', val);
+      const display = document.getElementById('bank-chip-scale-display');
+      if (display) display.textContent = `${val}%`;
+      document.documentElement.style.setProperty('--bank-chip-scale', `${val / 100}`);
+    });
+
     document.getElementById('bilingual-toggle')?.addEventListener('change', (e) => {
       const checked = /** @type {HTMLInputElement} */ (e.target).checked;
       store.set('bilingualInstructions', checked);
@@ -173,6 +204,22 @@ export const settingsController = {
     const fontScaleDisplay = document.getElementById('font-size-scale-display');
     if (fontScaleDisplay) fontScaleDisplay.textContent = `${fontScale}%`;
     document.documentElement.style.fontSize = `${fontScale}%`;
+
+    const dyslexia = !!store.get('dyslexiaFontEnabled') || store.get('theme') === 'dyslexia';
+    const dyslexiaToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('dyslexia-font-toggle'));
+    if (dyslexiaToggle) dyslexiaToggle.checked = dyslexia;
+
+    const highContrast = !!store.get('highContrastEnabled') || store.get('theme') === 'contrast';
+    const highContrastToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('high-contrast-toggle'));
+    if (highContrastToggle) highContrastToggle.checked = highContrast;
+    document.documentElement.setAttribute('data-high-contrast', highContrast ? 'true' : 'false');
+
+    const chipScale = Number(store.get('bankChipScale') || 100);
+    const chipScaleEl = /** @type {HTMLInputElement|null} */ (document.getElementById('bank-chip-scale'));
+    if (chipScaleEl) chipScaleEl.value = String(chipScale);
+    const chipScaleDisplay = document.getElementById('bank-chip-scale-display');
+    if (chipScaleDisplay) chipScaleDisplay.textContent = `${chipScale}%`;
+    document.documentElement.style.setProperty('--bank-chip-scale', `${chipScale / 100}`);
 
     const bilingual = !!store.get('bilingualInstructions');
     const bilingualToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('bilingual-toggle'));

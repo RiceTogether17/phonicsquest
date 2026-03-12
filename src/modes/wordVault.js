@@ -54,6 +54,8 @@ let _blankFills    = [];     // null | bankWordId per blank
 let _passage       = null;   // current passage object
 let _sessionCorrect = 0;
 let _sessionTotal   = 0;
+let _sessionBlankCorrect = 0;
+let _sessionBlankTotal = 0;
 let _keyHandler     = null;
 
 // ── Clue-mode state ────────────────────────────────────────────────────────
@@ -201,7 +203,8 @@ function _initPassage(passage) {
   _weakAttempts     = 0;
 
   if (passage.clues && passage.clues.length > 0) {
-    _activeBlankIndex = passage.clues[0].blankIndex;
+    const firstClue = [...passage.clues].sort((a, b) => a.blankIndex - b.blankIndex)[0];
+    _activeBlankIndex = firstClue?.blankIndex ?? -1;
     _bankLocked       = true;
   } else {
     _activeBlankIndex = -1;
@@ -297,6 +300,7 @@ function _buildClueHuntPanel(passage) {
       <div class="clue-hunt-feedback" id="clue-hunt-feedback" aria-live="polite"></div>
       <div class="clue-hint-row">
         <button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-hint-btn" aria-label="Get a hint">💡 Hint</button>
+        <button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-skip-btn" aria-label="Skip clue">Skip clue</button>
         <span class="clue-hint-msg" id="clue-hint-msg"></span>
       </div>
     </div>`;
@@ -315,7 +319,16 @@ function _attachClueHuntListeners(passage) {
       hintMsg.textContent = message;
       hintMsg.className = 'clue-hint-msg clue-hint-msg--visible';
     }
-    if (_hintLevel >= 4) _unlockBankAfterClue(passage, null);
+    if (_hintLevel >= 4) {
+      _clueResults[_activeBlankIndex] = 'weak';
+      _unlockBankAfterClue(passage, 'weak');
+    }
+  });
+
+  document.getElementById('clue-skip-btn')?.addEventListener('click', () => {
+    if (_activeBlankIndex < 0) return;
+    _clueResults[_activeBlankIndex] = 'weak';
+    _unlockBankAfterClue(passage, 'weak');
   });
 }
 
@@ -374,7 +387,8 @@ function _unlockBankAfterClue(passage, result) {
   if (!_bankLocked) return;
 
   _bankLocked = false;
-  _sessionClueScore += clueResultToScore(result);
+  _activeBlankIndex = -1;
+  _sessionClueScore += clueResultToScore(result || 'weak');
 
   const instr = document.getElementById('wv-instruction');
   if (instr) instr.textContent = '🔑 Now tap a word to fill the blank!';
@@ -445,10 +459,12 @@ function _renderBank(passage) {
       if (!fillNextBlank(_bankWords, _blankFills, id)) return;
       audio.playSfx('pop');
 
-      const filledCount = _blankFills.filter(f => f !== null).length;
-      const nextClue = _getClueDataForBlank(passage, filledCount);
+      const nextClue = (passage.clues || [])
+        .slice()
+        .sort((a, b) => a.blankIndex - b.blankIndex)
+        .find(c => _blankFills[c.blankIndex] === null && !_clueResults.hasOwnProperty(c.blankIndex));
 
-      if (nextClue && !_clueResults.hasOwnProperty(filledCount)) {
+      if (nextClue) {
         _activeBlankIndex = nextClue.blankIndex;
         _bankLocked       = true;
         _hintLevel        = 0;
@@ -483,7 +499,9 @@ function _checkPassage(passage) {
   }
 
   const userAnswers = buildUserAnswers(_blankFills, _bankWords);
-  const allCorrect  = userAnswers.every((ans, i) => ans === passage.answers[i]);
+  const blankCorrect = userAnswers.filter((ans, i) => ans === passage.answers[i]).length;
+  const blankTotal = passage.answers.length;
+  const allCorrect  = blankCorrect === blankTotal;
 
   _sessionTotal++;
 
@@ -510,11 +528,14 @@ function _checkPassage(passage) {
 
     document.querySelectorAll('.wv-blank--filled').forEach(b => b.classList.add('wv-blank--correct'));
 
+    _sessionBlankCorrect = blankCorrect;
+    _sessionBlankTotal = blankTotal;
+
     if (passage.clues && passage.clues.length > 0) {
-      _showClueExplanation(passage, () => setTimeout(() => _showComplete(), 600));
+      _showClueExplanation(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 600));
     } else {
       _showFeedback('✅ Brilliant! All correct!', true);
-      setTimeout(() => _showComplete(), 1800);
+      setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 1800);
     }
   } else {
     audio.playSfx('wrong');
@@ -594,7 +615,7 @@ function _showFeedback(msg, success) {
 
 // ── Complete screen ────────────────────────────────────────────────────────
 
-function _showComplete() {
+function _showComplete(summary = {}) {
   if (!_container) return;
 
   const meta  = VOCAB_CATEGORIES[_currentCat];
@@ -605,7 +626,9 @@ function _showComplete() {
   audio.playSfx('levelUp');
   mascot.celebrate(true);
 
-  const acc   = _sessionTotal > 0 ? Math.round((_sessionCorrect / _sessionTotal) * 100) : 100;
+  const totalBlanks = summary.blankTotal ?? _sessionBlankTotal ?? _passage?.answers?.length ?? 0;
+  const correctBlanks = summary.blankCorrect ?? _sessionBlankCorrect ?? 0;
+  const acc   = totalBlanks > 0 ? Math.round((correctBlanks / totalBlanks) * 100) : 0;
   const stars = acc >= 90 ? 3 : acc >= 70 ? 2 : 1;
 
   const clueTotal = Object.keys(_clueResults).length;
@@ -617,12 +640,12 @@ function _showComplete() {
     : '';
 
   _container.innerHTML = `
-    <div class="wv-complete">
+    <div class="wv-summary-overlay"><div class="wv-complete">
       <div class="wv-complete-icon">${meta.icon}</div>
       <h3 class="wv-complete-title">Vault Opened! 🔑</h3>
       <p class="wv-complete-sub">${meta.label} · ${LEVEL_LABELS[_currentLevel]}</p>
       <div class="wv-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
-      <p class="wv-complete-score">${_sessionCorrect} / ${_sessionTotal} correct · ${acc}%</p>
+      <p class="wv-complete-score">Blanks: ${correctBlanks} / ${totalBlanks} correct · ${acc}%</p>
       ${clueAccLine}
       <div class="wv-complete-actions">
         ${nextLv
@@ -632,7 +655,7 @@ function _showComplete() {
         <button class="btn btn--ghost btn--sm" id="wv-back-lvls">All Levels</button>
         <button class="btn btn--ghost btn--sm" id="wv-back-cats2">Categories</button>
       </div>
-    </div>`;
+    </div></div>`;
 
   document.getElementById('wv-next-level')?.addEventListener('click', () => {
     _currentLevel = nextLv;

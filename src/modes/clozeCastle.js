@@ -21,6 +21,7 @@ import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 import { gamification } from '../modules/gamification.js';
 import { questMastery } from '../modules/questMastery.js';
+import { progress } from '../modules/progress.js';
 import {
   buildUserAnswers,
   clearClozeRound,
@@ -141,7 +142,8 @@ function _renderCategoryPicker(level) {
   html += `<p class="cloze-cat-subtitle">Choose a grammar topic:</p>`;
   html += '<div class="cloze-cat-grid">';
 
-  const recommendedCat = questMastery.getRecommendedSkill('clozeCastle', cats);
+  const recommendedCat = progress.getRecommendedGrammarCategory(level, cats)
+    || questMastery.getRecommendedSkill('clozeCastle', cats);
 
   for (const catKey of cats) {
     const cat   = GRAMMAR_CATEGORIES[catKey] || { label: catKey, icon: '📝' };
@@ -231,7 +233,8 @@ function _initPassage(passage) {
   // Determine starting mode
   if (passage.clues && passage.clues.length > 0) {
     // Start with the first blank's clue hunt
-    _activeBlankIndex = passage.clues[0].blankIndex;
+    const firstClue = [...passage.clues].sort((a, b) => a.blankIndex - b.blankIndex)[0];
+    _activeBlankIndex = firstClue?.blankIndex ?? -1;
     _bankLocked       = true;
   } else {
     _activeBlankIndex = -1;
@@ -345,6 +348,7 @@ function _buildClueHuntPanel(passage) {
       <div class="clue-hunt-feedback" id="clue-hunt-feedback" aria-live="polite"></div>
       <div class="clue-hint-row">
         <button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-hint-btn" aria-label="Get a hint">💡 Hint</button>
+        <button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-skip-btn" aria-label="Skip clue">Skip clue</button>
         <span class="clue-hint-msg" id="clue-hint-msg"></span>
       </div>
     </div>`;
@@ -364,8 +368,16 @@ function _attachClueHuntListeners(passage) {
       hintMsg.textContent = message;
       hintMsg.className = 'clue-hint-msg clue-hint-msg--visible';
     }
-    // At hint level 4 (reveal), also auto-unlock if weak attempts exhausted
-    if (_hintLevel >= 4) _unlockBankAfterClue(passage, null);
+    if (_hintLevel >= 4) {
+      _clueResults[_activeBlankIndex] = 'weak';
+      _unlockBankAfterClue(passage, 'weak');
+    }
+  });
+
+  document.getElementById('clue-skip-btn')?.addEventListener('click', () => {
+    if (_activeBlankIndex < 0) return;
+    _clueResults[_activeBlankIndex] = 'weak';
+    _unlockBankAfterClue(passage, 'weak');
   });
 }
 
@@ -428,6 +440,7 @@ function _unlockBankAfterClue(passage, result) {
   if (!_bankLocked) return; // already unlocked
 
   _bankLocked = false;
+  _activeBlankIndex = -1;
 
   // Accumulate clue score
   _sessionClueScore += clueResultToScore(result);
@@ -512,16 +525,18 @@ function _renderBankWords(passage) {
       if (!fillNextBlank(_bankWords, _blankFills, id)) return;
       audio.playSfx('pop');
 
-      // After filling a blank, check if the NEXT blank has clue data
-      const filledCount = _blankFills.filter(f => f !== null).length;
-      const nextClue = _getClueDataForBlank(passage, filledCount);
+      // After filling a blank, activate clue-hunt for the next unfilled clue target.
+      const nextClue = (passage.clues || [])
+        .slice()
+        .sort((a, b) => a.blankIndex - b.blankIndex)
+        .find(c => _blankFills[c.blankIndex] === null && !_clueResults.hasOwnProperty(c.blankIndex));
 
-      if (nextClue && !_clueResults.hasOwnProperty(filledCount)) {
-        // Lock bank again for next blank's clue hunt
+      if (nextClue) {
         _activeBlankIndex = nextClue.blankIndex;
         _bankLocked       = true;
         _hintLevel        = 0;
         _weakAttempts     = 0;
+        console.info('[ClozeCastle] Activating next clue target', { blankIndex: _activeBlankIndex, passageId: passage.id });
         _renderPassage(passage);
       } else {
         _renderPassageText(passage);
@@ -563,6 +578,7 @@ function _checkPassage(passage) {
     level: _currentLevel,
   });
   questMastery.updateSkill('clozeCastle', skillKey, allCorrect);
+  progress.recordGrammarCategoryAttempt(_currentLevel, skillKey, allCorrect);
 
   _sessionTotal++;
 
@@ -620,46 +636,40 @@ function _checkPassage(passage) {
 function _showClueExplanation(passage, onContinue) {
   if (!_container) return;
 
-  // Find the primary clue explanation (first blank's clue)
-  const primaryClue = passage.clues[0];
-  const clueSpan    = (primaryClue.acceptableSpans || [])[0] || '';
-  const playerResult = _clueResults[primaryClue.blankIndex] || 'weak';
-  const { cssClass } = clueResultFeedback(playerResult);
-
-  // Overlay the feedback on top of the current game
   const existing = document.getElementById('cloze-explanation-overlay');
   if (existing) existing.remove();
 
+  const lines = passage.answers.map((answer, idx) => {
+    const clue = (passage.clues || []).find(c => c.blankIndex === idx);
+    const result = _clueResults[idx] || 'weak';
+    const feedback = clueResultFeedback(result);
+    const score = clueResultToScore(result);
+    const selected = clue?.acceptableSpans?.[0] || 'Skipped / no clue';
+    const note = passage.grammarNotes?.[idx] || clue?.explanation || `"${answer}" is the best fit for the sentence meaning and grammar.`;
+
+    return `
+      <div class="clue-explanation-item">
+        <p><strong>Blank ${idx + 1}:</strong> ${answer}</p>
+        <p>Clue chosen: <span class="clue-result-badge ${feedback.cssClass}">${selected}</span> · Score ${Math.round(score * 100)}%</p>
+        <p class="clue-explanation-text">${note}</p>
+      </div>`;
+  }).join('');
+
   const overlay = document.createElement('div');
-  overlay.id        = 'cloze-explanation-overlay';
+  overlay.id = 'cloze-explanation-overlay';
   overlay.className = 'clue-explanation-overlay';
   overlay.innerHTML = `
     <div class="clue-explanation-card">
-      <p class="clue-explanation-title">✅ Excellent! All correct!</p>
-      <div class="clue-explanation-body">
-        <p class="clue-explanation-label">Clue you found:</p>
-        <span class="clue-result-badge ${cssClass}">${clueSpan || 'No clue selected'}</span>
-        <p class="clue-explanation-text">${primaryClue.explanation}</p>
-      </div>
+      <p class="clue-explanation-title">✅ Grammar Review</p>
+      <div class="clue-explanation-body">${lines}</div>
       <button class="btn btn--primary" id="clue-explanation-next">Next →</button>
     </div>`;
 
   _container.querySelector('.cloze-game')?.appendChild(overlay);
-
-  audio.playSfx('correct');
-
   document.getElementById('clue-explanation-next')?.addEventListener('click', () => {
     overlay.remove();
     onContinue();
   });
-
-  // Auto-advance after 4 seconds
-  setTimeout(() => {
-    if (document.getElementById('cloze-explanation-overlay')) {
-      overlay.remove();
-      onContinue();
-    }
-  }, 4000);
 }
 
 // ── Feedback helper ────────────────────────────────────────────────────────
