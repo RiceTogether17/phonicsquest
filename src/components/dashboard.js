@@ -287,6 +287,7 @@ function _renderLearnerSummary() {
   if (!container) return;
 
   const s = getLearnerSummary();
+  const accent = store.get('speechLocale') || 'en-SG';
 
   container.innerHTML = `
     <div class="dash-learner-summary">
@@ -307,6 +308,10 @@ function _renderLearnerSummary() {
         <div class="dash-learner-stat">
           <span class="dash-learner-stat-label">Current focus</span>
           <span class="dash-learner-stat-value">${s.currentFocus}</span>
+        </div>
+        <div class="dash-learner-stat">
+          <span class="dash-learner-stat-label">Speech accent</span>
+          <span class="dash-learner-stat-value">${accent}</span>
         </div>
       </div>
     </div>`;

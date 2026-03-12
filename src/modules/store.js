@@ -31,6 +31,7 @@ const DEFAULT_STATE = {
   reducedMotion:  false,    // manual override for prefers-reduced-motion
   speechEnabled:  true,
   speechLocale:   'en-SG',
+  speechThreshold: 0.75,
   fontScale:      100,
   bilingualInstructions: false,
   dyslexiaFontEnabled: false,

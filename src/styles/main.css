@@ -5613,3 +5613,9 @@ input, select, textarea { font-family: inherit; }
   border-width: 3px;
   box-shadow: 0 0 0 2px #000;
 }
+
+
+.settings-help {
+  font-size: .85rem;
+  opacity: .8;
+}

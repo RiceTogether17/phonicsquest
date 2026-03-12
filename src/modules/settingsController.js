@@ -69,6 +69,20 @@ export const settingsController = {
       if (display) display.textContent = `${val}×`;
     });
 
+
+    document.getElementById('speech-sensitivity')?.addEventListener('input', (e) => {
+      const pct = parseInt(/** @type {HTMLInputElement} */ (e.target).value, 10);
+      const threshold = Math.max(0.6, Math.min(0.95, pct / 100));
+      store.set('speechThreshold', threshold);
+      const display = document.getElementById('speech-sensitivity-display');
+      if (display) display.textContent = `${Math.round(threshold * 100)}%`;
+    });
+
+    document.getElementById('speech-accent-select')?.addEventListener('change', (e) => {
+      const locale = /** @type {HTMLSelectElement} */ (e.target).value;
+      store.set('speechLocale', locale);
+    });
+
     // ── Difficulty buttons ──────────────────────────────────────────────────
     document.querySelectorAll('.diff-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -174,6 +188,15 @@ export const settingsController = {
     if (speed) speed.value = store.get('voiceSpeed');
     const speedDisplay = document.getElementById('voice-speed-display');
     if (speedDisplay) speedDisplay.textContent = `${store.get('voiceSpeed')}×`;
+
+    const speechThreshold = Number(store.get('speechThreshold') ?? 0.75);
+    const sensitivity = /** @type {HTMLInputElement|null} */ (document.getElementById('speech-sensitivity'));
+    if (sensitivity) sensitivity.value = String(Math.round(speechThreshold * 100));
+    const sensitivityDisplay = document.getElementById('speech-sensitivity-display');
+    if (sensitivityDisplay) sensitivityDisplay.textContent = `${Math.round(speechThreshold * 100)}%`;
+
+    const speechAccent = /** @type {HTMLSelectElement|null} */ (document.getElementById('speech-accent-select'));
+    if (speechAccent) speechAccent.value = store.get('speechLocale') || 'en-SG';
 
     const diff = store.get('difficulty') || 1;
     document.querySelectorAll('.diff-btn').forEach(b => {
