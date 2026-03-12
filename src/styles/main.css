@@ -4604,6 +4604,16 @@ input, select, textarea { font-family: inherit; }
 .wv-feedback--error   { background: var(--color-error-light);   color: var(--color-error);   }
 
 /* Complete screen */
+.wv-summary-overlay {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+  border: 2px solid var(--border);
+  background: radial-gradient(circle at top, #ecfeff 0%, var(--surface) 55%);
+  box-shadow: var(--shadow-lg);
+}
+
 .wv-complete {
   display: flex;
   flex-direction: column;
