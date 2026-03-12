@@ -7,6 +7,15 @@
 
 import { store } from './store.js';
 
+export function buildSpeechLocales(preferredLocale = 'en-SG') {
+  return [...new Set([preferredLocale, 'en-SG', 'en-GB', 'en-AU', 'en-IN', 'en-US'])];
+}
+
+export function calculateCalibrationThreshold(avgScore) {
+  const raw = Number(avgScore) * 0.9;
+  return Math.max(0.5, Math.min(0.95, Number.isFinite(raw) ? raw : 0.75));
+}
+
 class SpeechRecognizer {
   constructor() {
     /** @type {SpeechRecognition|null} */
@@ -18,7 +27,7 @@ class SpeechRecognizer {
   /**
    * Start listening and return a scored result.
    * @param {string} targetWord  the word the child should say
-   * @returns {Promise<{ heard: string, score: number, correct: boolean, confidence?: number } | null>}
+   * @returns {Promise<{ heard: string, score: number, rawScore: number, correct: boolean, confidence?: number, localesTried?: string[] } | null>}
    *   null if cancelled or not supported
    */
   listen(targetWord) {
@@ -28,7 +37,8 @@ class SpeechRecognizer {
     return new Promise((resolve) => {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       const preferredLocale = store.get('speechLocale') || 'en-SG';
-      const locales = [...new Set([preferredLocale, 'en-SG', 'en-US'])];
+      const locales = buildSpeechLocales(preferredLocale);
+      const threshold = Number(store.get('speechThreshold') ?? 0.75);
       let localeIndex = 0;
 
       const startRecognition = () => {
@@ -43,7 +53,7 @@ class SpeechRecognizer {
         const timeout = setTimeout(() => {
           this.stop();
           resolve(null);
-        }, 8000); // 8-second timeout
+        }, 8000);
 
         this._recognition.onresult = (event) => {
           clearTimeout(timeout);
@@ -67,9 +77,11 @@ class SpeechRecognizer {
           this._listening = false;
           resolve({
             heard: bestMatch.text,
+            rawScore: bestMatch.score,
             score: Math.round(bestMatch.score * 100),
-            correct: exactMatch || bestMatch.score >= 0.75,
+            correct: exactMatch || bestMatch.score >= threshold,
             confidence: bestMatch.confidence,
+            localesTried: locales.slice(0, localeIndex + 1),
           });
         };
 
@@ -123,6 +135,42 @@ class SpeechRecognizer {
     return this._listening;
   }
 
+  _doubleMetaphoneCode(word) {
+    const w = (word || '').toLowerCase().replace(/[^a-z]/g, '');
+    if (!w) return '';
+
+    let s = w
+      .replace(/^kn/, 'n')
+      .replace(/^gn/, 'n')
+      .replace(/^wr/, 'r')
+      .replace(/^wh/, 'w')
+      .replace(/ph/g, 'f')
+      .replace(/ght/g, 't')
+      .replace(/dg(e|i|y)/g, 'j')
+      .replace(/tch/g, 'ch')
+      .replace(/sch/g, 'sk')
+      .replace(/sh/g, 'x')
+      .replace(/ch/g, 'x')
+      .replace(/th/g, '0')
+      .replace(/ck/g, 'k')
+      .replace(/qu/g, 'k')
+      .replace(/x/g, 'ks');
+
+    s = s.replace(/[aeiou]+/g, 'a');
+    s = s.replace(/(.)\1+/g, '$1');
+    s = s.replace(/[^a-z0]/g, '');
+    return s.slice(0, 6);
+  }
+
+  _doubleMetaphoneSimilarity(a, b) {
+    const ca = this._doubleMetaphoneCode(a);
+    const cb = this._doubleMetaphoneCode(b);
+    if (!ca || !cb) return 0;
+    if (ca === cb) return 1;
+    if (ca.slice(0, 2) && ca.slice(0, 2) === cb.slice(0, 2)) return 0.8;
+    return 0;
+  }
+
   _phoneticSimilarity(a, b) {
     if (a === b) return 1;
 
@@ -144,7 +192,9 @@ class SpeechRecognizer {
 
     const dist = this._levenshtein(na, nb);
     const maxLen = Math.max(na.length, nb.length, 1);
-    return 1 - (dist / maxLen);
+    const lev = 1 - (dist / maxLen);
+    const metaphone = this._doubleMetaphoneSimilarity(na, nb);
+    return (0.7 * lev) + (0.3 * metaphone);
   }
 
   _levenshtein(a, b) {
