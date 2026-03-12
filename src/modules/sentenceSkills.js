@@ -21,6 +21,7 @@ export const SENTENCE_SKILL_LABELS = {
   clause_boundary:     'Clause Boundary',
   inversion_pattern:   'Inversion',
   comparison_structure:'Comparisons',
+  preposition_clue:    'Prepositions',
 };
 
 /**
@@ -74,6 +75,12 @@ export function getSkillCluePrompt(entry) {
     return {
       prompt: 'This sentence uses a comparison. Find the pattern: adj + -er + than.',
       detail: entry.grammarNote || '',
+    };
+  }
+  if (skills.includes('preposition_clue')) {
+    return {
+      prompt: 'Find the preposition phrase. Which word shows position, time, or direction?',
+      detail: entry.grammarNote || 'Prepositions like in/on/under/between link nouns to place and time.',
     };
   }
   if (skills.includes('inversion_pattern')) {
@@ -157,6 +164,10 @@ export function diagnoseBuildError(entry, builtWords, correctWords) {
 
   if (skills.includes('comparison_structure')) {
     return entry.grammarNote || 'Check the comparative structure: adjective + -er + than.';
+  }
+
+  if (skills.includes('preposition_clue')) {
+    return entry.grammarNote || 'Check where the preposition phrase should go in the sentence.';
   }
 
   if (skills.includes('first_word_clue') && entry.firstWordHint) {
