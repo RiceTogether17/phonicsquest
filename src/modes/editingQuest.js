@@ -10,8 +10,38 @@ let _level = 1;
 let _idx = 0;
 let _list = [];
 let _errorIndex = 0;
-let _grammarCorrect = 0;
-let _spellingCorrect = 0;
+let _passageStats = _newPassageStats();
+let _sessionStats = _newSessionStats();
+let _attemptState = _newAttemptState();
+
+function _newPassageStats() {
+  return {
+    grammarCorrect: 0,
+    spellingCorrect: 0,
+    firstTryCorrect: 0,
+    totalAttempts: 0,
+  };
+}
+
+function _newSessionStats() {
+  return {
+    passagesCompleted: 0,
+    errorsAttempted: 0,
+    errorsCorrect: 0,
+    firstTryCorrect: 0,
+    hintsUsed: 0,
+    revealsUsed: 0,
+    accuracyByType: { grammar: { correct: 0, total: 0 }, spelling: { correct: 0, total: 0 } },
+  };
+}
+
+function _newAttemptState() {
+  return {
+    selectedType: null,
+    tries: 0,
+    hinted: false,
+  };
+}
 
 export function initEditingQuest(container, onGoHome) {
   _container = container;
@@ -41,16 +71,27 @@ export function showEditingBrowser() {
 
 function _startLevel(level) {
   _level = level;
-  _list = [...(editingPassages[level] || [])];
+  _sessionStats = _newSessionStats();
+  _list = _prioritisePassages(editingPassages[level] || []);
   _idx = 0;
   _renderCurrentPassage();
+}
+
+function _prioritisePassages(passages) {
+  const scored = passages.map((item) => {
+    const weaknesses = item.errors.reduce((sum, error) => {
+      const mastery = questMastery.getMastery?.('editingQuest', error.rule || error.type) ?? 0.5;
+      return sum + (1 - mastery);
+    }, 0);
+    return { item, score: weaknesses / Math.max(item.errors.length, 1) };
+  });
+  return scored.sort((a, b) => b.score - a.score).map(s => s.item);
 }
 
 function _renderCurrentPassage() {
   if (_idx >= _list.length) return _renderComplete();
   _errorIndex = 0;
-  _grammarCorrect = 0;
-  _spellingCorrect = 0;
+  _passageStats = _newPassageStats();
   _renderErrorStep();
 }
 
@@ -62,6 +103,7 @@ function _renderErrorStep() {
     return;
   }
 
+  _attemptState = _newAttemptState();
   const totalErrors = item.errors.length;
   const progressPct = Math.round(((_errorIndex + 1) / totalErrors) * 100);
 
@@ -90,6 +132,8 @@ function _renderErrorStep() {
         <input id="eq-correction-input" class="cp-name-input" placeholder="Type corrected word/phrase" />
         <div class="sfq-actions" style="margin-top:8px">
           <button class="btn btn--primary" id="eq-submit-correction">Submit correction</button>
+          <button class="btn btn--ghost btn--sm" id="eq-hint">Hint</button>
+          <button class="btn btn--ghost btn--sm" id="eq-reveal">Reveal</button>
         </div>
       </div>
 
@@ -113,11 +157,10 @@ function _renderErrorStep() {
 
   const typeButtons = Array.from(document.querySelectorAll('#eq-type-bank .sfq-word-chip'));
   const correctionWrap = document.getElementById('eq-correction-wrap');
-  let selectedType = null;
 
   typeButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      selectedType = btn.dataset.type;
+      _attemptState.selectedType = btn.dataset.type;
       typeButtons.forEach(b => b.classList.toggle('sfq-word-chip--used', b === btn));
       if (correctionWrap) correctionWrap.hidden = false;
     });
@@ -125,7 +168,29 @@ function _renderErrorStep() {
 
   document.getElementById('eq-submit-correction')?.addEventListener('click', () => {
     const typed = /** @type {HTMLInputElement|null} */ (document.getElementById('eq-correction-input'))?.value?.trim() || '';
-    _submitError(item, error, selectedType, typed);
+    _submitError(item, error, _attemptState.selectedType, typed);
+  });
+
+  document.getElementById('eq-hint')?.addEventListener('click', () => {
+    if (_attemptState.hinted) return;
+    _attemptState.hinted = true;
+    _sessionStats.hintsUsed++;
+    const fb = document.getElementById('eq-feedback');
+    if (!fb) return;
+    fb.hidden = false;
+    fb.className = 'sfq-feedback';
+    const firstLetter = error.correction?.[0] || '';
+    fb.textContent = `Hint: this is a ${error.type} item. Correct answer starts with "${firstLetter}".`;
+  });
+
+  document.getElementById('eq-reveal')?.addEventListener('click', () => {
+    _sessionStats.revealsUsed++;
+    _showFeedback(`🧩 Reveal: ${error.correction}. ${error.explanation}`, false);
+    _registerAttempt(error, false, true);
+    setTimeout(() => {
+      _errorIndex++;
+      _renderErrorStep();
+    }, 900);
   });
 
   document.getElementById('eq-quit')?.addEventListener('click', () => {
@@ -134,14 +199,46 @@ function _renderErrorStep() {
   });
 }
 
-function _submitError(item, error, selectedType, typedCorrection) {
+function _showFeedback(message, success) {
   const fb = document.getElementById('eq-feedback');
-  if (!selectedType || !typedCorrection) {
-    if (fb) {
-      fb.hidden = false;
-      fb.className = 'sfq-feedback sfq-feedback--error';
-      fb.textContent = 'Choose error type and enter a correction first.';
+  if (!fb) return;
+  fb.hidden = false;
+  fb.className = `sfq-feedback sfq-feedback--${success ? 'success' : 'error'}`;
+  fb.textContent = message;
+}
+
+function _registerAttempt(error, correct, forcedAdvance = false) {
+  _passageStats.totalAttempts++;
+  _sessionStats.errorsAttempted++;
+  _sessionStats.accuracyByType[error.type].total++;
+
+  if (correct) {
+    _sessionStats.errorsCorrect++;
+    _sessionStats.accuracyByType[error.type].correct++;
+    if (_attemptState.tries === 0) {
+      _passageStats.firstTryCorrect++;
+      _sessionStats.firstTryCorrect++;
     }
+    if (error.type === 'grammar') _passageStats.grammarCorrect++;
+    if (error.type === 'spelling') _passageStats.spellingCorrect++;
+  }
+
+  questMastery.updateSkill('editingQuest', error.rule || error.type, correct);
+  questMastery.recordAttempt({ quest: 'editingQuest', skill: error.rule || error.type, correct, level: _level });
+
+  store.recordLearningEvent?.({
+    eventType: forcedAdvance ? 'editing_reveal' : 'editing_attempt',
+    quest: 'editingQuest',
+    skill: error.rule || error.type,
+    correct,
+    level: _level,
+    meta: { tries: _attemptState.tries + 1, hinted: _attemptState.hinted, errorType: error.type },
+  });
+}
+
+function _submitError(item, error, selectedType, typedCorrection) {
+  if (!selectedType || !typedCorrection) {
+    _showFeedback('Choose error type and enter a correction first.', false);
     return;
   }
 
@@ -149,47 +246,68 @@ function _submitError(item, error, selectedType, typedCorrection) {
   const typeCorrect = selectedType === error.type;
   const correctionCorrect = accepted.some(a => a.toLowerCase() === typedCorrection.toLowerCase());
   const correct = typeCorrect && correctionCorrect;
+  _attemptState.tries++;
 
-  if (error.type === 'grammar' && correct) _grammarCorrect++;
-  if (error.type === 'spelling' && correct) _spellingCorrect++;
+  _registerAttempt(error, correct);
 
-  questMastery.updateSkill('editingQuest', error.rule || error.type, correct);
-  questMastery.recordAttempt({ quest: 'editingQuest', skill: error.rule || error.type, correct, level: _level });
-
-  if (fb) {
-    fb.hidden = false;
-    fb.className = `sfq-feedback sfq-feedback--${correct ? 'success' : 'error'}`;
-    fb.textContent = correct
-      ? `✅ Correct (${error.type}). ${error.explanation}`
-      : `❌ Not yet. Type: ${error.type}. Correction: ${error.correction}. ${error.explanation}`;
+  if (correct) {
+    _showFeedback(`✅ Correct (${error.type}). ${error.explanation}`, true);
+    audio.playSfx('correct');
+    setTimeout(() => {
+      _errorIndex++;
+      _renderErrorStep();
+    }, 850);
+    return;
   }
 
-  audio.playSfx(correct ? 'correct' : 'wrong');
+  audio.playSfx('wrong');
+  const attemptsLeft = Math.max(0, 2 - _attemptState.tries);
+  if (_attemptState.tries >= 2) {
+    _showFeedback(`❌ Not yet. Correct answer: ${error.correction}. ${error.explanation}`, false);
+    setTimeout(() => {
+      _errorIndex++;
+      _renderErrorStep();
+    }, 1000);
+    return;
+  }
 
-  setTimeout(() => {
-    _errorIndex++;
-    _renderErrorStep();
-  }, 1000);
+  _showFeedback(`❌ Not yet. Type: ${error.type}. Try again (${attemptsLeft} attempt left).`, false);
+
+  const input = /** @type {HTMLInputElement|null} */ (document.getElementById('eq-correction-input'));
+  if (input) input.value = '';
+}
+
+function _calculateStars(accuracy, firstTryRate) {
+  if (accuracy >= 0.9 && firstTryRate >= 0.7) return 3;
+  if (accuracy >= 0.75) return 2;
+  return 1;
 }
 
 function _finishPassage(item) {
   const totalGrammar = item.errors.filter(e => e.type === 'grammar').length;
   const totalSpelling = item.errors.filter(e => e.type === 'spelling').length;
-  const accuracy = (_grammarCorrect + _spellingCorrect) / Math.max(item.errors.length, 1);
-  const xpGain = Math.round((item.xp || 50) * accuracy);
+  const correctTotal = _passageStats.grammarCorrect + _passageStats.spellingCorrect;
+  const accuracy = correctTotal / Math.max(item.errors.length, 1);
+  const firstTryRate = _passageStats.firstTryCorrect / Math.max(item.errors.length, 1);
+  const stars = _calculateStars(accuracy, firstTryRate);
+  const xpGain = Math.round((item.xp || 50) * (0.6 + (accuracy * 0.4)) + (stars - 1) * 6);
 
   const xp = (store.get('xp') || 0) + xpGain;
   const levelInfo = getLevelInfo(xp);
   store.patch({ xp, level: levelInfo.level });
 
+  _sessionStats.passagesCompleted++;
+
   _container.innerHTML = `
     <div class="sfq-game">
-      <h3>✅ Passage complete</h3>
-      <p>Grammar: ${_grammarCorrect}/${totalGrammar} · Spelling: ${_spellingCorrect}/${totalSpelling}</p>
+      <h3>✅ Passage complete ${'⭐'.repeat(stars)}</h3>
+      <p>Grammar: ${_passageStats.grammarCorrect}/${totalGrammar} · Spelling: ${_passageStats.spellingCorrect}/${totalSpelling}</p>
+      <p>First-try accuracy: ${(firstTryRate * 100).toFixed(0)}% · Total attempts: ${_passageStats.totalAttempts}</p>
       <p>XP earned: +${xpGain}</p>
-      <p class="dash-pattern-item">📘 Missed rules are highlighted in feedback above; retry for 80%+ mastery.</p>
+      <p class="dash-pattern-item">📘 Focus next: ${_recommendFocusArea()}.</p>
       <div class="sfq-actions">
         <button class="btn btn--primary" id="eq-next-passage">Next passage →</button>
+        <button class="btn btn--ghost btn--sm" id="eq-retry-passage">Retry passage</button>
       </div>
     </div>`;
 
@@ -197,6 +315,17 @@ function _finishPassage(item) {
     _idx++;
     _renderCurrentPassage();
   });
+  document.getElementById('eq-retry-passage')?.addEventListener('click', () => {
+    _renderCurrentPassage();
+  });
+}
+
+function _recommendFocusArea() {
+  const grammar = _sessionStats.accuracyByType.grammar;
+  const spelling = _sessionStats.accuracyByType.spelling;
+  const grammarRate = grammar.correct / Math.max(grammar.total, 1);
+  const spellingRate = spelling.correct / Math.max(spelling.total, 1);
+  return grammarRate < spellingRate ? 'grammar consistency and tense control' : 'spelling patterns and proofreading';
 }
 
 function _renderComplete() {
@@ -204,14 +333,25 @@ function _renderComplete() {
   completed[_level] = Math.max(completed[_level] || 0, _list.length);
   store.set('editingCompleted', completed);
 
+  const accuracy = _sessionStats.errorsCorrect / Math.max(_sessionStats.errorsAttempted, 1);
+  const firstTryRate = _sessionStats.firstTryCorrect / Math.max(_sessionStats.errorsAttempted, 1);
+  const stars = _calculateStars(accuracy, firstTryRate);
+
   _container.innerHTML = `
     <div class="sfq-game">
-      <h3>🎉 Editing Quest Complete</h3>
-      <p>You completed PSLE-style grammar + spelling editing drills for ${EDITING_LEVELS[_level]}.</p>
-      <button class="btn btn--primary" id="eq-back">Back to Levels</button>
+      <h3>🎉 Editing Quest Complete ${'⭐'.repeat(stars)}</h3>
+      <p>You completed ${_sessionStats.passagesCompleted} passages for ${EDITING_LEVELS[_level]}.</p>
+      <p>Accuracy: ${(accuracy * 100).toFixed(0)}% · First-try: ${(firstTryRate * 100).toFixed(0)}%</p>
+      <p>Hints used: ${_sessionStats.hintsUsed} · Reveals used: ${_sessionStats.revealsUsed}</p>
+      <p class="dash-pattern-item">Next mission: ${_recommendFocusArea()}.</p>
+      <div class="sfq-actions">
+        <button class="btn btn--primary" id="eq-back">Back to Levels</button>
+        <button class="btn btn--ghost btn--sm" id="eq-replay">Replay Level</button>
+      </div>
     </div>`;
 
   document.getElementById('eq-back')?.addEventListener('click', showEditingBrowser);
+  document.getElementById('eq-replay')?.addEventListener('click', () => _startLevel(_level));
 }
 
 export function cleanupEditingQuest() {

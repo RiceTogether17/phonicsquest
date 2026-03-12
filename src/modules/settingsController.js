@@ -69,6 +69,20 @@ export const settingsController = {
       if (display) display.textContent = `${val}×`;
     });
 
+
+    document.getElementById('speech-sensitivity')?.addEventListener('input', (e) => {
+      const pct = parseInt(/** @type {HTMLInputElement} */ (e.target).value, 10);
+      const threshold = Math.max(0.6, Math.min(0.95, pct / 100));
+      store.set('speechThreshold', threshold);
+      const display = document.getElementById('speech-sensitivity-display');
+      if (display) display.textContent = `${Math.round(threshold * 100)}%`;
+    });
+
+    document.getElementById('speech-accent-select')?.addEventListener('change', (e) => {
+      const locale = /** @type {HTMLSelectElement} */ (e.target).value;
+      store.set('speechLocale', locale);
+    });
+
     // ── Difficulty buttons ──────────────────────────────────────────────────
     document.querySelectorAll('.diff-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -108,6 +122,37 @@ export const settingsController = {
       document.documentElement.style.fontSize = `${val}%`;
     });
 
+
+    document.getElementById('dyslexia-font-toggle')?.addEventListener('change', (e) => {
+      const checked = /** @type {HTMLInputElement} */ (e.target).checked;
+      store.set('dyslexiaFontEnabled', checked);
+      if (checked) {
+        this.applyTheme('dyslexia');
+        store.set('theme', 'dyslexia');
+      } else if (store.get('theme') === 'dyslexia') {
+        this.applyTheme('default');
+        store.set('theme', 'default');
+      }
+    });
+
+    document.getElementById('high-contrast-toggle')?.addEventListener('change', (e) => {
+      const checked = /** @type {HTMLInputElement} */ (e.target).checked;
+      store.set('highContrastEnabled', checked);
+      document.documentElement.setAttribute('data-high-contrast', checked ? 'true' : 'false');
+      if (checked) {
+        this.applyTheme('contrast');
+        store.set('theme', 'contrast');
+      }
+    });
+
+    document.getElementById('bank-chip-scale')?.addEventListener('input', (e) => {
+      const val = parseInt(/** @type {HTMLInputElement} */ (e.target).value, 10);
+      store.set('bankChipScale', val);
+      const display = document.getElementById('bank-chip-scale-display');
+      if (display) display.textContent = `${val}%`;
+      document.documentElement.style.setProperty('--bank-chip-scale', `${val / 100}`);
+    });
+
     document.getElementById('bilingual-toggle')?.addEventListener('change', (e) => {
       const checked = /** @type {HTMLInputElement} */ (e.target).checked;
       store.set('bilingualInstructions', checked);
@@ -144,6 +189,15 @@ export const settingsController = {
     const speedDisplay = document.getElementById('voice-speed-display');
     if (speedDisplay) speedDisplay.textContent = `${store.get('voiceSpeed')}×`;
 
+    const speechThreshold = Number(store.get('speechThreshold') ?? 0.75);
+    const sensitivity = /** @type {HTMLInputElement|null} */ (document.getElementById('speech-sensitivity'));
+    if (sensitivity) sensitivity.value = String(Math.round(speechThreshold * 100));
+    const sensitivityDisplay = document.getElementById('speech-sensitivity-display');
+    if (sensitivityDisplay) sensitivityDisplay.textContent = `${Math.round(speechThreshold * 100)}%`;
+
+    const speechAccent = /** @type {HTMLSelectElement|null} */ (document.getElementById('speech-accent-select'));
+    if (speechAccent) speechAccent.value = store.get('speechLocale') || 'en-SG';
+
     const diff = store.get('difficulty') || 1;
     document.querySelectorAll('.diff-btn').forEach(b => {
       const el = /** @type {HTMLElement} */ (b);
@@ -173,6 +227,22 @@ export const settingsController = {
     const fontScaleDisplay = document.getElementById('font-size-scale-display');
     if (fontScaleDisplay) fontScaleDisplay.textContent = `${fontScale}%`;
     document.documentElement.style.fontSize = `${fontScale}%`;
+
+    const dyslexia = !!store.get('dyslexiaFontEnabled') || store.get('theme') === 'dyslexia';
+    const dyslexiaToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('dyslexia-font-toggle'));
+    if (dyslexiaToggle) dyslexiaToggle.checked = dyslexia;
+
+    const highContrast = !!store.get('highContrastEnabled') || store.get('theme') === 'contrast';
+    const highContrastToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('high-contrast-toggle'));
+    if (highContrastToggle) highContrastToggle.checked = highContrast;
+    document.documentElement.setAttribute('data-high-contrast', highContrast ? 'true' : 'false');
+
+    const chipScale = Number(store.get('bankChipScale') || 100);
+    const chipScaleEl = /** @type {HTMLInputElement|null} */ (document.getElementById('bank-chip-scale'));
+    if (chipScaleEl) chipScaleEl.value = String(chipScale);
+    const chipScaleDisplay = document.getElementById('bank-chip-scale-display');
+    if (chipScaleDisplay) chipScaleDisplay.textContent = `${chipScale}%`;
+    document.documentElement.style.setProperty('--bank-chip-scale', `${chipScale / 100}`);
 
     const bilingual = !!store.get('bilingualInstructions');
     const bilingualToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('bilingual-toggle'));
