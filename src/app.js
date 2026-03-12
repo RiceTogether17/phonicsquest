@@ -16,7 +16,7 @@ import { audio } from './modules/audio.js';
 import { gamification } from './modules/gamification.js';
 import { badges } from './modules/badges.js';
 import { progress } from './modules/progress.js';
-import { speech } from './modules/speech.js';
+import { speech, calculateCalibrationThreshold } from './modules/speech.js';
 import { mascot } from './components/mascot.js';
 import { spinWheel, buildWordAnimation } from './components/wheel.js';
 import { renderDashboard, destroyDashboard } from './components/dashboard.js';
@@ -457,6 +457,10 @@ class App {
       this._openModal('modal-settings');
     });
 
+    document.getElementById('btn-calibrate-mic')?.addEventListener('click', () => {
+      this._runMicCalibration();
+    });
+
     // Dashboard button (PIN-gated)
     document.getElementById('dashboard-btn')?.addEventListener('click', () => {
       this._openModal('modal-pin');
@@ -784,7 +788,10 @@ class App {
         }
       }, 1200);
     } else {
-      this._showSpeechBubble(`I heard "${result.heard}" – ${result.score}% match. Try saying "${this._currentWord.word}" more clearly!`);
+      this._showSpeechBubble(`I heard "${result.heard}" – ${result.score}% match. Try saying "${this._currentWord.word}" more clearly!`, {
+        allowOverride: true,
+        recognisedWordId,
+      });
     }
   }
 
@@ -819,12 +826,64 @@ class App {
   }
 
   /** Show speech bubble with result */
-  _showSpeechBubble(text) {
+  _showSpeechBubble(text, opts = {}) {
     const bubble = this._els.speechBubble;
     if (!bubble) return;
-    bubble.textContent = text;
+
+    bubble.innerHTML = `<span>${text}</span>`;
+
+    if (opts.allowOverride) {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn--ghost btn--sm';
+      btn.textContent = 'Mark Correct';
+      btn.style.marginTop = '8px';
+      btn.addEventListener('click', () => this._applyManualSpeechOverride(opts.recognisedWordId));
+      bubble.appendChild(btn);
+    }
+
     bubble.hidden = false;
-    setTimeout(() => { bubble.hidden = true; }, 4000);
+    setTimeout(() => { bubble.hidden = true; }, opts.allowOverride ? 6500 : 4000);
+  }
+
+  _applyManualSpeechOverride(recognisedWordId) {
+    if (!this._currentWord || this._currentWord.id !== recognisedWordId) return;
+
+    progress.recordAttempt(this._currentWord.id, true, this._mode);
+    gamification.recordCorrect(2500, false);
+    this._showToast('Manual override applied: marked as correct.', 'success');
+
+    this._els.speechBubble && (this._els.speechBubble.hidden = true);
+    this._cleanupMode();
+    this._nextWord();
+  }
+
+  async _runMicCalibration() {
+    const status = document.getElementById('calibrate-mic-status');
+    if (!speech.supported) {
+      if (status) status.textContent = 'Speech recognition is not supported on this device.';
+      return;
+    }
+
+    const sampleWords = ['cat', 'dog', 'fish'];
+    const scores = [];
+
+    alert('Mic calibration: you will be asked to say 3 sample words.');
+
+    for (const word of sampleWords) {
+      alert(`Please say: ${word}`);
+      const result = await speech.listen(word);
+      if (result?.rawScore != null) scores.push(result.rawScore);
+    }
+
+    const avg = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0.75;
+    const threshold = calculateCalibrationThreshold(avg);
+    store.set('speechThreshold', threshold);
+
+    if (status) status.textContent = `Calibrated threshold: ${Math.round(threshold * 100)}%`;
+    const sensitivity = document.getElementById('speech-sensitivity');
+    if (sensitivity) sensitivity.value = String(Math.round(threshold * 100));
+    const display = document.getElementById('speech-sensitivity-display');
+    if (display) display.textContent = `${Math.round(threshold * 100)}%`;
   }
 
   // ── Settings ──
