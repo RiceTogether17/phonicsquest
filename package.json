@@ -1,7 +1,7 @@
 {
   "name": "phonicsquest",
   "version": "2.0.0",
-  "description": "PhonicsQuest – production-grade phonics learning adventure for early readers",
+  "description": "PhonicsQuest \u2013 production-grade phonics learning adventure for early readers",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:syntax": "find src -name '*.js' -print0 | xargs -0 -n1 node --check"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.2",
