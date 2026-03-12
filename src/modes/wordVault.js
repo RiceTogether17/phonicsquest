@@ -196,8 +196,11 @@ function _renderCategoryBrowser() {
 
   for (const [key, meta] of Object.entries(VOCAB_CATEGORIES)) {
     const catCompleted = completed[key] || {};
-    const totalPossible = 6;
     const doneLevels = Object.values(catCompleted).filter(v => v === true || v?.done).length;
+    const levelsForCat = Object.values(vocabPassages[key] || {});
+    const totalLevels = levelsForCat.filter(arr => (arr || []).length > 0).length;
+    const totalPassages = levelsForCat.reduce((sum, arr) => sum + ((arr || []).length), 0);
+    const perLevel = totalLevels ? Math.round(totalPassages / totalLevels) : 0;
     const isRecommended = key === recommendedCat;
 
     html += `
@@ -207,7 +210,7 @@ function _renderCategoryBrowser() {
         <span class="wv-cat-icon">${meta.icon}</span>
         <span class="wv-cat-label">${meta.label}</span>
         <span class="wv-cat-desc">${meta.desc}</span>
-        <span class="wv-cat-progress">${doneLevels} / ${totalPossible}${isRecommended ? ' · Recommended' : ''}</span>
+        <span class="wv-cat-progress">${doneLevels}/${totalLevels} levels · ${totalPassages} passages (~${perLevel}/level)${isRecommended ? ' · Recommended' : ''}</span>
       </button>`;
   }
 
@@ -254,6 +257,7 @@ function _renderLevelBrowser(catKey) {
               aria-label="${LEVEL_LABELS[lv]}${isDone ? ' – completed' : ''}">
         <span class="wv-level-icon">${isDone ? renderSummaryStars(completed[lv]?.stars || 1) : LEVEL_ICONS[lv]}</span>
         <span class="wv-level-name">${LEVEL_LABELS[lv]}</span>
+        <span class="wv-level-count">${(passages || []).length} passages</span>
       </button>`;
   }
 

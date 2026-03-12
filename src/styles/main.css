@@ -4491,6 +4491,7 @@ input, select, textarea { font-family: inherit; }
 .wv-level-btn--locked { opacity: 0.45; cursor: not-allowed; }
 .wv-level-icon  { font-size: 1.6rem; }
 .wv-level-name  { font-size: var(--font-size-sm); font-weight: 800; color: var(--text); }
+.wv-level-count { font-size: var(--font-size-xs); color: var(--text-muted); }
 
 /* Game area */
 .wv-game {
