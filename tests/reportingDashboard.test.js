@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { store } from '../src/modules/store.js';
-import { getVocabularyCategoryReport, getGrammarCategoryReport, getLatestQuestScoreboards } from '../src/modules/reporting.js';
+import { getVocabularyCategoryReport, getGrammarCategoryReport, getLatestQuestScoreboards, getMoePriorityRecommendations } from '../src/modules/reporting.js';
 
 describe('reporting module', () => {
   beforeEach(() => {
@@ -36,5 +36,13 @@ describe('reporting module', () => {
   it('returns grammar rows', () => {
     const rows = getGrammarCategoryReport();
     expect(rows.find(r => r.key === 'conditionals')).toBeTruthy();
+  });
+
+
+  it('returns MOE-priority recommendations weighted by category priority', () => {
+    const rec = getMoePriorityRecommendations();
+    expect(rec.vocab.length).toBeGreaterThan(0);
+    expect(rec.grammar.length).toBeGreaterThan(0);
+    expect(rec.grammar[0]).toHaveProperty('priorityScore');
   });
 });

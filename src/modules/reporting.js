@@ -21,7 +21,41 @@ const LO_CODE_MAP = {
   passiveVoice: 'LO-ENG-GR-09',
   reportedSpeech: 'LO-ENG-GR-10',
   relativeClauses: 'LO-ENG-GR-11',
+  grammarArticles: 'LO-ENG-GR-01',
+  grammarPrepositions: 'LO-ENG-GR-02',
+  grammarSVA: 'LO-ENG-GR-05',
+  tenses: 'LO-ENG-GR-06',
+  modals: 'LO-ENG-GR-07',
+  morphologicalAffix: 'LO-ENG-VOC-04',
+  collocationCloze: 'LO-ENG-VOC-09',
 };
+
+
+const PRIORITY_WEIGHTS = {
+  // MOE/PSLE-heavy grammar focus
+  grammarArticles: 1.25,
+  grammarPrepositions: 1.3,
+  grammarSVA: 1.35,
+  pronouns: 1.25,
+  connectorClue: 1.2,
+  conditionals: 1.2,
+  passiveVoice: 1.15,
+  reportedSpeech: 1.15,
+  tenses: 1.2,
+  modals: 1.2,
+  // vocabulary emphasis
+  morphologicalAffix: 1.15,
+  synonymContrast: 1.1,
+  collocationCloze: 1.15,
+  scienceTechTerms: 1.1,
+  socialStudiesVocab: 1.1,
+};
+
+function _priorityScore(row) {
+  const w = PRIORITY_WEIGHTS[row.key] || 1;
+  const attemptsPenalty = row.attempts === 0 ? 0.1 : 0;
+  return ((1 - (row.accuracy || 0)) * w) + attemptsPenalty;
+}
 
 const MOE_SYLLABUS_LINK = 'https://www.moe.gov.sg/primary/curriculum/syllabus';
 
@@ -75,6 +109,21 @@ export function getGrammarCategoryReport() {
     clueSuccess,
     syllabusLink: MOE_SYLLABUS_LINK,
   }));
+}
+
+
+export function getMoePriorityRecommendations() {
+  const vocab = getVocabularyCategoryReport()
+    .map(r => ({ ...r, priorityScore: _priorityScore(r) }))
+    .sort((a, b) => b.priorityScore - a.priorityScore)
+    .slice(0, 3);
+
+  const grammar = getGrammarCategoryReport()
+    .map(r => ({ ...r, priorityScore: _priorityScore(r) }))
+    .sort((a, b) => b.priorityScore - a.priorityScore)
+    .slice(0, 3);
+
+  return { vocab, grammar };
 }
 
 export function getLatestQuestScoreboards() {

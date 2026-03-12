@@ -31,6 +31,7 @@ import {
   getVocabularyCategoryReport,
   getGrammarCategoryReport,
   getLatestQuestScoreboards,
+  getMoePriorityRecommendations,
 } from '../modules/reporting.js';
 
 Chart.register(...registerables);
@@ -179,6 +180,7 @@ function _renderCategoryReporting() {
     .sort((a, b) => a.accuracy - b.accuracy)
     .slice(0, 8);
   const scoreboards = getLatestQuestScoreboards();
+  const priorities = getMoePriorityRecommendations();
 
   const rowHtml = (rows) => rows.map(r => {
     const pct = Math.round((r.accuracy || 0) * 100);
@@ -192,6 +194,20 @@ function _renderCategoryReporting() {
       <div class="dash-category-meta">Attempts: ${r.attempts} · Clue success: ${cluePct}% · <a href="${r.syllabusLink}" target="_blank" rel="noreferrer">MOE syllabus</a></div>
     </div>`;
   }).join('');
+
+
+  const priorityBlock = (title, rows) => `
+    <div class="dash-pattern-item">
+      <strong>${title}</strong>
+      ${rows.map(r => `<div class="dash-category-row" title="${r.tooltip}">
+        <div class="dash-category-head">
+          <span><strong>${r.label}</strong> <small>(${r.loCode})</small></span>
+          <span>${Math.round((r.accuracy || 0) * 100)}%</span>
+        </div>
+        <div class="dash-mini-track"><div class="dash-mini-fill" style="width:${Math.round((r.accuracy || 0) * 100)}%"></div></div>
+        <div class="dash-category-meta">Priority score: ${r.priorityScore.toFixed(2)} · <a href="${r.syllabusLink}" target="_blank" rel="noreferrer">MOE syllabus</a></div>
+      </div>`).join('')}
+    </div>`;
 
   const scoreHtml = scoreboards.map(s => {
     const pct = Math.round((s.accuracy || 0) * 100);
@@ -211,6 +227,11 @@ function _renderCategoryReporting() {
       </div>
     </div>
     <div class="dash-actions" style="justify-content:flex-start;gap:8px;margin-top:10px;">${scoreHtml}</div>
+    <h4 class="dash-section-title" style="margin-top:16px">MOE Priority Recommendations</h4>
+    <div class="dash-pattern-list" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      ${priorityBlock('Priority vocabulary revision', priorities.vocab)}
+      ${priorityBlock('Priority grammar revision', priorities.grammar)}
+    </div>
   `;
 }
 
