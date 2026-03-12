@@ -37,6 +37,7 @@ export const GRAMMAR_CATEGORIES = {
   simplePast:      { label: 'Simple Past Tense',      icon: '⏪' },
   presentCont:     { label: 'Present Continuous',     icon: '🔄' },
   pastCont:        { label: 'Past Continuous',        icon: '⏳' },
+  perfectContinuousTenses: { label: 'Perfect & Continuous Tenses', icon: '🕒' },
   futureTense:     { label: 'Future Tense',           icon: '🔮' },
   prepositions:    { label: 'Prepositions',           icon: '📍' },
   conjunctions:    { label: 'Conjunctions',           icon: '🔗' },
@@ -973,3 +974,127 @@ export const passages = {
     ],
   },
 };
+
+
+const GRAMMARMASTER_EXPANSION = {
+  pronouns: [
+    {
+      title: 'Class Helpers',
+      text: 'Alicia packed the crayons, and ___ gave ___ to the art teacher before ___ started class.',
+      answers: ['she', 'them', 'he'],
+      wordBank: ['she', 'them', 'he', 'her', 'they', 'him'],
+      clues: [
+        { blankIndex: 0, prompt: 'Tap the pronoun that replaces Alicia.', acceptableSpans: ['Alicia'], partialSpans: ['crayons'], clueType: 'subject-clue', explanation: 'Alicia is one girl, so we use "she".' },
+        { blankIndex: 1, prompt: 'Tap the noun that tells what was handed over.', acceptableSpans: ['crayons'], partialSpans: ['packed'], clueType: 'pronoun-object', explanation: 'The object pronoun "them" replaces crayons.' },
+        { blankIndex: 2, prompt: 'Tap the noun that the final pronoun replaces.', acceptableSpans: ['teacher'], partialSpans: ['class'], clueType: 'subject-clue', explanation: 'The teacher is singular male in this sentence, so "he" fits.' },
+      ],
+      notes: ['Use subject pronouns for who does the action.', 'Use object pronouns for what receives the action.', 'Match pronouns with the noun they replace.'],
+    },
+    {
+      title: 'Family Plans',
+      text: 'My cousins visited us, and ___ brought snacks. Mum thanked ___ warmly while ___ set the table.',
+      answers: ['they', 'them', 'we'],
+      wordBank: ['they', 'them', 'we', 'he', 'him', 'us'],
+      notes: ['Plural nouns take plural pronouns like they.', 'Object position needs them, not they.', 'Use we when the speaker is in the group.'],
+    },
+    {
+      title: 'Science Team',
+      text: 'Mr Tan checked the model, and ___ said ___ was ready before ___ moved it outside.',
+      answers: ['he', 'it', 'we'],
+      wordBank: ['he', 'it', 'we', 'they', 'him', 'them'],
+      notes: ['He replaces Mr Tan.', 'It replaces one thing (the model).', 'We refers to the speaker and teammates.'],
+    },
+  ],
+  svAgreement: [
+    { title: 'Morning Routine', text: 'The captain ___ early, and the prefects ___ beside the gate while I ___ attendance.', answers: ['arrives', 'stand', 'take'], wordBank: ['arrives', 'stand', 'take', 'arrive', 'stands', 'takes'], clues: [
+      { blankIndex: 0, prompt: 'Find the singular subject for blank 1.', acceptableSpans: ['captain'], partialSpans: ['prefects'], clueType: 'subject-clue', explanation: 'Singular subject "captain" needs "arrives".' },
+      { blankIndex: 1, prompt: 'Find the plural subject for blank 2.', acceptableSpans: ['prefects'], partialSpans: ['captain'], clueType: 'subject-clue', explanation: 'Plural subject "prefects" takes base verb "stand".' },
+      { blankIndex: 2, prompt: 'Tap the subject before blank 3.', acceptableSpans: ['I'], partialSpans: ['attendance'], clueType: 'subject-clue', explanation: 'With "I", we use base verb "take".' },
+    ], notes: ['Singular third-person subjects usually add -s.', 'Plural subjects use the base verb.', 'Subject and verb must match in number.'] },
+    { title: 'Library Duty', text: 'Each monitor ___ a task, but the volunteers ___ shelves and the librarian ___ notices.', answers: ['has', 'arrange', 'posts'], wordBank: ['has', 'arrange', 'posts', 'have', 'arranges', 'post'], notes: ['Each is singular, so use has.', 'Volunteers is plural, so use arrange.', 'One librarian takes posts.'] },
+    { title: 'CCA Afternoon', text: 'Our coach ___ instructions, the players ___ quickly, and Mei ___ the timing sheet.', answers: ['gives', 'respond', 'updates'], wordBank: ['gives', 'respond', 'updates', 'give', 'responds', 'update'], notes: ['Coach is singular so gives.', 'Players is plural so respond.', 'Mei is singular so updates.'] },
+  ],
+  perfectContinuousTenses: [
+    { title: 'Project Progress', text: 'By noon, we ___ finished the poster, and Kai ___ been checking the labels since recess before we ___ presenting.', answers: ['had', 'has', 'started'], wordBank: ['had', 'has', 'started', 'have', 'had been', 'start'], clues: [
+      { blankIndex: 0, prompt: 'Tap the time phrase that shows completion before another past point.', acceptableSpans: ['By noon'], partialSpans: ['noon'], clueType: 'time-marker', explanation: '"By noon" signals past perfect: had finished.' },
+      { blankIndex: 1, prompt: 'Tap the subject before blank 2.', acceptableSpans: ['Kai'], partialSpans: ['labels'], clueType: 'subject-clue', explanation: 'Kai is singular, so "has been" is correct.' },
+      { blankIndex: 2, prompt: 'Tap the word after blank 3 that completes the verb phrase.', acceptableSpans: ['presenting'], partialSpans: ['before'], clueType: 'tense-helper', explanation: 'After "before we", past simple "started" fits the sequence.' },
+    ], notes: ['Use had + past participle for past perfect.', 'Use has/have been + -ing for perfect continuous.', 'Time markers help choose tense.'] },
+    { title: 'Training Week', text: 'The team ___ been practising daily, and by Friday they ___ improved a lot while the coach ___ reviewing each drill.', answers: ['has', 'had', 'was'], wordBank: ['has', 'had', 'was', 'have', 'were', 'has been'], notes: ['Singular collective noun can take has in this context.', 'By + time marker often triggers had + past participle.', 'Was reviewing shows an action in progress in the past.'] },
+    { title: 'Reading Log', text: 'Since January, I ___ been recording my books, and I ___ completed ten entries when we ___ discussing the novel.', answers: ['have', 'had', 'were'], wordBank: ['have', 'had', 'were', 'has', 'have had', 'was'], notes: ['I takes have been in present perfect continuous.', 'Had completed marks an earlier completed action.', 'Were discussing is past continuous with we.'] },
+  ],
+  modals: [
+    { title: 'Safety Rules', text: 'Students ___ wear goggles in the lab, and they ___ run indoors but ___ ask for help politely.', answers: ['must', 'cannot', 'should'], wordBank: ['must', 'cannot', 'should', 'can', 'must not', 'could'], clues: [
+      { blankIndex: 0, prompt: 'Tap the rule word showing strong obligation.', acceptableSpans: ['lab'], partialSpans: ['goggles'], clueType: 'modal-clue', explanation: '"Must" shows a compulsory rule.' },
+      { blankIndex: 1, prompt: 'Tap the action that is not allowed.', acceptableSpans: ['run'], partialSpans: ['indoors'], clueType: 'modal-clue', explanation: 'Prohibition takes "cannot" + base verb.' },
+      { blankIndex: 2, prompt: 'Tap the polite action clue.', acceptableSpans: ['politely'], partialSpans: ['help'], clueType: 'modal-clue', explanation: 'Advice uses "should".' },
+    ], notes: ['Must expresses obligation.', 'Cannot expresses prohibition.', 'Should expresses advice.'] },
+    { title: 'Teamwork Reminder', text: 'You ___ share your files, but you ___ check details first and you ___ submit by Friday.', answers: ['can', 'should', 'must'], wordBank: ['can', 'should', 'must', 'could', 'may', 'would'], notes: ['Can shows ability or permission.', 'Should gives recommended action.', 'Must sets a requirement.'] },
+    { title: 'Assembly Prep', text: 'We ___ line up quietly, we ___ push anyone, and monitors ___ guide younger pupils.', answers: ['should', 'must not', 'can'], wordBank: ['should', 'must not', 'can', 'could', 'should not', 'must'], notes: ['Should for expected behaviour.', 'Must not for strict prohibition.', 'Can for permission/ability.'] },
+  ],
+  conditionals: [
+    { title: 'Rainy Plan', text: 'If it ___ after recess, we ___ in class, and if the floor dries we ___ outside later.', answers: ['rains', 'will stay', 'can go'], wordBank: ['rains', 'will stay', 'can go', 'rain', 'stayed', 'go'], clues: [
+      { blankIndex: 0, prompt: 'Tap the if-clause marker.', acceptableSpans: ['If'], partialSpans: ['recess'], clueType: 'connector-clue', explanation: 'Type 1 conditionals use present tense after if.' },
+      { blankIndex: 1, prompt: 'Tap the result clause marker near blank 2.', acceptableSpans: ['we'], partialSpans: ['class'], clueType: 'condition-clue', explanation: 'Main clause takes will + verb in Type 1.' },
+      { blankIndex: 2, prompt: 'Tap the second if-clause indicator.', acceptableSpans: ['if'], partialSpans: ['later'], clueType: 'condition-clue', explanation: 'Possible result can use can + base verb.' },
+    ], notes: ['If-clause usually takes present tense in real conditions.', 'Result clause often uses will/can + base verb.', 'Condition and result must match logically.'] },
+    { title: 'Exam Choices', text: 'If you ___ your notes, you ___ calmer, but if you panic you ___ marks.', answers: ['review', 'will feel', 'may lose'], wordBank: ['review', 'will feel', 'may lose', 'reviewed', 'feel', 'lose'], notes: ['Present simple in if-clause.', 'Will + base verb for likely result.', 'May + base verb for possible result.'] },
+    { title: 'Eco Actions', text: 'If each class ___ reusable bottles, the school ___ less waste and we ___ more resources.', answers: ['uses', 'will produce', 'can save'], wordBank: ['uses', 'will produce', 'can save', 'use', 'produces', 'saved'], notes: ['Singular subject each class takes uses.', 'Future result uses will + verb.', 'Can save shows possible positive outcome.'] },
+  ],
+  passiveVoice: [
+    { title: 'Lab Report', text: 'The samples ___ tested in the morning, the results ___ recorded by Mei, and a summary ___ prepared for the class.', answers: ['were', 'were', 'was'], wordBank: ['were', 'were', 'was', 'are', 'is', 'have'], clues: [
+      { blankIndex: 0, prompt: 'Tap the receiver of the action for blank 1.', acceptableSpans: ['samples'], partialSpans: ['tested'], clueType: 'passive-clue', explanation: 'Passive voice focuses on receivers: samples were tested.' },
+      { blankIndex: 1, prompt: 'Tap the noun receiving action in blank 2 clause.', acceptableSpans: ['results'], partialSpans: ['recorded'], clueType: 'passive-clue', explanation: 'Plural "results" needs "were".' },
+      { blankIndex: 2, prompt: 'Tap the singular receiver in blank 3 clause.', acceptableSpans: ['summary'], partialSpans: ['prepared'], clueType: 'passive-clue', explanation: 'Singular "summary" takes "was".' },
+    ], notes: ['Passive voice = be + past participle.', 'Match be-verb with singular/plural noun.', 'Use passive when focus is on action receiver.'] },
+    { title: 'Event Setup', text: 'The banners ___ printed yesterday, the stage ___ decorated early, and chairs ___ arranged by volunteers.', answers: ['were', 'was', 'were'], wordBank: ['were', 'was', 'were', 'are', 'is', 'be'], notes: ['Banners is plural so were.', 'Stage is singular so was.', 'Chairs is plural so were.'] },
+    { title: 'Library Notice', text: 'New books ___ delivered this week, each copy ___ labelled quickly, and overdue slips ___ sent every Friday.', answers: ['were', 'was', 'are'], wordBank: ['were', 'was', 'are', 'is', 'were being', 'be'], notes: ['Passive voice can describe completed or habitual processes.', 'Singular subject takes was/is.', 'Plural subject takes are/were.'] },
+  ],
+  reportedSpeech: [
+    { title: 'Teacher Briefing', text: 'Ms Lim said that the quiz ___ start at ten, and she told us that we ___ bring calculators because she ___ check them first.', answers: ['would', 'should', 'would'], wordBank: ['would', 'should', 'would', 'will', 'must', 'can'], clues: [
+      { blankIndex: 0, prompt: 'Tap the reporting verb clue.', acceptableSpans: ['said'], partialSpans: ['quiz'], clueType: 'reported-speech', explanation: 'After past reporting verbs, will often shifts to would.' },
+      { blankIndex: 1, prompt: 'Tap the phrase that gives advice.', acceptableSpans: ['told'], partialSpans: ['bring'], clueType: 'reported-speech', explanation: 'Advice in reported speech commonly uses should.' },
+      { blankIndex: 2, prompt: 'Tap the second reporting signal.', acceptableSpans: ['she'], partialSpans: ['check'], clueType: 'reported-speech', explanation: 'Future action from a past viewpoint shifts to would.' },
+    ], notes: ['Reported speech often shifts tense back.', 'Would commonly replaces will after said/told.', 'Keep pronouns and time references consistent.'] },
+    { title: 'Group Reflection', text: 'Ben said that he ___ completed his part, Jia reported that they ___ rehearsing earlier, and I replied that we ___ improve tonight.', answers: ['had', 'had been', 'would'], wordBank: ['had', 'had been', 'would', 'has', 'were', 'will'], notes: ['Past perfect reports an earlier completed action.', 'Had been + -ing reports ongoing past action.', 'Would is common in reported future plans.'] },
+    { title: 'Parent Message', text: 'Dad told me that he ___ arrive late, Mum said I ___ start dinner first, and they added that we ___ eat together later.', answers: ['would', 'should', 'could'], wordBank: ['would', 'should', 'could', 'will', 'must', 'can'], notes: ['Would reports future from past viewpoint.', 'Should reports advice.', 'Could reports possibility/ability.'] },
+  ],
+  relativeClauses: [
+    { title: 'School Heroes', text: 'The prefect ___ helped us yesterday is my cousin. The poster ___ won first prize is on the wall. The room ___ we practise is upstairs.', answers: ['who', 'that', 'where'], wordBank: ['who', 'that', 'where', 'which', 'whose', 'whom'], clues: [
+      { blankIndex: 0, prompt: 'Tap the noun that refers to a person.', acceptableSpans: ['prefect'], partialSpans: ['cousin'], clueType: 'relative-clue', explanation: 'Use who for people.' },
+      { blankIndex: 1, prompt: 'Tap the noun that refers to a thing.', acceptableSpans: ['poster'], partialSpans: ['prize'], clueType: 'relative-clue', explanation: 'Use that/which for things.' },
+      { blankIndex: 2, prompt: 'Tap the noun that names a place.', acceptableSpans: ['room'], partialSpans: ['upstairs'], clueType: 'relative-clue', explanation: 'Use where for places.' },
+    ], notes: ['Who introduces clauses about people.', 'That/which can refer to things.', 'Where introduces clauses about places.'] },
+    { title: 'Class Project', text: 'The student ___ designed the logo thanked the teacher ___ gave feedback on the board ___ we displayed it.', answers: ['who', 'who', 'where'], wordBank: ['who', 'who', 'where', 'which', 'whose', 'that'], notes: ['Who for person antecedents.', 'Relative pronouns connect noun and extra info.', 'Where for locations.'] },
+    { title: 'Neighbourhood Tour', text: 'The museum ___ we visited was crowded, the guide ___ stories were vivid spoke clearly, and the cafe ___ we rested was nearby.', answers: ['that', 'whose', 'where'], wordBank: ['that', 'whose', 'where', 'who', 'which', 'whom'], notes: ['That links to thing/object.', 'Whose shows possession.', 'Where links to place.'] },
+  ],
+};
+
+const EXPANSION_CATEGORIES = ['pronouns', 'svAgreement', 'perfectContinuousTenses', 'modals', 'conditionals', 'passiveVoice', 'reportedSpeech', 'relativeClauses'];
+const LEVEL_XP = { P1: 22, P2: 26, P3: 30, P4: 36, P5: 42, P6: 50 };
+
+function enrichGrammarPassages() {
+  const levelKeys = Object.keys(passages);
+  levelKeys.forEach(level => {
+    const bucket = passages[level];
+    EXPANSION_CATEGORIES.forEach(categoryKey => {
+      if (!bucket[categoryKey]) bucket[categoryKey] = [];
+      const samples = GRAMMARMASTER_EXPANSION[categoryKey] || [];
+      samples.forEach((sample, idx) => {
+        const passage = {
+          id: `gm-${level.toLowerCase()}-${categoryKey}-${idx + 1}`,
+          title: `${sample.title} (${level})`,
+          text: sample.text,
+          answers: [...sample.answers],
+          wordBank: [...sample.wordBank],
+          xp: LEVEL_XP[level],
+          grammarNotes: sample.notes ? [...sample.notes] : [],
+          clues: sample.clues ? sample.clues.map(c => ({ ...c })) : undefined,
+        };
+        bucket[categoryKey].push(passage);
+      });
+    });
+  });
+}
+
+enrichGrammarPassages();

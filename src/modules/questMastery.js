@@ -10,6 +10,24 @@ import { store } from './store.js';
 
 const DEFAULT_MASTERY = 0.5;
 
+
+const CROSS_QUEST_SKILL_ALIASES = {
+  connector_clue: ['connectorClue', 'conditionals', 'conjunctions'],
+  connectorClue: ['connector_clue', 'conditionals', 'conjunctions'],
+  conditionals: ['connector_clue', 'connectorClue', 'conjunctions'],
+  conjunctions: ['connector_clue', 'connectorClue', 'conditionals'],
+  tense_clue: ['simplePast', 'presentCont', 'pastCont', 'futureTense', 'perfectContinuousTenses'],
+  modal_order: ['modals'],
+  modals: ['modal_order'],
+  preposition_clue: ['prepositions', 'grammarPrepositions'],
+  prepositions: ['preposition_clue', 'grammarPrepositions'],
+};
+
+function _allQuestBuckets() {
+  return Object.keys(store.get('questMastery') || {});
+}
+
+
 function _clamp(v, min = 0, max = 1) {
   return Math.max(min, Math.min(max, v));
 }
@@ -48,6 +66,28 @@ class QuestMasteryService {
     return typeof score === 'number' ? score : DEFAULT_MASTERY;
   }
 
+  getUnifiedSkillScore(skillKey, preferredQuest = null) {
+    const normalized = _normalizeSkill(skillKey);
+    const aliasKeys = [normalized, ...(CROSS_QUEST_SKILL_ALIASES[normalized] || [])];
+    const mastery = store.get('questMastery') || {};
+    const quests = preferredQuest ? [preferredQuest, ..._allQuestBuckets().filter(q => q !== preferredQuest)] : _allQuestBuckets();
+
+    let total = 0;
+    let count = 0;
+    for (const quest of quests) {
+      const bucket = mastery[quest] || {};
+      for (const alias of aliasKeys) {
+        const raw = bucket[_normalizeSkill(alias)];
+        if (typeof raw === 'number') {
+          total += raw;
+          count++;
+        }
+      }
+    }
+
+    return count > 0 ? total / count : DEFAULT_MASTERY;
+  }
+
   getRecommendedSkill(questKey, skillKeys = []) {
     if (!skillKeys.length) return null;
 
@@ -55,7 +95,7 @@ class QuestMasteryService {
     let lowest = Infinity;
 
     for (const key of skillKeys) {
-      const score = this.getSkillScore(questKey, key);
+      const score = this.getUnifiedSkillScore(key, questKey);
       if (score < lowest) {
         lowest = score;
         recommendation = key;

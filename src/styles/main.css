@@ -5,6 +5,7 @@
 
 /* ── 1. CSS CUSTOM PROPERTIES ── */
 :root {
+  --bank-chip-scale: 1;
   /* Brand */
   --color-primary:        #6c63ff;
   --color-primary-light:  #ede9fe;
@@ -4009,6 +4010,15 @@ input, select, textarea { font-family: inherit; }
 .sfq-level-icon { font-size: 2rem; }
 .sfq-level-name { font-size: var(--font-size-sm); font-weight: 700; color: var(--text); text-align: center; }
 .sfq-level-count { font-size: var(--font-size-xs); color: var(--text-muted); }
+.sfq-level-categories { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.sfq-level-tag {
+  font-size: 0.68rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  border-radius: 999px;
+  color: var(--text-muted);
+}
 
 /* Game area */
 .sfq-game {
@@ -4162,6 +4172,17 @@ input, select, textarea { font-family: inherit; }
 .sfq-complete-sub   { font-size: var(--font-size-md); color: var(--text-muted); }
 .sfq-stars          { font-size: 2rem; letter-spacing: 4px; }
 .sfq-complete-score { font-size: var(--font-size-md); font-weight: 700; color: var(--text-muted); }
+.sfq-complete-message { font-weight: 700; color: var(--text); }
+.sfq-complete-meta { font-size: var(--font-size-sm); color: var(--text-muted); }
+.sfq-scoreboard-overlay {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  background: radial-gradient(circle at top, #fff8dc 0%, var(--surface) 52%);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+}
 .sfq-complete-actions { display: flex; flex-direction: column; gap: var(--space-3); align-items: center; width: 100%; max-width: 300px; }
 
 /* ============================================================
@@ -4584,6 +4605,16 @@ input, select, textarea { font-family: inherit; }
 .wv-feedback--error   { background: var(--color-error-light);   color: var(--color-error);   }
 
 /* Complete screen */
+.wv-summary-overlay {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+  border: 2px solid var(--border);
+  background: radial-gradient(circle at top, #ecfeff 0%, var(--surface) 55%);
+  box-shadow: var(--shadow-lg);
+}
+
 .wv-complete {
   display: flex;
   flex-direction: column;
@@ -4858,7 +4889,7 @@ input, select, textarea { font-family: inherit; }
   background: var(--surface);
   border-radius: var(--radius-xl);
   padding: var(--space-5) var(--space-6);
-  max-width: 340px;
+  max-width: 620px;
   width: 90%;
   box-shadow: var(--shadow-xl);
   display: flex;
@@ -4878,8 +4909,19 @@ input, select, textarea { font-family: inherit; }
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  align-items: center;
+  align-items: stretch;
+  max-height: 46vh;
+  overflow: auto;
 }
+
+.clue-explanation-item {
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-2);
+}
+.clue-explanation-item p { margin: 4px 0; }
 
 .clue-explanation-label {
   font-size: var(--font-size-xs);
@@ -5549,3 +5591,52 @@ input, select, textarea { font-family: inherit; }
   .dash-rec-cta { width: 100%; text-align: center; }
   .gj-hero { padding: var(--space-4) var(--space-5); }
 }
+
+
+.dash-category-row { margin-top: 10px; }
+.dash-category-head { display:flex; justify-content:space-between; font-size:0.9rem; }
+.dash-mini-track { height:8px; background:var(--surface-2); border-radius:999px; overflow:hidden; margin-top:4px; }
+.dash-mini-fill { height:100%; background:linear-gradient(90deg, var(--color-primary), var(--color-success)); }
+.dash-category-meta { font-size:0.75rem; color:var(--text-muted); margin-top:3px; }
+.dash-scoreboard-chip { border:1px solid var(--border); background:var(--surface); border-radius:10px; padding:8px 10px; font-size:0.8rem; }
+
+
+/* Accessibility: adjustable bank chip sizing */
+.sfq-word-chip, .sfq-answer-chip, .cloze-word-chip, .wv-word-chip {
+  font-size: calc(var(--font-size-base) * var(--bank-chip-scale));
+  padding: calc(var(--space-2) * var(--bank-chip-scale)) calc(var(--space-4) * var(--bank-chip-scale));
+}
+
+[data-high-contrast="true"] .wv-word-chip,
+[data-high-contrast="true"] .cloze-word-chip,
+[data-high-contrast="true"] .sfq-word-chip {
+  border-width: 3px;
+  box-shadow: 0 0 0 2px #000;
+}
+
+
+.settings-help {
+  font-size: .85rem;
+  opacity: .8;
+}
+
+.wv-progress { height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; margin-bottom: 10px; }
+.wv-progress > span { display:block; height:100%; background: linear-gradient(90deg, #34d399, #06b6d4); }
+.wv-pos-legend { display:flex; gap:10px; flex-wrap:wrap; font-size:.82rem; margin-bottom:8px; color:var(--text-muted); }
+.pos-noun { color:#2563eb; }
+.pos-verb { color:#dc2626; }
+.pos-adjective { color:#9333ea; }
+.pos-adverb { color:#ea580c; }
+.wv-word-chip--synonym { border-color:#16a34a; background:#f0fdf4; }
+.wv-word-chip--antonym { border-color:#dc2626; background:#fef2f2; }
+.wv-word-chip.pos-noun { border-color:#2563eb; background:#eff6ff; }
+.wv-word-chip.pos-verb { border-color:#dc2626; background:#fef2f2; }
+.wv-word-chip.pos-adjective { border-color:#9333ea; background:#faf5ff; }
+.wv-word-chip.pos-adverb { border-color:#ea580c; background:#fff7ed; }
+.wv-info-panel { display:none; border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--surface); max-height:180px; overflow:auto; }
+.wv-info-panel--open { display:block; }
+.wv-info-row { display:flex; flex-direction:column; gap:2px; margin-bottom:8px; font-size:.85rem; }
+.wv-review-table { width:100%; border-collapse: collapse; font-size:.85rem; }
+.wv-review-table th, .wv-review-table td { border:1px solid var(--border); padding:6px; text-align:left; }
+.wv-blank--affix { min-width: 140px; }
+.wv-affix-slot { margin-left:6px; font-size:.75rem; opacity:.75; }
