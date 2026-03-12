@@ -5,6 +5,7 @@
 
 /* ── 1. CSS CUSTOM PROPERTIES ── */
 :root {
+  --bank-chip-scale: 1;
   /* Brand */
   --color-primary:        #6c63ff;
   --color-primary-light:  #ede9fe;
@@ -5589,4 +5590,26 @@ input, select, textarea { font-family: inherit; }
   .dash-rec-action { flex-wrap: wrap; }
   .dash-rec-cta { width: 100%; text-align: center; }
   .gj-hero { padding: var(--space-4) var(--space-5); }
+}
+
+
+.dash-category-row { margin-top: 10px; }
+.dash-category-head { display:flex; justify-content:space-between; font-size:0.9rem; }
+.dash-mini-track { height:8px; background:var(--surface-2); border-radius:999px; overflow:hidden; margin-top:4px; }
+.dash-mini-fill { height:100%; background:linear-gradient(90deg, var(--color-primary), var(--color-success)); }
+.dash-category-meta { font-size:0.75rem; color:var(--text-muted); margin-top:3px; }
+.dash-scoreboard-chip { border:1px solid var(--border); background:var(--surface); border-radius:10px; padding:8px 10px; font-size:0.8rem; }
+
+
+/* Accessibility: adjustable bank chip sizing */
+.sfq-word-chip, .sfq-answer-chip, .cloze-word-chip, .wv-word-chip {
+  font-size: calc(var(--font-size-base) * var(--bank-chip-scale));
+  padding: calc(var(--space-2) * var(--bank-chip-scale)) calc(var(--space-4) * var(--bank-chip-scale));
+}
+
+[data-high-contrast="true"] .wv-word-chip,
+[data-high-contrast="true"] .cloze-word-chip,
+[data-high-contrast="true"] .sfq-word-chip {
+  border-width: 3px;
+  box-shadow: 0 0 0 2px #000;
 }

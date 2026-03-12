@@ -33,6 +33,9 @@ const DEFAULT_STATE = {
   speechLocale:   'en-SG',
   fontScale:      100,
   bilingualInstructions: false,
+  dyslexiaFontEnabled: false,
+  highContrastEnabled: false,
+  bankChipScale: 100,
 
   // Adaptive selection tuning (can be overridden by educator tooling)
   adaptiveConfig: {
