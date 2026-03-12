@@ -33,10 +33,9 @@ describe('word vault enhancements', () => {
     const sampleGrammar = vocabPassages.grammaticalRole.p4[0];
     expect(sampleGrammar.partOfSpeechMap).toBeTruthy();
 
-    expect((vocabPassages.idiomaticExpressions.p3 || []).length).toBeGreaterThanOrEqual(5);
-    expect((vocabPassages.scienceTechTerms.p6 || []).length).toBeGreaterThanOrEqual(5);
-    expect((vocabPassages.grammarPrepositions.p3 || []).length).toBeGreaterThanOrEqual(3);
-    expect((vocabPassages.grammarArticles.p4 || []).length).toBeGreaterThanOrEqual(3);
-    expect((vocabPassages.grammarSVA.p6 || []).length).toBeGreaterThanOrEqual(3);
+    expect((vocabPassages.contextInference.p1 || []).length).toBeGreaterThanOrEqual(8);
+    expect((vocabPassages.definitionMatch.p6 || []).length).toBeGreaterThanOrEqual(8);
+    expect((vocabPassages.idiomaticExpressions.p3 || []).length).toBeGreaterThanOrEqual(8);
+    expect((vocabPassages.scienceTechTerms.p6 || []).length).toBeGreaterThanOrEqual(8);
   });
 });

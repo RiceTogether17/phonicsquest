@@ -75,24 +75,6 @@ export const VOCAB_CATEGORIES = {
     color: '#2563eb',
     desc: 'Citizenship, community and governance terms',
   },
-  grammarPrepositions: {
-    label: 'Grammar Cloze: Prepositions',
-    icon: '🧭',
-    color: '#0284c7',
-    desc: 'Choose prepositions by meaning and position',
-  },
-  grammarArticles: {
-    label: 'Grammar Cloze: Articles',
-    icon: '📰',
-    color: '#16a34a',
-    desc: 'Choose a/an/the based on noun clues',
-  },
-  grammarSVA: {
-    label: 'Grammar Cloze: S-V Agreement',
-    icon: '⚙️',
-    color: '#b45309',
-    desc: 'Match verbs to singular/plural subjects',
-  },
 };
 
 export const vocabPassages = {
@@ -1637,7 +1619,7 @@ function _ensurePracticeDepth() {
   for (const [cat, levels] of Object.entries(vocabPassages)) {
     for (const [level, passages] of Object.entries(levels || {})) {
       if (!passages?.length) continue;
-      const target = cat.startsWith('grammar') ? 4 : 5;
+      const target = 8;
       const out = [...passages];
       while (out.length < target) {
         const seed = passages[out.length % passages.length];
@@ -1728,6 +1710,5 @@ function enrichVocabMetadata() {
 enrichVocabPassages();
 
 _ensureMinimumPassages();
-_ensureGrammarCategoryCoverage();
 _ensurePracticeDepth();
 enrichVocabMetadata();
