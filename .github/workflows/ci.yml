@@ -24,6 +24,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Syntax check source modules
+        run: |
+          npm run check:syntax
+
       - name: Build
         run: npm run build
 

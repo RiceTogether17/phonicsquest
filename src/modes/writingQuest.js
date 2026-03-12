@@ -221,13 +221,6 @@ function _renderDimensionBreakdown(result, peer) {
   return `<ul>${rows}</ul>${peer ? '<p>Peer review prompt: ask your partner to suggest one upgrade to your weakest dimension.</p>' : ''}`;
 }
 
-function _renderDimensionBreakdown(result, peer) {
-  const rows = Object.entries(result.dimensions)
-    .map(([key, val]) => `<li>${_dimensionLabel(key)}: ${(val * 100).toFixed(0)}% — ${_dimensionAdvice(key)}</li>`)
-    .join('');
-  return `<ul>${rows}</ul>${peer ? '<p>Peer review prompt: ask your partner to suggest one upgrade to your weakest dimension.</p>' : ''}`;
-}
-
 function _submit(item) {
   const text = /** @type {HTMLTextAreaElement|null} */ (document.getElementById('wq-text'))?.value?.trim() || '';
   const peer = /** @type {HTMLInputElement|null} */ (document.getElementById('wq-peer'))?.checked || false;
