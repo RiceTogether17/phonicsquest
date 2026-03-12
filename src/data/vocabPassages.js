@@ -1573,4 +1573,161 @@ function enrichVocabPassages() {
   }
 }
 
+
+const DEFAULT_DEFINITIONS = {
+  because: 'for that reason',
+  although: 'in spite of that',
+  however: 'in contrast',
+  therefore: 'as a result',
+  and: 'joins similar ideas',
+};
+
+function _inferDefinition(word) {
+  const clean = String(word || '').toLowerCase();
+  if (DEFAULT_DEFINITIONS[clean]) return DEFAULT_DEFINITIONS[clean];
+  if (clean.endsWith('ly')) return 'describes how an action happens';
+  if (clean.startsWith('un')) return 'means “not” + base word';
+  if (clean.endsWith('ness')) return 'state or quality of being';
+  if (clean.endsWith('tion') || clean.endsWith('sion')) return 'the act or process';
+  if (clean.includes(' ')) return 'multi-word expression used in context';
+  return `a vocabulary word used in this passage`;
+}
+
+
+function _clonePassage(seed, cat, level, idx) {
+  const n = idx + 1;
+  return {
+    ...seed,
+    id: `${seed.id || `${cat}-${level}`}-practice-${n}`,
+    title: `${seed.title} (Practice ${n})`,
+    clues: (seed.clues || []).map(c => ({ ...c })),
+    hints: [...(seed.hints || [])],
+    answers: [...(seed.answers || [])],
+    wordBank: [...(seed.wordBank || [])],
+    definitions: { ...(seed.definitions || {}) },
+    contrastPairs: (seed.contrastPairs || []).map(p => ({ ...p })),
+    collocationHintsByWord: { ...(seed.collocationHintsByWord || {}) },
+    partOfSpeechMap: { ...(seed.partOfSpeechMap || {}) },
+  };
+}
+
+function _ensureGrammarCategoryCoverage() {
+  const grammarCats = ['grammarPrepositions', 'grammarArticles', 'grammarSVA'];
+  for (const cat of grammarCats) {
+    if (!vocabPassages[cat]) vocabPassages[cat] = {};
+    for (const level of ['p3', 'p4', 'p5', 'p6']) {
+      const arr = vocabPassages[cat][level] || [];
+      const fallback = arr[0]
+        || vocabPassages[cat].p2?.[0]
+        || vocabPassages[cat].p1?.[0]
+        || vocabPassages.contextInference[level]?.[0]
+        || null;
+      if (!fallback) continue;
+
+      const out = [...arr];
+      while (out.length < 3) {
+        out.push(_clonePassage(fallback, cat, level, out.length));
+      }
+      vocabPassages[cat][level] = out;
+    }
+  }
+}
+
+function _ensurePracticeDepth() {
+  for (const [cat, levels] of Object.entries(vocabPassages)) {
+    for (const [level, passages] of Object.entries(levels || {})) {
+      if (!passages?.length) continue;
+      const target = cat.startsWith('grammar') ? 4 : 5;
+      const out = [...passages];
+      while (out.length < target) {
+        const seed = passages[out.length % passages.length];
+        out.push(_clonePassage(seed, cat, level, out.length));
+      }
+      vocabPassages[cat][level] = out;
+    }
+  }
+}
+
+function _ensureMinimumPassages() {
+  const needsThree = ['idiomaticExpressions', 'proverbsSayings', 'scienceTechTerms', 'socialStudiesVocab', 'grammarPrepositions', 'grammarArticles', 'grammarSVA'];
+  for (const cat of needsThree) {
+    for (const level of ['p3', 'p4', 'p5', 'p6']) {
+      const arr = vocabPassages[cat]?.[level] || [];
+      while (arr.length < 3 && arr.length > 0) {
+        const seed = arr[arr.length - 1];
+        arr.push({ ...seed, id: `${seed.id}-x${arr.length}`, title: `${seed.title} (Practice ${arr.length})` });
+      }
+      if (vocabPassages[cat]) vocabPassages[cat][level] = arr;
+    }
+  }
+}
+
+function enrichVocabMetadata() {
+  for (const [catKey, levels] of Object.entries(vocabPassages)) {
+    for (const passages of Object.values(levels || {})) {
+      for (const passage of passages || []) {
+        if (!passage.definitions) passage.definitions = {};
+        for (const word of (passage.wordBank || [])) {
+          if (!passage.definitions[word]) passage.definitions[word] = _inferDefinition(word);
+        }
+
+        if (!passage.hints || passage.hints.length !== (passage.answers || []).length) {
+          passage.hints = (passage.answers || []).map((ans, idx) => {
+            if (catKey === 'morphologicalAffix') {
+              if (ans.startsWith('un')) return 'Prefix un- means not/opposite.';
+              if (ans.startsWith('re')) return 'Prefix re- means again.';
+              if (ans.endsWith('ly')) return 'Suffix -ly usually forms an adverb.';
+              if (ans.endsWith('ness')) return 'Suffix -ness forms a noun meaning a state.';
+              return `Look at how ${ans} is built from a root word.`;
+            }
+            if (catKey === 'grammaticalRole') return 'Check which part of speech fits this sentence position.';
+            if (catKey === 'connectorClue') return 'Choose a connector that matches the relationship between ideas.';
+            return (passage.hints || [])[idx] || 'Use context clues around the blank.';
+          });
+        }
+
+        if (catKey === 'synonymContrast' && !passage.contrastPairs) {
+          const [a, b, c] = passage.answers || [];
+          passage.contrastPairs = [
+            { word: a, pair: b, type: 'antonym', explanation: `${a} is contrasted with ${b}.` },
+            { word: c || a, pair: a, type: 'synonym', explanation: `${c || a} is close in meaning to ${a}.` },
+          ];
+        }
+
+        if (catKey === 'collocationCloze') {
+          if (!passage.collocationHintsByWord) {
+            passage.collocationHintsByWord = Object.fromEntries((passage.answers || []).map(ans => [ans, `${ans} + key noun phrase` ]));
+          }
+          if (!passage.collocationHint) {
+            passage.collocationHint = Object.values(passage.collocationHintsByWord)[0] || 'Use natural word partners.';
+          }
+        }
+
+        if (catKey === 'grammaticalRole' && !passage.partOfSpeechMap) {
+          const posMap = {};
+          for (const word of (passage.wordBank || [])) {
+            const lw = word.toLowerCase();
+            if (lw.endsWith('ly')) posMap[word] = 'adverb';
+            else if (lw.endsWith('ing') || lw.endsWith('ed')) posMap[word] = 'verb';
+            else if (lw.endsWith('ous') || lw.endsWith('ful') || lw.endsWith('ive') || lw.endsWith('able')) posMap[word] = 'adjective';
+            else posMap[word] = 'noun';
+          }
+          passage.partOfSpeechMap = posMap;
+        }
+
+        if (catKey === 'connectorClue' && !passage.clueType) {
+          const text = (passage.text || '').toLowerCase();
+          passage.clueType = text.includes('but') || text.includes('although') ? 'contrast' : text.includes('because') || text.includes('since') ? 'reason' : 'sequence';
+        }
+      }
+    }
+  }
+}
+
+
 enrichVocabPassages();
+
+_ensureMinimumPassages();
+_ensureGrammarCategoryCoverage();
+_ensurePracticeDepth();
+enrichVocabMetadata();

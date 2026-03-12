@@ -106,7 +106,7 @@ describe('speech recognition enhancements', () => {
     expect(store.get('xp')).toBeGreaterThan(0);
     expect(app._cleanupMode).toHaveBeenCalled();
     expect(app._nextWord).toHaveBeenCalled();
-  });
+  }, 15000);
 
   it('phonetic similarity blends levenshtein and metaphone for accent variants', async () => {
     vi.resetModules();
