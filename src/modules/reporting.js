@@ -157,6 +157,59 @@ export function getLearningFunnelReport({ days = 7 } = {}) {
   };
 }
 
+
+export function getAdaptiveLessonQueue({ limit = 6 } = {}) {
+  const { vocab, grammar } = getMoePriorityRecommendations();
+  const funnel = getLearningFunnelReport({ days: 7 });
+
+  const queue = [];
+  for (const r of vocab) {
+    queue.push({
+      quest: 'wordVault',
+      skill: r.key,
+      label: r.label,
+      loCode: r.loCode,
+      reason: `Low mastery (${Math.round(r.accuracy * 100)}%) in ${r.label}`,
+      targetAccuracy: 0.85,
+    });
+  }
+  for (const r of grammar) {
+    queue.push({
+      quest: 'clozeCastle',
+      skill: r.key,
+      label: r.label,
+      loCode: r.loCode,
+      reason: `MOE-priority grammar focus: ${r.label}`,
+      targetAccuracy: 0.85,
+    });
+  }
+
+  // If response speed is very slow, add a confidence/speed item in Sentence Forge.
+  if (funnel.avgResponseMs !== null && funnel.avgResponseMs > 3500) {
+    queue.unshift({
+      quest: 'sentenceForge',
+      skill: 'fluency',
+      label: 'Sentence fluency sprint',
+      loCode: 'LO-ENG-FLUENCY',
+      reason: `Average response time is ${funnel.avgResponseMs}ms (target < 3000ms).`,
+      targetAccuracy: 0.8,
+    });
+  }
+
+  // Deduplicate by quest+skill and cap.
+  const seen = new Set();
+  const deduped = [];
+  for (const item of queue) {
+    const key = `${item.quest}:${item.skill}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(item);
+    if (deduped.length >= limit) break;
+  }
+  return deduped;
+}
+
+
 export function getLatestQuestScoreboards() {
   const attempts = store.get('questAttempts') || [];
   const byQuest = ['sentenceForge', 'clozeCastle', 'wordVault'].map((quest) => {

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { store } from '../src/modules/store.js';
-import { getVocabularyCategoryReport, getGrammarCategoryReport, getLatestQuestScoreboards, getMoePriorityRecommendations, getLearningFunnelReport } from '../src/modules/reporting.js';
+import { getVocabularyCategoryReport, getGrammarCategoryReport, getLatestQuestScoreboards, getMoePriorityRecommendations, getLearningFunnelReport, getAdaptiveLessonQueue } from '../src/modules/reporting.js';
 
 describe('reporting module', () => {
   beforeEach(() => {
@@ -54,5 +54,15 @@ describe('reporting module', () => {
     expect(funnel.attempts).toBeGreaterThanOrEqual(2);
     expect(funnel.byQuest.find(q => q.quest === 'wordVault')?.attempts).toBeGreaterThanOrEqual(1);
     expect(funnel.avgResponseMs).not.toBeNull();
+  });
+
+
+  it('builds adaptive lesson queue with deduped tasks', () => {
+    store.recordLearningEvent({ eventType: 'quest_attempt', quest: 'wordVault', skill: 'contextInference', correct: false, responseMs: 5200, level: 'p3' });
+    const queue = getAdaptiveLessonQueue({ limit: 4 });
+    expect(queue.length).toBeLessThanOrEqual(4);
+    expect(queue.length).toBeGreaterThan(0);
+    const uniqueKeys = new Set(queue.map(q => `${q.quest}:${q.skill}`));
+    expect(uniqueKeys.size).toBe(queue.length);
   });
 });

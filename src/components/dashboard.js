@@ -33,6 +33,7 @@ import {
   getLatestQuestScoreboards,
   getMoePriorityRecommendations,
   getLearningFunnelReport,
+  getAdaptiveLessonQueue,
 } from '../modules/reporting.js';
 
 Chart.register(...registerables);
@@ -183,6 +184,7 @@ function _renderCategoryReporting() {
   const scoreboards = getLatestQuestScoreboards();
   const priorities = getMoePriorityRecommendations();
   const funnel = getLearningFunnelReport({ days: 7 });
+  const lessonQueue = getAdaptiveLessonQueue({ limit: 6 });
 
   const rowHtml = (rows) => rows.map(r => {
     const pct = Math.round((r.accuracy || 0) * 100);
@@ -238,6 +240,10 @@ function _renderCategoryReporting() {
       ${priorityBlock('Priority vocabulary revision', priorities.vocab)}
       ${priorityBlock('Priority grammar revision', priorities.grammar)}
     </div>
+    <h4 class="dash-section-title" style="margin-top:16px">Adaptive Next Lesson Queue</h4>
+    <ul class="dash-pattern-list">
+      ${lessonQueue.map(item => `<li class="dash-pattern-item"><strong>${item.quest}</strong> · ${item.label} <small>(${item.loCode})</small><br>${item.reason}</li>`).join('')}
+    </ul>
   `;
 }
 
