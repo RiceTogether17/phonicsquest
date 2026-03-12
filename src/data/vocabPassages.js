@@ -51,6 +51,30 @@ export const VOCAB_CATEGORIES = {
     color: '#0d9488',
     desc: 'Link ideas with the right connector word',
   },
+  idiomaticExpressions: {
+    label: 'Idiomatic Expressions',
+    icon: '💬',
+    color: '#7c3aed',
+    desc: 'Use common idioms from context clues',
+  },
+  proverbsSayings: {
+    label: 'Proverbs & Sayings',
+    icon: '🪶',
+    color: '#ca8a04',
+    desc: 'Complete famous sayings with meaning clues',
+  },
+  scienceTechTerms: {
+    label: 'Science & Technology',
+    icon: '🧪',
+    color: '#0891b2',
+    desc: 'Topic vocabulary for science and technology',
+  },
+  socialStudiesVocab: {
+    label: 'Social Studies Vocabulary',
+    icon: '🏛️',
+    color: '#2563eb',
+    desc: 'Citizenship, community and governance terms',
+  },
   grammarPrepositions: {
     label: 'Grammar Cloze: Prepositions',
     icon: '🧭',
@@ -1427,3 +1451,283 @@ export const vocabPassages = {
     ],
   },
 };
+
+
+const EXTRA_VOCAB_CONTENT = {
+  idiomaticExpressions: {
+    p3: [
+      { id: 'idi-p3-01', title: 'Cool Down', text: 'After hearing the misunderstanding, Amir decided to ___ and speak politely. His teacher reminded him not to ___ over a small mistake.', answers: ['cool down', 'blow up'], wordBank: ['cool down', 'blow up', 'warm up', 'calm up', 'cheer up'], xp: 32, clues: [
+        { blankIndex: 0, prompt: 'Tap the context showing he should become less angry.', acceptableSpans: ['speak politely'], partialSpans: ['misunderstanding'], clueType: 'context-clue', explanation: '"Cool down" means become calm.' },
+        { blankIndex: 1, prompt: 'Tap the phrase showing the issue is small.', acceptableSpans: ['small mistake'], partialSpans: ['teacher reminded'], clueType: 'context-clue', explanation: '"Blow up" means become suddenly very angry.' },
+      ] },
+      { id: 'idi-p3-02', title: 'Team Spirit', text: 'During rehearsal, we told Ben to ___ and try the dance once more. After he succeeded, the class said he had ___!', answers: ['keep going', 'nailed it'], wordBank: ['keep going', 'nailed it', 'keep sleeping', 'missed it', 'gave up'], xp: 32 },
+    ],
+    p4: [
+      { id: 'idi-p4-01', title: 'Practice Makes Better', text: 'At first, coding felt difficult, but Mei refused to ___. She practised daily and finally ___ the challenge.', answers: ['throw in the towel', 'cracked'], wordBank: ['throw in the towel', 'cracked', 'passed in towel', 'blocked', 'quit on'], xp: 36 },
+      { id: 'idi-p4-02', title: 'Quiet Hero', text: 'Kai never boasts. He lets his work ___. During the project crisis, he ___ and solved the bug quickly.', answers: ['speak for itself', 'stepped up'], wordBank: ['speak for itself', 'stepped up', 'talk for itself', 'sat down', 'broke off'], xp: 36 },
+    ],
+    p5: [
+      { id: 'idi-p5-01', title: 'Debate Day', text: 'When the judge asked a hard question, Lina thought on her feet and did not ___. Her reply was so sharp that it ___ the audience.', answers: ['freeze up', 'won over'], wordBank: ['freeze up', 'won over', 'heated up', 'turned under', 'lost over'], xp: 42 },
+      { id: 'idi-p5-02', title: 'Busy Week', text: 'Before exams, many students feel they have too much on their ___. Jia made a checklist so she could ___ each task one by one.', answers: ['plate', 'tackle'], wordBank: ['plate', 'tackle', 'chair', 'juggle', 'ignore'], xp: 42 },
+    ],
+    p6: [
+      { id: 'idi-p6-01', title: 'Leadership Talk', text: 'Our mentor said a true leader must ___ when plans fail and keep the team focused. During setbacks, she always helps us ___ and move ahead.', answers: ['stay grounded', 'bounce back'], wordBank: ['stay grounded', 'bounce back', 'fly away', 'fall apart', 'break down'], xp: 50 },
+      { id: 'idi-p6-02', title: 'Innovation Pitch', text: 'The panel asked tough questions, but Dev kept his ___ and explained each idea clearly. By the end, the proposal had ___ with the judges.', answers: ['composure', 'struck a chord'], wordBank: ['composure', 'struck a chord', 'nerves', 'hit a wall', 'missed a beat'], xp: 50 },
+    ],
+  },
+  proverbsSayings: {
+    p3: [
+      { id: 'prov-p3-01', title: 'Finish Early', text: 'Grandma says, "A stitch in ___ saves ___." She means solving a problem early prevents bigger trouble.', answers: ['time', 'nine'], wordBank: ['time', 'nine', 'line', 'mine', 'ten'], xp: 32, clues: [
+        { blankIndex: 0, prompt: 'Tap the phrase that means doing something early.', acceptableSpans: ['early prevents bigger trouble'], partialSpans: ['problem early'], clueType: 'context-clue', explanation: 'The proverb begins with "in time".' },
+        { blankIndex: 1, prompt: 'Tap the final number in the proverb meaning many future problems.', acceptableSpans: ['bigger trouble'], partialSpans: ['prevents'], clueType: 'context-clue', explanation: '"Saves nine" means you avoid many later fixes.' },
+      ] },
+      { id: 'prov-p3-02', title: 'Practice Advice', text: 'Coach reminded us, "Practice makes ___." She explained that regular training helps us improve steadily.', answers: ['perfect'], wordBank: ['perfect', 'progress', 'late', 'tired'], xp: 32 },
+    ],
+    p4: [
+      { id: 'prov-p4-01', title: 'Patience', text: 'Dad smiled and said, "Rome was not built in a ___." He meant good work takes time.', answers: ['day'], wordBank: ['day', 'week', 'rush', 'hurry'], xp: 36 },
+      { id: 'prov-p4-02', title: 'Effort Matters', text: 'Our form teacher often says, "Where there is a will, there is a ___." She wants us to keep trying.', answers: ['way'], wordBank: ['way', 'road', 'wall', 'chance'], xp: 36 },
+    ],
+    p5: [
+      { id: 'prov-p5-01', title: 'Caution', text: 'Before sharing news, Mum says, "Look before you ___." She means check facts before acting.', answers: ['leap'], wordBank: ['leap', 'sleep', 'speak', 'run'], xp: 42 },
+      { id: 'prov-p5-02', title: 'Truth and Character', text: 'In values lesson we learnt, "Honesty is the best ___." and "Actions speak louder than ___."', answers: ['policy', 'words'], wordBank: ['policy', 'words', 'advice', 'voices', 'choices'], xp: 42 },
+    ],
+    p6: [
+      { id: 'prov-p6-01', title: 'Wise Choices', text: 'The principal quoted, "Do not count your chickens before they ___." She reminded us not to assume success too early.', answers: ['hatch'], wordBank: ['hatch', 'run', 'grow', 'arrive'], xp: 50 },
+      { id: 'prov-p6-02', title: 'Perseverance', text: 'Our mentor wrote, "When the going gets tough, the tough get ___." It teaches resilience under pressure.', answers: ['going'], wordBank: ['going', 'stronger', 'moving', 'winning'], xp: 50 },
+    ],
+  },
+  scienceTechTerms: {
+    p3: [
+      { id: 'st-p3-01', title: 'Living Things', text: 'A group of living things and their surroundings is an ___. Plants need ___ from the Sun to make food.', answers: ['ecosystem', 'energy'], wordBank: ['ecosystem', 'energy', 'planet', 'machine', 'gravity'], xp: 32 },
+      { id: 'st-p3-02', title: 'Simple Devices', text: 'A computer uses ___ to process data. A keyboard is an ___ device because we type with it.', answers: ['software', 'input'], wordBank: ['software', 'input', 'output', 'battery', 'screen'], xp: 32 },
+    ],
+    p4: [
+      { id: 'st-p4-01', title: 'Space Basics', text: 'The Earth moves around the Sun in an ___. The Moon is Earth\'s natural ___.', answers: ['orbit', 'satellite'], wordBank: ['orbit', 'satellite', 'rocket', 'engine', 'galaxy'], xp: 36 },
+      { id: 'st-p4-02', title: 'Energy Sources', text: 'Electric cars use stored ___ in batteries. Solar panels convert sunlight into electrical ___.', answers: ['energy', 'power'], wordBank: ['energy', 'power', 'plastic', 'temperature', 'signal'], xp: 36 },
+    ],
+    p5: [
+      { id: 'st-p5-01', title: 'Coding Concepts', text: 'A set of instructions for solving a problem is an ___. A coding ___ helps find and fix mistakes.', answers: ['algorithm', 'debugger'], wordBank: ['algorithm', 'debugger', 'browser', 'sensor', 'network'], xp: 42 },
+      { id: 'st-p5-02', title: 'Environmental Science', text: 'When species disappear forever, this is called ___. Protecting habitats helps conserve ___.', answers: ['extinction', 'biodiversity'], wordBank: ['extinction', 'biodiversity', 'evaporation', 'pressure', 'gravity'], xp: 42 },
+    ],
+    p6: [
+      { id: 'st-p6-01', title: 'Advanced Space', text: 'A huge system of stars is a ___. Objects pulled by a planet\'s force are affected by ___.', answers: ['galaxy', 'gravity'], wordBank: ['galaxy', 'gravity', 'circuit', 'signal', 'oxygen'], xp: 50 },
+      { id: 'st-p6-02', title: 'Emerging Technology', text: 'Systems that learn from data are called ___. Protecting online data requires strong ___.', answers: ['artificial intelligence', 'cybersecurity'], wordBank: ['artificial intelligence', 'cybersecurity', 'agriculture', 'ecosystem', 'radiation'], xp: 50 },
+    ],
+  },
+  socialStudiesVocab: {
+    p3: [
+      { id: 'ss-p3-01', title: 'Good Citizen', text: 'A responsible ___ follows rules and helps others. In school, we show ___ by listening and sharing.', answers: ['citizen', 'respect'], wordBank: ['citizen', 'respect', 'leader', 'traffic', 'noise'], xp: 32 },
+      { id: 'ss-p3-02', title: 'Our Community', text: 'A ___ is a place where people live and work together. Community helpers provide useful ___.', answers: ['community', 'services'], wordBank: ['community', 'services', 'machines', 'signals', 'experiments'], xp: 32 },
+    ],
+    p4: [
+      { id: 'ss-p4-01', title: 'Rules and Laws', text: 'A ___ is an official rule made by government. Obeying laws helps keep society ___.', answers: ['law', 'orderly'], wordBank: ['law', 'orderly', 'debate', 'rapid', 'fragile'], xp: 36 },
+      { id: 'ss-p4-02', title: 'Participating', text: 'When citizens join activities to improve society, this is called civic ___. Voting is one example of public ___.', answers: ['participation', 'engagement'], wordBank: ['participation', 'engagement', 'temperature', 'migration', 'storage'], xp: 36 },
+    ],
+    p5: [
+      { id: 'ss-p5-01', title: 'Government Roles', text: 'The ___ branch carries out laws, while the ___ branch makes laws.', answers: ['executive', 'legislative'], wordBank: ['executive', 'legislative', 'economic', 'cultural', 'historic'], xp: 42 },
+      { id: 'ss-p5-02', title: 'National Identity', text: 'Shared history and symbols build national ___. Citizens show loyalty through civic ___.', answers: ['identity', 'responsibility'], wordBank: ['identity', 'responsibility', 'pollution', 'innovation', 'circulation'], xp: 42 },
+    ],
+    p6: [
+      { id: 'ss-p6-01', title: 'Public Policy', text: 'A government ___ is a plan to solve public issues. Leaders review evidence before making a ___ decision.', answers: ['policy', 'balanced'], wordBank: ['policy', 'balanced', 'fragile', 'chemical', 'artistic'], xp: 50 },
+      { id: 'ss-p6-02', title: 'Global Citizenship', text: 'Global citizens show ___ for different cultures and support international ___.', answers: ['empathy', 'cooperation'], wordBank: ['empathy', 'cooperation', 'distance', 'pollution', 'friction'], xp: 50 },
+    ],
+  },
+};
+
+const EXTRA_CLUES_BY_ID = {
+  'ci-p3-04': [
+    { blankIndex: 0, prompt: 'Tap the phrase that shows Nora could not find the atlas.', acceptableSpans: ['missing atlas', 'empty space'], partialSpans: ['scanned each shelf'], clueType: 'context-clue', explanation: 'If something is missing, she likely felt worried.' },
+    { blankIndex: 1, prompt: 'Tap the place clue that suggests where books go after being borrowed.', acceptableSpans: ['counter'], partialSpans: ['trolley'], clueType: 'context-clue', explanation: 'A return trolley is usually near the counter.' },
+    { blankIndex: 2, prompt: 'Tap the event showing the problem was solved.', acceptableSpans: ['found it'], partialSpans: ['At last'], clueType: 'contrast-clue', explanation: 'Finding the atlas made her feel relieved, not upset.' },
+  ],
+  'sc-p4-01': [
+    { blankIndex: 0, prompt: 'Tap the clue showing the brother likes parties and social events.', acceptableSpans: ['loved parties'], partialSpans: ['brother'], clueType: 'synonym-clue', explanation: 'Someone who loves parties is often extroverted.' },
+    { blankIndex: 1, prompt: 'Tap the clue showing Maya preferred quiet time with books.', acceptableSpans: ['quiet evenings with a good book'], partialSpans: ['quiet evenings'], clueType: 'contrast-clue', explanation: 'Preferring quiet time suggests introverted personality.' },
+    { blankIndex: 2, prompt: 'Tap the sentence that explicitly states an opposite relationship.', acceptableSpans: ['opposite of being'], partialSpans: ['outgoing'], clueType: 'contrast-clue', explanation: 'Reserved is a synonym for quiet/shy and opposite of outgoing.' },
+  ],
+  'sc-p5-02': [
+    { blankIndex: 0, prompt: 'Tap the clue linked to harvest season and plenty.', acceptableSpans: ['harvest'], partialSpans: ['food'], clueType: 'context-clue', explanation: 'Harvest time usually means food is abundant.' },
+    { blankIndex: 1, prompt: 'Tap the clue that indicates shortage.', acceptableSpans: ['drought'], partialSpans: ['resources'], clueType: 'contrast-clue', explanation: 'During drought, resources become scarce.' },
+    { blankIndex: 2, prompt: 'Tap the phrase that mentions having very little.', acceptableSpans: ['what little they had'], partialSpans: ['villagers'], clueType: 'context-clue', explanation: 'When supplies are limited, people need to be frugal.' },
+  ],
+};
+
+function enrichVocabPassages() {
+  for (const [catKey, levels] of Object.entries(EXTRA_VOCAB_CONTENT)) {
+    if (!vocabPassages[catKey]) vocabPassages[catKey] = {};
+    for (const [level, items] of Object.entries(levels)) {
+      if (!vocabPassages[catKey][level]) vocabPassages[catKey][level] = [];
+      vocabPassages[catKey][level].push(...items.map(item => ({ ...item })));
+    }
+  }
+
+  for (const [id, clues] of Object.entries(EXTRA_CLUES_BY_ID)) {
+    for (const category of Object.values(vocabPassages)) {
+      for (const passages of Object.values(category || {})) {
+        const target = (passages || []).find(p => p.id === id);
+        if (target && (!target.clues || !target.clues.length)) {
+          target.clues = clues.map(c => ({ ...c }));
+        }
+      }
+    }
+  }
+}
+
+
+const DEFAULT_DEFINITIONS = {
+  because: 'for that reason',
+  although: 'in spite of that',
+  however: 'in contrast',
+  therefore: 'as a result',
+  and: 'joins similar ideas',
+};
+
+function _inferDefinition(word) {
+  const clean = String(word || '').toLowerCase();
+  if (DEFAULT_DEFINITIONS[clean]) return DEFAULT_DEFINITIONS[clean];
+  if (clean.endsWith('ly')) return 'describes how an action happens';
+  if (clean.startsWith('un')) return 'means “not” + base word';
+  if (clean.endsWith('ness')) return 'state or quality of being';
+  if (clean.endsWith('tion') || clean.endsWith('sion')) return 'the act or process';
+  if (clean.includes(' ')) return 'multi-word expression used in context';
+  return `a vocabulary word used in this passage`;
+}
+
+
+function _clonePassage(seed, cat, level, idx) {
+  const n = idx + 1;
+  return {
+    ...seed,
+    id: `${seed.id || `${cat}-${level}`}-practice-${n}`,
+    title: `${seed.title} (Practice ${n})`,
+    clues: (seed.clues || []).map(c => ({ ...c })),
+    hints: [...(seed.hints || [])],
+    answers: [...(seed.answers || [])],
+    wordBank: [...(seed.wordBank || [])],
+    definitions: { ...(seed.definitions || {}) },
+    contrastPairs: (seed.contrastPairs || []).map(p => ({ ...p })),
+    collocationHintsByWord: { ...(seed.collocationHintsByWord || {}) },
+    partOfSpeechMap: { ...(seed.partOfSpeechMap || {}) },
+  };
+}
+
+function _ensureGrammarCategoryCoverage() {
+  const grammarCats = ['grammarPrepositions', 'grammarArticles', 'grammarSVA'];
+  for (const cat of grammarCats) {
+    if (!vocabPassages[cat]) vocabPassages[cat] = {};
+    for (const level of ['p3', 'p4', 'p5', 'p6']) {
+      const arr = vocabPassages[cat][level] || [];
+      const fallback = arr[0]
+        || vocabPassages[cat].p2?.[0]
+        || vocabPassages[cat].p1?.[0]
+        || vocabPassages.contextInference[level]?.[0]
+        || null;
+      if (!fallback) continue;
+
+      const out = [...arr];
+      while (out.length < 3) {
+        out.push(_clonePassage(fallback, cat, level, out.length));
+      }
+      vocabPassages[cat][level] = out;
+    }
+  }
+}
+
+function _ensurePracticeDepth() {
+  for (const [cat, levels] of Object.entries(vocabPassages)) {
+    for (const [level, passages] of Object.entries(levels || {})) {
+      if (!passages?.length) continue;
+      const target = cat.startsWith('grammar') ? 4 : 5;
+      const out = [...passages];
+      while (out.length < target) {
+        const seed = passages[out.length % passages.length];
+        out.push(_clonePassage(seed, cat, level, out.length));
+      }
+      vocabPassages[cat][level] = out;
+    }
+  }
+}
+
+function _ensureMinimumPassages() {
+  const needsThree = ['idiomaticExpressions', 'proverbsSayings', 'scienceTechTerms', 'socialStudiesVocab', 'grammarPrepositions', 'grammarArticles', 'grammarSVA'];
+  for (const cat of needsThree) {
+    for (const level of ['p3', 'p4', 'p5', 'p6']) {
+      const arr = vocabPassages[cat]?.[level] || [];
+      while (arr.length < 3 && arr.length > 0) {
+        const seed = arr[arr.length - 1];
+        arr.push({ ...seed, id: `${seed.id}-x${arr.length}`, title: `${seed.title} (Practice ${arr.length})` });
+      }
+      if (vocabPassages[cat]) vocabPassages[cat][level] = arr;
+    }
+  }
+}
+
+function enrichVocabMetadata() {
+  for (const [catKey, levels] of Object.entries(vocabPassages)) {
+    for (const passages of Object.values(levels || {})) {
+      for (const passage of passages || []) {
+        if (!passage.definitions) passage.definitions = {};
+        for (const word of (passage.wordBank || [])) {
+          if (!passage.definitions[word]) passage.definitions[word] = _inferDefinition(word);
+        }
+
+        if (!passage.hints || passage.hints.length !== (passage.answers || []).length) {
+          passage.hints = (passage.answers || []).map((ans, idx) => {
+            if (catKey === 'morphologicalAffix') {
+              if (ans.startsWith('un')) return 'Prefix un- means not/opposite.';
+              if (ans.startsWith('re')) return 'Prefix re- means again.';
+              if (ans.endsWith('ly')) return 'Suffix -ly usually forms an adverb.';
+              if (ans.endsWith('ness')) return 'Suffix -ness forms a noun meaning a state.';
+              return `Look at how ${ans} is built from a root word.`;
+            }
+            if (catKey === 'grammaticalRole') return 'Check which part of speech fits this sentence position.';
+            if (catKey === 'connectorClue') return 'Choose a connector that matches the relationship between ideas.';
+            return (passage.hints || [])[idx] || 'Use context clues around the blank.';
+          });
+        }
+
+        if (catKey === 'synonymContrast' && !passage.contrastPairs) {
+          const [a, b, c] = passage.answers || [];
+          passage.contrastPairs = [
+            { word: a, pair: b, type: 'antonym', explanation: `${a} is contrasted with ${b}.` },
+            { word: c || a, pair: a, type: 'synonym', explanation: `${c || a} is close in meaning to ${a}.` },
+          ];
+        }
+
+        if (catKey === 'collocationCloze') {
+          if (!passage.collocationHintsByWord) {
+            passage.collocationHintsByWord = Object.fromEntries((passage.answers || []).map(ans => [ans, `${ans} + key noun phrase` ]));
+          }
+          if (!passage.collocationHint) {
+            passage.collocationHint = Object.values(passage.collocationHintsByWord)[0] || 'Use natural word partners.';
+          }
+        }
+
+        if (catKey === 'grammaticalRole' && !passage.partOfSpeechMap) {
+          const posMap = {};
+          for (const word of (passage.wordBank || [])) {
+            const lw = word.toLowerCase();
+            if (lw.endsWith('ly')) posMap[word] = 'adverb';
+            else if (lw.endsWith('ing') || lw.endsWith('ed')) posMap[word] = 'verb';
+            else if (lw.endsWith('ous') || lw.endsWith('ful') || lw.endsWith('ive') || lw.endsWith('able')) posMap[word] = 'adjective';
+            else posMap[word] = 'noun';
+          }
+          passage.partOfSpeechMap = posMap;
+        }
+
+        if (catKey === 'connectorClue' && !passage.clueType) {
+          const text = (passage.text || '').toLowerCase();
+          passage.clueType = text.includes('but') || text.includes('although') ? 'contrast' : text.includes('because') || text.includes('since') ? 'reason' : 'sequence';
+        }
+      }
+    }
+  }
+}
+
+
+enrichVocabPassages();
+
+_ensureMinimumPassages();
+_ensureGrammarCategoryCoverage();
+_ensurePracticeDepth();
+enrichVocabMetadata();
