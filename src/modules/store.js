@@ -31,8 +31,12 @@ const DEFAULT_STATE = {
   reducedMotion:  false,    // manual override for prefers-reduced-motion
   speechEnabled:  true,
   speechLocale:   'en-SG',
+  speechThreshold: 0.75,
   fontScale:      100,
   bilingualInstructions: false,
+  dyslexiaFontEnabled: false,
+  highContrastEnabled: false,
+  bankChipScale: 100,
 
   // Adaptive selection tuning (can be overridden by educator tooling)
   adaptiveConfig: {
@@ -52,6 +56,9 @@ const DEFAULT_STATE = {
 
   // Group mastery (per group accuracy)
   groupMastery: {},         // { [group]: accuracy 0-1 }
+
+  // Grammar category stats (Cloze Castle)
+  grammarCategoryStats: {}, // { [level-category]: { attempts, correct, accuracy } }
 
   // Quest mastery + telemetry
   questMastery: {
