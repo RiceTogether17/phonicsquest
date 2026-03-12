@@ -44,6 +44,8 @@ let _bankWords       = [];    // [{id, word, used}]
 let _answerSlots     = [];    // bank word ids in answer order
 let _sessionCorrect  = 0;
 let _sessionTotal    = 0;
+let _sessionXpEarned = 0;
+let _sessionStreakBonus = 0;
 let _keyHandler      = null;
 
 // Per-sentence-skill attempt tracking for the session
@@ -58,6 +60,33 @@ let _sessionClueMissionTotal = 0;
 
 // Skill clue panel – dismissed once per sentence after "Got it"
 let _skillClueDismissed = false;
+
+const LEVEL_SKILL_KEYS = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
+const LEVEL_TAG_LABELS = {
+  connector_clue: '🔗 Connectors',
+  comparison_structure: '⚖️ Comparatives',
+  modal_order: '🛡️ Modals',
+  tense_clue: '⏱️ Tenses',
+  preposition_clue: '📍 Prepositions',
+};
+
+export function getSentenceForgeCategoriesByLevel(sentences = allSentences) {
+  const result = {};
+  for (let lv = 1; lv <= 6; lv++) {
+    const skillSet = new Set();
+    sentences
+      .filter(s => s.level === lv)
+      .forEach(s => (s.sentenceSkills || []).forEach(skill => skillSet.add(skill)));
+    result[lv] = Object.keys(LEVEL_TAG_LABELS).filter(skill => skillSet.has(skill));
+  }
+  return result;
+}
+
+export function getScoreboardStats({ correct, total }) {
+  const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
+  const stars = accuracy >= 90 ? 3 : accuracy >= 70 ? 2 : 1;
+  return { accuracy, stars };
+}
 
 // ── Public API ──────────────────────────────────────────────────────────────
 
@@ -83,6 +112,7 @@ function _renderBrowser() {
   if (!_container) return;
 
   const completed = store.get('sfqCompleted') || {};
+  const categoryMap = getSentenceForgeCategoriesByLevel();
 
   let html = '<div class="sfq-browser"><div class="sfq-browser-grid">';
 
@@ -92,14 +122,19 @@ function _renderBrowser() {
     const isDone = done >= total;
     const icon   = SENTENCE_LEVEL_ICONS[lv - 1];
 
+    const categorySkills = categoryMap[lv] || [];
     html += `
       <button class="sfq-level-btn ${isDone ? 'sfq-level-btn--done' : ''}"
               data-level="${lv}" aria-label="${SENTENCE_LEVEL_LABELS[lv]}">
         <span class="sfq-level-icon">${isDone ? '⭐' : icon}</span>
         <span class="sfq-level-name">${SENTENCE_LEVEL_LABELS[lv]}</span>
         <span class="sfq-level-count">${Math.min(done, total)} / ${total}</span>
+        <span class="sfq-level-categories" aria-label="Sentence categories for level ${lv}">
+          ${categorySkills.map(skill => `<span class="sfq-level-tag">${LEVEL_TAG_LABELS[skill]}</span>`).join('')}
+        </span>
       </button>`;
   }
+  console.info('[SentenceForge] Level selector categories', categoryMap);
 
   html += '</div></div>';
   _container.innerHTML = html;
@@ -120,6 +155,8 @@ function _startLevel(level) {
   _sentenceIdx     = 0;
   _sessionCorrect  = 0;
   _sessionTotal    = 0;
+  _sessionXpEarned = 0;
+  _sessionStreakBonus = 0;
   _sessionClueCorrect = 0;
   _sessionClueMissionTotal = 0;
   _sessionSkillAttempts = {};
@@ -467,7 +504,10 @@ function _checkAnswer(entry, punct) {
       _recordSessionSkill(skill, true);
     }
 
-    gamification.recordCorrect(1200, false);
+    const reward = gamification.recordCorrect(1200, false);
+    _sessionXpEarned += reward?.xpEarned || 0;
+    if (reward?.reasons?.includes('5 in a row!')) _sessionStreakBonus += 10;
+    if (reward?.reasons?.includes('10 in a row!')) _sessionStreakBonus += 20;
     celebrateCorrect();
     audio.playSfx('correct');
     mascot.celebrate(false);
@@ -486,6 +526,7 @@ function _checkAnswer(entry, punct) {
       _recordSessionSkill(skill, false);
     }
 
+    gamification.recordWrong();
     audio.playSfx('wrong');
     mascot.encourage();
 
@@ -521,15 +562,18 @@ function _showFeedback(msg, success) {
 function _showComplete() {
   if (!_container) return;
 
-  const acc   = _sessionTotal > 0 ? Math.round((_sessionCorrect / _sessionTotal) * 100) : 0;
-  const stars = acc >= 90 ? 3 : acc >= 70 ? 2 : 1;
+  const { accuracy: acc, stars } = getScoreboardStats({ correct: _sessionCorrect, total: _sessionTotal });
   const icon  = SENTENCE_LEVEL_ICONS[_currentLevel - 1];
+  const allLevels = [...LEVEL_SKILL_KEYS];
+  const recommendedSkill = questMastery.getRecommendedSkill('sentenceForge', allLevels);
+  const recommendedLevel = Number((recommendedSkill || '').replace('p', '')) || Math.min(6, _currentLevel + 1);
+  const hasNextLevel = _currentLevel < 6;
+  const currentXp = store.get('xp') || 0;
 
   celebrateCorrect();
   audio.playSfx('levelUp');
   mascot.celebrate(true);
 
-  // Skill summary computed from session tracking
   const skillSummary = getSkillSummary(_sessionSkillAttempts);
   const skillLines = skillSummary.scores
     .sort((a, b) => b.score - a.score)
@@ -556,41 +600,57 @@ function _showComplete() {
   const weakestLine = (skillSummary.weakest && skillSummary.weakest !== skillSummary.strongest)
     ? `<p class="sfq-complete-skill-note">📈 To improve: <strong>${skillSummary.weakest}</strong></p>` : '';
 
+  const resultLine = acc >= 90
+    ? 'Outstanding sentence smithing!'
+    : acc >= 70
+    ? 'Great work — keep climbing!'
+    : 'Good effort — replay to boost mastery!';
+
   _container.innerHTML = `
-    <div class="sfq-complete">
-      <div class="sfq-complete-icon">${icon}</div>
-      <h3 class="sfq-complete-title">Level Complete!</h3>
-      <p class="sfq-complete-sub">${SENTENCE_LEVEL_LABELS[_currentLevel]}</p>
-      <div class="sfq-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
-      <p class="sfq-complete-score">${_sessionCorrect} / ${_sessionTotal} correct · ${acc}%</p>
-      ${clueAcc !== null ? `<p class="sfq-complete-clue">🔍 Clue accuracy: ${clueAcc}%</p>` : ''}
+    <div class="sfq-scoreboard-overlay" role="dialog" aria-label="Sentence Forge session summary">
+      <div class="sfq-complete">
+        <div class="sfq-complete-icon">${icon}</div>
+        <h3 class="sfq-complete-title">Session Scoreboard</h3>
+        <p class="sfq-complete-sub">${SENTENCE_LEVEL_LABELS[_currentLevel]}</p>
+        <div class="sfq-stars" aria-label="${stars} stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+        <p class="sfq-complete-message">${resultLine}</p>
+        <p class="sfq-complete-score">${_sessionCorrect} / ${_sessionTotal} correct · ${acc}%</p>
+        <p class="sfq-complete-meta">XP: ${currentXp} · Session XP +${_sessionXpEarned} · Streak bonus +${_sessionStreakBonus}</p>
+        <p class="sfq-complete-meta">Recommended next level: <strong>P${recommendedLevel}</strong></p>
+        ${clueAcc !== null ? `<p class="sfq-complete-clue">🔍 Clue accuracy: ${clueAcc}%</p>` : ''}
 
-      ${skillLines ? `
-        <div class="sfq-skill-summary">
-          <h4 class="sfq-skill-summary-title">Sentence Skills This Level</h4>
-          ${skillLines}
-          ${strongestLine}
-          ${weakestLine}
-        </div>` : ''}
+        ${skillLines ? `
+          <div class="sfq-skill-summary">
+            <h4 class="sfq-skill-summary-title">Sentence Skills This Level</h4>
+            ${skillLines}
+            ${strongestLine}
+            ${weakestLine}
+          </div>` : ''}
 
-      <div class="sfq-complete-actions">
-        <button class="btn btn--primary btn--lg" id="sfq-next-level">
-          ${_currentLevel < 6 ? 'Next Level →' : 'Back to Levels'}
-        </button>
-        <button class="btn btn--ghost btn--sm" id="sfq-replay">Play Again ↺</button>
-        <button class="btn btn--ghost btn--sm" id="sfq-back-levels">All Levels</button>
+        <div class="sfq-complete-actions">
+          <button class="btn btn--primary btn--lg" id="sfq-replay">Replay Level ↺</button>
+          <button class="btn btn--ghost btn--sm" id="sfq-next-level" ${hasNextLevel ? '' : 'disabled'}>${hasNextLevel ? 'Next Level →' : 'No higher level yet'}</button>
+          <button class="btn btn--ghost btn--sm" id="sfq-back-levels">Sentence Forge Menu</button>
+        </div>
       </div>
     </div>`;
 
+  console.info('[SentenceForge] Scoreboard rendered', {
+    correct: _sessionCorrect,
+    total: _sessionTotal,
+    accuracy: acc,
+    stars,
+    recommendedLevel,
+  });
+
   document.getElementById('sfq-next-level')?.addEventListener('click', () => {
     if (_currentLevel < 6) { _currentLevel++; _startLevel(_currentLevel); }
-    else _renderBrowser();
   });
   document.getElementById('sfq-replay')?.addEventListener('click', () => _startLevel(_currentLevel));
   document.getElementById('sfq-back-levels')?.addEventListener('click', () => _renderBrowser());
 
   if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
-  setTimeout(() => document.getElementById('sfq-next-level')?.focus(), 200);
+  setTimeout(() => document.getElementById('sfq-replay')?.focus(), 200);
 }
 
 // ── Keyboard helper ───────────────────────────────────────────────────────────
