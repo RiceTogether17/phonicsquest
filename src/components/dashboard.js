@@ -32,6 +32,7 @@ import {
   getGrammarCategoryReport,
   getLatestQuestScoreboards,
   getMoePriorityRecommendations,
+  getLearningFunnelReport,
 } from '../modules/reporting.js';
 
 Chart.register(...registerables);
@@ -181,6 +182,7 @@ function _renderCategoryReporting() {
     .slice(0, 8);
   const scoreboards = getLatestQuestScoreboards();
   const priorities = getMoePriorityRecommendations();
+  const funnel = getLearningFunnelReport({ days: 7 });
 
   const rowHtml = (rows) => rows.map(r => {
     const pct = Math.round((r.accuracy || 0) * 100);
@@ -227,6 +229,10 @@ function _renderCategoryReporting() {
       </div>
     </div>
     <div class="dash-actions" style="justify-content:flex-start;gap:8px;margin-top:10px;">${scoreHtml}</div>
+    <div class="dash-category-row" title="Recent telemetry-driven learning health">
+      <div class="dash-category-head"><span><strong>7-day Learning Funnel</strong></span><span>${Math.round((funnel.accuracy || 0) * 100)}%</span></div>
+      <div class="dash-category-meta">Attempts: ${funnel.attempts} · Correct: ${funnel.correct} · Avg response: ${funnel.avgResponseMs !== null ? `${funnel.avgResponseMs}ms` : 'N/A'}</div>
+    </div>
     <h4 class="dash-section-title" style="margin-top:16px">MOE Priority Recommendations</h4>
     <div class="dash-pattern-list" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       ${priorityBlock('Priority vocabulary revision', priorities.vocab)}

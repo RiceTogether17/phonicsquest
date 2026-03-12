@@ -51,12 +51,19 @@ class QuestMasteryService {
   }
 
   recordAttempt({ quest, skill, correct, responseMs = null, level = null }) {
-    store.recordQuestAttempt({
+    const normalizedSkill = _normalizeSkill(skill);
+    const payload = {
       quest,
-      skill: _normalizeSkill(skill),
+      skill: normalizedSkill,
       correct: !!correct,
       responseMs,
       level,
+    };
+    store.recordQuestAttempt(payload);
+    store.recordLearningEvent({
+      eventType: 'quest_attempt',
+      ...payload,
+      meta: { source: 'questMastery' },
     });
   }
 

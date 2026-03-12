@@ -70,6 +70,7 @@ const DEFAULT_STATE = {
     writingQuest: {},
   },
   questAttempts: [],        // recent quest attempts (capped)
+  learningEvents: [],       // fine-grained telemetry events (capped)
 
   // Clue detection accuracy (separate from answer accuracy)
   // { attempted: number, strong: number, partial: number, weak: number }
@@ -257,6 +258,27 @@ class Store {
       ...(this._state.questAttempts || []),
     ].slice(0, 300);
     this.set('questAttempts', attempts);
+  }
+
+  /**
+   * Record a fine-grained learning telemetry event (capped at 1000).
+   * @param {{eventType: string, quest?: string, skill?: string, correct?: boolean, responseMs?: number, level?: string|number, meta?: object, timestamp?: string}} entry
+   */
+  recordLearningEvent(entry) {
+    const events = [
+      {
+        eventType: entry.eventType || 'unknown',
+        quest: entry.quest ?? null,
+        skill: entry.skill ?? null,
+        correct: typeof entry.correct === 'boolean' ? entry.correct : null,
+        responseMs: entry.responseMs ?? null,
+        level: entry.level ?? null,
+        meta: entry.meta ?? null,
+        timestamp: entry.timestamp || new Date().toISOString(),
+      },
+      ...(this._state.learningEvents || []),
+    ].slice(0, 1000);
+    this.set('learningEvents', events);
   }
 
   /**

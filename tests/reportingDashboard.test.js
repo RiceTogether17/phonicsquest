@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { store } from '../src/modules/store.js';
-import { getVocabularyCategoryReport, getGrammarCategoryReport, getLatestQuestScoreboards, getMoePriorityRecommendations } from '../src/modules/reporting.js';
+import { getVocabularyCategoryReport, getGrammarCategoryReport, getLatestQuestScoreboards, getMoePriorityRecommendations, getLearningFunnelReport } from '../src/modules/reporting.js';
 
 describe('reporting module', () => {
   beforeEach(() => {
@@ -44,5 +44,15 @@ describe('reporting module', () => {
     expect(rec.vocab.length).toBeGreaterThan(0);
     expect(rec.grammar.length).toBeGreaterThan(0);
     expect(rec.grammar[0]).toHaveProperty('priorityScore');
+  });
+
+
+  it('builds 7-day learning funnel metrics from telemetry', () => {
+    store.recordLearningEvent({ eventType: 'quest_attempt', quest: 'wordVault', skill: 'contextInference', correct: true, responseMs: 1800, level: 'p3' });
+    store.recordLearningEvent({ eventType: 'quest_attempt', quest: 'clozeCastle', skill: 'conditionals', correct: false, responseMs: 4200, level: 'p5' });
+    const funnel = getLearningFunnelReport({ days: 7 });
+    expect(funnel.attempts).toBeGreaterThanOrEqual(2);
+    expect(funnel.byQuest.find(q => q.quest === 'wordVault')?.attempts).toBeGreaterThanOrEqual(1);
+    expect(funnel.avgResponseMs).not.toBeNull();
   });
 });

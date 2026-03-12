@@ -120,6 +120,43 @@ export function getMoePriorityRecommendations() {
   return { vocab, grammar };
 }
 
+
+export function getLearningFunnelReport({ days = 7 } = {}) {
+  const events = store.get('learningEvents') || [];
+  const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
+  const recent = events.filter(e => {
+    const ts = Date.parse(e.timestamp || '');
+    return Number.isFinite(ts) && ts >= cutoff;
+  });
+
+  const attempts = recent.filter(e => e.eventType === 'quest_attempt');
+  const withResponse = attempts.filter(e => typeof e.responseMs === 'number');
+  const correct = attempts.filter(e => e.correct === true).length;
+  const avgResponseMs = withResponse.length
+    ? Math.round(withResponse.reduce((sum, e) => sum + e.responseMs, 0) / withResponse.length)
+    : null;
+
+  const byQuest = ['sentenceForge', 'clozeCastle', 'wordVault'].map((quest) => {
+    const rows = attempts.filter(e => e.quest === quest);
+    const total = rows.length;
+    const right = rows.filter(e => e.correct === true).length;
+    return {
+      quest,
+      attempts: total,
+      accuracy: total > 0 ? right / total : 0,
+    };
+  });
+
+  return {
+    days,
+    attempts: attempts.length,
+    correct,
+    accuracy: attempts.length ? correct / attempts.length : 0,
+    avgResponseMs,
+    byQuest,
+  };
+}
+
 export function getLatestQuestScoreboards() {
   const attempts = store.get('questAttempts') || [];
   const byQuest = ['sentenceForge', 'clozeCastle', 'wordVault'].map((quest) => {
