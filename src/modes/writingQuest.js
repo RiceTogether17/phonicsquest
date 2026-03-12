@@ -22,6 +22,27 @@ function _newSessionStats() {
   };
 }
 
+
+function _getLengthTarget(level) {
+  if (level <= 1) return 35;
+  if (level === 2) return 55;
+  if (level === 3) return 80;
+  if (level === 4) return 110;
+  if (level === 5) return 150;
+  return 190;
+}
+
+export function getWritingLiveFeedback(item, text, level) {
+  const result = evaluateWritingSubmission(item, text, level);
+  const { strongest, weakest } = _findStrongWeak(result.dimensions);
+  return {
+    result,
+    strongest,
+    weakest,
+    tip: _dimensionAdvice(weakest),
+    progressLabel: `Words ${result.words}/${_getLengthTarget(level)}`,
+  };
+}
 export function evaluateWritingSubmission(item, text, level) {
   const normalized = (text || '').trim();
   const words = normalized ? normalized.split(/\s+/).length : 0;
@@ -38,7 +59,7 @@ export function evaluateWritingSubmission(item, text, level) {
   const requiredPoints = item.requiredPoints || [];
   const requiredHits = requiredPoints.filter((p) => normalized.toLowerCase().includes(p.split(' ')[0].toLowerCase())).length;
 
-  const lengthTarget = level === 1 ? 70 : level === 2 ? 130 : 180;
+  const lengthTarget = _getLengthTarget(level);
 
   const content = Math.min(1, ((requiredPoints.length ? requiredHits / requiredPoints.length : 0.6) * 0.7) + (Math.min(words / lengthTarget, 1) * 0.3));
   const organisation = Math.min(1, ((Math.min(sentenceCount / 5, 1) * 0.6) + (Math.min(connectorHits / 3, 1) * 0.4)));
@@ -168,11 +189,36 @@ function _render() {
         <button class="btn btn--primary" id="wq-submit">Submit</button>
         <button class="btn btn--ghost btn--sm" id="wq-menu">Menu</button>
       </div>
+      <div class="dash-pattern-item" id="wq-live-detector" aria-live="polite">Start typing to see instant writing feedback.</div>
       <div class="sfq-feedback" id="wq-feedback" hidden></div>
     </div>`;
 
   document.getElementById('wq-submit')?.addEventListener('click', () => _submit(item));
   document.getElementById('wq-menu')?.addEventListener('click', () => { cleanupWritingQuest(); _onGoHome?.(); });
+  document.getElementById('wq-text')?.addEventListener('input', (event) => {
+    const value = event?.target?.value || '';
+    _updateLiveDetector(item, value);
+  });
+}
+
+
+function _updateLiveDetector(item, text) {
+  const detector = document.getElementById('wq-live-detector');
+  if (!detector) return;
+  if (!text?.trim()) {
+    detector.textContent = 'Start typing to see instant writing feedback.';
+    return;
+  }
+
+  const live = getWritingLiveFeedback(item, text, _level);
+  detector.innerHTML = `🧠 Live detector: ${live.progressLabel} · score ${(live.result.score * 100).toFixed(0)}% · strongest ${_dimensionLabel(live.strongest)} · focus ${_dimensionLabel(live.weakest)}. Tip: ${live.tip}`;
+}
+
+function _renderDimensionBreakdown(result, peer) {
+  const rows = Object.entries(result.dimensions)
+    .map(([key, val]) => `<li>${_dimensionLabel(key)}: ${(val * 100).toFixed(0)}% — ${_dimensionAdvice(key)}</li>`)
+    .join('');
+  return `<ul>${rows}</ul>${peer ? '<p>Peer review prompt: ask your partner to suggest one upgrade to your weakest dimension.</p>' : ''}`;
 }
 
 function _renderDimensionBreakdown(result, peer) {

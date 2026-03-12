@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { editingPassages } from '../src/data/editingPassages.js';
 import { writingPrompts } from '../src/data/writingPrompts.js';
-import { evaluateWritingSubmission } from '../src/modes/writingQuest.js';
+import { evaluateWritingSubmission, getWritingLiveFeedback } from '../src/modes/writingQuest.js';
 
 describe('editing and writing depth guardrails', () => {
   it('provides at least 3 editing passages per level', () => {
@@ -16,6 +16,19 @@ describe('editing and writing depth guardrails', () => {
     }
   });
 
+
+  it('includes p1 to p6 levels for editing and writing quests', () => {
+    expect(Object.keys(editingPassages)).toEqual(['1', '2', '3', '4', '5', '6']);
+    expect(Object.keys(writingPrompts)).toEqual(['1', '2', '3', '4', '5', '6']);
+  });
+
+  it('writing live detector returns actionable feedback fields', () => {
+    const prompt = writingPrompts[1][0];
+    const live = getWritingLiveFeedback(prompt, 'I like the library because it is quiet.', 1);
+    expect(live.progressLabel).toContain('Words');
+    expect(typeof live.tip).toBe('string');
+    expect(live.tip.length).toBeGreaterThan(10);
+  });
   it('writing rubric evaluator rewards richer responses', () => {
     const prompt = writingPrompts[3][0];
     const weak = evaluateWritingSubmission(prompt, 'This is short', 3);
