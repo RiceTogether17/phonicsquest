@@ -187,6 +187,55 @@ class Progress {
     }
   }
 
+
+  /**
+   * Record grammar category accuracy and update mastery recommendation signal.
+   * A category-level mastery boost is applied once accuracy exceeds 90%.
+   * @param {string} levelKey
+   * @param {string} categoryKey
+   * @param {boolean} correct
+   */
+  recordGrammarCategoryAttempt(levelKey, categoryKey, correct) {
+    if (!levelKey || !categoryKey) return;
+    const stats = { ...(store.get('grammarCategoryStats') || {}) };
+    const statKey = `${levelKey}-${categoryKey}`;
+    const prev = stats[statKey] || { attempts: 0, correct: 0, accuracy: 0 };
+    const attempts = prev.attempts + 1;
+    const right = prev.correct + (correct ? 1 : 0);
+    const accuracy = attempts > 0 ? right / attempts : 0;
+    stats[statKey] = { attempts, correct: right, accuracy };
+    store.set('grammarCategoryStats', stats);
+
+    if (accuracy > 0.9 && attempts >= 3) {
+      const masteryKey = `grammar:${levelKey}:${categoryKey}`;
+      store.updateGroupMastery(masteryKey, Math.min(1, 0.85 + (accuracy - 0.9)));
+    }
+  }
+
+  /**
+   * Recommend weakest grammar category for a given level.
+   * @param {string} levelKey
+   * @param {string[]} categories
+   * @returns {string|null}
+   */
+  getRecommendedGrammarCategory(levelKey, categories = []) {
+    if (!levelKey || !categories.length) return null;
+    const stats = store.get('grammarCategoryStats') || {};
+    let best = null;
+    let lowest = Infinity;
+
+    for (const cat of categories) {
+      const key = `${levelKey}-${cat}`;
+      const entry = stats[key] || { attempts: 0, accuracy: 0 };
+      const score = entry.attempts === 0 ? 0.45 : entry.accuracy;
+      if (score < lowest) {
+        lowest = score;
+        best = cat;
+      }
+    }
+    return best;
+  }
+
   /**
    * Get accuracy for a specific word.
    * @param {string} wordId
