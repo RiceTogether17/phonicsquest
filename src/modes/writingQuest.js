@@ -138,8 +138,8 @@ function _startLevel(level) {
 
 function _prioritisePrompts(prompts) {
   return [...prompts].sort((a, b) => {
-    const aMastery = questMastery.getMastery?.('writingQuest', a.mode || 'composition') ?? 0.5;
-    const bMastery = questMastery.getMastery?.('writingQuest', b.mode || 'composition') ?? 0.5;
+    const aMastery = questMastery.getSkillScore('writingQuest', a.mode || 'composition');
+    const bMastery = questMastery.getSkillScore('writingQuest', b.mode || 'composition');
     return aMastery - bMastery;
   });
 }
