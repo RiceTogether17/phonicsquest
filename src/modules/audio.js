@@ -11,6 +11,11 @@
 
 import { store } from './store.js';
 
+/** Dev-mode logging helper */
+const devWarn = (...args) => {
+  if (import.meta.env.DEV) console.warn('[Audio]', ...args);
+};
+
 /** Base path for phoneme MP3 files */
 const BASE = import.meta.env.BASE_URL;
 const PHONEME_PATH = `${BASE}audio/phonemes/`;
@@ -198,7 +203,9 @@ class AudioManager {
         const buf = await this._loadBuffer(`${PHONEME_PATH}${filename}.mp3`);
         this._buffers.set(key, buf);
         return this._playBuffer(buf);
-      } catch (_) { /* fall through to TTS */ }
+      } catch (err) {
+        devWarn(`MP3 load failed for "${key}", falling back to TTS:`, err.message);
+      }
     }
 
     // TTS fallback – use phonetic text so TTS speaks the sound, not the letter name
@@ -263,7 +270,8 @@ class AudioManager {
         try {
           const buf = await this._loadBuffer(`${SFX_PATH}reveal-sound.mp3`);
           this._playBuffer(buf, 0.4);
-        } catch (_) {
+        } catch (err) {
+          devWarn('Reveal SFX fallback to tone:', err.message);
           this._playTone(ctx, 523, 0.1, 'sine');
         }
         break;
@@ -316,9 +324,14 @@ class AudioManager {
   async _loadBuffer(url) {
     const ctx = this._ensureCtx();
     const response = await fetch(url);
-    if (!response.ok) throw new Error(`Failed to fetch ${url}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
     const arrayBuffer = await response.arrayBuffer();
-    return ctx.decodeAudioData(arrayBuffer);
+    try {
+      return await ctx.decodeAudioData(arrayBuffer);
+    } catch (err) {
+      devWarn(`Failed to decode audio ${url}:`, err.message);
+      throw err;
+    }
   }
 
   /** @private — play an AudioBuffer */
@@ -374,7 +387,7 @@ class AudioManager {
       if (filename) {
         this._loadBuffer(`${PHONEME_PATH}${filename}.mp3`)
           .then(buf => this._buffers.set(key, buf))
-          .catch(() => {});
+          .catch(err => devWarn(`Preload failed for "${key}":`, err.message));
       }
     }
   }

@@ -24,6 +24,15 @@
  *   settingsController.applyTheme('ocean');
  */
 
+/** Debounce helper for slider inputs to avoid excessive localStorage writes */
+function debounce(fn, ms = 250) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), ms);
+  };
+}
+
 export const settingsController = {
   /**
    * Wire up all interactive settings controls.
@@ -61,19 +70,21 @@ export const settingsController = {
       store.set('autoplay', /** @type {HTMLInputElement} */ (e.target).checked);
     });
 
-    // ── Voice speed ────────────────────────────────────────────────────────
+    // ── Voice speed (debounced to reduce localStorage writes) ─────────────
+    const debouncedVoiceSpeed = debounce((val) => store.set('voiceSpeed', val));
     document.getElementById('voice-speed')?.addEventListener('input', (e) => {
       const val = parseFloat(/** @type {HTMLInputElement} */ (e.target).value);
-      store.set('voiceSpeed', val);
+      debouncedVoiceSpeed(val);
       const display = document.getElementById('voice-speed-display');
       if (display) display.textContent = `${val}×`;
     });
 
 
+    const debouncedSensitivity = debounce((threshold) => store.set('speechThreshold', threshold));
     document.getElementById('speech-sensitivity')?.addEventListener('input', (e) => {
       const pct = parseInt(/** @type {HTMLInputElement} */ (e.target).value, 10);
       const threshold = Math.max(0.6, Math.min(0.95, pct / 100));
-      store.set('speechThreshold', threshold);
+      debouncedSensitivity(threshold);
       const display = document.getElementById('speech-sensitivity-display');
       if (display) display.textContent = `${Math.round(threshold * 100)}%`;
     });
@@ -97,10 +108,11 @@ export const settingsController = {
       });
     });
 
-    // ── Daily-goal slider ──────────────────────────────────────────────────
+    // ── Daily-goal slider (debounced) ──────────────────────────────────────
+    const debouncedGoal = debounce((val) => store.set('dailyGoal', val));
     document.getElementById('goal-range')?.addEventListener('input', (e) => {
       const val = parseInt(/** @type {HTMLInputElement} */ (e.target).value);
-      store.set('dailyGoal', val);
+      debouncedGoal(val);
       const display = document.getElementById('goal-range-display');
       if (display) display.textContent = String(val);
       const total = document.getElementById('goal-total');
@@ -114,9 +126,10 @@ export const settingsController = {
       document.documentElement.setAttribute('data-reduced-motion', checked ? 'true' : 'false');
     });
 
+    const debouncedFontScale = debounce((val) => store.set('fontScale', val));
     document.getElementById('font-size-scale')?.addEventListener('input', (e) => {
       const val = parseInt(/** @type {HTMLInputElement} */ (e.target).value, 10);
-      store.set('fontScale', val);
+      debouncedFontScale(val);
       const display = document.getElementById('font-size-scale-display');
       if (display) display.textContent = `${val}%`;
       document.documentElement.style.fontSize = `${val}%`;
@@ -145,9 +158,10 @@ export const settingsController = {
       }
     });
 
+    const debouncedChipScale = debounce((val) => store.set('bankChipScale', val));
     document.getElementById('bank-chip-scale')?.addEventListener('input', (e) => {
       const val = parseInt(/** @type {HTMLInputElement} */ (e.target).value, 10);
-      store.set('bankChipScale', val);
+      debouncedChipScale(val);
       const display = document.getElementById('bank-chip-scale-display');
       if (display) display.textContent = `${val}%`;
       document.documentElement.style.setProperty('--bank-chip-scale', `${val / 100}`);

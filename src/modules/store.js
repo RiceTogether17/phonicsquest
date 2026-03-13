@@ -7,6 +7,11 @@
 const DEFAULT_STORAGE_KEY = 'phonicsquest_v2';
 let STORAGE_KEY = DEFAULT_STORAGE_KEY;
 
+/** Dev-mode logging helper — only logs in development builds */
+const devWarn = (...args) => {
+  if (import.meta.env.DEV) console.warn('[Store]', ...args);
+};
+
 /** Default application state */
 const DEFAULT_STATE = {
   // Gamification
@@ -104,6 +109,30 @@ class Store {
     this._state = this._load();
     /** @type {Map<string, Set<Function>>} */
     this._listeners = new Map();
+    /** Consecutive save failures for circuit breaker */
+    this._saveFailures = 0;
+  }
+
+  /**
+   * Validate critical fields of a saved state object.
+   * Returns false if the data is clearly corrupted.
+   * @private
+   */
+  _validateState(saved) {
+    if (typeof saved !== 'object' || saved === null) return false;
+    // Check critical numeric fields are numbers (not NaN, not strings)
+    for (const key of ['xp', 'level', 'energy', 'streak', 'dailyGoal', 'dailyDone']) {
+      if (key in saved && (typeof saved[key] !== 'number' || !Number.isFinite(saved[key]))) {
+        devWarn(`Invalid ${key}:`, saved[key]);
+        return false;
+      }
+    }
+    // Check wordStats is an object if present
+    if ('wordStats' in saved && (typeof saved.wordStats !== 'object' || saved.wordStats === null)) {
+      devWarn('Invalid wordStats:', typeof saved.wordStats);
+      return false;
+    }
+    return true;
   }
 
   /** Load from localStorage, merging with defaults to handle new keys */
@@ -112,9 +141,15 @@ class Store {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const saved = JSON.parse(raw);
+        if (!this._validateState(saved)) {
+          devWarn('State failed validation, using defaults');
+          return { ...DEFAULT_STATE };
+        }
         return { ...DEFAULT_STATE, ...saved };
       }
-    } catch (_) { /* ignore parse errors */ }
+    } catch (err) {
+      devWarn('Failed to parse stored state:', err.message);
+    }
     return { ...DEFAULT_STATE };
   }
 
@@ -122,7 +157,29 @@ class Store {
   _save() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this._state));
-    } catch (_) { /* quota exceeded — ignore */ }
+      this._saveFailures = 0;
+    } catch (err) {
+      this._saveFailures++;
+      devWarn('Save failed:', err.message, `(failure #${this._saveFailures})`);
+      if (this._saveFailures >= 3) {
+        this._showStorageWarning();
+      }
+    }
+  }
+
+  /** Show a user-visible warning when storage is persistently failing */
+  _showStorageWarning() {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    // Only show once per session
+    if (this._storageWarningShown) return;
+    this._storageWarningShown = true;
+    const toast = document.createElement('div');
+    toast.className = 'toast toast--warning';
+    toast.setAttribute('role', 'alert');
+    toast.textContent = 'Device storage full — progress may not be saved. Try clearing browser data.';
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 8000);
   }
 
   /**

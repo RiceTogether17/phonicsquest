@@ -28,6 +28,12 @@ jobs:
         run: |
           npm run check:syntax
 
+      - name: Run unit tests
+        run: npm run test
+
+      - name: TypeScript type check
+        run: npm run typecheck
+
       - name: Build
         run: npm run build
 

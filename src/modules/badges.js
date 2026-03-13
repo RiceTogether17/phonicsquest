@@ -10,6 +10,11 @@
 
 const STORAGE_KEY = 'phonicsquest_badges';
 
+/** Dev-mode logging helper */
+const devWarn = (...args) => {
+  if (import.meta.env.DEV) console.warn('[Badges]', ...args);
+};
+
 /** All available achievements, ordered by expected earn time */
 const BADGE_DEFINITIONS = [
   {
@@ -131,7 +136,7 @@ class BadgeManager {
           dailyGoalsCompleted: parsed.dailyGoalsCompleted ?? 0,
         };
       }
-    } catch (_) { /* ignore corrupted storage */ }
+    } catch (err) { devWarn('Failed to load badge state:', err.message); }
     return {
       earned: new Set(),
       totalCorrect: 0,
@@ -151,7 +156,7 @@ class BadgeManager {
         storiesOpened: this._state.storiesOpened,
         dailyGoalsCompleted: this._state.dailyGoalsCompleted,
       }));
-    } catch (_) { /* storage quota — not critical */ }
+    } catch (err) { devWarn('Failed to save badge state:', err.message); }
   }
 
   /**

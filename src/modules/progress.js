@@ -323,27 +323,18 @@ class Progress {
 
   /**
    * Weighted random sampling without replacement.
+   * Uses the Efraimidis-Spirakis reservoir algorithm for O(n log k) complexity
+   * instead of the previous O(n*k) approach with repeated weight recalculation.
    * @private
    */
   _weightedSample(items, count) {
-    const result = [];
-    const pool = [...items];
-
-    for (let i = 0; i < count && pool.length > 0; i++) {
-      const totalWeight = pool.reduce((sum, item) => sum + item.weight, 0);
-      let r = Math.random() * totalWeight;
-
-      for (let j = 0; j < pool.length; j++) {
-        r -= pool[j].weight;
-        if (r <= 0) {
-          result.push(pool[j].word);
-          pool.splice(j, 1);
-          break;
-        }
-      }
-    }
-
-    return result;
+    if (items.length === 0) return [];
+    const k = Math.min(count, items.length);
+    return items
+      .map(item => ({ word: item.word, key: Math.pow(Math.random(), 1 / Math.max(item.weight, 0.001)) }))
+      .sort((a, b) => b.key - a.key)
+      .slice(0, k)
+      .map(({ word }) => word);
   }
 }
 

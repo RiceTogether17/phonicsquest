@@ -168,6 +168,17 @@ class Gamification {
     this._sessionWrong   = 0;
   }
 
+  /** Announce a message to screen readers via a transient aria-live region */
+  _announceToScreenReader(message) {
+    const el = document.createElement('div');
+    el.className = 'sr-only';
+    el.setAttribute('aria-live', 'polite');
+    el.setAttribute('aria-atomic', 'true');
+    el.textContent = message;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+
   /** Trigger a brief pop/bump on a stat chip element */
   _bumpChip(el) {
     if (!el) return;
@@ -216,10 +227,16 @@ class Gamification {
       streakChip.setAttribute('aria-label', `Day streak: ${streak}`);
     }
 
-    // Bump chips when values change
+    // Bump chips when values change + announce to screen readers
     if (prevEnergy !== null && energy < prevEnergy) this._bumpChip(energyEl);
-    if (prevXp     !== null && store.get('xp')     > prevXp)     this._bumpChip(xpEl);
-    if (prevStreak !== null && store.get('streak')  > prevStreak) this._bumpChip(streakEl);
+    if (prevXp !== null && store.get('xp') > prevXp) {
+      this._bumpChip(xpEl);
+      this._announceToScreenReader(`Experience points: ${store.get('xp')}`);
+    }
+    if (prevStreak !== null && store.get('streak') > prevStreak) {
+      this._bumpChip(streakEl);
+      this._announceToScreenReader(`Day streak: ${store.get('streak')}`);
+    }
 
     const { level, progress } = getLevelInfo(store.get('xp'));
     if (levelEl) levelEl.textContent = level;
