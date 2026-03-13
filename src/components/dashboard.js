@@ -684,6 +684,23 @@ function _bindActions() {
       if (file) _handleCSVImport(file);
     });
   }
+
+  // Adaptive controls
+  const adaptiveWeak = /** @type {HTMLInputElement|null} */ (document.getElementById('adaptive-weak-weight'));
+  const adaptiveUnseen = /** @type {HTMLInputElement|null} */ (document.getElementById('adaptive-unseen-weight'));
+  const cfg = store.get('adaptiveConfig') || {};
+  if (adaptiveWeak) {
+    adaptiveWeak.value = String(cfg.weakWeight ?? 5);
+    adaptiveWeak.addEventListener('input', () => {
+      store.set('adaptiveConfig', { ...(store.get('adaptiveConfig') || {}), weakWeight: Number(adaptiveWeak.value) });
+    });
+  }
+  if (adaptiveUnseen) {
+    adaptiveUnseen.value = String(cfg.unseenWeight ?? 3);
+    adaptiveUnseen.addEventListener('input', () => {
+      store.set('adaptiveConfig', { ...(store.get('adaptiveConfig') || {}), unseenWeight: Number(adaptiveUnseen.value) });
+    });
+  }
 }
 
 function _buildParentReport() {
@@ -843,22 +860,6 @@ async function _handleCSVImport(file) {
     status.textContent = `Imported ${words.length} word${words.length > 1 ? 's' : ''} successfully!`;
     status.className = 'dash-import-status dash-import-status--success';
   });
-
-  const adaptiveWeak = /** @type {HTMLInputElement|null} */ (document.getElementById('adaptive-weak-weight'));
-  const adaptiveUnseen = /** @type {HTMLInputElement|null} */ (document.getElementById('adaptive-unseen-weight'));
-  const cfg = store.get('adaptiveConfig') || {};
-  if (adaptiveWeak) {
-    adaptiveWeak.value = String(cfg.weakWeight ?? 5);
-    adaptiveWeak.addEventListener('input', () => {
-      store.set('adaptiveConfig', { ...(store.get('adaptiveConfig') || {}), weakWeight: Number(adaptiveWeak.value) });
-    });
-  }
-  if (adaptiveUnseen) {
-    adaptiveUnseen.value = String(cfg.unseenWeight ?? 3);
-    adaptiveUnseen.addEventListener('input', () => {
-      store.set('adaptiveConfig', { ...(store.get('adaptiveConfig') || {}), unseenWeight: Number(adaptiveUnseen.value) });
-    });
-  }
 }
 
 function _timeAgo(timestamp) {

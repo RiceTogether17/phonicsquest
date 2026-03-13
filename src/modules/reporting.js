@@ -7,7 +7,7 @@ import { VOCAB_CATEGORIES } from '../data/vocabPassages.js';
 import { GRAMMAR_CATEGORIES } from '../data/passages.js';
 
 const LO_CODE_MAP = {
-  connector_clue: 'LO-ENG-GR-03',
+  connectorClue: 'LO-ENG-GR-03',
   contextInference: 'LO-ENG-VOC-02',
   synonymContrast: 'LO-ENG-VOC-03',
   definitionMatch: 'LO-ENG-VOC-01',
@@ -25,6 +25,7 @@ const LO_CODE_MAP = {
   modals: 'LO-ENG-GR-07',
   morphologicalAffix: 'LO-ENG-VOC-04',
   collocationCloze: 'LO-ENG-VOC-09',
+  grammaticalRole: 'LO-ENG-VOC-10',
 };
 
 

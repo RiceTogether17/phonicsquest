@@ -80,7 +80,7 @@ function _startLevel(level) {
 function _prioritisePassages(passages) {
   const scored = passages.map((item) => {
     const weaknesses = item.errors.reduce((sum, error) => {
-      const mastery = questMastery.getMastery?.('editingQuest', error.rule || error.type) ?? 0.5;
+      const mastery = questMastery.getSkillScore('editingQuest', error.rule || error.type);
       return sum + (1 - mastery);
     }, 0);
     return { item, score: weaknesses / Math.max(item.errors.length, 1) };
@@ -210,11 +210,12 @@ function _showFeedback(message, success) {
 function _registerAttempt(error, correct, forcedAdvance = false) {
   _passageStats.totalAttempts++;
   _sessionStats.errorsAttempted++;
-  _sessionStats.accuracyByType[error.type].total++;
+  const typeBucket = _sessionStats.accuracyByType[error.type];
+  if (typeBucket) typeBucket.total++;
 
   if (correct) {
     _sessionStats.errorsCorrect++;
-    _sessionStats.accuracyByType[error.type].correct++;
+    if (typeBucket) typeBucket.correct++;
     if (_attemptState.tries === 0) {
       _passageStats.firstTryCorrect++;
       _sessionStats.firstTryCorrect++;
