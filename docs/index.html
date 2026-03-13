@@ -21,10 +21,10 @@
   <!-- Styles -->
 
   <title>PhonicsQuest</title>
-  <script type="module" crossorigin src="/phonicsquest/assets/index-Cy4DMcqu.js"></script>
+  <script type="module" crossorigin src="/phonicsquest/assets/index-DVUI_ogK.js"></script>
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/gsap-C8pce-KX.js">
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/chartjs-BR_H7_9u.js">
-  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-Ci_AOazt.css">
+  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-DL92I8-Z.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -48,7 +48,7 @@
             <span class="energy-star energy-star--full" aria-hidden="true">⭐</span>
           </div>
         </div>
-        <div class="stat-chip" aria-label="Day streak" aria-live="polite">
+        <div class="stat-chip stat-chip--streak" id="streak-chip" aria-label="Day streak" aria-live="polite">
           <span class="stat-icon" aria-hidden="true">🔥</span>
           <span class="stat-value" id="streak-val">0</span>
         </div>
@@ -109,10 +109,12 @@
         <div class="home-hero" aria-hidden="true">
           <div class="mascot-home" id="mascot-home"></div>
         </div>
-        <h1 class="home-title">Ready to read?</h1>
-        <p class="home-subtitle">Pick your adventure!</p>
+
+        <!-- GUIDED LEARNER JOURNEY (rendered by app.js based on profile) -->
+        <div id="guided-journey-section" aria-label="Guided learning path"></div>
 
         <!-- Spin Wheel -->
+        <div id="explore-activities-label" class="home-explore-label" aria-hidden="true">Explore all activities</div>
         <div class="wheel-wrapper" id="wheel-wrapper">
           <canvas id="spin-wheel" width="260" height="260" aria-label="Word category wheel" role="img"></canvas>
           <button class="spin-btn" id="spin-btn" aria-label="Spin the wheel to pick a word category">
@@ -120,7 +122,7 @@
           </button>
         </div>
 
-        <!-- Mode Grid -->
+        <!-- Mode Grid (demoted below guided journey) -->
         <nav class="mode-grid" aria-label="Activity modes">
 
           <!-- Blending section -->
@@ -242,6 +244,29 @@
           <span class="stories-banner-text">
             <span class="stories-banner-title">🔑 Word Vault Quest</span>
             <span class="stories-banner-sub">7 categories · vocabulary cloze passages</span>
+          </span>
+          <span class="stories-banner-arrow">→</span>
+        </button>
+
+        <!-- Editing Quest banner -->
+        <button class="stories-banner stories-banner--purple" id="btn-editing-quest" aria-label="Open Editing Quest">
+          <span class="stories-banner-mascot">
+            <span style="font-size:2.5rem;line-height:1" aria-hidden="true">✏️</span>
+          </span>
+          <span class="stories-banner-text">
+            <span class="stories-banner-title">✏️ Editing Quest</span>
+            <span class="stories-banner-sub">Grammar and spelling correction with rule feedback</span>
+          </span>
+          <span class="stories-banner-arrow">→</span>
+        </button>
+
+        <button class="stories-banner stories-banner--orange" id="btn-writing-quest" aria-label="Open Writing Quest">
+          <span class="stories-banner-mascot">
+            <span style="font-size:2.5rem;line-height:1" aria-hidden="true">📝</span>
+          </span>
+          <span class="stories-banner-text">
+            <span class="stories-banner-title">📝 Writing Quest</span>
+            <span class="stories-banner-sub">Prompt-based writing with rubric and peer review mode</span>
           </span>
           <span class="stories-banner-arrow">→</span>
         </button>
@@ -405,6 +430,33 @@
         <div id="word-vault-content" class="stories-content"></div>
       </section>
 
+      <!-- SCREEN: EDITING QUEST -->
+      <section class="screen" id="screen-editing-quest" aria-label="Editing Quest">
+        <div class="stories-screen-header">
+          <button class="icon-btn" id="btn-eq-back" aria-label="Back to home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20" aria-hidden="true">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+          </button>
+          <h2 class="stories-screen-title">Editing Quest</h2>
+          <span style="font-size:1.6rem" aria-hidden="true">✏️</span>
+        </div>
+        <div id="editing-quest-content" class="stories-content"></div>
+      </section>
+
+      <section class="screen" id="screen-writing-quest" aria-label="Writing Quest">
+        <div class="stories-screen-header">
+          <button class="icon-btn" id="btn-writing-back" aria-label="Back to home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20" aria-hidden="true">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+          </button>
+          <h2 class="stories-screen-title">Writing Quest</h2>
+          <span style="font-size:1.6rem" aria-hidden="true">📝</span>
+        </div>
+        <div id="writing-quest-content" class="stories-content"></div>
+      </section>
+
       <!-- SCREEN: RESULT -->
       <section class="screen" id="screen-result" aria-label="Round result" aria-live="assertive">
         <div class="result-mascot" id="result-mascot" aria-hidden="true"></div>
@@ -487,6 +539,26 @@
               <input type="range" id="voice-speed" min="0.5" max="1.5" step="0.1" value="0.8" />
               <span id="voice-speed-display">0.8×</span>
             </div>
+            <div class="slider-row">
+              <label for="speech-sensitivity">Speech Sensitivity</label>
+              <input type="range" id="speech-sensitivity" min="60" max="95" step="5" value="75" />
+              <span id="speech-sensitivity-display">75%</span>
+            </div>
+            <div class="slider-row">
+              <label for="speech-accent-select">Speech Accent</label>
+              <select id="speech-accent-select" class="category-select" aria-label="Speech accent">
+                <option value="en-SG">English (Singapore)</option>
+                <option value="en-GB">English (UK)</option>
+                <option value="en-AU">English (Australia)</option>
+                <option value="en-IN">English (India)</option>
+                <option value="en-US">English (US)</option>
+              </select>
+              <span aria-hidden="true">🎙️</span>
+            </div>
+            <div class="slider-row">
+              <button class="btn btn--ghost btn--sm" id="btn-calibrate-mic">Calibrate Mic</button>
+              <span id="calibrate-mic-status" class="settings-help">Use three sample words to tune sensitivity.</span>
+            </div>
           </section>
 
           <section class="settings-group">
@@ -512,6 +584,37 @@
             <div class="toggle-row">
               <label for="reduced-motion-toggle">Reduce animations</label>
               <input type="checkbox" id="reduced-motion-toggle" role="switch" />
+            </div>
+            <div class="slider-row">
+              <label for="font-size-scale">Font size</label>
+              <input type="range" id="font-size-scale" min="90" max="130" step="5" value="100" />
+              <span id="font-size-scale-display">100%</span>
+            </div>
+            <label class="toggle-row">
+              <span>Bilingual Instructions (EN + MT cue)</span>
+              <span class="toggle-wrap">
+                <input type="checkbox" id="bilingual-toggle" role="switch" />
+                <span class="toggle-track" aria-hidden="true"></span>
+              </span>
+            </label>
+            <label class="toggle-row">
+              <span>Dyslexia-friendly font</span>
+              <span class="toggle-wrap">
+                <input type="checkbox" id="dyslexia-font-toggle" role="switch" />
+                <span class="toggle-track" aria-hidden="true"></span>
+              </span>
+            </label>
+            <label class="toggle-row">
+              <span>High contrast mode</span>
+              <span class="toggle-wrap">
+                <input type="checkbox" id="high-contrast-toggle" role="switch" />
+                <span class="toggle-track" aria-hidden="true"></span>
+              </span>
+            </label>
+            <div class="slider-row">
+              <label for="bank-chip-scale">Word bank chip size</label>
+              <input type="range" id="bank-chip-scale" min="85" max="130" step="5" value="100" />
+              <span id="bank-chip-scale-display">100%</span>
             </div>
           </section>
 
