@@ -7,6 +7,11 @@
 
 import { store } from './store.js';
 
+/** Dev-mode logging helper */
+const devWarn = (...args) => {
+  if (import.meta.env.DEV) console.warn('[Speech]', ...args);
+};
+
 export function buildSpeechLocales(preferredLocale = 'en-SG') {
   return [...new Set([preferredLocale, 'en-SG', 'en-GB', 'en-AU', 'en-IN', 'en-US'])];
 }
@@ -110,7 +115,8 @@ class SpeechRecognizer {
         this._listening = true;
         try {
           this._recognition.start();
-        } catch (_) {
+        } catch (err) {
+          devWarn('Recognition start failed:', err.message);
           clearTimeout(timeout);
           this._listening = false;
           resolve(null);
@@ -124,7 +130,7 @@ class SpeechRecognizer {
   /** Stop listening */
   stop() {
     if (this._recognition) {
-      try { this._recognition.stop(); } catch (_) {}
+      try { this._recognition.stop(); } catch (err) { devWarn('Stop failed:', err.message); }
       this._recognition = null;
     }
     this._listening = false;
@@ -171,7 +177,24 @@ class SpeechRecognizer {
     return 0;
   }
 
+  /** @type {Map<string, number>} LRU cache for phonetic similarity scores */
+  _similarityCache = new Map();
+  _CACHE_MAX = 500;
+
   _phoneticSimilarity(a, b) {
+    if (a === b) return 1;
+
+    const cacheKey = `${a}|${b}`;
+    if (this._similarityCache.has(cacheKey)) return this._similarityCache.get(cacheKey);
+    const score = this._computePhoneticSimilarity(a, b);
+    this._similarityCache.set(cacheKey, score);
+    if (this._similarityCache.size > this._CACHE_MAX) {
+      this._similarityCache.delete(this._similarityCache.keys().next().value);
+    }
+    return score;
+  }
+
+  _computePhoneticSimilarity(a, b) {
     if (a === b) return 1;
 
     const normalize = (s) => s
