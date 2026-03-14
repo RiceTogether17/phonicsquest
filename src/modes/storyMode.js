@@ -10,7 +10,7 @@
  *                   shows every sight word in the story before reading starts.
  */
 
-import { STORIES, LEVEL_META } from '../data/stories.js';
+import { STORIES, BAND_META, LEVEL_META } from '../data/stories.js';
 import { isHFW, extractStoryHFW } from '../data/hfw.js';
 import { WORDS } from '../data/words.js';
 import { audio } from '../modules/audio.js';
@@ -44,8 +44,8 @@ function tokenise(text) {
 
 let _container   = null;
 let _onGoHome    = null;
-let _activeLevel = 1;
-let _activeTab   = 'level';   // 'level' | 'singapore' | 'chapter'
+let _activeBand  = 'A';       // 'A' | 'B' | 'C' | 'D'
+let _activeTab   = 'band';   // 'band' | 'singapore' | 'chapter'
 let _readMode    = 'aloud';   // 'aloud' | 'decode'
 let _speaking    = false;
 let _activeWord  = null;      // for decode panel
@@ -81,7 +81,7 @@ function _renderBrowser() {
   // ── Category tabs ──────────────────────────────────────────────────────
   const categoryTabsHtml = /* html */`
     <div class="sb-category-tabs" role="tablist" aria-label="Story categories">
-      <button class="sb-cat-tab${_activeTab === 'level'     ? ' active' : ''}" data-cat="level">📖 By Level</button>
+      <button class="sb-cat-tab${_activeTab === 'band'      ? ' active' : ''}" data-cat="band">📖 By Band</button>
       <button class="sb-cat-tab${_activeTab === 'singapore' ? ' active' : ''}" data-cat="singapore">🇸🇬 Singapore</button>
       <button class="sb-cat-tab${_activeTab === 'chapter'   ? ' active' : ''}" data-cat="chapter">📚 Chapters</button>
     </div>
@@ -89,32 +89,32 @@ function _renderBrowser() {
 
   let innerHtml = '';
 
-  if (_activeTab === 'level') {
-    // ── Level tabs + cards ────────────────────────────────────────────
-    const levelMeta = LEVEL_META[_activeLevel - 1];
-    const stories = STORIES.filter(s => s.level === _activeLevel && s.category !== 'chapter');
+  if (_activeTab === 'band') {
+    // ── Band tabs + cards ─────────────────────────────────────────────
+    const bandMeta = BAND_META.find(m => m.band === _activeBand) ?? BAND_META[0];
+    const stories = STORIES.filter(s => s.band === _activeBand && s.category !== 'chapter' && s.category !== 'nonfiction-sg');
 
-    const levelTabsHtml = LEVEL_META.map(m => /* html */`
+    const bandTabsHtml = BAND_META.map(m => /* html */`
       <button
-        class="story-tab${m.level === _activeLevel ? ' active' : ''}"
-        data-level="${m.level}"
+        class="story-tab${m.band === _activeBand ? ' active' : ''}"
+        data-band="${m.band}"
         style="--tab-color:${m.color}"
       >
-        <span class="story-tab-num">L${m.level}</span>
+        <span class="story-tab-num">${m.band}</span>
         <span class="story-tab-name">${m.label}</span>
       </button>
     `).join('');
 
-    const cardsHtml = stories.map(s => _storyCardHtml(s, levelMeta)).join('');
+    const cardsHtml = stories.map(s => _storyCardHtml(s, bandMeta)).join('');
 
     innerHtml = /* html */`
-      <div class="stories-tabs" role="tablist" aria-label="Story levels">${levelTabsHtml}</div>
+      <div class="stories-tabs" role="tablist" aria-label="Reading bands">${bandTabsHtml}</div>
       <div class="stories-level-strip"
-           style="--level-color:${levelMeta.color};--level-bg:${levelMeta.bg}">
-        <span class="slstrip-label">Level ${_activeLevel}</span>
-        <span class="slstrip-name">${levelMeta.label}</span>
-        <span class="slstrip-sounds">${levelMeta.targetSounds}</span>
-        <span class="slstrip-prop">${levelMeta.prop}</span>
+           style="--level-color:${bandMeta.color};--level-bg:${bandMeta.bg}">
+        <span class="slstrip-label">Band ${_activeBand}</span>
+        <span class="slstrip-name">${bandMeta.label}</span>
+        <span class="slstrip-sounds">${bandMeta.targetSounds}</span>
+        <span class="slstrip-prop">${bandMeta.prop}</span>
       </div>
       <div class="story-cards-grid">${cardsHtml}</div>
     `;
@@ -122,7 +122,7 @@ function _renderBrowser() {
     // ── Singapore specials ─────────────────────────────────────────────
     const sgStories = STORIES.filter(s => s.category === 'nonfiction-sg');
     const cardsHtml = sgStories.map(s => {
-      const meta = LEVEL_META[s.level - 1];
+      const meta = BAND_META.find(m => m.band === s.band) ?? BAND_META[0];
       return _storyCardHtml(s, meta);
     }).join('');
 
@@ -139,7 +139,7 @@ function _renderBrowser() {
       (a, b) => (a.chapterNum ?? 0) - (b.chapterNum ?? 0),
     );
     const cardsHtml = chapterStories.map(s => {
-      const meta = LEVEL_META[s.level - 1];
+      const meta = BAND_META.find(m => m.band === s.band) ?? BAND_META[0];
       return _storyCardHtml(s, meta, true);
     }).join('');
 
@@ -167,10 +167,10 @@ function _renderBrowser() {
     });
   });
 
-  // Level tab listeners (only in level tab)
+  // Band tab listeners (only in band tab)
   _container.querySelectorAll('.story-tab').forEach(btn => {
     btn.addEventListener('click', () => {
-      _activeLevel = parseInt(btn.dataset.level, 10);
+      _activeBand = btn.dataset.band;
       _renderBrowser();
     });
   });
@@ -202,7 +202,7 @@ function _storyCardHtml(story, levelMeta, isChapter = false) {
       </div>
       <span class="story-card-title">${story.title}</span>
       <div class="story-card-meta">
-        <span class="story-card-level" style="color:${levelMeta.color}">Level ${story.level}</span>
+        <span class="story-card-level" style="color:${levelMeta.color}">Band ${story.band ?? 'A'}</span>
         ${questBadge}
       </div>
     </button>
@@ -219,7 +219,7 @@ function _showReader(storyId) {
 }
 
 function _renderReader(story) {
-  const levelMeta = LEVEL_META[story.level - 1];
+  const levelMeta = BAND_META.find(m => m.band === story.band) ?? BAND_META[(story.level ?? 1) - 1];
 
   _container.innerHTML = /* html */`
     <div class="story-reader">
@@ -234,7 +234,7 @@ function _renderReader(story) {
       <!-- Meta bar -->
       <div class="story-meta-bar" style="--level-color:${levelMeta.color}">
         <button class="btn btn--ghost story-lib-btn" id="btn-reader-back">← Library</button>
-        <span class="story-meta-badge">Level ${story.level} · ${levelMeta.label}</span>
+        <span class="story-meta-badge">Band ${story.band ?? 'A'} · ${levelMeta.label}</span>
       </div>
 
       <!-- Title -->
@@ -294,7 +294,7 @@ function _setModeToggle(mode) {
 /** Count the words in a story's spoken text */
 function _countStoryWords(story) {
   return story.lines
-    .filter(l => l.type !== 'label' && l.type !== 'chapter')
+    .filter(l => l.type !== 'label' && l.type !== 'chapter' && l.text)
     .reduce((acc, l) => acc + l.text.trim().split(/\s+/).length, 0);
 }
 
@@ -304,9 +304,21 @@ function _renderReadAloud(story) {
 
   const linesHtml = story.lines.map((line, i) => _lineHtml(line, i)).join('');
   const hasQuest  = !!story.comprehension?.length;
+  const hasTalk   = !!story.talkAboutIt?.length;
+
+  // Talk About It section (Band A mini-decodables)
+  const talkHtml = hasTalk ? /* html */`
+    <div class="story-talk">
+      <h3 class="story-talk-title">💬 Talk About It</h3>
+      <ul class="story-talk-list">
+        ${story.talkAboutIt.map(q => `<li>${q}</li>`).join('')}
+      </ul>
+    </div>
+  ` : '';
 
   dynamic.innerHTML = /* html */`
     <div class="story-body" id="story-body" aria-live="polite">${linesHtml}</div>
+    ${talkHtml}
     <div class="story-tts-bar">
       <button class="btn btn--primary btn--xl" id="btn-story-play" aria-label="Read aloud">
         ▶ Read Aloud
@@ -365,13 +377,15 @@ function _renderReadAloud(story) {
 
 function _lineHtml(line, i) {
   switch (line.type) {
-    case 'chapter': return `<div class="sline sline--chapter" data-line="${i}">📚 ${line.text}</div>`;
-    case 'label':   return `<div class="sline sline--label"   data-line="${i}">${line.text}</div>`;
-    case 'beat':    return `<p class="sline sline--beat"      data-line="${i}">${line.text}</p>`;
-    case 'intro':   return `<p class="sline sline--intro"     data-line="${i}">${line.text}</p>`;
-    case 'refrain': return `<div class="sline sline--refrain" data-line="${i}">🫧 ${line.text}</div>`;
-    case 'end':     return `<p class="sline sline--end"       data-line="${i}">${line.text}</p>`;
-    default:        return `<p class="sline"                  data-line="${i}">${line.text}</p>`;
+    case 'chapter':   return `<div class="sline sline--chapter"   data-line="${i}">📚 ${line.text}</div>`;
+    case 'label':     return `<div class="sline sline--label"     data-line="${i}">${line.text}</div>`;
+    case 'beat':      return `<p class="sline sline--beat"        data-line="${i}">${line.text}</p>`;
+    case 'intro':     return `<p class="sline sline--intro"       data-line="${i}">${line.text}</p>`;
+    case 'refrain':   return `<div class="sline sline--refrain"   data-line="${i}">🫧 ${line.text}</div>`;
+    case 'end':       return `<p class="sline sline--end"         data-line="${i}">${line.text}</p>`;
+    case 'text':      return `<p class="sline sline--text"        data-line="${i}">${line.text}</p>`;
+    case 'paragraph': return `<p class="sline sline--paragraph"   data-line="${i}">${line.text}</p>`;
+    default:          return `<p class="sline"                    data-line="${i}">${line.text}</p>`;
   }
 }
 
@@ -414,6 +428,7 @@ function _renderDecodeMode(story) {
 
     const cls = {
       intro: 'sline--intro', beat: 'sline--beat', end: 'sline--end',
+      text: 'sline--text', paragraph: 'sline--paragraph',
     }[line.type] ?? '';
 
     return `<p class="sline ${cls} decode-line" data-line="${lineIdx}">${tokenHtml}</p>`;
