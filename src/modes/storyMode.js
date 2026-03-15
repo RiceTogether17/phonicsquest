@@ -50,6 +50,23 @@ let _readMode    = 'aloud';   // 'aloud' | 'decode'
 let _speaking    = false;
 let _activeWord  = null;      // for decode panel
 let _decodePanelEl = null;    // ref to the decode panel DOM node
+let _currentStoryVocab = [];  // vocab words for current story (used in decode panel)
+let _currentStory = null;     // story being read (for markStoryRead on TTS finish)
+
+// ── Story completion tracking ─────────────────────────────────────────────
+const READ_KEY = 'giri_stories_read';
+
+function getReadStories() {
+  try { return JSON.parse(localStorage.getItem(READ_KEY) ?? '[]'); } catch { return []; }
+}
+
+function markStoryRead(id) {
+  const read = getReadStories();
+  if (!read.includes(id)) {
+    read.push(id);
+    localStorage.setItem(READ_KEY, JSON.stringify(read));
+  }
+}
 
 // Fluency timer state
 let _fluencyTimer   = null;
@@ -94,6 +111,9 @@ function _renderBrowser() {
     const bandMeta = BAND_META.find(m => m.band === _activeBand) ?? BAND_META[0];
     const stories = STORIES.filter(s => s.band === _activeBand && s.category !== 'chapter' && s.category !== 'nonfiction-sg');
 
+    const read = getReadStories();
+    const readCount = stories.filter(s => read.includes(s.id)).length;
+
     const bandTabsHtml = BAND_META.map(m => /* html */`
       <button
         class="story-tab${m.band === _activeBand ? ' active' : ''}"
@@ -105,7 +125,8 @@ function _renderBrowser() {
       </button>
     `).join('');
 
-    const cardsHtml = stories.map(s => _storyCardHtml(s, bandMeta)).join('');
+    const cardsHtml = stories.map(s => _storyCardHtml(s, bandMeta, false, read.includes(s.id))).join('');
+    const progressPct = stories.length ? Math.round((readCount / stories.length) * 100) : 0;
 
     innerHtml = /* html */`
       <div class="stories-tabs" role="tablist" aria-label="Reading bands">${bandTabsHtml}</div>
@@ -115,15 +136,20 @@ function _renderBrowser() {
         <span class="slstrip-name">${bandMeta.label}</span>
         <span class="slstrip-sounds">${bandMeta.targetSounds}</span>
         <span class="slstrip-prop">${bandMeta.prop}</span>
+        <span class="slstrip-progress" title="${readCount} of ${stories.length} stories read">
+          ${readCount}/${stories.length} read
+          <span class="slstrip-progress-bar" style="--pct:${progressPct}%"></span>
+        </span>
       </div>
       <div class="story-cards-grid">${cardsHtml}</div>
     `;
   } else if (_activeTab === 'singapore') {
     // ── Singapore specials ─────────────────────────────────────────────
     const sgStories = STORIES.filter(s => s.category === 'nonfiction-sg');
+    const read = getReadStories();
     const cardsHtml = sgStories.map(s => {
       const meta = BAND_META.find(m => m.band === s.band) ?? BAND_META[0];
-      return _storyCardHtml(s, meta);
+      return _storyCardHtml(s, meta, false, read.includes(s.id));
     }).join('');
 
     innerHtml = /* html */`
@@ -138,9 +164,10 @@ function _renderBrowser() {
     const chapterStories = STORIES.filter(s => s.category === 'chapter').sort(
       (a, b) => (a.chapterNum ?? 0) - (b.chapterNum ?? 0),
     );
+    const read = getReadStories();
     const cardsHtml = chapterStories.map(s => {
       const meta = BAND_META.find(m => m.band === s.band) ?? BAND_META[0];
-      return _storyCardHtml(s, meta, true);
+      return _storyCardHtml(s, meta, true, read.includes(s.id));
     }).join('');
 
     innerHtml = /* html */`
@@ -182,23 +209,28 @@ function _renderBrowser() {
 }
 
 /** Build a story card button element HTML */
-function _storyCardHtml(story, levelMeta, isChapter = false) {
+function _storyCardHtml(story, levelMeta, isChapter = false, isRead = false) {
   const questBadge = story.comprehension?.length
     ? '<span class="story-card-quest-badge">⭐ Quest</span>'
     : '';
   const chapterBadge = isChapter
     ? `<span class="story-card-chapter-badge">Ch. ${story.chapterNum}</span>`
     : '';
+  const readBadge = isRead
+    ? '<span class="story-card-read-badge" title="Story read">✓</span>'
+    : '';
   return /* html */`
-    <button class="story-card${isChapter ? ' story-card--chapter' : ''}" data-story-id="${story.id}">
+    <button class="story-card${isChapter ? ' story-card--chapter' : ''}${isRead ? ' story-card--read' : ''}" data-story-id="${story.id}">
       <div class="story-card-illo" style="background:${levelMeta.bg}">
         <img
           src="${BASE}images/stories/${story.illustration}"
           alt="${story.title}"
           class="story-card-mascot"
           draggable="false"
+          loading="lazy"
         />
         ${chapterBadge}
+        ${readBadge}
       </div>
       <span class="story-card-title">${story.title}</span>
       <div class="story-card-meta">
@@ -369,6 +401,7 @@ function _renderReadAloud(story) {
   document.getElementById('btn-launch-quest')?.addEventListener('click', () => {
     _stopTTS();
     _stopFluencyTimer();
+    markStoryRead(story.id);
     runStoryQuest(_container, story, () => {
       _renderBrowser();
     });
@@ -395,12 +428,29 @@ function _renderDecodeMode(story) {
   const dynamic = document.getElementById('story-dynamic');
   if (!dynamic) return;
 
+  // Store vocab for decode-panel lookup
+  _currentStoryVocab = story.vocab ?? [];
+
   const hfwInStory = extractStoryHFW(story);
 
-  // Pre-teach section
+  // Pre-teach section — HFW chips
   const hfwChipsHtml = hfwInStory.map(w => /* html */`
     <button class="hfw-chip" data-word="${w}" aria-label="Hear sight word ${w}">
       ⭐ ${w}
+    </button>
+  `).join('');
+
+  // Pre-teach section — Vocab key-word chips (words that appear in story text)
+  const storyText = story.lines.map(l => l.text ?? '').join(' ').toLowerCase();
+  const vocabToPreteach = _currentStoryVocab.filter(v => {
+    const firstWord = v.word.toLowerCase().split(/\s+/)[0];
+    return storyText.includes(firstWord);
+  });
+  const vocabChipsHtml = vocabToPreteach.map(v => /* html */`
+    <button class="vocab-chip" data-word="${v.word}" aria-label="Key word: ${v.word}">
+      <span class="vocab-chip-icon">${v.icon}</span>
+      <span class="vocab-chip-word">${v.word}</span>
+      <span class="vocab-chip-meaning">${v.meaning}</span>
     </button>
   `).join('');
 
@@ -451,9 +501,27 @@ function _renderDecodeMode(story) {
       </div>
     </div>
 
+    <!-- Key vocabulary pre-teach -->
+    ${vocabChipsHtml.length ? /* html */`
+    <div class="vocab-preteach" id="vocab-preteach">
+      <div class="hfw-preteach-header">
+        <span class="hfw-preteach-title">📚 Key Words — tap to hear</span>
+        <button class="hfw-toggle-btn" id="btn-vocab-toggle" aria-expanded="true" aria-controls="vocab-chip-list">
+          Hide ▲
+        </button>
+      </div>
+      <div id="vocab-chip-list" class="vocab-chip-list">${vocabChipsHtml}</div>
+    </div>
+    ` : ''}
+
     <!-- Decode-mode story body -->
     <div class="story-body decode-body" id="story-body" aria-live="polite">
       ${storyBodyHtml}
+    </div>
+
+    <!-- Mark as read bar -->
+    <div class="story-done-bar">
+      <button class="btn btn--primary" id="btn-mark-read">✓ Mark story as read</button>
     </div>
 
     <!-- Decode panel (slides up when a word is tapped) -->
@@ -474,6 +542,16 @@ function _renderDecodeMode(story) {
     btn.textContent = expanded ? 'Show ▼' : 'Hide ▲';
   });
 
+  // Collapse/expand vocab section
+  document.getElementById('btn-vocab-toggle')?.addEventListener('click', () => {
+    const list = document.getElementById('vocab-chip-list');
+    const btn  = document.getElementById('btn-vocab-toggle');
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    list.hidden  = expanded;
+    btn.setAttribute('aria-expanded', String(!expanded));
+    btn.textContent = expanded ? 'Show ▼' : 'Hide ▲';
+  });
+
   // HFW chip taps → just read the word aloud
   dynamic.querySelectorAll('.hfw-chip').forEach(chip => {
     chip.addEventListener('click', () => {
@@ -485,6 +563,29 @@ function _renderDecodeMode(story) {
       window.speechSynthesis?.cancel();
       window.speechSynthesis?.speak(utt);
     });
+  });
+
+  // Vocab chip taps → read word aloud + expand meaning
+  dynamic.querySelectorAll('.vocab-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const w = chip.dataset.word;
+      _flashChip(chip);
+      chip.classList.toggle('vocab-chip--expanded');
+      const utt = new SpeechSynthesisUtterance(w);
+      utt.rate = 0.85;
+      utt.lang = 'en-GB';
+      window.speechSynthesis?.cancel();
+      window.speechSynthesis?.speak(utt);
+    });
+  });
+
+  // Mark as read
+  document.getElementById('btn-mark-read')?.addEventListener('click', (e) => {
+    markStoryRead(story.id);
+    const btn = e.currentTarget;
+    btn.textContent = '✓ Read!';
+    btn.disabled = true;
+    btn.classList.add('btn--success');
   });
 
   // Word tap → decode
@@ -650,6 +751,7 @@ function _startTTS(story) {
   if (!window.speechSynthesis) return;
   _stopTTS();
 
+  _currentStory = story;
   _toggleTTSButtons(true);
   _speaking = true;
 
@@ -697,6 +799,8 @@ function _onTTSDone() {
   _speaking = false;
   _container?.querySelectorAll('.sline--active').forEach(el => el.classList.remove('sline--active'));
   _toggleTTSButtons(false);
+  // Mark story as read when TTS finishes
+  if (_currentStory) markStoryRead(_currentStory.id);
   // Reveal Story Quest CTA if story has quest data
   const cta = document.getElementById('story-quest-cta');
   if (cta) cta.hidden = false;
