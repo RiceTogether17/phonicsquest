@@ -1,17 +1,58 @@
 /**
- * First Sound Mode
+ * First Sound Mode  (Phonemic Awareness — Initial Phoneme Identification)
  *
  * Core loop:
  * 1. Show the word image/emoji (but NOT the word text)
  * 2. Play the word audio
  * 3. Show 4 phoneme choices for the FIRST sound
  * 4. Child identifies the initial phoneme
+ * 5. Reveal full word + play first phoneme then full word
+ *
+ * Distractor strategy: prefer phonemes that children commonly confuse with
+ * the target (e.g. /b/ vs /p/, /d/ vs /t/, /f/ vs /th/) before falling back
+ * to same-type or any-type phonemes from the word list.
  */
 
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { WORDS, shuffleArray } from '../data/words.js';
+
+/**
+ * Common phoneme confusion pairs for initial consonants and short vowels.
+ * Keyed by the grapheme string; values are the most confusable alternatives.
+ */
+const CONFUSION_MAP = {
+  // Stop consonant pairs (voicing & place)
+  b:  ['p', 'd'],
+  p:  ['b', 't'],
+  d:  ['b', 't'],
+  t:  ['d', 'k'],
+  k:  ['g', 't'],
+  g:  ['k', 'd'],
+  // Fricative / affricate confusions
+  f:  ['th', 'v'],
+  v:  ['f', 'b'],
+  th: ['f', 'd'],
+  s:  ['z', 'sh'],
+  z:  ['s', 'j'],
+  sh: ['s', 'ch'],
+  ch: ['sh', 'j'],
+  j:  ['ch', 'g'],
+  // Nasal / liquid
+  m:  ['n', 'b'],
+  n:  ['m', 'ng'],
+  ng: ['n', 'm'],
+  r:  ['w', 'l'],
+  w:  ['r', 'v'],
+  l:  ['r', 'n'],
+  // Short vowel confusions (medial, but also appear as first grapheme in some words)
+  a:  ['u', 'o'],
+  e:  ['i', 'a'],
+  i:  ['e', 'a'],
+  o:  ['u', 'a'],
+  u:  ['a', 'o'],
+};
 
 let currentWord = null;
 let answered = false;
@@ -32,8 +73,8 @@ export function setupFirstSound(word, els) {
   els.wordDisplay.innerHTML = '';
   els.phonemeRow.innerHTML = '';
 
-  // Instruction
-  els.modeInstruction.textContent = 'What sound does this word start with?';
+  // Instruction — prompt the child to say the word slowly before choosing
+  els.modeInstruction.textContent = 'Say the word slowly… what\'s the FIRST sound?';
 
   // The first grapheme / phoneme
   const firstGrapheme = word.graphemes[0];
@@ -112,23 +153,48 @@ function handleChoice(choice, btn, word, els, grid) {
 }
 
 /**
- * Get distractor first-sounds from other words.
+ * Get distractor first-sounds.
+ *
+ * Priority:
+ *   1. Phonemes the child is most likely to confuse with the target (CONFUSION_MAP).
+ *   2. Other phonemes of the same type from the word list.
+ *   3. Any phoneme from the word list (fallback).
  */
 function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel = 3) {
-  const seen = new Set([correctGrapheme]);
+  const seen        = new Set([correctGrapheme]);
   const distractors = [];
 
-  for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
-    const g = word.graphemes[0];
-    const t = word.types[0];
-    if (!seen.has(g) && t === correctType) {
-      seen.add(g);
-      distractors.push({ grapheme: g, type: t });
-      if (distractors.length >= 6) break;
+  // Tier 1: confusion-pair phonemes — the most instructionally useful distractors
+  const confusionTargets = CONFUSION_MAP[correctGrapheme.toLowerCase()] ?? [];
+  for (const cg of confusionTargets) {
+    if (seen.has(cg)) continue;
+    // Find this grapheme in the word list to get its type
+    const match = WORDS.find(w => w.level <= maxLevel && w.graphemes[0] === cg);
+    if (match) {
+      seen.add(cg);
+      distractors.push({ grapheme: cg, type: match.types[0] });
+    } else {
+      // Use the correct type as a reasonable approximation
+      seen.add(cg);
+      distractors.push({ grapheme: cg, type: correctType });
+    }
+    if (distractors.length >= 3) break;
+  }
+
+  // Tier 2: same-type phonemes from the word list
+  if (distractors.length < 3) {
+    for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
+      const g = word.graphemes[0];
+      const t = word.types[0];
+      if (!seen.has(g) && t === correctType) {
+        seen.add(g);
+        distractors.push({ grapheme: g, type: t });
+        if (distractors.length >= 6) break;
+      }
     }
   }
 
-  // Fallback: allow mixed consonant types at this level.
+  // Tier 3: any phoneme (fallback)
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
       const g = word.graphemes[0];

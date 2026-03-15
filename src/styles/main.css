@@ -874,6 +874,60 @@ input, select, textarea { font-family: inherit; }
   animation: shake 0.4s ease;
 }
 
+/* ── Oral Blend mode: emoji-only choices ─────────────────────────────── */
+.choice-grid--emoji {
+  grid-template-columns: 1fr 1fr;
+}
+
+.choice-btn--emoji {
+  flex-direction: column;
+  gap: var(--space-1);
+  min-height: 96px;
+  padding: var(--space-3);
+}
+
+.choice-btn-emoji {
+  font-size: 2.8rem;
+  line-height: 1;
+  display: block;
+}
+
+.choice-btn-word {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.choice-btn-word--hidden {
+  visibility: hidden;
+}
+
+/* ── Sound Count mode: number + dot display ──────────────────────────── */
+.choice-grid--count {
+  grid-template-columns: 1fr 1fr;
+}
+
+.choice-btn--count {
+  flex-direction: column;
+  gap: var(--space-1);
+  min-height: 80px;
+}
+
+.count-number {
+  font-size: var(--font-size-3xl);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.count-dots {
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  word-break: break-all;
+  max-width: 6rem;
+  text-align: center;
+}
+
 /* Segment-it: tap-to-segment */
 .segment-word {
   display: flex;

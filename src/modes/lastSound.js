@@ -6,12 +6,47 @@
  * 2. Show 4 phoneme choices for the LAST sound
  * 3. Child identifies the final phoneme
  * 4. Reveal full word + play final phoneme, then blend
+ *
+ * Distractor strategy: prefer phonemes that children commonly confuse with
+ * the target before falling back to same-type or any-type phonemes.
  */
 
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { WORDS, shuffleArray } from '../data/words.js';
+
+/**
+ * Common phoneme confusion pairs — especially relevant for final consonants
+ * where voicing is harder to discriminate (e.g. /d/ vs /t/ at word end).
+ */
+const CONFUSION_MAP = {
+  // Final stop pairs (voicing)
+  b:  ['p', 'd'],
+  p:  ['b', 't'],
+  d:  ['t', 'b'],
+  t:  ['d', 'k'],
+  k:  ['g', 't', 'ck'],
+  g:  ['k', 'd'],
+  ck: ['k', 't'],
+  // Fricatives / affricates
+  f:  ['v', 'th'],
+  v:  ['f', 'b'],
+  th: ['f', 's'],
+  s:  ['z', 'sh', 'se'],
+  z:  ['s'],
+  sh: ['s', 'ch'],
+  ch: ['sh', 'j'],
+  j:  ['ch', 'g'],
+  // Nasals
+  m:  ['n', 'ng'],
+  n:  ['m', 'ng'],
+  ng: ['n', 'm'],
+  // Liquids / glides
+  r:  ['l'],
+  l:  ['r', 'll'],
+  ll: ['l', 'r'],
+};
 
 let currentWord = null;
 let answered    = false;
@@ -30,7 +65,7 @@ export function setupLastSound(word, els) {
   els.wordDisplay.innerHTML = '';
   els.phonemeRow.innerHTML  = '';
 
-  els.modeInstruction.textContent = 'What sound does this word end with?';
+  els.modeInstruction.textContent = 'Listen to the end of the word… what\'s the LAST sound?';
 
   const lastIdx      = word.graphemes.length - 1;
   const lastGrapheme = word.graphemes[lastIdx];
@@ -88,21 +123,51 @@ function _handleChoice(choice, btn, word, els, grid, lastIdx) {
   }, choice.correct ? 800 : 1500);
 }
 
+/**
+ * Build distractor pool for the last-sound position.
+ *
+ * Priority:
+ *   1. Confusion-pair phonemes most likely to trip up the child.
+ *   2. Same-type phonemes from words at this level.
+ *   3. Any final phoneme (fallback).
+ */
 function _getDistractors(correctGrapheme, position, maxLevel = 3, targetType = null) {
-  const seen = new Set([correctGrapheme]);
+  const seen        = new Set([correctGrapheme]);
   const distractors = [];
 
-  for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
-    const idx = position === 'last' ? word.graphemes.length - 1 : 0;
-    const g = word.graphemes[idx];
-    const t = word.types[idx];
-    if (!seen.has(g) && (!targetType || t === targetType)) {
-      seen.add(g);
-      distractors.push({ grapheme: g, type: t });
-      if (distractors.length >= 6) break;
+  // Tier 1: confusion-pair phonemes
+  const confusionTargets = CONFUSION_MAP[correctGrapheme.toLowerCase()] ?? [];
+  for (const cg of confusionTargets) {
+    if (seen.has(cg)) continue;
+    const levelWords = WORDS.filter(w => w.level <= maxLevel);
+    const lastIdx    = position === 'last' ? -1 : 0;
+    const match      = levelWords.find(w => {
+      const idx = lastIdx === -1 ? w.graphemes.length - 1 : 0;
+      return w.graphemes[idx] === cg;
+    });
+    const type = match
+      ? match.types[lastIdx === -1 ? match.graphemes.length - 1 : 0]
+      : (targetType ?? 'c');
+    seen.add(cg);
+    distractors.push({ grapheme: cg, type });
+    if (distractors.length >= 3) break;
+  }
+
+  // Tier 2: same-type phonemes from word list
+  if (distractors.length < 3) {
+    for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
+      const idx = position === 'last' ? word.graphemes.length - 1 : 0;
+      const g = word.graphemes[idx];
+      const t = word.types[idx];
+      if (!seen.has(g) && (!targetType || t === targetType)) {
+        seen.add(g);
+        distractors.push({ grapheme: g, type: t });
+        if (distractors.length >= 6) break;
+      }
     }
   }
 
+  // Tier 3: any final phoneme (fallback)
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
       const idx = position === 'last' ? word.graphemes.length - 1 : 0;
@@ -115,6 +180,7 @@ function _getDistractors(correctGrapheme, position, maxLevel = 3, targetType = n
       }
     }
   }
+
   return distractors;
 }
 

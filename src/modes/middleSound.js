@@ -8,7 +8,12 @@
  * 4. Reveal full word + highlight middle phoneme, then blend
  *
  * Works best with CVC / CCVC / CVCC patterns.
+ * At level 1 the distractor pool is restricted to short vowels only, so
+ * beginners compare the five short vowels rather than a mixed vowel set.
  * Falls back to Math.floor(length/2) index if no interior vowel found.
+ *
+ * Distractor strategy: prefer short-vowel confusion pairs (e.g. /a/ vs /u/,
+ * /e/ vs /i/) which are the most commonly confused medial vowels.
  */
 
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
@@ -16,7 +21,20 @@ import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { WORDS, shuffleArray } from '../data/words.js';
 
-const VOWEL_TYPES = new Set(['sv', 'lv', 'rc', 'dp']);
+const VOWEL_TYPES       = new Set(['sv', 'lv', 'rc', 'dp']);
+const SHORT_VOWEL_TYPES = new Set(['sv']);
+
+/**
+ * Short-vowel confusion pairs — the most commonly mixed-up medial vowels.
+ * Keyed by grapheme (for short vowels only).
+ */
+const VOWEL_CONFUSION_MAP = {
+  a: ['u', 'o', 'e'],
+  e: ['i', 'a'],
+  i: ['e', 'a'],
+  o: ['u', 'a'],
+  u: ['a', 'o'],
+};
 
 let currentWord = null;
 let answered    = false;
@@ -35,7 +53,7 @@ export function setupMiddleSound(word, els) {
   els.wordDisplay.innerHTML = '';
   els.phonemeRow.innerHTML  = '';
 
-  els.modeInstruction.textContent = 'What is the middle sound in this word?';
+  els.modeInstruction.textContent = 'Stretch the word… what sound is in the MIDDLE?';
 
   const midIdx     = _getMiddleVowelIdx(word);
   const midGrapheme = word.graphemes[midIdx];
@@ -105,35 +123,66 @@ function _getMiddleVowelIdx(word) {
   return Math.floor(word.graphemes.length / 2);
 }
 
-/** Build vowel-biased distractor pool. */
+/**
+ * Build vowel distractor pool.
+ *
+ * At level 1 only short vowels are used — beginners should compare the
+ * five short vowels before being exposed to long vowels and complex patterns.
+ *
+ * Priority:
+ *   1. Short-vowel confusion pairs from VOWEL_CONFUSION_MAP.
+ *   2. Other vowels of the same type from the word list.
+ *   3. Any vowel (fallback).
+ */
 function _getVowelDistractors(correctGrapheme, maxLevel = 3, targetType = null) {
-  const seen = new Set([correctGrapheme]);
+  const seen        = new Set([correctGrapheme]);
   const distractors = [];
 
-  // First pass: vowels only
-  for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
-    for (let i = 0; i < word.graphemes.length; i++) {
-      const g = word.graphemes[i];
-      const t = word.types[i];
-      if (!seen.has(g) && VOWEL_TYPES.has(t) && (!targetType || t === targetType)) {
-        seen.add(g);
-        distractors.push({ grapheme: g, type: t });
-        if (distractors.length >= 6) break;
-      }
-    }
-    if (distractors.length >= 6) break;
+  // At level 1 restrict to short vowels so beginners compare a/e/i/o/u only
+  const allowedVowelTypes = maxLevel <= 1 ? SHORT_VOWEL_TYPES : VOWEL_TYPES;
+
+  // Tier 1: confusion-pair vowels
+  const confusionTargets = VOWEL_CONFUSION_MAP[correctGrapheme.toLowerCase()] ?? [];
+  for (const cg of confusionTargets) {
+    if (seen.has(cg)) continue;
+    // Only include if this vowel type is allowed at this level
+    const match = WORDS.find(w => w.graphemes.includes(cg) && allowedVowelTypes.has(w.types[w.graphemes.indexOf(cg)]));
+    const type  = match ? match.types[match.graphemes.indexOf(cg)] : 'sv';
+    if (!allowedVowelTypes.has(type)) continue;
+    seen.add(cg);
+    distractors.push({ grapheme: cg, type });
+    if (distractors.length >= 3) break;
   }
 
-  // Fallback: any phoneme
+  // Tier 2: same allowed vowel type from word list
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
-      const g = word.graphemes[0];
-      const t = word.types[0];
-      if (!seen.has(g)) {
-        seen.add(g);
-        distractors.push({ grapheme: g, type: t });
-        if (distractors.length >= 6) break;
+      for (let i = 0; i < word.graphemes.length; i++) {
+        const g = word.graphemes[i];
+        const t = word.types[i];
+        if (!seen.has(g) && allowedVowelTypes.has(t) && (!targetType || t === targetType)) {
+          seen.add(g);
+          distractors.push({ grapheme: g, type: t });
+          if (distractors.length >= 6) break;
+        }
       }
+      if (distractors.length >= 6) break;
+    }
+  }
+
+  // Tier 3: any vowel (fallback)
+  if (distractors.length < 3) {
+    for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
+      for (let i = 0; i < word.graphemes.length; i++) {
+        const g = word.graphemes[i];
+        const t = word.types[i];
+        if (!seen.has(g) && VOWEL_TYPES.has(t)) {
+          seen.add(g);
+          distractors.push({ grapheme: g, type: t });
+          if (distractors.length >= 6) break;
+        }
+      }
+      if (distractors.length >= 6) break;
     }
   }
 
