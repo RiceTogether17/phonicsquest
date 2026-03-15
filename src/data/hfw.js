@@ -95,6 +95,11 @@ const EXTENDED_HFW_LIST = [
   'funny', 'red', 'three', 'up', 'off', 'yellow',
   // Story-specific
   'felt', 'glad', 'sat', 'had', 'met',
+  // Very common words with irregular/advanced phonics — pre-taught as sight words
+  'girl', 'year', 'saw', 'far', 'crowd', 'oil', 'near', 'hear', 'fear',
+  'dear', 'bear', 'wear', 'know', 'show', 'grow', 'glow', 'blow', 'snow',
+  // Character name and key cultural terms — always pre-taught, treated as sight words
+  'giri', 'hawker', 'neighbour',
 ];
 
 const EXTENDED_HFW_SET = new Set(EXTENDED_HFW_LIST.map(w => w.toLowerCase()));
