@@ -16,6 +16,15 @@ import { normalizeAdaptiveConfig, getWordWeight } from './adaptiveSelection.js';
 const NON_DECODABLE_GROUPS = new Set(['sight-highfreq']);
 const BLENDING_MODES = new Set(['blend', 'classicBlend']);
 
+// Groups that should not appear in phonemic-awareness activities because their
+// words are irregular, multisyllabic, or non-decodable at the phoneme level.
+const PA_EXCLUDED_GROUPS = new Set([
+  'sight-highfreq', 'multisyllable', 'prefixes', 'suffixes-advanced',
+]);
+const PHONEMIC_AWARENESS_MODES = new Set([
+  'first', 'last', 'middle', 'oralBlend', 'soundCount', 'missing', 'segment',
+]);
+
 class Progress {
   /**
    * Get adaptively-weighted word pool.
@@ -84,6 +93,10 @@ class Progress {
 
     if (isBlendingMode) {
       pool = pool.filter(word => !NON_DECODABLE_GROUPS.has(word.group) && word.pattern !== 'sight');
+    }
+
+    if (PHONEMIC_AWARENESS_MODES.has(opts.mode)) {
+      pool = pool.filter(word => !PA_EXCLUDED_GROUPS.has(word.group));
     }
 
     if (pool.length === 0) {

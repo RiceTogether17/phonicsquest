@@ -16,16 +16,26 @@ const BASE = import.meta.env.BASE_URL;
 // ── Phoneme-type metadata ─────────────────────────────────────────────────
 
 const TYPE_META = {
-  c:   { label: 'Consonants',    short: 'Con',   color: '#3b82f6', bg: '#dbeafe', order: 1 },
-  sv:  { label: 'Short Vowels',  short: 'Short', color: '#ef4444', bg: '#fee2e2', order: 2 },
-  lv:  { label: 'Long Vowels',   short: 'Long',  color: '#22c55e', bg: '#dcfce7', order: 3 },
-  d:   { label: 'Digraphs',      short: 'Digrph',color: '#a855f7', bg: '#f3e8ff', order: 4 },
-  bl:  { label: 'Blends',        short: 'Blend', color: '#f97316', bg: '#ffedd5', order: 5 },
-  rc:  { label: 'R-Controlled',  short: 'R-Ctrl',color: '#ec4899', bg: '#fce7f3', order: 6 },
-  dp:  { label: 'Diphthongs',    short: 'Dipth', color: '#0d9488', bg: '#ccfbf1', order: 7 },
-  se:  { label: 'Silent-E',      short: 'Sil-E', color: '#94a3b8', bg: '#f1f5f9', order: 8 },
-  sfx: { label: 'Suffixes',      short: 'Suffix',color: '#d97706', bg: '#fef3c7', order: 9 },
+  c:      { label: 'Consonants',    short: 'Con',   color: '#3b82f6', bg: '#dbeafe', order: 1 },
+  sv:     { label: 'Short Vowels',  short: 'Short', color: '#ef4444', bg: '#fee2e2', order: 2 },
+  lv:     { label: 'Long Vowels',   short: 'Long',  color: '#22c55e', bg: '#dcfce7', order: 3 },
+  d:      { label: 'Digraphs',      short: 'Digrph',color: '#a855f7', bg: '#f3e8ff', order: 4 },
+  bl:     { label: 'Blends',        short: 'Blend', color: '#f97316', bg: '#ffedd5', order: 5 },
+  rc:     { label: 'R-Controlled',  short: 'R-Ctrl',color: '#ec4899', bg: '#fce7f3', order: 6 },
+  dp:     { label: 'Diphthongs',    short: 'Dipth', color: '#0d9488', bg: '#ccfbf1', order: 7 },
+  se:     { label: 'Silent-E',      short: 'Sil-E', color: '#94a3b8', bg: '#f1f5f9', order: 8 },
+  sfx:    { label: 'Suffixes',      short: 'Suffix',color: '#d97706', bg: '#fef3c7', order: 9 },
+  soft_c: { label: 'Soft C (/s/)',  short: 'Soft C',color: '#06b6d4', bg: '#cffafe', order: 10 },
+  soft_g: { label: 'Soft G (/j/)',  short: 'Soft G',color: '#8b5cf6', bg: '#ede9fe', order: 11 },
 };
+
+// ── Groups excluded from the Letter Sounds reference screen ───────────────
+// These groups contain irregular/multisyllabic words whose grapheme chunks
+// (e.g. "sci", "eir", "nough", "cau", "mar") are not genuine beginner
+// phonics correspondences.
+const LS_EXCLUDED_GROUPS = new Set([
+  'multisyllable', 'sight-highfreq', 'prefixes', 'suffixes-advanced',
+]);
 
 // ── Build card data from word bank ────────────────────────────────────────
 
@@ -34,6 +44,7 @@ function buildCardMap() {
   const map = new Map();
 
   for (const word of WORDS) {
+    if (LS_EXCLUDED_GROUPS.has(word.group)) continue; // skip irregular/advanced chunks
     for (let i = 0; i < word.graphemes.length; i++) {
       const g = word.graphemes[i];
       const t = word.types[i];
