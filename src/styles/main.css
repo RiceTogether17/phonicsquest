@@ -444,14 +444,93 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* ── 5. HOME SCREEN ── */
-.home-hero {
+
+/* Hero zone: mascot + guided journey + daily goal strip */
+.home-hero-zone {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto var(--space-3);
+}
+/* Override guided-journey's own positioning when it lives inside hero-zone */
+.home-hero-zone #guided-journey-section {
+  max-width: none;
+  padding: 0;
+  margin: 0 0 var(--space-2);
+}
+/* Daily goal when inside hero-zone */
+.home-hero-zone .daily-goal {
+  margin-top: var(--space-2);
+}
+
+/* Home body: stacks on mobile, 2-col grid on desktop */
+.home-body {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+}
+.home-main-col,
+.home-side-col {
+  width: 100%;
+}
+
+/* Section wrapper */
+.home-section {
+  width: 100%;
+  margin-bottom: var(--space-6);
+}
+/* Remove mode-grid's own bottom margin when inside a section */
+.home-section .mode-grid {
+  margin-bottom: 0;
+}
+
+/* Section heading label */
+.home-section-heading {
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 var(--space-3);
+  padding-left: 2px;
+}
+
+/* Quest banners: tighter vertical stack within section */
+.home-quests-section .stories-banner {
+  max-width: none;
+  margin: 0 0 var(--space-2);
+}
+.home-quests-section .stories-banner:last-child { margin-bottom: 0; }
+
+/* Spin section: centres the wheel */
+.home-spin-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
   margin-bottom: var(--space-4);
 }
 
+/* Explore / tools banners: compact variant */
+.home-tools-section .stories-banner {
+  max-width: none;
+  margin: 0 0 var(--space-2);
+  padding: var(--space-2) var(--space-3);
+}
+.home-tools-section .stories-banner:last-child { margin-bottom: 0; }
+.home-tools-section .stories-banner-title { font-size: var(--font-size-sm); }
+.home-tools-section .stories-banner-sub   { font-size: var(--font-size-xs); }
+.home-tools-section .stories-banner-mascot { width: 40px; height: 40px; }
+.home-tools-section .stories-banner-mascot img  { width: 40px; height: 40px; }
+.home-tools-section .stories-banner-mascot span { font-size: 1.8rem !important; line-height: 40px; }
+
+.home-hero {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-3);
+}
+
 .mascot-home {
-  width: 100px; height: 100px;
+  width: 80px; height: 80px;
   filter: drop-shadow(0 8px 16px rgba(108,99,255,0.3));
   animation: bob 3s ease-in-out infinite;
 }
@@ -1814,9 +1893,22 @@ input, select, textarea { font-family: inherit; }
 [data-reduced-motion="true"] .btn--hint-pulse { animation: none; }
 
 /* ── 18. RESPONSIVE ── */
+
+/* Mobile: hide the XP chip on narrow screens — streak + energy is enough */
+@media (max-width: 479px) {
+  /* XP chip is the third .stat-chip */
+  .header-stats .stat-chip:nth-child(3) { display: none; }
+  /* Tighten header */
+  .app-header { padding: 0 var(--space-3); gap: var(--space-1); }
+  .app-brand { font-size: var(--font-size-base); }
+  /* Dashboard icon-btn uses more subtle color on mobile to de-emphasise admin */
+  #dashboard-btn { opacity: 0.7; }
+}
+
 @media (max-width: 360px) {
   .mode-grid { grid-template-columns: 1fr 1fr; }
-  .header-stats .stat-chip:last-child { display: none; }
+  /* Hide all but streak on very tiny screens */
+  .header-stats .stat-chip:not(.stat-chip--streak) { display: none; }
   .choice-grid { grid-template-columns: 1fr; }
   .letter-tile { min-width: 52px; height: 60px; font-size: var(--font-size-xl); }
 }
@@ -1855,7 +1947,7 @@ input, select, textarea { font-family: inherit; }
 @media (min-width: 1024px) {
   #app { max-width: 100%; box-shadow: none; overflow-x: hidden; }
 
-  .app-header { padding: 12px 32px; }
+  .app-header { padding: 12px 32px; height: 64px; }
   .main-content { padding: 24px 48px; overflow: visible; }
 
   /* ── Desktop: ALL game screens fill full width ── */
@@ -1896,8 +1988,8 @@ input, select, textarea { font-family: inherit; }
   /* Larger phoneme tiles on desktop */
   .phoneme-tile { padding: 12px 20px; font-size: var(--font-size-xl); min-width: 60px; }
 
-  /* Mode grid: 3 columns on desktop */
-  .mode-grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-4); max-width: 960px; margin: 0 auto; }
+  /* Mode grid: 3 columns on desktop — controlled by home-section width now */
+  .mode-grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-4); max-width: none; margin: 0; }
 
   /* Choice grid: 2 columns */
   .choice-grid { grid-template-columns: 1fr 1fr; gap: var(--space-3); }
@@ -1940,7 +2032,7 @@ input, select, textarea { font-family: inherit; }
   }
   .sm-card-back { font-size: clamp(2.5rem, 3vw, 4.4rem); line-height: 1.1; }
 
-  /* Stories banner */
+  /* Stories banner (outside home-tools-section, in other screens) */
   .stories-banner { max-width: 600px; }
 
   /* Category/level grids: 4 columns on desktop */
@@ -1958,10 +2050,22 @@ input, select, textarea { font-family: inherit; }
   .mode-title { font-size: var(--font-size-xl); }
   .section-title { font-size: var(--font-size-lg); }
 
-  /* Modals scale up on desktop */
-  .modal-panel { max-width: 640px; border-radius: var(--radius-xl); }
-
-
+  /* Modals: centered dialog on desktop instead of bottom-sheet */
+  .modal-overlay {
+    align-items: center;
+    padding: var(--space-8);
+  }
+  .modal-panel {
+    max-width: 620px;
+    border-radius: var(--radius-xl);
+    max-height: 88dvh;
+    animation: modal-pop-in 0.3s var(--ease-bounce);
+  }
+  @keyframes modal-pop-in {
+    from { transform: scale(0.94) translateY(12px); opacity: 0; }
+    to   { transform: scale(1)    translateY(0);    opacity: 1; }
+  }
+  .modal-panel--wide { max-width: 900px; }
 
   /* Category selector wider */
   .category-select { max-width: 400px; }
@@ -1969,15 +2073,51 @@ input, select, textarea { font-family: inherit; }
   /* Result screen centered */
   #screen-result { max-width: 600px; margin: 0 auto; }
 
-  /* Home screen sections */
-  .home-section { max-width: 960px; margin-left: auto; margin-right: auto; }
+  /* ── Home screen desktop layout ── */
+
+  /* Hero zone: constrained width, centered */
+  .home-hero-zone {
+    max-width: 680px;
+    margin-bottom: var(--space-5);
+  }
+
+  /* Home body: proper 2-column grid */
+  .home-body {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 0 var(--space-8);
+    align-items: start;
+    width: 100%;
+    max-width: 1140px;
+    margin: 0 auto;
+  }
+
+  /* Main col fills left */
+  .home-main-col {
+    min-width: 0;
+  }
+
+  /* Side col fixed width */
+  .home-side-col {
+    width: 300px;
+  }
+
+  /* Quest banners: no max-width override from general .stories-banner rule */
+  .home-quests-section .stories-banner,
+  .home-tools-section .stories-banner {
+    max-width: none;
+  }
+
+  /* Home sections: no outer max-width (body controls centering) */
+  .home-section { max-width: none; }
 }
 
 /* Large desktop: comfortable max width */
 @media (min-width: 1440px) {
   .main-content { padding: 32px 64px; }
-  .mode-grid { max-width: 1060px; }
-  .home-section { max-width: 1060px; }
+  .home-body { max-width: 1280px; grid-template-columns: 1fr 340px; }
+  .home-side-col { width: 340px; }
+  .home-section { max-width: none; }
   .sm-quest-grid { grid-template-columns: repeat(5, 1fr); }
   .cloze-browser-grid,
   .cloze-cat-grid,
@@ -5277,11 +5417,12 @@ input, select, textarea { font-family: inherit; }
    GUIDED LEARNER JOURNEY — Home screen
    ══════════════════════════════════════════════════════════════════════════ */
 
+/* Now lives inside .home-hero-zone which handles width/centering */
 #guided-journey-section {
   width: 100%;
-  max-width: 560px;
-  margin: 0 auto var(--space-4);
-  padding: 0 var(--space-4);
+  max-width: none;
+  margin: 0 0 var(--space-3);
+  padding: 0;
 }
 
 /* Hero banner */
