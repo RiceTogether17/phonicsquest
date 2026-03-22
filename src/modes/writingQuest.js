@@ -2,6 +2,17 @@ import { WRITING_LEVELS, writingPrompts } from '../data/writingPrompts.js';
 import { store } from '../modules/store.js';
 import { questMastery } from '../modules/questMastery.js';
 import { getLevelInfo } from '../data/curriculum.js';
+import {
+  evaluateWriting,
+  getLiveHint,
+  compareRevisions,
+  getDimensionFeedback,
+  getRevisionMission,
+  getEncouragement,
+  DIMENSION_LABELS,
+  DIMENSION_EMOJIS,
+} from '../modules/writingEvaluator.js';
+import { detectBadges, renderBadgeChips } from '../modules/writingBadges.js';
 
 let _container = null;
 let _onGoHome = null;
@@ -9,6 +20,7 @@ let _level = 1;
 let _idx = 0;
 let _list = [];
 let _sessionStats = _newSessionStats();
+let _firstResult = null; // stored for revision comparison
 
 function _newSessionStats() {
   return {
@@ -19,97 +31,12 @@ function _newSessionStats() {
     revisionsSuggested: 0,
     strongestDimension: 'content',
     weakestDimension: 'language',
-  };
-}
-
-
-function _getLengthTarget(level) {
-  if (level <= 1) return 35;
-  if (level === 2) return 55;
-  if (level === 3) return 80;
-  if (level === 4) return 110;
-  if (level === 5) return 150;
-  return 190;
-}
-
-export function getWritingLiveFeedback(item, text, level) {
-  const result = evaluateWritingSubmission(item, text, level);
-  const { strongest, weakest } = _findStrongWeak(result.dimensions);
-  return {
-    result,
-    strongest,
-    weakest,
-    tip: _dimensionAdvice(weakest),
-    progressLabel: `Words ${result.words}/${_getLengthTarget(level)}`,
-  };
-}
-export function evaluateWritingSubmission(item, text, level) {
-  const normalized = (text || '').trim();
-  const words = normalized ? normalized.split(/\s+/).length : 0;
-  const sentences = normalized
-    .split(/[.!?]+/)
-    .map(s => s.trim())
-    .filter(Boolean);
-  const sentenceCount = sentences.length;
-
-  const hasEndingPunctuation = /[.!?]$/.test(normalized);
-  const connectors = ['because', 'although', 'however', 'therefore', 'meanwhile', 'finally', 'consequently', 'moreover', 'but', 'so'];
-  const connectorHits = connectors.reduce((count, word) => count + (normalized.toLowerCase().includes(word) ? 1 : 0), 0);
-
-  const requiredPoints = item.requiredPoints || [];
-  const requiredHits = requiredPoints.filter((p) => normalized.toLowerCase().includes(p.split(' ')[0].toLowerCase())).length;
-
-  const lengthTarget = _getLengthTarget(level);
-
-  const content = Math.min(1, ((requiredPoints.length ? requiredHits / requiredPoints.length : 0.6) * 0.7) + (Math.min(words / lengthTarget, 1) * 0.3));
-  const organisation = Math.min(1, ((Math.min(sentenceCount / 5, 1) * 0.6) + (Math.min(connectorHits / 3, 1) * 0.4)));
-  const language = Math.min(1, ((hasEndingPunctuation ? 0.5 : 0.2) + (Math.min(words / (lengthTarget * 0.85), 1) * 0.2) + (Math.min(connectorHits / 4, 1) * 0.3)));
-  const taskFulfilment = Math.min(1, ((requiredPoints.length ? requiredHits / requiredPoints.length : 0.7) * 0.8) + (hasEndingPunctuation ? 0.2 : 0));
-
-  const weighted = (content * 0.3) + (organisation * 0.25) + (language * 0.25) + (taskFulfilment * 0.2);
-
-  return {
-    words,
-    sentenceCount,
-    requiredHits,
-    requiredTotal: requiredPoints.length,
-    dimensions: {
-      content,
-      organisation,
-      language,
-      taskFulfilment,
-    },
-    score: weighted,
-    passed: weighted >= 0.72,
+    badgesEarned: [],
   };
 }
 
 function _dimensionLabel(key) {
-  if (key === 'taskFulfilment') return 'task fulfilment';
-  return key;
-}
-
-function _findStrongWeak(dimensions) {
-  const entries = Object.entries(dimensions);
-  const strongest = entries.reduce((best, next) => (next[1] > best[1] ? next : best));
-  const weakest = entries.reduce((worst, next) => (next[1] < worst[1] ? next : worst));
-  return { strongest: strongest[0], weakest: weakest[0] };
-}
-
-function _dimensionAdvice(key) {
-  switch (key) {
-    case 'content': return 'Add specific details, examples, or emotions so ideas feel complete.';
-    case 'organisation': return 'Use clearer paragraph flow: opening → development → ending, with connectors.';
-    case 'language': return 'Proofread grammar and punctuation. Vary sentence starters for fluency.';
-    case 'taskFulfilment': return 'Check every required point and keep tone aligned to purpose/audience.';
-    default: return 'Revise one paragraph to strengthen clarity.';
-  }
-}
-
-function _scoreToStars(score) {
-  if (score >= 0.88) return 3;
-  if (score >= 0.72) return 2;
-  return 1;
+  return DIMENSION_LABELS[key] || key;
 }
 
 export function initWritingQuest(container, onGoHome) {
@@ -133,6 +60,7 @@ function _startLevel(level) {
   _sessionStats = _newSessionStats();
   _list = _prioritisePrompts(writingPrompts[level] || []);
   _idx = 0;
+  _firstResult = null;
   _render();
 }
 
@@ -146,6 +74,7 @@ function _prioritisePrompts(prompts) {
 
 function _render() {
   if (_idx >= _list.length) return _renderDone();
+  _firstResult = null;
   const item = _list[_idx];
 
   const pacBlock = item.pac ? `
@@ -210,13 +139,18 @@ function _updateLiveDetector(item, text) {
     return;
   }
 
-  const live = getWritingLiveFeedback(item, text, _level);
-  detector.innerHTML = `🧠 Live detector: ${live.progressLabel} · score ${(live.result.score * 100).toFixed(0)}% · strongest ${_dimensionLabel(live.strongest)} · focus ${_dimensionLabel(live.weakest)}. Tip: ${live.tip}`;
+  const hint = getLiveHint(item, text, _level);
+  detector.innerHTML = `🧠 Live detector: ${hint.words}/${hint.target} words · score ${(hint.score * 100).toFixed(0)}% · focus: ${_dimensionLabel(hint.weakest)}. Tip: ${hint.tip}`;
 }
 
 function _renderDimensionBreakdown(result, peer) {
   const rows = Object.entries(result.dimensions)
-    .map(([key, val]) => `<li>${_dimensionLabel(key)}: ${(val * 100).toFixed(0)}% — ${_dimensionAdvice(key)}</li>`)
+    .map(([key, val]) => {
+      const emoji = DIMENSION_EMOJIS[key] || '';
+      const label = _dimensionLabel(key);
+      const fb = result.feedback?.[key] || getDimensionFeedback(key, val);
+      return `<li>${emoji} <strong>${label}</strong>: ${(val * 100).toFixed(0)}% — ${fb}</li>`;
+    })
     .join('');
   return `<ul>${rows}</ul>${peer ? '<p>Peer review prompt: ask your partner to suggest one upgrade to your weakest dimension.</p>' : ''}`;
 }
@@ -234,26 +168,26 @@ function _submit(item) {
     return;
   }
 
-  const result = evaluateWritingSubmission(item, text, _level);
-  const stars = _scoreToStars(result.score);
-  const { strongest, weakest } = _findStrongWeak(result.dimensions);
+  const result = evaluateWriting(item, text, _level);
+  const badges = detectBadges(result.metrics, text);
   const skill = item.mode || 'composition';
 
   questMastery.updateSkill('writingQuest', skill, result.passed);
   questMastery.recordAttempt({ quest: 'writingQuest', skill, correct: result.passed, level: _level });
 
-  const xpGain = Math.round((item.xp || 30) * (0.55 + result.score * 0.45) + (stars - 1) * 8);
+  const xpGain = Math.round((item.xp || 30) * (0.55 + result.score * 0.45) + (result.stars - 1) * 8);
   const xp = (store.get('xp') || 0) + xpGain;
   const levelInfo = getLevelInfo(xp);
   store.patch({ xp, level: levelInfo.level });
 
   _sessionStats.promptsCompleted++;
   _sessionStats.totalScore += result.score;
-  _sessionStats.starsEarned += stars;
+  _sessionStats.starsEarned += result.stars;
   if (peer) _sessionStats.peerReviews++;
-  if (result.score < 0.72) _sessionStats.revisionsSuggested++;
-  _sessionStats.strongestDimension = strongest;
-  _sessionStats.weakestDimension = weakest;
+  if (!result.passed) _sessionStats.revisionsSuggested++;
+  _sessionStats.strongestDimension = result.strongest;
+  _sessionStats.weakestDimension = result.weakest;
+  _sessionStats.badgesEarned.push(...badges);
 
   store.recordLearningEvent?.({
     eventType: 'writing_submission',
@@ -263,10 +197,11 @@ function _submit(item) {
     level: _level,
     meta: {
       score: result.score,
-      stars,
-      words: result.words,
-      weakest,
-      strongest,
+      stars: result.stars,
+      words: result.metrics.words,
+      weakest: result.weakest,
+      strongest: result.strongest,
+      badges,
       peer,
     },
   });
@@ -274,18 +209,122 @@ function _submit(item) {
   if (fb) {
     fb.hidden = false;
     fb.className = `sfq-feedback sfq-feedback--${result.passed ? 'success' : 'error'}`;
-    fb.innerHTML = `${result.passed ? '✅ Strong draft.' : '🟡 Draft needs revision.'} Score ${(result.score * 100).toFixed(0)}% ${'⭐'.repeat(stars)}
-      <p>Required points: ${result.requiredHits}/${result.requiredTotal || 0} · Words: ${result.words}</p>
+
+    const badgeHtml = badges.length
+      ? `<div style="margin:8px 0"><strong>Badges earned:</strong><br>${renderBadgeChips(badges)}</div>`
+      : '';
+
+    const checkHtml = result.checkResults?.length
+      ? `<ul style="margin:4px 0">${result.checkResults.map(c => `<li>${c.hit ? '✅' : '❌'} ${c.label}</li>`).join('')}</ul>`
+      : `<p>Required points: ${result.metrics.requiredHits}/${result.metrics.requiredTotal || 0}</p>`;
+
+    const reviseBtn = !result.passed
+      ? `<button class="btn btn--primary" id="wq-revise" style="margin-top:10px">✏️ Revise Draft</button>`
+      : '';
+
+    fb.innerHTML = `
+      <p><strong>${result.encouragement}</strong></p>
+      <p>Score ${(result.score * 100).toFixed(0)}% ${'⭐'.repeat(result.stars)} · Words: ${result.metrics.words}/${result.metrics.target}</p>
+      ${badgeHtml}
+      ${checkHtml}
       ${_renderDimensionBreakdown(result, peer)}
+      <p><em>${result.revisionMission}</em></p>
       <p>Sample: ${item.sampleAnswer}</p>
       <p>Try This Tier 1: ${item.tryThis?.[0] || ''}</p>
-      <p>Tier 2: ${item.tryThis?.[1] || ''}</p>`;
+      <p>Tier 2: ${item.tryThis?.[1] || ''}</p>
+      ${reviseBtn}`;
+
+    if (!result.passed) {
+      _firstResult = result;
+      document.getElementById('wq-revise')?.addEventListener('click', () => _startRevision(item, peer));
+    }
+  }
+
+  if (result.passed) {
+    setTimeout(() => {
+      _idx++;
+      _render();
+    }, 2200);
+  }
+}
+
+function _startRevision(item, peer) {
+  const fb = document.getElementById('wq-feedback');
+  const textarea = /** @type {HTMLTextAreaElement|null} */ (document.getElementById('wq-text'));
+  if (!textarea || !fb) return;
+
+  fb.hidden = true;
+  textarea.value = '';
+  textarea.focus();
+
+  const submitBtn = document.getElementById('wq-submit');
+  if (submitBtn) {
+    submitBtn.textContent = 'Submit Revision';
+    submitBtn.removeEventListener('click', submitBtn._handler);
+    submitBtn._handler = () => _submitRevision(item, peer);
+    submitBtn.addEventListener('click', submitBtn._handler);
+  }
+
+  const detector = document.getElementById('wq-live-detector');
+  if (detector) detector.textContent = 'Revise your draft based on the mission above, then submit again.';
+}
+
+function _submitRevision(item, peer) {
+  const text = /** @type {HTMLTextAreaElement|null} */ (document.getElementById('wq-text'))?.value?.trim() || '';
+  const fb = document.getElementById('wq-feedback');
+  if (!text) {
+    if (fb) {
+      fb.hidden = false;
+      fb.className = 'sfq-feedback sfq-feedback--error';
+      fb.textContent = 'Write your revision before submitting.';
+    }
+    return;
+  }
+
+  const result = evaluateWriting(item, text, _level);
+  const comparison = compareRevisions(_firstResult, result);
+  const badges = detectBadges(result.metrics, text, comparison);
+  const skill = item.mode || 'composition';
+
+  questMastery.updateSkill('writingQuest', skill, result.passed);
+  questMastery.recordAttempt({ quest: 'writingQuest', skill, correct: result.passed, level: _level });
+
+  if (comparison?.revisionBonus > 0) {
+    const xp = (store.get('xp') || 0) + comparison.revisionBonus;
+    store.patch({ xp });
+  }
+
+  _sessionStats.totalScore += result.score;
+  _sessionStats.starsEarned += result.stars;
+  _sessionStats.strongestDimension = result.strongest;
+  _sessionStats.weakestDimension = result.weakest;
+  _sessionStats.badgesEarned.push(...badges);
+
+  if (fb) {
+    fb.hidden = false;
+    fb.className = `sfq-feedback sfq-feedback--${result.passed ? 'success' : 'error'}`;
+
+    const badgeHtml = badges.length
+      ? `<div style="margin:8px 0"><strong>Badges earned:</strong><br>${renderBadgeChips(badges)}</div>`
+      : '';
+
+    const improvHtml = comparison
+      ? `<p>Score improved by ${comparison.scoreDiff >= 0 ? '+' : ''}${(comparison.scoreDiff * 100).toFixed(0)}%${comparison.revisionBonus ? ` · +${comparison.revisionBonus} XP bonus` : ''}</p>`
+      : '';
+
+    fb.innerHTML = `
+      <p><strong>${result.encouragement}</strong></p>
+      <p>Revision score ${(result.score * 100).toFixed(0)}% ${'⭐'.repeat(result.stars)}</p>
+      ${improvHtml}
+      ${badgeHtml}
+      ${_renderDimensionBreakdown(result, peer)}
+      <p>Sample: ${item.sampleAnswer}</p>`;
   }
 
   setTimeout(() => {
     _idx++;
     _render();
-  }, 2200);
+  }, 2800);
 }
 
 function _renderDone() {
@@ -295,6 +334,7 @@ function _renderDone() {
 
   const avgScore = _sessionStats.totalScore / Math.max(_sessionStats.promptsCompleted, 1);
   const avgStars = _sessionStats.starsEarned / Math.max(_sessionStats.promptsCompleted, 1);
+  const uniqueBadges = [...new Set(_sessionStats.badgesEarned)];
 
   _container.innerHTML = `<div class="sfq-game">
     <h3>🎉 Writing Quest complete</h3>
@@ -302,6 +342,7 @@ function _renderDone() {
     <p>Average score: ${(avgScore * 100).toFixed(0)}% · Average stars: ${avgStars.toFixed(1)}</p>
     <p>Peer reviews: ${_sessionStats.peerReviews} · Revisions suggested: ${_sessionStats.revisionsSuggested}</p>
     <p>Strongest dimension: ${_dimensionLabel(_sessionStats.strongestDimension)} · Focus next: ${_dimensionLabel(_sessionStats.weakestDimension)}</p>
+    ${uniqueBadges.length ? `<div><strong>Session badges:</strong><br>${renderBadgeChips(uniqueBadges)}</div>` : ''}
     <div class="sfq-actions">
       <button class="btn btn--primary" id="wq-back">Back to Levels</button>
       <button class="btn btn--ghost btn--sm" id="wq-replay">Replay Level</button>
