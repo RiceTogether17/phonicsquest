@@ -13,20 +13,36 @@ export function createPlanChecks(plan) {
         .split(/[^a-z]+/)
         .filter((word) => word.length >= 4 && !STOPWORDS.has(word))
         .slice(0, 3);
-      return {
-        id: `plan-${key}`,
-        label: `Planned ${key} appears in draft`,
-        keywordsAny,
-      };
+      return { id: `plan-${key}`, label: `Planned ${key} appears in draft`, keywordsAny };
     })
     .filter((check) => check.keywordsAny.length > 0);
 }
 
+function _normaliseMission(mission, idx) {
+  if (typeof mission === 'string') {
+    const inferred = mission.toLowerCase().split(/[^a-z]+/).filter((w) => w.length > 4).slice(0, 2);
+    return { id: `mission-${idx}`, text: mission, keywordsAny: inferred };
+  }
+  return { id: mission.id || `mission-${idx}`, text: mission.text || '', keywordsAny: mission.keywordsAny || [] };
+}
+
+export function getParagraphMissionStatus(lesson, text = '') {
+  const lower = (text || '').toLowerCase();
+  const missions = (lesson.paragraphMissions || []).map(_normaliseMission);
+  return missions.map((mission) => ({
+    ...mission,
+    hit: mission.keywordsAny.length === 0 ? false : mission.keywordsAny.some((kw) => lower.includes(kw.toLowerCase())),
+  }));
+}
+
 export function mergeLessonWithPlan(lesson, plan) {
   const planChecks = createPlanChecks(plan);
+  const missionChecks = getParagraphMissionStatus(lesson)
+    .map((m) => ({ id: m.id, label: m.text, keywordsAny: m.keywordsAny }))
+    .filter((m) => m.keywordsAny?.length);
   return {
     ...lesson,
-    requiredChecks: [...(lesson.requiredChecks || []), ...planChecks],
+    requiredChecks: [...(lesson.requiredChecks || []), ...missionChecks, ...planChecks],
   };
 }
 
