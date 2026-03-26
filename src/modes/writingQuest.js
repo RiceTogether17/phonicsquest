@@ -144,6 +144,7 @@ function _renderRevisePrep(item) {
     _phase = 'plan';
     setTimeout(_render, 500);
   });
+  document.getElementById('wq-menu')?.addEventListener('click', () => { cleanupWritingQuest(); _onGoHome?.(); });
 }
 
 function _renderPlan(item) {
