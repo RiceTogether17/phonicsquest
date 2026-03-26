@@ -3955,6 +3955,177 @@ input, select, textarea { font-family: inherit; }
 .fluency-level  { font-size: 0.9rem; }
 .fluency-tip    { font-size: 0.8rem; color: #6b7280; margin: 0; }
 
+/* ── Fluency History ──────────────────────────────────────────────────── */
+.fluency-history {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid #86efac;
+}
+.fluency-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+.fluency-history-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #15803d;
+}
+.fluency-history-best {
+  font-size: 0.8rem;
+  color: #15803d;
+  background: #dcfce7;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+}
+.fluency-history-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.fluency-history-item {
+  font-size: 0.78rem;
+  color: #374151;
+  background: #fff;
+  border: 1px solid #d1fae5;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+/* ── Follow-mode toggle ───────────────────────────────────────────────── */
+.follow-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-content: center;
+}
+.follow-mode-label {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+.follow-mode-btn {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.follow-mode-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.follow-mode-btn.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+/* ── Word-follow highlighting (within active line) ────────────────────── */
+.wf-word {
+  transition: background 0.12s ease, color 0.12s ease;
+  border-radius: 3px;
+  padding: 0 1px;
+}
+.wf-word--active {
+  background: color-mix(in srgb, var(--color-primary) 25%, transparent);
+  color: var(--color-primary);
+  font-weight: 800;
+}
+/* Echo-read active line */
+.sline--echo-active {
+  background: color-mix(in srgb, #8b5cf6 12%, transparent) !important;
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #8b5cf6 20%, transparent);
+}
+
+/* ── Recording bar ────────────────────────────────────────────────────── */
+.recording-bar {
+  background: #fef2f2;
+  border: 2px solid #fca5a5;
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4);
+  margin-top: var(--space-3);
+}
+.recording-bar-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.recording-label {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #991b1b;
+}
+.recording-hint {
+  font-size: 0.8rem;
+  color: #b91c1c;
+  flex: 1;
+}
+.recording-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.recording-status {
+  margin-top: var(--space-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-height: 1.2em;
+}
+.recording-status--active { color: #dc2626; }
+.recording-status--ready  { color: #059669; }
+.recording-status--playing { color: var(--color-primary); }
+.recording-status--error  { color: #dc2626; }
+
+/* ── Echo Read bar ────────────────────────────────────────────────────── */
+.echo-read-bar {
+  background: linear-gradient(135deg, #ede9fe 0%, #f3e8ff 100%);
+  border: 2px solid #c4b5fd;
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4);
+  margin-top: var(--space-3);
+}
+.echo-read-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.echo-read-label {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #5b21b6;
+}
+.echo-read-hint {
+  font-size: 0.8rem;
+  color: #6d28d9;
+  flex: 1;
+}
+.echo-read-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.echo-read-status {
+  margin-top: var(--space-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-height: 1.2em;
+  color: #5b21b6;
+}
+.echo-read-status--active    { color: #5b21b6; }
+.echo-read-status--recording { color: #dc2626; }
+.echo-read-status--done      { color: #059669; }
+.echo-read-status--error     { color: #dc2626; }
+
 /* ═══════════════════════════════════════════════════════════════════════════
    STORY QUEST CTA (shown after TTS completes)
    ═══════════════════════════════════════════════════════════════════════════ */

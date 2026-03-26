@@ -15,6 +15,11 @@ import { isHFW, extractStoryHFW } from '../data/hfw.js';
 import { WORDS } from '../data/words.js';
 import { audio } from '../modules/audio.js';
 import { runStoryQuest } from './storyQuest.js';
+import {
+  startRecording, stopRecording, playRecording, deleteRecording,
+  stopPlayback, cleanupRecording, getRecorderState,
+  saveFluencyAttempt, getFluencyHistory, getBestWcpm,
+} from '../modules/storyRecording.js';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -53,6 +58,14 @@ let _decodePanelEl = null;    // ref to the decode panel DOM node
 let _currentStoryVocab = [];  // vocab words for current story (used in decode panel)
 let _currentStory = null;     // story being read (for markStoryRead on TTS finish)
 
+// Word-follow highlighting mode for Read Aloud
+let _followMode = 'line';     // 'line' | 'word'  (word = line + word highlight inside)
+let _boundarySupported = null; // null = untested, true/false after first TTS attempt
+
+// Echo-read state
+let _echoLineIdx  = -1;       // current echo-read line index (-1 = not active)
+let _echoStory    = null;     // story reference during echo-read
+
 // ── Story completion tracking ─────────────────────────────────────────────
 const READ_KEY = 'giri_stories_read';
 
@@ -88,8 +101,11 @@ export function showBrowser() {
 export function cleanupStoryMode() {
   _stopTTS();
   _stopFluencyTimer();
+  cleanupRecording();
   _activeWord = null;
   _decodePanelEl = null;
+  _echoLineIdx = -1;
+  _echoStory = null;
 }
 
 // ── Browser view ──────────────────────────────────────────────────────────
@@ -334,7 +350,9 @@ function _renderReadAloud(story) {
   const dynamic = document.getElementById('story-dynamic');
   if (!dynamic) return;
 
-  const linesHtml = story.lines.map((line, i) => _lineHtml(line, i)).join('');
+  // Use word spans when follow mode is 'word'
+  const useWordSpans = _followMode === 'word';
+  const linesHtml = story.lines.map((line, i) => _lineHtml(line, i, useWordSpans)).join('');
   const hasQuest  = !!story.comprehension?.length;
   const hasTalk   = !!story.talkAboutIt?.length;
 
@@ -348,7 +366,33 @@ function _renderReadAloud(story) {
     </div>
   ` : '';
 
+  // Fluency history for this story
+  const historyAttempts = getFluencyHistory(story.id);
+  const bestWcpm = getBestWcpm(story.id);
+  const historyHtml = historyAttempts.length > 0 ? /* html */`
+    <div class="fluency-history" id="fluency-history">
+      <div class="fluency-history-header">
+        <span class="fluency-history-title">📊 Recent Attempts</span>
+        ${bestWcpm !== null ? `<span class="fluency-history-best">Best: <strong>${bestWcpm}</strong> wpm</span>` : ''}
+      </div>
+      <div class="fluency-history-list">
+        ${historyAttempts.slice().reverse().map(a => {
+          const d = new Date(a.date);
+          const dateStr = `${d.getDate()}/${d.getMonth() + 1}`;
+          return `<span class="fluency-history-item">${dateStr}: <strong>${a.wcpm}</strong> wpm</span>`;
+        }).join('')}
+      </div>
+    </div>
+  ` : '';
+
   dynamic.innerHTML = /* html */`
+    <!-- Follow-mode toggle -->
+    <div class="follow-mode-toggle">
+      <span class="follow-mode-label">Highlight:</span>
+      <button class="follow-mode-btn${_followMode === 'line' ? ' active' : ''}" data-follow="line">Line</button>
+      <button class="follow-mode-btn${_followMode === 'word' ? ' active' : ''}" data-follow="word">Line + Word</button>
+    </div>
+
     <div class="story-body" id="story-body" aria-live="polite">${linesHtml}</div>
     ${talkHtml}
     <div class="story-tts-bar">
@@ -372,6 +416,38 @@ function _renderReadAloud(story) {
         <button class="btn btn--primary" id="btn-fluency-done" disabled>✓ Done</button>
       </div>
       <div class="fluency-result" id="fluency-result" hidden></div>
+      ${historyHtml}
+    </div>
+
+    <!-- Recording controls -->
+    <div class="recording-bar" id="recording-bar">
+      <div class="recording-bar-header">
+        <span class="recording-label">🎙 Record Your Reading</span>
+        <span class="recording-hint">Record yourself reading the story aloud</span>
+      </div>
+      <div class="recording-controls" id="recording-controls">
+        <button class="btn btn--ghost" id="btn-rec-start">🎙 Start Recording</button>
+        <button class="btn btn--ghost btn--danger" id="btn-rec-stop" hidden>⏹ Stop</button>
+        <button class="btn btn--ghost" id="btn-rec-play" hidden>▶ Play Back</button>
+        <button class="btn btn--ghost btn--sm" id="btn-rec-delete" hidden>🗑 Delete</button>
+      </div>
+      <div class="recording-status" id="recording-status"></div>
+    </div>
+
+    <!-- Echo Read section -->
+    <div class="echo-read-bar" id="echo-read-bar">
+      <div class="echo-read-header">
+        <span class="echo-read-label">🔁 Echo Read</span>
+        <span class="echo-read-hint">App reads a line, then you record yourself reading it</span>
+      </div>
+      <div class="echo-read-controls">
+        <button class="btn btn--ghost" id="btn-echo-start">Start Echo Read</button>
+        <button class="btn btn--ghost" id="btn-echo-next" hidden>Next Line →</button>
+        <button class="btn btn--ghost" id="btn-echo-rec" hidden>🎙 Your Turn</button>
+        <button class="btn btn--ghost" id="btn-echo-play" hidden>▶ Hear Yourself</button>
+        <button class="btn btn--ghost btn--sm" id="btn-echo-stop" hidden>✕ Exit Echo Read</button>
+      </div>
+      <div class="echo-read-status" id="echo-read-status"></div>
     </div>
 
     <!-- Story Quest CTA (shown after TTS or fluency) -->
@@ -389,18 +465,33 @@ function _renderReadAloud(story) {
     ` : ''}
   `;
 
+  // Follow-mode toggle
+  dynamic.querySelectorAll('.follow-mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      _followMode = btn.dataset.follow;
+      _renderReadAloud(story);
+    });
+  });
+
   document.getElementById('btn-story-play')?.addEventListener('click', () => _startTTS(story));
   document.getElementById('btn-story-stop')?.addEventListener('click', () => _stopTTS());
 
   // Fluency timer controls
   const wordCount = _countStoryWords(story);
   document.getElementById('btn-fluency-start')?.addEventListener('click', () => _startFluencyTimer());
-  document.getElementById('btn-fluency-done')?.addEventListener('click', () => _stopFluencyTimer(wordCount));
+  document.getElementById('btn-fluency-done')?.addEventListener('click', () => _stopFluencyTimer(wordCount, story));
+
+  // Recording controls
+  _wireRecordingControls(story);
+
+  // Echo Read controls
+  _wireEchoReadControls(story);
 
   // Story Quest launch
   document.getElementById('btn-launch-quest')?.addEventListener('click', () => {
     _stopTTS();
     _stopFluencyTimer();
+    cleanupRecording();
     markStoryRead(story.id);
     runStoryQuest(_container, story, () => {
       _renderBrowser();
@@ -408,18 +499,38 @@ function _renderReadAloud(story) {
   });
 }
 
-function _lineHtml(line, i) {
+/**
+ * Build HTML for a story line.
+ * @param {object} line
+ * @param {number} i – line index
+ * @param {boolean} [wordSpans=false] – if true, wrap each word in a span for word-follow highlighting
+ */
+function _lineHtml(line, i, wordSpans = false) {
+  const content = wordSpans ? _wordSpanText(line.text) : line.text;
   switch (line.type) {
-    case 'chapter':   return `<div class="sline sline--chapter"   data-line="${i}">📚 ${line.text}</div>`;
-    case 'label':     return `<div class="sline sline--label"     data-line="${i}">${line.text}</div>`;
-    case 'beat':      return `<p class="sline sline--beat"        data-line="${i}">${line.text}</p>`;
-    case 'intro':     return `<p class="sline sline--intro"       data-line="${i}">${line.text}</p>`;
-    case 'refrain':   return `<div class="sline sline--refrain"   data-line="${i}">🫧 ${line.text}</div>`;
-    case 'end':       return `<p class="sline sline--end"         data-line="${i}">${line.text}</p>`;
-    case 'text':      return `<p class="sline sline--text"        data-line="${i}">${line.text}</p>`;
-    case 'paragraph': return `<p class="sline sline--paragraph"   data-line="${i}">${line.text}</p>`;
-    default:          return `<p class="sline"                    data-line="${i}">${line.text}</p>`;
+    case 'chapter':   return `<div class="sline sline--chapter"   data-line="${i}">📚 ${content}</div>`;
+    case 'label':     return `<div class="sline sline--label"     data-line="${i}">${content}</div>`;
+    case 'beat':      return `<p class="sline sline--beat"        data-line="${i}">${content}</p>`;
+    case 'intro':     return `<p class="sline sline--intro"       data-line="${i}">${content}</p>`;
+    case 'refrain':   return `<div class="sline sline--refrain"   data-line="${i}">🫧 ${content}</div>`;
+    case 'end':       return `<p class="sline sline--end"         data-line="${i}">${content}</p>`;
+    case 'text':      return `<p class="sline sline--text"        data-line="${i}">${content}</p>`;
+    case 'paragraph': return `<p class="sline sline--paragraph"   data-line="${i}">${content}</p>`;
+    default:          return `<p class="sline"                    data-line="${i}">${content}</p>`;
   }
+}
+
+/** Wrap each word in a data-word-idx span for word-follow highlighting. */
+function _wordSpanText(text) {
+  if (!text) return '';
+  const tokens = tokenise(text);
+  let wordIdx = 0;
+  return tokens.map(tok => {
+    if (tok.type === 'word') {
+      return `<span class="wf-word" data-word-idx="${wordIdx++}">${tok.text}</span>`;
+    }
+    return tok.text;
+  }).join('');
 }
 
 // ── DECODE mode ───────────────────────────────────────────────────────────
@@ -773,14 +884,67 @@ function _speakNext(segments, idx) {
   utt.lang   = 'en-GB';
   const pauseMs = seg.text.startsWith('Puff') ? 600 : 380;
 
-  utt.onend  = () => { if (_speaking) setTimeout(() => _speakNext(segments, idx + 1), pauseMs); };
+  // Word-boundary highlighting (progressive enhancement)
+  if (_followMode === 'word') {
+    _attachBoundaryListener(utt, seg.highlightIdx);
+  }
+
+  utt.onend  = () => {
+    _clearWordHighlight();
+    if (_speaking) setTimeout(() => _speakNext(segments, idx + 1), pauseMs);
+  };
   utt.onerror = () => _onTTSDone();
 
   window.speechSynthesis.speak(utt);
 }
 
+/**
+ * Attach a 'boundary' event listener to highlight individual words
+ * within the active line during TTS playback.
+ * Falls back gracefully if the browser/voice doesn't fire boundary events.
+ */
+function _attachBoundaryListener(utt, lineIndex) {
+  const lineEl = _container?.querySelector(`[data-line="${lineIndex}"]`);
+  if (!lineEl) return;
+
+  const wordSpans = lineEl.querySelectorAll('.wf-word');
+  if (wordSpans.length === 0) return;
+
+  let wordIdx = 0;
+  let boundaryFired = false;
+
+  utt.addEventListener('boundary', (e) => {
+    if (e.name !== 'word') return;
+    boundaryFired = true;
+    if (_boundarySupported === null) _boundarySupported = true;
+
+    // Clear previous word highlight
+    wordSpans.forEach(s => s.classList.remove('wf-word--active'));
+
+    // charIndex-based matching: find the word span whose position matches
+    if (wordIdx < wordSpans.length) {
+      wordSpans[wordIdx].classList.add('wf-word--active');
+      wordIdx++;
+    }
+  });
+
+  // If no boundary events fire by the time the utterance ends,
+  // mark boundary support as unavailable
+  utt.addEventListener('end', () => {
+    if (!boundaryFired && _boundarySupported === null) {
+      _boundarySupported = false;
+    }
+  });
+}
+
+/** Remove word-level highlighting from all word spans. */
+function _clearWordHighlight() {
+  _container?.querySelectorAll('.wf-word--active').forEach(el => el.classList.remove('wf-word--active'));
+}
+
 function _highlightLine(lineIndex) {
   _container?.querySelectorAll('.sline--active').forEach(el => el.classList.remove('sline--active'));
+  _clearWordHighlight();
   const el = _container?.querySelector(`[data-line="${lineIndex}"]`);
   if (el) {
     el.classList.add('sline--active');
@@ -792,12 +956,14 @@ function _stopTTS() {
   _speaking = false;
   window.speechSynthesis?.cancel();
   _container?.querySelectorAll('.sline--active').forEach(el => el.classList.remove('sline--active'));
+  _clearWordHighlight();
   _toggleTTSButtons(false);
 }
 
 function _onTTSDone() {
   _speaking = false;
   _container?.querySelectorAll('.sline--active').forEach(el => el.classList.remove('sline--active'));
+  _clearWordHighlight();
   _toggleTTSButtons(false);
   // Mark story as read when TTS finishes
   if (_currentStory) markStoryRead(_currentStory.id);
@@ -814,6 +980,195 @@ function _toggleTTSButtons(playing) {
 }
 
 const _delay = ms => new Promise(r => setTimeout(r, ms));
+
+// ── Recording controls ────────────────────────────────────────────────────
+
+function _wireRecordingControls(story) {
+  const btnStart  = document.getElementById('btn-rec-start');
+  const btnStop   = document.getElementById('btn-rec-stop');
+  const btnPlay   = document.getElementById('btn-rec-play');
+  const btnDelete = document.getElementById('btn-rec-delete');
+  const statusEl  = document.getElementById('recording-status');
+  if (!btnStart) return;
+
+  function updateUI(state) {
+    btnStart.hidden  = state !== 'idle';
+    btnStop.hidden   = state !== 'recording';
+    btnPlay.hidden   = state !== 'recorded' && state !== 'playing';
+    btnDelete.hidden = state !== 'recorded' && state !== 'playing';
+
+    if (statusEl) {
+      switch (state) {
+        case 'recording': statusEl.textContent = '🔴 Recording...'; statusEl.className = 'recording-status recording-status--active'; break;
+        case 'recorded':  statusEl.textContent = '✓ Recording ready'; statusEl.className = 'recording-status recording-status--ready'; break;
+        case 'playing':   statusEl.textContent = '▶ Playing...'; statusEl.className = 'recording-status recording-status--playing'; break;
+        case 'error':     statusEl.textContent = '⚠ Microphone not available — check permissions'; statusEl.className = 'recording-status recording-status--error'; break;
+        default:          statusEl.textContent = ''; statusEl.className = 'recording-status'; break;
+      }
+    }
+
+    // Update play button text
+    if (btnPlay) btnPlay.textContent = state === 'playing' ? '⏹ Stop' : '▶ Play Back';
+  }
+
+  btnStart.addEventListener('click', async () => {
+    const started = await startRecording({
+      storyId: story.id,
+      onStateChange: updateUI,
+    });
+    if (!started) updateUI('error');
+  });
+
+  btnStop.addEventListener('click', () => {
+    stopRecording();
+  });
+
+  btnPlay.addEventListener('click', () => {
+    if (getRecorderState() === 'playing') {
+      stopPlayback();
+      updateUI('recorded');
+    } else {
+      playRecording();
+    }
+  });
+
+  btnDelete.addEventListener('click', () => {
+    deleteRecording();
+    updateUI('idle');
+  });
+}
+
+// ── Echo Read ──────────────────────────────────────────────────────────────
+
+function _wireEchoReadControls(story) {
+  const btnStart = document.getElementById('btn-echo-start');
+  const btnNext  = document.getElementById('btn-echo-next');
+  const btnRec   = document.getElementById('btn-echo-rec');
+  const btnPlay  = document.getElementById('btn-echo-play');
+  const btnExit  = document.getElementById('btn-echo-stop');
+  const statusEl = document.getElementById('echo-read-status');
+  if (!btnStart) return;
+
+  // Filter to speakable lines only
+  const speakableLines = story.lines
+    .map((l, i) => ({ ...l, idx: i }))
+    .filter(l => l.type !== 'label' && l.type !== 'chapter' && l.text);
+
+  let currentEchoIdx = -1;
+  let echoRecId = null;
+
+  function resetEchoUI() {
+    btnStart.hidden = false;
+    btnNext.hidden = true;
+    btnRec.hidden = true;
+    btnPlay.hidden = true;
+    btnExit.hidden = true;
+    if (statusEl) { statusEl.textContent = ''; statusEl.className = 'echo-read-status'; }
+    _container?.querySelectorAll('.sline--echo-active').forEach(el => el.classList.remove('sline--echo-active'));
+    currentEchoIdx = -1;
+    _echoLineIdx = -1;
+  }
+
+  function showEchoLine(echoIdx) {
+    currentEchoIdx = echoIdx;
+    const line = speakableLines[echoIdx];
+    if (!line) { resetEchoUI(); return; }
+
+    _echoLineIdx = line.idx;
+
+    // Highlight the line
+    _container?.querySelectorAll('.sline--echo-active').forEach(el => el.classList.remove('sline--echo-active'));
+    const lineEl = _container?.querySelector(`[data-line="${line.idx}"]`);
+    if (lineEl) {
+      lineEl.classList.add('sline--echo-active');
+      lineEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    if (statusEl) {
+      statusEl.textContent = `Line ${echoIdx + 1} of ${speakableLines.length}`;
+      statusEl.className = 'echo-read-status echo-read-status--active';
+    }
+
+    // App reads the line first
+    btnNext.hidden = true;
+    btnRec.hidden = true;
+    btnPlay.hidden = true;
+    const utt = new SpeechSynthesisUtterance(line.text);
+    utt.rate = 0.82;
+    utt.lang = 'en-GB';
+    utt.onend = () => {
+      // Now child's turn
+      btnRec.hidden = false;
+      btnRec.textContent = '🎙 Your Turn';
+      if (statusEl) statusEl.textContent = `Your turn! Read line ${echoIdx + 1}`;
+    };
+    utt.onerror = () => {
+      btnRec.hidden = false;
+    };
+    window.speechSynthesis?.cancel();
+    window.speechSynthesis?.speak(utt);
+  }
+
+  btnStart.addEventListener('click', () => {
+    btnStart.hidden = true;
+    btnExit.hidden = false;
+    echoRecId = null;
+    showEchoLine(0);
+  });
+
+  btnRec.addEventListener('click', async () => {
+    if (getRecorderState() === 'recording') {
+      stopRecording();
+      return;
+    }
+    const line = speakableLines[currentEchoIdx];
+    const started = await startRecording({
+      storyId: story.id,
+      lineIdx: line?.idx,
+      onStateChange: (state) => {
+        if (state === 'recording') {
+          btnRec.textContent = '⏹ Stop Recording';
+          if (statusEl) { statusEl.textContent = '🔴 Recording...'; statusEl.className = 'echo-read-status echo-read-status--recording'; }
+        } else if (state === 'recorded') {
+          btnRec.hidden = true;
+          btnPlay.hidden = false;
+          btnNext.hidden = currentEchoIdx >= speakableLines.length - 1;
+          if (statusEl) { statusEl.textContent = '✓ Great job!'; statusEl.className = 'echo-read-status echo-read-status--done'; }
+        } else if (state === 'error') {
+          if (statusEl) { statusEl.textContent = '⚠ Microphone not available'; statusEl.className = 'echo-read-status echo-read-status--error'; }
+        }
+      },
+    });
+    if (!started && statusEl) {
+      statusEl.textContent = '⚠ Microphone not available — check permissions';
+      statusEl.className = 'echo-read-status echo-read-status--error';
+    }
+  });
+
+  btnPlay.addEventListener('click', () => {
+    playRecording();
+  });
+
+  btnNext.addEventListener('click', () => {
+    deleteRecording(); // clear previous line's recording
+    btnPlay.hidden = true;
+    if (currentEchoIdx + 1 < speakableLines.length) {
+      showEchoLine(currentEchoIdx + 1);
+    } else {
+      if (statusEl) { statusEl.textContent = '🎉 Echo Read complete!'; statusEl.className = 'echo-read-status echo-read-status--done'; }
+      btnNext.hidden = true;
+      btnRec.hidden = true;
+      setTimeout(resetEchoUI, 2000);
+    }
+  });
+
+  btnExit.addEventListener('click', () => {
+    _stopTTS();
+    stopRecording();
+    deleteRecording();
+    resetEchoUI();
+  });
+}
 
 // ── Fluency Timer ─────────────────────────────────────────────────────────
 
@@ -836,8 +1191,9 @@ function _startFluencyTimer() {
 /**
  * Stop the fluency timer and display WCPM result.
  * @param {number} [wordCount] – total words in story; if omitted, skips WCPM display
+ * @param {object} [story] – story object for saving fluency history
  */
-function _stopFluencyTimer(wordCount) {
+function _stopFluencyTimer(wordCount, story) {
   if (!_fluencyRunning && _fluencyTimer === null) return;
   clearInterval(_fluencyTimer);
   _fluencyTimer   = null;
@@ -855,6 +1211,16 @@ function _stopFluencyTimer(wordCount) {
   const wcpm   = Math.round((wordCount / elapsedSec) * 60);
   const mins   = Math.floor(elapsedSec / 60);
   const secs   = Math.round(elapsedSec % 60);
+
+  // Save to fluency history
+  if (story) {
+    saveFluencyAttempt({
+      storyId: story.id,
+      wcpm,
+      durationSec: elapsedSec,
+      wordCount,
+    });
+  }
 
   // Benchmark guidance (Hasbrouck & Tindal norms, Grade 1 Spring ≈ 53 WCPM)
   let level = '';
