@@ -5,9 +5,9 @@ import { questMastery } from '../modules/questMastery.js';
 import { getLevelInfo } from '../data/curriculum.js';
 import { evaluateWriting, getLiveHint, compareRevisions, getDimensionFeedback, DIMENSION_LABELS, DIMENSION_EMOJIS } from '../modules/writingEvaluator.js';
 import { detectBadges, renderBadgeChips } from '../modules/writingBadges.js';
-import { isPlanReady, mergeLessonWithPlan, getRemediationPath, getParagraphMissionStatus } from '../modules/writingLessonEngine.js';
+import { isPlanReady, mergeLessonWithPlan, getRemediationPath, getParagraphMissionStatus, getPlanDraftMatchReport } from '../modules/writingLessonEngine.js';
 import { renderDrill, collectDrillAnswers, gradeDrills } from '../modules/writingReviseDrills.js';
-import { getTrackProgress, setTrackProgress, migrateLegacyWritingCompleted } from '../modules/writingTrackProgress.js';
+import { getTrackProgress, setTrackProgress, migrateLegacyWritingCompleted, getLevelTrackProgress } from '../modules/writingTrackProgress.js';
 
 let _container = null;
 let _onGoHome = null;
@@ -33,19 +33,33 @@ function _dimensionLabel(key) { return DIMENSION_LABELS[key] || key; }
 
 export function showWritingBrowser() {
   if (!_container) return;
-  const completed = store.get('writingCompleted') || {};
   _container.innerHTML = `<div class="sfq-browser"><div class="sfq-browser-grid">${Object.entries(WRITING_LEVELS).map(([k, label]) => {
     const level = Number(k);
     const tracks = getTracksForLevel(level);
-    let total = (writingPrompts[k] || []).length;
-    let done = completed[k] || 0;
-    if (tracks.length) {
-      total = tracks.reduce((sum, t) => sum + t.lessonIds.length, 0);
-      done = tracks.reduce((sum, t) => sum + (getTrackProgress(t.id).completedLessons || 0), 0);
-    }
+    const { done, total } = _getLevelProgress(level, tracks);
     return `<button class="sfq-level-btn" data-level="${k}"><span class="sfq-level-icon">📝</span><span class="sfq-level-name">${label}</span><span class="sfq-level-count">${Math.min(done, total)} / ${total}</span></button>`;
   }).join('')}</div></div>`;
   _container.querySelectorAll('[data-level]').forEach((btn) => btn.addEventListener('click', () => _chooseLevel(Number(btn.dataset.level))));
+}
+
+/**
+ * Get progress for a level. Track-based progress is the source of truth
+ * for tracked levels. Legacy writingCompleted is used only as fallback
+ * for untracked levels.
+ */
+function _getLevelProgress(level, tracks) {
+  if (tracks.length) {
+    // Ensure migration has run for all tracks at this level
+    tracks.forEach(t => migrateLegacyWritingCompleted([t.id], t.lessonIds.length, level));
+    const total = tracks.reduce((sum, t) => sum + t.lessonIds.length, 0);
+    const done = tracks.reduce((sum, t) => sum + (getTrackProgress(t.id).completedLessons || 0), 0);
+    return { done, total };
+  }
+  // Legacy fallback for levels without tracks
+  const completed = store.get('writingCompleted') || {};
+  const total = (writingPrompts[level] || []).length;
+  const done = completed[level] || 0;
+  return { done, total };
 }
 
 function _chooseLevel(level) {
@@ -61,12 +75,24 @@ function _chooseLevel(level) {
 }
 
 function _renderTrackBrowser(level) {
+  // Migrate before reading progress so counts are up-to-date
+  _tracksForLevel.forEach(t => migrateLegacyWritingCompleted([t.id], t.lessonIds.length, level));
+
+  // Sort tracks by term order (T1 before T2, etc.)
+  const sortedTracks = [..._tracksForLevel].sort((a, b) => {
+    const termA = (a.term || '').replace(/\D/g, '') || '0';
+    const termB = (b.term || '').replace(/\D/g, '') || '0';
+    return Number(termA) - Number(termB);
+  });
+
   _container.innerHTML = `<div class="sfq-game"><h3 class="cloze-title">Choose your writing track</h3>
   <p class="sfq-instruction">${WRITING_LEVELS[level]} has multiple term tracks.</p>
-  <div class="sfq-browser-grid">${_tracksForLevel.map((track) => {
+  <div class="sfq-browser-grid">${sortedTracks.map((track) => {
     const progress = getTrackProgress(track.id);
-    migrateLegacyWritingCompleted([track.id], track.lessonIds.length, level);
-    return `<button class="sfq-level-btn" data-track="${track.id}"><span class="sfq-level-icon">📚</span><span class="sfq-level-name">${track.track}</span><span class="sfq-level-count">${progress.completedLessons || 0}/${track.lessonIds.length}</span></button>`;
+    const completed = progress.completedLessons || 0;
+    const total = track.lessonIds.length;
+    const statusLabel = completed >= total ? ' (Complete)' : '';
+    return `<button class="sfq-level-btn" data-track="${track.id}"><span class="sfq-level-icon">📚</span><span class="sfq-level-name">${track.track}${statusLabel}</span><span class="sfq-level-count">${completed}/${total}</span></button>`;
   }).join('')}</div>
   <div class="sfq-actions" style="margin-top:10px"><button class="btn btn--ghost btn--sm" id="wq-level-back">Back</button></div></div>`;
   _container.querySelectorAll('[data-track]').forEach((btn) => btn.addEventListener('click', () => _startTrack(btn.dataset.track)));
@@ -226,14 +252,80 @@ function _submitDraft(item, lessonForEval) {
 }
 
 function _renderRepair(item) {
+  const remediation = _lastDraftRemediation || { missingChecks: [], narrativePrompts: [], title: 'Polish your draft.' };
+  const firstScore = _firstResult ? ((_firstResult.score || 0) * 100).toFixed(0) : '?';
+  const weakDim = remediation.weakestDimension || _firstResult?.weakest || 'content';
+  const weakLabel = _dimensionLabel(weakDim);
+  const weakFeedback = _firstResult?.feedback?.[weakDim] || getDimensionFeedback(weakDim, 0.4);
+
+  // Build checklist items from missing checks + narrative prompts
+  const checklistItems = [
+    ...remediation.missingChecks.map(c => ({ text: c, type: 'checkpoint' })),
+    ...remediation.narrativePrompts.map(p => ({ text: p, type: 'narrative' })),
+  ];
+  if (checklistItems.length === 0) {
+    checklistItems.push({ text: 'Polish language and flow — all checkpoints met.', type: 'polish' });
+  }
+
   _container.innerHTML = `<div class="sfq-game"><h3 class="cloze-title">Revise: Repair Mission</h3>
-    <div class="dash-pattern-item"><strong>First Draft Snapshot</strong><p>${_firstDraftText.slice(0, 240)}${_firstDraftText.length > 240 ? '…' : ''}</p></div>
-    <div class="dash-pattern-item"><strong>Fix list</strong><ul>${(_lastDraftRemediation?.missingChecks || []).map((m) => `<li>❌ ${m}</li>`).join('') || '<li>✅ All checkpoints met — polish language and flow.</li>'}</ul></div>
-    <p class="sfq-instruction">Targeted prompt: ${_lastDraftRemediation?.title || 'Strengthen your weakest writing dimension.'}</p>
+    <div class="dash-pattern-item" style="background:var(--bg-card);padding:8px;border-radius:6px">
+      <strong>First Draft Snapshot</strong> (Score: ${firstScore}%)
+      <p style="font-size:0.9em;white-space:pre-wrap;max-height:120px;overflow-y:auto;border:1px solid var(--border);padding:6px;border-radius:4px;margin-top:4px">${_escapeHtml(_firstDraftText)}</p>
+    </div>
+    <div class="dash-pattern-item">
+      <strong>Weakest area:</strong> ${DIMENSION_EMOJIS[weakDim] || ''} ${weakLabel}
+      <p style="font-size:0.9em">${weakFeedback}</p>
+    </div>
+    <div class="dash-pattern-item">
+      <strong>Repair Checklist</strong>
+      <ul id="wq-repair-checklist">${checklistItems.map((c, i) => `<li id="repair-check-${i}">❌ ${c.text}</li>`).join('')}</ul>
+    </div>
+    <p class="sfq-instruction">${remediation.title}</p>
     <textarea id="wq-revision-text" class="cp-name-input" rows="9" placeholder="Write improved draft...">${_firstDraftText}</textarea>
+    <div id="wq-repair-live" class="dash-pattern-item" style="font-size:0.9em">Start editing to see live repair progress.</div>
     <div class="sfq-actions"><button class="btn btn--primary" id="wq-submit-revision">Submit Revision</button></div>
     <div class="sfq-feedback" id="wq-feedback" hidden></div></div>`;
+
+  // Live repair checklist update while typing
+  const lessonForEval = mergeLessonWithPlan(item, _currentPlan);
+  document.getElementById('wq-revision-text')?.addEventListener('input', (event) => {
+    const text = event.target.value || '';
+    const hint = getLiveHint(lessonForEval, text, _level);
+    const missionStatus = getParagraphMissionStatus(item, text);
+    const currentResult = evaluateWriting(lessonForEval, text, _level);
+
+    // Update live stats
+    const liveEl = document.getElementById('wq-repair-live');
+    const scoreDiff = currentResult.score - (_firstResult?.score || 0);
+    if (liveEl) {
+      liveEl.innerHTML = `🔧 ${hint.words} words · Score: ${(currentResult.score * 100).toFixed(0)}% (${scoreDiff >= 0 ? '+' : ''}${(scoreDiff * 100).toFixed(0)}%) · Missions: ${missionStatus.filter(m => m.hit).length}/${missionStatus.length}`;
+    }
+
+    // Update checklist — mark items that are now satisfied
+    const checkResults = currentResult.checkResults || [];
+    const missingNow = new Set(checkResults.filter(c => !c.hit).map(c => c.label));
+    checklistItems.forEach((c, i) => {
+      const el = document.getElementById(`repair-check-${i}`);
+      if (!el) return;
+      if (c.type === 'checkpoint') {
+        el.textContent = missingNow.has(c.text) ? `❌ ${c.text}` : `✅ ${c.text}`;
+      } else if (c.type === 'narrative') {
+        // Re-evaluate narrative quality for narrative prompts
+        const nq = currentResult.metrics?.narrativeQuality || {};
+        const satisfied = (nq.climax > 0.3 || !c.text.includes('turning point'))
+          && (nq.resolution > 0.3 || !c.text.includes('problem was solved'))
+          && (nq.reflection > 0.3 || !c.text.includes('learned or felt'))
+          && (nq.dialogue > 0.3 || !c.text.includes('dialogue'));
+        el.textContent = satisfied ? `✅ ${c.text}` : `❌ ${c.text}`;
+      }
+    });
+  });
+
   document.getElementById('wq-submit-revision')?.addEventListener('click', () => _submitRevision(item));
+}
+
+function _escapeHtml(text) {
+  return (text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 function _submitRevision(item) {
@@ -247,14 +339,39 @@ function _submitRevision(item) {
   const missionStatus = getParagraphMissionStatus(item, text);
   _awardLessonRewards(item, result, cmp, badges, missionStatus);
 
+  // Build before/after comparison summary
+  const beforeScore = _firstResult ? (_firstResult.score * 100).toFixed(0) : '?';
+  const afterScore = (result.score * 100).toFixed(0);
+  const beforeWords = _firstResult?.metrics?.words || 0;
+  const afterWords = result.metrics?.words || 0;
+
+  const dimComparison = cmp ? Object.entries(cmp.improved).map(([k, v]) => {
+    const before = _firstResult?.dimensions?.[k] || 0;
+    const after = result.dimensions?.[k] || 0;
+    const arrow = v > 0.02 ? '⬆️' : v < -0.02 ? '⬇️' : '➡️';
+    return `<li>${DIMENSION_EMOJIS[k] || ''} ${_dimensionLabel(k)}: ${(before * 100).toFixed(0)}% ${arrow} ${(after * 100).toFixed(0)}%</li>`;
+  }).join('') : '';
+
   const fb = document.getElementById('wq-feedback');
   if (fb) {
     fb.hidden = false;
     fb.className = `sfq-feedback sfq-feedback--${result.passed ? 'success' : 'error'}`;
-    fb.innerHTML = `<p><strong>Revision complete!</strong> Score ${(result.score * 100).toFixed(0)}%</p>
+    fb.innerHTML = `<p><strong>Revision complete!</strong></p>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin:8px 0">
+        <div style="flex:1;min-width:100px;text-align:center;padding:6px;border:1px solid var(--border);border-radius:6px">
+          <div style="font-size:0.8em;color:var(--text-muted)">Before</div>
+          <div style="font-size:1.3em;font-weight:bold">${beforeScore}%</div>
+          <div style="font-size:0.8em">${beforeWords} words</div>
+        </div>
+        <div style="flex:1;min-width:100px;text-align:center;padding:6px;border:1px solid var(--border);border-radius:6px">
+          <div style="font-size:0.8em;color:var(--text-muted)">After</div>
+          <div style="font-size:1.3em;font-weight:bold">${afterScore}%</div>
+          <div style="font-size:0.8em">${afterWords} words</div>
+        </div>
+      </div>
       <p>Score change: ${cmp ? `${cmp.scoreDiff >= 0 ? '+' : ''}${(cmp.scoreDiff * 100).toFixed(0)}%` : 'n/a'} · XP bonus: ${cmp?.revisionBonus || 0}</p>
       <p>Mission completion: ${missionStatus.filter((m) => m.hit).length}/${missionStatus.length}</p>
-      <ul>${cmp ? Object.entries(cmp.improved).map(([k, v]) => `<li>${_dimensionLabel(k)} ${v >= 0 ? '⬆️' : '⬇️'} ${(v * 100).toFixed(0)}%</li>`).join('') : ''}</ul>
+      <ul>${dimComparison}</ul>
       ${renderBadgeChips(badges)}`;
   }
   setTimeout(() => { _phase = 'complete'; _render(); }, 1400);
@@ -293,8 +410,13 @@ function _renderLessonComplete(item) {
 
 function _renderBossQuiz(item) {
   const quiz = item.bossQuiz;
+  const allItems = [...quiz.questions, ...(quiz.constructedItems || [])];
+  const totalItems = allItems.length;
+
   _container.innerHTML = `<div class="sfq-game"><h3 class="cloze-title">Boss Check: ${item.lessonTitle}</h3>
-    <form id="wq-boss-form">${quiz.questions.map((q, idx) => `<div class="dash-pattern-item"><strong>Q${idx + 1}. ${q.q}</strong>${q.options.map((opt, oi) => `<label style="display:block"><input type="radio" name="${q.id}" value="${oi}"/> ${opt}</label>`).join('')}</div>`).join('')}
+    <form id="wq-boss-form">
+      ${quiz.questions.map((q, idx) => `<div class="dash-pattern-item"><strong>Q${idx + 1}. ${q.q}</strong>${q.options.map((opt, oi) => `<label style="display:block"><input type="radio" name="${q.id}" value="${oi}"/> ${opt}</label>`).join('')}</div>`).join('')}
+      ${(quiz.constructedItems || []).map((ci, idx) => _renderBossConstructedItem(ci, quiz.questions.length + idx)).join('')}
       <div class="sfq-actions"><button type="submit" class="btn btn--primary">Submit Boss Check</button></div>
     </form>
     <div class="sfq-feedback" id="wq-feedback" hidden></div></div>`;
@@ -302,17 +424,23 @@ function _renderBossQuiz(item) {
   document.getElementById('wq-boss-form')?.addEventListener('submit', (e) => {
     e.preventDefault();
     let score = 0;
+    // Grade MCQ questions
     quiz.questions.forEach((q) => {
       const val = Number(_container.querySelector(`input[name="${q.id}"]:checked`)?.value);
       if (val === q.answer) score++;
     });
+    // Grade constructed-response items
+    (quiz.constructedItems || []).forEach((ci) => {
+      const response = _container.querySelector(`textarea[name="${ci.id}"]`)?.value?.trim() || '';
+      if (_gradeBossConstructedItem(ci, response)) score++;
+    });
     const passed = score >= quiz.passMark;
-    _awardLessonRewards(item, { passed, score: score / quiz.questions.length }, null, []);
+    _awardLessonRewards(item, { passed, score: score / totalItems, dimensions: {} }, null, []);
     const fb = document.getElementById('wq-feedback');
     if (fb) {
       fb.hidden = false;
       fb.className = `sfq-feedback sfq-feedback--${passed ? 'success' : 'error'}`;
-      fb.innerHTML = `<p>${passed ? 'Boss defeated!' : 'Boss is still standing—review and retry!'} ${score}/${quiz.questions.length}</p>
+      fb.innerHTML = `<p>${passed ? 'Boss defeated!' : 'Boss is still standing — review and retry!'} ${score}/${totalItems}</p>
       <button class="btn btn--primary" id="wq-boss-next" style="margin-top:8px">${passed ? 'Finish Track' : 'Retry Boss Check'}</button>`;
     }
     document.getElementById('wq-boss-next')?.addEventListener('click', () => {
@@ -320,6 +448,49 @@ function _renderBossQuiz(item) {
       _render();
     });
   });
+}
+
+function _renderBossConstructedItem(ci, displayIdx) {
+  if (ci.type === 'short_response') {
+    return `<div class="dash-pattern-item">
+      <strong>Q${displayIdx + 1}. ${ci.q}</strong>
+      <p style="font-size:0.9em;color:var(--text-muted)">${ci.hint || 'Write a short answer.'}</p>
+      <textarea name="${ci.id}" class="cp-name-input" rows="2" placeholder="Your answer..."></textarea>
+    </div>`;
+  }
+  if (ci.type === 'mini_revision') {
+    return `<div class="dash-pattern-item">
+      <strong>Q${displayIdx + 1}. ${ci.q}</strong>
+      <p style="font-size:0.9em"><em>Original:</em> "${ci.original}"</p>
+      <p style="font-size:0.9em;color:var(--text-muted)">${ci.hint || 'Rewrite to improve it.'}</p>
+      <textarea name="${ci.id}" class="cp-name-input" rows="2" placeholder="Your improved version..."></textarea>
+    </div>`;
+  }
+  return '';
+}
+
+function _gradeBossConstructedItem(ci, response) {
+  if (!response || response.length < 3) return false;
+  const lower = response.toLowerCase();
+
+  if (ci.type === 'short_response') {
+    // Check that response contains at least one required signal
+    const signals = ci.requiredSignals || [];
+    if (signals.length === 0) return response.length >= 8;
+    return signals.some(s => lower.includes(s.toLowerCase()));
+  }
+
+  if (ci.type === 'mini_revision') {
+    const original = (ci.original || '').toLowerCase();
+    // Must be different from original
+    if (lower === original) return false;
+    // Check for improvement signals
+    const signals = ci.improvementSignals || [];
+    if (signals.length === 0) return response.length > original.length;
+    return signals.some(s => lower.includes(s.toLowerCase()));
+  }
+
+  return false;
 }
 
 function _renderLegacyPrompt(item) {
@@ -344,12 +515,14 @@ function _renderLegacyPrompt(item) {
 }
 
 function _renderDone() {
-  const completed = { ...(store.get('writingCompleted') || {}) };
-  completed[_level] = Math.max(completed[_level] || 0, _list.length);
-  store.set('writingCompleted', completed);
+  // Track-based progress is the primary source of truth
   if (_track) {
     setTrackProgress(_track.id, _list.length, _list.length, _level);
   }
+  // Legacy writingCompleted maintained as backward-compat fallback only
+  const completed = { ...(store.get('writingCompleted') || {}) };
+  completed[_level] = Math.max(completed[_level] || 0, _list.length);
+  store.set('writingCompleted', completed);
 
   _container.innerHTML = `<div class="sfq-game"><h3>🎉 Writing Quest complete</h3><p>${_track ? `Track cleared: ${_track.track}.` : 'Level complete.'}</p>
     <div class="sfq-actions"><button class="btn btn--primary" id="wq-back">Back to Levels</button></div></div>`;

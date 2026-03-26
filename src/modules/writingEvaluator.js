@@ -14,6 +14,8 @@
  *   taskFulfilment– Required checks, purpose/audience/tone alignment
  */
 
+import { computeNarrativeQuality } from './writingNarrativeHelpers.js';
+
 // Approximate word-count targets by level (guide, not strict cap)
 const LENGTH_TARGETS = { 1: 35, 2: 55, 3: 80, 4: 110, 5: 150, 6: 190 };
 
@@ -141,6 +143,9 @@ export function computeMetrics(item, text, level) {
   // First sentence (for badge detection)
   const firstSentence = t.split(/[.!?]/)[0]?.trim() || '';
 
+  // Narrative quality sub-scores (from writingNarrativeHelpers)
+  const narrativeQuality = computeNarrativeQuality(t);
+
   return {
     words, sentenceCount, paragraphCount,
     wordRatio, lengthScore, target,
@@ -152,6 +157,7 @@ export function computeMetrics(item, text, level) {
     hasStoryStructure, hasClimaxSignal, hasResolutionSignal, hasReflectionSignal, chronologicalFlow, emotionTellingCount, sensoryHits,
     longWords, uniqueWords, lexicalDensity,
     firstSentence,
+    narrativeQuality,
   };
 }
 
@@ -173,6 +179,7 @@ function _scoreContent(item, m) {
 
 // Organisation: connector VARIETY (across banks) is rewarded,
 // not raw connector count. Stuffing one connector type doesn't inflate this.
+// Now also incorporates narrative arc and chronology from narrative helpers.
 function _scoreOrganisation(item, m, level) {
   const bankDiversity = Object.values(m.connectorHits)
                                .filter(hits => hits.length > 0).length;
@@ -189,17 +196,27 @@ function _scoreOrganisation(item, m, level) {
     : sentScore;
   const closureScore = m.hasEndPunct ? 1 : 0.4;
 
-  const chronologyScore = Math.min(m.chronologicalFlow / 2, 1);
+  // Use richer chronology from narrative helpers instead of simple count
+  const nq = m.narrativeQuality || {};
+  const chronologyScore = nq.chronology ?? Math.min(m.chronologicalFlow / 2, 1);
+  // Narrative arc bonus for continuous/narrative modes
+  const mode = item.mode || 'guided';
+  const arcBonus = (mode === 'continuous' || item.lessonType === 'narrative' || item.lessonType === 'bootcamp')
+    ? (nq.arc || 0) * 0.10
+    : 0;
+
   return Math.min(1,
-    connectorScore * 0.32 +
-    sentScore      * 0.24 +
-    paraScore      * 0.18 +
-    closureScore   * 0.10 +
-    chronologyScore * 0.16
+    connectorScore  * 0.28 +
+    sentScore       * 0.22 +
+    paraScore       * 0.16 +
+    closureScore    * 0.08 +
+    chronologyScore * 0.16 +
+    arcBonus
   );
 }
 
 // Language: mechanics, vocabulary variety, genre-appropriate patterns, sentence variety
+// Now uses richer narrative craft scoring from narrative helpers.
 function _scoreLanguage(item, m) {
   const punctScore   = m.hasEndPunct ? 1 : 0.3;
   const vocabScore   = Math.min(m.lexicalDensity * 1.6, 1);
@@ -207,23 +224,32 @@ function _scoreLanguage(item, m) {
   const sentCount    = Math.max(m.sentenceCount, 1);
   const varietyScore = Math.min(m.sentenceStartCapitals / (sentCount - 0.5), 1);
 
-  const narrativeCraft = (m.hasClimaxSignal ? 0.25 : 0) + (m.hasResolutionSignal ? 0.25 : 0) + (m.hasReflectionSignal ? 0.25 : 0) + (m.purposefulDialogue ? 0.25 : 0);
+  // Use deeper narrative quality signals instead of flat boolean checks
+  const nq = m.narrativeQuality || {};
+  const narrativeCraft = (
+    (nq.climax || 0) * 0.22 +
+    (nq.resolution || 0) * 0.22 +
+    (nq.reflection || 0) * 0.22 +
+    (nq.dialogue || 0) * 0.34
+  );
   return Math.min(1,
-    punctScore   * 0.24 +
-    vocabScore   * 0.24 +
-    genreScore   * 0.20 +
-    varietyScore * 0.16 +
-    narrativeCraft * 0.16
+    punctScore      * 0.22 +
+    vocabScore      * 0.22 +
+    genreScore      * 0.18 +
+    varietyScore    * 0.14 +
+    narrativeCraft  * 0.24
   );
 }
 
 // Task Fulfilment: required coverage + purpose/audience alignment
+// Arc bonus now uses graduated narrative quality scores instead of binary flags.
 function _scoreTaskFulfilment(item, m) {
-  const arcBonus = (m.hasClimaxSignal ? 0.10 : 0) + (m.hasResolutionSignal ? 0.10 : 0) + (m.hasReflectionSignal ? 0.10 : 0);
+  const nq = m.narrativeQuality || {};
+  const arcBonus = ((nq.climax || 0) + (nq.resolution || 0) + (nq.reflection || 0)) * 0.10;
   return Math.min(1,
-    m.requiredCoverage       * 0.60 +
+    m.requiredCoverage       * 0.55 +
     _purposeAlignmentScore(item, m) * 0.30 +
-    arcBonus
+    Math.min(arcBonus, 0.30)
   );
 }
 

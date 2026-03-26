@@ -54,7 +54,7 @@ export const writingLessonPacks = {
     introTeaching: ['Great stories help readers see, hear, and feel the moment.', 'Instead of saying “I was scared”, show it using body actions and sounds.', 'An opening line should place the reader inside the scene quickly.'],
     vocabRevision: ['drizzle', 'echoed', 'clutched', 'shivered', 'glimmered', 'stumbled'],
     spellingRevision: ['whisper', 'suddenly', 'because', 'through', 'shadow'],
-    reviseDrills: [...REVISION_CORE_DRILLS, { type: 'show_not_tell', question: 'Upgrade “I was excited.”', options: ['I was excited.', 'My feet bounced and my grin stretched wide.', 'Excited happened.'], correctIndex: 1 }],
+    reviseDrills: [...REVISION_CORE_DRILLS, { type: 'show_not_tell', question: 'Upgrade “I was excited.”', options: ['I was excited.', 'My feet bounced and my grin stretched wide.', 'Excited happened.'], correctIndex: 1 }, { type: 'arrange_sequence', question: 'Put these story events in order:', sentences: ['The corridor lights flickered as I reached the staircase.', 'I heard footsteps echoing behind me.', 'Suddenly, my friend appeared and laughed.', 'In the end, I felt silly for being scared.'], correctOrder: [0, 1, 2, 3] }],
     storyStarterChoices: ['The corridor lights flickered just as I reached the staircase.', 'Rain hammered the roof while I searched for my missing notebook.', 'A soft voice called my name from the empty basketball court.'],
     plotPlanTemplate: ['setting', 'character', 'problem', 'feelings', 'conclusion'],
     paragraphMissions: [{ text: 'Open with a scene', keywordsAny: ['corridor', 'rain', 'lights', 'court'] }, { text: 'Show one feeling using actions', keywordsAny: ['clutched', 'shivered', 'jumped', 'trembled'] }, { text: 'End with a clear resolution', keywordsAny: ['finally', 'in the end', 'at last'] }],
@@ -118,7 +118,7 @@ export const writingLessonPacks = {
     skillFocus: ['5 senses recycle', 'plot arc polish', 'show-not-tell recycle'],
     introTeaching: ['Recycle all key term skills in one complete story.', 'Plan carefully so climax and ending are clear.'],
     vocabRevision: ['creaked', 'faint', 'tiptoed', 'heartbeat', 'laughed'], spellingRevision: ['midnight', 'kitchen', 'listened', 'instead'],
-    reviseDrills: [...REVISION_CORE_DRILLS, { type: 'order_sequence', question: 'Pick the best climax order.', options: ['ending -> beginning -> climax', 'beginning -> problem -> climax -> resolution', 'climax -> title -> ending'], correctIndex: 1 }],
+    reviseDrills: [...REVISION_CORE_DRILLS, { type: 'order_sequence', question: 'Pick the best climax order.', options: ['ending -> beginning -> climax', 'beginning -> problem -> climax -> resolution', 'climax -> title -> ending'], correctIndex: 1 }, { type: 'sentence_upgrade', weakSentence: 'I heard a noise in the kitchen.', question: 'Upgrade this sentence with sensory detail.', options: ['I heard a noise in the kitchen.', 'A sharp clatter echoed from the dark kitchen, and my heart hammered.', 'There was something in the kitchen maybe.'], correctIndex: 1 }],
     storyStarterChoices: ['A loud thud woke me just after midnight.', 'The house was dark, but the kitchen light was on.'],
     plotPlanTemplate: ['introduction', 'risingAction', 'climax', 'fallingAction', 'conclusion'],
     paragraphMissions: [{ text: 'Add at least one sensory clue', keywordsAny: ['heard', 'cold', 'dark', 'smell'] }, { text: 'Use one dialogue line', keywordsAny: ['"', '“', '”'] }, { text: 'End with reflection', keywordsAny: ['I learned', 'in the end', 'next time'] }],
@@ -132,12 +132,14 @@ export const writingLessonPacks = {
   'p3-boss-quiz': {
     id: 'p3-boss-quiz', track: 'p3t1Creative', level: 3, lessonType: 'bossQuiz', lessonTitle: 'Boss Check: Creative Writing Review',
     skillFocus: ['sensory details', 'show-not-tell', 'dialogue tags', 'plot sequence', 'conclusions'], introTeaching: ['Beat the boss quiz to complete Term 1 training.'],
-    bossQuiz: { passMark: 4, questions: [
+    bossQuiz: { passMark: 5, questions: [
       { id: 'q1', q: 'Which line shows-not-tells a feeling?', options: ['I was scared.', 'My hands trembled and I stepped back.', 'I felt nervous.'], answer: 1 },
       { id: 'q2', q: 'Which connector best signals an ending?', options: ['because', 'while', 'finally'], answer: 2 },
-      { id: 'q3', q: 'Which sentence has purposeful dialogue?', options: ['“Hi,” I said.', '“Hide behind me,” Zara whispered as she blocked the door.', '“Okay,” he replied.'], answer: 1 },
+      { id: 'q3', q: 'Which sentence has purposeful dialogue?', options: ['”Hi,” I said.', '”Hide behind me,” Zara whispered as she blocked the door.', '”Okay,” he replied.'], answer: 1 },
       { id: 'q4', q: 'Best plot order?', options: ['Climax → intro → ending', 'Intro → rising action → climax → falling action → conclusion', 'Ending → intro → problem'], answer: 1 },
       { id: 'q5', q: 'A strong conclusion should...', options: ['Repeat the title only', 'Introduce a new character suddenly', 'Resolve the problem and show what changed'], answer: 2 },
+    ], constructedItems: [
+      { id: 'q6-cr', type: 'mini_revision', q: 'Improve this weak sentence using show-not-tell.', original: 'I was very happy about the result.', hint: 'Replace the emotion word with an action or physical reaction.', improvementSignals: ['smiled', 'grinned', 'jumped', 'cheered', 'punched the air', 'bounced', 'leaped'] },
     ] },
     rewards: { xp: 60, collectibles: ['p3-term1-writing-medal'] },
   },
@@ -165,7 +167,7 @@ export const writingLessonPacks = {
     skillFocus: ['sensory detail', 'chronological flow', 'climax build'],
     introTeaching: ['Use smell/sound details to anchor setting.', 'Build urgency toward a clear turning point.'],
     vocabRevision: ['bustled', 'sizzling', 'weaved', 'stumbled', 'grabbed'], spellingRevision: ['crowded', 'careful', 'vegetables', 'balance'],
-    reviseDrills: [...REVISION_CORE_DRILLS],
+    reviseDrills: [...REVISION_CORE_DRILLS, { type: 'choose_best_revision', original: 'The market was busy and loud.', question: 'Which revision is stronger?', options: ['The market was very busy and very loud.', 'Shoppers bustled between stalls while the sizzle of oil and shouts of vendors filled the air.'], correctIndex: 1 }],
     storyStarterChoices: ['Steam rose from the noodle stall while shoppers squeezed past one another.'],
     plotPlanTemplate: ['introduction', 'risingAction', 'climax', 'fallingAction', 'conclusion'],
     paragraphMissions: [{ text: 'Sensory opening', keywordsAny: ['smell', 'sizzling', 'steam', 'shouted'] }, { text: 'Build a climax moment', keywordsAny: ['suddenly', 'all at once', 'just then'] }, { text: 'Clear resolution', keywordsAny: ['finally', 'in the end'] }],
@@ -178,7 +180,7 @@ export const writingLessonPacks = {
     skillFocus: ['personification', 'dialogue for decisions'],
     introTeaching: ['Personification can make weather scenes vivid.', 'Dialogue should show planning in the crisis.'],
     vocabRevision: ['howled', 'lashed', 'shelter', 'dragged', 'soaked'], spellingRevision: ['thunder', 'lightning', 'umbrella', 'decision'],
-    reviseDrills: [{ type: 'dialogue_tag', question: 'Which line shows purposeful dialogue?', options: ['"Oh," I said.', '"Take the small plants first," Jia shouted, pulling the cart.', '"Nice," he replied.'], correctIndex: 1 }, ...REVISION_CORE_DRILLS],
+    reviseDrills: [{ type: 'dialogue_tag', question: 'Which line shows purposeful dialogue?', options: ['"Oh," I said.', '"Take the small plants first," Jia shouted, pulling the cart.', '"Nice," he replied.'], correctIndex: 1 }, ...REVISION_CORE_DRILLS, { type: 'dialogue_improve', weakDialogue: '"Hello," said Jia. "Hello," I replied.', question: 'Pick the dialogue that best moves the story forward:', options: ['"How are you?" asked Jia. "Good," I said.', '"Grab the pots before the wind takes them!" Jia shouted, reaching for the nearest shelf.'], correctIndex: 1 }],
     storyStarterChoices: ['Dark clouds gathered, and the wind clawed at the garden flags.'],
     plotPlanTemplate: ['setting', 'problem', 'climax', 'fallingAction', 'conclusion'],
     paragraphMissions: [{ text: 'Use one personification line', keywordsAny: ['wind', 'clouds', 'rain'] }, { text: 'Purposeful dialogue in climax', keywordsAny: ['take', 'run', 'quick', 'help'] }, { text: 'Ending linked to problem', keywordsAny: ['saved', 'safe', 'in the end'] }],
@@ -230,7 +232,7 @@ export const writingLessonPacks = {
     skillFocus: ['openings', 'figurative language', 'dialogue choices', 'climax and conclusion'],
     introTeaching: ['Final check for Term 2 writing powers.'],
     bossQuiz: {
-      passMark: 5,
+      passMark: 6,
       questions: [
         { id: 't2q1', q: 'Which opening creates strongest setting?', options: ['It was fun.', 'At dawn, fog curled around the empty playground.', 'I have story.'], answer: 1 },
         { id: 't2q2', q: 'Which line uses simile?', options: ['The bell rang.', 'My thoughts raced like marbles down a slope.', 'I felt fast.'], answer: 1 },
@@ -238,6 +240,10 @@ export const writingLessonPacks = {
         { id: 't2q4', q: 'Best climax marker?', options: ['because', 'all at once', 'therefore maybe'], answer: 1 },
         { id: 't2q5', q: 'Best conclusion move?', options: ['add random event', 'link ending to solved problem/theme', 'stop abruptly'], answer: 1 },
         { id: 't2q6', q: 'Which sequence is strongest?', options: ['ending, intro, problem', 'intro, rising action, climax, resolution, reflection', 'climax, title, ending'], answer: 1 },
+      ],
+      constructedItems: [
+        { id: 't2q7-cr', type: 'short_response', q: 'Write one sentence that uses personification to describe a storm.', hint: 'Give the storm a human action or feeling.', requiredSignals: ['wind', 'rain', 'clouds', 'thunder', 'howled', 'whispered', 'danced', 'roared', 'screamed', 'clawed', 'tapped', 'wept'] },
+        { id: 't2q8-cr', type: 'mini_revision', q: 'Improve this weak opening line.', original: 'One day something happened at school.', hint: 'Add a specific place, time, or action to hook the reader.', improvementSignals: ['morning', 'bell', 'corridor', 'classroom', 'gate', 'suddenly', 'rushed', 'rang', 'echoed'] },
       ],
     },
     rewards: { xp: 62, collectibles: ['p3-term2-writing-medal'] },
