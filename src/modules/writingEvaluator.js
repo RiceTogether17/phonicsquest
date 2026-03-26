@@ -108,7 +108,12 @@ export function computeMetrics(item, text, level) {
   const hasDialogue = /["'""\u2018\u2019\u201c\u201d]/.test(t)
                    && / said| asked| replied| whispered| explained/i.test(t);
   const dialoguePunctOk = hasDialogue
-    && /["'""\u201c\u201d][^"'""\n]{3,}[.!?,]["'""\u201d]/.test(t);
+    && /["“”][^"\n]{3,}[.!?,]["”]/.test(t);
+  const purposefulDialogue = hasDialogue && /(let's|we should|we can|help|run|quick|plan|careful)/i.test(t);
+  const hasClimaxSignal = /(suddenly|all at once|just then|without warning|at that moment)/i.test(t);
+  const hasResolutionSignal = /(in the end|finally|at last|eventually)/i.test(t);
+  const hasReflectionSignal = /(i learned|i realised|i realized|next time|i promised)/i.test(t);
+  const chronologicalFlow = ['first', 'next', 'then', 'after that', 'finally'].filter((c) => lower.includes(c)).length;
 
   // Formal register signals (relevant for situational writing)
   const hasFormalOpening = FORMAL_OPENINGS.some(p => lower.includes(p));
@@ -142,9 +147,9 @@ export function computeMetrics(item, text, level) {
     connectorHits, totalDistinct,
     requiredHits, requiredTotal, requiredCoverage, checkResults,
     hasEndPunct, sentenceStartCapitals,
-    hasDialogue, dialoguePunctOk,
+    hasDialogue, dialoguePunctOk, purposefulDialogue,
     hasFormalOpening, hasFormalClosing,
-    hasStoryStructure, emotionTellingCount, sensoryHits,
+    hasStoryStructure, hasClimaxSignal, hasResolutionSignal, hasReflectionSignal, chronologicalFlow, emotionTellingCount, sensoryHits,
     longWords, uniqueWords, lexicalDensity,
     firstSentence,
   };
@@ -184,11 +189,13 @@ function _scoreOrganisation(item, m, level) {
     : sentScore;
   const closureScore = m.hasEndPunct ? 1 : 0.4;
 
+  const chronologyScore = Math.min(m.chronologicalFlow / 2, 1);
   return Math.min(1,
-    connectorScore * 0.40 +
-    sentScore      * 0.30 +
-    paraScore      * 0.20 +
-    closureScore   * 0.10
+    connectorScore * 0.32 +
+    sentScore      * 0.24 +
+    paraScore      * 0.18 +
+    closureScore   * 0.10 +
+    chronologyScore * 0.16
   );
 }
 
@@ -200,19 +207,23 @@ function _scoreLanguage(item, m) {
   const sentCount    = Math.max(m.sentenceCount, 1);
   const varietyScore = Math.min(m.sentenceStartCapitals / (sentCount - 0.5), 1);
 
+  const narrativeCraft = (m.hasClimaxSignal ? 0.25 : 0) + (m.hasResolutionSignal ? 0.25 : 0) + (m.hasReflectionSignal ? 0.25 : 0) + (m.purposefulDialogue ? 0.25 : 0);
   return Math.min(1,
-    punctScore   * 0.30 +
-    vocabScore   * 0.30 +
+    punctScore   * 0.24 +
+    vocabScore   * 0.24 +
     genreScore   * 0.20 +
-    varietyScore * 0.20
+    varietyScore * 0.16 +
+    narrativeCraft * 0.16
   );
 }
 
 // Task Fulfilment: required coverage + purpose/audience alignment
 function _scoreTaskFulfilment(item, m) {
+  const arcBonus = (m.hasClimaxSignal ? 0.10 : 0) + (m.hasResolutionSignal ? 0.10 : 0) + (m.hasReflectionSignal ? 0.10 : 0);
   return Math.min(1,
-    m.requiredCoverage       * 0.70 +
-    _purposeAlignmentScore(item, m) * 0.30
+    m.requiredCoverage       * 0.60 +
+    _purposeAlignmentScore(item, m) * 0.30 +
+    arcBonus
   );
 }
 
