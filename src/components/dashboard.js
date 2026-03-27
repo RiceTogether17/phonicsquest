@@ -202,13 +202,53 @@ function _renderParentCoachingCard() {
     'no-data':        'coaching-card--grey',
   }[card.overallSignal] || 'coaching-card--grey';
 
+  // Advancement decision banner (only when there's a clear recommendation)
+  const advHtml = card.advancementNote
+    ? `<div class="coaching-advancement">${card.advancementNote}</div>`
+    : '';
+
+  // At-risk domain chips
   const atRiskHtml = card.domainsAtRisk.length
     ? `<div class="coaching-at-risk">
-        <span class="coaching-at-risk-label">🔴 At risk:</span>
+        <span class="coaching-at-risk-label">🔴 Needs attention:</span>
         ${card.domainsAtRisk.map(d => `<span class="coaching-domain-chip coaching-chip--red">${d.icon} ${d.label}</span>`).join('')}
        </div>`
     : '';
 
+  // Strength line
+  const strengthHtml = `
+    <div class="coaching-strength">
+      <span class="coaching-strength-label">💪 Strength:</span>
+      <span class="coaching-strength-text">${card.mainStrength}</span>
+    </div>`;
+
+  // Concern line (only when there is one)
+  const concernHtml = card.mainConcern
+    ? `<div class="coaching-concern">
+        <span class="coaching-concern-label">⚠️ Concern:</span>
+        <span class="coaching-concern-text">${card.mainConcern}</span>
+       </div>`
+    : '';
+
+  // Weekly priority with explanation
+  const priorityHtml = `
+    <div class="coaching-priority">
+      <div class="coaching-priority-head">
+        <span class="coaching-priority-icon">🎯</span>
+        <span class="coaching-priority-text">${card.weeklyPriority}</span>
+      </div>
+      <p class="coaching-priority-why">${card.whyPriority}</p>
+    </div>`;
+
+  // Weekly XP (only show when non-zero)
+  const xpStatHtml = card.weekXp > 0
+    ? `<div class="coaching-stat">
+        <span class="coaching-stat-value">+${card.weekXp}</span>
+        <span class="coaching-stat-label">XP this week</span>
+       </div>`
+    : '';
+
+  // Review note
   const reviewHtml = card.reviewsDue > 0
     ? `<div class="coaching-review">
         <span class="coaching-review-icon">🔁</span>
@@ -220,7 +260,7 @@ function _renderParentCoachingCard() {
     <div class="coaching-card ${signalClass}" aria-label="Parent coaching summary">
       <div class="coaching-card-header">
         <span class="coaching-signal-badge">${card.signalEmoji} ${card.signalLabel}</span>
-        <span class="coaching-card-title">This Week's Learning Snapshot</span>
+        <span class="coaching-card-title">This Week's Coaching Report</span>
       </div>
 
       <div class="coaching-stats-row">
@@ -236,14 +276,14 @@ function _renderParentCoachingCard() {
           <span class="coaching-stat-value">${card.streak}</span>
           <span class="coaching-stat-label">day streak</span>
         </div>
+        ${xpStatHtml}
       </div>
 
-      <div class="coaching-focus">
-        <span class="coaching-focus-icon">🎯</span>
-        <span class="coaching-focus-text">${card.weeklyFocus}</span>
-      </div>
-
+      ${advHtml}
+      ${strengthHtml}
+      ${concernHtml}
       ${atRiskHtml}
+      ${priorityHtml}
       ${reviewHtml}
     </div>`;
 }

@@ -135,6 +135,11 @@ const DEFAULT_STATE = {
   // ── Backup reminder ─────────────────────────────────────────────────────
   // ISO date string of last time the backup reminder was shown.
   lastBackupReminderAt: null,
+
+  // ── Weekly XP log ────────────────────────────────────────────────────────
+  // Rolling daily XP ledger for true 7-day reporting.
+  // Each entry: { date: 'YYYY-MM-DD', xp: number }. Pruned to last 8 days.
+  weeklyXpLog: [],
 };
 
 class Store {
@@ -457,9 +462,22 @@ class Store {
     }
   }
 
-  /** Add XP to today's session total (used by session summary). */
+  /** Add XP to today's session total AND rolling weekly log. */
   addSessionXp(amount) {
+    if (!amount || amount <= 0) return;
     this.set('sessionXpToday', (this._state.sessionXpToday || 0) + amount);
+
+    // Accumulate into rolling weekly log (one entry per calendar day)
+    const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
+    const cutoff = new Date(Date.now() - 8 * 86400000).toISOString().slice(0, 10);
+    const log = (this._state.weeklyXpLog || []).filter(e => e.date >= cutoff);
+    const todayEntry = log.find(e => e.date === today);
+    if (todayEntry) {
+      todayEntry.xp = (todayEntry.xp || 0) + amount;
+    } else {
+      log.push({ date: today, xp: amount });
+    }
+    this.set('weeklyXpLog', log);
   }
 
   /** Increment daily goal counter. */

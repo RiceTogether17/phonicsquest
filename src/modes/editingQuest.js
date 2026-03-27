@@ -4,6 +4,74 @@ import { questMastery } from '../modules/questMastery.js';
 import { audio } from '../modules/audio.js';
 import { getLevelInfo } from '../data/curriculum.js';
 
+// ── Error-specific teach-back content ────────────────────────────────────────
+// Keyed by error.rule (specific) then error.type (grammar|spelling) as fallback.
+const EDITING_TEACHBACK = {
+  // Grammar rules
+  svAgreement: {
+    icon: '👥',
+    rule: 'Subject-verb agreement: singular subjects use singular verbs (adds -s); plural subjects use plural verbs.',
+    example: '"The dog runs fast." (singular) — "The dogs run fast." (plural)',
+    tip: 'Swap the subject with he/she/it — if that sounds right, the verb needs -s.',
+  },
+  tense: {
+    icon: '⏱️',
+    rule: 'Tense shows WHEN something happens. Look for time clues (yesterday, now, soon) to choose the right tense.',
+    example: '"Yesterday, she walked home." — "Right now, he is running." — "Tomorrow, we will leave."',
+    tip: 'Find the time word first — it tells you which tense belongs in the sentence.',
+  },
+  articles: {
+    icon: '📖',
+    rule: 'Use "a" before consonant sounds and "an" before vowel sounds (a, e, i, o, u).',
+    example: '"a cat" · "a house" · "an egg" · "an umbrella"',
+    tip: 'Say the next word out loud. Does it start with a vowel SOUND? Use "an". Otherwise use "a".',
+  },
+  prepositions: {
+    icon: '📍',
+    rule: 'Prepositions link nouns to the rest of the sentence. Common ones: in, on, at, by, with, for, from, to.',
+    example: '"She is AT school." — "He sat ON the chair." — "They arrived IN the morning."',
+    tip: 'Read the full phrase. Ask: WHERE, WHEN, or HOW? That determines the preposition.',
+  },
+  pronouns: {
+    icon: '🙋',
+    rule: 'A pronoun replaces a noun. Subject: I, he, she, they. Object: me, him, her, them.',
+    example: '"Tom helped me." (object) — "He helped Tom." (subject)',
+    tip: 'Is the pronoun doing the action (subject) or receiving it (object)? Different forms for each.',
+  },
+  modals: {
+    icon: '🛡️',
+    rule: 'Modal verbs (can, could, should, must, will, would) come before the base verb — no "to" needed.',
+    example: '"She should go." ✓ — "She should to go." ✗',
+    tip: 'After a modal, always use the BASE form of the verb (no -s, no -ing, no -ed).',
+  },
+  connectors: {
+    icon: '🔗',
+    rule: 'Connectors join ideas. Each type has a different meaning: contrast (but/although), reason (because/since), result (so).',
+    example: '"She was tired, SO she rested." — "Although it rained, they played."',
+    tip: 'What is the relationship between the two ideas? That relationship tells you which connector fits.',
+  },
+  // Spelling rules
+  doubling: {
+    icon: '✏️',
+    rule: 'Double the final consonant before adding -ing or -ed to short vowel + consonant words.',
+    example: '"run" → "running" · "hop" → "hopped" · "big" → "bigger"',
+    tip: 'Check if the word is short vowel + consonant. If so, double the consonant before the suffix.',
+  },
+  spelling: {
+    icon: '🔤',
+    rule: 'English spelling often follows patterns. Check vowel pairs, silent letters, and suffix rules.',
+    example: '"receive" (i before e except after c) · "necessary" (one c, double s) · "beautiful" (beauty + ful)',
+    tip: 'Break the word into syllables. Say each part. Does it match a pattern you know?',
+  },
+  // Fallbacks by type
+  grammar: {
+    icon: '📘',
+    rule: 'Grammar errors are about how words work together — tense, agreement, articles, or word order.',
+    example: '"She have finished." ✗ → "She has finished." ✓',
+    tip: 'Read the sentence aloud slowly. If one part sounds wrong, that is usually the grammar error.',
+  },
+};
+
 let _container = null;
 let _onGoHome = null;
 let _level = 1;
@@ -264,11 +332,10 @@ function _submitError(item, error, selectedType, typedCorrection) {
   audio.playSfx('wrong');
   const attemptsLeft = Math.max(0, 2 - _attemptState.tries);
   if (_attemptState.tries >= 2) {
-    _showFeedback(`❌ Not yet. Correct answer: ${error.correction}. ${error.explanation}`, false);
-    setTimeout(() => {
+    _showEditingTeachBackOverlay(error, () => {
       _errorIndex++;
       _renderErrorStep();
-    }, 1000);
+    });
     return;
   }
 
@@ -276,6 +343,32 @@ function _submitError(item, error, selectedType, typedCorrection) {
 
   const input = /** @type {HTMLInputElement|null} */ (document.getElementById('eq-correction-input'));
   if (input) input.value = '';
+}
+
+function _showEditingTeachBackOverlay(error, onContinue) {
+  const tb = EDITING_TEACHBACK[error.rule] || EDITING_TEACHBACK[error.type] || EDITING_TEACHBACK.grammar;
+  const game = _container.querySelector('.sfq-game');
+  if (!game) { onContinue(); return; }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'eq-teachback-overlay';
+  overlay.innerHTML = `
+    <div class="eq-teachback-card">
+      <div class="eq-teachback-icon">${tb.icon}</div>
+      <h4 class="eq-teachback-heading">Let's learn this rule</h4>
+      <p class="eq-teachback-rule">${tb.rule}</p>
+      <div class="eq-teachback-example">${tb.example}</div>
+      <p class="eq-teachback-tip">💡 <strong>Quick tip:</strong> ${tb.tip}</p>
+      <div class="eq-teachback-answer">✅ Correct answer: <strong>${error.correction}</strong></div>
+      <p class="eq-teachback-explanation">${error.explanation}</p>
+      <button class="btn btn--primary eq-teachback-continue">Got it — Continue</button>
+    </div>`;
+
+  game.appendChild(overlay);
+  overlay.querySelector('.eq-teachback-continue').addEventListener('click', () => {
+    overlay.remove();
+    onContinue();
+  });
 }
 
 function _calculateStars(accuracy, firstTryRate) {

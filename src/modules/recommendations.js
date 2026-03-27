@@ -8,6 +8,7 @@
 
 import { store } from './store.js';
 import { getActiveProfile } from './profiles.js';
+import { getLearnerReadinessSummary, getProgressionReadiness, getDomainMastery } from './masteryEngine.js';
 
 const SHORT_VOWEL_GROUPS = ['short-a', 'short-e', 'short-i', 'short-o', 'short-u'];
 
@@ -103,23 +104,30 @@ export function getRecommendation() {
 }
 
 function _preschoolRec() {
-  const gm = store.get('groupMastery') || {};
-  const weakGroup = _weakestPhonicsGroup();
-  const phonicsAvg = _avgShortVowelScore();
+  // Check mastery engine first for any at-risk phonics domain
+  const summary = getLearnerReadinessSummary();
+  const phonicsDomain = summary.domainsAtRisk.find(d => d.id === 'phonics')
+    || summary.needsPractice.find(d => d.id === 'phonics');
 
-  // Very weak short-vowel group → recommend blending practice
-  if (weakGroup && _groupMastery(weakGroup) < 0.6) {
-    const pct = Math.round(_groupMastery(weakGroup) * 100);
+  const gm       = store.get('groupMastery') || {};
+  const weakGroup = _weakestPhonicsGroup();
+
+  // At-risk phonics — surface the weakest group specifically
+  if (phonicsDomain || (weakGroup && _groupMastery(weakGroup) < 0.6)) {
+    const group = weakGroup || null;
+    const pct   = group ? Math.round(_groupMastery(group) * 100) : 0;
     return {
-      title: `Practice ${VOWEL_LABELS[weakGroup]} Blending`,
-      reason: `${VOWEL_LABELS[weakGroup]} accuracy is ${pct}% — below the 60% target.`,
-      ctaLabel: 'Start Blend It!', ctaTarget: 'blend', ctaGroup: weakGroup,
-      domain: 'Phonics', urgency: pct < 40 ? 'high' : 'medium',
+      title:    group ? `Practise ${VOWEL_LABELS[group] || group} Blending` : 'Phonics Needs Attention',
+      reason:   group
+        ? `${VOWEL_LABELS[group] || group} accuracy is ${pct}% — focused practice will close this gap.`
+        : 'Phonics scores across one or more groups are below target.',
+      ctaLabel: 'Start Blend It!', ctaTarget: 'blend', ctaGroup: group || undefined,
+      domain: 'Phonics', urgency: pct > 0 && pct < 40 ? 'high' : 'medium',
     };
   }
 
   // Struggling with recent phonics attempts → Listen & Blend
-  const history = store.get('wordHistory') || [];
+  const history      = store.get('wordHistory') || [];
   const recentPhonics = history.slice(0, 15)
     .filter(h => ['blend', 'classicBlend', 'hear', 'segment'].includes(h.mode));
   if (recentPhonics.length >= 5) {
@@ -134,8 +142,19 @@ function _preschoolRec() {
     }
   }
 
+  // Mastered phonics → explicitly congratulate + push sight words
+  const phonicsMastered = summary.masteredDomains.some(d => d.id === 'phonics');
+  if (phonicsMastered || _avgShortVowelScore() >= 0.85) {
+    return {
+      title: 'Phonics Mastered — Try Sight Words',
+      reason: 'Phonics is solid! Sight words are the next step to fluent reading.',
+      ctaLabel: 'Open Sight Words', ctaTarget: 'sight-words',
+      domain: 'Sight Words', urgency: 'low',
+    };
+  }
+
   // Decent phonics → push sight words
-  if (phonicsAvg >= 0.7) {
+  if (_avgShortVowelScore() >= 0.7) {
     return {
       title: 'Explore Sight Words',
       reason: 'Phonics is looking strong! Sight words extend reading fluency.',
@@ -153,52 +172,91 @@ function _preschoolRec() {
 }
 
 function _primaryRec() {
-  // Low clue accuracy in Cloze Castle → grammar focus
+  // Use masteryEngine domain composites to pick the highest-priority domain
+  const summary = getLearnerReadinessSummary();
+  const allDomains = getDomainMastery();
+
+  // First pick: at-risk domain with the lowest composite score
+  const atRiskDomains = summary.domainsAtRisk
+    .map(d => allDomains.find(x => x.id === d.id))
+    .filter(Boolean)
+    .sort((a, b) => (a.composite ?? 1) - (b.composite ?? 1));
+
+  if (atRiskDomains.length > 0) {
+    const worst = atRiskDomains[0];
+    const questMap = {
+      sentenceSkills: { label: 'Sentence Forge', target: 'sentence-forge' },
+      grammarCloze:   { label: 'Cloze Castle',   target: 'cloze-castle'  },
+      vocabCloze:     { label: 'Word Vault',      target: 'word-vault'    },
+      editingQuest:   { label: 'Editing Quest',   target: 'editing-quest' },
+    };
+    const qt = questMap[worst.id];
+    if (qt) {
+      const weak = _weakestQuestSkill(worst.questKey || worst.id);
+      return {
+        title: `${worst.icon} ${qt.label} Needs Attention`,
+        reason: weak
+          ? `"${humaniseSkill(weak.skill)}" skill scores ${Math.round(weak.score * 100)}% — needs consolidation.`
+          : `${worst.label} composite score is ${Math.round((worst.composite ?? 0) * 100)}% — below the 50% threshold.`,
+        ctaLabel: `Open ${qt.label}`, ctaTarget: qt.target,
+        domain: worst.label, urgency: (worst.composite ?? 0) < 0.35 ? 'high' : 'medium',
+      };
+    }
+  }
+
+  // Second pick: needs-practice domain with specific skill weakness
+  const needsDomains = summary.needsPractice
+    .map(d => allDomains.find(x => x.id === d.id))
+    .filter(Boolean)
+    .sort((a, b) => (a.composite ?? 1) - (b.composite ?? 1));
+
+  if (needsDomains.length > 0) {
+    const d = needsDomains[0];
+    const questMap = {
+      grammarCloze:   { label: 'Cloze Castle',   target: 'cloze-castle'  },
+      sentenceSkills: { label: 'Sentence Forge',  target: 'sentence-forge'},
+      vocabCloze:     { label: 'Word Vault',      target: 'word-vault'    },
+      editingQuest:   { label: 'Editing Quest',   target: 'editing-quest' },
+    };
+    const qt = questMap[d.id];
+    if (qt) {
+      return {
+        title: `Keep Building ${qt.label}`,
+        reason: `${d.label} is at ${Math.round((d.composite ?? 0) * 100)}% — a little more practice will push it over the line.`,
+        ctaLabel: `Open ${qt.label}`, ctaTarget: qt.target,
+        domain: d.label, urgency: 'medium',
+      };
+    }
+  }
+
+  // Fallback: SRS reviews due?
+  const reviewsDue = summary.reviewsDue;
+  if (reviewsDue > 0) {
+    return {
+      title: `Review ${reviewsDue} Word${reviewsDue > 1 ? 's' : ''} Due Today`,
+      reason: 'Spaced repetition is most effective when reviews happen on time.',
+      ctaLabel: 'Open Blend It!', ctaTarget: 'blend',
+      domain: 'Review', urgency: 'medium',
+    };
+  }
+
+  // All domains on-track
   const ccAcc = _clueAccuracy('clozeCastle');
   if (ccAcc !== null && ccAcc < 0.55) {
     const weak = _weakestQuestSkill('clozeCastle');
     return {
       title: 'Targeted Grammar Cloze Practice',
       reason: weak
-        ? `Grammar clue accuracy is low. Weakest area: ${humaniseSkill(weak.skill)}.`
-        : `Grammar clue accuracy is ${Math.round(ccAcc * 100)}% — needs work.`,
+        ? `Weakest grammar area: ${humaniseSkill(weak.skill)}.`
+        : `Grammar clue accuracy is ${Math.round(ccAcc * 100)}%.`,
       ctaLabel: 'Open Cloze Castle', ctaTarget: 'cloze-castle',
-      domain: 'Grammar Cloze', urgency: ccAcc < 0.4 ? 'high' : 'medium',
+      domain: 'Grammar Cloze', urgency: 'medium',
     };
   }
 
-  // Low Sentence Forge accuracy → sentence skills focus
-  const sfAcc = _recentQuestAccuracy('sentenceForge');
-  const sfWeak = _weakestQuestSkill('sentenceForge');
-  if ((sfAcc !== null && sfAcc < 0.6) || (sfWeak && sfWeak.score < 0.5)) {
-    return {
-      title: 'Strengthen Sentence Skills',
-      reason: sfWeak
-        ? `"${humaniseSkill(sfWeak.skill)}" skill needs practice (${Math.round(sfWeak.score * 100)}%).`
-        : 'Recent sentence building accuracy is below target.',
-      ctaLabel: 'Open Sentence Forge', ctaTarget: 'sentence-forge',
-      domain: 'Sentence Skills', urgency: 'medium',
-    };
-  }
-
-  // Low Word Vault clue accuracy
-  const wvAcc = _clueAccuracy('wordVault');
-  if (wvAcc !== null && wvAcc < 0.55) {
-    const weak = _weakestQuestSkill('wordVault');
-    return {
-      title: 'Vocabulary Context Practice',
-      reason: weak
-        ? `Vocabulary clues are weak. Try the ${humaniseSkill(weak.skill)} category.`
-        : `Vocabulary clue accuracy is ${Math.round(wvAcc * 100)}% — needs work.`,
-      ctaLabel: 'Open Word Vault', ctaTarget: 'word-vault',
-      domain: 'Vocabulary', urgency: 'medium',
-    };
-  }
-
-  // No notable weakness → suggest next challenge
   return {
     title: 'Ready for a Challenge?',
-    reason: 'Skills are in good shape. Keep building with advanced grammar and sentence work.',
+    reason: 'All skills are on track. Keep pushing with advanced grammar and sentence work.',
     ctaLabel: 'Open Cloze Castle', ctaTarget: 'cloze-castle',
     domain: 'Grammar Cloze', urgency: 'low',
   };
