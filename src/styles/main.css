@@ -7010,3 +7010,288 @@ input, select, textarea { font-family: inherit; }
 .ctb-example-text  { font-size: var(--font-md); font-style: italic; margin: 0; color: var(--color-text); }
 .ctb-memory-tip    { font-size: var(--font-sm); color: var(--color-text-muted); margin: 0; }
 .ctb-btn { align-self: stretch; }
+
+/* ── Phase 3: Sentence Forge Teach-Back Overlay ─────────────────────────── */
+.sfq-teachback-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 50;
+  border-radius: var(--radius-lg);
+  animation: fadeIn 0.2s ease;
+}
+.sfq-tb-panel {
+  background: var(--color-surface);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  max-width: 420px; width: 90%;
+  display: flex; flex-direction: column; gap: var(--space-3);
+  box-shadow: var(--shadow-lg);
+}
+.sfq-tb-header {
+  display: flex; align-items: center; gap: var(--space-2);
+}
+.sfq-tb-icon {
+  font-size: 2rem; line-height: 1;
+}
+.sfq-tb-title {
+  font-size: var(--font-lg); font-weight: 700;
+  color: var(--color-primary); margin: 0;
+}
+.sfq-tb-rule {
+  font-size: var(--font-md); font-weight: 600;
+  color: var(--color-text); margin: 0;
+}
+.sfq-tb-example {
+  background: var(--color-bg-alt, #f8f9fa);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+.sfq-tb-tip {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+.sfq-tb-btn { align-self: stretch; }
+
+/* ── Phase 3: Word Vault Teach-Back Overlay ─────────────────────────────── */
+.wv-teachback-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 50;
+  border-radius: var(--radius-lg);
+  animation: fadeIn 0.2s ease;
+}
+.wv-tb-panel {
+  background: var(--color-surface);
+  border: 2px solid var(--color-teal, #0d9488);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  max-width: 440px; width: 90%;
+  display: flex; flex-direction: column; gap: var(--space-3);
+  box-shadow: var(--shadow-lg);
+}
+.wv-tb-header {
+  display: flex; align-items: center; gap: var(--space-2);
+}
+.wv-tb-icon {
+  font-size: 2rem; line-height: 1;
+}
+.wv-tb-title {
+  font-size: var(--font-lg); font-weight: 700;
+  color: var(--color-teal, #0d9488); margin: 0;
+}
+.wv-tb-rule {
+  font-size: var(--font-md); font-weight: 600;
+  color: var(--color-text); margin: 0;
+}
+.wv-tb-example {
+  background: var(--color-bg-alt, #f8f9fa);
+  border-left: 3px solid var(--color-teal, #0d9488);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+.wv-tb-tip {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+.wv-tb-btn { align-self: stretch; }
+
+/* ── Phase 3: Parent Coaching Card ─────────────────────────────────────── */
+.coaching-card {
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-4);
+  border: 2px solid transparent;
+}
+.coaching-card--green  { background: #f0fdf4; border-color: #22c55e; }
+.coaching-card--amber  { background: #fffbeb; border-color: #f59e0b; }
+.coaching-card--red    { background: #fff1f2; border-color: #ef4444; }
+.coaching-card--grey   { background: var(--color-surface); border-color: var(--color-border); }
+
+.coaching-card-header {
+  display: flex; align-items: center; gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.coaching-signal-badge {
+  font-size: var(--font-sm); font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.06);
+}
+.coaching-card-title {
+  font-size: var(--font-md); font-weight: 700;
+  color: var(--color-text);
+}
+.coaching-stats-row {
+  display: flex; gap: var(--space-4); margin-bottom: var(--space-3);
+  flex-wrap: wrap;
+}
+.coaching-stat {
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 64px;
+}
+.coaching-stat-value {
+  font-size: var(--font-xl); font-weight: 800;
+  color: var(--color-text);
+}
+.coaching-stat-label {
+  font-size: var(--font-xs); color: var(--color-text-muted);
+  text-align: center;
+}
+.coaching-focus {
+  display: flex; align-items: flex-start; gap: var(--space-2);
+  background: rgba(0,0,0,0.04);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-sm); font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+.coaching-at-risk {
+  display: flex; align-items: center; gap: var(--space-2);
+  flex-wrap: wrap;
+  font-size: var(--font-sm);
+}
+.coaching-at-risk-label { font-weight: 700; }
+.coaching-domain-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: var(--font-xs); font-weight: 600;
+}
+.coaching-chip--red { background: #fee2e2; color: #991b1b; }
+.coaching-review {
+  display: flex; align-items: center; gap: var(--space-2);
+  font-size: var(--font-sm); color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+/* ── Phase 3: Curriculum Map ────────────────────────────────────────────── */
+.cm-wrapper {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+.cm-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: var(--space-4); gap: var(--space-3);
+}
+.cm-header-left { display: flex; align-items: center; gap: var(--space-3); }
+.cm-avatar { font-size: 2.5rem; line-height: 1; }
+.cm-title  { font-size: var(--font-lg); font-weight: 800; margin: 0; color: var(--color-text); }
+.cm-subtitle { font-size: var(--font-sm); color: var(--color-text-muted); margin: 4px 0 0; }
+.cm-close { flex-shrink: 0; }
+
+.cm-section { margin-bottom: var(--space-5); }
+.cm-section--future { opacity: 0.75; }
+.cm-section-title {
+  display: flex; align-items: center; gap: var(--space-2);
+  font-size: var(--font-md); font-weight: 700;
+  color: var(--color-text); margin: 0 0 var(--space-1);
+}
+.cm-section-icon  { font-size: 1.2rem; }
+.cm-section-tag   {
+  font-size: var(--font-xs); font-weight: 600;
+  padding: 2px 8px; border-radius: 999px;
+  background: var(--color-bg-alt, #f3f4f6); color: var(--color-text-muted);
+  margin-left: var(--space-2);
+}
+.cm-section-desc  { font-size: var(--font-sm); color: var(--color-text-muted); margin: 0 0 var(--space-3); }
+
+.cm-phase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-3);
+}
+.cm-phase {
+  position: relative;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-border);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  transition: box-shadow 0.15s;
+}
+.cm-phase--complete    { border-color: #22c55e; background: #f0fdf4; }
+.cm-phase--in-progress { border-color: var(--color-primary); background: #f0f0ff; }
+.cm-phase--locked      { opacity: 0.55; }
+.cm-phase--current     { box-shadow: 0 0 0 3px var(--color-primary); }
+
+.cm-you-are-here {
+  position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+  background: var(--color-primary); color: #fff;
+  font-size: var(--font-xs); font-weight: 700;
+  padding: 2px 10px; border-radius: 999px;
+  white-space: nowrap;
+}
+.cm-phase-header {
+  display: flex; align-items: center; gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.cm-phase-icon   { font-size: 1.5rem; flex-shrink: 0; }
+.cm-phase-label  { font-size: var(--font-xs); font-weight: 700; color: var(--color-text-muted); display: block; }
+.cm-phase-title  { font-size: var(--font-sm); font-weight: 700; color: var(--color-text); display: block; }
+.cm-phase-badge  { margin-left: auto; font-size: var(--font-sm); font-weight: 700; }
+.cm-phase-desc   { font-size: var(--font-xs); color: var(--color-text-muted); margin: 0 0 var(--space-2); }
+.cm-phase-bar-track {
+  height: 6px; background: rgba(0,0,0,0.08);
+  border-radius: 999px; overflow: hidden;
+  margin-bottom: 4px;
+}
+.cm-phase-bar-fill {
+  height: 100%; background: var(--color-primary);
+  border-radius: 999px; transition: width 0.4s ease;
+}
+.cm-phase--complete .cm-phase-bar-fill { background: #22c55e; }
+.cm-phase-meta         { font-size: var(--font-xs); color: var(--color-text-muted); }
+.cm-phase-meta--locked { color: var(--color-text-muted); font-style: italic; }
+
+.cm-connector {
+  display: flex; align-items: center; gap: var(--space-3);
+  margin: var(--space-2) 0 var(--space-4);
+}
+.cm-connector-line {
+  flex: 1; height: 2px;
+  background: linear-gradient(to right, var(--color-primary), #22c55e);
+  border-radius: 999px;
+}
+.cm-connector-label {
+  font-size: var(--font-xs); font-weight: 600;
+  color: var(--color-text-muted); white-space: nowrap;
+}
+
+.cm-domain-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-3);
+}
+.cm-domain {
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-border);
+  padding: var(--space-3);
+  background: var(--color-surface);
+}
+.cm-domain--strong   { border-color: #22c55e; background: #f0fdf4; }
+.cm-domain--building { border-color: var(--color-primary); background: #f0f0ff; }
+.cm-domain--starting { border-color: #f59e0b; background: #fffbeb; }
+.cm-domain--not-started { opacity: 0.55; }
+.cm-domain-header {
+  display: flex; align-items: center; gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.cm-domain-icon  { font-size: 1.3rem; flex-shrink: 0; }
+.cm-domain-label { font-size: var(--font-sm); font-weight: 700; color: var(--color-text); flex: 1; }
+.cm-domain-pct   { font-size: var(--font-sm); font-weight: 700; color: var(--color-primary); }
+.cm-domain-desc  { font-size: var(--font-xs); color: var(--color-text-muted); margin: 0 0 var(--space-2); }
+
+@media (max-width: 600px) {
+  .cm-phase-grid, .cm-domain-grid { grid-template-columns: 1fr 1fr; }
+  .coaching-stats-row { gap: var(--space-3); }
+}

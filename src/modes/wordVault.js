@@ -75,6 +75,49 @@ let _infoPanelOpen = false;
 let _affixWrongAttempts = {};
 let _affixParts = [];
 
+// Wrong-attempt counter per passage — resets each new passage
+let _passageWrongCount = 0;
+
+// ── Category-specific teach-back content ────────────────────────────────────
+const VAULT_TEACHBACK = {
+  morphologicalAffix: {
+    icon: '🧩',
+    rule: 'Word parts: a PREFIX comes before the root, a SUFFIX comes after it.',
+    example: '"un-" + "happy" = "unhappy" (not happy)  ·  "teach" + "-er" = "teacher" (one who teaches)',
+    tip: 'Find the ROOT word meaning first, then choose the affix that changes it in the right direction.',
+  },
+  synonymContrast: {
+    icon: '📚',
+    rule: 'A synonym means nearly the same thing; an antonym means the opposite.',
+    example: '"Happy" ↔ "joyful" (synonyms)  ·  "Happy" ↔ "sad" (antonyms)',
+    tip: 'Read the tone of the passage — does it need a SAME-meaning word or an OPPOSITE one?',
+  },
+  collocationCloze: {
+    icon: '🤝',
+    rule: 'Collocations are word partners that always travel together in natural English.',
+    example: '"make a decision" (not "do a decision")  ·  "heavy rain" (not "strong rain")',
+    tip: 'Ask: which option sounds most natural next to the surrounding words?',
+  },
+  connectorClue: {
+    icon: '🔗',
+    rule: 'Connectors show HOW two ideas relate: contrast, reason, result, sequence, or addition.',
+    example: '"She was tired, SO she rested." (result)  ·  "Although it rained, they played." (contrast)',
+    tip: 'Contrast: but/although · Reason: because/since · Result: so/therefore · Sequence: then/finally',
+  },
+  grammaticalRole: {
+    icon: '🔤',
+    rule: 'Every word has a role: NOUN (thing), VERB (action), ADJECTIVE (describes noun), ADVERB (describes verb, often -ly).',
+    example: '"The FAST (adj) car ZOOMED (verb) QUICKLY (adv) past the BUILDING (noun)."',
+    tip: 'After "the/a" = noun · Before a noun = adjective · Modifying a verb = adverb.',
+  },
+  default: {
+    icon: '🔍',
+    rule: 'Context clues are hints in the surrounding sentences that help you find the right answer.',
+    example: '"The scientist performed many ___. Each experiment took days." → the blank must be a noun meaning tests.',
+    tip: 'Read the whole sentence AND the sentence before/after. Together they usually reveal the answer.',
+  },
+};
+
 const POS_CLASS_MAP = { noun: 'pos-noun', verb: 'pos-verb', adjective: 'pos-adjective', adverb: 'pos-adverb' };
 const CONNECTOR_TYPE_LABELS = {
   reason: 'Reason connector (because/since)',
@@ -317,6 +360,7 @@ function _initPassage(passage) {
   _blankFills  = round.blankFills;
   _affixWrongAttempts = {};
   _affixParts = [];
+  _passageWrongCount = 0;
 
   if (_isAffixMode(passage)) {
     _affixParts = (passage.answers || []).map((ans, idx) => {
@@ -853,13 +897,67 @@ function _checkPassage(passage) {
       b.classList.toggle('wv-blank--wrong', ans !== passage.answers[i]);
     });
     mascot.encourage();
-    _showFeedback('❌ Some blanks are wrong – check and try again!', false);
-    setTimeout(() => {
-      document.querySelectorAll('.wv-blank--wrong').forEach(b => b.classList.remove('wv-blank--wrong'));
-      const fb = document.getElementById('wv-feedback');
-      if (fb) fb.hidden = true;
-    }, 1800);
+    _passageWrongCount++;
+
+    if (_passageWrongCount >= 2) {
+      _showFeedback('❌ Let\'s look at the rule, then try again!', false);
+      setTimeout(() => {
+        document.querySelectorAll('.wv-blank--wrong').forEach(b => b.classList.remove('wv-blank--wrong'));
+        _showVaultTeachBackOverlay(passage);
+      }, 900);
+    } else {
+      _showFeedback('❌ Some blanks are wrong – check and try again!', false);
+      setTimeout(() => {
+        document.querySelectorAll('.wv-blank--wrong').forEach(b => b.classList.remove('wv-blank--wrong'));
+        const fb = document.getElementById('wv-feedback');
+        if (fb) fb.hidden = true;
+      }, 1800);
+    }
   }
+}
+
+// ── Vocabulary teach-back overlay ──────────────────────────────────────────
+
+function _showVaultTeachBackOverlay(passage) {
+  if (!_container) return;
+
+  const tb = VAULT_TEACHBACK[_currentCat] || VAULT_TEACHBACK.default;
+
+  const existing = document.getElementById('wv-teachback-overlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id        = 'wv-teachback-overlay';
+  overlay.className = 'wv-teachback-overlay';
+  overlay.innerHTML = `
+    <div class="wv-tb-panel">
+      <div class="wv-tb-header">
+        <span class="wv-tb-icon">${tb.icon}</span>
+        <h3 class="wv-tb-title">Quick Skill Reminder</h3>
+      </div>
+      <p class="wv-tb-rule">${tb.rule}</p>
+      <div class="wv-tb-example">${tb.example}</div>
+      <p class="wv-tb-tip">💡 ${tb.tip}</p>
+      <button class="btn btn--primary wv-tb-btn" id="wv-tb-got-it">
+        Got it — Try again →
+      </button>
+    </div>`;
+
+  _container.querySelector('.wv-game')?.appendChild(overlay);
+
+  document.getElementById('wv-tb-got-it')?.addEventListener('click', () => {
+    overlay.remove();
+    // Reset fills so learner retries from scratch
+    _bankWords.forEach(w => { w.used = false; });
+    _blankFills.fill(null);
+    _passageWrongCount = 0;
+    _renderText(passage);
+    _renderBank(passage);
+    const fb = document.getElementById('wv-feedback');
+    if (fb) fb.hidden = true;
+  });
+
+  setTimeout(() => document.getElementById('wv-tb-got-it')?.focus(), 100);
 }
 
 // ── Post-answer Clue Explanation ───────────────────────────────────────────
