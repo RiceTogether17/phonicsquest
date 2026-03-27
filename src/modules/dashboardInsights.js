@@ -9,6 +9,7 @@
 import { store } from './store.js';
 import { getActiveProfile } from './profiles.js';
 import { humaniseSkill } from './recommendations.js';
+import { getLearnerReadinessSummary } from './masteryEngine.js';
 
 const SHORT_VOWEL_GROUPS = ['short-a', 'short-e', 'short-i', 'short-o', 'short-u'];
 const VOWEL_LABELS = {
@@ -371,4 +372,82 @@ export function getRecentPatternInsights() {
   }
 
   return insights.slice(0, 4);
+}
+
+/**
+ * Generate a concise "10-second parent coaching card" from real store data.
+ * Combines weekly stats, mastery readiness signals, and a single weekly focus.
+ * @returns {{
+ *   weekDays: number,
+ *   weekWords: number,
+ *   weekXp: number,
+ *   streak: number,
+ *   overallSignal: string,
+ *   signalLabel: string,
+ *   signalEmoji: string,
+ *   domainsAtRisk: Array<{label:string, icon:string}>,
+ *   weeklyFocus: string,
+ *   reviewsDue: number,
+ *   reviewNote: string,
+ * }}
+ */
+export function getParentCoachingCard() {
+  const readiness   = getLearnerReadinessSummary();
+  const wordHistory = store.get('wordHistory') || [];
+  const streak      = store.get('streak') || 0;
+
+  // 7-day stats
+  const now    = Date.now();
+  const WEEK   = 7 * 24 * 3600 * 1000;
+  const recent = wordHistory.filter(h => h.timestamp && now - new Date(h.timestamp).getTime() < WEEK);
+
+  const weekWords  = new Set(recent.map(h => h.word).filter(Boolean)).size;
+  const weekXp     = store.get('sessionXpToday') || 0; // proxy — limited without weekly XP accumulation
+
+  // Days played this week (from challengeCalendar + lastPlayDate)
+  const calendar  = store.get('challengeCalendar') || [];
+  const today     = new Date().toDateString();
+  const daysAgo   = (dStr) => {
+    const d = new Date(dStr);
+    return isNaN(d) ? Infinity : Math.floor((now - d.getTime()) / 86400000);
+  };
+  const weekDays = new Set(
+    calendar.filter(d => daysAgo(d) < 7).concat(
+      store.get('lastPlayDate') === today ? [today] : []
+    )
+  ).size;
+
+  // Signal labels
+  const SIGNAL_META = {
+    'on-track':       { label: 'On track',       emoji: '✅' },
+    'needs-practice': { label: 'Needs practice', emoji: '⚠️' },
+    'at-risk':        { label: 'At risk',         emoji: '🔴' },
+    'no-data':        { label: 'Not enough data', emoji: '📊' },
+  };
+  const meta = SIGNAL_META[readiness.overallSignal] || SIGNAL_META['no-data'];
+
+  // Weekly focus: first at-risk domain, else first needs-practice, else generic praise
+  const focusDomain = readiness.domainsAtRisk[0] || readiness.needsPractice?.[0] || null;
+  const weeklyFocus = focusDomain
+    ? `Focus this week: ${focusDomain.icon} ${focusDomain.label}`
+    : 'Great work across all areas — keep the daily habit going!';
+
+  // Review note
+  const reviewNote = readiness.reviewsDue > 0
+    ? `${readiness.reviewsDue} word${readiness.reviewsDue > 1 ? 's' : ''} due for review today`
+    : 'No review words due today';
+
+  return {
+    weekDays,
+    weekWords,
+    weekXp,
+    streak,
+    overallSignal:  readiness.overallSignal,
+    signalLabel:    meta.label,
+    signalEmoji:    meta.emoji,
+    domainsAtRisk:  readiness.domainsAtRisk,
+    weeklyFocus,
+    reviewsDue:     readiness.reviewsDue,
+    reviewNote,
+  };
 }

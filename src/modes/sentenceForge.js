@@ -61,6 +61,49 @@ let _sessionClueMissionTotal = 0;
 // Skill clue panel – dismissed once per sentence after "Got it"
 let _skillClueDismissed = false;
 
+// Wrong-attempt counter per sentence — resets each new sentence
+let _sentenceWrongCount = 0;
+
+// ── Sentence skill teach-back content ───────────────────────────────────────
+const SENTENCE_SKILL_TEACHBACK = {
+  connector_clue: {
+    icon: '🔗',
+    rule: 'Connectors link two ideas. Choose the connector that matches the relationship.',
+    example: '"She was tired, BUT she kept working." — "He was late BECAUSE his bus broke down."',
+    tip: 'Ask: contrast (but/although), reason (because/since), result (so/therefore), addition (and/also)?',
+  },
+  comparison_structure: {
+    icon: '⚖️',
+    rule: 'Comparisons use -er + than for short adjectives, or more + adjective + than for longer ones.',
+    example: '"This box is BIGGER than that one." — "She is MORE careful than her brother."',
+    tip: 'Short adjective (1–2 syllables): add -er. Long adjective (3+ syllables): use "more".',
+  },
+  modal_order: {
+    icon: '🛡️',
+    rule: 'Modal verbs (can, should, must, could, would) go BEFORE the base verb — no "to" needed.',
+    example: '"You SHOULD eat vegetables." — "He CAN swim fast." — "They MUST leave now."',
+    tip: '"She must go" ✓ · "She must to go" ✗ — modals never need "to".',
+  },
+  tense_clue: {
+    icon: '⏱️',
+    rule: 'The tense shows WHEN something happens. Look for time-clue words first.',
+    example: '"Yesterday, she WALKED home." — "Right now, he IS RUNNING." — "Tomorrow, we WILL travel."',
+    tip: 'Find the time word (yesterday / now / tomorrow / since) — it tells you which tense fits.',
+  },
+  preposition_clue: {
+    icon: '📍',
+    rule: 'Prepositions show time, place, or direction: in, on, at, by, with, for, from, to.',
+    example: '"The cat is ON the chair." — "We eat AT 7." — "She walked TO school."',
+    tip: 'Ask: WHERE is it? WHEN did it happen? HOW was it done? The answer starts with a preposition.',
+  },
+  word_order: {
+    icon: '🔨',
+    rule: 'English sentences follow the order: Subject → Verb → Object (SVO).',
+    example: '"The dog (S) chased (V) the ball (O)." — "She (S) reads (V) books (O) every day."',
+    tip: 'Find WHO is doing the action first — that is the Subject, and it goes at the start.',
+  },
+};
+
 const LEVEL_SKILL_KEYS = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
 const LEVEL_TAG_LABELS = {
   connector_clue: '🔗 Connectors',
@@ -173,6 +216,7 @@ function _showSentence() {
   _clueMissionDone   = false;
   _clueMissionResult = null;
   _skillClueDismissed = false;
+  _sentenceWrongCount = 0;
 
   if (entry.clueMission) {
     _renderClueMission(entry);
@@ -529,17 +573,70 @@ function _checkAnswer(entry, punct) {
     gamification.recordWrong();
     audio.playSfx('wrong');
     mascot.encourage();
+    _sentenceWrongCount++;
 
     // Targeted diagnostic hint using sentence metadata
     const hint = diagnoseBuildError(entry, builtWords, cleanTarget);
-    _showFeedback(`❌ ${hint}`, false);
 
     const area = document.getElementById('sfq-answer-area');
     area?.classList.remove('sfq-shake');
     void area?.offsetWidth;
     area?.classList.add('sfq-shake');
     setTimeout(() => area?.classList.remove('sfq-shake'), 500);
+
+    // On 2nd wrong attempt: show teach-back overlay instead of inline hint
+    if (_sentenceWrongCount >= 2) {
+      _showFeedback('❌ Let\'s look at the rule, then try again!', false);
+      setTimeout(() => _showSentenceTeachBackOverlay(entry, punct), 1000);
+    } else {
+      _showFeedback(`❌ ${hint}`, false);
+    }
   }
+}
+
+// ── Sentence teach-back overlay ──────────────────────────────────────────────
+
+function _showSentenceTeachBackOverlay(entry, punct) {
+  if (!_container) return;
+
+  // Pick the most relevant skill for this sentence
+  const primarySkill = (entry.sentenceSkills || [])[0] || 'word_order';
+  const tb = SENTENCE_SKILL_TEACHBACK[primarySkill] || SENTENCE_SKILL_TEACHBACK.word_order;
+
+  const existing = document.getElementById('sfq-teachback-overlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id        = 'sfq-teachback-overlay';
+  overlay.className = 'sfq-teachback-overlay';
+  overlay.innerHTML = `
+    <div class="sfq-tb-panel">
+      <div class="sfq-tb-header">
+        <span class="sfq-tb-icon">${tb.icon}</span>
+        <h3 class="sfq-tb-title">Quick Skill Reminder</h3>
+      </div>
+      <p class="sfq-tb-rule">${tb.rule}</p>
+      <div class="sfq-tb-example">${tb.example}</div>
+      <p class="sfq-tb-tip">💡 ${tb.tip}</p>
+      <button class="btn btn--primary sfq-tb-btn" id="sfq-tb-got-it">
+        Got it — Try again →
+      </button>
+    </div>`;
+
+  _container.querySelector('.sfq-game')?.appendChild(overlay);
+  document.getElementById('sfq-tb-got-it')?.addEventListener('click', () => {
+    overlay.remove();
+    // Reset answer slots so learner can retry with a fresh slate
+    _bankWords.forEach(w => (w.used = false));
+    _answerSlots = [];
+    _sentenceWrongCount = 0;
+    _renderBank();
+    _renderAnswer();
+    const fbEl = document.getElementById('sfq-feedback');
+    if (fbEl) { fbEl.hidden = true; }
+  });
+
+  setTimeout(() => document.getElementById('sfq-tb-got-it')?.focus(), 100);
 }
 
 function _recordSessionSkill(skill, correct) {

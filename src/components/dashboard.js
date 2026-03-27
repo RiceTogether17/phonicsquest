@@ -26,7 +26,9 @@ import {
   getRecommendedActions,
   getRecentPatternInsights,
   getMoeOutcomeMappings,
+  getParentCoachingCard,
 } from '../modules/dashboardInsights.js';
+import { renderCurriculumMap } from './curriculumMap.js';
 import {
   getVocabularyCategoryReport,
   getGrammarCategoryReport,
@@ -55,6 +57,9 @@ export function renderDashboard(container, opts = {}) {
   const stats = progress.getOverallStats();
 
   container.innerHTML = `
+    <!-- B0: Parent Coaching Card -->
+    <div id="dash-coaching-card"></div>
+
     <!-- B1: Learner Summary -->
     <div id="dash-learner-summary"></div>
 
@@ -101,6 +106,9 @@ export function renderDashboard(container, opts = {}) {
       <canvas id="chart-mastery" aria-label="Group mastery chart"></canvas>
     </div>
     <div class="mastery-bar-list" id="mastery-bars"></div>
+
+    <!-- Curriculum Map -->
+    <div id="dash-curriculum-map" style="margin-top:24px"></div>
 
     <!-- Learning Path (existing) -->
     <h3 class="dash-section-title" style="margin-top:24px">Learning Path</h3>
@@ -152,6 +160,7 @@ export function renderDashboard(container, opts = {}) {
   `;
 
   // Render new insight sections
+  _renderParentCoachingCard();
   _renderLearnerSummary();
   _renderRecommendedActions();
   _renderLiteracyDomains();
@@ -162,6 +171,7 @@ export function renderDashboard(container, opts = {}) {
   _renderClassManagement();
 
   // Render existing sections
+  _renderCurriculumMapSection();
   _renderMasteryChart(stats);
   _renderMasteryBars(stats);
   _renderLearningPath(stats);
@@ -170,6 +180,73 @@ export function renderDashboard(container, opts = {}) {
   _bindActions();
 }
 
+
+function _renderCurriculumMapSection() {
+  const container = document.getElementById('dash-curriculum-map');
+  if (!container) return;
+  container.innerHTML = `<h3 class="dash-section-title">Learning Journey Map</h3><div id="dash-cm-inner"></div>`;
+  const inner = document.getElementById('dash-cm-inner');
+  if (inner) renderCurriculumMap(inner);
+}
+
+function _renderParentCoachingCard() {
+  const container = document.getElementById('dash-coaching-card');
+  if (!container) return;
+
+  const card = getParentCoachingCard();
+
+  const signalClass = {
+    'on-track':       'coaching-card--green',
+    'needs-practice': 'coaching-card--amber',
+    'at-risk':        'coaching-card--red',
+    'no-data':        'coaching-card--grey',
+  }[card.overallSignal] || 'coaching-card--grey';
+
+  const atRiskHtml = card.domainsAtRisk.length
+    ? `<div class="coaching-at-risk">
+        <span class="coaching-at-risk-label">🔴 At risk:</span>
+        ${card.domainsAtRisk.map(d => `<span class="coaching-domain-chip coaching-chip--red">${d.icon} ${d.label}</span>`).join('')}
+       </div>`
+    : '';
+
+  const reviewHtml = card.reviewsDue > 0
+    ? `<div class="coaching-review">
+        <span class="coaching-review-icon">🔁</span>
+        <span class="coaching-review-text">${card.reviewNote}</span>
+       </div>`
+    : '';
+
+  container.innerHTML = `
+    <div class="coaching-card ${signalClass}" aria-label="Parent coaching summary">
+      <div class="coaching-card-header">
+        <span class="coaching-signal-badge">${card.signalEmoji} ${card.signalLabel}</span>
+        <span class="coaching-card-title">This Week's Learning Snapshot</span>
+      </div>
+
+      <div class="coaching-stats-row">
+        <div class="coaching-stat">
+          <span class="coaching-stat-value">${card.weekDays}</span>
+          <span class="coaching-stat-label">days active</span>
+        </div>
+        <div class="coaching-stat">
+          <span class="coaching-stat-value">${card.weekWords}</span>
+          <span class="coaching-stat-label">words practised</span>
+        </div>
+        <div class="coaching-stat">
+          <span class="coaching-stat-value">${card.streak}</span>
+          <span class="coaching-stat-label">day streak</span>
+        </div>
+      </div>
+
+      <div class="coaching-focus">
+        <span class="coaching-focus-icon">🎯</span>
+        <span class="coaching-focus-text">${card.weeklyFocus}</span>
+      </div>
+
+      ${atRiskHtml}
+      ${reviewHtml}
+    </div>`;
+}
 
 function _renderCategoryReporting() {
   const container = document.getElementById('dash-reporting-section');
