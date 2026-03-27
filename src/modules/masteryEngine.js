@@ -1,63 +1,63 @@
 /**
- * PhonicsQuest – Mastery 2.0 Engine
+ * PhonicsQuest – Mastery 2.1 Engine
  *
- * Multi-dimensional mastery model that goes beyond binary "mastered / not mastered".
- * Three dimensions per word:
+ * Multi-dimensional mastery model. Three dimensions per word:
  *   accuracy   – correct / attempts ratio
- *   retention  – how well spaced-repetition intervals have been stretched (0–1)
- *   speed      – response time relative to a target (0–1, faster = higher)
+ *   retention  – depth of SRS interval reached (0–1)
+ *   speed      – median response time vs 3 s target (0–1, optional)
  *
- * Domain mastery aggregates across phonics groups and quest skills.
- * Readiness signals tell parents and the app whether a learner is ready to advance,
- * needs more practice, or is at risk of falling behind.
+ * Five-state readiness model (replaces the old 3-state):
+ *   just-started  < 20%
+ *   building      20–49%
+ *   consolidating 50–69%
+ *   on-track      70–84%
+ *   mastered      ≥ 85%
+ *
+ * Domain mastery aggregates all phonics groups that have been practised
+ * (not just the 5 short-vowel groups) plus all quest skill buckets.
  *
  * Public API:
- *   getWordMastery(wordId)                  → { accuracy, retention, speed, composite }
- *   getDomainMastery()                      → [{ id, label, icon, composite, signal }]
- *   getReadinessSignal(domainId)            → 'on-track' | 'needs-practice' | 'at-risk'
- *   getLearnerReadinessSummary()            → { overallSignal, domainsAtRisk, strongDomains, nextFocus }
+ *   getWordMastery(wordId)              → { accuracy, retention, speed, composite }
+ *   getDomainMastery()                  → array of domain objects
+ *   getReadinessState(score)            → 5-state label
+ *   getReadinessSignal(score)           → 3-state label (backward compat)
+ *   getProgressionReadiness(domainId)   → { decision, label, canAdvance }
+ *   getLearnerReadinessSummary()        → comprehensive readiness snapshot
+ *   getWeeklyDomainPractice()           → { [questKey]: attemptCount } last 7 days
  */
 
 import { store } from './store.js';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const SRS_INTERVALS    = [1, 3, 7, 14, 30]; // days per interval level 0–4
-const TARGET_SPEED_MS  = 3000;              // under 3 s counts as "fast"
-const MIN_ATTEMPTS     = 3;                 // minimum attempts before mastery is meaningful
+const SRS_INTERVALS   = [1, 3, 7, 14, 30];
+const TARGET_SPEED_MS = 3000;
+const MIN_ATTEMPTS    = 3;
 
-const DOMAIN_DEFS = [
-  { id: 'phonics',        label: 'Phonics / Decoding',  icon: '🔤', source: 'groupMastery',  keys: ['short-a','short-e','short-i','short-o','short-u'] },
-  { id: 'sentenceSkills', label: 'Sentence Skills',      icon: '🔨', source: 'questMastery',  keys: ['sentenceForge'] },
-  { id: 'grammarCloze',   label: 'Grammar Cloze',        icon: '🏰', source: 'questMastery',  keys: ['clozeCastle'] },
-  { id: 'vocabCloze',     label: 'Vocabulary Cloze',     icon: '🔑', source: 'questMastery',  keys: ['wordVault'] },
-  { id: 'editingQuest',   label: 'Editing Quest',        icon: '✏️', source: 'questMastery',  keys: ['editingQuest'] },
-  { id: 'writingQuest',   label: 'Writing Quest',        icon: '📝', source: 'questMastery',  keys: ['writingQuest'] },
-];
-
-// Thresholds for readiness signals
-const SIGNAL_THRESHOLDS = {
-  ON_TRACK:       0.70,
-  NEEDS_PRACTICE: 0.50,
-  // below NEEDS_PRACTICE → at-risk
+// Five-state readiness thresholds
+const RT = {
+  MASTERED:      0.85,
+  ON_TRACK:      0.70,
+  CONSOLIDATING: 0.50,
+  BUILDING:      0.20,
 };
+
+// Domain definitions — phonics uses ALL available groupMastery keys (computed dynamically)
+const QUEST_DOMAIN_DEFS = [
+  { id: 'sentenceSkills', label: 'Sentence Skills',  icon: '🔨', questKey: 'sentenceForge' },
+  { id: 'grammarCloze',   label: 'Grammar Cloze',    icon: '🏰', questKey: 'clozeCastle'  },
+  { id: 'vocabCloze',     label: 'Vocabulary Cloze', icon: '🔑', questKey: 'wordVault'    },
+  { id: 'editingQuest',   label: 'Editing Quest',    icon: '✏️', questKey: 'editingQuest' },
+  { id: 'writingQuest',   label: 'Writing Quest',    icon: '📝', questKey: 'writingQuest' },
+];
 
 // ── Internal helpers ─────────────────────────────────────────────────────────
 
-/**
- * Retention score: the fraction of maximum SRS interval reached.
- * 0 = never reviewed / interval 0, 1 = longest interval (30 days).
- */
 function _retentionScore(stat) {
   if (!stat || (stat.attempts || 0) < MIN_ATTEMPTS) return 0;
-  const interval = stat.reviewInterval ?? 0;
-  return interval / (SRS_INTERVALS.length - 1); // 0 → 0.0, 4 → 1.0
+  return (stat.reviewInterval ?? 0) / (SRS_INTERVALS.length - 1);
 }
 
-/**
- * Speed score: derived from learningEvents for this word.
- * We take the median response time of correct answers and map to 0–1.
- */
 function _speedScore(wordId) {
   const events = (store.get('learningEvents') || [])
     .filter(e =>
@@ -69,146 +69,184 @@ function _speedScore(wordId) {
   if (!events.length) return null;
   const times = events.map(e => e.meta.responseMs).sort((a, b) => a - b);
   const median = times[Math.floor(times.length / 2)];
-  // Linear mapping: 0ms → 1.0, TARGET_SPEED_MS → 0.5, 2×TARGET → 0.0 (clamped)
-  const score = Math.max(0, 1 - (median / (2 * TARGET_SPEED_MS)));
-  return Math.min(1, score);
+  return Math.min(1, Math.max(0, 1 - median / (2 * TARGET_SPEED_MS)));
 }
 
-/**
- * Average quest-mastery score for an array of quest keys.
- */
-function _avgQuestScore(questKeys) {
-  const qm = store.get('questMastery') || {};
-  let total = 0, count = 0;
-  for (const qk of questKeys) {
-    const bucket = qm[qk] || {};
-    const scores = Object.values(bucket).filter(s => typeof s === 'number');
-    if (scores.length) {
-      total += scores.reduce((a, b) => a + b, 0) / scores.length;
-      count++;
-    }
-  }
-  return count > 0 ? total / count : null;
+function _avgQuestScore(questKey) {
+  const bucket = (store.get('questMastery') || {})[questKey] || {};
+  const scores = Object.values(bucket).filter(s => typeof s === 'number');
+  return scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
 }
 
-/**
- * Average group-mastery score for an array of group keys.
- */
-function _avgGroupScore(groupKeys) {
+/** Average mastery for ALL phonics groups that have been practised. */
+function _avgPhonicsScore() {
   const gm = store.get('groupMastery') || {};
-  const scores = groupKeys.map(k => gm[k]).filter(s => typeof s === 'number');
-  if (!scores.length) return null;
-  return scores.reduce((a, b) => a + b, 0) / scores.length;
+  const scores = Object.values(gm).filter(s => typeof s === 'number');
+  return scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
+}
+
+/** Average word-level SRS retention across all words with enough attempts. */
+function _avgWordRetention() {
+  const wordStats = store.get('wordStats') || {};
+  const retentions = Object.values(wordStats)
+    .filter(s => (s?.attempts || 0) >= MIN_ATTEMPTS)
+    .map(s => _retentionScore(s));
+  return retentions.length
+    ? retentions.reduce((a, b) => a + b, 0) / retentions.length
+    : 0;
 }
 
 // ── Public API ───────────────────────────────────────────────────────────────
 
 /**
  * Multi-dimensional mastery for a single word.
- * @param {string} wordId
- * @returns {{ accuracy: number|null, retention: number, speed: number|null, composite: number|null }}
  */
 export function getWordMastery(wordId) {
-  const wordStats = store.get('wordStats') || {};
-  const stat      = wordStats[wordId];
-
-  const accuracy  = stat && stat.attempts >= MIN_ATTEMPTS
-    ? (stat.correct || 0) / stat.attempts
-    : null;
+  const stat     = (store.get('wordStats') || {})[wordId];
+  const accuracy = stat && stat.attempts >= MIN_ATTEMPTS
+    ? (stat.correct || 0) / stat.attempts : null;
   const retention = _retentionScore(stat);
   const speed     = _speedScore(wordId);
 
-  // Composite: weighted average of dimensions with data
-  // weights: accuracy 50%, retention 30%, speed 20%
-  let composite = null;
-  let wSum = 0, vSum = 0;
-  if (accuracy !== null)  { vSum += accuracy  * 0.5; wSum += 0.5; }
-  if (retention > 0)      { vSum += retention * 0.3; wSum += 0.3; }
-  if (speed !== null)     { vSum += speed     * 0.2; wSum += 0.2; }
+  let composite = null, wSum = 0, vSum = 0;
+  if (accuracy  !== null) { vSum += accuracy  * 0.5; wSum += 0.5; }
+  if (retention  > 0)     { vSum += retention * 0.3; wSum += 0.3; }
+  if (speed     !== null) { vSum += speed     * 0.2; wSum += 0.2; }
   if (wSum > 0) composite = Math.min(1, vSum / wSum);
 
   return { accuracy, retention, speed, composite };
 }
 
 /**
- * Domain mastery summary across all 6 literacy domains.
- * @returns {Array<{ id, label, icon, composite: number|null, signal: string }>}
+ * Domain mastery for all domains including full phonics coverage.
+ * @returns {Array<{ id, label, icon, raw, composite, state, signal }>}
  */
 export function getDomainMastery() {
-  return DOMAIN_DEFS.map(def => {
-    const rawScore = def.source === 'questMastery'
-      ? _avgQuestScore(def.keys)
-      : _avgGroupScore(def.keys);
+  const avgRetention = _avgWordRetention();
+  const phonicsRaw   = _avgPhonicsScore();
+  const phonicsComp  = phonicsRaw !== null
+    ? Math.min(1, phonicsRaw * 0.8 + avgRetention * 0.2)
+    : null;
 
-    // Blend raw score with word-level retention where possible
-    let composite = rawScore;
-    if (def.source === 'groupMastery') {
-      // Augment phonics domain with average retention across practiced words
-      const wordStats = store.get('wordStats') || {};
-      const retentions = Object.values(wordStats)
-        .filter(s => (s.attempts || 0) >= MIN_ATTEMPTS)
-        .map(s => _retentionScore(s));
-      if (retentions.length) {
-        const avgRetention = retentions.reduce((a, b) => a + b, 0) / retentions.length;
-        // 80% raw accuracy + 20% retention
-        composite = rawScore !== null
-          ? rawScore * 0.8 + avgRetention * 0.2
-          : null;
-      }
-    }
+  const phDomain = {
+    id: 'phonics', label: 'Phonics / Decoding', icon: '🔤',
+    raw:       phonicsRaw,
+    composite: phonicsComp,
+    state:     getReadinessState(phonicsComp),
+    signal:    getReadinessSignal(phonicsComp),
+  };
 
+  const questDomains = QUEST_DOMAIN_DEFS.map(def => {
+    const raw  = _avgQuestScore(def.questKey);
+    const comp = raw;   // quest mastery already aggregates skill accuracy
     return {
       ...def,
-      raw:       rawScore,
-      composite,
-      signal:    composite !== null ? getReadinessSignal(composite) : 'no-data',
+      raw,
+      composite: comp,
+      state:  getReadinessState(comp),
+      signal: getReadinessSignal(comp),
     };
   });
+
+  return [phDomain, ...questDomains];
 }
 
 /**
- * Map a composite score to a readiness signal.
- * @param {number} score  0–1
- * @returns {'on-track'|'needs-practice'|'at-risk'|'no-data'}
+ * Map a score (0–1) to a five-state readiness label.
+ */
+export function getReadinessState(score) {
+  if (score === null || score === undefined) return 'no-data';
+  if (score >= RT.MASTERED)      return 'mastered';
+  if (score >= RT.ON_TRACK)      return 'on-track';
+  if (score >= RT.CONSOLIDATING) return 'consolidating';
+  if (score >= RT.BUILDING)      return 'building';
+  return 'just-started';
+}
+
+/**
+ * Map a score to a 3-state signal (backward-compatible with dashboard rendering).
  */
 export function getReadinessSignal(score) {
   if (score === null || score === undefined) return 'no-data';
-  if (score >= SIGNAL_THRESHOLDS.ON_TRACK)       return 'on-track';
-  if (score >= SIGNAL_THRESHOLDS.NEEDS_PRACTICE) return 'needs-practice';
+  if (score >= RT.ON_TRACK)      return 'on-track';
+  if (score >= RT.CONSOLIDATING) return 'needs-practice';
   return 'at-risk';
 }
 
 /**
- * Overall learner readiness summary for the coaching card.
- * @returns {{
- *   overallSignal: string,
- *   domainsAtRisk: Array<{id, label, icon}>,
- *   strongDomains:  Array<{id, label, icon}>,
- *   nextFocus:      string,
- *   reviewsDue:     number,
- * }}
+ * Human-readable label for a readiness state.
+ */
+export function readinessStateLabel(state) {
+  return {
+    'mastered':      'Mastered ✅',
+    'on-track':      'On track',
+    'consolidating': 'Consolidating',
+    'building':      'Building',
+    'just-started':  'Just started',
+    'no-data':       'No data yet',
+  }[state] || state;
+}
+
+/**
+ * Progression decision for a domain:
+ *   advance     → mastered, ready to move on
+ *   continue    → on-track, keep going at this level
+ *   consolidate → consolidating, secure before advancing
+ *   review      → building or just-started, needs more practice
+ */
+export function getProgressionReadiness(domainId) {
+  const domains = getDomainMastery();
+  const domain  = domains.find(d => d.id === domainId);
+  if (!domain || domain.composite === null) {
+    return { decision: 'no-data', label: 'Not enough data yet', canAdvance: false };
+  }
+  const s = domain.state;
+  if (s === 'mastered')      return { decision: 'advance',     label: 'Ready to advance ✅',           canAdvance: true  };
+  if (s === 'on-track')      return { decision: 'continue',    label: 'On track — keep going',         canAdvance: false };
+  if (s === 'consolidating') return { decision: 'consolidate', label: 'Consolidate before advancing ⚠️', canAdvance: false };
+  return                           { decision: 'review',       label: 'Needs more practice 🔴',          canAdvance: false };
+}
+
+/**
+ * Count quest attempts per domain in the last 7 days.
+ * @returns {{ [questKey]: number }}
+ */
+export function getWeeklyDomainPractice() {
+  const attempts = store.get('questAttempts') || [];
+  const cutoff   = Date.now() - 7 * 24 * 3600 * 1000;
+  const counts   = {};
+  for (const a of attempts) {
+    if (a.timestamp && new Date(a.timestamp).getTime() >= cutoff) {
+      counts[a.quest] = (counts[a.quest] || 0) + 1;
+    }
+  }
+  return counts;
+}
+
+/**
+ * Comprehensive learner readiness summary for coaching card and dashboard.
  */
 export function getLearnerReadinessSummary() {
   const domains = getDomainMastery().filter(d => d.composite !== null);
 
-  const domainsAtRisk   = domains.filter(d => d.signal === 'at-risk');
-  const needsPractice   = domains.filter(d => d.signal === 'needs-practice');
-  const strongDomains   = domains.filter(d => d.signal === 'on-track');
+  const domainsAtRisk    = domains.filter(d => d.signal === 'at-risk');
+  const needsPractice    = domains.filter(d => d.signal === 'needs-practice');
+  const strongDomains    = domains.filter(d => d.signal === 'on-track');
+  const masteredDomains  = domains.filter(d => d.state  === 'mastered');
 
-  // Overall signal: worst single domain signal
-  const overallSignal = domainsAtRisk.length   > 0 ? 'at-risk'
-    : needsPractice.length > 0 ? 'needs-practice'
-    : domains.length > 0       ? 'on-track'
+  const overallSignal = domainsAtRisk.length  > 0 ? 'at-risk'
+    : needsPractice.length > 0               ? 'needs-practice'
+    : domains.length > 0                     ? 'on-track'
     : 'no-data';
 
-  // Next focus: lowest-scoring domain with data
+  // Weakest domain with data
   const sorted = [...domains].sort((a, b) => (a.composite ?? 1) - (b.composite ?? 1));
   const weakest = sorted[0];
   const nextFocus = weakest
     ? `${weakest.icon} ${weakest.label} (${Math.round((weakest.composite ?? 0) * 100)}%)`
     : 'Keep practising across all areas!';
 
-  // Count SRS reviews due today
+  // SRS reviews due
   const wordStats = store.get('wordStats') || {};
   const now = Date.now();
   let reviewsDue = 0;
@@ -219,5 +257,21 @@ export function getLearnerReadinessSummary() {
     }
   }
 
-  return { overallSignal, domainsAtRisk, needsPractice, strongDomains, nextFocus, reviewsDue };
+  // Progression decision for weakest domain
+  const progressionDecision = weakest
+    ? getProgressionReadiness(weakest.id)
+    : null;
+
+  return {
+    overallSignal,
+    domainsAtRisk,
+    needsPractice,
+    strongDomains,
+    masteredDomains,
+    nextFocus,
+    reviewsDue,
+    progressionDecision,
+    weakestDomain: weakest || null,
+    domains,
+  };
 }

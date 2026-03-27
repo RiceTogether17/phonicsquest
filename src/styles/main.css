@@ -4499,6 +4499,7 @@ input, select, textarea { font-family: inherit; }
 
 /* Game area */
 .sfq-game {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -7294,4 +7295,81 @@ input, select, textarea { font-family: inherit; }
 @media (max-width: 600px) {
   .cm-phase-grid, .cm-domain-grid { grid-template-columns: 1fr 1fr; }
   .coaching-stats-row { gap: var(--space-3); }
+}
+
+/* ── EditingQuest Teach-Back Overlay ─────────────────────────────────────── */
+.eq-teachback-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200; border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+.eq-teachback-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  max-width: 480px; width: 100%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column; gap: var(--space-3);
+}
+.eq-teachback-icon { font-size: 2rem; text-align: center; }
+.eq-teachback-heading {
+  font-size: var(--font-lg); font-weight: 700;
+  color: var(--color-text); text-align: center; margin: 0;
+}
+.eq-teachback-rule {
+  font-size: var(--font-sm); color: var(--color-text);
+  background: #f0f0ff; border-left: 3px solid var(--color-primary);
+  padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm);
+  margin: 0;
+}
+.eq-teachback-example {
+  font-size: var(--font-sm); color: var(--color-text-muted);
+  font-style: italic; padding: var(--space-2) var(--space-3);
+  background: var(--color-bg); border-radius: var(--radius-sm);
+}
+.eq-teachback-tip {
+  font-size: var(--font-sm); color: var(--color-text); margin: 0;
+}
+.eq-teachback-answer {
+  font-size: var(--font-sm);
+  background: #f0fdf4; border: 1px solid #86efac;
+  padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm);
+  color: #166534;
+}
+.eq-teachback-explanation {
+  font-size: var(--font-xs); color: var(--color-text-muted); margin: 0;
+}
+.eq-teachback-continue { align-self: stretch; margin-top: var(--space-1); }
+
+/* ── Parent Coaching Card 2.0 ────────────────────────────────────────────── */
+.coaching-advancement {
+  display: flex; align-items: center; gap: var(--space-2);
+  background: #f0fdf4; border: 1px solid #86efac;
+  border-radius: var(--radius-md); padding: var(--space-2) var(--space-3);
+  font-size: var(--font-sm); color: #166534; font-weight: 600;
+  margin-bottom: var(--space-3);
+}
+.coaching-advancement--consolidate {
+  background: #fffbeb; border-color: #fcd34d; color: #92400e;
+}
+.coaching-strength {
+  font-size: var(--font-sm); color: var(--color-text);
+  padding: var(--space-1) 0;
+}
+.coaching-concern {
+  font-size: var(--font-sm); color: #b45309;
+  padding: var(--space-1) 0;
+}
+.coaching-priority {
+  background: #f0f0ff; border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  font-size: var(--font-sm); font-weight: 600; color: var(--color-text);
+  margin-top: var(--space-2);
+}
+.coaching-priority-why {
+  font-size: var(--font-xs); color: var(--color-text-muted);
+  margin-top: var(--space-1); font-weight: 400;
 }

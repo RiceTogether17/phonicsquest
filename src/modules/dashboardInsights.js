@@ -9,7 +9,12 @@
 import { store } from './store.js';
 import { getActiveProfile } from './profiles.js';
 import { humaniseSkill } from './recommendations.js';
-import { getLearnerReadinessSummary } from './masteryEngine.js';
+import {
+  getLearnerReadinessSummary,
+  getWeeklyDomainPractice,
+  getProgressionReadiness,
+  readinessStateLabel,
+} from './masteryEngine.js';
 
 const SHORT_VOWEL_GROUPS = ['short-a', 'short-e', 'short-i', 'short-o', 'short-u'];
 const VOWEL_LABELS = {
@@ -375,79 +380,124 @@ export function getRecentPatternInsights() {
 }
 
 /**
- * Generate a concise "10-second parent coaching card" from real store data.
- * Combines weekly stats, mastery readiness signals, and a single weekly focus.
- * @returns {{
- *   weekDays: number,
- *   weekWords: number,
- *   weekXp: number,
- *   streak: number,
- *   overallSignal: string,
- *   signalLabel: string,
- *   signalEmoji: string,
- *   domainsAtRisk: Array<{label:string, icon:string}>,
- *   weeklyFocus: string,
- *   reviewsDue: number,
- *   reviewNote: string,
- * }}
+ * Generate the parent coaching card.
+ *
+ * v2 — uses real accumulated data throughout:
+ *   - weekXp from weeklyXpLog (daily accumulation, not today-only proxy)
+ *   - weekDays derived from questAttempts timestamps (always available)
+ *   - weekWords from wordHistory timestamps
+ *   - domain practice counts from questAttempts
+ *   - actionable advancement decision per weakest domain
+ *   - one clear strength, one clear concern, one weekly priority
  */
 export function getParentCoachingCard() {
-  const readiness   = getLearnerReadinessSummary();
-  const wordHistory = store.get('wordHistory') || [];
-  const streak      = store.get('streak') || 0;
+  const readiness    = getLearnerReadinessSummary();
+  const wordHistory  = store.get('wordHistory') || [];
+  const streak       = store.get('streak') || 0;
+  const now          = Date.now();
+  const WEEK_MS      = 7 * 24 * 3600 * 1000;
+  const weekCutoffMs = now - WEEK_MS;
+  const weekCutoffDate = new Date(weekCutoffMs).toISOString().slice(0, 10);
 
-  // 7-day stats
-  const now    = Date.now();
-  const WEEK   = 7 * 24 * 3600 * 1000;
-  const recent = wordHistory.filter(h => h.timestamp && now - new Date(h.timestamp).getTime() < WEEK);
+  // ── True weekly XP from rolling log ──────────────────────────────────────
+  const xpLog = store.get('weeklyXpLog') || [];
+  const weekXp = xpLog
+    .filter(e => e.date >= weekCutoffDate)
+    .reduce((sum, e) => sum + (e.xp || 0), 0);
 
-  const weekWords  = new Set(recent.map(h => h.word).filter(Boolean)).size;
-  const weekXp     = store.get('sessionXpToday') || 0; // proxy — limited without weekly XP accumulation
+  // ── True weekly words practised from wordHistory timestamps ───────────────
+  const recentWords = wordHistory.filter(
+    h => h.timestamp && new Date(h.timestamp).getTime() >= weekCutoffMs
+  );
+  const weekWords = new Set(recentWords.map(h => h.word).filter(Boolean)).size;
 
-  // Days played this week (from challengeCalendar + lastPlayDate)
-  const calendar  = store.get('challengeCalendar') || [];
-  const today     = new Date().toDateString();
-  const daysAgo   = (dStr) => {
-    const d = new Date(dStr);
-    return isNaN(d) ? Infinity : Math.floor((now - d.getTime()) / 86400000);
-  };
-  const weekDays = new Set(
-    calendar.filter(d => daysAgo(d) < 7).concat(
-      store.get('lastPlayDate') === today ? [today] : []
-    )
-  ).size;
+  // ── Days active this week from questAttempts timestamps ───────────────────
+  const questAttempts = store.get('questAttempts') || [];
+  const activeDays = new Set(
+    questAttempts
+      .filter(a => a.timestamp && new Date(a.timestamp).getTime() >= weekCutoffMs)
+      .map(a => new Date(a.timestamp).toDateString())
+  );
+  // Also include today if lastPlayDate matches
+  if (store.get('lastPlayDate') === new Date().toDateString()) {
+    activeDays.add(new Date().toDateString());
+  }
+  const weekDays = activeDays.size;
 
-  // Signal labels
+  // ── Weekly domain practice counts ─────────────────────────────────────────
+  const domainCounts = getWeeklyDomainPractice(); // { questKey: count }
+
+  // ── Signal meta ───────────────────────────────────────────────────────────
   const SIGNAL_META = {
-    'on-track':       { label: 'On track',       emoji: '✅' },
-    'needs-practice': { label: 'Needs practice', emoji: '⚠️' },
-    'at-risk':        { label: 'At risk',         emoji: '🔴' },
-    'no-data':        { label: 'Not enough data', emoji: '📊' },
+    'on-track':       { label: 'On track',        emoji: '✅' },
+    'needs-practice': { label: 'Needs practice',  emoji: '⚠️' },
+    'at-risk':        { label: 'Needs attention',  emoji: '🔴' },
+    'no-data':        { label: 'Getting started', emoji: '📊' },
   };
-  const meta = SIGNAL_META[readiness.overallSignal] || SIGNAL_META['no-data'];
+  const sigMeta = SIGNAL_META[readiness.overallSignal] || SIGNAL_META['no-data'];
 
-  // Weekly focus: first at-risk domain, else first needs-practice, else generic praise
-  const focusDomain = readiness.domainsAtRisk[0] || readiness.needsPractice?.[0] || null;
-  const weeklyFocus = focusDomain
-    ? `Focus this week: ${focusDomain.icon} ${focusDomain.label}`
-    : 'Great work across all areas — keep the daily habit going!';
+  // ── One clear strength ────────────────────────────────────────────────────
+  const strongDomain = readiness.strongDomains[0] || readiness.masteredDomains[0] || null;
+  const mainStrength = strongDomain
+    ? `${strongDomain.icon} ${strongDomain.label} (${readinessStateLabel(strongDomain.state)})`
+    : 'Still building foundations — every session counts!';
 
-  // Review note
+  // ── One clear concern ─────────────────────────────────────────────────────
+  const concernDomain = readiness.domainsAtRisk[0] || readiness.needsPractice[0] || null;
+  const mainConcern = concernDomain
+    ? `${concernDomain.icon} ${concernDomain.label} needs attention`
+    : null;
+
+  // ── Advancement decision on weakest domain ────────────────────────────────
+  const prog = readiness.progressionDecision;
+  const advancementNote = prog && prog.decision !== 'no-data' ? prog.label : null;
+
+  // ── One weekly priority (with WHY) ────────────────────────────────────────
+  let weeklyPriority, whyPriority;
+  if (concernDomain) {
+    weeklyPriority = `Practise ${concernDomain.icon} ${concernDomain.label} this week`;
+    whyPriority    = prog?.decision === 'consolidate'
+      ? 'Securing this area before moving on will build lasting confidence.'
+      : 'Regular short practice sessions will close the gap quickly.';
+  } else if (readiness.reviewsDue > 0) {
+    weeklyPriority = `Complete ${readiness.reviewsDue} spaced review word${readiness.reviewsDue > 1 ? 's' : ''}`;
+    whyPriority    = 'Reviewing words at the right time is how long-term memory forms.';
+  } else {
+    weeklyPriority = 'Keep the daily habit going — all areas are in good shape';
+    whyPriority    = 'Consistency is the most powerful factor in language learning.';
+  }
+
+  // ── Review note ───────────────────────────────────────────────────────────
   const reviewNote = readiness.reviewsDue > 0
-    ? `${readiness.reviewsDue} word${readiness.reviewsDue > 1 ? 's' : ''} due for review today`
+    ? `${readiness.reviewsDue} word${readiness.reviewsDue > 1 ? 's' : ''} due for review`
     : 'No review words due today';
 
   return {
+    // Weekly stats (all real-data)
     weekDays,
     weekWords,
     weekXp,
     streak,
-    overallSignal:  readiness.overallSignal,
-    signalLabel:    meta.label,
-    signalEmoji:    meta.emoji,
+    domainCounts,
+
+    // Overall signal
+    overallSignal: readiness.overallSignal,
+    signalLabel:   sigMeta.label,
+    signalEmoji:   sigMeta.emoji,
+
+    // Domains
     domainsAtRisk:  readiness.domainsAtRisk,
-    weeklyFocus,
-    reviewsDue:     readiness.reviewsDue,
+    needsPractice:  readiness.needsPractice,
+
+    // Actionable coaching outputs
+    mainStrength,
+    mainConcern,
+    advancementNote,
+    weeklyPriority,
+    whyPriority,
+
+    // Review
+    reviewsDue: readiness.reviewsDue,
     reviewNote,
   };
 }
