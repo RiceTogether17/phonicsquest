@@ -5760,8 +5760,8 @@ input, select, textarea { font-family: inherit; }
    ══════════════════════════════════════════════════════════════════════════ */
 
 .sfq-skill-clue-panel {
-  background: var(--color-warning-light);
-  border: 2px solid var(--color-warning);
+  background: #fff7d6;
+  border: 2px solid #f59e0b;
   border-radius: var(--radius-lg);
   padding: var(--space-5) var(--space-6);
   margin: var(--space-4) 0;
@@ -5769,15 +5769,17 @@ input, select, textarea { font-family: inherit; }
 }
 .sfq-skill-clue-icon { font-size: 2rem; margin-bottom: var(--space-3); display: block; }
 .sfq-skill-clue-prompt {
-  font-size: var(--font-size-md);
-  font-weight: 700;
-  color: var(--text);
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: #5b3a00;
   margin: 0 0 var(--space-2);
+  line-height: 1.5;
 }
 .sfq-skill-clue-detail {
-  font-size: var(--font-size-sm);
-  color: var(--text-muted);
+  font-size: var(--font-size-base);
+  color: #6b4f1d;
   margin: 0 0 var(--space-4);
+  line-height: 1.5;
 }
 .sfq-skill-clue-go { min-width: 200px; }
 
