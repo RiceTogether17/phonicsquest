@@ -950,6 +950,168 @@ class App {
     });
   }
 
+  // ── Onboarding Tutorial ──
+
+  /**
+   * Show the first-run onboarding tutorial modal.
+   * 4 screens explain: pathway, daily order, Best Next Step card, bonus activities.
+   * Stores a flag so it only shows once per install.
+   * @param {object} profile - the newly activated profile
+   */
+  _showOnboardingTutorial(profile) {
+    const isPrimary = profile?.schoolLevel === 'primary';
+    const levelKey  = isPrimary ? 'primary' : 'preschool';
+
+    const TUTORIAL = {
+      preschool: [
+        {
+          icon: '🌱',
+          title: "Your child's Preschool Journey",
+          body: `<p class="ob-intro">PhonicsQuest guides your child through three daily activities:</p>
+                 <ul class="ob-list">
+                   <li><strong>🎯 Blend It!</strong> — sound out letters to make words</li>
+                   <li><strong>👂 Sound skills</strong> — first, last &amp; middle sounds</li>
+                   <li><strong>📚 Giri Stories</strong> — read a short phonics story</li>
+                 </ul>`,
+        },
+        {
+          icon: '📋',
+          title: 'Follow this order each day',
+          body: `<div class="ob-steps">
+                   <div class="ob-step">
+                     <span class="ob-step-num">1</span>
+                     <div><strong>Start with Blend It!</strong><br><small>Step-by-step sound blending</small></div>
+                   </div>
+                   <div class="ob-step">
+                     <span class="ob-step-num">2</span>
+                     <div><strong>Practise one sound skill</strong><br><small>First Sound or Hear &amp; Choose</small></div>
+                   </div>
+                   <div class="ob-step">
+                     <span class="ob-step-num">3</span>
+                     <div><strong>Read one Giri Story</strong><br><small>Short decodable phonics story</small></div>
+                   </div>
+                 </div>`,
+        },
+        {
+          icon: '⭐',
+          title: 'Look for this card every day',
+          body: `<div class="ob-highlight-card">
+                   <div class="ob-highlight-eyebrow">TODAY'S START POINT</div>
+                   <p class="ob-highlight-title">Best Next Step</p>
+                   <p class="ob-highlight-body">This card is always first on the home screen. It tells you <strong>exactly which activity</strong> to start with today, based on your child's progress.</p>
+                 </div>
+                 <p class="ob-highlight-hint">👆 Just tap the big button — the app guides you from there.</p>`,
+        },
+        {
+          icon: '🎮',
+          title: 'Bonus activities — use after the main lesson',
+          body: `<div class="ob-bonus-list">
+                   <div class="ob-bonus-item">⚡ <strong>Daily Challenge</strong> — 5-word bonus round, earns extra XP</div>
+                   <div class="ob-bonus-item">🃏 <strong>Sight Words</strong> — flip &amp; match high-frequency words</div>
+                   <div class="ob-bonus-item">🎡 <strong>Random Activity</strong> — spin the wheel for a surprise mode</div>
+                   <div class="ob-bonus-item">🔤 <strong>Letter Sounds</strong> — tap any sound to hear it</div>
+                 </div>
+                 <p class="ob-bonus-note">Find these in the <strong>Extra Practice</strong> section below the main lesson cards.</p>`,
+        },
+      ],
+      primary: [
+        {
+          icon: '🏫',
+          title: "Your child's Primary Journey",
+          body: `<p class="ob-intro">PhonicsQuest guides your child through three daily quests:</p>
+                 <ul class="ob-list">
+                   <li><strong>🔨 Sentence Forge</strong> — unscramble &amp; build sentences</li>
+                   <li><strong>🏰 Cloze Castle</strong> — grammar cloze passages P1–P6</li>
+                   <li><strong>🔑 Word Vault</strong> — vocabulary in context</li>
+                 </ul>`,
+        },
+        {
+          icon: '📋',
+          title: 'Follow this order each day',
+          body: `<div class="ob-steps">
+                   <div class="ob-step">
+                     <span class="ob-step-num">1</span>
+                     <div><strong>Start with Sentence Forge</strong><br><small>Build sentence structure skills</small></div>
+                   </div>
+                   <div class="ob-step">
+                     <span class="ob-step-num">2</span>
+                     <div><strong>Do Cloze Castle</strong><br><small>Grammar cloze with clue detection</small></div>
+                   </div>
+                   <div class="ob-step">
+                     <span class="ob-step-num">3</span>
+                     <div><strong>Finish with Word Vault</strong><br><small>Vocabulary in context practice</small></div>
+                   </div>
+                 </div>`,
+        },
+        {
+          icon: '⭐',
+          title: 'Look for this card every day',
+          body: `<div class="ob-highlight-card">
+                   <div class="ob-highlight-eyebrow">TODAY'S START POINT</div>
+                   <p class="ob-highlight-title">Best Next Step</p>
+                   <p class="ob-highlight-body">This card is always first on the home screen. It targets your child's <strong>weakest skill</strong> so every session has a clear, focused starting point.</p>
+                 </div>
+                 <p class="ob-highlight-hint">👆 Just tap the big button — the app guides you from there.</p>`,
+        },
+        {
+          icon: '🎮',
+          title: 'Bonus activities — use after the main lesson',
+          body: `<div class="ob-bonus-list">
+                   <div class="ob-bonus-item">⚡ <strong>Daily Challenge</strong> — 5-word bonus round, earns extra XP</div>
+                   <div class="ob-bonus-item">📚 <strong>Giri Stories</strong> — short decodable phonics stories</div>
+                   <div class="ob-bonus-item">🃏 <strong>Sight Words</strong> — flip &amp; match high-frequency words</div>
+                   <div class="ob-bonus-item">🎡 <strong>Random Activity</strong> — spin the wheel for variety</div>
+                 </div>
+                 <p class="ob-bonus-note">Find these in the <strong>Extra Practice</strong> section below the main lesson cards.</p>`,
+        },
+      ],
+    };
+
+    const screens   = TUTORIAL[levelKey];
+    let   step      = 0;
+
+    const contentEl = document.getElementById('ob-content');
+    const dotsEl    = document.getElementById('ob-dots');
+    const prevBtn   = document.getElementById('ob-prev');
+    const nextBtn   = document.getElementById('ob-next');
+    const skipBtn   = document.getElementById('ob-skip-btn');
+
+    if (!contentEl || !dotsEl || !prevBtn || !nextBtn) return;
+
+    const renderStep = (s) => {
+      const sc = screens[s];
+      contentEl.innerHTML = `
+        <div class="ob-screen">
+          <div class="ob-screen-icon" aria-hidden="true">${sc.icon}</div>
+          <h2 class="ob-screen-title">${sc.title}</h2>
+          <div class="ob-screen-body">${sc.body}</div>
+        </div>`;
+
+      dotsEl.innerHTML = screens.map((_, i) =>
+        `<span class="ob-dot ${i === s ? 'ob-dot--active' : ''}" role="tab" aria-selected="${i === s}"></span>`
+      ).join('');
+
+      prevBtn.hidden = s === 0;
+      nextBtn.textContent = s === screens.length - 1 ? "Let's go! 🚀" : 'Next →';
+    };
+
+    const closeTutorial = () => {
+      store.set('onboardingComplete', true);
+      this._closeModal('modal-onboarding');
+    };
+
+    // Re-attach listeners each open (avoids accumulation across re-opens)
+    prevBtn.onclick = () => { if (step > 0) { step--; renderStep(step); } };
+    nextBtn.onclick = () => {
+      if (step < screens.length - 1) { step++; renderStep(step); }
+      else closeTutorial();
+    };
+    if (skipBtn) skipBtn.onclick = closeTutorial;
+
+    renderStep(0);
+    this._openModal('modal-onboarding');
+  }
+
   _openDashboard() {
     this._openModal('modal-dashboard');
     const container = document.getElementById('dashboard-content');
@@ -1025,13 +1187,20 @@ class App {
 
   /**
    * Render the guided learner journey section on the home screen.
-   * Uses recommendation engine to generate a profile-aware plan.
+   *
+   * New IA (redesign):
+   *   1. Pathway badge  – "🌱 Preschool Journey" / "🏫 Primary Journey"
+   *   2. Start card     – dominant hero with a single, large CTA (Best Next Step)
+   *   3. Today's path   – 3-step clickable roadmap (do these in order)
+   *   4. Progress chips – concise learner snapshot
+   *
+   * Then manages section visibility so preschool vs primary layouts differ.
    */
   _renderGuidedJourney() {
     const section = document.getElementById('guided-journey-section');
     if (!section) return;
 
-    const profile = getActiveProfile ? getActiveProfile() : null;
+    const profile   = getActiveProfile ? getActiveProfile() : null;
     const isPrimary = profile?.schoolLevel === 'primary';
 
     let rec, plan, chips;
@@ -1044,71 +1213,115 @@ class App {
       return;
     }
 
-    const urgencyColor = rec.urgency === 'high'
-      ? 'var(--color-error)'
-      : rec.urgency === 'medium'
-      ? 'var(--color-warning)'
-      : 'var(--color-primary)';
+    // ── Pathway meta ───────────────────────────────────────────────────────
+    const pathwayIcon  = isPrimary ? '🏫' : '🌱';
+    const pathwayLabel = isPrimary ? 'Primary Journey' : 'Preschool Journey';
+    const pathwayMod   = isPrimary ? 'pathway-badge--primary' : 'pathway-badge--preschool';
+    const profileName  = profile?.name ? `${profile.name}'s ` : '';
 
-    const heroClass  = isPrimary ? 'gj-hero gj-hero--primary' : 'gj-hero gj-hero--preschool';
-    const heroTitle  = isPrimary ? 'School skills to strengthen' : 'Ready to read?';
-    const heroSub    = isPrimary ? 'Targeted practice for today' : 'Your learning path for today';
+    // ── Urgency display ────────────────────────────────────────────────────
+    const urgencyIcon  = rec.urgency === 'high'   ? '🔴'
+                       : rec.urgency === 'medium' ? '🟡' : '🟢';
+    const urgencyText  = rec.urgency === 'high'   ? 'Focus area'
+                       : rec.urgency === 'medium' ? 'Needs practice' : 'Looking good';
 
-    const chipsHtml = chips.length
-      ? `<div class="gj-chips" aria-label="Learner snapshot">
-          ${chips.map(c => `<span class="gj-chip">${c}</span>`).join('')}
-        </div>`
-      : '';
-
-    const planHtml = plan.map(step => `
-      <button class="gj-plan-step" data-target="${step.ctaTarget}" ${step.ctaGroup ? `data-group="${step.ctaGroup}"` : ''}>
-        <span class="gj-plan-num">${step.step}</span>
-        <div class="gj-plan-info">
-          <span class="gj-plan-label">${step.label}</span>
-          <span class="gj-plan-detail">${step.detail}</span>
+    // ── 3-step roadmap ─────────────────────────────────────────────────────
+    const roadmapHtml = plan.map(step => `
+      <button class="home-roadmap-step"
+              data-target="${step.ctaTarget}"
+              ${step.ctaGroup ? `data-group="${step.ctaGroup}"` : ''}
+              aria-label="Step ${step.step}: ${step.label}">
+        <span class="roadmap-num" aria-hidden="true">${step.step}</span>
+        <div class="roadmap-info">
+          <span class="roadmap-label">${step.label}</span>
+          <span class="roadmap-detail">${step.detail}</span>
         </div>
-        <span class="gj-plan-arrow">→</span>
+        <span class="roadmap-arrow" aria-hidden="true">→</span>
       </button>`).join('');
 
+    // ── Progress chips ─────────────────────────────────────────────────────
+    const chipsHtml = chips.length
+      ? `<div class="progress-chips" aria-label="Progress snapshot">
+           ${chips.map(c => `<span class="progress-chip">${c}</span>`).join('')}
+         </div>`
+      : '';
+
+    // ── Render ─────────────────────────────────────────────────────────────
     section.innerHTML = `
-      <div class="${heroClass}">
-        <div class="gj-hero-text">
-          <h2 class="gj-hero-title">${heroTitle}</h2>
-          <p class="gj-hero-sub">${heroSub}</p>
-          ${chipsHtml}
-        </div>
+      <div class="pathway-badge ${pathwayMod}" aria-label="Learning pathway: ${pathwayLabel}">
+        <span class="pathway-badge-icon" aria-hidden="true">${pathwayIcon}</span>
+        <span class="pathway-badge-text">${profileName}${pathwayLabel}</span>
       </div>
 
-      <div class="gj-rec-block" aria-label="Best next step">
-        <div class="gj-rec-header">
-          <span class="gj-rec-icon" style="color:${urgencyColor}">⭐</span>
-          <span class="gj-rec-domain-badge">${rec.domain}</span>
-          <span class="gj-rec-title">Best Next Step</span>
+      <div class="home-start-card" aria-label="Today's best next step">
+        <div class="start-card-eyebrow">
+          <span class="start-card-label">TODAY'S START POINT</span>
+          <span class="start-card-urgency" aria-label="Urgency: ${urgencyText}">
+            ${urgencyIcon} ${urgencyText}
+          </span>
         </div>
-        <div class="gj-rec-body">
-          <p class="gj-rec-activity">${rec.title}</p>
-          <p class="gj-rec-reason">${rec.reason}</p>
-        </div>
-        <button class="btn btn--primary gj-rec-cta" data-target="${rec.ctaTarget}" ${rec.ctaGroup ? `data-group="${rec.ctaGroup}"` : ''}>
-          ${rec.ctaLabel}
+        <span class="start-card-domain-badge">${rec.domain}</span>
+        <h2 class="start-card-title">${rec.title}</h2>
+        <p class="start-card-reason">${rec.reason}</p>
+        <button class="btn btn--primary btn--xl start-card-cta"
+                data-target="${rec.ctaTarget}"
+                ${rec.ctaGroup ? `data-group="${rec.ctaGroup}"` : ''}>
+          ${rec.ctaLabel} →
         </button>
       </div>
 
-      <div class="gj-plan-block" aria-label="Today's recommended path">
-        <h3 class="gj-plan-title">📋 Recommended for today</h3>
-        <div class="gj-plan-steps">
-          ${planHtml}
+      <div class="home-roadmap" aria-label="Today's recommended learning path">
+        <h3 class="home-roadmap-title">
+          <span aria-hidden="true">📋</span>
+          Your child's path today
+          <span class="roadmap-order-hint">· do in order</span>
+        </h3>
+        <div class="home-roadmap-steps">
+          ${roadmapHtml}
         </div>
-      </div>`;
+      </div>
 
-    // Wire up CTA buttons
+      ${chipsHtml ? `<div class="progress-snapshot" aria-label="Progress snapshot">${chipsHtml}</div>` : ''}`;
+
+    // Wire up all [data-target] buttons
     section.querySelectorAll('[data-target]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const target = btn.dataset.target;
-        const group  = btn.dataset.group || null;
-        this._navigateTo(target, group);
+        this._navigateTo(btn.dataset.target, btn.dataset.group || null);
       });
     });
+
+    // Manage section visibility for preschool vs primary layout
+    this._manageSectionVisibility(isPrimary);
+  }
+
+  /**
+   * Show / hide home sections based on pathway so parents see a clean,
+   * pathway-specific layout rather than an undifferentiated content library.
+   *
+   * Preschool: phonics mode grid is the main lesson → show it prominently.
+   *            Quest banners are locked milestones → demote below extra practice.
+   * Primary:   quest banners are the main lesson → show them prominently.
+   *            Phonics modes are irrelevant → hide them.
+   */
+  _manageSectionVisibility(isPrimary) {
+    const coreSection   = document.getElementById('home-core-section');
+    const questsSection = document.getElementById('home-quests-section');
+    const questsHeading = document.getElementById('quests-section-heading');
+    const questsSub     = document.getElementById('quests-section-sub');
+
+    if (isPrimary) {
+      // Hide preschool phonics grid; quests are the primary lesson
+      coreSection?.classList.add('home-section--hidden');
+      questsSection?.classList.remove('home-section--milestone');
+      if (questsHeading) questsHeading.textContent = 'Your Learning Quests';
+      if (questsSub)     questsSub.textContent     = 'Follow the order above · do these each session';
+    } else {
+      // Show phonics grid; demote quests as milestone tracker
+      coreSection?.classList.remove('home-section--hidden');
+      questsSection?.classList.add('home-section--milestone');
+      if (questsHeading) questsHeading.textContent = 'Quest Milestones';
+      if (questsSub)     questsSub.textContent     = 'Unlocks as you master phonics words';
+    }
   }
 
   // ── Modals ──
@@ -1318,12 +1531,17 @@ class App {
     this._updateProfileChip();
     this._renderProfileGrid();
 
-    // If this is the first profile, go straight to home
-    if (getProfiles().length === 1) {
-      this._showScreen(SCREENS.HOME);
-      mascot.setHomeState('holdCard');
-      this._renderGuidedJourney();
+    // Go straight to home
+    this._showScreen(SCREENS.HOME);
+    mascot.setHomeState('holdCard');
+    this._renderGuidedJourney();
+    this._updateQuestBanners();
+
+    // Show onboarding tutorial for new profiles (first-run experience)
+    if (!store.get('onboardingComplete')) {
+      setTimeout(() => this._showOnboardingTutorial(profile), 400);
     }
+
     audio.playSfx('correct');
   }
 
