@@ -107,6 +107,11 @@ export const GRAMMAR_TIPS = {
     example: '"The girl who won the prize is my friend." — "The book that I read was great."',
     tip: 'Is the clause about a person? Use "who". About a thing? Use "which" or "that".',
   },
+  countableUncountable: {
+    rule: 'Countable nouns can be counted (one apple, two apples). Uncountable nouns cannot be counted (water, rice, information). Use "many/few/a few" with countable nouns and "much/little/a little" with uncountable nouns.',
+    example: '"There are many books on the shelf." — "There is not much water left." — "She has a few pencils but only a little glue."',
+    tip: 'Ask: can I put a number in front of it? If yes (3 chairs, 5 eggs), it is countable — use many/few. If no (you cannot say 3 rices or 2 informations), it is uncountable — use much/little.',
+  },
 };
 
 /**

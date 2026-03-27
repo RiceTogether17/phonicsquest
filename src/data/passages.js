@@ -13,6 +13,7 @@
  * Conditionals recur:            P3 (Type 1 intro) → P5 (Types 1/2) → P6 (Types 2/3)
  * Modals recur:                  P4 (basic: should/must/may) → P5 (perfect: should have / could have)
  * Quantifiers recur:             P4 (basic: many/few/some) → P6 (complex: a great deal of / most of)
+ * Countable/Uncountable recur:   P1 (a/an/some) → P2 (many/much) → P3 (a few/a little) → P4 (few/little) → P5 (fewer/less, too many/too much) → P6 (number/amount, a great deal of)
  *
  * Structure: passages[level][categoryKey] = [passage, passage, passage]
  */
@@ -50,6 +51,7 @@ export const GRAMMAR_CATEGORIES = {
   conditionals:    { label: 'Conditionals (If)',      icon: '❓' },
   reportedSpeech:  { label: 'Reported Speech',        icon: '💬' },
   relativeClauses: { label: 'Relative Clauses',       icon: '🧩' },
+  countableUncountable: { label: 'Countable & Uncountable Nouns', icon: '🧺' },
 };
 
 export const passages = {
@@ -292,6 +294,61 @@ export const passages = {
         xp: 20,
       },
     ],
+    countableUncountable: [
+      {
+        id: 'g-p1-cu-01', title: 'At the Fruit Shop',
+        text: 'I want ___ apple. Mum buys ___ oranges. We also need ___ rice for dinner.',
+        answers: ['an', 'some', 'some'],
+        wordBank: ['an', 'some', 'some', 'a', 'many', 'any'],
+        xp: 20,
+        clues: [
+          { blankIndex: 0, prompt: 'Look at the word after the blank. Does it start with a vowel or consonant sound?', acceptableSpans: ['apple'], partialSpans: [], clueType: 'noun-initial-vowel', explanation: '"Apple" starts with the vowel sound "a", so we use "an" (not "a").' },
+          { blankIndex: 2, prompt: 'Can you count rice? Think about whether you can say "one rice, two rices".', acceptableSpans: ['rice'], partialSpans: ['dinner'], clueType: 'mass-noun-clue', explanation: '"Rice" is uncountable — you cannot say "one rice". We use "some" with uncountable nouns.' },
+        ],
+      },
+      {
+        id: 'g-p1-cu-02', title: 'My Breakfast',
+        text: 'I eat ___ egg every morning. I drink ___ milk. Mum gives me ___ banana too.',
+        answers: ['an', 'some', 'a'],
+        wordBank: ['an', 'some', 'a', 'a', 'many', 'an'],
+        xp: 20,
+        clues: [
+          { blankIndex: 1, prompt: 'Can you count milk? Can you say "one milk, two milks"?', acceptableSpans: ['milk'], partialSpans: ['drink'], clueType: 'mass-noun-clue', explanation: '"Milk" is uncountable. We use "some" with uncountable nouns: some milk.' },
+        ],
+      },
+      {
+        id: 'g-p1-cu-03', title: 'In the Kitchen',
+        text: 'There is ___ cup on the table. We have ___ water in the bottle. Dad cuts ___ onion for the soup.',
+        answers: ['a', 'some', 'an'],
+        wordBank: ['a', 'some', 'an', 'an', 'many', 'a'],
+        xp: 20,
+      },
+      {
+        id: 'g-p1-cu-04', title: 'Packing My Bag',
+        text: 'I put ___ pencil in my bag. I also bring ___ paper for drawing. Mum packs ___ sandwich for recess.',
+        answers: ['a', 'some', 'a'],
+        wordBank: ['a', 'some', 'a', 'an', 'many', 'an'],
+        xp: 20,
+        grammarNotes: ['We use "a" before words that start with a consonant sound.', '"Paper" is uncountable — we say "some paper", not "a paper".', '"Sandwich" is countable — we say "a sandwich".'],
+      },
+      {
+        id: 'g-p1-cu-05', title: 'At the Canteen',
+        text: 'I buy ___ bowl of noodles. My friend has ___ bread. We share ___ juice.',
+        answers: ['a', 'some', 'some'],
+        wordBank: ['a', 'some', 'some', 'an', 'many', 'a'],
+        xp: 20,
+      },
+      {
+        id: 'g-p1-cu-06', title: 'My Garden',
+        text: 'There is ___ flower in the pot. We pour ___ water on the plants. I see ___ ant on the leaf.',
+        answers: ['a', 'some', 'an'],
+        wordBank: ['a', 'some', 'an', 'an', 'many', 'a'],
+        xp: 20,
+        clues: [
+          { blankIndex: 2, prompt: 'Look at the word after the blank. Does it start with a vowel sound?', acceptableSpans: ['ant'], partialSpans: ['leaf'], clueType: 'noun-initial-vowel', explanation: '"Ant" starts with the vowel sound "a", so we use "an".' },
+        ],
+      },
+    ],
   },
 
   P2: {
@@ -525,6 +582,61 @@ export const passages = {
       { id: 'g-p2-conj-05', title: 'Canteen Choice', text: 'I wanted noodles, ___ my sister chose rice. We shared fruit juice ___ sat together. We left quickly ___ recess was ending.', answers: ['but', 'and', 'because'], wordBank: ['but', 'and', 'because', 'or', 'so', 'while'], xp: 25 },
       { id: 'g-p2-conj-06', title: 'Homework Time', text: 'Do your spelling now, ___ check your corrections later. You can ask me ___ ask your partner. I finished early, ___ I helped my brother.', answers: ['then', 'or', 'so'], wordBank: ['then', 'or', 'so', 'but', 'because', 'and'], xp: 25 },
     ],
+    countableUncountable: [
+      {
+        id: 'g-p2-cu-01', title: 'At the Bookshop',
+        text: 'There are ___ books on the shelf. We do not have ___ money left. I bought ___ stickers for my friends.',
+        answers: ['many', 'much', 'some'],
+        wordBank: ['many', 'much', 'some', 'much', 'many', 'any'],
+        xp: 25,
+        clues: [
+          { blankIndex: 0, prompt: 'Look at the noun after the blank. Can you count it?', acceptableSpans: ['books'], partialSpans: ['shelf'], clueType: 'noun-countable', explanation: '"Books" is countable (one book, two books), so we use "many".' },
+          { blankIndex: 1, prompt: 'Can you count money? Can you say "one money, two moneys"?', acceptableSpans: ['money'], partialSpans: ['left'], clueType: 'mass-noun-clue', explanation: '"Money" is uncountable, so we use "much" (not "many").' },
+        ],
+      },
+      {
+        id: 'g-p2-cu-02', title: 'Playing with Sand',
+        text: 'There is ___ sand in my shoes. I see ___ marbles on the ground. We need ___ water to wash our hands.',
+        answers: ['some', 'many', 'some'],
+        wordBank: ['some', 'many', 'some', 'many', 'much', 'a lot of'],
+        xp: 25,
+        clues: [
+          { blankIndex: 0, prompt: 'Can you count sand? Think: can you say "one sand, two sands"?', acceptableSpans: ['sand'], partialSpans: ['shoes'], clueType: 'mass-noun-clue', explanation: '"Sand" is uncountable. We use "some" with uncountable nouns.' },
+        ],
+      },
+      {
+        id: 'g-p2-cu-03', title: 'Canteen Lunch',
+        text: 'Auntie puts ___ sugar in my drink. There are ___ children in the queue. I want ___ juice, please.',
+        answers: ['some', 'many', 'some'],
+        wordBank: ['some', 'many', 'some', 'many', 'much', 'a'],
+        xp: 25,
+      },
+      {
+        id: 'g-p2-cu-04', title: 'Grocery Shopping',
+        text: 'Mum buys ___ eggs at the market. We also need ___ bread. There are ___ people at the shop today.',
+        answers: ['a lot of', 'some', 'many'],
+        wordBank: ['a lot of', 'some', 'many', 'much', 'a', 'any'],
+        xp: 25,
+        grammarNotes: ['"A lot of" can be used with both countable and uncountable nouns.', '"Bread" is uncountable — we say "some bread", not "many bread".', '"People" is countable, so "many" is correct.'],
+      },
+      {
+        id: 'g-p2-cu-05', title: 'Art Class',
+        text: 'We use ___ paint for the poster. I have ___ crayons in my box. Do you have ___ glue?',
+        answers: ['some', 'many', 'any'],
+        wordBank: ['some', 'many', 'any', 'much', 'a', 'some'],
+        xp: 25,
+        clues: [
+          { blankIndex: 2, prompt: 'Is this a question? What word do we use in questions with uncountable nouns?', acceptableSpans: ['glue'], partialSpans: ['Do'], clueType: 'question-clue', explanation: 'In questions, we use "any" with uncountable nouns: "Do you have any glue?"' },
+        ],
+      },
+      {
+        id: 'g-p2-cu-06', title: 'A Rainy Day',
+        text: 'There is ___ rain outside. ___ puddles are on the path. We do not have ___ umbrellas.',
+        answers: ['a lot of', 'Many', 'any'],
+        wordBank: ['a lot of', 'Many', 'any', 'much', 'Some', 'some'],
+        xp: 25,
+      },
+    ],
   },
 
   P3: {
@@ -698,6 +810,64 @@ export const passages = {
         xp: 30,
       },
     ],
+    countableUncountable: [
+      {
+        id: 'g-p3-cu-01', title: 'Preparing for the Test',
+        text: 'We have ___ pencils on the desk. There is only ___ time left to study. Do you have ___ paper to spare?',
+        answers: ['a few', 'a little', 'any'],
+        wordBank: ['a few', 'a little', 'any', 'a little', 'a few', 'some'],
+        xp: 30,
+        clues: [
+          { blankIndex: 0, prompt: 'Look at the noun after the blank. Can you count pencils?', acceptableSpans: ['pencils'], partialSpans: ['desk'], clueType: 'noun-countable', explanation: '"Pencils" is countable — we can say one pencil, two pencils. Use "a few" for a small number of countable nouns.' },
+          { blankIndex: 1, prompt: 'Can you count time? Can you say "one time, two times" here?', acceptableSpans: ['time'], partialSpans: ['only'], clueType: 'mass-noun-clue', explanation: '"Time" is uncountable here (meaning duration). Use "a little" for a small amount of uncountable nouns.' },
+          { blankIndex: 2, prompt: 'Is this a question? What word fits in questions?', acceptableSpans: ['paper'], partialSpans: ['Do'], clueType: 'question-clue', explanation: 'In questions, we use "any" — "Do you have any paper?"' },
+        ],
+      },
+      {
+        id: 'g-p3-cu-02', title: 'At the School Canteen',
+        text: 'There is not ___ soup left in the pot. I still have ___ coins in my pocket. Would you like ___ water?',
+        answers: ['much', 'a few', 'some'],
+        wordBank: ['much', 'a few', 'some', 'many', 'a little', 'any'],
+        xp: 30,
+        clues: [
+          { blankIndex: 0, prompt: 'Look at the noun. Is soup countable or uncountable?', acceptableSpans: ['soup'], partialSpans: ['not'], clueType: 'mass-noun-clue', explanation: '"Soup" is uncountable. In negative sentences, we use "much" with uncountable nouns: "not much soup".' },
+          { blankIndex: 1, prompt: 'Can you count coins?', acceptableSpans: ['coins'], partialSpans: ['pocket'], clueType: 'noun-countable', explanation: '"Coins" is countable. "A few" means a small number of countable things.' },
+        ],
+      },
+      {
+        id: 'g-p3-cu-03', title: 'Homework Time',
+        text: 'I have ___ homework to finish tonight. There are ___ questions on the worksheet. I do not have ___ coloured pencils left.',
+        answers: ['some', 'many', 'any'],
+        wordBank: ['some', 'many', 'any', 'much', 'a few', 'some'],
+        xp: 30,
+        grammarNotes: ['"Homework" is uncountable — we say "some homework", not "many homeworks".', '"Questions" is countable — we can use "many".', 'In negative sentences, use "any" with both countable and uncountable nouns.'],
+      },
+      {
+        id: 'g-p3-cu-04', title: 'The School Garden',
+        text: 'We need ___ water for the plants. There are ___ flowers blooming today. We only have ___ soil left in the bag.',
+        answers: ['some', 'many', 'a little'],
+        wordBank: ['some', 'many', 'a little', 'any', 'much', 'a few'],
+        xp: 30,
+      },
+      {
+        id: 'g-p3-cu-05', title: 'Packing for a Trip',
+        text: 'Do we have ___ snacks for the bus ride? I packed ___ clothes in my bag. There is not ___ space left.',
+        answers: ['any', 'a few', 'much'],
+        wordBank: ['any', 'a few', 'much', 'some', 'a little', 'many'],
+        xp: 30,
+      },
+      {
+        id: 'g-p3-cu-06', title: 'Baking Day',
+        text: 'We need ___ flour to make cookies. Mum bought ___ eggs from the shop. There is only ___ butter in the fridge.',
+        answers: ['some', 'some', 'a little'],
+        wordBank: ['some', 'some', 'a little', 'many', 'any', 'a few'],
+        xp: 30,
+        clues: [
+          { blankIndex: 0, prompt: 'Can you count flour?', acceptableSpans: ['flour'], partialSpans: ['cookies'], clueType: 'mass-noun-clue', explanation: '"Flour" is uncountable. We use "some" with uncountable nouns.' },
+          { blankIndex: 2, prompt: 'Is butter countable or uncountable? Look at the "only" clue — it suggests a small amount.', acceptableSpans: ['butter'], partialSpans: ['only'], clueType: 'amount-clue', explanation: '"Butter" is uncountable. "Only" hints at a small amount, so "a little" is correct.' },
+        ],
+      },
+    ],
   },
 
   P4: {
@@ -801,6 +971,60 @@ export const passages = {
       { id: 'g-p4-sva-04', title: 'The Debate Team', text: 'Each speaker ___ two minutes to present. The judges ___ listening carefully. One of the teams ___ prepared extra notes.', answers: ['has', 'are', 'has'], wordBank: ['has', 'are', 'has', 'have', 'is', 'were'], xp: 35 },
       { id: 'g-p4-sva-05', title: 'School Garden', text: 'A row of sunflowers ___ near the fence. Every student ___ a watering schedule. The class monitor ___ the tools after use.', answers: ['grows', 'has', 'checks'], wordBank: ['grows', 'has', 'checks', 'grow', 'have', 'check'], xp: 35 },
       { id: 'g-p4-sva-06', title: 'Math Competition', text: 'Neither Ben nor Ravi ___ absent today. The team leader ___ ready with the answer sheet. All participants ___ excited for the final round.', answers: ['is', 'is', 'are'], wordBank: ['is', 'is', 'are', 'are', 'am', 'was'], xp: 35 },
+    ],
+    countableUncountable: [
+      {
+        id: 'g-p4-cu-01', title: 'Setting Up the Classroom',
+        text: 'There are ___ chairs in the hall, but there is ___ space for more. We have ___ information about the event so far.',
+        answers: ['few', 'little', 'little'],
+        wordBank: ['few', 'little', 'little', 'a few', 'a little', 'a little'],
+        xp: 35,
+        clues: [
+          { blankIndex: 0, prompt: 'Is "chairs" countable or uncountable? Does the sentence suggest a positive or negative tone?', acceptableSpans: ['chairs'], partialSpans: ['hall'], clueType: 'noun-countable', explanation: '"Chairs" is countable. "Few" (without "a") means "not many" — it has a negative tone, suggesting there are not enough chairs.' },
+          { blankIndex: 2, prompt: 'Can you count information? What does "so far" suggest about the amount?', acceptableSpans: ['information'], partialSpans: ['so far'], clueType: 'mass-noun-clue', explanation: '"Information" is uncountable. "Little" (without "a") means "not much" — a negative tone suggesting we need more.' },
+        ],
+        grammarNotes: ['"Few" (countable) and "little" (uncountable) without "a" suggest not enough — a negative meaning.', '"A few" and "a little" with "a" suggest some — a more positive meaning.'],
+      },
+      {
+        id: 'g-p4-cu-02', title: 'The School Project',
+        text: 'We still have ___ time before the deadline. There are ___ pupils who have not started. ___ the furniture in the room needs to be moved.',
+        answers: ['a little', 'a few', 'All'],
+        wordBank: ['a little', 'a few', 'All', 'little', 'few', 'Some'],
+        xp: 35,
+        clues: [
+          { blankIndex: 0, prompt: 'Is the tone positive or negative? Does "still" suggest hope or worry?', acceptableSpans: ['still'], partialSpans: ['time'], clueType: 'amount-clue', explanation: '"Still" suggests a positive tone — there is some time. Use "a little" (positive) not "little" (negative).' },
+          { blankIndex: 2, prompt: 'Can you count furniture?', acceptableSpans: ['furniture'], partialSpans: ['room'], clueType: 'mass-noun-clue', explanation: '"Furniture" is uncountable. "All" works with both countable and uncountable nouns.' },
+        ],
+      },
+      {
+        id: 'g-p4-cu-03', title: 'After the School Fair',
+        text: 'There is ___ food left on the table. Only ___ people stayed to help clean up. Do we have ___ time to finish?',
+        answers: ['some', 'a few', 'enough'],
+        wordBank: ['some', 'a few', 'enough', 'any', 'few', 'many'],
+        xp: 35,
+      },
+      {
+        id: 'g-p4-cu-04', title: 'Library Visit',
+        text: '___ pupils wanted to borrow the same book. The librarian said there was ___ time before closing. She found ___ copies on the back shelf.',
+        answers: ['Several', 'little', 'a few'],
+        wordBank: ['Several', 'little', 'a few', 'Much', 'few', 'a little'],
+        xp: 35,
+      },
+      {
+        id: 'g-p4-cu-05', title: 'Preparing the Canteen',
+        text: 'We need ___ help to carry the trays. There is ___ rice left in the container. ___ of the cups have been washed.',
+        answers: ['some', 'enough', 'All'],
+        wordBank: ['some', 'enough', 'All', 'any', 'many', 'Few'],
+        xp: 35,
+      },
+      {
+        id: 'g-p4-cu-06', title: 'Class Discussion',
+        text: '___ students shared their ideas during the lesson. The teacher gave ___ advice on how to improve. There was ___ noise in the corridor.',
+        answers: ['A few', 'some', 'little'],
+        wordBank: ['A few', 'some', 'little', 'A little', 'any', 'few'],
+        xp: 35,
+        grammarNotes: ['"A few" (positive) means some students did share.', '"Advice" is uncountable — we say "some advice", not "many advices".', '"Little noise" (negative) means almost no noise — a good thing here.'],
+      },
     ],
   },
 
@@ -949,6 +1173,63 @@ export const passages = {
         xp: 40,
       },
     ],
+    countableUncountable: [
+      {
+        id: 'g-p5-cu-01', title: 'Checking the Equipment',
+        text: 'There were ___ bottles of water in the storeroom, but there was ___ equipment for the relay race. The teacher said we had ___ supplies to manage.',
+        answers: ['too many', 'too little', 'plenty of'],
+        wordBank: ['too many', 'too little', 'plenty of', 'too much', 'fewer', 'enough'],
+        xp: 40,
+        clues: [
+          { blankIndex: 0, prompt: 'Can you count bottles? What word pairs with countable nouns to mean "more than needed"?', acceptableSpans: ['bottles'], partialSpans: ['storeroom'], clueType: 'noun-countable', explanation: '"Bottles" is countable. "Too many" is used with countable nouns to mean an excessive number.' },
+          { blankIndex: 1, prompt: 'Can you count equipment?', acceptableSpans: ['equipment'], partialSpans: ['relay race'], clueType: 'mass-noun-clue', explanation: '"Equipment" is uncountable. "Too little" is used with uncountable nouns to mean not enough.' },
+        ],
+      },
+      {
+        id: 'g-p5-cu-02', title: 'Traffic Near School',
+        text: 'There is ___ traffic outside the school every morning. ___ cars park along the narrow road. The principal asked parents to make ___ trips by car.',
+        answers: ['too much', 'Too many', 'fewer'],
+        wordBank: ['too much', 'Too many', 'fewer', 'too many', 'Too much', 'less'],
+        xp: 40,
+        clues: [
+          { blankIndex: 0, prompt: 'Can you count traffic?', acceptableSpans: ['traffic'], partialSpans: ['morning'], clueType: 'mass-noun-clue', explanation: '"Traffic" is uncountable. Use "too much" with uncountable nouns.' },
+          { blankIndex: 2, prompt: 'Can you count trips? Which word means a smaller number?', acceptableSpans: ['trips'], partialSpans: ['car'], clueType: 'noun-countable', explanation: '"Trips" is countable. Use "fewer" (not "less") with countable nouns.' },
+        ],
+      },
+      {
+        id: 'g-p5-cu-03', title: 'The Science Fair',
+        text: 'Our group made ___ mistakes in the first round. There was ___ time to redo the experiment. Luckily, we had ___ materials to try again.',
+        answers: ['too many', 'not enough', 'enough'],
+        wordBank: ['too many', 'not enough', 'enough', 'too much', 'plenty of', 'fewer'],
+        xp: 40,
+        grammarNotes: ['"Too many" is for countable nouns (mistakes).', '"Enough" works with both countable and uncountable nouns.', '"Not enough" signals an insufficient amount.'],
+      },
+      {
+        id: 'g-p5-cu-04', title: 'Planning the Camp',
+        text: 'We need ___ luggage space on the bus. There are ___ sleeping bags, but we have ___ food for everyone.',
+        answers: ['enough', 'fewer', 'plenty of'],
+        wordBank: ['enough', 'fewer', 'plenty of', 'less', 'too many', 'too much'],
+        xp: 40,
+        clues: [
+          { blankIndex: 1, prompt: 'Can you count sleeping bags? Which word means a smaller number of something?', acceptableSpans: ['sleeping bags'], partialSpans: [], clueType: 'noun-countable', explanation: '"Sleeping bags" is countable. "Fewer" is used for a smaller number of countable nouns.' },
+        ],
+      },
+      {
+        id: 'g-p5-cu-05', title: 'Noise in the Hall',
+        text: 'There was ___ noise during the assembly. The prefects noticed ___ students were chatting. The teacher reminded us to show ___ respect.',
+        answers: ['too much', 'too many', 'more'],
+        wordBank: ['too much', 'too many', 'more', 'too many', 'too much', 'less'],
+        xp: 40,
+      },
+      {
+        id: 'g-p5-cu-06', title: 'Sports Day Preparation',
+        text: 'The committee had ___ volunteers to help this year. There was ___ confusion about the schedule. We needed ___ practice sessions before the big day.',
+        answers: ['plenty of', 'less', 'fewer'],
+        wordBank: ['plenty of', 'less', 'fewer', 'enough', 'more', 'too many'],
+        xp: 40,
+        grammarNotes: ['"Plenty of" works with both countable and uncountable nouns.', '"Less" is for uncountable nouns (confusion).', '"Fewer" is for countable nouns (practice sessions).'],
+      },
+    ],
   },
 
   P6: {
@@ -1074,6 +1355,70 @@ export const passages = {
         answers: ['Few', 'A great deal of', 'every'],
         wordBank: ['Few', 'A great deal of', 'every', 'Some', 'Little', 'each'],
         xp: 50,
+      },
+    ],
+    countableUncountable: [
+      {
+        id: 'g-p6-cu-01', title: 'The Research Project',
+        text: 'The team gathered ___ evidence to support their argument. A small ___ of students presented the findings. There was ___ advice from the judges on how to improve.',
+        answers: ['a great deal of', 'number', 'very little'],
+        wordBank: ['a great deal of', 'number', 'very little', 'a large amount of', 'amount', 'very few'],
+        xp: 50,
+        clues: [
+          { blankIndex: 0, prompt: 'Can you count evidence?', acceptableSpans: ['evidence'], partialSpans: ['argument'], clueType: 'mass-noun-clue', explanation: '"Evidence" is uncountable. "A great deal of" is used with uncountable nouns to mean a large amount.' },
+          { blankIndex: 1, prompt: 'Is "students" countable or uncountable? Which word goes with countable nouns — "number" or "amount"?', acceptableSpans: ['students'], partialSpans: ['small'], clueType: 'noun-countable', explanation: '"Students" is countable. We say "a small number of students" (not "amount").' },
+          { blankIndex: 2, prompt: 'Can you count advice?', acceptableSpans: ['advice'], partialSpans: ['judges'], clueType: 'mass-noun-clue', explanation: '"Advice" is uncountable. "Very little" is used with uncountable nouns to mean almost none.' },
+        ],
+        grammarNotes: ['Use "number" with countable nouns: a small number of pupils.', 'Use "amount" with uncountable nouns: a large amount of work.', '"A great deal of" is always for uncountable nouns.'],
+      },
+      {
+        id: 'g-p6-cu-02', title: 'School Improvement Plan',
+        text: 'The committee reviewed ___ resources before making a decision. ___ opportunities were available for students to volunteer. The principal noted that ___ progress had been made this term.',
+        answers: ['a large amount of', 'Very few', 'a great deal of'],
+        wordBank: ['a large amount of', 'Very few', 'a great deal of', 'a large number of', 'Very little', 'many'],
+        xp: 50,
+        clues: [
+          { blankIndex: 0, prompt: 'Can you count resources in this context? Think about whether "resources" means materials or money.', acceptableSpans: ['resources'], partialSpans: ['decision'], clueType: 'mass-noun-clue', explanation: 'In this context, "resources" refers to funding and materials collectively (uncountable sense). "A large amount of" fits.' },
+          { blankIndex: 1, prompt: 'Can you count opportunities?', acceptableSpans: ['opportunities'], partialSpans: ['students'], clueType: 'noun-countable', explanation: '"Opportunities" is countable. "Very few" is used with countable nouns to mean almost none.' },
+        ],
+      },
+      {
+        id: 'g-p6-cu-03', title: 'The Debate Competition',
+        text: 'The judges offered ___ feedback after each round. A large ___ of participants came from neighbouring schools. There were ___ errors in the strongest team\'s argument.',
+        answers: ['very little', 'number', 'fewer'],
+        wordBank: ['very little', 'number', 'fewer', 'very few', 'amount', 'less'],
+        xp: 50,
+        clues: [
+          { blankIndex: 1, prompt: 'Is "participants" countable? Which word — "number" or "amount" — goes with countable nouns?', acceptableSpans: ['participants'], partialSpans: ['schools'], clueType: 'noun-countable', explanation: '"Participants" is countable. We use "a large number of" with countable nouns.' },
+          { blankIndex: 2, prompt: 'Can you count errors? Which word means a smaller number?', acceptableSpans: ['errors'], partialSpans: ['argument'], clueType: 'noun-countable', explanation: '"Errors" is countable. "Fewer" is for countable nouns; "less" is for uncountable nouns.' },
+        ],
+      },
+      {
+        id: 'g-p6-cu-04', title: 'End-of-Year Review',
+        text: 'The school conducted ___ research on student well-being. A small ___ of teachers attended the training session. There was ___ evidence that the new programmes were helping.',
+        answers: ['a great deal of', 'number', 'less'],
+        wordBank: ['a great deal of', 'number', 'less', 'a large number of', 'amount', 'fewer'],
+        xp: 50,
+        grammarNotes: ['"Research" is uncountable — we never say "researches" in this sense.', 'Use "number" with countable nouns (teachers).', '"Less" is for uncountable nouns (evidence); "fewer" is for countable nouns.'],
+      },
+      {
+        id: 'g-p6-cu-05', title: 'Community Service Day',
+        text: 'A large ___ of volunteers signed up for the event. The organisers had ___ time to prepare, but they managed well. There were ___ complaints from the residents.',
+        answers: ['number', 'very little', 'very few'],
+        wordBank: ['number', 'very little', 'very few', 'amount', 'less', 'fewer'],
+        xp: 50,
+        clues: [
+          { blankIndex: 0, prompt: 'Can you count volunteers?', acceptableSpans: ['volunteers'], partialSpans: ['event'], clueType: 'noun-countable', explanation: '"Volunteers" is countable. Use "a large number of" with countable nouns.' },
+          { blankIndex: 2, prompt: 'Can you count complaints?', acceptableSpans: ['complaints'], partialSpans: ['residents'], clueType: 'noun-countable', explanation: '"Complaints" is countable. "Very few" is for countable nouns meaning almost none.' },
+        ],
+      },
+      {
+        id: 'g-p6-cu-06', title: 'Preparing for PSLE',
+        text: 'The students received ___ advice from their teachers on revision strategies. ___ practice papers were completed before the examination. There was ___ room for error in the final weeks.',
+        answers: ['a great deal of', 'A large number of', 'very little'],
+        wordBank: ['a great deal of', 'A large number of', 'very little', 'a large amount of', 'A great deal of', 'very few'],
+        xp: 50,
+        grammarNotes: ['"Advice" is always uncountable — never say "advices".', '"Practice papers" is countable — use "a large number of".', '"Room" (meaning space/opportunity) is uncountable here.'],
       },
     ],
   },
