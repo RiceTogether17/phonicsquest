@@ -6118,4 +6118,521 @@ input, select, textarea { font-family: inherit; }
 .wv-review-table { width:100%; border-collapse: collapse; font-size:.85rem; }
 .wv-review-table th, .wv-review-table td { border:1px solid var(--border); padding:6px; text-align:left; }
 .wv-blank--affix { min-width: 140px; }
+
+
+/* ============================================================
+   REDESIGN: HOMEPAGE IA + ONBOARDING
+   Pathway Badge · Start Card · Daily Roadmap ·
+   Section helpers · Extra Practice · Tutorial Modal
+   ============================================================ */
+
+/* ── Home screen: single-column full-width flow ───────────────── */
+#screen-home {
+  align-items: stretch;  /* let children stretch full width */
+  padding: var(--space-4) var(--space-4) var(--space-10);
+  gap: 0;
+}
+
+/* Section header text group */
+.home-section-header {
+  margin-bottom: var(--space-3);
+}
+.home-section-sub {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-style: italic;
+}
+
+/* Section visibility helpers */
+.home-section--hidden {
+  display: none !important;
+}
+/* Milestone variant: reduced visual weight for preschool quest section */
+.home-section--milestone {
+  opacity: 0.75;
+  margin-top: var(--space-2);
+}
+.home-section--milestone .home-section-heading {
+  color: var(--text-muted);
+}
+
+/* ── PATHWAY BADGE ────────────────────────────────────────────── */
+.pathway-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  margin-bottom: var(--space-3);
+  align-self: flex-start;
+  border: 2px solid transparent;
+}
+.pathway-badge--preschool {
+  background: linear-gradient(135deg, #fdf4ff, #fce7f3);
+  border-color: #f0abfc;
+  color: #86198f;
+}
+.pathway-badge--primary {
+  background: linear-gradient(135deg, #eff6ff, #e0e7ff);
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+.pathway-badge-icon {
+  font-size: 1.1rem;
+}
+.pathway-badge-text {
+  letter-spacing: 0.01em;
+}
+
+/* ── HOME START CARD (dominant hero CTA) ─────────────────────── */
+.home-start-card {
+  width: 100%;
+  background: linear-gradient(145deg, var(--color-primary) 0%, #8b5cf6 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  margin-bottom: var(--space-4);
+  box-shadow: 0 8px 32px rgba(108,99,255,0.35), 0 2px 0 rgba(0,0,0,0.1);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+/* Subtle decorative arc */
+.home-start-card::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  pointer-events: none;
+}
+
+.start-card-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+.start-card-label {
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  color: white;
+}
+.start-card-urgency {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  background: rgba(255,255,255,0.18);
+  border-radius: var(--radius-full);
+  padding: 2px 10px;
+  color: white;
+}
+
+.start-card-domain-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  color: white;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  margin-bottom: var(--space-3);
+  letter-spacing: 0.02em;
+}
+
+.start-card-title {
+  font-size: var(--font-size-xl);
+  font-weight: 900;
+  color: white;
+  margin: 0 0 var(--space-2);
+  line-height: 1.2;
+}
+.start-card-reason {
+  font-size: var(--font-size-sm);
+  color: rgba(255,255,255,0.85);
+  margin: 0 0 var(--space-5);
+  line-height: 1.5;
+}
+
+/* Large white CTA inside the start card */
+.start-card-cta {
+  width: 100%;
+  justify-content: center;
+  background: white !important;
+  color: var(--color-primary-dark) !important;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.2) !important;
+  font-size: var(--font-size-md) !important;
+  border-radius: var(--radius-xl) !important;
+}
+.start-card-cta:hover {
+  filter: brightness(0.97);
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.22) !important;
+}
+.start-card-cta:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.2) !important;
+}
+
+/* ── TODAY'S LEARNING PATH (3-step roadmap) ──────────────────── */
+.home-roadmap {
+  width: 100%;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+.home-roadmap-title {
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  margin: 0 0 var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.roadmap-order-hint {
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+.home-roadmap-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.home-roadmap-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-align: left;
+  font-family: var(--font-main);
+  cursor: pointer;
+  transition: background var(--dur-fast), transform var(--dur-fast) var(--ease-bounce),
+              border-color var(--dur-fast);
+  width: 100%;
+}
+.home-roadmap-step:hover,
+.home-roadmap-step:focus-visible {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  transform: translateX(3px);
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.home-roadmap-step:active {
+  transform: translateX(0) scale(0.98);
+}
+.roadmap-num {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: white;
+  font-size: var(--font-size-sm);
+  font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+}
+.roadmap-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.roadmap-label  { font-size: var(--font-size-sm); font-weight: 700; color: var(--text); }
+.roadmap-detail { font-size: var(--font-size-xs); color: var(--text-muted); }
+.roadmap-arrow  { color: var(--color-primary); font-size: 1.1rem; font-weight: 800; flex-shrink: 0; }
+
+/* ── PROGRESS SNAPSHOT (chips) ────────────────────────────────── */
+.progress-snapshot {
+  width: 100%;
+  margin-bottom: var(--space-3);
+}
+.progress-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.progress-chip {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 4px 12px;
+}
+
+/* ── DAILY GOAL (now standalone, not inside hero-zone) ────────── */
+/* Inherit existing .daily-goal styles; add margin below */
+#screen-home .daily-goal {
+  margin-bottom: var(--space-4);
+}
+
+/* ── HOME SECTION generic improvements ────────────────────────── */
+#screen-home .home-section {
+  width: 100%;
+  margin-bottom: var(--space-6);
+}
+#screen-home .home-section-heading {
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  margin: 0 0 2px;
+}
+
+/* ── QUEST BANNERS inside quests section ──────────────────────── */
+#home-quests-section .stories-banner {
+  max-width: none;
+  margin: 0 0 var(--space-2);
+}
+#home-quests-section .stories-banner:last-child { margin-bottom: 0; }
+
+/* ── EXTRA PRACTICE section ───────────────────────────────────── */
+.home-extra-section {
+  border-top: 2px dashed var(--border);
+  padding-top: var(--space-5);
+  margin-top: var(--space-2);
+}
+.home-extra-section .home-section-heading {
+  color: var(--text-muted);
+}
+
+/* Spin section label */
+.home-spin-label {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: var(--space-3);
+}
+
+/* Tools banners inside extra section */
+.home-tools-section .stories-banner {
+  max-width: none;
+  margin: 0 0 var(--space-2);
+  padding: var(--space-2) var(--space-3);
+}
+.home-tools-section .stories-banner:last-child { margin-bottom: 0; }
+.home-tools-section .stories-banner-title { font-size: var(--font-size-sm); }
+.home-tools-section .stories-banner-sub   { font-size: var(--font-size-xs); }
+.home-tools-section .stories-banner-mascot { width: 40px; height: 40px; }
+.home-tools-section .stories-banner-mascot img  { width: 40px; height: 40px; }
+.home-tools-section .stories-banner-mascot span { font-size: 1.8rem !important; line-height: 40px; }
+
+/* ── ONBOARDING TUTORIAL MODAL ────────────────────────────────── */
+.ob-panel {
+  padding: var(--space-5) var(--space-6) var(--space-6);
+  max-width: 440px;
+  width: 100%;
+}
+
+.ob-skip-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-4);
+}
+.ob-skip-btn {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  padding: var(--space-1) var(--space-3);
+}
+
+.ob-content {
+  min-height: 240px;
+}
+
+.ob-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-bottom: var(--space-4);
+}
+.ob-screen-icon {
+  font-size: 3.5rem;
+  line-height: 1;
+  margin-bottom: var(--space-3);
+  animation: pop 0.4s var(--ease-bounce);
+}
+.ob-screen-title {
+  font-size: var(--font-size-lg);
+  font-weight: 900;
+  color: var(--text);
+  margin: 0 0 var(--space-4);
+  line-height: 1.25;
+}
+.ob-screen-body {
+  width: 100%;
+  text-align: left;
+  font-size: var(--font-size-sm);
+  color: var(--text);
+  line-height: 1.6;
+}
+.ob-intro {
+  color: var(--text-muted);
+  margin: 0 0 var(--space-3);
+}
+.ob-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0;
+}
+.ob-list li {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+/* Steps (ordered) */
+.ob-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.ob-step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+.ob-step-num {
+  flex-shrink: 0;
+  width: 26px; height: 26px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: white;
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px;
+}
+
+/* Highlight card (Start Here demo) */
+.ob-highlight-card {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #8b5cf6 100%);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-3);
+  color: white;
+}
+.ob-highlight-eyebrow {
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin-bottom: var(--space-1);
+}
+.ob-highlight-title {
+  font-size: var(--font-size-md);
+  font-weight: 900;
+  color: white;
+  margin: 0 0 var(--space-2);
+}
+.ob-highlight-body {
+  font-size: var(--font-size-sm);
+  color: rgba(255,255,255,0.9);
+  margin: 0;
+  line-height: 1.5;
+}
+.ob-highlight-hint {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Bonus list */
+.ob-bonus-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.ob-bonus-item {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+.ob-bonus-note {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Tutorial navigation */
+.ob-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-5);
+  gap: var(--space-3);
+}
+.ob-dots {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.ob-dot {
+  width: 8px; height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--border);
+  transition: background var(--dur-base), transform var(--dur-base) var(--ease-bounce);
+}
+.ob-dot--active {
+  background: var(--color-primary);
+  transform: scale(1.3);
+}
+.ob-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.ob-next-btn { min-width: 110px; justify-content: center; }
+
+/* Dark mode adjustments for new components */
+@media (prefers-color-scheme: dark) {
+  .home-start-card {
+    box-shadow: 0 8px 32px rgba(108,99,255,0.5), 0 2px 0 rgba(0,0,0,0.3);
+  }
+  .pathway-badge--preschool {
+    background: linear-gradient(135deg, #3b1f44, #3b1f33);
+    border-color: #9333ea;
+    color: #e879f9;
+  }
+  .pathway-badge--primary {
+    background: linear-gradient(135deg, #1e3a5f, #1e2d5f);
+    border-color: #3b82f6;
+    color: #93c5fd;
+  }
+}
 .wv-affix-slot { margin-left:6px; font-size:.75rem; opacity:.75; }
