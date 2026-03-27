@@ -21,10 +21,10 @@
   <!-- Styles -->
 
   <title>PhonicsQuest</title>
-  <script type="module" crossorigin src="/phonicsquest/assets/index-DVUI_ogK.js"></script>
+  <script type="module" crossorigin src="/phonicsquest/assets/index-CN_io8-N.js"></script>
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/gsap-C8pce-KX.js">
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/chartjs-BR_H7_9u.js">
-  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-DL92I8-Z.css">
+  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-Bd_vl-0F.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -92,6 +92,14 @@
     <!-- MAIN CONTENT -->
     <main id="main-content" class="main-content">
 
+      <!-- SCREEN: PLACEMENT TEST -->
+      <!-- Rendered dynamically by placementTest.js into this container -->
+      <section class="screen" id="screen-placement" aria-label="Quick placement check"></section>
+
+      <!-- SCREEN: SESSION SUMMARY -->
+      <!-- Rendered dynamically by sessionSummary.js into this container -->
+      <section class="screen" id="screen-session-summary" aria-label="Session complete"></section>
+
       <!-- SCREEN: PROFILE PICKER -->
       <section class="screen" id="screen-profiles" aria-label="Choose your profile">
         <div class="profile-screen">
@@ -106,189 +114,211 @@
 
       <!-- SCREEN: HOME -->
       <section class="screen active" id="screen-home" aria-label="Choose your activity">
-        <div class="home-hero" aria-hidden="true">
-          <div class="mascot-home" id="mascot-home"></div>
-        </div>
 
-        <!-- GUIDED LEARNER JOURNEY (rendered by app.js based on profile) -->
+        <!-- ① GUIDED JOURNEY: pathway badge + dominant start card + today's roadmap -->
+        <!--   (fully rendered by app.js _renderGuidedJourney based on profile)      -->
         <div id="guided-journey-section" aria-label="Guided learning path"></div>
 
-        <!-- Spin Wheel -->
-        <div id="explore-activities-label" class="home-explore-label" aria-hidden="true">Explore all activities</div>
-        <div class="wheel-wrapper" id="wheel-wrapper">
-          <canvas id="spin-wheel" width="260" height="260" aria-label="Word category wheel" role="img"></canvas>
-          <button class="spin-btn" id="spin-btn" aria-label="Spin the wheel to pick a word category">
-            SPIN!
-          </button>
-        </div>
-
-        <!-- Mode Grid (demoted below guided journey) -->
-        <nav class="mode-grid" aria-label="Activity modes">
-
-          <!-- Blending section -->
-          <p class="mode-section-label">Blending</p>
-          <button class="mode-card mode-card--highlight" data-mode="blend">
-            <span class="mode-icon" aria-hidden="true">🎯</span>
-            <span class="mode-name">Blend It!</span>
-            <span class="mode-desc">Step by step · for beginners</span>
-          </button>
-          <button class="mode-card" data-mode="classicBlend">
-            <span class="mode-icon" aria-hidden="true">🔊</span>
-            <span class="mode-name">Listen &amp; Blend</span>
-            <span class="mode-desc">Free mode · confident learners</span>
-          </button>
-
-          <!-- Phoneme identification section -->
-          <p class="mode-section-label">Phoneme Skills</p>
-          <button class="mode-card" data-mode="hear">
-            <span class="mode-icon" aria-hidden="true">👂</span>
-            <span class="mode-name">Hear &amp; Choose</span>
-            <span class="mode-desc">Listen carefully</span>
-          </button>
-          <button class="mode-card" data-mode="segment">
-            <span class="mode-icon" aria-hidden="true">✂️</span>
-            <span class="mode-name">Segment It</span>
-            <span class="mode-desc">Break it apart</span>
-          </button>
-          <button class="mode-card" data-mode="missing">
-            <span class="mode-icon" aria-hidden="true">🔍</span>
-            <span class="mode-name">Missing Sound</span>
-            <span class="mode-desc">Find the gap</span>
-          </button>
-
-          <!-- Phonemic awareness section -->
-          <p class="mode-section-label">Phonemic Awareness</p>
-          <button class="mode-card" data-mode="first">
-            <span class="mode-icon" aria-hidden="true">🚀</span>
-            <span class="mode-name">First Sound</span>
-            <span class="mode-desc">What starts it?</span>
-          </button>
-          <button class="mode-card" data-mode="last">
-            <span class="mode-icon" aria-hidden="true">🔚</span>
-            <span class="mode-name">Last Sound</span>
-            <span class="mode-desc">What ends it?</span>
-          </button>
-          <button class="mode-card" data-mode="middle">
-            <span class="mode-icon" aria-hidden="true">🎵</span>
-            <span class="mode-name">Middle Sound</span>
-            <span class="mode-desc">Find the vowel!</span>
-          </button>
-
-        </nav>
-
-        <!-- Letter Sounds banner -->
-        <button class="stories-banner stories-banner--green" id="btn-letter-sounds" aria-label="Open letter sounds introduction">
-          <span class="stories-banner-mascot">
-            <img src="/phonicsquest/images/mascot/giri-whiteboard.png" alt="Giri" draggable="false" width="52" height="52" style="object-fit:contain"/>
-          </span>
-          <span class="stories-banner-text">
-            <span class="stories-banner-title">🔤 Letter Sounds</span>
-            <span class="stories-banner-sub">Tap any sound to hear it · organised by type</span>
-          </span>
-          <span class="stories-banner-arrow">→</span>
-        </button>
-
-        <!-- Daily Challenge banner -->
-        <button class="stories-banner stories-banner--gold" id="btn-daily-challenge" aria-label="Start today's daily challenge">
-          <span class="stories-banner-mascot">
-            <span style="font-size:2.5rem;line-height:1" aria-hidden="true">📅</span>
-          </span>
-          <span class="stories-banner-text">
-            <span class="stories-banner-title" id="daily-banner-title">⚡ Daily Challenge</span>
-            <span class="stories-banner-sub" id="daily-banner-sub">5 words · earn 50 bonus XP</span>
-          </span>
-          <span class="stories-banner-arrow" id="daily-banner-arrow">→</span>
-        </button>
-
-        <!-- Sight Words banner -->
-        <button class="stories-banner stories-banner--blue" id="btn-sight-words" aria-label="Open sight word matching game">
-          <span class="stories-banner-mascot">
-            <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🃏</span>
-          </span>
-          <span class="stories-banner-text">
-            <span class="stories-banner-title">🔡 Sight Words</span>
-            <span class="stories-banner-sub">35 quests · flip &amp; match Dolch words</span>
-          </span>
-          <span class="stories-banner-arrow">→</span>
-        </button>
-
-        <!-- Sentence Forge Quest banner -->
-        <button class="stories-banner stories-banner--orange" id="btn-sentence-forge" aria-label="Open Sentence Forge Quest">
-          <span class="stories-banner-mascot">
-            <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🔨</span>
-          </span>
-          <span class="stories-banner-text">
-            <span class="stories-banner-title">🔨 Sentence Forge Quest</span>
-            <span class="stories-banner-sub">6 levels · unscramble &amp; build sentences</span>
-          </span>
-          <span class="stories-banner-arrow">→</span>
-        </button>
-
-        <!-- Cloze Castle Quest banner -->
-        <button class="stories-banner stories-banner--purple" id="btn-cloze-castle" aria-label="Open Cloze Castle Quest">
-          <span class="stories-banner-mascot">
-            <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🏰</span>
-          </span>
-          <span class="stories-banner-text">
-            <span class="stories-banner-title">🏰 Cloze Castle Quest</span>
-            <span class="stories-banner-sub">P1–P6 · grammar cloze passages</span>
-          </span>
-          <span class="stories-banner-arrow">→</span>
-        </button>
-
-        <!-- Word Vault Quest banner -->
-        <button class="stories-banner stories-banner--teal" id="btn-word-vault" aria-label="Open Word Vault Quest">
-          <span class="stories-banner-mascot">
-            <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🔑</span>
-          </span>
-          <span class="stories-banner-text">
-            <span class="stories-banner-title">🔑 Word Vault Quest</span>
-            <span class="stories-banner-sub">7 categories · vocabulary cloze passages</span>
-          </span>
-          <span class="stories-banner-arrow">→</span>
-        </button>
-
-        <!-- Editing Quest banner -->
-        <button class="stories-banner stories-banner--purple" id="btn-editing-quest" aria-label="Open Editing Quest">
-          <span class="stories-banner-mascot">
-            <span style="font-size:2.5rem;line-height:1" aria-hidden="true">✏️</span>
-          </span>
-          <span class="stories-banner-text">
-            <span class="stories-banner-title">✏️ Editing Quest</span>
-            <span class="stories-banner-sub">Grammar and spelling correction with rule feedback</span>
-          </span>
-          <span class="stories-banner-arrow">→</span>
-        </button>
-
-        <button class="stories-banner stories-banner--orange" id="btn-writing-quest" aria-label="Open Writing Quest">
-          <span class="stories-banner-mascot">
-            <span style="font-size:2.5rem;line-height:1" aria-hidden="true">📝</span>
-          </span>
-          <span class="stories-banner-text">
-            <span class="stories-banner-title">📝 Writing Quest</span>
-            <span class="stories-banner-sub">Prompt-based writing with rubric and peer review mode</span>
-          </span>
-          <span class="stories-banner-arrow">→</span>
-        </button>
-
-        <!-- Stories banner -->
-        <button class="stories-banner" id="btn-stories" aria-label="Open Giri story library">
-          <span class="stories-banner-mascot">
-            <img src="/phonicsquest/images/mascot/giri-hold-card.png" alt="Giri" draggable="false" width="52" height="52" style="object-fit:contain"/>
-          </span>
-          <span class="stories-banner-text">
-            <span class="stories-banner-title">📚 Giri Stories</span>
-            <span class="stories-banner-sub">16 decodable phonics stories · Read Aloud &amp; Decode</span>
-          </span>
-          <span class="stories-banner-arrow">→</span>
-        </button>
-
-        <!-- Daily Goal -->
+        <!-- ② Daily Goal progress strip -->
         <div class="daily-goal" role="status" aria-label="Daily goal progress">
           <span class="goal-label">Today</span>
           <div class="goal-track"><div class="goal-fill" id="goal-fill" style="width:0%"></div></div>
           <span class="goal-count"><span id="goal-done">0</span>/<span id="goal-total">10</span></span>
         </div>
+
+        <!-- ③ YOUR CHILD'S PATHWAY ACTIVITIES -->
+        <!--   Preschool: phonics mode grid (visible by default, hidden for primary by JS)   -->
+        <!--   Primary:   quest banners appear here (reordered by JS)                        -->
+
+        <!-- Phonics modes (preschool main lesson activities) -->
+        <div class="home-section" id="home-core-section">
+          <div class="home-section-header">
+            <p class="home-section-heading">All Phonics Activities</p>
+            <p class="home-section-sub">Tap any mode to practise · your guide above shows where to start</p>
+          </div>
+          <nav class="mode-grid" aria-label="Activity modes">
+
+            <p class="mode-section-label">Blending</p>
+            <button class="mode-card mode-card--highlight" data-mode="blend">
+              <span class="mode-icon" aria-hidden="true">🎯</span>
+              <span class="mode-name">Blend It!</span>
+              <span class="mode-desc">Step by step</span>
+            </button>
+            <button class="mode-card" data-mode="classicBlend">
+              <span class="mode-icon" aria-hidden="true">🔊</span>
+              <span class="mode-name">Listen &amp; Blend</span>
+              <span class="mode-desc">Free mode</span>
+            </button>
+
+            <p class="mode-section-label">Phoneme Skills</p>
+            <button class="mode-card" data-mode="hear">
+              <span class="mode-icon" aria-hidden="true">👂</span>
+              <span class="mode-name">Hear &amp; Choose</span>
+              <span class="mode-desc">Listen carefully</span>
+            </button>
+            <button class="mode-card" data-mode="segment">
+              <span class="mode-icon" aria-hidden="true">✂️</span>
+              <span class="mode-name">Segment It</span>
+              <span class="mode-desc">Break it apart</span>
+            </button>
+            <button class="mode-card" data-mode="missing">
+              <span class="mode-icon" aria-hidden="true">🔍</span>
+              <span class="mode-name">Missing Sound</span>
+              <span class="mode-desc">Find the gap</span>
+            </button>
+
+            <p class="mode-section-label">Phonemic Awareness</p>
+            <button class="mode-card" data-mode="first">
+              <span class="mode-icon" aria-hidden="true">🚀</span>
+              <span class="mode-name">First Sound</span>
+              <span class="mode-desc">What starts it?</span>
+            </button>
+            <button class="mode-card" data-mode="last">
+              <span class="mode-icon" aria-hidden="true">🔚</span>
+              <span class="mode-name">Last Sound</span>
+              <span class="mode-desc">What ends it?</span>
+            </button>
+            <button class="mode-card" data-mode="middle">
+              <span class="mode-icon" aria-hidden="true">🎵</span>
+              <span class="mode-name">Middle Sound</span>
+              <span class="mode-desc">Find the vowel!</span>
+            </button>
+
+          </nav>
+        </div><!-- end home-core-section -->
+
+        <!-- Quest banners (primary main lesson; preschool: milestone tracker) -->
+        <div class="home-section home-quests-section" id="home-quests-section">
+          <div class="home-section-header">
+            <p class="home-section-heading" id="quests-section-heading">Learning Quests</p>
+            <p class="home-section-sub" id="quests-section-sub">Sentence, grammar &amp; vocabulary practice</p>
+          </div>
+
+          <button class="stories-banner stories-banner--orange" id="btn-sentence-forge" aria-label="Open Sentence Forge Quest">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🔨</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title">🔨 Sentence Forge</span>
+              <span class="stories-banner-sub">Unscramble &amp; build sentences · 6 levels</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+
+          <button class="stories-banner stories-banner--purple" id="btn-cloze-castle" aria-label="Open Cloze Castle Quest">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🏰</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title">🏰 Cloze Castle</span>
+              <span class="stories-banner-sub">Grammar cloze passages · P1–P6</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+
+          <button class="stories-banner stories-banner--teal" id="btn-word-vault" aria-label="Open Word Vault Quest">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🔑</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title">🔑 Word Vault</span>
+              <span class="stories-banner-sub">Vocabulary in context · 7 categories</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+
+          <button class="stories-banner stories-banner--purple" id="btn-editing-quest" aria-label="Open Editing Quest">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">✏️</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title">✏️ Editing Quest</span>
+              <span class="stories-banner-sub">Grammar &amp; spelling correction</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+
+          <button class="stories-banner stories-banner--orange" id="btn-writing-quest" aria-label="Open Writing Quest">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">📝</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title">📝 Writing Quest</span>
+              <span class="stories-banner-sub">Prompt-based writing with rubric</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+
+        </div><!-- end home-quests-section -->
+
+        <!-- ④ EXTRA PRACTICE — clearly labelled as bonus, after main lesson -->
+        <div class="home-section home-extra-section" id="home-extra-section">
+          <div class="home-section-header">
+            <p class="home-section-heading">Extra Practice</p>
+            <p class="home-section-sub">Use these <em>after</em> your main lesson activities above</p>
+          </div>
+
+          <!-- Spin Wheel (random activity selector) -->
+          <div class="home-spin-section">
+            <p class="home-spin-label" aria-hidden="true">🎡 Random Activity — spin for a surprise!</p>
+            <div class="wheel-wrapper" id="wheel-wrapper">
+              <canvas id="spin-wheel" width="260" height="260" aria-label="Word category wheel" role="img"></canvas>
+              <button class="spin-btn" id="spin-btn" aria-label="Spin the wheel to pick a word category">
+                SPIN!
+              </button>
+            </div>
+          </div>
+
+          <!-- Bonus activity banners -->
+          <div class="home-tools-section" id="home-tools-section">
+
+            <button class="stories-banner stories-banner--gold" id="btn-daily-challenge" aria-label="Start today's daily challenge">
+              <span class="stories-banner-mascot">
+                <span style="font-size:2rem;line-height:1" aria-hidden="true">⚡</span>
+              </span>
+              <span class="stories-banner-text">
+                <span class="stories-banner-title" id="daily-banner-title">⚡ Daily Challenge</span>
+                <span class="stories-banner-sub" id="daily-banner-sub">5 words · earn 50 bonus XP</span>
+              </span>
+              <span class="stories-banner-arrow" id="daily-banner-arrow">→</span>
+            </button>
+
+            <button class="stories-banner stories-banner--blue" id="btn-sight-words" aria-label="Open sight word matching game">
+              <span class="stories-banner-mascot">
+                <span style="font-size:2rem;line-height:1" aria-hidden="true">🃏</span>
+              </span>
+              <span class="stories-banner-text">
+                <span class="stories-banner-title">🔡 Sight Words</span>
+                <span class="stories-banner-sub">35 quests · flip &amp; match</span>
+              </span>
+              <span class="stories-banner-arrow">→</span>
+            </button>
+
+            <button class="stories-banner" id="btn-stories" aria-label="Open Giri story library">
+              <span class="stories-banner-mascot">
+                <img src="/phonicsquest/images/mascot/giri-hold-card.png" alt="" draggable="false" width="44" height="44" style="object-fit:contain"/>
+              </span>
+              <span class="stories-banner-text">
+                <span class="stories-banner-title">📚 Giri Stories</span>
+                <span class="stories-banner-sub">16 decodable phonics stories</span>
+              </span>
+              <span class="stories-banner-arrow">→</span>
+            </button>
+
+            <button class="stories-banner stories-banner--green" id="btn-letter-sounds" aria-label="Open letter sounds introduction">
+              <span class="stories-banner-mascot">
+                <img src="/phonicsquest/images/mascot/giri-whiteboard.png" alt="" draggable="false" width="44" height="44" style="object-fit:contain"/>
+              </span>
+              <span class="stories-banner-text">
+                <span class="stories-banner-title">🔤 Letter Sounds</span>
+                <span class="stories-banner-sub">Tap any sound to hear it</span>
+              </span>
+              <span class="stories-banner-arrow">→</span>
+            </button>
+
+          </div><!-- end home-tools-section -->
+        </div><!-- end home-extra-section -->
+
       </section>
 
       <!-- SCREEN: GAME -->
@@ -482,6 +512,24 @@
     <canvas id="confetti-canvas" aria-hidden="true"
             style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999;"></canvas>
 
+    <!-- ONBOARDING TUTORIAL MODAL -->
+    <div class="modal-overlay" id="modal-onboarding" role="dialog" aria-modal="true" aria-label="Welcome to PhonicsQuest" hidden>
+      <div class="modal-panel ob-panel">
+        <div class="ob-skip-row">
+          <button class="btn btn--ghost btn--sm ob-skip-btn" id="ob-skip-btn" aria-label="Skip tutorial">Skip</button>
+        </div>
+        <!-- Tutorial content rendered by app.js -->
+        <div id="ob-content" class="ob-content"></div>
+        <div class="ob-nav">
+          <div class="ob-dots" id="ob-dots" aria-label="Tutorial progress" role="tablist"></div>
+          <div class="ob-actions">
+            <button class="btn btn--ghost" id="ob-prev" hidden aria-label="Previous step">← Back</button>
+            <button class="btn btn--primary ob-next-btn" id="ob-next" aria-label="Next step">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- SETTINGS MODAL -->
     <div class="modal-overlay" id="modal-settings" role="dialog" aria-modal="true" aria-label="Settings" hidden>
       <div class="modal-panel">
@@ -637,6 +685,16 @@
           </button>
         </div>
         <div class="modal-body" id="dashboard-content"><!-- Injected by dashboard.js --></div>
+        <!-- Export / Import toolbar — always visible at the bottom of the dashboard -->
+        <div class="dashboard-data-row" aria-label="Backup and restore">
+          <button class="btn btn--ghost btn--sm" id="dashboard-export-btn" aria-label="Download progress backup">
+            📥 Export backup
+          </button>
+          <label class="btn btn--ghost btn--sm dashboard-import-label" aria-label="Import progress from file">
+            📤 Import backup
+            <input type="file" id="dashboard-import-input" accept=".json" class="sr-only" tabindex="-1">
+          </label>
+        </div>
       </div>
     </div>
 

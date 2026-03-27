@@ -15,8 +15,9 @@ import { getLevelInfo, XP_REWARDS } from '../data/curriculum.js';
 
 class Gamification {
   constructor() {
-    this._sessionCorrect = 0;
-    this._sessionWrong   = 0;
+    this._sessionCorrect        = 0;
+    this._sessionWrong          = 0;
+    this._freezeUsedThisSession = false;
   }
 
   /** Initialize: check daily reset, update streak, reset session energy */
@@ -27,7 +28,7 @@ class Gamification {
     this._updateUI();
   }
 
-  /** Check / maintain day streak */
+  /** Check / maintain day streak, applying a freeze token if available. */
   _checkStreak() {
     const today = new Date().toDateString();
     const last  = store.get('lastPlayDate');
@@ -35,10 +36,66 @@ class Gamification {
     if (last === today) return; // same day
 
     const yesterday = new Date(Date.now() - 86400000).toDateString();
-    if (last !== yesterday) {
-      // Streak broken
+    if (last === yesterday) return; // consecutive day — streak intact
+
+    // Streak is broken (missed at least one day).
+    // Refresh weekly freeze token if it's a new week (Sunday = day 0).
+    this._refreshWeeklyFreeze();
+
+    const freezes = store.get('streakFreezes') ?? 0;
+    const daysMissed = this._daysBetween(last, today);
+
+    // Apply a freeze token if: only 1 day was missed and a freeze is available.
+    if (daysMissed === 1 && freezes > 0) {
+      store.patch({
+        streakFreezes: freezes - 1,
+        // Do NOT reset streak — the freeze bridges the gap.
+      });
+      this._freezeUsedThisSession = true;
+    } else {
+      // Streak genuinely broken — reset.
       store.set('streak', 0);
     }
+  }
+
+  /** Refresh the weekly streak-freeze token on Sunday. */
+  _refreshWeeklyFreeze() {
+    const now       = new Date();
+    const isSunday  = now.getDay() === 0;
+    const lastReset = store.get('weeklyFreezeResetAt');
+    const lastDate  = lastReset ? new Date(lastReset).toDateString() : null;
+
+    if (isSunday && lastDate !== now.toDateString()) {
+      store.patch({
+        streakFreezes:       1,
+        weeklyFreezeResetAt: now.toISOString(),
+      });
+    }
+  }
+
+  /**
+   * Count the number of calendar days between two Date.toDateString() values.
+   * @param {string} fromDateStr
+   * @param {string} toDateStr
+   * @returns {number}
+   */
+  _daysBetween(fromDateStr, toDateStr) {
+    const from = new Date(fromDateStr).getTime();
+    const to   = new Date(toDateStr).getTime();
+    return Math.round(Math.abs(to - from) / 86400000);
+  }
+
+  /**
+   * How many days has the learner been away?
+   * Returns 0 if they played today, a positive integer otherwise.
+   * @returns {number}
+   */
+  getDaysAway() {
+    const last = store.get('lastPlayDate');
+    if (!last) return 0;
+    const today = new Date().toDateString();
+    if (last === today) return 0;
+    return this._daysBetween(last, today);
   }
 
   /**
@@ -164,8 +221,65 @@ class Gamification {
 
   /** Reset session counters */
   resetSession() {
-    this._sessionCorrect = 0;
-    this._sessionWrong   = 0;
+    this._sessionCorrect  = 0;
+    this._sessionWrong    = 0;
+    this._freezeUsedThisSession = false;
+  }
+
+  /**
+   * Was a streak freeze consumed when the app loaded today?
+   * Used to show a "streak saved!" message in the UI.
+   */
+  wasFreezeUsed() {
+    return !!this._freezeUsedThisSession;
+  }
+
+  /**
+   * Aggregate learning stats for the last 7 calendar days.
+   * Used by the weekly recap screen and parent dashboard.
+   * @returns {{ daysPlayed:number, xpThisWeek:number, wordsThisWeek:number, questsThisWeek:number, newBadgesThisWeek:string[] }}
+   */
+  getWeeklyStats() {
+    const events    = store.get('learningEvents') || [];
+    const calendar  = store.get('challengeCalendar') || [];
+    const cutoff    = Date.now() - 7 * 86400000;
+
+    const recentEvents = events.filter(e => {
+      const t = e.timestamp ? new Date(e.timestamp).getTime() : 0;
+      return t >= cutoff;
+    });
+
+    const wordsSeen = new Set(
+      recentEvents
+        .filter(e => e.eventType === 'word_attempt' && e.meta?.wordId)
+        .map(e => e.meta.wordId)
+    );
+
+    const questsCompleted = recentEvents.filter(e => e.eventType === 'quest_complete').length;
+
+    // Days played is estimated from the challengeCalendar + lastPlayDate
+    const today   = new Date().toDateString();
+    const daysAgo = (dStr) => {
+      const d = new Date(dStr);
+      return isNaN(d) ? Infinity : Math.floor((Date.now() - d.getTime()) / 86400000);
+    };
+    const daysPlayed = new Set(
+      calendar.filter(d => daysAgo(d) < 7).concat(
+        store.get('lastPlayDate') === today ? [today] : []
+      )
+    ).size;
+
+    // XP gained this week: sum of xpEarned in recent events
+    const xpThisWeek = recentEvents
+      .filter(e => typeof e.meta?.xpEarned === 'number')
+      .reduce((sum, e) => sum + e.meta.xpEarned, 0);
+
+    return {
+      daysPlayed,
+      xpThisWeek,
+      wordsThisWeek: wordsSeen.size,
+      questsThisWeek: questsCompleted,
+    };
   }
 
   /** Announce a message to screen readers via a transient aria-live region */

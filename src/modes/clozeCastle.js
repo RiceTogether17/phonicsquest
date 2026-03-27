@@ -17,6 +17,7 @@
  */
 
 import { passages, CLOZE_LEVEL_LABELS, CLOZE_LEVEL_ICONS, GRAMMAR_CATEGORIES } from '../data/passages.js';
+import { getGrammarTip } from '../data/grammarTips.js';
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 import { gamification } from '../modules/gamification.js';
@@ -51,9 +52,10 @@ let _passageIdx     = 0;
 let _levelPassages  = [];
 let _bankWords      = [];   // [{id, word, used}]
 let _blankFills     = [];   // null | bankWordId per blank
-let _sessionCorrect = 0;
-let _sessionTotal   = 0;
-let _keyHandler     = null;
+let _sessionCorrect   = 0;
+let _sessionTotal     = 0;
+let _passageWrongCount = 0; // wrong attempts on current passage (for teach-back)
+let _keyHandler       = null;
 
 // ── Clue-mode state ────────────────────────────────────────────────────────
 // activeBlankIndex: which blank is in the clue-hunt phase right now (-1 = all done)
@@ -226,9 +228,10 @@ function _initPassage(passage) {
   _blankFills = round.blankFills;
 
   // Reset clue state
-  _clueResults      = {};
-  _hintLevel        = 0;
-  _weakAttempts     = 0;
+  _clueResults       = {};
+  _hintLevel         = 0;
+  _weakAttempts      = 0;
+  _passageWrongCount = 0; // reset per-passage wrong counter for teach-back
 
   // Determine starting mode
   if (passage.clues && passage.clues.length > 0) {
@@ -615,6 +618,7 @@ function _checkPassage(passage) {
     }
   } else {
     audio.playSfx('wrong');
+    _passageWrongCount++;
 
     document.querySelectorAll('.cloze-blank--filled').forEach((b, i) => {
       const userAns = _bankWords.find(w => w.id === _blankFills[i])?.word || '';
@@ -622,13 +626,84 @@ function _checkPassage(passage) {
     });
 
     mascot.encourage();
-    _showFeedback('❌ Some blanks are wrong – try again!', false);
-    setTimeout(() => {
-      document.querySelectorAll('.cloze-blank--wrong').forEach(b => b.classList.remove('cloze-blank--wrong'));
-      const fb = document.getElementById('cloze-feedback');
-      if (fb) fb.hidden = true;
-    }, 1800);
+
+    if (_passageWrongCount >= 2) {
+      // Second wrong attempt on this passage → teach-back before retry
+      _showFeedback('❌ Let\'s look at the rule first, then try again!', false);
+      setTimeout(() => {
+        document.querySelectorAll('.cloze-blank--wrong').forEach(b => b.classList.remove('cloze-blank--wrong'));
+        const fb = document.getElementById('cloze-feedback');
+        if (fb) fb.hidden = true;
+        _showTeachBackOverlay(passage);
+      }, 1000);
+    } else {
+      _showFeedback('❌ Some blanks are wrong – try again!', false);
+      setTimeout(() => {
+        document.querySelectorAll('.cloze-blank--wrong').forEach(b => b.classList.remove('cloze-blank--wrong'));
+        const fb = document.getElementById('cloze-feedback');
+        if (fb) fb.hidden = true;
+      }, 1800);
+    }
   }
+}
+
+// ── Teach-Back Overlay ─────────────────────────────────────────────────────
+
+/**
+ * Show a grammar tip overlay when the learner has failed a passage twice.
+ * Displays the rule, an example, and a "Got it, try again" button.
+ * @param {object} passage
+ */
+function _showTeachBackOverlay(passage) {
+  if (!_container) return;
+
+  const existing = document.getElementById('cloze-teachback-overlay');
+  if (existing) existing.remove();
+
+  const catKey = _currentCat === '__all__' ? null : _currentCat;
+  const tip    = catKey ? getGrammarTip(catKey) : {
+    rule: 'Read each sentence carefully and look for clues about which word fits best.',
+    example: 'Look at the words around the blank — they often tell you what grammar rule to use.',
+  };
+
+  const overlay = document.createElement('div');
+  overlay.id        = 'cloze-teachback-overlay';
+  overlay.className = 'cloze-teachback-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', 'Grammar tip');
+
+  overlay.innerHTML = `
+    <div class="ctb-panel">
+      <div class="ctb-header">
+        <span class="ctb-icon" aria-hidden="true">💡</span>
+        <h3 class="ctb-title">Here's a tip!</h3>
+      </div>
+      <div class="ctb-rule">
+        <p class="ctb-rule-text">${tip.rule}</p>
+      </div>
+      <div class="ctb-example">
+        <span class="ctb-example-label">Example:</span>
+        <p class="ctb-example-text">${tip.example}</p>
+      </div>
+      ${tip.tip ? `<p class="ctb-memory-tip">💡 ${tip.tip}</p>` : ''}
+      <button class="btn btn--primary ctb-btn" id="ctb-try-again">
+        Got it — try again!
+      </button>
+    </div>`;
+
+  _container.appendChild(overlay);
+
+  overlay.querySelector('#ctb-try-again')?.addEventListener('click', () => {
+    overlay.remove();
+    // Clear all fills so the child starts the passage fresh
+    clearClozeRound(_blankFills);
+    _blankFills = _blankFills.map(() => null);
+    _renderBankWords(passage);
+    _renderPassageText(passage);
+  });
+
+  setTimeout(() => overlay.querySelector('#ctb-try-again')?.focus(), 100);
 }
 
 // ── Post-answer Clue Explanation ───────────────────────────────────────────

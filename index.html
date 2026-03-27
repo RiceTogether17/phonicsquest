@@ -89,6 +89,14 @@
     <!-- MAIN CONTENT -->
     <main id="main-content" class="main-content">
 
+      <!-- SCREEN: PLACEMENT TEST -->
+      <!-- Rendered dynamically by placementTest.js into this container -->
+      <section class="screen" id="screen-placement" aria-label="Quick placement check"></section>
+
+      <!-- SCREEN: SESSION SUMMARY -->
+      <!-- Rendered dynamically by sessionSummary.js into this container -->
+      <section class="screen" id="screen-session-summary" aria-label="Session complete"></section>
+
       <!-- SCREEN: PROFILE PICKER -->
       <section class="screen" id="screen-profiles" aria-label="Choose your profile">
         <div class="profile-screen">
@@ -674,6 +682,16 @@
           </button>
         </div>
         <div class="modal-body" id="dashboard-content"><!-- Injected by dashboard.js --></div>
+        <!-- Export / Import toolbar — always visible at the bottom of the dashboard -->
+        <div class="dashboard-data-row" aria-label="Backup and restore">
+          <button class="btn btn--ghost btn--sm" id="dashboard-export-btn" aria-label="Download progress backup">
+            📥 Export backup
+          </button>
+          <label class="btn btn--ghost btn--sm dashboard-import-label" aria-label="Import progress from file">
+            📤 Import backup
+            <input type="file" id="dashboard-import-input" accept=".json" class="sr-only" tabindex="-1">
+          </label>
+        </div>
       </div>
     </div>
 
