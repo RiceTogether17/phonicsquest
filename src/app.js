@@ -34,6 +34,7 @@ import { initWritingQuest, showWritingBrowser, cleanupWritingQuest } from './mod
 import {
   getProfiles, createProfile, deleteProfile, activateProfile,
   getActiveProfile, needsProfileSelection, restoreActiveProfile,
+  exportProfile, importProfile,
   AVATAR_OPTIONS, COLOR_OPTIONS,
 } from './modules/profiles.js';
 import {
@@ -48,6 +49,9 @@ import { modalManager } from './modules/modalManager.js';
 import { keyboardManager } from './modules/keyboardManager.js';
 import { settingsController } from './modules/settingsController.js';
 import { getQuestUnlockStatus } from './modules/questUnlocks.js';
+import { showPlacementTest } from './modules/placementTest.js';
+import { showSessionSummary } from './components/sessionSummary.js';
+import { showWeeklyRecap, shouldShowWeeklyRecap } from './components/weeklyRecap.js';
 
 async function hashPin(pin) {
   if (!window.crypto?.subtle) return `plain:${pin}`;
@@ -128,6 +132,9 @@ class App {
       this._renderProfileGrid();
     } else {
       this._updateProfileChip();
+      // Returning user — increment total sessions and run return-event checks
+      store.set('totalSessions', (store.get('totalSessions') || 0) + 1);
+      setTimeout(() => this._checkReturnEvents(), 800);
     }
 
     this._updateDailyBanner();
@@ -646,9 +653,13 @@ class App {
         audio.playSfx('correct');
       }
 
+      // Track today's session XP
+      store.addSessionXp(reward.xpEarned || 0);
+
       if (reward.dailyComplete) {
         celebrateDailyGoal();
-        this._showToast('Daily goal complete!', 'success');
+        // Show session summary after a brief result screen pause
+        setTimeout(() => this._showSessionSummaryScreen(reward), 1800);
       }
 
       // Show result screen
@@ -1124,6 +1135,41 @@ class App {
         },
       });
     }
+
+    // Bind the export-profile button inside the dashboard (rendered dynamically)
+    setTimeout(() => {
+      const exportBtn = document.getElementById('dashboard-export-btn');
+      if (exportBtn && !exportBtn._bound) {
+        exportBtn._bound = true;
+        exportBtn.addEventListener('click', () => {
+          const profile = getActiveProfile();
+          if (profile?.id) {
+            const ok = exportProfile(profile.id);
+            this._showToast(ok ? '📥 Backup downloaded!' : 'Export failed — please try again.', ok ? 'success' : 'warning');
+          }
+        });
+      }
+
+      const importInput = document.getElementById('dashboard-import-input');
+      if (importInput && !importInput._bound) {
+        importInput._bound = true;
+        importInput.addEventListener('change', (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const { profile: newProfile, error } = importProfile(ev.target.result);
+            if (error) {
+              this._showToast(`Import failed: ${error}`, 'warning');
+            } else {
+              this._showToast(`Profile "${newProfile.name}" imported! Switch profiles to use it.`, 'success');
+            }
+            importInput.value = '';
+          };
+          reader.readAsText(file);
+        });
+      }
+    }, 100);
   }
 
   /**
@@ -1531,7 +1577,58 @@ class App {
     this._updateProfileChip();
     this._renderProfileGrid();
 
-    // Go straight to home
+    // Show placement test for new profiles before home screen.
+    // Preschool learners go to home directly (they start at Phase 1 by design).
+    // Primary learners get a short diagnostic to set starting level.
+    if (!store.get('placementComplete')) {
+      this._showScreen('screen-placement');
+      this._runPlacementTest(profile);
+    } else {
+      this._afterPlacement(profile, null);
+    }
+
+    audio.playSfx('correct');
+  }
+
+  // ── Placement Test ──
+
+  /**
+   * Run the placement diagnostic for a newly created profile.
+   * Renders into #screen-placement and calls _afterPlacement when done.
+   * @param {object} profile
+   */
+  _runPlacementTest(profile) {
+    const container = document.getElementById('screen-placement');
+    if (!container) {
+      this._afterPlacement(profile, null);
+      return;
+    }
+    showPlacementTest({
+      container,
+      profile,
+      onComplete: (result) => {
+        // Apply placement result to store
+        if (result.preSeededStats && Object.keys(result.preSeededStats).length > 0) {
+          const existing = store.get('wordStats') || {};
+          store.set('wordStats', { ...result.preSeededStats, ...existing });
+        }
+        if (result.startGroup) {
+          store.set('currentGroup', result.startGroup);
+        }
+        store.set('placementComplete', true);
+        this._afterPlacement(profile, result);
+      },
+    });
+  }
+
+  /**
+   * Navigate to the home screen after placement (or on returning users).
+   * Applies post-placement state, shows onboarding tutorial if needed,
+   * then checks for weekly recap / comeback session.
+   * @param {object} profile
+   * @param {object|null} placementResult
+   */
+  _afterPlacement(profile, placementResult) {
     this._showScreen(SCREENS.HOME);
     mascot.setHomeState('holdCard');
     this._renderGuidedJourney();
@@ -1540,9 +1637,195 @@ class App {
     // Show onboarding tutorial for new profiles (first-run experience)
     if (!store.get('onboardingComplete')) {
       setTimeout(() => this._showOnboardingTutorial(profile), 400);
+      return;
     }
 
-    audio.playSfx('correct');
+    // Weekly recap / comeback checks for returning users
+    this._checkReturnEvents();
+  }
+
+  // ── Return-event checks (streak freeze, comeback, weekly recap, backup) ──
+
+  /**
+   * Run on init (returning user) or after first placement (onboarding done).
+   * Checks: streak freeze notification → comeback session → weekly recap → backup reminder.
+   * Each check is mutually exclusive per session to avoid modal stacking.
+   */
+  _checkReturnEvents() {
+    // 1. Streak freeze notification
+    if (gamification.wasFreezeUsed()) {
+      this._showToast('Streak saved! 🛡️ Your streak freeze was used automatically.', 'success');
+    }
+
+    // 2. Comeback session: 2–6 days away
+    const daysAway = gamification.getDaysAway();
+    if (daysAway >= 2 && daysAway <= 6) {
+      const last = store.get('comebackShownAt');
+      const today = new Date().toDateString();
+      if (!last || new Date(last).toDateString() !== today) {
+        store.set('comebackShownAt', new Date().toISOString());
+        setTimeout(() => this._showComebackModal(daysAway), 600);
+        return; // don't show other modals on top
+      }
+    }
+
+    // 3. Weekly recap (7+ days since last shown, and user has some history)
+    if (shouldShowWeeklyRecap()) {
+      const stats = gamification.getWeeklyStats();
+      setTimeout(() => showWeeklyRecap({
+        stats,
+        onClose: () => this._checkBackupReminder(),
+      }), 600);
+      return;
+    }
+
+    // 4. Backup reminder
+    this._checkBackupReminder();
+  }
+
+  /**
+   * Show the "Welcome back" modal after a 2–6 day absence.
+   * @param {number} daysAway
+   */
+  _showComebackModal(daysAway) {
+    const profile  = getActiveProfile();
+    const name     = profile?.name?.split(' ')[0] || 'there';
+    const existing = document.getElementById('modal-comeback');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id        = 'modal-comeback';
+    modal.className = 'modal-overlay modal-overlay--active';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Welcome back');
+
+    const dayLabel = daysAway === 1 ? 'yesterday' : `${daysAway} days ago`;
+    const streak   = store.get('streak') || 0;
+
+    modal.innerHTML = `
+      <div class="modal-panel cb-panel">
+        <div class="cb-icon" aria-hidden="true">👋</div>
+        <h2 class="cb-title">Welcome back, ${name}!</h2>
+        <p class="cb-body">You last played ${dayLabel}. Let's warm up with a quick 5-question round before diving in.</p>
+        ${streak > 0 ? `<p class="cb-streak">🔥 Your streak is at <strong>${streak} days</strong> — keep it going!</p>` : ''}
+        <div class="cb-actions">
+          <button class="btn btn--primary btn--xl" id="cb-warm-up">Start warm-up →</button>
+          <button class="btn btn--ghost" id="cb-skip">Skip, go to home</button>
+        </div>
+      </div>`;
+
+    document.body.appendChild(modal);
+
+    modal.querySelector('#cb-warm-up')?.addEventListener('click', () => {
+      modal.remove();
+      // Start blend mode on the last-played group — a familiar warm-up
+      this._mode = 'blend';
+      store.set('currentMode', 'blend');
+      this._startGame(store.get('currentGroup') || 'cvc-a');
+    });
+    modal.querySelector('#cb-skip')?.addEventListener('click', () => {
+      modal.remove();
+      this._checkBackupReminder();
+    });
+
+    setTimeout(() => modal.querySelector('#cb-warm-up')?.focus(), 100);
+  }
+
+  /**
+   * Show the backup reminder if 7+ days have passed since the last reminder
+   * and the profile has meaningful progress.
+   */
+  _checkBackupReminder() {
+    const last = store.get('lastBackupReminderAt');
+    if (last) {
+      const daysSince = (Date.now() - new Date(last).getTime()) / 86400000;
+      if (daysSince < 7) return;
+    }
+
+    // Only remind if there is real progress to lose
+    const wordCount = Object.keys(store.get('wordStats') || {}).length;
+    if (wordCount < 10) return;
+
+    store.set('lastBackupReminderAt', new Date().toISOString());
+    this._showBackupReminderModal();
+  }
+
+  /**
+   * Show the backup reminder modal.
+   */
+  _showBackupReminderModal() {
+    const existing = document.getElementById('modal-backup-reminder');
+    if (existing) existing.remove();
+
+    const profile  = getActiveProfile();
+    const wordCount = Object.keys(store.get('wordStats') || {}).length;
+
+    const modal = document.createElement('div');
+    modal.id        = 'modal-backup-reminder';
+    modal.className = 'modal-overlay modal-overlay--active';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Backup your progress');
+
+    modal.innerHTML = `
+      <div class="modal-panel br-panel">
+        <div class="br-icon" aria-hidden="true">💾</div>
+        <h2 class="br-title">Back up your progress!</h2>
+        <p class="br-body">
+          ${profile?.name || 'Your learner'} has practised <strong>${wordCount} words</strong>.
+          If browser data is cleared, this progress could be lost.
+        </p>
+        <p class="br-body">Download a backup file to keep it safe.</p>
+        <div class="br-actions">
+          <button class="btn btn--primary" id="br-export-btn">📥 Download backup</button>
+          <button class="btn btn--ghost" id="br-dismiss-btn">Remind me later</button>
+        </div>
+      </div>`;
+
+    document.body.appendChild(modal);
+
+    modal.querySelector('#br-export-btn')?.addEventListener('click', () => {
+      const activeId = profile?.id;
+      if (activeId) exportProfile(activeId);
+      modal.remove();
+      this._showToast('Backup downloaded! Keep the file somewhere safe.', 'success');
+    });
+    modal.querySelector('#br-dismiss-btn')?.addEventListener('click', () => modal.remove());
+
+    setTimeout(() => modal.querySelector('#br-export-btn')?.focus(), 100);
+  }
+
+  // ── Session Summary ──
+
+  /**
+   * Show the session summary screen when the daily goal is reached.
+   * Called from _handleResult when dailyComplete is true.
+   * @param {{ xpEarned: number }} reward
+   */
+  _showSessionSummaryScreen(reward) {
+    const wordsToday = (store.get('sessionWordsToday') || []).length;
+    const streak     = store.get('streak') || 0;
+
+    // Collect any badges that fired today
+    const newBadges = badges.getRecentlyEarned?.() || [];
+
+    showSessionSummary({
+      xpEarned:   store.get('sessionXpToday') || reward.xpEarned || 0,
+      wordsCount: wordsToday,
+      streak,
+      newBadges,
+      onClose: ({ continueSession } = {}) => {
+        if (continueSession) {
+          // Go back to game
+          this._nextWord();
+        } else {
+          this._showScreen(SCREENS.HOME);
+          mascot.setHomeState('holdCard');
+        }
+      },
+    });
+    this._showScreen('screen-session-summary');
   }
 
   // ── Blend Curriculum Picker ──

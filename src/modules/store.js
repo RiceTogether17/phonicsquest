@@ -102,6 +102,39 @@ const DEFAULT_STATE = {
 
   // Mascot
   mascotName: 'Ollie',
+
+  // ── Placement & onboarding ─────────────────────────────────────────────
+  // Set to true after the placement diagnostic has been completed (or skipped).
+  placementComplete: false,
+
+  // Total sessions ever played (incremented on each session start).
+  totalSessions: 0,
+
+  // ── Streak freeze system ────────────────────────────────────────────────
+  // Number of streak-freeze tokens available to the learner.
+  // Refreshes to 1 each week (Sunday midnight).
+  streakFreezes: 1,
+  // ISO date string of last weekly freeze reset (to determine when to refresh).
+  weeklyFreezeResetAt: null,
+
+  // ── Comeback / return detection ─────────────────────────────────────────
+  // ISO date string of last time the comeback session was shown, so it only
+  // appears once per return event (not every time the app opens).
+  comebackShownAt: null,
+
+  // ── Session summary ─────────────────────────────────────────────────────
+  // XP earned in the current calendar day (reset at midnight alongside dailyDone).
+  sessionXpToday: 0,
+  // Words seen in the current calendar day (IDs, capped at 50).
+  sessionWordsToday: [],
+
+  // ── Weekly recap ────────────────────────────────────────────────────────
+  // ISO date string of last time the weekly recap was shown.
+  lastWeeklyRecapAt: null,
+
+  // ── Backup reminder ─────────────────────────────────────────────────────
+  // ISO date string of last time the backup reminder was shown.
+  lastBackupReminderAt: null,
 };
 
 class Store {
@@ -269,12 +302,58 @@ class Store {
   recordWordAttempt(wordId, correct) {
     const stats = { ...this._state.wordStats };
     const existing = stats[wordId] ?? { attempts: 0, correct: 0, lastSeen: null };
+    const newAttempts = existing.attempts + 1;
+    const newCorrect  = existing.correct + (correct ? 1 : 0);
+    const accuracy    = newCorrect / newAttempts;
+
+    // Advance or reset the spaced-repetition review interval when a word
+    // transitions from "not mastered" → "mastered" (or regresses).
+    // Intervals in days: [0=daily, 1=3d, 2=7d, 3=14d, 4=30d]
+    const SRS_INTERVALS = [1, 3, 7, 14, 30];
+    const cfg = this._state.adaptiveConfig || {};
+    const minAttempts = cfg.masteryMinAttempts ?? 6;
+    const strongAcc   = cfg.strongAccuracy   ?? 0.9;
+
+    let reviewInterval = existing.reviewInterval ?? 0;
+    let nextReviewDate = existing.nextReviewDate ?? null;
+
+    if (newAttempts >= minAttempts && accuracy >= strongAcc) {
+      // Word is mastered — schedule next review
+      const wasMastered = (existing.attempts >= minAttempts)
+        && ((existing.correct / existing.attempts) >= strongAcc);
+      if (correct) {
+        // Successfully recalled on schedule → advance interval
+        reviewInterval = Math.min(reviewInterval + 1, SRS_INTERVALS.length - 1);
+      } else {
+        // Forgot a mastered word → reset interval
+        reviewInterval = 0;
+      }
+      const dayMs = 86400000;
+      const due = new Date(Date.now() + SRS_INTERVALS[reviewInterval] * dayMs);
+      nextReviewDate = due.toISOString();
+    } else if (!correct && existing.reviewInterval > 0) {
+      // Non-mastered wrong answer after prior mastery — reset
+      reviewInterval = 0;
+      nextReviewDate = new Date().toISOString();
+    }
+
     stats[wordId] = {
-      attempts: existing.attempts + 1,
-      correct:  existing.correct + (correct ? 1 : 0),
+      attempts: newAttempts,
+      correct:  newCorrect,
       lastSeen: new Date().toISOString(),
+      reviewInterval,
+      nextReviewDate,
     };
     this.set('wordStats', stats);
+
+    // Track today's words (for session summary)
+    const today = new Date().toDateString();
+    if (this._state.lastPlayDate === today) {
+      const todayWords = [...(this._state.sessionWordsToday || [])];
+      if (!todayWords.includes(wordId)) {
+        this.set('sessionWordsToday', [...todayWords, wordId].slice(-50));
+      }
+    }
   }
 
   /** Append an entry to word history (capped at 100). */
@@ -369,8 +448,18 @@ class Store {
   checkDailyReset() {
     const today = new Date().toDateString();
     if (this._state.lastPlayDate !== today) {
-      this.patch({ dailyDone: 0, lastPlayDate: today });
+      this.patch({
+        dailyDone: 0,
+        lastPlayDate: today,
+        sessionXpToday: 0,
+        sessionWordsToday: [],
+      });
     }
+  }
+
+  /** Add XP to today's session total (used by session summary). */
+  addSessionXp(amount) {
+    this.set('sessionXpToday', (this._state.sessionXpToday || 0) + amount);
   }
 
   /** Increment daily goal counter. */

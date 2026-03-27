@@ -178,4 +178,88 @@ export function restoreActiveProfile() {
   return false;
 }
 
+// ── Export / Import ─────────────────────────────────────────────────────────
+
+/**
+ * Export a profile and all its progress data to a JSON file download.
+ * The exported file can later be imported via importProfile().
+ * @param {string} id  Profile ID to export
+ * @returns {boolean}  true if export was triggered, false if profile not found
+ */
+export function exportProfile(id) {
+  const profiles = getProfiles();
+  const profile = profiles.find(p => p.id === id);
+  if (!profile) return false;
+
+  let progressData = null;
+  try {
+    const raw = localStorage.getItem(PROFILE_STORAGE_KEY(id));
+    progressData = raw ? JSON.parse(raw) : {};
+  } catch (_) {
+    progressData = {};
+  }
+
+  const exportPayload = {
+    _type:       'phonicsquest_profile_export',
+    _version:    2,
+    _exportedAt: new Date().toISOString(),
+    profile,
+    progressData,
+  };
+
+  const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const safeName = profile.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  a.href     = url;
+  a.download = `phonicsquest_${safeName}_${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  return true;
+}
+
+/**
+ * Import a profile from a previously exported JSON blob/string.
+ * Creates a new profile with a fresh ID (to avoid collisions) and
+ * restores all progress data.
+ * @param {string} jsonString  Raw JSON text of the export file
+ * @returns {{ profile: object, error?: string }}
+ */
+export function importProfile(jsonString) {
+  let payload;
+  try {
+    payload = JSON.parse(jsonString);
+  } catch (_) {
+    return { profile: null, error: 'File could not be read. Make sure it is a valid PhonicsQuest export.' };
+  }
+
+  if (payload?._type !== 'phonicsquest_profile_export') {
+    return { profile: null, error: 'This file is not a PhonicsQuest export file.' };
+  }
+
+  if (!payload.profile?.name) {
+    return { profile: null, error: 'Export file is missing profile data.' };
+  }
+
+  // Create a fresh profile (new ID to avoid stomping an existing one)
+  const newProfile = createProfile(
+    payload.profile.name + ' (imported)',
+    payload.profile.avatar || AVATAR_OPTIONS[0],
+    payload.profile.color  || COLOR_OPTIONS[0],
+    payload.profile.schoolLevel || 'preschool',
+    { classId: payload.profile.classId || 'class-a' }
+  );
+
+  // Restore progress data under the new profile's storage key
+  if (payload.progressData && typeof payload.progressData === 'object') {
+    try {
+      localStorage.setItem(PROFILE_STORAGE_KEY(newProfile.id), JSON.stringify(payload.progressData));
+    } catch (_) {
+      return { profile: newProfile, error: 'Profile created but progress data could not be restored (storage full?).' };
+    }
+  }
+
+  return { profile: newProfile, error: null };
+}
+
 export { AVATAR_OPTIONS, COLOR_OPTIONS, CLASSES_META_KEY };
