@@ -140,6 +140,11 @@ const DEFAULT_STATE = {
   // Rolling daily XP ledger for true 7-day reporting.
   // Each entry: { date: 'YYYY-MM-DD', xp: number }. Pruned to last 8 days.
   weeklyXpLog: [],
+
+  // ── Writing Quest draft persistence ─────────────────────────────────────
+  // Per-lesson draft state: text, plan, feedback, phase, revision data.
+  // Keyed by `${trackId}__${lessonIdx}` or `legacy__${level}__${lessonIdx}`.
+  writingDraftData: {},
 };
 
 class Store {

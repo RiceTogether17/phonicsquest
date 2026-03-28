@@ -8,6 +8,7 @@ import { detectBadges, renderBadgeChips } from '../modules/writingBadges.js';
 import { isPlanReady, mergeLessonWithPlan, getRemediationPath, getParagraphMissionStatus, getPlanDraftMatchReport } from '../modules/writingLessonEngine.js';
 import { renderDrill, collectDrillAnswers, gradeDrills } from '../modules/writingReviseDrills.js';
 import { getTrackProgress, setTrackProgress, migrateLegacyWritingCompleted, getLevelTrackProgress } from '../modules/writingTrackProgress.js';
+import { saveDraft, loadDraft, clearDraft, updatePhase, updateFeedback, updateRevision, saveLegacyDraft, loadLegacyDraft, clearLegacyDraft, getDraftSummary } from '../modules/writingDraftStore.js';
 
 let _container = null;
 let _onGoHome = null;
@@ -104,8 +105,29 @@ function _startTrack(trackId) {
   _idx = 0;
   _phase = 'learn';
   _firstResult = null;
+  _firstDraftText = '';
+  _currentPlan = {};
+  _selectedStarter = '';
+  _lastDraftRemediation = null;
+  _lastMissionStatus = [];
   _list = getLessonsForTrack(trackId);
+
+  // Resume from saved draft if one exists for the current lesson
+  _tryRestoreFromDraft(trackId, _idx);
   _render();
+}
+
+/** Attempt to restore in-memory state from a persisted draft record. */
+function _tryRestoreFromDraft(trackId, lessonIdx) {
+  const saved = loadDraft(trackId, lessonIdx);
+  if (!saved) return;
+  if (saved.phase) _phase = saved.phase;
+  if (saved.firstDraftText) _firstDraftText = saved.firstDraftText;
+  if (saved.plan && Object.keys(saved.plan).length) _currentPlan = saved.plan;
+  if (saved.selectedStarter) _selectedStarter = saved.selectedStarter;
+  if (saved.feedbackResult) _firstResult = saved.feedbackResult;
+  if (saved.remediation) _lastDraftRemediation = saved.remediation;
+  if (saved.missionStatus) _lastMissionStatus = saved.missionStatus;
 }
 
 function _startLegacyLevel(level) {
@@ -134,16 +156,51 @@ function _render() {
 }
 
 function _renderLearn(item) {
+  // Check if there's a saved draft for this lesson (to offer resume)
+  const saved = _track ? loadDraft(_track.id, _idx) : null;
+  const summary = getDraftSummary(saved);
+  const resumeHtml = summary && summary.hasText ? `<div class="wq-resume-banner">
+    <p><strong>You have a saved draft for this lesson.</strong></p>
+    <p>Phase: ${summary.phase} ${summary.hasFeedback ? ' · Feedback saved' : ''} ${summary.hasRevision ? ' · Revision saved' : ''}</p>
+    <p style="font-size:0.85em;color:var(--text-muted)">Last worked on: ${summary.updatedAt ? new Date(summary.updatedAt).toLocaleDateString() : 'unknown'}</p>
+    <div class="sfq-actions" style="margin-top:6px">
+      <button class="btn btn--primary btn--sm" id="wq-resume">Continue Where You Left Off</button>
+      <button class="btn btn--ghost btn--sm" id="wq-start-fresh">Start Fresh</button>
+    </div>
+  </div>` : '';
+
   _container.innerHTML = `<div class="sfq-game"><div class="sfq-header"><span class="sfq-badge">🧭 ${WRITING_TRACKS[item.track].track}</span><span class="sfq-progress">${_idx + 1}/${_list.length}</span></div>
     <h3 class="cloze-title">Learn: ${item.lessonTitle}</h3>
+    ${resumeHtml}
     <div class="dash-pattern-item"><strong>Skill focus:</strong> ${item.skillFocus.join(' · ')}</div>
     <ul class="dash-pattern-item">${(item.introTeaching || []).map((line) => `<li>${line}</li>`).join('')}</ul>
     ${item.storyStarterChoices?.length ? `<div class="dash-pattern-item"><strong>Story Starter Cards</strong>${item.storyStarterChoices.map((s, i) => `<label style="display:block;margin:6px 0"><input type="radio" name="starter" value="${i}" ${i === 0 ? 'checked' : ''}/> ${s}</label>`).join('')}</div>` : ''}
     <div class="sfq-actions"><button class="btn btn--primary" id="wq-next">Next: Revise Drills</button><button class="btn btn--ghost btn--sm" id="wq-menu">Menu</button></div></div>`;
+
+  // Resume button: restore saved state and jump to saved phase
+  document.getElementById('wq-resume')?.addEventListener('click', () => {
+    _tryRestoreFromDraft(_track.id, _idx);
+    _render();
+  });
+  // Start fresh: clear saved draft and stay on learn
+  document.getElementById('wq-start-fresh')?.addEventListener('click', () => {
+    if (_track) clearDraft(_track.id, _idx);
+    _phase = 'learn';
+    _firstResult = null;
+    _firstDraftText = '';
+    _currentPlan = {};
+    _selectedStarter = '';
+    _lastDraftRemediation = null;
+    _lastMissionStatus = [];
+    _render();
+  });
+
   document.getElementById('wq-next')?.addEventListener('click', () => {
     const selected = _container.querySelector('input[name="starter"]:checked');
     _selectedStarter = selected ? item.storyStarterChoices?.[Number(selected.value)] : (item.storyStarterChoices?.[0] || '');
     _phase = 'revise';
+    // Persist starter choice and phase
+    if (_track) saveDraft(_track.id, _idx, { selectedStarter: _selectedStarter, phase: 'revise' });
     _render();
   });
   document.getElementById('wq-menu')?.addEventListener('click', () => { cleanupWritingQuest(); _onGoHome?.(); });
@@ -168,6 +225,7 @@ function _renderRevisePrep(item) {
     }
     if (msg) msg.textContent = `Great! ${result.correctCount}/${result.total}. Planning unlocked.`;
     _phase = 'plan';
+    if (_track) updatePhase(_track.id, _idx, 'plan');
     setTimeout(_render, 500);
   });
   document.getElementById('wq-menu')?.addEventListener('click', () => { cleanupWritingQuest(); _onGoHome?.(); });
@@ -180,6 +238,14 @@ function _renderPlan(item) {
     <div class="dash-pattern-item">${fields.map((field) => `<label style="display:block;margin:8px 0"><strong>${field}</strong><textarea data-plan="${field}" class="cp-name-input" rows="2" placeholder="Plan this part..."></textarea></label>`).join('')}</div>
     <div class="sfq-actions"><button class="btn btn--primary" id="wq-plan-next">Unlock Draft</button></div>
     <div id="wq-plan-msg" class="dash-pattern-item">All core plot boxes need at least one short sentence.</div></div>`;
+  // Restore saved plan values if resuming
+  if (_currentPlan && Object.keys(_currentPlan).length) {
+    fields.forEach(field => {
+      const el = _container.querySelector(`[data-plan="${field}"]`);
+      if (el && _currentPlan[field]) el.value = _currentPlan[field];
+    });
+  }
+
   document.getElementById('wq-plan-next')?.addEventListener('click', () => {
     const plan = {};
     _container.querySelectorAll('[data-plan]').forEach((el) => { plan[el.dataset.plan] = el.value.trim(); });
@@ -190,22 +256,32 @@ function _renderPlan(item) {
       return;
     }
     _phase = 'draft';
+    // Persist plan and phase
+    if (_track) saveDraft(_track.id, _idx, { plan: _currentPlan, phase: 'draft' });
     _render();
   });
 }
 
 function _renderDraft(item) {
   const lessonForEval = mergeLessonWithPlan(item, _currentPlan);
+  // Restore saved draft text if resuming
+  const savedRecord = _track ? loadDraft(_track.id, _idx) : null;
+  const restoredText = savedRecord?.draftText || '';
+
   _container.innerHTML = `<div class="sfq-game"><h3 class="cloze-title">Draft: ${item.lessonTitle}</h3>
     <p class="sfq-instruction">Starter: ${_selectedStarter || item.storyStarterChoices?.[0] || 'Create your own opening.'}</p>
     <div class="dash-pattern-item"><strong>Paragraph Missions</strong><ul id="wq-mission-list">${(item.paragraphMissions || []).map((m) => `<li>${typeof m === 'string' ? m : m.text}</li>`).join('')}</ul></div>
     <div class="dash-pattern-item"><strong>Checkpoints:</strong><ul>${(lessonForEval.requiredChecks || []).map((c) => `<li>${c.label}</li>`).join('')}</ul></div>
     <p class="dash-pattern-item">🧰 Support words: ${(item.supportWords || []).join(', ')}</p>
-    <textarea id="wq-text" class="cp-name-input" rows="9" placeholder="Write your draft..."></textarea>
+    <textarea id="wq-text" class="cp-name-input" rows="9" placeholder="Write your draft...">${_escapeHtml(restoredText)}</textarea>
     <div class="sfq-actions"><button class="btn btn--primary" id="wq-submit">Submit Draft</button></div>
     <div class="dash-pattern-item" id="wq-live-detector">Start typing to see instant writing feedback.</div>
-    <div class="sfq-feedback" id="wq-feedback" hidden></div></div>`;
+    <div class="sfq-feedback" id="wq-feedback" hidden></div>
+    ${_renderFeedbackReviewPanel()}
+    </div>`;
 
+  // Debounced auto-save for draft text
+  let _draftSaveTimer = null;
   document.getElementById('wq-text')?.addEventListener('input', (event) => {
     const text = event.target.value || '';
     const hint = getLiveHint(lessonForEval, text, _level);
@@ -215,9 +291,16 @@ function _renderDraft(item) {
     if (detector) detector.innerHTML = `🧠 ${hint.words}/${hint.target} words · ${(hint.score * 100).toFixed(0)}% · focus ${_dimensionLabel(hint.weakest)} · missions ${missionStatus.filter((m) => m.hit).length}/${missionStatus.length}`;
     const missionList = document.getElementById('wq-mission-list');
     if (missionList) missionList.innerHTML = missionStatus.map((m) => `<li>${m.hit ? '✅' : '⬜'} ${m.text}</li>`).join('');
+
+    // Auto-save draft text every 2 seconds of inactivity
+    clearTimeout(_draftSaveTimer);
+    _draftSaveTimer = setTimeout(() => {
+      if (_track) saveDraft(_track.id, _idx, { draftText: text, phase: 'draft' });
+    }, 2000);
   });
 
   document.getElementById('wq-submit')?.addEventListener('click', () => _submitDraft(item, lessonForEval));
+  _bindFeedbackReviewToggle();
 }
 
 function _renderDimensionBreakdown(result) {
@@ -236,6 +319,16 @@ function _submitDraft(item, lessonForEval) {
   const missionHits = _lastMissionStatus.filter((m) => m.hit).length;
   const badges = detectBadges(result.metrics, text);
 
+  // Persist draft text, feedback, and all structured data
+  if (_track) {
+    saveDraft(_track.id, _idx, {
+      draftText: text,
+      firstDraftText: text,
+      phase: 'draft',
+    });
+    updateFeedback(_track.id, _idx, result, _lastDraftRemediation, _lastMissionStatus, badges);
+  }
+
   if (fb) {
     fb.hidden = false;
     fb.className = `sfq-feedback sfq-feedback--${result.passed ? 'success' : 'error'}`;
@@ -246,9 +339,16 @@ function _submitDraft(item, lessonForEval) {
       ${_lastDraftRemediation.missingChecks.length ? `<p>Missing checkpoints: ${_lastDraftRemediation.missingChecks.join(' · ')}</p>` : ''}
       ${_renderDimensionBreakdown(result)}
       <div>${renderBadgeChips(badges)}</div>
-      <div class="sfq-actions" style="margin-top:8px"><button class="btn btn--primary" id="wq-go-revise">${result.passed ? 'Polish Draft' : 'Start Repair Mission'}</button></div>`;
+      <p style="font-size:0.85em;color:var(--text-muted);margin-top:6px">Take your time to read the feedback above. Press Continue when you are ready.</p>
+      <div class="sfq-actions" style="margin-top:8px"><button class="btn btn--primary" id="wq-go-revise">${result.passed ? 'Continue: Polish Draft' : 'Continue: Start Repair Mission'}</button></div>`;
   }
-  document.getElementById('wq-go-revise')?.addEventListener('click', () => { _phase = 'repair'; _render(); });
+  // Scroll feedback into view
+  fb?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  document.getElementById('wq-go-revise')?.addEventListener('click', () => {
+    _phase = 'repair';
+    if (_track) updatePhase(_track.id, _idx, 'repair');
+    _render();
+  });
 }
 
 function _renderRepair(item) {
@@ -284,7 +384,9 @@ function _renderRepair(item) {
     <textarea id="wq-revision-text" class="cp-name-input" rows="9" placeholder="Write improved draft...">${_firstDraftText}</textarea>
     <div id="wq-repair-live" class="dash-pattern-item" style="font-size:0.9em">Start editing to see live repair progress.</div>
     <div class="sfq-actions"><button class="btn btn--primary" id="wq-submit-revision">Submit Revision</button></div>
-    <div class="sfq-feedback" id="wq-feedback" hidden></div></div>`;
+    <div class="sfq-feedback" id="wq-feedback" hidden></div>
+    ${_renderFeedbackReviewPanel()}
+    </div>`;
 
   // Live repair checklist update while typing
   const lessonForEval = mergeLessonWithPlan(item, _currentPlan);
@@ -322,6 +424,7 @@ function _renderRepair(item) {
   });
 
   document.getElementById('wq-submit-revision')?.addEventListener('click', () => _submitRevision(item));
+  _bindFeedbackReviewToggle();
 }
 
 function _escapeHtml(text) {
@@ -338,6 +441,16 @@ function _submitRevision(item) {
   const badges = detectBadges(result.metrics, text, cmp);
   const missionStatus = getParagraphMissionStatus(item, text);
   _awardLessonRewards(item, result, cmp, badges, missionStatus);
+
+  // Persist revision data
+  if (_track) {
+    updateRevision(_track.id, _idx, text, result, cmp, badges);
+    saveDraft(_track.id, _idx, {
+      revisedDraftText: text,
+      phase: 'complete',
+      missionStatus,
+    });
+  }
 
   // Build before/after comparison summary
   const beforeScore = _firstResult ? (_firstResult.score * 100).toFixed(0) : '?';
@@ -372,9 +485,16 @@ function _submitRevision(item) {
       <p>Score change: ${cmp ? `${cmp.scoreDiff >= 0 ? '+' : ''}${(cmp.scoreDiff * 100).toFixed(0)}%` : 'n/a'} · XP bonus: ${cmp?.revisionBonus || 0}</p>
       <p>Mission completion: ${missionStatus.filter((m) => m.hit).length}/${missionStatus.length}</p>
       <ul>${dimComparison}</ul>
-      ${renderBadgeChips(badges)}`;
+      ${renderBadgeChips(badges)}
+      <p style="font-size:0.85em;color:var(--text-muted);margin-top:6px">Review your results above. Press Continue when ready.</p>
+      <div class="sfq-actions" style="margin-top:8px"><button class="btn btn--primary" id="wq-revision-continue">Continue</button></div>`;
   }
-  setTimeout(() => { _phase = 'complete'; _render(); }, 1400);
+  // Scroll feedback into view and wait for user to click Continue
+  fb?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  document.getElementById('wq-revision-continue')?.addEventListener('click', () => {
+    _phase = 'complete';
+    _render();
+  });
 }
 
 function _awardLessonRewards(item, result, cmp, badges, missionStatus = []) {
@@ -395,15 +515,38 @@ function _renderLessonComplete(item) {
   if (_track) {
     setTrackProgress(_track.id, _idx + 1, _list.length, _level);
   }
+
+  // Build a persistent feedback summary from the saved draft record
+  const saved = _track ? loadDraft(_track.id, _idx) : null;
+  let feedbackSummaryHtml = '';
+  if (saved?.feedbackResult) {
+    const r = saved.feedbackResult;
+    const cmp = saved.revisionComparison;
+    feedbackSummaryHtml = `<div class="wq-feedback-review-panel">
+      <strong>Lesson Feedback Summary</strong>
+      <p>Score: ${(r.score * 100).toFixed(0)}% ${'⭐'.repeat(r.stars || 0)}</p>
+      <p>${r.encouragement || ''}</p>
+      ${_renderDimensionBreakdown(r)}
+      ${cmp ? `<p>Revision improvement: ${cmp.scoreDiff >= 0 ? '+' : ''}${((cmp.scoreDiff || 0) * 100).toFixed(0)}%</p>` : ''}
+      ${saved.badges?.length ? `<p>Badges: ${saved.badges.join(' · ')}</p>` : ''}
+    </div>`;
+  }
+
   _container.innerHTML = `<div class="sfq-game"><h3>✅ Lesson complete: ${item.lessonTitle}</h3>
+    ${feedbackSummaryHtml}
     <p><strong>Collection:</strong> ${collectibles.slice(-6).join(' · ') || 'None yet'}</p>
     <div class="sfq-actions"><button class="btn btn--primary" id="wq-next-lesson">Next Lesson</button></div></div>`;
   document.getElementById('wq-next-lesson')?.addEventListener('click', () => {
+    // Clear the saved draft for this lesson now that it's complete
+    if (_track) clearDraft(_track.id, _idx);
     _idx++;
     _phase = 'learn';
     _currentPlan = {};
     _selectedStarter = '';
     _firstDraftText = '';
+    _firstResult = null;
+    _lastDraftRemediation = null;
+    _lastMissionStatus = [];
     _render();
   });
 }
@@ -494,23 +637,55 @@ function _gradeBossConstructedItem(ci, response) {
 }
 
 function _renderLegacyPrompt(item) {
+  // Restore saved legacy draft if available
+  const savedLegacy = loadLegacyDraft(_level, _idx);
+  const restoredText = savedLegacy?.draftText || '';
+
   _container.innerHTML = `<div class="sfq-game"><h3 class="cloze-title">Writing Quest (${item.textType})</h3>
     <p class="sfq-instruction">${item.prompt}</p>
     <p class="dash-pattern-item">Legacy prompt mode remains available for this level.</p>
-    <textarea id="wq-text" class="cp-name-input" rows="9" placeholder="Write your response here..."></textarea>
+    <textarea id="wq-text" class="cp-name-input" rows="9" placeholder="Write your response here...">${_escapeHtml(restoredText)}</textarea>
     <div class="sfq-actions"><button class="btn btn--primary" id="wq-submit">Submit</button></div><div class="sfq-feedback" id="wq-feedback" hidden></div></div>`;
+
+  // Auto-save legacy draft
+  let _legacySaveTimer = null;
+  document.getElementById('wq-text')?.addEventListener('input', (e) => {
+    clearTimeout(_legacySaveTimer);
+    _legacySaveTimer = setTimeout(() => {
+      saveLegacyDraft(_level, _idx, { draftText: e.target.value || '', phase: 'draft' });
+    }, 2000);
+  });
+
   document.getElementById('wq-submit')?.addEventListener('click', () => {
     const text = document.getElementById('wq-text')?.value?.trim() || '';
     if (!text) return;
     const result = evaluateWriting(item, text, _level);
     _awardLessonRewards(item, result, null, []);
+
+    // Persist legacy feedback
+    saveLegacyDraft(_level, _idx, {
+      draftText: text,
+      firstDraftText: text,
+      feedbackResult: result,
+      phase: 'complete',
+    });
+
     const fb = document.getElementById('wq-feedback');
     if (fb) {
       fb.hidden = false;
       fb.className = `sfq-feedback sfq-feedback--${result.passed ? 'success' : 'error'}`;
-      fb.innerHTML = `<p>Score ${(result.score * 100).toFixed(0)}%</p>`;
+      fb.innerHTML = `<p><strong>${result.encouragement || (result.passed ? 'Well done!' : 'Keep practising!')}</strong></p>
+        <p>Score ${(result.score * 100).toFixed(0)}% ${'⭐'.repeat(result.stars || 0)}</p>
+        ${_renderDimensionBreakdown(result)}
+        <p style="font-size:0.85em;color:var(--text-muted);margin-top:6px">Review your feedback. Press Continue when ready.</p>
+        <div class="sfq-actions" style="margin-top:8px"><button class="btn btn--primary" id="wq-legacy-continue">Continue</button></div>`;
     }
-    setTimeout(() => { _idx++; _render(); }, 900);
+    fb?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    document.getElementById('wq-legacy-continue')?.addEventListener('click', () => {
+      clearLegacyDraft(_level, _idx);
+      _idx++;
+      _render();
+    });
   });
 }
 
@@ -529,6 +704,50 @@ function _renderDone() {
   document.getElementById('wq-back')?.addEventListener('click', () => {
     if (_tracksForLevel.length > 1) return _renderTrackBrowser(_level);
     showWritingBrowser();
+  });
+}
+
+/**
+ * Render a collapsible "View Feedback" panel that shows the latest persisted
+ * feedback for the current lesson. Shown in draft and repair phases so the
+ * learner (or parent) can review feedback at any time.
+ */
+function _renderFeedbackReviewPanel() {
+  const saved = _track ? loadDraft(_track.id, _idx) : null;
+  if (!saved?.feedbackResult) return '';
+  const r = saved.feedbackResult;
+  const rem = saved.remediation;
+  const ms = saved.missionStatus || [];
+  const cmp = saved.revisionComparison;
+  const badges = saved.badges || [];
+
+  return `<div class="wq-feedback-review-panel" id="wq-review-panel">
+    <button class="wq-review-toggle" id="wq-review-toggle" aria-expanded="false">
+      View Last Feedback
+    </button>
+    <div class="wq-review-body" id="wq-review-body" hidden>
+      <p><strong>${r.encouragement || ''}</strong></p>
+      <p>Score: ${(r.score * 100).toFixed(0)}% ${'⭐'.repeat(r.stars || 0)}</p>
+      <p>Mission Progress: ${ms.filter(m => m.hit).length}/${ms.length}</p>
+      ${rem?.title ? `<p>Revision Mission: ${rem.title}</p>` : ''}
+      ${rem?.missingChecks?.length ? `<p>Missing: ${rem.missingChecks.join(' · ')}</p>` : ''}
+      ${_renderDimensionBreakdown(r)}
+      ${badges.length ? `<p>Badges: ${badges.join(' · ')}</p>` : ''}
+      ${cmp ? `<p>Revision change: ${cmp.scoreDiff >= 0 ? '+' : ''}${((cmp.scoreDiff || 0) * 100).toFixed(0)}% · XP bonus: ${cmp.revisionBonus || 0}</p>` : ''}
+    </div>
+  </div>`;
+}
+
+/** Bind the toggle behaviour for the feedback review panel. */
+function _bindFeedbackReviewToggle() {
+  const toggle = document.getElementById('wq-review-toggle');
+  const body = document.getElementById('wq-review-body');
+  if (!toggle || !body) return;
+  toggle.addEventListener('click', () => {
+    const expanded = body.hidden;
+    body.hidden = !expanded;
+    toggle.setAttribute('aria-expanded', String(expanded));
+    toggle.textContent = expanded ? 'Hide Feedback' : 'View Last Feedback';
   });
 }
 

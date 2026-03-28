@@ -4663,6 +4663,42 @@ input, select, textarea { font-family: inherit; }
 }
 .sfq-complete-actions { display: flex; flex-direction: column; gap: var(--space-3); align-items: center; width: 100%; max-width: 300px; }
 
+/* ── Writing Quest: Resume banner ─────────────────────────── */
+.wq-resume-banner {
+  background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+  border: 2px solid #fbbf24;
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  text-align: center;
+}
+.wq-resume-banner p { margin: 4px 0; }
+
+/* ── Writing Quest: Feedback review panel ────────────────── */
+.wq-feedback-review-panel {
+  background: var(--surface-2, #f8fafc);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  margin-top: var(--space-3);
+}
+.wq-feedback-review-panel ul { padding-left: 1.2em; margin: 6px 0; }
+.wq-feedback-review-panel li { margin-bottom: 4px; font-size: 0.92em; }
+.wq-review-toggle {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  padding: var(--space-2) 0;
+  text-align: left;
+}
+.wq-review-toggle:hover { text-decoration: underline; }
+.wq-review-body { padding-top: var(--space-2); }
+.wq-review-body p { margin: 4px 0; font-size: 0.92em; }
+
 /* ============================================================
    CLOZE CASTLE QUEST (cloze-*)
    ============================================================ */
