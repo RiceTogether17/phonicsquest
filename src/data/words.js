@@ -552,7 +552,6 @@ export const WORDS = [
   { id:'with',  word:'with',  graphemes:['w','i','th'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🤝' },
   { id:'path',  word:'path',  graphemes:['p','a','th'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🛤️' },
   { id:'cloth', word:'cloth', graphemes:['cl','o','th'], types:['bl','sv','d'], pattern:'digraph', group:'digraphs', level:2, emoji:'🧶' },
-  { id:'chin',  word:'chin',  graphemes:['ch','i','n'],  types:['d','sv','c'],  pattern:'digraph', group:'digraphs', level:2, emoji:'😊' },
   { id:'whip',  word:'whip',  graphemes:['wh','i','p'],  types:['d','sv','c'],  pattern:'digraph', group:'digraphs', level:2, emoji:'💨' },
   { id:'when',  word:'when',  graphemes:['wh','e','n'],  types:['d','sv','c'],  pattern:'digraph', group:'digraphs', level:2, emoji:'❓' },
   { id:'whiz',  word:'whiz',  graphemes:['wh','i','z'],  types:['d','sv','c'],  pattern:'digraph', group:'digraphs', level:2, emoji:'⚡' },
@@ -625,7 +624,6 @@ export const WORDS = [
   { id:'gong',  word:'gong',  graphemes:['g','o','ng'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🥁' },
   { id:'long',  word:'long',  graphemes:['l','o','ng'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'📏' },
   { id:'bong',  word:'bong',  graphemes:['b','o','ng'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🔔' },
-  { id:'prong', word:'prong', graphemes:['pr','o','ng'], types:['bl','sv','d'], pattern:'blend',   group:'digraphs', level:3, emoji:'🍴' },
   { id:'sung',  word:'sung',  graphemes:['s','u','ng'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🎤' },
   { id:'hung',  word:'hung',  graphemes:['h','u','ng'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🪝' },
   { id:'lung',  word:'lung',  graphemes:['l','u','ng'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🫁' },
@@ -743,9 +741,6 @@ export const WORDS = [
   /* ══════════════════════════════════════
      CVCC – Short O  (level 2)
   ══════════════════════════════════════ */
-  { id:'long',  word:'long',  graphemes:['l','o','ng'],  types:['c','sv','d'],  pattern:'blend', group:'blends', level:2, emoji:'📏' },
-  { id:'song',  word:'song',  graphemes:['s','o','ng'],  types:['c','sv','d'],  pattern:'blend', group:'blends', level:2, emoji:'🎵' },
-  { id:'gong',  word:'gong',  graphemes:['g','o','ng'],  types:['c','sv','d'],  pattern:'blend', group:'blends', level:2, emoji:'🔔' },
   { id:'bond',  word:'bond',  graphemes:['b','o','nd'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🔗' },
   { id:'fond',  word:'fond',  graphemes:['f','o','nd'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'❤️' },
   { id:'pond',  word:'pond',  graphemes:['p','o','nd'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🐸' },
@@ -765,8 +760,6 @@ export const WORDS = [
   { id:'bust',  word:'bust',  graphemes:['b','u','st'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'💥' },
   { id:'hunt',  word:'hunt',  graphemes:['h','u','nt'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🏹' },
   { id:'runt',  word:'runt',  graphemes:['r','u','nt'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🐕' },
-  { id:'lung',  word:'lung',  graphemes:['l','u','ng'],  types:['c','sv','d'],  pattern:'blend', group:'blends', level:2, emoji:'🫁' },
-  { id:'sung',  word:'sung',  graphemes:['s','u','ng'],  types:['c','sv','d'],  pattern:'blend', group:'blends', level:2, emoji:'🎵' },
   { id:'funk',  word:'funk',  graphemes:['f','u','nk'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🎸' },
   { id:'junk',  word:'junk',  graphemes:['j','u','nk'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🗑️' },
   { id:'hulk',  word:'hulk',  graphemes:['h','u','lk'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'💪' },
