@@ -173,8 +173,29 @@ class AudioManager {
     }
 
     // Suffix tile (-ing, -ed, -er, -est) — speak the morpheme via TTS
+    // For -ed: pronunciation depends on the final sound of the base word:
+    //   /ɪd/ after /t/ or /d/ sounds (preceding grapheme ends with t or d)
+    //   /t/  after voiceless sounds (preceding grapheme ends with p, k, f, s, x, or is sh/ch/th/ck/ss)
+    //   /d/  after voiced sounds (everything else)
     if (type === 'sf') {
-      return this._speak(grapheme.replace(/^-/, ''), 0.9);
+      const suffix = grapheme.replace(/^-/, '');
+      if (suffix === 'ed' && opts.prevGrapheme) {
+        const prev = opts.prevGrapheme.toLowerCase();
+        const lastChar = prev[prev.length - 1];
+        // /ɪd/ after t or d
+        if (lastChar === 't' || lastChar === 'd') {
+          return this._speak('id', 0.9);
+        }
+        // /t/ after voiceless consonants
+        const voicelessEndings = ['p','k','f','s','x'];
+        const voicelessDigraphs = ['sh','ch','th','ck','ss'];
+        if (voicelessEndings.includes(lastChar) || voicelessDigraphs.includes(prev)) {
+          return this._playPhonemeAudio('t');
+        }
+        // /d/ after voiced consonants
+        return this._playPhonemeAudio('d');
+      }
+      return this._speak(suffix, 0.9);
     }
 
     // Blend components — speak each letter separately (handles 2- and 3-letter blends)
@@ -232,8 +253,9 @@ class AudioManager {
     for (let i = 0; i < wordData.graphemes.length; i++) {
       const grapheme = wordData.graphemes[i];
       const type     = wordData.types[i];
+      const prevGrapheme = i > 0 ? wordData.graphemes[i - 1] : null;
       onPhoneme?.(i);
-      await this.speakPhoneme(grapheme, type);
+      await this.speakPhoneme(grapheme, type, { word: wordData.word, prevGrapheme });
       await this._delay(350);
     }
     // Brief pause then say full word
