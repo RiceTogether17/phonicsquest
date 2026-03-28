@@ -112,6 +112,41 @@ export const GRAMMAR_TIPS = {
     example: '"There are many books on the shelf." — "There is not much water left." — "She has a few pencils but only a little glue."',
     tip: 'Ask: can I put a number in front of it? If yes (3 chairs, 5 eggs), it is countable — use many/few. If no (you cannot say 3 rices or 2 informations), it is uncountable — use much/little.',
   },
+  possessives: {
+    rule: 'Possessive adjectives (my, your, his, her, its, our, their) come before a noun. Possessive pronouns (mine, yours, his, hers, ours, theirs) stand alone. Add apostrophe + s to nouns to show ownership.',
+    example: '"This is my book." — "The book is mine." — "Sara\'s bag is blue."',
+    tip: 'Before a noun? Use my/your/his/her. Standing alone? Use mine/yours/his/hers. For nouns: add \'s (Tom\'s toy).',
+  },
+  adjAdverbs: {
+    rule: 'Adjectives describe nouns (a tall tree). Adverbs describe verbs, adjectives, or other adverbs (runs quickly). Most adverbs end in -ly, but some do not (fast, hard, well).',
+    example: '"She is a careful driver." (adjective) — "She drives carefully." (adverb) — "He speaks well." (adverb)',
+    tip: 'Ask: does this word describe a noun or an action? Noun → adjective. Action → adverb. After linking verbs (is/was/looks/seems), use an adjective.',
+  },
+  auxiliaries: {
+    rule: 'Auxiliary (helping) verbs form questions and negatives. Use do/does for present, did for past. Use has/have for present perfect. Match the auxiliary to the subject.',
+    example: '"Does she like music?" — "Did they finish?" — "Have you eaten?" — "He does not know."',
+    tip: 'He/she/it → does (present) or has (perfect). I/you/we/they → do (present) or have (perfect). Past → did for everyone.',
+  },
+  presentPerfect: {
+    rule: 'Present perfect connects past actions to the present. Use has/have + past participle. Time markers: since, for, already, yet, ever, never, just.',
+    example: '"I have finished my homework." — "She has lived here since 2015." — "Have you ever visited Japan?"',
+    tip: 'He/she/it → has + past participle. I/you/we/they → have + past participle. Look for since, for, already, yet.',
+  },
+  pastPerfect: {
+    rule: 'Past perfect describes an action completed before another past action. Use had + past participle. Time markers: by the time, before, after, already.',
+    example: '"By the time we arrived, the show had started." — "She had already eaten when I called."',
+    tip: 'Two past events? The earlier one uses had + past participle. Look for "by the time", "before", or "after".',
+  },
+  superlatives: {
+    rule: 'Superlatives compare three or more things. Short adjectives: add -est (tallest). Long adjectives: use most (most beautiful). Irregular: good → best, bad → worst.',
+    example: '"He is the tallest boy." — "This is the most interesting book." — "She is the best singer."',
+    tip: 'Comparing three or more? Short word → the + adjective + -est. Long word → the most + adjective.',
+  },
+  mixedGrammar: {
+    rule: 'In exam-style cloze passages, you need to identify the grammar rule for each blank. Look for clues: time markers for tense, subjects for agreement, connectors for conjunctions, and sentence structure for voice.',
+    example: 'Read the whole sentence. Find the subject, the time clue, and the sentence pattern — they will guide you to the right answer.',
+    tip: 'For each blank: (1) What is the subject? (2) What is the time? (3) Is it active or passive? (4) Is there a connector clue?',
+  },
 };
 
 /**

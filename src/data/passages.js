@@ -52,6 +52,13 @@ export const GRAMMAR_CATEGORIES = {
   reportedSpeech:  { label: 'Reported Speech',        icon: '💬' },
   relativeClauses: { label: 'Relative Clauses',       icon: '🧩' },
   countableUncountable: { label: 'Countable & Uncountable Nouns', icon: '🧺' },
+  possessives:     { label: 'Possessives',            icon: '🏷' },
+  adjAdverbs:      { label: 'Adjectives & Adverbs',   icon: '🎨' },
+  auxiliaries:     { label: 'Auxiliaries & Questions', icon: '🙋' },
+  presentPerfect:  { label: 'Present Perfect',         icon: '✅' },
+  pastPerfect:     { label: 'Past Perfect',            icon: '🔙' },
+  superlatives:    { label: 'Superlatives',            icon: '🏆' },
+  mixedGrammar:    { label: 'Mixed Grammar (Exam)',    icon: '📝' },
 };
 
 export const passages = {
@@ -349,6 +356,33 @@ export const passages = {
         ],
       },
     ],
+    possessives: [
+      {
+        id: 'g-p1-pos-01', title: 'Whose Is It?',
+        text: 'This is ___ bag. That pencil is ___. The toy belongs to Tom. It is ___ toy.',
+        answers: ['my', 'mine', 'his'],
+        wordBank: ['my', 'mine', 'his', 'her', 'hers', 'your'],
+        xp: 20,
+        clues: [
+          { blankIndex: 0, prompt: 'The blank comes before a noun. Which type of possessive goes before a noun?', acceptableSpans: ['bag'], partialSpans: ['This'], clueType: 'possessive-clue', explanation: '"My" is a possessive adjective — it goes before a noun: my bag.' },
+          { blankIndex: 1, prompt: 'The blank stands alone without a noun after it. Which type of possessive stands alone?', acceptableSpans: ['pencil'], partialSpans: ['That'], clueType: 'possessive-clue', explanation: '"Mine" is a possessive pronoun — it replaces the noun: the pencil is mine.' },
+        ],
+      },
+      {
+        id: 'g-p1-pos-02', title: 'In the Classroom',
+        text: '___ teacher is Mrs Tan. The blue bag is ___. Sara forgot ___ water bottle.',
+        answers: ['Our', 'yours', 'her'],
+        wordBank: ['Our', 'yours', 'her', 'My', 'mine', 'his'],
+        xp: 20,
+      },
+      {
+        id: 'g-p1-pos-03', title: 'Family Things',
+        text: 'Dad washed ___ car. The red shoes are ___. We cleaned ___ room together.',
+        answers: ['his', 'hers', 'our'],
+        wordBank: ['his', 'hers', 'our', 'her', 'mine', 'their'],
+        xp: 20,
+      },
+    ],
   },
 
   P2: {
@@ -637,6 +671,82 @@ export const passages = {
         xp: 25,
       },
     ],
+    possessives: [
+      {
+        id: 'g-p2-pos-01', title: 'Show and Tell',
+        text: 'Ali brought ___ robot to school. "Is this ___?" asked the teacher. "No, it is ___," Ali replied.',
+        answers: ['his', 'yours', 'mine'],
+        wordBank: ['his', 'yours', 'mine', 'her', 'hers', 'your'],
+        xp: 25,
+      },
+      {
+        id: 'g-p2-pos-02', title: 'Lost Property',
+        text: 'Someone left ___ water bottle on the desk. The pink one is ___. We must return it to ___ owner.',
+        answers: ['their', 'hers', 'its'],
+        wordBank: ['their', 'hers', 'its', 'his', 'mine', 'your'],
+        xp: 25,
+      },
+      {
+        id: 'g-p2-pos-03', title: 'The Class Garden',
+        text: 'Each group has ___ own pot. The tallest plant is ___. We water ___ plants every morning.',
+        answers: ['its', 'ours', 'our'],
+        wordBank: ['its', 'ours', 'our', 'their', 'theirs', 'your'],
+        xp: 25,
+      },
+    ],
+    adjAdverbs: [
+      {
+        id: 'g-p2-aa-01', title: 'How We Do Things',
+        text: 'The rabbit is very ___. It hops ___. The tortoise moves ___.',
+        answers: ['fast', 'quickly', 'slowly'],
+        wordBank: ['fast', 'quickly', 'slowly', 'quick', 'slow', 'careful'],
+        xp: 25,
+        clues: [
+          { blankIndex: 1, prompt: 'Does this word describe the noun or the action (verb)?', acceptableSpans: ['hops'], partialSpans: ['It'], clueType: 'adverb-clue', explanation: '"Quickly" describes how the rabbit hops — it modifies the verb, so it is an adverb.' },
+        ],
+      },
+      {
+        id: 'g-p2-aa-02', title: 'A Busy Day',
+        text: 'The teacher spoke ___. She gave us a ___ worksheet. We worked ___ to finish it.',
+        answers: ['softly', 'difficult', 'hard'],
+        wordBank: ['softly', 'difficult', 'hard', 'soft', 'difficultly', 'hardly'],
+        xp: 25,
+      },
+      {
+        id: 'g-p2-aa-03', title: 'At the Park',
+        text: 'The flowers are ___. The birds sang ___. A ___ breeze blew across the field.',
+        answers: ['beautiful', 'sweetly', 'gentle'],
+        wordBank: ['beautiful', 'sweetly', 'gentle', 'beautifully', 'sweet', 'gently'],
+        xp: 25,
+      },
+    ],
+    auxiliaries: [
+      {
+        id: 'g-p2-aux-01', title: 'Questions and Answers',
+        text: '___ you like ice cream? Yes, I ___. ___ she coming to the party?',
+        answers: ['Do', 'do', 'Is'],
+        wordBank: ['Do', 'do', 'Is', 'Does', 'does', 'Are'],
+        xp: 25,
+        clues: [
+          { blankIndex: 0, prompt: 'The subject is "you". Which auxiliary forms a question with "you"?', acceptableSpans: ['you'], partialSpans: ['like'], clueType: 'auxiliary-clue', explanation: 'With "you" in present tense questions, use "Do": Do you like...?' },
+          { blankIndex: 2, prompt: 'The subject is "she". Which auxiliary goes with "she" + verb-ing?', acceptableSpans: ['she'], partialSpans: ['coming'], clueType: 'auxiliary-clue', explanation: '"She" is singular, so we use "Is": Is she coming?' },
+        ],
+      },
+      {
+        id: 'g-p2-aux-02', title: 'Asking About School',
+        text: '___ Tom finish his homework? No, he ___ not. ___ the children playing outside?',
+        answers: ['Did', 'did', 'Are'],
+        wordBank: ['Did', 'did', 'Are', 'Does', 'does', 'Is'],
+        xp: 25,
+      },
+      {
+        id: 'g-p2-aux-03', title: 'Helping Verbs',
+        text: 'I ___ not understand the question. She ___ not like spicy food. ___ they going home now?',
+        answers: ['do', 'does', 'Are'],
+        wordBank: ['do', 'does', 'Are', 'did', 'do', 'Is'],
+        xp: 25,
+      },
+    ],
   },
 
   P3: {
@@ -754,62 +864,6 @@ export const passages = {
       { id: 'g-p3-pre-05', title: 'Computer Lab', text: 'Log ___ your account before class starts. Save your file ___ the shared folder. Sit ___ your assigned seat quietly.', answers: ['into', 'in', 'at'], wordBank: ['into', 'in', 'at', 'through', 'beside', 'over'], xp: 30 },
       { id: 'g-p3-pre-06', title: 'Class Noticeboard', text: 'The schedule is pinned ___ the board near the door. Please write your name ___ the attendance sheet. Put completed forms ___ the blue tray.', answers: ['on', 'on', 'in'], wordBank: ['on', 'on', 'in', 'under', 'between', 'after'], xp: 30 },
     ],
-    conjunctions: [
-      {
-        id: 'g-p3-conj-01', title: 'Class Project',
-        text: 'Our group planned the poster, ___ we shared the work fairly. Mei drew the pictures ___ Dan wrote the captions. We finished early ___ everyone stayed focused.',
-        answers: ['so', 'while', 'because'],
-        wordBank: ['so', 'while', 'because', 'but', 'or', 'unless'],
-        xp: 30,
-        clues: [
-          {
-            blankIndex: 0,
-            prompt: 'The second clause shows the result of planning. Which connector shows a result?',
-            acceptableSpans: ['shared the work fairly'],
-            partialSpans: ['planned'],
-            clueType: 'result-clue',
-            explanation: 'Planning led to fair sharing, so "so" is the best connector.',
-          },
-        ],
-      },
-      {
-        id: 'g-p3-conj-02', title: 'After School',
-        text: 'I wanted to stay longer at the library, ___ my father was waiting outside. We packed up quickly ___ we could leave on time. I borrowed one more book ___ I had not finished my series yet.',
-        answers: ['but', 'so', 'because'],
-        wordBank: ['but', 'so', 'because', 'or', 'and', 'unless'],
-        xp: 30,
-      },
-      {
-        id: 'g-p3-conj-03', title: 'Sports Practice',
-        text: 'The coach blew the whistle, ___ the team ran to the court. We listened carefully ___ we did not miss the instructions. You can play in defence ___ attack during drills.',
-        answers: ['and', 'so', 'or'],
-        wordBank: ['and', 'so', 'or', 'but', 'because', 'if'],
-        xp: 30,
-      },
-    ],
-    prepositions: [
-      {
-        id: 'g-p3-pre-01', title: 'Science Corner',
-        text: 'The seedlings are ___ the tray near the window. We poured water ___ the measuring cup. Our notes were placed ___ the experiment file.',
-        answers: ['in', 'from', 'inside'],
-        wordBank: ['in', 'from', 'inside', 'under', 'during', 'across'],
-        xp: 30,
-      },
-      {
-        id: 'g-p3-pre-02', title: 'Walking to Assembly',
-        text: 'We lined up ___ the classroom door before assembly. The prefect walked ___ the two rows to check uniforms. Our class stopped ___ the hall entrance.',
-        answers: ['outside', 'between', 'at'],
-        wordBank: ['outside', 'between', 'at', 'inside', 'under', 'towards'],
-        xp: 30,
-      },
-      {
-        id: 'g-p3-pre-03', title: 'Art Lesson',
-        text: 'Please stick the photo ___ the centre of your page. Draw a border ___ the picture. Write your name ___ the bottom right corner.',
-        answers: ['in', 'around', 'at'],
-        wordBank: ['in', 'around', 'at', 'during', 'through', 'onto'],
-        xp: 30,
-      },
-    ],
     countableUncountable: [
       {
         id: 'g-p3-cu-01', title: 'Preparing for the Test',
@@ -866,6 +920,189 @@ export const passages = {
           { blankIndex: 0, prompt: 'Can you count flour?', acceptableSpans: ['flour'], partialSpans: ['cookies'], clueType: 'mass-noun-clue', explanation: '"Flour" is uncountable. We use "some" with uncountable nouns.' },
           { blankIndex: 2, prompt: 'Is butter countable or uncountable? Look at the "only" clue — it suggests a small amount.', acceptableSpans: ['butter'], partialSpans: ['only'], clueType: 'amount-clue', explanation: '"Butter" is uncountable. "Only" hints at a small amount, so "a little" is correct.' },
         ],
+      },
+    ],
+    pastCont: [
+      {
+        id: 'g-p3-pc-01', title: 'The Rainy Afternoon',
+        text: 'While we ___ waiting for the bus, it started to rain. The children ___ playing when the bell rang. I ___ reading when Mum called me.',
+        answers: ['were', 'were', 'was'],
+        wordBank: ['were', 'were', 'was', 'are', 'is', 'was being'],
+        xp: 30,
+        clues: [
+          { blankIndex: 0, prompt: 'Look for the word that signals two actions happening at the same time.', acceptableSpans: ['While'], partialSpans: ['waiting'], clueType: 'time-marker', explanation: '"While" signals an ongoing past action — use was/were + verb-ing.' },
+          { blankIndex: 1, prompt: 'Find the word that interrupts the ongoing action.', acceptableSpans: ['when'], partialSpans: ['bell'], clueType: 'time-marker', explanation: '"When" the bell rang interrupts the ongoing action: the children were playing.' },
+        ],
+      },
+      {
+        id: 'g-p3-pc-02', title: 'During the Assembly',
+        text: 'The principal ___ speaking when the fire alarm rang. Some pupils ___ whispering in the back row. The prefect ___ standing near the stage.',
+        answers: ['was', 'were', 'was'],
+        wordBank: ['was', 'were', 'was', 'is', 'are', 'were being'],
+        xp: 30,
+      },
+      {
+        id: 'g-p3-pc-03', title: 'A Noisy Recess',
+        text: 'The boys ___ shouting while the girls ___ skipping rope. The teacher ___ walking towards the canteen when she heard the noise.',
+        answers: ['were', 'were', 'was'],
+        wordBank: ['were', 'were', 'was', 'are', 'is', 'are being'],
+        xp: 30,
+      },
+    ],
+    comparatives: [
+      {
+        id: 'g-p3-comp-01', title: 'Comparing Friends',
+        text: 'Ali is ___ than Ben. Sara is ___ than Mei at spelling. My bag is ___ than yours.',
+        answers: ['taller', 'better', 'heavier'],
+        wordBank: ['taller', 'better', 'heavier', 'more tall', 'gooder', 'more heavy'],
+        xp: 30,
+        clues: [
+          { blankIndex: 1, prompt: '"Good" is an irregular comparative. What is the comparative form of "good"?', acceptableSpans: ['spelling'], partialSpans: ['Sara'], clueType: 'comparative-clue', explanation: '"Good" becomes "better" (not "gooder") in the comparative form.' },
+        ],
+      },
+      {
+        id: 'g-p3-comp-02', title: 'Animals at the Zoo',
+        text: 'The elephant is ___ than the monkey. The cheetah is ___ than the bear. The snake is ___ than the rabbit.',
+        answers: ['bigger', 'faster', 'longer'],
+        wordBank: ['bigger', 'faster', 'longer', 'more big', 'more fast', 'more long'],
+        xp: 30,
+      },
+      {
+        id: 'g-p3-comp-03', title: 'Classroom Objects',
+        text: 'This ruler is ___ than that one. The dictionary is ___ than the storybook. My pencil is ___ than yours.',
+        answers: ['longer', 'thicker', 'sharper'],
+        wordBank: ['longer', 'thicker', 'sharper', 'more long', 'more thick', 'more sharp'],
+        xp: 30,
+      },
+    ],
+    superlatives: [
+      {
+        id: 'g-p3-sup-01', title: 'Our Class Champions',
+        text: 'Ali is the ___ boy in our class. Sara is the ___ reader. This is the ___ test we have had.',
+        answers: ['tallest', 'best', 'hardest'],
+        wordBank: ['tallest', 'best', 'hardest', 'most tall', 'goodest', 'most hard'],
+        xp: 30,
+        clues: [
+          { blankIndex: 1, prompt: 'What is the superlative of "good"? It is irregular.', acceptableSpans: ['reader'], partialSpans: ['Sara'], clueType: 'superlative-clue', explanation: '"Good" becomes "best" (not "goodest") in the superlative form.' },
+        ],
+      },
+      {
+        id: 'g-p3-sup-02', title: 'Amazing Animals',
+        text: 'The blue whale is the ___ animal in the world. The cheetah is the ___ land animal. The giraffe is the ___ animal.',
+        answers: ['largest', 'fastest', 'tallest'],
+        wordBank: ['largest', 'fastest', 'tallest', 'most large', 'most fast', 'most tall'],
+        xp: 30,
+      },
+      {
+        id: 'g-p3-sup-03', title: 'School Events',
+        text: 'Sports Day was the ___ event of the year. The art competition was the ___ colourful. The science fair was the ___ interesting.',
+        answers: ['biggest', 'most', 'most'],
+        wordBank: ['biggest', 'most', 'most', 'bigger', 'more', 'more'],
+        xp: 30,
+      },
+    ],
+    possessives: [
+      {
+        id: 'g-p3-pos-01', title: 'The Class Pet',
+        text: 'The ___ cage needs to be cleaned. It is the ___ responsibility. Each ___ turn comes once a week.',
+        answers: ["hamster's", "class's", "student's"],
+        wordBank: ["hamster's", "class's", "student's", "hamsters", "class", "students"],
+        xp: 30,
+        clues: [
+          { blankIndex: 0, prompt: 'Who owns the cage? Add an apostrophe + s to show ownership.', acceptableSpans: ['cage'], partialSpans: ['cleaned'], clueType: 'possessive-clue', explanation: 'The cage belongs to the hamster. We add apostrophe + s: hamster\'s cage.' },
+        ],
+      },
+      {
+        id: 'g-p3-pos-02', title: 'After School',
+        text: 'We went to ___ house for a playdate. The ___ toys were everywhere. ___ mum served us some juice.',
+        answers: ["Tom's", "children's", "Tom's"],
+        wordBank: ["Tom's", "children's", "Tom's", "Toms", "childrens", "Toms'"],
+        xp: 30,
+      },
+      {
+        id: 'g-p3-pos-03', title: 'Sports Day',
+        text: 'The ___ uniforms were bright red. The ___ trophy was displayed proudly. Each ___ effort was praised.',
+        answers: ["team's", "winner's", "player's"],
+        wordBank: ["team's", "winner's", "player's", "teams", "winners", "players"],
+        xp: 30,
+      },
+    ],
+    adjAdverbs: [
+      {
+        id: 'g-p3-aa-01', title: 'The School Concert',
+        text: 'The choir sang ___. The stage looked ___. The audience clapped ___.',
+        answers: ['beautifully', 'wonderful', 'loudly'],
+        wordBank: ['beautifully', 'wonderful', 'loudly', 'beautiful', 'wonderfully', 'loud'],
+        xp: 30,
+        clues: [
+          { blankIndex: 0, prompt: 'Does the blank describe the noun "choir" or the action "sang"?', acceptableSpans: ['sang'], partialSpans: ['choir'], clueType: 'adverb-clue', explanation: 'The word describes how they sang — it modifies a verb, so use the adverb "beautifully".' },
+          { blankIndex: 1, prompt: 'Does the blank describe the stage itself or an action?', acceptableSpans: ['stage'], partialSpans: ['looked'], clueType: 'adjective-clue', explanation: '"Looked" is a linking verb here. The word describes the stage, so use the adjective "wonderful".' },
+        ],
+      },
+      {
+        id: 'g-p3-aa-02', title: 'At the Library',
+        text: 'We must speak ___ in the library. The librarian is very ___. She arranged the books ___.',
+        answers: ['quietly', 'helpful', 'neatly'],
+        wordBank: ['quietly', 'helpful', 'neatly', 'quiet', 'helpfully', 'neat'],
+        xp: 30,
+      },
+      {
+        id: 'g-p3-aa-03', title: 'Morning Exercise',
+        text: 'The coach ran ___. The exercises were ___. We stretched ___ before the run.',
+        answers: ['quickly', 'tiring', 'carefully'],
+        wordBank: ['quickly', 'tiring', 'carefully', 'quick', 'tiringly', 'careful'],
+        xp: 30,
+      },
+    ],
+    auxiliaries: [
+      {
+        id: 'g-p3-aux-01', title: 'Interview Practice',
+        text: '___ your father work in an office? ___ the pupils finished their project? We ___ not expect the quiz today.',
+        answers: ['Does', 'Have', 'did'],
+        wordBank: ['Does', 'Have', 'did', 'Do', 'Has', 'does'],
+        xp: 30,
+        clues: [
+          { blankIndex: 0, prompt: 'The subject is "your father" (singular). Which auxiliary fits a singular subject in present tense?', acceptableSpans: ['father'], partialSpans: ['work'], clueType: 'auxiliary-clue', explanation: '"Father" is third-person singular — use "Does" in present tense questions.' },
+          { blankIndex: 1, prompt: 'The subject is "the pupils" (plural). Which auxiliary forms a perfect tense question with a plural subject?', acceptableSpans: ['pupils'], partialSpans: ['finished'], clueType: 'auxiliary-clue', explanation: '"Pupils" is plural — use "Have" (not "Has") with plural subjects.' },
+        ],
+      },
+      {
+        id: 'g-p3-aux-02', title: 'After the Outing',
+        text: '___ it rain during the trip? The bus ___ not arrive on time. ___ everyone brought their lunch?',
+        answers: ['Did', 'did', 'Had'],
+        wordBank: ['Did', 'did', 'Had', 'Does', 'does', 'Has'],
+        xp: 30,
+      },
+      {
+        id: 'g-p3-aux-03', title: 'Planning a Party',
+        text: '___ we need more balloons? She ___ not know the time yet. ___ anyone told the teacher?',
+        answers: ['Do', 'does', 'Has'],
+        wordBank: ['Do', 'does', 'Has', 'Does', 'do', 'Have'],
+        xp: 30,
+      },
+    ],
+    mixedGrammar: [
+      {
+        id: 'g-p3-mix-01', title: 'A Busy Week at School',
+        text: 'Last Monday, we ___ to the science lab. The teacher ___ speaking when a student ___ his hand. If everyone ___ quiet, the experiment will work better.',
+        answers: ['went', 'was', 'raised', 'keeps'],
+        wordBank: ['went', 'was', 'raised', 'keeps', 'go', 'is', 'raises', 'kept'],
+        xp: 35,
+        grammarNotes: ['Simple past: went (last Monday).', 'Past continuous: was speaking (ongoing past action).', 'Simple past: raised (completed action).', 'Type 1 conditional: If + present tense.'],
+      },
+      {
+        id: 'g-p3-mix-02', title: 'The School Carnival',
+        text: 'The carnival ___ organised by the parents. There were ___ games to play ___ the children had a great time. Ali ran ___ than his classmates.',
+        answers: ['was', 'many', 'and', 'faster'],
+        wordBank: ['was', 'many', 'and', 'faster', 'were', 'much', 'but', 'more fast'],
+        xp: 35,
+      },
+      {
+        id: 'g-p3-mix-03', title: 'My Weekend',
+        text: 'I ___ not have much homework, ___ I went to the park. While I ___ playing, it started to rain. I ran home ___.',
+        answers: ['did', 'so', 'was', 'quickly'],
+        wordBank: ['did', 'so', 'was', 'quickly', 'do', 'because', 'were', 'quick'],
+        xp: 35,
       },
     ],
   },
@@ -1026,6 +1263,133 @@ export const passages = {
         grammarNotes: ['"A few" (positive) means some students did share.', '"Advice" is uncountable — we say "some advice", not "many advices".', '"Little noise" (negative) means almost no noise — a good thing here.'],
       },
     ],
+    presentPerfect: [
+      {
+        id: 'g-p4-pp-01', title: 'How Much Have We Done?',
+        text: 'I ___ finished my homework already. She ___ not eaten her lunch yet. We ___ practised the song three times.',
+        answers: ['have', 'has', 'have'],
+        wordBank: ['have', 'has', 'have', 'had', 'has', 'had'],
+        xp: 35,
+        clues: [
+          { blankIndex: 0, prompt: 'The subject is "I". Which auxiliary forms present perfect with "I"?', acceptableSpans: ['I'], partialSpans: ['already'], clueType: 'tense-helper', explanation: 'With "I", use "have" (not "has") + past participle: I have finished.' },
+          { blankIndex: 1, prompt: 'The subject is "She". Which auxiliary forms present perfect with third-person singular?', acceptableSpans: ['She'], partialSpans: ['yet'], clueType: 'tense-helper', explanation: 'With "she/he/it", use "has" + past participle: She has not eaten.' },
+        ],
+      },
+      {
+        id: 'g-p4-pp-02', title: 'Since and For',
+        text: 'Ali ___ lived in Singapore since 2018. They ___ known each other for five years. She ___ not visited the museum before.',
+        answers: ['has', 'have', 'has'],
+        wordBank: ['has', 'have', 'has', 'had', 'have', 'had'],
+        xp: 35,
+      },
+      {
+        id: 'g-p4-pp-03', title: 'After the Holidays',
+        text: '___ you ever been to the zoo? Tom ___ already read the new book. The class ___ not started the project yet.',
+        answers: ['Have', 'has', 'has'],
+        wordBank: ['Have', 'has', 'has', 'Has', 'have', 'had'],
+        xp: 35,
+      },
+    ],
+    comparatives: [
+      {
+        id: 'g-p4-comp-01', title: 'Two Schools',
+        text: 'The hall in our school is ___ than the one in St Andrew\'s. Their canteen food is ___ than ours. Our library is ___ than theirs.',
+        answers: ['larger', 'more delicious', 'quieter'],
+        wordBank: ['larger', 'more delicious', 'quieter', 'more large', 'deliciouser', 'more quiet'],
+        xp: 35,
+        clues: [
+          { blankIndex: 1, prompt: '"Delicious" is a long adjective (3 syllables). How do we form its comparative?', acceptableSpans: ['delicious'], partialSpans: ['food'], clueType: 'comparative-clue', explanation: 'Long adjectives use "more" + adjective: more delicious (not "deliciouser").' },
+        ],
+      },
+      {
+        id: 'g-p4-comp-02', title: 'Sports Comparison',
+        text: 'Swimming is ___ than running for building strength. Badminton is ___ than tennis to learn. Football is ___ than volleyball in Singapore.',
+        answers: ['better', 'easier', 'more popular'],
+        wordBank: ['better', 'easier', 'more popular', 'gooder', 'more easy', 'popularer'],
+        xp: 35,
+      },
+      {
+        id: 'g-p4-comp-03', title: 'Exam Preparation',
+        text: 'This year\'s paper was ___ than last year\'s. The questions were ___ than before. My score was ___ than I expected.',
+        answers: ['harder', 'more challenging', 'worse'],
+        wordBank: ['harder', 'more challenging', 'worse', 'more hard', 'challenginger', 'badder'],
+        xp: 35,
+      },
+    ],
+    superlatives: [
+      {
+        id: 'g-p4-sup-01', title: 'Our School Records',
+        text: 'Mei ran the ___ race in Sports Day history. The ___ beautiful painting was displayed in the hall. It was the ___ exciting event of the year.',
+        answers: ['fastest', 'most', 'most'],
+        wordBank: ['fastest', 'most', 'most', 'most fast', 'more', 'more'],
+        xp: 35,
+      },
+      {
+        id: 'g-p4-sup-02', title: 'Around Singapore',
+        text: 'The MRT is the ___ way to travel in Singapore. Changi Airport is the ___ airport in Asia. The ___ thing about Singapore is its food.',
+        answers: ['fastest', 'best', 'greatest'],
+        wordBank: ['fastest', 'best', 'greatest', 'most fast', 'goodest', 'most great'],
+        xp: 35,
+      },
+      {
+        id: 'g-p4-sup-03', title: 'Class Competition',
+        text: 'Ben wrote the ___ essay. Sara gave the ___ interesting presentation. Our group made the ___ creative poster.',
+        answers: ['longest', 'most', 'most'],
+        wordBank: ['longest', 'most', 'most', 'most long', 'more', 'more'],
+        xp: 35,
+      },
+    ],
+    adjAdverbs: [
+      {
+        id: 'g-p4-aa-01', title: 'The Science Experiment',
+        text: 'The liquid changed colour ___. The result was ___. We measured the temperature ___.',
+        answers: ['rapidly', 'unexpected', 'accurately'],
+        wordBank: ['rapidly', 'unexpected', 'accurately', 'rapid', 'unexpectedly', 'accurate'],
+        xp: 35,
+        clues: [
+          { blankIndex: 1, prompt: '"Was" is a linking verb. Does the word describe the subject or the action?', acceptableSpans: ['result'], partialSpans: ['was'], clueType: 'adjective-clue', explanation: 'After linking verbs (is, was, seems, looks), use an adjective to describe the subject: the result was unexpected.' },
+        ],
+      },
+      {
+        id: 'g-p4-aa-02', title: 'Good vs Well',
+        text: 'Ali speaks English ___. She is a ___ student. The team played ___.',
+        answers: ['well', 'good', 'well'],
+        wordBank: ['well', 'good', 'well', 'good', 'well', 'good'],
+        xp: 35,
+        grammarNotes: ['"Well" is the adverb form of "good". Use "well" to describe how someone does something (modifies verb).', '"Good" is an adjective — use it to describe nouns: a good student.'],
+      },
+      {
+        id: 'g-p4-aa-03', title: 'The Art Exhibition',
+        text: 'The paintings were ___. Each artist had worked ___. The visitors spoke ___ about the children\'s talent.',
+        answers: ['impressive', 'diligently', 'highly'],
+        wordBank: ['impressive', 'diligently', 'highly', 'impressively', 'diligent', 'high'],
+        xp: 35,
+      },
+    ],
+    mixedGrammar: [
+      {
+        id: 'g-p4-mix-01', title: 'The School Debate',
+        text: 'Each speaker ___ given two minutes. The audience listened ___. Ali ___ already prepared his notes. If the team ___ well, they will win.',
+        answers: ['was', 'attentively', 'had', 'performs'],
+        wordBank: ['was', 'attentively', 'had', 'performs', 'were', 'attentive', 'has', 'performed'],
+        xp: 40,
+        grammarNotes: ['Passive voice: Each speaker was given.', 'Adverb: listened attentively (how they listened).', 'Past perfect: had already prepared.', 'Type 1 conditional: If + present tense.'],
+      },
+      {
+        id: 'g-p4-mix-02', title: 'Our Trip to the Museum',
+        text: 'We ___ visited the museum before. The guide, ___ was very knowledgeable, spoke ___. ___ class enjoyed the trip.',
+        answers: ['had', 'who', 'clearly', 'Every'],
+        wordBank: ['had', 'who', 'clearly', 'Every', 'have', 'which', 'clear', 'Each'],
+        xp: 40,
+      },
+      {
+        id: 'g-p4-mix-03', title: 'End-of-Term Review',
+        text: 'The teacher said we ___ improved a lot this term. She asked if we ___ practised our spelling. I ___ not have ___ time to revise yesterday.',
+        answers: ['had', 'had', 'did', 'much'],
+        wordBank: ['had', 'had', 'did', 'much', 'have', 'have', 'do', 'many'],
+        xp: 40,
+      },
+    ],
   },
 
   P5: {
@@ -1117,62 +1481,6 @@ export const passages = {
       { id: 'g-p5-pv-05', title: 'Book Drive', text: 'Hundreds of books ___ collected in one week. Every box ___ labelled by student leaders. The donated novels ___ sent to partner schools.', answers: ['were', 'was', 'were'], wordBank: ['were', 'was', 'were', 'are', 'is', 'be'], xp: 40 },
       { id: 'g-p5-pv-06', title: 'Science Lab Rules', text: 'Safety goggles ___ worn during each experiment. The chemical bottles ___ stored in locked cabinets. A checklist ___ completed before dismissal.', answers: ['are', 'are', 'is'], wordBank: ['are', 'are', 'is', 'were', 'was', 'be'], xp: 40 },
     ],
-    conditionals: [
-      {
-        id: 'g-p5-cond-01', title: 'Science Fair Planning',
-        text: 'If our group ___ the model tonight, we will have time to rehearse tomorrow. If I ___ more cardboard, I would build a taller volcano. If we had labelled each wire, we ___ not have wasted so much time.',
-        answers: ['finishes', 'had', 'would'],
-        wordBank: ['finishes', 'had', 'would', 'finished', 'have', 'will'],
-        xp: 40,
-      },
-      {
-        id: 'g-p5-cond-02', title: 'Football Match Review',
-        text: 'If the defenders ___ their positions, the team will stay organised. If Amir ___ faster, he could reach the through ball. If the referee had seen the foul, he ___ have awarded a free kick.',
-        answers: ['keep', 'ran', 'would'],
-        wordBank: ['keep', 'ran', 'would', 'kept', 'runs', 'will'],
-        xp: 40,
-      },
-      {
-        id: 'g-p5-cond-03', title: 'Study Habits',
-        text: 'If I ___ my schedule, I can finish revision by Friday. If my sister ___ less distracted, she would complete her work sooner. If we had started earlier, we ___ have had more time to check our answers.',
-        answers: ['follow', 'were', 'would'],
-        wordBank: ['follow', 'were', 'would', 'followed', 'is', 'will'],
-        xp: 40,
-        clues: [
-          {
-            blankIndex: 1,
-            prompt: 'This sentence imagines an unreal present situation. Which verb form fits?',
-            acceptableSpans: ['would complete'],
-            partialSpans: ['If my sister'],
-            clueType: 'conditional-clue',
-            explanation: 'In a Type 2 conditional, we use "if + were" and "would + base verb".',
-          },
-        ],
-      },
-    ],
-    passiveVoice: [
-      {
-        id: 'g-p5-pv-01', title: 'Recycling Week',
-        text: 'The recycling bins ___ emptied every afternoon by the Green Team. Old worksheets ___ sorted into paper and plastic groups. A short report ___ written after each collection round.',
-        answers: ['are', 'are', 'is'],
-        wordBank: ['are', 'are', 'is', 'were', 'was', 'be'],
-        xp: 40,
-      },
-      {
-        id: 'g-p5-pv-02', title: 'Library Duty',
-        text: 'The returned books ___ checked for damage at the counter. New labels ___ printed for missing spine tags. The fiction shelf ___ cleaned before dismissal.',
-        answers: ['are', 'are', 'is'],
-        wordBank: ['are', 'are', 'is', 'were', 'was', 'be'],
-        xp: 40,
-      },
-      {
-        id: 'g-p5-pv-03', title: 'Classroom Renovation',
-        text: 'The notice board ___ repainted during the holidays. Fresh charts ___ put up by the class committee. Each desk ___ moved back into neat rows.',
-        answers: ['was', 'were', 'was'],
-        wordBank: ['was', 'were', 'was', 'is', 'are', 'be'],
-        xp: 40,
-      },
-    ],
     countableUncountable: [
       {
         id: 'g-p5-cu-01', title: 'Checking the Equipment',
@@ -1228,6 +1536,82 @@ export const passages = {
         wordBank: ['plenty of', 'less', 'fewer', 'enough', 'more', 'too many'],
         xp: 40,
         grammarNotes: ['"Plenty of" works with both countable and uncountable nouns.', '"Less" is for uncountable nouns (confusion).', '"Fewer" is for countable nouns (practice sessions).'],
+      },
+    ],
+    presentPerfect: [
+      {
+        id: 'g-p5-pp-01', title: 'The STEM Project',
+        text: 'Our team ___ completed the prototype since last Wednesday. Each member ___ contributed at least two ideas. The teacher ___ not given us the final brief yet.',
+        answers: ['has', 'has', 'has'],
+        wordBank: ['has', 'has', 'has', 'have', 'had', 'have'],
+        xp: 40,
+        clues: [
+          { blankIndex: 0, prompt: 'Look for the time marker that tells you this action started in the past and connects to now.', acceptableSpans: ['since'], partialSpans: ['Wednesday'], clueType: 'time-marker', explanation: '"Since" signals present perfect tense. "Our team" is treated as singular: has completed.' },
+        ],
+      },
+      {
+        id: 'g-p5-pp-02', title: 'Reading Challenge',
+        text: 'I ___ read five novels so far this term. Mei ___ not finished the biography yet. ___ you ever read a graphic novel?',
+        answers: ['have', 'has', 'Have'],
+        wordBank: ['have', 'has', 'Have', 'had', 'has', 'Has'],
+        xp: 40,
+      },
+      {
+        id: 'g-p5-pp-03', title: 'Changes in the Neighbourhood',
+        text: 'The old playground ___ been replaced with a new one. Many shops ___ closed down over the years. The hawker centre ___ remained popular since it opened.',
+        answers: ['has', 'have', 'has'],
+        wordBank: ['has', 'have', 'has', 'had', 'have', 'had'],
+        xp: 40,
+      },
+    ],
+    pastPerfect: [
+      {
+        id: 'g-p5-ppt-01', title: 'The Late Arrival',
+        text: 'By the time Ali arrived, the teacher ___ already started the lesson. The class ___ finished the warm-up exercise. He realised he ___ forgotten his textbook at home.',
+        answers: ['had', 'had', 'had'],
+        wordBank: ['had', 'had', 'had', 'has', 'have', 'was'],
+        xp: 40,
+        clues: [
+          { blankIndex: 0, prompt: 'Find the phrase that tells you one action happened before another past action.', acceptableSpans: ['By the time'], partialSpans: ['arrived'], clueType: 'time-marker', explanation: '"By the time Ali arrived" sets a past reference point. The lesson started before that, so use past perfect: had started.' },
+        ],
+      },
+      {
+        id: 'g-p5-ppt-02', title: 'Before the Trip',
+        text: 'We ___ packed our bags the night before. The teacher ___ already arranged the bus. Nobody ___ expected the rain that morning.',
+        answers: ['had', 'had', 'had'],
+        wordBank: ['had', 'had', 'had', 'has', 'have', 'was'],
+        xp: 40,
+      },
+      {
+        id: 'g-p5-ppt-03', title: 'The Missing Report',
+        text: 'Mei discovered that someone ___ taken her file. She ___ left it on the desk during recess. The teacher said he ___ not seen anyone near the desk.',
+        answers: ['had', 'had', 'had'],
+        wordBank: ['had', 'had', 'had', 'has', 'have', 'was'],
+        xp: 40,
+      },
+    ],
+    mixedGrammar: [
+      {
+        id: 'g-p5-mix-01', title: 'The Camp Experience',
+        text: 'The tents ___ set up by the students before nightfall. If they ___ started earlier, they ___ have finished in daylight. The instructor told them that they ___ done a commendable job.',
+        answers: ['were', 'had', 'would', 'had'],
+        wordBank: ['were', 'had', 'would', 'had', 'was', 'have', 'will', 'have'],
+        xp: 45,
+        grammarNotes: ['Passive voice: tents were set up (by someone).', 'Type 3 conditional: If + past perfect, would have + past participle.', 'Reported speech: told them that they had done.'],
+      },
+      {
+        id: 'g-p5-mix-02', title: 'Science and Safety',
+        text: 'Safety goggles ___ worn during the experiment. The chemicals ___ handled ___. If the students ___ the rules, accidents can be prevented.',
+        answers: ['are', 'should be', 'carefully', 'follow'],
+        wordBank: ['are', 'should be', 'carefully', 'follow', 'were', 'must be', 'careful', 'followed'],
+        xp: 45,
+      },
+      {
+        id: 'g-p5-mix-03', title: 'Exam Week Pressure',
+        text: '___ of the students ___ been revising since the start of term. There was ___ noise in the hall during the paper. The teacher reminded us that we ___ check our answers before submission.',
+        answers: ['Most', 'have', 'very little', 'should'],
+        wordBank: ['Most', 'have', 'very little', 'should', 'Many', 'has', 'very few', 'must'],
+        xp: 45,
       },
     ],
   },
@@ -1421,6 +1805,57 @@ export const passages = {
         grammarNotes: ['"Advice" is always uncountable — never say "advices".', '"Practice papers" is countable — use "a large number of".', '"Room" (meaning space/opportunity) is uncountable here.'],
       },
     ],
+    pastPerfect: [
+      {
+        id: 'g-p6-ppt-01', title: 'The Investigation',
+        text: 'The detective discovered that the thief ___ entered through the back door. The security camera ___ stopped working an hour before. Nobody ___ noticed the broken lock until morning.',
+        answers: ['had', 'had', 'had'],
+        wordBank: ['had', 'had', 'had', 'has', 'have', 'was'],
+        xp: 50,
+      },
+      {
+        id: 'g-p6-ppt-02', title: 'Before the Ceremony',
+        text: 'By the time the guests arrived, the committee ___ already set up the hall. The caterer ___ prepared enough food for three hundred people. The performers ___ rehearsed their items twice.',
+        answers: ['had', 'had', 'had'],
+        wordBank: ['had', 'had', 'had', 'has', 'have', 'were'],
+        xp: 50,
+      },
+      {
+        id: 'g-p6-ppt-03', title: 'A Learning Moment',
+        text: 'Mei realised she ___ misunderstood the question after reading the answer key. She wished she ___ studied more carefully. If she ___ checked her work, she would have noticed the error.',
+        answers: ['had', 'had', 'had'],
+        wordBank: ['had', 'had', 'had', 'has', 'have', 'would'],
+        xp: 50,
+        clues: [
+          { blankIndex: 2, prompt: 'Find the conditional structure: "If she ___ checked" leads to "would have noticed". What tense goes in the if-clause?', acceptableSpans: ['If', 'would have'], partialSpans: ['checked'], clueType: 'conditional-clue', explanation: 'In Type 3 conditionals (past unreal), the if-clause uses past perfect: If she had checked...' },
+        ],
+      },
+    ],
+    mixedGrammar: [
+      {
+        id: 'g-p6-mix-01', title: 'The School Fair',
+        text: 'The school fair ___ organised by the student council last Friday. If we ___ started planning earlier, we ___ have had more stalls. The principal said that everyone ___ done a wonderful job.',
+        answers: ['was', 'had', 'would', 'had'],
+        wordBank: ['was', 'had', 'would', 'had', 'were', 'has', 'will', 'have'],
+        xp: 55,
+        grammarNotes: ['Passive voice: The fair was organised (by someone).', 'Type 3 conditional: If + past perfect, would have + past participle.', 'Reported speech: said that everyone had done.'],
+      },
+      {
+        id: 'g-p6-mix-02', title: 'Preparing for PSLE',
+        text: 'The students ___ been revising since March. Each pupil ___ given a revision booklet by the teachers. If they ___ hard, they ___ do well in the exam.',
+        answers: ['have', 'was', 'study', 'will'],
+        wordBank: ['have', 'was', 'study', 'will', 'has', 'were', 'studied', 'would'],
+        xp: 55,
+        grammarNotes: ['Present perfect continuous: have been revising (since March).', 'Passive voice: Each pupil was given (by the teachers).', 'Type 1 conditional: If + present tense, will + base verb.'],
+      },
+      {
+        id: 'g-p6-mix-03', title: 'The Class Monitor Report',
+        text: 'Ali, ___ is the class monitor, reported that ___ students ___ not completed their homework. The teacher reminded us that we ___ submit it by Friday.',
+        answers: ['who', 'several', 'had', 'must'],
+        wordBank: ['who', 'several', 'had', 'must', 'which', 'many', 'have', 'should'],
+        xp: 55,
+      },
+    ],
   },
 };
 
@@ -1519,14 +1954,36 @@ const GRAMMARMASTER_EXPANSION = {
   ],
 };
 
-const EXPANSION_CATEGORIES = ['pronouns', 'svAgreement', 'perfectContinuousTenses', 'modals', 'conditionals', 'passiveVoice', 'reportedSpeech', 'relativeClauses'];
+/**
+ * LEVEL-APPROPRIATE EXPANSION MAP
+ * ────────────────────────────────────────────────────────────────────────────
+ * Only adds expansion practice for categories that are developmentally
+ * appropriate at each level. This prevents P1/P2 children from encountering
+ * passive voice, reported speech, relative clauses, or perfect tenses.
+ *
+ * P1: pronouns, svAgreement, modals (basic can/cannot/must only)
+ * P2: pronouns, svAgreement, modals
+ * P3: pronouns, svAgreement, modals, conditionals (Type 1 only)
+ * P4: pronouns, svAgreement, modals, conditionals, perfectContinuousTenses
+ * P5: pronouns, svAgreement, modals, conditionals, passiveVoice, perfectContinuousTenses, reportedSpeech
+ * P6: all categories including relativeClauses
+ */
+const LEVEL_EXPANSION_MAP = {
+  P1: ['pronouns', 'svAgreement', 'modals'],
+  P2: ['pronouns', 'svAgreement', 'modals'],
+  P3: ['pronouns', 'svAgreement', 'modals', 'conditionals'],
+  P4: ['pronouns', 'svAgreement', 'modals', 'conditionals', 'perfectContinuousTenses'],
+  P5: ['pronouns', 'svAgreement', 'modals', 'conditionals', 'passiveVoice', 'perfectContinuousTenses', 'reportedSpeech'],
+  P6: ['pronouns', 'svAgreement', 'modals', 'conditionals', 'passiveVoice', 'perfectContinuousTenses', 'reportedSpeech', 'relativeClauses'],
+};
 const LEVEL_XP = { P1: 22, P2: 26, P3: 30, P4: 36, P5: 42, P6: 50 };
 
 function enrichGrammarPassages() {
   const levelKeys = Object.keys(passages);
   levelKeys.forEach(level => {
     const bucket = passages[level];
-    EXPANSION_CATEGORIES.forEach(categoryKey => {
+    const allowedCategories = LEVEL_EXPANSION_MAP[level] || [];
+    allowedCategories.forEach(categoryKey => {
       if (!bucket[categoryKey]) bucket[categoryKey] = [];
       const samples = GRAMMARMASTER_EXPANSION[categoryKey] || [];
       samples.forEach((sample, idx) => {
