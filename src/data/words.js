@@ -988,8 +988,8 @@ export const WORDS = [
      SUFFIX: -ing  (level 3)
      Base word phonemes + '-ing' suffix tile
   ══════════════════════════════════════ */
-  { id:'sitting',  word:'sitting',  graphemes:['s','i','t','-ing'],   types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-ing', level:3, emoji:'💺' },
-  { id:'running',  word:'running',  graphemes:['r','u','n','-ing'],   types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-ing', level:3, emoji:'🏃' },
+  { id:'sitting',  word:'sitting',  graphemes:['s','i','tt','-ing'],  types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-ing', level:3, emoji:'💺' },
+  { id:'running',  word:'running',  graphemes:['r','u','nn','-ing'],  types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-ing', level:3, emoji:'🏃' },
   { id:'jumping',  word:'jumping',  graphemes:['j','u','mp','-ing'],  types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-ing', level:3, emoji:'🦘' },
   { id:'fishing',  word:'fishing',  graphemes:['f','i','sh','-ing'],  types:['c','sv','d','sf'],  pattern:'suffix', group:'suffix-ing', level:3, emoji:'🎣' },
   { id:'wishing',  word:'wishing',  graphemes:['w','i','sh','-ing'],  types:['c','sv','d','sf'],  pattern:'suffix', group:'suffix-ing', level:3, emoji:'⭐' },
@@ -1018,14 +1018,14 @@ export const WORDS = [
   /* ══════════════════════════════════════
      SUFFIX: -er  (level 3)
   ══════════════════════════════════════ */
-  { id:'runner',  word:'runner',  graphemes:['r','u','n','-er'],   types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-er', level:3, emoji:'🏃' },
+  { id:'runner',  word:'runner',  graphemes:['r','u','nn','-er'],  types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-er', level:3, emoji:'🏃' },
   { id:'jumper',  word:'jumper',  graphemes:['j','u','mp','-er'],  types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-er', level:3, emoji:'🦘' },
   { id:'fisher',  word:'fisher',  graphemes:['f','i','sh','-er'],  types:['c','sv','d','sf'],  pattern:'suffix', group:'suffix-er', level:3, emoji:'🎣' },
   { id:'singer',  word:'singer',  graphemes:['s','i','ng','-er'],  types:['c','sv','d','sf'],  pattern:'suffix', group:'suffix-er', level:3, emoji:'🎤' },
   { id:'faster',  word:'faster',  graphemes:['f','a','st','-er'],  types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-er', level:3, emoji:'⚡' },
   { id:'longer',  word:'longer',  graphemes:['l','o','ng','-er'],  types:['c','sv','d','sf'],  pattern:'suffix', group:'suffix-er', level:3, emoji:'📏' },
-  { id:'bigger',  word:'bigger',  graphemes:['b','i','g','-er'],   types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-er', level:3, emoji:'🐘' },
-  { id:'winner',  word:'winner',  graphemes:['w','i','n','-er'],   types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-er', level:3, emoji:'🏆' },
+  { id:'bigger',  word:'bigger',  graphemes:['b','i','gg','-er'],  types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-er', level:3, emoji:'🐘' },
+  { id:'winner',  word:'winner',  graphemes:['w','i','nn','-er'],  types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-er', level:3, emoji:'🏆' },
 
   /* ══════════════════════════════════════
      SUFFIX: -est  (level 3)
@@ -1033,7 +1033,7 @@ export const WORDS = [
   { id:'fastest', word:'fastest', graphemes:['f','a','st','-est'],  types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'⚡' },
   { id:'longest', word:'longest', graphemes:['l','o','ng','-est'],  types:['c','sv','d','sf'],  pattern:'suffix', group:'suffix-est', level:3, emoji:'📏' },
   { id:'richest', word:'richest', graphemes:['r','i','ch','-est'],  types:['c','sv','d','sf'],  pattern:'suffix', group:'suffix-est', level:3, emoji:'💰' },
-  { id:'biggest', word:'biggest', graphemes:['b','i','g','-est'],   types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-est', level:3, emoji:'🐘' },
+  { id:'biggest', word:'biggest', graphemes:['b','i','gg','-est'],  types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-est', level:3, emoji:'🐘' },
   { id:'coldest', word:'coldest', graphemes:['c','o','ld','-est'],  types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'🧊' },
   { id:'boldest', word:'boldest', graphemes:['b','o','ld','-est'],  types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'💪' },
   { id:'kindest', word:'kindest', graphemes:['k','i','nd','-est'],  types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'💛' },
@@ -1046,7 +1046,7 @@ export const WORDS = [
   ══════════════════════════════════════ */
 
   // --- Short-A new ---
-  { id:'ash',  word:'ash',  graphemes:['a','sh'],      types:['sv','d'],     pattern:'CVC',     group:'short-a', level:1, emoji:'🌋' },
+  { id:'ash',  word:'ash',  graphemes:['a','sh'],      types:['sv','d'],     pattern:'digraph', group:'short-a', level:1, emoji:'🌋' },
   { id:'gas',  word:'gas',  graphemes:['g','a','s'],   types:['c','sv','c'], pattern:'CVC',     group:'short-a', level:1, emoji:'⛽' },
   { id:'pal',  word:'pal',  graphemes:['p','a','l'],   types:['c','sv','c'], pattern:'CVC',     group:'short-a', level:1, emoji:'🤝' },
   { id:'gal',  word:'gal',  graphemes:['g','a','l'],   types:['c','sv','c'], pattern:'CVC',     group:'short-a', level:1, emoji:'👧' },
