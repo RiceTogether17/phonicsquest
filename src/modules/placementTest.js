@@ -12,8 +12,6 @@
 
 import { audio } from './audio.js';
 
-const READING_BANDS = ['pre-reader', 'emerging-decoder', 'developing-reader', 'reader'];
-
 const GATE_A_ITEMS = [
   {
     id: 'a-or-1',
@@ -91,17 +89,9 @@ const GATE_A_ITEMS = [
     id: 'a-letters-1',
     gate: 'A',
     section: 'letterSounds',
-    kind: 'print-choice',
+    kind: 'teacher-scale',
     title: 'Letter-sound knowledge',
-    prompt: 'Tap the letter that says /s/.',
-    speak: 'sss',
-    correct: 's',
-    options: [
-      { id: 's', label: 's' },
-      { id: 'm', label: 'm' },
-      { id: 't', label: 't' },
-      { id: 'a', label: 'a' },
-    ],
+    prompt: 'Teacher score: learner identifies common letter sounds in an adult-led check (no independent print demand).',
   },
   {
     id: 'a-blend-1',
@@ -122,10 +112,10 @@ const GATE_A_ITEMS = [
 ];
 
 const GATE_B_ITEMS = [
-  { id: 'b-cvc-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'CVC decoding', prompt: 'Tap: cat', speak: 'cat', correct: 'cat', phase: 1, group: 'short-a', options: ['cat', 'cut', 'cot', 'cap'] },
-  { id: 'b-cvc-2', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: bed', speak: 'bed', correct: 'bed', phase: 1, group: 'short-e', options: ['bad', 'bid', 'bed', 'bud'] },
-  { id: 'b-blend-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: flag', speak: 'flag', correct: 'flag', phase: 2, group: 'blends', options: ['flag', 'flap', 'frog', 'plug'] },
-  { id: 'b-cvcc-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: best', speak: 'best', correct: 'best', phase: 3, group: 'struct-cvcc', options: ['best', 'beast', 'bent', 'belt'] },
+  { id: 'b-cvc-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'CVC decoding', prompt: 'Tap: cat', speak: 'cat', correct: 'cat', phase: 1, group: 'cvc-a', options: ['cat', 'cut', 'cot', 'cap'] },
+  { id: 'b-cvc-2', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: bed', speak: 'bed', correct: 'bed', phase: 1, group: 'cvc-e', options: ['bad', 'bid', 'bed', 'bud'] },
+  { id: 'b-blend-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: flag', speak: 'flag', correct: 'flag', phase: 2, group: 'ccvc-a', options: ['flag', 'flap', 'frog', 'plug'] },
+  { id: 'b-cvcc-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: best', speak: 'best', correct: 'best', phase: 3, group: 'cvcc-e', options: ['best', 'beast', 'bent', 'belt'] },
   { id: 'b-digraph-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: ship', speak: 'ship', correct: 'ship', phase: 4, group: 'digraphs', options: ['chip', 'shop', 'ship', 'slip'] },
   { id: 'b-long-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: cake', speak: 'cake', correct: 'cake', phase: 5, group: 'long-a', options: ['cake', 'cane', 'cook', 'kick'] },
   { id: 'b-sight-1', gate: 'B', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: said', speak: 'said', correct: 'said', options: ['seed', 'said', 'sad', 'sail'] },
@@ -222,7 +212,7 @@ function _phaseFromDecoding(results) {
     else break;
   }
   const group = (phaseAccuracy.get(phase)?.groups || []).slice(-1)[0]
-    || (phase <= 1 ? 'short-a' : phase === 2 ? 'blends' : phase === 3 ? 'struct-cvcc' : phase === 4 ? 'digraphs' : 'long-a');
+    || (phase <= 1 ? 'cvc-a' : phase === 2 ? 'ccvc-a' : phase === 3 ? 'cvcc-a' : phase === 4 ? 'digraphs' : 'long-a');
   return { phase, startGroup: group };
 }
 
@@ -251,7 +241,7 @@ function _recommendedPath(result) {
   return byBand[result.readingBand] || byBand['pre-reader'];
 }
 
-function _deriveResult(results, intake = {}, schoolLevel = 'preschool') {
+export function derivePlacementResult(results, intake = {}, schoolLevel = 'preschool') {
   const oral = _teacherScore(results, 'oral');
   const first = _accuracy(results, 'firstSound');
   const last = _accuracy(results, 'lastSound');
@@ -339,7 +329,6 @@ function _deriveResult(results, intake = {}, schoolLevel = 'preschool') {
   };
 
   result.recommendedHomePath = _recommendedPath(result);
-  result.primaryLevel = result.readingBand === 'reader' ? 'P3' : 'P1';
   return result;
 }
 
@@ -357,7 +346,7 @@ function _defaultResult(profile) {
     readingBand: profile?.schoolLevel === 'primary' ? 'developing-reader' : 'pre-reader',
     phonicsPhase: 1,
     phase: 1,
-    startGroup: 'short-a',
+    startGroup: 'cvc-a',
     preSeededStats: {},
     soundAwarenessProfile: { firstSound: 0, lastSound: 0, middleSound: 0, oralBlending: 0, letterSounds: 0 },
     oralLanguageProfile: { basicResponse: 0, receptiveVocabulary: 0 },
@@ -369,8 +358,19 @@ function _defaultResult(profile) {
     intake,
     gateScores: { gateA: 0, gateB: 0, gateC: 0, gateD: 0 },
     recommendedHomePath: ['blend', 'first-sound', 'sight-words', 'stories'],
-    primaryLevel: 'P1',
   };
+}
+
+export function getNextGateToAppend(baseResult, existingSequence = []) {
+  const gates = new Set(existingSequence.map(i => i.gate));
+  const gateA = baseResult?.gateScores?.gateA ?? 0;
+  const gateB = baseResult?.gateScores?.gateB ?? 0;
+  const gateC = baseResult?.gateScores?.gateC ?? 0;
+
+  if (!gates.has('B') && gateA >= 0.55) return 'B';
+  if (!gates.has('C') && gateA >= 0.55 && gateB >= 0.55) return 'C';
+  if (!gates.has('D') && gateA >= 0.55 && gateB >= 0.55 && gateC >= 0.6) return 'D';
+  return null;
 }
 
 /**
@@ -518,13 +518,19 @@ export function showPlacementTest({ container, profile, onComplete }) {
 
   function renderPictureChoice(item) {
     const opts = _shuffle(item.options);
+    const hideText = item.gate === 'A';
     renderFrame(`
       <div class="pt-item">
         <div class="pt-phase-tag">Gate ${item.gate} · ${item.title}</div>
         <button class="pt-listen-btn" id="pt-listen">🔊 Hear prompt</button>
         <p class="pt-question">${item.prompt}</p>
         <div class="pt-choices" role="group" aria-label="Picture choices">
-          ${opts.map(o => `<button class="pt-choice-btn" data-choice="${o.id}"><span>${o.emoji || ''}</span><small>${o.label}</small></button>`).join('')}
+          ${opts.map(o => `
+            <button class="pt-choice-btn" data-choice="${o.id}" aria-label="${o.label}">
+              <span>${o.emoji || ''}</span>
+              <small class="${hideText ? 'visually-hidden' : ''}">${o.label}</small>
+            </button>
+          `).join('')}
         </div>
       </div>
     `);
@@ -561,27 +567,22 @@ export function showPlacementTest({ container, profile, onComplete }) {
   }
 
   function finish() {
-    const baseResult = _deriveResult(responses, intake, profile?.schoolLevel);
-
-    // Gate adaptivity (do not over-place into print/grammar if earlier gates are weak)
-    const gateA = baseResult.gateScores.gateA;
-    const gateB = baseResult.gateScores.gateB;
-    const gateC = baseResult.gateScores.gateC;
-
-    if (!sequence.some(i => i.gate === 'B') && gateA >= 0.55) {
+    const baseResult = derivePlacementResult(responses, intake, profile?.schoolLevel);
+    const nextGate = getNextGateToAppend(baseResult, sequence);
+    if (nextGate === 'B') {
       sequence = [...sequence, ...GATE_B_ITEMS];
       return renderCurrent();
     }
-    if (!sequence.some(i => i.gate === 'C') && gateA >= 0.55 && gateB >= 0.55) {
+    if (nextGate === 'C') {
       sequence = [...sequence, ...GATE_C_ITEMS];
       return renderCurrent();
     }
-    if (!sequence.some(i => i.gate === 'D') && gateA >= 0.55 && gateB >= 0.55 && gateC >= 0.6) {
+    if (nextGate === 'D') {
       sequence = [...sequence, ...GATE_D_ITEMS];
       return renderCurrent();
     }
 
-    const result = _deriveResult(responses, intake, profile?.schoolLevel);
+    const result = derivePlacementResult(responses, intake, profile?.schoolLevel);
     const bandLabels = {
       'pre-reader': 'Pre-reader pathway',
       'emerging-decoder': 'Emerging decoder pathway',

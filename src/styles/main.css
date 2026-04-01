@@ -6842,6 +6842,11 @@ input, select, textarea { font-family: inherit; }
 }
 .pt-intake-wide { grid-column: 1 / -1; }
 
+.stories-banner--spotlight {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 35%, transparent);
+  border-color: var(--color-primary);
+}
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SESSION SUMMARY  (#screen-session-summary)

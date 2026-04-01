@@ -50,7 +50,7 @@ import { keyboardManager } from './modules/keyboardManager.js';
 import { settingsController } from './modules/settingsController.js';
 import { getQuestUnlockStatus } from './modules/questUnlocks.js';
 import { showPlacementTest } from './modules/placementTest.js';
-import { getReadingBand } from './modules/readingStages.js';
+import { getReadingBand, getHomeLayoutForReadingBand } from './modules/readingStages.js';
 import { showSessionSummary } from './components/sessionSummary.js';
 import { showWeeklyRecap, shouldShowWeeklyRecap } from './components/weeklyRecap.js';
 
@@ -971,19 +971,19 @@ class App {
    * @param {object} profile - the newly activated profile
    */
   _showOnboardingTutorial(profile) {
-    const isPrimary = profile?.schoolLevel === 'primary';
-    const levelKey  = isPrimary ? 'primary' : 'preschool';
+    const readingBand = getReadingBand(profile, store.get('placementProfile') || null);
+    const levelKey = readingBand;
 
     const TUTORIAL = {
-      preschool: [
+      'pre-reader': [
         {
           icon: '🌱',
-          title: "Your child's Preschool Journey",
+          title: "Your child's Pre-reader Journey",
           body: `<p class="ob-intro">PhonicsQuest guides your child through three daily activities:</p>
                  <ul class="ob-list">
-                   <li><strong>🎯 Blend It!</strong> — sound out letters to make words</li>
+                   <li><strong>👂 First Sound</strong> — listening-first sound awareness</li>
                    <li><strong>👂 Sound skills</strong> — first, last &amp; middle sounds</li>
-                   <li><strong>📚 Giri Stories</strong> — read a short phonics story</li>
+                   <li><strong>🔤 Letter Sounds</strong> — adult-guided sound-to-print bridge</li>
                  </ul>`,
         },
         {
@@ -992,15 +992,15 @@ class App {
           body: `<div class="ob-steps">
                    <div class="ob-step">
                      <span class="ob-step-num">1</span>
-                     <div><strong>Start with Blend It!</strong><br><small>Step-by-step sound blending</small></div>
+                     <div><strong>Start with First Sound</strong><br><small>No-print listening warm-up</small></div>
                    </div>
                    <div class="ob-step">
                      <span class="ob-step-num">2</span>
-                     <div><strong>Practise one sound skill</strong><br><small>First Sound or Hear &amp; Choose</small></div>
+                     <div><strong>Practise Hear &amp; Choose</strong><br><small>Sound-to-picture matching</small></div>
                    </div>
                    <div class="ob-step">
                      <span class="ob-step-num">3</span>
-                     <div><strong>Read one Giri Story</strong><br><small>Short decodable phonics story</small></div>
+                     <div><strong>Add Letter Sounds</strong><br><small>Teacher-supported print bridge</small></div>
                    </div>
                  </div>`,
         },
@@ -1026,10 +1026,34 @@ class App {
                  <p class="ob-bonus-note">Find these in the <strong>Extra Practice</strong> section below the main lesson cards.</p>`,
         },
       ],
-      primary: [
+      'emerging-decoder': [
+        {
+          icon: '🧩',
+          title: "Your child's Emerging Decoder Journey",
+          body: `<p class="ob-intro">This stage strengthens early reading fluency:</p>
+                 <ul class="ob-list">
+                   <li><strong>🎯 Blend It!</strong> — decode step by step</li>
+                   <li><strong>🃏 Sight Words</strong> — build automatic word reading</li>
+                   <li><strong>📚 Giri Stories</strong> — short connected reading</li>
+                 </ul>`,
+        },
+      ],
+      'developing-reader': [
+        {
+          icon: '📘',
+          title: "Your child's Developing Reader Bridge",
+          body: `<p class="ob-intro">Keep decoding active while adding sentence work:</p>
+                 <ul class="ob-list">
+                   <li><strong>🎯 Blend It!</strong> — quick phonics review</li>
+                   <li><strong>📚 Giri Stories</strong> — sentence &amp; paragraph reading</li>
+                   <li><strong>🔨 Sentence Forge</strong> — begin sentence building</li>
+                 </ul>`,
+        },
+      ],
+      reader: [
         {
           icon: '🏫',
-          title: "Your child's Primary Journey",
+          title: "Your child's Reader Journey",
           body: `<p class="ob-intro">PhonicsQuest guides your child through three daily quests:</p>
                  <ul class="ob-list">
                    <li><strong>🔨 Sentence Forge</strong> — unscramble &amp; build sentences</li>
@@ -1079,7 +1103,7 @@ class App {
       ],
     };
 
-    const screens   = TUTORIAL[levelKey];
+    const screens   = TUTORIAL[levelKey] || TUTORIAL['pre-reader'];
     let   step      = 0;
 
     const contentEl = document.getElementById('ob-content');
@@ -1371,19 +1395,29 @@ class App {
     const questsHeading = document.getElementById('quests-section-heading');
     const questsSub     = document.getElementById('quests-section-sub');
 
-    const grammarHeavy = readingBand === 'reader';
-    if (grammarHeavy) {
+    const layout = getHomeLayoutForReadingBand(readingBand);
+    const sentenceForgeBtn = document.getElementById('btn-sentence-forge');
+
+    if (layout.hidePhonicsCore) {
       // Hide preschool phonics grid; quests are the primary lesson
       coreSection?.classList.add('home-section--hidden');
       questsSection?.classList.remove('home-section--milestone');
       if (questsHeading) questsHeading.textContent = 'Your Learning Quests';
       if (questsSub)     questsSub.textContent     = 'Follow the order above · do these each session';
+      sentenceForgeBtn?.classList.remove('stories-banner--spotlight');
+    } else if (!layout.questsMilestone) {
+      coreSection?.classList.remove('home-section--hidden');
+      questsSection?.classList.remove('home-section--milestone');
+      if (questsHeading) questsHeading.textContent = 'Bridge Quests';
+      if (questsSub)     questsSub.textContent     = 'Keep phonics active and begin Sentence Forge first';
+      sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
     } else {
       // Show phonics grid; demote quests as milestone tracker
       coreSection?.classList.remove('home-section--hidden');
       questsSection?.classList.add('home-section--milestone');
       if (questsHeading) questsHeading.textContent = 'Quest Milestones';
       if (questsSub)     questsSub.textContent     = 'Unlocks as decoding and reading readiness improve';
+      sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
     }
   }
 
@@ -1594,9 +1628,8 @@ class App {
     this._updateProfileChip();
     this._renderProfileGrid();
 
-    // Show placement test for new profiles before home screen.
-    // Preschool learners go to home directly (they start at Phase 1 by design).
-    // Primary learners get a short diagnostic to set starting level.
+    // Show placement test for all new profiles before home screen.
+    // The resulting reading band (not school level) drives pathway routing.
     if (!store.get('placementComplete')) {
       this._showScreen('screen-placement');
       this._runPlacementTest(profile);

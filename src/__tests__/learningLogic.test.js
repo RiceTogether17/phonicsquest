@@ -51,6 +51,19 @@ describe('quest unlock logic', () => {
     expect(unlock.sentenceForge.unlocked).toBe(true);
     expect(unlock.clozeCastle.unlocked).toBe(false);
   });
+
+  it('fully unlocks language quests for reader band', () => {
+    const unlock = getQuestUnlockStatus(
+      {},
+      { schoolLevel: 'preschool' },
+      undefined,
+      { readingBand: 'reader', sentenceReady: true, grammarReady: true, vocabularyReady: true }
+    );
+
+    expect(unlock.sentenceForge.unlocked).toBe(true);
+    expect(unlock.clozeCastle.unlocked).toBe(true);
+    expect(unlock.wordVault.unlocked).toBe(true);
+  });
 });
 
 describe('progress summary', () => {

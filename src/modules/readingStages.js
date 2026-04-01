@@ -30,3 +30,14 @@ export function getReadingBand(profile = null, placementProfile = null) {
 export function isGrammarPathway(band) {
   return normaliseReadingBand(band) === 'reader';
 }
+
+export function getHomeLayoutForReadingBand(band) {
+  const normalised = normaliseReadingBand(band);
+  if (normalised === 'reader') {
+    return { hidePhonicsCore: true, questsMilestone: false, spotlightSentenceForge: false };
+  }
+  if (normalised === 'developing-reader') {
+    return { hidePhonicsCore: false, questsMilestone: false, spotlightSentenceForge: true };
+  }
+  return { hidePhonicsCore: false, questsMilestone: true, spotlightSentenceForge: false };
+}

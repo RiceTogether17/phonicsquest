@@ -160,11 +160,15 @@ export function getRecommendation() {
   }
 
   if (readingBand === 'developing-reader') {
+    const placement = _placementProfile();
+    const sentenceReady = !!placement?.sentenceReady;
     return {
-      title: 'Bridge to connected reading',
-      reason: 'Keep phonics active while adding sight words and short story reading.',
-      ctaLabel: 'Open Blend It!',
-      ctaTarget: 'blend',
+      title: sentenceReady ? 'Bridge to sentence work' : 'Bridge to connected reading',
+      reason: sentenceReady
+        ? 'Keep phonics visible, then start Sentence Forge for structured sentence practice.'
+        : 'Keep phonics active while adding sight words and short story reading.',
+      ctaLabel: sentenceReady ? 'Open Sentence Forge' : 'Open Blend It!',
+      ctaTarget: sentenceReady ? 'sentence-forge' : 'blend',
       domain: 'Decoding + Stories',
       urgency: 'medium',
     };
