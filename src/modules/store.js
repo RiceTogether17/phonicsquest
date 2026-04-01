@@ -106,6 +106,8 @@ const DEFAULT_STATE = {
   // ── Placement & onboarding ─────────────────────────────────────────────
   // Set to true after the placement diagnostic has been completed (or skipped).
   placementComplete: false,
+  // Rich placement profile used for reading-stage routing.
+  placementProfile: null,
 
   // Total sessions ever played (incremented on each session start).
   totalSessions: 0,
