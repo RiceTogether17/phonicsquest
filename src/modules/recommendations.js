@@ -8,11 +8,15 @@
 import { store } from './store.js';
 import { getActiveProfile } from './profiles.js';
 import { getReadingBand } from './readingStages.js';
+import {
+  SHORT_VOWEL_CANONICAL_GROUPS,
+  normalizeGroupMasteryMap,
+  normalizePhonicsGroupKey,
+} from './phonicsGroupKeys.js';
 
-const SHORT_VOWEL_GROUPS = ['short-a', 'short-e', 'short-i', 'short-o', 'short-u'];
 const VOWEL_LABELS = {
-  'short-a': 'Short A', 'short-e': 'Short E',
-  'short-i': 'Short I', 'short-o': 'Short O', 'short-u': 'Short U',
+  'cvc-a': 'CVC Short A', 'cvc-e': 'CVC Short E',
+  'cvc-i': 'CVC Short I', 'cvc-o': 'CVC Short O', 'cvc-u': 'CVC Short U',
 };
 
 export function humaniseSkill(skill) {
@@ -36,13 +40,14 @@ function _placementProfile() {
 }
 
 function _groupMastery(group) {
-  return (store.get('groupMastery') || {})[group] ?? 0;
+  const gm = normalizeGroupMasteryMap(store.get('groupMastery') || {});
+  return gm[normalizePhonicsGroupKey(group)] ?? 0;
 }
 
 function _weakestPhonicsGroup() {
-  const gm = store.get('groupMastery') || {};
+  const gm = normalizeGroupMasteryMap(store.get('groupMastery') || {});
   let weakest = null, lowest = Infinity;
-  for (const g of SHORT_VOWEL_GROUPS) {
+  for (const g of SHORT_VOWEL_CANONICAL_GROUPS) {
     const s = gm[g];
     if (typeof s === 'number' && s < lowest) {
       lowest = s;

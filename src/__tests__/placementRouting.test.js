@@ -3,6 +3,7 @@ import { store } from '../modules/store.js';
 import { createProfile, activateProfile } from '../modules/profiles.js';
 import { getHomeLayoutForReadingBand } from '../modules/readingStages.js';
 import { getRecommendation, getDailyPlan } from '../modules/recommendations.js';
+import { normalizePhonicsGroupKey, normalizeGroupMasteryMap } from '../modules/phonicsGroupKeys.js';
 
 let derivePlacementResult;
 let getNextGateToAppend;
@@ -149,5 +150,23 @@ describe('reading-band routing', () => {
     expect(layout.hidePhonicsCore).toBe(false);
     expect(layout.questsMilestone).toBe(false);
     expect(layout.spotlightSentenceForge).toBe(true);
+  });
+
+  it('normalizes legacy short-vowel keys to canonical curriculum keys', () => {
+    expect(normalizePhonicsGroupKey('short-a')).toBe('cvc-a');
+    const gm = normalizeGroupMasteryMap({ 'short-a': 0.32, 'cvc-a': 0.61, 'short-e': 0.48 });
+    expect(gm['cvc-a']).toBe(0.61);
+    expect(gm['cvc-e']).toBe(0.48);
+  });
+
+  it('weak-group recommendation targets canonical cvc-* group keys', () => {
+    const p = createProfile('Bo', '🦁', '#6c63ff', 'preschool');
+    activateProfile(p.id);
+    store.set('placementProfile', { readingBand: 'emerging-decoder' });
+    store.set('groupMastery', { 'short-a': 0.31, 'short-e': 0.72 });
+
+    const rec = getRecommendation();
+    expect(rec.ctaTarget).toBe('blend');
+    expect(rec.ctaGroup).toBe('cvc-a');
   });
 });

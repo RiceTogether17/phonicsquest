@@ -89,7 +89,7 @@ const DEFAULT_STATE = {
 
   // Session
   currentMode:  'blend',
-  currentGroup: 'short-a',
+  currentGroup: 'cvc-a',
 
   // Per-mode difficulty (auto-adjusts based on performance)
   modeDifficulty: {},  // { [modeKey]: 1|2|3 }
