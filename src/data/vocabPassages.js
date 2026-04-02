@@ -75,6 +75,24 @@ export const VOCAB_CATEGORIES = {
     color: '#2563eb',
     desc: 'Citizenship, community and governance terms',
   },
+  grammarPrepositions: {
+    label: 'Prepositions',
+    icon: '📍',
+    color: '#64748b',
+    desc: 'Choose the correct preposition in context',
+  },
+  grammarArticles: {
+    label: 'Articles',
+    icon: '📰',
+    color: '#475569',
+    desc: 'Select the right article (a, an, the)',
+  },
+  grammarSVA: {
+    label: 'Subject-Verb Agreement',
+    icon: '🤝',
+    color: '#334155',
+    desc: 'Match subjects with the correct verb form',
+  },
 };
 
 export const vocabPassages = {

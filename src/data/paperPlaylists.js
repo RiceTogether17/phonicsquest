@@ -4,7 +4,7 @@ export const PAPER_MODE_PLAYLISTS = {
   P1: ['grammar-mcq', 'vocab-mcq', 'cloze-castle', 'word-vault', 'sentence-forge-word-order', 'editing-quest'],
   P2: ['grammar-mcq', 'vocab-mcq', 'cloze-castle', 'word-vault', 'sentence-forge-word-order', 'sentence-forge-combining', 'editing-quest'],
   P3: ['grammar-mcq', 'vocab-mcq', 'cloze-castle', 'word-vault', 'sentence-forge-combining', 'editing-quest'],
-  P4: ['grammar-mcq', 'vocab-mcq', 'cloze-castle', 'cloze-castle', 'sentence-forge-synthesis', 'editing-quest'],
+  P4: ['grammar-mcq', 'vocab-mcq', 'cloze-castle', 'word-vault', 'sentence-forge-synthesis', 'editing-quest'],
   P5: ['grammar-mcq', 'vocab-mcq', 'word-vault', 'cloze-castle', 'sentence-forge-synthesis', 'editing-quest'],
   P6: ['grammar-mcq', 'vocab-mcq', 'cloze-castle', 'word-vault', 'sentence-forge-synthesis', 'editing-quest'],
 };

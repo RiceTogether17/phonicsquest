@@ -1,14 +1,20 @@
 import { PAPER_LEVELS, PAPER_MODE_PLAYLISTS, PAPER_SECTION_LABELS } from '../data/paperPlaylists.js';
+import { store } from '../modules/store.js';
 
 let _container = null;
 let _launchSection = null;
 let _onGoHome = null;
 let _activeSession = null;
 
+function _persistSession() {
+  store.set('paperSession', _activeSession);
+}
+
 export function initPaperMode(container, { onLaunchSection, onGoHome }) {
   _container = container;
   _launchSection = onLaunchSection;
   _onGoHome = onGoHome;
+  _activeSession = store.get('paperSession') || null;
 }
 
 export function cleanupPaperMode() {
@@ -69,6 +75,7 @@ function _startFullPaper(level, sections) {
     marks: [],
     complete: false,
   };
+  _persistSession();
   _renderSessionCard();
 }
 
@@ -121,6 +128,7 @@ function _renderSessionCard() {
     if (_activeSession.index >= _activeSession.sections.length) {
       _activeSession.complete = true;
     }
+    _persistSession();
     _renderSessionCard();
   });
 }
