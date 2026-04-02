@@ -31,6 +31,7 @@ import {
   diagnoseBuildError,
   getSkillSummary,
 } from '../modules/sentenceSkills.js';
+import { classifySentenceTrack } from '../modules/sentenceForgeTracks.js';
 
 // ── Module state ────────────────────────────────────────────────────────────
 
@@ -230,9 +231,7 @@ function _startLevel(level) {
 }
 
 function _getSentenceTrack(entry) {
-  if (entry.level <= 2) return 'word-order';
-  if (entry.level <= 4) return 'sentence-combining';
-  return 'synthesis-transformation';
+  return classifySentenceTrack(entry);
 }
 
 function _showSentence() {

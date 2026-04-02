@@ -43,6 +43,11 @@ function _start(level) {
   _renderQuestion();
 }
 
+export function startGrammarMcqLevel(level) {
+  if (!_container) return;
+  _start(level);
+}
+
 function _renderQuestion() {
   if (!_container) return;
   const item = _items[_idx];

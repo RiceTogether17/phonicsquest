@@ -29,8 +29,8 @@ import { initSightMatch, showSightBrowser, cleanupSightMatch } from './modes/sig
 import { initSentenceForge, showSentenceBrowser, cleanupSentenceForge, setSentenceForgeTrack } from './modes/sentenceForge.js';
 import { initClozeCastle, showClozeBrowser, cleanupClozeCastle } from './modes/clozeCastle.js';
 import { initWordVault, showVaultBrowser, cleanupWordVault } from './modes/wordVault.js';
-import { initGrammarMcq, showGrammarMcqBrowser, cleanupGrammarMcq } from './modes/grammarMcq.js';
-import { initVocabMcq, showVocabMcqBrowser, cleanupVocabMcq } from './modes/vocabMcq.js';
+import { initGrammarMcq, showGrammarMcqBrowser, cleanupGrammarMcq, startGrammarMcqLevel } from './modes/grammarMcq.js';
+import { initVocabMcq, showVocabMcqBrowser, cleanupVocabMcq, startVocabMcqLevel } from './modes/vocabMcq.js';
 import { initPaperMode, showPaperModeBrowser, cleanupPaperMode } from './modes/paperMode.js';
 import { initEditingQuest, showEditingBrowser, cleanupEditingQuest } from './modes/editingQuest.js';
 import { initWritingQuest, showWritingBrowser, cleanupWritingQuest } from './modes/writingQuest.js';
@@ -380,9 +380,9 @@ class App {
           this._showScreen(SCREENS.HOME);
           mascot.setHomeState('holdCard');
         },
-        onLaunchSection: (sectionKey) => {
+        onLaunchSection: (sectionKey, level) => {
           cleanupPaperMode();
-          this._launchPaperSection(sectionKey);
+          this._launchPaperSection(sectionKey, level);
         },
       });
       showPaperModeBrowser();
@@ -1339,10 +1339,36 @@ class App {
     }
   }
 
-  _launchPaperSection(sectionKey) {
+  _launchPaperSection(sectionKey, level) {
     const map = {
-      'grammar-mcq': () => document.getElementById('btn-grammar-mcq')?.click(),
-      'vocab-mcq': () => document.getElementById('btn-vocab-mcq')?.click(),
+      'grammar-mcq': () => {
+        initGrammarMcq(
+          document.getElementById('grammar-mcq-content'),
+          () => {
+            cleanupGrammarMcq();
+            this._showScreen(SCREENS.HOME);
+            mascot.setHomeState('holdCard');
+          },
+        );
+        this._showScreen(SCREENS.GRAMMAR_MCQ);
+        mascot.setState('whiteboard');
+        if (level) startGrammarMcqLevel(level);
+        else showGrammarMcqBrowser();
+      },
+      'vocab-mcq': () => {
+        initVocabMcq(
+          document.getElementById('vocab-mcq-content'),
+          () => {
+            cleanupVocabMcq();
+            this._showScreen(SCREENS.HOME);
+            mascot.setHomeState('holdCard');
+          },
+        );
+        this._showScreen(SCREENS.VOCAB_MCQ);
+        mascot.setState('celebrate');
+        if (level) startVocabMcqLevel(level);
+        else showVocabMcqBrowser();
+      },
       'cloze-castle': () => document.getElementById('btn-cloze-castle')?.click(),
       'word-vault': () => document.getElementById('btn-word-vault')?.click(),
       'editing-quest': () => document.getElementById('btn-editing-quest')?.click(),

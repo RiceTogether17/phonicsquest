@@ -43,6 +43,11 @@ function _start(level) {
   _renderQuestion();
 }
 
+export function startVocabMcqLevel(level) {
+  if (!_container) return;
+  _start(level);
+}
+
 function _renderQuestion() {
   const item = _items[_idx];
   if (!item) return _renderDone();
