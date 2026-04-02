@@ -73,6 +73,9 @@ const DEFAULT_STATE = {
     stories: {},
     editingQuest: {},
     writingQuest: {},
+    grammarMcq: {},
+    vocabMcq: {},
+    paperMode: {},
   },
   questAttempts: [],        // recent quest attempts (capped)
   learningEvents: [],       // fine-grained telemetry events (capped)

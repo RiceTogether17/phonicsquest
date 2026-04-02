@@ -26,9 +26,12 @@ import { getRecommendation, getDailyPlan, getLearnerSummaryChips } from './modul
 import { initStoryMode, showBrowser, cleanupStoryMode } from './modes/storyMode.js';
 import { initLetterSounds, cleanupLetterSounds } from './modes/letterSounds.js';
 import { initSightMatch, showSightBrowser, cleanupSightMatch } from './modes/sightMatch.js';
-import { initSentenceForge, showSentenceBrowser, cleanupSentenceForge } from './modes/sentenceForge.js';
+import { initSentenceForge, showSentenceBrowser, cleanupSentenceForge, setSentenceForgeTrack } from './modes/sentenceForge.js';
 import { initClozeCastle, showClozeBrowser, cleanupClozeCastle } from './modes/clozeCastle.js';
 import { initWordVault, showVaultBrowser, cleanupWordVault } from './modes/wordVault.js';
+import { initGrammarMcq, showGrammarMcqBrowser, cleanupGrammarMcq } from './modes/grammarMcq.js';
+import { initVocabMcq, showVocabMcqBrowser, cleanupVocabMcq } from './modes/vocabMcq.js';
+import { initPaperMode, showPaperModeBrowser, cleanupPaperMode } from './modes/paperMode.js';
 import { initEditingQuest, showEditingBrowser, cleanupEditingQuest } from './modes/editingQuest.js';
 import { initWritingQuest, showWritingBrowser, cleanupWritingQuest } from './modes/writingQuest.js';
 import {
@@ -325,6 +328,69 @@ class App {
     // Sentence Forge screen back button (→ home)
     document.getElementById('btn-sfq-back')?.addEventListener('click', () => {
       cleanupSentenceForge();
+      this._showScreen(SCREENS.HOME);
+      mascot.setHomeState('holdCard');
+    });
+
+    // Grammar MCQ button
+    document.getElementById('btn-grammar-mcq')?.addEventListener('click', () => {
+      initGrammarMcq(
+        document.getElementById('grammar-mcq-content'),
+        () => {
+          cleanupGrammarMcq();
+          this._showScreen(SCREENS.HOME);
+          mascot.setHomeState('holdCard');
+        },
+      );
+      showGrammarMcqBrowser();
+      this._showScreen(SCREENS.GRAMMAR_MCQ);
+      mascot.setState('whiteboard');
+    });
+    document.getElementById('btn-gmcq-back')?.addEventListener('click', () => {
+      cleanupGrammarMcq();
+      this._showScreen(SCREENS.HOME);
+      mascot.setHomeState('holdCard');
+    });
+
+    // Vocabulary MCQ button
+    document.getElementById('btn-vocab-mcq')?.addEventListener('click', () => {
+      initVocabMcq(
+        document.getElementById('vocab-mcq-content'),
+        () => {
+          cleanupVocabMcq();
+          this._showScreen(SCREENS.HOME);
+          mascot.setHomeState('holdCard');
+        },
+      );
+      showVocabMcqBrowser();
+      this._showScreen(SCREENS.VOCAB_MCQ);
+      mascot.setState('celebrate');
+    });
+    document.getElementById('btn-vmcq-back')?.addEventListener('click', () => {
+      cleanupVocabMcq();
+      this._showScreen(SCREENS.HOME);
+      mascot.setHomeState('holdCard');
+    });
+
+    // Paper Mode button
+    document.getElementById('btn-paper-mode')?.addEventListener('click', () => {
+      initPaperMode(document.getElementById('paper-mode-content'), {
+        onGoHome: () => {
+          cleanupPaperMode();
+          this._showScreen(SCREENS.HOME);
+          mascot.setHomeState('holdCard');
+        },
+        onLaunchSection: (sectionKey) => {
+          cleanupPaperMode();
+          this._launchPaperSection(sectionKey);
+        },
+      });
+      showPaperModeBrowser();
+      this._showScreen(SCREENS.PAPER_MODE);
+      mascot.setState('whiteboard');
+    });
+    document.getElementById('btn-paper-back')?.addEventListener('click', () => {
+      cleanupPaperMode();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
@@ -1241,6 +1307,15 @@ class App {
       case 'sentence-forge':
         document.getElementById('btn-sentence-forge')?.click();
         break;
+      case 'grammar-mcq':
+        document.getElementById('btn-grammar-mcq')?.click();
+        break;
+      case 'vocab-mcq':
+        document.getElementById('btn-vocab-mcq')?.click();
+        break;
+      case 'paper-mode':
+        document.getElementById('btn-paper-mode')?.click();
+        break;
       case 'cloze-castle':
         document.getElementById('btn-cloze-castle')?.click();
         break;
@@ -1262,6 +1337,29 @@ class App {
       default:
         break;
     }
+  }
+
+  _launchPaperSection(sectionKey) {
+    const map = {
+      'grammar-mcq': () => document.getElementById('btn-grammar-mcq')?.click(),
+      'vocab-mcq': () => document.getElementById('btn-vocab-mcq')?.click(),
+      'cloze-castle': () => document.getElementById('btn-cloze-castle')?.click(),
+      'word-vault': () => document.getElementById('btn-word-vault')?.click(),
+      'editing-quest': () => document.getElementById('btn-editing-quest')?.click(),
+      'sentence-forge-word-order': () => {
+        setSentenceForgeTrack('word-order');
+        document.getElementById('btn-sentence-forge')?.click();
+      },
+      'sentence-forge-combining': () => {
+        setSentenceForgeTrack('sentence-combining');
+        document.getElementById('btn-sentence-forge')?.click();
+      },
+      'sentence-forge-synthesis': () => {
+        setSentenceForgeTrack('synthesis-transformation');
+        document.getElementById('btn-sentence-forge')?.click();
+      },
+    };
+    map[sectionKey]?.();
   }
 
   /**
