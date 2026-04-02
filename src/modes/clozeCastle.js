@@ -697,7 +697,7 @@ function _showTeachBackOverlay(passage) {
   overlay.querySelector('#ctb-try-again')?.addEventListener('click', () => {
     overlay.remove();
     // Clear all fills so the child starts the passage fresh
-    clearClozeRound(_blankFills);
+    clearClozeRound(_bankWords, _blankFills);
     _blankFills = _blankFills.map(() => null);
     _renderBankWords(passage);
     _renderPassageText(passage);
