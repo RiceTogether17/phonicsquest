@@ -24,13 +24,16 @@ export function countMasteredWords(wordStats = {}, minAttempts = 6, masteryThres
 
 /**
  * Compute quest unlock status from profile + per-word progress.
- * Primary profiles bypass gating.
+ * Reading stage (from placement) now takes precedence over schoolLevel.
  * @param {Record<string, ProgressRecord>} wordStats
  * @param {UserProfile|null} profile
  * @param {{ sentenceForge:number, clozeCastle:number, wordVault:number, editingQuest:number, writingQuest:number }} [thresholds]
+ * @param {{ readingBand?: string, sentenceReady?: boolean, grammarReady?: boolean, vocabularyReady?: boolean }|null} [placementProfile]
  */
-export function getQuestUnlockStatus(wordStats = {}, profile = null, thresholds = QUEST_THRESHOLDS) {
-  if (profile?.schoolLevel === 'primary') {
+export function getQuestUnlockStatus(wordStats = {}, profile = null, thresholds = QUEST_THRESHOLDS, placementProfile = null) {
+  const readingBand = placementProfile?.readingBand || profile?.readingBand || null;
+
+  if (readingBand === 'reader') {
     return {
       mastered: Infinity,
       sentenceForge: { unlocked: true, required: thresholds.sentenceForge, current: Infinity },
@@ -42,12 +45,39 @@ export function getQuestUnlockStatus(wordStats = {}, profile = null, thresholds 
   }
 
   const mastered = countMasteredWords(wordStats);
+  const sentenceReady = !!placementProfile?.sentenceReady || readingBand === 'developing-reader';
+  const grammarReady = !!placementProfile?.grammarReady && sentenceReady;
+  const vocabReady = !!placementProfile?.vocabularyReady && sentenceReady;
+
+  // Backward compatibility for older profiles that have no placement profile.
+  const legacyPrimaryBypass = !placementProfile && profile?.schoolLevel === 'primary';
+
   return {
     mastered,
-    sentenceForge: { unlocked: mastered >= thresholds.sentenceForge, required: thresholds.sentenceForge, current: mastered },
-    clozeCastle:   { unlocked: mastered >= thresholds.clozeCastle,   required: thresholds.clozeCastle,   current: mastered },
-    wordVault:     { unlocked: mastered >= thresholds.wordVault,     required: thresholds.wordVault,     current: mastered },
-    editingQuest:  { unlocked: mastered >= thresholds.editingQuest,  required: thresholds.editingQuest,  current: mastered },
-    writingQuest:  { unlocked: mastered >= thresholds.writingQuest,  required: thresholds.writingQuest,  current: mastered },
+    sentenceForge: {
+      unlocked: legacyPrimaryBypass || sentenceReady || mastered >= thresholds.sentenceForge,
+      required: thresholds.sentenceForge,
+      current: mastered,
+    },
+    clozeCastle: {
+      unlocked: legacyPrimaryBypass || grammarReady || mastered >= thresholds.clozeCastle,
+      required: thresholds.clozeCastle,
+      current: mastered,
+    },
+    wordVault: {
+      unlocked: legacyPrimaryBypass || vocabReady || mastered >= thresholds.wordVault,
+      required: thresholds.wordVault,
+      current: mastered,
+    },
+    editingQuest: {
+      unlocked: legacyPrimaryBypass || grammarReady || mastered >= thresholds.editingQuest,
+      required: thresholds.editingQuest,
+      current: mastered,
+    },
+    writingQuest: {
+      unlocked: legacyPrimaryBypass || grammarReady || mastered >= thresholds.writingQuest,
+      required: thresholds.writingQuest,
+      current: mastered,
+    },
   };
 }

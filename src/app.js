@@ -26,9 +26,12 @@ import { getRecommendation, getDailyPlan, getLearnerSummaryChips } from './modul
 import { initStoryMode, showBrowser, cleanupStoryMode } from './modes/storyMode.js';
 import { initLetterSounds, cleanupLetterSounds } from './modes/letterSounds.js';
 import { initSightMatch, showSightBrowser, cleanupSightMatch } from './modes/sightMatch.js';
-import { initSentenceForge, showSentenceBrowser, cleanupSentenceForge } from './modes/sentenceForge.js';
+import { initSentenceForge, showSentenceBrowser, cleanupSentenceForge, setSentenceForgeTrack } from './modes/sentenceForge.js';
 import { initClozeCastle, showClozeBrowser, cleanupClozeCastle } from './modes/clozeCastle.js';
 import { initWordVault, showVaultBrowser, cleanupWordVault } from './modes/wordVault.js';
+import { initGrammarMcq, showGrammarMcqBrowser, cleanupGrammarMcq } from './modes/grammarMcq.js';
+import { initVocabMcq, showVocabMcqBrowser, cleanupVocabMcq } from './modes/vocabMcq.js';
+import { initPaperMode, showPaperModeBrowser, cleanupPaperMode } from './modes/paperMode.js';
 import { initEditingQuest, showEditingBrowser, cleanupEditingQuest } from './modes/editingQuest.js';
 import { initWritingQuest, showWritingBrowser, cleanupWritingQuest } from './modes/writingQuest.js';
 import {
@@ -50,6 +53,7 @@ import { keyboardManager } from './modules/keyboardManager.js';
 import { settingsController } from './modules/settingsController.js';
 import { getQuestUnlockStatus } from './modules/questUnlocks.js';
 import { showPlacementTest } from './modules/placementTest.js';
+import { getReadingBand, getHomeLayoutForReadingBand } from './modules/readingStages.js';
 import { showSessionSummary } from './components/sessionSummary.js';
 import { showWeeklyRecap, shouldShowWeeklyRecap } from './components/weeklyRecap.js';
 
@@ -324,6 +328,69 @@ class App {
     // Sentence Forge screen back button (→ home)
     document.getElementById('btn-sfq-back')?.addEventListener('click', () => {
       cleanupSentenceForge();
+      this._showScreen(SCREENS.HOME);
+      mascot.setHomeState('holdCard');
+    });
+
+    // Grammar MCQ button
+    document.getElementById('btn-grammar-mcq')?.addEventListener('click', () => {
+      initGrammarMcq(
+        document.getElementById('grammar-mcq-content'),
+        () => {
+          cleanupGrammarMcq();
+          this._showScreen(SCREENS.HOME);
+          mascot.setHomeState('holdCard');
+        },
+      );
+      showGrammarMcqBrowser();
+      this._showScreen(SCREENS.GRAMMAR_MCQ);
+      mascot.setState('whiteboard');
+    });
+    document.getElementById('btn-gmcq-back')?.addEventListener('click', () => {
+      cleanupGrammarMcq();
+      this._showScreen(SCREENS.HOME);
+      mascot.setHomeState('holdCard');
+    });
+
+    // Vocabulary MCQ button
+    document.getElementById('btn-vocab-mcq')?.addEventListener('click', () => {
+      initVocabMcq(
+        document.getElementById('vocab-mcq-content'),
+        () => {
+          cleanupVocabMcq();
+          this._showScreen(SCREENS.HOME);
+          mascot.setHomeState('holdCard');
+        },
+      );
+      showVocabMcqBrowser();
+      this._showScreen(SCREENS.VOCAB_MCQ);
+      mascot.setState('celebrate');
+    });
+    document.getElementById('btn-vmcq-back')?.addEventListener('click', () => {
+      cleanupVocabMcq();
+      this._showScreen(SCREENS.HOME);
+      mascot.setHomeState('holdCard');
+    });
+
+    // Paper Mode button
+    document.getElementById('btn-paper-mode')?.addEventListener('click', () => {
+      initPaperMode(document.getElementById('paper-mode-content'), {
+        onGoHome: () => {
+          cleanupPaperMode();
+          this._showScreen(SCREENS.HOME);
+          mascot.setHomeState('holdCard');
+        },
+        onLaunchSection: (sectionKey) => {
+          cleanupPaperMode();
+          this._launchPaperSection(sectionKey);
+        },
+      });
+      showPaperModeBrowser();
+      this._showScreen(SCREENS.PAPER_MODE);
+      mascot.setState('whiteboard');
+    });
+    document.getElementById('btn-paper-back')?.addEventListener('click', () => {
+      cleanupPaperMode();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
@@ -970,19 +1037,19 @@ class App {
    * @param {object} profile - the newly activated profile
    */
   _showOnboardingTutorial(profile) {
-    const isPrimary = profile?.schoolLevel === 'primary';
-    const levelKey  = isPrimary ? 'primary' : 'preschool';
+    const readingBand = getReadingBand(profile, store.get('placementProfile') || null);
+    const levelKey = readingBand;
 
     const TUTORIAL = {
-      preschool: [
+      'pre-reader': [
         {
           icon: '🌱',
-          title: "Your child's Preschool Journey",
+          title: "Your child's Pre-reader Journey",
           body: `<p class="ob-intro">PhonicsQuest guides your child through three daily activities:</p>
                  <ul class="ob-list">
-                   <li><strong>🎯 Blend It!</strong> — sound out letters to make words</li>
+                   <li><strong>👂 First Sound</strong> — listening-first sound awareness</li>
                    <li><strong>👂 Sound skills</strong> — first, last &amp; middle sounds</li>
-                   <li><strong>📚 Giri Stories</strong> — read a short phonics story</li>
+                   <li><strong>🔤 Letter Sounds</strong> — adult-guided sound-to-print bridge</li>
                  </ul>`,
         },
         {
@@ -991,15 +1058,15 @@ class App {
           body: `<div class="ob-steps">
                    <div class="ob-step">
                      <span class="ob-step-num">1</span>
-                     <div><strong>Start with Blend It!</strong><br><small>Step-by-step sound blending</small></div>
+                     <div><strong>Start with First Sound</strong><br><small>No-print listening warm-up</small></div>
                    </div>
                    <div class="ob-step">
                      <span class="ob-step-num">2</span>
-                     <div><strong>Practise one sound skill</strong><br><small>First Sound or Hear &amp; Choose</small></div>
+                     <div><strong>Practise Hear &amp; Choose</strong><br><small>Sound-to-picture matching</small></div>
                    </div>
                    <div class="ob-step">
                      <span class="ob-step-num">3</span>
-                     <div><strong>Read one Giri Story</strong><br><small>Short decodable phonics story</small></div>
+                     <div><strong>Add Letter Sounds</strong><br><small>Teacher-supported print bridge</small></div>
                    </div>
                  </div>`,
         },
@@ -1025,10 +1092,34 @@ class App {
                  <p class="ob-bonus-note">Find these in the <strong>Extra Practice</strong> section below the main lesson cards.</p>`,
         },
       ],
-      primary: [
+      'emerging-decoder': [
+        {
+          icon: '🧩',
+          title: "Your child's Emerging Decoder Journey",
+          body: `<p class="ob-intro">This stage strengthens early reading fluency:</p>
+                 <ul class="ob-list">
+                   <li><strong>🎯 Blend It!</strong> — decode step by step</li>
+                   <li><strong>🃏 Sight Words</strong> — build automatic word reading</li>
+                   <li><strong>📚 Giri Stories</strong> — short connected reading</li>
+                 </ul>`,
+        },
+      ],
+      'developing-reader': [
+        {
+          icon: '📘',
+          title: "Your child's Developing Reader Bridge",
+          body: `<p class="ob-intro">Keep decoding active while adding sentence work:</p>
+                 <ul class="ob-list">
+                   <li><strong>🎯 Blend It!</strong> — quick phonics review</li>
+                   <li><strong>📚 Giri Stories</strong> — sentence &amp; paragraph reading</li>
+                   <li><strong>🔨 Sentence Forge</strong> — begin sentence building</li>
+                 </ul>`,
+        },
+      ],
+      reader: [
         {
           icon: '🏫',
-          title: "Your child's Primary Journey",
+          title: "Your child's Reader Journey",
           body: `<p class="ob-intro">PhonicsQuest guides your child through three daily quests:</p>
                  <ul class="ob-list">
                    <li><strong>🔨 Sentence Forge</strong> — unscramble &amp; build sentences</li>
@@ -1078,7 +1169,7 @@ class App {
       ],
     };
 
-    const screens   = TUTORIAL[levelKey];
+    const screens   = TUTORIAL[levelKey] || TUTORIAL['pre-reader'];
     let   step      = 0;
 
     const contentEl = document.getElementById('ob-content');
@@ -1200,6 +1291,14 @@ class App {
         store.set('currentMode', 'first');
         this._startGame();
         break;
+      case 'oral-blend':
+        this._mode = 'oralBlend';
+        store.set('currentMode', 'oralBlend');
+        this._startGame();
+        break;
+      case 'letter-sounds':
+        document.getElementById('btn-letter-sounds')?.click();
+        break;
       case 'hear':
         this._mode = 'hear';
         store.set('currentMode', 'hear');
@@ -1207,6 +1306,15 @@ class App {
         break;
       case 'sentence-forge':
         document.getElementById('btn-sentence-forge')?.click();
+        break;
+      case 'grammar-mcq':
+        document.getElementById('btn-grammar-mcq')?.click();
+        break;
+      case 'vocab-mcq':
+        document.getElementById('btn-vocab-mcq')?.click();
+        break;
+      case 'paper-mode':
+        document.getElementById('btn-paper-mode')?.click();
         break;
       case 'cloze-castle':
         document.getElementById('btn-cloze-castle')?.click();
@@ -1231,6 +1339,29 @@ class App {
     }
   }
 
+  _launchPaperSection(sectionKey) {
+    const map = {
+      'grammar-mcq': () => document.getElementById('btn-grammar-mcq')?.click(),
+      'vocab-mcq': () => document.getElementById('btn-vocab-mcq')?.click(),
+      'cloze-castle': () => document.getElementById('btn-cloze-castle')?.click(),
+      'word-vault': () => document.getElementById('btn-word-vault')?.click(),
+      'editing-quest': () => document.getElementById('btn-editing-quest')?.click(),
+      'sentence-forge-word-order': () => {
+        setSentenceForgeTrack('word-order');
+        document.getElementById('btn-sentence-forge')?.click();
+      },
+      'sentence-forge-combining': () => {
+        setSentenceForgeTrack('sentence-combining');
+        document.getElementById('btn-sentence-forge')?.click();
+      },
+      'sentence-forge-synthesis': () => {
+        setSentenceForgeTrack('synthesis-transformation');
+        document.getElementById('btn-sentence-forge')?.click();
+      },
+    };
+    map[sectionKey]?.();
+  }
+
   /**
    * Render the guided learner journey section on the home screen.
    *
@@ -1247,7 +1378,8 @@ class App {
     if (!section) return;
 
     const profile   = getActiveProfile ? getActiveProfile() : null;
-    const isPrimary = profile?.schoolLevel === 'primary';
+    const placement = store.get('placementProfile') || null;
+    const readingBand = getReadingBand(profile, placement);
 
     let rec, plan, chips;
     try {
@@ -1260,9 +1392,15 @@ class App {
     }
 
     // ── Pathway meta ───────────────────────────────────────────────────────
-    const pathwayIcon  = isPrimary ? '🏫' : '🌱';
-    const pathwayLabel = isPrimary ? 'Primary Journey' : 'Preschool Journey';
-    const pathwayMod   = isPrimary ? 'pathway-badge--primary' : 'pathway-badge--preschool';
+    const stageMeta = {
+      'pre-reader': { icon: '🌱', label: 'Pre-reader Journey', mod: 'pathway-badge--preschool' },
+      'emerging-decoder': { icon: '🧩', label: 'Emerging Decoder Journey', mod: 'pathway-badge--preschool' },
+      'developing-reader': { icon: '📘', label: 'Developing Reader Journey', mod: 'pathway-badge--primary' },
+      reader: { icon: '🏫', label: 'Reader Journey', mod: 'pathway-badge--primary' },
+    };
+    const pathwayIcon  = stageMeta[readingBand]?.icon || '🌱';
+    const pathwayLabel = stageMeta[readingBand]?.label || 'Reading Journey';
+    const pathwayMod   = stageMeta[readingBand]?.mod || 'pathway-badge--preschool';
     const profileName  = profile?.name ? `${profile.name}'s ` : '';
 
     // ── Urgency display ────────────────────────────────────────────────────
@@ -1337,7 +1475,7 @@ class App {
     });
 
     // Manage section visibility for preschool vs primary layout
-    this._manageSectionVisibility(isPrimary);
+    this._manageSectionVisibility(readingBand);
   }
 
   /**
@@ -1349,24 +1487,35 @@ class App {
    * Primary:   quest banners are the main lesson → show them prominently.
    *            Phonics modes are irrelevant → hide them.
    */
-  _manageSectionVisibility(isPrimary) {
+  _manageSectionVisibility(readingBand = 'pre-reader') {
     const coreSection   = document.getElementById('home-core-section');
     const questsSection = document.getElementById('home-quests-section');
     const questsHeading = document.getElementById('quests-section-heading');
     const questsSub     = document.getElementById('quests-section-sub');
 
-    if (isPrimary) {
+    const layout = getHomeLayoutForReadingBand(readingBand);
+    const sentenceForgeBtn = document.getElementById('btn-sentence-forge');
+
+    if (layout.hidePhonicsCore) {
       // Hide preschool phonics grid; quests are the primary lesson
       coreSection?.classList.add('home-section--hidden');
       questsSection?.classList.remove('home-section--milestone');
       if (questsHeading) questsHeading.textContent = 'Your Learning Quests';
       if (questsSub)     questsSub.textContent     = 'Follow the order above · do these each session';
+      sentenceForgeBtn?.classList.remove('stories-banner--spotlight');
+    } else if (!layout.questsMilestone) {
+      coreSection?.classList.remove('home-section--hidden');
+      questsSection?.classList.remove('home-section--milestone');
+      if (questsHeading) questsHeading.textContent = 'Bridge Quests';
+      if (questsSub)     questsSub.textContent     = 'Keep phonics active and begin Sentence Forge first';
+      sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
     } else {
       // Show phonics grid; demote quests as milestone tracker
       coreSection?.classList.remove('home-section--hidden');
       questsSection?.classList.add('home-section--milestone');
       if (questsHeading) questsHeading.textContent = 'Quest Milestones';
-      if (questsSub)     questsSub.textContent     = 'Unlocks as you master phonics words';
+      if (questsSub)     questsSub.textContent     = 'Unlocks as decoding and reading readiness improve';
+      sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
     }
   }
 
@@ -1577,9 +1726,8 @@ class App {
     this._updateProfileChip();
     this._renderProfileGrid();
 
-    // Show placement test for new profiles before home screen.
-    // Preschool learners go to home directly (they start at Phase 1 by design).
-    // Primary learners get a short diagnostic to set starting level.
+    // Show placement test for all new profiles before home screen.
+    // The resulting reading band (not school level) drives pathway routing.
     if (!store.get('placementComplete')) {
       this._showScreen('screen-placement');
       this._runPlacementTest(profile);
@@ -1615,6 +1763,7 @@ class App {
         if (result.startGroup) {
           store.set('currentGroup', result.startGroup);
         }
+        store.set('placementProfile', result);
         store.set('placementComplete', true);
         this._afterPlacement(profile, result);
       },
@@ -1995,7 +2144,8 @@ class App {
   _getQuestUnlockStatus() {
     const profile = getActiveProfile();
     const stats = store.get('wordStats') || {};
-    return getQuestUnlockStatus(stats, profile, QUEST_THRESHOLDS);
+    const placementProfile = store.get('placementProfile') || null;
+    return getQuestUnlockStatus(stats, profile, QUEST_THRESHOLDS, placementProfile);
   }
 
   /** Update quest banner UI to show lock/unlock state */
