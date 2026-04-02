@@ -7,6 +7,9 @@ export const VOCAB_MCQ_ITEMS = {
     { id:'v3', q:'A cat says ___.', choices:['moo','meow','quack','neigh'], answer:'meow', skill:'animal_sounds', explain:'Cats meow.' },
     { id:'v19', q:'The opposite of "big" is ___.', choices:['small','tall','wide','thick'], answer:'small', skill:'antonyms', explain:'Small is the opposite of big.' },
     { id:'v20', q:'We use a ___ to cut paper.', choices:['spoon','scissors','pillow','bucket'], answer:'scissors', skill:'tools', explain:'Scissors are used for cutting.' },
+    { id:'v31', q:'The opposite of "full" is ___.', choices:['empty','round','deep','noisy'], answer:'empty', skill:'antonyms', explain:'Empty is the opposite of full.' },
+    { id:'v32', q:'A doctor works in a ___.', choices:['library','hospital','stadium','bakery'], answer:'hospital', skill:'places', explain:'Doctors commonly work in hospitals.' },
+    { id:'v33', q:'Birds build a ___ in trees.', choices:['nest','cave','lane','shelf'], answer:'nest', skill:'nature_vocab', explain:'Birds live in nests.' },
   ],
   P2: [
     { id:'v4', q:'A group of fish is called a ___.', choices:['pack','school','flock','herd'], answer:'school', skill:'group_nouns', explain:'Fish move in a school.' },
@@ -14,6 +17,9 @@ export const VOCAB_MCQ_ITEMS = {
     { id:'v6', q:'The soup is very hot. Sip it ___.', choices:['slowly','loudly','early','empty'], answer:'slowly', skill:'collocations', explain:'Hot soup is usually sipped slowly.' },
     { id:'v21', q:'A person who teaches is a ___.', choices:['teacher','baker','pilot','tailor'], answer:'teacher', skill:'occupations', explain:'A teacher teaches students.' },
     { id:'v22', q:'Please speak ___. The baby is sleeping.', choices:['softly','wildly','brightly','sharply'], answer:'softly', skill:'adverbs', explain:'Softly describes gentle speaking.' },
+    { id:'v34', q:'A lion is a ___ animal.', choices:['wild','tidy','gentle','tiny'], answer:'wild', skill:'descriptive_vocab', explain:'Lions are wild animals.' },
+    { id:'v35', q:'Bring your umbrella. It looks ___.', choices:['rainy','sunset','cloud','stormed'], answer:'rainy', skill:'weather_vocab', explain:'Rainy describes weather likely to rain.' },
+    { id:'v36', q:'Please ___ your homework before dinner.', choices:['finish','borrow','scatter','freeze'], answer:'finish', skill:'actions', explain:'Finish means complete.' },
   ],
   P3: [
     { id:'v7', q:'The old man walked very ___.', choices:['quickly','slowly','bright','high'], answer:'slowly', skill:'adverbs', explain:'Walked modifies with adverb "slowly".' },
@@ -21,6 +27,9 @@ export const VOCAB_MCQ_ITEMS = {
     { id:'v9', q:'We were ___ when the match was cancelled.', choices:['delighted','disappointed','polite','careful'], answer:'disappointed', skill:'emotions', explain:'Cancelled plans often cause disappointment.' },
     { id:'v23', q:'The firefighters were very ___.', choices:['brave','fragile','sleepy','empty'], answer:'brave', skill:'character_traits', explain:'Brave describes courage.' },
     { id:'v24', q:'She gave a ___ smile to welcome us.', choices:['warm','coldly','rust','stone'], answer:'warm', skill:'descriptive_vocab', explain:'Warm smile is a common positive collocation.' },
+    { id:'v37', q:'The students listened ___.', choices:['attentively','attention','attentive','attend'], answer:'attentively', skill:'word_form', explain:'An adverb is needed to modify "listened".' },
+    { id:'v38', q:'The road was crowded, so the bus moved ___.', choices:['slowly','silent','slow','slowness'], answer:'slowly', skill:'word_form', explain:'Adverb form fits after a verb.' },
+    { id:'v39', q:'She felt ___ after receiving the prize.', choices:['proud','dusty','narrow','plain'], answer:'proud', skill:'emotions', explain:'Receiving a prize often makes someone proud.' },
   ],
   P4: [
     { id:'v10', q:'Please ___ the form before noon.', choices:['fill in','look after','run into','carry on'], answer:'fill in', skill:'phrasal_verbs', explain:'"Fill in" means complete a form.' },
@@ -28,6 +37,9 @@ export const VOCAB_MCQ_ITEMS = {
     { id:'v12', q:'Her answer was brief but very ___.', choices:['accurate','loud','messy','hungry'], answer:'accurate', skill:'nuanced_choice', explain:'Accurate means correct.' },
     { id:'v25', q:'The coach told us to ___ after practice.', choices:['cool down','give up','break out','turn off'], answer:'cool down', skill:'phrasal_verbs', explain:'Cool down means recover after exercise.' },
     { id:'v26', q:'The guide gave a ___ explanation of the exhibit.', choices:['detailed','muddy','careless','shallow'], answer:'detailed', skill:'formal_vocab', explain:'Detailed means with many useful details.' },
+    { id:'v40', q:'The school launched a campaign to ___ recycling.', choices:['promote','collapse','dismiss','wander'], answer:'promote', skill:'formal_vocab', explain:'Promote means encourage or support.' },
+    { id:'v41', q:'He ___ into an old friend at the mall.', choices:['ran','ran into','ran off','ran out'], answer:'ran into', skill:'phrasal_verbs', explain:'"Run into" means meet unexpectedly.' },
+    { id:'v42', q:'The instructions were clear and ___.', choices:['concise','brokenly','wobble','untidily'], answer:'concise', skill:'nuanced_choice', explain:'Concise means brief but clear.' },
   ],
   P5: [
     { id:'v13', q:'The manager decided to ___ the meeting.', choices:['postpone','explode','decorate','capture'], answer:'postpone', skill:'formal_vocab', explain:'Postpone means delay to a later time.' },
@@ -35,6 +47,9 @@ export const VOCAB_MCQ_ITEMS = {
     { id:'v15', q:'Choose the best phrase: "keep calm" means ___.', choices:['stay relaxed','run quickly','shout loudly','eat quickly'], answer:'stay relaxed', skill:'idioms', explain:'Keep calm means remain relaxed.' },
     { id:'v27', q:'The scientist made a ___ observation.', choices:['careful','noisy','hollow','untidy'], answer:'careful', skill:'academic_collocation', explain:'Careful observation is a common academic phrase.' },
     { id:'v28', q:'Please ___ your claim with evidence.', choices:['support','erase','delay','narrow'], answer:'support', skill:'formal_vocab', explain:'Support a claim means provide evidence.' },
+    { id:'v43', q:'The principal ___ the students for their effort.', choices:['commended','scattered','postponed','widened'], answer:'commended', skill:'formal_vocab', explain:'Commended means praised formally.' },
+    { id:'v44', q:'The hikers had to ___ with the steep climb.', choices:['cope','cope up','cope over','cope out'], answer:'cope', skill:'collocations', explain:'Common collocation: cope with (here simplified as base verb choice).' },
+    { id:'v45', q:'Her explanation was ___, so everyone understood.', choices:['lucid','murky','slanted','tiny'], answer:'lucid', skill:'advanced_word_choice', explain:'Lucid means clear and easy to understand.' },
   ],
   P6: [
     { id:'v16', q:'The witness gave a very ___ statement.', choices:['vague','coherent','sleepy','rusty'], answer:'coherent', skill:'formal_vocab', explain:'Coherent means clear and logical.' },
@@ -42,5 +57,8 @@ export const VOCAB_MCQ_ITEMS = {
     { id:'v18', q:'Despite setbacks, the team remained ___.', choices:['resilient','fragile','silent','rare'], answer:'resilient', skill:'nuanced_choice', explain:'Resilient means able to recover quickly.' },
     { id:'v29', q:'Her speech was ___ and persuasive.', choices:['eloquent','clumsy','faint','rigid'], answer:'eloquent', skill:'advanced_word_choice', explain:'Eloquent means fluent and persuasive.' },
     { id:'v30', q:'The report aims to ___ key trends.', choices:['highlight','scatter','postpone','tangle'], answer:'highlight', skill:'formal_vocab', explain:'Highlight means emphasize important points.' },
+    { id:'v46', q:'The committee reached a ___ decision after debate.', choices:['unanimous','rusty','shallow','playful'], answer:'unanimous', skill:'formal_vocab', explain:'Unanimous means everyone agreed.' },
+    { id:'v47', q:'The policy was designed to ___ waste.', choices:['minimise','stumble','inflate','misplace'], answer:'minimise', skill:'academic_collocation', explain:'Minimise waste is a common formal collocation.' },
+    { id:'v48', q:'Even under pressure, she stayed ___.', choices:['composed','brittle','faded','random'], answer:'composed', skill:'nuanced_choice', explain:'Composed means calm and self-controlled.' },
   ],
 };
