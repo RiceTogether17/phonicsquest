@@ -31,6 +31,7 @@ import {
   diagnoseBuildError,
   getSkillSummary,
 } from '../modules/sentenceSkills.js';
+import { classifySentenceTrack } from '../modules/sentenceForgeTracks.js';
 
 // ── Module state ────────────────────────────────────────────────────────────
 
@@ -38,6 +39,7 @@ let _container = null;
 let _onGoHome  = null;
 
 let _currentLevel    = 1;
+let _currentTrack    = 'word-order';
 let _levelSentences  = [];
 let _sentenceIdx     = 0;
 let _bankWords       = [];    // [{id, word, used}]
@@ -142,6 +144,12 @@ export function showSentenceBrowser() {
   _renderBrowser();
 }
 
+export function setSentenceForgeTrack(trackKey) {
+  if (['word-order', 'sentence-combining', 'synthesis-transformation'].includes(trackKey)) {
+    _currentTrack = trackKey;
+  }
+}
+
 export function cleanupSentenceForge() {
   if (_container) _container.innerHTML = '';
   _bankWords   = [];
@@ -157,16 +165,26 @@ function _renderBrowser() {
   const completed = store.get('sfqCompleted') || {};
   const categoryMap = getSentenceForgeCategoriesByLevel();
 
-  let html = '<div class="sfq-browser"><div class="sfq-browser-grid">';
+  const tracks = [
+    { key: 'word-order', label: 'Word Order (P1–P2)' },
+    { key: 'sentence-combining', label: 'Sentence Combining (P2–P4)' },
+    { key: 'synthesis-transformation', label: 'Synthesis & Transformation (P4–P6)' },
+  ];
+
+  let html = `<div class="sfq-browser">
+    <div class="sfq-actions" style="flex-wrap:wrap">
+      ${tracks.map(t => `<button class="btn ${_currentTrack === t.key ? 'btn--primary' : 'btn--ghost'}" data-track="${t.key}">${t.label}</button>`).join('')}
+    </div>
+    <div class="sfq-browser-grid">`;
 
   for (let lv = 1; lv <= 6; lv++) {
-    const total = allSentences.filter(s => s.level === lv).length;
+    const total = allSentences.filter(s => s.level === lv && _getSentenceTrack(s) === _currentTrack).length;
     const done  = completed[lv] || 0;
     const isDone = done >= total;
     const icon   = SENTENCE_LEVEL_ICONS[lv - 1];
 
     const categorySkills = categoryMap[lv] || [];
-    html += `
+    html += total > 0 ? `
       <button class="sfq-level-btn ${isDone ? 'sfq-level-btn--done' : ''}"
               data-level="${lv}" aria-label="${SENTENCE_LEVEL_LABELS[lv]}">
         <span class="sfq-level-icon">${isDone ? '⭐' : icon}</span>
@@ -175,7 +193,7 @@ function _renderBrowser() {
         <span class="sfq-level-categories" aria-label="Sentence categories for level ${lv}">
           ${categorySkills.map(skill => `<span class="sfq-level-tag">${LEVEL_TAG_LABELS[skill]}</span>`).join('')}
         </span>
-      </button>`;
+      </button>` : '';
   }
   console.info('[SentenceForge] Level selector categories', categoryMap);
 
@@ -188,12 +206,18 @@ function _renderBrowser() {
       _startLevel(_currentLevel);
     });
   });
+  _container.querySelectorAll('[data-track]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      _currentTrack = btn.dataset.track;
+      _renderBrowser();
+    });
+  });
 }
 
 // ── Level flow ───────────────────────────────────────────────────────────────
 
 function _startLevel(level) {
-  const raw = allSentences.filter(s => s.level === level);
+  const raw = allSentences.filter(s => s.level === level && _getSentenceTrack(s) === _currentTrack);
   _levelSentences  = [...raw].sort(() => Math.random() - 0.5);
   _sentenceIdx     = 0;
   _sessionCorrect  = 0;
@@ -204,6 +228,10 @@ function _startLevel(level) {
   _sessionClueMissionTotal = 0;
   _sessionSkillAttempts = {};
   _showSentence();
+}
+
+function _getSentenceTrack(entry) {
+  return classifySentenceTrack(entry);
 }
 
 function _showSentence() {

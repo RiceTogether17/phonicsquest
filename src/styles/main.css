@@ -6792,6 +6792,12 @@ input, select, textarea { font-family: inherit; }
   transition: border-color 0.15s, background 0.15s, transform 0.1s;
   text-align: center;
 }
+.pt-choice-btn small {
+  display: block;
+  font-size: var(--font-sm);
+  margin-top: 2px;
+  font-weight: 600;
+}
 .pt-choice-btn:hover:not(:disabled)  { border-color: var(--color-primary); background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface)); }
 .pt-choice-btn:active:not(:disabled) { transform: scale(0.97); }
 .pt-choice-btn:disabled              { cursor: default; }
@@ -6811,6 +6817,35 @@ input, select, textarea { font-family: inherit; }
 .pt-result-desc    { font-size: var(--font-md); color: var(--color-text-muted); margin: 0; }
 .pt-result-grammar { font-size: var(--font-md); margin: 0; }
 .pt-start-btn      { min-width: 200px; }
+
+.pt-intake-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+.pt-intake-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--font-sm);
+  font-weight: 700;
+}
+.pt-intake-grid input,
+.pt-intake-grid select,
+.pt-intake-grid textarea {
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 8px 10px;
+  font: inherit;
+}
+.pt-intake-wide { grid-column: 1 / -1; }
+
+.stories-banner--spotlight {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 35%, transparent);
+  border-color: var(--color-primary);
+}
 
 
 /* ═══════════════════════════════════════════════════════════════════════════

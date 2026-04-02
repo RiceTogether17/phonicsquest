@@ -15,11 +15,14 @@ import {
   getProgressionReadiness,
   readinessStateLabel,
 } from './masteryEngine.js';
+import {
+  SHORT_VOWEL_CANONICAL_GROUPS,
+  normalizeGroupMasteryMap,
+} from './phonicsGroupKeys.js';
 
-const SHORT_VOWEL_GROUPS = ['short-a', 'short-e', 'short-i', 'short-o', 'short-u'];
 const VOWEL_LABELS = {
-  'short-a': 'Short A', 'short-e': 'Short E',
-  'short-i': 'Short I', 'short-o': 'Short O', 'short-u': 'Short U',
+  'cvc-a': 'CVC Short A', 'cvc-e': 'CVC Short E',
+  'cvc-i': 'CVC Short I', 'cvc-o': 'CVC Short O', 'cvc-u': 'CVC Short U',
 };
 
 // ── Internal helpers ───────────────────────────────────────────────────────
@@ -59,9 +62,9 @@ function _weakestQuestSkill(questKey) {
 }
 
 function _weakestPhonicsGroup() {
-  const gm = store.get('groupMastery') || {};
+  const gm = normalizeGroupMasteryMap(store.get('groupMastery') || {});
   let weakest = null, lowest = Infinity;
-  for (const g of SHORT_VOWEL_GROUPS) {
+  for (const g of SHORT_VOWEL_CANONICAL_GROUPS) {
     const s = gm[g];
     if (typeof s === 'number' && s < lowest) { lowest = s; weakest = g; }
   }
@@ -97,10 +100,10 @@ function _interpretClueVsAnswer(clueAcc, answerAcc) {
  */
 export function getLearnerSummary() {
   const profile = getActiveProfile();
-  const gm = store.get('groupMastery') || {};
+  const gm = normalizeGroupMasteryMap(store.get('groupMastery') || {});
   const learnerType = profile?.schoolLevel === 'primary' ? 'Primary' : 'Preschool';
 
-  const phonicsEntries = SHORT_VOWEL_GROUPS
+  const phonicsEntries = SHORT_VOWEL_CANONICAL_GROUPS
     .map(g => ({ label: VOWEL_LABELS[g], score: gm[g] ?? null }))
     .filter(e => e.score !== null);
 
@@ -154,10 +157,10 @@ export function getLearnerSummary() {
  * Returns an array of domain objects with real-data scores (null = no data).
  */
 export function getLiteracyDomains() {
-  const gm = store.get('groupMastery') || {};
+  const gm = normalizeGroupMasteryMap(store.get('groupMastery') || {});
   const cs = store.get('clueStats') || {};
 
-  const phonicsScores = SHORT_VOWEL_GROUPS
+  const phonicsScores = SHORT_VOWEL_CANONICAL_GROUPS
     .map(g => gm[g]).filter(s => typeof s === 'number');
   const phonicsScore = phonicsScores.length
     ? phonicsScores.reduce((a, b) => a + b, 0) / phonicsScores.length
