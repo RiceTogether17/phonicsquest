@@ -84,8 +84,10 @@ export function createProfile(name, avatar, color, schoolLevel = 'preschool', op
     avatar: avatar || AVATAR_OPTIONS[0],
     color:  color  || COLOR_OPTIONS[0],
     // 'primary' bypasses phonics-mastery unlock gates for Sentence Forge,
-    // Cloze Castle and Word Vault. Defaults to 'preschool' (mastery-gated).
+    // Cloze Castle and Word Vault for legacy profiles. New placement now
+    // routes by reading band, but schoolLevel is still kept as metadata.
     schoolLevel: schoolLevel === 'primary' ? 'primary' : 'preschool',
+    readingBand: opts.readingBand || null,
     classId: opts.classId || 'class-a',
     createdAt: new Date().toISOString(),
   };

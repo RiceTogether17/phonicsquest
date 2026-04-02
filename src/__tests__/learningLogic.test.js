@@ -26,6 +26,44 @@ describe('quest unlock logic', () => {
     expect(unlock.sentenceForge.unlocked).toBe(true);
     expect(unlock.sentenceForge.current).toBe(15);
   });
+
+  it('does not auto-unlock grammar quests for weak primary readers when placement says pre-reader', () => {
+    const unlock = getQuestUnlockStatus(
+      {},
+      { schoolLevel: 'primary' },
+      undefined,
+      { readingBand: 'pre-reader', sentenceReady: false, grammarReady: false, vocabularyReady: false }
+    );
+
+    expect(unlock.sentenceForge.unlocked).toBe(false);
+    expect(unlock.clozeCastle.unlocked).toBe(false);
+    expect(unlock.wordVault.unlocked).toBe(false);
+  });
+
+  it('unlocks Sentence Forge for developing readers but keeps grammar gated', () => {
+    const unlock = getQuestUnlockStatus(
+      {},
+      { schoolLevel: 'primary' },
+      undefined,
+      { readingBand: 'developing-reader', sentenceReady: true, grammarReady: false, vocabularyReady: false }
+    );
+
+    expect(unlock.sentenceForge.unlocked).toBe(true);
+    expect(unlock.clozeCastle.unlocked).toBe(false);
+  });
+
+  it('fully unlocks language quests for reader band', () => {
+    const unlock = getQuestUnlockStatus(
+      {},
+      { schoolLevel: 'preschool' },
+      undefined,
+      { readingBand: 'reader', sentenceReady: true, grammarReady: true, vocabularyReady: true }
+    );
+
+    expect(unlock.sentenceForge.unlocked).toBe(true);
+    expect(unlock.clozeCastle.unlocked).toBe(true);
+    expect(unlock.wordVault.unlocked).toBe(true);
+  });
 });
 
 describe('progress summary', () => {

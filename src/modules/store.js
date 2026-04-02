@@ -73,6 +73,9 @@ const DEFAULT_STATE = {
     stories: {},
     editingQuest: {},
     writingQuest: {},
+    grammarMcq: {},
+    vocabMcq: {},
+    paperMode: {},
   },
   questAttempts: [],        // recent quest attempts (capped)
   learningEvents: [],       // fine-grained telemetry events (capped)
@@ -89,7 +92,7 @@ const DEFAULT_STATE = {
 
   // Session
   currentMode:  'blend',
-  currentGroup: 'short-a',
+  currentGroup: 'cvc-a',
 
   // Per-mode difficulty (auto-adjusts based on performance)
   modeDifficulty: {},  // { [modeKey]: 1|2|3 }
@@ -106,6 +109,8 @@ const DEFAULT_STATE = {
   // ── Placement & onboarding ─────────────────────────────────────────────
   // Set to true after the placement diagnostic has been completed (or skipped).
   placementComplete: false,
+  // Rich placement profile used for reading-stage routing.
+  placementProfile: null,
 
   // Total sessions ever played (incremented on each session start).
   totalSessions: 0,
