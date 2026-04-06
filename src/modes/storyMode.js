@@ -386,83 +386,90 @@ function _renderReadAloud(story) {
   ` : '';
 
   dynamic.innerHTML = /* html */`
-    <!-- Follow-mode toggle -->
-    <div class="follow-mode-toggle">
-      <span class="follow-mode-label">Highlight:</span>
-      <button class="follow-mode-btn${_followMode === 'line' ? ' active' : ''}" data-follow="line">Line</button>
-      <button class="follow-mode-btn${_followMode === 'word' ? ' active' : ''}" data-follow="word">Line + Word</button>
+    <!-- Story text column -->
+    <div class="story-content-wrap">
+      <!-- Follow-mode toggle -->
+      <div class="follow-mode-toggle">
+        <span class="follow-mode-label">Highlight:</span>
+        <button class="follow-mode-btn${_followMode === 'line' ? ' active' : ''}" data-follow="line">Line</button>
+        <button class="follow-mode-btn${_followMode === 'word' ? ' active' : ''}" data-follow="word">Line + Word</button>
+      </div>
+
+      <div class="story-body" id="story-body" aria-live="polite">${linesHtml}</div>
+      ${talkHtml}
     </div>
 
-    <div class="story-body" id="story-body" aria-live="polite">${linesHtml}</div>
-    ${talkHtml}
-    <div class="story-tts-bar">
-      <button class="btn btn--primary btn--xl" id="btn-story-play" aria-label="Read aloud">
-        ▶ Read Aloud
-      </button>
-      <button class="btn btn--ghost btn--xl" id="btn-story-stop" style="display:none" aria-label="Stop">
-        ⏹ Stop
-      </button>
-    </div>
+    <!-- Controls sidebar column -->
+    <div class="story-controls-wrap">
+      <div class="story-tts-bar">
+        <button class="btn btn--primary btn--xl" id="btn-story-play" aria-label="Read aloud">
+          ▶ Read Aloud
+        </button>
+        <button class="btn btn--ghost btn--xl" id="btn-story-stop" style="display:none" aria-label="Stop">
+          ⏹ Stop
+        </button>
+      </div>
 
-    <!-- Fluency timer section -->
-    <div class="fluency-bar" id="fluency-bar">
-      <div class="fluency-bar-header">
-        <span class="fluency-label">⏱ Fluency Read</span>
-        <span class="fluency-hint">Child reads aloud — tap Start, then Done when finished</span>
-      </div>
-      <div class="fluency-controls">
-        <button class="btn btn--ghost" id="btn-fluency-start">▶ Start timer</button>
-        <span class="fluency-clock" id="fluency-clock" aria-live="polite">0:00</span>
-        <button class="btn btn--primary" id="btn-fluency-done" disabled>✓ Done</button>
-      </div>
-      <div class="fluency-result" id="fluency-result" hidden></div>
-      ${historyHtml}
-    </div>
-
-    <!-- Recording controls -->
-    <div class="recording-bar" id="recording-bar">
-      <div class="recording-bar-header">
-        <span class="recording-label">🎙 Record Your Reading</span>
-        <span class="recording-hint">Record yourself reading the story aloud</span>
-      </div>
-      <div class="recording-controls" id="recording-controls">
-        <button class="btn btn--ghost" id="btn-rec-start">🎙 Start Recording</button>
-        <button class="btn btn--ghost btn--danger" id="btn-rec-stop" hidden>⏹ Stop</button>
-        <button class="btn btn--ghost" id="btn-rec-play" hidden>▶ Play Back</button>
-        <button class="btn btn--ghost btn--sm" id="btn-rec-delete" hidden>🗑 Delete</button>
-      </div>
-      <div class="recording-status" id="recording-status"></div>
-    </div>
-
-    <!-- Echo Read section -->
-    <div class="echo-read-bar" id="echo-read-bar">
-      <div class="echo-read-header">
-        <span class="echo-read-label">🔁 Echo Read</span>
-        <span class="echo-read-hint">App reads a line, then you record yourself reading it</span>
-      </div>
-      <div class="echo-read-controls">
-        <button class="btn btn--ghost" id="btn-echo-start">Start Echo Read</button>
-        <button class="btn btn--ghost" id="btn-echo-next" hidden>Next Line →</button>
-        <button class="btn btn--ghost" id="btn-echo-rec" hidden>🎙 Your Turn</button>
-        <button class="btn btn--ghost" id="btn-echo-play" hidden>▶ Hear Yourself</button>
-        <button class="btn btn--ghost btn--sm" id="btn-echo-stop" hidden>✕ Exit Echo Read</button>
-      </div>
-      <div class="echo-read-status" id="echo-read-status"></div>
-    </div>
-
-    <!-- Story Quest CTA (shown after TTS or fluency) -->
-    ${hasQuest ? /* html */`
-      <div class="story-quest-cta" id="story-quest-cta" hidden>
-        <div class="sq-cta-inner">
-          <span class="sq-cta-icon">🌟</span>
-          <div>
-            <strong>Story Quest ready!</strong>
-            <p>Check your understanding with questions, vocab, and grammar.</p>
-          </div>
-          <button class="btn btn--primary" id="btn-launch-quest">Start Quest →</button>
+      <!-- Fluency timer section -->
+      <div class="fluency-bar" id="fluency-bar">
+        <div class="fluency-bar-header">
+          <span class="fluency-label">⏱ Fluency Read</span>
+          <span class="fluency-hint">Child reads aloud — tap Start, then Done when finished</span>
         </div>
+        <div class="fluency-controls">
+          <button class="btn btn--ghost" id="btn-fluency-start">▶ Start timer</button>
+          <span class="fluency-clock" id="fluency-clock" aria-live="polite">0:00</span>
+          <button class="btn btn--primary" id="btn-fluency-done" disabled>✓ Done</button>
+        </div>
+        <div class="fluency-result" id="fluency-result" hidden></div>
+        ${historyHtml}
       </div>
-    ` : ''}
+
+      <!-- Recording controls -->
+      <div class="recording-bar" id="recording-bar">
+        <div class="recording-bar-header">
+          <span class="recording-label">🎙 Record Your Reading</span>
+          <span class="recording-hint">Record yourself reading the story aloud</span>
+        </div>
+        <div class="recording-controls" id="recording-controls">
+          <button class="btn btn--ghost" id="btn-rec-start">🎙 Start Recording</button>
+          <button class="btn btn--ghost btn--danger" id="btn-rec-stop" hidden>⏹ Stop</button>
+          <button class="btn btn--ghost" id="btn-rec-play" hidden>▶ Play Back</button>
+          <button class="btn btn--ghost btn--sm" id="btn-rec-delete" hidden>🗑 Delete</button>
+        </div>
+        <div class="recording-status" id="recording-status"></div>
+      </div>
+
+      <!-- Echo Read section -->
+      <div class="echo-read-bar" id="echo-read-bar">
+        <div class="echo-read-header">
+          <span class="echo-read-label">🔁 Echo Read</span>
+          <span class="echo-read-hint">App reads a line, then you record yourself reading it</span>
+        </div>
+        <div class="echo-read-controls">
+          <button class="btn btn--ghost" id="btn-echo-start">Start Echo Read</button>
+          <button class="btn btn--ghost" id="btn-echo-next" hidden>Next Line →</button>
+          <button class="btn btn--ghost" id="btn-echo-rec" hidden>🎙 Your Turn</button>
+          <button class="btn btn--ghost" id="btn-echo-play" hidden>▶ Hear Yourself</button>
+          <button class="btn btn--ghost btn--sm" id="btn-echo-stop" hidden>✕ Exit Echo Read</button>
+        </div>
+        <div class="echo-read-status" id="echo-read-status"></div>
+      </div>
+
+      <!-- Story Quest CTA (shown after TTS or fluency) -->
+      ${hasQuest ? /* html */`
+        <div class="story-quest-cta" id="story-quest-cta" hidden>
+          <div class="sq-cta-inner">
+            <span class="sq-cta-icon">🌟</span>
+            <div>
+              <strong>Story Quest ready!</strong>
+              <p>Check your understanding with questions, vocab, and grammar.</p>
+            </div>
+            <button class="btn btn--primary" id="btn-launch-quest">Start Quest →</button>
+          </div>
+        </div>
+      ` : ''}
+    </div>
   `;
 
   // Follow-mode toggle
@@ -596,49 +603,55 @@ function _renderDecodeMode(story) {
   }).join('');
 
   dynamic.innerHTML = /* html */`
-    <!-- Sight word pre-teach -->
-    <div class="hfw-preteach" id="hfw-preteach">
-      <div class="hfw-preteach-header">
-        <span class="hfw-preteach-title">⭐ Sight Words in this story</span>
-        <button class="hfw-toggle-btn" id="btn-hfw-toggle" aria-expanded="true" aria-controls="hfw-chip-list">
-          Hide ▲
-        </button>
+    <!-- Story text column -->
+    <div class="story-content-wrap">
+      <!-- Sight word pre-teach -->
+      <div class="hfw-preteach" id="hfw-preteach">
+        <div class="hfw-preteach-header">
+          <span class="hfw-preteach-title">⭐ Sight Words in this story</span>
+          <button class="hfw-toggle-btn" id="btn-hfw-toggle" aria-expanded="true" aria-controls="hfw-chip-list">
+            Hide ▲
+          </button>
+        </div>
+        <div id="hfw-chip-list" class="hfw-chip-list">
+          ${hfwChipsHtml.length
+            ? hfwChipsHtml
+            : '<span class="hfw-none">None — all words are fully decodable!</span>'}
+          <p class="hfw-tip">Tap each word to hear it. These words are read aloud in the story.</p>
+        </div>
       </div>
-      <div id="hfw-chip-list" class="hfw-chip-list">
-        ${hfwChipsHtml.length
-          ? hfwChipsHtml
-          : '<span class="hfw-none">None — all words are fully decodable!</span>'}
-        <p class="hfw-tip">Tap each word to hear it. These words are read aloud in the story.</p>
+
+      <!-- Key vocabulary pre-teach -->
+      ${vocabChipsHtml.length ? /* html */`
+      <div class="vocab-preteach" id="vocab-preteach">
+        <div class="hfw-preteach-header">
+          <span class="hfw-preteach-title">📚 Key Words — tap to hear</span>
+          <button class="hfw-toggle-btn" id="btn-vocab-toggle" aria-expanded="true" aria-controls="vocab-chip-list">
+            Hide ▲
+          </button>
+        </div>
+        <div id="vocab-chip-list" class="vocab-chip-list">${vocabChipsHtml}</div>
+      </div>
+      ` : ''}
+
+      <!-- Decode-mode story body -->
+      <div class="story-body decode-body" id="story-body" aria-live="polite">
+        ${storyBodyHtml}
       </div>
     </div>
 
-    <!-- Key vocabulary pre-teach -->
-    ${vocabChipsHtml.length ? /* html */`
-    <div class="vocab-preteach" id="vocab-preteach">
-      <div class="hfw-preteach-header">
-        <span class="hfw-preteach-title">📚 Key Words — tap to hear</span>
-        <button class="hfw-toggle-btn" id="btn-vocab-toggle" aria-expanded="true" aria-controls="vocab-chip-list">
-          Hide ▲
-        </button>
+    <!-- Controls sidebar column -->
+    <div class="story-controls-wrap">
+      <!-- Mark as read bar -->
+      <div class="story-done-bar">
+        <button class="btn btn--primary" id="btn-mark-read">✓ Mark story as read</button>
       </div>
-      <div id="vocab-chip-list" class="vocab-chip-list">${vocabChipsHtml}</div>
-    </div>
-    ` : ''}
 
-    <!-- Decode-mode story body -->
-    <div class="story-body decode-body" id="story-body" aria-live="polite">
-      ${storyBodyHtml}
-    </div>
-
-    <!-- Mark as read bar -->
-    <div class="story-done-bar">
-      <button class="btn btn--primary" id="btn-mark-read">✓ Mark story as read</button>
-    </div>
-
-    <!-- Decode panel (slides up when a word is tapped) -->
-    <div class="decode-panel" id="decode-panel" aria-live="polite" hidden>
-      <div class="decode-panel-inner" id="decode-panel-inner">
-        <!-- filled dynamically -->
+      <!-- Decode panel (slides up when a word is tapped) -->
+      <div class="decode-panel" id="decode-panel" aria-live="polite" hidden>
+        <div class="decode-panel-inner" id="decode-panel-inner">
+          <!-- filled dynamically -->
+        </div>
       </div>
     </div>
   `;

@@ -1980,9 +1980,77 @@ input, select, textarea { font-family: inherit; }
   /* Keep Stories content centered on desktop (avoid left-tug layout) */
   .stories-screen-header,
   .stories-content {
-    width: min(100%, 980px);
-    max-width: 980px;
+    width: min(100%, 1200px);
+    max-width: 1200px;
     margin: 0 auto;
+  }
+
+  /* Story browser: 4-column card grid */
+  .story-cards-grid { grid-template-columns: repeat(4, 1fr); }
+
+  /* Story reader: 2-column grid (text left, controls right) */
+  .story-reader {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    grid-template-areas:
+      "illo    illo"
+      "meta    meta"
+      "title   toggle"
+      "dynamic dynamic";
+    column-gap: var(--space-6);
+    row-gap: var(--space-4);
+    align-items: start;
+  }
+  .story-reader > .story-illo        { grid-area: illo; min-height: 280px; }
+  .story-reader > .story-meta-bar    { grid-area: meta; }
+  .story-reader > .story-reader-title { grid-area: title; align-self: center; margin-bottom: 0; }
+  .story-reader > .story-mode-toggle { grid-area: toggle; margin: 0; align-self: center; }
+  .story-reader > .story-dynamic     { grid-area: dynamic; }
+
+  /* Larger illustration mascot */
+  .story-illo-mascot { width: 210px; height: 210px; }
+  .story-illo-prop   { font-size: 4rem; }
+
+  /* story-dynamic: inner 2-column grid matching parent columns */
+  .story-dynamic {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    column-gap: var(--space-6);
+    align-items: start;
+  }
+  .story-content-wrap  { grid-column: 1; display: flex; flex-direction: column; gap: var(--space-3); }
+  .story-controls-wrap {
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    position: sticky;
+    top: calc(64px + var(--space-4));
+    max-height: calc(100dvh - 100px);
+    overflow-y: auto;
+  }
+
+  /* Decode panel: no longer sticky-bottom in sidebar */
+  .story-controls-wrap .decode-panel {
+    position: static;
+    border-top: none;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    animation: none;
+  }
+
+  /* TTS bar: tighter padding in sidebar */
+  .story-controls-wrap .story-tts-bar {
+    padding: var(--space-2) 0;
+    flex-wrap: wrap;
+  }
+
+  /* Done bar: no top-border/margin in sidebar */
+  .story-controls-wrap .story-done-bar {
+    border-top: none;
+    margin-top: 0;
+    padding: var(--space-2) 0;
   }
 
   /* Larger phoneme tiles on desktop */
@@ -2436,6 +2504,18 @@ input, select, textarea { font-family: inherit; }
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+}
+
+/* Layout wrappers (stack on mobile, 2-col on desktop via media query) */
+.story-content-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.story-controls-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
 /* Illustration header */
