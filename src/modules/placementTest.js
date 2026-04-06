@@ -177,7 +177,12 @@ const GATE_D_ITEMS = [
 ];
 
 function _shuffle(arr) {
-  return [...arr].sort(() => Math.random() - 0.5);
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 function _accuracy(results, section) {
@@ -194,7 +199,7 @@ function _teacherScore(results, section) {
 
 function _phaseFromDecoding(results) {
   const decoding = results.filter(r => r.section === 'decoding');
-  if (!decoding.length) return 1;
+  if (!decoding.length) return { phase: 1, startGroup: 'cvc-a' };
   const phaseAccuracy = new Map();
   for (const row of decoding) {
     const p = row.phase || 1;
@@ -224,6 +229,7 @@ function _buildPreSeededStats(phase) {
     ...(phase >= 2 ? ['cat', 'bed', 'sit', 'dog', 'map', 'sun'] : []),
     ...(phase >= 3 ? ['flag', 'frog', 'step', 'best', 'nest'] : []),
     ...(phase >= 4 ? ['camp', 'hand', 'gift', 'sand'] : []),
+    ...(phase >= 5 ? ['cake', 'kite', 'home', 'cute', 'tune'] : []),
   ];
   for (const w of seed) {
     stats[w] = { attempts: 8, correct: 8, lastSeen: now, reviewInterval: 1, nextReviewDate: now };
@@ -246,7 +252,7 @@ export function derivePlacementResult(results, intake = {}, schoolLevel = 'presc
   const first = _accuracy(results, 'firstSound');
   const last = _accuracy(results, 'lastSound');
   const middle = _accuracy(results, 'middleSound');
-  const letterSounds = _accuracy(results, 'letterSounds');
+  const letterSounds = _teacherScore(results, 'letterSounds');
   const oralBlending = _accuracy(results, 'oralBlending');
   const vocab = _accuracy(results, 'vocab');
   const decoding = _accuracy(results, 'decoding');
@@ -342,8 +348,9 @@ function _defaultResult(profile) {
     simpleWordReading: 'unknown',
     notes: '',
   };
-  return {
-    readingBand: profile?.schoolLevel === 'primary' ? 'developing-reader' : 'pre-reader',
+  const readingBand = profile?.schoolLevel === 'primary' ? 'developing-reader' : 'pre-reader';
+  const base = {
+    readingBand,
     phonicsPhase: 1,
     phase: 1,
     startGroup: 'cvc-a',
@@ -357,8 +364,9 @@ function _defaultResult(profile) {
     vocabularyReady: false,
     intake,
     gateScores: { gateA: 0, gateB: 0, gateC: 0, gateD: 0 },
-    recommendedHomePath: ['blend', 'first-sound', 'sight-words', 'stories'],
   };
+  base.recommendedHomePath = _recommendedPath(base);
+  return base;
 }
 
 export function getNextGateToAppend(baseResult, existingSequence = []) {
