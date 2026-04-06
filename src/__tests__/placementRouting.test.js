@@ -122,6 +122,43 @@ describe('placement gate adaptivity', () => {
 
     expect(['cvc-a', 'ccvc-a', 'cvcc-a', 'digraphs', 'long-a']).toContain(result.startGroup);
   });
+
+  it('returns valid startGroup and phonicsPhase when no decoding data is present', () => {
+    // Pre-reader who never reaches Gate B should still have defined placement fields
+    const preReaderOnly = [
+      { section: 'oral', score: 0 },
+      { section: 'vocab', correct: false },
+      { section: 'firstSound', correct: false },
+      { section: 'lastSound', correct: false },
+      { section: 'middleSound', correct: false },
+      { section: 'letterSounds', score: 0 },
+      { section: 'oralBlending', correct: false },
+    ];
+
+    const result = derivePlacementResult(preReaderOnly, {}, 'preschool');
+
+    expect(result.startGroup).toBe('cvc-a');
+    expect(result.phonicsPhase).toBe(1);
+    expect(result.phase).toBe(1);
+  });
+
+  it('counts letterSounds teacher-scale score toward Gate A', () => {
+    // Learner has strong letter-sounds (teacher confirmed) but borderline elsewhere
+    // Without the fix, letterSounds = 0, causing Gate A to fail
+    const borderlineA = [
+      { section: 'oral', score: 0.5 },
+      { section: 'vocab', correct: true },
+      { section: 'firstSound', correct: true },
+      { section: 'lastSound', correct: false },
+      { section: 'middleSound', correct: false },
+      { section: 'letterSounds', score: 1 },   // teacher-scale: strong
+      { section: 'oralBlending', correct: true },
+    ];
+    // gateA = (0.5 + 1 + 1 + 0 + 0 + 1 + 1) / 7 ≈ 0.643 → should pass with letterSounds counted
+    const result = derivePlacementResult(borderlineA, {}, 'preschool');
+    expect(result.gateScores.gateA).toBeGreaterThanOrEqual(0.6);
+    expect(result.readingBand).toBe('emerging-decoder');
+  });
 });
 
 describe('reading-band routing', () => {
