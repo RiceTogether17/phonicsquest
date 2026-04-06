@@ -1,9 +1,14 @@
 /**
- * PhonicsQuest – Developmental Placement Diagnostic
+ * PhonicsQuest – Literacy Placement Screener
+ *
+ * This is a cross-domain developmental placement tool (not a pure phonics
+ * diagnostic).  It measures oral language, phonological awareness, decoding,
+ * connected reading, and language readiness to route each learner into the
+ * best overall pathway in PhonicsQuest.
  *
  * Gate sequence:
  *   A. Oral/no-print foundations
- *   B. Early print readiness
+ *   B. Print decoding (phonics phases + sight words reported separately)
  *   C. Connected reading
  *   D. Sentence/grammar/vocabulary readiness
  *
@@ -326,10 +331,16 @@ const GATE_B_ITEMS = [
 ];
 
 const GATE_C_ITEMS = [
+  // ── Decodable word reading ────────────────────────────────────────────────
   {
     id: 'c-word-1', gate: 'C', section: 'connectedReading', kind: 'word-choice', title: 'Decodable reading',
     prompt: 'Tap: jump', speak: 'jump', correct: 'jump', options: ['jump', 'lump', 'lamp', 'hump'],
   },
+  {
+    id: 'c-word-2', gate: 'C', section: 'connectedReading', kind: 'word-choice', title: 'Decodable reading',
+    prompt: 'Tap: help', speak: 'help', correct: 'help', options: ['help', 'held', 'heap', 'helm'],
+  },
+  // ── Sentence reading ──────────────────────────────────────────────────────
   {
     id: 'c-sentence-1', gate: 'C', section: 'connectedReading', kind: 'sentence-choice', title: 'Sentence reading',
     sentence: 'The cat can hop.', prompt: 'Read and choose the matching picture.',
@@ -342,10 +353,28 @@ const GATE_C_ITEMS = [
     ],
   },
   {
+    id: 'c-sentence-2', gate: 'C', section: 'connectedReading', kind: 'sentence-choice', title: 'Sentence reading',
+    sentence: 'The dog sat on the rug.', prompt: 'Read and choose the matching picture.',
+    correct: 'dog-rug',
+    options: [
+      { id: 'dog-rug', emoji: '🐶🟫', label: 'Dog on rug' },
+      { id: 'cat-bed', emoji: '🐱🛏️', label: 'Cat on bed' },
+      { id: 'hen-box', emoji: '🐔📦', label: 'Hen on box' },
+      { id: 'pig-mud', emoji: '🐷💧', label: 'Pig in mud' },
+    ],
+  },
+  // ── Read aloud readiness (teacher-scale) ──────────────────────────────────
+  {
     id: 'c-readaloud-1', gate: 'C', section: 'storyReadiness', kind: 'teacher-scale',
     title: 'Read aloud readiness',
     prompt: 'Teacher score: learner reads 1–2 short decodable sentences with support.',
   },
+  {
+    id: 'c-readaloud-2', gate: 'C', section: 'storyReadiness', kind: 'teacher-scale',
+    title: 'Read aloud fluency',
+    prompt: 'Teacher score: learner reads short sentences without heavy sounding-out on every word.',
+  },
+  // ── Comprehension ─────────────────────────────────────────────────────────
   {
     id: 'c-comp-1', gate: 'C', section: 'comprehension', kind: 'picture-choice', title: 'Comprehension',
     prompt: 'Listen: "Sam had a red cap." Tap what Sam had.', speak: 'red cap', correct: 'cap',
@@ -356,9 +385,20 @@ const GATE_C_ITEMS = [
       { id: 'pen', emoji: '🖊️', label: 'Pen' },
     ],
   },
+  {
+    id: 'c-comp-2', gate: 'C', section: 'comprehension', kind: 'picture-choice', title: 'Comprehension',
+    prompt: 'Listen: "The frog sat on a log." Where did the frog sit?', speak: 'log', correct: 'log',
+    options: [
+      { id: 'log', emoji: '🪵', label: 'Log' },
+      { id: 'rock', emoji: '🪨', label: 'Rock' },
+      { id: 'bed', emoji: '🛏️', label: 'Bed' },
+      { id: 'hat', emoji: '🎩', label: 'Hat' },
+    ],
+  },
 ];
 
 const GATE_D_ITEMS = [
+  // ── Sentence building (2 items) ───────────────────────────────────────────
   {
     id: 'd-sentence-1', gate: 'D', section: 'sentenceReady', kind: 'word-choice', title: 'Sentence building',
     prompt: 'Pick the best sentence:',
@@ -366,16 +406,36 @@ const GATE_D_ITEMS = [
     correct: 'She is running.',
   },
   {
+    id: 'd-sentence-2', gate: 'D', section: 'sentenceReady', kind: 'word-choice', title: 'Sentence building',
+    prompt: 'Pick the best sentence:',
+    options: ['The boy kicked the ball.', 'Kicked the ball boy.', 'Ball the kicked boy.', 'The kicked boy ball.'],
+    correct: 'The boy kicked the ball.',
+  },
+  // ── Grammar cloze (2 items) ───────────────────────────────────────────────
+  {
     id: 'd-grammar-1', gate: 'D', section: 'grammarReady', kind: 'word-choice', title: 'Grammar cloze',
     prompt: 'He ___ to school yesterday.',
     options: ['go', 'goes', 'went', 'going'],
     correct: 'went',
   },
   {
+    id: 'd-grammar-2', gate: 'D', section: 'grammarReady', kind: 'word-choice', title: 'Grammar cloze',
+    prompt: 'She ___ two cats at home.',
+    options: ['has', 'have', 'having', 'had'],
+    correct: 'has',
+  },
+  // ── Vocabulary in context (2 items) ───────────────────────────────────────
+  {
     id: 'd-vocab-1', gate: 'D', section: 'vocabularyReady', kind: 'word-choice', title: 'Vocabulary in context',
     prompt: 'The room was dark, so we turned on the ___.',
     options: ['light', 'spoon', 'shoe', 'rain'],
     correct: 'light',
+  },
+  {
+    id: 'd-vocab-2', gate: 'D', section: 'vocabularyReady', kind: 'word-choice', title: 'Vocabulary in context',
+    prompt: 'I was thirsty, so I drank some ___.',
+    options: ['water', 'bread', 'paper', 'stone'],
+    correct: 'water',
   },
 ];
 
@@ -424,18 +484,40 @@ function _phaseFromDecoding(results) {
   return { phase, startGroup: group };
 }
 
+/**
+ * Build placement-exempt known-content stats for words below the learner's
+ * demonstrated phonics phase.
+ *
+ * Phase-to-word mapping now matches Gate B phase labels:
+ *   phase 1 = CVC, phase 2 = initial blends (CCVC), phase 3 = final blends (CVCC),
+ *   phase 4 = digraphs, phase 5 = long vowels.
+ *
+ * Stats are stored as placement-seeded (not genuine mastery) so dashboards
+ * and adaptive review can distinguish them from real practice data.
+ */
 function _buildPreSeededStats(phase) {
   if (phase <= 1) return {};
   const now = new Date().toISOString();
   const stats = {};
   const seed = [
+    // Phase 1 words (CVC) — seeded when learner is at phase 2+
     ...(phase >= 2 ? ['cat', 'bed', 'sit', 'dog', 'map', 'sun'] : []),
-    ...(phase >= 3 ? ['flag', 'frog', 'step', 'best', 'nest'] : []),
-    ...(phase >= 4 ? ['camp', 'hand', 'gift', 'sand'] : []),
-    ...(phase >= 5 ? ['cake', 'kite', 'home', 'cute', 'tune'] : []),
+    // Phase 2 words (CCVC / initial blends) — seeded when learner is at phase 3+
+    ...(phase >= 3 ? ['flag', 'frog', 'step', 'skip', 'plan'] : []),
+    // Phase 3 words (CVCC / final blends) — seeded when learner is at phase 4+
+    ...(phase >= 4 ? ['best', 'lamp', 'gift', 'sand', 'hand'] : []),
+    // Phase 4 words (digraphs) — seeded when learner is at phase 5+
+    ...(phase >= 5 ? ['ship', 'chin', 'that', 'thin', 'chop'] : []),
   ];
   for (const w of seed) {
-    stats[w] = { attempts: 8, correct: 8, lastSeen: now, reviewInterval: 1, nextReviewDate: now };
+    stats[w] = {
+      attempts: 3,
+      correct: 3,
+      lastSeen: now,
+      reviewInterval: 1,
+      nextReviewDate: now,
+      placementSeeded: true,
+    };
   }
   return stats;
 }
@@ -467,9 +549,18 @@ export function derivePlacementResult(results, intake = {}, schoolLevel = 'presc
   const grammarReadyScore = _accuracy(results, 'grammarReady');
   const vocabularyReadyScore = _accuracy(results, 'vocabularyReady');
 
-  const gateASecure = (first + last + middle + letterSounds + oralBlending + vocab + oral) / 7 >= 0.6;
+  // Separate child-response scores from teacher-observed scores in Gate A.
+  // Child-response items (direct evidence) are weighted more heavily (70/30).
+  const gateAChildScore = (first + last + middle + oralBlending + vocab) / 5;
+  const gateATeacherScore = (letterSounds + oral) / 2;
+  const gateAComposite = gateAChildScore * 0.7 + gateATeacherScore * 0.3;
+  const gateASecure = gateAComposite >= 0.6;
   const gateBSecure = decoding >= 0.6;
-  const gateCSecure = ((connectedReading + comprehension + readAloud) / 3) >= 0.6;
+  // Gate C: separate child-response (connected reading + comprehension) from teacher observation (read aloud).
+  const gateCChildScore = (connectedReading + comprehension) / 2;
+  const gateCTeacherScore = readAloud;
+  const gateCComposite = gateCChildScore * 0.7 + gateCTeacherScore * 0.3;
+  const gateCSecure = gateCComposite >= 0.6;
 
   let readingBand = 'pre-reader';
   if (gateASecure) readingBand = 'emerging-decoder';
@@ -530,9 +621,11 @@ export function derivePlacementResult(results, intake = {}, schoolLevel = 'presc
       notes: intake.notes || '',
     },
     gateScores: {
-      gateA: Number(((first + last + middle + letterSounds + oralBlending + vocab + oral) / 7).toFixed(2)),
+      gateA: Number(gateAComposite.toFixed(2)),
+      gateAChildScore: Number(gateAChildScore.toFixed(2)),
+      gateATeacherScore: Number(gateATeacherScore.toFixed(2)),
       gateB: Number(decoding.toFixed(2)),
-      gateC: Number((((connectedReading + comprehension + readAloud) / 3)).toFixed(2)),
+      gateC: Number(gateCComposite.toFixed(2)),
       gateD: Number((((sentenceReadyScore + grammarReadyScore + vocabularyReadyScore) / 3)).toFixed(2)),
     },
   };
@@ -541,6 +634,12 @@ export function derivePlacementResult(results, intake = {}, schoolLevel = 'presc
   return result;
 }
 
+/**
+ * Default result used when the placement test is skipped.
+ * Always defaults to 'pre-reader' — the safest conservative assumption.
+ * A brief screener that controls the entire product pathway should not
+ * assume a higher band without evidence.
+ */
 function _defaultResult(profile) {
   const intake = {
     age: '',
@@ -551,7 +650,7 @@ function _defaultResult(profile) {
     simpleWordReading: 'unknown',
     notes: '',
   };
-  const readingBand = profile?.schoolLevel === 'primary' ? 'developing-reader' : 'pre-reader';
+  const readingBand = 'pre-reader';
   const base = {
     readingBand,
     phonicsPhase: 1,
@@ -602,16 +701,16 @@ export function showPlacementTest({ container, profile, onComplete }) {
     return `${current} / ${sequence.length}`;
   }
 
-  function renderFrame(content, title = 'Reading Readiness Check') {
+  function renderFrame(content, title = 'Literacy Placement Screener') {
     const pct = sequence.length ? Math.round((index / sequence.length) * 100) : 0;
     container.innerHTML = `
-      <div class="pt-wrapper" role="main" aria-label="Placement diagnostic">
+      <div class="pt-wrapper" role="main" aria-label="Literacy placement screener">
         <div class="pt-header">
           <div class="pt-title-row">
             <span class="pt-title-icon" aria-hidden="true">🧭</span>
             <div>
               <h1 class="pt-title">${title}</h1>
-              <p class="pt-subtitle">No-print first, then print, then reading, then language.</p>
+              <p class="pt-subtitle">Oral language, then phonics, then reading, then language skills.</p>
             </div>
             <button class="btn btn--ghost btn--sm pt-skip-btn" id="pt-skip">Skip</button>
           </div>
@@ -621,7 +720,25 @@ export function showPlacementTest({ container, profile, onComplete }) {
         <div class="pt-body" id="pt-body">${content}</div>
       </div>`;
 
-    container.querySelector('#pt-skip')?.addEventListener('click', () => onComplete(_defaultResult(profile)));
+    container.querySelector('#pt-skip')?.addEventListener('click', () => {
+      const overlay = document.createElement('div');
+      overlay.className = 'pt-skip-confirm';
+      overlay.innerHTML = `
+        <div class="pt-skip-confirm__card">
+          <h3>Skip placement?</h3>
+          <p>Skipping will place the learner on the pre-reader pathway. The screener helps find the best starting point — are you sure?</p>
+          <div class="pt-skip-confirm__actions">
+            <button class="btn btn--ghost btn--sm" id="pt-skip-cancel">Go back</button>
+            <button class="btn btn--primary btn--sm" id="pt-skip-confirm">Skip anyway</button>
+          </div>
+        </div>`;
+      container.appendChild(overlay);
+      overlay.querySelector('#pt-skip-cancel')?.addEventListener('click', () => overlay.remove());
+      overlay.querySelector('#pt-skip-confirm')?.addEventListener('click', () => {
+        overlay.remove();
+        onComplete(_defaultResult(profile));
+      });
+    });
   }
 
   function next() {
@@ -713,9 +830,10 @@ export function showPlacementTest({ container, profile, onComplete }) {
     renderFrame(`
       <div class="pt-item">
         <div class="pt-phase-tag">Gate ${item.gate} · ${item.title}</div>
+        <span class="pt-teacher-badge">Adult observation</span>
         <p class="pt-question">${item.prompt}</p>
-        <p class="pt-grammar-hint">Teacher/parent assisted scoring</p>
-        <div class="pt-choices" role="group">
+        <p class="pt-grammar-hint">This item is scored by the teacher or parent, not the child directly.</p>
+        <div class="pt-choices" role="group" aria-label="Teacher scoring options">
           <button class="pt-choice-btn" data-score="0">Not yet</button>
           <button class="pt-choice-btn" data-score="0.5">With support</button>
           <button class="pt-choice-btn" data-score="1">Independent</button>
@@ -801,12 +919,48 @@ export function showPlacementTest({ container, profile, onComplete }) {
       reader: 'Reader pathway',
     };
 
+    const sa = result.soundAwarenessProfile;
+    const avgSoundAwareness = (sa.firstSound + sa.lastSound + sa.middleSound + sa.oralBlending) / 4;
+    const phaseLabels = { 1: 'Phase 1 — CVC', 2: 'Phase 2 — Blends', 3: 'Phase 3 — Final blends', 4: 'Phase 4 — Digraphs', 5: 'Phase 5 — Long vowels' };
+    const sightLabels = { strong: 'Strong', developing: 'Developing', early: 'Early', none: 'Not yet assessed' };
+    const storyLabels = { 'not-ready': 'Not yet ready', sentence: 'Sentence level', paragraph: 'Paragraph level' };
+
+    function _strengthClass(score) {
+      if (score >= 0.7) return 'pt-result-row__value--strong';
+      if (score >= 0.4) return 'pt-result-row__value--moderate';
+      return 'pt-result-row__value--weak';
+    }
+    function _pct(score) { return Math.round(score * 100) + '%'; }
+
     renderFrame(`
       <div class="pt-result">
         <div class="pt-result-icon">🎯</div>
         <h2 class="pt-result-title">Placement complete</h2>
         <p class="pt-result-desc"><strong>${bandLabels[result.readingBand]}</strong></p>
-        <p class="pt-result-grammar">Start focus: <strong>${result.recommendedHomePath.slice(0, 3).join(' → ')}</strong></p>
+
+        <div class="pt-result-summary" aria-label="Placement summary for parents">
+          <div class="pt-result-row">
+            <span class="pt-result-row__label">Sound awareness</span>
+            <span class="pt-result-row__value ${_strengthClass(avgSoundAwareness)}">${_pct(avgSoundAwareness)}</span>
+          </div>
+          <div class="pt-result-row">
+            <span class="pt-result-row__label">Decoding phase</span>
+            <span class="pt-result-row__value">${phaseLabels[result.phonicsPhase] || 'Phase 1'}</span>
+          </div>
+          <div class="pt-result-row">
+            <span class="pt-result-row__label">Sight words</span>
+            <span class="pt-result-row__value">${sightLabels[result.sightWordBand]}</span>
+          </div>
+          <div class="pt-result-row">
+            <span class="pt-result-row__label">Reading readiness</span>
+            <span class="pt-result-row__value">${storyLabels[result.storyReadiness]}</span>
+          </div>
+          <div class="pt-result-row">
+            <span class="pt-result-row__label">Next focus</span>
+            <span class="pt-result-row__value">${result.recommendedHomePath.slice(0, 3).join(' → ')}</span>
+          </div>
+        </div>
+
         <button class="btn btn--primary btn--xl pt-start-btn" id="pt-start-btn">Start learning →</button>
       </div>
     `, 'Placement Result');
