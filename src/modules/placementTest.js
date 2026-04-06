@@ -13,6 +13,7 @@
 import { audio } from './audio.js';
 
 const GATE_A_ITEMS = [
+  // ── Oral / Basic Response (teacher-scale) ──────────────────────────────────
   {
     id: 'a-or-1',
     gate: 'A',
@@ -21,6 +22,15 @@ const GATE_A_ITEMS = [
     title: 'Basic oral response',
     prompt: 'Learner responds to name/questions with understandable speech.',
   },
+  {
+    id: 'a-or-2',
+    gate: 'A',
+    section: 'oral',
+    kind: 'teacher-scale',
+    title: 'Basic oral response',
+    prompt: 'Learner follows a 2-step instruction (e.g. "Clap twice, then stand up").',
+  },
+  // ── Vocabulary (picture-choice, no print) ─────────────────────────────────
   {
     id: 'a-vocab-1',
     gate: 'A',
@@ -38,6 +48,39 @@ const GATE_A_ITEMS = [
     ],
   },
   {
+    id: 'a-vocab-2',
+    gate: 'A',
+    section: 'vocab',
+    kind: 'picture-choice',
+    title: 'Vocabulary',
+    prompt: 'Tap the apple.',
+    speak: 'apple',
+    correct: 'apple',
+    options: [
+      { id: 'apple', emoji: '🍎', label: 'Apple' },
+      { id: 'ball', emoji: '⚽', label: 'Ball' },
+      { id: 'tree', emoji: '🌳', label: 'Tree' },
+      { id: 'shoe', emoji: '👟', label: 'Shoe' },
+    ],
+  },
+  {
+    id: 'a-vocab-3',
+    gate: 'A',
+    section: 'vocab',
+    kind: 'picture-choice',
+    title: 'Vocabulary',
+    prompt: 'Tap the star.',
+    speak: 'star',
+    correct: 'star',
+    options: [
+      { id: 'star', emoji: '⭐', label: 'Star' },
+      { id: 'cloud', emoji: '☁️', label: 'Cloud' },
+      { id: 'flower', emoji: '🌸', label: 'Flower' },
+      { id: 'leaf', emoji: '🍃', label: 'Leaf' },
+    ],
+  },
+  // ── First Sound (picture-choice) ──────────────────────────────────────────
+  {
     id: 'a-first-1',
     gate: 'A',
     section: 'firstSound',
@@ -53,6 +96,39 @@ const GATE_A_ITEMS = [
       { id: 'bus', emoji: '🚌', label: 'Bus' },
     ],
   },
+  {
+    id: 'a-first-2',
+    gate: 'A',
+    section: 'firstSound',
+    kind: 'picture-choice',
+    title: 'First sound',
+    prompt: 'Which picture starts with /s/?',
+    speak: 'sock',
+    correct: 'sock',
+    options: [
+      { id: 'sock', emoji: '🧦', label: 'Sock' },
+      { id: 'duck', emoji: '🦆', label: 'Duck' },
+      { id: 'fish', emoji: '🐟', label: 'Fish' },
+      { id: 'bear', emoji: '🐻', label: 'Bear' },
+    ],
+  },
+  {
+    id: 'a-first-3',
+    gate: 'A',
+    section: 'firstSound',
+    kind: 'picture-choice',
+    title: 'First sound',
+    prompt: 'Which picture starts with /b/?',
+    speak: 'ball',
+    correct: 'ball',
+    options: [
+      { id: 'ball', emoji: '⚽', label: 'Ball' },
+      { id: 'cat', emoji: '🐱', label: 'Cat' },
+      { id: 'tree', emoji: '🌳', label: 'Tree' },
+      { id: 'star', emoji: '⭐', label: 'Star' },
+    ],
+  },
+  // ── Last Sound (picture-choice) ───────────────────────────────────────────
   {
     id: 'a-last-1',
     gate: 'A',
@@ -70,6 +146,39 @@ const GATE_A_ITEMS = [
     ],
   },
   {
+    id: 'a-last-2',
+    gate: 'A',
+    section: 'lastSound',
+    kind: 'picture-choice',
+    title: 'Last sound',
+    prompt: 'Which picture ends with /g/?',
+    speak: 'dog',
+    correct: 'dog',
+    options: [
+      { id: 'dog', emoji: '🐶', label: 'Dog' },
+      { id: 'cat', emoji: '🐱', label: 'Cat' },
+      { id: 'hen', emoji: '🐔', label: 'Hen' },
+      { id: 'bee', emoji: '🐝', label: 'Bee' },
+    ],
+  },
+  {
+    id: 'a-last-3',
+    gate: 'A',
+    section: 'lastSound',
+    kind: 'picture-choice',
+    title: 'Last sound',
+    prompt: 'Which picture ends with /n/?',
+    speak: 'sun',
+    correct: 'sun',
+    options: [
+      { id: 'sun', emoji: '☀️', label: 'Sun' },
+      { id: 'frog', emoji: '🐸', label: 'Frog' },
+      { id: 'pig', emoji: '🐷', label: 'Pig' },
+      { id: 'duck', emoji: '🦆', label: 'Duck' },
+    ],
+  },
+  // ── Middle Sound (picture-choice) ─────────────────────────────────────────
+  {
     id: 'a-middle-1',
     gate: 'A',
     section: 'middleSound',
@@ -86,6 +195,39 @@ const GATE_A_ITEMS = [
     ],
   },
   {
+    id: 'a-middle-2',
+    gate: 'A',
+    section: 'middleSound',
+    kind: 'picture-choice',
+    title: 'Middle sound',
+    prompt: 'Which picture has /i/ in the middle?',
+    speak: 'pig',
+    correct: 'pig',
+    options: [
+      { id: 'pig', emoji: '🐷', label: 'Pig' },
+      { id: 'dog', emoji: '🐶', label: 'Dog' },
+      { id: 'cup', emoji: '🥤', label: 'Cup' },
+      { id: 'hen', emoji: '🐔', label: 'Hen' },
+    ],
+  },
+  {
+    id: 'a-middle-3',
+    gate: 'A',
+    section: 'middleSound',
+    kind: 'picture-choice',
+    title: 'Middle sound',
+    prompt: 'Which picture has /o/ in the middle?',
+    speak: 'dog',
+    correct: 'dog',
+    options: [
+      { id: 'dog', emoji: '🐶', label: 'Dog' },
+      { id: 'cat', emoji: '🐱', label: 'Cat' },
+      { id: 'bee', emoji: '🐝', label: 'Bee' },
+      { id: 'pig', emoji: '🐷', label: 'Pig' },
+    ],
+  },
+  // ── Letter-Sound Knowledge (teacher-scale) ────────────────────────────────
+  {
     id: 'a-letters-1',
     gate: 'A',
     section: 'letterSounds',
@@ -93,6 +235,15 @@ const GATE_A_ITEMS = [
     title: 'Letter-sound knowledge',
     prompt: 'Teacher score: learner identifies common letter sounds in an adult-led check (no independent print demand).',
   },
+  {
+    id: 'a-letters-2',
+    gate: 'A',
+    section: 'letterSounds',
+    kind: 'teacher-scale',
+    title: 'Letter-sound knowledge',
+    prompt: 'Teacher score: learner identifies vowel sounds (a, e, i, o, u) when letter cards are shown.',
+  },
+  // ── Oral Blending (picture-choice) ────────────────────────────────────────
   {
     id: 'a-blend-1',
     gate: 'A',
@@ -109,17 +260,69 @@ const GATE_A_ITEMS = [
       { id: 'car', emoji: '🚗', label: 'Car' },
     ],
   },
+  {
+    id: 'a-blend-2',
+    gate: 'A',
+    section: 'oralBlending',
+    kind: 'picture-choice',
+    title: 'Oral blending',
+    prompt: 'Listen: /d/ /o/ /g/. Tap the word.',
+    speak: 'dog',
+    correct: 'dog',
+    options: [
+      { id: 'dog', emoji: '🐶', label: 'Dog' },
+      { id: 'log', emoji: '🪵', label: 'Log' },
+      { id: 'fog', emoji: '🌫️', label: 'Fog' },
+      { id: 'frog', emoji: '🐸', label: 'Frog' },
+    ],
+  },
+  {
+    id: 'a-blend-3',
+    gate: 'A',
+    section: 'oralBlending',
+    kind: 'picture-choice',
+    title: 'Oral blending',
+    prompt: 'Listen: /s/ /u/ /n/. Tap the word.',
+    speak: 'sun',
+    correct: 'sun',
+    options: [
+      { id: 'sun', emoji: '☀️', label: 'Sun' },
+      { id: 'bun', emoji: '🍞', label: 'Bun' },
+      { id: 'run', emoji: '🏃', label: 'Run' },
+      { id: 'fun', emoji: '🎉', label: 'Fun' },
+    ],
+  },
 ];
 
 const GATE_B_ITEMS = [
+  // ── Phase 1: CVC short vowels ─────────────────────────────────────────────
   { id: 'b-cvc-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'CVC decoding', prompt: 'Tap: cat', speak: 'cat', correct: 'cat', phase: 1, group: 'cvc-a', options: ['cat', 'cut', 'cot', 'cap'] },
   { id: 'b-cvc-2', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: bed', speak: 'bed', correct: 'bed', phase: 1, group: 'cvc-e', options: ['bad', 'bid', 'bed', 'bud'] },
+  { id: 'b-cvc-3', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: sit', speak: 'sit', correct: 'sit', phase: 1, group: 'cvc-i', options: ['sit', 'set', 'sat', 'bit'] },
+  { id: 'b-cvc-4', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: dog', speak: 'dog', correct: 'dog', phase: 1, group: 'cvc-o', options: ['dog', 'dig', 'dug', 'hog'] },
+  // ── Phase 2: Initial blends (CCVC) ────────────────────────────────────────
   { id: 'b-blend-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: flag', speak: 'flag', correct: 'flag', phase: 2, group: 'ccvc-a', options: ['flag', 'flap', 'frog', 'plug'] },
+  { id: 'b-blend-2', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: frog', speak: 'frog', correct: 'frog', phase: 2, group: 'ccvc-o', options: ['frog', 'fog', 'from', 'grog'] },
+  { id: 'b-blend-3', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: step', speak: 'step', correct: 'step', phase: 2, group: 'ccvc-e', options: ['step', 'stem', 'stop', 'skip'] },
+  // ── Phase 3: Final blends (CVCC) ──────────────────────────────────────────
   { id: 'b-cvcc-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: best', speak: 'best', correct: 'best', phase: 3, group: 'cvcc-e', options: ['best', 'beast', 'bent', 'belt'] },
+  { id: 'b-cvcc-2', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: lamp', speak: 'lamp', correct: 'lamp', phase: 3, group: 'cvcc-a', options: ['lamp', 'lame', 'camp', 'damp'] },
+  { id: 'b-cvcc-3', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: gift', speak: 'gift', correct: 'gift', phase: 3, group: 'cvcc-i', options: ['gift', 'gist', 'lift', 'sift'] },
+  // ── Phase 4: Digraphs ─────────────────────────────────────────────────────
   { id: 'b-digraph-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: ship', speak: 'ship', correct: 'ship', phase: 4, group: 'digraphs', options: ['chip', 'shop', 'ship', 'slip'] },
+  { id: 'b-digraph-2', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: chin', speak: 'chin', correct: 'chin', phase: 4, group: 'digraphs', options: ['chin', 'thin', 'shin', 'win'] },
+  { id: 'b-digraph-3', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: that', speak: 'that', correct: 'that', phase: 4, group: 'digraphs', options: ['that', 'chat', 'flat', 'hat'] },
+  // ── Phase 5: Long vowels ──────────────────────────────────────────────────
   { id: 'b-long-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: cake', speak: 'cake', correct: 'cake', phase: 5, group: 'long-a', options: ['cake', 'cane', 'cook', 'kick'] },
+  { id: 'b-long-2', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: kite', speak: 'kite', correct: 'kite', phase: 5, group: 'long-i', options: ['kite', 'kit', 'bite', 'site'] },
+  { id: 'b-long-3', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: home', speak: 'home', correct: 'home', phase: 5, group: 'long-o', options: ['home', 'hone', 'some', 'come'] },
+  // ── Sight words ───────────────────────────────────────────────────────────
   { id: 'b-sight-1', gate: 'B', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: said', speak: 'said', correct: 'said', options: ['seed', 'said', 'sad', 'sail'] },
   { id: 'b-sight-2', gate: 'B', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: the', speak: 'the', correct: 'the', options: ['the', 'then', 'them', 'that'] },
+  { id: 'b-sight-3', gate: 'B', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: was', speak: 'was', correct: 'was', options: ['was', 'saw', 'has', 'gas'] },
+  { id: 'b-sight-4', gate: 'B', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: they', speak: 'they', correct: 'they', options: ['they', 'them', 'then', 'the'] },
+  { id: 'b-sight-5', gate: 'B', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: have', speak: 'have', correct: 'have', options: ['have', 'gave', 'live', 'cave'] },
+  { id: 'b-sight-6', gate: 'B', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: look', speak: 'look', correct: 'look', options: ['look', 'took', 'book', 'good'] },
 ];
 
 const GATE_C_ITEMS = [
