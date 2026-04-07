@@ -316,6 +316,25 @@ class Progress {
   }
 
   /**
+   * Get words that are due for spaced-repetition review.
+   * @returns {import('../data/words.js').Word[]}
+   */
+  getReviewDueWords() {
+    const stats = store.get('wordStats') || {};
+    const now = new Date();
+    const dueWords = [];
+
+    for (const word of WORDS) {
+      const s = stats[word.id];
+      if (!s || !s.nextReviewDate) continue;
+      if (new Date(s.nextReviewDate) <= now) {
+        dueWords.push(word);
+      }
+    }
+    return dueWords;
+  }
+
+  /**
    * Export progress as CSV string.
    * @returns {string}
    */

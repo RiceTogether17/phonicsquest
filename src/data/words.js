@@ -30,7 +30,7 @@ export const WORD_GROUPS = {
   'short-o':  { label: 'Short O',  color: '#22c55e', bg: '#dcfce7', icon: '🐙', audioFile: 'o' },
   'short-u':  { label: 'Short U',  color: '#3b82f6', bg: '#dbeafe', icon: '☂️', audioFile: 'u' },
   'long-a':   { label: 'Long A',   color: '#a855f7', bg: '#f3e8ff', icon: '🎂', audioFile: 'long_a' },
-  'long-e':   { label: 'Long E',   color: '#ec4899', bg: '#fce7f3', icon: '🦁', audioFile: 'long_e' },
+  'long-e':   { label: 'Long E',   color: '#ec4899', bg: '#fce7f3', icon: '🐝', audioFile: 'long_e' },
   'long-i':   { label: 'Long I',   color: '#14b8a6', bg: '#ccfbf1', icon: '🪁', audioFile: 'long_i' },
   'long-o':   { label: 'Long O',   color: '#f59e0b', bg: '#fef3c7', icon: '🏠', audioFile: 'long_o' },
   'long-u':   { label: 'Long U',   color: '#6366f1', bg: '#e0e7ff', icon: '🎵', audioFile: 'long_u' },

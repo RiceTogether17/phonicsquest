@@ -85,10 +85,15 @@ class App {
     /** @type {number} correct answers in current daily session */
     this._dailyCorrect = 0;
 
+    /** @type {number} words completed in current session */
+    this._sessionWordCount = 0;
+
     /** @type {boolean} hint used for current word (no heart loss on 1st wrong if unused) */
     this._hintUsed = false;
     /** @type {number} wrong attempts on current word (for two-strike system) */
     this._wrongStrikes = 0;
+    /** @type {number} progressive hint tier for current word (0 = none, 1-3 = tiers) */
+    this._hintTier = 0;
 
     /**
      * Guard flag – prevents _handleResult from being called twice for the
@@ -143,6 +148,7 @@ class App {
 
     this._updateDailyBanner();
     this._updateQuestBanners();
+    this._updateReviewBanner();
     this._renderGuidedJourney();
 
     console.log('[PhonicsQuest] App initialized');
@@ -225,6 +231,8 @@ class App {
     // Back button
     this._els.btnBack?.addEventListener('click', () => {
       this._cleanupMode();
+      this._sessionWordCount = 0;
+      this._hideGameMascot();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
@@ -577,6 +585,21 @@ class App {
       modalManager,
     });
 
+    // Review words button
+    document.getElementById('btn-review-words')?.addEventListener('click', () => {
+      this._startReviewSession();
+    });
+
+    // Extra Practice collapsible toggle
+    document.getElementById('extra-practice-toggle')?.addEventListener('click', () => {
+      const content = document.getElementById('extra-practice-content');
+      const toggle = document.getElementById('extra-practice-toggle');
+      if (!content || !toggle) return;
+      const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!isExpanded));
+      content.classList.toggle('home-extra-content--collapsed', isExpanded);
+    });
+
     // Mascot tap (random cheer)
     document.getElementById('mascot-trigger')?.addEventListener('click', () => {
       mascot.clap();
@@ -646,16 +669,30 @@ class App {
     // Preload audio
     audio.preloadWord(this._currentWord);
 
+    // Increment session progress counter
+    this._sessionWordCount++;
+    const progressEl = document.getElementById('game-progress-count');
+    if (progressEl) {
+      progressEl.textContent = `Word ${this._sessionWordCount}`;
+    }
+
     // Reset per-word state (hint, strikes, and the double-submit guard).
     this._hintUsed = false;
+    this._hintTier = 0;
     this._wrongStrikes = 0;
     this._resultProcessing = false;
-    this._els.btnHint?.classList.remove('used');
-    this._els.btnHint?.removeAttribute('aria-disabled');
+    if (this._els.btnHint) {
+      this._els.btnHint.classList.remove('used');
+      this._els.btnHint.removeAttribute('aria-disabled');
+      this._els.btnHint.textContent = '💡 Hint';
+    }
 
     // Switch to game screen
     this._showScreen(SCREENS.GAME);
     mascot.think();
+
+    // Show floating mascot in game
+    this._setGameMascot('thinking');
 
     // Set up the mode
     const mode = MODES[this._mode];
@@ -710,6 +747,7 @@ class App {
       // Celebrations
       mascot.celebrate(reward.levelUp);
       mascot.setResultState(reward.levelUp ? 'trophy' : 'confetti');
+      this._setGameMascot('celebrate');
 
       if (reward.levelUp) {
         celebrateLevelUp();
@@ -745,6 +783,7 @@ class App {
       setTimeout(() => phonemeRow?.classList.remove('phoneme-row--shake'), 500);
 
       this._wrongStrikes++;
+      this._setGameMascot('encourage');
 
       // Two-strike system: first wrong with no hint used = gentle nudge, no heart loss
       if (this._wrongStrikes === 1 && !this._hintUsed) {
@@ -819,7 +858,35 @@ class App {
     // Refresh quest banners and guided journey when returning home
     if (screenId === SCREENS.HOME) {
       this._updateQuestBanners();
+      this._updateReviewBanner();
       this._renderGuidedJourney();
+    }
+  }
+
+  /** Set the floating game mascot state */
+  _setGameMascot(state) {
+    const el = document.getElementById('game-mascot');
+    if (!el) return;
+    const src = {
+      thinking: 'giri-thinking.png',
+      celebrate: 'giri-celebrate.png',
+      encourage: 'giri-encourage.png',
+      clap: 'giri-clap-frame.png',
+    }[state] || 'giri-neutral.png';
+    const base = import.meta.env.BASE_URL;
+    el.innerHTML = `<img src="${base}images/mascot/${src}" alt="" width="48" height="48" style="object-fit:contain"/>`;
+    el.classList.add('game-mascot--visible');
+    el.classList.remove('game-mascot--celebrate');
+    if (state === 'celebrate' || state === 'clap') {
+      el.classList.add('game-mascot--celebrate');
+    }
+  }
+
+  /** Hide the floating game mascot */
+  _hideGameMascot() {
+    const el = document.getElementById('game-mascot');
+    if (el) {
+      el.classList.remove('game-mascot--visible', 'game-mascot--celebrate');
     }
   }
 
@@ -874,32 +941,62 @@ class App {
   }
 
   /**
-   * Give a hint: play the first phoneme of the current word.
-   * Marks hint as used so the two-strike grace no longer applies.
+   * Give a progressive hint — three tiers of scaffolding:
+   *  Tier 1: Highlight the vowel type (short/long) below the phoneme row
+   *  Tier 2: Play the first phoneme sound and highlight the first tile
+   *  Tier 3: Reveal a hidden grapheme or play the full word slowly
+   * Each tap advances the tier. After tier 3 the button is disabled.
    */
   async _giveHint() {
     if (!this._currentWord) return;
-    if (this._hintUsed) return; // Only one hint per word
 
-    this._hintUsed = true;
-
-    // Mark button as used
+    this._hintTier++;
+    const word = this._currentWord;
     const btn = this._els.btnHint;
-    if (btn) {
-      btn.classList.add('used');
-      btn.setAttribute('aria-disabled', 'true');
+
+    if (this._hintTier === 1) {
+      // Tier 1: Show vowel type hint
+      this._hintUsed = true;
+      const vowelIdx = word.types.findIndex(t => t === 'sv' || t === 'lv');
+      if (vowelIdx >= 0) {
+        const vowelType = word.types[vowelIdx] === 'sv' ? 'short' : 'long';
+        this._showToast(`Hint: The vowel makes a ${vowelType} sound`, 'info');
+        // Briefly highlight the vowel tile
+        const tiles = document.querySelectorAll('#phoneme-row .phoneme-tile');
+        if (tiles[vowelIdx]) {
+          tiles[vowelIdx].classList.add('active');
+          setTimeout(() => tiles[vowelIdx].classList.remove('active'), 800);
+        }
+      } else {
+        // No clear vowel — skip to tier 2
+        this._hintTier++;
+      }
+      if (btn) btn.textContent = '💡 Hint 2';
     }
 
-    // Play first phoneme sound
-    const firstGrapheme = this._currentWord.graphemes[0];
-    const firstType     = this._currentWord.types[0];
-    await audio.speakPhoneme(firstGrapheme, firstType);
+    if (this._hintTier === 2) {
+      // Tier 2: Play the first phoneme and highlight it
+      const firstGrapheme = word.graphemes[0];
+      const firstType     = word.types[0];
+      await audio.speakPhoneme(firstGrapheme, firstType);
 
-    // Highlight the first phoneme tile briefly
-    const firstTile = document.querySelector('#phoneme-row .phoneme-tile');
-    if (firstTile) {
-      firstTile.classList.add('active');
-      setTimeout(() => firstTile.classList.remove('active'), 600);
+      const firstTile = document.querySelector('#phoneme-row .phoneme-tile');
+      if (firstTile) {
+        firstTile.classList.add('active');
+        setTimeout(() => firstTile.classList.remove('active'), 800);
+      }
+      if (btn) btn.textContent = '💡 Hint 3';
+
+    } else if (this._hintTier >= 3) {
+      // Tier 3: Play the full word slowly
+      await audio.speakWord(word.word);
+
+      // Mark button as fully used
+      if (btn) {
+        btn.classList.add('used');
+        btn.setAttribute('aria-disabled', 'true');
+        btn.textContent = '💡 Used';
+      }
     }
   }
 
@@ -2048,8 +2145,11 @@ class App {
               </div>
               <div class="bp-stage-desc">${stage.description}</div>
               ${isUnlocked ? `
-                <div class="bp-stage-mastery-wrap">
-                  <div class="bp-stage-mastery-bar" style="width:${pct}%"></div>
+                <div class="bp-stage-mastery-row">
+                  <div class="bp-stage-mastery-wrap">
+                    <div class="bp-stage-mastery-bar" style="width:${pct}%"></div>
+                  </div>
+                  <span class="bp-stage-pct${pct >= 80 ? ' bp-stage-pct--mastered' : ''}">${pct}%</span>
                 </div>` : ''}
             </div>
           </button>`;
@@ -2100,6 +2200,38 @@ class App {
     this._mode = 'blend';
     store.set('currentGroup', null);
     this._showToast(`Today's 5 words – go! ⚡`, 'info');
+    this._startGame();
+  }
+
+  /** Update the review words banner */
+  _updateReviewBanner() {
+    const dueWords = progress.getReviewDueWords();
+    const banner = document.getElementById('review-banner');
+    const sub = document.getElementById('review-banner-sub');
+    if (!banner) return;
+
+    if (dueWords.length > 0) {
+      banner.style.display = '';
+      if (sub) sub.textContent = `${dueWords.length} word${dueWords.length === 1 ? '' : 's'} due for review`;
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  /** Start a review session with SRS-due words */
+  _startReviewSession() {
+    const dueWords = progress.getReviewDueWords();
+    if (dueWords.length === 0) {
+      this._showToast('No words due for review right now!', 'info');
+      return;
+    }
+    // Use the daily mode infrastructure for review queue
+    this._dailyMode = true;
+    this._dailyWordsQueue = dueWords.slice(0, 10); // Cap at 10 per session
+    this._dailyCorrect = 0;
+    this._mode = 'blend';
+    store.set('currentGroup', null);
+    this._showToast(`Review time! ${this._dailyWordsQueue.length} words to practise 🔄`, 'info');
     this._startGame();
   }
 

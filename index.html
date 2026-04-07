@@ -116,6 +116,20 @@
         <!--   (fully rendered by app.js _renderGuidedJourney based on profile)      -->
         <div id="guided-journey-section" aria-label="Guided learning path"></div>
 
+        <!-- Review Words Due (SRS) -->
+        <div class="review-banner" id="review-banner" style="display:none" role="status">
+          <button class="stories-banner stories-banner--green" id="btn-review-words" aria-label="Review words due for practice">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2rem;line-height:1" aria-hidden="true">🔄</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title">🔄 Review Time</span>
+              <span class="stories-banner-sub" id="review-banner-sub">0 words due for review</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+        </div>
+
         <!-- ② Daily Goal progress strip -->
         <div class="daily-goal" role="status" aria-label="Daily goal progress">
           <span class="goal-label">Today</span>
@@ -283,10 +297,15 @@
 
         <!-- ④ EXTRA PRACTICE — clearly labelled as bonus, after main lesson -->
         <div class="home-section home-extra-section" id="home-extra-section">
-          <div class="home-section-header">
-            <p class="home-section-heading">Extra Practice</p>
-            <p class="home-section-sub">Use these <em>after</em> your main lesson activities above</p>
-          </div>
+          <button class="home-section-header home-section-header--collapsible" id="extra-practice-toggle" aria-expanded="true" aria-controls="extra-practice-content">
+            <div>
+              <p class="home-section-heading">Extra Practice</p>
+              <p class="home-section-sub">Use these <em>after</em> your main lesson activities above</p>
+            </div>
+            <span class="home-section-chevron" aria-hidden="true">▾</span>
+          </button>
+
+          <div id="extra-practice-content" class="home-extra-content">
 
           <!-- Spin Wheel (random activity selector) -->
           <div class="home-spin-section">
@@ -347,12 +366,18 @@
             </button>
 
           </div><!-- end home-tools-section -->
+          </div><!-- end extra-practice-content -->
         </div><!-- end home-extra-section -->
 
       </section>
 
       <!-- SCREEN: GAME -->
       <section class="screen" id="screen-game" aria-label="Game" aria-live="polite">
+
+        <!-- Session Progress -->
+        <div class="game-progress" id="game-progress" role="status" aria-label="Session progress">
+          <span class="game-progress-count" id="game-progress-count"></span>
+        </div>
 
         <!-- Word Stage -->
         <div class="word-stage" id="word-stage">
@@ -392,6 +417,9 @@
         </button>
 
         <div class="speech-bubble" id="speech-bubble" aria-live="polite" hidden></div>
+
+        <!-- Floating mascot reaction during gameplay -->
+        <div class="game-mascot" id="game-mascot" aria-hidden="true"></div>
 
         <button class="back-btn" id="btn-back" aria-label="Back to menu">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16" aria-hidden="true">
