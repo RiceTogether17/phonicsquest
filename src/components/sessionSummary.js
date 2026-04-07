@@ -23,7 +23,7 @@ import { getActiveProfile } from '../modules/profiles.js';
  *   onClose:   () => void,
  * }} opts
  */
-export function showSessionSummary({ xpEarned, wordsCount, streak, newBadges = [], onClose }) {
+export function showSessionSummary({ xpEarned, wordsCount, firstTryCount = 0, streak, newBadges = [], onClose }) {
   const container = document.getElementById('screen-session-summary');
   if (!container) { onClose(); return; }
 
@@ -65,6 +65,13 @@ export function showSessionSummary({ xpEarned, wordsCount, streak, newBadges = [
        </div>`
     : '';
 
+  // First-try rate: colour-code as a quality signal
+  const firstTryPct    = wordsCount > 0 ? Math.round((firstTryCount / wordsCount) * 100) : 0;
+  const firstTryColour = firstTryPct >= 70 ? '#22c55e' : firstTryPct >= 50 ? '#f59e0b' : '#ef4444';
+  const firstTryLabel  = firstTryPct >= 70 ? 'Decoded independently'
+                       : firstTryPct >= 50 ? 'Mostly independent'
+                       : 'Needs more practice';
+
   const statsHtml = `
     <div class="ss-stats" aria-label="Today's stats">
       <div class="ss-stat">
@@ -73,22 +80,28 @@ export function showSessionSummary({ xpEarned, wordsCount, streak, newBadges = [
         <span class="ss-stat-label">XP earned</span>
       </div>
       <div class="ss-stat">
-        <span class="ss-stat-icon" aria-hidden="true">📚</span>
+        <span class="ss-stat-icon" aria-hidden="true">📖</span>
         <span class="ss-stat-value">${wordsCount}</span>
-        <span class="ss-stat-label">word${wordsCount !== 1 ? 's' : ''} practised</span>
+        <span class="ss-stat-label">word${wordsCount !== 1 ? 's' : ''} decoded</span>
+      </div>
+      <div class="ss-stat ss-stat--quality" aria-label="${firstTryLabel}: ${firstTryCount} of ${wordsCount} words">
+        <span class="ss-stat-icon" aria-hidden="true">🎯</span>
+        <span class="ss-stat-value" style="color:${firstTryColour}">${firstTryCount}/${wordsCount}</span>
+        <span class="ss-stat-label">first try</span>
       </div>
       <div class="ss-stat">
         <span class="ss-stat-icon" aria-hidden="true">🏆</span>
         <span class="ss-stat-value">Lv ${level}</span>
         <span class="ss-stat-label">current level</span>
       </div>
-    </div>`;
+    </div>
+    <p class="ss-quality-label" style="color:${firstTryColour};font-size:0.75rem;font-weight:700;margin:0 0 12px;text-align:center;">${firstTryLabel}</p>`;
 
   container.innerHTML = `
     <div class="ss-wrapper" role="main" aria-label="Session complete">
       <div class="ss-avatar" aria-hidden="true">${avatar}</div>
       <h1 class="ss-heading">${heading}</h1>
-      <p class="ss-subheading">Daily goal complete! (${dailyGoal} activities done)</p>
+      <p class="ss-subheading">Reading session complete — ${wordsCount} word${wordsCount !== 1 ? 's' : ''} practised today!</p>
 
       ${statsHtml}
       ${streakHtml}

@@ -224,18 +224,33 @@ export function getDailyPlan() {
 }
 
 export function getLearnerSummaryChips() {
-  const placement = _placementProfile();
+  const placement   = _placementProfile();
   const readingBand = _band();
-  const chips = [];
+  const gm          = normalizeGroupMasteryMap(store.get('groupMastery') || {});
+  const chips       = [];
 
-  chips.push(`Reading stage: ${readingBand.replace('-', ' ')}`);
+  // Outcome-focused stage label
+  const stageLabels = {
+    'pre-reader':        'Learning sounds & letters',
+    'emerging-decoder':  'Decoding simple words',
+    'developing-reader': 'Reading short stories',
+    'reader':            'Reading fluently',
+  };
+  chips.push(stageLabels[readingBand] || `Stage: ${readingBand.replace(/-/g, ' ')}`);
 
-  if (placement?.phonicsPhase) chips.push(`Phonics phase ${placement.phonicsPhase}`);
-  if (placement?.sightWordBand) chips.push(`Sight words: ${placement.sightWordBand}`);
-  if (placement?.storyReadiness) chips.push(`Story readiness: ${placement.storyReadiness}`);
+  // Mastered phonics groups (accuracy > 75%)
+  const masteredGroups = SHORT_VOWEL_CANONICAL_GROUPS.filter(g => (gm[g] ?? 0) >= 0.75);
+  if (masteredGroups.length > 0) {
+    const groupLabels = masteredGroups.map(g => VOWEL_LABELS[g] || g);
+    chips.push(`Can decode: ${groupLabels.slice(0, 2).join(', ')}${groupLabels.length > 2 ? '…' : ''}`);
+  }
 
-  if (readingBand === 'reader') chips.push('Grammar pathway enabled');
-  else chips.push('Decoding-first pathway active');
+  // Story/sentence readiness
+  if (placement?.storyReadiness === 'ready') chips.push('Ready for stories');
+  else if (placement?.sentenceReady) chips.push('Ready for sentences');
+
+  // Pathway
+  if (readingBand === 'reader') chips.push('Grammar pathway unlocked');
 
   return chips.slice(0, 4);
 }

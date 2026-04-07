@@ -132,6 +132,9 @@ const DEFAULT_STATE = {
   sessionXpToday: 0,
   // Words seen in the current calendar day (IDs, capped at 50).
   sessionWordsToday: [],
+  // Words decoded correctly on the FIRST attempt (no wrong strikes, no hint used).
+  // Resets each day alongside sessionWordsToday.
+  sessionFirstTryToday: 0,
 
   // ── Weekly recap ────────────────────────────────────────────────────────
   // ISO date string of last time the weekly recap was shown.
@@ -488,6 +491,7 @@ class Store {
         dailyDone: 0,
         sessionXpToday: 0,
         sessionWordsToday: [],
+        sessionFirstTryToday: 0,
       });
     }
   }
