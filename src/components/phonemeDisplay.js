@@ -126,6 +126,14 @@ export function renderPhonemes(word, container, opts = {}) {
 export function renderWordImage(word, emojiEl, show = true) {
   if (!emojiEl) return;
   emojiEl.textContent = show ? word.emoji : '';
+  // Add accessible label so screen readers describe the illustration
   const wrap = emojiEl.closest('.word-image-wrap');
-  if (wrap) wrap.style.display = show ? '' : 'none';
+  if (wrap) {
+    wrap.style.display = show ? '' : 'none';
+    if (show) {
+      wrap.setAttribute('aria-hidden', 'false');
+      wrap.setAttribute('aria-label', `Picture of ${word.word}`);
+      wrap.setAttribute('role', 'img');
+    }
+  }
 }

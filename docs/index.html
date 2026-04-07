@@ -21,10 +21,10 @@
   <!-- Styles -->
 
   <title>PhonicsQuest</title>
-  <script type="module" crossorigin src="/phonicsquest/assets/index-BBSFGvki.js"></script>
+  <script type="module" crossorigin src="/phonicsquest/assets/index-BO4tJ9jj.js"></script>
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/gsap-C8pce-KX.js">
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/chartjs-BR_H7_9u.js">
-  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-C3BKS9Wg.css">
+  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-DOP0lvt9.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -119,6 +119,20 @@
         <!--   (fully rendered by app.js _renderGuidedJourney based on profile)      -->
         <div id="guided-journey-section" aria-label="Guided learning path"></div>
 
+        <!-- Review Words Due (SRS) -->
+        <div class="review-banner" id="review-banner" style="display:none" role="status">
+          <button class="stories-banner stories-banner--green" id="btn-review-words" aria-label="Review words due for practice">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2rem;line-height:1" aria-hidden="true">🔄</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title">🔄 Review Time</span>
+              <span class="stories-banner-sub" id="review-banner-sub">0 words due for review</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+        </div>
+
         <!-- ② Daily Goal progress strip -->
         <div class="daily-goal" role="status" aria-label="Daily goal progress">
           <span class="goal-label">Today</span>
@@ -205,6 +219,28 @@
             <span class="stories-banner-arrow">→</span>
           </button>
 
+          <button class="stories-banner stories-banner--purple" id="btn-grammar-mcq" aria-label="Open Grammar MCQ Quest">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🧠</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title">🧠 Grammar MCQ</span>
+              <span class="stories-banner-sub">Paper-style grammar multiple-choice P1–P6</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+
+          <button class="stories-banner stories-banner--teal" id="btn-vocab-mcq" aria-label="Open Vocabulary MCQ Quest">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">📖</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title">📖 Vocabulary MCQ</span>
+              <span class="stories-banner-sub">Paper-style vocabulary multiple-choice P1–P6</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+
           <button class="stories-banner stories-banner--purple" id="btn-cloze-castle" aria-label="Open Cloze Castle Quest">
             <span class="stories-banner-mascot">
               <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🏰</span>
@@ -249,14 +285,30 @@
             <span class="stories-banner-arrow">→</span>
           </button>
 
+          <button class="stories-banner stories-banner--gold" id="btn-paper-mode" aria-label="Open Paper Mode">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">📝</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title">📝 Paper Mode</span>
+              <span class="stories-banner-sub">Exam-style section playlists by level</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+
         </div><!-- end home-quests-section -->
 
         <!-- ④ EXTRA PRACTICE — clearly labelled as bonus, after main lesson -->
         <div class="home-section home-extra-section" id="home-extra-section">
-          <div class="home-section-header">
-            <p class="home-section-heading">Extra Practice</p>
-            <p class="home-section-sub">Use these <em>after</em> your main lesson activities above</p>
-          </div>
+          <button class="home-section-header home-section-header--collapsible" id="extra-practice-toggle" aria-expanded="true" aria-controls="extra-practice-content">
+            <div>
+              <p class="home-section-heading">Extra Practice</p>
+              <p class="home-section-sub">Use these <em>after</em> your main lesson activities above</p>
+            </div>
+            <span class="home-section-chevron" aria-hidden="true">▾</span>
+          </button>
+
+          <div id="extra-practice-content" class="home-extra-content">
 
           <!-- Spin Wheel (random activity selector) -->
           <div class="home-spin-section">
@@ -317,12 +369,18 @@
             </button>
 
           </div><!-- end home-tools-section -->
+          </div><!-- end extra-practice-content -->
         </div><!-- end home-extra-section -->
 
       </section>
 
       <!-- SCREEN: GAME -->
       <section class="screen" id="screen-game" aria-label="Game" aria-live="polite">
+
+        <!-- Session Progress -->
+        <div class="game-progress" id="game-progress" role="status" aria-label="Session progress">
+          <span class="game-progress-count" id="game-progress-count"></span>
+        </div>
 
         <!-- Word Stage -->
         <div class="word-stage" id="word-stage">
@@ -362,6 +420,9 @@
         </button>
 
         <div class="speech-bubble" id="speech-bubble" aria-live="polite" hidden></div>
+
+        <!-- Floating mascot reaction during gameplay -->
+        <div class="game-mascot" id="game-mascot" aria-hidden="true"></div>
 
         <button class="back-btn" id="btn-back" aria-label="Back to menu">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16" aria-hidden="true">
@@ -430,6 +491,30 @@
           <span style="font-size:1.6rem" aria-hidden="true">🔨</span>
         </div>
         <div id="sentence-forge-content" class="stories-content"></div>
+      </section>
+
+      <section class="screen" id="screen-grammar-mcq" aria-label="Grammar MCQ Quest">
+        <div class="stories-header">
+          <button class="icon-btn" id="btn-gmcq-back" aria-label="Back to home"><span aria-hidden="true">←</span></button>
+          <h2 class="stories-title">🧠 Grammar MCQ</h2>
+        </div>
+        <div id="grammar-mcq-content" class="stories-content"></div>
+      </section>
+
+      <section class="screen" id="screen-vocab-mcq" aria-label="Vocabulary MCQ Quest">
+        <div class="stories-header">
+          <button class="icon-btn" id="btn-vmcq-back" aria-label="Back to home"><span aria-hidden="true">←</span></button>
+          <h2 class="stories-title">📖 Vocabulary MCQ</h2>
+        </div>
+        <div id="vocab-mcq-content" class="stories-content"></div>
+      </section>
+
+      <section class="screen" id="screen-paper-mode" aria-label="Paper Mode">
+        <div class="stories-header">
+          <button class="icon-btn" id="btn-paper-back" aria-label="Back to home"><span aria-hidden="true">←</span></button>
+          <h2 class="stories-title">📝 Paper Mode</h2>
+        </div>
+        <div id="paper-mode-content" class="stories-content"></div>
       </section>
 
       <!-- SCREEN: CLOZE CASTLE QUEST -->

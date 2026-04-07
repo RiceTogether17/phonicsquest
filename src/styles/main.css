@@ -198,6 +198,7 @@ body {
   min-height: 100dvh;
   overflow-x: hidden;
   background: var(--bg);
+  line-height: 1.6;
 }
 
 img, svg { display: block; max-width: 100%; }
@@ -776,7 +777,7 @@ input, select, textarea { font-family: inherit; }
 
 .phoneme-symbol {
   font-size: var(--font-size-xl);
-  font-weight: 800;
+  font-weight: 700;
   min-width: 44px;
   text-align: center;
   padding: var(--space-2) var(--space-3);
@@ -1077,6 +1078,68 @@ input, select, textarea { font-family: inherit; }
   color: var(--color-primary);
 }
 
+/* ── GAME MASCOT REACTION ── */
+.game-mascot {
+  position: fixed;
+  bottom: 100px;
+  left: 12px;
+  width: 48px;
+  height: 48px;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity var(--dur-base), transform var(--dur-slow) var(--ease-bounce);
+  transform: translateY(20px);
+  pointer-events: none;
+}
+.game-mascot--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.game-mascot--celebrate {
+  animation: bob 1.5s ease-in-out 2;
+}
+
+/* ── GAME SESSION PROGRESS ── */
+.game-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-4);
+  margin-bottom: var(--space-2);
+}
+.game-progress-count {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-full);
+  letter-spacing: 0.04em;
+}
+
+/* ── COLOR-BLIND PHONEME INDICATORS ── */
+/* Secondary shape indicators for phoneme types beyond color alone */
+.phoneme-symbol::after {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 6px;
+  margin: 3px auto 0;
+  border-radius: 50%;
+  opacity: 0.7;
+}
+.phoneme-symbol--consonant::after   { background: transparent; /* no indicator for default type */ opacity: 0; }
+.phoneme-symbol--short-vowel::after { border-radius: 0; transform: rotate(45deg); background: rgba(255,255,255,0.8); }
+.phoneme-symbol--long-vowel::after  { width: 14px; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.8); }
+.phoneme-symbol--digraph::after     { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-bottom: 7px solid rgba(255,255,255,0.8); border-radius: 0; background: transparent; }
+.phoneme-symbol--blend::after       { width: 8px; height: 8px; border: 2px solid rgba(255,255,255,0.8); background: transparent; }
+.phoneme-symbol--silent-e::after    { width: 8px; height: 2px; border-radius: 1px; background: rgba(255,255,255,0.6); }
+.phoneme-symbol--r-control::after   { background: rgba(255,255,255,0.8); width: 7px; height: 7px; }
+.phoneme-symbol--diphthong::after   { width: 8px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.8); }
+.phoneme-symbol--suffix::after      { width: 10px; height: 3px; background: rgba(255,255,255,0.8); border-radius: 1px; }
+.phoneme-symbol--hidden::after,
+.phoneme-symbol--unrevealed::after  { display: none; }
+
 /* ── 8. ACTION BAR ── */
 .action-bar {
   display: flex;
@@ -1087,6 +1150,20 @@ input, select, textarea { font-family: inherit; }
   width: 100%;
   margin-top: var(--space-4);
 }
+/* Check button is the primary action — make it larger */
+.action-bar #btn-check {
+  padding: var(--space-3) var(--space-8);
+  font-size: var(--font-size-md);
+  flex-grow: 1;
+  max-width: 200px;
+}
+/* Skip button is de-emphasized */
+.action-bar #btn-skip {
+  font-size: var(--font-size-sm);
+  opacity: 0.7;
+  padding: var(--space-2) var(--space-4);
+}
+.action-bar #btn-skip:hover { opacity: 1; }
 
 /* ── BUTTONS ── */
 .btn {
@@ -3659,19 +3736,34 @@ input, select, textarea { font-family: inherit; }
   margin-top: 2px;
 }
 
+.bp-stage-mastery-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
 .bp-stage-mastery-wrap {
-  height: 4px;
+  flex: 1;
+  height: 6px;
   background: var(--border);
   border-radius: 99px;
-  margin-top: var(--space-1);
   overflow: hidden;
 }
-
 .bp-stage-mastery-bar {
   height: 100%;
-  background: var(--color-success, #16a34a);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-success));
   border-radius: 99px;
   transition: width 0.4s ease;
+}
+.bp-stage-pct {
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  color: var(--text-muted);
+  min-width: 32px;
+  text-align: right;
+}
+.bp-stage-pct--mastered {
+  color: var(--color-success);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -6531,6 +6623,41 @@ input, select, textarea { font-family: inherit; }
 }
 .home-extra-section .home-section-heading {
   color: var(--text-muted);
+}
+
+/* Collapsible Extra Practice */
+.home-section-header--collapsible {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  cursor: pointer;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  transition: background var(--dur-fast);
+  text-align: left;
+}
+.home-section-header--collapsible:hover {
+  background: var(--surface-2);
+}
+.home-section-chevron {
+  font-size: var(--font-size-lg);
+  color: var(--text-muted);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.home-section-header--collapsible[aria-expanded="false"] .home-section-chevron {
+  transform: rotate(-90deg);
+}
+.home-extra-content {
+  transition: max-height var(--dur-slow) var(--ease-out), opacity var(--dur-base);
+  overflow: hidden;
+}
+.home-extra-content--collapsed {
+  max-height: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+  margin: 0;
+  padding: 0;
 }
 
 /* Spin section label */
