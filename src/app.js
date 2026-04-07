@@ -722,6 +722,11 @@ class App {
     const isNew = progress.isNewWord(word.id);
     progress.recordAttempt(word.id, correct, this._mode);
 
+    // Track first-attempt success (decoded without any wrong strikes or hints).
+    if (correct && this._wrongStrikes === 0 && !this._hintUsed) {
+      store.set('sessionFirstTryToday', (store.get('sessionFirstTryToday') || 0) + 1);
+    }
+
     if (correct) {
       // Gamification
       const reward = gamification.recordCorrect(responseTime, isNew);
@@ -1517,6 +1522,50 @@ class App {
     const pathwayMod   = stageMeta[readingBand]?.mod || 'pathway-badge--preschool';
     const profileName  = profile?.name ? `${profile.name}'s ` : '';
 
+    // ── Reading Level Journey bar ──────────────────────────────────────────
+    // 4 ordered stages. Show "you are here" with progress toward next stage.
+    const JOURNEY_STAGES = [
+      { key: 'pre-reader',       label: 'Pre-reader',   shortLabel: 'Pre',     desc: 'Learning sounds & letters' },
+      { key: 'emerging-decoder', label: 'Emerging',     shortLabel: 'Emerging', desc: 'Decoding simple words' },
+      { key: 'developing-reader',label: 'Developing',   shortLabel: 'Developing', desc: 'Reading short stories' },
+      { key: 'reader',           label: 'Reader',       shortLabel: 'Reader',  desc: 'Reading fluently' },
+    ];
+    const currentStageIdx = JOURNEY_STAGES.findIndex(s => s.key === readingBand);
+    const safeIdx         = currentStageIdx === -1 ? 0 : currentStageIdx;
+    // Overall progress: each stage = 25%, plus partial from mastery within current stage
+    const groupMastery    = store.get('groupMastery') || {};
+    const masteryValues   = Object.values(groupMastery).filter(v => typeof v === 'number');
+    const avgMastery      = masteryValues.length ? masteryValues.reduce((a, b) => a + b, 0) / masteryValues.length : 0;
+    const withinStagePct  = Math.min(Math.round(avgMastery * 100), 99); // partial progress within stage
+    const baseProgress    = safeIdx * 25;
+    const totalProgress   = Math.min(baseProgress + Math.round(withinStagePct * 0.25), 100);
+    const nextStage       = JOURNEY_STAGES[safeIdx + 1];
+
+    const journeyStepsHtml = JOURNEY_STAGES.map((s, i) => {
+      const isDone    = i < safeIdx;
+      const isCurrent = i === safeIdx;
+      return `<div class="journey-stage ${isDone ? 'journey-stage--done' : ''} ${isCurrent ? 'journey-stage--current' : ''}"
+                   aria-label="${s.label}${isCurrent ? ' (current)' : isDone ? ' (complete)' : ''}">
+        <div class="journey-stage-dot">${isDone ? '✓' : isCurrent ? stageMeta[readingBand]?.icon || '•' : ''}</div>
+        <span class="journey-stage-name">${s.shortLabel}</span>
+      </div>`;
+    }).join('<div class="journey-stage-connector"></div>');
+
+    const journeyBarHtml = `
+      <div class="reading-journey-bar" aria-label="Reading level progress">
+        <div class="journey-bar-header">
+          <span class="journey-bar-title">Reading Journey</span>
+          <span class="journey-bar-stage">${JOURNEY_STAGES[safeIdx].label} · Stage ${safeIdx + 1} of 4</span>
+        </div>
+        <div class="journey-progress-track" role="progressbar" aria-valuenow="${totalProgress}" aria-valuemin="0" aria-valuemax="100" aria-label="Overall reading level: ${totalProgress}%">
+          <div class="journey-progress-fill" style="width:${totalProgress}%"></div>
+        </div>
+        <div class="journey-stages">
+          ${journeyStepsHtml}
+        </div>
+        ${nextStage ? `<p class="journey-next-goal">Next: <strong>${nextStage.label}</strong> — ${nextStage.desc}</p>` : '<p class="journey-next-goal">🏅 Reading journey complete!</p>'}
+      </div>`;
+
     // ── Urgency display ────────────────────────────────────────────────────
     const urgencyIcon  = rec.urgency === 'high'   ? '🔴'
                        : rec.urgency === 'medium' ? '🟡' : '🟢';
@@ -1546,6 +1595,8 @@ class App {
 
     // ── Render ─────────────────────────────────────────────────────────────
     section.innerHTML = `
+      ${journeyBarHtml}
+
       <div class="pathway-badge ${pathwayMod}" aria-label="Learning pathway: ${pathwayLabel}">
         <span class="pathway-badge-icon" aria-hidden="true">${pathwayIcon}</span>
         <span class="pathway-badge-text">${profileName}${pathwayLabel}</span>
@@ -2067,15 +2118,17 @@ class App {
    * @param {{ xpEarned: number }} reward
    */
   _showSessionSummaryScreen(reward) {
-    const wordsToday = (store.get('sessionWordsToday') || []).length;
-    const streak     = store.get('streak') || 0;
+    const wordsToday   = (store.get('sessionWordsToday') || []).length;
+    const firstTryCount = store.get('sessionFirstTryToday') || 0;
+    const streak       = store.get('streak') || 0;
 
     // Collect any badges that fired today
     const newBadges = badges.getRecentlyEarned?.() || [];
 
     showSessionSummary({
-      xpEarned:   store.get('sessionXpToday') || reward.xpEarned || 0,
-      wordsCount: wordsToday,
+      xpEarned:    store.get('sessionXpToday') || reward.xpEarned || 0,
+      wordsCount:  wordsToday,
+      firstTryCount,
       streak,
       newBadges,
       onClose: ({ continueSession } = {}) => {

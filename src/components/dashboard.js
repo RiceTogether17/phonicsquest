@@ -27,6 +27,7 @@ import {
   getRecentPatternInsights,
   getMoeOutcomeMappings,
   getParentCoachingCard,
+  getStuckWords,
 } from '../modules/dashboardInsights.js';
 import { renderCurriculumMap } from './curriculumMap.js';
 import {
@@ -65,6 +66,9 @@ export function renderDashboard(container, opts = {}) {
 
     <!-- B4: Recommended next actions -->
     <div id="dash-actions-section"></div>
+
+    <!-- Stuck words alert -->
+    <div id="dash-stuck-words"></div>
 
     <!-- B2: Literacy Domains -->
     <div id="dash-domains-section"></div>
@@ -163,6 +167,7 @@ export function renderDashboard(container, opts = {}) {
   _renderParentCoachingCard();
   _renderLearnerSummary();
   _renderRecommendedActions();
+  _renderStuckWords();
   _renderLiteracyDomains();
   _renderClueInsights();
   _renderPatternInsights();
@@ -594,6 +599,35 @@ function _renderRecommendedActions() {
       _onNavigate?.({ target, group });
     });
   });
+}
+
+// ── Stuck Words Alert ────────────────────────────────────────────────────────
+
+function _renderStuckWords() {
+  const container = document.getElementById('dash-stuck-words');
+  if (!container) return;
+
+  const stuckWords = getStuckWords();
+  if (!stuckWords.length) return;
+
+  const wordPills = stuckWords.map(w => `
+    <div class="stuck-word-pill" aria-label="${w.word}: ${w.accuracy}% correct after ${w.attempts} tries">
+      <span class="stuck-word-text">${w.word}</span>
+      <span class="stuck-word-stat">${w.accuracy}%</span>
+    </div>`).join('');
+
+  container.innerHTML = `
+    <div class="stuck-words-card" role="alert" aria-label="Words needing attention">
+      <div class="stuck-words-header">
+        <span class="stuck-words-icon" aria-hidden="true">🔍</span>
+        <div>
+          <h3 class="stuck-words-title">Words Needing Extra Attention</h3>
+          <p class="stuck-words-subtitle">Your child has attempted these ${stuckWords.length} word${stuckWords.length !== 1 ? 's' : ''} many times with low accuracy. App practice alone may not be enough.</p>
+        </div>
+      </div>
+      <div class="stuck-words-list">${wordPills}</div>
+      <p class="stuck-words-tip"><strong>Try at home:</strong> Say the word aloud, clap each sound, then blend — e.g. /c/ … /a/ … /t/ → "cat". Pair it with a picture or object they know.</p>
+    </div>`;
 }
 
 // ── B5: Recent Pattern Insights ──────────────────────────────────────────────

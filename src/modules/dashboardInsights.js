@@ -9,6 +9,7 @@
 import { store } from './store.js';
 import { getActiveProfile } from './profiles.js';
 import { humaniseSkill } from './recommendations.js';
+import { WORDS } from '../data/words.js';
 import {
   getLearnerReadinessSummary,
   getWeeklyDomainPractice,
@@ -503,4 +504,33 @@ export function getParentCoachingCard() {
     reviewsDue: readiness.reviewsDue,
     reviewNote,
   };
+}
+
+/**
+ * Return words the child is consistently struggling with.
+ * "Stuck" = 6+ attempts, accuracy below 40%.
+ * Returned sorted worst-first, capped at 6 words.
+ *
+ * Each item: { word, group, attempts, accuracy, tip }
+ */
+export function getStuckWords() {
+  const wordStats = store.get('wordStats') || {};
+  const stuck = [];
+
+  for (const w of WORDS) {
+    const s = wordStats[w.id];
+    if (!s || s.attempts < 6) continue;
+    const accuracy = s.correct / s.attempts;
+    if (accuracy < 0.40) {
+      stuck.push({
+        word:     w.word,
+        group:    w.group,
+        attempts: s.attempts,
+        accuracy: Math.round(accuracy * 100),
+      });
+    }
+  }
+
+  stuck.sort((a, b) => a.accuracy - b.accuracy);
+  return stuck.slice(0, 6);
 }
