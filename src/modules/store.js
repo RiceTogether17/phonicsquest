@@ -159,6 +159,8 @@ class Store {
     this._listeners = new Map();
     /** Consecutive save failures for circuit breaker */
     this._saveFailures = 0;
+    /** Whether a save is already queued via microtask */
+    this._savePending = false;
   }
 
   /**
@@ -201,8 +203,22 @@ class Store {
     return { ...DEFAULT_STATE };
   }
 
-  /** Persist current state to localStorage */
+  /**
+   * Schedule a persist to localStorage.
+   * Batches multiple synchronous set()/patch() calls into a single write
+   * via queueMicrotask, reducing UI jank on low-end devices.
+   */
   _save() {
+    if (this._savePending) return;
+    this._savePending = true;
+    queueMicrotask(() => {
+      this._savePending = false;
+      this._flushSave();
+    });
+  }
+
+  /** Actually write to localStorage (called by debounced _save). */
+  _flushSave() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this._state));
       this._saveFailures = 0;
@@ -297,7 +313,7 @@ class Store {
    * @param {string} key  localStorage key to use going forward
    */
   setStorageKey(key) {
-    this._save(); // flush current state before switching
+    this._flushSave(); // flush current state synchronously before switching
     STORAGE_KEY = key;
     this._state = this._load();
     this._notify('*', this._state);
@@ -459,13 +475,17 @@ class Store {
     this.set('clueStats', stats);
   }
 
-  /** Check and refresh daily goal (resets at midnight). */
+  /**
+   * Check and refresh daily goal (resets at midnight).
+   * IMPORTANT: does NOT overwrite lastPlayDate — streak logic must read
+   * the original lastPlayDate first. The date is updated later by
+   * gamification.recordCorrect() on the first correct answer of the day.
+   */
   checkDailyReset() {
     const today = new Date().toDateString();
     if (this._state.lastPlayDate !== today) {
       this.patch({
         dailyDone: 0,
-        lastPlayDate: today,
         sessionXpToday: 0,
         sessionWordsToday: [],
       });

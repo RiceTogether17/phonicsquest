@@ -6,10 +6,12 @@
     "strict": true,
     "noEmit": true,
     "allowJs": true,
-    "checkJs": false,
+    "checkJs": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "skipLibCheck": true
   },
-  "include": ["src/types/**/*.ts", "src/**/*.d.ts"]
+  "include": ["src/**/*.js", "src/**/*.ts", "src/types/**/*.ts", "src/**/*.d.ts"],
+  "exclude": ["node_modules", "docs", "tests", "src/__tests__"]
 }

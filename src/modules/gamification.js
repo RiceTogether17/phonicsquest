@@ -28,25 +28,30 @@ class Gamification {
     this._updateUI();
   }
 
-  /** Check / maintain day streak, applying a freeze token if available. */
+  /**
+   * Check / maintain day streak, applying a freeze token if available.
+   *
+   * Must be called BEFORE lastPlayDate is overwritten by checkDailyReset()
+   * or recordCorrect(), so we can read the *real* last-played date.
+   */
   _checkStreak() {
     const today = new Date().toDateString();
     const last  = store.get('lastPlayDate');
-    if (!last) return;
-    if (last === today) return; // same day
+    if (!last) return;          // first-ever session — nothing to evaluate
+    if (last === today) return; // already played today — streak already counted
 
     const yesterday = new Date(Date.now() - 86400000).toDateString();
     if (last === yesterday) return; // consecutive day — streak intact
 
-    // Streak is broken (missed at least one day).
-    // Refresh weekly freeze token if it's a new week (Sunday = day 0).
+    // Missed at least one day. Refresh weekly freeze token first.
     this._refreshWeeklyFreeze();
 
-    const freezes = store.get('streakFreezes') ?? 0;
-    const daysMissed = this._daysBetween(last, today);
+    const freezes    = store.get('streakFreezes') ?? 0;
+    const calendarGap = this._daysBetween(last, today);   // e.g. Mon→Wed = 2
+    const skippedDays = calendarGap - 1;                   // days actually missed
 
-    // Apply a freeze token if: only 1 day was missed and a freeze is available.
-    if (daysMissed === 1 && freezes > 0) {
+    // Apply a freeze token if exactly 1 day was skipped and a token is available.
+    if (skippedDays === 1 && freezes > 0) {
       store.patch({
         streakFreezes: freezes - 1,
         // Do NOT reset streak — the freeze bridges the gap.
@@ -99,6 +104,27 @@ class Gamification {
   }
 
   /**
+   * Central XP awarding method. All XP grants MUST go through this so
+   * level-ups, session XP, weekly logs, and badge hooks stay in sync.
+   * @param {number} amount   XP to award (must be positive)
+   * @param {string} [reason] human-readable label for UI / telemetry
+   * @returns {{ newXP: number, levelUp: boolean, newLevel: number }}
+   */
+  awardXp(amount, reason = '') {
+    if (!amount || amount <= 0) return { newXP: store.get('xp'), levelUp: false, newLevel: store.get('level') };
+
+    const oldLevel = store.get('level');
+    const newXP    = store.get('xp') + amount;
+    const { level: newLevel } = getLevelInfo(newXP);
+
+    store.patch({ xp: newXP, level: newLevel });
+    store.addSessionXp(amount);
+
+    this._updateUI();
+    return { newXP, levelUp: newLevel > oldLevel, newLevel };
+  }
+
+  /**
    * Record a correct answer. Returns the XP earned breakdown.
    * @param {number} responseTimeMs  how fast the child answered
    * @param {boolean} isNewWord      first time seeing this word
@@ -134,15 +160,10 @@ class Gamification {
       reasons.push('10 in a row!');
     }
 
-    // Apply XP
-    const newXP = store.get('xp') + xpEarned;
+    // Apply XP via centralized pipeline
     const oldLevel = store.get('level');
-    const { level: newLevel, progress } = getLevelInfo(newXP);
-
-    store.patch({
-      xp: newXP,
-      level: newLevel,
-    });
+    const { newXP, newLevel } = this.awardXp(xpEarned);
+    const { progress } = getLevelInfo(newXP);
 
     // Daily goal
     store.incrementDailyDone();
@@ -150,7 +171,7 @@ class Gamification {
     const dailyGoal = store.get('dailyGoal');
     if (dailyDone === dailyGoal) {
       xpEarned += XP_REWARDS.daily_goal;
-      store.set('xp', store.get('xp') + XP_REWARDS.daily_goal);
+      this.awardXp(XP_REWARDS.daily_goal, 'daily_goal');
       reasons.push('Daily goal complete!');
     }
 
