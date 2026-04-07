@@ -773,51 +773,57 @@ var Yc=Object.defineProperty;var Kc=(t,e,s)=>e in t?Yc(t,e,{enumerable:!0,config
         </button>
       </div>
 
-      <!-- Fluency timer section -->
-      <div class="fluency-bar" id="fluency-bar">
-        <div class="fluency-bar-header">
+      <!-- Fluency timer section (collapsible) -->
+      <details class="story-tool-section fluency-bar" id="fluency-bar">
+        <summary class="story-tool-summary fluency-summary">
           <span class="fluency-label">⏱ Fluency Read</span>
-          <span class="fluency-hint">Child reads aloud — tap Start, then Done when finished</span>
+          <span class="fluency-hint">Time your reading speed</span>
+        </summary>
+        <div class="story-tool-body">
+          <div class="fluency-controls">
+            <button class="btn btn--ghost" id="btn-fluency-start">▶ Start timer</button>
+            <span class="fluency-clock" id="fluency-clock" aria-live="polite">0:00</span>
+            <button class="btn btn--primary" id="btn-fluency-done" disabled>✓ Done</button>
+          </div>
+          <div class="fluency-result" id="fluency-result" hidden></div>
+          ${c}
         </div>
-        <div class="fluency-controls">
-          <button class="btn btn--ghost" id="btn-fluency-start">▶ Start timer</button>
-          <span class="fluency-clock" id="fluency-clock" aria-live="polite">0:00</span>
-          <button class="btn btn--primary" id="btn-fluency-done" disabled>✓ Done</button>
-        </div>
-        <div class="fluency-result" id="fluency-result" hidden></div>
-        ${c}
-      </div>
+      </details>
 
-      <!-- Recording controls -->
-      <div class="recording-bar" id="recording-bar">
-        <div class="recording-bar-header">
-          <span class="recording-label">🎙 Record Your Reading</span>
-          <span class="recording-hint">Record yourself reading the story aloud</span>
+      <!-- Recording controls (collapsible) -->
+      <details class="story-tool-section recording-bar" id="recording-bar">
+        <summary class="story-tool-summary recording-summary">
+          <span class="recording-label">🎙 Record Reading</span>
+          <span class="recording-hint">Record yourself reading aloud</span>
+        </summary>
+        <div class="story-tool-body">
+          <div class="recording-controls" id="recording-controls">
+            <button class="btn btn--ghost" id="btn-rec-start">🎙 Start Recording</button>
+            <button class="btn btn--ghost btn--danger" id="btn-rec-stop" hidden>⏹ Stop</button>
+            <button class="btn btn--ghost" id="btn-rec-play" hidden>▶ Play Back</button>
+            <button class="btn btn--ghost btn--sm" id="btn-rec-delete" hidden>🗑 Delete</button>
+          </div>
+          <div class="recording-status" id="recording-status"></div>
         </div>
-        <div class="recording-controls" id="recording-controls">
-          <button class="btn btn--ghost" id="btn-rec-start">🎙 Start Recording</button>
-          <button class="btn btn--ghost btn--danger" id="btn-rec-stop" hidden>⏹ Stop</button>
-          <button class="btn btn--ghost" id="btn-rec-play" hidden>▶ Play Back</button>
-          <button class="btn btn--ghost btn--sm" id="btn-rec-delete" hidden>🗑 Delete</button>
-        </div>
-        <div class="recording-status" id="recording-status"></div>
-      </div>
+      </details>
 
-      <!-- Echo Read section -->
-      <div class="echo-read-bar" id="echo-read-bar">
-        <div class="echo-read-header">
+      <!-- Echo Read section (collapsible) -->
+      <details class="story-tool-section echo-read-bar" id="echo-read-bar">
+        <summary class="story-tool-summary echo-read-summary">
           <span class="echo-read-label">🔁 Echo Read</span>
-          <span class="echo-read-hint">App reads a line, then you record yourself reading it</span>
+          <span class="echo-read-hint">Listen, then repeat each line</span>
+        </summary>
+        <div class="story-tool-body">
+          <div class="echo-read-controls">
+            <button class="btn btn--ghost" id="btn-echo-start">Start Echo Read</button>
+            <button class="btn btn--ghost" id="btn-echo-next" hidden>Next Line →</button>
+            <button class="btn btn--ghost" id="btn-echo-rec" hidden>🎙 Your Turn</button>
+            <button class="btn btn--ghost" id="btn-echo-play" hidden>▶ Hear Yourself</button>
+            <button class="btn btn--ghost btn--sm" id="btn-echo-stop" hidden>✕ Exit Echo Read</button>
+          </div>
+          <div class="echo-read-status" id="echo-read-status"></div>
         </div>
-        <div class="echo-read-controls">
-          <button class="btn btn--ghost" id="btn-echo-start">Start Echo Read</button>
-          <button class="btn btn--ghost" id="btn-echo-next" hidden>Next Line →</button>
-          <button class="btn btn--ghost" id="btn-echo-rec" hidden>🎙 Your Turn</button>
-          <button class="btn btn--ghost" id="btn-echo-play" hidden>▶ Hear Yourself</button>
-          <button class="btn btn--ghost btn--sm" id="btn-echo-stop" hidden>✕ Exit Echo Read</button>
-        </div>
-        <div class="echo-read-status" id="echo-read-status"></div>
-      </div>
+      </details>
 
       <!-- Story Quest CTA (shown after TTS or fluency) -->
       ${n?`
