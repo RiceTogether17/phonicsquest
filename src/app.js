@@ -78,12 +78,16 @@ class App {
     /** @type {import('./data/words.js').Word|null} */
     this._currentWord = null;
 
-    /** @type {boolean} whether a daily challenge session is active */
-    this._dailyMode = false;
-    /** @type {import('./data/words.js').Word[]} remaining daily words */
-    this._dailyWordsQueue = [];
-    /** @type {number} correct answers in current daily session */
-    this._dailyCorrect = 0;
+    /**
+     * Session type: 'normal' | 'dailyChallenge' | 'review'
+     * Prevents review sessions from accidentally completing the daily challenge.
+     * @type {'normal'|'dailyChallenge'|'review'}
+     */
+    this._sessionType = 'normal';
+    /** @type {import('./data/words.js').Word[]} remaining queued words (daily/review) */
+    this._queuedWords = [];
+    /** @type {number} correct answers in current queued session */
+    this._queuedCorrect = 0;
 
     /** @type {number} words completed in current session */
     this._sessionWordCount = 0;
@@ -639,23 +643,12 @@ class App {
 
   /** Start a game round */
   _startGame(group) {
-    // Get next word (adaptive or daily)
-    if (this._dailyMode && this._dailyWordsQueue.length > 0) {
-      this._currentWord = this._dailyWordsQueue.shift();
-    } else if (this._dailyMode) {
-      // All daily words played — complete the challenge
-      this._dailyMode = false;
-      const bonusXp = completeDailyChallenge();
-      if (bonusXp > 0) {
-        celebrateDailyGoal();
-        audio.playSfx('levelUp');
-        this._showToast(`Daily Challenge done! +${bonusXp} bonus XP!`, 'success');
-      } else {
-        this._showToast('Daily Challenge already claimed today!', 'info');
-      }
-      this._updateDailyBanner();
-      this._showScreen(SCREENS.HOME);
-      mascot.setHomeState('holdCard');
+    // Get next word — from queue (daily/review) or adaptive pool
+    if (this._sessionType !== 'normal' && this._queuedWords.length > 0) {
+      this._currentWord = this._queuedWords.shift();
+    } else if (this._sessionType !== 'normal' && this._queuedWords.length === 0) {
+      // Queued session finished
+      this._finishQueuedSession();
       return;
     } else {
       // Use per-mode difficulty if available, falling back to global setting
@@ -1023,13 +1016,11 @@ class App {
   _applyManualSpeechOverride(recognisedWordId) {
     if (!this._currentWord || this._currentWord.id !== recognisedWordId) return;
 
-    progress.recordAttempt(this._currentWord.id, true, this._mode);
-    gamification.recordCorrect(2500, false);
-    this._showToast('Manual override applied: marked as correct.', 'success');
-
     this._els.speechBubble && (this._els.speechBubble.hidden = true);
-    this._cleanupMode();
-    this._nextWord();
+
+    // Route through the normal result flow so celebrations, badges,
+    // level-ups, and session stats all fire consistently.
+    this._handleResult(true, 2500);
   }
 
   async _runMicCalibration() {
@@ -2191,16 +2182,59 @@ class App {
     }, 120);
   }
 
-  // ── Daily Challenge ──
+  // ── Queued Sessions (Daily Challenge / Review) ──
 
   _startDailyChallenge() {
-    this._dailyMode = true;
-    this._dailyWordsQueue = getDailyChallengeWords();
-    this._dailyCorrect = 0;
+    this._sessionType = 'dailyChallenge';
+    this._queuedWords = getDailyChallengeWords();
+    this._queuedCorrect = 0;
     this._mode = 'blend';
     store.set('currentGroup', null);
     this._showToast(`Today's 5 words – go! ⚡`, 'info');
     this._startGame();
+  }
+
+  /** Start a review session with SRS-due words */
+  _startReviewSession() {
+    const dueWords = progress.getReviewDueWords();
+    if (dueWords.length === 0) {
+      this._showToast('No words due for review right now!', 'info');
+      return;
+    }
+    this._sessionType = 'review';
+    this._queuedWords = dueWords.slice(0, 10);
+    this._queuedCorrect = 0;
+    this._mode = 'blend';
+    store.set('currentGroup', null);
+    this._showToast(`Review time! ${this._queuedWords.length} words to practise 🔄`, 'info');
+    this._startGame();
+  }
+
+  /**
+   * Handle completion of a queued session (daily challenge or review).
+   * Only daily challenge sessions trigger completeDailyChallenge().
+   */
+  _finishQueuedSession() {
+    const type = this._sessionType;
+    this._sessionType = 'normal';
+
+    if (type === 'dailyChallenge') {
+      const bonusXp = completeDailyChallenge();
+      if (bonusXp > 0) {
+        celebrateDailyGoal();
+        audio.playSfx('levelUp');
+        this._showToast(`Daily Challenge done! +${bonusXp} bonus XP!`, 'success');
+      } else {
+        this._showToast('Daily Challenge already claimed today!', 'info');
+      }
+      this._updateDailyBanner();
+    } else if (type === 'review') {
+      this._showToast('Review session complete! Great revision! 🔄', 'success');
+      audio.playSfx('correct');
+    }
+
+    this._showScreen(SCREENS.HOME);
+    mascot.setHomeState('holdCard');
   }
 
   /** Update the review words banner */
@@ -2216,23 +2250,6 @@ class App {
     } else {
       banner.style.display = 'none';
     }
-  }
-
-  /** Start a review session with SRS-due words */
-  _startReviewSession() {
-    const dueWords = progress.getReviewDueWords();
-    if (dueWords.length === 0) {
-      this._showToast('No words due for review right now!', 'info');
-      return;
-    }
-    // Use the daily mode infrastructure for review queue
-    this._dailyMode = true;
-    this._dailyWordsQueue = dueWords.slice(0, 10); // Cap at 10 per session
-    this._dailyCorrect = 0;
-    this._mode = 'blend';
-    store.set('currentGroup', null);
-    this._showToast(`Review time! ${this._dailyWordsQueue.length} words to practise 🔄`, 'info');
-    this._startGame();
   }
 
   _updateDailyBanner() {

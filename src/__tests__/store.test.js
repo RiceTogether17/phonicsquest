@@ -47,8 +47,11 @@ describe('Store', () => {
       expect(store.get('xp')).toBe(42);
     });
 
-    it('persists to localStorage on set', () => {
+    it('persists to localStorage on set (after microtask)', async () => {
+      localStorageMock.setItem.mockClear();
       store.set('xp', 100);
+      // Persistence is debounced via queueMicrotask
+      await new Promise(resolve => queueMicrotask(resolve));
       expect(localStorageMock.setItem).toHaveBeenCalled();
       const saved = JSON.parse(localStorageMock.setItem.mock.calls.at(-1)[1]);
       expect(saved.xp).toBe(100);

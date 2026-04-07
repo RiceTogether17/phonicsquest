@@ -8,6 +8,7 @@
 
 import { WORDS } from '../data/words.js';
 import { store } from './store.js';
+import { gamification } from './gamification.js';
 import { normalizeAdaptiveConfig, getWordWeight } from './adaptiveSelection.js';
 
 const DAILY_WORD_COUNT = 5;
@@ -117,9 +118,9 @@ export function completeDailyChallenge() {
     store.set('challengeCalendar', updated);
   }
 
-  // Award bonus XP via gamification (just add to raw xp)
-  const currentXp = store.get('xp') || 0;
-  store.set('xp', currentXp + DAILY_BONUS_XP);
+  // Award bonus XP through the centralized pipeline so level-ups,
+  // session XP, and weekly logs stay in sync.
+  gamification.awardXp(DAILY_BONUS_XP, 'daily_challenge_bonus');
 
   return DAILY_BONUS_XP;
 }

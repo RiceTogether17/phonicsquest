@@ -88,14 +88,47 @@ describe('speech recognition enhancements', () => {
       cancel: () => {},
     };
 
+    // Mock AudioContext for playSfx
+    globalThis.AudioContext = globalThis.AudioContext || class {
+      constructor() { this.state = 'running'; }
+      createOscillator() { return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } }; }
+      createGain() { return { connect: vi.fn(), gain: { value: 1, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() } }; }
+      get destination() { return {}; }
+      resume() { return Promise.resolve(); }
+    };
+
+    // Provide minimal DOM for _handleResult
+    document.body.innerHTML += `
+      <div id="phoneme-row"></div>
+      <div id="result-badge"></div>
+      <div id="result-message"></div>
+      <div id="result-word-display"></div>
+      <div id="result-xp"></div>
+      <div id="result-mascot"></div>
+      <button id="btn-next"></button>
+      <div id="game-mascot"></div>
+      <div id="toast-container"></div>
+    `;
+
     const { app } = await import('../src/app.js');
 
     app._mode = 'blend';
-    app._currentWord = { id: 'manual-word-1', word: 'cat' };
-    app._els = { speechBubble: document.getElementById('speech-bubble') };
-    app._cleanupMode = vi.fn();
-    app._nextWord = vi.fn();
+    app._currentWord = { id: 'manual-word-1', word: 'cat', emoji: '🐱', graphemes: ['c','a','t'], types: ['c','sv','c'] };
+    app._resultProcessing = false;
+    app._els = {
+      speechBubble: document.getElementById('speech-bubble'),
+      resultBadge: document.getElementById('result-badge'),
+      resultMessage: document.getElementById('result-message'),
+      resultWord: document.getElementById('result-word-display'),
+      resultXp: document.getElementById('result-xp'),
+      resultMascot: document.getElementById('result-mascot'),
+      btnNext: document.getElementById('btn-next'),
+      toastContainer: document.getElementById('toast-container'),
+    };
+    app._showScreen = vi.fn();
     app._showToast = vi.fn();
+    app._adjustModeDifficulty = vi.fn();
+    app._setGameMascot = vi.fn();
 
     app._applyManualSpeechOverride('manual-word-1');
 
@@ -104,8 +137,6 @@ describe('speech recognition enhancements', () => {
     expect(stats['manual-word-1'].attempts).toBe(1);
     expect(stats['manual-word-1'].correct).toBe(1);
     expect(store.get('xp')).toBeGreaterThan(0);
-    expect(app._cleanupMode).toHaveBeenCalled();
-    expect(app._nextWord).toHaveBeenCalled();
   }, 15000);
 
   it('phonetic similarity blends levenshtein and metaphone for accent variants', async () => {
