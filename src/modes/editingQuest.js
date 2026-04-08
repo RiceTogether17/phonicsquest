@@ -214,7 +214,7 @@ function _renderErrorStep() {
         </ul>
       </details>
 
-      <div class="sfq-feedback" id="eq-feedback" hidden></div>
+      <div class="sfq-feedback" id="eq-feedback" role="status" aria-live="polite" hidden></div>
       <div class="dash-pattern-item">💡 Try This! Tier 1: ${item.tryThis?.[0] || 'Write one corrected sentence.'}</div>
       <div class="dash-pattern-item">🚀 Try This! Tier 2: ${item.tryThis?.[1] || 'Explain one rule to a classmate.'}</div>
 
@@ -251,7 +251,9 @@ function _renderErrorStep() {
     fb.textContent = `Hint: this is a ${error.type} item. Correct answer starts with "${firstLetter}".`;
   });
 
-  document.getElementById('eq-reveal')?.addEventListener('click', () => {
+  document.getElementById('eq-reveal')?.addEventListener('click', function handler() {
+    this.removeEventListener('click', handler);
+    this.disabled = true;
     _sessionStats.revealsUsed++;
     _showFeedback(`🧩 Reveal: ${error.correction}. ${error.explanation}`, false);
     _registerAttempt(error, false, true);
@@ -352,6 +354,9 @@ function _showEditingTeachBackOverlay(error, onContinue) {
 
   const overlay = document.createElement('div');
   overlay.className = 'eq-teachback-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', 'Grammar rule explanation');
   overlay.innerHTML = `
     <div class="eq-teachback-card">
       <div class="eq-teachback-icon">${tb.icon}</div>

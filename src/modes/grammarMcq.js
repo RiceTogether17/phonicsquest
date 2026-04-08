@@ -7,6 +7,8 @@ let _level = 'P1';
 let _items = [];
 let _idx = 0;
 let _correct = 0;
+let _answered = false;
+let _advanceTimer = null;
 
 export function initGrammarMcq(container, onGoHome) {
   _container = container;
@@ -15,6 +17,7 @@ export function initGrammarMcq(container, onGoHome) {
 
 export function cleanupGrammarMcq() {
   if (_container) _container.innerHTML = '';
+  if (_advanceTimer) { clearTimeout(_advanceTimer); _advanceTimer = null; }
 }
 
 export function showGrammarMcqBrowser() {
@@ -35,11 +38,22 @@ export function showGrammarMcqBrowser() {
   _container.querySelector('#gmcq-home')?.addEventListener('click', () => _onGoHome?.());
 }
 
+function _shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 function _start(level) {
   _level = level;
-  _items = [...(GRAMMAR_MCQ_ITEMS[level] || [])].sort(() => Math.random() - 0.5);
+  _items = _shuffle(GRAMMAR_MCQ_ITEMS[level] || []);
   _idx = 0;
   _correct = 0;
+  _answered = false;
+  if (_advanceTimer) { clearTimeout(_advanceTimer); _advanceTimer = null; }
   _renderQuestion();
 }
 
@@ -53,38 +67,68 @@ function _renderQuestion() {
   const item = _items[_idx];
   if (!item) return _renderDone();
 
+  _answered = false;
+  const progressPct = Math.round(((_idx) / _items.length) * 100);
+
   _container.innerHTML = `
-    <div class="sfq-game-wrap">
-      <div class="sfq-game-head"><span class="sfq-badge">🧠 ${_level}</span><span>${_idx + 1}/${_items.length}</span></div>
-      <p class="sfq-instruction">${item.q}</p>
-      <div class="pt-choices">
-        ${item.choices.map(c => `<button class="pt-choice-btn" data-choice="${c}">${c}</button>`).join('')}
+    <div class="mcq-game" role="region" aria-label="Grammar question ${_idx + 1} of ${_items.length}">
+      <div class="sfq-header">
+        <span class="sfq-badge">🧠 ${_level}</span>
+        <span class="sfq-progress" aria-label="Question ${_idx + 1} of ${_items.length}">${_idx + 1}/${_items.length}</span>
       </div>
-      <p class="pt-grammar-hint" id="gmcq-hint"></p>
+      <div class="sq-progress-bar"><div class="sq-progress-fill" style="width:${progressPct}%"></div></div>
+      <p class="sfq-instruction">${item.q}</p>
+      <div class="pt-choices" role="group" aria-label="Answer choices">
+        ${item.choices.map(c => `<button class="pt-choice-btn" data-choice="${c}" aria-label="Choose ${c}">${c}</button>`).join('')}
+      </div>
+      <p class="pt-grammar-hint" id="gmcq-hint" role="status" aria-live="polite"></p>
     </div>`;
 
   _container.querySelectorAll('[data-choice]').forEach(btn => {
     btn.addEventListener('click', () => {
+      if (_answered) return;
+      _answered = true;
+
       const ans = btn.dataset.choice;
       const ok = ans === item.answer;
       if (ok) _correct++;
       questMastery.updateSkill('grammarMcq', item.skill, ok);
       questMastery.recordAttempt({ quest: 'grammarMcq', skill: item.skill, correct: ok, level: _level });
+
+      // Disable all buttons and highlight correct/wrong
+      _container.querySelectorAll('[data-choice]').forEach(b => {
+        b.disabled = true;
+        b.setAttribute('aria-disabled', 'true');
+        if (b.dataset.choice === item.answer) {
+          b.classList.add('pt-choice--correct');
+        } else if (b === btn && !ok) {
+          b.classList.add('pt-choice--wrong');
+        }
+      });
+
       const hint = _container.querySelector('#gmcq-hint');
       if (hint) hint.textContent = `${ok ? '✅ Correct.' : `❌ Correct answer: ${item.answer}.`} ${item.explain}`;
-      setTimeout(() => {
+
+      _advanceTimer = setTimeout(() => {
+        _advanceTimer = null;
         _idx += 1;
         _renderQuestion();
-      }, 900);
+      }, 1400);
     });
   });
 }
 
 function _renderDone() {
+  if (_advanceTimer) { clearTimeout(_advanceTimer); _advanceTimer = null; }
+  const accuracy = _items.length > 0 ? Math.round((_correct / _items.length) * 100) : 0;
+  const stars = accuracy >= 90 ? 3 : accuracy >= 70 ? 2 : 1;
+
   _container.innerHTML = `
-    <div class="sfq-browser">
-      <h2 class="sfq-title">Grammar MCQ complete</h2>
-      <p class="sfq-instruction">Score: ${_correct}/${_items.length}</p>
+    <div class="sfq-browser" role="region" aria-label="Grammar MCQ results">
+      <h2 class="sfq-title">Grammar MCQ Complete</h2>
+      <div class="sfq-stars" aria-label="${stars} stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+      <p class="sfq-instruction">${_correct}/${_items.length} correct · ${accuracy}%</p>
+      <p class="sfq-instruction">${accuracy >= 90 ? 'Outstanding!' : accuracy >= 70 ? 'Great work — keep practising!' : 'Good effort — replay to improve!'}</p>
       <div class="sfq-actions">
         <button class="btn btn--primary" id="gmcq-replay">Replay</button>
         <button class="btn btn--ghost" id="gmcq-menu">Levels</button>

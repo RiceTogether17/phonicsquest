@@ -104,6 +104,42 @@ const SENTENCE_SKILL_TEACHBACK = {
     example: '"The dog (S) chased (V) the ball (O)." — "She (S) reads (V) books (O) every day."',
     tip: 'Find WHO is doing the action first — that is the Subject, and it goes at the start.',
   },
+  clause_boundary: {
+    icon: '✂️',
+    rule: 'Clauses are separated by commas. The order of the main clause and subordinate clause matters.',
+    example: '"Although it was raining, we went out." — "We went out although it was raining."',
+    tip: 'Look for the comma — it marks where one clause ends and the next begins.',
+  },
+  first_word_clue: {
+    icon: '🔤',
+    rule: 'The first word of a sentence often signals the sentence type or clause order.',
+    example: '"After lunch, we played." — "We played after lunch." Capital letter = sentence start.',
+    tip: 'Look at time phrases and conjunctions — they often come first, followed by a comma.',
+  },
+  punctuation_clue: {
+    icon: '❗',
+    rule: 'Commas, full stops, and question marks guide sentence structure and word order.',
+    example: '"Before eating, wash your hands." — The comma after "eating" signals a clause boundary.',
+    tip: 'Find commas first — they separate phrases and show you where to split the sentence.',
+  },
+  subject_action_clue: {
+    icon: '🎯',
+    rule: 'Every sentence needs a subject (who/what) and an action (verb). Find them first.',
+    example: '"The cat (subject) sat (action) on the mat." — Subject comes before the verb.',
+    tip: 'Ask: WHO is doing WHAT? The answer gives you the subject and verb to place first.',
+  },
+  time_order_clue: {
+    icon: '🕐',
+    rule: 'Time phrases (yesterday, in the morning, after that) often come first or last in a sentence.',
+    example: '"Last week, she visited her grandmother." — "She visited her grandmother last week."',
+    tip: 'If the time phrase comes first, remember to add a comma after it.',
+  },
+  inversion_pattern: {
+    icon: '🔄',
+    rule: 'In inverted sentences, the verb or auxiliary comes before the subject.',
+    example: '"Rarely do we see such talent." — "Not only did he win, but he also set a record."',
+    tip: 'Fronted adverbs (Rarely, Seldom, Never, Not only) trigger subject-auxiliary inversion.',
+  },
 };
 
 const LEVEL_SKILL_KEYS = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
@@ -154,6 +190,14 @@ export function cleanupSentenceForge() {
   if (_container) _container.innerHTML = '';
   _bankWords   = [];
   _answerSlots = [];
+  _sessionSkillAttempts = {};
+  _sessionCorrect  = 0;
+  _sessionTotal    = 0;
+  _sessionXpEarned = 0;
+  _sessionStreakBonus = 0;
+  _sessionClueCorrect = 0;
+  _sessionClueMissionTotal = 0;
+  _sentenceWrongCount = 0;
   if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
 }
 

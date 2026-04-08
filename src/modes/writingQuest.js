@@ -316,7 +316,7 @@ function _submitDraft(item, lessonForEval) {
   const result = evaluateWriting(lessonForEval, text, _level);
   _firstResult = result;
   _lastDraftRemediation = getRemediationPath(result);
-  const missionHits = _lastMissionStatus.filter((m) => m.hit).length;
+  const missionHits = (_lastMissionStatus || []).filter((m) => m.hit).length;
   const badges = detectBadges(result.metrics, text);
 
   // Persist draft text, feedback, and all structured data
