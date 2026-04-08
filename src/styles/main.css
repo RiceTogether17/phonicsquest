@@ -2107,18 +2107,7 @@ input, select, textarea { font-family: inherit; }
     overflow-y: auto;
   }
 
-  /* Decode panel: fixed overlay on desktop too */
-  .story-controls-wrap .decode-panel {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    border-top: 2px solid var(--color-border);
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    box-shadow: 0 -4px 24px rgba(0,0,0,0.10);
-    animation: slideUp 0.22s var(--ease-out);
-  }
+  /* Decode panel: no sidebar override needed — panel is on document.body */
 
   /* TTS bar: compact in sidebar */
   .story-controls-wrap .story-tts-bar {

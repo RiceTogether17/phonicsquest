@@ -103,6 +103,10 @@ export function cleanupStoryMode() {
   _stopFluencyTimer();
   cleanupRecording();
   _activeWord = null;
+  // Remove body-level decode panel if it exists
+  if (_decodePanelEl && _decodePanelEl.parentNode === document.body) {
+    _decodePanelEl.remove();
+  }
   _decodePanelEl = null;
   _echoLineIdx = -1;
   _echoStory = null;
@@ -719,7 +723,13 @@ function _renderDecodeMode(story) {
   });
 
   // Word tap → decode
-  _decodePanelEl = document.getElementById('decode-panel');
+  // Move decode panel to document.body so it escapes #app overflow:hidden
+  const inlinePanel = document.getElementById('decode-panel');
+  if (inlinePanel) {
+    inlinePanel.remove();
+    document.body.appendChild(inlinePanel);
+  }
+  _decodePanelEl = inlinePanel;
   dynamic.querySelectorAll('.decode-word').forEach(btn => {
     btn.addEventListener('click', () => _handleWordTap(btn));
   });
