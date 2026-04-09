@@ -111,7 +111,7 @@ export const allSentences = [
     },
   },
   {
-    id: 's016', sentence: 'My father took me to the hawker centre yesterday.', level: 2,
+    id: 's016', sentence: 'My father took me to the hawker centre yesterday.', acceptableAnswers: ['Yesterday my father took me to the hawker centre.'], level: 2,
     sentenceSkills: ['tense_clue', 'time_order_clue'],
     grammarNote: '"yesterday" is a past time marker — it confirms the past tense, so we use "took" not "take".',
     focusLabel: 'Past tense signal',
@@ -156,7 +156,7 @@ export const allSentences = [
     },
   },
   {
-    id: 's020', sentence: 'They had a picnic last Saturday morning.', level: 2,
+    id: 's020', sentence: 'They had a picnic last Saturday morning.', acceptableAnswers: ['Last Saturday morning they had a picnic.'], level: 2,
     sentenceSkills: ['tense_clue', 'time_order_clue'],
     grammarNote: '"last Saturday" is a past time expression — it confirms we use "had" (simple past).',
     focusLabel: 'Past time marker',
@@ -230,7 +230,7 @@ export const allSentences = [
       explanation: '"Before" is a fronted time word — it comes at the start of the sentence, before the comma.',
     },
   },
-  { id: 's024', sentence: 'The old man walked slowly down the stairs.', level: 3, sentenceSkills: ['word_order', 'tense_clue'], grammarNote: '"walked" is past tense. Adverbs like "slowly" usually follow the verb.', focusLabel: 'Adverb placement' },
+  { id: 's024', sentence: 'The old man walked slowly down the stairs.', acceptableAnswers: ['The old man slowly walked down the stairs.'], level: 3, sentenceSkills: ['word_order', 'tense_clue'], grammarNote: '"walked" is past tense. Adverbs like "slowly" usually follow the verb.', focusLabel: 'Adverb placement' },
   {
     id: 's025', sentence: 'After finishing her homework, she watched television.', level: 3,
     sentenceSkills: ['time_order_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'],
@@ -299,12 +299,12 @@ export const allSentences = [
     punctuationHint: 'Put a comma after "After the lights went out".',
     focusLabel: 'Fronted time clause',
   },
-  { id: 's068', sentence: 'The rabbit moved quickly across the garden.', level: 3, sentenceSkills: ['word_order', 'adverb_placement'], grammarNote: 'The adverb "quickly" tells how the action happened and usually follows the verb.', focusLabel: 'Adverb placement' },
+  { id: 's068', sentence: 'The rabbit moved quickly across the garden.', acceptableAnswers: ['The rabbit quickly moved across the garden.'], level: 3, sentenceSkills: ['word_order', 'adverb_placement'], grammarNote: 'The adverb "quickly" tells how the action happened and usually follows the verb.', focusLabel: 'Adverb placement' },
   { id: 's069', sentence: 'This puzzle is easier than the one we did yesterday.', level: 3, sentenceSkills: ['comparison_structure', 'tense_clue'], focusLabel: 'Comparative structure', grammarNote: 'Comparative form: adjective + -er + than.' },
   { id: 's091', sentence: 'When the rain stopped, the children ran outside.', level: 3, sentenceSkills: ['time_order_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'When', punctuationHint: 'A comma separates the fronted time clause.', focusLabel: 'Fronted time clause' },
   { id: 's092', sentence: 'After the teacher explained the task, we began quietly.', level: 3, sentenceSkills: ['time_order_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'After', punctuationHint: 'Use a comma after the fronted clause.', focusLabel: 'Fronted time clause' },
   { id: 's093', sentence: 'The blue route is shorter than the green route.', level: 3, sentenceSkills: ['comparison_structure'], grammarNote: 'Use comparative adjective + than for comparison.', focusLabel: 'Comparative structure' },
-  { id: 's094', sentence: 'She carefully packed the microscope into the box.', level: 3, sentenceSkills: ['word_order', 'adverb_placement'], focusLabel: 'Adverb placement' },
+  { id: 's094', sentence: 'She carefully packed the microscope into the box.', acceptableAnswers: ['She packed the microscope carefully into the box.', 'She packed the microscope into the box carefully.'], level: 3, sentenceSkills: ['word_order', 'adverb_placement'], focusLabel: 'Adverb placement' },
   { id: 's095', sentence: 'Although he was nervous, he answered the question clearly.', level: 3, sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Although', expectedConnector: 'Although', punctuationHint: 'Use a comma after the concessive clause.', focusLabel: 'Contrast clause' },
   { id: 's096', sentence: 'The later train arrived more slowly than usual.', level: 3, sentenceSkills: ['comparison_structure', 'adverb_placement'], focusLabel: 'Comparative adverb pattern' },
 
@@ -400,7 +400,7 @@ export const allSentences = [
     focusLabel: 'Infinitive of purpose',
   },
   {
-    id: 's039', sentence: 'The school will hold its annual sports day next Friday.', level: 4,
+    id: 's039', sentence: 'The school will hold its annual sports day next Friday.', acceptableAnswers: ['Next Friday the school will hold its annual sports day.'], level: 4,
     sentenceSkills: ['tense_clue', 'word_order'],
     grammarNote: '"will hold" is the future tense — "next Friday" is the future time marker that signals this.',
     focusLabel: 'Future tense',
@@ -433,7 +433,7 @@ export const allSentences = [
   { id: 's097', sentence: 'If the rain continues, the coach will cancel practice.', level: 4, sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'If', expectedConnector: 'If', punctuationHint: 'Use a comma between condition and result.', focusLabel: 'Conditional clause' },
   { id: 's098', sentence: 'Because we revised together, we solved the questions faster.', level: 4, sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Because', focusLabel: 'Fronted cause clause' },
   { id: 's099', sentence: 'You should never post private details online.', level: 4, sentenceSkills: ['modal_order', 'word_order'], focusLabel: 'Modal + adverb order' },
-  { id: 's100', sentence: 'The class will present their project next Monday.', level: 4, sentenceSkills: ['tense_clue', 'word_order'], focusLabel: 'Future signal' },
+  { id: 's100', sentence: 'The class will present their project next Monday.', acceptableAnswers: ['Next Monday the class will present their project.'], level: 4, sentenceSkills: ['tense_clue', 'word_order'], focusLabel: 'Future signal' },
   { id: 's101', sentence: 'He spoke so clearly that everyone understood the instructions.', level: 4, sentenceSkills: ['connector_clue', 'clause_boundary'], expectedConnector: 'so', focusLabel: 'So…that result structure' },
   { id: 's102', sentence: 'Should you need help, please call the office immediately.', level: 4, sentenceSkills: ['modal_order', 'clause_boundary'], focusLabel: 'Formal conditional opening', grammarNote: 'In formal instructions, an auxiliary opening can front the condition clause.' },
 
@@ -446,7 +446,7 @@ export const allSentences = [
   { id: 's046', sentence: 'By the time they arrived, the show had already ended.', level: 5, sentenceSkills: ['time_order_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'By', firstWordHint: '"By the time" starts a time clause — it comes first, before the comma.', focusLabel: 'Time reference clause' },
   { id: 's047', sentence: 'He worked so carefully that he did not make a single mistake.', level: 5, sentenceSkills: ['connector_clue', 'clause_boundary'], grammarNote: '"so…that" is a result structure — so + adverb/adjective + that + result clause.', focusLabel: 'So…that structure' },
   { id: 's048', sentence: 'Both the students and their teacher were proud of the result.', level: 5, sentenceSkills: ['connector_clue'], expectedConnector: 'and', grammarNote: '"Both…and" links two subjects — they go before the verb.', focusLabel: 'Both…and structure' },
-  { id: 's049', sentence: 'She practised every day so that she could improve her results.', level: 5, sentenceSkills: ['connector_clue', 'tense_clue'], expectedConnector: 'so', grammarNote: '"so that" introduces the purpose clause — it follows the main action.', focusLabel: 'Purpose clause' },
+  { id: 's049', sentence: 'She practised every day so that she could improve her results.', acceptableAnswers: ['Every day she practised so that she could improve her results.'], level: 5, sentenceSkills: ['connector_clue', 'tense_clue'], expectedConnector: 'so', grammarNote: '"so that" introduces the purpose clause — it follows the main action.', focusLabel: 'Purpose clause' },
   { id: 's050', sentence: 'Having saved enough money, she finally bought the book she wanted.', level: 5, sentenceSkills: ['first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Having', firstWordHint: '"Having saved" is a participial phrase — it comes at the start, before the comma.', punctuationHint: 'A comma follows the participial phrase "Having saved enough money".', focusLabel: 'Fronted participial phrase' },
   { id: 's073', sentence: 'Despite the heavy rain, the netball training continued.', level: 5, sentenceSkills: ['first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Despite', firstWordHint: '"Despite" starts a fronted concessive phrase before the comma.', punctuationHint: 'Use a comma after the concessive phrase.', focusLabel: 'Fronted concessive phrase' },
   { id: 's074', sentence: 'Without checking the map, they took the wrong bus home.', level: 5, sentenceSkills: ['first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Without', firstWordHint: '"Without" starts the fronted phrase.', punctuationHint: 'A comma separates the fronted phrase from the main clause.', focusLabel: 'Fronted participial phrase' },
