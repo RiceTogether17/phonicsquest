@@ -2107,15 +2107,7 @@ input, select, textarea { font-family: inherit; }
     overflow-y: auto;
   }
 
-  /* Decode panel: no longer sticky-bottom in sidebar */
-  .story-controls-wrap .decode-panel {
-    position: static;
-    border-top: none;
-    border: 2px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-md);
-    animation: none;
-  }
+  /* Decode panel: no sidebar override needed — panel is on document.body */
 
   /* TTS bar: compact in sidebar */
   .story-controls-wrap .story-tts-bar {
@@ -3231,10 +3223,11 @@ details.story-tool-section[open] > .story-tool-summary::before {
 
 /* Decode panel */
 .decode-panel {
-  position: sticky;
+  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
+  z-index: 1000;
   background: var(--color-bg);
   border-top: 2px solid var(--color-border);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
@@ -7298,6 +7291,17 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .pt-choice-btn:disabled              { cursor: default; }
 .pt-choice--correct { border-color: var(--color-success) !important; background: color-mix(in srgb, var(--color-success) 12%, var(--surface)) !important; }
 .pt-choice--wrong   { border-color: var(--color-error)   !important; background: color-mix(in srgb, var(--color-error)   10%, var(--surface)) !important; }
+.pt-choice-btn:disabled { opacity: 0.7; }
+
+/* MCQ game wrapper */
+.mcq-game {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
 
 .pt-result {
   display: flex;
