@@ -32,6 +32,17 @@ const PHONEME_FILES = {
   wh: 'w',   // "wh" makes the /w/ sound
   ck: 'c',   // "ck" makes the /k/ sound
   ll: 'l',   // "ll" makes the /l/ sound
+  ss: 's',   // "ss" makes the /s/ sound
+  tt: 't',   // "tt" makes the /t/ sound (doubled consonant)
+  nn: 'n',   // "nn" makes the /n/ sound (doubled consonant)
+  gg: 'g',   // "gg" makes the /g/ sound (doubled consonant)
+  ff: 'f',   // "ff" makes the /f/ sound (doubled consonant)
+  dd: 'd',   // "dd" makes the /d/ sound (doubled consonant)
+  zz: 'z',   // "zz" makes the /z/ sound (doubled consonant)
+  bb: 'b',   // "bb" makes the /b/ sound (doubled consonant)
+  pp: 'p',   // "pp" makes the /p/ sound (doubled consonant)
+  mm: 'm',   // "mm" makes the /m/ sound (doubled consonant)
+  rr: 'r',   // "rr" makes the /r/ sound (doubled consonant)
   se: 's',   // "se" makes the /s/ sound
   // R-controlled vowels
   ar: 'ar', or: 'or', er: 'er',
@@ -73,6 +84,9 @@ const PHONEME_TTS = {
   // Digraphs
   sh: 'shh',  ch: 'chuh',  th: 'thuh',  ng: 'ing',
   wh: 'wuh',  ck: 'kuh',  ll: 'lll',  se: 'sss',
+  ss: 'sss',  tt: 'tuh',  nn: 'nnn',  gg: 'guh',
+  ff: 'fff',  dd: 'duh',  zz: 'zzz',  bb: 'buh',
+  pp: 'puh',  mm: 'mmm',  rr: 'rrr',
   // Short vowels
   a: 'ah',  e: 'eh',  i: 'ih',  o: 'aw',  u: 'uh',
   // Long vowels (canonical)

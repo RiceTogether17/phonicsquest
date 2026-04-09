@@ -113,7 +113,8 @@ function _handleChoice(choice, btn, word, els, grid, lastIdx) {
   renderPhonemes(word, els.phonemeRow, { showDiacritics: true, showLabels: true });
 
   setTimeout(async () => {
-    await audio.speakPhoneme(word.graphemes[lastIdx], word.types[lastIdx]);
+    const prevGrapheme = lastIdx > 0 ? word.graphemes[lastIdx - 1] : null;
+    await audio.speakPhoneme(word.graphemes[lastIdx], word.types[lastIdx], { word: word.word, prevGrapheme });
     await new Promise(r => setTimeout(r, 300));
     await audio.speakWord(word.word);
   }, 300);

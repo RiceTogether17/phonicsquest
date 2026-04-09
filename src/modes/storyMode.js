@@ -842,7 +842,8 @@ async function _speakPhonemes(wordObj) {
   const tiles = document.querySelectorAll('.dp-tile');
   for (let i = 0; i < wordObj.graphemes.length; i++) {
     tiles.forEach((t, ti) => t.classList.toggle('dp-tile--active', ti === i));
-    await audio.speakPhoneme(wordObj.graphemes[i], wordObj.types[i]);
+    const prevGrapheme = i > 0 ? wordObj.graphemes[i - 1] : null;
+    await audio.speakPhoneme(wordObj.graphemes[i], wordObj.types[i], { word: wordObj.word, prevGrapheme });
     await _delay(200);
   }
   tiles.forEach(t => t.classList.remove('dp-tile--active'));

@@ -154,7 +154,8 @@ async function _revealNext(word, els) {
   });
 
   // Play the phoneme
-  await audio.speakPhoneme(word.graphemes[idx], word.types[idx]);
+  const prevGrapheme = idx > 0 ? word.graphemes[idx - 1] : null;
+  await audio.speakPhoneme(word.graphemes[idx], word.types[idx], { word: word.word, prevGrapheme });
   await _delay(200);
 
   isRevealing = false;
@@ -207,7 +208,8 @@ async function _animateBlendSweep(phonemeRow, word) {
   // Sequential highlight
   for (let i = 0; i < tiles.length; i++) {
     tiles[i].classList.add('blend-highlight');
-    await audio.speakPhoneme(word.graphemes[i], word.types[i]);
+    const prev = i > 0 ? word.graphemes[i - 1] : null;
+    await audio.speakPhoneme(word.graphemes[i], word.types[i], { word: word.word, prevGrapheme: prev });
     await _delay(perTile);
     tiles[i].classList.remove('blend-highlight');
   }
