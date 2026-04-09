@@ -603,7 +603,8 @@ function _checkAnswer(entry, punct) {
 
   const builtWords  = _answerSlots.map(id => _bankWords.find(w => w.id === id)?.word || '');
   const constructed = builtWords.join(' ') + punct;
-  const correct     = constructed === entry.sentence;
+  const correct     = constructed === entry.sentence ||
+                      (entry.acceptableAnswers || []).includes(constructed);
   const cleanTarget = entry.sentence.replace(/[.!?]$/, '').split(' ');
 
   _sessionTotal++;
