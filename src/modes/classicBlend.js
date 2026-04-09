@@ -190,7 +190,8 @@ async function _playSounds(word, els) {
     tiles.forEach((t, ti) => t.classList.toggle('active', ti === i));
 
     // Play this phoneme's audio
-    await audio.speakPhoneme(word.graphemes[i], word.types[i]);
+    const prevGrapheme = i > 0 ? word.graphemes[i - 1] : null;
+    await audio.speakPhoneme(word.graphemes[i], word.types[i], { word: word.word, prevGrapheme });
     await _delay(delay);
   }
 

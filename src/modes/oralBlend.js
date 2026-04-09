@@ -77,7 +77,8 @@ export function setupOralBlend(word, els) {
 async function _playPhonemes(word) {
   for (let i = 0; i < word.graphemes.length; i++) {
     if (i > 0) await new Promise(r => setTimeout(r, 300));
-    await audio.speakPhoneme(word.graphemes[i], word.types[i]);
+    const prevGrapheme = i > 0 ? word.graphemes[i - 1] : null;
+    await audio.speakPhoneme(word.graphemes[i], word.types[i], { word: word.word, prevGrapheme });
   }
 }
 

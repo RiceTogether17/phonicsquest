@@ -131,7 +131,8 @@ function handleChoice(choice, btn, word, els, grid) {
 
   // Play the missing phoneme then full word
   setTimeout(async () => {
-    await audio.speakPhoneme(word.graphemes[missingIndex], word.types[missingIndex]);
+    const prevGrapheme = missingIndex > 0 ? word.graphemes[missingIndex - 1] : null;
+    await audio.speakPhoneme(word.graphemes[missingIndex], word.types[missingIndex], { word: word.word, prevGrapheme });
     await new Promise(r => setTimeout(r, 300));
     await audio.speakWord(word.word);
   }, 300);
