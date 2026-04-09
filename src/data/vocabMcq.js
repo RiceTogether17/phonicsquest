@@ -3,7 +3,7 @@ export const VOCAB_MCQ_LEVELS = ['P1','P2','P3','P4','P5','P6'];
 export const VOCAB_MCQ_ITEMS = {
   P1: [
     { id:'v1', q:'The baby is crying. She feels ___.', choices:['happy','sad','brave','tidy'], answer:'sad', skill:'emotions', explain:'Crying often shows sadness.' },
-    { id:'v2', q:'We buy books at the ___.', choices:['library','bakery','hospital','playground'], answer:'library', skill:'places', explain:'A library is where books are borrowed.' },
+    { id:'v2', q:'We borrow books at the ___.', choices:['library','bakery','hospital','playground'], answer:'library', skill:'places', explain:'A library is where we borrow books to read.' },
     { id:'v3', q:'A cat says ___.', choices:['moo','meow','quack','neigh'], answer:'meow', skill:'animal_sounds', explain:'Cats meow.' },
     { id:'v19', q:'The opposite of "big" is ___.', choices:['small','tall','wide','thick'], answer:'small', skill:'antonyms', explain:'Small is the opposite of big.' },
     { id:'v20', q:'We use a ___ to cut paper.', choices:['spoon','scissors','pillow','bucket'], answer:'scissors', skill:'tools', explain:'Scissors are used for cutting.' },
@@ -62,7 +62,7 @@ export const VOCAB_MCQ_ITEMS = {
     { id:'v25', q:'The coach told us to ___ after practice.', choices:['cool down','give up','break out','turn off'], answer:'cool down', skill:'phrasal_verbs', explain:'Cool down means recover after exercise.' },
     { id:'v26', q:'The guide gave a ___ explanation of the exhibit.', choices:['detailed','muddy','careless','shallow'], answer:'detailed', skill:'formal_vocab', explain:'Detailed means with many useful details.' },
     { id:'v40', q:'The school launched a campaign to ___ recycling.', choices:['promote','collapse','dismiss','wander'], answer:'promote', skill:'formal_vocab', explain:'Promote means encourage or support.' },
-    { id:'v41', q:'He ___ into an old friend at the mall.', choices:['ran','ran into','ran off','ran out'], answer:'ran into', skill:'phrasal_verbs', explain:'"Run into" means meet unexpectedly.' },
+    { id:'v41', q:'He ___ an old friend at the mall.', choices:['ran into','ran off','ran out','ran over'], answer:'ran into', skill:'phrasal_verbs', explain:'"Run into" means meet unexpectedly.' },
     { id:'v42', q:'The instructions were clear and ___.', choices:['concise','brokenly','wobble','untidily'], answer:'concise', skill:'nuanced_choice', explain:'Concise means brief but clear.' },
     { id:'v73', q:'She had to ___ a lot of challenges.', choices:['overcome','overrun','overlook','overhear'], answer:'overcome', skill:'formal_vocab', explain:'Overcome means succeed in dealing with a difficulty.' },
     { id:'v74', q:'Don\'t ___ — we still have time.', choices:['give up','put off','turn down','break in'], answer:'give up', skill:'phrasal_verbs', explain:'"Give up" means stop trying.' },

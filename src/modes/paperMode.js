@@ -1,4 +1,4 @@
-import { PAPER_LEVELS, PAPER_MODE_PLAYLISTS, PAPER_SECTION_LABELS } from '../data/paperPlaylists.js';
+import { PAPER_LEVELS, PAPER_MODE_PLAYLISTS, PAPER_SECTION_LABELS, PAPER_SECTION_MARKS, PAPER_BOOKLET_SPLIT, PAPER_TIMING } from '../data/paperPlaylists.js';
 import { store } from '../modules/store.js';
 
 let _container = null;
@@ -26,9 +26,9 @@ export function showPaperModeBrowser() {
   _container.innerHTML = `
     <div class="sfq-browser" role="region" aria-label="Paper Mode level selection">
       <h2 class="sfq-title">📝 Paper Mode</h2>
-      <p class="sfq-instruction">Choose a level to run exam-style section playlists.</p>
+      <p class="sfq-instruction">Practise exam-style papers aligned to the PSLE English Paper 2 format.</p>
       <div class="sfq-browser-grid" role="group" aria-label="Level buttons">
-        ${PAPER_LEVELS.map(l => `<button class="sfq-level-btn" data-level="${l}" aria-label="Start ${l} paper">${l}</button>`).join('')}
+        ${PAPER_LEVELS.map(l => `<button class="sfq-level-btn" data-level="${l}" aria-label="Start ${l} paper">${l}<span style="display:block;font-size:0.7em;opacity:0.8">${PAPER_TIMING[l]}</span></button>`).join('')}
       </div>
       <div class="sfq-actions"><button class="btn btn--ghost" id="paper-home">← Home</button></div>
       <div id="paper-playlist"></div>
@@ -45,12 +45,38 @@ function _renderPlaylist(level) {
   const holder = _container?.querySelector('#paper-playlist');
   if (!holder) return;
   const canResume = _activeSession && _activeSession.level === level && !_activeSession.complete;
+  const marks = PAPER_SECTION_MARKS[level] || {};
+  const totalMarks = sections.reduce((sum, s) => sum + (marks[s] || 0), 0);
+  const booklet = PAPER_BOOKLET_SPLIT[level];
+  const timing = PAPER_TIMING[level] || '';
+
+  const sectionHtml = (s, i) => {
+    const m = marks[s] || '–';
+    return `<li><button class="btn btn--ghost" data-section="${s}">Section ${i + 1}: ${PAPER_SECTION_LABELS[s] || s} <span style="opacity:0.7">[${m} marks]</span></button></li>`;
+  };
+
+  let listHtml;
+  if (booklet) {
+    const aIdx = [];
+    const bIdx = [];
+    sections.forEach((s, i) => {
+      if (booklet.bookletA.includes(s)) aIdx.push(i);
+      else bIdx.push(i);
+    });
+    listHtml = `
+      <p style="font-weight:600;margin:8px 0 2px">Booklet A</p>
+      <ol>${aIdx.map(i => sectionHtml(sections[i], i)).join('')}</ol>
+      <p style="font-weight:600;margin:8px 0 2px">Booklet B</p>
+      <ol start="${aIdx.length + 1}">${bIdx.map(i => sectionHtml(sections[i], i)).join('')}</ol>`;
+  } else {
+    listHtml = `<ol>${sections.map((s, i) => sectionHtml(s, i)).join('')}</ol>`;
+  }
+
   holder.innerHTML = `
     <div class="dash-pattern-item" style="margin-top:12px">
       <h3>${level} Paper Playlist</h3>
-      <ol>
-        ${sections.map((s, i) => `<li><button class="btn btn--ghost" data-section="${s}">Section ${i + 1}: ${PAPER_SECTION_LABELS[s] || s}</button></li>`).join('')}
-      </ol>
+      <p class="sfq-instruction" style="margin:4px 0 8px">Total: ${totalMarks} marks · ${timing}</p>
+      ${listHtml}
       <div class="sfq-actions" style="margin-top:8px">
         <button class="btn btn--primary" id="paper-start-all">Start Full Paper</button>
         ${canResume ? '<button class="btn btn--ghost" id="paper-resume">Resume Session</button>' : ''}
@@ -117,7 +143,7 @@ function _renderSessionCard() {
           <label for="paper-scored-input">Marks scored:</label>
           <input id="paper-scored-input" class="cp-name-input" type="number" min="0" value="0" aria-label="Marks scored" />
           <label for="paper-total-input">Total marks:</label>
-          <input id="paper-total-input" class="cp-name-input" type="number" min="0" value="5" aria-label="Total marks" />
+          <input id="paper-total-input" class="cp-name-input" type="number" min="0" value="${(PAPER_SECTION_MARKS[_activeSession.level] || {})[current] || 5}" aria-label="Total marks" />
           <div class="sfq-actions" style="margin-top:4px">
             <button class="btn btn--primary btn--sm" id="paper-confirm-mark">Confirm</button>
             <button class="btn btn--ghost btn--sm" id="paper-cancel-mark">Cancel</button>
