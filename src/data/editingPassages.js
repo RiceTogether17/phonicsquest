@@ -317,7 +317,7 @@ const BASE_PASSAGES = {
       id: 'eq-p6-02',
       title: 'PSLE Practice Passage – Community Event',
       paragraph:
-        'Last month, the residents\' committee organise a community carnival at the void deck. The chairperson reported that preparations has been ongoing for weeks. Nevertheless, some of the volunteer were still unfamiliar with their roles. A group of helpers, who was stationed at the entrance, greeted every visitor warmly. The children was thrilled because the carnival feautred many exciting game. One resident said that she wish she could of come earlier. Consequently, the committee decide to hold the event again next year. The occassion was a tremendous succes for the entire neighbourhood.',
+        'Last month, the residents\' committee organise a community carnival at the void deck. The chairperson reported that preparations has been ongoing for weeks. Nevertheless, some of the volunteer were still unfamiliar with their roles. A group of helpers, who was stationed at the entrance, greeted every visitor warmly. The children was thrilled because the carnival feautred many exciting game. One resident said that she wish she could of come earlier. Consequently, the committee decide to hold the event again next year. The occasion was a tremendous success for the entire neighbourhood.',
       errors: [
         { token: 'organise', type: 'grammar', correction: 'organised', rule: 'tense consistency', explanation: '"Last month" requires past tense: "organised".', accepted: ['organised'] },
         { token: 'has', type: 'grammar', correction: 'had', rule: 'tense consistency', explanation: 'Reported speech in past context uses "had been": "had been ongoing".', accepted: ['had'] },
