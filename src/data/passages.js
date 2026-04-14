@@ -18,6 +18,9 @@
  * Structure: passages[level][categoryKey] = [passage, passage, passage]
  */
 
+// Category definitions are shared with Grammar MCQ — single source of truth.
+export { GRAMMAR_CATEGORIES } from './grammarCategories.js';
+
 export const CLOZE_LEVEL_LABELS = {
   P1: 'Primary 1',
   P2: 'Primary 2',
@@ -29,36 +32,6 @@ export const CLOZE_LEVEL_LABELS = {
 
 export const CLOZE_LEVEL_ICONS = {
   P1: '🌱', P2: '🌿', P3: '🌳', P4: '🔥', P5: '💎', P6: '👑',
-};
-
-export const GRAMMAR_CATEGORIES = {
-  articles:        { label: 'Articles (a/an/the)',    icon: '📰' },
-  pronouns:        { label: 'Pronouns',               icon: '👤' },
-  svAgreement:     { label: 'Subject-Verb Agreement', icon: '🤝' },
-  simplePast:      { label: 'Simple Past Tense',      icon: '⏪' },
-  presentCont:     { label: 'Present Continuous',     icon: '🔄' },
-  pastCont:        { label: 'Past Continuous',        icon: '⏳' },
-  perfectContinuousTenses: { label: 'Perfect & Continuous Tenses', icon: '🕒' },
-  futureTense:     { label: 'Future Tense',           icon: '🔮' },
-  prepositions:    { label: 'Prepositions',           icon: '📍' },
-  connectors:      { label: 'Connectors',             icon: '🔗' },
-  conjunctions:    { label: 'Conjunctions',           icon: '🔗' },
-  modals:          { label: 'Modal Verbs',            icon: '💪' },
-  comparatives:    { label: 'Comparatives',           icon: '📊' },
-  quantifiers:     { label: 'Quantifiers',            icon: '🔢' },
-  tenseAwareness:  { label: 'Tense Awareness',        icon: '⏰' },
-  passiveVoice:    { label: 'Passive Voice',          icon: '🔃' },
-  conditionals:    { label: 'Conditionals (If)',      icon: '❓' },
-  reportedSpeech:  { label: 'Reported Speech',        icon: '💬' },
-  relativeClauses: { label: 'Relative Clauses',       icon: '🧩' },
-  countableUncountable: { label: 'Countable & Uncountable Nouns', icon: '🧺' },
-  possessives:     { label: 'Possessives',            icon: '🏷' },
-  adjAdverbs:      { label: 'Adjectives & Adverbs',   icon: '🎨' },
-  auxiliaries:     { label: 'Auxiliaries & Questions', icon: '🙋' },
-  presentPerfect:  { label: 'Present Perfect',         icon: '✅' },
-  pastPerfect:     { label: 'Past Perfect',            icon: '🔙' },
-  superlatives:    { label: 'Superlatives',            icon: '🏆' },
-  mixedGrammar:    { label: 'Mixed Grammar (Exam)',    icon: '📝' },
 };
 
 export const passages = {
