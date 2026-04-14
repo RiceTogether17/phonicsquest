@@ -40,6 +40,8 @@ export const VOCAB_MCQ_ITEMS = {
     { id:'v-p1-014', level:'P1', category:'contextInference', subskill:'nature', difficulty:1, q:'A frog lives near a ___.', choices:['pond','desert','mountain','sky'], answer:'pond', explain:'Frogs live near ponds and water.' },
     { id:'v-p1-015', level:'P1', category:'synonymContrast', subskill:'antonyms', difficulty:1, q:'The opposite of "tall" is ___.', choices:['short','fast','heavy','wide'], answer:'short', explain:'Short is the opposite of tall.' },
     { id:'v-p1-016', level:'P1', category:'contextInference', subskill:'nature', difficulty:1, q:'At night, we can see the ___ in the sky.', choices:['moon','sun','rain','wind'], answer:'moon', explain:'The moon is visible at night.' },
+    { id:'v-p1-017', level:'P1', category:'connectorClue', subskill:'basic_and_but', difficulty:1, q:'I like cake ___ I do not like biscuits.', choices:['but','and','so','or'], answer:'but', explain:'"But" shows a contrast between liking cake and not liking biscuits.' },
+    { id:'v-p1-018', level:'P1', category:'connectorClue', subskill:'basic_and_but', difficulty:1, q:'She is kind ___ helpful.', choices:['and','but','so','or'], answer:'and', explain:'"And" joins two similar ideas.' },
   ],
   P2: [
     { id:'v-p2-001', level:'P2', category:'definitionMatch', subskill:'group_nouns', difficulty:1, q:'A group of fish is called a ___.', choices:['pack','school','flock','herd'], answer:'school', explain:'Fish move in a school.' },
@@ -58,6 +60,9 @@ export const VOCAB_MCQ_ITEMS = {
     { id:'v-p2-014', level:'P2', category:'contextInference', subskill:'actions', difficulty:1, q:'Please ___ the door when you leave.', choices:['close','throw','plant','bake'], answer:'close', explain:'Close means shut.' },
     { id:'v-p2-015', level:'P2', category:'definitionMatch', subskill:'group_nouns', difficulty:1, q:'A group of wolves is called a ___.', choices:['flock','pack','herd','colony'], answer:'pack', explain:'Wolves travel in a pack.' },
     { id:'v-p2-016', level:'P2', category:'grammaticalRole', subskill:'adverb_choice', difficulty:1, q:'She ran ___ to catch the bus.', choices:['quickly','quietly','gently','lazily'], answer:'quickly', explain:'Quickly describes fast movement.' },
+    { id:'v-p2-017', level:'P2', category:'morphologicalAffix', subskill:'prefix_un', difficulty:1, q:'If you are not happy, you are ___.', choices:['unhappy','dishappy','nothappy','rehappy'], answer:'unhappy', explain:'The prefix "un-" means "not". Unhappy = not happy.' },
+    { id:'v-p2-018', level:'P2', category:'morphologicalAffix', subskill:'suffix_ful', difficulty:1, q:'She is full of care. She is very ___.', choices:['careful','careless','caring','cared'], answer:'careful', explain:'The suffix "-ful" means "full of". Careful = full of care.' },
+    { id:'v-p2-019', level:'P2', category:'connectorClue', subskill:'because_so', difficulty:1, q:'He was hungry ___ he ate a big lunch.', choices:['so','but','or','yet'], answer:'so', explain:'"So" shows the result of being hungry.' },
   ],
   P3: [
     { id:'v-p3-001', level:'P3', category:'grammaticalRole', subskill:'adverb_choice', difficulty:1, q:'The old man walked very ___.', choices:['quickly','slowly','bright','high'], answer:'slowly', explain:'Walked modifies with adverb "slowly".' },
@@ -76,6 +81,9 @@ export const VOCAB_MCQ_ITEMS = {
     { id:'v-p3-014', level:'P3', category:'contextInference', subskill:'emotions', difficulty:1, q:'The news of the holiday made them feel ___.', choices:['overjoyed','gloomy','weary','puzzled'], answer:'overjoyed', explain:'Overjoyed means extremely happy.' },
     { id:'v-p3-015', level:'P3', category:'grammaticalRole', subskill:'word_form', difficulty:2, q:'He completed the task ___ before the deadline.', choices:['successfully','successful','success','succeed'], answer:'successfully', explain:'Adverb form "successfully" modifies "completed".' },
     { id:'v-p3-016', level:'P3', category:'collocationCloze', subskill:'verb_noun', difficulty:1, q:'Please ___ an effort to arrive on time.', choices:['make','do','take','pay'], answer:'make', explain:'The collocation is "make an effort".' },
+    { id:'v-p3-017', level:'P3', category:'morphologicalAffix', subskill:'suffix_less', difficulty:1, q:'He has no fear. He is ___.', choices:['fearless','fearful','fearing','feared'], answer:'fearless', explain:'The suffix "-less" means "without". Fearless = without fear.' },
+    { id:'v-p3-018', level:'P3', category:'morphologicalAffix', subskill:'suffix_ness', difficulty:2, q:'She is kind. Everyone admires her ___.', choices:['kindness','kindly','kinder','kindful'], answer:'kindness', explain:'The suffix "-ness" turns an adjective into a noun. Kindness = the quality of being kind.' },
+    { id:'v-p3-019', level:'P3', category:'scienceTechTerms', subskill:'basic_science', difficulty:1, q:'Plants need sunlight and water to ___.', choices:['grow','fly','swim','drive'], answer:'grow', explain:'Plants grow when they get sunlight and water.' },
   ],
   P4: [
     { id:'v-p4-001', level:'P4', category:'collocationCloze', subskill:'phrasal_verbs', difficulty:1, q:'Please ___ the form before noon.', choices:['fill in','look after','run into','carry on'], answer:'fill in', explain:'"Fill in" means complete a form.' },
@@ -94,6 +102,10 @@ export const VOCAB_MCQ_ITEMS = {
     { id:'v-p4-014', level:'P4', category:'synonymContrast', subskill:'nuanced_choice', difficulty:2, q:'The food was ___ and everyone enjoyed it.', choices:['scrumptious','soggy','bland','stale'], answer:'scrumptious', explain:'Scrumptious means extremely tasty and delicious.' },
     { id:'v-p4-015', level:'P4', category:'collocationCloze', subskill:'phrasal_verbs', difficulty:1, q:'He decided to ___ the invitation politely.', choices:['turn down','turn up','turn over','turn in'], answer:'turn down', explain:'"Turn down" means refuse or decline.' },
     { id:'v-p4-016', level:'P4', category:'contextInference', subskill:'formal_vocab', difficulty:2, q:'The students were asked to ___ their ideas.', choices:['present','prevent','pretend','preserve'], answer:'present', explain:'Present means show or share with others.' },
+    { id:'v-p4-017', level:'P4', category:'scienceTechTerms', subskill:'technology', difficulty:2, q:'We use a ___ to search for information online.', choices:['browser','printer','scanner','speaker'], answer:'browser', explain:'A browser is a program used to access websites on the internet.' },
+    { id:'v-p4-018', level:'P4', category:'socialStudiesVocab', subskill:'community', difficulty:2, q:'People vote during an ___ to choose their leaders.', choices:['election','exhibition','expedition','education'], answer:'election', explain:'An election is when people vote to choose leaders.' },
+    { id:'v-p4-019', level:'P4', category:'scienceTechTerms', subskill:'basic_science', difficulty:2, q:'The ___ of water from liquid to gas is called evaporation.', choices:['change','colour','taste','weight'], answer:'change', explain:'Evaporation is the change of state from liquid to gas.' },
+    { id:'v-p4-020', level:'P4', category:'connectorClue', subskill:'although_however', difficulty:2, q:'___ it was cold, the children still played outside.', choices:['Although','Because','So','And'], answer:'Although', explain:'"Although" introduces a contrast — the cold did not stop them.' },
   ],
   P5: [
     { id:'v-p5-001', level:'P5', category:'contextInference', subskill:'formal_vocab', difficulty:2, q:'The manager decided to ___ the meeting.', choices:['postpone','explode','decorate','capture'], answer:'postpone', explain:'Postpone means delay to a later time.' },
@@ -112,6 +124,10 @@ export const VOCAB_MCQ_ITEMS = {
     { id:'v-p5-014', level:'P5', category:'collocationCloze', subskill:'academic', difficulty:2, q:'The teacher drew a ___ conclusion from the data.', choices:['logical','foggy','random','noisy'], answer:'logical', explain:'Logical conclusion is a common academic phrase.' },
     { id:'v-p5-015', level:'P5', category:'synonymContrast', subskill:'advanced_word_choice', difficulty:2, q:'He was ___ about the unfair treatment.', choices:['indignant','indifferent','ignorant','indirect'], answer:'indignant', explain:'Indignant means feeling angry about something unjust.' },
     { id:'v-p5-016', level:'P5', category:'contextInference', subskill:'formal_vocab', difficulty:2, q:'The athlete showed great ___ during the race.', choices:['perseverance','reluctance','hesitation','negligence'], answer:'perseverance', explain:'Perseverance means continued effort despite difficulties.' },
+    { id:'v-p5-017', level:'P5', category:'proverbsSayings', subskill:'common_proverbs', difficulty:2, q:'"Actions speak louder than ___" means what you do matters more than what you say.', choices:['words','thoughts','dreams','wishes'], answer:'words', explain:'This proverb means deeds are more important than promises.' },
+    { id:'v-p5-018', level:'P5', category:'grammarPrepositions', subskill:'dependent_prep', difficulty:2, q:'She is very good ___ mathematics.', choices:['at','in','on','with'], answer:'at', explain:'The collocation is "good at" a subject or skill.' },
+    { id:'v-p5-019', level:'P5', category:'grammarArticles', subskill:'specific_vs_general', difficulty:2, q:'___ Earth revolves around the Sun.', choices:['The','A','An','Some'], answer:'The', explain:'We use "The" for unique objects like the Earth.' },
+    { id:'v-p5-020', level:'P5', category:'proverbsSayings', subskill:'common_proverbs', difficulty:2, q:'"Every cloud has a silver ___" means there is something good in every bad situation.', choices:['lining','edge','light','side'], answer:'lining', explain:'This proverb means even difficult situations have a positive side.' },
   ],
   P6: [
     { id:'v-p6-001', level:'P6', category:'contextInference', subskill:'formal_vocab', difficulty:3, q:'The witness gave a very ___ statement.', choices:['vague','coherent','sleepy','rusty'], answer:'coherent', explain:'Coherent means clear and logical.' },
@@ -130,5 +146,9 @@ export const VOCAB_MCQ_ITEMS = {
     { id:'v-p6-014', level:'P6', category:'synonymContrast', subskill:'nuanced_choice', difficulty:3, q:'Her account of the event was ___ and well-structured.', choices:['meticulous','muddled','mundane','mischievous'], answer:'meticulous', explain:'Meticulous means showing great attention to detail.' },
     { id:'v-p6-015', level:'P6', category:'collocationCloze', subskill:'academic', difficulty:3, q:'The speaker delivered a ___ argument in favour of change.', choices:['compelling','confusing','casual','comical'], answer:'compelling', explain:'A compelling argument is one that is very convincing.' },
     { id:'v-p6-016', level:'P6', category:'idiomaticExpressions', subskill:'common_idioms', difficulty:2, q:'To "turn over a new leaf" means to ___.', choices:['make a fresh start','plant a tree','read a book','move away'], answer:'make a fresh start', explain:'This idiom means to start behaving better.' },
+    { id:'v-p6-017', level:'P6', category:'grammarSVA', subskill:'complex_subjects', difficulty:3, q:'The number of students ___ increased this year.', choices:['has','have','are','were'], answer:'has', explain:'"The number of" is singular and takes "has".' },
+    { id:'v-p6-018', level:'P6', category:'proverbsSayings', subskill:'common_proverbs', difficulty:2, q:'"Don\'t put all your eggs in one ___" means don\'t risk everything on a single plan.', choices:['basket','bag','box','bowl'], answer:'basket', explain:'This proverb advises against depending on a single strategy.' },
+    { id:'v-p6-019', level:'P6', category:'grammarSVA', subskill:'complex_subjects', difficulty:3, q:'A number of students ___ absent today.', choices:['are','is','was','has'], answer:'are', explain:'"A number of" is plural and takes "are".' },
+    { id:'v-p6-020', level:'P6', category:'socialStudiesVocab', subskill:'governance', difficulty:3, q:'The government introduced a new ___ to reduce pollution.', choices:['policy','polity','police','polish'], answer:'policy', explain:'A policy is a plan or course of action adopted by a government.' },
   ],
 };
