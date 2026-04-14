@@ -38,18 +38,22 @@ export function showVocabMcqBrowser() {
   _container.querySelector('#vmcq-home')?.addEventListener('click', () => _onGoHome?.());
 }
 
-function _shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+/**
+ * Mastery-weighted shuffle: items in weaker categories float toward the
+ * front so the child practises what they need most.  A random jitter
+ * (±0.15) keeps the order varied across replays.
+ */
+function _adaptiveShuffle(items) {
+  return [...items].sort((a, b) => {
+    const sa = questMastery.getSkillScore('vocabMcq', a.category);
+    const sb = questMastery.getSkillScore('vocabMcq', b.category);
+    return (sa - sb) + (Math.random() - 0.5) * 0.3;
+  });
 }
 
 function _start(level) {
   _level = level;
-  _items = _shuffle(VOCAB_MCQ_ITEMS[level] || []);
+  _items = _adaptiveShuffle(VOCAB_MCQ_ITEMS[level] || []);
   _idx = 0;
   _correct = 0;
   _answered = false;
