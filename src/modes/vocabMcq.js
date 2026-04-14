@@ -92,8 +92,8 @@ function _renderQuestion() {
       const ans = btn.dataset.choice;
       const ok = ans === item.answer;
       if (ok) _correct++;
-      questMastery.updateSkill('vocabMcq', item.skill, ok);
-      questMastery.recordAttempt({ quest: 'vocabMcq', skill: item.skill, correct: ok, level: _level });
+      questMastery.updateSkill('vocabMcq', item.category, ok);
+      questMastery.recordAttempt({ quest: 'vocabMcq', skill: item.category, correct: ok, level: _level });
 
       // Disable all buttons and highlight correct/wrong
       _container.querySelectorAll('[data-choice]').forEach(b => {

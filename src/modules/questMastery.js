@@ -12,15 +12,64 @@ const DEFAULT_MASTERY = 0.5;
 
 
 const CROSS_QUEST_SKILL_ALIASES = {
-  connector_clue: ['connectorClue', 'conditionals', 'conjunctions'],
-  connectorClue: ['connector_clue', 'conditionals', 'conjunctions'],
-  conditionals: ['connector_clue', 'connectorClue', 'conjunctions'],
-  conjunctions: ['connector_clue', 'connectorClue', 'conditionals'],
-  tense_clue: ['simplePast', 'presentCont', 'pastCont', 'futureTense', 'perfectContinuousTenses'],
+  // ── Grammar: connectors / conjunctions (Cloze ↔ MCQ) ──
+  connector_clue: ['connectorClue', 'connectors', 'conditionals', 'conjunctions'],
+  connectorClue:  ['connector_clue', 'connectors', 'conditionals', 'conjunctions'],
+  connectors:     ['connector_clue', 'connectorClue', 'conditionals', 'conjunctions'],
+  conditionals:   ['connector_clue', 'connectorClue', 'connectors', 'conjunctions'],
+  conjunctions:   ['connector_clue', 'connectorClue', 'connectors', 'conditionals'],
+
+  // ── Grammar: tenses (Cloze ↔ MCQ) ──
+  tense_clue:               ['simplePast', 'presentCont', 'pastCont', 'futureTense', 'perfectContinuousTenses', 'presentPerfect', 'pastPerfect', 'tenseAwareness'],
+  simplePast:               ['tense_clue', 'presentCont', 'pastCont', 'tenseAwareness'],
+  presentCont:              ['tense_clue', 'simplePast', 'pastCont', 'tenseAwareness'],
+  pastCont:                 ['tense_clue', 'simplePast', 'presentCont', 'tenseAwareness'],
+  presentPerfect:           ['tense_clue', 'pastPerfect', 'tenseAwareness'],
+  pastPerfect:              ['tense_clue', 'presentPerfect', 'tenseAwareness'],
+  tenseAwareness:           ['tense_clue', 'simplePast', 'presentCont', 'pastCont', 'presentPerfect', 'pastPerfect'],
+
+  // ── Grammar: modals ──
   modal_order: ['modals'],
-  modals: ['modal_order'],
-  preposition_clue: ['prepositions', 'grammarPrepositions'],
-  prepositions: ['preposition_clue', 'grammarPrepositions'],
+  modals:      ['modal_order'],
+
+  // ── Grammar: prepositions (Cloze ↔ MCQ ↔ Vocab Cloze) ──
+  preposition_clue:   ['prepositions', 'grammarPrepositions'],
+  prepositions:       ['preposition_clue', 'grammarPrepositions'],
+  grammarPrepositions:['preposition_clue', 'prepositions'],
+
+  // ── Grammar: SV agreement (Grammar Cloze ↔ MCQ ↔ Vocab Cloze) ──
+  svAgreement: ['grammarSVA'],
+  grammarSVA:  ['svAgreement'],
+
+  // ── Grammar: articles (Grammar Cloze ↔ Vocab Cloze) ──
+  articles:        ['grammarArticles'],
+  grammarArticles: ['articles'],
+
+  // ── Grammar: comparatives / superlatives ──
+  comparatives:  ['superlatives'],
+  superlatives:  ['comparatives'],
+
+  // ── Grammar: passive / reported / relative / inversion ──
+  passiveVoice:    [],
+  reportedSpeech:  [],
+  relativeClauses: [],
+  inversion:       [],
+
+  // ── Vocabulary: context & synonyms (Cloze ↔ MCQ) ──
+  contextInference: [],
+  definitionMatch:  [],
+  synonymContrast:  [],
+
+  // ── Vocabulary: collocations (Cloze ↔ MCQ) ──
+  collocationCloze: [],
+
+  // ── Vocabulary: word form (Cloze ↔ MCQ) ──
+  grammaticalRole:    ['morphologicalAffix'],
+  morphologicalAffix: ['grammaticalRole'],
+
+  // ── Vocabulary: idioms (Cloze ↔ MCQ) ──
+  idiomaticExpressions: ['proverbsSayings'],
+  proverbsSayings:      ['idiomaticExpressions'],
 };
 
 function _allQuestBuckets() {
