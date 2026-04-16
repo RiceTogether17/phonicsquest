@@ -7303,6 +7303,52 @@ details.story-tool-section[open] > .story-tool-summary::before {
   gap: var(--space-3);
 }
 
+/* MCQ streak badge */
+.mcq-streak {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-warning, #f59e0b) 15%, var(--surface));
+  color: var(--color-warning, #f59e0b);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.mcq-streak--flash {
+  animation: mcq-streak-pop 0.4s ease;
+}
+@keyframes mcq-streak-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.35); background: color-mix(in srgb, var(--color-warning, #f59e0b) 35%, var(--surface)); }
+  100% { transform: scale(1); }
+}
+
+/* Category tag shown above each question */
+.mcq-category-tag {
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Category chip summary on results screen */
+.mcq-cat-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  justify-content: center;
+  margin: var(--space-2) 0;
+}
+.mcq-cat-chip {
+  font-size: var(--font-size-xs, 0.75rem);
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--surface));
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
 .pt-result {
   display: flex;
   flex-direction: column;
