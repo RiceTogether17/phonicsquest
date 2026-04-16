@@ -15,7 +15,7 @@ export const DEFAULT_ADAPTIVE_CONFIG = Object.freeze({
 });
 
 /**
- * @param {any} raw
+ * @param {Partial<typeof DEFAULT_ADAPTIVE_CONFIG>} [raw]
  */
 export function normalizeAdaptiveConfig(raw = {}) {
   const cfg = { ...DEFAULT_ADAPTIVE_CONFIG, ...(raw || {}) };

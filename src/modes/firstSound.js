@@ -68,19 +68,15 @@ export function setupFirstSound(word, els) {
   answered = false;
   startTime = Date.now();
 
-  // Show image but NOT the word text (child must identify first sound)
   renderWordImage(word, els.wordEmoji, true);
   els.wordDisplay.innerHTML = '';
   els.phonemeRow.innerHTML = '';
 
-  // Instruction — prompt the child to say the word slowly before choosing
   els.modeInstruction.textContent = 'Say the word slowly… what\'s the FIRST sound?';
 
-  // The first grapheme / phoneme
   const firstGrapheme = word.graphemes[0];
   const firstType     = word.types[0];
 
-  // Get distractors (different first sounds)
   const distractorGraphemes = getFirstSoundDistractors(firstGrapheme, firstType, word.level);
   const distractors = shuffleArray(distractorGraphemes).slice(0, 3);
 
@@ -89,7 +85,6 @@ export function setupFirstSound(word, els) {
     ...distractors.map(g => ({ grapheme: g.grapheme, type: g.type, correct: false })),
   ]);
 
-  // Render choice buttons with phoneme styling
   els.modeArea.innerHTML = `<div class="choice-grid"></div>`;
   const grid = els.modeArea.querySelector('.choice-grid');
 
@@ -109,12 +104,10 @@ export function setupFirstSound(word, els) {
     grid.appendChild(btn);
   }
 
-  // Buttons
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = '';
   els.btnSkip.style.display = '';
 
-  // Play the word
   setTimeout(() => audio.speakWord(word.word), 400);
 }
 
@@ -123,7 +116,6 @@ function handleChoice(choice, btn, word, els, grid) {
   answered = true;
   const responseTime = Date.now() - startTime;
 
-  // Disable all
   grid.querySelectorAll('.choice-btn').forEach(b => {
     b.disabled = true;
     if (b.dataset.correct === 'true') b.classList.add('correct');
@@ -133,14 +125,12 @@ function handleChoice(choice, btn, word, els, grid) {
     btn.classList.add('wrong');
   }
 
-  // Reveal the full word
   buildWordAnimation(word, els.wordDisplay);
   renderPhonemes(word, els.phonemeRow, {
     showDiacritics: true,
     showLabels: true,
   });
 
-  // Play first phoneme then full word
   setTimeout(async () => {
     await audio.speakPhoneme(word.graphemes[0], word.types[0]);
     await new Promise(r => setTimeout(r, 300));

@@ -10,7 +10,7 @@
  *                   shows every sight word in the story before reading starts.
  */
 
-import { STORIES, BAND_META, LEVEL_META } from '../data/stories.js';
+import { STORIES, BAND_META } from '../data/stories.js';
 import { isHFW, extractStoryHFW } from '../data/hfw.js';
 import { WORDS } from '../data/words.js';
 import { audio } from '../modules/audio.js';

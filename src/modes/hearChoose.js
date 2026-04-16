@@ -27,19 +27,15 @@ export function setupHearChoose(word, els) {
   answered = false;
   startTime = Date.now();
 
-  // Hide image initially (reveal after answer)
   renderWordImage(word, els.wordEmoji, false);
   els.wordDisplay.innerHTML = '';
   els.phonemeRow.innerHTML = '';
 
-  // Instruction
   els.modeInstruction.textContent = 'Listen to the word, then pick the right one!';
 
-  // Generate 4 choices
   const distractors = getDistractors(word, 3, { maxLevel: word.level });
   const choices = shuffleArray([word, ...distractors]);
 
-  // Render choice buttons
   els.modeArea.innerHTML = `<div class="choice-grid"></div>`;
   const grid = els.modeArea.querySelector('.choice-grid');
 
@@ -54,12 +50,10 @@ export function setupHearChoose(word, els) {
     grid.appendChild(btn);
   }
 
-  // Show Say It button (re-play audio)
   els.btnSayIt.style.display = '';
   els.btnCheck.style.display = 'none';
   els.btnSkip.style.display = '';
 
-  // Play the word
   setTimeout(() => audio.speakWord(word.word), 400);
 }
 
@@ -69,7 +63,6 @@ function handleChoice(chosen, btn, target, els, grid) {
   const responseTime = Date.now() - startTime;
   const correct = chosen.id === target.id;
 
-  // Disable all buttons
   grid.querySelectorAll('.choice-btn').forEach(b => {
     b.disabled = true;
     if (b.dataset.wordId === target.id) {
@@ -81,7 +74,6 @@ function handleChoice(chosen, btn, target, els, grid) {
     btn.classList.add('wrong');
   }
 
-  // Show the word with phonemes + image
   renderWordImage(target, els.wordEmoji, true);
   buildWordAnimation(target, els.wordDisplay);
   renderPhonemes(target, els.phonemeRow, { showDiacritics: true });

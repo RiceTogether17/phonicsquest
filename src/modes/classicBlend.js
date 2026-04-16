@@ -37,28 +37,22 @@ export function setupClassicBlend(word, els) {
   isPlaying = false;
   startTime = Date.now();
 
-  // Show word image
   renderWordImage(word, els.wordEmoji, true);
 
-  // Instruction
   els.modeInstruction.textContent = 'Listen to each sound — then blend!';
 
-  // Show ALL phoneme tiles immediately (all revealed)
   renderPhonemes(word, els.phonemeRow, {
     showDiacritics: true,
     showLabels: true,
-    revealedIndices: null, // all visible
+    revealedIndices: null,
   });
 
-  // Build the mode area (category picker + play controls)
   _renderControls(els, word);
 
-  // Hide check / say-it buttons; show skip
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = 'none';
   els.btnSkip.style.display = '';
 
-  // Auto-play if autoplay setting is on
   if (store.get('autoplay')) {
     setTimeout(() => _playSounds(word, els), 500);
   }
@@ -195,16 +189,13 @@ async function _playSounds(word, els) {
     await _delay(delay);
   }
 
-  // Remove highlights
   tiles.forEach(t => t.classList.remove('active'));
 
-  // Brief pause then say the full blended word
   await _delay(Math.min(delay, 300));
   await audio.speakWord(word.word);
 
   isPlaying = false;
 
-  // Show assessment buttons after first play
   _renderControls(els, word, true);
   els.btnSayIt.style.display = '';
 }

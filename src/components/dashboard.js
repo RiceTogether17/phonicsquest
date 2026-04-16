@@ -1,15 +1,5 @@
 /**
  * PhonicsQuest – Parent Dashboard
- *
- * Upgraded (Part B) to surface actionable insights:
- *   B1. Learner summary panel at the top
- *   B2. Literacy domains section
- *   B3. Clue accuracy vs. answer accuracy
- *   B4. Recommended next actions (with CTAs)
- *   B5. Recent learning pattern insights
- *   B6. Existing charts preserved below action content
- *
- * All data is computed from real store state via dashboardInsights.js.
  */
 
 import { Chart, registerables } from 'chart.js';
@@ -44,13 +34,12 @@ Chart.register(...registerables);
 /** @type {Chart|null} */
 let accuracyChart = null;
 
-// Callback wired in by app.js to navigate to a quest/mode
 let _onNavigate = null;
 
 /**
  * Render the full dashboard content.
  * @param {HTMLElement} container  #dashboard-content
- * @param {{ onNavigate?: Function }} [opts]
+ * @param {{ onNavigate?: (mode: string) => void }} [opts]
  */
 export function renderDashboard(container, opts = {}) {
   _onNavigate = opts.onNavigate || null;

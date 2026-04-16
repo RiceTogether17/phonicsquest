@@ -261,7 +261,7 @@ class AudioManager {
   /**
    * Reveal phonemes one-by-one for Blend It mode.
    * @param {import('../data/words.js').Word} wordData
-   * @param {Function} [onPhoneme]  called with (index) after each phoneme plays
+   * @param {(index: number) => void} [onPhoneme]  called with (index) after each phoneme plays
    */
   async revealPhonemes(wordData, onPhoneme) {
     for (let i = 0; i < wordData.graphemes.length; i++) {

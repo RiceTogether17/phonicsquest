@@ -12,8 +12,8 @@
  * Renders inside the same `container` element as the story reader.
  *
  * @param {HTMLElement} container   – the stories-content div
- * @param {object}      story       – the story object (must have .comprehension, .vocab, .grammarSpotlight)
- * @param {Function}    onDone      – called when child presses "Back to Library"
+ * @param {{ comprehension: Array<{q: string, options: string[], answer: number, type: string}>, vocab: Array<{word: string, meaning: string, icon: string}>, grammarSpotlight: Array<{pattern: string, example: string, tip: string}> }} story – the story object
+ * @param {() => void}  onDone      – called when child presses "Back to Library"
  */
 export function runStoryQuest(container, story, onDone) {
   if (!story.comprehension?.length) {

@@ -116,36 +116,27 @@ class App {
     this._cacheElements();
     this._bindEvents();
 
-    // Apply persisted settings to the UI (uses settingsController).
     settingsController.apply(store);
-
-    // Restore active profile (if any) before any store reads
     restoreActiveProfile();
 
-    // Init subsystems
     gamification.init();
     mascot.init();
 
-    // Init spin wheel
     const canvas = document.getElementById('spin-wheel');
     if (canvas) spinWheel.init(canvas);
 
-    // Show mic button only if speech recognition is supported
     const micBtn = document.getElementById('btn-mic');
     if (micBtn && !speech.supported) {
       micBtn.classList.add('hidden');
     }
 
-    // Apply saved theme
     settingsController.applyTheme(store.get('theme') || 'default');
 
-    // Route to profile picker if needed
     if (needsProfileSelection()) {
       this._showScreen(SCREENS.PROFILES);
       this._renderProfileGrid();
     } else {
       this._updateProfileChip();
-      // Returning user — increment total sessions and run return-event checks
       store.set('totalSessions', (store.get('totalSessions') || 0) + 1);
       setTimeout(() => this._checkReturnEvents(), 800);
     }
@@ -161,19 +152,16 @@ class App {
   /** Cache frequently used DOM elements */
   _cacheElements() {
     this._els = {
-      // Screens
       screenHome:   document.getElementById('screen-home'),
       screenGame:   document.getElementById('screen-game'),
       screenResult: document.getElementById('screen-result'),
 
-      // Game elements
       wordDisplay:    document.getElementById('word-display'),
       wordEmoji:      document.getElementById('word-emoji'),
       phonemeRow:     document.getElementById('phoneme-row'),
       modeInstruction: document.getElementById('mode-instruction'),
       modeArea:       document.getElementById('mode-area'),
 
-      // Buttons
       btnCheck: document.getElementById('btn-check'),
       btnSayIt: document.getElementById('btn-say-it'),
       btnHint:  document.getElementById('btn-hint'),
@@ -182,24 +170,20 @@ class App {
       btnNext:  document.getElementById('btn-next'),
       btnMic:   document.getElementById('btn-mic'),
 
-      // Result
       resultBadge:   document.getElementById('result-badge'),
       resultMessage: document.getElementById('result-message'),
       resultWord:    document.getElementById('result-word-display'),
       resultXp:      document.getElementById('result-xp'),
       resultMascot:  document.getElementById('result-mascot'),
 
-      // Speech
       speechBubble: document.getElementById('speech-bubble'),
 
-      // Toast
       toastContainer: document.getElementById('toast-container'),
     };
   }
 
   /** Bind all event listeners */
   _bindEvents() {
-    // Mode cards
     document.querySelectorAll('.mode-card').forEach(card => {
       card.addEventListener('click', () => {
         this._mode = card.dataset.mode;
@@ -216,23 +200,18 @@ class App {
       });
     });
 
-    // Spin wheel
     document.getElementById('spin-btn')?.addEventListener('click', async () => {
       const btn = document.getElementById('spin-btn');
       if (!btn || spinWheel.isSpinning) return;
       btn.disabled = true;
-      try {
-        const group = await spinWheel.spin();
-        store.set('currentGroup', group);
-        audio.playSfx('correct');
-        // Start game in blend mode with that group
-        this._mode = 'blend';
-        setTimeout(() => this._startGame(group), 500);
-      } catch (_) {}
+      const group = await spinWheel.spin();
+      store.set('currentGroup', group);
+      audio.playSfx('correct');
+      this._mode = 'blend';
+      setTimeout(() => this._startGame(group), 500);
       btn.disabled = false;
     });
 
-    // Back button
     this._els.btnBack?.addEventListener('click', () => {
       this._cleanupMode();
       this._sessionWordCount = 0;
@@ -241,7 +220,6 @@ class App {
       mascot.setHomeState('holdCard');
     });
 
-    // Stories button (home → stories screen)
     document.getElementById('btn-stories')?.addEventListener('click', () => {
       initStoryMode(
         document.getElementById('stories-content'),
@@ -254,18 +232,15 @@ class App {
       showBrowser();
       this._showScreen('screen-stories');
       mascot.setState('celebrate');
-      // Check badge for first story open
       badges.onStoriesOpened().forEach(b => badges.notify(b));
     });
 
-    // Stories screen back button (→ home)
     document.getElementById('btn-stories-back')?.addEventListener('click', () => {
       cleanupStoryMode();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
-    // Letter Sounds button (home → letter sounds screen)
     document.getElementById('btn-letter-sounds')?.addEventListener('click', () => {
       initLetterSounds(
         document.getElementById('ls-content'),
@@ -279,14 +254,12 @@ class App {
       mascot.setState('whiteboard');
     });
 
-    // Letter Sounds screen back button (→ home)
     document.getElementById('btn-ls-back')?.addEventListener('click', () => {
       cleanupLetterSounds();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
-    // Daily Challenge button
     document.getElementById('btn-daily-challenge')?.addEventListener('click', () => {
       if (isDailyChallengeComplete()) {
         this._showToast('Daily challenge already done! Come back tomorrow.', 'info');
@@ -295,7 +268,6 @@ class App {
       this._startDailyChallenge();
     });
 
-    // Sight Words button (home → sight match screen)
     document.getElementById('btn-sight-words')?.addEventListener('click', () => {
       initSightMatch(
         document.getElementById('sight-match-content'),
@@ -310,14 +282,12 @@ class App {
       mascot.setState('celebrate');
     });
 
-    // Sight Words screen back button (→ home)
     document.getElementById('btn-sm-back')?.addEventListener('click', () => {
       cleanupSightMatch();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
-    // Sentence Forge Quest button (home → sentence-forge screen)
     document.getElementById('btn-sentence-forge')?.addEventListener('click', () => {
       const unlock = this._getQuestUnlockStatus();
       if (!unlock.sentenceForge.unlocked) {
@@ -337,14 +307,12 @@ class App {
       mascot.setState('celebrate');
     });
 
-    // Sentence Forge screen back button (→ home)
     document.getElementById('btn-sfq-back')?.addEventListener('click', () => {
       cleanupSentenceForge();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
-    // Grammar MCQ button
     document.getElementById('btn-grammar-mcq')?.addEventListener('click', () => {
       initGrammarMcq(
         document.getElementById('grammar-mcq-content'),
@@ -364,7 +332,6 @@ class App {
       mascot.setHomeState('holdCard');
     });
 
-    // Vocabulary MCQ button
     document.getElementById('btn-vocab-mcq')?.addEventListener('click', () => {
       initVocabMcq(
         document.getElementById('vocab-mcq-content'),
@@ -384,7 +351,6 @@ class App {
       mascot.setHomeState('holdCard');
     });
 
-    // Paper Mode button
     document.getElementById('btn-paper-mode')?.addEventListener('click', () => {
       initPaperMode(document.getElementById('paper-mode-content'), {
         onGoHome: () => {
@@ -407,7 +373,6 @@ class App {
       mascot.setHomeState('holdCard');
     });
 
-    // Cloze Castle Quest button (home → cloze-castle screen)
     document.getElementById('btn-cloze-castle')?.addEventListener('click', () => {
       const unlock = this._getQuestUnlockStatus();
       if (!unlock.clozeCastle.unlocked) {
@@ -427,14 +392,12 @@ class App {
       mascot.setState('celebrate');
     });
 
-    // Cloze Castle screen back button (→ home)
     document.getElementById('btn-ccq-back')?.addEventListener('click', () => {
       cleanupClozeCastle();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
-    // Word Vault Quest button (home → word-vault screen)
     document.getElementById('btn-word-vault')?.addEventListener('click', () => {
       const unlock = this._getQuestUnlockStatus();
       if (!unlock.wordVault.unlocked) {
@@ -454,14 +417,12 @@ class App {
       mascot.setState('celebrate');
     });
 
-    // Word Vault screen back button (→ home)
     document.getElementById('btn-wvq-back')?.addEventListener('click', () => {
       cleanupWordVault();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
-    // Editing Quest button (home → editing quest screen)
     document.getElementById('btn-editing-quest')?.addEventListener('click', () => {
       const unlock = this._getQuestUnlockStatus();
       if (!unlock.editingQuest.unlocked) {
@@ -517,28 +478,23 @@ class App {
       this._nextWord();
     });
 
-    // Say It button
     this._els.btnSayIt?.addEventListener('click', () => {
       if (this._currentWord) audio.speakWord(this._currentWord.word);
     });
 
-    // Hint button — play first phoneme sound; no heart penalty on next wrong
     this._els.btnHint?.addEventListener('click', () => {
       this._giveHint();
     });
 
-    // Skip button
     this._els.btnSkip?.addEventListener('click', () => {
       this._cleanupMode();
       this._nextWord();
     });
 
-    // Mic button (speech recognition)
     this._els.btnMic?.addEventListener('click', () => {
       this._handleSpeechRecognition();
     });
 
-    // Settings button
     document.getElementById('settings-btn')?.addEventListener('click', () => {
       this._openModal('modal-settings');
     });
@@ -547,14 +503,11 @@ class App {
       this._runMicCalibration();
     });
 
-    // Dashboard button (PIN-gated)
     document.getElementById('dashboard-btn')?.addEventListener('click', () => {
       this._openModal('modal-pin');
-      // Focus first PIN digit
       setTimeout(() => document.querySelector('.pin-digit')?.focus(), 200);
     });
 
-    // Modal close buttons
     document.querySelectorAll('.modal-close').forEach(btn => {
       btn.addEventListener('click', () => {
         const modalId = btn.dataset.close;
@@ -562,14 +515,12 @@ class App {
       });
     });
 
-    // Modal overlay click-to-close
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
       overlay.addEventListener('click', (e) => {
         if (e.target === overlay) this._closeModal(overlay.id);
       });
     });
 
-    // Settings bindings (via settingsController)
     settingsController.bind({
       store,
       badges,
@@ -578,10 +529,8 @@ class App {
       onReset    : () => this._showToast('Progress reset!', 'warning'),
     });
 
-    // PIN gate
     this._bindPinGate();
 
-    // Keyboard shortcuts (via keyboardManager – fixes the 'n' shortcut bug)
     keyboardManager.init({
       getScreen   : () => this._screen,
       els         : this._els,
@@ -589,12 +538,10 @@ class App {
       modalManager,
     });
 
-    // Review words button
     document.getElementById('btn-review-words')?.addEventListener('click', () => {
       this._startReviewSession();
     });
 
-    // Extra Practice collapsible toggle
     document.getElementById('extra-practice-toggle')?.addEventListener('click', () => {
       const content = document.getElementById('extra-practice-content');
       const toggle = document.getElementById('extra-practice-toggle');
@@ -604,25 +551,21 @@ class App {
       content.classList.toggle('home-extra-content--collapsed', isExpanded);
     });
 
-    // Mascot tap (random cheer)
     document.getElementById('mascot-trigger')?.addEventListener('click', () => {
       mascot.clap();
       this._showToast(mascot.getCheer(), 'success');
       audio.playSfx('pop');
     });
 
-    // Profile chip → show profile picker
     document.getElementById('profile-chip')?.addEventListener('click', () => {
       this._renderProfileGrid();
       this._showScreen(SCREENS.PROFILES);
     });
 
-    // Add profile button on profile screen
     document.getElementById('btn-add-profile')?.addEventListener('click', () => {
       this._openCreateProfileModal();
     });
 
-    // Create profile modal close
     document.querySelector('[data-close="modal-create-profile"]')?.addEventListener('click', () => {
       this._closeModal('modal-create-profile');
     });
@@ -632,7 +575,6 @@ class App {
       }
     });
 
-    // Confirm new profile creation
     document.getElementById('cp-confirm-btn')?.addEventListener('click', () => {
       this._confirmCreateProfile();
     });
@@ -643,15 +585,12 @@ class App {
 
   /** Start a game round */
   _startGame(group) {
-    // Get next word — from queue (daily/review) or adaptive pool
     if (this._sessionType !== 'normal' && this._queuedWords.length > 0) {
       this._currentWord = this._queuedWords.shift();
     } else if (this._sessionType !== 'normal' && this._queuedWords.length === 0) {
-      // Queued session finished
       this._finishQueuedSession();
       return;
     } else {
-      // Use per-mode difficulty if available, falling back to global setting
       const modeDiffs = store.get('modeDifficulty') || {};
       const effectiveDiff = modeDiffs[this._mode] ?? store.get('difficulty') ?? 1;
       const opts = { maxLevel: effectiveDiff, mode: this._mode };
@@ -659,17 +598,14 @@ class App {
       this._currentWord = progress.getNextWord(opts);
     }
 
-    // Preload audio
     audio.preloadWord(this._currentWord);
 
-    // Increment session progress counter
     this._sessionWordCount++;
     const progressEl = document.getElementById('game-progress-count');
     if (progressEl) {
       progressEl.textContent = `Word ${this._sessionWordCount}`;
     }
 
-    // Reset per-word state (hint, strikes, and the double-submit guard).
     this._hintUsed = false;
     this._hintTier = 0;
     this._wrongStrikes = 0;
@@ -680,7 +616,6 @@ class App {
       this._els.btnHint.textContent = '💡 Hint';
     }
 
-    // Switch to game screen
     this._showScreen(SCREENS.GAME);
     mascot.think();
 
@@ -702,7 +637,6 @@ class App {
     });
   }
 
-  /** Load the next word in the current mode */
   _nextWord() {
     this._cleanupMode();
     this._startGame(store.get('currentGroup'));
@@ -713,25 +647,22 @@ class App {
     const word = this._currentWord;
     if (!word) return;
 
-    // Prevent double-submission: rapid button clicks or a delayed speech-
+    // Guard against double-submission: rapid button clicks or a delayed speech-
     // recognition timeout firing after the word has already been evaluated.
     if (this._resultProcessing) return;
     this._resultProcessing = true;
 
-    // Record progress
     const isNew = progress.isNewWord(word.id);
     progress.recordAttempt(word.id, correct, this._mode);
 
-    // Track first-attempt success (decoded without any wrong strikes or hints).
+    // First-attempt success = decoded without any wrong strikes or hint use.
     if (correct && this._wrongStrikes === 0 && !this._hintUsed) {
       store.set('sessionFirstTryToday', (store.get('sessionFirstTryToday') || 0) + 1);
     }
 
     if (correct) {
-      // Gamification
       const reward = gamification.recordCorrect(responseTime, isNew);
 
-      // Badges
       const newBadges = badges.onCorrect({
         fast: responseTime < 3000,
         sessionStreak: gamification.getSessionStats().correct,
@@ -742,7 +673,6 @@ class App {
       });
       newBadges.forEach(b => badges.notify(b));
 
-      // Celebrations
       mascot.celebrate(reward.levelUp);
       mascot.setResultState(reward.levelUp ? 'trophy' : 'confetti');
       this._setGameMascot('celebrate');
@@ -756,19 +686,14 @@ class App {
         audio.playSfx('correct');
       }
 
-      // Track today's session XP
       store.addSessionXp(reward.xpEarned || 0);
 
       if (reward.dailyComplete) {
         celebrateDailyGoal();
-        // Show session summary after a brief result screen pause
         setTimeout(() => this._showSessionSummaryScreen(reward), 1800);
       }
 
-      // Show result screen
       this._showResultScreen(true, word, reward);
-
-      // Check if per-mode difficulty should adjust
       this._adjustModeDifficulty();
 
     } else {
@@ -783,21 +708,19 @@ class App {
       this._wrongStrikes++;
       this._setGameMascot('encourage');
 
-      // Two-strike system: first wrong with no hint used = gentle nudge, no heart loss
+      // Two-strike system: first wrong with no hint = gentle nudge, no energy loss.
       if (this._wrongStrikes === 1 && !this._hintUsed) {
         mascot.encourage();
         audio.playSfx('wrong');
         this._showToast('Almost! Try the 💡 Hint to hear the first sound.', 'warning');
-        // Pulse the hint button to draw attention
         this._els.btnHint?.classList.remove('btn--hint-pulse');
         void this._els.btnHint?.offsetWidth;
         this._els.btnHint?.classList.add('btn--hint-pulse');
         this._els.btnHint?.addEventListener('animationend', () => {
           this._els.btnHint?.classList.remove('btn--hint-pulse');
         }, { once: true });
-        // Allow the next wrong attempt to be processed.
         this._resultProcessing = false;
-        return; // Stay on game screen — no result screen yet
+        return;
       }
 
       const result = gamification.recordWrong();
@@ -814,7 +737,6 @@ class App {
       }
     }
 
-    // Reset guard so the next word can be submitted.
     this._resultProcessing = false;
   }
 
@@ -839,7 +761,6 @@ class App {
     this._els.btnNext.focus();
   }
 
-  /** Switch visible screen with animation */
   _showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(screen => {
       if (screen.id === screenId) {
@@ -853,7 +774,6 @@ class App {
     });
     this._screen = screenId;
 
-    // Refresh quest banners and guided journey when returning home
     if (screenId === SCREENS.HOME) {
       this._updateQuestBanners();
       this._updateReviewBanner();
@@ -861,7 +781,6 @@ class App {
     }
   }
 
-  /** Set the floating game mascot state */
   _setGameMascot(state) {
     const el = document.getElementById('game-mascot');
     if (!el) return;
@@ -880,7 +799,6 @@ class App {
     }
   }
 
-  /** Hide the floating game mascot */
   _hideGameMascot() {
     const el = document.getElementById('game-mascot');
     if (el) {
@@ -888,13 +806,11 @@ class App {
     }
   }
 
-  /** Cleanup current mode */
   _cleanupMode() {
     const mode = MODES[this._mode];
     mode?.cleanup();
   }
 
-  /** Handle speech recognition flow */
   async _handleSpeechRecognition() {
     if (!this._currentWord || !speech.supported) return;
     const btn = this._els.btnMic;
@@ -923,8 +839,7 @@ class App {
 
     if (result.correct) {
       this._showSpeechBubble(`I heard "${result.heard}" – ${result.score}% match! Great job!`);
-      // Auto-mark as correct — but only if the word hasn't changed while we
-      // were waiting (guards against double-submission on rapid navigation).
+      // Guard: word may have changed if the user navigated away during the await.
       setTimeout(() => {
         if (this._currentWord?.id === recognisedWordId) {
           this._handleResult(true, 3000);
@@ -953,27 +868,24 @@ class App {
     const btn = this._els.btnHint;
 
     if (this._hintTier === 1) {
-      // Tier 1: Show vowel type hint
       this._hintUsed = true;
       const vowelIdx = word.types.findIndex(t => t === 'sv' || t === 'lv');
       if (vowelIdx >= 0) {
         const vowelType = word.types[vowelIdx] === 'sv' ? 'short' : 'long';
         this._showToast(`Hint: The vowel makes a ${vowelType} sound`, 'info');
-        // Briefly highlight the vowel tile
         const tiles = document.querySelectorAll('#phoneme-row .phoneme-tile');
         if (tiles[vowelIdx]) {
           tiles[vowelIdx].classList.add('active');
           setTimeout(() => tiles[vowelIdx].classList.remove('active'), 800);
         }
       } else {
-        // No clear vowel — skip to tier 2
+        // No vowel tile to highlight — advance straight to tier 2
         this._hintTier++;
       }
       if (btn) btn.textContent = '💡 Hint 2';
     }
 
     if (this._hintTier === 2) {
-      // Tier 2: Play the first phoneme and highlight it
       const firstGrapheme = word.graphemes[0];
       const firstType     = word.types[0];
       await audio.speakPhoneme(firstGrapheme, firstType);
@@ -986,10 +898,8 @@ class App {
       if (btn) btn.textContent = '💡 Hint 3';
 
     } else if (this._hintTier >= 3) {
-      // Tier 3: Play the full word slowly
       await audio.speakWord(word.word);
 
-      // Mark button as fully used
       if (btn) {
         btn.classList.add('used');
         btn.setAttribute('aria-disabled', 'true');
@@ -998,7 +908,6 @@ class App {
     }
   }
 
-  /** Show speech bubble with result */
   _showSpeechBubble(text, opts = {}) {
     const bubble = this._els.speechBubble;
     if (!bubble) return;
@@ -1057,16 +966,12 @@ class App {
     if (display) display.textContent = `${Math.round(threshold * 100)}%`;
   }
 
-  // ── Settings ──
-  // Binding and value-application have been extracted to settingsController.js.
-
   // ── PIN Gate ──
 
   _bindPinGate() {
     const digits = document.querySelectorAll('.pin-digit');
     const hint = document.getElementById('pin-hint');
 
-    // Auto-advance PIN inputs
     digits.forEach((input, i) => {
       input.addEventListener('input', (e) => {
         if (e.target.value && i < digits.length - 1) {
@@ -1080,7 +985,6 @@ class App {
       });
     });
 
-    // Confirm PIN
     document.getElementById('pin-confirm-btn')?.addEventListener('click', async () => {
       const pin = Array.from(digits).map(d => d.value).join('');
       if (pin.length < 4) {
@@ -1092,7 +996,7 @@ class App {
       const candidateHash = await hashPin(pin);
 
       if (!savedPin) {
-        // First time: store hashed PIN
+        // First time entering a PIN — store it hashed.
         store.set('parentPin', candidateHash);
         if (hint) hint.textContent = '';
         this._closeModal('modal-pin');
@@ -1102,19 +1006,16 @@ class App {
         if (!isHashedPin(savedPin)) {
           store.set('parentPin', candidateHash);
         }
-        // Correct PIN
         if (hint) hint.textContent = '';
         this._closeModal('modal-pin');
         this._openDashboard();
       } else {
-        // Wrong PIN
         if (hint) hint.textContent = 'Wrong PIN. Try again.';
         digits.forEach(d => { d.value = ''; });
         digits[0].focus();
       }
     });
 
-    // Cancel PIN
     document.getElementById('pin-cancel-btn')?.addEventListener('click', () => {
       this._closeModal('modal-pin');
       document.querySelectorAll('.pin-digit').forEach(d => { d.value = ''; });
@@ -1312,7 +1213,6 @@ class App {
     const container = document.getElementById('dashboard-content');
     if (container) {
       renderDashboard(container, {
-        // Allow dashboard CTAs to close the dashboard and navigate to a quest
         onNavigate: ({ target, group }) => {
           this._closeModal('modal-dashboard');
           this._navigateTo(target, group);
@@ -1320,7 +1220,7 @@ class App {
       });
     }
 
-    // Bind the export-profile button inside the dashboard (rendered dynamically)
+    // Export/import buttons are rendered inside the dashboard — bind after it renders.
     setTimeout(() => {
       const exportBtn = document.getElementById('dashboard-export-btn');
       if (exportBtn && !exportBtn._bound) {
@@ -1483,14 +1383,8 @@ class App {
 
   /**
    * Render the guided learner journey section on the home screen.
-   *
-   * New IA (redesign):
-   *   1. Pathway badge  – "🌱 Preschool Journey" / "🏫 Primary Journey"
-   *   2. Start card     – dominant hero with a single, large CTA (Best Next Step)
-   *   3. Today's path   – 3-step clickable roadmap (do these in order)
-   *   4. Progress chips – concise learner snapshot
-   *
-   * Then manages section visibility so preschool vs primary layouts differ.
+   * Renders: pathway badge, Best Next Step hero card, 3-step roadmap, progress chips.
+   * Then adjusts section visibility for preschool vs primary layouts.
    */
   _renderGuidedJourney() {
     const section = document.getElementById('guided-journey-section');
@@ -1500,17 +1394,10 @@ class App {
     const placement = store.get('placementProfile') || null;
     const readingBand = getReadingBand(profile, placement);
 
-    let rec, plan, chips;
-    try {
-      rec   = getRecommendation();
-      plan  = getDailyPlan();
-      chips = getLearnerSummaryChips();
-    } catch (_) {
-      section.innerHTML = '';
-      return;
-    }
+    const rec   = getRecommendation();
+    const plan  = getDailyPlan();
+    const chips = getLearnerSummaryChips();
 
-    // ── Pathway meta ───────────────────────────────────────────────────────
     const stageMeta = {
       'pre-reader': { icon: '🌱', label: 'Pre-reader Journey', mod: 'pathway-badge--preschool' },
       'emerging-decoder': { icon: '🧩', label: 'Emerging Decoder Journey', mod: 'pathway-badge--preschool' },
@@ -1522,8 +1409,7 @@ class App {
     const pathwayMod   = stageMeta[readingBand]?.mod || 'pathway-badge--preschool';
     const profileName  = profile?.name ? `${profile.name}'s ` : '';
 
-    // ── Reading Level Journey bar ──────────────────────────────────────────
-    // 4 ordered stages. Show "you are here" with progress toward next stage.
+    // Progress bar: each of 4 stages = 25%, plus partial credit from within-stage mastery.
     const JOURNEY_STAGES = [
       { key: 'pre-reader',       label: 'Pre-reader',   shortLabel: 'Pre',     desc: 'Learning sounds & letters' },
       { key: 'emerging-decoder', label: 'Emerging',     shortLabel: 'Emerging', desc: 'Decoding simple words' },
@@ -1532,11 +1418,10 @@ class App {
     ];
     const currentStageIdx = JOURNEY_STAGES.findIndex(s => s.key === readingBand);
     const safeIdx         = currentStageIdx === -1 ? 0 : currentStageIdx;
-    // Overall progress: each stage = 25%, plus partial from mastery within current stage
     const groupMastery    = store.get('groupMastery') || {};
     const masteryValues   = Object.values(groupMastery).filter(v => typeof v === 'number');
     const avgMastery      = masteryValues.length ? masteryValues.reduce((a, b) => a + b, 0) / masteryValues.length : 0;
-    const withinStagePct  = Math.min(Math.round(avgMastery * 100), 99); // partial progress within stage
+    const withinStagePct  = Math.min(Math.round(avgMastery * 100), 99);
     const baseProgress    = safeIdx * 25;
     const totalProgress   = Math.min(baseProgress + Math.round(withinStagePct * 0.25), 100);
     const nextStage       = JOURNEY_STAGES[safeIdx + 1];
@@ -1566,13 +1451,11 @@ class App {
         ${nextStage ? `<p class="journey-next-goal">Next: <strong>${nextStage.label}</strong> — ${nextStage.desc}</p>` : '<p class="journey-next-goal">🏅 Reading journey complete!</p>'}
       </div>`;
 
-    // ── Urgency display ────────────────────────────────────────────────────
     const urgencyIcon  = rec.urgency === 'high'   ? '🔴'
                        : rec.urgency === 'medium' ? '🟡' : '🟢';
     const urgencyText  = rec.urgency === 'high'   ? 'Focus area'
                        : rec.urgency === 'medium' ? 'Needs practice' : 'Looking good';
 
-    // ── 3-step roadmap ─────────────────────────────────────────────────────
     const roadmapHtml = plan.map(step => `
       <button class="home-roadmap-step"
               data-target="${step.ctaTarget}"
@@ -1586,14 +1469,12 @@ class App {
         <span class="roadmap-arrow" aria-hidden="true">→</span>
       </button>`).join('');
 
-    // ── Progress chips ─────────────────────────────────────────────────────
     const chipsHtml = chips.length
       ? `<div class="progress-chips" aria-label="Progress snapshot">
            ${chips.map(c => `<span class="progress-chip">${c}</span>`).join('')}
          </div>`
       : '';
 
-    // ── Render ─────────────────────────────────────────────────────────────
     section.innerHTML = `
       ${journeyBarHtml}
 
@@ -1662,7 +1543,6 @@ class App {
     const sentenceForgeBtn = document.getElementById('btn-sentence-forge');
 
     if (layout.hidePhonicsCore) {
-      // Hide preschool phonics grid; quests are the primary lesson
       coreSection?.classList.add('home-section--hidden');
       questsSection?.classList.remove('home-section--milestone');
       if (questsHeading) questsHeading.textContent = 'Your Learning Quests';
@@ -1675,7 +1555,6 @@ class App {
       if (questsSub)     questsSub.textContent     = 'Keep phonics active and begin Sentence Forge first';
       sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
     } else {
-      // Show phonics grid; demote quests as milestone tracker
       coreSection?.classList.remove('home-section--hidden');
       questsSection?.classList.add('home-section--milestone');
       if (questsHeading) questsHeading.textContent = 'Quest Milestones';
@@ -1686,25 +1565,12 @@ class App {
 
   // ── Modals ──
 
-  /**
-   * Open a modal by ID.
-   * Delegates focus-trapping and Escape-key registration to `modalManager`
-   * so that listeners never accumulate across multiple open/close cycles.
-   */
   _openModal(id) {
     modalManager.open(id, {
-      onClose: () => {
-        // Run any modal-specific close-side-effects (e.g. chart teardown).
-        this._onModalClosed(id);
-      },
+      onClose: () => this._onModalClosed(id),
     });
   }
 
-  /**
-   * Close a modal by ID.
-   * Delegates to `modalManager` (removes the Escape listener) then handles
-   * any modal-specific cleanup.
-   */
   _closeModal(id) {
     modalManager.close(id);
     this._onModalClosed(id);
@@ -1771,7 +1637,6 @@ class App {
         this._showScreen(SCREENS.HOME);
         mascot.setHomeState('holdCard');
         audio.playSfx('correct');
-        // Refresh guided journey for the newly activated profile
         this._renderGuidedJourney();
       });
     });
@@ -1818,7 +1683,6 @@ class App {
   }
 
   _openCreateProfileModal() {
-    // Populate avatar picker
     const row = document.getElementById('cp-avatar-row');
     if (row) {
       row.innerHTML = AVATAR_OPTIONS.map((av, i) => `
@@ -1843,7 +1707,6 @@ class App {
     const input = document.getElementById('cp-name-input');
     if (input) input.value = '';
 
-    // Reset school-level picker to Preschool and wire up toggle
     const levelGroup = document.getElementById('cp-level-group');
     const levelHint  = document.getElementById('cp-level-hint');
     if (levelGroup) {
@@ -1891,8 +1754,7 @@ class App {
     this._updateProfileChip();
     this._renderProfileGrid();
 
-    // Show placement test for all new profiles before home screen.
-    // The resulting reading band (not school level) drives pathway routing.
+    // Placement determines reading band; school level only affects quest gating.
     if (!store.get('placementComplete')) {
       this._showScreen('screen-placement');
       this._runPlacementTest(profile);
@@ -1948,30 +1810,25 @@ class App {
     this._renderGuidedJourney();
     this._updateQuestBanners();
 
-    // Show onboarding tutorial for new profiles (first-run experience)
     if (!store.get('onboardingComplete')) {
       setTimeout(() => this._showOnboardingTutorial(profile), 400);
       return;
     }
 
-    // Weekly recap / comeback checks for returning users
     this._checkReturnEvents();
   }
 
   // ── Return-event checks (streak freeze, comeback, weekly recap, backup) ──
 
   /**
-   * Run on init (returning user) or after first placement (onboarding done).
    * Checks: streak freeze notification → comeback session → weekly recap → backup reminder.
    * Each check is mutually exclusive per session to avoid modal stacking.
    */
   _checkReturnEvents() {
-    // 1. Streak freeze notification
     if (gamification.wasFreezeUsed()) {
       this._showToast('Streak saved! 🛡️ Your streak freeze was used automatically.', 'success');
     }
 
-    // 2. Comeback session: 2–6 days away
     const daysAway = gamification.getDaysAway();
     if (daysAway >= 2 && daysAway <= 6) {
       const last = store.get('comebackShownAt');
@@ -1979,11 +1836,10 @@ class App {
       if (!last || new Date(last).toDateString() !== today) {
         store.set('comebackShownAt', new Date().toISOString());
         setTimeout(() => this._showComebackModal(daysAway), 600);
-        return; // don't show other modals on top
+        return;
       }
     }
 
-    // 3. Weekly recap (7+ days since last shown, and user has some history)
     if (shouldShowWeeklyRecap()) {
       const stats = gamification.getWeeklyStats();
       setTimeout(() => showWeeklyRecap({
@@ -1993,7 +1849,6 @@ class App {
       return;
     }
 
-    // 4. Backup reminder
     this._checkBackupReminder();
   }
 
@@ -2033,7 +1888,6 @@ class App {
 
     modal.querySelector('#cb-warm-up')?.addEventListener('click', () => {
       modal.remove();
-      // Start blend mode on the last-played group — a familiar warm-up
       this._mode = 'blend';
       store.set('currentMode', 'blend');
       this._startGame(store.get('currentGroup') || 'cvc-a');
@@ -2057,7 +1911,6 @@ class App {
       if (daysSince < 7) return;
     }
 
-    // Only remind if there is real progress to lose
     const wordCount = Object.keys(store.get('wordStats') || {}).length;
     if (wordCount < 10) return;
 
@@ -2065,9 +1918,6 @@ class App {
     this._showBackupReminderModal();
   }
 
-  /**
-   * Show the backup reminder modal.
-   */
   _showBackupReminderModal() {
     const existing = document.getElementById('modal-backup-reminder');
     if (existing) existing.remove();
@@ -2155,10 +2005,8 @@ class App {
     const unlocked     = getUnlockedStages(groupMastery);
     const recommended  = getRecommendedStage(groupMastery);
 
-    // Remove stale picker if any
     document.getElementById('modal-blend-picker')?.remove();
 
-    // Group stages by phase
     const byPhase = {};
     for (const stage of CURRICULUM) {
       (byPhase[stage.phase] ??= []).push(stage);
@@ -2215,7 +2063,6 @@ class App {
 
     document.body.appendChild(modal);
 
-    // Stage click → start game with that group
     modal.querySelectorAll('.bp-stage:not([disabled])').forEach(btn => {
       btn.addEventListener('click', () => {
         const group = btn.dataset.group;
@@ -2358,16 +2205,10 @@ class App {
   }
 
   // ── Quest Unlock Gating ──
-  // QUEST_THRESHOLDS have been moved to constants.js.
 
   /**
-   * Calculate quest unlock status based on words mastered.
-   * A word is "mastered" when it has >= 6 attempts and >= 80% accuracy.
-   *
-   * Primary-school profiles bypass mastery gating: all three quests are
-   * treated as immediately unlocked regardless of word progress.
-   * Preschool profiles (and existing profiles without a schoolLevel field)
-   * continue to use the mastery-threshold unlock path.
+   * Primary-school profiles bypass mastery gating (all quests unlock immediately).
+   * Preschool profiles unlock quests as words are mastered (≥6 attempts, ≥80% accuracy).
    */
   _getQuestUnlockStatus() {
     const profile = getActiveProfile();
@@ -2376,7 +2217,6 @@ class App {
     return getQuestUnlockStatus(stats, profile, QUEST_THRESHOLDS, placementProfile);
   }
 
-  /** Update quest banner UI to show lock/unlock state */
   _updateQuestBanners() {
     const unlock = this._getQuestUnlockStatus();
 
@@ -2405,9 +2245,6 @@ class App {
     }
   }
 
-  // ── Keyboard Shortcuts ──
-  // Handled by keyboardManager (see src/modules/keyboardManager.js).
-  // keyboardManager.init() is called from _bindEvents().
 }
 
 

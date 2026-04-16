@@ -186,7 +186,7 @@ class SpinWheel {
  * Animate letters flying into position to spell a word.
  * @param {import('../data/words.js').Word} word
  * @param {HTMLElement} container  the #word-display element
- * @param {Function} [onLetterLand]  callback(index) when each letter lands
+ * @param {(index: number) => void} [onLetterLand]  callback(index) when each letter lands
  */
 export function buildWordAnimation(word, container, onLetterLand) {
   container.innerHTML = '';

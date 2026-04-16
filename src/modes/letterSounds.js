@@ -81,7 +81,7 @@ const ALL_CARDS = buildCardMap();
 
 /**
  * @param {HTMLElement} container
- * @param {Function}    onGoHome
+ * @param {() => void}  onGoHome
  */
 export function initLetterSounds(container, onGoHome) {
   _container  = container;

@@ -21,5 +21,7 @@ export interface UserProfile {
   avatar: string;
   color: string;
   schoolLevel: 'preschool' | 'primary';
+  readingBand?: string | null;
+  classId?: string;
   createdAt: string;
 }

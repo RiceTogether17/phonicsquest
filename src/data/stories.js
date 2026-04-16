@@ -23,7 +23,6 @@
 // ── Signature refrain (pre-taught as a unit) ─────────────────────────────────
 export const REFRAIN = 'Puff puff puff! Ears wiggle!';
 
-// ── Band metadata (replaces old LEVEL_META) ──────────────────────────────────
 export const BAND_META = [
   {
     band: 'A', level: 1,
@@ -58,9 +57,6 @@ export const BAND_META = [
     wordRange: '140\u2013250', sentenceRange: '15\u201330',
   },
 ];
-
-/** @deprecated Use BAND_META instead. Alias kept for backward compatibility. */
-export const LEVEL_META = BAND_META;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 

@@ -2,6 +2,11 @@
 
 export const SHORT_VOWEL_CANONICAL_GROUPS = Object.freeze(['cvc-a', 'cvc-e', 'cvc-i', 'cvc-o', 'cvc-u']);
 
+export const VOWEL_LABELS = Object.freeze({
+  'cvc-a': 'CVC Short A', 'cvc-e': 'CVC Short E',
+  'cvc-i': 'CVC Short I', 'cvc-o': 'CVC Short O', 'cvc-u': 'CVC Short U',
+});
+
 const LEGACY_TO_CANONICAL = Object.freeze({
   'short-a': 'cvc-a',
   'short-e': 'cvc-e',

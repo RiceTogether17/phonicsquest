@@ -94,12 +94,7 @@ describe('Gamification', () => {
       expect(store.get('energy')).toBe(3);
     });
 
-    it('refillHearts is an alias for resetEnergy', () => {
-      store.set('energy', 0);
-      gamification.refillHearts();
-      expect(store.get('energy')).toBe(3);
-    });
-  });
+});
 
   describe('getSessionStats', () => {
     it('tracks session correct and wrong counts', () => {

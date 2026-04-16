@@ -14,8 +14,6 @@ import { store } from '../modules/store.js';
 import { getActiveProfile } from '../modules/profiles.js';
 import { getDomainMastery } from '../modules/masteryEngine.js';
 
-// ── Phase metadata ────────────────────────────────────────────────────────────
-
 const PHASE_META = [
   { phase: 1, label: 'Phase 1',  title: 'CVC Words',          icon: '🔤', desc: 'Simple 3-sound words (cat, hen, big)' },
   { phase: 2, label: 'Phase 2',  title: 'CCVC Blends',         icon: '🔀', desc: 'Blends at the start (flat, step, drip)' },
@@ -33,8 +31,6 @@ const PRIMARY_DOMAINS = [
   { id: 'editingQuest',   label: 'Editing Quest',    icon: '✏️', desc: 'Spot and fix errors' },
   { id: 'writingQuest',   label: 'Writing Quest',    icon: '📝', desc: 'Extended writing tasks' },
 ];
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
 
 function _getGroupMastery(groupKey) {
   const gm = store.get('groupMastery') || {};
@@ -83,8 +79,6 @@ function _getDomainStatus(domainId) {
   return { status, pct };
 }
 
-// ── Render ────────────────────────────────────────────────────────────────────
-
 export function renderCurriculumMap(container, { onClose } = {}) {
   if (!container) return;
 
@@ -94,7 +88,6 @@ export function renderCurriculumMap(container, { onClose } = {}) {
   const avatar       = profile?.avatar || '🦁';
   const name         = profile?.name?.split(' ')[0] || 'Learner';
 
-  // Build phonics phase cards
   const phaseCards = PHASE_META.map(pm => {
     const { status, pct, masteredCount, total } = _getPhaseStatus(pm.phase);
     const isCurrent = pm.phase === currentPhase && status !== 'complete';
@@ -123,7 +116,6 @@ export function renderCurriculumMap(container, { onClose } = {}) {
       </div>`;
   }).join('');
 
-  // Build primary English domain cards
   const domainCards = PRIMARY_DOMAINS.map(pd => {
     const { status, pct } = _getDomainStatus(pd.id);
     const statusClass = `cm-domain--${status}`;
