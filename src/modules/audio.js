@@ -68,6 +68,46 @@ const PHONEME_FILES = {
   oi: 'oi', ow: 'ow', aw: 'aw',
   // Soft consonants (used only when explicitly tagged in word data)
   soft_g: 'soft_g', soft_c: 'soft_c',
+  // Schwa (used in affix phoneme sequences)
+  'ə': 'u',  // schwa maps to short-u audio as closest match
+};
+
+/**
+ * Explicit pronunciation map for affix / suffix chunks.
+ *
+ * Consonant+le endings, reduced-vowel suffixes, and other affixes where
+ * raw text-to-speech guesses wrong (letter-name spelling or wrong vowel).
+ * Each value is an array of phoneme keys to play in sequence.
+ * The special key 'ə' represents the schwa sound.
+ */
+const AFFIX_PRONUNCIATION = {
+  // Consonant + le endings → consonant, /l/, /ə/
+  ble: ['b', 'l', 'ə'],
+  cle: ['c', 'l', 'ə'],
+  dle: ['d', 'l', 'ə'],
+  fle: ['f', 'l', 'ə'],
+  gle: ['g', 'l', 'ə'],
+  kle: ['k', 'l', 'ə'],
+  ple: ['p', 'l', 'ə'],
+  tle: ['t', 'l', 'ə'],
+  zle: ['z', 'l', 'ə'],
+  // Bare -le suffix (e.g. "unable" → ['un','a','b','le'])
+  le:  ['l', 'ə'],
+  // Schwa-reduced endings
+  al: ['ə', 'l'],
+  el: ['ə', 'l'],
+};
+
+/**
+ * TTS text overrides for affixes that should be spoken as a unit
+ * but where raw text produces the wrong pronunciation.
+ */
+const AFFIX_TTS_OVERRIDES = {
+  tion: 'shun',
+  sion: 'zhun',
+  ous:  'uss',
+  ious: 'ee-uss',
+  ture: 'chur',
 };
 
 /**
@@ -104,6 +144,8 @@ const PHONEME_TTS = {
   oi: 'oy',  ow: 'ow',  aw: 'aw',
   // Soft consonants
   soft_g: 'juh', soft_c: 'sss',
+  // Schwa (reduced unstressed vowel in affixes)
+  'ə': 'uh',
 };
 
 /** Sound effect file names */
@@ -188,13 +230,32 @@ class AudioManager {
       return this._playPhonemeAudio(key);
     }
 
-    // Suffix tile (-ing, -ed, -er, -est) — speak the morpheme via TTS
+    // Suffix / affix tile (-ing, -ed, -er, -est, -ble, -tion, etc.)
     // For -ed: pronunciation depends on the final sound of the base word:
     //   /ɪd/ after /t/ or /d/ sounds (preceding grapheme ends with t or d)
     //   /t/  after voiceless sounds (preceding grapheme ends with p, k, f, s, x, or is sh/ch/th/ck/ss)
     //   /d/  after voiced sounds (everything else)
     if (type === 'sf') {
       const suffix = grapheme.replace(/^-/, '');
+
+      // 1) Explicit phoneme sequence (consonant+le, schwa endings, etc.)
+      //    Plays each phoneme individually so TTS never guesses wrong.
+      const phonemes = AFFIX_PRONUNCIATION[suffix];
+      if (phonemes) {
+        for (let i = 0; i < phonemes.length; i++) {
+          if (i > 0) await this._delay(80);
+          await this._playPhonemeAudio(phonemes[i]);
+        }
+        return;
+      }
+
+      // 2) TTS text override (e.g. "tion" → "shun")
+      const ttsOverride = AFFIX_TTS_OVERRIDES[suffix];
+      if (ttsOverride) {
+        return this._speak(ttsOverride, 0.9);
+      }
+
+      // 3) Context-dependent -ed pronunciation
       if (suffix === 'ed' && opts.prevGrapheme) {
         const prev = opts.prevGrapheme.toLowerCase();
         const lastChar = prev[prev.length - 1];
@@ -211,6 +272,8 @@ class AudioManager {
         // /d/ after voiced consonants
         return this._playPhonemeAudio('d');
       }
+
+      // 4) Fallback: let TTS pronounce the suffix text directly
       return this._speak(suffix, 0.9);
     }
 
