@@ -1,5 +1,6 @@
 import { questMastery } from '../modules/questMastery.js';
 import { gamification } from '../modules/gamification.js';
+import { store } from '../modules/store.js';
 import { GRAMMAR_MCQ_ITEMS, GRAMMAR_MCQ_LEVELS } from '../data/grammarMcq.js';
 import { GRAMMAR_CATEGORIES } from '../data/grammarCategories.js';
 import { checkPostAttempt } from '../modules/remediationRouter.js';
@@ -63,6 +64,9 @@ function _adaptiveShuffle(items) {
 function _start(level) {
   _level = level;
   _items = _adaptiveShuffle(GRAMMAR_MCQ_ITEMS[level] || []);
+  // Honour paper-mode item cap (one-shot flag set by Paper Mode before launch)
+  const limit = store.get('paperItemLimit');
+  if (limit) { store.set('paperItemLimit', null); _items = _items.slice(0, limit); }
   _idx = 0;
   _correct = 0;
   _streak = 0;

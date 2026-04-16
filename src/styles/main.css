@@ -6441,6 +6441,38 @@ details.story-tool-section[open] > .story-tool-summary::before {
   padding: var(--space-3) 0;
 }
 
+/* Paper Mode diagnostic weak-skills panel */
+.paper-weak-panel {
+  background: color-mix(in srgb, var(--color-warning, #f59e0b) 8%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--color-warning, #f59e0b) 30%, transparent);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  margin: var(--space-2) 0;
+}
+.paper-weak-title {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  margin: 0 0 var(--space-1);
+  color: var(--text);
+}
+.paper-weak-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.paper-weak-chip {
+  font-size: var(--font-size-xs, 0.75rem);
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-warning, #f59e0b) 18%, var(--surface));
+  color: var(--text);
+  font-weight: 600;
+}
+.paper-weak-score {
+  font-weight: 400;
+  opacity: 0.75;
+}
+
 /* Responsive adjustments */
 @media (max-width: 480px) {
   .dash-learner-summary { flex-direction: column; gap: var(--space-3); }
