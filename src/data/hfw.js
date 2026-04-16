@@ -66,15 +66,6 @@ export function getAllowedHFW(band) {
   }
 }
 
-// ── Legacy exports (backward compatibility) ──────────────────────────────────
-
-/** @deprecated Use HFW_TIER_1 instead. The original 12 pre-taught HFW. */
-export const STORY_HFW = [
-  ...HFW_TIER_1,
-  // These 3 were in the original STORY_HFW but are now in Tier 2+
-  'said', 'up', 'off',
-];
-
 // ── Extended HFW (for game modes, not story gating) ──────────────────────────
 
 const EXTENDED_HFW_LIST = [

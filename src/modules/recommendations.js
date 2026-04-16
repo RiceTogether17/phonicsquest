@@ -10,14 +10,10 @@ import { getActiveProfile } from './profiles.js';
 import { getReadingBand } from './readingStages.js';
 import {
   SHORT_VOWEL_CANONICAL_GROUPS,
+  VOWEL_LABELS,
   normalizeGroupMasteryMap,
   normalizePhonicsGroupKey,
 } from './phonicsGroupKeys.js';
-
-const VOWEL_LABELS = {
-  'cvc-a': 'CVC Short A', 'cvc-e': 'CVC Short E',
-  'cvc-i': 'CVC Short I', 'cvc-o': 'CVC Short O', 'cvc-u': 'CVC Short U',
-};
 
 export function humaniseSkill(skill) {
   const map = {

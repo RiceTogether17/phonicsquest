@@ -225,9 +225,6 @@ class Gamification {
     this._updateUI();
   }
 
-  /** @deprecated kept for compat – use resetEnergy() */
-  refillHearts() { this.resetEnergy(); }
-
   /** Get current session stats */
   getSessionStats() {
     return {

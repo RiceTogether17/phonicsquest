@@ -29,9 +29,9 @@ import { setupSoundCount,  cleanup as cleanupSoundCount, getCurrentWord as getSo
  * @property {string} icon
  * @property {string} group     – UI grouping: 'blend' | 'phonemic'
  * @property {string} subskill  – specific skill tag for reporting/routing
- * @property {Function} setup  (word, els) => void
- * @property {Function} cleanup  () => void
- * @property {Function} getCurrentWord  () => Word|null
+ * @property {(word: import('../data/words.js').Word, els: Record<string, HTMLElement | null>) => void} setup
+ * @property {() => void} cleanup
+ * @property {() => import('../data/words.js').Word | null} getCurrentWord
  */
 
 /** @type {Record<string, Mode>} */

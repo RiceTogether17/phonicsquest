@@ -17,8 +17,6 @@ const DEFAULT_STATE = {
   // Gamification
   xp:        0,
   level:     1,
-  // Giri Energy: 3 stars per session (non-punitive, resets each session)
-  // hearts key kept for backward-compat but ignored by new UI
   energy:    3,
   streak:    0,
   bestStreak: 0,
@@ -158,7 +156,7 @@ const DEFAULT_STATE = {
 class Store {
   constructor() {
     this._state = this._load();
-    /** @type {Map<string, Set<Function>>} */
+    /** @type {Map<string, Set<(value: unknown, key: string) => void>>} */
     this._listeners = new Map();
     /** Consecutive save failures for circuit breaker */
     this._saveFailures = 0;
@@ -262,7 +260,7 @@ class Store {
   /**
    * Update one key and notify subscribers.
    * @param {string} key
-   * @param {*} value
+   * @param {typeof DEFAULT_STATE[keyof typeof DEFAULT_STATE]} value
    */
   set(key, value) {
     this._state[key] = value;
@@ -285,8 +283,8 @@ class Store {
   /**
    * Subscribe to a state key change.
    * @param {string} key   state key, or '*' for any change
-   * @param {Function} fn  called with (newValue, key)
-   * @returns {Function}   unsubscribe function
+   * @param {(value: unknown, key: string) => void} fn  called with (newValue, key)
+   * @returns {() => void}   unsubscribe function
    */
   subscribe(key, fn) {
     if (!this._listeners.has(key)) this._listeners.set(key, new Set());

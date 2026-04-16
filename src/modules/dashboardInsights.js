@@ -18,13 +18,9 @@ import {
 } from './masteryEngine.js';
 import {
   SHORT_VOWEL_CANONICAL_GROUPS,
+  VOWEL_LABELS,
   normalizeGroupMasteryMap,
 } from './phonicsGroupKeys.js';
-
-const VOWEL_LABELS = {
-  'cvc-a': 'CVC Short A', 'cvc-e': 'CVC Short E',
-  'cvc-i': 'CVC Short I', 'cvc-o': 'CVC Short O', 'cvc-u': 'CVC Short U',
-};
 
 // ── Internal helpers ───────────────────────────────────────────────────────
 
@@ -267,7 +263,7 @@ export function getRecommendedActions() {
       });
     }
 
-    const phonicsScores = SHORT_VOWEL_GROUPS.map(g => gm[g] ?? 0);
+    const phonicsScores = SHORT_VOWEL_CANONICAL_GROUPS.map(g => gm[g] ?? 0);
     const avg = phonicsScores.reduce((a, b) => a + b, 0) / phonicsScores.length;
     if (avg >= 0.6) {
       actions.push({
@@ -383,17 +379,7 @@ export function getRecentPatternInsights() {
   return insights.slice(0, 4);
 }
 
-/**
- * Generate the parent coaching card.
- *
- * v2 — uses real accumulated data throughout:
- *   - weekXp from weeklyXpLog (daily accumulation, not today-only proxy)
- *   - weekDays derived from questAttempts timestamps (always available)
- *   - weekWords from wordHistory timestamps
- *   - domain practice counts from questAttempts
- *   - actionable advancement decision per weakest domain
- *   - one clear strength, one clear concern, one weekly priority
- */
+/** Generate the parent coaching card with real accumulated data. */
 export function getParentCoachingCard() {
   const readiness    = getLearnerReadinessSummary();
   const wordHistory  = store.get('wordHistory') || [];

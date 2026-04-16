@@ -28,15 +28,12 @@ export function setupSegment(word, els) {
   segmentsFound = [];
   startTime = Date.now();
 
-  // Show image + word
   renderWordImage(word, els.wordEmoji, true);
   buildWordAnimation(word, els.wordDisplay);
   els.phonemeRow.innerHTML = '';
 
-  // Instruction
   els.modeInstruction.textContent = 'Tap letters that go together to make each sound!';
 
-  // Split word into individual letters
   const letters = word.word.split('');
 
   els.modeArea.innerHTML = `
@@ -47,7 +44,6 @@ export function setupSegment(word, els) {
   const lettersContainer = document.getElementById('segment-letters');
   const targetsContainer = document.getElementById('segment-targets');
 
-  // Create target slots (one per grapheme)
   for (let i = 0; i < word.graphemes.length; i++) {
     const slot = document.createElement('div');
     slot.className = 'segment-slot';
@@ -56,7 +52,6 @@ export function setupSegment(word, els) {
     targetsContainer.appendChild(slot);
   }
 
-  // Create tappable letter buttons
   letters.forEach((letter, i) => {
     const btn = document.createElement('button');
     btn.className = 'segment-btn';
@@ -67,18 +62,15 @@ export function setupSegment(word, els) {
     lettersContainer.appendChild(btn);
   });
 
-  // Show check button
   els.btnCheck.style.display = '';
   els.btnCheck.onclick = () => checkSegmentation(word, els);
   els.btnSayIt.style.display = '';
   els.btnSkip.style.display = '';
 
-  // Play the word
   setTimeout(() => audio.speakWord(word.word), 400);
 }
 
 function handleLetterTap(index, letter, btn, word, els) {
-  // Toggle selection
   if (btn.classList.contains('selected')) {
     btn.classList.remove('selected');
     selectedLetters = selectedLetters.filter(l => l.index !== index);
@@ -88,7 +80,7 @@ function handleLetterTap(index, letter, btn, word, els) {
     selectedLetters.sort((a, b) => a.index - b.index);
   }
 
-  // If selected letters form a valid grapheme, auto-submit
+  // Auto-submit when the selection matches the next expected grapheme.
   const selectedStr = selectedLetters.map(l => l.letter).join('');
   const nextGrapheme = word.graphemes[segmentsFound.length];
   if (nextGrapheme && selectedStr === nextGrapheme) {
@@ -103,10 +95,8 @@ function confirmSegment(word, els) {
   const expectedGrapheme = word.graphemes[segmentsFound.length];
 
   if (selectedStr === expectedGrapheme) {
-    // Correct segment!
     segmentsFound.push(selectedStr);
 
-    // Mark letters as matched
     const lettersContainer = document.getElementById('segment-letters');
     selectedLetters.forEach(l => {
       const btns = lettersContainer.querySelectorAll('.segment-btn');
@@ -115,7 +105,6 @@ function confirmSegment(word, els) {
       btns[l.index].disabled = true;
     });
 
-    // Fill the target slot
     const slots = document.querySelectorAll('.segment-slot');
     const slot = slots[segmentsFound.length - 1];
     if (slot) {
@@ -123,14 +112,12 @@ function confirmSegment(word, els) {
       slot.classList.add('filled');
     }
 
-    // Play the phoneme sound
     const i = segmentsFound.length - 1;
     const prevGrapheme = i > 0 ? word.graphemes[i - 1] : null;
     audio.speakPhoneme(word.graphemes[i], word.types[i], { word: word.word, prevGrapheme });
 
     selectedLetters = [];
 
-    // All segments found?
     if (segmentsFound.length === word.graphemes.length) {
       onAllSegmented(word, els);
     }
@@ -156,19 +143,13 @@ function checkSegmentation(word, els) {
 function onAllSegmented(word, els) {
   const responseTime = Date.now() - startTime;
 
-  // Show phonemes with full diacritics
   renderPhonemes(word, els.phonemeRow, {
     showDiacritics: true,
     showLabels: true,
   });
 
-  // Play full word
   setTimeout(() => audio.speakWord(word.word), 300);
-
-  // Auto-mark as correct (they completed it!)
-  setTimeout(() => {
-    els.onResult(true, responseTime);
-  }, 1000);
+  setTimeout(() => els.onResult(true, responseTime), 1000);
 }
 
 export function getCurrentWord() {
