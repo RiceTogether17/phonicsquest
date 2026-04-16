@@ -173,6 +173,8 @@ class AudioManager {
     // Map grapheme + type to audio key
     let key = grapheme.toLowerCase();
     if (type === 'lv') key = `long_${grapheme.toLowerCase().replace('ee','e').replace('ay','a')}`;
+    if (type === 'soft_c') key = 'soft_c';
+    if (type === 'soft_g') key = 'soft_g';
     if (type === 'se') return; // silent-e: no sound
 
     // Ensure hard /g/ for consonant 'g' — always use 'g' (hard g) audio.
@@ -414,6 +416,8 @@ class AudioManager {
       const type     = wordData.types[i];
       let key = grapheme.toLowerCase();
       if (type === 'lv') key = `long_${grapheme.toLowerCase()}`;
+      if (type === 'soft_c') key = 'soft_c';
+      if (type === 'soft_g') key = 'soft_g';
       if (type === 'dp') {
         const dipMap = { oy: 'oi', ou: 'ow', au: 'aw' };
         key = dipMap[grapheme.toLowerCase()] ?? grapheme.toLowerCase();

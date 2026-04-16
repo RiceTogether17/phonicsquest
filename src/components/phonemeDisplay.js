@@ -17,6 +17,8 @@ const TYPE_CLASS = {
   rc: 'r-control',
   dp: 'diphthong',
   sf: 'suffix',
+  soft_c: 'consonant',
+  soft_g: 'consonant',
 };
 
 /** Human-readable labels for phoneme types */
@@ -30,6 +32,8 @@ const TYPE_LABEL = {
   rc: 'r-controlled',
   dp: 'diphthong',
   sf: 'suffix',
+  soft_c: 'soft c (/s/)',
+  soft_g: 'soft g (/j/)',
 };
 
 /**

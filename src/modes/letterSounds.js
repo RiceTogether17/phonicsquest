@@ -24,7 +24,7 @@ const TYPE_META = {
   rc:     { label: 'R-Controlled',  short: 'R-Ctrl',color: '#ec4899', bg: '#fce7f3', order: 6 },
   dp:     { label: 'Diphthongs',    short: 'Dipth', color: '#0d9488', bg: '#ccfbf1', order: 7 },
   se:     { label: 'Silent-E',      short: 'Sil-E', color: '#94a3b8', bg: '#f1f5f9', order: 8 },
-  sfx:    { label: 'Suffixes',      short: 'Suffix',color: '#d97706', bg: '#fef3c7', order: 9 },
+  sf:     { label: 'Suffixes',      short: 'Suffix',color: '#d97706', bg: '#fef3c7', order: 9 },
   soft_c: { label: 'Soft C (/s/)',  short: 'Soft C',color: '#06b6d4', bg: '#cffafe', order: 10 },
   soft_g: { label: 'Soft G (/j/)',  short: 'Soft G',color: '#8b5cf6', bg: '#ede9fe', order: 11 },
 };
