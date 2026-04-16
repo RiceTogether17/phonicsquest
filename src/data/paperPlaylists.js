@@ -54,6 +54,24 @@ export const PAPER_BOOKLET_SPLIT = {
   P6: { bookletA: ['grammar-mcq', 'cloze-castle', 'vocab-mcq', 'word-vault', 'editing-quest'], bookletB: ['sentence-forge-synthesis'] },
 };
 
+/**
+ * Item count caps per section per level, aligned to PSLE Paper 2 question
+ * counts.  When Paper Mode launches a section, it sets this as a one-shot
+ * store flag so MCQ modes present only the right number of questions rather
+ * than the entire item bank.
+ *
+ * null means "no cap — present all items" (e.g. cloze passages where length
+ * is determined by the passage itself).
+ */
+export const PAPER_ITEM_COUNTS = {
+  P1: { 'grammar-mcq': 10, 'vocab-mcq': 5,  'cloze-castle': null, 'word-vault': null, 'sentence-forge-word-order': null, 'editing-quest': null },
+  P2: { 'grammar-mcq': 10, 'vocab-mcq': 5,  'cloze-castle': null, 'word-vault': null, 'sentence-forge-word-order': null, 'sentence-forge-combining': null, 'editing-quest': null },
+  P3: { 'grammar-mcq': 12, 'vocab-mcq': 5,  'cloze-castle': null, 'word-vault': null, 'sentence-forge-combining': null, 'editing-quest': null },
+  P4: { 'grammar-mcq': 15, 'vocab-mcq': 5,  'cloze-castle': null, 'word-vault': null, 'editing-quest': null, 'sentence-forge-synthesis': null },
+  P5: { 'grammar-mcq': 15, 'vocab-mcq': 5,  'cloze-castle': null, 'word-vault': null, 'editing-quest': null, 'sentence-forge-synthesis': null },
+  P6: { 'grammar-mcq': 15, 'vocab-mcq': 5,  'cloze-castle': null, 'word-vault': null, 'editing-quest': null, 'sentence-forge-synthesis': null },
+};
+
 /** Suggested time per level (practice paper pacing). */
 export const PAPER_TIMING = {
   P1: '45 min',

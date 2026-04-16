@@ -1,5 +1,6 @@
-import { PAPER_LEVELS, PAPER_MODE_PLAYLISTS, PAPER_SECTION_LABELS, PAPER_SECTION_MARKS, PAPER_BOOKLET_SPLIT, PAPER_TIMING } from '../data/paperPlaylists.js';
+import { PAPER_LEVELS, PAPER_MODE_PLAYLISTS, PAPER_SECTION_LABELS, PAPER_SECTION_MARKS, PAPER_BOOKLET_SPLIT, PAPER_TIMING, PAPER_ITEM_COUNTS } from '../data/paperPlaylists.js';
 import { store } from '../modules/store.js';
+import { getWeakSkills } from '../modules/remediationRouter.js';
 
 let _container = null;
 let _launchSection = null;
@@ -46,13 +47,26 @@ function _renderPlaylist(level) {
   if (!holder) return;
   const canResume = _activeSession && _activeSession.level === level && !_activeSession.complete;
   const marks = PAPER_SECTION_MARKS[level] || {};
+  const itemCounts = PAPER_ITEM_COUNTS[level] || {};
   const totalMarks = sections.reduce((sum, s) => sum + (marks[s] || 0), 0);
   const booklet = PAPER_BOOKLET_SPLIT[level];
   const timing = PAPER_TIMING[level] || '';
 
+  // Diagnostic: surface up to 3 weakest skills so the child knows what to focus on
+  const weakSkills = getWeakSkills().slice(0, 3);
+  const weakPanel = weakSkills.length ? `
+    <div class="paper-weak-panel" role="note" aria-label="Weak skills to focus on">
+      <p class="paper-weak-title">📊 Focus areas this paper:</p>
+      <div class="paper-weak-chips">
+        ${weakSkills.map(ws => `<span class="paper-weak-chip">${ws.label} <span class="paper-weak-score">${Math.round(ws.score * 100)}%</span></span>`).join('')}
+      </div>
+    </div>` : '';
+
   const sectionHtml = (s, i) => {
     const m = marks[s] || '–';
-    return `<li><button class="btn btn--ghost" data-section="${s}">Section ${i + 1}: ${PAPER_SECTION_LABELS[s] || s} <span style="opacity:0.7">[${m} marks]</span></button></li>`;
+    const cap = itemCounts[s];
+    const capLabel = cap ? ` · ${cap}q` : '';
+    return `<li><button class="btn btn--ghost" data-section="${s}">Section ${i + 1}: ${PAPER_SECTION_LABELS[s] || s} <span style="opacity:0.7">[${m} marks${capLabel}]</span></button></li>`;
   };
 
   let listHtml;
@@ -76,6 +90,7 @@ function _renderPlaylist(level) {
     <div class="dash-pattern-item" style="margin-top:12px">
       <h3>${level} Paper Playlist</h3>
       <p class="sfq-instruction" style="margin:4px 0 8px">Total: ${totalMarks} marks · ${timing}</p>
+      ${weakPanel}
       ${listHtml}
       <div class="sfq-actions" style="margin-top:8px">
         <button class="btn btn--primary" id="paper-start-all">Start Full Paper</button>
@@ -154,6 +169,9 @@ function _renderSessionCard() {
 
   card.querySelector('#paper-launch-current')?.addEventListener('click', () => {
     if (!_activeSession || _activeSession.complete) return;
+    // Set one-shot item cap so MCQ modes present PSLE-realistic question counts
+    const cap = (PAPER_ITEM_COUNTS[_activeSession.level] || {})[current];
+    if (cap) store.set('paperItemLimit', cap);
     _launchSection?.(current, _activeSession.level);
   });
 
