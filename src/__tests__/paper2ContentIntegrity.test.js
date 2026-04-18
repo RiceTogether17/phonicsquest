@@ -35,7 +35,7 @@ const VOCAB_CATEGORY_KEYS = new Set(Object.keys(VOCAB_CATEGORIES));
 
 // Baseline minimums (current state) — later chunks should grow these.
 const MIN_GRAMMAR_MCQ_PER_LEVEL = 35;
-const MIN_VOCAB_MCQ_PER_LEVEL   = 15;
+const MIN_VOCAB_MCQ_PER_LEVEL   = 35;
 const MIN_GRAMMAR_MCQ_CATEGORIES_PER_LEVEL = 5;
 const MIN_VOCAB_MCQ_CATEGORIES_PER_LEVEL   = 4;
 const MIN_GRAMMAR_PASSAGES_PER_LEVEL = 30;
@@ -91,6 +91,19 @@ describe('Paper 2 content integrity — Vocabulary MCQ', () => {
   it('does not contain duplicate vocabulary MCQ prompts after normalization', () => {
     const issues = validateUniqueMcqPrompts(VOCAB_MCQ_ITEMS, 'Vocab MCQ');
     expect(issues, issues.join('\n')).toEqual([]);
+  });
+
+  it('keeps upper-primary meaning-in-context stems sufficiently contextual', () => {
+    const contextCats = new Set(['contextInference', 'synonymContrast', 'collocationCloze']);
+    const levels = ['P4', 'P5', 'P6'];
+    for (const level of levels) {
+      const items = (VOCAB_MCQ_ITEMS[level] || []).filter(it => contextCats.has(it.category));
+      for (const it of items) {
+        const wc = String(it.q || '').trim().split(/\s+/).filter(Boolean).length;
+        expect(wc, `${it.id} has too little context in stem`).toBeGreaterThanOrEqual(6);
+        expect(String(it.q || '').includes('___'), `${it.id} must retain a cloze slot`).toBe(true);
+      }
+    }
   });
 });
 
