@@ -17,6 +17,7 @@
  *
  * Structure: passages[level][categoryKey] = [passage, passage, passage]
  */
+import { EXTRA_GRAMMAR_PASSAGES } from './passagesExtra.js';
 
 // Category definitions are shared with Grammar MCQ — single source of truth.
 export { GRAMMAR_CATEGORIES } from './grammarCategories.js';
@@ -1977,3 +1978,26 @@ function enrichGrammarPassages() {
 }
 
 enrichGrammarPassages();
+
+function _mergeUniqueById(targetArr, incomingArr) {
+  const seen = new Set((targetArr || []).map(item => item?.id).filter(Boolean));
+  for (const item of incomingArr || []) {
+    if (!item) continue;
+    if (item.id && seen.has(item.id)) continue;
+    targetArr.push({ ...item });
+    if (item.id) seen.add(item.id);
+  }
+}
+
+function mergeExtraPassages() {
+  for (const [level, cats] of Object.entries(EXTRA_GRAMMAR_PASSAGES || {})) {
+    if (!passages[level]) passages[level] = {};
+    for (const [catKey, arr] of Object.entries(cats || {})) {
+      if (!Array.isArray(arr) || !arr.length) continue;
+      if (!passages[level][catKey]) passages[level][catKey] = [];
+      _mergeUniqueById(passages[level][catKey], arr);
+    }
+  }
+}
+
+mergeExtraPassages();
