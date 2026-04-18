@@ -25,6 +25,7 @@
 const GRAMMAR_MCQ_REQUIRED = ['id', 'level', 'category', 'subskill', 'difficulty', 'q', 'choices', 'answer', 'explain'];
 const VOCAB_MCQ_REQUIRED   = ['id', 'level', 'category', 'subskill', 'difficulty', 'q', 'choices', 'answer', 'explain'];
 const PASSAGE_REQUIRED     = ['id', 'text', 'answers', 'wordBank'];
+const SPIRAL_LEVEL_KEYS    = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 
 function _countBlanks(text) {
   return (String(text || '').match(/___/g) || []).length;
@@ -32,6 +33,11 @@ function _countBlanks(text) {
 
 function _hasDupes(arr) {
   return new Set(arr).size !== arr.length;
+}
+
+function _hasCaseFoldDupes(arr) {
+  const normalized = arr.map(v => String(v).trim().toLowerCase());
+  return new Set(normalized).size !== normalized.length;
 }
 
 /**
@@ -69,6 +75,9 @@ export function validateMcqItem(item, ctx) {
     if (_hasDupes(item.choices)) {
       issues.push(`${tag}: duplicate choices`);
     }
+    if (_hasCaseFoldDupes(item.choices)) {
+      issues.push(`${tag}: duplicate choices after case/space normalization`);
+    }
     if (item.answer !== undefined && !item.choices.includes(item.answer)) {
       issues.push(`${tag}: answer "${item.answer}" is not in choices`);
     }
@@ -80,6 +89,10 @@ export function validateMcqItem(item, ctx) {
     }
   } else if (item.choices !== undefined) {
     issues.push(`${tag}: choices must be an array`);
+  }
+
+  if (item.answer !== undefined && (typeof item.answer !== 'string' || !item.answer.trim())) {
+    issues.push(`${tag}: answer must be a non-empty string`);
   }
 
   if (typeof item.q === 'string') {
@@ -282,4 +295,100 @@ export function countMcqCategories(bank) {
     }
   }
   return out;
+}
+
+/**
+ * Validate Paper Mode playlists + item count maps.
+ * Keeps section routing stable for Paper Mode launcher and MCQ caps.
+ *
+ * @param {{
+ *   levels: string[],
+ *   playlists: Record<string, string[]>,
+ *   sectionLabels: Record<string, string>,
+ *   itemCounts: Record<string, Record<string, number|null>>
+ * }} cfg
+ */
+export function validatePaperModeConfig(cfg) {
+  const issues = [];
+  const levels = Array.isArray(cfg?.levels) ? cfg.levels : [];
+  const playlists = cfg?.playlists || {};
+  const sectionLabels = cfg?.sectionLabels || {};
+  const itemCounts = cfg?.itemCounts || {};
+
+  for (const lv of levels) {
+    const seq = playlists[lv];
+    if (!Array.isArray(seq)) {
+      issues.push(`Paper playlists ${lv}: not an array`);
+      continue;
+    }
+    if (!seq.length) issues.push(`Paper playlists ${lv}: empty sequence`);
+    if (_hasDupes(seq)) issues.push(`Paper playlists ${lv}: duplicate section keys`);
+
+    for (const section of seq) {
+      if (!sectionLabels[section]) {
+        issues.push(`Paper playlists ${lv}: unknown section "${section}" (missing label)`);
+      }
+    }
+
+    const caps = itemCounts[lv];
+    if (!caps || typeof caps !== 'object') {
+      issues.push(`Paper item counts ${lv}: missing`);
+      continue;
+    }
+
+    for (const section of seq) {
+      if (!(section in caps)) {
+        issues.push(`Paper item counts ${lv}: missing key for "${section}"`);
+        continue;
+      }
+      const value = caps[section];
+      if (value !== null && (!Number.isInteger(value) || value <= 0)) {
+        issues.push(`Paper item counts ${lv}/${section}: expected positive integer or null (got ${value})`);
+      }
+    }
+  }
+
+  return issues;
+}
+
+/**
+ * Validate Spiral Grammar matrix structure (level coverage + required fields).
+ * This guards the curriculum map consumed by recommendation / planning logic.
+ */
+export function validateSpiralGrammarMatrix(matrix, knownCategories = null) {
+  const issues = [];
+  for (const [strand, levels] of Object.entries(matrix || {})) {
+    if (knownCategories && !knownCategories.has(strand)) {
+      issues.push(`Spiral matrix: unknown strand "${strand}"`);
+    }
+    if (!levels || typeof levels !== 'object') {
+      issues.push(`Spiral matrix ${strand}: invalid level map`);
+      continue;
+    }
+
+    const presentLevels = SPIRAL_LEVEL_KEYS.filter(lv => levels[lv] && typeof levels[lv] === 'object');
+    if (!presentLevels.length) {
+      issues.push(`Spiral matrix ${strand}: no valid level nodes`);
+      continue;
+    }
+    const startIdx = SPIRAL_LEVEL_KEYS.indexOf(presentLevels[0]);
+
+    for (let i = startIdx; i < SPIRAL_LEVEL_KEYS.length; i++) {
+      const lv = SPIRAL_LEVEL_KEYS[i];
+      const node = levels[lv];
+      if (!node || typeof node !== 'object') {
+        issues.push(`Spiral matrix ${strand}: missing ${lv}`);
+        continue;
+      }
+      for (const f of ['label', 'focus', 'keyForms', 'questionDemand']) {
+        if (node[f] === undefined || node[f] === null || node[f] === '') {
+          issues.push(`Spiral matrix ${strand}/${lv}: missing "${f}"`);
+        }
+      }
+      if (!Array.isArray(node.keyForms) || node.keyForms.length === 0) {
+        issues.push(`Spiral matrix ${strand}/${lv}: keyForms must be a non-empty array`);
+      }
+    }
+  }
+  return issues;
 }
