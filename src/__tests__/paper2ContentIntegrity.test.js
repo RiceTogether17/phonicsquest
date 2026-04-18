@@ -28,9 +28,9 @@ const GRAMMAR_CATEGORY_KEYS = new Set(Object.keys(GRAMMAR_CATEGORIES));
 const VOCAB_CATEGORY_KEYS = new Set(Object.keys(VOCAB_CATEGORIES));
 
 // Baseline minimums (current state) — later chunks should grow these.
-const MIN_GRAMMAR_MCQ_PER_LEVEL = 15;
+const MIN_GRAMMAR_MCQ_PER_LEVEL = 40;
 const MIN_VOCAB_MCQ_PER_LEVEL   = 15;
-const MIN_GRAMMAR_MCQ_CATEGORIES_PER_LEVEL = 5;
+const MIN_GRAMMAR_MCQ_CATEGORIES_PER_LEVEL = 7;
 const MIN_VOCAB_MCQ_CATEGORIES_PER_LEVEL   = 4;
 const MIN_GRAMMAR_PASSAGES_PER_LEVEL = 30;
 

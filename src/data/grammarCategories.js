@@ -36,6 +36,7 @@ export const GRAMMAR_CATEGORIES = {
   reportedSpeech:            { label: 'Reported Speech',                  icon: '💬' },
   relativeClauses:           { label: 'Relative Clauses',                 icon: '🧩' },
   countableUncountable:      { label: 'Countable & Uncountable Nouns',    icon: '🧺' },
+  plurals:                   { label: 'Plural Nouns',                     icon: '📚' },
   possessives:               { label: 'Possessives',                      icon: '🏷' },
   adjAdverbs:                { label: 'Adjectives & Adverbs',             icon: '🎨' },
   auxiliaries:               { label: 'Auxiliaries & Questions',           icon: '🙋' },

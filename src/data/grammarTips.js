@@ -147,6 +147,11 @@ export const GRAMMAR_TIPS = {
     example: 'Read the whole sentence. Find the subject, the time clue, and the sentence pattern — they will guide you to the right answer.',
     tip: 'For each blank: (1) What is the subject? (2) What is the time? (3) Is it active or passive? (4) Is there a connector clue?',
   },
+  plurals: {
+    rule: 'Most nouns add -s to become plural. Words ending in -s, -x, -ch, -sh add -es. Words ending in consonant + y change y → ies. Some nouns are irregular (man → men, child → children, foot → feet).',
+    example: '"one book → two books" — "one box → two boxes" — "one baby → three babies" — "one mouse → many mice"',
+    tip: 'Listen to the last sound. Hissy endings (-s/-x/-ch/-sh) need -es. Consonant + y becomes -ies. Some nouns just change shape — learn them by heart.',
+  },
 };
 
 /**
