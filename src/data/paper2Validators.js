@@ -35,6 +35,11 @@ function _hasDupes(arr) {
   return new Set(arr).size !== arr.length;
 }
 
+function _hasCaseFoldDupes(arr) {
+  const normalized = arr.map(v => String(v).trim().toLowerCase());
+  return new Set(normalized).size !== normalized.length;
+}
+
 /**
  * Validate a single MCQ item.  Returns an array of issue strings.
  * @param {object} item
@@ -70,6 +75,9 @@ export function validateMcqItem(item, ctx) {
     if (_hasDupes(item.choices)) {
       issues.push(`${tag}: duplicate choices`);
     }
+    if (_hasCaseFoldDupes(item.choices)) {
+      issues.push(`${tag}: duplicate choices after case/space normalization`);
+    }
     if (item.answer !== undefined && !item.choices.includes(item.answer)) {
       issues.push(`${tag}: answer "${item.answer}" is not in choices`);
     }
@@ -81,6 +89,10 @@ export function validateMcqItem(item, ctx) {
     }
   } else if (item.choices !== undefined) {
     issues.push(`${tag}: choices must be an array`);
+  }
+
+  if (item.answer !== undefined && (typeof item.answer !== 'string' || !item.answer.trim())) {
+    issues.push(`${tag}: answer must be a non-empty string`);
   }
 
   if (typeof item.q === 'string') {
