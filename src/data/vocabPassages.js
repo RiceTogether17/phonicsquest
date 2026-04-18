@@ -11,6 +11,8 @@
 // Category definitions are shared with Vocabulary MCQ — single source of truth.
 export { VOCAB_CATEGORIES } from './vocabCategories.js';
 
+import { EXTRA_VOCAB_PASSAGES } from './vocabPassagesExtra.js';
+
 export const vocabPassages = {
   // ── CONTEXT INFERENCE ──────────────────────────────────────────────────────
   contextInference: {
@@ -1450,6 +1452,17 @@ const EXTRA_VOCAB_CONTENT = {
   },
 };
 
+
+function mergeVocabPassageExtensions(baseMap, extensionMap) {
+  for (const [catKey, levels] of Object.entries(extensionMap || {})) {
+    if (!baseMap[catKey]) baseMap[catKey] = {};
+    for (const [level, items] of Object.entries(levels || {})) {
+      if (!baseMap[catKey][level]) baseMap[catKey][level] = [];
+      baseMap[catKey][level].push(...(items || []).map(item => ({ ...item })));
+    }
+  }
+}
+
 const EXTRA_CLUES_BY_ID = {
   'ci-p3-04': [
     { blankIndex: 0, prompt: 'Tap the phrase that shows Nora could not find the atlas.', acceptableSpans: ['missing atlas', 'empty space'], partialSpans: ['scanned each shelf'], clueType: 'context-clue', explanation: 'If something is missing, she likely felt worried.' },
@@ -1619,6 +1632,7 @@ function enrichVocabMetadata() {
 }
 
 
+mergeVocabPassageExtensions(vocabPassages, EXTRA_VOCAB_PASSAGES);
 enrichVocabPassages();
 
 _ensureMinimumPassages();
