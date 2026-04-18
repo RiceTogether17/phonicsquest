@@ -9,6 +9,7 @@ import {
   validateSpiralGrammarMatrix,
   validateMcqItem,
   validateUniqueMcqPrompts,
+  validateVocabMcqDiscrimination,
 } from '../data/paper2Validators.js';
 import { GRAMMAR_MCQ_ITEMS, GRAMMAR_MCQ_LEVELS } from '../data/grammarMcq.js';
 import { VOCAB_MCQ_ITEMS, VOCAB_MCQ_LEVELS } from '../data/vocabMcq.js';
@@ -104,6 +105,11 @@ describe('Paper 2 content integrity — Vocabulary MCQ', () => {
         expect(String(it.q || '').includes('___'), `${it.id} must retain a cloze slot`).toBe(true);
       }
     }
+  });
+
+  it('passes ambiguity-focused discrimination guardrails for upper-primary vocab MCQs', () => {
+    const issues = validateVocabMcqDiscrimination(VOCAB_MCQ_ITEMS);
+    expect(issues, issues.join('\n')).toEqual([]);
   });
 });
 

@@ -325,6 +325,33 @@ export function validateUniqueMcqPrompts(bank, label = 'MCQ') {
 }
 
 /**
+<<<<<<< codex/audit-paper-mode-system-for-content-improvement-b9ril2
+ * Heuristic guardrails for ambiguity-prone vocabulary MCQs.
+ * Focuses on upper-primary contextual discrimination items.
+ */
+export function validateVocabMcqDiscrimination(bank) {
+  const issues = [];
+  const targetLevels = new Set(['P5', 'P6']);
+  const targetCats = new Set(['contextInference', 'synonymContrast', 'collocationCloze', 'connectorClue']);
+
+  for (const [level, items] of Object.entries(bank || {})) {
+    if (!targetLevels.has(level)) continue;
+    for (const item of items || []) {
+      if (!targetCats.has(item?.category)) continue;
+      if ((item?.difficulty || 0) < 3) continue;
+      const q = String(item?.q || '').trim();
+      const wc = q.split(/\s+/).filter(Boolean).length;
+      if (wc < 6) {
+        issues.push(`${item?.id || 'missing-id'}: upper-primary high-difficulty vocab stem should provide richer context (min 6 words)`);
+      }
+    }
+  }
+  return issues;
+}
+
+/**
+=======
+>>>>>>> main
  * Validate Paper Mode playlists + item count maps.
  * Keeps section routing stable for Paper Mode launcher and MCQ caps.
  *
