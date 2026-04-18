@@ -298,6 +298,33 @@ export function countMcqCategories(bank) {
 }
 
 /**
+ * Detect duplicate MCQ prompts after whitespace/case normalization.
+ * Helps prevent accidental clone stems in large content expansions.
+ */
+export function validateUniqueMcqPrompts(bank, label = 'MCQ') {
+  const issues = [];
+  const seen = new Map();
+
+  for (const [level, items] of Object.entries(bank || {})) {
+    for (const item of items || []) {
+      const normalized = String(item?.q || '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
+      if (!normalized) continue;
+      const prev = seen.get(normalized);
+      if (prev) {
+        issues.push(`${label}: duplicate prompt "${item?.q}" (${prev} vs ${item?.id || 'missing-id'})`);
+      } else {
+        seen.set(normalized, item?.id || `${level}-missing-id`);
+      }
+    }
+  }
+
+  return issues;
+}
+
+/**
  * Validate Paper Mode playlists + item count maps.
  * Keeps section routing stable for Paper Mode launcher and MCQ caps.
  *

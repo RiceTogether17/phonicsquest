@@ -8,6 +8,7 @@ import {
   validatePaperModeConfig,
   validateSpiralGrammarMatrix,
   validateMcqItem,
+  validateUniqueMcqPrompts,
 } from '../data/paper2Validators.js';
 import { GRAMMAR_MCQ_ITEMS, GRAMMAR_MCQ_LEVELS } from '../data/grammarMcq.js';
 import { VOCAB_MCQ_ITEMS, VOCAB_MCQ_LEVELS } from '../data/vocabMcq.js';
@@ -59,6 +60,11 @@ describe('Paper 2 content integrity — Grammar MCQ', () => {
       expect(cats.length, `${level} only covers ${cats.join(',')}`).toBeGreaterThanOrEqual(MIN_GRAMMAR_MCQ_CATEGORIES_PER_LEVEL);
     }
   });
+
+  it('does not contain duplicate grammar MCQ prompts after normalization', () => {
+    const issues = validateUniqueMcqPrompts(GRAMMAR_MCQ_ITEMS, 'Grammar MCQ');
+    expect(issues, issues.join('\n')).toEqual([]);
+  });
 });
 
 describe('Paper 2 content integrity — Vocabulary MCQ', () => {
@@ -80,6 +86,11 @@ describe('Paper 2 content integrity — Vocabulary MCQ', () => {
       const cats = Object.keys(counts[level] || {});
       expect(cats.length, `${level} only covers ${cats.join(',')}`).toBeGreaterThanOrEqual(MIN_VOCAB_MCQ_CATEGORIES_PER_LEVEL);
     }
+  });
+
+  it('does not contain duplicate vocabulary MCQ prompts after normalization', () => {
+    const issues = validateUniqueMcqPrompts(VOCAB_MCQ_ITEMS, 'Vocab MCQ');
+    expect(issues, issues.join('\n')).toEqual([]);
   });
 });
 
