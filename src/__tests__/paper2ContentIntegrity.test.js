@@ -5,6 +5,8 @@ import {
   validateGrammarPassages,
   validateVocabPassages,
   countMcqCategories,
+  validatePaperModeConfig,
+  validateSpiralGrammarMatrix,
 } from '../data/paper2Validators.js';
 import { GRAMMAR_MCQ_ITEMS, GRAMMAR_MCQ_LEVELS } from '../data/grammarMcq.js';
 import { VOCAB_MCQ_ITEMS, VOCAB_MCQ_LEVELS } from '../data/vocabMcq.js';
@@ -12,6 +14,8 @@ import { GRAMMAR_CATEGORIES } from '../data/grammarCategories.js';
 import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
 import { passages } from '../data/passages.js';
 import { vocabPassages } from '../data/vocabPassages.js';
+import { PAPER_ITEM_COUNTS, PAPER_LEVELS, PAPER_MODE_PLAYLISTS, PAPER_SECTION_LABELS } from '../data/paperPlaylists.js';
+import { SPIRAL_MATRIX } from '../data/spiralGrammar.js';
 
 /**
  * Chunk-1 foundational guardrails for the Paper 2 content banks.
@@ -112,5 +116,22 @@ describe('Paper 2 content integrity — Vocabulary Cloze passages', () => {
         expect(Array.isArray(arr) && arr.length > 0, `${cat} missing content at ${lv}`).toBe(true);
       }
     }
+  });
+});
+
+describe('Paper 2 content integrity — Routing and curriculum contracts', () => {
+  it('paper playlists, labels and item caps stay in sync', () => {
+    const issues = validatePaperModeConfig({
+      levels: PAPER_LEVELS,
+      playlists: PAPER_MODE_PLAYLISTS,
+      sectionLabels: PAPER_SECTION_LABELS,
+      itemCounts: PAPER_ITEM_COUNTS,
+    });
+    expect(issues, issues.join('\n')).toEqual([]);
+  });
+
+  it('spiral grammar matrix remains structurally complete for P1-P6', () => {
+    const issues = validateSpiralGrammarMatrix(SPIRAL_MATRIX, GRAMMAR_CATEGORY_KEYS);
+    expect(issues, issues.join('\n')).toEqual([]);
   });
 });
