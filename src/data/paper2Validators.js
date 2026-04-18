@@ -325,6 +325,7 @@ export function validateUniqueMcqPrompts(bank, label = 'MCQ') {
 }
 
 /**
+<<<<<<< codex/audit-paper-mode-system-for-content-improvement-b9ril2
  * Heuristic guardrails for ambiguity-prone vocabulary MCQs.
  * Focuses on upper-primary contextual discrimination items.
  */
@@ -349,6 +350,8 @@ export function validateVocabMcqDiscrimination(bank) {
 }
 
 /**
+=======
+>>>>>>> main
  * Validate Paper Mode playlists + item count maps.
  * Keeps section routing stable for Paper Mode launcher and MCQ caps.
  *
