@@ -10,8 +10,29 @@
 
 // Category definitions are shared with Vocabulary MCQ — single source of truth.
 export { VOCAB_CATEGORIES } from './vocabCategories.js';
+import { vocabPassagesExtra } from './vocabPassagesExtra/index.js';
 
-export const vocabPassages = {
+function mergeVocabPassageBanks(baseMap = {}, extraMap = {}) {
+  const merged = {};
+  const categoryKeys = new Set([...Object.keys(baseMap), ...Object.keys(extraMap)]);
+
+  for (const category of categoryKeys) {
+    const baseLevels = baseMap[category] || {};
+    const extraLevels = extraMap[category] || {};
+    const levelKeys = new Set([...Object.keys(baseLevels), ...Object.keys(extraLevels)]);
+    merged[category] = {};
+
+    for (const level of levelKeys) {
+      const baseItems = Array.isArray(baseLevels[level]) ? baseLevels[level] : [];
+      const extraItems = Array.isArray(extraLevels[level]) ? extraLevels[level] : [];
+      merged[category][level] = [...baseItems, ...extraItems];
+    }
+  }
+
+  return merged;
+}
+
+const baseVocabPassages = {
   // ── CONTEXT INFERENCE ──────────────────────────────────────────────────────
   contextInference: {
     p1: [
@@ -1367,6 +1388,8 @@ export const vocabPassages = {
     ],
   },
 };
+
+export const vocabPassages = mergeVocabPassageBanks(baseVocabPassages, vocabPassagesExtra);
 
 
 const EXTRA_VOCAB_CONTENT = {

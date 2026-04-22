@@ -40,6 +40,10 @@ function _hasCaseFoldDupes(arr) {
   return new Set(normalized).size !== normalized.length;
 }
 
+function _normalizeToken(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
 /**
  * Validate a single MCQ item.  Returns an array of issue strings.
  * @param {object} item
@@ -58,6 +62,19 @@ export function validateMcqItem(item, ctx) {
 
   if (ctx.expectedLevel && item.level && item.level !== ctx.expectedLevel) {
     issues.push(`${tag}: level mismatch — expected ${ctx.expectedLevel}, got ${item.level}`);
+  }
+
+  if (item.id !== undefined && (typeof item.id !== 'string' || !item.id.trim())) {
+    issues.push(`${tag}: id must be a non-empty string`);
+  }
+  if (item.q !== undefined && (typeof item.q !== 'string' || !item.q.trim())) {
+    issues.push(`${tag}: q must be a non-empty string`);
+  }
+  if (item.explain !== undefined && (typeof item.explain !== 'string' || !item.explain.trim())) {
+    issues.push(`${tag}: explain must be a non-empty string`);
+  }
+  if (item.subskill !== undefined && (typeof item.subskill !== 'string' || !item.subskill.trim())) {
+    issues.push(`${tag}: subskill must be a non-empty string`);
   }
 
   if (typeof item.difficulty === 'number' && ![1, 2, 3].includes(item.difficulty)) {
@@ -114,6 +131,7 @@ export function validateClozePassage(p, ctx = {}) {
   const issues = [];
   const tag = p && p.id ? p.id : '(missing id)';
   if (!p || typeof p !== 'object') return [`${tag}: passage is not an object`];
+  const strictQuality = Boolean(ctx?.strictQuality);
 
   for (const f of PASSAGE_REQUIRED) {
     if (p[f] === undefined || p[f] === null) {
@@ -149,6 +167,34 @@ export function validateClozePassage(p, ctx = {}) {
     }
     if (p.wordBank.length < p.answers.length) {
       issues.push(`${tag}: wordBank shorter than answers`);
+    }
+
+    if (strictQuality) {
+      const normalizedAnswers = p.answers.map(_normalizeToken);
+      const normalizedWordBank = p.wordBank.map(_normalizeToken);
+
+      if (_hasCaseFoldDupes(p.wordBank)) {
+        issues.push(`${tag}: wordBank has duplicate entries after case/space normalization`);
+      }
+      if (_hasCaseFoldDupes(p.answers)) {
+        issues.push(`${tag}: answers has duplicate entries after case/space normalization`);
+      }
+      if (p.wordBank.length < p.answers.length + 2) {
+        issues.push(`${tag}: strict quality requires at least 2 distractors in wordBank`);
+      }
+
+      for (const wb of p.wordBank) {
+        if (typeof wb !== 'string' || !wb.trim()) {
+          issues.push(`${tag}: strict quality requires all wordBank entries to be non-empty strings`);
+          break;
+        }
+      }
+
+      const answerSet = new Set(normalizedAnswers);
+      const distractors = normalizedWordBank.filter(token => !answerSet.has(token));
+      if (distractors.length < 2) {
+        issues.push(`${tag}: strict quality requires at least 2 non-answer distractors in wordBank`);
+      }
     }
   }
 
@@ -223,7 +269,7 @@ export function validateVocabMcqBank(bank, knownCategories) {
 /**
  * Validate a grammar passages map (levels -> category -> passage[]).
  */
-export function validateGrammarPassages(passagesMap, knownCategories) {
+export function validateGrammarPassages(passagesMap, knownCategories, opts = {}) {
   const issues = [];
   const seenIds = new Set();
   for (const [level, cats] of Object.entries(passagesMap || {})) {
@@ -244,6 +290,7 @@ export function validateGrammarPassages(passagesMap, knownCategories) {
           knownCategories,
           category: catKey,
           level,
+          strictQuality: opts.strictQuality,
         }));
       }
     }
@@ -254,7 +301,7 @@ export function validateGrammarPassages(passagesMap, knownCategories) {
 /**
  * Validate a vocab passages map (category -> level -> passage[]).
  */
-export function validateVocabPassages(vocabMap, knownCategories) {
+export function validateVocabPassages(vocabMap, knownCategories, opts = {}) {
   const issues = [];
   const seenIds = new Set();
   for (const [catKey, levels] of Object.entries(vocabMap || {})) {
@@ -275,6 +322,7 @@ export function validateVocabPassages(vocabMap, knownCategories) {
           knownCategories,
           category: catKey,
           level: lv,
+          strictQuality: opts.strictQuality,
         }));
       }
     }
@@ -325,7 +373,6 @@ export function validateUniqueMcqPrompts(bank, label = 'MCQ') {
 }
 
 /**
-<<<<<<< codex/audit-paper-mode-system-for-content-improvement-b9ril2
  * Heuristic guardrails for ambiguity-prone vocabulary MCQs.
  * Focuses on upper-primary contextual discrimination items.
  */
@@ -350,8 +397,6 @@ export function validateVocabMcqDiscrimination(bank) {
 }
 
 /**
-=======
->>>>>>> main
  * Validate Paper Mode playlists + item count maps.
  * Keeps section routing stable for Paper Mode launcher and MCQ caps.
  *
