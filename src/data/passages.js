@@ -20,6 +20,7 @@
 
 // Category definitions are shared with Grammar MCQ — single source of truth.
 export { GRAMMAR_CATEGORIES } from './grammarCategories.js';
+import { passagesExtra } from './passagesExtra/index.js';
 
 export const CLOZE_LEVEL_LABELS = {
   P1: 'Primary 1',
@@ -34,7 +35,27 @@ export const CLOZE_LEVEL_ICONS = {
   P1: '🌱', P2: '🌿', P3: '🌳', P4: '🔥', P5: '💎', P6: '👑',
 };
 
-export const passages = {
+function mergePassageBanks(baseMap = {}, extraMap = {}) {
+  const merged = {};
+  const levelKeys = new Set([...Object.keys(baseMap), ...Object.keys(extraMap)]);
+
+  for (const level of levelKeys) {
+    const baseCategories = baseMap[level] || {};
+    const extraCategories = extraMap[level] || {};
+    const categoryKeys = new Set([...Object.keys(baseCategories), ...Object.keys(extraCategories)]);
+    merged[level] = {};
+
+    for (const category of categoryKeys) {
+      const baseItems = Array.isArray(baseCategories[category]) ? baseCategories[category] : [];
+      const extraItems = Array.isArray(extraCategories[category]) ? extraCategories[category] : [];
+      merged[level][category] = [...baseItems, ...extraItems];
+    }
+  }
+
+  return merged;
+}
+
+const basePassages = {
   P1: {
     articles: [
       {
@@ -1831,6 +1852,8 @@ export const passages = {
     ],
   },
 };
+
+export const passages = mergePassageBanks(basePassages, passagesExtra);
 
 
 const GRAMMARMASTER_EXPANSION = {

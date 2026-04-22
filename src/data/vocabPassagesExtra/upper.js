@@ -1,0 +1,16 @@
+export const upperVocabPassagesExtra = {
+  contextInference: {},
+  definitionMatch: {},
+  synonymContrast: {},
+  morphologicalAffix: {},
+  collocationCloze: {},
+  grammaticalRole: {},
+  connectorClue: {},
+  grammarPrepositions: {},
+  grammarArticles: {},
+  grammarSVA: {},
+  idiomaticExpressions: {},
+  proverbsSayings: {},
+  scienceTechTerms: {},
+  socialStudiesVocab: {},
+};

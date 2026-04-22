@@ -207,4 +207,57 @@ describe('Paper 2 validator guardrails — malformed MCQ detection', () => {
 
     expect(issues.some(i => i.includes('answer must be a non-empty string'))).toBe(true);
   });
+
+  it('flags non-string explain fields', () => {
+    const issues = validateMcqItem({
+      id: 'test-explain-type',
+      level: 'P3',
+      category: 'articles',
+      subskill: 'a_an',
+      difficulty: 1,
+      q: 'She bought ___ orange.',
+      choices: ['a', 'an', 'the', 'some'],
+      answer: 'an',
+      explain: 123,
+    }, {
+      required: ['id', 'level', 'category', 'subskill', 'difficulty', 'q', 'choices', 'answer', 'explain'],
+      knownCategories: GRAMMAR_CATEGORY_KEYS,
+      expectedLevel: 'P3',
+    });
+
+    expect(issues.some(i => i.includes('explain must be a non-empty string'))).toBe(true);
+  });
+});
+
+describe('Paper 2 validator guardrails — strict cloze quality checks', () => {
+  it('fails strict mode when word banks do not provide enough distractors', () => {
+    const issues = validateGrammarPassages({
+      P3: {
+        svAgreement: [{
+          id: 'strict-cloze-1',
+          text: 'The girls ___ at home.',
+          answers: ['are'],
+          wordBank: ['are'],
+        }],
+      },
+    }, GRAMMAR_CATEGORY_KEYS, { strictQuality: true });
+
+    expect(issues.some(i => i.includes('strict quality requires at least 2 distractors in wordBank'))).toBe(true);
+    expect(issues.some(i => i.includes('strict quality requires at least 2 non-answer distractors in wordBank'))).toBe(true);
+  });
+
+  it('flags duplicate word-bank entries after normalization in strict mode', () => {
+    const issues = validateVocabPassages({
+      contextInference: {
+        p5: [{
+          id: 'strict-cloze-2',
+          text: 'She felt ___ after the race.',
+          answers: ['tired'],
+          wordBank: ['tired', ' Tired ', 'rested', 'calm'],
+        }],
+      },
+    }, VOCAB_CATEGORY_KEYS, { strictQuality: true });
+
+    expect(issues.some(i => i.includes('wordBank has duplicate entries after case/space normalization'))).toBe(true);
+  });
 });
