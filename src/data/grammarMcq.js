@@ -32,6 +32,14 @@ const CONTEXT_TAILS = [
   'during oral practice',
   'before dismissal',
 ];
+const LEVEL_TAILS = {
+  P1: ['before story time', 'during phonics practice', 'after snack break'],
+  P2: ['before spelling practice', 'during reading lesson', 'after group work'],
+  P3: ['during project discussion', 'before oral practice', 'after science activity'],
+  P4: ['during class debate', 'before journal writing', 'after team rehearsal'],
+  P5: ['during revision class', 'before presentation practice', 'after consultation'],
+  P6: ['during exam preparation', 'before timed practice', 'after reflection session'],
+};
 
 function rotate(arr, idx) {
   return arr[idx % arr.length];
@@ -49,8 +57,8 @@ function difficultyFor(level, idx) {
 }
 
 function decorateStem(stem, level, idx) {
-  const tail = rotate(CONTEXT_TAILS, idx);
-  return `${String(stem).replace(/\.$/, '')} ${tail} in ${level} practice set ${idx + 1}.`;
+  const tail = rotate([...(LEVEL_TAILS[level] || []), ...CONTEXT_TAILS], idx);
+  return `${String(stem).replace(/\.$/, '')} ${tail}.`;
 }
 
 const GRAMMAR_BUILDERS = {
@@ -332,7 +340,7 @@ const GRAMMAR_BUILDERS = {
 
 function buildLevel(level) {
   const categories = LEVEL_CATEGORY_PLAN[level];
-  const targetCount = 84;
+  const targetCount = 150;
   const items = [];
   const categoryCursor = Object.fromEntries(categories.map(c => [c, 0]));
 

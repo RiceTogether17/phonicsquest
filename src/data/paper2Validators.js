@@ -26,6 +26,7 @@ const GRAMMAR_MCQ_REQUIRED = ['id', 'level', 'category', 'subskill', 'difficulty
 const VOCAB_MCQ_REQUIRED   = ['id', 'level', 'category', 'subskill', 'difficulty', 'q', 'choices', 'answer', 'explain'];
 const PASSAGE_REQUIRED     = ['id', 'text', 'answers', 'wordBank'];
 const SPIRAL_LEVEL_KEYS    = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
+const BANNED_PRACTICE_LEAKS = /(practice set|p1 practice|p2 practice|p3 practice|p4 practice|p5 practice|p6 practice|set 88)/i;
 
 function _countBlanks(text) {
   return (String(text || '').match(/___/g) || []).length;
@@ -96,8 +97,8 @@ export function validateMcqItem(item, ctx) {
   }
 
   if (Array.isArray(item.choices)) {
-    if (item.choices.length < 3 || item.choices.length > 4) {
-      issues.push(`${tag}: choices must have 3 or 4 options (got ${item.choices.length})`);
+    if (item.choices.length !== 4) {
+      issues.push(`${tag}: choices must have exactly 4 options (got ${item.choices.length})`);
     }
     if (_hasDupes(item.choices)) {
       issues.push(`${tag}: duplicate choices`);
@@ -126,6 +127,12 @@ export function validateMcqItem(item, ctx) {
     const blanks = _countBlanks(item.q);
     if (blanks !== 1) {
       issues.push(`${tag}: question stem must contain exactly one "___" blank (found ${blanks})`);
+    }
+    if (BANNED_PRACTICE_LEAKS.test(item.q)) {
+      issues.push(`${tag}: question contains banned internal practice label text`);
+    }
+    if (!/[.?!]$/.test(item.q.trim())) {
+      issues.push(`${tag}: question should end with natural sentence punctuation`);
     }
   }
 
@@ -157,6 +164,9 @@ export function validateClozePassage(p, ctx = {}) {
   }
 
   const blanks = _countBlanks(p.text);
+  if (BANNED_PRACTICE_LEAKS.test(String(p.text || '')) || BANNED_PRACTICE_LEAKS.test(String(p.title || ''))) {
+    issues.push(`${tag}: passage contains banned internal practice label text`);
+  }
   if (Array.isArray(p.answers)) {
     if (p.answers.length !== blanks) {
       issues.push(`${tag}: ${blanks} blank(s) in text but ${p.answers.length} answer(s)`);

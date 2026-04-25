@@ -29,6 +29,14 @@ const CONTEXT_TAILS = [
   'during enrichment week',
   'before the final check',
 ];
+const LEVEL_TAILS = {
+  P1: ['during a short class story', 'before playtime', 'after phonics station'],
+  P2: ['during worksheet practice', 'before sharing time', 'after library period'],
+  P3: ['during group discussion', 'before oral reading', 'after science period'],
+  P4: ['during project reflection', 'before class presentation', 'after feedback session'],
+  P5: ['during exam revision', 'before composition drafting', 'after problem-solving workshop'],
+  P6: ['during PSLE preparation', 'before timed correction', 'after strategy review'],
+};
 
 function rotate(arr, idx) {
   return arr[idx % arr.length];
@@ -45,8 +53,8 @@ function difficultyFor(level, idx) {
 }
 
 function decorateStem(stem, level, idx) {
-  const tail = rotate(CONTEXT_TAILS, idx);
-  return `${String(stem).replace(/\.$/, '')} ${tail} in ${level} practice set ${idx + 1}.`;
+  const tail = rotate([...(LEVEL_TAILS[level] || []), ...CONTEXT_TAILS], idx);
+  return `${String(stem).replace(/\.$/, '')} ${tail}.`;
 }
 
 const VOCAB_BUILDERS = {
@@ -168,7 +176,7 @@ function toCanonicalCategory(cat) {
 }
 
 function buildLevel(level) {
-  const target = 80;
+  const target = 150;
   const cats = LEVEL_CATEGORY_PLAN[level];
   const items = [];
   const categoryCursor = Object.fromEntries(cats.map(c => [c, 0]));
