@@ -198,7 +198,7 @@ function _buildDefinitionRows(passage) {
   const defs = passage.definitions || {};
   return (passage.wordBank || []).map((word) => ({
     word,
-    definition: defs[word] || 'Definition unavailable',
+    definition: defs[word] || 'Use the sentence context and clue to infer this word.',
     pos: (passage.partOfSpeechMap || {})[word] || 'word',
     collocationHint: (passage.collocationHintsByWord || {})[word] || passage.collocationHint || '',
   }));
