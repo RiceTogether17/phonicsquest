@@ -4765,6 +4765,105 @@ details.story-tool-section[open] > .story-tool-summary::before {
   color: var(--text-muted);
 }
 
+/* MCQ skill browser cards */
+.mcq-browser {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.mcq-browser-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+}
+.mcq-browser-heading {
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 var(--space-3);
+}
+.mcq-level-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+.mcq-level-card {
+  padding: var(--space-3);
+}
+.mcq-level-card--active {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--surface));
+  box-shadow: var(--shadow-md);
+}
+.mcq-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 2px 8px;
+  color: var(--text-muted);
+  background: var(--surface-2);
+}
+.mcq-skill-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+.mcq-skill-card {
+  text-align: left;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mcq-skill-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+}
+.mcq-skill-card--disabled {
+  opacity: 0.55;
+  filter: grayscale(0.2);
+}
+.mcq-skill-title {
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  color: var(--text);
+}
+.mcq-skill-sub {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+.mcq-mini-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.mcq-mini-chip {
+  min-height: auto;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.mcq-mini-chip:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
+}
+@media (max-width: 560px) {
+  .mcq-level-grid,
+  .mcq-skill-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Game area */
 .sfq-game {
   position: relative;

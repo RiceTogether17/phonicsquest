@@ -1,394 +1,199 @@
 /**
  * PhonicsQuest – Vocabulary MCQ Item Bank
  *
- * Restructured to align with the Vocabulary Cloze (Word Vault) category spine.
- * Every item now carries:
- *   category  – matches a key in vocabCategories.js (same as Word Vault)
- *   subskill  – specific micro-concept within the category
- *   difficulty – 1 (intro) → 2 (developing) → 3 (challenging) within level
- *
- * SPIRAL MODEL
- * ────────────────────────────────────────────────────────────────────────
- * Core strands (contextInference, definitionMatch, synonymContrast,
- * collocationCloze, grammaticalRole) recur across P1-P6 with rising
- * sophistication.
- *
- * Upper-primary strands (idiomaticExpressions, morphologicalAffix) build
- * on concrete vocabulary foundations laid in lower primary.
- *
- * The `category` key is used by questMastery so that Vocabulary MCQ and
- * Vocabulary Cloze share the same mastery buckets.
+ * Item generation follows the vocabulary category spine and keeps
+ * contextual stems for upper-primary practice.
  */
 
-export const VOCAB_MCQ_LEVELS = ['P1','P2','P3','P4','P5','P6'];
+export const VOCAB_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 
-export const VOCAB_MCQ_ITEMS = {
-  P1: [
-    { id:'v-p1-001', level:'P1', category:'contextInference', subskill:'emotions', difficulty:1, q:'The baby is crying. She feels ___.', choices:['happy','sad','brave','tidy'], answer:'sad', explain:'Crying often shows sadness.' },
-    { id:'v-p1-002', level:'P1', category:'definitionMatch', subskill:'places', difficulty:1, q:'We borrow books at the ___.', choices:['library','bakery','hospital','playground'], answer:'library', explain:'A library is where we borrow books to read.' },
-    { id:'v-p1-003', level:'P1', category:'definitionMatch', subskill:'animal_sounds', difficulty:1, q:'A cat says ___.', choices:['moo','meow','quack','neigh'], answer:'meow', explain:'Cats meow.' },
-    { id:'v-p1-004', level:'P1', category:'synonymContrast', subskill:'antonyms', difficulty:1, q:'The opposite of "big" is ___.', choices:['small','tall','wide','thick'], answer:'small', explain:'Small is the opposite of big.' },
-    { id:'v-p1-005', level:'P1', category:'definitionMatch', subskill:'tools', difficulty:1, q:'We use a ___ to cut paper.', choices:['spoon','scissors','pillow','bucket'], answer:'scissors', explain:'Scissors are used for cutting.' },
-    { id:'v-p1-006', level:'P1', category:'synonymContrast', subskill:'antonyms', difficulty:1, q:'The opposite of "full" is ___.', choices:['empty','round','deep','noisy'], answer:'empty', explain:'Empty is the opposite of full.' },
-    { id:'v-p1-007', level:'P1', category:'definitionMatch', subskill:'places', difficulty:1, q:'A doctor works in a ___.', choices:['library','hospital','stadium','bakery'], answer:'hospital', explain:'Doctors commonly work in hospitals.' },
-    { id:'v-p1-008', level:'P1', category:'contextInference', subskill:'nature', difficulty:1, q:'Birds build a ___ in trees.', choices:['nest','cave','lane','shelf'], answer:'nest', explain:'Birds live in nests.' },
-    { id:'v-p1-009', level:'P1', category:'synonymContrast', subskill:'antonyms', difficulty:1, q:'The opposite of "hot" is ___.', choices:['cold','loud','fast','short'], answer:'cold', explain:'Cold is the opposite of hot.' },
-    { id:'v-p1-010', level:'P1', category:'definitionMatch', subskill:'animal_sounds', difficulty:1, q:'A cow says ___.', choices:['meow','moo','bark','chirp'], answer:'moo', explain:'Cows moo.' },
-    { id:'v-p1-011', level:'P1', category:'definitionMatch', subskill:'places', difficulty:1, q:'We bake bread in a ___.', choices:['bakery','library','garden','zoo'], answer:'bakery', explain:'A bakery is where bread and cakes are made.' },
-    { id:'v-p1-012', level:'P1', category:'contextInference', subskill:'emotions', difficulty:1, q:'The boy is smiling. He feels ___.', choices:['angry','happy','tired','scared'], answer:'happy', explain:'Smiling shows happiness.' },
-    { id:'v-p1-013', level:'P1', category:'definitionMatch', subskill:'tools', difficulty:1, q:'We use a ___ to write.', choices:['pencil','plate','pillow','ladder'], answer:'pencil', explain:'A pencil is used for writing.' },
-    { id:'v-p1-014', level:'P1', category:'contextInference', subskill:'nature', difficulty:1, q:'A frog lives near a ___.', choices:['pond','desert','mountain','sky'], answer:'pond', explain:'Frogs live near ponds and water.' },
-    { id:'v-p1-015', level:'P1', category:'synonymContrast', subskill:'antonyms', difficulty:1, q:'The opposite of "tall" is ___.', choices:['short','fast','heavy','wide'], answer:'short', explain:'Short is the opposite of tall.' },
-    { id:'v-p1-016', level:'P1', category:'contextInference', subskill:'nature', difficulty:1, q:'At night, we can see the ___ in the sky.', choices:['moon','sun','rain','wind'], answer:'moon', explain:'The moon is visible at night.' },
-    { id:'v-p1-017', level:'P1', category:'connectorClue', subskill:'basic_and_but', difficulty:1, q:'I like cake ___ I do not like biscuits.', choices:['but','and','so','or'], answer:'but', explain:'"But" shows a contrast between liking cake and not liking biscuits.' },
-    { id:'v-p1-018', level:'P1', category:'connectorClue', subskill:'basic_and_but', difficulty:1, q:'She is kind ___ helpful.', choices:['and','but','so','or'], answer:'and', explain:'"And" joins two similar ideas.' },
-    { id:'v-p1-019', level:'P1', category:'contextInference', subskill:'school_objects', difficulty:1, q:'The teacher wrote on the board with a ___.', choices:['marker','pillow','spoon','slipper'], answer:'marker', explain:'A marker is used for writing on a board.' },
-    { id:'v-p1-020', level:'P1', category:'contextInference', subskill:'daily_routines', difficulty:1, q:'Before bed, I brush my ___.', choices:['teeth','knees','elbows','fingers'], answer:'teeth', explain:'Brushing teeth is part of bedtime routine.' },
-    { id:'v-p1-021', level:'P1', category:'synonymContrast', subskill:'antonym_context', difficulty:1, q:'The soup is too hot. Please wait till it is ___.', choices:['cool','loud','sharp','full'], answer:'cool', explain:'Cool is the opposite of hot in this context.' },
-    { id:'v-p1-022', level:'P1', category:'collocationCloze', subskill:'verb_noun_basic', difficulty:1, q:'Please ___ your hands before lunch.', choices:['wash','draw','fold','carry'], answer:'wash', explain:'We usually wash our hands before eating.' },
-    { id:'v-p1-023', level:'P1', category:'definitionMatch', subskill:'playground', difficulty:1, q:'At recess, we slide down the ___.', choices:['slide','blanket','ceiling','stove'], answer:'slide', explain:'A slide is found in a playground.' },
-    { id:'v-p1-024', level:'P1', category:'contextInference', subskill:'weather_clue', difficulty:1, q:'It is raining. Bring your ___.', choices:['umbrella','helmet','whistle','eraser'], answer:'umbrella', explain:'An umbrella is used in rain.' },
-    { id:'v-p1-025', level:'P1', category:'synonymContrast', subskill:'synonym_context', difficulty:1, q:'The room was very quiet. No one made a ___.', choices:['sound','game','line','meal'], answer:'sound', explain:'Quiet means little or no sound.' },
-    { id:'v-p1-026', level:'P1', category:'definitionMatch', subskill:'classroom', difficulty:1, q:'We keep books on a ___.', choices:['shelf','puddle','ladder','blanket'], answer:'shelf', explain:'A shelf is used to store books.' },
-    { id:'v-p1-027', level:'P1', category:'collocationCloze', subskill:'verb_noun_basic', difficulty:1, q:'Before the lesson starts, ___ the classroom door gently.', choices:['close','paint','peel','stir'], answer:'close', explain:'Close the door is the natural collocation.' },
-    { id:'v-p1-028', level:'P1', category:'contextInference', subskill:'meal_context', difficulty:1, q:'I drink warm milk from a ___.', choices:['cup','sock','drum','kite'], answer:'cup', explain:'Milk is commonly drunk from a cup.' },
-    { id:'v-p1-029', level:'P1', category:'synonymContrast', subskill:'antonym_context', difficulty:1, q:'The bag is heavy. It is not ___.', choices:['light','round','clean','new'], answer:'light', explain:'Light is the opposite of heavy.' },
-    { id:'v-p1-030', level:'P1', category:'definitionMatch', subskill:'family', difficulty:1, q:'My mother’s father is my ___.', choices:['grandfather','uncle','brother','cousin'], answer:'grandfather', explain:'Mother’s father is grandfather.' },
-    { id:'v-p1-031', level:'P1', category:'collocationCloze', subskill:'verb_noun_basic', difficulty:1, q:'Please ___ a line and wait your turn.', choices:['form','boil','plant','fix'], answer:'form', explain:'The phrase is "form a line".' },
-    { id:'v-p1-032', level:'P1', category:'contextInference', subskill:'time_words', difficulty:1, q:'The sky is dark now. It is ___.', choices:['night','morning','noon','recess'], answer:'night', explain:'Dark sky suggests night.' },
-    { id:'v-p1-033', level:'P1', category:'definitionMatch', subskill:'home', difficulty:1, q:'We sleep on a ___.', choices:['bed','desk','sink','stool'], answer:'bed', explain:'A bed is for sleeping.' },
-    { id:'v-p1-034', level:'P1', category:'synonymContrast', subskill:'synonym_context', difficulty:1, q:'Tim was glad to see his friend. He felt ___.', choices:['happy','angry','tired','lonely'], answer:'happy', explain:'Glad means happy.' },
-    { id:'v-p1-035', level:'P1', category:'contextInference', subskill:'school_action', difficulty:1, q:'We use crayons to ___ pictures.', choices:['colour','climb','fold','sweep'], answer:'colour', explain:'Crayons are used to colour pictures.' },
-    { id:'v-p1-036', level:'P1', category:'collocationCloze', subskill:'verb_noun_basic', difficulty:1, q:'Please ___ your seat belts before the bus moves.', choices:['fasten','carry','borrow','staple'], answer:'fasten', explain:'Seat belts are fastened.' },
-    { id:'v-p1-037', level:'P1', category:'definitionMatch', subskill:'animals', difficulty:1, q:'A rabbit has long ___.', choices:['ears','wings','fins','hooves'], answer:'ears', explain:'Rabbits are known for long ears.' },
-    { id:'v-p1-038', level:'P1', category:'contextInference', subskill:'hygiene', difficulty:1, q:'After playing outside, wash your ___ with soap.', choices:['hands','shoes','books','bag'], answer:'hands', explain:'Hands are washed with soap for hygiene.' },
-    { id:'v-p1-039', level:'P1', category:'contextInference', subskill:'school_activity', difficulty:1, q:'During art class, we use glue to ___ paper pieces together.', choices:['stick','chase','sweep','pour'], answer:'stick', explain:'Glue is used to stick things together.' },
-    { id:'v-p1-040', level:'P1', category:'synonymContrast', subskill:'antonym_context', difficulty:1, q:'The pillow is soft, not ___.', choices:['hard','clean','plain','warm'], answer:'hard', explain:'Hard is the opposite of soft.' },
-    { id:'v-p1-041', level:'P1', category:'definitionMatch', subskill:'home_items', difficulty:1, q:'We keep food cold in a ___.', choices:['fridge','drawer','mirror','carpet'], answer:'fridge', explain:'A fridge keeps food cold.' },
-    { id:'v-p1-042', level:'P1', category:'collocationCloze', subskill:'verb_noun_basic', difficulty:1, q:'Please ___ your shoes neatly outside the door.', choices:['place','stir','chase','write'], answer:'place', explain:'Place shoes neatly is a natural phrase.' },
-    { id:'v-p1-043', level:'P1', category:'contextInference', subskill:'safety', difficulty:1, q:'The light turned red, so we ___ before crossing.', choices:['stopped','laughed','jumped','sang'], answer:'stopped', explain:'Red lights signal us to stop.' },
-    { id:'v-p1-044', level:'P1', category:'synonymContrast', subskill:'synonym_context', difficulty:1, q:'The girl was glad to help. She was ___.', choices:['pleased','sleepy','angry','lost'], answer:'pleased', explain:'Glad and pleased have similar meaning.' },
-    { id:'v-p1-045', level:'P1', category:'definitionMatch', subskill:'school_places', difficulty:1, q:'We buy food during recess at the ___.', choices:['canteen','library','office','hallway'], answer:'canteen', explain:'Food is sold at the canteen in school.' },
-    { id:'v-p1-046', level:'P1', category:'collocationCloze', subskill:'verb_noun_basic', difficulty:1, q:'Every morning, we ___ the national pledge together.', choices:['say','drink','draw','throw'], answer:'say', explain:'We say or recite the pledge.' },
-    { id:'v-p1-047', level:'P1', category:'contextInference', subskill:'weather', difficulty:1, q:'The wind blew strongly and leaves fell from the ___.', choices:['trees','tables','boxes','bottles'], answer:'trees', explain:'Leaves fall from trees.' },
-    { id:'v-p1-048', level:'P1', category:'synonymContrast', subskill:'antonym_context', difficulty:1, q:'The classroom is noisy, not ___.', choices:['quiet','crowded','bright','warm'], answer:'quiet', explain:'Quiet is opposite of noisy.' },
-  ],
-  P2: [
-    { id:'v-p2-001', level:'P2', category:'definitionMatch', subskill:'group_nouns', difficulty:1, q:'A group of fish is called a ___.', choices:['pack','school','flock','herd'], answer:'school', explain:'Fish move in a school.' },
-    { id:'v-p2-002', level:'P2', category:'contextInference', subskill:'actions', difficulty:1, q:'Please ___ your shoes before entering.', choices:['remove','invent','collect','borrow'], answer:'remove', explain:'Remove means take off.' },
-    { id:'v-p2-003', level:'P2', category:'collocationCloze', subskill:'verb_adverb', difficulty:1, q:'The soup is very hot. Sip it ___.', choices:['slowly','loudly','early','empty'], answer:'slowly', explain:'Hot soup is usually sipped slowly.' },
-    { id:'v-p2-004', level:'P2', category:'definitionMatch', subskill:'occupations', difficulty:1, q:'A person who teaches is a ___.', choices:['teacher','baker','pilot','tailor'], answer:'teacher', explain:'A teacher teaches students.' },
-    { id:'v-p2-005', level:'P2', category:'grammaticalRole', subskill:'adverb_choice', difficulty:1, q:'Please speak ___. The baby is sleeping.', choices:['softly','wildly','brightly','sharply'], answer:'softly', explain:'Softly describes gentle speaking.' },
-    { id:'v-p2-006', level:'P2', category:'contextInference', subskill:'descriptive', difficulty:1, q:'A lion is a ___ animal.', choices:['wild','tidy','gentle','tiny'], answer:'wild', explain:'Lions are wild animals.' },
-    { id:'v-p2-007', level:'P2', category:'contextInference', subskill:'weather', difficulty:1, q:'Bring your umbrella. It looks ___.', choices:['rainy','sunset','cloud','stormed'], answer:'rainy', explain:'Rainy describes weather likely to rain.' },
-    { id:'v-p2-008', level:'P2', category:'contextInference', subskill:'actions', difficulty:1, q:'Please ___ your homework before dinner.', choices:['finish','borrow','scatter','freeze'], answer:'finish', explain:'Finish means complete.' },
-    { id:'v-p2-009', level:'P2', category:'definitionMatch', subskill:'group_nouns', difficulty:1, q:'A group of sheep is called a ___.', choices:['pack','school','flock','swarm'], answer:'flock', explain:'Sheep are in a flock.' },
-    { id:'v-p2-010', level:'P2', category:'definitionMatch', subskill:'occupations', difficulty:1, q:'A person who flies planes is a ___.', choices:['pilot','dentist','tailor','baker'], answer:'pilot', explain:'A pilot flies aeroplanes.' },
-    { id:'v-p2-011', level:'P2', category:'grammaticalRole', subskill:'adverb_choice', difficulty:1, q:'The wind was blowing very ___.', choices:['strongly','brightly','sweetly','softly'], answer:'strongly', explain:'Strongly describes forceful wind.' },
-    { id:'v-p2-012', level:'P2', category:'contextInference', subskill:'descriptive', difficulty:1, q:'A bear is a ___ animal.', choices:['tiny','gentle','fierce','tidy'], answer:'fierce', explain:'Bears can be fierce and powerful.' },
-    { id:'v-p2-013', level:'P2', category:'contextInference', subskill:'weather', difficulty:1, q:'It was very ___ and the puddles were everywhere.', choices:['wet','dry','warm','bright'], answer:'wet', explain:'Wet describes conditions with lots of water.' },
-    { id:'v-p2-014', level:'P2', category:'contextInference', subskill:'actions', difficulty:1, q:'Please ___ the door when you leave.', choices:['close','throw','plant','bake'], answer:'close', explain:'Close means shut.' },
-    { id:'v-p2-015', level:'P2', category:'definitionMatch', subskill:'group_nouns', difficulty:1, q:'A group of wolves is called a ___.', choices:['flock','pack','herd','colony'], answer:'pack', explain:'Wolves travel in a pack.' },
-    { id:'v-p2-016', level:'P2', category:'grammaticalRole', subskill:'adverb_choice', difficulty:1, q:'She ran ___ to catch the bus.', choices:['quickly','quietly','gently','lazily'], answer:'quickly', explain:'Quickly describes fast movement.' },
-    { id:'v-p2-017', level:'P2', category:'morphologicalAffix', subskill:'prefix_un', difficulty:1, q:'If you are not happy, you are ___.', choices:['unhappy','dishappy','nothappy','rehappy'], answer:'unhappy', explain:'The prefix "un-" means "not". Unhappy = not happy.' },
-    { id:'v-p2-018', level:'P2', category:'morphologicalAffix', subskill:'suffix_ful', difficulty:1, q:'She is full of care. She is very ___.', choices:['careful','careless','caring','cared'], answer:'careful', explain:'The suffix "-ful" means "full of". Careful = full of care.' },
-    { id:'v-p2-019', level:'P2', category:'connectorClue', subskill:'because_so', difficulty:1, q:'He was hungry ___ he ate a big lunch.', choices:['so','but','or','yet'], answer:'so', explain:'"So" shows the result of being hungry.' },
-    { id:'v-p2-020', level:'P2', category:'contextInference', subskill:'school_rules', difficulty:1, q:'Please walk in a straight ___ during assembly.', choices:['line','circle','puddle','basket'], answer:'line', explain:'Students line up during assembly.' },
-    { id:'v-p2-021', level:'P2', category:'synonymContrast', subskill:'synonym_context', difficulty:1, q:'The puppy was tiny. It was very ___.', choices:['small','rough','loud','sharp'], answer:'small', explain:'Tiny means small.' },
-    { id:'v-p2-022', level:'P2', category:'synonymContrast', subskill:'antonym_context', difficulty:1, q:'The towel is wet. Please find a ___ one.', choices:['dry','soft','new','blue'], answer:'dry', explain:'Dry is the opposite of wet.' },
-    { id:'v-p2-023', level:'P2', category:'definitionMatch', subskill:'food', difficulty:1, q:'We spread jam on a slice of ___.', choices:['bread','glass','stone','paper'], answer:'bread', explain:'Jam is usually spread on bread.' },
-    { id:'v-p2-024', level:'P2', category:'collocationCloze', subskill:'verb_noun', difficulty:1, q:'Please ___ your homework before watching TV.', choices:['finish','throw','chase','pour'], answer:'finish', explain:'Finish homework is a common phrase.' },
-    { id:'v-p2-025', level:'P2', category:'contextInference', subskill:'time_clue', difficulty:1, q:'The sun is setting. It is getting ___.', choices:['dark','sweet','quietly','round'], answer:'dark', explain:'When the sun sets, it gets dark.' },
-    { id:'v-p2-026', level:'P2', category:'definitionMatch', subskill:'transport', difficulty:1, q:'We cross a river using a ___.', choices:['bridge','blanket','shelf','ladle'], answer:'bridge', explain:'A bridge helps people cross rivers.' },
-    { id:'v-p2-027', level:'P2', category:'collocationCloze', subskill:'verb_noun', difficulty:1, q:'At recess, we ___ a snack.', choices:['have','write','grow','carry'], answer:'have', explain:'The phrase is "have a snack".' },
-    { id:'v-p2-028', level:'P2', category:'contextInference', subskill:'feelings', difficulty:1, q:'After running, I felt very ___.', choices:['tired','wooden','silent','narrow'], answer:'tired', explain:'Running often makes people tired.' },
-    { id:'v-p2-029', level:'P2', category:'synonymContrast', subskill:'synonym_context', difficulty:1, q:'The room was neat and ___.', choices:['tidy','stormy','noisy','sticky'], answer:'tidy', explain:'Neat and tidy are close in meaning.' },
-    { id:'v-p2-030', level:'P2', category:'definitionMatch', subskill:'nature', difficulty:1, q:'A butterfly has colourful ___.', choices:['wings','teeth','paws','shells'], answer:'wings', explain:'Butterflies fly with wings.' },
-    { id:'v-p2-031', level:'P2', category:'collocationCloze', subskill:'verb_noun', difficulty:1, q:'Please ___ your name at the top of the page.', choices:['write','climb','drink','tear'], answer:'write', explain:'You write your name on a page.' },
-    { id:'v-p2-032', level:'P2', category:'contextInference', subskill:'weather', difficulty:1, q:'The wind is strong and the sky is grey. A ___ may come.', choices:['storm','festival','rainbow','dessert'], answer:'storm', explain:'Strong wind and grey sky suggest a storm.' },
-    { id:'v-p2-033', level:'P2', category:'synonymContrast', subskill:'antonym_context', difficulty:1, q:'The bag is empty. It is not ___.', choices:['full','clean','small','new'], answer:'full', explain:'Full is the opposite of empty.' },
-    { id:'v-p2-034', level:'P2', category:'definitionMatch', subskill:'classroom', difficulty:1, q:'We erase pencil marks with a ___.', choices:['rubber','ruler','coin','pin'], answer:'rubber', explain:'A rubber (eraser) removes pencil marks.' },
-    { id:'v-p2-035', level:'P2', category:'collocationCloze', subskill:'verb_noun', difficulty:1, q:'Please ___ attention when the teacher explains.', choices:['pay','make','do','take'], answer:'pay', explain:'Correct collocation: pay attention.' },
-    { id:'v-p2-036', level:'P2', category:'contextInference', subskill:'home_actions', difficulty:1, q:'After dinner, we ___ the table.', choices:['clear','paint','bounce','dig'], answer:'clear', explain:'We clear the table after eating.' },
-    { id:'v-p2-037', level:'P2', category:'synonymContrast', subskill:'synonym_context', difficulty:1, q:'The test was simple and ___.', choices:['easy','busy','dusty','curly'], answer:'easy', explain:'Simple and easy are similar in meaning.' },
-    { id:'v-p2-038', level:'P2', category:'definitionMatch', subskill:'sports', difficulty:1, q:'In football, players kick a ___.', choices:['ball','plate','rope','paint'], answer:'ball', explain:'Football is played with a ball.' },
-    { id:'v-p2-039', level:'P2', category:'contextInference', subskill:'safety', difficulty:2, q:'Look left and right before you ___ the road.', choices:['cross','water','draw','wash'], answer:'cross', explain:'You cross a road after checking for traffic.' },
-    { id:'v-p2-040', level:'P2', category:'contextInference', subskill:'school_life', difficulty:1, q:'The teacher rang the bell to ___ the lesson.', choices:['start','paint','borrow','melt'], answer:'start', explain:'A bell can signal the start of lesson.' },
-    { id:'v-p2-041', level:'P2', category:'synonymContrast', subskill:'synonym_context', difficulty:1, q:'The box was huge. It was very ___.', choices:['large','thin','sharp','quiet'], answer:'large', explain:'Huge means very large.' },
-    { id:'v-p2-042', level:'P2', category:'synonymContrast', subskill:'antonym_context', difficulty:1, q:'The blanket is dry now, not ___.', choices:['wet','thick','warm','blue'], answer:'wet', explain:'Wet is opposite of dry.' },
-    { id:'v-p2-043', level:'P2', category:'definitionMatch', subskill:'community_places', difficulty:1, q:'We borrow storybooks from the ___.', choices:['library','factory','stadium','market'], answer:'library', explain:'Books are borrowed from libraries.' },
-    { id:'v-p2-044', level:'P2', category:'collocationCloze', subskill:'verb_noun', difficulty:1, q:'Please ___ your bag on the hook.', choices:['hang','boil','fold','dig'], answer:'hang', explain:'The natural phrase is "hang your bag".' },
-    { id:'v-p2-045', level:'P2', category:'contextInference', subskill:'home', difficulty:1, q:'Mum used a broom to ___ the floor.', choices:['sweep','draw','chop','pour'], answer:'sweep', explain:'A broom is used to sweep floors.' },
-    { id:'v-p2-046', level:'P2', category:'synonymContrast', subskill:'synonym_context', difficulty:1, q:'The road is broad and ___.', choices:['wide','late','sharp','calm'], answer:'wide', explain:'Broad and wide have similar meaning.' },
-    { id:'v-p2-047', level:'P2', category:'definitionMatch', subskill:'nature', difficulty:1, q:'A place with many trees is a ___.', choices:['forest','factory','market','museum'], answer:'forest', explain:'Forests have many trees.' },
-    { id:'v-p2-048', level:'P2', category:'collocationCloze', subskill:'verb_noun', difficulty:1, q:'At the crossing, we ___ for the green man.', choices:['wait','carry','plant','float'], answer:'wait', explain:'We wait for the green signal to cross.' },
-    { id:'v-p2-049', level:'P2', category:'contextInference', subskill:'sequence_clue', difficulty:2, q:'She packed her bag first and ___ left for school.', choices:['then','unless','however','although'], answer:'then', explain:'Then indicates the next action in sequence.' },
-  ],
-  P3: [
-    { id:'v-p3-001', level:'P3', category:'grammaticalRole', subskill:'adverb_choice', difficulty:1, q:'The old man walked very ___.', choices:['quickly','slowly','bright','high'], answer:'slowly', explain:'Walked modifies with adverb "slowly".' },
-    { id:'v-p3-002', level:'P3', category:'collocationCloze', subskill:'verb_noun', difficulty:1, q:'The teacher asked us to ___ attention.', choices:['do','make','pay','take'], answer:'pay', explain:'The collocation is "pay attention".' },
-    { id:'v-p3-003', level:'P3', category:'contextInference', subskill:'emotions', difficulty:1, q:'We were ___ when the match was cancelled.', choices:['delighted','disappointed','polite','careful'], answer:'disappointed', explain:'Cancelled plans often cause disappointment.' },
-    { id:'v-p3-004', level:'P3', category:'contextInference', subskill:'character_traits', difficulty:1, q:'The firefighters were very ___.', choices:['brave','fragile','sleepy','empty'], answer:'brave', explain:'Brave describes courage.' },
-    { id:'v-p3-005', level:'P3', category:'collocationCloze', subskill:'adj_noun', difficulty:1, q:'She gave a ___ smile to welcome us.', choices:['warm','coldly','rust','stone'], answer:'warm', explain:'Warm smile is a common positive collocation.' },
-    { id:'v-p3-006', level:'P3', category:'grammaticalRole', subskill:'word_form', difficulty:2, q:'The students listened ___.', choices:['attentively','attention','attentive','attend'], answer:'attentively', explain:'An adverb is needed to modify "listened".' },
-    { id:'v-p3-007', level:'P3', category:'grammaticalRole', subskill:'word_form', difficulty:2, q:'The road was crowded, so the bus moved ___.', choices:['slowly','silent','slow','slowness'], answer:'slowly', explain:'Adverb form fits after a verb.' },
-    { id:'v-p3-008', level:'P3', category:'contextInference', subskill:'emotions', difficulty:1, q:'She felt ___ after receiving the prize.', choices:['proud','dusty','narrow','plain'], answer:'proud', explain:'Receiving a prize often makes someone proud.' },
-    { id:'v-p3-009', level:'P3', category:'contextInference', subskill:'character_traits', difficulty:1, q:'He is very ___. He always shares his food.', choices:['generous','greedy','lazy','clumsy'], answer:'generous', explain:'Generous means willing to share.' },
-    { id:'v-p3-010', level:'P3', category:'collocationCloze', subskill:'verb_noun', difficulty:1, q:'They need to ___ a decision soon.', choices:['make','do','take','give'], answer:'make', explain:'The collocation is "make a decision".' },
-    { id:'v-p3-011', level:'P3', category:'contextInference', subskill:'emotions', difficulty:1, q:'The children were ___ to see their grandparents.', choices:['thrilled','bored','anxious','puzzled'], answer:'thrilled', explain:'Thrilled means very excited and happy.' },
-    { id:'v-p3-012', level:'P3', category:'grammaticalRole', subskill:'word_form', difficulty:2, q:'He spoke ___ so everyone could hear.', choices:['clearly','clear','clearing','cleared'], answer:'clearly', explain:'Adverb form "clearly" modifies the verb "spoke".' },
-    { id:'v-p3-013', level:'P3', category:'contextInference', subskill:'character_traits', difficulty:1, q:'She always acts ___. She thinks about others.', choices:['thoughtfully','carelessly','rudely','loudly'], answer:'thoughtfully', explain:'Thoughtful means considerate of others.' },
-    { id:'v-p3-014', level:'P3', category:'contextInference', subskill:'emotions', difficulty:1, q:'The news of the holiday made them feel ___.', choices:['overjoyed','gloomy','weary','puzzled'], answer:'overjoyed', explain:'Overjoyed means extremely happy.' },
-    { id:'v-p3-015', level:'P3', category:'grammaticalRole', subskill:'word_form', difficulty:2, q:'He completed the task ___ before the deadline.', choices:['successfully','successful','success','succeed'], answer:'successfully', explain:'Adverb form "successfully" modifies "completed".' },
-    { id:'v-p3-016', level:'P3', category:'collocationCloze', subskill:'verb_noun', difficulty:1, q:'Please ___ an effort to arrive on time.', choices:['make','do','take','pay'], answer:'make', explain:'The collocation is "make an effort".' },
-    { id:'v-p3-017', level:'P3', category:'morphologicalAffix', subskill:'suffix_less', difficulty:1, q:'He has no fear. He is ___.', choices:['fearless','fearful','fearing','feared'], answer:'fearless', explain:'The suffix "-less" means "without". Fearless = without fear.' },
-    { id:'v-p3-018', level:'P3', category:'morphologicalAffix', subskill:'suffix_ness', difficulty:2, q:'She is kind. Everyone admires her ___.', choices:['kindness','kindly','kinder','kindful'], answer:'kindness', explain:'The suffix "-ness" turns an adjective into a noun. Kindness = the quality of being kind.' },
-    { id:'v-p3-019', level:'P3', category:'scienceTechTerms', subskill:'basic_science', difficulty:1, q:'Plants need sunlight and water to ___.', choices:['grow','fly','swim','drive'], answer:'grow', explain:'Plants grow when they get sunlight and water.' },
-    { id:'v-p3-020', level:'P3', category:'contextInference', subskill:'problem_solving', difficulty:2, q:'The puzzle was tricky, but Mei Ling stayed calm and found a ___.', choices:['solution','celebration','decoration','prediction'], answer:'solution', explain:'A solution solves a puzzle/problem.' },
-    { id:'v-p3-021', level:'P3', category:'synonymContrast', subskill:'synonym_context', difficulty:2, q:'The classroom was silent during the test. Everyone was ___.', choices:['quiet','wild','fierce','muddy'], answer:'quiet', explain:'Silent and quiet are close in meaning.' },
-    { id:'v-p3-022', level:'P3', category:'synonymContrast', subskill:'antonym_context', difficulty:2, q:'The path was narrow, not ___.', choices:['wide','long','smooth','dusty'], answer:'wide', explain:'Wide is the opposite of narrow.' },
-    { id:'v-p3-023', level:'P3', category:'definitionMatch', subskill:'library', difficulty:2, q:'At the library counter, we ___ books before leaving.', choices:['borrow','boil','hammer','fold'], answer:'borrow', explain:'People borrow books from libraries.' },
-    { id:'v-p3-024', level:'P3', category:'collocationCloze', subskill:'make_a_mistake', difficulty:2, q:'Check your work so you do not ___ a mistake.', choices:['make','do','take','pay'], answer:'make', explain:'The collocation is "make a mistake".' },
-    { id:'v-p3-025', level:'P3', category:'contextInference', subskill:'cause_effect', difficulty:2, q:'The floor was slippery, so the students walked ___.', choices:['carefully','reckless','careless','caution'], answer:'carefully', explain:'A slippery floor requires careful walking.' },
-    { id:'v-p3-026', level:'P3', category:'definitionMatch', subskill:'health', difficulty:2, q:'When we have a fever, we visit a ___.', choices:['clinic','stadium','factory','gallery'], answer:'clinic', explain:'People seek treatment at a clinic.' },
-    { id:'v-p3-027', level:'P3', category:'collocationCloze', subskill:'draw_a_conclusion', difficulty:2, q:'After reading the clues, the detective ___ a conclusion.', choices:['drew','grew','threw','blew'], answer:'drew', explain:'The collocation is "draw a conclusion".' },
-    { id:'v-p3-028', level:'P3', category:'contextInference', subskill:'tone_clue', difficulty:2, q:'The crowd clapped loudly after the song. They were very ___.', choices:['impressed','confused','angry','lonely'], answer:'impressed', explain:'Loud applause suggests they were impressed.' },
-    { id:'v-p3-029', level:'P3', category:'synonymContrast', subskill:'synonym_context', difficulty:2, q:'Her reply was brief but ___.', choices:['clear','frozen','crooked','dusty'], answer:'clear', explain:'A brief reply can still be clear.' },
-    { id:'v-p3-030', level:'P3', category:'definitionMatch', subskill:'community', difficulty:2, q:'A person who helps keep streets safe is a ___.', choices:['police officer','tailor','chef','librarian'], answer:'police officer', explain:'Police officers help maintain public safety.' },
-    { id:'v-p3-031', level:'P3', category:'collocationCloze', subskill:'keep_a_promise', difficulty:2, q:'You should ___ your promise to your friend.', choices:['keep','hold','save','lock'], answer:'keep', explain:'Common collocation: keep a promise.' },
-    { id:'v-p3-032', level:'P3', category:'contextInference', subskill:'time_signal', difficulty:2, q:'The bell rang. ___, the pupils packed their bags.', choices:['Immediately','Probably','Quiet','Narrow'], answer:'Immediately', explain:'The sequence clue suggests immediate action.' },
-    { id:'v-p3-033', level:'P3', category:'synonymContrast', subskill:'antonym_context', difficulty:2, q:'The answer was correct, not ___.', choices:['wrong','fast','tiny','early'], answer:'wrong', explain:'Wrong is the opposite of correct.' },
-    { id:'v-p3-034', level:'P3', category:'definitionMatch', subskill:'science', difficulty:2, q:'Water turns into ___ when it freezes.', choices:['ice','steam','sand','smoke'], answer:'ice', explain:'Frozen water becomes ice.' },
-    { id:'v-p3-035', level:'P3', category:'collocationCloze', subskill:'take_part', difficulty:2, q:'Many pupils will ___ part in the talent show.', choices:['take','make','give','bring'], answer:'take', explain:'The phrase is "take part".' },
-    { id:'v-p3-036', level:'P3', category:'contextInference', subskill:'meaning_in_sentence', difficulty:2, q:'The nurse spoke in a gentle voice to ___ the child.', choices:['comfort','collect','correct','confuse'], answer:'comfort', explain:'A gentle voice is used to comfort someone.' },
-    { id:'v-p3-037', level:'P3', category:'synonymContrast', subskill:'synonym_context', difficulty:2, q:'The exam was difficult, but she stayed ___.', choices:['calm','curly','colourful','crooked'], answer:'calm', explain:'Calm means not anxious or panicky.' },
-    { id:'v-p3-038', level:'P3', category:'definitionMatch', subskill:'hobbies', difficulty:2, q:'He waters plants and pulls weeds in his ___.', choices:['garden','garage','kitchen','attic'], answer:'garden', explain:'Gardening activities happen in a garden.' },
-    { id:'v-p3-039', level:'P3', category:'contextInference', subskill:'cause_effect', difficulty:2, q:'The team practised every day, so their performance ___.', choices:['improved','collapsed','vanished','tilted'], answer:'improved', explain:'Frequent practice usually improves performance.' },
-    { id:'v-p3-040', level:'P3', category:'synonymContrast', subskill:'near_synonym_context', difficulty:2, q:'The teacher gave a short yet ___ reminder before the test.', choices:['important','colourful','muddy','empty'], answer:'important', explain:'A reminder can be short but important.' },
-    { id:'v-p3-041', level:'P3', category:'synonymContrast', subskill:'antonym_context', difficulty:2, q:'The road was smooth, not ___.', choices:['rough','wide','quiet','clean'], answer:'rough', explain:'Rough is opposite of smooth.' },
-    { id:'v-p3-042', level:'P3', category:'collocationCloze', subskill:'make_a_plan', difficulty:2, q:'Before the camp, we should ___ a plan together.', choices:['make','do','build','take'], answer:'make', explain:'The collocation is "make a plan".' },
-    { id:'v-p3-043', level:'P3', category:'connectorClue', subskill:'although', difficulty:2, q:'___ the queue was long, everyone waited quietly.', choices:['Although','Because','So','And'], answer:'Although', explain:'Although introduces contrast with expected impatience.' },
-    { id:'v-p3-044', level:'P3', category:'contextInference', subskill:'tone_clue', difficulty:2, q:'She lowered her voice in the library to be ___.', choices:['respectful','noisy','restless','careless'], answer:'respectful', explain:'Quiet behaviour in a library is respectful.' },
-    { id:'v-p3-045', level:'P3', category:'definitionMatch', subskill:'semantic_field_weather', difficulty:2, q:'A sudden flash in the sky during a storm is ___.', choices:['lightning','drizzle','fog','shadow'], answer:'lightning', explain:'Lightning is a bright flash in storms.' },
-    { id:'v-p3-046', level:'P3', category:'collocationCloze', subskill:'reach_a_goal', difficulty:2, q:'With practice, she finally ___ her goal.', choices:['reached','caught','held','pressed'], answer:'reached', explain:'The collocation is "reach a goal".' },
-    { id:'v-p3-047', level:'P3', category:'synonymContrast', subskill:'near_synonym_context', difficulty:2, q:'The class was excited and ___ for the school trip.', choices:['eager','fragile','silent','plain'], answer:'eager', explain:'Eager means excited and ready.' },
-    { id:'v-p3-048', level:'P3', category:'connectorClue', subskill:'therefore', difficulty:2, q:'The clues matched perfectly; ___, the detective solved the case quickly.', choices:['therefore','although','meanwhile','unless'], answer:'therefore', explain:'Therefore signals a logical result.' },
-    { id:'v-p3-049', level:'P3', category:'contextInference', subskill:'multi_clue', difficulty:2, q:'The child rubbed his eyes and yawned, so he was probably ___.', choices:['sleepy','hungry','proud','curious'], answer:'sleepy', explain:'Yawning and rubbing eyes are clues for sleepiness.' },
-    { id:'v-p3-050', level:'P3', category:'collocationCloze', subskill:'pay_respect', difficulty:2, q:'Students stood in silence to ___ respect for the guests.', choices:['show','lift','find','press'], answer:'show', explain:'The phrase is "show respect".' },
-    { id:'v-p3-051', level:'P3', category:'synonymContrast', subskill:'near_synonym_context', difficulty:2, q:'His explanation was simple and easy to ___.', choices:['understand','discover','borrow','collect'], answer:'understand', explain:'Simple explanations are easy to understand.' },
-    { id:'v-p3-052', level:'P3', category:'definitionMatch', subskill:'semantic_field_school', difficulty:2, q:'A book that lists words and meanings is a ___.', choices:['dictionary','notebook','storybook','magazine'], answer:'dictionary', explain:'Dictionaries list words and meanings.' },
-    { id:'v-p3-053', level:'P3', category:'contextInference', subskill:'cause_effect', difficulty:2, q:'He forgot his water bottle, so he felt very ___.', choices:['thirsty','sleepy','shy','angry'], answer:'thirsty', explain:'Without water, one feels thirsty.' },
-    { id:'v-p3-054', level:'P3', category:'connectorClue', subskill:'because', difficulty:2, q:'She stayed under the shelter ___ it was pouring.', choices:['because','although','however','unless'], answer:'because', explain:'Because introduces the reason.' },
-    { id:'v-p3-055', level:'P3', category:'collocationCloze', subskill:'give_support', difficulty:2, q:'Friends should ___ support when someone feels upset.', choices:['give','take','draw','send out'], answer:'give', explain:'The natural phrase is "give support".' },
-    { id:'v-p3-056', level:'P3', category:'synonymContrast', subskill:'antonym_context', difficulty:2, q:'The jar was full yesterday, but today it is ___.', choices:['empty','heavy','clean','green'], answer:'empty', explain:'Empty contrasts with full.' },
-    { id:'v-p3-057', level:'P3', category:'contextInference', subskill:'literal_plus_context', difficulty:2, q:'The football rolled into the drain, so they used a stick to ___ it out.', choices:['pull','stir','erase','pack'], answer:'pull', explain:'A stick can be used to pull objects out.' },
-    { id:'v-p3-058', level:'P3', category:'definitionMatch', subskill:'semantic_field_animals', difficulty:2, q:'An animal that carries its home on its back is a ___.', choices:['snail','sparrow','rabbit','hamster'], answer:'snail', explain:'Snails carry shells on their backs.' },
-    { id:'v-p3-059', level:'P3', category:'connectorClue', subskill:'however', difficulty:2, q:'The task looked easy; ___, it took us an hour to finish.', choices:['however','therefore','because','so'], answer:'however', explain:'However marks contrast with expectation.' },
-    { id:'v-p3-060', level:'P3', category:'collocationCloze', subskill:'make_an_attempt', difficulty:2, q:'Even if it is hard, you should ___ an attempt.', choices:['make','do','have','hold'], answer:'make', explain:'The collocation is "make an attempt".' },
-    { id:'v-p3-061', level:'P3', category:'synonymContrast', subskill:'near_synonym_context', difficulty:2, q:'The little boy was frightened and held his mother tightly. He was ___.', choices:['scared','brave','calm','relaxed'], answer:'scared', explain:'Frightened and scared are close in meaning.' },
-    { id:'v-p3-062', level:'P3', category:'contextInference', subskill:'multi_clue', difficulty:2, q:'She checked the spelling, punctuation and spacing before handing in, so her work was ___.', choices:['careful','careless','hasty','messy'], answer:'careful', explain:'Checking details suggests careful work.' },
-    { id:'v-p3-063', level:'P3', category:'connectorClue', subskill:'unless', difficulty:2, q:'___ we hurry, we will miss the school bus.', choices:['Unless','Because','Although','So'], answer:'Unless', explain:'Unless means if we do not hurry.' },
-    { id:'v-p3-064', level:'P3', category:'collocationCloze', subskill:'show_improvement', difficulty:2, q:'After extra practice, he began to ___ improvement in his spelling.', choices:['show','create','throw','turn'], answer:'show', explain:'The phrase is "show improvement".' },
-  ],
-  P4: [
-    { id:'v-p4-001', level:'P4', category:'collocationCloze', subskill:'phrasal_verbs', difficulty:1, q:'Please ___ the form before noon.', choices:['fill in','look after','run into','carry on'], answer:'fill in', explain:'"Fill in" means complete a form.' },
-    { id:'v-p4-002', level:'P4', category:'contextInference', subskill:'formal_vocab', difficulty:2, q:'The museum has many ancient ___.', choices:['artefacts','arguments','accidents','alliances'], answer:'artefacts', explain:'Artefacts are historical objects.' },
-    { id:'v-p4-003', level:'P4', category:'synonymContrast', subskill:'nuanced_choice', difficulty:2, q:'Her answer was brief but very ___.', choices:['accurate','loud','messy','hungry'], answer:'accurate', explain:'Accurate means correct.' },
-    { id:'v-p4-004', level:'P4', category:'collocationCloze', subskill:'phrasal_verbs', difficulty:1, q:'The coach told us to ___ after practice.', choices:['cool down','give up','break out','turn off'], answer:'cool down', explain:'Cool down means recover after exercise.' },
-    { id:'v-p4-005', level:'P4', category:'contextInference', subskill:'formal_vocab', difficulty:2, q:'The guide gave a ___ explanation of the exhibit.', choices:['detailed','muddy','careless','shallow'], answer:'detailed', explain:'Detailed means with many useful details.' },
-    { id:'v-p4-006', level:'P4', category:'contextInference', subskill:'formal_vocab', difficulty:2, q:'The school launched a campaign to ___ recycling.', choices:['promote','collapse','dismiss','wander'], answer:'promote', explain:'Promote means encourage or support.' },
-    { id:'v-p4-007', level:'P4', category:'collocationCloze', subskill:'phrasal_verbs', difficulty:1, q:'He ___ an old friend at the mall.', choices:['ran into','ran off','ran out','ran over'], answer:'ran into', explain:'"Run into" means meet unexpectedly.' },
-    { id:'v-p4-008', level:'P4', category:'synonymContrast', subskill:'nuanced_choice', difficulty:2, q:'The instructions were clear and ___.', choices:['concise','brokenly','wobble','untidily'], answer:'concise', explain:'Concise means brief but clear.' },
-    { id:'v-p4-009', level:'P4', category:'contextInference', subskill:'formal_vocab', difficulty:2, q:'She had to ___ a lot of challenges.', choices:['overcome','overrun','overlook','overhear'], answer:'overcome', explain:'Overcome means succeed in dealing with a difficulty.' },
-    { id:'v-p4-010', level:'P4', category:'collocationCloze', subskill:'phrasal_verbs', difficulty:1, q:'Don\'t ___ — we still have time.', choices:['give up','put off','turn down','break in'], answer:'give up', explain:'"Give up" means stop trying.' },
-    { id:'v-p4-011', level:'P4', category:'synonymContrast', subskill:'nuanced_choice', difficulty:2, q:'The atmosphere at the event was very ___.', choices:['lively','dull','stale','rigid'], answer:'lively', explain:'Lively means full of energy and excitement.' },
-    { id:'v-p4-012', level:'P4', category:'collocationCloze', subskill:'phrasal_verbs', difficulty:1, q:'The teacher asked us to ___ the experiment.', choices:['carry out','carry on','carry off','carry away'], answer:'carry out', explain:'"Carry out" means perform or conduct.' },
-    { id:'v-p4-013', level:'P4', category:'contextInference', subskill:'formal_vocab', difficulty:2, q:'We need to ___ a plan before the trip.', choices:['devise','delete','desert','decline'], answer:'devise', explain:'Devise means invent or plan carefully.' },
-    { id:'v-p4-014', level:'P4', category:'synonymContrast', subskill:'nuanced_choice', difficulty:2, q:'The food was ___ and everyone enjoyed it.', choices:['scrumptious','soggy','bland','stale'], answer:'scrumptious', explain:'Scrumptious means extremely tasty and delicious.' },
-    { id:'v-p4-015', level:'P4', category:'collocationCloze', subskill:'phrasal_verbs', difficulty:1, q:'He decided to ___ the invitation politely.', choices:['turn down','turn up','turn over','turn in'], answer:'turn down', explain:'"Turn down" means refuse or decline.' },
-    { id:'v-p4-016', level:'P4', category:'contextInference', subskill:'formal_vocab', difficulty:2, q:'The students were asked to ___ their ideas.', choices:['present','prevent','pretend','preserve'], answer:'present', explain:'Present means show or share with others.' },
-    { id:'v-p4-017', level:'P4', category:'scienceTechTerms', subskill:'technology', difficulty:2, q:'We use a ___ to search for information online.', choices:['browser','printer','scanner','speaker'], answer:'browser', explain:'A browser is a program used to access websites on the internet.' },
-    { id:'v-p4-018', level:'P4', category:'socialStudiesVocab', subskill:'community', difficulty:2, q:'People vote during an ___ to choose their leaders.', choices:['election','exhibition','expedition','education'], answer:'election', explain:'An election is when people vote to choose leaders.' },
-    { id:'v-p4-019', level:'P4', category:'scienceTechTerms', subskill:'basic_science', difficulty:2, q:'The ___ of water from liquid to gas is called evaporation.', choices:['change','colour','taste','weight'], answer:'change', explain:'Evaporation is the change of state from liquid to gas.' },
-    { id:'v-p4-020', level:'P4', category:'connectorClue', subskill:'although_however', difficulty:2, q:'___ it was cold, the children still played outside.', choices:['Although','Because','So','And'], answer:'Although', explain:'"Although" introduces a contrast — the cold did not stop them.' },
-    { id:'v-p4-021', level:'P4', category:'contextInference', subskill:'school_projects', difficulty:2, q:'To complete the poster, the group had to ___ their ideas clearly.', choices:['organise','scatter','postpone','ignore'], answer:'organise', explain:'Groups organise ideas when creating a poster.' },
-    { id:'v-p4-022', level:'P4', category:'synonymContrast', subskill:'synonym_context', difficulty:2, q:'The speech was short but very ___.', choices:['meaningful','careless','muddy','distant'], answer:'meaningful', explain:'A short speech can still be meaningful.' },
-    { id:'v-p4-023', level:'P4', category:'synonymContrast', subskill:'antonym_context', difficulty:2, q:'The instructions were clear, not ___.', choices:['confusing','helpful','brief','useful'], answer:'confusing', explain:'Confusing is opposite in this context.' },
-    { id:'v-p4-024', level:'P4', category:'definitionMatch', subskill:'semantic_field_environment', difficulty:2, q:'A place where plants are grown for study is a ___.', choices:['greenhouse','workshop','canteen','stadium'], answer:'greenhouse', explain:'Greenhouses are used for growing plants.' },
-    { id:'v-p4-025', level:'P4', category:'collocationCloze', subskill:'make_progress', difficulty:2, q:'With regular practice, she began to ___ progress in swimming.', choices:['make','do','take','pay'], answer:'make', explain:'The collocation is "make progress".' },
-    { id:'v-p4-026', level:'P4', category:'contextInference', subskill:'cause_effect', difficulty:2, q:'The queue was long, so we had to ___ patiently.', choices:['wait','wander','whisper','wobble'], answer:'wait', explain:'A long queue causes waiting.' },
-    { id:'v-p4-027', level:'P4', category:'definitionMatch', subskill:'semantic_field_health', difficulty:2, q:'A person who checks our teeth is a ___.', choices:['dentist','chemist','carpenter','cashier'], answer:'dentist', explain:'Dentists care for teeth.' },
-    { id:'v-p4-028', level:'P4', category:'collocationCloze', subskill:'take_responsibility', difficulty:2, q:'Class leaders should ___ responsibility for their duties.', choices:['take','give','keep','draw'], answer:'take', explain:'Common collocation: take responsibility.' },
-    { id:'v-p4-029', level:'P4', category:'contextInference', subskill:'tone_clue', difficulty:2, q:'The child hid behind her mother during the thunderstorm because she was ___.', choices:['frightened','carefree','proud','relaxed'], answer:'frightened', explain:'Hiding during thunderstorm suggests fear.' },
-    { id:'v-p4-030', level:'P4', category:'synonymContrast', subskill:'synonym_context', difficulty:2, q:'The principal praised the class for being ___.', choices:['disciplined','messy','fragile','silent'], answer:'disciplined', explain:'Disciplined means orderly and well-behaved.' },
-    { id:'v-p4-031', level:'P4', category:'synonymContrast', subskill:'antonym_context', difficulty:2, q:'The stage was crowded, so there was very ___ space to move.', choices:['little','ample','wide','plenty'], answer:'little', explain:'Crowded places have little space.' },
-    { id:'v-p4-032', level:'P4', category:'definitionMatch', subskill:'semantic_field_transport', difficulty:2, q:'A place where buses start and end their routes is a ___.', choices:['interchange','laboratory','aquarium','bookshop'], answer:'interchange', explain:'Buses operate from interchanges.' },
-    { id:'v-p4-033', level:'P4', category:'collocationCloze', subskill:'keep_in_touch', difficulty:2, q:'After moving house, they still ___ in touch with old neighbours.', choices:['kept','made','did','paid'], answer:'kept', explain:'The collocation is "keep in touch".' },
-    { id:'v-p4-034', level:'P4', category:'contextInference', subskill:'school_event', difficulty:2, q:'The hall was decorated with flags to ___ National Day.', choices:['celebrate','postpone','replace','suspect'], answer:'celebrate', explain:'Decorations are used to celebrate events.' },
-    { id:'v-p4-035', level:'P4', category:'definitionMatch', subskill:'semantic_field_science', difficulty:2, q:'An instrument used to look at tiny objects is a ___.', choices:['microscope','megaphone','thermometer','projector'], answer:'microscope', explain:'Microscopes magnify tiny objects.' },
-    { id:'v-p4-036', level:'P4', category:'collocationCloze', subskill:'raise_funds', difficulty:2, q:'The pupils sold cookies to ___ funds for charity.', choices:['raise','lift','gather up','create'], answer:'raise', explain:'The natural phrase is "raise funds".' },
-    { id:'v-p4-037', level:'P4', category:'contextInference', subskill:'cause_effect', difficulty:2, q:'Because the path was muddy, everyone walked ___.', choices:['carefully','carelessly','boldly','blindly'], answer:'carefully', explain:'Muddy paths require caution.' },
-    { id:'v-p4-038', level:'P4', category:'synonymContrast', subskill:'synonym_context', difficulty:2, q:'The coach was strict but also ___.', choices:['fair','faint','frozen','fragile'], answer:'fair', explain:'Strict and fair can both describe good coaching.' },
-    { id:'v-p4-039', level:'P4', category:'collocationCloze', subskill:'draw_attention', difficulty:2, q:'Bright colours were used to ___ attention to the notice board.', choices:['draw','pull in','push','carry'], answer:'draw', explain:'The collocation is "draw attention".' },
-    { id:'v-p4-040', level:'P4', category:'connectorClue', subskill:'however', difficulty:2, q:'The weather looked sunny; ___, we packed raincoats just in case.', choices:['however','because','therefore','and'], answer:'however', explain:'"However" introduces contrast.' },
-    { id:'v-p4-041', level:'P4', category:'synonymContrast', subskill:'near_synonym_discrimination', difficulty:2, q:'Although the film was short, its message was very ___.', choices:['powerful','loud','lengthy','ordinary'], answer:'powerful', explain:'Message impact is best captured by powerful.' },
-    { id:'v-p4-042', level:'P4', category:'synonymContrast', subskill:'tone_discrimination', difficulty:2, q:'He answered the question politely, not in a ___ way.', choices:['rude','calm','formal','cheerful'], answer:'rude', explain:'Politely contrasts most clearly with rude.' },
-    { id:'v-p4-043', level:'P4', category:'collocationCloze', subskill:'reach_a_decision', difficulty:2, q:'After discussing all ideas, the class finally ___ a decision.', choices:['reached','grabbed','found out','carried'], answer:'reached', explain:'The collocation is "reach a decision".' },
-    { id:'v-p4-044', level:'P4', category:'connectorClue', subskill:'therefore_inference', difficulty:2, q:'The ground was wet after heavy rain; therefore, the match was ___.', choices:['postponed','celebrated','expanded','invited'], answer:'postponed', explain:'Wet ground logically leads to postponement.' },
-    { id:'v-p4-045', level:'P4', category:'contextInference', subskill:'multi_clue', difficulty:2, q:'She reread the passage twice and underlined keywords before answering, so her response was ___.', choices:['thoughtful','careless','random','hasty'], answer:'thoughtful', explain:'Rereading and underlining show thoughtful response.' },
-    { id:'v-p4-046', level:'P4', category:'collocationCloze', subskill:'make_a_request', difficulty:2, q:'If you need help, please ___ a request at the office.', choices:['make','do','set','hold'], answer:'make', explain:'The collocation is "make a request".' },
-    { id:'v-p4-047', level:'P4', category:'synonymContrast', subskill:'near_synonym_discrimination', difficulty:2, q:'The report was concise yet ___.', choices:['informative','silent','fragile','ordinary'], answer:'informative', explain:'Concise and informative can both describe good reports.' },
-    { id:'v-p4-048', level:'P4', category:'connectorClue', subskill:'although_inference', difficulty:2, q:'Although he felt nervous, he spoke ___.', choices:['confidently','angrily','quietly','carelessly'], answer:'confidently', explain:'Contrast clue signals successful performance despite nerves.' },
-    { id:'v-p4-049', level:'P4', category:'contextInference', subskill:'literal_plus_context', difficulty:2, q:'The candles flickered and the room turned dim, so they switched on the ___.', choices:['lights','fans','screens','speakers'], answer:'lights', explain:'Dim room implies turning on lights.' },
-    { id:'v-p4-050', level:'P4', category:'collocationCloze', subskill:'show_respect', difficulty:2, q:'Students stood up to ___ respect for the national anthem.', choices:['show','bring','collect','build'], answer:'show', explain:'The phrase is "show respect".' },
-    { id:'v-p4-051', level:'P4', category:'synonymContrast', subskill:'connotation_choice', difficulty:2, q:'The audience listened in complete silence, showing their ___.', choices:['attention','fear','hunger','laughter'], answer:'attention', explain:'Silence during listening indicates attention.' },
-    { id:'v-p4-052', level:'P4', category:'connectorClue', subskill:'because_reason', difficulty:2, q:'Because the paint was still wet, the sign needed more time to ___.', choices:['dry','drop','bend','shake'], answer:'dry', explain:'Wet paint needs time to dry.' },
-    { id:'v-p4-053', level:'P4', category:'contextInference', subskill:'tone_and_context', difficulty:2, q:'He thanked his classmates for helping him, showing he was ___.', choices:['grateful','greedy','gloomy','careless'], answer:'grateful', explain:'Thanking others shows gratitude.' },
-    { id:'v-p4-054', level:'P4', category:'collocationCloze', subskill:'pay_a_visit', difficulty:2, q:'During the holidays, we will ___ a visit to the museum.', choices:['pay','make','do','draw'], answer:'pay', explain:'The collocation is "pay a visit".' },
-    { id:'v-p4-055', level:'P4', category:'synonymContrast', subskill:'near_synonym_discrimination', difficulty:2, q:'The rescue team acted quickly and ___.', choices:['efficiently','roughly','loosely','carelessly'], answer:'efficiently', explain:'Quick and efficient work is the best contextual fit.' },
-    { id:'v-p4-056', level:'P4', category:'connectorClue', subskill:'however_contrast', difficulty:2, q:'The road looked clear; however, traffic soon became very ___.', choices:['heavy','tiny','smooth','silent'], answer:'heavy', explain:'However signals a change from clear to congested traffic.' },
-    { id:'v-p4-057', level:'P4', category:'contextInference', subskill:'cause_effect', difficulty:2, q:'The class forgot to bring the props, so their rehearsal was ___.', choices:['delayed','decorated','expanded','cheered'], answer:'delayed', explain:'Missing props causes delay.' },
-    { id:'v-p4-058', level:'P4', category:'collocationCloze', subskill:'draw_a_map', difficulty:2, q:'Use this ruler to ___ a map of the playground.', choices:['draw','write','carry','stack'], answer:'draw', explain:'Maps are drawn.' },
-    { id:'v-p4-059', level:'P4', category:'synonymContrast', subskill:'connotation_choice', difficulty:2, q:'Her comments were honest but ___.', choices:['kind','frozen','fragile','dull'], answer:'kind', explain:'Honest but kind suggests truthful yet considerate tone.' },
-    { id:'v-p4-060', level:'P4', category:'connectorClue', subskill:'so_result', difficulty:2, q:'The battery was flat, so the torch could not ___.', choices:['work','whisper','grow','save'], answer:'work', explain:'Flat batteries prevent devices from working.' },
-    { id:'v-p4-061', level:'P4', category:'contextInference', subskill:'multi_clue', difficulty:2, q:'After checking all answers and correcting spelling errors, she submitted a ___ draft.', choices:['polished','broken','random','uncertain'], answer:'polished', explain:'Careful corrections produce a polished draft.' },
-    { id:'v-p4-062', level:'P4', category:'collocationCloze', subskill:'make_an_offer', difficulty:2, q:'He smiled and ___ an offer to help carry the boxes.', choices:['made','did','held','drew'], answer:'made', explain:'The collocation is "make an offer".' },
-    { id:'v-p4-063', level:'P4', category:'synonymContrast', subskill:'near_synonym_discrimination', difficulty:2, q:'Although the classroom was old, it was neat and ___.', choices:['well-kept','expensive','narrow','gloomy'], answer:'well-kept', explain:'Well-kept best matches neatness despite age.' },
-    { id:'v-p4-064', level:'P4', category:'connectorClue', subskill:'unless_condition', difficulty:2, q:'Unless we leave now, we may ___ the opening speech.', choices:['miss','host','print','raise'], answer:'miss', explain:'Condition clue indicates missing the event if late.' },
-    { id:'v-p4-065', level:'P4', category:'contextInference', subskill:'literal_and_contextual', difficulty:2, q:'The rope was too short; therefore, they needed an ___.', choices:['extension','emotion','excuse','edition'], answer:'extension', explain:'Short rope logically requires an extension.' },
-  ],
-  P5: [
-    { id:'v-p5-001', level:'P5', category:'contextInference', subskill:'formal_vocab', difficulty:2, q:'The manager decided to ___ the meeting.', choices:['postpone','explode','decorate','capture'], answer:'postpone', explain:'Postpone means delay to a later time.' },
-    { id:'v-p5-002', level:'P5', category:'contextInference', subskill:'actions', difficulty:2, q:'After many tries, he finally ___ the problem.', choices:['solved','borrowed','folded','planted'], answer:'solved', explain:'Solve is used for problems.' },
-    { id:'v-p5-003', level:'P5', category:'idiomaticExpressions', subskill:'common_idioms', difficulty:1, q:'Choose the best phrase: "keep calm" means ___.', choices:['stay relaxed','run quickly','shout loudly','eat quickly'], answer:'stay relaxed', explain:'Keep calm means remain relaxed.' },
-    { id:'v-p5-004', level:'P5', category:'collocationCloze', subskill:'academic', difficulty:2, q:'The scientist made a ___ observation.', choices:['careful','noisy','hollow','untidy'], answer:'careful', explain:'Careful observation is a common academic phrase.' },
-    { id:'v-p5-005', level:'P5', category:'contextInference', subskill:'formal_vocab', difficulty:2, q:'Please ___ your claim with evidence.', choices:['support','erase','delay','narrow'], answer:'support', explain:'Support a claim means provide evidence.' },
-    { id:'v-p5-006', level:'P5', category:'contextInference', subskill:'formal_vocab', difficulty:2, q:'The principal ___ the students for their effort.', choices:['commended','scattered','postponed','widened'], answer:'commended', explain:'Commended means praised formally.' },
-    { id:'v-p5-007', level:'P5', category:'collocationCloze', subskill:'verb_preposition', difficulty:2, q:'The hikers had to ___ with the steep climb.', choices:['cope','cope up','cope over','cope out'], answer:'cope', explain:'Common collocation: cope with (here simplified as base verb choice).' },
-    { id:'v-p5-008', level:'P5', category:'synonymContrast', subskill:'advanced_word_choice', difficulty:2, q:'Her explanation was ___, so everyone understood.', choices:['lucid','murky','slanted','tiny'], answer:'lucid', explain:'Lucid means clear and easy to understand.' },
-    { id:'v-p5-009', level:'P5', category:'idiomaticExpressions', subskill:'common_idioms', difficulty:1, q:'"It\'s raining cats and dogs" means it is raining ___.', choices:['heavily','lightly','slowly','gently'], answer:'heavily', explain:'This idiom means very heavy rain.' },
-    { id:'v-p5-010', level:'P5', category:'collocationCloze', subskill:'academic', difficulty:2, q:'The researchers conducted a ___ study.', choices:['comprehensive','clumsy','hollow','dusty'], answer:'comprehensive', explain:'Comprehensive study means thorough and covering all aspects.' },
-    { id:'v-p5-011', level:'P5', category:'synonymContrast', subskill:'advanced_word_choice', difficulty:2, q:'She ___ the opportunity to study abroad.', choices:['seized','scattered','suspended','stumbled'], answer:'seized', explain:'Seized means grabbed or took eagerly.' },
-    { id:'v-p5-012', level:'P5', category:'idiomaticExpressions', subskill:'common_idioms', difficulty:1, q:'To "break the ice" means to ___.', choices:['start a conversation','break something','feel cold','end a talk'], answer:'start a conversation', explain:'Break the ice means make people feel more comfortable.' },
-    { id:'v-p5-013', level:'P5', category:'contextInference', subskill:'formal_vocab', difficulty:2, q:'The students ___ to raise funds for charity.', choices:['collaborated','collapsed','conflicted','concealed'], answer:'collaborated', explain:'Collaborated means worked together.' },
-    { id:'v-p5-014', level:'P5', category:'collocationCloze', subskill:'academic', difficulty:2, q:'The teacher drew a ___ conclusion from the data.', choices:['logical','foggy','random','noisy'], answer:'logical', explain:'Logical conclusion is a common academic phrase.' },
-    { id:'v-p5-015', level:'P5', category:'synonymContrast', subskill:'advanced_word_choice', difficulty:2, q:'He was ___ about the unfair treatment.', choices:['indignant','indifferent','ignorant','indirect'], answer:'indignant', explain:'Indignant means feeling angry about something unjust.' },
-    { id:'v-p5-016', level:'P5', category:'contextInference', subskill:'formal_vocab', difficulty:2, q:'The athlete showed great ___ during the race.', choices:['perseverance','reluctance','hesitation','negligence'], answer:'perseverance', explain:'Perseverance means continued effort despite difficulties.' },
-    { id:'v-p5-017', level:'P5', category:'proverbsSayings', subskill:'common_proverbs', difficulty:2, q:'"Actions speak louder than ___" means what you do matters more than what you say.', choices:['words','thoughts','dreams','wishes'], answer:'words', explain:'This proverb means deeds are more important than promises.' },
-    { id:'v-p5-018', level:'P5', category:'grammarPrepositions', subskill:'dependent_prep', difficulty:2, q:'She is very good ___ mathematics.', choices:['at','in','on','with'], answer:'at', explain:'The collocation is "good at" a subject or skill.' },
-    { id:'v-p5-019', level:'P5', category:'grammarArticles', subskill:'specific_vs_general', difficulty:2, q:'___ Earth revolves around the Sun.', choices:['The','A','An','Some'], answer:'The', explain:'We use "The" for unique objects like the Earth.' },
-    { id:'v-p5-020', level:'P5', category:'proverbsSayings', subskill:'common_proverbs', difficulty:2, q:'"Every cloud has a silver ___" means there is something good in every bad situation.', choices:['lining','edge','light','side'], answer:'lining', explain:'This proverb means even difficult situations have a positive side.' },
-    { id:'v-p5-021', level:'P5', category:'contextInference', subskill:'formal_vocab', difficulty:2, q:'The committee decided to ___ the final report after checking all data.', choices:['finalise','scatter','delay','erase'], answer:'finalise', explain:'Finalise means complete and approve finally.' },
-    { id:'v-p5-022', level:'P5', category:'synonymContrast', subskill:'synonym_context', difficulty:2, q:'Her explanation was clear and ___.', choices:['precise','noisy','flimsy','hasty'], answer:'precise', explain:'Precise means exact and clear.' },
-    { id:'v-p5-023', level:'P5', category:'synonymContrast', subskill:'antonym_context', difficulty:2, q:'The process was simple, not ___.', choices:['complicated','useful','short','formal'], answer:'complicated', explain:'Complicated is opposite of simple.' },
-    { id:'v-p5-024', level:'P5', category:'definitionMatch', subskill:'semantic_field_civics', difficulty:2, q:'A formal plan made by a government is called a ___.', choices:['policy','poetry','parcel','portrait'], answer:'policy', explain:'A policy is a formal plan or course of action.' },
-    { id:'v-p5-025', level:'P5', category:'collocationCloze', subskill:'pose_a_risk', difficulty:3, q:'Leaving wires exposed can ___ a risk to children.', choices:['pose','raise up','build','show'], answer:'pose', explain:'The collocation is "pose a risk".' },
-    { id:'v-p5-026', level:'P5', category:'contextInference', subskill:'cause_effect', difficulty:2, q:'The speaker paused and repeated the key point to ___ understanding.', choices:['ensure','shatter','replace','question'], answer:'ensure', explain:'Repeating points helps ensure understanding.' },
-    { id:'v-p5-027', level:'P5', category:'definitionMatch', subskill:'semantic_field_science', difficulty:2, q:'A careful test to discover new facts is an ___.', choices:['experiment','expedition','excuse','exhibit'], answer:'experiment', explain:'Experiments are structured tests in science.' },
-    { id:'v-p5-028', level:'P5', category:'collocationCloze', subskill:'reach_a_conclusion', difficulty:2, q:'After comparing both sources, they reached a ___.', choices:['conclusion','collision','condition','collection'], answer:'conclusion', explain:'The phrase is "reach a conclusion".' },
-    { id:'v-p5-029', level:'P5', category:'contextInference', subskill:'tone_clue', difficulty:2, q:'His voice trembled and his hands shook; he looked ___.', choices:['anxious','confident','carefree','relieved'], answer:'anxious', explain:'Shaking and trembling signal anxiety.' },
-    { id:'v-p5-030', level:'P5', category:'synonymContrast', subskill:'synonym_context', difficulty:2, q:'The volunteers were eager and ___.', choices:['enthusiastic','hostile','fragile','silent'], answer:'enthusiastic', explain:'Enthusiastic means eager and energetic.' },
-    { id:'v-p5-031', level:'P5', category:'collocationCloze', subskill:'deliver_a_speech', difficulty:2, q:'The head prefect will ___ a speech at assembly.', choices:['deliver','carry','move','presented'], answer:'deliver', explain:'The collocation is "deliver a speech".' },
-    { id:'v-p5-032', level:'P5', category:'definitionMatch', subskill:'semantic_field_finance', difficulty:2, q:'Money set aside for future use is called ___.', choices:['savings','spending','salary','stocks'], answer:'savings', explain:'Savings refers to money kept for future use.' },
-    { id:'v-p5-033', level:'P5', category:'contextInference', subskill:'choice_in_context', difficulty:2, q:'The witness gave details that matched the facts, so her statement seemed ___.', choices:['reliable','careless','hollow','random'], answer:'reliable', explain:'Matching facts suggests reliability.' },
-    { id:'v-p5-034', level:'P5', category:'synonymContrast', subskill:'antonym_context', difficulty:2, q:'The route was safe, not ___.', choices:['dangerous','direct','short','familiar'], answer:'dangerous', explain:'Dangerous is opposite of safe.' },
-    { id:'v-p5-035', level:'P5', category:'collocationCloze', subskill:'take_notes', difficulty:2, q:'Please ___ notes while watching the documentary.', choices:['take','make','do','hold'], answer:'take', explain:'The fixed phrase is "take notes".' },
-    { id:'v-p5-036', level:'P5', category:'contextInference', subskill:'formal_vocab', difficulty:2, q:'The article aims to ___ readers about healthy habits.', choices:['inform','confuse','distract','pressure'], answer:'inform', explain:'Inform means give useful knowledge.' },
-    { id:'v-p5-037', level:'P5', category:'definitionMatch', subskill:'semantic_field_environment', difficulty:2, q:'A place where rubbish is sorted for reuse is a ___.', choices:['recycling centre','bus terminal','sports hall','canteen'], answer:'recycling centre', explain:'Recycling centres process reusable waste.' },
-    { id:'v-p5-038', level:'P5', category:'collocationCloze', subskill:'show_interest', difficulty:2, q:'Parents were pleased that their children showed ___ in reading.', choices:['interest','intent','instance','income'], answer:'interest', explain:'The phrase is "show interest in".' },
-    { id:'v-p5-039', level:'P5', category:'synonymContrast', subskill:'synonym_context', difficulty:2, q:'The report was long but still ___.', choices:['readable','edible','stable','flexible'], answer:'readable', explain:'Readable means easy enough to read and understand.' },
-    { id:'v-p5-040', level:'P5', category:'contextInference', subskill:'cause_effect', difficulty:2, q:'She checked every calculation twice to avoid making an ___.', choices:['error','echo','entry','engine'], answer:'error', explain:'Double-checking helps avoid errors.' },
-    { id:'v-p5-041', level:'P5', category:'synonymContrast', subskill:'near_synonym_discrimination', difficulty:3, q:'His response was brief but ____, so the committee accepted it quickly.', choices:['convincing','casual','unclear','playful'], answer:'convincing', explain:'Despite being brief, it persuaded the committee.' },
-    { id:'v-p5-042', level:'P5', category:'synonymContrast', subskill:'tone_connotation', difficulty:3, q:'She corrected her teammate firmly but ____, so no one felt embarrassed.', choices:['respectfully','rudely','coldly','wildly'], answer:'respectfully', explain:'Firm yet respectful feedback avoids embarrassment.' },
-    { id:'v-p5-043', level:'P5', category:'collocationCloze', subskill:'reach_consensus', difficulty:3, q:'After hearing both sides, the panel finally ___ a consensus.', choices:['reached','collected','pushed','built up'], answer:'reached', explain:'The collocation is "reach a consensus".' },
-    { id:'v-p5-044', level:'P5', category:'connectorClue', subskill:'despite', difficulty:3, q:'Despite the late hour, the volunteers remained ____.', choices:['energetic','silent','rigid','confused'], answer:'energetic', explain:'Despite signals contrast with expected tiredness.' },
-    { id:'v-p5-045', level:'P5', category:'contextInference', subskill:'multi_clue', difficulty:3, q:'Although the plan looked costly at first, it saved resources later and proved ____.', choices:['economical','wasteful','hasty','fragile'], answer:'economical', explain:'Savings over time indicate economical value.' },
-    { id:'v-p5-046', level:'P5', category:'collocationCloze', subskill:'draw_conclusion', difficulty:3, q:'From the evidence, the class could ___ a logical conclusion.', choices:['draw','lift','shape','copy'], answer:'draw', explain:'The collocation is "draw a conclusion".' },
-    { id:'v-p5-047', level:'P5', category:'synonymContrast', subskill:'near_synonym_discrimination', difficulty:3, q:'The witness gave a detailed and ___ account of the event.', choices:['accurate','dramatic','colourful','gentle'], answer:'accurate', explain:'Detailed facts point to accuracy, not style.' },
-    { id:'v-p5-048', level:'P5', category:'connectorClue', subskill:'however_inference', difficulty:3, q:'The route was shorter; however, it was less ___ for cyclists.', choices:['safe','familiar','direct','quiet'], answer:'safe', explain:'However introduces downside despite being shorter.' },
-    { id:'v-p5-049', level:'P5', category:'contextInference', subskill:'literal_contextual_combo', difficulty:3, q:'He spoke too softly and turned away from the audience, so his message was hard to ___.', choices:['hear','paint','store','measure'], answer:'hear', explain:'Soft voice and turning away reduce audibility.' },
-    { id:'v-p5-050', level:'P5', category:'collocationCloze', subskill:'show_commitment', difficulty:3, q:'Submitting work early each week can ___ commitment to the project.', choices:['show','take','send','raise'], answer:'show', explain:'The phrase is "show commitment".' },
-    { id:'v-p5-051', level:'P5', category:'synonymContrast', subskill:'tone_connotation', difficulty:3, q:'The manager rejected the idea politely, using a ___ tone.', choices:['courteous','sarcastic','hostile','careless'], answer:'courteous', explain:'Polite rejection matches courteous tone.' },
-    { id:'v-p5-052', level:'P5', category:'connectorClue', subskill:'therefore_inference', difficulty:3, q:'The data came from a small sample; therefore, the conclusion should be treated with ___.', choices:['caution','excitement','certainty','speed'], answer:'caution', explain:'Small samples reduce certainty, requiring caution.' },
-    { id:'v-p5-053', level:'P5', category:'contextInference', subskill:'multi_clue', difficulty:3, q:'She checked sources from two books and one website before writing, so her paragraph was ___.', choices:['well-supported','hurried','imaginary','vague'], answer:'well-supported', explain:'Multiple sources support reliability.' },
-    { id:'v-p5-054', level:'P5', category:'collocationCloze', subskill:'raise_concerns', difficulty:3, q:'Parents attended the meeting to ___ concerns about online safety.', choices:['raise','lift','bring up to','draw'], answer:'raise', explain:'The collocation is "raise concerns".' },
-    { id:'v-p5-055', level:'P5', category:'synonymContrast', subskill:'near_synonym_discrimination', difficulty:3, q:'His notes were brief yet ____, which made revision easier.', choices:['comprehensive','careless','messy','uncertain'], answer:'comprehensive', explain:'Comprehensive notes still cover key points fully.' },
-    { id:'v-p5-056', level:'P5', category:'connectorClue', subskill:'unless_inference', difficulty:3, q:'Unless the team edits the draft carefully, the final report may appear ____.', choices:['incomplete','polished','thorough','balanced'], answer:'incomplete', explain:'Unless clause warns of negative outcome without editing.' },
-    { id:'v-p5-057', level:'P5', category:'contextInference', subskill:'tone_and_purpose', difficulty:3, q:'The speaker used examples from students’ daily lives to make the message more ____.', choices:['relatable','complicated','formal','distant'], answer:'relatable', explain:'Daily-life examples help audiences relate.' },
-    { id:'v-p5-058', level:'P5', category:'collocationCloze', subskill:'meet_deadline', difficulty:3, q:'To meet the deadline, the group divided tasks and worked ____.', choices:['efficiently','decoratively','loosely','randomly'], answer:'efficiently', explain:'Meeting deadlines requires efficient work.' },
-    { id:'v-p5-059', level:'P5', category:'synonymContrast', subskill:'antonym_context', difficulty:3, q:'The remarks were constructive, not ____.', choices:['hurtful','clear','brief','gentle'], answer:'hurtful', explain:'Constructive feedback contrasts with hurtful remarks.' },
-    { id:'v-p5-060', level:'P5', category:'connectorClue', subskill:'although_inference', difficulty:3, q:'Although the question looked simple, the answer required careful ____.', choices:['analysis','guessing','drawing','copying'], answer:'analysis', explain:'Although clue signals hidden complexity.' },
-    { id:'v-p5-061', level:'P5', category:'contextInference', subskill:'multi_clue', difficulty:3, q:'He reviewed his speech, removed repeated points, and tightened wording, making it more ____.', choices:['concise','dramatic','lengthy','casual'], answer:'concise', explain:'Removing repetition makes language concise.' },
-    { id:'v-p5-062', level:'P5', category:'collocationCloze', subskill:'make_adjustments', difficulty:3, q:'After feedback, the team had to ___ adjustments to the presentation.', choices:['make','do','set','hold'], answer:'make', explain:'The collocation is "make adjustments".' },
-    { id:'v-p5-063', level:'P5', category:'synonymContrast', subskill:'tone_connotation', difficulty:3, q:'The article criticised the policy in a sharp but ___ manner.', choices:['reasoned','reckless','playful','vague'], answer:'reasoned', explain:'Criticism can be sharp yet reasoned with logic.' },
-    { id:'v-p5-064', level:'P5', category:'connectorClue', subskill:'because_of', difficulty:3, q:'Because of the strong evidence, the proposal gained broad ____.', choices:['support','delay','damage','confusion'], answer:'support', explain:'Strong evidence usually builds support.' },
-    { id:'v-p5-065', level:'P5', category:'contextInference', subskill:'literal_and_contextual', difficulty:3, q:'The coach lowered the training intensity after noticing signs of fatigue, showing a ___ approach.', choices:['responsible','harsh','reckless','careless'], answer:'responsible', explain:'Adjusting workload for safety is responsible.' },
-  ],
-  P6: [
-    { id:'v-p6-001', level:'P6', category:'contextInference', subskill:'formal_vocab', difficulty:3, q:'The witness gave a very ___ statement.', choices:['vague','coherent','sleepy','rusty'], answer:'coherent', explain:'Coherent means clear and logical.' },
-    { id:'v-p6-002', level:'P6', category:'synonymContrast', subskill:'advanced_word_choice', difficulty:3, q:'The charity hopes to ___ public support.', choices:['garner','shiver','wander','scatter'], answer:'garner', explain:'Garner means gather/collect.' },
-    { id:'v-p6-003', level:'P6', category:'synonymContrast', subskill:'nuanced_choice', difficulty:3, q:'Despite setbacks, the team remained ___.', choices:['resilient','fragile','silent','rare'], answer:'resilient', explain:'Resilient means able to recover quickly.' },
-    { id:'v-p6-004', level:'P6', category:'synonymContrast', subskill:'advanced_word_choice', difficulty:3, q:'Her speech was ___ and persuasive.', choices:['eloquent','clumsy','faint','rigid'], answer:'eloquent', explain:'Eloquent means fluent and persuasive.' },
-    { id:'v-p6-005', level:'P6', category:'contextInference', subskill:'formal_vocab', difficulty:3, q:'The report aims to ___ key trends.', choices:['highlight','scatter','postpone','tangle'], answer:'highlight', explain:'Highlight means emphasize important points.' },
-    { id:'v-p6-006', level:'P6', category:'contextInference', subskill:'formal_vocab', difficulty:3, q:'The committee reached a ___ decision after debate.', choices:['unanimous','rusty','shallow','playful'], answer:'unanimous', explain:'Unanimous means everyone agreed.' },
-    { id:'v-p6-007', level:'P6', category:'collocationCloze', subskill:'academic', difficulty:3, q:'The policy was designed to ___ waste.', choices:['minimise','stumble','inflate','misplace'], answer:'minimise', explain:'Minimise waste is a common formal collocation.' },
-    { id:'v-p6-008', level:'P6', category:'synonymContrast', subskill:'nuanced_choice', difficulty:3, q:'Even under pressure, she stayed ___.', choices:['composed','brittle','faded','random'], answer:'composed', explain:'Composed means calm and self-controlled.' },
-    { id:'v-p6-009', level:'P6', category:'synonymContrast', subskill:'advanced_word_choice', difficulty:3, q:'The team managed to ___ their rivals convincingly.', choices:['surpass','stumble','suspend','stagger'], answer:'surpass', explain:'Surpass means exceed or outperform.' },
-    { id:'v-p6-010', level:'P6', category:'collocationCloze', subskill:'academic', difficulty:3, q:'The scientist\'s findings were ___ and well-supported.', choices:['credible','clumsy','vague','casual'], answer:'credible', explain:'Credible findings means believable and trustworthy results.' },
-    { id:'v-p6-011', level:'P6', category:'synonymContrast', subskill:'advanced_word_choice', difficulty:3, q:'His remark was ___ and uncalled for.', choices:['disparaging','delightful','diligent','dynamic'], answer:'disparaging', explain:'Disparaging means expressing disapproval in a critical way.' },
-    { id:'v-p6-012', level:'P6', category:'synonymContrast', subskill:'nuanced_choice', difficulty:3, q:'The volunteers showed ___ dedication to the cause.', choices:['unwavering','uncertain','unkempt','unlikely'], answer:'unwavering', explain:'Unwavering means steady and resolute.' },
-    { id:'v-p6-013', level:'P6', category:'contextInference', subskill:'formal_vocab', difficulty:3, q:'The new policy aims to ___ community engagement.', choices:['foster','fracture','fumble','flounder'], answer:'foster', explain:'Foster means encourage or promote the development of.' },
-    { id:'v-p6-014', level:'P6', category:'synonymContrast', subskill:'nuanced_choice', difficulty:3, q:'Her account of the event was ___ and well-structured.', choices:['meticulous','muddled','mundane','mischievous'], answer:'meticulous', explain:'Meticulous means showing great attention to detail.' },
-    { id:'v-p6-015', level:'P6', category:'collocationCloze', subskill:'academic', difficulty:3, q:'The speaker delivered a ___ argument in favour of change.', choices:['compelling','confusing','casual','comical'], answer:'compelling', explain:'A compelling argument is one that is very convincing.' },
-    { id:'v-p6-016', level:'P6', category:'idiomaticExpressions', subskill:'common_idioms', difficulty:2, q:'To "turn over a new leaf" means to ___.', choices:['make a fresh start','plant a tree','read a book','move away'], answer:'make a fresh start', explain:'This idiom means to start behaving better.' },
-    { id:'v-p6-017', level:'P6', category:'grammarSVA', subskill:'complex_subjects', difficulty:3, q:'The number of students ___ increased this year.', choices:['has','have','are','were'], answer:'has', explain:'"The number of" is singular and takes "has".' },
-    { id:'v-p6-018', level:'P6', category:'proverbsSayings', subskill:'common_proverbs', difficulty:2, q:'"Don\'t put all your eggs in one ___" means don\'t risk everything on a single plan.', choices:['basket','bag','box','bowl'], answer:'basket', explain:'This proverb advises against depending on a single strategy.' },
-    { id:'v-p6-019', level:'P6', category:'grammarSVA', subskill:'complex_subjects', difficulty:3, q:'A number of students ___ absent today.', choices:['are','is','was','has'], answer:'are', explain:'"A number of" is plural and takes "are".' },
-    { id:'v-p6-020', level:'P6', category:'socialStudiesVocab', subskill:'governance', difficulty:3, q:'The government introduced a new ___ to reduce pollution.', choices:['policy','polity','police','polish'], answer:'policy', explain:'A policy is a plan or course of action adopted by a government.' },
-    { id:'v-p6-021', level:'P6', category:'contextInference', subskill:'formal_vocab', difficulty:3, q:'The principal urged students to ___ their time wisely during revision.', choices:['manage','scatter','delay','waste'], answer:'manage', explain:'Manage time means use it wisely.' },
-    { id:'v-p6-022', level:'P6', category:'synonymContrast', subskill:'synonym_context', difficulty:3, q:'Her tone was calm and ___.', choices:['measured','reckless','hollow','harsh'], answer:'measured', explain:'Measured means controlled and thoughtful.' },
-    { id:'v-p6-023', level:'P6', category:'synonymContrast', subskill:'antonym_context', difficulty:3, q:'The account was accurate, not ___.', choices:['inaccurate','detailed','official','concise'], answer:'inaccurate', explain:'Inaccurate is opposite of accurate.' },
-    { id:'v-p6-024', level:'P6', category:'definitionMatch', subskill:'semantic_field_governance', difficulty:3, q:'A group chosen to make decisions for an organisation is a ___.', choices:['committee','conductor','catalogue','category'], answer:'committee', explain:'Committees are decision-making groups.' },
-    { id:'v-p6-025', level:'P6', category:'collocationCloze', subskill:'reach_an_agreement', difficulty:3, q:'After a long discussion, both sides reached an ___.', choices:['agreement','arrangement','assignment','announcement'], answer:'agreement', explain:'The collocation is "reach an agreement".' },
-    { id:'v-p6-026', level:'P6', category:'contextInference', subskill:'evidence_clue', difficulty:3, q:'The scientist repeated the test to ___ the results.', choices:['verify','invent','oppose','disturb'], answer:'verify', explain:'Repeating tests helps verify results.' },
-    { id:'v-p6-027', level:'P6', category:'definitionMatch', subskill:'semantic_field_media', difficulty:3, q:'A short written statement shared with journalists is a ___.', choices:['press release','score sheet','menu card','entry pass'], answer:'press release', explain:'Press releases are written for the media.' },
-    { id:'v-p6-028', level:'P6', category:'collocationCloze', subskill:'pose_a_challenge', difficulty:3, q:'Limited resources can ___ a challenge for small schools.', choices:['pose','deliver','collect','scatter'], answer:'pose', explain:'The phrase is "pose a challenge".' },
-    { id:'v-p6-029', level:'P6', category:'contextInference', subskill:'tone_clue', difficulty:3, q:'He admitted his mistake and apologised ___.', choices:['sincerely','noisily','carelessly','vaguely'], answer:'sincerely', explain:'A genuine apology is sincere.' },
-    { id:'v-p6-030', level:'P6', category:'synonymContrast', subskill:'synonym_context', difficulty:3, q:'The evidence was weak, so the argument was not ___.', choices:['convincing','balanced','creative','practical'], answer:'convincing', explain:'Weak evidence makes an argument less convincing.' },
-    { id:'v-p6-031', level:'P6', category:'collocationCloze', subskill:'draw_a_distinction', difficulty:3, q:'The writer carefully ___ a distinction between fact and opinion.', choices:['drew','built','lifted','found'], answer:'drew', explain:'Common phrase: draw a distinction.' },
-    { id:'v-p6-032', level:'P6', category:'definitionMatch', subskill:'semantic_field_statistics', difficulty:3, q:'Information shown in numbers and charts is called ___.', choices:['data','drama','debt','debate'], answer:'data', explain:'Data refers to factual information, often numerical.' },
-    { id:'v-p6-033', level:'P6', category:'contextInference', subskill:'cause_effect', difficulty:3, q:'The speaker paused often, making the message hard to ___.', choices:['follow','foster','finance','forgive'], answer:'follow', explain:'Frequent pauses can make ideas hard to follow.' },
-    { id:'v-p6-034', level:'P6', category:'synonymContrast', subskill:'antonym_context', difficulty:3, q:'The procedure was efficient, not ___.', choices:['wasteful','timely','stable','direct'], answer:'wasteful', explain:'Wasteful is opposite in this efficiency context.' },
-    { id:'v-p6-035', level:'P6', category:'collocationCloze', subskill:'conduct_research', difficulty:3, q:'The team will ___ research before writing the article.', choices:['conduct','drive','strike','gathered'], answer:'conduct', explain:'Common collocation: conduct research.' },
-    { id:'v-p6-036', level:'P6', category:'contextInference', subskill:'formal_vocab', difficulty:3, q:'The charity event aimed to ___ awareness about food waste.', choices:['raise','rise','lift up','height'], answer:'raise', explain:'We raise awareness about issues.' },
-    { id:'v-p6-037', level:'P6', category:'definitionMatch', subskill:'semantic_field_economy', difficulty:3, q:'Money paid regularly for work done is called a ___.', choices:['salary','saving','supply','survey'], answer:'salary', explain:'Salary is regular payment for work.' },
-    { id:'v-p6-038', level:'P6', category:'collocationCloze', subskill:'make_an_inference', difficulty:3, q:'From the clues in the passage, readers can ___ an inference.', choices:['make','do','take','build'], answer:'make', explain:'The collocation is "make an inference".' },
-    { id:'v-p6-039', level:'P6', category:'contextInference', subskill:'meaning_in_context', difficulty:3, q:'Her comments were brief but showed deep ___.', choices:['insight','outing','insect','inflow'], answer:'insight', explain:'Insight means deep understanding.' },
-    { id:'v-p6-040', level:'P6', category:'synonymContrast', subskill:'synonym_context', difficulty:3, q:'The project required careful and ___ planning.', choices:['thorough','hollow','fragile','stale'], answer:'thorough', explain:'Thorough planning is detailed and complete.' },
-    { id:'v-p6-041', level:'P6', category:'synonymContrast', subskill:'near_synonym_discrimination', difficulty:3, q:'Although his speech was emotional, its structure remained ____.', choices:['coherent','colourful','dramatic','casual'], answer:'coherent', explain:'Coherent best fits logical structure despite emotion.' },
-    { id:'v-p6-042', level:'P6', category:'synonymContrast', subskill:'tone_connotation', difficulty:3, q:'The editor rejected the draft in a firm but ___ tone.', choices:['professional','sarcastic','hostile','mocking'], answer:'professional', explain:'Firm yet professional rejection fits formal setting.' },
-    { id:'v-p6-043', level:'P6', category:'collocationCloze', subskill:'conduct_an_audit', difficulty:3, q:'Before releasing the report, the team decided to ___ an internal audit.', choices:['conduct','drive','carry over','invent'], answer:'conduct', explain:'The collocation is "conduct an audit".' },
-    { id:'v-p6-044', level:'P6', category:'connectorClue', subskill:'therefore_nuance', difficulty:3, q:'The source could not be verified; therefore, the claim remained ____.', choices:['questionable','convincing','definite','confirmed'], answer:'questionable', explain:'Unverified source weakens certainty.' },
-    { id:'v-p6-045', level:'P6', category:'contextInference', subskill:'multi_clue', difficulty:3, q:'She compared three datasets, checked for outliers, and justified each step, so her findings seemed ____.', choices:['credible','careless','hurried','invented'], answer:'credible', explain:'Methodical checking supports credibility.' },
-    { id:'v-p6-046', level:'P6', category:'collocationCloze', subskill:'mitigate_risk', difficulty:3, q:'Installing guardrails can help ___ risk on steep paths.', choices:['mitigate','collect','magnify','delay'], answer:'mitigate', explain:'Mitigate means reduce severity of risk.' },
-    { id:'v-p6-047', level:'P6', category:'synonymContrast', subskill:'near_synonym_discrimination', difficulty:3, q:'The witness gave a detailed yet ___ account, with no contradiction.', choices:['consistent','dramatic','casual','vague'], answer:'consistent', explain:'No contradiction indicates consistency.' },
-    { id:'v-p6-048', level:'P6', category:'connectorClue', subskill:'however_nuance', difficulty:3, q:'The solution looked efficient; however, its long-term cost was ____.', choices:['high','minor','fixed','steady'], answer:'high', explain:'However marks a drawback despite initial efficiency.' },
-    { id:'v-p6-049', level:'P6', category:'contextInference', subskill:'literal_contextual_mix', difficulty:3, q:'He kept interrupting others, so the discussion became less ____.', choices:['productive','friendly','formal','brief'], answer:'productive', explain:'Interruptions reduce productive discussion.' },
-    { id:'v-p6-050', level:'P6', category:'collocationCloze', subskill:'draw_attention_to_issue', difficulty:3, q:'The campaign aimed to ___ attention to cyber safety.', choices:['draw','take','push','carry'], answer:'draw', explain:'The phrase is "draw attention to".' },
-    { id:'v-p6-051', level:'P6', category:'synonymContrast', subskill:'tone_connotation', difficulty:3, q:'His feedback was direct yet ____, which encouraged improvement.', choices:['constructive','destructive','confusing','dismissive'], answer:'constructive', explain:'Constructive feedback helps improvement.' },
-    { id:'v-p6-052', level:'P6', category:'connectorClue', subskill:'despite_nuance', difficulty:3, q:'Despite limited funding, the organisers delivered a ___ event.', choices:['successful','careless','ordinary','narrow'], answer:'successful', explain:'Despite signals success against difficulty.' },
-    { id:'v-p6-053', level:'P6', category:'contextInference', subskill:'multi_clue', difficulty:3, q:'The article cited experts, included data tables, and acknowledged limits, making it appear ____.', choices:['balanced','biased','careless','hollow'], answer:'balanced', explain:'Acknowledging limits and evidence suggests balance.' },
-    { id:'v-p6-054', level:'P6', category:'collocationCloze', subskill:'reach_a_verdict', difficulty:3, q:'After reviewing all testimonies, the panel reached a ____.', choices:['verdict','version','venture','vibration'], answer:'verdict', explain:'Panels/juries reach a verdict.' },
-    { id:'v-p6-055', level:'P6', category:'synonymContrast', subskill:'antonym_context', difficulty:3, q:'The policy was transparent, not ____.', choices:['opaque','public','fair','timely'], answer:'opaque', explain:'Opaque is opposite of transparent in meaning.' },
-    { id:'v-p6-056', level:'P6', category:'connectorClue', subskill:'unless_nuance', difficulty:3, q:'Unless the figures are verified, the report should remain ____.', choices:['draft','final','published','approved'], answer:'draft', explain:'Unless clause warns against finalising unverified work.' },
-    { id:'v-p6-057', level:'P6', category:'contextInference', subskill:'tone_and_purpose', difficulty:3, q:'She simplified technical terms for younger readers, making the guide more ____.', choices:['accessible','exclusive','formal','rigid'], answer:'accessible', explain:'Simplified terms improve accessibility.' },
-    { id:'v-p6-058', level:'P6', category:'collocationCloze', subskill:'make_a_recommendation', difficulty:3, q:'Based on the evidence, the committee will ___ a recommendation.', choices:['make','take','hold','render up'], answer:'make', explain:'The collocation is "make a recommendation".' },
-    { id:'v-p6-059', level:'P6', category:'synonymContrast', subskill:'near_synonym_discrimination', difficulty:3, q:'The explanation was concise yet ____, covering all key points.', choices:['comprehensive','lengthy','rambling','vague'], answer:'comprehensive', explain:'Comprehensive means complete coverage.' },
-    { id:'v-p6-060', level:'P6', category:'connectorClue', subskill:'because_of_nuance', difficulty:3, q:'Because of repeated delays, stakeholders grew increasingly ____.', choices:['frustrated','grateful','excited','carefree'], answer:'frustrated', explain:'Repeated delays cause frustration.' },
-    { id:'v-p6-061', level:'P6', category:'contextInference', subskill:'literal_and_contextual', difficulty:3, q:'The data points were scattered widely, so the trend was hard to ____.', choices:['interpret','decorate','store','compress'], answer:'interpret', explain:'Scattered data makes interpretation difficult.' },
-    { id:'v-p6-062', level:'P6', category:'collocationCloze', subskill:'pose_a_threat', difficulty:3, q:'Unsecured accounts can ___ a threat to online safety.', choices:['pose','pull','place','render'], answer:'pose', explain:'The collocation is "pose a threat".' },
-    { id:'v-p6-063', level:'P6', category:'synonymContrast', subskill:'tone_connotation', difficulty:3, q:'Her apology sounded sincere, not ____.', choices:['insincere','formal','brief','quiet'], answer:'insincere', explain:'Sincere directly contrasts with insincere.' },
-    { id:'v-p6-064', level:'P6', category:'connectorClue', subskill:'therefore_final', difficulty:3, q:'The trial results were inconsistent; therefore, the hypothesis was ____.', choices:['revised','proven','celebrated','ignored'], answer:'revised', explain:'Inconsistent results typically require revision.' },
-    { id:'v-p6-065', level:'P6', category:'contextInference', subskill:'multi_clue', difficulty:3, q:'He summarised opposing views fairly before stating his own, which made his argument more ____.', choices:['credible','dramatic','aggressive','narrow'], answer:'credible', explain:'Fair presentation of views increases credibility.' },
-  ],
+const LEVEL_CATEGORY_PLAN = {
+  P1: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue'],
+  P2: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'wordParts'],
+  P3: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue', 'wordParts', 'scienceTechTerms'],
+  P4: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue', 'wordParts', 'socialStudiesVocab'],
+  P5: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue', 'wordParts', 'idiomaticExpressions', 'proverbsSayings', 'scienceTechTerms'],
+  P6: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue', 'wordParts', 'idiomaticExpressions', 'proverbsSayings', 'socialStudiesVocab'],
 };
+const CONTEXT_TAILS = [
+  'during morning assembly',
+  'in class discussion',
+  'while revising for the exam',
+  'at the neighbourhood library',
+  'during project work',
+  'before the oral presentation',
+  'during group rehearsal',
+  'at the science corner',
+  'in the canteen queue',
+  'during values-in-action day',
+  'during enrichment week',
+  'before the final check',
+];
+
+function rotate(arr, idx) {
+  return arr[idx % arr.length];
+}
+
+function buildChoices(answer, distractors) {
+  return [answer, ...distractors].slice(0, 4);
+}
+
+function difficultyFor(level, idx) {
+  if (level === 'P1' || level === 'P2') return idx % 5 === 0 ? 2 : 1;
+  if (level === 'P3' || level === 'P4') return idx % 4 === 0 ? 3 : 2;
+  return idx % 3 === 0 ? 3 : 2;
+}
+
+function decorateStem(stem, level, idx) {
+  const tail = rotate(CONTEXT_TAILS, idx);
+  return `${String(stem).replace(/\.$/, '')} ${tail} in ${level} practice set ${idx + 1}.`;
+}
+
+const VOCAB_BUILDERS = {
+  contextInference(level, i) {
+    const rows = [
+      ['After running three rounds in the sun, Amir felt very ___.', 'tired', ['cheerful', 'spotless', 'plastic']],
+      ['The classroom was so ___ that everyone could hear a pin drop.', 'quiet', ['crowded', 'muddy', 'rapid']],
+      ['Because the floor was wet, we walked ___.', 'carefully', ['lazily', 'noisily', 'luckily']],
+      ['The soup smelled fresh and tasted very ___.', 'delicious', ['dusty', 'broken', 'narrow']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { category: 'contextInference', subskill: 'meaning_in_context', q, choices: buildChoices(answer, ds), answer, explain: 'Use clues in the sentence to infer meaning.' };
+  },
+  definitionMatch(level, i) {
+    const rows = [
+      ['A person who treats sick animals is a ___.', 'veterinarian', ['librarian', 'tailor', 'cashier']],
+      ['A place where we borrow storybooks is a ___.', 'library', ['bakery', 'stadium', 'factory']],
+      ['A machine that shows moving pictures on a screen is a ___.', 'projector', ['stapler', 'compass', 'teapot']],
+      ['A long journey to explore a place is an ___.', 'expedition', ['equation', 'invitation', 'reflection']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { category: 'definitionMatch', subskill: 'word_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the word that matches the definition.' };
+  },
+  synonymContrast(level, i) {
+    const rows = [
+      ['The principal’s message was brief but very ___.', 'meaningful', ['careless', 'shallow', 'crooked']],
+      ['The opposite of "ancient" in this sentence is ___.', 'modern', ['fragile', 'gentle', 'hollow']],
+      ['Her tone was polite, not ___.', 'rude', ['formal', 'steady', 'honest']],
+      ['The child was joyful, which means she was ___.', 'happy', ['angry', 'silent', 'frozen']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { category: 'synonymContrast', subskill: 'synonym_antonym', q, choices: buildChoices(answer, ds), answer, explain: 'Select the closest synonym or contrast word from context.' };
+  },
+  collocationCloze(level, i) {
+    const rows = [
+      ['Please ___ attention to the safety signs at the lab door.', 'pay', ['do', 'keep', 'set']],
+      ['The class decided to ___ a charity sale next Friday.', 'hold', ['make', 'draw', 'carry']],
+      ['After discussion, the team ___ a decision quickly.', 'reached', ['caught', 'drew', 'lifted']],
+      ['To improve, you should ___ an effort every day.', 'make', ['do', 'bring', 'throw']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { category: 'collocationCloze', subskill: 'word_partners', q, choices: buildChoices(answer, ds), answer, explain: 'Some words naturally go together as collocations.' };
+  },
+  grammaticalRole(level, i) {
+    const rows = [
+      ['The class admired her ___ performance during speech day.', 'confident', ['confidence', 'confidently', 'confide']],
+      ['The referee blew the whistle ___.', 'sharply', ['sharp', 'sharpness', 'sharpen']],
+      ['Their ___ helped the new pupil settle in quickly.', 'kindness', ['kind', 'kindly', 'kinder']],
+      ['The team moved with great ___ during the relay.', 'speed', ['speedy', 'speedily', 'speeding']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { category: 'grammaticalRole', subskill: 'word_form', q, choices: buildChoices(answer, ds), answer, explain: 'Pick the word form that fits the grammar slot.' };
+  },
+  connectorClue(level, i) {
+    const rows = [
+      ['Although the backpack looked small, it was surprisingly ___.', 'heavy', ['empty', 'gentle', 'silent']],
+      ['The map was clear; however, the route was still ___.', 'confusing', ['tidy', 'famous', 'silent']],
+      ['Because the lights went out suddenly, the hall became ___.', 'dark', ['tiny', 'modern', 'spacious']],
+      ['She was nervous, yet her voice remained ___.', 'steady', ['crooked', 'dusty', 'fragile']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { category: 'connectorClue', subskill: 'connector_inference', q, choices: buildChoices(answer, ds), answer, explain: 'Use the connector to infer the missing meaning word.' };
+  },
+  wordParts(level, i) {
+    const rows = [
+      ['The prefix "re-" in "rewrite" means to do it ___.', 'again', ['slowly', 'poorly', 'outside']],
+      ['A person who drives is a ___.', 'driver', ['driving', 'driveful', 'driveless']],
+      ['The suffix "-less" in "careless" means "without ___."', 'care', ['speed', 'noise', 'luck']],
+      ['If something is "unfair", the prefix "un-" means ___.', 'not', ['very', 'more', 'before']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { category: 'morphologicalAffix', subskill: 'prefix_suffix', q, choices: buildChoices(answer, ds), answer, explain: 'Word parts can help you infer meaning.' };
+  },
+  idiomaticExpressions(level, i) {
+    const rows = [
+      ['When Jia Min said "break the ice", she meant to ___.', 'start friendly conversation', ['smash something cold', 'end the meeting', 'draw a cube']],
+      ['"Hit the books" means to ___.', 'study hard', ['close the library', 'buy textbooks', 'tear paper']],
+      ['If someone is "on cloud nine", the person feels ___.', 'very happy', ['very sleepy', 'very angry', 'very hungry']],
+      ['"Piece of cake" describes a task that is ___.', 'very easy', ['very expensive', 'very noisy', 'very late']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { category: 'idiomaticExpressions', subskill: 'idiom_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'Idioms are figurative, not literal.' };
+  },
+  proverbsSayings(level, i) {
+    const rows = [
+      ['"Practice makes ___."', 'perfect', ['faster', 'silent', 'famous']],
+      ['"Where there is a will, there is a ___."', 'way', ['roadblock', 'ticket', 'raincoat']],
+      ['"Actions speak louder than ___."', 'words', ['coins', 'voices', 'windows']],
+      ['"A stitch in time saves ___."', 'nine', ['mine', 'fine', 'line']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { category: 'proverbsSayings', subskill: 'proverb_completion', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the proverb word that completes the saying correctly.' };
+  },
+  scienceTechTerms(level, i) {
+    const rows = [
+      ['Plants make food using sunlight through ___.', 'photosynthesis', ['evaporation', 'erosion', 'migration']],
+      ['A program used to browse websites is a web ___.', 'browser', ['charger', 'beaker', 'ruler']],
+      ['The boiling point of water is measured using a ___.', 'thermometer', ['compass', 'tripod', 'magnet']],
+      ['A robot uses sensors to ___ its surroundings.', 'detect', ['decorate', 'defend', 'delay']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { category: 'scienceTechTerms', subskill: 'topic_vocabulary', q, choices: buildChoices(answer, ds), answer, explain: 'Use science and technology context clues.' };
+  },
+  socialStudiesVocab(level, i) {
+    const rows = [
+      ['People choose leaders during an ___.', 'election', ['excursion', 'eruption', 'equation']],
+      ['A person who belongs to a country is a ___.', 'citizen', ['chemist', 'captain', 'carpenter']],
+      ['Rules made by the government are called ___.', 'laws', ['drawings', 'lanes', 'ladders']],
+      ['Helping at a food drive is a form of ___.', 'volunteering', ['calculating', 'whispering', 'postponing']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { category: 'socialStudiesVocab', subskill: 'civics_terms', q, choices: buildChoices(answer, ds), answer, explain: 'Use social studies context to identify vocabulary.' };
+  },
+};
+
+function toCanonicalCategory(cat) {
+  if (cat === 'wordParts') return 'morphologicalAffix';
+  return cat;
+}
+
+function buildLevel(level) {
+  const target = 80;
+  const cats = LEVEL_CATEGORY_PLAN[level];
+  const items = [];
+  const categoryCursor = Object.fromEntries(cats.map(c => [c, 0]));
+
+  for (let i = 0; i < target; i += 1) {
+    const baseCat = cats[i % cats.length];
+    const localIndex = categoryCursor[baseCat];
+    categoryCursor[baseCat] += 1;
+    const spec = VOCAB_BUILDERS[baseCat](level, localIndex);
+    items.push({
+      id: `v-${level.toLowerCase()}-${String(i + 1).padStart(3, '0')}`,
+      level,
+      category: toCanonicalCategory(spec.category),
+      subskill: spec.subskill,
+      difficulty: difficultyFor(level, i),
+      q: decorateStem(spec.q, level, i + localIndex * 2),
+      choices: spec.choices,
+      answer: spec.answer,
+      explain: spec.explain,
+    });
+  }
+
+  return items;
+}
+
+export const VOCAB_MCQ_ITEMS = Object.fromEntries(
+  VOCAB_MCQ_LEVELS.map(level => [level, buildLevel(level)]),
+);
