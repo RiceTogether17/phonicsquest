@@ -1,404 +1,371 @@
 /**
  * PhonicsQuest – Grammar MCQ Item Bank
  *
- * Restructured to align with the Grammar Cloze (Cloze Castle) category spine.
- * Every item now carries:
- *   category  – matches a key in grammarCategories.js (same as Cloze Castle)
- *   subskill  – specific micro-concept within the category
- *   difficulty – 1 (intro) → 2 (developing) → 3 (challenging) within level
- *
- * SPIRAL MODEL
- * ────────────────────────────────────────────────────────────────────────
- * Core strands (svAgreement, articles, prepositions, tenses, pronouns,
- * connectors, comparatives/superlatives, quantifiers) recur across
- * multiple levels with rising difficulty.
- *
- * Upper-primary strands (passiveVoice, conditionals, reportedSpeech,
- * relativeClauses, modals, inversion) build on lower-primary foundations.
- *
- * The `category` key is used by questMastery so that Grammar MCQ and
- * Grammar Cloze share the same mastery buckets.
+ * Data is generated from level/category blueprints so we can maintain
+ * broad category coverage and consistent schema quality at scale.
  */
 
-export const GRAMMAR_MCQ_LEVELS = ['P1','P2','P3','P4','P5','P6'];
+export const GRAMMAR_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 
-export const GRAMMAR_MCQ_ITEMS = {
-  P1: [
-    { id:'g-p1-001', level:'P1', category:'svAgreement', subskill:'has_have', difficulty:1, q:'She ___ a red bag.', choices:['has','have','having','had'], answer:'has', explain:'Singular subject "She" takes "has".' },
-    { id:'g-p1-002', level:'P1', category:'prepositions', subskill:'place', difficulty:1, q:'I am sitting ___ my chair.', choices:['on','by','from','to'], answer:'on', explain:'We sit on a chair.' },
-    { id:'g-p1-003', level:'P1', category:'articles', subskill:'a_an', difficulty:1, q:'___ apple is sweet.', choices:['A','An','The','Some'], answer:'An', explain:'Use "An" before vowel sound words like apple.' },
-    { id:'g-p1-004', level:'P1', category:'svAgreement', subskill:'is_are', difficulty:1, q:'My brother and I ___ friends.', choices:['is','am','are','was'], answer:'are', explain:'Compound subject "brother and I" is plural.' },
-    { id:'g-p1-005', level:'P1', category:'articles', subskill:'the_specific', difficulty:1, q:'This is ___ umbrella I bought yesterday.', choices:['a','an','the','many'], answer:'the', explain:'Use "the" when referring to a specific umbrella.' },
-    { id:'g-p1-006', level:'P1', category:'presentCont', subskill:'is_are_verb_ing', difficulty:1, q:'The boys ___ in the field now.', choices:['plays','are playing','played','play'], answer:'are playing', explain:'"now" signals present continuous.' },
-    { id:'g-p1-007', level:'P1', category:'articles', subskill:'the_unique', difficulty:1, q:'___ sun is bright today.', choices:['A','An','The','Some'], answer:'The', explain:'We use "the" for unique nouns like the sun.' },
-    { id:'g-p1-008', level:'P1', category:'pronouns', subskill:'possessive_pronoun', difficulty:1, q:'These pencils are ___.', choices:['my','mine','me','I'], answer:'mine', explain:'Use possessive pronoun "mine" without a following noun.' },
-    { id:'g-p1-009', level:'P1', category:'svAgreement', subskill:'is_are', difficulty:1, q:'The girl ___ reading a book.', choices:['is','are','am','be'], answer:'is', explain:'Singular subject "girl" takes "is".' },
-    { id:'g-p1-010', level:'P1', category:'svAgreement', subskill:'base_form', difficulty:1, q:'We ___ to school every day.', choices:['go','goes','going','gone'], answer:'go', explain:'Plural subject "we" takes the base verb "go".' },
-    { id:'g-p1-011', level:'P1', category:'prepositions', subskill:'direction', difficulty:1, q:'He put the toys ___ the box.', choices:['into','on','at','by'], answer:'into', explain:'"Into" shows movement inside a container.' },
-    { id:'g-p1-012', level:'P1', category:'articles', subskill:'a_an', difficulty:1, q:'I can see ___ elephant at the zoo.', choices:['a','an','the','some'], answer:'an', explain:'Use "an" before a vowel sound like "elephant".' },
-    { id:'g-p1-013', level:'P1', category:'presentCont', subskill:'is_are_verb_ing', difficulty:1, q:'Mother ___ cooking dinner now.', choices:['is','are','was','were'], answer:'is', explain:'"now" signals present continuous with singular "is".' },
-    { id:'g-p1-014', level:'P1', category:'pronouns', subskill:'possessive_pronoun', difficulty:1, q:'That bag is ___, not yours.', choices:['her','hers','she','herself'], answer:'hers', explain:'Possessive pronoun "hers" stands alone without a noun.' },
-    { id:'g-p1-015', level:'P1', category:'prepositions', subskill:'place', difficulty:1, q:'The cat is hiding ___ the table.', choices:['under','on','into','from'], answer:'under', explain:'"Under" means below or beneath something.' },
-    { id:'g-p1-016', level:'P1', category:'simplePast', subskill:'irregular_past', difficulty:1, q:'Last week, Father ___ me to the park.', choices:['bring','brings','brought','bringing'], answer:'brought', explain:'"Last week" signals past tense — "brought" is past of "bring".' },
-    { id:'g-p1-017', level:'P1', category:'possessives', subskill:'my_your', difficulty:1, q:'That is ___ book. Give it back to me.', choices:['my','me','I','mine'], answer:'my', explain:'"My" is a possessive adjective used before a noun.' },
-    { id:'g-p1-018', level:'P1', category:'countableUncountable', subskill:'a_an_some', difficulty:1, q:'Can I have ___ water, please?', choices:['a','an','some','many'], answer:'some', explain:'"Water" is uncountable, so we use "some" (not "a" or "an").' },
-    { id:'g-p1-019', level:'P1', category:'possessives', subskill:'his_her', difficulty:1, q:'Sara loves ___ doll very much.', choices:['his','her','hers','she'], answer:'her', explain:'"Her" is used before a noun to show possession for a girl.' },
-    { id:'g-p1-020', level:'P1', category:'svAgreement', subskill:'is_are', difficulty:1, q:'The kittens ___ sleeping in the basket now.', choices:['is','are','was','am'], answer:'are', explain:'Plural subject "kittens" takes "are".' },
-    { id:'g-p1-021', level:'P1', category:'presentCont', subskill:'am_verb_ing', difficulty:1, q:'I ___ drawing a house now.', choices:['am','is','are','was'], answer:'am', explain:'Subject "I" takes "am" in present continuous.' },
-    { id:'g-p1-022', level:'P1', category:'simplePast', subskill:'regular_past', difficulty:1, q:'Yesterday, we ___ football after school.', choices:['play','plays','played','playing'], answer:'played', explain:'"Yesterday" signals simple past.' },
-    { id:'g-p1-023', level:'P1', category:'articles', subskill:'a_an', difficulty:1, q:'Mum bought ___ orange for my snack.', choices:['a','an','the','some'], answer:'an', explain:'Use "an" before a vowel sound.' },
-    { id:'g-p1-024', level:'P1', category:'pronouns', subskill:'subject_pronoun', difficulty:1, q:'My sister is seven. ___ likes reading storybooks.', choices:['He','She','It','They'], answer:'She', explain:'Use "She" for a singular female person.' },
-    { id:'g-p1-025', level:'P1', category:'quantifiers', subskill:'many', difficulty:1, q:'There are ___ stars on the poster.', choices:['much','many','little','any'], answer:'many', explain:'"Stars" is a countable plural noun, so use "many".' },
-    { id:'g-p1-026', level:'P1', category:'articles', subskill:'the_specific', difficulty:1, q:'Please close ___ door near the window.', choices:['a','an','the','some'], answer:'the', explain:'A specific door is referred to, so use "the".' },
-    { id:'g-p1-027', level:'P1', category:'svAgreement', subskill:'third_person_s', difficulty:1, q:'My father ___ to work by bus every day.', choices:['go','goes','going','went'], answer:'goes', explain:'Singular third-person subject takes verb + s.' },
-    { id:'g-p1-028', level:'P1', category:'possessives', subskill:'their', difficulty:1, q:'The boys packed ___ school bags quickly.', choices:['their','there','they','theirs'], answer:'their', explain:'Use possessive adjective "their" before a noun.' },
-    { id:'g-p1-029', level:'P1', category:'simplePast', subskill:'irregular_past', difficulty:1, q:'Last night, I ___ a glass of milk.', choices:['drink','drinks','drank','drinking'], answer:'drank', explain:'Past tense of "drink" is "drank".' },
-    { id:'g-p1-030', level:'P1', category:'presentCont', subskill:'is_are_verb_ing', difficulty:1, q:'Look! The baby ___ loudly.', choices:['cry','cries','is crying','cried'], answer:'is crying', explain:'"Look!" shows the action is happening now.' },
-    { id:'g-p1-031', level:'P1', category:'countableUncountable', subskill:'some_any', difficulty:1, q:'There is ___ rice left in the pot.', choices:['many','some','a few','an'], answer:'some', explain:'"Rice" is uncountable, so "some" fits.' },
-    { id:'g-p1-032', level:'P1', category:'pronouns', subskill:'object_pronoun', difficulty:1, q:'My aunt called ___.', choices:['I','me','my','mine'], answer:'me', explain:'Object pronoun "me" is needed after the verb "called".' },
-    { id:'g-p1-033', level:'P1', category:'svAgreement', subskill:'am_is_are', difficulty:1, q:'I ___ in Primary One this year.', choices:['am','is','are','be'], answer:'am', explain:'Subject "I" takes "am".' },
-    { id:'g-p1-034', level:'P1', category:'articles', subskill:'a_an', difficulty:1, q:'He saw ___ ant on the picnic mat.', choices:['a','an','the','some'], answer:'an', explain:'Use "an" before a vowel sound like "ant".' },
-    { id:'g-p1-035', level:'P1', category:'simplePast', subskill:'irregular_past', difficulty:1, q:'We ___ to the library after lunch.', choices:['go','went','goes','going'], answer:'went', explain:'Past tense of "go" is "went".' },
-    { id:'g-p1-036', level:'P1', category:'presentCont', subskill:'are_verb_ing', difficulty:1, q:'The girls ___ skipping near the hall.', choices:['is','are','was','be'], answer:'are', explain:'Plural subject "girls" takes "are" in present continuous.' },
-    { id:'g-p1-037', level:'P1', category:'possessives', subskill:'our', difficulty:1, q:'___ classroom is on the second floor.', choices:['Our','Us','We','Ours'], answer:'Our', explain:'Use possessive adjective "Our" before a noun.' },
-    { id:'g-p1-038', level:'P1', category:'quantifiers', subskill:'much', difficulty:1, q:'How ___ juice is in your bottle?', choices:['many','much','few','several'], answer:'much', explain:'"Juice" is uncountable, so use "much".' },
-    { id:'g-p1-039', level:'P1', category:'pronouns', subskill:'subject_pronoun', difficulty:1, q:'Ben and I are classmates. ___ sit together.', choices:['They','We','He','Us'], answer:'We', explain:'Use "We" for Ben and I.' },
-    { id:'g-p1-040', level:'P1', category:'svAgreement', subskill:'there_is_are', difficulty:1, q:'There ___ two swings in the playground.', choices:['is','are','was','be'], answer:'are', explain:'Plural noun "two swings" takes "are".' },
-    { id:'g-p1-041', level:'P1', category:'prepositions', subskill:'place_in', difficulty:1, q:'The crayons are ___ the pencil case.', choices:['in','on','under','to'], answer:'in', explain:'Items inside a container are "in" it.' },
-    { id:'g-p1-042', level:'P1', category:'prepositions', subskill:'place_on', difficulty:1, q:'Please put your workbook ___ the table.', choices:['on','in','between','from'], answer:'on', explain:'Objects resting on a surface are "on" it.' },
-    { id:'g-p1-043', level:'P1', category:'connectors', subskill:'and', difficulty:1, q:'I packed my bottle ___ my lunchbox.', choices:['and','but','or','because'], answer:'and', explain:'"And" joins two similar ideas/items.' },
-    { id:'g-p1-044', level:'P1', category:'connectors', subskill:'but', difficulty:1, q:'It was sunny, ___ we still brought umbrellas.', choices:['and','but','or','so'], answer:'but', explain:'"But" shows contrast.' },
-    { id:'g-p1-045', level:'P1', category:'adjAdverbs', subskill:'linking_verb_adj', difficulty:1, q:'The soup smells ___.', choices:['good','well','better','best'], answer:'good', explain:'After linking verbs like "smells", use an adjective.' },
-    { id:'g-p1-046', level:'P1', category:'adjAdverbs', subskill:'verb_adv', difficulty:1, q:'Please walk ___ in the corridor.', choices:['quiet','quietly','quieter','quietest'], answer:'quietly', explain:'Adverbs modify action verbs.' },
-    { id:'g-p1-047', level:'P1', category:'simplePast', subskill:'irregular_go', difficulty:1, q:'Yesterday, we ___ home before dark.', choices:['go','goes','went','going'], answer:'went', explain:'Past tense of "go" is "went".' },
-    { id:'g-p1-048', level:'P1', category:'simplePast', subskill:'irregular_have', difficulty:1, q:'Last Sunday, they ___ a picnic at East Coast Park.', choices:['have','has','had','having'], answer:'had', explain:'Past tense of "have" is "had".' },
-    { id:'g-p1-049', level:'P1', category:'prepositions', subskill:'time_at', difficulty:1, q:'Our lesson starts ___ eight o’clock.', choices:['at','on','in','from'], answer:'at', explain:'Use "at" for exact times.' },
-    { id:'g-p1-050', level:'P1', category:'connectors', subskill:'because', difficulty:1, q:'I drank water ___ I was thirsty.', choices:['because','but','or','so'], answer:'because', explain:'"Because" introduces a reason.' },
-  ],
-  P2: [
-    { id:'g-p2-001', level:'P2', category:'simplePast', subskill:'irregular_past', difficulty:1, q:'Yesterday, we ___ to the zoo.', choices:['go','goes','went','going'], answer:'went', explain:'"Yesterday" signals past tense.' },
-    { id:'g-p2-002', level:'P2', category:'quantifiers', subskill:'many_much', difficulty:1, q:'There are ___ pencils in the box.', choices:['much','many','little','fewest'], answer:'many', explain:'Countable plural noun uses "many".' },
-    { id:'g-p2-003', level:'P2', category:'connectors', subskill:'contrast', difficulty:1, q:'I was tired, ___ I still finished my homework.', choices:['and','but','or','so'], answer:'but', explain:'"but" shows contrast.' },
-    { id:'g-p2-004', level:'P2', category:'svAgreement', subskill:'third_person_s', difficulty:1, q:'She ___ her teeth every night.', choices:['brush','brushes','brushed','brushing'], answer:'brushes', explain:'Singular third person takes verb + s.' },
-    { id:'g-p2-005', level:'P2', category:'prepositions', subskill:'place', difficulty:1, q:'The cookies are ___ the jar.', choices:['in','to','for','with'], answer:'in', explain:'Items contained by a jar are "in" it.' },
-    { id:'g-p2-006', level:'P2', category:'svAgreement', subskill:'plural_subject', difficulty:1, q:'Mina and her sister ___ to school together.', choices:['walks','walk','walking','walked'], answer:'walk', explain:'Plural subject takes base form in simple present.' },
-    { id:'g-p2-007', level:'P2', category:'svAgreement', subskill:'there_is_are', difficulty:1, q:'There ___ a rainbow after the rain.', choices:['is','are','were','be'], answer:'is', explain:'Singular noun "rainbow" takes "is".' },
-    { id:'g-p2-008', level:'P2', category:'prepositions', subskill:'place', difficulty:1, q:'Please place the books ___ the shelf.', choices:['on','between','into','from'], answer:'on', explain:'Objects resting on a surface are "on" it.' },
-    { id:'g-p2-009', level:'P2', category:'simplePast', subskill:'irregular_past', difficulty:1, q:'He ___ his lunch an hour ago.', choices:['eat','eats','ate','eating'], answer:'ate', explain:'"An hour ago" signals past tense — "ate" is past of "eat".' },
-    { id:'g-p2-010', level:'P2', category:'connectors', subskill:'cause_effect', difficulty:1, q:'It rained heavily, ___ we stayed home.', choices:['so','but','or','yet'], answer:'so', explain:'"so" shows a result or consequence.' },
-    { id:'g-p2-011', level:'P2', category:'quantifiers', subskill:'many_much', difficulty:1, q:'There is not ___ water in the bottle.', choices:['many','much','few','several'], answer:'much', explain:'Uncountable noun "water" takes "much".' },
-    { id:'g-p2-012', level:'P2', category:'presentCont', subskill:'is_are_verb_ing', difficulty:2, q:'The children ___ playing in the garden now.', choices:['is','are','was','am'], answer:'are', explain:'Plural subject + "now" = present continuous with "are".' },
-    { id:'g-p2-013', level:'P2', category:'connectors', subskill:'addition', difficulty:1, q:'I like apples ___ oranges.', choices:['and','but','or','so'], answer:'and', explain:'"and" joins items in a list.' },
-    { id:'g-p2-014', level:'P2', category:'svAgreement', subskill:'third_person_s', difficulty:1, q:'She ___ to the library every Saturday.', choices:['go','goes','going','went'], answer:'goes', explain:'Singular third person in present simple takes "goes".' },
-    { id:'g-p2-015', level:'P2', category:'prepositions', subskill:'direction', difficulty:1, q:'Father drove us ___ school this morning.', choices:['to','on','in','by'], answer:'to', explain:'"To" shows direction towards a destination.' },
-    { id:'g-p2-016', level:'P2', category:'svAgreement', subskill:'there_is_are', difficulty:1, q:'There ___ some milk left in the fridge.', choices:['is','are','were','have'], answer:'is', explain:'Uncountable noun "milk" takes singular "is".' },
-    { id:'g-p2-017', level:'P2', category:'conjunctions', subskill:'because', difficulty:1, q:'We stayed inside ___ it was raining.', choices:['because','so','but','or'], answer:'because', explain:'"Because" gives the reason for staying inside.' },
-    { id:'g-p2-018', level:'P2', category:'countableUncountable', subskill:'a_few_a_little', difficulty:1, q:'I have ___ friends in my class.', choices:['a few','a little','much','any'], answer:'a few', explain:'"Friends" is countable, so we use "a few" (not "a little").' },
-    { id:'g-p2-019', level:'P2', category:'conjunctions', subskill:'and_or_but', difficulty:1, q:'Would you like tea ___ coffee?', choices:['and','or','but','so'], answer:'or', explain:'"Or" is used when offering a choice between two things.' },
-    { id:'g-p2-020', level:'P2', category:'svAgreement', subskill:'third_person_s', difficulty:1, q:'My brother ___ his bed every morning.', choices:['make','makes','made','making'], answer:'makes', explain:'Singular third-person subject takes verb + s.' },
-    { id:'g-p2-021', level:'P2', category:'simplePast', subskill:'regular_past', difficulty:1, q:'After school yesterday, we ___ our art project.', choices:['finish','finishes','finished','finishing'], answer:'finished', explain:'"Yesterday" requires simple past.' },
-    { id:'g-p2-022', level:'P2', category:'presentCont', subskill:'is_are_verb_ing', difficulty:1, q:'Listen! The birds ___ in the tree.', choices:['sing','sang','are singing','sings'], answer:'are singing', explain:'"Listen!" signals an action happening now.' },
-    { id:'g-p2-023', level:'P2', category:'futureTense', subskill:'will', difficulty:1, q:'I think our team ___ the game tomorrow.', choices:['wins','won','will win','winning'], answer:'will win', explain:'Use "will" for a future prediction.' },
-    { id:'g-p2-024', level:'P2', category:'articles', subskill:'a_an', difficulty:1, q:'My uncle is ___ honest man.', choices:['a','an','the','some'], answer:'an', explain:'"Honest" begins with a vowel sound, so use "an".' },
-    { id:'g-p2-025', level:'P2', category:'pronouns', subskill:'object_pronoun', difficulty:1, q:'The teacher praised ___ for helping.', choices:['we','us','our','ours'], answer:'us', explain:'Object pronoun "us" follows the verb "praised".' },
-    { id:'g-p2-026', level:'P2', category:'quantifiers', subskill:'some_any', difficulty:1, q:'Do you have ___ crayons I can borrow?', choices:['some','any','much','few'], answer:'any', explain:'In most questions, "any" is used.' },
-    { id:'g-p2-027', level:'P2', category:'countableUncountable', subskill:'a_little', difficulty:1, q:'Please add ___ sugar to the lemonade.', choices:['a few','a little','many','several'], answer:'a little', explain:'"Sugar" is uncountable, so use "a little".' },
-    { id:'g-p2-028', level:'P2', category:'svAgreement', subskill:'there_is_are', difficulty:1, q:'There ___ three apples on the plate.', choices:['is','are','was','has'], answer:'are', explain:'Plural noun "three apples" takes "are".' },
-    { id:'g-p2-029', level:'P2', category:'simplePast', subskill:'irregular_past', difficulty:1, q:'Last Saturday, my cousin ___ me a postcard.', choices:['send','sends','sent','sending'], answer:'sent', explain:'Past tense of "send" is "sent".' },
-    { id:'g-p2-030', level:'P2', category:'pronouns', subskill:'possessive_pronoun', difficulty:1, q:'This water bottle is ___, not mine.', choices:['your','yours','you','yourself'], answer:'yours', explain:'Use possessive pronoun "yours" without a following noun.' },
-    { id:'g-p2-031', level:'P2', category:'articles', subskill:'the_unique', difficulty:1, q:'___ moon looked bright last night.', choices:['A','An','The','Some'], answer:'The', explain:'Use "the" for unique things like the moon.' },
-    { id:'g-p2-032', level:'P2', category:'presentCont', subskill:'am_verb_ing', difficulty:1, q:'I ___ packing my bag now.', choices:['am','is','are','be'], answer:'am', explain:'Subject "I" takes "am" in present continuous.' },
-    { id:'g-p2-033', level:'P2', category:'futureTense', subskill:'going_to', difficulty:2, q:'We are ___ visit Grandma this weekend.', choices:['going to','will','go','gone to'], answer:'going to', explain:'"Going to" expresses a planned action.' },
-    { id:'g-p2-034', level:'P2', category:'svAgreement', subskill:'do_does', difficulty:1, q:'___ your sister enjoy swimming?', choices:['Do','Does','Did','Are'], answer:'Does', explain:'Singular third person uses "Does" in questions.' },
-    { id:'g-p2-035', level:'P2', category:'simplePast', subskill:'regular_past', difficulty:1, q:'The class ___ thank-you cards for our coach.', choices:['write','writes','wrote','writing'], answer:'wrote', explain:'The sentence describes a completed past action.' },
-    { id:'g-p2-036', level:'P2', category:'quantifiers', subskill:'few', difficulty:1, q:'Only a ___ pupils were absent today.', choices:['little','few','much','many'], answer:'few', explain:'"Pupils" is countable, so use "few".' },
-    { id:'g-p2-037', level:'P2', category:'pronouns', subskill:'subject_pronoun', difficulty:1, q:'My friends are at the gate. ___ are waiting for me.', choices:['He','She','They','We'], answer:'They', explain:'Use "They" for plural people.' },
-    { id:'g-p2-038', level:'P2', category:'countableUncountable', subskill:'many_much', difficulty:1, q:'How ___ books did you borrow?', choices:['much','many','little','less'], answer:'many', explain:'"Books" is countable plural, so use "many".' },
-    { id:'g-p2-039', level:'P2', category:'articles', subskill:'zero_article_meals', difficulty:2, q:'We usually eat ___ breakfast at home.', choices:['a','an','the','no article'], answer:'no article', explain:'Meals are usually used without an article in general statements.' },
-    { id:'g-p2-040', level:'P2', category:'svAgreement', subskill:'has_have', difficulty:1, q:'The children ___ new notebooks for class.', choices:['has','have','had','having'], answer:'have', explain:'Plural subject "children" takes "have".' },
-    { id:'g-p2-041', level:'P2', category:'prepositions', subskill:'between', difficulty:1, q:'Rina sat ___ Ben and Jia Hao.', choices:['between','among','in','from'], answer:'between', explain:'Use "between" for two people/items.' },
-    { id:'g-p2-042', level:'P2', category:'prepositions', subskill:'time_on', difficulty:1, q:'We have swimming practice ___ Monday.', choices:['in','on','at','for'], answer:'on', explain:'Use "on" for days.' },
-    { id:'g-p2-043', level:'P2', category:'conjunctions', subskill:'if', difficulty:2, q:'___ you finish early, help me arrange the chairs.', choices:['If','Because','So','But'], answer:'If', explain:'"If" introduces a condition.' },
-    { id:'g-p2-044', level:'P2', category:'connectors', subskill:'so', difficulty:1, q:'The rain was heavy, ___ the match was cancelled.', choices:['so','but','or','because'], answer:'so', explain:'"So" introduces a result.' },
-    { id:'g-p2-045', level:'P2', category:'adjAdverbs', subskill:'verb_adv', difficulty:1, q:'The rabbit ran ___.', choices:['quick','quickly','quicker','quickest'], answer:'quickly', explain:'Use an adverb to describe how it ran.' },
-    { id:'g-p2-046', level:'P2', category:'adjAdverbs', subskill:'linking_verb_adj', difficulty:1, q:'The flowers look ___.', choices:['beautiful','beautifully','more beautiful','beautifullest'], answer:'beautiful', explain:'After linking verb "look", use adjective.' },
-    { id:'g-p2-047', level:'P2', category:'simplePast', subskill:'irregular_see', difficulty:1, q:'We ___ a rainbow after the storm.', choices:['see','saw','seen','sees'], answer:'saw', explain:'Past tense of "see" is "saw".' },
-    { id:'g-p2-048', level:'P2', category:'simplePast', subskill:'irregular_take', difficulty:1, q:'Father ___ us to the market yesterday.', choices:['take','takes','took','taken'], answer:'took', explain:'Past tense of "take" is "took".' },
-    { id:'g-p2-049', level:'P2', category:'comparatives', subskill:'short_adj_er', difficulty:1, q:'This puzzle is ___ than that one.', choices:['hard','harder','hardest','more hard'], answer:'harder', explain:'Use comparative form for two items.' },
-    { id:'g-p2-050', level:'P2', category:'superlatives', subskill:'short_adj_est', difficulty:1, q:'Ali is the ___ boy in our group.', choices:['tall','taller','tallest','more tall'], answer:'tallest', explain:'Use superlative when comparing more than two.' },
-  ],
-  P3: [
-    { id:'g-p3-001', level:'P3', category:'presentCont', subskill:'is_are_verb_ing', difficulty:2, q:'He ___ playing football now.', choices:['is','was','were','be'], answer:'is', explain:'"now" pairs with present continuous: is + verb-ing.' },
-    { id:'g-p3-002', level:'P3', category:'comparatives', subskill:'short_adj_er', difficulty:1, q:'This book is ___ than that one.', choices:['heavy','heavier','heaviest','more heavy'], answer:'heavier', explain:'Comparative adjective for two things is "heavier".' },
-    { id:'g-p3-003', level:'P3', category:'pronouns', subskill:'possessive_its', difficulty:2, q:'The cat chased ___ tail.', choices:['it','its','it\'s','their'], answer:'its', explain:'Possessive pronoun is "its".' },
-    { id:'g-p3-004', level:'P3', category:'svAgreement', subskill:'there_is_are', difficulty:2, q:'There ___ many birds on the tree.', choices:['is','are','was','be'], answer:'are', explain:'Plural noun "birds" takes "are".' },
-    { id:'g-p3-005', level:'P3', category:'comparatives', subskill:'short_adj_er', difficulty:1, q:'This problem is ___ than the first one.', choices:['easy','easier','easiest','more easiest'], answer:'easier', explain:'Use comparative form for two items.' },
-    { id:'g-p3-006', level:'P3', category:'svAgreement', subskill:'plural_subject', difficulty:2, q:'My cousins ___ visiting us this weekend.', choices:['is','are','was','be'], answer:'are', explain:'Plural subject "cousins" takes "are".' },
-    { id:'g-p3-007', level:'P3', category:'superlatives', subskill:'short_adj_est', difficulty:1, q:'She is the ___ runner in our class.', choices:['fast','faster','fastest','more fast'], answer:'fastest', explain:'Use superlative when comparing more than two.' },
-    { id:'g-p3-008', level:'P3', category:'pronouns', subskill:'reflexive', difficulty:2, q:'Tom and I enjoyed ___ at the camp.', choices:['ourselves','ourself','us','we'], answer:'ourselves', explain:'Reflexive pronoun matches plural subject.' },
-    { id:'g-p3-009', level:'P3', category:'pastCont', subskill:'was_were_verb_ing', difficulty:1, q:'While we ___ eating, the phone rang.', choices:['are','were','is','was'], answer:'were', explain:'"While" + past continuous: "were eating".' },
-    { id:'g-p3-010', level:'P3', category:'comparatives', subskill:'short_adj_er', difficulty:1, q:'An elephant is ___ than a cat.', choices:['big','bigger','biggest','more big'], answer:'bigger', explain:'Comparative for short adjective: add -er.' },
-    { id:'g-p3-011', level:'P3', category:'superlatives', subskill:'short_adj_est', difficulty:1, q:'Mount Everest is the ___ mountain in the world.', choices:['tall','taller','tallest','most tall'], answer:'tallest', explain:'Superlative for short adjective: add -est.' },
-    { id:'g-p3-012', level:'P3', category:'pronouns', subskill:'reflexive', difficulty:2, q:'The children hurt ___ when they fell.', choices:['theirselves','themselves','them','their'], answer:'themselves', explain:'Reflexive pronoun for plural third person is "themselves".' },
-    { id:'g-p3-013', level:'P3', category:'svAgreement', subskill:'each_every', difficulty:2, q:'Each of the students ___ a pencil.', choices:['have','has','having','are having'], answer:'has', explain:'"Each" is singular, so the verb is "has".' },
-    { id:'g-p3-014', level:'P3', category:'svAgreement', subskill:'is_are', difficulty:2, q:'My sister ___ taller than me now.', choices:['is','are','were','am'], answer:'is', explain:'Singular subject "sister" takes "is".' },
-    { id:'g-p3-015', level:'P3', category:'simplePast', subskill:'irregular_past', difficulty:2, q:'She ___ to the market before it closed.', choices:['run','runs','ran','running'], answer:'ran', explain:'"Before it closed" signals past tense.' },
-    { id:'g-p3-016', level:'P3', category:'superlatives', subskill:'most_long_adj', difficulty:1, q:'This movie is the ___ one I have ever seen.', choices:['exciting','more exciting','most exciting','excitinger'], answer:'most exciting', explain:'Long adjectives use "most" for superlative.' },
-    { id:'g-p3-017', level:'P3', category:'adjAdverbs', subskill:'adj_vs_adv', difficulty:1, q:'The music was too ___. I could not sleep.', choices:['loud','loudly','louder','loudest'], answer:'loud', explain:'After the linking verb "was", use an adjective, not an adverb.' },
-    { id:'g-p3-018', level:'P3', category:'possessives', subskill:'whose_possession', difficulty:2, q:'___ bag is this? It has your name on it.', choices:['Whose','Who','Who\'s','Which'], answer:'Whose', explain:'"Whose" asks about possession.' },
-    { id:'g-p3-019', level:'P3', category:'adjAdverbs', subskill:'adj_vs_adv', difficulty:1, q:'She sings ___. Everyone loves her voice.', choices:['beautiful','beautifully','beauty','more beautiful'], answer:'beautifully', explain:'An adverb (beautifully) is needed to modify the verb "sings".' },
-    { id:'g-p3-020', level:'P3', category:'auxiliaries', subskill:'do_does', difficulty:1, q:'___ your brother like ice cream?', choices:['Do','Does','Is','Are'], answer:'Does', explain:'Singular third person uses "Does" in questions.' },
-    { id:'g-p3-021', level:'P3', category:'simplePast', subskill:'regular_past', difficulty:1, q:'Last month, our class ___ a trip to the Science Centre.', choices:['plan','plans','planned','planning'], answer:'planned', explain:'"Last month" signals simple past.' },
-    { id:'g-p3-022', level:'P3', category:'presentCont', subskill:'is_are_verb_ing', difficulty:1, q:'Be quiet. The baby ___ now.', choices:['sleep','sleeps','is sleeping','slept'], answer:'is sleeping', explain:'The action is happening now, so use present continuous.' },
-    { id:'g-p3-023', level:'P3', category:'futureTense', subskill:'will_prediction', difficulty:1, q:'I think our teacher ___ us a quiz tomorrow.', choices:['give','gives','will give','gave'], answer:'will give', explain:'Use "will" for a future prediction.' },
-    { id:'g-p3-024', level:'P3', category:'svAgreement', subskill:'third_person_s', difficulty:1, q:'My cousin ___ piano lessons every Friday.', choices:['take','takes','took','taking'], answer:'takes', explain:'Singular third-person subject takes verb + s.' },
-    { id:'g-p3-025', level:'P3', category:'articles', subskill:'a_an', difficulty:1, q:'She wants to be ___ astronaut when she grows up.', choices:['a','an','the','some'], answer:'an', explain:'Use "an" before vowel sounds.' },
-    { id:'g-p3-026', level:'P3', category:'pronouns', subskill:'object_pronoun', difficulty:1, q:'Grandfather told ___ an interesting story.', choices:['we','our','us','ourselves'], answer:'us', explain:'Object pronoun "us" follows the verb "told".' },
-    { id:'g-p3-027', level:'P3', category:'quantifiers', subskill:'few_little', difficulty:2, q:'There is very ___ milk left, so we need to buy more.', choices:['few','little','many','several'], answer:'little', explain:'"Milk" is uncountable, so use "little".' },
-    { id:'g-p3-028', level:'P3', category:'countableUncountable', subskill:'fewer_less', difficulty:2, q:'We have ___ oranges than yesterday.', choices:['less','fewer','little','much'], answer:'fewer', explain:'Use "fewer" with countable nouns like oranges.' },
-    { id:'g-p3-029', level:'P3', category:'simplePast', subskill:'irregular_past', difficulty:2, q:'The bell rang, and everyone ___ into the hall.', choices:['run','ran','runs','running'], answer:'ran', explain:'Past action requires the irregular past tense "ran".' },
-    { id:'g-p3-030', level:'P3', category:'presentCont', subskill:'am_is_are', difficulty:1, q:'The twins ___ preparing for the concert.', choices:['is','are','was','be'], answer:'are', explain:'Plural subject "twins" takes "are".' },
-    { id:'g-p3-031', level:'P3', category:'futureTense', subskill:'going_to_plan', difficulty:2, q:'We are ___ make lanterns for the Mid-Autumn celebration.', choices:['going to','will','going','goes to'], answer:'going to', explain:'"Going to" expresses a planned future action.' },
-    { id:'g-p3-032', level:'P3', category:'svAgreement', subskill:'each_every', difficulty:2, q:'Every player ___ a water bottle during practice.', choices:['bring','brings','brought','bringing'], answer:'brings', explain:'"Every" takes a singular verb.' },
-    { id:'g-p3-033', level:'P3', category:'articles', subskill:'the_specific', difficulty:1, q:'Please return ___ ruler you borrowed from me.', choices:['a','an','the','some'], answer:'the', explain:'It refers to one specific ruler.' },
-    { id:'g-p3-034', level:'P3', category:'pronouns', subskill:'possessive_pronoun', difficulty:2, q:'That seat is ___; yours is near the window.', choices:['she','her','hers','herself'], answer:'hers', explain:'Use possessive pronoun "hers" without a noun.' },
-    { id:'g-p3-035', level:'P3', category:'quantifiers', subskill:'some_any', difficulty:1, q:'There are not ___ eggs left in the fridge.', choices:['some','any','many of','a little'], answer:'any', explain:'Negative sentences usually take "any".' },
-    { id:'g-p3-036', level:'P3', category:'countableUncountable', subskill:'many_much', difficulty:1, q:'How ___ homework do you have tonight?', choices:['many','much','few','several'], answer:'much', explain:'"Homework" is uncountable, so use "much".' },
-    { id:'g-p3-037', level:'P3', category:'simplePast', subskill:'regular_past', difficulty:1, q:'After dinner, Dad ___ the dishes.', choices:['wash','washes','washed','washing'], answer:'washed', explain:'Completed action in the past uses simple past.' },
-    { id:'g-p3-038', level:'P3', category:'presentCont', subskill:'verb_ing_spelling', difficulty:2, q:'The class is ___ for the National Day performance.', choices:['practise','practising','practised','practises'], answer:'practising', explain:'Present continuous uses be + verb-ing.' },
-    { id:'g-p3-039', level:'P3', category:'futureTense', subskill:'future_time_marker', difficulty:2, q:'At 8 p.m. tonight, we ___ the school concert online.', choices:['watch','watched','will watch','watching'], answer:'will watch', explain:'"Tonight" with future reference takes "will watch".' },
-    { id:'g-p3-040', level:'P3', category:'svAgreement', subskill:'there_is_are', difficulty:1, q:'There ___ a new notice on the board.', choices:['is','are','were','have'], answer:'is', explain:'Singular noun "notice" takes "is".' },
-    { id:'g-p3-041', level:'P3', category:'pronouns', subskill:'subject_pronoun', difficulty:1, q:'Aisyah and Mei Ling are best friends. ___ cycle to school together.', choices:['She','They','Them','We'], answer:'They', explain:'Use "They" for two people.' },
-    { id:'g-p3-042', level:'P3', category:'prepositions', subskill:'across_through', difficulty:2, q:'We walked ___ the field to reach the hall quickly.', choices:['across','through','between','under'], answer:'across', explain:'"Across" means from one side to the other over a surface.' },
-    { id:'g-p3-043', level:'P3', category:'prepositions', subskill:'during_for', difficulty:2, q:'Please keep silent ___ the performance.', choices:['during','for','since','from'], answer:'during', explain:'Use "during" for an event period.' },
-    { id:'g-p3-044', level:'P3', category:'conjunctions', subskill:'although', difficulty:2, q:'___ he was tired, he completed his homework.', choices:['Although','Because','So','And'], answer:'Although', explain:'"Although" introduces contrast.' },
-    { id:'g-p3-045', level:'P3', category:'conjunctions', subskill:'unless', difficulty:2, q:'You will miss the bus ___ you leave now.', choices:['unless','if','because','so'], answer:'unless', explain:'"Unless" means "if not".' },
-    { id:'g-p3-046', level:'P3', category:'modals', subskill:'can_permission', difficulty:1, q:'___ I borrow your ruler for a while?', choices:['Can','Must','Should','Would'], answer:'Can', explain:'"Can" can be used for polite permission requests in school settings.' },
-    { id:'g-p3-047', level:'P3', category:'modals', subskill:'must_obligation', difficulty:2, q:'Students ___ wear their name tags during assembly.', choices:['must','may','can','would'], answer:'must', explain:'"Must" shows requirement.' },
-    { id:'g-p3-048', level:'P3', category:'adjAdverbs', subskill:'good_well', difficulty:2, q:'Nadia plays badminton ___.', choices:['good','well','better','best'], answer:'well', explain:'Use adverb "well" to modify "plays".' },
-    { id:'g-p3-049', level:'P3', category:'adjAdverbs', subskill:'feel_adjective', difficulty:2, q:'After the run, the boys felt ___.', choices:['tired','tiredly','more tiredly','most tiredly'], answer:'tired', explain:'After "felt", use an adjective.' },
-    { id:'g-p3-050', level:'P3', category:'comparatives', subskill:'more_long_adj', difficulty:2, q:'This chapter is ___ interesting than the previous one.', choices:['interestinger','more','more interesting','most interesting'], answer:'more interesting', explain:'Long adjectives use "more" for comparatives.' },
-    { id:'g-p3-051', level:'P3', category:'superlatives', subskill:'most_long_adj', difficulty:2, q:'That was the ___ speech in the contest.', choices:['more inspiring','most inspiring','inspiringer','inspiring'], answer:'most inspiring', explain:'Long adjectives use "most" for superlatives.' },
-    { id:'g-p3-052', level:'P3', category:'simplePast', subskill:'irregular_bring', difficulty:2, q:'She ___ her sketchbook to art class yesterday.', choices:['bring','brought','brang','brings'], answer:'brought', explain:'Past tense of "bring" is "brought".' },
-    { id:'g-p3-053', level:'P3', category:'simplePast', subskill:'irregular_write', difficulty:2, q:'I ___ a thank-you note to my teacher last night.', choices:['write','wrote','written','writes'], answer:'wrote', explain:'Past tense of "write" is "wrote".' },
-    { id:'g-p3-054', level:'P3', category:'connectors', subskill:'cause_effect', difficulty:2, q:'The road was flooded, ___ we took another route.', choices:['so','although','because','or'], answer:'so', explain:'The second clause is a result of the first.' },
-    { id:'g-p3-055', level:'P3', category:'mixedGrammar', subskill:'time_and_tense', difficulty:3, q:'By the time we reached the hall, the show ___ already begun.', choices:['has','had','is','will'], answer:'had', explain:'"By the time ... reached" signals past perfect for earlier action.' },
-    { id:'g-p3-056', level:'P3', category:'mixedGrammar', subskill:'contrast_and_form', difficulty:3, q:'Although she was nervous, she spoke ___ during the presentation.', choices:['clear','clearly','clearest','more clear'], answer:'clearly', explain:'Verb "spoke" needs adverb "clearly"; "although" provides contrast clue.' },
-  ],
-  P4: [
-    { id:'g-p4-001', level:'P4', category:'conditionals', subskill:'first_conditional', difficulty:1, q:'If it rains, we ___ stay indoors.', choices:['will','would','can\'t','had'], answer:'will', explain:'First conditional: If + present, will + base verb.' },
-    { id:'g-p4-002', level:'P4', category:'passiveVoice', subskill:'present_passive', difficulty:1, q:'The work ___ by the class monitor.', choices:['is checked','checked','are checking','check'], answer:'is checked', explain:'Passive voice uses be + past participle.' },
-    { id:'g-p4-003', level:'P4', category:'svAgreement', subskill:'neither_nor', difficulty:2, q:'Neither Ben nor his friends ___ late.', choices:['is','are','was','be'], answer:'are', explain:'Nearest plural subject "friends" takes "are".' },
-    { id:'g-p4-004', level:'P4', category:'passiveVoice', subskill:'present_passive', difficulty:1, q:'The cake ___ by my aunt every Sunday.', choices:['bakes','is baked','was baking','baked'], answer:'is baked', explain:'Habitual passive in present simple uses is + past participle.' },
-    { id:'g-p4-005', level:'P4', category:'conditionals', subskill:'first_conditional', difficulty:1, q:'If you study hard, you ___ well.', choices:['did','will do','doing','have'], answer:'will do', explain:'First conditional: If + present, will + base verb.' },
-    { id:'g-p4-006', level:'P4', category:'passiveVoice', subskill:'present_passive', difficulty:1, q:'The windows ___ every morning by the cleaner.', choices:['clean','are cleaned','cleaned','is cleaning'], answer:'are cleaned', explain:'Plural subject needs "are" + past participle.' },
-    { id:'g-p4-007', level:'P4', category:'svAgreement', subskill:'either_or', difficulty:2, q:'Either the teacher or the pupils ___ presenting today.', choices:['is','are','was','be'], answer:'are', explain:'Agreement follows nearest subject "pupils".' },
-    { id:'g-p4-008', level:'P4', category:'conditionals', subskill:'first_conditional', difficulty:1, q:'If she ___ early, we will catch the bus.', choices:['leave','leaves','left','leaving'], answer:'leaves', explain:'If-clause in first conditional uses simple present.' },
-    { id:'g-p4-009', level:'P4', category:'presentPerfect', subskill:'has_have_pp', difficulty:1, q:'She has ___ her homework already.', choices:['finish','finishing','finished','finishes'], answer:'finished', explain:'Present perfect uses "has" + past participle.' },
-    { id:'g-p4-010', level:'P4', category:'passiveVoice', subskill:'past_passive', difficulty:1, q:'The letter was ___ by the postman.', choices:['deliver','delivered','delivering','delivers'], answer:'delivered', explain:'Past passive uses "was" + past participle.' },
-    { id:'g-p4-011', level:'P4', category:'articles', subskill:'a_an', difficulty:2, q:'We should bring ___ umbrella because it is cloudy.', choices:['a','an','the','some'], answer:'an', explain:'"An" before a vowel sound — "umbrella" starts with "uh".' },
-    { id:'g-p4-012', level:'P4', category:'conditionals', subskill:'first_conditional', difficulty:1, q:'If the bell ___, we will line up.', choices:['ring','rings','rang','ringing'], answer:'rings', explain:'If-clause in first conditional uses present simple.' },
-    { id:'g-p4-013', level:'P4', category:'svAgreement', subskill:'not_only_but_also', difficulty:3, q:'Not only the students but also the teacher ___ surprised.', choices:['was','were','are','be'], answer:'was', explain:'With "not only…but also", verb agrees with nearest subject "teacher" (singular).' },
-    { id:'g-p4-014', level:'P4', category:'presentPerfect', subskill:'has_been', difficulty:2, q:'She ___ to the dentist since morning.', choices:['has been','have been','was','is'], answer:'has been', explain:'"Since morning" signals present perfect continuous/present perfect.' },
-    { id:'g-p4-015', level:'P4', category:'passiveVoice', subskill:'past_passive', difficulty:1, q:'The trophy ___ to the winning team.', choices:['gave','was given','give','is giving'], answer:'was given', explain:'Passive: the trophy receives the action — "was given".' },
-    { id:'g-p4-016', level:'P4', category:'svAgreement', subskill:'each_every', difficulty:2, q:'Every one of the flowers ___ beautiful.', choices:['is','are','were','be'], answer:'is', explain:'"Every one" is singular, so verb is "is".' },
-    { id:'g-p4-017', level:'P4', category:'futureTense', subskill:'will', difficulty:1, q:'I think it ___ rain tomorrow.', choices:['will','is','was','has'], answer:'will', explain:'"Will" expresses a future prediction.' },
-    { id:'g-p4-018', level:'P4', category:'futureTense', subskill:'going_to', difficulty:1, q:'We are ___ visit our grandparents next week.', choices:['going to','will','about','go'], answer:'going to', explain:'"Going to" expresses a planned future action.' },
-    { id:'g-p4-019', level:'P4', category:'auxiliaries', subskill:'do_does_did', difficulty:2, q:'She ___ not finish her homework yesterday.', choices:['did','does','do','was'], answer:'did', explain:'"Did" is the past tense auxiliary for negative/question forms.' },
-    { id:'g-p4-020', level:'P4', category:'countableUncountable', subskill:'few_little', difficulty:2, q:'There is very ___ time left before the exam.', choices:['little','few','less','fewer'], answer:'little', explain:'"Time" is uncountable, so we use "little" (not "few").' },
-    { id:'g-p4-021', level:'P4', category:'simplePast', subskill:'sequence_past', difficulty:1, q:'After the class ended, we ___ our desks quietly.', choices:['tidy','tidies','tidied','tidying'], answer:'tidied', explain:'Past sequence marker "After ... ended" needs simple past.' },
-    { id:'g-p4-022', level:'P4', category:'presentCont', subskill:'temporary_action', difficulty:1, q:'This week, our form teacher ___ us science.', choices:['teach','teaches','is teaching','taught'], answer:'is teaching', explain:'Temporary current arrangement takes present continuous.' },
-    { id:'g-p4-023', level:'P4', category:'futureTense', subskill:'will_offer', difficulty:1, q:'You look tired. I ___ carry your files.', choices:['carry','carried','will carry','am carried'], answer:'will carry', explain:'Use "will" for an immediate offer.' },
-    { id:'g-p4-024', level:'P4', category:'svAgreement', subskill:'neither_nor', difficulty:2, q:'Neither the boys nor Amir ___ in the canteen now.', choices:['are','is','were','be'], answer:'is', explain:'Verb agrees with nearest subject "Amir" (singular).' },
-    { id:'g-p4-025', level:'P4', category:'articles', subskill:'the_superlative', difficulty:2, q:'She is ___ tallest girl in the netball team.', choices:['a','an','the','no article'], answer:'the', explain:'Superlatives usually take "the".' },
-    { id:'g-p4-026', level:'P4', category:'pronouns', subskill:'relative_who', difficulty:2, q:'The nurse ___ treated me was very kind.', choices:['which','who','whose','whom'], answer:'who', explain:'Use "who" for people as subject of the relative clause.' },
-    { id:'g-p4-027', level:'P4', category:'quantifiers', subskill:'too_much_too_many', difficulty:2, q:'There are ___ cars outside the school gate.', choices:['too much','too many','much too','many too'], answer:'too many', explain:'Use "too many" for countable plural nouns.' },
-    { id:'g-p4-028', level:'P4', category:'countableUncountable', subskill:'much_many', difficulty:1, q:'How ___ flour do we need for the cake?', choices:['many','much','few','several'], answer:'much', explain:'"Flour" is uncountable, so use "much".' },
-    { id:'g-p4-029', level:'P4', category:'simplePast', subskill:'irregular_past', difficulty:2, q:'When the whistle blew, the runners ___ forward.', choices:['spring','sprang','sprung','springs'], answer:'sprang', explain:'Simple past of "spring" is "sprang".' },
-    { id:'g-p4-030', level:'P4', category:'presentCont', subskill:'future_arrangement', difficulty:2, q:'Our class ___ the museum on Friday morning.', choices:['visits','visited','is visiting','visit'], answer:'is visiting', explain:'Present continuous can show a fixed future arrangement.' },
-    { id:'g-p4-031', level:'P4', category:'futureTense', subskill:'going_to_prediction', difficulty:2, q:'Look at those dark clouds. It ___ rain soon.', choices:['will','is going to','was going to','goes to'], answer:'is going to', explain:'Visible evidence supports "is going to" for prediction.' },
-    { id:'g-p4-032', level:'P4', category:'svAgreement', subskill:'either_or', difficulty:2, q:'Either the prefects or the class chairman ___ the report daily.', choices:['submit','submits','submitting','submitted'], answer:'submits', explain:'Nearest subject "chairman" is singular, so use "submits".' },
-    { id:'g-p4-033', level:'P4', category:'articles', subskill:'zero_article_institutions', difficulty:2, q:'My brother goes to ___ school by bus.', choices:['a','an','the','no article'], answer:'no article', explain:'As an institution, "school" usually takes no article.' },
-    { id:'g-p4-034', level:'P4', category:'pronouns', subskill:'whose_possession', difficulty:2, q:'I met the boy ___ wallet was found in the library.', choices:['who','whose','which','whom'], answer:'whose', explain:'Use "whose" to show possession.' },
-    { id:'g-p4-035', level:'P4', category:'quantifiers', subskill:'enough', difficulty:2, q:'We do not have ___ chairs for all the parents.', choices:['many','enough','much','few'], answer:'enough', explain:'"Enough" shows sufficient quantity.' },
-    { id:'g-p4-036', level:'P4', category:'countableUncountable', subskill:'fewer_less', difficulty:2, q:'The new printer uses ___ paper than the old one.', choices:['fewer','less','few','little'], answer:'less', explain:'Use "less" with uncountable nouns like paper.' },
-    { id:'g-p4-037', level:'P4', category:'simplePast', subskill:'did_base_verb', difficulty:2, q:'Did you ___ your maths worksheet last night?', choices:['completed','complete','completing','completes'], answer:'complete', explain:'After "did", use the base verb.' },
-    { id:'g-p4-038', level:'P4', category:'presentCont', subskill:'negative_form', difficulty:2, q:'The pupils are not ___ attention to the instructions.', choices:['pay','paying','paid','pays'], answer:'paying', explain:'Present continuous negative uses "are not + verb-ing".' },
-    { id:'g-p4-039', level:'P4', category:'futureTense', subskill:'shall_offer', difficulty:2, q:'___ we help you carry those books?', choices:['Shall','Will','Are','Did'], answer:'Shall', explain:'"Shall we ...?" is used to make offers or suggestions.' },
-    { id:'g-p4-040', level:'P4', category:'svAgreement', subskill:'collective_noun', difficulty:2, q:'The class ___ preparing for the assembly item.', choices:['is','are','were','be'], answer:'is', explain:'As one group acting together, "class" takes singular verb.' },
-    { id:'g-p4-041', level:'P4', category:'pronouns', subskill:'reflexive', difficulty:2, q:'Please help ___ to the fruit on the table.', choices:['you','your','yourself','yours'], answer:'yourself', explain:'Reflexive pronoun fits the expression "help yourself".' },
-    { id:'g-p4-042', level:'P4', category:'prepositions', subskill:'among_between', difficulty:2, q:'The teacher walked ___ the groups and checked their work.', choices:['among','between','under','towards'], answer:'among', explain:'Use "among" for more than two groups.' },
-    { id:'g-p4-043', level:'P4', category:'prepositions', subskill:'since_for', difficulty:2, q:'She has lived here ___ 2019.', choices:['for','since','during','from'], answer:'since', explain:'Use "since" with a starting point in time.' },
-    { id:'g-p4-044', level:'P4', category:'conjunctions', subskill:'while', difficulty:2, q:'I revised my notes ___ my brother watched television.', choices:['while','because','so','unless'], answer:'while', explain:'"While" shows two actions happening at the same time.' },
-    { id:'g-p4-045', level:'P4', category:'conjunctions', subskill:'unless', difficulty:2, q:'You cannot enter the lab ___ you wear safety goggles.', choices:['unless','because','although','so'], answer:'unless', explain:'"Unless" means "if not".' },
-    { id:'g-p4-046', level:'P4', category:'modals', subskill:'should_advice', difficulty:2, q:'You ___ drink more water after PE lessons.', choices:['should','mustn’t','cannot','might'], answer:'should', explain:'"Should" gives advice.' },
-    { id:'g-p4-047', level:'P4', category:'modals', subskill:'may_permission', difficulty:2, q:'You ___ leave early today if your parent is here.', choices:['may','must','should','would'], answer:'may', explain:'"May" can express formal permission.' },
-    { id:'g-p4-048', level:'P4', category:'adjAdverbs', subskill:'hard_hardly', difficulty:3, q:'He worked ___ to complete the model on time.', choices:['hard','hardly','harder','hardest'], answer:'hard', explain:'"Hard" means with effort; "hardly" means almost not.' },
-    { id:'g-p4-049', level:'P4', category:'adjAdverbs', subskill:'late_lately', difficulty:3, q:'The bus arrived ___ because of heavy traffic.', choices:['late','lately','later','latest'], answer:'late', explain:'"Late" describes time delay; "lately" means recently.' },
-    { id:'g-p4-050', level:'P4', category:'comparatives', subskill:'irregular_comparative', difficulty:2, q:'This route is ___ than the old one.', choices:['good','better','best','more good'], answer:'better', explain:'Comparative of "good" is "better".' },
-    { id:'g-p4-051', level:'P4', category:'superlatives', subskill:'irregular_superlative', difficulty:2, q:'Of all the options, this is the ___.', choices:['good','better','best','most good'], answer:'best', explain:'Superlative of "good" is "best".' },
-    { id:'g-p4-052', level:'P4', category:'simplePast', subskill:'irregular_choose', difficulty:2, q:'They ___ the blue theme for the class board yesterday.', choices:['choose','chosen','chose','choosing'], answer:'chose', explain:'Past tense of "choose" is "chose".' },
-    { id:'g-p4-053', level:'P4', category:'simplePast', subskill:'irregular_begin', difficulty:2, q:'The programme ___ at nine sharp.', choices:['begin','began','begun','begins'], answer:'began', explain:'Past tense of "begin" is "began".' },
-    { id:'g-p4-054', level:'P4', category:'connectors', subskill:'cause_effect', difficulty:2, q:'The floor was wet, ___ the cleaner put up a warning sign.', choices:['so','although','because','unless'], answer:'so', explain:'The second clause is the result of the first.' },
-    { id:'g-p4-055', level:'P4', category:'connectors', subskill:'time_order', difficulty:2, q:'First we mixed the paint; ___, we applied it to the model.', choices:['next','because','although','but'], answer:'next', explain:'"Next" shows sequence in time.' },
-    { id:'g-p4-056', level:'P4', category:'mixedGrammar', subskill:'modal_and_connector', difficulty:3, q:'You ___ submit the form today, or your team cannot join the event.', choices:['must','may','could','would'], answer:'must', explain:'The consequence clause shows strong obligation.' },
-    { id:'g-p4-057', level:'P4', category:'mixedGrammar', subskill:'time_marker_and_verb', difficulty:3, q:'After he ___ his lunch, he went to the library.', choices:['finishes','finished','has finished','finishing'], answer:'finished', explain:'Main clause is in simple past, so the earlier action here is also simple past in this sequence.' },
-    { id:'g-p4-058', level:'P4', category:'prepositions', subskill:'against', difficulty:2, q:'Please lean your bicycle ___ the wall.', choices:['against','between','across','onto'], answer:'against', explain:'Use "against" for contact with a vertical surface.' },
-    { id:'g-p4-059', level:'P4', category:'conjunctions', subskill:'because_vs_so', difficulty:2, q:'He stayed home ___ he had a fever.', choices:['because','so','but','or'], answer:'because', explain:'This clause gives the reason.' },
-    { id:'g-p4-060', level:'P4', category:'modals', subskill:'must_not', difficulty:2, q:'You ___ run in the science lab.', choices:['must not','should','can','may'], answer:'must not', explain:'"Must not" expresses prohibition.' },
-    { id:'g-p4-061', level:'P4', category:'adjAdverbs', subskill:'fast_adjective_adverb', difficulty:2, q:'The cheetah can run very ___.', choices:['fast','fastly','faster','fastest'], answer:'fast', explain:'"Fast" is both adjective and adverb.' },
-    { id:'g-p4-062', level:'P4', category:'comparatives', subskill:'less_than', difficulty:2, q:'This bag is ___ expensive than that one.', choices:['less','least','fewer','fewest'], answer:'less', explain:'Use "less" with adjectives for comparison.' },
-    { id:'g-p4-063', level:'P4', category:'superlatives', subskill:'the_most', difficulty:2, q:'She gave the ___ detailed explanation in class.', choices:['more','most','more than','the most'], answer:'the most', explain:'Superlative with long adjective requires "the most".' },
-    { id:'g-p4-064', level:'P4', category:'simplePast', subskill:'irregular_fly', difficulty:2, q:'The kite ___ high in the sky yesterday.', choices:['fly','flew','flown','flies'], answer:'flew', explain:'Past tense of "fly" is "flew".' },
-    { id:'g-p4-065', level:'P4', category:'mixedGrammar', subskill:'logic_time_contrast', difficulty:3, q:'Although it was late, the team ___ practising for the competition.', choices:['kept','keep','keeps','keeping'], answer:'kept', explain:'Past-time clue plus contrast requires simple past "kept".' },
-    { id:'g-p4-066', level:'P4', category:'mixedGrammar', subskill:'preposition_and_count', difficulty:3, q:'There were too many cars ___ the narrow road, so traffic slowed down.', choices:['on','in','at','to'], answer:'on', explain:'Vehicles travel "on" roads; cause/effect clue supports the sentence logic.' },
-  ],
-  P5: [
-    { id:'g-p5-001', level:'P5', category:'reportedSpeech', subskill:'will_would', difficulty:1, q:'She said that she ___ finish the task.', choices:['will','would','can','must'], answer:'would', explain:'Backshift after "said": will -> would.' },
-    { id:'g-p5-002', level:'P5', category:'relativeClauses', subskill:'who_which', difficulty:1, q:'The boy ___ won the prize is my cousin.', choices:['which','who','whom','whose'], answer:'who', explain:'Use "who" for people as subject relative pronoun.' },
-    { id:'g-p5-003', level:'P5', category:'modals', subskill:'obligation', difficulty:1, q:'You ___ submit your work by Friday.', choices:['must','maybe','can\'t not','been'], answer:'must', explain:'"must" shows strong obligation.' },
-    { id:'g-p5-004', level:'P5', category:'relativeClauses', subskill:'whose', difficulty:2, q:'The girl ___ bicycle was stolen reported it.', choices:['who','whose','which','whom'], answer:'whose', explain:'Use "whose" to show possession.' },
-    { id:'g-p5-005', level:'P5', category:'reportedSpeech', subskill:'backshift_past', difficulty:1, q:'He explained that he ___ the keys at home.', choices:['left','leave','leaves','will leave'], answer:'left', explain:'Reported past statement keeps past tense.' },
-    { id:'g-p5-006', level:'P5', category:'relativeClauses', subskill:'who_which', difficulty:1, q:'The book ___ was on the desk is missing.', choices:['who','which','whose','whom'], answer:'which', explain:'Use "which" for things.' },
-    { id:'g-p5-007', level:'P5', category:'modals', subskill:'should_have', difficulty:2, q:'You ___ have submitted your work earlier.', choices:['should','could to','musted','can'], answer:'should', explain:'"should have + past participle" expresses advice/regret.' },
-    { id:'g-p5-008', level:'P5', category:'reportedSpeech', subskill:'will_would', difficulty:2, q:'She said that her parents ___ abroad the next year.', choices:['move','would move','moves','will move'], answer:'would move', explain:'Future in direct speech shifts to "would".' },
-    { id:'g-p5-009', level:'P5', category:'conditionals', subskill:'second_conditional', difficulty:2, q:'If I were you, I ___ apologise.', choices:['will','would','can','am'], answer:'would', explain:'Second conditional: If + past, would + base verb.' },
-    { id:'g-p5-010', level:'P5', category:'relativeClauses', subskill:'whom', difficulty:2, q:'The man ___ I spoke to was the manager.', choices:['who','whom','which','whose'], answer:'whom', explain:'"Whom" is the object form — I spoke to him.' },
-    { id:'g-p5-011', level:'P5', category:'reportedSpeech', subskill:'backshift_past', difficulty:1, q:'She told me that she ___ feeling unwell.', choices:['is','was','has','will'], answer:'was', explain:'Backshift: "is" becomes "was" in reported speech.' },
-    { id:'g-p5-012', level:'P5', category:'passiveVoice', subskill:'present_passive', difficulty:2, q:'The students ___ to bring their own materials.', choices:['are required','required','is requiring','requiring'], answer:'are required', explain:'Passive voice: plural subject + "are required".' },
-    { id:'g-p5-013', level:'P5', category:'modals', subskill:'advice', difficulty:2, q:'We ___ to leave now if we want to be on time.', choices:['ought','ought to','should to','must to'], answer:'ought to', explain:'"Ought to" expresses advice — always followed by "to".' },
-    { id:'g-p5-014', level:'P5', category:'relativeClauses', subskill:'who_which', difficulty:1, q:'The homework ___ she completed was excellent.', choices:['who','whose','whom','which'], answer:'which', explain:'"Which" refers to things — "homework" is a thing.' },
-    { id:'g-p5-015', level:'P5', category:'conditionals', subskill:'third_conditional', difficulty:2, q:'If he ___ harder, he would have passed.', choices:['study','studied','had studied','studies'], answer:'had studied', explain:'Third conditional: If + past perfect.' },
-    { id:'g-p5-016', level:'P5', category:'reportedSpeech', subskill:'reported_question', difficulty:2, q:'He asked me where I ___.', choices:['live','lived','will live','am living'], answer:'lived', explain:'Reported question with backshift: "live" becomes "lived".' },
-    { id:'g-p5-017', level:'P5', category:'perfectContinuousTenses', subskill:'present_perfect_cont', difficulty:2, q:'She has been ___ for the test all week.', choices:['studying','study','studied','studies'], answer:'studying', explain:'Present perfect continuous: has been + verb-ing.' },
-    { id:'g-p5-018', level:'P5', category:'tenseAwareness', subskill:'mixed_tense', difficulty:2, q:'By the time we arrived, the movie ___ already started.', choices:['had','has','is','will'], answer:'had', explain:'Past perfect "had started" shows the movie began before arrival.' },
-    { id:'g-p5-019', level:'P5', category:'adjAdverbs', subskill:'comparative_adv', difficulty:2, q:'She completed the puzzle ___ than her brother.', choices:['more quickly','more quick','quicklier','most quickly'], answer:'more quickly', explain:'Adverbs of two or more syllables use "more" for comparison.' },
-    { id:'g-p5-020', level:'P5', category:'pastPerfect', subskill:'had_pp', difficulty:2, q:'After she ___ the letter, she posted it.', choices:['had written','has written','wrote','writes'], answer:'had written', explain:'Past perfect: "had written" shows the earlier of two past actions.' },
-    { id:'g-p5-021', level:'P5', category:'perfectContinuousTenses', subskill:'past_perfect_cont', difficulty:2, q:'They had been ___ for two hours before the bus came.', choices:['waiting','waited','wait','waits'], answer:'waiting', explain:'Past perfect continuous: had been + verb-ing.' },
-    { id:'g-p5-022', level:'P5', category:'simplePast', subskill:'past_time_clause', difficulty:2, q:'When the lights went out, the pupils ___ calm.', choices:['remain','remains','remained','remaining'], answer:'remained', explain:'The sentence describes a past event, so use simple past.' },
-    { id:'g-p5-023', level:'P5', category:'presentCont', subskill:'current_trend', difficulty:2, q:'More families ___ reusable bottles these days.', choices:['use','uses','are using','used'], answer:'are using', explain:'"These days" can describe a current trend with present continuous.' },
-    { id:'g-p5-024', level:'P5', category:'futureTense', subskill:'will_vs_going_to', difficulty:2, q:'I have bought the ingredients. I ___ bake cookies tonight.', choices:['bake','am going to','will be','baked'], answer:'am going to', explain:'Prior plan/evidence favours "am going to".' },
-    { id:'g-p5-025', level:'P5', category:'svAgreement', subskill:'each_of', difficulty:2, q:'Each of the contestants ___ given two minutes to speak.', choices:['were','was','are','be'], answer:'was', explain:'"Each" is singular.' },
-    { id:'g-p5-026', level:'P5', category:'articles', subskill:'zero_article_subjects', difficulty:2, q:'My sister likes ___ Mathematics best.', choices:['a','an','the','no article'], answer:'no article', explain:'School subjects generally take no article.' },
-    { id:'g-p5-027', level:'P5', category:'pronouns', subskill:'pronoun_reference', difficulty:2, q:'The girls thanked Mrs Lim because ___ had guided them.', choices:['she','her','hers','they'], answer:'she', explain:'Subject pronoun "she" refers to Mrs Lim.' },
-    { id:'g-p5-028', level:'P5', category:'quantifiers', subskill:'a_number_of_the_number_of', difficulty:3, q:'A number of volunteers ___ helping at the event.', choices:['is','are','was','has'], answer:'are', explain:'"A number of + plural noun" takes a plural verb.' },
-    { id:'g-p5-029', level:'P5', category:'countableUncountable', subskill:'amount_number', difficulty:2, q:'The ___ of homework has increased this term.', choices:['number','amount','few','many'], answer:'amount', explain:'"Homework" is uncountable, so use "amount".' },
-    { id:'g-p5-030', level:'P5', category:'simplePast', subskill:'did_not_base', difficulty:2, q:'They did not ___ their costumes on time.', choices:['finish','finished','finishing','finishes'], answer:'finish', explain:'After "did not", use the base verb.' },
-    { id:'g-p5-031', level:'P5', category:'presentCont', subskill:'stative_verb_exception', difficulty:3, q:'I ___ your point, but I need more time to decide.', choices:['am understanding','understand','understood','understands'], answer:'understand', explain:'Stative verb "understand" is usually not used in continuous form here.' },
-    { id:'g-p5-032', level:'P5', category:'futureTense', subskill:'future_question', difficulty:2, q:'What time ___ the bus leave tomorrow?', choices:['do','does','will','did'], answer:'will', explain:'Use "will" for future questions.' },
-    { id:'g-p5-033', level:'P5', category:'svAgreement', subskill:'the_number_of', difficulty:3, q:'The number of library books ___ increased this year.', choices:['have','has','are','were'], answer:'has', explain:'"The number of" takes a singular verb.' },
-    { id:'g-p5-034', level:'P5', category:'articles', subskill:'the_only', difficulty:2, q:'She is ___ only child in her family.', choices:['a','an','the','no article'], answer:'the', explain:'Use "the" before "only".' },
-    { id:'g-p5-035', level:'P5', category:'pronouns', subskill:'relative_which', difficulty:2, q:'The laptop, ___ was on the desk, is missing.', choices:['who','which','whose','whom'], answer:'which', explain:'Use "which" for things in non-defining clauses.' },
-    { id:'g-p5-036', level:'P5', category:'quantifiers', subskill:'plenty_of', difficulty:2, q:'There is ___ time to revise before the test.', choices:['plenty of','many','few','several'], answer:'plenty of', explain:'"Plenty of" works with uncountable nouns like time.' },
-    { id:'g-p5-037', level:'P5', category:'countableUncountable', subskill:'fewer_less', difficulty:2, q:'We need ___ plastic bags for this activity.', choices:['less','fewer','little','much'], answer:'fewer', explain:'Use "fewer" with countable plural nouns like bags.' },
-    { id:'g-p5-038', level:'P5', category:'simplePast', subskill:'irregular_past', difficulty:2, q:'The goalkeeper ___ the ball just before half-time.', choices:['catch','caught','catches','catching'], answer:'caught', explain:'Past tense of "catch" is "caught".' },
-    { id:'g-p5-039', level:'P5', category:'presentCont', subskill:'present_vs_continuous', difficulty:2, q:'Please be quiet. The principal ___ a speech now.', choices:['gives','gave','is giving','giving'], answer:'is giving', explain:'"Now" indicates present continuous action.' },
-    { id:'g-p5-040', level:'P5', category:'futureTense', subskill:'be_about_to', difficulty:3, q:'Hurry up! The show is ___ start.', choices:['about to','going','will','about'], answer:'about to', explain:'"Be about to" shows something will happen very soon.' },
-    { id:'g-p5-041', level:'P5', category:'svAgreement', subskill:'one_of', difficulty:3, q:'One of the players ___ absent today.', choices:['is','are','were','have'], answer:'is', explain:'The head word "One" is singular.' },
-    { id:'g-p5-042', level:'P5', category:'pronouns', subskill:'reciprocal_pronoun', difficulty:2, q:'The twins often help ___ with homework.', choices:['each other','themselves','them','one'], answer:'each other', explain:'"Each other" is used for reciprocal actions between two people.' },
-    { id:'g-p5-043', level:'P5', category:'prepositions', subskill:'in_spite_of', difficulty:3, q:'___ the heavy rain, the match continued.', choices:['Despite','Because','Although','So'], answer:'Despite', explain:'"Despite" is a preposition used before a noun phrase.' },
-    { id:'g-p5-044', level:'P5', category:'prepositions', subskill:'instead_of', difficulty:2, q:'Use the staircase ___ the lift during the fire drill.', choices:['instead of','because of','according to','next to'], answer:'instead of', explain:'"Instead of" shows replacement choice.' },
-    { id:'g-p5-045', level:'P5', category:'conjunctions', subskill:'even_though', difficulty:3, q:'___ she had revised well, she still felt nervous.', choices:['Even though','Because','So that','Unless'], answer:'Even though', explain:'"Even though" introduces contrast despite a fact.' },
-    { id:'g-p5-046', level:'P5', category:'conjunctions', subskill:'so_that', difficulty:3, q:'He spoke clearly ___ everyone could hear the instructions.', choices:['so that','although','unless','while'], answer:'so that', explain:'"So that" introduces purpose/result intended.' },
-    { id:'g-p5-047', level:'P5', category:'modals', subskill:'might_possibility', difficulty:2, q:'Bring an umbrella; it ___ rain later.', choices:['might','must','should','cannot'], answer:'might', explain:'"Might" expresses possibility.' },
-    { id:'g-p5-048', level:'P5', category:'modals', subskill:'could_ability_past', difficulty:2, q:'When she was younger, she ___ run very fast.', choices:['can','could','must','should'], answer:'could', explain:'"Could" expresses past ability.' },
-    { id:'g-p5-049', level:'P5', category:'adjAdverbs', subskill:'near_nearly', difficulty:3, q:'The project is ___ complete; we only need one more chart.', choices:['near','nearly','nearest','nearer'], answer:'nearly', explain:'"Nearly" means almost.' },
-    { id:'g-p5-050', level:'P5', category:'adjAdverbs', subskill:'real_really', difficulty:2, q:'That was a ___ exciting science experiment.', choices:['real','really','reality','more real'], answer:'really', explain:'Adverb "really" modifies adjective "exciting".' },
-    { id:'g-p5-051', level:'P5', category:'comparatives', subskill:'farther_further', difficulty:3, q:'Our classroom is ___ from the canteen than yours.', choices:['far','farther','farthest','furthermost'], answer:'farther', explain:'"Farther" is standard for physical distance.' },
-    { id:'g-p5-052', level:'P5', category:'superlatives', subskill:'best_worst', difficulty:2, q:'This is the ___ solution to reduce food waste.', choices:['good','better','best','most good'], answer:'best', explain:'Superlative of "good" is "best".' },
-    { id:'g-p5-053', level:'P5', category:'simplePast', subskill:'irregular_lie_lay', difficulty:3, q:'After lunch, he ___ down on the bench for a short rest.', choices:['lay','laid','lain','lies'], answer:'lay', explain:'Past tense of "lie" (recline) is "lay".' },
-    { id:'g-p5-054', level:'P5', category:'simplePast', subskill:'irregular_lay_laid', difficulty:3, q:'She ___ the worksheets on the teacher’s desk just now.', choices:['lay','laid','lain','lays'], answer:'laid', explain:'Past tense of "lay" (put) is "laid".' },
-    { id:'g-p5-055', level:'P5', category:'connectors', subskill:'therefore', difficulty:3, q:'The evidence was weak; ___, the claim was rejected.', choices:['therefore','although','meanwhile','unless'], answer:'therefore', explain:'"Therefore" signals logical consequence.' },
-    { id:'g-p5-056', level:'P5', category:'connectors', subskill:'however', difficulty:3, q:'The route is longer; ___, it is safer for cyclists.', choices:['however','so','because','after'], answer:'however', explain:'"However" introduces contrast between clauses.' },
-    { id:'g-p5-057', level:'P5', category:'mixedGrammar', subskill:'time_marker_modal', difficulty:3, q:'Since the weather is improving, we ___ be able to continue practice outdoors.', choices:['might','must not','should have','would have'], answer:'might', explain:'Current condition + future possibility points to "might".' },
-    { id:'g-p5-058', level:'P5', category:'mixedGrammar', subskill:'cause_effect_preposition', difficulty:3, q:'___ the delay, the team arrived after the briefing had started.', choices:['Because of','Although','Unless','So'], answer:'Because of', explain:'"Because of" is followed by noun phrase "the delay".' },
-    { id:'g-p5-059', level:'P5', category:'prepositions', subskill:'according_to', difficulty:2, q:'___ the notice, the hall closes at 6 p.m.', choices:['According to','Across','Despite','Except'], answer:'According to', explain:'Use "according to" when citing a source.' },
-    { id:'g-p5-060', level:'P5', category:'conjunctions', subskill:'whereas', difficulty:3, q:'My brother enjoys football, ___ I prefer badminton.', choices:['whereas','because','if','until'], answer:'whereas', explain:'"Whereas" contrasts two preferences.' },
-    { id:'g-p5-061', level:'P5', category:'modals', subskill:'need_not', difficulty:3, q:'You ___ bring your own marker; extras are provided.', choices:['need not','must','should','ought'], answer:'need not', explain:'"Need not" indicates lack of necessity.' },
-    { id:'g-p5-062', level:'P5', category:'adjAdverbs', subskill:'comparative_adverb', difficulty:2, q:'She solved the puzzle ___ than I did.', choices:['quick','quickly','more quickly','most quickly'], answer:'more quickly', explain:'Comparative adverb form is "more quickly".' },
-    { id:'g-p5-063', level:'P5', category:'comparatives', subskill:'as_as', difficulty:2, q:'This corridor is ___ wide as the one near the hall.', choices:['as','so','more','most'], answer:'as', explain:'Use "as ... as" for equal comparison.' },
-    { id:'g-p5-064', level:'P5', category:'superlatives', subskill:'least', difficulty:2, q:'Of all tasks, filing forms is the ___ exciting.', choices:['less','least','little','fewest'], answer:'least', explain:'Use "least" for the lowest degree with long adjectives.' },
-    { id:'g-p5-065', level:'P5', category:'simplePast', subskill:'irregular_shrink', difficulty:3, q:'After washing, the shirt ___ slightly.', choices:['shrink','shrunk','shrank','shrinks'], answer:'shrank', explain:'Past tense of "shrink" is "shrank".' },
-    { id:'g-p5-066', level:'P5', category:'mixedGrammar', subskill:'contrast_and_word_class', difficulty:3, q:'Although the track was wet, the runners moved ___ to avoid slipping.', choices:['careful','carefully','more careful','most careful'], answer:'carefully', explain:'Verb "moved" needs adverb; contrast clue comes from "Although".' },
-    { id:'g-p5-067', level:'P5', category:'mixedGrammar', subskill:'time_and_irregular', difficulty:3, q:'By the time I arrived, the audience had ___ their seats.', choices:['take','took','taken','takes'], answer:'taken', explain:'Past perfect requires past participle "taken".' },
-    { id:'g-p5-068', level:'P5', category:'prepositions', subskill:'except_for', difficulty:2, q:'Everyone was present ___ Faris, who was unwell.', choices:['except for','instead of','because of','next to'], answer:'except for', explain:'"Except for" excludes one person from a group.' },
-    { id:'g-p5-069', level:'P5', category:'conjunctions', subskill:'provided_that', difficulty:3, q:'You may use the lab ___ you follow all safety rules.', choices:['provided that','although','since','whereas'], answer:'provided that', explain:'"Provided that" introduces a condition.' },
-    { id:'g-p5-070', level:'P5', category:'modals', subskill:'would_polite_request', difficulty:2, q:'___ you mind passing me the stapler?', choices:['Would','Must','Can’t','Shouldn’t'], answer:'Would', explain:'"Would you mind ...?" is a polite request form.' },
-    { id:'g-p5-071', level:'P5', category:'adjAdverbs', subskill:'well_adjective', difficulty:3, q:'She does not feel ___ today, so she stayed home.', choices:['well','goodly','betterly','best'], answer:'well', explain:'After "feel", "well" can be used as adjective meaning healthy.' },
-    { id:'g-p5-072', level:'P5', category:'mixedGrammar', subskill:'result_and_modal', difficulty:3, q:'The sky is clearing; the event ___ start on time after all.', choices:['might','must not','should have','would have'], answer:'might', explain:'Evidence supports possibility, not certainty or past obligation.' },
-  ],
-  P6: [
-    { id:'g-p6-001', level:'P6', category:'inversion', subskill:'fronted_adverb', difficulty:1, q:'Rarely ___ we see such courage.', choices:['do','did','are','have'], answer:'do', explain:'Fronted adverbials can trigger inversion: Rarely do we...' },
-    { id:'g-p6-002', level:'P6', category:'conditionals', subskill:'inverted_third', difficulty:3, q:'Had he listened, he ___ avoided the mistake.', choices:['will have','would have','has','would'], answer:'would have', explain:'Inverted third conditional: Had + past participle, would have + past participle.' },
-    { id:'g-p6-003', level:'P6', category:'svAgreement', subskill:'along_with', difficulty:3, q:'The principal, along with the teachers, ___ attending.', choices:['is','are','were','be'], answer:'is', explain:'Main subject "principal" is singular.' },
-    { id:'g-p6-004', level:'P6', category:'inversion', subskill:'no_sooner', difficulty:2, q:'No sooner ___ he arrived than the show began.', choices:['had','has','did','was'], answer:'had', explain:'Inversion structure: No sooner had + subject + past participle.' },
-    { id:'g-p6-005', level:'P6', category:'conditionals', subskill:'third_conditional', difficulty:2, q:'If she ___ earlier, she would have caught the train.', choices:['left','had left','has left','would leave'], answer:'had left', explain:'Third conditional uses If + past perfect.' },
-    { id:'g-p6-006', level:'P6', category:'inversion', subskill:'scarcely', difficulty:2, q:'Scarcely ___ the lesson begun when the fire alarm rang.', choices:['had','has','did','was'], answer:'had', explain:'With "Scarcely", use past perfect inversion.' },
-    { id:'g-p6-007', level:'P6', category:'svAgreement', subskill:'as_well_as', difficulty:3, q:'The committee, as well as the principal, ___ agreed.', choices:['have','has','are','were'], answer:'has', explain:'Main subject "committee" is singular here.' },
-    { id:'g-p6-008', level:'P6', category:'conditionals', subskill:'inverted_third', difficulty:3, q:'Had they prepared better, they ___ the match.', choices:['would win','would have won','won','had won'], answer:'would have won', explain:'Inverted third conditional needs "would have + past participle".' },
-    { id:'g-p6-009', level:'P6', category:'inversion', subskill:'only_after', difficulty:2, q:'Only after the bell rang ___ the students leave.', choices:['did','do','were','had'], answer:'did', explain:'"Only after" triggers inversion with "did".' },
-    { id:'g-p6-010', level:'P6', category:'reportedSpeech', subskill:'backshift_modal', difficulty:2, q:'She asked whether I ___ attend the ceremony.', choices:['can','could','will','am'], answer:'could', explain:'Backshift: "can" becomes "could" in reported speech.' },
-    { id:'g-p6-011', level:'P6', category:'relativeClauses', subskill:'whose', difficulty:2, q:'The winners, ___ names were announced, cheered loudly.', choices:['who','whose','whom','which'], answer:'whose', explain:'"Whose" shows possession — their names.' },
-    { id:'g-p6-012', level:'P6', category:'modals', subskill:'should_have', difficulty:2, q:'He ___ not have left without permission.', choices:['should','shall to','musted','can to'], answer:'should', explain:'"Should not have" + past participle expresses disapproval.' },
-    { id:'g-p6-013', level:'P6', category:'inversion', subskill:'not_until', difficulty:2, q:'Not until the rain stopped ___ we go outside.', choices:['did','do','had','were'], answer:'did', explain:'"Not until" triggers subject-auxiliary inversion.' },
-    { id:'g-p6-014', level:'P6', category:'passiveVoice', subskill:'reduced_relative', difficulty:3, q:'The report ___ by the team was thorough.', choices:['prepare','prepared','preparing','prepares'], answer:'prepared', explain:'Reduced relative clause: "prepared by" = "which was prepared by".' },
-    { id:'g-p6-015', level:'P6', category:'conditionals', subskill:'inverted_third', difficulty:3, q:'Had I known about the delay, I ___ left earlier.', choices:['will have','would have','had','could'], answer:'would have', explain:'Inverted third conditional: Had + subject + past participle.' },
-    { id:'g-p6-016', level:'P6', category:'svAgreement', subskill:'together_with', difficulty:3, q:'The school, together with the parents, ___ organised the event.', choices:['have','has','are','were'], answer:'has', explain:'"Together with" doesn\'t change the main subject — "school" is singular.' },
-    { id:'g-p6-017', level:'P6', category:'pastPerfect', subskill:'had_pp', difficulty:2, q:'By the time the ambulance arrived, the patient ___ already been treated.', choices:['had','has','was','is'], answer:'had', explain:'Past perfect shows the treatment happened before the ambulance arrived.' },
-    { id:'g-p6-018', level:'P6', category:'tenseAwareness', subskill:'mixed_tense', difficulty:3, q:'Every day she ___ to school, but yesterday she stayed home.', choices:['walks','walked','walk','walking'], answer:'walks', explain:'The habitual action uses present simple "walks"; the contrast is "yesterday".' },
-    { id:'g-p6-019', level:'P6', category:'adjAdverbs', subskill:'adv_position', difficulty:3, q:'She ___ forgot to bring her keys.', choices:['nearly','near','nearing','nears'], answer:'nearly', explain:'"Nearly" is an adverb modifying the verb "forgot".' },
-    { id:'g-p6-020', level:'P6', category:'mixedGrammar', subskill:'exam_mixed', difficulty:3, q:'Neither the teacher nor the students ___ aware of the change.', choices:['were','was','is','has'], answer:'were', explain:'With "neither…nor", the verb agrees with the nearest subject "students" (plural).' },
-    { id:'g-p6-021', level:'P6', category:'mixedGrammar', subskill:'exam_mixed', difficulty:3, q:'Not only ___ she win the race, but she also broke the record.', choices:['did','does','was','had'], answer:'did', explain:'Inversion after "Not only": "Not only did she..."' },
-    { id:'g-p6-022', level:'P6', category:'simplePast', subskill:'tense_consistency', difficulty:2, q:'The pupils packed up and ___ for the gate when the bell rang.', choices:['head','headed','heads','heading'], answer:'headed', explain:'Two completed past actions should stay in simple past.' },
-    { id:'g-p6-023', level:'P6', category:'presentCont', subskill:'temporary_situation', difficulty:2, q:'This term, our class ___ in the computer lab while the classroom is repaired.', choices:['studies','studied','is studying','study'], answer:'is studying', explain:'Temporary current situation takes present continuous.' },
-    { id:'g-p6-024', level:'P6', category:'futureTense', subskill:'future_perfect_intro', difficulty:3, q:'By next Monday, we ___ the group project.', choices:['complete','will complete','will have completed','completed'], answer:'will have completed', explain:'"By next Monday" points to completion before a future time.' },
-    { id:'g-p6-025', level:'P6', category:'svAgreement', subskill:'indefinite_pronoun', difficulty:3, q:'Everyone in the team ___ expected to submit the reflection.', choices:['are','is','were','have'], answer:'is', explain:'Indefinite pronoun "Everyone" is singular.' },
-    { id:'g-p6-026', level:'P6', category:'articles', subskill:'article_precision', difficulty:2, q:'The principal gave ___ encouraging speech at assembly.', choices:['a','an','the','no article'], answer:'an', explain:'"Encouraging" begins with a vowel sound, so use "an".' },
-    { id:'g-p6-027', level:'P6', category:'pronouns', subskill:'pronoun_agreement', difficulty:2, q:'Neither Sarah nor Lina brought ___ PE attire.', choices:['her','their','hers','theirs'], answer:'her', explain:'Nearest singular subject takes singular possessive pronoun.' },
-    { id:'g-p6-028', level:'P6', category:'quantifiers', subskill:'most_of', difficulty:2, q:'___ the students in my class travel by bus.', choices:['Most of','Much of','Few of','Every of'], answer:'Most of', explain:'Use "Most of" before plural noun phrases.' },
-    { id:'g-p6-029', level:'P6', category:'countableUncountable', subskill:'amount_number', difficulty:2, q:'A large ___ of water was used to clean the hall.', choices:['number','amount','few','many'], answer:'amount', explain:'Use "amount" with uncountable nouns like water.' },
-    { id:'g-p6-030', level:'P6', category:'simplePast', subskill:'irregular_past', difficulty:2, q:'The crowd ___ silent when the results were announced.', choices:['fall','fell','falls','falling'], answer:'fell', explain:'Past tense of "fall" is "fell".' },
-    { id:'g-p6-031', level:'P6', category:'presentCont', subskill:'not_now_simple_present', difficulty:3, q:'I usually walk to school, but today I ___ the bus.', choices:['take','am taking','took','takes'], answer:'am taking', explain:'Contrast with "today" shows temporary present change.' },
-    { id:'g-p6-032', level:'P6', category:'futureTense', subskill:'will_not', difficulty:2, q:'Don’t worry, I ___ tell anyone your secret.', choices:['don’t','won’t','am not','didn’t'], answer:'won’t', explain:'Use "won’t" for a future promise/negative intention.' },
-    { id:'g-p6-033', level:'P6', category:'svAgreement', subskill:'none_of', difficulty:3, q:'None of the milk ___ spoiled.', choices:['are','is','were','have'], answer:'is', explain:'With uncountable noun "milk", singular verb is used.' },
-    { id:'g-p6-034', level:'P6', category:'articles', subskill:'the_with_ordinal', difficulty:2, q:'She came in ___ first place during Sports Day.', choices:['a','an','the','no article'], answer:'the', explain:'Ordinals usually take "the".' },
-    { id:'g-p6-035', level:'P6', category:'pronouns', subskill:'relative_whom', difficulty:3, q:'The coach ___ the team respected retired last year.', choices:['who','whom','which','whose'], answer:'whom', explain:'Object relative pronoun is "whom" in formal usage.' },
-    { id:'g-p6-036', level:'P6', category:'quantifiers', subskill:'little_a_little', difficulty:2, q:'There is ___ hope of success unless we revise our plan.', choices:['a little','little','few','many'], answer:'little', explain:'"Little" means almost none.' },
-    { id:'g-p6-037', level:'P6', category:'countableUncountable', subskill:'many_much_complex', difficulty:2, q:'How ___ information did the speaker provide?', choices:['many','much','few','several'], answer:'much', explain:'"Information" is uncountable.' },
-    { id:'g-p6-038', level:'P6', category:'simplePast', subskill:'did_question', difficulty:2, q:'Why did the monitor ___ the classroom keys?', choices:['took','take','taking','takes'], answer:'take', explain:'After "did", use base verb.' },
-    { id:'g-p6-039', level:'P6', category:'presentCont', subskill:'passive_continuous_intro', difficulty:3, q:'The school hall is being ___ for Prize-Giving Day.', choices:['decorate','decorated','decorating','decoration'], answer:'decorated', explain:'Passive continuous form is "is being + past participle".' },
-    { id:'g-p6-040', level:'P6', category:'futureTense', subskill:'be_going_to_vs_will', difficulty:2, q:'The sky is dark. It ___ rain very soon.', choices:['will','is going to','would','was going to'], answer:'is going to', explain:'Current evidence supports "is going to".' },
-    { id:'g-p6-041', level:'P6', category:'svAgreement', subskill:'a_pair_of', difficulty:3, q:'A pair of scissors ___ on the teacher’s table.', choices:['are','is','were','have'], answer:'is', explain:'Head noun "pair" is singular.' },
-    { id:'g-p6-042', level:'P6', category:'pronouns', subskill:'reflexive_emphasis', difficulty:2, q:'The pupils decorated the notice board ___ without help.', choices:['them','themselves','their','theirself'], answer:'themselves', explain:'Reflexive pronoun "themselves" matches plural subject.' },
-    { id:'g-p6-043', level:'P6', category:'prepositions', subskill:'in_accordance_with', difficulty:3, q:'The experiment was conducted ___ the safety guidelines.', choices:['in accordance with','instead of','ahead of','apart from'], answer:'in accordance with', explain:'This phrase means "according to".' },
-    { id:'g-p6-044', level:'P6', category:'prepositions', subskill:'in_addition_to', difficulty:3, q:'___ the written report, each group gave an oral presentation.', choices:['In addition to','Because of','In spite of','Except for'], answer:'In addition to', explain:'The phrase means "as well as".' },
-    { id:'g-p6-045', level:'P6', category:'conjunctions', subskill:'not_only_but_also_logic', difficulty:3, q:'She not only organised the files ___ labelled them by topic.', choices:['but also','and','because','so'], answer:'but also', explain:'Correlative pair is "not only ... but also".' },
-    { id:'g-p6-046', level:'P6', category:'conjunctions', subskill:'no_sooner_than', difficulty:3, q:'No sooner had we sat down ___ the bell rang.', choices:['than','when','while','because'], answer:'than', explain:'Fixed structure: "No sooner ... than ...".' },
-    { id:'g-p6-047', level:'P6', category:'modals', subskill:'should_have', difficulty:3, q:'You ___ checked the figures before submitting the report.', choices:['should have','should','must','might'], answer:'should have', explain:'"Should have + past participle" expresses criticism/advice about past action.' },
-    { id:'g-p6-048', level:'P6', category:'modals', subskill:'must_have_deduction', difficulty:3, q:'The lights are off and the door is locked; they ___ gone home.', choices:['must have','should have','might','would'], answer:'must have', explain:'Strong logical deduction in the present about past action.' },
-    { id:'g-p6-049', level:'P6', category:'adjAdverbs', subskill:'adverb_degree', difficulty:2, q:'The class responded ___ positively to the new timetable.', choices:['extreme','extremely','extremity','more extreme'], answer:'extremely', explain:'Adverb "extremely" modifies adverb "positively".' },
-    { id:'g-p6-050', level:'P6', category:'adjAdverbs', subskill:'flat_adverb', difficulty:3, q:'Drive ___ and keep your eyes on the road.', choices:['safe','safely','safer','safest'], answer:'safely', explain:'Verb "Drive" requires adverb "safely".' },
-    { id:'g-p6-051', level:'P6', category:'comparatives', subskill:'double_comparative_error', difficulty:3, q:'This explanation is ___ than the previous one.', choices:['clearer','more clearer','clearest','most clear'], answer:'clearer', explain:'Do not use double comparative ("more clearer").' },
-    { id:'g-p6-052', level:'P6', category:'superlatives', subskill:'double_superlative_error', difficulty:3, q:'It was the ___ route we could take.', choices:['safest','most safest','safer','more safe'], answer:'safest', explain:'Do not use double superlative ("most safest").' },
-    { id:'g-p6-053', level:'P6', category:'simplePast', subskill:'irregular_sink', difficulty:3, q:'The heavy box ___ to the bottom of the pool.', choices:['sink','sank','sunk','sinks'], answer:'sank', explain:'Past tense of "sink" is "sank".' },
-    { id:'g-p6-054', level:'P6', category:'simplePast', subskill:'irregular_rise', difficulty:3, q:'The balloon ___ quickly when we released it.', choices:['rise','rose','risen','rises'], answer:'rose', explain:'Past tense of "rise" is "rose".' },
-    { id:'g-p6-055', level:'P6', category:'connectors', subskill:'therefore_formal', difficulty:3, q:'The evidence was incomplete; ___, the panel postponed the decision.', choices:['therefore','otherwise','although','meanwhile'], answer:'therefore', explain:'"Therefore" marks a logical result.' },
-    { id:'g-p6-056', level:'P6', category:'connectors', subskill:'nevertheless', difficulty:3, q:'The trail was steep; ___, the hikers continued carefully.', choices:['nevertheless','because','so','unless'], answer:'nevertheless', explain:'"Nevertheless" introduces contrast despite difficulty.' },
-    { id:'g-p6-057', level:'P6', category:'mixedGrammar', subskill:'time_cause_and_modal', difficulty:3, q:'Since the rehearsal starts at 7, we ___ leave by 6.30.', choices:['must','might','should have','would'], answer:'must', explain:'Time constraint plus cause clue signals strong necessity.' },
-    { id:'g-p6-058', level:'P6', category:'mixedGrammar', subskill:'preposition_and_irregular', difficulty:3, q:'By the time we got to the station, the train had ___.', choices:['leave','left','leaving','leaves'], answer:'left', explain:'Past perfect requires participle "left"; time clue is "By the time".' },
-    { id:'g-p6-059', level:'P6', category:'prepositions', subskill:'on_behalf_of', difficulty:3, q:'She accepted the award ___ her teammates.', choices:['on behalf of','in spite of','next to','along'], answer:'on behalf of', explain:'Use "on behalf of" when representing others.' },
-    { id:'g-p6-060', level:'P6', category:'conjunctions', subskill:'as_soon_as', difficulty:2, q:'Call me ___ you reach home.', choices:['as soon as','although','because','unless'], answer:'as soon as', explain:'This conjunction introduces immediate time relation.' },
-    { id:'g-p6-061', level:'P6', category:'modals', subskill:'cannot_have', difficulty:3, q:'He ___ forgotten the meeting — he set two reminders.', choices:['cannot have','must have','should have','might have'], answer:'cannot have', explain:'Evidence makes past event very unlikely, so use "cannot have".' },
-    { id:'g-p6-062', level:'P6', category:'adjAdverbs', subskill:'high_highly', difficulty:3, q:'The drone flew ___ above the field.', choices:['high','highly','higherly','highest'], answer:'high', explain:'"High" describes physical height; "highly" means very (degree).' },
-    { id:'g-p6-063', level:'P6', category:'comparatives', subskill:'the_more_the_more', difficulty:3, q:'The ___ you practise, the more confident you become.', choices:['more','most','much','many'], answer:'more', explain:'Correlative comparative structure: "The more..., the more...".' },
-    { id:'g-p6-064', level:'P6', category:'superlatives', subskill:'least_vs_fewest', difficulty:3, q:'Among all proposals, this one received the ___ support.', choices:['least','fewest','less','fewer'], answer:'least', explain:'"Support" is uncountable, so use "least".' },
-    { id:'g-p6-065', level:'P6', category:'mixedGrammar', subskill:'contrast_wordclass', difficulty:3, q:'Although the instructions were complex, she explained them ___.', choices:['patient','patiently','more patient','most patient'], answer:'patiently', explain:'Verb "explained" requires adverb; "Although" gives contrast clue.' },
-    { id:'g-p6-066', level:'P6', category:'mixedGrammar', subskill:'cause_effect_and_tense', difficulty:3, q:'Because the storm worsened, the organisers ___ the outdoor event.', choices:['cancelled','cancel','cancels','had cancelling'], answer:'cancelled', explain:'Cause clue plus past-time context calls for simple past.' },
-    { id:'g-p6-067', level:'P6', category:'prepositions', subskill:'prior_to', difficulty:3, q:'All forms must be submitted ___ Friday noon.', choices:['prior to','beside','through','among'], answer:'prior to', explain:'"Prior to" means before.' },
-    { id:'g-p6-068', level:'P6', category:'conjunctions', subskill:'lest', difficulty:3, q:'Speak softly, ___ the baby wake up.', choices:['lest','because','so','whereas'], answer:'lest', explain:'"Lest" means "for fear that".' },
-    { id:'g-p6-069', level:'P6', category:'modals', subskill:'would_have', difficulty:3, q:'If you had called me earlier, I ___ helped you.', choices:['would have','will have','must have','can'], answer:'would have', explain:'Third conditional result clause uses "would have".' },
-    { id:'g-p6-070', level:'P6', category:'adjAdverbs', subskill:'bad_badly', difficulty:2, q:'The plants were watered ___, so many leaves turned brown.', choices:['bad','badly','worse','worst'], answer:'badly', explain:'Adverb needed to modify "watered".' },
-    { id:'g-p6-071', level:'P6', category:'comparatives', subskill:'fewer_vs_less', difficulty:2, q:'There are ___ mistakes in this draft than in the first one.', choices:['less','fewer','least','little'], answer:'fewer', explain:'Use "fewer" with countable plural nouns like mistakes.' },
-    { id:'g-p6-072', level:'P6', category:'mixedGrammar', subskill:'time_and_modal_deduction', difficulty:3, q:'It is only 6 p.m.; they ___ have arrived yet.', choices:['cannot','must','should','would'], answer:'cannot', explain:'Time clue makes arrival impossible at this point.' },
-  ],
+const LEVEL_CATEGORY_PLAN = {
+  P1: ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'possessives', 'quantifiers'],
+  P2: ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'connectors', 'countableUncountable', 'futureTense'],
+  P3: ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'connectors', 'conjunctions', 'comparatives', 'modals'],
+  P4: ['svAgreement', 'presentPerfect', 'pastCont', 'futureTense', 'prepositions', 'connectors', 'quantifiers', 'adjAdverbs', 'auxiliaries', 'conjunctions'],
+  P5: ['svAgreement', 'tenseAwareness', 'presentPerfect', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'quantifiers', 'mixedGrammar'],
+  P6: ['tenseAwareness', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'inversion', 'auxiliaries', 'connectors', 'mixedGrammar'],
 };
+
+const SUBJECTS = ['The pupil', 'My brother', 'Our teacher', 'The class monitor', 'The twins', 'The players', 'Her cousin', 'The science team'];
+const PLACES = ['in the canteen', 'at the void deck', 'near the school gate', 'in the library', 'at East Coast Park', 'beside the hall', 'on the field', 'at the community club'];
+const CONTEXT_TAILS = [
+  'during English lesson',
+  'before assembly',
+  'after recess',
+  'during CCA training',
+  'at the book fair',
+  'during Mother Tongue class',
+  'while preparing for the concert',
+  'during camp briefing',
+  'before the spelling quiz',
+  'after the science activity',
+  'during oral practice',
+  'before dismissal',
+];
+const LEVEL_TAILS = {
+  P1: ['before story time', 'during phonics practice', 'after snack break'],
+  P2: ['before spelling practice', 'during reading lesson', 'after group work'],
+  P3: ['during project discussion', 'before oral practice', 'after science activity'],
+  P4: ['during class debate', 'before journal writing', 'after team rehearsal'],
+  P5: ['during revision class', 'before presentation practice', 'after consultation'],
+  P6: ['during exam preparation', 'before timed practice', 'after reflection session'],
+};
+
+function rotate(arr, idx) {
+  return arr[idx % arr.length];
+}
+
+function buildChoices(answer, distractors) {
+  const choices = [answer, ...distractors.slice(0, 3)];
+  return [...new Set(choices)].slice(0, 4);
+}
+
+function difficultyFor(level, idx) {
+  if (level === 'P1' || level === 'P2') return idx % 5 === 0 ? 2 : 1;
+  if (level === 'P3' || level === 'P4') return idx % 4 === 0 ? 3 : 2;
+  return idx % 3 === 0 ? 3 : 2;
+}
+
+function decorateStem(stem, level, idx) {
+  const tail = rotate([...(LEVEL_TAILS[level] || []), ...CONTEXT_TAILS], idx);
+  return `${String(stem).replace(/\.$/, '')} ${tail}.`;
+}
+
+const GRAMMAR_BUILDERS = {
+  articles(level, i) {
+    const nouns = [
+      ['apple', 'an'], ['uniform', 'a'], ['hour', 'an'], ['museum', 'a'], ['umbrella', 'an'], ['homework file', 'a'],
+    ];
+    const [noun, article] = rotate(nouns, i);
+    return {
+      subskill: 'article_choice',
+      q: `${rotate(SUBJECTS, i)} packed ___ ${noun} before assembly.`,
+      choices: buildChoices(article, article === 'an' ? ['a', 'the', 'some'] : ['an', 'the', 'some']),
+      answer: article,
+      explain: `Use "${article}" for this noun sound in context.`,
+    };
+  },
+  pronouns(level, i) {
+    const rows = [
+      ['The girls were late, so ___ apologised to the teacher.', 'they', ['them', 'their', 'theirs']],
+      ['Mr Tan called Ali and me, so he spoke to ___.', 'us', ['we', 'our', 'ours']],
+      ['That sketchbook belongs to Mei. It is ___.', 'hers', ['her', 'she', 'herself']],
+      ['Please pass the worksheet to Dan and ___.', 'me', ['I', 'my', 'mine']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'pronoun_form', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the pronoun form that fits the sentence role.' };
+  },
+  svAgreement(level, i) {
+    const rows = [
+      ['The captain of the team ___ early every day.', 'arrives', ['arrive', 'arrived', 'arriving']],
+      ['My cousins ___ badminton after school.', 'play', ['plays', 'played', 'is playing']],
+      ['There ___ two packets of rice on the shelf.', 'are', ['is', 'was', 'has']],
+      ['Neither the coach nor the players ___ careless today.', 'are', ['is', 'was', 'be']],
+      ['Each student ___ a name tag for the camp.', 'has', ['have', 'had', 'having']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Match the verb with the true subject.' };
+  },
+  simplePast(level, i) {
+    const rows = [
+      ['Yesterday, we ___ the art display before lunch.', 'visited', ['visit', 'visits', 'visiting']],
+      ['Last Friday, she ___ her wallet at home.', 'left', ['leave', 'leaves', 'leaving']],
+      ['Two days ago, they ___ the heavy box upstairs.', 'carried', ['carry', 'carries', 'carrying']],
+      ['Last night, Father ___ us a story about courage.', 'told', ['tell', 'tells', 'telling']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'past_tense_form', q, choices: buildChoices(answer, ds), answer, explain: 'Past time markers require a past-tense verb.' };
+  },
+  presentCont(level, i) {
+    const rows = [
+      ['Look! The children ___ across the hall.', 'are running', ['run', 'ran', 'is running']],
+      ['Right now, my mother ___ dinner for everyone.', 'is cooking', ['cooks', 'cooked', 'are cooking']],
+      ['At the moment, I ___ my spelling corrections.', 'am checking', ['check', 'checked', 'is checking']],
+      ['Listen! The choir ___ the final chorus.', 'is singing', ['sing', 'sang', 'are singing']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'present_continuous', q, choices: buildChoices(answer, ds), answer, explain: 'Use present continuous for actions happening now.' };
+  },
+  prepositions(level, i) {
+    const rows = [
+      ['Please place the attendance file ___ the principal’s desk.', 'on', ['in', 'under', 'between']],
+      ['We reached school ___ 7.20 a.m. today.', 'at', ['on', 'in', 'by']],
+      ['The football rolled ___ the bench.', 'under', ['above', 'across', 'toward']],
+      ['They walked ___ the bridge to the science centre.', 'across', ['behind', 'inside', 'with']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'preposition_use', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the preposition that best shows time, place or movement.' };
+  },
+  possessives(level, i) {
+    const rows = [
+      ['This is not my bottle. It is ___.', 'hers', ['her', 'she', 'herself']],
+      ['The boys forgot ___ PE shirts in class.', 'their', ['there', 'they', 'theirs']],
+      ['That laptop belongs to my parents. It is ___.', 'theirs', ['their', 'them', 'they']],
+      ['I borrowed ___ ruler because mine was missing.', 'his', ['he', 'him', 'himself']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'possessive_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Use the possessive word that shows ownership clearly.' };
+  },
+  quantifiers(level, i) {
+    const rows = [
+      ['There are ___ marbles in this small pouch.', 'few', ['little', 'much', 'less']],
+      ['How ___ sugar should we add to this drink?', 'much', ['many', 'few', 'several']],
+      ['Only ___ pupils were absent during rehearsal.', 'a few', ['a little', 'much', 'less']],
+      ['We have ___ water left, so refill the bottle.', 'little', ['few', 'many', 'several']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'quantifier_choice', q, choices: buildChoices(answer, ds), answer, explain: 'Use quantifiers based on whether the noun is countable or uncountable.' };
+  },
+  connectors(level, i) {
+    const rows = [
+      ['The sky darkened, ___ we packed our raincoats.', 'so', ['but', 'or', 'because']],
+      ['She was tired, ___ she still completed her corrections.', 'but', ['and', 'so', 'because']],
+      ['Pack your bottle ___ your worksheet before camp.', 'and', ['but', 'or', 'because']],
+      ['He revised carefully ___ he wanted to improve.', 'because', ['but', 'so', 'or']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'connector_logic', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the connector that matches the relationship between ideas.' };
+  },
+  countableUncountable(level, i) {
+    const rows = [
+      ['There is ___ rice left in the cooker.', 'some', ['many', 'few', 'an']],
+      ['How ___ oranges did Grandma buy?', 'many', ['much', 'little', 'less']],
+      ['Please add ___ flour to the bowl.', 'a little', ['a few', 'many', 'several']],
+      ['We need ___ chairs for the visitors.', 'a few', ['a little', 'much', 'less']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'countability', q, choices: buildChoices(answer, ds), answer, explain: 'Match the quantifier to countable or uncountable nouns.' };
+  },
+  futureTense(level, i) {
+    const rows = [
+      ['Tomorrow, our class ___ the heritage gallery.', 'will visit', ['visit', 'visited', 'is visiting']],
+      ['I think it ___ later in the afternoon.', 'will rain', ['rains', 'rained', 'is raining']],
+      ['The coach says we ___ extra drills next week.', 'will have', ['have', 'had', 'are having']],
+      ['Do not worry. I ___ you after CCA.', 'will call', ['call', 'called', 'am calling']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'future_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Use future forms for plans, promises or predictions.' };
+  },
+  conjunctions(level, i) {
+    const rows = [
+      ['Would you prefer noodles ___ rice for lunch?', 'or', ['and', 'but', 'because']],
+      ['He stayed quiet ___ he was unsure of the answer.', 'because', ['or', 'but', 'so']],
+      ['Take your umbrella, ___ the clouds look heavy.', 'for', ['yet', 'or', 'and']],
+      ['She practised daily, ___ she improved steadily.', 'so', ['or', 'because', 'but']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'conjunction_function', q, choices: buildChoices(answer, ds), answer, explain: 'Pick the conjunction that links the clauses correctly.' };
+  },
+  comparatives(level, i) {
+    const rows = [
+      ['This puzzle is ___ than yesterday’s puzzle.', 'harder', ['hard', 'hardest', 'more hard']],
+      ['The new route is ___ than the old one.', 'shorter', ['short', 'shortest', 'more short']],
+      ['A cheetah is ___ than a rabbit.', 'faster', ['fast', 'fastest', 'more fast']],
+      ['Today is ___ than Monday.', 'hotter', ['hot', 'hottest', 'more hot']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'comparative_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Use a comparative form when comparing two things.' };
+  },
+  modals(level, i) {
+    const rows = [
+      ['You ___ submit the form by Friday.', 'must', ['might', 'could', 'would']],
+      ['May I borrow your marker? Yes, you ___.', 'may', ['must', 'should', 'would']],
+      ['If you feel unwell, you ___ see the school nurse.', 'should', ['might', 'would', 'can’t']],
+      ['The sign says we ___ run in the corridor.', 'must not', ['should', 'might', 'could']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'modal_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the modal that expresses the intended rule or advice.' };
+  },
+  presentPerfect(level, i) {
+    const rows = [
+      ['She ___ her assignment already.', 'has completed', ['completed', 'had completed', 'is completing']],
+      ['We ___ this museum before.', 'have visited', ['visited', 'had visited', 'are visiting']],
+      ['The boys ___ their shoes, so they are ready.', 'have polished', ['polished', 'had polished', 'are polishing']],
+      ['He ___ his wallet, so he cannot pay now.', 'has lost', ['lost', 'had lost', 'is losing']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'present_perfect', q, choices: buildChoices(answer, ds), answer, explain: 'Present perfect links a past action to the present result.' };
+  },
+  pastCont(level, i) {
+    const rows = [
+      ['At 8 p.m., we ___ for the oral exam.', 'were revising', ['revised', 'have revised', 'are revising']],
+      ['While I was washing dishes, my brother ___ the floor.', 'was mopping', ['mopped', 'has mopped', 'is mopping']],
+      ['They ___ when the principal entered.', 'were talking', ['talked', 'have talked', 'are talking']],
+      ['At that moment, the class ___ a video.', 'was watching', ['watched', 'has watched', 'is watching']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'past_continuous', q, choices: buildChoices(answer, ds), answer, explain: 'Past continuous describes an action in progress at a past time.' };
+  },
+  adjAdverbs(level, i) {
+    const rows = [
+      ['The speaker explained the rule ___.', 'clearly', ['clear', 'clearest', 'more clear']],
+      ['After the race, the runners looked ___.', 'tired', ['tiredly', 'more tiredly', 'tiring']],
+      ['Please answer the question ___.', 'politely', ['polite', 'politer', 'politeness']],
+      ['The soup tastes ___.', 'delicious', ['deliciously', 'more deliciously', 'deliciousness']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'adjective_adverb_choice', q, choices: buildChoices(answer, ds), answer, explain: 'Use adjectives after linking verbs and adverbs to describe actions.' };
+  },
+  auxiliaries(level, i) {
+    const rows = [
+      ['___ you finished your corrections yet?', 'Have', ['Do', 'Did', 'Are']],
+      ['Why ___ the players so quiet today?', 'are', ['is', 'was', 'has']],
+      ['___ she submit the file yesterday?', 'Did', ['Does', 'Do', 'Has']],
+      ['How many chapters ___ you read so far?', 'have', ['has', 'had', 'are']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'aux_question_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Question forms need the correct auxiliary verb.' };
+  },
+  tenseAwareness(level, i) {
+    const rows = [
+      ['By the time we reached the hall, the programme ___.', 'had started', ['has started', 'was starting', 'starts']],
+      ['She practises daily, so she usually ___ well.', 'performs', ['performed', 'is performing', 'has performed']],
+      ['We ___ for twenty minutes before the rain stopped.', 'had been waiting', ['have waited', 'are waiting', 'waited']],
+      ['Next month, they ___ the same project for a year.', 'will have done', ['have done', 'did', 'do']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'tense_selection', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the tense that best matches the time relationship.' };
+  },
+  pastPerfect(level, i) {
+    const rows = [
+      ['The train had left before we ___ the station.', 'reached', ['reach', 'have reached', 'are reaching']],
+      ['She ___ her notes before the quiz began.', 'had revised', ['has revised', 'revised', 'was revising']],
+      ['By 6 p.m., they ___ all the banners.', 'had hung', ['have hung', 'hung', 'were hanging']],
+      ['He was hungry because he ___ breakfast.', 'had skipped', ['has skipped', 'skipped', 'is skipping']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'past_perfect_sequence', q, choices: buildChoices(answer, ds), answer, explain: 'Past perfect shows the earlier past action.' };
+  },
+  perfectContinuousTenses(level, i) {
+    const rows = [
+      ['By noon, we ___ for two hours.', 'had been practising', ['have practised', 'practised', 'are practising']],
+      ['She looks tired because she ___ non-stop since dawn.', 'has been working', ['worked', 'had worked', 'was working']],
+      ['They ___ in this neighbourhood for ten years.', 'have been living', ['lived', 'had lived', 'are living']],
+      ['By next week, he ___ at this task for a month.', 'will have been working', ['has worked', 'worked', 'is working']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'perfect_continuous', q, choices: buildChoices(answer, ds), answer, explain: 'Perfect continuous tenses emphasise duration of an action.' };
+  },
+  conditionals(level, i) {
+    const rows = [
+      ['If you heat ice, it ___ into water.', 'melts', ['melted', 'will melt', 'has melted']],
+      ['If it rains this afternoon, we ___ indoors.', 'will stay', ['stayed', 'stay', 'have stayed']],
+      ['If she had left earlier, she ___ the bus.', 'would have caught', ['catches', 'will catch', 'has caught']],
+      ['If I were class chairperson, I ___ clearer notices.', 'would write', ['write', 'wrote', 'will write']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'if_clauses', q, choices: buildChoices(answer, ds), answer, explain: 'Match the if-clause type with the correct result verb form.' };
+  },
+  passiveVoice(level, i) {
+    const rows = [
+      ['The science models ___ by the P5 pupils.', 'were built', ['built', 'are building', 'have built']],
+      ['The report ___ by the committee tomorrow.', 'will be reviewed', ['reviews', 'reviewed', 'has reviewed']],
+      ['The hall ___ before the event started.', 'had been cleaned', ['cleaned', 'was cleaning', 'has cleaned']],
+      ['The safety rules ___ to all new students.', 'are explained', ['explain', 'explained', 'have explained']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'passive_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Passive voice focuses on the action or receiver, not the doer.' };
+  },
+  relativeClauses(level, i) {
+    const rows = [
+      ['The teacher ___ guided us is retiring this year.', 'who', ['which', 'whose', 'whom']],
+      ['This is the book ___ cover was torn.', 'whose', ['who', 'which', 'whom']],
+      ['The park ___ we visited has a new playground.', 'that', ['who', 'whose', 'whom']],
+      ['The scientist to ___ we wrote replied kindly.', 'whom', ['who', 'which', 'whose']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'relative_pronouns', q, choices: buildChoices(answer, ds), answer, explain: 'Use the relative pronoun that fits the noun and clause function.' };
+  },
+  reportedSpeech(level, i) {
+    const rows = [
+      ['Mum said that she ___ home late that evening.', 'would be', ['is', 'was', 'has been']],
+      ['The coach told us that we ___ to bring water bottles.', 'had to', ['have to', 'must', 'are having to']],
+      ['Alicia said that she ___ the worksheet already.', 'had finished', ['has finished', 'finished', 'is finishing']],
+      ['He asked whether I ___ the notice.', 'had read', ['have read', 'read', 'am reading']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'speech_reporting', q, choices: buildChoices(answer, ds), answer, explain: 'Reported speech usually shifts tense and pronouns.' };
+  },
+  inversion(level, i) {
+    const rows = [
+      ['Rarely ___ such a neat project display.', 'have we seen', ['we have seen', 'we saw', 'had we see']],
+      ['Not only ___ the plan clear, but it was practical too.', 'was', ['is', 'were', 'has']],
+      ['Hardly ___ when the bell rang.', 'had we sat down', ['we had sat down', 'we sit down', 'have we sat down']],
+      ['Only after checking the data ___ the error.', 'did she notice', ['she noticed', 'has she noticed', 'she notices']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'inversion_patterns', q, choices: buildChoices(answer, ds), answer, explain: 'Certain fronted phrases trigger inversion in formal structures.' };
+  },
+  mixedGrammar(level, i) {
+    const rows = [
+      ['Neither the prefect nor the players ___ responsible for the delay.', 'were', ['was', 'is', 'has']],
+      ['By next June, she ___ this school for six years.', 'will have attended', ['has attended', 'attended', 'attends']],
+      ['The worksheet, ___ was printed yesterday, is already outdated.', 'which', ['who', 'whom', 'whose']],
+      ['If they had checked the map earlier, they ___ lost.', 'would not have got', ['do not get', 'will not get', 'have not got']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { subskill: 'exam_mix', q, choices: buildChoices(answer, ds), answer, explain: 'Use all sentence clues to choose the most accurate grammar form.' };
+  },
+};
+
+function buildLevel(level) {
+  const categories = LEVEL_CATEGORY_PLAN[level];
+  const targetCount = 150;
+  const items = [];
+  const categoryCursor = Object.fromEntries(categories.map(c => [c, 0]));
+
+  for (let i = 0; i < targetCount; i += 1) {
+    const category = categories[i % categories.length];
+    const localIndex = categoryCursor[category];
+    categoryCursor[category] += 1;
+    const spec = GRAMMAR_BUILDERS[category](level, localIndex);
+    const id = `g-${level.toLowerCase()}-${String(i + 1).padStart(3, '0')}`;
+    items.push({
+      id,
+      level,
+      category,
+      subskill: spec.subskill,
+      difficulty: difficultyFor(level, i),
+      q: decorateStem(spec.q, level, i + localIndex * 3),
+      choices: spec.choices,
+      answer: spec.answer,
+      explain: spec.explain,
+    });
+  }
+
+  return items;
+}
+
+export const GRAMMAR_MCQ_ITEMS = Object.fromEntries(
+  GRAMMAR_MCQ_LEVELS.map(level => [level, buildLevel(level)]),
+);

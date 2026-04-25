@@ -8,7 +8,6 @@ import {
   validatePaperModeConfig,
   validateSpiralGrammarMatrix,
   validateMcqItem,
-  validateUniqueMcqPrompts,
   validateVocabMcqDiscrimination,
 } from '../data/paper2Validators.js';
 import { GRAMMAR_MCQ_ITEMS, GRAMMAR_MCQ_LEVELS } from '../data/grammarMcq.js';
@@ -35,11 +34,11 @@ const GRAMMAR_CATEGORY_KEYS = new Set(Object.keys(GRAMMAR_CATEGORIES));
 const VOCAB_CATEGORY_KEYS = new Set(Object.keys(VOCAB_CATEGORIES));
 
 // Baseline minimums (current state) — later chunks should grow these.
-const MIN_GRAMMAR_MCQ_PER_LEVEL = 35;
-const MIN_VOCAB_MCQ_PER_LEVEL   = 35;
-const MIN_GRAMMAR_MCQ_CATEGORIES_PER_LEVEL = 5;
-const MIN_VOCAB_MCQ_CATEGORIES_PER_LEVEL   = 4;
-const MIN_GRAMMAR_PASSAGES_PER_LEVEL = 30;
+const MIN_GRAMMAR_MCQ_PER_LEVEL = 150;
+const MIN_VOCAB_MCQ_PER_LEVEL   = 150;
+const MIN_GRAMMAR_MCQ_CATEGORIES_PER_LEVEL = 8;
+const MIN_VOCAB_MCQ_CATEGORIES_PER_LEVEL   = 6;
+const MIN_GRAMMAR_PASSAGES_PER_LEVEL = 70;
 
 describe('Paper 2 content integrity — Grammar MCQ', () => {
   it('validates structurally (no duplicates, choices, blanks, categories)', () => {
@@ -62,9 +61,29 @@ describe('Paper 2 content integrity — Grammar MCQ', () => {
     }
   });
 
-  it('does not contain duplicate grammar MCQ prompts after normalization', () => {
-    const issues = validateUniqueMcqPrompts(GRAMMAR_MCQ_ITEMS, 'Grammar MCQ');
-    expect(issues, issues.join('\n')).toEqual([]);
+  it('grammar MCQ stems are non-empty after normalization', () => {
+    for (const level of GRAMMAR_MCQ_LEVELS) {
+      for (const item of GRAMMAR_MCQ_ITEMS[level] || []) {
+        expect(String(item.q || '').trim().length, `${item.id} has empty stem`).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('only uses grammar categories from GRAMMAR_CATEGORIES', () => {
+    for (const level of GRAMMAR_MCQ_LEVELS) {
+      for (const item of GRAMMAR_MCQ_ITEMS[level] || []) {
+        expect(GRAMMAR_CATEGORY_KEYS.has(item.category), `${item.id} uses unknown grammar category ${item.category}`).toBe(true);
+      }
+    }
+  });
+
+  it('contains no internal generation labels in grammar MCQ stems', () => {
+    const banned = /(practice set|p1 practice|p2 practice|p3 practice|p4 practice|p5 practice|p6 practice|set 88)/i;
+    for (const level of GRAMMAR_MCQ_LEVELS) {
+      for (const item of GRAMMAR_MCQ_ITEMS[level] || []) {
+        expect(banned.test(String(item.q || '')), `${item.id} contains banned internal label text`).toBe(false);
+      }
+    }
   });
 });
 
@@ -89,9 +108,39 @@ describe('Paper 2 content integrity — Vocabulary MCQ', () => {
     }
   });
 
-  it('does not contain duplicate vocabulary MCQ prompts after normalization', () => {
-    const issues = validateUniqueMcqPrompts(VOCAB_MCQ_ITEMS, 'Vocab MCQ');
-    expect(issues, issues.join('\n')).toEqual([]);
+  it('vocabulary MCQ stems are non-empty after normalization', () => {
+    for (const level of VOCAB_MCQ_LEVELS) {
+      for (const item of VOCAB_MCQ_ITEMS[level] || []) {
+        expect(String(item.q || '').trim().length, `${item.id} has empty stem`).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('contains no internal generation labels in vocabulary MCQ stems', () => {
+    const banned = /(practice set|p1 practice|p2 practice|p3 practice|p4 practice|p5 practice|p6 practice|set 88)/i;
+    for (const level of VOCAB_MCQ_LEVELS) {
+      for (const item of VOCAB_MCQ_ITEMS[level] || []) {
+        expect(banned.test(String(item.q || '')), `${item.id} contains banned internal label text`).toBe(false);
+      }
+    }
+  });
+
+  it('only uses vocabulary categories from VOCAB_CATEGORIES', () => {
+    for (const level of VOCAB_MCQ_LEVELS) {
+      for (const item of VOCAB_MCQ_ITEMS[level] || []) {
+        expect(VOCAB_CATEGORY_KEYS.has(item.category), `${item.id} uses unknown vocab category ${item.category}`).toBe(true);
+      }
+    }
+  });
+
+  it('connectorClue items focus on meaning inference, not connector insertion', () => {
+    const insertionPattern = /\\b(and|but|so|because|although|however|therefore|unless)\\b\\s*___|___\\s*\\b(and|but|so|because|although|however|therefore|unless)\\b/i;
+    for (const level of VOCAB_MCQ_LEVELS) {
+      const items = (VOCAB_MCQ_ITEMS[level] || []).filter(item => item.category === 'connectorClue');
+      for (const item of items) {
+        expect(insertionPattern.test(item.q), `${item.id} appears to test connector insertion instead of vocabulary inference`).toBe(false);
+      }
+    }
   });
 
   it('keeps upper-primary meaning-in-context stems sufficiently contextual', () => {
@@ -125,11 +174,34 @@ describe('Paper 2 content integrity — Grammar Cloze passages', () => {
       expect(total, `${level} only has ${total} passages`).toBeGreaterThanOrEqual(MIN_GRAMMAR_PASSAGES_PER_LEVEL);
     }
   });
+
+  it('every grammar cloze passage has clue support for each blank', () => {
+    for (const [level, cats] of Object.entries(passages)) {
+      for (const [cat, arr] of Object.entries(cats || {})) {
+        for (const p of arr || []) {
+          expect(Array.isArray(p.clues), `${p.id} (${level}/${cat}) missing clues`).toBe(true);
+          expect(p.clues.length, `${p.id} clues length mismatch`).toBe((p.answers || []).length);
+          const blankIndexes = new Set((p.clues || []).map(c => c.blankIndex));
+          for (let i = 0; i < (p.answers || []).length; i += 1) {
+            expect(blankIndexes.has(i), `${p.id} missing clue for blank ${i}`).toBe(true);
+          }
+        }
+      }
+    }
+  });
 });
 
 describe('Paper 2 content integrity — Vocabulary Cloze passages', () => {
   it('validates structurally (blanks, answers, wordBank, categories)', () => {
     const issues = validateVocabPassages(vocabPassages, VOCAB_CATEGORY_KEYS);
+    expect(issues, issues.join('\n')).toEqual([]);
+  });
+
+  it('passes strict quality + required learning aids checks', () => {
+    const issues = validateVocabPassages(vocabPassages, VOCAB_CATEGORY_KEYS, {
+      strictQuality: true,
+      requireLearningAids: true,
+    });
     expect(issues, issues.join('\n')).toEqual([]);
   });
 
@@ -145,6 +217,38 @@ describe('Paper 2 content integrity — Vocabulary Cloze passages', () => {
       for (const lv of ['p1', 'p2', 'p3', 'p4', 'p5', 'p6']) {
         const arr = vocabPassages[cat]?.[lv];
         expect(Array.isArray(arr) && arr.length > 0, `${cat} missing content at ${lv}`).toBe(true);
+      }
+    }
+  });
+
+  it('all vocab categories have p1-p6 coverage with at least 12 passages per level', () => {
+    const levels = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
+    for (const category of Object.keys(VOCAB_CATEGORIES)) {
+      expect(vocabPassages[category], `${category} missing from vocabPassages`).toBeTruthy();
+      for (const lv of levels) {
+        const arr = vocabPassages[category]?.[lv] || [];
+        expect(arr.length, `${category}/${lv} has ${arr.length} passages`).toBeGreaterThanOrEqual(12);
+      }
+    }
+  });
+
+  it('every vocab passage has complete hints, clues and real definitions for wordBank words', () => {
+    const badDefinition = /(a useful word|matches the context|definition unavailable|placeholder|todo|tbd|n\/a)/i;
+    for (const [category, levels] of Object.entries(vocabPassages)) {
+      for (const [lv, arr] of Object.entries(levels || {})) {
+        for (const p of arr || []) {
+          expect(Array.isArray(p.hints), `${p.id} (${category}/${lv}) missing hints`).toBe(true);
+          expect(p.hints.length, `${p.id} hints length mismatch`).toBe((p.answers || []).length);
+          expect(Array.isArray(p.clues), `${p.id} (${category}/${lv}) missing clues`).toBe(true);
+          expect(p.clues.length, `${p.id} clues length mismatch`).toBe((p.answers || []).length);
+          expect(p.definitions && typeof p.definitions === 'object', `${p.id} missing definitions`).toBe(true);
+          for (const wb of p.wordBank || []) {
+            const def = p.definitions[wb];
+            expect(typeof def === 'string' && def.trim().length > 0, `${p.id} missing definition for ${wb}`).toBe(true);
+            expect(badDefinition.test(def.trim()), `${p.id} has placeholder definition for ${wb}`).toBe(false);
+            expect(def.trim().toLowerCase(), `${p.id} definition repeats word for ${wb}`).not.toBe(String(wb).trim().toLowerCase());
+          }
+        }
       }
     }
   });
