@@ -8083,3 +8083,153 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-size: var(--font-xs); color: var(--color-text-muted);
   margin-top: var(--space-1); font-weight: 400;
 }
+
+/* ── 15. UX Refresh (global quality pass) ───────────────────────────────── */
+:root {
+  --surface-3: #ece8ff;
+  --outline-ring: color-mix(in srgb, var(--color-primary) 40%, transparent);
+  --content-max: 560px;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  background:
+    radial-gradient(circle at 20% -10%, color-mix(in srgb, var(--color-primary) 18%, transparent), transparent 40%),
+    radial-gradient(circle at 85% 0%, color-mix(in srgb, var(--color-secondary) 14%, transparent), transparent 40%),
+    var(--bg);
+  padding: var(--space-4);
+}
+
+#app {
+  max-width: min(100%, var(--content-max));
+  border: 1px solid color-mix(in srgb, var(--border) 70%, var(--color-primary) 30%);
+  border-radius: 28px;
+}
+
+.screen {
+  overscroll-behavior: contain;
+  scroll-padding-top: var(--space-8);
+}
+
+/* More visible keyboard focus and larger tap targets. */
+:where(button, .btn, .icon-btn, .mode-card, .stories-banner, input, select, textarea) {
+  min-height: 44px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-primary);
+  box-shadow: 0 0 0 6px var(--outline-ring);
+}
+
+.btn,
+.icon-btn,
+.mode-card,
+.stories-banner,
+.stat-chip,
+.profile-chip {
+  transition:
+    transform var(--dur-fast) var(--ease-bounce),
+    box-shadow var(--dur-fast),
+    background-color var(--dur-fast),
+    border-color var(--dur-fast),
+    filter var(--dur-fast);
+}
+
+.btn:hover,
+.mode-card:hover,
+.stories-banner:hover,
+.profile-chip:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.mode-card,
+.stories-banner,
+.daily-goal,
+.guided-journey,
+.profile-card,
+.result-card,
+.game-card {
+  border-color: color-mix(in srgb, var(--border) 75%, var(--color-primary) 25%);
+  box-shadow: 0 10px 24px rgba(76, 70, 200, 0.08);
+}
+
+.app-header {
+  backdrop-filter: saturate(120%) blur(6px);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+
+.home-section-header,
+.home-section-header--collapsible {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-2) 72%, white), var(--surface));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.home-section-sub {
+  color: color-mix(in srgb, var(--text-muted) 82%, var(--text) 18%);
+  font-size: var(--font-size-sm);
+}
+
+input,
+select,
+textarea {
+  background: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.8rem;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 42%, var(--border));
+}
+
+/* Scrollbar polish */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-primary) 55%, #999) color-mix(in srgb, var(--surface-2) 70%, #fff);
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary) 55%, #999);
+  border: 2px solid color-mix(in srgb, var(--surface-2) 70%, #fff);
+}
+*::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--surface-2) 80%, white);
+}
+
+/* Better desktop ergonomics while preserving single-column pedagogy. */
+@media (min-width: 720px) {
+  body {
+    padding: var(--space-6);
+  }
+
+  #app {
+    border-radius: 32px;
+  }
+
+  .screen {
+    padding-inline: var(--space-6);
+  }
+}
+
+/* Honor OS reduced-motion preference for all transitions/animations. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
