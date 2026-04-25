@@ -85,6 +85,14 @@ describe('Paper 2 content integrity — Grammar MCQ', () => {
       }
     }
   });
+
+  it('only uses grammar categories from GRAMMAR_CATEGORIES', () => {
+    for (const level of GRAMMAR_MCQ_LEVELS) {
+      for (const item of GRAMMAR_MCQ_ITEMS[level] || []) {
+        expect(GRAMMAR_CATEGORY_KEYS.has(item.category), `${item.id} uses unknown grammar category ${item.category}`).toBe(true);
+      }
+    }
+  });
 });
 
 describe('Paper 2 content integrity — Vocabulary MCQ', () => {
@@ -121,6 +129,24 @@ describe('Paper 2 content integrity — Vocabulary MCQ', () => {
     for (const level of VOCAB_MCQ_LEVELS) {
       for (const item of VOCAB_MCQ_ITEMS[level] || []) {
         expect(banned.test(String(item.q || '')), `${item.id} contains banned internal label text`).toBe(false);
+      }
+    }
+  });
+
+  it('only uses vocabulary categories from VOCAB_CATEGORIES', () => {
+    for (const level of VOCAB_MCQ_LEVELS) {
+      for (const item of VOCAB_MCQ_ITEMS[level] || []) {
+        expect(VOCAB_CATEGORY_KEYS.has(item.category), `${item.id} uses unknown vocab category ${item.category}`).toBe(true);
+      }
+    }
+  });
+
+  it('connectorClue items focus on meaning inference, not connector insertion', () => {
+    const insertionPattern = /\\b(and|but|so|because|although|however|therefore|unless)\\b\\s*___|___\\s*\\b(and|but|so|because|although|however|therefore|unless)\\b/i;
+    for (const level of VOCAB_MCQ_LEVELS) {
+      const items = (VOCAB_MCQ_ITEMS[level] || []).filter(item => item.category === 'connectorClue');
+      for (const item of items) {
+        expect(insertionPattern.test(item.q), `${item.id} appears to test connector insertion instead of vocabulary inference`).toBe(false);
       }
     }
   });
