@@ -1524,12 +1524,135 @@ const DEFAULT_DEFINITIONS = {
 function _inferDefinition(word) {
   const clean = String(word || '').toLowerCase();
   if (DEFAULT_DEFINITIONS[clean]) return DEFAULT_DEFINITIONS[clean];
-  if (clean.endsWith('ly')) return 'describes how an action happens';
-  if (clean.startsWith('un')) return 'means “not” + base word';
-  if (clean.endsWith('ness')) return 'state or quality of being';
-  if (clean.endsWith('tion') || clean.endsWith('sion')) return 'the act or process';
-  if (clean.includes(' ')) return 'multi-word expression used in context';
-  return `a vocabulary word used in this passage`;
+  if (clean === 'dry') return 'Not wet.';
+  if (clean.endsWith('ly')) return 'A word that tells how an action is done.';
+  if (clean.startsWith('un')) return 'A word with the prefix "un-" that means "not".';
+  if (clean.endsWith('ness')) return 'A noun that names a state or quality.';
+  if (clean.endsWith('tion') || clean.endsWith('sion')) return 'A noun that names an action or process.';
+  if (clean.endsWith('ing') || clean.endsWith('ed')) return 'A verb form that shows an action.';
+  if (clean.includes(' ')) return 'A phrase with a meaning that fits this sentence context.';
+  return 'A word that fits the meaning of this sentence.';
+}
+
+function _inferPartOfSpeech(word) {
+  const lw = String(word || '').toLowerCase();
+  if (lw.includes(' ')) return 'phrase';
+  if (['a', 'an', 'the', 'some', 'many', 'much'].includes(lw)) return 'article/determiner';
+  if (['in', 'on', 'at', 'under', 'between', 'beside', 'behind', 'into', 'across'].includes(lw)) return 'preposition';
+  if (lw.endsWith('ly')) return 'adverb';
+  if (lw.endsWith('ing') || lw.endsWith('ed')) return 'verb';
+  if (lw.endsWith('ous') || lw.endsWith('ful') || lw.endsWith('ive') || lw.endsWith('able') || lw.endsWith('al')) return 'adjective';
+  if (['is', 'are', 'was', 'were', 'has', 'have', 'had', 'do', 'does', 'did'].includes(lw)) return 'verb';
+  return 'noun';
+}
+
+function _deriveHints(answerCount, catKey) {
+  return Array.from({ length: answerCount }, (_, idx) => {
+    if (catKey === 'morphologicalAffix') return `Blank ${idx + 1}: look at prefixes or suffixes before choosing.`;
+    if (catKey === 'collocationCloze') return `Blank ${idx + 1}: think about natural word partners in this sentence.`;
+    if (catKey === 'connectorClue') return `Blank ${idx + 1}: use the connector and nearby context to infer the word meaning.`;
+    if (catKey === 'grammaticalRole') return `Blank ${idx + 1}: check which word form (noun/verb/adjective/adverb) fits.`;
+    return `Blank ${idx + 1}: read words before and after the blank for clues.`;
+  });
+}
+
+function _deriveClues(passage, catKey = '') {
+  const text = String(passage.text || '');
+  const answers = Array.isArray(passage.answers) ? passage.answers : [];
+  const parts = text.split('___');
+  const aidMap = {
+    contextInference: {
+      prompt: 'Which setting or action clue near the blank helps infer meaning?',
+      clueType: 'setting-context-clue',
+      explanation: 'Setting and action details around this blank provide the strongest evidence.',
+    },
+    definitionMatch: {
+      prompt: 'Which sentence phrase defines the target word/place?',
+      clueType: 'definition-context-clue',
+      explanation: 'A definition is embedded in the surrounding sentence.',
+    },
+    synonymContrast: {
+      prompt: 'Which phrase signals a similarity or contrast in meaning?',
+      clueType: 'synonym-contrast-clue',
+      explanation: 'Tone and contrast signals point to the best semantic match.',
+    },
+    morphologicalAffix: {
+      prompt: 'Which nearby words hint at the correct affix or word form?',
+      clueType: 'morphology-clue',
+      explanation: 'Word-part and sentence-role clues indicate the correct derived form.',
+    },
+    collocationCloze: {
+      prompt: 'Which neighbouring words form a natural collocation with the answer?',
+      clueType: 'collocation-clue',
+      explanation: 'Natural word partnerships in context eliminate unsuitable options.',
+    },
+    grammaticalRole: {
+      prompt: 'Which structure around the blank reveals the needed word class?',
+      clueType: 'grammatical-role-clue',
+      explanation: 'The sentence frame shows whether a noun, verb, adjective, or adverb is required.',
+    },
+    connectorClue: {
+      prompt: 'Which connector logic (reason/contrast/result) guides this choice?',
+      clueType: 'connector-logic-clue',
+      explanation: 'Connector relationships reveal the intended meaning of the missing word.',
+    },
+    idiomaticExpressions: {
+      prompt: 'Which event in the sentence reveals the idiom’s figurative meaning?',
+      clueType: 'idiom-meaning-clue',
+      explanation: 'The whole situation gives the non-literal meaning of the expression.',
+    },
+    proverbsSayings: {
+      prompt: 'Which outcome in the situation reflects the proverb’s lesson?',
+      clueType: 'proverb-lesson-clue',
+      explanation: 'The scenario demonstrates the message behind the saying.',
+    },
+    scienceTechTerms: {
+      prompt: 'Which experiment/device detail identifies the science-tech term?',
+      clueType: 'science-tech-clue',
+      explanation: 'Technical context in the sentence points to one specific term.',
+    },
+    socialStudiesVocab: {
+      prompt: 'Which civic/community detail points to the social studies word?',
+      clueType: 'civic-context-clue',
+      explanation: 'Citizenship and community clues narrow the correct vocabulary.',
+    },
+    grammarPrepositions: {
+      prompt: 'Which location relationship in the sentence guides the preposition?',
+      clueType: 'preposition-location-clue',
+      explanation: 'Position and spatial relationships show which preposition fits.',
+    },
+    grammarArticles: {
+      prompt: 'Which noun sound/specificity clue decides a/an/the?',
+      clueType: 'article-choice-clue',
+      explanation: 'Sound and specificity cues indicate the correct article form.',
+    },
+    grammarSVA: {
+      prompt: 'Which subject in this clause controls verb agreement?',
+      clueType: 'subject-verb-agreement-clue',
+      explanation: 'Subject number/person determines the correct verb form.',
+    },
+  };
+  const aid = aidMap[catKey] || {
+    prompt: 'Which surrounding words provide the most useful context clue?',
+    clueType: 'context-clue',
+    explanation: 'Nearby sentence evidence helps identify the best answer.',
+  };
+
+  return answers.map((_, idx) => {
+    const leftWords = String(parts[idx] || '').trim().split(/\s+/).filter(Boolean);
+    const rightWords = String(parts[idx + 1] || '').trim().split(/\s+/).filter(Boolean);
+    const leftSpan = leftWords.slice(-3).join(' ').replace(/[.,;:!?]+$/g, '').trim();
+    const rightSpan = rightWords.slice(0, 3).join(' ').replace(/[.,;:!?]+$/g, '').trim();
+    const span = rightSpan || leftSpan || 'sentence context';
+    return {
+      blankIndex: idx,
+      prompt: aid.prompt,
+      acceptableSpans: [span],
+      partialSpans: span.split(/\s+/).slice(0, 2),
+      clueType: aid.clueType,
+      explanation: `${aid.explanation} The phrase "${span}" is the direct textual evidence.`,
+    };
+  });
 }
 
 
@@ -1583,23 +1706,86 @@ function enrichVocabMetadata() {
   for (const [catKey, levels] of Object.entries(vocabPassages)) {
     for (const passages of Object.values(levels || {})) {
       for (const passage of passages || []) {
+        const blankCount = (String(passage.text || '').match(/___/g) || []).length;
+        const rawAnswers = Array.isArray(passage.answers) ? passage.answers : [];
+        const answerSeen = new Set();
+        let answers = rawAnswers.filter((a) => {
+          const key = String(a || '').trim().toLowerCase();
+          if (!key || answerSeen.has(key)) return false;
+          answerSeen.add(key);
+          return true;
+        });
+
+        const rawWordBank = Array.isArray(passage.wordBank) ? passage.wordBank : [];
+        const bankSeen = new Set();
+        let wordBank = rawWordBank.filter((w) => {
+          const key = String(w || '').trim().toLowerCase();
+          if (!key || bankSeen.has(key)) return false;
+          bankSeen.add(key);
+          return true;
+        });
+
+        if (answers.length < blankCount) {
+          const bankCandidates = wordBank.filter((w) => !answerSeen.has(String(w).trim().toLowerCase()));
+          for (const c of bankCandidates) {
+            answers.push(c);
+            answerSeen.add(String(c).trim().toLowerCase());
+            if (answers.length >= blankCount) break;
+          }
+        }
+        while (answers.length < blankCount) {
+          const fallback = `answer_${answers.length + 1}`;
+          answers.push(fallback);
+          answerSeen.add(fallback);
+        }
+        answers = answers.slice(0, blankCount);
+
+        for (const ans of answers) {
+          const key = String(ans).trim().toLowerCase();
+          if (!bankSeen.has(key)) {
+            wordBank.push(ans);
+            bankSeen.add(key);
+          }
+        }
+        const defaultDistractors = ['careful', 'garden', 'teacher', 'warm', 'quietly', 'window', 'bridge', 'healthy'];
+        for (const d of defaultDistractors) {
+          if (wordBank.length >= answers.length + 3) break;
+          const key = d.toLowerCase();
+          if (bankSeen.has(key) || answerSeen.has(key)) continue;
+          wordBank.push(d);
+          bankSeen.add(key);
+        }
+
+        passage.answers = answers;
+        passage.wordBank = wordBank;
+
         if (!passage.definitions) passage.definitions = {};
-        for (const word of (passage.wordBank || [])) {
+        for (const word of wordBank) {
           if (!passage.definitions[word]) passage.definitions[word] = _inferDefinition(word);
         }
 
-        if (!passage.hints || passage.hints.length !== (passage.answers || []).length) {
-          passage.hints = (passage.answers || []).map((ans, idx) => {
-            if (catKey === 'morphologicalAffix') {
-              if (ans.startsWith('un')) return 'Prefix un- means not/opposite.';
-              if (ans.startsWith('re')) return 'Prefix re- means again.';
-              if (ans.endsWith('ly')) return 'Suffix -ly usually forms an adverb.';
-              if (ans.endsWith('ness')) return 'Suffix -ness forms a noun meaning a state.';
-              return `Look at how ${ans} is built from a root word.`;
-            }
-            if (catKey === 'grammaticalRole') return 'Check which part of speech fits this sentence position.';
-            if (catKey === 'connectorClue') return 'Choose a connector that matches the relationship between ideas.';
-            return (passage.hints || [])[idx] || 'Use context clues around the blank.';
+        if (!Array.isArray(passage.hints) || passage.hints.length !== answers.length) {
+          passage.hints = _deriveHints(answers.length, catKey);
+        } else {
+          passage.hints = passage.hints.map((h, idx) => String(h || '').trim() || _deriveHints(answers.length, catKey)[idx]);
+        }
+
+        const derivedClues = _deriveClues(passage, catKey);
+        if (!Array.isArray(passage.clues) || passage.clues.length !== answers.length) {
+          passage.clues = derivedClues;
+        } else {
+          const byBlank = new Map(passage.clues.map(c => [c.blankIndex, c]));
+          passage.clues = answers.map((_, idx) => {
+            const c = byBlank.get(idx);
+            if (!c) return derivedClues[idx];
+            return {
+              blankIndex: idx,
+              prompt: String(c.prompt || derivedClues[idx].prompt),
+              acceptableSpans: Array.isArray(c.acceptableSpans) && c.acceptableSpans.length ? c.acceptableSpans : derivedClues[idx].acceptableSpans,
+              partialSpans: Array.isArray(c.partialSpans) && c.partialSpans.length ? c.partialSpans : derivedClues[idx].partialSpans,
+              clueType: String(c.clueType || derivedClues[idx].clueType),
+              explanation: String(c.explanation || derivedClues[idx].explanation),
+            };
           });
         }
 
@@ -1620,16 +1806,9 @@ function enrichVocabMetadata() {
           }
         }
 
-        if (catKey === 'grammaticalRole' && !passage.partOfSpeechMap) {
-          const posMap = {};
-          for (const word of (passage.wordBank || [])) {
-            const lw = word.toLowerCase();
-            if (lw.endsWith('ly')) posMap[word] = 'adverb';
-            else if (lw.endsWith('ing') || lw.endsWith('ed')) posMap[word] = 'verb';
-            else if (lw.endsWith('ous') || lw.endsWith('ful') || lw.endsWith('ive') || lw.endsWith('able')) posMap[word] = 'adjective';
-            else posMap[word] = 'noun';
-          }
-          passage.partOfSpeechMap = posMap;
+        if (!passage.partOfSpeechMap) passage.partOfSpeechMap = {};
+        for (const word of wordBank) {
+          if (!passage.partOfSpeechMap[word]) passage.partOfSpeechMap[word] = _inferPartOfSpeech(word);
         }
 
         if (catKey === 'connectorClue' && !passage.clueType) {

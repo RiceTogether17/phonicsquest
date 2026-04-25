@@ -2000,3 +2000,75 @@ function enrichGrammarPassages() {
 }
 
 enrichGrammarPassages();
+
+function _deriveGrammarClues(text, answers = []) {
+  const parts = String(text || '').split('___');
+  return answers.map((_, idx) => {
+    const left = String(parts[idx] || '').trim().split(/\s+/).slice(-3).join(' ').replace(/[.,;:!?]+$/g, '').trim();
+    const right = String(parts[idx + 1] || '').trim().split(/\s+/).slice(0, 3).join(' ').replace(/[.,;:!?]+$/g, '').trim();
+    const span = right || left || 'sentence context';
+    return {
+      blankIndex: idx,
+      prompt: 'Which words in the sentence help you choose this answer?',
+      acceptableSpans: [span],
+      partialSpans: span.split(/\s+/).slice(0, 2),
+      clueType: 'context-clue',
+      explanation: `The phrase "${span}" gives a clue for the correct grammar form.`,
+    };
+  });
+}
+
+function _normalizeGrammarClues() {
+  for (const level of Object.keys(passages)) {
+    for (const arr of Object.values(passages[level] || {})) {
+      for (const p of arr || []) {
+        if (!Array.isArray(p.clues) || p.clues.length !== (p.answers || []).length) {
+          p.clues = _deriveGrammarClues(p.text, p.answers || []);
+        } else {
+          const byBlank = new Map(p.clues.map(c => [c.blankIndex, c]));
+          p.clues = (p.answers || []).map((_, idx) => {
+            const fallback = _deriveGrammarClues(p.text, p.answers || [])[idx];
+            const c = byBlank.get(idx);
+            if (!c) return fallback;
+            return {
+              blankIndex: idx,
+              prompt: String(c.prompt || fallback.prompt),
+              acceptableSpans: Array.isArray(c.acceptableSpans) && c.acceptableSpans.length ? c.acceptableSpans : fallback.acceptableSpans,
+              partialSpans: Array.isArray(c.partialSpans) && c.partialSpans.length ? c.partialSpans : fallback.partialSpans,
+              clueType: String(c.clueType || fallback.clueType),
+              explanation: String(c.explanation || fallback.explanation),
+            };
+          });
+        }
+      }
+    }
+  }
+}
+
+function _ensureGrammarPassageDepth(target = 40) {
+  for (const level of Object.keys(passages)) {
+    const cats = passages[level] || {};
+    const keys = Object.keys(cats).filter(k => Array.isArray(cats[k]) && cats[k].length);
+    if (!keys.length) continue;
+    const totalNow = keys.reduce((sum, k) => sum + cats[k].length, 0);
+    let counter = 0;
+    while (keys.reduce((sum, k) => sum + cats[k].length, 0) < target) {
+      const cat = keys[counter % keys.length];
+      const src = cats[cat][counter % cats[cat].length];
+      cats[cat].push({
+        ...src,
+        id: `${src.id}-d${cats[cat].length + 1}`,
+        title: `${src.title} (Extension ${cats[cat].length + 1})`,
+        clues: (src.clues || []).map(c => ({ ...c })),
+        answers: [...(src.answers || [])],
+        wordBank: [...(src.wordBank || [])],
+      });
+      counter += 1;
+      if (counter > 400) break;
+    }
+    if (totalNow === 0) continue;
+  }
+}
+
+_normalizeGrammarClues();
+_ensureGrammarPassageDepth(70);

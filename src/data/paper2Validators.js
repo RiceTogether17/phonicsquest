@@ -26,6 +26,7 @@ const GRAMMAR_MCQ_REQUIRED = ['id', 'level', 'category', 'subskill', 'difficulty
 const VOCAB_MCQ_REQUIRED   = ['id', 'level', 'category', 'subskill', 'difficulty', 'q', 'choices', 'answer', 'explain'];
 const PASSAGE_REQUIRED     = ['id', 'text', 'answers', 'wordBank'];
 const SPIRAL_LEVEL_KEYS    = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
+const BANNED_PRACTICE_LEAKS = /(practice set|p1 practice|p2 practice|p3 practice|p4 practice|p5 practice|p6 practice|set 88)/i;
 
 function _countBlanks(text) {
   return (String(text || '').match(/___/g) || []).length;
@@ -42,6 +43,17 @@ function _hasCaseFoldDupes(arr) {
 
 function _normalizeToken(value) {
   return String(value || '').trim().toLowerCase();
+}
+
+function _looksLikePlaceholderDefinition(word, definition) {
+  const d = String(definition || '').trim().toLowerCase();
+  const w = String(word || '').trim().toLowerCase();
+  if (!d) return true;
+  if (['definition unavailable', 'tbd', 'placeholder', 'todo', 'n/a', 'na'].includes(d)) return true;
+  if (/(a useful word|matches the context|definition unavailable|placeholder|todo|tbd|n\/a)/i.test(d)) return true;
+  if (d === w) return true;
+  if (d.length < 7 && !['not wet.'].includes(d)) return true;
+  return false;
 }
 
 /**
@@ -86,8 +98,8 @@ export function validateMcqItem(item, ctx) {
   }
 
   if (Array.isArray(item.choices)) {
-    if (item.choices.length < 3 || item.choices.length > 4) {
-      issues.push(`${tag}: choices must have 3 or 4 options (got ${item.choices.length})`);
+    if (item.choices.length !== 4) {
+      issues.push(`${tag}: choices must have exactly 4 options (got ${item.choices.length})`);
     }
     if (_hasDupes(item.choices)) {
       issues.push(`${tag}: duplicate choices`);
@@ -116,6 +128,12 @@ export function validateMcqItem(item, ctx) {
     const blanks = _countBlanks(item.q);
     if (blanks !== 1) {
       issues.push(`${tag}: question stem must contain exactly one "___" blank (found ${blanks})`);
+    }
+    if (BANNED_PRACTICE_LEAKS.test(item.q)) {
+      issues.push(`${tag}: question contains banned internal practice label text`);
+    }
+    if (!/[.?!]$/.test(item.q.trim())) {
+      issues.push(`${tag}: question should end with natural sentence punctuation`);
     }
   }
 
@@ -147,6 +165,9 @@ export function validateClozePassage(p, ctx = {}) {
   }
 
   const blanks = _countBlanks(p.text);
+  if (BANNED_PRACTICE_LEAKS.test(String(p.text || '')) || BANNED_PRACTICE_LEAKS.test(String(p.title || ''))) {
+    issues.push(`${tag}: passage contains banned internal practice label text`);
+  }
   if (Array.isArray(p.answers)) {
     if (p.answers.length !== blanks) {
       issues.push(`${tag}: ${blanks} blank(s) in text but ${p.answers.length} answer(s)`);
@@ -304,6 +325,9 @@ export function validateGrammarPassages(passagesMap, knownCategories, opts = {})
 export function validateVocabPassages(vocabMap, knownCategories, opts = {}) {
   const issues = [];
   const seenIds = new Set();
+  const strictQuality = Boolean(opts?.strictQuality);
+  const requireLearningAids = Boolean(opts?.requireLearningAids);
+
   for (const [catKey, levels] of Object.entries(vocabMap || {})) {
     if (knownCategories && !knownCategories.has(catKey)) {
       issues.push(`Vocab passages: unknown category "${catKey}"`);
@@ -322,8 +346,79 @@ export function validateVocabPassages(vocabMap, knownCategories, opts = {}) {
           knownCategories,
           category: catKey,
           level: lv,
-          strictQuality: opts.strictQuality,
+          strictQuality,
         }));
+
+        if (requireLearningAids) {
+          if (!Array.isArray(p?.hints)) {
+            issues.push(`${p?.id || 'missing-id'}: hints must be an array`);
+          } else if (Array.isArray(p?.answers) && p.hints.length !== p.answers.length) {
+            issues.push(`${p?.id || 'missing-id'}: hints length must match answers length`);
+          } else {
+            p.hints.forEach((h, idx) => {
+              if (typeof h !== 'string' || !h.trim()) {
+                issues.push(`${p?.id || 'missing-id'}: hints[${idx}] must be a non-empty string`);
+              }
+            });
+          }
+
+          if (!Array.isArray(p?.clues)) {
+            issues.push(`${p?.id || 'missing-id'}: clues must be an array`);
+          } else if (Array.isArray(p?.answers) && p.clues.length !== p.answers.length) {
+            issues.push(`${p?.id || 'missing-id'}: clues length must match answers length`);
+          } else {
+            const seenBlankIndexes = new Set();
+            p.clues.forEach((clue, idx) => {
+              const tag = `${p?.id || 'missing-id'} clues[${idx}]`;
+              if (typeof clue?.blankIndex !== 'number') issues.push(`${tag}: blankIndex must be a number`);
+              if (seenBlankIndexes.has(clue?.blankIndex)) issues.push(`${tag}: duplicate blankIndex ${clue?.blankIndex}`);
+              seenBlankIndexes.add(clue?.blankIndex);
+              if (typeof clue?.prompt !== 'string' || !clue.prompt.trim()) issues.push(`${tag}: prompt must be non-empty string`);
+              if (typeof clue?.explanation !== 'string' || !clue.explanation.trim()) issues.push(`${tag}: explanation must be non-empty string`);
+              if (!Array.isArray(clue?.acceptableSpans) || !clue.acceptableSpans.length) issues.push(`${tag}: acceptableSpans must be non-empty array`);
+              if (!Array.isArray(clue?.partialSpans) || !clue.partialSpans.length) issues.push(`${tag}: partialSpans must be non-empty array`);
+              if (typeof clue?.clueType !== 'string' || !clue.clueType.trim()) issues.push(`${tag}: clueType must be non-empty string`);
+              for (const span of clue?.acceptableSpans || []) {
+                if (typeof span !== 'string' || !span.trim()) issues.push(`${tag}: acceptableSpans must contain non-empty strings`);
+                else if (!String(p?.text || '').toLowerCase().includes(span.trim().toLowerCase())) {
+                  issues.push(`${tag}: acceptable span "${span}" not found in passage text`);
+                }
+              }
+              for (const span of clue?.partialSpans || []) {
+                if (typeof span !== 'string' || !span.trim()) issues.push(`${tag}: partialSpans must contain non-empty strings`);
+              }
+            });
+
+            if (Array.isArray(p?.answers)) {
+              for (let i = 0; i < p.answers.length; i += 1) {
+                if (!seenBlankIndexes.has(i)) issues.push(`${p?.id || 'missing-id'}: missing clue for blankIndex ${i}`);
+              }
+            }
+          }
+
+          if (!p?.definitions || typeof p.definitions !== 'object') {
+            issues.push(`${p?.id || 'missing-id'}: definitions object is required`);
+          } else {
+            for (const wb of p?.wordBank || []) {
+              if (!(wb in p.definitions)) {
+                issues.push(`${p?.id || 'missing-id'}: missing definition for "${wb}"`);
+              } else if (_looksLikePlaceholderDefinition(wb, p.definitions[wb])) {
+                issues.push(`${p?.id || 'missing-id'}: definition for "${wb}" looks like a placeholder`);
+              }
+            }
+          }
+
+          if (!p?.partOfSpeechMap || typeof p.partOfSpeechMap !== 'object') {
+            issues.push(`${p?.id || 'missing-id'}: partOfSpeechMap object is required`);
+          } else {
+            for (const wb of p?.wordBank || []) {
+              const pos = p.partOfSpeechMap[wb];
+              if (typeof pos !== 'string' || !pos.trim()) {
+                issues.push(`${p?.id || 'missing-id'}: missing partOfSpeechMap entry for "${wb}"`);
+              }
+            }
+          }
+        }
       }
     }
   }

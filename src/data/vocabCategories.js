@@ -53,7 +53,7 @@ export const VOCAB_CATEGORIES = {
     label: 'Connectors',
     icon: '🔗',
     color: '#0d9488',
-    desc: 'Link ideas with the right connector word',
+    desc: 'Use connectors as clues to infer word meaning',
   },
   idiomaticExpressions: {
     label: 'Idiomatic Expressions',
