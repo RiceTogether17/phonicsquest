@@ -50,8 +50,9 @@ function _looksLikePlaceholderDefinition(word, definition) {
   const w = String(word || '').trim().toLowerCase();
   if (!d) return true;
   if (['definition unavailable', 'tbd', 'placeholder', 'todo', 'n/a', 'na'].includes(d)) return true;
+  if (/(a useful word|matches the context|definition unavailable|placeholder|todo|tbd|n\/a)/i.test(d)) return true;
   if (d === w) return true;
-  if (d.length < 7 && d !== 'not wet.') return true;
+  if (d.length < 7 && !['not wet.'].includes(d)) return true;
   return false;
 }
 

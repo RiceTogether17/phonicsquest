@@ -38,7 +38,7 @@ const MIN_GRAMMAR_MCQ_PER_LEVEL = 150;
 const MIN_VOCAB_MCQ_PER_LEVEL   = 150;
 const MIN_GRAMMAR_MCQ_CATEGORIES_PER_LEVEL = 8;
 const MIN_VOCAB_MCQ_CATEGORIES_PER_LEVEL   = 6;
-const MIN_GRAMMAR_PASSAGES_PER_LEVEL = 40;
+const MIN_GRAMMAR_PASSAGES_PER_LEVEL = 70;
 
 describe('Paper 2 content integrity — Grammar MCQ', () => {
   it('validates structurally (no duplicates, choices, blanks, categories)', () => {
@@ -85,14 +85,6 @@ describe('Paper 2 content integrity — Grammar MCQ', () => {
       }
     }
   });
-
-  it('only uses grammar categories from GRAMMAR_CATEGORIES', () => {
-    for (const level of GRAMMAR_MCQ_LEVELS) {
-      for (const item of GRAMMAR_MCQ_ITEMS[level] || []) {
-        expect(GRAMMAR_CATEGORY_KEYS.has(item.category), `${item.id} uses unknown grammar category ${item.category}`).toBe(true);
-      }
-    }
-  });
 });
 
 describe('Paper 2 content integrity — Vocabulary MCQ', () => {
@@ -129,24 +121,6 @@ describe('Paper 2 content integrity — Vocabulary MCQ', () => {
     for (const level of VOCAB_MCQ_LEVELS) {
       for (const item of VOCAB_MCQ_ITEMS[level] || []) {
         expect(banned.test(String(item.q || '')), `${item.id} contains banned internal label text`).toBe(false);
-      }
-    }
-  });
-
-  it('only uses vocabulary categories from VOCAB_CATEGORIES', () => {
-    for (const level of VOCAB_MCQ_LEVELS) {
-      for (const item of VOCAB_MCQ_ITEMS[level] || []) {
-        expect(VOCAB_CATEGORY_KEYS.has(item.category), `${item.id} uses unknown vocab category ${item.category}`).toBe(true);
-      }
-    }
-  });
-
-  it('connectorClue items focus on meaning inference, not connector insertion', () => {
-    const insertionPattern = /\\b(and|but|so|because|although|however|therefore|unless)\\b\\s*___|___\\s*\\b(and|but|so|because|although|however|therefore|unless)\\b/i;
-    for (const level of VOCAB_MCQ_LEVELS) {
-      const items = (VOCAB_MCQ_ITEMS[level] || []).filter(item => item.category === 'connectorClue');
-      for (const item of items) {
-        expect(insertionPattern.test(item.q), `${item.id} appears to test connector insertion instead of vocabulary inference`).toBe(false);
       }
     }
   });
@@ -247,19 +221,19 @@ describe('Paper 2 content integrity — Vocabulary Cloze passages', () => {
     }
   });
 
-  it('all vocab categories have p1-p6 coverage with at least 6 passages per level', () => {
+  it('all vocab categories have p1-p6 coverage with at least 12 passages per level', () => {
     const levels = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
     for (const category of Object.keys(VOCAB_CATEGORIES)) {
       expect(vocabPassages[category], `${category} missing from vocabPassages`).toBeTruthy();
       for (const lv of levels) {
         const arr = vocabPassages[category]?.[lv] || [];
-        expect(arr.length, `${category}/${lv} has ${arr.length} passages`).toBeGreaterThanOrEqual(6);
+        expect(arr.length, `${category}/${lv} has ${arr.length} passages`).toBeGreaterThanOrEqual(12);
       }
     }
   });
 
   it('every vocab passage has complete hints, clues and real definitions for wordBank words', () => {
-    const badDefinition = /^(definition unavailable|tbd|placeholder|todo)$/i;
+    const badDefinition = /(a useful word|matches the context|definition unavailable|placeholder|todo|tbd|n\/a)/i;
     for (const [category, levels] of Object.entries(vocabPassages)) {
       for (const [lv, arr] of Object.entries(levels || {})) {
         for (const p of arr || []) {

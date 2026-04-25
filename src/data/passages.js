@@ -2071,4 +2071,4 @@ function _ensureGrammarPassageDepth(target = 40) {
 }
 
 _normalizeGrammarClues();
-_ensureGrammarPassageDepth(40);
+_ensureGrammarPassageDepth(70);
