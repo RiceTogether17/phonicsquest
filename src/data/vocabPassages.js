@@ -1556,10 +1556,87 @@ function _deriveHints(answerCount, catKey) {
   });
 }
 
-function _deriveClues(passage) {
+function _deriveClues(passage, catKey = '') {
   const text = String(passage.text || '');
   const answers = Array.isArray(passage.answers) ? passage.answers : [];
   const parts = text.split('___');
+  const aidMap = {
+    contextInference: {
+      prompt: 'Which setting or action clue near the blank helps infer meaning?',
+      clueType: 'setting-context-clue',
+      explanation: 'Setting and action details around this blank provide the strongest evidence.',
+    },
+    definitionMatch: {
+      prompt: 'Which sentence phrase defines the target word/place?',
+      clueType: 'definition-context-clue',
+      explanation: 'A definition is embedded in the surrounding sentence.',
+    },
+    synonymContrast: {
+      prompt: 'Which phrase signals a similarity or contrast in meaning?',
+      clueType: 'synonym-contrast-clue',
+      explanation: 'Tone and contrast signals point to the best semantic match.',
+    },
+    morphologicalAffix: {
+      prompt: 'Which nearby words hint at the correct affix or word form?',
+      clueType: 'morphology-clue',
+      explanation: 'Word-part and sentence-role clues indicate the correct derived form.',
+    },
+    collocationCloze: {
+      prompt: 'Which neighbouring words form a natural collocation with the answer?',
+      clueType: 'collocation-clue',
+      explanation: 'Natural word partnerships in context eliminate unsuitable options.',
+    },
+    grammaticalRole: {
+      prompt: 'Which structure around the blank reveals the needed word class?',
+      clueType: 'grammatical-role-clue',
+      explanation: 'The sentence frame shows whether a noun, verb, adjective, or adverb is required.',
+    },
+    connectorClue: {
+      prompt: 'Which connector logic (reason/contrast/result) guides this choice?',
+      clueType: 'connector-logic-clue',
+      explanation: 'Connector relationships reveal the intended meaning of the missing word.',
+    },
+    idiomaticExpressions: {
+      prompt: 'Which event in the sentence reveals the idiom’s figurative meaning?',
+      clueType: 'idiom-meaning-clue',
+      explanation: 'The whole situation gives the non-literal meaning of the expression.',
+    },
+    proverbsSayings: {
+      prompt: 'Which outcome in the situation reflects the proverb’s lesson?',
+      clueType: 'proverb-lesson-clue',
+      explanation: 'The scenario demonstrates the message behind the saying.',
+    },
+    scienceTechTerms: {
+      prompt: 'Which experiment/device detail identifies the science-tech term?',
+      clueType: 'science-tech-clue',
+      explanation: 'Technical context in the sentence points to one specific term.',
+    },
+    socialStudiesVocab: {
+      prompt: 'Which civic/community detail points to the social studies word?',
+      clueType: 'civic-context-clue',
+      explanation: 'Citizenship and community clues narrow the correct vocabulary.',
+    },
+    grammarPrepositions: {
+      prompt: 'Which location relationship in the sentence guides the preposition?',
+      clueType: 'preposition-location-clue',
+      explanation: 'Position and spatial relationships show which preposition fits.',
+    },
+    grammarArticles: {
+      prompt: 'Which noun sound/specificity clue decides a/an/the?',
+      clueType: 'article-choice-clue',
+      explanation: 'Sound and specificity cues indicate the correct article form.',
+    },
+    grammarSVA: {
+      prompt: 'Which subject in this clause controls verb agreement?',
+      clueType: 'subject-verb-agreement-clue',
+      explanation: 'Subject number/person determines the correct verb form.',
+    },
+  };
+  const aid = aidMap[catKey] || {
+    prompt: 'Which surrounding words provide the most useful context clue?',
+    clueType: 'context-clue',
+    explanation: 'Nearby sentence evidence helps identify the best answer.',
+  };
 
   return answers.map((_, idx) => {
     const leftWords = String(parts[idx] || '').trim().split(/\s+/).filter(Boolean);
@@ -1569,11 +1646,11 @@ function _deriveClues(passage) {
     const span = rightSpan || leftSpan || 'sentence context';
     return {
       blankIndex: idx,
-      prompt: 'Which word or phrase helps you choose the answer?',
+      prompt: aid.prompt,
       acceptableSpans: [span],
       partialSpans: span.split(/\s+/).slice(0, 2),
-      clueType: 'context-clue',
-      explanation: `The phrase "${span}" gives context that supports the best answer choice.`,
+      clueType: aid.clueType,
+      explanation: `${aid.explanation} The phrase "${span}" is the direct textual evidence.`,
     };
   });
 }
@@ -1693,20 +1770,21 @@ function enrichVocabMetadata() {
           passage.hints = passage.hints.map((h, idx) => String(h || '').trim() || _deriveHints(answers.length, catKey)[idx]);
         }
 
+        const derivedClues = _deriveClues(passage, catKey);
         if (!Array.isArray(passage.clues) || passage.clues.length !== answers.length) {
-          passage.clues = _deriveClues(passage);
+          passage.clues = derivedClues;
         } else {
           const byBlank = new Map(passage.clues.map(c => [c.blankIndex, c]));
           passage.clues = answers.map((_, idx) => {
             const c = byBlank.get(idx);
-            if (!c) return _deriveClues(passage)[idx];
+            if (!c) return derivedClues[idx];
             return {
               blankIndex: idx,
-              prompt: String(c.prompt || 'Which word or phrase helps you choose the answer?'),
-              acceptableSpans: Array.isArray(c.acceptableSpans) && c.acceptableSpans.length ? c.acceptableSpans : _deriveClues(passage)[idx].acceptableSpans,
-              partialSpans: Array.isArray(c.partialSpans) && c.partialSpans.length ? c.partialSpans : _deriveClues(passage)[idx].partialSpans,
-              clueType: String(c.clueType || 'context-clue'),
-              explanation: String(c.explanation || _deriveClues(passage)[idx].explanation),
+              prompt: String(c.prompt || derivedClues[idx].prompt),
+              acceptableSpans: Array.isArray(c.acceptableSpans) && c.acceptableSpans.length ? c.acceptableSpans : derivedClues[idx].acceptableSpans,
+              partialSpans: Array.isArray(c.partialSpans) && c.partialSpans.length ? c.partialSpans : derivedClues[idx].partialSpans,
+              clueType: String(c.clueType || derivedClues[idx].clueType),
+              explanation: String(c.explanation || derivedClues[idx].explanation),
             };
           });
         }

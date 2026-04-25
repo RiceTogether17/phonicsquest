@@ -39,6 +39,7 @@ const MIN_VOCAB_MCQ_PER_LEVEL   = 150;
 const MIN_GRAMMAR_MCQ_CATEGORIES_PER_LEVEL = 8;
 const MIN_VOCAB_MCQ_CATEGORIES_PER_LEVEL   = 6;
 const MIN_GRAMMAR_PASSAGES_PER_LEVEL = 70;
+const BANNED_INTERNAL_LABEL = /(practice set|p1 practice|p2 practice|p3 practice|p4 practice|p5 practice|p6 practice|set 88)/i;
 
 describe('Paper 2 content integrity — Grammar MCQ', () => {
   it('validates structurally (no duplicates, choices, blanks, categories)', () => {
@@ -78,10 +79,9 @@ describe('Paper 2 content integrity — Grammar MCQ', () => {
   });
 
   it('contains no internal generation labels in grammar MCQ stems', () => {
-    const banned = /(practice set|p1 practice|p2 practice|p3 practice|p4 practice|p5 practice|p6 practice|set 88)/i;
     for (const level of GRAMMAR_MCQ_LEVELS) {
       for (const item of GRAMMAR_MCQ_ITEMS[level] || []) {
-        expect(banned.test(String(item.q || '')), `${item.id} contains banned internal label text`).toBe(false);
+        expect(BANNED_INTERNAL_LABEL.test(String(item.q || '')), `${item.id} contains banned internal label text`).toBe(false);
       }
     }
   });
@@ -117,10 +117,9 @@ describe('Paper 2 content integrity — Vocabulary MCQ', () => {
   });
 
   it('contains no internal generation labels in vocabulary MCQ stems', () => {
-    const banned = /(practice set|p1 practice|p2 practice|p3 practice|p4 practice|p5 practice|p6 practice|set 88)/i;
     for (const level of VOCAB_MCQ_LEVELS) {
       for (const item of VOCAB_MCQ_ITEMS[level] || []) {
-        expect(banned.test(String(item.q || '')), `${item.id} contains banned internal label text`).toBe(false);
+        expect(BANNED_INTERNAL_LABEL.test(String(item.q || '')), `${item.id} contains banned internal label text`).toBe(false);
       }
     }
   });
@@ -189,6 +188,17 @@ describe('Paper 2 content integrity — Grammar Cloze passages', () => {
       }
     }
   });
+
+  it('contains no internal generation labels in grammar cloze titles/text', () => {
+    for (const [level, cats] of Object.entries(passages)) {
+      for (const [cat, arr] of Object.entries(cats || {})) {
+        for (const p of arr || []) {
+          expect(BANNED_INTERNAL_LABEL.test(String(p.title || '')), `${p.id} (${level}/${cat}) has banned label in title`).toBe(false);
+          expect(BANNED_INTERNAL_LABEL.test(String(p.text || '')), `${p.id} (${level}/${cat}) has banned label in text`).toBe(false);
+        }
+      }
+    }
+  });
 });
 
 describe('Paper 2 content integrity — Vocabulary Cloze passages', () => {
@@ -234,13 +244,21 @@ describe('Paper 2 content integrity — Vocabulary Cloze passages', () => {
 
   it('every vocab passage has complete hints, clues and real definitions for wordBank words', () => {
     const badDefinition = /(a useful word|matches the context|definition unavailable|placeholder|todo|tbd|n\/a)/i;
+    const genericHint = /(choose the best word|read carefully|fill in the blank)/i;
+    const genericPrompt = /(which word or phrase helps you choose the answer|best clue for this blank)/i;
     for (const [category, levels] of Object.entries(vocabPassages)) {
       for (const [lv, arr] of Object.entries(levels || {})) {
         for (const p of arr || []) {
           expect(Array.isArray(p.hints), `${p.id} (${category}/${lv}) missing hints`).toBe(true);
           expect(p.hints.length, `${p.id} hints length mismatch`).toBe((p.answers || []).length);
+          for (const hint of p.hints || []) {
+            expect(genericHint.test(String(hint || '')), `${p.id} has generic hint text`).toBe(false);
+          }
           expect(Array.isArray(p.clues), `${p.id} (${category}/${lv}) missing clues`).toBe(true);
           expect(p.clues.length, `${p.id} clues length mismatch`).toBe((p.answers || []).length);
+          for (const clue of p.clues || []) {
+            expect(genericPrompt.test(String(clue?.prompt || '')), `${p.id} has generic clue prompt`).toBe(false);
+          }
           expect(p.definitions && typeof p.definitions === 'object', `${p.id} missing definitions`).toBe(true);
           for (const wb of p.wordBank || []) {
             const def = p.definitions[wb];
@@ -251,6 +269,52 @@ describe('Paper 2 content integrity — Vocabulary Cloze passages', () => {
         }
       }
     }
+  });
+
+  it('contains no internal generation labels in vocab cloze titles/text', () => {
+    for (const [category, levels] of Object.entries(vocabPassages)) {
+      for (const [lv, arr] of Object.entries(levels || {})) {
+        for (const p of arr || []) {
+          expect(BANNED_INTERNAL_LABEL.test(String(p.title || '')), `${p.id} (${category}/${lv}) has banned label in title`).toBe(false);
+          expect(BANNED_INTERNAL_LABEL.test(String(p.text || '')), `${p.id} (${category}/${lv}) has banned label in text`).toBe(false);
+        }
+      }
+    }
+  });
+});
+
+describe('Paper 2 coverage report', () => {
+  it('prints current category-level coverage for audit visibility', () => {
+    const grammarMcqCounts = countMcqCategories(GRAMMAR_MCQ_ITEMS);
+    const vocabMcqCounts = countMcqCategories(VOCAB_MCQ_ITEMS);
+
+    const grammarClozeCounts = Object.fromEntries(
+      Object.entries(passages).map(([level, cats]) => [
+        level,
+        Object.fromEntries(Object.entries(cats || {}).map(([cat, arr]) => [cat, (arr || []).length])),
+      ]),
+    );
+
+    const vocabClozeCounts = Object.fromEntries(
+      Object.entries(vocabPassages).map(([cat, levels]) => [
+        cat,
+        Object.fromEntries(Object.entries(levels || {}).map(([lv, arr]) => [lv, (arr || []).length])),
+      ]),
+    );
+
+    // eslint-disable-next-line no-console
+    console.log('[Coverage] Grammar MCQ by level/category', JSON.stringify(grammarMcqCounts));
+    // eslint-disable-next-line no-console
+    console.log('[Coverage] Vocab MCQ by level/category', JSON.stringify(vocabMcqCounts));
+    // eslint-disable-next-line no-console
+    console.log('[Coverage] Grammar Cloze by level/category', JSON.stringify(grammarClozeCounts));
+    // eslint-disable-next-line no-console
+    console.log('[Coverage] Vocab Cloze by category/level', JSON.stringify(vocabClozeCounts));
+
+    expect(Object.keys(grammarMcqCounts).length).toBeGreaterThan(0);
+    expect(Object.keys(vocabMcqCounts).length).toBeGreaterThan(0);
+    expect(Object.keys(grammarClozeCounts).length).toBeGreaterThan(0);
+    expect(Object.keys(vocabClozeCounts).length).toBeGreaterThan(0);
   });
 });
 

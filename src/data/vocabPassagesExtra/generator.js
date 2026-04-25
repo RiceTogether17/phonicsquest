@@ -160,36 +160,107 @@ function makeText(category, level, idx) {
 
 function buildLearningAids(text, category, answers) {
   const segments = text.split('___');
-  const hintMap = {
-    contextInference: 'Use nearby details to infer meaning from context.',
-    definitionMatch: 'Read the sentence definition clues for each place or word.',
-    synonymContrast: 'Look for clues showing similar or opposite meaning.',
-    morphologicalAffix: 'Check prefixes/suffixes to infer meaning or word form.',
-    collocationCloze: 'Choose the word that forms a natural collocation.',
-    grammaticalRole: 'Decide whether a noun, adjective, or adverb form fits.',
-    connectorClue: 'Use connector clues like although, because, and since.',
-    idiomaticExpressions: 'Infer the figurative meaning from surrounding context.',
-    proverbsSayings: 'Use the situation to infer the proverb meaning.',
-    scienceTechTerms: 'Use science or technology context words around the blank.',
-    socialStudiesVocab: 'Use civic and community context to infer meaning.',
-    grammarPrepositions: 'Use location clues around the blank.',
-    grammarArticles: 'Check noun sounds and specificity clues.',
-    grammarSVA: 'Match the verb to the subject in the sentence.',
+  const aidMap = {
+    contextInference: {
+      hint: 'Use setting and cause clues around the blank to infer meaning.',
+      prompt: 'Which nearby setting detail (weather/place/action) points to the correct word?',
+      clueType: 'setting-cause-clue',
+      explanation: 'The surrounding setting details narrow the meaning to one suitable word.',
+    },
+    definitionMatch: {
+      hint: 'Match each blank to the sentence definition of that place or concept.',
+      prompt: 'Which sentence phrase defines what this place/word is used for?',
+      clueType: 'definition-in-context',
+      explanation: 'The sentence itself gives a child-friendly definition that matches one option.',
+    },
+    synonymContrast: {
+      hint: 'Look for tone clues that signal similar or opposite meaning.',
+      prompt: 'Which phrase signals a positive/negative contrast that guides the word choice?',
+      clueType: 'synonym-contrast-clue',
+      explanation: 'Contrast and tone clues show whether the answer should be close in meaning or opposite.',
+    },
+    morphologicalAffix: {
+      hint: 'Use prefix/suffix clues to decide the correct word form and meaning.',
+      prompt: 'Which part of the sentence hints at a prefix/suffix meaning (re-, -less, etc.)?',
+      clueType: 'affix-word-formation',
+      explanation: 'Word-part clues in context indicate the correct derived form.',
+    },
+    collocationCloze: {
+      hint: 'Pick the word that naturally pairs with nearby words (collocation).',
+      prompt: 'Which neighbouring words form a natural collocation with the answer?',
+      clueType: 'collocation-clue',
+      explanation: 'Only one option forms a natural word partnership in this context.',
+    },
+    grammaticalRole: {
+      hint: 'Check the sentence frame for noun/adjective/adverb form.',
+      prompt: 'Which surrounding words show the needed grammatical role here?',
+      clueType: 'word-form-role',
+      explanation: 'The sentence structure reveals the required part of speech.',
+    },
+    connectorClue: {
+      hint: 'Use connector logic (although/because/since) to infer meaning.',
+      prompt: 'Which connector relationship (contrast/reason/result) gives the clue?',
+      clueType: 'connector-logic-clue',
+      explanation: 'The connector sets a logic relationship that points to the best vocabulary choice.',
+    },
+    idiomaticExpressions: {
+      hint: 'Use whole-situation clues to infer figurative meaning.',
+      prompt: 'Which event in the sentence reveals the idiom’s intended meaning?',
+      clueType: 'idiom-context-clue',
+      explanation: 'The scenario context, not literal words, signals the idiom meaning.',
+    },
+    proverbsSayings: {
+      hint: 'Infer the proverb meaning from actions and outcomes in the scenario.',
+      prompt: 'Which outcome in the situation reflects the proverb’s lesson?',
+      clueType: 'proverb-lesson-clue',
+      explanation: 'The situation demonstrates the proverb’s message and supports one answer.',
+    },
+    scienceTechTerms: {
+      hint: 'Use experiment/device clues to infer the science or tech term.',
+      prompt: 'Which experiment or device detail in the sentence identifies the term?',
+      clueType: 'science-tech-context',
+      explanation: 'Lab and device evidence in the sentence identifies the precise technical word.',
+    },
+    socialStudiesVocab: {
+      hint: 'Use citizenship/community clues to infer the social studies word.',
+      prompt: 'Which civic action or leadership detail gives the strongest clue?',
+      clueType: 'civic-context-clue',
+      explanation: 'Community and citizenship details point to the correct social studies vocabulary.',
+    },
+    grammarPrepositions: {
+      hint: 'Use location/position clues to choose the preposition.',
+      prompt: 'Which place relationship in the sentence guides the preposition choice?',
+      clueType: 'preposition-location-clue',
+      explanation: 'Relative position words in the sentence indicate the correct preposition.',
+    },
+    grammarArticles: {
+      hint: 'Use noun sound and specificity clues for article choice.',
+      prompt: 'Which noun sound or specificity clue decides a/an/the here?',
+      clueType: 'article-sound-specificity',
+      explanation: 'Vowel/consonant sound and specific reference clues determine the right article.',
+    },
+    grammarSVA: {
+      hint: 'Use subject number clues to choose the correct verb form.',
+      prompt: 'Which subject in this clause controls subject-verb agreement?',
+      clueType: 'subject-verb-agreement-clue',
+      explanation: 'The subject’s number/person determines the matching verb form.',
+    },
   };
+  const aid = aidMap[category] || aidMap.contextInference;
 
   return answers.map((_, i) => {
     const left = (segments[i] || '').trim().split(/\s+/).slice(-5).join(' ').replace(/[.,;:!?]+$/g, '').trim();
     const right = (segments[i + 1] || '').trim().split(/\s+/).slice(0, 5).join(' ').replace(/[.,;:!?]+$/g, '').trim();
     const span = right || left || 'sentence context';
     return {
-      hint: `Blank ${i + 1}: ${hintMap[category]}`,
+      hint: `Blank ${i + 1}: ${aid.hint}`,
       clue: {
         blankIndex: i,
-        prompt: 'Which words in the passage give the best clue for this blank?',
+        prompt: aid.prompt,
         acceptableSpans: [span],
         partialSpans: span.split(/\s+/).slice(0, 2),
-        clueType: `${category}-context-clue`,
-        explanation: `The phrase "${span}" is the local evidence for choosing the best answer.`,
+        clueType: aid.clueType,
+        explanation: `${aid.explanation} The phrase "${span}" is the key textual evidence.`,
       },
     };
   });

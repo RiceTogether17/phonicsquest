@@ -2058,7 +2058,7 @@ function _ensureGrammarPassageDepth(target = 40) {
       cats[cat].push({
         ...src,
         id: `${src.id}-d${cats[cat].length + 1}`,
-        title: `${src.title} (Extra Practice)`,
+        title: `${src.title} (Extension ${cats[cat].length + 1})`,
         clues: (src.clues || []).map(c => ({ ...c })),
         answers: [...(src.answers || [])],
         wordBank: [...(src.wordBank || [])],
