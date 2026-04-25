@@ -159,6 +159,14 @@ describe('Paper 2 content integrity — Vocabulary Cloze passages', () => {
     expect(issues, issues.join('\n')).toEqual([]);
   });
 
+  it('passes strict quality + required learning aids checks', () => {
+    const issues = validateVocabPassages(vocabPassages, VOCAB_CATEGORY_KEYS, {
+      strictQuality: true,
+      requireLearningAids: true,
+    });
+    expect(issues, issues.join('\n')).toEqual([]);
+  });
+
   it('every category in vocabPassages is registered in VOCAB_CATEGORIES', () => {
     for (const key of Object.keys(vocabPassages)) {
       expect(VOCAB_CATEGORIES[key], `"${key}" in vocabPassages but not in VOCAB_CATEGORIES`).toBeTruthy();
@@ -171,6 +179,38 @@ describe('Paper 2 content integrity — Vocabulary Cloze passages', () => {
       for (const lv of ['p1', 'p2', 'p3', 'p4', 'p5', 'p6']) {
         const arr = vocabPassages[cat]?.[lv];
         expect(Array.isArray(arr) && arr.length > 0, `${cat} missing content at ${lv}`).toBe(true);
+      }
+    }
+  });
+
+  it('all vocab categories have p1-p6 coverage with at least 6 passages per level', () => {
+    const levels = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
+    for (const category of Object.keys(VOCAB_CATEGORIES)) {
+      expect(vocabPassages[category], `${category} missing from vocabPassages`).toBeTruthy();
+      for (const lv of levels) {
+        const arr = vocabPassages[category]?.[lv] || [];
+        expect(arr.length, `${category}/${lv} has ${arr.length} passages`).toBeGreaterThanOrEqual(6);
+      }
+    }
+  });
+
+  it('every vocab passage has complete hints, clues and real definitions for wordBank words', () => {
+    const badDefinition = /^(definition unavailable|tbd|placeholder|todo)$/i;
+    for (const [category, levels] of Object.entries(vocabPassages)) {
+      for (const [lv, arr] of Object.entries(levels || {})) {
+        for (const p of arr || []) {
+          expect(Array.isArray(p.hints), `${p.id} (${category}/${lv}) missing hints`).toBe(true);
+          expect(p.hints.length, `${p.id} hints length mismatch`).toBe((p.answers || []).length);
+          expect(Array.isArray(p.clues), `${p.id} (${category}/${lv}) missing clues`).toBe(true);
+          expect(p.clues.length, `${p.id} clues length mismatch`).toBe((p.answers || []).length);
+          expect(p.definitions && typeof p.definitions === 'object', `${p.id} missing definitions`).toBe(true);
+          for (const wb of p.wordBank || []) {
+            const def = p.definitions[wb];
+            expect(typeof def === 'string' && def.trim().length > 0, `${p.id} missing definition for ${wb}`).toBe(true);
+            expect(badDefinition.test(def.trim()), `${p.id} has placeholder definition for ${wb}`).toBe(false);
+            expect(def.trim().toLowerCase(), `${p.id} definition repeats word for ${wb}`).not.toBe(String(wb).trim().toLowerCase());
+          }
+        }
       }
     }
   });
