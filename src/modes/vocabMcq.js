@@ -2,23 +2,22 @@ import { questMastery } from '../modules/questMastery.js';
 import { gamification } from '../modules/gamification.js';
 import { store } from '../modules/store.js';
 import { VOCAB_MCQ_ITEMS, VOCAB_MCQ_LEVELS } from '../data/vocabMcq.js';
-import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
+import { VOCAB_CATEGORIES, VOCAB_CATEGORY_KEYS } from '../data/vocabCategories.js';
 import { checkPostAttempt } from '../modules/remediationRouter.js';
 
 let _container = null;
 let _onGoHome = null;
-let _level = 'P1';
 let _items = [];
 let _idx = 0;
 let _correct = 0;
 let _answered = false;
 let _advanceTimer = null;
+let _scope = { level: null, category: null, label: 'All Skills' };
 
-// ── Gamification state ──────────────────────────────────────────────────
 let _streak = 0;
 let _maxStreak = 0;
-let _missed = [];        // items answered incorrectly — for recovery round
-let _isRecovery = false;  // true during recovery round
+let _missed = [];
+let _isRecovery = false;
 
 export function initVocabMcq(container, onGoHome) {
   _container = container;
@@ -30,29 +29,125 @@ export function cleanupVocabMcq() {
   if (_advanceTimer) { clearTimeout(_advanceTimer); _advanceTimer = null; }
 }
 
-export function showVocabMcqBrowser() {
-  if (!_container) return;
-  _container.innerHTML = `
-    <div class="sfq-browser">
-      <h2 class="sfq-title">📖 Vocabulary MCQ</h2>
-      <p class="sfq-instruction">Practise level-based vocabulary paper items.</p>
-      <div class="sfq-browser-grid">
-        ${VOCAB_MCQ_LEVELS.map(l => `<button class="sfq-level-btn" data-level="${l}">${l}</button>`).join('')}
-      </div>
-      <div class="sfq-actions"><button class="btn btn--ghost" id="vmcq-home">← Home</button></div>
-    </div>`;
-
-  _container.querySelectorAll('[data-level]').forEach(btn => {
-    btn.addEventListener('click', () => _start(btn.dataset.level));
-  });
-  _container.querySelector('#vmcq-home')?.addEventListener('click', () => _onGoHome?.());
+export function getAllItems(bank = VOCAB_MCQ_ITEMS) {
+  return VOCAB_MCQ_LEVELS.flatMap(level => bank[level] || []);
 }
 
-/**
- * Mastery-weighted shuffle: items in weaker categories float toward the
- * front so the child practises what they need most.  A random jitter
- * (±0.15) keeps the order varied across replays.
- */
+export function getItemsForScope({ level = null, category = null } = {}, bank = VOCAB_MCQ_ITEMS) {
+  const source = level ? (bank[level] || []) : getAllItems(bank);
+  return category ? source.filter(item => item.category === category) : source;
+}
+
+export function countItemsForScope(scope = {}, bank = VOCAB_MCQ_ITEMS) {
+  return getItemsForScope(scope, bank).length;
+}
+
+export function getCategoryCounts(bank = VOCAB_MCQ_ITEMS, categories = VOCAB_CATEGORY_KEYS) {
+  return categories.map(category => {
+    const levels = {};
+    let total = 0;
+    for (const level of VOCAB_MCQ_LEVELS) {
+      const count = countItemsForScope({ level, category }, bank);
+      levels[level] = count;
+      total += count;
+    }
+    return { category, total, levels };
+  });
+}
+
+export function getLevelCounts(bank = VOCAB_MCQ_ITEMS, levels = VOCAB_MCQ_LEVELS) {
+  return levels.map(level => ({ level, total: countItemsForScope({ level }, bank) }));
+}
+
+function _categoryLabel(key) {
+  return VOCAB_CATEGORIES[key]?.label || key;
+}
+
+function _scopeLabel(scope) {
+  const left = scope.level || null;
+  const right = scope.category ? _categoryLabel(scope.category) : null;
+  return [left, right].filter(Boolean).join(' · ') || 'All Skills';
+}
+
+export function showVocabMcqBrowser() {
+  if (!_container) return;
+
+  const levelCounts = getLevelCounts();
+  const categoryCounts = getCategoryCounts();
+  let selectedLevel = _scope.level || 'P1';
+
+  const render = () => {
+    _container.innerHTML = `
+      <div class="sfq-browser mcq-browser">
+        <h2 class="sfq-title">📖 Vocabulary MCQ</h2>
+        <p class="sfq-instruction">Choose a level first, then practise vocabulary concepts within that level.</p>
+
+        <section class="mcq-browser-section">
+          <h3 class="mcq-browser-heading">Step 1 · Select Level</h3>
+          <div class="sfq-browser-grid mcq-level-grid">
+            ${levelCounts.map(({ level, total }) => `
+              <button class="sfq-level-btn mcq-level-card ${level === selectedLevel ? 'mcq-level-card--active' : ''}" data-pick-level="${level}">
+                <span class="sfq-level-name">${level}</span>
+                <span class="mcq-count-badge">${total} items</span>
+              </button>
+            `).join('')}
+          </div>
+        </section>
+
+        <section class="mcq-browser-section">
+          <h3 class="mcq-browser-heading">Step 2 · ${selectedLevel} Vocabulary Concepts</h3>
+          <div class="sfq-actions">
+            <button class="btn btn--primary" id="vmcq-start-level">Start ${selectedLevel} (All Skills)</button>
+          </div>
+          <div class="mcq-skill-grid">
+            ${categoryCounts.map(({ category, levels }) => {
+              const count = levels[selectedLevel] || 0;
+              const meta = VOCAB_CATEGORIES[category] || { icon: '📘', label: category, desc: '' };
+
+              if (!count) {
+                return `
+                  <button class="mcq-skill-card mcq-skill-card--disabled" disabled>
+                    <div class="mcq-skill-title">${meta.icon} ${meta.label}</div>
+                    <p class="mcq-skill-sub">Coming soon for ${selectedLevel}</p>
+                  </button>`;
+              }
+
+              return `
+                <button class="mcq-skill-card" data-scope-level="${selectedLevel}" data-scope-category="${category}">
+                  <div class="mcq-skill-title">${meta.icon} ${meta.label}</div>
+                  <p class="mcq-skill-sub">${meta.desc || ''}</p>
+                  <p class="mcq-skill-sub"><span class="mcq-count-badge">${count} items in ${selectedLevel}</span></p>
+                </button>`;
+            }).join('')}
+          </div>
+        </section>
+
+        <div class="sfq-actions"><button class="btn btn--ghost" id="vmcq-home">← Home</button></div>
+      </div>`;
+
+    _container.querySelectorAll('[data-pick-level]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedLevel = btn.dataset.pickLevel;
+        render();
+      });
+    });
+
+    _container.querySelector('#vmcq-start-level')?.addEventListener('click', () => {
+      _startScope({ level: selectedLevel, category: null });
+    });
+
+    _container.querySelectorAll('[data-scope-level][data-scope-category]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        _startScope({ level: btn.dataset.scopeLevel, category: btn.dataset.scopeCategory });
+      });
+    });
+
+    _container.querySelector('#vmcq-home')?.addEventListener('click', () => _onGoHome?.());
+  };
+
+  render();
+}
+
 function _adaptiveShuffle(items) {
   return [...items].sort((a, b) => {
     const sa = questMastery.getSkillScore('vocabMcq', a.category);
@@ -61,12 +156,16 @@ function _adaptiveShuffle(items) {
   });
 }
 
-function _start(level) {
-  _level = level;
-  _items = _adaptiveShuffle(VOCAB_MCQ_ITEMS[level] || []);
-  // Honour paper-mode item cap (one-shot flag set by Paper Mode before launch)
+function _startScope({ level = null, category = null, label = '' } = {}) {
+  _scope = { level, category, label: label || _scopeLabel({ level, category }) };
+  _items = _adaptiveShuffle(getItemsForScope({ level, category }));
+
   const limit = store.get('paperItemLimit');
-  if (limit) { store.set('paperItemLimit', null); _items = _items.slice(0, limit); }
+  if (limit) {
+    store.set('paperItemLimit', null);
+    _items = _items.slice(0, limit);
+  }
+
   _idx = 0;
   _correct = 0;
   _streak = 0;
@@ -93,11 +192,7 @@ function _startRecovery() {
 
 export function startVocabMcqLevel(level) {
   if (!_container) return;
-  _start(level);
-}
-
-function _categoryLabel(key) {
-  return VOCAB_CATEGORIES[key]?.label || key;
+  _startScope({ level, category: null, label: level });
 }
 
 function _streakBadge() {
@@ -113,7 +208,7 @@ function _renderQuestion() {
 
   _answered = false;
   const progressPct = Math.round(((_idx) / _items.length) * 100);
-  const roundLabel = _isRecovery ? 'Recovery Round' : _level;
+  const roundLabel = _isRecovery ? `Recovery · ${_scope.label}` : _scope.label;
 
   _container.innerHTML = `
     <div class="mcq-game" role="region" aria-label="Vocabulary question ${_idx + 1} of ${_items.length}">
@@ -140,9 +235,9 @@ function _renderQuestion() {
       const ok = ans === item.answer;
 
       if (ok) {
-        _correct++;
-        _streak++;
-        if (_streak > _maxStreak) _maxStreak = _streak;
+        _correct += 1;
+        _streak += 1;
+        _maxStreak = Math.max(_maxStreak, _streak);
         gamification.recordCorrect();
       } else {
         _streak = 0;
@@ -151,9 +246,8 @@ function _renderQuestion() {
       }
 
       questMastery.updateSkill('vocabMcq', item.category, ok);
-      questMastery.recordAttempt({ quest: 'vocabMcq', skill: item.category, correct: ok, level: _level });
+      questMastery.recordAttempt({ quest: 'vocabMcq', skill: item.category, correct: ok, level: _scope.level || 'Mixed' });
 
-      // Disable all buttons and highlight correct/wrong
       _container.querySelectorAll('[data-choice]').forEach(b => {
         b.disabled = true;
         b.setAttribute('aria-disabled', 'true');
@@ -164,23 +258,13 @@ function _renderQuestion() {
         }
       });
 
-      // Streak flash
-      if (ok && _streak >= 3) {
-        const streakEl = _container.querySelector('.mcq-streak');
-        if (streakEl) streakEl.classList.add('mcq-streak--flash');
-      }
-
-      // Feedback text
       const hint = _container.querySelector('#vmcq-hint');
       let hintText = ok ? '✅ Correct.' : `❌ Correct answer: ${item.answer}.`;
       hintText += ` ${item.explain}`;
 
-      // Remediation nudge on wrong answer
       if (!ok) {
         const suggestion = checkPostAttempt('vocabMcq', item.category, false);
-        if (suggestion && suggestion.type === 'redirect') {
-          hintText += ` 💡 ${suggestion.message}`;
-        }
+        if (suggestion && suggestion.type === 'redirect') hintText += ` 💡 ${suggestion.message}`;
       }
 
       if (hint) hint.textContent = hintText;
@@ -201,13 +285,7 @@ function _renderDone() {
   const stars = accuracy >= 90 ? 3 : accuracy >= 70 ? 2 : 1;
   const hasMissed = _missed.length > 0 && !_isRecovery;
 
-  // Per-category coverage
-  const catStats = {};
-  for (const item of _items) {
-    if (!catStats[item.category]) catStats[item.category] = { total: 0 };
-    catStats[item.category].total++;
-  }
-  const catKeys = Object.keys(catStats);
+  const catKeys = [...new Set(_items.map(item => item.category))];
 
   _container.innerHTML = `
     <div class="sfq-browser" role="region" aria-label="Vocabulary MCQ results">
@@ -222,13 +300,11 @@ function _renderDone() {
       <div class="sfq-actions">
         ${hasMissed ? `<button class="btn btn--primary" id="vmcq-recovery">🔄 Recovery Round (${_missed.length})</button>` : ''}
         <button class="btn ${hasMissed ? 'btn--ghost' : 'btn--primary'}" id="vmcq-replay">Replay</button>
-        <button class="btn btn--ghost" id="vmcq-menu">Levels</button>
+        <button class="btn btn--ghost" id="vmcq-menu">Back to Skill Menu</button>
       </div>
     </div>`;
 
-  if (hasMissed) {
-    _container.querySelector('#vmcq-recovery')?.addEventListener('click', () => _startRecovery());
-  }
-  _container.querySelector('#vmcq-replay')?.addEventListener('click', () => _start(_level));
+  if (hasMissed) _container.querySelector('#vmcq-recovery')?.addEventListener('click', () => _startRecovery());
+  _container.querySelector('#vmcq-replay')?.addEventListener('click', () => _startScope(_scope));
   _container.querySelector('#vmcq-menu')?.addEventListener('click', () => showVocabMcqBrowser());
 }
