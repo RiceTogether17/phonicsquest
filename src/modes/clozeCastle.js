@@ -78,6 +78,9 @@ let _sessionMode      = 'practice';
 let _sessionHintsUsed = 0;
 let _examStartedAt    = 0;
 let _lastUserAnswers  = [];
+let _sessionReviewRows = [];
+let _sessionBlankTotal = 0;
+let _sessionBlankCorrect = 0;
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
@@ -223,6 +226,9 @@ function _startCategory(level, catKey) {
   _sessionClueScore = 0;
   _sessionHintsUsed = 0;
   _examStartedAt = Date.now();
+  _sessionReviewRows = [];
+  _sessionBlankTotal = 0;
+  _sessionBlankCorrect = 0;
   _showPassage();
 }
 
@@ -236,6 +242,9 @@ function _startAllCategories(level) {
   _sessionClueScore = 0;
   _sessionHintsUsed = 0;
   _examStartedAt = Date.now();
+  _sessionReviewRows = [];
+  _sessionBlankTotal = 0;
+  _sessionBlankCorrect = 0;
   _showPassage();
 }
 
@@ -377,6 +386,7 @@ function _renderClueScoreMeter() {
 function _buildClueHuntPanel(passage) {
   const clueData = _getActiveClueData(passage);
   if (!clueData) return '';
+  const modeCfg = getModeConfig(_sessionMode);
 
   return `
     <div class="clue-hunt-panel" id="clue-hunt-panel">
@@ -388,10 +398,8 @@ function _buildClueHuntPanel(passage) {
       <p class="clue-hunt-prompt">${escapeHtml(clueData.prompt)}</p>
       <div class="clue-hunt-feedback" id="clue-hunt-feedback" aria-live="polite"></div>
       <div class="clue-hint-row">
-        ${_sessionMode === 'exam'
-          ? '<details><summary class="btn btn--ghost btn--sm">Need help?</summary><button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-hint-btn" aria-label="Get a hint">💡 Hint</button></details>'
-          : '<button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-hint-btn" aria-label="Get a hint">💡 Hint</button>'}
-        <button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-skip-btn" aria-label="Skip clue">Skip clue</button>
+        ${modeCfg.allowHints ? '<button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-hint-btn" aria-label="Get a hint">💡 Hint</button>' : ''}
+        ${modeCfg.allowHints ? '<button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-skip-btn" aria-label="Skip clue">Skip clue</button>' : ''}
         <span class="clue-hint-msg" id="clue-hint-msg"></span>
       </div>
     </div>`;
@@ -400,6 +408,8 @@ function _buildClueHuntPanel(passage) {
 // ── Clue Hunt Listeners ────────────────────────────────────────────────────
 
 function _attachClueHuntListeners(passage) {
+  const modeCfg = getModeConfig(_sessionMode);
+  if (!modeCfg.allowHints) return;
   // Hint button
   document.getElementById('clue-hint-btn')?.addEventListener('click', () => {
     const clueData = _getActiveClueData(passage);
@@ -609,6 +619,7 @@ function _buildReviewRows(passage, userAnswers) {
     const studentAnswer = userAnswers[idx] || '';
     return {
       blank: `#${idx + 1}`,
+      passageTitle: passage.title,
       studentAnswer,
       correctAnswer,
       status: studentAnswer === correctAnswer ? 'Correct' : 'Try again',
@@ -629,6 +640,8 @@ function _checkPassage(passage) {
   const userAnswers = buildUserAnswers(_blankFills, _bankWords);
   _lastUserAnswers = [...userAnswers];
   const allCorrect  = userAnswers.every((ans, i) => ans === passage.answers[i]);
+  const blankCorrect = userAnswers.filter((ans, i) => ans === passage.answers[i]).length;
+  const modeCfg = getModeConfig(_sessionMode);
   const skillKey = _currentCat === '__all__' ? 'mixed' : _currentCat;
 
   questMastery.recordAttempt({
@@ -642,6 +655,32 @@ function _checkPassage(passage) {
   progress.recordGrammarCategoryAttempt(_currentLevel, skillKey, allCorrect);
 
   _sessionTotal++;
+  _sessionBlankTotal += passage.answers.length;
+  _sessionBlankCorrect += blankCorrect;
+
+  if (modeCfg.showFinalReviewOnly) {
+    const rows = _buildReviewRows(passage, userAnswers);
+    _sessionReviewRows.push(...rows.filter(r => r.status !== 'Correct').map(r => ({
+      passageTitle: r.passageTitle,
+      blank: r.blank,
+      studentAnswer: r.studentAnswer,
+      correctAnswer: r.correctAnswer,
+      explanation: r.explanation,
+    })));
+    const examAttempts = store.get('ccqExamAttempts') || [];
+    examAttempts.push({
+      level: _currentLevel,
+      category: skillKey,
+      passageId: passage.id,
+      blankCorrect,
+      blankTotal: passage.answers.length,
+      submittedAt: Date.now(),
+    });
+    store.set('ccqExamAttempts', examAttempts.slice(-150));
+    _passageIdx++;
+    _showPassage();
+    return;
+  }
 
   if (allCorrect) {
     _sessionCorrect++;
@@ -650,7 +689,7 @@ function _checkPassage(passage) {
     audio.playSfx('correct');
     mascot.celebrate(false);
 
-    const accPercent = Math.round((userAnswers.filter((ans, i) => ans === passage.answers[i]).length / Math.max(1, passage.answers.length)) * 100);
+    const accPercent = Math.round((blankCorrect / Math.max(1, passage.answers.length)) * 100);
     if (_currentCat !== '__all__' && passage.id) {
       const tracked = recordClozeCompletion({
         level: _currentLevel,
@@ -852,17 +891,12 @@ function _showComplete() {
     ? `${GRAMMAR_CATEGORIES[_currentCat].icon} ${GRAMMAR_CATEGORIES[_currentCat].label}`
     : 'All Topics';
 
-  const acc   = _sessionTotal > 0 ? Math.round((_sessionCorrect / _sessionTotal) * 100) : 100;
+  const acc   = _sessionBlankTotal > 0 ? Math.round((_sessionBlankCorrect / _sessionBlankTotal) * 100) : 100;
   const stars = acc >= 90 ? 3 : acc >= 70 ? 2 : 1;
   const modeCfg = getModeConfig(_sessionMode);
   const elapsedSec = Math.max(1, Math.round((Date.now() - (_examStartedAt || Date.now())) / 1000));
   const recommendation = getNextStepRecommendation({ accuracy: acc, skillLabel: catInfo, hintsUsed: _sessionHintsUsed });
-  const lastPassageAnswers = _levelPassages[_levelPassages.length - 1]?.answers || [];
-  const wrongLines = lastPassageAnswers.map((ans, idx) => {
-    const got = _lastUserAnswers[idx];
-    if (!got || got === ans) return null;
-    return `- Blank ${idx + 1}: ${got} → ${ans}`;
-  }).filter(Boolean);
+  const wrongLines = _sessionReviewRows.map((row) => `- ${row.passageTitle} ${row.blank}: ${row.studentAnswer || '(blank)'} → ${row.correctAnswer}`);
 
   // Clue accuracy line (only shown if clue mode was used)
   const clueTotal = Object.keys(_clueResults).length;
@@ -879,7 +913,7 @@ function _showComplete() {
       <h3 class="cloze-complete-title">Castle Cleared! 🏰</h3>
       <p class="cloze-complete-sub">${CLOZE_LEVEL_LABELS[_currentLevel]} · ${catInfo}</p>
       <div class="cloze-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
-      <p class="cloze-complete-score">${_sessionCorrect} / ${_sessionTotal} correct · ${acc}%</p>
+      <p class="cloze-complete-score">Blanks: ${_sessionBlankCorrect} / ${_sessionBlankTotal} correct · ${acc}%</p>
       <p class="cloze-complete-score">Mode: ${modeCfg.label} · Hints used: ${_sessionHintsUsed} · Time: ${elapsedSec}s</p>
       ${clueAccLine}
       <p class="cloze-complete-score">Next step: ${recommendation}</p>
@@ -904,6 +938,7 @@ function _showComplete() {
       level: CLOZE_LEVEL_LABELS[_currentLevel],
       scoreLine: `${_sessionCorrect}/${_sessionTotal}`,
       accuracy: acc,
+      timeTaken: `${elapsedSec}s`,
       hintsUsed: _sessionHintsUsed,
       clueScore: clueAcc ?? 0,
       wrongLines,

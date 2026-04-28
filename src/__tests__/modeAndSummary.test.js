@@ -5,14 +5,23 @@ import { showAnswerReviewPanel } from '../modes/clozeReviewPanel.js';
 describe('mode config', () => {
   it('practice mode allows hints and immediate feedback', () => {
     const cfg = getModeConfig('practice');
-    expect(cfg.hintsInline).toBe(true);
-    expect(cfg.immediateFeedback).toBe(true);
+    expect(cfg.allowHints).toBe(true);
+    expect(cfg.showImmediateFeedback).toBe(true);
+    expect(cfg.showPerPassageReview).toBe(true);
   });
 
   it('exam mode hides inline hints and delays immediate feedback flag', () => {
     const cfg = getModeConfig('exam');
-    expect(cfg.hintsInline).toBe(false);
-    expect(cfg.immediateFeedback).toBe(false);
+    expect(cfg.allowHints).toBe(false);
+    expect(cfg.allowInfoPanel).toBe(false);
+    expect(cfg.showImmediateFeedback).toBe(false);
+    expect(cfg.showFinalReviewOnly).toBe(true);
+  });
+
+  it('practice mode keeps teaching flow on', () => {
+    const cfg = getModeConfig('practice');
+    expect(cfg.allowInfoPanel).toBe(true);
+    expect(cfg.confettiPerPassage).toBe(true);
   });
 });
 
@@ -25,16 +34,19 @@ describe('copy summary', () => {
       level: 'P5',
       scoreLine: '8/10',
       accuracy: 80,
+      timeTaken: '95s',
       hintsUsed: 1,
       clueScore: 70,
-      wrongLines: ['- Blank 3: because → although'],
+      wrongLines: ['- P5 Passage #3: because → although', '- P5 Passage #7: since → however'],
       nextStep: 'Revise connector clues',
     });
     expect(text).toContain('Mode: Exam Mode');
     expect(text).toContain('Passage: Passage A');
     expect(text).toContain('Score: 8/10');
+    expect(text).toContain('Time: 95s');
     expect(text).toContain('Hints used: 1');
     expect(text).toContain('Clue score: 70%');
+    expect(text).toContain('- P5 Passage #7: since → however');
     expect(text).toContain('Next Step: Revise connector clues');
   });
 });

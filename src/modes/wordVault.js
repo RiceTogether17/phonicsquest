@@ -78,6 +78,7 @@ let _sessionHintsUsed = 0;
 let _sessionMode = 'practice';
 let _examStartedAt = 0;
 let _infoPanelOpen = false;
+let _sessionReviewRows = [];
 let _affixWrongAttempts = {};
 let _affixParts = [];
 
@@ -354,6 +355,7 @@ function _startPassage(catKey, level) {
   _sessionClueScore = 0;
   _sessionHintsUsed = 0;
   _examStartedAt = Date.now();
+  _sessionReviewRows = [];
   _infoPanelOpen = false;
 
   const perf = store.get('wvqWordPerformance') || {};
@@ -459,13 +461,13 @@ function _renderPassage(passage) {
         <div class="wv-bank" id="wv-bank" aria-label="Word choices"></div>
       </div>
 
-      <aside class="wv-info-panel ${_infoPanelOpen ? 'wv-info-panel--open' : ''}" id="wv-info-panel" aria-live="polite"></aside>
+      ${modeCfg.allowInfoPanel ? `<aside class="wv-info-panel ${_infoPanelOpen ? 'wv-info-panel--open' : ''}" id="wv-info-panel" aria-live="polite"></aside>` : ''}
 
       <div class="wv-actions">
         <button class="btn btn--ghost btn--sm" id="wv-clear">↺ Clear all</button>
         <button class="btn btn--ghost btn--sm" id="wv-listen" aria-label="Listen to passage">🔊 Listen</button>
-        <button class="btn btn--ghost btn--sm" id="wv-info" aria-label="Show definitions panel">ℹ️ Info</button>
-        ${modeCfg.hintsInline ? '<button class="btn btn--ghost btn--sm" id="wv-hint">💡 Hint</button>' : '<details><summary class="btn btn--ghost btn--sm">Need help?</summary><button class="btn btn--ghost btn--sm" id="wv-hint">💡 Hint</button></details>'}
+        ${modeCfg.allowInfoPanel ? '<button class="btn btn--ghost btn--sm" id="wv-info" aria-label="Show definitions panel">ℹ️ Info</button>' : ''}
+        ${modeCfg.allowHints ? '<button class="btn btn--ghost btn--sm" id="wv-hint">💡 Hint</button>' : ''}
         <button class="btn btn--primary" id="wv-check" ${inClueMode ? 'disabled' : ''}>Check ✓</button>
         <button class="btn btn--ghost btn--sm" id="wv-quit">Menu</button>
       </div>
@@ -521,6 +523,7 @@ function _renderPassage(passage) {
 }
 
 function _renderInfoPanel(passage) {
+  if (!getModeConfig(_sessionMode).allowInfoPanel) return;
   const panel = document.getElementById('wv-info-panel');
   if (!panel) return;
   panel.className = `wv-info-panel ${_infoPanelOpen ? 'wv-info-panel--open' : ''}`;
@@ -547,6 +550,7 @@ function _renderClueScoreMeter() {
 function _buildClueHuntPanel(passage) {
   const clueData = _getActiveClueData(passage);
   if (!clueData) return '';
+  const modeCfg = getModeConfig(_sessionMode);
 
   return `
     <div class="clue-hunt-panel" id="clue-hunt-panel">
@@ -558,8 +562,8 @@ function _buildClueHuntPanel(passage) {
       <p class="clue-hunt-prompt">${escapeHtml(clueData.prompt)}</p>
       <div class="clue-hunt-feedback" id="clue-hunt-feedback" aria-live="polite"></div>
       <div class="clue-hint-row">
-        <button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-hint-btn" aria-label="Get a hint">💡 Hint</button>
-        <button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-skip-btn" aria-label="Skip clue">Skip clue</button>
+        ${modeCfg.allowHints ? '<button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-hint-btn" aria-label="Get a hint">💡 Hint</button>' : ''}
+        ${modeCfg.allowHints ? '<button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-skip-btn" aria-label="Skip clue">Skip clue</button>' : ''}
         <span class="clue-hint-msg" id="clue-hint-msg"></span>
       </div>
     </div>`;
@@ -568,6 +572,7 @@ function _buildClueHuntPanel(passage) {
 // ── Clue Hunt Listeners ────────────────────────────────────────────────────
 
 function _attachClueHuntListeners(passage) {
+  if (!getModeConfig(_sessionMode).allowHints) return;
   document.getElementById('clue-hint-btn')?.addEventListener('click', () => {
     const clueData = _getActiveClueData(passage);
     if (!clueData) return;
@@ -900,10 +905,35 @@ function _checkPassage(passage) {
   const blankCorrect = userAnswers.filter((ans, i) => ans === passage.answers[i]).length;
   const blankTotal = passage.answers.length;
   const allCorrect  = blankCorrect === blankTotal;
+  const modeCfg = getModeConfig(_sessionMode);
 
   _sessionTotal++;
 
   userAnswers.forEach((ans, i) => _recordVocabPerformance(passage.answers[i], ans === passage.answers[i]));
+
+  if (modeCfg.showFinalReviewOnly) {
+    _sessionBlankCorrect = blankCorrect;
+    _sessionBlankTotal = blankTotal;
+    _sessionReviewRows.push(..._buildVocabReviewRows(passage, userAnswers).filter(r => r.status !== 'Correct').map(r => ({
+      passageTitle: passage.title,
+      blank: r.blank,
+      studentAnswer: r.studentAnswer,
+      correctAnswer: r.correctAnswer,
+      explanation: r.explanation,
+    })));
+    const examAttempts = store.get('wvqExamAttempts') || [];
+    examAttempts.push({
+      category: _currentCat,
+      level: _currentLevel,
+      passageId: passage.id,
+      blankCorrect,
+      blankTotal,
+      submittedAt: Date.now(),
+    });
+    store.set('wvqExamAttempts', examAttempts.slice(-150));
+    _showComplete({ blankCorrect, blankTotal, userAnswers });
+    return;
+  }
 
   if (allCorrect) {
     _sessionCorrect++;
@@ -1156,12 +1186,7 @@ function _showComplete(summary = {}) {
   const modeCfg = getModeConfig(_sessionMode);
   const elapsedSec = Math.max(1, Math.round((Date.now() - (_examStartedAt || Date.now())) / 1000));
   const recommendation = getNextStepRecommendation({ accuracy: acc, skillLabel: meta.label, hintsUsed: _sessionHintsUsed });
-  const userAnswers = summary.userAnswers || [];
-  const wrongLines = (_passage?.answers || []).map((ans, idx) => {
-    const got = userAnswers[idx];
-    if (!got || got === ans) return null;
-    return `- Blank ${idx + 1}: ${got} → ${ans}`;
-  }).filter(Boolean);
+  const wrongLines = _sessionReviewRows.map((row) => `- ${row.passageTitle} ${row.blank}: ${row.studentAnswer || '(blank)'} → ${row.correctAnswer}`);
 
   const clueTotal = Object.keys(_clueResults).length;
   const clueAcc   = clueTotal > 0
@@ -1205,6 +1230,7 @@ function _showComplete(summary = {}) {
       level: LEVEL_LABELS[_currentLevel],
       scoreLine: `${correctBlanks}/${totalBlanks}`,
       accuracy: acc,
+      timeTaken: `${elapsedSec}s`,
       hintsUsed: _sessionHintsUsed,
       clueScore: clueAcc ?? 0,
       wrongLines,
