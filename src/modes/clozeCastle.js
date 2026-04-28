@@ -40,6 +40,9 @@ import {
 } from './clueEngine.js';
 import { celebrateCorrect } from '../components/confettiHelper.js';
 import { mascot } from '../components/mascot.js';
+import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
+import { getUniqueClozeDone, recordClozeCompletion } from './clozeCompletionTracker.js';
+import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -103,7 +106,7 @@ function _renderBrowser() {
   for (const lv of levels) {
     const cats  = Object.keys(passages[lv]);
     const total = cats.reduce((sum, cat) => sum + passages[lv][cat].length, 0);
-    const done  = completed[lv] || 0;
+    const done  = getUniqueClozeDone({ level: lv, ccqCompletedByPassage: store.get('ccqCompletedByPassage') || {}, ccqCompleted: completed });
     const isDone = done >= total;
     const icon   = CLOZE_LEVEL_ICONS[lv];
 
@@ -151,7 +154,7 @@ function _renderCategoryPicker(level) {
     const cat   = GRAMMAR_CATEGORIES[catKey] || { label: catKey, icon: '📝' };
     const total = passages[level][catKey].length;
     const doneKey = `${level}-${catKey}`;
-    const done  = completed[doneKey] || 0;
+    const done  = getUniqueClozeDone({ level, category: catKey, ccqCompletedByPassage: store.get('ccqCompletedByPassage') || {}, ccqCatCompleted: completed });
     const isDone = done >= total;
     const isRecommended = catKey === recommendedCat;
 
@@ -334,6 +337,15 @@ function _renderPassage(passage) {
   document.addEventListener('keydown', _keyHandler);
 }
 
+
+function _renderClueScoreMeter() {
+  const scores = Object.values(_clueResults || {}).map(clueResultToScore);
+  if (!scores.length) return '☆ ☆ ☆';
+  const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+  const stars = avg >= 0.85 ? 3 : avg >= 0.45 ? 2 : 1;
+  return `${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}`;
+}
+
 // ── Clue Hunt Panel HTML ───────────────────────────────────────────────────
 
 function _buildClueHuntPanel(passage) {
@@ -345,9 +357,9 @@ function _buildClueHuntPanel(passage) {
       <div class="clue-hunt-header">
         <span class="clue-hunt-icon">🔍</span>
         <span class="clue-hunt-title">Find the Clue</span>
-        <span class="clue-hunt-sub">Blank ${_activeBlankIndex + 1}</span>
+        <span class="clue-hunt-sub">Blank ${_activeBlankIndex + 1} · Clue Score ${_renderClueScoreMeter()}</span>
       </div>
-      <p class="clue-hunt-prompt">${clueData.prompt}</p>
+      <p class="clue-hunt-prompt">${escapeHtml(clueData.prompt)}</p>
       <div class="clue-hunt-feedback" id="clue-hunt-feedback" aria-live="polite"></div>
       <div class="clue-hint-row">
         <button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-hint-btn" aria-label="Get a hint">💡 Hint</button>
@@ -514,7 +526,7 @@ function _renderBankWords(passage) {
     bank.innerHTML = _bankWords.map(w => `
       <button class="cloze-word-chip cloze-word-chip--locked"
               disabled aria-disabled="true"
-              aria-label="${w.word}">${w.word}</button>
+              aria-label="${escapeAttr(w.word)}">${escapeHtml(w.word)}</button>
     `).join('');
     return;
   }
@@ -561,6 +573,22 @@ function _getClueDataForBlank(passage, blankIndex) {
   return passage.clues.find(c => c.blankIndex === blankIndex) || null;
 }
 
+
+function _buildReviewRows(passage, userAnswers) {
+  return passage.answers.map((correctAnswer, idx) => {
+    const clue = _getClueDataForBlank(passage, idx);
+    const studentAnswer = userAnswers[idx] || '';
+    return {
+      blank: `#${idx + 1}`,
+      studentAnswer,
+      correctAnswer,
+      status: studentAnswer === correctAnswer ? 'Correct' : 'Try again',
+      clue: clue?.acceptableSpans?.[0] || '—',
+      explanation: passage.grammarNotes?.[idx] || clue?.explanation || 'Read the words before and after the blank.',
+    };
+  });
+}
+
 // ── Checking ───────────────────────────────────────────────────────────────
 
 function _checkPassage(passage) {
@@ -592,30 +620,37 @@ function _checkPassage(passage) {
     audio.playSfx('correct');
     mascot.celebrate(false);
 
-    // Track per-level completion
-    const completed = store.get('ccqCompleted') || {};
-    completed[_currentLevel] = (completed[_currentLevel] || 0) + 1;
-    store.set('ccqCompleted', completed);
-
-    // Track per-category completion
-    if (_currentCat !== '__all__') {
-      const catCompleted = store.get('ccqCatCompleted') || {};
-      const key = `${_currentLevel}-${_currentCat}`;
-      catCompleted[key] = (catCompleted[key] || 0) + 1;
-      store.set('ccqCatCompleted', catCompleted);
+    const accPercent = Math.round((userAnswers.filter((ans, i) => ans === passage.answers[i]).length / Math.max(1, passage.answers.length)) * 100);
+    if (_currentCat !== '__all__' && passage.id) {
+      const tracked = recordClozeCompletion({
+        level: _currentLevel,
+        category: _currentCat,
+        passageId: passage.id,
+        accuracy: accPercent,
+        ccqCompletedByPassage: store.get('ccqCompletedByPassage') || {},
+        ccqCompleted: store.get('ccqCompleted') || {},
+        ccqCatCompleted: store.get('ccqCatCompleted') || {},
+      });
+      store.set('ccqCompletedByPassage', tracked.nextByPassage);
+      store.set('ccqCompleted', tracked.nextCompleted);
+      store.set('ccqCatCompleted', tracked.nextCatCompleted);
     }
 
     document.querySelectorAll('.cloze-blank--filled').forEach(b => b.classList.add('cloze-blank--correct'));
 
-    // Post-answer explanation if clue mode was active
-    if (passage.clues && passage.clues.length > 0) {
-      _showClueExplanation(passage, () => {
-        setTimeout(() => { _passageIdx++; _showPassage(); }, 600);
-      });
-    } else {
-      _showFeedback('✅ Excellent! All correct!', true);
-      setTimeout(() => { _passageIdx++; _showPassage(); }, 1800);
-    }
+    showAnswerReviewPanel({
+      host: _container.querySelector('.cloze-game'),
+      title: 'Answer Review',
+      rows: _buildReviewRows(passage, userAnswers),
+      onContinue: () => {
+        if (passage.clues && passage.clues.length > 0) {
+          _showClueExplanation(passage, () => setTimeout(() => { _passageIdx++; _showPassage(); }, 600));
+        } else {
+          _showFeedback('✅ Excellent! All correct!', true);
+          setTimeout(() => { _passageIdx++; _showPassage(); }, 1200);
+        }
+      },
+    });
   } else {
     audio.playSfx('wrong');
     _passageWrongCount++;
@@ -629,13 +664,18 @@ function _checkPassage(passage) {
 
     if (_passageWrongCount >= 2) {
       // Second wrong attempt on this passage → teach-back before retry
-      _showFeedback('❌ Let\'s look at the rule first, then try again!', false);
+      _showFeedback('❌ Let\'s review your answers first.', false);
       setTimeout(() => {
         document.querySelectorAll('.cloze-blank--wrong').forEach(b => b.classList.remove('cloze-blank--wrong'));
         const fb = document.getElementById('cloze-feedback');
         if (fb) fb.hidden = true;
-        _showTeachBackOverlay(passage);
-      }, 1000);
+        showAnswerReviewPanel({
+          host: _container.querySelector('.cloze-game'),
+          title: 'Review Mistakes',
+          rows: _buildReviewRows(passage, userAnswers),
+          onContinue: () => _showTeachBackOverlay(passage),
+        });
+      }, 800);
     } else {
       _showFeedback('❌ Some blanks are wrong – try again!', false);
       setTimeout(() => {
@@ -680,13 +720,13 @@ function _showTeachBackOverlay(passage) {
         <h3 class="ctb-title">Here's a tip!</h3>
       </div>
       <div class="ctb-rule">
-        <p class="ctb-rule-text">${tip.rule}</p>
+        <p class="ctb-rule-text">${escapeHtml(tip.rule)}</p>
       </div>
       <div class="ctb-example">
         <span class="ctb-example-label">Example:</span>
-        <p class="ctb-example-text">${tip.example}</p>
+        <p class="ctb-example-text">${escapeHtml(tip.example)}</p>
       </div>
-      ${tip.tip ? `<p class="ctb-memory-tip">💡 ${tip.tip}</p>` : ''}
+      ${tip.tip ? `<p class="ctb-memory-tip">💡 ${escapeHtml(tip.tip)}</p>` : ''}
       <button class="btn btn--primary ctb-btn" id="ctb-try-again">
         Got it — try again!
       </button>
@@ -724,9 +764,9 @@ function _showClueExplanation(passage, onContinue) {
 
     return `
       <div class="clue-explanation-item">
-        <p><strong>Blank ${idx + 1}:</strong> ${answer}</p>
-        <p>Clue chosen: <span class="clue-result-badge ${feedback.cssClass}">${selected}</span> · Score ${Math.round(score * 100)}%</p>
-        <p class="clue-explanation-text">${note}</p>
+        <p><strong>Blank ${idx + 1}:</strong> ${escapeHtml(answer)}</p>
+        <p>Clue chosen: <span class="clue-result-badge ${feedback.cssClass}">${escapeHtml(selected)}</span> · Score ${Math.round(score * 100)}%</p>
+        <p class="clue-explanation-text">${escapeHtml(note)}</p>
       </div>`;
   }).join('');
 

@@ -40,6 +40,9 @@ import {
 } from './clueEngine.js';
 import { celebrateCorrect } from '../components/confettiHelper.js';
 import { mascot } from '../components/mascot.js';
+import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
+import { getUniqueWordVaultDone, recordWordVaultCompletion } from './clozeCompletionTracker.js';
+import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -239,7 +242,7 @@ function _renderCategoryBrowser() {
 
   for (const [key, meta] of Object.entries(VOCAB_CATEGORIES)) {
     const catCompleted = completed[key] || {};
-    const doneLevels = Object.values(catCompleted).filter(v => v === true || v?.done).length;
+    const doneLevels = ['p1','p2','p3','p4','p5','p6'].filter((lv) => getUniqueWordVaultDone({ category: key, level: lv, wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {}, wvqCompleted: completed }) > 0).length;
     const levelsForCat = Object.values(vocabPassages[key] || {});
     const totalLevels = levelsForCat.filter(arr => (arr || []).length > 0).length;
     const totalPassages = levelsForCat.reduce((sum, arr) => sum + ((arr || []).length), 0);
@@ -290,7 +293,7 @@ function _renderLevelBrowser(catKey) {
   for (const lv of levels) {
     const passages = catData[lv];
     const hasPassage = passages && passages.length > 0;
-    const isDone = !!(completed[lv] && (completed[lv] === true || completed[lv].done));
+    const isDone = getUniqueWordVaultDone({ category: catKey, level: lv, wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {}, wvqCompleted: store.get('wvqCompleted') || {} }) > 0;
 
     html += `
       <button class="wv-level-btn ${isDone ? 'wv-level-btn--done' : ''} ${!hasPassage ? 'wv-level-btn--locked' : ''}"
@@ -501,7 +504,16 @@ function _renderInfoPanel(passage) {
   }
 
   const rows = _buildDefinitionRows(passage);
-  panel.innerHTML = `<h4>Word Guide</h4>${rows.map((r) => `<div class="wv-info-row"><strong>${r.word}</strong><span>${r.definition}</span><small>${r.pos}${r.collocationHint ? ` · ${r.collocationHint}` : ''}</small></div>`).join('')}`;
+  panel.innerHTML = `<h4>Word Guide</h4>${rows.map((r) => `<div class="wv-info-row"><strong>${escapeHtml(r.word)}</strong><span>${escapeHtml(r.definition)}</span><small>${escapeHtml(r.pos)}${r.collocationHint ? ` · ${escapeHtml(r.collocationHint)}` : ''}</small></div>`).join('')}`;
+}
+
+
+function _renderClueScoreMeter() {
+  const scores = Object.values(_clueResults || {}).map(clueResultToScore);
+  if (!scores.length) return '☆ ☆ ☆';
+  const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+  const stars = avg >= 0.85 ? 3 : avg >= 0.45 ? 2 : 1;
+  return `${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}`;
 }
 
 // ── Clue Hunt Panel HTML ───────────────────────────────────────────────────
@@ -515,9 +527,9 @@ function _buildClueHuntPanel(passage) {
       <div class="clue-hunt-header">
         <span class="clue-hunt-icon">🔍</span>
         <span class="clue-hunt-title">Find the Context Clue</span>
-        <span class="clue-hunt-sub">Blank ${_activeBlankIndex + 1}</span>
+        <span class="clue-hunt-sub">Blank ${_activeBlankIndex + 1} · Clue Score ${_renderClueScoreMeter()}</span>
       </div>
-      <p class="clue-hunt-prompt">${clueData.prompt}</p>
+      <p class="clue-hunt-prompt">${escapeHtml(clueData.prompt)}</p>
       <div class="clue-hunt-feedback" id="clue-hunt-feedback" aria-live="polite"></div>
       <div class="clue-hint-row">
         <button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-hint-btn" aria-label="Get a hint">💡 Hint</button>
@@ -700,7 +712,7 @@ function _renderBank(passage) {
     bank.innerHTML = _bankWords.map(w => `
       <button class="wv-word-chip wv-word-chip--locked"
               disabled aria-disabled="true"
-              aria-label="${w.word}">${w.word}</button>
+              aria-label="${escapeAttr(w.word)}">${escapeHtml(w.word)}</button>
     `).join('');
     return;
   }
@@ -712,12 +724,12 @@ function _renderBank(passage) {
     const isUsed = w.used;
     const tone = _getChipToneClass(passage, w.word);
     const cue = _currentCat === 'collocationCloze' && passage.collocationHintsByWord?.[answerForBlank] && !isUsed
-      ? ` title="${passage.collocationHintsByWord[w.word] || ''}"`
+      ? ` title="${escapeAttr(passage.collocationHintsByWord[w.word] || '')}"`
       : '';
     const label = _currentCat === 'collocationCloze' && passage.collocationHintsByWord?.[w.word]
       ? `${w.word} … ${(passage.collocationHintsByWord[w.word].split('+')[1] || '').trim()}`
       : w.word;
-    return `<button class="wv-word-chip ${tone} ${isUsed ? 'wv-word-chip--used' : ''}" data-id="${w.id}" ${isUsed ? 'disabled aria-disabled="true"' : ''}${cue} aria-label="${label}">${label}</button>`;
+    return `<button class="wv-word-chip ${tone} ${isUsed ? 'wv-word-chip--used' : ''}" data-id="${w.id}" ${isUsed ? 'disabled aria-disabled="true"' : ''}${cue} aria-label="${escapeAttr(label)}">${escapeHtml(label)}</button>`;
   }).join('');
 
   bank.querySelectorAll('.wv-word-chip:not([disabled])').forEach(chip => {
@@ -808,6 +820,31 @@ function _getClueDataForBlank(passage, blankIndex) {
   return passage.clues.find(c => c.blankIndex === blankIndex) || null;
 }
 
+
+function _getVocabSkillLabel() {
+  if (_currentCat === 'synonymContrast') return 'synonym';
+  if (_currentCat === 'collocationCloze') return 'collocation';
+  if (_currentCat === 'connectorClue') return 'connector';
+  if (_currentCat === 'morphologicalAffix') return 'affix';
+  if (_currentCat === 'grammaticalRole') return 'word form';
+  return 'context meaning';
+}
+
+function _buildVocabReviewRows(passage, userAnswers) {
+  const skill = _getVocabSkillLabel();
+  return passage.answers.map((correctAnswer, idx) => {
+    const clue = _getClueDataForBlank(passage, idx);
+    return {
+      blank: `#${idx + 1}`,
+      studentAnswer: userAnswers[idx] || '',
+      correctAnswer,
+      status: (userAnswers[idx] || '') === correctAnswer ? 'Correct' : 'Try again',
+      clue: clue?.acceptableSpans?.[0] || (passage.hints || [])[idx] || '—',
+      explanation: `${(passage.definitions || {})[correctAnswer] || 'Use sentence context.'} · ${skill}`,
+    };
+  });
+}
+
 // ── Checking ───────────────────────────────────────────────────────────────
 
 function _checkPassage(passage) {
@@ -840,12 +877,21 @@ function _checkPassage(passage) {
     audio.playSfx('correct');
     mascot.celebrate(false);
 
-    const completed = store.get('wvqCompleted') || {};
-    if (!completed[_currentCat]) completed[_currentCat] = {};
     const accPercent = Math.round((blankCorrect / Math.max(1, blankTotal)) * 100);
     const stars = getWordVaultStars({ accuracy: accPercent, hintsUsed: _sessionHintsUsed });
-    completed[_currentCat][_currentLevel] = { done: true, stars };
-    store.set('wvqCompleted', completed);
+    if (passage.id) {
+      const tracked = recordWordVaultCompletion({
+        category: _currentCat,
+        level: _currentLevel,
+        passageId: passage.id,
+        stars,
+        accuracy: accPercent,
+        wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {},
+        wvqCompleted: store.get('wvqCompleted') || {},
+      });
+      store.set('wvqCompletedByPassage', tracked.nextByPassage);
+      store.set('wvqCompleted', tracked.nextCompleted);
+    }
 
     questMastery.recordAttempt({
       quest: 'wordVault',
@@ -861,27 +907,18 @@ function _checkPassage(passage) {
     _sessionBlankCorrect = blankCorrect;
     _sessionBlankTotal = blankTotal;
 
-    if (_isAffixMode(passage)) {
-      _showMorphologySummary(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 400));
-      return;
-    }
-
-    if (_currentCat === 'synonymContrast') {
-      _showSynonymReview(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 400));
-      return;
-    }
-
-    if (_currentCat === 'collocationCloze') {
-      _showCollocationReview(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 400));
-      return;
-    }
-
-    if (passage.clues && passage.clues.length > 0) {
-      _showClueExplanation(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 600));
-    } else {
-      _showFeedback('✅ Brilliant! All correct!', true);
-      setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 1000);
-    }
+    showAnswerReviewPanel({
+      host: _container.querySelector('.wv-game'),
+      title: 'Answer Review',
+      rows: _buildVocabReviewRows(passage, userAnswers),
+      onContinue: () => {
+        if (_isAffixMode(passage)) return _showMorphologySummary(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 300));
+        if (_currentCat === 'synonymContrast') return _showSynonymReview(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 300));
+        if (_currentCat === 'collocationCloze') return _showCollocationReview(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 300));
+        if (passage.clues && passage.clues.length > 0) return _showClueExplanation(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 400));
+        _showComplete({ blankCorrect, blankTotal });
+      },
+    });
   } else {
     audio.playSfx('wrong');
     questMastery.recordAttempt({
@@ -900,11 +937,16 @@ function _checkPassage(passage) {
     _passageWrongCount++;
 
     if (_passageWrongCount >= 2) {
-      _showFeedback('❌ Let\'s look at the rule, then try again!', false);
+      _showFeedback('❌ Let\'s review the mistakes first.', false);
       setTimeout(() => {
         document.querySelectorAll('.wv-blank--wrong').forEach(b => b.classList.remove('wv-blank--wrong'));
-        _showVaultTeachBackOverlay(passage);
-      }, 900);
+        showAnswerReviewPanel({
+          host: _container.querySelector('.wv-game'),
+          title: 'Review Mistakes',
+          rows: _buildVocabReviewRows(passage, userAnswers),
+          onContinue: () => _showVaultTeachBackOverlay(passage),
+        });
+      }, 800);
     } else {
       _showFeedback('❌ Some blanks are wrong – check and try again!', false);
       setTimeout(() => {
@@ -935,9 +977,9 @@ function _showVaultTeachBackOverlay(passage) {
         <span class="wv-tb-icon">${tb.icon}</span>
         <h3 class="wv-tb-title">Quick Skill Reminder</h3>
       </div>
-      <p class="wv-tb-rule">${tb.rule}</p>
-      <div class="wv-tb-example">${tb.example}</div>
-      <p class="wv-tb-tip">💡 ${tb.tip}</p>
+      <p class="wv-tb-rule">${escapeHtml(tb.rule)}</p>
+      <div class="wv-tb-example">${escapeHtml(tb.example)}</div>
+      <p class="wv-tb-tip">💡 ${escapeHtml(tb.tip)}</p>
       <button class="btn btn--primary wv-tb-btn" id="wv-tb-got-it">
         Got it — Try again →
       </button>
@@ -981,8 +1023,8 @@ function _showClueExplanation(passage, onContinue) {
       <p class="clue-explanation-title">✅ Brilliant! All correct!</p>
       <div class="clue-explanation-body">
         <p class="clue-explanation-label">Context clue:</p>
-        <span class="clue-result-badge ${cssClass}">${clueSpan || 'No clue selected'}</span>
-        <p class="clue-explanation-text">${primaryClue.explanation}</p>
+        <span class="clue-result-badge ${cssClass}">${escapeHtml(clueSpan || 'No clue selected')}</span>
+        <p class="clue-explanation-text">${escapeHtml(primaryClue.explanation)}</p>
       </div>
       <button class="btn btn--primary" id="wv-explanation-next">Continue →</button>
     </div>`;
@@ -1008,7 +1050,7 @@ function _showMorphologySummary(passage, onContinue) {
   const overlay = document.createElement('div');
   overlay.className = 'clue-explanation-overlay';
   overlay.innerHTML = `<div class="clue-explanation-card"><p class="clue-explanation-title">🧩 Word Parts Recap</p>
-    <div class="clue-explanation-body">${_affixParts.map((part) => `<p><strong>${part.answer}</strong> = ${part.type === 'prefix' ? `${part.affix}- + ${part.root}` : `${part.root} + -${part.affix}`} → ${part.definition}</p>`).join('')}</div>
+    <div class="clue-explanation-body">${_affixParts.map((part) => `<p><strong>${escapeHtml(part.answer)}</strong> = ${part.type === 'prefix' ? `${part.affix}- + ${part.root}` : `${part.root} + -${part.affix}`} → ${escapeHtml(part.definition)}</p>`).join('')}</div>
     <button class="btn btn--primary" id="wv-review-next">Continue →</button></div>`;
   _container.querySelector('.wv-game')?.appendChild(overlay);
   document.getElementById('wv-review-next')?.addEventListener('click', () => { overlay.remove(); onContinue?.(); });
@@ -1023,7 +1065,7 @@ function _showSynonymReview(passage, onContinue) {
     <tbody>${passage.answers.map((word) => {
       const syn = (passage.contrastPairs || []).find(p => p.word === word && p.type === 'synonym')?.pair || '—';
       const ant = (passage.contrastPairs || []).find(p => p.word === word && p.type === 'antonym')?.pair || '—';
-      return `<tr><td>${word}</td><td>${defs[word] || '—'}</td><td>${syn}</td><td>${ant}</td></tr>`;
+      return `<tr><td>${word}</td><td>${escapeHtml(defs[word] || '—')}</td><td>${escapeHtml(syn)}</td><td>${escapeHtml(ant)}</td></tr>`;
     }).join('')}</tbody></table></div>
     <button class="btn btn--primary" id="wv-review-next">Continue →</button></div>`;
   _container.querySelector('.wv-game')?.appendChild(overlay);
@@ -1034,7 +1076,7 @@ function _showCollocationReview(passage, onContinue) {
   const overlay = document.createElement('div');
   overlay.className = 'clue-explanation-overlay';
   overlay.innerHTML = `<div class="clue-explanation-card"><p class="clue-explanation-title">🤝 Collocation Guide</p>
-    <div class="clue-explanation-body">${passage.answers.map((word) => `<p><strong>${word}</strong>: ${(passage.collocationHintsByWord || {})[word] || passage.collocationHint || 'Word partner pattern'}</p>`).join('')}</div>
+    <div class="clue-explanation-body">${passage.answers.map((word) => `<p><strong>${escapeHtml(word)}</strong>: ${escapeHtml((passage.collocationHintsByWord || {})[word] || passage.collocationHint || 'Word partner pattern')}</p>`).join('')}</div>
     <button class="btn btn--primary" id="wv-review-next">Continue →</button></div>`;
   _container.querySelector('.wv-game')?.appendChild(overlay);
   document.getElementById('wv-review-next')?.addEventListener('click', () => { overlay.remove(); onContinue?.(); });

@@ -22,6 +22,8 @@
  * }
  */
 
+import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
+
 // ── Tokenisation ─────────────────────────────────────────────────────────────
 
 /**
@@ -148,16 +150,16 @@ export function renderClueHuntPassage({
         return ' ';
 
       case 'punct':
-        return `<span class="clue-punct">${tok.value}</span>`;
+        return `<span class="clue-punct">${escapeHtml(tok.value)}</span>`;
 
       case 'blank': {
         const isActive = tok.blankIndex === activeBlankIndex;
         const filled   = filledAnswers[tok.blankIndex];
         if (filled) {
-          return `<span class="clue-blank-token clue-blank-token--filled">${filled}</span>`;
+          return `<span class="clue-blank-token clue-blank-token--filled">${escapeHtml(filled)}</span>`;
         }
         return `<span class="clue-blank-token ${isActive ? 'clue-blank-token--active' : ''}"
-                      aria-label="${isActive ? 'Active blank ' + (tok.blankIndex + 1) : 'Blank ' + (tok.blankIndex + 1)}">
+                      aria-label="${escapeAttr(isActive ? 'Active blank ' + (tok.blankIndex + 1) : 'Blank ' + (tok.blankIndex + 1))}">
                   ${isActive ? '❓' : '___'}
                 </span>`;
       }
@@ -169,8 +171,8 @@ export function renderClueHuntPassage({
           extra = `clue-word-token--${selectedResult}`;
         }
         return `<button class="clue-word-token ${extra}"
-                        data-word="${tok.value}"
-                        aria-label="Tap ${tok.value} as clue">${tok.value}</button>`;
+                        data-word="${escapeAttr(tok.value)}"
+                        aria-label="${escapeAttr(`Tap ${tok.value} as clue`)}">${escapeHtml(tok.value)}</button>`;
       }
 
       default:
@@ -272,18 +274,18 @@ export function clueResultFeedback(result) {
   switch (result) {
     case 'strong':
       return {
-        message:  '✨ Strong clue! Now choose your answer.',
+        message:  'Excellent clue! This tells you the answer directly.',
         cssClass: 'clue-feedback--strong',
       };
     case 'partial':
       return {
-        message:  '🟡 Good try! That gives a hint. Now choose your answer.',
+        message:  'Good clue, but there is a stronger one nearby.',
         cssClass: 'clue-feedback--partial',
       };
     case 'weak':
     default:
       return {
-        message:  '🔴 That word doesn\'t help much. Try a stronger clue.',
+        message:  'This word does not help enough. Look near the blank.',
         cssClass: 'clue-feedback--weak',
       };
   }
