@@ -1003,6 +1003,16 @@ function _checkPassage(passage) {
     mascot.encourage();
     _passageWrongCount++;
 
+    if (_sessionMode === 'exam') {
+      showAnswerReviewPanel({
+        host: _container.querySelector('.wv-game'),
+        title: 'Exam Submission Review',
+        rows: _buildVocabReviewRows(passage, userAnswers),
+        onContinue: () => _showComplete({ blankCorrect, blankTotal, userAnswers }),
+      });
+      return;
+    }
+
     if (_passageWrongCount >= 2) {
       _showFeedback('❌ Let\'s review the mistakes first.', false);
       setTimeout(() => {
