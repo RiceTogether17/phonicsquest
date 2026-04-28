@@ -43,6 +43,7 @@ import { mascot } from '../components/mascot.js';
 import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
 import { getUniqueClozeDone, recordClozeCompletion } from './clozeCompletionTracker.js';
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
+import { buildCopySummaryText, getModeConfig, getNextStepRecommendation } from './clozeSessionSummary.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -73,6 +74,10 @@ let _hintLevel        = 0;
 let _bankLocked       = false;
 let _weakAttempts     = 0;
 let _sessionClueScore = 0;   // accumulated clue points this session
+let _sessionMode      = 'practice';
+let _sessionHintsUsed = 0;
+let _examStartedAt    = 0;
+let _lastUserAnswers  = [];
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
@@ -169,6 +174,13 @@ function _renderCategoryPicker(level) {
 
   html += '</div>';
 
+  const modeCfg = getModeConfig(_sessionMode);
+  html += `<div class="cloze-mode-toggle">
+    <span class="cloze-mode-label">Mode:</span>
+    <button class="btn btn--ghost btn--sm ${modeCfg.mode === 'practice' ? 'is-active' : ''}" id="cloze-mode-practice">Practice</button>
+    <button class="btn btn--ghost btn--sm ${modeCfg.mode === 'exam' ? 'is-active' : ''}" id="cloze-mode-exam">Exam</button>
+  </div>`;
+
   const totalAll = cats.reduce((s, c) => s + passages[level][c].length, 0);
   html += `<div class="cloze-cat-actions">
     <button class="btn btn--primary btn--lg" id="cloze-play-all">Play All (${totalAll} passages)</button>
@@ -178,6 +190,14 @@ function _renderCategoryPicker(level) {
   _container.innerHTML = html;
 
   document.getElementById('cloze-back-levels')?.addEventListener('click', () => _renderBrowser());
+  document.getElementById('cloze-mode-practice')?.addEventListener('click', () => {
+    _sessionMode = 'practice';
+    _renderCategoryPicker(level);
+  });
+  document.getElementById('cloze-mode-exam')?.addEventListener('click', () => {
+    _sessionMode = 'exam';
+    _renderCategoryPicker(level);
+  });
 
   _container.querySelectorAll('.cloze-cat-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -201,6 +221,8 @@ function _startCategory(level, catKey) {
   _sessionCorrect = 0;
   _sessionTotal   = 0;
   _sessionClueScore = 0;
+  _sessionHintsUsed = 0;
+  _examStartedAt = Date.now();
   _showPassage();
 }
 
@@ -212,6 +234,8 @@ function _startAllCategories(level) {
   _sessionCorrect = 0;
   _sessionTotal   = 0;
   _sessionClueScore = 0;
+  _sessionHintsUsed = 0;
+  _examStartedAt = Date.now();
   _showPassage();
 }
 
@@ -263,12 +287,14 @@ function _renderPassage(passage) {
 
   const hasClues = passage.clues && passage.clues.length > 0;
   const inClueMode = hasClues && _bankLocked;
+  const modeCfg = getModeConfig(_sessionMode);
 
   _container.innerHTML = `
     <div class="cloze-game">
       <div class="cloze-game-header">
         <span class="cloze-badge">${icon} ${CLOZE_LEVEL_LABELS[_currentLevel]}</span>
         <span class="cloze-badge cloze-badge--cat">${catInfo}</span>
+        <span class="cloze-badge">${modeCfg.label}</span>
         <span class="cloze-progress">${progress}</span>
         <span class="cloze-xp-badge">+${passage.xp} XP</span>
       </div>
@@ -362,7 +388,9 @@ function _buildClueHuntPanel(passage) {
       <p class="clue-hunt-prompt">${escapeHtml(clueData.prompt)}</p>
       <div class="clue-hunt-feedback" id="clue-hunt-feedback" aria-live="polite"></div>
       <div class="clue-hint-row">
-        <button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-hint-btn" aria-label="Get a hint">💡 Hint</button>
+        ${_sessionMode === 'exam'
+          ? '<details><summary class="btn btn--ghost btn--sm">Need help?</summary><button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-hint-btn" aria-label="Get a hint">💡 Hint</button></details>'
+          : '<button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-hint-btn" aria-label="Get a hint">💡 Hint</button>'}
         <button class="btn btn--ghost btn--sm clue-hint-btn" id="clue-skip-btn" aria-label="Skip clue">Skip clue</button>
         <span class="clue-hint-msg" id="clue-hint-msg"></span>
       </div>
@@ -377,6 +405,7 @@ function _attachClueHuntListeners(passage) {
     const clueData = _getActiveClueData(passage);
     if (!clueData) return;
     _hintLevel = Math.min(_hintLevel + 1, 4);
+    _sessionHintsUsed++;
     const { message } = getClueHint(_hintLevel, clueData);
     const hintMsg = document.getElementById('clue-hint-msg');
     if (hintMsg) {
@@ -598,6 +627,7 @@ function _checkPassage(passage) {
   }
 
   const userAnswers = buildUserAnswers(_blankFills, _bankWords);
+  _lastUserAnswers = [...userAnswers];
   const allCorrect  = userAnswers.every((ans, i) => ans === passage.answers[i]);
   const skillKey = _currentCat === '__all__' ? 'mixed' : _currentCat;
 
@@ -616,7 +646,7 @@ function _checkPassage(passage) {
   if (allCorrect) {
     _sessionCorrect++;
     gamification.recordCorrect(2000, false);
-    celebrateCorrect();
+    if (getModeConfig(_sessionMode).confettiPerPassage) celebrateCorrect();
     audio.playSfx('correct');
     mascot.celebrate(false);
 
@@ -661,6 +691,16 @@ function _checkPassage(passage) {
     });
 
     mascot.encourage();
+
+    if (_sessionMode === 'exam') {
+      showAnswerReviewPanel({
+        host: _container.querySelector('.cloze-game'),
+        title: 'Exam Submission Review',
+        rows: _buildReviewRows(passage, userAnswers),
+        onContinue: () => { _passageIdx++; _showPassage(); },
+      });
+      return;
+    }
 
     if (_passageWrongCount >= 2) {
       // Second wrong attempt on this passage → teach-back before retry
@@ -814,6 +854,15 @@ function _showComplete() {
 
   const acc   = _sessionTotal > 0 ? Math.round((_sessionCorrect / _sessionTotal) * 100) : 100;
   const stars = acc >= 90 ? 3 : acc >= 70 ? 2 : 1;
+  const modeCfg = getModeConfig(_sessionMode);
+  const elapsedSec = Math.max(1, Math.round((Date.now() - (_examStartedAt || Date.now())) / 1000));
+  const recommendation = getNextStepRecommendation({ accuracy: acc, skillLabel: catInfo, hintsUsed: _sessionHintsUsed });
+  const lastPassageAnswers = _levelPassages[_levelPassages.length - 1]?.answers || [];
+  const wrongLines = lastPassageAnswers.map((ans, idx) => {
+    const got = _lastUserAnswers[idx];
+    if (!got || got === ans) return null;
+    return `- Blank ${idx + 1}: ${got} → ${ans}`;
+  }).filter(Boolean);
 
   // Clue accuracy line (only shown if clue mode was used)
   const clueTotal = Object.keys(_clueResults).length;
@@ -831,10 +880,13 @@ function _showComplete() {
       <p class="cloze-complete-sub">${CLOZE_LEVEL_LABELS[_currentLevel]} · ${catInfo}</p>
       <div class="cloze-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
       <p class="cloze-complete-score">${_sessionCorrect} / ${_sessionTotal} correct · ${acc}%</p>
+      <p class="cloze-complete-score">Mode: ${modeCfg.label} · Hints used: ${_sessionHintsUsed} · Time: ${elapsedSec}s</p>
       ${clueAccLine}
+      <p class="cloze-complete-score">Next step: ${recommendation}</p>
       <div class="cloze-complete-actions">
         <button class="btn btn--primary btn--lg" id="cloze-back-cat">Choose Another Topic</button>
         <button class="btn btn--ghost btn--sm" id="cloze-replay">Play Again ↺</button>
+        <button class="btn btn--ghost btn--sm" id="cloze-copy-summary">Copy Summary</button>
         <button class="btn btn--ghost btn--sm" id="cloze-back-levels">All Levels</button>
       </div>
     </div>`;
@@ -843,6 +895,26 @@ function _showComplete() {
   document.getElementById('cloze-replay')?.addEventListener('click', () => {
     if (_currentCat === '__all__') _startAllCategories(_currentLevel);
     else _startCategory(_currentLevel, _currentCat);
+  });
+  document.getElementById('cloze-copy-summary')?.addEventListener('click', async () => {
+    const text = buildCopySummaryText({
+      modeLabel: modeCfg.label,
+      title: `${CLOZE_LEVEL_LABELS[_currentLevel]} · ${catInfo}`,
+      category: catInfo,
+      level: CLOZE_LEVEL_LABELS[_currentLevel],
+      scoreLine: `${_sessionCorrect}/${_sessionTotal}`,
+      accuracy: acc,
+      hintsUsed: _sessionHintsUsed,
+      clueScore: clueAcc ?? 0,
+      wrongLines,
+      nextStep: recommendation,
+    });
+    try {
+      await navigator.clipboard?.writeText(text);
+      _showFeedback('Summary copied!', true);
+    } catch {
+      _showFeedback('Unable to copy summary on this device.', false);
+    }
   });
   document.getElementById('cloze-back-levels')?.addEventListener('click', () => _renderBrowser());
 

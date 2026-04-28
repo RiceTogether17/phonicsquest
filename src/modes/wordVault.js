@@ -43,6 +43,7 @@ import { mascot } from '../components/mascot.js';
 import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
 import { getUniqueWordVaultDone, recordWordVaultCompletion } from './clozeCompletionTracker.js';
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
+import { buildCopySummaryText, getModeConfig, getNextStepRecommendation } from './clozeSessionSummary.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -74,6 +75,8 @@ const LEVEL_ICONS  = { p1: '🌱', p2: '🌿', p3: '🌳', p4: '🔥', p5: '💎
 
 
 let _sessionHintsUsed = 0;
+let _sessionMode = 'practice';
+let _examStartedAt = 0;
 let _infoPanelOpen = false;
 let _affixWrongAttempts = {};
 let _affixParts = [];
@@ -197,6 +200,17 @@ function _recordAffixAttempt(affix, correct) {
   store.set('clueStats', clueStats);
 }
 
+function _getUniquePassageCountForCategory(catKey, levels = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6']) {
+  return levels.reduce((sum, lv) => (
+    sum + getUniqueWordVaultDone({
+      category: catKey,
+      level: lv,
+      wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {},
+      wvqCompleted: store.get('wvqCompleted') || {},
+    })
+  ), 0);
+}
+
 function _buildDefinitionRows(passage) {
   const defs = passage.definitions || {};
   return (passage.wordBank || []).map((word) => ({
@@ -246,6 +260,7 @@ function _renderCategoryBrowser() {
     const levelsForCat = Object.values(vocabPassages[key] || {});
     const totalLevels = levelsForCat.filter(arr => (arr || []).length > 0).length;
     const totalPassages = levelsForCat.reduce((sum, arr) => sum + ((arr || []).length), 0);
+    const donePassages = _getUniquePassageCountForCategory(key);
     const perLevel = totalLevels ? Math.round(totalPassages / totalLevels) : 0;
     const isRecommended = key === recommendedCat;
 
@@ -256,7 +271,7 @@ function _renderCategoryBrowser() {
         <span class="wv-cat-icon">${meta.icon}</span>
         <span class="wv-cat-label">${meta.label}</span>
         <span class="wv-cat-desc">${meta.desc}</span>
-        <span class="wv-cat-progress">${doneLevels}/${totalLevels} levels · ${totalPassages} passages (~${perLevel}/level)${isRecommended ? ' · Recommended' : ''}</span>
+        <span class="wv-cat-progress">${doneLevels}/${totalLevels} levels · ${donePassages}/${totalPassages} passages (~${perLevel}/level)${isRecommended ? ' · Recommended' : ''}</span>
       </button>`;
   }
 
@@ -288,12 +303,18 @@ function _renderLevelBrowser(catKey) {
         <span class="wv-level-title" style="color:${meta.color}">${meta.icon} ${meta.label}</span>
       </div>
       <p class="wv-level-desc">${meta.desc}</p>
+      <div class="cloze-mode-toggle">
+        <span class="cloze-mode-label">Mode:</span>
+        <button class="btn btn--ghost btn--sm ${_sessionMode === 'practice' ? 'is-active' : ''}" id="wv-mode-practice">Practice</button>
+        <button class="btn btn--ghost btn--sm ${_sessionMode === 'exam' ? 'is-active' : ''}" id="wv-mode-exam">Exam</button>
+      </div>
       <div class="wv-level-grid">`;
 
   for (const lv of levels) {
     const passages = catData[lv];
     const hasPassage = passages && passages.length > 0;
     const isDone = getUniqueWordVaultDone({ category: catKey, level: lv, wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {}, wvqCompleted: store.get('wvqCompleted') || {} }) > 0;
+    const uniqueDone = getUniqueWordVaultDone({ category: catKey, level: lv, wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {}, wvqCompleted: store.get('wvqCompleted') || {} });
 
     html += `
       <button class="wv-level-btn ${isDone ? 'wv-level-btn--done' : ''} ${!hasPassage ? 'wv-level-btn--locked' : ''}"
@@ -303,7 +324,7 @@ function _renderLevelBrowser(catKey) {
               aria-label="${LEVEL_LABELS[lv]}${isDone ? ' – completed' : ''}">
         <span class="wv-level-icon">${isDone ? renderSummaryStars(completed[lv]?.stars || 1) : LEVEL_ICONS[lv]}</span>
         <span class="wv-level-name">${LEVEL_LABELS[lv]}</span>
-        <span class="wv-level-count">${(passages || []).length} passages</span>
+        <span class="wv-level-count">${uniqueDone}/${(passages || []).length} passages</span>
       </button>`;
   }
 
@@ -311,6 +332,8 @@ function _renderLevelBrowser(catKey) {
   _container.innerHTML = html;
 
   document.getElementById('wv-back-cats')?.addEventListener('click', () => _renderCategoryBrowser());
+  document.getElementById('wv-mode-practice')?.addEventListener('click', () => { _sessionMode = 'practice'; _renderLevelBrowser(catKey); });
+  document.getElementById('wv-mode-exam')?.addEventListener('click', () => { _sessionMode = 'exam'; _renderLevelBrowser(catKey); });
 
   _container.querySelectorAll('.wv-level-btn:not([disabled])').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -330,6 +353,7 @@ function _startPassage(catKey, level) {
   _sessionTotal     = 0;
   _sessionClueScore = 0;
   _sessionHintsUsed = 0;
+  _examStartedAt = Date.now();
   _infoPanelOpen = false;
 
   const perf = store.get('wvqWordPerformance') || {};
@@ -406,6 +430,7 @@ function _renderPassage(passage) {
   const lv        = _currentLevel;
   const inClueMode = passage.clues && passage.clues.length > 0 && _bankLocked;
   const showLegend = _currentCat === 'grammaticalRole';
+  const modeCfg = getModeConfig(_sessionMode);
 
   _container.innerHTML = `
     <div class="wv-game">
@@ -413,6 +438,7 @@ function _renderPassage(passage) {
         <button class="btn btn--ghost btn--sm" id="wv-back-levels">← Levels</button>
         <span class="wv-game-badge" style="color:${meta.color}">${meta.icon} ${meta.label}</span>
         <span class="wv-game-level">${LEVEL_ICONS[lv]} ${LEVEL_LABELS[lv]}</span>
+        <span class="wv-game-level">${modeCfg.label}</span>
       </div>
 
       <h3 class="wv-passage-title">${passage.title}</h3>
@@ -439,7 +465,7 @@ function _renderPassage(passage) {
         <button class="btn btn--ghost btn--sm" id="wv-clear">↺ Clear all</button>
         <button class="btn btn--ghost btn--sm" id="wv-listen" aria-label="Listen to passage">🔊 Listen</button>
         <button class="btn btn--ghost btn--sm" id="wv-info" aria-label="Show definitions panel">ℹ️ Info</button>
-        <button class="btn btn--ghost btn--sm" id="wv-hint">💡 Hint</button>
+        ${modeCfg.hintsInline ? '<button class="btn btn--ghost btn--sm" id="wv-hint">💡 Hint</button>' : '<details><summary class="btn btn--ghost btn--sm">Need help?</summary><button class="btn btn--ghost btn--sm" id="wv-hint">💡 Hint</button></details>'}
         <button class="btn btn--primary" id="wv-check" ${inClueMode ? 'disabled' : ''}>Check ✓</button>
         <button class="btn btn--ghost btn--sm" id="wv-quit">Menu</button>
       </div>
@@ -834,13 +860,22 @@ function _buildVocabReviewRows(passage, userAnswers) {
   const skill = _getVocabSkillLabel();
   return passage.answers.map((correctAnswer, idx) => {
     const clue = _getClueDataForBlank(passage, idx);
+    const examTip = _currentCat === 'connectorClue'
+      ? 'Exam tip: Check the connector logic between clauses.'
+      : _currentCat === 'collocationCloze'
+        ? 'Exam tip: Look for natural word partners.'
+        : _currentCat === 'grammaticalRole'
+          ? 'Exam tip: Check the required word form and part of speech.'
+          : 'Exam tip: Use context around the blank to confirm meaning.';
+    const chosen = userAnswers[idx] || '';
+    const wrongTrap = chosen && chosen !== correctAnswer ? `Not ${chosen}: it does not match this sentence clue.` : 'Correct choice matched context.';
     return {
       blank: `#${idx + 1}`,
-      studentAnswer: userAnswers[idx] || '',
+      studentAnswer: chosen,
       correctAnswer,
-      status: (userAnswers[idx] || '') === correctAnswer ? 'Correct' : 'Try again',
-      clue: clue?.acceptableSpans?.[0] || (passage.hints || [])[idx] || '—',
-      explanation: `${(passage.definitions || {})[correctAnswer] || 'Use sentence context.'} · ${skill}`,
+      status: chosen === correctAnswer ? 'Correct' : 'Try again',
+      clue: clue?.acceptableSpans?.[0] || (passage.hints || [])[idx] || 'Look near this blank.',
+      explanation: `${(passage.definitions || {})[correctAnswer] || 'Use sentence context.'} · ${skill}. ${wrongTrap} ${examTip}`,
     };
   });
 }
@@ -873,7 +908,7 @@ function _checkPassage(passage) {
   if (allCorrect) {
     _sessionCorrect++;
     gamification.recordCorrect(2000, false);
-    celebrateCorrect();
+    if (getModeConfig(_sessionMode).confettiPerPassage) celebrateCorrect();
     audio.playSfx('correct');
     mascot.celebrate(false);
 
@@ -935,6 +970,16 @@ function _checkPassage(passage) {
     });
     mascot.encourage();
     _passageWrongCount++;
+
+    if (_sessionMode === 'exam') {
+      showAnswerReviewPanel({
+        host: _container.querySelector('.wv-game'),
+        title: 'Exam Submission Review',
+        rows: _buildVocabReviewRows(passage, userAnswers),
+        onContinue: () => _showComplete({ blankCorrect, blankTotal, userAnswers }),
+      });
+      return;
+    }
 
     if (_passageWrongCount >= 2) {
       _showFeedback('❌ Let\'s review the mistakes first.', false);
@@ -1108,6 +1153,15 @@ function _showComplete(summary = {}) {
   const correctBlanks = summary.blankCorrect ?? _sessionBlankCorrect ?? 0;
   const acc   = totalBlanks > 0 ? Math.round((correctBlanks / totalBlanks) * 100) : 0;
   const stars = getWordVaultStars({ accuracy: acc, hintsUsed: _sessionHintsUsed });
+  const modeCfg = getModeConfig(_sessionMode);
+  const elapsedSec = Math.max(1, Math.round((Date.now() - (_examStartedAt || Date.now())) / 1000));
+  const recommendation = getNextStepRecommendation({ accuracy: acc, skillLabel: meta.label, hintsUsed: _sessionHintsUsed });
+  const userAnswers = summary.userAnswers || [];
+  const wrongLines = (_passage?.answers || []).map((ans, idx) => {
+    const got = userAnswers[idx];
+    if (!got || got === ans) return null;
+    return `- Blank ${idx + 1}: ${got} → ${ans}`;
+  }).filter(Boolean);
 
   const clueTotal = Object.keys(_clueResults).length;
   const clueAcc   = clueTotal > 0
@@ -1124,12 +1178,15 @@ function _showComplete(summary = {}) {
       <p class="wv-complete-sub">${meta.label} · ${LEVEL_LABELS[_currentLevel]}</p>
       <div class="wv-stars">${renderSummaryStars(stars)}</div>
       <p class="wv-complete-score">Blanks: ${correctBlanks} / ${totalBlanks} correct · ${acc}%</p>
+      <p class="wv-complete-score">Mode: ${modeCfg.label} · Hints used: ${_sessionHintsUsed} · Time: ${elapsedSec}s</p>
       ${clueAccLine}
+      <p class="wv-complete-score">Next Step: ${recommendation}</p>
       <div class="wv-complete-actions">
         ${nextLv
           ? `<button class="btn btn--primary btn--lg" id="wv-next-level">${LEVEL_LABELS[nextLv]} →</button>`
           : ''}
         <button class="btn btn--ghost btn--sm" id="wv-replay">Play Again ↺</button>
+        <button class="btn btn--ghost btn--sm" id="wv-copy-summary">Copy Summary</button>
         <button class="btn btn--ghost btn--sm" id="wv-back-lvls">All Levels</button>
         <button class="btn btn--ghost btn--sm" id="wv-back-cats2">Categories</button>
       </div>
@@ -1140,6 +1197,26 @@ function _showComplete(summary = {}) {
     _startPassage(_currentCat, _currentLevel);
   });
   document.getElementById('wv-replay')?.addEventListener('click', () => _startPassage(_currentCat, _currentLevel));
+  document.getElementById('wv-copy-summary')?.addEventListener('click', async () => {
+    const text = buildCopySummaryText({
+      modeLabel: modeCfg.label,
+      title: _passage?.title || 'Word Vault Passage',
+      category: meta.label,
+      level: LEVEL_LABELS[_currentLevel],
+      scoreLine: `${correctBlanks}/${totalBlanks}`,
+      accuracy: acc,
+      hintsUsed: _sessionHintsUsed,
+      clueScore: clueAcc ?? 0,
+      wrongLines,
+      nextStep: recommendation,
+    });
+    try {
+      await navigator.clipboard?.writeText(text);
+      _showFeedback('Summary copied!', true);
+    } catch {
+      _showFeedback('Unable to copy summary on this device.', false);
+    }
+  });
   document.getElementById('wv-back-lvls')?.addEventListener('click', () => _renderLevelBrowser(_currentCat));
   document.getElementById('wv-back-cats2')?.addEventListener('click', () => _renderCategoryBrowser());
 
