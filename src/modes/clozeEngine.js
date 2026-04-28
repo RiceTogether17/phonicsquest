@@ -5,6 +5,8 @@
  * Keeps rendering and interaction logic consistent between both modes.
  */
 
+import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
+
 export function createClozeRound(passage) {
   const blankCount = (passage.text.match(/___/g) || []).length;
   const bankWords = passage.wordBank.map((word, id) => ({ id, word, used: false }));
@@ -57,15 +59,15 @@ export function renderClozePassage({
   let html = '';
 
   parts.forEach((part, i) => {
-    html += `<span>${part}</span>`;
+    html += `<span>${escapeHtml(part)}</span>`;
     if (i < parts.length - 1) {
       const fillId = blankFills[i];
       const fill = fillId !== null ? bankWords.find(w => w.id === fillId) : null;
 
       if (fill) {
-        html += `<button class="${blankClass} ${filledClass}" data-blank="${i}" aria-label="${removeBlankAria(fill.word)}">${fill.word}</button>`;
+        html += `<button class="${blankClass} ${filledClass}" data-blank="${i}" aria-label="${escapeAttr(removeBlankAria(fill.word))}">${escapeHtml(fill.word)}</button>`;
       } else {
-        html += `<button class="${blankClass}" data-blank="${i}" aria-label="${emptyBlankAria(i)}"></button>`;
+        html += `<button class="${blankClass}" data-blank="${i}" aria-label="${escapeAttr(emptyBlankAria(i))}"></button>`;
       }
     }
   });
@@ -95,7 +97,7 @@ export function renderClozeBank({ container, bankWords, chipClass, usedClass, on
     <button class="${chipClass} ${w.used ? usedClass : ''}"
             data-id="${w.id}"
             ${w.used ? 'disabled aria-disabled="true"' : ''}
-            aria-label="${w.word}">${w.word}</button>
+            aria-label="${escapeAttr(w.word)}">${escapeHtml(w.word)}</button>
   `).join('');
 
   container.querySelectorAll(`.${chipClass}:not([disabled])`).forEach(chip => {
