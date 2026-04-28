@@ -43,7 +43,8 @@ import { mascot } from '../components/mascot.js';
 import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
 import { getUniqueClozeDone, recordClozeCompletion } from './clozeCompletionTracker.js';
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
-import { buildCopySummaryText, getModeConfig, getNextStepRecommendation } from './clozeSessionSummary.js';
+import { buildCopySummaryText, getModeConfig, getNextStepRecommendation, getSummaryScoreLine } from './clozeSessionSummary.js';
+import { incrementHintUsage } from './hintUsage.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -415,7 +416,7 @@ function _attachClueHuntListeners(passage) {
     const clueData = _getActiveClueData(passage);
     if (!clueData) return;
     _hintLevel = Math.min(_hintLevel + 1, 4);
-    _sessionHintsUsed++;
+    _sessionHintsUsed = incrementHintUsage(_sessionHintsUsed);
     const { message } = getClueHint(_hintLevel, clueData);
     const hintMsg = document.getElementById('clue-hint-msg');
     if (hintMsg) {
@@ -936,7 +937,13 @@ function _showComplete() {
       title: `${CLOZE_LEVEL_LABELS[_currentLevel]} · ${catInfo}`,
       category: catInfo,
       level: CLOZE_LEVEL_LABELS[_currentLevel],
-      scoreLine: `${_sessionCorrect}/${_sessionTotal}`,
+      scoreLine: getSummaryScoreLine({
+        mode: _sessionMode,
+        blankCorrect: _sessionBlankCorrect,
+        blankTotal: _sessionBlankTotal,
+        passageCorrect: _sessionCorrect,
+        passageTotal: _sessionTotal,
+      }),
       accuracy: acc,
       timeTaken: `${elapsedSec}s`,
       hintsUsed: _sessionHintsUsed,

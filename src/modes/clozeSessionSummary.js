@@ -50,6 +50,11 @@ export function buildCopySummaryText({
   return lines.map((line) => String(line || '').replace(/\s+/g, ' ').trim()).join('\n');
 }
 
+export function getSummaryScoreLine({ mode = 'practice', blankCorrect = 0, blankTotal = 0, passageCorrect = 0, passageTotal = 0 }) {
+  if (mode === 'exam') return `${blankCorrect}/${blankTotal}`;
+  return `${blankCorrect || passageCorrect}/${blankTotal || passageTotal}`;
+}
+
 export function safeText(value) {
   return escapeHtml(String(value ?? ''));
 }

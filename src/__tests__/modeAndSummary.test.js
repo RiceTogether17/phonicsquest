@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { buildCopySummaryText, getModeConfig } from '../modes/clozeSessionSummary.js';
+import { buildCopySummaryText, getModeConfig, getSummaryScoreLine } from '../modes/clozeSessionSummary.js';
 import { showAnswerReviewPanel } from '../modes/clozeReviewPanel.js';
+import { incrementHintUsage } from '../modes/hintUsage.js';
 
 describe('mode config', () => {
   it('practice mode allows hints and immediate feedback', () => {
@@ -37,7 +38,7 @@ describe('copy summary', () => {
       timeTaken: '95s',
       hintsUsed: 1,
       clueScore: 70,
-      wrongLines: ['- P5 Passage #3: because → although', '- P5 Passage #7: since → however'],
+      wrongLines: ['- Passage 1 #3: because → although', '- Passage 2 #7: since → however'],
       nextStep: 'Revise connector clues',
     });
     expect(text).toContain('Mode: Exam Mode');
@@ -46,8 +47,27 @@ describe('copy summary', () => {
     expect(text).toContain('Time: 95s');
     expect(text).toContain('Hints used: 1');
     expect(text).toContain('Clue score: 70%');
-    expect(text).toContain('- P5 Passage #7: since → however');
+    expect(text).toContain('- Passage 2 #7: since → however');
     expect(text).toContain('Next Step: Revise connector clues');
+  });
+
+  it('uses blank-level score line for exam mode', () => {
+    expect(getSummaryScoreLine({
+      mode: 'exam',
+      blankCorrect: 8,
+      blankTotal: 10,
+      passageCorrect: 0,
+      passageTotal: 3,
+    })).toBe('8/10');
+  });
+});
+
+describe('hint usage tracking', () => {
+  it('increments clue hint count reliably', () => {
+    let hints = 0;
+    hints = incrementHintUsage(hints);
+    hints = incrementHintUsage(hints);
+    expect(hints).toBe(2);
   });
 });
 

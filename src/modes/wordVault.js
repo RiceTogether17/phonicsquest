@@ -44,6 +44,7 @@ import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
 import { getUniqueWordVaultDone, recordWordVaultCompletion } from './clozeCompletionTracker.js';
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { buildCopySummaryText, getModeConfig, getNextStepRecommendation } from './clozeSessionSummary.js';
+import { incrementHintUsage } from './hintUsage.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -503,7 +504,7 @@ function _renderPassage(passage) {
   document.getElementById('wv-hint')?.addEventListener('click', () => {
     const idx = _getActiveBlankIndex();
     const msg = (passage.hints || [])[idx] || (passage.clueType ? (CONNECTOR_TYPE_LABELS[passage.clueType] || passage.clueType) : 'Look for nearby context clues.');
-    _sessionHintsUsed += 1;
+    _sessionHintsUsed = incrementHintUsage(_sessionHintsUsed);
     _showFeedback(`💡 ${msg}`, false);
     if (_isAffixMode(passage) && _affixParts[idx]) {
       audio.speakWord(_affixParts[idx].meaning || `Affix ${_affixParts[idx].affix}`);
@@ -577,6 +578,7 @@ function _attachClueHuntListeners(passage) {
     const clueData = _getActiveClueData(passage);
     if (!clueData) return;
     _hintLevel = Math.min(_hintLevel + 1, 4);
+    _sessionHintsUsed = incrementHintUsage(_sessionHintsUsed);
     const { message } = getClueHint(_hintLevel, clueData);
     const hintMsg = document.getElementById('clue-hint-msg');
     if (hintMsg) {
