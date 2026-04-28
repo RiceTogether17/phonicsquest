@@ -731,6 +731,16 @@ function _checkPassage(passage) {
 
     mascot.encourage();
 
+    if (_sessionMode === 'exam') {
+      showAnswerReviewPanel({
+        host: _container.querySelector('.cloze-game'),
+        title: 'Exam Submission Review',
+        rows: _buildReviewRows(passage, userAnswers),
+        onContinue: () => { _passageIdx++; _showPassage(); },
+      });
+      return;
+    }
+
     if (_passageWrongCount >= 2) {
       // Second wrong attempt on this passage → teach-back before retry
       _showFeedback('❌ Let\'s review your answers first.', false);
