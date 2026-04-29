@@ -43,6 +43,7 @@ import { mascot } from '../components/mascot.js';
 import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
 import { getUniqueWordVaultDone, recordWordVaultCompletion } from './clozeCompletionTracker.js';
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
+import { renderReadFirstScan } from './readFirstScan.js';
 import { buildCopySummaryText, getModeConfig, getNextStepRecommendation } from './clozeSessionSummary.js';
 import { incrementHintUsage } from './hintUsage.js';
 import { getClueTypeLabel, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
@@ -87,6 +88,8 @@ let _affixParts = [];
 
 // Wrong-attempt counter per passage — resets each new passage
 let _passageWrongCount = 0;
+
+let _readFirstAcknowledged = false;
 
 // ── Category-specific teach-back content ────────────────────────────────────
 const VAULT_TEACHBACK = {
@@ -437,7 +440,29 @@ function _initPassage(passage) {
     _bankLocked       = false;
   }
 
-  _renderPassage(passage);
+  _readFirstAcknowledged = false;
+  _renderVaultScan(passage);
+}
+
+function _renderVaultScan(passage) {
+  if (!_container) return;
+  if (_readFirstAcknowledged) {
+    _renderPassage(passage);
+    return;
+  }
+  renderReadFirstScan({
+    host: _container,
+    quest: 'vault',
+    passageTitle: passage.title || 'Word Vault',
+    onContinue: () => {
+      _readFirstAcknowledged = true;
+      _renderPassage(passage);
+    },
+    onQuit: () => {
+      cleanupWordVault();
+      _onGoHome?.();
+    },
+  });
 }
 
 // ── Passage render ─────────────────────────────────────────────────────────
