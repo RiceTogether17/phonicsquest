@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  TRAINING_STAGES,
   normaliseSkillTag,
   getSkillLabel,
   getClueTypeLabel,
@@ -8,6 +9,10 @@ import {
 } from '../modes/examTrainingFramework.js';
 
 describe('examTrainingFramework', () => {
+
+  it('exports the full learn-to-mastery stage sequence', () => {
+    expect(TRAINING_STAGES).toEqual(['LEARN', 'GUIDED', 'EXAM', 'REVIEW', 'MASTERY']);
+  });
   it('normalises unknown skill tags to sentenceLogic', () => {
     expect(normaliseSkillTag('tense')).toBe('tense');
     expect(normaliseSkillTag('unknown')).toBe('sentenceLogic');

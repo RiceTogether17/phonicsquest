@@ -481,11 +481,15 @@ function _handleClueWordTap(tappedWord, passage) {
 
   const result   = evaluateClueSelection(tappedWord, clueData);
   const feedback = clueResultFeedback(result);
+  const skillTag = normaliseSkillTag(passage.blankSkills?.[_activeBlankIndex] || (_currentCat !== '__all__' ? _currentCat : 'sentenceLogic'));
 
   // Show feedback in clue panel
   const fbEl = document.getElementById('clue-hunt-feedback');
   if (fbEl) {
-    fbEl.textContent  = feedback.message;
+    const clueLabel = getClueTypeLabel(clueData.clueType);
+    const skillLabel = getSkillLabel(skillTag);
+    const whyLine = clueData.explanation || 'Use the clue to choose the best-fitting word.';
+    fbEl.textContent  = `${clueLabel} · ${skillLabel}. ${feedback.message} ${whyLine}`;
     fbEl.className    = `clue-hunt-feedback ${feedback.cssClass}`;
   }
 
