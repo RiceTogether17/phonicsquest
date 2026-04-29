@@ -66,3 +66,32 @@ export function recordWordVaultCompletion({ category, level, passageId, stars = 
 
   return { nextByPassage, nextCompleted };
 }
+
+
+function _upsertWeakSkillBucket(current, level, skill, wasWrong, now) {
+  const next = structuredClone(current || {});
+  if (!next[level]) next[level] = {};
+  const prev = next[level][skill] || { attempts: 0, wrong: 0, lastSeenAt: 0 };
+  next[level][skill] = {
+    attempts: prev.attempts + 1,
+    wrong: prev.wrong + (wasWrong ? 1 : 0),
+    lastSeenAt: now,
+  };
+  return next;
+}
+
+export function recordWeakSkills({ storageKey, level, skills = [], wrongSkillSet = new Set(), now = Date.now(), current = {} }) {
+  let next = structuredClone(current || {});
+  skills.forEach((skill) => {
+    next = _upsertWeakSkillBucket(next, level, skill, wrongSkillSet.has(skill), now);
+  });
+  return next;
+}
+
+export function getTopWeakSkills({ level, weakSkillsMap = {}, limit = 3 }) {
+  const entries = Object.entries(weakSkillsMap?.[level] || {});
+  return entries
+    .map(([skill, stats]) => ({ skill, attempts: Number(stats.attempts || 0), wrong: Number(stats.wrong || 0) }))
+    .sort((a, b) => ((b.wrong / Math.max(1, b.attempts)) - (a.wrong / Math.max(1, a.attempts))) || (b.wrong - a.wrong))
+    .slice(0, limit);
+}
