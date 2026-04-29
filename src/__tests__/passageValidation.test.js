@@ -41,6 +41,42 @@ function checkBase(passage) {
     expect(String(ans).trim().length).toBeGreaterThan(0);
     expect(passage.wordBank).toContain(ans);
   }
+
+  const bankCounts = new Map();
+  for (const word of passage.wordBank) {
+    const key = String(word).trim();
+    expect(key.length, `empty option in wordBank for ${passage.id}`).toBeGreaterThan(0);
+    bankCounts.set(key, (bankCounts.get(key) || 0) + 1);
+  }
+  const answerCounts = new Map();
+  for (const ans of passage.answers) {
+    const key = String(ans).trim();
+    answerCounts.set(key, (answerCounts.get(key) || 0) + 1);
+  }
+  for (const [key, needed] of answerCounts) {
+    const have = bankCounts.get(key) || 0;
+    expect(have >= needed,
+      `wordBank missing copies of "${key}" in ${passage.id} (need ${needed}, have ${have})`).toBe(true);
+  }
+}
+
+function checkBlankSkillsSchema(passage) {
+  if (!Array.isArray(passage.blankSkills)) return;
+  for (const entry of passage.blankSkills) {
+    if (entry == null) continue;
+    if (typeof entry === 'string') continue;
+    if (typeof entry === 'object') {
+      if (Object.prototype.hasOwnProperty.call(entry, 'blankIndex')) {
+        expect(Number.isInteger(entry.blankIndex), `non-integer blankIndex in ${passage.id}`).toBe(true);
+        expect(entry.blankIndex, `blankIndex out of range in ${passage.id}`).toBeGreaterThanOrEqual(0);
+        expect(entry.blankIndex).toBeLessThan(passage.answers.length);
+      }
+      if (entry.wrongOptionTraps !== undefined) {
+        expect(typeof entry.wrongOptionTraps === 'object' && !Array.isArray(entry.wrongOptionTraps),
+          `wrongOptionTraps must be an object map in ${passage.id}`).toBe(true);
+      }
+    }
+  }
 }
 
 function containsWord(text, word) {
@@ -80,6 +116,8 @@ describe('Cloze Castle passage validation', () => {
             expect(Array.isArray(passage.grammarNotes)).toBe(true);
             expect(passage.grammarNotes.length).toBeLessThanOrEqual(passage.answers.length);
           }
+
+          checkBlankSkillsSchema(passage);
         }
       }
     }
@@ -117,6 +155,8 @@ describe('Word Vault passage validation', () => {
               expect(String(hint || '').trim().length).toBeGreaterThan(0);
             }
           }
+
+          checkBlankSkillsSchema(passage);
 
           if (catKey === 'morphologicalAffix' || passage.mode === 'affix') {
             for (let i = 0; i < passage.answers.length; i++) {

@@ -65,3 +65,85 @@ export function getMasteryRecommendation({ weakSkills = [], hintsUsed = 0, accur
   if (weakSkills.length > 0) return `Practise ${getSkillLabel(firstWeak).toLowerCase()} in exam mode next.`;
   return 'Great job. Try a harder level for mastery.';
 }
+
+/**
+ * Normalise per-blank metadata into a single shape.
+ *
+ * Supports three input shapes for `passage.blankSkills[blankIndex]`:
+ *   1. Rich object: `{ blankIndex, primarySkill, clueType, expectedThinking,
+ *      correctReason, wrongOptionTraps, examTip }`
+ *   2. String tag (legacy): "tense", "connectorLogic", …
+ *   3. Missing: falls back to clue + passage-level fields.
+ *
+ * Returns a normalised meta object with safe defaults so callers never need
+ * optional-chaining beyond the top level.
+ */
+export function getBlankSkillMeta(passage = {}, blankIndex = 0) {
+  const rawArray = Array.isArray(passage.blankSkills) ? passage.blankSkills : [];
+  let raw = rawArray[blankIndex];
+  if (!raw && rawArray.length) {
+    raw = rawArray.find((entry) => entry && typeof entry === 'object' && entry.blankIndex === blankIndex);
+  }
+
+  let meta = {};
+  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+    meta = { ...raw };
+  } else if (typeof raw === 'string') {
+    meta.primarySkill = raw;
+  }
+
+  const clue = Array.isArray(passage.clues)
+    ? passage.clues.find((c) => c && c.blankIndex === blankIndex)
+    : null;
+  if (clue) {
+    if (!meta.clueType) meta.clueType = clue.clueType;
+    if (!meta.expectedThinking) meta.expectedThinking = clue.prompt;
+    if (!meta.correctReason) meta.correctReason = clue.explanation;
+  }
+
+  if (!meta.simpleMeaning) meta.simpleMeaning = passage.simpleMeaning;
+  if (!meta.partOfSpeech) meta.partOfSpeech = passage.partOfSpeech;
+  if (!meta.writingUse) meta.writingUse = passage.writingUse;
+
+  if (!meta.wrongOptionTraps && Array.isArray(passage.wrongOptionTraps)) {
+    meta.wrongOptionTraps = passage.wrongOptionTraps.reduce((acc, item) => {
+      if (item && item.option) acc[item.option] = item.reason || '';
+      return acc;
+    }, {});
+  }
+
+  meta.primarySkill = normaliseSkillTag(meta.primarySkill);
+  return meta;
+}
+
+/**
+ * Build a child-friendly explanation for a wrong answer.
+ *
+ * Returns four short fields the review UI can stack:
+ *   - whyWrong:   why the chosen option does not fit
+ *   - whyRight:   why the correct option fits
+ *   - missedClue: which words in the sentence were the clue
+ *   - examTip:    one-line study tip
+ *
+ * Falls back to generic skill-level prompts when no rich metadata exists, so
+ * older passages still render a useful review.
+ */
+export function buildWhyWrongExplanation({ meta = {}, chosen = '', correct = '' } = {}) {
+  const traps = meta.wrongOptionTraps || {};
+  const trap = chosen && Object.prototype.hasOwnProperty.call(traps, chosen) ? traps[chosen] : '';
+
+  const whyWrong = trap
+    || (chosen
+      ? `"${chosen}" does not match the clue in this sentence.`
+      : 'No answer was chosen for this blank.');
+
+  const whyRight = meta.correctReason
+    || (correct ? `"${correct}" fits the meaning the sentence builds up to.` : 'Re-read the sentence to find the best fit.');
+
+  const missedClue = meta.expectedThinking
+    || (meta.clueType ? `Look for the ${getClueTypeLabel(meta.clueType).toLowerCase()} near the blank.` : 'Check the words just before and after the blank.');
+
+  const examTip = meta.examTip || getReviewPromptForSkill(meta.primarySkill);
+
+  return { whyWrong, whyRight, missedClue, examTip };
+}

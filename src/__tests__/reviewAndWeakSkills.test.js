@@ -21,6 +21,7 @@ describe('review enrichment', () => {
         clue: 'yesterday',
         explanation: 'past action',
         nextStepPrompt: 'Look for time words.',
+        examTip: 'Look for time words.',
       }],
     });
 
@@ -30,6 +31,32 @@ describe('review enrichment', () => {
     expect(html).toContain('Look for time words.');
     expect(html).not.toContain('<script>');
     expect(html).not.toContain('<img');
+  });
+
+  it('stacks why-wrong / why-right / missed-clue cells safely when provided', () => {
+    const host = document.getElementById('host');
+    showAnswerReviewPanel({
+      host,
+      rows: [{
+        passageTitle: 'Stormy Night',
+        blank: '#2',
+        studentAnswer: 'excited',
+        correctAnswer: 'nervous',
+        skillLabel: 'Connector logic',
+        clueTypeLabel: 'Contrast clue',
+        clue: 'although',
+        whyWrong: 'Opposite <bad> meaning of the contrast.',
+        whyRight: '"Nervous" matches the trembling clue.',
+        missedClue: '"hands were trembling" shows fear.',
+        examTip: 'Look for connectors first.',
+      }],
+    });
+    const html = host.innerHTML;
+    expect(html).toContain('Why wrong:');
+    expect(html).toContain('Why right:');
+    expect(html).toContain('Missed clue:');
+    expect(html).toContain('Look for connectors first.');
+    expect(html).not.toContain('<bad>');
   });
 
   it('renders word-vault context review fields safely', () => {
