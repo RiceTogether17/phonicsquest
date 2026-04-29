@@ -58,3 +58,36 @@ export function getSummaryScoreLine({ mode = 'practice', blankCorrect = 0, blank
 export function safeText(value) {
   return escapeHtml(String(value ?? ''));
 }
+
+/**
+ * Group exam-mode wrong rows by their skillLabel and return one summary
+ * line per group. Each row should carry { skillLabel, passageTitle,
+ * blank, studentAnswer, correctAnswer }.
+ *
+ * Returns an array of strings ready to drop into a copyable summary, e.g.
+ *   "By skill — Verb tense (2 wrong):"
+ *   "  - Storm Day #1: walk → walked"
+ */
+export function groupWrongLinesBySkill(rows = []) {
+  const groups = new Map();
+  for (const row of rows) {
+    const label = String(row?.skillLabel || 'Other').trim() || 'Other';
+    const list = groups.get(label) || [];
+    list.push(row);
+    groups.set(label, list);
+  }
+  if (!groups.size) return [];
+  const ordered = [...groups.entries()].sort((a, b) => b[1].length - a[1].length);
+  const lines = [];
+  for (const [label, list] of ordered) {
+    lines.push(`By skill — ${label} (${list.length} wrong):`);
+    for (const row of list) {
+      const studentAnswer = row.studentAnswer || '(blank)';
+      const correctAnswer = row.correctAnswer || '?';
+      const title = row.passageTitle || 'Passage';
+      const blank = row.blank || '';
+      lines.push(`  - ${title} ${blank}: ${studentAnswer} → ${correctAnswer}`);
+    }
+  }
+  return lines;
+}

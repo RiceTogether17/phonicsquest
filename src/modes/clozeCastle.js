@@ -45,10 +45,11 @@ import { getUniqueClozeDone, recordClozeCompletion } from './clozeCompletionTrac
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { renderReadFirstScan } from './readFirstScan.js';
 import { buildScanTaskForPassage, renderScanTask } from './scanTask.js';
-import { buildCopySummaryText, getModeConfig, getNextStepRecommendation, getSummaryScoreLine } from './clozeSessionSummary.js';
+import { buildCopySummaryText, getModeConfig, getNextStepRecommendation, getSummaryScoreLine, groupWrongLinesBySkill } from './clozeSessionSummary.js';
 import { incrementHintUsage } from './hintUsage.js';
 import { buildWhyWrongExplanation, getBlankSkillMeta, getClueTypeLabel, getMasteryRecommendation, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
 import { getTopWeakSkills, recordWeakSkills } from './clozeCompletionTracker.js';
+import { getTopMasteryGaps, recordMasteryAttempt, summariseMasteryGap } from './masteryMap.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -189,15 +190,32 @@ function _renderCategoryPicker(level) {
   const modeCfg = getModeConfig(_sessionMode);
   html += `<div class="cloze-mode-toggle">
     <span class="cloze-mode-label">Mode:</span>
-    <button class="btn btn--ghost btn--sm ${modeCfg.mode === 'practice' ? 'is-active' : ''}" id="cloze-mode-practice">Practice</button>
-    <button class="btn btn--ghost btn--sm ${modeCfg.mode === 'exam' ? 'is-active' : ''}" id="cloze-mode-exam">Exam</button>
+    <button class="btn btn--ghost btn--sm ${modeCfg.mode === 'practice' ? 'is-active' : ''}" id="cloze-mode-practice" aria-pressed="${modeCfg.mode === 'practice'}">Practice Mode</button>
+    <button class="btn btn--ghost btn--sm ${modeCfg.mode === 'exam' ? 'is-active' : ''}" id="cloze-mode-exam" aria-pressed="${modeCfg.mode === 'exam'}">Exam Mode</button>
+    <span class="cloze-mode-hint">${modeCfg.mode === 'practice' ? 'Hints + scan + per-blank feedback.' : 'No hints, timed, review only at the end.'}</span>
   </div>`;
 
   const totalAll = cats.reduce((s, c) => s + passages[level][c].length, 0);
-  const weakSkills = getTopWeakSkills({ level, weakSkillsMap: store.get('ccqWeakSkills') || {} });
-  const masteryRows = weakSkills.map((item) => `
-    <li>${escapeHtml(getSkillLabel(item.skill))}: ${item.wrong}/${item.attempts} · ${escapeHtml(getMasteryRecommendation({ weakSkills: [item.skill], accuracy: Math.round(((item.attempts - item.wrong) / Math.max(1, item.attempts)) * 100), hintsUsed: 0 }))}</li>
-  `).join('');
+  const masteryGaps = getTopMasteryGaps({ mode: 'clozeCastle', level, masteryMap: store.get('masteryMap') || {} });
+  const weakSkills = masteryGaps.length
+    ? masteryGaps
+    : getTopWeakSkills({ level, weakSkillsMap: store.get('ccqWeakSkills') || {} }).map((s) => ({
+      skill: s.skill,
+      skillLabel: getSkillLabel(s.skill),
+      attempts: s.attempts,
+      wrong: s.wrong,
+      accuracy: Math.round(((s.attempts - s.wrong) / Math.max(1, s.attempts)) * 100),
+      lastExample: null,
+    }));
+  const masteryRows = weakSkills.map((item) => {
+    const recommendation = item.accuracy != null
+      ? summariseMasteryGap(item)
+      : getMasteryRecommendation({ weakSkills: [item.skill], accuracy: item.accuracy, hintsUsed: 0 });
+    const lastExample = item.lastExample
+      ? ` · Last slip: "${escapeHtml(item.lastExample.chosen || '—')}" → "${escapeHtml(item.lastExample.correct || '?')}"`
+      : '';
+    return `<li>${escapeHtml(item.skillLabel || getSkillLabel(item.skill))}: ${item.wrong}/${item.attempts} · ${escapeHtml(recommendation)}${lastExample}</li>`;
+  }).join('');
   html += `<div class="cloze-cat-actions">
     <button class="btn btn--primary btn--lg" id="cloze-play-all">Play All (${totalAll} passages)</button>
     <button class="btn btn--ghost btn--sm" id="cloze-mastery-review">Practise Recommended Topic</button>
@@ -769,14 +787,39 @@ function _checkPassage(passage) {
   });
   store.set('ccqWeakSkills', weakMap);
 
+  let masteryMap = store.get('masteryMap') || {};
+  const reviewRows = _buildReviewRows(passage, userAnswers);
+  reviewRows.forEach((row, idx) => {
+    const meta = getBlankSkillMeta(passage, idx);
+    masteryMap = recordMasteryAttempt({
+      mode: 'clozeCastle',
+      level: _currentLevel,
+      category: skillKey,
+      skill: meta.primarySkill,
+      clueType: meta.clueType,
+      wasWrong: row.status !== 'Correct',
+      example: row.status !== 'Correct'
+        ? {
+          passageId: passage.id,
+          blankIndex: idx,
+          chosen: row.studentAnswer,
+          correct: row.correctAnswer,
+          clueType: meta.clueType,
+        }
+        : null,
+      current: masteryMap,
+    });
+  });
+  store.set('masteryMap', masteryMap);
+
   if (modeCfg.showFinalReviewOnly) {
-    const rows = _buildReviewRows(passage, userAnswers);
-    _sessionReviewRows.push(...rows.filter(r => r.status !== 'Correct').map(r => ({
+    _sessionReviewRows.push(...reviewRows.filter(r => r.status !== 'Correct').map(r => ({
       passageTitle: r.passageTitle,
       blank: r.blank,
       studentAnswer: r.studentAnswer,
       correctAnswer: r.correctAnswer,
       explanation: r.explanation,
+      skillLabel: r.skillLabel,
     })));
     const examAttempts = store.get('ccqExamAttempts') || [];
     examAttempts.push({
@@ -1011,7 +1054,9 @@ function _showComplete() {
   const weakSkillsLine = weakSkills.length
     ? `<p class="cloze-complete-score">Mastery focus: ${weakSkills.map((s) => `${getSkillLabel(s.skill)} (${s.wrong}/${s.attempts})`).join(' · ')}</p>`
     : '';
-  const wrongLines = _sessionReviewRows.map((row) => `- ${row.passageTitle} ${row.blank}: ${row.studentAnswer || '(blank)'} → ${row.correctAnswer}`);
+  const wrongLines = _sessionMode === 'exam' && _sessionReviewRows.length
+    ? groupWrongLinesBySkill(_sessionReviewRows)
+    : _sessionReviewRows.map((row) => `- ${row.passageTitle} ${row.blank}: ${row.studentAnswer || '(blank)'} → ${row.correctAnswer}`);
 
   // Clue accuracy line (only shown if clue mode was used)
   const clueTotal = Object.keys(_clueResults).length;
