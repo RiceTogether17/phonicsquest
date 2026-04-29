@@ -31,6 +31,29 @@ describe('review enrichment', () => {
     expect(html).not.toContain('<script>');
     expect(html).not.toContain('<img');
   });
+
+  it('renders word-vault context review fields safely', () => {
+    const host = document.getElementById('host');
+    showAnswerReviewPanel({
+      host,
+      rows: [{
+        passageTitle: 'Vault <b>1</b>',
+        blank: '2',
+        studentAnswer: 'assured',
+        correctAnswer: 'lamented',
+        skillLabel: 'Meaning in context',
+        clueTypeLabel: 'Meaning clue',
+        clue: 'It was hopeless',
+        explanation: 'Trap check: positive meaning mismatches sad context.',
+        nextStepPrompt: 'Use sentence clues. POS: verb. Writing tip: Use for disappointment.',
+      }],
+    });
+    const html = host.innerHTML;
+    expect(html).toContain('Meaning clue');
+    expect(html).toContain('Trap check');
+    expect(html).toContain('POS: verb');
+    expect(html).not.toContain('<b>');
+  });
 });
 
 describe('weak skills tracking', () => {
