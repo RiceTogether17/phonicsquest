@@ -45,10 +45,11 @@ import { getUniqueWordVaultDone, recordWordVaultCompletion } from './clozeComple
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { renderReadFirstScan } from './readFirstScan.js';
 import { buildScanTaskForPassage, renderScanTask } from './scanTask.js';
-import { buildCopySummaryText, getModeConfig, getNextStepRecommendation } from './clozeSessionSummary.js';
+import { buildCopySummaryText, getModeConfig, getNextStepRecommendation, groupWrongLinesBySkill } from './clozeSessionSummary.js';
 import { incrementHintUsage } from './hintUsage.js';
 import { buildWhyWrongExplanation, getBlankSkillMeta, getClueTypeLabel, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
 import { getTopWeakSkills, recordWeakSkills } from './clozeCompletionTracker.js';
+import { getTopMasteryGaps, recordMasteryAttempt, summariseMasteryGap } from './masteryMap.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -265,7 +266,17 @@ function _renderCategoryBrowser() {
   const keys = Object.keys(VOCAB_CATEGORIES);
   const recommendedCat = questMastery.getRecommendedSkill('wordVault', keys);
   const profileLevel = 'P5';
-  const weakSkills = getTopWeakSkills({ level: profileLevel, weakSkillsMap: store.get('wvWeakSkills') || {} });
+  const masteryGaps = getTopMasteryGaps({ mode: 'wordVault', level: profileLevel, masteryMap: store.get('masteryMap') || {} });
+  const weakSkills = masteryGaps.length
+    ? masteryGaps
+    : getTopWeakSkills({ level: profileLevel, weakSkillsMap: store.get('wvWeakSkills') || {} }).map((s) => ({
+      skill: s.skill,
+      skillLabel: getSkillLabel(s.skill),
+      attempts: s.attempts,
+      wrong: s.wrong,
+      accuracy: Math.round(((s.attempts - s.wrong) / Math.max(1, s.attempts)) * 100),
+      lastExample: null,
+    }));
 
   for (const [key, meta] of Object.entries(VOCAB_CATEGORIES)) {
     const catCompleted = completed[key] || {};
@@ -288,7 +299,13 @@ function _renderCategoryBrowser() {
       </button>`;
   }
 
-  const weakList = weakSkills.map((item) => `<li>${escapeHtml(getSkillLabel(item.skill))}: ${item.wrong}/${item.attempts}</li>`).join('');
+  const weakList = weakSkills.map((item) => {
+    const recommendation = summariseMasteryGap(item);
+    const lastExample = item.lastExample
+      ? ` · Last slip: "${escapeHtml(item.lastExample.chosen || '—')}" → "${escapeHtml(item.lastExample.correct || '?')}"`
+      : '';
+    return `<li>${escapeHtml(item.skillLabel || getSkillLabel(item.skill))}: ${item.wrong}/${item.attempts} · ${escapeHtml(recommendation)}${lastExample}</li>`;
+  }).join('');
   html += `</div>
     <div class="cloze-cat-actions">
       <button class="btn btn--ghost btn--sm" id="wv-mastery-review">Review Weak Words</button>
@@ -330,8 +347,9 @@ function _renderLevelBrowser(catKey) {
       <p class="wv-level-desc">${meta.desc}</p>
       <div class="cloze-mode-toggle">
         <span class="cloze-mode-label">Mode:</span>
-        <button class="btn btn--ghost btn--sm ${_sessionMode === 'practice' ? 'is-active' : ''}" id="wv-mode-practice">Practice</button>
-        <button class="btn btn--ghost btn--sm ${_sessionMode === 'exam' ? 'is-active' : ''}" id="wv-mode-exam">Exam</button>
+        <button class="btn btn--ghost btn--sm ${_sessionMode === 'practice' ? 'is-active' : ''}" id="wv-mode-practice" aria-pressed="${_sessionMode === 'practice'}">Practice Mode</button>
+        <button class="btn btn--ghost btn--sm ${_sessionMode === 'exam' ? 'is-active' : ''}" id="wv-mode-exam" aria-pressed="${_sessionMode === 'exam'}">Exam Mode</button>
+        <span class="cloze-mode-hint">${_sessionMode === 'practice' ? 'Hints + scan + per-blank feedback.' : 'No hints, timed, review only at the end.'}</span>
       </div>
       <div class="wv-level-grid">`;
 
@@ -1022,17 +1040,44 @@ function _checkPassage(passage) {
   });
   store.set('wvWeakSkills', weakMap);
 
+  let masteryMap = store.get('masteryMap') || {};
+  const vocabRows = _buildVocabReviewRows(passage, userAnswers);
+  const vaultLevel = String(_currentLevel).toUpperCase();
+  vocabRows.forEach((row, idx) => {
+    const meta = getBlankSkillMeta(passage, idx);
+    masteryMap = recordMasteryAttempt({
+      mode: 'wordVault',
+      level: vaultLevel,
+      category: _currentCat,
+      skill: meta.primarySkill || skillTag,
+      clueType: meta.clueType,
+      wasWrong: row.status !== 'Correct',
+      example: row.status !== 'Correct'
+        ? {
+          passageId: passage.id,
+          blankIndex: idx,
+          chosen: row.studentAnswer,
+          correct: row.correctAnswer,
+          clueType: meta.clueType,
+        }
+        : null,
+      current: masteryMap,
+    });
+  });
+  store.set('masteryMap', masteryMap);
+
   userAnswers.forEach((ans, i) => _recordVocabPerformance(passage.answers[i], ans === passage.answers[i]));
 
   if (modeCfg.showFinalReviewOnly) {
     _sessionBlankCorrect = blankCorrect;
     _sessionBlankTotal = blankTotal;
-    _sessionReviewRows.push(..._buildVocabReviewRows(passage, userAnswers).filter(r => r.status !== 'Correct').map(r => ({
+    _sessionReviewRows.push(...vocabRows.filter(r => r.status !== 'Correct').map(r => ({
       passageTitle: passage.title,
       blank: r.blank,
       studentAnswer: r.studentAnswer,
       correctAnswer: r.correctAnswer,
       explanation: r.explanation,
+      skillLabel: r.skillLabel,
     })));
     const examAttempts = store.get('wvqExamAttempts') || [];
     examAttempts.push({
@@ -1303,7 +1348,9 @@ function _showComplete(summary = {}) {
   const weakSkillsLine = weakSkills.length
     ? `<p class="wv-complete-score">Weak skills: ${weakSkills.map((s) => `${getSkillLabel(s.skill)} ${s.wrong}/${s.attempts}`).join(' · ')}</p>`
     : '';
-  const wrongLines = _sessionReviewRows.map((row) => `- ${row.passageTitle} ${row.blank}: ${row.studentAnswer || '(blank)'} → ${row.correctAnswer}`);
+  const wrongLines = _sessionMode === 'exam' && _sessionReviewRows.length
+    ? groupWrongLinesBySkill(_sessionReviewRows)
+    : _sessionReviewRows.map((row) => `- ${row.passageTitle} ${row.blank}: ${row.studentAnswer || '(blank)'} → ${row.correctAnswer}`);
 
   const clueTotal = Object.keys(_clueResults).length;
   const clueAcc   = clueTotal > 0
