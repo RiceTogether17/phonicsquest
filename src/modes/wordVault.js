@@ -44,6 +44,7 @@ import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
 import { getUniqueWordVaultDone, recordWordVaultCompletion } from './clozeCompletionTracker.js';
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { renderReadFirstScan } from './readFirstScan.js';
+import { buildScanTaskForPassage, renderScanTask } from './scanTask.js';
 import { buildCopySummaryText, getModeConfig, getNextStepRecommendation } from './clozeSessionSummary.js';
 import { incrementHintUsage } from './hintUsage.js';
 import { buildWhyWrongExplanation, getBlankSkillMeta, getClueTypeLabel, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
@@ -90,6 +91,9 @@ let _affixParts = [];
 let _passageWrongCount = 0;
 
 let _readFirstAcknowledged = false;
+let _scanTaskCompleted = false;
+let _sessionScanCorrect = 0;
+let _sessionScanTotal   = 0;
 
 // ── Category-specific teach-back content ────────────────────────────────────
 const VAULT_TEACHBACK = {
@@ -374,6 +378,8 @@ function _startPassage(catKey, level) {
   _sessionTotal     = 0;
   _sessionClueScore = 0;
   _sessionHintsUsed = 0;
+  _sessionScanCorrect = 0;
+  _sessionScanTotal = 0;
   _examStartedAt = Date.now();
   _sessionReviewRows = [];
   _infoPanelOpen = false;
@@ -441,13 +447,14 @@ function _initPassage(passage) {
   }
 
   _readFirstAcknowledged = false;
+  _scanTaskCompleted = false;
   _renderVaultScan(passage);
 }
 
 function _renderVaultScan(passage) {
   if (!_container) return;
   if (_readFirstAcknowledged) {
-    _renderPassage(passage);
+    _renderVaultScanTaskStep(passage);
     return;
   }
   renderReadFirstScan({
@@ -456,11 +463,49 @@ function _renderVaultScan(passage) {
     passageTitle: passage.title || 'Word Vault',
     onContinue: () => {
       _readFirstAcknowledged = true;
-      _renderPassage(passage);
+      _renderVaultScanTaskStep(passage);
     },
     onQuit: () => {
       cleanupWordVault();
       _onGoHome?.();
+    },
+  });
+}
+
+function _renderVaultScanTaskStep(passage) {
+  if (!_container) return;
+  if (_scanTaskCompleted || _sessionMode === 'exam') {
+    _renderPassage(passage);
+    return;
+  }
+  const task = buildScanTaskForPassage(passage);
+  if (!task) {
+    _scanTaskCompleted = true;
+    _renderPassage(passage);
+    return;
+  }
+  _container.innerHTML = `
+    <div class="wv-game wv-game--scan">
+      <div class="wv-game-header">
+        <span class="wv-game-badge">Scan Step</span>
+      </div>
+      <h3 class="wv-passage-title">${escapeHtml(passage.title || 'Word Vault')}</h3>
+      <p class="wv-instruction">What clue helps you?</p>
+      <div id="wv-scan-host"></div>
+    </div>`;
+  const host = document.getElementById('wv-scan-host');
+  renderScanTask({
+    host,
+    task,
+    onAnswer: ({ correct }) => {
+      _scanTaskCompleted = true;
+      _sessionScanTotal++;
+      if (correct) _sessionScanCorrect++;
+      _renderPassage(passage);
+    },
+    onSkip: () => {
+      _scanTaskCompleted = true;
+      _renderPassage(passage);
     },
   });
 }
@@ -1268,6 +1313,13 @@ function _showComplete(summary = {}) {
     ? `<p class="wv-complete-clue">🔍 Clue accuracy: ${clueAcc}%</p>`
     : '';
 
+  const scanAcc = _sessionScanTotal > 0
+    ? Math.round((_sessionScanCorrect / _sessionScanTotal) * 100)
+    : null;
+  const scanAccLine = scanAcc !== null
+    ? `<p class="wv-complete-clue">🔎 Scan accuracy: ${scanAcc}% (${_sessionScanCorrect}/${_sessionScanTotal})</p>`
+    : '';
+
   _container.innerHTML = `
     <div class="wv-summary-overlay"><div class="wv-complete">
       <div class="wv-complete-icon">${meta.icon}</div>
@@ -1278,6 +1330,7 @@ function _showComplete(summary = {}) {
       <p class="wv-complete-score">Mode: ${modeCfg.label} · Hints used: ${_sessionHintsUsed} · Time: ${elapsedSec}s</p>
       ${weakSkillsLine}
       ${clueAccLine}
+      ${scanAccLine}
       <p class="wv-complete-score">Next Step: ${recommendation}</p>
       <div class="wv-complete-actions">
         ${nextLv
