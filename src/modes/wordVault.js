@@ -46,7 +46,7 @@ import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { renderReadFirstScan } from './readFirstScan.js';
 import { buildCopySummaryText, getModeConfig, getNextStepRecommendation } from './clozeSessionSummary.js';
 import { incrementHintUsage } from './hintUsage.js';
-import { getClueTypeLabel, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
+import { buildWhyWrongExplanation, getBlankSkillMeta, getClueTypeLabel, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
 import { getTopWeakSkills, recordWeakSkills } from './clozeCompletionTracker.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
@@ -908,21 +908,38 @@ function _buildVocabReviewRows(passage, userAnswers) {
   const fallbackSkill = _currentCat === 'collocationCloze' ? 'collocation' : 'vocabularyInContext';
   return passage.answers.map((correctAnswer, idx) => {
     const clue = _getClueDataForBlank(passage, idx);
-    const skillTag = normaliseSkillTag(passage.skillTag || fallbackSkill);
+    const meta = getBlankSkillMeta(passage, idx);
+    const skillTag = normaliseSkillTag(meta.primarySkill || passage.skillTag || fallbackSkill);
     const chosen = userAnswers[idx] || '';
-    const trapReason = (passage.wrongOptionTraps || []).find((t) => t.option === chosen)?.reason;
-    const simpleMeaning = passage.simpleMeaning || (passage.definitions || {})[correctAnswer] || 'Use context clues to find the meaning.';
+    const isWrong = chosen !== correctAnswer;
+    const why = isWrong ? buildWhyWrongExplanation({ meta, chosen, correct: correctAnswer }) : null;
+    const simpleMeaning = meta.simpleMeaning || (passage.definitions || {})[correctAnswer] || 'Use context clues to find the meaning.';
+    const trapReason = (passage.wrongOptionTraps || []).find((t) => t.option === chosen)?.reason
+      || meta.wrongOptionTraps?.[chosen];
+
+    const explanationParts = [simpleMeaning];
+    if (trapReason) explanationParts.push(`Trap check: ${trapReason}`);
+    else explanationParts.push('Choose the word that matches the clue meaning.');
+
+    const nextStepParts = [getReviewPromptForSkill(skillTag)];
+    if (meta.partOfSpeech) nextStepParts.push(`POS: ${meta.partOfSpeech}.`);
+    if (meta.writingUse) nextStepParts.push(`Writing tip: ${meta.writingUse}`);
+
     return {
       blank: `#${idx + 1}`,
       passageTitle: passage.title,
       studentAnswer: chosen,
       correctAnswer,
-      status: chosen === correctAnswer ? 'Correct' : 'Try again',
+      status: isWrong ? 'Try again' : 'Correct',
       skillLabel: getSkillLabel(skillTag),
-      clueTypeLabel: getClueTypeLabel(clue?.clueType || passage.clueType),
+      clueTypeLabel: getClueTypeLabel(meta.clueType || clue?.clueType || passage.clueType),
       clue: clue?.acceptableSpans?.[0] || (passage.hints || [])[idx] || 'Look near this blank.',
-      explanation: `${simpleMeaning} ${trapReason ? `Trap check: ${trapReason}` : 'Choose the word that matches the clue meaning.'}`,
-      nextStepPrompt: `${getReviewPromptForSkill(skillTag)}${passage.partOfSpeech ? ` POS: ${passage.partOfSpeech}.` : ''}${passage.writingUse ? ` Writing tip: ${passage.writingUse}` : ''}`,
+      explanation: explanationParts.join(' '),
+      nextStepPrompt: nextStepParts.join(' '),
+      whyWrong: why?.whyWrong,
+      whyRight: why?.whyRight,
+      missedClue: why?.missedClue,
+      examTip: meta.examTip || (why ? why.examTip : ''),
     };
   });
 }

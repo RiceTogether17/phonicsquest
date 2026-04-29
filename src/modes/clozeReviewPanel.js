@@ -4,6 +4,15 @@ function _td(value) {
   return `<td>${escapeHtml(value || '')}</td>`;
 }
 
+function _whyCell(row) {
+  const lines = [];
+  if (row.whyWrong) lines.push(`<p class="review-why review-why--wrong"><strong>Why wrong:</strong> ${escapeHtml(row.whyWrong)}</p>`);
+  if (row.whyRight) lines.push(`<p class="review-why review-why--right"><strong>Why right:</strong> ${escapeHtml(row.whyRight)}</p>`);
+  if (row.missedClue) lines.push(`<p class="review-why review-why--clue"><strong>Missed clue:</strong> ${escapeHtml(row.missedClue)}</p>`);
+  if (lines.length) return `<td>${lines.join('')}</td>`;
+  return _td(row.explanation || '');
+}
+
 export function showAnswerReviewPanel({ host, title = 'Answer Review', rows = [], onContinue }) {
   if (!host) return;
   host.querySelector('#cloze-answer-review')?.remove();
@@ -20,8 +29,8 @@ export function showAnswerReviewPanel({ host, title = 'Answer Review', rows = []
       ${_td(row.skillLabel || '')}
       ${_td(row.clueTypeLabel || '')}
       ${_td(row.clue || '')}
-      ${_td(row.explanation || '')}
-      ${_td(row.nextStepPrompt || row.status || '')}
+      ${_whyCell(row)}
+      ${_td(row.examTip || row.nextStepPrompt || row.status || '')}
     </tr>
   `).join('');
 
@@ -30,7 +39,7 @@ export function showAnswerReviewPanel({ host, title = 'Answer Review', rows = []
       <p class="clue-explanation-title">${escapeHtml(title)}</p>
       <div class="clue-explanation-body">
         <table class="wv-review-table">
-          <thead><tr><th>Passage</th><th>Blank</th><th>Your answer</th><th>Correct</th><th>Skill</th><th>Clue type</th><th>Clue</th><th>Why</th><th>Next step</th></tr></thead>
+          <thead><tr><th>Passage</th><th>Blank</th><th>Your answer</th><th>Correct</th><th>Skill</th><th>Clue type</th><th>Clue</th><th>Why</th><th>Exam tip</th></tr></thead>
           <tbody>${body}</tbody>
         </table>
       </div>

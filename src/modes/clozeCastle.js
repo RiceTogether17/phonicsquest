@@ -46,7 +46,7 @@ import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { renderReadFirstScan } from './readFirstScan.js';
 import { buildCopySummaryText, getModeConfig, getNextStepRecommendation, getSummaryScoreLine } from './clozeSessionSummary.js';
 import { incrementHintUsage } from './hintUsage.js';
-import { getClueTypeLabel, getMasteryRecommendation, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
+import { buildWhyWrongExplanation, getBlankSkillMeta, getClueTypeLabel, getMasteryRecommendation, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
 import { getTopWeakSkills, recordWeakSkills } from './clozeCompletionTracker.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
@@ -660,18 +660,25 @@ function _buildReviewRows(passage, userAnswers) {
   return passage.answers.map((correctAnswer, idx) => {
     const clue = _getClueDataForBlank(passage, idx);
     const studentAnswer = userAnswers[idx] || '';
-    const skillTag = normaliseSkillTag(passage.blankSkills?.[idx] || inferredSkill);
+    const meta = getBlankSkillMeta(passage, idx);
+    const skillTag = normaliseSkillTag(meta.primarySkill || inferredSkill);
+    const isWrong = studentAnswer !== correctAnswer;
+    const why = isWrong ? buildWhyWrongExplanation({ meta, chosen: studentAnswer, correct: correctAnswer }) : null;
     return {
       blank: `#${idx + 1}`,
       passageTitle: passage.title,
       studentAnswer,
       correctAnswer,
-      status: studentAnswer === correctAnswer ? 'Correct' : 'Try again',
+      status: isWrong ? 'Try again' : 'Correct',
       skillLabel: getSkillLabel(skillTag),
-      clueTypeLabel: getClueTypeLabel(clue?.clueType),
+      clueTypeLabel: getClueTypeLabel(meta.clueType || clue?.clueType),
       clue: clue?.acceptableSpans?.[0] || '—',
-      explanation: passage.grammarNotes?.[idx] || clue?.explanation || 'Read the words before and after the blank.',
+      explanation: passage.grammarNotes?.[idx] || meta.correctReason || clue?.explanation || 'Read the words before and after the blank.',
       nextStepPrompt: getReviewPromptForSkill(skillTag),
+      whyWrong: why?.whyWrong,
+      whyRight: why?.whyRight,
+      missedClue: why?.missedClue,
+      examTip: meta.examTip || (why ? why.examTip : ''),
     };
   });
 }

@@ -39,7 +39,7 @@ const P1_SPECS = [
   { category: 'connectors', title: 'Rainy Recess Plan', text: 'It was raining, ___ we stayed in class. We played word games ___ everyone could join. We waited quietly ___ the bell rang.', answers: ['so', 'because', 'until'], wordBank: ['so', 'because', 'until', 'but', 'or'] },
   { category: 'modals', title: 'Classroom Rules', text: 'Pupils ___ walk in the corridor. You ___ run there. You ___ ask if you need help.', answers: ['must', 'must not', 'can'], wordBank: ['must', 'must not', 'can', 'could', 'should'] },
   { category: 'countableUncountable', title: 'Art Supplies', text: 'There are many ___ on the shelf. We need some ___ for painting. There is little ___ left in the glue bottle.', answers: ['brushes', 'paper', 'glue'], wordBank: ['brushes', 'paper', 'glue', 'waters', 'scissors'] },
-  { category: 'possessives', title: 'Lost-and-Found Table', text: 'This is Ali___ water bottle. Those are the girls___ badges. The teacher returned the class___ football.', answers: ['’s', '’', '’'], wordBank: ['’s', '’', 'is', 'are', 'have'] },
+  { category: 'possessives', title: 'Lost-and-Found Table', text: 'This is Ali___ water bottle. Those are the girls___ badges. The teacher returned the class___ football.', answers: ['’s', '’', '’'], wordBank: ['’s', '’', '’', 'is', 'are', 'have'] },
 ];
 
 const P2_SPECS = [
