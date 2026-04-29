@@ -44,6 +44,7 @@ import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
 import { getUniqueClozeDone, recordClozeCompletion } from './clozeCompletionTracker.js';
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { renderReadFirstScan } from './readFirstScan.js';
+import { buildScanTaskForPassage, renderScanTask } from './scanTask.js';
 import { buildCopySummaryText, getModeConfig, getNextStepRecommendation, getSummaryScoreLine } from './clozeSessionSummary.js';
 import { incrementHintUsage } from './hintUsage.js';
 import { buildWhyWrongExplanation, getBlankSkillMeta, getClueTypeLabel, getMasteryRecommendation, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
@@ -86,6 +87,9 @@ let _sessionReviewRows = [];
 let _sessionBlankTotal = 0;
 let _sessionBlankCorrect = 0;
 let _readFirstAcknowledged = false;
+let _scanTaskCompleted = false;
+let _sessionScanCorrect = 0;
+let _sessionScanTotal   = 0;
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
@@ -245,6 +249,8 @@ function _startCategory(level, catKey) {
   _sessionReviewRows = [];
   _sessionBlankTotal = 0;
   _sessionBlankCorrect = 0;
+  _sessionScanCorrect = 0;
+  _sessionScanTotal = 0;
   _showPassage();
 }
 
@@ -261,6 +267,8 @@ function _startAllCategories(level) {
   _sessionReviewRows = [];
   _sessionBlankTotal = 0;
   _sessionBlankCorrect = 0;
+  _sessionScanCorrect = 0;
+  _sessionScanTotal = 0;
   _showPassage();
 }
 
@@ -297,6 +305,7 @@ function _initPassage(passage) {
   }
 
   _readFirstAcknowledged = false;
+  _scanTaskCompleted = false;
   _renderCastleScan(passage);
 }
 
@@ -392,7 +401,7 @@ function _renderPassage(passage) {
 function _renderCastleScan(passage) {
   if (!_container) return;
   if (_readFirstAcknowledged) {
-    _renderPassage(passage);
+    _renderScanTaskStep(passage);
     return;
   }
   renderReadFirstScan({
@@ -401,11 +410,49 @@ function _renderCastleScan(passage) {
     passageTitle: passage.title || 'Cloze Castle',
     onContinue: () => {
       _readFirstAcknowledged = true;
-      _renderPassage(passage);
+      _renderScanTaskStep(passage);
     },
     onQuit: () => {
       cleanupClozeCastle();
       _onGoHome?.();
+    },
+  });
+}
+
+function _renderScanTaskStep(passage) {
+  if (!_container) return;
+  if (_scanTaskCompleted || _sessionMode === 'exam') {
+    _renderPassage(passage);
+    return;
+  }
+  const task = buildScanTaskForPassage(passage);
+  if (!task) {
+    _scanTaskCompleted = true;
+    _renderPassage(passage);
+    return;
+  }
+  _container.innerHTML = `
+    <div class="cloze-game cloze-game--scan">
+      <div class="cloze-game-header">
+        <span class="cloze-badge">Scan Step</span>
+      </div>
+      <h3 class="cloze-title">${escapeHtml(passage.title || 'Cloze Castle')}</h3>
+      <p class="cloze-instruction">Find the clue before you choose.</p>
+      <div id="cloze-scan-host"></div>
+    </div>`;
+  const host = document.getElementById('cloze-scan-host');
+  renderScanTask({
+    host,
+    task,
+    onAnswer: ({ correct }) => {
+      _scanTaskCompleted = true;
+      _sessionScanTotal++;
+      if (correct) _sessionScanCorrect++;
+      _renderPassage(passage);
+    },
+    onSkip: () => {
+      _scanTaskCompleted = true;
+      _renderPassage(passage);
     },
   });
 }
@@ -975,6 +1022,13 @@ function _showComplete() {
     ? `<p class="cloze-complete-clue">🔍 Clue accuracy: ${clueAcc}%</p>`
     : '';
 
+  const scanAcc = _sessionScanTotal > 0
+    ? Math.round((_sessionScanCorrect / _sessionScanTotal) * 100)
+    : null;
+  const scanAccLine = scanAcc !== null
+    ? `<p class="cloze-complete-clue">🔎 Scan accuracy: ${scanAcc}% (${_sessionScanCorrect}/${_sessionScanTotal})</p>`
+    : '';
+
   _container.innerHTML = `
     <div class="cloze-complete">
       <div class="cloze-complete-icon">${icon}</div>
@@ -985,6 +1039,7 @@ function _showComplete() {
       <p class="cloze-complete-score">Mode: ${modeCfg.label} · Hints used: ${_sessionHintsUsed} · Time: ${elapsedSec}s</p>
       ${weakSkillsLine}
       ${clueAccLine}
+      ${scanAccLine}
       <p class="cloze-complete-score">Next step: ${recommendation}</p>
       <div class="cloze-complete-actions">
         <button class="btn btn--primary btn--lg" id="cloze-back-cat">Choose Another Topic</button>
