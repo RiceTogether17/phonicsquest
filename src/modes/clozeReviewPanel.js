@@ -1,5 +1,9 @@
 import { escapeHtml } from '../utils/escapeHtml.js';
 
+function _td(value) {
+  return `<td>${escapeHtml(value || '')}</td>`;
+}
+
 export function showAnswerReviewPanel({ host, title = 'Answer Review', rows = [], onContinue }) {
   if (!host) return;
   host.querySelector('#cloze-answer-review')?.remove();
@@ -9,12 +13,15 @@ export function showAnswerReviewPanel({ host, title = 'Answer Review', rows = []
 
   const body = rows.map((row) => `
     <tr>
-      <td>${escapeHtml(row.blank || '')}</td>
-      <td>${escapeHtml(row.studentAnswer || '')}</td>
-      <td>${escapeHtml(row.correctAnswer || '')}</td>
-      <td>${escapeHtml(row.status || '')}</td>
-      <td>${escapeHtml(row.clue || '')}</td>
-      <td>${escapeHtml(row.explanation || '')}</td>
+      ${_td(row.passageTitle)}
+      ${_td(row.blank || '')}
+      ${_td(row.studentAnswer || '')}
+      ${_td(row.correctAnswer || '')}
+      ${_td(row.skillLabel || '')}
+      ${_td(row.clueTypeLabel || '')}
+      ${_td(row.clue || '')}
+      ${_td(row.explanation || '')}
+      ${_td(row.nextStepPrompt || row.status || '')}
     </tr>
   `).join('');
 
@@ -23,7 +30,7 @@ export function showAnswerReviewPanel({ host, title = 'Answer Review', rows = []
       <p class="clue-explanation-title">${escapeHtml(title)}</p>
       <div class="clue-explanation-body">
         <table class="wv-review-table">
-          <thead><tr><th>Blank</th><th>Your answer</th><th>Correct</th><th>Status</th><th>Clue</th><th>Explanation</th></tr></thead>
+          <thead><tr><th>Passage</th><th>Blank</th><th>Your answer</th><th>Correct</th><th>Skill</th><th>Clue type</th><th>Clue</th><th>Why</th><th>Next step</th></tr></thead>
           <tbody>${body}</tbody>
         </table>
       </div>
