@@ -257,6 +257,8 @@ function _renderCategoryBrowser() {
 
   const keys = Object.keys(VOCAB_CATEGORIES);
   const recommendedCat = questMastery.getRecommendedSkill('wordVault', keys);
+  const profileLevel = 'P5';
+  const weakSkills = getTopWeakSkills({ level: profileLevel, weakSkillsMap: store.get('wvWeakSkills') || {} });
 
   for (const [key, meta] of Object.entries(VOCAB_CATEGORIES)) {
     const catCompleted = completed[key] || {};
@@ -279,7 +281,13 @@ function _renderCategoryBrowser() {
       </button>`;
   }
 
-  html += '</div></div>';
+  const weakList = weakSkills.map((item) => `<li>${escapeHtml(getSkillLabel(item.skill))}: ${item.wrong}/${item.attempts}</li>`).join('');
+  html += `</div>
+    <div class="cloze-cat-actions">
+      <button class="btn btn--ghost btn--sm" id="wv-mastery-review">Review Weak Words</button>
+      ${weakSkills.length ? `<ul class="cloze-mastery-list">${weakList}</ul>` : '<p class="cloze-cat-subtitle">Read the sentence first. Weak skills will appear here.</p>'}
+    </div>
+  </div>`;
   _container.innerHTML = html;
 
   _container.querySelectorAll('.wv-cat-btn').forEach(btn => {
@@ -287,6 +295,12 @@ function _renderCategoryBrowser() {
       _currentCat = btn.dataset.cat;
       _renderLevelBrowser(_currentCat);
     });
+  });
+  document.getElementById('wv-mastery-review')?.addEventListener('click', () => {
+    const target = recommendedCat || keys[0];
+    _currentCat = target;
+    _currentLevel = 'p5';
+    _startPassage(_currentCat, _currentLevel);
   });
 }
 

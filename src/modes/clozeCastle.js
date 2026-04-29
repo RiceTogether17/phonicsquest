@@ -45,7 +45,7 @@ import { getUniqueClozeDone, recordClozeCompletion } from './clozeCompletionTrac
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { buildCopySummaryText, getModeConfig, getNextStepRecommendation, getSummaryScoreLine } from './clozeSessionSummary.js';
 import { incrementHintUsage } from './hintUsage.js';
-import { getClueTypeLabel, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
+import { getClueTypeLabel, getMasteryRecommendation, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
 import { getTopWeakSkills, recordWeakSkills } from './clozeCompletionTracker.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
@@ -189,8 +189,14 @@ function _renderCategoryPicker(level) {
   </div>`;
 
   const totalAll = cats.reduce((s, c) => s + passages[level][c].length, 0);
+  const weakSkills = getTopWeakSkills({ level, weakSkillsMap: store.get('ccqWeakSkills') || {} });
+  const masteryRows = weakSkills.map((item) => `
+    <li>${escapeHtml(getSkillLabel(item.skill))}: ${item.wrong}/${item.attempts} · ${escapeHtml(getMasteryRecommendation({ weakSkills: [item.skill], accuracy: Math.round(((item.attempts - item.wrong) / Math.max(1, item.attempts)) * 100), hintsUsed: 0 }))}</li>
+  `).join('');
   html += `<div class="cloze-cat-actions">
     <button class="btn btn--primary btn--lg" id="cloze-play-all">Play All (${totalAll} passages)</button>
+    <button class="btn btn--ghost btn--sm" id="cloze-mastery-review">Mastery Review</button>
+    ${weakSkills.length ? `<ul class="cloze-mastery-list">${masteryRows}</ul>` : '<p class="cloze-cat-subtitle">Mastery tip: complete a few passages to unlock weak-skill hints.</p>'}
   </div>`;
 
   html += '</div>';
@@ -216,6 +222,11 @@ function _renderCategoryPicker(level) {
   document.getElementById('cloze-play-all')?.addEventListener('click', () => {
     _currentCat = '__all__';
     _startAllCategories(_currentLevel);
+  });
+  document.getElementById('cloze-mastery-review')?.addEventListener('click', () => {
+    const targetCat = progress.getRecommendedGrammarCategory(level, cats) || cats[0];
+    _currentCat = targetCat;
+    _startCategory(_currentLevel, _currentCat);
   });
 }
 
