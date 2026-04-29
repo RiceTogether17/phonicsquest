@@ -45,6 +45,8 @@ import { getUniqueWordVaultDone, recordWordVaultCompletion } from './clozeComple
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { buildCopySummaryText, getModeConfig, getNextStepRecommendation } from './clozeSessionSummary.js';
 import { incrementHintUsage } from './hintUsage.js';
+import { getClueTypeLabel, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
+import { getTopWeakSkills, recordWeakSkills } from './clozeCompletionTracker.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -864,25 +866,24 @@ function _getVocabSkillLabel() {
 }
 
 function _buildVocabReviewRows(passage, userAnswers) {
-  const skill = _getVocabSkillLabel();
+  const fallbackSkill = _currentCat === 'collocationCloze' ? 'collocation' : 'vocabularyInContext';
   return passage.answers.map((correctAnswer, idx) => {
     const clue = _getClueDataForBlank(passage, idx);
-    const examTip = _currentCat === 'connectorClue'
-      ? 'Exam tip: Check the connector logic between clauses.'
-      : _currentCat === 'collocationCloze'
-        ? 'Exam tip: Look for natural word partners.'
-        : _currentCat === 'grammaticalRole'
-          ? 'Exam tip: Check the required word form and part of speech.'
-          : 'Exam tip: Use context around the blank to confirm meaning.';
+    const skillTag = normaliseSkillTag(passage.skillTag || fallbackSkill);
     const chosen = userAnswers[idx] || '';
-    const wrongTrap = chosen && chosen !== correctAnswer ? `Not ${chosen}: it does not match this sentence clue.` : 'Correct choice matched context.';
+    const trapReason = (passage.wrongOptionTraps || []).find((t) => t.option === chosen)?.reason;
+    const simpleMeaning = passage.simpleMeaning || (passage.definitions || {})[correctAnswer] || 'Use context clues to find the meaning.';
     return {
       blank: `#${idx + 1}`,
+      passageTitle: passage.title,
       studentAnswer: chosen,
       correctAnswer,
       status: chosen === correctAnswer ? 'Correct' : 'Try again',
+      skillLabel: getSkillLabel(skillTag),
+      clueTypeLabel: getClueTypeLabel(clue?.clueType || passage.clueType),
       clue: clue?.acceptableSpans?.[0] || (passage.hints || [])[idx] || 'Look near this blank.',
-      explanation: `${(passage.definitions || {})[correctAnswer] || 'Use sentence context.'} · ${skill}. ${wrongTrap} ${examTip}`,
+      explanation: `${simpleMeaning} ${trapReason ? `Trap check: ${trapReason}` : 'Choose the word that matches the clue meaning.'}`,
+      nextStepPrompt: `${getReviewPromptForSkill(skillTag)}${passage.partOfSpeech ? ` POS: ${passage.partOfSpeech}.` : ''}${passage.writingUse ? ` Writing tip: ${passage.writingUse}` : ''}`,
     };
   });
 }
@@ -908,8 +909,17 @@ function _checkPassage(passage) {
   const blankTotal = passage.answers.length;
   const allCorrect  = blankCorrect === blankTotal;
   const modeCfg = getModeConfig(_sessionMode);
+  const skillTag = normaliseSkillTag(passage.skillTag || (_currentCat === 'collocationCloze' ? 'collocation' : 'vocabularyInContext'));
 
   _sessionTotal++;
+  const weakMap = recordWeakSkills({
+    storageKey: 'wvWeakSkills',
+    level: String(_currentLevel).toUpperCase(),
+    skills: passage.answers.map(() => skillTag),
+    wrongSkillSet: new Set(allCorrect ? [] : [skillTag]),
+    current: store.get('wvWeakSkills') || {},
+  });
+  store.set('wvWeakSkills', weakMap);
 
   userAnswers.forEach((ans, i) => _recordVocabPerformance(passage.answers[i], ans === passage.answers[i]));
 
@@ -1188,6 +1198,10 @@ function _showComplete(summary = {}) {
   const modeCfg = getModeConfig(_sessionMode);
   const elapsedSec = Math.max(1, Math.round((Date.now() - (_examStartedAt || Date.now())) / 1000));
   const recommendation = getNextStepRecommendation({ accuracy: acc, skillLabel: meta.label, hintsUsed: _sessionHintsUsed });
+  const weakSkills = getTopWeakSkills({ level: String(_currentLevel).toUpperCase(), weakSkillsMap: store.get('wvWeakSkills') || {} });
+  const weakSkillsLine = weakSkills.length
+    ? `<p class="wv-complete-score">Weak skills: ${weakSkills.map((s) => `${getSkillLabel(s.skill)} ${s.wrong}/${s.attempts}`).join(' · ')}</p>`
+    : '';
   const wrongLines = _sessionReviewRows.map((row) => `- ${row.passageTitle} ${row.blank}: ${row.studentAnswer || '(blank)'} → ${row.correctAnswer}`);
 
   const clueTotal = Object.keys(_clueResults).length;
@@ -1206,6 +1220,7 @@ function _showComplete(summary = {}) {
       <div class="wv-stars">${renderSummaryStars(stars)}</div>
       <p class="wv-complete-score">Blanks: ${correctBlanks} / ${totalBlanks} correct · ${acc}%</p>
       <p class="wv-complete-score">Mode: ${modeCfg.label} · Hints used: ${_sessionHintsUsed} · Time: ${elapsedSec}s</p>
+      ${weakSkillsLine}
       ${clueAccLine}
       <p class="wv-complete-score">Next Step: ${recommendation}</p>
       <div class="wv-complete-actions">

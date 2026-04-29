@@ -45,6 +45,8 @@ import { getUniqueClozeDone, recordClozeCompletion } from './clozeCompletionTrac
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { buildCopySummaryText, getModeConfig, getNextStepRecommendation, getSummaryScoreLine } from './clozeSessionSummary.js';
 import { incrementHintUsage } from './hintUsage.js';
+import { getClueTypeLabel, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
+import { getTopWeakSkills, recordWeakSkills } from './clozeCompletionTracker.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -82,6 +84,7 @@ let _lastUserAnswers  = [];
 let _sessionReviewRows = [];
 let _sessionBlankTotal = 0;
 let _sessionBlankCorrect = 0;
+let _readFirstAcknowledged = false;
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
@@ -281,6 +284,7 @@ function _initPassage(passage) {
     _bankLocked       = false;
   }
 
+  _readFirstAcknowledged = false;
   _renderPassage(passage);
 }
 
@@ -371,6 +375,28 @@ function _renderPassage(passage) {
     if (e.key === 'Escape') { cleanupClozeCastle(); _onGoHome?.(); }
   };
   document.addEventListener('keydown', _keyHandler);
+}
+
+function _renderCastleScan(passage) {
+  _container.innerHTML = `
+    <div class="cloze-game">
+      <div class="cloze-game-header">
+        <span class="cloze-badge">Castle Scan</span>
+      </div>
+      <h3 class="cloze-title">${escapeHtml(passage.title || 'Cloze Castle')}</h3>
+      <p class="cloze-instruction">Read the whole passage first.</p>
+      <p class="cloze-instruction">What is the passage mostly about?</p>
+      <button class="btn btn--primary" id="cloze-read-first">I have read the passage</button>
+      <button class="btn btn--ghost btn--sm" id="cloze-quit">Menu</button>
+    </div>`;
+  document.getElementById('cloze-read-first')?.addEventListener('click', () => {
+    _readFirstAcknowledged = true;
+    _renderPassage(passage);
+  });
+  document.getElementById('cloze-quit')?.addEventListener('click', () => {
+    cleanupClozeCastle();
+    _onGoHome?.();
+  });
 }
 
 
@@ -615,17 +641,22 @@ function _getClueDataForBlank(passage, blankIndex) {
 
 
 function _buildReviewRows(passage, userAnswers) {
+  const inferredSkill = _currentCat !== '__all__' ? normaliseSkillTag(_currentCat) : 'sentenceLogic';
   return passage.answers.map((correctAnswer, idx) => {
     const clue = _getClueDataForBlank(passage, idx);
     const studentAnswer = userAnswers[idx] || '';
+    const skillTag = normaliseSkillTag(passage.blankSkills?.[idx] || inferredSkill);
     return {
       blank: `#${idx + 1}`,
       passageTitle: passage.title,
       studentAnswer,
       correctAnswer,
       status: studentAnswer === correctAnswer ? 'Correct' : 'Try again',
+      skillLabel: getSkillLabel(skillTag),
+      clueTypeLabel: getClueTypeLabel(clue?.clueType),
       clue: clue?.acceptableSpans?.[0] || '—',
       explanation: passage.grammarNotes?.[idx] || clue?.explanation || 'Read the words before and after the blank.',
+      nextStepPrompt: getReviewPromptForSkill(skillTag),
     };
   });
 }
@@ -644,6 +675,8 @@ function _checkPassage(passage) {
   const blankCorrect = userAnswers.filter((ans, i) => ans === passage.answers[i]).length;
   const modeCfg = getModeConfig(_sessionMode);
   const skillKey = _currentCat === '__all__' ? 'mixed' : _currentCat;
+  const normalisedSkills = passage.answers.map((_, idx) => normaliseSkillTag(passage.blankSkills?.[idx] || (_currentCat !== '__all__' ? _currentCat : 'sentenceLogic')));
+  const wrongSkillSet = new Set(normalisedSkills.filter((skill, idx) => userAnswers[idx] !== passage.answers[idx]));
 
   questMastery.recordAttempt({
     quest: 'clozeCastle',
@@ -658,6 +691,14 @@ function _checkPassage(passage) {
   _sessionTotal++;
   _sessionBlankTotal += passage.answers.length;
   _sessionBlankCorrect += blankCorrect;
+  const weakMap = recordWeakSkills({
+    storageKey: 'ccqWeakSkills',
+    level: _currentLevel,
+    skills: normalisedSkills,
+    wrongSkillSet,
+    current: store.get('ccqWeakSkills') || {},
+  });
+  store.set('ccqWeakSkills', weakMap);
 
   if (modeCfg.showFinalReviewOnly) {
     const rows = _buildReviewRows(passage, userAnswers);
@@ -897,6 +938,10 @@ function _showComplete() {
   const modeCfg = getModeConfig(_sessionMode);
   const elapsedSec = Math.max(1, Math.round((Date.now() - (_examStartedAt || Date.now())) / 1000));
   const recommendation = getNextStepRecommendation({ accuracy: acc, skillLabel: catInfo, hintsUsed: _sessionHintsUsed });
+  const weakSkills = getTopWeakSkills({ level: _currentLevel, weakSkillsMap: store.get('ccqWeakSkills') || {} });
+  const weakSkillsLine = weakSkills.length
+    ? `<p class="cloze-complete-score">Mastery focus: ${weakSkills.map((s) => `${getSkillLabel(s.skill)} (${s.wrong}/${s.attempts})`).join(' · ')}</p>`
+    : '';
   const wrongLines = _sessionReviewRows.map((row) => `- ${row.passageTitle} ${row.blank}: ${row.studentAnswer || '(blank)'} → ${row.correctAnswer}`);
 
   // Clue accuracy line (only shown if clue mode was used)
@@ -916,6 +961,7 @@ function _showComplete() {
       <div class="cloze-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
       <p class="cloze-complete-score">Blanks: ${_sessionBlankCorrect} / ${_sessionBlankTotal} correct · ${acc}%</p>
       <p class="cloze-complete-score">Mode: ${modeCfg.label} · Hints used: ${_sessionHintsUsed} · Time: ${elapsedSec}s</p>
+      ${weakSkillsLine}
       ${clueAccLine}
       <p class="cloze-complete-score">Next step: ${recommendation}</p>
       <div class="cloze-complete-actions">
