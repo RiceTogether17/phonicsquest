@@ -43,6 +43,7 @@ import { mascot } from '../components/mascot.js';
 import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
 import { getUniqueClozeDone, recordClozeCompletion } from './clozeCompletionTracker.js';
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
+import { renderReadFirstScan } from './readFirstScan.js';
 import { buildCopySummaryText, getModeConfig, getNextStepRecommendation, getSummaryScoreLine } from './clozeSessionSummary.js';
 import { incrementHintUsage } from './hintUsage.js';
 import { getClueTypeLabel, getMasteryRecommendation, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
@@ -195,7 +196,7 @@ function _renderCategoryPicker(level) {
   `).join('');
   html += `<div class="cloze-cat-actions">
     <button class="btn btn--primary btn--lg" id="cloze-play-all">Play All (${totalAll} passages)</button>
-    <button class="btn btn--ghost btn--sm" id="cloze-mastery-review">Mastery Review</button>
+    <button class="btn btn--ghost btn--sm" id="cloze-mastery-review">Practise Recommended Topic</button>
     ${weakSkills.length ? `<ul class="cloze-mastery-list">${masteryRows}</ul>` : '<p class="cloze-cat-subtitle">Mastery tip: complete a few passages to unlock weak-skill hints.</p>'}
   </div>`;
 
@@ -296,7 +297,7 @@ function _initPassage(passage) {
   }
 
   _readFirstAcknowledged = false;
-  _renderPassage(passage);
+  _renderCastleScan(passage);
 }
 
 // ── Passage render ─────────────────────────────────────────────────────────
@@ -389,24 +390,23 @@ function _renderPassage(passage) {
 }
 
 function _renderCastleScan(passage) {
-  _container.innerHTML = `
-    <div class="cloze-game">
-      <div class="cloze-game-header">
-        <span class="cloze-badge">Castle Scan</span>
-      </div>
-      <h3 class="cloze-title">${escapeHtml(passage.title || 'Cloze Castle')}</h3>
-      <p class="cloze-instruction">Read the whole passage first.</p>
-      <p class="cloze-instruction">What is the passage mostly about?</p>
-      <button class="btn btn--primary" id="cloze-read-first">I have read the passage</button>
-      <button class="btn btn--ghost btn--sm" id="cloze-quit">Menu</button>
-    </div>`;
-  document.getElementById('cloze-read-first')?.addEventListener('click', () => {
-    _readFirstAcknowledged = true;
+  if (!_container) return;
+  if (_readFirstAcknowledged) {
     _renderPassage(passage);
-  });
-  document.getElementById('cloze-quit')?.addEventListener('click', () => {
-    cleanupClozeCastle();
-    _onGoHome?.();
+    return;
+  }
+  renderReadFirstScan({
+    host: _container,
+    quest: 'cloze',
+    passageTitle: passage.title || 'Cloze Castle',
+    onContinue: () => {
+      _readFirstAcknowledged = true;
+      _renderPassage(passage);
+    },
+    onQuit: () => {
+      cleanupClozeCastle();
+      _onGoHome?.();
+    },
   });
 }
 
