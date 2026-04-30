@@ -3,7 +3,7 @@ import { WRITING_TRACKS, getTracksForLevel, getLessonsForTrack } from '../data/w
 import { store } from '../modules/store.js';
 import { questMastery } from '../modules/questMastery.js';
 import { getLevelInfo } from '../data/curriculum.js';
-import { evaluateWriting, getLiveHint, compareRevisions, getDimensionFeedback, DIMENSION_LABELS, DIMENSION_EMOJIS } from '../modules/writingEvaluator.js';
+import { evaluateWriting, getLiveHint, compareRevisions, getDimensionFeedback, DIMENSION_LABELS, DIMENSION_EMOJIS, getRubricBand, getDimensionBandLabel } from '../modules/writingEvaluator.js';
 import { detectBadges, renderBadgeChips } from '../modules/writingBadges.js';
 import { isPlanReady, mergeLessonWithPlan, getRemediationPath, getParagraphMissionStatus, getPlanDraftMatchReport } from '../modules/writingLessonEngine.js';
 import { renderDrill, collectDrillAnswers, gradeDrills } from '../modules/writingReviseDrills.js';
@@ -304,7 +304,10 @@ function _renderDraft(item) {
 }
 
 function _renderDimensionBreakdown(result) {
-  return `<ul>${Object.entries(result.dimensions).map(([key, val]) => `<li>${DIMENSION_EMOJIS[key] || ''} <strong>${_dimensionLabel(key)}</strong>: ${(val * 100).toFixed(0)}% — ${result.feedback?.[key] || getDimensionFeedback(key, val)}</li>`).join('')}</ul>`;
+  return `<ul class="wq-dimension-list">${Object.entries(result.dimensions).map(([key, val]) => {
+    const band = getDimensionBandLabel(val);
+    return `<li>${DIMENSION_EMOJIS[key] || ''} <strong>${_dimensionLabel(key)}</strong>: <span class="wq-dim-band wq-dim-band--${band.replace(/\s/g, '-').toLowerCase()}">${band}</span> — ${result.feedback?.[key] || getDimensionFeedback(key, val)}</li>`;
+  }).join('')}</ul>`;
 }
 
 function _submitDraft(item, lessonForEval) {
@@ -332,8 +335,9 @@ function _submitDraft(item, lessonForEval) {
   if (fb) {
     fb.hidden = false;
     fb.className = `sfq-feedback sfq-feedback--${result.passed ? 'success' : 'error'}`;
+    const rubric = getRubricBand(result.score);
     fb.innerHTML = `<p><strong>${result.encouragement}</strong></p>
-      <p>Score ${(result.score * 100).toFixed(0)}% ${'⭐'.repeat(result.stars)}</p>
+      <p><strong>Writing Coach Feedback</strong> — ${rubric.emoji} Band ${rubric.band}: ${rubric.label} ${'⭐'.repeat(result.stars)}</p>
       <p><strong>Mission Progress:</strong> ${missionHits}/${_lastMissionStatus.length || 0}</p>
       <p><strong>Revision Mission:</strong> ${_lastDraftRemediation.title}</p>
       ${_lastDraftRemediation.missingChecks.length ? `<p>Missing checkpoints: ${_lastDraftRemediation.missingChecks.join(' · ')}</p>` : ''}
@@ -353,7 +357,8 @@ function _submitDraft(item, lessonForEval) {
 
 function _renderRepair(item) {
   const remediation = _lastDraftRemediation || { missingChecks: [], narrativePrompts: [], title: 'Polish your draft.' };
-  const firstScore = _firstResult ? ((_firstResult.score || 0) * 100).toFixed(0) : '?';
+  const firstBand = _firstResult ? getRubricBand(_firstResult.score || 0) : null;
+  const firstScore = firstBand ? `Band ${firstBand.band} – ${firstBand.label}` : '?';
   const weakDim = remediation.weakestDimension || _firstResult?.weakest || 'content';
   const weakLabel = _dimensionLabel(weakDim);
   const weakFeedback = _firstResult?.feedback?.[weakDim] || getDimensionFeedback(weakDim, 0.4);
@@ -369,7 +374,7 @@ function _renderRepair(item) {
 
   _container.innerHTML = `<div class="sfq-game"><h3 class="cloze-title">Revise: Repair Mission</h3>
     <div class="dash-pattern-item" style="background:var(--bg-card);padding:8px;border-radius:6px">
-      <strong>First Draft Snapshot</strong> (Score: ${firstScore}%)
+      <strong>First Draft Snapshot</strong> (${firstScore})
       <p style="font-size:0.9em;white-space:pre-wrap;max-height:120px;overflow-y:auto;border:1px solid var(--border);padding:6px;border-radius:4px;margin-top:4px">${_escapeHtml(_firstDraftText)}</p>
     </div>
     <div class="dash-pattern-item">
@@ -400,7 +405,8 @@ function _renderRepair(item) {
     const liveEl = document.getElementById('wq-repair-live');
     const scoreDiff = currentResult.score - (_firstResult?.score || 0);
     if (liveEl) {
-      liveEl.innerHTML = `🔧 ${hint.words} words · Score: ${(currentResult.score * 100).toFixed(0)}% (${scoreDiff >= 0 ? '+' : ''}${(scoreDiff * 100).toFixed(0)}%) · Missions: ${missionStatus.filter(m => m.hit).length}/${missionStatus.length}`;
+      const liveRubric = getRubricBand(currentResult.score);
+      liveEl.innerHTML = `🔧 ${hint.words} words · ${liveRubric.emoji} ${liveRubric.label} (${scoreDiff >= 0 ? '+' : ''}${(scoreDiff * 100).toFixed(0)}%) · Missions: ${missionStatus.filter(m => m.hit).length}/${missionStatus.length}`;
     }
 
     // Update checklist — mark items that are now satisfied
@@ -453,16 +459,16 @@ function _submitRevision(item) {
   }
 
   // Build before/after comparison summary
-  const beforeScore = _firstResult ? (_firstResult.score * 100).toFixed(0) : '?';
-  const afterScore = (result.score * 100).toFixed(0);
+  const beforeBand  = _firstResult ? getRubricBand(_firstResult.score) : null;
+  const afterBand   = getRubricBand(result.score);
   const beforeWords = _firstResult?.metrics?.words || 0;
-  const afterWords = result.metrics?.words || 0;
+  const afterWords  = result.metrics?.words || 0;
 
   const dimComparison = cmp ? Object.entries(cmp.improved).map(([k, v]) => {
     const before = _firstResult?.dimensions?.[k] || 0;
-    const after = result.dimensions?.[k] || 0;
-    const arrow = v > 0.02 ? '⬆️' : v < -0.02 ? '⬇️' : '➡️';
-    return `<li>${DIMENSION_EMOJIS[k] || ''} ${_dimensionLabel(k)}: ${(before * 100).toFixed(0)}% ${arrow} ${(after * 100).toFixed(0)}%</li>`;
+    const after  = result.dimensions?.[k] || 0;
+    const arrow  = v > 0.02 ? '⬆️' : v < -0.02 ? '⬇️' : '➡️';
+    return `<li>${DIMENSION_EMOJIS[k] || ''} ${_dimensionLabel(k)}: ${getDimensionBandLabel(before)} ${arrow} ${getDimensionBandLabel(after)}</li>`;
   }).join('') : '';
 
   const fb = document.getElementById('wq-feedback');
@@ -473,16 +479,16 @@ function _submitRevision(item) {
       <div style="display:flex;gap:16px;flex-wrap:wrap;margin:8px 0">
         <div style="flex:1;min-width:100px;text-align:center;padding:6px;border:1px solid var(--border);border-radius:6px">
           <div style="font-size:0.8em;color:var(--text-muted)">Before</div>
-          <div style="font-size:1.3em;font-weight:bold">${beforeScore}%</div>
+          <div style="font-size:1.1em;font-weight:bold">${beforeBand ? `${beforeBand.emoji} ${beforeBand.label}` : '?'}</div>
           <div style="font-size:0.8em">${beforeWords} words</div>
         </div>
         <div style="flex:1;min-width:100px;text-align:center;padding:6px;border:1px solid var(--border);border-radius:6px">
           <div style="font-size:0.8em;color:var(--text-muted)">After</div>
-          <div style="font-size:1.3em;font-weight:bold">${afterScore}%</div>
+          <div style="font-size:1.1em;font-weight:bold">${afterBand.emoji} ${afterBand.label}</div>
           <div style="font-size:0.8em">${afterWords} words</div>
         </div>
       </div>
-      <p>Score change: ${cmp ? `${cmp.scoreDiff >= 0 ? '+' : ''}${(cmp.scoreDiff * 100).toFixed(0)}%` : 'n/a'} · XP bonus: ${cmp?.revisionBonus || 0}</p>
+      <p>${cmp?.netImproved ? '📈 Your writing improved!' : '➡️ Keep refining.'} XP bonus: ${cmp?.revisionBonus || 0}</p>
       <p>Mission completion: ${missionStatus.filter((m) => m.hit).length}/${missionStatus.length}</p>
       <ul>${dimComparison}</ul>
       ${renderBadgeChips(badges)}
@@ -524,10 +530,10 @@ function _renderLessonComplete(item) {
     const cmp = saved.revisionComparison;
     feedbackSummaryHtml = `<div class="wq-feedback-review-panel">
       <strong>Lesson Feedback Summary</strong>
-      <p>Score: ${(r.score * 100).toFixed(0)}% ${'⭐'.repeat(r.stars || 0)}</p>
+      ${(() => { const rb = getRubricBand(r.score || 0); return `<p>${rb.emoji} Band ${rb.band}: ${rb.label} ${'⭐'.repeat(r.stars || 0)}</p>`; })()}
       <p>${r.encouragement || ''}</p>
       ${_renderDimensionBreakdown(r)}
-      ${cmp ? `<p>Revision improvement: ${cmp.scoreDiff >= 0 ? '+' : ''}${((cmp.scoreDiff || 0) * 100).toFixed(0)}%</p>` : ''}
+      ${cmp?.netImproved ? `<p>📈 Revision improved your writing!</p>` : ''}
       ${saved.badges?.length ? `<p>Badges: ${saved.badges.join(' · ')}</p>` : ''}
     </div>`;
   }
@@ -674,8 +680,9 @@ function _renderLegacyPrompt(item) {
     if (fb) {
       fb.hidden = false;
       fb.className = `sfq-feedback sfq-feedback--${result.passed ? 'success' : 'error'}`;
+      const legacyRubric = getRubricBand(result.score || 0);
       fb.innerHTML = `<p><strong>${result.encouragement || (result.passed ? 'Well done!' : 'Keep practising!')}</strong></p>
-        <p>Score ${(result.score * 100).toFixed(0)}% ${'⭐'.repeat(result.stars || 0)}</p>
+        <p><strong>Writing Coach Feedback</strong> — ${legacyRubric.emoji} Band ${legacyRubric.band}: ${legacyRubric.label} ${'⭐'.repeat(result.stars || 0)}</p>
         ${_renderDimensionBreakdown(result)}
         <p style="font-size:0.85em;color:var(--text-muted);margin-top:6px">Review your feedback. Press Continue when ready.</p>
         <div class="sfq-actions" style="margin-top:8px"><button class="btn btn--primary" id="wq-legacy-continue">Continue</button></div>`;
@@ -727,13 +734,13 @@ function _renderFeedbackReviewPanel() {
     </button>
     <div class="wq-review-body" id="wq-review-body" hidden>
       <p><strong>${r.encouragement || ''}</strong></p>
-      <p>Score: ${(r.score * 100).toFixed(0)}% ${'⭐'.repeat(r.stars || 0)}</p>
+      ${(() => { const rb = getRubricBand(r.score || 0); return `<p>${rb.emoji} Band ${rb.band}: ${rb.label} ${'⭐'.repeat(r.stars || 0)}</p>`; })()}
       <p>Mission Progress: ${ms.filter(m => m.hit).length}/${ms.length}</p>
       ${rem?.title ? `<p>Revision Mission: ${rem.title}</p>` : ''}
       ${rem?.missingChecks?.length ? `<p>Missing: ${rem.missingChecks.join(' · ')}</p>` : ''}
       ${_renderDimensionBreakdown(r)}
       ${badges.length ? `<p>Badges: ${badges.join(' · ')}</p>` : ''}
-      ${cmp ? `<p>Revision change: ${cmp.scoreDiff >= 0 ? '+' : ''}${((cmp.scoreDiff || 0) * 100).toFixed(0)}% · XP bonus: ${cmp.revisionBonus || 0}</p>` : ''}
+      ${cmp?.netImproved ? `<p>📈 Revision improved! XP bonus: ${cmp.revisionBonus || 0}</p>` : ''}
     </div>
   </div>`;
 }

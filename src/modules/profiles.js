@@ -87,6 +87,8 @@ export function createProfile(name, avatar, color, schoolLevel = 'preschool', op
     // Cloze Castle and Word Vault for legacy profiles. New placement now
     // routes by reading band, but schoolLevel is still kept as metadata.
     schoolLevel: schoolLevel === 'primary' ? 'primary' : 'preschool',
+    // For primary profiles: 'P1'–'P6'. Null means not yet set.
+    primaryGrade: (schoolLevel === 'primary' && opts.primaryGrade) ? opts.primaryGrade : null,
     readingBand: opts.readingBand || null,
     classId: opts.classId || 'class-a',
     createdAt: new Date().toISOString(),

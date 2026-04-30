@@ -361,6 +361,25 @@ export function getEncouragement(score) {
   return 'Every writer improves through revision. Use the mission below to guide your next draft.';
 }
 
+/**
+ * Map a 0-1 score to a 4-band rubric label.
+ * Returns an object with band number, label, and description.
+ * Band 4 Strong / Band 3 Secure / Band 2 Developing / Band 1 Needs Support
+ */
+export function getRubricBand(score) {
+  if (score >= 0.80) return { band: 4, label: 'Strong',         emoji: '🌟' };
+  if (score >= 0.65) return { band: 3, label: 'Secure',         emoji: '✅' };
+  if (score >= 0.50) return { band: 2, label: 'Developing',     emoji: '📈' };
+  return               { band: 1, label: 'Needs Support',   emoji: '💪' };
+}
+
+/** Dimension-level band label (single word) */
+export function getDimensionBandLabel(dimensionScore) {
+  if (dimensionScore >= 0.80) return 'Good';
+  if (dimensionScore >= 0.58) return 'Developing';
+  return 'Needs work';
+}
+
 // ── Main Evaluation Export ────────────────────────────────────────────────────
 
 /**

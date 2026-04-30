@@ -1538,28 +1538,42 @@ class App {
     const questsSection = document.getElementById('home-quests-section');
     const questsHeading = document.getElementById('quests-section-heading');
     const questsSub     = document.getElementById('quests-section-sub');
+    const levelBadge    = document.getElementById('primary-level-badge');
 
     const layout = getHomeLayoutForReadingBand(readingBand);
     const sentenceForgeBtn = document.getElementById('btn-sentence-forge');
 
     if (layout.hidePhonicsCore) {
+      // Primary pathway: hide early-reading phonics, show Primary English hub
       coreSection?.classList.add('home-section--hidden');
       questsSection?.classList.remove('home-section--milestone');
-      if (questsHeading) questsHeading.textContent = 'Your Learning Quests';
-      if (questsSub)     questsSub.textContent     = 'Follow the order above · do these each session';
+      if (questsHeading) questsHeading.textContent = 'Primary English Practice';
+      if (questsSub)     questsSub.textContent     = 'Choose a component · follow the order above';
       sentenceForgeBtn?.classList.remove('stories-banner--spotlight');
+
+      // Show grade context badge if profile has a grade set
+      const profile = getActiveProfile ? getActiveProfile() : null;
+      if (levelBadge && profile?.primaryGrade) {
+        levelBadge.style.display = '';
+        levelBadge.innerHTML =
+          `<span class="primary-level-badge__text">Practising: <strong>${profile.primaryGrade} English</strong></span>`;
+      } else if (levelBadge) {
+        levelBadge.style.display = 'none';
+      }
     } else if (!layout.questsMilestone) {
       coreSection?.classList.remove('home-section--hidden');
       questsSection?.classList.remove('home-section--milestone');
       if (questsHeading) questsHeading.textContent = 'Bridge Quests';
       if (questsSub)     questsSub.textContent     = 'Keep phonics active and begin Sentence Forge first';
       sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
+      if (levelBadge) levelBadge.style.display = 'none';
     } else {
       coreSection?.classList.remove('home-section--hidden');
       questsSection?.classList.add('home-section--milestone');
       if (questsHeading) questsHeading.textContent = 'Quest Milestones';
       if (questsSub)     questsSub.textContent     = 'Unlocks as decoding and reading readiness improve';
       sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
+      if (levelBadge) levelBadge.style.display = 'none';
     }
   }
 
@@ -1708,24 +1722,40 @@ class App {
     if (input) input.value = '';
 
     const levelGroup = document.getElementById('cp-level-group');
+    const gradeGroup = document.getElementById('cp-grade-group');
     const levelHint  = document.getElementById('cp-level-hint');
     if (levelGroup) {
       const levelBtns = levelGroup.querySelectorAll('.cp-level-btn');
+      const gradeBtns = gradeGroup ? gradeGroup.querySelectorAll('.cp-grade-btn') : [];
+
+      const setGrade = (selected) => {
+        gradeBtns.forEach(b => {
+          const active = b === selected;
+          b.classList.toggle('cp-grade-btn--selected', active);
+          b.setAttribute('aria-pressed', String(active));
+        });
+      };
+
       const setLevel = (selected) => {
         levelBtns.forEach(b => {
           const active = b === selected;
           b.classList.toggle('cp-level-btn--selected', active);
           b.setAttribute('aria-pressed', String(active));
         });
+        const isPrimary = selected.dataset.level === 'primary';
+        if (gradeGroup) gradeGroup.style.display = isPrimary ? '' : 'none';
         if (levelHint) {
-          levelHint.textContent = selected.dataset.level === 'primary'
-            ? 'Sentence Forge, Cloze Castle & Word Vault unlock immediately'
+          levelHint.textContent = isPrimary
+            ? 'All Primary English components unlock immediately'
             : 'Phonics games unlock as words are mastered';
         }
+        if (!isPrimary) setGrade(null);
       };
+
       // Default to preschool on each open
       setLevel(levelGroup.querySelector('[data-level="preschool"]'));
       levelBtns.forEach(btn => btn.addEventListener('click', () => setLevel(btn)));
+      gradeBtns.forEach(btn => btn.addEventListener('click', () => setGrade(btn)));
     }
 
     this._openModal('modal-create-profile');
@@ -1745,8 +1775,10 @@ class App {
     const color = COLOR_OPTIONS[colorIdx];
     const selectedLevelBtn = document.querySelector('.cp-level-btn--selected');
     const schoolLevel = selectedLevelBtn?.dataset.level || 'preschool';
+    const selectedGradeBtn = document.querySelector('.cp-grade-btn--selected');
+    const primaryGrade = selectedGradeBtn?.dataset.grade || null;
 
-    const profile = createProfile(name, avatar, color, schoolLevel);
+    const profile = createProfile(name, avatar, color, schoolLevel, { primaryGrade });
     this._closeModal('modal-create-profile');
 
     activateProfile(profile.id);

@@ -141,11 +141,11 @@
         <!--   Preschool: phonics mode grid (visible by default, hidden for primary by JS)   -->
         <!--   Primary:   quest banners appear here (reordered by JS)                        -->
 
-        <!-- Phonics modes (preschool main lesson activities) -->
+        <!-- Phonics modes (preschool / early reading activities) -->
         <div class="home-section" id="home-core-section">
           <div class="home-section-header">
-            <p class="home-section-heading">All Phonics Activities</p>
-            <p class="home-section-sub">Tap any mode to practise · your guide above shows where to start</p>
+            <p class="home-section-heading">Early Reading Activities</p>
+            <p class="home-section-sub">Phonics, blending &amp; sound skills · follow your guide above</p>
           </div>
           <nav class="mode-grid" aria-label="Activity modes">
 
@@ -198,12 +198,14 @@
           </nav>
         </div><!-- end home-core-section -->
 
-        <!-- Quest banners (primary main lesson; preschool: milestone tracker) -->
+        <!-- Quest banners (primary: exam-hub components; preschool: milestone tracker) -->
         <div class="home-section home-quests-section" id="home-quests-section">
           <div class="home-section-header">
-            <p class="home-section-heading" id="quests-section-heading">Learning Quests</p>
-            <p class="home-section-sub" id="quests-section-sub">Sentence, grammar &amp; vocabulary practice</p>
+            <p class="home-section-heading" id="quests-section-heading">Primary English Practice</p>
+            <p class="home-section-sub" id="quests-section-sub">Choose a component to practise · P1–P6</p>
           </div>
+          <!-- Level context badge — shows 'Practising: P3' for primary profiles -->
+          <div class="primary-level-badge" id="primary-level-badge" style="display:none" aria-live="polite"></div>
 
           <button class="stories-banner stories-banner--orange" id="btn-sentence-forge" aria-label="Open Sentence Forge Quest">
             <span class="stories-banner-mascot">
@@ -282,13 +284,13 @@
             <span class="stories-banner-arrow">→</span>
           </button>
 
-          <button class="stories-banner stories-banner--gold" id="btn-paper-mode" aria-label="Open Paper Mode">
+          <button class="stories-banner stories-banner--gold" id="btn-paper-mode" aria-label="Open Full Paper Practice">
             <span class="stories-banner-mascot">
-              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">📝</span>
+              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">📋</span>
             </span>
             <span class="stories-banner-text">
-              <span class="stories-banner-title">📝 Paper Mode</span>
-              <span class="stories-banner-sub">Exam-style section playlists by level</span>
+              <span class="stories-banner-title">📋 Full Paper Practice</span>
+              <span class="stories-banner-sub">Timed exam-style paper by level · P1–P6</span>
             </span>
             <span class="stories-banner-arrow">→</span>
           </button>
@@ -802,6 +804,17 @@
             <button class="cp-level-btn" data-level="primary" aria-pressed="false">
               🏫 Primary School
             </button>
+          </div>
+          <div class="cp-grade-group" id="cp-grade-group" role="group" aria-label="Choose primary school grade" style="display:none">
+            <p class="cp-grade-label">Which year?</p>
+            <div class="cp-grade-btns">
+              <button class="cp-grade-btn" data-grade="P1" aria-pressed="false">P1</button>
+              <button class="cp-grade-btn" data-grade="P2" aria-pressed="false">P2</button>
+              <button class="cp-grade-btn" data-grade="P3" aria-pressed="false">P3</button>
+              <button class="cp-grade-btn" data-grade="P4" aria-pressed="false">P4</button>
+              <button class="cp-grade-btn" data-grade="P5" aria-pressed="false">P5</button>
+              <button class="cp-grade-btn" data-grade="P6" aria-pressed="false">P6</button>
+            </div>
           </div>
           <p class="cp-level-hint" id="cp-level-hint">Phonics games unlock as words are mastered</p>
           <button class="btn btn--primary btn--full" id="cp-confirm-btn">Create Profile →</button>
