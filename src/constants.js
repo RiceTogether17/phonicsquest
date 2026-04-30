@@ -23,6 +23,7 @@ export const SCREENS = Object.freeze({
   WORD_VAULT:     'screen-word-vault',
   EDITING_QUEST:  'screen-editing-quest',
   WRITING_QUEST:  'screen-writing-quest',
+  PRIMARY_PLACEHOLDER: 'screen-primary-placeholder',
 });
 
 /**

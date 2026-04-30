@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="PhonicsQuest – the phonics learning adventure for early readers. Practice blending, segmenting, and identifying sounds." />
+  <meta name="description" content="PhonicsQuest – an English learning adventure for K1 to P6. Two pathways: Early Reading Quest (phonics, blending, sight words) and Primary English Quest (grammar, vocabulary, cloze, editing, writing and PSLE-style Exam Practice Hub)." />
   <meta name="theme-color" content="#6c63ff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="PhonicsQuest" />
+  <meta name="apple-mobile-web-app-title" content="PhonicsQuest – English Learning" />
 
   <!-- PWA -->
   <link rel="manifest" href="/phonicsquest/manifest.json" />
@@ -20,16 +20,16 @@
 
   <!-- Styles -->
 
-  <title>PhonicsQuest</title>
-  <script type="module" crossorigin src="/phonicsquest/assets/index-CCUiMlrh.js"></script>
+  <title>PhonicsQuest – Early Reading & Primary English</title>
+  <script type="module" crossorigin src="/phonicsquest/assets/index-yHuC6heu.js"></script>
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/gsap-C8pce-KX.js">
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/chartjs-BR_H7_9u.js">
-  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-iQlWJ-RQ.css">
+  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-DeuZiSi2.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
 
-  <div id="app" role="application" aria-label="PhonicsQuest phonics learning app">
+  <div id="app" role="application" aria-label="PhonicsQuest – Early Reading and Primary English learning app">
 
     <!-- APP HEADER -->
     <header class="app-header" role="banner">
@@ -37,7 +37,7 @@
         <button class="mascot-btn" id="mascot-trigger" aria-label="Ollie the owl – tap to cheer!">
           <div class="mascot-mini" id="mascot-mini" aria-hidden="true"></div>
         </button>
-        <span class="app-brand">PhonicsQuest</span>
+        <span class="app-brand" aria-label="PhonicsQuest – Early Reading and Primary English">PhonicsQuest <span class="app-brand-tag" aria-hidden="true">· Early Reading + Primary English</span></span>
       </div>
 
       <div class="header-stats" id="header-stats" aria-label="Your progress">
@@ -144,11 +144,14 @@
         <!--   Preschool: phonics mode grid (visible by default, hidden for primary by JS)   -->
         <!--   Primary:   quest banners appear here (reordered by JS)                        -->
 
-        <!-- Phonics modes (preschool main lesson activities) -->
-        <div class="home-section" id="home-core-section">
+        <!-- "Start Here Today" recommendation strip for primary profiles -->
+        <div class="home-section primary-start-here" id="primary-start-here" style="display:none" aria-label="Start here today"></div>
+
+        <!-- Phonics modes (preschool / early reading activities) -->
+        <div class="home-section" id="home-core-section" aria-label="Early Reading Quest activities">
           <div class="home-section-header">
-            <p class="home-section-heading">All Phonics Activities</p>
-            <p class="home-section-sub">Tap any mode to practise · your guide above shows where to start</p>
+            <p class="home-section-heading">🌱 Early Reading Quest</p>
+            <p class="home-section-sub">Phonics, blending, letter sounds &amp; Giri stories · K1–K2 / early P1</p>
           </div>
           <nav class="mode-grid" aria-label="Activity modes">
 
@@ -201,97 +204,172 @@
           </nav>
         </div><!-- end home-core-section -->
 
-        <!-- Quest banners (primary main lesson; preschool: milestone tracker) -->
-        <div class="home-section home-quests-section" id="home-quests-section">
+        <!-- Quest banners (primary: exam-hub components; preschool: milestone tracker) -->
+        <div class="home-section home-quests-section" id="home-quests-section" aria-label="Primary English Quest modules">
           <div class="home-section-header">
-            <p class="home-section-heading" id="quests-section-heading">Learning Quests</p>
-            <p class="home-section-sub" id="quests-section-sub">Sentence, grammar &amp; vocabulary practice</p>
+            <p class="home-section-heading" id="quests-section-heading">🏫 Primary English Quest</p>
+            <p class="home-section-sub" id="quests-section-sub">School-paper components · P1–P6</p>
           </div>
+          <!-- Level context badge — shows 'Practising: P3' for primary profiles -->
+          <div class="primary-level-badge" id="primary-level-badge" style="display:none" aria-live="polite"></div>
 
-          <button class="stories-banner stories-banner--orange" id="btn-sentence-forge" aria-label="Open Sentence Forge Quest">
-            <span class="stories-banner-mascot">
-              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🔨</span>
-            </span>
-            <span class="stories-banner-text">
-              <span class="stories-banner-title">🔨 Sentence Forge</span>
-              <span class="stories-banner-sub">Unscramble &amp; build sentences · 6 levels</span>
-            </span>
-            <span class="stories-banner-arrow">→</span>
-          </button>
+          <!-- GROUP: Language Use (Grammar) -->
+          <p class="mode-section-label" id="primary-group-language">Language Use · Paper 2 Booklet A</p>
 
-          <button class="stories-banner stories-banner--purple" id="btn-grammar-mcq" aria-label="Open Grammar MCQ Quest">
+          <button class="stories-banner stories-banner--purple" id="btn-grammar-mcq" aria-label="Open Grammar MCQ — Language Use practice for Booklet A">
             <span class="stories-banner-mascot">
               <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🧠</span>
             </span>
             <span class="stories-banner-text">
               <span class="stories-banner-title">🧠 Grammar MCQ</span>
-              <span class="stories-banner-sub">Paper-style grammar multiple-choice P1–P6</span>
+              <span class="stories-banner-sub">Helps with: Paper 2 grammar MCQ · P1–P6</span>
             </span>
             <span class="stories-banner-arrow">→</span>
           </button>
 
-          <button class="stories-banner stories-banner--teal" id="btn-vocab-mcq" aria-label="Open Vocabulary MCQ Quest">
+          <!-- GROUP: Vocabulary & Cloze -->
+          <p class="mode-section-label" id="primary-group-vocab">Vocabulary &amp; Cloze · Paper 2 Booklet A</p>
+
+          <button class="stories-banner stories-banner--teal" id="btn-vocab-mcq" aria-label="Open Vocabulary MCQ — helps with Paper 2 vocabulary multiple-choice">
             <span class="stories-banner-mascot">
               <span style="font-size:2.5rem;line-height:1" aria-hidden="true">📖</span>
             </span>
             <span class="stories-banner-text">
               <span class="stories-banner-title">📖 Vocabulary MCQ</span>
-              <span class="stories-banner-sub">Paper-style vocabulary multiple-choice P1–P6</span>
+              <span class="stories-banner-sub">Helps with: Paper 2 vocabulary MCQ · P1–P6</span>
             </span>
             <span class="stories-banner-arrow">→</span>
           </button>
 
-          <button class="stories-banner stories-banner--purple" id="btn-cloze-castle" aria-label="Open Cloze Castle Quest">
+          <button class="stories-banner stories-banner--purple" id="btn-cloze-castle" aria-label="Open Cloze Castle — helps with grammar cloze passages">
             <span class="stories-banner-mascot">
               <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🏰</span>
             </span>
             <span class="stories-banner-text">
               <span class="stories-banner-title">🏰 Cloze Castle</span>
-              <span class="stories-banner-sub">Grammar cloze passages · P1–P6</span>
+              <span class="stories-banner-sub">Helps with: Grammar cloze · P1–P6</span>
             </span>
             <span class="stories-banner-arrow">→</span>
           </button>
 
-          <button class="stories-banner stories-banner--teal" id="btn-word-vault" aria-label="Open Word Vault Quest">
+          <button class="stories-banner stories-banner--teal" id="btn-word-vault" aria-label="Open Word Vault — helps with vocabulary cloze">
             <span class="stories-banner-mascot">
               <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🔑</span>
             </span>
             <span class="stories-banner-text">
               <span class="stories-banner-title">🔑 Word Vault</span>
-              <span class="stories-banner-sub">Vocabulary in context · 7 categories</span>
+              <span class="stories-banner-sub">Helps with: Vocabulary cloze · 7 themes</span>
             </span>
             <span class="stories-banner-arrow">→</span>
           </button>
 
-          <button class="stories-banner stories-banner--purple" id="btn-editing-quest" aria-label="Open Editing Quest">
+          <button class="stories-banner stories-banner--blue" id="btn-comprehension-cloze" aria-label="Open Comprehension Cloze — open-cloze passages with multiple skill clues">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">📰</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title">📰 Comprehension Cloze</span>
+              <span class="stories-banner-sub">Helps with: Paper 2 Comprehension Cloze · P3–P6</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+
+          <!-- GROUP: Sentence Skills -->
+          <p class="mode-section-label" id="primary-group-sentences">Sentence Skills · Paper 2 Booklet B</p>
+
+          <button class="stories-banner stories-banner--orange" id="btn-sentence-forge" aria-label="Open Sentence Forge — helps with word order and sentence combining">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🔨</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title">🔨 Sentence Forge</span>
+              <span class="stories-banner-sub">Helps with: Word order &amp; sentence building · 6 levels</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+
+          <button class="stories-banner stories-banner--orange" id="btn-synthesis" aria-label="Open Synthesis &amp; Transformation — helps with Paper 2 sentence transformation">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🔁</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title">🔁 Synthesis &amp; Transformation</span>
+              <span class="stories-banner-sub">Helps with: Paper 2 Booklet B Synthesis · P4–P6</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+
+          <!-- GROUP: Writing & Editing -->
+          <p class="mode-section-label" id="primary-group-writing">Writing &amp; Editing · Paper 1 + Paper 2</p>
+
+          <button class="stories-banner stories-banner--purple" id="btn-editing-quest" aria-label="Open Editing Quest — helps with editing for spelling and grammar">
             <span class="stories-banner-mascot">
               <span style="font-size:2.5rem;line-height:1" aria-hidden="true">✏️</span>
             </span>
             <span class="stories-banner-text">
               <span class="stories-banner-title">✏️ Editing Quest</span>
-              <span class="stories-banner-sub">Grammar &amp; spelling correction</span>
+              <span class="stories-banner-sub">Helps with: Editing for Spelling &amp; Grammar (Paper 2)</span>
             </span>
             <span class="stories-banner-arrow">→</span>
           </button>
 
-          <button class="stories-banner stories-banner--orange" id="btn-writing-quest" aria-label="Open Writing Quest">
+          <button class="stories-banner stories-banner--orange" id="btn-writing-quest" aria-label="Open Writing Quest — helps with continuous writing">
             <span class="stories-banner-mascot">
               <span style="font-size:2.5rem;line-height:1" aria-hidden="true">📝</span>
             </span>
             <span class="stories-banner-text">
               <span class="stories-banner-title">📝 Writing Quest</span>
-              <span class="stories-banner-sub">Prompt-based writing with rubric</span>
+              <span class="stories-banner-sub">Helps with: Continuous Writing (Paper 1)</span>
             </span>
             <span class="stories-banner-arrow">→</span>
           </button>
 
-          <button class="stories-banner stories-banner--gold" id="btn-paper-mode" aria-label="Open Paper Mode">
+          <button class="stories-banner stories-banner--orange" id="btn-situational-writing" aria-label="Open Situational Writing — helps with Paper 1 Situational Writing">
             <span class="stories-banner-mascot">
-              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">📝</span>
+              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">✉️</span>
             </span>
             <span class="stories-banner-text">
-              <span class="stories-banner-title">📝 Paper Mode</span>
-              <span class="stories-banner-sub">Exam-style section playlists by level</span>
+              <span class="stories-banner-title">✉️ Situational Writing</span>
+              <span class="stories-banner-sub">Helps with: Paper 1 Situational Writing · P5–P6</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+
+          <!-- GROUP: Comprehension -->
+          <p class="mode-section-label" id="primary-group-comprehension">Comprehension · Paper 2</p>
+
+          <button class="stories-banner stories-banner--blue" id="btn-visual-text" aria-label="Open Visual Text Comprehension — read posters, signs and notices">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">🖼️</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title">🖼️ Visual Text Comprehension</span>
+              <span class="stories-banner-sub">Helps with: Paper 2 Visual Text · P3–P6</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+
+          <button class="stories-banner stories-banner--blue" id="btn-open-comprehension" aria-label="Open Open-ended Comprehension — answer questions about a passage">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">📚</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title">📚 Open-ended Comprehension</span>
+              <span class="stories-banner-sub">Helps with: Paper 2 Comprehension OE · P3–P6</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+
+          <!-- GROUP: Exam Practice Hub -->
+          <p class="mode-section-label" id="primary-group-exam">Exam Practice Hub · Full Paper</p>
+
+          <button class="stories-banner stories-banner--gold" id="btn-paper-mode" aria-label="Open Exam Practice Hub — full paper practice with Practice, Test and Review modes">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2.5rem;line-height:1" aria-hidden="true">📋</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title">📋 Exam Practice Hub</span>
+              <span class="stories-banner-sub">Practice · Test · Review Mistakes · P1–P6</span>
             </span>
             <span class="stories-banner-arrow">→</span>
           </button>
@@ -572,6 +650,20 @@
         <div id="writing-quest-content" class="stories-content"></div>
       </section>
 
+      <!-- SCREEN: PRIMARY ENGLISH PLACEHOLDER MODULES -->
+      <section class="screen" id="screen-primary-placeholder" aria-label="Primary English component">
+        <div class="stories-screen-header">
+          <button class="icon-btn" id="btn-pp-back" aria-label="Back to home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20" aria-hidden="true">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+          </button>
+          <h2 class="stories-screen-title" id="primary-placeholder-title">Primary English</h2>
+          <span style="font-size:1.6rem" aria-hidden="true" id="primary-placeholder-icon">📝</span>
+        </div>
+        <div id="primary-placeholder-content" class="stories-content"></div>
+      </section>
+
       <!-- SCREEN: RESULT -->
       <section class="screen" id="screen-result" aria-label="Round result" aria-live="assertive">
         <div class="result-mascot" id="result-mascot" aria-hidden="true"></div>
@@ -759,7 +851,7 @@
     </div>
 
     <!-- DASHBOARD MODAL -->
-    <div class="modal-overlay" id="modal-dashboard" role="dialog" aria-modal="true" aria-label="Parent Dashboard" hidden>
+    <div class="modal-overlay" id="modal-dashboard" role="dialog" aria-modal="true" aria-label="Parent Dashboard – progress and report card" hidden>
       <div class="modal-panel modal-panel--wide">
         <div class="modal-header">
           <h2 class="modal-title">Parent Dashboard</h2>
@@ -805,6 +897,17 @@
             <button class="cp-level-btn" data-level="primary" aria-pressed="false">
               🏫 Primary School
             </button>
+          </div>
+          <div class="cp-grade-group" id="cp-grade-group" role="group" aria-label="Choose primary school grade" style="display:none">
+            <p class="cp-grade-label">Which year?</p>
+            <div class="cp-grade-btns">
+              <button class="cp-grade-btn" data-grade="P1" aria-pressed="false">P1</button>
+              <button class="cp-grade-btn" data-grade="P2" aria-pressed="false">P2</button>
+              <button class="cp-grade-btn" data-grade="P3" aria-pressed="false">P3</button>
+              <button class="cp-grade-btn" data-grade="P4" aria-pressed="false">P4</button>
+              <button class="cp-grade-btn" data-grade="P5" aria-pressed="false">P5</button>
+              <button class="cp-grade-btn" data-grade="P6" aria-pressed="false">P6</button>
+            </div>
           </div>
           <p class="cp-level-hint" id="cp-level-hint">Phonics games unlock as words are mastered</p>
           <button class="btn btn--primary btn--full" id="cp-confirm-btn">Create Profile →</button>

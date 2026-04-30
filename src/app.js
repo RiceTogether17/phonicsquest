@@ -34,6 +34,8 @@ import { initVocabMcq, showVocabMcqBrowser, cleanupVocabMcq, startVocabMcqLevel 
 import { initPaperMode, showPaperModeBrowser, cleanupPaperMode } from './modes/paperMode.js';
 import { initEditingQuest, showEditingBrowser, cleanupEditingQuest } from './modes/editingQuest.js';
 import { initWritingQuest, showWritingBrowser, cleanupWritingQuest } from './modes/writingQuest.js';
+import { mountPlaceholderModule, getPlaceholderMeta } from './modes/primaryPlaceholders.js';
+import { getWeakSkills } from './modules/remediationRouter.js';
 import {
   getProfiles, createProfile, deleteProfile, activateProfile,
   getActiveProfile, needsProfileSelection, restoreActiveProfile,
@@ -469,6 +471,27 @@ class App {
 
     document.getElementById('btn-writing-back')?.addEventListener('click', () => {
       cleanupWritingQuest();
+      this._showScreen(SCREENS.HOME);
+      mascot.setHomeState('holdCard');
+    });
+
+    // ── Primary English placeholder modules (Visual Text, Comprehension Cloze,
+    //    Open-ended Comprehension, Synthesis & Transformation, Situational
+    //    Writing) — first-version implementations so parents can see the full
+    //    Primary English pathway in the home screen.
+    const placeholderHandlers = [
+      ['btn-visual-text',         'visual-text'],
+      ['btn-comprehension-cloze', 'comprehension-cloze'],
+      ['btn-open-comprehension',  'open-comprehension'],
+      ['btn-synthesis',           'synthesis'],
+      ['btn-situational-writing', 'situational-writing'],
+    ];
+    placeholderHandlers.forEach(([btnId, kind]) => {
+      document.getElementById(btnId)?.addEventListener('click', () => {
+        this._openPrimaryPlaceholder(kind);
+      });
+    });
+    document.getElementById('btn-pp-back')?.addEventListener('click', () => {
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
@@ -1327,9 +1350,35 @@ class App {
       case 'stories':
         document.getElementById('btn-stories')?.click();
         break;
+      case 'visual-text':
+      case 'comprehension-cloze':
+      case 'open-comprehension':
+      case 'synthesis':
+      case 'situational-writing':
+        this._openPrimaryPlaceholder(target);
+        break;
       default:
         break;
     }
+  }
+
+  _openPrimaryPlaceholder(kind) {
+    const meta = getPlaceholderMeta(kind);
+    if (!meta) return;
+    const titleEl = document.getElementById('primary-placeholder-title');
+    const iconEl  = document.getElementById('primary-placeholder-icon');
+    if (titleEl) titleEl.textContent = meta.label;
+    if (iconEl)  iconEl.textContent = meta.icon;
+    const container = document.getElementById('primary-placeholder-content');
+    mountPlaceholderModule(container, kind, {
+      onClose: () => {
+        this._showScreen(SCREENS.HOME);
+        mascot.setHomeState('holdCard');
+      },
+      onRelated: (target) => this._navigateTo(target),
+    });
+    this._showScreen(SCREENS.PRIMARY_PLACEHOLDER);
+    mascot.setState('whiteboard');
   }
 
   _launchPaperSection(sectionKey, level) {
@@ -1539,20 +1588,31 @@ class App {
     const questsHeading = document.getElementById('quests-section-heading');
     const questsSub     = document.getElementById('quests-section-sub');
     const levelBadge    = document.getElementById('primary-level-badge');
+    const startHere     = document.getElementById('primary-start-here');
 
-    const layout = getHomeLayoutForReadingBand(readingBand);
+    const profile = getActiveProfile ? getActiveProfile() : null;
+    // P1–P6 primary profiles always get the Primary English-first layout
+    // even if their reading band placement hasn't run yet.
+    const isPrimary = !!profile?.primaryGrade
+      || profile?.schoolLevel === 'primary'
+      || readingBand === 'reader';
+
+    const layout = isPrimary
+      ? { hidePhonicsCore: true, questsMilestone: false, spotlightSentenceForge: false }
+      : getHomeLayoutForReadingBand(readingBand);
     const sentenceForgeBtn = document.getElementById('btn-sentence-forge');
 
     if (layout.hidePhonicsCore) {
-      // Primary pathway: hide early-reading phonics, show Primary English hub
-      coreSection?.classList.add('home-section--hidden');
+      // Primary pathway: collapse Early Reading Quest to a small "also available"
+      // strip below the Primary English Quest hub, and surface a "Start Here
+      // Today" recommendation built from weak skills.
+      coreSection?.classList.add('home-section--collapsed');
       questsSection?.classList.remove('home-section--milestone');
-      if (questsHeading) questsHeading.textContent = 'Primary English Practice';
-      if (questsSub)     questsSub.textContent     = 'Choose a component · follow the order above';
+      questsSection?.classList.add('home-section--primary-priority');
+      if (questsHeading) questsHeading.textContent = '🏫 Primary English Quest';
+      if (questsSub)     questsSub.textContent     = 'School-paper components · choose a module · P1–P6';
       sentenceForgeBtn?.classList.remove('stories-banner--spotlight');
 
-      // Show grade context badge if profile has a grade set
-      const profile = getActiveProfile ? getActiveProfile() : null;
       if (levelBadge && profile?.primaryGrade) {
         levelBadge.style.display = '';
         levelBadge.innerHTML =
@@ -1560,21 +1620,83 @@ class App {
       } else if (levelBadge) {
         levelBadge.style.display = 'none';
       }
+
+      this._renderPrimaryStartHere(startHere);
+      this._renderPrimaryEarlyReadingNote(coreSection);
     } else if (!layout.questsMilestone) {
-      coreSection?.classList.remove('home-section--hidden');
-      questsSection?.classList.remove('home-section--milestone');
+      coreSection?.classList.remove('home-section--hidden', 'home-section--collapsed');
+      questsSection?.classList.remove('home-section--milestone', 'home-section--primary-priority');
       if (questsHeading) questsHeading.textContent = 'Bridge Quests';
       if (questsSub)     questsSub.textContent     = 'Keep phonics active and begin Sentence Forge first';
       sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
       if (levelBadge) levelBadge.style.display = 'none';
+      if (startHere) startHere.style.display = 'none';
     } else {
-      coreSection?.classList.remove('home-section--hidden');
+      coreSection?.classList.remove('home-section--hidden', 'home-section--collapsed');
       questsSection?.classList.add('home-section--milestone');
+      questsSection?.classList.remove('home-section--primary-priority');
       if (questsHeading) questsHeading.textContent = 'Quest Milestones';
       if (questsSub)     questsSub.textContent     = 'Unlocks as decoding and reading readiness improve';
       sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
       if (levelBadge) levelBadge.style.display = 'none';
+      if (startHere) startHere.style.display = 'none';
     }
+  }
+
+  /**
+   * Render the "Start Here Today" recommendation strip on the primary home.
+   * Picks the weakest grammar/vocab skill (or a default Grammar MCQ session
+   * for new profiles) so a parent always has one obvious 10-minute task.
+   */
+  _renderPrimaryStartHere(host) {
+    if (!host) return;
+    let weakSkills = [];
+    try { weakSkills = getWeakSkills(); } catch (_) { weakSkills = []; }
+    const top = weakSkills?.[0] || null;
+    const recommendation = top
+      ? {
+          icon: '🎯',
+          title: `Today: practise ${top.label}`,
+          reason: `This is your weakest skill — ${Math.round((top.score || 0) * 100)}% so far. 10 focused minutes here will lift your next paper score.`,
+          target: top.domain === 'grammar' ? 'grammar-mcq' : 'vocab-mcq',
+          ctaLabel: top.domain === 'grammar' ? 'Open Grammar MCQ' : 'Open Vocabulary MCQ',
+        }
+      : {
+          icon: '🌟',
+          title: 'Today: warm up with Grammar MCQ',
+          reason: 'No weak skills yet — start with Grammar MCQ at your level to unlock targeted practice.',
+          target: 'grammar-mcq',
+          ctaLabel: 'Open Grammar MCQ',
+        };
+    host.style.display = '';
+    host.innerHTML = `
+      <div class="home-section-header">
+        <p class="home-section-heading">${recommendation.icon} Start Here Today</p>
+        <p class="home-section-sub">A 10-minute task picked from your weak skills.</p>
+      </div>
+      <button class="stories-banner stories-banner--gold start-here-banner" data-target="${recommendation.target}" aria-label="${recommendation.title}">
+        <span class="stories-banner-mascot">
+          <span style="font-size:2.2rem;line-height:1" aria-hidden="true">${recommendation.icon}</span>
+        </span>
+        <span class="stories-banner-text">
+          <span class="stories-banner-title">${recommendation.title}</span>
+          <span class="stories-banner-sub">${recommendation.reason}</span>
+        </span>
+        <span class="stories-banner-arrow">→</span>
+      </button>`;
+    host.querySelectorAll('[data-target]').forEach(btn => {
+      btn.addEventListener('click', () => this._navigateTo(btn.dataset.target));
+    });
+  }
+
+  _renderPrimaryEarlyReadingNote(section) {
+    if (!section) return;
+    if (section.querySelector('.early-reading-note')) return;
+    const note = document.createElement('p');
+    note.className = 'early-reading-note';
+    note.setAttribute('role', 'note');
+    note.textContent = 'Phonics and blending are still available below — open them whenever you want a warm-up before Primary English practice.';
+    section.prepend(note);
   }
 
   // ── Modals ──
