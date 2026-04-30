@@ -75,9 +75,28 @@ function _saveProfiles(profiles) {
   } catch (_) {}
 }
 
+const VALID_PRIMARY_GRADES = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
+const VALID_READING_BANDS = ['pre-reader', 'emerging-decoder', 'developing-reader', 'reader'];
+
+function _normalisePrimaryGrade(grade) {
+  if (!grade) return null;
+  const upper = String(grade).toUpperCase().trim();
+  return VALID_PRIMARY_GRADES.includes(upper) ? upper : null;
+}
+
+function _normaliseReadingBand(band) {
+  if (!band) return null;
+  return VALID_READING_BANDS.includes(band) ? band : null;
+}
+
 /** Create a new profile and return it. */
 export function createProfile(name, avatar, color, schoolLevel = 'preschool', opts = {}) {
-  const id = 'p_' + Date.now().toString(36);
+  const id = 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+  const normalisedGrade = _normalisePrimaryGrade(opts.primaryGrade);
+  const normalisedBand = _normaliseReadingBand(opts.readingBand);
+  // If a primaryGrade is provided we treat the profile as primary, even when
+  // the caller forgot to pass schoolLevel='primary'.
+  const resolvedSchoolLevel = (schoolLevel === 'primary' || normalisedGrade) ? 'primary' : 'preschool';
   const profile = {
     id,
     name: name || 'Player',
@@ -86,10 +105,10 @@ export function createProfile(name, avatar, color, schoolLevel = 'preschool', op
     // 'primary' bypasses phonics-mastery unlock gates for Sentence Forge,
     // Cloze Castle and Word Vault for legacy profiles. New placement now
     // routes by reading band, but schoolLevel is still kept as metadata.
-    schoolLevel: schoolLevel === 'primary' ? 'primary' : 'preschool',
+    schoolLevel: resolvedSchoolLevel,
     // For primary profiles: 'P1'–'P6'. Null means not yet set.
-    primaryGrade: (schoolLevel === 'primary' && opts.primaryGrade) ? opts.primaryGrade : null,
-    readingBand: opts.readingBand || null,
+    primaryGrade: resolvedSchoolLevel === 'primary' ? normalisedGrade : null,
+    readingBand: normalisedBand,
     classId: opts.classId || 'class-a',
     createdAt: new Date().toISOString(),
   };
@@ -97,6 +116,37 @@ export function createProfile(name, avatar, color, schoolLevel = 'preschool', op
   profiles.push(profile);
   _saveProfiles(profiles);
   return profile;
+}
+
+/**
+ * Update an existing profile in-place. Used by the dashboard / settings
+ * to fix a stale primaryGrade or readingBand without having to re-create
+ * the profile. Returns the updated profile, or null if the id is unknown.
+ */
+export function updateProfile(id, patch = {}) {
+  const profiles = getProfiles();
+  const idx = profiles.findIndex(p => p.id === id);
+  if (idx < 0) return null;
+  const existing = profiles[idx];
+  const next = { ...existing };
+  if ('name' in patch && typeof patch.name === 'string' && patch.name.trim()) next.name = patch.name.trim();
+  if ('avatar' in patch && patch.avatar) next.avatar = patch.avatar;
+  if ('color' in patch && patch.color) next.color = patch.color;
+  if ('schoolLevel' in patch) {
+    next.schoolLevel = patch.schoolLevel === 'primary' ? 'primary' : 'preschool';
+  }
+  if ('primaryGrade' in patch) {
+    const g = _normalisePrimaryGrade(patch.primaryGrade);
+    next.primaryGrade = g;
+    if (g && next.schoolLevel !== 'primary') next.schoolLevel = 'primary';
+  }
+  if ('readingBand' in patch) {
+    next.readingBand = _normaliseReadingBand(patch.readingBand);
+  }
+  if ('classId' in patch && patch.classId) next.classId = patch.classId;
+  profiles[idx] = next;
+  _saveProfiles(profiles);
+  return next;
 }
 
 export function getClasses() {
@@ -225,7 +275,9 @@ export function exportProfile(id) {
 /**
  * Import a profile from a previously exported JSON blob/string.
  * Creates a new profile with a fresh ID (to avoid collisions) and
- * restores all progress data.
+ * restores all progress data, including primaryGrade, readingBand and
+ * classId so a parent's child shows up as the same kind of learner after
+ * a backup restore.
  * @param {string} jsonString  Raw JSON text of the export file
  * @returns {{ profile: object, error?: string }}
  */
@@ -245,16 +297,30 @@ export function importProfile(jsonString) {
     return { profile: null, error: 'Export file is missing profile data.' };
   }
 
+  const src = payload.profile;
+  const importedGrade = _normalisePrimaryGrade(src.primaryGrade);
+  const importedBand  = _normaliseReadingBand(src.readingBand);
+  // If the export had a primaryGrade we treat it as a primary profile even if
+  // the legacy schoolLevel field was missing.
+  const resolvedSchoolLevel = (src.schoolLevel === 'primary' || importedGrade) ? 'primary' : 'preschool';
+
   // Create a fresh profile (new ID to avoid stomping an existing one)
   const newProfile = createProfile(
-    payload.profile.name + ' (imported)',
-    payload.profile.avatar || AVATAR_OPTIONS[0],
-    payload.profile.color  || COLOR_OPTIONS[0],
-    payload.profile.schoolLevel || 'preschool',
-    { classId: payload.profile.classId || 'class-a' }
+    src.name + ' (imported)',
+    src.avatar || AVATAR_OPTIONS[0],
+    src.color  || COLOR_OPTIONS[0],
+    resolvedSchoolLevel,
+    {
+      primaryGrade: importedGrade,
+      readingBand:  importedBand,
+      classId:      src.classId || 'class-a',
+    },
   );
 
-  // Restore progress data under the new profile's storage key
+  // Restore progress data under the new profile's storage key.  Progress
+  // includes weak-skill maps (wvWeakSkills, ccqWeakSkills), questMastery,
+  // wordStats, paperSession, etc., so the imported child looks exactly the
+  // same as the exported one.
   if (payload.progressData && typeof payload.progressData === 'object') {
     try {
       localStorage.setItem(PROFILE_STORAGE_KEY(newProfile.id), JSON.stringify(payload.progressData));
@@ -264,6 +330,41 @@ export function importProfile(jsonString) {
   }
 
   return { profile: newProfile, error: null };
+}
+
+/**
+ * Pure-function variant of import used by tests and the dashboard "preview"
+ * flow.  It parses a JSON payload and produces the canonical profile object
+ * (without writing to localStorage), so callers can verify that fields like
+ * primaryGrade and readingBand survive the round-trip.
+ */
+export function parseProfileImportPayload(jsonString) {
+  let payload;
+  try {
+    payload = JSON.parse(jsonString);
+  } catch (_) {
+    return { profile: null, progressData: null, error: 'invalid-json' };
+  }
+  if (payload?._type !== 'phonicsquest_profile_export' || !payload.profile?.name) {
+    return { profile: null, progressData: null, error: 'invalid-shape' };
+  }
+  const src = payload.profile;
+  const importedGrade = _normalisePrimaryGrade(src.primaryGrade);
+  const importedBand  = _normaliseReadingBand(src.readingBand);
+  const resolvedSchoolLevel = (src.schoolLevel === 'primary' || importedGrade) ? 'primary' : 'preschool';
+  return {
+    profile: {
+      name:        src.name,
+      avatar:      src.avatar || AVATAR_OPTIONS[0],
+      color:       src.color || COLOR_OPTIONS[0],
+      schoolLevel: resolvedSchoolLevel,
+      primaryGrade: resolvedSchoolLevel === 'primary' ? importedGrade : null,
+      readingBand: importedBand,
+      classId:     src.classId || 'class-a',
+    },
+    progressData: payload.progressData && typeof payload.progressData === 'object' ? payload.progressData : {},
+    error: null,
+  };
 }
 
 export { AVATAR_OPTIONS, COLOR_OPTIONS, CLASSES_META_KEY };

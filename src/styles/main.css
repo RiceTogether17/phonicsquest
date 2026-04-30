@@ -8417,3 +8417,180 @@ textarea:hover {
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Primary English: Start Here Today + section visibility ─────────────── */
+.home-section--collapsed {
+  opacity: 0.85;
+  margin-top: var(--space-4, 16px);
+  border-top: 1px dashed color-mix(in srgb, var(--border) 80%, transparent);
+  padding-top: var(--space-3, 12px);
+}
+.home-section--collapsed .mode-grid { gap: 6px; }
+.home-section--primary-priority { order: -1; }
+.early-reading-note {
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--text-muted, #666) 90%, #000);
+  margin: 0 0 8px 0;
+}
+.primary-start-here {
+  margin-bottom: var(--space-3, 12px);
+}
+.start-here-banner { width: 100%; }
+.app-brand-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  opacity: 0.8;
+  margin-left: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Exam Practice Hub ───────────────────────────────────────────────────── */
+.exam-hub-modes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+.exam-hub-mode-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 10px 12px;
+  border: 2px solid color-mix(in srgb, var(--color-primary) 25%, var(--border));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface-2) 80%, #fff);
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  gap: 4px;
+}
+.exam-hub-mode-btn:hover { border-color: var(--color-primary); }
+.exam-hub-mode-btn--active {
+  background: color-mix(in srgb, var(--color-primary) 18%, #fff);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+.exam-hub-mode-icon { font-size: 1.4rem; }
+.exam-hub-mode-name { font-weight: 700; }
+.exam-hub-mode-desc { font-size: 0.78rem; opacity: 0.75; }
+.exam-hub-selected-mode {
+  font-size: 0.85rem;
+  color: var(--text-muted, #555);
+  margin-bottom: 8px;
+}
+.paper-section-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+}
+.paper-section-no { font-weight: 700; min-width: 24px; }
+.paper-section-label { flex: 1; }
+.paper-section-status {
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+.paper-section-status--done { background: color-mix(in srgb, var(--color-success, #16a34a) 18%, transparent); color: var(--color-success, #16a34a); }
+.paper-section-status--pending { background: color-mix(in srgb, var(--text-muted, #666) 18%, transparent); color: var(--text-muted, #555); }
+.exam-hub-summary,
+.exam-hub-section-feedback,
+.exam-hub-session,
+.exam-hub-playlist {
+  border-radius: 14px;
+}
+.exam-hub-followups ul { margin: 6px 0 0; padding-left: 18px; }
+
+/* ── Parent Report Card ─────────────────────────────────────────────────── */
+.parent-report-card {
+  background: color-mix(in srgb, var(--color-primary) 8%, #fff);
+  border: 2px solid color-mix(in srgb, var(--color-primary) 25%, var(--border));
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 18px;
+}
+.parent-report-card__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.parent-report-card__avatar { font-size: 2.2rem; line-height: 1; }
+.parent-report-card__title { margin: 0; font-size: 1.05rem; }
+.parent-report-card__sub { margin: 2px 0 0; font-size: 0.82rem; opacity: 0.8; }
+.parent-report-card__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+.parent-report-card__cell {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+}
+.parent-report-card__cell h4 { margin: 0 0 6px; font-size: 0.92rem; }
+.parent-report-card__cell ul { margin: 0; padding-left: 18px; font-size: 0.85rem; }
+.parent-report-card__cell--cta { background: color-mix(in srgb, var(--color-warning, #f59e0b) 10%, #fff); }
+.parent-report-card__detail { font-size: 0.8rem; opacity: 0.8; margin: 4px 0 8px; }
+.parent-report-card__teacher {
+  margin-top: 10px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+}
+.parent-report-card__teacher h4 { margin: 0 0 4px; font-size: 0.92rem; }
+.parent-report-card__teacher p { margin: 0; font-size: 0.88rem; line-height: 1.45; }
+.parent-report-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.parent-report-card__hint { font-size: 0.8rem; opacity: 0.85; }
+.parent-report-card__fallback {
+  width: 100%;
+  margin-top: 8px;
+  min-height: 80px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+/* ── Primary English placeholder modules ─────────────────────────────────── */
+.primary-placeholder { padding: 12px; }
+.placeholder-header { margin-bottom: 12px; }
+.placeholder-paper-link {
+  display: inline-block;
+  font-size: 0.78rem;
+  background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  color: var(--color-primary);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.placeholder-blurb { font-size: 0.92rem; color: var(--text-muted, #555); }
+.placeholder-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.placeholder-card h3 { margin: 0 0 6px; font-size: 1rem; }
+.placeholder-poster {
+  font-family: inherit;
+  white-space: pre-wrap;
+  background: color-mix(in srgb, var(--color-primary) 6%, #fff);
+  border: 1px dashed color-mix(in srgb, var(--color-primary) 25%, var(--border));
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.92rem;
+}
+.placeholder-related { font-size: 0.85rem; }

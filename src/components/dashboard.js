@@ -28,6 +28,8 @@ import {
   getLearningFunnelReport,
   getAdaptiveLessonQueue,
 } from '../modules/reporting.js';
+import { getWeakSkills } from '../modules/remediationRouter.js';
+import { buildParentReportCard, buildWhatsAppMessage } from '../modules/parentReportCard.js';
 
 Chart.register(...registerables);
 
@@ -47,6 +49,9 @@ export function renderDashboard(container, opts = {}) {
   const stats = progress.getOverallStats();
 
   container.innerHTML = `
+    <!-- A0: Parent-friendly Report Card (top of the dashboard for non-technical viewing) -->
+    <div id="dash-parent-report-card"></div>
+
     <!-- B0: Parent Coaching Card -->
     <div id="dash-coaching-card"></div>
 
@@ -153,6 +158,7 @@ export function renderDashboard(container, opts = {}) {
   `;
 
   // Render new insight sections
+  _renderParentReportCard();
   _renderParentCoachingCard();
   _renderLearnerSummary();
   _renderRecommendedActions();
@@ -181,6 +187,151 @@ function _renderCurriculumMapSection() {
   container.innerHTML = `<h3 class="dash-section-title">Learning Journey Map</h3><div id="dash-cm-inner"></div>`;
   const inner = document.getElementById('dash-cm-inner');
   if (inner) renderCurriculumMap(inner);
+}
+
+function _renderParentReportCard() {
+  const container = document.getElementById('dash-parent-report-card');
+  if (!container) return;
+
+  const profile = getActiveProfile();
+  const stats = progress.getOverallStats();
+  const coaching = getParentCoachingCard();
+  const weakSkills = getWeakSkills();
+
+  // Strengths come from quest mastery — pick highest-scoring skill
+  const mastery = store.get('questMastery') || {};
+  const allMastery = [];
+  for (const [, bucket] of Object.entries(mastery)) {
+    if (!bucket || typeof bucket !== 'object') continue;
+    for (const [skill, score] of Object.entries(bucket)) {
+      if (typeof score !== 'number') continue;
+      const existing = allMastery.find(r => r.skill === skill);
+      if (existing) {
+        if (score > existing.score) existing.score = score;
+      } else {
+        allMastery.push({ skill, score });
+      }
+    }
+  }
+  const strengths = allMastery
+    .filter(s => s.score >= 0.75)
+    .sort((a, b) => b.score - a.score)
+    .map(s => ({ skill: s.skill, label: _humaniseSkill(s.skill), score: s.score }));
+
+  // Recent mistakes from word history
+  const recentMistakes = (stats.recentHistory || [])
+    .filter(h => h && h.correct === false)
+    .slice(0, 5)
+    .map(h => ({ word: h.wordId, mode: h.mode, when: _timeAgo(h.timestamp), correct: false }));
+
+  const weekly = {
+    days: coaching?.weekDays ?? 0,
+    words: coaching?.weekWords ?? (stats.totalAttempts || 0),
+    accuracy: stats.overallAccuracy || 0,
+  };
+
+  const card = buildParentReportCard({
+    profile,
+    weakSkills,
+    strengths,
+    recentMistakes,
+    weekly,
+  });
+
+  container.innerHTML = `
+    <section class="parent-report-card" aria-label="Parent report card" role="region">
+      <header class="parent-report-card__head">
+        <span class="parent-report-card__avatar" aria-hidden="true">${card.avatar}</span>
+        <div>
+          <h3 class="parent-report-card__title">📋 Report Card · ${escapeHtml(card.learnerName)}${card.grade ? ` <small>(${card.grade})</small>` : ''}</h3>
+          <p class="parent-report-card__sub">Parent-friendly snapshot · this week ${card.weekly.days} day${card.weekly.days === 1 ? '' : 's'}, ${card.weekly.words} questions, ${Math.round(card.weekly.accuracy * 100)}% accurate</p>
+        </div>
+      </header>
+      <div class="parent-report-card__grid">
+        <div class="parent-report-card__cell">
+          <h4>✅ Strengths</h4>
+          <ul>
+            ${card.strengths.map(s => `<li>${escapeHtml(s.label)}${s.pct ? ` <strong>(${s.pct}%)</strong>` : ''}</li>`).join('') || '<li>Steady effort across the board</li>'}
+          </ul>
+        </div>
+        <div class="parent-report-card__cell">
+          <h4>🎯 Needs Practice</h4>
+          <ul>
+            ${card.needsPractice.map(s => `<li>${escapeHtml(s.label)} <strong>(${s.pct}%)</strong></li>`).join('') || '<li>No major gaps detected</li>'}
+          </ul>
+        </div>
+        <div class="parent-report-card__cell">
+          <h4>📝 Recent Mistakes</h4>
+          <ul>
+            ${card.recentMistakes.map(m => `<li>${escapeHtml(m.word)}${m.mode ? ` <small>· ${escapeHtml(m.mode)}</small>` : ''}${m.when ? ` <small>· ${escapeHtml(m.when)}</small>` : ''}</li>`).join('') || '<li>No recent mistakes recorded</li>'}
+          </ul>
+        </div>
+        <div class="parent-report-card__cell parent-report-card__cell--cta">
+          <h4>⏱️ Recommended 10-minute practice</h4>
+          <p><strong>${escapeHtml(card.recommendation.title)}</strong></p>
+          <p class="parent-report-card__detail">${escapeHtml(card.recommendation.detail)}</p>
+          <button class="btn btn--primary btn--sm" id="parent-report-cta" data-target="${card.recommendation.target}">${escapeHtml(card.recommendation.targetLabel)} →</button>
+        </div>
+      </div>
+      <div class="parent-report-card__teacher">
+        <h4>💬 Teacher's note</h4>
+        <p>${escapeHtml(card.teacherComment)}</p>
+      </div>
+      <div class="parent-report-card__actions">
+        <button class="btn btn--primary" id="copy-parent-update" data-clip="parent-update">📲 Copy Parent Update (WhatsApp)</button>
+        <span class="parent-report-card__hint" id="parent-update-hint" aria-live="polite"></span>
+      </div>
+    </section>`;
+
+  const cta = container.querySelector('#parent-report-cta');
+  cta?.addEventListener('click', () => {
+    const target = cta.dataset.target;
+    if (_onNavigate && target) _onNavigate({ target });
+  });
+
+  const copyBtn = container.querySelector('#copy-parent-update');
+  const hint = container.querySelector('#parent-update-hint');
+  copyBtn?.addEventListener('click', async () => {
+    const message = buildWhatsAppMessage(card);
+    let copied = false;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(message);
+        copied = true;
+      }
+    } catch (_) { /* ignore */ }
+
+    if (!copied) {
+      // Fallback: show the message in a textarea so the parent can copy manually
+      const ta = document.createElement('textarea');
+      ta.value = message;
+      ta.setAttribute('aria-label', 'Parent update message');
+      ta.className = 'parent-report-card__fallback';
+      ta.readOnly = true;
+      copyBtn.parentElement?.appendChild(ta);
+      ta.focus();
+      ta.select();
+    }
+    if (hint) hint.textContent = copied ? 'Copied! Paste it into WhatsApp.' : 'Select the text below and copy manually.';
+  });
+}
+
+function _humaniseSkill(key) {
+  return String(key)
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/[-_]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/^./, c => c.toUpperCase());
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function _renderParentCoachingCard() {
