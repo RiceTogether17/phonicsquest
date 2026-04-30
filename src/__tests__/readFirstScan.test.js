@@ -25,6 +25,24 @@ describe('renderReadFirstScan', () => {
     expect(host.querySelector('#cloze-quit')).not.toBeNull();
   });
 
+  it('renders the passage text on the read-first screen and escapes unsafe text', () => {
+    renderReadFirstScan({
+      host,
+      quest: 'cloze',
+      passageTitle: 'Storm Day',
+      passageText: 'Yesterday, I ___ to the park. <script>alert(1)</script>',
+      onContinue: () => {},
+    });
+    const html = host.innerHTML;
+    expect(html).toContain('Yesterday, I ___ to the park.');
+    expect(html).not.toContain('<script>');
+  });
+
+  it('omits the passage block when no text is provided', () => {
+    renderReadFirstScan({ host, quest: 'cloze', passageTitle: 'X', onContinue: () => {} });
+    expect(host.querySelector('.cloze-game-scan-passage')).toBeNull();
+  });
+
   it('renders Vault Scan defaults for vault quest', () => {
     renderReadFirstScan({
       host,

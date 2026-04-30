@@ -45,7 +45,7 @@ import { getUniqueWordVaultDone, recordWordVaultCompletion } from './clozeComple
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { renderReadFirstScan } from './readFirstScan.js';
 import { buildScanTaskForPassage, renderScanTask } from './scanTask.js';
-import { buildCopySummaryText, getModeConfig, getNextStepRecommendation, groupWrongLinesBySkill } from './clozeSessionSummary.js';
+import { buildCopySummaryText, buildParentReport, getModeConfig, getNextStepRecommendation, groupWrongLinesBySkill, pickStrongestWeakest } from './clozeSessionSummary.js';
 import { incrementHintUsage } from './hintUsage.js';
 import { buildWhyWrongExplanation, getBlankSkillMeta, getClueTypeLabel, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
 import { getTopWeakSkills, recordWeakSkills } from './clozeCompletionTracker.js';
@@ -95,6 +95,7 @@ let _readFirstAcknowledged = false;
 let _scanTaskCompleted = false;
 let _sessionScanCorrect = 0;
 let _sessionScanTotal   = 0;
+let _sessionSkillStats  = {}; // skill -> { correct, total, label, lastWrongExamples: [] }
 
 // ── Category-specific teach-back content ────────────────────────────────────
 const VAULT_TEACHBACK = {
@@ -398,6 +399,7 @@ function _startPassage(catKey, level) {
   _sessionHintsUsed = 0;
   _sessionScanCorrect = 0;
   _sessionScanTotal = 0;
+  _sessionSkillStats = {};
   _examStartedAt = Date.now();
   _sessionReviewRows = [];
   _infoPanelOpen = false;
@@ -479,6 +481,7 @@ function _renderVaultScan(passage) {
     host: _container,
     quest: 'vault',
     passageTitle: passage.title || 'Word Vault',
+    passageText: passage.text || '',
     onContinue: () => {
       _readFirstAcknowledged = true;
       _renderVaultScanTaskStep(passage);
@@ -1045,14 +1048,25 @@ function _checkPassage(passage) {
   const vaultLevel = String(_currentLevel).toUpperCase();
   vocabRows.forEach((row, idx) => {
     const meta = getBlankSkillMeta(passage, idx);
+    const wasWrong = row.status !== 'Correct';
+    const skillKey = meta.primarySkill || skillTag;
+    if (!_sessionSkillStats[skillKey]) {
+      _sessionSkillStats[skillKey] = { correct: 0, total: 0, label: row.skillLabel || getSkillLabel(skillKey), lastWrongExamples: [] };
+    }
+    const stat = _sessionSkillStats[skillKey];
+    stat.total += 1;
+    if (!wasWrong) stat.correct += 1;
+    else if (row.correctAnswer && stat.lastWrongExamples.length < 3) {
+      stat.lastWrongExamples.push(row.correctAnswer);
+    }
     masteryMap = recordMasteryAttempt({
       mode: 'wordVault',
       level: vaultLevel,
       category: _currentCat,
-      skill: meta.primarySkill || skillTag,
+      skill: skillKey,
       clueType: meta.clueType,
-      wasWrong: row.status !== 'Correct',
-      example: row.status !== 'Correct'
+      wasWrong,
+      example: wasWrong
         ? {
           passageId: passage.id,
           blankIndex: idx,
@@ -1385,6 +1399,7 @@ function _showComplete(summary = {}) {
           : ''}
         <button class="btn btn--ghost btn--sm" id="wv-replay">Play Again ↺</button>
         <button class="btn btn--ghost btn--sm" id="wv-copy-summary">Copy Summary</button>
+        <button class="btn btn--ghost btn--sm" id="wv-copy-parent-report">Copy Parent Report</button>
         <button class="btn btn--ghost btn--sm" id="wv-back-lvls">All Levels</button>
         <button class="btn btn--ghost btn--sm" id="wv-back-cats2">Categories</button>
       </div>
@@ -1414,6 +1429,25 @@ function _showComplete(summary = {}) {
       _showFeedback('Summary copied!', true);
     } catch {
       _showFeedback('Unable to copy summary on this device.', false);
+    }
+  });
+  document.getElementById('wv-copy-parent-report')?.addEventListener('click', async () => {
+    const { strongest, weakest } = pickStrongestWeakest(_sessionSkillStats);
+    const text = buildParentReport({
+      questLabel: 'Word Vault',
+      modeLabel: modeCfg.label,
+      scoreLine: `${correctBlanks}/${totalBlanks}`,
+      accuracy: acc,
+      strongest,
+      weakest,
+      weakExamples: weakest ? (_sessionSkillStats[weakest.skill]?.lastWrongExamples || []) : [],
+      recommendation,
+    });
+    try {
+      await navigator.clipboard?.writeText(text);
+      _showFeedback('Parent report copied!', true);
+    } catch {
+      _showFeedback('Unable to copy parent report on this device.', false);
     }
   });
   document.getElementById('wv-back-lvls')?.addEventListener('click', () => _renderLevelBrowser(_currentCat));

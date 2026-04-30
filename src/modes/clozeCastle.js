@@ -45,7 +45,7 @@ import { getUniqueClozeDone, recordClozeCompletion } from './clozeCompletionTrac
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { renderReadFirstScan } from './readFirstScan.js';
 import { buildScanTaskForPassage, renderScanTask } from './scanTask.js';
-import { buildCopySummaryText, getModeConfig, getNextStepRecommendation, getSummaryScoreLine, groupWrongLinesBySkill } from './clozeSessionSummary.js';
+import { buildCopySummaryText, buildParentReport, getModeConfig, getNextStepRecommendation, getSummaryScoreLine, groupWrongLinesBySkill, pickStrongestWeakest } from './clozeSessionSummary.js';
 import { incrementHintUsage } from './hintUsage.js';
 import { buildWhyWrongExplanation, getBlankSkillMeta, getClueTypeLabel, getMasteryRecommendation, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
 import { getTopWeakSkills, recordWeakSkills } from './clozeCompletionTracker.js';
@@ -91,6 +91,7 @@ let _readFirstAcknowledged = false;
 let _scanTaskCompleted = false;
 let _sessionScanCorrect = 0;
 let _sessionScanTotal   = 0;
+let _sessionSkillStats  = {}; // skill -> { correct, total, label, lastWrongExamples: [] }
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
@@ -269,6 +270,7 @@ function _startCategory(level, catKey) {
   _sessionBlankCorrect = 0;
   _sessionScanCorrect = 0;
   _sessionScanTotal = 0;
+  _sessionSkillStats = {};
   _showPassage();
 }
 
@@ -287,6 +289,7 @@ function _startAllCategories(level) {
   _sessionBlankCorrect = 0;
   _sessionScanCorrect = 0;
   _sessionScanTotal = 0;
+  _sessionSkillStats = {};
   _showPassage();
 }
 
@@ -426,6 +429,7 @@ function _renderCastleScan(passage) {
     host: _container,
     quest: 'cloze',
     passageTitle: passage.title || 'Cloze Castle',
+    passageText: passage.text || '',
     onContinue: () => {
       _readFirstAcknowledged = true;
       _renderScanTaskStep(passage);
@@ -791,14 +795,25 @@ function _checkPassage(passage) {
   const reviewRows = _buildReviewRows(passage, userAnswers);
   reviewRows.forEach((row, idx) => {
     const meta = getBlankSkillMeta(passage, idx);
+    const wasWrong = row.status !== 'Correct';
+    const skillTag = meta.primarySkill;
+    if (!_sessionSkillStats[skillTag]) {
+      _sessionSkillStats[skillTag] = { correct: 0, total: 0, label: row.skillLabel || getSkillLabel(skillTag), lastWrongExamples: [] };
+    }
+    const stat = _sessionSkillStats[skillTag];
+    stat.total += 1;
+    if (!wasWrong) stat.correct += 1;
+    else if (row.correctAnswer && stat.lastWrongExamples.length < 3) {
+      stat.lastWrongExamples.push(row.correctAnswer);
+    }
     masteryMap = recordMasteryAttempt({
       mode: 'clozeCastle',
       level: _currentLevel,
       category: skillKey,
-      skill: meta.primarySkill,
+      skill: skillTag,
       clueType: meta.clueType,
-      wasWrong: row.status !== 'Correct',
-      example: row.status !== 'Correct'
+      wasWrong,
+      example: wasWrong
         ? {
           passageId: passage.id,
           blankIndex: idx,
@@ -1090,6 +1105,7 @@ function _showComplete() {
         <button class="btn btn--primary btn--lg" id="cloze-back-cat">Choose Another Topic</button>
         <button class="btn btn--ghost btn--sm" id="cloze-replay">Play Again ↺</button>
         <button class="btn btn--ghost btn--sm" id="cloze-copy-summary">Copy Summary</button>
+        <button class="btn btn--ghost btn--sm" id="cloze-copy-parent-report">Copy Parent Report</button>
         <button class="btn btn--ghost btn--sm" id="cloze-back-levels">All Levels</button>
       </div>
     </div>`;
@@ -1124,6 +1140,32 @@ function _showComplete() {
       _showFeedback('Summary copied!', true);
     } catch {
       _showFeedback('Unable to copy summary on this device.', false);
+    }
+  });
+  document.getElementById('cloze-copy-parent-report')?.addEventListener('click', async () => {
+    const { strongest, weakest } = pickStrongestWeakest(_sessionSkillStats);
+    const scoreLine = getSummaryScoreLine({
+      mode: _sessionMode,
+      blankCorrect: _sessionBlankCorrect,
+      blankTotal: _sessionBlankTotal,
+      passageCorrect: _sessionCorrect,
+      passageTotal: _sessionTotal,
+    });
+    const text = buildParentReport({
+      questLabel: 'Cloze Castle',
+      modeLabel: modeCfg.label,
+      scoreLine,
+      accuracy: acc,
+      strongest,
+      weakest,
+      weakExamples: weakest ? (_sessionSkillStats[weakest.skill]?.lastWrongExamples || []) : [],
+      recommendation,
+    });
+    try {
+      await navigator.clipboard?.writeText(text);
+      _showFeedback('Parent report copied!', true);
+    } catch {
+      _showFeedback('Unable to copy parent report on this device.', false);
     }
   });
   document.getElementById('cloze-back-levels')?.addEventListener('click', () => _renderBrowser());
