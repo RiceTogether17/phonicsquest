@@ -50,6 +50,7 @@ import { incrementHintUsage } from './hintUsage.js';
 import { buildWhyWrongExplanation, getBlankSkillMeta, getClueTypeLabel, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
 import { getTopWeakSkills, recordWeakSkills } from './clozeCompletionTracker.js';
 import { getTopMasteryGaps, recordMasteryAttempt, summariseMasteryGap } from './masteryMap.js';
+import { getActiveProfile } from '../modules/profiles.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -78,6 +79,22 @@ let _sessionClueScore = 0;
 
 const LEVEL_LABELS = { p1: 'P1', p2: 'P2', p3: 'P3', p4: 'P4', p5: 'P5', p6: 'P6' };
 const LEVEL_ICONS  = { p1: '🌱', p2: '🌿', p3: '🌳', p4: '🔥', p5: '💎', p6: '👑' };
+
+// Map the active profile's primary grade to a lowercase level key ('p1'–'p6').
+// Falls back to 'p3' if no grade is set, 'p1' for preschool profiles.
+function _getProfileLevelKey() {
+  const profile = getActiveProfile();
+  if (!profile) return 'p3';
+  if (profile.schoolLevel !== 'primary') return 'p1';
+  const grade = profile.primaryGrade; // e.g. 'P3' stored on profile
+  if (grade && /^P[1-6]$/i.test(grade)) return grade.toLowerCase();
+  return 'p3';
+}
+
+// Human-readable label for the current profile level, e.g. 'P3'.
+function _getProfileLevelLabel() {
+  return LEVEL_LABELS[_getProfileLevelKey()] || 'P3';
+}
 
 
 let _sessionHintsUsed = 0;
@@ -261,16 +278,21 @@ function _renderCategoryBrowser() {
 
   const completed = store.get('wvqCompleted') || {};
 
+  const levelKey   = _getProfileLevelKey();
+  const levelLabel = _getProfileLevelLabel();
+
   let html = '<div class="wv-browser">';
+  html += `<div class="wv-level-context-banner" aria-live="polite">
+    Currently practising: <strong>${levelLabel} Vocabulary Cloze</strong>
+  </div>`;
   html += '<div class="wv-cat-grid">';
 
   const keys = Object.keys(VOCAB_CATEGORIES);
   const recommendedCat = questMastery.getRecommendedSkill('wordVault', keys);
-  const profileLevel = 'P5';
-  const masteryGaps = getTopMasteryGaps({ mode: 'wordVault', level: profileLevel, masteryMap: store.get('masteryMap') || {} });
+  const masteryGaps = getTopMasteryGaps({ mode: 'wordVault', level: levelLabel, masteryMap: store.get('masteryMap') || {} });
   const weakSkills = masteryGaps.length
     ? masteryGaps
-    : getTopWeakSkills({ level: profileLevel, weakSkillsMap: store.get('wvWeakSkills') || {} }).map((s) => ({
+    : getTopWeakSkills({ level: levelLabel, weakSkillsMap: store.get('wvWeakSkills') || {} }).map((s) => ({
       skill: s.skill,
       skillLabel: getSkillLabel(s.skill),
       attempts: s.attempts,
@@ -324,7 +346,7 @@ function _renderCategoryBrowser() {
   document.getElementById('wv-mastery-review')?.addEventListener('click', () => {
     const target = recommendedCat || keys[0];
     _currentCat = target;
-    _currentLevel = 'p5';
+    _currentLevel = _getProfileLevelKey();
     _startPassage(_currentCat, _currentLevel);
   });
 }

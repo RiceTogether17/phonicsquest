@@ -4067,6 +4067,44 @@ details.story-tool-section[open] > .story-tool-summary::before {
   margin: 0 0 var(--space-3);
 }
 
+/* Primary grade picker (P1–P6) shown when 'Primary School' is selected */
+.cp-grade-group {
+  margin-bottom: var(--space-2);
+}
+.cp-grade-label {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 var(--space-1);
+}
+.cp-grade-btns {
+  display: flex;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+.cp-grade-btn {
+  flex: 1;
+  min-width: 2.5rem;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-main);
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--dur-fast), background var(--dur-fast);
+}
+.cp-grade-btn:hover { border-color: var(--color-primary); }
+.cp-grade-btn--selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    STORY BROWSER — PHASE 2 ADDITIONS
    Category tabs · Singapore section · Chapter cards
@@ -5066,6 +5104,20 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .wq-review-body { padding-top: var(--space-2); }
 .wq-review-body p { margin: 4px 0; font-size: 0.92em; }
 
+/* Dimension band labels inside Writing Quest feedback */
+.wq-dim-band {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+}
+.wq-dim-band--good          { background: var(--color-success-light); color: var(--color-success); }
+.wq-dim-band--developing    { background: #fff8e1; color: #b45309; }
+.wq-dim-band--needs-work    { background: var(--color-error-light); color: var(--color-error); }
+
 /* ============================================================
    CLOZE CASTLE QUEST (cloze-*)
    ============================================================ */
@@ -5292,6 +5344,20 @@ details.story-tool-section[open] > .story-tool-summary::before {
   max-width: 700px;
   margin: 0 auto;
 }
+/* Level context banner at top of Word Vault category browser */
+.wv-level-context-banner {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-primary-light);
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  color: var(--color-primary);
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+}
+.wv-level-context-banner strong { font-weight: 800; }
 .wv-cat-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -6664,6 +6730,25 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .home-section--milestone .home-section-heading {
   color: var(--text-muted);
+}
+
+/* ── PRIMARY LEVEL BADGE — shown inside Primary English Practice section ── */
+.primary-level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-primary-light);
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: var(--space-3);
+  align-self: flex-start;
+}
+.primary-level-badge__text strong {
+  font-weight: 800;
 }
 
 /* ── PATHWAY BADGE ────────────────────────────────────────────── */
