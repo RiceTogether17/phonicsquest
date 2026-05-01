@@ -6,7 +6,7 @@ import { Chart, registerables } from 'chart.js';
 import { progress } from '../modules/progress.js';
 import { store } from '../modules/store.js';
 import { badges } from '../modules/badges.js';
-import { getActiveProfile, getProfiles, getClasses, saveClasses } from '../modules/profiles.js';
+import { getActiveProfile, getProfiles } from '../modules/profiles.js';
 import { WORD_GROUPS, GROUP_ORDER, WORDS } from '../data/words.js';
 import { CURRICULUM, getUnlockedStages } from '../data/curriculum.js';
 import {
@@ -75,7 +75,6 @@ export function renderDashboard(container, opts = {}) {
 
     <div id="dash-reporting-section"></div>
     <div id="dash-moe-section"></div>
-    <div id="dash-class-section"></div>
 
     <!-- Summary Stats (existing) -->
     <h3 class="dash-section-title" style="margin-top:24px">Progress Summary</h3>
@@ -168,7 +167,6 @@ export function renderDashboard(container, opts = {}) {
   _renderPatternInsights();
   _renderCategoryReporting();
   _renderMoeOutcomes();
-  _renderClassManagement();
 
   // Render existing sections
   _renderCurriculumMapSection();
@@ -523,61 +521,6 @@ function _renderMoeOutcomes() {
     <ul class="dash-pattern-list">
       ${rows.map(r => `<li class="dash-pattern-item"><strong>${r.code}</strong> · ${r.focus}</li>`).join('')}
     </ul>`;
-}
-
-function _renderClassManagement() {
-  const container = document.getElementById('dash-class-section');
-  if (!container) return;
-  const classes = getClasses();
-  const profiles = getProfiles();
-  const assignments = store.get('teacherAssignments') || {};
-  container.innerHTML = `
-    <h3 class="dash-section-title" style="margin-top:24px">Teacher Class Management</h3>
-    <ul class="dash-pattern-list">
-      ${classes.map(c => `<li class="dash-pattern-item">🏫 ${c.name} · ${profiles.filter(p => p.classId === c.id).length} learner(s)</li>`).join('')}
-    </ul>
-    <div class="dash-actions">
-      <input id="class-name-input" class="cp-name-input" placeholder="New class name" />
-      <button class="btn btn--ghost" id="btn-add-class">Add Class</button>
-    </div>
-    <div class="dash-actions" style="margin-top:8px">
-      <select id="assign-class" class="category-select">
-        ${classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
-      </select>
-      <select id="assign-quest" class="category-select">
-        <option value="sentence-forge">Sentence Forge</option>
-        <option value="cloze-castle">Cloze Castle</option>
-        <option value="word-vault">Word Vault</option>
-        <option value="editing-quest">Editing Quest</option>
-        <option value="writing-quest">Writing Quest</option>
-      </select>
-      <select id="assign-level" class="category-select">
-        <option value="1">Level 1</option><option value="2">Level 2</option><option value="3">Level 3</option>
-        <option value="4">Level 4</option><option value="5">Level 5</option><option value="6">Level 6</option>
-      </select>
-      <button class="btn btn--ghost" id="btn-save-assignment">Assign</button>
-    </div>
-    <p class="dash-pattern-item">📌 Current assignments: ${Object.keys(assignments).length ? Object.entries(assignments).map(([k,v]) => `${k}: ${v.quest} L${v.level}`).join(' | ') : 'none'}</p>`;
-
-  document.getElementById('btn-add-class')?.addEventListener('click', () => {
-    const input = /** @type {HTMLInputElement|null} */ (document.getElementById('class-name-input'));
-    const name = input?.value?.trim();
-    if (!name) return;
-    const next = [...classes, { id: `class-${Date.now().toString(36)}`, name }];
-    saveClasses(next);
-    _renderClassManagement();
-  });
-
-  document.getElementById('btn-save-assignment')?.addEventListener('click', () => {
-    const classId = /** @type {HTMLSelectElement|null} */ (document.getElementById('assign-class'))?.value;
-    const quest = /** @type {HTMLSelectElement|null} */ (document.getElementById('assign-quest'))?.value;
-    const level = /** @type {HTMLSelectElement|null} */ (document.getElementById('assign-level'))?.value;
-    if (!classId || !quest || !level) return;
-    const next = { ...(store.get('teacherAssignments') || {}) };
-    next[classId] = { quest, level: Number(level), updatedAt: new Date().toISOString() };
-    store.set('teacherAssignments', next);
-    _renderClassManagement();
-  });
 }
 
 // ── B1: Learner Summary ──────────────────────────────────────────────────────

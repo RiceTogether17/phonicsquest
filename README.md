@@ -104,7 +104,7 @@ A **📲 Copy Parent Update** button generates a WhatsApp-ready message that cap
 ### Profiles
 
 - Multiple child profiles, each with their own progress
-- Each profile carries: `name`, `avatar`, `color`, `schoolLevel`, `primaryGrade`, `readingBand`, `classId` and full progress (XP, mastery, weak-skill maps, paper sessions)
+- Each profile carries: `name`, `avatar`, `color`, `schoolLevel`, `primaryGrade`, `readingBand` and full progress (XP, mastery, weak-skill maps, paper sessions)
 - Export / Import preserves every one of those fields so a parent can move a profile across devices without losing the child's grade or weak-skill history
 
 ---
@@ -213,7 +213,7 @@ phonicsquest/
 
 ### State management
 
-A single reactive store (`store.js`) backed by one per-profile localStorage key. Profile metadata (name, avatar, primaryGrade, readingBand, classId) lives in `phonicsquest_profiles`; per-profile progress in `phonicsquest_profile_<id>`. No framework dependency.
+A single reactive store (`store.js`) backed by one per-profile localStorage key. Profile metadata (name, avatar, primaryGrade, readingBand) lives in `phonicsquest_profiles`; per-profile progress in `phonicsquest_profile_<id>`. No framework dependency.
 
 ### Tech stack
 

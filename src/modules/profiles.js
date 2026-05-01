@@ -10,7 +10,6 @@ import { store } from './store.js';
 
 const PROFILES_META_KEY = 'phonicsquest_profiles';
 const ACTIVE_PROFILE_KEY = 'phonicsquest_active_profile';
-const CLASSES_META_KEY = 'phonicsquest_classes_meta';
 const PROFILE_STORAGE_KEY = (id) => `phonicsquest_profile_${id}`;
 const LEGACY_STORAGE_KEY = 'phonicsquest_v2';
 const LEGACY_MIGRATION_FLAG = 'phonicsquest_legacy_migrated_to_profiles';
@@ -109,7 +108,6 @@ export function createProfile(name, avatar, color, schoolLevel = 'preschool', op
     // For primary profiles: 'P1'–'P6'. Null means not yet set.
     primaryGrade: resolvedSchoolLevel === 'primary' ? normalisedGrade : null,
     readingBand: normalisedBand,
-    classId: opts.classId || 'class-a',
     createdAt: new Date().toISOString(),
   };
   const profiles = getProfiles();
@@ -143,26 +141,9 @@ export function updateProfile(id, patch = {}) {
   if ('readingBand' in patch) {
     next.readingBand = _normaliseReadingBand(patch.readingBand);
   }
-  if ('classId' in patch && patch.classId) next.classId = patch.classId;
   profiles[idx] = next;
   _saveProfiles(profiles);
   return next;
-}
-
-export function getClasses() {
-  try {
-    const raw = localStorage.getItem(CLASSES_META_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    if (Array.isArray(parsed) && parsed.length) return parsed;
-  } catch (_) {}
-  return [{ id: 'class-a', name: 'Class A' }];
-}
-
-export function saveClasses(classes = []) {
-  try {
-    const safe = Array.isArray(classes) ? classes.filter(c => c && c.id && c.name) : [];
-    localStorage.setItem(CLASSES_META_KEY, JSON.stringify(safe.length ? safe : [{ id: 'class-a', name: 'Class A' }]));
-  } catch (_) {}
 }
 
 /** Delete a profile and its progress data. */
@@ -275,9 +256,9 @@ export function exportProfile(id) {
 /**
  * Import a profile from a previously exported JSON blob/string.
  * Creates a new profile with a fresh ID (to avoid collisions) and
- * restores all progress data, including primaryGrade, readingBand and
- * classId so a parent's child shows up as the same kind of learner after
- * a backup restore.
+ * restores all progress data, including primaryGrade and readingBand
+ * so a parent's child shows up as the same kind of learner after a
+ * backup restore.
  * @param {string} jsonString  Raw JSON text of the export file
  * @returns {{ profile: object, error?: string }}
  */
@@ -313,7 +294,6 @@ export function importProfile(jsonString) {
     {
       primaryGrade: importedGrade,
       readingBand:  importedBand,
-      classId:      src.classId || 'class-a',
     },
   );
 
@@ -360,11 +340,10 @@ export function parseProfileImportPayload(jsonString) {
       schoolLevel: resolvedSchoolLevel,
       primaryGrade: resolvedSchoolLevel === 'primary' ? importedGrade : null,
       readingBand: importedBand,
-      classId:     src.classId || 'class-a',
     },
     progressData: payload.progressData && typeof payload.progressData === 'object' ? payload.progressData : {},
     error: null,
   };
 }
 
-export { AVATAR_OPTIONS, COLOR_OPTIONS, CLASSES_META_KEY };
+export { AVATAR_OPTIONS, COLOR_OPTIONS };
