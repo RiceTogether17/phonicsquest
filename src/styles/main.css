@@ -2356,6 +2356,22 @@ input, select, textarea { font-family: inherit; }
   font-weight: 700;
 }
 
+/* P-level badge on module tiles — at-a-glance level coverage for parents */
+.module-level-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: color-mix(in srgb, currentColor 12%, #fff);
+  color: inherit;
+  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
 /* ── Screen header ───────────────────────────────────────────────────────── */
 .stories-screen-header {
   display: flex;
