@@ -48,7 +48,6 @@ function setActiveProfile({ primaryGrade = 'P4', name = 'Test', readingBand = 'r
     schoolLevel: 'primary',
     primaryGrade,
     readingBand,
-    classId: 'class-a',
   };
   localStorage.setItem('phonicsquest_profiles', JSON.stringify([profile]));
   localStorage.setItem('phonicsquest_active_profile', id);
@@ -228,7 +227,7 @@ describe('user-flow: imported profile keeps primaryGrade and readingBand', () =>
     localStorage.clear();
   });
 
-  it('importProfile preserves primaryGrade, readingBand, classId and progress', async () => {
+  it('importProfile preserves primaryGrade, readingBand and progress', async () => {
     const { importProfile, parseProfileImportPayload } =
       await import('../modules/profiles.js');
 
@@ -244,7 +243,6 @@ describe('user-flow: imported profile keeps primaryGrade and readingBand', () =>
         schoolLevel: 'primary',
         primaryGrade: 'P5',
         readingBand: 'reader',
-        classId: 'class-b',
       },
       progressData: {
         xp: 480,
@@ -259,13 +257,11 @@ describe('user-flow: imported profile keeps primaryGrade and readingBand', () =>
     expect(parsed.profile.primaryGrade).toBe('P5');
     expect(parsed.profile.readingBand).toBe('reader');
     expect(parsed.profile.schoolLevel).toBe('primary');
-    expect(parsed.profile.classId).toBe('class-b');
 
     const result = importProfile(JSON.stringify(exportPayload));
     expect(result.error).toBeNull();
     expect(result.profile.primaryGrade).toBe('P5');
     expect(result.profile.readingBand).toBe('reader');
-    expect(result.profile.classId).toBe('class-b');
     expect(result.profile.schoolLevel).toBe('primary');
 
     // Progress data must be restored
