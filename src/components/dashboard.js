@@ -246,6 +246,11 @@ function _renderParentReportCard() {
           <h3 class="parent-report-card__title">📋 Report Card · ${escapeHtml(card.learnerName)}${card.grade ? ` <small>(${card.grade})</small>` : ''}</h3>
           <p class="parent-report-card__sub">Parent-friendly snapshot · this week ${card.weekly.days} day${card.weekly.days === 1 ? '' : 's'}, ${card.weekly.words} questions, ${Math.round(card.weekly.accuracy * 100)}% accurate</p>
         </div>
+        ${card.examRisk ? `
+          <div class="exam-risk exam-risk--${card.examRisk.band}" role="status" aria-label="Exam focus: ${escapeHtml(card.examRisk.label)}">
+            <span class="exam-risk__label">${escapeHtml(card.examRisk.label)}</span>
+            <span class="exam-risk__summary">${escapeHtml(card.examRisk.summary)}</span>
+          </div>` : ''}
       </header>
       <div class="parent-report-card__grid">
         <div class="parent-report-card__cell">
@@ -256,8 +261,8 @@ function _renderParentReportCard() {
         </div>
         <div class="parent-report-card__cell">
           <h4>🎯 Needs Practice</h4>
-          <ul>
-            ${card.needsPractice.map(s => `<li>${escapeHtml(s.label)} <strong>(${s.pct}%)</strong></li>`).join('') || '<li>No major gaps detected</li>'}
+          <ul class="needs-practice-list">
+            ${card.needsPractice.map(s => `<li class="needs-practice-item needs-practice-item--${s.band || 'amber'}"><span class="needs-practice-dot" aria-hidden="true"></span>${escapeHtml(s.label)} <strong>(${s.pct}%)</strong></li>`).join('') || '<li>No major gaps detected</li>'}
           </ul>
         </div>
         <div class="parent-report-card__cell">

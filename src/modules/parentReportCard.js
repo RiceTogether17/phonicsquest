@@ -20,6 +20,79 @@ const PRACTICE_BY_DOMAIN = {
   vocab:      { target: 'vocab-mcq',   label: '📖 Vocabulary MCQ' },
 };
 
+/** Score thresholds (0–100) for the exam-risk traffic-light band. */
+const RISK_THRESHOLDS = Object.freeze({ red: 55, amber: 75 });
+
+const RISK_LABELS = Object.freeze({
+  green: '🟢 Exam-ready',
+  amber: '🟡 Watch list',
+  red:   '🔴 Needs attention',
+});
+
+/**
+ * @typedef {'green'|'amber'|'red'} ExamRiskBand
+ */
+
+/**
+ * Map a 0–100 skill score onto a traffic-light band.
+ * @param {number|null} pct
+ * @returns {ExamRiskBand}
+ */
+export function bandForPct(pct) {
+  if (pct == null || Number.isNaN(pct)) return 'green';
+  if (pct < RISK_THRESHOLDS.red)   return 'red';
+  if (pct < RISK_THRESHOLDS.amber) return 'amber';
+  return 'green';
+}
+
+/**
+ * Build the exam-risk summary from the child's weakest skills.
+ * Returns the overall band (worst across listed skills) plus a short,
+ * parent-readable explanation that names the skills driving the risk.
+ *
+ * @param {Array<{ label: string, pct: number }>} needsPractice
+ * @returns {{ band: ExamRiskBand, label: string, summary: string, skills: Array<{ label: string, pct: number, band: ExamRiskBand }> }}
+ */
+export function buildExamRisk(needsPractice = []) {
+  if (!Array.isArray(needsPractice) || needsPractice.length === 0) {
+    return {
+      band: 'green',
+      label: RISK_LABELS.green,
+      summary: 'No weak skills detected yet — keep practising to build a clearer picture.',
+      skills: [],
+    };
+  }
+
+  const skills = needsPractice.map(s => ({
+    label: s.label,
+    pct: s.pct,
+    band: bandForPct(s.pct),
+  }));
+
+  const order = { red: 3, amber: 2, green: 1 };
+  const worstBand = skills.reduce((acc, s) => (order[s.band] > order[acc] ? s.band : acc), 'green');
+
+  let summary;
+  if (worstBand === 'red') {
+    const reds = skills.filter(s => s.band === 'red').map(s => s.label);
+    summary = `${_joinList(reds)} below ${RISK_THRESHOLDS.red}% — focused practice this week will lift exam scores.`;
+  } else if (worstBand === 'amber') {
+    const ambers = skills.filter(s => s.band === 'amber').map(s => s.label);
+    summary = `${_joinList(ambers)} under ${RISK_THRESHOLDS.amber}% — solid practice will close the gap before the next paper.`;
+  } else {
+    summary = 'Skills look solid for the next paper — keep the rhythm going.';
+  }
+
+  return { band: worstBand, label: RISK_LABELS[worstBand], summary, skills };
+}
+
+function _joinList(items) {
+  if (items.length === 0) return '';
+  if (items.length === 1) return items[0];
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
+}
+
 /**
  * @typedef {Object} ParentReportCardInput
  * @property {{ name?: string, primaryGrade?: string|null, avatar?: string }|null} profile
@@ -51,6 +124,7 @@ export function buildParentReportCard(input) {
     pct: Math.round((s.score || 0) * 100),
   }));
 
+  const examRisk = buildExamRisk(topWeak);
   const recommendation = _buildRecommendation(topWeak[0], profile);
   const teacherComment = _buildTeacherComment({ topWeak, topStrong, weekly, profile });
 
@@ -60,15 +134,19 @@ export function buildParentReportCard(input) {
     when: m.when || '',
   }));
 
+  // Tag each weak skill with its band so the dashboard can colour the chip.
+  const needsPractice = topWeak.map(w => ({ ...w, band: bandForPct(w.pct) }));
+
   return {
     learnerName: profile?.name || 'Your child',
     grade: profile?.primaryGrade || null,
     avatar: profile?.avatar || '🧒',
     weekly,
     strengths: topStrong.length ? topStrong : [{ label: 'Steady effort', pct: null }],
-    needsPractice: topWeak,
+    needsPractice,
     recentMistakes,
     recommendation,
+    examRisk,
     teacherComment,
   };
 }
@@ -126,6 +204,9 @@ export function buildWhatsAppMessage(card) {
   }
   if (card.needsPractice?.[0]) {
     lines.push(`🎯 Needs practice: ${card.needsPractice[0].label} (${card.needsPractice[0].pct}%)`);
+  }
+  if (card.examRisk) {
+    lines.push(`🚦 Exam focus: ${card.examRisk.label} — ${card.examRisk.summary}`);
   }
   if (card.recentMistakes?.length) {
     lines.push(`📝 Recent slips: ${card.recentMistakes.slice(0, 3).map(m => m.word).join(', ')}`);
