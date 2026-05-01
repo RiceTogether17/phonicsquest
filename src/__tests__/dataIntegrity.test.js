@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { PAPER_MODE_PLAYLISTS, PAPER_SECTION_LABELS } from '../data/paperPlaylists.js';
 import { VOCAB_CATEGORIES, vocabPassages } from '../data/vocabPassages.js';
+import { passages as clozePassages } from '../data/passages.js';
 
 describe('Paper Playlist data integrity', () => {
   it('has no duplicate sections within any level playlist', () => {
@@ -33,4 +34,30 @@ describe('Vocab Passages data integrity', () => {
       expect(levelCount, `Category "${key}" has zero levels`).toBeGreaterThan(0);
     }
   });
+});
+
+/**
+ * Sufficiency targets for Cloze Castle (Grammar Cloze).
+ *
+ * Each entry pins a minimum passage count for one (level × category) cell.
+ * The list grows as content-fill chunks land — this is the regression guard
+ * that prevents accidental deletion / refactoring from re-thinning a cell.
+ *
+ * Target = 6 passages per in-scope cell (≈18–30 attempt opportunities once
+ * every passage's blanks are counted).
+ */
+const CLOZE_SUFFICIENCY_TARGETS = [
+  // Chunk 1a — connectors P2 & P3 (subordination + sequence)
+  { level: 'P2', category: 'connectors', min: 6 },
+  { level: 'P3', category: 'connectors', min: 6 },
+];
+
+describe('Cloze Castle passage sufficiency', () => {
+  for (const { level, category, min } of CLOZE_SUFFICIENCY_TARGETS) {
+    it(`${category} at ${level} has at least ${min} passages`, () => {
+      const cell = clozePassages?.[level]?.[category];
+      const count = Array.isArray(cell) ? cell.length : 0;
+      expect(count, `${category}/${level} has only ${count} passage(s); target is ${min}`).toBeGreaterThanOrEqual(min);
+    });
+  }
 });
