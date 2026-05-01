@@ -35,7 +35,6 @@ import { initPaperMode, showPaperModeBrowser, cleanupPaperMode } from './modes/p
 import { initEditingQuest, showEditingBrowser, cleanupEditingQuest } from './modes/editingQuest.js';
 import { initWritingQuest, showWritingBrowser, cleanupWritingQuest } from './modes/writingQuest.js';
 import { mountPlaceholderModule, getPlaceholderMeta } from './modes/primaryPlaceholders.js';
-import { getWeakSkills } from './modules/remediationRouter.js';
 import {
   getProfiles, createProfile, deleteProfile, activateProfile,
   getActiveProfile, needsProfileSelection, restoreActiveProfile,
@@ -46,6 +45,9 @@ import {
   getDailyChallengeWords, isDailyChallengeComplete,
   completeDailyChallenge, DAILY_BONUS_XP,
 } from './modules/dailyChallenge.js';
+import {
+  getMissionSummary, markMissionStepDone,
+} from './modules/missionToday.js';
 import {
   CURRICULUM, PHASE_LABELS, getUnlockedStages, getRecommendedStage,
 } from './data/curriculum.js';
@@ -1644,48 +1646,70 @@ class App {
   }
 
   /**
-   * Render the "Start Here Today" recommendation strip on the primary home.
-   * Picks the weakest grammar/vocab skill (or a default Grammar MCQ session
-   * for new profiles) so a parent always has one obvious 10-minute task.
+   * Render the "Today's Mission" card on the primary home — a five-step
+   * 10-minute English Quest (3 grammar cloze + 3 vocab cloze + 1 comp clue
+   * + 1 sentence correction + 1 yesterday's-slip review). Step progress is
+   * read live from questAttempts so completing tasks inside the modules
+   * ticks chips automatically.
    */
   _renderPrimaryStartHere(host) {
     if (!host) return;
-    let weakSkills = [];
-    try { weakSkills = getWeakSkills(); } catch (_) { weakSkills = []; }
-    const top = weakSkills?.[0] || null;
-    const recommendation = top
-      ? {
-          icon: '🎯',
-          title: `Today: practise ${top.label}`,
-          reason: `This is your weakest skill — ${Math.round((top.score || 0) * 100)}% so far. 10 focused minutes here will lift your next paper score.`,
-          target: top.domain === 'grammar' ? 'grammar-mcq' : 'vocab-mcq',
-          ctaLabel: top.domain === 'grammar' ? 'Open Grammar MCQ' : 'Open Vocabulary MCQ',
-        }
-      : {
-          icon: '🌟',
-          title: 'Today: warm up with Grammar MCQ',
-          reason: 'No weak skills yet — start with Grammar MCQ at your level to unlock targeted practice.',
-          target: 'grammar-mcq',
-          ctaLabel: 'Open Grammar MCQ',
-        };
+    let summary;
+    try { summary = getMissionSummary(); } catch (_) { summary = null; }
+    if (!summary) {
+      host.style.display = 'none';
+      return;
+    }
+
+    const escAttr = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
+
+    const stepsHtml = summary.steps.map(step => {
+      const stateClass = step.done ? 'mission-step--done' : '';
+      const progressLabel = step.goal > 1
+        ? `${Math.min(step.count, step.goal)}/${step.goal}`
+        : (step.done ? '✓' : 'Start');
+      const aria = step.done
+        ? `${step.title}, complete`
+        : `${step.title}, ${progressLabel}`;
+      return `
+        <button type="button"
+          class="mission-step ${stateClass}"
+          data-target="${escAttr(step.target || '')}"
+          data-step-id="${escAttr(step.id)}"
+          aria-label="${escAttr(aria)}">
+          <span class="mission-step__num" aria-hidden="true">${step.num}</span>
+          <span class="mission-step__icon" aria-hidden="true">${escText(step.icon)}</span>
+          <span class="mission-step__body">
+            <span class="mission-step__title">${escText(step.title)}</span>
+            <span class="mission-step__desc">${escText(step.description)}</span>
+          </span>
+          <span class="mission-step__progress" aria-hidden="true">${escText(progressLabel)}</span>
+        </button>`;
+    }).join('');
+
+    const headline = summary.complete
+      ? '🎉 Mission complete! See you tomorrow.'
+      : `🎯 Today's Mission · ${summary.done}/${summary.total} done`;
+
     host.style.display = '';
     host.innerHTML = `
       <div class="home-section-header">
-        <p class="home-section-heading">${recommendation.icon} Start Here Today</p>
-        <p class="home-section-sub">A 10-minute task picked from your weak skills.</p>
+        <p class="home-section-heading">${headline}</p>
+        <p class="home-section-sub">10 minutes · do them in order for the best lift.</p>
       </div>
-      <button class="stories-banner stories-banner--gold start-here-banner" data-target="${recommendation.target}" aria-label="${recommendation.title}">
-        <span class="stories-banner-mascot">
-          <span style="font-size:2.2rem;line-height:1" aria-hidden="true">${recommendation.icon}</span>
-        </span>
-        <span class="stories-banner-text">
-          <span class="stories-banner-title">${recommendation.title}</span>
-          <span class="stories-banner-sub">${recommendation.reason}</span>
-        </span>
-        <span class="stories-banner-arrow">→</span>
-      </button>`;
-    host.querySelectorAll('[data-target]').forEach(btn => {
-      btn.addEventListener('click', () => this._navigateTo(btn.dataset.target));
+      <div class="mission-card" role="list">${stepsHtml}</div>`;
+
+    host.querySelectorAll('.mission-step[data-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.target;
+        const stepId = btn.dataset.stepId;
+        if (!target) return;
+        if (stepId === 'comprehension-clue') {
+          markMissionStepDone(stepId);
+        }
+        this._navigateTo(target);
+      });
     });
   }
 
