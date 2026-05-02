@@ -58,6 +58,10 @@ const CLOZE_SUFFICIENCY_TARGETS = [
   { level: 'P4', category: 'conjunctions', min: 6 },
   { level: 'P2', category: 'comparatives', min: 6 },
   { level: 'P5', category: 'comparatives', min: 6 },
+  // Chunk 1d — quantifiers P3 + relativeClauses P4 + inversion P6
+  { level: 'P3', category: 'quantifiers', min: 6 },
+  { level: 'P4', category: 'relativeClauses', min: 6 },
+  { level: 'P6', category: 'inversion', min: 6 },
 ];
 
 describe('Cloze Castle passage sufficiency', () => {
