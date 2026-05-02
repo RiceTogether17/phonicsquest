@@ -54,6 +54,10 @@ const CLOZE_SUFFICIENCY_TARGETS = [
   { level: 'P2', category: 'prepositions', min: 6 },
   { level: 'P3', category: 'tenseAwareness', min: 6 },
   { level: 'P4', category: 'prepositions', min: 6 },
+  // Chunk 1c — conjunctions P4 + comparatives P2/P5
+  { level: 'P4', category: 'conjunctions', min: 6 },
+  { level: 'P2', category: 'comparatives', min: 6 },
+  { level: 'P5', category: 'comparatives', min: 6 },
 ];
 
 describe('Cloze Castle passage sufficiency', () => {
