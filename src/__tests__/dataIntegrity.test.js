@@ -62,6 +62,16 @@ const CLOZE_SUFFICIENCY_TARGETS = [
   { level: 'P3', category: 'quantifiers', min: 6 },
   { level: 'P4', category: 'relativeClauses', min: 6 },
   { level: 'P6', category: 'inversion', min: 6 },
+  // Chunk 2a — articles P2 (specific vs general; previously empty)
+  { level: 'P2', category: 'articles', min: 6 },
+  // Chunk 2b — articles P3 (zero article in context; previously empty)
+  { level: 'P3', category: 'articles', min: 6 },
+  // Chunk 2c — articles P4 (the + superlative/ordinal; previously empty)
+  { level: 'P4', category: 'articles', min: 6 },
+  // Chunk 2d — articles P5 (formal writing register; previously empty)
+  { level: 'P5', category: 'articles', min: 6 },
+  // Chunk 2e — articles P6 (precision in complex texts; previously empty)
+  { level: 'P6', category: 'articles', min: 6 },
 ];
 
 describe('Cloze Castle passage sufficiency', () => {
