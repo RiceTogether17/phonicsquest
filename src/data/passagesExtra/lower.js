@@ -68,6 +68,12 @@ const P2_SPECS = [
   { category: 'comparatives', title: 'Reading Race', text: 'Sara read ___ than Ali in our reading race. My book has ___ pages than hers. The story felt ___ to follow than the last one.', answers: ['faster', 'more', 'simpler'], wordBank: ['faster', 'more', 'simpler', 'fast', 'most'] },
   { category: 'comparatives', title: 'Snack Sharing', text: "This biscuit tastes ___ than yesterday's. The juice is ___ than water in the cooler. My apple feels ___ than the one I ate this morning.", answers: ['sweeter', 'colder', 'crunchier'], wordBank: ['sweeter', 'colder', 'crunchier', 'sweet', 'cold'] },
   { category: 'comparatives', title: 'PE Stations', text: 'The skipping rope was ___ than the hula hoop. The beanbag throw is ___ than the ball toss. I felt ___ after the warm-up than before.', answers: ['lighter', 'easier', 'stronger'], wordBank: ['lighter', 'easier', 'stronger', 'light', 'easy'] },
+  { category: 'articles', title: 'New Pencil Case', text: 'I bought ___ pencil case at the bookshop. ___ pencil case has dragon stickers on the front. I also got ___ eraser to put inside.', answers: ['a', 'The', 'an'], wordBank: ['a', 'The', 'an', 'the', 'A'] },
+  { category: 'articles', title: 'Lost Water Bottle', text: 'Mei found ___ water bottle near the gate. ___ water bottle had her name on it. She also picked up ___ umbrella from the same spot.', answers: ['a', 'The', 'an'], wordBank: ['a', 'The', 'an', 'the', 'A'] },
+  { category: 'articles', title: 'Library Visit', text: 'I borrowed ___ storybook and ___ activity book from the library. ___ storybook has colourful pictures inside.', answers: ['a', 'an', 'The'], wordBank: ['a', 'an', 'The', 'the', 'A'] },
+  { category: 'articles', title: 'Snack Box Treat', text: 'Mum packed ___ orange and ___ biscuit in my snack box. ___ orange was sweet and juicy. I shared ___ biscuit with my friend.', answers: ['an', 'a', 'The', 'the'], wordBank: ['an', 'a', 'The', 'the', 'A'] },
+  { category: 'articles', title: 'Class Pet', text: 'Our class has ___ rabbit named Snowy. ___ rabbit lives in a small cage. We feed ___ rabbit with carrots and lettuce every afternoon.', answers: ['a', 'The', 'the'], wordBank: ['a', 'The', 'the', 'an', 'A'] },
+  { category: 'articles', title: 'Sports Day Story', text: 'There was ___ exciting race on the field. ___ race had ten runners from our level. Our class collected ___ trophy at the end of the day.', answers: ['an', 'The', 'a'], wordBank: ['an', 'The', 'a', 'the', 'A'] },
 ];
 
 const P3_SPECS = [
