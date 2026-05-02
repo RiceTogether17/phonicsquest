@@ -66,6 +66,8 @@ const CLOZE_SUFFICIENCY_TARGETS = [
   { level: 'P2', category: 'articles', min: 6 },
   // Chunk 2b — articles P3 (zero article in context; previously empty)
   { level: 'P3', category: 'articles', min: 6 },
+  // Chunk 2c — articles P4 (the + superlative/ordinal; previously empty)
+  { level: 'P4', category: 'articles', min: 6 },
 ];
 
 describe('Cloze Castle passage sufficiency', () => {
