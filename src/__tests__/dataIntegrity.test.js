@@ -72,6 +72,8 @@ const CLOZE_SUFFICIENCY_TARGETS = [
   { level: 'P5', category: 'articles', min: 6 },
   // Chunk 2e — articles P6 (precision in complex texts; previously empty)
   { level: 'P6', category: 'articles', min: 6 },
+  // Chunk 3a — simplePast P3 (paragraph consistency; previously empty)
+  { level: 'P3', category: 'simplePast', min: 6 },
 ];
 
 describe('Cloze Castle passage sufficiency', () => {
