@@ -72,6 +72,20 @@ const CLOZE_SUFFICIENCY_TARGETS = [
   { level: 'P5', category: 'articles', min: 6 },
   // Chunk 2e — articles P6 (precision in complex texts; previously empty)
   { level: 'P6', category: 'articles', min: 6 },
+  // Chunk 3a — simplePast P3 (paragraph consistency; previously empty)
+  { level: 'P3', category: 'simplePast', min: 6 },
+  // Chunk 3b — simplePast P4 (contrast with past continuous; previously empty)
+  { level: 'P4', category: 'simplePast', min: 6 },
+  // Chunk 3c — simplePast P5 (complex subordinated clauses; previously empty)
+  { level: 'P5', category: 'simplePast', min: 6 },
+  // Chunk 3d — simplePast P6 (advanced tense control with past perfect + reported speech; previously empty)
+  { level: 'P6', category: 'simplePast', min: 6 },
+  // Chunk 4a — connectors P4 (if / unless / although; previously empty)
+  { level: 'P4', category: 'connectors', min: 6 },
+  // Chunk 4b — connectors P5 (despite / even though / not only…but also; previously empty)
+  { level: 'P5', category: 'connectors', min: 6 },
+  // Chunk 4c — connectors P6 (formal: consequently / furthermore / nevertheless / however; previously empty)
+  { level: 'P6', category: 'connectors', min: 6 },
 ];
 
 describe('Cloze Castle passage sufficiency', () => {
