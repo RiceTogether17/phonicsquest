@@ -86,6 +86,14 @@ const CLOZE_SUFFICIENCY_TARGETS = [
   { level: 'P5', category: 'connectors', min: 6 },
   // Chunk 4c — connectors P6 (formal: consequently / furthermore / nevertheless / however; previously empty)
   { level: 'P6', category: 'connectors', min: 6 },
+  // Chunk 5a — prepositions P5 (despite / in spite of / instead of; previously empty)
+  { level: 'P5', category: 'prepositions', min: 6 },
+  // Chunk 5b — prepositions P6 (complex prepositional phrases in formal writing; previously empty)
+  { level: 'P6', category: 'prepositions', min: 6 },
+  // Chunk 6a — tenseAwareness P5 (present perfect control; previously empty)
+  { level: 'P5', category: 'tenseAwareness', min: 6 },
+  // Chunk 6b — tenseAwareness P6 (past perfect + tense control across long passages; previously empty)
+  { level: 'P6', category: 'tenseAwareness', min: 6 },
 ];
 
 describe('Cloze Castle passage sufficiency', () => {
