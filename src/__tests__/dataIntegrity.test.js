@@ -82,6 +82,8 @@ const CLOZE_SUFFICIENCY_TARGETS = [
   { level: 'P6', category: 'simplePast', min: 6 },
   // Chunk 4a — connectors P4 (if / unless / although; previously empty)
   { level: 'P4', category: 'connectors', min: 6 },
+  // Chunk 4b — connectors P5 (despite / even though / not only…but also; previously empty)
+  { level: 'P5', category: 'connectors', min: 6 },
 ];
 
 describe('Cloze Castle passage sufficiency', () => {
