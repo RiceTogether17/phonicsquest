@@ -80,6 +80,8 @@ const CLOZE_SUFFICIENCY_TARGETS = [
   { level: 'P5', category: 'simplePast', min: 6 },
   // Chunk 3d — simplePast P6 (advanced tense control with past perfect + reported speech; previously empty)
   { level: 'P6', category: 'simplePast', min: 6 },
+  // Chunk 4a — connectors P4 (if / unless / although; previously empty)
+  { level: 'P4', category: 'connectors', min: 6 },
 ];
 
 describe('Cloze Castle passage sufficiency', () => {
