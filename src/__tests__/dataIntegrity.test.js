@@ -92,6 +92,8 @@ const CLOZE_SUFFICIENCY_TARGETS = [
   { level: 'P6', category: 'prepositions', min: 6 },
   // Chunk 6a — tenseAwareness P5 (present perfect control; previously empty)
   { level: 'P5', category: 'tenseAwareness', min: 6 },
+  // Chunk 6b — tenseAwareness P6 (past perfect + tense control across long passages; previously empty)
+  { level: 'P6', category: 'tenseAwareness', min: 6 },
 ];
 
 describe('Cloze Castle passage sufficiency', () => {
