@@ -88,6 +88,8 @@ const CLOZE_SUFFICIENCY_TARGETS = [
   { level: 'P6', category: 'connectors', min: 6 },
   // Chunk 5a — prepositions P5 (despite / in spite of / instead of; previously empty)
   { level: 'P5', category: 'prepositions', min: 6 },
+  // Chunk 5b — prepositions P6 (complex prepositional phrases in formal writing; previously empty)
+  { level: 'P6', category: 'prepositions', min: 6 },
 ];
 
 describe('Cloze Castle passage sufficiency', () => {
