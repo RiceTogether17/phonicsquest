@@ -24,7 +24,6 @@ import { escapeHtml } from '../utils/escapeHtml.js';
 
 export const PRIMARY_PLACEHOLDER_KINDS = Object.freeze([
   'visual-text',
-  'comprehension-cloze',
   'open-comprehension',
   'synthesis',
   'situational-writing',
@@ -64,16 +63,6 @@ const VISUAL_TEXT_SAMPLES = [
       { q: 'How will the timing change for parents?', a: 'The bus will arrive 5 minutes earlier, at 6:55 a.m.' },
       { q: 'Where should pupils now wait?', a: 'At Bedok Interchange, Stand B5.' },
     ],
-  },
-];
-
-const CLOZE_COMPREHENSION_SAMPLES = [
-  {
-    id: 'oc-1',
-    level: 'P5',
-    title: 'A Surprise Storm',
-    passageWithBlanks: 'When we first set out, the sky was {1:bright/dark} and the wind was gentle. We were {2:looking/sailing} forward to the picnic. {3:Suddenly/Slowly}, dark clouds rolled in and rain began to {4:fall/laugh} heavily. We had to {5:abandon/begin} the picnic and run home.',
-    answers: { 1: 'bright', 2: 'looking', 3: 'Suddenly', 4: 'fall', 5: 'abandon' },
   },
 ];
 
@@ -208,20 +197,6 @@ function _renderBody(kind) {
             </li>`).join('')}
         </ol>
       </article>`).join('');
-  }
-
-  if (kind === 'comprehension-cloze') {
-    return CLOZE_COMPREHENSION_SAMPLES.map(s => {
-      const answersList = Object.entries(s.answers).map(([k, v]) => `<li>${k}. <strong>${escapeHtml(v)}</strong></li>`).join('');
-      const passageHtml = escapeHtml(s.passageWithBlanks)
-        .replace(/\{(\d+):([^/}]+)\/([^}]+)\}/g, (_m, num, a, b) => `(${num}) [<em>${a}</em> / <em>${b}</em>]`);
-      return `
-        <article class="placeholder-card">
-          <h3>${escapeHtml(s.title)} <small>(${s.level})</small></h3>
-          <p>${passageHtml}</p>
-          <details><summary>Show answers</summary><ol>${answersList}</ol></details>
-        </article>`;
-    }).join('');
   }
 
   if (kind === 'open-comprehension') {

@@ -35,6 +35,7 @@ import { initPaperMode, showPaperModeBrowser, cleanupPaperMode } from './modes/p
 import { initEditingQuest, showEditingBrowser, cleanupEditingQuest } from './modes/editingQuest.js';
 import { initWritingQuest, showWritingBrowser, cleanupWritingQuest } from './modes/writingQuest.js';
 import { mountPlaceholderModule, getPlaceholderMeta } from './modes/primaryPlaceholders.js';
+import { initComprehensionClozeQuest, cleanupComprehensionClozeQuest } from './modes/comprehensionClozeQuest.js';
 import {
   getProfiles, createProfile, deleteProfile, activateProfile,
   getActiveProfile, needsProfileSelection, restoreActiveProfile,
@@ -494,6 +495,7 @@ class App {
       });
     });
     document.getElementById('btn-pp-back')?.addEventListener('click', () => {
+      cleanupComprehensionClozeQuest();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
@@ -1372,13 +1374,19 @@ class App {
     if (titleEl) titleEl.textContent = meta.label;
     if (iconEl)  iconEl.textContent = meta.icon;
     const container = document.getElementById('primary-placeholder-content');
-    mountPlaceholderModule(container, kind, {
-      onClose: () => {
-        this._showScreen(SCREENS.HOME);
-        mascot.setHomeState('holdCard');
-      },
-      onRelated: (target) => this._navigateTo(target),
-    });
+    const goHome = () => {
+      cleanupComprehensionClozeQuest();
+      this._showScreen(SCREENS.HOME);
+      mascot.setHomeState('holdCard');
+    };
+    if (kind === 'comprehension-cloze') {
+      initComprehensionClozeQuest(container, { onClose: goHome });
+    } else {
+      mountPlaceholderModule(container, kind, {
+        onClose: goHome,
+        onRelated: (target) => this._navigateTo(target),
+      });
+    }
     this._showScreen(SCREENS.PRIMARY_PLACEHOLDER);
     mascot.setState('whiteboard');
   }
