@@ -120,7 +120,10 @@ describe('placement gate adaptivity', () => {
       { section: 'decoding', correct: true, phase: 2, group: 'ccvc-a' },
     ]);
 
-    expect(['cvc-a', 'ccvc-a', 'cvcc-a', 'digraphs', 'long-a']).toContain(result.startGroup);
+    // Valid set tracks PLACEMENT_PHASES.fallbackGroup. CCVCC was missing
+    // from the screener entirely before the curriculum/placement alignment
+    // fix; it now gates phase 5 between digraphs and long vowels.
+    expect(['cvc-a', 'ccvc-a', 'cvcc-a', 'digraphs', 'ccvcc-a', 'long-a']).toContain(result.startGroup);
   });
 
   it('returns valid startGroup and phonicsPhase when no decoding data is present', () => {

@@ -1,15 +1,24 @@
 /**
  * PhonicsQuest Curriculum
  *
- * Scope & sequence for the sequential blending progression:
+ * Scope & sequence for the sequential blending progression. The phase numbers
+ * here MUST stay in sync with the placement screener in
+ * `src/modules/placementTest.js` — the architecture review called out a
+ * curriculum/placement mismatch where each file claimed a different home for
+ * digraphs, and we don't want that to drift again.
  *
- *   Phase 1  CVC        short A → E → I → O → U
- *   Phase 2  CCVC       short A → E → I → O → U  (blend/digraph + vowel + consonant)
- *   Phase 3  CVCC       short A → E → I → O → U  (consonant + vowel + blend/digraph)
- *   Phase 4  CCVCC      short A → E → I → O → U  (blends at both ends)
- *   Phase 5  Long Vowels  A → E → I → O → U
- *   Phase 6  Diphthongs
- *   Phase 7  Advanced (digraphs standalone review, r-controlled)
+ *   Phase 1  CVC               short A → E → I → O → U
+ *   Phase 2  CCVC              initial blends  (blend + vowel + consonant)
+ *   Phase 3  CVCC              final blends    (consonant + vowel + blend)
+ *   Phase 4  Digraphs          sh, ch, th, wh, ck, ng — needed for early
+ *                              decodable reading, hence introduced before
+ *                              long vowels rather than buried at the end
+ *   Phase 5  CCVCC             both-end blends
+ *   Phase 6  Long Vowels       A → E → I → O → U
+ *   Phase 7  Diphthongs
+ *   Phase 8  Advanced          mixed-blends review
+ *   Phase 9  Suffixes
+ *   Phase 10 Morphology & high-frequency sight words
  *
  * Each stage unlocks when its prerequisite reaches mastery threshold.
  * The `group` field is used by progress.getAdaptivePool() to filter words.
@@ -138,159 +147,164 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'cvcc-o',
   },
 
-  /* ── Phase 4: CCVCC by vowel ────────────────────────────────────── */
+  /* ── Phase 4: Digraphs ───────────────────────────────────────────── */
+  // Introduced before CCVCC and long vowels because sh/ch/th/ck/ng appear
+  // in real decodable reading from the start. Buried-at-the-end placement
+  // was the curriculum vs. placement mismatch flagged in the review.
   {
-    id: 'ccvcc-a', phase: 4,
+    id: 'digraphs', phase: 4,
+    name: 'Digraphs',
+    description: 'ship, chip, that, when, sing…',
+    icon: '🤝', group: 'digraphs', level: 2,
+    requiredMastery: 0.70, prerequisite: 'cvcc-u',
+  },
+
+  /* ── Phase 5: CCVCC by vowel ────────────────────────────────────── */
+  {
+    id: 'ccvcc-a', phase: 5,
     name: 'CCVCC – Short A',
     description: 'Blends both ends: stamp, clamp, blast…',
     icon: '🌱', group: 'ccvcc-a', level: 2,
-    requiredMastery: 0.70, prerequisite: 'cvcc-u',
+    requiredMastery: 0.70, prerequisite: 'digraphs',
   },
   {
-    id: 'ccvcc-e', phase: 4,
+    id: 'ccvcc-e', phase: 5,
     name: 'CCVCC – Short E',
     description: 'Blends both ends: blend, trend, crest…',
     icon: '🌿', group: 'ccvcc-e', level: 2,
     requiredMastery: 0.70, prerequisite: 'ccvcc-a',
   },
   {
-    id: 'ccvcc-i', phase: 4,
+    id: 'ccvcc-i', phase: 5,
     name: 'CCVCC – Short I',
     description: 'Blends both ends: blink, drink, print…',
     icon: '💎', group: 'ccvcc-i', level: 2,
     requiredMastery: 0.70, prerequisite: 'ccvcc-e',
   },
   {
-    id: 'ccvcc-o', phase: 4,
+    id: 'ccvcc-o', phase: 5,
     name: 'CCVCC – Short O',
     description: 'Blends both ends: stomp, front, prong…',
     icon: '🎺', group: 'ccvcc-o', level: 2,
     requiredMastery: 0.70, prerequisite: 'ccvcc-i',
   },
   {
-    id: 'ccvcc-u', phase: 4,
+    id: 'ccvcc-u', phase: 5,
     name: 'CCVCC – Short U',
     description: 'Blends both ends: stump, clump, blunt…',
     icon: '🏆', group: 'ccvcc-u', level: 2,
     requiredMastery: 0.70, prerequisite: 'ccvcc-o',
   },
 
-  /* ── Phase 5: Long vowels ────────────────────────────────────────── */
+  /* ── Phase 6: Long vowels ────────────────────────────────────────── */
   {
-    id: 'long-a', phase: 5,
+    id: 'long-a', phase: 6,
     name: 'Long Vowel A',
     description: 'cake, rain, play, name…',
     icon: '✨', group: 'long-a', level: 2,
     requiredMastery: 0.70, prerequisite: 'ccvcc-u',
   },
   {
-    id: 'long-e', phase: 5,
+    id: 'long-e', phase: 6,
     name: 'Long Vowel E',
     description: 'keep, beat, tree, feet…',
     icon: '🌟', group: 'long-e', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-a',
   },
   {
-    id: 'long-i', phase: 5,
+    id: 'long-i', phase: 6,
     name: 'Long Vowel I',
     description: 'bike, kite, fly, time…',
     icon: '🌙', group: 'long-i', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-e',
   },
   {
-    id: 'long-o', phase: 5,
+    id: 'long-o', phase: 6,
     name: 'Long Vowel O',
     description: 'home, boat, snow, road…',
     icon: '☀️', group: 'long-o', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-i',
   },
   {
-    id: 'long-u', phase: 5,
+    id: 'long-u', phase: 6,
     name: 'Long Vowel U',
     description: 'cube, tune, blue, rule…',
     icon: '🦄', group: 'long-u', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-o',
   },
 
-  /* ── Phase 6: Diphthongs ─────────────────────────────────────────── */
+  /* ── Phase 7: Diphthongs ─────────────────────────────────────────── */
   {
-    id: 'diphthongs', phase: 6,
+    id: 'diphthongs', phase: 7,
     name: 'Diphthongs',
     description: 'coin, boy, out, cow, paw…',
     icon: '🌊', group: 'diphthongs', level: 3,
     requiredMastery: 0.70, prerequisite: 'long-u',
   },
 
-  /* ── Phase 7: Advanced patterns ──────────────────────────────────── */
+  /* ── Phase 8: Advanced — mixed-blends review ──────────────────────── */
   {
-    id: 'digraphs', phase: 7,
-    name: 'Digraphs',
-    description: 'ship, chip, that, when…',
-    icon: '🤝', group: 'digraphs', level: 2,
-    requiredMastery: 0.70, prerequisite: 'diphthongs',
-  },
-  {
-    id: 'blends-review', phase: 7,
+    id: 'blends-review', phase: 8,
     name: 'Blends Review',
     description: 'float, crisp, blend, sprint…',
     icon: '🚀', group: 'blends', level: 3,
-    requiredMastery: 0.70, prerequisite: 'digraphs',
+    requiredMastery: 0.70, prerequisite: 'diphthongs',
   },
 
-  /* ── Phase 8: Suffixes ────────────────────────────────────────────── */
+  /* ── Phase 9: Suffixes ────────────────────────────────────────────── */
   {
-    id: 'suffix-ing', phase: 8,
+    id: 'suffix-ing', phase: 9,
     name: '-ing Words',
     description: 'running, jumping, sitting…',
     icon: '🏃', group: 'suffix-ing', level: 2,
     requiredMastery: 0.70, prerequisite: 'blends-review',
   },
   {
-    id: 'suffix-ed', phase: 8,
+    id: 'suffix-ed', phase: 9,
     name: '-ed Words',
     description: 'jumped, helped, picked…',
     icon: '✅', group: 'suffix-ed', level: 2,
     requiredMastery: 0.70, prerequisite: 'suffix-ing',
   },
   {
-    id: 'suffix-er', phase: 8,
+    id: 'suffix-er', phase: 9,
     name: '-er Words',
     description: 'faster, taller, bigger…',
     icon: '📈', group: 'suffix-er', level: 2,
     requiredMastery: 0.70, prerequisite: 'suffix-ed',
   },
   {
-    id: 'suffix-est', phase: 8,
+    id: 'suffix-est', phase: 9,
     name: '-est Words',
     description: 'fastest, tallest, biggest…',
     icon: '🏆', group: 'suffix-est', level: 2,
     requiredMastery: 0.70, prerequisite: 'suffix-er',
   },
 
-  /* ── Phase 9: Morphology + multisyllabic + sight vocabulary ─────────── */
+  /* ── Phase 10: Morphology + multisyllabic + sight vocabulary ─────────── */
   {
-    id: 'prefixes', phase: 9,
+    id: 'prefixes', phase: 10,
     name: 'Prefixes (re-, un-)',
     description: 'redo, untie, unwrap…',
     icon: '↩️', group: 'prefixes', level: 2,
     requiredMastery: 0.70, prerequisite: 'suffix-est',
   },
   {
-    id: 'suffixes-advanced', phase: 9,
+    id: 'suffixes-advanced', phase: 10,
     name: 'Advanced Suffixes (-tion, -able)',
     description: 'action, nation, readable…',
     icon: '🧩', group: 'suffixes-advanced', level: 3,
     requiredMastery: 0.70, prerequisite: 'prefixes',
   },
   {
-    id: 'multisyllable', phase: 9,
+    id: 'multisyllable', phase: 10,
     name: 'Multi-syllabic Words',
     description: 'science, market, energy…',
     icon: '🎼', group: 'multisyllable', level: 3,
     requiredMastery: 0.70, prerequisite: 'suffixes-advanced',
   },
   {
-    id: 'sight-highfreq', phase: 9,
+    id: 'sight-highfreq', phase: 10,
     name: 'High-frequency Sight Words',
     description: 'their, because, enough…',
     icon: '👀', group: 'sight-highfreq', level: 3,
@@ -298,17 +312,18 @@ export const CURRICULUM = [
   },
 ];
 
-/** Phase labels for UI display */
+/** Phase labels for UI display. Must match PLACEMENT_PHASES in placementTest.js. */
 export const PHASE_LABELS = {
-  1: 'Phase 1 – CVC',
-  2: 'Phase 2 – CCVC',
-  3: 'Phase 3 – CVCC',
-  4: 'Phase 4 – CCVCC',
-  5: 'Phase 5 – Long Vowels',
-  6: 'Phase 6 – Diphthongs',
-  7: 'Phase 7 – Advanced',
-  8: 'Phase 8 – Suffixes',
-  9: 'Phase 9 – Morphology & Fluency',
+  1:  'Phase 1 – CVC',
+  2:  'Phase 2 – CCVC',
+  3:  'Phase 3 – CVCC',
+  4:  'Phase 4 – Digraphs',
+  5:  'Phase 5 – CCVCC',
+  6:  'Phase 6 – Long Vowels',
+  7:  'Phase 7 – Diphthongs',
+  8:  'Phase 8 – Advanced',
+  9:  'Phase 9 – Suffixes',
+  10: 'Phase 10 – Morphology & Fluency',
 };
 
 /**

@@ -13,9 +13,35 @@
  *   D. Sentence/grammar/vocabulary readiness
  *
  * Gate progression is adaptive: B only appears if A is secure, etc.
+ *
+ * The Gate B phase numbers MUST match curriculum.js. PLACEMENT_PHASES below
+ * is the single source of truth for: gate-B item phase tags, the phase →
+ * fallback-group mapping, the pre-seeded mastery stats, and the result-card
+ * label. Any drift between this file and curriculum.js was the alignment
+ * bug called out in the architecture review — keep them in sync.
  */
 
 import { audio } from './audio.js';
+
+/**
+ * Canonical phase definitions for Gate B decoding. Each entry is one row
+ * the placement test samples. `fallbackGroup` is what we route the learner
+ * into if we can't recover a more specific group from their answers, and
+ * `seedWords` are the words we mark as already-known when the learner
+ * passes a phase below their demonstrated level.
+ *
+ * Ordered list — index = phase - 1.
+ */
+export const PLACEMENT_PHASES = [
+  { phase: 1, label: 'Phase 1 — CVC',            fallbackGroup: 'cvc-a',   seedWords: ['cat', 'bed', 'sit', 'dog', 'map', 'sun'] },
+  { phase: 2, label: 'Phase 2 — Initial blends', fallbackGroup: 'ccvc-a',  seedWords: ['flag', 'frog', 'step', 'skip', 'plan'] },
+  { phase: 3, label: 'Phase 3 — Final blends',   fallbackGroup: 'cvcc-a',  seedWords: ['best', 'lamp', 'gift', 'sand', 'hand'] },
+  { phase: 4, label: 'Phase 4 — Digraphs',       fallbackGroup: 'digraphs', seedWords: ['ship', 'chin', 'that', 'thin', 'chop'] },
+  { phase: 5, label: 'Phase 5 — Both-end blends', fallbackGroup: 'ccvcc-a', seedWords: ['stamp', 'blend', 'print', 'plant', 'crisp'] },
+  { phase: 6, label: 'Phase 6 — Long vowels',    fallbackGroup: 'long-a',  seedWords: ['cake', 'kite', 'home', 'rain', 'bike'] },
+];
+
+const MAX_PLACEMENT_PHASE = PLACEMENT_PHASES.length;
 
 const GATE_A_ITEMS = [
   // ── Oral / Basic Response (teacher-scale) ──────────────────────────────────
@@ -317,10 +343,14 @@ const GATE_B_ITEMS = [
   { id: 'b-digraph-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: ship', speak: 'ship', correct: 'ship', phase: 4, group: 'digraphs', options: ['chip', 'shop', 'ship', 'slip'] },
   { id: 'b-digraph-2', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: chin', speak: 'chin', correct: 'chin', phase: 4, group: 'digraphs', options: ['chin', 'thin', 'shin', 'win'] },
   { id: 'b-digraph-3', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: that', speak: 'that', correct: 'that', phase: 4, group: 'digraphs', options: ['that', 'chat', 'flat', 'hat'] },
-  // ── Phase 5: Long vowels ──────────────────────────────────────────────────
-  { id: 'b-long-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: cake', speak: 'cake', correct: 'cake', phase: 5, group: 'long-a', options: ['cake', 'cane', 'cook', 'kick'] },
-  { id: 'b-long-2', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: kite', speak: 'kite', correct: 'kite', phase: 5, group: 'long-i', options: ['kite', 'kit', 'bite', 'site'] },
-  { id: 'b-long-3', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: home', speak: 'home', correct: 'home', phase: 5, group: 'long-o', options: ['home', 'hone', 'some', 'come'] },
+  // ── Phase 5: Both-end blends (CCVCC) ──────────────────────────────────────
+  { id: 'b-ccvcc-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Both-end blends', prompt: 'Tap: stamp', speak: 'stamp', correct: 'stamp', phase: 5, group: 'ccvcc-a', options: ['stamp', 'stomp', 'stump', 'champ'] },
+  { id: 'b-ccvcc-2', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Both-end blends', prompt: 'Tap: blend', speak: 'blend', correct: 'blend', phase: 5, group: 'ccvcc-e', options: ['blend', 'blond', 'bland', 'bend'] },
+  { id: 'b-ccvcc-3', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Both-end blends', prompt: 'Tap: print', speak: 'print', correct: 'print', phase: 5, group: 'ccvcc-i', options: ['print', 'paint', 'plant', 'pint'] },
+  // ── Phase 6: Long vowels ──────────────────────────────────────────────────
+  { id: 'b-long-1', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: cake', speak: 'cake', correct: 'cake', phase: 6, group: 'long-a', options: ['cake', 'cane', 'cook', 'kick'] },
+  { id: 'b-long-2', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: kite', speak: 'kite', correct: 'kite', phase: 6, group: 'long-i', options: ['kite', 'kit', 'bite', 'site'] },
+  { id: 'b-long-3', gate: 'B', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: home', speak: 'home', correct: 'home', phase: 6, group: 'long-o', options: ['home', 'hone', 'some', 'come'] },
   // ── Sight words ───────────────────────────────────────────────────────────
   { id: 'b-sight-1', gate: 'B', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: said', speak: 'said', correct: 'said', options: ['seed', 'said', 'sad', 'sail'] },
   { id: 'b-sight-2', gate: 'B', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: the', speak: 'the', correct: 'the', options: ['the', 'then', 'them', 'that'] },
@@ -462,7 +492,8 @@ function _teacherScore(results, section) {
 
 function _phaseFromDecoding(results) {
   const decoding = results.filter(r => r.section === 'decoding');
-  if (!decoding.length) return { phase: 1, startGroup: 'cvc-a' };
+  if (!decoding.length) return { phase: 1, startGroup: PLACEMENT_PHASES[0].fallbackGroup };
+
   const phaseAccuracy = new Map();
   for (const row of decoding) {
     const p = row.phase || 1;
@@ -472,25 +503,24 @@ function _phaseFromDecoding(results) {
     if (row.group && !bucket.groups.includes(row.group)) bucket.groups.push(row.group);
     phaseAccuracy.set(p, bucket);
   }
+
   let phase = 1;
-  for (let p = 1; p <= 5; p++) {
+  for (let p = 1; p <= MAX_PLACEMENT_PHASE; p++) {
     const b = phaseAccuracy.get(p);
     if (!b) break;
     if ((b.correct / b.total) >= 0.6) phase = p;
     else break;
   }
-  const group = (phaseAccuracy.get(phase)?.groups || []).slice(-1)[0]
-    || (phase <= 1 ? 'cvc-a' : phase === 2 ? 'ccvc-a' : phase === 3 ? 'cvcc-a' : phase === 4 ? 'digraphs' : 'long-a');
+
+  const fallback = PLACEMENT_PHASES[phase - 1]?.fallbackGroup ?? PLACEMENT_PHASES[0].fallbackGroup;
+  const group = (phaseAccuracy.get(phase)?.groups || []).slice(-1)[0] || fallback;
   return { phase, startGroup: group };
 }
 
 /**
  * Build placement-exempt known-content stats for words below the learner's
- * demonstrated phonics phase.
- *
- * Phase-to-word mapping now matches Gate B phase labels:
- *   phase 1 = CVC, phase 2 = initial blends (CCVC), phase 3 = final blends (CVCC),
- *   phase 4 = digraphs, phase 5 = long vowels.
+ * demonstrated phonics phase. Pulls seed words from PLACEMENT_PHASES so the
+ * mapping stays in lockstep with the Gate B item phases and curriculum.js.
  *
  * Stats are stored as placement-seeded (not genuine mastery) so dashboards
  * and adaptive review can distinguish them from real practice data.
@@ -499,25 +529,19 @@ function _buildPreSeededStats(phase) {
   if (phase <= 1) return {};
   const now = new Date().toISOString();
   const stats = {};
-  const seed = [
-    // Phase 1 words (CVC) — seeded when learner is at phase 2+
-    ...(phase >= 2 ? ['cat', 'bed', 'sit', 'dog', 'map', 'sun'] : []),
-    // Phase 2 words (CCVC / initial blends) — seeded when learner is at phase 3+
-    ...(phase >= 3 ? ['flag', 'frog', 'step', 'skip', 'plan'] : []),
-    // Phase 3 words (CVCC / final blends) — seeded when learner is at phase 4+
-    ...(phase >= 4 ? ['best', 'lamp', 'gift', 'sand', 'hand'] : []),
-    // Phase 4 words (digraphs) — seeded when learner is at phase 5+
-    ...(phase >= 5 ? ['ship', 'chin', 'that', 'thin', 'chop'] : []),
-  ];
-  for (const w of seed) {
-    stats[w] = {
-      attempts: 3,
-      correct: 3,
-      lastSeen: now,
-      reviewInterval: 1,
-      nextReviewDate: now,
-      placementSeeded: true,
-    };
+  // Seed every phase strictly below the learner's demonstrated phase.
+  for (const def of PLACEMENT_PHASES) {
+    if (def.phase >= phase) break;
+    for (const w of def.seedWords) {
+      stats[w] = {
+        attempts: 3,
+        correct: 3,
+        lastSeen: now,
+        reviewInterval: 1,
+        nextReviewDate: now,
+        placementSeeded: true,
+      };
+    }
   }
   return stats;
 }
@@ -921,7 +945,7 @@ export function showPlacementTest({ container, profile, onComplete }) {
 
     const sa = result.soundAwarenessProfile;
     const avgSoundAwareness = (sa.firstSound + sa.lastSound + sa.middleSound + sa.oralBlending) / 4;
-    const phaseLabels = { 1: 'Phase 1 — CVC', 2: 'Phase 2 — Blends', 3: 'Phase 3 — Final blends', 4: 'Phase 4 — Digraphs', 5: 'Phase 5 — Long vowels' };
+    const phaseLabels = Object.fromEntries(PLACEMENT_PHASES.map(p => [p.phase, p.label]));
     const sightLabels = { strong: 'Strong', developing: 'Developing', early: 'Early', none: 'Not yet assessed' };
     const storyLabels = { 'not-ready': 'Not yet ready', sentence: 'Sentence level', paragraph: 'Paragraph level' };
 
