@@ -35,7 +35,7 @@ export function setupSoundCount(word, els) {
 
   els.modeInstruction.textContent = 'How many sounds do you hear?';
 
-  const correctCount = word.graphemes.length;
+  const correctCount = word.phonemes.length;
   const choices      = _getCountChoices(correctCount);
 
   els.modeArea.innerHTML = '<div class="choice-grid choice-grid--count"></div>';
@@ -87,7 +87,7 @@ function _handleChoice(count, btn, word, els, grid) {
   if (answered) return;
   answered = true;
   const responseTime = Date.now() - startTime;
-  const correct = count === word.graphemes.length;
+  const correct = count === word.phonemes.length;
 
   grid.querySelectorAll('.choice-btn').forEach(b => {
     b.disabled = true;
