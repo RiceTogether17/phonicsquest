@@ -4,7 +4,8 @@
  * Core loop:
  * 1. Show the word image/emoji (but NOT the word text)
  * 2. Play the word audio
- * 3. Show 4 phoneme choices for the FIRST sound
+ * 3. Show 4 SOUND-FIRST choices (speaker icon + /phoneme/ notation, with
+ *    each option auto-played in sequence) — never bare uppercase letters
  * 4. Child identifies the initial phoneme
  * 5. Reveal full word + play first phoneme then full word
  *
@@ -14,6 +15,7 @@
  */
 
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
+import { renderPhonemeChoiceGrid } from '../components/phonemeChoice.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { WORDS, shuffleArray } from '../data/words.js';
@@ -85,24 +87,10 @@ export function setupFirstSound(word, els) {
     ...distractors.map(g => ({ grapheme: g.grapheme, type: g.type, correct: false })),
   ]);
 
-  els.modeArea.innerHTML = `<div class="choice-grid"></div>`;
-  const grid = els.modeArea.querySelector('.choice-grid');
-
-  for (const choice of choices) {
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
-    btn.textContent = choice.grapheme.toUpperCase();
-    btn.dataset.correct = choice.correct;
-    btn.setAttribute('aria-label', `Choose ${choice.grapheme}`);
-
-    // Play phoneme on hover/focus for accessibility
-    btn.addEventListener('mouseenter', () => {
-      audio.speakPhoneme(choice.grapheme, choice.type);
-    });
-
-    btn.addEventListener('click', () => handleChoice(choice, btn, word, els, grid));
-    grid.appendChild(btn);
-  }
+  renderPhonemeChoiceGrid(els.modeArea, choices, {
+    onChoose: (choice, btn) =>
+      handleChoice(choice, btn, word, els, els.modeArea.querySelector('.choice-grid')),
+  });
 
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = '';

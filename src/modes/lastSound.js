@@ -12,6 +12,7 @@
  */
 
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
+import { renderPhonemeChoiceGrid } from '../components/phonemeChoice.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { WORDS, shuffleArray } from '../data/words.js';
@@ -77,19 +78,10 @@ export function setupLastSound(word, els) {
     ...distractors.slice(0, 3).map(g => ({ ...g, correct: false })),
   ]);
 
-  els.modeArea.innerHTML = '<div class="choice-grid"></div>';
-  const grid = els.modeArea.querySelector('.choice-grid');
-
-  for (const choice of choices) {
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
-    btn.textContent = choice.grapheme.toUpperCase();
-    btn.dataset.correct = choice.correct;
-    btn.setAttribute('aria-label', `Choose ${choice.grapheme}`);
-    btn.addEventListener('mouseenter', () => audio.speakPhoneme(choice.grapheme, choice.type));
-    btn.addEventListener('click', () => _handleChoice(choice, btn, word, els, grid, lastIdx));
-    grid.appendChild(btn);
-  }
+  renderPhonemeChoiceGrid(els.modeArea, choices, {
+    onChoose: (choice, btn) =>
+      _handleChoice(choice, btn, word, els, els.modeArea.querySelector('.choice-grid'), lastIdx),
+  });
 
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = '';

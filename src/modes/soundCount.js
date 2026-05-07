@@ -2,11 +2,13 @@
  * Sound Count Mode  (Phonemic Awareness — Phoneme Segmenting)
  *
  * Core loop:
- * 1. Show word image + word text
+ * 1. Show word image only — NOT the printed word (sound-counting is an oral
+ *    task; if the child can see the letters they'll count those instead)
  * 2. Play the word
  * 3. "How many sounds?" — 4 number choices
  * 4. Child picks the phoneme count
- * 5. Reveal phoneme tiles animated one-by-one to reinforce the count
+ * 5. Reveal printed word + phoneme tiles animated one-by-one to reinforce
+ *    the count
  *
  * Teaches children to attend to the number of distinct phonemes in a word,
  * a foundational segmenting skill before sound-box spelling.
@@ -29,13 +31,14 @@ export function setupSoundCount(word, els) {
   answered    = false;
   startTime   = Date.now();
 
+  // Image yes, printed word NO — see the module-level comment on why.
   renderWordImage(word, els.wordEmoji, true);
-  buildWordAnimation(word, els.wordDisplay);
+  els.wordDisplay.innerHTML = '';
   els.phonemeRow.innerHTML = '';
 
   els.modeInstruction.textContent = 'How many sounds do you hear?';
 
-  const correctCount = word.graphemes.length;
+  const correctCount = word.phonemes.length;
   const choices      = _getCountChoices(correctCount);
 
   els.modeArea.innerHTML = '<div class="choice-grid choice-grid--count"></div>';
@@ -87,7 +90,7 @@ function _handleChoice(count, btn, word, els, grid) {
   if (answered) return;
   answered = true;
   const responseTime = Date.now() - startTime;
-  const correct = count === word.graphemes.length;
+  const correct = count === word.phonemes.length;
 
   grid.querySelectorAll('.choice-btn').forEach(b => {
     b.disabled = true;
@@ -95,7 +98,8 @@ function _handleChoice(count, btn, word, els, grid) {
   });
   if (!correct) btn.classList.add('wrong');
 
-  // Reveal phoneme tiles so child can see + count the sounds
+  // Reveal printed word + phoneme tiles so child can see + count the sounds
+  buildWordAnimation(word, els.wordDisplay);
   renderPhonemes(word, els.phonemeRow, { showDiacritics: true, showLabels: true });
 
   // Play phonemes sequentially to reinforce the count

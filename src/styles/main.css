@@ -982,6 +982,47 @@ input, select, textarea { font-family: inherit; }
   visibility: hidden;
 }
 
+/* ── Phonemic-awareness modes: sound-first choice buttons ────────────── */
+/*
+ * Used by firstSound / lastSound / middleSound. The label shows phoneme
+ * notation ("/k/") with a speaker icon — visually distinct from the bare
+ * letters used in print-based phonics modes — and each option auto-plays
+ * once on render (.previewing pulse).
+ */
+.choice-grid--phoneme {
+  grid-template-columns: 1fr 1fr;
+}
+
+.choice-btn--phoneme {
+  flex-direction: column;
+  gap: var(--space-1);
+  min-height: 88px;
+  padding: var(--space-3);
+}
+
+.choice-btn-speaker {
+  font-size: 1.4rem;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.choice-btn-phoneme {
+  font-size: var(--font-size-2xl);
+  font-weight: 900;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+.choice-btn--phoneme.previewing {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  animation: pulse-correct 0.5s var(--ease-bounce);
+}
+.choice-btn--phoneme.previewing .choice-btn-speaker {
+  opacity: 1;
+}
+
 /* ── Sound Count mode: number + dot display ──────────────────────────── */
 .choice-grid--count {
   grid-template-columns: 1fr 1fr;

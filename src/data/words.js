@@ -82,13 +82,113 @@ export const WORD_GROUPS = {
  * @typedef {Object} Word
  * @property {string}   id        - unique key (= word itself)
  * @property {string}   word      - the actual word
- * @property {string[]} graphemes - letter groups matching phonemes (['c','a','t'])
+ * @property {string[]} graphemes - letter groups for spelling (['c','a','t'], ['sh','i','p'])
  * @property {string[]} types     - phoneme type per grapheme (['c','sv','c'])
+ * @property {string[]} [phonemes] - one entry per actual sound, derived from graphemes+types
+ *                                   (['/c/','/a/','/t/']). Length is the true phoneme count and
+ *                                   may differ from graphemes.length for silent-e ('cake' = 3),
+ *                                   blends ('flat' = 4), 'x' ('tax' = 4), or silent letters
+ *                                   ('know' = 2). Use this — never graphemes.length — to count
+ *                                   sounds.
  * @property {string}   pattern   - 'CVC' | 'CVCe' | 'blend' | 'digraph' | 'other'
  * @property {string}   group     - key into WORD_GROUPS
  * @property {number}   level     - 1 (easy) → 3 (hard)
  * @property {string}   emoji     - emoji illustration
  */
+
+// ── Phoneme derivation ───────────────────────────────────────────────────────
+//
+// The `graphemes` array stores spelling units (what the child sees). The
+// `phonemes` array stores sounds (what the child hears). They are NOT always
+// the same length:
+//   • silent-e ('se')         → 0 phonemes (the 'e' is silent in 'cake')
+//   • blends ('bl')           → one phoneme per letter ('fl' → /f/+/l/, 'spl' → 3)
+//   • single 'x' (consonant)  → 2 phonemes (/k/+/s/) in 'tax', 'fox', 'six'
+//   • silent-letter blends    → handled via PHONEME_OVERRIDES ('kn' → /n/ only)
+//   • multi-phoneme suffixes  → handled via SUFFIX_PHONEMES ('-ing' → /i/+/ng/)
+//
+// Anywhere that needs a sound count MUST read `word.phonemes.length`, never
+// `word.graphemes.length`.
+
+/**
+ * Per-suffix phoneme breakdowns. Keys match the literal grapheme stored on
+ * the word (with the leading dash for separable suffixes).
+ */
+const SUFFIX_PHONEMES = Object.freeze({
+  '-ing':  ['/i/', '/ng/'],
+  '-ed':   ['/d/'],                  // contextual /d/, /t/, or /ɪd/ — count as 1
+  '-er':   ['/er/'],                 // r-controlled, 1 phoneme
+  '-est':  ['/e/', '/s/', '/t/'],
+  'tion':  ['/sh/', '/uh/', '/n/'],
+  'able':  ['/uh/', '/b/', '/l/'],
+  'ble':   ['/b/', '/uh/', '/l/'],
+  'le':    ['/uh/', '/l/'],
+});
+
+/**
+ * Per-word overrides for cases the structural deriver cannot get right
+ * (silent letters, irregular spellings, etc.). Keyed by word id.
+ */
+const PHONEME_OVERRIDES = Object.freeze({
+  // silent k: 'know' = /n/ + /ō/, 'knee' = /n/ + /ē/, etc.
+  // Add more as words are introduced. Only words whose `graphemes` start
+  // with 'kn' need an override here.
+  know: ['/n/', '/ō/'],
+});
+
+/**
+ * Phonemes contributed by a single grapheme of the given type.
+ * @param {string} grapheme
+ * @param {string} type
+ * @returns {string[]}
+ */
+function _phonemesForGrapheme(grapheme, type) {
+  if (!grapheme) return [];
+  switch (type) {
+    case 'se': return [];                                    // silent e
+    case 'sf': return SUFFIX_PHONEMES[grapheme] || [`/${grapheme.replace(/^-/, '')}/`];
+    case 'bl': return [...grapheme].map(ch => `/${ch}/`);    // blend: each letter is one sound
+    case 'c':  return grapheme === 'x' ? ['/k/', '/s/'] : [`/${grapheme}/`];
+    // 'd' digraph, 'dp' diphthong, 'rc' r-controlled, 'sv' short vowel, 'lv' long vowel: 1 sound
+    default:   return [`/${grapheme}/`];
+  }
+}
+
+/**
+ * The English `-ed` suffix is pronounced /ɪd/ (2 phonemes) after a stem
+ * ending in /t/ or /d/, otherwise it's a single /t/ or /d/. The default
+ * SUFFIX_PHONEMES table treats it as 1 phoneme; this helper upgrades it
+ * to 2 when the preceding phoneme calls for it.
+ */
+function _adjustEdSuffix(phonemes, lastStemPhoneme) {
+  if (lastStemPhoneme === '/t/' || lastStemPhoneme === '/d/') {
+    return ['/ɪ/', '/d/'];
+  }
+  return phonemes;
+}
+
+/**
+ * Derive the ordered phoneme array for a word from its graphemes + types.
+ * Honours PHONEME_OVERRIDES first when present.
+ * @param {Word} word
+ * @returns {string[]}
+ */
+export function derivePhonemes(word) {
+  if (!word) return [];
+  if (word.id && PHONEME_OVERRIDES[word.id]) return [...PHONEME_OVERRIDES[word.id]];
+  const graphemes = Array.isArray(word.graphemes) ? word.graphemes : [];
+  const types     = Array.isArray(word.types)     ? word.types     : [];
+  const result    = [];
+  const n = Math.min(graphemes.length, types.length);
+  for (let i = 0; i < n; i++) {
+    let chunk = _phonemesForGrapheme(graphemes[i], types[i]);
+    if (graphemes[i] === '-ed' && types[i] === 'sf') {
+      chunk = _adjustEdSuffix(chunk, result[result.length - 1]);
+    }
+    result.push(...chunk);
+  }
+  return result;
+}
 
 /** @type {Word[]} */
 export const WORDS = [
@@ -1100,6 +1200,13 @@ export const WORDS = [
   { id:'could', word:'could', graphemes:['c','ou','ld'], types:['c','dp','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'💡' },
 ];
 
+// Attach `phonemes` to every word so consumers can read word.phonemes.length
+// instead of falling back to graphemes.length (which is wrong for silent-e,
+// blends, 'x' words, and silent-letter spellings).
+for (const w of WORDS) {
+  if (!Array.isArray(w.phonemes)) w.phonemes = derivePhonemes(w);
+}
+
 /**
  * Get words filtered by group(s) and max level.
  * @param {string|string[]} groups
@@ -1299,6 +1406,7 @@ export function loadCustomWords() {
     const existingIds = new Set(WORDS.map(w => w.id));
     for (const w of custom) {
       if (w && w.id && w.word && !existingIds.has(w.id)) {
+        if (!Array.isArray(w.phonemes)) w.phonemes = derivePhonemes(w);
         WORDS.push(w);
         existingIds.add(w.id);
       }
