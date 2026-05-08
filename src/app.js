@@ -680,7 +680,7 @@ class App {
     this._resultProcessing = true;
 
     const isNew = progress.isNewWord(word.id);
-    progress.recordAttempt(word.id, correct, this._mode);
+    progress.recordAttempt(word.id, correct, this._mode, responseTime);
 
     // First-attempt success = decoded without any wrong strikes or hint use.
     if (correct && this._wrongStrikes === 0 && !this._hintUsed) {

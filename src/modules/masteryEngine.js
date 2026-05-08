@@ -27,12 +27,26 @@
  */
 
 import { store } from './store.js';
+import { SKILLS } from './progress.js';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const SRS_INTERVALS   = [1, 3, 7, 14, 30];
 const TARGET_SPEED_MS = 3000;
 const MIN_ATTEMPTS    = 3;
+
+/**
+ * Per-skill fluency targets (median response time on correct attempts at
+ * which speed score = 1.0; double the target gives 0.0). Segmenting and
+ * spelling are slower than decoding because the learner is producing
+ * phonemes/letters rather than just identifying a word.
+ */
+const SKILL_TARGET_MS = Object.freeze({
+  oralBlend:  4000,
+  segmenting: 5000,
+  decoding:   3000,
+  spelling:   5000,
+});
 
 // Five-state readiness thresholds
 const RT = {
@@ -115,6 +129,76 @@ export function getWordMastery(wordId) {
   if (wSum > 0) composite = Math.min(1, vSum / wSum);
 
   return { accuracy, retention, speed, composite };
+}
+
+/**
+ * Per-skill mastery for one word.
+ *
+ * A child often reads `cat` perfectly (decoding=high) but can't orally
+ * segment /c/-/a/-/t/ (segmenting=low). Cross-skill `getWordMastery`
+ * collapses these into one composite and hides the gap. This API surfaces
+ * each skill's accuracy and fluency separately so adaptive review and the
+ * dashboard can target the actual weakness.
+ *
+ * @param {string} wordId
+ * @param {string} skill   one of 'oralBlend' | 'segmenting' | 'decoding' | 'spelling'
+ * @returns {{ attempts: number, accuracy: number|null, fluency: number|null, composite: number|null }}
+ */
+export function getWordSkillMastery(wordId, skill) {
+  const all   = store.get('wordSkillStats') || {};
+  const stat  = all?.[wordId]?.[skill];
+  if (!stat || stat.attempts === 0) {
+    return { attempts: 0, accuracy: null, fluency: null, composite: null };
+  }
+
+  const accuracy = stat.attempts >= MIN_ATTEMPTS ? stat.correct / stat.attempts : null;
+
+  // Fluency: median correct-attempt response time vs the skill's target.
+  // Falls back to the most recent correct response if telemetry is sparse.
+  const target = SKILL_TARGET_MS[skill] ?? TARGET_SPEED_MS;
+  const correctTimes = (store.get('learningEvents') || [])
+    .filter(e =>
+      e.eventType === 'word_attempt' &&
+      e.skill === skill &&
+      e.correct === true &&
+      e.meta?.wordId === wordId &&
+      typeof e.responseMs === 'number'
+    )
+    .map(e => e.responseMs)
+    .sort((a, b) => a - b);
+  let fluency = null;
+  if (correctTimes.length) {
+    const median = correctTimes[Math.floor(correctTimes.length / 2)];
+    fluency = Math.min(1, Math.max(0, 1 - median / (2 * target)));
+  } else if (stat.lastResponseMs && stat.correct > 0) {
+    fluency = Math.min(1, Math.max(0, 1 - stat.lastResponseMs / (2 * target)));
+  }
+
+  // Composite: 70% accuracy, 30% fluency. No retention component here —
+  // SRS intervals live on cross-skill wordStats; per-skill retention would
+  // need its own SRS scheduler, which isn't worth the complexity yet.
+  let composite = null, wSum = 0, vSum = 0;
+  if (accuracy !== null) { vSum += accuracy * 0.7; wSum += 0.7; }
+  if (fluency  !== null) { vSum += fluency  * 0.3; wSum += 0.3; }
+  if (wSum > 0) composite = Math.min(1, vSum / wSum);
+
+  return { attempts: stat.attempts, accuracy, fluency, composite };
+}
+
+/**
+ * Per-skill mastery for one word, returned as an object keyed by skill.
+ * Skills the child hasn't practised yet have null values, not 0 — null
+ * means "no data yet" (don't penalise) and 0 means "tried and failed".
+ *
+ * @param {string} wordId
+ * @returns {Record<string, ReturnType<typeof getWordSkillMastery>>}
+ */
+export function getWordMasteryBySkill(wordId) {
+  const out = {};
+  for (const skill of SKILLS) {
+    out[skill] = getWordSkillMastery(wordId, skill);
+  }
+  return out;
 }
 
 /**

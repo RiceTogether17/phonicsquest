@@ -54,22 +54,25 @@ describe('curriculum/placement phase alignment', () => {
 
   it('placement and curriculum agree that digraphs come before CCVCC, long vowels, and diphthongs', () => {
     // Curriculum order — extracted from the stage list rather than hard-coded.
+    // After the long-vowel/diphthong micro-stage split, the canonical order
+    // markers are: digraphs → ccvcc-a → long-a-ae (first long-vowel
+    // micro-stage) → dip-oi (first diphthong micro-stage).
     const stageOrder = CURRICULUM.map(s => s.id);
     const idx = (id) => stageOrder.indexOf(id);
 
     expect(idx('digraphs')).toBeGreaterThan(-1);
     expect(idx('ccvcc-a')).toBeGreaterThan(-1);
-    expect(idx('long-a')).toBeGreaterThan(-1);
-    expect(idx('diphthongs')).toBeGreaterThan(-1);
+    expect(idx('long-a-ae')).toBeGreaterThan(-1);
+    expect(idx('dip-oi')).toBeGreaterThan(-1);
 
     expect(idx('digraphs')).toBeLessThan(idx('ccvcc-a'));
-    expect(idx('digraphs')).toBeLessThan(idx('long-a'));
-    expect(idx('digraphs')).toBeLessThan(idx('diphthongs'));
+    expect(idx('digraphs')).toBeLessThan(idx('long-a-ae'));
+    expect(idx('digraphs')).toBeLessThan(idx('dip-oi'));
 
-    // Placement order matches: digraphs phase < ccvcc phase < long-a phase
+    // Placement order matches: digraphs phase < ccvcc phase < long-vowel phase
     const phaseOf = (group) => PLACEMENT_PHASES.find(p => p.fallbackGroup === group)?.phase;
     expect(phaseOf('digraphs')).toBeLessThan(phaseOf('ccvcc-a'));
-    expect(phaseOf('ccvcc-a')).toBeLessThan(phaseOf('long-a'));
+    expect(phaseOf('ccvcc-a')).toBeLessThan(phaseOf('long-a-ae'));
   });
 
   it('PHASE_LABELS covers every PLACEMENT_PHASES.phase number', () => {

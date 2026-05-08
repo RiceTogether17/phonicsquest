@@ -25,6 +25,46 @@ const PHONEMIC_AWARENESS_MODES = new Set([
   'first', 'last', 'middle', 'oralBlend', 'soundCount', 'missing', 'segment',
 ]);
 
+/**
+ * Mode-key → canonical skill bin.
+ *
+ * Different modes target different reading-science skills. Collapsing them
+ * all into one wordStats accuracy hides the actual gap (a child who decodes
+ * `cat` flawlessly may still be unable to orally segment /c/-/a/-/t/).
+ *
+ * Skill bins (architecture review):
+ *   oralBlend  — auditory blending (hear sounds, identify the word)
+ *   segmenting — break a word into its sounds (oral or written)
+ *   decoding   — read a word from print
+ *   spelling   — produce letters from a sound (sound→print mapping)
+ *
+ * Fluency is NOT a separate bin — it's derived from response speed on
+ * correct attempts within decoding/segmenting (see masteryEngine).
+ */
+export const SKILL_BY_MODE = Object.freeze({
+  oralBlend:    'oralBlend',
+  first:        'segmenting',
+  last:         'segmenting',
+  middle:       'segmenting',
+  soundCount:   'segmenting',
+  segment:      'segmenting',
+  blend:        'decoding',
+  classicBlend: 'decoding',
+  hear:         'decoding',
+  letterSounds: 'decoding',
+  sightMatch:   'decoding',
+  missing:      'spelling',
+});
+
+/** Canonical skill bins, in display order. */
+export const SKILLS = Object.freeze(['oralBlend', 'segmenting', 'decoding', 'spelling']);
+
+/** Map a mode key to its skill bin. Returns null for unknown modes. */
+export function getSkillForMode(modeKey) {
+  if (!modeKey) return null;
+  return SKILL_BY_MODE[modeKey] ?? null;
+}
+
 class Progress {
   /**
    * Filter WORDS by structural group, with an optional level cap.
@@ -53,6 +93,25 @@ class Progress {
       const struct = structMatch[1].toUpperCase();
       const vowel  = structMatch[2];
       return WORDS.filter(w => getWordStructure(w) === struct && getShortVowelLetter(w) === vowel && lvl(w));
+    }
+
+    // Long-vowel micro-stages: <long-X>-<spellingPattern>
+    //   long-a-ae → group:'long-a' AND spellingPattern:'ae'
+    //   long-o-ow → group:'long-o' AND spellingPattern:'ow'
+    const longMatch = group.match(/^(long-[aeiou])-([a-z]+)$/);
+    if (longMatch) {
+      const parent  = longMatch[1];
+      const pattern = longMatch[2];
+      return WORDS.filter(w => w.group === parent && w.spellingPattern === pattern && lvl(w));
+    }
+
+    // Diphthong micro-stages: dip-<spellingPattern>
+    //   dip-oi → group:'diphthongs' AND spellingPattern:'oi'  (covers oi+oy)
+    //   dip-aw → group:'diphthongs' AND spellingPattern:'aw'
+    const dipMatch = group.match(/^dip-([a-z]+)$/);
+    if (dipMatch) {
+      const pattern = dipMatch[1];
+      return WORDS.filter(w => w.group === 'diphthongs' && w.spellingPattern === pattern && lvl(w));
     }
 
     return WORDS.filter(w => w.group === group && lvl(w));
@@ -128,17 +187,41 @@ class Progress {
 
   /**
    * Record an attempt result.
-   * @param {string} wordId
+   *
+   * Both the cross-skill summary (wordStats) AND the per-skill breakdown
+   * (wordSkillStats) are updated, so the rest of the app keeps reading
+   * wordStats unchanged while skill-aware features can read the breakdown.
+   * The mode-key is also mapped to a learning event so masteryEngine's
+   * speed score has data to work with (the previous code path filtered for
+   * `word_attempt` events but nothing was emitting them).
+   *
+   * @param {string}  wordId
    * @param {boolean} correct
-   * @param {string} mode  which game mode was played
+   * @param {string}  mode        which game mode was played
+   * @param {number=} responseMs  time-to-answer for fluency scoring
    */
-  recordAttempt(wordId, correct, mode = 'blend') {
+  recordAttempt(wordId, correct, mode = 'blend', responseMs = null) {
     store.recordWordAttempt(wordId, correct);
     store.addWordHistory({
       wordId,
       correct,
       mode,
       timestamp: new Date().toISOString(),
+    });
+
+    // Per-skill breakdown — only when the mode maps to a phonics skill.
+    const skill = getSkillForMode(mode);
+    if (skill) {
+      store.recordWordSkillAttempt(wordId, skill, correct, responseMs);
+    }
+
+    // Telemetry event for downstream scorers (masteryEngine.speed, reporting)
+    store.recordLearningEvent({
+      eventType:  'word_attempt',
+      skill:      skill ?? null,
+      correct,
+      responseMs: typeof responseMs === 'number' ? responseMs : null,
+      meta:       { wordId, mode },
     });
 
     // Update group mastery (both canonical group and structural-vowel cross-cut)
@@ -179,6 +262,55 @@ class Progress {
 
     const accuracy = totalAttempts > 0 ? totalCorrect / totalAttempts : 0;
     store.updateGroupMastery(group, accuracy);
+
+    // Long-vowel/diphthong macro-groups also have spelling-pattern micro-stages
+    // (long-a → long-a-ae, long-a-ai, long-a-ay; diphthongs → dip-oi, dip-ou,
+    // dip-aw). Refresh those alongside the parent so existing users migrate
+    // automatically — the first practice attempt repopulates each micro-key
+    // from the persisted wordStats.
+    if (group.startsWith('long-') && /^long-[aeiou]$/.test(group)) {
+      this._refreshMicroStageMastery(group, groupWords, stats);
+    } else if (group === 'diphthongs') {
+      this._refreshDiphthongMicroStages(groupWords, stats);
+    }
+  }
+
+  /** Recompute micro-stage mastery for one long-vowel macro-group. */
+  _refreshMicroStageMastery(parentGroup, groupWords, stats) {
+    const buckets = new Map(); // pattern → { attempts, correct }
+    for (const w of groupWords) {
+      const pat = w.spellingPattern;
+      if (!pat) continue;
+      const s = stats[w.id];
+      if (!(s && s.attempts > 0)) continue;
+      const b = buckets.get(pat) || { attempts: 0, correct: 0 };
+      b.attempts += s.attempts;
+      b.correct  += s.correct;
+      buckets.set(pat, b);
+    }
+    for (const [pattern, b] of buckets) {
+      const acc = b.attempts > 0 ? b.correct / b.attempts : 0;
+      store.updateGroupMastery(`${parentGroup}-${pattern}`, acc);
+    }
+  }
+
+  /** Same idea, but the diphthong micro-keys are 'dip-<pattern>'. */
+  _refreshDiphthongMicroStages(groupWords, stats) {
+    const buckets = new Map();
+    for (const w of groupWords) {
+      const pat = w.spellingPattern;
+      if (!pat) continue;
+      const s = stats[w.id];
+      if (!(s && s.attempts > 0)) continue;
+      const b = buckets.get(pat) || { attempts: 0, correct: 0 };
+      b.attempts += s.attempts;
+      b.correct  += s.correct;
+      buckets.set(pat, b);
+    }
+    for (const [pattern, b] of buckets) {
+      const acc = b.attempts > 0 ? b.correct / b.attempts : 0;
+      store.updateGroupMastery(`dip-${pattern}`, acc);
+    }
   }
 
   /** Update mastery for all structural-vowel groups a word belongs to */
