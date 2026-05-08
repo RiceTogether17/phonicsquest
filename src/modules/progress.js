@@ -55,6 +55,25 @@ class Progress {
       return WORDS.filter(w => getWordStructure(w) === struct && getShortVowelLetter(w) === vowel && lvl(w));
     }
 
+    // Long-vowel micro-stages: <long-X>-<spellingPattern>
+    //   long-a-ae → group:'long-a' AND spellingPattern:'ae'
+    //   long-o-ow → group:'long-o' AND spellingPattern:'ow'
+    const longMatch = group.match(/^(long-[aeiou])-([a-z]+)$/);
+    if (longMatch) {
+      const parent  = longMatch[1];
+      const pattern = longMatch[2];
+      return WORDS.filter(w => w.group === parent && w.spellingPattern === pattern && lvl(w));
+    }
+
+    // Diphthong micro-stages: dip-<spellingPattern>
+    //   dip-oi → group:'diphthongs' AND spellingPattern:'oi'  (covers oi+oy)
+    //   dip-aw → group:'diphthongs' AND spellingPattern:'aw'
+    const dipMatch = group.match(/^dip-([a-z]+)$/);
+    if (dipMatch) {
+      const pattern = dipMatch[1];
+      return WORDS.filter(w => w.group === 'diphthongs' && w.spellingPattern === pattern && lvl(w));
+    }
+
     return WORDS.filter(w => w.group === group && lvl(w));
   }
 
@@ -179,6 +198,55 @@ class Progress {
 
     const accuracy = totalAttempts > 0 ? totalCorrect / totalAttempts : 0;
     store.updateGroupMastery(group, accuracy);
+
+    // Long-vowel/diphthong macro-groups also have spelling-pattern micro-stages
+    // (long-a → long-a-ae, long-a-ai, long-a-ay; diphthongs → dip-oi, dip-ou,
+    // dip-aw). Refresh those alongside the parent so existing users migrate
+    // automatically — the first practice attempt repopulates each micro-key
+    // from the persisted wordStats.
+    if (group.startsWith('long-') && /^long-[aeiou]$/.test(group)) {
+      this._refreshMicroStageMastery(group, groupWords, stats);
+    } else if (group === 'diphthongs') {
+      this._refreshDiphthongMicroStages(groupWords, stats);
+    }
+  }
+
+  /** Recompute micro-stage mastery for one long-vowel macro-group. */
+  _refreshMicroStageMastery(parentGroup, groupWords, stats) {
+    const buckets = new Map(); // pattern → { attempts, correct }
+    for (const w of groupWords) {
+      const pat = w.spellingPattern;
+      if (!pat) continue;
+      const s = stats[w.id];
+      if (!(s && s.attempts > 0)) continue;
+      const b = buckets.get(pat) || { attempts: 0, correct: 0 };
+      b.attempts += s.attempts;
+      b.correct  += s.correct;
+      buckets.set(pat, b);
+    }
+    for (const [pattern, b] of buckets) {
+      const acc = b.attempts > 0 ? b.correct / b.attempts : 0;
+      store.updateGroupMastery(`${parentGroup}-${pattern}`, acc);
+    }
+  }
+
+  /** Same idea, but the diphthong micro-keys are 'dip-<pattern>'. */
+  _refreshDiphthongMicroStages(groupWords, stats) {
+    const buckets = new Map();
+    for (const w of groupWords) {
+      const pat = w.spellingPattern;
+      if (!pat) continue;
+      const s = stats[w.id];
+      if (!(s && s.attempts > 0)) continue;
+      const b = buckets.get(pat) || { attempts: 0, correct: 0 };
+      b.attempts += s.attempts;
+      b.correct  += s.correct;
+      buckets.set(pat, b);
+    }
+    for (const [pattern, b] of buckets) {
+      const acc = b.attempts > 0 ? b.correct / b.attempts : 0;
+      store.updateGroupMastery(`dip-${pattern}`, acc);
+    }
   }
 
   /** Update mastery for all structural-vowel groups a word belongs to */

@@ -196,50 +196,124 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'ccvcc-o',
   },
 
-  /* ── Phase 6: Long vowels ────────────────────────────────────────── */
+  /* ── Phase 6: Long vowels (split by spelling pattern) ────────────────
+   *
+   * Each long vowel is split into orthographic micro-stages because
+   * children master the patterns at very different rates. Within a vowel,
+   * the order is: split-digraph (a_e/o_e/etc.) → vowel teams (ai/oa/ee)
+   * → end-of-word patterns (ay/ow). Long I and Long U have a single stage
+   * each for now — igh, final-y, ue and ew aren't yet in the word data;
+   * deriveSpellingPattern() in words.js will route those words to the
+   * right stage as soon as they are added.
+   */
+
+  // Long A: a_e → ai → ay
   {
-    id: 'long-a', phase: 6,
-    name: 'Long Vowel A',
-    description: 'cake, rain, play, name…',
-    icon: '✨', group: 'long-a', level: 2,
+    id: 'long-a-ae', phase: 6,
+    name: 'Long A · a_e',
+    description: 'Split digraph: cake, name, late…',
+    icon: '🎂', group: 'long-a-ae', level: 2,
     requiredMastery: 0.70, prerequisite: 'ccvcc-u',
   },
   {
-    id: 'long-e', phase: 6,
-    name: 'Long Vowel E',
-    description: 'keep, beat, tree, feet…',
-    icon: '🌟', group: 'long-e', level: 2,
-    requiredMastery: 0.70, prerequisite: 'long-a',
+    id: 'long-a-ai', phase: 6,
+    name: 'Long A · ai',
+    description: 'Vowel team: rain, tail, sail…',
+    icon: '🌧️', group: 'long-a-ai', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-a-ae',
   },
   {
-    id: 'long-i', phase: 6,
-    name: 'Long Vowel I',
-    description: 'bike, kite, fly, time…',
-    icon: '🌙', group: 'long-i', level: 2,
-    requiredMastery: 0.70, prerequisite: 'long-e',
-  },
-  {
-    id: 'long-o', phase: 6,
-    name: 'Long Vowel O',
-    description: 'home, boat, snow, road…',
-    icon: '☀️', group: 'long-o', level: 2,
-    requiredMastery: 0.70, prerequisite: 'long-i',
-  },
-  {
-    id: 'long-u', phase: 6,
-    name: 'Long Vowel U',
-    description: 'cube, tune, blue, rule…',
-    icon: '🦄', group: 'long-u', level: 2,
-    requiredMastery: 0.70, prerequisite: 'long-o',
+    id: 'long-a-ay', phase: 6,
+    name: 'Long A · ay',
+    description: 'Word-end pattern: play, day, way…',
+    icon: '🎲', group: 'long-a-ay', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-a-ai',
   },
 
-  /* ── Phase 7: Diphthongs ─────────────────────────────────────────── */
+  // Long E: ee → ea
   {
-    id: 'diphthongs', phase: 7,
-    name: 'Diphthongs',
-    description: 'coin, boy, out, cow, paw…',
-    icon: '🌊', group: 'diphthongs', level: 3,
-    requiredMastery: 0.70, prerequisite: 'long-u',
+    id: 'long-e-ee', phase: 6,
+    name: 'Long E · ee',
+    description: 'Doubled vowel team: tree, feet, see…',
+    icon: '🌲', group: 'long-e-ee', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-a-ay',
+  },
+  {
+    id: 'long-e-ea', phase: 6,
+    name: 'Long E · ea',
+    description: 'Vowel team: beat, sea, dream…',
+    icon: '🍃', group: 'long-e-ea', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-e-ee',
+  },
+
+  // Long I: i_e (igh and y stages will join when their words exist)
+  {
+    id: 'long-i-ie', phase: 6,
+    name: 'Long I · i_e',
+    description: 'Split digraph: kite, like, time…',
+    icon: '🪁', group: 'long-i-ie', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-e-ea',
+  },
+
+  // Long O: o_e → oa → ow
+  {
+    id: 'long-o-oe', phase: 6,
+    name: 'Long O · o_e',
+    description: 'Split digraph: home, hope, note…',
+    icon: '🏠', group: 'long-o-oe', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-i-ie',
+  },
+  {
+    id: 'long-o-oa', phase: 6,
+    name: 'Long O · oa',
+    description: 'Vowel team: boat, coat, road…',
+    icon: '🚤', group: 'long-o-oa', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-o-oe',
+  },
+  {
+    id: 'long-o-ow', phase: 6,
+    name: 'Long O · ow',
+    description: 'Word-end pattern: snow, slow, low…',
+    icon: '❄️', group: 'long-o-ow', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-o-oa',
+  },
+
+  // Long U: u_e (ue/ew stages will join when their words exist)
+  {
+    id: 'long-u-ue', phase: 6,
+    name: 'Long U · u_e',
+    description: 'Split digraph: cube, tube, rule…',
+    icon: '🎲', group: 'long-u-ue', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-o-ow',
+  },
+
+  /* ── Phase 7: Diphthongs (split by spelling pattern) ─────────────────
+   *
+   * oi/oy share the /ɔɪ/ sound and get one stage. ou/ow share /aʊ/ and
+   * get one stage. /aw/ is technically a low back vowel rather than a
+   * true diphthong, so it earns its own stage rather than being mixed in
+   * with the others.
+   */
+  {
+    id: 'dip-oi', phase: 7,
+    name: 'Diphthong · oi/oy',
+    description: 'Same /ɔɪ/ sound: coin, boy, soil, joy…',
+    icon: '🪙', group: 'dip-oi', level: 3,
+    requiredMastery: 0.70, prerequisite: 'long-u-ue',
+  },
+  {
+    id: 'dip-ou', phase: 7,
+    name: 'Diphthong · ou/ow',
+    description: 'Same /aʊ/ sound: out, cow, loud, town…',
+    icon: '🐄', group: 'dip-ou', level: 3,
+    requiredMastery: 0.70, prerequisite: 'dip-oi',
+  },
+  {
+    id: 'dip-aw', phase: 7,
+    name: '/aw/ pattern',
+    description: 'Separate from oi/ou: paw, jaw, saw, dawn…',
+    icon: '🐾', group: 'dip-aw', level: 3,
+    requiredMastery: 0.70, prerequisite: 'dip-ou',
   },
 
   /* ── Phase 8: Advanced — mixed-blends review ──────────────────────── */
@@ -248,7 +322,7 @@ export const CURRICULUM = [
     name: 'Blends Review',
     description: 'float, crisp, blend, sprint…',
     icon: '🚀', group: 'blends', level: 3,
-    requiredMastery: 0.70, prerequisite: 'diphthongs',
+    requiredMastery: 0.70, prerequisite: 'dip-aw',
   },
 
   /* ── Phase 9: Suffixes ────────────────────────────────────────────── */

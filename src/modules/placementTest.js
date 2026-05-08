@@ -38,7 +38,11 @@ export const PLACEMENT_PHASES = [
   { phase: 3, label: 'Phase 3 — Final blends',   fallbackGroup: 'cvcc-a',  seedWords: ['best', 'lamp', 'gift', 'sand', 'hand'] },
   { phase: 4, label: 'Phase 4 — Digraphs',       fallbackGroup: 'digraphs', seedWords: ['ship', 'chin', 'that', 'thin', 'chop'] },
   { phase: 5, label: 'Phase 5 — Both-end blends', fallbackGroup: 'ccvcc-a', seedWords: ['stamp', 'blend', 'print', 'plant', 'crisp'] },
-  { phase: 6, label: 'Phase 6 — Long vowels',    fallbackGroup: 'long-a',  seedWords: ['cake', 'kite', 'home', 'rain', 'bike'] },
+  // Phase 6 fallback points at the FIRST long-vowel micro-stage (a_e) so
+  // a child placed here lands on the easiest entry point — the macro-group
+  // `long-a` no longer exists as a curriculum stage after the spelling-
+  // pattern split.
+  { phase: 6, label: 'Phase 6 — Long vowels',    fallbackGroup: 'long-a-ae', seedWords: ['cake', 'kite', 'home', 'rain', 'bike'] },
 ];
 
 const MAX_PLACEMENT_PHASE = PLACEMENT_PHASES.length;

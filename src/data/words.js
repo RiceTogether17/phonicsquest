@@ -67,6 +67,29 @@ export const WORD_GROUPS = {
   'ccvcc-o':  { label:'CCVCC – Short O', color:'#db2777', bg:'#fce7f3', icon:'🎺', audioFile: null },
   'ccvcc-u':  { label:'CCVCC – Short U', color:'#db2777', bg:'#fce7f3', icon:'🏆', audioFile: null },
 
+  // ── Long-vowel micro-stages (split by spelling pattern) ─────────────────
+  // Children secure split-digraph (a_e) before vowel teams (ai), and ay
+  // last because it only occurs at word end. Same staged release for the
+  // other long vowels. Patterns missing from the dataset (igh, final-y, ue,
+  // ew, oo) deliberately have no group entry — adding the words first.
+  'long-a-ae':  { label: 'Long A · a_e (cake)', color: '#a855f7', bg: '#f3e8ff', icon: '🎂', audioFile: 'long_a' },
+  'long-a-ai':  { label: 'Long A · ai (rain)',  color: '#a855f7', bg: '#f3e8ff', icon: '🌧️', audioFile: 'long_a' },
+  'long-a-ay':  { label: 'Long A · ay (play)',  color: '#a855f7', bg: '#f3e8ff', icon: '🎲', audioFile: 'long_a' },
+  'long-e-ee':  { label: 'Long E · ee (tree)',  color: '#ec4899', bg: '#fce7f3', icon: '🌲', audioFile: 'long_e' },
+  'long-e-ea':  { label: 'Long E · ea (beat)',  color: '#ec4899', bg: '#fce7f3', icon: '🍃', audioFile: 'long_e' },
+  'long-i-ie':  { label: 'Long I · i_e (kite)', color: '#14b8a6', bg: '#ccfbf1', icon: '🪁', audioFile: 'long_i' },
+  'long-o-oe':  { label: 'Long O · o_e (home)', color: '#f59e0b', bg: '#fef3c7', icon: '🏠', audioFile: 'long_o' },
+  'long-o-oa':  { label: 'Long O · oa (boat)',  color: '#f59e0b', bg: '#fef3c7', icon: '🚤', audioFile: 'long_o' },
+  'long-o-ow':  { label: 'Long O · ow (snow)',  color: '#f59e0b', bg: '#fef3c7', icon: '❄️', audioFile: 'long_o' },
+  'long-u-ue':  { label: 'Long U · u_e (cube)', color: '#6366f1', bg: '#e0e7ff', icon: '🎲', audioFile: 'long_u' },
+
+  // ── Diphthong micro-stages (combine same-sound spellings) ──────────────
+  // oi/oy share /ɔɪ/, ou/ow share /aʊ/. aw is its own pattern (technically
+  // an r/aw-controlled vowel, not a true diphthong) and gets its own stage.
+  'dip-oi':     { label: 'Diphthong · oi/oy', color: '#0d9488', bg: '#ccfbf1', icon: '🪙', audioFile: null },
+  'dip-ou':     { label: 'Diphthong · ou/ow', color: '#0d9488', bg: '#ccfbf1', icon: '🐄', audioFile: null },
+  'dip-aw':     { label: '/aw/ pattern',      color: '#0d9488', bg: '#ccfbf1', icon: '🐾', audioFile: null },
+
   // ── Suffix patterns ───────────────────────────────────────────────────
   'suffix-ing':   { label: '-ing Words', color: '#059669', bg: '#d1fae5', icon: '🏃', audioFile: null },
   'suffix-ed':    { label: '-ed Words',  color: '#d97706', bg: '#fef3c7', icon: '✅', audioFile: null },
@@ -188,6 +211,84 @@ export function derivePhonemes(word) {
     result.push(...chunk);
   }
   return result;
+}
+
+// ── Spelling-pattern derivation (long vowels + diphthongs micro-stages) ─────
+//
+// Long-vowel and diphthong words used to all share a single group (long-a,
+// diphthongs). That hides the orthographic split — children master a_e long
+// before ay, and `aw` is a different sound from oi/oy/ou/ow. Curriculum
+// micro-stages filter words by group + spellingPattern instead.
+//
+// The pattern is derived from the existing graphemes/types arrays, so we
+// don't need to hand-edit every word. PHONEME_OVERRIDES sister table
+// SPELLING_PATTERN_OVERRIDES handles irregulars (none yet, but the hook
+// is there for future words like 'high', 'cry', 'blue').
+
+const SPELLING_PATTERN_OVERRIDES = Object.freeze({
+  // id: 'pattern'
+  // (intentionally empty — derivation handles every word currently in the
+  // dataset; add entries when igh / final-y / ue / ew words are introduced)
+});
+
+/**
+ * Derive the orthographic spelling pattern for a long-vowel or diphthong
+ * word. Returns null for words outside those groups.
+ *
+ * Patterns:
+ *   long-a       → 'ae' (cake), 'ai' (rain), 'ay' (play)
+ *   long-e       → 'ee' (tree), 'ea' (beat)
+ *   long-i       → 'ie' (kite), 'igh' (high), 'y' (cry)
+ *   long-o       → 'oe' (home), 'oa' (boat), 'ow' (snow)
+ *   long-u       → 'ue' (cube), 'uue' (blue), 'ew' (new)
+ *   diphthongs   → 'oi' (covers oi+oy, same /ɔɪ/),
+ *                  'ou' (covers ou+ow, same /aʊ/),
+ *                  'aw' (separate; not a true diphthong)
+ *
+ * @param {Word} word
+ * @returns {string|null}
+ */
+export function deriveSpellingPattern(word) {
+  if (!word) return null;
+  if (word.id && SPELLING_PATTERN_OVERRIDES[word.id]) return SPELLING_PATTERN_OVERRIDES[word.id];
+
+  const group     = word.group;
+  const graphemes = Array.isArray(word.graphemes) ? word.graphemes : [];
+  const types     = Array.isArray(word.types)     ? word.types     : [];
+
+  // Long vowels: split-digraph (CVCe) is the strongest signal.
+  if (group && group.startsWith('long-')) {
+    if (types.includes('se')) return group.endsWith('-a') ? 'ae'
+                                : group.endsWith('-e') ? 'ee'  // rare; 'ee' typically captures these first
+                                : group.endsWith('-i') ? 'ie'
+                                : group.endsWith('-o') ? 'oe'
+                                : group.endsWith('-u') ? 'ue'
+                                : null;
+    if (graphemes.includes('ai'))  return 'ai';
+    if (graphemes.includes('ay'))  return 'ay';
+    if (graphemes.includes('ee'))  return 'ee';
+    if (graphemes.includes('ea'))  return 'ea';
+    if (graphemes.includes('igh')) return 'igh';
+    if (graphemes.includes('oa'))  return 'oa';
+    if (graphemes.includes('ow'))  return 'ow';
+    if (graphemes.includes('oo'))  return 'oo';
+    if (graphemes.includes('ue'))  return 'uue'; // distinguish from split-digraph 'ue' (cube)
+    if (graphemes.includes('ew'))  return 'ew';
+    // word ends in 'y' acting as long-i or long-e
+    const last = graphemes[graphemes.length - 1];
+    if (last === 'y' && types[types.length - 1] === 'lv') return 'y';
+    return null;
+  }
+
+  // Diphthongs: combine same-sound spellings into one micro-stage.
+  if (group === 'diphthongs') {
+    if (graphemes.includes('oi') || graphemes.includes('oy')) return 'oi';
+    if (graphemes.includes('ou') || graphemes.includes('ow')) return 'ou';
+    if (graphemes.includes('aw') || graphemes.includes('au') || graphemes.includes('cau')) return 'aw';
+    return null;
+  }
+
+  return null;
 }
 
 /** @type {Word[]} */
@@ -1200,11 +1301,14 @@ export const WORDS = [
   { id:'could', word:'could', graphemes:['c','ou','ld'], types:['c','dp','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'💡' },
 ];
 
-// Attach `phonemes` to every word so consumers can read word.phonemes.length
-// instead of falling back to graphemes.length (which is wrong for silent-e,
-// blends, 'x' words, and silent-letter spellings).
+// Attach `phonemes` and `spellingPattern` to every word at load time, so
+// consumers don't need to call the deriver every time. phonemes.length is
+// the true sound count (graphemes.length is wrong for silent-e, blends,
+// 'x' words, silent letters). spellingPattern is the long-vowel/diphthong
+// micro-stage selector (null for everything else).
 for (const w of WORDS) {
-  if (!Array.isArray(w.phonemes)) w.phonemes = derivePhonemes(w);
+  if (!Array.isArray(w.phonemes))                  w.phonemes        = derivePhonemes(w);
+  if (typeof w.spellingPattern === 'undefined')    w.spellingPattern = deriveSpellingPattern(w);
 }
 
 /**
@@ -1406,7 +1510,8 @@ export function loadCustomWords() {
     const existingIds = new Set(WORDS.map(w => w.id));
     for (const w of custom) {
       if (w && w.id && w.word && !existingIds.has(w.id)) {
-        if (!Array.isArray(w.phonemes)) w.phonemes = derivePhonemes(w);
+        if (!Array.isArray(w.phonemes))               w.phonemes        = derivePhonemes(w);
+        if (typeof w.spellingPattern === 'undefined') w.spellingPattern = deriveSpellingPattern(w);
         WORDS.push(w);
         existingIds.add(w.id);
       }
