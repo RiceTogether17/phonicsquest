@@ -25,6 +25,46 @@ const PHONEMIC_AWARENESS_MODES = new Set([
   'first', 'last', 'middle', 'oralBlend', 'soundCount', 'missing', 'segment',
 ]);
 
+/**
+ * Mode-key → canonical skill bin.
+ *
+ * Different modes target different reading-science skills. Collapsing them
+ * all into one wordStats accuracy hides the actual gap (a child who decodes
+ * `cat` flawlessly may still be unable to orally segment /c/-/a/-/t/).
+ *
+ * Skill bins (architecture review):
+ *   oralBlend  — auditory blending (hear sounds, identify the word)
+ *   segmenting — break a word into its sounds (oral or written)
+ *   decoding   — read a word from print
+ *   spelling   — produce letters from a sound (sound→print mapping)
+ *
+ * Fluency is NOT a separate bin — it's derived from response speed on
+ * correct attempts within decoding/segmenting (see masteryEngine).
+ */
+export const SKILL_BY_MODE = Object.freeze({
+  oralBlend:    'oralBlend',
+  first:        'segmenting',
+  last:         'segmenting',
+  middle:       'segmenting',
+  soundCount:   'segmenting',
+  segment:      'segmenting',
+  blend:        'decoding',
+  classicBlend: 'decoding',
+  hear:         'decoding',
+  letterSounds: 'decoding',
+  sightMatch:   'decoding',
+  missing:      'spelling',
+});
+
+/** Canonical skill bins, in display order. */
+export const SKILLS = Object.freeze(['oralBlend', 'segmenting', 'decoding', 'spelling']);
+
+/** Map a mode key to its skill bin. Returns null for unknown modes. */
+export function getSkillForMode(modeKey) {
+  if (!modeKey) return null;
+  return SKILL_BY_MODE[modeKey] ?? null;
+}
+
 class Progress {
   /**
    * Filter WORDS by structural group, with an optional level cap.
@@ -147,17 +187,41 @@ class Progress {
 
   /**
    * Record an attempt result.
-   * @param {string} wordId
+   *
+   * Both the cross-skill summary (wordStats) AND the per-skill breakdown
+   * (wordSkillStats) are updated, so the rest of the app keeps reading
+   * wordStats unchanged while skill-aware features can read the breakdown.
+   * The mode-key is also mapped to a learning event so masteryEngine's
+   * speed score has data to work with (the previous code path filtered for
+   * `word_attempt` events but nothing was emitting them).
+   *
+   * @param {string}  wordId
    * @param {boolean} correct
-   * @param {string} mode  which game mode was played
+   * @param {string}  mode        which game mode was played
+   * @param {number=} responseMs  time-to-answer for fluency scoring
    */
-  recordAttempt(wordId, correct, mode = 'blend') {
+  recordAttempt(wordId, correct, mode = 'blend', responseMs = null) {
     store.recordWordAttempt(wordId, correct);
     store.addWordHistory({
       wordId,
       correct,
       mode,
       timestamp: new Date().toISOString(),
+    });
+
+    // Per-skill breakdown — only when the mode maps to a phonics skill.
+    const skill = getSkillForMode(mode);
+    if (skill) {
+      store.recordWordSkillAttempt(wordId, skill, correct, responseMs);
+    }
+
+    // Telemetry event for downstream scorers (masteryEngine.speed, reporting)
+    store.recordLearningEvent({
+      eventType:  'word_attempt',
+      skill:      skill ?? null,
+      correct,
+      responseMs: typeof responseMs === 'number' ? responseMs : null,
+      meta:       { wordId, mode },
     });
 
     // Update group mastery (both canonical group and structural-vowel cross-cut)

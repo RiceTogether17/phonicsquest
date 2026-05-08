@@ -54,8 +54,14 @@ const DEFAULT_STATE = {
     masteryMinAttempts: 6,
   },
 
-  // Progress (per-word stats)
-  wordStats: {},            // { [wordId]: { attempts, correct, lastSeen } }
+  // Progress (per-word stats — cross-skill summary, kept for backward compat)
+  wordStats: {},            // { [wordId]: { attempts, correct, lastSeen, ... } }
+
+  // Per-word per-skill stats (oralBlend / segmenting / decoding / spelling).
+  // A child who decodes 'cat' easily but can't orally segment /c/-/a/-/t/
+  // shows up here as decoding=high, segmenting=low. Adaptive review reads
+  // this map to target the actual gap rather than the cross-skill average.
+  wordSkillStats: {},       // { [wordId]: { [skill]: { attempts, correct, lastSeen, lastResponseMs } } }
 
   // Group mastery (per group accuracy)
   groupMastery: {},         // { [group]: accuracy 0-1 }
@@ -383,6 +389,28 @@ class Store {
         this.set('sessionWordsToday', [...todayWords, wordId].slice(-50));
       }
     }
+  }
+
+  /**
+   * Record a per-word per-skill attempt. Coexists with recordWordAttempt —
+   * both are called on every attempt (the cross-skill summary and the
+   * skill-specific breakdown stay in sync). `skill` is one of the bins
+   * returned by progress.getSkillForMode(); pass null to skip skill recording
+   * for modes that don't map to a phonics skill (e.g. grammar quests).
+   */
+  recordWordSkillAttempt(wordId, skill, correct, responseMs = null) {
+    if (!wordId || !skill) return;
+    const all = { ...(this._state.wordSkillStats || {}) };
+    const forWord = { ...(all[wordId] || {}) };
+    const prev = forWord[skill] || { attempts: 0, correct: 0, lastSeen: null, lastResponseMs: null };
+    forWord[skill] = {
+      attempts:       prev.attempts + 1,
+      correct:        prev.correct + (correct ? 1 : 0),
+      lastSeen:       new Date().toISOString(),
+      lastResponseMs: typeof responseMs === 'number' ? responseMs : prev.lastResponseMs,
+    };
+    all[wordId] = forWord;
+    this.set('wordSkillStats', all);
   }
 
   /** Append an entry to word history (capped at 100). */
