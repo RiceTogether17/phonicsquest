@@ -78,10 +78,15 @@ export const WORD_GROUPS = {
   'long-e-ee':  { label: 'Long E · ee (tree)',  color: '#ec4899', bg: '#fce7f3', icon: '🌲', audioFile: 'long_e' },
   'long-e-ea':  { label: 'Long E · ea (beat)',  color: '#ec4899', bg: '#fce7f3', icon: '🍃', audioFile: 'long_e' },
   'long-i-ie':  { label: 'Long I · i_e (kite)', color: '#14b8a6', bg: '#ccfbf1', icon: '🪁', audioFile: 'long_i' },
+  'long-i-igh': { label: 'Long I · igh (night)',color: '#14b8a6', bg: '#ccfbf1', icon: '💡', audioFile: 'long_i' },
+  'long-i-y':   { label: 'Long I · y (cry)',    color: '#14b8a6', bg: '#ccfbf1', icon: '😭', audioFile: 'long_i' },
   'long-o-oe':  { label: 'Long O · o_e (home)', color: '#f59e0b', bg: '#fef3c7', icon: '🏠', audioFile: 'long_o' },
   'long-o-oa':  { label: 'Long O · oa (boat)',  color: '#f59e0b', bg: '#fef3c7', icon: '🚤', audioFile: 'long_o' },
   'long-o-ow':  { label: 'Long O · ow (snow)',  color: '#f59e0b', bg: '#fef3c7', icon: '❄️', audioFile: 'long_o' },
   'long-u-ue':  { label: 'Long U · u_e (cube)', color: '#6366f1', bg: '#e0e7ff', icon: '🎲', audioFile: 'long_u' },
+  'long-u-uue': { label: 'Long U · ue (blue)',  color: '#6366f1', bg: '#e0e7ff', icon: '💙', audioFile: 'long_u' },
+  'long-u-ew':  { label: 'Long U · ew (new)',   color: '#6366f1', bg: '#e0e7ff', icon: '🆕', audioFile: 'long_u' },
+  'long-u-oo':  { label: 'Long U · oo (moon)',  color: '#6366f1', bg: '#e0e7ff', icon: '🌙', audioFile: 'long_u' },
 
   // ── Diphthong micro-stages (combine same-sound spellings) ──────────────
   // oi/oy share /ɔɪ/, ou/ow share /aʊ/. aw is its own pattern (technically
@@ -634,6 +639,30 @@ export const WORDS = [
   { id:'pipe',  word:'pipe',  graphemes:['p','i','p','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-i', level:2, emoji:'🪠' },
   { id:'ripe',  word:'ripe',  graphemes:['r','i','p','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-i', level:2, emoji:'🍎' },
 
+  /* ── Long-I · igh (trigraph, /ī/ as one phoneme) ───────────────────── */
+  { id:'high',   word:'high',   graphemes:['h','igh'],     types:['c','lv'],     pattern:'other', group:'long-i', level:2, emoji:'⬆️' },
+  { id:'sigh',   word:'sigh',   graphemes:['s','igh'],     types:['c','lv'],     pattern:'other', group:'long-i', level:3, emoji:'😮‍💨' },
+  { id:'night',  word:'night',  graphemes:['n','igh','t'], types:['c','lv','c'], pattern:'other', group:'long-i', level:2, emoji:'🌃' },
+  { id:'light',  word:'light',  graphemes:['l','igh','t'], types:['c','lv','c'], pattern:'other', group:'long-i', level:2, emoji:'💡' },
+  { id:'right',  word:'right',  graphemes:['r','igh','t'], types:['c','lv','c'], pattern:'other', group:'long-i', level:2, emoji:'👉' },
+  { id:'might',  word:'might',  graphemes:['m','igh','t'], types:['c','lv','c'], pattern:'other', group:'long-i', level:2, emoji:'💪' },
+  { id:'sight',  word:'sight',  graphemes:['s','igh','t'], types:['c','lv','c'], pattern:'other', group:'long-i', level:2, emoji:'👁️' },
+  { id:'fight',  word:'fight',  graphemes:['f','igh','t'], types:['c','lv','c'], pattern:'other', group:'long-i', level:2, emoji:'🥊' },
+  { id:'tight',  word:'tight',  graphemes:['t','igh','t'], types:['c','lv','c'], pattern:'other', group:'long-i', level:3, emoji:'🤏' },
+  { id:'bright', word:'bright', graphemes:['br','igh','t'], types:['bl','lv','c'], pattern:'other', group:'long-i', level:3, emoji:'🌟' },
+
+  /* ── Long-I · final-y (single-syllable, /ī/) ───────────────────────── */
+  { id:'my',  word:'my',  graphemes:['m','y'],   types:['c','lv'],   pattern:'other', group:'long-i', level:2, emoji:'👤' },
+  { id:'by',  word:'by',  graphemes:['b','y'],   types:['c','lv'],   pattern:'other', group:'long-i', level:2, emoji:'👋' },
+  { id:'cry', word:'cry', graphemes:['cr','y'],  types:['bl','lv'],  pattern:'other', group:'long-i', level:2, emoji:'😭' },
+  { id:'try', word:'try', graphemes:['tr','y'],  types:['bl','lv'],  pattern:'other', group:'long-i', level:2, emoji:'🎯' },
+  { id:'fly', word:'fly', graphemes:['fl','y'],  types:['bl','lv'],  pattern:'other', group:'long-i', level:2, emoji:'🪰' },
+  { id:'sky', word:'sky', graphemes:['sk','y'],  types:['bl','lv'],  pattern:'other', group:'long-i', level:2, emoji:'☁️' },
+  { id:'dry', word:'dry', graphemes:['dr','y'],  types:['bl','lv'],  pattern:'other', group:'long-i', level:2, emoji:'🏜️' },
+  { id:'why', word:'why', graphemes:['wh','y'],  types:['d','lv'],   pattern:'other', group:'long-i', level:2, emoji:'❓' },
+  { id:'shy', word:'shy', graphemes:['sh','y'],  types:['d','lv'],   pattern:'other', group:'long-i', level:3, emoji:'😳' },
+  { id:'fry', word:'fry', graphemes:['fr','y'],  types:['bl','lv'],  pattern:'other', group:'long-i', level:3, emoji:'🍟' },
+
   /* ══════════════════════════════════════
      LONG-O  (CVCe, level 2)
   ══════════════════════════════════════ */
@@ -712,6 +741,34 @@ export const WORDS = [
   { id:'Luke',  word:'Luke',  graphemes:['l','u','k','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-u', level:2, emoji:'🌟' },
   { id:'flute', word:'flute', graphemes:['fl','u','t','e'], types:['bl','lv','c','se'],pattern:'CVCe', group:'long-u', level:2, emoji:'🪈' },
   { id:'fluke', word:'fluke', graphemes:['fl','u','k','e'], types:['bl','lv','c','se'],pattern:'CVCe', group:'long-u', level:3, emoji:'🎲' },
+
+  /* ── Long-U · ue (vowel team, distinct from u_e split-digraph) ─────── */
+  { id:'blue', word:'blue', graphemes:['bl','ue'], types:['bl','lv'], pattern:'other', group:'long-u', level:2, emoji:'💙' },
+  { id:'true', word:'true', graphemes:['tr','ue'], types:['bl','lv'], pattern:'other', group:'long-u', level:2, emoji:'✅' },
+  { id:'glue', word:'glue', graphemes:['gl','ue'], types:['bl','lv'], pattern:'other', group:'long-u', level:2, emoji:'🧴' },
+  { id:'clue', word:'clue', graphemes:['cl','ue'], types:['bl','lv'], pattern:'other', group:'long-u', level:2, emoji:'🔍' },
+
+  /* ── Long-U · ew (word-end pattern, /ū/ or /uː/) ───────────────────── */
+  { id:'new',  word:'new',  graphemes:['n','ew'],   types:['c','lv'],   pattern:'other', group:'long-u', level:2, emoji:'🆕' },
+  { id:'few',  word:'few',  graphemes:['f','ew'],   types:['c','lv'],   pattern:'other', group:'long-u', level:2, emoji:'✋' },
+  { id:'dew',  word:'dew',  graphemes:['d','ew'],   types:['c','lv'],   pattern:'other', group:'long-u', level:3, emoji:'💧' },
+  { id:'drew', word:'drew', graphemes:['dr','ew'],  types:['bl','lv'],  pattern:'other', group:'long-u', level:2, emoji:'🎨' },
+  { id:'blew', word:'blew', graphemes:['bl','ew'],  types:['bl','lv'],  pattern:'other', group:'long-u', level:2, emoji:'💨' },
+  { id:'flew', word:'flew', graphemes:['fl','ew'],  types:['bl','lv'],  pattern:'other', group:'long-u', level:2, emoji:'✈️' },
+  { id:'grew', word:'grew', graphemes:['gr','ew'],  types:['bl','lv'],  pattern:'other', group:'long-u', level:2, emoji:'🌱' },
+  { id:'crew', word:'crew', graphemes:['cr','ew'],  types:['bl','lv'],  pattern:'other', group:'long-u', level:3, emoji:'👥' },
+
+  /* ── Long-U · oo (vowel team, /uː/ as in moon — NOT short /ʊ/ as in book) ── */
+  { id:'moon',  word:'moon',  graphemes:['m','oo','n'],  types:['c','lv','c'],  pattern:'other', group:'long-u', level:2, emoji:'🌙' },
+  { id:'food',  word:'food',  graphemes:['f','oo','d'],  types:['c','lv','c'],  pattern:'other', group:'long-u', level:2, emoji:'🍔' },
+  { id:'room',  word:'room',  graphemes:['r','oo','m'],  types:['c','lv','c'],  pattern:'other', group:'long-u', level:2, emoji:'🚪' },
+  { id:'pool',  word:'pool',  graphemes:['p','oo','l'],  types:['c','lv','c'],  pattern:'other', group:'long-u', level:2, emoji:'🏊' },
+  { id:'zoo',   word:'zoo',   graphemes:['z','oo'],      types:['c','lv'],      pattern:'other', group:'long-u', level:2, emoji:'🦁' },
+  { id:'boot',  word:'boot',  graphemes:['b','oo','t'],  types:['c','lv','c'],  pattern:'other', group:'long-u', level:2, emoji:'👢' },
+  { id:'soon',  word:'soon',  graphemes:['s','oo','n'],  types:['c','lv','c'],  pattern:'other', group:'long-u', level:2, emoji:'⏰' },
+  { id:'tool',  word:'tool',  graphemes:['t','oo','l'],  types:['c','lv','c'],  pattern:'other', group:'long-u', level:2, emoji:'🔧' },
+  { id:'broom', word:'broom', graphemes:['br','oo','m'], types:['bl','lv','c'], pattern:'other', group:'long-u', level:3, emoji:'🧹' },
+  { id:'spoon', word:'spoon', graphemes:['sp','oo','n'], types:['bl','lv','c'], pattern:'other', group:'long-u', level:3, emoji:'🥄' },
 
   /* ══════════════════════════════════════
      DIGRAPHS  (level 2)

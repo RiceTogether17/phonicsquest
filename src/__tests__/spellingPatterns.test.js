@@ -30,14 +30,19 @@ describe('deriveSpellingPattern()', () => {
     // Long E
     ['tree', 'ee'], ['feet', 'ee'], ['bee', 'ee'],
     ['beat', 'ea'], ['sea',  'ea'], ['mean', 'ea'],
-    // Long I (only i_e currently)
+    // Long I: i_e, igh, final-y
     ['kite', 'ie'], ['bike', 'ie'], ['line', 'ie'],
+    ['high', 'igh'], ['night', 'igh'], ['light', 'igh'], ['bright', 'igh'],
+    ['my',   'y'],   ['cry',   'y'],   ['fly',   'y'],   ['why',    'y'],
     // Long O
     ['home', 'oe'], ['note', 'oe'],
     ['boat', 'oa'], ['coat', 'oa'],
     ['snow', 'ow'], ['low',  'ow'],
-    // Long U (only u_e currently)
-    ['cube', 'ue'], ['tune', 'ue'],
+    // Long U: u_e (split-digraph) → ue (vowel team) → ew → oo
+    ['cube', 'ue'],  ['tune', 'ue'],
+    ['blue', 'uue'], ['true', 'uue'], ['glue', 'uue'],
+    ['new',  'ew'],  ['drew', 'ew'],  ['flew', 'ew'],
+    ['moon', 'oo'],  ['food', 'oo'],  ['zoo',  'oo'],
     // Diphthongs (oi/oy collapse, ou/ow collapse, aw separate)
     ['coin', 'oi'], ['boy',  'oi'], ['joy', 'oi'],
     ['out',  'ou'], ['cow',  'ou'], ['town', 'ou'],
@@ -66,9 +71,9 @@ describe('long-vowel / diphthong micro-stage curriculum coverage', () => {
   const microIds = [
     'long-a-ae', 'long-a-ai', 'long-a-ay',
     'long-e-ee', 'long-e-ea',
-    'long-i-ie',
+    'long-i-ie', 'long-i-igh', 'long-i-y',
     'long-o-oe', 'long-o-oa', 'long-o-ow',
-    'long-u-ue',
+    'long-u-ue', 'long-u-uue', 'long-u-ew', 'long-u-oo',
     'dip-oi', 'dip-ou', 'dip-aw',
   ];
 
@@ -124,6 +129,17 @@ describe('micro-stage pedagogical ordering', () => {
   it('Long O: split-digraph before oa before ow', () => {
     expect(order('long-o-oe')).toBeLessThan(order('long-o-oa'));
     expect(order('long-o-oa')).toBeLessThan(order('long-o-ow'));
+  });
+
+  it('Long I: split-digraph before igh before final-y', () => {
+    expect(order('long-i-ie')).toBeLessThan(order('long-i-igh'));
+    expect(order('long-i-igh')).toBeLessThan(order('long-i-y'));
+  });
+
+  it('Long U: split-digraph before vowel-team ue before ew before oo', () => {
+    expect(order('long-u-ue')).toBeLessThan(order('long-u-uue'));
+    expect(order('long-u-uue')).toBeLessThan(order('long-u-ew'));
+    expect(order('long-u-ew')).toBeLessThan(order('long-u-oo'));
   });
 
   it('Diphthongs: oi/oy before ou/ow before aw', () => {

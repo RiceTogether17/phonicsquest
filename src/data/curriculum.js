@@ -246,13 +246,27 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'long-e-ee',
   },
 
-  // Long I: i_e (igh and y stages will join when their words exist)
+  // Long I: i_e → igh → y
   {
     id: 'long-i-ie', phase: 6,
     name: 'Long I · i_e',
     description: 'Split digraph: kite, like, time…',
     icon: '🪁', group: 'long-i-ie', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-e-ea',
+  },
+  {
+    id: 'long-i-igh', phase: 6,
+    name: 'Long I · igh',
+    description: 'Trigraph (igh = one /ī/ sound): night, light, right, might…',
+    icon: '💡', group: 'long-i-igh', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-i-ie',
+  },
+  {
+    id: 'long-i-y', phase: 6,
+    name: 'Long I · y',
+    description: 'Word-end y as long /ī/: cry, try, fly, my, sky…',
+    icon: '😭', group: 'long-i-y', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-i-igh',
   },
 
   // Long O: o_e → oa → ow
@@ -261,7 +275,7 @@ export const CURRICULUM = [
     name: 'Long O · o_e',
     description: 'Split digraph: home, hope, note…',
     icon: '🏠', group: 'long-o-oe', level: 2,
-    requiredMastery: 0.70, prerequisite: 'long-i-ie',
+    requiredMastery: 0.70, prerequisite: 'long-i-y',
   },
   {
     id: 'long-o-oa', phase: 6,
@@ -278,13 +292,34 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'long-o-oa',
   },
 
-  // Long U: u_e (ue/ew stages will join when their words exist)
+  // Long U: u_e (split-digraph) → ue (vowel team) → ew → oo
   {
     id: 'long-u-ue', phase: 6,
     name: 'Long U · u_e',
     description: 'Split digraph: cube, tube, rule…',
     icon: '🎲', group: 'long-u-ue', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-o-ow',
+  },
+  {
+    id: 'long-u-uue', phase: 6,
+    name: 'Long U · ue',
+    description: 'Vowel team ue (different from u_e): blue, true, glue, clue.',
+    icon: '💙', group: 'long-u-uue', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-u-ue',
+  },
+  {
+    id: 'long-u-ew', phase: 6,
+    name: 'Long U · ew',
+    description: 'Word-end ew: new, few, drew, blew, flew, grew…',
+    icon: '🆕', group: 'long-u-ew', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-u-uue',
+  },
+  {
+    id: 'long-u-oo', phase: 6,
+    name: 'Long U · oo',
+    description: 'Long /uː/ as in moon, food, pool, room (NOT short /ʊ/ as in book).',
+    icon: '🌙', group: 'long-u-oo', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-u-ew',
   },
 
   /* ── Phase 7: Diphthongs (split by spelling pattern) ─────────────────
@@ -299,7 +334,7 @@ export const CURRICULUM = [
     name: 'Diphthong · oi/oy',
     description: 'Same /ɔɪ/ sound: coin, boy, soil, joy…',
     icon: '🪙', group: 'dip-oi', level: 3,
-    requiredMastery: 0.70, prerequisite: 'long-u-ue',
+    requiredMastery: 0.70, prerequisite: 'long-u-oo',
   },
   {
     id: 'dip-ou', phase: 7,
