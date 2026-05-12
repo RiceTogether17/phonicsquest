@@ -64,12 +64,37 @@ const PHONEME_FILES = {
   long_ee: 'long_e',  // ee  → long E sound
   long_oa: 'long_o',  // oa  → long O sound
   long_ow: 'long_o',  // ow (long-O words: blow, snow…) → long O sound
+  long_oe: 'long_o',  // oe (toe, goes) → long O sound
+  long_y:  'long_i',  // final y as long i (cry, fly, sky) → long I sound
+  long_ie: 'long_i',  // ie (pie, tie)                    → long I sound
+  long_igh:'long_i',  // igh (night, light, high)         → long I sound
+  long_oo: 'long_u',  // oo (moon, food, zoo)             → long U sound
+  long_ue: 'long_u',  // ue (cube split-digraph, blue)    → long U sound
+  long_ew: 'long_u',  // ew (new, drew, blew)             → long U sound
   // Diphthongs  (oi covers oi+oy, ow covers ow+ou, aw covers aw+au)
   oi: 'oi', ow: 'ow', aw: 'aw',
   // Soft consonants (used only when explicitly tagged in word data)
   soft_g: 'soft_g', soft_c: 'soft_c',
   // Schwa (used in affix phoneme sequences)
   'ə': 'u',  // schwa maps to short-u audio as closest match
+};
+
+/**
+ * Pronunciation map for PREFIX tiles (type 'p' on the word entry).
+ *
+ * Without this, a 'un' grapheme would fall through to `_playPhonemeAudio('un')`,
+ * which lacks a PHONEME_FILES entry and would speak the literal text "un"
+ * via TTS. Splitting each prefix into its real phoneme sequence makes the
+ * Blend It / per-phoneme reveal mode sound correct.
+ */
+const PREFIX_PRONUNCIATION = {
+  un:  ['u', 'n'],
+  re:  ['r', 'long_e'],
+  pre: ['p', 'r', 'long_e'],
+  dis: ['d', 'i', 's'],
+  mis: ['m', 'i', 's'],
+  in:  ['i', 'n'],
+  im:  ['i', 'm'],
 };
 
 /**
@@ -131,10 +156,12 @@ const PHONEME_TTS = {
   a: 'ah',  e: 'eh',  i: 'ih',  o: 'aw',  u: 'uh',
   // Long vowels (canonical)
   long_a: 'ay',  long_e: 'ee',  long_i: 'eye',  long_o: 'oh',  long_u: 'you',
-  // Long-vowel spelling aliases
+  // Long-vowel spelling aliases — fallback TTS strings when MP3 unavailable
   long_ai: 'ay',  long_ay: 'ay',
   long_ea: 'ee',  long_ee: 'ee',
-  long_oa: 'oh',  long_ow: 'oh',
+  long_oa: 'oh',  long_ow: 'oh',  long_oe: 'oh',
+  long_y:  'eye', long_ie: 'eye', long_igh: 'eye',
+  long_oo: 'oo',  long_ue: 'you', long_ew: 'oo',
   // R-controlled vowels
   ar: 'ar',  or: 'or',  er: 'err',
   ir: 'err', ur: 'err',
@@ -282,6 +309,19 @@ class AudioManager {
       for (let i = 0; i < grapheme.length; i++) {
         if (i > 0) await this._delay(80);
         await this._playPhonemeAudio(grapheme[i]);
+      }
+      return;
+    }
+
+    // Prefix tile — play the curated phoneme sequence (un → /u/+/n/,
+    // re → /r/+/ē/, pre → /p/+/r/+/ē/). Falls back to per-letter playback
+    // if the prefix isn't in PREFIX_PRONUNCIATION.
+    if (type === 'p') {
+      const seq = PREFIX_PRONUNCIATION[grapheme.toLowerCase()];
+      const sequence = seq ?? [...grapheme];
+      for (let i = 0; i < sequence.length; i++) {
+        if (i > 0) await this._delay(80);
+        await this._playPhonemeAudio(sequence[i]);
       }
       return;
     }

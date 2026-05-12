@@ -4,13 +4,22 @@
  * adaptive learning, and multi-mode support.
  *
  * Phoneme types:
- *   'c'  = consonant (blue)
- *   'sv' = short vowel (red)
- *   'lv' = long vowel (green)
- *   'd'  = digraph (purple)
- *   'bl' = blend consonant (orange)
- *   'se' = silent-e (gray)
- *   'rc' = r-controlled vowel (pink)
+ *   'c'      = consonant (blue)
+ *   'sv'     = short vowel (red)
+ *   'lv'     = long vowel (green)
+ *   'd'      = digraph (purple)
+ *   'bl'     = blend consonant (orange)
+ *   'se'     = silent-e (gray)
+ *   'rc'     = r-controlled vowel (pink)
+ *   'dp'     = diphthong (teal)
+ *   'p'      = prefix tile (multi-letter morpheme, e.g. 'un', 're', 'pre').
+ *              Backed by PREFIX_PHONEMES so the tile contributes the right
+ *              number of phonemes ('un' = /u/+/n/) instead of being treated
+ *              as a single consonant sound.
+ *   'sf'     = suffix tile (multi-letter morpheme, e.g. '-ing', '-ed',
+ *              '-tion', 'le', 'able'). Backed by SUFFIX_PHONEMES.
+ *   'soft_c' = c saying /s/ (race, rice, ice). Distinct from hard 'c'.
+ *   'soft_g' = g saying /j/ (gem, gist, huge). Distinct from hard 'c'.
  */
 
 /** Display diacritics for vowels */
@@ -169,21 +178,66 @@ const SUFFIX_PHONEMES = Object.freeze({
   '-ed':   ['/d/'],                  // contextual /d/, /t/, or /ɪd/ — count as 1
   '-er':   ['/er/'],                 // r-controlled, 1 phoneme
   '-est':  ['/e/', '/s/', '/t/'],
-  'tion':  ['/sh/', '/uh/', '/n/'],
-  'able':  ['/uh/', '/b/', '/l/'],
-  'ble':   ['/b/', '/uh/', '/l/'],
-  'le':    ['/uh/', '/l/'],
+  '-ly':   ['/l/', '/ē/'],           // happy → /h/ /a/ /p/ /l/ /ē/ if used
+  '-ful':  ['/f/', '/ə/', '/l/'],    // /fəl/ reduced vowel
+  '-less': ['/l/', '/e/', '/s/'],
+  '-ment': ['/m/', '/ə/', '/n/', '/t/'],
+  '-ness': ['/n/', '/ə/', '/s/'],
+  tion:    ['/sh/', '/uh/', '/n/'],
+  sion:    ['/zh/', '/uh/', '/n/'],
+  able:    ['/uh/', '/b/', '/l/'],
+  ible:    ['/uh/', '/b/', '/l/'],
+  ble:     ['/b/', '/uh/', '/l/'],
+  le:      ['/uh/', '/l/'],
+});
+
+/**
+ * Per-prefix phoneme breakdowns. Keys match the literal grapheme stored on
+ * the word (no leading dash — prefixes attach to the front).
+ *
+ * Without this table, a 'un' grapheme typed 'c' would produce a single
+ * phoneme '/un/' and audio would speak the literal "un" via TTS. Tagging
+ * the grapheme as type 'p' instead routes through here so the prefix
+ * decomposes into its actual sounds (/u/+/n/, /r/+/ē/, etc.).
+ */
+const PREFIX_PHONEMES = Object.freeze({
+  un:  ['/u/', '/n/'],          // /ʌn/   – untie, unable, undo
+  re:  ['/r/', '/ē/'],          // /riː/  – redo, replay, reread
+  pre: ['/p/', '/r/', '/ē/'],   // /priː/ – preheat, preview
+  dis: ['/d/', '/i/', '/s/'],   // /dɪs/  – disagree, distrust
+  mis: ['/m/', '/i/', '/s/'],   // /mɪs/  – mismatch, misread
+  in:  ['/i/', '/n/'],          // /ɪn/   – inside (when truly a prefix)
+  im:  ['/i/', '/m/'],          // /ɪm/   – impossible
 });
 
 /**
  * Per-word overrides for cases the structural deriver cannot get right
- * (silent letters, irregular spellings, etc.). Keyed by word id.
+ * (silent letters, irregular spellings, sight words). Keyed by word id.
+ * The override is the canonical phoneme list — derivePhonemes returns a
+ * copy directly without consulting graphemes/types.
  */
 const PHONEME_OVERRIDES = Object.freeze({
-  // silent k: 'know' = /n/ + /ō/, 'knee' = /n/ + /ē/, etc.
-  // Add more as words are introduced. Only words whose `graphemes` start
-  // with 'kn' need an override here.
-  know: ['/n/', '/ō/'],
+  // Silent k: 'know' = /n/ + /ō/, 'knee' = /n/ + /ē/, etc.
+  // Only words whose `graphemes` start with 'kn' need an override here.
+  know:    ['/n/', '/ō/'],
+
+  // Sight / irregular words: spellings don't decode regularly, so the
+  // grapheme-based deriver produces nonsense like /be/+/cau/+/se/. These
+  // overrides surface accurate sound counts for the soundCount mode and
+  // give per-phoneme reveal an honest segmentation.
+  because: ['/b/', '/i/', '/k/', '/aw/', '/z/'],
+  enough:  ['/i/', '/n/', '/u/', '/f/'],
+  should:  ['/sh/', '/oo/', '/d/'],  // /ʃʊd/ — silent l, short oo
+  could:   ['/k/', '/oo/', '/d/'],   // /kʊd/ — silent l, short oo
+  their:   ['/th/', '/air/'],        // /ðer/ — r-controlled air sound
+
+  // Multisyllable words whose syllable graphemes ('mar', 'sci', 'gy',
+  // 'nough') don't decompose under the standard deriver. These are level
+  // 3 and rely on TTS for the whole-word read; the phoneme list here is
+  // for sound-count accuracy and parent-facing displays.
+  science: ['/s/', '/ī/', '/ə/', '/n/', '/s/'],
+  energy:  ['/e/', '/n/', '/er/', '/j/', '/i/'],
+  market:  ['/m/', '/ar/', '/k/', '/i/', '/t/'],
 });
 
 /**
@@ -196,9 +250,25 @@ function _phonemesForGrapheme(grapheme, type) {
   if (!grapheme) return [];
   switch (type) {
     case 'se': return [];                                    // silent e
-    case 'sf': return SUFFIX_PHONEMES[grapheme] || [`/${grapheme.replace(/^-/, '')}/`];
+    // Suffix lookup: tolerate both '-ing' and 'ing' as the grapheme
+    // key so word entries can drop the leading dash where the suffix
+    // is fused to the stem (e.g. 'tion' on `nation`, 'le' on `unable`).
+    case 'sf': return SUFFIX_PHONEMES[grapheme]
+                  || SUFFIX_PHONEMES[`-${grapheme}`]
+                  || SUFFIX_PHONEMES[grapheme.replace(/^-/, '')]
+                  || [`/${grapheme.replace(/^-/, '')}/`];
+    // Prefix lookup: the prefix tile decomposes into its constituent
+    // phonemes (un → /u/+/n/, re → /r/+/ē/). Falls back to one-phoneme-
+    // per-letter if the prefix isn't curated.
+    case 'p':  return PREFIX_PHONEMES[grapheme.toLowerCase()]
+                  || [...grapheme].map(ch => `/${ch}/`);
     case 'bl': return [...grapheme].map(ch => `/${ch}/`);    // blend: each letter is one sound
     case 'c':  return grapheme === 'x' ? ['/k/', '/s/'] : [`/${grapheme}/`];
+    // Soft consonants render as the sound they make, not the letter:
+    //   gem  = /j/+/e/+/m/   (not /g/)
+    //   rice = /r/+/ī/+/s/   (not /c/)
+    case 'soft_c': return ['/s/'];
+    case 'soft_g': return ['/j/'];
     // 'd' digraph, 'dp' diphthong, 'rc' r-controlled, 'sv' short vowel, 'lv' long vowel: 1 sound
     default:   return [`/${grapheme}/`];
   }
@@ -330,20 +400,73 @@ export function deriveSpellingPattern(word) {
 // adaptive review, remediation routing, and the lesson UI can spot
 // it. That's what `flags` and `decodableStage` are for.
 
-/** Words explicitly tagged as soft-c (c saying /s/). Hand-curated because
- *  the `c` type is the same for hard /k/ and soft /s/, so we can't infer
- *  it from types alone. Add words here as they enter the dataset. */
+/** Words explicitly tagged as soft-c (c saying /s/).
+ *
+ *  English orthography is reliable here: 'c' before e / i / y is almost
+ *  always soft (/s/). The exceptions are rare loanwords (e.g. 'Celtic'
+ *  for some speakers). We list HARD_C_EXCEPTIONS to avoid false positives
+ *  in the rule-based detector below, then this curated set documents the
+ *  soft-c words we want flagged even if they aren't yet in WORDS.
+ *
+ *  IMPORTANT: this list controls the `'soft-c'` flag only. To make the
+ *  AUDIO play /s/ instead of /k/, the relevant grapheme's entry in
+ *  `types[]` must be `'soft_c'` — that is the source of truth for audio.
+ */
 const SOFT_C_WORDS = Object.freeze(new Set([
-  // Currently no level 1 soft-c words in the dataset.
-  // Add 'ice', 'rice', 'race' etc. when they're introduced.
+  // Words currently in the dataset.
+  'race', 'science',
+  // Forward-looking: ce / ci / cy words likely to enter the curriculum.
+  // Listing them here ensures `deriveFlags` immediately tags them once
+  // their entries are added to WORDS.
+  'ice', 'rice', 'mice', 'nice', 'dice', 'lice', 'vice', 'price', 'slice',
+  'twice', 'space', 'place', 'face', 'lace', 'pace', 'grace', 'trace',
+  'cell', 'cent', 'city', 'cite', 'cyst', 'cyclone', 'cycle', 'civic',
+  'circle', 'center', 'centre', 'circus', 'centaur', 'ceiling',
+  'fence', 'dance', 'prince', 'since', 'once', 'rinse', 'sense', 'tense',
+  'voice', 'choice', 'juice', 'peace', 'piece', 'niece', 'force', 'source',
 ]));
 
-/** Words explicitly tagged as soft-g (g saying /j/). Same reason: type
- *  'c' is shared between hard /g/ (get, give, girl) and soft /j/ (gem,
- *  gym, gist), so the override list is the truth source. */
+/** Words explicitly tagged as soft-g (g saying /j/).
+ *
+ *  Unlike soft-c, soft-g is unreliable: 'get', 'give', 'gift', 'girl',
+ *  'gig', 'gear' and many others keep the hard /g/ sound before e/i/y.
+ *  We pair this curated set with HARD_G_EXCEPTIONS so the rule-based
+ *  detector below has a fighting chance.
+ *
+ *  IMPORTANT: same caveat as SOFT_C_WORDS — this drives the flag only.
+ *  Audio routing requires `'soft_g'` in the word's `types[]`.
+ */
 const SOFT_G_WORDS = Object.freeze(new Set([
-  'gem', 'gist', 'gym', 'huge',
-  // Add 'age', 'cage', 'sage' etc. when introduced.
+  // Words currently in the dataset.
+  'gem', 'gist', 'huge', 'energy',
+  // Forward-looking: ge / gi / gy words likely to enter the curriculum.
+  'gym', 'gel', 'germ', 'gene',
+  'age', 'cage', 'page', 'sage', 'rage', 'wage', 'stage', 'wage',
+  'large', 'change', 'orange', 'strange', 'arrange',
+  'edge', 'bridge', 'fridge', 'judge', 'badge', 'lodge', 'budge',
+  'magic', 'logic', 'fragile', 'agile', 'tragic',
+  'giant', 'giraffe', 'ginger', 'gentle', 'gentleman', 'general',
+  'danger', 'manager', 'agent', 'angel', 'engine', 'energy',
+  'college', 'village', 'message', 'package', 'language',
+]));
+
+/** 'c' before e/i/y that is pronounced HARD /k/ rather than soft /s/.
+ *  Very rare in English — the entries below are mostly defensive. */
+const HARD_C_EXCEPTIONS = Object.freeze(new Set([
+  // 'celtic' is hard /k/ for some speakers, soft /s/ for others.
+  // Add real-world exceptions here as they emerge.
+]));
+
+/** 'g' before e/i/y that stays HARD /g/. Required because soft-g is the
+ *  irregular case in English: get, give, girl etc. all defy the soft-g
+ *  pattern. Listed in lowercase. */
+const HARD_G_EXCEPTIONS = Object.freeze(new Set([
+  'get', 'give', 'given', 'gift', 'girl', 'gig', 'gild', 'gilt',
+  'gear', 'geek', 'geese', 'geezer', 'geld', 'gecko', 'gecko',
+  'girth', 'gird', 'girdle', 'gill', 'gimbal', 'gimmick',
+  'tiger', 'target', 'again', 'begin', 'finger', 'anger', 'linger',
+  'hunger', 'singer', 'longer', 'longest', 'bigger', 'biggest',
+  'ringing', 'singing', 'forget', 'forgive', 'together',
 ]));
 
 /** Graphemes that represent a doubled consonant producing one sound
@@ -373,13 +496,34 @@ export function deriveFlags(word) {
   if (!word) return [];
   const graphemes = Array.isArray(word.graphemes) ? word.graphemes : [];
   const types     = Array.isArray(word.types)     ? word.types     : [];
+  const wordText  = (word.word || '').toLowerCase();
   const flags     = [];
 
   if (graphemes.includes('x'))                                    flags.push('multi-phoneme-x');
   if (graphemes.includes('kn') || types.includes('se'))           flags.push('silent-letter');
   if (graphemes.some(g => DOUBLED_CONSONANT_GRAPHEMES.has(g)))    flags.push('doubled-consonant');
-  if (SOFT_C_WORDS.has(word.word))                                flags.push('soft-c');
-  if (SOFT_G_WORDS.has(word.word))                                flags.push('soft-g');
+
+  // Soft-c / soft-g detection. Three independent signals; any one flags
+  // the word:
+  //   1. The grapheme type is explicitly 'soft_c' / 'soft_g' (source of
+  //      truth for AUDIO too).
+  //   2. The word appears in the curated SOFT_C_WORDS / SOFT_G_WORDS set
+  //      (covers words that haven't been re-typed yet, plus forward-
+  //      looking words not yet in the dataset).
+  //   3. Rule-based: the spelling matches /c[eiy]/ or /g[eiy]/ AND the
+  //      word is not in HARD_C_EXCEPTIONS / HARD_G_EXCEPTIONS. This is a
+  //      safety net so newly-added words light up the right phonics
+  //      lesson even if a content author forgot to update the types[]
+  //      array. The HARD_* sets keep words like `get`, `girl`, `gift`
+  //      from being miscategorised.
+  const hasSoftCType = types.includes('soft_c');
+  const hasSoftGType = types.includes('soft_g');
+  const matchesSoftC = /c[eiy]/.test(wordText) && !HARD_C_EXCEPTIONS.has(wordText);
+  const matchesSoftG = /g[eiy]/.test(wordText) && !HARD_G_EXCEPTIONS.has(wordText);
+
+  if (hasSoftCType || SOFT_C_WORDS.has(wordText) || matchesSoftC)  flags.push('soft-c');
+  if (hasSoftGType || SOFT_G_WORDS.has(wordText) || matchesSoftG)  flags.push('soft-g');
+
   if (word.pattern === 'sight')                                   flags.push('irregular');
   if (typeof word.id === 'string' && /^[A-Z]/.test(word.id))      flags.push('capital');
 
@@ -535,7 +679,7 @@ export const WORDS = [
   // more short-e CVC
   { id:'vet',  word:'vet',  graphemes:['v','e','t'],   types:['c','sv','c'],  pattern:'CVC', group:'short-e', level:1, emoji:'🐕‍🦺' },
   { id:'web',  word:'web',  graphemes:['w','e','b'],   types:['c','sv','c'],  pattern:'CVC', group:'short-e', level:1, emoji:'🕸️' },
-  { id:'gem',  word:'gem',  graphemes:['g','e','m'],   types:['c','sv','c'],  pattern:'CVC', group:'short-e', level:1, emoji:'💎' },
+  { id:'gem',  word:'gem',  graphemes:['g','e','m'],   types:['soft_g','sv','c'],  pattern:'CVC', group:'short-e', level:1, emoji:'💎' },
   { id:'hem',  word:'hem',  graphemes:['h','e','m'],   types:['c','sv','c'],  pattern:'CVC', group:'short-e', level:1, emoji:'🪡' },
   { id:'pep',  word:'pep',  graphemes:['p','e','p'],   types:['c','sv','c'],  pattern:'CVC', group:'short-e', level:1, emoji:'⚡' },
   { id:'hex',  word:'hex',  graphemes:['h','e','x'],   types:['c','sv','c'],  pattern:'CVC', group:'short-e', level:1, emoji:'🔮' },
@@ -1156,7 +1300,7 @@ export const WORDS = [
   { id:'wilt',  word:'wilt',  graphemes:['w','i','lt'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🥀' },
   { id:'tilt',  word:'tilt',  graphemes:['t','i','lt'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'↗️' },
   { id:'mist',  word:'mist',  graphemes:['m','i','st'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🌫️' },
-  { id:'gist',  word:'gist',  graphemes:['g','i','st'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'📝' },
+  { id:'gist',  word:'gist',  graphemes:['g','i','st'],  types:['soft_g','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'📝' },
   { id:'sift',  word:'sift',  graphemes:['s','i','ft'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🫙' },
 
   /* ══════════════════════════════════════
@@ -1458,7 +1602,7 @@ export const WORDS = [
   { id:'coldest', word:'coldest', graphemes:['c','o','ld','-est'],  types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'🧊' },
   { id:'boldest', word:'boldest', graphemes:['b','o','ld','-est'],  types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'💪' },
   { id:'kindest', word:'kindest', graphemes:['k','i','nd','-est'],  types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'💛' },
-  { id:'oldest',  word:'oldest',  graphemes:['o','ld','-est'],      types:['sv','bl','sf'],     pattern:'suffix', group:'suffix-est', level:3, emoji:'🧓' },
+  { id:'oldest',  word:'oldest',  graphemes:['o','ld','-est'],      types:['lv','bl','sf'],     pattern:'suffix', group:'suffix-est', level:3, emoji:'🧓' },
 
   /* ══════════════════════════════════════
      EXPANSION PACK — NEW WORDS
@@ -1505,9 +1649,9 @@ export const WORDS = [
   { id:'than',  word:'than',  graphemes:['th','a','n'],   types:['d','sv','c'], pattern:'digraph', group:'digraphs', level:1, emoji:'⚖️' },
 
   // ── Morphology + multisyllabic + high-frequency sight words ─────────────
-  { id:'untie', word:'untie', graphemes:['un','t','ie'], types:['c','c','lv'], pattern:'prefix', group:'prefixes', level:2, emoji:'🎀' },
-  { id:'redo', word:'redo', graphemes:['re','d','o'], types:['c','c','lv'], pattern:'prefix', group:'prefixes', level:2, emoji:'🔁' },
-  { id:'unable', word:'unable', graphemes:['un','a','b','le'], types:['c','sv','c','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🚫' },
+  { id:'untie', word:'untie', graphemes:['un','t','ie'], types:['p','c','lv'], pattern:'prefix', group:'prefixes', level:2, emoji:'🎀' },
+  { id:'redo', word:'redo', graphemes:['re','d','o'], types:['p','c','lv'], pattern:'prefix', group:'prefixes', level:2, emoji:'🔁' },
+  { id:'unable', word:'unable', graphemes:['un','a','b','le'], types:['p','sv','c','sf'], pattern:'prefix-suffix', group:'suffixes-advanced', level:3, emoji:'🚫' },
   { id:'readable', word:'readable', graphemes:['r','ea','d','a','ble'], types:['c','lv','c','sv','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'📘' },
   { id:'action', word:'action', graphemes:['a','c','tion'], types:['sv','c','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🎬' },
   { id:'nation', word:'nation', graphemes:['n','a','tion'], types:['c','lv','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🇸🇬' },
@@ -1632,10 +1776,13 @@ export function getWordStructure(word) {
 
   if (leadTypes.length === 0 || trailTypes.length === 0) return 'other';
 
+  // soft_c / soft_g are still simple single-grapheme consonants
+  // structurally — only their sound differs from hard c/g.
+  const isSimpleConsonant = (t) => t === 'c' || t === 'soft_c' || t === 'soft_g';
   const leadComplex  = leadTypes.some(t => t === 'bl' || t === 'd');
-  const leadSimple   = leadTypes.length === 1 && leadTypes[0] === 'c';
+  const leadSimple   = leadTypes.length === 1 && isSimpleConsonant(leadTypes[0]);
   const trailComplex = trailTypes.some(t => t === 'bl' || t === 'd');
-  const trailSimple  = trailTypes.length === 1 && trailTypes[0] === 'c';
+  const trailSimple  = trailTypes.length === 1 && isSimpleConsonant(trailTypes[0]);
 
   if (leadSimple  && trailSimple)  return 'CVC';
   if (leadComplex && trailSimple)  return 'CCVC';
@@ -1686,8 +1833,41 @@ export const ADVANCED_GROUP_ORDER = [
   'prefixes', 'suffixes-advanced', 'multisyllable', 'sight-highfreq',
 ];
 
-const KNOWN_PREFIXES = ['re', 'un', 'dis', 'pre'];
-const KNOWN_SUFFIXES = ['ing', 'ed', 'er', 'est', 'tion', 'able', 'ful', 'less'];
+/**
+ * Conservative list of prefixes used by `getMorphologyParts` and exported
+ * for downstream consumers (wordVault affix mode shares this list to
+ * keep splitting consistent across the app). Order matters: longer
+ * prefixes appear first so `dis` wins over `d` etc.
+ *
+ * Tightly scoped on purpose — adding 'in' / 'im' here would mis-flag
+ * common non-prefixed words ('inch', 'image'). The wordVault affix mode
+ * augments this list with KNOWN_PREFIXES_EXTENDED inside an explicit
+ * affix exercise where false positives aren't a risk.
+ */
+export const KNOWN_PREFIXES = Object.freeze(['dis', 'pre', 'mis', 'un', 're']);
+
+/**
+ * Conservative list of suffixes. Same caveats as KNOWN_PREFIXES — longer
+ * suffixes first ('tion' before 't'); only include suffixes whose presence
+ * is a near-certain morphological signal across general vocabulary.
+ */
+export const KNOWN_SUFFIXES = Object.freeze([
+  'tion', 'sion', 'able', 'ible', 'ment', 'ness', 'less',
+  'ful', 'ing', 'est', 'ed', 'er',
+]);
+
+/**
+ * Extended affix lists for affix-exercise contexts (Word Vault's
+ * morphological affix mode) where the input is already known to be a
+ * prefixed/suffixed word. Safe to include short, ambiguous affixes here
+ * because the caller has already committed to splitting morphologically.
+ */
+export const KNOWN_PREFIXES_EXTENDED = Object.freeze([
+  ...KNOWN_PREFIXES, 'in', 'im', 'sub', 'non',
+]);
+export const KNOWN_SUFFIXES_EXTENDED = Object.freeze([
+  ...KNOWN_SUFFIXES, 'ly',
+]);
 
 /**
  * Split a word into morphological parts for prefix/suffix activities.
