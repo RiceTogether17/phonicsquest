@@ -34,6 +34,7 @@
  * a time.
  */
 import { CURRICULUM } from '../data/curriculum.js';
+import { getTrickyWordsForPhase } from '../data/trickyWords.js';
 import { store } from './store.js';
 import { progress } from './progress.js';
 
@@ -311,6 +312,23 @@ export function explainLockReason(stageId, snapshot = buildProgressionSnapshot()
     if (c.reason === 'no-decoding-data')       return `${label}: practise this stage first`;
     return `${label}: not yet`;
   }).join(' · ');
+}
+
+/**
+ * Tricky high-frequency words the learner should be working on at their
+ * current curriculum phase. Returns 0–8 entries (phases 1 and 5 have the
+ * most; later phases taper off as more become fully decodable). UI can
+ * surface these alongside the next stage so early decodable sentences
+ * have `the`, `a`, `I`, `to`, `was`, `said`, `you`, `my` available from
+ * phase 1 rather than waiting for the old phase-10 sight-word bucket.
+ *
+ * @param {ProgressionSnapshot=} snapshot
+ * @returns {Array<import('../data/trickyWords.js').TrickyWord>}
+ */
+export function getTrickyWordsForCurrentStage(snapshot = buildProgressionSnapshot()) {
+  const stage = getRecommendedStage(snapshot);
+  if (!stage) return [];
+  return getTrickyWordsForPhase(stage.phase);
 }
 
 /**
