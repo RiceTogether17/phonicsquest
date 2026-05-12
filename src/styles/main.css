@@ -1285,7 +1285,7 @@ input, select, textarea { font-family: inherit; }
 .mic-btn {
   position: fixed;
   bottom: 24px;
-  right: max(24px, calc(50% - 240px + 24px));
+  right: max(24px, calc(50% - var(--content-half) + 24px));
   width: 64px; height: 64px;
   border-radius: var(--radius-full);
   background: var(--color-secondary);
@@ -1310,7 +1310,7 @@ input, select, textarea { font-family: inherit; }
 .speech-bubble {
   position: fixed;
   bottom: 100px;
-  right: max(16px, calc(50% - 240px + 16px));
+  right: max(16px, calc(50% - var(--content-half) + 16px));
   max-width: 200px;
   background: var(--surface);
   border: 2px solid var(--border);
@@ -1393,7 +1393,7 @@ input, select, textarea { font-family: inherit; }
 .mascot-float {
   position: fixed;
   bottom: -10px;
-  left: max(10px, calc(50% - 240px + 10px));
+  left: max(10px, calc(50% - var(--content-half) + 10px));
   width: 80px; height: 80px;
   z-index: 200;
   pointer-events: none;
@@ -1408,7 +1408,7 @@ input, select, textarea { font-family: inherit; }
 .toast-container {
   position: fixed;
   top: 80px;
-  right: max(16px, calc(50% - 240px + 16px));
+  right: max(16px, calc(50% - var(--content-half) + 16px));
   z-index: 5000;
   display: flex;
   flex-direction: column;
@@ -8338,7 +8338,22 @@ details.story-tool-section[open] > .story-tool-summary::before {
 :root {
   --surface-3: #ece8ff;
   --outline-ring: color-mix(in srgb, var(--color-primary) 40%, transparent);
-  --content-max: 560px;
+
+  /* Responsive content widths.
+     Each variable below is the cap a given UI band should respect;
+     they grow at the breakpoints further down so the app feels
+     focused on phones and spacious on tablets/desktops. */
+  --content-max:   560px;                       /* card-aesthetic shell cap */
+  --shell-max:     min(100%, var(--content-max));
+  --panel-max:     min(100%, 540px);            /* generic card/panel cap */
+  --reading-max:   min(100%, 720px);            /* prose/passages cap */
+  --grid-max:      min(100%, 720px);            /* mode/quest browser grids */
+
+  /* Half of the active shell width — drives anchoring of floating
+     UI (mic, speech bubble, mascot, toasts) to the content edge
+     across every viewport size. Falls back to 0 below the card width
+     so the max(...) wrapper pins floaters to the viewport edge. */
+  --content-half:  calc(var(--content-max) / 2);
 }
 
 html {
@@ -8354,7 +8369,8 @@ body {
 }
 
 #app {
-  max-width: min(100%, var(--content-max));
+  max-width: var(--shell-max);
+  margin-inline: auto;
   border: 1px solid color-mix(in srgb, var(--border) 70%, var(--color-primary) 30%);
   border-radius: 28px;
 }
@@ -8461,6 +8477,18 @@ textarea:hover {
 
 /* Better desktop ergonomics while preserving single-column pedagogy. */
 @media (min-width: 720px) {
+  :root {
+    /* On tablets, let the shell breathe out of its narrow phone card
+       but keep the centred, focused feel. Panels can expand to use
+       the extra width. */
+    --content-max: 900px;
+    --shell-max:   min(96vw, 1000px);
+    --panel-max:   min(100%, 760px);
+    --reading-max: min(100%, 820px);
+    --grid-max:    min(100%, 880px);
+    --content-half: calc(min(96vw, 1000px) / 2);
+  }
+
   body {
     padding: var(--space-6);
   }
@@ -8472,6 +8500,118 @@ textarea:hover {
   .screen {
     padding-inline: var(--space-6);
   }
+}
+
+/* Desktop: full-width shell, panels open up to use the real estate. */
+@media (min-width: 1024px) {
+  :root {
+    --content-max: 1140px;
+    --shell-max:   min(96vw, 1280px);
+    --panel-max:   min(100%, 980px);
+    --reading-max: min(100%, 920px);
+    --grid-max:    min(100%, 1100px);
+    --content-half: calc(min(96vw, 1280px) / 2);
+  }
+
+  body {
+    padding: var(--space-6) var(--space-8);
+  }
+
+  #app {
+    /* The "phone card" border softens on desktop so the shell reads
+       as a full-bleed surface rather than a floating tile. */
+    border-color: color-mix(in srgb, var(--border) 90%, var(--color-primary) 10%);
+  }
+}
+
+/* Large desktops: maintain comfortable maximums without going edge-to-edge. */
+@media (min-width: 1440px) {
+  :root {
+    --content-max: 1280px;
+    --shell-max:   min(94vw, 1440px);
+    --panel-max:   min(100%, 1100px);
+    --reading-max: min(100%, 980px);
+    --grid-max:    min(100%, 1200px);
+    --content-half: calc(min(94vw, 1440px) / 2);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Panel cap relaxation for tablet+ screens.
+   Many panels declared explicit max-widths in the 400–500px range early
+   in the file. Those caps make sense on phones but feel cramped on
+   tablets/desktops. We relax them at ≥720px (panel cap) and again at
+   ≥1024px (more generous), while leaving phones untouched.
+   ────────────────────────────────────────────────────────────────────────── */
+@media (min-width: 720px) {
+  /* Cards & dialog-style panels */
+  .modal-panel,
+  .ob-panel,
+  .ss-wrapper,
+  .wr-panel,
+  .cb-panel,
+  .br-panel,
+  .pt-wrapper,
+  .pt-skip-confirm__card,
+  .sq-question-card,
+  .sq-options,
+  .sq-feedback,
+  .sq-grammar-list,
+  .sq-progress-bar,
+  .stories-screen-header,
+  .stories-banner {
+    max-width: var(--panel-max);
+    margin-inline: auto;
+  }
+
+  /* Hero zone — already widens to 680px on desktop in the existing rule;
+     give it the same breathing room on tablets too. */
+  .home-hero-zone {
+    max-width: var(--panel-max);
+  }
+
+  /* Quest browsers / games — the "playfield" cards */
+  .sfq-browser,
+  .cloze-browser,
+  .wv-browser,
+  .wv-level-browser,
+  .sm-game,
+  .cloze-game,
+  .sfq-game,
+  .wv-game {
+    max-width: var(--grid-max);
+  }
+
+  /* Long-form reading passages — keep them measure-friendly */
+  .cloze-passage,
+  .wv-passage-text,
+  .cc-quest__passage,
+  .cc-quest__text {
+    max-width: var(--reading-max);
+    margin-inline: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* Desktop: dialogs stay dialogs (not full-bleed) but more generous */
+  .modal-panel { max-width: min(96vw, 760px); }
+  .modal-panel--wide { max-width: min(96vw, 1080px); }
+
+  /* Game/quest playfields can spread further on desktop */
+  .sfq-browser,
+  .cloze-browser,
+  .wv-browser,
+  .wv-level-browser,
+  .sm-game,
+  .cloze-game,
+  .sfq-game,
+  .wv-game {
+    max-width: var(--grid-max);
+  }
+
+  /* Action bar primary button shouldn't be a tiny 200px control
+     stranded in a sea of whitespace */
+  .action-bar #btn-check { max-width: 320px; }
 }
 
 /* Honor OS reduced-motion preference for all transitions/animations. */
