@@ -49,6 +49,7 @@ import { buildCopySummaryText, buildParentReport, getModeConfig, getNextStepReco
 import { incrementHintUsage } from './hintUsage.js';
 import { buildWhyWrongExplanation, getBlankSkillMeta, getClueTypeLabel, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
 import { getTopWeakSkills, recordWeakSkills } from './clozeCompletionTracker.js';
+import { KNOWN_PREFIXES_EXTENDED, KNOWN_SUFFIXES_EXTENDED } from '../data/words.js';
 import { getTopMasteryGaps, recordMasteryAttempt, summariseMasteryGap } from './masteryMap.js';
 import { getActiveProfile } from '../modules/profiles.js';
 
@@ -176,8 +177,10 @@ export function getWordVaultStars({ accuracy = 0, hintsUsed = 0 }) {
 
 export function buildAffixParts(answer, hint = '') {
   const lower = (answer || '').toLowerCase();
-  const knownPrefixes = ['un', 're', 'dis', 'mis', 'in', 'im'];
-  const knownSuffixes = ['ing', 'ed', 'ly', 'er', 'est', 'ful', 'less', 'tion', 'sion', 'ment', 'ness', 'able', 'ible'];
+  // Source of truth lives in src/data/words.js so morphology splits stay
+  // consistent across the app (helpers, audio, lesson UI).
+  const knownPrefixes = KNOWN_PREFIXES_EXTENDED;
+  const knownSuffixes = KNOWN_SUFFIXES_EXTENDED;
   const hintAffix = (hint.match(/(un-|re-|dis-|mis-|in-|im-|-ing|-ed|-ly|-er|-est|-ful|-less|-tion|-sion|-ment|-ness|-able|-ible)/i) || [])[0];
 
   const normalizedHintAffix = hintAffix ? hintAffix.replace(/^-/, '').replace(/-$/, '') : '';

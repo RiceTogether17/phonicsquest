@@ -80,6 +80,24 @@ const PHONEME_FILES = {
 };
 
 /**
+ * Pronunciation map for PREFIX tiles (type 'p' on the word entry).
+ *
+ * Without this, a 'un' grapheme would fall through to `_playPhonemeAudio('un')`,
+ * which lacks a PHONEME_FILES entry and would speak the literal text "un"
+ * via TTS. Splitting each prefix into its real phoneme sequence makes the
+ * Blend It / per-phoneme reveal mode sound correct.
+ */
+const PREFIX_PRONUNCIATION = {
+  un:  ['u', 'n'],
+  re:  ['r', 'long_e'],
+  pre: ['p', 'r', 'long_e'],
+  dis: ['d', 'i', 's'],
+  mis: ['m', 'i', 's'],
+  in:  ['i', 'n'],
+  im:  ['i', 'm'],
+};
+
+/**
  * Explicit pronunciation map for affix / suffix chunks.
  *
  * Consonant+le endings, reduced-vowel suffixes, and other affixes where
@@ -291,6 +309,19 @@ class AudioManager {
       for (let i = 0; i < grapheme.length; i++) {
         if (i > 0) await this._delay(80);
         await this._playPhonemeAudio(grapheme[i]);
+      }
+      return;
+    }
+
+    // Prefix tile — play the curated phoneme sequence (un → /u/+/n/,
+    // re → /r/+/ē/, pre → /p/+/r/+/ē/). Falls back to per-letter playback
+    // if the prefix isn't in PREFIX_PRONUNCIATION.
+    if (type === 'p') {
+      const seq = PREFIX_PRONUNCIATION[grapheme.toLowerCase()];
+      const sequence = seq ?? [...grapheme];
+      for (let i = 0; i < sequence.length; i++) {
+        if (i > 0) await this._delay(80);
+        await this._playPhonemeAudio(sequence[i]);
       }
       return;
     }

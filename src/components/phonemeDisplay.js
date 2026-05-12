@@ -17,6 +17,7 @@ const TYPE_CLASS = {
   rc: 'r-control',
   dp: 'diphthong',
   sf: 'suffix',
+  p:  'suffix',                // prefix tile reuses the suffix tile colour
   soft_c: 'consonant',
   soft_g: 'consonant',
 };
@@ -32,6 +33,7 @@ const TYPE_LABEL = {
   rc: 'r-controlled',
   dp: 'diphthong',
   sf: 'suffix',
+  p:  'prefix',
   soft_c: 'soft c (/s/)',
   soft_g: 'soft g (/j/)',
 };
