@@ -49,9 +49,10 @@ import {
 import {
   getMissionSummary, markMissionStepDone,
 } from './modules/missionToday.js';
+import { CURRICULUM, PHASE_LABELS } from './data/curriculum.js';
 import {
-  CURRICULUM, PHASE_LABELS, getUnlockedStages, getRecommendedStage,
-} from './data/curriculum.js';
+  buildProgressionSnapshot, getUnlockedStages, getRecommendedStage, explainLockReason,
+} from './modules/progression.js';
 import { SCREENS, QUEST_THRESHOLDS } from './constants.js';
 import { modalManager } from './modules/modalManager.js';
 import { keyboardManager } from './modules/keyboardManager.js';
@@ -2188,8 +2189,9 @@ class App {
    */
   _openBlendPicker() {
     const groupMastery = store.get('groupMastery') || {};
-    const unlocked     = getUnlockedStages(groupMastery);
-    const recommended  = getRecommendedStage(groupMastery);
+    const snapshot     = buildProgressionSnapshot();
+    const unlocked     = getUnlockedStages(snapshot);
+    const recommended  = getRecommendedStage(snapshot);
 
     document.getElementById('modal-blend-picker')?.remove();
 
@@ -2210,6 +2212,9 @@ class App {
         const pct        = Math.round(mastery * 100);
         const lockedCls  = isUnlocked ? '' : 'bp-stage--locked';
         const recCls     = isRec      ? 'bp-stage--recommended' : '';
+        // When locked, show *why* — the strict gate's failed checks. Helps
+        // a parent see "ah, only 8/12 unique words" rather than a bare 🔒.
+        const lockReason = isUnlocked ? '' : (explainLockReason(stage.id, snapshot) || '');
 
         stagesHtml += `
           <button class="bp-stage ${lockedCls} ${recCls}"
@@ -2228,7 +2233,7 @@ class App {
                     <div class="bp-stage-mastery-bar" style="width:${pct}%"></div>
                   </div>
                   <span class="bp-stage-pct${pct >= 80 ? ' bp-stage-pct--mastered' : ''}">${pct}%</span>
-                </div>` : ''}
+                </div>` : lockReason ? `<div class="bp-stage-lock-reason">${lockReason}</div>` : ''}
             </div>
           </button>`;
       }
