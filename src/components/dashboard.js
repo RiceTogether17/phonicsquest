@@ -8,7 +8,8 @@ import { store } from '../modules/store.js';
 import { badges } from '../modules/badges.js';
 import { getActiveProfile, getProfiles } from '../modules/profiles.js';
 import { WORD_GROUPS, GROUP_ORDER, WORDS } from '../data/words.js';
-import { CURRICULUM, getUnlockedStages } from '../data/curriculum.js';
+import { CURRICULUM } from '../data/curriculum.js';
+import { getUnlockedStages, buildProgressionSnapshot } from '../modules/progression.js';
 import {
   getLearnerSummary,
   getLiteracyDomains,
@@ -803,7 +804,7 @@ function _renderLearningPath(stats) {
   const container = document.getElementById('learning-path');
   if (!container) return;
 
-  const unlocked = getUnlockedStages(stats.groupMastery);
+  const unlocked = getUnlockedStages(buildProgressionSnapshot());
 
   container.innerHTML = CURRICULUM.map(stage => {
     const isUnlocked = unlocked.includes(stage.id);

@@ -67,6 +67,15 @@ export function getSkillForMode(modeKey) {
 
 class Progress {
   /**
+   * Public wrapper around _filterByGroup. Used by progression.js to
+   * enumerate words in a curriculum stage's group without reaching into
+   * the singleton's internals.
+   */
+  getWordsInGroup(group, maxLevel = null) {
+    return this._filterByGroup(group, maxLevel);
+  }
+
+  /**
    * Filter WORDS by structural group, with an optional level cap.
    * @param {string} group
    * @param {number|null} [maxLevel]

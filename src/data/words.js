@@ -118,10 +118,32 @@ export const WORD_GROUPS = {
  *                                   blends ('flat' = 4), 'x' ('tax' = 4), or silent letters
  *                                   ('know' = 2). Use this — never graphemes.length — to count
  *                                   sounds.
- * @property {string}   pattern   - 'CVC' | 'CVCe' | 'blend' | 'digraph' | 'other'
+ * @property {string}   pattern   - VISUAL spelling structure used for adaptive distractor
+ *                                  matching and curriculum-stage alignment:
+ *                                  'CVC' | 'CVCe' | 'blend' | 'digraph' | 'sight' | 'other'.
+ *                                  NOTE: this is the *spelling* shape, not the *phoneme* count.
+ *                                  `tax` keeps pattern:'CVC' even though it has 4 phonemes
+ *                                  because it is taught alongside cat and hat. For sound count,
+ *                                  always read `phonemes.length`. For "this word has a tricky
+ *                                  feature" routing, read `flags`.
  * @property {string}   group     - key into WORD_GROUPS
  * @property {number}   level     - 1 (easy) → 3 (hard)
  * @property {string}   emoji     - emoji illustration
+ * @property {string=}  spellingPattern - long-vowel / diphthong micro-stage selector
+ *                                       ('ae', 'ai', 'ay', 'ee', 'ea', 'ie', 'igh', 'y',
+ *                                        'oe', 'oa', 'ow', 'ue', 'uue', 'ew', 'oo', 'oi',
+ *                                        'ou', 'aw'). null for short-vowel / structural words.
+ * @property {string[]} [flags]   - problematic-feature flags, derived from data:
+ *                                  'multi-phoneme-x' (tax=/t/+/a/+/k/+/s/),
+ *                                  'silent-letter' (know, cake silent-e),
+ *                                  'doubled-consonant' (kiss, well — one sound, two letters),
+ *                                  'soft-c' / 'soft-g' (curated override list),
+ *                                  'irregular' (sight words),
+ *                                  'capital' (proper nouns).
+ * @property {string=}  decodableStage - the curriculum stage id where this word is fully
+ *                                       decodable (e.g. 'cvc-a', 'long-a-ae', 'digraphs').
+ *                                       Used by remediation routing: if the child fails on
+ *                                       `cake` the engine knows to drop them at 'long-a-ae'.
  */
 
 // ── Phoneme derivation ───────────────────────────────────────────────────────
@@ -292,6 +314,147 @@ export function deriveSpellingPattern(word) {
     if (graphemes.includes('aw') || graphemes.includes('au') || graphemes.includes('cau')) return 'aw';
     return null;
   }
+
+  return null;
+}
+
+// ── Word-quality flags + decodable-stage routing (review item #5) ───────────
+//
+// The `pattern` field on each word is the *visual spelling structure*
+// (CVC, CVCe, blend, digraph, sight…). It deliberately stays aligned to
+// the curriculum stage where the word is taught — so `tax` keeps
+// pattern:'CVC' even though it has four phonemes (/t/ /a/ /k/ /s/),
+// because it IS taught in the cvc-a stage alongside cat and hat.
+//
+// What WAS missing: a way to flag the "tax is special" exception so
+// adaptive review, remediation routing, and the lesson UI can spot
+// it. That's what `flags` and `decodableStage` are for.
+
+/** Words explicitly tagged as soft-c (c saying /s/). Hand-curated because
+ *  the `c` type is the same for hard /k/ and soft /s/, so we can't infer
+ *  it from types alone. Add words here as they enter the dataset. */
+const SOFT_C_WORDS = Object.freeze(new Set([
+  // Currently no level 1 soft-c words in the dataset.
+  // Add 'ice', 'rice', 'race' etc. when they're introduced.
+]));
+
+/** Words explicitly tagged as soft-g (g saying /j/). Same reason: type
+ *  'c' is shared between hard /g/ (get, give, girl) and soft /j/ (gem,
+ *  gym, gist), so the override list is the truth source. */
+const SOFT_G_WORDS = Object.freeze(new Set([
+  'gem', 'gist', 'gym', 'huge',
+  // Add 'age', 'cage', 'sage' etc. when introduced.
+]));
+
+/** Graphemes that represent a doubled consonant producing one sound
+ *  (kiss = /k/ /ĭ/ /s/, NOT /k/ /ĭ/ /s/ /s/). Excludes ck/ng/sh/ch/th
+ *  because those are true digraphs, taught as a unit elsewhere. */
+const DOUBLED_CONSONANT_GRAPHEMES = Object.freeze(new Set([
+  'tt', 'nn', 'gg', 'ff', 'll', 'ss', 'pp', 'bb', 'rr', 'mm', 'dd', 'zz',
+]));
+
+/**
+ * Per-word feature flags. Returned as an array (possibly empty) for
+ * easy serialisation. Stable order is alphabetical.
+ *
+ * Known flags:
+ *   - 'multi-phoneme-x'    Single grapheme 'x' = /ks/ (tax, fox, six).
+ *                          The word IS in a CVC stage but has 4 phonemes.
+ *   - 'soft-c' | 'soft-g'  Letter making the soft sound (curated overrides).
+ *   - 'silent-letter'      Has silent-e ('se' type), or silent-k ('kn' grapheme).
+ *   - 'doubled-consonant'  Has tt/nn/gg/ff/ll/ss/pp/bb/rr/mm/dd/zz.
+ *   - 'irregular'          pattern==='sight' — not regularly decodable.
+ *   - 'capital'            Proper noun (id starts with a capital letter).
+ *
+ * @param {Word} word
+ * @returns {string[]}
+ */
+export function deriveFlags(word) {
+  if (!word) return [];
+  const graphemes = Array.isArray(word.graphemes) ? word.graphemes : [];
+  const types     = Array.isArray(word.types)     ? word.types     : [];
+  const flags     = [];
+
+  if (graphemes.includes('x'))                                    flags.push('multi-phoneme-x');
+  if (graphemes.includes('kn') || types.includes('se'))           flags.push('silent-letter');
+  if (graphemes.some(g => DOUBLED_CONSONANT_GRAPHEMES.has(g)))    flags.push('doubled-consonant');
+  if (SOFT_C_WORDS.has(word.word))                                flags.push('soft-c');
+  if (SOFT_G_WORDS.has(word.word))                                flags.push('soft-g');
+  if (word.pattern === 'sight')                                   flags.push('irregular');
+  if (typeof word.id === 'string' && /^[A-Z]/.test(word.id))      flags.push('capital');
+
+  return flags.sort();
+}
+
+/**
+ * Groups that map *directly* to a named curriculum stage rather than to
+ * a structural-vowel cell. The deriver consults this set BEFORE doing
+ * the structural inference, because words like `ship` (group:'digraphs')
+ * are structurally CCVC but pedagogically belong in the digraphs phase —
+ * the `sh` digraph needs that phase unlocked. Same idea for the
+ * suffix-* words: `running` is structurally CVC but belongs in
+ * suffix-ing.
+ */
+const NAMED_STAGE_GROUPS = Object.freeze(new Set([
+  'digraphs',
+  'multisyllable',
+  'prefixes',
+  'suffixes-advanced',
+  'sight-highfreq',
+  'suffix-ing', 'suffix-ed', 'suffix-er', 'suffix-est',
+]));
+
+/**
+ * Curriculum stage id where this word is first fully decodable. Used by
+ * remediation routing: if a child fails on `cake`, the engine knows to
+ * point them at 'long-a-ae' rather than guessing.
+ *
+ * Resolution order (most specific wins):
+ *   1. Long-vowel / diphthong micro-stage from spellingPattern.
+ *   2. Named curriculum-stage group (digraphs, suffix-ing, prefixes…).
+ *      Wins over structural inference because the named group encodes
+ *      the actually-taught stage.
+ *   3. Structural-vowel stage (cvc-X / ccvc-X / cvcc-X / ccvcc-X) from
+ *      getWordStructure + getShortVowelLetter.
+ *   4. The word's group as-is (for groups without an explicit curriculum
+ *      stage, e.g. 'r-controlled' — the field still gives the remediation
+ *      router a routing key).
+ *
+ * @param {Word} word
+ * @returns {string|null}
+ */
+export function deriveDecodableStage(word) {
+  if (!word) return null;
+
+  // 1. Long-vowel / diphthong micro-stage.
+  if (word.spellingPattern) {
+    if (word.group?.startsWith('long-')) return `${word.group}-${word.spellingPattern}`;
+    if (word.group === 'diphthongs')     return `dip-${word.spellingPattern}`;
+  }
+
+  // 2. Named curriculum-stage groups beat structural inference. `ship`
+  //    is structurally CCVC but pedagogically belongs in the digraphs
+  //    phase; `running` is structurally CVC but belongs in suffix-ing.
+  if (NAMED_STAGE_GROUPS.has(word.group)) return word.group;
+
+  // 2b. pattern:'digraph' catches words like `ash` where the group is
+  //     the vowel ('short-a') but the word itself contains a digraph.
+  //     The digraphs stage is where it's first decodable.
+  if (word.pattern === 'digraph') return 'digraphs';
+
+  // 3. Structural-vowel stage. Even when word.group is the legacy
+  //    'short-a' or the generic 'blends', the structure+vowel pin down
+  //    the curriculum cell exactly.
+  const structure = getWordStructure(word);
+  const vowel     = getShortVowelLetter(word);
+  if (structure !== 'other' && vowel) {
+    return `${structure.toLowerCase()}-${vowel}`;
+  }
+
+  // 4. Direct group fallback (covers r-controlled, blends-review, etc.
+  //    where the curriculum doesn't have a leaf stage but the group is
+  //    still a meaningful routing key).
+  if (word.group) return word.group;
 
   return null;
 }
@@ -1358,14 +1521,19 @@ export const WORDS = [
   { id:'could', word:'could', graphemes:['c','ou','ld'], types:['c','dp','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'💡' },
 ];
 
-// Attach `phonemes` and `spellingPattern` to every word at load time, so
-// consumers don't need to call the deriver every time. phonemes.length is
-// the true sound count (graphemes.length is wrong for silent-e, blends,
-// 'x' words, silent letters). spellingPattern is the long-vowel/diphthong
-// micro-stage selector (null for everything else).
+// Attach `phonemes`, `spellingPattern`, `flags`, and `decodableStage` to
+// every word at load time, so consumers don't need to call the derivers
+// every time. phonemes.length is the true sound count (graphemes.length
+// is wrong for silent-e, blends, 'x' words, silent letters).
+// spellingPattern is the long-vowel/diphthong micro-stage selector
+// (null elsewhere). flags surface problematic features
+// (multi-phoneme-x, soft-c/g, doubled-consonant, irregular).
+// decodableStage is the curriculum-stage id the word belongs to.
 for (const w of WORDS) {
   if (!Array.isArray(w.phonemes))                  w.phonemes        = derivePhonemes(w);
   if (typeof w.spellingPattern === 'undefined')    w.spellingPattern = deriveSpellingPattern(w);
+  if (!Array.isArray(w.flags))                     w.flags           = deriveFlags(w);
+  if (typeof w.decodableStage === 'undefined')     w.decodableStage  = deriveDecodableStage(w);
 }
 
 /**
@@ -1569,6 +1737,8 @@ export function loadCustomWords() {
       if (w && w.id && w.word && !existingIds.has(w.id)) {
         if (!Array.isArray(w.phonemes))               w.phonemes        = derivePhonemes(w);
         if (typeof w.spellingPattern === 'undefined') w.spellingPattern = deriveSpellingPattern(w);
+        if (!Array.isArray(w.flags))                  w.flags           = deriveFlags(w);
+        if (typeof w.decodableStage === 'undefined')  w.decodableStage  = deriveDecodableStage(w);
         WORDS.push(w);
         existingIds.add(w.id);
       }

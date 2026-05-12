@@ -3889,6 +3889,15 @@ details.story-tool-section[open] > .story-tool-summary::before {
   margin-top: 2px;
 }
 
+/* Strict-gate explanation shown under a locked stage so the parent can see
+ * which criterion blocks unlock (decoding %, unique words, sessions, etc.). */
+.bp-stage-lock-reason {
+  margin-top: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 .bp-stage-mastery-row {
   display: flex;
   align-items: center;
