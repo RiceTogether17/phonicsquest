@@ -199,6 +199,11 @@ function _phonemesForGrapheme(grapheme, type) {
     case 'sf': return SUFFIX_PHONEMES[grapheme] || [`/${grapheme.replace(/^-/, '')}/`];
     case 'bl': return [...grapheme].map(ch => `/${ch}/`);    // blend: each letter is one sound
     case 'c':  return grapheme === 'x' ? ['/k/', '/s/'] : [`/${grapheme}/`];
+    // Soft consonants render as the sound they make, not the letter:
+    //   gem  = /j/+/e/+/m/   (not /g/)
+    //   rice = /r/+/ī/+/s/   (not /c/)
+    case 'soft_c': return ['/s/'];
+    case 'soft_g': return ['/j/'];
     // 'd' digraph, 'dp' diphthong, 'rc' r-controlled, 'sv' short vowel, 'lv' long vowel: 1 sound
     default:   return [`/${grapheme}/`];
   }
@@ -330,20 +335,73 @@ export function deriveSpellingPattern(word) {
 // adaptive review, remediation routing, and the lesson UI can spot
 // it. That's what `flags` and `decodableStage` are for.
 
-/** Words explicitly tagged as soft-c (c saying /s/). Hand-curated because
- *  the `c` type is the same for hard /k/ and soft /s/, so we can't infer
- *  it from types alone. Add words here as they enter the dataset. */
+/** Words explicitly tagged as soft-c (c saying /s/).
+ *
+ *  English orthography is reliable here: 'c' before e / i / y is almost
+ *  always soft (/s/). The exceptions are rare loanwords (e.g. 'Celtic'
+ *  for some speakers). We list HARD_C_EXCEPTIONS to avoid false positives
+ *  in the rule-based detector below, then this curated set documents the
+ *  soft-c words we want flagged even if they aren't yet in WORDS.
+ *
+ *  IMPORTANT: this list controls the `'soft-c'` flag only. To make the
+ *  AUDIO play /s/ instead of /k/, the relevant grapheme's entry in
+ *  `types[]` must be `'soft_c'` — that is the source of truth for audio.
+ */
 const SOFT_C_WORDS = Object.freeze(new Set([
-  // Currently no level 1 soft-c words in the dataset.
-  // Add 'ice', 'rice', 'race' etc. when they're introduced.
+  // Words currently in the dataset.
+  'race', 'science',
+  // Forward-looking: ce / ci / cy words likely to enter the curriculum.
+  // Listing them here ensures `deriveFlags` immediately tags them once
+  // their entries are added to WORDS.
+  'ice', 'rice', 'mice', 'nice', 'dice', 'lice', 'vice', 'price', 'slice',
+  'twice', 'space', 'place', 'face', 'lace', 'pace', 'grace', 'trace',
+  'cell', 'cent', 'city', 'cite', 'cyst', 'cyclone', 'cycle', 'civic',
+  'circle', 'center', 'centre', 'circus', 'centaur', 'ceiling',
+  'fence', 'dance', 'prince', 'since', 'once', 'rinse', 'sense', 'tense',
+  'voice', 'choice', 'juice', 'peace', 'piece', 'niece', 'force', 'source',
 ]));
 
-/** Words explicitly tagged as soft-g (g saying /j/). Same reason: type
- *  'c' is shared between hard /g/ (get, give, girl) and soft /j/ (gem,
- *  gym, gist), so the override list is the truth source. */
+/** Words explicitly tagged as soft-g (g saying /j/).
+ *
+ *  Unlike soft-c, soft-g is unreliable: 'get', 'give', 'gift', 'girl',
+ *  'gig', 'gear' and many others keep the hard /g/ sound before e/i/y.
+ *  We pair this curated set with HARD_G_EXCEPTIONS so the rule-based
+ *  detector below has a fighting chance.
+ *
+ *  IMPORTANT: same caveat as SOFT_C_WORDS — this drives the flag only.
+ *  Audio routing requires `'soft_g'` in the word's `types[]`.
+ */
 const SOFT_G_WORDS = Object.freeze(new Set([
-  'gem', 'gist', 'gym', 'huge',
-  // Add 'age', 'cage', 'sage' etc. when introduced.
+  // Words currently in the dataset.
+  'gem', 'gist', 'huge', 'energy',
+  // Forward-looking: ge / gi / gy words likely to enter the curriculum.
+  'gym', 'gel', 'germ', 'gene',
+  'age', 'cage', 'page', 'sage', 'rage', 'wage', 'stage', 'wage',
+  'large', 'change', 'orange', 'strange', 'arrange',
+  'edge', 'bridge', 'fridge', 'judge', 'badge', 'lodge', 'budge',
+  'magic', 'logic', 'fragile', 'agile', 'tragic',
+  'giant', 'giraffe', 'ginger', 'gentle', 'gentleman', 'general',
+  'danger', 'manager', 'agent', 'angel', 'engine', 'energy',
+  'college', 'village', 'message', 'package', 'language',
+]));
+
+/** 'c' before e/i/y that is pronounced HARD /k/ rather than soft /s/.
+ *  Very rare in English — the entries below are mostly defensive. */
+const HARD_C_EXCEPTIONS = Object.freeze(new Set([
+  // 'celtic' is hard /k/ for some speakers, soft /s/ for others.
+  // Add real-world exceptions here as they emerge.
+]));
+
+/** 'g' before e/i/y that stays HARD /g/. Required because soft-g is the
+ *  irregular case in English: get, give, girl etc. all defy the soft-g
+ *  pattern. Listed in lowercase. */
+const HARD_G_EXCEPTIONS = Object.freeze(new Set([
+  'get', 'give', 'given', 'gift', 'girl', 'gig', 'gild', 'gilt',
+  'gear', 'geek', 'geese', 'geezer', 'geld', 'gecko', 'gecko',
+  'girth', 'gird', 'girdle', 'gill', 'gimbal', 'gimmick',
+  'tiger', 'target', 'again', 'begin', 'finger', 'anger', 'linger',
+  'hunger', 'singer', 'longer', 'longest', 'bigger', 'biggest',
+  'ringing', 'singing', 'forget', 'forgive', 'together',
 ]));
 
 /** Graphemes that represent a doubled consonant producing one sound
@@ -373,13 +431,34 @@ export function deriveFlags(word) {
   if (!word) return [];
   const graphemes = Array.isArray(word.graphemes) ? word.graphemes : [];
   const types     = Array.isArray(word.types)     ? word.types     : [];
+  const wordText  = (word.word || '').toLowerCase();
   const flags     = [];
 
   if (graphemes.includes('x'))                                    flags.push('multi-phoneme-x');
   if (graphemes.includes('kn') || types.includes('se'))           flags.push('silent-letter');
   if (graphemes.some(g => DOUBLED_CONSONANT_GRAPHEMES.has(g)))    flags.push('doubled-consonant');
-  if (SOFT_C_WORDS.has(word.word))                                flags.push('soft-c');
-  if (SOFT_G_WORDS.has(word.word))                                flags.push('soft-g');
+
+  // Soft-c / soft-g detection. Three independent signals; any one flags
+  // the word:
+  //   1. The grapheme type is explicitly 'soft_c' / 'soft_g' (source of
+  //      truth for AUDIO too).
+  //   2. The word appears in the curated SOFT_C_WORDS / SOFT_G_WORDS set
+  //      (covers words that haven't been re-typed yet, plus forward-
+  //      looking words not yet in the dataset).
+  //   3. Rule-based: the spelling matches /c[eiy]/ or /g[eiy]/ AND the
+  //      word is not in HARD_C_EXCEPTIONS / HARD_G_EXCEPTIONS. This is a
+  //      safety net so newly-added words light up the right phonics
+  //      lesson even if a content author forgot to update the types[]
+  //      array. The HARD_* sets keep words like `get`, `girl`, `gift`
+  //      from being miscategorised.
+  const hasSoftCType = types.includes('soft_c');
+  const hasSoftGType = types.includes('soft_g');
+  const matchesSoftC = /c[eiy]/.test(wordText) && !HARD_C_EXCEPTIONS.has(wordText);
+  const matchesSoftG = /g[eiy]/.test(wordText) && !HARD_G_EXCEPTIONS.has(wordText);
+
+  if (hasSoftCType || SOFT_C_WORDS.has(wordText) || matchesSoftC)  flags.push('soft-c');
+  if (hasSoftGType || SOFT_G_WORDS.has(wordText) || matchesSoftG)  flags.push('soft-g');
+
   if (word.pattern === 'sight')                                   flags.push('irregular');
   if (typeof word.id === 'string' && /^[A-Z]/.test(word.id))      flags.push('capital');
 
@@ -535,7 +614,7 @@ export const WORDS = [
   // more short-e CVC
   { id:'vet',  word:'vet',  graphemes:['v','e','t'],   types:['c','sv','c'],  pattern:'CVC', group:'short-e', level:1, emoji:'🐕‍🦺' },
   { id:'web',  word:'web',  graphemes:['w','e','b'],   types:['c','sv','c'],  pattern:'CVC', group:'short-e', level:1, emoji:'🕸️' },
-  { id:'gem',  word:'gem',  graphemes:['g','e','m'],   types:['c','sv','c'],  pattern:'CVC', group:'short-e', level:1, emoji:'💎' },
+  { id:'gem',  word:'gem',  graphemes:['g','e','m'],   types:['soft_g','sv','c'],  pattern:'CVC', group:'short-e', level:1, emoji:'💎' },
   { id:'hem',  word:'hem',  graphemes:['h','e','m'],   types:['c','sv','c'],  pattern:'CVC', group:'short-e', level:1, emoji:'🪡' },
   { id:'pep',  word:'pep',  graphemes:['p','e','p'],   types:['c','sv','c'],  pattern:'CVC', group:'short-e', level:1, emoji:'⚡' },
   { id:'hex',  word:'hex',  graphemes:['h','e','x'],   types:['c','sv','c'],  pattern:'CVC', group:'short-e', level:1, emoji:'🔮' },
@@ -1156,7 +1235,7 @@ export const WORDS = [
   { id:'wilt',  word:'wilt',  graphemes:['w','i','lt'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🥀' },
   { id:'tilt',  word:'tilt',  graphemes:['t','i','lt'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'↗️' },
   { id:'mist',  word:'mist',  graphemes:['m','i','st'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🌫️' },
-  { id:'gist',  word:'gist',  graphemes:['g','i','st'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'📝' },
+  { id:'gist',  word:'gist',  graphemes:['g','i','st'],  types:['soft_g','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'📝' },
   { id:'sift',  word:'sift',  graphemes:['s','i','ft'],  types:['c','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🫙' },
 
   /* ══════════════════════════════════════
@@ -1632,10 +1711,13 @@ export function getWordStructure(word) {
 
   if (leadTypes.length === 0 || trailTypes.length === 0) return 'other';
 
+  // soft_c / soft_g are still simple single-grapheme consonants
+  // structurally — only their sound differs from hard c/g.
+  const isSimpleConsonant = (t) => t === 'c' || t === 'soft_c' || t === 'soft_g';
   const leadComplex  = leadTypes.some(t => t === 'bl' || t === 'd');
-  const leadSimple   = leadTypes.length === 1 && leadTypes[0] === 'c';
+  const leadSimple   = leadTypes.length === 1 && isSimpleConsonant(leadTypes[0]);
   const trailComplex = trailTypes.some(t => t === 'bl' || t === 'd');
-  const trailSimple  = trailTypes.length === 1 && trailTypes[0] === 'c';
+  const trailSimple  = trailTypes.length === 1 && isSimpleConsonant(trailTypes[0]);
 
   if (leadSimple  && trailSimple)  return 'CVC';
   if (leadComplex && trailSimple)  return 'CCVC';
