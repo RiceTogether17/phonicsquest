@@ -1337,8 +1337,8 @@ export const WORDS = [
   { id:'drink', word:'drink', graphemes:['dr','i','nk'],  types:['bl','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🥤' },
   { id:'flint', word:'flint', graphemes:['fl','i','nt'],  types:['bl','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🪨' },
   { id:'print', word:'print', graphemes:['pr','i','nt'],  types:['bl','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🖨️' },
-  { id:'grind', word:'grind', graphemes:['gr','i','nd'],  types:['bl','sv','bl'], pattern:'blend', group:'blends', level:3, emoji:'⚙️' },
-  { id:'blind', word:'blind', graphemes:['bl','i','nd'],  types:['bl','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🙈' },
+  { id:'grind', word:'grind', graphemes:['gr','i','nd'],  types:['bl','lv','bl'], pattern:'blend', group:'blends', level:3, emoji:'⚙️' },
+  { id:'blind', word:'blind', graphemes:['bl','i','nd'],  types:['bl','lv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🙈' },
   { id:'brink', word:'brink', graphemes:['br','i','nk'],  types:['bl','sv','bl'], pattern:'blend', group:'blends', level:3, emoji:'⚠️' },
 
   /* ══════════════════════════════════════
@@ -1599,9 +1599,12 @@ export const WORDS = [
   { id:'longest', word:'longest', graphemes:['l','o','ng','-est'],  types:['c','sv','d','sf'],  pattern:'suffix', group:'suffix-est', level:3, emoji:'📏' },
   { id:'richest', word:'richest', graphemes:['r','i','ch','-est'],  types:['c','sv','d','sf'],  pattern:'suffix', group:'suffix-est', level:3, emoji:'💰' },
   { id:'biggest', word:'biggest', graphemes:['b','i','gg','-est'],  types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-est', level:3, emoji:'🐘' },
-  { id:'coldest', word:'coldest', graphemes:['c','o','ld','-est'],  types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'🧊' },
-  { id:'boldest', word:'boldest', graphemes:['b','o','ld','-est'],  types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'💪' },
-  { id:'kindest', word:'kindest', graphemes:['k','i','nd','-est'],  types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'💛' },
+  // -ind / -old / -ild words have a LONG vowel even though they look like
+  // CVCC short-vowel patterns. Tag the base vowel as 'lv' so audio plays
+  // the right sound and the phoneme display shows the long-vowel diacritic.
+  { id:'coldest', word:'coldest', graphemes:['c','o','ld','-est'],  types:['c','lv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'🧊' },
+  { id:'boldest', word:'boldest', graphemes:['b','o','ld','-est'],  types:['c','lv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'💪' },
+  { id:'kindest', word:'kindest', graphemes:['k','i','nd','-est'],  types:['c','lv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'💛' },
   { id:'oldest',  word:'oldest',  graphemes:['o','ld','-est'],      types:['lv','bl','sf'],     pattern:'suffix', group:'suffix-est', level:3, emoji:'🧓' },
 
   /* ══════════════════════════════════════
