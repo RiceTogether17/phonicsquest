@@ -163,7 +163,18 @@ describe('deriveDecodableStage / word.decodableStage', () => {
     // 'r-controlled' is a meaningful group key (no curriculum stage yet).
     // 'blends' falls through only when `play` mis-groups long-a-ay as
     // 'blends' (pre-existing data bug, out of scope for this commit).
-    const ALLOWED_NON_STAGE_KEYS = new Set(['r-controlled', 'blends']);
+    // long-e-ie / long-i-ind / long-i-ild / long-o-old / long-u-ui are
+    // real orthographic patterns that don't yet have their own curriculum
+    // micro-stage. They're routing keys awaiting curriculum expansion.
+    const ALLOWED_NON_STAGE_KEYS = new Set([
+      'r-controlled',
+      'blends',
+      'long-e-ie',
+      'long-i-ind',
+      'long-i-ild',
+      'long-o-old',
+      'long-u-ui',
+    ]);
     for (const w of WORDS) {
       if (curriculumIds.has(w.decodableStage)) continue;
       expect(ALLOWED_NON_STAGE_KEYS.has(w.decodableStage),
