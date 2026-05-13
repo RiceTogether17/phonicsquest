@@ -3554,24 +3554,6 @@ details.story-tool-section[open] > .story-tool-summary::before {
   gap: var(--space-3);
 }
 
-.sm-quest-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-1);
-  padding: var(--space-3) var(--space-3);
-  background: var(--surface);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  text-align: left;
-  transition: transform var(--dur-fast) var(--ease-bounce),
-              box-shadow var(--dur-fast);
-}
-.sm-quest-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--color-primary); }
-.sm-quest-btn:active { transform: scale(0.96); }
-.sm-quest-btn--done { background: var(--color-success-light); border-color: var(--color-success); }
-
 .sm-quest-icon { font-size: 1.2rem; }
 .sm-quest-name { font-size: var(--font-size-sm); font-weight: 800; color: var(--text); }
 .sm-quest-preview { font-size: var(--font-size-xs); color: var(--text-muted); }
@@ -3785,6 +3767,416 @@ details.story-tool-section[open] > .story-tool-summary::before {
   gap: var(--space-2);
   align-items: center;
   width: 100%;
+}
+
+/* ── Quest card (Learn / Play dual-button layout) ─────────────────────────
+   The browser now shows a card per quest with two actions (Learn / Play)
+   and a status badge (Not started / Studied / Completed). */
+.sm-quest-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: transform var(--dur-fast) var(--ease-bounce),
+              box-shadow var(--dur-fast),
+              border-color var(--dur-fast);
+}
+.sm-quest-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+.sm-quest-card--studied {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+.sm-quest-card--done {
+  border-color: var(--color-success);
+  background: var(--color-success-light);
+}
+
+.sm-quest-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.sm-quest-card-head .sm-quest-name { flex: 1 1 auto; min-width: 0; }
+
+.sm-quest-badge {
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text);
+  white-space: nowrap;
+}
+.sm-quest-card--studied .sm-quest-badge {
+  background: var(--color-primary);
+  color: #fff;
+}
+.sm-quest-card--done .sm-quest-badge {
+  background: var(--color-success);
+  color: #fff;
+}
+
+.sm-quest-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.sm-quest-action {
+  flex: 1 1 0;
+  min-width: 0;
+  white-space: nowrap;
+}
+/* On unstudied quests, draw the eye to "Learn Words" first. */
+.sm-quest-card--new .sm-quest-action--learn {
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
+  font-weight: 800;
+}
+/* Once completed, demote the Learn button visually (it's still available
+   for review, just not the recommended action). */
+.sm-quest-card--done .sm-quest-action--learn {
+  opacity: 0.85;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SIGHT WORD LEARN  (study mode that precedes the matching game)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sl-learn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: min(100%, 760px);
+  margin-inline: auto;
+  padding-bottom: var(--space-6);
+  position: relative;
+}
+
+.sl-header { text-align: center; }
+.sl-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.sl-quest-icon { font-size: 1.6rem; }
+.sl-quest-title {
+  font-size: var(--font-size-xl);
+  font-weight: 900;
+  color: var(--text);
+  margin: 0;
+}
+.sl-studied-pill {
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: #fff;
+}
+.sl-hello {
+  margin: var(--space-2) auto 0;
+  max-width: 56ch;
+  font-size: var(--font-size-base);
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.sl-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  padding: var(--space-2) 0;
+  border-bottom: 2px dashed var(--border);
+}
+.sl-tool-btn { white-space: nowrap; }
+.sl-tool-btn--busy { opacity: 0.7; cursor: progress; }
+.sl-progress {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-primary-light);
+  border-radius: var(--radius-full);
+}
+
+.sl-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-3);
+}
+.sl-card-grid--shuffling { animation: sl-shuffle-pulse 0.35s ease; }
+@keyframes sl-shuffle-pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(0.985); }
+  100% { transform: scale(1); }
+}
+
+.sl-word-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 140px;
+  padding: var(--space-4) var(--space-3);
+  background: var(--surface);
+  border: 2.5px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: center;
+  user-select: none;
+  outline: none;
+  transition: transform var(--dur-fast) var(--ease-bounce),
+              box-shadow var(--dur-fast),
+              border-color var(--dur-fast),
+              background-color var(--dur-fast);
+}
+.sl-word-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+.sl-word-card:focus-visible {
+  box-shadow: 0 0 0 3px var(--color-primary), var(--shadow-md);
+}
+.sl-word-card:active { transform: scale(0.97); }
+
+.sl-word-text {
+  font-size: clamp(1.4rem, 4.5vw, 2.2rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.1;
+  word-break: break-word;
+}
+
+.sl-word-hear {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px var(--space-2);
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+}
+.sl-speaker-icon { font-size: 1rem; }
+
+.sl-word-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 900;
+  color: #fff;
+  background: var(--color-success);
+  border-radius: 999px;
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity var(--dur-fast),
+              transform var(--dur-fast) var(--ease-bounce);
+  pointer-events: none;
+}
+.sl-word-card--practiced {
+  background: var(--color-success-light);
+  border-color: var(--color-success);
+}
+.sl-word-card--practiced .sl-word-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Brief glow when a card is tapped */
+.sl-word-card--pop {
+  animation: sl-pop 0.45s var(--ease-bounce);
+}
+@keyframes sl-pop {
+  0%   { transform: scale(1);    box-shadow: var(--shadow-sm); }
+  40%  { transform: scale(1.06); box-shadow: 0 0 0 6px rgba(108, 99, 255, 0.25), var(--shadow-md); }
+  100% { transform: scale(1);    box-shadow: var(--shadow-sm); }
+}
+
+/* Highlight ring used during "Listen to all" sequential playback */
+.sl-word-card--highlight {
+  box-shadow: 0 0 0 4px var(--color-primary), var(--shadow-md);
+}
+
+/* ── Quick Recall ───────────────────────────────────────────────────────── */
+.sl-recall-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--surface);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.sl-recall-card--teaser,
+.sl-recall-card--done {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.sl-recall-emoji { font-size: 2rem; }
+.sl-recall-copy { flex: 1 1 220px; min-width: 0; }
+.sl-recall-title {
+  font-size: var(--font-size-md);
+  font-weight: 900;
+  color: var(--text);
+}
+.sl-recall-sub {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.sl-recall-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.sl-quiz-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.sl-quiz-step {
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  color: var(--color-primary-dark);
+}
+.sl-quiz-prompt {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--text);
+}
+.sl-quiz-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-2);
+}
+.sl-quiz-choice {
+  padding: var(--space-3);
+  font-size: clamp(1rem, 3vw, 1.3rem);
+  font-weight: 900;
+  color: var(--text);
+  background: var(--surface);
+  border: 2.5px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-bounce),
+              background-color var(--dur-fast),
+              border-color var(--dur-fast);
+}
+.sl-quiz-choice:hover  { transform: translateY(-2px); }
+.sl-quiz-choice:active { transform: scale(0.97); }
+.sl-quiz-choice:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary);
+}
+.sl-quiz-choice--correct {
+  background: var(--color-success-light);
+  border-color: var(--color-success);
+  color: #166534;
+  animation: sl-pop 0.45s var(--ease-bounce);
+}
+.sl-quiz-choice--wrong {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #991b1b;
+  opacity: 0.85;
+  cursor: not-allowed;
+}
+.sl-quiz-choice--hint {
+  animation: sl-hint-pulse 0.9s ease;
+  background: var(--color-success-light);
+  border-color: var(--color-success);
+  color: #166534;
+}
+@keyframes sl-hint-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.0); }
+  50%      { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0.35); }
+}
+
+/* ── Bottom actions ─────────────────────────────────────────────────────── */
+.sl-bottom-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 2px solid var(--border);
+}
+.sl-bottom-actions .sl-btn-play {
+  flex: 1 1 260px;
+  min-width: 220px;
+  font-size: var(--font-size-base);
+  font-weight: 900;
+  padding: var(--space-3) var(--space-4);
+}
+
+/* ── Inline toast (success confirmation) ────────────────────────────────── */
+.sl-inline-toast {
+  position: absolute;
+  bottom: var(--space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-success);
+  color: #fff;
+  font-weight: 800;
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-md);
+  animation: sl-toast-in 0.3s var(--ease-out);
+  z-index: 5;
+}
+.sl-inline-toast--leave {
+  animation: sl-toast-out 0.3s ease forwards;
+}
+@keyframes sl-toast-in {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+@keyframes sl-toast-out {
+  from { opacity: 1; transform: translate(-50%, 0); }
+  to   { opacity: 0; transform: translate(-50%, 12px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sl-word-card,
+  .sl-quiz-choice,
+  .sl-card-grid--shuffling,
+  .sl-word-card--pop,
+  .sl-word-card--highlight,
+  .sl-quiz-choice--correct,
+  .sl-quiz-choice--hint,
+  .sl-inline-toast {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

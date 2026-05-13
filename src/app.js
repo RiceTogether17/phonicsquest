@@ -25,7 +25,13 @@ import { MODES } from './modes/index.js';
 import { getRecommendation, getDailyPlan, getLearnerSummaryChips } from './modules/recommendations.js';
 import { initStoryMode, showBrowser, cleanupStoryMode } from './modes/storyMode.js';
 import { initLetterSounds, cleanupLetterSounds } from './modes/letterSounds.js';
-import { initSightMatch, showSightBrowser, cleanupSightMatch } from './modes/sightMatch.js';
+import {
+  initSightMatch, showSightBrowser, cleanupSightMatch,
+  startSightMatchQuest,
+} from './modes/sightMatch.js';
+import {
+  initSightLearn, showSightLearn, cleanupSightLearn,
+} from './modes/sightLearn.js';
 import { initSentenceForge, showSentenceBrowser, cleanupSentenceForge, setSentenceForgeTrack } from './modes/sentenceForge.js';
 import { initClozeCastle, showClozeBrowser, cleanupClozeCastle } from './modes/clozeCastle.js';
 import { initWordVault, showVaultBrowser, cleanupWordVault } from './modes/wordVault.js';
@@ -274,25 +280,47 @@ class App {
       this._startDailyChallenge();
     });
 
-    document.getElementById('btn-sight-words')?.addEventListener('click', () => {
-      initSightMatch(
-        document.getElementById('sight-match-content'),
-        () => {
-          cleanupSightMatch();
-          this._showScreen(SCREENS.HOME);
-          mascot.setHomeState('holdCard');
-        },
-      );
+    // Sight Words: the container hosts both the Match mode (browser + card
+    // game) and the Learn mode (study screen). The two are wired together via
+    // callbacks so the child can hop between Learn → Match → Browser without
+    // leaving the Sight Words screen.
+    const sightContainer = () => document.getElementById('sight-match-content');
+
+    const enterSightBrowser = () => {
+      cleanupSightLearn();
+      initSightMatch(sightContainer(), goHomeFromSight, openSightLearn);
       showSightBrowser();
+    };
+
+    const openSightLearn = (quest) => {
+      cleanupSightMatch();
+      initSightLearn(sightContainer(), {
+        onGoHome:        goHomeFromSight,
+        onBackToBrowser: enterSightBrowser,
+        onStartMatch:    (q) => {
+          cleanupSightLearn();
+          initSightMatch(sightContainer(), goHomeFromSight, openSightLearn);
+          startSightMatchQuest(q);
+        },
+      });
+      showSightLearn(quest);
+      mascot.setState('celebrate');
+    };
+
+    const goHomeFromSight = () => {
+      cleanupSightMatch();
+      cleanupSightLearn();
+      this._showScreen(SCREENS.HOME);
+      mascot.setHomeState('holdCard');
+    };
+
+    document.getElementById('btn-sight-words')?.addEventListener('click', () => {
+      enterSightBrowser();
       this._showScreen('screen-sight-match');
       mascot.setState('celebrate');
     });
 
-    document.getElementById('btn-sm-back')?.addEventListener('click', () => {
-      cleanupSightMatch();
-      this._showScreen(SCREENS.HOME);
-      mascot.setHomeState('holdCard');
-    });
+    document.getElementById('btn-sm-back')?.addEventListener('click', goHomeFromSight);
 
     document.getElementById('btn-sentence-forge')?.addEventListener('click', () => {
       const unlock = this._getQuestUnlockStatus();

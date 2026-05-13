@@ -6,9 +6,14 @@
  * matched pairs stay face-up. Complete all 5 pairs to win.
  *
  * Public API:
- *   initSightMatch(container, onGoHome) – attach to DOM container
- *   showSightBrowser()                  – render quest picker
- *   cleanupSightMatch()                 – remove event listeners
+ *   initSightMatch(container, onGoHome, onLearnQuest?) – attach to DOM container
+ *   showSightBrowser()                                 – render quest picker
+ *   startSightMatchQuest(quest)                        – jump straight into game
+ *   cleanupSightMatch()                                – remove event listeners
+ *
+ * Browser shows two actions per quest: "Learn Words" (calls `onLearnQuest`
+ * with the quest object) and "Play Match" (starts the matching game). Quests
+ * also display a status badge: Not started / Studied / Completed.
  */
 
 import { SIGHT_QUESTS, TIER_LABELS, getQuestsByTier } from '../data/sightwords.js';
@@ -19,8 +24,9 @@ const BASE = import.meta.env.BASE_URL;
 
 // ── Module state ───────────────────────────────────────────────────────────
 
-let _container = null;
-let _onGoHome  = null;
+let _container    = null;
+let _onGoHome     = null;
+let _onLearnQuest = null; // called when child taps "Learn Words" in browser
 
 let _activeQuest   = null;  // current SIGHT_QUESTS entry
 let _flipped       = [];    // indices of currently face-up (unmatched) cards
@@ -31,14 +37,25 @@ let _fullscreenListener = null;
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
-export function initSightMatch(container, onGoHome) {
-  _container = container;
-  _onGoHome  = onGoHome;
+export function initSightMatch(container, onGoHome, onLearnQuest) {
+  _container    = container;
+  _onGoHome     = onGoHome;
+  _onLearnQuest = onLearnQuest || null;
 }
 
 export function showSightBrowser() {
   _activeQuest = null;
   _renderBrowser();
+}
+
+/**
+ * Start the matching game for a specific quest, bypassing the browser.
+ * Used by `sightLearn.js` when the child taps "Ready to play the matching
+ * game?" so the hand-off is seamless.
+ */
+export function startSightMatchQuest(quest) {
+  if (!quest) return;
+  _startQuest(quest);
 }
 
 export function cleanupSightMatch() {
@@ -59,6 +76,7 @@ function _renderBrowser() {
   if (!_container) return;
 
   const completedQuests = store.get('sightQuestsCompleted') || {};
+  const studiedQuests   = store.get('sightQuestsStudied')   || {};
 
   const tiers = ['easy', 'medium', 'hard'];
   let html = '<div class="sm-browser">';
@@ -79,15 +97,39 @@ function _renderBrowser() {
         <div class="sm-quest-grid">`;
 
     for (const quest of quests) {
-      const done = completedQuests[quest.id];
+      const done    = Boolean(completedQuests[quest.id]);
+      const studied = Boolean(studiedQuests[quest.id]);
+      const status  = done
+        ? { cls: 'sm-quest-card--done',    label: '✅ Completed' }
+        : studied
+          ? { cls: 'sm-quest-card--studied', label: '📖 Studied' }
+          : { cls: 'sm-quest-card--new',     label: '✨ Not started' };
+
+      const preview = quest.words.slice(0, 3).join(' · ');
+      const ariaQuest =
+        `${quest.name} – words: ${quest.words.join(', ')} – ${status.label.replace(/^\W+\s*/, '')}`;
+
       html += `
-        <button class="sm-quest-btn ${done ? 'sm-quest-btn--done' : ''}"
-                data-quest="${quest.id}"
-                aria-label="${quest.name} – ${quest.words.join(', ')}${done ? ' – completed' : ''}">
-          <span class="sm-quest-icon">${done ? '✅' : quest.icon}</span>
-          <span class="sm-quest-name">${quest.name}</span>
-          <span class="sm-quest-preview">${quest.words.slice(0, 3).join(' · ')}…</span>
-        </button>`;
+        <div class="sm-quest-card ${status.cls}" data-quest="${quest.id}">
+          <div class="sm-quest-card-head">
+            <span class="sm-quest-icon" aria-hidden="true">${done ? '✅' : quest.icon}</span>
+            <span class="sm-quest-name">${quest.name}</span>
+            <span class="sm-quest-badge" aria-label="${status.label}">${status.label}</span>
+          </div>
+          <div class="sm-quest-preview" aria-hidden="true">${preview}…</div>
+          <div class="sm-quest-actions">
+            <button class="btn btn--ghost btn--sm sm-quest-action sm-quest-action--learn"
+                    data-quest="${quest.id}" data-action="learn"
+                    aria-label="${ariaQuest} – Learn words first">
+              📖 Learn Words
+            </button>
+            <button class="btn btn--primary btn--sm sm-quest-action sm-quest-action--play"
+                    data-quest="${quest.id}" data-action="play"
+                    aria-label="${ariaQuest} – Play matching game">
+              🃏 Play Match
+            </button>
+          </div>
+        </div>`;
     }
 
     html += '</div></div>';
@@ -96,10 +138,17 @@ function _renderBrowser() {
   html += '</div>';
   _container.innerHTML = html;
 
-  _container.querySelectorAll('.sm-quest-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
+  _container.querySelectorAll('.sm-quest-action').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
       const quest = SIGHT_QUESTS.find(q => q.id === btn.dataset.quest);
-      if (quest) _startQuest(quest);
+      if (!quest) return;
+      if (btn.dataset.action === 'learn') {
+        if (_onLearnQuest) _onLearnQuest(quest);
+        else _startQuest(quest); // graceful fallback if learn isn't wired
+      } else {
+        _startQuest(quest);
+      }
     });
   });
 }
