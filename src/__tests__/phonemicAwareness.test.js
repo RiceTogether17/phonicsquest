@@ -166,6 +166,35 @@ describe('first/last/middle sound modes hide print during the question', () => {
   });
 });
 
+describe('missingSound distractors respect the target word\'s level', () => {
+  it('only offers graphemes that appear in some word at or below the target word\'s level', async () => {
+    const { setupMissingSound } = await import('../modes/missingSound.js');
+    const { WORDS } = await import('../data/words.js');
+
+    // 'cat' is a level-1 CVC word. A level-1 learner must not be shown
+    // distractor graphemes that only exist in level-2 or level-3 words
+    // (e.g. 'oo', 'ar', 'igh').
+    const word = WORDS.find(w => w.id === 'cat');
+    expect(word?.level).toBe(1);
+
+    const levelOneGraphemes = new Set();
+    for (const w of WORDS.filter(w => w.level <= word.level)) {
+      for (const g of w.graphemes) levelOneGraphemes.add(g);
+    }
+
+    // Run the setup several times so we exercise the random selection.
+    for (let trial = 0; trial < 10; trial++) {
+      const els = baseEls();
+      setupMissingSound(word, els);
+      const buttons = [...els.modeArea.querySelectorAll('.choice-btn')];
+      expect(buttons).toHaveLength(4);
+      for (const btn of buttons) {
+        expect(levelOneGraphemes.has(btn.textContent)).toBe(true);
+      }
+    }
+  });
+});
+
 describe('soundCount mode hides the printed word during the question', () => {
   it('does not render the printed word on setup', async () => {
     const { setupSoundCount } = await import('../modes/soundCount.js');
