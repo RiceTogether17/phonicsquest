@@ -3550,7 +3550,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 
 .sm-quest-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: var(--space-3);
 }
 
@@ -3826,13 +3826,18 @@ details.story-tool-section[open] > .story-tool-summary::before {
 
 .sm-quest-actions {
   display: flex;
+  flex-direction: column;
   gap: var(--space-2);
-  flex-wrap: wrap;
+  margin-top: auto; /* anchor actions to the bottom so cards align nicely */
 }
 .sm-quest-action {
-  flex: 1 1 0;
+  width: 100%;
   min-width: 0;
-  white-space: nowrap;
+  justify-content: center;
+  text-align: center;
+  white-space: normal;
+  word-break: keep-all;
+  line-height: 1.15;
 }
 /* On unstudied quests, draw the eye to "Learn Words" first. */
 .sm-quest-card--new .sm-quest-action--learn {
