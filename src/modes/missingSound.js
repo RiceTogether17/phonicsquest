@@ -76,8 +76,10 @@ export function setupMissingSound(word, els) {
   const correctGrapheme = word.graphemes[missingIndex];
   const correctType = word.types[missingIndex];
 
-  // Get distractor graphemes (same type, different value)
-  const distractorPool = getPhonemeDistractors(correctGrapheme, correctType);
+  // Get distractor graphemes (same type, different value) — bounded by the
+  // target word's level so beginners never see graphemes that only appear in
+  // higher-level words (e.g. r-controlled or diphthong vowels at level 1).
+  const distractorPool = getPhonemeDistractors(correctGrapheme, correctType, word.level);
   const distractors = shuffleArray(distractorPool).slice(0, 3);
   const choices = shuffleArray([
     { grapheme: correctGrapheme, type: correctType, correct: true },
@@ -143,21 +145,27 @@ function handleChoice(choice, btn, word, els, grid) {
 }
 
 /**
- * Get distractor graphemes of the same phoneme type.
+ * Get distractor graphemes of the same phoneme type, bounded to graphemes
+ * that actually appear in words at or below `maxLevel`. Falls back to the
+ * full word list if the level-restricted pool is empty.
  */
-function getPhonemeDistractors(correctGrapheme, type) {
-  // Collect unique graphemes of the same type from all words
-  const graphemes = new Set();
-
-  for (const word of WORDS) {
-    for (let i = 0; i < word.graphemes.length; i++) {
-      if (word.types[i] === type && word.graphemes[i] !== correctGrapheme) {
-        graphemes.add(word.graphemes[i]);
+function getPhonemeDistractors(correctGrapheme, type, maxLevel = 3) {
+  const collect = (pool) => {
+    const graphemes = new Set();
+    for (const word of pool) {
+      for (let i = 0; i < word.graphemes.length; i++) {
+        if (word.types[i] === type && word.graphemes[i] !== correctGrapheme) {
+          graphemes.add(word.graphemes[i]);
+        }
       }
     }
-  }
+    return graphemes;
+  };
 
-  return Array.from(graphemes);
+  const levelGraphemes = collect(WORDS.filter(w => w.level <= maxLevel));
+  if (levelGraphemes.size > 0) return Array.from(levelGraphemes);
+
+  return Array.from(collect(WORDS));
 }
 
 export function getCurrentWord() {
