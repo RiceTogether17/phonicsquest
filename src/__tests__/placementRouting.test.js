@@ -209,4 +209,39 @@ describe('reading-band routing', () => {
     expect(rec.ctaTarget).toBe('blend');
     expect(rec.ctaGroup).toBe('cvc-a');
   });
+
+  // New: confirm the additive stage-score + skill-gap fields surface alongside
+  // the legacy gateScores. Adding them must not break any of the routing
+  // expectations above.
+  it('attaches stageScores + skillGaps + bandDescription without breaking legacy routing', () => {
+    const responses = [
+      { id: 'a-or-1', section: 'oral', score: 1 },
+      { id: 'a-or-2', section: 'oral', score: 1 },
+      { id: 'a-pic-1', section: 'vocab', correct: true },
+      { id: 'a-pic-2', section: 'vocab', correct: true },
+      { id: 'a-pic-3', section: 'vocab', correct: true },
+      { id: 'a-first-1', section: 'firstSound', correct: true },
+      { id: 'a-first-2', section: 'firstSound', correct: true },
+      { id: 'a-first-3', section: 'firstSound', correct: true },
+      { id: 'a-last-1', section: 'lastSound', correct: true },
+      { id: 'a-last-2', section: 'lastSound', correct: true },
+      { id: 'a-last-3', section: 'lastSound', correct: true },
+      { id: 'a-middle-1', section: 'middleSound', correct: false },
+      { id: 'a-middle-2', section: 'middleSound', correct: false },
+      { id: 'a-middle-3', section: 'middleSound', correct: false },
+      { id: 'a-letters-1', section: 'letterSounds', score: 1 },
+      { id: 'a-letters-2', section: 'letterSounds', score: 1 },
+      { id: 'a-blend-1', section: 'oralBlending', correct: true },
+      { id: 'a-blend-2', section: 'oralBlending', correct: true },
+      { id: 'a-blend-3', section: 'oralBlending', correct: true },
+    ];
+    const result = derivePlacementResult(responses, {}, 'preschool');
+    // Legacy invariants still hold
+    expect(result.readingBand).toBe('emerging-decoder');
+    expect(result.gateScores.gateA).toBeGreaterThanOrEqual(0.6);
+    // New fields are present + middle-sound shows up as a gap
+    expect(result.stageScores.phonemicAwareness.middleSound).toBeCloseTo(0, 1);
+    expect(result.skillGaps.some(g => g.skill === 'middleSound')).toBe(true);
+    expect(typeof result.bandDescription).toBe('string');
+  });
 });
