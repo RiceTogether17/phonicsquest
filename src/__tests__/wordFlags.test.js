@@ -163,17 +163,29 @@ describe('deriveDecodableStage / word.decodableStage', () => {
     // 'r-controlled' is a meaningful group key (no curriculum stage yet).
     // 'blends' falls through only when `play` mis-groups long-a-ay as
     // 'blends' (pre-existing data bug, out of scope for this commit).
-    // long-e-ie / long-i-ind / long-i-ild / long-o-old / long-u-ui are
-    // real orthographic patterns that don't yet have their own curriculum
-    // micro-stage. They're routing keys awaiting curriculum expansion.
+    // long-e-eo / long-e-ei / long-e-ey / long-i-eigh are rare one-off
+    // orthographic patterns (people, seized, valley, height) that don't
+    // warrant their own curriculum stage.
+    // Bare 'long-X' fallbacks cover multisyllabic words whose primary
+    // long vowel doesn't sit in a recognised micro-stage (e.g. paper,
+    // open, ruler) — awaiting curriculum expansion for 2-syllable patterns.
     const ALLOWED_NON_STAGE_KEYS = new Set([
       'r-controlled',
       'blends',
-      'long-e-ie',
-      'long-i-ind',
-      'long-i-ild',
-      'long-o-old',
-      'long-u-ui',
+      // Single-letter long-vowel fallback for multisyllabic words that
+      // don't fit a recognised vowel-team or tail-cluster pattern
+      // (paper, opening, ruler, spider, etc.) — awaiting curriculum
+      // expansion for 2-syllable patterns.
+      'long-a-a',
+      'long-e-e',
+      'long-i-i',
+      'long-o-o',
+      'long-u-u',
+      // Rare one-off orthographic patterns (people, seized, valley, height)
+      'long-e-eo',
+      'long-e-ei',
+      'long-e-ey',
+      'long-i-eigh',
     ]);
     for (const w of WORDS) {
       if (curriculumIds.has(w.decodableStage)) continue;

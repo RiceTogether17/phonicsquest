@@ -353,36 +353,64 @@ export function deriveSpellingPattern(word) {
   const graphemes = Array.isArray(word.graphemes) ? word.graphemes : [];
   const types     = Array.isArray(word.types)     ? word.types     : [];
 
-  // Long vowels: split-digraph (CVCe) is the strongest signal.
-  if (group && group.startsWith('long-')) {
-    if (types.includes('se')) return group.endsWith('-a') ? 'ae'
-                                : group.endsWith('-e') ? 'ee'  // rare; 'ee' typically captures these first
-                                : group.endsWith('-i') ? 'ie'
-                                : group.endsWith('-o') ? 'oe'
-                                : group.endsWith('-u') ? 'ue'
-                                : null;
-    if (graphemes.includes('ai'))  return 'ai';
-    if (graphemes.includes('ay'))  return 'ay';
-    if (graphemes.includes('ee'))  return 'ee';
-    if (graphemes.includes('ea'))  return 'ea';
-    if (graphemes.includes('igh')) return 'igh';
-    if (graphemes.includes('oa'))  return 'oa';
-    if (graphemes.includes('ow'))  return 'ow';
-    if (graphemes.includes('oo'))  return 'oo';
-    if (graphemes.includes('ue'))  return 'uue'; // distinguish from split-digraph 'ue' (cube)
-    if (graphemes.includes('ew'))  return 'ew';
-    if (group === 'long-e' && graphemes.includes('ie')) return 'ie'; // thief, brief, field
-    if (group === 'long-u' && graphemes.includes('ui')) return 'ui'; // fruit, suit, juice, bruise
-    // Naked-vowel-before-cluster: 'find/kind/blind' (ind), 'mild/wild/child' (ild),
-    // 'cold/gold/hold/told/fold/bold' (old). Single-letter long vowel adjacent to -nd / -ld.
-    const tail3 = graphemes.slice(-3).join('');
-    if (group === 'long-i' && tail3 === 'ind') return 'ind';
-    if (group === 'long-i' && tail3 === 'ild') return 'ild';
-    if (group === 'long-o' && tail3 === 'old') return 'old';
-    // word ends in 'y' acting as long-i or long-e
+  // Each long-vowel branch is group-gated so that a grapheme like 'igh'
+  // can't fire across groups (e.g. 'moonlight' is long-u, not long-i).
+  // Where no vowel-team / split-digraph / tail-cluster pattern matches —
+  // typically for multisyllabic words like 'paper' or 'opening' — fall
+  // back to the first long-vowel grapheme as the pattern.
+  const lvFallback = () => {
+    const lvIdx = types.indexOf('lv');
+    return lvIdx >= 0 ? graphemes[lvIdx] : null;
+  };
+  const lastY = () => {
     const last = graphemes[graphemes.length - 1];
-    if (last === 'y' && types[types.length - 1] === 'lv') return 'y';
-    return null;
+    return last === 'y' && types[types.length - 1] === 'lv' ? 'y' : null;
+  };
+
+  if (group === 'long-a') {
+    if (types.includes('se'))     return 'ae';
+    if (graphemes.includes('ai')) return 'ai';
+    if (graphemes.includes('ay')) return 'ay';
+    return lastY() ?? lvFallback();
+  }
+
+  if (group === 'long-e') {
+    if (graphemes.includes('ee')) return 'ee';
+    if (graphemes.includes('ea')) return 'ea';
+    if (graphemes.includes('ie')) return 'ie';
+    if (graphemes.includes('eo')) return 'eo';
+    if (graphemes.includes('ey')) return 'ey';
+    if (graphemes.includes('ei')) return 'ei';
+    if (types.includes('se'))     return 'ee'; // rare CVCe-style long-e fallback
+    return lastY() ?? lvFallback();
+  }
+
+  if (group === 'long-i') {
+    if (types.includes('se'))       return 'ie';
+    if (graphemes.includes('eigh')) return 'eigh'; // height (check before igh; eigh ⊃ igh)
+    if (graphemes.includes('igh'))  return 'igh';
+    const tail3i = graphemes.slice(-3).join('');
+    if (tail3i === 'ind') return 'ind';
+    if (tail3i === 'ild') return 'ild';
+    return lastY() ?? lvFallback();
+  }
+
+  if (group === 'long-o') {
+    if (types.includes('se'))     return 'oe';
+    if (graphemes.includes('oa')) return 'oa';
+    if (graphemes.includes('ow')) return 'ow';
+    const tail3o = graphemes.slice(-3).join('');
+    if (tail3o === 'old') return 'old';
+    return lastY() ?? lvFallback();
+  }
+
+  if (group === 'long-u') {
+    if (types.includes('se'))     return 'ue';
+    if (graphemes.includes('ue')) return 'uue';
+    if (graphemes.includes('oo')) return 'oo';
+    if (graphemes.includes('ew')) return 'ew';
+    if (graphemes.includes('ui')) return 'ui';
+    return lastY() ?? lvFallback();
   }
 
   // Diphthongs: combine same-sound spellings into one micro-stage.
@@ -890,6 +918,22 @@ export const WORDS = [
   { id:'plate', word:'plate', graphemes:['pl','a','t','e'], types:['bl','lv','c','se'],     pattern:'CVCe', group:'long-a', level:2, emoji:'🍽️' },
   { id:'grape', word:'grape', graphemes:['gr','a','p','e'], types:['bl','lv','c','se'],     pattern:'CVCe', group:'long-a', level:2, emoji:'🍇' },
   { id:'shape', word:'shape', graphemes:['sh','a','p','e'], types:['d','lv','c','se'],      pattern:'CVCe', group:'long-a', level:2, emoji:'🔷' },
+  // ── Long-A · multisyllabic / advanced ───────────────────────────────────
+  { id:'baby',    word:'baby',    graphemes:['b','a','b','y'],         types:['c','lv','c','lv'],         pattern:'multisyllable', group:'long-a', level:3, emoji:'👶' },
+  { id:'paper',   word:'paper',   graphemes:['p','a','p','er'],        types:['c','lv','c','rc'],         pattern:'multisyllable', group:'long-a', level:3, emoji:'📄' },
+  { id:'table',   word:'table',   graphemes:['t','a','b','le'],        types:['c','lv','c','sf'],         pattern:'multisyllable', group:'long-a', level:3, emoji:'🪑' },
+  { id:'maple',   word:'maple',   graphemes:['m','a','p','le'],        types:['c','lv','c','sf'],         pattern:'multisyllable', group:'long-a', level:3, emoji:'🍁' },
+  { id:'able',    word:'able',    graphemes:['a','b','le'],            types:['lv','c','sf'],             pattern:'multisyllable', group:'long-a', level:3, emoji:'💪' },
+  { id:'cable',   word:'cable',   graphemes:['c','a','b','le'],        types:['c','lv','c','sf'],         pattern:'multisyllable', group:'long-a', level:3, emoji:'🔌' },
+  { id:'raining', word:'raining', graphemes:['r','ai','n','ing'],      types:['c','lv','c','sf'],         pattern:'suffix',        group:'long-a', level:3, emoji:'🌧️' },
+  { id:'painted', word:'painted', graphemes:['p','ai','n','t','ed'],   types:['c','lv','c','c','sf'],     pattern:'suffix',        group:'long-a', level:3, emoji:'🎨' },
+  { id:'waiting', word:'waiting', graphemes:['w','ai','t','ing'],      types:['c','lv','c','sf'],         pattern:'suffix',        group:'long-a', level:3, emoji:'⏳' },
+  { id:'mailbox', word:'mailbox', graphemes:['m','ai','l','b','o','x'],types:['c','lv','c','c','sv','c'], pattern:'multisyllable', group:'long-a', level:3, emoji:'📬' },
+  { id:'daily',   word:'daily',   graphemes:['d','ai','l','y'],        types:['c','lv','c','lv'],         pattern:'multisyllable', group:'long-a', level:3, emoji:'📅' },
+  { id:'playing', word:'playing', graphemes:['pl','ay','ing'],         types:['bl','lv','sf'],            pattern:'suffix',        group:'long-a', level:3, emoji:'🎮' },
+  { id:'maybe',   word:'maybe',   graphemes:['m','ay','b','e'],        types:['c','lv','c','lv'],         pattern:'multisyllable', group:'long-a', level:3, emoji:'🤔' },
+  { id:'away',    word:'away',    graphemes:['a','w','ay'],            types:['sv','c','lv'],             pattern:'multisyllable', group:'long-a', level:3, emoji:'➡️' },
+  { id:'baking',  word:'baking',  graphemes:['b','a','k','ing'],       types:['c','lv','c','sf'],         pattern:'suffix',        group:'long-a', level:3, emoji:'🍰' },
 
   /* ══════════════════════════════════════
      LONG-E  (level 2)
@@ -952,6 +996,28 @@ export const WORDS = [
   { id:'sneak', word:'sneak', graphemes:['sn','ea','k'],   types:['bl','lv','c'], pattern:'blend',   group:'long-e', level:3, emoji:'🕵️' },
   // ── Long-E · ie pattern (thief — new spellingPattern key) ───────────────
   { id:'thief', word:'thief', graphemes:['th','ie','f'],   types:['d','lv','c'],  pattern:'other',   group:'long-e', level:3, emoji:'🥷' },
+  // ── Long-E · multisyllabic / advanced ───────────────────────────────────
+  { id:'speaking', word:'speaking', graphemes:['sp','ea','k','ing'],      types:['bl','lv','c','sf'],          pattern:'suffix',        group:'long-e', level:3, emoji:'🗣️' },
+  { id:'create',   word:'create',   graphemes:['cr','ea','t','e'],        types:['bl','lv','c','se'],          pattern:'CVCe',          group:'long-e', level:3, emoji:'🎨' },
+  { id:'eagle',    word:'eagle',    graphemes:['ea','g','le'],            types:['lv','c','sf'],               pattern:'multisyllable', group:'long-e', level:3, emoji:'🦅' },
+  { id:'breeze',   word:'breeze',   graphemes:['br','ee','z','e'],        types:['bl','lv','c','se'],          pattern:'CVCe',          group:'long-e', level:3, emoji:'🍃' },
+  { id:'released', word:'released', graphemes:['r','e','l','ea','s','ed'],types:['c','sv','c','lv','c','sf'],  pattern:'suffix',        group:'long-e', level:3, emoji:'🕊️' },
+  { id:'revealed', word:'revealed', graphemes:['r','e','v','ea','l','ed'],types:['c','sv','c','lv','c','sf'],  pattern:'suffix',        group:'long-e', level:3, emoji:'👀' },
+  { id:'realise',  word:'realise',  graphemes:['r','ea','l','i','s','e'], types:['c','lv','c','lv','c','se'],  pattern:'multisyllable', group:'long-e', level:3, emoji:'💡' },
+  { id:'realised', word:'realised', graphemes:['r','ea','l','i','s','ed'],types:['c','lv','c','lv','c','sf'],  pattern:'suffix',        group:'long-e', level:3, emoji:'💡' },
+  // ── Long-E · y-as-long-e in 2-syllable words (new long-e-y stage) ──────
+  { id:'happy',    word:'happy',    graphemes:['h','a','pp','y'],         types:['c','sv','d','lv'],           pattern:'multisyllable', group:'long-e', level:3, emoji:'😊' },
+  { id:'funny',    word:'funny',    graphemes:['f','u','nn','y'],         types:['c','sv','d','lv'],           pattern:'multisyllable', group:'long-e', level:3, emoji:'😄' },
+  { id:'puppy',    word:'puppy',    graphemes:['p','u','pp','y'],         types:['c','sv','d','lv'],           pattern:'multisyllable', group:'long-e', level:3, emoji:'🐶' },
+  { id:'grumpy',   word:'grumpy',   graphemes:['gr','u','m','p','y'],     types:['bl','sv','c','c','lv'],      pattern:'multisyllable', group:'long-e', level:3, emoji:'😠' },
+  { id:'hungry',   word:'hungry',   graphemes:['h','u','ng','r','y'],     types:['c','sv','d','c','lv'],       pattern:'multisyllable', group:'long-e', level:3, emoji:'😋' },
+  { id:'lazy',     word:'lazy',     graphemes:['l','a','z','y'],          types:['c','lv','c','lv'],           pattern:'multisyllable', group:'long-e', level:3, emoji:'😴' },
+  // ── Long-E · rare / irregular orthography (one-off pattern keys) ────────
+  { id:'valley',   word:'valley',   graphemes:['v','a','ll','ey'],        types:['c','sv','d','lv'],           pattern:'multisyllable', group:'long-e', level:3, emoji:'🏞️' },
+  { id:'breathe',  word:'breathe',  graphemes:['br','ea','th','e'],       types:['bl','lv','d','se'],          pattern:'CVCe',          group:'long-e', level:3, emoji:'🌬️' },
+  { id:'believe',  word:'believe',  graphemes:['b','e','l','ie','v','e'], types:['c','sv','c','lv','c','se'],  pattern:'multisyllable', group:'long-e', level:3, emoji:'🙏' },
+  { id:'people',   word:'people',   graphemes:['p','eo','p','le'],        types:['c','lv','c','sf'],           pattern:'multisyllable', group:'long-e', level:3, emoji:'👥' },
+  { id:'seized',   word:'seized',   graphemes:['s','ei','z','ed'],        types:['c','lv','c','sf'],           pattern:'suffix',        group:'long-e', level:3, emoji:'✊' },
 
   /* ══════════════════════════════════════
      LONG-I  (CVCe, level 2)
@@ -1027,6 +1093,19 @@ export const WORDS = [
   { id:'mild',  word:'mild',  graphemes:['m','i','l','d'],  types:['c','lv','c','c'],   pattern:'other', group:'long-i', level:2, emoji:'🌡️' },
   { id:'wild',  word:'wild',  graphemes:['w','i','l','d'],  types:['c','lv','c','c'],   pattern:'other', group:'long-i', level:2, emoji:'🦁' },
   { id:'child', word:'child', graphemes:['ch','i','l','d'], types:['d','lv','c','c'],   pattern:'other', group:'long-i', level:2, emoji:'🧒' },
+  // ── Long-I · multisyllabic / advanced ───────────────────────────────────
+  { id:'height',    word:'height',    graphemes:['h','eigh','t'],            types:['c','lv','c'],                pattern:'other',         group:'long-i', level:3, emoji:'📏' },
+  { id:'quite',     word:'quite',     graphemes:['qu','i','t','e'],          types:['bl','lv','c','se'],          pattern:'CVCe',          group:'long-i', level:3, emoji:'✔️' },
+  { id:'flies',     word:'flies',     graphemes:['fl','ie','s'],             types:['bl','lv','c'],               pattern:'suffix',        group:'long-i', level:3, emoji:'🪰' },
+  { id:'skies',     word:'skies',     graphemes:['sk','ie','s'],             types:['bl','lv','c'],               pattern:'suffix',        group:'long-i', level:3, emoji:'🌌' },
+  { id:'finally',   word:'finally',   graphemes:['f','i','n','a','l','ly'],  types:['c','lv','c','sv','c','sf'],  pattern:'suffix',        group:'long-i', level:3, emoji:'🎉' },
+  { id:'delighted', word:'delighted', graphemes:['d','e','l','igh','t','ed'],types:['c','sv','c','lv','c','sf'],  pattern:'suffix',        group:'long-i', level:3, emoji:'😁' },
+  { id:'spider',    word:'spider',    graphemes:['sp','i','d','er'],         types:['bl','lv','c','rc'],          pattern:'multisyllable', group:'long-i', level:3, emoji:'🕷️' },
+  { id:'tiger',     word:'tiger',     graphemes:['t','i','g','er'],          types:['c','lv','c','rc'],           pattern:'multisyllable', group:'long-i', level:3, emoji:'🐯' },
+  { id:'title',     word:'title',     graphemes:['t','i','t','le'],          types:['c','lv','c','sf'],           pattern:'multisyllable', group:'long-i', level:3, emoji:'📖' },
+  { id:'pilot',     word:'pilot',     graphemes:['p','i','l','o','t'],       types:['c','lv','c','sv','c'],       pattern:'multisyllable', group:'long-i', level:3, emoji:'✈️' },
+  { id:'sunrise',   word:'sunrise',   graphemes:['s','u','n','r','i','s','e'], types:['c','sv','c','c','lv','c','se'], pattern:'multisyllable', group:'long-i', level:3, emoji:'🌅' },
+  { id:'shiny',     word:'shiny',     graphemes:['sh','i','n','y'],          types:['d','lv','c','lv'],           pattern:'multisyllable', group:'long-i', level:3, emoji:'✨' },
 
   /* ══════════════════════════════════════
      LONG-O  (CVCe, level 2)
@@ -1106,6 +1185,22 @@ export const WORDS = [
   { id:'fold',  word:'fold',  graphemes:['f','o','l','d'],  types:['c','lv','c','c'],   pattern:'other', group:'long-o', level:2, emoji:'📃' },
   // ── Long-O · alone (initial schwa simplified to short-a for now) ────────
   { id:'alone', word:'alone', graphemes:['a','l','o','n','e'], types:['sv','c','lv','c','se'], pattern:'CVCe', group:'long-o', level:3, emoji:'🧍' },
+  // ── Long-O · multisyllabic / advanced ───────────────────────────────────
+  { id:'open',    word:'open',    graphemes:['o','p','e','n'],           types:['lv','c','sv','c'],         pattern:'multisyllable', group:'long-o', level:3, emoji:'🚪' },
+  { id:'opening', word:'opening', graphemes:['o','p','e','n','ing'],     types:['lv','c','sv','c','sf'],    pattern:'suffix',        group:'long-o', level:3, emoji:'🎬' },
+  { id:'over',    word:'over',    graphemes:['o','v','er'],              types:['lv','c','rc'],             pattern:'multisyllable', group:'long-o', level:3, emoji:'⬆️' },
+  { id:'hello',   word:'hello',   graphemes:['h','e','ll','o'],          types:['c','sv','d','lv'],         pattern:'multisyllable', group:'long-o', level:3, emoji:'👋' },
+  { id:'yellow',  word:'yellow',  graphemes:['y','e','ll','ow'],         types:['c','sv','d','lv'],         pattern:'multisyllable', group:'long-o', level:3, emoji:'🟡' },
+  { id:'follow',  word:'follow',  graphemes:['f','o','ll','ow'],         types:['c','sv','d','lv'],         pattern:'multisyllable', group:'long-o', level:3, emoji:'➡️' },
+  { id:'window',  word:'window',  graphemes:['w','i','n','d','ow'],      types:['c','sv','c','c','lv'],     pattern:'multisyllable', group:'long-o', level:3, emoji:'🪟' },
+  { id:'growing', word:'growing', graphemes:['gr','ow','ing'],           types:['bl','lv','sf'],            pattern:'suffix',        group:'long-o', level:3, emoji:'🌱' },
+  { id:'showing', word:'showing', graphemes:['sh','ow','ing'],           types:['d','lv','sf'],             pattern:'suffix',        group:'long-o', level:3, emoji:'🎭' },
+  { id:'boating', word:'boating', graphemes:['b','oa','t','ing'],        types:['c','lv','c','sf'],         pattern:'suffix',        group:'long-o', level:3, emoji:'⛵' },
+  { id:'floated', word:'floated', graphemes:['fl','oa','t','ed'],        types:['bl','lv','c','sf'],        pattern:'suffix',        group:'long-o', level:3, emoji:'🎈' },
+  { id:'golden',  word:'golden',  graphemes:['g','o','l','d','e','n'],   types:['c','lv','c','c','sv','c'], pattern:'multisyllable', group:'long-o', level:3, emoji:'🥇' },
+  { id:'holder',  word:'holder',  graphemes:['h','o','l','d','er'],      types:['c','lv','c','c','rc'],     pattern:'multisyllable', group:'long-o', level:3, emoji:'🤲' },
+  { id:'motor',   word:'motor',   graphemes:['m','o','t','or'],          types:['c','lv','c','rc'],         pattern:'multisyllable', group:'long-o', level:3, emoji:'🏍️' },
+  { id:'photo',   word:'photo',   graphemes:['ph','o','t','o'],          types:['d','sv','c','lv'],         pattern:'multisyllable', group:'long-o', level:3, emoji:'📷' },
 
   /* ══════════════════════════════════════
      LONG-U  (CVCe, level 2)
@@ -1173,6 +1268,22 @@ export const WORDS = [
   { id:'suit',  word:'suit',  graphemes:['s','ui','t'],     types:['c','lv','c'],               pattern:'other',   group:'long-u', level:3, emoji:'🤵' },
   { id:'juice', word:'juice', graphemes:['j','u','i','c','e'], types:['c','lv','c','soft_c','se'], pattern:'CVCe', group:'long-u', level:3, emoji:'🧃' },
   { id:'bruise',word:'bruise',graphemes:['br','ui','s','e'],   types:['bl','lv','c','se'],     pattern:'CVCe',     group:'long-u', level:3, emoji:'🤕' },
+  // ── Long-U · multisyllabic / advanced ───────────────────────────────────
+  { id:'ruler',     word:'ruler',     graphemes:['r','u','l','er'],       types:['c','lv','c','rc'],          pattern:'multisyllable', group:'long-u', level:3, emoji:'📏' },
+  { id:'super',     word:'super',     graphemes:['s','u','p','er'],       types:['c','lv','c','rc'],          pattern:'multisyllable', group:'long-u', level:3, emoji:'🦸' },
+  { id:'music',     word:'music',     graphemes:['m','u','s','i','c'],    types:['c','lv','c','sv','c'],      pattern:'multisyllable', group:'long-u', level:3, emoji:'🎵' },
+  { id:'unit',      word:'unit',      graphemes:['u','n','i','t'],        types:['lv','c','sv','c'],          pattern:'multisyllable', group:'long-u', level:3, emoji:'🧩' },
+  { id:'human',     word:'human',     graphemes:['h','u','m','a','n'],    types:['c','lv','c','sv','c'],      pattern:'multisyllable', group:'long-u', level:3, emoji:'🧑' },
+  { id:'useful',    word:'useful',    graphemes:['u','s','e','f','ul'],   types:['lv','c','se','c','sf'],     pattern:'suffix',        group:'long-u', level:3, emoji:'🛠️' },
+  { id:'student',   word:'student',   graphemes:['st','u','d','e','n','t'], types:['bl','lv','c','sv','c','c'], pattern:'multisyllable', group:'long-u', level:3, emoji:'🎓' },
+  { id:'chewing',   word:'chewing',   graphemes:['ch','ew','ing'],        types:['d','lv','sf'],              pattern:'suffix',        group:'long-u', level:3, emoji:'😋' },
+  { id:'moonlight', word:'moonlight', graphemes:['m','oo','n','l','igh','t'], types:['c','lv','c','c','lv','c'], pattern:'multisyllable', group:'long-u', level:3, emoji:'🌙' },
+  { id:'rooftop',   word:'rooftop',   graphemes:['r','oo','f','t','o','p'], types:['c','lv','c','c','sv','c'], pattern:'multisyllable', group:'long-u', level:3, emoji:'🏠' },
+  { id:'balloon',   word:'balloon',   graphemes:['b','a','ll','oo','n'],  types:['c','sv','d','lv','c'],      pattern:'multisyllable', group:'long-u', level:3, emoji:'🎈' },
+  { id:'cartoon',   word:'cartoon',   graphemes:['c','ar','t','oo','n'],  types:['c','rc','c','lv','c'],      pattern:'multisyllable', group:'long-u', level:3, emoji:'📺' },
+  { id:'shampoo',   word:'shampoo',   graphemes:['sh','a','m','p','oo'],  types:['d','sv','c','c','lv'],      pattern:'multisyllable', group:'long-u', level:3, emoji:'🧴' },
+  { id:'duty',      word:'duty',      graphemes:['d','u','t','y'],        types:['c','lv','c','lv'],          pattern:'multisyllable', group:'long-u', level:3, emoji:'🎖️' },
+  { id:'fruity',    word:'fruity',    graphemes:['fr','ui','t','y'],      types:['bl','lv','c','lv'],         pattern:'multisyllable', group:'long-u', level:3, emoji:'🍓' },
 
   /* ══════════════════════════════════════
      DIGRAPHS  (level 2)

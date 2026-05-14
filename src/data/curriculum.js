@@ -229,14 +229,21 @@ export const CURRICULUM = [
     icon: '🎲', group: 'long-a-ay', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-a-ai',
   },
+  {
+    id: 'long-a-y', phase: 6,
+    name: 'Long A · y (2-syllable)',
+    description: 'Long A in syllable 1 + y-as-long-e ending: baby, lady, lazy…',
+    icon: '👶', group: 'long-a-y', level: 3,
+    requiredMastery: 0.70, prerequisite: 'long-a-ay',
+  },
 
-  // Long E: ee → ea
+  // Long E: ee → ea → ie → y
   {
     id: 'long-e-ee', phase: 6,
     name: 'Long E · ee',
     description: 'Doubled vowel team: tree, feet, see…',
     icon: '🌲', group: 'long-e-ee', level: 2,
-    requiredMastery: 0.70, prerequisite: 'long-a-ay',
+    requiredMastery: 0.70, prerequisite: 'long-a-y',
   },
   {
     id: 'long-e-ea', phase: 6,
@@ -245,14 +252,28 @@ export const CURRICULUM = [
     icon: '🍃', group: 'long-e-ea', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-e-ee',
   },
+  {
+    id: 'long-e-ie', phase: 6,
+    name: 'Long E · ie',
+    description: 'Vowel team ie says /ee/: thief, brief, field, believe…',
+    icon: '🥷', group: 'long-e-ie', level: 3,
+    requiredMastery: 0.70, prerequisite: 'long-e-ea',
+  },
+  {
+    id: 'long-e-y', phase: 6,
+    name: 'Long E · y (2-syllable)',
+    description: 'Word-end y as long /ee/ in 2-syllable words: happy, puppy, funny, lazy…',
+    icon: '😊', group: 'long-e-y', level: 3,
+    requiredMastery: 0.70, prerequisite: 'long-e-ie',
+  },
 
-  // Long I: i_e → igh → y
+  // Long I: i_e → igh → y → ind → ild
   {
     id: 'long-i-ie', phase: 6,
     name: 'Long I · i_e',
     description: 'Split digraph: kite, like, time…',
     icon: '🪁', group: 'long-i-ie', level: 2,
-    requiredMastery: 0.70, prerequisite: 'long-e-ea',
+    requiredMastery: 0.70, prerequisite: 'long-e-y',
   },
   {
     id: 'long-i-igh', phase: 6,
@@ -268,14 +289,28 @@ export const CURRICULUM = [
     icon: '😭', group: 'long-i-y', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-i-igh',
   },
+  {
+    id: 'long-i-ind', phase: 6,
+    name: 'Long I · ind',
+    description: 'Naked i + nd cluster says long /ī/: find, kind, blind…',
+    icon: '🔍', group: 'long-i-ind', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-i-y',
+  },
+  {
+    id: 'long-i-ild', phase: 6,
+    name: 'Long I · ild',
+    description: 'Naked i + ld cluster says long /ī/: mild, wild, child…',
+    icon: '🧒', group: 'long-i-ild', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-i-ind',
+  },
 
-  // Long O: o_e → oa → ow
+  // Long O: o_e → oa → ow → old
   {
     id: 'long-o-oe', phase: 6,
     name: 'Long O · o_e',
     description: 'Split digraph: home, hope, note…',
     icon: '🏠', group: 'long-o-oe', level: 2,
-    requiredMastery: 0.70, prerequisite: 'long-i-y',
+    requiredMastery: 0.70, prerequisite: 'long-i-ild',
   },
   {
     id: 'long-o-oa', phase: 6,
@@ -291,14 +326,21 @@ export const CURRICULUM = [
     icon: '❄️', group: 'long-o-ow', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-o-oa',
   },
+  {
+    id: 'long-o-old', phase: 6,
+    name: 'Long O · old',
+    description: 'Naked o + ld cluster says long /ō/: cold, gold, hold, told…',
+    icon: '🥇', group: 'long-o-old', level: 2,
+    requiredMastery: 0.70, prerequisite: 'long-o-ow',
+  },
 
-  // Long U: u_e (split-digraph) → ue (vowel team) → ew → oo
+  // Long U: u_e (split-digraph) → ue (vowel team) → ew → oo → ui → y
   {
     id: 'long-u-ue', phase: 6,
     name: 'Long U · u_e',
     description: 'Split digraph: cube, tube, rule…',
     icon: '🎲', group: 'long-u-ue', level: 2,
-    requiredMastery: 0.70, prerequisite: 'long-o-ow',
+    requiredMastery: 0.70, prerequisite: 'long-o-old',
   },
   {
     id: 'long-u-uue', phase: 6,
@@ -321,6 +363,20 @@ export const CURRICULUM = [
     icon: '🌙', group: 'long-u-oo', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-u-ew',
   },
+  {
+    id: 'long-u-ui', phase: 6,
+    name: 'Long U · ui',
+    description: 'Vowel team ui says /uː/: fruit, suit, juice, bruise…',
+    icon: '🍎', group: 'long-u-ui', level: 3,
+    requiredMastery: 0.70, prerequisite: 'long-u-oo',
+  },
+  {
+    id: 'long-u-y', phase: 6,
+    name: 'Long U · y (2-syllable)',
+    description: 'Long U in syllable 1 + y-as-long-e ending: duty, ruby, fruity…',
+    icon: '🧃', group: 'long-u-y', level: 3,
+    requiredMastery: 0.70, prerequisite: 'long-u-ui',
+  },
 
   /* ── Phase 7: Diphthongs (split by spelling pattern) ─────────────────
    *
@@ -334,7 +390,7 @@ export const CURRICULUM = [
     name: 'Diphthong · oi/oy',
     description: 'Same /ɔɪ/ sound: coin, boy, soil, joy…',
     icon: '🪙', group: 'dip-oi', level: 3,
-    requiredMastery: 0.70, prerequisite: 'long-u-oo',
+    requiredMastery: 0.70, prerequisite: 'long-u-y',
   },
   {
     id: 'dip-ou', phase: 7,
