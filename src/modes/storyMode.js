@@ -86,6 +86,88 @@ let _fluencyTimer   = null;
 let _fluencyStart   = null;
 let _fluencyRunning = false;
 
+// ── Structured-literacy preferences (per-device localStorage) ─────────────
+// Visual scaffolds — child/teacher can switch them off when no longer needed.
+
+const PREFS_GRAPHEMES_KEY = 'giri_show_graphemes';
+const PREFS_RULER_KEY     = 'giri_show_ruler';
+const MEET_WORDS_KEY      = 'giri_meet_words';
+const COMP_LOG_KEY        = 'giri_comp_log';
+
+let _showGraphemes = _loadPref(PREFS_GRAPHEMES_KEY, true);
+let _showRuler     = _loadPref(PREFS_RULER_KEY, false);
+
+function _loadPref(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw === null) return fallback;
+    return JSON.parse(raw);
+  } catch { return fallback; }
+}
+
+function _persistPref(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+}
+
+// ── Meet-the-Words gate state ─────────────────────────────────────────────
+// Tracks which stories have had their pre-teach panel completed today so
+// the gate appears once-per-story-per-day in both Read Aloud and Decode
+// mode. Stale entries (> 30 days) are dropped on the next read.
+
+const _gatePassedSession = new Set();
+
+function _todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function _readMeetWordsMap() {
+  try {
+    const raw = localStorage.getItem(MEET_WORDS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+
+function _writeMeetWordsMap(map) {
+  try { localStorage.setItem(MEET_WORDS_KEY, JSON.stringify(map)); } catch {}
+}
+
+export function _isMeetWordsCompletedToday(storyId) {
+  if (_gatePassedSession.has(storyId)) return true;
+  return _readMeetWordsMap()[storyId] === _todayStr();
+}
+
+export function _setMeetWordsCompleted(storyId) {
+  _gatePassedSession.add(storyId);
+  const map = _readMeetWordsMap();
+  map[storyId] = _todayStr();
+  // Drop entries older than 30 days
+  const cutoffMs = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  for (const [k, v] of Object.entries(map)) {
+    if (!v || Date.parse(v) < cutoffMs) delete map[k];
+  }
+  _writeMeetWordsMap(map);
+}
+
+// ── Comprehension micro-check state ───────────────────────────────────────
+// Once-per-story-per-session, shown after the story is read. Implements the
+// "ask quick comprehension questions after reading" principle as an oral
+// self-check (the way a teacher would coach it) rather than an MCQ test —
+// stories don't carry MCQ distractor data for the open-ended talkAboutIt
+// prompts, so a self-check is more honest and still surfaces the question.
+
+const _compShownSession = new Set();
+const COMP_LOG_CAP = 100;
+
+export function _logComprehensionAttempt(entry) {
+  try {
+    const raw = localStorage.getItem(COMP_LOG_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    list.push({ ts: Date.now(), ...entry });
+    while (list.length > COMP_LOG_CAP) list.shift();
+    localStorage.setItem(COMP_LOG_KEY, JSON.stringify(list));
+  } catch {}
+}
+
 // ── Public API ────────────────────────────────────────────────────────────
 
 export function initStoryMode(container, onGoHome) {
@@ -317,21 +399,29 @@ function _renderReader(story) {
     _readMode = 'aloud';
     _stopTTS();
     _setModeToggle('aloud');
-    _renderReadAloud(story);
+    _renderModeOrGate(story);
   });
 
   document.getElementById('btn-mode-decode')?.addEventListener('click', () => {
     _readMode = 'decode';
     _stopTTS();
     _setModeToggle('decode');
-    _renderDecodeMode(story);
+    _renderModeOrGate(story);
   });
 
-  // Render current mode
-  if (_readMode === 'aloud') {
-    _renderReadAloud(story);
+  // Render current mode — but first show Meet-the-Words gate if not done today.
+  // The gate teaches sight words + key vocabulary before any reading begins,
+  // so beginning readers can decode in context rather than guess at unfamiliar
+  // words. Once passed (today, this story), both modes load the reader directly.
+  _renderModeOrGate(story);
+}
+
+function _renderModeOrGate(story) {
+  if (_isMeetWordsCompletedToday(story.id)) {
+    if (_readMode === 'aloud') _renderReadAloud(story);
+    else _renderDecodeMode(story);
   } else {
-    _renderDecodeMode(story);
+    _renderMeetTheWordsGate(story);
   }
 }
 
@@ -339,6 +429,113 @@ function _setModeToggle(mode) {
   document.querySelectorAll('.smode-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.mode === mode);
   });
+}
+
+// ── MEET THE WORDS gate (pre-reading vocab + sight word introduction) ─────
+
+function _renderMeetTheWordsGate(story) {
+  const dynamic = document.getElementById('story-dynamic');
+  if (!dynamic) return;
+
+  _currentStoryVocab = story.vocab ?? [];
+  const hfwInStory = extractStoryHFW(story);
+
+  // Filter vocab to words actually appearing in the story text
+  const storyText = story.lines.map(l => l.text ?? '').join(' ').toLowerCase();
+  const vocabToPreteach = _currentStoryVocab.filter(v => {
+    const firstWord = v.word.toLowerCase().split(/\s+/)[0];
+    return storyText.includes(firstWord);
+  });
+
+  // Nothing to pre-teach? Skip the gate silently.
+  if (!hfwInStory.length && !vocabToPreteach.length) {
+    _setMeetWordsCompleted(story.id);
+    _renderModeOrGate(story);
+    return;
+  }
+
+  const totalChips = hfwInStory.length + vocabToPreteach.length;
+  const tapped = new Set();
+
+  const hfwChipsHtml = hfwInStory.map(w => /* html */`
+    <button class="hfw-chip" data-tap-id="hfw:${w}" data-word="${w}" aria-label="Hear sight word ${w}">
+      ⭐ ${w}
+    </button>
+  `).join('');
+
+  const vocabChipsHtml = vocabToPreteach.map(v => /* html */`
+    <button class="vocab-chip" data-tap-id="vocab:${v.word}" data-word="${v.word}" aria-label="Key word: ${v.word}">
+      <span class="vocab-chip-icon">${v.icon}</span>
+      <span class="vocab-chip-word">${v.word}</span>
+      <span class="vocab-chip-meaning">${v.meaning}</span>
+    </button>
+  `).join('');
+
+  dynamic.innerHTML = /* html */`
+    <div class="meet-words-gate" role="region" aria-labelledby="gate-title">
+      <h3 id="gate-title">🤝 Meet the Words</h3>
+      <p class="gate-hello">
+        Tap each word to hear it. When you know them all, you're ready to read
+        <strong>${story.title}</strong>.
+      </p>
+
+      ${hfwChipsHtml ? /* html */`
+        <div class="gate-section">
+          <div class="gate-section-title">⭐ Sight words in this story</div>
+          <div class="hfw-chip-list">${hfwChipsHtml}</div>
+        </div>
+      ` : ''}
+
+      ${vocabChipsHtml ? /* html */`
+        <div class="gate-section">
+          <div class="gate-section-title">📚 Key words to know</div>
+          <div class="vocab-chip-list">${vocabChipsHtml}</div>
+        </div>
+      ` : ''}
+
+      <div class="gate-continue-row">
+        <span class="gate-progress" id="gate-progress" aria-live="polite">0 / ${totalChips} tapped</span>
+        <button class="gate-skip" id="gate-skip" hidden type="button">I know these →</button>
+        <button class="btn btn--primary" id="gate-continue" type="button" disabled>Start Reading →</button>
+      </div>
+    </div>
+  `;
+
+  function recordTap(chip) {
+    const id = chip.dataset.tapId;
+    if (tapped.has(id)) return;
+    tapped.add(id);
+    chip.setAttribute('data-tapped', 'true');
+    const progressEl = document.getElementById('gate-progress');
+    if (progressEl) progressEl.textContent = `${tapped.size} / ${totalChips} tapped`;
+    if (tapped.size === totalChips) {
+      const continueBtn = document.getElementById('gate-continue');
+      if (continueBtn) continueBtn.disabled = false;
+    }
+  }
+
+  // Wire chip taps (HFW + vocab) — speak the word and mark as tapped.
+  dynamic.querySelectorAll('.hfw-chip, .vocab-chip').forEach(chip => {
+    chip.addEventListener('click', async () => {
+      _flashChip(chip);
+      try { await audio.speakWord(chip.dataset.word); } catch {}
+      recordTap(chip);
+    });
+  });
+
+  // Safety valve: after 10 s, show "I know these" so a returning learner
+  // can bypass the gate without tapping every chip.
+  setTimeout(() => {
+    const skip = document.getElementById('gate-skip');
+    if (skip) skip.hidden = false;
+  }, 10_000);
+
+  const proceed = () => {
+    _setMeetWordsCompleted(story.id);
+    _renderModeOrGate(story);
+  };
+  document.getElementById('gate-skip')?.addEventListener('click', proceed);
+  document.getElementById('gate-continue')?.addEventListener('click', proceed);
 }
 
 // ── READ ALOUD mode ───────────────────────────────────────────────────────
@@ -356,7 +553,7 @@ function _renderReadAloud(story) {
 
   // Use word spans when follow mode is 'word'
   const useWordSpans = _followMode === 'word';
-  const linesHtml = story.lines.map((line, i) => _lineHtml(line, i, useWordSpans)).join('');
+  const linesHtml = story.lines.map((line, i) => _lineHtml(line, i, useWordSpans, story)).join('');
   const hasQuest  = !!story.comprehension?.length;
   const hasTalk   = !!story.talkAboutIt?.length;
 
@@ -392,6 +589,13 @@ function _renderReadAloud(story) {
   dynamic.innerHTML = /* html */`
     <!-- Story text column -->
     <div class="story-content-wrap">
+      <!-- Reading scaffold toggles (target-sound highlights + reading ruler) -->
+      <div class="reader-scaffold-bar" role="group" aria-label="Reading scaffolds">
+        <span class="scaffold-label">Scaffolds</span>
+        <button class="scaffold-toggle" id="btn-toggle-graphemes" aria-pressed="${_showGraphemes}" title="Highlight the target sound in this story">🎨 Show sounds</button>
+        <button class="scaffold-toggle" id="btn-toggle-ruler" aria-pressed="${_showRuler}" title="Underline the line being read to keep your eyes on track">📏 Reading ruler</button>
+      </div>
+
       <!-- Follow-mode toggle -->
       <div class="follow-mode-toggle">
         <span class="follow-mode-label">Highlight:</span>
@@ -399,7 +603,7 @@ function _renderReadAloud(story) {
         <button class="follow-mode-btn${_followMode === 'word' ? ' active' : ''}" data-follow="word">Line + Word</button>
       </div>
 
-      <div class="story-body" id="story-body" aria-live="polite">${linesHtml}</div>
+      <div class="story-body${_showRuler ? ' story-ruler-on' : ''}" id="story-body" aria-live="polite">${linesHtml}</div>
       ${talkHtml}
     </div>
 
@@ -490,6 +694,23 @@ function _renderReadAloud(story) {
     });
   });
 
+  // Show-sounds toggle (target-grapheme highlighting)
+  document.getElementById('btn-toggle-graphemes')?.addEventListener('click', () => {
+    _showGraphemes = !_showGraphemes;
+    _persistPref(PREFS_GRAPHEMES_KEY, _showGraphemes);
+    _renderReadAloud(story);
+  });
+
+  // Reading-ruler toggle
+  document.getElementById('btn-toggle-ruler')?.addEventListener('click', () => {
+    _showRuler = !_showRuler;
+    _persistPref(PREFS_RULER_KEY, _showRuler);
+    const btn  = document.getElementById('btn-toggle-ruler');
+    const body = document.getElementById('story-body');
+    btn?.setAttribute('aria-pressed', String(_showRuler));
+    body?.classList.toggle('story-ruler-on', _showRuler);
+  });
+
   document.getElementById('btn-story-play')?.addEventListener('click', () => _startTTS(story));
   document.getElementById('btn-story-stop')?.addEventListener('click', () => _stopTTS());
 
@@ -517,13 +738,98 @@ function _renderReadAloud(story) {
 }
 
 /**
+ * Wrap target-grapheme substrings in a story-text segment with band-aware
+ * spans so beginning readers can attach the eye to the new pattern. Single
+ * vowels are matched everywhere; digraphs (ai/ee/oa/igh/oo…) match greedily
+ * left-to-right longest-first; split digraphs ('a_e','i_e','o_e','u_e') only
+ * match a vowel-consonant-e pattern at a word boundary, and wrap the vowel
+ * and the silent e separately (different colours).
+ *
+ * @param {string} text
+ * @param {string[]} targetGraphemes
+ * @param {string}   band  – 'A'|'B'|'C'|'D'
+ * @returns {string} HTML with grapheme spans
+ */
+export function _highlightGraphemes(text, targetGraphemes, band) {
+  if (!_showGraphemes || !text || !targetGraphemes?.length || !band) return text;
+
+  const ALPHA = /[a-z]/;
+  const CONS  = /[bcdfghjklmnpqrstvwxyz]/;
+  const lower = text.toLowerCase();
+
+  const splits   = [];
+  const digraphs = [];
+  const vowels   = [];
+  for (const g of targetGraphemes) {
+    if (!g) continue;
+    if (g.includes('_e')) splits.push(g[0].toLowerCase());
+    else if (g.length >= 2) digraphs.push(g.toLowerCase());
+    else vowels.push(g.toLowerCase());
+  }
+  digraphs.sort((a, b) => b.length - a.length);
+
+  let out = '';
+  let i = 0;
+  while (i < text.length) {
+    // Try split-digraph (e.g. 'a_e' → match v-C-e at word boundary)
+    let matched = false;
+    for (const v of splits) {
+      if (lower[i] === v &&
+          i + 2 < text.length &&
+          CONS.test(lower[i + 1]) &&
+          lower[i + 2] === 'e' &&
+          (i + 3 >= text.length || !ALPHA.test(lower[i + 3]))) {
+        out += `<span class="gph gph--${band} gph-vowel">${text[i]}</span>`;
+        out += text[i + 1];
+        out += `<span class="gph gph--${band} gph-silent">${text[i + 2]}</span>`;
+        i += 3;
+        matched = true;
+        break;
+      }
+    }
+    if (matched) continue;
+
+    // Try digraph (longest first)
+    for (const g of digraphs) {
+      if (lower.slice(i, i + g.length) === g) {
+        out += `<span class="gph gph--${band} gph-digraph">${text.slice(i, i + g.length)}</span>`;
+        i += g.length;
+        matched = true;
+        break;
+      }
+    }
+    if (matched) continue;
+
+    // Try single vowel
+    for (const v of vowels) {
+      if (lower[i] === v) {
+        out += `<span class="gph gph--${band} gph-vowel">${text[i]}</span>`;
+        i += 1;
+        matched = true;
+        break;
+      }
+    }
+    if (matched) continue;
+
+    out += text[i];
+    i += 1;
+  }
+  return out;
+}
+
+/**
  * Build HTML for a story line.
  * @param {object} line
  * @param {number} i – line index
  * @param {boolean} [wordSpans=false] – if true, wrap each word in a span for word-follow highlighting
+ * @param {object}  [story]            – the current story (for grapheme highlighting)
  */
-function _lineHtml(line, i, wordSpans = false) {
-  const content = wordSpans ? _wordSpanText(line.text) : line.text;
+function _lineHtml(line, i, wordSpans = false, story = null) {
+  const baseText = line.text ?? '';
+  const highlighted = story
+    ? _highlightGraphemes(baseText, story.targetGraphemes, story.band)
+    : baseText;
+  const content = wordSpans ? _wordSpanText(baseText, story) : highlighted;
   switch (line.type) {
     case 'chapter':   return `<div class="sline sline--chapter"   data-line="${i}">📚 ${content}</div>`;
     case 'label':     return `<div class="sline sline--label"     data-line="${i}">${content}</div>`;
@@ -538,13 +844,16 @@ function _lineHtml(line, i, wordSpans = false) {
 }
 
 /** Wrap each word in a data-word-idx span for word-follow highlighting. */
-function _wordSpanText(text) {
+function _wordSpanText(text, story = null) {
   if (!text) return '';
   const tokens = tokenise(text);
   let wordIdx = 0;
   return tokens.map(tok => {
     if (tok.type === 'word') {
-      return `<span class="wf-word" data-word-idx="${wordIdx++}">${tok.text}</span>`;
+      const inner = story
+        ? _highlightGraphemes(tok.text, story.targetGraphemes, story.band)
+        : tok.text;
+      return `<span class="wf-word" data-word-idx="${wordIdx++}">${inner}</span>`;
     }
     return tok.text;
   }).join('');
@@ -596,10 +905,11 @@ function _renderDecodeMode(story) {
       if (tok.type === 'word') {
         const cleanWord = tok.text.toLowerCase().replace(/[^a-z]/g, '');
         const hfw = isHFW(cleanWord);
+        const inner = _highlightGraphemes(tok.text, story.targetGraphemes, story.band);
         return `<button class="decode-word${hfw ? ' decode-hfw' : ''}"
                          data-word="${tok.text}"
                          aria-label="${hfw ? 'Sight word: ' : 'Decode: '}${tok.text}"
-                >${tok.text}</button>`;
+                >${inner}</button>`;
       }
       return `<span class="decode-punct">${tok.text}</span>`;
     }).join('');
@@ -615,6 +925,12 @@ function _renderDecodeMode(story) {
   dynamic.innerHTML = /* html */`
     <!-- Story text column -->
     <div class="story-content-wrap">
+      <!-- Reading scaffold toggles -->
+      <div class="reader-scaffold-bar" role="group" aria-label="Reading scaffolds">
+        <span class="scaffold-label">Scaffolds</span>
+        <button class="scaffold-toggle" id="btn-toggle-graphemes-decode" aria-pressed="${_showGraphemes}" title="Highlight the target sound in this story">🎨 Show sounds</button>
+      </div>
+
       <!-- Sight word pre-teach -->
       <div class="hfw-preteach" id="hfw-preteach">
         <div class="hfw-preteach-header">
@@ -665,6 +981,13 @@ function _renderDecodeMode(story) {
       </div>
     </div>
   `;
+
+  // Show-sounds toggle (target-grapheme highlighting) — re-renders this mode
+  document.getElementById('btn-toggle-graphemes-decode')?.addEventListener('click', () => {
+    _showGraphemes = !_showGraphemes;
+    _persistPref(PREFS_GRAPHEMES_KEY, _showGraphemes);
+    _renderDecodeMode(story);
+  });
 
   // Collapse/expand HFW section
   document.getElementById('btn-hfw-toggle')?.addEventListener('click', () => {
@@ -720,6 +1043,8 @@ function _renderDecodeMode(story) {
     btn.textContent = '✓ Read!';
     btn.disabled = true;
     btn.classList.add('btn--success');
+    // Surface a quick comprehension self-check after marking the story read
+    _showComprehensionCheck(story);
   });
 
   // Word tap → decode
@@ -1000,6 +1325,81 @@ function _onTTSDone() {
   // Reveal Story Quest CTA if story has quest data
   const cta = document.getElementById('story-quest-cta');
   if (cta) cta.hidden = false;
+  // Surface a quick comprehension self-check (once per session)
+  if (_currentStory) _showComprehensionCheck(_currentStory);
+}
+
+/**
+ * Render an inline comprehension self-check at the end of the story.
+ * Uses the existing `talkAboutIt` prompt — coaches the learner to retell
+ * rather than testing with auto-generated MCQ distractors. Logged to
+ * localStorage so a teacher/parent can spot stories that needed re-reads.
+ *
+ * Buttons:
+ *   🙂 I can answer        – logs response='confident', closes panel
+ *   🤔 Let me re-read     – logs response='reread',    re-plays TTS
+ *   💭 Show me where      – logs response='hint',      scrolls last line into view
+ */
+function _showComprehensionCheck(story) {
+  if (!story || !story.talkAboutIt?.length) return;
+  if (_compShownSession.has(story.id)) return;
+
+  const content = _container?.querySelector('.story-content-wrap');
+  if (!content) return;
+  // Avoid double-inserting
+  if (content.querySelector('.comp-check')) return;
+
+  _compShownSession.add(story.id);
+  const question = story.talkAboutIt[0];
+
+  const panel = document.createElement('div');
+  panel.className = 'comp-check';
+  panel.setAttribute('role', 'region');
+  panel.setAttribute('aria-label', 'Comprehension check');
+  panel.innerHTML = /* html */`
+    <h4>💬 Quick check</h4>
+    <div class="comp-q">${question}</div>
+    <div class="comp-choices">
+      <button class="comp-choice" data-resp="confident" type="button">🙂 I can answer this</button>
+      <button class="comp-choice" data-resp="reread" type="button">🤔 Let me re-read</button>
+      <button class="comp-choice" data-resp="hint" type="button">💭 Show me where</button>
+    </div>
+    <div class="comp-feedback" id="comp-feedback" hidden></div>
+    <button class="comp-skip" id="comp-skip" type="button">Skip</button>
+  `;
+  content.appendChild(panel);
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  const feedback = panel.querySelector('#comp-feedback');
+
+  panel.querySelectorAll('.comp-choice').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const resp = btn.dataset.resp;
+      _logComprehensionAttempt({ storyId: story.id, question, response: resp });
+
+      panel.querySelectorAll('.comp-choice').forEach(b => b.disabled = true);
+      btn.classList.add('correct'); // green outline regardless — this is a self-check
+
+      if (resp === 'confident') {
+        feedback.textContent = '👍 Great! You understood the story.';
+      } else if (resp === 'reread') {
+        feedback.textContent = '📖 Good plan — listening again helps build fluency.';
+        // If TTS is available, re-start the read-aloud for the same story
+        setTimeout(() => _startTTS(story), 300);
+      } else {
+        feedback.textContent = '💡 Look at the end of the story for clues.';
+        // Scroll the last text line into view to support the prompt
+        const lastLine = _container?.querySelector('.sline.sline--end, .sline:last-of-type');
+        lastLine?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      feedback.hidden = false;
+    });
+  });
+
+  panel.querySelector('#comp-skip')?.addEventListener('click', () => {
+    _logComprehensionAttempt({ storyId: story.id, question, response: 'skipped' });
+    panel.remove();
+  });
 }
 
 function _toggleTTSButtons(playing) {
