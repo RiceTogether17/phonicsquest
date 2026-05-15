@@ -207,7 +207,7 @@ function _onWordCardTap(cardEl) {
   cardEl.classList.add('sl-word-card--pop');
 
   audio.playSfx('pop');
-  audio.speakWord(word);
+  audio.speakSightWord(word);
 
   if (!_practiced.has(word)) {
     _practiced.add(word);
@@ -246,7 +246,7 @@ async function _listenToAll() {
     );
     cardEl?.classList.add('sl-word-card--highlight');
     audio.playSfx('pop');
-    audio.speakWord(word);
+    audio.speakSightWord(word);
 
     if (!_practiced.has(word)) {
       _practiced.add(word);
@@ -392,7 +392,7 @@ function _renderQuizRound() {
   `;
 
   document.getElementById('sl-btn-quiz-hear')?.addEventListener('click', () => {
-    if (_quizTarget) audio.speakWord(_quizTarget);
+    if (_quizTarget) audio.speakSightWord(_quizTarget);
   });
 
   panel.querySelectorAll('.sl-quiz-choice').forEach(btn => {
@@ -400,7 +400,7 @@ function _renderQuizRound() {
   });
 
   // Speak target after a short beat so the UI is rendered first.
-  setTimeout(() => { if (_quizTarget) audio.speakWord(_quizTarget); }, 250);
+  setTimeout(() => { if (_quizTarget) audio.speakSightWord(_quizTarget); }, 250);
 }
 
 function _onQuizChoice(btn) {

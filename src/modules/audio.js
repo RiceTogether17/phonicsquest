@@ -124,6 +124,23 @@ const AFFIX_PRONUNCIATION = {
 };
 
 /**
+ * Sight-word pronunciation overrides.
+ *
+ * Sight words whose default browser-TTS pronunciation differs from how the
+ * word is actually read in connected speech.  Each entry is either a
+ * phoneme key (preferred, plays the cached MP3 — consistent across voices)
+ * or a TTS-text override (used when no single phoneme captures the word).
+ *
+ * The classic offender is the article "a", which TTS reads as the letter
+ * NAME /eɪ/ ("ay") rather than the schwa /ə/ ("uh") that occurs in real
+ * sentences.  Keep additions narrow — most sight words speak correctly
+ * with raw TTS and adding too many overrides would obscure regressions.
+ */
+const SIGHT_WORD_PRONUNCIATIONS = {
+  a:   { phoneme: 'u' },   // schwa → use the short-u MP3 (closest cached match)
+};
+
+/**
  * TTS text overrides for affixes that should be spoken as a unit
  * but where raw text produces the wrong pronunciation.
  */
@@ -361,6 +378,36 @@ class AudioManager {
   speakWord(word) {
     if (!store.get('sfxEnabled')) return Promise.resolve();
     return this._speak(word, store.get('voiceSpeed') ?? 0.8);
+  }
+
+  /**
+   * Speak a SIGHT WORD with the natural unstressed pronunciation.
+   *
+   * Browser TTS engines pronounce single-letter strings like "a" using the
+   * letter NAME ("ay" /eɪ/) instead of the unstressed schwa /ə/ that the
+   * article actually has in connected speech.  This wrecks the phonics
+   * lesson: a child taps the sight-word card "a" expecting to hear the
+   * sound they read, and hears the alphabet letter instead.
+   *
+   * Look the word up in SIGHT_WORD_PRONUNCIATIONS — entries can be either:
+   *   • { phoneme: '<key>' } → play the phoneme MP3 directly
+   *   • { tts: '<text>' }    → speak overridden TTS text (e.g. "uh")
+   * Falls back to plain speakWord for any word with no override.
+   *
+   * @param {string} word
+   * @returns {Promise<void>}
+   */
+  speakSightWord(word) {
+    if (!store.get('sfxEnabled')) return Promise.resolve();
+    const key = String(word || '').trim();
+    const override = SIGHT_WORD_PRONUNCIATIONS[key] || SIGHT_WORD_PRONUNCIATIONS[key.toLowerCase()];
+    if (override?.phoneme) {
+      return this._playPhonemeAudio(override.phoneme);
+    }
+    if (override?.tts) {
+      return this._speak(override.tts, store.get('voiceSpeed') ?? 0.8);
+    }
+    return this.speakWord(word);
   }
 
   /**
