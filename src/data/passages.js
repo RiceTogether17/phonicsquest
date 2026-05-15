@@ -1,1 +1,1 @@
-Continued P5 clue refinements for better consistency.
+P5 clue refinements - continuing improvement.
