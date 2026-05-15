@@ -21,10 +21,10 @@
   <!-- Styles -->
 
   <title>PhonicsQuest – Early Reading & Primary English</title>
-  <script type="module" crossorigin src="/phonicsquest/assets/index-Dpfp_Xz1.js"></script>
+  <script type="module" crossorigin src="/phonicsquest/assets/index-DDN6ajc5.js"></script>
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/gsap-C8pce-KX.js">
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/chartjs-BR_H7_9u.js">
-  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-CD5T4WkO.css">
+  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-EcfKtslP.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -681,6 +681,17 @@
 
     <!-- Offline / audio cache indicator -->
     <div class="offline-indicator" id="offline-indicator" role="status" aria-live="polite" hidden></div>
+
+    <!-- Install / Add-to-Home-Screen banner -->
+    <div class="install-banner" id="install-banner" role="complementary" aria-label="Add PhonicsQuest to your home screen" hidden>
+      <span class="install-banner__icon" aria-hidden="true">📲</span>
+      <div class="install-banner__text">
+        <strong>Add to Home Screen</strong>
+        <span id="install-banner-sub">Open PhonicsQuest instantly — no link needed!</span>
+      </div>
+      <button class="install-banner__btn" id="install-btn">Install</button>
+      <button class="install-banner__close" id="install-dismiss" aria-label="Dismiss install prompt">✕</button>
+    </div>
 
     <!-- Toast notifications -->
     <div class="toast-container" id="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
