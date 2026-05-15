@@ -1,1 +1,1 @@
-UI improvements to results/complete screen and Clue Mission phase: better visual hierarchy, clearer skill summary, improved button layout, and more polished presentation.
+Additional UI refinements across browser, headers, and general layout for improved consistency, better mobile spacing, and cleaner visual presentation.
