@@ -146,6 +146,20 @@ export const VOCAB_CATEGORIES = {
     desc: 'Borrow vs lend, send vs fetch — pick the verb that fits',
     mcqOnly: true,
   },
+  similes: {
+    label: 'Similes',
+    icon: '🦚',
+    color: '#15803d',
+    desc: 'As proud as a peacock, as sly as a fox — fixed comparisons',
+    mcqOnly: true,
+  },
+  mannerAdverbs: {
+    label: 'Adverbs of Manner',
+    icon: '🌀',
+    color: '#7c3aed',
+    desc: 'Soundly, quietly, fiercely — how an action is done',
+    mcqOnly: true,
+  },
 };
 
 /** Categories exercised only through Vocab MCQ (no cloze passage bank). */

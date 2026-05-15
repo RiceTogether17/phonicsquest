@@ -637,9 +637,9 @@ export function validateP1PracticeTests(bank = P1_PRACTICE_TESTS) {
         if (typeof item.answer !== 'string' || !item.answer.trim()) {
           issues.push(`${tag}/sectionE: missing answer sentence`);
         }
-        const stripPunct = (s) => String(s).replace(/[‘’“”".,?!]/g, '').toLowerCase().trim().split(/\s+/).sort().join(' ');
-        const scrambledNorm = (item.scrambled || []).map(w => String(w).toLowerCase()).sort().join(' ');
-        const answerNorm = stripPunct(item.answer);
+        const stripPunct = (s) => String(s).replace(/[‘’“”".,?!]/g, '').toLowerCase().trim();
+        const scrambledNorm = (item.scrambled || []).map(stripPunct).sort().join(' ');
+        const answerNorm = stripPunct(item.answer).split(/\s+/).sort().join(' ');
         if (scrambledNorm !== answerNorm) {
           issues.push(`${tag}/sectionE: scrambled words do not form the answer (${item.answer})`);
         }

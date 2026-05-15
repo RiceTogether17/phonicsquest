@@ -15,6 +15,7 @@
 export const GRAMMAR_CATEGORIES = {
   articles:                  { label: 'Articles (a/an/the)',              icon: '📰' },
   pronouns:                  { label: 'Pronouns',                         icon: '👤' },
+  reflexivePronouns:         { label: 'Reflexive Pronouns (myself / yourselves / themselves)', icon: '🪞' },
   demonstratives:            { label: 'Demonstratives (this/that/these/those)', icon: '👉' },
   whQuestions:               { label: 'Wh- Questions (how/what/when/where/why)', icon: '❔' },
   svAgreement:               { label: 'Subject-Verb Agreement',           icon: '🤝' },

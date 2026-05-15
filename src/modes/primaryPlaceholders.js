@@ -22,6 +22,9 @@
 
 import { escapeHtml } from '../utils/escapeHtml.js';
 import { P1_PRACTICE_TESTS, P1_PRACTICE_TEST_TERMS } from '../data/p1PracticeTests.js';
+import { P2_PRACTICE_TESTS, P2_PRACTICE_TEST_TERMS } from '../data/p2PracticeTests.js';
+import { GRAMMAR_CATEGORIES } from '../data/grammarCategories.js';
+import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
 
 export const PRIMARY_PLACEHOLDER_KINDS = Object.freeze([
   'visual-text',
@@ -29,7 +32,55 @@ export const PRIMARY_PLACEHOLDER_KINDS = Object.freeze([
   'synthesis',
   'situational-writing',
   'p1-practice-tests',
+  'p2-practice-tests',
 ]);
+
+const PRACTISE_TARGET_LABELS = {
+  'grammar-mcq':   '🧠 Grammar MCQ',
+  'vocab-mcq':     '📖 Vocabulary MCQ',
+  'cloze-castle':  '🏰 Cloze Castle',
+  'word-vault':    '🔑 Word Vault',
+  'sentence-forge':'🔨 Sentence Forge',
+  'editing-quest': '✏️ Editing Quest',
+};
+
+function _skillLabel(skill) {
+  if (!skill) return '';
+  const meta = GRAMMAR_CATEGORIES[skill] || VOCAB_CATEGORIES[skill];
+  return meta?.label || skill;
+}
+
+function _skillIcon(skill) {
+  if (!skill) return '';
+  const meta = GRAMMAR_CATEGORIES[skill] || VOCAB_CATEGORIES[skill];
+  return meta?.icon || '';
+}
+
+function _skillChip(skill, target) {
+  if (!skill) return '';
+  const icon = _skillIcon(skill);
+  const label = _skillLabel(skill);
+  const targetBtn = target && PRACTISE_TARGET_LABELS[target]
+    ? `<button class="ptest-practise" data-related="${escapeHtml(target)}" type="button">Practise → ${PRACTISE_TARGET_LABELS[target]}</button>`
+    : '';
+  return `<div class="ptest-skill-row">
+    <span class="ptest-skill-chip" title="${escapeHtml(label)}">${icon} ${escapeHtml(label)}</span>
+    ${targetBtn}
+  </div>`;
+}
+
+function _sectionSkillSummary(items) {
+  const seen = new Set();
+  const chips = [];
+  for (const it of items || []) {
+    const key = it?.skill;
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    chips.push(`<span class="ptest-skill-chip ptest-skill-chip--mini">${_skillIcon(key)} ${escapeHtml(_skillLabel(key))}</span>`);
+  }
+  if (!chips.length) return '';
+  return `<p class="ptest-skill-summary"><strong>Skills practised:</strong> ${chips.join(' ')}</p>`;
+}
 
 const VISUAL_TEXT_SAMPLES = [
   {
@@ -223,6 +274,12 @@ const META = {
     blurb: 'Four full P1 English papers — Term 1 to Term 4. Each paper covers Grammar MCQ, Vocabulary MCQ, Grammar Cloze, Vocabulary Cloze, Word Order, Editing (T3 & T4) and a Comprehension passage. Use them to spot weak sections, then drill those modules.',
     paperLink: 'P1 · Continual Assessment style',
   },
+  'p2-practice-tests': {
+    icon: '🎓',
+    label: 'Primary 2 Practice Tests',
+    blurb: 'Four full P2 English papers — Term 1 to Term 4. Each paper adds Sentence Combining and mixed-error Editing (spelling, punctuation AND grammar). Every question shows the skill it tests with a "Practise this →" shortcut to the matching drill module.',
+    paperLink: 'P2 · Continual Assessment style',
+  },
 };
 
 export function getPlaceholderMeta(kind) {
@@ -303,7 +360,20 @@ function _renderBody(kind) {
   }
 
   if (kind === 'p1-practice-tests') {
-    return _renderP1PracticeTests();
+    return _renderPracticeTests({
+      level: 'P1',
+      terms: P1_PRACTICE_TEST_TERMS,
+      bank: P1_PRACTICE_TESTS,
+      hasEditingFromTerm: 3, // T3 + T4 have sectionF editing in P1
+    });
+  }
+  if (kind === 'p2-practice-tests') {
+    return _renderPracticeTests({
+      level: 'P2',
+      terms: P2_PRACTICE_TEST_TERMS,
+      bank: P2_PRACTICE_TESTS,
+      hasEditingFromTerm: 3, // T3 + T4 add Editing as Section G; T1/T2 stop after Section F (Sentence Combining)
+    });
   }
 
   if (kind === 'situational-writing') {
@@ -341,11 +411,78 @@ function _formatEditingParagraph(paragraph) {
   });
 }
 
+function _renderComprehensionSection(section, heading) {
+  const questions = section.questions.map((q, i) => {
+    const stem = `<p><strong>${i + 1}.</strong> ${escapeHtml(q.q)} <small>(${q.marks}m)</small></p>`;
+    if (q.type === 'mcq') {
+      return `<li>${stem}
+        <ol type="1" class="p1pt-choices">${q.choices.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ol>
+        <details><summary>Show answer</summary>
+          <p><strong>${escapeHtml(q.answer)}</strong></p>
+          <p>${escapeHtml(q.explain || '')}</p>
+        </details>
+      </li>`;
+    }
+    if (q.type === 'sequence') {
+      const opts = q.options.map((o, idx) => `<li>${escapeHtml(o)} <em>(answer ${q.answer[idx]})</em></li>`).join('');
+      return `<li>${stem}
+        <ul class="p1pt-sequence">${q.options.map(o => `<li>______ ${escapeHtml(o)}</li>`).join('')}</ul>
+        <details><summary>Show order</summary><ol>${opts}</ol></details>
+      </li>`;
+    }
+    if (q.type === 'word-meaning') {
+      return `<li>${stem}
+        <p><em>${escapeHtml(q.sentence || '')}</em></p>
+        <details><summary>Show answer</summary>
+          <p><strong>${escapeHtml(q.answer)}</strong> — ${escapeHtml(q.explain || '')}</p>
+        </details>
+      </li>`;
+    }
+    return `<li>${stem}
+      <details><summary>Show model answer</summary><p>${escapeHtml(q.model || '')}</p></details>
+    </li>`;
+  }).join('');
+  return `${heading}
+    <p class="p1pt-passage" style="white-space:pre-line">${escapeHtml(section.passage)}</p>
+    <ol class="p1pt-comprehension">${questions}</ol>`;
+}
+
+function _renderEditingSection(section, heading) {
+  const errs = section.errors.map(e => {
+    const kind = e.kind ? `<span class="ptest-edit-kind">${escapeHtml(e.kind)}</span>` : '';
+    return `<li>(${e.num}) ${kind} <strong>${escapeHtml(e.correction)}</strong> — ${escapeHtml(e.explain || '')}</li>`;
+  }).join('');
+  return `${heading}
+    <p>${escapeHtml(section.instructions || '')}</p>
+    <p class="p1pt-editing" style="white-space:pre-line">${_formatEditingParagraph(section.paragraph)}</p>
+    <details><summary>Show corrections</summary><ol>${errs}</ol></details>`;
+}
+
+function _renderSentenceCombining(section, heading) {
+  const list = section.items.map((it, i) => {
+    const originals = (it.originals || []).map(o => `<li>${escapeHtml(o)}</li>`).join('');
+    const skillRow = it.skill ? _skillChip(it.skill, 'sentence-forge') : '';
+    return `<li>
+      <ol class="ptest-combining-originals">${originals}</ol>
+      <p><strong>Connector:</strong> <code>${escapeHtml(it.connector)}</code></p>
+      <details><summary>Show combined sentence</summary>
+        <p><strong>${escapeHtml(it.model)}</strong></p>
+        <p>${escapeHtml(it.explain || '')}</p>
+      </details>
+      ${skillRow}
+    </li>`;
+  }).join('');
+  return `${heading}
+    <p>${escapeHtml(section.instructions || '')}</p>
+    <ol class="ptest-combining">${list}</ol>`;
+}
+
 function _renderPaperSection(test, key) {
   const section = test[key];
   if (!section) return '';
   const heading = `<h4>${escapeHtml(section.title)} <small>(${section.marks} marks)</small></h4>`;
 
+  // ── Section A / B — MCQ with skill chips and "Practise this →" buttons ──
   if (key === 'sectionA' || key === 'sectionB') {
     const list = section.items.map((it, i) => `
       <li>
@@ -357,14 +494,18 @@ function _renderPaperSection(test, key) {
           <p><strong>Answer:</strong> ${escapeHtml(it.answer)}</p>
           <p>${escapeHtml(it.explain || '')}</p>
         </details>
+        ${_skillChip(it.skill, it.practiseTarget)}
       </li>`).join('');
-    return `${heading}<ol class="p1pt-mcq">${list}</ol>`;
+    const summary = _sectionSkillSummary(section.items);
+    return `${heading}${summary}<ol class="p1pt-mcq">${list}</ol>`;
   }
 
+  // ── Section C / D — Cloze with word box ───────────────────────────────
   if (key === 'sectionC' || key === 'sectionD') {
     const wordBank = (section.wordBank || []).map(w => `<span class="p1pt-word">${escapeHtml(w)}</span>`).join(' ');
     const formatted = _formatClozeText(section.text);
     const reuse = section.reuseAllowed ? '<p><em>You may use the words more than once.</em></p>' : '';
+    const skillRow = section.skill ? _skillChip(section.skill, section.practiseTarget) : '';
     return `${heading}
       <p>${escapeHtml(section.instructions || '')}</p>
       <p class="p1pt-wordbank"><strong>Word box:</strong> ${wordBank}</p>
@@ -375,9 +516,11 @@ function _renderPaperSection(test, key) {
           ${section.answers.map((a, i) => `<li>(${i + 1}) <strong>${escapeHtml(a)}</strong></li>`).join('')}
         </ol>
         ${(section.leftOver || []).length ? `<p><em>Left over: ${section.leftOver.map(escapeHtml).join(', ')}</em></p>` : ''}
-      </details>`;
+      </details>
+      ${skillRow}`;
   }
 
+  // ── Section E — Word Order ────────────────────────────────────────────
   if (key === 'sectionE') {
     const list = section.items.map((it, i) => `
       <li>
@@ -386,65 +529,42 @@ function _renderPaperSection(test, key) {
       </li>`).join('');
     return `${heading}
       <p>${escapeHtml(section.instructions || '')}</p>
-      <ol class="p1pt-word-order">${list}</ol>`;
+      <ol class="p1pt-word-order">${list}</ol>
+      ${_skillChip('wordOrder', 'sentence-forge')}`;
   }
 
+  // ── Section F (P1: editing; P2 T1/T2: sentence combining; P2 T3/T4: sentence combining) ──
   if (key === 'sectionF') {
-    const errs = section.errors.map(e => `<li>(${e.num}) <strong>${escapeHtml(e.correction)}</strong> — ${escapeHtml(e.explain || '')}</li>`).join('');
-    return `${heading}
-      <p>${escapeHtml(section.instructions || '')}</p>
-      <p class="p1pt-editing" style="white-space:pre-line">${_formatEditingParagraph(section.paragraph)}</p>
-      <details><summary>Show corrections</summary><ol>${errs}</ol></details>`;
+    if (Array.isArray(section.items)) return _renderSentenceCombining(section, heading);
+    if (section.paragraph) return _renderEditingSection(section, heading);
   }
 
+  // ── Section G (P1: comprehension; P2 T3/T4: editing) ──
   if (key === 'sectionG') {
-    const questions = section.questions.map((q, i) => {
-      const stem = `<p><strong>${i + 1}.</strong> ${escapeHtml(q.q)} <small>(${q.marks}m)</small></p>`;
-      if (q.type === 'mcq') {
-        return `<li>${stem}
-          <ol type="1" class="p1pt-choices">${q.choices.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ol>
-          <details><summary>Show answer</summary>
-            <p><strong>${escapeHtml(q.answer)}</strong></p>
-            <p>${escapeHtml(q.explain || '')}</p>
-          </details>
-        </li>`;
-      }
-      if (q.type === 'sequence') {
-        const opts = q.options.map((o, idx) => `<li>${escapeHtml(o)} <em>(answer ${q.answer[idx]})</em></li>`).join('');
-        return `<li>${stem}
-          <ul class="p1pt-sequence">${q.options.map(o => `<li>______ ${escapeHtml(o)}</li>`).join('')}</ul>
-          <details><summary>Show order</summary><ol>${opts}</ol></details>
-        </li>`;
-      }
-      if (q.type === 'word-meaning') {
-        return `<li>${stem}
-          <p><em>${escapeHtml(q.sentence || '')}</em></p>
-          <details><summary>Show answer</summary>
-            <p><strong>${escapeHtml(q.answer)}</strong> — ${escapeHtml(q.explain || '')}</p>
-          </details>
-        </li>`;
-      }
-      return `<li>${stem}
-        <details><summary>Show model answer</summary><p>${escapeHtml(q.model || '')}</p></details>
-      </li>`;
-    }).join('');
-    return `${heading}
-      <p class="p1pt-passage" style="white-space:pre-line">${escapeHtml(section.passage)}</p>
-      <ol class="p1pt-comprehension">${questions}</ol>`;
+    if (section.paragraph) return _renderEditingSection(section, heading);
+    if (section.passage) return _renderComprehensionSection(section, heading);
+  }
+
+  // ── Section H (P2 T3/T4: comprehension) ──
+  if (key === 'sectionH') {
+    return _renderComprehensionSection(section, heading);
   }
 
   return '';
 }
 
-function _renderP1PracticeTests() {
-  const sectionsForTerm = (term) => (term === 'T1' || term === 'T2')
-    ? ['sectionA', 'sectionB', 'sectionC', 'sectionD', 'sectionE', 'sectionG']
-    : ['sectionA', 'sectionB', 'sectionC', 'sectionD', 'sectionE', 'sectionF', 'sectionG'];
+function _sectionKeysForTest(test) {
+  // Use the keys that actually exist on the test so we don't have to hard-code
+  // per-term layouts.  Order is fixed (A → H).
+  return ['sectionA', 'sectionB', 'sectionC', 'sectionD', 'sectionE', 'sectionF', 'sectionG', 'sectionH']
+    .filter(k => test[k]);
+}
 
-  const cards = P1_PRACTICE_TEST_TERMS.map(term => {
-    const test = P1_PRACTICE_TESTS[term];
+function _renderPracticeTests({ terms, bank }) {
+  const cards = terms.map(term => {
+    const test = bank[term];
     if (!test) return '';
-    const sections = sectionsForTerm(term).map(key => _renderPaperSection(test, key)).join('');
+    const sections = _sectionKeysForTest(test).map(key => _renderPaperSection(test, key)).join('');
     return `
       <article class="placeholder-card p1pt-paper" data-term="${term}">
         <header>
@@ -459,7 +579,7 @@ function _renderP1PracticeTests() {
       </article>`;
   }).join('');
 
-  return `<p>Tap a paper below to expand it. Each section can be tried on paper or read aloud together — answers and short explanations are tucked under "Show answer".</p>${cards}`;
+  return `<p>Tap a paper below to expand it. Each section can be tried on paper or read aloud together — answers and short explanations are tucked under "Show answer". The skill chips show which PhonicsQuest module to drill if a question feels hard.</p>${cards}`;
 }
 
 /**

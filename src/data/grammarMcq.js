@@ -9,7 +9,7 @@ export const GRAMMAR_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 
 const LEVEL_CATEGORY_PLAN = {
   P1: ['articles', 'pronouns', 'demonstratives', 'whQuestions', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'possessives', 'quantifiers'],
-  P2: ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'connectors', 'countableUncountable', 'futureTense'],
+  P2: ['articles', 'pronouns', 'reflexivePronouns', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'connectors', 'countableUncountable', 'futureTense', 'whQuestions'],
   P3: ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'connectors', 'conjunctions', 'comparatives', 'modals'],
   P4: ['svAgreement', 'presentPerfect', 'pastCont', 'futureTense', 'prepositions', 'connectors', 'quantifiers', 'adjAdverbs', 'auxiliaries', 'conjunctions'],
   P5: ['svAgreement', 'tenseAwareness', 'presentPerfect', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'quantifiers', 'mixedGrammar'],
@@ -93,6 +93,25 @@ const GRAMMAR_BUILDERS = {
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'pronoun_form', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the pronoun form that fits the sentence role.' };
   },
+  reflexivePronouns(level, i) {
+    const rows = [
+      ['We can do this ___. We do not need your help.', 'ourselves', ['himself', 'yourselves', 'themselves']],
+      ['"You only have ___ to blame," Mother scolded my sister and me.', 'yourselves', ['yourself', 'ourselves', 'themselves']],
+      ['Lin Lin made the cake all by ___ — she is very proud.', 'herself', ['himself', 'themselves', 'yourselves']],
+      ['The boys built the tree house ___ over the weekend.', 'themselves', ['ourselves', 'himself', 'herself']],
+      ['I taught ___ how to ride a bicycle last year.', 'myself', ['himself', 'ourselves', 'themselves']],
+      ['The cat groomed ___ patiently in the sunshine.', 'itself', ['himself', 'themselves', 'herself']],
+      ['Mr Lim, please help ___ to the snacks on the table.', 'yourself', ['himself', 'themselves', 'ourselves']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return {
+      subskill: 'reflexive_pronoun_form',
+      q,
+      choices: buildChoices(answer, ds),
+      answer,
+      explain: 'A reflexive pronoun (-self/-selves) matches the subject — I→myself, we→ourselves, they→themselves, he→himself, you (plural)→yourselves.',
+    };
+  },
   demonstratives(level, i) {
     const rows = [
       ['I like this toy. I do not like ___ one over there.', 'that', ['this', 'these', 'those']],
@@ -149,13 +168,20 @@ const GRAMMAR_BUILDERS = {
       ['Last night, Dad ___ us a bedtime story.', 'told', ['tell', 'tells', 'telling']],
       ['Yesterday, we ___ pizza at the food court.', 'ate', ['eat', 'eats', 'eating']],
     ];
+    const p2Rows = [
+      ['I was studying in my bedroom when I ___ a loud noise.', 'heard', ['hear', 'hears', 'was hearing']],
+      ['My mother ___ a lot while watching a sad movie just now.', 'cried', ['cry', 'cries', 'crying']],
+      ['Just a moment ago, the wind ___ and toppled the tree.', 'blew', ['blow', 'blows', 'is blowing']],
+      ['Last week, our class ___ a small project for the science fair.', 'built', ['build', 'builds', 'building']],
+      ['Yesterday morning, the rain ___ very heavily.', 'fell', ['fall', 'falls', 'is falling']],
+    ];
     const upperRows = [
       ['Yesterday, we ___ the art display before lunch.', 'visited', ['visit', 'visits', 'visiting']],
       ['Last Friday, she ___ her wallet at home.', 'left', ['leave', 'leaves', 'leaving']],
       ['Two days ago, they ___ the heavy box upstairs.', 'carried', ['carry', 'carries', 'carrying']],
       ['Last night, Father ___ us a story about courage.', 'told', ['tell', 'tells', 'telling']],
     ];
-    const rows = level === 'P1' ? p1Rows : upperRows;
+    const rows = level === 'P1' ? p1Rows : level === 'P2' ? p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'past_tense_form', q, choices: buildChoices(answer, ds), answer, explain: 'Past time markers require a past-tense verb.' };
   },
@@ -178,13 +204,21 @@ const GRAMMAR_BUILDERS = {
       ['My bag is ___ the table next to my books.', 'on', ['in', 'under', 'between']],
       ['The cat is hiding ___ the chair. I cannot see it.', 'under', ['above', 'across', 'behind']],
     ];
+    const p2Rows = [
+      ['The cyclist took shelter ___ the bridge as it was raining.', 'under', ['at', 'on', 'above']],
+      ['Joe kicked the ball so hard that it flew ___ the fence.', 'over', ['above', 'across', 'through']],
+      ['It is dangerous to dash ___ the road without watching out for traffic.', 'across', ['along', 'over', 'through']],
+      ['Emily wandered ___ a street she did not recognise.', 'down', ['off', 'around', 'among']],
+      ['Tall buildings stood all ___ her.', 'around', ['beside', 'across', 'towards']],
+      ['She decided to head ___ the park to find her way home.', 'towards', ['among', 'beside', 'off']],
+    ];
     const upperRows = [
       ['Please place the attendance file ___ the principal’s desk.', 'on', ['in', 'under', 'between']],
       ['We reached school ___ 7.20 a.m. today.', 'at', ['on', 'in', 'by']],
       ['The football rolled ___ the bench.', 'under', ['above', 'across', 'toward']],
       ['They walked ___ the bridge to the science centre.', 'across', ['behind', 'inside', 'with']],
     ];
-    const rows = level === 'P1' ? p1Rows : upperRows;
+    const rows = level === 'P1' ? p1Rows : level === 'P2' ? p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'preposition_use', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the preposition that best shows time, place or movement.' };
   },
@@ -218,14 +252,23 @@ const GRAMMAR_BUILDERS = {
     return { subskill: 'quantifier_choice', q, choices: buildChoices(answer, ds), answer, explain: 'Use quantifiers based on whether the noun is countable or uncountable.' };
   },
   connectors(level, i) {
-    const rows = [
+    const p2Rows = [
+      ['Mandy and Ken can walk ___ take the bus to school.', 'or', ['nor', 'and', 'but']],
+      ['We took off our coats ___ it was warm inside the building.', 'as', ['so', 'but', 'when']],
+      ['The fire broke out ___ the store was just about to open.', 'when', ['so', 'but', 'because']],
+      ['You can enter only ___ you have an entry pass.', 'if', ['as', 'while', 'until']],
+      ['Shake the bottle well ___ you pour out the sauce.', 'before', ['as', 'when', 'after']],
+      ['I kept ringing the doorbell ___ someone finally opened the door.', 'until', ['since', 'unless', 'while']],
+    ];
+    const upperRows = [
       ['The sky darkened, ___ we packed our raincoats.', 'so', ['but', 'or', 'because']],
       ['She was tired, ___ she still completed her corrections.', 'but', ['and', 'so', 'because']],
       ['Pack your bottle ___ your worksheet before camp.', 'and', ['but', 'or', 'because']],
       ['He revised carefully ___ he wanted to improve.', 'because', ['but', 'so', 'or']],
     ];
+    const rows = (level === 'P1' || level === 'P2') ? p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'connector_logic', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the connector that matches the relationship between ideas.' };
+    return { subskill: 'connector_logic', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the connector that matches the relationship between the two ideas — choice (or), reason (because/as), time (before/when/until), condition (if), contrast (but).' };
   },
   countableUncountable(level, i) {
     const rows = [
