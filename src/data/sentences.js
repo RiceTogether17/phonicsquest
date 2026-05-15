@@ -1,1 +1,1 @@
-Big metadata improvement pass on P5 sentences. Focused on fronted phrases, inversion patterns, and advanced clause structures.
+Big metadata improvement pass on P6 sentences. Improved consistency for inversion, embedded clauses, and advanced structures across most P6 items.
