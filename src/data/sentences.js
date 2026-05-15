@@ -1,1 +1,1 @@
-Improved metadata on second batch of P1 sentences: added sentenceSkills, focusLabel, and grammarNote for better consistency and teaching support.
+Completed metadata improvements for remaining P1 sentences. All P1 sentences now have consistent sentenceSkills, focusLabel, and grammarNote where applicable.
