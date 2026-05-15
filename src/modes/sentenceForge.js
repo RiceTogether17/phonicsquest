@@ -1,1 +1,1 @@
-Further UI refinements: improved answer chip area, better feedback styling, enhanced spacing and visual hierarchy in the game screen for a cleaner experience.
+UI improvements to Skill Clue Panel and Teach-back overlay: better spacing, clearer hierarchy, improved button styling and focus states for a more polished teaching moment experience.
