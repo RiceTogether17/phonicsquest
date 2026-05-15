@@ -1,1 +1,1 @@
-Big metadata improvement pass on P6 sentences. Improved consistency for inversion, embedded clauses, and advanced structures across most P6 items.
+Focused metadata pass on P6: Added missing inversion_pattern tags, improved grammarNote on advanced structures, and strengthened clause_boundary tagging on complex sentences.
