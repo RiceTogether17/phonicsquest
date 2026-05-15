@@ -1,1 +1,1 @@
-Significant expansion applied to multiple GRAMMAR_BUILDERS (svAgreement, connectors, conditionals, passiveVoice, tense categories, and others). Added many new sentence examples across levels and enriched explanations with clueWords and reasoning in key areas. Total question count increased substantially while maintaining generation logic.
+Improved svAgreement builder with better clueWords, clearer reasoning, and more accurate explanations. Also enhanced a few tense-related items. Changes are additive and non-breaking.
