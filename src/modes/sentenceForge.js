@@ -1,1 +1,1 @@
-Additional UI refinements across browser, headers, and general layout for improved consistency, better mobile spacing, and cleaner visual presentation.
+Final refinement pass: minor consistency improvements, better visual alignment across panels, and small UX tweaks for a more cohesive experience.
