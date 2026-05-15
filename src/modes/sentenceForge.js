@@ -1,1 +1,1 @@
-UI improvements to Skill Clue Panel and Teach-back overlay: better spacing, clearer hierarchy, improved button styling and focus states for a more polished teaching moment experience.
+UI improvements to results/complete screen and Clue Mission phase: better visual hierarchy, clearer skill summary, improved button layout, and more polished presentation.
