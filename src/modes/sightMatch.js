@@ -287,7 +287,7 @@ function _onCardClick(cardEl) {
   cardEl.classList.add('sm-card--flipped');
   cardEl.setAttribute('aria-label', `Card – ${cardEl.dataset.word}`);
   audio.playSfx('pop');
-  audio.speakWord(cardEl.dataset.word);
+  audio.speakSightWord(cardEl.dataset.word);
   _flipped.push(idx);
 
   if (_flipped.length < 2) return;
