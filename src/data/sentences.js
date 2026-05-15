@@ -1,1 +1,1 @@
-Completed metadata improvements for remaining P1 sentences. All P1 sentences now have consistent sentenceSkills, focusLabel, and grammarNote where applicable.
+Started metadata improvements for P2 sentences. Focused on connector_clue, time_order_clue, and punctuation_clue consistency.
