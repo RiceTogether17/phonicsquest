@@ -1,1 +1,1 @@
-Improved word chip rendering and interaction: larger effective touch targets, better visual feedback states, clearer active/used styling, and improved accessibility labels for mobile experience.
+Further UI refinements: improved answer chip area, better feedback styling, enhanced spacing and visual hierarchy in the game screen for a cleaner experience.
