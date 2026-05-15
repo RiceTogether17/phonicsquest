@@ -1,1 +1,1 @@
-Improved metadata on first batch of P1 sentences: added missing sentenceSkills, focusLabel, and grammarNote where helpful. Non-breaking changes focused on consistency.
+Improved metadata on second batch of P1 sentences: added sentenceSkills, focusLabel, and grammarNote for better consistency and teaching support.
