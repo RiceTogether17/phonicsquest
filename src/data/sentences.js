@@ -1,1 +1,1 @@
-Big metadata improvement pass on P4 sentences. Improved consistency in modal_order, connector_clue, clause_boundary, and related skills across most P4 items.
+Big metadata improvement pass on P5 sentences. Focused on fronted phrases, inversion patterns, and advanced clause structures.
