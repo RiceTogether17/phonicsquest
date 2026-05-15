@@ -97,7 +97,77 @@ export const VOCAB_CATEGORIES = {
     color: '#334155',
     desc: 'Match subjects with the correct verb form',
   },
+  bodyPartsAnimals: {
+    label: 'Animal Body Parts',
+    icon: '🪶',
+    color: '#0f766e',
+    desc: 'Name the beak, mane, claws and more',
+    mcqOnly: true,
+  },
+  collectiveNouns: {
+    label: 'Collective Nouns',
+    icon: '🐘',
+    color: '#b45309',
+    desc: 'A herd of elephants, a flock of birds, a troop of monkeys',
+    mcqOnly: true,
+  },
+  placeNouns: {
+    label: 'Places & Buildings',
+    icon: '🏥',
+    color: '#9333ea',
+    desc: 'Bakery, clinic, library — name the right place',
+    mcqOnly: true,
+  },
+  actionVerbs: {
+    label: 'Action Verbs',
+    icon: '🏃',
+    color: '#dc2626',
+    desc: 'Wag, wipe, sneak — the verb that matches the action',
+    mcqOnly: true,
+  },
+  soundVerbs: {
+    label: 'Sound Verbs',
+    icon: '🔊',
+    color: '#1d4ed8',
+    desc: 'Birds chirp, owls screech — sounds in nature',
+    mcqOnly: true,
+  },
+  emotionAdjectives: {
+    label: 'Emotion Words',
+    icon: '😊',
+    color: '#db2777',
+    desc: 'Delighted, amazed, grumpy — describe how someone feels',
+    mcqOnly: true,
+  },
+  verbDistinction: {
+    label: 'Tricky Verb Pairs',
+    icon: '🔀',
+    color: '#0369a1',
+    desc: 'Borrow vs lend, send vs fetch — pick the verb that fits',
+    mcqOnly: true,
+  },
+  similes: {
+    label: 'Similes',
+    icon: '🦚',
+    color: '#15803d',
+    desc: 'As proud as a peacock, as sly as a fox — fixed comparisons',
+    mcqOnly: true,
+  },
+  mannerAdverbs: {
+    label: 'Adverbs of Manner',
+    icon: '🌀',
+    color: '#7c3aed',
+    desc: 'Soundly, quietly, fiercely — how an action is done',
+    mcqOnly: true,
+  },
 };
+
+/** Categories exercised only through Vocab MCQ (no cloze passage bank). */
+export const VOCAB_MCQ_ONLY_CATEGORIES = Object.freeze(
+  Object.entries(VOCAB_CATEGORIES)
+    .filter(([, def]) => def?.mcqOnly)
+    .map(([key]) => key),
+);
 
 /** Ordered list of category keys for UI iteration. */
 export const VOCAB_CATEGORY_KEYS = Object.keys(VOCAB_CATEGORIES);

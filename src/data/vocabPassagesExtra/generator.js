@@ -294,6 +294,11 @@ function buildPassage(category, level, idx) {
 export function buildExtraPassageBank(levels = []) {
   const out = {};
   for (const category of Object.keys(VOCAB_CATEGORIES)) {
+    // Skip categories that don't have a generator bank (e.g. P1-only MCQ-only
+    // categories such as collectiveNouns, soundVerbs, placeNouns).  These
+    // categories are exercised through Vocabulary MCQ but don't have cloze
+    // passages, so we omit them from the auto-generated extras.
+    if (!CATEGORY_BANK[category]) continue;
     out[category] = {};
     for (const level of levels) {
       out[category][level] = Array.from({ length: 12 }, (_, i) => buildPassage(category, level, i));

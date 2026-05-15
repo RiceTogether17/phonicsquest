@@ -13,7 +13,7 @@ import {
 import { GRAMMAR_MCQ_ITEMS, GRAMMAR_MCQ_LEVELS } from '../data/grammarMcq.js';
 import { VOCAB_MCQ_ITEMS, VOCAB_MCQ_LEVELS } from '../data/vocabMcq.js';
 import { GRAMMAR_CATEGORIES } from '../data/grammarCategories.js';
-import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
+import { VOCAB_CATEGORIES, VOCAB_MCQ_ONLY_CATEGORIES } from '../data/vocabCategories.js';
 import { passages } from '../data/passages.js';
 import { vocabPassages } from '../data/vocabPassages.js';
 import { PAPER_ITEM_COUNTS, PAPER_LEVELS, PAPER_MODE_PLAYLISTS, PAPER_SECTION_LABELS } from '../data/paperPlaylists.js';
@@ -231,9 +231,11 @@ describe('Paper 2 content integrity — Vocabulary Cloze passages', () => {
     }
   });
 
-  it('all vocab categories have p1-p6 coverage with at least 12 passages per level', () => {
+  it('all cloze-eligible vocab categories have p1-p6 coverage with at least 12 passages per level', () => {
     const levels = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
+    const mcqOnly = new Set(VOCAB_MCQ_ONLY_CATEGORIES);
     for (const category of Object.keys(VOCAB_CATEGORIES)) {
+      if (mcqOnly.has(category)) continue; // exercised only through MCQ, no cloze bank
       expect(vocabPassages[category], `${category} missing from vocabPassages`).toBeTruthy();
       for (const lv of levels) {
         const arr = vocabPassages[category]?.[lv] || [];
