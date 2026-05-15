@@ -1,1 +1,1 @@
-Focused metadata pass on P6: Added missing inversion_pattern tags, improved grammarNote on advanced structures, and strengthened clause_boundary tagging on complex sentences.
+Additional targeted pass on P6: Improved relative clause tagging and formal conditional structures (Had..., Were...to).
