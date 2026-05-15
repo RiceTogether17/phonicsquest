@@ -160,6 +160,13 @@ export const VOCAB_CATEGORIES = {
     desc: 'Soundly, quietly, fiercely — how an action is done',
     mcqOnly: true,
   },
+  phrasalVerbs: {
+    label: 'Phrasal Verbs',
+    icon: '🪢',
+    color: '#ea580c',
+    desc: 'Break out, fall through, look forward to — multi-word verbs',
+    mcqOnly: true,
+  },
 };
 
 /** Categories exercised only through Vocab MCQ (no cloze passage bank). */

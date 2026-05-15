@@ -10,7 +10,7 @@ export const GRAMMAR_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 const LEVEL_CATEGORY_PLAN = {
   P1: ['articles', 'pronouns', 'demonstratives', 'whQuestions', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'possessives', 'quantifiers'],
   P2: ['articles', 'pronouns', 'reflexivePronouns', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'connectors', 'countableUncountable', 'futureTense', 'whQuestions'],
-  P3: ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'connectors', 'conjunctions', 'comparatives', 'modals'],
+  P3: ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'pastCont', 'prepositions', 'connectors', 'conjunctions', 'comparatives', 'modals', 'tagQuestions', 'compoundIndefinite'],
   P4: ['svAgreement', 'presentPerfect', 'pastCont', 'futureTense', 'prepositions', 'connectors', 'quantifiers', 'adjAdverbs', 'auxiliaries', 'conjunctions'],
   P5: ['svAgreement', 'tenseAwareness', 'presentPerfect', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'quantifiers', 'mixedGrammar'],
   P6: ['tenseAwareness', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'inversion', 'auxiliaries', 'connectors', 'mixedGrammar'],
@@ -110,6 +110,42 @@ const GRAMMAR_BUILDERS = {
       choices: buildChoices(answer, ds),
       answer,
       explain: 'A reflexive pronoun (-self/-selves) matches the subject — I→myself, we→ourselves, they→themselves, he→himself, you (plural)→yourselves.',
+    };
+  },
+  tagQuestions(level, i) {
+    const rows = [
+      ['Andy is joining us for recess, ___ he?', 'isn’t', ['is', 'does', 'doesn’t']],
+      ['You have watched this movie before, ___ you?', 'haven’t', ['did', 'have', 'didn’t']],
+      ['They will join the swim team, ___ they?', 'won’t', ['will', 'do', 'don’t']],
+      ['She does not eat seafood, ___ she?', 'does', ['doesn’t', 'is', 'isn’t']],
+      ['We must finish this by Friday, ___ we?', 'mustn’t', ['must', 'do', 'don’t']],
+      ['The twins are not in the team, ___ they?', 'are', ['aren’t', 'is', 'isn’t']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return {
+      subskill: 'tag_question_form',
+      q,
+      choices: buildChoices(answer, ds),
+      answer,
+      explain: 'A tag question reverses the polarity of the main verb — positive statement → negative tag (and vice versa). Use the same auxiliary (is/are, do/does, have/has, will, must...).',
+    };
+  },
+  compoundIndefinite(level, i) {
+    const rows = [
+      ['I must have dropped my key ___. I cannot seem to find it.', 'somewhere', ['nowhere', 'anywhere', 'everywhere']],
+      ['Is there ___ at home? The lights are off.', 'anyone', ['no one', 'someone', 'everyone']],
+      ['There is ___ to do — the room is spotless.', 'nothing', ['anything', 'something', 'everything']],
+      ['I want to go ___ quiet for the holidays.', 'somewhere', ['nowhere', 'anywhere', 'everywhere']],
+      ['___ in the class enjoys art lessons — even the shy ones.', 'Everyone', ['No one', 'Anyone', 'Someone']],
+      ['I looked ___ for my glasses but they were on my head.', 'everywhere', ['nowhere', 'somewhere', 'anywhere']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return {
+      subskill: 'compound_pronoun_choice',
+      q,
+      choices: buildChoices(answer, ds),
+      answer,
+      explain: 'some- = unknown but exists; any- = unspecified (in questions/negatives); no- = none; every- = all.',
     };
   },
   demonstratives(level, i) {

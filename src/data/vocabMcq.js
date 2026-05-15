@@ -16,7 +16,7 @@ const LEVEL_CATEGORY_PLAN = {
     'contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'wordParts',
     'actionVerbs', 'soundVerbs', 'collectiveNouns', 'emotionAdjectives', 'similes', 'mannerAdverbs',
   ],
-  P3: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue', 'wordParts', 'scienceTechTerms'],
+  P3: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue', 'wordParts', 'scienceTechTerms', 'phrasalVerbs', 'similes', 'mannerAdverbs', 'actionVerbs'],
   P4: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue', 'wordParts', 'socialStudiesVocab'],
   P5: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue', 'wordParts', 'idiomaticExpressions', 'proverbsSayings', 'scienceTechTerms'],
   P6: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue', 'wordParts', 'idiomaticExpressions', 'proverbsSayings', 'socialStudiesVocab'],
@@ -281,6 +281,19 @@ const VOCAB_BUILDERS = {
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'mannerAdverbs', subskill: 'adverb_manner', q, choices: buildChoices(answer, ds), answer, explain: 'An adverb of manner describes HOW an action is done — match the adverb to the mood and intensity of the scene.' };
+  },
+  phrasalVerbs(level, i) {
+    const rows = [
+      ['The prisoners succeeded in ___ of prison by using a secret underground tunnel.', 'breaking out', ['breaking into', 'breaking up', 'breaking through']],
+      ['The business deal ___ because both sides could not agree on many matters.', 'fell through', ['fell out', 'fell behind', 'fell over']],
+      ['Ali is very ___ with his sister — they share everything.', 'close to', ['close with', 'close on', 'close at']],
+      ['Please ___ the music. We can\'t hear ourselves think.', 'turn down', ['turn off', 'turn over', 'turn out']],
+      ['I am ___ to my birthday next week.', 'looking forward', ['looking up', 'looking out', 'looking after']],
+      ['The teacher told us to ___ our textbooks to page 42.', 'turn to', ['turn over', 'turn down', 'turn in']],
+      ['Mum said I had to ___ my room before going out.', 'tidy up', ['tidy in', 'tidy on', 'tidy down']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { category: 'phrasalVerbs', subskill: 'phrasal_verb_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'Phrasal verbs combine a verb + particle into a fixed meaning — break out (escape), fall through (fail to happen), turn down (lower / refuse).' };
   },
   verbDistinction(level, i) {
     const rows = [

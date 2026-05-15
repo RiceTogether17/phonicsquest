@@ -71,27 +71,21 @@ describe('P1 Practice Test data bank', () => {
   });
 });
 
-describe('P1 Practice Test renderer', () => {
+describe('P1 Practice Test launcher', () => {
   it('registers p1-practice-tests as a valid placeholder kind', () => {
     expect(PRIMARY_PLACEHOLDER_KINDS).toContain('p1-practice-tests');
   });
 
-  it('renders the four papers with answers tucked into details', () => {
+  it('renders a launcher card for every paper with a Start button', () => {
     const html = buildPlaceholderHtml('p1-practice-tests');
     expect(html).toContain('Primary 1 Practice Tests');
     for (const term of P1_PRACTICE_TEST_TERMS) {
       const test = P1_PRACTICE_TESTS[term];
       expect(html).toContain(test.label);
+      expect(html).toContain(`data-start-paper="${test.id}"`);
     }
-    expect(html).toContain('Show answer'); // MCQ details
-    expect(html).toContain('Show answers'); // cloze details
-    expect(html).toContain('Show sentence'); // word order details
-  });
-
-  it('shows Editing section only on T3 and T4 papers', () => {
-    const html = buildPlaceholderHtml('p1-practice-tests');
-    // T3 + T4 have two editing-paragraph wrappers between them
-    const editingCount = (html.match(/p1pt-editing/g) || []).length;
-    expect(editingCount).toBeGreaterThanOrEqual(2);
+    // The launcher no longer ships static answers — those live in the
+    // interactive game mode now.
+    expect(html).not.toContain('Show answer');
   });
 });
