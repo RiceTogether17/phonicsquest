@@ -1,1 +1,1 @@
-Batch improvements on P5 clues. Focused on strengthening explanations and prompt quality across more passages.
+Continued clue improvements on P5 passages with focus on consistency and educational value.
