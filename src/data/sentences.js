@@ -1,1 +1,1 @@
-Significant metadata improvement pass on P2 sentences. Added consistent sentenceSkills, focusLabel, grammarNote, and clueMission where appropriate across most P2 items.
+Started metadata improvements for P3 sentences. Focused on fronted clauses, comparatives, and clause boundary skills.
