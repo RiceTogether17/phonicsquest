@@ -8587,6 +8587,29 @@ details.story-tool-section[open] > .story-tool-summary::before {
   100% { transform: scale(1); }
 }
 
+/* clueWords + reasoning chips shown in MCQ feedback (merged from main) */
+.mcq-clue-words {
+  display: inline-block;
+  font-size: 0.85em;
+  margin-top: 4px;
+}
+.mcq-clue-chip {
+  display: inline-block;
+  background: color-mix(in srgb, var(--color-primary) 12%, #fff);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 28%, var(--border));
+  border-radius: 999px;
+  padding: 1px 8px;
+  margin: 1px 3px;
+  font-weight: 600;
+  color: var(--color-primary-dark, var(--color-primary));
+}
+.mcq-reasoning {
+  display: inline-block;
+  font-style: italic;
+  color: var(--text-muted, #555);
+  margin-top: 2px;
+}
+
 /* Category tag shown above each question */
 .mcq-category-tag {
   font-size: var(--font-size-xs, 0.75rem);
