@@ -1,1 +1,1 @@
-Further improved explanations in connectors, conditionals, passiveVoice, and additional tense categories. Added clueWords and clearer reasoning to support student understanding. Non-breaking changes.
+Broad quality pass across remaining categories (articles, pronouns, prepositions, quantifiers, modals, conjunctions, comparatives, reportedSpeech, relativeClauses and others). Added clueWords and improved reasoning where impactful. Non-breaking.
