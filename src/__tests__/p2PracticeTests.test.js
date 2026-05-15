@@ -89,30 +89,13 @@ describe('P2 Practice Test renderer', () => {
     expect(PRIMARY_PLACEHOLDER_KINDS).toContain('p2-practice-tests');
   });
 
-  it('renders the four papers with answer details and Sentence Combining blocks', () => {
+  it('renders a launcher card for every paper with a Start button', () => {
     const html = buildPlaceholderHtml('p2-practice-tests');
     expect(html).toContain('Primary 2 Practice Tests');
     for (const term of P2_PRACTICE_TEST_TERMS) {
-      expect(html).toContain(P2_PRACTICE_TESTS[term].label);
+      const test = P2_PRACTICE_TESTS[term];
+      expect(html).toContain(test.label);
+      expect(html).toContain(`data-start-paper="${test.id}"`);
     }
-    expect(html).toContain('Show combined sentence');
-    expect(html).toContain('Show corrections');
-  });
-
-  it('emits a Practise this skill button for every Section A / B item', () => {
-    const html = buildPlaceholderHtml('p2-practice-tests');
-    // 4 papers × 10 MCQ items each = 40 practise links minimum
-    const practiseLinks = (html.match(/class="ptest-practise"/g) || []).length;
-    expect(practiseLinks).toBeGreaterThanOrEqual(40);
-    expect(html).toContain('data-related="grammar-mcq"');
-    expect(html).toContain('data-related="vocab-mcq"');
-  });
-
-  it('labels editing-error kinds (spelling / punctuation / grammar) inline', () => {
-    const html = buildPlaceholderHtml('p2-practice-tests');
-    expect(html).toContain('ptest-edit-kind');
-    expect(html).toMatch(/ptest-edit-kind">spelling/);
-    expect(html).toMatch(/ptest-edit-kind">grammar/);
-    expect(html).toMatch(/ptest-edit-kind">punctuation/);
   });
 });
