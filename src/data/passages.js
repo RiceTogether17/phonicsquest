@@ -1,1 +1,1 @@
-Continued refinements to P5 clues.
+Further P5 clue refinements.
