@@ -18,6 +18,11 @@ const LEVEL_CATEGORY_PLAN = {
 
 const SUBJECTS = ['The pupil', 'My brother', 'Our teacher', 'The class monitor', 'The twins', 'The players', 'Her cousin', 'The science team'];
 const PLACES = ['in the canteen', 'at the void deck', 'near the school gate', 'in the library', 'at East Coast Park', 'beside the hall', 'on the field', 'at the community club'];
+// 16 context tails — combined with the 3 level-specific tails, the total
+// pool size is 19, which is prime.  A prime pool size means any step the
+// build loop uses to rotate through tails will be coprime with the pool
+// and therefore cycle through every slot before repeating, eliminating
+// duplicate stems in the generated banks.
 const CONTEXT_TAILS = [
   'during English lesson',
   'before assembly',
@@ -31,6 +36,10 @@ const CONTEXT_TAILS = [
   'after the science activity',
   'during oral practice',
   'before dismissal',
+  'after the library visit',
+  'before the field trip',
+  'during weekly assembly',
+  'after morning briefing',
 ];
 const LEVEL_TAILS = {
   P1: ['before story time', 'during phonics practice', 'after snack break'],
@@ -56,9 +65,44 @@ function difficultyFor(level, idx) {
   return idx % 3 === 0 ? 3 : 2;
 }
 
+// Common sentence-starters that should be lowercased when the stem is
+// promoted into a sub-clause (after a fronted context phrase + comma).
+// Proper nouns and "I" are intentionally NOT in this set so they keep
+// their natural capital.
+const STEM_STARTERS_TO_LOWERCASE = new Set([
+  'a', 'an', 'the', 'this', 'that', 'these', 'those',
+  'he', 'she', 'it', 'we', 'they', 'you',
+  'can', 'could', 'will', 'would', 'shall', 'should', 'may', 'might', 'must',
+  'do', 'does', 'did', 'is', 'are', 'was', 'were', 'has', 'have', 'had',
+  'look', 'listen', 'see', 'watch',
+  'how', 'what', 'when', 'where', 'who', 'whose', 'which', 'why',
+  'please', 'pass', 'put', 'tell',
+]);
+
+function _lowercaseFirstWordIfCommon(s) {
+  const m = s.match(/^("?)([A-Z][a-z']+)\b/);
+  if (!m) return s;
+  const [full, openQuote, word] = m;
+  if (!STEM_STARTERS_TO_LOWERCASE.has(word.toLowerCase())) return s;
+  return openQuote + word.charAt(0).toLowerCase() + word.slice(1) + s.slice(full.length);
+}
+
 function decorateStem(stem, level, idx) {
-  const tail = rotate([...(LEVEL_TAILS[level] || []), ...CONTEXT_TAILS], idx);
-  return `${String(stem).replace(/\.$/, '')} ${tail}.`;
+  const stemStr = String(stem);
+  // Multiplicative hash with a prime-sized pool so consecutive idx
+  // values cycle through every tail slot before repeating.  No 32-bit
+  // mask (>>> 0) because the mask would collapse big products onto
+  // multiples of common factors of pool length and re-introduce
+  // duplicates.
+  const pool = [...(LEVEL_TAILS[level] || []), ...CONTEXT_TAILS];
+  const tail = pool[Math.abs(idx * 2654435761) % pool.length];
+  // For question/exclamation stems, PREPEND the context as an opening
+  // phrase — appending after "?" would break the closing punctuation.
+  if (/[?!]\s*$/.test(stemStr)) {
+    const opener = tail.charAt(0).toUpperCase() + tail.slice(1);
+    return `${opener}, ${_lowercaseFirstWordIfCommon(stemStr)}`;
+  }
+  return `${stemStr.replace(/\.$/, '')} ${tail}.`;
 }
 
 const GRAMMAR_BUILDERS = {

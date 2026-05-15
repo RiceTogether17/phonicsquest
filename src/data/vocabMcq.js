@@ -21,6 +21,9 @@ const LEVEL_CATEGORY_PLAN = {
   P5: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue', 'wordParts', 'idiomaticExpressions', 'proverbsSayings', 'scienceTechTerms'],
   P6: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue', 'wordParts', 'idiomaticExpressions', 'proverbsSayings', 'socialStudiesVocab'],
 };
+// 16 context tails — together with the 3 level-specific tails the pool
+// is 19, a prime size.  See grammarMcq.js for the rationale (prime pool
+// keeps every step coprime with pool size, eliminating duplicate stems).
 const CONTEXT_TAILS = [
   'during morning assembly',
   'in class discussion',
@@ -34,6 +37,10 @@ const CONTEXT_TAILS = [
   'during values-in-action day',
   'during enrichment week',
   'before the final check',
+  'during after-school care',
+  'before lining up for recess',
+  'during silent reading',
+  'after the show-and-tell session',
 ];
 const LEVEL_TAILS = {
   P1: ['during a short class story', 'before playtime', 'after phonics station'],
@@ -58,9 +65,37 @@ function difficultyFor(level, idx) {
   return idx % 3 === 0 ? 3 : 2;
 }
 
+// Common sentence-starters that are NOT proper nouns and so can be
+// safely lowercased after a fronted context phrase + comma.
+const STEM_STARTERS_TO_LOWERCASE = new Set([
+  'a', 'an', 'the', 'this', 'that', 'these', 'those',
+  'he', 'she', 'it', 'we', 'they', 'you',
+  'can', 'could', 'will', 'would', 'shall', 'should', 'may', 'might', 'must',
+  'do', 'does', 'did', 'is', 'are', 'was', 'were', 'has', 'have', 'had',
+  'look', 'listen', 'see', 'watch',
+  'how', 'what', 'when', 'where', 'who', 'whose', 'which', 'why',
+  'please', 'pass', 'put', 'tell',
+]);
+
+function _lowercaseFirstWordIfCommon(s) {
+  const m = s.match(/^("?)([A-Z][a-z']+)\b/);
+  if (!m) return s;
+  const [full, openQuote, word] = m;
+  if (!STEM_STARTERS_TO_LOWERCASE.has(word.toLowerCase())) return s;
+  return openQuote + word.charAt(0).toLowerCase() + word.slice(1) + s.slice(full.length);
+}
+
 function decorateStem(stem, level, idx) {
-  const tail = rotate([...(LEVEL_TAILS[level] || []), ...CONTEXT_TAILS], idx);
-  return `${String(stem).replace(/\.$/, '')} ${tail}.`;
+  const stemStr = String(stem);
+  // Multiplicative hash with a prime-sized pool so consecutive idx
+  // values cycle through every tail slot before repeating.
+  const pool = [...(LEVEL_TAILS[level] || []), ...CONTEXT_TAILS];
+  const tail = pool[Math.abs(idx * 2654435761) % pool.length];
+  if (/[?!]\s*$/.test(stemStr)) {
+    const opener = tail.charAt(0).toUpperCase() + tail.slice(1);
+    return `${opener}, ${_lowercaseFirstWordIfCommon(stemStr)}`;
+  }
+  return `${stemStr.replace(/\.$/, '')} ${tail}.`;
 }
 
 const VOCAB_BUILDERS = {
@@ -263,7 +298,7 @@ const VOCAB_BUILDERS = {
       ['Dennis is as proud as a ___. He always thinks he is better than other people.', 'peacock', ['fox', 'eel', 'lion']],
       ['Little Liyana is as quiet as a ___ when she reads in the library.', 'mouse', ['lion', 'parrot', 'monkey']],
       ['After running the race, John was as fast as a ___.', 'cheetah', ['turtle', 'snail', 'whale']],
-      ['Grandma said the porridge was as smooth as ___.', 'silk', ['sand', 'rock', 'glass']],
+      ['The kitten’s fur felt as soft as ___.', 'silk', ['sand', 'rock', 'wood']],
       ['Our prefect, Aliya, is as brave as a ___ when she stops bullies in school.', 'lion', ['mouse', 'rabbit', 'parrot']],
       ['Daniel was as busy as a ___ during the school carnival.', 'bee', ['bear', 'sloth', 'cat']],
     ];
