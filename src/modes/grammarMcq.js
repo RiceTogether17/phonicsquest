@@ -200,6 +200,16 @@ function _streakBadge() {
   return `<span class="mcq-streak" aria-label="${_streak} in a row">${icon} ${_streak}</span>`;
 }
 
+function _renderClueWords(item) {
+  if (!item.clueWords || item.clueWords.length === 0) return '';
+  return `
+    <div class="mcq-clue-words">
+      <strong>🔍 Clue words:</strong> 
+      ${item.clueWords.map(w => `<span class="mcq-clue-chip">${w}</span>`).join(' ')}
+    </div>
+  `;
+}
+
 function _renderQuestion() {
   if (!_container) return;
   const item = _items[_idx];
@@ -258,21 +268,41 @@ function _renderQuestion() {
       });
 
       const hint = _container.querySelector('#gmcq-hint');
-      let hintText = ok ? '✅ Correct.' : `❌ Correct answer: ${item.answer}.`;
-      hintText += ` ${item.explain}`;
+      
+      let hintText = '';
+      
+      if (ok) {
+        hintText = '✅ <strong>Correct!</strong>';
+      } else {
+        hintText = `❌ <strong>Correct answer:</strong> ${item.answer}`;
+      }
+
+      // Show clue words if available
+      if (item.clueWords && item.clueWords.length > 0) {
+        hintText += `<br><span class="mcq-clue-words"><strong>🔍 Clue words:</strong> ${item.clueWords.map(w => `<span class="mcq-clue-chip">${w}</span>`).join(' ')}</span>`;
+      }
+
+      // Show reasoning if available, otherwise fall back to explain
+      if (item.reasoning) {
+        hintText += `<br><span class="mcq-reasoning">${item.reasoning}</span>`;
+      } else if (item.explain) {
+        hintText += `<br>${item.explain}`;
+      }
 
       if (!ok) {
         const suggestion = checkPostAttempt('grammarMcq', item.category, false);
-        if (suggestion && suggestion.type === 'redirect') hintText += ` 💡 ${suggestion.message}`;
+        if (suggestion && suggestion.type === 'redirect') {
+          hintText += ` <br>💡 ${suggestion.message}`;
+        }
       }
 
-      if (hint) hint.textContent = hintText;
+      if (hint) hint.innerHTML = hintText;
 
       _advanceTimer = setTimeout(() => {
         _advanceTimer = null;
         _idx += 1;
         _renderQuestion();
-      }, ok ? 1200 : 2000);
+      }, ok ? 1400 : 2200);
     });
   });
 }
