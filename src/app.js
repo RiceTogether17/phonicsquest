@@ -1976,7 +1976,18 @@ class App {
     this._renderProfileGrid();
 
     // Placement determines reading band; school level only affects quest gating.
-    if (!store.get('placementComplete')) {
+    //
+    // Primary-school profiles (P1-P6) skip the phonics diagnostic — those
+    // children are already past the decode-blend-segment stage and the
+    // placement test would just be a frustrating barrier between them and
+    // the Primary English content.  Seed a "reader" placement so downstream
+    // band-aware logic still has a sane shape to read from.
+    if (profile.schoolLevel === 'primary' && !store.get('placementComplete')) {
+      const primaryPlacement = this._buildPrimaryDefaultPlacement(profile);
+      store.set('placementProfile', primaryPlacement);
+      store.set('placementComplete', true);
+      this._afterPlacement(profile, primaryPlacement);
+    } else if (!store.get('placementComplete')) {
       this._showScreen('screen-placement');
       this._runPlacementTest(profile);
     } else {
@@ -1984,6 +1995,35 @@ class App {
     }
 
     audio.playSfx('correct');
+  }
+
+  /**
+   * Build a default placement payload for primary-school profiles that
+   * skip the diagnostic.  Sets readingBand to "reader" so the Primary
+   * English layout is shown, and marks every readiness flag so quest
+   * gating doesn't block access.  Phonics-stage fields are kept at
+   * their highest values for consistency with the rest of the app.
+   * @param {object} profile
+   */
+  _buildPrimaryDefaultPlacement(profile) {
+    return {
+      readingBand: 'reader',
+      phonicsPhase: 5,
+      phase: 5,
+      startGroup: null,
+      preSeededStats: {},
+      sightWordBand: 'strong',
+      storyReadiness: 'paragraph',
+      sentenceReady: true,
+      grammarReady: true,
+      vocabularyReady: true,
+      bandDescription: 'Primary English pathway — diagnostic skipped for school-age learners.',
+      intake: {
+        schoolLevel: 'primary',
+        primaryGrade: profile?.primaryGrade || null,
+      },
+      skippedDiagnostic: true,
+    };
   }
 
   // ── Placement Test ──
