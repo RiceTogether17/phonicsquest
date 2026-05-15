@@ -1,1 +1,1 @@
-Broad quality pass across remaining categories (articles, pronouns, prepositions, quantifiers, modals, conjunctions, comparatives, reportedSpeech, relativeClauses and others). Added clueWords and improved reasoning where impactful. Non-breaking.
+Significant expansion of question volume across multiple categories. Added many new varied examples while maintaining improved explanation quality with clueWords and reasoning. Non-breaking changes.
