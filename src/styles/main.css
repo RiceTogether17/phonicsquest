@@ -10038,6 +10038,70 @@ textarea:hover {
 }
 .placeholder-related { font-size: 0.85rem; }
 
+/* ── P1 Practice Tests ─────────────────────────────────────────────────── */
+.p1pt-paper { background: color-mix(in srgb, var(--color-primary) 4%, #fff); }
+.p1pt-paper > header h3 { margin-bottom: 2px; }
+.p1pt-paper-toggle > summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--color-primary);
+  padding: 6px 0;
+}
+.p1pt-paper-toggle h4 {
+  margin: 14px 0 6px;
+  font-size: 0.98rem;
+  color: var(--color-primary-dark, var(--color-primary));
+  border-bottom: 1px solid color-mix(in srgb, var(--color-primary) 18%, var(--border));
+  padding-bottom: 3px;
+}
+.p1pt-mcq > li,
+.p1pt-word-order > li,
+.p1pt-comprehension > li { margin-bottom: 10px; }
+.p1pt-mcq > li > p,
+.p1pt-comprehension > li > p { margin: 0 0 4px; }
+.p1pt-choices { list-style: lower-alpha inside; margin: 4px 0 4px 8px; padding: 0; }
+.p1pt-choices > li { padding: 1px 0; font-size: 0.92rem; }
+.p1pt-wordbank {
+  background: color-mix(in srgb, var(--color-primary) 8%, #fff);
+  border: 1px dashed color-mix(in srgb, var(--color-primary) 22%, var(--border));
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.92rem;
+  margin: 6px 0;
+}
+.p1pt-word {
+  display: inline-block;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 8px;
+  margin: 2px;
+  font-weight: 600;
+}
+.p1pt-blank {
+  display: inline-block;
+  padding: 0 4px;
+  border-bottom: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+.p1pt-edit { color: var(--color-primary); font-weight: 600; }
+.p1pt-cloze,
+.p1pt-passage,
+.p1pt-editing {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 6px 0;
+  line-height: 1.6;
+}
+.p1pt-sequence { list-style: none; padding-left: 0; margin: 4px 0; }
+.p1pt-sequence > li {
+  padding: 3px 0;
+  font-family: inherit;
+}
+
 /* ── Comprehension Cloze Quest ──────────────────────────────────────────── */
 .cc-quest {
   display: flex;

@@ -517,6 +517,7 @@ class App {
       ['btn-open-comprehension',  'open-comprehension'],
       ['btn-synthesis',           'synthesis'],
       ['btn-situational-writing', 'situational-writing'],
+      ['btn-p1-practice-tests',   'p1-practice-tests'],
     ];
     placeholderHandlers.forEach(([btnId, kind]) => {
       document.getElementById(btnId)?.addEventListener('click', () => {
@@ -1388,6 +1389,7 @@ class App {
       case 'open-comprehension':
       case 'synthesis':
       case 'situational-writing':
+      case 'p1-practice-tests':
         this._openPrimaryPlaceholder(target);
         break;
       default:

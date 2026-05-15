@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { PAPER_MODE_PLAYLISTS, PAPER_SECTION_LABELS } from '../data/paperPlaylists.js';
 import { VOCAB_CATEGORIES, vocabPassages } from '../data/vocabPassages.js';
+import { VOCAB_MCQ_ONLY_CATEGORIES } from '../data/vocabCategories.js';
 import { passages as clozePassages } from '../data/passages.js';
 
 describe('Paper Playlist data integrity', () => {
@@ -26,8 +27,10 @@ describe('Vocab Passages data integrity', () => {
     }
   });
 
-  it('every VOCAB_CATEGORIES key has at least one passage in vocabPassages', () => {
+  it('every cloze-eligible VOCAB_CATEGORIES key has at least one passage in vocabPassages', () => {
+    const mcqOnly = new Set(VOCAB_MCQ_ONLY_CATEGORIES);
     for (const key of Object.keys(VOCAB_CATEGORIES)) {
+      if (mcqOnly.has(key)) continue; // MCQ-only categories have no cloze bank
       const catData = vocabPassages[key];
       expect(catData, `Category "${key}" in VOCAB_CATEGORIES but no passages in vocabPassages`).toBeTruthy();
       const levelCount = Object.keys(catData).length;

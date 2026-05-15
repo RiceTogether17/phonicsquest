@@ -15,6 +15,8 @@
 export const GRAMMAR_CATEGORIES = {
   articles:                  { label: 'Articles (a/an/the)',              icon: '📰' },
   pronouns:                  { label: 'Pronouns',                         icon: '👤' },
+  demonstratives:            { label: 'Demonstratives (this/that/these/those)', icon: '👉' },
+  whQuestions:               { label: 'Wh- Questions (how/what/when/where/why)', icon: '❔' },
   svAgreement:               { label: 'Subject-Verb Agreement',           icon: '🤝' },
   simplePast:                { label: 'Simple Past Tense',                icon: '⏪' },
   presentCont:               { label: 'Present Continuous',               icon: '🔄' },

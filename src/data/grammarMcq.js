@@ -8,7 +8,7 @@
 export const GRAMMAR_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 
 const LEVEL_CATEGORY_PLAN = {
-  P1: ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'possessives', 'quantifiers'],
+  P1: ['articles', 'pronouns', 'demonstratives', 'whQuestions', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'possessives', 'quantifiers'],
   P2: ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'connectors', 'countableUncountable', 'futureTense'],
   P3: ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'connectors', 'conjunctions', 'comparatives', 'modals'],
   P4: ['svAgreement', 'presentPerfect', 'pastCont', 'futureTense', 'prepositions', 'connectors', 'quantifiers', 'adjAdverbs', 'auxiliaries', 'conjunctions'],
@@ -76,14 +76,58 @@ const GRAMMAR_BUILDERS = {
     };
   },
   pronouns(level, i) {
-    const rows = [
+    const p1Rows = [
+      ['Tom is my friend. ___ likes to play football with me.', 'He', ['She', 'It', 'They']],
+      ['Sara and I went to the park. ___ played on the swings.', 'We', ['I', 'They', 'She']],
+      ['Look at the bird in the cage. ___ is so colourful!', 'It', ['He', 'She', 'They']],
+      ['The boys forgot their bags. The teacher reminded ___.', 'them', ['they', 'their', 'theirs']],
+      ['Don’t eat the bread. ___ has turned mouldy.', 'It', ['He', 'She', 'They']],
+    ];
+    const upperRows = [
       ['The girls were late, so ___ apologised to the teacher.', 'they', ['them', 'their', 'theirs']],
       ['Mr Tan called Ali and me, so he spoke to ___.', 'us', ['we', 'our', 'ours']],
       ['That sketchbook belongs to Mei. It is ___.', 'hers', ['her', 'she', 'herself']],
       ['Please pass the worksheet to Dan and ___.', 'me', ['I', 'my', 'mine']],
     ];
+    const rows = level === 'P1' ? p1Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'pronoun_form', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the pronoun form that fits the sentence role.' };
+  },
+  demonstratives(level, i) {
+    const rows = [
+      ['I like this toy. I do not like ___ one over there.', 'that', ['this', 'these', 'those']],
+      ['"___ is my pencil," said Mimi as she held it in her hand.', 'This', ['That', 'These', 'Those']],
+      ['Look at ___ apples on the table in front of us. They are red and shiny.', 'these', ['this', 'that', 'those']],
+      ['Can you see ___ birds flying high in the sky?', 'those', ['this', 'that', 'these']],
+      ['"Pass me ___ book on your desk, please," asked the teacher.', 'that', ['this', 'these', 'those']],
+      ['"___ shoes here are mine. The ones over there are yours."', 'These', ['That', 'Those', 'This']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return {
+      subskill: 'demonstrative_choice',
+      q,
+      choices: buildChoices(answer, ds),
+      answer,
+      explain: 'Use "this/these" for things near, "that/those" for things far. Use the singular form for one and the plural form for many.',
+    };
+  },
+  whQuestions(level, i) {
+    const rows = [
+      ['"___ did you perform this magic trick? Please show me," Fred asked.', 'How', ['When', 'What', 'Where']],
+      ['"___ are you today? I hope you are feeling much better," my teacher said to me.', 'How', ['Why', 'What', 'Which']],
+      ['"___ is your birthday party? I want to know the date," Sara asked.', 'When', ['Where', 'How', 'Who']],
+      ['"___ do you keep your school bag at home?" asked Mum.', 'Where', ['When', 'How', 'Why']],
+      ['"___ are you wearing a raincoat? It is not raining," Tom asked.', 'Why', ['How', 'When', 'Where']],
+      ['"___ is the largest animal in the world?" the teacher asked the class.', 'Which', ['How', 'When', 'Whose']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return {
+      subskill: 'wh_question_word',
+      q,
+      choices: buildChoices(answer, ds),
+      answer,
+      explain: 'Wh- words ask about time (when), place (where), reason (why), manner (how), choice (which).',
+    };
   },
   svAgreement(level, i) {
     const rows = [
@@ -97,12 +141,21 @@ const GRAMMAR_BUILDERS = {
     return { subskill: 'agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Match the verb with the true subject.' };
   },
   simplePast(level, i) {
-    const rows = [
+    const p1Rows = [
+      ['Yesterday, I ___ to the library to borrow books.', 'went', ['go', 'gone', 'goes']],
+      ['Yesterday, Jean ___ her bicycle to the park.', 'rode', ['ride', 'rides', 'riding']],
+      ['Last weekend, Mum ___ a chocolate cake for my birthday.', 'baked', ['bake', 'bakes', 'baking']],
+      ['As a young boy, Grandfather ___ in this river.', 'swam', ['swim', 'swims', 'swum']],
+      ['Last night, Dad ___ us a bedtime story.', 'told', ['tell', 'tells', 'telling']],
+      ['Yesterday, we ___ pizza at the food court.', 'ate', ['eat', 'eats', 'eating']],
+    ];
+    const upperRows = [
       ['Yesterday, we ___ the art display before lunch.', 'visited', ['visit', 'visits', 'visiting']],
       ['Last Friday, she ___ her wallet at home.', 'left', ['leave', 'leaves', 'leaving']],
       ['Two days ago, they ___ the heavy box upstairs.', 'carried', ['carry', 'carries', 'carrying']],
       ['Last night, Father ___ us a story about courage.', 'told', ['tell', 'tells', 'telling']],
     ];
+    const rows = level === 'P1' ? p1Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'past_tense_form', q, choices: buildChoices(answer, ds), answer, explain: 'Past time markers require a past-tense verb.' };
   },
@@ -117,12 +170,21 @@ const GRAMMAR_BUILDERS = {
     return { subskill: 'present_continuous', q, choices: buildChoices(answer, ds), answer, explain: 'Use present continuous for actions happening now.' };
   },
   prepositions(level, i) {
-    const rows = [
+    const p1Rows = [
+      ['Gavin fell asleep ___ the sofa.', 'on', ['in', 'into', 'onto']],
+      ['The ball rolled away and fell ___ a drain.', 'into', ['to', 'on', 'over']],
+      ['Holly has to attend a lesson ___ 8 o’clock in the morning.', 'at', ['in', 'on', 'by']],
+      ['It was very hot, so we sat ___ the shade where it was cooler.', 'in', ['on', 'with', 'below']],
+      ['My bag is ___ the table next to my books.', 'on', ['in', 'under', 'between']],
+      ['The cat is hiding ___ the chair. I cannot see it.', 'under', ['above', 'across', 'behind']],
+    ];
+    const upperRows = [
       ['Please place the attendance file ___ the principal’s desk.', 'on', ['in', 'under', 'between']],
       ['We reached school ___ 7.20 a.m. today.', 'at', ['on', 'in', 'by']],
       ['The football rolled ___ the bench.', 'under', ['above', 'across', 'toward']],
       ['They walked ___ the bridge to the science centre.', 'across', ['behind', 'inside', 'with']],
     ];
+    const rows = level === 'P1' ? p1Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'preposition_use', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the preposition that best shows time, place or movement.' };
   },
@@ -137,12 +199,21 @@ const GRAMMAR_BUILDERS = {
     return { subskill: 'possessive_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Use the possessive word that shows ownership clearly.' };
   },
   quantifiers(level, i) {
-    const rows = [
+    const p1Rows = [
+      ['I looked into the refrigerator. There wasn’t ___ juice left.', 'any', ['a few', 'many', 'a little']],
+      ['There is no ___ soup left after Dan finished the whole pot.', 'more', ['any', 'much', 'many']],
+      ['After a tiring day, Mother had ___ rest when she came home.', 'some', ['any', 'little', 'few']],
+      ['There wasn’t ___ juice left. I only had half a glass of it.', 'much', ['some', 'little', 'few']],
+      ['I bought ___ apples at the market for our breakfast.', 'some', ['any', 'much', 'a little']],
+      ['How ___ pencils do you have in your pencil case?', 'many', ['much', 'a little', 'less']],
+    ];
+    const upperRows = [
       ['There are ___ marbles in this small pouch.', 'few', ['little', 'much', 'less']],
       ['How ___ sugar should we add to this drink?', 'much', ['many', 'few', 'several']],
       ['Only ___ pupils were absent during rehearsal.', 'a few', ['a little', 'much', 'less']],
       ['We have ___ water left, so refill the bottle.', 'little', ['few', 'many', 'several']],
     ];
+    const rows = level === 'P1' ? p1Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'quantifier_choice', q, choices: buildChoices(answer, ds), answer, explain: 'Use quantifiers based on whether the noun is countable or uncountable.' };
   },
