@@ -1,1 +1,1 @@
-Improved highest-impact Vocabulary MCQ categories (contextInference, collocationCloze, connectorClue, synonymContrast) with better explanations, clueWords, and clearer reasoning. Non-breaking changes.
+Improved additional Vocabulary categories and significantly expanded volume in high-impact areas (contextInference, collocations, connectors, etc.) while maintaining better explanation quality with clueWords. Non-breaking.
