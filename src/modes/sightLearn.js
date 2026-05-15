@@ -22,6 +22,7 @@
 
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
+import { startLscwcDrill, cleanupLscwcDrill } from './lscwcDrill.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -68,6 +69,7 @@ export function cleanupSightLearn() {
   _autoplayAbort = true;
   _autoPlaying   = false;
   _quizActive    = false;
+  cleanupLscwcDrill();
   if (_container) _container.innerHTML = '';
   _activeQuest   = null;
   _practiced     = new Set();
@@ -457,6 +459,10 @@ function _finishQuiz() {
                 aria-label="Try the quick check again">
           🔁 Try again
         </button>
+        <button class="btn btn--ghost btn--sm" id="sl-btn-spell-it"
+                aria-label="Practise spelling these words">
+          🔤 Spell it!
+        </button>
         <button class="btn btn--primary btn--sm" id="sl-btn-quiz-to-match"
                 aria-label="Play the matching game now">
           🃏 Play matching game
@@ -466,7 +472,59 @@ function _finishQuiz() {
   `;
 
   document.getElementById('sl-btn-quiz-retry')?.addEventListener('click', _startQuiz);
+  document.getElementById('sl-btn-spell-it')?.addEventListener('click', _startSpellIt);
   document.getElementById('sl-btn-quiz-to-match')?.addEventListener('click', () => {
+    _handlers.onStartMatch?.(_activeQuest);
+  });
+}
+
+// ── Spell-It (Look, Say, Cover, Write, Check) ──────────────────────────────
+
+function _startSpellIt() {
+  if (!_activeQuest) return;
+  const panel = document.getElementById('sl-recall');
+  if (!panel) return;
+  audio.playSfx?.('reveal');
+  startLscwcDrill(panel, _activeQuest.words, {
+    onDone: (summary) => _onSpellItDone(summary),
+    onCancel: _finishQuiz,
+  });
+}
+
+function _onSpellItDone(summary) {
+  const panel = document.getElementById('sl-recall');
+  if (!panel) return;
+  audio.playSfx?.('levelUp');
+  const total = summary?.totalWords ?? 0;
+  const firstTry = summary?.correctFirstTry ?? 0;
+  const allFirstTry = total > 0 && firstTry === total;
+
+  panel.innerHTML = `
+    <div class="sl-recall-card sl-recall-card--done">
+      <div class="sl-recall-emoji" aria-hidden="true">${allFirstTry ? '🏆' : '✨'}</div>
+      <div class="sl-recall-copy">
+        <div class="sl-recall-title">
+          ${allFirstTry ? 'Perfect spelling!' : 'Great spelling practice!'}
+        </div>
+        <div class="sl-recall-sub">
+          You spelled ${firstTry} of ${total} on the first try.
+          ${allFirstTry ? 'You\'re a spelling star!' : 'Keep practising and you\'ll get them all.'}
+        </div>
+      </div>
+      <div class="sl-recall-actions">
+        <button class="btn btn--ghost btn--sm" id="sl-btn-spell-it-again"
+                aria-label="Spell these words again">
+          🔁 Spell again
+        </button>
+        <button class="btn btn--primary btn--sm" id="sl-btn-spell-to-match"
+                aria-label="Play the matching game now">
+          🃏 Play matching game
+        </button>
+      </div>
+    </div>
+  `;
+  document.getElementById('sl-btn-spell-it-again')?.addEventListener('click', _startSpellIt);
+  document.getElementById('sl-btn-spell-to-match')?.addEventListener('click', () => {
     _handlers.onStartMatch?.(_activeQuest);
   });
 }
