@@ -1,1 +1,1 @@
-Improved svAgreement builder with better clueWords, clearer reasoning, and more accurate explanations. Also enhanced a few tense-related items. Changes are additive and non-breaking.
+Further improved explanations in connectors, conditionals, passiveVoice, and additional tense categories. Added clueWords and clearer reasoning to support student understanding. Non-breaking changes.
