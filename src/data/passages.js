@@ -1,1 +1,1 @@
-Started clue improvements on P5 passages. Focused on Modals, Conditionals, Passive Voice, and Countable/Uncountable categories.
+Batch improvements on P5 clues. Focused on strengthening explanations and prompt quality across more passages.
