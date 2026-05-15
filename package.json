@@ -1,7 +1,7 @@
 {
   "name": "phonicsquest",
   "version": "2.0.0",
-  "description": "PhonicsQuest \u2013 production-grade phonics learning adventure for early readers",
+  "description": "PhonicsQuest – production-grade phonics learning adventure for early readers",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@vitest/ui": "^4.0.18",
+    "jimp": "^1.6.1",
     "jsdom": "^28.1.0",
     "typescript": "^5.9.3",
     "vite": "^5.2.0",
