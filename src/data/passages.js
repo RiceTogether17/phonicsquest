@@ -1,1 +1,1 @@
-Targeted clue improvements on selected P6 passages (passive voice, reported speech, relative clauses). Improved prompt quality, explanations, and acceptableSpans for better clue-hunt experience.
+Batch 2 clue improvements on P6 passages (Conditionals, Countable/Uncountable, Past Perfect, Mixed Grammar). Focused on clearer prompts and stronger educational explanations.
