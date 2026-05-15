@@ -1,1 +1,1 @@
-Batch 2 clue improvements on P6 passages (Conditionals, Countable/Uncountable, Past Perfect, Mixed Grammar). Focused on clearer prompts and stronger educational explanations.
+Batch 3 clue improvements on remaining P6 passages. Focused on final categories and overall consistency in prompt quality and explanations.
