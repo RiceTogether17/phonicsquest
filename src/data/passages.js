@@ -1,1 +1,1 @@
-Additional clue improvements on P5 passages for better educational support.
+Further clue refinements on P5 passages.
