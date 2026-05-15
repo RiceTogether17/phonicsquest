@@ -1872,6 +1872,72 @@ input, select, textarea { font-family: inherit; }
   color: var(--text-on-dark);
 }
 
+/* ── Install / Add-to-Home-Screen Banner ─────────────────────────────────── */
+.install-banner {
+  position: fixed;
+  bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: #fff;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 998;
+  max-width: min(92vw, 480px);
+  width: max-content;
+  font-family: var(--font-main);
+  animation: install-banner-in 0.35s var(--ease-out);
+}
+.install-banner[hidden] { display: none; }
+.install-banner__icon { font-size: 1.5rem; flex-shrink: 0; }
+.install-banner__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--font-size-sm);
+  line-height: 1.3;
+  flex: 1;
+  min-width: 0;
+}
+.install-banner__text strong {
+  font-size: var(--font-size-base);
+  color: var(--color-primary-dark);
+}
+.install-banner__btn {
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-primary);
+  color: var(--text-on-dark);
+  border: none;
+  border-radius: var(--radius-full);
+  font-family: var(--font-main);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.install-banner__btn:hover { background: var(--color-primary-dark); }
+.install-banner__close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--space-1);
+  line-height: 1;
+  border-radius: var(--radius-sm);
+}
+.install-banner__close:hover { color: var(--text); }
+@keyframes install-banner-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
 /* ── Badge Grid (dashboard) ── */
 .badge-grid {
   display: grid;

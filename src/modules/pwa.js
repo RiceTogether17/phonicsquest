@@ -58,6 +58,63 @@ export function registerServiceWorker() {
   window.addEventListener('offline', () => _updateNetworkStatus(false));
 }
 
+/** Show an "Add to Home Screen" banner so parents can install the app */
+export function initInstallPrompt() {
+  // Already running as an installed PWA — nothing to do
+  if (window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true) return;
+
+  // Respect a recent dismiss (hidden for 14 days)
+  const dismissed = localStorage.getItem('pwa-install-dismissed');
+  if (dismissed && Date.now() - Number(dismissed) < 14 * 24 * 60 * 60 * 1000) return;
+
+  const banner   = document.getElementById('install-banner');
+  const btn      = document.getElementById('install-btn');
+  const closeBtn = document.getElementById('install-dismiss');
+  const subText  = document.getElementById('install-banner-sub');
+  if (!banner || !btn || !closeBtn) return;
+
+  function dismiss() {
+    banner.hidden = true;
+    localStorage.setItem('pwa-install-dismissed', String(Date.now()));
+  }
+  closeBtn.addEventListener('click', dismiss);
+
+  // iOS Safari: no beforeinstallprompt — show manual instructions instead
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  if (isIos) {
+    if (subText) subText.textContent = 'Tap Share ⎙ then "Add to Home Screen"';
+    btn.textContent = 'Got it';
+    btn.addEventListener('click', dismiss);
+    setTimeout(() => { banner.hidden = false; }, 2500);
+    return;
+  }
+
+  // Chrome / Edge / Samsung Internet: use the deferred install prompt
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    setTimeout(() => { banner.hidden = false; }, 2000);
+  });
+
+  btn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    banner.hidden = true;
+    if (outcome === 'dismissed') {
+      localStorage.setItem('pwa-install-dismissed', String(Date.now()));
+    }
+  });
+
+  window.addEventListener('appinstalled', () => {
+    banner.hidden = true;
+    deferredPrompt = null;
+  });
+}
+
 function _updateNetworkStatus(isOnline) {
   const indicator = document.getElementById('offline-indicator');
   if (!indicator) return;

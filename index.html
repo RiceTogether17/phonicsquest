@@ -679,6 +679,17 @@
     <!-- Offline / audio cache indicator -->
     <div class="offline-indicator" id="offline-indicator" role="status" aria-live="polite" hidden></div>
 
+    <!-- Install / Add-to-Home-Screen banner -->
+    <div class="install-banner" id="install-banner" role="complementary" aria-label="Add PhonicsQuest to your home screen" hidden>
+      <span class="install-banner__icon" aria-hidden="true">📲</span>
+      <div class="install-banner__text">
+        <strong>Add to Home Screen</strong>
+        <span id="install-banner-sub">Open PhonicsQuest instantly — no link needed!</span>
+      </div>
+      <button class="install-banner__btn" id="install-btn">Install</button>
+      <button class="install-banner__close" id="install-dismiss" aria-label="Dismiss install prompt">✕</button>
+    </div>
+
     <!-- Toast notifications -->
     <div class="toast-container" id="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
 
