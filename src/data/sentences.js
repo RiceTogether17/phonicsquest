@@ -1,1 +1,1 @@
-Big metadata improvement pass on P6 sentences. Improved consistency for inversion, embedded clauses, and advanced structures across most P6 items.
+Additional targeted pass on P6: Improved relative clause tagging and formal conditional structures (Had..., Were...to).
