@@ -1,1 +1,1 @@
-Improved additional Vocabulary categories and significantly expanded volume in high-impact areas (contextInference, collocations, connectors, etc.) while maintaining better explanation quality with clueWords. Non-breaking.
+Continued improvement and expansion across more Vocabulary MCQ categories (idioms, proverbs, word parts, emotions, verbs, etc.). Added clueWords and better reasoning while increasing volume. Non-breaking.
