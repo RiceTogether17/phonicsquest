@@ -1,1 +1,1 @@
-Started metadata improvements for P4 sentences. Focused on modal order, fronted cause clauses, and so...that structures.
+Big metadata improvement pass on P4 sentences. Improved consistency in modal_order, connector_clue, clause_boundary, and related skills across most P4 items.
