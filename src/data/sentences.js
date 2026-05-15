@@ -1,1 +1,1 @@
-Big metadata improvement pass on P3 sentences. Added consistent sentenceSkills, focusLabel, grammarNote, and clueMission support across the majority of P3 items.
+Started metadata improvements for P4 sentences. Focused on modal order, fronted cause clauses, and so...that structures.
