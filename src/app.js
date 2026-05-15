@@ -625,6 +625,16 @@ class App {
       this._openCreateProfileModal();
     });
 
+    // Home-screen "For Parents" footer — large tappable mirrors of the
+    // header icons so mobile users don't have to hunt in the top right.
+    document.getElementById('btn-home-manage-players')?.addEventListener('click', () => {
+      this._renderProfileGrid();
+      this._showScreen(SCREENS.PROFILES);
+    });
+    document.getElementById('btn-home-parent-dashboard')?.addEventListener('click', () => {
+      document.getElementById('dashboard-btn')?.click();
+    });
+
     document.querySelector('[data-close="modal-create-profile"]')?.addEventListener('click', () => {
       this._closeModal('modal-create-profile');
     });
