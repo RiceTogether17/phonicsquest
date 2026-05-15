@@ -10044,15 +10044,31 @@ textarea:hover {
 .placeholder-blurb { font-size: 0.92rem; color: var(--text-muted, #555); }
 .placeholder-card {
   background: #fff;
+  /* Always render dark text inside the white card — the parent dark-mode
+     theme would otherwise leak in a near-invisible light-grey color. */
+  color: #1f2937;
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 12px 14px;
   margin-bottom: 10px;
 }
+.placeholder-card h3,
+.placeholder-card p,
+.placeholder-card li,
+.placeholder-card strong,
+.placeholder-card em,
+.placeholder-card code,
+.placeholder-card summary,
+.placeholder-card details {
+  color: #1f2937;
+}
+.placeholder-card small { color: #4b5563; }
+.placeholder-card details summary { cursor: pointer; color: #1d4ed8; font-weight: 600; }
 .placeholder-card h3 { margin: 0 0 6px; font-size: 1rem; }
 .placeholder-poster {
   font-family: inherit;
   white-space: pre-wrap;
+  color: #1f2937;
   background: color-mix(in srgb, var(--color-primary) 6%, #fff);
   border: 1px dashed color-mix(in srgb, var(--color-primary) 25%, var(--border));
   border-radius: 10px;
@@ -10060,6 +10076,32 @@ textarea:hover {
   font-size: 0.92rem;
 }
 .placeholder-related { font-size: 0.85rem; }
+
+/* Force dark text on every white/light surface inside the placeholder
+   screen — the dark-mode theme above sets --text to near-white, which
+   would otherwise leak into these cards and make the contents nearly
+   invisible (issue surfaced on the Synthesis & Transformation page). */
+.primary-placeholder .p1pt-paper,
+.primary-placeholder .p1pt-paper *,
+.primary-placeholder .p1pt-cloze,
+.primary-placeholder .p1pt-passage,
+.primary-placeholder .p1pt-editing,
+.primary-placeholder .p1pt-wordbank,
+.primary-placeholder .p1pt-word,
+.primary-placeholder .ptg-stage,
+.primary-placeholder .ptg-stage *,
+.primary-placeholder .ptg-launcher-card,
+.primary-placeholder .ptg-launcher-card * {
+  color: #1f2937;
+}
+.primary-placeholder .p1pt-paper-toggle > summary,
+.primary-placeholder .ptg-launcher-card .btn,
+.primary-placeholder .placeholder-card details summary {
+  color: var(--color-primary);
+}
+.primary-placeholder .p1pt-paper-toggle h4 {
+  color: var(--color-primary-dark, var(--color-primary));
+}
 
 /* ── P1 Practice Tests ─────────────────────────────────────────────────── */
 .p1pt-paper { background: color-mix(in srgb, var(--color-primary) 4%, #fff); }
