@@ -9,11 +9,11 @@ export const GRAMMAR_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 
 const LEVEL_CATEGORY_PLAN = {
   P1: ['articles', 'pronouns', 'demonstratives', 'whQuestions', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'possessives', 'quantifiers'],
-  P2: ['articles', 'pronouns', 'reflexivePronouns', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'connectors', 'countableUncountable', 'futureTense', 'whQuestions'],
-  P3: ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'pastCont', 'prepositions', 'connectors', 'conjunctions', 'comparatives', 'modals', 'tagQuestions', 'compoundIndefinite'],
-  P4: ['svAgreement', 'presentPerfect', 'pastCont', 'futureTense', 'prepositions', 'connectors', 'quantifiers', 'adjAdverbs', 'auxiliaries', 'conjunctions'],
-  P5: ['svAgreement', 'tenseAwareness', 'presentPerfect', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'quantifiers', 'mixedGrammar'],
-  P6: ['tenseAwareness', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'inversion', 'auxiliaries', 'connectors', 'mixedGrammar'],
+  P2: ['articles', 'pronouns', 'reflexivePronouns', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'connectors', 'countableUncountable', 'futureTense', 'whQuestions', 'demonstratives', 'pastCont', 'quantifiers', 'possessives'],
+  P3: ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'pastCont', 'prepositions', 'connectors', 'conjunctions', 'comparatives', 'modals', 'tagQuestions', 'compoundIndefinite', 'quantifiers', 'possessives', 'reflexivePronouns', 'whQuestions', 'futureTense', 'presentPerfect', 'tenseAwareness', 'countableUncountable', 'adjAdverbs', 'auxiliaries'],
+  P4: ['svAgreement', 'presentPerfect', 'pastCont', 'futureTense', 'prepositions', 'connectors', 'quantifiers', 'adjAdverbs', 'auxiliaries', 'conjunctions', 'possessives', 'reflexivePronouns', 'whQuestions', 'countableUncountable', 'pronouns', 'tagQuestions', 'compoundIndefinite', 'simplePast', 'presentCont', 'perfectContinuousTenses', 'pastPerfect', 'modals', 'comparatives', 'conditionals', 'tenseAwareness'],
+  P5: ['svAgreement', 'tenseAwareness', 'presentPerfect', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'quantifiers', 'mixedGrammar', 'pastCont', 'reflexivePronouns', 'futureTense', 'countableUncountable', 'adjAdverbs', 'auxiliaries', 'tagQuestions', 'compoundIndefinite', 'simplePast', 'presentCont', 'comparatives', 'prepositions', 'connectors', 'conjunctions'],
+  P6: ['tenseAwareness', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'inversion', 'auxiliaries', 'connectors', 'mixedGrammar', 'pastCont', 'quantifiers', 'reflexivePronouns', 'futureTense', 'presentPerfect', 'countableUncountable', 'adjAdverbs', 'tagQuestions', 'compoundIndefinite', 'simplePast', 'presentCont', 'prepositions', 'conjunctions', 'svAgreement'],
 };
 
 const SUBJECTS = ['The pupil', 'My brother', 'Our teacher', 'The class monitor', 'The twins', 'The players', 'Her cousin', 'The science team'];
