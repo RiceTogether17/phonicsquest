@@ -1,1 +1,1 @@
-Initial UI improvements: Enhanced Clue Hunt panel visibility, better feedback during clue selection, and improved mobile spacing in passage view.
+Further UI improvements: Better visual distinction between Clue Hunt and Fill phases, improved bank locking feedback, and clearer instructions.
