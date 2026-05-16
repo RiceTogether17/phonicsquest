@@ -1678,6 +1678,7 @@ class App {
 
       this._renderPrimaryStartHere(startHere);
       this._renderPrimaryEarlyReadingNote(coreSection);
+      this._filterGradeSpecificModules(profile?.primaryGrade || null);
     } else if (!layout.questsMilestone) {
       coreSection?.classList.remove('home-section--hidden', 'home-section--collapsed');
       questsSection?.classList.remove('home-section--milestone', 'home-section--primary-priority');
@@ -1763,6 +1764,26 @@ class App {
         }
         this._navigateTo(target);
       });
+    });
+  }
+
+  /**
+   * Hide grade-specific practice-test buttons that don't match the child's
+   * primaryGrade.  A P3 child shouldn't see "P1 Practice Tests" + "P2
+   * Practice Tests" in the list — those are pure noise for them.  When
+   * no grade is set we show everything (e.g. for a generic primary
+   * profile created without a grade picker).
+   * @param {?string} grade  e.g. 'P1' / 'P2' / 'P3' / null
+   */
+  _filterGradeSpecificModules(grade) {
+    const buttons = document.querySelectorAll('[data-grade-filter]');
+    if (!grade) {
+      buttons.forEach((b) => { b.hidden = false; });
+      return;
+    }
+    buttons.forEach((b) => {
+      const filter = b.getAttribute('data-grade-filter');
+      b.hidden = filter !== grade;
     });
   }
 

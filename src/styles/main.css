@@ -3220,6 +3220,69 @@ details.story-tool-section[open] > .story-tool-summary::before {
   color: var(--color-text-muted);
   margin: var(--space-2) 0 var(--space-1);
 }
+
+/* ── Collapsible Primary English group cards ──────────────────────────── */
+.home-group {
+  margin: var(--space-3) 0;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.home-group[open] {
+  background: var(--surface);
+}
+.home-group__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  font-weight: 700;
+}
+.home-group__summary::-webkit-details-marker { display: none; }
+.home-group__summary:hover { background: color-mix(in srgb, var(--color-primary) 6%, transparent); }
+.home-group__title {
+  font-size: var(--font-size-md);
+  color: var(--text);
+  flex-shrink: 0;
+}
+.home-group__sub {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  flex: 1;
+  font-weight: 500;
+}
+.home-group__chev {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  transition: transform var(--dur-fast);
+  flex-shrink: 0;
+}
+.home-group[open] .home-group__chev { transform: rotate(180deg); }
+.home-group__body {
+  padding: 0 var(--space-3) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+/* Tighten the banners inside groups since the group card already provides
+   the visual frame — banners no longer need their own thick borders. */
+.home-group__body .stories-banner {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-width: 1.5px;
+  max-width: none;
+}
+.home-group__body .stories-banner-mascot span { font-size: 1.6rem !important; }
+.home-group__body .stories-banner-title { font-size: var(--font-size-base); }
+/* Drop the sub-line since we trimmed the long "Helps with…" text. */
+.home-group__body .stories-banner-sub { display: none; }
+@media (max-width: 480px) {
+  .home-group__sub { display: none; }
+}
 .mode-card--highlight {
   border-color: var(--color-primary);
   background: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
@@ -8208,9 +8271,9 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .home-parents-btn {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
   width: 100%;
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-2) var(--space-3);
   background: var(--surface-2);
   border: 1.5px solid var(--border);
   border-radius: var(--radius-md);
@@ -8218,6 +8281,13 @@ details.story-tool-section[open] > .story-tool-summary::before {
   text-align: left;
   color: var(--text);
   transition: background var(--dur-fast), border-color var(--dur-fast), transform var(--dur-fast);
+}
+@media (max-width: 480px) {
+  /* On phones, hide the descriptive sub-line so the two rows stay
+     compact at the top of the screen — the title is self-explanatory. */
+  .home-parents-section--top .home-parents-btn__sub { display: none; }
+  .home-parents-section--top .home-parents-btn { padding: 10px 12px; }
+  .home-parents-section--top .home-parents-btn__icon { font-size: 1.5rem; }
 }
 .home-parents-btn:hover,
 .home-parents-btn:focus-visible {
