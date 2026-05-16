@@ -1,4 +1,6 @@
-export const lowerVocabPassagesExtra = {
+import { buildExtraPassageBank } from './generator.js';
+
+const handwritten = {
   contextInference: {
     p1: [
       {
@@ -535,3 +537,24 @@ export const lowerVocabPassagesExtra = {
   scienceTechTerms: {},
   socialStudiesVocab: {},
 };
+
+const generated = buildExtraPassageBank(['p1', 'p2', 'p3']);
+
+export const lowerVocabPassagesExtra = (() => {
+  const merged = {};
+  const cats = new Set([...Object.keys(handwritten), ...Object.keys(generated)]);
+  for (const cat of cats) {
+    merged[cat] = {};
+    const lvls = new Set([
+      ...Object.keys(handwritten[cat] || {}),
+      ...Object.keys(generated[cat] || {}),
+    ]);
+    for (const lv of lvls) {
+      merged[cat][lv] = [
+        ...(handwritten[cat]?.[lv] || []),
+        ...(generated[cat]?.[lv] || []),
+      ];
+    }
+  }
+  return merged;
+})();

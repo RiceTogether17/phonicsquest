@@ -278,7 +278,7 @@ function buildPassage(category, level, idx) {
   const titleSeed = pick(level, idx, TITLE_SEEDS[category]);
 
   return {
-    id: `vxp-${short}-p${levelNum}-${String(idx + 1).padStart(2, '0')}`,
+    id: `vxg-${short}-p${levelNum}-${String(idx + 1).padStart(2, '0')}`,
     title: `${titleSeed} (${level.toUpperCase()})`,
     text,
     answers: [...core.answers],
