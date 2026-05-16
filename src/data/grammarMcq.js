@@ -1,1 +1,1 @@
-Improved builders for reflexivePronouns, tagQuestions, and compoundIndefinite to generate proper items across levels (especially P1-P3). These categories should no longer show as 'Coming soon'.
+Expanded variety in reflexivePronouns, tagQuestions, and compoundIndefinite builders with more templates and better level progression.
