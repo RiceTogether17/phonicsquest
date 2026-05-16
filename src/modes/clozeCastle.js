@@ -1,1 +1,1 @@
-UI refinements: Improved word bank chip design, better mobile responsiveness for passage and bank, and general visual polish.
+Additional UI polish: Improved results/complete screen and overall visual consistency.
