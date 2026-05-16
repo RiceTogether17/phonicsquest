@@ -1,3 +1,16 @@
-import { buildExtraPassageBank } from './generator.js';
-
-export const upperVocabPassagesExtra = buildExtraPassageBank(['p4', 'p5', 'p6']);
+export const upperVocabPassagesExtra = {
+  contextInference: {},
+  definitionMatch: {},
+  synonymContrast: {},
+  morphologicalAffix: {},
+  collocationCloze: {},
+  grammaticalRole: {},
+  connectorClue: {},
+  grammarPrepositions: {},
+  grammarArticles: {},
+  grammarSVA: {},
+  idiomaticExpressions: {},
+  proverbsSayings: {},
+  scienceTechTerms: {},
+  socialStudiesVocab: {},
+};
