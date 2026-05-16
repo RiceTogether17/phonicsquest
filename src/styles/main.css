@@ -4942,10 +4942,21 @@ details.story-tool-section[open] > .story-tool-summary::before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;  /* was `center` — pushed Add Player below the fold when many profiles existed */
   gap: var(--space-5);
-  padding: var(--space-8) var(--space-4);
+  padding: var(--space-6) var(--space-4) var(--space-8);
   min-height: 100%;
+}
+/* Sticky "+ Add Player" button on small screens so it's always reachable
+   even with several profile cards above it. */
+@media (max-width: 600px) {
+  #screen-profiles #btn-add-profile {
+    position: sticky;
+    bottom: var(--space-3);
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 8px 20px -8px color-mix(in srgb, var(--color-primary) 50%, transparent);
+  }
 }
 .profile-hero {
   font-size: 3.5rem;
@@ -8181,6 +8192,14 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .home-parents-section .home-section-heading {
   color: var(--text-muted);
   margin-bottom: var(--space-3);
+}
+/* When placed at the top of the home screen, drop the muted "footer" treatment
+   and visually emphasise the row so it's the first thing parents see on mobile. */
+.home-parents-section--top {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+  margin-bottom: var(--space-4);
 }
 .home-parents-grid {
   display: grid;
