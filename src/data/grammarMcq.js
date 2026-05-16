@@ -1,1 +1,1 @@
-Started expanding advanced categories for P4–P6 (inversion, tenseAwareness, perfectContinuousTenses, mixedGrammar, reportedSpeech) to improve coverage and variety.
+Continued expansion of advanced categories for P4–P6 with more templates and variety.
