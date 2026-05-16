@@ -109,6 +109,7 @@ const GRAMMAR_BUILDERS = {
   articles(level, i) {
     const nouns = [
       ['apple', 'an'], ['uniform', 'a'], ['hour', 'an'], ['museum', 'a'], ['umbrella', 'an'], ['homework file', 'a'],
+      ['orange', 'an'], ['banana', 'a'], ['eagle', 'an'], ['pencil case', 'a'], ['ice-cream cone', 'an'], ['water bottle', 'a'],
     ];
     const [noun, article] = rotate(nouns, i);
     return {
@@ -132,6 +133,12 @@ const GRAMMAR_BUILDERS = {
       ['Mr Tan called Ali and me, so he spoke to ___.', 'us', ['we', 'our', 'ours']],
       ['That sketchbook belongs to Mei. It is ___.', 'hers', ['her', 'she', 'herself']],
       ['Please pass the worksheet to Dan and ___.', 'me', ['I', 'my', 'mine']],
+      ['The volunteers worked hard, and the principal thanked ___ warmly.', 'them', ['they', 'their', 'theirs']],
+      ['My brother and ___ share the same room at home.', 'I', ['me', 'my', 'mine']],
+      ['The new uniform belongs to my cousin — it is ___.', 'his', ['he', 'him', 'himself']],
+      ['Sarah lent me her novel, so I returned it to ___ this morning.', 'her', ['she', 'hers', 'herself']],
+      ['The committee made ___ decision after a long discussion.', 'its', ['it', 'their', 'theirs']],
+      ['Between Daniel and ___, who do you think will win the quiz?', 'me', ['I', 'my', 'mine']],
     ];
     const rows = level === 'P1' ? p1Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
@@ -229,6 +236,10 @@ const GRAMMAR_BUILDERS = {
       ['Can you see ___ birds flying high in the sky?', 'those', ['this', 'that', 'these']],
       ['"Pass me ___ book on your desk, please," asked the teacher.', 'that', ['this', 'these', 'those']],
       ['"___ shoes here are mine. The ones over there are yours."', 'These', ['That', 'Those', 'This']],
+      ['"___ is the way to the principal\'s office?" I asked the prefect standing beside me.', 'This', ['That', 'These', 'Those']],
+      ['Could you please hand me ___ scissors over there on the cupboard?', 'those', ['this', 'that', 'these']],
+      ['"___ cookies that I am holding are still warm — try one!"', 'These', ['That', 'Those', 'This']],
+      ['Look! ___ butterfly near the window is much smaller than ours.', 'That', ['This', 'These', 'Those']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return {
@@ -247,6 +258,10 @@ const GRAMMAR_BUILDERS = {
       ['"___ do you keep your school bag at home?" asked Mum.', 'Where', ['When', 'How', 'Why']],
       ['"___ are you wearing a raincoat? It is not raining," Tom asked.', 'Why', ['How', 'When', 'Where']],
       ['"___ is the largest animal in the world?" the teacher asked the class.', 'Which', ['How', 'When', 'Whose']],
+      ['"___ did you go on your school holiday last December?" Aunt Mei asked.', 'Where', ['When', 'How', 'Why']],
+      ['"___ is the new student who joined our class today?" Daniel whispered.', 'Who', ['What', 'Which', 'Whose']],
+      ['"___ pencil case is this on the floor near the door?" the teacher asked.', 'Whose', ['Who', 'Which', 'What']],
+      ['"___ many books did you borrow from the school library yesterday?" the librarian asked politely.', 'How', ['What', 'When', 'Which']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return {
@@ -289,6 +304,12 @@ const GRAMMAR_BUILDERS = {
       ['Last Friday, she ___ her wallet at home.', 'left', ['leave', 'leaves', 'leaving']],
       ['Two days ago, they ___ the heavy box upstairs.', 'carried', ['carry', 'carries', 'carrying']],
       ['Last night, Father ___ us a story about courage.', 'told', ['tell', 'tells', 'telling']],
+      ['During the last fire drill, all the pupils ___ calmly to the assembly area.', 'walked', ['walk', 'walks', 'walking']],
+      ['When the bell rang earlier this morning, the prefect ___ the door open for us.', 'held', ['hold', 'holds', 'is holding']],
+      ['Three days ago, our librarian ___ a new shipment of storybooks.', 'received', ['receive', 'receives', 'is receiving']],
+      ['Last weekend, my grandparents ___ all the way from Penang to visit us.', 'drove', ['drive', 'drives', 'driving']],
+      ['Yesterday afternoon, the painter ___ the entire fence in just two hours.', 'painted', ['paints', 'paint', 'painting']],
+      ['Just before assembly began, the principal ___ that the swimming meet was postponed.', 'announced', ['announces', 'announce', 'is announcing']],
     ];
     const rows = level === 'P1' ? p1Rows : level === 'P2' ? p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
@@ -300,6 +321,12 @@ const GRAMMAR_BUILDERS = {
       ['Right now, my mother ___ dinner for everyone.', 'is cooking', ['cooks', 'cooked', 'are cooking']],
       ['At the moment, I ___ my spelling corrections.', 'am checking', ['check', 'checked', 'is checking']],
       ['Listen! The choir ___ the final chorus.', 'is singing', ['sing', 'sang', 'are singing']],
+      ['Sshh — the baby ___ in the pram.', 'is sleeping', ['sleep', 'sleeps', 'are sleeping']],
+      ['The technicians ___ the new projector right now.', 'are installing', ['installs', 'install', 'is installing']],
+      ['Look outside! It ___ heavily again.', 'is raining', ['rains', 'rained', 'are raining']],
+      ['The art teacher ___ a beautiful mural at this very moment.', 'is painting', ['paints', 'painted', 'are painting']],
+      ['Right now, our librarian ___ the new books on the shelves.', 'is arranging', ['arranges', 'arrange', 'are arranging']],
+      ['Look — the puppies ___ in the playpen!', 'are tumbling', ['tumbles', 'tumble', 'is tumbling']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'present_continuous', q, choices: buildChoices(answer, ds), answer, explain: 'Use present continuous for actions happening now.' };
@@ -326,6 +353,12 @@ const GRAMMAR_BUILDERS = {
       ['We reached school ___ 7.20 a.m. today.', 'at', ['on', 'in', 'by']],
       ['The football rolled ___ the bench.', 'under', ['above', 'across', 'toward']],
       ['They walked ___ the bridge to the science centre.', 'across', ['behind', 'inside', 'with']],
+      ['The science exhibition was held ___ the multipurpose hall on Monday.', 'in', ['on', 'at', 'into']],
+      ['Pass the message ___ Mrs Lim before recess, please.', 'to', ['at', 'for', 'with']],
+      ['The new mural was painted ___ several talented seniors over the holidays.', 'by', ['for', 'with', 'from']],
+      ['The library is open ___ 8 a.m. to 4 p.m. every weekday.', 'from', ['for', 'since', 'until']],
+      ['We must hand in the project ___ Friday at the latest.', 'by', ['until', 'at', 'on']],
+      ['The class chairperson stood ___ the principal and the vice-principal during the photograph.', 'between', ['among', 'beside', 'with']],
     ];
     const rows = level === 'P1' ? p1Rows : level === 'P2' ? p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
@@ -337,6 +370,12 @@ const GRAMMAR_BUILDERS = {
       ['The boys forgot ___ PE shirts in class.', 'their', ['there', 'they', 'theirs']],
       ['That laptop belongs to my parents. It is ___.', 'theirs', ['their', 'them', 'they']],
       ['I borrowed ___ ruler because mine was missing.', 'his', ['he', 'him', 'himself']],
+      ['The cat washed ___ paws after the long nap on the sofa.', 'its', ['it\'s', 'their', 'his']],
+      ['My sister and I take turns walking ___ dog every evening.', 'our', ['ours', 'us', 'we']],
+      ['"Is this jacket ___, Aunt Mei?" I asked at the door.', 'yours', ['your', 'you', 'yourself']],
+      ['Dan said the spare key on the table is ___.', 'his', ['he', 'him', 'himself']],
+      ['Daniel and Mei brought ___ projects to school in clear folders.', 'their', ['theirs', 'them', 'they']],
+      ['Each student must label ___ exercise book before the lesson begins.', 'his or her', ['theirs', 'them', 'their\'s']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'possessive_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Use the possessive word that shows ownership clearly.' };
@@ -355,6 +394,12 @@ const GRAMMAR_BUILDERS = {
       ['How ___ sugar should we add to this drink?', 'much', ['many', 'few', 'several']],
       ['Only ___ pupils were absent during rehearsal.', 'a few', ['a little', 'much', 'less']],
       ['We have ___ water left, so refill the bottle.', 'little', ['few', 'many', 'several']],
+      ['The volunteers prepared ___ packets of dried noodles for the food drive.', 'several', ['much', 'a little', 'less']],
+      ['Add ___ salt to the soup — it already tastes salty.', 'less', ['fewer', 'many', 'several']],
+      ['Take ___ time as you need to finish the paper.', 'as much', ['as many', 'how much', 'how many']],
+      ['Mr Lee asked, "How ___ chairs do we still need for the parents?"', 'many', ['much', 'a little', 'less']],
+      ['There has been ___ rainfall this month than last month.', 'less', ['fewer', 'many', 'several']],
+      ['___ of the homework was done on the bus ride home.', 'Most', ['Many', 'Several', 'A few']],
     ];
     const rows = level === 'P1' ? p1Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
@@ -374,6 +419,12 @@ const GRAMMAR_BUILDERS = {
       ['She was tired, ___ she still completed her corrections.', 'but', ['and', 'so', 'because']],
       ['Pack your bottle ___ your worksheet before camp.', 'and', ['but', 'or', 'because']],
       ['He revised carefully ___ he wanted to improve.', 'because', ['but', 'so', 'or']],
+      ['We must hurry, ___ we will miss the last bus.', 'or', ['so', 'and', 'but']],
+      ['The teacher praised Mei ___ she had spotted the missing comma.', 'because', ['but', 'so', 'or']],
+      ['I love both salads ___ stir-fried vegetables for lunch.', 'and', ['or', 'but', 'so']],
+      ['Wear sunscreen, ___ you will get sunburnt at the beach.', 'or', ['so', 'because', 'and']],
+      ['She studied for the test, ___ she still felt nervous on the day.', 'but', ['so', 'and', 'because']],
+      ['The lift was broken, ___ we used the stairs to reach the fifth floor.', 'so', ['but', 'or', 'because']],
     ];
     const rows = (level === 'P1' || level === 'P2') ? p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
@@ -385,6 +436,12 @@ const GRAMMAR_BUILDERS = {
       ['How ___ oranges did Grandma buy?', 'many', ['much', 'little', 'less']],
       ['Please add ___ flour to the bowl.', 'a little', ['a few', 'many', 'several']],
       ['We need ___ chairs for the visitors.', 'a few', ['a little', 'much', 'less']],
+      ['There is too ___ noise in the corridor — please be quieter.', 'much', ['many', 'few', 'several']],
+      ['I have ___ friends who play the violin.', 'many', ['much', 'a little', 'less']],
+      ['The recipe calls for ___ sugar, just enough to balance the lemon.', 'a little', ['a few', 'many', 'several']],
+      ['We bought ___ bottles of water for the camp trip.', 'several', ['a little', 'much', 'less']],
+      ['There is ___ time before the bell rings — hurry up!', 'little', ['few', 'many', 'several']],
+      ['Only ___ pupils were absent on the school photo day.', 'a few', ['a little', 'much', 'less']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'countability', q, choices: buildChoices(answer, ds), answer, explain: 'Match the quantifier to countable or uncountable nouns.' };
@@ -395,6 +452,12 @@ const GRAMMAR_BUILDERS = {
       ['I think it ___ later in the afternoon.', 'will rain', ['rains', 'rained', 'is raining']],
       ['The coach says we ___ extra drills next week.', 'will have', ['have', 'had', 'are having']],
       ['Do not worry. I ___ you after CCA.', 'will call', ['call', 'called', 'am calling']],
+      ['Next term, the new student ___ our table-tennis team.', 'will join', ['joins', 'joined', 'is joining']],
+      ['"___ you help me carry these books, please?" asked Mrs Lim.', 'Will', ['Did', 'Are', 'Do']],
+      ['Mum says we ___ for dinner at Grandpa\'s on Sunday.', 'will go', ['go', 'went', 'are going']],
+      ['Look at those clouds — it ___ heavily in a few minutes.', 'is going to rain', ['rains', 'rained', 'has rained']],
+      ['Hold on a second — I ___ the door for you.', 'will open', ['open', 'opened', 'am opening']],
+      ['By tomorrow morning, my brother ___ his last exam paper.', 'will finish', ['finishes', 'finished', 'has finished']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'future_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Use future forms for plans, promises or predictions.' };
@@ -405,6 +468,12 @@ const GRAMMAR_BUILDERS = {
       ['He stayed quiet ___ he was unsure of the answer.', 'because', ['or', 'but', 'so']],
       ['Take your umbrella, ___ the clouds look heavy.', 'for', ['yet', 'or', 'and']],
       ['She practised daily, ___ she improved steadily.', 'so', ['or', 'because', 'but']],
+      ['The kitten was hungry ___ tired after the long ride home.', 'and', ['or', 'but', 'so']],
+      ['Choose the blue file ___ the red one — they hold the same number of pages.', 'or', ['so', 'and', 'because']],
+      ['He woke up early, ___ he still missed the school bus.', 'yet', ['so', 'and', 'because']],
+      ['Wash your hands carefully ___ you finish playing outside.', 'after', ['so', 'or', 'yet']],
+      ['I left early ___ I would not be caught in the storm.', 'so that', ['because', 'or', 'but']],
+      ['The volunteers were patient ___ kind to every visitor in the booth.', 'and', ['but', 'or', 'so']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'conjunction_function', q, choices: buildChoices(answer, ds), answer, explain: 'Pick the conjunction that links the clauses correctly.' };
@@ -415,6 +484,12 @@ const GRAMMAR_BUILDERS = {
       ['The new route is ___ than the old one.', 'shorter', ['short', 'shortest', 'more short']],
       ['A cheetah is ___ than a rabbit.', 'faster', ['fast', 'fastest', 'more fast']],
       ['Today is ___ than Monday.', 'hotter', ['hot', 'hottest', 'more hot']],
+      ['Mei is ___ than Daniel at solving riddles.', 'better', ['gooder', 'best', 'more good']],
+      ['The river near my grandmother\'s village is ___ than the canal beside our school.', 'wider', ['widest', 'wide', 'more wide']],
+      ['Math homework usually feels ___ than the science project to me.', 'easier', ['easy', 'easiest', 'more easy']],
+      ['This year\'s school musical is ___ than last year\'s play.', 'more entertaining', ['entertaining', 'most entertaining', 'entertainingest']],
+      ['My cousin is ___ than I am, even though he is two years younger.', 'taller', ['tall', 'tallest', 'more tall']],
+      ['Walking home is ___ than waiting for the late bus.', 'quicker', ['quick', 'quickest', 'more quick']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'comparative_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Use a comparative form when comparing two things.' };
@@ -425,6 +500,12 @@ const GRAMMAR_BUILDERS = {
       ['May I borrow your marker? Yes, you ___.', 'may', ['must', 'should', 'would']],
       ['If you feel unwell, you ___ see the school nurse.', 'should', ['might', 'would', 'can’t']],
       ['The sign says we ___ run in the corridor.', 'must not', ['should', 'might', 'could']],
+      ['"___ you please hold the door for the smaller pupils?" asked Mrs Tan.', 'Could', ['Should', 'Must', 'Will']],
+      ['You ___ bring your spelling book tomorrow because we have a test.', 'have to', ['could', 'might', 'would']],
+      ['Children ___ not cross the road without an adult.', 'must', ['can', 'may', 'will']],
+      ['It looks cloudy — it ___ rain later in the afternoon.', 'might', ['must', 'will', 'should']],
+      ['You ___ be tired after such a long walk. Sit down for a while.', 'must', ['can', 'might', 'will']],
+      ['I ___ swim across the entire pool by myself now!', 'can', ['must', 'should', 'may']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'modal_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the modal that expresses the intended rule or advice.' };
