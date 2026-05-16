@@ -1,1 +1,1 @@
-Expanded variety in reflexivePronouns, tagQuestions, and compoundIndefinite builders with more templates and better level progression.
+Further expanded question variety and templates for reflexivePronouns, tagQuestions, and compoundIndefinite categories.
