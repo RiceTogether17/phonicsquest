@@ -1,1 +1,1 @@
-Continued expansion of advanced categories for P4–P6 with more templates and variety.
+Additional expansion of P4–P6 advanced grammar categories.
