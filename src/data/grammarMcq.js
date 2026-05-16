@@ -1,1 +1,1 @@
-Further expanded question variety and templates for reflexivePronouns, tagQuestions, and compoundIndefinite categories.
+Started expanding advanced categories for P4–P6 (inversion, tenseAwareness, perfectContinuousTenses, mixedGrammar, reportedSpeech) to improve coverage and variety.
