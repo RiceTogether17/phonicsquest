@@ -2,7 +2,7 @@ import { questMastery } from '../modules/questMastery.js';
 import { gamification } from '../modules/gamification.js';
 import { store } from '../modules/store.js';
 import { GRAMMAR_MCQ_ITEMS, GRAMMAR_MCQ_LEVELS } from '../data/grammarMcq.js';
-import { GRAMMAR_CATEGORIES, GRAMMAR_CATEGORY_KEYS } from '../data/grammarCategories.js';
+import { GRAMMAR_CATEGORIES, GRAMMAR_CATEGORY_KEYS, categoryAppliesToLevel } from '../data/grammarCategories.js';
 import { checkPostAttempt } from '../modules/remediationRouter.js';
 
 let _container = null;
@@ -100,7 +100,9 @@ export function showGrammarMcqBrowser() {
             <button class="btn btn--primary" id="gmcq-start-level">Start ${selectedLevel} (All Skills)</button>
           </div>
           <div class="mcq-skill-grid">
-            ${categoryCounts.map(({ category, levels }) => {
+            ${categoryCounts
+              .filter(({ category }) => categoryAppliesToLevel(category, selectedLevel))
+              .map(({ category, levels }) => {
               const count = levels[selectedLevel] || 0;
               const meta = GRAMMAR_CATEGORIES[category] || { icon: '🧩', label: category };
 
