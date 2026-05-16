@@ -146,6 +146,15 @@ const GRAMMAR_BUILDERS = {
       ['I taught ___ how to ride a bicycle last year.', 'myself', ['himself', 'ourselves', 'themselves']],
       ['The cat groomed ___ patiently in the sunshine.', 'itself', ['himself', 'themselves', 'herself']],
       ['Mr Lim, please help ___ to the snacks on the table.', 'yourself', ['himself', 'themselves', 'ourselves']],
+      ['Tim could not lift the heavy box by ___, so he asked his brother for help.', 'himself', ['themselves', 'yourself', 'itself']],
+      ['The girls poured ___ a glass of juice each before assembly.', 'themselves', ['herself', 'ourselves', 'yourselves']],
+      ['"Do not blame ___, Ali — it was not your fault," said Mother.', 'yourself', ['himself', 'yourselves', 'itself']],
+      ['The new pupil introduced ___ to the whole class confidently.', 'himself', ['herself', 'themselves', 'myself']],
+      ['After the long walk, we treated ___ to ice cream at the void deck.', 'ourselves', ['themselves', 'yourselves', 'myself']],
+      ['The robot can repair ___ when one of its parts is damaged.', 'itself', ['himself', 'themselves', 'herself']],
+      ['Hannah baked the loaf of bread ___ for the school bake sale.', 'herself', ['themselves', 'yourself', 'ourselves']],
+      ['Sarah and Mia found ___ a quiet corner of the library to study.', 'themselves', ['herself', 'yourself', 'ourselves']],
+      ['Have you ever asked ___ why the sky looks blue, Daniel?', 'yourself', ['himself', 'yourselves', 'themselves']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return {
@@ -164,6 +173,16 @@ const GRAMMAR_BUILDERS = {
       ['She does not eat seafood, ___ she?', 'does', ['doesn’t', 'is', 'isn’t']],
       ['We must finish this by Friday, ___ we?', 'mustn’t', ['must', 'do', 'don’t']],
       ['The twins are not in the team, ___ they?', 'are', ['aren’t', 'is', 'isn’t']],
+      ['Your sister can swim very well, ___ she?', 'can’t', ['can', 'does', 'doesn’t']],
+      ['He should bring his calculator tomorrow, ___ he?', 'shouldn’t', ['should', 'does', 'doesn’t']],
+      ['They were practising in the hall after school, ___ they?', 'weren’t', ['were', 'are', 'aren’t']],
+      ['It was a tiring P.E. lesson, ___ it?', 'wasn’t', ['was', 'is', 'isn’t']],
+      ['Mei did her homework already, ___ she?', 'didn’t', ['did', 'does', 'doesn’t']],
+      ['We had finished the test before the bell rang, ___ we?', 'hadn’t', ['had', 'did', 'didn’t']],
+      ['The kittens are playing in the garden, ___ they?', 'aren’t', ['are', 'is', 'isn’t']],
+      ['Father has fixed the broken chair, ___ he?', 'hasn’t', ['has', 'does', 'doesn’t']],
+      ['Aunty Lin would prefer chicken rice, ___ she?', 'wouldn’t', ['would', 'does', 'doesn’t']],
+      ['Your brother could not find his keys, ___ he?', 'could', ['couldn’t', 'can', 'can’t']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return {
@@ -182,6 +201,16 @@ const GRAMMAR_BUILDERS = {
       ['I want to go ___ quiet for the holidays.', 'somewhere', ['nowhere', 'anywhere', 'everywhere']],
       ['___ in the class enjoys art lessons — even the shy ones.', 'Everyone', ['No one', 'Anyone', 'Someone']],
       ['I looked ___ for my glasses but they were on my head.', 'everywhere', ['nowhere', 'somewhere', 'anywhere']],
+      ['Did you see ___ suspicious near the school gate just now?', 'anything', ['something', 'nothing', 'everything']],
+      ['___ knocked at the door, but I could not see who it was through the peephole.', 'Someone', ['No one', 'Anyone', 'Everyone']],
+      ['There is ___ in the snack jar — I finished it yesterday.', 'nothing', ['anything', 'something', 'everywhere']],
+      ['We searched ___ for the missing hamster and finally found it under the sofa.', 'everywhere', ['somewhere', 'anywhere', 'nowhere']],
+      ['___ in the room felt the sudden chill when Mum opened the window.', 'Everyone', ['Anyone', 'Someone', 'No one']],
+      ['Has ___ told you about the change in the timetable yet?', 'anyone', ['someone', 'everyone', 'no one']],
+      ['I do not know ___ in this new class — please introduce me to your friends.', 'anyone', ['someone', 'everyone', 'no one']],
+      ['___ has been moved on my desk — my pencil case is in the wrong spot!', 'Something', ['Nothing', 'Anything', 'Everything']],
+      ['The shop was so quiet that there was ___ inside except the cashier.', 'no one', ['someone', 'anyone', 'everyone']],
+      ['Let us go ___ peaceful and read a book together this afternoon.', 'somewhere', ['anywhere', 'nowhere', 'everywhere']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return {
