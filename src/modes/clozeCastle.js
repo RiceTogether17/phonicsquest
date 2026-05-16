@@ -1,1 +1,1 @@
-Further UI improvements: Better visual distinction between Clue Hunt and Fill phases, improved bank locking feedback, and clearer instructions.
+UI refinements: Improved word bank chip design, better mobile responsiveness for passage and bank, and general visual polish.
