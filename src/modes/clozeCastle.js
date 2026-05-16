@@ -345,12 +345,25 @@ function _renderPassage(passage) {
   const inClueMode = hasClues && _bankLocked;
   const modeCfg = getModeConfig(_sessionMode);
 
+  const phaseBadge = hasClues
+    ? (inClueMode
+      ? '<span class="cloze-badge cloze-badge--phase cloze-badge--phase-clue">🔍 Step 1 · Clue Hunt</span>'
+      : '<span class="cloze-badge cloze-badge--phase cloze-badge--phase-fill">🏰 Step 2 · Fill the Blanks</span>')
+    : '';
+
+  const instructionText = hasClues
+    ? (inClueMode
+      ? '🔍 Step 1 of 2 — Tap the clue word in the passage that hints at the answer.'
+      : '🏰 Step 2 of 2 — Now tap a word from the bank to fill the next blank.')
+    : '🏰 Tap a word from the bank to fill the next blank.';
+
   _container.innerHTML = `
     <div class="cloze-game">
       <div class="cloze-game-header">
         <span class="cloze-badge">${icon} ${CLOZE_LEVEL_LABELS[_currentLevel]}</span>
         <span class="cloze-badge cloze-badge--cat">${catInfo}</span>
         <span class="cloze-badge">${modeCfg.label}</span>
+        ${phaseBadge}
         <span class="cloze-progress">${progress}</span>
         <span class="cloze-xp-badge">+${passage.xp} XP</span>
       </div>
@@ -360,7 +373,7 @@ function _renderPassage(passage) {
       ${inClueMode ? _buildClueHuntPanel(passage) : ''}
 
       <p class="cloze-instruction" id="cloze-instruction">
-        ${inClueMode ? '🔍 Tap the clue word in the passage first!' : '🏰 Tap a word to fill the next blank!'}
+        ${instructionText}
       </p>
 
       <div class="cloze-passage" id="cloze-passage" aria-live="polite"></div>

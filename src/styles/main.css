@@ -6096,6 +6096,21 @@ details.story-tool-section[open] > .story-tool-summary::before {
   margin-left: 2px;
 }
 
+/* Small section labels above answer area and word bank — give the screen a
+   clear visual hierarchy so children always know which area to look at. */
+.sfq-section-label {
+  display: inline-block;
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--space-1);
+  padding: 0 var(--space-1);
+}
+.sfq-section-label--answer { color: var(--color-primary); }
+.sfq-section-label--bank { color: var(--text-muted); }
+
 /* Word chips */
 .sfq-word-chip,
 .sfq-answer-chip {
@@ -6107,6 +6122,23 @@ details.story-tool-section[open] > .story-tool-summary::before {
   cursor: pointer;
   transition: all var(--dur-fast) var(--ease-out);
   border: 2px solid transparent;
+}
+.sfq-word-chip:focus-visible,
+.sfq-answer-chip:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Mobile touch targets — bump to ≥ 44px on small screens. */
+@media (max-width: 600px) {
+  .sfq-word-chip,
+  .sfq-answer-chip {
+    min-height: 44px;
+    padding: 10px var(--space-4);
+    display: inline-flex;
+    align-items: center;
+  }
+  .sfq-answer-area { min-height: 96px; padding: var(--space-4) var(--space-3); }
 }
 .sfq-word-chip {
   background: var(--surface);
@@ -6459,6 +6491,62 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .cloze-stars          { font-size: 2rem; letter-spacing: 4px; }
 .cloze-complete-score { font-size: var(--font-size-md); font-weight: 700; color: var(--text-muted); }
 .cloze-complete-actions { display: flex; flex-direction: column; gap: var(--space-3); align-items: center; width: 100%; max-width: 300px; }
+
+/* Phase indicator badge in the game header (Clue Hunt vs Fill).
+   Distinct color per phase so the child always knows which step they're on. */
+.cloze-badge--phase {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.cloze-badge--phase-clue {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border: 1.5px solid #93c5fd;
+}
+.cloze-badge--phase-fill {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1.5px solid #fcd34d;
+}
+
+/* Stronger focus-visible for keyboard navigation of word chips and blanks */
+.cloze-word-chip:focus-visible,
+.cloze-blank:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Mobile touch targets — WCAG suggests ≥ 44px tappable height.
+   Default styles set blanks at 36px and chips at ~32px; bump them on phones. */
+@media (max-width: 600px) {
+  .cloze-blank {
+    height: 44px;
+    min-width: 96px;
+    font-size: var(--font-size-md);
+  }
+  .cloze-word-chip {
+    padding: 10px var(--space-4);
+    font-size: var(--font-size-md);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .cloze-passage {
+    line-height: 2.6;
+    padding: var(--space-4) var(--space-3);
+  }
+}
+
+/* Locked word bank — make the "blocked" state more visually obvious so kids
+   notice they need to finish the clue step first. */
+.cloze-bank-wrapper--locked {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e0e7ff 100%);
+  border-color: #93c5fd;
+}
+.cloze-bank-lock-msg {
+  color: #1d4ed8;
+  font-weight: 800;
+}
 
 /* ============================================================
    WORD VAULT QUEST (wv-*)

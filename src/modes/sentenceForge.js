@@ -489,7 +489,7 @@ function _renderGame(entry, punct) {
         ${entry.focusLabel ? `<span class="sfq-focus-chip">${entry.focusLabel}</span>` : ''}
       </div>
 
-      <p class="sfq-instruction">🔨 Tap the words to build the sentence!</p>
+      <p class="sfq-instruction">🔨 Tap the words below to build the sentence above.</p>
       ${entry.synthesisTask ? `
       <div class="dash-pattern-item" style="margin-bottom:12px">
         <strong>🧪 Synthesis Task:</strong> ${entry.synthesisTask.prompt}
@@ -497,13 +497,15 @@ function _renderGame(entry, punct) {
         ${entry.synthesisTask.punctuationHint ? `<br><em>Punctuation:</em> ${entry.synthesisTask.punctuationHint}` : ''}
       </div>` : ''}
 
+      <span class="sfq-section-label sfq-section-label--answer">Your sentence</span>
       <div class="sfq-answer-area" id="sfq-answer-area" aria-label="Your sentence">
         <div class="sfq-answer-chips" id="sfq-answer-chips">
-          <span class="sfq-placeholder" id="sfq-placeholder">Tap words below…</span>
+          <span class="sfq-placeholder" id="sfq-placeholder">Tap a word from the bank below to start…</span>
         </div>
         <span class="sfq-punct" id="sfq-punct" aria-hidden="true">${punct}</span>
       </div>
 
+      <span class="sfq-section-label sfq-section-label--bank">Word bank</span>
       <div class="sfq-bank" id="sfq-bank" aria-label="Word choices"></div>
 
       <div class="sfq-actions">
