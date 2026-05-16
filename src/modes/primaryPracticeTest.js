@@ -191,6 +191,59 @@ function renderSentenceCombiningSection(section, sectionKey) {
   return `<p class="ptg-instructions">${escapeHtml(section.instructions || '')}</p><ol class="ptg-combining">${items}</ol>`;
 }
 
+function renderSynthesisSection(section, sectionKey) {
+  const items = section.items.map((item, i) => {
+    const alts = (item.alternates || []).join('|');
+    return `
+      <li class="ptg-question" data-q-index="${i}">
+        <p class="ptg-q-stem">${i + 1}. ${escapeHtml(item.q)}</p>
+        <p class="ptg-synthesis-stem"><strong>Begin with:</strong> <code>${escapeHtml(item.stem)}</code></p>
+        <textarea class="ptg-input ptg-input--area" rows="2"
+                  data-q-key="${sectionKey}/${i}"
+                  data-answer="${escapeAttr(item.answer)}"
+                  data-accept="${escapeAttr(alts)}"
+                  data-skill="${escapeAttr(item.skillKey || item.skill || 'synthesis')}"
+                  data-practise="sentence-forge"
+                  placeholder="Write your transformed sentence…"></textarea>
+        <div class="ptg-feedback" data-feedback-for="${sectionKey}/${i}" hidden></div>
+      </li>`;
+  }).join('');
+  return `<p class="ptg-instructions">${escapeHtml(section.instructions || 'Rewrite each sentence using the given beginning. Do not change the meaning.')}</p><ol class="ptg-combining">${items}</ol>`;
+}
+
+function renderSituationalWritingSection(section, sectionKey) {
+  const bullets = (section.bullets || []).map(b => `<li>${escapeHtml(b)}</li>`).join('');
+  const rubricRows = section.rubric
+    ? Object.entries(section.rubric).map(([k, v]) => `<tr><td><strong>${escapeHtml(k)}</strong></td><td>${escapeHtml(v)}</td></tr>`).join('')
+    : '';
+  const rubricTable = rubricRows
+    ? `<details class="ptg-rubric"><summary>Marking rubric</summary><table class="ptg-table"><tbody>${rubricRows}</tbody></table></details>`
+    : '';
+  return `
+    <div class="ptg-situational-writing">
+      <div class="ptg-sw-brief">
+        <p><strong>Format:</strong> ${escapeHtml(section.format || '')} &nbsp;|&nbsp; <strong>Audience:</strong> ${escapeHtml(section.audience || '')} &nbsp;|&nbsp; <strong>Word count:</strong> ${escapeHtml(section.wordCount || '100–120 words')}</p>
+        <p><strong>Purpose:</strong> ${escapeHtml(section.purpose || '')}</p>
+        ${section.context ? `<p class="ptg-sw-context">${escapeHtml(section.context)}</p>` : ''}
+        <p><strong>In your response, include ALL of the following:</strong></p>
+        <ul class="ptg-sw-bullets">${bullets}</ul>
+      </div>
+      <p class="ptg-instructions">Write your response in the box below. Check format, tone and that all 3 points are covered.</p>
+      <textarea class="ptg-input ptg-input--writing" rows="8"
+                data-q-key="${sectionKey}/0"
+                data-q-type="writing"
+                data-skill="situationalWriting"
+                data-practise="writing-quest"
+                placeholder="Write your ${escapeHtml(section.format || 'response')} here…"></textarea>
+      <details class="ptg-model-answer">
+        <summary>Show model answer</summary>
+        <pre class="ptg-sw-model">${escapeHtml(section.modelAnswer || '')}</pre>
+      </details>
+      ${rubricTable}
+      <div class="ptg-feedback" data-feedback-for="${sectionKey}/all" hidden></div>
+    </div>`;
+}
+
 function renderEditingSection(section, sectionKey) {
   const text = escapeHtml(section.paragraph).replace(/\{\{(\d+):([^}]*)\}\}/g, (_, n, wrong) => {
     const idx = Number(n) - 1;
@@ -306,31 +359,33 @@ function renderComprehensionSection(section, sectionKey) {
   return `${passage}<ol class="ptg-comprehension">${items}</ol>`;
 }
 
+function _dispatchSection(s, k) {
+  if (!s) return '';
+  if (s.bullets && s.modelAnswer !== undefined) return renderSituationalWritingSection(s, k);
+  if (Array.isArray(s.blanks)) return renderOpenClozeSection(s, k);
+  if (s.paragraph) return renderEditingSection(s, k);
+  if (s.passage) return renderComprehensionSection(s, k);
+  if (Array.isArray(s.items)) {
+    const first = s.items[0];
+    if (first?.scrambled) return renderWordOrderSection(s, k);
+    if (first?.originals) return renderSentenceCombiningSection(s, k);
+    if (first?.stem !== undefined) return renderSynthesisSection(s, k);
+    if (first?.choices) return renderMcqSection(s, k);
+  }
+  if (s.wordBank) return renderClozeSection(s, k);
+  if (s.text && !s.wordBank) return renderOpenClozeSection(s, k);
+  return '';
+}
+
 const SECTION_RENDERERS = {
   sectionA: (s, k) => renderMcqSection(s, k),
   sectionB: (s, k) => renderMcqSection(s, k),
   sectionC: (s, k) => renderClozeSection(s, k),
   sectionD: (s, k) => renderClozeSection(s, k),
-  sectionE: (s, k) => {
-    if (Array.isArray(s.blanks)) return renderOpenClozeSection(s, k);
-    if (Array.isArray(s.items)) {
-      const first = s.items[0];
-      if (first?.scrambled) return renderWordOrderSection(s, k);
-      if (first?.originals) return renderSentenceCombiningSection(s, k);
-    }
-    return '';
-  },
-  sectionF: (s, k) => {
-    if (s.paragraph) return renderEditingSection(s, k);
-    if (Array.isArray(s.items) && s.items[0]?.originals) return renderSentenceCombiningSection(s, k);
-    return '';
-  },
-  sectionG: (s, k) => {
-    if (s.paragraph) return renderEditingSection(s, k);
-    if (s.passage) return renderComprehensionSection(s, k);
-    return '';
-  },
-  sectionH: (s, k) => (s.passage ? renderComprehensionSection(s, k) : ''),
+  sectionE: (s, k) => _dispatchSection(s, k),
+  sectionF: (s, k) => _dispatchSection(s, k),
+  sectionG: (s, k) => _dispatchSection(s, k),
+  sectionH: (s, k) => (s.passage ? renderComprehensionSection(s, k) : _dispatchSection(s, k)),
   sectionI: (s, k) => (s.passage ? renderComprehensionSection(s, k) : ''),
 };
 
@@ -354,6 +409,8 @@ function gradeInput(el) {
   const accepts = (el.getAttribute('data-accept') || '').split('|').filter(Boolean);
   const value = el.value ?? '';
   const qType = el.getAttribute('data-q-type') || '';
+
+  if (qType === 'writing') return null; // self-assessed — not auto-graded
 
   if (el.type === 'radio') {
     if (!el.checked) return null; // grade only the checked radio per group
@@ -386,6 +443,7 @@ function readSectionMarks(section, sectionKey) {
   if (sectionKey === 'sectionC' || sectionKey === 'sectionD') return 1;
   if (Array.isArray(section.items) && section.items[0]?.originals) return 2; // sentence combining
   if (Array.isArray(section.items) && section.items[0]?.scrambled) return 1; // word order
+  if (Array.isArray(section.items) && section.items[0]?.stem !== undefined) return 2; // synthesis
   if (Array.isArray(section.blanks)) return 1; // open cloze
   if (section.paragraph) return 1; // editing
   return 1;
@@ -432,9 +490,15 @@ function gradeSection(root, sectionKey, section) {
     const skill = el.getAttribute('data-skill') || '';
     const practise = el.getAttribute('data-practise') || '';
     const qType = el.getAttribute('data-q-type') || '';
+    const grade = gradeInput(el);
+    if (grade === null) {
+      // self-assessed section (e.g. situational writing) — skip from score
+      perKey.set(key, { key, marks: 0, correct: false, selfAssess: true, answered: true, userValue: el.value || '', expected: '', skill, practise, qType });
+      return;
+    }
     const marks = Number(el.getAttribute('data-marks')) || readSectionMarks(section, sectionKey);
     total += marks;
-    const correct = gradeInput(el) === true;
+    const correct = grade === true;
     if (correct) scored += marks;
     perKey.set(key, {
       key, marks, correct,
@@ -587,6 +651,11 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill }
           </div>`
         : '';
       fb.hidden = false;
+      if (info.selfAssess) {
+        fb.className = 'ptg-feedback ptg-feedback--info';
+        fb.innerHTML = '<span>📝 Self-assess: compare your response to the model answer above. Check format, tone, and that all 3 bullet points are covered.</span>';
+        return;
+      }
       fb.className = `ptg-feedback ptg-feedback--${info.correct ? 'ok' : 'no'}`;
       if (info.correct) {
         fb.innerHTML = `<span>✅ Correct.</span>${skillRow}`;

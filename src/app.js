@@ -520,6 +520,9 @@ class App {
       ['btn-p1-practice-tests',   'p1-practice-tests'],
       ['btn-p2-practice-tests',   'p2-practice-tests'],
       ['btn-p3-practice-tests',   'p3-practice-tests'],
+      ['btn-p4-practice-tests',   'p4-practice-tests'],
+      ['btn-p5-practice-tests',   'p5-practice-tests'],
+      ['btn-p6-practice-tests',   'p6-practice-tests'],
     ];
     placeholderHandlers.forEach(([btnId, kind]) => {
       document.getElementById(btnId)?.addEventListener('click', () => {
@@ -1404,6 +1407,9 @@ class App {
       case 'p1-practice-tests':
       case 'p2-practice-tests':
       case 'p3-practice-tests':
+      case 'p4-practice-tests':
+      case 'p5-practice-tests':
+      case 'p6-practice-tests':
         this._openPrimaryPlaceholder(target);
         break;
       default:
