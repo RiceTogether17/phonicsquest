@@ -1,1 +1,1 @@
-Additional expansion of P4–P6 advanced grammar categories.
+Further expansion of advanced categories in P4–P6.
