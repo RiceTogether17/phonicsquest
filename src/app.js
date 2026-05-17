@@ -196,7 +196,8 @@ class App {
 
   /** Bind all event listeners */
   _bindEvents() {
-    document.querySelectorAll('.mode-card').forEach(card => {
+    document.querySelectorAll('.mode-card').forEach((card, idx) => {
+      card.style.setProperty('--i', String(idx));
       card.addEventListener('click', () => {
         this._mode = card.dataset.mode;
         store.set('currentMode', this._mode);
@@ -850,6 +851,7 @@ class App {
       this._updateQuestBanners();
       this._updateReviewBanner();
       this._renderGuidedJourney();
+      this._refreshQuestProgress();
     }
   }
 
@@ -1770,6 +1772,33 @@ class App {
         }
         this._navigateTo(target);
       });
+    });
+  }
+
+  /** Mark mode cards and quest banners that have been used before. */
+  _refreshQuestProgress() {
+    const currentMode = store.get('currentMode');
+    document.querySelectorAll('.mode-card').forEach(card => {
+      card.classList.toggle('mode-card--started', !!currentMode && card.dataset.mode === currentMode);
+    });
+
+    const mastery = store.get('questMastery') || {};
+    const questMap = {
+      'btn-grammar-mcq':   'grammarMcq',
+      'btn-vocab-mcq':     'vocabMcq',
+      'btn-cloze-castle':  'clozeCastle',
+      'btn-word-vault':    'wordVault',
+      'btn-sentence-forge':'sentenceForge',
+      'btn-editing-quest': 'editingQuest',
+      'btn-writing-quest': 'writingQuest',
+      'btn-paper-mode':    'paperMode',
+      'btn-stories':       'stories',
+    };
+    Object.entries(questMap).forEach(([btnId, key]) => {
+      const btn = document.getElementById(btnId);
+      if (!btn) return;
+      const hasProgress = Object.keys(mastery[key] || {}).length > 0;
+      btn.classList.toggle('stories-banner--started', hasProgress);
     });
   }
 

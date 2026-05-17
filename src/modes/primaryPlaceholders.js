@@ -307,6 +307,15 @@ export function mountPlaceholderModule(container, kind, { onClose, onRelated } =
     btn.addEventListener('click', () => onRelated?.(btn.dataset.related));
   });
 
+  // Mode picker toggle (Practice / Test Mode).
+  const modeBtns = container.querySelectorAll('.ptg-mode-btn');
+  modeBtns.forEach(mb => {
+    mb.addEventListener('click', () => {
+      modeBtns.forEach(b => b.classList.remove('ptg-mode-btn--active'));
+      mb.classList.add('ptg-mode-btn--active');
+    });
+  });
+
   // Practice-test launcher buttons — start the interactive mode in-place.
   const startButtons = container.querySelectorAll('[data-start-paper]');
   if (startButtons.length) {
@@ -316,6 +325,8 @@ export function mountPlaceholderModule(container, kind, { onClose, onRelated } =
         const id = btn.getAttribute('data-start-paper');
         const paper = paperBank.find(p => p.id === id);
         if (!paper) return;
+        const activeMode = container.querySelector('.ptg-mode-btn--active');
+        const mode = activeMode?.getAttribute('data-mode') || 'practice';
         const stage = document.createElement('div');
         stage.className = 'primary-placeholder ptg-stage-wrap';
         container.innerHTML = '';
@@ -323,6 +334,7 @@ export function mountPlaceholderModule(container, kind, { onClose, onRelated } =
         mountPracticeTest(stage, paper, {
           onClose: () => onClose?.(),
           onPractiseSkill: (target) => onRelated?.(target),
+          mode,
         });
       });
     });
