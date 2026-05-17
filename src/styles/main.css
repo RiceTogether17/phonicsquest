@@ -10490,6 +10490,72 @@ textarea:hover {
 .ptg-launcher-card .btn { margin-top: auto; align-self: flex-start; }
 
 .ptg { display: flex; flex-direction: column; gap: 14px; }
+.ptg-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ptg-header-row h2 { margin: 0; flex: 1 1 auto; }
+.ptg-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: color-mix(in srgb, var(--color-primary) 10%, #fff);
+  color: var(--color-primary-dark, var(--color-primary));
+  border: 1.5px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+  border-radius: 8px;
+  padding: 4px 10px;
+  min-width: 7ch;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ptg-timer--warn {
+  background: var(--color-warning-light);
+  color: #92400e;
+  border-color: var(--color-warning);
+  animation: ptg-timer-pulse 1s ease-in-out infinite;
+}
+.ptg-timer--up {
+  background: color-mix(in srgb, var(--color-error) 12%, #fff);
+  color: var(--color-error);
+  border-color: var(--color-error);
+  animation: none;
+}
+@keyframes ptg-timer-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.65; }
+}
+.ptg-mode-picker {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.ptg-mode-btn {
+  flex: 1 1 auto;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  background: #fff;
+  color: var(--text-muted, #555);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.ptg-mode-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.ptg-mode-btn--active {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 12%, #fff);
+  color: var(--color-primary-dark, var(--color-primary));
+}
 .ptg-header h2 { margin: 0 0 4px; }
 .ptg-stepper {
   display: flex; gap: 6px; margin: 6px 0;

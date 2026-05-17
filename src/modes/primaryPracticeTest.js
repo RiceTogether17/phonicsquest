@@ -573,11 +573,32 @@ function buildSummaryHtml(paper, sectionResults) {
     </div>`;
 }
 
+/** Converts "1 h 50 min", "45 min", "1 h" etc. → milliseconds (0 if unparseable). */
+function parseDurationMs(str) {
+  if (!str) return 0;
+  const h = str.match(/(\d+)\s*h/);
+  const m = str.match(/(\d+)\s*min/);
+  return ((h ? Number(h[1]) : 0) * 60 + (m ? Number(m[1]) : 0)) * 60_000;
+}
+
+/** Formats a positive millisecond count as M:SS or H:MM:SS. */
+function formatRemaining(ms) {
+  const totalSec = Math.max(0, Math.ceil(ms / 1000));
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
 function renderPaperFrame(paper) {
   return `
     <section class="ptg" data-paper-id="${escapeAttr(paper.id)}">
       <header class="ptg-header">
-        <h2>${escapeHtml(paper.label)}</h2>
+        <div class="ptg-header-row">
+          <h2>${escapeHtml(paper.label)}</h2>
+          <div class="ptg-timer" role="timer" aria-label="Time remaining" aria-live="off" hidden></div>
+        </div>
         <p><small>${escapeHtml(paper.duration)} · ${paper.totalMarks} marks · ${escapeHtml(paper.level)}</small></p>
         <div class="ptg-stepper" aria-label="Section progress"></div>
         <p class="ptg-blurb">${escapeHtml(paper.blurb || '')}</p>
@@ -593,7 +614,7 @@ function renderPaperFrame(paper) {
     </section>`;
 }
 
-export function mountPracticeTest(container, paper, { onClose, onPractiseSkill } = {}) {
+export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, mode = 'practice' } = {}) {
   if (!container || !paper) return;
   const sectionKeys = SECTION_KEYS.filter(k => paper[k]);
   if (!sectionKeys.length) {
@@ -605,6 +626,7 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill }
 
   const stepperEl = container.querySelector('.ptg-stepper');
   const stageEl = container.querySelector('.ptg-stage');
+  const timerEl = container.querySelector('.ptg-timer');
   const btnPrev = container.querySelector('[data-action="prev"]');
   const btnCheck = container.querySelector('[data-action="check"]');
   const btnNext = container.querySelector('[data-action="next"]');
@@ -613,6 +635,7 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill }
 
   let idx = 0;
   const sectionResults = []; // collected on Check
+  let timerInterval = null;
 
   function renderStepper() {
     stepperEl.innerHTML = sectionKeys.map((k, i) => {
@@ -717,6 +740,8 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill }
   }
 
   function onFinish() {
+    clearInterval(timerInterval);
+    if (timerEl) timerEl.hidden = true;
     stageEl.innerHTML = buildSummaryHtml(paper, sectionResults);
     stepperEl.innerHTML = '';
     btnPrev.hidden = true;
@@ -746,6 +771,48 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill }
   btnFinish.addEventListener('click', onFinish);
   btnExit.addEventListener('click', () => onClose?.());
 
+  // Countdown timer — only active in Test Mode
+  if (mode === 'test' && timerEl) {
+    const durationMs = parseDurationMs(paper.duration || '');
+    if (durationMs > 0) {
+      const startedAt = Date.now();
+      const WARN_THRESHOLD = 5 * 60_000; // 5 minutes
+
+      const tick = () => {
+        const remaining = durationMs - (Date.now() - startedAt);
+        if (remaining <= 0) {
+          clearInterval(timerInterval);
+          timerEl.textContent = '⏰ Time\'s up!';
+          timerEl.className = 'ptg-timer ptg-timer--up';
+          timerEl.setAttribute('aria-live', 'assertive');
+          // Grade the current section silently if not already done
+          if (!sectionResults[idx]) {
+            const key = sectionKeys[idx];
+            const section = paper[key];
+            const result = gradeSection(stageEl, key, section);
+            sectionResults[idx] = { ...result, title: section.title, key };
+          }
+          onFinish();
+          return;
+        }
+        timerEl.textContent = '⏱ ' + formatRemaining(remaining);
+        if (remaining <= WARN_THRESHOLD) {
+          timerEl.classList.add('ptg-timer--warn');
+          if (remaining <= WARN_THRESHOLD && !timerEl.dataset.warnAnnounced) {
+            timerEl.dataset.warnAnnounced = '1';
+            timerEl.setAttribute('aria-live', 'polite');
+            // One-shot announcement; revert so subsequent ticks stay quiet
+            setTimeout(() => timerEl.setAttribute('aria-live', 'off'), 2000);
+          }
+        }
+      };
+
+      timerEl.hidden = false;
+      tick(); // render immediately before first interval fires
+      timerInterval = setInterval(tick, 1000);
+    }
+  }
+
   renderCurrentSection();
 }
 
@@ -763,6 +830,10 @@ export function buildPaperLauncherHtml({ level, papers, intro }) {
       <button class="btn btn--primary" data-start-paper="${escapeAttr(p.id)}" type="button">Start paper</button>
     </article>`).join('');
   return `
-    <p>${escapeHtml(intro || 'Pick a paper to take the test interactively. Every section is scored — at the end you’ll see which skills to drill.')}</p>
+    <div class="ptg-mode-picker" role="group" aria-label="Select paper mode">
+      <button class="ptg-mode-btn ptg-mode-btn--active" data-mode="practice" type="button">🎯 Practice</button>
+      <button class="ptg-mode-btn" data-mode="test" type="button">⏱ Test Mode</button>
+    </div>
+    <p>${escapeHtml(intro || "Pick a paper to take the test interactively. Every section is scored — at the end you’ll see which skills to drill.")}</p>
     <div class="ptg-launcher-grid" data-level="${escapeAttr(level)}">${cards}</div>`;
 }
