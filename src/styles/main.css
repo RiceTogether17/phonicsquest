@@ -682,6 +682,37 @@ input, select, textarea { font-family: inherit; }
 }
 .mode-card:focus-visible { outline-color: var(--color-primary); }
 
+@keyframes card-pop-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+.mode-card {
+  animation: card-pop-in var(--dur-normal) var(--ease-bounce) both;
+  animation-delay: calc(var(--i, 0) * 50ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mode-card { animation: none; }
+}
+.motion-reduced .mode-card { animation: none; }
+
+/* In-progress state: dashed border + small progress pip */
+.mode-card--started {
+  border-style: dashed;
+  border-color: var(--color-primary);
+  position: relative;
+}
+.mode-card--started::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--surface);
+}
+
 .mode-icon { font-size: 2rem; line-height: 1; }
 .mode-name { font-size: var(--font-size-sm); font-weight: 800; color: var(--text); text-align: center; }
 .mode-desc { font-size: var(--font-size-xs); color: var(--text-muted); text-align: center; }
@@ -1318,7 +1349,7 @@ input, select, textarea { font-family: inherit; }
   opacity: 0.7;
 }
 
-.btn--sm { padding: var(--space-2) var(--space-4); font-size: var(--font-size-sm); }
+.btn--sm { padding: var(--space-2) var(--space-4); font-size: var(--font-size-sm); min-height: 44px; }
 .btn--xl {
   padding: var(--space-5) var(--space-8);
   font-size: var(--font-size-xl);
@@ -2108,19 +2139,19 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* Manual reduced-motion override (Settings toggle) */
-[data-reduced-motion="true"] *,
-[data-reduced-motion="true"] *::before,
-[data-reduced-motion="true"] *::after {
+.motion-reduced *,
+.motion-reduced *::before,
+.motion-reduced *::after {
   animation-duration: 0.01ms !important;
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
 }
-[data-reduced-motion="true"] .mascot-home,
-[data-reduced-motion="true"] .word-emoji { animation: none; }
-[data-reduced-motion="true"] .phoneme-tile--pop .phoneme-symbol { animation: none; }
-[data-reduced-motion="true"] .phoneme-row--shake { animation: none; }
-[data-reduced-motion="true"] .stat-chip--bump { animation: none; }
-[data-reduced-motion="true"] .btn--hint-pulse { animation: none; }
+.motion-reduced .mascot-home,
+.motion-reduced .word-emoji { animation: none; }
+.motion-reduced .phoneme-tile--pop .phoneme-symbol { animation: none; }
+.motion-reduced .phoneme-row--shake { animation: none; }
+.motion-reduced .stat-chip--bump { animation: none; }
+.motion-reduced .btn--hint-pulse { animation: none; }
 
 /* ── 18. RESPONSIVE ── */
 
@@ -2194,7 +2225,6 @@ input, select, textarea { font-family: inherit; }
   /* Touch targets */
   .btn { font-size: var(--font-size-base); padding: 12px 22px; }
   .action-bar .btn { min-height: 52px; font-size: var(--font-size-md); padding: 14px 24px; }
-  .btn--sm { min-height: 44px; }
   .icon-btn { width: 48px; height: 48px; }
   .stat-chip { min-height: 44px; }
 
@@ -2206,6 +2236,34 @@ input, select, textarea { font-family: inherit; }
 @media (min-width: 600px) and (orientation: landscape) {
   #app { max-width: 100%; box-shadow: none; overflow-x: hidden; }
   .main-content { padding: 16px 32px; }
+}
+
+/* Compact landscape on phones (e.g. iPhone SE/14 rotated) */
+@media (max-width: 767px) and (orientation: landscape) and (max-height: 500px) {
+  .app-header { height: 40px; padding: 0 var(--space-3); }
+  .app-header .logo-text { font-size: var(--font-size-sm); }
+  .main-content { padding: var(--space-2) var(--space-3); }
+  .hero-zone { padding: var(--space-2) 0; gap: var(--space-2); }
+  .mascot-home { display: none; }
+  .mode-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-2);
+  }
+  .mode-card { min-height: 72px; padding: var(--space-2); }
+  .mode-icon { font-size: 1.4rem; }
+  .mode-desc { display: none; }
+  /* Game screens: put controls beside the word display */
+  #screen-game .game-inner,
+  #screen-sight-match .game-inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .word-image-wrap { width: 80px; height: 80px; }
+  .word-emoji { font-size: 3.5rem; }
+  .daily-goal { padding: var(--space-2) var(--space-3); }
+  .spin-section { padding: var(--space-2) 0; }
 }
 
 @media (min-height: 700px) {
@@ -3379,6 +3437,24 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .stories-banner--green .stories-banner-title { color: #15803d; }
 .stories-banner--green .stories-banner-arrow { color: #22c55e; }
+
+/* In-progress quest banner: subtle dashed accent + a small progress pip */
+.stories-banner--started {
+  border-style: dashed;
+  border-color: var(--color-primary);
+  position: relative;
+}
+.stories-banner--started::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--surface);
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    BLEND IT! — sequential guided mode

@@ -123,7 +123,7 @@ export const settingsController = {
     document.getElementById('reduced-motion-toggle')?.addEventListener('change', (e) => {
       const checked = /** @type {HTMLInputElement} */ (e.target).checked;
       store.set('reducedMotion', checked);
-      document.documentElement.setAttribute('data-reduced-motion', checked ? 'true' : 'false');
+      document.documentElement.classList.toggle('motion-reduced', checked);
     });
 
     const debouncedFontScale = debounce((val) => store.set('fontScale', val));
@@ -230,10 +230,7 @@ export const settingsController = {
       document.getElementById('reduced-motion-toggle')
     );
     if (reducedMotion) reducedMotion.checked = store.get('reducedMotion') ?? false;
-    document.documentElement.setAttribute(
-      'data-reduced-motion',
-      store.get('reducedMotion') ? 'true' : 'false',
-    );
+    document.documentElement.classList.toggle('motion-reduced', !!store.get('reducedMotion'));
 
     const fontScale = Number(store.get('fontScale') || 100);
     const fontScaleEl = /** @type {HTMLInputElement|null} */ (document.getElementById('font-size-scale'));
