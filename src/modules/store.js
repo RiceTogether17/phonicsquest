@@ -80,6 +80,7 @@ const DEFAULT_STATE = {
     grammarMcq: {},
     vocabMcq: {},
     paperMode: {},
+    synthesisQuest: {},
   },
   questAttempts: [],        // recent quest attempts (capped)
   learningEvents: [],       // fine-grained telemetry events (capped)

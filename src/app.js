@@ -40,6 +40,7 @@ import { initVocabMcq, showVocabMcqBrowser, cleanupVocabMcq, startVocabMcqLevel 
 import { initPaperMode, showPaperModeBrowser, cleanupPaperMode } from './modes/paperMode.js';
 import { initEditingQuest, showEditingBrowser, cleanupEditingQuest } from './modes/editingQuest.js';
 import { initWritingQuest, showWritingBrowser, cleanupWritingQuest } from './modes/writingQuest.js';
+import { initSynthesisQuest, showSynthesisBrowser, cleanupSynthesisQuest } from './modes/synthesisQuest.js';
 import { mountPlaceholderModule, getPlaceholderMeta } from './modes/primaryPlaceholders.js';
 import { initComprehensionClozeQuest, cleanupComprehensionClozeQuest } from './modes/comprehensionClozeQuest.js';
 import {
@@ -532,6 +533,7 @@ class App {
     });
     document.getElementById('btn-pp-back')?.addEventListener('click', () => {
       cleanupComprehensionClozeQuest();
+      cleanupSynthesisQuest();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
@@ -1429,11 +1431,15 @@ class App {
     const container = document.getElementById('primary-placeholder-content');
     const goHome = () => {
       cleanupComprehensionClozeQuest();
+      cleanupSynthesisQuest();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     };
     if (kind === 'comprehension-cloze') {
       initComprehensionClozeQuest(container, { onClose: goHome });
+    } else if (kind === 'synthesis') {
+      initSynthesisQuest(container, goHome);
+      showSynthesisBrowser();
     } else {
       mountPlaceholderModule(container, kind, {
         onClose: goHome,

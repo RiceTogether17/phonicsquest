@@ -591,4 +591,247 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     explain: '"As soon as" means "at the very moment when". Both events are in the simple past when talking about past events. No comma is needed when "as soon as" is in the middle.',
   },
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CAUSATIVE "HAVE SOMETHING DONE" (4 items, P5–P6)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'st-caus-1',
+    level: 'P5',
+    skill: 'Causative — have something done',
+    skillKey: 'causativeHave',
+    pattern: 'have/had something done',
+    original: 'A photographer took their family portrait yesterday.',
+    stem: 'They had',
+    answer: 'They had their family portrait taken by a photographer yesterday.',
+    alternates: ['They had their family portrait taken yesterday.'],
+    explain: '"Have + object + past participle" shows that the subject arranged for someone else to do the action. The subject did NOT take the photo — they paid or arranged for it.',
+  },
+
+  {
+    id: 'st-caus-2',
+    level: 'P5',
+    skill: 'Causative — have something done (repair)',
+    skillKey: 'causativeHave',
+    pattern: 'have/had something done',
+    original: 'The mechanic repaired Mr Lee\'s bicycle last Saturday.',
+    stem: 'Mr Lee had',
+    answer: 'Mr Lee had his bicycle repaired by the mechanic last Saturday.',
+    alternates: ['Mr Lee had his bicycle repaired last Saturday.'],
+    explain: '"Have + object + past participle": Mr Lee did not repair the bicycle himself — the mechanic did. "His" replaces "Mr Lee\'s" because the subject is now Mr Lee.',
+  },
+
+  {
+    id: 'st-caus-3',
+    level: 'P6',
+    skill: 'Causative — have something done (future)',
+    skillKey: 'causativeHave',
+    pattern: 'will have something done',
+    original: 'The interior designer will redecorate their new flat next month.',
+    stem: 'They will have',
+    answer: 'They will have their new flat redecorated by the interior designer next month.',
+    alternates: ['They will have their new flat redecorated next month.'],
+    explain: '"Will have + object + past participle" is the future causative. It shows a planned arrangement where someone else will carry out the action on the subject\'s behalf.',
+  },
+
+  {
+    id: 'st-caus-4',
+    level: 'P6',
+    skill: 'Causative — have something done (present perfect)',
+    skillKey: 'causativeHave',
+    pattern: 'have had something done',
+    original: 'A doctor has checked the elderly patient\'s blood pressure twice today.',
+    stem: 'The elderly patient has',
+    answer: 'The elderly patient has had her blood pressure checked by a doctor twice today.',
+    alternates: ['The elderly patient has had her blood pressure checked twice today.'],
+    explain: '"Have/has had + object + past participle" is the present perfect causative. It means the arrangement and action happened recently and are still relevant to the present.',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CLEFT SENTENCES (3 items, P5–P6)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'st-cleft-1',
+    level: 'P5',
+    skill: 'Cleft sentence — It was…who',
+    skillKey: 'cleftSentence',
+    pattern: 'It was/is…who/that',
+    original: 'Mrs Tan inspired Priya to pursue medicine.',
+    stem: 'It was Mrs Tan',
+    answer: 'It was Mrs Tan who inspired Priya to pursue medicine.',
+    alternates: [],
+    explain: '"It was + [person] + who + [rest of sentence]" places strong emphasis on the person. Use "who" for people and "that" for things. The tense of "was/is" mirrors the original tense.',
+  },
+
+  {
+    id: 'st-cleft-2',
+    level: 'P5',
+    skill: 'Cleft sentence — It was…that (thing)',
+    skillKey: 'cleftSentence',
+    pattern: 'It was/is…who/that',
+    original: 'The thunderstorm caused the power outage in our estate.',
+    stem: 'It was the thunderstorm',
+    answer: 'It was the thunderstorm that caused the power outage in our estate.',
+    alternates: [],
+    explain: '"It was + [thing/cause] + that + [rest of sentence]" highlights the cause or key element. Use "that" (not "who") when the emphasised element is not a person.',
+  },
+
+  {
+    id: 'st-cleft-3',
+    level: 'P6',
+    skill: 'Cleft sentence — It was…that (time/place)',
+    skillKey: 'cleftSentence',
+    pattern: 'It was/is…who/that',
+    original: 'They first met at the science fair in 2019.',
+    stem: 'It was at the science fair',
+    answer: 'It was at the science fair that they first met in 2019.',
+    alternates: ['It was in 2019 that they first met at the science fair.'],
+    explain: 'Cleft sentences can emphasise a time or place by fronting it: "It was at [place] that…" The rest of the sentence follows "that" in normal word order.',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // TYPE 2 CONDITIONAL (3 items, P5)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'st-cond2-1',
+    level: 'P5',
+    skill: 'Conditional Type 2 — imaginary present/future',
+    skillKey: 'conditionalType2',
+    pattern: 'If + past simple, would/could + base verb',
+    original: 'She does not have a bicycle, so she cannot cycle to school.',
+    stem: 'If she had',
+    answer: 'If she had a bicycle, she could cycle to school.',
+    alternates: ['She could cycle to school if she had a bicycle.'],
+    explain: 'Type 2 conditional describes an imaginary or unlikely situation in the present/future. Use past simple in the "if" clause and "would/could/might + base verb" in the result clause.',
+  },
+
+  {
+    id: 'st-cond2-2',
+    level: 'P5',
+    skill: 'Conditional Type 2 — were (formal)',
+    skillKey: 'conditionalType2',
+    pattern: 'If + were, would + base verb',
+    original: 'He is not the captain, so he does not make the final decision.',
+    stem: 'If he were',
+    answer: 'If he were the captain, he would make the final decision.',
+    alternates: ['He would make the final decision if he were the captain.'],
+    explain: 'In formal Type 2 conditionals, use "were" for all subjects (not "was"): "If he were…", "If she were…". This is standard in academic writing and PSLE.',
+  },
+
+  {
+    id: 'st-cond2-3',
+    level: 'P5',
+    skill: 'Conditional Type 2 — could/might',
+    skillKey: 'conditionalType2',
+    pattern: 'If + past simple, could/might + base verb',
+    original: 'The school does not have a swimming pool, so pupils cannot swim during PE.',
+    stem: 'If the school had',
+    answer: 'If the school had a swimming pool, pupils could swim during PE.',
+    alternates: ['Pupils could swim during PE if the school had a swimming pool.'],
+    explain: '"Could" in the result clause suggests ability or possibility, while "might" suggests a weaker possibility. Both are correct alternatives to "would" in Type 2 conditionals.',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // TYPE 3 CONDITIONAL (3 items, P6)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'st-cond3-1',
+    level: 'P6',
+    skill: 'Conditional Type 3 — imaginary past',
+    skillKey: 'conditionalType3',
+    pattern: 'If + past perfect, would have + past participle',
+    original: 'She did not study hard enough, so she did not pass the examination.',
+    stem: 'If she had studied',
+    answer: 'If she had studied hard enough, she would have passed the examination.',
+    alternates: ['She would have passed the examination if she had studied hard enough.'],
+    explain: 'Type 3 conditional talks about an imaginary past — something that did NOT happen. Use past perfect ("had + past participle") in the "if" clause and "would have + past participle" in the result clause.',
+  },
+
+  {
+    id: 'st-cond3-2',
+    level: 'P6',
+    skill: 'Conditional Type 3 — negative result',
+    skillKey: 'conditionalType3',
+    pattern: 'If + past perfect, would not have + past participle',
+    original: 'He left early and therefore missed the important announcement.',
+    stem: 'If he had not left early,',
+    answer: 'If he had not left early, he would not have missed the important announcement.',
+    alternates: ['He would not have missed the important announcement if he had not left early.'],
+    explain: 'In a negative Type 3 conditional, both clauses can be negative. "If he had not left early" (the imaginary past) → "he would not have missed" (the imaginary past result).',
+  },
+
+  {
+    id: 'st-cond3-3',
+    level: 'P6',
+    skill: 'Conditional Type 3 — could have',
+    skillKey: 'conditionalType3',
+    pattern: 'If + past perfect, could have + past participle',
+    original: 'They did not bring umbrellas, so they got drenched in the rain.',
+    stem: 'If they had brought umbrellas,',
+    answer: 'If they had brought umbrellas, they would not have got drenched in the rain.',
+    alternates: [
+      'If they had brought umbrellas, they would not have gotten drenched in the rain.',
+      'If they had brought umbrellas, they could have avoided getting drenched.',
+    ],
+    explain: '"Could have + past participle" in the result clause shows a past ability or possibility that was missed. It is slightly softer than "would have" and implies the outcome was achievable.',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // DESPITE / IN SPITE OF (3 items, P5–P6)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'st-despite-1',
+    level: 'P5',
+    skill: 'Contrast — despite / in spite of',
+    skillKey: 'despiteInSpiteOf',
+    pattern: 'despite / in spite of + noun/-ing',
+    original: 'Although the rain was heavy, the match continued.',
+    stem: 'Despite the heavy rain,',
+    answer: 'Despite the heavy rain, the match continued.',
+    alternates: [
+      'In spite of the heavy rain, the match continued.',
+      'The match continued despite the heavy rain.',
+      'The match continued in spite of the heavy rain.',
+    ],
+    explain: '"Despite" and "in spite of" are followed by a noun phrase, not a full clause. "The heavy rain" is a noun phrase, so it fits. Never write "despite of…" — "despite" is never followed by "of".',
+  },
+
+  {
+    id: 'st-despite-2',
+    level: 'P5',
+    skill: 'Contrast — despite + -ing form',
+    skillKey: 'despiteInSpiteOf',
+    pattern: 'despite / in spite of + -ing',
+    original: 'Although he tried very hard, he could not solve the problem.',
+    stem: 'Despite trying hard,',
+    answer: 'Despite trying hard, he could not solve the problem.',
+    alternates: [
+      'In spite of trying hard, he could not solve the problem.',
+      'Despite his hard efforts, he could not solve the problem.',
+      'In spite of his efforts, he could not solve the problem.',
+    ],
+    explain: 'When you want to use "despite/in spite of" before a verb idea, use the -ing (gerund) form: "despite trying" not "despite he tried". Alternatively, use a noun: "despite his efforts".',
+  },
+
+  {
+    id: 'st-despite-3',
+    level: 'P6',
+    skill: 'Contrast — in spite of (formal register)',
+    skillKey: 'despiteInSpiteOf',
+    pattern: 'despite / in spite of + noun/-ing',
+    original: 'Although the team had limited resources, they completed the project on time.',
+    stem: 'In spite of their limited resources,',
+    answer: 'In spite of their limited resources, the team completed the project on time.',
+    alternates: [
+      'Despite their limited resources, the team completed the project on time.',
+      'The team completed the project on time in spite of their limited resources.',
+      'The team completed the project on time despite their limited resources.',
+    ],
+    explain: '"In spite of" is slightly more formal than "despite" and is commonly used in written English. Both have the same meaning and grammar rules. Note: "their limited resources" is a noun phrase, so no "of" issue arises.',
+  },
+
 ]);

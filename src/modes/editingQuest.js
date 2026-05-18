@@ -63,6 +63,24 @@ const EDITING_TEACHBACK = {
     example: '"receive" (i before e except after c) · "necessary" (one c, double s) · "beautiful" (beauty + ful)',
     tip: 'Break the word into syllables. Say each part. Does it match a pattern you know?',
   },
+  quantifiers: {
+    icon: '🔢',
+    rule: 'Use "many/few" with countable nouns and "much/little" with uncountable nouns.',
+    example: '"many books" · "few apples" · "much water" · "little sugar"',
+    tip: 'Ask: can I count it? If yes → many/few. If not → much/little.',
+  },
+  comparatives: {
+    icon: '📏',
+    rule: 'Comparative adjectives compare two things. Short adjectives add -er; long ones use "more".',
+    example: '"taller than" · "more expensive than" · "better than" (irregular)',
+    tip: 'Two syllables or more? Use "more + adjective". One syllable? Add "-er". Check irregular forms: good → better, bad → worse.',
+  },
+  conjunctions: {
+    icon: '🔗',
+    rule: 'Coordinating conjunctions (and, but, or, so) join equal clauses; subordinating (because, although, when) join unequal ones.',
+    example: '"She was tired, so she rested." — "Although it rained, they played."',
+    tip: 'The conjunction shows the logical link: reason (because), contrast (although/but), result (so), addition (and).',
+  },
   // Fallbacks by type
   grammar: {
     icon: '📘',
@@ -436,13 +454,43 @@ function _renderComplete() {
   const firstTryRate = _sessionStats.firstTryCorrect / Math.max(_sessionStats.errorsAttempted, 1);
   const stars = _calculateStars(accuracy, firstTryRate);
 
+  // Build per-rule mastery rows from questMastery
+  const rulesEncountered = [...new Set(_list.flatMap(p => p.errors.map(e => e.rule || e.type)))];
+  const ruleRows = rulesEncountered.map(rule => {
+    const score = questMastery.getSkillScore('editingQuest', rule) ?? 0.5;
+    const pct = Math.round(score * 100);
+    const tb = EDITING_TEACHBACK[rule];
+    const label = tb ? `${tb.icon} ${rule}` : rule;
+    const barColour = pct >= 70 ? 'var(--color-success)' : pct >= 40 ? 'var(--color-primary)' : 'var(--color-error)';
+    return `
+      <div class="sq-skill-row">
+        <span class="sq-skill-name">${label}</span>
+        <div class="sq-skill-track"><div class="sq-skill-bar" style="width:${pct}%;background:${barColour}"></div></div>
+        <span class="sq-skill-pct">${pct}%</span>
+      </div>`;
+  }).join('');
+
+  const grammarTotal = _sessionStats.accuracyByType.grammar.total;
+  const grammarCorrect = _sessionStats.accuracyByType.grammar.correct;
+  const spellingTotal = _sessionStats.accuracyByType.spelling.total;
+  const spellingCorrect = _sessionStats.accuracyByType.spelling.correct;
+
   _container.innerHTML = `
     <div class="sfq-game">
       <h3>🎉 Editing Quest Complete ${'⭐'.repeat(stars)}</h3>
-      <p>You completed ${_sessionStats.passagesCompleted} passages for ${EDITING_LEVELS[_level]}.</p>
-      <p>Accuracy: ${(accuracy * 100).toFixed(0)}% · First-try: ${(firstTryRate * 100).toFixed(0)}%</p>
-      <p>Hints used: ${_sessionStats.hintsUsed} · Reveals used: ${_sessionStats.revealsUsed}</p>
-      <p class="dash-pattern-item">Next mission: ${_recommendFocusArea()}.</p>
+      <div class="sq-summary-stats">
+        <div class="sq-stat-chip"><span class="sq-stat-val">${_sessionStats.errorsCorrect}/${_sessionStats.errorsAttempted}</span><span class="sq-stat-lbl">Correct</span></div>
+        <div class="sq-stat-chip"><span class="sq-stat-val">${(accuracy * 100).toFixed(0)}%</span><span class="sq-stat-lbl">Accuracy</span></div>
+        <div class="sq-stat-chip"><span class="sq-stat-val">${(firstTryRate * 100).toFixed(0)}%</span><span class="sq-stat-lbl">First try</span></div>
+        <div class="sq-stat-chip"><span class="sq-stat-val">${_sessionStats.passagesCompleted}</span><span class="sq-stat-lbl">Passages</span></div>
+      </div>
+      <div class="eq-type-breakdown">
+        <span>📘 Grammar: ${grammarCorrect}/${grammarTotal}</span>
+        <span>🔤 Spelling: ${spellingCorrect}/${spellingTotal}</span>
+        <span>💡 Hints: ${_sessionStats.hintsUsed} · 🧩 Reveals: ${_sessionStats.revealsUsed}</span>
+      </div>
+      ${ruleRows ? `<h4 class="sq-skills-heading">Rule mastery (lifetime)</h4><div class="sq-skills-list">${ruleRows}</div>` : ''}
+      <p class="sq-focus-tip">📌 Focus next: ${_recommendFocusArea()}.</p>
       <div class="sfq-actions">
         <button class="btn btn--primary" id="eq-back">Back to Levels</button>
         <button class="btn btn--ghost btn--sm" id="eq-replay">Replay Level</button>
