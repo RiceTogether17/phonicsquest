@@ -508,7 +508,7 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'ccvcc-i',
     learningOutcome: 'Decode short-O words with blends at both ends.',
     targetSounds: ['stCC-mp', 'frCC-nt', 'prCC-ng', 'frCC-st'],
-    sampleWords: ['stomp', 'front', 'prong', 'blond', 'frost', 'crop', 'cross', 'gloss'],
+    sampleWords: ['stomp', 'front', 'prong', 'blond', 'frost', 'floss', 'cross', 'gloss'],
     sentenceExamples: ['Stomp at the front.', 'The frost is on the prong.'],
     recommendedModes: ['classicBlend', 'segment', 'missing', 'soundCount'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
