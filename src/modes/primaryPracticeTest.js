@@ -27,6 +27,15 @@ import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 import { GRAMMAR_CATEGORIES } from '../data/grammarCategories.js';
 import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
 
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 const PRACTISE_TARGET_LABELS = {
   'grammar-mcq':    '🧠 Grammar MCQ',
   'vocab-mcq':      '📖 Vocabulary MCQ',
@@ -113,7 +122,7 @@ function renderMcqSection(section, sectionKey) {
   const items = section.items.map((item, i) => {
     const groupName = `q-${sectionKey}-${i}`;
     const practise = item.practiseTarget || _defaultPractiseTarget(item.skill);
-    const choices = item.choices.map((c, ci) => `
+    const choices = shuffle(item.choices).map(c => `
       <label class="ptg-radio">
         <input type="radio" name="${groupName}" value="${escapeAttr(c)}"
                data-q-key="${sectionKey}/${i}"
@@ -302,7 +311,7 @@ function renderComprehensionSection(section, sectionKey) {
 
     if (q.type === 'mcq') {
       const group = `cmcq-${sectionKey}-${i}`;
-      const choices = q.choices.map(c => `
+      const choices = shuffle(q.choices).map(c => `
         <label class="ptg-radio">
           <input type="radio" name="${group}" value="${escapeAttr(c)}"
                  data-q-key="${qKey}" data-answer="${escapeAttr(q.answer)}"
@@ -316,7 +325,7 @@ function renderComprehensionSection(section, sectionKey) {
     if (q.type === 'word-meaning') {
       const group = `cwm-${sectionKey}-${i}`;
       const sentence = q.sentence ? `<p><em>${escapeHtml(q.sentence)}</em></p>` : '';
-      const choices = q.choices.map(c => `
+      const choices = shuffle(q.choices).map(c => `
         <label class="ptg-radio">
           <input type="radio" name="${group}" value="${escapeAttr(c)}"
                  data-q-key="${qKey}" data-answer="${escapeAttr(q.answer)}"
