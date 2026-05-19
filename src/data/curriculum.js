@@ -1,24 +1,28 @@
 /**
- * PhonicsQuest Curriculum
+ * PhonicsQuest Curriculum — Single Source of Truth
  *
- * Scope & sequence for the sequential blending progression. The phase numbers
- * here MUST stay in sync with the placement screener in
- * `src/modules/placementTest.js` — the architecture review called out a
- * curriculum/placement mismatch where each file claimed a different home for
- * digraphs, and we don't want that to drift again.
+ * This file is the canonical curriculum. Anything that needs to know about
+ * phases, stages, learning outcomes, target sounds, sample words, decodable
+ * sentence examples, recommended game modes, or mastery thresholds reads
+ * from here. UI components MUST NOT redefine their own phase metadata —
+ * `src/components/curriculumMap.js` previously kept a parallel PHASE_META
+ * table that drifted out of sync (7 vs 10 phases). That duplication has been
+ * removed; see `PHASES` below.
+ *
+ * The phase numbers here MUST stay in sync with the placement screener in
+ * `src/modules/placementTest.js` — covered by
+ * `__tests__/curriculumPlacementAlignment.test.js`.
  *
  *   Phase 1  CVC               short A → E → I → O → U
  *   Phase 2  CCVC              initial blends  (blend + vowel + consonant)
  *   Phase 3  CVCC              final blends    (consonant + vowel + blend)
- *   Phase 4  Digraphs          sh, ch, th, wh, ck, ng — needed for early
- *                              decodable reading, hence introduced before
- *                              long vowels rather than buried at the end
+ *   Phase 4  Digraphs          sh, ch, th, wh, ck, ng
  *   Phase 5  CCVCC             both-end blends
- *   Phase 6  Long Vowels       A → E → I → O → U
- *   Phase 7  Diphthongs
+ *   Phase 6  Long Vowels       split-digraph / vowel-team / word-end patterns
+ *   Phase 7  Diphthongs        oi/oy, ou/ow, aw
  *   Phase 8  Advanced          mixed-blends review
- *   Phase 9  Suffixes
- *   Phase 10 Morphology & high-frequency sight words
+ *   Phase 9  Suffixes          -ing, -ed, -er, -est
+ *   Phase 10 Morphology        prefixes, advanced suffixes, multisyllabic, sight
  *
  * Each stage unlocks when its prerequisite reaches mastery threshold.
  * The `group` field is used by progress.getAdaptivePool() to filter words.
@@ -31,8 +35,212 @@ export const MASTERY_THRESHOLD = 0.80;
 export const MIN_ATTEMPTS_FOR_MASTERY = 6;
 
 /**
+ * Default per-stage mastery criteria. Individual stages may override these
+ * by providing their own `masteryCriteria` field. The strict-gate readiness
+ * check in `src/modules/progression.js` uses additional criteria (unique
+ * words, session days, vowel confusion) on top of these.
+ */
+export const DEFAULT_MASTERY_CRITERIA = Object.freeze({
+  accuracy:    MASTERY_THRESHOLD,
+  minAttempts: MIN_ATTEMPTS_FOR_MASTERY,
+});
+
+/**
+ * Required fields every CURRICULUM stage must declare. Asserted in
+ * `__tests__/curriculumSchema.test.js`.
+ */
+export const REQUIRED_STAGE_FIELDS = Object.freeze([
+  'id',
+  'phase',
+  'name',
+  'group',
+  'learningOutcome',
+  'targetSounds',
+  'sampleWords',
+  'sentenceExamples',
+  'recommendedModes',
+  'masteryCriteria',
+]);
+
+/**
+ * Required fields every PHASES entry must declare. Asserted in
+ * `__tests__/curriculumSchema.test.js`.
+ */
+export const REQUIRED_PHASE_FIELDS = Object.freeze([
+  'phase',
+  'id',
+  'title',
+  'label',
+  'icon',
+  'description',
+  'learningOutcome',
+  'targetSounds',
+  'sampleWords',
+  'sentenceExamples',
+  'recommendedModes',
+  'masteryCriteria',
+]);
+
+/**
+ * Phase-level rollup. UI surfaces (curriculum map, dashboard headings)
+ * derive their phase cards from this table instead of redefining one
+ * locally. `label` is the short header form ("Phase 1 — CVC"); `title` is
+ * the friendly card title; `description` is one parent-facing sentence.
+ */
+export const PHASES = Object.freeze([
+  {
+    phase: 1,
+    id: 'phase-1-cvc',
+    title: 'CVC Words',
+    label: 'Phase 1 — CVC',
+    icon: '🔤',
+    description: 'Simple 3-sound short-vowel words (cat, hen, big, dog, bug).',
+    learningOutcome: 'Decode any short-vowel consonant–vowel–consonant word in isolation and in a simple sentence.',
+    targetSounds: ['short a /ă/', 'short e /ĕ/', 'short i /ĭ/', 'short o /ŏ/', 'short u /ŭ/'],
+    sampleWords: ['cat', 'hen', 'big', 'dog', 'bug', 'map', 'pen', 'sit', 'top', 'sun'],
+    sentenceExamples: ['The cat sat on a mat.', 'A pig is in the mud.'],
+    recommendedModes: ['oralBlend', 'first', 'middle', 'soundCount', 'blend', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+  {
+    phase: 2,
+    id: 'phase-2-ccvc',
+    title: 'CCVC Initial Blends',
+    label: 'Phase 2 — CCVC',
+    icon: '🔀',
+    description: 'Two consonants at the start before the vowel (flat, step, drip, drum).',
+    learningOutcome: 'Decode and spell short-vowel words that begin with an l-, r-, or s-blend.',
+    targetSounds: ['bl', 'cl', 'fl', 'gl', 'pl', 'sl', 'br', 'cr', 'dr', 'fr', 'gr', 'pr', 'tr', 'sk', 'sm', 'sn', 'sp', 'st', 'sw'],
+    sampleWords: ['flat', 'clap', 'trap', 'step', 'sled', 'flip', 'drip', 'drop', 'stop', 'drum'],
+    sentenceExamples: ['I can clap and step.', 'A frog is on the slip mat.'],
+    recommendedModes: ['blend', 'classicBlend', 'segment', 'hear', 'soundCount', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+  {
+    phase: 3,
+    id: 'phase-3-cvcc',
+    title: 'CVCC Final Blends',
+    label: 'Phase 3 — CVCC',
+    icon: '📐',
+    description: 'Two consonants at the end after the vowel (band, belt, gift, song, jump).',
+    learningOutcome: 'Decode and spell short-vowel words that end in a consonant blend.',
+    targetSounds: ['-nd', '-nt', '-mp', '-st', '-lt', '-lk', '-lp', '-sk', '-ft', '-nk', '-ng'],
+    sampleWords: ['band', 'fast', 'belt', 'gift', 'milk', 'song', 'lost', 'jump', 'dust', 'lamp'],
+    sentenceExamples: ['Hand me the lamp.', 'I jump in the dust.'],
+    recommendedModes: ['classicBlend', 'segment', 'last', 'hear', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+  {
+    phase: 4,
+    id: 'phase-4-digraphs',
+    title: 'Consonant Digraphs',
+    label: 'Phase 4 — Digraphs',
+    icon: '🤝',
+    description: 'Two letters making one sound — sh, ch, th, wh, ck, ng.',
+    learningOutcome: 'Recognise that two letters can make one sound, and decode digraph words in connected text.',
+    targetSounds: ['sh /ʃ/', 'ch /tʃ/', 'th /θ/', 'th /ð/', 'wh /w/', 'ck /k/', 'ng /ŋ/'],
+    sampleWords: ['ship', 'chip', 'that', 'when', 'sing', 'lock', 'fish', 'chop', 'this', 'whip'],
+    sentenceExamples: ['The ship has a chip.', 'Wash the dish in the sink.'],
+    recommendedModes: ['hear', 'blend', 'segment', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+  {
+    phase: 5,
+    id: 'phase-5-ccvcc',
+    title: 'CCVCC Both-end Blends',
+    label: 'Phase 5 — CCVCC',
+    icon: '🎯',
+    description: 'Blends at both ends of the word (stamp, blend, print, stomp, stump).',
+    learningOutcome: 'Decode and spell short-vowel words with blends at both the start and the end.',
+    targetSounds: ['stCC-', 'plCC-', 'brCC-', 'spCC-', 'sprCC-', '-mp', '-nd', '-nt', '-st'],
+    sampleWords: ['stamp', 'blend', 'print', 'stomp', 'stump', 'blast', 'crest', 'drink', 'frost', 'trust'],
+    sentenceExamples: ['Print the brand on the stamp.', 'I trust the stump will hold.'],
+    recommendedModes: ['classicBlend', 'segment', 'hear', 'missing', 'soundCount'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+  {
+    phase: 6,
+    id: 'phase-6-long-vowels',
+    title: 'Long Vowels',
+    label: 'Phase 6 — Long Vowels',
+    icon: '🌟',
+    description: 'Long vowel patterns — split digraphs (a_e), vowel teams (ai, ee, oa) and word-end patterns (ay, ow, y).',
+    learningOutcome: 'Decode long-vowel words across the major spelling patterns and choose the right pattern when spelling.',
+    targetSounds: ['a_e /eɪ/', 'ai /eɪ/', 'ay /eɪ/', 'ee /iː/', 'ea /iː/', 'i_e /aɪ/', 'igh /aɪ/', 'y /aɪ/', 'o_e /oʊ/', 'oa /oʊ/', 'ow /oʊ/', 'u_e /juː/', 'ue /uː/', 'ew /uː/', 'oo /uː/'],
+    sampleWords: ['cake', 'rain', 'play', 'tree', 'beat', 'kite', 'night', 'cry', 'home', 'boat', 'snow', 'cube', 'blue', 'new', 'moon'],
+    sentenceExamples: ['The cake is on the plate.', 'I see a bee in the tree.', 'At night the light is bright.'],
+    recommendedModes: ['classicBlend', 'hear', 'middle', 'segment', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+  {
+    phase: 7,
+    id: 'phase-7-diphthongs',
+    title: 'Diphthongs',
+    label: 'Phase 7 — Diphthongs',
+    icon: '🌊',
+    description: 'Sliding vowel sounds — oi/oy, ou/ow and the aw pattern.',
+    learningOutcome: 'Decode and spell words with diphthong vowel patterns and discriminate them by sound.',
+    targetSounds: ['oi /ɔɪ/', 'oy /ɔɪ/', 'ou /aʊ/', 'ow /aʊ/', 'aw /ɔː/', 'au /ɔː/'],
+    sampleWords: ['coin', 'boy', 'out', 'cow', 'paw', 'jaw', 'loud', 'joy', 'town', 'dawn'],
+    sentenceExamples: ['The boy found a coin.', 'I saw a paw on the lawn.'],
+    recommendedModes: ['classicBlend', 'hear', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+  {
+    phase: 8,
+    id: 'phase-8-advanced',
+    title: 'Advanced Blends Review',
+    label: 'Phase 8 — Advanced',
+    icon: '🚀',
+    description: 'Mixed-blend review to keep fluency strong before morphology.',
+    learningOutcome: 'Read mixed-blend words fluently in sentences without sounding each one out.',
+    targetSounds: ['CCV', 'CVCC', 'CCVCC', 'multi-blend review'],
+    sampleWords: ['float', 'crisp', 'blend', 'sprint', 'blast', 'scrap', 'twist', 'shrink', 'sprout', 'thrust'],
+    sentenceExamples: ['Sprint and blast through the crisp grass.', 'Twist the lid and stash the snack.'],
+    recommendedModes: ['classicBlend', 'hear', 'soundCount'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+  {
+    phase: 9,
+    id: 'phase-9-suffixes',
+    title: 'Inflectional Suffixes',
+    label: 'Phase 9 — Suffixes',
+    icon: '🏃',
+    description: '-ing, -ed, -er and -est on familiar base words.',
+    learningOutcome: 'Read and spell words with -ing, -ed, -er and -est, hearing the suffix as a separate chunk.',
+    targetSounds: ['-ing /ɪŋ/', '-ed /d/, /t/, /ɪd/', '-er /ɚ/', '-est /ɪst/'],
+    sampleWords: ['running', 'jumped', 'faster', 'tallest', 'helped', 'biggest', 'playing', 'sitting', 'slower', 'eating'],
+    sentenceExamples: ['He was running faster than me.', 'The biggest cat jumped highest.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+  {
+    phase: 10,
+    id: 'phase-10-morphology',
+    title: 'Morphology & Fluency',
+    label: 'Phase 10 — Morphology & Fluency',
+    icon: '🧩',
+    description: 'Prefixes, advanced suffixes, multi-syllabic words and high-frequency irregular sight words.',
+    learningOutcome: 'Read multi-syllable and morphologically complex words and recognise common irregular sight words on sight.',
+    targetSounds: ['re-', 'un-', '-tion', '-able', 'open/closed syllables', 'irregular sight'],
+    sampleWords: ['redo', 'untie', 'action', 'readable', 'science', 'market', 'their', 'because', 'enough', 'through'],
+    sentenceExamples: ['Their friend is reading because the book is good.', 'I will redo my action plan.'],
+    recommendedModes: ['classicBlend', 'hear'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+]);
+
+/** Phase labels for UI display. Derived from PHASES so they cannot drift. */
+export const PHASE_LABELS = Object.freeze(
+  PHASES.reduce((acc, p) => { acc[p.phase] = p.label; return acc; }, {})
+);
+
+/**
  * Curriculum stages in learning order.
  * `group` maps to a WORD_GROUPS key or a structural-vowel key (e.g. 'cvc-a').
+ *
+ * Each stage carries the canonical educational metadata that all surfaces
+ * (UI, reporting, adaptive routing) depend on. See REQUIRED_STAGE_FIELDS.
  */
 export const CURRICULUM = [
 
@@ -42,7 +250,13 @@ export const CURRICULUM = [
     name: 'CVC – Short A',
     description: 'Simple three-sound words: cat, hat, map…',
     icon: '🐱', group: 'cvc-a', level: 1,
-    requiredMastery: 0,           // always unlocked
+    requiredMastery: 0,
+    learningOutcome: 'Decode and spell short-A CVC words in isolation and in a simple sentence.',
+    targetSounds: ['short a /ă/'],
+    sampleWords: ['cat', 'hat', 'map', 'bat', 'ran', 'pan', 'jam', 'tap'],
+    sentenceExamples: ['The cat sat on a mat.', 'A bat had a hat.'],
+    recommendedModes: ['oralBlend', 'first', 'middle', 'blend', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'cvc-e', phase: 1,
@@ -50,6 +264,12 @@ export const CURRICULUM = [
     description: 'Short E words: bed, leg, ten…',
     icon: '🛏️', group: 'cvc-e', level: 1,
     requiredMastery: 0.70, prerequisite: 'cvc-a',
+    learningOutcome: 'Discriminate short-E from short-A and decode short-E CVC words.',
+    targetSounds: ['short e /ĕ/'],
+    sampleWords: ['bed', 'leg', 'ten', 'hen', 'pen', 'red', 'web', 'jet'],
+    sentenceExamples: ['Ten men ran.', 'The hen is in the pen.'],
+    recommendedModes: ['middle', 'blend', 'segment', 'hear'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'cvc-i', phase: 1,
@@ -57,6 +277,12 @@ export const CURRICULUM = [
     description: 'Short I words: bit, tip, dip…',
     icon: '🐟', group: 'cvc-i', level: 1,
     requiredMastery: 0.70, prerequisite: 'cvc-e',
+    learningOutcome: 'Decode short-I CVC words and contrast /ĭ/ with /ĕ/.',
+    targetSounds: ['short i /ĭ/'],
+    sampleWords: ['bit', 'tip', 'dip', 'pig', 'win', 'sit', 'big', 'lip'],
+    sentenceExamples: ['A pig can dig.', 'I sit in the bin.'],
+    recommendedModes: ['middle', 'blend', 'segment', 'hear'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'cvc-o', phase: 1,
@@ -64,6 +290,12 @@ export const CURRICULUM = [
     description: 'Short O words: hop, dog, top…',
     icon: '🐸', group: 'cvc-o', level: 1,
     requiredMastery: 0.70, prerequisite: 'cvc-i',
+    learningOutcome: 'Decode short-O CVC words and contrast /ŏ/ with the other short vowels.',
+    targetSounds: ['short o /ŏ/'],
+    sampleWords: ['hop', 'dog', 'top', 'pot', 'fox', 'hot', 'log', 'mom'],
+    sentenceExamples: ['The dog hops on top.', 'A fox got a pot.'],
+    recommendedModes: ['middle', 'blend', 'segment', 'hear'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'cvc-u', phase: 1,
@@ -71,6 +303,12 @@ export const CURRICULUM = [
     description: 'Short U words: bug, cup, run…',
     icon: '🐛', group: 'cvc-u', level: 1,
     requiredMastery: 0.70, prerequisite: 'cvc-o',
+    learningOutcome: 'Decode short-U CVC words and contrast /ŭ/ with the other short vowels.',
+    targetSounds: ['short u /ŭ/'],
+    sampleWords: ['bug', 'cup', 'run', 'sun', 'mud', 'hug', 'fun', 'nut'],
+    sentenceExamples: ['The bug is in the mud.', 'The sun is hot.'],
+    recommendedModes: ['middle', 'blend', 'segment', 'hear'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 
   /* ── Phase 2: CCVC by vowel ─────────────────────────────────────── */
@@ -80,6 +318,12 @@ export const CURRICULUM = [
     description: 'Blend at the start: flat, clap, trap…',
     icon: '🚩', group: 'ccvc-a', level: 1,
     requiredMastery: 0.70, prerequisite: 'cvc-u',
+    learningOutcome: 'Decode short-A words with an initial l-, r- or s-blend without skipping the second consonant.',
+    targetSounds: ['bl', 'cl', 'fl', 'pl', 'sl', 'br', 'cr', 'dr', 'fr', 'gr', 'pr', 'tr', 'sk', 'sm', 'sn', 'sp', 'st', 'sw'],
+    sampleWords: ['flat', 'clap', 'trap', 'plan', 'snap', 'flag', 'grab', 'stab'],
+    sentenceExamples: ['I clap and tap.', 'A frog is in a trap.'],
+    recommendedModes: ['blend', 'classicBlend', 'segment', 'soundCount'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'ccvc-e', phase: 2,
@@ -87,6 +331,12 @@ export const CURRICULUM = [
     description: 'Blend at the start: step, fret, sled…',
     icon: '🎯', group: 'ccvc-e', level: 1,
     requiredMastery: 0.70, prerequisite: 'ccvc-a',
+    learningOutcome: 'Decode short-E words with an initial consonant blend.',
+    targetSounds: ['st-', 'fr-', 'sl-', 'sp-', 'sw-'],
+    sampleWords: ['step', 'fret', 'sled', 'fled', 'spell', 'swept', 'stem', 'sped'],
+    sentenceExamples: ['Step on the sled.', 'I fell off the sled.'],
+    recommendedModes: ['blend', 'classicBlend', 'segment', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'ccvc-i', phase: 2,
@@ -94,6 +344,12 @@ export const CURRICULUM = [
     description: 'Blend at the start: flip, trip, drip…',
     icon: '💪', group: 'ccvc-i', level: 1,
     requiredMastery: 0.70, prerequisite: 'ccvc-e',
+    learningOutcome: 'Decode short-I words with an initial consonant blend.',
+    targetSounds: ['fl-', 'tr-', 'dr-', 'sl-', 'sw-', 'sp-'],
+    sampleWords: ['flip', 'trip', 'drip', 'slip', 'swim', 'spin', 'grin', 'skin'],
+    sentenceExamples: ['Flip and slip on the trip.', 'I can spin and grin.'],
+    recommendedModes: ['blend', 'classicBlend', 'segment', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'ccvc-o', phase: 2,
@@ -101,6 +357,12 @@ export const CURRICULUM = [
     description: 'Blend at the start: flop, drop, stop…',
     icon: '🐊', group: 'ccvc-o', level: 1,
     requiredMastery: 0.70, prerequisite: 'ccvc-i',
+    learningOutcome: 'Decode short-O words with an initial consonant blend.',
+    targetSounds: ['fl-', 'dr-', 'st-', 'sl-', 'pl-'],
+    sampleWords: ['flop', 'drop', 'stop', 'slot', 'plot', 'crop', 'trot', 'frog'],
+    sentenceExamples: ['Stop! Drop the box.', 'The frog can hop and trot.'],
+    recommendedModes: ['blend', 'classicBlend', 'segment', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'ccvc-u', phase: 2,
@@ -108,6 +370,12 @@ export const CURRICULUM = [
     description: 'Blend at the start: drum, slug, stub…',
     icon: '🥁', group: 'ccvc-u', level: 1,
     requiredMastery: 0.70, prerequisite: 'ccvc-o',
+    learningOutcome: 'Decode short-U words with an initial consonant blend.',
+    targetSounds: ['dr-', 'sl-', 'st-', 'pl-', 'bl-'],
+    sampleWords: ['drum', 'slug', 'stub', 'plum', 'blur', 'club', 'snug', 'crust'],
+    sentenceExamples: ['Drum on the drum.', 'A snug slug hid in the mud.'],
+    recommendedModes: ['blend', 'classicBlend', 'segment', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 
   /* ── Phase 3: CVCC by vowel ─────────────────────────────────────── */
@@ -117,6 +385,12 @@ export const CURRICULUM = [
     description: 'Blend at the end: band, fast, camp…',
     icon: '✋', group: 'cvcc-a', level: 2,
     requiredMastery: 0.70, prerequisite: 'ccvc-u',
+    learningOutcome: 'Decode short-A words ending in a consonant blend.',
+    targetSounds: ['-nd', '-st', '-mp', '-nk', '-sk', '-ft'],
+    sampleWords: ['band', 'fast', 'camp', 'hand', 'sand', 'lamp', 'task', 'raft'],
+    sentenceExamples: ['The band is fast.', 'Hand me the lamp.'],
+    recommendedModes: ['classicBlend', 'segment', 'last', 'hear'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'cvcc-e', phase: 3,
@@ -124,6 +398,12 @@ export const CURRICULUM = [
     description: 'Blend at the end: belt, best, bend…',
     icon: '🔔', group: 'cvcc-e', level: 2,
     requiredMastery: 0.70, prerequisite: 'cvcc-a',
+    learningOutcome: 'Decode short-E words ending in a consonant blend.',
+    targetSounds: ['-lt', '-st', '-nd', '-nt', '-lp'],
+    sampleWords: ['belt', 'best', 'bend', 'melt', 'vent', 'help', 'kept', 'left'],
+    sentenceExamples: ['The best belt is here.', 'Help me melt the wax.'],
+    recommendedModes: ['classicBlend', 'segment', 'last', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'cvcc-i', phase: 3,
@@ -131,6 +411,12 @@ export const CURRICULUM = [
     description: 'Blend at the end: gift, milk, list…',
     icon: '🎁', group: 'cvcc-i', level: 2,
     requiredMastery: 0.70, prerequisite: 'cvcc-e',
+    learningOutcome: 'Decode short-I words ending in a consonant blend.',
+    targetSounds: ['-ft', '-lk', '-st', '-nt', '-lt'],
+    sampleWords: ['gift', 'milk', 'list', 'hint', 'lift', 'silk', 'mist', 'wilt'],
+    sentenceExamples: ['A gift in the bin.', 'Lift the lid for a hint.'],
+    recommendedModes: ['classicBlend', 'segment', 'last', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'cvcc-o', phase: 3,
@@ -138,6 +424,12 @@ export const CURRICULUM = [
     description: 'Blend at the end: bond, song, lost…',
     icon: '🎵', group: 'cvcc-o', level: 2,
     requiredMastery: 0.70, prerequisite: 'cvcc-i',
+    learningOutcome: 'Decode short-O words ending in a consonant blend.',
+    targetSounds: ['-nd', '-ng', '-st', '-nk'],
+    sampleWords: ['bond', 'song', 'lost', 'long', 'cost', 'pond', 'gong', 'honk'],
+    sentenceExamples: ['I sing a long song.', 'The pond is lost in fog.'],
+    recommendedModes: ['classicBlend', 'segment', 'last', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'cvcc-u', phase: 3,
@@ -145,18 +437,27 @@ export const CURRICULUM = [
     description: 'Blend at the end: jump, dust, lung…',
     icon: '💥', group: 'cvcc-u', level: 2,
     requiredMastery: 0.70, prerequisite: 'cvcc-o',
+    learningOutcome: 'Decode short-U words ending in a consonant blend.',
+    targetSounds: ['-mp', '-st', '-ng', '-nt'],
+    sampleWords: ['jump', 'dust', 'lung', 'hunt', 'dump', 'rust', 'sung', 'bunt'],
+    sentenceExamples: ['Jump in the dust.', 'The hunt was fun.'],
+    recommendedModes: ['classicBlend', 'segment', 'last', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 
   /* ── Phase 4: Digraphs ───────────────────────────────────────────── */
-  // Introduced before CCVCC and long vowels because sh/ch/th/ck/ng appear
-  // in real decodable reading from the start. Buried-at-the-end placement
-  // was the curriculum vs. placement mismatch flagged in the review.
   {
     id: 'digraphs', phase: 4,
     name: 'Digraphs',
     description: 'ship, chip, that, when, sing…',
     icon: '🤝', group: 'digraphs', level: 2,
     requiredMastery: 0.70, prerequisite: 'cvcc-u',
+    learningOutcome: 'Treat sh, ch, th, wh, ck and ng as single phonemes when decoding and segmenting.',
+    targetSounds: ['sh /ʃ/', 'ch /tʃ/', 'th /θ/', 'th /ð/', 'wh /w/', 'ck /k/', 'ng /ŋ/'],
+    sampleWords: ['ship', 'chip', 'that', 'when', 'sing', 'lock', 'fish', 'chop', 'this', 'whip'],
+    sentenceExamples: ['The ship has a chip.', 'Wash the dish in the sink.'],
+    recommendedModes: ['hear', 'blend', 'segment', 'missing', 'soundCount'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 
   /* ── Phase 5: CCVCC by vowel ────────────────────────────────────── */
@@ -166,6 +467,12 @@ export const CURRICULUM = [
     description: 'Blends both ends: stamp, clamp, blast…',
     icon: '🌱', group: 'ccvcc-a', level: 2,
     requiredMastery: 0.70, prerequisite: 'digraphs',
+    learningOutcome: 'Decode short-A words with blends at both ends.',
+    targetSounds: ['stCC-mp', 'clCC-', 'blCC-st', 'brCC-nd'],
+    sampleWords: ['stamp', 'clamp', 'blast', 'brand', 'grant', 'plant', 'craft', 'tract'],
+    sentenceExamples: ['Stamp the brand on the plant.', 'I can craft a fast raft.'],
+    recommendedModes: ['classicBlend', 'segment', 'missing', 'soundCount'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'ccvcc-e', phase: 5,
@@ -173,6 +480,12 @@ export const CURRICULUM = [
     description: 'Blends both ends: blend, trend, crest…',
     icon: '🌿', group: 'ccvcc-e', level: 2,
     requiredMastery: 0.70, prerequisite: 'ccvcc-a',
+    learningOutcome: 'Decode short-E words with blends at both ends.',
+    targetSounds: ['blCC-nd', 'trCC-nd', 'crCC-st', 'spCC-nt'],
+    sampleWords: ['blend', 'trend', 'crest', 'spent', 'swept', 'crept', 'shelf', 'flesh'],
+    sentenceExamples: ['I blend and trend.', 'The crest of the hill swept down.'],
+    recommendedModes: ['classicBlend', 'segment', 'missing', 'soundCount'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'ccvcc-i', phase: 5,
@@ -180,6 +493,12 @@ export const CURRICULUM = [
     description: 'Blends both ends: blink, drink, print…',
     icon: '💎', group: 'ccvcc-i', level: 2,
     requiredMastery: 0.70, prerequisite: 'ccvcc-e',
+    learningOutcome: 'Decode short-I words with blends at both ends.',
+    targetSounds: ['blCC-nk', 'drCC-nk', 'prCC-nt', 'swCC-ft'],
+    sampleWords: ['blink', 'drink', 'print', 'swift', 'sprint', 'flint', 'crisp', 'glint'],
+    sentenceExamples: ['Blink and drink fast.', 'Print and sprint to the desk.'],
+    recommendedModes: ['classicBlend', 'segment', 'missing', 'soundCount'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'ccvcc-o', phase: 5,
@@ -187,6 +506,12 @@ export const CURRICULUM = [
     description: 'Blends both ends: stomp, front, prong…',
     icon: '🎺', group: 'ccvcc-o', level: 2,
     requiredMastery: 0.70, prerequisite: 'ccvcc-i',
+    learningOutcome: 'Decode short-O words with blends at both ends.',
+    targetSounds: ['stCC-mp', 'frCC-nt', 'prCC-ng', 'frCC-st'],
+    sampleWords: ['stomp', 'front', 'prong', 'blond', 'frost', 'crop', 'cross', 'gloss'],
+    sentenceExamples: ['Stomp at the front.', 'The frost is on the prong.'],
+    recommendedModes: ['classicBlend', 'segment', 'missing', 'soundCount'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'ccvcc-u', phase: 5,
@@ -194,18 +519,15 @@ export const CURRICULUM = [
     description: 'Blends both ends: stump, clump, blunt…',
     icon: '🏆', group: 'ccvcc-u', level: 2,
     requiredMastery: 0.70, prerequisite: 'ccvcc-o',
+    learningOutcome: 'Decode short-U words with blends at both ends.',
+    targetSounds: ['stCC-mp', 'clCC-mp', 'blCC-nt', 'grCC-nt'],
+    sampleWords: ['stump', 'clump', 'blunt', 'grunt', 'trust', 'thump', 'crust', 'crunch'],
+    sentenceExamples: ['Trust the blunt stump.', 'I crunch the crust and grunt.'],
+    recommendedModes: ['classicBlend', 'segment', 'missing', 'soundCount'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 
-  /* ── Phase 6: Long vowels (split by spelling pattern) ────────────────
-   *
-   * Each long vowel is split into orthographic micro-stages because
-   * children master the patterns at very different rates. Within a vowel,
-   * the order is: split-digraph (a_e/o_e/etc.) → vowel teams (ai/oa/ee)
-   * → end-of-word patterns (ay/ow). Long I and Long U have a single stage
-   * each for now — igh, final-y, ue and ew aren't yet in the word data;
-   * deriveSpellingPattern() in words.js will route those words to the
-   * right stage as soon as they are added.
-   */
+  /* ── Phase 6: Long vowels (split by spelling pattern) ────────────── */
 
   // Long A: a_e → ai → ay
   {
@@ -214,6 +536,12 @@ export const CURRICULUM = [
     description: 'Split digraph: cake, name, late…',
     icon: '🎂', group: 'long-a-ae', level: 2,
     requiredMastery: 0.70, prerequisite: 'ccvcc-u',
+    learningOutcome: 'Read and spell long-A words with the a_e split-digraph pattern.',
+    targetSounds: ['a_e /eɪ/'],
+    sampleWords: ['cake', 'name', 'late', 'bake', 'lake', 'gate', 'wave', 'tape'],
+    sentenceExamples: ['The cake has my name.', 'Make a lake by the gate.'],
+    recommendedModes: ['classicBlend', 'hear', 'middle', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'long-a-ai', phase: 6,
@@ -221,6 +549,12 @@ export const CURRICULUM = [
     description: 'Vowel team: rain, tail, sail…',
     icon: '🌧️', group: 'long-a-ai', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-a-ae',
+    learningOutcome: 'Read and spell long-A words with the ai vowel-team pattern.',
+    targetSounds: ['ai /eɪ/'],
+    sampleWords: ['rain', 'tail', 'sail', 'paid', 'train', 'mail', 'wait', 'snail'],
+    sentenceExamples: ['Rain on the train.', 'The snail has a tail.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'long-a-ay', phase: 6,
@@ -228,6 +562,12 @@ export const CURRICULUM = [
     description: 'Word-end pattern: play, day, way…',
     icon: '🎲', group: 'long-a-ay', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-a-ai',
+    learningOutcome: 'Read and spell long-A words ending in -ay.',
+    targetSounds: ['ay /eɪ/'],
+    sampleWords: ['play', 'day', 'way', 'say', 'may', 'stay', 'tray', 'gray'],
+    sentenceExamples: ['We play all day.', 'Stay on the tray.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 
   // Long E: ee → ea
@@ -237,6 +577,12 @@ export const CURRICULUM = [
     description: 'Doubled vowel team: tree, feet, see…',
     icon: '🌲', group: 'long-e-ee', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-a-ay',
+    learningOutcome: 'Read and spell long-E words with the ee vowel-team pattern.',
+    targetSounds: ['ee /iː/'],
+    sampleWords: ['tree', 'feet', 'see', 'bee', 'week', 'seed', 'feed', 'green'],
+    sentenceExamples: ['I see a bee in the tree.', 'My feet feel the seeds.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'long-e-ea', phase: 6,
@@ -244,6 +590,12 @@ export const CURRICULUM = [
     description: 'Vowel team: beat, sea, dream…',
     icon: '🍃', group: 'long-e-ea', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-e-ee',
+    learningOutcome: 'Read and spell long-E words with the ea vowel-team pattern.',
+    targetSounds: ['ea /iː/'],
+    sampleWords: ['beat', 'sea', 'dream', 'beach', 'leaf', 'seat', 'mean', 'team'],
+    sentenceExamples: ['I dream of the sea.', 'The team is on the beach.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 
   // Long I: i_e → igh → y
@@ -253,6 +605,12 @@ export const CURRICULUM = [
     description: 'Split digraph: kite, like, time…',
     icon: '🪁', group: 'long-i-ie', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-e-ea',
+    learningOutcome: 'Read and spell long-I words with the i_e split-digraph pattern.',
+    targetSounds: ['i_e /aɪ/'],
+    sampleWords: ['kite', 'like', 'time', 'ride', 'smile', 'bike', 'side', 'wide'],
+    sentenceExamples: ['I ride my bike at five.', 'It is time to fly the kite.'],
+    recommendedModes: ['classicBlend', 'hear', 'middle', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'long-i-igh', phase: 6,
@@ -260,6 +618,12 @@ export const CURRICULUM = [
     description: 'Trigraph (igh = one /ī/ sound): night, light, right, might…',
     icon: '💡', group: 'long-i-igh', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-i-ie',
+    learningOutcome: 'Read and spell long-I words using the igh trigraph as a single phoneme.',
+    targetSounds: ['igh /aɪ/'],
+    sampleWords: ['night', 'light', 'right', 'might', 'sight', 'high', 'fight', 'bright'],
+    sentenceExamples: ['At night the light is bright.', 'The right path is in sight.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'long-i-y', phase: 6,
@@ -267,6 +631,12 @@ export const CURRICULUM = [
     description: 'Word-end y as long /ī/: cry, try, fly, my, sky…',
     icon: '😭', group: 'long-i-y', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-i-igh',
+    learningOutcome: 'Read and spell short one-syllable words ending in y pronounced /aɪ/.',
+    targetSounds: ['y /aɪ/'],
+    sampleWords: ['cry', 'try', 'fly', 'my', 'sky', 'why', 'dry', 'shy'],
+    sentenceExamples: ['Why does my fly try to fly?', 'The sky is dry today.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 
   // Long O: o_e → oa → ow
@@ -276,6 +646,12 @@ export const CURRICULUM = [
     description: 'Split digraph: home, hope, note…',
     icon: '🏠', group: 'long-o-oe', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-i-y',
+    learningOutcome: 'Read and spell long-O words with the o_e split-digraph pattern.',
+    targetSounds: ['o_e /oʊ/'],
+    sampleWords: ['home', 'hope', 'note', 'rope', 'vote', 'bone', 'rose', 'stove'],
+    sentenceExamples: ['Hope is at home.', 'Tie the rope by the stove.'],
+    recommendedModes: ['classicBlend', 'hear', 'middle', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'long-o-oa', phase: 6,
@@ -283,6 +659,12 @@ export const CURRICULUM = [
     description: 'Vowel team: boat, coat, road…',
     icon: '🚤', group: 'long-o-oa', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-o-oe',
+    learningOutcome: 'Read and spell long-O words with the oa vowel-team pattern.',
+    targetSounds: ['oa /oʊ/'],
+    sampleWords: ['boat', 'coat', 'road', 'soap', 'toad', 'goal', 'load', 'foam'],
+    sentenceExamples: ['A toad in a boat.', 'I load soap onto the road.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'long-o-ow', phase: 6,
@@ -290,15 +672,27 @@ export const CURRICULUM = [
     description: 'Word-end pattern: snow, slow, low…',
     icon: '❄️', group: 'long-o-ow', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-o-oa',
+    learningOutcome: 'Read and spell long-O words ending in -ow.',
+    targetSounds: ['ow /oʊ/'],
+    sampleWords: ['snow', 'slow', 'low', 'mow', 'grow', 'blow', 'show', 'glow'],
+    sentenceExamples: ['The snow is so low.', 'Slow plants grow well.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 
-  // Long U: u_e (split-digraph) → ue (vowel team) → ew → oo
+  // Long U: u_e → ue → ew → oo
   {
     id: 'long-u-ue', phase: 6,
     name: 'Long U · u_e',
     description: 'Split digraph: cube, tube, rule…',
     icon: '🎲', group: 'long-u-ue', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-o-ow',
+    learningOutcome: 'Read and spell long-U words with the u_e split-digraph pattern.',
+    targetSounds: ['u_e /juː/', 'u_e /uː/'],
+    sampleWords: ['cube', 'tube', 'rule', 'mule', 'cute', 'use', 'tune', 'flute'],
+    sentenceExamples: ['The cube is cute.', 'Use the flute to play a tune.'],
+    recommendedModes: ['classicBlend', 'hear', 'middle', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'long-u-uue', phase: 6,
@@ -306,6 +700,12 @@ export const CURRICULUM = [
     description: 'Vowel team ue (different from u_e): blue, true, glue, clue.',
     icon: '💙', group: 'long-u-uue', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-u-ue',
+    learningOutcome: 'Read and spell long-U words with the ue vowel-team pattern.',
+    targetSounds: ['ue /uː/'],
+    sampleWords: ['blue', 'true', 'glue', 'clue', 'sue', 'due', 'value', 'rescue'],
+    sentenceExamples: ['The blue glue is true.', 'The clue is in the rescue.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'long-u-ew', phase: 6,
@@ -313,6 +713,12 @@ export const CURRICULUM = [
     description: 'Word-end ew: new, few, drew, blew, flew, grew…',
     icon: '🆕', group: 'long-u-ew', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-u-uue',
+    learningOutcome: 'Read and spell long-U words ending in -ew.',
+    targetSounds: ['ew /uː/'],
+    sampleWords: ['new', 'few', 'drew', 'blew', 'flew', 'grew', 'chew', 'stew'],
+    sentenceExamples: ['I drew a new boat.', 'A few birds flew over the stew.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'long-u-oo', phase: 6,
@@ -320,21 +726,27 @@ export const CURRICULUM = [
     description: 'Long /uː/ as in moon, food, pool, room (NOT short /ʊ/ as in book).',
     icon: '🌙', group: 'long-u-oo', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-u-ew',
+    learningOutcome: 'Read and spell words with the oo /uː/ pattern and distinguish them from /ʊ/ as in book.',
+    targetSounds: ['oo /uː/'],
+    sampleWords: ['moon', 'food', 'pool', 'room', 'soon', 'boot', 'roof', 'noon'],
+    sentenceExamples: ['The moon is on the pool soon.', 'I eat my food at noon.'],
+    recommendedModes: ['classicBlend', 'hear', 'middle', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 
-  /* ── Phase 7: Diphthongs (split by spelling pattern) ─────────────────
-   *
-   * oi/oy share the /ɔɪ/ sound and get one stage. ou/ow share /aʊ/ and
-   * get one stage. /aw/ is technically a low back vowel rather than a
-   * true diphthong, so it earns its own stage rather than being mixed in
-   * with the others.
-   */
+  /* ── Phase 7: Diphthongs (split by spelling pattern) ─────────────── */
   {
     id: 'dip-oi', phase: 7,
     name: 'Diphthong · oi/oy',
     description: 'Same /ɔɪ/ sound: coin, boy, soil, joy…',
     icon: '🪙', group: 'dip-oi', level: 3,
     requiredMastery: 0.70, prerequisite: 'long-u-oo',
+    learningOutcome: 'Read and spell oi/oy words and choose oi inside a word vs oy at word-end.',
+    targetSounds: ['oi /ɔɪ/', 'oy /ɔɪ/'],
+    sampleWords: ['coin', 'boy', 'soil', 'joy', 'boil', 'toy', 'point', 'enjoy'],
+    sentenceExamples: ['The boy has a coin.', 'Joy is in the soil.'],
+    recommendedModes: ['classicBlend', 'hear', 'middle', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'dip-ou', phase: 7,
@@ -342,6 +754,12 @@ export const CURRICULUM = [
     description: 'Same /aʊ/ sound: out, cow, loud, town…',
     icon: '🐄', group: 'dip-ou', level: 3,
     requiredMastery: 0.70, prerequisite: 'dip-oi',
+    learningOutcome: 'Read and spell ou/ow words and discriminate /aʊ/ from /oʊ/ in similar spellings.',
+    targetSounds: ['ou /aʊ/', 'ow /aʊ/'],
+    sampleWords: ['out', 'cow', 'loud', 'town', 'found', 'now', 'down', 'house'],
+    sentenceExamples: ['The cow is loud in town.', 'I found a house down the road.'],
+    recommendedModes: ['classicBlend', 'hear', 'middle', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'dip-aw', phase: 7,
@@ -349,24 +767,42 @@ export const CURRICULUM = [
     description: 'Separate from oi/ou: paw, jaw, saw, dawn…',
     icon: '🐾', group: 'dip-aw', level: 3,
     requiredMastery: 0.70, prerequisite: 'dip-ou',
+    learningOutcome: 'Read and spell words with the aw / au /ɔː/ pattern.',
+    targetSounds: ['aw /ɔː/', 'au /ɔː/'],
+    sampleWords: ['paw', 'jaw', 'saw', 'dawn', 'lawn', 'draw', 'yawn', 'crawl'],
+    sentenceExamples: ['I saw a paw on the lawn.', 'Draw a yawn at dawn.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 
-  /* ── Phase 8: Advanced — mixed-blends review ──────────────────────── */
+  /* ── Phase 8: Advanced — mixed-blends review ─────────────────────── */
   {
     id: 'blends-review', phase: 8,
     name: 'Blends Review',
     description: 'float, crisp, blend, sprint…',
     icon: '🚀', group: 'blends', level: 3,
     requiredMastery: 0.70, prerequisite: 'dip-aw',
+    learningOutcome: 'Read mixed-blend words fluently in continuous text without sounding each one out.',
+    targetSounds: ['initial blends', 'final blends', 'both-end blends', 'tri-consonant blends (spr-, str-, scr-)'],
+    sampleWords: ['float', 'crisp', 'blend', 'sprint', 'blast', 'scrap', 'twist', 'shrink'],
+    sentenceExamples: ['Sprint and blast through the crisp grass.', 'Twist the lid and stash the snack.'],
+    recommendedModes: ['classicBlend', 'hear', 'soundCount'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 
-  /* ── Phase 9: Suffixes ────────────────────────────────────────────── */
+  /* ── Phase 9: Suffixes ──────────────────────────────────────────── */
   {
     id: 'suffix-ing', phase: 9,
     name: '-ing Words',
     description: 'running, jumping, sitting…',
     icon: '🏃', group: 'suffix-ing', level: 2,
     requiredMastery: 0.70, prerequisite: 'blends-review',
+    learningOutcome: 'Read and spell base + -ing words, including doubled-consonant forms (running, sitting).',
+    targetSounds: ['-ing /ɪŋ/'],
+    sampleWords: ['running', 'jumping', 'sitting', 'eating', 'playing', 'singing', 'reading', 'going'],
+    sentenceExamples: ['She is running and jumping.', 'I am reading and singing.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'suffix-ed', phase: 9,
@@ -374,6 +810,12 @@ export const CURRICULUM = [
     description: 'jumped, helped, picked…',
     icon: '✅', group: 'suffix-ed', level: 2,
     requiredMastery: 0.70, prerequisite: 'suffix-ing',
+    learningOutcome: 'Read and spell base + -ed words and recognise the three pronunciations /d/, /t/, /ɪd/.',
+    targetSounds: ['-ed /d/', '-ed /t/', '-ed /ɪd/'],
+    sampleWords: ['jumped', 'helped', 'picked', 'played', 'walked', 'wanted', 'landed', 'rested'],
+    sentenceExamples: ['She picked and packed.', 'I walked and wanted to rest.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'suffix-er', phase: 9,
@@ -381,6 +823,12 @@ export const CURRICULUM = [
     description: 'faster, taller, bigger…',
     icon: '📈', group: 'suffix-er', level: 2,
     requiredMastery: 0.70, prerequisite: 'suffix-ed',
+    learningOutcome: 'Read and spell comparative -er adjectives, including doubled-consonant forms.',
+    targetSounds: ['-er /ɚ/'],
+    sampleWords: ['faster', 'taller', 'bigger', 'smaller', 'slower', 'longer', 'higher', 'softer'],
+    sentenceExamples: ['Faster than a snail.', 'The taller tree is older.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'suffix-est', phase: 9,
@@ -388,15 +836,27 @@ export const CURRICULUM = [
     description: 'fastest, tallest, biggest…',
     icon: '🏆', group: 'suffix-est', level: 2,
     requiredMastery: 0.70, prerequisite: 'suffix-er',
+    learningOutcome: 'Read and spell superlative -est adjectives, including doubled-consonant forms.',
+    targetSounds: ['-est /ɪst/'],
+    sampleWords: ['fastest', 'tallest', 'biggest', 'smallest', 'slowest', 'longest', 'softest', 'kindest'],
+    sentenceExamples: ['The fastest is the best.', 'Kindest words win the longest friends.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 
-  /* ── Phase 10: Morphology + multisyllabic + sight vocabulary ─────────── */
+  /* ── Phase 10: Morphology + multisyllabic + sight vocabulary ───── */
   {
     id: 'prefixes', phase: 10,
     name: 'Prefixes (re-, un-)',
     description: 'redo, untie, unwrap…',
     icon: '↩️', group: 'prefixes', level: 2,
     requiredMastery: 0.70, prerequisite: 'suffix-est',
+    learningOutcome: 'Read and spell base words with re- and un- prefixes and infer the meaning shift.',
+    targetSounds: ['re- /ri/', 'un- /ʌn/'],
+    sampleWords: ['redo', 'untie', 'unwrap', 'rewrite', 'unzip', 'unsafe', 'reuse', 'unfold'],
+    sentenceExamples: ['I will redo my work and untie my shoe.', 'Unwrap the gift and reuse the box.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'suffixes-advanced', phase: 10,
@@ -404,6 +864,12 @@ export const CURRICULUM = [
     description: 'action, nation, readable…',
     icon: '🧩', group: 'suffixes-advanced', level: 3,
     requiredMastery: 0.70, prerequisite: 'prefixes',
+    learningOutcome: 'Read and spell words with -tion (/ʃən/) and -able (/əbl/) suffixes.',
+    targetSounds: ['-tion /ʃən/', '-able /əbl/'],
+    sampleWords: ['action', 'nation', 'readable', 'station', 'lovable', 'fiction', 'portable', 'option'],
+    sentenceExamples: ['The nation took action.', 'A readable book is portable.'],
+    recommendedModes: ['classicBlend', 'hear'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'multisyllable', phase: 10,
@@ -411,6 +877,12 @@ export const CURRICULUM = [
     description: 'science, market, energy…',
     icon: '🎼', group: 'multisyllable', level: 3,
     requiredMastery: 0.70, prerequisite: 'suffixes-advanced',
+    learningOutcome: 'Read and spell two- and three-syllable words using syllable-division heuristics.',
+    targetSounds: ['open syllable', 'closed syllable', 'consonant-le'],
+    sampleWords: ['science', 'market', 'energy', 'jungle', 'planet', 'magnet', 'family', 'puzzle'],
+    sentenceExamples: ['We learn science at the market.', 'My family solved the jungle puzzle.'],
+    recommendedModes: ['classicBlend', 'hear'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'sight-highfreq', phase: 10,
@@ -418,22 +890,31 @@ export const CURRICULUM = [
     description: 'their, because, enough…',
     icon: '👀', group: 'sight-highfreq', level: 3,
     requiredMastery: 0.70, prerequisite: 'multisyllable',
+    learningOutcome: 'Recognise and spell common irregular high-frequency words on sight.',
+    targetSounds: ['irregular sight'],
+    sampleWords: ['their', 'because', 'enough', 'through', 'friend', 'every', 'people', 'thought'],
+    sentenceExamples: ['Their friend has enough.', 'Every person thought of a friend.'],
+    recommendedModes: ['classicBlend', 'hear'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 ];
 
-/** Phase labels for UI display. Must match PLACEMENT_PHASES in placementTest.js. */
-export const PHASE_LABELS = {
-  1:  'Phase 1 – CVC',
-  2:  'Phase 2 – CCVC',
-  3:  'Phase 3 – CVCC',
-  4:  'Phase 4 – Digraphs',
-  5:  'Phase 5 – CCVCC',
-  6:  'Phase 6 – Long Vowels',
-  7:  'Phase 7 – Diphthongs',
-  8:  'Phase 8 – Advanced',
-  9:  'Phase 9 – Suffixes',
-  10: 'Phase 10 – Morphology & Fluency',
-};
+// ── Lookups ────────────────────────────────────────────────────────────────
+
+/** Get the PHASES entry for a phase number, or null. */
+export function getPhase(phaseNumber) {
+  return PHASES.find(p => p.phase === phaseNumber) ?? null;
+}
+
+/** Get a CURRICULUM stage by id, or null. */
+export function getStage(stageId) {
+  return CURRICULUM.find(s => s.id === stageId) ?? null;
+}
+
+/** Get every CURRICULUM stage that belongs to a phase number. */
+export function getStagesInPhase(phaseNumber) {
+  return CURRICULUM.filter(s => s.phase === phaseNumber);
+}
 
 /**
  * Returns which curriculum stages are unlocked based on mastery scores.

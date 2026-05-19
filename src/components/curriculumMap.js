@@ -9,20 +9,21 @@
  *   renderCurriculumMap(container, { onClose })
  */
 
-import { CURRICULUM } from '../data/curriculum.js';
+import { CURRICULUM, PHASES } from '../data/curriculum.js';
 import { store } from '../modules/store.js';
 import { getActiveProfile } from '../modules/profiles.js';
 import { getDomainMastery } from '../modules/masteryEngine.js';
 
-const PHASE_META = [
-  { phase: 1, label: 'Phase 1',  title: 'CVC Words',          icon: '🔤', desc: 'Simple 3-sound words (cat, hen, big)' },
-  { phase: 2, label: 'Phase 2',  title: 'CCVC Blends',         icon: '🔀', desc: 'Blends at the start (flat, step, drip)' },
-  { phase: 3, label: 'Phase 3',  title: 'CVCC Blends',         icon: '📐', desc: 'Blends at the end (fast, belt, milk)' },
-  { phase: 4, label: 'Phase 4',  title: 'CCVCC Blends',        icon: '🎯', desc: 'Blends at both ends (clamp, print)' },
-  { phase: 5, label: 'Phase 5',  title: 'Long Vowels',         icon: '🌟', desc: 'Long vowel patterns (cake, ride, bone)' },
-  { phase: 6, label: 'Phase 6',  title: 'Diphthongs',          icon: '🌊', desc: 'Vowel pairs (coin, loud, saw)' },
-  { phase: 7, label: 'Phase 7',  title: 'Advanced Patterns',   icon: '🏆', desc: 'Digraphs, r-controlled, morphology' },
-];
+// Phase display metadata is derived from the canonical PHASES table in
+// curriculum.js. Don't redefine it here — a parallel table previously drifted
+// out of sync (7 entries vs the curriculum's 10) and mislabelled stages.
+const PHASE_META = PHASES.map(p => ({
+  phase: p.phase,
+  label: `Phase ${p.phase}`,
+  title: p.title,
+  icon:  p.icon,
+  desc:  p.description,
+}));
 
 const PRIMARY_DOMAINS = [
   { id: 'sentenceSkills', label: 'Sentence Forge',   icon: '🔨', desc: 'Build and arrange sentences' },
