@@ -27,6 +27,15 @@ import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 import { GRAMMAR_CATEGORIES } from '../data/grammarCategories.js';
 import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
 
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 const PRACTISE_TARGET_LABELS = {
   'grammar-mcq':    '🧠 Grammar MCQ',
   'vocab-mcq':      '📖 Vocabulary MCQ',
@@ -37,6 +46,20 @@ const PRACTISE_TARGET_LABELS = {
 };
 
 const SECTION_KEYS = ['sectionA', 'sectionB', 'sectionC', 'sectionD', 'sectionE', 'sectionF', 'sectionG', 'sectionH', 'sectionI'];
+
+// Suggested time allocations for a 1 h 50 min paper (110 min total).
+// Based on Singapore PSLE Paper 2 pacing guidance.
+const SECTION_TIME_GUIDE = {
+  sectionA: '~10 min',
+  sectionB: '~5 min',
+  sectionC: '~15 min',
+  sectionD: '~12 min',
+  sectionE: '~20 min',
+  sectionF: '~12 min',
+  sectionG: '~8 min',
+  sectionH: '~20 min',
+  sectionI: '~8 min',
+};
 
 // Tiny CSS attr-selector escape — JSDOM (and older browsers) may lack
 // CSS.escape.  Our q-keys only contain `/` and `#`, so escape `#`.
@@ -99,7 +122,7 @@ function renderMcqSection(section, sectionKey) {
   const items = section.items.map((item, i) => {
     const groupName = `q-${sectionKey}-${i}`;
     const practise = item.practiseTarget || _defaultPractiseTarget(item.skill);
-    const choices = item.choices.map((c, ci) => `
+    const choices = shuffle(item.choices).map(c => `
       <label class="ptg-radio">
         <input type="radio" name="${groupName}" value="${escapeAttr(c)}"
                data-q-key="${sectionKey}/${i}"
@@ -288,7 +311,7 @@ function renderComprehensionSection(section, sectionKey) {
 
     if (q.type === 'mcq') {
       const group = `cmcq-${sectionKey}-${i}`;
-      const choices = q.choices.map(c => `
+      const choices = shuffle(q.choices).map(c => `
         <label class="ptg-radio">
           <input type="radio" name="${group}" value="${escapeAttr(c)}"
                  data-q-key="${qKey}" data-answer="${escapeAttr(q.answer)}"
@@ -302,7 +325,7 @@ function renderComprehensionSection(section, sectionKey) {
     if (q.type === 'word-meaning') {
       const group = `cwm-${sectionKey}-${i}`;
       const sentence = q.sentence ? `<p><em>${escapeHtml(q.sentence)}</em></p>` : '';
-      const choices = q.choices.map(c => `
+      const choices = shuffle(q.choices).map(c => `
         <label class="ptg-radio">
           <input type="radio" name="${group}" value="${escapeAttr(c)}"
                  data-q-key="${qKey}" data-answer="${escapeAttr(q.answer)}"
@@ -695,7 +718,10 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
     const key = sectionKeys[idx];
     const section = paper[key];
     const renderer = SECTION_RENDERERS[key];
-    const title = `<h3 class="ptg-section-title">${escapeHtml(section.title)} <small>(${section.marks} marks)</small></h3>`;
+    const timeHint = SECTION_TIME_GUIDE[key]
+      ? ` <span class="ptg-time-hint">⏱ ${SECTION_TIME_GUIDE[key]}</span>`
+      : '';
+    const title = `<h3 class="ptg-section-title">${escapeHtml(section.title)} <small>(${section.marks} marks)</small>${timeHint}</h3>`;
     const body = renderer ? renderer(section, key) : '<p>Unsupported section.</p>';
     stageEl.innerHTML = `${title}${body}`;
     renderStepper();

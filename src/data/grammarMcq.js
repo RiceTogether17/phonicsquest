@@ -54,9 +54,17 @@ function rotate(arr, idx) {
   return arr[idx % arr.length];
 }
 
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 function buildChoices(answer, distractors) {
   const choices = [answer, ...distractors.slice(0, 3)];
-  return [...new Set(choices)].slice(0, 4);
+  return shuffle([...new Set(choices)].slice(0, 4));
 }
 
 function difficultyFor(level, idx) {

@@ -91,17 +91,17 @@ class Progress {
       return WORDS.filter(w => w.pattern === 'blend' && w.types.includes('sv') && lvl(w));
     }
     if (group === 'struct-cvcc') {
-      return WORDS.filter(w => (w.group === 'struct-cvcc' || (getWordStructure(w) === 'CVCC' && w.types.includes('sv'))) && lvl(w));
+      return WORDS.filter(w => (w.group === 'struct-cvcc' || (getWordStructure(w) === 'CVCC' && w.types.includes('sv') && !w.types.includes('sf'))) && lvl(w));
     }
     if (group === 'struct-ccvcc') {
-      return WORDS.filter(w => (w.group === 'struct-ccvcc' || (getWordStructure(w) === 'CCVCC' && w.types.includes('sv'))) && lvl(w));
+      return WORDS.filter(w => (w.group === 'struct-ccvcc' || (getWordStructure(w) === 'CCVCC' && w.types.includes('sv') && !w.types.includes('sf'))) && lvl(w));
     }
 
     const structMatch = group.match(/^(cvc|ccvc|cvcc|ccvcc)-([aeiou])$/);
     if (structMatch) {
       const struct = structMatch[1].toUpperCase();
       const vowel  = structMatch[2];
-      return WORDS.filter(w => getWordStructure(w) === struct && getShortVowelLetter(w) === vowel && lvl(w));
+      return WORDS.filter(w => getWordStructure(w) === struct && getShortVowelLetter(w) === vowel && !w.types.includes('sf') && lvl(w));
     }
 
     // Long-vowel micro-stages: <long-X>-<spellingPattern>

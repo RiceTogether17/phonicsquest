@@ -110,3 +110,22 @@ describe('gamification rewards', () => {
     expect(store.get('xp')).toBe(XP_REWARDS.correct_fast + XP_REWARDS.daily_goal);
   });
 });
+
+describe('CVCC / CCVCC filter excludes suffix words', () => {
+  const SUFFIX_WORDS = ['jumping', 'landing', 'camping', 'melting', 'resting',
+    'jumped', 'landed', 'camped', 'melted', 'rested',
+    'jumper', 'faster', 'blending', 'blended'];
+
+  const GROUPS = ['cvcc-a', 'cvcc-e', 'cvcc-u', 'struct-cvcc',
+    'ccvcc-a', 'ccvcc-e', 'struct-ccvcc'];
+
+  for (const group of GROUPS) {
+    it(`${group} contains no suffix words`, () => {
+      const words = progress._filterByGroup(group);
+      const ids = new Set(words.map(w => w.id));
+      for (const sf of SUFFIX_WORDS) {
+        expect(ids.has(sf), `"${sf}" should not appear in ${group}`).toBe(false);
+      }
+    });
+  }
+});
