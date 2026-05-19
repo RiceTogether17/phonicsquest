@@ -28,7 +28,9 @@ import { PHONICS_MODES } from '../../modes/phonicsModes.js';
 import { CURRICULUM } from '../../data/curriculum.js';
 import { attemptLog, summarise } from '../../modules/progressAnalytics.js';
 
-const SLICE_STAGE = 'cvc-a';
+// Default vertical-slice stage — Phase 2 (CCVC Short A: flat, clap, trap).
+// Override at mount time with `mountQuestJourney(host, { stageId: ... })`.
+const SLICE_STAGE = 'ccvc-a';
 const ROUNDS_PER_MODE = 3;
 
 /**
@@ -44,7 +46,7 @@ export function mountQuestJourney(host, opts = {}) {
 
   const state = {
     screen: 'welcome',
-    stageId: SLICE_STAGE,
+    stageId: opts.stageId ?? SLICE_STAGE,
     learnerName,
     lesson: null,
     currentMode: null,        // 'soundMatch' | 'blendBuilder'

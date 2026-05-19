@@ -56,7 +56,7 @@ function seededRng(seed = 1) {
 
 describe('buildSoundMatchRound', () => {
   it('produces a 4-choice round for cvc-a with the named vowel as the answer', () => {
-    const round = buildSoundMatchRound('cvc-a', { rng: seededRng(7) });
+    const round = buildSoundMatchRound('ccvc-a', { rng: seededRng(7) });
     expect(round.mode).toBe('soundMatch');
     expect(round.choices).toHaveLength(4);
     expect(round.choices).toContain('a');
@@ -70,9 +70,10 @@ describe('buildSoundMatchRound', () => {
 
 describe('buildBlendBuilderRound', () => {
   it('produces a bank that contains every target grapheme', () => {
-    const round = buildBlendBuilderRound('cvc-a', { wordIndex: 0, addDistractor: false, rng: seededRng(3) });
+    const round = buildBlendBuilderRound('ccvc-a', { wordIndex: 0, addDistractor: false, rng: seededRng(3) });
     expect(round.mode).toBe('blendBuilder');
-    expect(round.target.word.length).toBe(3);
+    // ccvc-a stage ships 4-letter words (flat, clap, trap …).
+    expect(round.target.word.length).toBe(4);
     for (const g of round.target.graphemes) {
       expect(round.bank).toContain(g);
     }
@@ -80,14 +81,14 @@ describe('buildBlendBuilderRound', () => {
   });
 
   it('adds a single distractor when addDistractor is true', () => {
-    const round = buildBlendBuilderRound('cvc-a', { addDistractor: true, rng: seededRng(5) });
+    const round = buildBlendBuilderRound('ccvc-a', { addDistractor: true, rng: seededRng(5) });
     expect(round.bank.length).toBe(round.target.graphemes.length + 1);
   });
 });
 
 describe('buildLesson', () => {
   it('builds 3 rounds per mode using distinct words', () => {
-    const lesson = buildLesson('cvc-a', { roundsPerMode: 3, rng: seededRng(11) });
+    const lesson = buildLesson('ccvc-a', { roundsPerMode: 3, rng: seededRng(11) });
     expect(lesson.soundMatch).toHaveLength(3);
     expect(lesson.blendBuilder).toHaveLength(3);
     const words = lesson.blendBuilder.map(r => r.target.word);
@@ -147,13 +148,13 @@ describe('renderQuestMap', () => {
   it('marks the current stage and locks future stages', () => {
     const host = makeHost();
     renderQuestMap(host, {
-      currentStageId: 'cvc-a',
+      currentStageId: 'ccvc-a',
       masteredStageIds: [],
-      unlockedStageIds: ['cvc-a'],
+      unlockedStageIds: ['ccvc-a'],
     });
     const current = host.querySelector('.qj-node--current');
     expect(current).not.toBeNull();
-    expect(current.dataset.stageId).toBe('cvc-a');
+    expect(current.dataset.stageId).toBe('ccvc-a');
     expect(host.querySelectorAll('.qj-node--locked').length).toBeGreaterThan(0);
   });
 
@@ -161,9 +162,9 @@ describe('renderQuestMap', () => {
     const host = makeHost();
     let picked = null;
     renderQuestMap(host, {
-      currentStageId: 'cvc-a',
+      currentStageId: 'ccvc-a',
       masteredStageIds: [],
-      unlockedStageIds: ['cvc-a'],
+      unlockedStageIds: ['ccvc-a'],
       onPick: (id) => picked = id,
     });
     const locked = host.querySelector('.qj-node--locked');
@@ -175,7 +176,7 @@ describe('renderQuestMap', () => {
 describe('renderLessonIntro', () => {
   it('shows the target sound, a sample word, and a sentence', () => {
     const host = makeHost();
-    renderLessonIntro(host, { stageId: 'cvc-a' });
+    renderLessonIntro(host, { stageId: 'ccvc-a' });
     const bubble = host.querySelector('.qj-sound-bubble');
     const word = host.querySelector('.qj-word-card');
     expect(bubble).not.toBeNull();
@@ -187,9 +188,9 @@ describe('renderLessonIntro', () => {
   it('the start CTA fires onStart with the stage id', () => {
     const host = makeHost();
     let started = null;
-    renderLessonIntro(host, { stageId: 'cvc-a', onStart: (id) => started = id });
+    renderLessonIntro(host, { stageId: 'ccvc-a', onStart: (id) => started = id });
     host.querySelector('[data-action="start"]').click();
-    expect(started).toBe('cvc-a');
+    expect(started).toBe('ccvc-a');
   });
 });
 
@@ -296,7 +297,7 @@ describe('renderResults', () => {
   it('shows the right headline for a mastered run', () => {
     const host = makeHost();
     renderResults(host, { summary: {
-      name: 'Aanya', stageId: 'cvc-a',
+      name: 'Aanya', stageId: 'ccvc-a',
       totalRounds: 6, correctRounds: 6, accuracy: 1, stars: 3,
       wordsPractised: ['cat', 'hat'],
     } });
@@ -308,7 +309,7 @@ describe('renderResults', () => {
   it('uses the supportive headline below 50% accuracy', () => {
     const host = makeHost();
     renderResults(host, { summary: {
-      name: 'Aanya', stageId: 'cvc-a',
+      name: 'Aanya', stageId: 'ccvc-a',
       totalRounds: 6, correctRounds: 2, accuracy: 0.33, stars: 0,
       wordsPractised: ['cat'],
     } });
@@ -446,7 +447,7 @@ describe('mountQuestJourney — end-to-end slice', () => {
     expect(entries.length).toBe(1);
     const e = entries[0];
     expect(e).toMatchObject({
-      stageId: 'cvc-a',
+      stageId: 'ccvc-a',
       mode: 'soundMatch',
       correct: true,
     });

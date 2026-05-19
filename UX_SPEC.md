@@ -225,10 +225,16 @@ objective, error hints, scoring).
 
 ## 4. Vertical slice — what we're shipping in this pass
 
-> The brief asked for "Phase 2 CVC Short A → Sound Match → Blend
-> Builder → Results". In PhonicsQuest's curriculum, "CVC Short A" is
-> stage `cvc-a` (Phase 1 of our 10-phase scope — the UK Letters & Sounds
-> "Phase 2" naming convention maps onto this). This slice uses `cvc-a`.
+> The brief asked for **"Phase 2 CVC Short A → Sound Match → Blend
+> Builder → Results"**. In PhonicsQuest's 10-phase scope, **Phase 2**
+> is CCVC (initial blends with the short vowel). The Phase 2 short-A
+> stage is `ccvc-a` (sample words: flat, clap, trap, plan, snap,
+> flag, grab, stab) — short-A children with one extra consonant
+> in front. That's what this slice targets.
+>
+> The Phase 1 short-A stage `cvc-a` (cat, hat, map…) shares the same
+> rendering pipeline; switching the slice target is one constant
+> change in `controller.js` (or pass `stageId` to `mountQuestJourney`).
 
 The slice covers these screens end-to-end, using real curriculum data:
 
@@ -237,9 +243,9 @@ Welcome
   ↓
 Profile select   (skipped if a default profile exists)
   ↓
-Quest map        (cvc-a is the highlighted "current" node)
+Quest map        (ccvc-a is the highlighted "current" node)
   ↓
-Lesson intro     (target sound /ă/, sample word "cat", sentence)
+Lesson intro     (target sound /ă/, sample word "flat", sentence)
   ↓
 Game: Sound Match   (3 rounds, audio → grapheme)
   ↓
@@ -252,7 +258,7 @@ Out of slice (planned, not built this pass): mastery badge screen,
 parent progress view (the data model is shipped, the UI is not).
 
 ### 4.1 Data the slice consumes
-- `CURRICULUM` stage `cvc-a` for outcome, sample words, sentences.
+- `CURRICULUM` stage `ccvc-a` for outcome, sample words, sentences.
 - `PHONICS_MODES.soundMatch` / `.blendBuilder` for instructions,
   objectives, error hints, scoring.
 - `progressAnalytics` (new module) for read/write of attempts.
@@ -270,12 +276,12 @@ parent progress view (the data model is shipped, the UI is not).
 A child can:
 1. Land on Welcome → press Start.
 2. Pick a profile (or skip if one exists).
-3. See the quest map with `cvc-a` pulsing.
+3. See the quest map with `ccvc-a` pulsing.
 4. Open the lesson, hear the target sound, hit "Let's go!".
 5. Play 3 Sound Match rounds with calm feedback.
 6. Play 3 Blend Builder rounds with calm feedback.
 7. See a results screen with stars, accuracy, and the words they tried.
-8. Return to the quest map with `cvc-a` now showing progress.
+8. Return to the quest map with `ccvc-a` now showing progress.
 
 A developer can:
 1. `npm test` → schema, mode, content, and progress tests all pass.
