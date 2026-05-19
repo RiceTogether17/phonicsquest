@@ -62,6 +62,9 @@ function _normalizeSentence(s) {
   return _normalize(s).replace(/[?!.]+$/, '');
 }
 
+// Module-level mode flag — set by mountPracticeTest, read by section renderers
+let _currentMode = 'practice';
+
 function _skillMeta(skill) {
   if (!skill) return null;
   return GRAMMAR_CATEGORIES[skill] || VOCAB_CATEGORIES[skill] || null;
@@ -117,19 +120,32 @@ function renderMcqSection(section, sectionKey) {
 
 function renderClozeSection(section, sectionKey) {
   const practise = section.practiseTarget || _defaultPractiseTarget(section.skill) || 'cloze-castle';
-  const wordBank = (section.wordBank || []).map(w => `<span class="ptg-word-pill">${escapeHtml(w)}</span>`).join(' ');
+  const wordBankPills = (section.wordBank || []).map(w => `<span class="ptg-word-pill">${escapeHtml(w)}</span>`).join(' ');
   const text = escapeHtml(section.text).replace(/\{\{(\d+)\}\}/g, (_, n) => {
     const idx = Number(n) - 1;
     return `<input type="text" class="ptg-input ptg-input--cloze" data-q-key="${sectionKey}/${idx}"
             data-answer="${escapeAttr(section.answers[idx] || '')}"
+            data-accept="${escapeAttr((section.accept?.[idx] || []).join('|'))}"
             data-skill="${escapeAttr(section.skill || '')}"
             data-practise="${escapeAttr(practise)}"
             aria-label="Blank ${n}" autocomplete="off" />`;
   });
   const reuse = section.reuseAllowed ? '<p class="ptg-note"><em>You may use the words more than once.</em></p>' : '';
+
+  // Section C (Grammar Cloze) has no word bank in the real PSLE exam.
+  // In test mode hide it entirely; in practice mode show it with an exam note.
+  const isGrammarCloze = sectionKey === 'sectionC';
+  const hideBank = isGrammarCloze && _currentMode === 'test';
+  const bankNote = isGrammarCloze
+    ? _currentMode === 'test'
+      ? '<p class="ptg-exam-note ptg-exam-note--warn">⚠️ No word box — PSLE Section C (Grammar Cloze) has no word bank. Supply each word from grammar knowledge.</p>'
+      : '<p class="ptg-exam-note">📝 Scaffolded practice: the real PSLE Section C has <strong>no word box</strong>. This bank is shown here to help you learn the patterns — practise without looking at it once you feel confident.</p>'
+    : '';
+
   return `
     <p class="ptg-instructions">${escapeHtml(section.instructions || '')}</p>
-    <p class="ptg-wordbank"><strong>Word box:</strong> ${wordBank}</p>
+    ${bankNote}
+    ${!hideBank ? `<p class="ptg-wordbank"><strong>Word box:</strong> ${wordBankPills}</p>` : ''}
     ${reuse}
     <p class="ptg-cloze">${text}</p>
     <div class="ptg-feedback" data-feedback-for="${sectionKey}/all" hidden></div>`;
@@ -342,7 +358,33 @@ function renderComprehensionSection(section, sectionKey) {
         <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
     }
 
-    // type: 'short'
+    // type: 'evidence' — requires a direct quote + explanation
+    if (q.type === 'evidence') {
+      const keywordsAttr = (q.keywords || []).join('|');
+      return `<li>${stem}
+        <p class="ptg-scaffold-hint">📌 Quote a phrase from the passage, then explain what it shows.</p>
+        <p class="ptg-scaffold-example"><em>Example structure:</em> "…" — This shows that…</p>
+        <textarea class="ptg-input ptg-input--area" rows="3" data-q-key="${qKey}"
+          data-answer="${escapeAttr(q.model || '')}" data-keywords="${escapeAttr(keywordsAttr)}"
+          data-q-type="short" data-marks="${q.marks}"
+          placeholder="&quot;[quote from passage]&quot; This shows that…"></textarea>
+        <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
+    }
+
+    // type: 'language-use' — effect of language / figurative expression
+    if (q.type === 'language-use') {
+      const keywordsAttr = (q.keywords || []).join('|');
+      return `<li>${stem}
+        <p class="ptg-scaffold-hint">💬 State what the word / phrase means or suggests, then explain the effect on the reader.</p>
+        <p class="ptg-scaffold-example"><em>Example structure:</em> The phrase "…" suggests… / The effect on the reader is…</p>
+        <textarea class="ptg-input ptg-input--area" rows="3" data-q-key="${qKey}"
+          data-answer="${escapeAttr(q.model || '')}" data-keywords="${escapeAttr(keywordsAttr)}"
+          data-q-type="short" data-marks="${q.marks}"
+          placeholder="The word/phrase … suggests… The effect on the reader is…"></textarea>
+        <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
+    }
+
+    // type: 'short' (default — factual / inference / vocabulary / personal-response)
     const keywordsAttr = (q.keywords || []).join('|');
     const isOneWord = (q.model || '').trim().split(/\s+/).length <= 3;
     const input = isOneWord
@@ -386,7 +428,11 @@ const SECTION_RENDERERS = {
   sectionF: (s, k) => _dispatchSection(s, k),
   sectionG: (s, k) => _dispatchSection(s, k),
   sectionH: (s, k) => (s.passage ? renderComprehensionSection(s, k) : _dispatchSection(s, k)),
-  sectionI: (s, k) => (s.passage ? renderComprehensionSection(s, k) : ''),
+  sectionI: (s, k) => {
+    if (s.passage)   return renderComprehensionSection(s, k);
+    if (s.paragraph) return renderEditingSection(s, k);
+    return _dispatchSection(s, k);
+  },
 };
 
 /* ────────────────────────────────────────────────────────────────────── */
@@ -616,6 +662,7 @@ function renderPaperFrame(paper) {
 
 export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, mode = 'practice' } = {}) {
   if (!container || !paper) return;
+  _currentMode = mode;
   const sectionKeys = SECTION_KEYS.filter(k => paper[k]);
   if (!sectionKeys.length) {
     container.innerHTML = '<p>No sections in this paper.</p>';
