@@ -326,9 +326,19 @@ const VOCAB_BUILDERS = {
       ['I am ___ to my birthday next week.', 'looking forward', ['looking up', 'looking out', 'looking after']],
       ['The teacher told us to ___ our textbooks to page 42.', 'turn to', ['turn over', 'turn down', 'turn in']],
       ['Mum said I had to ___ my room before going out.', 'tidy up', ['tidy in', 'tidy on', 'tidy down']],
+      ['I ___ my old photo album while clearing the storeroom and found many childhood memories.', 'came across', ['came over', 'came along', 'came through']],
+      ['Despite training hard all year, the team decided to ___ just before the finals.', 'give up', ['give in', 'give out', 'give away']],
+      ['The school concert was ___ because the hall was flooded after the heavy rain.', 'called off', ['called out', 'called up', 'called for']],
+      ['The scientist ___ a series of experiments to test her new theory.', 'carried out', ['carried on', 'carried over', 'carried away']],
+      ['We have ___ milk. Could you buy some on your way home?', 'run out of', ['run into', 'run over', 'run through']],
+      ['The teacher ___ that the answer to question 5 was on the board all along.', 'pointed out', ['pointed at', 'pointed to', 'pointed up']],
+      ['My father ___ his own business after working for a large company for twenty years.', 'set up', ['set off', 'set out', 'set aside']],
+      ['She had to ___ a very difficult period after her grandmother passed away.', 'go through', ['go over', 'go along', 'go into']],
+      ['My sister and I always ___ after an argument — we cannot stay angry at each other for long.', 'make up', ['make out', 'make over', 'make for']],
+      ['My brother decided to ___ swimming as a hobby after watching the Olympics.', 'take up', ['take on', 'take over', 'take off']],
     ];
     const [q, answer, ds] = rotate(rows, i);
-    return { category: 'phrasalVerbs', subskill: 'phrasal_verb_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'Phrasal verbs combine a verb + particle into a fixed meaning — break out (escape), fall through (fail to happen), turn down (lower / refuse).' };
+    return { category: 'phrasalVerbs', subskill: 'phrasal_verb_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'Phrasal verbs combine a verb + particle into a fixed meaning — come across (encounter), give up (stop trying), call off (cancel), carry out (perform), run out of (exhaust supply).' };
   },
   verbDistinction(level, i) {
     const rows = [

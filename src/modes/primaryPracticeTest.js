@@ -38,6 +38,20 @@ const PRACTISE_TARGET_LABELS = {
 
 const SECTION_KEYS = ['sectionA', 'sectionB', 'sectionC', 'sectionD', 'sectionE', 'sectionF', 'sectionG', 'sectionH', 'sectionI'];
 
+// Suggested time allocations for a 1 h 50 min paper (110 min total).
+// Based on Singapore PSLE Paper 2 pacing guidance.
+const SECTION_TIME_GUIDE = {
+  sectionA: '~10 min',
+  sectionB: '~5 min',
+  sectionC: '~15 min',
+  sectionD: '~12 min',
+  sectionE: '~20 min',
+  sectionF: '~12 min',
+  sectionG: '~8 min',
+  sectionH: '~20 min',
+  sectionI: '~8 min',
+};
+
 // Tiny CSS attr-selector escape — JSDOM (and older browsers) may lack
 // CSS.escape.  Our q-keys only contain `/` and `#`, so escape `#`.
 function cssEscape(value) {
@@ -695,7 +709,10 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
     const key = sectionKeys[idx];
     const section = paper[key];
     const renderer = SECTION_RENDERERS[key];
-    const title = `<h3 class="ptg-section-title">${escapeHtml(section.title)} <small>(${section.marks} marks)</small></h3>`;
+    const timeHint = SECTION_TIME_GUIDE[key]
+      ? ` <span class="ptg-time-hint">⏱ ${SECTION_TIME_GUIDE[key]}</span>`
+      : '';
+    const title = `<h3 class="ptg-section-title">${escapeHtml(section.title)} <small>(${section.marks} marks)</small>${timeHint}</h3>`;
     const body = renderer ? renderer(section, key) : '<p>Unsupported section.</p>';
     stageEl.innerHTML = `${title}${body}`;
     renderStepper();

@@ -316,6 +316,51 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     explain: 'Exclamations ("What a…!") are reported using "exclaimed that" + a statement. The exclamation structure changes to a normal sentence. "What a + adjective + noun" becomes "very + adjective + noun".',
   },
 
+  {
+    id: 'st-rs-7',
+    level: 'P5',
+    skill: 'Reported Speech — Exclamation',
+    skillKey: 'reportedSpeechExclamation',
+    pattern: 'direct exclamation → reported speech',
+    original: '"How brave the firefighters are!" cried the rescued family.',
+    stem: 'The rescued family cried that',
+    answer: 'The rescued family cried that the firefighters were very brave.',
+    alternates: ['The rescued family exclaimed that the firefighters were very brave.'],
+    explain: '"How + adjective!" becomes "exclaimed/cried that + subject + was/were very + adjective." Shift present tense to past tense in reported speech.',
+  },
+
+  {
+    id: 'st-rs-8',
+    level: 'P5',
+    skill: 'Reported Speech — Exclamation',
+    skillKey: 'reportedSpeechExclamation',
+    pattern: 'direct exclamation → reported speech',
+    original: '"What a terrible mess you have made!" scolded Mother.',
+    stem: 'Mother scolded that',
+    answer: 'Mother scolded that they had made a very terrible mess.',
+    alternates: [
+      'Mother exclaimed that they had made a very terrible mess.',
+      'Mother scolded that we had made a very terrible mess.',
+    ],
+    explain: '"What a + adjective + noun!" → "scolded/exclaimed that + subject + had made a very + adjective + noun." Shift present perfect ("have made") to past perfect ("had made") in reported speech.',
+  },
+
+  {
+    id: 'st-rs-9',
+    level: 'P6',
+    skill: 'Reported Speech — Exclamation',
+    skillKey: 'reportedSpeechExclamation',
+    pattern: 'direct exclamation → reported speech',
+    original: '"What an incredible goal that was!" shouted the commentator.',
+    stem: 'The commentator shouted that',
+    answer: 'The commentator shouted that it had been a very incredible goal.',
+    alternates: [
+      'The commentator exclaimed that it had been a very incredible goal.',
+      'The commentator shouted that the goal had been very incredible.',
+    ],
+    explain: '"What a/an + adjective + noun!" → "shouted/exclaimed that + it had been a very + adjective + noun." Because the original uses past tense ("was"), shift to past perfect ("had been") in reported speech.',
+  },
+
   // ═══════════════════════════════════════════════════════════════════════════
   // RELATIVE CLAUSES (4 items)
   // ═══════════════════════════════════════════════════════════════════════════
@@ -495,7 +540,7 @@ export const SYNTHESIS_ITEMS = Object.freeze([
 
   // Extra reported speech
   {
-    id: 'st-rs-7',
+    id: 'st-rs-10',
     level: 'P6',
     skill: 'Reported Speech — Statement (time expression changes)',
     skillKey: 'reportedSpeechStatement',
