@@ -146,6 +146,13 @@ export const VOCAB_CATEGORIES = {
     desc: 'Borrow vs lend, send vs fetch — pick the verb that fits',
     mcqOnly: true,
   },
+  movementVerbs: {
+    label: 'Animal Movements',
+    icon: '🐾',
+    color: '#16a34a',
+    desc: 'Slither, gallop, soar — the way each animal moves',
+    mcqOnly: true,
+  },
   similes: {
     label: 'Similes',
     icon: '🦚',

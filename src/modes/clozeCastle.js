@@ -44,7 +44,7 @@ import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
 import { getUniqueClozeDone, recordClozeCompletion } from './clozeCompletionTracker.js';
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { renderReadFirstScan } from './readFirstScan.js';
-import { buildScanTaskForPassage, renderScanTask } from './scanTask.js';
+import { buildScanAttention, renderScanAttention } from './scanTask.js';
 import { buildCopySummaryText, buildParentReport, getModeConfig, getNextStepRecommendation, getSummaryScoreLine, groupWrongLinesBySkill, pickStrongestWeakest } from './clozeSessionSummary.js';
 import { incrementHintUsage } from './hintUsage.js';
 import { buildWhyWrongExplanation, getBlankSkillMeta, getClueTypeLabel, getMasteryRecommendation, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
@@ -460,8 +460,8 @@ function _renderScanTaskStep(passage) {
     _renderPassage(passage);
     return;
   }
-  const task = buildScanTaskForPassage(passage);
-  if (!task) {
+  const attention = buildScanAttention(passage);
+  if (!attention) {
     _scanTaskCompleted = true;
     _renderPassage(passage);
     return;
@@ -472,17 +472,14 @@ function _renderScanTaskStep(passage) {
         <span class="cloze-badge">Scan Step</span>
       </div>
       <h3 class="cloze-title">${escapeHtml(passage.title || 'Cloze Castle')}</h3>
-      <p class="cloze-instruction">Find the clue before you choose.</p>
       <div id="cloze-scan-host"></div>
     </div>`;
   const host = document.getElementById('cloze-scan-host');
-  renderScanTask({
+  renderScanAttention({
     host,
-    task,
-    onAnswer: ({ correct }) => {
+    attention,
+    onContinue: () => {
       _scanTaskCompleted = true;
-      _sessionScanTotal++;
-      if (correct) _sessionScanCorrect++;
       _renderPassage(passage);
     },
     onSkip: () => {

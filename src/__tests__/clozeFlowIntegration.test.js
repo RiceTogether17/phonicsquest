@@ -75,12 +75,12 @@ describe('Cloze Castle integration flow', () => {
     root.querySelector('.cloze-cat-btn').click();
     root.querySelector('#cloze-read-first').click();
 
-    const onScan = root.querySelector('.scan-task-card');
+    const onScan = root.querySelector('.scan-attention-card');
     const onBank = root.querySelector('#cloze-bank');
     expect(onScan || onBank).not.toBeNull();
 
     if (onScan) {
-      root.querySelector('#scan-task-skip').click();
+      root.querySelector('#scan-attention-skip').click();
       expect(root.querySelector('#cloze-bank')).not.toBeNull();
     }
     Math.random.mockRestore();
