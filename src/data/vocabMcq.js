@@ -11,15 +11,42 @@ const LEVEL_CATEGORY_PLAN = {
   P1: [
     'contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue',
     'bodyPartsAnimals', 'collectiveNouns', 'placeNouns', 'actionVerbs', 'soundVerbs', 'emotionAdjectives', 'verbDistinction',
+    'wordParts', 'similes', 'mannerAdverbs', 'scienceTechTerms', 'socialStudiesVocab', 'proverbsSayings',
+    'idiomaticExpressions', 'phrasalVerbs', 'grammarPrepositions', 'grammarArticles', 'grammarSVA',
   ],
   P2: [
     'contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'wordParts',
     'actionVerbs', 'soundVerbs', 'collectiveNouns', 'emotionAdjectives', 'similes', 'mannerAdverbs',
+    'connectorClue', 'placeNouns', 'bodyPartsAnimals', 'verbDistinction', 'scienceTechTerms', 'socialStudiesVocab',
+    'proverbsSayings', 'idiomaticExpressions', 'phrasalVerbs', 'grammarPrepositions', 'grammarArticles', 'grammarSVA',
   ],
-  P3: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue', 'wordParts', 'scienceTechTerms', 'phrasalVerbs', 'similes', 'mannerAdverbs', 'actionVerbs'],
-  P4: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue', 'wordParts', 'socialStudiesVocab'],
-  P5: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue', 'wordParts', 'idiomaticExpressions', 'proverbsSayings', 'scienceTechTerms'],
-  P6: ['contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue', 'wordParts', 'idiomaticExpressions', 'proverbsSayings', 'socialStudiesVocab'],
+  P3: [
+    'contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue',
+    'wordParts', 'scienceTechTerms', 'phrasalVerbs', 'similes', 'mannerAdverbs', 'actionVerbs',
+    'collectiveNouns', 'placeNouns', 'bodyPartsAnimals', 'soundVerbs', 'emotionAdjectives', 'verbDistinction',
+    'socialStudiesVocab', 'idiomaticExpressions', 'proverbsSayings', 'grammarPrepositions', 'grammarArticles', 'grammarSVA',
+  ],
+  P4: [
+    'contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue',
+    'wordParts', 'socialStudiesVocab',
+    'actionVerbs', 'soundVerbs', 'emotionAdjectives', 'similes', 'mannerAdverbs', 'phrasalVerbs',
+    'collectiveNouns', 'placeNouns', 'bodyPartsAnimals', 'verbDistinction', 'scienceTechTerms',
+    'idiomaticExpressions', 'proverbsSayings', 'grammarPrepositions', 'grammarArticles', 'grammarSVA',
+  ],
+  P5: [
+    'contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue',
+    'wordParts', 'idiomaticExpressions', 'proverbsSayings', 'scienceTechTerms',
+    'socialStudiesVocab', 'actionVerbs', 'soundVerbs', 'emotionAdjectives', 'similes', 'mannerAdverbs',
+    'phrasalVerbs', 'collectiveNouns', 'placeNouns', 'bodyPartsAnimals', 'verbDistinction',
+    'grammarPrepositions', 'grammarArticles', 'grammarSVA',
+  ],
+  P6: [
+    'contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue',
+    'wordParts', 'idiomaticExpressions', 'proverbsSayings', 'socialStudiesVocab',
+    'scienceTechTerms', 'actionVerbs', 'soundVerbs', 'emotionAdjectives', 'similes', 'mannerAdverbs',
+    'phrasalVerbs', 'collectiveNouns', 'placeNouns', 'bodyPartsAnimals', 'verbDistinction',
+    'grammarPrepositions', 'grammarArticles', 'grammarSVA',
+  ],
 };
 // 16 context tails — together with the 3 level-specific tails the pool
 // is 19, a prime size.  See grammarMcq.js for the rationale (prime pool
@@ -108,82 +135,310 @@ function decorateStem(stem, level, idx) {
 
 const VOCAB_BUILDERS = {
   contextInference(level, i) {
-    const rows = [
+    const p1p2Rows = [
       ['After running three rounds in the sun, Amir felt very ___.', 'tired', ['cheerful', 'spotless', 'plastic']],
       ['The classroom was so ___ that everyone could hear a pin drop.', 'quiet', ['crowded', 'muddy', 'rapid']],
       ['Because the floor was wet, we walked ___.', 'carefully', ['lazily', 'noisily', 'luckily']],
       ['The soup smelled fresh and tasted very ___.', 'delicious', ['dusty', 'broken', 'narrow']],
+      ['The baby smiled because she was very ___.', 'happy', ['sleepy', 'angry', 'cold']],
+      ['The dog ran to the door because it was ___ to see its owner.', 'excited', ['bored', 'sad', 'tired']],
+      ['It was raining so we stayed ___ to keep dry.', 'indoors', ['outside', 'upstairs', 'away']],
+      ['She put on a thick coat because it was ___ outside.', 'cold', ['sunny', 'warm', 'bright']],
+      ['The boy cried because he ___ his favourite toy.', 'lost', ['found', 'broke', 'shared']],
+      ['The children laughed because the clown was very ___.', 'funny', ['scary', 'quiet', 'angry']],
+      ['The cake was so sweet that everyone asked for ___ slice.', 'another', ['a smaller', 'no more', 'a last']],
+      ['Tom put on his shoes because he was going ___.', 'outside', ['to sleep', 'to bath', 'indoors']],
+      ['The light went off because there was a power ___.', 'failure', ['station', 'switch', 'cable']],
+      ['She finished her homework quickly because she was ___.', 'efficient', ['clumsy', 'noisy', 'absent']],
+      ['The shopkeeper smiled and nodded — he was clearly ___.', 'pleased', ['confused', 'upset', 'afraid']],
+      ['After the long journey, everyone was too ___ to eat.', 'exhausted', ['curious', 'cheerful', 'talkative']],
     ];
+    const upperRows = [
+      ['The scientist repeated the experiment three times to ___ her results.', 'verify', ['contradict', 'estimate', 'ignore']],
+      ['The politician\'s speech was deliberately vague to ___ taking a clear stand.', 'avoid', ['demand', 'welcome', 'highlight']],
+      ['Despite her initial reluctance, she ___ accepted the award graciously.', 'eventually', ['hastily', 'reluctantly', 'angrily']],
+      ['The rare manuscript was kept in a controlled environment to ___ its condition.', 'preserve', ['duplicate', 'advertise', 'dissolve']],
+      ['His tone was calm yet his words were ___, leaving no room for compromise.', 'firm', ['hesitant', 'confused', 'cheerful']],
+      ['The report was so detailed that it left ___ for misinterpretation.', 'little room', ['extra time', 'clear gaps', 'broad scope']],
+      ['After weeks of drought, the farmers were ___ for rain.', 'desperate', ['grateful', 'indifferent', 'hopeful']],
+      ['The project was completed ahead of schedule, which was a testament to the team\'s ___.', 'efficiency', ['creativity', 'conflict', 'ambition']],
+      ['She spoke with such ___ that the audience was moved to tears.', 'conviction', ['confusion', 'boredom', 'hesitation']],
+      ['The sudden announcement ___ the carefully laid plans.', 'disrupted', ['reinforced', 'expanded', 'supported']],
+      ['The policy was revised to better ___ the needs of rural communities.', 'address', ['ignore', 'suppress', 'delay']],
+      ['His ___ approach to learning helped him master new skills quickly.', 'disciplined', ['reckless', 'passive', 'erratic']],
+      ['The new regulation was met with ___ from business owners who feared higher costs.', 'resistance', ['approval', 'celebration', 'indifference']],
+      ['The athlete\'s ___ performance in the final round secured the championship.', 'flawless', ['mediocre', 'inconsistent', 'reckless']],
+      ['The community came together to ___ the flood victims with food and shelter.', 'assist', ['abandon', 'criticise', 'monitor']],
+      ['Her explanation was so clear that even the most ___ student understood the concept.', 'confused', ['advanced', 'attentive', 'curious']],
+    ];
+    const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'contextInference', subskill: 'meaning_in_context', q, choices: buildChoices(answer, ds), answer, explain: 'Use clues in the sentence to infer meaning.' };
   },
   definitionMatch(level, i) {
-    const rows = [
+    const p1p2Rows = [
       ['A person who treats sick animals is a ___.', 'veterinarian', ['librarian', 'tailor', 'cashier']],
       ['A place where we borrow storybooks is a ___.', 'library', ['bakery', 'stadium', 'factory']],
       ['A machine that shows moving pictures on a screen is a ___.', 'projector', ['stapler', 'compass', 'teapot']],
-      ['A long journey to explore a place is an ___.', 'expedition', ['equation', 'invitation', 'reflection']],
+      ['A person who fixes taps and pipes is a ___.', 'plumber', ['mechanic', 'carpenter', 'painter']],
+      ['A place where sick people go to get better is a ___.', 'hospital', ['hotel', 'school', 'factory']],
+      ['A person who flies an aeroplane is a ___.', 'pilot', ['captain', 'engineer', 'soldier']],
+      ['Something you use to cut paper is a pair of ___.', 'scissors', ['pliers', 'tongs', 'tweezers']],
+      ['A place where you can watch animals from many countries is a ___.', 'zoo', ['park', 'farm', 'museum']],
+      ['A person who helps put out fires is a ___.', 'firefighter', ['policeman', 'sailor', 'doctor']],
+      ['The seven colours you see in the sky after rain form a ___.', 'rainbow', ['sunset', 'hailstorm', 'tornado']],
+      ['A small book you carry to write notes and appointments in is a ___.', 'diary', ['calendar', 'atlas', 'register']],
+      ['A person who cooks food in a restaurant is a ___.', 'chef', ['waiter', 'baker', 'grocer']],
+      ['A container used to boil water for making tea is a ___.', 'kettle', ['flask', 'jug', 'basin']],
+      ['A place where bread and cakes are made and sold is a ___.', 'bakery', ['cafeteria', 'stall', 'pantry']],
+      ['A person who teaches students is a ___.', 'teacher', ['prefect', 'counsellor', 'warden']],
+      ['Something you wear on your wrist to tell the time is a ___.', 'watch', ['bracelet', 'bangle', 'compass']],
     ];
+    const upperRows = [
+      ['A long journey to explore a place is an ___.', 'expedition', ['equation', 'invitation', 'reflection']],
+      ['A government system where citizens choose their leaders by voting is a ___.', 'democracy', ['monarchy', 'embassy', 'tribunal']],
+      ['A person who studies and writes about history is a ___.', 'historian', ['journalist', 'archaeologist', 'diplomat']],
+      ['The process by which green plants make food using sunlight is ___.', 'photosynthesis', ['respiration', 'germination', 'erosion']],
+      ['An official document that allows a person to travel abroad is a ___.', 'passport', ['permit', 'visa', 'certificate']],
+      ['A person who is new to a job or skill and is still learning is an ___.', 'apprentice', ['intern', 'assistant', 'consultant']],
+      ['The study of the stars and planets is called ___.', 'astronomy', ['astrology', 'geology', 'philosophy']],
+      ['A piece of land entirely surrounded by water is an ___.', 'island', ['peninsula', 'atoll', 'lagoon']],
+      ['The practice of growing crops and raising animals for food is ___.', 'agriculture', ['horticulture', 'commerce', 'infrastructure']],
+      ['A formal agreement between two or more countries is a ___.', 'treaty', ['legislation', 'referendum', 'charter']],
+      ['The outer layer of the Earth on which we live is the ___.', 'crust', ['mantle', 'core', 'membrane']],
+      ['A person who is against violence and believes in peaceful solutions is a ___.', 'pacifist', ['activist', 'nationalist', 'mediator']],
+      ['The branch of government that makes laws is the ___.', 'legislature', ['judiciary', 'executive', 'bureaucracy']],
+      ['A story passed down through generations that explains natural events is a ___.', 'myth', ['fable', 'legend', 'parable']],
+      ['The point at which a substance changes from solid to liquid is its ___ point.', 'melting', ['boiling', 'freezing', 'tipping']],
+      ['An organisation that helps people in need without seeking profit is a ___.', 'charity', ['corporation', 'agency', 'syndicate']],
+    ];
+    const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'definitionMatch', subskill: 'word_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the word that matches the definition.' };
   },
   synonymContrast(level, i) {
-    const rows = [
-      ['The principal’s message was brief but very ___.', 'meaningful', ['careless', 'shallow', 'crooked']],
-      ['The opposite of "ancient" in this sentence is ___.', 'modern', ['fragile', 'gentle', 'hollow']],
-      ['Her tone was polite, not ___.', 'rude', ['formal', 'steady', 'honest']],
+    const p1p2Rows = [
       ['The child was joyful, which means she was ___.', 'happy', ['angry', 'silent', 'frozen']],
+      ['Her tone was polite, not ___.', 'rude', ['formal', 'steady', 'honest']],
+      ['The room was tiny — it means it was very ___.', 'small', ['bright', 'cold', 'loud']],
+      ['He was very brave, which means he was not ___.', 'afraid', ['angry', 'lazy', 'hungry']],
+      ['The box was heavy, which is the opposite of being ___.', 'light', ['short', 'old', 'narrow']],
+      ['The kitten was gentle, not ___.', 'rough', ['soft', 'little', 'timid']],
+      ['The hall was noisy, which is the opposite of ___.', 'quiet', ['dark', 'small', 'crowded']],
+      ['She was absent from school, which means she was not ___.', 'present', ['well', 'alert', 'ready']],
+      ['The water was freezing, which means it was extremely ___.', 'cold', ['warm', 'fresh', 'still']],
+      ['The shop was closed, which is the opposite of being ___.', 'open', ['busy', 'large', 'bright']],
+      ['The puppy was playful, which means it was very ___.', 'lively', ['quiet', 'serious', 'timid']],
+      ['He was very generous, which means he was not ___.', 'selfish', ['kind', 'gentle', 'polite']],
+      ['The path was narrow, which is the opposite of being ___.', 'wide', ['long', 'steep', 'rough']],
+      ['She felt miserable, which means she was very ___.', 'unhappy', ['hungry', 'tired', 'confused']],
+      ['The answer was incorrect, which means it was ___.', 'wrong', ['hidden', 'partial', 'unclear']],
+      ['The athlete was swift, which means she was very ___.', 'fast', ['tall', 'lean', 'strong']],
     ];
+    const upperRows = [
+      ['The principal\'s message was brief but very ___.', 'meaningful', ['careless', 'shallow', 'crooked']],
+      ['The opposite of "ancient" in this sentence is ___.', 'modern', ['fragile', 'gentle', 'hollow']],
+      ['The report was concise, which means it was ___ and to the point.', 'brief', ['lengthy', 'vague', 'repetitive']],
+      ['Her argument was coherent, meaning it was ___ and easy to follow.', 'logical', ['creative', 'repetitive', 'bold']],
+      ['The policy was transparent, which means it was ___.', 'open', ['complicated', 'confidential', 'flexible']],
+      ['The evidence was conclusive, meaning it was ___ and left no doubt.', 'decisive', ['partial', 'ambiguous', 'suggestive']],
+      ['His behaviour was erratic, which means it was ___ and unpredictable.', 'irregular', ['consistent', 'calm', 'deliberate']],
+      ['The speech was eloquent, meaning it was ___ and persuasive.', 'articulate', ['simple', 'aggressive', 'unclear']],
+      ['The decision was unanimous — it means everyone was ___ about it.', 'in agreement', ['divided', 'uncertain', 'unaware']],
+      ['The scientist\'s theory was controversial, which means it was ___.', 'disputed', ['accepted', 'proven', 'ignored']],
+      ['The student was diligent, which means she was ___.', 'hardworking', ['talented', 'creative', 'confident']],
+      ['The opposite of "oppressive" in this passage is ___.', 'liberating', ['demanding', 'strict', 'formal']],
+      ['The fund was depleted, meaning it was almost ___.', 'empty', ['full', 'distributed', 'frozen']],
+      ['The new law was contentious, meaning it was ___.', 'debatable', ['popular', 'temporary', 'straightforward']],
+      ['The writer\'s prose was vivid, which means it was ___ and descriptive.', 'lively', ['plain', 'direct', 'restrained']],
+      ['The economy was stagnant, which is the opposite of being ___.', 'growing', ['stable', 'regulated', 'diversified']],
+    ];
+    const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'synonymContrast', subskill: 'synonym_antonym', q, choices: buildChoices(answer, ds), answer, explain: 'Select the closest synonym or contrast word from context.' };
   },
   collocationCloze(level, i) {
-    const rows = [
+    const p1p2Rows = [
       ['Please ___ attention to the safety signs at the lab door.', 'pay', ['do', 'keep', 'set']],
       ['The class decided to ___ a charity sale next Friday.', 'hold', ['make', 'draw', 'carry']],
       ['After discussion, the team ___ a decision quickly.', 'reached', ['caught', 'drew', 'lifted']],
       ['To improve, you should ___ an effort every day.', 'make', ['do', 'bring', 'throw']],
+      ['She helped her friend ___ a mistake in the exercise.', 'correct', ['repair', 'undo', 'remove']],
+      ['The pupils were told to ___ their hands before asking a question.', 'raise', ['lift', 'wave', 'stretch']],
+      ['He had to ___ a test on Friday about everything he had learnt.', 'take', ['sit', 'do', 'write']],
+      ['The teacher asked us to ___ a line under the important words.', 'draw', ['write', 'mark', 'place']],
+      ['We need to ___ our best in every competition.', 'do', ['give', 'make', 'bring']],
+      ['The children ___ a song at the National Day celebration.', 'sang', ['played', 'performed', 'acted']],
+      ['Could you ___ me a favour and pass the salt?', 'do', ['give', 'make', 'offer']],
+      ['The pupils have to ___ their homework before going home.', 'complete', ['finish off', 'end', 'close']],
+      ['She ___ a deep breath before stepping onto the stage.', 'took', ['drew', 'inhaled', 'pulled']],
+      ['We should ___ care of our belongings.', 'take', ['do', 'make', 'give']],
+      ['The doctor asked the patient to ___ an appointment early.', 'make', ['take', 'set', 'keep']],
+      ['The team had to ___ a plan before the competition.', 'form', ['make up', 'build', 'arrange']],
     ];
+    const upperRows = [
+      ['The government decided to ___ a new policy on plastic use.', 'implement', ['deploy', 'announce', 'delay']],
+      ['Researchers will ___ a study on the effects of screen time.', 'conduct', ['produce', 'arrange', 'perform']],
+      ['The committee ___ a conclusion after weeks of deliberation.', 'reached', ['caught', 'drew', 'lifted']],
+      ['The athlete had to ___ her determination to push through the pain.', 'summon', ['create', 'remember', 'carry']],
+      ['The new policy will ___ effect from the first of January.', 'take', ['bring', 'come', 'make']],
+      ['She had to ___ a compromise between her career and family.', 'strike', ['make', 'reach', 'draw']],
+      ['The organisation aims to ___ awareness about mental health.', 'raise', ['build', 'grow', 'create']],
+      ['The speaker managed to ___ the attention of the entire hall.', 'capture', ['hold', 'attract', 'keep']],
+      ['The report will ___ light on the challenges faced by migrant workers.', 'shed', ['cast', 'throw', 'bring']],
+      ['The students were asked to ___ their findings before the class.', 'present', ['discuss', 'share', 'report']],
+      ['They hope to ___ an agreement by the end of the week.', 'reach', ['make', 'settle', 'find']],
+      ['The scientist ___ a breakthrough after years of research.', 'achieved', ['made', 'found', 'discovered']],
+      ['The council had to ___ into account the residents\' feedback.', 'take', ['bring', 'call', 'put']],
+      ['The government will ___ measures to tackle water wastage.', 'introduce', ['apply', 'enforce', 'publish']],
+      ['The charity event managed to ___ over a thousand dollars.', 'raise', ['earn', 'collect', 'generate']],
+      ['The team had to ___ a balance between cost and quality.', 'strike', ['achieve', 'maintain', 'find']],
+    ];
+    const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'collocationCloze', subskill: 'word_partners', q, choices: buildChoices(answer, ds), answer, explain: 'Some words naturally go together as collocations.' };
   },
   grammaticalRole(level, i) {
-    const rows = [
+    const p1p2Rows = [
       ['The class admired her ___ performance during speech day.', 'confident', ['confidence', 'confidently', 'confide']],
       ['The referee blew the whistle ___.', 'sharply', ['sharp', 'sharpness', 'sharpen']],
       ['Their ___ helped the new pupil settle in quickly.', 'kindness', ['kind', 'kindly', 'kinder']],
       ['The team moved with great ___ during the relay.', 'speed', ['speedy', 'speedily', 'speeding']],
+      ['She spoke very ___ to the younger children.', 'gently', ['gentle', 'gentleness', 'gentler']],
+      ['The ___ of the playground made it a popular spot.', 'beauty', ['beautiful', 'beautifully', 'beautify']],
+      ['He was ___ that he had left his bag on the bus.', 'upset', ['upsetting', 'upsets', 'upsettingly']],
+      ['The puppy ran ___ around the garden.', 'joyfully', ['joyful', 'joyfulness', 'joy']],
+      ['Her ___ surprised everyone in the class.', 'bravery', ['brave', 'bravely', 'braver']],
+      ['The boy smiled ___ when he received his prize.', 'proudly', ['proud', 'pride', 'prouder']],
+      ['It was ___ of him to share his lunch with his friend.', 'kind', ['kindly', 'kindness', 'kinder']],
+      ['The children played ___ in the sand.', 'happily', ['happy', 'happiness', 'happier']],
+      ['The ___ of the music filled the hall.', 'beauty', ['beautiful', 'beautifully', 'beautify']],
+      ['He was very ___ after winning the race.', 'excited', ['excitedly', 'excitement', 'exciting']],
+      ['The teacher spoke ___ to the nervous student.', 'calmly', ['calm', 'calmness', 'calmer']],
+      ['Her ___ helped her finish the task first.', 'focus', ['focused', 'focusedly', 'focusing']],
     ];
+    const upperRows = [
+      ['The government made a ___ decision to postpone the elections.', 'controversial', ['controversy', 'controversially', 'controvert']],
+      ['The essay was written with great ___.', 'clarity', ['clear', 'clearly', 'clearer']],
+      ['She argued ___ for a change in the school policy.', 'persuasively', ['persuasive', 'persuasion', 'persuade']],
+      ['The committee reached a ___ agreement after long debate.', 'unanimous', ['unanimously', 'unanimity', 'unanime']],
+      ['The data showed a ___ improvement in student performance.', 'significant', ['significantly', 'significance', 'signify']],
+      ['The report was presented with ___.', 'precision', ['precise', 'precisely', 'preciser']],
+      ['The delegate spoke ___ on behalf of her country.', 'eloquently', ['eloquent', 'eloquence', 'eloquenter']],
+      ['The ___ of the new policy surprised many citizens.', 'complexity', ['complex', 'complexly', 'complicate']],
+      ['The scientist worked ___ to reproduce the results.', 'systematically', ['systematic', 'system', 'systematise']],
+      ['Her ___ approach to the problem impressed the panel.', 'analytical', ['analytically', 'analysis', 'analyse']],
+      ['The volunteers worked ___ throughout the night.', 'tirelessly', ['tireless', 'tirelessness', 'tire']],
+      ['The speaker delivered a ___ address to the nation.', 'stirring', ['stir', 'stirringly', 'stirred']],
+      ['The new curriculum promotes ___ thinking among students.', 'critical', ['critically', 'criticism', 'criticise']],
+      ['She approached the challenge with admirable ___.', 'resilience', ['resilient', 'resiliently', 'resile']],
+      ['The law was passed ___ by both chambers of parliament.', 'unanimously', ['unanimous', 'unanimity', 'union']],
+      ['The ___ of his work was recognised at the national level.', 'excellence', ['excellent', 'excellently', 'excel']],
+    ];
+    const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'grammaticalRole', subskill: 'word_form', q, choices: buildChoices(answer, ds), answer, explain: 'Pick the word form that fits the grammar slot.' };
   },
   connectorClue(level, i) {
-    const rows = [
+    const p1p2Rows = [
       ['Although the backpack looked small, it was surprisingly ___.', 'heavy', ['empty', 'gentle', 'silent']],
-      ['The map was clear; however, the route was still ___.', 'confusing', ['tidy', 'famous', 'silent']],
       ['Because the lights went out suddenly, the hall became ___.', 'dark', ['tiny', 'modern', 'spacious']],
       ['She was nervous, yet her voice remained ___.', 'steady', ['crooked', 'dusty', 'fragile']],
+      ['The toy was old; however, it was still ___.', 'working', ['broken', 'missing', 'rusted']],
+      ['He ate a big breakfast, so he was not ___ by lunchtime.', 'hungry', ['sleepy', 'angry', 'wet']],
+      ['Although it was raining, the children played ___ outside.', 'happily', ['sadly', 'lazily', 'quietly']],
+      ['She practised hard; therefore, she performed ___ on stage.', 'well', ['badly', 'slowly', 'silently']],
+      ['The shop was far; however, Mum walked there ___.', 'anyway', ['never', 'slowly', 'reluctantly']],
+      ['Because the sun was bright, everyone wore ___ glasses.', 'sunglasses', ['mittens', 'boots', 'scarves']],
+      ['He forgot his umbrella, so he got ___ in the rain.', 'wet', ['lost', 'cold', 'scared']],
     ];
+    const upperRows = [
+      ['The map was clear; however, the route was still ___.', 'confusing', ['tidy', 'famous', 'silent']],
+      ['Despite the setback, the team remained ___ and continued their work.', 'determined', ['discouraged', 'confused', 'impatient']],
+      ['Although the experiment failed, the scientists gained ___ insights.', 'valuable', ['negative', 'useless', 'obvious']],
+      ['The evidence was limited; nevertheless, the judge reached a ___ verdict.', 'reasonable', ['hasty', 'unfair', 'random']],
+      ['She had rehearsed for months; consequently, her performance was ___.', 'outstanding', ['average', 'poor', 'rushed']],
+      ['Unless the budget is increased, the project will remain ___.', 'incomplete', ['ambitious', 'approved', 'successful']],
+      ['The policy was popular; however, its implementation was ___.', 'challenging', ['swift', 'celebrated', 'clear']],
+      ['While the report was detailed, the recommendations were surprisingly ___.', 'vague', ['thorough', 'accepted', 'decisive']],
+      ['He prepared thoroughly; therefore, he answered the questions ___.', 'confidently', ['nervously', 'carelessly', 'reluctantly']],
+      ['Even though the task seemed impossible, the team completed it ___.', 'successfully', ['poorly', 'reluctantly', 'hastily']],
+      ['Because of the heavy traffic, the convoy arrived ___ at the venue.', 'late', ['early', 'quietly', 'ahead']],
+      ['The solution was elegant; furthermore, it was ___ to implement.', 'practical', ['costly', 'difficult', 'controversial']],
+      ['Despite being the youngest member, she contributed ___ to the group.', 'significantly', ['minimally', 'carelessly', 'grudgingly']],
+      ['The data was incomplete; as a result, the conclusions were ___.', 'unreliable', ['precise', 'final', 'convincing']],
+      ['He was nervous before the interview; nonetheless, he performed ___.', 'admirably', ['terribly', 'forgetfully', 'quietly']],
+      ['Since the deadline was moved forward, the team had to work ___.', 'faster', ['later', 'individually', 'silently']],
+    ];
+    const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'connectorClue', subskill: 'connector_inference', q, choices: buildChoices(answer, ds), answer, explain: 'Use the connector to infer the missing meaning word.' };
   },
   wordParts(level, i) {
-    const rows = [
+    const p1p2Rows = [
       ['The prefix "re-" in "rewrite" means to do it ___.', 'again', ['slowly', 'poorly', 'outside']],
       ['A person who drives is a ___.', 'driver', ['driving', 'driveful', 'driveless']],
       ['The suffix "-less" in "careless" means "without ___."', 'care', ['speed', 'noise', 'luck']],
       ['If something is "unfair", the prefix "un-" means ___.', 'not', ['very', 'more', 'before']],
+      ['The word "happiness" ends in "-ness", which makes it a ___.', 'noun', ['verb', 'adjective', 'adverb']],
+      ['"Rebuild" uses the prefix "re-", which means to ___.', 'build again', ['build quickly', 'build well', 'build slowly']],
+      ['The suffix "-ful" in "helpful" means ___.', 'full of help', ['without help', 'against help', 'before help']],
+      ['The word "unkind" means ___.', 'not kind', ['very kind', 'most kind', 'quite kind']],
+      ['"Playful" describes someone who is full of ___.', 'play', ['work', 'study', 'rest']],
+      ['The prefix "pre-" in "preview" means ___.', 'before', ['after', 'again', 'not']],
     ];
+    const upperRows = [
+      ['The root "port" in "transport" relates to ___.', 'carrying', ['speaking', 'writing', 'building']],
+      ['The root "dict" in "predict" and "contradict" relates to ___.', 'saying', ['seeing', 'moving', 'hearing']],
+      ['The suffix "-ology" in "biology" means the ___ of something.', 'study', ['practice', 'history', 'art']],
+      ['The prefix "mis-" in "misinterpret" means to interpret ___.', 'incorrectly', ['again', 'before', 'fully']],
+      ['The root "graph" in "photography" relates to ___.', 'writing or recording', ['light', 'movement', 'colour']],
+      ['The prefix "inter-" in "international" means ___.', 'between', ['inside', 'above', 'before']],
+      ['The suffix "-ible" in "reversible" means capable of being ___.', 'reversed', ['improved', 'confirmed', 'required']],
+      ['The root "aud" in "audible" relates to ___.', 'hearing', ['seeing', 'speaking', 'touching']],
+      ['The prefix "over-" in "overestimate" means to estimate ___.', 'too highly', ['not at all', 'exactly', 'again']],
+      ['The root "scribe" in "prescribe" and "describe" relates to ___.', 'writing', ['seeing', 'measuring', 'learning']],
+      ['The prefix "sub-" in "submarine" means ___.', 'under', ['above', 'beside', 'through']],
+      ['The suffix "-ment" in "achievement" turns a verb into a ___.', 'noun', ['verb', 'adjective', 'adverb']],
+      ['The root "vis" in "visible" and "invisible" relates to ___.', 'seeing', ['knowing', 'moving', 'hearing']],
+      ['The prefix "contra-" in "contradict" means ___.', 'against', ['with', 'before', 'within']],
+      ['The root "struct" in "construct" and "instruct" relates to ___.', 'building', ['ordering', 'breaking', 'joining']],
+      ['The suffix "-ation" in "organisation" turns a verb into a ___.', 'noun', ['verb', 'adjective', 'preposition']],
+    ];
+    const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'morphologicalAffix', subskill: 'prefix_suffix', q, choices: buildChoices(answer, ds), answer, explain: 'Word parts can help you infer meaning.' };
   },
   idiomaticExpressions(level, i) {
-    const rows = [
-      ['When Jia Min said "break the ice", she meant to ___.', 'start friendly conversation', ['smash something cold', 'end the meeting', 'draw a cube']],
+    const p1p2Rows = [
       ['"Hit the books" means to ___.', 'study hard', ['close the library', 'buy textbooks', 'tear paper']],
       ['If someone is "on cloud nine", the person feels ___.', 'very happy', ['very sleepy', 'very angry', 'very hungry']],
       ['"Piece of cake" describes a task that is ___.', 'very easy', ['very expensive', 'very noisy', 'very late']],
+      ['When someone says "break a leg", they are wishing you ___.', 'good luck', ['to be careful', 'to rest', 'to hurry up']],
+      ['"Under the weather" means that someone is ___.', 'feeling unwell', ['going outside', 'checking the rain', 'feeling cold']],
+      ['"Bite the bullet" means to ___ a difficult situation.', 'endure', ['escape', 'complain about', 'ignore']],
+      ['"Let the cat out of the bag" means to ___ a secret.', 'reveal', ['keep', 'discover', 'hide']],
+      ['When someone is "all ears", they are ___.', 'listening carefully', ['feeling tired', 'looking around', 'very hungry']],
     ];
+    const upperRows = [
+      ['When Jia Min said "break the ice", she meant to ___.', 'start friendly conversation', ['smash something cold', 'end the meeting', 'draw a cube']],
+      ['"Burning the midnight oil" means to ___.', 'work late into the night', ['set things on fire', 'waste electricity', 'sleep poorly']],
+      ['"Turn a blind eye" means to ___ something wrong deliberately.', 'ignore', ['report', 'witness', 'stop']],
+      ['"Beat around the bush" means to ___ the main point.', 'avoid', ['explain', 'repeat', 'support']],
+      ['"The ball is in your court" means ___ has to make the next decision.', 'you', ['the opponent', 'the referee', 'the crowd']],
+      ['"Take with a grain of salt" means to ___ what someone says.', 'not fully believe', ['accept completely', 'question loudly', 'report immediately']],
+      ['"Pull strings" means to use ___ to get something done.', 'personal connections', ['physical force', 'detailed plans', 'extra money']],
+      ['"Read between the lines" means to understand a ___ meaning.', 'hidden', ['literal', 'repeated', 'simple']],
+      ['"Burn your bridges" means to permanently ___ a relationship or opportunity.', 'destroy', ['repair', 'establish', 'improve']],
+      ['"Go back to the drawing board" means to ___ from the beginning.', 'start again', ['revise slightly', 'present earlier', 'abandon completely']],
+      ['"On the fence" describes someone who is ___ about a decision.', 'undecided', ['determined', 'excited', 'confident']],
+      ['"Let sleeping dogs lie" means to ___ a past problem.', 'not disturb', ['resolve', 'expose', 'remember']],
+      ['"Bite off more than you can chew" means to take on more ___ than you can handle.', 'responsibility', ['food', 'rest', 'money']],
+      ['"Spill the beans" means to ___ information that was meant to be secret.', 'reveal', ['conceal', 'exaggerate', 'question']],
+      ['"Hit the nail on the head" means to describe something ___.', 'exactly right', ['too harshly', 'very creatively', 'with difficulty']],
+      ['"Add fuel to the fire" means to make a difficult situation ___.', 'worse', ['better', 'clearer', 'calmer']],
+    ];
+    const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'idiomaticExpressions', subskill: 'idiom_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'Idioms are figurative, not literal.' };
   },
@@ -193,38 +448,136 @@ const VOCAB_BUILDERS = {
       ['"Where there is a will, there is a ___."', 'way', ['roadblock', 'ticket', 'raincoat']],
       ['"Actions speak louder than ___."', 'words', ['coins', 'voices', 'windows']],
       ['"A stitch in time saves ___."', 'nine', ['mine', 'fine', 'line']],
+      ['"Do not judge a book by its ___."', 'cover', ['content', 'author', 'title']],
+      ['"Better late than ___."', 'never', ['later', 'sooner', 'always']],
+      ['"Two heads are better than ___."', 'one', ['two', 'none', 'three']],
+      ['"Every cloud has a silver ___."', 'lining', ['edge', 'border', 'frame']],
+      ['"Look before you ___."', 'leap', ['run', 'sleep', 'climb']],
+      ['"The early bird catches the ___."', 'worm', ['fish', 'fly', 'bug']],
+      ['"All that glitters is not ___."', 'gold', ['bright', 'silver', 'precious']],
+      ['"A friend in need is a friend ___."', 'indeed', ['always', 'forever', 'truly']],
+      ['"Too many cooks spoil the ___."', 'broth', ['meal', 'food', 'dish']],
+      ['"When in Rome, do as the Romans ___."', 'do', ['say', 'eat', 'sing']],
+      ['"Honesty is the best ___."', 'policy', ['action', 'virtue', 'lesson']],
+      ['"The pen is mightier than the ___."', 'sword', ['gun', 'shield', 'arrow']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'proverbsSayings', subskill: 'proverb_completion', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the proverb word that completes the saying correctly.' };
   },
   scienceTechTerms(level, i) {
-    const rows = [
+    const p1p2Rows = [
+      ['All living things need ___ to survive.', 'water', ['sand', 'metal', 'plastic']],
+      ['A butterfly starts its life as a ___.', 'caterpillar', ['tadpole', 'larva', 'chick']],
+      ['The sun gives us heat and ___.', 'light', ['wind', 'water', 'soil']],
+      ['We use our ___ to smell things around us.', 'nose', ['tongue', 'ears', 'eyes']],
+      ['When water is heated, it turns into ___.', 'steam', ['ice', 'snow', 'rain']],
+      ['A tadpole grows into a ___.', 'frog', ['fish', 'lizard', 'turtle']],
+      ['Plants need ___ from the soil to grow.', 'nutrients', ['sand', 'petrol', 'paint']],
+      ['We can use a ___ to see very small things.', 'microscope', ['telescope', 'compass', 'ruler']],
+      ['The force that pulls objects toward the Earth is called ___.', 'gravity', ['friction', 'pressure', 'tension']],
+      ['A ___ is used to measure how hot or cold something is.', 'thermometer', ['barometer', 'compass', 'ruler']],
+    ];
+    const p3p4Rows = [
       ['Plants make food using sunlight through ___.', 'photosynthesis', ['evaporation', 'erosion', 'migration']],
       ['A program used to browse websites is a web ___.', 'browser', ['charger', 'beaker', 'ruler']],
       ['The boiling point of water is measured using a ___.', 'thermometer', ['compass', 'tripod', 'magnet']],
       ['A robot uses sensors to ___ its surroundings.', 'detect', ['decorate', 'defend', 'delay']],
+      ['The process of a liquid turning into a gas is called ___.', 'evaporation', ['condensation', 'photosynthesis', 'germination']],
+      ['The layer of gases surrounding the Earth is called the ___.', 'atmosphere', ['stratosphere', 'hydrosphere', 'biosphere']],
+      ['A substance that speeds up a chemical reaction without being used up is a ___.', 'catalyst', ['reactant', 'solvent', 'compound']],
+      ['Electricity that builds up on the surface of an object is called ___ electricity.', 'static', ['current', 'magnetic', 'thermal']],
+      ['The movement of water from the soil into the air via plants is called ___.', 'transpiration', ['evaporation', 'condensation', 'precipitation']],
+      ['A ___ is a device that converts solar energy into electrical energy.', 'solar panel', ['generator', 'turbine', 'circuit']],
     ];
+    const upperRows = [
+      ['The study of heredity and genetic variation in living organisms is called ___.', 'genetics', ['genomics', 'taxonomy', 'ecology']],
+      ['A ___ is a network of interconnected computers that share information globally.', 'internet', ['intranet', 'server', 'router']],
+      ['The process by which rocks are broken down by weather is called ___.', 'weathering', ['erosion', 'sedimentation', 'leaching']],
+      ['Data stored in a remote server accessible via the internet is called ___ storage.', 'cloud', ['digital', 'virtual', 'remote']],
+      ['The branch of science that studies matter and its interactions with energy is ___.', 'physics', ['chemistry', 'geology', 'biology']],
+      ['An organism that breaks down dead material into simpler substances is a ___.', 'decomposer', ['producer', 'consumer', 'predator']],
+      ['The use of computer systems to perform tasks that normally require human intelligence is ___.', 'artificial intelligence', ['machine learning', 'data science', 'robotics']],
+      ['A ___ is a strand of DNA that carries genetic information.', 'chromosome', ['protein', 'enzyme', 'hormone']],
+      ['The study of the structure and history of the Earth is called ___.', 'geology', ['ecology', 'biology', 'meteorology']],
+      ['Software that protects a computer from malicious programmes is called ___.', 'antivirus software', ['firewall', 'operating system', 'browser']],
+      ['A ___ is a device that measures the amount of an electric current.', 'ammeter', ['voltmeter', 'galvanometer', 'resistor']],
+      ['The conversion of light energy to chemical energy in plants is called ___.', 'photosynthesis', ['chemosynthesis', 'bioluminescence', 'catalysis']],
+      ['A ___ reaction releases energy in the form of heat and light.', 'combustion', ['reduction', 'oxidation', 'neutralisation']],
+      ['The force that opposes the relative motion of two surfaces in contact is ___.', 'friction', ['tension', 'compression', 'pressure']],
+      ['A ___ is a chart that shows the elements arranged by atomic number.', 'periodic table', ['chemical equation', 'data table', 'formula chart']],
+      ['The use of living organisms or their products in industry is called ___.', 'biotechnology', ['nanotechnology', 'biochemistry', 'genetics']],
+    ];
+    let rows;
+    if (level === 'P1' || level === 'P2') rows = p1p2Rows;
+    else if (level === 'P3' || level === 'P4') rows = p3p4Rows;
+    else rows = upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'scienceTechTerms', subskill: 'topic_vocabulary', q, choices: buildChoices(answer, ds), answer, explain: 'Use science and technology context clues.' };
   },
   socialStudiesVocab(level, i) {
-    const rows = [
+    const p1p2Rows = [
+      ['A person who lives in a place and is part of the community is a ___.', 'resident', ['visitor', 'tourist', 'stranger']],
+      ['The place where a family lives together is called a ___.', 'home', ['shelter', 'dormitory', 'retreat']],
+      ['People who help others in the community are called ___.', 'volunteers', ['tourists', 'inspectors', 'merchants']],
+      ['The person in charge of a school is called the ___.', 'principal', ['teacher', 'counsellor', 'librarian']],
+      ['A rule that everyone in a community must follow is called a ___.', 'rule', ['suggestion', 'guideline', 'request']],
+      ['The person who leads a country is called the ___.', 'leader', ['mayor', 'officer', 'assistant']],
+      ['People who move to a new country to live are called ___.', 'immigrants', ['tourists', 'travellers', 'diplomats']],
+      ['A person who keeps the neighbourhood safe is a ___.', 'police officer', ['firefighter', 'doctor', 'teacher']],
+      ['The building where a country\'s government meets is called the ___.', 'parliament', ['court', 'embassy', 'town hall']],
+      ['A large town where many people live and work is called a ___.', 'city', ['village', 'estate', 'suburb']],
+    ];
+    const p3p4Rows = [
       ['People choose leaders during an ___.', 'election', ['excursion', 'eruption', 'equation']],
       ['A person who belongs to a country is a ___.', 'citizen', ['chemist', 'captain', 'carpenter']],
       ['Rules made by the government are called ___.', 'laws', ['drawings', 'lanes', 'ladders']],
       ['Helping at a food drive is a form of ___.', 'volunteering', ['calculating', 'whispering', 'postponing']],
+      ['A government that is chosen by the people through voting is a ___.', 'democracy', ['monarchy', 'autocracy', 'theocracy']],
+      ['The process of bringing goods into a country from abroad is called ___.', 'importing', ['exporting', 'trading', 'distributing']],
+      ['An area that is controlled and managed by a foreign country is called a ___.', 'colony', ['territory', 'province', 'nation']],
+      ['A formal agreement between countries to trade freely is a ___ agreement.', 'free trade', ['diplomatic', 'cultural', 'security']],
+      ['The duty of citizens to obey the laws and contribute to society is called ___.', 'civic responsibility', ['social obligation', 'moral duty', 'legal practice']],
+      ['The system of rules that governs a country is called the ___.', 'constitution', ['statute', 'legislation', 'ordinance']],
     ];
+    const upperRows = [
+      ['The expansion of connections between countries through trade and communication is called ___.', 'globalisation', ['urbanisation', 'industrialisation', 'migration']],
+      ['A binding agreement between two countries signed by their leaders is a ___.', 'treaty', ['memorandum', 'charter', 'protocol']],
+      ['The movement of people from rural areas to cities is called ___.', 'urbanisation', ['migration', 'industrialisation', 'globalisation']],
+      ['Goods and services produced in a country and sold abroad are called ___.', 'exports', ['imports', 'commodities', 'tariffs']],
+      ['The body of international law that protects people affected by armed conflict is ___.', 'humanitarian law', ['trade law', 'maritime law', 'civil law']],
+      ['A tax placed on imported goods to protect domestic industries is a ___.', 'tariff', ['subsidy', 'quota', 'levy']],
+      ['The idea that every person has basic rights simply by being human is called ___.', 'human rights', ['civil liberties', 'legal rights', 'civil rights']],
+      ['The policy of a government that favours its own citizens over immigrants is ___.', 'nationalism', ['protectionism', 'isolationism', 'patriotism']],
+      ['The process by which countries work together on issues that affect the whole world is ___.', 'multilateralism', ['bilateralism', 'unilateralism', 'pluralism']],
+      ['A reduction in the value of a country\'s currency relative to other currencies is ___.', 'depreciation', ['devaluation', 'deflation', 'recession']],
+      ['The practice of managing a country\'s money supply to control inflation is called ___ policy.', 'monetary', ['fiscal', 'trade', 'industrial']],
+      ['A group of countries that cooperate on economic and political matters is called a ___.', 'bloc', ['alliance', 'coalition', 'federation']],
+      ['The fair and equal treatment of all people under the law is called ___.', 'justice', ['equality', 'fairness', 'democracy']],
+      ['The right of a country to govern itself without interference from others is called ___.', 'sovereignty', ['autonomy', 'independence', 'self-determination']],
+      ['The migration of skilled workers from developing countries to developed ones is called brain ___.', 'drain', ['gain', 'shift', 'flow']],
+      ['Organisations that operate across multiple countries are called ___ corporations.', 'multinational', ['bilateral', 'regional', 'national']],
+    ];
+    let rows;
+    if (level === 'P1' || level === 'P2') rows = p1p2Rows;
+    else if (level === 'P3' || level === 'P4') rows = p3p4Rows;
+    else rows = upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'socialStudiesVocab', subskill: 'civics_terms', q, choices: buildChoices(answer, ds), answer, explain: 'Use social studies context to identify vocabulary.' };
   },
   bodyPartsAnimals(level, i) {
     const rows = [
       ['The bird dipped its ___ into the pond to drink water.', 'beak', ['wing', 'claws', 'feathers']],
-      ['The farmer brushed the horse’s ___ with a comb.', 'mane', ['fur', 'fleece', 'wool']],
+      ['The farmer brushed the horse\'s ___ with a comb.', 'mane', ['fur', 'fleece', 'wool']],
       ['The cat scratched the door with its sharp ___.', 'claws', ['paws', 'wings', 'beak']],
       ['The fish moved its ___ to swim through the water.', 'fins', ['paws', 'legs', 'feathers']],
       ['The elephant lifted the log with its long ___.', 'trunk', ['horn', 'tail', 'paw']],
       ['The peacock spread its colourful ___ to show off.', 'feathers', ['scales', 'fur', 'fins']],
+      ['The snake moved silently by wriggling its ___.', 'body', ['fins', 'wings', 'claws']],
+      ['The deer had sharp, branching ___ growing from its head.', 'antlers', ['tusks', 'horns', 'spines']],
+      ['The tortoise retreated into its hard ___ when frightened.', 'shell', ['scales', 'pouch', 'skin']],
+      ['The kangaroo carried its joey safely in its ___.', 'pouch', ['shell', 'skin', 'mane']],
+      ['The shark sliced through the water using its powerful ___.', 'tail fin', ['front legs', 'gills', 'flippers']],
+      ['The frog pushed itself off the lily pad using its strong ___.', 'hind legs', ['fins', 'claws', 'wings']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'bodyPartsAnimals', subskill: 'animal_part_name', q, choices: buildChoices(answer, ds), answer, explain: 'Different animals have different body parts. Match the part to the animal.' };
@@ -240,6 +593,9 @@ const VOCAB_BUILDERS = {
       ['A ___ of fish swam past the diver.', 'school', ['flock', 'herd', 'pack']],
       ['Mrs Lee bought a ___ of milk from the supermarket.', 'carton', ['bowl', 'tub', 'tray']],
       ['A ___ of wolves howled in the forest at night.', 'pack', ['flock', 'herd', 'troop']],
+      ['A ___ of bees buzzed around the hive near our garden.', 'swarm', ['flock', 'colony', 'herd']],
+      ['The children found a ___ of kittens behind the shed.', 'litter', ['pack', 'nest', 'flock']],
+      ['The ranger spotted a ___ of lions resting under a tree.', 'pride', ['pack', 'herd', 'troop']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'collectiveNouns', subskill: 'collective_noun', q, choices: buildChoices(answer, ds), answer, explain: 'Each group of animals, threaded objects or container uses its own special collective word.' };
@@ -253,6 +609,11 @@ const VOCAB_BUILDERS = {
       ['We borrowed storybooks from the school ___.', 'library', ['canteen', 'office', 'hall']],
       ['Mum stopped at the ___ to fill petrol in the car.', 'petrol station', ['bus stop', 'taxi stand', 'workshop']],
       ['We watched a movie at the ___ last weekend.', 'cinema', ['theatre', 'studio', 'gallery']],
+      ['Athletes train and compete in a large covered ___.', 'stadium', ['gymnasium', 'court', 'arena']],
+      ['Passengers board and alight from planes at the ___.', 'airport', ['harbour', 'station', 'terminal']],
+      ['Scientists conduct experiments in a ___.', 'laboratory', ['workshop', 'studio', 'office']],
+      ['Patients stay overnight to recover after surgery in a ___.', 'hospital ward', ['clinic room', 'pharmacy', 'surgery']],
+      ['Trees are felled and timber is processed at a ___.', 'sawmill', ['quarry', 'foundry', 'warehouse']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'placeNouns', subskill: 'place_name', q, choices: buildChoices(answer, ds), answer, explain: 'Each place has a special name that tells us what people do there.' };
@@ -268,6 +629,9 @@ const VOCAB_BUILDERS = {
       ['The vase ___ when it hit the floor.', 'shattered', ['exploded', 'burst', 'crashed']],
       ['The chef ___ the eggs in a bowl before pouring them into the pan.', 'whisked', ['poured', 'sliced', 'fried']],
       ['Anna ___ a cup of hot tea slowly so as not to burn her tongue.', 'sipped', ['gulped', 'chewed', 'spilled']],
+      ['The puppy ___ at the ball and knocked it across the room.', 'pounced', ['leaped', 'snapped', 'dashed']],
+      ['He ___ the wet shirt on the bamboo pole to dry.', 'hung', ['draped', 'placed', 'dropped']],
+      ['She ___ the heavy bag over her shoulders before setting off.', 'hoisted', ['carried', 'threw', 'held']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'actionVerbs', subskill: 'action_verb', q, choices: buildChoices(answer, ds), answer, explain: 'Each action has a precise verb — pick the one that matches the movement, speed and surface.' };
@@ -282,6 +646,10 @@ const VOCAB_BUILDERS = {
       ['The lion ___ loudly, frightening the visitors at the zoo.', 'roared', ['barked', 'meowed', 'squeaked']],
       ['Bees were ___ near the flowers in our garden.', 'buzzing', ['barking', 'roaring', 'crowing']],
       ['The puppy ___ when it heard the doorbell ring.', 'barked', ['mewed', 'roared', 'hooted']],
+      ['The snake made a loud ___ sound when it felt threatened.', 'hissing', ['buzzing', 'chirping', 'hooting']],
+      ['The horse ___ and reared up when it heard the thunderclap.', 'neighed', ['brayed', 'bleated', 'grunted']],
+      ['The frog ___ all night, keeping us awake by the pond.', 'croaked', ['chirped', 'howled', 'barked']],
+      ['The crowd ___ in delight when the magician pulled a rabbit from his hat.', 'gasped', ['sighed', 'screamed', 'mumbled']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'soundVerbs', subskill: 'animal_sound', q, choices: buildChoices(answer, ds), answer, explain: 'Each animal — and some human sounds (sigh) — has its own specific verb.' };
@@ -289,14 +657,17 @@ const VOCAB_BUILDERS = {
   emotionAdjectives(level, i) {
     const rows = [
       ['Alison was ___ with her gift. She loved it very much.', 'delighted', ['upset', 'excited', 'surprised']],
-      ['I was ___ by the size of Jane’s home. It looks like a palace!', 'amazed', ['frightened', 'delighted', 'angry']],
+      ['I was ___ by the size of Jane\'s home. It looks like a palace!', 'amazed', ['frightened', 'delighted', 'angry']],
       ['Whenever Steve does not have enough sleep, he will be in a ___ mood.', 'grumpy', ['jolly', 'lazy', 'miserable']],
       ['Most children feel ___ visiting the dentist. It is an unpleasant experience.', 'nervous', ['excited', 'annoyed', 'discouraged']],
       ['As I had no one to play with and talk to all day, I felt ___.', 'miserable', ['nasty', 'disappointed', 'discouraged']],
-      ['Everyone was ___ by the passenger’s strange behaviour. They did not know why.', 'puzzled', ['curious', 'amazed', 'dazed']],
+      ['Everyone was ___ by the passenger\'s strange behaviour. They did not know why.', 'puzzled', ['curious', 'amazed', 'dazed']],
       ['He seems to be ___, so do not believe every word he says.', 'sly', ['honest', 'truthful', 'mischievous']],
       ['Tom felt ___ when he won first prize in the spelling bee.', 'proud', ['angry', 'sleepy', 'bored']],
       ['The children were ___ to ride the new roller coaster.', 'excited', ['bored', 'tired', 'upset']],
+      ['She felt ___ when she realised she had been left out of the group project.', 'hurt', ['relieved', 'grateful', 'confused']],
+      ['The boy was ___ when he saw the spider crawl towards him.', 'terrified', ['thrilled', 'amused', 'calm']],
+      ['She was ___ at herself for forgetting to bring her homework.', 'annoyed', ['pleased', 'proud', 'grateful']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'emotionAdjectives', subskill: 'feeling_word', q, choices: buildChoices(answer, ds), answer, explain: 'Use the feeling word that matches the situation and the strength of the emotion.' };
@@ -306,9 +677,15 @@ const VOCAB_BUILDERS = {
       ['Dennis is as proud as a ___. He always thinks he is better than other people.', 'peacock', ['fox', 'eel', 'lion']],
       ['Little Liyana is as quiet as a ___ when she reads in the library.', 'mouse', ['lion', 'parrot', 'monkey']],
       ['After running the race, John was as fast as a ___.', 'cheetah', ['turtle', 'snail', 'whale']],
-      ['The kitten’s fur felt as soft as ___.', 'silk', ['sand', 'rock', 'wood']],
+      ['The kitten\'s fur felt as soft as ___.', 'silk', ['sand', 'rock', 'wood']],
       ['Our prefect, Aliya, is as brave as a ___ when she stops bullies in school.', 'lion', ['mouse', 'rabbit', 'parrot']],
       ['Daniel was as busy as a ___ during the school carnival.', 'bee', ['bear', 'sloth', 'cat']],
+      ['The old man\'s skin was as rough as ___.', 'sandpaper', ['cotton', 'silk', 'velvet']],
+      ['Her answer was as clear as ___ — there was no doubt at all.', 'crystal', ['mud', 'sand', 'glass']],
+      ['He was as stubborn as a ___ and refused to change his mind.', 'mule', ['cat', 'rabbit', 'fox']],
+      ['The twins are as alike as two peas in a ___.', 'pod', ['bag', 'box', 'basket']],
+      ['Her memory is as sharp as a ___ — she never forgets a face.', 'tack', ['knife', 'pin', 'pencil']],
+      ['After swimming for an hour, the children were as hungry as ___.', 'wolves', ['birds', 'fish', 'ducks']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'similes', subskill: 'fixed_comparison', q, choices: buildChoices(answer, ds), answer, explain: 'Similes are fixed comparisons — you cannot swap the noun for another animal.' };
@@ -321,6 +698,12 @@ const VOCAB_BUILDERS = {
       ['The old man walked ___ down the road, leaning on his stick.', 'slowly', ['hastily', 'rapidly', 'briskly']],
       ['She thanked the volunteer ___ for helping her cross the road.', 'politely', ['rudely', 'angrily', 'wildly']],
       ['The boys clapped ___ when their team scored the winning goal.', 'wildly', ['quietly', 'gently', 'softly']],
+      ['The ambulance sped ___ through the traffic to reach the patient.', 'swiftly', ['calmly', 'lazily', 'carefully']],
+      ['The thief moved ___ through the dark corridor so as not to make a sound.', 'stealthily', ['boldly', 'noisily', 'carelessly']],
+      ['She answered the teacher\'s question ___ without hesitation.', 'confidently', ['shyly', 'reluctantly', 'vaguely']],
+      ['The wounded soldier crawled ___ towards the shelter.', 'painfully', ['comfortably', 'swiftly', 'playfully']],
+      ['He practised the piano ___ every evening until he mastered the piece.', 'diligently', ['casually', 'lazily', 'reluctantly']],
+      ['The baby slept ___ in her mother\'s arms throughout the journey.', 'peacefully', ['restlessly', 'noisily', 'alertly']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'mannerAdverbs', subskill: 'adverb_manner', q, choices: buildChoices(answer, ds), answer, explain: 'An adverb of manner describes HOW an action is done — match the adverb to the mood and intensity of the scene.' };
@@ -344,6 +727,9 @@ const VOCAB_BUILDERS = {
       ['She had to ___ a very difficult period after her grandmother passed away.', 'go through', ['go over', 'go along', 'go into']],
       ['My sister and I always ___ after an argument — we cannot stay angry at each other for long.', 'make up', ['make out', 'make over', 'make for']],
       ['My brother decided to ___ swimming as a hobby after watching the Olympics.', 'take up', ['take on', 'take over', 'take off']],
+      ['The manager had to ___ a difficult decision that affected the whole team.', 'face up to', ['face off with', 'face down from', 'face away from']],
+      ['He was so excited that he could not ___ the urge to share the news.', 'hold back', ['hold on', 'hold out', 'hold up']],
+      ['The volunteers ___ enough food to feed the entire shelter for a week.', 'gathered up', ['used up', 'gave out', 'called off']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'phrasalVerbs', subskill: 'phrasal_verb_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'Phrasal verbs combine a verb + particle into a fixed meaning — come across (encounter), give up (stop trying), call off (cancel), carry out (perform), run out of (exhaust supply).' };
@@ -353,12 +739,74 @@ const VOCAB_BUILDERS = {
       ['May I ___ a colour pencil from you?', 'borrow', ['get', 'lend', 'use']],
       ['I ___ my grandmother a birthday card. She received it in her mailbox today.', 'sent', ['fetched', 'took', 'picked']],
       ['Please ___ me your eraser; I will return it after class.', 'lend', ['borrow', 'give', 'pass']],
-      ['Father will ___ me from school at three o’clock today.', 'fetch', ['send', 'borrow', 'leave']],
+      ['Father will ___ me from school at three o\'clock today.', 'fetch', ['send', 'borrow', 'leave']],
       ['Sara ___ her brother to the park on her bicycle.', 'took', ['brought', 'fetched', 'sent']],
       ['Could you ___ the salt over here, please?', 'pass', ['lend', 'borrow', 'send']],
+      ['She ___ her younger sister to the bus stop every morning.', 'brings', ['fetches', 'sends', 'takes']],
+      ['He forgot his wallet, so his mother had to ___ it to him at school.', 'bring', ['fetch', 'lend', 'send']],
+      ['He will ___ his friend the book and expect it back next week.', 'lend', ['give', 'borrow', 'pass']],
+      ['The teacher ___ all the marked test papers back to us.', 'returned', ['sent', 'delivered', 'passed']],
+      ['May I ___ this book from the library for two weeks?', 'borrow', ['rent', 'lend', 'take']],
+      ['She ___ her grandfather to the clinic and waited with him there.', 'brought', ['fetched', 'sent', 'delivered']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'verbDistinction', subskill: 'verb_pair_choice', q, choices: buildChoices(answer, ds), answer, explain: 'These verbs look similar but mean different things — pay attention to who is doing what to whom.' };
+  },
+
+  // ── NEW BUILDERS ──────────────────────────────────────────────────────────
+  grammarPrepositions(level, i) {
+    const rows = [
+      ['The meeting will start ___ nine o\'clock in the morning.', 'at', ['on', 'in', 'by']],
+      ['She has been living ___ Singapore since she was five years old.', 'in', ['at', 'on', 'from']],
+      ['The library book is due ___ Friday, so please return it in time.', 'on', ['at', 'in', 'by']],
+      ['He completed the assignment ___ himself without any help.', 'by', ['from', 'with', 'at']],
+      ['The school is located ___ Clementi Road, near the MRT station.', 'along', ['on', 'by', 'at']],
+      ['The aeroplane flew ___ the clouds and into clear blue sky.', 'above', ['over', 'across', 'through']],
+      ['We have been waiting for the bus ___ half an hour.', 'for', ['since', 'from', 'during']],
+      ['The temperature has been rising steadily ___ last month.', 'since', ['from', 'for', 'during']],
+      ['The book is ___ the shelf, just above the dictionary.', 'on', ['in', 'at', 'over']],
+      ['Please choose ___ option A and option B carefully before answering.', 'between', ['among', 'across', 'within']],
+      ['The instructions are printed ___ the back of the worksheet.', 'on', ['at', 'in', 'over']],
+      ['She arrived ___ the airport two hours before her flight departed.', 'at', ['in', 'to', 'on']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { category: 'grammarPrepositions', subskill: 'preposition_in_context', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the preposition that fits the sentence context.' };
+  },
+  grammarArticles(level, i) {
+    const rows = [
+      ['She bought ___ orange from the fruit stall near her house.', 'an', ['a', 'the', 'some']],
+      ['___ Moon is clearly visible on a clear night.', 'The', ['A', 'An', 'Some']],
+      ['He is ___ honest student who always tells the truth.', 'an', ['a', 'the', 'some']],
+      ['Could I have ___ water, please? I am very thirsty.', 'some', ['a', 'an', 'the']],
+      ['___ elephant in the zoo gave birth to a calf last night.', 'The', ['An', 'A', 'Some']],
+      ['She plays ___ violin in the school orchestra every Tuesday.', 'the', ['a', 'an', 'some']],
+      ['We need to buy ___ new pencil case before the term starts.', 'a', ['an', 'the', 'some']],
+      ['He is ___ only student who completed the bonus question.', 'the', ['a', 'an', 'some']],
+      ['I heard ___ unusual noise coming from the storeroom last night.', 'an', ['a', 'the', 'some']],
+      ['The teacher gave each student ___ exercise book to write in.', 'an', ['a', 'the', 'some']],
+      ['They decided to adopt ___ stray cat that appeared at their doorstep.', 'a', ['an', 'the', 'some']],
+      ['___ Pacific Ocean is the largest ocean on Earth.', 'The', ['A', 'An', 'Some']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { category: 'grammarArticles', subskill: 'article_in_context', q, choices: buildChoices(answer, ds), answer, explain: 'Use "a" before consonant sounds, "an" before vowel sounds, "the" for specific nouns, and "some" for uncountable or plural quantities.' };
+  },
+  grammarSVA(level, i) {
+    const rows = [
+      ['Each of the students ___ expected to submit their work on time.', 'is', ['are', 'were', 'have been']],
+      ['Neither the captain nor the players ___ satisfied with the result.', 'were', ['was', 'is', 'has been']],
+      ['The committee ___ reached a unanimous decision after the debate.', 'has', ['have', 'were', 'are']],
+      ['Either the manager or the assistants ___ responsible for the error.', 'are', ['is', 'was', 'has been']],
+      ['One of the windows ___ broken during the storm last night.', 'was', ['were', 'have been', 'are']],
+      ['The news ___ shocking and left everyone speechless.', 'was', ['were', 'have been', 'are']],
+      ['Mathematics ___ considered one of the most important subjects in school.', 'is', ['are', 'were', 'have been']],
+      ['A number of students ___ absent from school due to the flu outbreak.', 'were', ['was', 'is', 'has been']],
+      ['The teacher, together with her pupils, ___ going on a field trip.', 'is', ['are', 'were', 'have been']],
+      ['Neither of the answers ___ correct according to the marking scheme.', 'is', ['are', 'were', 'have been']],
+      ['The pair of scissors ___ missing from the art room again.', 'is', ['are', 'were', 'have been']],
+      ['Everyone in the classrooms ___ asked to be quiet during the examination.', 'was', ['were', 'are', 'have been']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { category: 'grammarSVA', subskill: 'subject_verb_agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Make sure the verb agrees with the subject in number — watch for collective nouns, "each/either/neither", and interrupting phrases.' };
   },
 };
 
