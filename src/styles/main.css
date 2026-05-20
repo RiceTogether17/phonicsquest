@@ -6988,6 +6988,63 @@ details.story-tool-section[open] > .story-tool-summary::before {
    CLUE DETECTION — shared across Cloze Castle, Word Vault, Sentence Forge
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ── Scan Attention Card ──────────────────────────────────────────────────── */
+.scan-attention-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: linear-gradient(135deg, #fefce8 0%, #f0fdf4 100%);
+  border: 2px solid #ca8a04;
+  border-radius: var(--radius-xl);
+  padding: var(--space-3) var(--space-4);
+  margin: var(--space-3) 0;
+}
+
+.scan-attention-step {
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  color: #92400e;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+
+.scan-attention-sentence {
+  font-size: var(--font-size-base);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.scan-context-word {
+  background: #fef08a;
+  color: #713f12;
+  border-radius: var(--radius-sm);
+  padding: 1px 4px;
+  font-weight: 700;
+}
+
+.scan-blank {
+  display: inline-block;
+  border-bottom: 3px solid var(--color-primary);
+  min-width: 3ch;
+  color: var(--color-primary);
+  font-weight: 700;
+  padding: 0 2px;
+}
+
+.scan-attention-tip {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.scan-attention-actions {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 /* ── Clue Hunt Panel ──────────────────────────────────────────────────────── */
 .clue-hunt-panel {
   display: flex;

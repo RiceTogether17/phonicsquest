@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { buildScanTask, buildScanTaskForPassage, renderScanTask } from '../modes/scanTask.js';
+import { buildScanTask, buildScanTaskForPassage, renderScanTask, buildScanAttention, renderScanAttention } from '../modes/scanTask.js';
 
 function fixedRandom(seq) {
   let i = 0;
@@ -134,5 +134,88 @@ describe('renderScanTask', () => {
   it('returns silently when host or task is missing', () => {
     expect(() => renderScanTask({ host: null, task: { options: [] } })).not.toThrow();
     expect(() => renderScanTask({ host, task: null })).not.toThrow();
+  });
+});
+
+describe('buildScanAttention', () => {
+  it('extracts the sentence containing the first blank', () => {
+    const passage = { text: 'The cat sat. The dog ___ over the fence.', answers: ['jumped'] };
+    const attention = buildScanAttention(passage);
+    expect(attention).not.toBeNull();
+    expect(attention.blankSentence).toContain('___');
+    expect(attention.blankSentence).toContain('dog');
+    expect(attention.totalBlanks).toBe(1);
+  });
+
+  it('handles passage where blank is in the first sentence', () => {
+    const passage = { text: 'The ___ ran fast. Then it stopped.', answers: ['dog'] };
+    const attention = buildScanAttention(passage);
+    expect(attention).not.toBeNull();
+    expect(attention.blankSentence).toContain('___');
+  });
+
+  it('returns null when passage has no blanks', () => {
+    expect(buildScanAttention({ text: 'No blanks here.' })).toBeNull();
+    expect(buildScanAttention({})).toBeNull();
+  });
+
+  it('counts multiple blanks correctly', () => {
+    const passage = { text: 'The ___ ran and the ___ jumped.', answers: ['dog', 'cat'] };
+    const attention = buildScanAttention(passage);
+    expect(attention.totalBlanks).toBe(2);
+  });
+});
+
+describe('renderScanAttention', () => {
+  let host;
+  beforeEach(() => {
+    document.body.innerHTML = '<div id="host"></div>';
+    host = document.getElementById('host');
+  });
+
+  it('renders the sentence and action button', () => {
+    const attention = { blankSentence: 'The cat ___ quickly.', totalBlanks: 1 };
+    renderScanAttention({ host, attention, onContinue: () => {} });
+    expect(host.querySelector('.scan-attention-card')).not.toBeNull();
+    expect(host.querySelector('#scan-attention-go')).not.toBeNull();
+    expect(host.querySelector('.scan-attention-sentence')).not.toBeNull();
+  });
+
+  it('highlights a context word adjacent to the blank', () => {
+    const attention = { blankSentence: 'The cat ___ quickly.', totalBlanks: 1 };
+    renderScanAttention({ host, attention, onContinue: () => {} });
+    expect(host.querySelector('.scan-context-word')).not.toBeNull();
+  });
+
+  it('calls onContinue and removes card when go button is clicked', () => {
+    const onContinue = vi.fn();
+    const attention = { blankSentence: 'The dog ___ away.', totalBlanks: 1 };
+    renderScanAttention({ host, attention, onContinue });
+    host.querySelector('#scan-attention-go').click();
+    expect(onContinue).toHaveBeenCalledTimes(1);
+    expect(host.querySelector('.scan-attention-card')).toBeNull();
+  });
+
+  it('calls onSkip when skip is clicked', () => {
+    const onSkip = vi.fn();
+    const onContinue = vi.fn();
+    const attention = { blankSentence: 'The bird ___ south.', totalBlanks: 1 };
+    renderScanAttention({ host, attention, onContinue, onSkip });
+    host.querySelector('#scan-attention-skip').click();
+    expect(onSkip).toHaveBeenCalledTimes(1);
+    expect(onContinue).not.toHaveBeenCalled();
+  });
+
+  it('fires onContinue immediately when attention is null', () => {
+    const onContinue = vi.fn();
+    renderScanAttention({ host, attention: null, onContinue });
+    expect(onContinue).toHaveBeenCalledTimes(1);
+  });
+
+  it('escapes unsafe content in the sentence', () => {
+    const attention = { blankSentence: '<img onerror=alert(1)> ___ end.', totalBlanks: 1 };
+    renderScanAttention({ host, attention, onContinue: () => {} });
+    expect(host.innerHTML).not.toContain('<img ');
+    expect(host.innerHTML).not.toContain('<script');
   });
 });

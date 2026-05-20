@@ -91,6 +91,75 @@ export function buildScanTaskForPassage(passage = {}, { randomFn = Math.random }
 }
 
 /**
+ * Build data for a guided-attention prompt: extracts the sentence containing
+ * the first blank so it can be displayed with context words highlighted.
+ * Returns null when the passage text contains no blanks.
+ */
+export function buildScanAttention(passage = {}) {
+  const text = String(passage.text || '');
+  if (!text.includes('___')) return null;
+
+  const sentences = text.split(/(?<=[.!?])\s+/);
+  const blankSentence = sentences.find((s) => s.includes('___')) || text;
+
+  return {
+    blankSentence: blankSentence.trim(),
+    totalBlanks: (text.match(/___/g) || []).length,
+  };
+}
+
+function _buildHighlightedSentence(sentence) {
+  if (!sentence.includes('___')) return escapeHtml(sentence);
+  const [rawBefore, ...afterParts] = sentence.split('___');
+  const rawAfter = afterParts.join('___');
+
+  const before = escapeHtml(rawBefore).replace(
+    /(\S+)(\s*)$/,
+    '<mark class="scan-context-word">$1</mark>$2',
+  );
+  const after = escapeHtml(rawAfter).replace(
+    /^(\s*)(\S+)/,
+    '$1<mark class="scan-context-word">$2</mark>',
+  );
+  return `${before}<span class="scan-blank">___</span>${after}`;
+}
+
+/**
+ * Render a guided-attention prompt into `host`.
+ *
+ * Shows the sentence containing blank 1 with the immediately adjacent
+ * context words highlighted. No MCQ — directs the child's attention, then
+ * fires onContinue when they tap "Got it".
+ */
+export function renderScanAttention({ host, attention, onContinue, onSkip, allowSkip = true }) {
+  if (!host || !attention) { onContinue?.(); return; }
+
+  const sentenceHtml = _buildHighlightedSentence(attention.blankSentence);
+
+  const card = document.createElement('div');
+  card.className = 'scan-attention-card';
+  card.innerHTML = `
+    <p class="scan-attention-step">Before you fill — spot the clue</p>
+    <p class="scan-attention-sentence">${sentenceHtml}</p>
+    <p class="scan-attention-tip">🔍 The highlighted words are clues — they show you what kind of word fits in the blank.</p>
+    <div class="scan-attention-actions">
+      <button class="btn btn--primary" id="scan-attention-go">Got it — start filling!</button>
+      ${allowSkip ? '<button class="btn btn--ghost btn--sm" id="scan-attention-skip">Skip</button>' : ''}
+    </div>`;
+
+  host.appendChild(card);
+
+  card.querySelector('#scan-attention-go')?.addEventListener('click', () => {
+    card.remove();
+    onContinue?.();
+  });
+  card.querySelector('#scan-attention-skip')?.addEventListener('click', () => {
+    card.remove();
+    onSkip?.();
+  });
+}
+
+/**
  * Render a child-friendly scan task into `host`.
  *
  * - `onAnswer({ correct, chosenClueType, expectedClueType })` fires once

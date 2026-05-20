@@ -11,40 +11,40 @@ const LEVEL_CATEGORY_PLAN = {
   P1: [
     'contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue',
     'bodyPartsAnimals', 'collectiveNouns', 'placeNouns', 'actionVerbs', 'soundVerbs', 'emotionAdjectives', 'verbDistinction',
-    'wordParts', 'similes', 'mannerAdverbs', 'scienceTechTerms', 'socialStudiesVocab', 'proverbsSayings',
+    'movementVerbs', 'wordParts', 'similes', 'mannerAdverbs', 'scienceTechTerms', 'socialStudiesVocab', 'proverbsSayings',
     'idiomaticExpressions', 'phrasalVerbs', 'grammarPrepositions', 'grammarArticles', 'grammarSVA',
   ],
   P2: [
     'contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'wordParts',
     'actionVerbs', 'soundVerbs', 'collectiveNouns', 'emotionAdjectives', 'similes', 'mannerAdverbs',
-    'connectorClue', 'placeNouns', 'bodyPartsAnimals', 'verbDistinction', 'scienceTechTerms', 'socialStudiesVocab',
+    'connectorClue', 'placeNouns', 'bodyPartsAnimals', 'verbDistinction', 'movementVerbs', 'scienceTechTerms', 'socialStudiesVocab',
     'proverbsSayings', 'idiomaticExpressions', 'phrasalVerbs', 'grammarPrepositions', 'grammarArticles', 'grammarSVA',
   ],
   P3: [
     'contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue',
     'wordParts', 'scienceTechTerms', 'phrasalVerbs', 'similes', 'mannerAdverbs', 'actionVerbs',
     'collectiveNouns', 'placeNouns', 'bodyPartsAnimals', 'soundVerbs', 'emotionAdjectives', 'verbDistinction',
-    'socialStudiesVocab', 'idiomaticExpressions', 'proverbsSayings', 'grammarPrepositions', 'grammarArticles', 'grammarSVA',
+    'movementVerbs', 'socialStudiesVocab', 'idiomaticExpressions', 'proverbsSayings', 'grammarPrepositions', 'grammarArticles', 'grammarSVA',
   ],
   P4: [
     'contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue',
     'wordParts', 'socialStudiesVocab',
     'actionVerbs', 'soundVerbs', 'emotionAdjectives', 'similes', 'mannerAdverbs', 'phrasalVerbs',
-    'collectiveNouns', 'placeNouns', 'bodyPartsAnimals', 'verbDistinction', 'scienceTechTerms',
+    'collectiveNouns', 'placeNouns', 'bodyPartsAnimals', 'verbDistinction', 'movementVerbs', 'scienceTechTerms',
     'idiomaticExpressions', 'proverbsSayings', 'grammarPrepositions', 'grammarArticles', 'grammarSVA',
   ],
   P5: [
     'contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue',
     'wordParts', 'idiomaticExpressions', 'proverbsSayings', 'scienceTechTerms',
     'socialStudiesVocab', 'actionVerbs', 'soundVerbs', 'emotionAdjectives', 'similes', 'mannerAdverbs',
-    'phrasalVerbs', 'collectiveNouns', 'placeNouns', 'bodyPartsAnimals', 'verbDistinction',
+    'phrasalVerbs', 'collectiveNouns', 'placeNouns', 'bodyPartsAnimals', 'verbDistinction', 'movementVerbs',
     'grammarPrepositions', 'grammarArticles', 'grammarSVA',
   ],
   P6: [
     'contextInference', 'definitionMatch', 'synonymContrast', 'collocationCloze', 'grammaticalRole', 'connectorClue',
     'wordParts', 'idiomaticExpressions', 'proverbsSayings', 'socialStudiesVocab',
     'scienceTechTerms', 'actionVerbs', 'soundVerbs', 'emotionAdjectives', 'similes', 'mannerAdverbs',
-    'phrasalVerbs', 'collectiveNouns', 'placeNouns', 'bodyPartsAnimals', 'verbDistinction',
+    'phrasalVerbs', 'collectiveNouns', 'placeNouns', 'bodyPartsAnimals', 'verbDistinction', 'movementVerbs',
     'grammarPrepositions', 'grammarArticles', 'grammarSVA',
   ],
 };
@@ -751,6 +751,27 @@ const VOCAB_BUILDERS = {
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'verbDistinction', subskill: 'verb_pair_choice', q, choices: buildChoices(answer, ds), answer, explain: 'These verbs look similar but mean different things — pay attention to who is doing what to whom.' };
+  },
+  movementVerbs(level, i) {
+    const rows = [
+      ['The snake ___ silently through the tall grass towards the pond.', 'slithered', ['galloped', 'soared', 'waded']],
+      ['The horse ___ gracefully across the open field, kicking up dust.', 'galloped', ['slithered', 'waddled', 'lumbered']],
+      ['The eagle ___ high above the mountains, searching for prey below.', 'soared', ['prowled', 'waded', 'scurried']],
+      ['The rabbit ___ away into the bushes when it heard a loud noise.', 'scurried', ['lumbered', 'soared', 'galloped']],
+      ['The hippopotamus ___ slowly through the muddy river shallows.', 'waded', ['soared', 'galloped', 'scurried']],
+      ['The tiger ___ silently through the jungle, watching the deer.', 'prowled', ['waded', 'scurried', 'galloped']],
+      ['The old bear ___ out of the cave after its long winter sleep.', 'lumbered', ['darted', 'soared', 'prowled']],
+      ['The hawk ___ from the sky and snatched the mouse in its talons.', 'swooped', ['lumbered', 'waded', 'galloped']],
+      ['The frog ___ from one lily pad to the next across the pond.', 'leaped', ['slithered', 'lumbered', 'prowled']],
+      ['The little crab ___ sideways across the sandy beach at low tide.', 'scuttled', ['soared', 'galloped', 'waded']],
+      ['The monkey ___ up the tall tree trunk using its strong limbs.', 'scrambled', ['galloped', 'waded', 'prowled']],
+      ['The kangaroo ___ across the dry plains with powerful bounding leaps.', 'bounded', ['slithered', 'waded', 'lumbered']],
+      ['The cat ___ slowly towards the sleeping mouse, making no sound.', 'crept', ['galloped', 'soared', 'bounded']],
+      ['The duck ___ gently across the calm lake on a quiet morning.', 'paddled', ['galloped', 'prowled', 'scurried']],
+      ['The deer ___ gracefully over the low fence and into the forest.', 'leaped', ['waded', 'lumbered', 'scuttled']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return { category: 'movementVerbs', subskill: 'animal_movement', q, choices: buildChoices(answer, ds), answer, explain: 'Each animal has its own way of moving — match the verb to how that animal travels.' };
   },
 
   // ── NEW BUILDERS ──────────────────────────────────────────────────────────
