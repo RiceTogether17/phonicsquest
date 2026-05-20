@@ -115,17 +115,31 @@ function decorateStem(stem, level, idx) {
 
 const GRAMMAR_BUILDERS = {
   articles(level, i) {
-    const nouns = [
-      ['apple', 'an'], ['uniform', 'a'], ['hour', 'an'], ['museum', 'a'], ['umbrella', 'an'], ['homework file', 'a'],
-      ['orange', 'an'], ['banana', 'a'], ['eagle', 'an'], ['pencil case', 'a'], ['ice-cream cone', 'an'], ['water bottle', 'a'],
+    const rows = [
+      ['___ hour had passed, but the team had not given up.', 'An', ['A', 'The', 'Some']],
+      ['Priya found ___ umbrella leaning against the classroom door.', 'an', ['a', 'the', 'some']],
+      ['The coach shared ___ useful tip just before the match began.', 'a', ['an', 'the', 'some']],
+      ['I saw ___ eagle gliding slowly above the field.', 'an', ['a', 'the', 'some']],
+      ['That was ___ excellent answer — the class was impressed.', 'an', ['a', 'the', 'some']],
+      ['Mum left ___ orange on the counter as a snack.', 'an', ['a', 'the', 'some']],
+      ['Please pass me ___ ruler so I can draw a margin.', 'a', ['an', 'the', 'some']],
+      ['___ uniform with the school crest hung in the display case.', 'A', ['An', 'The', 'Some']],
+      ['She gave ___ honest answer to a tricky question.', 'an', ['a', 'the', 'some']],
+      ['He found ___ empty seat near the library window.', 'an', ['a', 'the', 'some']],
+      ['The class planted ___ mango seedling in the school garden.', 'a', ['an', 'the', 'some']],
+      ['We heard ___ unusual noise coming from the storeroom.', 'an', ['a', 'the', 'some']],
+      ['Jake slipped ___ extra pen into his pencil case just in case.', 'an', ['a', 'the', 'some']],
+      ['___ ice-cream treat awaited each pupil after Sports Day.', 'An', ['A', 'The', 'Some']],
+      ['The new pupil gave ___ interesting talk about her home country.', 'an', ['a', 'the', 'some']],
+      ['The principal made ___ announcement about the upcoming camp.', 'an', ['a', 'the', 'some']],
     ];
-    const [noun, article] = rotate(nouns, i);
+    const [q, answer, ds] = rotate(rows, i);
     return {
       subskill: 'article_choice',
-      q: `${rotate(SUBJECTS, i)} packed ___ ${noun} before assembly.`,
-      choices: buildChoices(article, article === 'an' ? ['a', 'the', 'some'] : ['an', 'the', 'some']),
-      answer: article,
-      explain: `Use "${article}" for this noun sound in context.`,
+      q,
+      choices: buildChoices(answer, ds),
+      answer,
+      explain: 'Use "a" before consonant sounds and "an" before vowel sounds — including silent-h words like "hour" and "honest".',
     };
   },
   pronouns(level, i) {
@@ -134,7 +148,15 @@ const GRAMMAR_BUILDERS = {
       ['Sara and I went to the park. ___ played on the swings.', 'We', ['I', 'They', 'She']],
       ['Look at the bird in the cage. ___ is so colourful!', 'It', ['He', 'She', 'They']],
       ['The boys forgot their bags. The teacher reminded ___.', 'them', ['they', 'their', 'theirs']],
-      ['Don’t eat the bread. ___ has turned mouldy.', 'It', ['He', 'She', 'They']],
+      ['Don\'t eat the bread. ___ has turned mouldy.', 'It', ['He', 'She', 'They']],
+      ['My dog loves to run. ___ chases every ball in the park.', 'It', ['He', 'She', 'They']],
+      ['Aunty Sue baked some cookies. ___ put them on the table for us.', 'She', ['He', 'It', 'They']],
+      ['The twins like football. ___ practise every Saturday morning.', 'They', ['He', 'She', 'It']],
+      ['Mum and I went to the market. ___ bought fresh fruit.', 'We', ['They', 'I', 'She']],
+      ['Dad called my sister and ___. We had to come inside.', 'me', ['I', 'my', 'mine']],
+      ['My sister lost her pencil. I lent ___ mine for the rest of the lesson.', 'her', ['she', 'hers', 'herself']],
+      ['The kitten knocked over the cup. ___ fell off the table.', 'It', ['He', 'She', 'They']],
+      ['Our class won the quiz. The teacher praised ___.', 'us', ['we', 'our', 'ours']],
     ];
     const upperRows = [
       ['The girls were late, so ___ apologised to the teacher.', 'they', ['them', 'their', 'theirs']],
@@ -182,22 +204,22 @@ const GRAMMAR_BUILDERS = {
   },
   tagQuestions(level, i) {
     const rows = [
-      ['Andy is joining us for recess, ___ he?', 'isn’t', ['is', 'does', 'doesn’t']],
-      ['You have watched this movie before, ___ you?', 'haven’t', ['did', 'have', 'didn’t']],
-      ['They will join the swim team, ___ they?', 'won’t', ['will', 'do', 'don’t']],
-      ['She does not eat seafood, ___ she?', 'does', ['doesn’t', 'is', 'isn’t']],
-      ['We must finish this by Friday, ___ we?', 'mustn’t', ['must', 'do', 'don’t']],
-      ['The twins are not in the team, ___ they?', 'are', ['aren’t', 'is', 'isn’t']],
-      ['Your sister can swim very well, ___ she?', 'can’t', ['can', 'does', 'doesn’t']],
-      ['He should bring his calculator tomorrow, ___ he?', 'shouldn’t', ['should', 'does', 'doesn’t']],
-      ['They were practising in the hall after school, ___ they?', 'weren’t', ['were', 'are', 'aren’t']],
-      ['It was a tiring P.E. lesson, ___ it?', 'wasn’t', ['was', 'is', 'isn’t']],
-      ['Mei did her homework already, ___ she?', 'didn’t', ['did', 'does', 'doesn’t']],
-      ['We had finished the test before the bell rang, ___ we?', 'hadn’t', ['had', 'did', 'didn’t']],
-      ['The kittens are playing in the garden, ___ they?', 'aren’t', ['are', 'is', 'isn’t']],
-      ['Father has fixed the broken chair, ___ he?', 'hasn’t', ['has', 'does', 'doesn’t']],
-      ['Aunty Lin would prefer chicken rice, ___ she?', 'wouldn’t', ['would', 'does', 'doesn’t']],
-      ['Your brother could not find his keys, ___ he?', 'could', ['couldn’t', 'can', 'can’t']],
+      ['Andy is joining us for recess, ___ he?', 'isn\'t', ['is', 'does', 'doesn\'t']],
+      ['You have watched this movie before, ___ you?', 'haven\'t', ['did', 'have', 'didn\'t']],
+      ['They will join the swim team, ___ they?', 'won\'t', ['will', 'do', 'don\'t']],
+      ['She does not eat seafood, ___ she?', 'does', ['doesn\'t', 'is', 'isn\'t']],
+      ['We must finish this by Friday, ___ we?', 'mustn\'t', ['must', 'do', 'don\'t']],
+      ['The twins are not in the team, ___ they?', 'are', ['aren\'t', 'is', 'isn\'t']],
+      ['Your sister can swim very well, ___ she?', 'can\'t', ['can', 'does', 'doesn\'t']],
+      ['He should bring his calculator tomorrow, ___ he?', 'shouldn\'t', ['should', 'does', 'doesn\'t']],
+      ['They were practising in the hall after school, ___ they?', 'weren\'t', ['were', 'are', 'aren\'t']],
+      ['It was a tiring P.E. lesson, ___ it?', 'wasn\'t', ['was', 'is', 'isn\'t']],
+      ['Mei did her homework already, ___ she?', 'didn\'t', ['did', 'does', 'doesn\'t']],
+      ['We had finished the test before the bell rang, ___ we?', 'hadn\'t', ['had', 'did', 'didn\'t']],
+      ['The kittens are playing in the garden, ___ they?', 'aren\'t', ['are', 'is', 'isn\'t']],
+      ['Father has fixed the broken chair, ___ he?', 'hasn\'t', ['has', 'does', 'doesn\'t']],
+      ['Aunty Lin would prefer chicken rice, ___ she?', 'wouldn\'t', ['would', 'does', 'doesn\'t']],
+      ['Your brother could not find his keys, ___ he?', 'could', ['couldn\'t', 'can', 'can\'t']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return {
@@ -248,6 +270,11 @@ const GRAMMAR_BUILDERS = {
       ['Could you please hand me ___ scissors over there on the cupboard?', 'those', ['this', 'that', 'these']],
       ['"___ cookies that I am holding are still warm — try one!"', 'These', ['That', 'Those', 'This']],
       ['Look! ___ butterfly near the window is much smaller than ours.', 'That', ['This', 'These', 'Those']],
+      ['"___ is how you fold the paper into a boat," Mrs Lee told the class.', 'This', ['That', 'These', 'Those']],
+      ['___ little boy beside me is my younger brother Tim.', 'This', ['That', 'These', 'Those']],
+      ['"Please move ___ chairs here to the front of the room," said the teacher.', 'these', ['those', 'this', 'that']],
+      ['"___ pupil by the window — please sit up straight," the teacher said.', 'That', ['This', 'These', 'Those']],
+      ['Look at ___ clouds in the distance. I think it might rain later.', 'those', ['these', 'this', 'that']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return {
@@ -270,6 +297,11 @@ const GRAMMAR_BUILDERS = {
       ['"___ is the new student who joined our class today?" Daniel whispered.', 'Who', ['What', 'Which', 'Whose']],
       ['"___ pencil case is this on the floor near the door?" the teacher asked.', 'Whose', ['Who', 'Which', 'What']],
       ['"___ many books did you borrow from the school library yesterday?" the librarian asked politely.', 'How', ['What', 'When', 'Which']],
+      ['"___ do you spell \'necessary\'?" the teacher asked the class.', 'How', ['What', 'When', 'Where']],
+      ['"___ gave you permission to leave the classroom?" the prefect asked sternly.', 'Who', ['What', 'Which', 'Whose']],
+      ['"___ colour would you like for your name card?" asked the art teacher.', 'Which', ['What', 'Whose', 'How']],
+      ['"___ is the science lab? I cannot find it," the new student said.', 'Where', ['When', 'Why', 'How']],
+      ['"___ did you arrive late today, Sam?" the teacher asked with concern.', 'Why', ['How', 'When', 'Where']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return {
@@ -287,9 +319,19 @@ const GRAMMAR_BUILDERS = {
       ['There ___ two packets of rice on the shelf.', 'are', ['is', 'was', 'has']],
       ['Neither the coach nor the players ___ careless today.', 'are', ['is', 'was', 'be']],
       ['Each student ___ a name tag for the camp.', 'has', ['have', 'had', 'having']],
+      ['One of the pupils ___ a birthday today.', 'has', ['have', 'had', 'having']],
+      ['Both the teacher and the principal ___ the new timetable.', 'support', ['supports', 'supported', 'is supporting']],
+      ['A box of crayons ___ been left in the art room.', 'has', ['have', 'had', 'having']],
+      ['Either the twins or their older sister ___ staying to help.', 'is', ['are', 'were', 'be']],
+      ['The news about the school trip ___ very exciting.', 'is', ['are', 'was', 'be']],
+      ['Not a single pupil ___ absent on Picture Day.', 'was', ['were', 'is', 'are']],
+      ['Mathematics ___ her favourite subject at school.', 'is', ['are', 'was', 'be']],
+      ['The pair of scissors ___ on the craft table.', 'is', ['are', 'were', 'be']],
+      ['Everyone on the bus ___ to arrive by seven.', 'needs', ['need', 'needed', 'needing']],
+      ['The committee ___ its decision after a long discussion.', 'made', ['make', 'makes', 'making']],
     ];
     const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Match the verb with the true subject.' };
+    return { subskill: 'agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Match the verb with the true subject — collective nouns and "each/one/either" take a singular verb.' };
   },
   simplePast(level, i) {
     const p1Rows = [
@@ -306,6 +348,12 @@ const GRAMMAR_BUILDERS = {
       ['Just a moment ago, the wind ___ and toppled the tree.', 'blew', ['blow', 'blows', 'is blowing']],
       ['Last week, our class ___ a small project for the science fair.', 'built', ['build', 'builds', 'building']],
       ['Yesterday morning, the rain ___ very heavily.', 'fell', ['fall', 'falls', 'is falling']],
+      ['Our class ___ first place in the inter-school quiz last term.', 'won', ['win', 'wins', 'winning']],
+      ['The librarian ___ ten new books on the display shelf last week.', 'placed', ['place', 'places', 'is placing']],
+      ['Everyone ___ when the magician pulled the rabbit from the hat.', 'clapped', ['clap', 'claps', 'clapping']],
+      ['The coach ___ the team captain after the final whistle.', 'congratulated', ['congratulate', 'congratulates', 'congratulating']],
+      ['It ___ raining suddenly during our outdoor lesson last Thursday.', 'started', ['start', 'starts', 'is starting']],
+      ['The puppy ___ at the door the whole time we were out yesterday.', 'waited', ['wait', 'waits', 'was waiting']],
     ];
     const upperRows = [
       ['Yesterday, we ___ the art display before lunch.', 'visited', ['visit', 'visits', 'visiting']],
@@ -343,10 +391,18 @@ const GRAMMAR_BUILDERS = {
     const p1Rows = [
       ['Gavin fell asleep ___ the sofa.', 'on', ['in', 'into', 'onto']],
       ['The ball rolled away and fell ___ a drain.', 'into', ['to', 'on', 'over']],
-      ['Holly has to attend a lesson ___ 8 o’clock in the morning.', 'at', ['in', 'on', 'by']],
+      ['Holly has to attend a lesson ___ 8 o\'clock in the morning.', 'at', ['in', 'on', 'by']],
       ['It was very hot, so we sat ___ the shade where it was cooler.', 'in', ['on', 'with', 'below']],
       ['My bag is ___ the table next to my books.', 'on', ['in', 'under', 'between']],
       ['The cat is hiding ___ the chair. I cannot see it.', 'under', ['above', 'across', 'behind']],
+      ['The children ran ___ the playground after the bell rang.', 'to', ['at', 'on', 'in']],
+      ['She kept her storybook ___ her bag to read later.', 'in', ['on', 'at', 'under']],
+      ['The kite flew high ___ the trees in the park.', 'above', ['under', 'below', 'behind']],
+      ['We live ___ the sixth floor of the apartment block.', 'on', ['at', 'in', 'above']],
+      ['Dad parked the car ___ the shopping centre.', 'at', ['in', 'on', 'above']],
+      ['The bird perched ___ the branch and sang a sweet song.', 'on', ['at', 'in', 'under']],
+      ['She waited ___ the bus stop for almost twenty minutes.', 'at', ['in', 'on', 'by']],
+      ['The dog sat ___ the two children in the photograph.', 'between', ['among', 'beside', 'behind']],
     ];
     const p2Rows = [
       ['The cyclist took shelter ___ the bridge as it was raining.', 'under', ['at', 'on', 'above']],
@@ -355,9 +411,14 @@ const GRAMMAR_BUILDERS = {
       ['Emily wandered ___ a street she did not recognise.', 'down', ['off', 'around', 'among']],
       ['Tall buildings stood all ___ her.', 'around', ['beside', 'across', 'towards']],
       ['She decided to head ___ the park to find her way home.', 'towards', ['among', 'beside', 'off']],
+      ['The train went ___ a long tunnel before reaching the next station.', 'through', ['over', 'across', 'along']],
+      ['The rabbit hopped ___ the fence and landed on the soft grass.', 'over', ['across', 'through', 'into']],
+      ['The cat jumped ___ the open box and sat down inside.', 'into', ['onto', 'over', 'through']],
+      ['We walked ___ the busy road carefully, watching out for traffic.', 'along', ['across', 'through', 'around']],
+      ['She slid ___ the chair to make room for the new pupil.', 'off', ['over', 'across', 'below']],
     ];
     const upperRows = [
-      ['Please place the attendance file ___ the principal’s desk.', 'on', ['in', 'under', 'between']],
+      ['Please place the attendance file ___ the principal\'s desk.', 'on', ['in', 'under', 'between']],
       ['We reached school ___ 7.20 a.m. today.', 'at', ['on', 'in', 'by']],
       ['The football rolled ___ the bench.', 'under', ['above', 'across', 'toward']],
       ['They walked ___ the bridge to the science centre.', 'across', ['behind', 'inside', 'with']],
@@ -390,12 +451,19 @@ const GRAMMAR_BUILDERS = {
   },
   quantifiers(level, i) {
     const p1Rows = [
-      ['I looked into the refrigerator. There wasn’t ___ juice left.', 'any', ['a few', 'many', 'a little']],
+      ['I looked into the refrigerator. There wasn\'t ___ juice left.', 'any', ['a few', 'many', 'a little']],
       ['There is no ___ soup left after Dan finished the whole pot.', 'more', ['any', 'much', 'many']],
       ['After a tiring day, Mother had ___ rest when she came home.', 'some', ['any', 'little', 'few']],
-      ['There wasn’t ___ juice left. I only had half a glass of it.', 'much', ['some', 'little', 'few']],
+      ['There wasn\'t ___ juice left. I only had half a glass of it.', 'much', ['some', 'little', 'few']],
       ['I bought ___ apples at the market for our breakfast.', 'some', ['any', 'much', 'a little']],
       ['How ___ pencils do you have in your pencil case?', 'many', ['much', 'a little', 'less']],
+      ['We only had ___ time left, so we hurried to the bus stop.', 'a little', ['a few', 'many', 'much']],
+      ['There are ___ children waiting outside — about twenty of them.', 'many', ['much', 'a little', 'some']],
+      ['I drank ___ water after the long run because I was very thirsty.', 'some', ['any', 'many', 'much']],
+      ['Only ___ seats are left in the hall — let us sit down quickly.', 'a few', ['a little', 'much', 'less']],
+      ['Can I have ___ more time to finish my drawing?', 'a little', ['a few', 'many', 'much']],
+      ['There were ___ clouds in the sky, so we stayed outside to play.', 'few', ['little', 'much', 'many']],
+      ['He ate ___ biscuits but saved the rest for his sister.', 'some', ['any', 'much', 'a little']],
     ];
     const upperRows = [
       ['There are ___ marbles in this small pouch.', 'few', ['little', 'much', 'less']],
@@ -421,6 +489,11 @@ const GRAMMAR_BUILDERS = {
       ['You can enter only ___ you have an entry pass.', 'if', ['as', 'while', 'until']],
       ['Shake the bottle well ___ you pour out the sauce.', 'before', ['as', 'when', 'after']],
       ['I kept ringing the doorbell ___ someone finally opened the door.', 'until', ['since', 'unless', 'while']],
+      ['She wore a raincoat ___ she knew it might drizzle later.', 'because', ['but', 'or', 'when']],
+      ['He was ill, ___ he still came to school for the important test.', 'but', ['and', 'so', 'because']],
+      ['The teacher waited ___ the whole class was quiet.', 'until', ['since', 'while', 'as']],
+      ['Read the passage carefully ___ you try to answer the questions.', 'before', ['after', 'when', 'so']],
+      ['The shop was closed, ___ we went home without buying anything.', 'so', ['but', 'and', 'because']],
     ];
     const upperRows = [
       ['The sky darkened, ___ we packed our raincoats.', 'so', ['but', 'or', 'because']],
@@ -488,7 +561,7 @@ const GRAMMAR_BUILDERS = {
   },
   comparatives(level, i) {
     const rows = [
-      ['This puzzle is ___ than yesterday’s puzzle.', 'harder', ['hard', 'hardest', 'more hard']],
+      ['This puzzle is ___ than yesterday\'s puzzle.', 'harder', ['hard', 'hardest', 'more hard']],
       ['The new route is ___ than the old one.', 'shorter', ['short', 'shortest', 'more short']],
       ['A cheetah is ___ than a rabbit.', 'faster', ['fast', 'fastest', 'more fast']],
       ['Today is ___ than Monday.', 'hotter', ['hot', 'hottest', 'more hot']],
@@ -524,7 +597,7 @@ const GRAMMAR_BUILDERS = {
     const rows = [
       ['You ___ submit the form by Friday.', 'must', ['might', 'could', 'would']],
       ['May I borrow your marker? Yes, you ___.', 'may', ['must', 'should', 'would']],
-      ['If you feel unwell, you ___ see the school nurse.', 'should', ['might', 'would', 'can’t']],
+      ['If you feel unwell, you ___ see the school nurse.', 'should', ['might', 'would', 'can\'t']],
       ['The sign says we ___ run in the corridor.', 'must not', ['should', 'might', 'could']],
       ['"___ you please hold the door for the smaller pupils?" asked Mrs Tan.', 'Could', ['Should', 'Must', 'Will']],
       ['You ___ bring your spelling book tomorrow because we have a test.', 'have to', ['could', 'might', 'would']],
@@ -614,7 +687,7 @@ const GRAMMAR_BUILDERS = {
       ['She practises daily, so she usually ___ well.', 'performs', ['performed', 'is performing', 'has performed']],
       ['We ___ for twenty minutes before the rain stopped.', 'had been waiting', ['have waited', 'are waiting', 'waited']],
       ['Next month, they ___ the same project for a year.', 'will have done', ['have done', 'did', 'do']],
-      ['Whenever I visit Singapore, I always ___ at my grandmother’s house.', 'stay', ['stayed', 'have stayed', 'will stay']],
+      ['Whenever I visit Singapore, I always ___ at my grandmother\'s house.', 'stay', ['stayed', 'have stayed', 'will stay']],
       ['Right now, my cousin ___ a documentary about marine animals.', 'is watching', ['watches', 'watched', 'will watch']],
       ['By next Friday, the construction team ___ the new bridge.', 'will have finished', ['finished', 'has finished', 'will finish']],
       ['Every morning before the bell rang, the children ___ in the courtyard.', 'gathered', ['gather', 'are gathering', 'have gathered']],
