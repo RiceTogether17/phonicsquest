@@ -9071,6 +9071,15 @@ details.story-tool-section[open] > .story-tool-summary::before {
   margin-top: 2px;
 }
 
+.vmcq-next-wrap {
+  margin-top: 1.25rem;
+  text-align: center;
+}
+
+.vmcq-next-btn {
+  min-width: 140px;
+}
+
 /* Category tag shown above each question */
 .mcq-category-tag {
   font-size: var(--font-size-xs, 0.75rem);
