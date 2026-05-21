@@ -48,35 +48,6 @@ const LEVEL_CATEGORY_PLAN = {
     'grammarPrepositions', 'grammarArticles', 'grammarSVA',
   ],
 };
-// 16 context tails — together with the 3 level-specific tails the pool
-// is 19, a prime size.  See grammarMcq.js for the rationale (prime pool
-// keeps every step coprime with pool size, eliminating duplicate stems).
-const CONTEXT_TAILS = [
-  'during morning assembly',
-  'in class discussion',
-  'while revising for the exam',
-  'at the neighbourhood library',
-  'during project work',
-  'before the oral presentation',
-  'during group rehearsal',
-  'at the science corner',
-  'in the canteen queue',
-  'during values-in-action day',
-  'during enrichment week',
-  'before the final check',
-  'during after-school care',
-  'before lining up for recess',
-  'during silent reading',
-  'after the show-and-tell session',
-];
-const LEVEL_TAILS = {
-  P1: ['during a short class story', 'before playtime', 'after phonics station'],
-  P2: ['during worksheet practice', 'before sharing time', 'after library period'],
-  P3: ['during group discussion', 'before oral reading', 'after science period'],
-  P4: ['during project reflection', 'before class presentation', 'after feedback session'],
-  P5: ['during exam revision', 'before composition drafting', 'after problem-solving workshop'],
-  P6: ['during PSLE preparation', 'before timed correction', 'after strategy review'],
-};
 
 function rotate(arr, idx) {
   return arr[idx % arr.length];
@@ -98,39 +69,6 @@ function difficultyFor(level, idx) {
   if (level === 'P1' || level === 'P2') return idx % 5 === 0 ? 2 : 1;
   if (level === 'P3' || level === 'P4') return idx % 4 === 0 ? 3 : 2;
   return idx % 3 === 0 ? 3 : 2;
-}
-
-// Common sentence-starters that are NOT proper nouns and so can be
-// safely lowercased after a fronted context phrase + comma.
-const STEM_STARTERS_TO_LOWERCASE = new Set([
-  'a', 'an', 'the', 'this', 'that', 'these', 'those',
-  'he', 'she', 'it', 'we', 'they', 'you',
-  'can', 'could', 'will', 'would', 'shall', 'should', 'may', 'might', 'must',
-  'do', 'does', 'did', 'is', 'are', 'was', 'were', 'has', 'have', 'had',
-  'look', 'listen', 'see', 'watch',
-  'how', 'what', 'when', 'where', 'who', 'whose', 'which', 'why',
-  'please', 'pass', 'put', 'tell',
-]);
-
-function _lowercaseFirstWordIfCommon(s) {
-  const m = s.match(/^("?)([A-Z][a-z']+)\b/);
-  if (!m) return s;
-  const [full, openQuote, word] = m;
-  if (!STEM_STARTERS_TO_LOWERCASE.has(word.toLowerCase())) return s;
-  return openQuote + word.charAt(0).toLowerCase() + word.slice(1) + s.slice(full.length);
-}
-
-function decorateStem(stem, level, idx) {
-  const stemStr = String(stem);
-  // Multiplicative hash with a prime-sized pool so consecutive idx
-  // values cycle through every tail slot before repeating.
-  const pool = [...(LEVEL_TAILS[level] || []), ...CONTEXT_TAILS];
-  const tail = pool[Math.abs(idx * 2654435761) % pool.length];
-  if (/[?!]\s*$/.test(stemStr)) {
-    const opener = tail.charAt(0).toUpperCase() + tail.slice(1);
-    return `${opener}, ${_lowercaseFirstWordIfCommon(stemStr)}`;
-  }
-  return `${stemStr.replace(/\.$/, '')} ${tail}.`;
 }
 
 const VOCAB_BUILDERS = {
@@ -853,7 +791,7 @@ function buildLevel(level) {
       category: toCanonicalCategory(spec.category),
       subskill: spec.subskill,
       difficulty: difficultyFor(level, i),
-      q: decorateStem(spec.q, level, i + localIndex * 2),
+      q: spec.q,
       choices: spec.choices,
       answer: spec.answer,
       explain: spec.explain,
