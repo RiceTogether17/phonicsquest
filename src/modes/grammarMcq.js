@@ -235,6 +235,9 @@ function _renderQuestion() {
         ${item.choices.map(c => `<button class="pt-choice-btn" data-choice="${c}" aria-label="Choose ${c}">${c}</button>`).join('')}
       </div>
       <p class="pt-grammar-hint" id="gmcq-hint" role="status" aria-live="polite"></p>
+      <div class="vmcq-next-wrap" id="gmcq-next-wrap" style="display:none">
+        <button class="btn btn--primary vmcq-next-btn" id="gmcq-next" aria-label="Next question"></button>
+      </div>
     </div>`;
 
   _container.querySelectorAll('[data-choice]').forEach(btn => {
@@ -300,11 +303,19 @@ function _renderQuestion() {
 
       if (hint) hint.innerHTML = hintText;
 
-      _advanceTimer = setTimeout(() => {
-        _advanceTimer = null;
-        _idx += 1;
-        _renderQuestion();
-      }, ok ? 1400 : 2200);
+      const nextWrap = _container.querySelector('#gmcq-next-wrap');
+      const nextBtn = _container.querySelector('#gmcq-next');
+      if (nextWrap && nextBtn) {
+        const isLast = _idx + 1 >= _items.length;
+        nextBtn.textContent = isLast ? 'See Results →' : 'Next →';
+        nextBtn.setAttribute('aria-label', isLast ? 'See results' : 'Next question');
+        nextWrap.style.display = '';
+        nextBtn.addEventListener('click', () => {
+          _idx += 1;
+          _renderQuestion();
+        });
+        nextBtn.focus();
+      }
     });
   });
 }

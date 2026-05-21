@@ -409,28 +409,38 @@ function _onQuizChoice(btn) {
   if (!word) return;
   _quizBusy = true;
 
+  const panel = document.getElementById('sl-recall');
   if (word === _quizTarget) {
     btn.classList.add('sl-quiz-choice--correct');
     _quizCorrect++;
     audio.playSfx('correct');
-    setTimeout(() => {
-      _quizBusy = false;
-      _nextQuizRound();
-    }, 700);
   } else {
     btn.classList.add('sl-quiz-choice--wrong');
     btn.setAttribute('disabled', '');
     audio.playSfx('wrong');
     // Highlight the correct one so it's a learning moment, not a punishment.
-    const panel = document.getElementById('sl-recall');
     const correctBtn = panel?.querySelector(
       `.sl-quiz-choice[data-word="${_attrEscape(_quizTarget)}"]`,
     );
     correctBtn?.classList.add('sl-quiz-choice--hint');
-    setTimeout(() => {
+  }
+
+  // Let the student control when to move on
+  const card = panel?.querySelector('.sl-recall-card--quiz');
+  if (card) {
+    const wrap = document.createElement('div');
+    wrap.className = 'vmcq-next-wrap';
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'btn btn--primary vmcq-next-btn';
+    nextBtn.textContent = _quizRound >= _quizTotal ? 'See Results →' : 'Next →';
+    nextBtn.setAttribute('aria-label', _quizRound >= _quizTotal ? 'See results' : 'Next word');
+    wrap.appendChild(nextBtn);
+    card.appendChild(wrap);
+    nextBtn.addEventListener('click', () => {
       _quizBusy = false;
       _nextQuizRound();
-    }, 1100);
+    });
+    nextBtn.focus();
   }
 }
 

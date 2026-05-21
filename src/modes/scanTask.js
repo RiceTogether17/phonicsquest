@@ -213,10 +213,22 @@ export function renderScanTask({ host, task, onAnswer, onSkip, allowSkip = true 
           ? `Good scan! Look for the ${getClueTypeLabel(task.expectedClueType).toLowerCase()}.`
           : `Not quite. The clue is the ${getClueTypeLabel(task.expectedClueType).toLowerCase()}.`;
       }
-      setTimeout(() => {
-        overlay.remove();
-        onAnswer?.({ correct, chosenClueType: chosen, expectedClueType: task.expectedClueType });
-      }, 700);
+      const card = overlay.querySelector('.scan-task-card');
+      if (card) {
+        const wrap = document.createElement('div');
+        wrap.className = 'vmcq-next-wrap';
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'btn btn--primary vmcq-next-btn';
+        nextBtn.textContent = 'Got it →';
+        nextBtn.setAttribute('aria-label', 'Continue');
+        wrap.appendChild(nextBtn);
+        card.appendChild(wrap);
+        nextBtn.addEventListener('click', () => {
+          overlay.remove();
+          onAnswer?.({ correct, chosenClueType: chosen, expectedClueType: task.expectedClueType });
+        });
+        nextBtn.focus();
+      }
     });
   });
 
