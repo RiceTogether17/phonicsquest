@@ -68,7 +68,8 @@ const PHONEME_FILES = {
   long_y:  'long_i',  // final y as long i (cry, fly, sky) → long I sound
   long_ie: 'long_i',  // ie (pie, tie)                    → long I sound
   long_igh:'long_i',  // igh (night, light, high)         → long I sound
-  long_oo: 'long_u',  // oo (moon, food, zoo)             → long U sound
+  // long_oo is intentionally absent: long_u.mp3 says /juː/ ("you"), not /uː/ ("oo").
+  // It falls through to PHONEME_TTS where long_oo → 'oo' gives the correct sound.
   long_ue: 'long_u',  // ue (cube split-digraph, blue)    → long U sound
   long_ew: 'long_u',  // ew (new, drew, blew)             → long U sound
   // Diphthongs  (oi covers oi+oy, ow covers ow+ou, aw covers aw+au)
@@ -178,7 +179,9 @@ const PHONEME_TTS = {
   long_ea: 'ee',  long_ee: 'ee',
   long_oa: 'oh',  long_ow: 'oh',  long_oe: 'oh',
   long_y:  'eye', long_ie: 'eye', long_igh: 'eye',
-  long_oo: 'oo',  long_ue: 'you', long_ew: 'oo',
+  long_oo:  'oo',   // /uː/ as in moon, food, zoo
+  short_oo: 'oo',   // /ʊ/  as in book, look, cook (closest TTS match)
+  long_ue: 'you', long_ew: 'oo',
   // R-controlled vowels
   ar: 'ar',  or: 'or',  er: 'err',
   ir: 'err', ur: 'err',
