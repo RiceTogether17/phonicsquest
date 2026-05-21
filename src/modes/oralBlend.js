@@ -108,9 +108,16 @@ function _handleChoice(choice, btn, word, els, grid) {
   // Play full word
   setTimeout(() => audio.speakWord(word.word), 400);
 
-  setTimeout(() => {
-    els.onResult(correct, responseTime);
-  }, correct ? 800 : 1500);
+  const wrap = document.createElement('div');
+  wrap.className = 'vmcq-next-wrap';
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'btn btn--primary vmcq-next-btn';
+  nextBtn.textContent = 'Next →';
+  nextBtn.setAttribute('aria-label', 'Next word');
+  wrap.appendChild(nextBtn);
+  els.modeArea.appendChild(wrap);
+  nextBtn.addEventListener('click', () => els.onResult(correct, responseTime));
+  nextBtn.focus();
 }
 
 export function getCurrentWord() { return currentWord; }

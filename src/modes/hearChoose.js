@@ -81,10 +81,16 @@ function handleChoice(chosen, btn, target, els, grid) {
   // Play correct word
   setTimeout(() => audio.speakWord(target.word), 500);
 
-  // Report result after a short delay for visual feedback
-  setTimeout(() => {
-    els.onResult(correct, responseTime);
-  }, correct ? 800 : 1500);
+  const wrap = document.createElement('div');
+  wrap.className = 'vmcq-next-wrap';
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'btn btn--primary vmcq-next-btn';
+  nextBtn.textContent = 'Next →';
+  nextBtn.setAttribute('aria-label', 'Next word');
+  wrap.appendChild(nextBtn);
+  els.modeArea.appendChild(wrap);
+  nextBtn.addEventListener('click', () => els.onResult(correct, responseTime));
+  nextBtn.focus();
 }
 
 export function getCurrentWord() {

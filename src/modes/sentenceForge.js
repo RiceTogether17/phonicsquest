@@ -396,7 +396,21 @@ function _handleMissionWordTap(btn, entry, words) {
   if (correct) _sessionClueCorrect++;
 
   audio.playSfx(correct ? 'correct' : 'wrong');
-  setTimeout(() => _setupArrangePhase(entry), correct ? 1400 : 2200);
+
+  // Disable all word buttons so student can't re-tap while reading feedback
+  document.querySelectorAll('.clue-mission-word-btn').forEach(b => { b.disabled = true; });
+
+  // Replace the skip button with a Continue button so the student controls pacing
+  const skipBtn = document.getElementById('sfq-mission-skip');
+  if (skipBtn) {
+    const contBtn = skipBtn.cloneNode(false);
+    contBtn.className = 'btn btn--primary';
+    contBtn.textContent = 'Continue →';
+    contBtn.setAttribute('aria-label', 'Continue to build the sentence');
+    contBtn.addEventListener('click', () => _setupArrangePhase(entry));
+    skipBtn.replaceWith(contBtn);
+    contBtn.focus();
+  }
 }
 
 // ── Arrange Phase ────────────────────────────────────────────────────────────
