@@ -234,14 +234,19 @@ function renderSentenceCombiningSection(section, sectionKey) {
 function renderSynthesisSection(section, sectionKey) {
   const items = section.items.map((item, i) => {
     const alts = (item.alternates || []).join('|');
+    const requiredGroupsAttr = Array.isArray(item.requiredGroups) && item.requiredGroups.length
+      ? JSON.stringify(item.requiredGroups)
+      : '';
     return `
       <li class="ptg-question" data-q-index="${i}">
         <p class="ptg-q-stem">${i + 1}. ${escapeHtml(item.q)}</p>
         <p class="ptg-synthesis-stem"><strong>Begin with:</strong> <code>${escapeHtml(item.stem)}</code></p>
         <textarea class="ptg-input ptg-input--area" rows="2"
                   data-q-key="${sectionKey}/${i}"
+                  data-q-type="synthesis"
                   data-answer="${escapeAttr(item.answer)}"
                   data-accept="${escapeAttr(alts)}"
+                  data-required-groups="${escapeAttr(requiredGroupsAttr)}"
                   data-skill="${escapeAttr(item.skillKey || item.skill || 'synthesis')}"
                   data-practise="sentence-forge"
                   placeholder="Write your transformed sentence…"></textarea>
@@ -511,6 +516,16 @@ function gradeInput(el) {
     const keywords = (el.getAttribute('data-keywords') || '').split('|').filter(Boolean);
     const requiredGroups = _parseRequiredGroups(el.getAttribute('data-required-groups'));
     const result = gradeShortAnswer(value, { expected, accepts, keywords, requiredGroups });
+    return { fraction: result.fraction, trace: result.trace };
+  }
+
+  if (qType === 'synthesis') {
+    // PSLE Synthesis & Transformation: full-credit on exact-match OR an
+    // accepted alternate; partial credit (1/2) when requiredGroups
+    // captures only one of the two meaning units — mirroring the marker's
+    // structure-vs-content split.
+    const requiredGroups = _parseRequiredGroups(el.getAttribute('data-required-groups'));
+    const result = gradeShortAnswer(value, { expected, accepts, requiredGroups });
     return { fraction: result.fraction, trace: result.trace };
   }
 

@@ -336,6 +336,72 @@ describe('Comprehension OE — requiredGroups + negation-aware partial credit', 
   });
 });
 
+describe('Practice Test Section F — PSLE-style partial credit in synthesis', () => {
+  beforeEach(() => { document.body.innerHTML = ''; });
+
+  function jumpToSectionF(paper) {
+    const { root } = mount(paper);
+    while (!root.querySelector('.ptg-section-title')?.textContent?.includes('Synthesis')) {
+      const check = root.querySelector('[data-action="check"]');
+      if (!check || check.hidden) break;
+      check.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      const next = root.querySelector('[data-action="next"]');
+      if (!next || next.hidden) break;
+      next.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    }
+    return root;
+  }
+
+  it('every P5/P6 sectionF item declares 2 required groups for the marker\'s 1+1 split', async () => {
+    const { P5_PRACTICE_TESTS } = await import('../data/p5PracticeTests.js');
+    const { P6_PRACTICE_TESTS } = await import('../data/p6PracticeTests.js');
+    const offenders = [];
+    for (const [lvl, bank] of [['P5', P5_PRACTICE_TESTS], ['P6', P6_PRACTICE_TESTS]]) {
+      for (const term of ['T1', 'T2', 'T3', 'T4']) {
+        const items = bank[term]?.sectionF?.items || [];
+        items.forEach((it, i) => {
+          if (!Array.isArray(it.requiredGroups) || it.requiredGroups.length !== 2) {
+            offenders.push(`${lvl}/${term}/sectionF[${i}]`);
+          }
+        });
+      }
+    }
+    expect(offenders, offenders.join(', ')).toEqual([]);
+  });
+
+  it('renders synthesis textareas with data-q-type="synthesis" and data-required-groups attribute', () => {
+    const paper = P6_PRACTICE_TESTS.T1;
+    const root = jumpToSectionF(paper);
+    const ta = root.querySelector('textarea[data-q-type="synthesis"]');
+    expect(ta, 'expected at least one synthesis textarea').toBeTruthy();
+    expect(ta.getAttribute('data-required-groups'), 'required-groups attribute must be present').toBeTruthy();
+  });
+
+  it('awards partial credit (◐) when only one of the two meaning units is preserved', () => {
+    const paper = P6_PRACTICE_TESTS.T1;
+    const root = jumpToSectionF(paper);
+    // Item 1 = "The pollution was too ___" → "severe for the fish to survive in the water"
+    // Group A: too severe / severe for the fish. Group B: survive / live.
+    // Type something that hits A but misses B.
+    const ta = root.querySelector('textarea[data-q-key="sectionF/1"]');
+    expect(ta).toBeTruthy();
+    ta.value = 'too severe but the fish managed to swim away';
+    root.querySelector('[data-action="check"]').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const fb = root.querySelector('[data-feedback-for="sectionF/1"]');
+    expect(fb?.className, fb?.outerHTML).toContain('ptg-feedback--partial');
+  });
+
+  it('awards full credit when both meaning units appear unnegated', () => {
+    const paper = P6_PRACTICE_TESTS.T1;
+    const root = jumpToSectionF(paper);
+    const ta = root.querySelector('textarea[data-q-key="sectionF/1"]');
+    ta.value = 'severe for the fish to survive in the water';
+    root.querySelector('[data-action="check"]').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const fb = root.querySelector('[data-feedback-for="sectionF/1"]');
+    expect(fb?.className).toContain('ptg-feedback--ok');
+  });
+});
+
 describe('Summary distinguishes self-assessed writing from the auto-graded total', () => {
   beforeEach(() => { document.body.innerHTML = ''; });
 
