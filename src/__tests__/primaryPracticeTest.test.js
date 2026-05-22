@@ -280,6 +280,62 @@ describe('Validator regressions — answer-in-choices + duplicate-choice + Secti
   });
 });
 
+describe('Comprehension OE — requiredGroups + negation-aware partial credit', () => {
+  beforeEach(() => { document.body.innerHTML = ''; });
+
+  function mountToComprehension(paper) {
+    const { root } = mount(paper);
+    // Click through every section without answering until we land on the
+    // comprehension passage (Section H).
+    while (!root.querySelector('.ptg-passage')) {
+      const check = root.querySelector('[data-action="check"]');
+      if (!check || check.hidden) break;
+      check.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      const next = root.querySelector('[data-action="next"]');
+      if (!next || next.hidden) break;
+      next.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    }
+    return root;
+  }
+
+  it('a negated answer does NOT credit the keyword (e.g. "not urgent" with keyword "urgent")', () => {
+    const paper = P6_PRACTICE_TESTS.T1;
+    const root = mountToComprehension(paper);
+    // The evidence question at sectionH/3 uses requiredGroups for the
+    // Coral Reefs passage. Type an answer whose only "hits" are negated.
+    const ta = root.querySelector('textarea[data-q-key="sectionH/3"]');
+    expect(ta, 'expected an evidence textarea at sectionH/3').toBeTruthy();
+    ta.value = 'It is not bleaching and there is no sedimentation at all.';
+    root.querySelector('[data-action="check"]').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const fb = root.querySelector('[data-feedback-for="sectionH/3"]');
+    // Negation should disqualify both meaning units → 0 marks → "no" feedback.
+    expect(fb?.className).toContain('ptg-feedback--no');
+  });
+
+  it('awards partial credit when only ONE required meaning unit is hit', () => {
+    const paper = P6_PRACTICE_TESTS.T1;
+    const root = mountToComprehension(paper);
+    const ta = root.querySelector('textarea[data-q-key="sectionH/3"]');
+    // Mentions a global threat (bleaching) but no local Singapore threat.
+    ta.value = 'Rising sea temperatures cause widespread bleaching across the reefs.';
+    root.querySelector('[data-action="check"]').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const fb = root.querySelector('[data-feedback-for="sectionH/3"]');
+    expect(fb?.className, fb?.outerHTML).toContain('ptg-feedback--partial');
+    // The teacher-style marking guide should call out what was missing.
+    expect(fb?.textContent || '').toMatch(/Missing/i);
+  });
+
+  it('awards full credit when BOTH required meaning units appear unnegated', () => {
+    const paper = P6_PRACTICE_TESTS.T1;
+    const root = mountToComprehension(paper);
+    const ta = root.querySelector('textarea[data-q-key="sectionH/3"]');
+    ta.value = 'Singapore reefs suffer from bleaching driven by rising temperatures, on top of local sedimentation from land reclamation.';
+    root.querySelector('[data-action="check"]').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const fb = root.querySelector('[data-feedback-for="sectionH/3"]');
+    expect(fb?.className).toContain('ptg-feedback--ok');
+  });
+});
+
 describe('Summary distinguishes self-assessed writing from the auto-graded total', () => {
   beforeEach(() => { document.body.innerHTML = ''; });
 

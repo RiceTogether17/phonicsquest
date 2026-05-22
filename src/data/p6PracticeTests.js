@@ -400,6 +400,14 @@ Alex Tan`,
           marks: 2,
           q: 'Using evidence from paragraphs 2 and 3, explain why coral reefs in Singapore face a particularly difficult situation.',
           model: 'Singapore\'s reefs face both global threats (rising temperatures causing bleaching) and local threats specific to a highly developed city-state (sedimentation from land reclamation and boat traffic). This combination makes recovery harder than in more remote locations.',
+          // Two required meaning units, 1 mark each. The student must mention
+          // BOTH a global / climate-driven threat AND a local Singapore-specific
+          // threat — naming only one earns half marks.
+          requiredGroups: [
+            ['bleaching', 'rising temperature', 'global warming', 'climate'],
+            ['sedimentation', 'land reclamation', 'pollution', 'boat traffic', 'urban'],
+          ],
+          // Retained for back-compat — used only when requiredGroups is absent.
           keywords: ['bleaching', 'sedimentation', 'land reclamation', 'pollution', 'global'],
         },
         {

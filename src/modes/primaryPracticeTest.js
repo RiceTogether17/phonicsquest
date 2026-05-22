@@ -26,6 +26,7 @@
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 import { GRAMMAR_CATEGORIES } from '../data/grammarCategories.js';
 import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
+import { gradeShortAnswer } from './scoring/shortAnswerGrader.js';
 
 function shuffle(arr) {
   const a = [...arr];
@@ -303,6 +304,23 @@ function renderEditingSection(section, sectionKey) {
     <div class="ptg-feedback" data-feedback-for="${sectionKey}/all" hidden></div>`;
 }
 
+/**
+ * Render the data-* attributes a short-answer comprehension input needs
+ * for the grader. Pulls model answer, accept list, legacy keywords, and
+ * the strict requiredGroups (JSON-encoded) off the question object.
+ */
+function _shortAnswerAttrs(q) {
+  const keywordsAttr = (q.keywords || []).join('|');
+  const acceptsAttr = (q.acceptable || []).join('|');
+  const requiredGroupsAttr = Array.isArray(q.requiredGroups) && q.requiredGroups.length
+    ? JSON.stringify(q.requiredGroups)
+    : '';
+  return `data-answer="${escapeAttr(q.model || '')}"
+          data-keywords="${escapeAttr(keywordsAttr)}"
+          data-accept="${escapeAttr(acceptsAttr)}"
+          data-required-groups="${escapeAttr(requiredGroupsAttr)}"`;
+}
+
 function renderComprehensionSection(section, sectionKey) {
   const passage = `<p class="ptg-passage">${escapeHtml(section.passage)}</p>`;
   const items = (section.questions || []).map((q, i) => {
@@ -383,12 +401,11 @@ function renderComprehensionSection(section, sectionKey) {
 
     // type: 'evidence' — requires a direct quote + explanation
     if (q.type === 'evidence') {
-      const keywordsAttr = (q.keywords || []).join('|');
       return `<li>${stem}
         <p class="ptg-scaffold-hint">📌 Quote a phrase from the passage, then explain what it shows.</p>
         <p class="ptg-scaffold-example"><em>Example structure:</em> "…" — This shows that…</p>
         <textarea class="ptg-input ptg-input--area" rows="3" data-q-key="${qKey}"
-          data-answer="${escapeAttr(q.model || '')}" data-keywords="${escapeAttr(keywordsAttr)}"
+          ${_shortAnswerAttrs(q)}
           data-q-type="short" data-marks="${q.marks}"
           placeholder="&quot;[quote from passage]&quot; This shows that…"></textarea>
         <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
@@ -396,26 +413,24 @@ function renderComprehensionSection(section, sectionKey) {
 
     // type: 'language-use' — effect of language / figurative expression
     if (q.type === 'language-use') {
-      const keywordsAttr = (q.keywords || []).join('|');
       return `<li>${stem}
         <p class="ptg-scaffold-hint">💬 State what the word / phrase means or suggests, then explain the effect on the reader.</p>
         <p class="ptg-scaffold-example"><em>Example structure:</em> The phrase "…" suggests… / The effect on the reader is…</p>
         <textarea class="ptg-input ptg-input--area" rows="3" data-q-key="${qKey}"
-          data-answer="${escapeAttr(q.model || '')}" data-keywords="${escapeAttr(keywordsAttr)}"
+          ${_shortAnswerAttrs(q)}
           data-q-type="short" data-marks="${q.marks}"
           placeholder="The word/phrase … suggests… The effect on the reader is…"></textarea>
         <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
     }
 
     // type: 'short' (default — factual / inference / vocabulary / personal-response)
-    const keywordsAttr = (q.keywords || []).join('|');
     const isOneWord = (q.model || '').trim().split(/\s+/).length <= 3;
     const input = isOneWord
       ? `<input type="text" class="ptg-input ptg-input--full" data-q-key="${qKey}"
-         data-answer="${escapeAttr(q.model || '')}" data-keywords="${escapeAttr(keywordsAttr)}"
+         ${_shortAnswerAttrs(q)}
          data-q-type="short" data-marks="${q.marks}" placeholder="Type your answer" autocomplete="off">`
       : `<textarea class="ptg-input ptg-input--area" rows="2" data-q-key="${qKey}"
-         data-answer="${escapeAttr(q.model || '')}" data-keywords="${escapeAttr(keywordsAttr)}"
+         ${_shortAnswerAttrs(q)}
          data-q-type="short" data-marks="${q.marks}" placeholder="Type your answer in a full sentence"></textarea>`;
     return `<li>${stem}${input}
       <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
@@ -462,17 +477,23 @@ const SECTION_RENDERERS = {
 /* Grading                                                                */
 /* ────────────────────────────────────────────────────────────────────── */
 
-function isShortAnswerCorrect(userValue, expected, keywordsAttr) {
-  const u = _normalize(userValue);
-  if (!u) return false;
-  const e = _normalize(expected);
-  if (u === e) return true;
-  const keywords = (keywordsAttr || '').split('|').filter(Boolean);
-  if (keywords.length === 0) return false;
-  // Pass if at least one expected keyword appears in the user's answer.
-  return keywords.some(k => u.includes(_normalize(k)));
+function _parseRequiredGroups(attr) {
+  if (!attr) return null;
+  try {
+    const parsed = JSON.parse(attr);
+    return Array.isArray(parsed) && parsed.length ? parsed : null;
+  } catch {
+    return null;
+  }
 }
 
+/**
+ * gradeInput returns one of:
+ *   - null  → not gradable (radio not checked, writing input)
+ *   - true  → fully correct
+ *   - false → fully incorrect
+ *   - { fraction, trace } → partial credit (short answers only)
+ */
 function gradeInput(el) {
   const expected = el.getAttribute('data-answer') || '';
   const accepts = (el.getAttribute('data-accept') || '').split('|').filter(Boolean);
@@ -487,8 +508,10 @@ function gradeInput(el) {
   }
 
   if (qType === 'short') {
-    const keywords = el.getAttribute('data-keywords') || '';
-    return isShortAnswerCorrect(value, expected, keywords);
+    const keywords = (el.getAttribute('data-keywords') || '').split('|').filter(Boolean);
+    const requiredGroups = _parseRequiredGroups(el.getAttribute('data-required-groups'));
+    const result = gradeShortAnswer(value, { expected, accepts, keywords, requiredGroups });
+    return { fraction: result.fraction, trace: result.trace };
   }
 
   if (el.tagName === 'TEXTAREA' || (qType === '' && el.classList.contains('ptg-input--area'))) {
@@ -598,10 +621,19 @@ function gradeSection(root, sectionKey, section) {
     }
     const marks = Number(el.getAttribute('data-marks')) || readSectionMarks(section, sectionKey, numGradable);
     total += marks;
-    const correct = grade === true;
-    if (correct) scored += marks;
+    // Short-answer grader can return a partial-credit object; everything
+    // else returns boolean. Roll both into a single 0..1 fraction.
+    const fraction = (typeof grade === 'object' && grade !== null) ? grade.fraction
+      : (grade === true ? 1 : 0);
+    const earned = marks * fraction;
+    scored += earned;
+    const correct = fraction >= 1;
+    const partial = fraction > 0 && fraction < 1;
     perKey.set(key, {
-      key, marks, correct,
+      key, marks, correct, partial,
+      earned,
+      fraction,
+      trace: (typeof grade === 'object' && grade !== null) ? grade.trace : null,
       answered: !!String(el.value || '').trim(),
       userValue: el.value || '',
       expected: el.getAttribute('data-answer') || '',
@@ -630,6 +662,27 @@ function gradeSection(root, sectionKey, section) {
 /** Display a possibly-fractional mark count without a trailing ".0". */
 function _fmtMark(n) {
   return Number.isInteger(n) ? String(n) : (Math.round(n * 10) / 10).toString();
+}
+
+/**
+ * Render the per-question marking trace as a small teacher-style guide:
+ * what meaning units hit, what was missed. Only shown when the grader
+ * actually ran a structured check (requiredGroups path); otherwise empty.
+ */
+function _markingGuideHtml(info) {
+  const t = info?.trace;
+  if (!t) return '';
+  const hits = (t.hits || []).filter(Boolean);
+  const misses = (t.misses || []).filter(Boolean);
+  if (t.reason !== 'required-groups' && t.reason !== 'no-keyword-hit') return '';
+  if (!hits.length && !misses.length) return '';
+  const hitsHtml = hits.length
+    ? `<li class="ptg-mark-hit">✓ Meaning units found: ${hits.map(h => `<code>${escapeHtml(h)}</code>`).join(', ')}</li>`
+    : '';
+  const missHtml = misses.length
+    ? `<li class="ptg-mark-miss">✗ Missing: ${misses.map(m => `<code>${escapeHtml(m)}</code>`).join(', ')}</li>`
+    : '';
+  return `<ul class="ptg-marking-guide">${hitsHtml}${missHtml}</ul>`;
 }
 
 function buildSummaryHtml(paper, sectionResults) {
@@ -832,13 +885,19 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
         fb.innerHTML = '<span>📝 Self-assess: compare your response to the model answer above. Check format, tone, and that all 3 bullet points are covered.</span>';
         return;
       }
-      fb.className = `ptg-feedback ptg-feedback--${info.correct ? 'ok' : 'no'}`;
+      const markingGuide = _markingGuideHtml(info);
       if (info.correct) {
-        fb.innerHTML = `<span>✅ Correct.</span>${skillRow}`;
+        fb.className = 'ptg-feedback ptg-feedback--ok';
+        fb.innerHTML = `<span>✅ Correct${info.marks > 1 ? ` (${_fmtMark(info.earned ?? info.marks)} / ${_fmtMark(info.marks)})` : ''}.</span>${markingGuide}${skillRow}`;
+      } else if (info.partial) {
+        fb.className = 'ptg-feedback ptg-feedback--partial';
+        fb.innerHTML = `<span>◐ Partial credit: ${_fmtMark(info.earned)} / ${_fmtMark(info.marks)}.</span>${markingGuide}<details class="ptg-model-peek"><summary>Show model answer</summary><p>${escapeHtml(info.expected || '')}</p></details>${skillRow}`;
       } else if (!info.answered) {
+        fb.className = 'ptg-feedback ptg-feedback--no';
         fb.innerHTML = `<span>⚠️ Not answered. Correct: <strong>${escapeHtml(info.expected || '')}</strong></span>${skillRow}`;
       } else {
-        fb.innerHTML = `<span>❌ Correct answer: <strong>${escapeHtml(info.expected || '')}</strong></span>${skillRow}`;
+        fb.className = 'ptg-feedback ptg-feedback--no';
+        fb.innerHTML = `<span>❌ Correct answer: <strong>${escapeHtml(info.expected || '')}</strong></span>${markingGuide}${skillRow}`;
       }
     });
   }
