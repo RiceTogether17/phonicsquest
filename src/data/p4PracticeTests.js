@@ -34,6 +34,8 @@
  * Comprehension: passage + questions of type mcq / short / vocab / tf-reason / open
  */
 
+import { checkEditingErrors } from './practiceTestValidators.js';
+
 export const P4_PRACTICE_TEST_TERMS = Object.freeze(['T1', 'T2', 'T3', 'T4']);
 
 export const P4_PRACTICE_TESTS = Object.freeze({
@@ -1488,6 +1490,7 @@ export function validateP4PracticeTests(bank = P4_PRACTICE_TESTS) {
       const blanks = [...sE.paragraph.matchAll(editingBlankRe)].map(m => Number(m[1]));
       if (blanks.length !== 5) issues.push(`${tag}/sectionE: expected 5 editing blanks, found ${blanks.length}`);
       if (!Array.isArray(sE.errors) || sE.errors.length !== 5) issues.push(`${tag}/sectionE: expected 5 errors`);
+      checkEditingErrors(issues, `${tag}/sectionE`, sE);
     }
 
     // Section F — synthesis, 5 items

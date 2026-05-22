@@ -72,3 +72,34 @@ export function checkSectionMarks(issues, tag, section, kind, expectedItems) {
     issues.push(`${tag}: declared marks=${section.marks} but ${expectedItems} ${kind} items × ${weight} = ${expected} mark${expected === 1 ? '' : 's'}`);
   }
 }
+
+/** Compare two strings ignoring case + trailing/leading whitespace. */
+function _eqLoose(a, b) {
+  return String(a ?? '').trim().toLowerCase() === String(b ?? '').trim().toLowerCase();
+}
+
+/**
+ * Verify an editing section: every blank should test a REAL error.
+ *
+ * PSLE editing sections explicitly tell the student "the passage contains
+ * errors" — so each numbered blank must have a correction that differs
+ * from the underlined wrong text. "No change" / control items confuse the
+ * exam discipline (students stop hunting for errors) and never appear in
+ * real papers.
+ *
+ * Punctuation blanks have an empty `wrong` (just the circle marker) and
+ * a non-empty `correction` — those are real errors by construction, not
+ * "no change", so we only flag matches when BOTH fields are non-empty.
+ */
+export function checkEditingErrors(issues, tag, section) {
+  if (!section || !Array.isArray(section.errors)) return;
+  for (let i = 0; i < section.errors.length; i += 1) {
+    const e = section.errors[i];
+    const wrong = String(e?.wrong ?? '');
+    const correction = String(e?.correction ?? '');
+    if (!wrong.trim() || !correction.trim()) continue; // punctuation slot
+    if (_eqLoose(wrong, correction)) {
+      issues.push(`${tag}/error[${i}] (num ${e.num}): "wrong" and "correction" are both "${wrong}" — every editing blank must test a real error.`);
+    }
+  }
+}

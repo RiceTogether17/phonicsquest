@@ -34,7 +34,7 @@
  *   T4 — global issues / youth activism (balanced PSLE review)
  */
 
-import { checkMcqItems, checkSectionMarks } from './practiceTestValidators.js';
+import { checkMcqItems, checkSectionMarks, checkEditingErrors } from './practiceTestValidators.js';
 
 export const P6_PRACTICE_TEST_TERMS = Object.freeze(['T1', 'T2', 'T3', 'T4']);
 
@@ -1729,6 +1729,7 @@ export function validateP6PracticeTests(bank = P6_PRACTICE_TESTS) {
         issues.push(`${tag}/sectionI: expected 10 numbered errors, found ${blanks.length}`);
       if (!Array.isArray(sI.errors) || sI.errors.length !== blanks.length)
         issues.push(`${tag}/sectionI: errors count (${sI.errors?.length ?? 0}) must match blanks (${blanks.length})`);
+      checkEditingErrors(issues, `${tag}/sectionI`, sI);
     }
 
     // Per-section mark/blank alignment.

@@ -23,6 +23,8 @@
  * launchpad into the corresponding drill module.
  */
 
+import { checkEditingErrors } from './practiceTestValidators.js';
+
 export const P2_PRACTICE_TEST_TERMS = Object.freeze(['T1', 'T2', 'T3', 'T4']);
 
 export const P2_PRACTICE_TESTS = Object.freeze({
@@ -591,6 +593,7 @@ export function validateP2PracticeTests(bank = P2_PRACTICE_TESTS) {
         const blanks = [...sG.paragraph.matchAll(editingBlankRe)].map(m => Number(m[1]));
         if (blanks.length !== 5) issues.push(`${tag}/sectionG: expected 5 editing blanks, found ${blanks.length}`);
         if (!Array.isArray(sG.errors) || sG.errors.length !== 5) issues.push(`${tag}/sectionG: expected 5 errors`);
+        checkEditingErrors(issues, `${tag}/sectionG`, sG);
       }
     }
 

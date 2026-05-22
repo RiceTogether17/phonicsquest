@@ -76,6 +76,58 @@ describe('P3 Practice Test data bank', () => {
   });
 });
 
+describe('P3 editing sections — every blank tests a real error', () => {
+  it('no P3 editing item has wrong === correction (no "No change" entries)', () => {
+    const offenders = [];
+    for (const test of getP3PracticeTests()) {
+      const editKey = test.term === 'T3' ? 'sectionG' : 'sectionF';
+      const edit = test[editKey];
+      if (!edit?.errors) continue;
+      for (const e of edit.errors) {
+        const w = String(e.wrong ?? '').trim().toLowerCase();
+        const c = String(e.correction ?? '').trim().toLowerCase();
+        if (w && c && w === c) {
+          offenders.push(`${test.term}/${editKey} num=${e.num}: "${e.wrong}" === "${e.correction}"`);
+        }
+      }
+    }
+    expect(offenders, offenders.join('\n')).toEqual([]);
+  });
+
+  it('P3 T1 passage no longer mentions a non-existent "Carla" — friend name is consistent', () => {
+    const t1 = getP3PracticeTest('T1');
+    const paragraph = t1.sectionF.paragraph;
+    // The original passage said "her friend Carla" but then quoted "Kelly".
+    // After the fix, Carla must be gone and Kelly must appear.
+    expect(paragraph).not.toMatch(/Carla/);
+    expect(paragraph).toMatch(/Kelly/);
+  });
+
+  it('checkEditingErrors validator flags a fake "No change" entry', async () => {
+    const { checkEditingErrors } = await import('../data/practiceTestValidators.js');
+    const issues = [];
+    checkEditingErrors(issues, 'FIXTURE/sectionF', {
+      errors: [
+        { num: 1, kind: 'grammar', wrong: 'forward', correction: 'forward', explain: 'no change' },
+        { num: 2, kind: 'spelling', wrong: 'recieve', correction: 'receive', explain: 'real fix' },
+      ],
+    });
+    expect(issues).toHaveLength(1);
+    expect(issues[0]).toMatch(/both "forward"/);
+  });
+
+  it('checkEditingErrors leaves punctuation blanks (empty wrong) alone', async () => {
+    const { checkEditingErrors } = await import('../data/practiceTestValidators.js');
+    const issues = [];
+    checkEditingErrors(issues, 'FIXTURE/sectionF', {
+      errors: [
+        { num: 1, kind: 'punctuation', wrong: '', correction: ',', explain: 'missing comma' },
+      ],
+    });
+    expect(issues).toEqual([]);
+  });
+});
+
 describe('P3 Practice Test launcher', () => {
   it('registers p3-practice-tests as a placeholder kind', () => {
     expect(PRIMARY_PLACEHOLDER_KINDS).toContain('p3-practice-tests');
