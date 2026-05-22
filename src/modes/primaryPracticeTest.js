@@ -279,7 +279,7 @@ function renderSituationalWritingSection(section, sectionKey) {
         <pre class="ptg-sw-model">${escapeHtml(section.modelAnswer || '')}</pre>
       </details>
       ${rubricTable}
-      <div class="ptg-feedback" data-feedback-for="${sectionKey}/all" hidden></div>
+      <div class="ptg-feedback" data-feedback-for="${sectionKey}/0" hidden></div>
     </div>`;
 }
 
@@ -506,8 +506,18 @@ function gradeInput(el) {
   return accepts.map(_normalize).includes(u);
 }
 
-function readSectionMarks(section, sectionKey) {
-  // How many marks does each grader-checked input contribute?
+function readSectionMarks(section, sectionKey, numGradableInputs) {
+  // Prefer the section's declared total divided across gradable inputs —
+  // this guarantees per-section scored/total = section.marks, so the
+  // displayed "/N" matches what was actually rendered.
+  if (
+    typeof section?.marks === 'number'
+    && Number.isFinite(section.marks)
+    && numGradableInputs > 0
+  ) {
+    return section.marks / numGradableInputs;
+  }
+  // Fallback heuristics — used only when section.marks is missing.
   if (sectionKey === 'sectionA' || sectionKey === 'sectionB') return 1;
   if (sectionKey === 'sectionC' || sectionKey === 'sectionD') return 1;
   if (Array.isArray(section.items) && section.items[0]?.originals) return 2; // sentence combining
@@ -518,8 +528,29 @@ function readSectionMarks(section, sectionKey) {
   return 1;
 }
 
+/** Count gradable units in a section root — one per radio group; writing excluded. */
+function _countGradableInputs(root, sectionKey) {
+  const allInputs = root.querySelectorAll(`[data-q-key^="${sectionKey}/"]`);
+  const radioGroupsSeen = new Set();
+  let n = 0;
+  for (const el of allInputs) {
+    if ((el.getAttribute('data-q-type') || '') === 'writing') continue;
+    if (el.type === 'radio') {
+      if (radioGroupsSeen.has(el.name)) continue;
+      radioGroupsSeen.add(el.name);
+    }
+    // Items with an explicit data-marks (e.g. comprehension questions)
+    // override the default per-input weight — they should not skew the
+    // remaining unweighted inputs. Skip them from the divisor.
+    if (el.hasAttribute('data-marks')) continue;
+    n += 1;
+  }
+  return n;
+}
+
 function gradeSection(root, sectionKey, section) {
   const inputs = root.querySelectorAll(`[data-q-key^="${sectionKey}/"]`);
+  const numGradable = _countGradableInputs(root, sectionKey);
   let scored = 0;
   let total = 0;
   const perKey = new Map(); // key → { correct: bool, expected, value, skill, practise }
@@ -535,7 +566,7 @@ function gradeSection(root, sectionKey, section) {
       const skill = el.getAttribute('data-skill') || '';
       const practise = el.getAttribute('data-practise') || '';
       const qType = el.getAttribute('data-q-type') || '';
-      const marks = Number(el.getAttribute('data-marks')) || (qType === 'true-false' ? 1 : readSectionMarks(section, sectionKey));
+      const marks = Number(el.getAttribute('data-marks')) || (qType === 'true-false' ? 1 : readSectionMarks(section, sectionKey, numGradable));
       total += marks;
       let correct = false;
       let answered = false;
@@ -565,7 +596,7 @@ function gradeSection(root, sectionKey, section) {
       perKey.set(key, { key, marks: 0, correct: false, selfAssess: true, answered: true, userValue: el.value || '', expected: '', skill, practise, qType });
       return;
     }
-    const marks = Number(el.getAttribute('data-marks')) || readSectionMarks(section, sectionKey);
+    const marks = Number(el.getAttribute('data-marks')) || readSectionMarks(section, sectionKey, numGradable);
     total += marks;
     const correct = grade === true;
     if (correct) scored += marks;
@@ -580,20 +611,37 @@ function gradeSection(root, sectionKey, section) {
     });
   });
 
-  return { scored, total, perKey };
+  // A section is "self-assessed" when it carries declared marks but no
+  // gradable input contributed to the total (e.g. Situational Writing).
+  const selfAssessed = total === 0 && [...perKey.values()].some(v => v.selfAssess);
+  return {
+    scored,
+    total,
+    perKey,
+    selfAssessed,
+    declaredMarks: typeof section?.marks === 'number' ? section.marks : total,
+  };
 }
 
 /* ────────────────────────────────────────────────────────────────────── */
 /* Mount                                                                  */
 /* ────────────────────────────────────────────────────────────────────── */
 
-function buildSummaryHtml(paper, sectionResults) {
-  const totalScored = sectionResults.reduce((a, r) => a + r.scored, 0);
-  const totalMarks = sectionResults.reduce((a, r) => a + r.total, 0);
+/** Display a possibly-fractional mark count without a trailing ".0". */
+function _fmtMark(n) {
+  return Number.isInteger(n) ? String(n) : (Math.round(n * 10) / 10).toString();
+}
 
-  // Aggregate weak skills across sections.
+function buildSummaryHtml(paper, sectionResults) {
+  const autoScored = sectionResults.reduce((a, r) => a + (r.selfAssessed ? 0 : r.scored), 0);
+  const autoTotal  = sectionResults.reduce((a, r) => a + (r.selfAssessed ? 0 : r.total),  0);
+  const selfMarks  = sectionResults.reduce((a, r) => a + (r.selfAssessed ? r.declaredMarks : 0), 0);
+
+  // Aggregate weak skills across sections. Self-assessed sections don't
+  // contribute (no correct/wrong signal to draw from).
   const weakSkills = new Map(); // skill -> { wrong, total, practise }
   for (const r of sectionResults) {
+    if (r.selfAssessed) continue;
     for (const v of r.perKey.values()) {
       if (!v.skill) continue;
       const existing = weakSkills.get(v.skill) || { wrong: 0, total: 0, practise: v.practise };
@@ -619,16 +667,29 @@ function buildSummaryHtml(paper, sectionResults) {
       }).join('')
     : '<li>No clear weak skill — you nailed it across the board! 🎉</li>';
 
-  const perSection = sectionResults.map(r => `
-    <tr>
+  const perSection = sectionResults.map(r => {
+    if (r.selfAssessed) {
+      return `<tr class="ptg-row-self">
+        <td>${escapeHtml(r.title)}</td>
+        <td>Self-assessed: — / ${_fmtMark(r.declaredMarks)}</td>
+        <td>—</td>
+      </tr>`;
+    }
+    return `<tr>
       <td>${escapeHtml(r.title)}</td>
-      <td>${r.scored} / ${r.total}</td>
+      <td>${_fmtMark(r.scored)} / ${_fmtMark(r.total)}</td>
       <td>${r.total > 0 ? Math.round(100 * r.scored / r.total) : 0}%</td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
+
+  const selfNote = selfMarks > 0
+    ? `<p class="ptg-summary-self"><em>Plus ${_fmtMark(selfMarks)} mark${selfMarks === 1 ? '' : 's'} of self-assessed writing — compare your response against the model answer in that section.</em></p>`
+    : '';
 
   return `
     <h3>📊 ${escapeHtml(paper.label)} — Summary</h3>
-    <p class="ptg-summary-total"><strong>Total:</strong> ${totalScored} / ${totalMarks} (auto-graded sections)</p>
+    <p class="ptg-summary-total"><strong>Auto-graded total:</strong> ${_fmtMark(autoScored)} / ${_fmtMark(autoTotal)}</p>
+    ${selfNote}
     <p class="ptg-note"><em>Open-ended comprehension answers were graded with keyword matching — re-read the model answer if you're unsure.</em></p>
     <table class="ptg-summary-table">
       <thead><tr><th>Section</th><th>Score</th><th>%</th></tr></thead>
@@ -660,6 +721,25 @@ function formatRemaining(ms) {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
+function _paperMarksBreakdown(paper) {
+  // Surface the auto-graded total separately from any self-assessed
+  // writing sections, so the displayed total in the header matches what
+  // students will actually see scored.
+  let selfMarks = 0;
+  for (const key of SECTION_KEYS) {
+    const s = paper[key];
+    if (!s) continue;
+    if (s.bullets && s.modelAnswer !== undefined && typeof s.marks === 'number') {
+      selfMarks += s.marks;
+    }
+  }
+  const auto = (paper.totalMarks || 0) - selfMarks;
+  if (selfMarks > 0) {
+    return `${paper.totalMarks} marks (${auto} auto-graded + ${selfMarks} self-assessed writing)`;
+  }
+  return `${paper.totalMarks} marks`;
+}
+
 function renderPaperFrame(paper) {
   return `
     <section class="ptg" data-paper-id="${escapeAttr(paper.id)}">
@@ -668,7 +748,7 @@ function renderPaperFrame(paper) {
           <h2>${escapeHtml(paper.label)}</h2>
           <div class="ptg-timer" role="timer" aria-label="Time remaining" aria-live="off" hidden></div>
         </div>
-        <p><small>${escapeHtml(paper.duration)} · ${paper.totalMarks} marks · ${escapeHtml(paper.level)}</small></p>
+        <p><small>${escapeHtml(paper.duration)} · ${_paperMarksBreakdown(paper)} · ${escapeHtml(paper.level)}</small></p>
         <div class="ptg-stepper" aria-label="Section progress"></div>
         <p class="ptg-blurb">${escapeHtml(paper.blurb || '')}</p>
       </header>

@@ -8,11 +8,11 @@
  * Section breakdown per paper (total 85 marks, 1 h 30 min):
  *   Section A — Grammar MCQ            10 items  10 marks
  *   Section B — Vocabulary MCQ          5 items   5 marks
- *   Section C — Grammar Cloze          10 blanks 15 marks
+ *   Section C — Grammar Cloze          10 blanks 10 marks
  *   Section D — Vocabulary Cloze       10 blanks 10 marks
- *   Section E — Situational Writing              15 marks
+ *   Section E — Situational Writing              15 marks  (self-assessed)
  *   Section F — Synthesis & Transformation 5 items 10 marks
- *   Section G — Comprehension Cloze    10 blanks  5 marks  (open, no word bank)
+ *   Section G — Comprehension Cloze    10 blanks 10 marks  (open, no word bank)
  *   Section H — Comprehension          1 passage 15 marks
  *                                               ─────────
  *                                                   85
@@ -43,6 +43,8 @@
  *   T4 — technology / sports, balanced review
  */
 
+import { checkMcqItems, checkSectionMarks } from './practiceTestValidators.js';
+
 export const P5_PRACTICE_TEST_TERMS = Object.freeze(['T1', 'T2', 'T3', 'T4']);
 
 export const P5_PRACTICE_TESTS = Object.freeze({
@@ -64,12 +66,12 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       marks: 10,
       items: [
         {
-          q: 'All rubbish ___ in the designated bins before you leave the campsite.',
+          q: 'All rubbish ___ of in the designated bins before you leave the campsite.',
           choices: ['must dispose', 'must be disposed', 'should dispose', 'should disposing'],
           answer: 'must be disposed',
           skill: 'passiveVoice',
           practiseTarget: 'grammar-mcq',
-          explain: 'Passive voice with modal: "must be disposed of" — the subject (rubbish) receives the action.',
+          explain: 'Passive voice with modal: "must be disposed of" — the subject (rubbish) receives the action; "dispose" takes the preposition "of".',
         },
         {
           q: 'If the weather ___ fine tomorrow, we ___ our nature walk as planned.',
@@ -161,10 +163,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         {
           q: 'Her colleagues noticed that Amanda was stressed, but her cheerful smile was ___ — it was actually a sign that she was coping well.',
           choices: ['a blessing in disguise', 'the last straw', 'a piece of cake', 'a silver lining'],
-          answer: 'a blessing in disguise',
+          answer: 'a silver lining',
           skill: 'idiomaticExpressions',
           practiseTarget: 'vocab-mcq',
-          explain: '"A blessing in disguise" — something that seems bad but turns out to be good.',
+          explain: '"A silver lining" — a positive or hopeful aspect of an otherwise difficult situation. Her cheerful smile was the encouraging sign within a stressful period.',
         },
         {
           q: 'The loss of the rainforest is not just an environmental disaster — it is a ___ wound on the planet\'s ecological system.',
@@ -195,7 +197,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
 
     sectionC: {
       title: 'Section C: Grammar Cloze',
-      marks: 15,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word from the word bank. Each word may be used only once. Two words will be left over.',
       wordBank: ['although', 'has', 'been', 'which', 'were', 'being', 'unless', 'their', 'as', 'more', 'whose', 'despite'],
       text:
@@ -318,7 +320,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
 
     sectionG: {
       title: 'Section G: Comprehension Cloze',
-      marks: 5,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word.',
       text:
         'Every year, millions of sea turtles are born on beaches around the world. ' +
@@ -580,7 +582,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
 
     sectionC: {
       title: 'Section C: Grammar Cloze',
-      marks: 15,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word from the word bank. Each word may be used only once. Two words will be left over.',
       wordBank: ['whenever', 'had', 'so', 'which', 'being', 'however', 'their', 'have', 'whether', 'one', 'though', 'despite'],
       text:
@@ -704,7 +706,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
 
     sectionG: {
       title: 'Section G: Comprehension Cloze',
-      marks: 5,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word.',
       text:
         'In many countries, volunteering has become an important part of school life. Students {{1}} give up their weekends to help at food banks, elderly care centres, and community gardens gain more than just a sense of satisfaction. ' +
@@ -963,7 +965,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
 
     sectionC: {
       title: 'Section C: Grammar Cloze',
-      marks: 15,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word from the word bank. Each word may be used only once. Two words will be left over.',
       wordBank: ['had', 'been', 'which', 'whose', 'were', 'having', 'although', 'such', 'where', 'that', 'with', 'once'],
       text:
@@ -1085,7 +1087,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
 
     sectionG: {
       title: 'Section G: Comprehension Cloze',
-      marks: 5,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word.',
       text:
         'For centuries, Singapore\'s waterways served as the arteries of commerce. Bumboats laden {{1}} pepper, gambier, and rice navigated the Singapore River, {{2}} its banks teemed with merchants, coolies, and hawkers. ' +
@@ -1346,7 +1348,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
 
     sectionC: {
       title: 'Section C: Grammar Cloze',
-      marks: 15,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word from the word bank. Each word may be used only once. Two words will be left over.',
       wordBank: ['not', 'been', 'which', 'had', 'so', 'whether', 'their', 'having', 'as', 'only', 'who', 'though'],
       text:
@@ -1463,7 +1465,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
 
     sectionG: {
       title: 'Section G: Comprehension Cloze',
-      marks: 5,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word.',
       text:
         'Competitive esports is no longer a pastime reserved for teenagers in their bedrooms. ' +
@@ -1606,12 +1608,7 @@ export function validateP5PracticeTests(bank = P5_PRACTICE_TESTS) {
     if (!sA || !Array.isArray(sA.items) || sA.items.length !== 10) {
       issues.push(`${tag}/sectionA: must have 10 items`);
     } else {
-      for (const item of sA.items) {
-        if (!item.q || !Array.isArray(item.choices) || item.choices.length !== 4)
-          issues.push(`${tag}/sectionA: malformed item "${String(item.q).slice(0, 30)}"`);
-        if (!item.choices?.includes(item.answer))
-          issues.push(`${tag}/sectionA: answer "${item.answer}" not among choices`);
-      }
+      checkMcqItems(issues, `${tag}/sectionA`, sA.items, 4);
     }
 
     // Section B — 5 MCQ items
@@ -1619,10 +1616,7 @@ export function validateP5PracticeTests(bank = P5_PRACTICE_TESTS) {
     if (!sB || !Array.isArray(sB.items) || sB.items.length !== 5) {
       issues.push(`${tag}/sectionB: must have 5 items`);
     } else {
-      for (const item of sB.items) {
-        if (!item.choices?.includes(item.answer))
-          issues.push(`${tag}/sectionB: answer "${item.answer}" not among choices`);
-      }
+      checkMcqItems(issues, `${tag}/sectionB`, sB.items, 4);
     }
 
     // Sections C & D — cloze with 10 blanks, word bank of 12
@@ -1672,8 +1666,21 @@ export function validateP5PracticeTests(bank = P5_PRACTICE_TESTS) {
     if (!Array.isArray(sH?.questions) || sH.questions.length < 6)
       issues.push(`${tag}/sectionH: needs at least 6 questions`);
 
-    // Marks total
-    const markKeys = ['sectionA', 'sectionB', 'sectionC', 'sectionD', 'sectionE', 'sectionF', 'sectionG', 'sectionH'];
+    // Per-section mark/blank alignment — gradable inputs × standard weight should equal section.marks.
+    // This prevents the rendered "X marks" label drifting away from the
+    // grader's actual capacity. Writing (sectionE) is self-assessed; its
+    // marks are exempt from this check.
+    checkSectionMarks(issues, `${tag}/sectionA`, sA, 'mcq', 10);
+    checkSectionMarks(issues, `${tag}/sectionB`, sB, 'mcq', 5);
+    checkSectionMarks(issues, `${tag}/sectionC`, test.sectionC, 'cloze', 10);
+    checkSectionMarks(issues, `${tag}/sectionD`, test.sectionD, 'cloze', 10);
+    checkSectionMarks(issues, `${tag}/sectionF`, test.sectionF, 'synthesis', 5);
+    checkSectionMarks(issues, `${tag}/sectionG`, test.sectionG, 'cloze', 10);
+
+    // Marks total — sum across EVERY rendered section, not just A–H.
+    // Section I exists in some papers and is rendered/graded; excluding it
+    // from this check let mark mismatches sneak past unnoticed.
+    const markKeys = ['sectionA', 'sectionB', 'sectionC', 'sectionD', 'sectionE', 'sectionF', 'sectionG', 'sectionH', 'sectionI'];
     const total = markKeys.reduce((acc, k) => acc + (test[k]?.marks || 0), 0);
     if (total !== test.totalMarks)
       issues.push(`${tag}: section marks sum to ${total} but totalMarks=${test.totalMarks}`);

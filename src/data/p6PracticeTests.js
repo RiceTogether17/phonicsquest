@@ -5,17 +5,18 @@
  * These mirror the Singapore P6 Semestral Assessment / PSLE Preliminary
  * format used by mainstream primary schools.
  *
- * Section breakdown per paper (total 85 marks, 1 h 50 min):
+ * Section breakdown per paper (total 95 marks, 1 h 50 min):
  *   Section A — Grammar MCQ            10 items  10 marks
  *   Section B — Vocabulary MCQ          5 items   5 marks
- *   Section C — Grammar Cloze          10 blanks 15 marks
+ *   Section C — Grammar Cloze          10 blanks 10 marks
  *   Section D — Vocabulary Cloze       10 blanks 10 marks
- *   Section E — Situational Writing              15 marks
+ *   Section E — Situational Writing              15 marks  (self-assessed)
  *   Section F — Synthesis & Transformation 5 items 10 marks
- *   Section G — Comprehension Cloze    10 blanks  5 marks  (open, no word bank)
+ *   Section G — Comprehension Cloze    10 blanks 10 marks  (open, no word bank)
  *   Section H — Comprehension          1 passage 15 marks
+ *   Section I — Editing for Spelling and Grammar 10 errors 10 marks
  *                                               ─────────
- *                                                   85
+ *                                                   95
  *
  * P6 / PSLE-level grammar features:
  *   - Inversion: "Not only did she...", "Seldom have I seen..."
@@ -33,6 +34,8 @@
  *   T4 — global issues / youth activism (balanced PSLE review)
  */
 
+import { checkMcqItems, checkSectionMarks } from './practiceTestValidators.js';
+
 export const P6_PRACTICE_TEST_TERMS = Object.freeze(['T1', 'T2', 'T3', 'T4']);
 
 export const P6_PRACTICE_TESTS = Object.freeze({
@@ -46,7 +49,7 @@ export const P6_PRACTICE_TESTS = Object.freeze({
     level: 'P6',
     label: 'Term 1 Practice Test (PSLE Grammar Focus)',
     duration: '1 h 50 min',
-    totalMarks: 85,
+    totalMarks: 95,
     blurb: 'P6 Term 1 PSLE-format paper — inversion, causative "have something done", Type 3 conditionals, complex passive. Situational Writing: Formal Letter. Comprehension: coral reef conservation.',
 
     sectionA: {
@@ -200,7 +203,7 @@ export const P6_PRACTICE_TESTS = Object.freeze({
 
     sectionC: {
       title: 'Section C: Grammar Cloze',
-      marks: 15,
+      marks: 10,
       instructions: 'Choose the correct word from the box to fill in each blank. You may use a word more than once if needed.',
       wordBank: ['been', 'being', 'by', 'for', 'had', 'have', 'having', 'in', 'of', 'on', 'since', 'which'],
       text: 'The coral reefs surrounding our island have {{1}} under threat for many years. {{2}} damaged by rising sea temperatures, large sections of the reef have turned white — a process known as bleaching. Scientists who {{3}} studied the reefs {{4}} the past decade warn that immediate action is needed. The most urgent measure is reducing the amount {{5}} carbon dioxide released into the atmosphere. {{6}} account, industries are {{7}} encouraged to adopt cleaner technologies. Divers are also {{8}} trained to remove invasive species {{9}} harm native coral. Thanks to these combined efforts, small signs {{10}} recovery have been observed in several reef zones.',
@@ -339,7 +342,7 @@ Alex Tan`,
 
     sectionG: {
       title: 'Section G: Comprehension Cloze',
-      marks: 5,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word.',
       text: 'Marine biologists have long {{1}} aware of the delicate balance that sustains coral reef ecosystems. When water temperatures rise even slightly, corals expel the algae living {{2}} their tissues and turn completely white. This phenomenon, known {{3}} coral bleaching, can be fatal {{4}} left unchecked. Encouragingly, researchers have recently developed a technique {{5}} involves coating young corals with a heat-resistant probiotic. In early trials, corals treated {{6}} this method survived temperatures that would normally {{7}} caused mass bleaching. Scientists caution, {{8}}, that this is not a substitute for reducing carbon emissions. The probiotic buys time, {{9}} it does not solve the underlying problem. Governments {{10}} the world must act together if we are to protect these irreplaceable ecosystems.',
       answers: ['been', 'within', 'as', 'if', 'that', 'with', 'have', 'however', 'but', 'around'],
@@ -456,7 +459,7 @@ Alex Tan`,
     level: 'P6',
     label: 'Term 2 Practice Test (PSLE Vocabulary Focus)',
     duration: '1 h 50 min',
-    totalMarks: 85,
+    totalMarks: 95,
     blurb: 'P6 Term 2 PSLE-format paper — reported speech with embedded questions, causative, inversion. Situational Writing: Email. Comprehension: social media and mental health.',
 
     sectionA: {
@@ -605,7 +608,7 @@ Alex Tan`,
 
     sectionC: {
       title: 'Section C: Grammar Cloze',
-      marks: 15,
+      marks: 10,
       instructions: 'Choose the correct word from the box to fill in each blank. Use each word once only. There are two extra words you do not need to use.',
       wordBank: ['although', 'despite', 'even', 'had', 'have', 'having', 'if', 'in', 'since', 'than', 'though', 'unless'],
       text: 'Social media platforms {{1}} transformed communication in ways that were unimaginable a generation ago. {{2}} their obvious benefits, however, these platforms have also introduced new risks, particularly for younger users. Researchers warn that teenagers who spend more {{3}} three hours daily on social media are significantly more likely to experience anxiety. This is {{4}} more concerning given that many young people access these apps {{5}} the age of ten. {{6}} parents monitor their children\'s online activity carefully, harmful content can easily go unnoticed. Some families have {{7}} banned devices at mealtimes, {{8}} this requires consistent enforcement. Experts recommend that children be taught to think critically about the content they consume, {{9}} they are young. Schools, too, play a vital role: {{10}} digital literacy classes become standard in primary education, the next generation may be better equipped to navigate the online world safely.',
@@ -735,7 +738,7 @@ Jordan`,
 
     sectionG: {
       title: 'Section G: Comprehension Cloze',
-      marks: 5,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word.',
       text: 'The rise of social media has dramatically changed the way young people communicate and form relationships. {{1}} the past decade, the average age at which children receive their first smartphone has dropped to just ten years old. This means that primary school children are now being {{2}} to online content — both educational and harmful — before they are emotionally mature enough to process it. Mental health professionals are increasingly concerned that the constant pressure to gain "likes" and followers is {{3}} teenagers to compare themselves to unrealistic standards. Research shows that young people who spend the most time scrolling {{4}} their feeds report higher levels of loneliness and anxiety than those who do not. {{5}}, some studies suggest that social media can strengthen friendships and provide support networks, particularly for teenagers {{6}} feel isolated at school. The key, experts agree, is balance. Children should be encouraged to take regular breaks from screens {{7}} to engage in physical activities and face-to-face interactions. Parents and teachers play a crucial role in helping young people develop the critical thinking skills needed to evaluate the content they see {{8}} and the way it makes them feel. {{9}} young people are guided carefully, they can learn to harness the benefits of social media {{10}} falling into its many pitfalls.',
       answers: ['Over', 'exposed', 'causing', 'through', 'However', 'who', 'and', 'online', 'If', 'without'],
@@ -846,7 +849,7 @@ Jordan`,
     level: 'P6',
     label: 'Term 3 Practice Test (PSLE Synthesis Focus)',
     duration: '1 h 50 min',
-    totalMarks: 85,
+    totalMarks: 95,
     blurb: 'P6 Term 3 PSLE-format paper — advanced conditionals, complex reported speech, participial phrases. Situational Writing: Diary Entry. Comprehension: Singapore\'s hawker culture and UNESCO recognition.',
 
     sectionA: {
@@ -995,7 +998,7 @@ Jordan`,
 
     sectionC: {
       title: 'Section C: Grammar Cloze',
-      marks: 15,
+      marks: 10,
       instructions: 'Choose the correct word from the box to fill in each blank. You may use a word more than once if needed.',
       wordBank: ['be', 'been', 'being', 'for', 'from', 'had', 'have', 'in', 'of', 'that', 'which', 'who'],
       text: 'Singapore\'s hawker culture has {{1}} recognised by UNESCO as an Intangible Cultural Heritage of Humanity. This achievement, {{2}} was announced in December 2020, came after years {{3}} tireless effort by hawkers, community groups and government agencies. The nomination had {{4}} submitted twice before it was finally accepted, highlighting just how competitive the process can {{5}}. Each stall that is included in the heritage list must {{6}} deemed to represent genuine cultural significance, rather than merely producing popular food. Hawkers {{7}} worked at their trade for decades were interviewed and their stories documented. UNESCO requires {{8}} the living traditions behind each dish — its history, its techniques and its role {{9}} community bonding — {{10}} carefully preserved and passed on to the next generation.',
@@ -1125,7 +1128,7 @@ Wei Ling`,
 
     sectionG: {
       title: 'Section G: Comprehension Cloze',
-      marks: 5,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word.',
       text: 'Singapore\'s hawker centres have long {{1}} considered one of the city-state\'s most beloved institutions. Unlike restaurants, {{2}} operate under one roof and employ teams of chefs, each hawker stall is independently run — often by a single stallholder {{3}} has dedicated decades to perfecting just one or two dishes. The result is an extraordinary concentration {{4}} culinary expertise in a single location. Visitors to a typical hawker centre can choose from dozens of different cuisines, {{5}} chicken rice and laksa to roti prata and dim sum, all at very affordable prices. It is this combination {{6}} variety, quality and accessibility {{7}} makes hawker centres unlike any other dining experience in the world. In recent years, the younger generation {{8}} increasingly embraced hawker culture, recognising it as an essential part of {{9}} national identity. Food bloggers and social media influencers have helped to introduce these humble stalls to a global audience, ensuring {{10}} Singapore\'s culinary heritage continues to attract visitors from all corners of the world.',
       answers: ['been', 'which', 'who', 'of', 'from', 'of', 'that', 'has', 'their', 'that'],
@@ -1236,7 +1239,7 @@ Wei Ling`,
     level: 'P6',
     label: 'Term 4 Practice Test (Balanced PSLE Review)',
     duration: '1 h 50 min',
-    totalMarks: 85,
+    totalMarks: 95,
     blurb: 'P6 Term 4 comprehensive PSLE mock — full range of grammar structures, rich vocabulary, and complex comprehension. Situational Writing: Speech. Comprehension: climate change and youth activism.',
 
     sectionA: {
@@ -1385,7 +1388,7 @@ Wei Ling`,
 
     sectionC: {
       title: 'Section C: Grammar Cloze',
-      marks: 15,
+      marks: 10,
       instructions: 'Choose the correct word from the box to fill in each blank. You may use a word more than once if needed.',
       wordBank: ['although', 'been', 'by', 'despite', 'had', 'have', 'having', 'if', 'in', 'since', 'that', 'unless'],
       text: 'Climate scientists {{1}} been warning about global warming for decades, yet meaningful action has proved elusive. {{2}} the mounting evidence — rising sea levels, more frequent extreme weather events and shrinking glaciers — many governments continue to prioritise economic growth over environmental protection. If nations {{3}} acted decisively in the 1990s, today\'s temperatures would {{4}} been significantly lower. {{5}} immediate steps are taken to reduce carbon emissions, scientists warn {{6}} the planet could experience irreversible tipping points within the next thirty years. Youth activists, frustrated {{7}} the slow pace of change, have taken matters into their own hands. {{8}} faced barriers and opposition from established industries, these young campaigners have succeeded {{9}} bringing climate policy to the forefront of public debate. Their message is clear: we cannot afford to wait — {{10}} we act now, future generations will inherit a severely damaged planet.',
@@ -1514,7 +1517,7 @@ Thank you.`,
 
     sectionG: {
       title: 'Section G: Comprehension Cloze',
-      marks: 5,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word.',
       text: 'Climate change is no longer a distant threat — its effects {{1}} already being felt in every corner of the globe. Rising temperatures are causing glaciers to melt at an alarming rate, {{2}} in turn raises sea levels and threatens low-lying coastal communities. Extreme weather events, {{3}} as hurricanes, droughts and wildfires, are becoming both more frequent and more destructive. Scientists warn that unless carbon emissions are dramatically {{4}} within the next decade, some of these changes may become irreversible. Young people, {{5}} will bear the heaviest burden of a warming world, are increasingly frustrated by the slow pace of action. Youth-led movements have {{6}} international attention and sparked public debate, yet many activists feel {{7}} governments are still not doing enough. Despite the challenges, there is reason for hope: the cost of renewable energy {{8}} fallen dramatically in recent years, making clean energy an increasingly viable alternative to fossil fuels. {{9}} countries transition to greener economies, new jobs in the renewable sector are being created, suggesting {{10}} acting on climate change and growing the economy are not mutually exclusive.',
       answers: ['are', 'which', 'such', 'reduced', 'who', 'attracted', 'that', 'has', 'As', 'that'],
@@ -1652,10 +1655,7 @@ export function validateP6PracticeTests(bank = P6_PRACTICE_TESTS) {
     if (!sA || !Array.isArray(sA.items) || sA.items.length !== 10) {
       issues.push(`${tag}/sectionA: must have 10 items`);
     } else {
-      for (const item of sA.items) {
-        if (!item.choices?.includes(item.answer))
-          issues.push(`${tag}/sectionA: answer "${item.answer}" not among choices`);
-      }
+      checkMcqItems(issues, `${tag}/sectionA`, sA.items, 4);
     }
 
     // Section B — vocab MCQ: 5 items
@@ -1663,10 +1663,7 @@ export function validateP6PracticeTests(bank = P6_PRACTICE_TESTS) {
     if (!sB || !Array.isArray(sB.items) || sB.items.length !== 5) {
       issues.push(`${tag}/sectionB: must have 5 items`);
     } else {
-      for (const item of sB.items) {
-        if (!item.choices?.includes(item.answer))
-          issues.push(`${tag}/sectionB: answer "${item.answer}" not among choices`);
-      }
+      checkMcqItems(issues, `${tag}/sectionB`, sB.items, 4);
     }
 
     // Sections C & D — cloze with 10 blanks, word bank of 12
@@ -1716,8 +1713,29 @@ export function validateP6PracticeTests(bank = P6_PRACTICE_TESTS) {
     if (!Array.isArray(sH?.questions) || sH.questions.length < 6)
       issues.push(`${tag}/sectionH: needs at least 6 questions`);
 
-    // Marks total
-    const markKeys = ['sectionA', 'sectionB', 'sectionC', 'sectionD', 'sectionE', 'sectionF', 'sectionG', 'sectionH'];
+    // Section I — editing for spelling/grammar (10 errors)
+    const sI = test.sectionI;
+    if (sI) {
+      const blanks = [...(sI.paragraph || '').matchAll(/\{\{(\d+):([^}]*)\}\}/g)];
+      if (blanks.length !== 10)
+        issues.push(`${tag}/sectionI: expected 10 numbered errors, found ${blanks.length}`);
+      if (!Array.isArray(sI.errors) || sI.errors.length !== blanks.length)
+        issues.push(`${tag}/sectionI: errors count (${sI.errors?.length ?? 0}) must match blanks (${blanks.length})`);
+    }
+
+    // Per-section mark/blank alignment.
+    checkSectionMarks(issues, `${tag}/sectionA`, sA, 'mcq', 10);
+    checkSectionMarks(issues, `${tag}/sectionB`, sB, 'mcq', 5);
+    checkSectionMarks(issues, `${tag}/sectionC`, test.sectionC, 'cloze', 10);
+    checkSectionMarks(issues, `${tag}/sectionD`, test.sectionD, 'cloze', 10);
+    checkSectionMarks(issues, `${tag}/sectionF`, test.sectionF, 'synthesis', 5);
+    checkSectionMarks(issues, `${tag}/sectionG`, test.sectionG, 'cloze', 10);
+    checkSectionMarks(issues, `${tag}/sectionI`, sI, 'editing', 10);
+
+    // Marks total — include EVERY rendered section. Section I was previously
+    // excluded, which let a 10-mark editing block sit outside the declared
+    // paper total without the validator noticing.
+    const markKeys = ['sectionA', 'sectionB', 'sectionC', 'sectionD', 'sectionE', 'sectionF', 'sectionG', 'sectionH', 'sectionI'];
     const total = markKeys.reduce((acc, k) => acc + (test[k]?.marks || 0), 0);
     if (total !== test.totalMarks)
       issues.push(`${tag}: section marks sum to ${total} but totalMarks=${test.totalMarks}`);
