@@ -25,7 +25,18 @@
 
 const NEGATION_RE = /^(not|never|no|none|neither|nothing|nobody|nor|cannot|n't|didn't|doesn't|don't|isn't|aren't|wasn't|weren't|hasn't|haven't|hadn't|won't|wouldn't|shouldn't|couldn't|can't|mustn't|mightn't)$/i;
 const CLAUSE_BREAK_RE = /[.;!?]|\b(but|however|although|though|whereas|yet)\b/i;
-const NEG_LOOKBACK_WORDS = 4;
+const NEG_LOOKBACK_WORDS = 2;
+
+// PSLE-fronted emphatic negatives. When one of these appears at the START
+// of a clause, it's a structural inversion trigger, not a predicate
+// negation of what follows: "Never had I seen..." doesn't negate "seen".
+const FRONTED_NEG_WORDS = new Set(['never', 'seldom', 'rarely', 'hardly', 'barely']);
+
+// Fixed phrases where the bare negation isn't actually negating the next
+// content word: "not only X but also Y" adds X and Y, doesn't reject X;
+// "no sooner had X" is a time-of-occurrence marker, not a rejection.
+const NOT_PHRASE_NEXT = new Set(['only', 'just', 'until', 'yet']);
+const NO_PHRASE_NEXT = new Set(['sooner', 'longer', 'less']);
 
 function _normalize(s) {
   return String(s ?? '')
@@ -39,7 +50,14 @@ function _normalize(s) {
 
 /**
  * Is the substring at `position` in `text` preceded (within the same clause,
- * within NEG_LOOKBACK_WORDS) by a negation word?
+ * within NEG_LOOKBACK_WORDS) by a TRUE predicate negation?
+ *
+ * Two exemptions stop us from wrongly rejecting valid PSLE patterns:
+ *   1. Fronted emphatic negatives at clause start ("Never had I…",
+ *      "Seldom does she…") — these trigger inversion, they don't predicate-
+ *      negate the verb that follows.
+ *   2. Fixed phrases where bare "not"/"no" doesn't reject the following
+ *      content ("not only X but also Y", "not until X", "no sooner had…").
  */
 function isNegated(text, position) {
   const before = text.slice(0, position);
@@ -49,11 +67,24 @@ function isNegated(text, position) {
   const clause = before.slice(clauseStart);
   const words = clause.trim().split(/[\s,]+/).filter(Boolean);
   const window = words.slice(-NEG_LOOKBACK_WORDS);
-  // Also catch words like "wasn't" / "couldn't" by stripping the contracted tail.
   for (const w of window) {
-    if (NEGATION_RE.test(w)) return true;
-    // Apostrophe variants that survived normalisation.
-    if (/n't$/i.test(w)) return true;
+    const isNeg = NEGATION_RE.test(w) || /n't$/i.test(w);
+    if (!isNeg) continue;
+
+    const wLower = w.toLowerCase();
+    // Look at the position of THIS negation word inside the clause so we
+    // can inspect the word immediately after it.
+    const negIdx = words.lastIndexOf(w);
+
+    // Exemption 1: fronted emphatic negative at clause start.
+    if (negIdx === 0 && FRONTED_NEG_WORDS.has(wLower)) continue;
+
+    // Exemption 2: fixed phrase where the negation isn't predicate-negating.
+    const nextWord = (words[negIdx + 1] || '').toLowerCase();
+    if (wLower === 'not' && NOT_PHRASE_NEXT.has(nextWord)) continue;
+    if (wLower === 'no' && NO_PHRASE_NEXT.has(nextWord)) continue;
+
+    return true;
   }
   return false;
 }

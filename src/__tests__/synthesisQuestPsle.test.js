@@ -101,6 +101,87 @@ describe('buildAcceptableAnswers — accepts both PSLE continuation and full-sen
   });
 });
 
+describe('P6 synthesis — PSLE-style partial credit via requiredGroups', () => {
+  const p6 = SYNTHESIS_ITEMS.filter(i => i.level === 'P6');
+
+  it('every P6 item declares exactly 2 required meaning units (1 + 1 marks)', () => {
+    const offenders = p6
+      .filter(i => !Array.isArray(i.requiredGroups) || i.requiredGroups.length !== 2)
+      .map(i => i.id);
+    expect(offenders, offenders.join(', ')).toEqual([]);
+  });
+
+  it('the canonical answer for every P6 item scores 1.0 against its requiredGroups', async () => {
+    const { gradeShortAnswer } = await import('../modes/scoring/shortAnswerGrader.js');
+    const offenders = [];
+    for (const item of p6) {
+      const r = gradeShortAnswer(item.answer, { requiredGroups: item.requiredGroups });
+      if (r.fraction !== 1) {
+        offenders.push(`${item.id}: ${r.fraction} (missed ${r.trace.misses.join(', ')})`);
+      }
+    }
+    expect(offenders, offenders.join('\n')).toEqual([]);
+  });
+
+  it('every listed alternate also scores 1.0 against its requiredGroups', async () => {
+    const { gradeShortAnswer } = await import('../modes/scoring/shortAnswerGrader.js');
+    const offenders = [];
+    for (const item of p6) {
+      for (const alt of (item.alternates || [])) {
+        const r = gradeShortAnswer(alt, { requiredGroups: item.requiredGroups });
+        if (r.fraction !== 1) {
+          offenders.push(`${item.id} alt "${alt.slice(0, 40)}...": ${r.fraction}`);
+        }
+      }
+    }
+    expect(offenders, offenders.join('\n')).toEqual([]);
+  });
+
+  it('drops a P6 item to 0.5 when only one meaning unit is preserved (reported speech)', async () => {
+    const { gradeShortAnswer } = await import('../modes/scoring/shortAnswerGrader.js');
+    const rs10 = p6.find(i => i.id === 'st-rs-10');
+    expect(rs10).toBeTruthy();
+    // Tense backshifted (had finished) but time NOT backshifted (still "ago").
+    // PSLE marker: 1/2 — got the structure but missed the time-word shift.
+    const r = gradeShortAnswer('that she had finished the project three days ago.', {
+      requiredGroups: rs10.requiredGroups,
+    });
+    expect(r.fraction).toBeCloseTo(0.5, 5);
+  });
+
+  it('scores 0 when neither meaning unit is preserved', async () => {
+    const { gradeShortAnswer } = await import('../modes/scoring/shortAnswerGrader.js');
+    const conn7 = p6.find(i => i.id === 'st-conn-7');
+    const r = gradeShortAnswer('Something completely different happened in a faraway place.', {
+      requiredGroups: conn7.requiredGroups,
+    });
+    expect(r.fraction).toBe(0);
+  });
+});
+
+describe('Negation detector — PSLE fronted-inversion and not-only exemptions', () => {
+  it('does NOT reject keywords after a fronted "Never" at clause start', async () => {
+    const { hasUnnegatedMatch } = await import('../modes/scoring/shortAnswerGrader.js');
+    expect(hasUnnegatedMatch('Never had the champion lost a match.', 'had the champion lost')).toBe(true);
+  });
+
+  it('does NOT reject keywords after "not only" / "no sooner" fixed phrases', async () => {
+    const { hasUnnegatedMatch } = await import('../modes/scoring/shortAnswerGrader.js');
+    expect(hasUnnegatedMatch('The complex is not only affordable but also convenient.', 'affordable')).toBe(true);
+    expect(hasUnnegatedMatch('No sooner had he sat down than the bell rang.', 'sat down')).toBe(true);
+  });
+
+  it('still rejects a true predicate negation ("She was never afraid" → keyword "afraid")', async () => {
+    const { hasUnnegatedMatch } = await import('../modes/scoring/shortAnswerGrader.js');
+    expect(hasUnnegatedMatch('She was never afraid of speaking up.', 'afraid')).toBe(false);
+  });
+
+  it('credits the conditional outcome after "would not have got X" (X is the outcome, not negated)', async () => {
+    const { hasUnnegatedMatch } = await import('../modes/scoring/shortAnswerGrader.js');
+    expect(hasUnnegatedMatch('They would not have got drenched in the rain.', 'drenched')).toBe(true);
+  });
+});
+
 describe('Synthesis data alignment — every stem starts its answer', () => {
   it('all 58 items have a stem that cleanly prefixes the canonical answer', () => {
     const offenders = [];

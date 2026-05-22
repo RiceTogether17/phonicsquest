@@ -131,6 +131,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'No sooner had',
     answer: 'No sooner had the children sat down than the teacher started the test.',
     alternates: [],
+    requiredGroups: [
+      ['sat down', 'children sat', 'children had sat'],
+      ['teacher started', 'started the test', 'teacher began', 'began the test'],
+    ],
     explain: '"No sooner had + subject + past participle + than + subject + simple past" shows that the second event followed the first with no delay. Note: "no sooner" always uses the past perfect (had + past participle) in its clause.',
   },
 
@@ -218,6 +222,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'A safety helmet',
     answer: 'A safety helmet must be worn by everyone inside the construction site.',
     alternates: ['A safety helmet must be worn inside the construction site.'],
+    requiredGroups: [
+      ['must be worn', 'has to be worn', 'is to be worn'],
+      ['everyone', 'all workers', 'construction site'],
+    ],
     explain: 'For modal passives with "must", use: [object] + "must be" + past participle. The agent ("by everyone") can be omitted if the meaning is clear.',
   },
 
@@ -231,6 +239,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'The P5 pupils',
     answer: 'The P5 pupils conducted the science experiment last Friday.',
     alternates: [],
+    requiredGroups: [
+      ['conducted', 'performed', 'carried out', 'did'],
+      ['science experiment', 'experiment'],
+    ],
     explain: 'To change passive to active, move the "by" agent to the front as the subject, put the verb in the correct active tense (simple past here), and make the original subject the object.',
   },
 
@@ -313,6 +325,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'The judge exclaimed that',
     answer: 'The judge exclaimed that it was a very beautiful painting.',
     alternates: ['The judge exclaimed that the painting was very beautiful.'],
+    requiredGroups: [
+      ['very beautiful', 'a beautiful', 'so beautiful'],
+      ['painting', 'piece of art', 'artwork'],
+    ],
     explain: 'Exclamations ("What a…!") are reported using "exclaimed that" + a statement. The exclamation structure changes to a normal sentence. "What a + adjective + noun" becomes "very + adjective + noun".',
   },
 
@@ -357,6 +373,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     alternates: [
       'The commentator exclaimed that it had been a very incredible goal.',
       'The commentator shouted that the goal had been very incredible.',
+    ],
+    requiredGroups: [
+      ['had been', 'was'],
+      ['incredible', 'amazing', 'wonderful', 'spectacular'],
     ],
     explain: '"What a/an + adjective + noun!" → "shouted/exclaimed that + it had been a very + adjective + noun." Because the original uses past tense ("was"), shift to past perfect ("had been") in reported speech.',
   },
@@ -414,6 +434,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'The mentor to whom',
     answer: 'The mentor to whom Jun was very grateful had helped him greatly.',
     alternates: ['The mentor whom Jun was very grateful to had helped him greatly.'],
+    requiredGroups: [
+      ['grateful', 'thankful', 'indebted'],
+      ['helped', 'assisted', 'aided'],
+    ],
     explain: '"Whom" is used for people in the object position. When a preposition is involved ("to him"), it moves before "whom" in formal English: "to whom". In informal English, the preposition can stay at the end.',
   },
 
@@ -457,6 +481,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'The more you practise,',
     answer: 'The more you practise, the more you will improve.',
     alternates: [],
+    requiredGroups: [
+      ['the more', 'more you'],
+      ['improve', 'get better', 'do better'],
+    ],
     explain: '"The more…the more" shows a proportional relationship — as one thing increases, another increases too. Both parts use the comparative form and the structure is always: "The more [clause], the more [clause]."',
   },
 
@@ -474,6 +502,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'It was not until',
     answer: 'It was not until Priya reached home that she realised she had lost her phone.',
     alternates: [],
+    requiredGroups: [
+      ['reached home', 'got home', 'arrived home', 'came home'],
+      ['realised', 'realized', 'discovered', 'noticed', 'found out'],
+    ],
     explain: '"It was not until [time/event] that [main clause]" emphasises the lateness of a realisation or action. The main clause uses simple past tense. This structure is often used to highlight a delay.',
   },
 
@@ -487,6 +519,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'No sooner had he',
     answer: 'No sooner had he switched off the lights than his phone rang.',
     alternates: [],
+    requiredGroups: [
+      ['switched off', 'turned off', 'switched out', 'turned out'],
+      ['phone rang', 'phone began', 'phone started'],
+    ],
     explain: '"No sooner had + subject + past participle + than + subject + simple past" places "no sooner" at the front for emphasis. Note that the past perfect is used in the first clause and simple past in the second.',
   },
 
@@ -500,6 +536,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'Seldom did',
     answer: 'Seldom did she complain about her difficulties.',
     alternates: ['Rarely did she complain about her difficulties.', 'Never did she complain about her difficulties.'],
+    requiredGroups: [
+      ['complain', 'grumble', 'protest', 'moan'],
+      ['difficulties', 'hardships', 'problems', 'troubles'],
+    ],
     explain: 'When negative adverbs like "seldom", "rarely", or "never" are placed at the beginning of a sentence for emphasis, the subject and auxiliary verb must be inverted (like in a question): "Seldom did she…" not "Seldom she did…"',
   },
 
@@ -549,6 +589,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'Maya told her mother',
     answer: 'Maya told her mother that she had finished the project three days before.',
     alternates: ['Maya told her mother that she had finished the project three days earlier.'],
+    requiredGroups: [
+      ['had finished', 'had completed', 'had done'],
+      ['three days before', 'three days earlier'],
+    ],
     explain: 'In reported speech, "ago" changes to "before" or "earlier", and the verb shifts back one tense: "finished" (simple past) → "had finished" (past perfect).',
   },
 
@@ -591,6 +635,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'Never',
     answer: 'Never had the champion lost a match in his entire career.',
     alternates: [],
+    requiredGroups: [
+      ['had the champion lost', 'had he lost', 'had they lost', 'champion lost'],
+      ['match', 'career', 'entire career'],
+    ],
     explain: 'Fronting "never" gives the sentence greater emphasis. Use past perfect after "never" when the original sentence is also past perfect: "had never lost" → "Never had he lost".',
   },
 
@@ -605,6 +653,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'Students can use the computer lab after school',
     answer: 'Students can use the computer lab after school provided that they have a teacher\'s permission.',
     alternates: ['Provided that they have a teacher\'s permission, students can use the computer lab after school.'],
+    requiredGroups: [
+      ['provided that', 'on the condition that', 'so long as', 'as long as'],
+      ['teacher', "teacher's permission", 'permission'],
+    ],
     explain: '"Provided that" sets a condition that must be met for the main clause to be true. It is more formal than "if" and is commonly used in rules and notices.',
   },
 
@@ -619,6 +671,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'Not only is',
     answer: 'Not only is the new sports complex affordable, but it is also conveniently located.',
     alternates: ['The new sports complex is not only affordable but also conveniently located.'],
+    requiredGroups: [
+      ['affordable', 'cheap', 'inexpensive', 'reasonably priced'],
+      ['conveniently located', 'convenient', 'well located', 'easy to reach'],
+    ],
     explain: 'When "not only" is fronted (moved to the beginning), invert the subject and auxiliary verb in the first clause: "Not only is the complex…". The second clause keeps normal word order.',
   },
 
@@ -676,6 +732,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'They will have',
     answer: 'They will have their new flat redecorated by the interior designer next month.',
     alternates: ['They will have their new flat redecorated next month.'],
+    requiredGroups: [
+      ['flat redecorated', 'new flat redecorated', 'flat done up', 'flat decorated'],
+      ['interior designer', 'designer', 'next month'],
+    ],
     explain: '"Will have + object + past participle" is the future causative. It shows a planned arrangement where someone else will carry out the action on the subject\'s behalf.',
   },
 
@@ -689,6 +749,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'The elderly patient has',
     answer: 'The elderly patient has had her blood pressure checked by a doctor twice today.',
     alternates: ['The elderly patient has had her blood pressure checked twice today.'],
+    requiredGroups: [
+      ['blood pressure checked', 'blood pressure measured', 'pressure checked'],
+      ['doctor', 'twice today', 'twice'],
+    ],
     explain: '"Have/has had + object + past participle" is the present perfect causative. It means the arrangement and action happened recently and are still relevant to the present.',
   },
 
@@ -732,6 +796,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'It was at the science fair',
     answer: 'It was at the science fair that they first met in 2019.',
     alternates: ['It was in 2019 that they first met at the science fair.'],
+    requiredGroups: [
+      ['that they first met', 'that they met', 'they first met'],
+      ['2019'],
+    ],
     explain: 'Cleft sentences can emphasise a time or place by fronting it: "It was at [place] that…" The rest of the sentence follows "that" in normal word order.',
   },
 
@@ -792,6 +860,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'If she had studied',
     answer: 'If she had studied hard enough, she would have passed the examination.',
     alternates: ['She would have passed the examination if she had studied hard enough.'],
+    requiredGroups: [
+      ['hard enough', 'harder', 'more'],
+      ['would have passed', 'would have succeeded', 'would have done well'],
+    ],
     explain: 'Type 3 conditional talks about an imaginary past — something that did NOT happen. Use past perfect ("had + past participle") in the "if" clause and "would have + past participle" in the result clause.',
   },
 
@@ -805,6 +877,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     stem: 'If he had not left early,',
     answer: 'If he had not left early, he would not have missed the important announcement.',
     alternates: ['He would not have missed the important announcement if he had not left early.'],
+    requiredGroups: [
+      ['would not have missed', 'would have heard', 'would have caught', 'would have been there'],
+      ['important announcement', 'announcement'],
+    ],
     explain: 'In a negative Type 3 conditional, both clauses can be negative. "If he had not left early" (the imaginary past) → "he would not have missed" (the imaginary past result).',
   },
 
@@ -820,6 +896,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     alternates: [
       'If they had brought umbrellas, they would not have gotten drenched in the rain.',
       'If they had brought umbrellas, they could have avoided getting drenched.',
+    ],
+    requiredGroups: [
+      ['would not have got', 'would not have gotten', 'would have avoided', 'could have avoided'],
+      ['drenched', 'wet', 'soaked'],
     ],
     explain: '"Could have + past participle" in the result clause shows a past ability or possibility that was missed. It is slightly softer than "would have" and implies the outcome was achievable.',
   },
@@ -875,6 +955,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
       'Despite their limited resources, the team completed the project on time.',
       'The team completed the project on time in spite of their limited resources.',
       'The team completed the project on time despite their limited resources.',
+    ],
+    requiredGroups: [
+      ['team completed', 'team finished', 'they completed', 'they finished'],
+      ['on time', 'in time', 'before the deadline'],
     ],
     explain: '"In spite of" is slightly more formal than "despite" and is commonly used in written English. Both have the same meaning and grammar rules. Note: "their limited resources" is a noun phrase, so no "of" issue arises.',
   },
