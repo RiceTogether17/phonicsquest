@@ -152,6 +152,60 @@ describe('renderPhonemeChoiceGrid()', () => {
   });
 });
 
+describe('PA modes hold the choice previews past the word audio even when TTS resolves early', () => {
+  /**
+   * Regression guard for the iOS Safari quirk where speakWord's Promise can
+   * settle before the audio buffer actually finishes outputting. Each PA
+   * mode now waits on `Promise.all([ttsDone, floorHold])` where floorHold
+   * is a wall-clock duration proportional to the word length. This test
+   * makes speakWord resolve instantly and confirms the gate still holds
+   * for the floor duration.
+   */
+  async function runHoldTest(modeName, setupName, wordId) {
+    const { audio } = await import('../modules/audio.js');
+    const mod = await import(`../modes/${modeName}.js`);
+    const { WORDS } = await import('../data/words.js');
+    const word = WORDS.find(w => w.id === wordId);
+    const els  = baseEls();
+
+    // Make every audio call complete instantly so the only thing holding
+    // the gate is the wall-clock floor.
+    const speakWordSpy    = vi.spyOn(audio, 'speakWord').mockResolvedValue();
+    const speakPhonemeSpy = vi.spyOn(audio, 'speakPhoneme').mockResolvedValue();
+
+    mod[setupName](word, els);
+
+    // Within the first 500ms the speakWord setTimeout has barely fired —
+    // the gate must NOT have lifted yet. No phoneme previews allowed.
+    await vi.advanceTimersByTimeAsync(500);
+    expect(speakPhonemeSpy, `${modeName}: phoneme played within 500ms`).not.toHaveBeenCalled();
+
+    // The floor for a short word is ~1100ms PLUS the 600ms autoPlayDelay
+    // PLUS the 350ms pre-speak delay → previews should not begin until ~2.0s.
+    await vi.advanceTimersByTimeAsync(800);
+    expect(speakPhonemeSpy, `${modeName}: phoneme played at 1.3s, still inside floor`).not.toHaveBeenCalled();
+
+    // After the floor + autoPlay delay we expect at least one preview to run.
+    await vi.advanceTimersByTimeAsync(1500);
+    expect(speakPhonemeSpy, `${modeName}: phoneme should have played after the floor`).toHaveBeenCalled();
+
+    speakWordSpy.mockRestore();
+    speakPhonemeSpy.mockRestore();
+  }
+
+  it('firstSound holds previews past the wall-clock floor even when TTS reports done', async () => {
+    await runHoldTest('firstSound', 'setupFirstSound', 'cat');
+  });
+
+  it('lastSound holds previews past the wall-clock floor even when TTS reports done', async () => {
+    await runHoldTest('lastSound', 'setupLastSound', 'cat');
+  });
+
+  it('middleSound holds previews past the wall-clock floor even when TTS reports done', async () => {
+    await runHoldTest('middleSound', 'setupMiddleSound', 'cat');
+  });
+});
+
 describe('first/last/middle sound modes hide print during the question', () => {
   it('firstSound never shows the printed word until after a choice', async () => {
     const { setupFirstSound } = await import('../modes/firstSound.js');

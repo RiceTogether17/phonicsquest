@@ -79,24 +79,36 @@ export function setupLastSound(word, els) {
   ]);
 
   // Speak the word first; gate the choice previews on it finishing so the
-  // two audio streams never overlap.
-  const wordPlayed = new Promise(resolve => {
-    setTimeout(() => {
-      audio.speakWord(word.word).finally(resolve);
-    }, 400);
-  });
+  // two audio streams never overlap. Gate combines TTS-end + wall-clock
+  // floor (see _waitForWordAudio).
+  const wordPlayed = _waitForWordAudio(word.word);
 
   renderPhonemeChoiceGrid(els.modeArea, choices, {
     onChoose: (choice, btn) =>
       _handleChoice(choice, btn, word, els, els.modeArea.querySelector('.choice-grid'), lastIdx),
     autoPlayAfter: wordPlayed,
-    autoPlayDelay:  500,
-    autoPlayStride: 750,
+    autoPlayDelay:  600,
+    autoPlayStride: 800,
   });
 
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = '';
   els.btnSkip.style.display  = '';
+}
+
+/**
+ * See firstSound.js — same gating combining TTS-end + wall-clock floor.
+ * Duplicated locally to keep each mode file self-contained.
+ */
+function _waitForWordAudio(text) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const ttsDone   = audio.speakWord(text).catch(() => {});
+      const minHoldMs = Math.max(1100, String(text || '').length * 140 + 400);
+      const floorHold = new Promise(r => setTimeout(r, minHoldMs));
+      Promise.all([ttsDone, floorHold]).finally(resolve);
+    }, 350);
+  });
 }
 
 function _handleChoice(choice, btn, word, els, grid, lastIdx) {

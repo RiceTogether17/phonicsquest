@@ -90,23 +90,43 @@ export function setupFirstSound(word, els) {
   // Play the target word FIRST and wait for it to finish before previewing
   // the choice phonemes — overlapping the two makes the question unlistenable
   // for young children who are still building auditory discrimination.
-  const wordPlayed = new Promise(resolve => {
-    setTimeout(() => {
-      audio.speakWord(word.word).finally(resolve);
-    }, 400);
-  });
+  // We gate on BOTH the TTS promise AND a word-length-proportional wall-clock
+  // floor: some browsers (notably iOS Safari) resolve the speak Promise before
+  // the audio buffer actually finishes outputting, so the TTS signal alone
+  // isn't reliable on every device.
+  const wordPlayed = _waitForWordAudio(word.word);
 
   renderPhonemeChoiceGrid(els.modeArea, choices, {
     onChoose: (choice, btn) =>
       handleChoice(choice, btn, word, els, els.modeArea.querySelector('.choice-grid')),
     autoPlayAfter: wordPlayed,
-    autoPlayDelay:  500,   // brief pause after the word so the child can re-attune to phoneme listening
-    autoPlayStride: 750,
+    autoPlayDelay:  600,   // pause after the word so the child can re-attune to phoneme listening
+    autoPlayStride: 800,
   });
 
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = '';
   els.btnSkip.style.display = '';
+}
+
+/**
+ * Resolve only when the target-word audio is genuinely done playing.
+ *
+ * Combines the TTS promise (which reports completion based on the
+ * SpeechSynthesis `onend` event) with a wall-clock floor derived from
+ * word length. On some browsers `onend` fires before the audio actually
+ * leaves the speaker — the floor catches that case so the choice phonemes
+ * never bleed into the end of the word.
+ */
+function _waitForWordAudio(text) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const ttsDone     = audio.speakWord(text).catch(() => {});
+      const minHoldMs   = Math.max(1100, String(text || '').length * 140 + 400);
+      const floorHold   = new Promise(r => setTimeout(r, minHoldMs));
+      Promise.all([ttsDone, floorHold]).finally(resolve);
+    }, 350);
+  });
 }
 
 function handleChoice(choice, btn, word, els, grid) {
