@@ -10880,6 +10880,11 @@ textarea:hover {
 }
 
 /* ── Interactive Practice Test (game mode) ──────────────────────────────── */
+.ptg-launcher-count {
+  font-size: var(--font-size-sm, 0.9em); color: var(--text-muted, #555);
+  margin: 8px 0 4px;
+}
+.ptg-launcher-count strong { color: var(--text, #222); }
 .ptg-launcher-grid {
   display: grid;
   gap: 12px;

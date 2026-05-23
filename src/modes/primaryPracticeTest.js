@@ -1056,11 +1056,19 @@ export function buildPaperLauncherHtml({ level, papers, intro }) {
       <p>${escapeHtml(p.blurb || '')}</p>
       <button class="btn btn--primary" data-start-paper="${escapeAttr(p.id)}" type="button">Start paper</button>
     </article>`).join('');
+  const count = papers.length;
+  // Honest framing: surface the exact paper count up front so parents see
+  // "3 papers available" for P3 rather than assuming it's a full 4-term
+  // year bank like the upper-primary levels.
+  const countCaption = count > 0
+    ? `<p class="ptg-launcher-count"><strong>${count} paper${count === 1 ? '' : 's'} available</strong> at ${escapeHtml(level)}.</p>`
+    : '';
   return `
     <div class="ptg-mode-picker" role="group" aria-label="Select paper mode">
       <button class="ptg-mode-btn ptg-mode-btn--active" data-mode="practice" type="button">🎯 Practice</button>
       <button class="ptg-mode-btn" data-mode="test" type="button">⏱ Test Mode</button>
     </div>
+    ${countCaption}
     <p>${escapeHtml(intro || "Pick a paper to take the test interactively. Every section is scored — at the end you’ll see which skills to drill.")}</p>
     <div class="ptg-launcher-grid" data-level="${escapeAttr(level)}">${cards}</div>`;
 }

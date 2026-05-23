@@ -142,4 +142,19 @@ describe('P3 Practice Test launcher', () => {
       expect(html).toContain(`data-start-paper="${test.id}"`);
     }
   });
+
+  it('honestly labels the launcher as "3 papers available" and notes T4 is absent', () => {
+    const html = buildPlaceholderHtml('p3-practice-tests');
+    // Count caption surfaces the exact paper count.
+    expect(html).toMatch(/3 papers available/);
+    // Intro tells the user T4 is not in the bank — no surprise.
+    expect(html.toLowerCase()).toMatch(/no t4|t1.{0,4}t3 only|only terms 1.{0,4}3/i);
+  });
+
+  it('upper-primary launchers honestly show 4 papers available', () => {
+    for (const kind of ['p4-practice-tests', 'p5-practice-tests', 'p6-practice-tests']) {
+      const html = buildPlaceholderHtml(kind);
+      expect(html, kind).toMatch(/4 papers available/);
+    }
+  });
 });

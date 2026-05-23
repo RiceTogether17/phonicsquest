@@ -86,7 +86,7 @@ const META = {
   'p3-practice-tests': {
     icon: '🎓',
     label: 'Primary 3 Practice Tests',
-    blurb: 'Three P3 papers (T1–T3). Adds tag questions, phrasal verbs, modal-regret ("should have"), open Comprehension Cloze and two-passage comprehension in T3.',
+    blurb: 'Three P3 papers (T1–T3 only — there is no T4 in this bank). Adds tag questions, phrasal verbs, modal-regret ("should have"), open Comprehension Cloze and two-passage comprehension in T3.',
     paperLink: 'P3 · Continual Assessment style',
   },
   'p4-practice-tests': {
@@ -269,7 +269,7 @@ function _renderBody(kind) {
     return buildPaperLauncherHtml({
       level: 'P3',
       papers: P3_PRACTICE_TEST_TERMS.map(t => P3_PRACTICE_TESTS[t]).filter(Boolean),
-      intro: 'Pick a P3 paper to take the test interactively. T3 includes open Comprehension Cloze and two passages.',
+      intro: 'Pick a P3 paper to take the test interactively. Only Terms 1–3 are in this bank (no T4). T3 includes open Comprehension Cloze and two passages.',
     });
   }
   if (kind === 'p4-practice-tests') {
