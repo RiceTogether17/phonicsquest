@@ -227,24 +227,71 @@ class AudioManager {
     return this._ctx;
   }
 
-  /** Load preferred TTS voice */
+  /**
+   * Load the clearest available English TTS voice.
+   *
+   * Phonics relies on accurate, well-articulated speech, so the choice of
+   * voice matters as much as the audio path. We bias hard against the
+   * "Compact" / "Eloquence" / novelty voices that ship on iOS and against
+   * Android's robotic default — these are the ones parents most often
+   * report as muddy.  Selection order:
+   *
+   *   1. Named "Online"/"Natural"/"Neural" cloud voices (highest clarity).
+   *   2. Named premium platform voices (Samantha-Enhanced, Aria, Google US, …).
+   *   3. Any voice whose name advertises enhanced/premium/natural quality.
+   *   4. First non-low-quality en-US → en-GB → en-AU → en-SG → any en-* voice.
+   *   5. Last resort: first voice in the list.
+   */
   _initTTS() {
+    const isLowQuality = (v) =>
+      // iOS "Compact" voices are noticeably more robotic than the default
+      // ones, and "Eloquence" / novelty voices distort phoneme articulation.
+      /\bcompact\b|eloquence|novelty|whisper|bahh|albert|fred|junior|kathy|ralph|trinoids|zarvox/i.test(v.name || '');
+
+    const isEnglish = (v) => /^en(?:[-_]|$)/i.test(v.lang || '');
+
     const load = () => {
-      const voices = speechSynthesis.getVoices();
-      // Prefer natural-sounding English voices
-      const preferred = [
-        'Google US English', 'Microsoft Aria Online',
-        'Karen', 'Samantha', 'Daniel',
+      const all = speechSynthesis.getVoices();
+      if (!all.length) return;
+      const voices = all.filter(v => isEnglish(v) && !isLowQuality(v));
+
+      // Tier 1 – cloud / neural voices (these tend to be the clearest of all)
+      const naturalNeural = voices.find(v => /natural|neural|online|wavenet|studio/i.test(v.name));
+      if (naturalNeural) { this._ttsVoice = naturalNeural; return; }
+
+      // Tier 2 – named premium voices known to be clear on each platform
+      const namedPreferred = [
+        // macOS / iOS enhanced
+        'Samantha (Enhanced)', 'Ava (Enhanced)', 'Ava (Premium)', 'Allison (Enhanced)',
+        'Samantha', 'Ava', 'Allison', 'Karen', 'Moira', 'Tessa', 'Daniel',
+        // Microsoft Edge / Windows
+        'Microsoft Aria', 'Microsoft Jenny', 'Microsoft Sonia',
+        'Microsoft Zira', 'Microsoft Hazel', 'Microsoft Mark',
+        // Google (Android Chrome)
+        'Google US English', 'Google UK English Female', 'Google UK English Male',
       ];
-      for (const name of preferred) {
-        const v = voices.find(v => v.name.includes(name));
+      for (const name of namedPreferred) {
+        const v = voices.find(v => (v.name || '').includes(name));
         if (v) { this._ttsVoice = v; return; }
       }
-      // Fallback: first en-US voice
-      this._ttsVoice = voices.find(v => v.lang === 'en-US') ?? voices[0] ?? null;
+
+      // Tier 3 – any voice that advertises enhanced/premium quality
+      const enhanced = voices.find(v => /enhanced|premium|hd\b/i.test(v.name));
+      if (enhanced) { this._ttsVoice = enhanced; return; }
+
+      // Tier 4 – first voice in a clear language preference order
+      const langOrder = ['en-US', 'en-GB', 'en-AU', 'en-SG', 'en-IN'];
+      for (const lang of langOrder) {
+        const v = voices.find(v => (v.lang || '').toLowerCase() === lang.toLowerCase());
+        if (v) { this._ttsVoice = v; return; }
+      }
+
+      // Tier 5 – any English voice, then absolute fallback
+      this._ttsVoice = voices[0] ?? all[0] ?? null;
     };
+
     if (speechSynthesis.getVoices().length) load();
-    else speechSynthesis.addEventListener('voiceschanged', load, { once: true });
+    else speechSynthesis.addEventListener('voiceschanged', load);
   }
 
   /**
@@ -481,6 +528,11 @@ class AudioManager {
       utt.pitch = 1.1;
       utt.volume = 1;
       if (this._ttsVoice) utt.voice = this._ttsVoice;
+      // Setting `lang` matters even when a voice is selected: on Android the
+      // voiceschanged event sometimes fires after the first utterance, so
+      // lang is what nudges the engine to pick an English voice instead of
+      // the device default (which may be muffled or non-English).
+      utt.lang = this._ttsVoice?.lang || 'en-US';
 
       let resolved = false;
       const done = () => {
