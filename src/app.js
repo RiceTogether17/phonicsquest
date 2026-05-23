@@ -18,6 +18,7 @@ import { badges } from './modules/badges.js';
 import { progress } from './modules/progress.js';
 import { estimateMinutes as estimateReviewMinutes, getReviewCapForProfile } from './modules/reviewScheduler.js';
 import { getEarlyReadingPlan } from './modules/todaysPlan.js';
+import { getMistakesDenSummary, timeAgo as mistakeTimeAgo, MISTAKES_LOOKBACK_DAYS } from './modules/mistakesDen.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
 import { mascot } from './components/mascot.js';
 import { spinWheel, buildWordAnimation } from './components/wheel.js';
@@ -159,6 +160,7 @@ class App {
     this._updateDailyBanner();
     this._updateQuestBanners();
     this._updateReviewBanner();
+    this._updateMistakesDenBanner();
     this._renderGuidedJourney();
 
     console.log('[PhonicsQuest] App initialized');
@@ -609,6 +611,14 @@ class App {
       this._startReviewSession();
     });
 
+    document.getElementById('btn-mistakes-den')?.addEventListener('click', () => {
+      this._openMistakesDen();
+    });
+
+    document.querySelectorAll('[data-close="modal-mistakes-den"]').forEach(btn => {
+      btn.addEventListener('click', () => modalManager.close('modal-mistakes-den'));
+    });
+
     document.getElementById('extra-practice-toggle')?.addEventListener('click', () => {
       const content = document.getElementById('extra-practice-content');
       const toggle = document.getElementById('extra-practice-toggle');
@@ -854,6 +864,7 @@ class App {
     if (screenId === SCREENS.HOME) {
       this._updateQuestBanners();
       this._updateReviewBanner();
+      this._updateMistakesDenBanner();
       this._renderGuidedJourney();
       this._refreshQuestProgress();
     }
@@ -2597,6 +2608,106 @@ class App {
     } else {
       banner.style.display = 'none';
     }
+  }
+
+  /**
+   * Refresh the Mistakes Den home tile. Hidden when the last 7 days are
+   * blank so a brand-new profile (or one that hasn't slipped at all) sees
+   * a clean home rather than a "0 mistakes" guilt-free chip.
+   */
+  _updateMistakesDenBanner() {
+    const banner = document.getElementById('mistakes-den-banner');
+    if (!banner) return;
+    let summary;
+    try { summary = getMistakesDenSummary(); } catch (_) { summary = { count: 0 }; }
+    const sub = document.getElementById('mistakes-den-sub');
+
+    if (summary.count > 0) {
+      banner.style.display = '';
+      if (sub) {
+        sub.textContent = `${summary.count} to retry · last ${MISTAKES_LOOKBACK_DAYS} days`;
+      }
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  /**
+   * Open the Mistakes Den modal. Pulls a fresh summary every open so a
+   * mid-session retry that just happened isn't shown stale.
+   */
+  _openMistakesDen() {
+    const host = document.getElementById('mistakes-den-content');
+    if (!host) return;
+    let summary;
+    try { summary = getMistakesDenSummary(); } catch (_) { summary = { count: 0, mistakes: [], byModule: {} }; }
+    this._renderMistakesDen(host, summary);
+    modalManager.open('modal-mistakes-den');
+  }
+
+  /**
+   * Render the Mistakes Den modal body — list grouped by module, each row
+   * tappable to navigate back to the parent module (where adaptive
+   * selection picks up the now-overdue item).
+   */
+  _renderMistakesDen(host, summary) {
+    if (!host) return;
+    const escAttr = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
+
+    if (!summary || summary.count === 0) {
+      host.innerHTML = `
+        <div class="mistakes-den-empty">
+          <p class="mistakes-den-empty__title">🎉 Nothing to retry — all clear!</p>
+          <p class="mistakes-den-empty__sub">Mistakes from the last ${MISTAKES_LOOKBACK_DAYS} days show up here so you can have another go.</p>
+        </div>`;
+      return;
+    }
+
+    // Group rows by moduleLabel so the modal reads as "Grammar MCQ · 4 · …".
+    const byModuleLabel = new Map();
+    for (const m of summary.mistakes) {
+      const key = m.moduleLabel;
+      if (!byModuleLabel.has(key)) byModuleLabel.set(key, []);
+      byModuleLabel.get(key).push(m);
+    }
+
+    const groupsHtml = Array.from(byModuleLabel.entries()).map(([label, items]) => {
+      const rowsHtml = items.map(m => {
+        const countChip = m.count > 1 ? `<span class="mistakes-den-row__count" aria-label="${m.count} mistakes">×${m.count}</span>` : '';
+        const when = mistakeTimeAgo(m.lastMistakeAt);
+        return `
+          <button type="button"
+            class="mistakes-den-row"
+            data-target="${escAttr(m.target || '')}"
+            data-id="${escAttr(m.id)}"
+            aria-label="Retry ${escAttr(m.label)} in ${escAttr(m.moduleLabel)}, ${escAttr(when)}">
+            <span class="mistakes-den-row__label">${escText(m.label)}</span>
+            <span class="mistakes-den-row__when">${escText(when)}</span>
+            ${countChip}
+            <span class="mistakes-den-row__arrow" aria-hidden="true">→</span>
+          </button>`;
+      }).join('');
+
+      return `
+        <div class="mistakes-den-group" role="list">
+          <h3 class="mistakes-den-group__title">${escText(label)} <small>· ${items.length}</small></h3>
+          ${rowsHtml}
+        </div>`;
+    }).join('');
+
+    host.innerHTML = `
+      <p class="mistakes-den-intro">Tap any to retry — Giri's got you. ${escText(summary.count)} slip${summary.count === 1 ? '' : 's'} from the last ${MISTAKES_LOOKBACK_DAYS} days.</p>
+      <div class="mistakes-den-list">${groupsHtml}</div>`;
+
+    host.querySelectorAll('.mistakes-den-row[data-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.target;
+        if (!target) return;
+        modalManager.close('modal-mistakes-den');
+        this._navigateTo(target);
+      });
+    });
   }
 
   _updateDailyBanner() {

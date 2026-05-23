@@ -21,10 +21,10 @@
   <!-- Styles -->
 
   <title>PhonicsQuest – Early Reading & Primary English</title>
-  <script type="module" crossorigin src="/phonicsquest/assets/index-C-sACdBJ.js"></script>
+  <script type="module" crossorigin src="/phonicsquest/assets/index-D8mKGH9X.js"></script>
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/gsap-C8pce-KX.js">
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/chartjs-BR_H7_9u.js">
-  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-C0Z4MYGw.css">
+  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-CuQ9yo5h.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -128,6 +128,20 @@
             <span class="stories-banner-text">
               <span class="stories-banner-title" id="review-banner-title">🌟 Giri's Review Lane</span>
               <span class="stories-banner-sub" id="review-banner-sub">0 words due today</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+        </div>
+
+        <!-- Mistakes Den — universal review hub (rendered by app.js) -->
+        <div class="review-banner" id="mistakes-den-banner" style="display:none" role="status">
+          <button class="stories-banner stories-banner--blue" id="btn-mistakes-den" aria-label="Open Mistakes Den">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2rem;line-height:1" aria-hidden="true">🗂️</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title" id="mistakes-den-title">🗂️ Mistakes Den</span>
+              <span class="stories-banner-sub" id="mistakes-den-sub">0 to retry · last 7 days</span>
             </span>
             <span class="stories-banner-arrow">→</span>
           </button>
@@ -999,6 +1013,21 @@
             <input type="file" id="dashboard-import-input" accept=".json" class="sr-only" tabindex="-1">
           </label>
         </div>
+      </div>
+    </div>
+
+    <!-- MISTAKES DEN MODAL — universal review hub -->
+    <div class="modal-overlay" id="modal-mistakes-den" role="dialog" aria-modal="true" aria-label="Mistakes Den — review your recent mistakes" hidden>
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h2 class="modal-title">🗂️ Mistakes Den</h2>
+          <button class="modal-close" aria-label="Close Mistakes Den" data-close="modal-mistakes-den">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body" id="mistakes-den-content"><!-- Injected by app.js _renderMistakesDen --></div>
       </div>
     </div>
 
