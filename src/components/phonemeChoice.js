@@ -75,10 +75,15 @@ export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
     btn.appendChild(speaker);
     btn.appendChild(label);
 
-    btn.addEventListener('mouseenter', () => {
-      // Desktop preview — silently no-ops on touch devices.
-      audio.speakPhoneme(choice.grapheme, choice.type);
-    });
+    // Desktop hover preview only. iOS synthesizes mouseenter on tap, so on
+    // touch devices this fires concurrently with the word audio and causes
+    // the exact overlap we're trying to avoid. Gate it behind a real
+    // pointing device using the hover media query.
+    if (_hasRealHover()) {
+      btn.addEventListener('mouseenter', () => {
+        audio.speakPhoneme(choice.grapheme, choice.type);
+      });
+    }
     btn.addEventListener('click', () => {
       if (onChoose) onChoose(choice, btn);
     });
@@ -105,13 +110,19 @@ export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
  * Play each option's phoneme in sequence with a brief visual highlight on
  * the currently-playing button, so a non-reading child can still distinguish
  * the choices.
+ *
+ * Before the FIRST preview plays we cancel any in-flight SpeechSynthesis
+ * utterance — even with our wall-clock gate, an iOS quirk can leave the
+ * word's TTS audio tail still draining. Cancelling here guarantees a clean
+ * silence before the phoneme audio starts.
  */
 function _previewChoicesInOrder(buttons, choices, initialDelay, stride) {
   buttons.forEach((btn, i) => {
     setTimeout(async () => {
-      // Skip if the button has already been disabled (child answered before
-      // the preview finished).
       if (btn.disabled) return;
+      if (i === 0 && typeof window !== 'undefined' && window.speechSynthesis) {
+        try { window.speechSynthesis.cancel(); } catch (_) { /* non-fatal */ }
+      }
       btn.classList.add('previewing');
       try {
         await audio.speakPhoneme(choices[i].grapheme, choices[i].type);
@@ -119,4 +130,19 @@ function _previewChoicesInOrder(buttons, choices, initialDelay, stride) {
       btn.classList.remove('previewing');
     }, initialDelay + i * stride);
   });
+}
+
+/**
+ * True if the device has a mouse-like pointer that can hover (desktop with
+ * a mouse / trackpad). Returns false on touch-only devices where the OS
+ * synthesizes mouseenter events from taps and would falsely trigger our
+ * hover-preview.
+ */
+function _hasRealHover() {
+  if (typeof window === 'undefined' || !window.matchMedia) return false;
+  try {
+    return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  } catch (_) {
+    return false;
+  }
 }
