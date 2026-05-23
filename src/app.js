@@ -16,6 +16,7 @@ import { audio } from './modules/audio.js';
 import { gamification } from './modules/gamification.js';
 import { badges } from './modules/badges.js';
 import { progress } from './modules/progress.js';
+import { estimateMinutes as estimateReviewMinutes, getReviewCapForProfile } from './modules/reviewScheduler.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
 import { mascot } from './components/mascot.js';
 import { spinWheel, buildWordAnimation } from './components/wheel.js';
@@ -2431,19 +2432,29 @@ class App {
     this._startGame();
   }
 
-  /** Start a review session with SRS-due words */
+  /**
+   * Open Giri's Review Lane — pulls due items oldest-overdue first and caps
+   * the session by the child's reading band (K1–P1: 10, P2+: 20) so a child
+   * returning from a missed week isn't avalanched by a 50-item pile.
+   */
   _startReviewSession() {
-    const dueWords = progress.getReviewDueWords();
+    const profile = getActiveProfile ? getActiveProfile() : null;
+    const cap = getReviewCapForProfile(profile);
+    const dueWords = progress.getReviewDueWords({ cap });
+    const totalDue = progress.getReviewDueCount();
     if (dueWords.length === 0) {
-      this._showToast('No words due for review right now!', 'info');
+      this._showToast('All caught up! Come back tomorrow.', 'info');
       return;
     }
     this._sessionType = 'review';
-    this._queuedWords = dueWords.slice(0, 10);
+    this._queuedWords = dueWords;
     this._queuedCorrect = 0;
     this._mode = 'blend';
     store.set('currentGroup', null);
-    this._showToast(`Review time! ${this._queuedWords.length} words to practise 🔄`, 'info');
+    const overflow = totalDue > dueWords.length
+      ? ` (${totalDue - dueWords.length} more saved for tomorrow)`
+      : '';
+    this._showToast(`Review Lane: ${dueWords.length} word${dueWords.length === 1 ? '' : 's'}${overflow} 🌟`, 'info');
     this._startGame();
   }
 
@@ -2474,16 +2485,23 @@ class App {
     mascot.setHomeState('holdCard');
   }
 
-  /** Update the review words banner */
+  /**
+   * Refresh the Giri's Review Lane home-screen tile. Hides itself when there
+   * are no due items so a brand-new profile sees a clean home; surfaces a
+   * minutes estimate (~35s/item) once the queue has anything in it.
+   */
   _updateReviewBanner() {
-    const dueWords = progress.getReviewDueWords();
     const banner = document.getElementById('review-banner');
-    const sub = document.getElementById('review-banner-sub');
     if (!banner) return;
+    const dueCount = progress.getReviewDueCount();
+    const sub = document.getElementById('review-banner-sub');
 
-    if (dueWords.length > 0) {
+    if (dueCount > 0) {
       banner.style.display = '';
-      if (sub) sub.textContent = `${dueWords.length} word${dueWords.length === 1 ? '' : 's'} due for review`;
+      const minutes = estimateReviewMinutes(dueCount);
+      if (sub) {
+        sub.textContent = `${dueCount} word${dueCount === 1 ? '' : 's'} due today · about ${minutes} min`;
+      }
     } else {
       banner.style.display = 'none';
     }

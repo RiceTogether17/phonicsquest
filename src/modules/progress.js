@@ -12,6 +12,7 @@ import { store } from './store.js';
 import { WORDS, shuffleArray, getWordsByLevel, getWordStructure, getShortVowelLetter } from '../data/words.js';
 import { MASTERY_THRESHOLD, MIN_ATTEMPTS_FOR_MASTERY } from '../data/curriculum.js';
 import { normalizeAdaptiveConfig, getWordWeight } from './adaptiveSelection.js';
+import { getDueItems, countDueItems } from './reviewScheduler.js';
 
 const NON_DECODABLE_GROUPS = new Set(['sight-highfreq']);
 const BLENDING_MODES = new Set(['blend', 'classicBlend']);
@@ -449,21 +450,24 @@ class Progress {
 
   /**
    * Get words that are due for spaced-repetition review.
+   * Oldest-overdue first, optionally capped to `opts.cap`. Reads the new
+   * `dueAt` / `box` fields with a fallback to the legacy `nextReviewDate`
+   * so words played before the engine shipped still surface correctly.
+   * @param {{ cap?: number, now?: number }} [opts]
    * @returns {import('../data/words.js').Word[]}
    */
-  getReviewDueWords() {
+  getReviewDueWords(opts = {}) {
     const stats = store.get('wordStats') || {};
-    const now = new Date();
-    const dueWords = [];
+    return getDueItems(stats, WORDS, opts).map(d => d.item);
+  }
 
-    for (const word of WORDS) {
-      const s = stats[word.id];
-      if (!s || !s.nextReviewDate) continue;
-      if (new Date(s.nextReviewDate) <= now) {
-        dueWords.push(word);
-      }
-    }
-    return dueWords;
+  /**
+   * Total number of words due for spaced-repetition review right now.
+   * Used by the Giri's Review Lane home-screen tile.
+   * @returns {number}
+   */
+  getReviewDueCount() {
+    return countDueItems(store.get('wordStats') || {}, WORDS);
   }
 
   /**
