@@ -1666,6 +1666,63 @@ export const WORDS = [
   { id:'enough', word:'enough', graphemes:['e','nough'], types:['sv','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'✅' },
   { id:'should', word:'should', graphemes:['sh','ou','ld'], types:['d','dp','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'🧠' },
   { id:'could', word:'could', graphemes:['c','ou','ld'], types:['c','dp','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'💡' },
+
+  /* ══════════════════════════════════════
+     PHONEMIC AWARENESS — VOWEL-INITIAL DEPTH
+     Words whose FIRST sound is a long vowel,
+     diphthong, or r-controlled vowel. Before
+     this section the first-sound pool for
+     these phonemes was 1–3 words, leaving
+     learners with effectively no practice on
+     "what sound does ape/eat/oak start with?".
+     Carries through to last-sound and
+     middle-sound modes too because the same
+     words are mid-vowel-rich.
+  ══════════════════════════════════════ */
+
+  // --- Long-A initial: split-digraph (a_e) ---
+  { id:'ape',  word:'ape',  graphemes:['a','p','e'],     types:['lv','c','se'],            pattern:'CVCe',  group:'long-a', level:2, emoji:'🦍' },
+  { id:'ate',  word:'ate',  graphemes:['a','t','e'],     types:['lv','c','se'],            pattern:'CVCe',  group:'long-a', level:2, emoji:'🍴' },
+  { id:'ace',  word:'ace',  graphemes:['a','c','e'],     types:['lv','soft_c','se'],       pattern:'CVCe',  group:'long-a', level:2, emoji:'🃏' },
+  { id:'age',  word:'age',  graphemes:['a','g','e'],     types:['lv','soft_g','se'],       pattern:'CVCe',  group:'long-a', level:2, emoji:'🎂' },
+  // --- Long-A initial: vowel team (ai) ---
+  { id:'aim',  word:'aim',  graphemes:['ai','m'],        types:['lv','c'],                 pattern:'other', group:'long-a', level:2, emoji:'🎯' },
+  { id:'aid',  word:'aid',  graphemes:['ai','d'],        types:['lv','c'],                 pattern:'other', group:'long-a', level:2, emoji:'🩹' },
+
+  // --- Long-E initial: vowel team (ea / ee) ---
+  { id:'eat',  word:'eat',  graphemes:['ea','t'],        types:['lv','c'],                 pattern:'other', group:'long-e', level:2, emoji:'🍽️' },
+  { id:'east', word:'east', graphemes:['ea','st'],       types:['lv','bl'],                pattern:'other', group:'long-e', level:2, emoji:'🧭' },
+  { id:'eel',  word:'eel',  graphemes:['ee','l'],        types:['lv','c'],                 pattern:'other', group:'long-e', level:2, emoji:'🐍' },
+
+  // --- Long-I initial: split-digraph (i_e) with soft c ---
+  { id:'ice',  word:'ice',  graphemes:['i','c','e'],     types:['lv','soft_c','se'],       pattern:'CVCe',  group:'long-i', level:2, emoji:'🧊' },
+
+  // --- Long-O initial: vowel team (oa) ---
+  { id:'oak',  word:'oak',  graphemes:['oa','k'],        types:['lv','c'],                 pattern:'other', group:'long-o', level:2, emoji:'🌳' },
+  { id:'oat',  word:'oat',  graphemes:['oa','t'],        types:['lv','c'],                 pattern:'other', group:'long-o', level:2, emoji:'🌾' },
+
+  // --- R-controlled initial (ar) ---
+  { id:'arm',  word:'arm',  graphemes:['ar','m'],        types:['rc','c'],                 pattern:'other', group:'r-controlled', level:2, emoji:'💪' },
+  { id:'art',  word:'art',  graphemes:['ar','t'],        types:['rc','c'],                 pattern:'other', group:'r-controlled', level:2, emoji:'🎨' },
+  { id:'ark',  word:'ark',  graphemes:['ar','k'],        types:['rc','c'],                 pattern:'other', group:'r-controlled', level:2, emoji:'🚢' },
+
+  // --- Diphthong initial (ou / ow) ---
+  { id:'ouch', word:'ouch', graphemes:['ou','ch'],       types:['dp','d'],                 pattern:'other', group:'diphthongs', level:3, emoji:'🤕' },
+  { id:'owl',  word:'owl',  graphemes:['ow','l'],        types:['dp','c'],                 pattern:'other', group:'diphthongs', level:3, emoji:'🦉' },
+
+  // --- Extra diphthong middle/last-sound practice ---
+  // Bolsters the level-3 diphthong pool so middle- and last-sound modes
+  // have more than the original ~30 words to draw from.
+  { id:'point', word:'point', graphemes:['p','oi','n','t'], types:['c','dp','c','c'],      pattern:'other', group:'diphthongs', level:3, emoji:'👉' },
+  { id:'joint', word:'joint', graphemes:['j','oi','n','t'], types:['c','dp','c','c'],      pattern:'other', group:'diphthongs', level:3, emoji:'🦴' },
+  { id:'noise', word:'noise', graphemes:['n','oi','se'],    types:['c','dp','d'],          pattern:'other', group:'diphthongs', level:3, emoji:'🔊' },
+  { id:'voice', word:'voice', graphemes:['v','oi','c','e'], types:['c','dp','soft_c','se'],pattern:'other', group:'diphthongs', level:3, emoji:'🎤' },
+  { id:'crown', word:'crown', graphemes:['cr','ow','n'],    types:['bl','dp','c'],         pattern:'other', group:'diphthongs', level:3, emoji:'👑' },
+  { id:'brown', word:'brown', graphemes:['br','ow','n'],    types:['bl','dp','c'],         pattern:'other', group:'diphthongs', level:3, emoji:'🟫' },
+  { id:'count', word:'count', graphemes:['c','ou','n','t'], types:['c','dp','c','c'],      pattern:'other', group:'diphthongs', level:3, emoji:'🔢' },
+  { id:'round', word:'round', graphemes:['r','ou','n','d'], types:['c','dp','c','c'],      pattern:'other', group:'diphthongs', level:3, emoji:'⭕' },
+  { id:'house', word:'house', graphemes:['h','ou','se'],    types:['c','dp','d'],          pattern:'other', group:'diphthongs', level:3, emoji:'🏠' },
+  { id:'mouse', word:'mouse', graphemes:['m','ou','se'],    types:['c','dp','d'],          pattern:'other', group:'diphthongs', level:3, emoji:'🐭' },
 ];
 
 // Attach `phonemes`, `spellingPattern`, `flags`, and `decodableStage` to

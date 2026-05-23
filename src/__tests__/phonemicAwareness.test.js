@@ -224,6 +224,70 @@ describe('missingSound distractors respect the target word\'s level', () => {
   });
 });
 
+describe('phonemic-awareness modes have a sufficient word pool', () => {
+  /**
+   * Children need varied practice on first/last/middle sound — including
+   * long vowels and diphthongs, not just short-vowel CVC words. These
+   * floors lock in the pool depth so a future curriculum refactor can't
+   * silently drop the vowel-initial words and leave the modes asking
+   * "what does ape start with?" with no answer pool to draw from.
+   *
+   * Numbers are conservative — well below the actual count, just enough
+   * that the modes can always assemble a real adaptive sample.
+   */
+  const PA_EXCLUDED = new Set(['sight-highfreq', 'multisyllable', 'prefixes', 'suffixes-advanced']);
+  const VOWEL_TYPES = new Set(['sv', 'lv', 'rc', 'dp']);
+
+  /** Replicates the middle-index logic used by setupMiddleSound. */
+  function middleIdx(word) {
+    const minI = word.graphemes.length > 2 ? 1 : 0;
+    const maxI = word.graphemes.length > 2 ? word.graphemes.length - 2 : word.graphemes.length - 1;
+    for (let i = minI; i <= maxI; i++) {
+      if (VOWEL_TYPES.has(word.types[i])) return i;
+    }
+    return Math.floor(word.graphemes.length / 2);
+  }
+
+  let pool;
+  beforeEach(async () => {
+    const { WORDS } = await import('../data/words.js');
+    pool = WORDS.filter(w => !PA_EXCLUDED.has(w.group) && w.pattern !== 'sight');
+  });
+
+  it('overall PA-eligible pool is deep enough to keep questions fresh across a session', () => {
+    // Each session can play 30+ items; the pool must dwarf that several times
+    // over so the adaptive sampler isn't forced to repeat too aggressively.
+    expect(pool.filter(w => w.level === 1).length).toBeGreaterThanOrEqual(150);
+    expect(pool.filter(w => w.level === 2).length).toBeGreaterThanOrEqual(300);
+    expect(pool.filter(w => w.level === 3).length).toBeGreaterThanOrEqual(120);
+  });
+
+  it('first-sound mode can practise long vowels and diphthongs, not just consonants', () => {
+    const lvFirst = pool.filter(w => w.types[0] === 'lv');
+    const dpFirst = pool.filter(w => w.types[0] === 'dp');
+    const rcFirst = pool.filter(w => w.types[0] === 'rc');
+    // Need at least one correct word + three distractors per round; with
+    // adaptive replay we want a comfortable surplus over that floor of 4.
+    expect(lvFirst.length).toBeGreaterThanOrEqual(10);
+    expect(dpFirst.length).toBeGreaterThanOrEqual(4);
+    expect(rcFirst.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('last-sound mode has a non-trivial diphthong and long-vowel pool', () => {
+    const lvLast = pool.filter(w => w.types[w.types.length - 1] === 'lv');
+    const dpLast = pool.filter(w => w.types[w.types.length - 1] === 'dp');
+    expect(lvLast.length).toBeGreaterThanOrEqual(30);
+    expect(dpLast.length).toBeGreaterThanOrEqual(10);
+  });
+
+  it('middle-sound mode has plenty of long-vowel and diphthong medial words', () => {
+    const lvMid = pool.filter(w => w.types[middleIdx(w)] === 'lv');
+    const dpMid = pool.filter(w => w.types[middleIdx(w)] === 'dp');
+    expect(lvMid.length).toBeGreaterThanOrEqual(150);
+    expect(dpMid.length).toBeGreaterThanOrEqual(30);
+  });
+});
+
 describe('soundCount mode hides the printed word during the question', () => {
   it('does not render the printed word on setup', async () => {
     const { setupSoundCount } = await import('../modes/soundCount.js');
