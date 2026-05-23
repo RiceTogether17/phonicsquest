@@ -17,6 +17,7 @@ import { gamification } from './modules/gamification.js';
 import { badges } from './modules/badges.js';
 import { progress } from './modules/progress.js';
 import { estimateMinutes as estimateReviewMinutes, getReviewCapForProfile } from './modules/reviewScheduler.js';
+import { getEarlyReadingPlan } from './modules/todaysPlan.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
 import { mascot } from './components/mascot.js';
 import { spinWheel, buildWordAnimation } from './components/wheel.js';
@@ -1672,6 +1673,8 @@ class App {
       : getHomeLayoutForReadingBand(readingBand);
     const sentenceForgeBtn = document.getElementById('btn-sentence-forge');
 
+    const todaysPlanHost = document.getElementById('early-reading-todays-plan');
+
     if (layout.hidePhonicsCore) {
       // Primary pathway: collapse Early Reading Quest to a small "also available"
       // strip below the Primary English Quest hub, and surface a "Start Here
@@ -1694,6 +1697,9 @@ class App {
       this._renderPrimaryStartHere(startHere);
       this._renderPrimaryEarlyReadingNote(coreSection);
       this._filterGradeSpecificModules(profile?.primaryGrade || null);
+      // Primary profiles get the 5-step Mission Today (above) — hide the
+      // 3-step early-reading plan so they aren't shown two overlapping cards.
+      if (todaysPlanHost) todaysPlanHost.style.display = 'none';
     } else if (!layout.questsMilestone) {
       coreSection?.classList.remove('home-section--hidden', 'home-section--collapsed');
       questsSection?.classList.remove('home-section--milestone', 'home-section--primary-priority');
@@ -1702,6 +1708,7 @@ class App {
       sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
       if (levelBadge) levelBadge.style.display = 'none';
       if (startHere) startHere.style.display = 'none';
+      this._renderEarlyReadingTodaysPlan(todaysPlanHost);
     } else {
       coreSection?.classList.remove('home-section--hidden', 'home-section--collapsed');
       questsSection?.classList.add('home-section--milestone');
@@ -1711,7 +1718,88 @@ class App {
       sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
       if (levelBadge) levelBadge.style.display = 'none';
       if (startHere) startHere.style.display = 'none';
+      this._renderEarlyReadingTodaysPlan(todaysPlanHost);
     }
+  }
+
+  /**
+   * Render the 3-step "Today's Plan" card on the early-reading home screen
+   * (K1–P1 / emerging-decoder bands). Mirrors the primary `_renderPrimaryStartHere`
+   * shape but with steps anchored on Review Lane → Daily Challenge → Warm-up.
+   *
+   * Step completion is derived live from existing signals (review-due count,
+   * daily-challenge state, sessionWordsToday) so no extra event plumbing is
+   * needed — ticks update the moment the underlying task is completed.
+   */
+  _renderEarlyReadingTodaysPlan(host) {
+    if (!host) return;
+    let plan;
+    try { plan = getEarlyReadingPlan(); } catch (_) { plan = null; }
+    if (!plan) { host.style.display = 'none'; return; }
+
+    const escAttr = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
+
+    const stepsHtml = plan.steps.map(step => {
+      const stateClass = step.done ? 'mission-step--done' : '';
+      const aria = step.done
+        ? `${step.title}, complete`
+        : `${step.title}, ${step.progressLabel}`;
+      return `
+        <button type="button"
+          class="mission-step ${stateClass}"
+          data-step-target="${escAttr(step.target)}"
+          data-step-group="${escAttr(step.group || '')}"
+          data-step-id="${escAttr(step.id)}"
+          aria-label="${escAttr(aria)}">
+          <span class="mission-step__num" aria-hidden="true">${step.num}</span>
+          <span class="mission-step__icon" aria-hidden="true">${escText(step.icon)}</span>
+          <span class="mission-step__body">
+            <span class="mission-step__title">${escText(step.title)}</span>
+            <span class="mission-step__desc">${escText(step.detail)}</span>
+          </span>
+          <span class="mission-step__progress" aria-hidden="true">${escText(step.progressLabel)}</span>
+        </button>`;
+    }).join('');
+
+    const headline = plan.complete
+      ? (plan.allCaughtUp
+          ? "🎉 Today's Plan done — all caught up!"
+          : "🎉 Today's Plan complete!")
+      : `🎯 Today's Plan · ${plan.done}/${plan.total} done`;
+    const sub = plan.complete
+      ? 'Come back tomorrow for the next plan.'
+      : '3 small steps · about 10 minutes';
+
+    host.style.display = '';
+    host.innerHTML = `
+      <div class="home-section-header">
+        <p class="home-section-heading">${headline}</p>
+        <p class="home-section-sub">${sub}</p>
+      </div>
+      <div class="mission-card" role="list">${stepsHtml}</div>`;
+
+    host.querySelectorAll('.mission-step[data-step-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.stepTarget;
+        const group  = btn.dataset.stepGroup || null;
+        const stepId = btn.dataset.stepId;
+        if (!target) return;
+        if (stepId === 'review') {
+          this._startReviewSession();
+          return;
+        }
+        if (stepId === 'daily' || target === 'daily-challenge') {
+          if (isDailyChallengeComplete()) {
+            this._showToast('Daily challenge already done! Come back tomorrow.', 'info');
+            return;
+          }
+          this._startDailyChallenge();
+          return;
+        }
+        this._navigateTo(target, group);
+      });
+    });
   }
 
   /**
@@ -2479,7 +2567,11 @@ class App {
     } else if (type === 'review') {
       this._showToast('Review session complete! Great revision! 🔄', 'success');
       audio.playSfx('correct');
+      this._updateReviewBanner();
     }
+    // Refresh Today's Plan ticks immediately on return to home so the child
+    // sees their step flip to ✓ without waiting for the next render.
+    this._renderGuidedJourney();
 
     this._showScreen(SCREENS.HOME);
     mascot.setHomeState('holdCard');
