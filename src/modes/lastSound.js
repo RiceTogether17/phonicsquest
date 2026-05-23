@@ -78,16 +78,25 @@ export function setupLastSound(word, els) {
     ...distractors.slice(0, 3).map(g => ({ ...g, correct: false })),
   ]);
 
+  // Speak the word first; gate the choice previews on it finishing so the
+  // two audio streams never overlap.
+  const wordPlayed = new Promise(resolve => {
+    setTimeout(() => {
+      audio.speakWord(word.word).finally(resolve);
+    }, 400);
+  });
+
   renderPhonemeChoiceGrid(els.modeArea, choices, {
     onChoose: (choice, btn) =>
       _handleChoice(choice, btn, word, els, els.modeArea.querySelector('.choice-grid'), lastIdx),
+    autoPlayAfter: wordPlayed,
+    autoPlayDelay:  500,
+    autoPlayStride: 750,
   });
 
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = '';
   els.btnSkip.style.display  = '';
-
-  setTimeout(() => audio.speakWord(word.word), 400);
 }
 
 function _handleChoice(choice, btn, word, els, grid, lastIdx) {

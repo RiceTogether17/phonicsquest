@@ -11,7 +11,9 @@
  *
  *   2. Each option auto-plays once on render so the child hears every choice
  *      before being asked to pick. A child who can't read still has full
- *      access to the task.
+ *      access to the task. Auto-play can be deferred via `autoPlayAfter`
+ *      (a Promise) so the target-word audio plays in full before the choice
+ *      previews start — overlapping the two confuses young listeners.
  *
  * Tap = commit. To re-hear an option, the user can use the existing "Say it"
  * button (which repeats the target word). Mouseenter previews on desktop for
@@ -37,6 +39,9 @@ import { audio } from '../modules/audio.js';
  * @param {boolean} [opts.autoPlay=true]   - cycle through each option once on mount
  * @param {number}  [opts.autoPlayDelay=400] - initial delay before first auto-play (ms)
  * @param {number}  [opts.autoPlayStride=650] - gap between auto-played choices (ms)
+ * @param {Promise<void>|null} [opts.autoPlayAfter=null] - if provided, defer the
+ *   auto-play preview until this promise resolves (e.g. wait for the target
+ *   word audio to finish so the two don't overlap)
  * @returns {HTMLButtonElement[]} the rendered buttons in render order
  */
 export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
@@ -45,6 +50,7 @@ export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
     autoPlay        = true,
     autoPlayDelay   = 400,
     autoPlayStride  = 650,
+    autoPlayAfter   = null,
   } = opts;
 
   container.innerHTML = '<div class="choice-grid choice-grid--phoneme"></div>';
@@ -82,7 +88,14 @@ export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
   });
 
   if (autoPlay) {
-    _previewChoicesInOrder(buttons, choices, autoPlayDelay, autoPlayStride);
+    const start = () => _previewChoicesInOrder(buttons, choices, autoPlayDelay, autoPlayStride);
+    if (autoPlayAfter && typeof autoPlayAfter.then === 'function') {
+      // Defer until the gate promise settles. Errors are non-fatal — start
+      // the previews anyway so the child isn't left in silence.
+      autoPlayAfter.then(start, start);
+    } else {
+      start();
+    }
   }
 
   return buttons;

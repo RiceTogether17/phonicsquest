@@ -87,16 +87,26 @@ export function setupFirstSound(word, els) {
     ...distractors.map(g => ({ grapheme: g.grapheme, type: g.type, correct: false })),
   ]);
 
+  // Play the target word FIRST and wait for it to finish before previewing
+  // the choice phonemes — overlapping the two makes the question unlistenable
+  // for young children who are still building auditory discrimination.
+  const wordPlayed = new Promise(resolve => {
+    setTimeout(() => {
+      audio.speakWord(word.word).finally(resolve);
+    }, 400);
+  });
+
   renderPhonemeChoiceGrid(els.modeArea, choices, {
     onChoose: (choice, btn) =>
       handleChoice(choice, btn, word, els, els.modeArea.querySelector('.choice-grid')),
+    autoPlayAfter: wordPlayed,
+    autoPlayDelay:  500,   // brief pause after the word so the child can re-attune to phoneme listening
+    autoPlayStride: 750,
   });
 
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = '';
   els.btnSkip.style.display = '';
-
-  setTimeout(() => audio.speakWord(word.word), 400);
 }
 
 function handleChoice(choice, btn, word, els, grid) {

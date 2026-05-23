@@ -121,6 +121,35 @@ describe('renderPhonemeChoiceGrid()', () => {
     await vi.advanceTimersByTimeAsync(200);
     expect(container.querySelectorAll('.choice-btn--phoneme')).toHaveLength(4);
   });
+
+  it('defers choice previews until autoPlayAfter resolves so the word and phonemes never overlap', async () => {
+    const { audio } = await import('../modules/audio.js');
+    const spy = vi.spyOn(audio, 'speakPhoneme').mockResolvedValue();
+
+    let resolveGate;
+    const gate = new Promise(r => { resolveGate = r; });
+
+    const container = document.createElement('div');
+    renderPhonemeChoiceGrid(container, choices, {
+      autoPlay: true,
+      autoPlayDelay: 0,
+      autoPlayStride: 10,
+      autoPlayAfter: gate,
+    });
+
+    // While the gate is unresolved, no choice phonemes should have been spoken,
+    // regardless of how much wall-clock time has passed.
+    await vi.advanceTimersByTimeAsync(500);
+    expect(spy).not.toHaveBeenCalled();
+
+    // After the gate resolves the previews queue up.
+    resolveGate();
+    await Promise.resolve();
+    await vi.advanceTimersByTimeAsync(100);
+    expect(spy).toHaveBeenCalled();
+
+    spy.mockRestore();
+  });
 });
 
 describe('first/last/middle sound modes hide print during the question', () => {
