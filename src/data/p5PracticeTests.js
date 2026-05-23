@@ -8,11 +8,11 @@
  * Section breakdown per paper (total 85 marks, 1 h 30 min):
  *   Section A — Grammar MCQ            10 items  10 marks
  *   Section B — Vocabulary MCQ          5 items   5 marks
- *   Section C — Grammar Cloze          10 blanks 15 marks
+ *   Section C — Grammar Cloze          10 blanks 10 marks
  *   Section D — Vocabulary Cloze       10 blanks 10 marks
- *   Section E — Situational Writing              15 marks
+ *   Section E — Situational Writing              15 marks  (self-assessed)
  *   Section F — Synthesis & Transformation 5 items 10 marks
- *   Section G — Comprehension Cloze    10 blanks  5 marks  (open, no word bank)
+ *   Section G — Comprehension Cloze    10 blanks 10 marks  (open, no word bank)
  *   Section H — Comprehension          1 passage 15 marks
  *                                               ─────────
  *                                                   85
@@ -43,6 +43,8 @@
  *   T4 — technology / sports, balanced review
  */
 
+import { checkMcqItems, checkSectionMarks } from './practiceTestValidators.js';
+
 export const P5_PRACTICE_TEST_TERMS = Object.freeze(['T1', 'T2', 'T3', 'T4']);
 
 export const P5_PRACTICE_TESTS = Object.freeze({
@@ -64,12 +66,12 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       marks: 10,
       items: [
         {
-          q: 'All rubbish ___ in the designated bins before you leave the campsite.',
+          q: 'All rubbish ___ of in the designated bins before you leave the campsite.',
           choices: ['must dispose', 'must be disposed', 'should dispose', 'should disposing'],
           answer: 'must be disposed',
           skill: 'passiveVoice',
           practiseTarget: 'grammar-mcq',
-          explain: 'Passive voice with modal: "must be disposed of" — the subject (rubbish) receives the action.',
+          explain: 'Passive voice with modal: "must be disposed of" — the subject (rubbish) receives the action; "dispose" takes the preposition "of".',
         },
         {
           q: 'If the weather ___ fine tomorrow, we ___ our nature walk as planned.',
@@ -161,10 +163,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         {
           q: 'Her colleagues noticed that Amanda was stressed, but her cheerful smile was ___ — it was actually a sign that she was coping well.',
           choices: ['a blessing in disguise', 'the last straw', 'a piece of cake', 'a silver lining'],
-          answer: 'a blessing in disguise',
+          answer: 'a silver lining',
           skill: 'idiomaticExpressions',
           practiseTarget: 'vocab-mcq',
-          explain: '"A blessing in disguise" — something that seems bad but turns out to be good.',
+          explain: '"A silver lining" — a positive or hopeful aspect of an otherwise difficult situation. Her cheerful smile was the encouraging sign within a stressful period.',
         },
         {
           q: 'The loss of the rainforest is not just an environmental disaster — it is a ___ wound on the planet\'s ecological system.',
@@ -195,7 +197,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
 
     sectionC: {
       title: 'Section C: Grammar Cloze',
-      marks: 15,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word from the word bank. Each word may be used only once. Two words will be left over.',
       wordBank: ['although', 'has', 'been', 'which', 'were', 'being', 'unless', 'their', 'as', 'more', 'whose', 'despite'],
       text:
@@ -278,6 +280,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'All nesting sites ___',
           answer: 'All nesting sites must be protected from human interference by park rangers.',
           alternates: ['All nesting sites must be protected from human interference.'],
+          requiredGroups: [
+            ["must be protected", "have to be protected", "are to be protected"],
+            ["human interference", "interference", "park rangers", "rangers"],
+          ],
           skill: 'passiveVoice',
           explain: 'Passive with modal: move the object to subject position and insert "must be + past participle".',
         },
@@ -286,6 +292,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'The officer ordered the boys ___',
           answer: 'The officer ordered the boys to stop throwing litter into the river at once.',
           alternates: ['The officer ordered the boys not to throw litter into the river.'],
+          requiredGroups: [
+            ["stop throwing", "not to throw", "to stop throwing"],
+            ["litter", "rubbish"],
+          ],
           skill: 'reportedSpeech',
           explain: 'Reported command: "ordered + object + to-infinitive"; negative command: "ordered + object + not + to-infinitive".',
         },
@@ -294,6 +304,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'Were the government ___',
           answer: 'Were the government not to act swiftly, the rare pangolin population would vanish.',
           alternates: ['Were the government to fail to act swiftly, the rare pangolin population would vanish.'],
+          requiredGroups: [
+            ["not to act", "to fail to act"],
+            ["pangolin", "would vanish", "would disappear"],
+          ],
           skill: 'conditionals',
           explain: 'Type 2 conditional inversion: "Were + subject + to-infinitive" replaces "If + subject + past tense".',
         },
@@ -302,6 +316,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'The wetland reserve, whose ___',
           answer: 'The wetland reserve, whose restoration work had not been completed, was closed to visitors.',
           alternates: [],
+          requiredGroups: [
+            ["restoration work", "restoration"],
+            ["had not been completed", "was not completed", "remained incomplete"],
+          ],
           skill: 'relativeClauses',
           explain: '"Whose + noun" combines two sentences into a non-restrictive relative clause.',
         },
@@ -310,6 +328,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'Such ___',
           answer: 'Such was the severity of the flooding that it destroyed three coastal villages.',
           alternates: ['Such severe flooding occurred that it destroyed three coastal villages.'],
+          requiredGroups: [
+            ["severity", "severe flooding", "severe"],
+            ["destroyed", "wiped out", "wrecked"],
+          ],
           skill: 'conjunctions',
           explain: '"Such + noun phrase + that" — inversion structure.',
         },
@@ -318,7 +340,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
 
     sectionG: {
       title: 'Section G: Comprehension Cloze',
-      marks: 5,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word.',
       text:
         'Every year, millions of sea turtles are born on beaches around the world. ' +
@@ -580,7 +602,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
 
     sectionC: {
       title: 'Section C: Grammar Cloze',
-      marks: 15,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word from the word bank. Each word may be used only once. Two words will be left over.',
       wordBank: ['whenever', 'had', 'so', 'which', 'being', 'however', 'their', 'have', 'whether', 'one', 'though', 'despite'],
       text:
@@ -664,6 +686,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'Ms Chen asked Marcus ___',
           answer: 'Ms Chen asked Marcus whether he had remembered to submit his portfolio before the deadline.',
           alternates: ['Ms Chen asked Marcus if he had remembered to submit his portfolio before the deadline.'],
+          requiredGroups: [
+            ["whether", "if"],
+            ["had remembered", "remembered to submit"],
+          ],
           skill: 'reportedSpeech',
           explain: 'Reported yes/no question: "asked + whether/if + subject + had + past participle".',
         },
@@ -672,6 +698,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'Such ___',
           answer: 'Such is the beauty of the new community garden that residents queue to take photographs in it.',
           alternates: ['Such a beautiful community garden has been created that residents queue to take photographs in it.'],
+          requiredGroups: [
+            ["beauty", "beautiful"],
+            ["queue", "line up", "wait in line"],
+          ],
           skill: 'conjunctions',
           explain: '"Such + noun phrase + that" — inversion structure.',
         },
@@ -680,6 +710,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'Had ___',
           answer: 'Had I more time, I would volunteer at the library every week.',
           alternates: [],
+          requiredGroups: [
+            ["had i", "more time"],
+            ["would volunteer", "would help"],
+          ],
           skill: 'conditionals',
           explain: 'Type 2 conditional inversion: "Had + subject + noun/adjective" replaces "If + subject + had".',
         },
@@ -688,6 +722,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'A group of students ___',
           answer: 'A group of students from the neighbourhood school painted the mural.',
           alternates: [],
+          requiredGroups: [
+            ["students", "group of students"],
+            ["painted the mural", "made the mural", "created the mural"],
+          ],
           skill: 'passiveVoice',
           explain: 'Convert passive to active: the agent (by phrase) becomes the new subject.',
         },
@@ -696,6 +734,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'Not only ___',
           answer: 'Not only does Maya read widely, but she has also scored highly in English every year.',
           alternates: ['Not only has Maya read widely, but she has also scored highly in English every year.'],
+          requiredGroups: [
+            ["read widely", "reads widely"],
+            ["scored highly", "achieved high"],
+          ],
           skill: 'conjunctions',
           explain: '"Not only ... but also" — inversion after "Not only": auxiliary before subject.',
         },
@@ -704,7 +746,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
 
     sectionG: {
       title: 'Section G: Comprehension Cloze',
-      marks: 5,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word.',
       text:
         'In many countries, volunteering has become an important part of school life. Students {{1}} give up their weekends to help at food banks, elderly care centres, and community gardens gain more than just a sense of satisfaction. ' +
@@ -963,7 +1005,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
 
     sectionC: {
       title: 'Section C: Grammar Cloze',
-      marks: 15,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word from the word bank. Each word may be used only once. Two words will be left over.',
       wordBank: ['had', 'been', 'which', 'whose', 'were', 'having', 'although', 'such', 'where', 'that', 'with', 'once'],
       text:
@@ -1045,6 +1087,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'Had the developers ___',
           answer: 'Had the developers respected the conservation guidelines, the heritage shophouses would not have been torn down.',
           alternates: [],
+          requiredGroups: [
+            ["respected", "followed", "observed"],
+            ["would not have been", "would not be", "would have been preserved"],
+          ],
           skill: 'conditionals',
           explain: 'Type 3 conditional inversion: "Had + subject + past participle" replaces "If + subject + had + past participle".',
         },
@@ -1053,6 +1099,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'The journalist asked the historian ___',
           answer: 'The journalist asked the historian when the district had first received conservation status.',
           alternates: ['The journalist asked the historian when the district first received conservation status.'],
+          requiredGroups: [
+            ["when the district", "when the area"],
+            ["received conservation status", "received the status", "had first received"],
+          ],
           skill: 'reportedSpeech',
           explain: 'Reported wh-question: "asked + when/what/where + subject + verb (backshifted)".',
         },
@@ -1061,6 +1111,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'The restoration team had barely ___',
           answer: 'The restoration team had barely finished work on the temple when a flood damaged part of the newly repaired roof.',
           alternates: ['The restoration team had barely finished work on the temple before a flood damaged part of the newly repaired roof.'],
+          requiredGroups: [
+            ["had barely finished", "barely finished"],
+            ["flood damaged", "damaged"],
+          ],
           skill: 'conjunctions',
           explain: '"Barely/scarcely + past perfect ... when/before" is equivalent to "No sooner had ... than".',
         },
@@ -1069,6 +1123,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'The old lighthouse, beside ___',
           answer: 'The old lighthouse, beside which a new visitor centre has been built, stands at the tip of the peninsula.',
           alternates: [],
+          requiredGroups: [
+            ["beside which", "next to which"],
+            ["visitor centre", "visitor center"],
+          ],
           skill: 'relativeClauses',
           explain: 'Preposition + relative pronoun: "beside which" creates a non-restrictive relative clause.',
         },
@@ -1077,6 +1135,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'The museum attracted such ___',
           answer: 'The museum attracted such a large number of visitors that the curators extended the exhibition by another month.',
           alternates: ['The museum attracted such crowds that the curators extended the exhibition by another month.'],
+          requiredGroups: [
+            ["such a large number", "such crowds", "such many visitors"],
+            ["extended", "lengthened", "prolonged"],
+          ],
           skill: 'conjunctions',
           explain: '"Such + noun phrase + that" — equivalent to "so + adjective/adverb + that".',
         },
@@ -1085,7 +1147,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
 
     sectionG: {
       title: 'Section G: Comprehension Cloze',
-      marks: 5,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word.',
       text:
         'For centuries, Singapore\'s waterways served as the arteries of commerce. Bumboats laden {{1}} pepper, gambier, and rice navigated the Singapore River, {{2}} its banks teemed with merchants, coolies, and hawkers. ' +
@@ -1346,7 +1408,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
 
     sectionC: {
       title: 'Section C: Grammar Cloze',
-      marks: 15,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word from the word bank. Each word may be used only once. Two words will be left over.',
       wordBank: ['not', 'been', 'which', 'had', 'so', 'whether', 'their', 'having', 'as', 'only', 'who', 'though'],
       text:
@@ -1423,6 +1485,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'In addition to ___',
           answer: 'In addition to breaking the school record, the young swimmer also qualified for the national trials.',
           alternates: ['In addition to breaking the school record, she also qualified for the national trials.'],
+          requiredGroups: [
+            ["breaking the school record", "breaking the record"],
+            ["qualified", "made it"],
+          ],
           skill: 'conjunctions',
           explain: '"In addition to + gerund" rephrases "Not only ... but also".',
         },
@@ -1431,6 +1497,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'So crowded ___',
           answer: 'So crowded was the esports arena that the organisers had to turn away several spectators.',
           alternates: [],
+          requiredGroups: [
+            ["so crowded", "so packed"],
+            ["turn away", "reject", "refuse"],
+          ],
           skill: 'conjunctions',
           explain: '"So + adjective + was + subject + that" — fronted inversion for emphasis.',
         },
@@ -1439,6 +1509,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'The reporter asked the minister ___',
           answer: 'The reporter asked the minister whether the new stadium had been officially opened yet.',
           alternates: ['The reporter asked the minister if the new stadium had been officially opened yet.'],
+          requiredGroups: [
+            ["whether", "if"],
+            ["had been officially opened", "had been opened", "had opened"],
+          ],
           skill: 'reportedSpeech',
           explain: 'Reported yes/no question in passive: "asked + whether/if + subject + had been + past participle".',
         },
@@ -1447,6 +1521,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'Had ___',
           answer: 'Had the coach spotted the athlete\'s talent earlier, he would have given her more opportunities.',
           alternates: [],
+          requiredGroups: [
+            ["spotted", "noticed", "identified"],
+            ["would have given", "would have offered", "would have provided"],
+          ],
           skill: 'conditionals',
           explain: 'Type 3 conditional inversion: "Had + subject + past participle".',
         },
@@ -1455,6 +1533,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           stem: 'The medal ceremony was held in the main stadium, where ___',
           answer: 'The medal ceremony was held in the main stadium, where thousands of fans had gathered.',
           alternates: [],
+          requiredGroups: [
+            ["where thousands", "where fans"],
+            ["had gathered", "gathered", "were present"],
+          ],
           skill: 'relativeClauses',
           explain: '"Where" introduces a non-restrictive relative clause referring to a place.',
         },
@@ -1463,7 +1545,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
 
     sectionG: {
       title: 'Section G: Comprehension Cloze',
-      marks: 5,
+      marks: 10,
       instructions: 'Fill in each blank with ONE suitable word.',
       text:
         'Competitive esports is no longer a pastime reserved for teenagers in their bedrooms. ' +
@@ -1606,12 +1688,7 @@ export function validateP5PracticeTests(bank = P5_PRACTICE_TESTS) {
     if (!sA || !Array.isArray(sA.items) || sA.items.length !== 10) {
       issues.push(`${tag}/sectionA: must have 10 items`);
     } else {
-      for (const item of sA.items) {
-        if (!item.q || !Array.isArray(item.choices) || item.choices.length !== 4)
-          issues.push(`${tag}/sectionA: malformed item "${String(item.q).slice(0, 30)}"`);
-        if (!item.choices?.includes(item.answer))
-          issues.push(`${tag}/sectionA: answer "${item.answer}" not among choices`);
-      }
+      checkMcqItems(issues, `${tag}/sectionA`, sA.items, 4);
     }
 
     // Section B — 5 MCQ items
@@ -1619,10 +1696,7 @@ export function validateP5PracticeTests(bank = P5_PRACTICE_TESTS) {
     if (!sB || !Array.isArray(sB.items) || sB.items.length !== 5) {
       issues.push(`${tag}/sectionB: must have 5 items`);
     } else {
-      for (const item of sB.items) {
-        if (!item.choices?.includes(item.answer))
-          issues.push(`${tag}/sectionB: answer "${item.answer}" not among choices`);
-      }
+      checkMcqItems(issues, `${tag}/sectionB`, sB.items, 4);
     }
 
     // Sections C & D — cloze with 10 blanks, word bank of 12
@@ -1672,8 +1746,21 @@ export function validateP5PracticeTests(bank = P5_PRACTICE_TESTS) {
     if (!Array.isArray(sH?.questions) || sH.questions.length < 6)
       issues.push(`${tag}/sectionH: needs at least 6 questions`);
 
-    // Marks total
-    const markKeys = ['sectionA', 'sectionB', 'sectionC', 'sectionD', 'sectionE', 'sectionF', 'sectionG', 'sectionH'];
+    // Per-section mark/blank alignment — gradable inputs × standard weight should equal section.marks.
+    // This prevents the rendered "X marks" label drifting away from the
+    // grader's actual capacity. Writing (sectionE) is self-assessed; its
+    // marks are exempt from this check.
+    checkSectionMarks(issues, `${tag}/sectionA`, sA, 'mcq', 10);
+    checkSectionMarks(issues, `${tag}/sectionB`, sB, 'mcq', 5);
+    checkSectionMarks(issues, `${tag}/sectionC`, test.sectionC, 'cloze', 10);
+    checkSectionMarks(issues, `${tag}/sectionD`, test.sectionD, 'cloze', 10);
+    checkSectionMarks(issues, `${tag}/sectionF`, test.sectionF, 'synthesis', 5);
+    checkSectionMarks(issues, `${tag}/sectionG`, test.sectionG, 'cloze', 10);
+
+    // Marks total — sum across EVERY rendered section, not just A–H.
+    // Section I exists in some papers and is rendered/graded; excluding it
+    // from this check let mark mismatches sneak past unnoticed.
+    const markKeys = ['sectionA', 'sectionB', 'sectionC', 'sectionD', 'sectionE', 'sectionF', 'sectionG', 'sectionH', 'sectionI'];
     const total = markKeys.reduce((acc, k) => acc + (test[k]?.marks || 0), 0);
     if (total !== test.totalMarks)
       issues.push(`${tag}: section marks sum to ${total} but totalMarks=${test.totalMarks}`);

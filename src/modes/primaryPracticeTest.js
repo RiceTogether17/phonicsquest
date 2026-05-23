@@ -26,6 +26,7 @@
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 import { GRAMMAR_CATEGORIES } from '../data/grammarCategories.js';
 import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
+import { gradeShortAnswer } from './scoring/shortAnswerGrader.js';
 
 function shuffle(arr) {
   const a = [...arr];
@@ -233,14 +234,19 @@ function renderSentenceCombiningSection(section, sectionKey) {
 function renderSynthesisSection(section, sectionKey) {
   const items = section.items.map((item, i) => {
     const alts = (item.alternates || []).join('|');
+    const requiredGroupsAttr = Array.isArray(item.requiredGroups) && item.requiredGroups.length
+      ? JSON.stringify(item.requiredGroups)
+      : '';
     return `
       <li class="ptg-question" data-q-index="${i}">
         <p class="ptg-q-stem">${i + 1}. ${escapeHtml(item.q)}</p>
         <p class="ptg-synthesis-stem"><strong>Begin with:</strong> <code>${escapeHtml(item.stem)}</code></p>
         <textarea class="ptg-input ptg-input--area" rows="2"
                   data-q-key="${sectionKey}/${i}"
+                  data-q-type="synthesis"
                   data-answer="${escapeAttr(item.answer)}"
                   data-accept="${escapeAttr(alts)}"
+                  data-required-groups="${escapeAttr(requiredGroupsAttr)}"
                   data-skill="${escapeAttr(item.skillKey || item.skill || 'synthesis')}"
                   data-practise="sentence-forge"
                   placeholder="Write your transformed sentence…"></textarea>
@@ -279,7 +285,7 @@ function renderSituationalWritingSection(section, sectionKey) {
         <pre class="ptg-sw-model">${escapeHtml(section.modelAnswer || '')}</pre>
       </details>
       ${rubricTable}
-      <div class="ptg-feedback" data-feedback-for="${sectionKey}/all" hidden></div>
+      <div class="ptg-feedback" data-feedback-for="${sectionKey}/0" hidden></div>
     </div>`;
 }
 
@@ -301,6 +307,23 @@ function renderEditingSection(section, sectionKey) {
   return `<p class="ptg-instructions">${escapeHtml(section.instructions || '')}</p>
     <p class="ptg-editing">${text}</p>
     <div class="ptg-feedback" data-feedback-for="${sectionKey}/all" hidden></div>`;
+}
+
+/**
+ * Render the data-* attributes a short-answer comprehension input needs
+ * for the grader. Pulls model answer, accept list, legacy keywords, and
+ * the strict requiredGroups (JSON-encoded) off the question object.
+ */
+function _shortAnswerAttrs(q) {
+  const keywordsAttr = (q.keywords || []).join('|');
+  const acceptsAttr = (q.acceptable || []).join('|');
+  const requiredGroupsAttr = Array.isArray(q.requiredGroups) && q.requiredGroups.length
+    ? JSON.stringify(q.requiredGroups)
+    : '';
+  return `data-answer="${escapeAttr(q.model || '')}"
+          data-keywords="${escapeAttr(keywordsAttr)}"
+          data-accept="${escapeAttr(acceptsAttr)}"
+          data-required-groups="${escapeAttr(requiredGroupsAttr)}"`;
 }
 
 function renderComprehensionSection(section, sectionKey) {
@@ -383,12 +406,11 @@ function renderComprehensionSection(section, sectionKey) {
 
     // type: 'evidence' — requires a direct quote + explanation
     if (q.type === 'evidence') {
-      const keywordsAttr = (q.keywords || []).join('|');
       return `<li>${stem}
         <p class="ptg-scaffold-hint">📌 Quote a phrase from the passage, then explain what it shows.</p>
         <p class="ptg-scaffold-example"><em>Example structure:</em> "…" — This shows that…</p>
         <textarea class="ptg-input ptg-input--area" rows="3" data-q-key="${qKey}"
-          data-answer="${escapeAttr(q.model || '')}" data-keywords="${escapeAttr(keywordsAttr)}"
+          ${_shortAnswerAttrs(q)}
           data-q-type="short" data-marks="${q.marks}"
           placeholder="&quot;[quote from passage]&quot; This shows that…"></textarea>
         <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
@@ -396,26 +418,24 @@ function renderComprehensionSection(section, sectionKey) {
 
     // type: 'language-use' — effect of language / figurative expression
     if (q.type === 'language-use') {
-      const keywordsAttr = (q.keywords || []).join('|');
       return `<li>${stem}
         <p class="ptg-scaffold-hint">💬 State what the word / phrase means or suggests, then explain the effect on the reader.</p>
         <p class="ptg-scaffold-example"><em>Example structure:</em> The phrase "…" suggests… / The effect on the reader is…</p>
         <textarea class="ptg-input ptg-input--area" rows="3" data-q-key="${qKey}"
-          data-answer="${escapeAttr(q.model || '')}" data-keywords="${escapeAttr(keywordsAttr)}"
+          ${_shortAnswerAttrs(q)}
           data-q-type="short" data-marks="${q.marks}"
           placeholder="The word/phrase … suggests… The effect on the reader is…"></textarea>
         <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
     }
 
     // type: 'short' (default — factual / inference / vocabulary / personal-response)
-    const keywordsAttr = (q.keywords || []).join('|');
     const isOneWord = (q.model || '').trim().split(/\s+/).length <= 3;
     const input = isOneWord
       ? `<input type="text" class="ptg-input ptg-input--full" data-q-key="${qKey}"
-         data-answer="${escapeAttr(q.model || '')}" data-keywords="${escapeAttr(keywordsAttr)}"
+         ${_shortAnswerAttrs(q)}
          data-q-type="short" data-marks="${q.marks}" placeholder="Type your answer" autocomplete="off">`
       : `<textarea class="ptg-input ptg-input--area" rows="2" data-q-key="${qKey}"
-         data-answer="${escapeAttr(q.model || '')}" data-keywords="${escapeAttr(keywordsAttr)}"
+         ${_shortAnswerAttrs(q)}
          data-q-type="short" data-marks="${q.marks}" placeholder="Type your answer in a full sentence"></textarea>`;
     return `<li>${stem}${input}
       <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
@@ -462,17 +482,23 @@ const SECTION_RENDERERS = {
 /* Grading                                                                */
 /* ────────────────────────────────────────────────────────────────────── */
 
-function isShortAnswerCorrect(userValue, expected, keywordsAttr) {
-  const u = _normalize(userValue);
-  if (!u) return false;
-  const e = _normalize(expected);
-  if (u === e) return true;
-  const keywords = (keywordsAttr || '').split('|').filter(Boolean);
-  if (keywords.length === 0) return false;
-  // Pass if at least one expected keyword appears in the user's answer.
-  return keywords.some(k => u.includes(_normalize(k)));
+function _parseRequiredGroups(attr) {
+  if (!attr) return null;
+  try {
+    const parsed = JSON.parse(attr);
+    return Array.isArray(parsed) && parsed.length ? parsed : null;
+  } catch {
+    return null;
+  }
 }
 
+/**
+ * gradeInput returns one of:
+ *   - null  → not gradable (radio not checked, writing input)
+ *   - true  → fully correct
+ *   - false → fully incorrect
+ *   - { fraction, trace } → partial credit (short answers only)
+ */
 function gradeInput(el) {
   const expected = el.getAttribute('data-answer') || '';
   const accepts = (el.getAttribute('data-accept') || '').split('|').filter(Boolean);
@@ -487,8 +513,20 @@ function gradeInput(el) {
   }
 
   if (qType === 'short') {
-    const keywords = el.getAttribute('data-keywords') || '';
-    return isShortAnswerCorrect(value, expected, keywords);
+    const keywords = (el.getAttribute('data-keywords') || '').split('|').filter(Boolean);
+    const requiredGroups = _parseRequiredGroups(el.getAttribute('data-required-groups'));
+    const result = gradeShortAnswer(value, { expected, accepts, keywords, requiredGroups });
+    return { fraction: result.fraction, trace: result.trace };
+  }
+
+  if (qType === 'synthesis') {
+    // PSLE Synthesis & Transformation: full-credit on exact-match OR an
+    // accepted alternate; partial credit (1/2) when requiredGroups
+    // captures only one of the two meaning units — mirroring the marker's
+    // structure-vs-content split.
+    const requiredGroups = _parseRequiredGroups(el.getAttribute('data-required-groups'));
+    const result = gradeShortAnswer(value, { expected, accepts, requiredGroups });
+    return { fraction: result.fraction, trace: result.trace };
   }
 
   if (el.tagName === 'TEXTAREA' || (qType === '' && el.classList.contains('ptg-input--area'))) {
@@ -506,8 +544,18 @@ function gradeInput(el) {
   return accepts.map(_normalize).includes(u);
 }
 
-function readSectionMarks(section, sectionKey) {
-  // How many marks does each grader-checked input contribute?
+function readSectionMarks(section, sectionKey, numGradableInputs) {
+  // Prefer the section's declared total divided across gradable inputs —
+  // this guarantees per-section scored/total = section.marks, so the
+  // displayed "/N" matches what was actually rendered.
+  if (
+    typeof section?.marks === 'number'
+    && Number.isFinite(section.marks)
+    && numGradableInputs > 0
+  ) {
+    return section.marks / numGradableInputs;
+  }
+  // Fallback heuristics — used only when section.marks is missing.
   if (sectionKey === 'sectionA' || sectionKey === 'sectionB') return 1;
   if (sectionKey === 'sectionC' || sectionKey === 'sectionD') return 1;
   if (Array.isArray(section.items) && section.items[0]?.originals) return 2; // sentence combining
@@ -518,8 +566,29 @@ function readSectionMarks(section, sectionKey) {
   return 1;
 }
 
+/** Count gradable units in a section root — one per radio group; writing excluded. */
+function _countGradableInputs(root, sectionKey) {
+  const allInputs = root.querySelectorAll(`[data-q-key^="${sectionKey}/"]`);
+  const radioGroupsSeen = new Set();
+  let n = 0;
+  for (const el of allInputs) {
+    if ((el.getAttribute('data-q-type') || '') === 'writing') continue;
+    if (el.type === 'radio') {
+      if (radioGroupsSeen.has(el.name)) continue;
+      radioGroupsSeen.add(el.name);
+    }
+    // Items with an explicit data-marks (e.g. comprehension questions)
+    // override the default per-input weight — they should not skew the
+    // remaining unweighted inputs. Skip them from the divisor.
+    if (el.hasAttribute('data-marks')) continue;
+    n += 1;
+  }
+  return n;
+}
+
 function gradeSection(root, sectionKey, section) {
   const inputs = root.querySelectorAll(`[data-q-key^="${sectionKey}/"]`);
+  const numGradable = _countGradableInputs(root, sectionKey);
   let scored = 0;
   let total = 0;
   const perKey = new Map(); // key → { correct: bool, expected, value, skill, practise }
@@ -535,7 +604,7 @@ function gradeSection(root, sectionKey, section) {
       const skill = el.getAttribute('data-skill') || '';
       const practise = el.getAttribute('data-practise') || '';
       const qType = el.getAttribute('data-q-type') || '';
-      const marks = Number(el.getAttribute('data-marks')) || (qType === 'true-false' ? 1 : readSectionMarks(section, sectionKey));
+      const marks = Number(el.getAttribute('data-marks')) || (qType === 'true-false' ? 1 : readSectionMarks(section, sectionKey, numGradable));
       total += marks;
       let correct = false;
       let answered = false;
@@ -565,12 +634,21 @@ function gradeSection(root, sectionKey, section) {
       perKey.set(key, { key, marks: 0, correct: false, selfAssess: true, answered: true, userValue: el.value || '', expected: '', skill, practise, qType });
       return;
     }
-    const marks = Number(el.getAttribute('data-marks')) || readSectionMarks(section, sectionKey);
+    const marks = Number(el.getAttribute('data-marks')) || readSectionMarks(section, sectionKey, numGradable);
     total += marks;
-    const correct = grade === true;
-    if (correct) scored += marks;
+    // Short-answer grader can return a partial-credit object; everything
+    // else returns boolean. Roll both into a single 0..1 fraction.
+    const fraction = (typeof grade === 'object' && grade !== null) ? grade.fraction
+      : (grade === true ? 1 : 0);
+    const earned = marks * fraction;
+    scored += earned;
+    const correct = fraction >= 1;
+    const partial = fraction > 0 && fraction < 1;
     perKey.set(key, {
-      key, marks, correct,
+      key, marks, correct, partial,
+      earned,
+      fraction,
+      trace: (typeof grade === 'object' && grade !== null) ? grade.trace : null,
       answered: !!String(el.value || '').trim(),
       userValue: el.value || '',
       expected: el.getAttribute('data-answer') || '',
@@ -580,20 +658,58 @@ function gradeSection(root, sectionKey, section) {
     });
   });
 
-  return { scored, total, perKey };
+  // A section is "self-assessed" when it carries declared marks but no
+  // gradable input contributed to the total (e.g. Situational Writing).
+  const selfAssessed = total === 0 && [...perKey.values()].some(v => v.selfAssess);
+  return {
+    scored,
+    total,
+    perKey,
+    selfAssessed,
+    declaredMarks: typeof section?.marks === 'number' ? section.marks : total,
+  };
 }
 
 /* ────────────────────────────────────────────────────────────────────── */
 /* Mount                                                                  */
 /* ────────────────────────────────────────────────────────────────────── */
 
-function buildSummaryHtml(paper, sectionResults) {
-  const totalScored = sectionResults.reduce((a, r) => a + r.scored, 0);
-  const totalMarks = sectionResults.reduce((a, r) => a + r.total, 0);
+/** Display a possibly-fractional mark count without a trailing ".0". */
+function _fmtMark(n) {
+  return Number.isInteger(n) ? String(n) : (Math.round(n * 10) / 10).toString();
+}
 
-  // Aggregate weak skills across sections.
+/**
+ * Render the per-question marking trace as a small teacher-style guide:
+ * what meaning units hit, what was missed. Only shown when the grader
+ * actually ran a structured check (requiredGroups path); otherwise empty.
+ */
+function _markingGuideHtml(info) {
+  const t = info?.trace;
+  if (!t) return '';
+  const hits = (t.hits || []).filter(Boolean);
+  const misses = (t.misses || []).filter(Boolean);
+  if (t.reason !== 'required-groups' && t.reason !== 'no-keyword-hit') return '';
+  if (!hits.length && !misses.length) return '';
+  const hitsHtml = hits.length
+    ? `<li class="ptg-mark-hit">✓ Meaning units found: ${hits.map(h => `<code>${escapeHtml(h)}</code>`).join(', ')}</li>`
+    : '';
+  const missHtml = misses.length
+    ? `<li class="ptg-mark-miss">✗ Missing: ${misses.map(m => `<code>${escapeHtml(m)}</code>`).join(', ')}</li>`
+    : '';
+  return `<ul class="ptg-marking-guide">${hitsHtml}${missHtml}</ul>`;
+}
+
+function buildSummaryHtml(paper, sectionResults) {
+  const autoScored = sectionResults.reduce((a, r) => a + (r.selfAssessed ? 0 : r.scored), 0);
+  const autoTotal  = sectionResults.reduce((a, r) => a + (r.selfAssessed ? 0 : r.total),  0);
+  const selfMarks  = sectionResults.reduce((a, r) => a + (r.selfAssessed ? r.declaredMarks : 0), 0);
+
+  // Aggregate weak skills across sections. Self-assessed sections don't
+  // contribute (no correct/wrong signal to draw from).
   const weakSkills = new Map(); // skill -> { wrong, total, practise }
   for (const r of sectionResults) {
+    if (r.selfAssessed) continue;
     for (const v of r.perKey.values()) {
       if (!v.skill) continue;
       const existing = weakSkills.get(v.skill) || { wrong: 0, total: 0, practise: v.practise };
@@ -619,16 +735,29 @@ function buildSummaryHtml(paper, sectionResults) {
       }).join('')
     : '<li>No clear weak skill — you nailed it across the board! 🎉</li>';
 
-  const perSection = sectionResults.map(r => `
-    <tr>
+  const perSection = sectionResults.map(r => {
+    if (r.selfAssessed) {
+      return `<tr class="ptg-row-self">
+        <td>${escapeHtml(r.title)}</td>
+        <td>Self-assessed: — / ${_fmtMark(r.declaredMarks)}</td>
+        <td>—</td>
+      </tr>`;
+    }
+    return `<tr>
       <td>${escapeHtml(r.title)}</td>
-      <td>${r.scored} / ${r.total}</td>
+      <td>${_fmtMark(r.scored)} / ${_fmtMark(r.total)}</td>
       <td>${r.total > 0 ? Math.round(100 * r.scored / r.total) : 0}%</td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
+
+  const selfNote = selfMarks > 0
+    ? `<p class="ptg-summary-self"><em>Plus ${_fmtMark(selfMarks)} mark${selfMarks === 1 ? '' : 's'} of self-assessed writing — compare your response against the model answer in that section.</em></p>`
+    : '';
 
   return `
     <h3>📊 ${escapeHtml(paper.label)} — Summary</h3>
-    <p class="ptg-summary-total"><strong>Total:</strong> ${totalScored} / ${totalMarks} (auto-graded sections)</p>
+    <p class="ptg-summary-total"><strong>Auto-graded total:</strong> ${_fmtMark(autoScored)} / ${_fmtMark(autoTotal)}</p>
+    ${selfNote}
     <p class="ptg-note"><em>Open-ended comprehension answers were graded with keyword matching — re-read the model answer if you're unsure.</em></p>
     <table class="ptg-summary-table">
       <thead><tr><th>Section</th><th>Score</th><th>%</th></tr></thead>
@@ -660,6 +789,25 @@ function formatRemaining(ms) {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
+function _paperMarksBreakdown(paper) {
+  // Surface the auto-graded total separately from any self-assessed
+  // writing sections, so the displayed total in the header matches what
+  // students will actually see scored.
+  let selfMarks = 0;
+  for (const key of SECTION_KEYS) {
+    const s = paper[key];
+    if (!s) continue;
+    if (s.bullets && s.modelAnswer !== undefined && typeof s.marks === 'number') {
+      selfMarks += s.marks;
+    }
+  }
+  const auto = (paper.totalMarks || 0) - selfMarks;
+  if (selfMarks > 0) {
+    return `${paper.totalMarks} marks (${auto} auto-graded + ${selfMarks} self-assessed writing)`;
+  }
+  return `${paper.totalMarks} marks`;
+}
+
 function renderPaperFrame(paper) {
   return `
     <section class="ptg" data-paper-id="${escapeAttr(paper.id)}">
@@ -668,7 +816,7 @@ function renderPaperFrame(paper) {
           <h2>${escapeHtml(paper.label)}</h2>
           <div class="ptg-timer" role="timer" aria-label="Time remaining" aria-live="off" hidden></div>
         </div>
-        <p><small>${escapeHtml(paper.duration)} · ${paper.totalMarks} marks · ${escapeHtml(paper.level)}</small></p>
+        <p><small>${escapeHtml(paper.duration)} · ${_paperMarksBreakdown(paper)} · ${escapeHtml(paper.level)}</small></p>
         <div class="ptg-stepper" aria-label="Section progress"></div>
         <p class="ptg-blurb">${escapeHtml(paper.blurb || '')}</p>
       </header>
@@ -752,13 +900,19 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
         fb.innerHTML = '<span>📝 Self-assess: compare your response to the model answer above. Check format, tone, and that all 3 bullet points are covered.</span>';
         return;
       }
-      fb.className = `ptg-feedback ptg-feedback--${info.correct ? 'ok' : 'no'}`;
+      const markingGuide = _markingGuideHtml(info);
       if (info.correct) {
-        fb.innerHTML = `<span>✅ Correct.</span>${skillRow}`;
+        fb.className = 'ptg-feedback ptg-feedback--ok';
+        fb.innerHTML = `<span>✅ Correct${info.marks > 1 ? ` (${_fmtMark(info.earned ?? info.marks)} / ${_fmtMark(info.marks)})` : ''}.</span>${markingGuide}${skillRow}`;
+      } else if (info.partial) {
+        fb.className = 'ptg-feedback ptg-feedback--partial';
+        fb.innerHTML = `<span>◐ Partial credit: ${_fmtMark(info.earned)} / ${_fmtMark(info.marks)}.</span>${markingGuide}<details class="ptg-model-peek"><summary>Show model answer</summary><p>${escapeHtml(info.expected || '')}</p></details>${skillRow}`;
       } else if (!info.answered) {
+        fb.className = 'ptg-feedback ptg-feedback--no';
         fb.innerHTML = `<span>⚠️ Not answered. Correct: <strong>${escapeHtml(info.expected || '')}</strong></span>${skillRow}`;
       } else {
-        fb.innerHTML = `<span>❌ Correct answer: <strong>${escapeHtml(info.expected || '')}</strong></span>${skillRow}`;
+        fb.className = 'ptg-feedback ptg-feedback--no';
+        fb.innerHTML = `<span>❌ Correct answer: <strong>${escapeHtml(info.expected || '')}</strong></span>${markingGuide}${skillRow}`;
       }
     });
   }
@@ -902,11 +1056,19 @@ export function buildPaperLauncherHtml({ level, papers, intro }) {
       <p>${escapeHtml(p.blurb || '')}</p>
       <button class="btn btn--primary" data-start-paper="${escapeAttr(p.id)}" type="button">Start paper</button>
     </article>`).join('');
+  const count = papers.length;
+  // Honest framing: surface the exact paper count up front so parents see
+  // "3 papers available" for P3 rather than assuming it's a full 4-term
+  // year bank like the upper-primary levels.
+  const countCaption = count > 0
+    ? `<p class="ptg-launcher-count"><strong>${count} paper${count === 1 ? '' : 's'} available</strong> at ${escapeHtml(level)}.</p>`
+    : '';
   return `
     <div class="ptg-mode-picker" role="group" aria-label="Select paper mode">
       <button class="ptg-mode-btn ptg-mode-btn--active" data-mode="practice" type="button">🎯 Practice</button>
       <button class="ptg-mode-btn" data-mode="test" type="button">⏱ Test Mode</button>
     </div>
+    ${countCaption}
     <p>${escapeHtml(intro || "Pick a paper to take the test interactively. Every section is scored — at the end you’ll see which skills to drill.")}</p>
     <div class="ptg-launcher-grid" data-level="${escapeAttr(level)}">${cards}</div>`;
 }

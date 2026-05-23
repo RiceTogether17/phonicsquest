@@ -9945,6 +9945,27 @@ details.story-tool-section[open] > .story-tool-summary::before {
   background: var(--color-primary-light); border-radius: var(--radius-md);
   padding: var(--space-1) var(--space-3); display: inline-block;
 }
+.sq-task-note {
+  font-size: var(--font-size-xs); color: var(--text-muted);
+  text-transform: none; letter-spacing: 0; margin-left: var(--space-2);
+}
+.sq-psle-prompt {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2);
+  padding: var(--space-2) var(--space-3); margin-top: var(--space-2);
+  background: var(--surface-alt, color-mix(in srgb, var(--color-primary) 8%, transparent));
+  border-left: 3px solid var(--color-primary); border-radius: var(--radius-md);
+  font-size: var(--font-size-md); line-height: 1.5;
+}
+.sq-psle-prefix { font-weight: 600; color: var(--text); }
+.sq-psle-blank {
+  font-family: monospace; color: var(--text-muted); letter-spacing: 0.15em;
+  user-select: none;
+}
+.sq-input-label {
+  display: block; font-size: var(--font-size-xs); text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: var(--space-1);
+}
+.sq-success-stitched { font-size: var(--font-size-md); margin-bottom: var(--space-2); }
 .sq-input-wrap { margin-bottom: var(--space-3); }
 .sq-textarea {
   width: 100%; min-height: 84px;
@@ -10859,6 +10880,11 @@ textarea:hover {
 }
 
 /* ── Interactive Practice Test (game mode) ──────────────────────────────── */
+.ptg-launcher-count {
+  font-size: var(--font-size-sm, 0.9em); color: var(--text-muted, #555);
+  margin: 8px 0 4px;
+}
+.ptg-launcher-count strong { color: var(--text, #222); }
 .ptg-launcher-grid {
   display: grid;
   gap: 12px;

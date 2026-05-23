@@ -12,6 +12,7 @@ import { store } from '../modules/store.js';
 import { questMastery } from '../modules/questMastery.js';
 import { audio } from '../modules/audio.js';
 import { getLevelInfo } from '../data/curriculum.js';
+import { gradeShortAnswer } from './scoring/shortAnswerGrader.js';
 
 const LEVEL_LABELS = { P4: 'Primary 4', P5: 'Primary 5', P6: 'Primary 6' };
 const SESSION_SIZE = 8;
@@ -227,17 +228,24 @@ function _renderQuestion() {
       <div class="sq-pattern-chip">${_esc(item.pattern || item.skill)}</div>
 
       <div class="sq-task-card">
-        <p class="sq-task-label">Rewrite using the pattern above</p>
+        <p class="sq-task-label">Rewrite without changing the meaning. <small class="sq-task-note">(PSLE format — fill in the blank only)</small></p>
         <p class="sq-original">${_esc(item.original)}</p>
-        ${item.stem ? `<p class="sq-stem-hint">Begin with: <strong>${_esc(item.stem)} …</strong></p>` : ''}
+        ${item.stem ? `
+          <div class="sq-psle-prompt" aria-label="Sentence to complete">
+            <span class="sq-psle-prefix">${_esc(item.stem)}</span>
+            <span class="sq-psle-blank" aria-hidden="true">_______________</span>
+          </div>` : ''}
       </div>
 
       <div class="sq-input-wrap">
+        <label for="sq-answer-input" class="sq-input-label">
+          ${item.stem ? 'Type what fills the blank' : 'Type your rewritten sentence'}
+        </label>
         <textarea
           id="sq-answer-input"
           class="sq-textarea"
-          rows="3"
-          placeholder="Type your rewritten sentence here…"
+          rows="2"
+          placeholder="${item.stem ? 'continue the sentence…' : 'rewrite the sentence…'}"
           autocomplete="off"
           spellcheck="false"
           aria-label="Your answer"
@@ -281,10 +289,64 @@ function _normalise(str) {
     .trim();
 }
 
+/**
+ * Strip the stem from the front of a candidate answer.
+ *
+ * PSLE format presents a partial sentence ending in ___ and asks the
+ * student to fill ONLY the blank. We accept either form (full sentence
+ * or the continuation alone) by maintaining a set of acceptable
+ * strings that includes both.
+ */
+function _stripStem(stem, candidate) {
+  if (!stem) return null;
+  const ns = _normalise(stem);
+  const nc = _normalise(candidate);
+  if (!nc.startsWith(ns)) return null;
+  // We want the human-readable continuation, not the normalised one,
+  // for display. Find the corresponding slice in the original candidate
+  // by matching the stem length after trimming.
+  const stemLen = stem.trim().length;
+  return candidate.trim().slice(stemLen).replace(/^[\s,]+/, '').trim();
+}
+
+/**
+ * Build the acceptable-answer set for an item.
+ *
+ * Returns every form a marker would award — the full rewritten sentence(s),
+ * and (when the answer starts with the stem) the bare continuation. The
+ * student is free to type either form.
+ */
+export function buildAcceptableAnswers(item) {
+  const fulls = [item.answer, ...(item.alternates || [])].filter(Boolean);
+  const completions = [];
+  for (const full of fulls) {
+    const c = _stripStem(item.stem, full);
+    if (c) completions.push(c);
+  }
+  // De-dupe by normalised form so the grader doesn't try the same string twice.
+  const seen = new Set();
+  const all = [];
+  for (const s of [...completions, ...fulls]) {
+    const k = _normalise(s);
+    if (!k || seen.has(k)) continue;
+    seen.add(k);
+    all.push(s);
+  }
+  return all;
+}
+
+function _grade(typed, item) {
+  const accepts = buildAcceptableAnswers(item);
+  return gradeShortAnswer(typed, {
+    expected: accepts[0] || '',
+    accepts: accepts.slice(1),
+    // Per-item authored partial-credit support (not used yet — opt-in).
+    requiredGroups: Array.isArray(item.requiredGroups) ? item.requiredGroups : null,
+  });
+}
+
 function _isCorrect(typed, item) {
-  const t = _normalise(typed);
-  if (!t) return false;
-  return [item.answer, ...(item.alternates || [])].some(a => _normalise(a) === t);
+  return _grade(typed, item).fraction >= 1;
 }
 
 function _checkAnswer(item) {
@@ -293,7 +355,9 @@ function _checkAnswer(item) {
   if (!typed) { _showFeedback('Type your rewritten sentence first.', 'neutral'); return; }
 
   _tries++;
-  const correct = _isCorrect(typed, item);
+  const result = _grade(typed, item);
+  const correct = result.fraction >= 1;
+  const partial = result.fraction > 0 && result.fraction < 1;
 
   const sk = _sessionStats.bySkill[item.skillKey] || { correct: 0, total: 0, label: item.skill };
   sk.total++;
@@ -322,7 +386,19 @@ function _checkAnswer(item) {
 
   const tb = SQ_TEACHBACK[item.skillKey];
   const structureHint = tb?.structure ? `Structure: ${tb.structure}` : `Use the "${item.pattern || item.skill}" pattern.`;
-  _showFeedback(`❌ Not quite. ${structureHint}`, 'error');
+  if (partial) {
+    // PSLE markers award 1/2 for correct structure but tense/agreement errors.
+    // Surface the structural hits so the student knows which meaning units they
+    // got — and what they still need to add to earn the second mark.
+    const pct = Math.round(result.fraction * 100);
+    const hits = result.trace?.hits || [];
+    const misses = result.trace?.misses || [];
+    const hitText = hits.length ? ` ✓ ${hits.join(', ')}` : '';
+    const missText = misses.length ? ` ✗ still need: ${misses.join(', ')}` : '';
+    _showFeedback(`◐ Partial (${pct}% structure). ${structureHint}${hitText}${missText}`, 'hint');
+  } else {
+    _showFeedback(`❌ Not quite. ${structureHint}`, 'error');
+  }
   if (textarea) textarea.value = '';
   textarea?.focus();
 }
@@ -350,11 +426,14 @@ function _showSuccessCard(item, typed) {
   const stars = _tries === 1 ? '⭐⭐' : '⭐';
   const overlay = document.createElement('div');
   overlay.className = 'sq-success-overlay';
+  // Show how the student's continuation fits with the given stem so they see
+  // the complete PSLE-formatted sentence, not just the blank-fill in isolation.
+  const stitched = item.stem ? `${item.stem} ${typed.trim()}` : typed.trim();
   overlay.innerHTML = `
     <div class="sq-success-card">
       <div class="sq-success-icon">✅</div>
       <h4 class="sq-success-heading">${stars} Correct!</h4>
-      <p class="sq-success-your-answer"><em>${_esc(typed)}</em></p>
+      ${item.stem ? `<p class="sq-success-stitched"><strong>Full sentence:</strong> <em>${_esc(stitched)}</em></p>` : `<p class="sq-success-your-answer"><em>${_esc(typed)}</em></p>`}
       <p class="sq-success-explain">${_esc(item.explain)}</p>
       ${item.alternates?.length
         ? `<p class="sq-success-alts"><strong>Also accepted:</strong> ${item.alternates.map(a => `<em>${_esc(a)}</em>`).join('; ')}</p>`

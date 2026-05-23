@@ -31,6 +31,8 @@
  *   sectionF / sectionG / etc.  → editing, sentence combining, comprehension
  */
 
+import { checkEditingErrors } from './practiceTestValidators.js';
+
 export const P3_PRACTICE_TEST_TERMS = Object.freeze(['T1', 'T2', 'T3']);
 
 export const P3_PRACTICE_TESTS = Object.freeze({
@@ -99,17 +101,17 @@ export const P3_PRACTICE_TESTS = Object.freeze({
       title: 'Section F: Editing', marks: 6,
       instructions: 'Each underlined word contains either a spelling or grammatical mistake. A circle marks a missing or wrong punctuation mark.',
       paragraph:
-        'It was the first time that Sara was going for a ride on a rollercoaster. She was not keen, but her friend Carla wanted her to come {{1:by}} her. ' +
-        '"I promise you {{2:it}}{{3:o}}ll be fun! You will not regret it," Kelly said. ' +
-        'Sara was not {{4:konvinsed}}. However, she did not want to be a spoilsport so she climbed to the {{5:seat}} next to Kelly. ' +
-        'As the rollercoaster chugged up the track, Sara closed her eyes. When it started plunging down, Sara began to {{6:srheek}} at the top of her lungs. ' +
+        'It was the first time that Sara was going for a ride on a rollercoaster. She was not keen, but her friend Kelly wanted her to come {{1:by}} her. ' +
+        '"I promise you it{{2:o}}ll be fun! You will not regret it," Kelly said. ' +
+        'Sara was not {{3:konvinsed}}. However, she did not want to be a spoilsport so she climbed {{4:to}} the seat next to Kelly. ' +
+        'As the rollercoaster {{5:chuggled}} up the track, Sara closed her eyes. When it started plunging down, Sara began to {{6:srheek}} at the top of her lungs. ' +
         'Strangely, she lost her fear and began to enjoy the experience.',
       errors: [
         { num: 1, kind: 'grammar',    wrong: 'by',         correction: 'with',     explain: '"Come with her" — the preposition for accompaniment is "with", not "by".' },
-        { num: 2, kind: 'grammar',    wrong: 'it',         correction: 'it',       explain: 'No change here — the surrounding apostrophe is the real error (see next blank).' },
-        { num: 3, kind: 'punctuation',wrong: '',           correction: '’',        explain: 'An apostrophe is needed for the contraction "it\'ll" (= it will).' },
-        { num: 4, kind: 'spelling',   wrong: 'konvinsed',  correction: 'convinced',explain: 'Correct spelling is "convinced".' },
-        { num: 5, kind: 'grammar',    wrong: 'seat',       correction: 'seat',     explain: 'No change — the verb "climbed to" should really be "climbed into" but treat as control here.' },
+        { num: 2, kind: 'punctuation',wrong: '',           correction: '’',        explain: 'An apostrophe is needed for the contraction "it\'ll" (= it will).' },
+        { num: 3, kind: 'spelling',   wrong: 'konvinsed',  correction: 'convinced',explain: 'Correct spelling is "convinced".' },
+        { num: 4, kind: 'grammar',    wrong: 'to',         correction: 'into',     explain: '"Climbed into the seat" — use "into" for movement that ends inside something.' },
+        { num: 5, kind: 'spelling',   wrong: 'chuggled',   correction: 'chugged',  explain: 'Correct spelling is "chugged" (simple past of "chug").' },
         { num: 6, kind: 'spelling',   wrong: 'srheek',     correction: 'shriek',   explain: 'Correct spelling is "shriek".' },
       ],
     },
@@ -207,19 +209,18 @@ export const P3_PRACTICE_TESTS = Object.freeze({
       title: 'Section F: Editing', marks: 6,
       instructions: 'Each underlined word contains either a spelling or grammatical mistake. A circle marks a missing or wrong punctuation mark.',
       paragraph:
-        'It was April Fools’ Day. Frank had been looking {{1:forward}} to this day for almost a week. ' +
-        'He simply loved playing pranks {{2:with}} people. ' +
-        'However{{3:o}} little did he expect that his friends would be the ones taking {{4:rivange}} on him for the tricks he had played on them many times before. ' +
-        'When Frank was not looking, one of his friends Samuel {{5:hiding}} a large fake spider in his bag. ' +
-        'When Frank opened his bag, he screamed, "Eeks! There’s a huge spider{{6:o}}" Everyone laughed. Now Frank had a taste of his own {{7:medecine}}. He now knew how it felt to be scared out of his wits.',
+        'It was April Fools’ Day. Frank had been looking forward to this day for almost a week. ' +
+        'He simply loved playing pranks {{1:with}} people. ' +
+        'However{{2:o}} little did he expect that his friends would be the ones taking {{3:rivange}} on him for the tricks he had played on them many times before. ' +
+        'When Frank was not looking, one of his friends Samuel {{4:hiding}} a large fake spider in his bag. ' +
+        'When Frank opened his bag, he screamed, "Eeks! There’s a huge spider{{5:o}}" Everyone laughed. Now Frank had a taste of his own {{6:medecine}}. He now knew how it felt to be scared out of his wits.',
       errors: [
-        { num: 1, kind: 'grammar',    wrong: 'forward',    correction: 'forward',  explain: 'No change — "looking forward to" is correct. (Some papers list this as a control item.)' },
-        { num: 2, kind: 'grammar',    wrong: 'with',       correction: 'on',       explain: '"Playing pranks on people" — the correct preposition is "on", not "with".' },
-        { num: 3, kind: 'punctuation',wrong: '',           correction: ',',        explain: 'A comma is needed after the connector "However".' },
-        { num: 4, kind: 'spelling',   wrong: 'rivange',    correction: 'revenge',  explain: 'Correct spelling is "revenge".' },
-        { num: 5, kind: 'grammar',    wrong: 'hiding',     correction: 'hid',      explain: 'Past narrative — use simple past "hid", not the -ing form.' },
-        { num: 6, kind: 'punctuation',wrong: '',           correction: '!',        explain: 'An exclamation mark is needed to close the exclamation "There\'s a huge spider!".' },
-        { num: 7, kind: 'spelling',   wrong: 'medecine',   correction: 'medicine', explain: 'Correct spelling is "medicine".' },
+        { num: 1, kind: 'grammar',    wrong: 'with',       correction: 'on',       explain: '"Playing pranks on people" — the correct preposition is "on", not "with".' },
+        { num: 2, kind: 'punctuation',wrong: '',           correction: ',',        explain: 'A comma is needed after the connector "However".' },
+        { num: 3, kind: 'spelling',   wrong: 'rivange',    correction: 'revenge',  explain: 'Correct spelling is "revenge".' },
+        { num: 4, kind: 'grammar',    wrong: 'hiding',     correction: 'hid',      explain: 'Past narrative — use simple past "hid", not the -ing form.' },
+        { num: 5, kind: 'punctuation',wrong: '',           correction: '!',        explain: 'An exclamation mark is needed to close the exclamation "There\'s a huge spider!".' },
+        { num: 6, kind: 'spelling',   wrong: 'medecine',   correction: 'medicine', explain: 'Correct spelling is "medicine".' },
       ],
     },
     sectionG: {
@@ -335,15 +336,15 @@ export const P3_PRACTICE_TESTS = Object.freeze({
       paragraph:
         'According to Irish folktales, {{1:mischeveous}} little creatures called leprechauns are very fond {{2:about}} collecting gold. ' +
         'Legend also says that these leprechauns {{3:hiding}} their pots of gold at the end of rainbows. ' +
-        'Some people believe that if {{4:you}}{{5:o}}re ever lucky enough to catch a leprechaun, you can make them reveal where they have hidden their gold. ' +
-        'But what are your chances of catching one? That is an even tougher {{6:avanture}} than chasing a rainbow! It looks like it’s highly unlikely that such pots of gold can ever be found.',
+        'Some people believe that if you{{4:o}}re ever lucky enough to catch a leprechaun, you can make them reveal where they have hidden their gold. ' +
+        'But what are your chances of catching one? That is an even tougher {{5:avanture}} than chasing a rainbow! It looks like it’s highly {{6:unlikly}} that such pots of gold can ever be found.',
       errors: [
         { num: 1, kind: 'spelling',   wrong: 'mischeveous',correction: 'mischievous', explain: 'Correct spelling is "mischievous".' },
         { num: 2, kind: 'grammar',    wrong: 'about',      correction: 'of',          explain: '"Fond of" is the fixed pair — never "fond about".' },
         { num: 3, kind: 'grammar',    wrong: 'hiding',     correction: 'hide',        explain: 'Use the simple present "hide" — the legend is told as a general truth.' },
-        { num: 4, kind: 'grammar',    wrong: 'you',        correction: 'you',         explain: 'No change here — the apostrophe is the real fix (see next blank).' },
-        { num: 5, kind: 'punctuation',wrong: '',           correction: '’',           explain: 'An apostrophe is needed in the contraction "you\'re" (= you are).' },
-        { num: 6, kind: 'spelling',   wrong: 'avanture',   correction: 'adventure',   explain: 'Correct spelling is "adventure".' },
+        { num: 4, kind: 'punctuation',wrong: '',           correction: '’',           explain: 'An apostrophe is needed in the contraction "you\'re" (= you are).' },
+        { num: 5, kind: 'spelling',   wrong: 'avanture',   correction: 'adventure',   explain: 'Correct spelling is "adventure".' },
+        { num: 6, kind: 'spelling',   wrong: 'unlikly',    correction: 'unlikely',    explain: 'Correct spelling is "unlikely".' },
       ],
     },
     sectionH: {
@@ -482,9 +483,9 @@ export function validateP3PracticeTests(bank = P3_PRACTICE_TESTS) {
     if (!edit || typeof edit.paragraph !== 'string') issues.push(`${tag}/${editKey}: missing editing paragraph`);
     else {
       const blanks = [...edit.paragraph.matchAll(editingBlankRe)].map(m => Number(m[1]));
-      const expected = term === 'T3' ? null : null;
       if (blanks.length < 5) issues.push(`${tag}/${editKey}: editing has only ${blanks.length} blanks (expected 5+)`);
       if (!Array.isArray(edit.errors) || edit.errors.length !== blanks.length) issues.push(`${tag}/${editKey}: errors count must match blanks count`);
+      checkEditingErrors(issues, `${tag}/${editKey}`, edit);
     }
 
     const compKeys = term === 'T3' ? ['sectionH', 'sectionI'] : ['sectionG'];
