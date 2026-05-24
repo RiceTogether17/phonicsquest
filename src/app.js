@@ -70,6 +70,7 @@ import { keyboardManager } from './modules/keyboardManager.js';
 import { settingsController } from './modules/settingsController.js';
 import { getQuestUnlockStatus } from './modules/questUnlocks.js';
 import { showPlacementTest } from './modules/placementTest.js';
+import { showPrimaryQuickCheck } from './modules/primaryQuickCheck.js';
 import { getReadingBand, getHomeLayoutForReadingBand } from './modules/readingStages.js';
 import { showSessionSummary } from './components/sessionSummary.js';
 import { showWeeklyRecap, shouldShowWeeklyRecap } from './components/weeklyRecap.js';
@@ -2166,10 +2167,12 @@ class App {
     // the Primary English content.  Seed a "reader" placement so downstream
     // band-aware logic still has a sane shape to read from.
     if (profile.schoolLevel === 'primary' && !store.get('placementComplete')) {
-      const primaryPlacement = this._buildPrimaryDefaultPlacement(profile);
-      store.set('placementProfile', primaryPlacement);
-      store.set('placementComplete', true);
-      this._afterPlacement(profile, primaryPlacement);
+      // Primary profiles still get the maxed default placement (the existing
+      // skip behaviour kept skill-gates from blocking access), but we now
+      // offer an optional Quick Check first so questMastery, the parent
+      // dashboard and Today's Mission have signal from day one rather than
+      // having to wait for a couple of sessions of organic play.
+      this._runPrimaryQuickCheck(profile);
     } else if (!store.get('placementComplete')) {
       this._showScreen('screen-placement');
       this._runPlacementTest(profile);
@@ -2210,6 +2213,46 @@ class App {
   }
 
   // ── Placement Test ──
+
+  /**
+   * Run the optional 6-question Primary Quick Check (B1). Mounts into the
+   * shared #screen-placement container, then unconditionally seeds the
+   * maxed primary defaults so quest-gating still lets a P1 through every
+   * door — the Quick Check only enriches questMastery / questAttempts so
+   * Today's Mission and the dashboard have signal from day one.
+   *
+   * On skip OR completion we end up in the same place: defaults applied,
+   * placementComplete set, _afterPlacement called.
+   * @param {object} profile
+   */
+  _runPrimaryQuickCheck(profile) {
+    const container = document.getElementById('screen-placement');
+    const seedDefaultsAndContinue = () => {
+      const primaryPlacement = this._buildPrimaryDefaultPlacement(profile);
+      store.set('placementProfile', primaryPlacement);
+      store.set('placementComplete', true);
+      this._afterPlacement(profile, primaryPlacement);
+    };
+    if (!container) { seedDefaultsAndContinue(); return; }
+    this._showScreen('screen-placement');
+    try {
+      showPrimaryQuickCheck({
+        container,
+        profile,
+        onComplete: (_payload) => {
+          // Whether the parent skipped or completed, primary still gets the
+          // maxed default placement — Quick Check results are additive to
+          // questMastery and never gate access.
+          seedDefaultsAndContinue();
+        },
+      });
+    } catch (err) {
+      // Defensive: if Quick Check render throws, fall back to the previous
+      // straight-to-home behaviour so we never block a new profile.
+      if (import.meta.env?.DEV) console.warn('[QuickCheck] mount failed', err);
+      seedDefaultsAndContinue();
+    }
+  }
 
   /**
    * Run the placement diagnostic for a newly created profile.
