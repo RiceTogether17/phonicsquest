@@ -5614,16 +5614,27 @@ details.story-tool-section[open] > .story-tool-summary::before {
   border-color: var(--color-primary);
 }
 
-/* ── Word-follow highlighting (within active line) ────────────────────── */
+/* ── Word-follow highlighting + tap-to-repeat (within active line) ────── */
 .wf-word {
   transition: background 0.12s ease, color 0.12s ease;
   border-radius: 3px;
   padding: 0 1px;
+  cursor: pointer;
+}
+.wf-word:hover {
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+.wf-word:focus-visible {
+  outline: 2px solid var(--color-primary, #6c63ff);
+  outline-offset: 2px;
 }
 .wf-word--active {
   background: color-mix(in srgb, var(--color-primary) 25%, transparent);
   color: var(--color-primary);
   font-weight: 800;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wf-word { transition: none; }
 }
 /* Echo-read active line */
 .sline--echo-active {

@@ -15,6 +15,7 @@ import { isHFW, extractStoryHFW } from '../data/hfw.js';
 import { WORDS } from '../data/words.js';
 import { audio } from '../modules/audio.js';
 import { runStoryQuest } from './storyQuest.js';
+import { mapCharIndexToWord, isOffscreen } from '../modules/karaokeUtils.js';
 import {
   startRecording, stopRecording, playRecording, deleteRecording,
   stopPlayback, cleanupRecording, getRecorderState,
@@ -59,7 +60,10 @@ let _currentStoryVocab = [];  // vocab words for current story (used in decode p
 let _currentStory = null;     // story being read (for markStoryRead on TTS finish)
 
 // Word-follow highlighting mode for Read Aloud
-let _followMode = 'line';     // 'line' | 'word'  (word = line + word highlight inside)
+// Karaoke read-aloud follows individual words by default (rule 6 — accessibility
+// is first-class). Hydrated from PREFS_FOLLOW_KEY further down so the value
+// survives reloads; defaults to 'word' on first run.
+let _followMode = 'word'; // 'line' | 'word'
 let _boundarySupported = null; // null = untested, true/false after first TTS attempt
 
 // Echo-read state
@@ -91,11 +95,17 @@ let _fluencyRunning = false;
 
 const PREFS_GRAPHEMES_KEY = 'giri_show_graphemes';
 const PREFS_RULER_KEY     = 'giri_show_ruler';
+const PREFS_FOLLOW_KEY    = 'giri_follow_mode';
 const MEET_WORDS_KEY      = 'giri_meet_words';
 const COMP_LOG_KEY        = 'giri_comp_log';
 
 let _showGraphemes = _loadPref(PREFS_GRAPHEMES_KEY, true);
 let _showRuler     = _loadPref(PREFS_RULER_KEY, false);
+
+// Hydrate the karaoke follow-mode from prefs now that PREFS_FOLLOW_KEY is in
+// scope. Defaults to 'word' (declared above) so first-run users get karaoke
+// out of the box without having to discover the toggle.
+_followMode = _loadPref(PREFS_FOLLOW_KEY, 'word');
 
 function _loadPref(key, fallback) {
   try {
@@ -686,11 +696,34 @@ function _renderReadAloud(story) {
     </div>
   `;
 
-  // Follow-mode toggle
+  // Follow-mode toggle (persisted so karaoke preference sticks across stories)
   dynamic.querySelectorAll('.follow-mode-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       _followMode = btn.dataset.follow;
+      _persistPref(PREFS_FOLLOW_KEY, _followMode);
       _renderReadAloud(story);
+    });
+  });
+
+  // Karaoke tap-to-repeat — every word span is a tappable replay button.
+  // Tap stops in-flight TTS so the child hears the single word cleanly,
+  // then leaves the page (they can press Play to resume from the line).
+  dynamic.querySelectorAll('.wf-word').forEach(span => {
+    // Make it keyboard-accessible without changing the visual default.
+    span.setAttribute('role', 'button');
+    span.setAttribute('tabindex', '0');
+    const replay = (ev) => {
+      // Strip embedded grapheme-highlight tags so we send the bare word
+      // to TTS, not "<span>c</span><span>a</span>t".
+      const word = (span.textContent || '').trim();
+      if (!word) return;
+      ev.preventDefault();
+      _stopTTS();
+      try { audio.speakWord(word); } catch (_) { /* ignore — no SFX */ }
+    };
+    span.addEventListener('click', replay);
+    span.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter' || ev.key === ' ') replay(ev);
     });
   });
 
@@ -1255,7 +1288,9 @@ function _speakNext(segments, idx) {
 
 /**
  * Attach a 'boundary' event listener to highlight individual words
- * within the active line during TTS playback.
+ * within the active line during TTS playback. Uses the event's `charIndex`
+ * to map back to the right word span — sturdier than a counter when a
+ * voice fires multiple boundary events for one word (some Safari voices).
  * Falls back gracefully if the browser/voice doesn't fire boundary events.
  */
 function _attachBoundaryListener(utt, lineIndex) {
@@ -1265,22 +1300,27 @@ function _attachBoundaryListener(utt, lineIndex) {
   const wordSpans = lineEl.querySelectorAll('.wf-word');
   if (wordSpans.length === 0) return;
 
-  let wordIdx = 0;
+  const lineText = utt.text || '';
   let boundaryFired = false;
+  let lastWordIdx = -1;
 
   utt.addEventListener('boundary', (e) => {
-    if (e.name !== 'word') return;
+    if (e.name && e.name !== 'word') return;
     boundaryFired = true;
     if (_boundarySupported === null) _boundarySupported = true;
 
-    // Clear previous word highlight
-    wordSpans.forEach(s => s.classList.remove('wf-word--active'));
+    const wordIdx = mapCharIndexToWord(lineText, e.charIndex ?? -1);
+    if (wordIdx < 0 || wordIdx >= wordSpans.length) return;
+    if (wordIdx === lastWordIdx) return; // same word, ignore
+    lastWordIdx = wordIdx;
 
-    // charIndex-based matching: find the word span whose position matches
-    if (wordIdx < wordSpans.length) {
-      wordSpans[wordIdx].classList.add('wf-word--active');
-      wordIdx++;
-    }
+    wordSpans.forEach(s => s.classList.remove('wf-word--active'));
+    const active = wordSpans[wordIdx];
+    active.classList.add('wf-word--active');
+
+    // Keep the karaoke word in view, but only if it has scrolled off — never
+    // jiggle the line if the child can already see it.
+    _scrollIntoViewIfNeeded(active);
   });
 
   // If no boundary events fire by the time the utterance ends,
@@ -1290,6 +1330,22 @@ function _attachBoundaryListener(utt, lineIndex) {
       _boundarySupported = false;
     }
   });
+}
+
+/**
+ * Scroll an element into view only if it's currently off-screen — cheap
+ * and jiggle-free for karaoke highlighting; doesn't fight a manual scroll.
+ * @private
+ */
+function _scrollIntoViewIfNeeded(el) {
+  if (!el || typeof el.getBoundingClientRect !== 'function') return;
+  try {
+    const rect = el.getBoundingClientRect();
+    const viewportH = window.innerHeight || document.documentElement.clientHeight;
+    if (isOffscreen(rect, viewportH)) {
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  } catch (_) { /* JSDOM or older browsers — ignore */ }
 }
 
 /** Remove word-level highlighting from all word spans. */
