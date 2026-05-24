@@ -19,6 +19,7 @@ import { progress } from './modules/progress.js';
 import { estimateMinutes as estimateReviewMinutes, getReviewCapForProfile } from './modules/reviewScheduler.js';
 import { getEarlyReadingPlan } from './modules/todaysPlan.js';
 import { getMistakesDenSummary, timeAgo as mistakeTimeAgo, MISTAKES_LOOKBACK_DAYS } from './modules/mistakesDen.js';
+import { getPersonalBests } from './modules/personalBestWall.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
 import { mascot } from './components/mascot.js';
 import { spinWheel, buildWordAnimation } from './components/wheel.js';
@@ -161,6 +162,7 @@ class App {
     this._updateQuestBanners();
     this._updateReviewBanner();
     this._updateMistakesDenBanner();
+    this._updatePersonalBestBanner();
     this._renderGuidedJourney();
 
     console.log('[PhonicsQuest] App initialized');
@@ -619,6 +621,14 @@ class App {
       btn.addEventListener('click', () => modalManager.close('modal-mistakes-den'));
     });
 
+    document.getElementById('btn-personal-best')?.addEventListener('click', () => {
+      this._openPersonalBestWall();
+    });
+
+    document.querySelectorAll('[data-close="modal-personal-best"]').forEach(btn => {
+      btn.addEventListener('click', () => modalManager.close('modal-personal-best'));
+    });
+
     document.getElementById('extra-practice-toggle')?.addEventListener('click', () => {
       const content = document.getElementById('extra-practice-content');
       const toggle = document.getElementById('extra-practice-toggle');
@@ -865,6 +875,7 @@ class App {
       this._updateQuestBanners();
       this._updateReviewBanner();
       this._updateMistakesDenBanner();
+      this._updatePersonalBestBanner();
       this._renderGuidedJourney();
       this._refreshQuestProgress();
     }
@@ -2708,6 +2719,90 @@ class App {
         this._navigateTo(target);
       });
     });
+  }
+
+  /**
+   * Refresh the "My Trophy Room" home tile. Only surfaces once the child
+   * has earned some XP or completed at least one Daily Challenge — a
+   * brand-new profile sees nothing to celebrate yet, which is honest, not
+   * punitive. The tile copy is intentionally celebratory ("See your
+   * personal bests") not aspirational ("Beat your best"), so a slow
+   * week never feels like a scold.
+   */
+  _updatePersonalBestBanner() {
+    const banner = document.getElementById('personal-best-banner');
+    if (!banner) return;
+    const xp = store.get('xp') || 0;
+    const calendar = Array.isArray(store.get('challengeCalendar')) ? store.get('challengeCalendar') : [];
+    const hasSomethingToShow = xp > 0 || calendar.length > 0;
+
+    if (hasSomethingToShow) {
+      banner.style.display = '';
+      const sub = document.getElementById('personal-best-sub');
+      if (sub) {
+        const bestStreak = store.get('bestStreak') || 0;
+        sub.textContent = bestStreak > 0
+          ? `Best streak ${bestStreak} day${bestStreak === 1 ? '' : 's'} · see your trophies`
+          : 'See your personal bests';
+      }
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  /**
+   * Open the trophy room modal — pulls a fresh snapshot every time so a
+   * just-earned graduation / streak day shows immediately.
+   */
+  _openPersonalBestWall() {
+    const host = document.getElementById('personal-best-content');
+    if (!host) return;
+    let pb;
+    try { pb = getPersonalBests(); } catch (_) { pb = null; }
+    this._renderPersonalBestWall(host, pb);
+    modalManager.open('modal-personal-best');
+  }
+
+  /**
+   * Render the trophy room body: a grid of cards (numbers + label + sub),
+   * a "highlights" strip Giri reads back, and earned badges.
+   * Pure HTML build — no chart library, no comparison-to-others framing.
+   */
+  _renderPersonalBestWall(host, pb) {
+    if (!host) return;
+    const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
+
+    if (!pb) {
+      host.innerHTML = `<p class="trophy-empty">No data yet — play a quest to start your trophy room.</p>`;
+      return;
+    }
+
+    const cardsHtml = pb.cards.map(card => `
+      <div class="trophy-card" role="group" aria-label="${escText(card.label)}, ${escText(card.value)}">
+        <div class="trophy-card__icon" aria-hidden="true">${escText(card.icon)}</div>
+        <div class="trophy-card__value">${escText(card.value)}</div>
+        <div class="trophy-card__label">${escText(card.label)}</div>
+        ${card.sub ? `<div class="trophy-card__sub">${escText(card.sub)}</div>` : ''}
+      </div>`).join('');
+
+    const highlightsHtml = pb.summary?.highlights?.length
+      ? `<ul class="trophy-highlights">${pb.summary.highlights.map(h => `<li>${escText(h)}</li>`).join('')}</ul>`
+      : '';
+
+    const badgesHtml = pb.badges?.length
+      ? `<div class="trophy-badges">
+           <h3 class="trophy-badges__title">🎖️ Badges earned · ${pb.badges.length}</h3>
+           <div class="trophy-badges__list">
+             ${pb.badges.map(b => `<span class="trophy-badge" title="${escText(b.name)}"><span aria-hidden="true">${escText(b.emoji)}</span> ${escText(b.name)}</span>`).join('')}
+           </div>
+         </div>`
+      : '';
+
+    host.innerHTML = `
+      <p class="trophy-intro">Every number here is just <strong>you vs you</strong> — no rankings, no leagues.</p>
+      ${highlightsHtml}
+      <div class="trophy-grid">${cardsHtml}</div>
+      ${badgesHtml}`;
   }
 
   _updateDailyBanner() {

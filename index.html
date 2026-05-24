@@ -144,6 +144,20 @@
           </button>
         </div>
 
+        <!-- My Trophy Room — Personal Best Wall (rendered by app.js) -->
+        <div class="review-banner" id="personal-best-banner" style="display:none" role="status">
+          <button class="stories-banner stories-banner--gold" id="btn-personal-best" aria-label="Open My Trophy Room">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2rem;line-height:1" aria-hidden="true">🏆</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title" id="personal-best-title">🏆 My Trophy Room</span>
+              <span class="stories-banner-sub" id="personal-best-sub">See your personal bests</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+        </div>
+
         <!-- Today's Plan (early-reading 3-step daily quest, rendered by app.js) -->
         <div class="home-section early-reading-todays-plan" id="early-reading-todays-plan" style="display:none" aria-label="Today's plan"></div>
 
@@ -1025,6 +1039,21 @@
           </button>
         </div>
         <div class="modal-body" id="mistakes-den-content"><!-- Injected by app.js _renderMistakesDen --></div>
+      </div>
+    </div>
+
+    <!-- MY TROPHY ROOM MODAL — Personal Best Wall -->
+    <div class="modal-overlay" id="modal-personal-best" role="dialog" aria-modal="true" aria-label="My Trophy Room — your personal bests" hidden>
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h2 class="modal-title">🏆 My Trophy Room</h2>
+          <button class="modal-close" aria-label="Close My Trophy Room" data-close="modal-personal-best">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body" id="personal-best-content"><!-- Injected by app.js _renderPersonalBestWall --></div>
       </div>
     </div>
 
