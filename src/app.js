@@ -60,7 +60,8 @@ import {
 import {
   getMissionSummary, markMissionStepDone,
 } from './modules/missionToday.js';
-import { CURRICULUM, PHASE_LABELS } from './data/curriculum.js';
+import { CURRICULUM, PHASES, PHASE_LABELS } from './data/curriculum.js';
+import { getStagesForMode } from './modules/phonicsProgression.js';
 import {
   buildProgressionSnapshot, getUnlockedStages, getRecommendedStage, explainLockReason,
 } from './modules/progression.js';
@@ -204,18 +205,26 @@ class App {
 
   /** Bind all event listeners */
   _bindEvents() {
+    // Phonics modes that get the curriculum-stage picker before play
+    // starts. Classic Blend keeps its built-in dropdown (it sets the
+    // group itself), so it's excluded.
+    const PICKER_MODES = new Set([
+      'blend', 'oralBlend', 'first', 'last', 'middle',
+      'soundCount', 'hear', 'missing', 'segment',
+    ]);
+
     document.querySelectorAll('.mode-card').forEach((card, idx) => {
       card.style.setProperty('--i', String(idx));
       card.addEventListener('click', () => {
         this._mode = card.dataset.mode;
         store.set('currentMode', this._mode);
-        if (this._mode === 'blend') {
-          // Show curriculum stage picker before starting Blend It!
-          this._openBlendPicker();
+        if (PICKER_MODES.has(this._mode)) {
+          // Phonemic-awareness and segmenting modes now share Blend It!'s
+          // phase-by-phase progression — pick a stage, get a mastery bar.
+          this._openStagePicker(this._mode);
         } else {
-          // For Listen & Blend, respect the saved category so the first word
-          // matches the dropdown that is pre-populated from the store.
-          // For all other modes keep the same behaviour as _nextWord().
+          // Classic Blend has its own dropdown; everything else starts
+          // with the last group the child chose (or no group at all).
           this._startGame(store.get('currentGroup') || undefined);
         }
       });
@@ -2487,7 +2496,35 @@ class App {
    * Show a modal curriculum stage browser for Blend It!
    * Groups stages by phase, shows lock/unlock & mastery, highlights recommended.
    */
+  /**
+   * Back-compat wrapper for the original Blend It! picker entry point.
+   * Every other phonics mode now uses the parameterised version below.
+   */
   _openBlendPicker() {
+    this._openStagePicker('blend');
+  }
+
+  /**
+   * Open the curriculum-stage picker for `mode`. The same picker chrome
+   * Blend It! has always used — now filtered to stages where the phase's
+   * `recommendedModes` includes the mode the child tapped, so the
+   * phonemic-awareness and segmenting modes finally get phase-by-phase
+   * progression instead of starting cold on whatever `currentGroup` was
+   * last touched.
+   *
+   * @param {string} [mode] mode key (e.g. 'first', 'segment'). Defaults to
+   *   the currently active mode.
+   */
+  _openStagePicker(mode = this._mode) {
+    const stagesForMode = getStagesForMode(mode, CURRICULUM, PHASES);
+    if (!stagesForMode.length) {
+      // Defensive: should never hit — getStagesForMode falls back to full
+      // curriculum when no phase recommends the mode. If it does, just
+      // start the game from the current group rather than block the child.
+      this._startGame(store.get('currentGroup') || undefined);
+      return;
+    }
+
     const groupMastery = store.get('groupMastery') || {};
     const snapshot     = buildProgressionSnapshot();
     const unlocked     = getUnlockedStages(snapshot);
@@ -2495,10 +2532,17 @@ class App {
 
     document.getElementById('modal-blend-picker')?.remove();
 
+    // Group filtered stages by phase so headers stay accurate even when
+    // a mode skips, say, the digraph phase (e.g. middle-sound on CCVCC).
     const byPhase = {};
-    for (const stage of CURRICULUM) {
+    for (const stage of stagesForMode) {
       (byPhase[stage.phase] ??= []).push(stage);
     }
+
+    const modeMeta   = MODES[mode] || null;
+    const modeIcon   = modeMeta?.icon || '🎯';
+    const modeName   = modeMeta?.name || 'Phonics Quest';
+    const modeIntro  = modeMeta?.desc ? `${modeMeta.desc}.` : '';
 
     let stagesHtml = '';
     for (const [phaseNum, stages] of Object.entries(byPhase)) {
@@ -2546,9 +2590,10 @@ class App {
     modal.innerHTML = `
       <div class="modal-panel bp-panel">
         <div class="modal-header">
-          <h2 class="modal-title">🎯 Choose Your Stage</h2>
+          <h2 class="modal-title">${modeIcon} ${modeName} — Choose Your Stage</h2>
           <button class="modal-close" id="bp-close-btn" aria-label="Close picker">✕</button>
         </div>
+        ${modeIntro ? `<p class="bp-intro">${modeIntro} Pick a stage to practise.</p>` : ''}
         <div class="bp-stages-list">${stagesHtml}</div>
       </div>`;
 
