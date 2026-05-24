@@ -16,6 +16,8 @@ import { WORDS } from '../data/words.js';
 import { audio } from '../modules/audio.js';
 import { runStoryQuest } from './storyQuest.js';
 import { mapCharIndexToWord, isOffscreen } from '../modules/karaokeUtils.js';
+import { lookupWord as lookupWordForDetective, addWordToReview } from '../modules/wordDetective.js';
+import { modalManager } from '../modules/modalManager.js';
 import {
   startRecording, stopRecording, playRecording, deleteRecording,
   stopPlayback, cleanupRecording, getRecorderState,
@@ -96,11 +98,15 @@ let _fluencyRunning = false;
 const PREFS_GRAPHEMES_KEY = 'giri_show_graphemes';
 const PREFS_RULER_KEY     = 'giri_show_ruler';
 const PREFS_FOLLOW_KEY    = 'giri_follow_mode';
+const PREFS_DETECTIVE_KEY = 'giri_detective_mode';
 const MEET_WORDS_KEY      = 'giri_meet_words';
 const COMP_LOG_KEY        = 'giri_comp_log';
 
 let _showGraphemes = _loadPref(PREFS_GRAPHEMES_KEY, true);
 let _showRuler     = _loadPref(PREFS_RULER_KEY, false);
+// Word Detective is opt-in (default OFF) so the dominant tap-action stays
+// "repeat the word" (karaoke). Turn on to make taps open the breakdown card.
+let _detectiveMode = _loadPref(PREFS_DETECTIVE_KEY, false);
 
 // Hydrate the karaoke follow-mode from prefs now that PREFS_FOLLOW_KEY is in
 // scope. Defaults to 'word' (declared above) so first-run users get karaoke
@@ -613,6 +619,13 @@ function _renderReadAloud(story) {
         <button class="follow-mode-btn${_followMode === 'word' ? ' active' : ''}" data-follow="word">Line + Word</button>
       </div>
 
+      <!-- Word Detective toggle: tap any word to inspect its sounds. -->
+      <div class="follow-mode-toggle">
+        <span class="follow-mode-label">Tap a word:</span>
+        <button class="follow-mode-btn${!_detectiveMode ? ' active' : ''}" data-detective="off" title="Tap a word to hear it">🔊 Hear it</button>
+        <button class="follow-mode-btn${_detectiveMode ? ' active' : ''}" data-detective="on" title="Tap a word to see its sounds">🔍 Detective</button>
+      </div>
+
       <div class="story-body${_showRuler ? ' story-ruler-on' : ''}" id="story-body" aria-live="polite">${linesHtml}</div>
       ${talkHtml}
     </div>
@@ -697,7 +710,7 @@ function _renderReadAloud(story) {
   `;
 
   // Follow-mode toggle (persisted so karaoke preference sticks across stories)
-  dynamic.querySelectorAll('.follow-mode-btn').forEach(btn => {
+  dynamic.querySelectorAll('.follow-mode-btn[data-follow]').forEach(btn => {
     btn.addEventListener('click', () => {
       _followMode = btn.dataset.follow;
       _persistPref(PREFS_FOLLOW_KEY, _followMode);
@@ -705,25 +718,37 @@ function _renderReadAloud(story) {
     });
   });
 
-  // Karaoke tap-to-repeat — every word span is a tappable replay button.
-  // Tap stops in-flight TTS so the child hears the single word cleanly,
-  // then leaves the page (they can press Play to resume from the line).
+  // Detective toggle — re-renders so the word spans pick up the new tap
+  // behavior. Persisted so a teacher's "investigate this story together"
+  // session carries across pages.
+  dynamic.querySelectorAll('.follow-mode-btn[data-detective]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      _detectiveMode = btn.dataset.detective === 'on';
+      _persistPref(PREFS_DETECTIVE_KEY, _detectiveMode);
+      _renderReadAloud(story);
+    });
+  });
+
+  // Word tap behaviour: in karaoke mode (default) a tap replays the word
+  // via TTS; in Detective mode it opens the breakdown card. Every span is
+  // keyboard-accessible so the same flow works without a pointer.
   dynamic.querySelectorAll('.wf-word').forEach(span => {
-    // Make it keyboard-accessible without changing the visual default.
     span.setAttribute('role', 'button');
     span.setAttribute('tabindex', '0');
-    const replay = (ev) => {
-      // Strip embedded grapheme-highlight tags so we send the bare word
-      // to TTS, not "<span>c</span><span>a</span>t".
+    const handle = (ev) => {
       const word = (span.textContent || '').trim();
       if (!word) return;
       ev.preventDefault();
-      _stopTTS();
-      try { audio.speakWord(word); } catch (_) { /* ignore — no SFX */ }
+      if (_detectiveMode) {
+        _openWordDetective(word);
+      } else {
+        _stopTTS();
+        try { audio.speakWord(word); } catch (_) { /* ignore — no SFX */ }
+      }
     };
-    span.addEventListener('click', replay);
+    span.addEventListener('click', handle);
     span.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Enter' || ev.key === ' ') replay(ev);
+      if (ev.key === 'Enter' || ev.key === ' ') handle(ev);
     });
   });
 
@@ -1330,6 +1355,85 @@ function _attachBoundaryListener(utt, lineIndex) {
       _boundarySupported = false;
     }
   });
+}
+
+/**
+ * Open the Word Detective card for a tapped word. Looks up grapheme
+ * breakdown via wordDetective.lookupWord, renders the card into the
+ * shared modal body, then mounts the modal. Charter-safe: the "Add to
+ * Review Lane" CTA only enables when the word is in the WORDS bank (no
+ * stat pollution for story-only names).
+ *
+ * @param {string} text — raw word text from the tapped span
+ * @private
+ */
+function _openWordDetective(text) {
+  const host = document.getElementById('word-detective-content');
+  if (!host) return;
+  // Pause any karaoke so the child can focus on the breakdown card.
+  _stopTTS();
+  const info = lookupWordForDetective(text);
+  host.innerHTML = _renderWordDetectiveCard(info);
+  modalManager.open('modal-word-detective');
+
+  host.querySelector('[data-action="hear"]')?.addEventListener('click', () => {
+    try { audio.speakWord(info.text); } catch (_) { /* ignore */ }
+  });
+
+  const addBtn = host.querySelector('[data-action="add-review"]');
+  addBtn?.addEventListener('click', () => {
+    if (!info.word) return;
+    const ok = addWordToReview(info.word.id);
+    if (ok) {
+      addBtn.disabled = true;
+      addBtn.textContent = '✓ In your Review Lane';
+    }
+  });
+}
+
+/**
+ * Build the Word Detective card HTML. Pure — takes a lookup result, returns
+ * an HTML string with grapheme tiles colour-coded via the existing
+ * `.letter-tile--<family>` classes.
+ *
+ * @param {ReturnType<import('../modules/wordDetective.js').lookupWord>} info
+ * @returns {string}
+ */
+function _renderWordDetectiveCard(info) {
+  const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
+  const TYPE_CLASS = {
+    c: 'consonant', sv: 'short-vowel', lv: 'long-vowel', d: 'digraph',
+    bl: 'blend', se: 'silent-e', rc: 'r-control', dp: 'diphthong',
+    sf: 'suffix', p: 'suffix', soft_c: 'consonant', soft_g: 'consonant',
+  };
+  const TYPE_LABEL = {
+    c: 'consonant', sv: 'short vowel', lv: 'long vowel', d: 'digraph',
+    bl: 'blend', se: 'silent e', rc: 'r-controlled', dp: 'diphthong',
+    sf: 'suffix', p: 'prefix', soft_c: 'soft c', soft_g: 'soft g',
+  };
+
+  const tilesHtml = info.graphemes.map((g, i) => {
+    const type = info.types[i] || 'c';
+    const cls = TYPE_CLASS[type] || 'consonant';
+    const label = TYPE_LABEL[type] || 'sound';
+    return `<span class="wd-tile letter-tile letter-tile--${cls}" aria-label="${escText(g)}, ${escText(label)}">${escText(g)}</span>`;
+  }).join('');
+
+  const inBankBlock = info.foundInBank
+    ? `<button class="btn btn--primary" type="button" data-action="add-review" ${info.alreadyTracked ? 'disabled' : ''}>
+         ${info.alreadyTracked ? '✓ Already in your Review Lane' : '🎯 Add to my Review Lane'}
+       </button>`
+    : `<p class="wd-note">This word isn't in the practice bank — but you can still hear its sounds.</p>`;
+
+  return `
+    <div class="wd-card">
+      <p class="wd-word">${escText(info.text)}</p>
+      <div class="wd-tiles" aria-label="Sound breakdown">${tilesHtml}</div>
+      <div class="wd-actions">
+        <button class="btn btn--ghost" type="button" data-action="hear">🔊 Hear it</button>
+        ${inBankBlock}
+      </div>
+    </div>`;
 }
 
 /**
