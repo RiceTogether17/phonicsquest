@@ -12,6 +12,7 @@
 
 import { store } from './store.js';
 import { getLevelInfo, XP_REWARDS } from '../data/curriculum.js';
+import { isBedtimeActive } from './bedtimeMode.js';
 
 class Gamification {
   constructor() {
@@ -112,6 +113,14 @@ class Gamification {
    */
   awardXp(amount, reason = '') {
     if (!amount || amount <= 0) return { newXP: store.get('xp'), levelUp: false, newLevel: store.get('level') };
+
+    // Bedtime Mode honours the "not every minute needs XP" charter rule.
+    // When it's on, attempts are still recorded (so the SR ladder and
+    // dashboard stay accurate), but no XP/level-up triggers fire. The
+    // wind-down session is calm — not a hype loop before lights-out.
+    if (isBedtimeActive()) {
+      return { newXP: store.get('xp'), levelUp: false, newLevel: store.get('level') };
+    }
 
     const oldLevel = store.get('level');
     const newXP    = store.get('xp') + amount;

@@ -18,6 +18,13 @@ import { badges } from './modules/badges.js';
 import { progress } from './modules/progress.js';
 import { estimateMinutes as estimateReviewMinutes, getReviewCapForProfile } from './modules/reviewScheduler.js';
 import { getEarlyReadingPlan } from './modules/todaysPlan.js';
+import { buildWordWorkout } from './modules/wordWorkout.js';
+import {
+  isBedtimeActive,
+  setBedtimeEnabled,
+  applyBedtimeStateToDom,
+  getBedtimeStatus,
+} from './modules/bedtimeMode.js';
 import { getMistakesDenSummary, timeAgo as mistakeTimeAgo, MISTAKES_LOOKBACK_DAYS } from './modules/mistakesDen.js';
 import { getPersonalBests } from './modules/personalBestWall.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
@@ -60,7 +67,8 @@ import {
 import {
   getMissionSummary, markMissionStepDone,
 } from './modules/missionToday.js';
-import { CURRICULUM, PHASE_LABELS } from './data/curriculum.js';
+import { CURRICULUM, PHASES, PHASE_LABELS } from './data/curriculum.js';
+import { getStagesForMode } from './modules/phonicsProgression.js';
 import {
   buildProgressionSnapshot, getUnlockedStages, getRecommendedStage, explainLockReason,
 } from './modules/progression.js';
@@ -70,6 +78,7 @@ import { keyboardManager } from './modules/keyboardManager.js';
 import { settingsController } from './modules/settingsController.js';
 import { getQuestUnlockStatus } from './modules/questUnlocks.js';
 import { showPlacementTest } from './modules/placementTest.js';
+import { showPrimaryQuickCheck } from './modules/primaryQuickCheck.js';
 import { getReadingBand, getHomeLayoutForReadingBand } from './modules/readingStages.js';
 import { showSessionSummary } from './components/sessionSummary.js';
 import { showWeeklyRecap, shouldShowWeeklyRecap } from './components/weeklyRecap.js';
@@ -96,13 +105,22 @@ class App {
     this._currentWord = null;
 
     /**
-     * Session type: 'normal' | 'dailyChallenge' | 'review'
+     * Session type: 'normal' | 'dailyChallenge' | 'review' | 'wordWorkout'
      * Prevents review sessions from accidentally completing the daily challenge.
-     * @type {'normal'|'dailyChallenge'|'review'}
+     * @type {'normal'|'dailyChallenge'|'review'|'wordWorkout'}
      */
     this._sessionType = 'normal';
     /** @type {import('./data/words.js').Word[]} remaining queued words (daily/review) */
     this._queuedWords = [];
+    /**
+     * Multi-mode rounds for the Word Workout session. Each entry pins a
+     * specific mode to a specific word; the same word repeats across the
+     * list so the workout drills one item from several angles.
+     * @type {Array<{ word: import('./data/words.js').Word, mode: string }>}
+     */
+    this._queuedRounds = [];
+    /** Word being drilled in the active Word Workout (for results copy). */
+    this._workoutWord = null;
     /** @type {number} correct answers in current queued session */
     this._queuedCorrect = 0;
 
@@ -148,6 +166,10 @@ class App {
     }
 
     settingsController.applyTheme(store.get('theme') || 'default');
+    // Re-apply the persisted Bedtime Mode flag (was hydrated by the
+    // localStorage read in bedtimeMode.js when the module imported).
+    applyBedtimeStateToDom();
+    this._refreshBedtimeToggle();
 
     if (needsProfileSelection()) {
       this._showScreen(SCREENS.PROFILES);
@@ -161,8 +183,10 @@ class App {
     this._updateDailyBanner();
     this._updateQuestBanners();
     this._updateReviewBanner();
+    this._updateWordWorkoutBanner();
     this._updateMistakesDenBanner();
     this._updatePersonalBestBanner();
+    this._refreshBedtimeToggle();
     this._renderGuidedJourney();
 
     console.log('[PhonicsQuest] App initialized');
@@ -203,18 +227,26 @@ class App {
 
   /** Bind all event listeners */
   _bindEvents() {
+    // Phonics modes that get the curriculum-stage picker before play
+    // starts. Classic Blend keeps its built-in dropdown (it sets the
+    // group itself), so it's excluded.
+    const PICKER_MODES = new Set([
+      'blend', 'oralBlend', 'first', 'last', 'middle',
+      'soundCount', 'hear', 'missing', 'segment',
+    ]);
+
     document.querySelectorAll('.mode-card').forEach((card, idx) => {
       card.style.setProperty('--i', String(idx));
       card.addEventListener('click', () => {
         this._mode = card.dataset.mode;
         store.set('currentMode', this._mode);
-        if (this._mode === 'blend') {
-          // Show curriculum stage picker before starting Blend It!
-          this._openBlendPicker();
+        if (PICKER_MODES.has(this._mode)) {
+          // Phonemic-awareness and segmenting modes now share Blend It!'s
+          // phase-by-phase progression — pick a stage, get a mastery bar.
+          this._openStagePicker(this._mode);
         } else {
-          // For Listen & Blend, respect the saved category so the first word
-          // matches the dropdown that is pre-populated from the store.
-          // For all other modes keep the same behaviour as _nextWord().
+          // Classic Blend has its own dropdown; everything else starts
+          // with the last group the child chose (or no group at all).
           this._startGame(store.get('currentGroup') || undefined);
         }
       });
@@ -570,6 +602,18 @@ class App {
       this._openModal('modal-settings');
     });
 
+    document.getElementById('bedtime-toggle')?.addEventListener('click', () => {
+      const next = !isBedtimeActive();
+      setBedtimeEnabled(next);
+      this._refreshBedtimeToggle();
+      this._showToast(
+        next
+          ? '🌙 Bedtime Mode on — story time, no XP. Sweet dreams!'
+          : '☀️ Bedtime Mode off — XP and celebrations are back.',
+        'info',
+      );
+    });
+
     document.getElementById('btn-calibrate-mic')?.addEventListener('click', () => {
       this._runMicCalibration();
     });
@@ -615,6 +659,10 @@ class App {
 
     document.getElementById('btn-mistakes-den')?.addEventListener('click', () => {
       this._openMistakesDen();
+    });
+
+    document.getElementById('btn-word-workout')?.addEventListener('click', () => {
+      this._startWordWorkout();
     });
 
     document.querySelectorAll('[data-close="modal-mistakes-den"]').forEach(btn => {
@@ -682,7 +730,18 @@ class App {
 
   /** Start a game round */
   _startGame(group) {
-    if (this._sessionType !== 'normal' && this._queuedWords.length > 0) {
+    // Word Workout rounds pin a mode per round (the same word seen through
+    // 3–4 different cues). Handle this branch first so the mode-switch is
+    // applied before any setup is dispatched.
+    if (this._sessionType === 'wordWorkout' && this._queuedRounds.length > 0) {
+      const round = this._queuedRounds.shift();
+      this._mode = round.mode;
+      store.set('currentMode', this._mode);
+      this._currentWord = round.word;
+    } else if (this._sessionType === 'wordWorkout' && this._queuedRounds.length === 0) {
+      this._finishQueuedSession();
+      return;
+    } else if (this._sessionType !== 'normal' && this._queuedWords.length > 0) {
       this._currentWord = this._queuedWords.shift();
     } else if (this._sessionType !== 'normal' && this._queuedWords.length === 0) {
       this._finishQueuedSession();
@@ -2166,10 +2225,12 @@ class App {
     // the Primary English content.  Seed a "reader" placement so downstream
     // band-aware logic still has a sane shape to read from.
     if (profile.schoolLevel === 'primary' && !store.get('placementComplete')) {
-      const primaryPlacement = this._buildPrimaryDefaultPlacement(profile);
-      store.set('placementProfile', primaryPlacement);
-      store.set('placementComplete', true);
-      this._afterPlacement(profile, primaryPlacement);
+      // Primary profiles still get the maxed default placement (the existing
+      // skip behaviour kept skill-gates from blocking access), but we now
+      // offer an optional Quick Check first so questMastery, the parent
+      // dashboard and Today's Mission have signal from day one rather than
+      // having to wait for a couple of sessions of organic play.
+      this._runPrimaryQuickCheck(profile);
     } else if (!store.get('placementComplete')) {
       this._showScreen('screen-placement');
       this._runPlacementTest(profile);
@@ -2210,6 +2271,46 @@ class App {
   }
 
   // ── Placement Test ──
+
+  /**
+   * Run the optional 6-question Primary Quick Check (B1). Mounts into the
+   * shared #screen-placement container, then unconditionally seeds the
+   * maxed primary defaults so quest-gating still lets a P1 through every
+   * door — the Quick Check only enriches questMastery / questAttempts so
+   * Today's Mission and the dashboard have signal from day one.
+   *
+   * On skip OR completion we end up in the same place: defaults applied,
+   * placementComplete set, _afterPlacement called.
+   * @param {object} profile
+   */
+  _runPrimaryQuickCheck(profile) {
+    const container = document.getElementById('screen-placement');
+    const seedDefaultsAndContinue = () => {
+      const primaryPlacement = this._buildPrimaryDefaultPlacement(profile);
+      store.set('placementProfile', primaryPlacement);
+      store.set('placementComplete', true);
+      this._afterPlacement(profile, primaryPlacement);
+    };
+    if (!container) { seedDefaultsAndContinue(); return; }
+    this._showScreen('screen-placement');
+    try {
+      showPrimaryQuickCheck({
+        container,
+        profile,
+        onComplete: (_payload) => {
+          // Whether the parent skipped or completed, primary still gets the
+          // maxed default placement — Quick Check results are additive to
+          // questMastery and never gate access.
+          seedDefaultsAndContinue();
+        },
+      });
+    } catch (err) {
+      // Defensive: if Quick Check render throws, fall back to the previous
+      // straight-to-home behaviour so we never block a new profile.
+      if (import.meta.env?.DEV) console.warn('[QuickCheck] mount failed', err);
+      seedDefaultsAndContinue();
+    }
+  }
 
   /**
    * Run the placement diagnostic for a newly created profile.
@@ -2444,7 +2545,35 @@ class App {
    * Show a modal curriculum stage browser for Blend It!
    * Groups stages by phase, shows lock/unlock & mastery, highlights recommended.
    */
+  /**
+   * Back-compat wrapper for the original Blend It! picker entry point.
+   * Every other phonics mode now uses the parameterised version below.
+   */
   _openBlendPicker() {
+    this._openStagePicker('blend');
+  }
+
+  /**
+   * Open the curriculum-stage picker for `mode`. The same picker chrome
+   * Blend It! has always used — now filtered to stages where the phase's
+   * `recommendedModes` includes the mode the child tapped, so the
+   * phonemic-awareness and segmenting modes finally get phase-by-phase
+   * progression instead of starting cold on whatever `currentGroup` was
+   * last touched.
+   *
+   * @param {string} [mode] mode key (e.g. 'first', 'segment'). Defaults to
+   *   the currently active mode.
+   */
+  _openStagePicker(mode = this._mode) {
+    const stagesForMode = getStagesForMode(mode, CURRICULUM, PHASES);
+    if (!stagesForMode.length) {
+      // Defensive: should never hit — getStagesForMode falls back to full
+      // curriculum when no phase recommends the mode. If it does, just
+      // start the game from the current group rather than block the child.
+      this._startGame(store.get('currentGroup') || undefined);
+      return;
+    }
+
     const groupMastery = store.get('groupMastery') || {};
     const snapshot     = buildProgressionSnapshot();
     const unlocked     = getUnlockedStages(snapshot);
@@ -2452,10 +2581,17 @@ class App {
 
     document.getElementById('modal-blend-picker')?.remove();
 
+    // Group filtered stages by phase so headers stay accurate even when
+    // a mode skips, say, the digraph phase (e.g. middle-sound on CCVCC).
     const byPhase = {};
-    for (const stage of CURRICULUM) {
+    for (const stage of stagesForMode) {
       (byPhase[stage.phase] ??= []).push(stage);
     }
+
+    const modeMeta   = MODES[mode] || null;
+    const modeIcon   = modeMeta?.icon || '🎯';
+    const modeName   = modeMeta?.name || 'Phonics Quest';
+    const modeIntro  = modeMeta?.desc ? `${modeMeta.desc}.` : '';
 
     let stagesHtml = '';
     for (const [phaseNum, stages] of Object.entries(byPhase)) {
@@ -2503,9 +2639,10 @@ class App {
     modal.innerHTML = `
       <div class="modal-panel bp-panel">
         <div class="modal-header">
-          <h2 class="modal-title">🎯 Choose Your Stage</h2>
+          <h2 class="modal-title">${modeIcon} ${modeName} — Choose Your Stage</h2>
           <button class="modal-close" id="bp-close-btn" aria-label="Close picker">✕</button>
         </div>
+        ${modeIntro ? `<p class="bp-intro">${modeIntro} Pick a stage to practise.</p>` : ''}
         <div class="bp-stages-list">${stagesHtml}</div>
       </div>`;
 
@@ -2569,8 +2706,10 @@ class App {
   }
 
   /**
-   * Handle completion of a queued session (daily challenge or review).
-   * Only daily challenge sessions trigger completeDailyChallenge().
+   * Handle completion of a queued session (daily challenge / review /
+   * word workout). Only daily challenge sessions trigger
+   * completeDailyChallenge(); workouts get a bespoke "you took X through
+   * N modes!" toast.
    */
   _finishQueuedSession() {
     const type = this._sessionType;
@@ -2590,6 +2729,14 @@ class App {
       this._showToast('Review session complete! Great revision! 🔄', 'success');
       audio.playSfx('correct');
       this._updateReviewBanner();
+    } else if (type === 'wordWorkout') {
+      const word = this._workoutWord?.word || 'that word';
+      this._showToast(`Workout done! You took “${word}” through every angle. 🎽`, 'success');
+      audio.playSfx('correct');
+      this._workoutWord = null;
+      this._queuedRounds = [];
+      this._updateReviewBanner();
+      this._updateWordWorkoutBanner();
     }
     // Refresh Today's Plan ticks immediately on return to home so the child
     // sees their step flip to ✓ without waiting for the next render.
@@ -2597,6 +2744,41 @@ class App {
 
     this._showScreen(SCREENS.HOME);
     mascot.setHomeState('holdCard');
+  }
+
+  /**
+   * Start a Word Workout — pick the most-overdue Review Lane word (or fall
+   * back to the daily warmup), build a 3–4-round multi-mode ladder, and
+   * dispatch through the queued-session machinery. Same word, different
+   * cues per round.
+   *
+   * @param {import('./data/words.js').Word} [word]  optional explicit word
+   */
+  _startWordWorkout(word = null) {
+    let target = word;
+    if (!target) {
+      // Pull the most-overdue Review Lane item — the workout's natural
+      // home. If the queue is empty, surface a friendly toast and bail
+      // (the home tile is hidden in that case anyway).
+      const due = progress.getReviewDueWords({ cap: 1 });
+      target = due[0] || null;
+    }
+    if (!target) {
+      this._showToast('No words to work out — try Review Lane after some practice.', 'info');
+      return;
+    }
+    const rounds = buildWordWorkout(target);
+    if (rounds.length === 0) {
+      this._showToast('That word doesn\'t have a workout ladder yet.', 'info');
+      return;
+    }
+    this._sessionType = 'wordWorkout';
+    this._queuedRounds = rounds;
+    this._workoutWord = target;
+    this._queuedCorrect = 0;
+    store.set('currentGroup', null);
+    this._showToast(`Workout: “${target.word}” through ${rounds.length} modes 🎽`, 'info');
+    this._startGame();
   }
 
   /**
@@ -2616,6 +2798,43 @@ class App {
       if (sub) {
         sub.textContent = `${dueCount} word${dueCount === 1 ? '' : 's'} due today · about ${minutes} min`;
       }
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  /**
+   * Refresh the Bedtime Mode toggle in the header. Mirrors the persisted
+   * flag onto `aria-pressed`, applies the soft "suggested" pulse during
+   * the 19:00–06:00 window when bedtime isn't yet on, and updates the
+   * title attribute so the hover label reflects the current state.
+   */
+  _refreshBedtimeToggle() {
+    const btn = document.getElementById('bedtime-toggle');
+    if (!btn) return;
+    const status = getBedtimeStatus();
+    btn.setAttribute('aria-pressed', status.active ? 'true' : 'false');
+    btn.classList.toggle('bedtime-toggle--suggested', status.suggested);
+    btn.title = status.active
+      ? 'Bedtime Mode on — tap to turn off'
+      : status.suggested
+        ? "It's getting late — try Bedtime Mode (no XP, just stories)"
+        : 'Bedtime Mode';
+  }
+
+  /**
+   * Refresh the Word Workout home tile. Hidden when there's nothing
+   * overdue (a workout always pulls a Review Lane item), so a brand-new
+   * profile doesn't see a button that would just say "nothing to do".
+   */
+  _updateWordWorkoutBanner() {
+    const banner = document.getElementById('word-workout-banner');
+    if (!banner) return;
+    const due = progress.getReviewDueCount();
+    const sub = document.getElementById('word-workout-sub');
+    if (due > 0) {
+      banner.style.display = '';
+      if (sub) sub.textContent = 'Drill one due word through 4 angles';
     } else {
       banner.style.display = 'none';
     }

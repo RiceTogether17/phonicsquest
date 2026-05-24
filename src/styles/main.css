@@ -425,6 +425,52 @@ input, select, textarea { font-family: inherit; }
 .icon-btn:hover { background: var(--color-primary-light); color: var(--color-primary); transform: scale(1.05); }
 .icon-btn:active { transform: scale(0.92); }
 
+/* ── Bedtime Mode — toggle + global dim overlay ─────────────────────── */
+.bedtime-toggle { font-size: 1.1rem; line-height: 1; }
+.bedtime-toggle[aria-pressed="true"] {
+  background: #1e1b4b;
+  color: #facc15;
+}
+.bedtime-toggle.bedtime-toggle--suggested {
+  /* Soft pulse to hint "it's getting late" without being naggy. */
+  animation: bedtimePulse 2.4s ease-in-out infinite;
+}
+@keyframes bedtimePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.0); }
+  50%      { box-shadow: 0 0 0 6px rgba(250, 204, 21, 0.25); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bedtime-toggle.bedtime-toggle--suggested { animation: none; }
+}
+
+/* When Bedtime Mode is on, dim the whole interface — warm sepia bias,
+   muted chroma, no sharp blues. Confetti / XP toasts are suppressed in
+   JS; this layer just slows the eye. Sits on top of any selected theme. */
+body.bedtime-on {
+  filter: brightness(0.88) saturate(0.72) sepia(0.18);
+}
+body.bedtime-on .energy-display,
+body.bedtime-on #goal-fill,
+body.bedtime-on .level-bar-fill {
+  opacity: 0.7;
+}
+body.bedtime-on .toast--success,
+body.bedtime-on .toast--badge,
+body.bedtime-on .toast--levelup {
+  /* Suppress the loud reward toasts at bedtime — keep info/warning */
+  display: none !important;
+}
+body.bedtime-on .mascot--celebrate,
+body.bedtime-on .confetti-canvas {
+  display: none !important;
+}
+body.bedtime-on * {
+  transition-duration: 0.6s !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  body.bedtime-on * { transition-duration: 0s !important; }
+}
+
 /* ── LEVEL BAR ── */
 .level-bar-wrapper {
   display: flex;
@@ -5010,6 +5056,13 @@ details.story-tool-section[open] > .story-tool-summary::before {
   flex: 1;
   overflow-y: auto;
   padding: var(--space-2) var(--space-3) var(--space-4);
+}
+
+.bp-intro {
+  margin: 0;
+  padding: var(--space-3) var(--space-4) 0;
+  color: var(--text-muted, #475569);
+  font-size: 0.9rem;
 }
 
 .bp-phase-header {
@@ -10729,6 +10782,110 @@ textarea:hover {
   max-width: 36ch;
 }
 .modal-panel--narrow { max-width: 520px; }
+
+/* ── Primary Quick Check (B1 onboarding diagnostic) ─────────────────── */
+.pqc-card {
+  max-width: 640px;
+  margin: var(--space-6) auto;
+  padding: var(--space-8);
+  background: #ffffff;
+  border: 1px solid var(--qj-stroke, #ece9ff);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-card, 0 6px 24px rgba(0,0,0,0.06));
+  text-align: center;
+}
+.pqc-eyebrow {
+  color: var(--color-primary, #6c63ff);
+  font-weight: 700;
+  margin: 0 0 var(--space-2) 0;
+}
+.pqc-title {
+  margin: 0 0 var(--space-3) 0;
+  font-size: 1.6rem;
+}
+.pqc-body {
+  color: var(--text-muted, #475569);
+  max-width: 44ch;
+  margin: 0 auto var(--space-5) auto;
+}
+.pqc-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-3);
+  max-width: 320px;
+  margin: 0 auto;
+}
+.pqc-progress {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--qj-feedback-correct, #dcfce7);
+  color: var(--qj-feedback-correct-text, #14532d);
+  border-radius: var(--radius-full, 999px);
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: var(--space-4);
+}
+.pqc-prompt {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 var(--space-5) 0;
+}
+.pqc-choices {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+.pqc-choice {
+  min-height: 48px;
+  padding: var(--space-3) var(--space-4);
+  background: #ffffff;
+  border: 2px solid var(--qj-stroke, #ece9ff);
+  border-radius: var(--radius-md, 12px);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.pqc-choice:hover:not(:disabled) {
+  border-color: var(--color-primary, #6c63ff);
+  transform: translateY(-1px);
+}
+.pqc-choice:focus-visible {
+  outline: 3px solid var(--color-primary, #6c63ff);
+  outline-offset: 2px;
+}
+.pqc-choice:disabled { cursor: default; }
+.pqc-choice--correct {
+  background: var(--qj-feedback-correct, #dcfce7);
+  border-color: var(--color-success, #22c55e);
+  color: var(--qj-feedback-correct-text, #14532d);
+}
+.pqc-choice--wrong {
+  background: var(--qj-feedback-wrong, #fef3c7);
+  border-color: #f59e0b;
+  color: var(--qj-feedback-wrong-text, #78350f);
+}
+.pqc-feedback {
+  min-height: 1.5em;
+  padding: var(--space-3);
+  border-radius: var(--radius-md, 12px);
+  font-size: 0.95rem;
+}
+.pqc-feedback--correct {
+  background: var(--qj-feedback-correct, #dcfce7);
+  color: var(--qj-feedback-correct-text, #14532d);
+}
+.pqc-feedback--wrong {
+  background: var(--qj-feedback-wrong, #fef3c7);
+  color: var(--qj-feedback-wrong-text, #78350f);
+}
+@media (max-width: 480px) {
+  .pqc-card { padding: var(--space-6); margin: var(--space-3); }
+  .pqc-title { font-size: 1.3rem; }
+}
 .app-brand-tag {
   display: inline-block;
   font-size: 0.65rem;

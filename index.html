@@ -60,6 +60,9 @@
           <span id="profile-chip-avatar"></span>
           <span id="profile-chip-name"></span>
         </button>
+        <button class="icon-btn bedtime-toggle" id="bedtime-toggle" aria-label="Bedtime mode — dim the lights, no XP" aria-pressed="false" title="Bedtime mode">
+          <span aria-hidden="true">🌙</span>
+        </button>
         <button class="icon-btn" id="settings-btn" aria-label="Settings" aria-haspopup="dialog">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <circle cx="12" cy="12" r="3"/>
@@ -125,6 +128,20 @@
             <span class="stories-banner-text">
               <span class="stories-banner-title" id="review-banner-title">🌟 Giri's Review Lane</span>
               <span class="stories-banner-sub" id="review-banner-sub">0 words due today</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+        </div>
+
+        <!-- Word Workout — multi-mode practice from one item -->
+        <div class="review-banner" id="word-workout-banner" style="display:none" role="status">
+          <button class="stories-banner stories-banner--purple" id="btn-word-workout" aria-label="Start Word Workout — drill one word through 4 modes">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2rem;line-height:1" aria-hidden="true">🎽</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title" id="word-workout-title">🎽 Word Workout</span>
+              <span class="stories-banner-sub" id="word-workout-sub">Drill one word through 4 modes</span>
             </span>
             <span class="stories-banner-arrow">→</span>
           </button>
