@@ -16,6 +16,10 @@ import { audio } from './modules/audio.js';
 import { gamification } from './modules/gamification.js';
 import { badges } from './modules/badges.js';
 import { progress } from './modules/progress.js';
+import { estimateMinutes as estimateReviewMinutes, getReviewCapForProfile } from './modules/reviewScheduler.js';
+import { getEarlyReadingPlan } from './modules/todaysPlan.js';
+import { getMistakesDenSummary, timeAgo as mistakeTimeAgo, MISTAKES_LOOKBACK_DAYS } from './modules/mistakesDen.js';
+import { getPersonalBests } from './modules/personalBestWall.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
 import { mascot } from './components/mascot.js';
 import { spinWheel, buildWordAnimation } from './components/wheel.js';
@@ -157,6 +161,8 @@ class App {
     this._updateDailyBanner();
     this._updateQuestBanners();
     this._updateReviewBanner();
+    this._updateMistakesDenBanner();
+    this._updatePersonalBestBanner();
     this._renderGuidedJourney();
 
     console.log('[PhonicsQuest] App initialized');
@@ -607,6 +613,22 @@ class App {
       this._startReviewSession();
     });
 
+    document.getElementById('btn-mistakes-den')?.addEventListener('click', () => {
+      this._openMistakesDen();
+    });
+
+    document.querySelectorAll('[data-close="modal-mistakes-den"]').forEach(btn => {
+      btn.addEventListener('click', () => modalManager.close('modal-mistakes-den'));
+    });
+
+    document.getElementById('btn-personal-best')?.addEventListener('click', () => {
+      this._openPersonalBestWall();
+    });
+
+    document.querySelectorAll('[data-close="modal-personal-best"]').forEach(btn => {
+      btn.addEventListener('click', () => modalManager.close('modal-personal-best'));
+    });
+
     document.getElementById('extra-practice-toggle')?.addEventListener('click', () => {
       const content = document.getElementById('extra-practice-content');
       const toggle = document.getElementById('extra-practice-toggle');
@@ -852,6 +874,8 @@ class App {
     if (screenId === SCREENS.HOME) {
       this._updateQuestBanners();
       this._updateReviewBanner();
+      this._updateMistakesDenBanner();
+      this._updatePersonalBestBanner();
       this._renderGuidedJourney();
       this._refreshQuestProgress();
     }
@@ -1671,6 +1695,8 @@ class App {
       : getHomeLayoutForReadingBand(readingBand);
     const sentenceForgeBtn = document.getElementById('btn-sentence-forge');
 
+    const todaysPlanHost = document.getElementById('early-reading-todays-plan');
+
     if (layout.hidePhonicsCore) {
       // Primary pathway: collapse Early Reading Quest to a small "also available"
       // strip below the Primary English Quest hub, and surface a "Start Here
@@ -1693,6 +1719,9 @@ class App {
       this._renderPrimaryStartHere(startHere);
       this._renderPrimaryEarlyReadingNote(coreSection);
       this._filterGradeSpecificModules(profile?.primaryGrade || null);
+      // Primary profiles get the 5-step Mission Today (above) — hide the
+      // 3-step early-reading plan so they aren't shown two overlapping cards.
+      if (todaysPlanHost) todaysPlanHost.style.display = 'none';
     } else if (!layout.questsMilestone) {
       coreSection?.classList.remove('home-section--hidden', 'home-section--collapsed');
       questsSection?.classList.remove('home-section--milestone', 'home-section--primary-priority');
@@ -1701,6 +1730,7 @@ class App {
       sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
       if (levelBadge) levelBadge.style.display = 'none';
       if (startHere) startHere.style.display = 'none';
+      this._renderEarlyReadingTodaysPlan(todaysPlanHost);
     } else {
       coreSection?.classList.remove('home-section--hidden', 'home-section--collapsed');
       questsSection?.classList.add('home-section--milestone');
@@ -1710,7 +1740,88 @@ class App {
       sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
       if (levelBadge) levelBadge.style.display = 'none';
       if (startHere) startHere.style.display = 'none';
+      this._renderEarlyReadingTodaysPlan(todaysPlanHost);
     }
+  }
+
+  /**
+   * Render the 3-step "Today's Plan" card on the early-reading home screen
+   * (K1–P1 / emerging-decoder bands). Mirrors the primary `_renderPrimaryStartHere`
+   * shape but with steps anchored on Review Lane → Daily Challenge → Warm-up.
+   *
+   * Step completion is derived live from existing signals (review-due count,
+   * daily-challenge state, sessionWordsToday) so no extra event plumbing is
+   * needed — ticks update the moment the underlying task is completed.
+   */
+  _renderEarlyReadingTodaysPlan(host) {
+    if (!host) return;
+    let plan;
+    try { plan = getEarlyReadingPlan(); } catch (_) { plan = null; }
+    if (!plan) { host.style.display = 'none'; return; }
+
+    const escAttr = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
+
+    const stepsHtml = plan.steps.map(step => {
+      const stateClass = step.done ? 'mission-step--done' : '';
+      const aria = step.done
+        ? `${step.title}, complete`
+        : `${step.title}, ${step.progressLabel}`;
+      return `
+        <button type="button"
+          class="mission-step ${stateClass}"
+          data-step-target="${escAttr(step.target)}"
+          data-step-group="${escAttr(step.group || '')}"
+          data-step-id="${escAttr(step.id)}"
+          aria-label="${escAttr(aria)}">
+          <span class="mission-step__num" aria-hidden="true">${step.num}</span>
+          <span class="mission-step__icon" aria-hidden="true">${escText(step.icon)}</span>
+          <span class="mission-step__body">
+            <span class="mission-step__title">${escText(step.title)}</span>
+            <span class="mission-step__desc">${escText(step.detail)}</span>
+          </span>
+          <span class="mission-step__progress" aria-hidden="true">${escText(step.progressLabel)}</span>
+        </button>`;
+    }).join('');
+
+    const headline = plan.complete
+      ? (plan.allCaughtUp
+          ? "🎉 Today's Plan done — all caught up!"
+          : "🎉 Today's Plan complete!")
+      : `🎯 Today's Plan · ${plan.done}/${plan.total} done`;
+    const sub = plan.complete
+      ? 'Come back tomorrow for the next plan.'
+      : '3 small steps · about 10 minutes';
+
+    host.style.display = '';
+    host.innerHTML = `
+      <div class="home-section-header">
+        <p class="home-section-heading">${headline}</p>
+        <p class="home-section-sub">${sub}</p>
+      </div>
+      <div class="mission-card" role="list">${stepsHtml}</div>`;
+
+    host.querySelectorAll('.mission-step[data-step-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.stepTarget;
+        const group  = btn.dataset.stepGroup || null;
+        const stepId = btn.dataset.stepId;
+        if (!target) return;
+        if (stepId === 'review') {
+          this._startReviewSession();
+          return;
+        }
+        if (stepId === 'daily' || target === 'daily-challenge') {
+          if (isDailyChallengeComplete()) {
+            this._showToast('Daily challenge already done! Come back tomorrow.', 'info');
+            return;
+          }
+          this._startDailyChallenge();
+          return;
+        }
+        this._navigateTo(target, group);
+      });
+    });
   }
 
   /**
@@ -2431,19 +2542,29 @@ class App {
     this._startGame();
   }
 
-  /** Start a review session with SRS-due words */
+  /**
+   * Open Giri's Review Lane — pulls due items oldest-overdue first and caps
+   * the session by the child's reading band (K1–P1: 10, P2+: 20) so a child
+   * returning from a missed week isn't avalanched by a 50-item pile.
+   */
   _startReviewSession() {
-    const dueWords = progress.getReviewDueWords();
+    const profile = getActiveProfile ? getActiveProfile() : null;
+    const cap = getReviewCapForProfile(profile);
+    const dueWords = progress.getReviewDueWords({ cap });
+    const totalDue = progress.getReviewDueCount();
     if (dueWords.length === 0) {
-      this._showToast('No words due for review right now!', 'info');
+      this._showToast('All caught up! Come back tomorrow.', 'info');
       return;
     }
     this._sessionType = 'review';
-    this._queuedWords = dueWords.slice(0, 10);
+    this._queuedWords = dueWords;
     this._queuedCorrect = 0;
     this._mode = 'blend';
     store.set('currentGroup', null);
-    this._showToast(`Review time! ${this._queuedWords.length} words to practise 🔄`, 'info');
+    const overflow = totalDue > dueWords.length
+      ? ` (${totalDue - dueWords.length} more saved for tomorrow)`
+      : '';
+    this._showToast(`Review Lane: ${dueWords.length} word${dueWords.length === 1 ? '' : 's'}${overflow} 🌟`, 'info');
     this._startGame();
   }
 
@@ -2468,25 +2589,220 @@ class App {
     } else if (type === 'review') {
       this._showToast('Review session complete! Great revision! 🔄', 'success');
       audio.playSfx('correct');
+      this._updateReviewBanner();
     }
+    // Refresh Today's Plan ticks immediately on return to home so the child
+    // sees their step flip to ✓ without waiting for the next render.
+    this._renderGuidedJourney();
 
     this._showScreen(SCREENS.HOME);
     mascot.setHomeState('holdCard');
   }
 
-  /** Update the review words banner */
+  /**
+   * Refresh the Giri's Review Lane home-screen tile. Hides itself when there
+   * are no due items so a brand-new profile sees a clean home; surfaces a
+   * minutes estimate (~35s/item) once the queue has anything in it.
+   */
   _updateReviewBanner() {
-    const dueWords = progress.getReviewDueWords();
     const banner = document.getElementById('review-banner');
-    const sub = document.getElementById('review-banner-sub');
     if (!banner) return;
+    const dueCount = progress.getReviewDueCount();
+    const sub = document.getElementById('review-banner-sub');
 
-    if (dueWords.length > 0) {
+    if (dueCount > 0) {
       banner.style.display = '';
-      if (sub) sub.textContent = `${dueWords.length} word${dueWords.length === 1 ? '' : 's'} due for review`;
+      const minutes = estimateReviewMinutes(dueCount);
+      if (sub) {
+        sub.textContent = `${dueCount} word${dueCount === 1 ? '' : 's'} due today · about ${minutes} min`;
+      }
     } else {
       banner.style.display = 'none';
     }
+  }
+
+  /**
+   * Refresh the Mistakes Den home tile. Hidden when the last 7 days are
+   * blank so a brand-new profile (or one that hasn't slipped at all) sees
+   * a clean home rather than a "0 mistakes" guilt-free chip.
+   */
+  _updateMistakesDenBanner() {
+    const banner = document.getElementById('mistakes-den-banner');
+    if (!banner) return;
+    let summary;
+    try { summary = getMistakesDenSummary(); } catch (_) { summary = { count: 0 }; }
+    const sub = document.getElementById('mistakes-den-sub');
+
+    if (summary.count > 0) {
+      banner.style.display = '';
+      if (sub) {
+        sub.textContent = `${summary.count} to retry · last ${MISTAKES_LOOKBACK_DAYS} days`;
+      }
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  /**
+   * Open the Mistakes Den modal. Pulls a fresh summary every open so a
+   * mid-session retry that just happened isn't shown stale.
+   */
+  _openMistakesDen() {
+    const host = document.getElementById('mistakes-den-content');
+    if (!host) return;
+    let summary;
+    try { summary = getMistakesDenSummary(); } catch (_) { summary = { count: 0, mistakes: [], byModule: {} }; }
+    this._renderMistakesDen(host, summary);
+    modalManager.open('modal-mistakes-den');
+  }
+
+  /**
+   * Render the Mistakes Den modal body — list grouped by module, each row
+   * tappable to navigate back to the parent module (where adaptive
+   * selection picks up the now-overdue item).
+   */
+  _renderMistakesDen(host, summary) {
+    if (!host) return;
+    const escAttr = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
+
+    if (!summary || summary.count === 0) {
+      host.innerHTML = `
+        <div class="mistakes-den-empty">
+          <p class="mistakes-den-empty__title">🎉 Nothing to retry — all clear!</p>
+          <p class="mistakes-den-empty__sub">Mistakes from the last ${MISTAKES_LOOKBACK_DAYS} days show up here so you can have another go.</p>
+        </div>`;
+      return;
+    }
+
+    // Group rows by moduleLabel so the modal reads as "Grammar MCQ · 4 · …".
+    const byModuleLabel = new Map();
+    for (const m of summary.mistakes) {
+      const key = m.moduleLabel;
+      if (!byModuleLabel.has(key)) byModuleLabel.set(key, []);
+      byModuleLabel.get(key).push(m);
+    }
+
+    const groupsHtml = Array.from(byModuleLabel.entries()).map(([label, items]) => {
+      const rowsHtml = items.map(m => {
+        const countChip = m.count > 1 ? `<span class="mistakes-den-row__count" aria-label="${m.count} mistakes">×${m.count}</span>` : '';
+        const when = mistakeTimeAgo(m.lastMistakeAt);
+        return `
+          <button type="button"
+            class="mistakes-den-row"
+            data-target="${escAttr(m.target || '')}"
+            data-id="${escAttr(m.id)}"
+            aria-label="Retry ${escAttr(m.label)} in ${escAttr(m.moduleLabel)}, ${escAttr(when)}">
+            <span class="mistakes-den-row__label">${escText(m.label)}</span>
+            <span class="mistakes-den-row__when">${escText(when)}</span>
+            ${countChip}
+            <span class="mistakes-den-row__arrow" aria-hidden="true">→</span>
+          </button>`;
+      }).join('');
+
+      return `
+        <div class="mistakes-den-group" role="list">
+          <h3 class="mistakes-den-group__title">${escText(label)} <small>· ${items.length}</small></h3>
+          ${rowsHtml}
+        </div>`;
+    }).join('');
+
+    host.innerHTML = `
+      <p class="mistakes-den-intro">Tap any to retry — Giri's got you. ${escText(summary.count)} slip${summary.count === 1 ? '' : 's'} from the last ${MISTAKES_LOOKBACK_DAYS} days.</p>
+      <div class="mistakes-den-list">${groupsHtml}</div>`;
+
+    host.querySelectorAll('.mistakes-den-row[data-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.target;
+        if (!target) return;
+        modalManager.close('modal-mistakes-den');
+        this._navigateTo(target);
+      });
+    });
+  }
+
+  /**
+   * Refresh the "My Trophy Room" home tile. Only surfaces once the child
+   * has earned some XP or completed at least one Daily Challenge — a
+   * brand-new profile sees nothing to celebrate yet, which is honest, not
+   * punitive. The tile copy is intentionally celebratory ("See your
+   * personal bests") not aspirational ("Beat your best"), so a slow
+   * week never feels like a scold.
+   */
+  _updatePersonalBestBanner() {
+    const banner = document.getElementById('personal-best-banner');
+    if (!banner) return;
+    const xp = store.get('xp') || 0;
+    const calendar = Array.isArray(store.get('challengeCalendar')) ? store.get('challengeCalendar') : [];
+    const hasSomethingToShow = xp > 0 || calendar.length > 0;
+
+    if (hasSomethingToShow) {
+      banner.style.display = '';
+      const sub = document.getElementById('personal-best-sub');
+      if (sub) {
+        const bestStreak = store.get('bestStreak') || 0;
+        sub.textContent = bestStreak > 0
+          ? `Best streak ${bestStreak} day${bestStreak === 1 ? '' : 's'} · see your trophies`
+          : 'See your personal bests';
+      }
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  /**
+   * Open the trophy room modal — pulls a fresh snapshot every time so a
+   * just-earned graduation / streak day shows immediately.
+   */
+  _openPersonalBestWall() {
+    const host = document.getElementById('personal-best-content');
+    if (!host) return;
+    let pb;
+    try { pb = getPersonalBests(); } catch (_) { pb = null; }
+    this._renderPersonalBestWall(host, pb);
+    modalManager.open('modal-personal-best');
+  }
+
+  /**
+   * Render the trophy room body: a grid of cards (numbers + label + sub),
+   * a "highlights" strip Giri reads back, and earned badges.
+   * Pure HTML build — no chart library, no comparison-to-others framing.
+   */
+  _renderPersonalBestWall(host, pb) {
+    if (!host) return;
+    const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
+
+    if (!pb) {
+      host.innerHTML = `<p class="trophy-empty">No data yet — play a quest to start your trophy room.</p>`;
+      return;
+    }
+
+    const cardsHtml = pb.cards.map(card => `
+      <div class="trophy-card" role="group" aria-label="${escText(card.label)}, ${escText(card.value)}">
+        <div class="trophy-card__icon" aria-hidden="true">${escText(card.icon)}</div>
+        <div class="trophy-card__value">${escText(card.value)}</div>
+        <div class="trophy-card__label">${escText(card.label)}</div>
+        ${card.sub ? `<div class="trophy-card__sub">${escText(card.sub)}</div>` : ''}
+      </div>`).join('');
+
+    const highlightsHtml = pb.summary?.highlights?.length
+      ? `<ul class="trophy-highlights">${pb.summary.highlights.map(h => `<li>${escText(h)}</li>`).join('')}</ul>`
+      : '';
+
+    const badgesHtml = pb.badges?.length
+      ? `<div class="trophy-badges">
+           <h3 class="trophy-badges__title">🎖️ Badges earned · ${pb.badges.length}</h3>
+           <div class="trophy-badges__list">
+             ${pb.badges.map(b => `<span class="trophy-badge" title="${escText(b.name)}"><span aria-hidden="true">${escText(b.emoji)}</span> ${escText(b.name)}</span>`).join('')}
+           </div>
+         </div>`
+      : '';
+
+    host.innerHTML = `
+      <p class="trophy-intro">Every number here is just <strong>you vs you</strong> — no rankings, no leagues.</p>
+      ${highlightsHtml}
+      <div class="trophy-grid">${cardsHtml}</div>
+      ${badgesHtml}`;
   }
 
   _updateDailyBanner() {

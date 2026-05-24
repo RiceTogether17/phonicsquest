@@ -100,6 +100,8 @@ function _joinList(items) {
  * @property {Array<{ skill: string, label: string, score: number }>} strengths
  * @property {Array<{ word: string, mode?: string, when?: string, correct?: boolean }>} recentMistakes
  * @property {{ days: number, words: number, accuracy: number }} weekly
+ * @property {Array<{ word: string }>} [graduatingSoon]   words about to graduate to long-term memory
+ * @property {Array<{ word: string }>} [slippingRecently] words demoted in the last 7 days
  */
 
 /**
@@ -137,6 +139,16 @@ export function buildParentReportCard(input) {
   // Tag each weak skill with its band so the dashboard can colour the chip.
   const needsPractice = topWeak.map(w => ({ ...w, band: bandForPct(w.pct) }));
 
+  // Giri's Review Lane signals — surfaced for parents in plain language.
+  // Graduating: words about to lock into long-term memory (positive frame).
+  // Slipping: words demoted in the last week (gentle nudge to do a review).
+  const graduating = Array.isArray(input?.graduatingSoon)
+    ? input.graduatingSoon.slice(0, 5).map(g => ({ word: String(g.word || '').slice(0, 40) })).filter(g => g.word)
+    : [];
+  const slipping = Array.isArray(input?.slippingRecently)
+    ? input.slippingRecently.slice(0, 5).map(g => ({ word: String(g.word || '').slice(0, 40) })).filter(g => g.word)
+    : [];
+
   return {
     learnerName: profile?.name || 'Your child',
     grade: profile?.primaryGrade || null,
@@ -148,6 +160,8 @@ export function buildParentReportCard(input) {
     recommendation,
     examRisk,
     teacherComment,
+    graduatingSoon: graduating,
+    slippingRecently: slipping,
   };
 }
 
@@ -210,6 +224,12 @@ export function buildWhatsAppMessage(card) {
   }
   if (card.recentMistakes?.length) {
     lines.push(`📝 Recent slips: ${card.recentMistakes.slice(0, 3).map(m => m.word).join(', ')}`);
+  }
+  if (card.graduatingSoon?.length) {
+    lines.push(`🌱 Graduating soon: ${card.graduatingSoon.slice(0, 3).map(g => g.word).join(', ')}`);
+  }
+  if (card.slippingRecently?.length) {
+    lines.push(`🍂 Slipping: ${card.slippingRecently.slice(0, 3).map(g => g.word).join(', ')} — a 2-min review tonight will help.`);
   }
   lines.push(`👉 Today's 10 min: ${card.recommendation.title}`);
   lines.push(`💬 Teacher's note: ${card.teacherComment}`);

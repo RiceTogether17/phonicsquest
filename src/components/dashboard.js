@@ -31,6 +31,7 @@ import {
 } from '../modules/reporting.js';
 import { getWeakSkills } from '../modules/remediationRouter.js';
 import { buildParentReportCard, buildWhatsAppMessage } from '../modules/parentReportCard.js';
+import { getGraduatingSoon, getSlippingRecently } from '../modules/reviewScheduler.js';
 
 Chart.register(...registerables);
 
@@ -229,12 +230,21 @@ function _renderParentReportCard() {
     accuracy: stats.overallAccuracy || 0,
   };
 
+  // Giri's Review Lane signals for the report card — pulled from the same
+  // per-word stats that drive the home banner. Graduating soon = positive
+  // frame; slipping = gentle nudge.
+  const wordStats = store.get('wordStats') || {};
+  const graduatingSoon = getGraduatingSoon(wordStats, WORDS).map(g => ({ word: g.item.word || g.id }));
+  const slippingRecently = getSlippingRecently(wordStats, WORDS).map(g => ({ word: g.item.word || g.id }));
+
   const card = buildParentReportCard({
     profile,
     weakSkills,
     strengths,
     recentMistakes,
     weekly,
+    graduatingSoon,
+    slippingRecently,
   });
 
   container.innerHTML = `
@@ -270,6 +280,16 @@ function _renderParentReportCard() {
             ${card.recentMistakes.map(m => `<li>${escapeHtml(m.word)}${m.mode ? ` <small>· ${escapeHtml(m.mode)}</small>` : ''}${m.when ? ` <small>· ${escapeHtml(m.when)}</small>` : ''}</li>`).join('') || '<li>No recent mistakes recorded</li>'}
           </ul>
         </div>
+        ${(card.graduatingSoon?.length || card.slippingRecently?.length) ? `
+        <div class="parent-report-card__cell parent-report-card__cell--review-lane">
+          <h4>🌟 Giri's Review Lane</h4>
+          ${card.graduatingSoon?.length ? `
+            <p class="parent-report-card__detail"><strong>🌱 Graduating soon:</strong> ${card.graduatingSoon.slice(0, 5).map(g => escapeHtml(g.word)).join(', ')} — about to lock into long-term memory.</p>
+          ` : ''}
+          ${card.slippingRecently?.length ? `
+            <p class="parent-report-card__detail"><strong>🍂 Slipping:</strong> ${card.slippingRecently.slice(0, 5).map(g => escapeHtml(g.word)).join(', ')} — a 2-min review tonight will help.</p>
+          ` : ''}
+        </div>` : ''}
         <div class="parent-report-card__cell parent-report-card__cell--cta">
           <h4>⏱️ Recommended 10-minute practice</h4>
           <p><strong>${escapeHtml(card.recommendation.title)}</strong></p>

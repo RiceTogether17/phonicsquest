@@ -87,6 +87,10 @@ A **📲 Copy Parent Update** button generates a WhatsApp-ready message that cap
 - Per-skill mastery scores (0–100%) for grammar and vocabulary categories
 - Cross-quest remediation router: weak skills in Grammar MCQ pipe through to Cloze Castle → Sentence Forge → Editing Quest
 
+### 🌟 Giri's Review Lane (Spaced Review Engine)
+
+Every word a child sees rides a 6-box Leitner ladder (`Today → +1d → +3d → +7d → +14d → +30d → Graduated`). A home-screen tile surfaces "8 words due today · about 5 min" the moment anything is ready for review. Correct answers advance one box; wrong answers drop one (graduated items only ever drop to +7d — a single slip never undoes a month of practice). The session is capped at 10 items for K1–P1 and 20 for P2+, so a child returning from a missed week isn't avalanched. Existing progress is migrated automatically: a word at 95%+ accuracy seeds at box 5, a struggling word seeds at box 0. The Parent Report Card surfaces "🌱 Graduating soon" and "🍂 Slipping" lines in plain language, included in the WhatsApp update.
+
 ### Audio
 
 - Phoneme MP3 files cached via Web Audio API

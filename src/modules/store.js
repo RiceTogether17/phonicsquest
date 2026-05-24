@@ -4,6 +4,8 @@
  * No framework needed – subscribe to keys and get notified on change.
  */
 
+import { scheduleAttempt, seedFromLegacy } from './reviewScheduler.js';
+
 const DEFAULT_STORAGE_KEY = 'phonicsquest_v2';
 let STORAGE_KEY = DEFAULT_STORAGE_KEY;
 
@@ -334,51 +336,45 @@ class Store {
     return { ...this._state };
   }
 
-  /** Update per-word stats after an attempt. */
+  /**
+   * Update per-word stats after an attempt.
+   *
+   * Each call rides the Leitner box ladder from reviewScheduler:
+   *   correct → advance one box (up to Graduated at box 6)
+   *   wrong   → drop one box (graduated drops to box 3, never to zero)
+   *
+   * Legacy `reviewInterval` / `nextReviewDate` fields are kept as derived
+   * views of the new `box` / `dueAt` so the existing weighted-pick logic in
+   * adaptiveSelection.js and the daily-challenge picker keep working.
+   */
   recordWordAttempt(wordId, correct) {
     const stats = { ...this._state.wordStats };
-    const existing = stats[wordId] ?? { attempts: 0, correct: 0, lastSeen: null };
-    const newAttempts = existing.attempts + 1;
-    const newCorrect  = existing.correct + (correct ? 1 : 0);
-    const accuracy    = newCorrect / newAttempts;
+    let existing = stats[wordId] ?? { attempts: 0, correct: 0, lastSeen: null };
 
-    // Advance or reset the spaced-repetition review interval when a word
-    // transitions from "not mastered" → "mastered" (or regresses).
-    // Intervals in days: [0=daily, 1=3d, 2=7d, 3=14d, 4=30d]
-    const SRS_INTERVALS = [1, 3, 7, 14, 30];
-    const cfg = this._state.adaptiveConfig || {};
-    const minAttempts = cfg.masteryMinAttempts ?? 6;
-    const strongAcc   = cfg.strongAccuracy   ?? 0.9;
-
-    let reviewInterval = existing.reviewInterval ?? 0;
-    let nextReviewDate = existing.nextReviewDate ?? null;
-
-    if (newAttempts >= minAttempts && accuracy >= strongAcc) {
-      // Word is mastered — schedule next review
-      const wasMastered = (existing.attempts >= minAttempts)
-        && ((existing.correct / existing.attempts) >= strongAcc);
-      if (correct) {
-        // Successfully recalled on schedule → advance interval
-        reviewInterval = Math.min(reviewInterval + 1, SRS_INTERVALS.length - 1);
-      } else {
-        // Forgot a mastered word → reset interval
-        reviewInterval = 0;
-      }
-      const dayMs = 86400000;
-      const due = new Date(Date.now() + SRS_INTERVALS[reviewInterval] * dayMs);
-      nextReviewDate = due.toISOString();
-    } else if (!correct && existing.reviewInterval > 0) {
-      // Non-mastered wrong answer after prior mastery — reset
-      reviewInterval = 0;
-      nextReviewDate = new Date().toISOString();
+    // In-line migration: seed box/dueAt for legacy stats so the ladder starts
+    // from the child's existing accuracy, not from scratch.
+    if (typeof existing.box !== 'number') {
+      const seeded = seedFromLegacy(existing);
+      existing = { ...existing, box: seeded.box, dueAt: seeded.dueAt };
     }
 
+    const newAttempts = existing.attempts + 1;
+    const newCorrect  = existing.correct + (correct ? 1 : 0);
+    const sched = scheduleAttempt(existing, correct);
+
     stats[wordId] = {
+      ...existing,
       attempts: newAttempts,
       correct:  newCorrect,
       lastSeen: new Date().toISOString(),
-      reviewInterval,
-      nextReviewDate,
+      box:         sched.box,
+      dueAt:       sched.dueAt,
+      lastResult:  sched.lastResult,
+      graduatedAt: sched.graduatedAt,
+      // Legacy view fields — kept so adaptiveSelection.getWordWeight() and
+      // existing analytics keep reading the same shape.
+      reviewInterval: Math.min(sched.box, 4),
+      nextReviewDate: new Date(sched.dueAt).toISOString(),
     };
     this.set('wordStats', stats);
 
