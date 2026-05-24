@@ -425,6 +425,52 @@ input, select, textarea { font-family: inherit; }
 .icon-btn:hover { background: var(--color-primary-light); color: var(--color-primary); transform: scale(1.05); }
 .icon-btn:active { transform: scale(0.92); }
 
+/* ── Bedtime Mode — toggle + global dim overlay ─────────────────────── */
+.bedtime-toggle { font-size: 1.1rem; line-height: 1; }
+.bedtime-toggle[aria-pressed="true"] {
+  background: #1e1b4b;
+  color: #facc15;
+}
+.bedtime-toggle.bedtime-toggle--suggested {
+  /* Soft pulse to hint "it's getting late" without being naggy. */
+  animation: bedtimePulse 2.4s ease-in-out infinite;
+}
+@keyframes bedtimePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.0); }
+  50%      { box-shadow: 0 0 0 6px rgba(250, 204, 21, 0.25); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bedtime-toggle.bedtime-toggle--suggested { animation: none; }
+}
+
+/* When Bedtime Mode is on, dim the whole interface — warm sepia bias,
+   muted chroma, no sharp blues. Confetti / XP toasts are suppressed in
+   JS; this layer just slows the eye. Sits on top of any selected theme. */
+body.bedtime-on {
+  filter: brightness(0.88) saturate(0.72) sepia(0.18);
+}
+body.bedtime-on .energy-display,
+body.bedtime-on #goal-fill,
+body.bedtime-on .level-bar-fill {
+  opacity: 0.7;
+}
+body.bedtime-on .toast--success,
+body.bedtime-on .toast--badge,
+body.bedtime-on .toast--levelup {
+  /* Suppress the loud reward toasts at bedtime — keep info/warning */
+  display: none !important;
+}
+body.bedtime-on .mascot--celebrate,
+body.bedtime-on .confetti-canvas {
+  display: none !important;
+}
+body.bedtime-on * {
+  transition-duration: 0.6s !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  body.bedtime-on * { transition-duration: 0s !important; }
+}
+
 /* ── LEVEL BAR ── */
 .level-bar-wrapper {
   display: flex;

@@ -19,6 +19,12 @@ import { progress } from './modules/progress.js';
 import { estimateMinutes as estimateReviewMinutes, getReviewCapForProfile } from './modules/reviewScheduler.js';
 import { getEarlyReadingPlan } from './modules/todaysPlan.js';
 import { buildWordWorkout } from './modules/wordWorkout.js';
+import {
+  isBedtimeActive,
+  setBedtimeEnabled,
+  applyBedtimeStateToDom,
+  getBedtimeStatus,
+} from './modules/bedtimeMode.js';
 import { getMistakesDenSummary, timeAgo as mistakeTimeAgo, MISTAKES_LOOKBACK_DAYS } from './modules/mistakesDen.js';
 import { getPersonalBests } from './modules/personalBestWall.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
@@ -160,6 +166,10 @@ class App {
     }
 
     settingsController.applyTheme(store.get('theme') || 'default');
+    // Re-apply the persisted Bedtime Mode flag (was hydrated by the
+    // localStorage read in bedtimeMode.js when the module imported).
+    applyBedtimeStateToDom();
+    this._refreshBedtimeToggle();
 
     if (needsProfileSelection()) {
       this._showScreen(SCREENS.PROFILES);
@@ -176,6 +186,7 @@ class App {
     this._updateWordWorkoutBanner();
     this._updateMistakesDenBanner();
     this._updatePersonalBestBanner();
+    this._refreshBedtimeToggle();
     this._renderGuidedJourney();
 
     console.log('[PhonicsQuest] App initialized');
@@ -589,6 +600,18 @@ class App {
 
     document.getElementById('settings-btn')?.addEventListener('click', () => {
       this._openModal('modal-settings');
+    });
+
+    document.getElementById('bedtime-toggle')?.addEventListener('click', () => {
+      const next = !isBedtimeActive();
+      setBedtimeEnabled(next);
+      this._refreshBedtimeToggle();
+      this._showToast(
+        next
+          ? '🌙 Bedtime Mode on — story time, no XP. Sweet dreams!'
+          : '☀️ Bedtime Mode off — XP and celebrations are back.',
+        'info',
+      );
     });
 
     document.getElementById('btn-calibrate-mic')?.addEventListener('click', () => {
@@ -2778,6 +2801,25 @@ class App {
     } else {
       banner.style.display = 'none';
     }
+  }
+
+  /**
+   * Refresh the Bedtime Mode toggle in the header. Mirrors the persisted
+   * flag onto `aria-pressed`, applies the soft "suggested" pulse during
+   * the 19:00–06:00 window when bedtime isn't yet on, and updates the
+   * title attribute so the hover label reflects the current state.
+   */
+  _refreshBedtimeToggle() {
+    const btn = document.getElementById('bedtime-toggle');
+    if (!btn) return;
+    const status = getBedtimeStatus();
+    btn.setAttribute('aria-pressed', status.active ? 'true' : 'false');
+    btn.classList.toggle('bedtime-toggle--suggested', status.suggested);
+    btn.title = status.active
+      ? 'Bedtime Mode on — tap to turn off'
+      : status.suggested
+        ? "It's getting late — try Bedtime Mode (no XP, just stories)"
+        : 'Bedtime Mode';
   }
 
   /**
