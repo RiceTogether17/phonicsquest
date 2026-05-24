@@ -18,6 +18,7 @@ import { badges } from './modules/badges.js';
 import { progress } from './modules/progress.js';
 import { estimateMinutes as estimateReviewMinutes, getReviewCapForProfile } from './modules/reviewScheduler.js';
 import { getEarlyReadingPlan } from './modules/todaysPlan.js';
+import { buildWordWorkout } from './modules/wordWorkout.js';
 import { getMistakesDenSummary, timeAgo as mistakeTimeAgo, MISTAKES_LOOKBACK_DAYS } from './modules/mistakesDen.js';
 import { getPersonalBests } from './modules/personalBestWall.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
@@ -98,13 +99,22 @@ class App {
     this._currentWord = null;
 
     /**
-     * Session type: 'normal' | 'dailyChallenge' | 'review'
+     * Session type: 'normal' | 'dailyChallenge' | 'review' | 'wordWorkout'
      * Prevents review sessions from accidentally completing the daily challenge.
-     * @type {'normal'|'dailyChallenge'|'review'}
+     * @type {'normal'|'dailyChallenge'|'review'|'wordWorkout'}
      */
     this._sessionType = 'normal';
     /** @type {import('./data/words.js').Word[]} remaining queued words (daily/review) */
     this._queuedWords = [];
+    /**
+     * Multi-mode rounds for the Word Workout session. Each entry pins a
+     * specific mode to a specific word; the same word repeats across the
+     * list so the workout drills one item from several angles.
+     * @type {Array<{ word: import('./data/words.js').Word, mode: string }>}
+     */
+    this._queuedRounds = [];
+    /** Word being drilled in the active Word Workout (for results copy). */
+    this._workoutWord = null;
     /** @type {number} correct answers in current queued session */
     this._queuedCorrect = 0;
 
@@ -163,6 +173,7 @@ class App {
     this._updateDailyBanner();
     this._updateQuestBanners();
     this._updateReviewBanner();
+    this._updateWordWorkoutBanner();
     this._updateMistakesDenBanner();
     this._updatePersonalBestBanner();
     this._renderGuidedJourney();
@@ -627,6 +638,10 @@ class App {
       this._openMistakesDen();
     });
 
+    document.getElementById('btn-word-workout')?.addEventListener('click', () => {
+      this._startWordWorkout();
+    });
+
     document.querySelectorAll('[data-close="modal-mistakes-den"]').forEach(btn => {
       btn.addEventListener('click', () => modalManager.close('modal-mistakes-den'));
     });
@@ -692,7 +707,18 @@ class App {
 
   /** Start a game round */
   _startGame(group) {
-    if (this._sessionType !== 'normal' && this._queuedWords.length > 0) {
+    // Word Workout rounds pin a mode per round (the same word seen through
+    // 3–4 different cues). Handle this branch first so the mode-switch is
+    // applied before any setup is dispatched.
+    if (this._sessionType === 'wordWorkout' && this._queuedRounds.length > 0) {
+      const round = this._queuedRounds.shift();
+      this._mode = round.mode;
+      store.set('currentMode', this._mode);
+      this._currentWord = round.word;
+    } else if (this._sessionType === 'wordWorkout' && this._queuedRounds.length === 0) {
+      this._finishQueuedSession();
+      return;
+    } else if (this._sessionType !== 'normal' && this._queuedWords.length > 0) {
       this._currentWord = this._queuedWords.shift();
     } else if (this._sessionType !== 'normal' && this._queuedWords.length === 0) {
       this._finishQueuedSession();
@@ -2657,8 +2683,10 @@ class App {
   }
 
   /**
-   * Handle completion of a queued session (daily challenge or review).
-   * Only daily challenge sessions trigger completeDailyChallenge().
+   * Handle completion of a queued session (daily challenge / review /
+   * word workout). Only daily challenge sessions trigger
+   * completeDailyChallenge(); workouts get a bespoke "you took X through
+   * N modes!" toast.
    */
   _finishQueuedSession() {
     const type = this._sessionType;
@@ -2678,6 +2706,14 @@ class App {
       this._showToast('Review session complete! Great revision! 🔄', 'success');
       audio.playSfx('correct');
       this._updateReviewBanner();
+    } else if (type === 'wordWorkout') {
+      const word = this._workoutWord?.word || 'that word';
+      this._showToast(`Workout done! You took “${word}” through every angle. 🎽`, 'success');
+      audio.playSfx('correct');
+      this._workoutWord = null;
+      this._queuedRounds = [];
+      this._updateReviewBanner();
+      this._updateWordWorkoutBanner();
     }
     // Refresh Today's Plan ticks immediately on return to home so the child
     // sees their step flip to ✓ without waiting for the next render.
@@ -2685,6 +2721,41 @@ class App {
 
     this._showScreen(SCREENS.HOME);
     mascot.setHomeState('holdCard');
+  }
+
+  /**
+   * Start a Word Workout — pick the most-overdue Review Lane word (or fall
+   * back to the daily warmup), build a 3–4-round multi-mode ladder, and
+   * dispatch through the queued-session machinery. Same word, different
+   * cues per round.
+   *
+   * @param {import('./data/words.js').Word} [word]  optional explicit word
+   */
+  _startWordWorkout(word = null) {
+    let target = word;
+    if (!target) {
+      // Pull the most-overdue Review Lane item — the workout's natural
+      // home. If the queue is empty, surface a friendly toast and bail
+      // (the home tile is hidden in that case anyway).
+      const due = progress.getReviewDueWords({ cap: 1 });
+      target = due[0] || null;
+    }
+    if (!target) {
+      this._showToast('No words to work out — try Review Lane after some practice.', 'info');
+      return;
+    }
+    const rounds = buildWordWorkout(target);
+    if (rounds.length === 0) {
+      this._showToast('That word doesn\'t have a workout ladder yet.', 'info');
+      return;
+    }
+    this._sessionType = 'wordWorkout';
+    this._queuedRounds = rounds;
+    this._workoutWord = target;
+    this._queuedCorrect = 0;
+    store.set('currentGroup', null);
+    this._showToast(`Workout: “${target.word}” through ${rounds.length} modes 🎽`, 'info');
+    this._startGame();
   }
 
   /**
@@ -2704,6 +2775,24 @@ class App {
       if (sub) {
         sub.textContent = `${dueCount} word${dueCount === 1 ? '' : 's'} due today · about ${minutes} min`;
       }
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  /**
+   * Refresh the Word Workout home tile. Hidden when there's nothing
+   * overdue (a workout always pulls a Review Lane item), so a brand-new
+   * profile doesn't see a button that would just say "nothing to do".
+   */
+  _updateWordWorkoutBanner() {
+    const banner = document.getElementById('word-workout-banner');
+    if (!banner) return;
+    const due = progress.getReviewDueCount();
+    const sub = document.getElementById('word-workout-sub');
+    if (due > 0) {
+      banner.style.display = '';
+      if (sub) sub.textContent = 'Drill one due word through 4 angles';
     } else {
       banner.style.display = 'none';
     }
