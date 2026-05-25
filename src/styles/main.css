@@ -3393,14 +3393,13 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-size: var(--font-size-xs);
   color: #64748b;
 }
+/* Skip is a real second option now, not a hidden safety valve. Keep it
+   visibly subordinate to the primary "Start Reading" CTA so a confident
+   returning reader spots it easily, but it never out-shouts the warmup
+   path. (Audit fix #8.) */
 .meet-words-gate .gate-skip {
-  font-size: var(--font-size-xs);
-  background: none;
-  border: none;
-  color: #64748b;
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 4px 6px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted, #475569);
 }
 .meet-words-gate .gate-skip[hidden] { display: none; }
 .meet-words-gate .hfw-chip[data-tapped="true"],

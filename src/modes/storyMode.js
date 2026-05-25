@@ -471,6 +471,12 @@ function _renderMeetTheWordsGate(story) {
   }
 
   const totalChips = hfwInStory.length + vocabToPreteach.length;
+  // Gate softening (audit fix #8): require a 3-tap warm-up rather than
+  // every chip, so the child gets to the story in seconds without losing
+  // the priming benefit. The skip button stays available for returning
+  // readers who already know all the words.
+  const WARMUP_TARGET = 3;
+  const targetTaps = Math.min(WARMUP_TARGET, totalChips);
   const tapped = new Set();
 
   const hfwChipsHtml = hfwInStory.map(w => /* html */`
@@ -491,8 +497,8 @@ function _renderMeetTheWordsGate(story) {
     <div class="meet-words-gate" role="region" aria-labelledby="gate-title">
       <h3 id="gate-title">🤝 Meet the Words</h3>
       <p class="gate-hello">
-        Tap each word to hear it. When you know them all, you're ready to read
-        <strong>${story.title}</strong>.
+        Tap <strong>any ${targetTaps}</strong> to warm up — or skip if you already
+        know them. Then read <strong>${story.title}</strong>.
       </p>
 
       ${hfwChipsHtml ? /* html */`
@@ -510,8 +516,8 @@ function _renderMeetTheWordsGate(story) {
       ` : ''}
 
       <div class="gate-continue-row">
-        <span class="gate-progress" id="gate-progress" aria-live="polite">0 / ${totalChips} tapped</span>
-        <button class="gate-skip" id="gate-skip" hidden type="button">I know these →</button>
+        <span class="gate-progress" id="gate-progress" aria-live="polite">0 of ${targetTaps} tapped</span>
+        <button class="btn btn--ghost" id="gate-skip" type="button">I know these →</button>
         <button class="btn btn--primary" id="gate-continue" type="button" disabled>Start Reading →</button>
       </div>
     </div>
@@ -523,8 +529,12 @@ function _renderMeetTheWordsGate(story) {
     tapped.add(id);
     chip.setAttribute('data-tapped', 'true');
     const progressEl = document.getElementById('gate-progress');
-    if (progressEl) progressEl.textContent = `${tapped.size} / ${totalChips} tapped`;
-    if (tapped.size === totalChips) {
+    if (progressEl) {
+      progressEl.textContent = tapped.size >= targetTaps
+        ? `✓ Warmed up (${tapped.size} tapped) — keep going or start the story`
+        : `${tapped.size} of ${targetTaps} tapped`;
+    }
+    if (tapped.size >= targetTaps) {
       const continueBtn = document.getElementById('gate-continue');
       if (continueBtn) continueBtn.disabled = false;
     }
@@ -538,13 +548,6 @@ function _renderMeetTheWordsGate(story) {
       recordTap(chip);
     });
   });
-
-  // Safety valve: after 10 s, show "I know these" so a returning learner
-  // can bypass the gate without tapping every chip.
-  setTimeout(() => {
-    const skip = document.getElementById('gate-skip');
-    if (skip) skip.hidden = false;
-  }, 10_000);
 
   const proceed = () => {
     _setMeetWordsCompleted(story.id);

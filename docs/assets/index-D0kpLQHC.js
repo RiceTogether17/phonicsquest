@@ -784,45 +784,45 @@ var Kg=Object.defineProperty;var Jg=(e,t,a)=>t in e?Kg(e,t,{enumerable:!0,config
       <div id="story-dynamic" class="story-dynamic"></div>
 
     </div>
-  `,(a=document.getElementById("btn-reader-back"))==null||a.addEventListener("click",()=>{kt(),oo()}),(s=document.getElementById("btn-mode-aloud"))==null||s.addEventListener("click",()=>{Cn="aloud",kt(),Ud("aloud"),Nn(e)}),(n=document.getElementById("btn-mode-decode"))==null||n.addEventListener("click",()=>{Cn="decode",kt(),Ud("decode"),Nn(e)}),Nn(e)}function Nn(e){n_(e.id)?Cn==="aloud"?er(e):Sp(e):h_(e)}function Ud(e){document.querySelectorAll(".smode-btn").forEach(t=>{t.classList.toggle("active",t.dataset.mode===e)})}function h_(e){var h,u;const t=document.getElementById("story-dynamic");if(!t)return;Sr=e.vocab??[];const a=rp(e),s=e.lines.map(p=>p.text??"").join(" ").toLowerCase(),n=Sr.filter(p=>{const g=p.word.toLowerCase().split(/\s+/)[0];return s.includes(g)});if(!a.length&&!n.length){Fd(e.id),Nn(e);return}const o=a.length+n.length,r=new Set,i=a.map(p=>`
-    <button class="hfw-chip" data-tap-id="hfw:${p}" data-word="${p}" aria-label="Hear sight word ${p}">
-      ⭐ ${p}
+  `,(a=document.getElementById("btn-reader-back"))==null||a.addEventListener("click",()=>{kt(),oo()}),(s=document.getElementById("btn-mode-aloud"))==null||s.addEventListener("click",()=>{Cn="aloud",kt(),Ud("aloud"),Nn(e)}),(n=document.getElementById("btn-mode-decode"))==null||n.addEventListener("click",()=>{Cn="decode",kt(),Ud("decode"),Nn(e)}),Nn(e)}function Nn(e){n_(e.id)?Cn==="aloud"?er(e):Sp(e):h_(e)}function Ud(e){document.querySelectorAll(".smode-btn").forEach(t=>{t.classList.toggle("active",t.dataset.mode===e)})}function h_(e){var p,g;const t=document.getElementById("story-dynamic");if(!t)return;Sr=e.vocab??[];const a=rp(e),s=e.lines.map(w=>w.text??"").join(" ").toLowerCase(),n=Sr.filter(w=>{const f=w.word.toLowerCase().split(/\s+/)[0];return s.includes(f)});if(!a.length&&!n.length){Fd(e.id),Nn(e);return}const o=a.length+n.length,i=Math.min(3,o),l=new Set,c=a.map(w=>`
+    <button class="hfw-chip" data-tap-id="hfw:${w}" data-word="${w}" aria-label="Hear sight word ${w}">
+      ⭐ ${w}
     </button>
-  `).join(""),l=n.map(p=>`
-    <button class="vocab-chip" data-tap-id="vocab:${p.word}" data-word="${p.word}" aria-label="Key word: ${p.word}">
-      <span class="vocab-chip-icon">${p.icon}</span>
-      <span class="vocab-chip-word">${p.word}</span>
-      <span class="vocab-chip-meaning">${p.meaning}</span>
+  `).join(""),d=n.map(w=>`
+    <button class="vocab-chip" data-tap-id="vocab:${w.word}" data-word="${w.word}" aria-label="Key word: ${w.word}">
+      <span class="vocab-chip-icon">${w.icon}</span>
+      <span class="vocab-chip-word">${w.word}</span>
+      <span class="vocab-chip-meaning">${w.meaning}</span>
     </button>
   `).join("");t.innerHTML=`
     <div class="meet-words-gate" role="region" aria-labelledby="gate-title">
       <h3 id="gate-title">🤝 Meet the Words</h3>
       <p class="gate-hello">
-        Tap each word to hear it. When you know them all, you're ready to read
-        <strong>${e.title}</strong>.
+        Tap <strong>any ${i}</strong> to warm up — or skip if you already
+        know them. Then read <strong>${e.title}</strong>.
       </p>
 
-      ${i?`
+      ${c?`
         <div class="gate-section">
           <div class="gate-section-title">⭐ Sight words in this story</div>
-          <div class="hfw-chip-list">${i}</div>
+          <div class="hfw-chip-list">${c}</div>
         </div>
       `:""}
 
-      ${l?`
+      ${d?`
         <div class="gate-section">
           <div class="gate-section-title">📚 Key words to know</div>
-          <div class="vocab-chip-list">${l}</div>
+          <div class="vocab-chip-list">${d}</div>
         </div>
       `:""}
 
       <div class="gate-continue-row">
-        <span class="gate-progress" id="gate-progress" aria-live="polite">0 / ${o} tapped</span>
-        <button class="gate-skip" id="gate-skip" hidden type="button">I know these →</button>
+        <span class="gate-progress" id="gate-progress" aria-live="polite">0 of ${i} tapped</span>
+        <button class="btn btn--ghost" id="gate-skip" type="button">I know these →</button>
         <button class="btn btn--primary" id="gate-continue" type="button" disabled>Start Reading →</button>
       </div>
     </div>
-  `;function c(p){const g=p.dataset.tapId;if(r.has(g))return;r.add(g),p.setAttribute("data-tapped","true");const w=document.getElementById("gate-progress");if(w&&(w.textContent=`${r.size} / ${o} tapped`),r.size===o){const f=document.getElementById("gate-continue");f&&(f.disabled=!1)}}t.querySelectorAll(".hfw-chip, .vocab-chip").forEach(p=>{p.addEventListener("click",async()=>{pl(p);try{await I.speakWord(p.dataset.word)}catch{}c(p)})}),setTimeout(()=>{const p=document.getElementById("gate-skip");p&&(p.hidden=!1)},1e4);const d=()=>{Fd(e.id),Nn(e)};(h=document.getElementById("gate-skip"))==null||h.addEventListener("click",d),(u=document.getElementById("gate-continue"))==null||u.addEventListener("click",d)}function u_(e){return e.lines.filter(t=>t.type!=="label"&&t.type!=="chapter"&&t.text).reduce((t,a)=>t+a.text.trim().split(/\s+/).length,0)}function er(e){var h,u,p,g,w,f,b,v,q;const t=document.getElementById("story-dynamic");if(!t)return;const a=Ya==="word",s=e.lines.map((k,y)=>p_(k,y,a,e)).join(""),n=!!((h=e.comprehension)!=null&&h.length),r=!!((u=e.talkAboutIt)!=null&&u.length)?`
+  `;function h(w){const f=w.dataset.tapId;if(l.has(f))return;l.add(f),w.setAttribute("data-tapped","true");const b=document.getElementById("gate-progress");if(b&&(b.textContent=l.size>=i?`✓ Warmed up (${l.size} tapped) — keep going or start the story`:`${l.size} of ${i} tapped`),l.size>=i){const v=document.getElementById("gate-continue");v&&(v.disabled=!1)}}t.querySelectorAll(".hfw-chip, .vocab-chip").forEach(w=>{w.addEventListener("click",async()=>{pl(w);try{await I.speakWord(w.dataset.word)}catch{}h(w)})});const u=()=>{Fd(e.id),Nn(e)};(p=document.getElementById("gate-skip"))==null||p.addEventListener("click",u),(g=document.getElementById("gate-continue"))==null||g.addEventListener("click",u)}function u_(e){return e.lines.filter(t=>t.type!=="label"&&t.type!=="chapter"&&t.text).reduce((t,a)=>t+a.text.trim().split(/\s+/).length,0)}function er(e){var h,u,p,g,w,f,b,v,q;const t=document.getElementById("story-dynamic");if(!t)return;const a=Ya==="word",s=e.lines.map((k,y)=>p_(k,y,a,e)).join(""),n=!!((h=e.comprehension)!=null&&h.length),r=!!((u=e.talkAboutIt)!=null&&u.length)?`
     <div class="story-talk">
       <h3 class="story-talk-title">💬 Talk About It</h3>
       <ul class="story-talk-list">
