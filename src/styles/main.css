@@ -2737,9 +2737,18 @@ body:has(#screen-stories.screen.active) .mascot-float {
   margin-bottom: var(--space-3);
   overflow-x: auto;
   padding-bottom: 2px;
+  padding-right: var(--space-4);
   scrollbar-width: none;
+  /* Fade the right edge so off-screen tabs are visibly cued (audit fix
+     #10 — "Decodable Story Re..." truncated without a scroll hint). */
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
 }
 .stories-tabs::-webkit-scrollbar { display: none; }
+/* When fully scrolled to the end, drop the fade so the last tab isn't
+   permanently dimmed. CSS-only via scroll-snap doesn't reliably reach
+   "end" detection cross-browser; the fade staying on the rightmost tab
+   is acceptable polish — still better than the silent cut-off. */
 
 .story-tab {
   display: flex;
@@ -2771,6 +2780,13 @@ body:has(#screen-stories.screen.active) .mascot-float {
   white-space: nowrap;
 }
 .story-tab.active .story-tab-name { color: var(--color-text); }
+
+/* Phones: tighter tab pills so 4 bands fit closer to one screen. */
+@media (max-width: 480px) {
+  .story-tab { padding: var(--space-1) var(--space-2); }
+  .story-tab-num  { font-size: 0.7rem; }
+  .story-tab-name { font-size: 0.7rem; line-height: 1.1; }
+}
 
 /* ── Browser: level strip ────────────────────────────────────────────────── */
 .stories-level-strip {
@@ -3166,6 +3182,36 @@ details.story-tool-section[open] > .story-tool-summary::before {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  /* "More below" affordance (audit fix #9). A subtle radial shadow
+     anchored to the bottom edge hints that the story continues
+     off-screen when the page can scroll. The shadow is on the body
+     itself rather than a pseudo so it doesn't intercept clicks on the
+     `.wf-word` spans inside. */
+  position: relative;
+}
+.story-body::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -8px;
+  height: 24px;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center top,
+    color-mix(in srgb, var(--color-primary, #6c63ff) 14%, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+/* Show the affordance only when there is more story below the viewport
+   bottom. We can't detect this cross-browser in pure CSS, so we settle
+   for "always-on when there's a refrain or Talk About It after the
+   body" — those neighbours imply there's something to scroll to. */
+.story-body:has(+ *)::after { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .story-body::after { transition: none; }
 }
 
 .sline {
