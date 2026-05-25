@@ -10921,6 +10921,99 @@ textarea:hover {
 }
 .modal-panel--narrow { max-width: 520px; }
 
+/* ── Story Friends — collectible co-stars from completed stories ───── */
+.sb-cat-tab--friends {
+  margin-left: auto;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--qj-badge-gold, #facc15) 24%, white),
+    white);
+  border-color: color-mix(in srgb, var(--qj-badge-gold, #facc15) 50%, transparent);
+}
+.sb-friends-count {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  background: var(--qj-badge-gold, #facc15);
+  color: #78350f;
+  font-size: 0.75rem;
+  font-weight: 800;
+  border-radius: var(--radius-full, 999px);
+}
+.sf-intro {
+  margin: 0 0 var(--space-5) 0;
+  color: var(--text-muted, #475569);
+  font-size: 0.95rem;
+}
+.sf-band {
+  margin-bottom: var(--space-5);
+}
+.sf-band__title {
+  margin: 0 0 var(--space-3) 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.sf-band__title small {
+  color: var(--text-muted, #94a3b8);
+  font-weight: 600;
+  margin-left: 6px;
+}
+.sf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--space-3);
+}
+.sf-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: #ffffff;
+  border: 1px solid var(--qj-stroke, #ece9ff);
+  border-radius: var(--radius-md, 12px);
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.sf-tile--unlocked:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-primary, #6c63ff);
+}
+.sf-tile--unlocked:focus-visible {
+  outline: 3px solid var(--color-primary, #6c63ff);
+  outline-offset: 2px;
+}
+.sf-tile--locked {
+  cursor: default;
+  opacity: 0.55;
+  background: color-mix(in srgb, var(--qj-stroke, #ece9ff) 50%, #ffffff);
+  filter: grayscale(0.4);
+}
+.sf-tile__emoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+.sf-tile__name {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.sf-tile__story {
+  font-size: 0.75rem;
+  color: var(--text-muted, #64748b);
+  font-style: italic;
+}
+.sf-tile--locked .sf-tile__story {
+  font-style: normal;
+  font-weight: 600;
+}
+@media (max-width: 480px) {
+  .sf-grid { grid-template-columns: repeat(2, 1fr); }
+  .sf-tile { padding: var(--space-2); }
+  .sf-tile__emoji { font-size: 1.6rem; }
+  .sb-cat-tab--friends { margin-left: 0; }
+}
+
 /* ── Primary Quick Check (B1 onboarding diagnostic) ─────────────────── */
 .pqc-card {
   max-width: 640px;

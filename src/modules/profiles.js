@@ -154,6 +154,9 @@ export function deleteProfile(id) {
   if (getActiveProfileId() === id) {
     localStorage.removeItem(ACTIVE_PROFILE_KEY);
   }
+  // Clean up every per-profile scoped key registered above so a deleted
+  // profile leaves no residue (charter: adult-facing surfaces are calm).
+  _cleanupProfileScopedKeys(id);
 }
 
 /** Get the ID of the currently active profile (or null). */
@@ -166,6 +169,40 @@ export function getActiveProfile() {
   const id = getActiveProfileId();
   if (!id) return null;
   return getProfiles().find(p => p.id === id) ?? null;
+}
+
+/**
+ * Append the active profile id to a base localStorage key so per-profile
+ * data doesn't leak across siblings on the same device. Falls back to the
+ * base key when no profile is active (single-user / pre-onboarding) so
+ * tests and first-run still work without special-casing.
+ *
+ * @param {string} base — base storage key (e.g. 'giri_friends_unlocked')
+ * @returns {string}
+ */
+export function getProfileScopedKey(base) {
+  const id = getActiveProfileId();
+  return id ? `${base}__${id}` : base;
+}
+
+/**
+ * Known per-profile storage keys cleared when a profile is deleted.
+ * Adding a new profile-scoped module? Add its BASE key here so the
+ * scoped variant gets cleaned up cleanly.
+ *
+ * Pre-existing globally-keyed storage (giri_stories_read, giri_meet_words,
+ * giri_comp_log, phonicsquest_badges, lscwc_stats) is NOT cleaned up here
+ * — they're known to leak across profiles and need a separate migration
+ * pass (audit follow-up).
+ */
+const PROFILE_SCOPED_BASE_KEYS = [
+  'giri_friends_unlocked',
+];
+
+function _cleanupProfileScopedKeys(id) {
+  for (const base of PROFILE_SCOPED_BASE_KEYS) {
+    try { localStorage.removeItem(`${base}__${id}`); } catch (_) {}
+  }
 }
 
 /**

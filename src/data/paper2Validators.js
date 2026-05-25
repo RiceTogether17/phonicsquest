@@ -132,7 +132,10 @@ export function validateMcqItem(item, ctx) {
     if (BANNED_PRACTICE_LEAKS.test(item.q)) {
       issues.push(`${tag}: question contains banned internal practice label text`);
     }
-    if (!/[.?!]$/.test(item.q.trim())) {
+    // Natural sentence punctuation — accept an optional closing quote
+    // or bracket after the .?! so wrapped-in-quotes stems like
+    // `"Practice makes ___."` count as well-formed.
+    if (!/[.?!]["'’”)\]]?$/.test(item.q.trim())) {
       issues.push(`${tag}: question should end with natural sentence punctuation`);
     }
   }
