@@ -216,6 +216,17 @@ class AudioManager {
     this._initTTS();
   }
 
+  /**
+   * Best-available TTS voice (or null if voices haven't loaded yet).
+   * Exposed so other modules — like storyMode's Read Aloud — can apply the
+   * same elaborate cross-browser fallback this module already does,
+   * instead of just setting `utt.lang = 'en-GB'` and gambling on whether
+   * the user's device happens to ship that locale.
+   */
+  getTtsVoice() {
+    return this._ttsVoice;
+  }
+
   /** Lazily create AudioContext (must be after user gesture) */
   _ensureCtx() {
     if (!this._ctx) {
