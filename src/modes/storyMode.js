@@ -471,6 +471,12 @@ function _renderMeetTheWordsGate(story) {
   }
 
   const totalChips = hfwInStory.length + vocabToPreteach.length;
+  // Gate softening (audit fix #8): require a 3-tap warm-up rather than
+  // every chip, so the child gets to the story in seconds without losing
+  // the priming benefit. The skip button stays available for returning
+  // readers who already know all the words.
+  const WARMUP_TARGET = 3;
+  const targetTaps = Math.min(WARMUP_TARGET, totalChips);
   const tapped = new Set();
 
   const hfwChipsHtml = hfwInStory.map(w => /* html */`
@@ -491,8 +497,8 @@ function _renderMeetTheWordsGate(story) {
     <div class="meet-words-gate" role="region" aria-labelledby="gate-title">
       <h3 id="gate-title">🤝 Meet the Words</h3>
       <p class="gate-hello">
-        Tap each word to hear it. When you know them all, you're ready to read
-        <strong>${story.title}</strong>.
+        Tap <strong>any ${targetTaps}</strong> to warm up — or skip if you already
+        know them. Then read <strong>${story.title}</strong>.
       </p>
 
       ${hfwChipsHtml ? /* html */`
@@ -510,8 +516,8 @@ function _renderMeetTheWordsGate(story) {
       ` : ''}
 
       <div class="gate-continue-row">
-        <span class="gate-progress" id="gate-progress" aria-live="polite">0 / ${totalChips} tapped</span>
-        <button class="gate-skip" id="gate-skip" hidden type="button">I know these →</button>
+        <span class="gate-progress" id="gate-progress" aria-live="polite">0 of ${targetTaps} tapped</span>
+        <button class="btn btn--ghost" id="gate-skip" type="button">I know these →</button>
         <button class="btn btn--primary" id="gate-continue" type="button" disabled>Start Reading →</button>
       </div>
     </div>
@@ -523,8 +529,12 @@ function _renderMeetTheWordsGate(story) {
     tapped.add(id);
     chip.setAttribute('data-tapped', 'true');
     const progressEl = document.getElementById('gate-progress');
-    if (progressEl) progressEl.textContent = `${tapped.size} / ${totalChips} tapped`;
-    if (tapped.size === totalChips) {
+    if (progressEl) {
+      progressEl.textContent = tapped.size >= targetTaps
+        ? `✓ Warmed up (${tapped.size} tapped) — keep going or start the story`
+        : `${tapped.size} of ${targetTaps} tapped`;
+    }
+    if (tapped.size >= targetTaps) {
       const continueBtn = document.getElementById('gate-continue');
       if (continueBtn) continueBtn.disabled = false;
     }
@@ -538,13 +548,6 @@ function _renderMeetTheWordsGate(story) {
       recordTap(chip);
     });
   });
-
-  // Safety valve: after 10 s, show "I know these" so a returning learner
-  // can bypass the gate without tapping every chip.
-  setTimeout(() => {
-    const skip = document.getElementById('gate-skip');
-    if (skip) skip.hidden = false;
-  }, 10_000);
 
   const proceed = () => {
     _setMeetWordsCompleted(story.id);
@@ -605,25 +608,27 @@ function _renderReadAloud(story) {
   dynamic.innerHTML = /* html */`
     <!-- Story text column -->
     <div class="story-content-wrap">
-      <!-- Reading scaffold toggles (target-sound highlights + reading ruler) -->
-      <div class="reader-scaffold-bar" role="group" aria-label="Reading scaffolds">
-        <span class="scaffold-label">Scaffolds</span>
-        <button class="scaffold-toggle" id="btn-toggle-graphemes" aria-pressed="${_showGraphemes}" title="Highlight the target sound in this story">🎨 Show sounds</button>
-        <button class="scaffold-toggle" id="btn-toggle-ruler" aria-pressed="${_showRuler}" title="Underline the line being read to keep your eyes on track">📏 Reading ruler</button>
-      </div>
+      <!-- Combined reading toolbar — Scaffolds + Highlight + Tap-a-word.
+           Wraps to multiple rows on phones, lays out horizontally on tablet+
+           so the story body claims its space back (audit findings #5, #6). -->
+      <div class="story-reader-toolbar" role="group" aria-label="Reading controls">
+        <div class="reader-scaffold-bar" role="group" aria-label="Reading scaffolds">
+          <span class="scaffold-label">Scaffolds</span>
+          <button class="scaffold-toggle" id="btn-toggle-graphemes" aria-pressed="${_showGraphemes}" title="Highlight the target sound in this story">🎨 Show sounds</button>
+          <button class="scaffold-toggle" id="btn-toggle-ruler" aria-pressed="${_showRuler}" title="Underline the line being read to keep your eyes on track">📏 Reading ruler</button>
+        </div>
 
-      <!-- Follow-mode toggle -->
-      <div class="follow-mode-toggle">
-        <span class="follow-mode-label">Highlight:</span>
-        <button class="follow-mode-btn${_followMode === 'line' ? ' active' : ''}" data-follow="line">Line</button>
-        <button class="follow-mode-btn${_followMode === 'word' ? ' active' : ''}" data-follow="word">Line + Word</button>
-      </div>
+        <div class="follow-mode-toggle">
+          <span class="follow-mode-label">Highlight:</span>
+          <button class="follow-mode-btn${_followMode === 'line' ? ' active' : ''}" data-follow="line">Line</button>
+          <button class="follow-mode-btn${_followMode === 'word' ? ' active' : ''}" data-follow="word">Line + Word</button>
+        </div>
 
-      <!-- Word Detective toggle: tap any word to inspect its sounds. -->
-      <div class="follow-mode-toggle">
-        <span class="follow-mode-label">Tap a word:</span>
-        <button class="follow-mode-btn${!_detectiveMode ? ' active' : ''}" data-detective="off" title="Tap a word to hear it">🔊 Hear it</button>
-        <button class="follow-mode-btn${_detectiveMode ? ' active' : ''}" data-detective="on" title="Tap a word to see its sounds">🔍 Detective</button>
+        <div class="follow-mode-toggle">
+          <span class="follow-mode-label">Tap a word:</span>
+          <button class="follow-mode-btn${!_detectiveMode ? ' active' : ''}" data-detective="off" title="Tap a word to hear it">🔊 Hear it</button>
+          <button class="follow-mode-btn${_detectiveMode ? ' active' : ''}" data-detective="on" title="Tap a word to see its sounds">🔍 Detective</button>
+        </div>
       </div>
 
       <div class="story-body${_showRuler ? ' story-ruler-on' : ''}" id="story-body" aria-live="polite">${linesHtml}</div>
@@ -633,10 +638,10 @@ function _renderReadAloud(story) {
     <!-- Controls sidebar column -->
     <div class="story-controls-wrap">
       <div class="story-tts-bar">
-        <button class="btn btn--primary btn--xl" id="btn-story-play" aria-label="Read aloud">
-          ▶ Read Aloud
+        <button class="btn btn--primary btn--xl" id="btn-story-play" aria-label="Listen — play this story">
+          ▶ Listen
         </button>
-        <button class="btn btn--ghost btn--xl" id="btn-story-stop" style="display:none" aria-label="Stop">
+        <button class="btn btn--ghost btn--xl" id="btn-story-stop" style="display:none" aria-label="Stop listening">
           ⏹ Stop
         </button>
       </div>
@@ -1567,6 +1572,12 @@ function _toggleTTSButtons(playing) {
   const stop = document.getElementById('btn-story-stop');
   if (play) play.style.display = playing ? 'none' : '';
   if (stop) stop.style.display = playing ? ''     : 'none';
+  // While listening, mark the reader so CSS can collapse the hero
+  // illustration and give the story body the space it needs (audit
+  // finding #5 — hero is 250px tall on desktop and only matters
+  // pre-play).
+  const reader = _container?.querySelector('.story-reader');
+  if (reader) reader.classList.toggle('story-reader--listening', playing);
 }
 
 const _delay = ms => new Promise(r => setTimeout(r, ms));

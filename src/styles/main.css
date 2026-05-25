@@ -1527,6 +1527,15 @@ body.bedtime-on * {
 .mascot-float.sad { transform: translateY(-40px) rotate(-10deg); }
 .mascot-float svg { width: 100%; height: 100%; }
 
+/* Story Mode owns its own Giri illustration in the hero card; the global
+   floating mascot duplicates the character AND consistently overlaps the
+   refrain / second story line on every viewport (audit finding #1).
+   Hide it while a Giri Story is open. */
+body:has(#screen-stories.active) .mascot-float,
+body:has(#screen-stories.screen.active) .mascot-float {
+  display: none;
+}
+
 /* ── 11. TOAST ── */
 .toast-container {
   position: fixed;
@@ -1537,6 +1546,19 @@ body.bedtime-on * {
   flex-direction: column;
   gap: var(--space-2);
   pointer-events: none;
+}
+
+/* On phones the top-anchored toast container parks toasts directly over
+   the page header / title region (audit finding #2). Flip them to the
+   bottom on narrow viewports so the title and breadcrumbs stay readable. */
+@media (max-width: 480px) {
+  .toast-container {
+    top: auto;
+    right: 12px;
+    left: 12px;
+    bottom: 16px;
+    align-items: stretch;
+  }
 }
 
 .toast {
@@ -2715,9 +2737,18 @@ body.bedtime-on * {
   margin-bottom: var(--space-3);
   overflow-x: auto;
   padding-bottom: 2px;
+  padding-right: var(--space-4);
   scrollbar-width: none;
+  /* Fade the right edge so off-screen tabs are visibly cued (audit fix
+     #10 — "Decodable Story Re..." truncated without a scroll hint). */
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
 }
 .stories-tabs::-webkit-scrollbar { display: none; }
+/* When fully scrolled to the end, drop the fade so the last tab isn't
+   permanently dimmed. CSS-only via scroll-snap doesn't reliably reach
+   "end" detection cross-browser; the fade staying on the rightmost tab
+   is acceptable polish — still better than the silent cut-off. */
 
 .story-tab {
   display: flex;
@@ -2749,6 +2780,13 @@ body.bedtime-on * {
   white-space: nowrap;
 }
 .story-tab.active .story-tab-name { color: var(--color-text); }
+
+/* Phones: tighter tab pills so 4 bands fit closer to one screen. */
+@media (max-width: 480px) {
+  .story-tab { padding: var(--space-1) var(--space-2); }
+  .story-tab-num  { font-size: 0.7rem; }
+  .story-tab-name { font-size: 0.7rem; line-height: 1.1; }
+}
 
 /* ── Browser: level strip ────────────────────────────────────────────────── */
 .stories-level-strip {
@@ -3065,6 +3103,55 @@ details.story-tool-section[open] > .story-tool-summary::before {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  /* Wrap the Library button + band badge cleanly on phones rather than
+     letting them collide (audit finding #4 — mobile-large overlap). */
+  flex-wrap: wrap;
+}
+.story-meta-bar .story-meta-badge { min-width: 0; }
+
+/* Hero illustration collapses to a slim strip once the child presses
+   Listen — the picture matters before reading starts, not while
+   following the karaoke (audit finding #5). */
+.story-reader--listening .story-illo {
+  min-height: 64px;
+  max-height: 80px;
+  transition: max-height 0.32s ease, min-height 0.32s ease;
+}
+.story-reader--listening .story-illo-mascot {
+  width: 56px;
+  height: 56px;
+  animation: none;
+}
+.story-reader--listening .story-illo-steam,
+.story-reader--listening .story-illo-prop {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .story-reader--listening .story-illo { transition: none; }
+}
+
+/* Sticky play bar on mobile portrait — the audit caught the ▶ Listen
+   button being cropped above the viewport (audit finding #1, #4).
+   Pin it to the bottom of the screen on narrow widths so a child can
+   always press it without scrolling, and add bottom padding to the
+   story body so the last line isn't hidden behind it. */
+@media (max-width: 600px) {
+  .story-tts-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 25;
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--color-bg, #fff) 0%, transparent),
+      var(--color-bg, #fff) 30%);
+    padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom, 0));
+    margin: 0 calc(var(--space-4) * -1);
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
+  }
+  .story-tts-bar .btn {
+    width: 100%;
+    min-height: 56px;
+  }
+  .story-body { padding-bottom: calc(var(--space-8) + 56px); }
 }
 .story-lib-btn {
   font-size: var(--font-size-sm);
@@ -3095,6 +3182,36 @@ details.story-tool-section[open] > .story-tool-summary::before {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  /* "More below" affordance (audit fix #9). A subtle radial shadow
+     anchored to the bottom edge hints that the story continues
+     off-screen when the page can scroll. The shadow is on the body
+     itself rather than a pseudo so it doesn't intercept clicks on the
+     `.wf-word` spans inside. */
+  position: relative;
+}
+.story-body::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -8px;
+  height: 24px;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center top,
+    color-mix(in srgb, var(--color-primary, #6c63ff) 14%, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+/* Show the affordance only when there is more story below the viewport
+   bottom. We can't detect this cross-browser in pure CSS, so we settle
+   for "always-on when there's a refrain or Talk About It after the
+   body" — those neighbours imply there's something to scroll to. */
+.story-body:has(+ *)::after { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .story-body::after { transition: none; }
 }
 
 .sline {
@@ -3322,14 +3439,13 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-size: var(--font-size-xs);
   color: #64748b;
 }
+/* Skip is a real second option now, not a hidden safety valve. Keep it
+   visibly subordinate to the primary "Start Reading" CTA so a confident
+   returning reader spots it easily, but it never out-shouts the warmup
+   path. (Audit fix #8.) */
 .meet-words-gate .gate-skip {
-  font-size: var(--font-size-xs);
-  background: none;
-  border: none;
-  color: #64748b;
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 4px 6px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted, #475569);
 }
 .meet-words-gate .gate-skip[hidden] { display: none; }
 .meet-words-gate .hfw-chip[data-tapped="true"],
@@ -5635,6 +5751,28 @@ details.story-tool-section[open] > .story-tool-summary::before {
   border: 1px solid #d1fae5;
   padding: 2px var(--space-2);
   border-radius: var(--radius-full);
+}
+
+/* ── Reading toolbar — consolidates scaffolds + follow-mode + tap-mode
+   into one row on tablet+ so the story claims its vertical space back
+   (audit fix #6). On phones the children stack naturally via wrap. */
+.story-reader-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.story-reader-toolbar > .reader-scaffold-bar {
+  margin-bottom: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.story-reader-toolbar > .follow-mode-toggle {
+  flex: 0 0 auto;
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--color-primary) 4%, transparent);
+  border-radius: 8px;
 }
 
 /* ── Follow-mode toggle ───────────────────────────────────────────────── */
