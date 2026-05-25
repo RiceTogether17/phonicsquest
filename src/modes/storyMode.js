@@ -1089,7 +1089,7 @@ function _renderDecodeMode(story) {
       _flashChip(chip);
       const utt = new SpeechSynthesisUtterance(w);
       utt.rate = 0.85;
-      utt.lang = 'en-GB';
+      _applyTtsVoice(utt);
       window.speechSynthesis?.cancel();
       window.speechSynthesis?.speak(utt);
     });
@@ -1103,7 +1103,7 @@ function _renderDecodeMode(story) {
       chip.classList.toggle('vocab-chip--expanded');
       const utt = new SpeechSynthesisUtterance(w);
       utt.rate = 0.85;
-      utt.lang = 'en-GB';
+      _applyTtsVoice(utt);
       window.speechSynthesis?.cancel();
       window.speechSynthesis?.speak(utt);
     });
@@ -1155,7 +1155,7 @@ async function _handleWordTap(wordBtn) {
     _showDecodePanel({ type: 'hfw', word: clean });
     const utt = new SpeechSynthesisUtterance(clean);
     utt.rate = 0.85;
-    utt.lang = 'en-GB';
+    _applyTtsVoice(utt);
     window.speechSynthesis?.cancel();
     window.speechSynthesis?.speak(utt);
   } else if (wordObj) {
@@ -1167,7 +1167,7 @@ async function _handleWordTap(wordBtn) {
     _showDecodePanel({ type: 'tts', word: clean });
     const utt = new SpeechSynthesisUtterance(clean);
     utt.rate = 0.85;
-    utt.lang = 'en-GB';
+    _applyTtsVoice(utt);
     window.speechSynthesis?.cancel();
     window.speechSynthesis?.speak(utt);
   }
@@ -1188,7 +1188,7 @@ function _showDecodePanel({ type, word, wordObj }) {
     document.getElementById('dp-hear')?.addEventListener('click', () => {
       const utt = new SpeechSynthesisUtterance(word);
       utt.rate = 0.85;
-      utt.lang = 'en-GB';
+      _applyTtsVoice(utt);
       window.speechSynthesis?.cancel();
       window.speechSynthesis?.speak(utt);
     });
@@ -1205,7 +1205,7 @@ function _showDecodePanel({ type, word, wordObj }) {
     document.getElementById('dp-hear')?.addEventListener('click', () => {
       const utt = new SpeechSynthesisUtterance(word);
       utt.rate = 0.85;
-      utt.lang = 'en-GB';
+      _applyTtsVoice(utt);
       window.speechSynthesis?.cancel();
       window.speechSynthesis?.speak(utt);
     });
@@ -1309,7 +1309,7 @@ function _speakNext(segments, idx) {
 
   const utt  = new SpeechSynthesisUtterance(seg.text);
   utt.rate   = 0.82;
-  utt.lang   = 'en-GB';
+  _applyTtsVoice(utt);
   const pauseMs = seg.text.startsWith('Puff') ? 600 : 380;
 
   // Word-boundary highlighting (progressive enhancement)
@@ -1479,6 +1479,27 @@ function _highlightLine(lineIndex) {
   if (el) {
     el.classList.add('sline--active');
     el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+/**
+ * Apply the well-tested voice from `audio.js` to a SpeechSynthesisUtterance
+ * so Read Aloud / Decode TTS picks the best-available cross-browser voice
+ * (en-US → en-GB → en-AU → en-SG → en-IN) rather than gambling on whether
+ * the user's device happens to ship the bare `lang: 'en-GB'` we used to
+ * request. Devices without an en-GB voice were silently queuing utterances
+ * with no audible output — the "Listen button does nothing" regression.
+ *
+ * @param {SpeechSynthesisUtterance} utt
+ */
+function _applyTtsVoice(utt) {
+  let voice = null;
+  try { voice = audio.getTtsVoice?.() || null; } catch (_) { voice = null; }
+  if (voice) {
+    utt.voice = voice;
+    utt.lang = voice.lang || 'en-GB';
+  } else {
+    utt.lang = 'en-GB';
   }
 }
 
@@ -1816,7 +1837,7 @@ function _wireEchoReadControls(story) {
     btnPlay.hidden = true;
     const utt = new SpeechSynthesisUtterance(line.text);
     utt.rate = 0.82;
-    utt.lang = 'en-GB';
+    _applyTtsVoice(utt);
     utt.onend = () => {
       // Now child's turn
       btnRec.hidden = false;
