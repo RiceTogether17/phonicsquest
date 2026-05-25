@@ -18,6 +18,7 @@ import { runStoryQuest } from './storyQuest.js';
 import { mapCharIndexToWord, isOffscreen } from '../modules/karaokeUtils.js';
 import { lookupWord as lookupWordForDetective, addWordToReview } from '../modules/wordDetective.js';
 import { modalManager } from '../modules/modalManager.js';
+import { unlockFriend, isFriendUnlocked, getRosterSummary, friendFromStory } from '../modules/storyFriends.js';
 import {
   startRecording, stopRecording, playRecording, deleteRecording,
   stopPlayback, cleanupRecording, getRecorderState,
@@ -85,6 +86,10 @@ function markStoryRead(id) {
     read.push(id);
     localStorage.setItem(READ_KEY, JSON.stringify(read));
   }
+  // C3 — every story has a co-star. Finishing the story unlocks the
+  // friend (a one-shot narrative reward; pure charter-safe collectible
+  // since it's earned by reading, not bought).
+  unlockFriend(id);
 }
 
 // Fluency timer state
@@ -219,6 +224,7 @@ function _renderBrowser() {
       <button class="sb-cat-tab${_activeTab === 'band'      ? ' active' : ''}" data-cat="band">📖 By Band</button>
       <button class="sb-cat-tab${_activeTab === 'singapore' ? ' active' : ''}" data-cat="singapore">🇸🇬 Singapore</button>
       <button class="sb-cat-tab${_activeTab === 'chapter'   ? ' active' : ''}" data-cat="chapter">📚 Chapters</button>
+      <button class="sb-cat-tab sb-cat-tab--friends" id="btn-open-friends" type="button" aria-label="Open Giri's Friends">🐾 Friends ${_renderFriendsCount()}</button>
     </div>
   `;
 
@@ -304,12 +310,16 @@ function _renderBrowser() {
     </div>
   `;
 
-  // Category tab listeners
-  _container.querySelectorAll('.sb-cat-tab').forEach(btn => {
+  // Category tab listeners. The Friends pill is a sibling button but
+  // doesn't switch tabs — it opens the gallery modal instead.
+  _container.querySelectorAll('.sb-cat-tab[data-cat]').forEach(btn => {
     btn.addEventListener('click', () => {
       _activeTab = btn.dataset.cat;
       _renderBrowser();
     });
+  });
+  document.getElementById('btn-open-friends')?.addEventListener('click', () => {
+    _openFriendsGallery();
   });
 
   // Band tab listeners (only in band tab)
@@ -1564,6 +1574,116 @@ function _showComprehensionCheck(story) {
   panel.querySelector('#comp-skip')?.addEventListener('click', () => {
     _logComprehensionAttempt({ storyId: story.id, question, response: 'skipped' });
     panel.remove();
+  });
+}
+
+/**
+ * Render the "X/Y" count chip embedded in the Friends pill in the stories
+ * browser header.
+ */
+function _renderFriendsCount() {
+  try {
+    const summary = getRosterSummary(STORIES);
+    return `<span class="sb-friends-count">${summary.unlocked}/${summary.total}</span>`;
+  } catch (_) {
+    return '';
+  }
+}
+
+/**
+ * Open the Friends gallery modal. Renders unlocked friends in full
+ * colour and locked friends as silhouettes (NEVER as a "buy with XP"
+ * gate — friends are earned by reading, full stop).
+ *
+ * Reuses the global #modal-word-detective container by ID-mirroring
+ * the pattern, but actually creates a fresh DOM node so we don't
+ * collide with the Detective modal that lives elsewhere.
+ */
+function _openFriendsGallery() {
+  // Lazy-create the modal element so we don't add markup to index.html
+  // for a single rarely-opened surface.
+  document.getElementById('modal-story-friends')?.remove();
+  const summary = getRosterSummary(STORIES);
+  const modal = document.createElement('div');
+  modal.id = 'modal-story-friends';
+  modal.className = 'modal-overlay';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-label', "Giri's Friends gallery");
+
+  const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
+
+  // Group by band so the wall reads as a journey
+  const byBand = new Map();
+  for (const friend of summary.roster) {
+    if (!byBand.has(friend.band)) byBand.set(friend.band, []);
+    byBand.get(friend.band).push(friend);
+  }
+
+  const sectionsHtml = Array.from(byBand.entries())
+    .sort((a, b) => String(a[0]).localeCompare(String(b[0])))
+    .map(([band, friends]) => {
+      const unlockedInBand = friends.filter(f => f.unlocked).length;
+      const tilesHtml = friends.map(f => `
+        <button class="sf-tile ${f.unlocked ? 'sf-tile--unlocked' : 'sf-tile--locked'}"
+                data-story-id="${escText(f.storyId)}"
+                ${f.unlocked ? '' : 'disabled aria-disabled="true"'}
+                aria-label="${f.unlocked ? `${escText(f.name)} from ${escText(f.storyTitle)} — tap to re-read` : `Locked — read ${escText(f.storyTitle)} to meet ${escText(f.name)}`}">
+          <span class="sf-tile__emoji" aria-hidden="true">${f.unlocked ? escText(f.emoji) : '🔒'}</span>
+          <span class="sf-tile__name">${f.unlocked ? escText(f.name) : '???'}</span>
+          ${f.unlocked ? `<span class="sf-tile__story">from ${escText(f.storyTitle)}</span>` : `<span class="sf-tile__story">${escText(f.storyTitle)}</span>`}
+        </button>
+      `).join('');
+      return `
+        <div class="sf-band">
+          <h3 class="sf-band__title">Band ${escText(band)} <small>${unlockedInBand}/${friends.length} met</small></h3>
+          <div class="sf-grid">${tilesHtml}</div>
+        </div>`;
+    }).join('');
+
+  const intro = summary.unlocked === 0
+    ? "🐾 Read a Giri Story and the co-star moves in here. No friends yet — start with Band A!"
+    : `🐾 You've met <strong>${summary.unlocked}</strong> of <strong>${summary.total}</strong>. Tap a friend to re-read their story.`;
+
+  modal.innerHTML = `
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h2 class="modal-title">🐾 Giri's Friends</h2>
+        <button class="modal-close" aria-label="Close Friends gallery" data-close="modal-story-friends">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="sf-intro">${intro}</p>
+        ${sectionsHtml}
+      </div>
+    </div>`;
+
+  document.body.appendChild(modal);
+  modalManager.open('modal-story-friends');
+
+  modal.querySelector('[data-close]')?.addEventListener('click', () => {
+    modalManager.close('modal-story-friends');
+    modal.remove();
+  });
+  modal.addEventListener('click', e => {
+    if (e.target === modal) {
+      modalManager.close('modal-story-friends');
+      modal.remove();
+    }
+  });
+
+  // Tap an unlocked tile → close the modal and open that story.
+  modal.querySelectorAll('.sf-tile--unlocked[data-story-id]').forEach(tile => {
+    tile.addEventListener('click', () => {
+      const storyId = tile.dataset.storyId;
+      if (!storyId) return;
+      modalManager.close('modal-story-friends');
+      modal.remove();
+      _showReader(storyId);
+    });
   });
 }
 
