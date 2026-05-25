@@ -605,25 +605,27 @@ function _renderReadAloud(story) {
   dynamic.innerHTML = /* html */`
     <!-- Story text column -->
     <div class="story-content-wrap">
-      <!-- Reading scaffold toggles (target-sound highlights + reading ruler) -->
-      <div class="reader-scaffold-bar" role="group" aria-label="Reading scaffolds">
-        <span class="scaffold-label">Scaffolds</span>
-        <button class="scaffold-toggle" id="btn-toggle-graphemes" aria-pressed="${_showGraphemes}" title="Highlight the target sound in this story">🎨 Show sounds</button>
-        <button class="scaffold-toggle" id="btn-toggle-ruler" aria-pressed="${_showRuler}" title="Underline the line being read to keep your eyes on track">📏 Reading ruler</button>
-      </div>
+      <!-- Combined reading toolbar — Scaffolds + Highlight + Tap-a-word.
+           Wraps to multiple rows on phones, lays out horizontally on tablet+
+           so the story body claims its space back (audit findings #5, #6). -->
+      <div class="story-reader-toolbar" role="group" aria-label="Reading controls">
+        <div class="reader-scaffold-bar" role="group" aria-label="Reading scaffolds">
+          <span class="scaffold-label">Scaffolds</span>
+          <button class="scaffold-toggle" id="btn-toggle-graphemes" aria-pressed="${_showGraphemes}" title="Highlight the target sound in this story">🎨 Show sounds</button>
+          <button class="scaffold-toggle" id="btn-toggle-ruler" aria-pressed="${_showRuler}" title="Underline the line being read to keep your eyes on track">📏 Reading ruler</button>
+        </div>
 
-      <!-- Follow-mode toggle -->
-      <div class="follow-mode-toggle">
-        <span class="follow-mode-label">Highlight:</span>
-        <button class="follow-mode-btn${_followMode === 'line' ? ' active' : ''}" data-follow="line">Line</button>
-        <button class="follow-mode-btn${_followMode === 'word' ? ' active' : ''}" data-follow="word">Line + Word</button>
-      </div>
+        <div class="follow-mode-toggle">
+          <span class="follow-mode-label">Highlight:</span>
+          <button class="follow-mode-btn${_followMode === 'line' ? ' active' : ''}" data-follow="line">Line</button>
+          <button class="follow-mode-btn${_followMode === 'word' ? ' active' : ''}" data-follow="word">Line + Word</button>
+        </div>
 
-      <!-- Word Detective toggle: tap any word to inspect its sounds. -->
-      <div class="follow-mode-toggle">
-        <span class="follow-mode-label">Tap a word:</span>
-        <button class="follow-mode-btn${!_detectiveMode ? ' active' : ''}" data-detective="off" title="Tap a word to hear it">🔊 Hear it</button>
-        <button class="follow-mode-btn${_detectiveMode ? ' active' : ''}" data-detective="on" title="Tap a word to see its sounds">🔍 Detective</button>
+        <div class="follow-mode-toggle">
+          <span class="follow-mode-label">Tap a word:</span>
+          <button class="follow-mode-btn${!_detectiveMode ? ' active' : ''}" data-detective="off" title="Tap a word to hear it">🔊 Hear it</button>
+          <button class="follow-mode-btn${_detectiveMode ? ' active' : ''}" data-detective="on" title="Tap a word to see its sounds">🔍 Detective</button>
+        </div>
       </div>
 
       <div class="story-body${_showRuler ? ' story-ruler-on' : ''}" id="story-body" aria-live="polite">${linesHtml}</div>
@@ -633,10 +635,10 @@ function _renderReadAloud(story) {
     <!-- Controls sidebar column -->
     <div class="story-controls-wrap">
       <div class="story-tts-bar">
-        <button class="btn btn--primary btn--xl" id="btn-story-play" aria-label="Read aloud">
-          ▶ Read Aloud
+        <button class="btn btn--primary btn--xl" id="btn-story-play" aria-label="Listen — play this story">
+          ▶ Listen
         </button>
-        <button class="btn btn--ghost btn--xl" id="btn-story-stop" style="display:none" aria-label="Stop">
+        <button class="btn btn--ghost btn--xl" id="btn-story-stop" style="display:none" aria-label="Stop listening">
           ⏹ Stop
         </button>
       </div>
@@ -1567,6 +1569,12 @@ function _toggleTTSButtons(playing) {
   const stop = document.getElementById('btn-story-stop');
   if (play) play.style.display = playing ? 'none' : '';
   if (stop) stop.style.display = playing ? ''     : 'none';
+  // While listening, mark the reader so CSS can collapse the hero
+  // illustration and give the story body the space it needs (audit
+  // finding #5 — hero is 250px tall on desktop and only matters
+  // pre-play).
+  const reader = _container?.querySelector('.story-reader');
+  if (reader) reader.classList.toggle('story-reader--listening', playing);
 }
 
 const _delay = ms => new Promise(r => setTimeout(r, ms));
