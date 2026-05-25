@@ -21,6 +21,7 @@
 
 import { store } from './store.js';
 import { badges } from './badges.js';
+import { getActiveProfile } from './profiles.js';
 import { getLevelInfo } from '../data/curriculum.js';
 import { GRADUATED_BOX } from './reviewScheduler.js';
 
@@ -85,11 +86,9 @@ export function getPersonalBests(opts = {}) {
   // ── Profile name ─────────────────────────────────────────────────────
   let profileName = 'You';
   try {
-    // profiles module is optional — fall back gracefully if not available
-    // (e.g. in tests). The display name is only used as the header label.
-    const stored = JSON.parse(localStorage.getItem('phonicsquest_profiles_active') || '"null"');
-    if (typeof stored === 'string') profileName = stored;
-  } catch (_) { /* ignore */ }
+    const active = getActiveProfile();
+    if (active?.name) profileName = active.name;
+  } catch (_) { /* ignore — tests or first-run with no profile */ }
 
   const cards = [
     {

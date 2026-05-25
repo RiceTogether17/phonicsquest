@@ -98,7 +98,7 @@ describe('renderScanTask', () => {
     expect(html).not.toContain('<img');
   });
 
-  it('invokes onAnswer with correctness after the user picks an option', () => {
+  it('invokes onAnswer with correctness after the user picks an option and confirms', () => {
     const onAnswer = vi.fn();
     const task = buildScanTask({
       blankIndex: 0,
@@ -109,6 +109,12 @@ describe('renderScanTask', () => {
     const correctBtn = [...host.querySelectorAll('.scan-task-option')]
       .find((b) => b.dataset.correct === '1');
     correctBtn.click();
+    vi.runAllTimers();
+    // Product flow: option-click reveals feedback + a "Got it →" continue
+    // button. onAnswer fires only after the child confirms.
+    const continueBtn = host.querySelector('.vmcq-next-btn');
+    expect(continueBtn).toBeTruthy();
+    continueBtn.click();
     vi.runAllTimers();
     expect(onAnswer).toHaveBeenCalledTimes(1);
     expect(onAnswer.mock.calls[0][0]).toMatchObject({

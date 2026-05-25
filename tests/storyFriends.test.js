@@ -105,7 +105,7 @@ describe('unlockFriend / isFriendUnlocked — localStorage persistence', () => {
   });
 
   it('survives a corrupted storage value', () => {
-    localStorage.setItem(__TEST__.STORAGE_KEY, '{not json');
+    localStorage.setItem(__TEST__.storageKey(), '{not json');
     expect(Array.from(getUnlockedSet())).toEqual([]);
     expect(unlockFriend('core-a-01')).toBe(true);
     expect(isFriendUnlocked('core-a-01')).toBe(true);
@@ -144,6 +144,43 @@ describe('getRoster / getRosterSummary — gallery view', () => {
     expect(summary.unlocked).toBe(1);
     expect(summary.total).toBe(3);
     expect(summary.roster).toHaveLength(3);
+  });
+});
+
+describe('profile isolation — friends are per-profile, never shared', () => {
+  it('unlocks are scoped to the active profile (siblings stay separate)', () => {
+    // Set up two profiles on one device
+    localStorage.setItem('phonicsquest_profiles', JSON.stringify([
+      { id: 'child-a', name: 'A', avatar: '🦁', color: '#000', createdAt: 1 },
+      { id: 'child-b', name: 'B', avatar: '🐯', color: '#111', createdAt: 2 },
+    ]));
+
+    // Child A unlocks Red Hat
+    localStorage.setItem('phonicsquest_active_profile', 'child-a');
+    unlockFriend('core-a-01');
+    expect(isFriendUnlocked('core-a-01')).toBe(true);
+
+    // Switch to Child B — should see an empty friends list
+    localStorage.setItem('phonicsquest_active_profile', 'child-b');
+    expect(isFriendUnlocked('core-a-01')).toBe(false);
+    expect(Array.from(getUnlockedSet())).toEqual([]);
+
+    // Child B unlocks their own
+    unlockFriend('core-a-02');
+    expect(isFriendUnlocked('core-a-02')).toBe(true);
+    expect(isFriendUnlocked('core-a-01')).toBe(false);
+
+    // Switch back — Child A's unlocks survive unaffected
+    localStorage.setItem('phonicsquest_active_profile', 'child-a');
+    expect(isFriendUnlocked('core-a-01')).toBe(true);
+    expect(isFriendUnlocked('core-a-02')).toBe(false);
+  });
+
+  it('falls back to the base key when no profile is active (single-user / tests)', () => {
+    // No active profile set
+    expect(__TEST__.storageKey()).toBe(__TEST__.STORAGE_BASE);
+    unlockFriend('core-a-05');
+    expect(localStorage.getItem(__TEST__.STORAGE_BASE)).toBeTruthy();
   });
 });
 

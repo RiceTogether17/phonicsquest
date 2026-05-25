@@ -76,12 +76,18 @@ describe('user-flow: P4 user completes Grammar MCQ', () => {
       initGrammarMcq(root, () => {});
       startGrammarMcqLevel('P4');
 
-      // Answer 3 questions, fast-forwarding the inter-question timer each time
+      // Answer 3 questions. The product no longer auto-advances — after
+      // each answer the child sees the explanation and clicks Next/See
+      // Results to move on. The test mirrors that explicit flow.
       for (let i = 0; i < 3; i += 1) {
         const choice = root.querySelector('[data-choice]');
         expect(choice, `question ${i + 1} should render a choice button`).not.toBeNull();
         choice.click();
-        vi.advanceTimersByTime(2500);
+        vi.advanceTimersByTime(50);
+        const nextBtn = root.querySelector('#gmcq-next');
+        expect(nextBtn, `question ${i + 1} should expose a Next/See Results button`).not.toBeNull();
+        nextBtn.click();
+        vi.advanceTimersByTime(50);
       }
 
       const summaryText = root.textContent || '';

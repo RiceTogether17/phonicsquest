@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildWordWorkout, pickWorkoutModes, modeLabelForWorkout } from '../src/modules/wordWorkout.js';
+import { buildWordWorkout, pickWorkoutModes } from '../src/modules/wordWorkout.js';
 
 const cat   = { id: 'cat',   word: 'cat',   pattern: 'CVC',     group: 'short-a' };
 const flat  = { id: 'flat',  word: 'flat',  pattern: 'CCVC',    group: 'short-a' };
@@ -85,14 +85,3 @@ describe('buildWordWorkout — same word, varied cues per round', () => {
   });
 });
 
-describe('modeLabelForWorkout — round header copy', () => {
-  it('labels known modes with their emoji + name', () => {
-    expect(modeLabelForWorkout('blend')).toMatch(/Blend It!/);
-    expect(modeLabelForWorkout('hear')).toMatch(/Hear/);
-    expect(modeLabelForWorkout('segment')).toMatch(/Segment/);
-  });
-
-  it('returns the raw key for unknown modes (safe fallback)', () => {
-    expect(modeLabelForWorkout('unknownMode')).toBe('unknownMode');
-  });
-});

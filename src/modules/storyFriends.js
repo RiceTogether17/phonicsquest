@@ -21,7 +21,16 @@
  *     the first read instead of guilting on zero unlocks.
  */
 
-const STORAGE_KEY = 'giri_friends_unlocked';
+import { getProfileScopedKey } from './profiles.js';
+
+/**
+ * Base storage key — the actual key in use is per-profile via
+ * profiles.getProfileScopedKey so siblings on one device each have
+ * their own friends list. Base name is exported so the cleanup
+ * registry in profiles.js can reference it.
+ */
+const STORAGE_BASE = 'giri_friends_unlocked';
+function storageKey() { return getProfileScopedKey(STORAGE_BASE); }
 
 /**
  * Names that don't strip cleanly from the title patterns (e.g.
@@ -82,7 +91,7 @@ export function friendFromStory(story) {
 /** Read the unlocked set from localStorage, defensively. */
 export function getUnlockedSet() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(storageKey());
     const arr = raw ? JSON.parse(raw) : [];
     return new Set(Array.isArray(arr) ? arr : []);
   } catch (_) {
@@ -93,7 +102,7 @@ export function getUnlockedSet() {
 /** Persist the unlocked set. */
 function _saveUnlockedSet(set) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(set)));
+    localStorage.setItem(storageKey(), JSON.stringify(Array.from(set)));
   } catch (_) { /* storage full / disabled — ignore */ }
 }
 
@@ -147,4 +156,4 @@ export function getRosterSummary(stories) {
   return { unlocked, total: roster.length, roster };
 }
 
-export const __TEST__ = { STORAGE_KEY, NAME_OVERRIDES };
+export const __TEST__ = { STORAGE_BASE, storageKey, NAME_OVERRIDES };

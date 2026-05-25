@@ -74,28 +74,3 @@ export function buildWordWorkout(word) {
   return pickWorkoutModes(word).map(mode => ({ word, mode }));
 }
 
-/**
- * Friendly display name for a workout's mode in the round header.
- * Kept here so the UI can label rounds without re-importing the mode
- * registry.
- *
- * @param {string} mode
- * @returns {string}
- */
-export function modeLabelForWorkout(mode) {
-  return MODE_LABELS[mode] || mode;
-}
-
-const MODE_LABELS = Object.freeze({
-  hear:       '🔊 Hear & Choose',
-  blend:      '🎯 Blend It!',
-  segment:    '✂️ Segment It',
-  missing:    '🔍 Missing Sound',
-  soundCount: '🔢 Count the Sounds',
-  first:      '🚀 First Sound',
-  last:       '🏁 Last Sound',
-  middle:     '🎯 Middle Sound',
-  oralBlend:  '👂 Oral Blend',
-});
-
-export const __TEST__ = { MODE_LABELS };
