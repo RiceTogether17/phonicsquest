@@ -58,3 +58,18 @@ describe('integration — every phonemic-awareness mode gets a non-empty stage l
     }
   });
 });
+
+describe('real curriculum — Last Sound surfaces beginner phases, not just CVCC', () => {
+  it('Last Sound includes Phase 1 (CVC) so children can start on the easiest words', async () => {
+    const { CURRICULUM: REAL_CURRICULUM, PHASES: REAL_PHASES } = await import('../src/data/curriculum.js');
+    const stages = getStagesForMode('last', REAL_CURRICULUM, REAL_PHASES);
+    const phases = Array.from(new Set(stages.map(s => s.phase))).sort((a, b) => a - b);
+
+    // CVC (1) is the single-final-consonant sweet spot for last-sound practice;
+    // CCVC (2), CVCC (3), Digraphs (4) and CCVCC (5) all also have a clear final
+    // phoneme. If any of these drop out, Last Sound starts mid-curriculum and
+    // beginners hit a locked-stage wall (the original bug).
+    expect(phases).toEqual(expect.arrayContaining([1, 2, 3, 4, 5]));
+    expect(stages.length).toBeGreaterThan(0);
+  });
+});
