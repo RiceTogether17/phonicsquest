@@ -79,6 +79,11 @@ export const settingsController = {
       if (display) display.textContent = `${val}×`;
     });
 
+    // ── Stretched-speech toggle (phonemic-awareness modes) ─────────────────
+    document.getElementById('stretched-speech-toggle')?.addEventListener('change', (e) => {
+      store.set('stretchedSpeech', /** @type {HTMLInputElement} */ (e.target).checked);
+    });
+
 
     const debouncedSensitivity = debounce((threshold) => store.set('speechThreshold', threshold));
     document.getElementById('speech-sensitivity')?.addEventListener('input', (e) => {
@@ -202,6 +207,9 @@ export const settingsController = {
     if (speed) speed.value = store.get('voiceSpeed');
     const speedDisplay = document.getElementById('voice-speed-display');
     if (speedDisplay) speedDisplay.textContent = `${store.get('voiceSpeed')}×`;
+
+    const stretched = /** @type {HTMLInputElement|null} */ (document.getElementById('stretched-speech-toggle'));
+    if (stretched) stretched.checked = !!store.get('stretchedSpeech');
 
     const speechThreshold = Number(store.get('speechThreshold') ?? 0.75);
     const sensitivity = /** @type {HTMLInputElement|null} */ (document.getElementById('speech-sensitivity'));

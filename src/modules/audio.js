@@ -472,6 +472,51 @@ class AudioManager {
   }
 
   /**
+   * Speak a word "stretched out" for phonemic-awareness practice.
+   *
+   * Plays each grapheme through the existing speakPhoneme pipeline (so
+   * digraphs, blends, prefixes, suffixes all sound correct), separated by
+   * short gaps small enough that the child still perceives a single word
+   * — just elongated — then re-says the full word slowly so they hear the
+   * sounds reassemble. This is the "ssss-aaaa-t … sat" model that
+   * structured-literacy programmes use when isolating phonemes.
+   *
+   * Falls back to a single slow speakWord call when wordData lacks the
+   * grapheme breakdown (sight words, irregulars) so callers never branch.
+   *
+   * @param {import('../data/words.js').Word|string} wordData
+   * @returns {Promise<void>}
+   */
+  async speakWordStretched(wordData) {
+    if (!store.get('sfxEnabled')) return;
+
+    const word      = typeof wordData === 'string' ? wordData : wordData?.word;
+    const graphemes = typeof wordData === 'string' ? null     : wordData?.graphemes;
+    const types     = typeof wordData === 'string' ? null     : wordData?.types;
+    const slowRate  = Math.max(0.4, (store.get('voiceSpeed') ?? 0.8) * 0.7);
+
+    if (!Array.isArray(graphemes) || graphemes.length === 0) {
+      return this._speak(word || '', slowRate);
+    }
+
+    // Tight inter-phoneme gap — short enough to feel like one elongated word
+    // rather than separated sounds (revealPhonemes uses 350 ms for the
+    // explicit per-sound reveal in Blend It; PA needs the sounds to flow).
+    const INTER_PHONEME_MS = 140;
+
+    for (let i = 0; i < graphemes.length; i++) {
+      if (i > 0) await this._delay(INTER_PHONEME_MS);
+      await this.speakPhoneme(graphemes[i], types[i], {
+        word,
+        prevGrapheme: i > 0 ? graphemes[i - 1] : null,
+      });
+    }
+
+    await this._delay(280);
+    await this._speak(word, slowRate);
+  }
+
+  /**
    * Reveal phonemes one-by-one for Blend It mode.
    * @param {import('../data/words.js').Word} wordData
    * @param {(index: number) => void} [onPhoneme]  called with (index) after each phoneme plays

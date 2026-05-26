@@ -32,6 +32,10 @@ const DEFAULT_STATE = {
   sfxEnabled:     true,
   autoplay:       true,
   voiceSpeed:     0.8,
+  // When true, phonemic-awareness modes play the prompt word "stretched"
+  // (sound-by-sound with tight gaps) so children can isolate each phoneme.
+  // The 💡 Hint button in any PA mode uses stretched playback regardless.
+  stretchedSpeech: false,
   parentPin:      null,     // hashed PIN
   reducedMotion:  false,    // manual override for prefers-reduced-motion
   speechEnabled:  true,
