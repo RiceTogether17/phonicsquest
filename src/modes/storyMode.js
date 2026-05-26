@@ -630,8 +630,10 @@ function _renderReadAloud(story) {
 
         <div class="follow-mode-toggle">
           <span class="follow-mode-label">Highlight:</span>
-          <button class="follow-mode-btn${_followMode === 'line' ? ' active' : ''}" data-follow="line">Line</button>
-          <button class="follow-mode-btn${_followMode === 'word' ? ' active' : ''}" data-follow="word">Line + Word</button>
+          <button class="follow-mode-btn${_followMode === 'line' ? ' active' : ''}" data-follow="line"
+                  title="Light up the whole line as Giri reads it.">Whole line</button>
+          <button class="follow-mode-btn${_followMode === 'word' ? ' active' : ''}" data-follow="word"
+                  title="Light up each word as Giri says it — karaoke style.">Word by word</button>
         </div>
 
         <div class="follow-mode-toggle">
@@ -641,7 +643,7 @@ function _renderReadAloud(story) {
         </div>
       </div>
 
-      <div class="story-body${_showRuler ? ' story-ruler-on' : ''}" id="story-body" aria-live="polite">${linesHtml}</div>
+      <div class="story-body story-body--follow-${_followMode}${_showRuler ? ' story-ruler-on' : ''}" id="story-body" aria-live="polite">${linesHtml}</div>
       ${talkHtml}
     </div>
 
@@ -1343,33 +1345,72 @@ function _attachBoundaryListener(utt, lineIndex) {
   const lineText = utt.text || '';
   let boundaryFired = false;
   let lastWordIdx = -1;
+  let fallbackTimer = null;
+
+  function highlightWord(wordIdx) {
+    if (wordIdx < 0 || wordIdx >= wordSpans.length) return;
+    if (wordIdx === lastWordIdx) return;
+    lastWordIdx = wordIdx;
+    wordSpans.forEach(s => s.classList.remove('wf-word--active'));
+    const active = wordSpans[wordIdx];
+    active.classList.add('wf-word--active');
+    _scrollIntoViewIfNeeded(active);
+  }
 
   utt.addEventListener('boundary', (e) => {
     if (e.name && e.name !== 'word') return;
     boundaryFired = true;
     if (_boundarySupported === null) _boundarySupported = true;
-
-    const wordIdx = mapCharIndexToWord(lineText, e.charIndex ?? -1);
-    if (wordIdx < 0 || wordIdx >= wordSpans.length) return;
-    if (wordIdx === lastWordIdx) return; // same word, ignore
-    lastWordIdx = wordIdx;
-
-    wordSpans.forEach(s => s.classList.remove('wf-word--active'));
-    const active = wordSpans[wordIdx];
-    active.classList.add('wf-word--active');
-
-    // Keep the karaoke word in view, but only if it has scrolled off — never
-    // jiggle the line if the child can already see it.
-    _scrollIntoViewIfNeeded(active);
+    // Boundary supported → stop the fallback timer so we don't double-step.
+    if (fallbackTimer) { clearInterval(fallbackTimer); fallbackTimer = null; }
+    highlightWord(mapCharIndexToWord(lineText, e.charIndex ?? -1));
   });
 
-  // If no boundary events fire by the time the utterance ends,
-  // mark boundary support as unavailable
   utt.addEventListener('end', () => {
+    if (fallbackTimer) { clearInterval(fallbackTimer); fallbackTimer = null; }
     if (!boundaryFired && _boundarySupported === null) {
       _boundarySupported = false;
     }
   });
+
+  // ── Boundary-event fallback ────────────────────────────────────────
+  // Mobile Safari + some Chrome configs never fire word `boundary`
+  // events. Without a fallback the karaoke highlight would never appear
+  // and "Word by word" mode would look identical to "Whole line" on
+  // those browsers (audit follow-up).
+  //
+  // Strategy: estimate the per-word duration from the utterance rate
+  // (rough rule: ~3.5 words per second at rate 1, scaled linearly) and
+  // step the highlight on a timer. If a real boundary event fires
+  // before this kicks in, the timer is cleared and we use the real
+  // events instead.
+  if (_boundarySupported !== true) {
+    const rate = typeof utt.rate === 'number' && utt.rate > 0 ? utt.rate : 0.82;
+    const wordsPerSecond = 3.5 * rate;
+    const intervalMs = Math.max(180, Math.round(1000 / wordsPerSecond));
+    // Slight delay so a real boundary event has a chance to land first
+    // and toggle the support flag — only THEN start the fallback timer
+    // (and bail if boundary did fire).
+    setTimeout(() => {
+      if (boundaryFired) return;
+      let i = 0;
+      highlightWord(0);
+      fallbackTimer = setInterval(() => {
+        if (boundaryFired) {
+          clearInterval(fallbackTimer);
+          fallbackTimer = null;
+          return;
+        }
+        i++;
+        if (i >= wordSpans.length) {
+          clearInterval(fallbackTimer);
+          fallbackTimer = null;
+          return;
+        }
+        highlightWord(i);
+      }, intervalMs);
+    }, 300);
+  }
 }
 
 /**
