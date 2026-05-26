@@ -18,6 +18,7 @@ import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js
 import { renderPhonemeChoiceGrid } from '../components/phonemeChoice.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
+import { store } from '../modules/store.js';
 import { WORDS, shuffleArray } from '../data/words.js';
 
 /**
@@ -94,7 +95,7 @@ export function setupFirstSound(word, els) {
   // floor: some browsers (notably iOS Safari) resolve the speak Promise before
   // the audio buffer actually finishes outputting, so the TTS signal alone
   // isn't reliable on every device.
-  const wordPlayed = _waitForWordAudio(word.word);
+  const wordPlayed = _waitForWordAudio(word);
 
   renderPhonemeChoiceGrid(els.modeArea, choices, {
     onChoose: (choice, btn) =>
@@ -118,12 +119,21 @@ export function setupFirstSound(word, els) {
  * leaves the speaker — the floor catches that case so the choice phonemes
  * never bleed into the end of the word.
  */
-function _waitForWordAudio(text) {
+function _waitForWordAudio(wordData) {
+  const text = wordData?.word ?? String(wordData ?? '');
+  const stretched = !!store.get('stretchedSpeech');
   return new Promise(resolve => {
     setTimeout(() => {
-      const ttsDone     = audio.speakWord(text).catch(() => {});
-      const minHoldMs   = Math.max(1100, String(text || '').length * 140 + 400);
-      const floorHold   = new Promise(r => setTimeout(r, minHoldMs));
+      const ttsDone   = stretched
+        ? audio.speakWordStretched(wordData).catch(() => {})
+        : audio.speakWord(text).catch(() => {});
+      // Stretched playback is roughly 1 phoneme-MP3 (~600 ms) per grapheme
+      // plus the final slow blend, so the floor needs to grow accordingly.
+      const phonemeCount = wordData?.graphemes?.length ?? text.length;
+      const minHoldMs = stretched
+        ? Math.max(1400, phonemeCount * 800 + 900)
+        : Math.max(1100, text.length * 140 + 400);
+      const floorHold = new Promise(r => setTimeout(r, minHoldMs));
       Promise.all([ttsDone, floorHold]).finally(resolve);
     }, 350);
   });

@@ -1018,13 +1018,31 @@ class App {
    *  Tier 2: Play the first phoneme sound and highlight the first tile
    *  Tier 3: Reveal a hidden grapheme or play the full word slowly
    * Each tap advances the tier. After tier 3 the button is disabled.
+   *
+   * Phonemic-awareness modes (group='phonemic') bypass the tier system —
+   * tier-1 highlight tiles aren't rendered yet, and tier-2 would directly
+   * speak the answer for first-sound. Instead, a single-press hint plays
+   * the stretched word so the child can hear each sound in isolation.
    */
   async _giveHint() {
     if (!this._currentWord) return;
 
-    this._hintTier++;
     const word = this._currentWord;
     const btn = this._els.btnHint;
+    const isPhonemicMode = MODES[this._mode]?.group === 'phonemic';
+
+    if (isPhonemicMode) {
+      this._hintUsed = true;
+      await audio.speakWordStretched(word);
+      if (btn) {
+        btn.classList.add('used');
+        btn.setAttribute('aria-disabled', 'true');
+        btn.textContent = '💡 Used';
+      }
+      return;
+    }
+
+    this._hintTier++;
 
     if (this._hintTier === 1) {
       this._hintUsed = true;

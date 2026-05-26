@@ -11,6 +11,7 @@
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
+import { store } from '../modules/store.js';
 
 let currentWord = null;
 let selectedLetters = [];
@@ -67,7 +68,10 @@ export function setupSegment(word, els) {
   els.btnSayIt.style.display = '';
   els.btnSkip.style.display = '';
 
-  setTimeout(() => audio.speakWord(word.word), 400);
+  setTimeout(() => {
+    if (store.get('stretchedSpeech')) audio.speakWordStretched(word);
+    else audio.speakWord(word.word);
+  }, 400);
 }
 
 function handleLetterTap(index, letter, btn, word, els) {

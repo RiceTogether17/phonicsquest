@@ -11,6 +11,7 @@
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
+import { store } from '../modules/store.js';
 import { WORDS, shuffleArray } from '../data/words.js';
 
 let currentWord = null;
@@ -106,7 +107,10 @@ export function setupMissingSound(word, els) {
   els.btnSkip.style.display = '';
 
   // Play the word
-  setTimeout(() => audio.speakWord(word.word), 400);
+  setTimeout(() => {
+    if (store.get('stretchedSpeech')) audio.speakWordStretched(word);
+    else audio.speakWord(word.word);
+  }, 400);
 }
 
 function handleChoice(choice, btn, word, els, grid) {
