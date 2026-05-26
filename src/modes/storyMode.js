@@ -1345,7 +1345,8 @@ function _attachBoundaryListener(utt, lineIndex) {
   const lineText = utt.text || '';
   let boundaryFired = false;
   let lastWordIdx = -1;
-  let fallbackTimer = null;
+  let fallbackTimers = [];
+  let fallbackStarted = false;
 
   function highlightWord(wordIdx) {
     if (wordIdx < 0 || wordIdx >= wordSpans.length) return;
@@ -1357,60 +1358,88 @@ function _attachBoundaryListener(utt, lineIndex) {
     _scrollIntoViewIfNeeded(active);
   }
 
+  function clearFallback() {
+    for (const t of fallbackTimers) clearTimeout(t);
+    fallbackTimers = [];
+  }
+
+  // ── Per-word duration estimate ─────────────────────────────────────
+  // Browsers that don't fire `boundary` events get a calibrated fallback:
+  // schedule one setTimeout per word at the word's predicted start time.
+  // Long words get more time than short ones — a fixed-interval timer
+  // (the previous approach) drifts because "a" and "Giri" take very
+  // different amounts of speech time.
+  //
+  // Calibration (empirical, English, normal cadence):
+  //   per-word ms ≈ (90ms base + 60ms × character_count) / rate
+  //   minimum 160ms so very short words still register visually.
+  function startFallback() {
+    if (fallbackStarted) return;
+    fallbackStarted = true;
+    const rate = typeof utt.rate === 'number' && utt.rate > 0 ? utt.rate : 0.82;
+    // Use the actual word spans' text for length — story renderer
+    // splits on whitespace and punctuation, matching the highlight
+    // grain we want.
+    const wordTexts = Array.from(wordSpans, s => (s.textContent || '').trim());
+    let offset = 0;
+    for (let i = 0; i < wordSpans.length; i++) {
+      const wordIdx = i;
+      const len = wordTexts[i]?.length || 3;
+      const dur = Math.max(160, Math.round((90 + len * 60) / rate));
+      const t = setTimeout(() => {
+        if (boundaryFired) return;
+        highlightWord(wordIdx);
+      }, offset);
+      fallbackTimers.push(t);
+      offset += dur;
+    }
+  }
+
   utt.addEventListener('boundary', (e) => {
     if (e.name && e.name !== 'word') return;
     boundaryFired = true;
     if (_boundarySupported === null) _boundarySupported = true;
-    // Boundary supported → stop the fallback timer so we don't double-step.
-    if (fallbackTimer) { clearInterval(fallbackTimer); fallbackTimer = null; }
+    // Real boundary events arrived → cancel any fallback timeouts so
+    // we don't double-step the highlight.
+    clearFallback();
     highlightWord(mapCharIndexToWord(lineText, e.charIndex ?? -1));
   });
 
   utt.addEventListener('end', () => {
-    if (fallbackTimer) { clearInterval(fallbackTimer); fallbackTimer = null; }
+    clearFallback();
     if (!boundaryFired && _boundarySupported === null) {
       _boundarySupported = false;
     }
   });
 
-  // ── Boundary-event fallback ────────────────────────────────────────
-  // Mobile Safari + some Chrome configs never fire word `boundary`
-  // events. Without a fallback the karaoke highlight would never appear
-  // and "Word by word" mode would look identical to "Whole line" on
-  // those browsers (audit follow-up).
-  //
-  // Strategy: estimate the per-word duration from the utterance rate
-  // (rough rule: ~3.5 words per second at rate 1, scaled linearly) and
-  // step the highlight on a timer. If a real boundary event fires
-  // before this kicks in, the timer is cleared and we use the real
-  // events instead.
-  if (_boundarySupported !== true) {
-    const rate = typeof utt.rate === 'number' && utt.rate > 0 ? utt.rate : 0.82;
-    const wordsPerSecond = 3.5 * rate;
-    const intervalMs = Math.max(180, Math.round(1000 / wordsPerSecond));
-    // Slight delay so a real boundary event has a chance to land first
-    // and toggle the support flag — only THEN start the fallback timer
-    // (and bail if boundary did fire).
-    setTimeout(() => {
+  // Anchor the fallback to when AUDIO actually starts, not when speak()
+  // was queued — Chrome can have a 100ms queue delay, Safari can hit
+  // 300-500ms on the first utterance of a session. Without this anchor
+  // the highlight would lead the audio by that delay. After a small
+  // grace period (so a real boundary event can declare boundary
+  // support and skip the fallback entirely), schedule per-word
+  // highlights.
+  utt.addEventListener('start', () => {
+    if (boundaryFired) return;
+    const t = setTimeout(() => {
       if (boundaryFired) return;
-      let i = 0;
+      // Light up the first word immediately when fallback engages, so
+      // the karaoke doesn't open with a blank line.
       highlightWord(0);
-      fallbackTimer = setInterval(() => {
-        if (boundaryFired) {
-          clearInterval(fallbackTimer);
-          fallbackTimer = null;
-          return;
-        }
-        i++;
-        if (i >= wordSpans.length) {
-          clearInterval(fallbackTimer);
-          fallbackTimer = null;
-          return;
-        }
-        highlightWord(i);
-      }, intervalMs);
-    }, 300);
-  }
+      startFallback();
+    }, 180);
+    fallbackTimers.push(t);
+  });
+
+  // Belt-and-suspenders: some browsers (older Safari) don't fire `start`.
+  // If 800ms passes after `speak()` with no boundary AND no fallback
+  // started, start it anyway.
+  const safetyTimer = setTimeout(() => {
+    if (boundaryFired || fallbackStarted) return;
+    highlightWord(0);
+    startFallback();
+  }, 800);
+  fallbackTimers.push(safetyTimer);
 }
 
 /**
