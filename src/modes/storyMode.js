@@ -206,18 +206,32 @@ export function cleanupStoryMode() {
   _stopFluencyTimer();
   cleanupRecording();
   _activeWord = null;
-  // Remove body-level decode panel if it exists
-  if (_decodePanelEl && _decodePanelEl.parentNode === document.body) {
-    _decodePanelEl.remove();
-  }
-  _decodePanelEl = null;
+  _removeDecodePanel();
   _echoLineIdx = -1;
   _echoStory = null;
+}
+
+/**
+ * Remove the word-decode panel from the DOM and clear its reference.
+ *
+ * The panel is re-parented to <body> so it can escape #app's overflow
+ * clipping (see _renderDecodeMode). Because it lives outside the story
+ * container, re-rendering #story-dynamic does NOT remove it — so every
+ * exit from decode mode (mode switch, back to library, leaving stories)
+ * must call this explicitly or the panel lingers on screen over the next
+ * view (e.g. a tapped "glad" breakdown still showing during Read Aloud).
+ */
+function _removeDecodePanel() {
+  _decodePanelEl?.remove();
+  _decodePanelEl = null;
 }
 
 // ── Browser view ──────────────────────────────────────────────────────────
 
 function _renderBrowser() {
+  // Leaving the reader for the library — drop any lingering decode panel.
+  _removeDecodePanel();
+
   // ── Category tabs ──────────────────────────────────────────────────────
   const categoryTabsHtml = /* html */`
     <div class="sb-category-tabs" role="tablist" aria-label="Story categories">
@@ -580,6 +594,10 @@ function _renderReadAloud(story) {
   const dynamic = document.getElementById('story-dynamic');
   if (!dynamic) return;
 
+  // Decode mode parks its breakdown panel on <body>; clear it so a word
+  // tapped in Decode mode doesn't stay on screen once Read Aloud opens.
+  _removeDecodePanel();
+
   // Use word spans when follow mode is 'word'
   const useWordSpans = _followMode === 'word';
   const linesHtml = story.lines.map((line, i) => _lineHtml(line, i, useWordSpans, story)).join('');
@@ -939,6 +957,10 @@ function _wordSpanText(text, story = null) {
 function _renderDecodeMode(story) {
   const dynamic = document.getElementById('story-dynamic');
   if (!dynamic) return;
+
+  // Drop any prior body-level panel before this render creates a fresh one,
+  // otherwise re-entering decode mode orphans a duplicate panel on <body>.
+  _removeDecodePanel();
 
   // Store vocab for decode-panel lookup
   _currentStoryVocab = story.vocab ?? [];
