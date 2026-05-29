@@ -969,3 +969,8 @@ function buildLevel(level) {
 export const VOCAB_MCQ_ITEMS = Object.fromEntries(
   VOCAB_MCQ_LEVELS.map(level => [level, buildLevel(level)]),
 );
+
+/** Build a fresh item set for one level with a new random seed — call this each session. */
+export function buildVocabMcqLevel(level) {
+  return buildLevel(level);
+}
