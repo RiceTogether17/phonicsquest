@@ -175,7 +175,7 @@ const VOCAB_BUILDERS = {
     ];
     const upperRows = [
       ['The principal\'s message was brief but very ___.', 'meaningful', ['careless', 'shallow', 'crooked']],
-      ['The opposite of "ancient" in this sentence is ___.', 'modern', ['fragile', 'gentle', 'hollow']],
+      ['The restored square was celebrated for its ___ design, a striking contrast to the ancient buildings that surrounded it.', 'modern', ['fragile', 'gentle', 'hollow']],
       ['The report was concise, which means it was ___ and to the point.', 'brief', ['lengthy', 'vague', 'repetitive']],
       ['Her argument was coherent, meaning it was ___ and easy to follow.', 'logical', ['creative', 'repetitive', 'bold']],
       ['The policy was transparent, which means it was ___.', 'open', ['complicated', 'confidential', 'flexible']],
@@ -422,9 +422,9 @@ const VOCAB_BUILDERS = {
       ['A robot uses sensors to ___ its surroundings.', 'detect', ['decorate', 'defend', 'delay']],
       ['The process of a liquid turning into a gas is called ___.', 'evaporation', ['condensation', 'photosynthesis', 'germination']],
       ['The layer of gases surrounding the Earth is called the ___.', 'atmosphere', ['stratosphere', 'hydrosphere', 'biosphere']],
-      ['A substance that speeds up a chemical reaction without being used up is a ___.', 'catalyst', ['reactant', 'solvent', 'compound']],
+      ['The continuous movement of water from the Earth\'s surface into the sky as vapour and back again as rain is called the ___.', 'water cycle', ['food chain', 'rock cycle', 'carbon cycle']],
       ['Electricity that builds up on the surface of an object is called ___ electricity.', 'static', ['current', 'magnetic', 'thermal']],
-      ['The movement of water from the soil into the air via plants is called ___.', 'transpiration', ['evaporation', 'condensation', 'precipitation']],
+      ['Animals that eat both plants and other animals for food are called ___.', 'omnivores', ['herbivores', 'carnivores', 'decomposers']],
       ['A ___ is a device that converts solar energy into electrical energy.', 'solar panel', ['generator', 'turbine', 'circuit']],
     ];
     const upperRows = [
@@ -503,7 +503,7 @@ const VOCAB_BUILDERS = {
     return { category: 'socialStudiesVocab', subskill: 'civics_terms', q, choices: buildChoices(answer, ds), answer, explain: 'Use social studies context to identify vocabulary.' };
   },
   bodyPartsAnimals(level, i) {
-    const rows = [
+    const p1p2Rows = [
       ['The bird dipped its ___ into the pond to drink water.', 'beak', ['wing', 'claws', 'feathers']],
       ['The farmer brushed the horse\'s ___ with a comb.', 'mane', ['fur', 'fleece', 'wool']],
       ['The cat scratched the door with its sharp ___.', 'claws', ['paws', 'wings', 'beak']],
@@ -517,11 +517,26 @@ const VOCAB_BUILDERS = {
       ['The shark sliced through the water using its powerful ___.', 'tail fin', ['front legs', 'gills', 'flippers']],
       ['The frog pushed itself off the lily pad using its strong ___.', 'hind legs', ['fins', 'claws', 'wings']],
     ];
+    const p3UpperRows = [
+      ['As the egret waded silently through the shallows, it dipped its long ___ into the water and emerged with a wriggling fish.', 'beak', ['wing', 'claws', 'feathers']],
+      ['The zookeeper demonstrated how to care for the horse by carefully combing its thick, golden ___ to remove tangles.', 'mane', ['fur', 'fleece', 'wool']],
+      ['The climber watched nervously as the leopard extended its razor-sharp ___ and gripped the bark of the tree overhead.', 'claws', ['paws', 'wings', 'beak']],
+      ['In the aquarium, the clownfish darted between the coral by rippling its brightly coloured ___ with remarkable precision.', 'fins', ['paws', 'legs', 'feathers']],
+      ['During the drought, the elephant used its flexible ___ to suck up water from the muddy riverbed and spray it over its body.', 'trunk', ['horn', 'tail', 'paw']],
+      ['Although the peacock\'s brilliant blue-green ___ are spectacular, they make it harder for the bird to escape from predators.', 'feathers', ['scales', 'fur', 'fins']],
+      ['To avoid being detected, the grass snake pressed its scaled ___ flat against the ground and lay perfectly still among the leaves.', 'body', ['fins', 'wings', 'claws']],
+      ['Two male deer locked ___ during the mating season, pushing against each other for several minutes to establish dominance.', 'antlers', ['tusks', 'horns', 'spines']],
+      ['When the tortoise sensed danger approaching, it withdrew its head and all four limbs into its tough, dome-shaped ___.', 'shell', ['scales', 'pouch', 'skin']],
+      ['The mother kangaroo carefully lowered her tiny joey into the warmth of her ___ as the evening temperature began to drop sharply.', 'pouch', ['shell', 'skin', 'mane']],
+      ['Scientists studying sharks discovered that the powerful ___ propels the animal forward at speeds exceeding fifty kilometres per hour.', 'tail fin', ['front legs', 'gills', 'flippers']],
+      ['The frog waited motionless on the bank before pushing off with its muscular ___ and launching itself into the stream below.', 'hind legs', ['fins', 'claws', 'wings']],
+    ];
+    const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : p3UpperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'bodyPartsAnimals', subskill: 'animal_part_name', q, choices: buildChoices(answer, ds), answer, explain: 'Different animals have different body parts. Match the part to the animal.' };
   },
   collectiveNouns(level, i) {
-    const rows = [
+    const p1p2Rows = [
       ['We saw a ___ of elephants in the jungle.', 'herd', ['flock', 'school', 'pack']],
       ['A ___ of monkeys stole food from the shops.', 'troop', ['pack', 'army', 'flock']],
       ['A ___ of birds flew across the sky at sunset.', 'flock', ['herd', 'pack', 'school']],
@@ -535,11 +550,26 @@ const VOCAB_BUILDERS = {
       ['The children found a ___ of kittens behind the shed.', 'litter', ['pack', 'nest', 'flock']],
       ['The ranger spotted a ___ of lions resting under a tree.', 'pride', ['pack', 'herd', 'troop']],
     ];
+    const p3UpperRows = [
+      ['Park rangers reported that a ___ of over two hundred elephants had crossed the river overnight during the annual migration.', 'herd', ['flock', 'school', 'pack']],
+      ['Villagers were alarmed when a ___ of macaques descended from the hillside and raided their fruit trees at dawn.', 'troop', ['pack', 'army', 'flock']],
+      ['The pilot radioed the control tower after spotting a large ___ of birds flying directly into the aircraft\'s flight path.', 'flock', ['herd', 'pack', 'school']],
+      ['Dad kept the spare ___ of cards in the drawer, ready to bring out for family game nights after dinner.', 'pack', ['box', 'pile', 'heap']],
+      ['My grandmother treasured the antique ___ of pearls that had been passed down through three generations of our family.', 'string', ['group', 'line', 'bunch']],
+      ['To everyone\'s amusement, he finished an entire ___ of ice cream during the film without offering a single spoonful to anyone.', 'tub', ['carton', 'container', 'box']],
+      ['Divers swimming above the coral reef were surrounded by a shimmering ___ of sardines that moved together like one glittering cloud.', 'school', ['flock', 'herd', 'pack']],
+      ['The teacher collected a ___ of milk from the canteen to distribute among the pupils during their morning nutrition break.', 'carton', ['bowl', 'tub', 'tray']],
+      ['A ___ of wolves had been tracking the injured deer through the snow for several hours before finally cornering it near the ravine.', 'pack', ['flock', 'herd', 'troop']],
+      ['Scientists warned that a ___ of locusts stretching over thirty kilometres was moving rapidly towards the farmlands to the north.', 'swarm', ['flock', 'colony', 'herd']],
+      ['The vet examined each puppy in the ___ carefully before confirming that all six were healthy and ready for adoption.', 'litter', ['pack', 'nest', 'flock']],
+      ['A documentary filmmaker spent three months photographing a ___ of lions hunting prey across the open plains of East Africa.', 'pride', ['pack', 'herd', 'troop']],
+    ];
+    const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : p3UpperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'collectiveNouns', subskill: 'collective_noun', q, choices: buildChoices(answer, ds), answer, explain: 'Each group of animals, threaded objects or container uses its own special collective word.' };
   },
   placeNouns(level, i) {
-    const rows = [
+    const p1p2Rows = [
       ['Mrs Lee bought a loaf of bread and some buns from the ___.', 'bakery', ['kitchen', 'canteen', 'restaurant']],
       ['I was feeling ill, so I visited a ___ to see a doctor.', 'clinic', ['shop', 'hospital', 'sickbay']],
       ['It is hot and dry in the ___ where few plants can survive.', 'desert', ['forest', 'jungle', 'reservoir']],
@@ -553,11 +583,26 @@ const VOCAB_BUILDERS = {
       ['Patients stay overnight to recover after surgery in a ___.', 'hospital ward', ['clinic room', 'pharmacy', 'surgery']],
       ['Trees are felled and timber is processed at a ___.', 'sawmill', ['quarry', 'foundry', 'warehouse']],
     ];
+    const p3UpperRows = [
+      ['Every Saturday morning, our family stops at the neighbourhood ___ to collect freshly baked sourdough loaves and almond croissants.', 'bakery', ['kitchen', 'canteen', 'restaurant']],
+      ['Mum brought Kai to the ___ after he complained of a persistent headache that had not improved despite resting through the afternoon.', 'clinic', ['shop', 'hospital', 'sickbay']],
+      ['Researchers studying how animals survive in extreme conditions travelled to the Sahara ___, where daytime temperatures can exceed fifty degrees Celsius.', 'desert', ['forest', 'jungle', 'reservoir']],
+      ['The crowd was directed towards the nearest ___ when the fire alarm sounded, and security ensured that no one was left behind in the building.', 'exit', ['entrance', 'lobby', 'corridor']],
+      ['Mrs Tan encouraged us to explore the school ___ during recess to discover new titles in the recently updated reading corner on the second floor.', 'library', ['canteen', 'office', 'hall']],
+      ['Dad pulled into the ___ along the expressway to top up the fuel tank and check the tyre pressure before our long drive north.', 'petrol station', ['bus stop', 'taxi stand', 'workshop']],
+      ['Although they had watched the trailer many times, nothing prepared them for how spectacular the special effects appeared on the huge ___ screen.', 'cinema', ['theatre', 'studio', 'gallery']],
+      ['The ___ was packed with over fifty thousand fans who had waited years to see their favourite team compete in an international final.', 'stadium', ['gymnasium', 'court', 'arena']],
+      ['Passengers arriving at the ___ were reminded to collect their luggage from the correct carousel and proceed through customs without delay.', 'airport', ['harbour', 'station', 'terminal']],
+      ['The students visited the university ___ and observed researchers using electron microscopes to examine the detailed structure of plant cells.', 'laboratory', ['workshop', 'studio', 'office']],
+      ['The volunteers spent their afternoon reading to elderly patients in the ___, lifting their spirits with stories and friendly conversation.', 'hospital ward', ['clinic room', 'pharmacy', 'surgery']],
+      ['Logs from the sustainable plantation were transported to the ___, where they were cut into planks and treated before being used for furniture production.', 'sawmill', ['quarry', 'foundry', 'warehouse']],
+    ];
+    const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : p3UpperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'placeNouns', subskill: 'place_name', q, choices: buildChoices(answer, ds), answer, explain: 'Each place has a special name that tells us what people do there.' };
   },
   actionVerbs(level, i) {
-    const rows = [
+    const p1p2Rows = [
       ['Our pet dog ___ its tail excitedly when it sees us.', 'wags', ['flaps', 'waves', 'shakes']],
       ['Gail ___ the dirty table with a cloth.', 'wiped', ['rubbed', 'mopped', 'brushed']],
       ['No one saw the burglar ___ into the house when night fell.', 'sneaking', ['crawling', 'strolling', 'marching']],
@@ -571,11 +616,26 @@ const VOCAB_BUILDERS = {
       ['He ___ the wet shirt on the bamboo pole to dry.', 'hung', ['draped', 'placed', 'dropped']],
       ['She ___ the heavy bag over her shoulders before setting off.', 'hoisted', ['carried', 'threw', 'held']],
     ];
+    const p3UpperRows = [
+      ['The golden retriever ___ its tail so vigorously when it recognises its owner\'s car in the driveway that its whole body shakes.', 'wags', ['flaps', 'waves', 'shakes']],
+      ['The forensic technician carefully ___ the surface of the evidence tray before dusting it for fingerprints at the scene.', 'wiped', ['rubbed', 'mopped', 'brushed']],
+      ['Security footage showed a figure ___ through the emergency exit while the guard was occupied at the front desk.', 'sneaking', ['crawling', 'strolling', 'marching']],
+      ['The nature photographer spent three hours flat on the ground, watching a caterpillar ___ along the underside of a broad leaf.', 'crawling', ['sliding', 'trotting', 'travelling']],
+      ['The python ___ through the underbrush with barely a rustle, keeping its eyes fixed on the unsuspecting prey ahead.', 'slithered', ['slid', 'crept', 'glided']],
+      ['The elderly professor ___ into the wrong lecture hall and had begun speaking for several minutes before anyone dared to interrupt.', 'wandered', ['marched', 'strolled', 'travelled']],
+      ['The ancient vase ___ when it fell from the display case, scattering fragments across the polished museum floor.', 'shattered', ['exploded', 'burst', 'crashed']],
+      ['The pastry chef ___ the egg whites until they formed stiff peaks, then folded them gently into the cake mixture.', 'whisked', ['poured', 'sliced', 'fried']],
+      ['She ___ her chamomile tea in silence, reading through the final draft of her speech one last time before the ceremony.', 'sipped', ['gulped', 'chewed', 'spilled']],
+      ['The cheetah ___ on the gazelle with breathtaking speed, ending a chase that had stretched nearly four hundred metres across the plain.', 'pounced', ['leaped', 'snapped', 'dashed']],
+      ['Workers ___ the elaborate festival decorations across the entire length of the street, transforming it in preparation for the night\'s celebration.', 'hung', ['draped', 'placed', 'dropped']],
+      ['The mountaineers ___ their packs and began the steep ascent before sunrise, hoping to reach the summit by noon before the clouds moved in.', 'hoisted', ['carried', 'threw', 'held']],
+    ];
+    const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : p3UpperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'actionVerbs', subskill: 'action_verb', q, choices: buildChoices(answer, ds), answer, explain: 'Each action has a precise verb — pick the one that matches the movement, speed and surface.' };
   },
   soundVerbs(level, i) {
-    const rows = [
+    const p1p2Rows = [
       ['Every morning, I can hear birds ___ outside my window.', 'chirping', ['humming', 'cheeping', 'screeching']],
       ['I heard an owl ___ in the woods just now.', 'screech', ['chirp', 'howl', 'crow']],
       ['People believe that wolves like to ___ at the moon.', 'howl', ['bark', 'roar', 'growl']],
@@ -589,11 +649,26 @@ const VOCAB_BUILDERS = {
       ['The frog ___ all night, keeping us awake by the pond.', 'croaked', ['chirped', 'howled', 'barked']],
       ['The crowd ___ in delight when the magician pulled a rabbit from his hat.', 'gasped', ['sighed', 'screamed', 'mumbled']],
     ];
+    const p3UpperRows = [
+      ['As dawn broke over the nature reserve, dozens of bird species began ___ in the treetops, filling the air with a rich layering of sound.', 'chirping', ['humming', 'cheeping', 'screeching']],
+      ['The ornithologist paused on the trail when she heard the barn owl ___ from somewhere deep within the pine forest ahead.', 'screech', ['chirp', 'howl', 'crow']],
+      ['Explorers camped at the edge of the tundra listened in silence as a pack of wolves began to ___ at the full moon rising over the frozen plains.', 'howl', ['bark', 'roar', 'growl']],
+      ['Before the storm arrived, a murder of crows began to ___ from every rooftop along the street, as though warning the neighbourhood.', 'caw', ['chirp', 'squawk', 'screech']],
+      ['When Mrs Lim revealed the amount of work remaining before the holidays, the entire class let out a collective ___ of disappointment.', 'sigh', ['roar', 'hum', 'squeal']],
+      ['The male lion ___ across the savannah to announce his territory, and the sound could be heard from over five kilometres away.', 'roared', ['barked', 'meowed', 'squeaked']],
+      ['Scientists discovered that bees in stressed hives had been ___ more intensely than usual, suggesting they use sound as a form of communication.', 'buzzing', ['barking', 'roaring', 'crowing']],
+      ['The Border Collie ___ sharply twice to signal that it had located the lost hikers, then turned immediately to lead the rescuers forward.', 'barked', ['mewed', 'roared', 'hooted']],
+      ['The king cobra warned the approaching photographer by spreading its hood wide and producing a deep ___ sound that echoed through the undergrowth.', 'hissing', ['buzzing', 'chirping', 'hooting']],
+      ['Startled by the unexpected crack of lightning, the thoroughbred ___ and pulled hard against its reins before the groom managed to calm it down.', 'neighed', ['brayed', 'bleated', 'grunted']],
+      ['Throughout the monsoon season, frogs ___ incessantly in the drains and paddy fields surrounding the kampong, sometimes well into the early morning.', 'croaked', ['chirped', 'howled', 'barked']],
+      ['The audience ___ in unison when the trapeze artist released his grip at the very peak of the arc and appeared to plummet towards the net below.', 'gasped', ['sighed', 'screamed', 'mumbled']],
+    ];
+    const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : p3UpperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'soundVerbs', subskill: 'animal_sound', q, choices: buildChoices(answer, ds), answer, explain: 'Each animal — and some human sounds (sigh) — has its own specific verb.' };
   },
   emotionAdjectives(level, i) {
-    const rows = [
+    const p1p2Rows = [
       ['Alison was ___ with her gift. She loved it very much.', 'delighted', ['upset', 'excited', 'surprised']],
       ['I was ___ by the size of Jane\'s home. It looks like a palace!', 'amazed', ['frightened', 'delighted', 'angry']],
       ['Whenever Steve does not have enough sleep, he will be in a ___ mood.', 'grumpy', ['jolly', 'lazy', 'miserable']],
@@ -607,11 +682,26 @@ const VOCAB_BUILDERS = {
       ['The boy was ___ when he saw the spider crawl towards him.', 'terrified', ['thrilled', 'amused', 'calm']],
       ['She was ___ at herself for forgetting to bring her homework.', 'annoyed', ['pleased', 'proud', 'grateful']],
     ];
+    const p3UpperRows = [
+      ['When the judges announced her name as the first-prize winner, Alison was so ___ that she could barely manage her acceptance speech.', 'delighted', ['upset', 'excited', 'surprised']],
+      ['Visitors to the science exhibition were ___ at the working robot that could solve a Rubik\'s cube in under thirty seconds.', 'amazed', ['frightened', 'delighted', 'angry']],
+      ['Whenever Steve has not slept well the night before an examination, he tends to be in a particularly ___ mood throughout the day.', 'grumpy', ['jolly', 'lazy', 'miserable']],
+      ['Although she had rehearsed the piece over a hundred times, she still felt ___ the moment she sat down before the panel of judges.', 'nervous', ['excited', 'annoyed', 'discouraged']],
+      ['Stranded at the airport without her phone or boarding pass, she felt completely ___ and unsure what steps to take next.', 'miserable', ['nasty', 'disappointed', 'discouraged']],
+      ['The entire class was ___ by the magician\'s final trick, and not even the teacher could work out how it had been done.', 'puzzled', ['curious', 'amazed', 'dazed']],
+      ['The new student seemed ___ at first, making promises he had no intention of keeping; it took weeks for the class to notice the pattern.', 'sly', ['honest', 'truthful', 'mischievous']],
+      ['Tom felt genuinely ___ not because he had won, but because he had overcome the fear that had kept him from competing for years.', 'proud', ['angry', 'sleepy', 'bored']],
+      ['The children were so ___ about the expedition to the science centre that none of them could fall asleep the night before.', 'excited', ['bored', 'tired', 'upset']],
+      ['She felt deeply ___ when she discovered that her closest friend had been invited to the gathering but had chosen not to mention it.', 'hurt', ['relieved', 'grateful', 'confused']],
+      ['The experienced hiker admitted he was ___ during the unexpected lightning storm that caught them on the exposed ridge above the tree line.', 'terrified', ['thrilled', 'amused', 'calm']],
+      ['She was ___ at herself for leaving her identity card at home on the very day she needed it for the registration process.', 'annoyed', ['pleased', 'proud', 'grateful']],
+    ];
+    const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : p3UpperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'emotionAdjectives', subskill: 'feeling_word', q, choices: buildChoices(answer, ds), answer, explain: 'Use the feeling word that matches the situation and the strength of the emotion.' };
   },
   similes(level, i) {
-    const rows = [
+    const p1p2Rows = [
       ['Dennis is as proud as a ___. He always thinks he is better than other people.', 'peacock', ['fox', 'eel', 'lion']],
       ['Little Liyana is as quiet as a ___ when she reads in the library.', 'mouse', ['lion', 'parrot', 'monkey']],
       ['After running the race, John was as fast as a ___.', 'cheetah', ['turtle', 'snail', 'whale']],
@@ -625,6 +715,21 @@ const VOCAB_BUILDERS = {
       ['Her memory is as sharp as a ___ — she never forgets a face.', 'tack', ['knife', 'pin', 'pencil']],
       ['After swimming for an hour, the children were as hungry as ___.', 'wolves', ['birds', 'fish', 'ducks']],
     ];
+    const p3UpperRows = [
+      ['Despite receiving several critical remarks during the review, Dennis remained as proud as a ___, refusing to acknowledge any of the feedback.', 'peacock', ['fox', 'eel', 'lion']],
+      ['Even in the crowded school hall during the assembly, Liyana sat as quiet as a ___, completely absorbed in the book on her lap.', 'mouse', ['lion', 'parrot', 'monkey']],
+      ['Training twice a day for an entire term had clearly paid off, and by the finals, she was as fast as a ___, leaving her competitors well behind.', 'cheetah', ['turtle', 'snail', 'whale']],
+      ['The luxury bedding brand advertised that each sheet had been woven until it was as soft as ___ against the skin of its customers.', 'silk', ['sand', 'rock', 'wood']],
+      ['Even when outnumbered three to one in the debate, Aliya argued her point as bravely as a ___, never once backing down under pressure.', 'lion', ['mouse', 'rabbit', 'parrot']],
+      ['With twelve events to coordinate and barely two hours before the guests arrived, Daniel was as busy as a ___, rushing between stations.', 'bee', ['bear', 'sloth', 'cat']],
+      ['After years of working outdoors without gloves, the gardener\'s weathered hands had become as rough as ___ to the touch.', 'sandpaper', ['cotton', 'silk', 'velvet']],
+      ['After a week of patient revision and a thorough explanation from the tutor, the concept was finally as clear as ___ to her.', 'crystal', ['mud', 'sand', 'glass']],
+      ['The committee spent hours presenting evidence and alternative proposals, yet he remained as stubborn as a ___ and would not reconsider.', 'mule', ['cat', 'rabbit', 'fox']],
+      ['The new recruits were surprised to discover that the twins were as alike as two peas in a ___ in both appearance and personality.', 'pod', ['bag', 'box', 'basket']],
+      ['Even a decade after the event, Grandma\'s memory was as sharp as a ___, and she could recall every name and detail from that day.', 'tack', ['knife', 'pin', 'pencil']],
+      ['After completing the gruelling orienteering course through the jungle trail, the scouts were as hungry as ___ and devoured every scrap of food in sight.', 'wolves', ['birds', 'fish', 'ducks']],
+    ];
+    const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : p3UpperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'similes', subskill: 'fixed_comparison', q, choices: buildChoices(answer, ds), answer, explain: 'Similes are fixed comparisons — you cannot swap the noun for another animal.' };
   },
@@ -673,7 +778,7 @@ const VOCAB_BUILDERS = {
     return { category: 'phrasalVerbs', subskill: 'phrasal_verb_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'Phrasal verbs combine a verb + particle into a fixed meaning — come across (encounter), give up (stop trying), call off (cancel), carry out (perform), run out of (exhaust supply).' };
   },
   verbDistinction(level, i) {
-    const rows = [
+    const p1p2Rows = [
       ['May I ___ a colour pencil from you?', 'borrow', ['get', 'lend', 'use']],
       ['I ___ my grandmother a birthday card. She received it in her mailbox today.', 'sent', ['fetched', 'took', 'picked']],
       ['Please ___ me your eraser; I will return it after class.', 'lend', ['borrow', 'give', 'pass']],
@@ -687,6 +792,21 @@ const VOCAB_BUILDERS = {
       ['May I ___ this book from the library for two weeks?', 'borrow', ['rent', 'lend', 'take']],
       ['She ___ her grandfather to the clinic and waited with him there.', 'brought', ['fetched', 'sent', 'delivered']],
     ];
+    const p3UpperRows = [
+      ['Before the examination began, Jun discovered she had forgotten her ruler and had to ___ one from the student sitting in the next row.', 'borrow', ['get', 'lend', 'use']],
+      ['The school principal ___ a letter of congratulations to each finalist, acknowledging the effort they had sustained throughout the competition.', 'sent', ['fetched', 'took', 'picked']],
+      ['The librarian offered to ___ Priya a digital recorder so she could capture her interview with the visiting guest author after school.', 'lend', ['borrow', 'give', 'pass']],
+      ['Dad had arranged to ___ the children from the sports complex once the inter-school swimming competition had concluded for the day.', 'fetch', ['send', 'borrow', 'leave']],
+      ['The senior guide ___ the new recruits to the campsite via a longer route so that they could observe the wildlife along the way.', 'took', ['brought', 'fetched', 'sent']],
+      ['Could you ___ the reference books along the row, please, so that everyone has a chance to consult the same chapter?', 'pass', ['lend', 'borrow', 'send']],
+      ['Every Tuesday morning, the caretaker ___ the sports equipment out of the storeroom before physical education lessons begin on the field.', 'brings', ['fetches', 'sends', 'takes']],
+      ['She called her son to ask him to ___ her umbrella to the office, as the weather forecast had predicted heavy afternoon showers.', 'bring', ['fetch', 'lend', 'send']],
+      ['He agreed to ___ his neighbour the garden hose for the weekend, on the condition that it was returned in good condition by Monday.', 'lend', ['give', 'borrow', 'pass']],
+      ['The librarian ___ all donated books to their original shelves after the repair team had finished replacing the damaged flooring in the reading room.', 'returned', ['sent', 'delivered', 'passed']],
+      ['Travellers are not permitted to ___ items from museum display cases under any circumstances, regardless of the stated purpose.', 'borrow', ['rent', 'lend', 'take']],
+      ['She ___ her elderly grandmother to the community centre and stayed with her for the full duration of the health talk.', 'brought', ['fetched', 'sent', 'delivered']],
+    ];
+    const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : p3UpperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'verbDistinction', subskill: 'verb_pair_choice', q, choices: buildChoices(answer, ds), answer, explain: 'These verbs look similar but mean different things — pay attention to who is doing what to whom.' };
   },
