@@ -10,10 +10,10 @@ export const GRAMMAR_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 const LEVEL_CATEGORY_PLAN = {
   P1: ['articles', 'pronouns', 'demonstratives', 'whQuestions', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'possessives', 'quantifiers'],
   P2: ['articles', 'pronouns', 'reflexivePronouns', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'connectors', 'countableUncountable', 'futureTense', 'whQuestions', 'demonstratives', 'pastCont', 'quantifiers', 'possessives'],
-  P3: ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'pastCont', 'prepositions', 'connectors', 'conjunctions', 'comparatives', 'modals', 'tagQuestions', 'compoundIndefinite', 'quantifiers', 'possessives', 'reflexivePronouns', 'whQuestions', 'futureTense', 'presentPerfect', 'tenseAwareness', 'countableUncountable', 'adjAdverbs', 'auxiliaries', 'superlatives'],
-  P4: ['svAgreement', 'presentPerfect', 'pastCont', 'futureTense', 'prepositions', 'connectors', 'quantifiers', 'adjAdverbs', 'auxiliaries', 'conjunctions', 'possessives', 'reflexivePronouns', 'whQuestions', 'countableUncountable', 'pronouns', 'tagQuestions', 'compoundIndefinite', 'simplePast', 'presentCont', 'perfectContinuousTenses', 'pastPerfect', 'modals', 'comparatives', 'conditionals', 'tenseAwareness', 'superlatives'],
-  P5: ['svAgreement', 'tenseAwareness', 'presentPerfect', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'quantifiers', 'mixedGrammar', 'pastCont', 'reflexivePronouns', 'futureTense', 'countableUncountable', 'adjAdverbs', 'auxiliaries', 'tagQuestions', 'compoundIndefinite', 'simplePast', 'presentCont', 'comparatives', 'prepositions', 'connectors', 'conjunctions', 'superlatives'],
-  P6: ['tenseAwareness', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'inversion', 'auxiliaries', 'connectors', 'mixedGrammar', 'pastCont', 'quantifiers', 'reflexivePronouns', 'futureTense', 'presentPerfect', 'countableUncountable', 'adjAdverbs', 'tagQuestions', 'compoundIndefinite', 'simplePast', 'presentCont', 'prepositions', 'conjunctions', 'svAgreement', 'superlatives'],
+  P3: ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'pastCont', 'prepositions', 'connectors', 'conjunctions', 'comparatives', 'modals', 'tagQuestions', 'compoundIndefinite', 'quantifiers', 'possessives', 'reflexivePronouns', 'whQuestions', 'futureTense', 'presentPerfect', 'tenseAwareness', 'countableUncountable', 'adjAdverbs', 'auxiliaries', 'superlatives', 'demonstratives'],
+  P4: ['svAgreement', 'presentPerfect', 'pastCont', 'futureTense', 'prepositions', 'connectors', 'quantifiers', 'adjAdverbs', 'auxiliaries', 'conjunctions', 'possessives', 'reflexivePronouns', 'whQuestions', 'countableUncountable', 'pronouns', 'tagQuestions', 'compoundIndefinite', 'simplePast', 'presentCont', 'perfectContinuousTenses', 'pastPerfect', 'modals', 'comparatives', 'conditionals', 'tenseAwareness', 'superlatives', 'gerundInfinitive'],
+  P5: ['svAgreement', 'tenseAwareness', 'presentPerfect', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'quantifiers', 'mixedGrammar', 'pastCont', 'reflexivePronouns', 'futureTense', 'countableUncountable', 'adjAdverbs', 'auxiliaries', 'tagQuestions', 'compoundIndefinite', 'simplePast', 'presentCont', 'comparatives', 'prepositions', 'connectors', 'conjunctions', 'superlatives', 'gerundInfinitive'],
+  P6: ['tenseAwareness', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'inversion', 'auxiliaries', 'connectors', 'mixedGrammar', 'pastCont', 'quantifiers', 'reflexivePronouns', 'futureTense', 'presentPerfect', 'countableUncountable', 'adjAdverbs', 'tagQuestions', 'compoundIndefinite', 'simplePast', 'presentCont', 'prepositions', 'conjunctions', 'svAgreement', 'superlatives', 'gerundInfinitive', 'comparatives'],
 };
 
 const SUBJECTS = ['The pupil', 'My brother', 'Our teacher', 'The class monitor', 'The twins', 'The players', 'Her cousin', 'The science team'];
@@ -611,7 +611,17 @@ const GRAMMAR_BUILDERS = {
     return { subskill: 'aux_question_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Question forms need the correct auxiliary verb.' };
   },
   tenseAwareness(level, i) {
-    const rows = [
+    const p3Rows = [
+      ['She practises daily, so she usually ___ well in performances.', 'performs', ['performed', 'is performing', 'has performed']],
+      ['Right now, my cousin ___ a documentary about marine animals.', 'is watching', ['watches', 'watched', 'will watch']],
+      ['Last weekend, the team ___ in the pouring rain.', 'trained', ['trains', 'is training', 'has trained']],
+      ['When the alarm rang, the children ___ in the corridor.', 'were playing', ['played', 'play', 'have played']],
+      ['We ___ this museum twice, so the layout is familiar to us.', 'have visited', ['visited', 'were visiting', 'visit']],
+      ['Every evening, Father ___ the dog at the park near our block.', 'walks', ['walked', 'is walking', 'will walk']],
+      ['Tomorrow, our class ___ the science centre.', 'will visit', ['visits', 'visited', 'is visiting']],
+      ['Look! Those sparrows ___ at the crumbs near the canteen.', 'are pecking', ['peck', 'pecked', 'have pecked']],
+    ];
+    const upperRows = [
       ['By the time we reached the hall, the programme ___.', 'had started', ['has started', 'was starting', 'starts']],
       ['She practises daily, so she usually ___ well.', 'performs', ['performed', 'is performing', 'has performed']],
       ['We ___ for twenty minutes before the rain stopped.', 'had been waiting', ['have waited', 'are waiting', 'waited']],
@@ -625,6 +635,7 @@ const GRAMMAR_BUILDERS = {
       ['By the time you arrive, I ___ dinner already.', 'will have cooked', ['cooked', 'cook', 'have cooked']],
       ['Father ___ to work by train every day for the past ten years.', 'has been going', ['goes', 'went', 'is going']],
     ];
+    const rows = level === 'P3' ? p3Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'tense_selection', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the tense that best matches the time relationship.' };
   },
@@ -753,6 +764,34 @@ const GRAMMAR_BUILDERS = {
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'inversion_patterns', q, choices: buildChoices(answer, ds), answer, explain: 'Certain fronted phrases trigger inversion in formal structures.' };
+  },
+  gerundInfinitive(level, i) {
+    const rows = [
+      ['She enjoys ___ the piano for an hour every evening.', 'playing', ['play', 'to play', 'played']],
+      ['We managed ___ the last bus just in time.', 'to catch', ['catching', 'caught', 'catch']],
+      ['He decided ___ in the school play this year.', 'to take part', ['taking part', 'took part', 'take part']],
+      ['Please finish ___ your worksheet before the bell rings.', 'doing', ['to do', 'done', 'did']],
+      ['Mei hopes ___ a doctor when she grows up.', 'to become', ['becoming', 'become', 'became']],
+      ['I remember ___ my water bottle this morning — it is safely in my bag.', 'packing', ['to pack', 'packed', 'pack']],
+      ['He stopped ___ the view before continuing the hike.', 'to admire', ['admiring', 'admired', 'admire']],
+      ['The coach suggested ___ earlier to warm up properly.', 'arriving', ['to arrive', 'arrived', 'arrive']],
+      ['She agreed ___ the class presentation on behalf of the group.', 'to give', ['giving', 'gave', 'give']],
+      ['They avoided ___ the busy road during the morning rush.', 'crossing', ['to cross', 'crossed', 'cross']],
+      ['My brother plans ___ computing at the polytechnic next year.', 'to study', ['studying', 'studied', 'study']],
+      ['Instead of ___ the escalator, they climbed the stairs for exercise.', 'taking', ['take', 'to take', 'taken']],
+      ['The class kept ___ questions even after the lesson ended.', 'asking', ['to ask', 'asked', 'ask']],
+      ['He forgot ___ his PE kit at home, so he borrowed a spare set.', 'to bring', ['bringing', 'brought', 'bring']],
+      ['The volunteers offered ___ the elderly residents to the community hall.', 'to escort', ['escorting', 'escorted', 'escort']],
+      ['She practises ___ her lines for the drama every night before bed.', 'reciting', ['to recite', 'recited', 'recite']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return {
+      subskill: 'gerund_infinitive',
+      q,
+      choices: buildChoices(answer, ds),
+      answer,
+      explain: 'Certain verbs take gerunds (-ing forms), others take infinitives (to + verb). Some, like "stop" and "remember", change meaning depending on which is used.',
+    };
   },
   mixedGrammar(level, i) {
     const rows = [
