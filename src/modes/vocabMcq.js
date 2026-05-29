@@ -1,9 +1,10 @@
 import { questMastery } from '../modules/questMastery.js';
 import { gamification } from '../modules/gamification.js';
 import { store } from '../modules/store.js';
-import { VOCAB_MCQ_ITEMS, VOCAB_MCQ_LEVELS } from '../data/vocabMcq.js';
+import { VOCAB_MCQ_ITEMS, VOCAB_MCQ_LEVELS, buildVocabMcqLevel } from '../data/vocabMcq.js';
 import { VOCAB_CATEGORIES, VOCAB_CATEGORY_KEYS } from '../data/vocabCategories.js';
 import { checkPostAttempt } from '../modules/remediationRouter.js';
+import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 
 let _container = null;
 let _onGoHome = null;
@@ -11,7 +12,6 @@ let _items = [];
 let _idx = 0;
 let _correct = 0;
 let _answered = false;
-let _advanceTimer = null;
 let _scope = { level: null, category: null, label: 'All Skills' };
 
 let _streak = 0;
@@ -26,7 +26,6 @@ export function initVocabMcq(container, onGoHome) {
 
 export function cleanupVocabMcq() {
   if (_container) _container.innerHTML = '';
-  if (_advanceTimer) { clearTimeout(_advanceTimer); _advanceTimer = null; }
 }
 
 export function getAllItems(bank = VOCAB_MCQ_ITEMS) {
@@ -158,7 +157,12 @@ function _adaptiveShuffle(items) {
 
 function _startScope({ level = null, category = null, label = '' } = {}) {
   _scope = { level, category, label: label || _scopeLabel({ level, category }) };
-  _items = _adaptiveShuffle(getItemsForScope({ level, category }));
+
+  // Rebuild items fresh each session so the random seed varies (not frozen at module load).
+  const freshBank = level
+    ? { [level]: buildVocabMcqLevel(level) }
+    : Object.fromEntries(VOCAB_MCQ_LEVELS.map(l => [l, VOCAB_MCQ_ITEMS[l]]));
+  _items = _adaptiveShuffle(getItemsForScope({ level, category }, freshBank));
 
   const limit = store.get('paperItemLimit');
   if (limit) {
@@ -173,7 +177,6 @@ function _startScope({ level = null, category = null, label = '' } = {}) {
   _missed = [];
   _isRecovery = false;
   _answered = false;
-  if (_advanceTimer) { clearTimeout(_advanceTimer); _advanceTimer = null; }
   _renderQuestion();
 }
 
@@ -186,7 +189,6 @@ function _startRecovery() {
   _missed = [];
   _isRecovery = true;
   _answered = false;
-  if (_advanceTimer) { clearTimeout(_advanceTimer); _advanceTimer = null; }
   _renderQuestion();
 }
 
@@ -210,18 +212,21 @@ function _renderQuestion() {
   const progressPct = Math.round(((_idx) / _items.length) * 100);
   const roundLabel = _isRecovery ? `Recovery · ${_scope.label}` : _scope.label;
 
+  // Shuffle choices at render time so position doesn't become a memory cue on replays.
+  const displayChoices = [...item.choices].sort(() => Math.random() - 0.5);
+
   _container.innerHTML = `
     <div class="mcq-game" role="region" aria-label="Vocabulary question ${_idx + 1} of ${_items.length}">
       <div class="sfq-header">
-        <span class="sfq-badge">${_isRecovery ? '🔄' : '📖'} ${roundLabel}</span>
+        <span class="sfq-badge">${_isRecovery ? '🔄' : '📖'} ${escapeHtml(roundLabel)}</span>
         ${_streakBadge()}
         <span class="sfq-progress" aria-label="Question ${_idx + 1} of ${_items.length}">${_idx + 1}/${_items.length}</span>
       </div>
       <div class="sq-progress-bar"><div class="sq-progress-fill" style="width:${progressPct}%"></div></div>
-      <p class="mcq-category-tag">${_categoryLabel(item.category)}</p>
-      <p class="sfq-instruction">${item.q}</p>
+      <p class="mcq-category-tag">${escapeHtml(_categoryLabel(item.category))}</p>
+      <p class="sfq-instruction">${escapeHtml(item.q)}</p>
       <div class="pt-choices" role="group" aria-label="Answer choices">
-        ${item.choices.map(c => `<button class="pt-choice-btn" data-choice="${c}" aria-label="Choose ${c}">${c}</button>`).join('')}
+        ${displayChoices.map(c => `<button class="pt-choice-btn" data-choice="${escapeAttr(c)}" aria-label="Choose ${escapeAttr(c)}">${escapeHtml(c)}</button>`).join('')}
       </div>
       <p class="pt-grammar-hint" id="vmcq-hint" role="status" aria-live="polite"></p>
       <div class="vmcq-next-wrap" id="vmcq-next-wrap" style="display:none">
@@ -266,15 +271,15 @@ function _renderQuestion() {
       if (ok) {
         hintText = '✅ <strong>Correct!</strong>';
       } else {
-        hintText = `❌ <strong>Correct answer:</strong> ${item.answer}`;
+        hintText = `❌ <strong>Correct answer:</strong> ${escapeHtml(item.answer)}`;
       }
 
       // Show clue words if available
       if (item.clueWords && item.clueWords.length > 0) {
-        hintText += `<br><span class="mcq-clue-words"><strong>🔍 Clue words:</strong> ${item.clueWords.map(w => `<span class="mcq-clue-chip">${w}</span>`).join(' ')}</span>`;
+        hintText += `<br><span class="mcq-clue-words"><strong>🔍 Clue words:</strong> ${item.clueWords.map(w => `<span class="mcq-clue-chip">${escapeHtml(w)}</span>`).join(' ')}</span>`;
       }
 
-      // Show reasoning if available, otherwise fall back to explain
+      // explain/reasoning intentionally carry light HTML formatting (e.g. <strong>) from static data.
       if (item.reasoning) {
         hintText += `<br><span class="mcq-reasoning">${item.reasoning}</span>`;
       } else if (item.explain) {
@@ -284,7 +289,7 @@ function _renderQuestion() {
       if (!ok) {
         const suggestion = checkPostAttempt('vocabMcq', item.category, false);
         if (suggestion && suggestion.type === 'redirect') {
-          hintText += ` <br>💡 ${suggestion.message}`;
+          hintText += ` <br>💡 ${escapeHtml(suggestion.message)}`;
         }
       }
 
@@ -308,11 +313,19 @@ function _renderQuestion() {
 }
 
 function _renderDone() {
-  if (_advanceTimer) { clearTimeout(_advanceTimer); _advanceTimer = null; }
   const total = _items.length;
-  const accuracy = total > 0 ? Math.round((_correct / total) * 100) : 0;
-  const stars = accuracy >= 90 ? 3 : accuracy >= 70 ? 2 : 1;
-  const hasMissed = _missed.length > 0 && !_isRecovery;
+
+  // Edge case: no items were ever served (bad scope/filter). Go back to menu instead of showing a 1-star, 0/0 result.
+  if (total === 0) {
+    showVocabMcqBrowser();
+    return;
+  }
+
+  const accuracy = Math.round((_correct / total) * 100);
+  const stars = accuracy >= 90 ? 3 : accuracy >= 70 ? 2 : accuracy > 0 ? 1 : 0;
+  // Allow another recovery attempt even after a recovery round, so a struggling learner
+  // isn't left with no way to retry the questions they got wrong.
+  const hasMissed = _missed.length > 0;
 
   const catKeys = [...new Set(_items.map(item => item.category))];
 
@@ -322,9 +335,9 @@ function _renderDone() {
       <div class="sfq-stars" aria-label="${stars} stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
       <p class="sfq-instruction">${_correct}/${total} correct · ${accuracy}%</p>
       ${_maxStreak >= 3 ? `<p class="sfq-instruction">${_maxStreak >= 10 ? '🔥' : _maxStreak >= 5 ? '⚡' : '✨'} Best streak: ${_maxStreak} in a row</p>` : ''}
-      <p class="sfq-instruction">${accuracy >= 90 ? 'Outstanding!' : accuracy >= 70 ? 'Great work — keep practising!' : 'Good effort — replay to improve!'}</p>
+      <p class="sfq-instruction">${accuracy >= 90 ? 'Outstanding!' : accuracy >= 70 ? 'Great work — keep practising!' : accuracy > 0 ? 'Good effort — replay to improve!' : 'Keep trying — you can do it!'}</p>
       <div class="mcq-cat-summary">
-        ${catKeys.map(k => `<span class="mcq-cat-chip">${_categoryLabel(k)}</span>`).join('')}
+        ${catKeys.map(k => `<span class="mcq-cat-chip">${escapeHtml(_categoryLabel(k))}</span>`).join('')}
       </div>
       <div class="sfq-actions">
         ${hasMissed ? `<button class="btn btn--primary" id="vmcq-recovery">🔄 Recovery Round (${_missed.length})</button>` : ''}

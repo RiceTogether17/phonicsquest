@@ -20,6 +20,7 @@ const SUBJECTS = ['The pupil', 'My brother', 'Our teacher', 'The class monitor',
 const PLACES = ['in the canteen', 'at the void deck', 'near the school gate', 'in the library', 'at East Coast Park', 'beside the hall', 'on the field', 'at the community club'];
 
 function rotate(arr, idx) {
+  if (!arr || arr.length === 0) return [undefined, undefined, []];
   return arr[idx % arr.length];
 }
 
@@ -32,8 +33,9 @@ function shuffle(arr) {
 }
 
 function buildChoices(answer, distractors) {
-  const choices = [answer, ...distractors.slice(0, 3)];
-  return shuffle([...new Set(choices)].slice(0, 4));
+  // Filter out any distractor that duplicates the answer, then take up to 3.
+  const unique = distractors.filter(d => d !== answer).slice(0, 3);
+  return shuffle([answer, ...unique]);
 }
 
 function difficultyFor(level, idx) {
@@ -1108,3 +1110,8 @@ function buildLevel(level) {
 export const GRAMMAR_MCQ_ITEMS = Object.fromEntries(
   GRAMMAR_MCQ_LEVELS.map(level => [level, buildLevel(level)]),
 );
+
+/** Build a fresh item set for one level with a new random seed — call this each session. */
+export function buildGrammarMcqLevel(level) {
+  return buildLevel(level);
+}

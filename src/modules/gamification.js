@@ -17,6 +17,7 @@ import { isBedtimeActive } from './bedtimeMode.js';
 class Gamification {
   constructor() {
     this._sessionCorrect        = 0;
+    this._sessionStreak         = 0;
     this._sessionWrong          = 0;
     this._freezeUsedThisSession = false;
   }
@@ -141,6 +142,7 @@ class Gamification {
    */
   recordCorrect(responseTimeMs = 5000, isNewWord = false) {
     this._sessionCorrect++;
+    this._sessionStreak++;
     const reasons = [];
     let xpEarned = 0;
 
@@ -159,8 +161,8 @@ class Gamification {
       reasons.push('New word!');
     }
 
-    // Streak bonuses
-    const currentStreak = this._sessionCorrect;
+    // Streak bonuses (use _sessionStreak so wrong answers don't corrupt _sessionCorrect)
+    const currentStreak = this._sessionStreak;
     if (currentStreak === 5) {
       xpEarned += XP_REWARDS.streak_5;
       reasons.push('5 in a row!');
@@ -214,7 +216,7 @@ class Gamification {
    * @returns {{ energyLeft: number, needsRest: boolean }}
    */
   recordWrong() {
-    this._sessionCorrect = 0; // reset session streak
+    this._sessionStreak = 0;
     this._sessionWrong++;
 
     store.drainEnergy();
@@ -249,6 +251,7 @@ class Gamification {
   /** Reset session counters */
   resetSession() {
     this._sessionCorrect  = 0;
+    this._sessionStreak   = 0;
     this._sessionWrong    = 0;
     this._freezeUsedThisSession = false;
   }
