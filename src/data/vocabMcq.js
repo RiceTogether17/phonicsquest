@@ -289,6 +289,12 @@ const VOCAB_BUILDERS = {
       ['The shop was far; however, Mum walked there ___.', 'anyway', ['never', 'slowly', 'reluctantly']],
       ['Because the sun was bright, everyone wore ___ glasses.', 'sunglasses', ['mittens', 'boots', 'scarves']],
       ['He forgot his umbrella, so he got ___ in the rain.', 'wet', ['lost', 'cold', 'scared']],
+      ['Despite the cold, Mei wore only a ___ jacket outside.', 'thin', ['thick', 'warm', 'heavy']],
+      ['Because he dropped his tray, the food got ___.', 'dirty', ['tasty', 'hot', 'fresh']],
+      ['The bag was full, so Mum had to carry it ___.', 'carefully', ['lightly', 'lazily', 'quickly']],
+      ['She had not eaten all day, yet she still looked ___.', 'cheerful', ['hungry', 'weak', 'tired']],
+      ['Although the homework was long, Ali finished it ___.', 'quickly', ['slowly', 'badly', 'late']],
+      ['He left his water bottle behind; however, he was not ___ at all.', 'thirsty', ['happy', 'sleepy', 'bored']],
     ];
     const upperRows = [
       ['The map was clear; however, the route was still ___.', 'confusing', ['tidy', 'famous', 'silent']],
@@ -324,6 +330,12 @@ const VOCAB_BUILDERS = {
       ['The word "unkind" means ___.', 'not kind', ['very kind', 'most kind', 'quite kind']],
       ['"Playful" describes someone who is full of ___.', 'play', ['work', 'study', 'rest']],
       ['The prefix "pre-" in "preview" means ___.', 'before', ['after', 'again', 'not']],
+      ['The prefix "dis-" in "dislike" means you do ___ something.', 'not like', ['like a lot', 'like more', 'like later']],
+      ['A person who teaches is a ___.', 'teacher', ['teaching', 'teachful', 'teachless']],
+      ['The suffix "-ness" in "kindness" tells you it is a ___.', 'noun', ['verb', 'adjective', 'adverb']],
+      ['The word "retell" uses "re-", so it means to tell a story ___.', 'again', ['quietly', 'faster', 'badly']],
+      ['The suffix "-ly" in "slowly" tells you how something is ___.', 'done', ['seen', 'named', 'owned']],
+      ['If someone is "unwell", the prefix "un-" shows they are ___ well.', 'not', ['very', 'quite', 'most']],
     ];
     const upperRows = [
       ['The root "port" in "transport" relates to ___.', 'carrying', ['speaking', 'writing', 'building']],
@@ -357,6 +369,14 @@ const VOCAB_BUILDERS = {
       ['"Bite the bullet" means to ___ a difficult situation.', 'endure', ['escape', 'complain about', 'ignore']],
       ['"Let the cat out of the bag" means to ___ a secret.', 'reveal', ['keep', 'discover', 'hide']],
       ['When someone is "all ears", they are ___.', 'listening carefully', ['feeling tired', 'looking around', 'very hungry']],
+      ['"Keep an eye on" something means to ___ it.', 'watch carefully', ['close it', 'carry it', 'throw it away']],
+      ['"Have a heart of gold" means the person is very ___.', 'kind', ['clever', 'strong', 'noisy']],
+      ['"Give someone a hand" means to ___ someone.', 'help', ['wave at', 'clap for', 'hold hands with']],
+      ['"Out of the blue" means something happens ___.', 'suddenly', ['slowly', 'loudly', 'sadly']],
+      ['"Hold your horses" means you should ___.', 'wait', ['run faster', 'shout louder', 'sit down']],
+      ['"It is raining cats and dogs" means it is raining ___.', 'very heavily', ['very lightly', 'with animals', 'a little bit']],
+      ['"On top of the world" means feeling ___.', 'very happy', ['very tired', 'very confused', 'very hungry']],
+      ['"Get cold feet" means to feel ___ about doing something.', 'nervous', ['excited', 'ready', 'happy']],
     ];
     const upperRows = [
       ['When Jia Min said "break the ice", she meant to ___.', 'start friendly conversation', ['smash something cold', 'end the meeting', 'draw a cube']],
@@ -414,6 +434,12 @@ const VOCAB_BUILDERS = {
       ['We can use a ___ to see very small things.', 'microscope', ['telescope', 'compass', 'ruler']],
       ['The force that pulls objects toward the Earth is called ___.', 'gravity', ['friction', 'pressure', 'tension']],
       ['A ___ is used to measure how hot or cold something is.', 'thermometer', ['barometer', 'compass', 'ruler']],
+      ['A ___ is a baby cat.', 'kitten', ['puppy', 'chick', 'calf']],
+      ['We use our ___ to hear sounds around us.', 'ears', ['eyes', 'nose', 'tongue']],
+      ['Plants need ___ from the sun to make their own food.', 'sunlight', ['rainwater', 'soil', 'wind']],
+      ['Ice is water that has been ___.', 'frozen', ['boiled', 'dried', 'melted']],
+      ['We breathe in ___ to stay alive.', 'air', ['water', 'soil', 'light']],
+      ['A ___ spins to show which direction is north.', 'compass', ['ruler', 'clock', 'scale']],
     ];
     const p3p4Rows = [
       ['Plants make food using sunlight through ___.', 'photosynthesis', ['evaporation', 'erosion', 'migration']],
@@ -426,6 +452,12 @@ const VOCAB_BUILDERS = {
       ['Electricity that builds up on the surface of an object is called ___ electricity.', 'static', ['current', 'magnetic', 'thermal']],
       ['Animals that eat both plants and other animals for food are called ___.', 'omnivores', ['herbivores', 'carnivores', 'decomposers']],
       ['A ___ is a device that converts solar energy into electrical energy.', 'solar panel', ['generator', 'turbine', 'circuit']],
+      ['The process by which water vapour cools and turns back into liquid is called ___.', 'condensation', ['evaporation', 'precipitation', 'absorption']],
+      ['Animals with a backbone are called ___.', 'vertebrates', ['invertebrates', 'mammals', 'reptiles']],
+      ['The type of simple machine that allows a load to be lifted using a wheel and a rope is a ___.', 'pulley', ['lever', 'wedge', 'screw']],
+      ['When a solid changes directly into a gas without becoming a liquid first, the process is called ___.', 'sublimation', ['evaporation', 'condensation', 'melting']],
+      ['A complete path along which electricity flows is called a ___.', 'circuit', ['magnet', 'current', 'filament']],
+      ['The stage of a plant\'s life when a seed starts to grow into a new plant is called ___.', 'germination', ['pollination', 'photosynthesis', 'fertilisation']],
     ];
     const upperRows = [
       ['The study of heredity and genetic variation in living organisms is called ___.', 'genetics', ['genomics', 'taxonomy', 'ecology']],
@@ -464,6 +496,12 @@ const VOCAB_BUILDERS = {
       ['A person who keeps the neighbourhood safe is a ___.', 'police officer', ['firefighter', 'doctor', 'teacher']],
       ['The building where a country\'s government meets is called the ___.', 'parliament', ['court', 'embassy', 'town hall']],
       ['A large town where many people live and work is called a ___.', 'city', ['village', 'estate', 'suburb']],
+      ['A person who puts out fires to keep the community safe is a ___.', 'firefighter', ['teacher', 'sailor', 'pilot']],
+      ['The place where people go to borrow books for free is called a ___.', 'library', ['stadium', 'market', 'clinic']],
+      ['The flag of our country is a national ___.', 'symbol', ['food', 'sport', 'song']],
+      ['A person who delivers letters and packages to your home is a ___.', 'postman', ['driver', 'guard', 'vendor']],
+      ['The money that the government collects from workers to pay for services is called ___.', 'tax', ['fees', 'fines', 'wages']],
+      ['A place in the neighbourhood where sick people can see a doctor is a ___.', 'clinic', ['temple', 'mosque', 'stadium']],
     ];
     const p3p4Rows = [
       ['People choose leaders during an ___.', 'election', ['excursion', 'eruption', 'equation']],
@@ -476,6 +514,12 @@ const VOCAB_BUILDERS = {
       ['A formal agreement between countries to trade freely is a ___ agreement.', 'free trade', ['diplomatic', 'cultural', 'security']],
       ['The duty of citizens to obey the laws and contribute to society is called ___.', 'civic responsibility', ['social obligation', 'moral duty', 'legal practice']],
       ['The system of rules that governs a country is called the ___.', 'constitution', ['statute', 'legislation', 'ordinance']],
+      ['A group of countries in Southeast Asia that work together is called ___.', 'ASEAN', ['NATO', 'UNESCO', 'APEC']],
+      ['The person who represents their country in another country is called an ___.', 'ambassador', ['inspector', 'accountant', 'engineer']],
+      ['The process of selling goods made in Singapore to other countries is called ___.', 'exporting', ['importing', 'distributing', 'recycling']],
+      ['A person who is born in a country or who has been given the rights of belonging to that country is a ___.', 'citizen', ['resident', 'tourist', 'migrant']],
+      ['The principle of treating all people fairly and equally, regardless of their background, is called ___.', 'equality', ['diversity', 'harmony', 'loyalty']],
+      ['The government department responsible for collecting taxes in Singapore is called the ___.', 'IRAS', ['MAS', 'CPF', 'HDB']],
     ];
     const upperRows = [
       ['The expansion of connections between countries through trade and communication is called ___.', 'globalisation', ['urbanisation', 'industrialisation', 'migration']],
@@ -895,10 +939,11 @@ function toCanonicalCategory(cat) {
 }
 
 function buildLevel(level) {
-  const target = 150;
+  const target = 200;
   const cats = LEVEL_CATEGORY_PLAN[level];
   const items = [];
-  const categoryCursor = Object.fromEntries(cats.map(c => [c, 0]));
+  const sessionSeed = Math.floor(Math.random() * 10);
+  const categoryCursor = Object.fromEntries(cats.map(c => [c, sessionSeed]));
 
   for (let i = 0; i < target; i += 1) {
     const baseCat = cats[i % cats.length];

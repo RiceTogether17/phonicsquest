@@ -9,11 +9,11 @@ export const GRAMMAR_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 
 const LEVEL_CATEGORY_PLAN = {
   P1: ['articles', 'pronouns', 'demonstratives', 'whQuestions', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'possessives', 'quantifiers'],
-  P2: ['articles', 'pronouns', 'reflexivePronouns', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'connectors', 'countableUncountable', 'futureTense', 'whQuestions', 'demonstratives', 'pastCont', 'quantifiers', 'possessives'],
-  P3: ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'pastCont', 'prepositions', 'connectors', 'conjunctions', 'comparatives', 'modals', 'tagQuestions', 'compoundIndefinite', 'quantifiers', 'possessives', 'reflexivePronouns', 'whQuestions', 'futureTense', 'presentPerfect', 'tenseAwareness', 'countableUncountable', 'adjAdverbs', 'auxiliaries', 'superlatives'],
-  P4: ['svAgreement', 'presentPerfect', 'pastCont', 'futureTense', 'prepositions', 'connectors', 'quantifiers', 'adjAdverbs', 'auxiliaries', 'conjunctions', 'possessives', 'reflexivePronouns', 'whQuestions', 'countableUncountable', 'pronouns', 'tagQuestions', 'compoundIndefinite', 'simplePast', 'presentCont', 'perfectContinuousTenses', 'pastPerfect', 'modals', 'comparatives', 'conditionals', 'tenseAwareness', 'superlatives'],
-  P5: ['svAgreement', 'tenseAwareness', 'presentPerfect', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'quantifiers', 'mixedGrammar', 'pastCont', 'reflexivePronouns', 'futureTense', 'countableUncountable', 'adjAdverbs', 'auxiliaries', 'tagQuestions', 'compoundIndefinite', 'simplePast', 'presentCont', 'comparatives', 'prepositions', 'connectors', 'conjunctions', 'superlatives'],
-  P6: ['tenseAwareness', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'inversion', 'auxiliaries', 'connectors', 'mixedGrammar', 'pastCont', 'quantifiers', 'reflexivePronouns', 'futureTense', 'presentPerfect', 'countableUncountable', 'adjAdverbs', 'tagQuestions', 'compoundIndefinite', 'simplePast', 'presentCont', 'prepositions', 'conjunctions', 'svAgreement', 'superlatives'],
+  P2: ['articles', 'pronouns', 'reflexivePronouns', 'svAgreement', 'simplePast', 'presentCont', 'prepositions', 'connectors', 'countableUncountable', 'futureTense', 'whQuestions', 'demonstratives', 'pastCont', 'quantifiers', 'possessives', 'homophones'],
+  P3: ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'pastCont', 'prepositions', 'connectors', 'conjunctions', 'comparatives', 'modals', 'tagQuestions', 'compoundIndefinite', 'quantifiers', 'possessives', 'reflexivePronouns', 'whQuestions', 'futureTense', 'presentPerfect', 'tenseAwareness', 'countableUncountable', 'adjAdverbs', 'auxiliaries', 'superlatives', 'demonstratives', 'homophones', 'wordForms'],
+  P4: ['svAgreement', 'presentPerfect', 'pastCont', 'futureTense', 'prepositions', 'connectors', 'quantifiers', 'adjAdverbs', 'auxiliaries', 'conjunctions', 'possessives', 'reflexivePronouns', 'whQuestions', 'countableUncountable', 'pronouns', 'tagQuestions', 'compoundIndefinite', 'simplePast', 'presentCont', 'perfectContinuousTenses', 'pastPerfect', 'modals', 'comparatives', 'conditionals', 'tenseAwareness', 'superlatives', 'gerundInfinitive', 'homophones', 'wordForms'],
+  P5: ['svAgreement', 'tenseAwareness', 'presentPerfect', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'quantifiers', 'mixedGrammar', 'pastCont', 'reflexivePronouns', 'futureTense', 'countableUncountable', 'adjAdverbs', 'auxiliaries', 'tagQuestions', 'compoundIndefinite', 'simplePast', 'presentCont', 'comparatives', 'prepositions', 'connectors', 'conjunctions', 'superlatives', 'gerundInfinitive', 'homophones', 'wordForms'],
+  P6: ['tenseAwareness', 'pastPerfect', 'perfectContinuousTenses', 'conditionals', 'passiveVoice', 'relativeClauses', 'reportedSpeech', 'modals', 'inversion', 'auxiliaries', 'connectors', 'mixedGrammar', 'pastCont', 'quantifiers', 'reflexivePronouns', 'futureTense', 'presentPerfect', 'countableUncountable', 'adjAdverbs', 'tagQuestions', 'compoundIndefinite', 'simplePast', 'presentCont', 'prepositions', 'conjunctions', 'svAgreement', 'superlatives', 'gerundInfinitive', 'comparatives', 'homophones', 'wordForms'],
 };
 
 const SUBJECTS = ['The pupil', 'My brother', 'Our teacher', 'The class monitor', 'The twins', 'The players', 'Her cousin', 'The science team'];
@@ -61,6 +61,10 @@ const GRAMMAR_BUILDERS = {
       ['___ ice-cream treat awaited each pupil after Sports Day.', 'An', ['A', 'The', 'Some']],
       ['The new pupil gave ___ interesting talk about her home country.', 'an', ['a', 'the', 'some']],
       ['The principal made ___ announcement about the upcoming camp.', 'an', ['a', 'the', 'some']],
+      ['___ Sun rises in the east and sets in the west every day.', 'The', ['A', 'An', 'Some']],
+      ['My father is ___ engineer who works in Jurong Island.', 'an', ['a', 'the', 'some']],
+      ['Mdm Siti is ___ principal of our school this year.', 'the', ['a', 'an', 'some']],
+      ['Would you like ___ ice-cold water after your PE lesson?', 'some', ['a', 'an', 'the']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return {
@@ -86,6 +90,13 @@ const GRAMMAR_BUILDERS = {
       ['My sister lost her pencil. I lent ___ mine for the rest of the lesson.', 'her', ['she', 'hers', 'herself']],
       ['The kitten knocked over the cup. ___ fell off the table.', 'It', ['He', 'She', 'They']],
       ['Our class won the quiz. The teacher praised ___.', 'us', ['we', 'our', 'ours']],
+      ['Bala and I were late, so ___ ran to the classroom together.', 'we', ['us', 'they', 'them']],
+      ['Mum bought a new lunchbox and ___ is blue and yellow.', 'it', ['he', 'she', 'they']],
+      ['The children sat at the void deck because ___ were tired.', 'they', ['them', 'we', 'it']],
+      ['My brother forgot his umbrella, so I passed ___ mine.', 'him', ['he', 'his', 'them']],
+      ['Siti left her bag at the canteen, so the teacher kept ___ safe.', 'her', ['she', 'hers', 'it']],
+      ['The teacher asked Bala and ___ to clean the board.', 'us', ['we', 'they', 'them']],
+      ['Can you help ___? I cannot open my locker.', 'me', ['I', 'my', 'mine']],
     ];
     const upperRows = [
       ['The girls were late, so ___ apologised to the teacher.', 'they', ['them', 'their', 'theirs']],
@@ -101,7 +112,7 @@ const GRAMMAR_BUILDERS = {
     ];
     const rows = level === 'P1' ? p1Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'pronoun_form', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the pronoun form that fits the sentence role.' };
+    return { subskill: 'pronoun_form', q, choices: buildChoices(answer, ds), answer, explain: 'Subject pronouns (I, he, she, we, they) do the action. Object pronouns (me, him, her, us, them) receive it. After prepositions and as objects, use the object form — e.g. "between Daniel and me", "thanked them".' };
   },
   reflexivePronouns(level, i) {
     const rows = [
@@ -149,6 +160,10 @@ const GRAMMAR_BUILDERS = {
       ['Father has fixed the broken chair, ___ he?', 'hasn\'t', ['has', 'does', 'doesn\'t']],
       ['Aunty Lin would prefer chicken rice, ___ she?', 'wouldn\'t', ['would', 'does', 'doesn\'t']],
       ['Your brother could not find his keys, ___ he?', 'could', ['couldn\'t', 'can', 'can\'t']],
+      ['The bus will arrive at eight, ___ it?', 'won\'t', ['will', 'does', 'doesn\'t']],
+      ['You have been to the science centre before, ___ you?', 'haven\'t', ['have', 'did', 'didn\'t']],
+      ['It was raining when you left school, ___ it?', 'wasn\'t', ['was', 'is', 'isn\'t']],
+      ['We need not bring our art files today, ___ we?', 'need', ['needn\'t', 'do', 'don\'t']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return {
@@ -177,6 +192,10 @@ const GRAMMAR_BUILDERS = {
       ['___ has been moved on my desk — my pencil case is in the wrong spot!', 'Something', ['Nothing', 'Anything', 'Everything']],
       ['The shop was so quiet that there was ___ inside except the cashier.', 'no one', ['someone', 'anyone', 'everyone']],
       ['Let us go ___ peaceful and read a book together this afternoon.', 'somewhere', ['anywhere', 'nowhere', 'everywhere']],
+      ['The playground was empty — there was ___ in sight on such a hot afternoon.', 'no one', ['anyone', 'someone', 'everyone']],
+      ['After the storm, the debris had blown ___ — the field, the carpark, even the rooftop.', 'everywhere', ['somewhere', 'anywhere', 'nowhere']],
+      ['The librarian checked all the shelves but could not find the book ___.', 'anywhere', ['somewhere', 'nowhere', 'everywhere']],
+      ['The park was so dark that Mum said there was ___ safe to sit.', 'nowhere', ['somewhere', 'anywhere', 'everywhere']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return {
@@ -204,6 +223,11 @@ const GRAMMAR_BUILDERS = {
       ['"Please stack ___ chairs here against the wall before the parents arrive," said the teacher, pointing to the chairs beside her.', 'these', ['those', 'this', 'that']],
       ['"___ pupil by the window — please sit up straight," the teacher said.', 'That', ['This', 'These', 'Those']],
       ['Look at ___ clouds in the distance. I think it might rain later.', 'those', ['these', 'this', 'that']],
+      ['___ shoes near the door belong to my older brother.', 'Those', ['These', 'This', 'That']],
+      ['Can you pass me ___ stapler on the table right in front of you?', 'that', ['this', 'these', 'those']],
+      ['___ two boys standing beside the flagpole are in my class.', 'Those', ['These', 'That', 'This']],
+      ['I bought ___ new eraser at the school bookshop just now.', 'this', ['that', 'these', 'those']],
+      ['___ worksheet that Teacher handed out yesterday was very challenging.', 'That', ['This', 'Those', 'These']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return {
@@ -231,6 +255,11 @@ const GRAMMAR_BUILDERS = {
       ['"___ colour would you like for your name card?" asked the art teacher.', 'Which', ['What', 'Whose', 'How']],
       ['"___ is the science lab? I cannot find it," the new student said.', 'Where', ['When', 'Why', 'How']],
       ['"___ did you arrive late today, Sam?" the teacher asked with concern.', 'Why', ['How', 'When', 'Where']],
+      ['"___ time does the school bus arrive at the bus stop?" Ali asked.', 'What', ['When', 'Where', 'Which']],
+      ['"___ long does it take you to walk from your home to school?" asked the teacher.', 'How', ['What', 'When', 'Why']],
+      ['"___ book is this? It does not have a name written on it," said the teacher.', 'Whose', ['Who', 'Which', 'What']],
+      ['"___ is your grandmother? I heard she was not feeling well," said Auntie.', 'How', ['What', 'Who', 'Where']],
+      ['"___ is the date of the school Sports Day this year?" the pupil asked.', 'When', ['What', 'Where', 'Which']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return {
@@ -238,7 +267,7 @@ const GRAMMAR_BUILDERS = {
       q,
       choices: buildChoices(answer, ds),
       answer,
-      explain: 'Wh- words ask about time (when), place (where), reason (why), manner (how), choice (which).',
+      explain: 'who = person; whose = ownership; what = thing or action; which = choice from a set; when = time; where = place; why = reason; how = manner or degree. Look at what the answer in the sentence is about.',
     };
   },
   svAgreement(level, i) {
@@ -258,6 +287,11 @@ const GRAMMAR_BUILDERS = {
       ['The pair of scissors ___ on the craft table.', 'is', ['are', 'were', 'be']],
       ['Everyone on the bus ___ to arrive by seven.', 'needs', ['need', 'needed', 'needing']],
       ['The committee ___ its decision after a long discussion.', 'made', ['make', 'makes', 'making']],
+      ['The number of students who passed the test ___ very encouraging.', 'is', ['are', 'were', 'have been']],
+      ['A group of boys ___ playing catching in the school field.', 'is', ['are', 'were', 'have']],
+      ['Physics ___ my favourite subject this year.', 'is', ['are', 'were', 'have been']],
+      ['The audience ___ clapping loudly after the school concert ended.', 'was', ['were', 'is', 'are']],
+      ['None of the students ___ submitted their project on time.', 'has', ['have', 'had', 'were']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Match the verb with the true subject — collective nouns and "each/one/either" take a singular verb.' };
@@ -270,6 +304,20 @@ const GRAMMAR_BUILDERS = {
       ['As a young boy, Grandfather ___ in this river.', 'swam', ['swim', 'swims', 'swum']],
       ['Last night, Dad ___ us a bedtime story.', 'told', ['tell', 'tells', 'telling']],
       ['Yesterday, we ___ pizza at the food court.', 'ate', ['eat', 'eats', 'eating']],
+      ['Yesterday, I ___ my teeth before going to school.', 'brushed', ['brush', 'brushes', 'is brushing']],
+      ['Last night, Mei ___ a picture of her family.', 'drew', ['draw', 'draws', 'is drawing']],
+      ['This morning, we ___ a cartoon before breakfast.', 'watched', ['watch', 'watches', 'is watching']],
+      ['Yesterday, Grandma ___ me a red packet at the void deck.', 'gave', ['give', 'gives', 'is giving']],
+      ['Yesterday morning, Mum ___ me to school because it was raining.', 'drove', ['drive', 'drives', 'is driving']],
+      ['Just now, Ahmad ___ the ball and scored a goal.', 'caught', ['catch', 'catches', 'is catching']],
+      ['This morning, the whole school ___ around the field for PE.', 'ran', ['run', 'runs', 'is running']],
+      ['Yesterday, I ___ two glasses of cold water after recess.', 'drank', ['drink', 'drinks', 'is drinking']],
+      ['Last night, we ___ happy birthday to my little sister.', 'sang', ['sing', 'sings', 'is singing']],
+      ['This morning, Dad ___ new stationery for me at the bookshop.', 'bought', ['buy', 'buys', 'is buying']],
+      ['Yesterday, Siti ___ her friend carry the books to the classroom.', 'helped', ['help', 'helps', 'is helping']],
+      ['Just now, I ___ my water bottle and it spilled on the floor.', 'dropped', ['drop', 'drops', 'is dropping']],
+      ['This morning, the prefect ___ the school gate for the teachers.', 'opened', ['open', 'opens', 'is opening']],
+      ['Yesterday during recess, Raju ___ the ball against the wall.', 'kicked', ['kick', 'kicks', 'is kicking']],
     ];
     const p2Rows = [
       ['I was studying in my bedroom when I ___ a loud noise.', 'heard', ['hear', 'hears', 'was hearing']],
@@ -298,7 +346,7 @@ const GRAMMAR_BUILDERS = {
     ];
     const rows = level === 'P1' ? p1Rows : level === 'P2' ? p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'past_tense_form', q, choices: buildChoices(answer, ds), answer, explain: 'Past time markers require a past-tense verb.' };
+    return { subskill: 'past_tense_form', q, choices: buildChoices(answer, ds), answer, explain: 'Time markers like yesterday, last week, just now, and ago signal simple past. Regular verbs add -ed (baked, walked). Irregular verbs change form (go→went, eat→ate, blow→blew, win→won) — these must be memorised.' };
   },
   presentCont(level, i) {
     const rows = [
@@ -312,6 +360,16 @@ const GRAMMAR_BUILDERS = {
       ['The art teacher ___ a beautiful mural at this very moment.', 'is painting', ['paints', 'painted', 'are painting']],
       ['Right now, our librarian ___ the new books on the shelves.', 'is arranging', ['arranges', 'arrange', 'are arranging']],
       ['Look — the puppies ___ in the playpen!', 'are tumbling', ['tumbles', 'tumble', 'is tumbling']],
+      ['Look! The cat ___ on top of the HDB letterbox.', 'is sitting', ['sit', 'sat', 'are sitting']],
+      ['Right now, Father ___ the dishes after dinner.', 'is washing', ['washes', 'washed', 'are washing']],
+      ['Listen! The teacher ___ the instructions for the game.', 'is reading', ['read', 'reads', 'are reading']],
+      ['At the moment, the boys ___ their shoes before PE.', 'are tying', ['ties', 'tie', 'is tying']],
+      ['Look! My little sister ___ the cat with a ribbon.', 'is chasing', ['chases', 'chased', 'are chasing']],
+      ['Right now, the canteen auntie ___ fresh noodles for us.', 'is frying', ['fries', 'fried', 'are frying']],
+      ['Look! The twins ___ the void deck for the party.', 'are sweeping', ['sweep', 'swept', 'is sweeping']],
+      ['At the moment, our class ___ a thank-you card for the teacher.', 'is making', ['make', 'made', 'are making']],
+      ['Listen! The birds ___ outside the classroom window.', 'are chirping', ['chirp', 'chirped', 'is chirping']],
+      ['Right now, Mum ___ the MRT to meet us at Jurong East.', 'is taking', ['take', 'took', 'are taking']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'present_continuous', q, choices: buildChoices(answer, ds), answer, explain: 'Use present continuous for actions happening now.' };
@@ -332,6 +390,12 @@ const GRAMMAR_BUILDERS = {
       ['The bird perched ___ the branch and sang a sweet song.', 'on', ['at', 'in', 'under']],
       ['She waited ___ the bus stop for almost twenty minutes.', 'at', ['in', 'on', 'by']],
       ['The dog sat ___ the two children in the photograph.', 'between', ['among', 'beside', 'behind']],
+      ['The kitten is sleeping ___ the void deck bench.', 'under', ['on', 'above', 'into']],
+      ['We must line up ___ the classroom door before we go in.', 'at', ['on', 'in', 'over']],
+      ['Grandma keeps her glasses ___ her purse.', 'in', ['on', 'at', 'under']],
+      ['The ball landed ___ the two flowerpots.', 'between', ['above', 'behind', 'beside']],
+      ['My little brother sat ___ me on the MRT.', 'beside', ['above', 'into', 'behind']],
+      ['School starts ___ seven thirty in the morning.', 'at', ['on', 'in', 'by']],
     ];
     const p2Rows = [
       ['The cyclist took shelter ___ the bridge as it was raining.', 'under', ['at', 'on', 'above']],
@@ -360,7 +424,7 @@ const GRAMMAR_BUILDERS = {
     ];
     const rows = level === 'P1' ? p1Rows : level === 'P2' ? p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'preposition_use', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the preposition that best shows time, place or movement.' };
+    return { subskill: 'preposition_use', q, choices: buildChoices(answer, ds), answer, explain: 'Place: on (surface), in (enclosed), at (point/location), between (two), among (many). Movement: into, onto, across, through, over, along. Time: at (clock time), on (date/day), in (month/year), by (deadline), from…to (range).' };
   },
   possessives(level, i) {
     const rows = [
@@ -374,9 +438,19 @@ const GRAMMAR_BUILDERS = {
       ['Dan said the spare key on the table is ___.', 'his', ['he', 'him', 'himself']],
       ['Daniel and Mei brought ___ projects to school in clear folders.', 'their', ['theirs', 'them', 'they']],
       ['Each student must label ___ exercise book before the lesson begins.', 'his or her', ['theirs', 'them', 'their\'s']],
+      ['That blue water bottle is not mine. It is ___.', 'his', ['he', 'him', 'himself']],
+      ['Mei forgot her umbrella, so I lent her ___.', 'mine', ['my', 'me', 'myself']],
+      ['The girls packed ___ own snacks for the school trip.', 'their', ['theirs', 'them', 'they']],
+      ['The dog wagged ___ tail when it heard the doorbell.', 'its', ["it's", 'their', 'his']],
+      ['"Is this storybook ___, or does it belong to the class?" the teacher asked Siti.', 'yours', ['your', 'you', 'yourself']],
+      ['My sister and I share ___ bedroom at home.', 'our', ['ours', 'us', 'we']],
+      ['Tom left ___ lunchbox in the canteen by mistake.', 'his', ['he', 'him', 'himself']],
+      ['The red pencil case on the floor is not ___ — mine is blue.', 'hers', ['her', 'she', 'herself']],
+      ['My classmates finished ___ project before the deadline.', 'their', ['theirs', 'them', 'they']],
+      ['Grandma made these kueh herself. They are all ___.', 'hers', ['her', 'she', 'herself']],
     ];
     const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'possessive_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Use the possessive word that shows ownership clearly.' };
+    return { subskill: 'possessive_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Possessive adjectives (my, your, his, her, its, our, their) come before a noun. Possessive pronouns (mine, yours, his, hers, ours, theirs) stand alone. Never use an apostrophe in "its" when showing ownership.' };
   },
   quantifiers(level, i) {
     const p1Rows = [
@@ -393,6 +467,13 @@ const GRAMMAR_BUILDERS = {
       ['Can I have ___ more time to finish my drawing?', 'a little', ['a few', 'many', 'much']],
       ['There were ___ clouds in the sky, so we stayed outside to play.', 'few', ['little', 'much', 'many']],
       ['He ate ___ biscuits but saved the rest for his sister.', 'some', ['any', 'much', 'a little']],
+      ['Would you like ___ more rice from the canteen?', 'some', ['any', 'much', 'many']],
+      ['There are ___ pupils waiting at the bus stop after school.', 'a few', ['a little', 'much', 'any']],
+      ['We do not have ___ time left before the bell rings.', 'much', ['many', 'a few', 'some']],
+      ['She drank ___ water because she was very thirsty.', 'a little', ['a few', 'many', 'much']],
+      ['Are there ___ seats left on the MRT?', 'any', ['some', 'much', 'a little']],
+      ['___ of my friends live in HDB flats near the school.', 'Many', ['Much', 'A little', 'Any']],
+      ['I only have ___ coins left in my wallet for the canteen.', 'a few', ['a little', 'much', 'many']],
     ];
     const upperRows = [
       ['There are ___ marbles in this small pouch.', 'few', ['little', 'much', 'less']],
@@ -468,12 +549,22 @@ const GRAMMAR_BUILDERS = {
       ['Look at those clouds — it ___ heavily in a few minutes.', 'is going to rain', ['rains', 'rained', 'has rained']],
       ['Hold on a second — I ___ the door for you.', 'will open', ['open', 'opened', 'am opening']],
       ['By tomorrow morning, my brother ___ his last exam paper.', 'will finish', ['finishes', 'finished', 'has finished']],
+      ['Sam has bought all the ingredients — he ___ laksa for dinner tonight.', 'is going to cook', ['cooks', 'cooked', 'will cooking']],
+      ['The cinema doors ___ at seven o\'clock tomorrow evening.', 'will open', ['open', 'opened', 'are opening']],
+      ['Look at that enormous wave — it ___ the sandcastle!', 'is going to knock over', ['knocks over', 'knocked over', 'has knocked over']],
+      ['I promise I ___ your secret — not a word to anyone.', 'will keep', ['keep', 'kept', 'am keeping']],
+      ['We ___ our family in Penang during the June school holidays.', 'are visiting', ['visit', 'visited', 'have visited']],
+      ['"___ you be joining the astronomy club this term?" the teacher asked Daniel.', 'Will', ['Did', 'Do', 'Are']],
+      ['The school canteen ___ a new section for healthy snacks next month.', 'is going to have', ['has', 'had', 'is having']],
+      ['My flight ___ at six in the morning, so I need to wake up very early.', 'departs', ['will depart', 'departed', 'is departing']],
+      ['By next year, the new community centre ___ its doors to the public.', 'will open', ['opens', 'opened', 'is opening']],
+      ['I already told Mrs Tan — we ___ the performance for her birthday celebration next Friday.', 'are performing', ['perform', 'performed', 'will performing']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'future_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Use future forms for plans, promises or predictions.' };
   },
   conjunctions(level, i) {
-    const rows = [
+    const lowerRows = [
       ['Would you prefer noodles ___ rice for lunch?', 'or', ['and', 'but', 'because']],
       ['He stayed quiet ___ he was unsure of the answer.', 'because', ['or', 'but', 'so']],
       ['Pack an extra jacket, ___ the mountain evenings can be surprisingly cold.', 'for', ['yet', 'or', 'and']],
@@ -485,8 +576,21 @@ const GRAMMAR_BUILDERS = {
       ['I left early ___ I would not be caught in the storm.', 'so that', ['because', 'or', 'but']],
       ['The volunteers were patient ___ kind to every visitor in the booth.', 'and', ['but', 'or', 'so']],
     ];
+    const upperRows = [
+      ['The proposal was well-researched; ___, it was approved without changes.', 'consequently', ['nevertheless', 'however', 'although']],
+      ['She trained hard throughout the year. ___, she did not qualify for the finals.', 'Nevertheless', ['Therefore', 'Furthermore', 'Consequently']],
+      ['The talk was long; ___, every pupil stayed attentive throughout.', 'nonetheless', ['otherwise', 'therefore', 'subsequently']],
+      ['He scored well in English ___ despite struggling with comprehension early in the year.', 'although', ['nevertheless', 'consequently', 'furthermore']],
+      ['The hall was packed; ___, latecomers had to stand at the back.', 'as a result', ['in contrast', 'on the other hand', 'nonetheless']],
+      ['The first plan failed. ___, the team drafted a revised proposal overnight.', 'Subsequently', ['Nevertheless', 'Furthermore', 'Consequently']],
+      ['The campsite looked beautiful; ___, it was far too remote for young children.', 'however', ['therefore', 'furthermore', 'subsequently']],
+      ['She prepared thoroughly ___ she still felt nervous before the speech.', 'although', ['consequently', 'furthermore', 'nonetheless']],
+      ['The evidence was incomplete; ___, the committee deferred its decision.', 'therefore', ['however', 'furthermore', 'subsequently']],
+      ['The new system saves time. ___, it reduces the risk of human error.', 'Furthermore', ['Nevertheless', 'Consequently', 'However']],
+    ];
+    const rows = (level === 'P5' || level === 'P6') ? upperRows : lowerRows;
     const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'conjunction_function', q, choices: buildChoices(answer, ds), answer, explain: 'Pick the conjunction that links the clauses correctly.' };
+    return { subskill: 'conjunction_function', q, choices: buildChoices(answer, ds), answer, explain: 'and = adds; but/yet = contrast; or = choice; so/so that = result/purpose; because/for = reason; after/before/when = time sequence. Check whether the two clauses agree or contrast, and what relationship connects them.' };
   },
   comparatives(level, i) {
     const rows = [
@@ -500,6 +604,16 @@ const GRAMMAR_BUILDERS = {
       ['This year\'s school musical is ___ than last year\'s play.', 'more entertaining', ['entertaining', 'most entertaining', 'entertainingest']],
       ['My cousin is ___ than I am, even though he is two years younger.', 'taller', ['tall', 'tallest', 'more tall']],
       ['Walking home is ___ than waiting for the late bus.', 'quicker', ['quick', 'quickest', 'more quick']],
+      ['My new schoolbag is ___ than my old one, so it is easier to carry.', 'lighter', ['light', 'lightest', 'more light']],
+      ['The second attempt was ___ than the first because we had more practice.', 'worse', ['bad', 'worst', 'more bad']],
+      ['The library near Grandma\'s house is ___ from our school than the one in our estate.', 'farther', ['far', 'farthest', 'more far']],
+      ['My school bag feels ___ on Fridays when I bring all my books home.', 'heavier', ['heavy', 'heaviest', 'more heavy']],
+      ['We should be ___ when handling the science equipment.', 'more careful', ['careful', 'most careful', 'carefullier']],
+      ['After joining the debate club, Priya became ___ when speaking in front of the class.', 'more confident', ['confident', 'most confident', 'confidentest']],
+      ['The hawker stall near the bus stop is ___ than the café inside the shopping mall.', 'less expensive', ['expensive', 'least expensive', 'lesser expensive']],
+      ['The school canteen got a ___ drinks machine after the old one broke down last term.', 'newer', ['new', 'newest', 'more new']],
+      ['On clear nights, the moon looks ___ than usual from the rooftop garden.', 'brighter', ['bright', 'brightest', 'more bright']],
+      ['Taking the MRT is ___ than taking the bus during the morning rush hour.', 'more convenient', ['convenient', 'most convenient', 'convenientest']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'comparative_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Use a comparative form when comparing two things.' };
@@ -523,7 +637,7 @@ const GRAMMAR_BUILDERS = {
     return { subskill: 'superlative_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Use a superlative form (-est or "most ___") to compare three or more things, with "the" before it.' };
   },
   modals(level, i) {
-    const rows = [
+    const lowerRows = [
       ['You ___ submit the form by Friday.', 'must', ['might', 'could', 'would']],
       ['May I borrow your marker? Yes, you ___.', 'may', ['must', 'should', 'would']],
       ['If you feel unwell, you ___ see the school nurse.', 'should', ['might', 'would', 'can\'t']],
@@ -535,8 +649,21 @@ const GRAMMAR_BUILDERS = {
       ['You ___ be tired after such a long walk. Sit down for a while.', 'must', ['can', 'might', 'will']],
       ['I ___ swim across the entire pool by myself now!', 'can', ['must', 'should', 'may']],
     ];
+    const upperRows = [
+      ['She ___ her calculator at home — she had to borrow one for the test.', 'must have left', ['should leave', 'must leave', 'could leave']],
+      ['You ___ told me earlier — I would have waited for you.', 'should have', ['should', 'must have', 'could']],
+      ['He looks pale; he ___ been unwell since the start of the week.', 'must have', ['should have', 'could have', 'would have']],
+      ['We ___ finished the whole project by now if the printer had not broken down.', 'could have', ['could', 'must have', 'should']],
+      ['She ___ left without saying goodbye — that is so unlike her.', 'cannot have', ['could not', 'must not have', 'should not']],
+      ['If only I ___ studied harder, I might have scored better.', 'had', ['have', 'would have', 'could']],
+      ['You ___ not have borrowed the book without asking — it is not yours.', 'should', ['must', 'could', 'might']],
+      ['They ___ arrived already — the bus was supposed to leave an hour ago.', 'should have', ['must have', 'could have', 'would']],
+      ['I ___ have imagined it — the lights really did flicker on their own.', 'could not', ['must not', 'should not', 'would not']],
+      ['He ___ have known about the change in the timetable; he was absent that day.', 'might not', ['must not', 'should not', 'could']],
+    ];
+    const rows = (level === 'P5' || level === 'P6') ? upperRows : lowerRows;
     const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'modal_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the modal that expresses the intended rule or advice.' };
+    return { subskill: 'modal_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'must = strong obligation or logical certainty; should = advice; may/can = permission; might/could = possibility; must not = prohibition; have to = external obligation. Read the context to decide the strength and type of meaning needed.' };
   },
   presentPerfect(level, i) {
     const rows = [
@@ -552,6 +679,14 @@ const GRAMMAR_BUILDERS = {
       ['The cleaners ___ the corridor, so please walk carefully on the wet floor.', 'have just mopped', ['just mop', 'just mopping', 'were mopping']],
       ['She ___ her room since Monday — it has become a mess.', 'has not tidied', ['did not tidy', 'is not tidying', 'had not tidied']],
       ['The technician ___ the broken projector, so the lesson can begin.', 'has fixed', ['fixed', 'had fixed', 'is fixing']],
+      ['The students ___ already submitted their science projects.', 'have', ['has', 'had', 'are']],
+      ['Mr Tan ___ not yet received the permission slips from all parents.', 'has', ['have', 'had', 'was']],
+      ['We ___ never seen such a beautiful display at the science fair.', 'have', ['has', 'had', 'were']],
+      ['___ you ever tried chilli crab at a hawker centre?', 'Have', ['Has', 'Had', 'Did']],
+      ['The library ___ just introduced a new self-borrowing machine.', 'has', ['have', 'had', 'was']],
+      ['My grandmother ___ lived in the same flat since 1985.', 'has', ['have', 'had', 'is']],
+      ['The players ___ not trained since the last public holiday.', 'have', ['has', 'had', 'were']],
+      ['The bus ___ just left, so we will have to wait for the next one.', 'has', ['have', 'had', 'was']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'present_perfect', q, choices: buildChoices(answer, ds), answer, explain: 'Present perfect links a past action to the present result.' };
@@ -570,6 +705,14 @@ const GRAMMAR_BUILDERS = {
       ['Sarah ___ a postcard to her cousin when the phone rang.', 'was writing', ['wrote', 'has written', 'is writing']],
       ['The little kittens ___ in the warm sunshine when I found them.', 'were sleeping', ['slept', 'have slept', 'are sleeping']],
       ['While Father ___ the car, Mother prepared lunch.', 'was washing', ['washed', 'has washed', 'is washing']],
+      ['The boys ___ a ball in the courtyard when the teacher called them in.', 'were kicking', ['kicked', 'have kicked', 'are kicking']],
+      ['My mother ___ laksa when the guests arrived early.', 'was preparing', ['prepared', 'has prepared', 'is preparing']],
+      ['The pupils ___ their projects while the principal observed the lesson.', 'were presenting', ['presented', 'have presented', 'are presenting']],
+      ['It ___ lightly when we arrived at Bishan Park.', 'was drizzling', ['drizzled', 'has drizzled', 'is drizzling']],
+      ['Priya ___ in her sketchbook when the lights suddenly went out.', 'was sketching', ['sketched', 'has sketched', 'is sketching']],
+      ['The vendors ___ their stalls when the security guard made his rounds.', 'were packing up', ['packed up', 'have packed up', 'are packing up']],
+      ['He ___ along the park connector when he spotted a monitor lizard.', 'was cycling', ['cycled', 'has cycled', 'is cycling']],
+      ['The toddlers ___ while their parents attended the school briefing.', 'were napping', ['napped', 'have napped', 'are napping']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'past_continuous', q, choices: buildChoices(answer, ds), answer, explain: 'Past continuous describes an action in progress at a past time.' };
@@ -588,6 +731,14 @@ const GRAMMAR_BUILDERS = {
       ['The kitten felt ___ in its cosy basket.', 'safe', ['safely', 'more safely', 'safeness']],
       ['Mrs Tan explained the question ___ so even the youngest pupils understood.', 'patiently', ['patient', 'patientness', 'more patient']],
       ['The fresh fruit looked ___ on the breakfast tray.', 'appetising', ['appetisingly', 'more appetisingly', 'appetisement']],
+      ['The lemonade tasted ___ on such a hot afternoon.', 'refreshing', ['refreshingly', 'refreshed', 'more refreshingly']],
+      ['The prefect spoke ___ into the microphone so the whole hall could hear.', 'clearly', ['clear', 'clearer', 'clearness']],
+      ['After the long hike, every pupil felt ___.', 'exhausted', ['exhaustedly', 'more exhaustedly', 'exhaustion']],
+      ['She folded the origami crane ___ so that every crease was perfect.', 'neatly', ['neat', 'neater', 'neatness']],
+      ['The curry my aunt cooked smelled ___ when we opened the front door.', 'wonderful', ['wonderfully', 'more wonderfully', 'wonderfulness']],
+      ['The injured bird hopped ___ across the grass before flying away.', 'awkwardly', ['awkward', 'more awkward', 'awkwardness']],
+      ['The water in the swimming pool felt ___ after the blazing afternoon sun.', 'cool', ['coolly', 'more coolly', 'coolness']],
+      ['He answered every question on the quiz ___ and scored full marks.', 'correctly', ['correct', 'correcter', 'correctness']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'adjective_adverb_choice', q, choices: buildChoices(answer, ds), answer, explain: 'Use adjectives after linking verbs and adverbs to describe actions.' };
@@ -608,10 +759,20 @@ const GRAMMAR_BUILDERS = {
       ['What ___ the librarian say about the missing book?', 'did', ['does', 'is', 'has']],
     ];
     const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'aux_question_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Question forms need the correct auxiliary verb.' };
+    return { subskill: 'aux_question_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Match the auxiliary to the tense: Did (simple past), Do/Does (simple present), Is/Are/Was/Were (continuous), Have/Has/Had (perfect), Will (future). The auxiliary must also agree with the subject in number and person.' };
   },
   tenseAwareness(level, i) {
-    const rows = [
+    const p3Rows = [
+      ['She practises daily, so she usually ___ well in performances.', 'performs', ['performed', 'is performing', 'has performed']],
+      ['Right now, my cousin ___ a documentary about marine animals.', 'is watching', ['watches', 'watched', 'will watch']],
+      ['Last weekend, the team ___ in the pouring rain.', 'trained', ['trains', 'is training', 'has trained']],
+      ['When the alarm rang, the children ___ in the corridor.', 'were playing', ['played', 'play', 'have played']],
+      ['We ___ this museum twice, so the layout is familiar to us.', 'have visited', ['visited', 'were visiting', 'visit']],
+      ['Every evening, Father ___ the dog at the park near our block.', 'walks', ['walked', 'is walking', 'will walk']],
+      ['Tomorrow, our class ___ the science centre.', 'will visit', ['visits', 'visited', 'is visiting']],
+      ['Look! Those sparrows ___ at the crumbs near the canteen.', 'are pecking', ['peck', 'pecked', 'have pecked']],
+    ];
+    const upperRows = [
       ['By the time we reached the hall, the programme ___.', 'had started', ['has started', 'was starting', 'starts']],
       ['She practises daily, so she usually ___ well.', 'performs', ['performed', 'is performing', 'has performed']],
       ['We ___ for twenty minutes before the rain stopped.', 'had been waiting', ['have waited', 'are waiting', 'waited']],
@@ -625,8 +786,9 @@ const GRAMMAR_BUILDERS = {
       ['By the time you arrive, I ___ dinner already.', 'will have cooked', ['cooked', 'cook', 'have cooked']],
       ['Father ___ to work by train every day for the past ten years.', 'has been going', ['goes', 'went', 'is going']],
     ];
+    const rows = level === 'P3' ? p3Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'tense_selection', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the tense that best matches the time relationship.' };
+    return { subskill: 'tense_selection', q, choices: buildChoices(answer, ds), answer, explain: 'Look for time signals: right now/at this moment = present continuous; yesterday/last week = simple past; every day/usually = simple present; when X happened, Y was happening = past continuous; since/already/just = present perfect; by the time/before = past perfect.' };
   },
   pastPerfect(level, i) {
     const rows = [
@@ -642,6 +804,14 @@ const GRAMMAR_BUILDERS = {
       ['The dog wagged its tail because it ___ its owner from a distance.', 'had spotted', ['has spotted', 'spots', 'is spotting']],
       ['The shop assistant explained that the last set ___ minutes earlier.', 'had been sold', ['has been sold', 'was sold', 'is being sold']],
       ['Once the storm ___, we went outside to check the garden.', 'had passed', ['has passed', 'passed', 'is passing']],
+      ['By the time we got to the stall, the char kway teow ___ out.', 'had sold', ['has sold', 'sold', 'was selling']],
+      ['She was nervous because she ___ in front of such a large audience before.', 'had never performed', ['has never performed', 'never performed', 'was never performing']],
+      ['When Father came home, we ___ already the dishes after dinner.', 'had washed', ['have washed', 'washed', 'were washing']],
+      ['The teacher noticed that someone ___ all the art supplies from the cupboard.', 'had taken', ['has taken', 'took', 'was taking']],
+      ['After the pupils ___ their essays, the teacher collected the booklets.', 'had completed', ['have completed', 'completed', 'are completing']],
+      ['He could not board the bus because he ___ his EZ-Link card at home.', 'had left', ['has left', 'left', 'is leaving']],
+      ['By the time the guests arrived, Grandma ___ enough curry puffs for everyone.', 'had prepared', ['has prepared', 'prepared', 'was preparing']],
+      ['The referee blew the whistle because a player ___ the boundary line.', 'had crossed', ['has crossed', 'crossed', 'is crossing']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'past_perfect_sequence', q, choices: buildChoices(answer, ds), answer, explain: 'Past perfect shows the earlier past action.' };
@@ -660,6 +830,14 @@ const GRAMMAR_BUILDERS = {
       ['Our class ___ for the field trip ever since the term began.', 'has been preparing', ['prepared', 'had prepared', 'is preparing']],
       ['The rain ___ steadily for two days now, and the field is flooded.', 'has been falling', ['fell', 'had fallen', 'falls']],
       ['By the end of this month, she ___ in the gym every weekend for half a year.', 'will have been training', ['has trained', 'is training', 'trains']],
+      ['The construction workers ___ on the MRT extension for over three years.', 'have been working', ['worked', 'had worked', 'are working']],
+      ['By the time the match ends tonight, both teams ___ for more than ninety minutes.', 'will have been playing', ['have played', 'played', 'will play']],
+      ['She ___ Mandarin at the community centre since Primary Three.', 'has been learning', ['learned', 'had learned', 'will learn']],
+      ['When the bell finally rang, the pupils ___ the same maths problem for forty minutes.', 'had been solving', ['have been solving', 'solved', 'are solving']],
+      ['I feel dizzy because I ___ in the sun for too long without water.', 'have been standing', ['stood', 'had stood', 'am standing']],
+      ['By his next birthday, he ___ the violin for a full decade.', 'will have been playing', ['has played', 'is playing', 'will play']],
+      ['The volunteers ___ meals for the elderly residents since early this morning.', 'have been preparing', ['prepared', 'had prepared', 'were preparing']],
+      ['When Mum checked on us at midnight, we ___ the same board game for hours.', 'had been playing', ['have been playing', 'played', 'were playing']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'perfect_continuous', q, choices: buildChoices(answer, ds), answer, explain: 'Perfect continuous tenses emphasise duration of an action.' };
@@ -678,6 +856,14 @@ const GRAMMAR_BUILDERS = {
       ['If the band practises every weekend, they ___ steady progress.', 'will make', ['made', 'make', 'have made']],
       ['If we had not missed the train, we ___ the concert.', 'would have caught', ['will catch', 'catch', 'are catching']],
       ['If our teacher ___ here today, she would explain the homework.', 'were', ['is', 'will be', 'has been']],
+      ['If metal gets wet, it ___ to rust over time.', 'starts', ['started', 'will start', 'has started']],
+      ['If I study hard this term, I ___ my grade in Mathematics.', 'will improve', ['improve', 'improved', 'have improved']],
+      ['If it ___ on the day of the race, the organisers will move it indoors.', 'rains', ['rained', 'will rain', 'has rained']],
+      ['If she ___ the right bus, she would not have arrived late.', 'had taken', ['took', 'takes', 'has taken']],
+      ['If the library ___ open on Sundays, more pupils would visit.', 'were', ['is', 'will be', 'has been']],
+      ['If you freeze water, it ___ into ice.', 'turns', ['turned', 'will turn', 'has turned']],
+      ['If I ___ taller, I would join the basketball team without hesitation.', 'were', ['am', 'will be', 'was']],
+      ['If the team had trained harder, they ___ the inter-school finals.', 'would have reached', ['will reach', 'reach', 'have reached']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'if_clauses', q, choices: buildChoices(answer, ds), answer, explain: 'Match the if-clause type with the correct result verb form.' };
@@ -696,6 +882,14 @@ const GRAMMAR_BUILDERS = {
       ['When we arrived, the food ___ already.', 'had been served', ['has been served', 'served', 'is serving']],
       ['The library books ___ by the volunteers right now.', 'are being sorted', ['sort', 'sorted', 'have sorted']],
       ['The award ___ to the most improved player every year.', 'is given', ['gives', 'gave', 'has given']],
+      ['The new community centre ___ officially opened by the Member of Parliament last Saturday.', 'was', ['is', 'has been', 'were']],
+      ['All textbooks ___ collected by the form teacher at the end of the year.', 'are', ['is', 'were', 'have been']],
+      ['The injured stray cat ___ rescued by a group of volunteers near Toa Payoh.', 'was', ['is', 'were', 'had been']],
+      ['The prize-winners ___ announced after the closing ceremony.', 'were', ['was', 'are', 'have been']],
+      ['The examination timetable ___ been posted on the school notice board.', 'has', ['have', 'had', 'was']],
+      ['The students were told that their compositions ___ be marked by Friday.', 'would be', ['will be', 'are being', 'had been']],
+      ['By the time the referee blew the whistle, the result ___ already been decided.', 'had', ['has', 'have', 'was']],
+      ['Fresh flowers ___ delivered to the school office every Monday morning.', 'are', ['is', 'were', 'have been']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'passive_forms', q, choices: buildChoices(answer, ds), answer, explain: 'Passive voice focuses on the action or receiver, not the doer.' };
@@ -714,6 +908,14 @@ const GRAMMAR_BUILDERS = {
       ['I met the author ___ wrote my favourite picture book.', 'who', ['which', 'whose', 'whom']],
       ['This is the corridor ___ floor was newly polished.', 'whose', ['who', 'which', 'whom']],
       ['The volunteers, most of ___ are seniors, run the soup kitchen on weekends.', 'whom', ['who', 'which', 'whose']],
+      ['The cleaner ___ mops our classroom every morning always greets us cheerfully.', 'who', ['which', 'whose', 'whom']],
+      ['The laptop ___ the school lent me has a cracked screen.', 'that', ['who', 'whose', 'whom']],
+      ['The prefect ___ badge was missing reported it to the teacher immediately.', 'whose', ["who's", 'that', 'which']],
+      ['She is the author to ___ the school sent a letter of appreciation.', 'whom', ['who', 'which', 'whose']],
+      ['The hawker stall ___ always has a long queue serves the best chicken rice in the neighbourhood.', 'that', ['who', 'whom', 'whose']],
+      ['My neighbour, ___ moved in last month, works as a doctor at SGH.', 'who', ['which', 'whom', 'whose']],
+      ['The trophy, ___ was donated by an alumni, is displayed in the school foyer.', 'which', ['that', 'who', 'whose']],
+      ['The volunteer ___ they had been waiting for finally arrived with boxes of supplies.', 'whom', ['who', 'which', 'whose']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'relative_pronouns', q, choices: buildChoices(answer, ds), answer, explain: 'Use the relative pronoun that fits the noun and clause function.' };
@@ -732,6 +934,14 @@ const GRAMMAR_BUILDERS = {
       ['The guide warned us that the path ___ very slippery after the rain.', 'was', ['is', 'has been', 'will be']],
       ['The doctor said that I ___ plenty of water every day.', 'should drink', ['must drink', 'drink', 'have drunk']],
       ['She asked me where I ___ the spare key.', 'had hidden', ['have hidden', 'hid', 'am hiding']],
+      ['The teacher asked me what I ___ in my project report.', 'had written', ['have written', 'wrote', 'was writing']],
+      ['She told me that she ___ the trophy on the shelf in her room.', 'had kept', ['has kept', 'kept', 'was keeping']],
+      ['The coach asked us what time ___ the next day.', 'we were leaving', ['are we leaving', 'we left', 'we will leave']],
+      ['Mrs Tan told the class ___ the hall quietly after the performance.', 'to leave', ['leaving', 'that leaving', 'leave']],
+      ['He mentioned that his father ___ him to the airport that morning.', 'had driven', ['has driven', 'drove', 'was driving']],
+      ['The pupils asked when the new science lab ___ ready.', 'would be', ['will be', 'is', 'has been']],
+      ['The prefect told the younger pupils ___ in the corridor during recess.', 'not to run', ['not run', 'do not run', 'to not running']],
+      ['My brother said that he ___ the reply email before dinner.', 'would send', ['will send', 'sends', 'has sent']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'speech_reporting', q, choices: buildChoices(answer, ds), answer, explain: 'Reported speech usually shifts tense and pronouns.' };
@@ -750,9 +960,101 @@ const GRAMMAR_BUILDERS = {
       ['So loud ___ that I had to cover my ears immediately.', 'was the thunder', ['the thunder was', 'the thunder is', 'thunder had been']],
       ['Only when the rain stopped ___ to head home.', 'did we decide', ['we decided', 'we had decided', 'we decide']],
       ['Not until the last student left ___ to lock up the classroom.', 'did the teacher begin', ['the teacher began', 'the teacher begins', 'began the teacher']],
+      ['So exhausted ___ after the hike that she fell asleep at the dinner table.', 'was Priya', ['Priya was', 'Priya is', 'Priya had been']],
+      ['Only after finishing her corrections ___ allowed to go for recess.', 'was she', ['she was', 'she is', 'has she been']],
+      ['No sooner ___ our seats than the lights in the hall went out.', 'had we taken', ['we had taken', 'we took', 'have we taken']],
+      ['Not only ___ the speech well, but she also received a standing ovation.', 'did she deliver', ['she delivered', 'she did deliver', 'has she delivered']],
+      ['Seldom ___ the canteen as quiet as it was during the examination period.', 'have I found', ['I have found', 'I found', 'I find']],
+      ['Under no circumstances ___ the examination hall once the paper has begun.', 'are pupils to re-enter', ['pupils are to re-enter', 'pupils re-enter', 'pupils should re-enter']],
+      ['Hardly ___ my eyes when the alarm went off again.', 'had I closed', ['I had closed', 'I closed', 'have I closed']],
+      ['Only when the last volunteer had left ___ how much work had been done.', 'did we appreciate', ['we appreciated', 'we did appreciate', 'have we appreciated']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'inversion_patterns', q, choices: buildChoices(answer, ds), answer, explain: 'Certain fronted phrases trigger inversion in formal structures.' };
+  },
+  homophones(level, i) {
+    const rows = [
+      ['Please put ___ bags under the desk before the test begins.', 'your', ['you\'re', 'yore', 'ur']],
+      ['The cat licked ___ paw and then curled up to sleep.', 'its', ['it\'s', 'its\'', 'their']],
+      ['___ going to rain this afternoon, so bring an umbrella.', 'It\'s', ['Its', 'It\'ll', 'Its\'']],
+      ['The boys left ___ water bottles on the field after PE.', 'their', ['there', 'they\'re', 'theirs']],
+      ['"___ the art room? I cannot find it," the new student asked.', 'Where\'s', ['Were\'s', 'Wears', 'Whereas']],
+      ['The teacher praised the class because ___ all focused throughout the lesson.', 'they\'re', ['their', 'there', 'theirs']],
+      ['Place the books over ___, next to the reading corner.', 'there', ['their', 'they\'re', 'here']],
+      ['___ a long way from here to the community library.', 'It\'s', ['Its', 'It\'ll', 'Its\'']],
+      ['Do you know ___ backpack this is? It has no name tag.', 'whose', ['who\'s', 'whos', 'who']],
+      ['"___ your favourite book so far?" the librarian asked.', 'What\'s', ['Whats', 'What\'re', 'Whatever']],
+      ['___ going to be the class chairperson this term?', 'Who\'s', ['Whose', 'Whos', 'Who']],
+      ['The team collected all ___ equipment before leaving the field.', 'its', ['it\'s', 'their', 'its\'']],
+      ['She wore ___ new school shoes for the first time on Monday.', 'her', ['hers', 'she\'s', 'herself']],
+      ['We packed ___ lunches the night before the excursion.', 'our', ['ours', 'we\'re', 'hour']],
+      ['___ been three weeks since the class started the project.', 'It\'s', ['Its', 'Its\'', 'It\'ll']],
+      ['The guide showed us ___ to find the emergency exits.', 'where', ['were', 'wear', 'there']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return {
+      subskill: 'homophones',
+      q,
+      choices: buildChoices(answer, ds),
+      answer,
+      explain: 'Homophones sound the same but are spelled differently. its = belonging to it; it\'s = it is/it has. their = belonging to them; there = place; they\'re = they are. your = belonging to you; you\'re = you are. whose = belonging to whom; who\'s = who is.',
+    };
+  },
+  wordForms(level, i) {
+    const rows = [
+      ['The judges were impressed by the ___ of her piano performance.', 'brilliance', ['brilliant', 'brilliantly', 'brillianted']],
+      ['The school counsellor encouraged the pupils to be ___ of their own feelings.', 'aware', ['awareness', 'awared', 'unaware']],
+      ['The committee made a ___ to plant more trees along the school path.', 'decision', ['decide', 'decisive', 'decisively']],
+      ['He spoke ___ when addressing the crowd at the assembly.', 'confidently', ['confident', 'confidence', 'confide']],
+      ['The ___ of the volunteers was evident from the start.', 'dedication', ['dedicated', 'dedicatedly', 'dedicate']],
+      ['Her ___ response impressed the panel of judges.', 'creative', ['creation', 'creatively', 'creativity']],
+      ['The ___ of the new facilities was announced at the school open day.', 'completion', ['complete', 'completely', 'completed']],
+      ['The athlete trained with great ___ to prepare for the national competition.', 'determination', ['determined', 'determinedly', 'determine']],
+      ['The audience applauded ___ at the end of the performance.', 'enthusiastically', ['enthusiastic', 'enthusiasm', 'enthuse']],
+      ['The doctor explained that the patient\'s ___ was remarkable.', 'recovery', ['recover', 'recovered', 'recoverable']],
+      ['The principal reminded pupils that ___ is key to doing well.', 'perseverance', ['persevere', 'perseverant', 'persevering']],
+      ['The science teacher gave a clear ___ of how photosynthesis works.', 'explanation', ['explain', 'explainable', 'explanatory']],
+      ['The committee was ___ about the new timetable changes.', 'optimistic', ['optimism', 'optimistically', 'optimist']],
+      ['The ___ of the event was handled by a team of senior pupils.', 'organisation', ['organise', 'organised', 'organisational']],
+      ['She spoke with great ___ despite being the youngest speaker.', 'maturity', ['mature', 'maturely', 'maturing']],
+      ['The ___ between the two teams was intense throughout the final match.', 'competition', ['compete', 'competitive', 'competitively']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return {
+      subskill: 'word_forms',
+      q,
+      choices: buildChoices(answer, ds),
+      answer,
+      explain: 'Word forms: nouns name things (dedication, completion); adjectives describe nouns (dedicated, complete); adverbs describe verbs/adjectives (dedicatedly, completely); verbs show action (dedicate, complete). Identify the role the blank plays in the sentence before choosing the form.',
+    };
+  },
+  gerundInfinitive(level, i) {
+    const rows = [
+      ['She enjoys ___ the piano for an hour every evening.', 'playing', ['play', 'to play', 'played']],
+      ['We managed ___ the last bus just in time.', 'to catch', ['catching', 'caught', 'catch']],
+      ['He decided ___ in the school play this year.', 'to take part', ['taking part', 'took part', 'take part']],
+      ['Please finish ___ your worksheet before the bell rings.', 'doing', ['to do', 'done', 'did']],
+      ['Mei hopes ___ a doctor when she grows up.', 'to become', ['becoming', 'become', 'became']],
+      ['I remember ___ my water bottle this morning — it is safely in my bag.', 'packing', ['to pack', 'packed', 'pack']],
+      ['He stopped ___ the view before continuing the hike.', 'to admire', ['admiring', 'admired', 'admire']],
+      ['The coach suggested ___ earlier to warm up properly.', 'arriving', ['to arrive', 'arrived', 'arrive']],
+      ['She agreed ___ the class presentation on behalf of the group.', 'to give', ['giving', 'gave', 'give']],
+      ['They avoided ___ the busy road during the morning rush.', 'crossing', ['to cross', 'crossed', 'cross']],
+      ['My brother plans ___ computing at the polytechnic next year.', 'to study', ['studying', 'studied', 'study']],
+      ['Instead of ___ the escalator, they climbed the stairs for exercise.', 'taking', ['take', 'to take', 'taken']],
+      ['The class kept ___ questions even after the lesson ended.', 'asking', ['to ask', 'asked', 'ask']],
+      ['He forgot ___ his PE kit at home, so he borrowed a spare set.', 'to bring', ['bringing', 'brought', 'bring']],
+      ['The volunteers offered ___ the elderly residents to the community hall.', 'to escort', ['escorting', 'escorted', 'escort']],
+      ['She practises ___ her lines for the drama every night before bed.', 'reciting', ['to recite', 'recited', 'recite']],
+    ];
+    const [q, answer, ds] = rotate(rows, i);
+    return {
+      subskill: 'gerund_infinitive',
+      q,
+      choices: buildChoices(answer, ds),
+      answer,
+      explain: 'Certain verbs take gerunds (-ing forms), others take infinitives (to + verb). Some, like "stop" and "remember", change meaning depending on which is used.',
+    };
   },
   mixedGrammar(level, i) {
     const rows = [
@@ -776,9 +1078,10 @@ const GRAMMAR_BUILDERS = {
 
 function buildLevel(level) {
   const categories = LEVEL_CATEGORY_PLAN[level];
-  const targetCount = 150;
+  const targetCount = 200;
   const items = [];
-  const categoryCursor = Object.fromEntries(categories.map(c => [c, 0]));
+  const sessionSeed = Math.floor(Math.random() * 10);
+  const categoryCursor = Object.fromEntries(categories.map(c => [c, sessionSeed]));
 
   for (let i = 0; i < targetCount; i += 1) {
     const category = categories[i % categories.length];
