@@ -175,7 +175,7 @@ const VOCAB_BUILDERS = {
     ];
     const upperRows = [
       ['The principal\'s message was brief but very ___.', 'meaningful', ['careless', 'shallow', 'crooked']],
-      ['The opposite of "ancient" in this sentence is ___.', 'modern', ['fragile', 'gentle', 'hollow']],
+      ['The restored square was celebrated for its ___ design, a striking contrast to the ancient buildings that surrounded it.', 'modern', ['fragile', 'gentle', 'hollow']],
       ['The report was concise, which means it was ___ and to the point.', 'brief', ['lengthy', 'vague', 'repetitive']],
       ['Her argument was coherent, meaning it was ___ and easy to follow.', 'logical', ['creative', 'repetitive', 'bold']],
       ['The policy was transparent, which means it was ___.', 'open', ['complicated', 'confidential', 'flexible']],
@@ -422,9 +422,9 @@ const VOCAB_BUILDERS = {
       ['A robot uses sensors to ___ its surroundings.', 'detect', ['decorate', 'defend', 'delay']],
       ['The process of a liquid turning into a gas is called ___.', 'evaporation', ['condensation', 'photosynthesis', 'germination']],
       ['The layer of gases surrounding the Earth is called the ___.', 'atmosphere', ['stratosphere', 'hydrosphere', 'biosphere']],
-      ['A substance that speeds up a chemical reaction without being used up is a ___.', 'catalyst', ['reactant', 'solvent', 'compound']],
+      ['The continuous movement of water from the Earth\'s surface into the sky as vapour and back again as rain is called the ___.', 'water cycle', ['food chain', 'rock cycle', 'carbon cycle']],
       ['Electricity that builds up on the surface of an object is called ___ electricity.', 'static', ['current', 'magnetic', 'thermal']],
-      ['The movement of water from the soil into the air via plants is called ___.', 'transpiration', ['evaporation', 'condensation', 'precipitation']],
+      ['Animals that eat both plants and other animals for food are called ___.', 'omnivores', ['herbivores', 'carnivores', 'decomposers']],
       ['A ___ is a device that converts solar energy into electrical energy.', 'solar panel', ['generator', 'turbine', 'circuit']],
     ];
     const upperRows = [
