@@ -18,6 +18,7 @@ let _streak = 0;
 let _maxStreak = 0;
 let _missed = [];
 let _isRecovery = false;
+let _sessionSkillStats = {}; // category -> { correct, total }
 
 export function initGrammarMcq(container, onGoHome) {
   _container = container;
@@ -176,6 +177,7 @@ function _startScope({ level = null, category = null, label = '' } = {}) {
   _streak = 0;
   _maxStreak = 0;
   _missed = [];
+  _sessionSkillStats = {};
   _isRecovery = false;
   _answered = false;
   _renderQuestion();
@@ -188,6 +190,7 @@ function _startRecovery() {
   _streak = 0;
   _maxStreak = 0;
   _missed = [];
+  _sessionSkillStats = {};
   _isRecovery = true;
   _answered = false;
   _renderQuestion();
@@ -264,6 +267,10 @@ function _renderQuestion() {
         gamification.recordWrong();
       }
 
+      const stat = _sessionSkillStats[item.category] || (_sessionSkillStats[item.category] = { correct: 0, total: 0 });
+      stat.total += 1;
+      if (ok) stat.correct += 1;
+
       questMastery.updateSkill('grammarMcq', item.category, ok);
       questMastery.recordAttempt({ quest: 'grammarMcq', skill: item.category, correct: ok, level: _scope.level || 'Mixed' });
 
@@ -325,6 +332,29 @@ function _renderQuestion() {
   });
 }
 
+// Per-skill breakdown for this session, sorted weakest-first so the child
+// can see at a glance which concepts to revisit. Only shown when more than
+// one category was practised (a single-skill session needs no breakdown).
+function _renderSkillBreakdown() {
+  const entries = Object.entries(_sessionSkillStats).filter(([, s]) => s.total > 0);
+  if (entries.length < 2) return '';
+
+  const rows = entries
+    .map(([cat, s]) => ({ cat, pct: Math.round((s.correct / s.total) * 100), correct: s.correct, total: s.total }))
+    .sort((a, b) => a.pct - b.pct)
+    .map(({ cat, pct, correct, total }) => {
+      const barColour = pct >= 70 ? 'var(--color-success)' : pct >= 40 ? 'var(--color-primary)' : 'var(--color-error)';
+      return `
+        <div class="sq-skill-row">
+          <span class="sq-skill-name">${escapeHtml(_categoryLabel(cat))}</span>
+          <div class="sq-skill-track"><div class="sq-skill-bar" style="width:${pct}%;background:${barColour}"></div></div>
+          <span class="sq-skill-pct">${correct}/${total}</span>
+        </div>`;
+    }).join('');
+
+  return `<h4 class="sq-skills-heading">Skill breakdown</h4><div class="sq-skills-list">${rows}</div>`;
+}
+
 function _renderDone() {
   const total = _items.length;
 
@@ -340,7 +370,7 @@ function _renderDone() {
   // isn't left with no way to retry the questions they got wrong.
   const hasMissed = _missed.length > 0;
 
-  const catKeys = [...new Set(_items.map(item => item.category))];
+  const skillRows = _renderSkillBreakdown();
 
   _container.innerHTML = `
     <div class="sfq-browser" role="region" aria-label="Grammar MCQ results">
@@ -349,9 +379,7 @@ function _renderDone() {
       <p class="sfq-instruction">${_correct}/${total} correct · ${accuracy}%</p>
       ${_maxStreak >= 3 ? `<p class="sfq-instruction">${_maxStreak >= 10 ? '🔥' : _maxStreak >= 5 ? '⚡' : '✨'} Best streak: ${_maxStreak} in a row</p>` : ''}
       <p class="sfq-instruction">${accuracy >= 90 ? 'Outstanding!' : accuracy >= 70 ? 'Great work — keep practising!' : accuracy > 0 ? 'Good effort — replay to improve!' : 'Keep trying — you can do it!'}</p>
-      <div class="mcq-cat-summary">
-        ${catKeys.map(k => `<span class="mcq-cat-chip">${escapeHtml(_categoryLabel(k))}</span>`).join('')}
-      </div>
+      ${skillRows}
       <div class="sfq-actions">
         ${hasMissed ? `<button class="btn btn--primary" id="gmcq-recovery">🔄 Recovery Round (${_missed.length})</button>` : ''}
         <button class="btn ${hasMissed ? 'btn--ghost' : 'btn--primary'}" id="gmcq-replay">Replay</button>
