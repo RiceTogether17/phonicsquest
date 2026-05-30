@@ -283,29 +283,148 @@ const GRAMMAR_BUILDERS = {
   },
   svAgreement(level, i) {
     const rows = [
-      ['The captain of the team ___ early every day.', 'arrives', ['arrive', 'arrived', 'arriving']],
-      ['My cousins ___ badminton after school.', 'play', ['plays', 'played', 'is playing']],
-      ['There ___ two packets of rice on the shelf.', 'are', ['is', 'was', 'has']],
-      ['Neither the coach nor the players ___ careless today.', 'are', ['is', 'was', 'be']],
-      ['Each student ___ a name tag for the camp.', 'has', ['have', 'had', 'having']],
-      ['One of the pupils ___ a birthday today.', 'has', ['have', 'had', 'having']],
-      ['Both the teacher and the principal ___ the new timetable.', 'support', ['supports', 'supported', 'is supporting']],
-      ['A box of crayons ___ been left in the art room.', 'has', ['have', 'had', 'having']],
-      ['Either the twins or their older sister ___ staying to help.', 'is', ['are', 'were', 'be']],
-      ['The news about the school trip ___ very exciting.', 'is', ['are', 'was', 'be']],
-      ['Not a single pupil ___ absent on Picture Day.', 'was', ['were', 'is', 'are']],
-      ['Mathematics ___ her favourite subject at school.', 'is', ['are', 'was', 'be']],
-      ['The pair of scissors ___ on the craft table.', 'is', ['are', 'were', 'be']],
-      ['Everyone on the bus ___ to arrive by seven.', 'needs', ['need', 'needed', 'needing']],
-      ['The committee ___ its decision after a long discussion.', 'made', ['make', 'makes', 'making']],
-      ['The number of students who passed the test ___ very encouraging.', 'is', ['are', 'were', 'have been']],
-      ['A group of boys ___ playing catching in the school field.', 'is', ['are', 'were', 'have']],
-      ['Physics ___ my favourite subject this year.', 'is', ['are', 'were', 'have been']],
-      ['The audience ___ clapping loudly after the school concert ended.', 'was', ['were', 'is', 'are']],
-      ['None of the students ___ submitted their project on time.', 'has', ['have', 'had', 'were']],
+      ['The captain of the team ___ early every day.', 'arrives', ['arrive', 'arrived', 'arriving'], {
+        'arrives': '"Arrives" is correct because the true subject is "the captain" (singular), not "the team".',
+        'arrive': '"Arrive" is for plural subjects, but the true subject here is "the captain" (singular).',
+        'arrived': '"Arrived" is simple past, but the sentence describes a current routine.',
+        'arriving': '"Arriving" alone cannot be the main verb — it needs a helper like "is".',
+      }],
+      ['My cousins ___ badminton after school.', 'play', ['plays', 'played', 'is playing'], {
+        'play': '"Play" is correct because "cousins" is plural, so the base form without -s is used.',
+        'plays': '"Plays" is for a singular subject (he/she/it), but "cousins" is plural.',
+        'played': '"Played" is simple past, but the sentence describes a present routine.',
+        'is playing': '"Is playing" uses a singular auxiliary "is", but "cousins" is plural.',
+      }],
+      ['There ___ two packets of rice on the shelf.', 'are', ['is', 'was', 'has'], {
+        'are': '"Are" is correct because the real subject is "two packets" (plural), which comes after "there".',
+        'is': '"Is" is for singular subjects, but "two packets" is plural.',
+        'was': '"Was" is singular past tense, but "two packets" is plural and the sentence is present.',
+        'has': '"Has" is for present perfect or possession, not for the verb "to be" here.',
+      }],
+      ['Neither the coach nor the players ___ careless today.', 'are', ['is', 'was', 'be'], {
+        'are': '"Are" is correct because with "neither...nor", the verb agrees with the subject closest to it — "the players" (plural).',
+        'is': '"Is" agrees with a singular subject, but "the players" (the nearer subject) is plural.',
+        'was': '"Was" is singular past tense, but the sentence is in the present.',
+        'be': '"Be" is a base form and cannot be used as a main verb without a helper.',
+      }],
+      ['Each student ___ a name tag for the camp.', 'has', ['have', 'had', 'having'], {
+        'has': '"Has" is correct because "each" always takes a singular verb.',
+        'have': '"Have" is for plural subjects; "each student" is always treated as singular.',
+        'had': '"Had" is simple past or past perfect, but the sentence is in the present.',
+        'having': '"Having" alone cannot be the main verb — it needs a helper like "is".',
+      }],
+      ['One of the pupils ___ a birthday today.', 'has', ['have', 'had', 'having'], {
+        'has': '"Has" is correct because the true subject is "one" (singular), not "the pupils".',
+        'have': '"Have" is for plural subjects, but "one" is singular.',
+        'had': '"Had" is past tense, but the sentence is in the present.',
+        'having': '"Having" alone cannot be the main verb — it needs a helper like "is".',
+      }],
+      ['Both the teacher and the principal ___ the new timetable.', 'support', ['supports', 'supported', 'is supporting'], {
+        'support': '"Support" is correct because "both...and" joins two people, making the subject plural.',
+        'supports': '"Supports" is for singular subjects, but "both the teacher and the principal" is plural.',
+        'supported': '"Supported" is simple past, but the sentence is in the present.',
+        'is supporting': '"Is supporting" uses a singular auxiliary "is", but the subject is plural.',
+      }],
+      ['A box of crayons ___ been left in the art room.', 'has', ['have', 'had', 'having'], {
+        'has': '"Has" is correct because the true subject is "a box" (singular), not "crayons".',
+        'have': '"Have" is for plural subjects, but the true subject "a box" is singular.',
+        'had': '"Had" forms past perfect, but the context calls for present perfect with "has".',
+        'having': '"Having" alone cannot be the main verb — it needs a helper like "is".',
+      }],
+      ['Either the twins or their older sister ___ staying to help.', 'is', ['are', 'were', 'be'], {
+        'is': '"Is" is correct because with "either...or", the verb agrees with the nearer subject — "their older sister" (singular).',
+        'are': '"Are" is for plural subjects, but "their older sister" (the nearer subject) is singular.',
+        'were': '"Were" is plural past tense, but the sentence is in the present.',
+        'be': '"Be" is a base form and cannot be used as a main verb without a helper.',
+      }],
+      ['The news about the school trip ___ very exciting.', 'is', ['are', 'was', 'be'], {
+        'is': '"Is" is correct because "news" is an uncountable noun that is always singular.',
+        'are': '"Are" is for plural subjects, but "news" is always singular even though it ends in -s.',
+        'was': '"Was" is singular past tense, but the sentence describes a present state.',
+        'be': '"Be" is a base form and cannot be used as a main verb without a helper.',
+      }],
+      ['Not a single pupil ___ absent on Picture Day.', 'was', ['were', 'is', 'are'], {
+        'was': '"Was" is correct because "not a single pupil" is singular and Picture Day is a past event.',
+        'were': '"Were" is for plural subjects, but "not a single pupil" refers to one person at a time.',
+        'is': '"Is" is present singular, but Picture Day is described as a past event.',
+        'are': '"Are" is present plural, but the sentence refers to a past event with a singular subject.',
+      }],
+      ['Mathematics ___ her favourite subject at school.', 'is', ['are', 'was', 'be'], {
+        'is': '"Is" is correct because subjects ending in -ics (Mathematics, Physics) are treated as singular.',
+        'are': '"Are" is for plural subjects, but Mathematics is treated as a singular subject.',
+        'was': '"Was" is past tense, but the sentence describes a present fact.',
+        'be': '"Be" is a base form and cannot be used as a main verb without a helper.',
+      }],
+      ['The pair of scissors ___ on the craft table.', 'is', ['are', 'were', 'be'], {
+        'is': '"Is" is correct because the true subject is "the pair" (singular), not "scissors".',
+        'are': '"Are" is for plural subjects, but "the pair" is singular.',
+        'were': '"Were" is plural past tense, but the sentence describes a present situation.',
+        'be': '"Be" is a base form and cannot be used as a main verb without a helper.',
+      }],
+      ['Everyone on the bus ___ to arrive by seven.', 'needs', ['need', 'needed', 'needing'], {
+        'needs': '"Needs" is correct because "everyone" is always treated as singular.',
+        'need': '"Need" is for plural subjects or I/you, but "everyone" is always singular.',
+        'needed': '"Needed" is simple past, but the sentence is in the present.',
+        'needing': '"Needing" alone cannot be the main verb — it needs a helper like "is".',
+      }],
+      ['The committee ___ its decision after a long discussion.', 'made', ['make', 'makes', 'making'], {
+        'made': '"Made" is correct because the sentence describes a completed past action.',
+        'make': '"Make" is base form present, but the context ("after a long discussion") points to a past event.',
+        'makes': '"Makes" is present singular, but the action has already been completed in the past.',
+        'making': '"Making" alone cannot be the main verb — it needs a helper like "is" or "was".',
+      }],
+      ['The number of students who passed the test ___ very encouraging.', 'is', ['are', 'were', 'have been'], {
+        'is': '"Is" is correct because "the number" is the subject, which is singular.',
+        'are': '"Are" fits "a number of students" (meaning many), but "the number" is a singular subject.',
+        'were': '"Were" is plural past, but "the number" is singular and the sentence is present.',
+        'have been': '"Have been" is for plural subjects, but "the number" is singular.',
+      }],
+      ['A group of boys ___ playing catching in the school field.', 'is', ['are', 'were', 'have'], {
+        'is': '"Is" is correct because "a group" is a singular collective noun.',
+        'are': '"Are" is for plural subjects, but "a group" is treated as one unit.',
+        'were': '"Were" is plural past, but the sentence is present continuous.',
+        'have': '"Have" is for plural subjects in perfect tense, which does not fit this sentence.',
+      }],
+      ['Physics ___ my favourite subject this year.', 'is', ['are', 'were', 'have been'], {
+        'is': '"Is" is correct because subjects ending in -ics (Physics, Mathematics) are treated as singular.',
+        'are': '"Are" is for plural subjects, but Physics is treated as singular.',
+        'were': '"Were" is plural past, but the sentence is in the present.',
+        'have been': '"Have been" is for plural subjects in perfect tense, but Physics is singular.',
+      }],
+      ['The audience ___ clapping loudly after the school concert ended.', 'was', ['were', 'is', 'are'], {
+        'was': '"Was" is correct because "the audience" is a singular collective noun in a past context.',
+        'were': '"Were" would need "audience members" (plural) to be correct.',
+        'is': '"Is" is present tense, but the concert has already ended.',
+        'are': '"Are" is present plural, but the sentence describes a past event.',
+      }],
+      ['None of the students ___ submitted their project on time.', 'has', ['have', 'had', 'were'], {
+        'has': '"Has" is correct because "none" here means "not one", so it takes a singular verb.',
+        'have': '"Have" treats "none" as plural, which is less precise when "none" means "not one".',
+        'had': '"Had" forms past perfect, but this sentence uses present perfect.',
+        'were': '"Were" is a linking verb and cannot combine with "submitted" to form present perfect.',
+      }],
+      ['Ali is the top scorer in his class. Each of his test papers ___ a mark above ninety.', 'has', ['have', 'had', 'having'], {
+        'has': '"Has" is correct because "each" takes a singular verb, regardless of the noun that follows.',
+        'have': '"Have" is for plural subjects; "each" is always singular.',
+        'had': '"Had" is past tense, but the sentence is in the present.',
+        'having': '"Having" alone cannot be the main verb — it needs a helper like "is".',
+      }],
+      ['The school has many CCAs. Neither the chess club nor the art club ___ enough members this year.', 'has', ['have', 'had', 'having'], {
+        'has': '"Has" is correct because with "neither...nor", the verb agrees with the nearer subject — "the art club" (singular).',
+        'have': '"Have" is for plural subjects, but "the art club" (the nearer subject) is singular.',
+        'had': '"Had" is past tense, but the sentence is in the present.',
+        'having': '"Having" alone cannot be the main verb — it needs a helper like "is".',
+      }],
+      ['Mei loves science experiments. The whole class ___ excited about the volcano model she built.', 'is', ['are', 'were', 'be'], {
+        'is': '"Is" is correct because "the whole class" is a singular collective noun.',
+        'are': '"Are" would need "all the pupils" (plural) to be correct.',
+        'were': '"Were" is past tense, but the sentence is in the present.',
+        'be': '"Be" is a base form and cannot be used as a main verb without a helper.',
+      }],
     ];
-    const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Match the verb with the true subject — collective nouns and "each/one/either" take a singular verb.', optionExplanations: makeAgreementOptionExplanations(answer, ds) };
+    const [q, answer, ds, optionExplanations] = rotate(rows, i);
+    return { subskill: 'agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Match the verb with the true subject — collective nouns and "each/one/either" take a singular verb.',
+      optionExplanations };
   },
   simplePast(level, i) {
     const p1Rows = [
@@ -344,20 +463,71 @@ const GRAMMAR_BUILDERS = {
       ['The puppy ___ at the door the whole time we were out yesterday.', 'waited', ['wait', 'waits', 'was waiting']],
     ];
     const upperRows = [
-      ['Yesterday, we ___ the art display before lunch.', 'visited', ['visit', 'visits', 'visiting']],
-      ['Last Friday, she ___ her wallet at home.', 'left', ['leave', 'leaves', 'leaving']],
-      ['Two days ago, they ___ the heavy box upstairs.', 'carried', ['carry', 'carries', 'carrying']],
-      ['Last night, Father ___ us a story about courage.', 'told', ['tell', 'tells', 'telling']],
-      ['During the last fire drill, all the pupils ___ calmly to the assembly area.', 'walked', ['walk', 'walks', 'walking']],
-      ['When the bell rang earlier this morning, the prefect ___ the door open for us.', 'held', ['hold', 'holds', 'is holding']],
-      ['Three days ago, our librarian ___ a new shipment of storybooks.', 'received', ['receive', 'receives', 'is receiving']],
-      ['Last weekend, my grandparents ___ all the way from Penang to visit us.', 'drove', ['drive', 'drives', 'driving']],
-      ['Yesterday afternoon, the painter ___ the entire fence in just two hours.', 'painted', ['paints', 'paint', 'painting']],
-      ['Just before assembly began, the principal ___ that the swimming meet was postponed.', 'announced', ['announces', 'announce', 'is announcing']],
+      ['Yesterday, we ___ the art display before lunch.', 'visited', ['visit', 'visits', 'visiting'], {
+        'visited': '"Visited" is correct because "yesterday" signals a completed past action, so we use simple past.',
+        'visit': '"Visit" is base form present, but "yesterday" tells us the action is already done.',
+        'visits': '"Visits" is present tense for he/she/it, but "yesterday" requires the past tense.',
+        'visiting': '"Visiting" alone cannot be the main verb — it needs a helper like "was" or "were".',
+      }],
+      ['Last Friday, she ___ her wallet at home.', 'left', ['leave', 'leaves', 'leaving'], {
+        'left': '"Left" is correct because "last Friday" signals a completed past action, and "leave" is irregular (leave → left).',
+        'leave': '"Leave" is base form present; "last Friday" tells us the action happened in the past.',
+        'leaves': '"Leaves" is present tense for he/she/it; the time marker "last Friday" requires past tense.',
+        'leaving': '"Leaving" alone cannot be the main verb — it needs a helper like "was".',
+      }],
+      ['Two days ago, they ___ the heavy box upstairs.', 'carried', ['carry', 'carries', 'carrying'], {
+        'carried': '"Carried" is correct because "two days ago" signals a past action; regular verbs add -ied when ending in a consonant + y.',
+        'carry': '"Carry" is base form present; "two days ago" tells us to use past tense.',
+        'carries': '"Carries" is present tense for he/she/it; "two days ago" requires past tense.',
+        'carrying': '"Carrying" alone cannot be the main verb — it needs a helper like "was" or "were".',
+      }],
+      ['Last night, Father ___ us a story about courage.', 'told', ['tell', 'tells', 'telling'], {
+        'told': '"Told" is correct because "last night" signals a past action, and "tell" is irregular (tell → told).',
+        'tell': '"Tell" is base form present; "last night" tells us the action is already done.',
+        'tells': '"Tells" is present tense for he/she/it; "last night" requires past tense.',
+        'telling': '"Telling" alone cannot be the main verb — it needs a helper like "was".',
+      }],
+      ['During the last fire drill, all the pupils ___ calmly to the assembly area.', 'walked', ['walk', 'walks', 'walking'], {
+        'walked': '"Walked" is correct because "the last fire drill" points to a past event; regular verbs add -ed.',
+        'walk': '"Walk" is base form present; "the last fire drill" tells us the action is in the past.',
+        'walks': '"Walks" is present tense for he/she/it; the past event requires past tense.',
+        'walking': '"Walking" alone cannot be the main verb — it needs a helper like "were".',
+      }],
+      ['When the bell rang earlier this morning, the prefect ___ the door open for us.', 'held', ['hold', 'holds', 'is holding'], {
+        'held': '"Held" is correct because the bell rang in the past, and "hold" is irregular (hold → held).',
+        'hold': '"Hold" is base form present; "when the bell rang" tells us the action is already done.',
+        'holds': '"Holds" is present tense for he/she/it; the past context requires past tense.',
+        'is holding': '"Is holding" is present continuous, but the action happened when the bell rang earlier.',
+      }],
+      ['Three days ago, our librarian ___ a new shipment of storybooks.', 'received', ['receive', 'receives', 'is receiving'], {
+        'received': '"Received" is correct because "three days ago" signals a past action; regular verbs add -d.',
+        'receive': '"Receive" is base form present; "three days ago" tells us to use past tense.',
+        'receives': '"Receives" is present tense for he/she/it; the past time marker requires past tense.',
+        'is receiving': '"Is receiving" is present continuous, but the action was already completed three days ago.',
+      }],
+      ['Last weekend, my grandparents ___ all the way from Penang to visit us.', 'drove', ['drive', 'drives', 'driving'], {
+        'drove': '"Drove" is correct because "last weekend" signals a past action, and "drive" is irregular (drive → drove).',
+        'drive': '"Drive" is base form present; "last weekend" tells us the action is already done.',
+        'drives': '"Drives" is present tense for he/she/it; "last weekend" requires past tense.',
+        'driving': '"Driving" alone cannot be the main verb — it needs a helper like "were".',
+      }],
+      ['Yesterday afternoon, the painter ___ the entire fence in just two hours.', 'painted', ['paints', 'paint', 'painting'], {
+        'painted': '"Painted" is correct because "yesterday afternoon" signals a completed past action.',
+        'paints': '"Paints" is present tense for he/she/it; "yesterday afternoon" requires past tense.',
+        'paint': '"Paint" is base form present; "yesterday afternoon" tells us to use past tense.',
+        'painting': '"Painting" alone cannot be the main verb — it needs a helper like "was".',
+      }],
+      ['Just before assembly began, the principal ___ that the swimming meet was postponed.', 'announced', ['announces', 'announce', 'is announcing'], {
+        'announced': '"Announced" is correct because "just before assembly began" places the action in the past.',
+        'announces': '"Announces" is present tense for he/she/it; the past time clause requires past tense.',
+        'announce': '"Announce" is base form present; the past time clause tells us to use past tense.',
+        'is announcing': '"Is announcing" is present continuous, but the action happened before assembly in the past.',
+      }],
     ];
     const rows = level === 'P1' ? p1Rows : level === 'P2' ? p2Rows : upperRows;
-    const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'past_tense_form', q, choices: buildChoices(answer, ds), answer, explain: 'Time markers like yesterday, last week, just now, and ago signal simple past. Regular verbs add -ed (baked, walked). Irregular verbs change form (go→went, eat→ate, blow→blew, win→won) — these must be memorised.', optionExplanations: makeTenseOptionExplanations(answer, ds, 'Words like yesterday, last week, just now, and ago signal simple past.') };
+    const [q, answer, ds, optionExplanations] = rotate(rows, i);
+    return { subskill: 'past_tense_form', q, choices: buildChoices(answer, ds), answer, explain: 'Time markers like yesterday, last week, just now, and ago signal simple past. Regular verbs add -ed (baked, walked). Irregular verbs change form (go→went, eat→ate, blow→blew, win→won) — these must be memorised.',
+      optionExplanations };
   },
   presentCont(level, i) {
     const rows = [
@@ -527,6 +697,9 @@ const GRAMMAR_BUILDERS = {
       ['Wear sunscreen, ___ you will get sunburnt at the beach.', 'or', ['so', 'because', 'and']],
       ['She studied for the test, ___ she still felt nervous on the day.', 'but', ['so', 'and', 'because']],
       ['The lift was broken, ___ we used the stairs to reach the fifth floor.', 'so', ['but', 'or', 'because']],
+      ['Wei studied hard every night this week. ___, he felt confident when the test day arrived.', 'As a result', ['However', 'Nevertheless', 'Although']],
+      ['Rina practised her speech many times. ___, she still felt nervous standing in front of the audience.', 'However', ['Therefore', 'As a result', 'Furthermore']],
+      ['Ali finished his homework early. He spent the extra time reading ___ he wanted to improve his vocabulary.', 'because', ['but', 'or', 'so']],
     ];
     const rows = (level === 'P1' || level === 'P2') ? p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
@@ -698,6 +871,9 @@ const GRAMMAR_BUILDERS = {
       ['My grandmother ___ lived in the same flat since 1985.', 'has', ['have', 'had', 'is']],
       ['The players ___ not trained since the last public holiday.', 'have', ['has', 'had', 'were']],
       ['The bus ___ just left, so we will have to wait for the next one.', 'has', ['have', 'had', 'was']],
+      ['Priya practises the flute every day. She ___ been playing it since Primary One.', 'has', ['have', 'had', 'is']],
+      ['Siti forgot to bring her library book again today. She ___ forgotten it three times this week.', 'has', ['have', 'had', 'was']],
+      ['Wei and his team trained hard this term. They ___ won every match so far this season.', 'have', ['has', 'had', 'were']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'present_perfect', q, choices: buildChoices(answer, ds), answer, explain: 'Present perfect links a past action to the present result.', optionExplanations: makeTenseOptionExplanations(answer, ds, 'Present perfect links a past action to a present result.') };
@@ -782,6 +958,9 @@ const GRAMMAR_BUILDERS = {
       ['Every evening, Father ___ the dog at the park near our block.', 'walks', ['walked', 'is walking', 'will walk']],
       ['Tomorrow, our class ___ the science centre.', 'will visit', ['visits', 'visited', 'is visiting']],
       ['Look! Those sparrows ___ at the crumbs near the canteen.', 'are pecking', ['peck', 'pecked', 'have pecked']],
+      ['Priya goes swimming every Saturday morning. Last Saturday, she ___ three laps without stopping.', 'swam', ['swims', 'is swimming', 'has swum']],
+      ['Wei plays the piano every evening. Right now, he ___ a new song for the concert.', 'is practising', ['practises', 'practised', 'has practised']],
+      ['Siti visits the library every week. Last Tuesday, she ___ four storybooks in one afternoon.', 'read', ['reads', 'is reading', 'has read']],
     ];
     const upperRows = [
       ['By the time we reached the hall, the programme ___.', 'had started', ['has started', 'was starting', 'starts']],
@@ -823,6 +1002,9 @@ const GRAMMAR_BUILDERS = {
       ['He could not board the bus because he ___ his EZ-Link card at home.', 'had left', ['has left', 'left', 'is leaving']],
       ['By the time the guests arrived, Grandma ___ enough curry puffs for everyone.', 'had prepared', ['has prepared', 'prepared', 'was preparing']],
       ['The referee blew the whistle because a player ___ the boundary line.', 'had crossed', ['has crossed', 'crossed', 'is crossing']],
+      ['Rina was very hungry at lunch. She realised she ___ her breakfast by mistake that morning.', 'had skipped', ['has skipped', 'skipped', 'was skipping']],
+      ['Wei could not find his calculator during the test. He thought he ___ it at home.', 'had left', ['has left', 'left', 'is leaving']],
+      ['Priya smiled when she saw her results. She ___ worked harder than ever before that term.', 'had', ['has', 'have', 'was']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'past_perfect_sequence', q, choices: buildChoices(answer, ds), answer, explain: 'Past perfect shows the earlier past action.' };
@@ -875,6 +1057,9 @@ const GRAMMAR_BUILDERS = {
       ['If you freeze water, it ___ into ice.', 'turns', ['turned', 'will turn', 'has turned']],
       ['If I ___ taller, I would join the basketball team without hesitation.', 'were', ['am', 'will be', 'was']],
       ['If the team had trained harder, they ___ the inter-school finals.', 'would have reached', ['will reach', 'reach', 'have reached']],
+      ['Ali forgot his umbrella this morning. If he ___ the weather forecast, he would have brought it.', 'had checked', ['checked', 'has checked', 'checks']],
+      ['Siti loves cooking. If she follows a recipe carefully, her dishes always ___ well.', 'turn out', ['turned out', 'will turn out', 'would turn out']],
+      ['Mei missed the bus and arrived late. If she ___ earlier, she would have been on time.', 'had left', ['left', 'has left', 'leaves']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'if_clauses', q, choices: buildChoices(answer, ds), answer, explain: 'Match the if-clause type with the correct result verb form.' };

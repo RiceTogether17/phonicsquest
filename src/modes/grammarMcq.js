@@ -7,6 +7,7 @@ import { checkPostAttempt } from '../modules/remediationRouter.js';
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 import { buildMcqFeedbackHtml } from './mcqFeedback.js';
 import { filterMcqItemsForDifficulty, MCQ_DIFFICULTIES, renderMcqDifficultyToggle } from './mcqDifficulty.js';
+import { GRAMMAR_TIPS, getGrammarTip } from '../data/grammarTips.js';
 
 let _container = null;
 let _onGoHome = null;
@@ -22,6 +23,7 @@ let _maxStreak = 0;
 let _missed = [];
 let _isRecovery = false;
 let _sessionSkillStats = {}; // category -> { correct, total }
+let _categoryWrong = {}; // category -> consecutive wrong count
 
 export function initGrammarMcq(container, onGoHome) {
   _container = container;
@@ -197,7 +199,12 @@ function _startScope({ level = null, category = null, label = '', difficulty = _
   _sessionSkillStats = {};
   _isRecovery = false;
   _answered = false;
-  _renderQuestion();
+  _categoryWrong = {};
+  if (_scope.category && !_isRecovery) {
+    _renderRuleCard(_scope.category, () => _renderQuestion());
+  } else {
+    _renderQuestion();
+  }
 }
 
 function _startRecovery() {
@@ -228,7 +235,7 @@ function _renderClueWords(item) {
   if (!item.clueWords || item.clueWords.length === 0) return '';
   return `
     <div class="mcq-clue-words">
-      <strong>🔍 Clue words:</strong> 
+      <strong>🔍 Clue words:</strong>
       ${item.clueWords.map(w => `<span class="mcq-clue-chip">${w}</span>`).join(' ')}
     </div>
   `;
@@ -260,6 +267,8 @@ function _renderQuestion() {
       <div class="pt-choices" role="group" aria-label="Answer choices">
         ${displayChoices.map(c => `<button class="pt-choice-btn" data-choice="${escapeAttr(c)}" aria-label="Choose ${escapeAttr(c)}">${escapeHtml(c)}</button>`).join('')}
       </div>
+      <button class="mcq-hint-btn" id="gmcq-rule-hint" aria-expanded="false">💡 Show Rule</button>
+      <div class="mcq-hint-panel" id="gmcq-hint-panel" hidden></div>
       <p class="pt-grammar-hint" id="gmcq-hint" role="status" aria-live="polite"></p>
       <div class="vmcq-next-wrap" id="gmcq-next-wrap" style="display:none">
         <button class="btn btn--primary vmcq-next-btn" id="gmcq-next" aria-label="Next question"></button>
@@ -305,11 +314,22 @@ function _renderQuestion() {
       const hint = _container.querySelector('#gmcq-hint');
       let hintText = buildMcqFeedbackHtml(item, ans, ok, { showClueWords: _difficulty !== 'challenge' });
 
+      if (ok) {
+        _categoryWrong[item.category] = 0;
+      } else {
+        _categoryWrong[item.category] = (_categoryWrong[item.category] || 0) + 1;
+      }
+
       if (!ok) {
         const suggestion = checkPostAttempt('grammarMcq', item.category, false);
         if (suggestion && suggestion.type === 'redirect') {
           hintText += ` <br>💡 ${escapeHtml(suggestion.message)}`;
         }
+      }
+
+      if (!ok && _categoryWrong[item.category] >= 2) {
+        const confusionTip = getGrammarTip(item.category);
+        hintText += `<br><span class="mcq-struggling-tip"><strong>📚 Rule reminder:</strong> ${escapeHtml(confusionTip.rule)}<br><em>${escapeHtml(confusionTip.example)}</em></span>`;
       }
 
       if (hint) hint.innerHTML = hintText;
@@ -329,6 +349,24 @@ function _renderQuestion() {
       }
     });
   });
+
+  const ruleHintBtn = _container.querySelector('#gmcq-rule-hint');
+  const ruleHintPanel = _container.querySelector('#gmcq-hint-panel');
+  if (ruleHintBtn && ruleHintPanel) {
+    ruleHintBtn.addEventListener('click', () => {
+      const wasHidden = ruleHintPanel.hidden;
+      ruleHintPanel.hidden = !wasHidden;
+      ruleHintBtn.setAttribute('aria-expanded', String(wasHidden));
+      ruleHintBtn.textContent = wasHidden ? '💡 Hide Rule' : '💡 Show Rule';
+      if (wasHidden) {
+        const tip = getGrammarTip(item.category);
+        ruleHintPanel.innerHTML = `
+          <p class="mcq-hint-rule"><strong>Rule:</strong> ${escapeHtml(tip.rule)}</p>
+          <p class="mcq-hint-eg"><em>${escapeHtml(tip.example)}</em></p>
+          <p class="mcq-hint-tip">${escapeHtml(tip.tip)}</p>`;
+      }
+    });
+  }
 }
 
 // Per-skill breakdown for this session, sorted weakest-first so the child
@@ -355,6 +393,36 @@ function _renderSkillBreakdown() {
   return `<h4 class="sq-skills-heading">Skill breakdown</h4><table class="sq-skills-table"><thead><tr><th>Skill</th><th>Score</th><th>Progress</th><th>Accuracy</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
+function _renderRuleCard(category, onStart) {
+  const tip = getGrammarTip(category);
+  const meta = GRAMMAR_CATEGORIES[category] || { icon: '🧠', label: category };
+  _container.innerHTML = `
+    <div class="mcq-rule-card" role="region" aria-label="Grammar rule for ${escapeAttr(meta.label)}">
+      <div class="mcq-rule-icon">${meta.icon}</div>
+      <h2 class="mcq-rule-title">${escapeHtml(meta.label)}</h2>
+      <div class="mcq-rule-body">
+        <div class="mcq-rule-section">
+          <p class="mcq-rule-label">📖 Rule</p>
+          <p class="mcq-rule-text">${escapeHtml(tip.rule)}</p>
+        </div>
+        <div class="mcq-rule-section">
+          <p class="mcq-rule-label">✏️ Example</p>
+          <p class="mcq-rule-example">${escapeHtml(tip.example)}</p>
+        </div>
+        <div class="mcq-rule-section">
+          <p class="mcq-rule-label">💡 Tip</p>
+          <p class="mcq-rule-tip">${escapeHtml(tip.tip)}</p>
+        </div>
+      </div>
+      <div class="sfq-actions">
+        <button class="btn btn--primary" id="mcq-rule-start">Got it — start quiz →</button>
+        <button class="btn btn--ghost" id="mcq-rule-skip">Skip →</button>
+      </div>
+    </div>`;
+  _container.querySelector('#mcq-rule-start')?.addEventListener('click', onStart);
+  _container.querySelector('#mcq-rule-skip')?.addEventListener('click', onStart);
+}
+
 function _renderDone() {
   const total = _items.length;
 
@@ -372,6 +440,22 @@ function _renderDone() {
 
   const skillRows = _renderSkillBreakdown();
 
+  let focusTip = '';
+  if (accuracy < 70) {
+    const statEntries = Object.entries(_sessionSkillStats).filter(([, s]) => s.total > 0);
+    if (statEntries.length > 0) {
+      const [weakCat] = statEntries.sort(([, a], [, b]) => (a.correct / a.total) - (b.correct / b.total))[0];
+      const weakTip = getGrammarTip(weakCat);
+      const weakMeta = GRAMMAR_CATEGORIES[weakCat] || { icon: '🧠', label: weakCat };
+      focusTip = `
+        <div class="mcq-focus-tip">
+          <p class="mcq-focus-tip-heading">${weakMeta.icon} Focus area: ${escapeHtml(weakMeta.label)}</p>
+          <p class="mcq-focus-tip-rule">${escapeHtml(weakTip.rule)}</p>
+          <p class="mcq-focus-tip-eg"><em>${escapeHtml(weakTip.example)}</em></p>
+        </div>`;
+    }
+  }
+
   _container.innerHTML = `
     <div class="sfq-browser" role="region" aria-label="Grammar MCQ results">
       <h2 class="sfq-title">${_isRecovery ? '🔄 Recovery Round Complete' : 'Grammar MCQ Complete'}</h2>
@@ -379,7 +463,7 @@ function _renderDone() {
       <p class="sfq-instruction">${_correct}/${total} correct · ${accuracy}%</p>
       ${_maxStreak >= 3 ? `<p class="sfq-instruction">${_maxStreak >= 10 ? '🔥' : _maxStreak >= 5 ? '⚡' : '✨'} Best streak: ${_maxStreak} in a row</p>` : ''}
       <p class="sfq-instruction">${accuracy >= 90 ? 'Outstanding!' : accuracy >= 70 ? 'Great work — keep practising!' : accuracy > 0 ? 'Good effort — replay to improve!' : 'Keep trying — you can do it!'}</p>
-      ${skillRows}
+      ${skillRows}${focusTip}
       <div class="sfq-actions">
         ${hasMissed ? `<button class="btn btn--primary" id="gmcq-recovery">🔄 Recovery Round (${_missed.length})</button>` : ''}
         <button class="btn ${hasMissed ? 'btn--ghost' : 'btn--primary'}" id="gmcq-replay">Replay</button>

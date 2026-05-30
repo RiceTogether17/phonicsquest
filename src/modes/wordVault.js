@@ -52,6 +52,7 @@ import { getTopWeakSkills, recordWeakSkills } from './clozeCompletionTracker.js'
 import { KNOWN_PREFIXES_EXTENDED, KNOWN_SUFFIXES_EXTENDED } from '../data/words.js';
 import { getTopMasteryGaps, recordMasteryAttempt, summariseMasteryGap } from './masteryMap.js';
 import { getActiveProfile } from '../modules/profiles.js';
+import { scheduleWord, getDueCount } from '../modules/srsScheduler.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -284,10 +285,15 @@ function _renderCategoryBrowser() {
   const levelKey   = _getProfileLevelKey();
   const levelLabel = _getProfileLevelLabel();
 
+  const dueCount = getDueCount();
+
   let html = '<div class="wv-browser">';
   html += `<div class="wv-level-context-banner" aria-live="polite">
     Currently practising: <strong>${levelLabel} Vocabulary Cloze</strong>
   </div>`;
+  if (dueCount > 0) {
+    html += `<div class="wv-srs-due-badge" aria-live="polite">📅 ${dueCount} word${dueCount === 1 ? '' : 's'} due for review</div>`;
+  }
   html += '<div class="wv-cat-grid">';
 
   const keys = Object.keys(VOCAB_CATEGORIES);
@@ -1169,16 +1175,25 @@ function _checkPassage(passage) {
     _sessionBlankCorrect = blankCorrect;
     _sessionBlankTotal = blankTotal;
 
+    // In practice mode, wrap _showComplete with the sentence step.
+    const _advanceToComplete = () => {
+      if (_sessionMode === 'practice') {
+        _showSentenceStep(passage, () => _showComplete({ blankCorrect, blankTotal }));
+      } else {
+        _showComplete({ blankCorrect, blankTotal });
+      }
+    };
+
     showAnswerReviewPanel({
       host: _container.querySelector('.wv-game'),
       title: 'Answer Review',
       rows: _buildVocabReviewRows(passage, userAnswers),
       onContinue: () => {
-        if (_isAffixMode(passage)) return _showMorphologySummary(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 300));
-        if (_currentCat === 'synonymContrast') return _showSynonymReview(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 300));
-        if (_currentCat === 'collocationCloze') return _showCollocationReview(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 300));
-        if (passage.clues && passage.clues.length > 0) return _showClueExplanation(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 400));
-        _showComplete({ blankCorrect, blankTotal });
+        if (_isAffixMode(passage)) return _showMorphologySummary(passage, () => setTimeout(() => _advanceToComplete(), 300));
+        if (_currentCat === 'synonymContrast') return _showSynonymReview(passage, () => setTimeout(() => _advanceToComplete(), 300));
+        if (_currentCat === 'collocationCloze') return _showCollocationReview(passage, () => setTimeout(() => _advanceToComplete(), 300));
+        if (passage.clues && passage.clues.length > 0) return _showClueExplanation(passage, () => setTimeout(() => _advanceToComplete(), 400));
+        _advanceToComplete();
       },
     });
   } else {
@@ -1352,6 +1367,130 @@ function _showCollocationReview(passage, onContinue) {
     <button class="btn btn--primary" id="wv-review-next">Continue →</button></div>`;
   _container.querySelector('.wv-game')?.appendChild(overlay);
   document.getElementById('wv-review-next')?.addEventListener('click', () => { overlay.remove(); onContinue?.(); });
+}
+
+// ── "Use it in a sentence" step (practice mode only) ──────────────────────
+
+/**
+ * Pick the target word for the sentence step.
+ * Prefer the first answer that has a definition in passage.definitions,
+ * fall back to the first answer.
+ */
+function _getSentenceTargetWord(passage) {
+  const defs = passage.definitions || {};
+  const answers = passage.answers || [];
+  const withDef = answers.find(a => defs[a]);
+  return withDef || answers[0] || null;
+}
+
+/**
+ * Build a model sentence fragment from the passage text for the target word.
+ * Finds the sentence in the passage that contains the blank corresponding to
+ * the target word, then returns it with the blank filled.
+ */
+function _getModelSentence(passage, targetWord) {
+  const answers = passage.answers || [];
+  const blankIndex = answers.indexOf(targetWord);
+  if (blankIndex === -1) return `Use "${targetWord}" in a complete sentence.`;
+
+  // Split on ___ and reconstruct the surrounding sentence
+  const parts = (passage.text || '').split('___');
+  if (blankIndex >= parts.length - 1) return `Use "${targetWord}" in a complete sentence.`;
+
+  // Grab the text segment that spans the blank
+  const before = parts[blankIndex];
+  const after  = parts[blankIndex + 1];
+
+  // Find the start of the sentence containing the blank
+  const sentenceStartMatch = before.match(/(?:^|[.!?]\s+)([^.!?]*)$/s);
+  const sentenceBefore = sentenceStartMatch ? sentenceStartMatch[1] : before.slice(-60);
+
+  // Find the end of the sentence after the blank
+  const sentenceEndMatch = after.match(/^([^.!?]*[.!?])/s);
+  const sentenceAfter = sentenceEndMatch ? sentenceEndMatch[1] : after.slice(0, 60);
+
+  const model = `${sentenceBefore.trimStart()}${targetWord}${sentenceAfter}`.trim();
+  return model || `Use "${targetWord}" in a complete sentence.`;
+}
+
+/**
+ * Show the "Use it in a sentence" intermediate screen.
+ * Only called in practice mode. Calls scheduleWord() on self-assessment or skip,
+ * then invokes onContinue.
+ *
+ * @param {object} passage     - current passage object
+ * @param {function} onContinue - called after the step resolves
+ */
+function _showSentenceStep(passage, onContinue) {
+  if (!_container) { onContinue(); return; }
+
+  const targetWord = _getSentenceTargetWord(passage);
+  if (!targetWord) { onContinue(); return; }
+
+  const defs = passage.definitions || {};
+  const definition = defs[targetWord] || 'Use the sentence context to understand this word.';
+  const modelSentence = _getModelSentence(passage, targetWord);
+  const wordId = `${_currentCat}__${targetWord}`.toLowerCase().replace(/\s+/g, '_');
+
+  const existing = document.getElementById('wv-sentence-step-overlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id        = 'wv-sentence-step-overlay';
+  overlay.className = 'clue-explanation-overlay';
+  overlay.innerHTML = `
+    <div class="clue-explanation-card wv-sentence-step">
+      <p class="clue-explanation-title">📝 Use the word in a sentence!</p>
+      <div class="clue-explanation-body">
+        <p class="wv-sentence-step__word">Word: <strong>${escapeHtml(targetWord)}</strong></p>
+        <p class="wv-sentence-step__meaning">Meaning: ${escapeHtml(definition)}</p>
+        <label class="wv-sentence-step__label" for="wv-sentence-input">
+          Write a sentence using "<strong>${escapeHtml(targetWord)}</strong>":
+        </label>
+        <input
+          type="text"
+          id="wv-sentence-input"
+          class="sfq-input wv-sentence-step__input"
+          placeholder="Type your sentence here…"
+          autocomplete="off"
+          aria-label="Write a sentence using the word ${escapeHtml(targetWord)}"
+        />
+        <div class="wv-sentence-step__model" id="wv-sentence-model" hidden>
+          <p class="wv-sentence-step__model-label">Model sentence:</p>
+          <p class="wv-sentence-step__model-text">${escapeHtml(modelSentence)}</p>
+        </div>
+      </div>
+      <div class="wv-sentence-step__actions">
+        <button class="btn btn--primary" id="wv-sentence-similar">✓ My sentence is similar</button>
+        <button class="btn btn--ghost btn--sm" id="wv-sentence-skip">↩ Skip</button>
+      </div>
+    </div>`;
+
+  _container.querySelector('.wv-game')?.appendChild(overlay);
+
+  const input = overlay.querySelector('#wv-sentence-input');
+  const modelEl = overlay.querySelector('#wv-sentence-model');
+
+  // Show model sentence once at least 5 characters have been typed
+  input?.addEventListener('input', () => {
+    if (input.value.length >= 5 && modelEl) {
+      modelEl.hidden = false;
+    }
+  });
+
+  overlay.querySelector('#wv-sentence-similar')?.addEventListener('click', () => {
+    scheduleWord(wordId, true);
+    overlay.remove();
+    onContinue();
+  });
+
+  overlay.querySelector('#wv-sentence-skip')?.addEventListener('click', () => {
+    scheduleWord(wordId, false);
+    overlay.remove();
+    onContinue();
+  });
+
+  setTimeout(() => input?.focus(), 100);
 }
 
 function _showFeedback(msg, success) {
