@@ -74,10 +74,16 @@ export function setupLastSound(word, els) {
   const lastType     = word.types[lastIdx];
 
   const distractors = _getDistractors(lastGrapheme, 'last', word.level, lastType);
-  const choices = shuffleArray([
+  // Phase 1–2 words → alphabetical order (predictable for the teacher, lower
+  // load for the child). Phase 3+ → shuffled so the answer can't be located
+  // by remembered position. See firstSound.js for the rationale.
+  const baseChoices = [
     { grapheme: lastGrapheme, type: lastType, correct: true },
     ...distractors.slice(0, 3).map(g => ({ ...g, correct: false })),
-  ]);
+  ];
+  const choices = (word.level ?? 1) <= 2
+    ? [...baseChoices].sort((a, b) => a.grapheme.localeCompare(b.grapheme))
+    : shuffleArray(baseChoices);
 
   // Speak the word first; gate the choice previews on it finishing so the
   // two audio streams never overlap. Gate combines TTS-end + wall-clock

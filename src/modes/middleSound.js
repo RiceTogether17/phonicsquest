@@ -62,10 +62,16 @@ export function setupMiddleSound(word, els) {
   const midType    = word.types[midIdx];
 
   const distractors = _getVowelDistractors(midGrapheme, word.level, midType);
-  const choices = shuffleArray([
+  // Phase 1–2 words → vowels in alphabetical order (a, e, i, o, u feel),
+  // so the teacher can sweep through middle sounds systematically. Phase 3+
+  // → shuffled. See firstSound.js for the rationale.
+  const baseChoices = [
     { grapheme: midGrapheme, type: midType, correct: true },
     ...distractors.slice(0, 3).map(g => ({ ...g, correct: false })),
-  ]);
+  ];
+  const choices = (word.level ?? 1) <= 2
+    ? [...baseChoices].sort((a, b) => a.grapheme.localeCompare(b.grapheme))
+    : shuffleArray(baseChoices);
 
   // Speak the word first; gate the choice previews on it finishing so the
   // two audio streams never overlap. Gate combines TTS-end + wall-clock

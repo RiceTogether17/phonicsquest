@@ -72,6 +72,8 @@ import { getStagesForMode } from './modules/phonicsProgression.js';
 import {
   buildProgressionSnapshot, getUnlockedStages, getRecommendedStage, explainLockReason,
 } from './modules/progression.js';
+import { createPaSequencerState, nextPaWord, paPositionForMode } from './modules/paTargetSequencer.js';
+import { WORDS } from './data/words.js';
 import { SCREENS, QUEST_THRESHOLDS } from './constants.js';
 import { modalManager } from './modules/modalManager.js';
 import { keyboardManager } from './modules/keyboardManager.js';
@@ -103,6 +105,16 @@ class App {
     this._mode = 'blend';
     /** @type {import('./data/words.js').Word|null} */
     this._currentWord = null;
+
+    /**
+     * Per-session state for the phonemic-awareness target sequencer
+     * (First / Last / Middle Sound). Tracks where on the alphabetical
+     * target ladder the child is, so each sound is heard as a SET of
+     * exemplars before the ladder advances. Auto-resets when the mode
+     * or stage changes — see paTargetSequencer.js for the policy.
+     * @type {import('./modules/paTargetSequencer.js').PaSequencerState}
+     */
+    this._paSeqState = createPaSequencerState();
 
     /**
      * Session type: 'normal' | 'dailyChallenge' | 'review' | 'wordWorkout'
@@ -233,6 +245,7 @@ class App {
     const PICKER_MODES = new Set([
       'blend', 'oralBlend', 'first', 'last', 'middle',
       'soundCount', 'hear', 'missing', 'segment',
+      'train', 'syllable',
     ]);
 
     document.querySelectorAll('.mode-card').forEach((card, idx) => {
@@ -751,7 +764,16 @@ class App {
       const effectiveDiff = modeDiffs[this._mode] ?? store.get('difficulty') ?? 1;
       const opts = { maxLevel: effectiveDiff, mode: this._mode };
       if (group) opts.group = group;
-      this._currentWord = progress.getNextWord(opts);
+
+      // First / Last / Middle Sound run through the target sequencer so the
+      // child meets each target phoneme as a set of exemplars (alphabetical
+      // ladder) before moving on, instead of bouncing around adaptively.
+      if (paPositionForMode(this._mode)) {
+        this._currentWord = nextPaWord(this._paSeqState, { ...opts, wordList: WORDS });
+      }
+      if (!this._currentWord) {
+        this._currentWord = progress.getNextWord(opts);
+      }
     }
 
     audio.preloadWord(this._currentWord);

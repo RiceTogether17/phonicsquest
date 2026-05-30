@@ -83,10 +83,17 @@ export function setupFirstSound(word, els) {
   const distractorGraphemes = getFirstSoundDistractors(firstGrapheme, firstType, word.level);
   const distractors = shuffleArray(distractorGraphemes).slice(0, 3);
 
-  const choices = shuffleArray([
+  // Early-stage learners (Phase 1–2 words) get the choices in alphabetical
+  // order so the teacher/parent can cover initial sounds systematically and
+  // the child has a stable scanning frame. From Phase 3 onward we shuffle
+  // so finding the answer is a genuine auditory discrimination task again.
+  const baseChoices = [
     { grapheme: firstGrapheme, type: firstType, correct: true },
     ...distractors.map(g => ({ grapheme: g.grapheme, type: g.type, correct: false })),
-  ]);
+  ];
+  const choices = (word.level ?? 1) <= 2
+    ? [...baseChoices].sort((a, b) => a.grapheme.localeCompare(b.grapheme))
+    : shuffleArray(baseChoices);
 
   // Play the target word FIRST and wait for it to finish before previewing
   // the choice phonemes — overlapping the two makes the question unlistenable
@@ -185,7 +192,7 @@ function handleChoice(choice, btn, word, els, grid) {
  *   2. Other phonemes of the same type from the word list.
  *   3. Any phoneme from the word list (fallback).
  */
-function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel = 3) {
+export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel = 3) {
   const seen        = new Set([correctGrapheme]);
   const distractors = [];
 

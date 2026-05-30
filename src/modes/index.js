@@ -20,6 +20,8 @@ import { setupLastSound,   cleanup as cleanupLast,   getCurrentWord as getLastWo
 import { setupMiddleSound, cleanup as cleanupMiddle, getCurrentWord as getMiddleWord } from './middleSound.js';
 import { setupOralBlend,   cleanup as cleanupOralBlend, getCurrentWord as getOralBlendWord } from './oralBlend.js';
 import { setupSoundCount,  cleanup as cleanupSoundCount, getCurrentWord as getSoundCountWord } from './soundCount.js';
+import { setupTrainCarriages, cleanup as cleanupTrain, getCurrentWord as getTrainWord } from './trainCarriages.js';
+import { setupSyllableClap, cleanup as cleanupSyllable, getCurrentWord as getSyllableWord } from './syllableClap.js';
 
 /**
  * @typedef {Object} Mode
@@ -114,6 +116,28 @@ export const MODES = {
     setup: setupSoundCount,
     cleanup: cleanupSoundCount,
     getCurrentWord: getSoundCountWord,
+  },
+  train: {
+    key: 'train',
+    name: 'Train Carriages',
+    desc: 'Collect words that start with the same sound',
+    icon: '🚂',
+    group: 'phonemic',
+    subskill: 'initial-phoneme-collection',
+    setup: setupTrainCarriages,
+    cleanup: cleanupTrain,
+    getCurrentWord: getTrainWord,
+  },
+  syllable: {
+    key: 'syllable',
+    name: 'Clap the Syllables',
+    desc: 'How many beats in the word?',
+    icon: '👏',
+    group: 'phonemic',
+    subskill: 'syllable-counting',
+    setup: setupSyllableClap,
+    cleanup: cleanupSyllable,
+    getCurrentWord: getSyllableWord,
   },
   // ── Sound-to-print bridge (phonics application) ───────────────────────
   hear: {

@@ -99,7 +99,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['short a /ă/', 'short e /ĕ/', 'short i /ĭ/', 'short o /ŏ/', 'short u /ŭ/'],
     sampleWords: ['cat', 'hen', 'big', 'dog', 'bug', 'map', 'pen', 'sit', 'top', 'sun'],
     sentenceExamples: ['The cat sat on a mat.', 'A pig is in the mud.'],
-    recommendedModes: ['oralBlend', 'first', 'last', 'middle', 'soundCount', 'blend', 'segment'],
+    recommendedModes: ['oralBlend', 'first', 'last', 'middle', 'soundCount', 'blend', 'segment', 'train'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -113,7 +113,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['bl', 'cl', 'fl', 'gl', 'pl', 'sl', 'br', 'cr', 'dr', 'fr', 'gr', 'pr', 'tr', 'sk', 'sm', 'sn', 'sp', 'st', 'sw'],
     sampleWords: ['flat', 'clap', 'trap', 'step', 'sled', 'flip', 'drip', 'drop', 'stop', 'drum'],
     sentenceExamples: ['I can clap and step.', 'A frog is on the slip mat.'],
-    recommendedModes: ['blend', 'classicBlend', 'segment', 'hear', 'last', 'soundCount', 'missing'],
+    recommendedModes: ['blend', 'classicBlend', 'segment', 'hear', 'last', 'soundCount', 'missing', 'train'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -211,7 +211,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['-ing /ɪŋ/', '-ed /d/, /t/, /ɪd/', '-er /ɚ/', '-est /ɪst/'],
     sampleWords: ['running', 'jumped', 'faster', 'tallest', 'helped', 'biggest', 'playing', 'sitting', 'slower', 'eating'],
     sentenceExamples: ['He was running faster than me.', 'The biggest cat jumped highest.'],
-    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    recommendedModes: ['classicBlend', 'hear', 'segment', 'syllable'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -225,7 +225,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['re-', 'un-', '-tion', '-able', 'open/closed syllables', 'irregular sight'],
     sampleWords: ['redo', 'untie', 'action', 'readable', 'science', 'market', 'their', 'because', 'enough', 'through'],
     sentenceExamples: ['Their friend is reading because the book is good.', 'I will redo my action plan.'],
-    recommendedModes: ['classicBlend', 'hear'],
+    recommendedModes: ['classicBlend', 'hear', 'syllable'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 ]);
