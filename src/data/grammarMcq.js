@@ -1738,6 +1738,13 @@ function buildLevel(level) {
     if (spec.optionExplanations) item.optionExplanations = spec.optionExplanations;
     if (spec.clueWords) item.clueWords = spec.clueWords;
     if (spec.reasoning) item.reasoning = spec.reasoning;
+    // Two-sentence context items require reading the first sentence as a clue,
+    // which makes them inherently harder — promote to difficulty 3 regardless
+    // of where they landed in the rotation. P1/P2 cap at difficulty 2 by design.
+    if (item.difficulty < 3 && ['P3', 'P4', 'P5', 'P6'].includes(level) &&
+        /[a-zA-Z][.!?]\s+[A-Z][^.!?]*___/.test(item.q)) {
+      item.difficulty = 3;
+    }
     items.push(item);
   }
 
