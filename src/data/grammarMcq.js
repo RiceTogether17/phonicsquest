@@ -1,11 +1,3 @@
-import {
-  makeAgreementOptionExplanations,
-  makeArticleOptionExplanations,
-  makePronounOptionExplanations,
-  makeTenseOptionExplanations,
-} from './mcqOptionExplanations.js';
-import { inferQuestionContextType } from './mcqItemMetadata.js';
-
 /**
  * PhonicsQuest – Grammar MCQ Item Bank
  *
@@ -55,35 +47,135 @@ function difficultyFor(level, idx) {
 const GRAMMAR_BUILDERS = {
   articles(level, i) {
     const rows = [
-      ['___ hour had passed, but the team had not given up.', 'An', ['A', 'The', 'Some']],
-      ['Priya found ___ umbrella leaning against the classroom door.', 'an', ['a', 'the', 'some']],
-      ['The coach shared ___ useful tip just before the match began.', 'a', ['an', 'the', 'some']],
-      ['I saw ___ eagle gliding slowly above the field.', 'an', ['a', 'the', 'some']],
-      ['That was ___ excellent answer — the class was impressed.', 'an', ['a', 'the', 'some']],
-      ['Mum left ___ orange on the counter as a snack.', 'an', ['a', 'the', 'some']],
-      ['Please pass me ___ ruler so I can draw a margin.', 'a', ['an', 'the', 'some']],
-      ['___ uniform with the school crest hung in the display case.', 'A', ['An', 'The', 'Some']],
-      ['She gave ___ honest answer to a tricky question.', 'an', ['a', 'the', 'some']],
-      ['He found ___ empty seat near the library window.', 'an', ['a', 'the', 'some']],
-      ['The class planted ___ mango seedling in the school garden.', 'a', ['an', 'the', 'some']],
-      ['We heard ___ unusual noise coming from the storeroom.', 'an', ['a', 'the', 'some']],
-      ['Jake slipped ___ extra pen into his pencil case just in case.', 'an', ['a', 'the', 'some']],
-      ['___ ice-cream treat awaited each pupil after Sports Day.', 'An', ['A', 'The', 'Some']],
-      ['The new pupil gave ___ interesting talk about her home country.', 'an', ['a', 'the', 'some']],
-      ['The principal made ___ announcement about the upcoming camp.', 'an', ['a', 'the', 'some']],
-      ['___ Sun rises in the east and sets in the west every day.', 'The', ['A', 'An', 'Some']],
-      ['My father is ___ engineer who works in Jurong Island.', 'an', ['a', 'the', 'some']],
-      ['Mdm Siti is ___ principal of our school this year.', 'the', ['a', 'an', 'some']],
-      ['Would you like ___ ice-cold water after your PE lesson?', 'some', ['a', 'an', 'the']],
+      ['___ hour had passed, but the team had not given up.', 'An', ['A', 'The', 'Some'], {
+        'An': '"An" is correct because "hour" starts with a vowel sound /aʊ/, even though it is spelled with "h".',
+        'A': '"A" is used before consonant sounds, but "hour" starts with a vowel sound because the "h" is silent.',
+        'The': '"The" is for a specific noun already known to both speaker and listener, not a first mention.',
+        'Some': '"Some" is for plural or uncountable nouns, not a single countable hour.',
+      }],
+      ['Priya found ___ umbrella leaning against the classroom door.', 'an', ['a', 'the', 'some'], {
+        'an': '"An" is correct because "umbrella" starts with the vowel sound /ʌ/.',
+        'a': '"A" is used before consonant sounds, but "umbrella" starts with a vowel sound.',
+        'the': '"The" would mean a specific umbrella already known to the listener, but this is a first mention.',
+        'some': '"Some" is for plural or uncountable nouns, not a single umbrella.',
+      }],
+      ['The coach shared ___ useful tip just before the match began.', 'a', ['an', 'the', 'some'], {
+        'a': '"A" is correct because "useful" starts with the consonant sound /j/ (like "you"), not a vowel sound.',
+        'an': '"An" is used before vowel sounds, but "useful" starts with the /j/ consonant sound.',
+        'the': '"The" would suggest a specific tip already known, but this is new advice.',
+        'some': '"Some" is for plural or uncountable nouns, not a single tip.',
+      }],
+      ['I saw ___ eagle gliding slowly above the field.', 'an', ['a', 'the', 'some'], {
+        'an': '"An" is correct because "eagle" starts with the vowel sound /iː/.',
+        'a': '"A" is used before consonant sounds, but "eagle" begins with a vowel sound.',
+        'the': '"The" would mean a specific eagle already mentioned, but this is a first sighting.',
+        'some': '"Some" is for plural or uncountable nouns, not one eagle.',
+      }],
+      ['That was ___ excellent answer — the class was impressed.', 'an', ['a', 'the', 'some'], {
+        'an': '"An" is correct because "excellent" starts with the vowel sound /ɛ/.',
+        'a': '"A" is used before consonant sounds, but "excellent" starts with a vowel sound.',
+        'the': '"The" would point to a specific answer already known to both speaker and listener.',
+        'some': '"Some" is for plural or uncountable nouns, not a single answer.',
+      }],
+      ['Mum left ___ orange on the counter as a snack.', 'an', ['a', 'the', 'some'], {
+        'an': '"An" is correct because "orange" starts with the vowel sound /ɒ/.',
+        'a': '"A" is used before consonant sounds, but "orange" starts with a vowel sound.',
+        'the': '"The" would mean a specific orange already known to both speaker and listener.',
+        'some': '"Some" is for plural or uncountable nouns, not one orange.',
+      }],
+      ['Please pass me ___ ruler so I can draw a margin.', 'a', ['an', 'the', 'some'], {
+        'a': '"A" is correct because "ruler" starts with the consonant sound /r/.',
+        'an': '"An" is used before vowel sounds, but "ruler" begins with the consonant /r/.',
+        'the': '"The" would mean a specific ruler the listener already knows about.',
+        'some': '"Some" is for plural or uncountable nouns, not one ruler.',
+      }],
+      ['___ uniform with the school crest hung in the display case.', 'A', ['An', 'The', 'Some'], {
+        'A': '"A" is correct because "uniform" starts with the consonant sound /j/ (like "you"), not a vowel sound.',
+        'An': '"An" is used before vowel sounds, but "uniform" starts with the /j/ consonant sound.',
+        'The': '"The" would mean a specific uniform already known to everyone, but this is a first mention.',
+        'Some': '"Some" is for plural or uncountable nouns, not a single uniform.',
+      }],
+      ['She gave ___ honest answer to a tricky question.', 'an', ['a', 'the', 'some'], {
+        'an': '"An" is correct because "honest" has a silent "h", so it begins with the vowel sound /ɒ/.',
+        'a': '"A" is used before consonant sounds, but the "h" in "honest" is silent, making it start with a vowel sound.',
+        'the': '"The" would point to a specific answer already known to both speaker and listener.',
+        'some': '"Some" is for plural or uncountable nouns, not one answer.',
+      }],
+      ['He found ___ empty seat near the library window.', 'an', ['a', 'the', 'some'], {
+        'an': '"An" is correct because "empty" starts with the vowel sound /ɛ/.',
+        'a': '"A" is used before consonant sounds, but "empty" begins with a vowel sound.',
+        'the': '"The" would suggest a specific seat already known, but this is a first mention.',
+        'some': '"Some" is for plural or uncountable nouns, not one seat.',
+      }],
+      ['The class planted ___ mango seedling in the school garden.', 'a', ['an', 'the', 'some'], {
+        'a': '"A" is correct because "mango" starts with the consonant sound /m/.',
+        'an': '"An" is used before vowel sounds, but "mango" begins with the consonant /m/.',
+        'the': '"The" would mean a specific seedling already mentioned, but this is a new one.',
+        'some': '"Some" is for plural or uncountable nouns, not a single seedling.',
+      }],
+      ['We heard ___ unusual noise coming from the storeroom.', 'an', ['a', 'the', 'some'], {
+        'an': '"An" is correct because "unusual" starts with the vowel sound /ʌ/.',
+        'a': '"A" is used before consonant sounds, but "unusual" begins with a vowel sound.',
+        'the': '"The" would mean a specific noise already known, but this is an unexpected new sound.',
+        'some': '"Some" is for plural or uncountable nouns, not one noise.',
+      }],
+      ['Jake slipped ___ extra pen into his pencil case just in case.', 'an', ['a', 'the', 'some'], {
+        'an': '"An" is correct because "extra" starts with the vowel sound /ɛ/.',
+        'a': '"A" is used before consonant sounds, but "extra" begins with a vowel sound.',
+        'the': '"The" would point to a specific pen already known, but Jake is just adding one more.',
+        'some': '"Some" is for plural or uncountable nouns, not one pen.',
+      }],
+      ['___ ice-cream treat awaited each pupil after Sports Day.', 'An', ['A', 'The', 'Some'], {
+        'An': '"An" is correct because "ice-cream" starts with the vowel sound /aɪ/.',
+        'A': '"A" is used before consonant sounds, but "ice-cream" begins with a vowel sound.',
+        'The': '"The" would mean a specific treat already known to everyone, but this is simply one treat per pupil.',
+        'Some': '"Some" is for plural or uncountable nouns, not a single treat.',
+      }],
+      ['The new pupil gave ___ interesting talk about her home country.', 'an', ['a', 'the', 'some'], {
+        'an': '"An" is correct because "interesting" starts with the vowel sound /ɪ/.',
+        'a': '"A" is used before consonant sounds, but "interesting" begins with a vowel sound.',
+        'the': '"The" would mean a specific talk already known, but this is simply one talk she gave.',
+        'some': '"Some" is for plural or uncountable nouns, not one talk.',
+      }],
+      ['The principal made ___ announcement about the upcoming camp.', 'an', ['a', 'the', 'some'], {
+        'an': '"An" is correct because "announcement" starts with the vowel sound /ə/.',
+        'a': '"A" is used before consonant sounds, but "announcement" begins with a vowel sound.',
+        'the': '"The" would mean a specific announcement already known, but this is new information.',
+        'some': '"Some" is for plural or uncountable nouns, not one announcement.',
+      }],
+      ['___ Sun rises in the east and sets in the west every day.', 'The', ['A', 'An', 'Some'], {
+        'The': '"The" is correct because there is only one Sun, making it a unique noun that always takes "the".',
+        'A': '"A" is for any one of many things, but there is only one Sun, so it must be "the".',
+        'An': '"An" is used before vowel sounds with singular nouns, but the Sun is unique and always takes "the".',
+        'Some': '"Some" is for plural or uncountable nouns; the Sun is a unique singular noun.',
+      }],
+      ['My father is ___ engineer who works in Jurong Island.', 'an', ['a', 'the', 'some'], {
+        'an': '"An" is correct because "engineer" starts with the vowel sound /ɛ/.',
+        'a': '"A" is used before consonant sounds, but "engineer" begins with a vowel sound.',
+        'the': '"The" would mean a specific, unique engineer already known, but this is just introducing his job.',
+        'some': '"Some" is for plural or uncountable nouns, not one engineer.',
+      }],
+      ['Mdm Siti is ___ principal of our school this year.', 'the', ['a', 'an', 'some'], {
+        'the': '"The" is correct because there is only one principal of the school, making it a unique role.',
+        'a': '"A" would suggest one of several principals, but a school has only one principal at a time.',
+        'an': '"An" is used before vowel sounds, but "principal" starts with /p/, and there is only one anyway.',
+        'some': '"Some" is for plural or uncountable nouns, not a unique role like school principal.',
+      }],
+      ['Would you like ___ ice-cold water after your PE lesson?', 'some', ['a', 'an', 'the'], {
+        'some': '"Some" is correct because water is an uncountable noun, and "some" is used in polite offers.',
+        'a': '"A" is used with singular countable nouns; water is uncountable, so "a" does not fit.',
+        'an': '"An" is used before vowel sounds with singular countable nouns; water is uncountable.',
+        'the': '"The" would mean a specific water already known, but this is a general offer.',
+      }],
     ];
-    const [q, answer, ds] = rotate(rows, i);
+    const [q, answer, ds, optionExplanations] = rotate(rows, i);
     return {
       subskill: 'article_choice',
       q,
       choices: buildChoices(answer, ds),
       answer,
       explain: 'Use "a" before consonant sounds and "an" before vowel sounds — including silent-h words like "hour" and "honest".',
-      optionExplanations: makeArticleOptionExplanations(answer, ds),
+      optionExplanations,
     };
   },
   pronouns(level, i) {
@@ -110,20 +202,71 @@ const GRAMMAR_BUILDERS = {
       ['Can you help ___? I cannot open my locker.', 'me', ['I', 'my', 'mine']],
     ];
     const upperRows = [
-      ['The girls were late, so ___ apologised to the teacher.', 'they', ['them', 'their', 'theirs']],
-      ['Mr Tan called Ali and me, so he spoke to ___.', 'us', ['we', 'our', 'ours']],
-      ['That sketchbook belongs to Mei. It is ___.', 'hers', ['her', 'she', 'herself']],
-      ['Please pass the worksheet to Dan and ___.', 'me', ['I', 'my', 'mine']],
-      ['The volunteers worked hard, and the principal thanked ___ warmly.', 'them', ['they', 'their', 'theirs']],
-      ['My brother and ___ share the same room at home.', 'I', ['me', 'my', 'mine']],
-      ['The new uniform belongs to my cousin — it is ___.', 'his', ['he', 'him', 'himself']],
-      ['Sarah lent me her novel, so I returned it to ___ this morning.', 'her', ['she', 'hers', 'herself']],
-      ['The committee made ___ decision after a long discussion.', 'its', ['it', 'their', 'theirs']],
-      ['Between Daniel and ___, who do you think will win the quiz?', 'me', ['I', 'my', 'mine']],
+      ['The girls were late, so ___ apologised to the teacher.', 'they', ['them', 'their', 'theirs'], {
+        'they': '"They" is correct because it is the subject pronoun doing the action of apologising.',
+        'them': '"Them" is an object pronoun — it receives an action — but the girls are doing the apologising.',
+        'their': '"Their" is a possessive adjective (e.g. "their bags"), not a pronoun that performs an action.',
+        'theirs': '"Theirs" is a possessive pronoun used to show ownership, not to perform an action.',
+      }],
+      ['Mr Tan called Ali and me, so he spoke to ___.', 'us', ['we', 'our', 'ours'], {
+        'us': '"Us" is correct because it is the object pronoun — we are receiving the action of being spoken to.',
+        'we': '"We" is a subject pronoun; after "to" as the receiver of an action, the object pronoun "us" is needed.',
+        'our': '"Our" is a possessive adjective (e.g. "our books"), not an object pronoun.',
+        'ours': '"Ours" is a possessive pronoun showing ownership, not an object pronoun.',
+      }],
+      ['That sketchbook belongs to Mei. It is ___.', 'hers', ['her', 'she', 'herself'], {
+        'hers': '"Hers" is correct because it is a possessive pronoun that stands alone without a noun after it.',
+        'her': '"Her" is a possessive adjective used before a noun (e.g. "her book"), but no noun follows here.',
+        'she': '"She" is a subject pronoun, not used to show ownership.',
+        'herself': '"Herself" is a reflexive pronoun for emphasis or when subject and object are the same person.',
+      }],
+      ['Please pass the worksheet to Dan and ___.', 'me', ['I', 'my', 'mine'], {
+        'me': '"Me" is correct because it is the object pronoun — the worksheet is being passed to me.',
+        'I': '"I" is a subject pronoun used when doing an action; after "to", the object pronoun "me" is needed.',
+        'my': '"My" is a possessive adjective (e.g. "my worksheet"), not an object pronoun.',
+        'mine': '"Mine" is a possessive pronoun standing alone; it is not used after "to" as an object.',
+      }],
+      ['The volunteers worked hard, and the principal thanked ___ warmly.', 'them', ['they', 'their', 'theirs'], {
+        'them': '"Them" is correct because it is the object pronoun — the volunteers are being thanked.',
+        'they': '"They" is a subject pronoun for when people do an action, but here they receive the thanks.',
+        'their': '"Their" is a possessive adjective showing ownership, not an object pronoun.',
+        'theirs': '"Theirs" is a possessive pronoun showing ownership, not used after a verb as an object.',
+      }],
+      ['My brother and ___ share the same room at home.', 'I', ['me', 'my', 'mine'], {
+        'I': '"I" is correct because "my brother and I" is the subject doing the action of sharing.',
+        'me': '"Me" is an object pronoun; as part of the subject doing the action, "I" is needed.',
+        'my': '"My" is a possessive adjective, not a pronoun that can perform an action.',
+        'mine': '"Mine" is a possessive pronoun showing ownership, not a subject pronoun.',
+      }],
+      ['The new uniform belongs to my cousin — it is ___.', 'his', ['he', 'him', 'himself'], {
+        'his': '"His" is correct because it is a possessive pronoun that stands alone to show ownership.',
+        'he': '"He" is a subject pronoun, not used to show ownership.',
+        'him': '"Him" is an object pronoun, not used to show ownership.',
+        'himself': '"Himself" is a reflexive pronoun for emphasis or reflexive actions, not for possession.',
+      }],
+      ['Sarah lent me her novel, so I returned it to ___ this morning.', 'her', ['she', 'hers', 'herself'], {
+        'her': '"Her" is correct because it is the object pronoun — Sarah is the receiver after the preposition "to".',
+        'she': '"She" is a subject pronoun; after the preposition "to", the object pronoun "her" is needed.',
+        'hers': '"Hers" is a possessive pronoun standing alone; it is not used after a preposition like "to".',
+        'herself': '"Herself" is a reflexive pronoun used when subject and object are the same person.',
+      }],
+      ['The committee made ___ decision after a long discussion.', 'its', ['it', 'their', 'theirs'], {
+        'its': '"Its" is correct because "committee" is a singular collective noun, so the possessive adjective "its" is used.',
+        'it': '"It" is a subject or object pronoun, not a possessive adjective before a noun like "decision".',
+        'their': '"Their" is for plural subjects, but "committee" is treated as a singular noun here.',
+        'theirs': '"Theirs" is a possessive pronoun that stands alone and cannot come before a noun like "decision".',
+      }],
+      ['Between Daniel and ___, who do you think will win the quiz?', 'me', ['I', 'my', 'mine'], {
+        'me': '"Me" is correct because after the preposition "between", the object pronoun is always used.',
+        'I': '"I" is a subject pronoun; after the preposition "between", the object pronoun "me" is needed.',
+        'my': '"My" is a possessive adjective, not the pronoun needed after a preposition.',
+        'mine': '"Mine" is a possessive pronoun showing ownership, not used after a preposition like "between".',
+      }],
     ];
     const rows = level === 'P1' ? p1Rows : upperRows;
-    const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'pronoun_form', q, choices: buildChoices(answer, ds), answer, explain: 'Subject pronouns (I, he, she, we, they) do the action. Object pronouns (me, him, her, us, them) receive it. After prepositions and as objects, use the object form — e.g. "between Daniel and me", "thanked them".', optionExplanations: makePronounOptionExplanations(answer, ds) };
+    const [q, answer, ds, optionExplanations] = rotate(rows, i);
+    return { subskill: 'pronoun_form', q, choices: buildChoices(answer, ds), answer, explain: 'Subject pronouns (I, he, she, we, they) do the action. Object pronouns (me, him, her, us, them) receive it. After prepositions and as objects, use the object form — e.g. "between Daniel and me", "thanked them".',
+      optionExplanations };
   },
   reflexivePronouns(level, i) {
     const rows = [
@@ -851,32 +994,130 @@ const GRAMMAR_BUILDERS = {
   },
   presentPerfect(level, i) {
     const rows = [
-      ['She ___ her assignment already.', 'has completed', ['completed', 'had completed', 'is completing']],
-      ['We ___ this museum before.', 'have visited', ['visited', 'had visited', 'are visiting']],
-      ['The boys ___ their shoes, so they are ready.', 'have polished', ['polished', 'had polished', 'are polishing']],
-      ['He ___ his wallet, so he cannot pay now.', 'has lost', ['lost', 'had lost', 'is losing']],
-      ['I ___ the new librarian three times this week.', 'have met', ['met', 'had met', 'am meeting']],
-      ['My grandmother ___ in this town since she was a child.', 'has lived', ['lived', 'had lived', 'is living']],
-      ['The volunteers ___ over fifty bags of donations so far.', 'have packed', ['packed', 'had packed', 'are packing']],
-      ['Our teacher ___ the test papers, so we will know our scores tomorrow.', 'has marked', ['marked', 'had marked', 'was marking']],
-      ['I ___ to Penang twice and would happily go again.', 'have travelled', ['travelled', 'had travelled', 'am travelling']],
-      ['The cleaners ___ the corridor, so please walk carefully on the wet floor.', 'have just mopped', ['just mop', 'just mopping', 'were mopping']],
-      ['She ___ her room since Monday — it has become a mess.', 'has not tidied', ['did not tidy', 'is not tidying', 'had not tidied']],
-      ['The technician ___ the broken projector, so the lesson can begin.', 'has fixed', ['fixed', 'had fixed', 'is fixing']],
-      ['The students ___ already submitted their science projects.', 'have', ['has', 'had', 'are']],
-      ['Mr Tan ___ not yet received the permission slips from all parents.', 'has', ['have', 'had', 'was']],
-      ['We ___ never seen such a beautiful display at the science fair.', 'have', ['has', 'had', 'were']],
-      ['___ you ever tried chilli crab at a hawker centre?', 'Have', ['Has', 'Had', 'Did']],
-      ['The library ___ just introduced a new self-borrowing machine.', 'has', ['have', 'had', 'was']],
-      ['My grandmother ___ lived in the same flat since 1985.', 'has', ['have', 'had', 'is']],
-      ['The players ___ not trained since the last public holiday.', 'have', ['has', 'had', 'were']],
-      ['The bus ___ just left, so we will have to wait for the next one.', 'has', ['have', 'had', 'was']],
-      ['Priya practises the flute every day. She ___ been playing it since Primary One.', 'has', ['have', 'had', 'is']],
-      ['Siti forgot to bring her library book again today. She ___ forgotten it three times this week.', 'has', ['have', 'had', 'was']],
-      ['Wei and his team trained hard this term. They ___ won every match so far this season.', 'have', ['has', 'had', 'were']],
+      ['She ___ her assignment already.', 'has completed', ['completed', 'had completed', 'is completing'], {
+        'has completed': '"Has completed" is correct because "already" signals a past action with a present result.',
+        'completed': '"Completed" is simple past pinned to a specific past time, but "already" points to a present-connected result.',
+        'had completed': '"Had completed" is past perfect for something done before another past event, but no second past event is mentioned.',
+        'is completing': '"Is completing" is present continuous for an ongoing action, but "already" tells us it is finished.',
+      }],
+      ['We ___ this museum before.', 'have visited', ['visited', 'had visited', 'are visiting'], {
+        'have visited': '"Have visited" is correct because "before" signals past experience that is still relevant now.',
+        'visited': '"Visited" is simple past at a specific time, but "before" connects the experience to the present.',
+        'had visited': '"Had visited" is past perfect for something done before another past event, but no past event is mentioned.',
+        'are visiting': '"Are visiting" is present continuous for an ongoing action, but "before" tells us it already happened.',
+      }],
+      ['The boys ___ their shoes, so they are ready.', 'have polished', ['polished', 'had polished', 'are polishing'], {
+        'have polished': '"Have polished" is correct because the result (they are ready) is visible in the present.',
+        'polished': '"Polished" is simple past at a specific time, but the consequence "so they are ready" links it to now.',
+        'had polished': '"Had polished" is past perfect for something before another past event; "so they are ready" is present.',
+        'are polishing': '"Are polishing" is present continuous for an ongoing action, but the result shows it is done.',
+      }],
+      ['He ___ his wallet, so he cannot pay now.', 'has lost', ['lost', 'had lost', 'is losing'], {
+        'has lost': '"Has lost" is correct because losing the wallet affects the present — he cannot pay now.',
+        'lost': '"Lost" is simple past at a specific time, but the present consequence "he cannot pay now" requires present perfect.',
+        'had lost': '"Had lost" is past perfect for something before another past event, but the consequence is in the present.',
+        'is losing': '"Is losing" is present continuous for an ongoing action, but "he cannot pay now" shows it is already done.',
+      }],
+      ['I ___ the new librarian three times this week.', 'have met', ['met', 'had met', 'am meeting'], {
+        'have met': '"Have met" is correct because "this week" is still ongoing and the meetings connect to the present.',
+        'met': '"Met" is simple past at a specific finished time, but "this week" has not ended yet.',
+        'had met': '"Had met" is past perfect for something before a past event; "this week" is still in progress.',
+        'am meeting': '"Am meeting" is present continuous for an action in progress now, but the three meetings are already done.',
+      }],
+      ['My grandmother ___ in this town since she was a child.', 'has lived', ['lived', 'had lived', 'is living'], {
+        'has lived': '"Has lived" is correct because "since she was a child" shows an action that started in the past and continues now.',
+        'lived': '"Lived" is simple past for a finished period; "since" shows Grandma still lives there now.',
+        'had lived': '"Had lived" is past perfect for something before a past event; Grandma still lives there now.',
+        'is living': '"Is living" is present continuous, but "since she was a child" shows a long ongoing action needing present perfect.',
+      }],
+      ['The volunteers ___ over fifty bags of donations so far.', 'have packed', ['packed', 'had packed', 'are packing'], {
+        'have packed': '"Have packed" is correct because "so far" signals ongoing work with results up to the present.',
+        'packed': '"Packed" is simple past at a specific time, but "so far" links the work to the present.',
+        'had packed': '"Had packed" is past perfect for something before a past event; "so far" points to the present.',
+        'are packing': '"Are packing" is present continuous for an action in progress; "so far" counts completed bags.',
+      }],
+      ['Our teacher ___ the test papers, so we will know our scores tomorrow.', 'has marked', ['marked', 'had marked', 'was marking'], {
+        'has marked': '"Has marked" is correct because the marking is complete and the result affects tomorrow.',
+        'marked': '"Marked" is simple past at a specific time, but the future consequence "we will know tomorrow" links it to now.',
+        'had marked': '"Had marked" is past perfect for something before a past event; the consequence is still in the future.',
+        'was marking': '"Was marking" is past continuous for an action in progress in the past, but the marking is already done.',
+      }],
+      ['I ___ to Penang twice and would happily go again.', 'have travelled', ['travelled', 'had travelled', 'am travelling'], {
+        'have travelled': '"Have travelled" is correct because "twice" counts past experiences that are still relevant to the speaker now.',
+        'travelled': '"Travelled" is simple past at a specific time, but "twice" here refers to life experience linked to the present.',
+        'had travelled': '"Had travelled" is past perfect for something before another past event; no past reference point is given here.',
+        'am travelling': '"Am travelling" is present continuous for an action happening now, but the two trips are already done.',
+      }],
+      ['The cleaners ___ the corridor, so please walk carefully on the wet floor.', 'have just mopped', ['just mop', 'just mopping', 'were mopping'], {
+        'have just mopped': '"Have just mopped" is correct because "just" signals a very recent action with a visible present result.',
+        'just mop': '"Just mop" is base form; "just" with a present result requires the present perfect form.',
+        'just mopping': '"Just mopping" alone cannot be the main verb — it needs a helper like "are".',
+        'were mopping': '"Were mopping" is past continuous for an action in progress in the past, but the result (wet floor) is present.',
+      }],
+      ['She ___ her room since Monday — it has become a mess.', 'has not tidied', ['did not tidy', 'is not tidying', 'had not tidied'], {
+        'has not tidied': '"Has not tidied" is correct because "since Monday" shows the untidied state continues up to now.',
+        'did not tidy': '"Did not tidy" is simple past negative at a specific time; "since Monday" requires present perfect.',
+        'is not tidying': '"Is not tidying" is present continuous; "since Monday" shows a state lasting from the past to now.',
+        'had not tidied': '"Had not tidied" is past perfect negative for something before a past event; the mess exists now.',
+      }],
+      ['The technician ___ the broken projector, so the lesson can begin.', 'has fixed', ['fixed', 'had fixed', 'is fixing'], {
+        'has fixed': '"Has fixed" is correct because the fixing is done and the present result is that the lesson can begin.',
+        'fixed': '"Fixed" is simple past at a specific time, but the present consequence "the lesson can begin" requires present perfect.',
+        'had fixed': '"Had fixed" is past perfect for something before a past event; the consequence is in the present.',
+        'is fixing': '"Is fixing" is present continuous for an ongoing action, but "the lesson can begin" shows it is done.',
+      }],
+      ['The students ___ already submitted their science projects.', 'have', ['has', 'had', 'are'], {
+        'have': '"Have" is correct because "the students" is plural and "already" signals present perfect.',
+        'has': '"Has" is for singular subjects (he/she/it), but "the students" is plural.',
+        'had': '"Had" forms past perfect for something before a past event; "already" here points to a current state.',
+        'are': '"Are" is for present continuous, but the sentence needs a present perfect auxiliary.',
+      }],
+      ['Mr Tan ___ not yet received the permission slips from all parents.', 'has', ['have', 'had', 'was'], {
+        'has': '"Has" is correct because "Mr Tan" is singular and "not yet" signals present perfect.',
+        'have': '"Have" is for plural subjects (I/you/we/they), but "Mr Tan" is singular.',
+        'had': '"Had" forms past perfect for something before a past event; "not yet" points to the present.',
+        'was': '"Was" is a simple past linking verb, not a present perfect auxiliary.',
+      }],
+      ['We ___ never seen such a beautiful display at the science fair.', 'have', ['has', 'had', 'were'], {
+        'have': '"Have" is correct because "we" is plural and "never" signals a life-experience present perfect.',
+        'has': '"Has" is for singular subjects (he/she/it), but "we" is plural.',
+        'had': '"Had" forms past perfect for something before a past event; "never" here is a life-experience marker.',
+        'were': '"Were" is a past linking verb, not a present perfect auxiliary.',
+      }],
+      ['___ you ever tried chilli crab at a hawker centre?', 'Have', ['Has', 'Had', 'Did'], {
+        'Have': '"Have" is correct because "you" takes "have" and "ever" signals a present perfect question about experience.',
+        'Has': '"Has" is for he/she/it; "you" always takes "have" in present perfect.',
+        'Had': '"Had" forms past perfect for something before a past event; "ever" here asks about life experience.',
+        'Did': '"Did" forms a simple past question at a specific time; "ever" here asks about any time up to now.',
+      }],
+      ['The library ___ just introduced a new self-borrowing machine.', 'has', ['have', 'had', 'was'], {
+        'has': '"Has" is correct because "the library" is singular and "just" signals a very recent present perfect action.',
+        'have': '"Have" is for plural subjects (I/you/we/they), but "the library" is singular.',
+        'had': '"Had" forms past perfect for something before a past event; "just" here points to the present.',
+        'was': '"Was" is a past linking verb, not a present perfect auxiliary.',
+      }],
+      ['My grandmother ___ lived in the same flat since 1985.', 'has', ['have', 'had', 'is'], {
+        'has': '"Has" is correct because "my grandmother" is singular and "since 1985" signals an action continuing to the present.',
+        'have': '"Have" is for plural subjects; "my grandmother" is singular.',
+        'had': '"Had" forms past perfect for something before a past event; "since 1985" connects to the present.',
+        'is': '"Is" forms present continuous, but "since 1985" signals a long ongoing state needing present perfect.',
+      }],
+      ['The players ___ not trained since the last public holiday.', 'have', ['has', 'had', 'were'], {
+        'have': '"Have" is correct because "the players" is plural and "since" signals an ongoing state up to the present.',
+        'has': '"Has" is for singular subjects; "the players" is plural.',
+        'had': '"Had" forms past perfect for something before a past event; "since" connects to the present.',
+        'were': '"Were" is a past linking verb, not a present perfect auxiliary.',
+      }],
+      ['The bus ___ just left, so we will have to wait for the next one.', 'has', ['have', 'had', 'was'], {
+        'has': '"Has" is correct because "the bus" is singular and "just" signals a very recent present perfect action.',
+        'have': '"Have" is for plural subjects; "the bus" is singular.',
+        'had': '"Had" forms past perfect for something before a past event; "just" here connects to the present.',
+        'was': '"Was" is a past linking verb, not a present perfect auxiliary.',
+      }],
     ];
-    const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'present_perfect', q, choices: buildChoices(answer, ds), answer, explain: 'Present perfect links a past action to the present result.', optionExplanations: makeTenseOptionExplanations(answer, ds, 'Present perfect links a past action to a present result.') };
+    const [q, answer, ds, optionExplanations] = rotate(rows, i);
+    return { subskill: 'present_perfect', q, choices: buildChoices(answer, ds), answer, explain: 'Present perfect links a past action to the present result.',
+      optionExplanations };
   },
   pastCont(level, i) {
     const rows = [
@@ -950,35 +1191,133 @@ const GRAMMAR_BUILDERS = {
   },
   tenseAwareness(level, i) {
     const p3Rows = [
-      ['She practises daily, so she usually ___ well in performances.', 'performs', ['performed', 'is performing', 'has performed']],
-      ['Right now, my cousin ___ a documentary about marine animals.', 'is watching', ['watches', 'watched', 'will watch']],
-      ['Last weekend, the team ___ in the pouring rain.', 'trained', ['trains', 'is training', 'has trained']],
-      ['When the alarm rang, the children ___ in the corridor.', 'were playing', ['played', 'play', 'have played']],
-      ['We ___ this museum twice, so the layout is familiar to us.', 'have visited', ['visited', 'were visiting', 'visit']],
-      ['Every evening, Father ___ the dog at the park near our block.', 'walks', ['walked', 'is walking', 'will walk']],
-      ['Tomorrow, our class ___ the science centre.', 'will visit', ['visits', 'visited', 'is visiting']],
-      ['Look! Those sparrows ___ at the crumbs near the canteen.', 'are pecking', ['peck', 'pecked', 'have pecked']],
-      ['Priya goes swimming every Saturday morning. Last Saturday, she ___ three laps without stopping.', 'swam', ['swims', 'is swimming', 'has swum']],
-      ['Wei plays the piano every evening. Right now, he ___ a new song for the concert.', 'is practising', ['practises', 'practised', 'has practised']],
-      ['Siti visits the library every week. Last Tuesday, she ___ four storybooks in one afternoon.', 'read', ['reads', 'is reading', 'has read']],
+      ['She practises daily, so she usually ___ well in performances.', 'performs', ['performed', 'is performing', 'has performed'], {
+        'performs': '"Performs" is correct because "usually" signals a present habit, so simple present is needed.',
+        'performed': '"Performed" is simple past; "usually" points to a regular present habit, not a past event.',
+        'is performing': '"Is performing" is for an action happening right now, not a regular habit.',
+        'has performed': '"Has performed" shows a past action with a present result, but "usually" signals a routine habit.',
+      }],
+      ['Right now, my cousin ___ a documentary about marine animals.', 'is watching', ['watches', 'watched', 'will watch'], {
+        'is watching': '"Is watching" is correct because "right now" signals an action happening at this very moment.',
+        'watches': '"Watches" is simple present for habits; "right now" tells us the action is in progress.',
+        'watched': '"Watched" is simple past; "right now" tells us the action is still happening.',
+        'will watch': '"Will watch" is future tense; "right now" tells us the action is happening at this moment.',
+      }],
+      ['Last weekend, the team ___ in the pouring rain.', 'trained', ['trains', 'is training', 'has trained'], {
+        'trained': '"Trained" is correct because "last weekend" is a past time marker for a completed action.',
+        'trains': '"Trains" is simple present; "last weekend" tells us the action is already in the past.',
+        'is training': '"Is training" is present continuous; "last weekend" tells us the action is done.',
+        'has trained': '"Has trained" links a past action to the present, but "last weekend" pins it to a specific past time.',
+      }],
+      ['When the alarm rang, the children ___ in the corridor.', 'were playing', ['played', 'play', 'have played'], {
+        'were playing': '"Were playing" is correct because it shows an action that was already in progress when another past event happened.',
+        'played': '"Played" is simple past, but the sentence suggests the playing was ongoing when the alarm interrupted.',
+        'play': '"Play" is simple present; the sentence is set in the past with "when the alarm rang".',
+        'have played': '"Have played" is present perfect, but the sentence describes a past scene set off by "when the alarm rang".',
+      }],
+      ['We ___ this museum twice, so the layout is familiar to us.', 'have visited', ['visited', 'were visiting', 'visit'], {
+        'have visited': '"Have visited" is correct because "twice" counts past visits that still explain our familiarity now.',
+        'visited': '"Visited" is simple past pinned to a specific time, but no specific time is given here — the focus is on present familiarity.',
+        'were visiting': '"Were visiting" is past continuous for an action in progress, but the sentence counts completed visits.',
+        'visit': '"Visit" is simple present for habits; the sentence talks about past experiences, not a current habit.',
+      }],
+      ['Every evening, Father ___ the dog at the park near our block.', 'walks', ['walked', 'is walking', 'will walk'], {
+        'walks': '"Walks" is correct because "every evening" signals a regular habit in the simple present.',
+        'walked': '"Walked" is simple past; "every evening" signals an ongoing present routine.',
+        'is walking': '"Is walking" is for an action happening right now, not a regular evening routine.',
+        'will walk': '"Will walk" is future tense; "every evening" points to an established present habit.',
+      }],
+      ['Tomorrow, our class ___ the science centre.', 'will visit', ['visits', 'visited', 'is visiting'], {
+        'will visit': '"Will visit" is correct because "tomorrow" signals a future action.',
+        'visits': '"Visits" is simple present; "tomorrow" tells us the action has not happened yet.',
+        'visited': '"Visited" is simple past; "tomorrow" tells us the action is in the future.',
+        'is visiting': '"Is visiting" could work for a fixed plan, but "will visit" is the clearest future form here.',
+      }],
+      ['Look! Those sparrows ___ at the crumbs near the canteen.', 'are pecking', ['peck', 'pecked', 'have pecked'], {
+        'are pecking': '"Are pecking" is correct because "Look!" signals an action happening at this very moment.',
+        'peck': '"Peck" is simple present for habits; "Look!" tells us the action is in progress right now.',
+        'pecked': '"Pecked" is simple past; "Look!" tells us the action is currently happening.',
+        'have pecked': '"Have pecked" is present perfect for past actions with present results; "Look!" points to an ongoing action.',
+      }],
     ];
     const upperRows = [
-      ['By the time we reached the hall, the programme ___.', 'had started', ['has started', 'was starting', 'starts']],
-      ['She practises daily, so she usually ___ well.', 'performs', ['performed', 'is performing', 'has performed']],
-      ['We ___ for twenty minutes before the rain stopped.', 'had been waiting', ['have waited', 'are waiting', 'waited']],
-      ['Next month, they ___ the same project for a year.', 'will have done', ['have done', 'did', 'do']],
-      ['Whenever I visit Singapore, I always ___ at my grandmother\'s house.', 'stay', ['stayed', 'have stayed', 'will stay']],
-      ['Right now, my cousin ___ a documentary about marine animals.', 'is watching', ['watches', 'watched', 'will watch']],
-      ['By next Friday, the construction team ___ the new bridge.', 'will have finished', ['finished', 'has finished', 'will finish']],
-      ['Every morning before the bell rang, the children ___ in the courtyard.', 'gathered', ['gather', 'are gathering', 'have gathered']],
-      ['Look! That little boy ___ his ice cream all over his shirt.', 'has spilled', ['spilled', 'spills', 'will spill']],
-      ['When I called Sarah last night, she ___ a long bath.', 'was taking', ['took', 'has taken', 'takes']],
-      ['By the time you arrive, I ___ dinner already.', 'will have cooked', ['cooked', 'cook', 'have cooked']],
-      ['Father ___ to work by train every day for the past ten years.', 'has been going', ['goes', 'went', 'is going']],
+      ['By the time we reached the hall, the programme ___.', 'had started', ['has started', 'was starting', 'starts'], {
+        'had started': '"Had started" is correct because the programme beginning was earlier than our arrival in the past.',
+        'has started': '"Has started" is present perfect; both events are in the past, so past perfect is needed.',
+        'was starting': '"Was starting" is past continuous for an action in progress, but here the programme had already begun.',
+        'starts': '"Starts" is simple present; the sentence describes two past events in sequence.',
+      }],
+      ['She practises daily, so she usually ___ well.', 'performs', ['performed', 'is performing', 'has performed'], {
+        'performs': '"Performs" is correct because "usually" signals a present habit.',
+        'performed': '"Performed" is simple past; "usually" points to a current routine.',
+        'is performing': '"Is performing" is for an action happening right now, not a regular habit.',
+        'has performed': '"Has performed" links a past action to now, but "usually" signals a routine habit.',
+      }],
+      ['We ___ for twenty minutes before the rain stopped.', 'had been waiting', ['have waited', 'are waiting', 'waited'], {
+        'had been waiting': '"Had been waiting" is correct because it shows an action that continued up to another past event.',
+        'have waited': '"Have waited" is present perfect; both events are in the past, so past perfect continuous is needed.',
+        'are waiting': '"Are waiting" is present continuous; the sentence describes a past scene before the rain stopped.',
+        'waited': '"Waited" is simple past, but it does not show the duration of waiting leading up to the rain stopping.',
+      }],
+      ['Next month, they ___ the same project for a year.', 'will have done', ['have done', 'did', 'do'], {
+        'will have done': '"Will have done" is correct because "next month" is future, and the action will be completed by then.',
+        'have done': '"Have done" is present perfect, not future perfect — "next month" places this in the future.',
+        'did': '"Did" is simple past; "next month" tells us the event has not happened yet.',
+        'do': '"Do" is simple present; "next month" requires a future form.',
+      }],
+      ["Whenever I visit Singapore, I always ___ at my grandmother's house.", 'stay', ['stayed', 'have stayed', 'will stay'], {
+        'stay': '"Stay" is correct because "whenever" and "always" signal a recurring present habit.',
+        'stayed': '"Stayed" is simple past; "whenever...always" signals an ongoing habit, not a single past event.',
+        'have stayed': '"Have stayed" is present perfect for past experiences; "whenever...always" signals a current habit.',
+        'will stay': '"Will stay" is future tense, but "whenever I visit" describes a current routine.',
+      }],
+      ['Right now, my cousin ___ a documentary about marine animals.', 'is watching', ['watches', 'watched', 'will watch'], {
+        'is watching': '"Is watching" is correct because "right now" signals an action in progress at this moment.',
+        'watches': '"Watches" is for habits; "right now" tells us the action is happening at this very moment.',
+        'watched': '"Watched" is simple past; "right now" tells us the action is still ongoing.',
+        'will watch': '"Will watch" is future; "right now" tells us the action is happening now.',
+      }],
+      ['By next Friday, the construction team ___ the new bridge.', 'will have finished', ['finished', 'has finished', 'will finish'], {
+        'will have finished': '"Will have finished" is correct because "by next Friday" shows completion before a future deadline.',
+        'finished': '"Finished" is simple past; "by next Friday" places the completion in the future.',
+        'has finished': '"Has finished" is present perfect; "by next Friday" requires future perfect.',
+        'will finish': '"Will finish" is simple future, but "by next Friday" signals completion before a deadline, needing future perfect.',
+      }],
+      ['Every morning before the bell rang, the children ___ in the courtyard.', 'gathered', ['gather', 'are gathering', 'have gathered'], {
+        'gathered': '"Gathered" is correct because "before the bell rang" sets a past routine.',
+        'gather': '"Gather" is simple present; the past time clause tells us to use past tense.',
+        'are gathering': '"Are gathering" is present continuous; "before the bell rang" places this in the past.',
+        'have gathered': '"Have gathered" is present perfect; the past time clause requires past tense.',
+      }],
+      ['Look! That little boy ___ his ice cream all over his shirt.', 'has spilled', ['spilled', 'spills', 'will spill'], {
+        'has spilled': '"Has spilled" is correct because the spill just happened and we can still see the result now.',
+        'spilled': '"Spilled" is simple past pinned to a specific moment, but "Look!" suggests the result is visible right now.',
+        'spills': '"Spills" is simple present for habits; "Look!" points to a just-completed action with a visible result.',
+        'will spill': '"Will spill" is future; "Look!" tells us the action has already happened.',
+      }],
+      ['When I called Sarah last night, she ___ a long bath.', 'was taking', ['took', 'has taken', 'takes'], {
+        'was taking': '"Was taking" is correct because the bath was already in progress when the phone call interrupted.',
+        'took': '"Took" is simple past, but it does not show that the bath was ongoing when the call happened.',
+        'has taken': '"Has taken" is present perfect; the sentence is set entirely in the past.',
+        'takes': '"Takes" is simple present; "last night" tells us both events are in the past.',
+      }],
+      ['By the time you arrive, I ___ dinner already.', 'will have cooked', ['cooked', 'cook', 'have cooked'], {
+        'will have cooked': '"Will have cooked" is correct because "by the time you arrive" shows the cooking will be done before a future event.',
+        'cooked': '"Cooked" is simple past; "by the time you arrive" is a future event.',
+        'cook': '"Cook" is simple present; "by the time you arrive" requires a future perfect form.',
+        'have cooked': '"Have cooked" is present perfect; "by the time you arrive" places this completion in the future.',
+      }],
+      ['Father ___ to work by train every day for the past ten years.', 'has been going', ['goes', 'went', 'is going'], {
+        'has been going': '"Has been going" is correct because the action started in the past and is still continuing now.',
+        'goes': '"Goes" is simple present for habits, but "for the past ten years" shows the action has been ongoing since the past.',
+        'went': '"Went" is simple past for a completed action, but Father still takes the train, so the action is ongoing.',
+        'is going': '"Is going" is present continuous for right now, but "for the past ten years" shows a long ongoing action.',
+      }],
     ];
     const rows = level === 'P3' ? p3Rows : upperRows;
-    const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'tense_selection', q, choices: buildChoices(answer, ds), answer, explain: 'Look for time signals: right now/at this moment = present continuous; yesterday/last week = simple past; every day/usually = simple present; when X happened, Y was happening = past continuous; since/already/just = present perfect; by the time/before = past perfect.', optionExplanations: makeTenseOptionExplanations(answer, ds, 'Match the verb tense to the strongest time signal in the sentence.') };
+    const [q, answer, ds, optionExplanations] = rotate(rows, i);
+    return { subskill: 'tense_selection', q, choices: buildChoices(answer, ds), answer, explain: 'Look for time signals: right now/at this moment = present continuous; yesterday/last week = simple past; every day/usually = simple present; when X happened, Y was happening = past continuous; since/already/just = present perfect; by the time/before = past perfect.',
+      optionExplanations };
   },
   pastPerfect(level, i) {
     const rows = [
@@ -1037,32 +1376,130 @@ const GRAMMAR_BUILDERS = {
   },
   conditionals(level, i) {
     const rows = [
-      ['If you heat ice, it ___ into water.', 'melts', ['melted', 'will melt', 'has melted']],
-      ['If it rains this afternoon, we ___ indoors.', 'will stay', ['stayed', 'stay', 'have stayed']],
-      ['If she had left earlier, she ___ the bus.', 'would have caught', ['catches', 'will catch', 'has caught']],
-      ['If I were class chairperson, I ___ clearer notices.', 'would write', ['write', 'wrote', 'will write']],
-      ['If plants do not get sunlight, they ___ poorly.', 'grow', ['grew', 'will grow', 'have grown']],
-      ['If we finish the exam early, we ___ at our answers carefully.', 'will look', ['looked', 'look', 'have looked']],
-      ['If Tom had remembered the umbrella, he ___ wet on the way home.', 'would not have got', ['will not get', 'does not get', 'has not got']],
-      ['If I ___ a superpower, I would choose the ability to fly.', 'had', ['have', 'will have', 'will had']],
-      ['Water boils at 100°C if you ___ it long enough.', 'heat', ['heated', 'will heat', 'have heated']],
-      ['If the band practises every weekend, they ___ steady progress.', 'will make', ['made', 'make', 'have made']],
-      ['If we had not missed the train, we ___ the concert.', 'would have caught', ['will catch', 'catch', 'are catching']],
-      ['If our teacher ___ here today, she would explain the homework.', 'were', ['is', 'will be', 'has been']],
-      ['If metal gets wet, it ___ to rust over time.', 'starts', ['started', 'will start', 'has started']],
-      ['If I study hard this term, I ___ my grade in Mathematics.', 'will improve', ['improve', 'improved', 'have improved']],
-      ['If it ___ on the day of the race, the organisers will move it indoors.', 'rains', ['rained', 'will rain', 'has rained']],
-      ['If she ___ the right bus, she would not have arrived late.', 'had taken', ['took', 'takes', 'has taken']],
-      ['If the library ___ open on Sundays, more pupils would visit.', 'were', ['is', 'will be', 'has been']],
-      ['If you freeze water, it ___ into ice.', 'turns', ['turned', 'will turn', 'has turned']],
-      ['If I ___ taller, I would join the basketball team without hesitation.', 'were', ['am', 'will be', 'was']],
-      ['If the team had trained harder, they ___ the inter-school finals.', 'would have reached', ['will reach', 'reach', 'have reached']],
-      ['Ali forgot his umbrella this morning. If he ___ the weather forecast, he would have brought it.', 'had checked', ['checked', 'has checked', 'checks']],
-      ['Siti loves cooking. If she follows a recipe carefully, her dishes always ___ well.', 'turn out', ['turned out', 'will turn out', 'would turn out']],
-      ['Mei missed the bus and arrived late. If she ___ earlier, she would have been on time.', 'had left', ['left', 'has left', 'leaves']],
+      ['If you heat ice, it ___ into water.', 'melts', ['melted', 'will melt', 'has melted'], {
+        'melts': '"Melts" is correct because this is a zero conditional — a scientific fact, using simple present in both clauses.',
+        'melted': '"Melted" is simple past; facts and natural laws use simple present in zero conditionals.',
+        'will melt': '"Will melt" is first conditional for likely future events, but this is a timeless fact.',
+        'has melted': '"Has melted" is present perfect, which does not fit a general scientific truth.',
+      }],
+      ['If it rains this afternoon, we ___ indoors.', 'will stay', ['stayed', 'stay', 'have stayed'], {
+        'will stay': '"Will stay" is correct because this is a first conditional — a real possibility in the future.',
+        'stayed': '"Stayed" is simple past; the consequence of future rain should use "will + verb".',
+        'stay': '"Stay" alone fits zero conditionals (facts), but this is a likely future scenario needing "will".',
+        'have stayed': '"Have stayed" is present perfect, which does not fit a future consequence.',
+      }],
+      ['If she had left earlier, she ___ the bus.', 'would have caught', ['catches', 'will catch', 'has caught'], {
+        'would have caught': '"Would have caught" is correct because this is a third conditional — an impossible past situation.',
+        'catches': '"Catches" is simple present; the third conditional needs "would have + past participle".',
+        'will catch': '"Will catch" is future; the third conditional is about an impossible past, not the future.',
+        'has caught': '"Has caught" is present perfect; the third conditional needs "would have + past participle".',
+      }],
+      ['If I were class chairperson, I ___ clearer notices.', 'would write', ['write', 'wrote', 'will write'], {
+        'would write': '"Would write" is correct because this is a second conditional — an imaginary present situation.',
+        'write': '"Write" alone fits zero conditionals (facts), but this imaginary scenario needs "would + verb".',
+        'wrote': '"Wrote" is simple past; the second conditional result clause needs "would + base verb".',
+        'will write': '"Will write" is first conditional for real future possibilities; "if I were" signals an imaginary scenario.',
+      }],
+      ['If plants do not get sunlight, they ___ poorly.', 'grow', ['grew', 'will grow', 'have grown'], {
+        'grow': '"Grow" is correct because this is a zero conditional — a general truth about nature.',
+        'grew': '"Grew" is simple past; zero conditionals use simple present for timeless facts.',
+        'will grow': '"Will grow" is first conditional for likely future events, but this is a general truth.',
+        'have grown': '"Have grown" is present perfect, which does not fit a general scientific truth.',
+      }],
+      ['If we finish the exam early, we ___ at our answers carefully.', 'will look', ['looked', 'look', 'have looked'], {
+        'will look': '"Will look" is correct because this is a first conditional — a real possibility in the near future.',
+        'looked': '"Looked" is simple past; the first conditional result clause needs "will + base verb".',
+        'look': '"Look" alone fits zero conditionals (facts), but this realistic scenario needs "will".',
+        'have looked': '"Have looked" is present perfect, which does not fit a future consequence.',
+      }],
+      ['If Tom had remembered the umbrella, he ___ wet on the way home.', 'would not have got', ['will not get', 'does not get', 'has not got'], {
+        'would not have got': '"Would not have got" is correct because this is a third conditional — an impossible past regret.',
+        'will not get': '"Will not get" is future; the third conditional is about an impossible past scenario.',
+        'does not get': '"Does not get" is simple present; the third conditional needs "would not have + past participle".',
+        'has not got': '"Has not got" is present perfect; the third conditional needs "would not have + past participle".',
+      }],
+      ['If I ___ a superpower, I would choose the ability to fly.', 'had', ['have', 'will have', 'will had'], {
+        'had': '"Had" is correct because this is a second conditional if-clause — an imaginary present wish.',
+        'have': '"Have" is simple present, but "I would choose" in the result clause signals an imaginary scenario needing "had".',
+        'will have': '"Will have" is future; the second conditional if-clause uses simple past (had) for imaginary situations.',
+        'will had': '"Will had" is not a valid verb form in English.',
+      }],
+      ['Water boils at 100°C if you ___ it long enough.', 'heat', ['heated', 'will heat', 'have heated'], {
+        'heat': '"Heat" is correct because this is a zero conditional — a scientific fact using simple present.',
+        'heated': '"Heated" is simple past; zero conditionals use simple present for timeless facts.',
+        'will heat': '"Will heat" is first conditional for future possibilities; this is a fixed scientific truth.',
+        'have heated': '"Have heated" is present perfect, which does not fit a general scientific truth.',
+      }],
+      ['If the band practises every weekend, they ___ steady progress.', 'will make', ['made', 'make', 'have made'], {
+        'will make': '"Will make" is correct because this is a first conditional — a real future outcome if the condition is met.',
+        'made': '"Made" is simple past; the first conditional result clause needs "will + base verb".',
+        'make': '"Make" alone fits zero conditionals (facts), but this realistic future scenario needs "will".',
+        'have made': '"Have made" is present perfect, which does not fit a future consequence.',
+      }],
+      ['If we had not missed the train, we ___ the concert.', 'would have caught', ['will catch', 'catch', 'are catching'], {
+        'would have caught': '"Would have caught" is correct because this is a third conditional — an impossible past situation.',
+        'will catch': '"Will catch" is future; the third conditional is about a past impossibility.',
+        'catch': '"Catch" is simple present; the third conditional needs "would have + past participle".',
+        'are catching': '"Are catching" is present continuous; the third conditional is about a past regret.',
+      }],
+      ['If our teacher ___ here today, she would explain the homework.', 'were', ['is', 'will be', 'has been'], {
+        'were': '"Were" is correct because this is a second conditional — an imaginary present situation (she is not here).',
+        'is': '"Is" is simple present; "she would explain" in the result clause signals an imaginary scenario needing "were".',
+        'will be': '"Will be" is future; the second conditional if-clause uses "were" for imaginary present situations.',
+        'has been': '"Has been" is present perfect; the second conditional if-clause needs "were".',
+      }],
+      ['If metal gets wet, it ___ to rust over time.', 'starts', ['started', 'will start', 'has started'], {
+        'starts': '"Starts" is correct because this is a zero conditional — a general truth about metal.',
+        'started': '"Started" is simple past; zero conditionals use simple present for timeless facts.',
+        'will start': '"Will start" is first conditional for likely future events; this is a general truth.',
+        'has started': '"Has started" is present perfect, which does not fit a general scientific truth.',
+      }],
+      ['If I study hard this term, I ___ my grade in Mathematics.', 'will improve', ['improve', 'improved', 'have improved'], {
+        'will improve': '"Will improve" is correct because this is a first conditional — a real and likely future outcome.',
+        'improve': '"Improve" alone fits zero conditionals (facts), but this realistic future goal needs "will".',
+        'improved': '"Improved" is simple past; the first conditional result clause needs "will + base verb".',
+        'have improved': '"Have improved" is present perfect, which does not fit a future consequence.',
+      }],
+      ['If it ___ on the day of the race, the organisers will move it indoors.', 'rains', ['rained', 'will rain', 'has rained'], {
+        'rains': '"Rains" is correct because in a first conditional if-clause, simple present is used even for a future condition.',
+        'rained': '"Rained" is simple past; first conditional if-clauses use simple present, not past.',
+        'will rain': '"Will rain" is not used in the if-clause of a first conditional — use simple present instead.',
+        'has rained': '"Has rained" is present perfect, which does not fit the if-clause of a first conditional.',
+      }],
+      ['If she ___ the right bus, she would not have arrived late.', 'had taken', ['took', 'takes', 'has taken'], {
+        'had taken': '"Had taken" is correct because this is a third conditional if-clause — a past action that did not happen.',
+        'took': '"Took" is simple past; the third conditional if-clause needs "had + past participle".',
+        'takes': '"Takes" is simple present; the third conditional if-clause needs "had + past participle".',
+        'has taken': '"Has taken" is present perfect; the third conditional if-clause needs "had + past participle".',
+      }],
+      ['If the library ___ open on Sundays, more pupils would visit.', 'were', ['is', 'will be', 'has been'], {
+        'were': '"Were" is correct because this is a second conditional — an imaginary present situation.',
+        'is': '"Is" is simple present; "more pupils would visit" signals an imaginary scenario needing "were".',
+        'will be': '"Will be" is future; the second conditional if-clause uses "were" for unreal present situations.',
+        'has been': '"Has been" is present perfect; the second conditional if-clause needs "were".',
+      }],
+      ['If you freeze water, it ___ into ice.', 'turns', ['turned', 'will turn', 'has turned'], {
+        'turns': '"Turns" is correct because this is a zero conditional — a scientific fact using simple present.',
+        'turned': '"Turned" is simple past; zero conditionals use simple present for timeless facts.',
+        'will turn': '"Will turn" is first conditional for likely future events; this is a fixed scientific truth.',
+        'has turned': '"Has turned" is present perfect, which does not fit a general scientific truth.',
+      }],
+      ['If I ___ taller, I would join the basketball team without hesitation.', 'were', ['am', 'will be', 'was'], {
+        'were': '"Were" is correct because this is a second conditional — an imaginary present wish (I am not taller).',
+        'am': '"Am" is simple present; "I would join" in the result clause signals an imaginary scenario needing "were".',
+        'will be': '"Will be" is future; the second conditional if-clause uses "were" for imaginary present situations.',
+        'was': '"Was" is simple past singular; the second conditional prefers "were" for all subjects to show it is imaginary.',
+      }],
+      ['If the team had trained harder, they ___ the inter-school finals.', 'would have reached', ['will reach', 'reach', 'have reached'], {
+        'would have reached': '"Would have reached" is correct because this is a third conditional — a past opportunity that was missed.',
+        'will reach': '"Will reach" is future; the third conditional is about a past impossibility.',
+        'reach': '"Reach" is simple present; the third conditional result clause needs "would have + past participle".',
+        'have reached': '"Have reached" is present perfect; the third conditional result clause needs "would have + past participle".',
+      }],
     ];
-    const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'if_clauses', q, choices: buildChoices(answer, ds), answer, explain: 'Match the if-clause type with the correct result verb form.' };
+    const [q, answer, ds, optionExplanations] = rotate(rows, i);
+    return { subskill: 'if_clauses', q, choices: buildChoices(answer, ds), answer, explain: 'Match the if-clause type with the correct result verb form.',
+      optionExplanations };
   },
   passiveVoice(level, i) {
     const rows = [
@@ -1285,19 +1722,23 @@ function buildLevel(level) {
     categoryCursor[category] += 1;
     const spec = GRAMMAR_BUILDERS[category](level, localIndex);
     const id = `g-${level.toLowerCase()}-${String(i + 1).padStart(3, '0')}`;
-    items.push({
+    const item = {
       id,
       level,
       category,
       subskill: spec.subskill,
       difficulty: difficultyFor(level, i),
       q: spec.q,
-      contextType: inferQuestionContextType(spec.q),
       choices: spec.choices,
       answer: spec.answer,
       explain: spec.explain,
-      ...(spec.optionExplanations ? { optionExplanations: spec.optionExplanations } : {}),
-    });
+    };
+    // Pass through optional per-item fields only when the builder provided them,
+    // so items without them stay clean.
+    if (spec.optionExplanations) item.optionExplanations = spec.optionExplanations;
+    if (spec.clueWords) item.clueWords = spec.clueWords;
+    if (spec.reasoning) item.reasoning = spec.reasoning;
+    items.push(item);
   }
 
   return items;
