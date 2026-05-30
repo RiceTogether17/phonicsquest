@@ -5,6 +5,8 @@ import { VOCAB_MCQ_ITEMS, VOCAB_MCQ_LEVELS, buildVocabMcqLevel } from '../data/v
 import { VOCAB_CATEGORIES, VOCAB_CATEGORY_KEYS } from '../data/vocabCategories.js';
 import { checkPostAttempt } from '../modules/remediationRouter.js';
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
+import { buildMcqFeedbackHtml } from './mcqFeedback.js';
+import { filterMcqItemsForDifficulty, MCQ_DIFFICULTIES, renderMcqDifficultyToggle } from './mcqDifficulty.js';
 
 let _container = null;
 let _onGoHome = null;
@@ -12,7 +14,8 @@ let _items = [];
 let _idx = 0;
 let _correct = 0;
 let _answered = false;
-let _scope = { level: null, category: null, label: 'All Skills' };
+let _scope = { level: null, category: null, label: 'All Skills', difficulty: 'normal' };
+let _difficulty = 'normal';
 
 let _streak = 0;
 let _maxStreak = 0;
@@ -75,6 +78,7 @@ export function showVocabMcqBrowser() {
   const levelCounts = getLevelCounts();
   const categoryCounts = getCategoryCounts();
   let selectedLevel = _scope.level || 'P1';
+  let selectedDifficulty = _scope.difficulty || _difficulty || 'normal';
 
   const render = () => {
     _container.innerHTML = `
@@ -95,7 +99,12 @@ export function showVocabMcqBrowser() {
         </section>
 
         <section class="mcq-browser-section">
-          <h3 class="mcq-browser-heading">Step 2 · ${selectedLevel} Vocabulary Concepts</h3>
+          <h3 class="mcq-browser-heading">Step 2 · Choose Support</h3>
+          ${renderMcqDifficultyToggle({ selected: selectedDifficulty, prefix: 'vmcq' })}
+        </section>
+
+        <section class="mcq-browser-section">
+          <h3 class="mcq-browser-heading">Step 3 · ${selectedLevel} Vocabulary Concepts</h3>
           <div class="sfq-actions">
             <button class="btn btn--primary" id="vmcq-start-level">Start ${selectedLevel} (All Skills)</button>
           </div>
@@ -132,13 +141,20 @@ export function showVocabMcqBrowser() {
       });
     });
 
+    _container.querySelectorAll('[data-vmcq-difficulty]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedDifficulty = btn.dataset.vmcqDifficulty;
+        render();
+      });
+    });
+
     _container.querySelector('#vmcq-start-level')?.addEventListener('click', () => {
-      _startScope({ level: selectedLevel, category: null });
+      _startScope({ level: selectedLevel, category: null, difficulty: selectedDifficulty });
     });
 
     _container.querySelectorAll('[data-scope-level][data-scope-category]').forEach(btn => {
       btn.addEventListener('click', () => {
-        _startScope({ level: btn.dataset.scopeLevel, category: btn.dataset.scopeCategory });
+        _startScope({ level: btn.dataset.scopeLevel, category: btn.dataset.scopeCategory, difficulty: selectedDifficulty });
       });
     });
 
@@ -156,14 +172,15 @@ function _adaptiveShuffle(items) {
   });
 }
 
-function _startScope({ level = null, category = null, label = '' } = {}) {
-  _scope = { level, category, label: label || _scopeLabel({ level, category }) };
+function _startScope({ level = null, category = null, label = '', difficulty = _difficulty } = {}) {
+  _difficulty = MCQ_DIFFICULTIES[difficulty]?.key || 'normal';
+  _scope = { level, category, label: label || _scopeLabel({ level, category }), difficulty: _difficulty };
 
   // Rebuild items fresh each session so the random seed varies (not frozen at module load).
   const freshBank = level
     ? { [level]: buildVocabMcqLevel(level) }
     : Object.fromEntries(VOCAB_MCQ_LEVELS.map(l => [l, VOCAB_MCQ_ITEMS[l]]));
-  _items = _adaptiveShuffle(getItemsForScope({ level, category }, freshBank));
+  _items = _adaptiveShuffle(filterMcqItemsForDifficulty(getItemsForScope({ level, category }, freshBank), { level, difficulty: _difficulty }));
 
   const limit = store.get('paperItemLimit');
   if (limit) {
@@ -195,9 +212,9 @@ function _startRecovery() {
   _renderQuestion();
 }
 
-export function startVocabMcqLevel(level) {
+export function startVocabMcqLevel(level, difficulty = _difficulty) {
   if (!_container) return;
-  _startScope({ level, category: null, label: level });
+  _startScope({ level, category: null, label: level, difficulty });
 }
 
 function _streakBadge() {
@@ -226,7 +243,8 @@ function _renderQuestion() {
         <span class="sfq-progress" aria-label="Question ${_idx + 1} of ${_items.length}">${_idx + 1}/${_items.length}</span>
       </div>
       <div class="sq-progress-bar"><div class="sq-progress-fill" style="width:${progressPct}%"></div></div>
-      <p class="mcq-category-tag">${escapeHtml(_categoryLabel(item.category))}</p>
+      <p class="mcq-category-tag">${escapeHtml(_categoryLabel(item.category))}${_difficulty === 'challenge' ? ' · PSLE Challenge' : ''}</p>
+      ${_difficulty === 'guided' && item.explain ? `<div class="mcq-learn-tip"><strong>Learn tip:</strong> ${item.explain}</div>` : ''}
       <p class="sfq-instruction">${escapeHtml(item.q)}</p>
       <div class="pt-choices" role="group" aria-label="Answer choices">
         ${displayChoices.map(c => `<button class="pt-choice-btn" data-choice="${escapeAttr(c)}" aria-label="Choose ${escapeAttr(c)}">${escapeHtml(c)}</button>`).join('')}
@@ -274,24 +292,7 @@ function _renderQuestion() {
       });
 
       const hint = _container.querySelector('#vmcq-hint');
-      let hintText = '';
-      if (ok) {
-        hintText = '✅ <strong>Correct!</strong>';
-      } else {
-        hintText = `❌ <strong>Correct answer:</strong> ${escapeHtml(item.answer)}`;
-      }
-
-      // Show clue words if available
-      if (item.clueWords && item.clueWords.length > 0) {
-        hintText += `<br><span class="mcq-clue-words"><strong>🔍 Clue words:</strong> ${item.clueWords.map(w => `<span class="mcq-clue-chip">${escapeHtml(w)}</span>`).join(' ')}</span>`;
-      }
-
-      // explain/reasoning intentionally carry light HTML formatting (e.g. <strong>) from static data.
-      if (item.reasoning) {
-        hintText += `<br><span class="mcq-reasoning">${item.reasoning}</span>`;
-      } else if (item.explain) {
-        hintText += `<br>${item.explain}`;
-      }
+      let hintText = buildMcqFeedbackHtml(item, ans, ok, { showClueWords: _difficulty !== 'challenge' });
 
       if (!ok) {
         const suggestion = checkPostAttempt('vocabMcq', item.category, false);
@@ -324,7 +325,7 @@ function _renderQuestion() {
 // one category was practised (a single-skill session needs no breakdown).
 function _renderSkillBreakdown() {
   const entries = Object.entries(_sessionSkillStats).filter(([, s]) => s.total > 0);
-  if (entries.length < 2) return '';
+  if (entries.length === 0) return '';
 
   const rows = entries
     .map(([cat, s]) => ({ cat, pct: Math.round((s.correct / s.total) * 100), correct: s.correct, total: s.total }))
@@ -332,14 +333,15 @@ function _renderSkillBreakdown() {
     .map(({ cat, pct, correct, total }) => {
       const barColour = pct >= 70 ? 'var(--color-success)' : pct >= 40 ? 'var(--color-primary)' : 'var(--color-error)';
       return `
-        <div class="sq-skill-row">
-          <span class="sq-skill-name">${escapeHtml(_categoryLabel(cat))}</span>
-          <div class="sq-skill-track"><div class="sq-skill-bar" style="width:${pct}%;background:${barColour}"></div></div>
-          <span class="sq-skill-pct">${correct}/${total}</span>
-        </div>`;
+        <tr class="sq-skill-table-row ${pct < 50 ? 'sq-skill-table-row--weak' : ''}">
+          <th scope="row" class="sq-skill-name">${escapeHtml(_categoryLabel(cat))}</th>
+          <td class="sq-skill-score">${correct}/${total}</td>
+          <td><div class="sq-skill-track" aria-hidden="true"><div class="sq-skill-bar" style="width:${pct}%;background:${barColour}"></div></div></td>
+          <td class="sq-skill-pct">${pct}%${pct < 50 ? ' · weak' : ''}</td>
+        </tr>`;
     }).join('');
 
-  return `<h4 class="sq-skills-heading">Skill breakdown</h4><div class="sq-skills-list">${rows}</div>`;
+  return `<h4 class="sq-skills-heading">Skill breakdown</h4><table class="sq-skills-table"><thead><tr><th>Skill</th><th>Score</th><th>Progress</th><th>Accuracy</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function _renderDone() {

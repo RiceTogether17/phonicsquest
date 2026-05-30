@@ -771,6 +771,12 @@ class App {
       this._finishQueuedSession();
       return;
     } else {
+      // Normal rounds must pick a fresh word every time _startGame runs. Without
+      // clearing the previous round's word here, the fallback below sees an
+      // existing `_currentWord` and reuses it indefinitely (for example, Blend It
+      // and Segment It can get stuck showing only the initial “bag” word).
+      this._currentWord = null;
+
       const modeDiffs = store.get('modeDifficulty') || {};
       const effectiveDiff = modeDiffs[this._mode] ?? store.get('difficulty') ?? 1;
       const opts = { maxLevel: effectiveDiff, mode: this._mode };
