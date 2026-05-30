@@ -37,7 +37,10 @@
  * branches with fixtures.
  */
 
-const WORDS_PER_TARGET = { first: 3, last: 3, middle: 4 };
+// Train Carriages is round-based — the mode itself shows 4–6 cards per
+// target — so the sequencer hands the framework one word per round, just
+// to drive the alphabetical target advancement.
+const WORDS_PER_TARGET = { first: 3, last: 3, middle: 4, train: 1 };
 const RECENT_LOOKBACK   = 10;
 
 /**
@@ -62,7 +65,7 @@ export function createPaSequencerState() {
 
 /** Return 'first' | 'last' | 'middle' for the PA modes; null otherwise. */
 export function paPositionForMode(mode) {
-  if (mode === 'first')  return 'first';
+  if (mode === 'first' || mode === 'train') return 'first';
   if (mode === 'last')   return 'last';
   if (mode === 'middle') return 'middle';
   return null;

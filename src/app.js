@@ -245,6 +245,7 @@ class App {
     const PICKER_MODES = new Set([
       'blend', 'oralBlend', 'first', 'last', 'middle',
       'soundCount', 'hear', 'missing', 'segment',
+      'train', 'syllable',
     ]);
 
     document.querySelectorAll('.mode-card').forEach((card, idx) => {

@@ -192,7 +192,7 @@ function handleChoice(choice, btn, word, els, grid) {
  *   2. Other phonemes of the same type from the word list.
  *   3. Any phoneme from the word list (fallback).
  */
-function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel = 3) {
+export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel = 3) {
   const seen        = new Set([correctGrapheme]);
   const distractors = [];
 
