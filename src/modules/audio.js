@@ -672,6 +672,9 @@ class AudioManager {
    * Call this when a word is displayed so audio is ready.
    */
   preloadWord(wordData) {
+    // Some modes (e.g. Clap the Syllables) play words from a phonological
+    // pool that carries no grapheme breakdown — nothing to preload.
+    if (!Array.isArray(wordData?.graphemes)) return;
     for (let i = 0; i < wordData.graphemes.length; i++) {
       const grapheme = wordData.graphemes[i];
       const type     = wordData.types[i];

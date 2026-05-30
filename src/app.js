@@ -74,6 +74,7 @@ import {
 } from './modules/progression.js';
 import { createPaSequencerState, nextPaWord, paPositionForMode } from './modules/paTargetSequencer.js';
 import { WORDS } from './data/words.js';
+import { pickSyllableWord } from './data/syllableWords.js';
 import { SCREENS, QUEST_THRESHOLDS } from './constants.js';
 import { modalManager } from './modules/modalManager.js';
 import { keyboardManager } from './modules/keyboardManager.js';
@@ -115,6 +116,13 @@ class App {
      * @type {import('./modules/paTargetSequencer.js').PaSequencerState}
      */
     this._paSeqState = createPaSequencerState();
+
+    /**
+     * Recently-shown ids for Clap the Syllables (most-recent first),
+     * so the phonological pool doesn't repeat a picture back-to-back.
+     * @type {string[]}
+     */
+    this._syllableHistory = [];
 
     /**
      * Session type: 'normal' | 'dailyChallenge' | 'review' | 'wordWorkout'
@@ -242,10 +250,13 @@ class App {
     // Phonics modes that get the curriculum-stage picker before play
     // starts. Classic Blend keeps its built-in dropdown (it sets the
     // group itself), so it's excluded.
+    // Clap the Syllables is intentionally NOT here — it's a phonological
+    // game decoupled from the decoding curriculum, so it skips the
+    // (lockable) stage picker and launches straight into play.
     const PICKER_MODES = new Set([
       'blend', 'oralBlend', 'first', 'last', 'middle',
       'soundCount', 'hear', 'missing', 'segment',
-      'train', 'syllable',
+      'train',
     ]);
 
     document.querySelectorAll('.mode-card').forEach((card, idx) => {
@@ -765,10 +776,15 @@ class App {
       const opts = { maxLevel: effectiveDiff, mode: this._mode };
       if (group) opts.group = group;
 
-      // First / Last / Middle Sound run through the target sequencer so the
-      // child meets each target phoneme as a set of exemplars (alphabetical
-      // ladder) before moving on, instead of bouncing around adaptively.
-      if (paPositionForMode(this._mode)) {
+      if (this._mode === 'syllable') {
+        // Phonological game — draw from its own always-available pool
+        // that ramps 1→4 syllables, ignoring the decoding curriculum.
+        this._currentWord = pickSyllableWord(this._syllableHistory);
+        this._syllableHistory = [this._currentWord.id, ...this._syllableHistory].slice(0, 8);
+      } else if (paPositionForMode(this._mode)) {
+        // First / Last / Middle Sound run through the target sequencer so the
+        // child meets each target phoneme as a set of exemplars (alphabetical
+        // ladder) before moving on, instead of bouncing around adaptively.
         this._currentWord = nextPaWord(this._paSeqState, { ...opts, wordList: WORDS });
       }
       if (!this._currentWord) {

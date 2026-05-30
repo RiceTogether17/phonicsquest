@@ -211,7 +211,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['-ing /ɪŋ/', '-ed /d/, /t/, /ɪd/', '-er /ɚ/', '-est /ɪst/'],
     sampleWords: ['running', 'jumped', 'faster', 'tallest', 'helped', 'biggest', 'playing', 'sitting', 'slower', 'eating'],
     sentenceExamples: ['He was running faster than me.', 'The biggest cat jumped highest.'],
-    recommendedModes: ['classicBlend', 'hear', 'segment', 'syllable'],
+    recommendedModes: ['classicBlend', 'hear', 'segment'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -225,7 +225,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['re-', 'un-', '-tion', '-able', 'open/closed syllables', 'irregular sight'],
     sampleWords: ['redo', 'untie', 'action', 'readable', 'science', 'market', 'their', 'because', 'enough', 'through'],
     sentenceExamples: ['Their friend is reading because the book is good.', 'I will redo my action plan.'],
-    recommendedModes: ['classicBlend', 'hear', 'syllable'],
+    recommendedModes: ['classicBlend', 'hear'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 ]);

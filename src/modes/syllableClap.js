@@ -6,6 +6,13 @@
  * Distinct from Sound Count, which counts *phonemes*. Syllables are
  * the wider beat — a CVC word has 3 phonemes but 1 syllable.
  *
+ * Syllable awareness is a PHONOLOGICAL skill that develops earlier than
+ * phonemic awareness (word → syllable → onset-rime → phoneme), so this
+ * mode is available from the very start and is decoupled from the
+ * decoding curriculum: it draws words from the dedicated, always-open
+ * pool in src/data/syllableWords.js (which ramps 1→4 syllables), not
+ * the lockable curriculum stages. See _startGame in app.js.
+ *
  * Core loop:
  * 1. Show the word's picture (image, NOT the printed word — counting
  *    syllables from the printed letters is the trap this mode avoids).
@@ -65,9 +72,10 @@ export function setupSyllableClap(word, els) {
   });
 
   const grid = els.modeArea.querySelector('#syllable-grid');
-  // Choice range scales with curriculum level so younger children see
-  // a smaller, less daunting set.
-  const maxChoice = (word.level ?? 1) >= 4 ? 5 : 4;
+  // Choice range always covers the correct answer plus at least one
+  // higher option, capped at 6 so the grid stays tappable for little
+  // fingers (1-syllable words still show a full 1–4 set).
+  const maxChoice = Math.min(6, Math.max(4, correctCount + 1));
   for (let n = 1; n <= maxChoice; n++) {
     const btn = document.createElement('button');
     btn.type = 'button';
