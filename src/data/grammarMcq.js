@@ -1,3 +1,11 @@
+import {
+  makeAgreementOptionExplanations,
+  makeArticleOptionExplanations,
+  makePronounOptionExplanations,
+  makeTenseOptionExplanations,
+} from './mcqOptionExplanations.js';
+import { inferQuestionContextType } from './mcqItemMetadata.js';
+
 /**
  * PhonicsQuest – Grammar MCQ Item Bank
  *
@@ -75,6 +83,7 @@ const GRAMMAR_BUILDERS = {
       choices: buildChoices(answer, ds),
       answer,
       explain: 'Use "a" before consonant sounds and "an" before vowel sounds — including silent-h words like "hour" and "honest".',
+      optionExplanations: makeArticleOptionExplanations(answer, ds),
     };
   },
   pronouns(level, i) {
@@ -114,7 +123,7 @@ const GRAMMAR_BUILDERS = {
     ];
     const rows = level === 'P1' ? p1Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'pronoun_form', q, choices: buildChoices(answer, ds), answer, explain: 'Subject pronouns (I, he, she, we, they) do the action. Object pronouns (me, him, her, us, them) receive it. After prepositions and as objects, use the object form — e.g. "between Daniel and me", "thanked them".' };
+    return { subskill: 'pronoun_form', q, choices: buildChoices(answer, ds), answer, explain: 'Subject pronouns (I, he, she, we, they) do the action. Object pronouns (me, him, her, us, them) receive it. After prepositions and as objects, use the object form — e.g. "between Daniel and me", "thanked them".', optionExplanations: makePronounOptionExplanations(answer, ds) };
   },
   reflexivePronouns(level, i) {
     const rows = [
@@ -296,7 +305,7 @@ const GRAMMAR_BUILDERS = {
       ['None of the students ___ submitted their project on time.', 'has', ['have', 'had', 'were']],
     ];
     const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Match the verb with the true subject — collective nouns and "each/one/either" take a singular verb.' };
+    return { subskill: 'agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Match the verb with the true subject — collective nouns and "each/one/either" take a singular verb.', optionExplanations: makeAgreementOptionExplanations(answer, ds) };
   },
   simplePast(level, i) {
     const p1Rows = [
@@ -348,7 +357,7 @@ const GRAMMAR_BUILDERS = {
     ];
     const rows = level === 'P1' ? p1Rows : level === 'P2' ? p2Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'past_tense_form', q, choices: buildChoices(answer, ds), answer, explain: 'Time markers like yesterday, last week, just now, and ago signal simple past. Regular verbs add -ed (baked, walked). Irregular verbs change form (go→went, eat→ate, blow→blew, win→won) — these must be memorised.' };
+    return { subskill: 'past_tense_form', q, choices: buildChoices(answer, ds), answer, explain: 'Time markers like yesterday, last week, just now, and ago signal simple past. Regular verbs add -ed (baked, walked). Irregular verbs change form (go→went, eat→ate, blow→blew, win→won) — these must be memorised.', optionExplanations: makeTenseOptionExplanations(answer, ds, 'Words like yesterday, last week, just now, and ago signal simple past.') };
   },
   presentCont(level, i) {
     const rows = [
@@ -691,7 +700,7 @@ const GRAMMAR_BUILDERS = {
       ['The bus ___ just left, so we will have to wait for the next one.', 'has', ['have', 'had', 'was']],
     ];
     const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'present_perfect', q, choices: buildChoices(answer, ds), answer, explain: 'Present perfect links a past action to the present result.' };
+    return { subskill: 'present_perfect', q, choices: buildChoices(answer, ds), answer, explain: 'Present perfect links a past action to the present result.', optionExplanations: makeTenseOptionExplanations(answer, ds, 'Present perfect links a past action to a present result.') };
   },
   pastCont(level, i) {
     const rows = [
@@ -790,7 +799,7 @@ const GRAMMAR_BUILDERS = {
     ];
     const rows = level === 'P3' ? p3Rows : upperRows;
     const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'tense_selection', q, choices: buildChoices(answer, ds), answer, explain: 'Look for time signals: right now/at this moment = present continuous; yesterday/last week = simple past; every day/usually = simple present; when X happened, Y was happening = past continuous; since/already/just = present perfect; by the time/before = past perfect.' };
+    return { subskill: 'tense_selection', q, choices: buildChoices(answer, ds), answer, explain: 'Look for time signals: right now/at this moment = present continuous; yesterday/last week = simple past; every day/usually = simple present; when X happened, Y was happening = past continuous; since/already/just = present perfect; by the time/before = past perfect.', optionExplanations: makeTenseOptionExplanations(answer, ds, 'Match the verb tense to the strongest time signal in the sentence.') };
   },
   pastPerfect(level, i) {
     const rows = [
@@ -1098,9 +1107,11 @@ function buildLevel(level) {
       subskill: spec.subskill,
       difficulty: difficultyFor(level, i),
       q: spec.q,
+      contextType: inferQuestionContextType(spec.q),
       choices: spec.choices,
       answer: spec.answer,
       explain: spec.explain,
+      ...(spec.optionExplanations ? { optionExplanations: spec.optionExplanations } : {}),
     });
   }
 

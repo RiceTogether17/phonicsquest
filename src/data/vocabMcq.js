@@ -1,3 +1,9 @@
+import {
+  makeAgreementOptionExplanations,
+  makeArticleOptionExplanations,
+} from './mcqOptionExplanations.js';
+import { inferQuestionContextType } from './mcqItemMetadata.js';
+
 /**
  * PhonicsQuest – Vocabulary MCQ Item Bank
  *
@@ -911,7 +917,7 @@ const VOCAB_BUILDERS = {
       ['___ Pacific Ocean is the largest ocean on Earth.', 'The', ['A', 'An', 'Some']],
     ];
     const [q, answer, ds] = rotate(rows, i);
-    return { category: 'grammarArticles', subskill: 'article_in_context', q, choices: buildChoices(answer, ds), answer, explain: 'Use "a" before consonant sounds, "an" before vowel sounds, "the" for specific nouns, and "some" for uncountable or plural quantities.' };
+    return { category: 'grammarArticles', subskill: 'article_in_context', q, choices: buildChoices(answer, ds), answer, explain: 'Use "a" before consonant sounds, "an" before vowel sounds, "the" for specific nouns, and "some" for uncountable or plural quantities.', optionExplanations: makeArticleOptionExplanations(answer, ds) };
   },
   grammarSVA(level, i) {
     const rows = [
@@ -929,7 +935,7 @@ const VOCAB_BUILDERS = {
       ['Everyone in the classrooms ___ asked to be quiet during the examination.', 'was', ['were', 'are', 'have been']],
     ];
     const [q, answer, ds] = rotate(rows, i);
-    return { category: 'grammarSVA', subskill: 'subject_verb_agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Make sure the verb agrees with the subject in number — watch for collective nouns, "each/either/neither", and interrupting phrases.' };
+    return { category: 'grammarSVA', subskill: 'subject_verb_agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Make sure the verb agrees with the subject in number — watch for collective nouns, "each/either/neither", and interrupting phrases.', optionExplanations: makeAgreementOptionExplanations(answer, ds) };
   },
 };
 
@@ -957,9 +963,11 @@ function buildLevel(level) {
       subskill: spec.subskill,
       difficulty: difficultyFor(level, i),
       q: spec.q,
+      contextType: inferQuestionContextType(spec.q),
       choices: spec.choices,
       answer: spec.answer,
       explain: spec.explain,
+      ...(spec.optionExplanations ? { optionExplanations: spec.optionExplanations } : {}),
     });
   }
 
