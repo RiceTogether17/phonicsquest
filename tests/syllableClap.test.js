@@ -96,6 +96,33 @@ describe('setupSyllableClap', () => {
     expect(els.onResult).toHaveBeenCalledWith(true, expect.any(Number));
   });
 
+  it('works with a phonological pool word (3-syllable elephant) and shows up-to-4 choices', () => {
+    const elephant = {
+      id: 'syl-elephant', word: 'elephant', emoji: '🐘',
+      syllables: 3, syllableBreakdown: 'el-e-phant',
+    };
+    const els = makeEls();
+    setupSyllableClap(elephant, els);
+    const choices = document.querySelectorAll('#syllable-grid .choice-btn');
+    expect(choices.length).toBe(4);  // min(6, max(4, 3+1)) = 4
+    const choice3 = document.querySelector('#syllable-grid .choice-btn[data-value="3"]');
+    choice3.click();
+    expect(document.querySelector('.syllable-reveal-breakdown').textContent).toBe('el-e-phant');
+    els.modeArea.querySelector('.vmcq-next-btn').click();
+    expect(els.onResult).toHaveBeenCalledWith(true, expect.any(Number));
+  });
+
+  it('a 4-syllable word offers a choice up to 5', () => {
+    const caterpillar = {
+      id: 'syl-caterpillar', word: 'caterpillar', emoji: '🐛',
+      syllables: 4, syllableBreakdown: 'cat-er-pil-lar',
+    };
+    setupSyllableClap(caterpillar, makeEls());
+    const choices = document.querySelectorAll('#syllable-grid .choice-btn');
+    expect(choices.length).toBe(5);  // min(6, max(4, 4+1)) = 5
+    expect(document.querySelector('#syllable-grid .choice-btn[data-value="5"]')).not.toBeNull();
+  });
+
   it('wrong choice fires onResult(false) and shows correct answer', () => {
     const els = makeEls();
     setupSyllableClap(CAT, els);  // 1 syllable
