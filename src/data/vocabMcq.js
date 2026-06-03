@@ -1,9 +1,3 @@
-import {
-  makeAgreementOptionExplanations,
-  makeArticleOptionExplanations,
-} from './mcqOptionExplanations.js';
-import { inferQuestionContextType } from './mcqItemMetadata.js';
-
 /**
  * PhonicsQuest – Vocabulary MCQ Item Bank
  *
@@ -115,9 +109,46 @@ const VOCAB_BUILDERS = {
       ['The community came together to ___ the flood victims with food and shelter.', 'assist', ['abandon', 'criticise', 'monitor']],
       ['Her explanation was so clear that even the most ___ student understood the concept.', 'confused', ['advanced', 'attentive', 'curious']],
     ];
+    const p1p2RowsEx = [
+      { 'tired': '"tired" fits — running three rounds in the sun drains energy.', 'cheerful': '"cheerful" means happy, not a result of hard exercise.', 'spotless': '"spotless" means very clean — unrelated to how Amir feels.', 'plastic': '"plastic" is a material, not a feeling.' },
+      { 'quiet': '"quiet" fits — if you can hear a pin drop, the room must be silent.', 'crowded': '"crowded" means full of people — the opposite of pin-drop silence.', 'muddy': '"muddy" describes a wet floor, not a sound level.', 'rapid': '"rapid" means fast — it describes speed, not quietness.' },
+      { 'carefully': '"carefully" fits — a wet floor is slippery, so you walk with caution.', 'lazily': '"lazily" means slowly without effort — not the right response to a wet floor.', 'noisily': '"noisily" describes sound, not how you walk safely.', 'luckily': '"luckily" describes good fortune, not a manner of walking.' },
+      { 'delicious': '"delicious" fits — "fresh" smell and good taste go together.', 'dusty': '"dusty" describes something dry and old — the opposite of fresh soup.', 'broken': '"broken" describes a damaged object, not a taste.', 'narrow': '"narrow" describes width — it cannot describe soup.' },
+      { 'happy': '"happy" fits — a smile is a sign of happiness.', 'sleepy': '"sleepy" would cause drooping eyelids, not a smile.', 'angry': '"angry" would cause a frown, not a smile.', 'cold': '"cold" describes temperature, not an emotion.' },
+      { 'excited': '"excited" fits — dogs become excited when they see their owners.', 'bored': '"bored" would make a dog uninterested, not run to the door.', 'sad': '"sad" would make a dog stay still, not run eagerly.', 'tired': '"tired" would make a dog rest, not run to the door.' },
+      { 'indoors': '"indoors" fits — staying inside keeps you dry when it rains.', 'outside': '"outside" contradicts "to keep dry" in the rain.', 'upstairs': '"upstairs" is a direction inside a building but the clue is about staying dry, not going up.', 'away': '"away" is vague and does not explain how they stayed dry.' },
+      { 'cold': '"cold" fits — you wear a thick coat when the weather is cold.', 'sunny': '"sunny" is warm — you would not need a thick coat.', 'warm': '"warm" contradicts the need for a thick coat.', 'bright': '"bright" describes light, not temperature.' },
+      { 'lost': '"lost" fits — crying because you cannot find your favourite toy is natural.', 'found': '"found" would cause happiness, not tears.', 'broke': '"broke" is possible but "lost" is the stronger clue — the toy is gone entirely.', 'shared': '"shared" is a positive action — unlikely to cause crying.' },
+      { 'funny': '"funny" fits — laughter is always a response to something funny.', 'scary': '"scary" would cause fear, not laughter.', 'quiet': '"quiet" describes sound level, not something that makes you laugh.', 'angry': '"angry" describes a negative emotion — it would cause upset, not laughter.' },
+      { 'another': '"another" fits — liking something sweet makes you want one more slice.', 'a smaller': '"a smaller" suggests wanting less — the opposite if the cake is enjoyed.', 'no more': '"no more" means refusing — contradicts "so sweet that everyone asked for".', 'a last': '"a last" implies reluctance, not enjoyment.' },
+      { 'outside': '"outside" fits — you put on shoes when you are going out.', 'to sleep': '"to sleep" is incorrect — you remove shoes before sleeping.', 'to bath': '"to bath" is incorrect — you remove shoes before bathing.', 'indoors': '"indoors" contradicts putting shoes on — shoes are for going out.' },
+      { 'failure': '"failure" fits — a power failure explains why the light went off.', 'station': '"station" is a location — it does not cause lights to go off.', 'switch': '"switch" controls lights but a switch alone does not explain a sudden outage.', 'cable': '"cable" is part of the system but a broken cable is a type of failure, not the event itself.' },
+      { 'efficient': '"efficient" fits — working efficiently means finishing tasks quickly.', 'clumsy': '"clumsy" means accident-prone — this would slow someone down.', 'noisy': '"noisy" describes sound — unrelated to finishing quickly.', 'absent': '"absent" means not present — if absent, the homework cannot be done.' },
+      { 'pleased': '"pleased" fits — smiling and nodding are signs of satisfaction.', 'confused': '"confused" would show a puzzled face, not a smile.', 'upset': '"upset" would show a frown or frown, not a nod.', 'afraid': '"afraid" would show fear — contradicts a friendly smile and nod.' },
+      { 'exhausted': '"exhausted" fits — a long journey tires people out.', 'curious': '"curious" means wanting to know more — unrelated to a tiring journey.', 'cheerful': '"cheerful" is a happy state — unlikely after an exhausting journey.', 'talkative': '"talkative" means wanting to talk — too tired to eat suggests too tired to do anything.' },
+    ];
+    const upperRowsEx = [
+      { 'verify': '"verify" fits — repeating an experiment confirms the results are reliable.', 'contradict': '"contradict" means to go against — the scientist would not repeat tests to disprove herself.', 'estimate': '"estimate" means to guess — repeating precisely is not the same as guessing.', 'ignore': '"ignore" is the opposite of carefully checking results.' },
+      { 'avoid': '"avoid" fits — being "deliberately vague" means not taking a clear stand.', 'demand': '"demand" means to insist firmly — the opposite of being vague.', 'welcome': '"welcome" means to accept willingly — contradicts being deliberately vague.', 'highlight': '"highlight" means to draw attention to — the politician is hiding, not highlighting, a position.' },
+      { 'eventually': '"eventually" fits — "despite initial reluctance" shows she came around after some time.', 'hastily': '"hastily" means quickly and without care — this contradicts "reluctance" which suggests slowness.', 'reluctantly': '"reluctantly" describes her initial feeling, not how she ended up accepting — the connector "despite" signals a change.', 'angrily': '"angrily" contradicts "graciously" at the end of the sentence.' },
+      { 'preserve': '"preserve" fits — a controlled environment protects and maintains the manuscript\'s condition.', 'duplicate': '"duplicate" means to copy — this is not what a controlled environment does.', 'advertise': '"advertise" means to promote — a manuscript is kept private, not promoted.', 'dissolve': '"dissolve" means to break down — the opposite of preserving.' },
+      { 'firm': '"firm" fits — a calm tone combined with decisive words describes someone who is controlled but resolute.', 'hesitant': '"hesitant" contradicts "no room for compromise" — hesitation implies uncertainty.', 'confused': '"confused" contradicts the clear, decisive meaning of "no room for compromise".', 'cheerful': '"cheerful" contradicts the serious tone of leaving no room for compromise.' },
+      { 'little room': '"little room" fits — a detailed report leaves little space for misunderstanding.', 'extra time': '"extra time" does not relate to how much misinterpretation a report allows.', 'clear gaps': '"clear gaps" means obvious missing parts — the opposite of a detailed report.', 'broad scope': '"broad scope" means wide coverage — a broad scope increases, not decreases, misinterpretation.' },
+      { 'desperate': '"desperate" fits — weeks of drought with no rain would make farmers feel urgently in need.', 'grateful': '"grateful" means thankful — they have not yet received rain so cannot be grateful.', 'indifferent': '"indifferent" means not caring — farmers would care deeply about rain.', 'hopeful': '"hopeful" is possible but weaker than "desperate" — weeks of drought creates urgency, not just hope.' },
+      { 'efficiency': '"efficiency" fits — completing a project ahead of schedule demonstrates organised, effective work.', 'creativity': '"creativity" relates to original ideas — being ahead of schedule is about speed and organisation.', 'conflict': '"conflict" means disagreement — a successful early completion suggests the opposite.', 'ambition': '"ambition" means desire — the testament here is to ability, not just desire.' },
+      { 'conviction': '"conviction" fits — moving an audience to tears requires speaking with deep belief.', 'confusion': '"confusion" would make an audience puzzled, not moved.', 'boredom': '"boredom" would cause the audience to lose interest, not be moved to tears.', 'hesitation': '"hesitation" suggests uncertainty — the opposite of powerful, moving speech.' },
+      { 'disrupted': '"disrupted" fits — an unexpected announcement would upset carefully laid plans.', 'reinforced': '"reinforced" means strengthened — the opposite of upsetting plans.', 'expanded': '"expanded" means made larger — the plans were not expanded, they were upset.', 'supported': '"supported" means helped — contradicts the negative effect of a sudden announcement.' },
+      { 'address': '"address" fits — revising a policy to meet community needs means the policy must respond to or deal with those needs.', 'ignore': '"ignore" is the opposite — a revision aims to respond, not to neglect.', 'suppress': '"suppress" means to hold down — the opposite of meeting needs.', 'delay': '"delay" means to postpone — revising a policy is action, not postponement.' },
+      { 'disciplined': '"disciplined" fits — mastering new skills quickly suggests a structured, controlled approach.', 'reckless': '"reckless" means careless — this would lead to mistakes, not quick mastery.', 'passive': '"passive" means inactive — a passive learner would not master skills quickly.', 'erratic': '"erratic" means irregular — consistent skill-building requires the opposite.' },
+      { 'resistance': '"resistance" fits — business owners who fear higher costs would oppose the regulation.', 'approval': '"approval" is the opposite — fear of costs leads to opposition, not support.', 'celebration': '"celebration" is the opposite — opposition is not a celebration.', 'indifference': '"indifference" means not caring — business owners with financial concerns would not be indifferent.' },
+      { 'flawless': '"flawless" fits — securing a championship requires a perfect, error-free performance.', 'mediocre': '"mediocre" means average — an average performance would not secure a championship.', 'inconsistent': '"inconsistent" means uneven — inconsistency would lose, not win, a championship.', 'reckless': '"reckless" means careless — winning requires precision, not recklessness.' },
+      { 'assist': '"assist" fits — coming together to provide food and shelter means helping the victims.', 'abandon': '"abandon" means to leave behind — the opposite of coming together to help.', 'criticise': '"criticise" means to find fault — unrelated to providing food and shelter.', 'monitor': '"monitor" means to watch — the community actively helped, not just observed.' },
+      { 'confused': '"confused" fits — if even the most confused student understood, the explanation was clearly very clear.', 'advanced': '"advanced" would make the sentence complimentary but weak — "even the most advanced student" is not a strong test of clarity.', 'attentive': '"attentive" means paying close attention — these students would understand anyway.', 'curious': '"curious" means interested — curious students would likely understand with or without a clear explanation.' },
+    ];
+    const expl = (level === 'P1' || level === 'P2') ? p1p2RowsEx : upperRowsEx;
     const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : upperRows;
-    const [q, answer, ds] = rotate(rows, i);
-    return { category: 'contextInference', subskill: 'meaning_in_context', q, choices: buildChoices(answer, ds), answer, explain: 'Use clues in the sentence to infer meaning.' };
+    const [q, answer, ds, optionExplanations] = [rotate(rows, i)[0], rotate(rows, i)[1], rotate(rows, i)[2], expl[i % expl.length]];
+    return { category: 'contextInference', subskill: 'meaning_in_context', q, choices: buildChoices(answer, ds), answer, explain: 'Use clues in the sentence to infer meaning.', optionExplanations };
   },
   definitionMatch(level, i) {
     const p1p2Rows = [
@@ -156,9 +187,47 @@ const VOCAB_BUILDERS = {
       ['The point at which a substance changes from solid to liquid is its ___ point.', 'melting', ['boiling', 'freezing', 'tipping']],
       ['An organisation that helps people in need without seeking profit is a ___.', 'charity', ['corporation', 'agency', 'syndicate']],
     ];
+    const p1p2Ex = [
+      { 'veterinarian': 'A vet treats sick animals — the definition says "treats sick animals".', 'librarian': 'A librarian works with books, not animals.', 'tailor': 'A tailor makes clothes — unrelated to animals.', 'cashier': 'A cashier handles payments — not an animal doctor.' },
+      { 'library': 'A library is where you borrow books — "borrow storybooks" is the key clue.', 'bakery': 'A bakery sells bread and cakes — not books.', 'stadium': 'A stadium is for sports — not for borrowing books.', 'factory': 'A factory makes goods — it does not lend books.' },
+      { 'projector': 'A projector shows moving pictures on a screen — all three parts of the definition match.', 'stapler': 'A stapler joins paper together — it does not show pictures.', 'compass': 'A compass draws circles or shows direction — not pictures.', 'teapot': 'A teapot holds hot water for tea — not a machine for showing pictures.' },
+      { 'plumber': 'A plumber fixes taps and pipes — both clues match.', 'mechanic': 'A mechanic fixes engines and cars — not taps and pipes.', 'carpenter': 'A carpenter works with wood — not water pipes.', 'painter': 'A painter applies paint — not taps and pipes.' },
+      { 'hospital': 'A hospital is where sick people go to recover — "sick people … get better" matches exactly.', 'hotel': 'A hotel is for overnight stays, not for medical treatment.', 'school': 'A school is for learning — not a medical facility.', 'factory': 'A factory makes products — not a place for sick people.' },
+      { 'pilot': 'A pilot flies an aeroplane — the definition says exactly that.', 'captain': 'A captain leads a ship or team — not specifically an aeroplane.', 'engineer': 'An engineer designs or maintains systems — not the person who flies the plane.', 'soldier': 'A soldier serves in the military — not a pilot.' },
+      { 'scissors': 'Scissors are used to cut paper — "cut paper" and "pair of" both match.', 'pliers': 'Pliers grip and bend metal — not used to cut paper.', 'tongs': 'Tongs pick up objects — not a cutting tool.', 'tweezers': 'Tweezers grip tiny objects — not used for cutting paper.' },
+      { 'zoo': 'A zoo has animals from many countries — "watch animals from many countries" matches.', 'park': 'A park is an open green space — not specifically for animals from many countries.', 'farm': 'A farm has local farm animals — not animals from many countries.', 'museum': 'A museum displays objects and artefacts — not live animals.' },
+      { 'firefighter': 'A firefighter puts out fires — "helps put out fires" matches exactly.', 'policeman': 'A policeman enforces the law — not primarily a fire-fighting role.', 'sailor': 'A sailor works on ships — unrelated to putting out fires.', 'doctor': 'A doctor treats illness — does not put out fires.' },
+      { 'rainbow': 'A rainbow has seven colours and appears in the sky after rain — all clues match.', 'sunset': 'A sunset has colours but is not a ring of seven colours after rain.', 'hailstorm': 'A hailstorm is a weather event — not a colourful arc.', 'tornado': 'A tornado is a dangerous spinning wind — not a colourful arc after rain.' },
+      { 'diary': 'A diary is a small personal book for notes and appointments — all parts of the definition match.', 'calendar': 'A calendar shows dates — it is not carried around for personal notes.', 'atlas': 'An atlas is a book of maps — not for personal notes.', 'register': 'A register records names — not a personal notebook.' },
+      { 'chef': 'A chef cooks food in a restaurant — "cooks food in a restaurant" is the exact definition.', 'waiter': 'A waiter serves food — does not cook it.', 'baker': 'A baker bakes bread and pastries — not specifically in a restaurant.', 'grocer': 'A grocer sells food — does not cook it.' },
+      { 'kettle': 'A kettle boils water for making tea — "boil water for making tea" matches exactly.', 'flask': 'A flask keeps drinks hot or cold — it does not boil water.', 'jug': 'A jug pours liquids — it cannot boil water.', 'basin': 'A basin holds water for washing — not for boiling.' },
+      { 'bakery': 'A bakery is where bread and cakes are made and sold — all three clues match.', 'cafeteria': 'A cafeteria is a dining hall — not specifically for making bread and cakes.', 'stall': 'A stall sells items but does not make bread and cakes on site.', 'pantry': 'A pantry stores food — it is not a place where food is made and sold.' },
+      { 'teacher': 'A teacher teaches students — the definition says exactly that.', 'prefect': 'A prefect is a student leader — does not teach.', 'counsellor': 'A counsellor provides guidance and support — not primarily a teacher.', 'warden': 'A warden supervises a building or prisoners — not a classroom teacher.' },
+      { 'watch': 'A watch is worn on the wrist to tell the time — both clues match.', 'bracelet': 'A bracelet is a wrist decoration — it does not tell the time.', 'bangle': 'A bangle is a rigid wrist ornament — not a timepiece.', 'compass': 'A compass shows direction — it is not worn on the wrist to tell the time.' },
+    ];
+    const upperEx = [
+      { 'expedition': 'An expedition is a long journey to explore — "long journey to explore" matches.', 'equation': 'An equation is a mathematical statement — not a journey.', 'invitation': 'An invitation is a request to attend an event — not a journey.', 'reflection': 'A reflection is a thought or image — not a journey of exploration.' },
+      { 'democracy': 'In a democracy, citizens choose their leaders by voting — all parts match.', 'monarchy': 'A monarchy is ruled by a king or queen — not chosen by citizens voting.', 'embassy': 'An embassy is a diplomatic office in a foreign country — not a system of government.', 'tribunal': 'A tribunal is a court for special cases — not a voting system.' },
+      { 'historian': 'A historian studies and writes about history — both parts of the definition match.', 'journalist': 'A journalist reports current news — not someone who studies history.', 'archaeologist': 'An archaeologist studies ancient objects — not primarily a writer of history.', 'diplomat': 'A diplomat manages relations between countries — not a history writer.' },
+      { 'photosynthesis': 'Photosynthesis is the process by which green plants make food using sunlight — all parts match.', 'respiration': 'Respiration is the process of releasing energy from food — not making food from sunlight.', 'germination': 'Germination is when a seed begins to grow — not food production.', 'erosion': 'Erosion is the wearing away of rock or soil — unrelated to plants making food.' },
+      { 'passport': 'A passport is an official travel document — "official document … travel abroad" matches.', 'permit': 'A permit allows a specific activity — not the standard international travel document.', 'visa': 'A visa is a stamp allowing entry to a country — not the document itself that allows general travel.', 'certificate': 'A certificate proves an achievement — not a travel document.' },
+      { 'apprentice': 'An apprentice is a beginner learning a trade — "new to a job … still learning" matches.', 'intern': 'An intern is a temporary trainee — usually in a professional context, not learning a trade.', 'assistant': 'An assistant helps someone — not necessarily a beginner still learning.', 'consultant': 'A consultant is an expert adviser — the opposite of someone new to the job.' },
+      { 'astronomy': 'Astronomy is the study of stars and planets — both clues match.', 'astrology': 'Astrology uses stars to predict fortunes — not a scientific study.', 'geology': 'Geology studies rocks and the Earth — not stars and planets.', 'philosophy': 'Philosophy studies ideas and existence — not stars and planets.' },
+      { 'island': 'An island is land entirely surrounded by water — "entirely surrounded by water" matches.', 'peninsula': 'A peninsula is surrounded by water on three sides — not entirely surrounded.', 'atoll': 'An atoll is a ring-shaped coral island — a specific type, not the general definition.', 'lagoon': 'A lagoon is a stretch of shallow water — not a piece of land.' },
+      { 'agriculture': 'Agriculture is growing crops and raising animals for food — all parts match.', 'horticulture': 'Horticulture focuses on garden plants — not raising animals.', 'commerce': 'Commerce is trade and business — not farming.', 'infrastructure': 'Infrastructure refers to roads and utilities — not farming.' },
+      { 'treaty': 'A treaty is a formal agreement between countries — "formal agreement … countries" matches.', 'legislation': 'Legislation is law made by a government — not an agreement between countries.', 'referendum': 'A referendum is a public vote — not an agreement between countries.', 'charter': 'A charter is a formal document of rights — not specifically an agreement between nations.' },
+      { 'crust': 'The crust is the outer layer of the Earth — "outer layer of the Earth" matches exactly.', 'mantle': 'The mantle is the layer beneath the crust — not the outer layer.', 'core': 'The core is the innermost part of the Earth — not the outer layer.', 'membrane': 'A membrane is a thin biological layer — not a layer of the Earth.' },
+      { 'pacifist': 'A pacifist is against violence and believes in peaceful solutions — both clues match.', 'activist': 'An activist campaigns for change — not specifically against violence.', 'nationalist': 'A nationalist promotes national interests — not necessarily peaceful.', 'mediator': 'A mediator helps settle disputes — not specifically against violence.' },
+      { 'legislature': 'The legislature is the branch of government that makes laws — matches exactly.', 'judiciary': 'The judiciary interprets and applies laws — it does not make them.', 'executive': 'The executive enforces laws — it does not make them.', 'bureaucracy': 'The bureaucracy is the administrative system — not the law-making body.' },
+      { 'myth': 'A myth is a traditional story explaining natural events — "passed down … explains natural events" matches.', 'fable': 'A fable is a moral story featuring animals — not about natural events.', 'legend': 'A legend is a historical story about real or imagined heroes — not specifically about natural events.', 'parable': 'A parable is a short moral story — not a traditional explanation of natural events.' },
+      { 'melting': 'The melting point is where a solid turns to liquid — "solid to liquid" matches exactly.', 'boiling': 'The boiling point is where a liquid turns to gas — not solid to liquid.', 'freezing': 'The freezing point is where liquid turns to solid — the opposite direction.', 'tipping': '"Tipping point" is a figurative expression — not a scientific term for a change of state.' },
+      { 'charity': 'A charity helps people in need without seeking profit — both clues match.', 'corporation': 'A corporation seeks profit — the opposite of a charity.', 'agency': 'An agency provides services — not necessarily helping those in need.', 'syndicate': 'A syndicate is a group formed for business — not a non-profit organisation.' },
+    ];
     const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : upperRows;
+    const exRows = (level === 'P1' || level === 'P2') ? p1p2Ex : upperEx;
     const [q, answer, ds] = rotate(rows, i);
-    return { category: 'definitionMatch', subskill: 'word_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the word that matches the definition.' };
+    const optionExplanations = exRows[i % exRows.length];
+    return { category: 'definitionMatch', subskill: 'word_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the word that matches the definition.', optionExplanations };
   },
   synonymContrast(level, i) {
     const p1p2Rows = [
@@ -197,9 +266,47 @@ const VOCAB_BUILDERS = {
       ['The writer\'s prose was vivid, which means it was ___ and descriptive.', 'lively', ['plain', 'direct', 'restrained']],
       ['The economy was stagnant, which is the opposite of being ___.', 'growing', ['stable', 'regulated', 'diversified']],
     ];
+    const p1p2Ex = [
+      { 'happy': '"happy" is the synonym of "joyful" — both mean a feeling of great pleasure.', 'angry': '"angry" is an emotion, but it is the opposite of joyful.', 'silent': '"silent" describes sound level — unrelated to joyfulness.', 'frozen': '"frozen" means extremely cold — not a feeling of happiness.' },
+      { 'rude': '"rude" is the antonym of "polite" — the word "not" signals you need the opposite.', 'formal': '"formal" means serious and proper — it is not the opposite of polite.', 'steady': '"steady" means stable — unrelated to politeness.', 'honest': '"honest" is a positive quality — not the opposite of polite.' },
+      { 'small': '"small" is the synonym of "tiny" — both mean not large.', 'bright': '"bright" describes light, not size.', 'cold': '"cold" describes temperature, not size.', 'loud': '"loud" describes sound, not size.' },
+      { 'afraid': '"afraid" is the antonym of "brave" — "not" signals you need the opposite.', 'angry': '"angry" describes a feeling, not the opposite of brave.', 'lazy': '"lazy" means not working hard — not the opposite of brave.', 'hungry': '"hungry" describes an appetite — not the opposite of brave.' },
+      { 'light': '"light" is the antonym of "heavy" — "opposite of" is the key signal.', 'short': '"short" is the opposite of tall, not heavy.', 'old': '"old" is the opposite of new — not the opposite of heavy.', 'narrow': '"narrow" is the opposite of wide — not the opposite of heavy.' },
+      { 'rough': '"rough" is the antonym of "gentle" — "not gentle" signals you need the opposite.', 'soft': '"soft" is a synonym of gentle — not the opposite.', 'little': '"little" describes size — not the opposite of gentle.', 'timid': '"timid" means shy — not the opposite of gentle.' },
+      { 'quiet': '"quiet" is the antonym of "noisy" — "opposite of" signals this.', 'dark': '"dark" is the opposite of bright — not the opposite of noisy.', 'small': '"small" is the opposite of large — not the opposite of noisy.', 'crowded': '"crowded" can go with noisy, but it is not its opposite.' },
+      { 'present': '"present" is the antonym of "absent" — "not absent" means the same as being present.', 'well': '"well" means healthy — not the direct antonym of absent.', 'alert': '"alert" means aware — not the antonym of absent.', 'ready': '"ready" means prepared — not the antonym of absent.' },
+      { 'cold': '"cold" is the synonym of "freezing" (extremely cold) — "extremely" strengthens the meaning.', 'warm': '"warm" is the opposite of freezing — not a synonym.', 'fresh': '"fresh" means cool or new — not the same as extremely cold.', 'still': '"still" means not moving — unrelated to temperature.' },
+      { 'open': '"open" is the antonym of "closed" — "opposite of" signals this.', 'busy': '"busy" can describe an open shop but is not its opposite.', 'large': '"large" is the opposite of small — not the opposite of closed.', 'bright': '"bright" is the opposite of dark — not the opposite of closed.' },
+      { 'lively': '"lively" is a synonym of "playful" — both mean full of energy and fun.', 'quiet': '"quiet" is the opposite of lively — not a synonym.', 'serious': '"serious" means not playful — it is the opposite.', 'timid': '"timid" means shy and fearful — not a synonym of playful.' },
+      { 'selfish': '"selfish" is the antonym of "generous" — "not generous" signals you need the opposite.', 'kind': '"kind" is close to generous — not the opposite.', 'gentle': '"gentle" describes manner — not the opposite of generous.', 'polite': '"polite" is good behaviour — not the opposite of generous.' },
+      { 'wide': '"wide" is the antonym of "narrow" — "opposite of" signals this.', 'long': '"long" is the opposite of short — not the opposite of narrow.', 'steep': '"steep" describes slope — not the opposite of narrow.', 'rough': '"rough" describes texture — not the opposite of narrow.' },
+      { 'unhappy': '"unhappy" is the synonym of "miserable" — both mean very sad.', 'hungry': '"hungry" describes appetite — not the same as feeling miserable.', 'tired': '"tired" means physically drained — not the same as feeling miserable.', 'confused': '"confused" means puzzled — not the same as very sad.' },
+      { 'wrong': '"wrong" is the synonym of "incorrect" — both mean not right.', 'hidden': '"hidden" means not visible — not a synonym of incorrect.', 'partial': '"partial" means incomplete — not the same as incorrect.', 'unclear': '"unclear" means not clear — not the same as incorrect.' },
+      { 'fast': '"fast" is the synonym of "swift" — both mean moving quickly.', 'tall': '"tall" describes height — not a synonym of swift.', 'lean': '"lean" describes build — not a synonym of swift.', 'strong': '"strong" describes power — not the same as swift.' },
+    ];
+    const upperEx = [
+      { 'meaningful': '"meaningful" fits — "brief" describes length, but "very meaningful" describes the impact.', 'careless': '"careless" is a negative quality — contradicts the compliment "very".', 'shallow': '"shallow" means lacking depth — the opposite of meaningful.', 'crooked': '"crooked" means bent or dishonest — unrelated to the value of a message.' },
+      { 'modern': '"modern" fits — the contrast with "ancient buildings" signals a new, contemporary design.', 'fragile': '"fragile" means easily broken — not the focus of the contrast here.', 'gentle': '"gentle" describes manner — not relevant to architectural style.', 'hollow': '"hollow" means empty inside — not an architectural contrast.' },
+      { 'brief': '"brief" is the synonym of "concise" — both mean short and to the point.', 'lengthy': '"lengthy" is the antonym — the opposite of concise.', 'vague': '"vague" means unclear — not the same as concise.', 'repetitive': '"repetitive" means repeating unnecessarily — the opposite of concise.' },
+      { 'logical': '"logical" is the synonym of "coherent" — both mean clear and reasoned.', 'creative': '"creative" means original — not the same as logical and easy to follow.', 'repetitive': '"repetitive" means repeating — not a feature of a coherent argument.', 'bold': '"bold" means daring — not the same as clear and logical.' },
+      { 'open': '"open" is the synonym of "transparent" — both mean nothing is hidden.', 'complicated': '"complicated" is the opposite of transparent.', 'confidential': '"confidential" means secret — the opposite of transparent.', 'flexible': '"flexible" means adaptable — not the same as transparent.' },
+      { 'decisive': '"decisive" is the synonym of "conclusive" — both mean leaving no doubt.', 'partial': '"partial" means incomplete — the opposite of conclusive.', 'ambiguous': '"ambiguous" means unclear — the opposite of conclusive.', 'suggestive': '"suggestive" implies possibility — not the same as certain and final.' },
+      { 'irregular': '"irregular" is the synonym of "erratic" — both mean inconsistent and unpredictable.', 'consistent': '"consistent" is the antonym of erratic.', 'calm': '"calm" is the antonym of erratic.', 'deliberate': '"deliberate" means planned — the opposite of erratic.' },
+      { 'articulate': '"articulate" is the synonym of "eloquent" — both mean expressing ideas clearly and persuasively.', 'simple': '"simple" means basic — not the same as eloquent and persuasive.', 'aggressive': '"aggressive" means forceful and hostile — not the same as eloquent.', 'unclear': '"unclear" is the antonym of eloquent.' },
+      { 'in agreement': '"in agreement" matches "unanimous" — unanimous means all agreed.', 'divided': '"divided" is the antonym — unanimous means the opposite of divided.', 'uncertain': '"uncertain" means unsure — unanimous means certain agreement.', 'unaware': '"unaware" means not knowing — unrelated to unanimous agreement.' },
+      { 'disputed': '"disputed" is the synonym of "controversial" — both mean contested and debated.', 'accepted': '"accepted" is the antonym of controversial.', 'proven': '"proven" means established as fact — the opposite of controversial.', 'ignored': '"ignored" means not noticed — not the same as widely debated.' },
+      { 'hardworking': '"hardworking" is the synonym of "diligent" — both mean working with care and effort.', 'talented': '"talented" means naturally gifted — not the same as diligent.', 'creative': '"creative" means imaginative — not the same as hardworking.', 'confident': '"confident" means self-assured — not the same as diligent.' },
+      { 'liberating': '"liberating" is the antonym of "oppressive" — freedom contrasts with oppression.', 'demanding': '"demanding" is similar to oppressive — not its opposite.', 'strict': '"strict" is similar to oppressive — not its opposite.', 'formal': '"formal" means proper and official — not the opposite of oppressive.' },
+      { 'empty': '"empty" is the synonym of "depleted" — depleted means almost used up.', 'full': '"full" is the antonym of depleted.', 'distributed': '"distributed" means shared out — not the same as depleted.', 'frozen': '"frozen" means stopped — not the same as nearly empty.' },
+      { 'debatable': '"debatable" is the synonym of "contentious" — both mean open to argument.', 'popular': '"popular" is the antonym of contentious.', 'temporary': '"temporary" means short-lived — not the same as debatable.', 'straightforward': '"straightforward" means simple and clear — the opposite of contentious.' },
+      { 'lively': '"lively" is the synonym of "vivid" — both mean bright, striking, and full of life.', 'plain': '"plain" is the antonym of vivid.', 'direct': '"direct" means straightforward — not the same as vivid.', 'restrained': '"restrained" means held back — the opposite of vivid.' },
+      { 'growing': '"growing" is the antonym of "stagnant" — stagnant means not moving forward.', 'stable': '"stable" also contrasts with stagnant but is not exact — a stagnant economy is not moving, but neither is a stable one; the question signals an opposite, which is growth.', 'regulated': '"regulated" means controlled — not the antonym of stagnant.', 'diversified': '"diversified" means varied — not the antonym of stagnant.' },
+    ];
     const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : upperRows;
+    const exRows = (level === 'P1' || level === 'P2') ? p1p2Ex : upperEx;
     const [q, answer, ds] = rotate(rows, i);
-    return { category: 'synonymContrast', subskill: 'synonym_antonym', q, choices: buildChoices(answer, ds), answer, explain: 'Select the closest synonym or contrast word from context.' };
+    const optionExplanations = exRows[i % exRows.length];
+    return { category: 'synonymContrast', subskill: 'synonym_antonym', q, choices: buildChoices(answer, ds), answer, explain: 'Select the closest synonym or contrast word from context.', optionExplanations };
   },
   collocationCloze(level, i) {
     const p1p2Rows = [
@@ -238,9 +345,47 @@ const VOCAB_BUILDERS = {
       ['The charity event managed to ___ over a thousand dollars.', 'raise', ['earn', 'collect', 'generate']],
       ['The team had to ___ a balance between cost and quality.', 'strike', ['achieve', 'maintain', 'find']],
     ];
+    const p1p2Ex = [
+      { 'pay': 'We "pay attention" — this is a fixed collocation; you cannot "do" or "set" attention.', 'do': '"do attention" is not a natural English phrase.', 'keep': '"keep attention" is not idiomatic in this context.', 'set': '"set attention" is not a real collocation.' },
+      { 'hold': 'We "hold a sale" — the fixed collocation for running an event is "hold".', 'make': '"make a sale" means to sell something, not to organise a sale event.', 'draw': '"draw a sale" is not a real expression.', 'carry': '"carry a sale" is not idiomatic.' },
+      { 'reached': 'We "reach a decision" — this is the natural collocation; you arrive at a decision.', 'caught': '"caught a decision" is not a real collocation.', 'drew': '"drew a decision" is not used this way.', 'lifted': '"lifted a decision" is not idiomatic.' },
+      { 'make': 'We "make an effort" — this is a fixed collocation in English.', 'do': '"do an effort" is not standard; we "do our best" but "make an effort".', 'bring': '"bring an effort" is not a real collocation.', 'throw': '"throw an effort" is not idiomatic.' },
+      { 'correct': 'We "correct a mistake" — the natural verb for fixing an error.', 'repair': '"repair a mistake" is not standard; repair is for physical objects.', 'undo': '"undo a mistake" is possible informally but not the standard collocation.', 'remove': '"remove a mistake" suggests erasing, not fixing.' },
+      { 'raise': 'We "raise our hands" — the standard gesture for asking to speak.', 'lift': '"lift hands" is unusual; "raise hands" is the fixed phrase.', 'wave': '"wave hands" suggests signalling, not the classroom gesture.', 'stretch': '"stretch hands" means to extend for exercise — not the classroom convention.' },
+      { 'take': 'We "take a test" — the standard collocation in Singapore English.', 'sit': '"sit a test" is used in British English but less common here.', 'do': '"do a test" is possible in informal speech but "take" is more precise.', 'write': '"write a test" is informal in some regions but not the standard collocation.' },
+      { 'draw': 'We "draw a line" — the fixed collocation for making a line with a pencil.', 'write': '"write a line" means to write words, not to make a line.', 'mark': '"mark a line" suggests highlighting, not drawing.', 'place': '"place a line" is not a natural expression.' },
+      { 'do': 'We "do our best" — the fixed collocation for giving maximum effort.', 'give': '"give our best" is also used but "do our best" is the standard collocation here.', 'make': '"make our best" is not standard; we "do our best".', 'bring': '"bring our best" is not a fixed collocation.' },
+      { 'sang': 'We "sang a song" — the natural verb for performing a vocal piece.', 'played': '"played a song" is used for instruments, not singing.', 'performed': '"performed a song" is correct but "sang" is more natural and precise.', 'acted': '"acted a song" is not standard; acting applies to drama.' },
+      { 'do': 'We "do a favour" — the fixed collocation; you cannot "give" or "make" a favour.', 'give': '"give a favour" is not the standard collocation.', 'make': '"make a favour" is not standard in English.', 'offer': '"offer a favour" suggests proposing, not the act itself.' },
+      { 'complete': 'We "complete homework" — the precise verb for finishing all required work.', 'finish off': '"finish off" is informal and suggests finishing the last part.', 'end': '"end homework" is not a natural collocation.', 'close': '"close homework" is not a real expression.' },
+      { 'took': 'We "took a deep breath" — the fixed collocation for this action.', 'drew': '"drew a deep breath" is also correct but less common in Singapore English.', 'inhaled': '"inhaled a deep breath" is redundant — inhaling is part of breathing.', 'pulled': '"pulled a deep breath" is not standard.' },
+      { 'take': 'We "take care of" — the fixed phrase for looking after something.', 'do': '"do care of" is not correct.', 'make': '"make care of" is not a real collocation.', 'give': '"give care of" is not standard.' },
+      { 'make': 'We "make an appointment" — the standard collocation for booking a time.', 'take': '"take an appointment" is not the standard phrase.', 'set': '"set an appointment" is informal and less common.', 'keep': '"keep an appointment" means to not miss it — not to book one.' },
+      { 'form': 'We "form a plan" — a fixed collocation meaning to develop and create a plan.', 'make up': '"make up a plan" is informal and suggests inventing, not carefully creating.', 'build': '"build a plan" is possible informally but not the standard choice here.', 'arrange': '"arrange a plan" is not the natural collocation for creating one.' },
+    ];
+    const upperEx = [
+      { 'implement': 'We "implement a policy" — the precise collocation for putting a policy into action.', 'deploy': '"deploy a policy" is used in technology, not government contexts.', 'announce': '"announce a policy" means to tell people about it — not to put it into action.', 'delay': '"delay a policy" means to postpone — the opposite of implementing.' },
+      { 'conduct': 'We "conduct a study" — the formal collocation for carrying out research.', 'produce': '"produce a study" means to create the written report — not to carry it out.', 'arrange': '"arrange a study" means to organise — not the standard research collocation.', 'perform': '"perform a study" is less common; "conduct" is the standard choice.' },
+      { 'reached': 'We "reach a conclusion" — the natural collocation for arriving at a final decision.', 'caught': '"caught a conclusion" is not a real collocation.', 'drew': '"drew a conclusion" is also natural but is less common than "reached".', 'lifted': '"lifted a conclusion" is not idiomatic.' },
+      { 'summon': 'We "summon determination" — meaning to call up a resource from within yourself.', 'create': '"create determination" implies making something new — determination is an inner resource.', 'remember': '"remember determination" does not convey calling upon it in a difficult moment.', 'carry': '"carry determination" is not idiomatic for this meaning.' },
+      { 'take': '"Take effect" is the fixed collocation — a policy "takes effect" when it starts.', 'bring': '"bring effect" is not a standard collocation.', 'come': '"come effect" is not correct — "come into effect" is correct but not one of the choices.', 'make': '"make effect" is not a real collocation.' },
+      { 'strike': 'We "strike a compromise" — the precise collocation for reaching a middle ground.', 'make': '"make a compromise" is also used but "strike" is the more formal, precise collocation.', 'reach': '"reach a compromise" is natural but "strike" is the preferred collocation.', 'draw': '"draw a compromise" is not standard.' },
+      { 'raise': 'We "raise awareness" — the fixed collocation for increasing people\'s understanding.', 'build': '"build awareness" is used in some contexts but "raise" is the standard collocation.', 'grow': '"grow awareness" is informal — "raise" is the correct verb.', 'create': '"create awareness" is used but "raise awareness" is the fixed expression.' },
+      { 'capture': 'We "capture attention" — the precise collocation for gaining and holding focus.', 'hold': '"hold attention" means to maintain it — "capture" is the first act of gaining it.', 'attract': '"attract attention" works but "capture the attention of the entire hall" is the more complete phrase.', 'keep': '"keep attention" means to retain it — "capture" is about gaining it initially.' },
+      { 'shed': 'We "shed light on" something — the fixed collocation for revealing new information.', 'cast': '"cast light on" is used but less common than "shed light on".', 'throw': '"throw light on" is also used but "shed" is the most natural collocation.', 'bring': '"bring light on" is not standard.' },
+      { 'present': 'We "present findings" — the precise collocation for sharing research results formally.', 'discuss': '"discuss findings" means to talk them over — "present" is more formal.', 'share': '"share findings" is more informal — "present" is the formal academic collocation.', 'report': '"report findings" works but "present" is the stronger collocation for a classroom context.' },
+      { 'reach': 'We "reach an agreement" — the collocation for successfully coming to a deal.', 'make': '"make an agreement" is informal; "reach" implies effort and arrival at a point.', 'settle': '"settle an agreement" is not standard; "settle" is used with disputes.', 'find': '"find an agreement" is not a natural collocation.' },
+      { 'achieved': 'We "achieved a breakthrough" — the collocation for reaching an important discovery.', 'made': '"made a breakthrough" is also standard and natural here.', 'found': '"found a breakthrough" is not a typical collocation.', 'discovered': '"discovered a breakthrough" is redundant — a breakthrough is already a discovery.' },
+      { 'take': 'We "take into account" — the fixed phrase for considering something.', 'bring': '"bring into account" is not standard.', 'call': '"call into account" means to question someone — not to consider feedback.', 'put': '"put into account" is not the standard phrase.' },
+      { 'introduce': 'We "introduce measures" — the formal collocation for putting new actions in place.', 'apply': '"apply measures" is used but "introduce" is the collocation for new policies.', 'enforce': '"enforce measures" means to make people follow them — not the same as starting them.', 'publish': '"publish measures" means to announce them — not to put them into action.' },
+      { 'raise': 'We "raise money" — the fixed collocation for collecting funds.', 'earn': '"earn money" means to get it through work — not through a fundraising event.', 'collect': '"collect money" is natural and close, but "raise" is the charity/fundraising collocation.', 'generate': '"generate money" is formal and used in business — "raise" is the charity collocation.' },
+      { 'strike': 'We "strike a balance" — the fixed collocation for achieving equilibrium between two things.', 'achieve': '"achieve a balance" is natural but "strike a balance" is the fixed idiom.', 'maintain': '"maintain a balance" means to keep it once found — not to create it.', 'find': '"find a balance" is informal — "strike" is the standard formal collocation.' },
+    ];
     const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : upperRows;
+    const exRows = (level === 'P1' || level === 'P2') ? p1p2Ex : upperEx;
     const [q, answer, ds] = rotate(rows, i);
-    return { category: 'collocationCloze', subskill: 'word_partners', q, choices: buildChoices(answer, ds), answer, explain: 'Some words naturally go together as collocations.' };
+    const optionExplanations = exRows[i % exRows.length];
+    return { category: 'collocationCloze', subskill: 'word_partners', q, choices: buildChoices(answer, ds), answer, explain: 'Some words naturally go together as collocations.', optionExplanations };
   },
   grammaticalRole(level, i) {
     const p1p2Rows = [
@@ -917,7 +1062,7 @@ const VOCAB_BUILDERS = {
       ['___ Pacific Ocean is the largest ocean on Earth.', 'The', ['A', 'An', 'Some']],
     ];
     const [q, answer, ds] = rotate(rows, i);
-    return { category: 'grammarArticles', subskill: 'article_in_context', q, choices: buildChoices(answer, ds), answer, explain: 'Use "a" before consonant sounds, "an" before vowel sounds, "the" for specific nouns, and "some" for uncountable or plural quantities.', optionExplanations: makeArticleOptionExplanations(answer, ds) };
+    return { category: 'grammarArticles', subskill: 'article_in_context', q, choices: buildChoices(answer, ds), answer, explain: 'Use "a" before consonant sounds, "an" before vowel sounds, "the" for specific nouns, and "some" for uncountable or plural quantities.' };
   },
   grammarSVA(level, i) {
     const rows = [
@@ -935,7 +1080,7 @@ const VOCAB_BUILDERS = {
       ['Everyone in the classrooms ___ asked to be quiet during the examination.', 'was', ['were', 'are', 'have been']],
     ];
     const [q, answer, ds] = rotate(rows, i);
-    return { category: 'grammarSVA', subskill: 'subject_verb_agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Make sure the verb agrees with the subject in number — watch for collective nouns, "each/either/neither", and interrupting phrases.', optionExplanations: makeAgreementOptionExplanations(answer, ds) };
+    return { category: 'grammarSVA', subskill: 'subject_verb_agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Make sure the verb agrees with the subject in number — watch for collective nouns, "each/either/neither", and interrupting phrases.' };
   },
 };
 
@@ -956,19 +1101,28 @@ function buildLevel(level) {
     const localIndex = categoryCursor[baseCat];
     categoryCursor[baseCat] += 1;
     const spec = VOCAB_BUILDERS[baseCat](level, localIndex);
-    items.push({
+    const item = {
       id: `v-${level.toLowerCase()}-${String(i + 1).padStart(3, '0')}`,
       level,
       category: toCanonicalCategory(spec.category),
       subskill: spec.subskill,
       difficulty: difficultyFor(level, i),
       q: spec.q,
-      contextType: inferQuestionContextType(spec.q),
       choices: spec.choices,
       answer: spec.answer,
       explain: spec.explain,
-      ...(spec.optionExplanations ? { optionExplanations: spec.optionExplanations } : {}),
-    });
+    };
+    // Pass through optional per-item fields only when the builder provided them.
+    if (spec.optionExplanations) item.optionExplanations = spec.optionExplanations;
+    if (spec.clueWords) item.clueWords = spec.clueWords;
+    if (spec.reasoning) item.reasoning = spec.reasoning;
+    // Two-sentence context items are inherently harder — promote to difficulty 3
+    // regardless of rotation position. P1/P2 cap at difficulty 2 by design.
+    if (item.difficulty < 3 && ['P3', 'P4', 'P5', 'P6'].includes(level) &&
+        /[a-zA-Z][.!?]\s+[A-Z][^.!?]*___/.test(item.q)) {
+      item.difficulty = 3;
+    }
+    items.push(item);
   }
 
   return items;

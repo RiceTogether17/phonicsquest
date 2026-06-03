@@ -32,6 +32,9 @@ import {
 import { getWeakSkills } from '../modules/remediationRouter.js';
 import { buildParentReportCard, buildWhatsAppMessage } from '../modules/parentReportCard.js';
 import { getGraduatingSoon, getSlippingRecently } from '../modules/reviewScheduler.js';
+import { questMastery } from '../modules/questMastery.js';
+import { GRAMMAR_CATEGORIES, GRAMMAR_CATEGORY_KEYS } from '../data/grammarCategories.js';
+import { VOCAB_CATEGORIES, VOCAB_CATEGORY_KEYS } from '../data/vocabCategories.js';
 
 Chart.register(...registerables);
 
@@ -132,6 +135,12 @@ export function renderDashboard(container, opts = {}) {
       <button class="btn btn--ghost" id="btn-export-csv-anon">Export CSV (Anonymised)</button>
       <button class="btn btn--ghost" id="btn-export-report">Export Parent Report (JSON)</button>
       <button class="btn btn--ghost" id="btn-import-csv">Import Words (CSV)</button>
+      <button class="btn btn--ghost" id="btn-print-report">🖨️ Print Report</button>
+    </div>
+
+    <!-- Print report wrapper (hidden on screen, shown when printing) -->
+    <div class="print-report-wrapper">
+      <div class="print-report" id="print-report-content"></div>
     </div>
 
     <h3 class="dash-section-title" style="margin-top:24px">Adaptive Controls</h3>
@@ -177,6 +186,7 @@ export function renderDashboard(container, opts = {}) {
   _renderLearningPath(stats);
   _renderWordHistory(stats);
   _renderBadges();
+  _renderPrintReport();
   _bindActions();
 }
 
@@ -961,6 +971,95 @@ function _bindActions() {
       store.set('adaptiveConfig', { ...(store.get('adaptiveConfig') || {}), unseenWeight: Number(adaptiveUnseen.value) });
     });
   }
+
+  // Print Report button
+  document.getElementById('btn-print-report')?.addEventListener('click', () => {
+    document.body.classList.add('print-mode');
+    window.print();
+    setTimeout(() => document.body.classList.remove('print-mode'), 2000);
+  });
+}
+
+function _renderPrintReport() {
+  const container = document.getElementById('print-report-content');
+  if (!container) return;
+
+  // Today's date
+  const today = new Date().toLocaleDateString('en-SG', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  // Helper to colour-code a mastery score (0–1)
+  function _scoreColor(score) {
+    const pct = score * 100;
+    if (pct >= 70) return '#22c55e';
+    if (pct >= 40) return '#f59e0b';
+    return '#ef4444';
+  }
+
+  // Build rows for one skill category list
+  function _skillRows(questKey, categoryKeys, categories) {
+    const rows = [];
+    for (const key of categoryKeys) {
+      const score = questMastery.getSkillScore(questKey, key);
+      if (score === 0.5) continue; // default/unattempted — skip
+      const pct = Math.round(score * 100);
+      const color = _scoreColor(score);
+      const label = categories[key]?.label || key;
+      const barWidth = Math.max(pct, 4);
+      rows.push(`
+        <div class="print-report-skill-row">
+          <div class="print-report-bar" style="width:${barWidth}px;background:${color};"></div>
+          <span style="color:${color};font-weight:600;min-width:36px">${pct}%</span>
+          <span>${escapeHtml(label)}</span>
+        </div>`);
+    }
+    return rows.join('') || '<p style="font-size:12px;color:#6b7280">No attempts recorded yet.</p>';
+  }
+
+  // Overall stats from store
+  const xpTotal    = store.get('xp') ?? 0;
+  const streak     = store.get('streak') ?? 0;
+  const dailyGoal  = store.get('dailyGoal') ?? 0;
+  const daysPlayed = (() => {
+    const history = store.get('dailyHistory') || {};
+    const now = Date.now();
+    const msPerDay = 86400000;
+    let count = 0;
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(now - i * msPerDay).toISOString().slice(0, 10);
+      if (history[day]) count++;
+    }
+    return count;
+  })();
+
+  container.innerHTML = `
+    <div style="font-family:serif;padding:24px;max-width:700px;margin:0 auto;color:#1e1b4b">
+      <h1 style="font-size:20px;margin:0 0 4px">PhonicsQuest — Student Report</h1>
+      <p style="font-size:12px;color:#6b7280;margin:0 0 20px">Printed: ${escapeHtml(today)}</p>
+
+      <div class="print-report-section">
+        <h3>Overall Stats</h3>
+        <div style="display:flex;gap:24px;font-size:12px">
+          <span><strong>XP total:</strong> ${xpTotal}</span>
+          <span><strong>Day streak:</strong> ${streak}</span>
+          <span><strong>Daily goal:</strong> ${dailyGoal}</span>
+          <span><strong>Days played this week:</strong> ${daysPlayed}</span>
+        </div>
+      </div>
+
+      <div class="print-report-section">
+        <h3>Grammar Skills</h3>
+        ${_skillRows('grammarMcq', GRAMMAR_CATEGORY_KEYS, GRAMMAR_CATEGORIES)}
+      </div>
+
+      <div class="print-report-section">
+        <h3>Vocabulary Skills</h3>
+        ${_skillRows('vocabMcq', VOCAB_CATEGORY_KEYS, VOCAB_CATEGORIES)}
+      </div>
+
+      <p style="font-size:11px;color:#6b7280;border-top:1px solid #ccc;padding-top:8px;margin-top:24px">
+        Generated by PhonicsQuest · For teacher/parent use only
+      </p>
+    </div>`;
 }
 
 function _buildParentReport() {

@@ -52,6 +52,7 @@ import { getTopWeakSkills, recordWeakSkills } from './clozeCompletionTracker.js'
 import { KNOWN_PREFIXES_EXTENDED, KNOWN_SUFFIXES_EXTENDED } from '../data/words.js';
 import { getTopMasteryGaps, recordMasteryAttempt, summariseMasteryGap } from './masteryMap.js';
 import { getActiveProfile } from '../modules/profiles.js';
+import { scheduleWord, getDueCount } from '../modules/srsScheduler.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -284,10 +285,15 @@ function _renderCategoryBrowser() {
   const levelKey   = _getProfileLevelKey();
   const levelLabel = _getProfileLevelLabel();
 
+  const dueCount = getDueCount();
+
   let html = '<div class="wv-browser">';
   html += `<div class="wv-level-context-banner" aria-live="polite">
     Currently practising: <strong>${levelLabel} Vocabulary Cloze</strong>
   </div>`;
+  if (dueCount > 0) {
+    html += `<div class="wv-srs-due-badge" aria-live="polite">📅 ${dueCount} word${dueCount === 1 ? '' : 's'} due for review</div>`;
+  }
   html += '<div class="wv-cat-grid">';
 
   const keys = Object.keys(VOCAB_CATEGORIES);
@@ -451,7 +457,12 @@ function _startPassage(catKey, level) {
     }
   }
 
-  _initPassage(_passage);
+  // Show rule card before the passage in practice mode.
+  if (_sessionMode !== 'exam') {
+    _renderVaultRuleCard(_currentCat, () => _initPassage(_passage));
+  } else {
+    _initPassage(_passage);
+  }
 }
 
 function _initPassage(passage) {
@@ -601,9 +612,11 @@ function _renderPassage(passage) {
         <button class="btn btn--ghost btn--sm" id="wv-listen" aria-label="Listen to passage">🔊 Listen</button>
         ${modeCfg.allowInfoPanel ? '<button class="btn btn--ghost btn--sm" id="wv-info" aria-label="Show definitions panel">ℹ️ Info</button>' : ''}
         ${modeCfg.allowHints ? '<button class="btn btn--ghost btn--sm" id="wv-hint">💡 Hint</button>' : ''}
+        ${modeCfg.allowInfoPanel ? '<button class="btn btn--ghost btn--sm" id="wv-rule-hint" aria-expanded="false">📖 Show Rule</button>' : ''}
         <button class="btn btn--primary" id="wv-check" ${inClueMode ? 'disabled' : ''}>Check ✓</button>
         <button class="btn btn--ghost btn--sm" id="wv-quit">Menu</button>
       </div>
+      <div class="mcq-hint-panel" id="wv-rule-hint-panel" hidden></div>
 
       <div class="wv-feedback" id="wv-feedback" role="status" aria-live="assertive" hidden></div>
     </div>`;
@@ -642,6 +655,22 @@ function _renderPassage(passage) {
       audio.speakWord(_affixParts[idx].meaning || `Affix ${_affixParts[idx].affix}`);
     } else if (_currentCat === 'collocationCloze' && passage.collocationHint) {
       audio.speakWord(passage.collocationHint);
+    }
+  });
+  document.getElementById('wv-rule-hint')?.addEventListener('click', () => {
+    const btn = document.getElementById('wv-rule-hint');
+    const panel = document.getElementById('wv-rule-hint-panel');
+    if (!btn || !panel) return;
+    const wasHidden = panel.hidden;
+    panel.hidden = !wasHidden;
+    btn.setAttribute('aria-expanded', String(wasHidden));
+    btn.textContent = wasHidden ? '📖 Hide Rule' : '📖 Show Rule';
+    if (wasHidden) {
+      const tb = VAULT_TEACHBACK[_currentCat] || VAULT_TEACHBACK.default;
+      panel.innerHTML = `
+        <p class="mcq-hint-rule"><strong>Rule:</strong> ${escapeHtml(tb.rule)}</p>
+        <p class="mcq-hint-eg"><em>${escapeHtml(tb.example)}</em></p>
+        <p class="mcq-hint-tip">${escapeHtml(tb.tip)}</p>`;
     }
   });
   document.getElementById('wv-check')?.addEventListener('click', () => _checkPassage(passage));
@@ -1169,16 +1198,25 @@ function _checkPassage(passage) {
     _sessionBlankCorrect = blankCorrect;
     _sessionBlankTotal = blankTotal;
 
+    // In practice mode, wrap _showComplete with the sentence step.
+    const _advanceToComplete = () => {
+      if (_sessionMode === 'practice') {
+        _showSentenceStep(passage, () => _showComplete({ blankCorrect, blankTotal }));
+      } else {
+        _showComplete({ blankCorrect, blankTotal });
+      }
+    };
+
     showAnswerReviewPanel({
       host: _container.querySelector('.wv-game'),
       title: 'Answer Review',
       rows: _buildVocabReviewRows(passage, userAnswers),
       onContinue: () => {
-        if (_isAffixMode(passage)) return _showMorphologySummary(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 300));
-        if (_currentCat === 'synonymContrast') return _showSynonymReview(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 300));
-        if (_currentCat === 'collocationCloze') return _showCollocationReview(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 300));
-        if (passage.clues && passage.clues.length > 0) return _showClueExplanation(passage, () => setTimeout(() => _showComplete({ blankCorrect, blankTotal }), 400));
-        _showComplete({ blankCorrect, blankTotal });
+        if (_isAffixMode(passage)) return _showMorphologySummary(passage, () => setTimeout(() => _advanceToComplete(), 300));
+        if (_currentCat === 'synonymContrast') return _showSynonymReview(passage, () => setTimeout(() => _advanceToComplete(), 300));
+        if (_currentCat === 'collocationCloze') return _showCollocationReview(passage, () => setTimeout(() => _advanceToComplete(), 300));
+        if (passage.clues && passage.clues.length > 0) return _showClueExplanation(passage, () => setTimeout(() => _advanceToComplete(), 400));
+        _advanceToComplete();
       },
     });
   } else {
@@ -1228,6 +1266,41 @@ function _checkPassage(passage) {
       }, 1800);
     }
   }
+}
+
+// ── Pre-session rule card ──────────────────────────────────────────────────
+
+function _renderVaultRuleCard(catKey, onStart) {
+  if (!_container) return;
+  const tb = VAULT_TEACHBACK[catKey] || VAULT_TEACHBACK.default;
+  const meta = VOCAB_CATEGORIES[catKey] || { icon: '📘', label: catKey };
+
+  _container.innerHTML = `
+    <div class="mcq-rule-card" role="region" aria-label="Vocabulary tip: ${escapeAttr(meta.label)}">
+      <div class="mcq-rule-icon" aria-hidden="true">${tb.icon || meta.icon}</div>
+      <h2 class="mcq-rule-title">${escapeHtml(meta.label)}</h2>
+      <div class="mcq-rule-body">
+        <div class="mcq-rule-section">
+          <p class="mcq-rule-label">📖 Rule</p>
+          <p class="mcq-rule-text">${escapeHtml(tb.rule)}</p>
+        </div>
+        <div class="mcq-rule-section">
+          <p class="mcq-rule-label">✏️ Example</p>
+          <p class="mcq-rule-example">${escapeHtml(tb.example)}</p>
+        </div>
+        <div class="mcq-rule-section">
+          <p class="mcq-rule-label">💡 Tip</p>
+          <p class="mcq-rule-tip">${escapeHtml(tb.tip)}</p>
+        </div>
+      </div>
+      <div class="sfq-actions">
+        <button class="btn btn--primary" id="wv-rule-start">Got it — start passage →</button>
+        <button class="btn btn--ghost" id="wv-rule-skip">Skip →</button>
+      </div>
+    </div>`;
+
+  _container.querySelector('#wv-rule-start')?.addEventListener('click', onStart);
+  _container.querySelector('#wv-rule-skip')?.addEventListener('click', onStart);
 }
 
 // ── Vocabulary teach-back overlay ──────────────────────────────────────────
@@ -1354,6 +1427,130 @@ function _showCollocationReview(passage, onContinue) {
   document.getElementById('wv-review-next')?.addEventListener('click', () => { overlay.remove(); onContinue?.(); });
 }
 
+// ── "Use it in a sentence" step (practice mode only) ──────────────────────
+
+/**
+ * Pick the target word for the sentence step.
+ * Prefer the first answer that has a definition in passage.definitions,
+ * fall back to the first answer.
+ */
+function _getSentenceTargetWord(passage) {
+  const defs = passage.definitions || {};
+  const answers = passage.answers || [];
+  const withDef = answers.find(a => defs[a]);
+  return withDef || answers[0] || null;
+}
+
+/**
+ * Build a model sentence fragment from the passage text for the target word.
+ * Finds the sentence in the passage that contains the blank corresponding to
+ * the target word, then returns it with the blank filled.
+ */
+function _getModelSentence(passage, targetWord) {
+  const answers = passage.answers || [];
+  const blankIndex = answers.indexOf(targetWord);
+  if (blankIndex === -1) return `Use "${targetWord}" in a complete sentence.`;
+
+  // Split on ___ and reconstruct the surrounding sentence
+  const parts = (passage.text || '').split('___');
+  if (blankIndex >= parts.length - 1) return `Use "${targetWord}" in a complete sentence.`;
+
+  // Grab the text segment that spans the blank
+  const before = parts[blankIndex];
+  const after  = parts[blankIndex + 1];
+
+  // Find the start of the sentence containing the blank
+  const sentenceStartMatch = before.match(/(?:^|[.!?]\s+)([^.!?]*)$/s);
+  const sentenceBefore = sentenceStartMatch ? sentenceStartMatch[1] : before.slice(-60);
+
+  // Find the end of the sentence after the blank
+  const sentenceEndMatch = after.match(/^([^.!?]*[.!?])/s);
+  const sentenceAfter = sentenceEndMatch ? sentenceEndMatch[1] : after.slice(0, 60);
+
+  const model = `${sentenceBefore.trimStart()}${targetWord}${sentenceAfter}`.trim();
+  return model || `Use "${targetWord}" in a complete sentence.`;
+}
+
+/**
+ * Show the "Use it in a sentence" intermediate screen.
+ * Only called in practice mode. Calls scheduleWord() on self-assessment or skip,
+ * then invokes onContinue.
+ *
+ * @param {object} passage     - current passage object
+ * @param {function} onContinue - called after the step resolves
+ */
+function _showSentenceStep(passage, onContinue) {
+  if (!_container) { onContinue(); return; }
+
+  const targetWord = _getSentenceTargetWord(passage);
+  if (!targetWord) { onContinue(); return; }
+
+  const defs = passage.definitions || {};
+  const definition = defs[targetWord] || 'Use the sentence context to understand this word.';
+  const modelSentence = _getModelSentence(passage, targetWord);
+  const wordId = `${_currentCat}__${targetWord}`.toLowerCase().replace(/\s+/g, '_');
+
+  const existing = document.getElementById('wv-sentence-step-overlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id        = 'wv-sentence-step-overlay';
+  overlay.className = 'clue-explanation-overlay';
+  overlay.innerHTML = `
+    <div class="clue-explanation-card wv-sentence-step">
+      <p class="clue-explanation-title">📝 Use the word in a sentence!</p>
+      <div class="clue-explanation-body">
+        <p class="wv-sentence-step__word">Word: <strong>${escapeHtml(targetWord)}</strong></p>
+        <p class="wv-sentence-step__meaning">Meaning: ${escapeHtml(definition)}</p>
+        <label class="wv-sentence-step__label" for="wv-sentence-input">
+          Write a sentence using "<strong>${escapeHtml(targetWord)}</strong>":
+        </label>
+        <input
+          type="text"
+          id="wv-sentence-input"
+          class="sfq-input wv-sentence-step__input"
+          placeholder="Type your sentence here…"
+          autocomplete="off"
+          aria-label="Write a sentence using the word ${escapeHtml(targetWord)}"
+        />
+        <div class="wv-sentence-step__model" id="wv-sentence-model" hidden>
+          <p class="wv-sentence-step__model-label">Model sentence:</p>
+          <p class="wv-sentence-step__model-text">${escapeHtml(modelSentence)}</p>
+        </div>
+      </div>
+      <div class="wv-sentence-step__actions">
+        <button class="btn btn--primary" id="wv-sentence-similar">✓ My sentence is similar</button>
+        <button class="btn btn--ghost btn--sm" id="wv-sentence-skip">↩ Skip</button>
+      </div>
+    </div>`;
+
+  _container.querySelector('.wv-game')?.appendChild(overlay);
+
+  const input = overlay.querySelector('#wv-sentence-input');
+  const modelEl = overlay.querySelector('#wv-sentence-model');
+
+  // Show model sentence once at least 5 characters have been typed
+  input?.addEventListener('input', () => {
+    if (input.value.length >= 5 && modelEl) {
+      modelEl.hidden = false;
+    }
+  });
+
+  overlay.querySelector('#wv-sentence-similar')?.addEventListener('click', () => {
+    scheduleWord(wordId, true);
+    overlay.remove();
+    onContinue();
+  });
+
+  overlay.querySelector('#wv-sentence-skip')?.addEventListener('click', () => {
+    scheduleWord(wordId, false);
+    overlay.remove();
+    onContinue();
+  });
+
+  setTimeout(() => input?.focus(), 100);
+}
+
 function _showFeedback(msg, success) {
   const el = document.getElementById('wv-feedback');
   if (!el) return;
@@ -1406,6 +1603,19 @@ function _showComplete(summary = {}) {
     ? `<p class="wv-complete-clue">🔎 Scan accuracy: ${scanAcc}% (${_sessionScanCorrect}/${_sessionScanTotal})</p>`
     : '';
 
+  let focusTip = '';
+  if (acc < 70 && _currentCat) {
+    const tb = VAULT_TEACHBACK[_currentCat] || VAULT_TEACHBACK.default;
+    const tipMeta = VOCAB_CATEGORIES[_currentCat] || { icon: '📘', label: _currentCat };
+    focusTip = `
+      <div class="mcq-focus-tip">
+        <p class="mcq-focus-tip-heading">${tb.icon || tipMeta.icon} Focus on: <strong>${escapeHtml(tipMeta.label)}</strong></p>
+        <p class="mcq-focus-tip-rule">${escapeHtml(tb.rule)}</p>
+        <p class="mcq-focus-tip-eg"><em>${escapeHtml(tb.example)}</em></p>
+        <p class="mcq-focus-tip-tip">${escapeHtml(tb.tip)}</p>
+      </div>`;
+  }
+
   _container.innerHTML = `
     <div class="wv-summary-overlay"><div class="wv-complete">
       <div class="wv-complete-icon">${meta.icon}</div>
@@ -1416,7 +1626,7 @@ function _showComplete(summary = {}) {
       <p class="wv-complete-score">Mode: ${modeCfg.label} · Hints used: ${_sessionHintsUsed} · Time: ${elapsedSec}s</p>
       ${weakSkillsLine}
       ${clueAccLine}
-      ${scanAccLine}
+      ${scanAccLine}${focusTip}
       <p class="wv-complete-score">Next Step: ${recommendation}</p>
       <div class="wv-complete-actions">
         ${nextLv
