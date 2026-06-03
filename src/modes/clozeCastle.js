@@ -271,7 +271,13 @@ function _startCategory(level, catKey) {
   _sessionScanCorrect = 0;
   _sessionScanTotal = 0;
   _sessionSkillStats = {};
-  _showPassage();
+
+  // Teach the grammar rule before the first passage (practice mode only).
+  if (_sessionMode !== 'exam') {
+    _renderClozeRuleCard(catKey, () => _showPassage());
+  } else {
+    _showPassage();
+  }
 }
 
 function _startAllCategories(level) {
@@ -386,9 +392,11 @@ function _renderPassage(passage) {
       <div class="cloze-actions">
         <button class="btn btn--ghost btn--sm" id="cloze-clear">↺ Clear all</button>
         <button class="btn btn--ghost btn--sm" id="cloze-listen" aria-label="Listen to passage">🔊 Listen</button>
+        ${_sessionMode !== 'exam' ? '<button class="btn btn--ghost btn--sm" id="cloze-rule-hint" aria-expanded="false">💡 Show Rule</button>' : ''}
         <button class="btn btn--primary" id="cloze-check" ${inClueMode ? 'disabled' : ''}>Check ✓</button>
         <button class="btn btn--ghost btn--sm" id="cloze-quit">Menu</button>
       </div>
+      <div class="mcq-hint-panel" id="cloze-rule-hint-panel" hidden></div>
 
       <div class="cloze-feedback" id="cloze-feedback" role="status" aria-live="assertive" hidden></div>
     </div>`;
@@ -417,6 +425,28 @@ function _renderPassage(passage) {
   });
 
   document.getElementById('cloze-check')?.addEventListener('click', () => _checkPassage(passage));
+
+  document.getElementById('cloze-rule-hint')?.addEventListener('click', () => {
+    const btn = document.getElementById('cloze-rule-hint');
+    const panel = document.getElementById('cloze-rule-hint-panel');
+    if (!btn || !panel) return;
+    const wasHidden = panel.hidden;
+    panel.hidden = !wasHidden;
+    btn.setAttribute('aria-expanded', String(wasHidden));
+    btn.textContent = wasHidden ? '💡 Hide Rule' : '💡 Show Rule';
+    if (wasHidden) {
+      const tipCat = _currentCat !== '__all__' ? _currentCat : null;
+      const tip = tipCat ? getGrammarTip(tipCat) : {
+        rule: 'Read each sentence and look for grammar clues about which word fits best.',
+        example: 'The words around each blank — tense, pronouns, singular/plural — point to the answer.',
+        tip: 'Check tense markers, subject–verb agreement, and pronoun reference.',
+      };
+      panel.innerHTML = `
+        <p class="mcq-hint-rule"><strong>Rule:</strong> ${escapeHtml(tip.rule)}</p>
+        <p class="mcq-hint-eg"><em>${escapeHtml(tip.example)}</em></p>
+        <p class="mcq-hint-tip">${escapeHtml(tip.tip)}</p>`;
+    }
+  });
 
   document.getElementById('cloze-quit')?.addEventListener('click', () => {
     cleanupClozeCastle();
@@ -945,6 +975,41 @@ function _checkPassage(passage) {
   }
 }
 
+// ── Pre-session Rule Card ──────────────────────────────────────────────────
+
+function _renderClozeRuleCard(catKey, onStart) {
+  if (!_container) return;
+  const tip = getGrammarTip(catKey);
+  const meta = GRAMMAR_CATEGORIES[catKey] || { icon: '🏰', label: catKey };
+
+  _container.innerHTML = `
+    <div class="mcq-rule-card" role="region" aria-label="Grammar rule: ${escapeAttr(meta.label)}">
+      <div class="mcq-rule-icon" aria-hidden="true">${meta.icon}</div>
+      <h2 class="mcq-rule-title">${escapeHtml(meta.label)}</h2>
+      <div class="mcq-rule-body">
+        <div class="mcq-rule-section">
+          <p class="mcq-rule-label">📖 Rule</p>
+          <p class="mcq-rule-text">${escapeHtml(tip.rule)}</p>
+        </div>
+        <div class="mcq-rule-section">
+          <p class="mcq-rule-label">✏️ Example</p>
+          <p class="mcq-rule-example">${escapeHtml(tip.example)}</p>
+        </div>
+        <div class="mcq-rule-section">
+          <p class="mcq-rule-label">💡 Tip</p>
+          <p class="mcq-rule-tip">${escapeHtml(tip.tip)}</p>
+        </div>
+      </div>
+      <div class="sfq-actions">
+        <button class="btn btn--primary" id="cloze-rule-start">Got it — start passages →</button>
+        <button class="btn btn--ghost" id="cloze-rule-skip">Skip →</button>
+      </div>
+    </div>`;
+
+  _container.querySelector('#cloze-rule-start')?.addEventListener('click', onStart);
+  _container.querySelector('#cloze-rule-skip')?.addEventListener('click', onStart);
+}
+
 // ── Teach-Back Overlay ─────────────────────────────────────────────────────
 
 /**
@@ -1099,6 +1164,28 @@ function _showComplete() {
     ? `<p class="cloze-complete-clue">🔎 Scan accuracy: ${scanAcc}% (${_sessionScanCorrect}/${_sessionScanTotal})</p>`
     : '';
 
+  let focusTip = '';
+  if (acc < 70) {
+    let tipCat = _currentCat !== '__all__' ? _currentCat : null;
+    if (!tipCat) {
+      const statEntries = Object.entries(_sessionSkillStats).filter(([, s]) => s.total > 0);
+      if (statEntries.length > 0) {
+        tipCat = statEntries.sort(([, a], [, b]) => (a.correct / a.total) - (b.correct / b.total))[0][0];
+      }
+    }
+    if (tipCat) {
+      const tip = getGrammarTip(tipCat);
+      const tipMeta = GRAMMAR_CATEGORIES[tipCat] || { icon: '🏰', label: tipCat };
+      focusTip = `
+        <div class="mcq-focus-tip">
+          <p class="mcq-focus-tip-heading">${tipMeta.icon} Focus on: <strong>${escapeHtml(tipMeta.label)}</strong></p>
+          <p class="mcq-focus-tip-rule">${escapeHtml(tip.rule)}</p>
+          <p class="mcq-focus-tip-eg"><em>${escapeHtml(tip.example)}</em></p>
+          <p class="mcq-focus-tip-tip">${escapeHtml(tip.tip)}</p>
+        </div>`;
+    }
+  }
+
   _container.innerHTML = `
     <div class="cloze-complete">
       <div class="cloze-complete-icon">${icon}</div>
@@ -1110,6 +1197,7 @@ function _showComplete() {
       ${weakSkillsLine}
       ${clueAccLine}
       ${scanAccLine}
+      ${focusTip}
       <p class="cloze-complete-score">Next step: ${recommendation}</p>
       <div class="cloze-complete-actions">
         <button class="btn btn--primary btn--lg" id="cloze-back-cat">Choose Another Topic</button>

@@ -457,7 +457,12 @@ function _startPassage(catKey, level) {
     }
   }
 
-  _initPassage(_passage);
+  // Show rule card before the passage in practice mode.
+  if (_sessionMode !== 'exam') {
+    _renderVaultRuleCard(_currentCat, () => _initPassage(_passage));
+  } else {
+    _initPassage(_passage);
+  }
 }
 
 function _initPassage(passage) {
@@ -607,9 +612,11 @@ function _renderPassage(passage) {
         <button class="btn btn--ghost btn--sm" id="wv-listen" aria-label="Listen to passage">🔊 Listen</button>
         ${modeCfg.allowInfoPanel ? '<button class="btn btn--ghost btn--sm" id="wv-info" aria-label="Show definitions panel">ℹ️ Info</button>' : ''}
         ${modeCfg.allowHints ? '<button class="btn btn--ghost btn--sm" id="wv-hint">💡 Hint</button>' : ''}
+        ${modeCfg.allowInfoPanel ? '<button class="btn btn--ghost btn--sm" id="wv-rule-hint" aria-expanded="false">📖 Show Rule</button>' : ''}
         <button class="btn btn--primary" id="wv-check" ${inClueMode ? 'disabled' : ''}>Check ✓</button>
         <button class="btn btn--ghost btn--sm" id="wv-quit">Menu</button>
       </div>
+      <div class="mcq-hint-panel" id="wv-rule-hint-panel" hidden></div>
 
       <div class="wv-feedback" id="wv-feedback" role="status" aria-live="assertive" hidden></div>
     </div>`;
@@ -648,6 +655,22 @@ function _renderPassage(passage) {
       audio.speakWord(_affixParts[idx].meaning || `Affix ${_affixParts[idx].affix}`);
     } else if (_currentCat === 'collocationCloze' && passage.collocationHint) {
       audio.speakWord(passage.collocationHint);
+    }
+  });
+  document.getElementById('wv-rule-hint')?.addEventListener('click', () => {
+    const btn = document.getElementById('wv-rule-hint');
+    const panel = document.getElementById('wv-rule-hint-panel');
+    if (!btn || !panel) return;
+    const wasHidden = panel.hidden;
+    panel.hidden = !wasHidden;
+    btn.setAttribute('aria-expanded', String(wasHidden));
+    btn.textContent = wasHidden ? '📖 Hide Rule' : '📖 Show Rule';
+    if (wasHidden) {
+      const tb = VAULT_TEACHBACK[_currentCat] || VAULT_TEACHBACK.default;
+      panel.innerHTML = `
+        <p class="mcq-hint-rule"><strong>Rule:</strong> ${escapeHtml(tb.rule)}</p>
+        <p class="mcq-hint-eg"><em>${escapeHtml(tb.example)}</em></p>
+        <p class="mcq-hint-tip">${escapeHtml(tb.tip)}</p>`;
     }
   });
   document.getElementById('wv-check')?.addEventListener('click', () => _checkPassage(passage));
@@ -1245,6 +1268,41 @@ function _checkPassage(passage) {
   }
 }
 
+// ── Pre-session rule card ──────────────────────────────────────────────────
+
+function _renderVaultRuleCard(catKey, onStart) {
+  if (!_container) return;
+  const tb = VAULT_TEACHBACK[catKey] || VAULT_TEACHBACK.default;
+  const meta = VOCAB_CATEGORIES[catKey] || { icon: '📘', label: catKey };
+
+  _container.innerHTML = `
+    <div class="mcq-rule-card" role="region" aria-label="Vocabulary tip: ${escapeAttr(meta.label)}">
+      <div class="mcq-rule-icon" aria-hidden="true">${tb.icon || meta.icon}</div>
+      <h2 class="mcq-rule-title">${escapeHtml(meta.label)}</h2>
+      <div class="mcq-rule-body">
+        <div class="mcq-rule-section">
+          <p class="mcq-rule-label">📖 Rule</p>
+          <p class="mcq-rule-text">${escapeHtml(tb.rule)}</p>
+        </div>
+        <div class="mcq-rule-section">
+          <p class="mcq-rule-label">✏️ Example</p>
+          <p class="mcq-rule-example">${escapeHtml(tb.example)}</p>
+        </div>
+        <div class="mcq-rule-section">
+          <p class="mcq-rule-label">💡 Tip</p>
+          <p class="mcq-rule-tip">${escapeHtml(tb.tip)}</p>
+        </div>
+      </div>
+      <div class="sfq-actions">
+        <button class="btn btn--primary" id="wv-rule-start">Got it — start passage →</button>
+        <button class="btn btn--ghost" id="wv-rule-skip">Skip →</button>
+      </div>
+    </div>`;
+
+  _container.querySelector('#wv-rule-start')?.addEventListener('click', onStart);
+  _container.querySelector('#wv-rule-skip')?.addEventListener('click', onStart);
+}
+
 // ── Vocabulary teach-back overlay ──────────────────────────────────────────
 
 function _showVaultTeachBackOverlay(passage) {
@@ -1545,6 +1603,19 @@ function _showComplete(summary = {}) {
     ? `<p class="wv-complete-clue">🔎 Scan accuracy: ${scanAcc}% (${_sessionScanCorrect}/${_sessionScanTotal})</p>`
     : '';
 
+  let focusTip = '';
+  if (acc < 70 && _currentCat) {
+    const tb = VAULT_TEACHBACK[_currentCat] || VAULT_TEACHBACK.default;
+    const tipMeta = VOCAB_CATEGORIES[_currentCat] || { icon: '📘', label: _currentCat };
+    focusTip = `
+      <div class="mcq-focus-tip">
+        <p class="mcq-focus-tip-heading">${tb.icon || tipMeta.icon} Focus on: <strong>${escapeHtml(tipMeta.label)}</strong></p>
+        <p class="mcq-focus-tip-rule">${escapeHtml(tb.rule)}</p>
+        <p class="mcq-focus-tip-eg"><em>${escapeHtml(tb.example)}</em></p>
+        <p class="mcq-focus-tip-tip">${escapeHtml(tb.tip)}</p>
+      </div>`;
+  }
+
   _container.innerHTML = `
     <div class="wv-summary-overlay"><div class="wv-complete">
       <div class="wv-complete-icon">${meta.icon}</div>
@@ -1555,7 +1626,7 @@ function _showComplete(summary = {}) {
       <p class="wv-complete-score">Mode: ${modeCfg.label} · Hints used: ${_sessionHintsUsed} · Time: ${elapsedSec}s</p>
       ${weakSkillsLine}
       ${clueAccLine}
-      ${scanAccLine}
+      ${scanAccLine}${focusTip}
       <p class="wv-complete-score">Next Step: ${recommendation}</p>
       <div class="wv-complete-actions">
         ${nextLv
