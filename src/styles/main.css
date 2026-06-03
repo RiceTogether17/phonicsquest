@@ -9360,6 +9360,138 @@ details.story-tool-section[open] > .story-tool-summary::before {
   border-left-color: var(--color-success, #22c55e);
 }
 
+/* Pre-session rule card (teaches before testing) */
+.mcq-rule-card {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--space-6, 1.5rem) var(--space-4, 1rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 1rem);
+}
+.mcq-rule-icon {
+  font-size: 3rem;
+  text-align: center;
+  line-height: 1;
+}
+.mcq-rule-title {
+  text-align: center;
+  font-size: var(--font-size-xl, 1.25rem);
+  font-weight: 700;
+  margin: 0;
+}
+.mcq-rule-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+}
+.mcq-rule-section {
+  background: var(--surface-2, #f8fafc);
+  border-radius: var(--radius-md, 8px);
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+}
+.mcq-rule-label {
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 0 0 var(--space-1, 0.25rem);
+}
+.mcq-rule-text {
+  margin: 0;
+  font-size: var(--font-size-base, 1rem);
+  line-height: 1.5;
+}
+.mcq-rule-example {
+  margin: 0;
+  font-style: italic;
+  color: var(--color-primary, #6366f1);
+  font-size: var(--font-size-base, 1rem);
+}
+.mcq-rule-tip {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* In-question rule hint toggle */
+.mcq-hint-btn {
+  display: block;
+  margin: var(--space-3, 0.75rem) auto 0;
+  background: none;
+  border: 1.5px dashed var(--color-primary, #6366f1);
+  border-radius: var(--radius-full, 999px);
+  color: var(--color-primary, #6366f1);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 4px 14px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.mcq-hint-btn:hover,
+.mcq-hint-btn[aria-expanded="true"] {
+  background: var(--color-primary, #6366f1);
+  color: #fff;
+}
+.mcq-hint-panel {
+  margin: var(--space-2, 0.5rem) 0;
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  background: #eef2ff;
+  border-radius: var(--radius-md, 8px);
+  border-left: 3px solid var(--color-primary, #6366f1);
+}
+.mcq-hint-rule,
+.mcq-hint-eg,
+.mcq-hint-tip {
+  margin: 0 0 var(--space-1, 0.25rem);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.mcq-hint-tip {
+  color: var(--text-muted);
+}
+
+/* Inline confusion-detection rule reminder (shown after 2+ consecutive wrongs) */
+.mcq-struggling-tip {
+  display: block;
+  margin-top: var(--space-2, 0.5rem);
+  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  background: #fff7ed;
+  border-left: 3px solid var(--color-warning, #f59e0b);
+  border-radius: 0 var(--radius-sm, 4px) var(--radius-sm, 4px) 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Results-screen focus tip for lowest-scoring category */
+.mcq-focus-tip {
+  margin: var(--space-4, 1rem) 0;
+  padding: var(--space-4, 1rem);
+  background: #fffbeb;
+  border: 1.5px solid var(--color-warning, #f59e0b);
+  border-radius: var(--radius-md, 8px);
+}
+.mcq-focus-tip-heading {
+  font-weight: 700;
+  margin: 0 0 var(--space-2, 0.5rem);
+  font-size: var(--font-size-base, 1rem);
+}
+.mcq-focus-tip-rule {
+  margin: 0 0 var(--space-1, 0.25rem);
+  font-size: 0.9rem;
+}
+.mcq-focus-tip-eg {
+  margin: 0 0 var(--space-1, 0.25rem);
+  font-size: 0.9rem;
+  color: var(--color-primary, #6366f1);
+}
+.mcq-focus-tip-tip {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
 .vmcq-next-wrap {
   margin-top: 1.25rem;
   text-align: center;
