@@ -1047,40 +1047,46 @@ const VOCAB_BUILDERS = {
     return { category: 'grammarPrepositions', subskill: 'preposition_in_context', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the preposition that fits the sentence context.' };
   },
   grammarArticles(level, i) {
+    const OE_LOWER = { an: '"an" before vowel sounds (a, e, i, o, u) — "orange" starts with a vowel sound.', a: '"a" goes before consonant sounds — "orange" starts with a vowel, so use "an".', the: '"the" points to a specific, already-known thing — use "a/an" for something first mentioned.', some: '"some" is for uncountable or plural quantities — use "a/an" for a single countable item.' };
+    const OE_UPPER = { The: '"The" is used for unique things (the Moon, the Sun, the Pacific Ocean).', A: '"A" is for a non-specific singular noun starting with a consonant sound — not used for unique things.', An: '"An" is for a non-specific singular noun starting with a vowel sound — not used for unique things.', Some: '"Some" is for uncountable or plural quantities — not used before unique proper nouns.' };
+    const OE_SOME  = { some: '"some" is used with uncountable nouns like water, sugar, rice.', a: '"a" is only for singular countable nouns — water is uncountable.', an: '"an" is only for singular countable nouns starting with a vowel sound — water is uncountable.', the: '"the" points to a specific known thing; here we want an unspecified quantity.' };
+    const OE_THE   = { the: '"the" is used before superlatives (the only, the best) and unique roles.', a: '"a" introduces something for the first time — "only" signals uniqueness so use "the".', an: '"an" is for vowel-sound nouns seen for the first time — "only" signals uniqueness so use "the".', some: '"some" is for quantities or plurals — use "the" before superlatives and unique descriptions.' };
     const rows = [
-      ['She bought ___ orange from the fruit stall near her house.', 'an', ['a', 'the', 'some']],
-      ['___ Moon is clearly visible on a clear night.', 'The', ['A', 'An', 'Some']],
-      ['He is ___ honest student who always tells the truth.', 'an', ['a', 'the', 'some']],
-      ['Could I have ___ water, please? I am very thirsty.', 'some', ['a', 'an', 'the']],
-      ['___ elephant in the zoo gave birth to a calf last night.', 'The', ['An', 'A', 'Some']],
-      ['She plays ___ violin in the school orchestra every Tuesday.', 'the', ['a', 'an', 'some']],
-      ['We need to buy ___ new pencil case before the term starts.', 'a', ['an', 'the', 'some']],
-      ['He is ___ only student who completed the bonus question.', 'the', ['a', 'an', 'some']],
-      ['I heard ___ unusual noise coming from the storeroom last night.', 'an', ['a', 'the', 'some']],
-      ['The teacher gave each student ___ exercise book to write in.', 'an', ['a', 'the', 'some']],
-      ['They decided to adopt ___ stray cat that appeared at their doorstep.', 'a', ['an', 'the', 'some']],
-      ['___ Pacific Ocean is the largest ocean on Earth.', 'The', ['A', 'An', 'Some']],
+      ['She bought ___ orange from the fruit stall near her house.', 'an', ['a', 'the', 'some'], OE_LOWER],
+      ['___ Moon is clearly visible on a clear night.', 'The', ['A', 'An', 'Some'], OE_UPPER],
+      ['He is ___ honest student who always tells the truth.', 'an', ['a', 'the', 'some'], { an: '"an" before vowel sounds — "honest" starts with a vowel sound even though h is written.', a: '"a" goes before consonant sounds — but "honest" sounds like it starts with "o", a vowel.', the: '"the" is for a specific known person; here we are introducing a new description.', some: '"some" is for quantities or plurals — use "an" before this singular vowel-sound noun.' }],
+      ['Could I have ___ water, please? I am very thirsty.', 'some', ['a', 'an', 'the'], OE_SOME],
+      ['___ elephant in the zoo gave birth to a calf last night.', 'The', ['An', 'A', 'Some'], { The: '"The" points to a specific elephant we both know about — the one in that zoo.', An: '"An" introduces a new, unspecified animal — but this elephant is already identified.', A: '"A" introduces a new, unspecified thing — but this elephant is already identified.', Some: '"Some" is for uncountable or plural quantities — not a single specific animal.' }],
+      ['She plays ___ violin in the school orchestra every Tuesday.', 'the', ['a', 'an', 'some'], { the: '"the" is used with musical instruments when someone plays them as a skill.', a: '"a" is for a non-specific item introduced for the first time — instruments use "the".', an: '"an" is for vowel-sound nouns introduced for the first time — instruments use "the".', some: '"some" is for quantities or plurals — a single instrument uses "the".' }],
+      ['We need to buy ___ new pencil case before the term starts.', 'a', ['an', 'the', 'some'], { a: '"a" before consonant sounds — "new" starts with the consonant sound /n/.', an: '"an" before vowel sounds — but "new" starts with /n/, a consonant sound.', the: '"the" is for something specific and known — this is any pencil case, not one already mentioned.', some: '"some" is for uncountable or plural nouns — a pencil case is singular and countable.' }],
+      ['He is ___ only student who completed the bonus question.', 'the', ['a', 'an', 'some'], OE_THE],
+      ['I heard ___ unusual noise coming from the storeroom last night.', 'an', ['a', 'the', 'some'], { an: '"an" before vowel sounds — "unusual" starts with the vowel sound /ʌ/.', a: '"a" before consonant sounds — but "unusual" starts with the vowel /ʌ/, so use "an".', the: '"the" is for something specific and known — this noise is mentioned for the first time.', some: '"some" is for quantities or plurals — a single noise uses "a/an".' }],
+      ['The teacher gave each student ___ exercise book to write in.', 'an', ['a', 'the', 'some'], { an: '"an" before vowel sounds — "exercise" starts with the vowel /ɛ/.', a: '"a" before consonant sounds — but "exercise" starts with a vowel sound, so use "an".', the: '"the" would mean all students got the same specific book — each got their own new one.', some: '"some" is for uncountable or plural nouns — one book per student uses "an".' }],
+      ['They decided to adopt ___ stray cat that appeared at their doorstep.', 'a', ['an', 'the', 'some'], { a: '"a" before consonant sounds — "stray" starts with the consonant /s/.', an: '"an" before vowel sounds — but "stray" starts with /s/, a consonant sound.', the: '"the" would imply the cat was already known to both parties — it has just appeared.', some: '"some" is for quantities or plurals — a single cat uses "a".' }],
+      ['___ Pacific Ocean is the largest ocean on Earth.', 'The', ['A', 'An', 'Some'], OE_UPPER],
     ];
-    const [q, answer, ds] = rotate(rows, i);
-    return { category: 'grammarArticles', subskill: 'article_in_context', q, choices: buildChoices(answer, ds), answer, explain: 'Use "a" before consonant sounds, "an" before vowel sounds, "the" for specific nouns, and "some" for uncountable or plural quantities.' };
+    const [q, answer, ds, optionExplanations] = rotate(rows, i);
+    return { category: 'grammarArticles', subskill: 'article_in_context', q, choices: buildChoices(answer, ds), answer, explain: 'Use "a" before consonant sounds, "an" before vowel sounds, "the" for specific nouns, and "some" for uncountable or plural quantities.', optionExplanations };
   },
   grammarSVA(level, i) {
+    const OE_IS_SING = { is: '"is" — singular present; "each", "neither", "mathematics" all take a singular verb.', are: '"are" — plural present; the subject here is singular so use "is" instead.', were: '"were" — plural past; the subject is singular and the sentence is present tense.', 'have been': '"have been" — plural present perfect; the subject is singular, so use "has been".' };
+    const OE_WAS_SING = { was: '"was" — singular past; collective nouns and singular subjects use "was".', were: '"were" — plural past; the subject here is singular so use "was" instead.', are: '"are" — plural present; the sentence is in past tense and the subject is singular.', 'have been': '"have been" — plural present perfect; this sentence needs singular past tense.' };
     const rows = [
-      ['Each of the students ___ expected to submit their work on time.', 'is', ['are', 'were', 'have been']],
-      ['Neither the captain nor the players ___ satisfied with the result.', 'were', ['was', 'is', 'has been']],
-      ['The committee ___ reached a unanimous decision after the debate.', 'has', ['have', 'were', 'are']],
-      ['Either the manager or the assistants ___ responsible for the error.', 'are', ['is', 'was', 'has been']],
-      ['One of the windows ___ broken during the storm last night.', 'was', ['were', 'have been', 'are']],
-      ['The news ___ shocking and left everyone speechless.', 'was', ['were', 'have been', 'are']],
-      ['Mathematics ___ considered one of the most important subjects in school.', 'is', ['are', 'were', 'have been']],
-      ['A number of students ___ absent from school due to the flu outbreak.', 'were', ['was', 'is', 'has been']],
-      ['The teacher, together with her pupils, ___ going on a field trip.', 'is', ['are', 'were', 'have been']],
-      ['Neither of the answers ___ correct according to the marking scheme.', 'is', ['are', 'were', 'have been']],
-      ['The pair of scissors ___ missing from the art room again.', 'is', ['are', 'were', 'have been']],
-      ['Everyone in the classrooms ___ asked to be quiet during the examination.', 'was', ['were', 'are', 'have been']],
+      ['Each of the students ___ expected to submit their work on time.', 'is', ['are', 'were', 'have been'], OE_IS_SING],
+      ['Neither the captain nor the players ___ satisfied with the result.', 'were', ['was', 'is', 'has been'], { were: '"were" — with "neither…nor", match the verb to the nearest noun; "players" is plural.', was: '"was" — singular past; but the nearest noun is "players" which is plural, so use "were".', is: '"is" — singular present; but the nearest noun is plural and the sentence is past tense.', 'has been': '"has been" — singular present perfect; the nearest noun is plural and the tense is past.' }],
+      ['The committee ___ reached a unanimous decision after the debate.', 'has', ['have', 'were', 'are'], { has: '"has" — collective nouns like "committee" take a singular verb in formal writing.', have: '"have" — plural present perfect; "committee" is a collective noun treated as singular.', were: '"were" — plural past; "committee" is singular and needs present perfect here.', are: '"are" — plural present; "committee" needs singular present perfect "has reached".' }],
+      ['Either the manager or the assistants ___ responsible for the error.', 'are', ['is', 'was', 'has been'], { are: '"are" — with "either…or", match the verb to the nearest noun; "assistants" is plural.', is: '"is" — singular present; but the nearest noun "assistants" is plural, so use "are".', was: '"was" — singular past; the nearest noun is plural and the sentence is present tense.', 'has been': '"has been" — singular present perfect; nearest noun is plural and tense is simple present.' }],
+      ['One of the windows ___ broken during the storm last night.', 'was', ['were', 'have been', 'are'], { was: '"was" — "one of" is always singular; the verb must be singular past.', were: '"were" — plural past; "one of" takes a singular verb even though the noun after it is plural.', 'have been': '"have been" — plural present perfect; "one of" needs singular past tense here.', are: '"are" — plural present; "one of" needs singular past tense here.' }],
+      ['The news ___ shocking and left everyone speechless.', 'was', ['were', 'have been', 'are'], { was: '"was" — "news" is an uncountable noun that always takes a singular verb.', were: '"were" — plural past; "news" is uncountable and always singular.', 'have been': '"have been" — plural present perfect; "news" is singular and this sentence needs simple past.', are: '"are" — plural present; "news" is singular and the sentence is in past tense.' }],
+      ['Mathematics ___ considered one of the most important subjects in school.', 'is', ['are', 'were', 'have been'], OE_IS_SING],
+      ['A number of students ___ absent from school due to the flu outbreak.', 'were', ['was', 'is', 'has been'], { were: '"were" — "a number of" acts like a plural subject and takes a plural verb.', was: '"was" — singular past; but "a number of students" is treated as plural.', is: '"is" — singular present; "a number of students" is plural and the tense is past.', 'has been': '"has been" — singular present perfect; "a number of" needs plural past tense "were".' }],
+      ['The teacher, together with her pupils, ___ going on a field trip.', 'is', ['are', 'were', 'have been'], { is: '"is" — "together with" is a parenthetical phrase; the real subject is "the teacher" (singular).', are: '"are" — plural present; the real subject is singular "the teacher", not the parenthetical phrase.', were: '"were" — plural past; the subject is singular and the sentence is present continuous.', 'have been': '"have been" — plural present perfect; the subject is singular "the teacher".' }],
+      ['Neither of the answers ___ correct according to the marking scheme.', 'is', ['are', 'were', 'have been'], { is: '"is" — "neither of" always takes a singular verb in formal English.', are: '"are" — plural present; "neither of" takes a singular verb even with a plural noun after it.', were: '"were" — plural past; "neither of" is singular and the sentence is present tense.', 'have been': '"have been" — plural present perfect; "neither of" needs simple present singular "is".' }],
+      ['The pair of scissors ___ missing from the art room again.', 'is', ['are', 'were', 'have been'], { is: '"is" — "a pair of" is singular; we count one pair, so use a singular verb.', are: '"are" — plural present; "a pair of" is treated as singular — use "is".', were: '"were" — plural past; "a pair of" is singular and the sentence is present tense.', 'have been': '"have been" — plural present perfect; "a pair of" needs singular present tense.' }],
+      ['Everyone in the classrooms ___ asked to be quiet during the examination.', 'was', ['were', 'are', 'have been'], OE_WAS_SING],
     ];
-    const [q, answer, ds] = rotate(rows, i);
-    return { category: 'grammarSVA', subskill: 'subject_verb_agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Make sure the verb agrees with the subject in number — watch for collective nouns, "each/either/neither", and interrupting phrases.' };
+    const [q, answer, ds, optionExplanations] = rotate(rows, i);
+    return { category: 'grammarSVA', subskill: 'subject_verb_agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Make sure the verb agrees with the subject in number — watch for collective nouns, "each/either/neither", and interrupting phrases.', optionExplanations };
   },
 };
 

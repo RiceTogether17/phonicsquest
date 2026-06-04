@@ -5,6 +5,8 @@
  * broad category coverage and consistent schema quality at scale.
  */
 
+import { inferQuestionContextType } from './mcqItemMetadata.js';
+
 export const GRAMMAR_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 
 const LEVEL_CATEGORY_PLAN = {
@@ -4326,6 +4328,7 @@ function buildLevel(level) {
     if (spec.optionExplanations) item.optionExplanations = spec.optionExplanations;
     if (spec.clueWords) item.clueWords = spec.clueWords;
     if (spec.reasoning) item.reasoning = spec.reasoning;
+    item.contextType = inferQuestionContextType(item.q);
     // Two-sentence context items require reading the first sentence as a clue,
     // which makes them inherently harder — promote to difficulty 3 regardless
     // of where they landed in the rotation. P1/P2 cap at difficulty 2 by design.

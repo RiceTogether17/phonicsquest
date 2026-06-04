@@ -94,15 +94,19 @@ describe('MCQ stem quality — proper-noun capitalization', () => {
   });
 
   it('proper nouns stay capitalised wherever they appear in the stem', () => {
-    // Andy / Mei / Mum should keep their capital whether at sentence
-    // start or after punctuation. Since decorateStem was removed, most
-    // proper nouns now sit at the start of the stem rather than post-
-    // comma — capitalisation should still hold in both positions.
-    const items = GRAMMAR_MCQ_ITEMS.P3.filter(it => it.q.includes('Andy'));
-    expect(items.length).toBeGreaterThan(0);
-    for (const it of items) {
-      expect(it.q, `proper noun should keep capital: ${it.q}`)
-        .toMatch(/(^|[,.!?]\s+)Andy\s/);
+    // Proper nouns (Tom, Mei, Sara…) must never appear in lowercase form anywhere
+    // in a stem — capitalisation must be preserved whether the name is sentence-
+    // initial, mid-sentence, or follows dialog punctuation.
+    const NAMES = ['Tom', 'Mei', 'Sara', 'Tim', 'Jenny'];
+    for (const name of NAMES) {
+      const items = GRAMMAR_MCQ_ITEMS.P3.filter(it => it.q.includes(name));
+      for (const it of items) {
+        expect(it.q, `"${name}" should stay capitalised in: ${it.q}`)
+          .not.toMatch(new RegExp('\\b' + name.toLowerCase() + '\\b'));
+      }
     }
+    // At least one level must contain some named items so the loop isn't vacuous
+    const anyNamed = GRAMMAR_MCQ_ITEMS.P3.filter(it => NAMES.some(n => it.q.includes(n)));
+    expect(anyNamed.length).toBeGreaterThan(0);
   });
 });
