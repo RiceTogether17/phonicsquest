@@ -54,6 +54,7 @@ import { initWritingQuest, showWritingBrowser, cleanupWritingQuest } from './mod
 import { initSynthesisQuest, showSynthesisBrowser, cleanupSynthesisQuest } from './modes/synthesisQuest.js';
 import { mountPlaceholderModule, getPlaceholderMeta } from './modes/primaryPlaceholders.js';
 import { initComprehensionClozeQuest, cleanupComprehensionClozeQuest } from './modes/comprehensionClozeQuest.js';
+import { initListeningComp, showListeningBrowser, cleanupListeningComp } from './modes/listeningComp.js';
 import {
   getProfiles, createProfile, deleteProfile, activateProfile,
   getActiveProfile, needsProfileSelection, restoreActiveProfile,
@@ -587,6 +588,7 @@ class App {
       ['btn-p4-practice-tests',   'p4-practice-tests'],
       ['btn-p5-practice-tests',   'p5-practice-tests'],
       ['btn-p6-practice-tests',   'p6-practice-tests'],
+      ['btn-listening-comp',      'listening-comp'],
     ];
     placeholderHandlers.forEach(([btnId, kind]) => {
       document.getElementById(btnId)?.addEventListener('click', () => {
@@ -596,6 +598,7 @@ class App {
     document.getElementById('btn-pp-back')?.addEventListener('click', () => {
       cleanupComprehensionClozeQuest();
       cleanupSynthesisQuest();
+      cleanupListeningComp();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
@@ -1559,6 +1562,7 @@ class App {
       case 'p4-practice-tests':
       case 'p5-practice-tests':
       case 'p6-practice-tests':
+      case 'listening-comp':
         this._openPrimaryPlaceholder(target);
         break;
       default:
@@ -1568,15 +1572,22 @@ class App {
 
   _openPrimaryPlaceholder(kind) {
     const meta = getPlaceholderMeta(kind);
-    if (!meta) return;
+    // listening-comp manages its own header text inside the container
+    if (!meta && kind !== 'listening-comp') return;
     const titleEl = document.getElementById('primary-placeholder-title');
     const iconEl  = document.getElementById('primary-placeholder-icon');
-    if (titleEl) titleEl.textContent = meta.label;
-    if (iconEl)  iconEl.textContent = meta.icon;
+    if (meta) {
+      if (titleEl) titleEl.textContent = meta.label;
+      if (iconEl)  iconEl.textContent = meta.icon;
+    } else {
+      if (titleEl) titleEl.textContent = 'Listening Comprehension';
+      if (iconEl)  iconEl.textContent = '👂';
+    }
     const container = document.getElementById('primary-placeholder-content');
     const goHome = () => {
       cleanupComprehensionClozeQuest();
       cleanupSynthesisQuest();
+      cleanupListeningComp();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     };
@@ -1585,6 +1596,9 @@ class App {
     } else if (kind === 'synthesis') {
       initSynthesisQuest(container, goHome);
       showSynthesisBrowser();
+    } else if (kind === 'listening-comp') {
+      initListeningComp(container, goHome);
+      showListeningBrowser();
     } else {
       mountPlaceholderModule(container, kind, {
         onClose: goHome,

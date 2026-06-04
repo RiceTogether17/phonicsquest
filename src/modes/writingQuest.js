@@ -9,6 +9,7 @@ import { isPlanReady, mergeLessonWithPlan, getRemediationPath, getParagraphMissi
 import { renderDrill, collectDrillAnswers, gradeDrills } from '../modules/writingReviseDrills.js';
 import { getTrackProgress, setTrackProgress, migrateLegacyWritingCompleted, getLevelTrackProgress } from '../modules/writingTrackProgress.js';
 import { saveDraft, loadDraft, clearDraft, updatePhase, updateFeedback, updateRevision, saveLegacyDraft, loadLegacyDraft, clearLegacyDraft, getDraftSummary } from '../modules/writingDraftStore.js';
+import { hasApiKey, getWritingCoachFeedback } from '../modules/aiService.js';
 
 let _container = null;
 let _onGoHome = null;
@@ -310,7 +311,20 @@ function _renderDimensionBreakdown(result) {
   }).join('')}</ul>`;
 }
 
-function _submitDraft(item, lessonForEval) {
+function _renderAiCoachHtml(raw) {
+  if (raw.startsWith('GOOD:')) {
+    return `<div class="wq-ai-feedback-wrap"><p class="wq-ai-heading">✨ AI Coach</p><p class="wq-ai-good">${raw.replace('GOOD:', '').trim()}</p></div>`;
+  }
+  const lines = raw.split('\n').map(l => l.trim()).filter(l => l.startsWith('SENTENCE:'));
+  if (!lines.length) return '';
+  const items = lines.map(l => {
+    const [sentPart, issuePart] = l.replace('SENTENCE:', '').split('| ISSUE:');
+    return `<li class="wq-ai-item"><span class="wq-ai-quote">"${(sentPart || '').trim()}"</span><span class="wq-ai-tip">${(issuePart || '').trim()}</span></li>`;
+  }).join('');
+  return `<div class="wq-ai-feedback-wrap"><p class="wq-ai-heading">✨ AI Coach — sentence feedback</p><ul class="wq-ai-list">${items}</ul></div>`;
+}
+
+async function _submitDraft(item, lessonForEval) {
   const text = document.getElementById('wq-text')?.value?.trim() || '';
   const fb = document.getElementById('wq-feedback');
   if (!text) return;
@@ -348,6 +362,20 @@ function _submitDraft(item, lessonForEval) {
   }
   // Scroll feedback into view
   fb?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  // AI sentence-level feedback (async, appended when ready)
+  if (hasApiKey() && fb) {
+    const aiSection = document.createElement('div');
+    aiSection.className = 'wq-ai-feedback';
+    aiSection.innerHTML = '<p class="wq-ai-loading">✨ AI coach is reading your draft…</p>';
+    fb.appendChild(aiSection);
+    const taskDesc = item?.title || item?.prompt || '';
+    getWritingCoachFeedback(text, _level, taskDesc).then(raw => {
+      if (!raw || !aiSection.isConnected) return;
+      aiSection.innerHTML = _renderAiCoachHtml(raw);
+    });
+  }
+
   document.getElementById('wq-go-revise')?.addEventListener('click', () => {
     _phase = 'repair';
     if (_track) updatePhase(_track.id, _idx, 'repair');

@@ -11,8 +11,15 @@
  * Also exposes buildWhatsAppMessage() so the dashboard can render a
  * "Copy Parent Update" button that yields a WhatsApp-ready message.
  *
+ * Also exposes buildErrorDigest() / renderErrorDigest() for the weekly
+ * focus-areas panel shown in the parent dashboard.
+ *
  * Pure-ish: takes its inputs explicitly so it can be unit-tested without a DOM.
  */
+
+import { store } from './store.js';
+import { GRAMMAR_CATEGORIES } from '../data/grammarCategories.js';
+import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
 
 const PRACTICE_BY_DOMAIN = {
   grammar:    { target: 'grammar-mcq', label: '🧠 Grammar MCQ' },
@@ -201,6 +208,158 @@ function _buildTeacherComment({ topWeak, topStrong, weekly, profile }) {
   const closing = ' Encourage them to read aloud short passages every day to keep building fluency.';
 
   return `${greeting}${strengthLine}${weaknessLine}${closing}`;
+}
+
+// ─── Weekly Error Digest ──────────────────────────────────────────────────────
+
+/** Milliseconds in 14 days, used to filter recent attempts. */
+const MS_14_DAYS = 14 * 24 * 60 * 60 * 1000;
+
+/**
+ * Build a digest of weak skills for the weekly parent focus-areas panel.
+ *
+ * Reads `questMastery` and `questAttempts` from the store and finds every
+ * skill with:
+ *   - mastery score < 0.55, AND
+ *   - at least 2 attempts in the last 14 days
+ *
+ * @returns {{ weakSkills: Array<{ quest: string, skill: string, score: number, recentWrong: number }>, generatedAt: string }}
+ */
+export function buildErrorDigest() {
+  const mastery  = store.get('questMastery')  || {};
+  const attempts = store.get('questAttempts') || [];
+
+  const cutoff = Date.now() - MS_14_DAYS;
+
+  // Group recent attempts by "quest::skill"
+  const recentByKey = {};
+  for (const attempt of attempts) {
+    if (!attempt || !attempt.quest || !attempt.skill) continue;
+    const ts = typeof attempt.ts === 'number' ? attempt.ts : Date.parse(attempt.ts);
+    if (!ts || ts < cutoff) continue;
+    const key = `${attempt.quest}::${attempt.skill}`;
+    if (!recentByKey[key]) recentByKey[key] = { total: 0, wrong: 0, quest: attempt.quest, skill: attempt.skill };
+    recentByKey[key].total += 1;
+    if (!attempt.correct) recentByKey[key].wrong += 1;
+  }
+
+  const weakSkills = [];
+
+  for (const [key, stats] of Object.entries(recentByKey)) {
+    if (stats.total < 2) continue;
+
+    // Look up mastery score: mastery[quest][skill]
+    const questMastery = mastery[stats.quest];
+    const score = (questMastery && typeof questMastery[stats.skill] === 'number')
+      ? questMastery[stats.skill]
+      : null;
+
+    if (score === null || score >= 0.55) continue;
+
+    weakSkills.push({
+      quest:       stats.quest,
+      skill:       stats.skill,
+      score,
+      recentWrong: stats.wrong,
+    });
+  }
+
+  // Sort weakest-first
+  weakSkills.sort((a, b) => a.score - b.score);
+
+  return {
+    weakSkills,
+    generatedAt: new Date().toISOString(),
+  };
+}
+
+/**
+ * Resolve a human-readable label for a skill from the category data files.
+ * Checks grammar categories first, then vocab categories.
+ *
+ * @param {string} skill - category key
+ * @returns {{ label: string, icon: string }}
+ */
+function _categoryMeta(skill) {
+  if (GRAMMAR_CATEGORIES[skill]) {
+    return { label: GRAMMAR_CATEGORIES[skill].label, icon: GRAMMAR_CATEGORIES[skill].icon };
+  }
+  if (VOCAB_CATEGORIES[skill]) {
+    return { label: VOCAB_CATEGORIES[skill].label, icon: VOCAB_CATEGORIES[skill].icon };
+  }
+  return { label: skill, icon: '📚' };
+}
+
+/**
+ * Render the weekly error digest into a DOM container element.
+ *
+ * Shows "📊 This Week's Focus Areas" with up to 5 weak skills, each
+ * displaying an icon, label, accuracy bar, and a "practise now" link.
+ * If no weak skills are found: "✅ Great week — no struggling areas!"
+ *
+ * @param {HTMLElement} container - element to render into
+ */
+export function renderErrorDigest(container) {
+  if (!container) return;
+
+  const digest = buildErrorDigest();
+  container.innerHTML = '';
+
+  const heading = document.createElement('h3');
+  heading.textContent = '📊 This Week\'s Focus Areas';
+  heading.className = 'error-digest__heading';
+  container.appendChild(heading);
+
+  if (!digest.weakSkills.length) {
+    const empty = document.createElement('p');
+    empty.className = 'error-digest__empty';
+    empty.textContent = '✅ Great week — no struggling areas!';
+    container.appendChild(empty);
+    return;
+  }
+
+  const list = document.createElement('ul');
+  list.className = 'error-digest__list';
+
+  const top5 = digest.weakSkills.slice(0, 5);
+  for (const item of top5) {
+    const { label, icon } = _categoryMeta(item.skill);
+    const pct = Math.round(item.score * 100);
+
+    const li = document.createElement('li');
+    li.className = 'error-digest__item';
+
+    // Icon + label
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'error-digest__name';
+    nameSpan.textContent = `${icon} ${label}`;
+
+    // Accuracy bar
+    const barWrap = document.createElement('span');
+    barWrap.className = 'error-digest__bar-wrap';
+    barWrap.setAttribute('aria-label', `Accuracy: ${pct}%`);
+    const bar = document.createElement('span');
+    bar.className = 'error-digest__bar';
+    bar.style.width = `${pct}%`;
+    const barLabel = document.createElement('span');
+    barLabel.className = 'error-digest__bar-label';
+    barLabel.textContent = `${pct}%`;
+    barWrap.appendChild(bar);
+    barWrap.appendChild(barLabel);
+
+    // "Practise now" link
+    const link = document.createElement('a');
+    link.className = 'error-digest__link';
+    link.href = `#quest-${item.quest}`;
+    link.textContent = 'practise now';
+
+    li.appendChild(nameSpan);
+    li.appendChild(barWrap);
+    li.appendChild(link);
+    list.appendChild(li);
+  }
+
+  container.appendChild(list);
 }
 
 /**
