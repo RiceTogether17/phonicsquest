@@ -13,6 +13,7 @@ import { questMastery } from '../modules/questMastery.js';
 import { audio } from '../modules/audio.js';
 import { getLevelInfo } from '../data/curriculum.js';
 import { gradeShortAnswer } from './scoring/shortAnswerGrader.js';
+import { hasApiKey, gradeSynthesisAnswer } from '../modules/aiService.js';
 
 const LEVEL_LABELS = { P4: 'Primary 4', P5: 'Primary 5', P6: 'Primary 6' };
 const SESSION_SIZE = 8;
@@ -349,35 +350,55 @@ function _isCorrect(typed, item) {
   return _grade(typed, item).fraction >= 1;
 }
 
-function _checkAnswer(item) {
+async function _checkAnswer(item) {
   const textarea = /** @type {HTMLTextAreaElement|null} */ (document.getElementById('sq-answer-input'));
   const typed = textarea?.value?.trim() || '';
   if (!typed) { _showFeedback('Type your rewritten sentence first.', 'neutral'); return; }
 
   _tries++;
   const result = _grade(typed, item);
-  const correct = result.fraction >= 1;
+  const localCorrect = result.fraction >= 1;
   const partial = result.fraction > 0 && result.fraction < 1;
 
-  const sk = _sessionStats.bySkill[item.skillKey] || { correct: 0, total: 0, label: item.skill };
-  sk.total++;
-  _sessionStats.total++;
-  questMastery.recordAttempt({ quest: 'synthesisQuest', skill: item.skillKey, correct, level: _level });
+  // When local grader says wrong and Gemini key is available, ask Gemini before
+  // penalising the student — their wording may be valid even if it differs from
+  // the authored alternates.
+  if (!localCorrect && hasApiKey()) {
+    _showFeedback('✨ Checking with AI…', 'hint');
+    const checkBtn = document.getElementById('sq-check');
+    if (checkBtn) checkBtn.disabled = true;
 
-  if (correct) {
-    sk.correct++;
-    _sessionStats.correct++;
-    if (_tries === 1) _sessionStats.firstTry++;
-    _sessionStats.bySkill[item.skillKey] = sk;
-    questMastery.updateSkill('synthesisQuest', item.skillKey, true);
-    audio.playSfx('correct');
-    _showSuccessCard(item, typed);
+    const alts = item.alternates || [];
+    const ai = await gradeSynthesisAnswer(
+      item.original, item.stem || '', item.answer, alts, typed,
+      item.skill || item.skillKey,
+    );
+
+    if (checkBtn) checkBtn.disabled = false;
+
+    if (ai?.verdict === 'CORRECT') {
+      _recordOutcome(item, true, typed);
+      return;
+    }
+    if (ai?.verdict === 'PARTIAL') {
+      _recordOutcome(item, false);
+      const tb = SQ_TEACHBACK[item.skillKey];
+      const structureHint = tb?.structure ? `Structure: ${tb.structure}` : `Use the "${item.pattern || item.skill}" pattern.`;
+      const aiFb = ai.feedback ? ` ${ai.feedback}` : '';
+      _showFeedback(`◐ Almost!${aiFb} ${structureHint}`, 'hint');
+      if (textarea) textarea.value = '';
+      textarea?.focus();
+      return;
+    }
+    // WRONG or null — fall through to normal wrong handling
+  }
+
+  if (localCorrect) {
+    _recordOutcome(item, true, typed);
     return;
   }
 
-  _sessionStats.bySkill[item.skillKey] = sk;
-  questMastery.updateSkill('synthesisQuest', item.skillKey, false);
-  audio.playSfx('wrong');
+  _recordOutcome(item, false);
 
   if (_tries >= MAX_TRIES) {
     _showTeachBackOverlay(item, () => { _qIdx++; _renderQuestion(); });
@@ -387,9 +408,6 @@ function _checkAnswer(item) {
   const tb = SQ_TEACHBACK[item.skillKey];
   const structureHint = tb?.structure ? `Structure: ${tb.structure}` : `Use the "${item.pattern || item.skill}" pattern.`;
   if (partial) {
-    // PSLE markers award 1/2 for correct structure but tense/agreement errors.
-    // Surface the structural hits so the student knows which meaning units they
-    // got — and what they still need to add to earn the second mark.
     const pct = Math.round(result.fraction * 100);
     const hits = result.trace?.hits || [];
     const misses = result.trace?.misses || [];
@@ -401,6 +419,22 @@ function _checkAnswer(item) {
   }
   if (textarea) textarea.value = '';
   textarea?.focus();
+}
+
+function _recordOutcome(item, correct, typed) {
+  const sk = _sessionStats.bySkill[item.skillKey] || { correct: 0, total: 0, label: item.skill };
+  sk.total++;
+  _sessionStats.total++;
+  questMastery.recordAttempt({ quest: 'synthesisQuest', skill: item.skillKey, correct, level: _level });
+  if (correct) {
+    sk.correct++;
+    _sessionStats.correct++;
+    if (_tries === 1) _sessionStats.firstTry++;
+  }
+  _sessionStats.bySkill[item.skillKey] = sk;
+  questMastery.updateSkill('synthesisQuest', item.skillKey, correct);
+  audio.playSfx(correct ? 'correct' : 'wrong');
+  if (correct && typed !== undefined) _showSuccessCard(item, typed);
 }
 
 function _showHint(item) {
