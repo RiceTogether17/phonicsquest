@@ -12489,3 +12489,17 @@ body.print-mode > *:not(.print-report-wrapper) > * { visibility: hidden; }
 .wq-ai-tip { font-size: 0.9em; color: var(--text-main, #222); padding-left: 8px; border-left: 2px solid var(--color-primary); }
 .settings-input { width: 100%; padding: 6px 10px; border: 1px solid var(--border, #e5e3fa); border-radius: var(--radius-sm); font-size: 0.9em; background: var(--surface, #fff); color: var(--text-main, #222); }
 .settings-row { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
+
+/* ── Listening Comprehension ─────────────────────────────────────── */
+.lc-browser { max-width: 640px; margin: 0 auto; }
+.lc-passage-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--space-3, 12px); margin-top: var(--space-3, 12px); }
+.lc-passage-card { padding: var(--space-3, 12px); background: var(--surface, #fff); border: 2px solid var(--border, #e5e3fa); border-radius: 14px; cursor: pointer; text-align: left; transition: border-color 0.15s, transform 0.1s; }
+.lc-passage-card:hover { border-color: var(--color-primary); transform: translateY(-2px); }
+.lc-passage-title { font-weight: 700; font-size: 0.95em; }
+.lc-passage-meta { font-size: 0.8em; color: var(--text-muted, #888); margin-top: 3px; }
+.lc-player { text-align: center; padding: var(--space-4, 16px) 0; }
+.lc-listen-btn { font-size: 1.1em; padding: 14px 28px; margin: var(--space-3, 12px) auto; display: block; }
+.lc-question-box { background: var(--surface-2, #f6f5ff); border-radius: 12px; padding: var(--space-3, 12px); margin: var(--space-3, 12px) 0; }
+.lc-answer-area { width: 100%; min-height: 80px; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 1em; resize: vertical; }
+.lc-model-answer { background: color-mix(in srgb, var(--color-success, #16a34a) 8%, var(--surface)); border-left: 3px solid var(--color-success, #16a34a); padding: var(--space-2, 8px) var(--space-3, 12px); border-radius: 0 var(--radius-md) var(--radius-md) 0; margin-top: 8px; }
+.lc-self-mark { display: flex; gap: 8px; margin-top: 8px; }
