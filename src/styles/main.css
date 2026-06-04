@@ -12476,3 +12476,16 @@ body.print-mode > *:not(.print-report-wrapper) > * { visibility: hidden; }
   .print-report-section { margin-bottom: 16px; }
   .print-report-section h3 { font-size: 13px; border-bottom: 1px solid #ccc; margin-bottom: 6px; }
 }
+
+/* ── AI Writing Coach ────────────────────────────────────────────── */
+.wq-ai-feedback { margin-top: var(--space-3, 12px); }
+.wq-ai-loading { color: var(--text-muted, #888); font-style: italic; font-size: 0.9em; }
+.wq-ai-feedback-wrap { background: color-mix(in srgb, var(--color-primary) 6%, var(--surface)); border: 1px solid color-mix(in srgb, var(--color-primary) 20%, var(--border)); border-radius: var(--radius-md); padding: var(--space-3, 12px); }
+.wq-ai-heading { font-weight: 700; font-size: 0.9em; margin-bottom: 6px; color: var(--color-primary); }
+.wq-ai-good { color: var(--color-success, #16a34a); font-weight: 600; }
+.wq-ai-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.wq-ai-item { display: flex; flex-direction: column; gap: 2px; }
+.wq-ai-quote { font-style: italic; color: var(--text-muted, #555); font-size: 0.88em; }
+.wq-ai-tip { font-size: 0.9em; color: var(--text-main, #222); padding-left: 8px; border-left: 2px solid var(--color-primary); }
+.settings-input { width: 100%; padding: 6px 10px; border: 1px solid var(--border, #e5e3fa); border-radius: var(--radius-sm); font-size: 0.9em; background: var(--surface, #fff); color: var(--text-main, #222); }
+.settings-row { display: flex; gap: 8px; align-items: center; margin-top: 6px; }

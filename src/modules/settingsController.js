@@ -178,6 +178,16 @@ export const settingsController = {
       document.documentElement.setAttribute('data-bilingual', checked ? 'true' : 'false');
     });
 
+    // ── Gemini API key ─────────────────────────────────────────────────────
+    document.getElementById('gemini-key-save')?.addEventListener('click', () => {
+      const input = /** @type {HTMLInputElement|null} */ (document.getElementById('gemini-api-key'));
+      const status = document.getElementById('gemini-key-status');
+      const key = input?.value?.trim() || '';
+      store.set('geminiApiKey', key);
+      if (status) status.textContent = key ? '✓ Key saved' : 'Key cleared';
+      setTimeout(() => { if (status) status.textContent = ''; }, 2500);
+    });
+
     // ── Reset progress ─────────────────────────────────────────────────────
     document.getElementById('reset-progress-btn')?.addEventListener('click', () => {
       if (confirm('This will erase all progress. Are you sure?')) {
@@ -267,6 +277,10 @@ export const settingsController = {
     const bilingualToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('bilingual-toggle'));
     if (bilingualToggle) bilingualToggle.checked = bilingual;
     document.documentElement.setAttribute('data-bilingual', bilingual ? 'true' : 'false');
+
+    const geminiKey = store.get('geminiApiKey') || '';
+    const geminiInput = /** @type {HTMLInputElement|null} */ (document.getElementById('gemini-api-key'));
+    if (geminiInput && geminiKey) geminiInput.value = geminiKey;
   },
 
   /**
