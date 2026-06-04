@@ -217,6 +217,7 @@ function _startRecovery() {
   _sessionSkillStats = {};
   _isRecovery = true;
   _answered = false;
+  _categoryWrong = {};
   _renderQuestion();
 }
 
@@ -452,6 +453,7 @@ function _renderDone() {
           <p class="mcq-focus-tip-heading">${weakMeta.icon} Focus area: ${escapeHtml(weakMeta.label)}</p>
           <p class="mcq-focus-tip-rule">${escapeHtml(weakTip.rule)}</p>
           <p class="mcq-focus-tip-eg"><em>${escapeHtml(weakTip.example)}</em></p>
+          <p class="mcq-focus-tip-tip">${escapeHtml(weakTip.tip)}</p>
         </div>`;
     }
   }
