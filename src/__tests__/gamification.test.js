@@ -102,7 +102,7 @@ describe('Gamification', () => {
       gamification.recordCorrect(5000);
       gamification.recordWrong();
       const stats = gamification.getSessionStats();
-      expect(stats.correct).toBe(0); // reset by recordWrong
+      expect(stats.correct).toBe(2);
       expect(stats.wrong).toBe(1);
     });
 

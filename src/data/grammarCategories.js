@@ -52,6 +52,9 @@ export const GRAMMAR_CATEGORIES = {
   auxiliaries:               { label: 'Auxiliaries & Questions',           icon: '🙋', levels: ['P3', 'P4', 'P5', 'P6'] },
   inversion:                 { label: 'Inversion & Advanced Structures',  icon: '🔀', levels: ['P6'] },
   mixedGrammar:              { label: 'Mixed Grammar (Exam)',             icon: '📝', levels: ['P5', 'P6'] },
+  homophones:                { label: 'Homophones',                       icon: '👂', levels: ['P2', 'P3', 'P4', 'P5', 'P6'] },
+  wordForms:                 { label: 'Word Forms',                       icon: '🔤', levels: ['P3', 'P4', 'P5', 'P6'] },
+  gerundInfinitive:          { label: 'Gerund & Infinitive',              icon: '🔁', levels: ['P4', 'P5', 'P6'] },
 };
 
 /** Helper: does this category belong at the given level? */

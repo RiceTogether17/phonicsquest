@@ -55,6 +55,9 @@ describe('Cloze Castle integration flow', () => {
     const firstCat = root.querySelector('.cloze-cat-btn');
     expect(firstCat).not.toBeNull();
     firstCat.click();
+    // Click through the rule card that now shows before the scan
+    const ruleSkip = root.querySelector('#cloze-rule-skip');
+    if (ruleSkip) ruleSkip.click();
     const ackButton = root.querySelector('#cloze-read-first');
     expect(ackButton).not.toBeNull();
     expect(ackButton.textContent).toContain('I have read the passage');
@@ -73,6 +76,8 @@ describe('Cloze Castle integration flow', () => {
     showClozeBrowser();
     root.querySelector('.cloze-level-btn[data-level="P1"]').click();
     root.querySelector('.cloze-cat-btn').click();
+    const ruleSkip2 = root.querySelector('#cloze-rule-skip');
+    if (ruleSkip2) ruleSkip2.click();
     root.querySelector('#cloze-read-first').click();
 
     const onScan = root.querySelector('.scan-attention-card');
@@ -137,6 +142,9 @@ describe('Word Vault integration flow', () => {
     const lvBtn = root.querySelector('.wv-level-btn:not([disabled])');
     expect(lvBtn).not.toBeNull();
     lvBtn.click();
+    // Click through the rule card that now shows before the scan
+    const wvRuleSkip = root.querySelector('#wv-rule-skip');
+    if (wvRuleSkip) wvRuleSkip.click();
     expect(root.querySelector('#wv-read-first')).not.toBeNull();
     expect(root.querySelector('.wv-game-scan-passage-text')).not.toBeNull();
     Math.random.mockRestore();
