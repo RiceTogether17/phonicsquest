@@ -239,19 +239,31 @@ class AudioManager {
   }
 
   /**
-   * Load the clearest available English TTS voice.
+   * Load the clearest available English TTS voice — biased hard toward
+   * UK female voices so PhonicsQuest sounds consistent across devices.
    *
-   * Phonics relies on accurate, well-articulated speech, so the choice of
-   * voice matters as much as the audio path. We bias hard against the
-   * "Compact" / "Eloquence" / novelty voices that ship on iOS and against
-   * Android's robotic default — these are the ones parents most often
-   * report as muddy.  Selection order:
+   * Phonics relies on accurate, well-articulated speech, so the choice
+   * of voice matters as much as the audio path. The same word can sound
+   * crisp from one voice and muffled from another — and a child building
+   * a phonemic map of English needs the model voice to be stable.
    *
-   *   1. Named "Online"/"Natural"/"Neural" cloud voices (highest clarity).
-   *   2. Named premium platform voices (Samantha-Enhanced, Aria, Google US, …).
-   *   3. Any voice whose name advertises enhanced/premium/natural quality.
-   *   4. First non-low-quality en-US → en-GB → en-AU → en-SG → any en-* voice.
-   *   5. Last resort: first voice in the list.
+   * Selection order:
+   *
+   *   1. Named clearest UK FEMALE voices known to ship on each platform
+   *      (Microsoft Sonia / Libby / Olivia — Edge & Windows;
+   *       Google UK English Female — Chrome/Android;
+   *       Kate / Serena / Stephanie (Enhanced/Premium) — macOS/iOS).
+   *   2. Any en-GB voice whose first name is a known UK female (Sonia,
+   *      Libby, Hazel, Olivia, Kate, Serena, Stephanie, Susan, Amy,
+   *      Emma, Maisie, Hollie, Mia…).
+   *   3. Any high-quality en-GB voice (Natural / Neural / Online /
+   *      Enhanced / Premium / Studio / WaveNet) of any gender.
+   *   4. Any en-GB voice at all.
+   *   5. Fall through to the cross-locale fallback chain — premium
+   *      US/AU/SG/IN voices, then absolute last resort.
+   *
+   * Tiers 1–4 only fire on en-GB voices, so users on platforms without
+   * any UK voice installed still get a sensible non-robotic fallback.
    */
   _initTTS() {
     const isLowQuality = (v) =>
@@ -259,45 +271,93 @@ class AudioManager {
       // ones, and "Eloquence" / novelty voices distort phoneme articulation.
       /\bcompact\b|eloquence|novelty|whisper|bahh|albert|fred|junior|kathy|ralph|trinoids|zarvox/i.test(v.name || '');
 
-    const isEnglish = (v) => /^en(?:[-_]|$)/i.test(v.lang || '');
+    const isEnglish   = (v) => /^en(?:[-_]|$)/i.test(v.lang || '');
+    const isUkEnglish = (v) => /^en[-_]gb/i.test(v.lang || '');
+
+    // Tier 1 — exact-name picks: the clearest UK female voices known to
+    // ship on each major platform. Listed in priority order so neural
+    // cloud voices win over older offline ones.
+    const UK_FEMALE_NAMED = [
+      // Microsoft (Windows 11 / Edge / Azure Speech) — neural, very clear
+      'Microsoft Sonia Online (Natural) - English (United Kingdom)',
+      'Microsoft Libby Online (Natural) - English (United Kingdom)',
+      'Microsoft Olivia Online (Natural) - English (United Kingdom)',
+      'Microsoft Sonia',
+      'Microsoft Libby',
+      'Microsoft Olivia',
+      'Microsoft Hazel',
+      // Google (Chrome / Android / Chrome OS)
+      'Google UK English Female',
+      // Apple (macOS / iOS) — Enhanced/Premium versions first
+      'Kate (Enhanced)',  'Kate (Premium)',
+      'Serena (Enhanced)', 'Serena (Premium)',
+      'Stephanie (Enhanced)', 'Stephanie (Premium)',
+      'Kate', 'Serena', 'Stephanie', 'Susan',
+    ];
+
+    // Tier 2 fallback: en-GB voices whose first name is a known UK
+    // female. Catches future Microsoft Aria-style additions without
+    // needing the registry to be touched, and catches platform-specific
+    // naming variants ("Kate-compact" etc.) the named list misses.
+    const UK_FEMALE_FIRST_NAMES = /\b(sonia|libby|hazel|olivia|maisie|ada|bella|catherine|elsie|hollie|imogen|mia|susie|kate|serena|stephanie|susan|amy|emma|aria|jenny)\b/i;
 
     const load = () => {
       const all = speechSynthesis.getVoices();
       if (!all.length) return;
       const voices = all.filter(v => isEnglish(v) && !isLowQuality(v));
 
-      // Tier 1 – cloud / neural voices (these tend to be the clearest of all)
+      // Tier 1 — exact named UK female voices, highest clarity first.
+      for (const name of UK_FEMALE_NAMED) {
+        const v = voices.find(x => (x.name || '').includes(name));
+        if (v) { this._ttsVoice = v; return; }
+      }
+
+      // Tier 2 — any en-GB voice with a known female first name.
+      const ukVoices = voices.filter(isUkEnglish);
+      const ukFemaleByName = ukVoices.find(v => UK_FEMALE_FIRST_NAMES.test(v.name || ''));
+      if (ukFemaleByName) { this._ttsVoice = ukFemaleByName; return; }
+
+      // Tier 3 — any premium-quality en-GB voice (cloud / enhanced).
+      const ukPremium = ukVoices.find(v =>
+        /natural|neural|online|wavenet|studio|enhanced|premium|hd\b/i.test(v.name)
+      );
+      if (ukPremium) { this._ttsVoice = ukPremium; return; }
+
+      // Tier 4 — any en-GB voice at all.
+      if (ukVoices.length) { this._ttsVoice = ukVoices[0]; return; }
+
+      // ── Fallback chain when no UK voice is installed ────────────────
+
+      // Cloud / neural voices in any English locale (still better than
+      // robotic offline voices).
       const naturalNeural = voices.find(v => /natural|neural|online|wavenet|studio/i.test(v.name));
       if (naturalNeural) { this._ttsVoice = naturalNeural; return; }
 
-      // Tier 2 – named premium voices known to be clear on each platform
-      const namedPreferred = [
-        // macOS / iOS enhanced
+      // Premium named female voices in other locales — kept female so
+      // the model voice stays consistent in gender across fallbacks.
+      const namedPreferredFemale = [
         'Samantha (Enhanced)', 'Ava (Enhanced)', 'Ava (Premium)', 'Allison (Enhanced)',
-        'Samantha', 'Ava', 'Allison', 'Karen', 'Moira', 'Tessa', 'Daniel',
-        // Microsoft Edge / Windows
-        'Microsoft Aria', 'Microsoft Jenny', 'Microsoft Sonia',
-        'Microsoft Zira', 'Microsoft Hazel', 'Microsoft Mark',
-        // Google (Android Chrome)
-        'Google US English', 'Google UK English Female', 'Google UK English Male',
+        'Samantha', 'Ava', 'Allison', 'Karen', 'Moira', 'Tessa',
+        'Microsoft Aria', 'Microsoft Jenny', 'Microsoft Zira',
+        'Google US English',
       ];
-      for (const name of namedPreferred) {
-        const v = voices.find(v => (v.name || '').includes(name));
+      for (const name of namedPreferredFemale) {
+        const v = voices.find(x => (x.name || '').includes(name));
         if (v) { this._ttsVoice = v; return; }
       }
 
-      // Tier 3 – any voice that advertises enhanced/premium quality
+      // Any enhanced/premium voice in any English locale.
       const enhanced = voices.find(v => /enhanced|premium|hd\b/i.test(v.name));
       if (enhanced) { this._ttsVoice = enhanced; return; }
 
-      // Tier 4 – first voice in a clear language preference order
-      const langOrder = ['en-US', 'en-GB', 'en-AU', 'en-SG', 'en-IN'];
+      // First voice in a clear language preference order.
+      const langOrder = ['en-US', 'en-AU', 'en-SG', 'en-IN'];
       for (const lang of langOrder) {
-        const v = voices.find(v => (v.lang || '').toLowerCase() === lang.toLowerCase());
+        const v = voices.find(x => (x.lang || '').toLowerCase() === lang.toLowerCase());
         if (v) { this._ttsVoice = v; return; }
       }
 
-      // Tier 5 – any English voice, then absolute fallback
+      // Absolute last resort.
       this._ttsVoice = voices[0] ?? all[0] ?? null;
     };
 
