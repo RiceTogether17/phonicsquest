@@ -21,10 +21,10 @@
   <!-- Styles -->
 
   <title>PhonicsQuest – Early Reading & Primary English</title>
-  <script type="module" crossorigin src="/phonicsquest/assets/index-D1gniGbZ.js"></script>
+  <script type="module" crossorigin src="/phonicsquest/assets/index-CJzxu7TX.js"></script>
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/gsap-C8pce-KX.js">
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/chartjs-BR_H7_9u.js">
-  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-BotVyFox.css">
+  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-CkS5JJdr.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -359,6 +359,16 @@
                 </span>
                 <span class="stories-banner-text">
                   <span class="stories-banner-title">📰 Comprehension Cloze <span class="module-level-badge" aria-label="Covers Primary 3 to Primary 6">P3–P6</span></span>
+                </span>
+                <span class="stories-banner-arrow">→</span>
+              </button>
+
+              <button class="stories-banner stories-banner--blue" id="btn-listening-comp" data-navigate="listening-comp" aria-label="Open Listening Comprehension — listen to passages and answer questions">
+                <span class="stories-banner-mascot">
+                  <span style="font-size:2rem;line-height:1" aria-hidden="true">👂</span>
+                </span>
+                <span class="stories-banner-text">
+                  <span class="stories-banner-title">👂 Listening Comprehension <span class="module-level-badge" aria-label="Covers Primary 1 to Primary 6">P1–P6</span></span>
                 </span>
                 <span class="stories-banner-arrow">→</span>
               </button>
@@ -1030,6 +1040,16 @@
               <input type="range" id="bank-chip-scale" min="85" max="130" step="5" value="100" />
               <span id="bank-chip-scale-display">100%</span>
             </div>
+          </section>
+
+          <section class="settings-group">
+            <h3 class="settings-label">AI Writing Coach</h3>
+            <p class="settings-help">Enter a free <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google Gemini API key</a> to unlock sentence-level feedback on compositions.</p>
+            <div class="settings-row">
+              <input type="password" id="gemini-api-key" class="settings-input" placeholder="Paste your Gemini API key…" autocomplete="off" spellcheck="false" />
+              <button class="btn btn--ghost btn--sm" id="gemini-key-save">Save</button>
+            </div>
+            <span id="gemini-key-status" class="settings-help"></span>
           </section>
 
           <section class="settings-group">

@@ -11,7 +11,6 @@
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
-import { store } from '../modules/store.js';
 
 let currentWord = null;
 let selectedLetters = [];
@@ -68,9 +67,16 @@ export function setupSegment(word, els) {
   els.btnSayIt.style.display = '';
   els.btnSkip.style.display = '';
 
-  setTimeout(() => {
-    if (store.get('stretchedSpeech')) audio.speakWordStretched(word);
-    else audio.speakWord(word.word);
+  // Segmenting asks the child to mark where the sounds break. So we
+  // play the word twice: first at natural rate (recognise the word),
+  // then stretched (hear every phoneme as a separable beat). This
+  // double-pass is the gold-standard structured-literacy model for
+  // segmenting practice. The stretched-speech setting is treated as
+  // forced-on inside this mode — it directly serves the task.
+  setTimeout(async () => {
+    await audio.speakWord(word.word);
+    await new Promise(r => setTimeout(r, 350));
+    await audio.speakWordStretched(word);
   }, 400);
 }
 
