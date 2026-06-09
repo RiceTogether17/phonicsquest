@@ -18,7 +18,6 @@ import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js
 import { renderPhonemeChoiceGrid } from '../components/phonemeChoice.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
-import { store } from '../modules/store.js';
 import { WORDS, shuffleArray } from '../data/words.js';
 
 /**
@@ -128,18 +127,18 @@ export function setupFirstSound(word, els) {
  */
 function _waitForWordAudio(wordData) {
   const text = wordData?.word ?? String(wordData ?? '');
-  const stretched = !!store.get('stretchedSpeech');
+  // Always articulated for PA prompts — the segmented "stretched" path
+  // would reveal the answer (it literally plays /c/-/a/-/t/ for "cat",
+  // which IS the first/last/middle sound the child is being asked to
+  // identify). Articulated mode slows the whole word right down without
+  // segmenting it, which is exactly what classroom teachers do.
   return new Promise(resolve => {
     setTimeout(() => {
-      const ttsDone   = stretched
-        ? audio.speakWordStretched(wordData).catch(() => {})
-        : audio.speakWord(text).catch(() => {});
-      // Stretched playback is roughly 1 phoneme-MP3 (~600 ms) per grapheme
-      // plus the final slow blend, so the floor needs to grow accordingly.
-      const phonemeCount = wordData?.graphemes?.length ?? text.length;
-      const minHoldMs = stretched
-        ? Math.max(1400, phonemeCount * 800 + 900)
-        : Math.max(1100, text.length * 140 + 400);
+      const ttsDone   = audio.speakWordArticulated(text).catch(() => {});
+      // At ~0.55 rate the audio is roughly 45% longer than the default
+      // 0.8 path, so the wall-clock floor grows accordingly. Some
+      // browsers resolve onend early so the floor is the real guard.
+      const minHoldMs = Math.max(1600, text.length * 220 + 500);
       const floorHold = new Promise(r => setTimeout(r, minHoldMs));
       Promise.all([ttsDone, floorHold]).finally(resolve);
     }, 350);

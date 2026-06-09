@@ -20,7 +20,6 @@ import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js
 import { renderPhonemeChoiceGrid } from '../components/phonemeChoice.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
-import { store } from '../modules/store.js';
 import { WORDS, shuffleArray } from '../data/words.js';
 
 const VOWEL_TYPES       = new Set(['sv', 'lv', 'rc', 'dp']);
@@ -97,16 +96,10 @@ export function setupMiddleSound(word, els) {
  */
 function _waitForWordAudio(wordData) {
   const text = wordData?.word ?? String(wordData ?? '');
-  const stretched = !!store.get('stretchedSpeech');
   return new Promise(resolve => {
     setTimeout(() => {
-      const ttsDone   = stretched
-        ? audio.speakWordStretched(wordData).catch(() => {})
-        : audio.speakWord(text).catch(() => {});
-      const phonemeCount = wordData?.graphemes?.length ?? text.length;
-      const minHoldMs = stretched
-        ? Math.max(1400, phonemeCount * 800 + 900)
-        : Math.max(1100, text.length * 140 + 400);
+      const ttsDone   = audio.speakWordArticulated(text).catch(() => {});
+      const minHoldMs = Math.max(1600, text.length * 220 + 500);
       const floorHold = new Promise(r => setTimeout(r, minHoldMs));
       Promise.all([ttsDone, floorHold]).finally(resolve);
     }, 350);
