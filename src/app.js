@@ -609,7 +609,12 @@ class App {
     });
 
     this._els.btnSayIt?.addEventListener('click', () => {
-      if (this._currentWord) audio.speakWord(this._currentWord.word);
+      if (!this._currentWord) return;
+      // Segmenting practice needs the phonemes audibly separated —
+      // replay through the stretched path so each sound is its own
+      // beat. Other modes get a natural replay.
+      if (this._mode === 'segment') audio.speakWordStretched(this._currentWord);
+      else audio.speakWord(this._currentWord.word);
     });
 
     this._els.btnHint?.addEventListener('click', () => {
@@ -794,9 +799,13 @@ class App {
         // First / Last / Middle Sound run through the target sequencer so the
         // child meets each target phoneme as a set of exemplars (alphabetical
         // ladder) before moving on, instead of bouncing around adaptively.
-        this._currentWord = nextPaWord(this._paSeqState, { ...opts, wordList: WORDS });
-      }
-      if (!this._currentWord) {
+        this._currentWord = nextPaWord(this._paSeqState, { ...opts, wordList: WORDS })
+          || progress.getNextWord(opts);
+      } else {
+        // Every other mode (blend, segment, hear, missing, soundCount, …)
+        // uses the adaptive picker. Must run unconditionally — checking
+        // `!this._currentWord` here would silently reuse the previous
+        // round's word and re-show the same card forever (regression bug).
         this._currentWord = progress.getNextWord(opts);
       }
     }
