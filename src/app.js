@@ -999,7 +999,7 @@ class App {
       clap: 'giri-clap-frame.png',
     }[state] || 'giri-neutral.png';
     const base = import.meta.env.BASE_URL;
-    el.innerHTML = `<img src="${base}images/mascot/${src}" alt="" width="48" height="48" style="object-fit:contain"/>`;
+    el.innerHTML = `<img src="${base}images/mascot/${src}" alt="" width="48" height="48" decoding="async" style="object-fit:contain"/>`;
     el.classList.add('game-mascot--visible');
     el.classList.remove('game-mascot--celebrate');
     if (state === 'celebrate' || state === 'clap') {
