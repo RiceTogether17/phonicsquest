@@ -608,14 +608,7 @@ class App {
       this._nextWord();
     });
 
-    this._els.btnSayIt?.addEventListener('click', () => {
-      if (!this._currentWord) return;
-      // Segmenting practice needs the phonemes audibly separated —
-      // replay through the stretched path so each sound is its own
-      // beat. Other modes get a natural replay.
-      if (this._mode === 'segment') audio.speakWordStretched(this._currentWord);
-      else audio.speakWord(this._currentWord.word);
-    });
+    this._els.btnSayIt?.addEventListener('click', () => this._handleSayIt());
 
     this._els.btnHint?.addEventListener('click', () => {
       this._giveHint();
@@ -1080,6 +1073,27 @@ class App {
    * speak the answer for first-sound. Instead, a single-press hint plays
    * the stretched word so the child can hear each sound in isolation.
    */
+  /**
+   * Replay the current word for the child. Mode-aware:
+   *   • segment      → stretched (segmenting is the task; revealing
+   *                    the per-phoneme breakdown is the point).
+   *   • first/last/middle → articulated (slowed whole-word so the
+   *                    child can hear the target sound without it
+   *                    being spelled out for them).
+   *   • everything else → natural rate.
+   */
+  _handleSayIt() {
+    if (!this._currentWord) return;
+    const mode = this._mode;
+    if (mode === 'segment') {
+      return audio.speakWordStretched(this._currentWord);
+    }
+    if (mode === 'first' || mode === 'last' || mode === 'middle') {
+      return audio.speakWordArticulated(this._currentWord.word);
+    }
+    return audio.speakWord(this._currentWord.word);
+  }
+
   async _giveHint() {
     if (!this._currentWord) return;
 

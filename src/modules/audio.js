@@ -442,6 +442,30 @@ class AudioManager {
   }
 
   /**
+   * Speak a word at a slower, articulated rate WITHOUT segmenting.
+   *
+   * For First / Last / Middle Sound modes, the child has to identify
+   * one phoneme in a position. Segmenting the word (speakWordStretched)
+   * would reveal the answer; playing it at natural conversational
+   * speed (speakWord) muddles the target sound. The middle path is
+   * what classroom teachers actually do — slow the whole word right
+   * down so each beat is audible, but keep it as a single coarticulated
+   * utterance so the segmentation is still the child's job.
+   *
+   * Honours the user's voiceSpeed setting as a CEILING: a child whose
+   * parent has already lowered the slider gets the lower of (0.55,
+   * their setting), never faster than 0.55.
+   *
+   * @param {string} word
+   * @returns {Promise<void>}
+   */
+  speakWordArticulated(word) {
+    if (!store.get('sfxEnabled')) return Promise.resolve();
+    const userRate = store.get('voiceSpeed') ?? 0.8;
+    return this._speak(word, Math.min(userRate, 0.55));
+  }
+
+  /**
    * Speak a SIGHT WORD with the natural unstressed pronunciation.
    *
    * Browser TTS engines pronounce single-letter strings like "a" using the
