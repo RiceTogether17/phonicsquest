@@ -30,11 +30,9 @@ import { getPersonalBests } from './modules/personalBestWall.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
 import { mascot } from './components/mascot.js';
 import { spinWheel, buildWordAnimation } from './components/wheel.js';
-import { renderDashboard, destroyDashboard } from './components/dashboard.js';
 import { celebrateCorrect, celebrateLevelUp, celebrateStreak, celebrateDailyGoal } from './components/confettiHelper.js';
 import { MODES } from './modes/index.js';
 import { getRecommendation, getDailyPlan, getLearnerSummaryChips } from './modules/recommendations.js';
-import { initStoryMode, showBrowser, cleanupStoryMode } from './modes/storyMode.js';
 import { initLetterSounds, cleanupLetterSounds } from './modes/letterSounds.js';
 import {
   initSightMatch, showSightBrowser, cleanupSightMatch,
@@ -43,18 +41,29 @@ import {
 import {
   initSightLearn, showSightLearn, cleanupSightLearn,
 } from './modes/sightLearn.js';
-import { initSentenceForge, showSentenceBrowser, cleanupSentenceForge, setSentenceForgeTrack } from './modes/sentenceForge.js';
-import { initClozeCastle, showClozeBrowser, cleanupClozeCastle } from './modes/clozeCastle.js';
-import { initWordVault, showVaultBrowser, cleanupWordVault } from './modes/wordVault.js';
-import { initGrammarMcq, showGrammarMcqBrowser, cleanupGrammarMcq, startGrammarMcqLevel } from './modes/grammarMcq.js';
-import { initVocabMcq, showVocabMcqBrowser, cleanupVocabMcq, startVocabMcqLevel } from './modes/vocabMcq.js';
-import { initPaperMode, showPaperModeBrowser, cleanupPaperMode } from './modes/paperMode.js';
-import { initEditingQuest, showEditingBrowser, cleanupEditingQuest } from './modes/editingQuest.js';
-import { initWritingQuest, showWritingBrowser, cleanupWritingQuest } from './modes/writingQuest.js';
-import { initSynthesisQuest, showSynthesisBrowser, cleanupSynthesisQuest } from './modes/synthesisQuest.js';
-import { mountPlaceholderModule, getPlaceholderMeta } from './modes/primaryPlaceholders.js';
-import { initComprehensionClozeQuest, cleanupComprehensionClozeQuest } from './modes/comprehensionClozeQuest.js';
-import { initListeningComp, showListeningBrowser, cleanupListeningComp } from './modes/listeningComp.js';
+import { getPlaceholderMeta } from './modes/placeholderMeta.js';
+import { lazyModule } from './modes/lazy.js';
+
+// ── Lazily-loaded heavy features ────────────────────────────────────────────
+// These modes/components carry large data sets (word banks, practice tests,
+// comprehension passages) or libraries (chart.js). They are split into their
+// own chunks and fetched on first open instead of bloating the initial bundle.
+// Cleanup paths use `.get()?.fn()` so a feature that was never opened is a
+// safe no-op.
+const dashboardMod    = lazyModule(() => import('./components/dashboard.js'));
+const storyModeMod    = lazyModule(() => import('./modes/storyMode.js'));
+const sentenceForgeMod = lazyModule(() => import('./modes/sentenceForge.js'));
+const clozeCastleMod  = lazyModule(() => import('./modes/clozeCastle.js'));
+const wordVaultMod    = lazyModule(() => import('./modes/wordVault.js'));
+const grammarMcqMod   = lazyModule(() => import('./modes/grammarMcq.js'));
+const vocabMcqMod     = lazyModule(() => import('./modes/vocabMcq.js'));
+const paperModeMod    = lazyModule(() => import('./modes/paperMode.js'));
+const editingQuestMod = lazyModule(() => import('./modes/editingQuest.js'));
+const writingQuestMod = lazyModule(() => import('./modes/writingQuest.js'));
+const synthesisQuestMod = lazyModule(() => import('./modes/synthesisQuest.js'));
+const placeholdersMod = lazyModule(() => import('./modes/primaryPlaceholders.js'));
+const comprehensionClozeMod = lazyModule(() => import('./modes/comprehensionClozeQuest.js'));
+const listeningCompMod = lazyModule(() => import('./modes/listeningComp.js'));
 import {
   getProfiles, createProfile, deleteProfile, activateProfile,
   getActiveProfile, needsProfileSelection, restoreActiveProfile,
@@ -82,7 +91,7 @@ import { keyboardManager } from './modules/keyboardManager.js';
 import { settingsController } from './modules/settingsController.js';
 import { getQuestUnlockStatus } from './modules/questUnlocks.js';
 import { showPlacementTest } from './modules/placementTest.js';
-import { showPrimaryQuickCheck } from './modules/primaryQuickCheck.js';
+const quickCheckMod = lazyModule(() => import('./modules/primaryQuickCheck.js'));
 import { getReadingBand, getHomeLayoutForReadingBand } from './modules/readingStages.js';
 import { showSessionSummary } from './components/sessionSummary.js';
 import { showWeeklyRecap, shouldShowWeeklyRecap } from './components/weeklyRecap.js';
@@ -297,23 +306,24 @@ class App {
       mascot.setHomeState('holdCard');
     });
 
-    document.getElementById('btn-stories')?.addEventListener('click', () => {
-      initStoryMode(
+    document.getElementById('btn-stories')?.addEventListener('click', async () => {
+      const m = await storyModeMod.load();
+      m.initStoryMode(
         document.getElementById('stories-content'),
         () => {
-          cleanupStoryMode();
+          storyModeMod.get()?.cleanupStoryMode();
           this._showScreen(SCREENS.HOME);
           mascot.setHomeState('holdCard');
         },
       );
-      showBrowser();
+      m.showBrowser();
       this._showScreen('screen-stories');
       mascot.setState('celebrate');
       badges.onStoriesOpened().forEach(b => badges.notify(b));
     });
 
     document.getElementById('btn-stories-back')?.addEventListener('click', () => {
-      cleanupStoryMode();
+      storyModeMod.get()?.cleanupStoryMode();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
@@ -387,187 +397,195 @@ class App {
 
     document.getElementById('btn-sm-back')?.addEventListener('click', goHomeFromSight);
 
-    document.getElementById('btn-sentence-forge')?.addEventListener('click', () => {
+    document.getElementById('btn-sentence-forge')?.addEventListener('click', async () => {
       const unlock = this._getQuestUnlockStatus();
       if (!unlock.sentenceForge.unlocked) {
         this._showToast(`Master ${unlock.sentenceForge.required} words to unlock! (${unlock.sentenceForge.current} so far)`, 'warning');
         return;
       }
-      initSentenceForge(
+      const m = await sentenceForgeMod.load();
+      m.initSentenceForge(
         document.getElementById('sentence-forge-content'),
         () => {
-          cleanupSentenceForge();
+          sentenceForgeMod.get()?.cleanupSentenceForge();
           this._showScreen(SCREENS.HOME);
           mascot.setHomeState('holdCard');
         },
       );
-      showSentenceBrowser();
+      m.showSentenceBrowser();
       this._showScreen('screen-sentence-forge');
       mascot.setState('celebrate');
     });
 
     document.getElementById('btn-sfq-back')?.addEventListener('click', () => {
-      cleanupSentenceForge();
+      sentenceForgeMod.get()?.cleanupSentenceForge();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
-    document.getElementById('btn-grammar-mcq')?.addEventListener('click', () => {
-      initGrammarMcq(
+    document.getElementById('btn-grammar-mcq')?.addEventListener('click', async () => {
+      const m = await grammarMcqMod.load();
+      m.initGrammarMcq(
         document.getElementById('grammar-mcq-content'),
         () => {
-          cleanupGrammarMcq();
+          grammarMcqMod.get()?.cleanupGrammarMcq();
           this._showScreen(SCREENS.HOME);
           mascot.setHomeState('holdCard');
         },
       );
-      showGrammarMcqBrowser();
+      m.showGrammarMcqBrowser();
       this._showScreen(SCREENS.GRAMMAR_MCQ);
       mascot.setState('whiteboard');
     });
     document.getElementById('btn-gmcq-back')?.addEventListener('click', () => {
-      cleanupGrammarMcq();
+      grammarMcqMod.get()?.cleanupGrammarMcq();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
-    document.getElementById('btn-vocab-mcq')?.addEventListener('click', () => {
-      initVocabMcq(
+    document.getElementById('btn-vocab-mcq')?.addEventListener('click', async () => {
+      const m = await vocabMcqMod.load();
+      m.initVocabMcq(
         document.getElementById('vocab-mcq-content'),
         () => {
-          cleanupVocabMcq();
+          vocabMcqMod.get()?.cleanupVocabMcq();
           this._showScreen(SCREENS.HOME);
           mascot.setHomeState('holdCard');
         },
       );
-      showVocabMcqBrowser();
+      m.showVocabMcqBrowser();
       this._showScreen(SCREENS.VOCAB_MCQ);
       mascot.setState('celebrate');
     });
     document.getElementById('btn-vmcq-back')?.addEventListener('click', () => {
-      cleanupVocabMcq();
+      vocabMcqMod.get()?.cleanupVocabMcq();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
-    document.getElementById('btn-paper-mode')?.addEventListener('click', () => {
-      initPaperMode(document.getElementById('paper-mode-content'), {
+    document.getElementById('btn-paper-mode')?.addEventListener('click', async () => {
+      const m = await paperModeMod.load();
+      m.initPaperMode(document.getElementById('paper-mode-content'), {
         onGoHome: () => {
-          cleanupPaperMode();
+          paperModeMod.get()?.cleanupPaperMode();
           this._showScreen(SCREENS.HOME);
           mascot.setHomeState('holdCard');
         },
         onLaunchSection: (sectionKey, level) => {
-          cleanupPaperMode();
+          paperModeMod.get()?.cleanupPaperMode();
           this._launchPaperSection(sectionKey, level);
         },
       });
-      showPaperModeBrowser();
+      m.showPaperModeBrowser();
       this._showScreen(SCREENS.PAPER_MODE);
       mascot.setState('whiteboard');
     });
     document.getElementById('btn-paper-back')?.addEventListener('click', () => {
-      cleanupPaperMode();
+      paperModeMod.get()?.cleanupPaperMode();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
-    document.getElementById('btn-cloze-castle')?.addEventListener('click', () => {
+    document.getElementById('btn-cloze-castle')?.addEventListener('click', async () => {
       const unlock = this._getQuestUnlockStatus();
       if (!unlock.clozeCastle.unlocked) {
         this._showToast(`Master ${unlock.clozeCastle.required} words to unlock! (${unlock.clozeCastle.current} so far)`, 'warning');
         return;
       }
-      initClozeCastle(
+      const m = await clozeCastleMod.load();
+      m.initClozeCastle(
         document.getElementById('cloze-castle-content'),
         () => {
-          cleanupClozeCastle();
+          clozeCastleMod.get()?.cleanupClozeCastle();
           this._showScreen(SCREENS.HOME);
           mascot.setHomeState('holdCard');
         },
       );
-      showClozeBrowser();
+      m.showClozeBrowser();
       this._showScreen('screen-cloze-castle');
       mascot.setState('celebrate');
     });
 
     document.getElementById('btn-ccq-back')?.addEventListener('click', () => {
-      cleanupClozeCastle();
+      clozeCastleMod.get()?.cleanupClozeCastle();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
-    document.getElementById('btn-word-vault')?.addEventListener('click', () => {
+    document.getElementById('btn-word-vault')?.addEventListener('click', async () => {
       const unlock = this._getQuestUnlockStatus();
       if (!unlock.wordVault.unlocked) {
         this._showToast(`Master ${unlock.wordVault.required} words to unlock! (${unlock.wordVault.current} so far)`, 'warning');
         return;
       }
-      initWordVault(
+      const m = await wordVaultMod.load();
+      m.initWordVault(
         document.getElementById('word-vault-content'),
         () => {
-          cleanupWordVault();
+          wordVaultMod.get()?.cleanupWordVault();
           this._showScreen(SCREENS.HOME);
           mascot.setHomeState('holdCard');
         },
       );
-      showVaultBrowser();
+      m.showVaultBrowser();
       this._showScreen('screen-word-vault');
       mascot.setState('celebrate');
     });
 
     document.getElementById('btn-wvq-back')?.addEventListener('click', () => {
-      cleanupWordVault();
+      wordVaultMod.get()?.cleanupWordVault();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
-    document.getElementById('btn-editing-quest')?.addEventListener('click', () => {
+    document.getElementById('btn-editing-quest')?.addEventListener('click', async () => {
       const unlock = this._getQuestUnlockStatus();
       if (!unlock.editingQuest.unlocked) {
         this._showToast(`Master ${unlock.editingQuest.required} words to unlock! (${unlock.editingQuest.current} so far)`, 'warning');
         return;
       }
-      initEditingQuest(
+      const m = await editingQuestMod.load();
+      m.initEditingQuest(
         document.getElementById('editing-quest-content'),
         () => {
-          cleanupEditingQuest();
+          editingQuestMod.get()?.cleanupEditingQuest();
           this._showScreen(SCREENS.HOME);
           mascot.setHomeState('holdCard');
         },
       );
-      showEditingBrowser();
+      m.showEditingBrowser();
       this._showScreen(SCREENS.EDITING_QUEST);
       mascot.setState('whiteboard');
     });
 
     document.getElementById('btn-eq-back')?.addEventListener('click', () => {
-      cleanupEditingQuest();
+      editingQuestMod.get()?.cleanupEditingQuest();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
 
-    document.getElementById('btn-writing-quest')?.addEventListener('click', () => {
+    document.getElementById('btn-writing-quest')?.addEventListener('click', async () => {
       const unlock = this._getQuestUnlockStatus();
       if (!unlock.writingQuest.unlocked) {
         this._showToast(`Master ${unlock.writingQuest.required} words to unlock! (${unlock.writingQuest.current} so far)`, 'warning');
         return;
       }
-      initWritingQuest(
+      const m = await writingQuestMod.load();
+      m.initWritingQuest(
         document.getElementById('writing-quest-content'),
         () => {
-          cleanupWritingQuest();
+          writingQuestMod.get()?.cleanupWritingQuest();
           this._showScreen(SCREENS.HOME);
           mascot.setHomeState('holdCard');
         },
       );
-      showWritingBrowser();
+      m.showWritingBrowser();
       this._showScreen(SCREENS.WRITING_QUEST);
       mascot.setState('whiteboard');
     });
 
     document.getElementById('btn-writing-back')?.addEventListener('click', () => {
-      cleanupWritingQuest();
+      writingQuestMod.get()?.cleanupWritingQuest();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
@@ -596,9 +614,9 @@ class App {
       });
     });
     document.getElementById('btn-pp-back')?.addEventListener('click', () => {
-      cleanupComprehensionClozeQuest();
-      cleanupSynthesisQuest();
-      cleanupListeningComp();
+      comprehensionClozeMod.get()?.cleanupComprehensionClozeQuest();
+      synthesisQuestMod.get()?.cleanupSynthesisQuest();
+      listeningCompMod.get()?.cleanupListeningComp();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
@@ -1455,10 +1473,11 @@ class App {
     this._openModal('modal-onboarding');
   }
 
-  _openDashboard() {
+  async _openDashboard() {
     this._openModal('modal-dashboard');
     const container = document.getElementById('dashboard-content');
     if (container) {
+      const { renderDashboard } = await dashboardMod.load();
       renderDashboard(container, {
         onNavigate: ({ target, group }) => {
           this._closeModal('modal-dashboard');
@@ -1593,7 +1612,7 @@ class App {
     }
   }
 
-  _openPrimaryPlaceholder(kind) {
+  async _openPrimaryPlaceholder(kind) {
     const meta = getPlaceholderMeta(kind);
     // listening-comp manages its own header text inside the container
     if (!meta && kind !== 'listening-comp') return;
@@ -1608,22 +1627,26 @@ class App {
     }
     const container = document.getElementById('primary-placeholder-content');
     const goHome = () => {
-      cleanupComprehensionClozeQuest();
-      cleanupSynthesisQuest();
-      cleanupListeningComp();
+      comprehensionClozeMod.get()?.cleanupComprehensionClozeQuest();
+      synthesisQuestMod.get()?.cleanupSynthesisQuest();
+      listeningCompMod.get()?.cleanupListeningComp();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     };
     if (kind === 'comprehension-cloze') {
-      initComprehensionClozeQuest(container, { onClose: goHome });
+      const m = await comprehensionClozeMod.load();
+      m.initComprehensionClozeQuest(container, { onClose: goHome });
     } else if (kind === 'synthesis') {
-      initSynthesisQuest(container, goHome);
-      showSynthesisBrowser();
+      const m = await synthesisQuestMod.load();
+      m.initSynthesisQuest(container, goHome);
+      m.showSynthesisBrowser();
     } else if (kind === 'listening-comp') {
-      initListeningComp(container, goHome);
-      showListeningBrowser();
+      const m = await listeningCompMod.load();
+      m.initListeningComp(container, goHome);
+      m.showListeningBrowser();
     } else {
-      mountPlaceholderModule(container, kind, {
+      const m = await placeholdersMod.load();
+      m.mountPlaceholderModule(container, kind, {
         onClose: goHome,
         onRelated: (target) => this._navigateTo(target),
       });
@@ -1634,47 +1657,49 @@ class App {
 
   _launchPaperSection(sectionKey, level) {
     const map = {
-      'grammar-mcq': () => {
-        initGrammarMcq(
+      'grammar-mcq': async () => {
+        const m = await grammarMcqMod.load();
+        m.initGrammarMcq(
           document.getElementById('grammar-mcq-content'),
           () => {
-            cleanupGrammarMcq();
+            grammarMcqMod.get()?.cleanupGrammarMcq();
             this._showScreen(SCREENS.HOME);
             mascot.setHomeState('holdCard');
           },
         );
         this._showScreen(SCREENS.GRAMMAR_MCQ);
         mascot.setState('whiteboard');
-        if (level) startGrammarMcqLevel(level);
-        else showGrammarMcqBrowser();
+        if (level) m.startGrammarMcqLevel(level);
+        else m.showGrammarMcqBrowser();
       },
-      'vocab-mcq': () => {
-        initVocabMcq(
+      'vocab-mcq': async () => {
+        const m = await vocabMcqMod.load();
+        m.initVocabMcq(
           document.getElementById('vocab-mcq-content'),
           () => {
-            cleanupVocabMcq();
+            vocabMcqMod.get()?.cleanupVocabMcq();
             this._showScreen(SCREENS.HOME);
             mascot.setHomeState('holdCard');
           },
         );
         this._showScreen(SCREENS.VOCAB_MCQ);
         mascot.setState('celebrate');
-        if (level) startVocabMcqLevel(level);
-        else showVocabMcqBrowser();
+        if (level) m.startVocabMcqLevel(level);
+        else m.showVocabMcqBrowser();
       },
       'cloze-castle': () => document.getElementById('btn-cloze-castle')?.click(),
       'word-vault': () => document.getElementById('btn-word-vault')?.click(),
       'editing-quest': () => document.getElementById('btn-editing-quest')?.click(),
-      'sentence-forge-word-order': () => {
-        setSentenceForgeTrack('word-order');
+      'sentence-forge-word-order': async () => {
+        (await sentenceForgeMod.load()).setSentenceForgeTrack('word-order');
         document.getElementById('btn-sentence-forge')?.click();
       },
-      'sentence-forge-combining': () => {
-        setSentenceForgeTrack('sentence-combining');
+      'sentence-forge-combining': async () => {
+        (await sentenceForgeMod.load()).setSentenceForgeTrack('sentence-combining');
         document.getElementById('btn-sentence-forge')?.click();
       },
-      'sentence-forge-synthesis': () => {
-        setSentenceForgeTrack('synthesis-transformation');
+      'sentence-forge-synthesis': async () => {
+        (await sentenceForgeMod.load()).setSentenceForgeTrack('synthesis-transformation');
         document.getElementById('btn-sentence-forge')?.click();
       },
     };
@@ -2126,7 +2151,7 @@ class App {
    * @param {string} id
    */
   _onModalClosed(id) {
-    if (id === 'modal-dashboard') destroyDashboard();
+    if (id === 'modal-dashboard') dashboardMod.get()?.destroyDashboard();
   }
 
   // ── Toast ──
@@ -2382,7 +2407,7 @@ class App {
    * placementComplete set, _afterPlacement called.
    * @param {object} profile
    */
-  _runPrimaryQuickCheck(profile) {
+  async _runPrimaryQuickCheck(profile) {
     const container = document.getElementById('screen-placement');
     const seedDefaultsAndContinue = () => {
       const primaryPlacement = this._buildPrimaryDefaultPlacement(profile);
@@ -2393,6 +2418,7 @@ class App {
     if (!container) { seedDefaultsAndContinue(); return; }
     this._showScreen('screen-placement');
     try {
+      const { showPrimaryQuickCheck } = await quickCheckMod.load();
       showPrimaryQuickCheck({
         container,
         profile,
