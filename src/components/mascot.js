@@ -155,6 +155,7 @@ class Mascot {
       img = document.createElement('img');
       img.alt = 'Giri the mascot';
       img.draggable = false;
+      img.decoding = 'async';
       img.style.cssText = `width:${size}px; height:${size}px; object-fit:contain; user-select:none; pointer-events:none;`;
       container.innerHTML = '';
       container.appendChild(img);
