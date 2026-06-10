@@ -17,7 +17,6 @@ import { gamification } from './modules/gamification.js';
 import { badges } from './modules/badges.js';
 import { progress } from './modules/progress.js';
 import { estimateMinutes as estimateReviewMinutes, getReviewCapForProfile } from './modules/reviewScheduler.js';
-import { getEarlyReadingPlan } from './modules/todaysPlan.js';
 import { buildWordWorkout } from './modules/wordWorkout.js';
 import {
   isBedtimeActive,
@@ -29,11 +28,11 @@ import { getMistakesDenSummary, timeAgo as mistakeTimeAgo, MISTAKES_LOOKBACK_DAY
 import { getPersonalBests } from './modules/personalBestWall.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
 import { mascot } from './components/mascot.js';
-import { findStageForGroup, hasSeenLesson, maybeShowStageLesson } from './components/miniLesson.js';
+import { findStageForGroup, hasSeenLesson, maybeShowStageLesson, showTipLesson } from './components/miniLesson.js';
 import { spinWheel, buildWordAnimation } from './components/wheel.js';
 import { celebrateCorrect, celebrateLevelUp, celebrateStreak, celebrateDailyGoal } from './components/confettiHelper.js';
 import { MODES } from './modes/index.js';
-import { getRecommendation, getDailyPlan, getLearnerSummaryChips } from './modules/recommendations.js';
+import { getLearnerSummaryChips } from './modules/recommendations.js';
 import { initLetterSounds, cleanupLetterSounds } from './modes/letterSounds.js';
 import {
   initSightMatch, showSightBrowser, cleanupSightMatch,
@@ -75,9 +74,11 @@ import {
   getDailyChallengeWords, isDailyChallengeComplete,
   completeDailyChallenge, DAILY_BONUS_XP,
 } from './modules/dailyChallenge.js';
+import { markMissionStepDone } from './modules/missionToday.js';
 import {
-  getMissionSummary, markMissionStepDone,
-} from './modules/missionToday.js';
+  getTodaysLessonView, markLessonStarted, markTeachDone,
+  finalizeLessonIfComplete, LESSON_BONUS_XP,
+} from './modules/lessonRunner.js';
 import { CURRICULUM, PHASES, PHASE_LABELS } from './data/curriculum.js';
 import { getStagesForMode } from './modules/phonicsProgression.js';
 import {
@@ -1731,8 +1732,6 @@ class App {
     const placement = store.get('placementProfile') || null;
     const readingBand = getReadingBand(profile, placement);
 
-    const rec   = getRecommendation();
-    const plan  = getDailyPlan();
     const chips = getLearnerSummaryChips();
 
     const stageMeta = {
@@ -1788,29 +1787,32 @@ class App {
         ${nextStage ? `<p class="journey-next-goal">Next: <strong>${nextStage.label}</strong> — ${nextStage.desc}</p>` : '<p class="journey-next-goal">🏅 Reading journey complete!</p>'}
       </div>`;
 
-    const urgencyIcon  = rec.urgency === 'high'   ? '🔴'
-                       : rec.urgency === 'medium' ? '🟡' : '🟢';
-    const urgencyText  = rec.urgency === 'high'   ? 'Focus area'
-                       : rec.urgency === 'medium' ? 'Needs practice' : 'Looking good';
-
-    const roadmapHtml = plan.map(step => `
-      <button class="home-roadmap-step"
-              data-target="${step.ctaTarget}"
-              ${step.ctaGroup ? `data-group="${step.ctaGroup}"` : ''}
-              aria-label="Step ${step.step}: ${step.label}">
-        <span class="roadmap-num" aria-hidden="true">${step.step}</span>
-        <div class="roadmap-info">
-          <span class="roadmap-label">${step.label}</span>
-          <span class="roadmap-detail">${step.detail}</span>
-        </div>
-        <span class="roadmap-arrow" aria-hidden="true">→</span>
-      </button>`).join('');
-
     const chipsHtml = chips.length
       ? `<div class="progress-chips" aria-label="Progress snapshot">
            ${chips.map(c => `<span class="progress-chip">${c}</span>`).join('')}
          </div>`
       : '';
+
+    // One "today" surface: the guided lesson hero. The detailed step list
+    // renders in the lesson card below (_renderTodaysLesson); this hero
+    // surfaces the next step and a single Start/Continue CTA — the way a
+    // tutor opens a sitting — replacing the old start-card + roadmap pair.
+    const esc = (s) => String(s ?? '').replace(/[<>&"]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;', '"':'&quot;' }[c]));
+    let lesson = null;
+    try { lesson = getTodaysLessonView(); } catch (_) { lesson = null; }
+    const next = lesson?.nextStep || null;
+    const lessonHeroHtml = lesson ? `
+      <div class="home-start-card" aria-label="Today's lesson with Giri">
+        <div class="start-card-eyebrow">
+          <span class="start-card-label">🦉 TODAY'S LESSON WITH GIRI</span>
+          <span class="start-card-urgency">${lesson.complete ? '🎉 Complete' : `${lesson.done}/${lesson.total} steps done`}</span>
+        </div>
+        <h2 class="start-card-title">${next ? `${esc(next.icon)} ${esc(next.title)}` : '🎉 Lesson complete — great work!'}</h2>
+        <p class="start-card-reason">${next ? esc(next.detail) : `You finished every step today and earned a +${LESSON_BONUS_XP} XP bonus.`}</p>
+        ${next ? `<button class="btn btn--primary btn--xl start-card-cta" id="lesson-hero-cta">
+          ${lesson.started ? 'Continue lesson' : "Start today's lesson"} →
+        </button>` : ''}
+      </div>` : '';
 
     section.innerHTML = `
       ${journeyBarHtml}
@@ -1820,42 +1822,19 @@ class App {
         <span class="pathway-badge-text">${profileName}${pathwayLabel}</span>
       </div>
 
-      <div class="home-start-card" aria-label="Today's best next step">
-        <div class="start-card-eyebrow">
-          <span class="start-card-label">TODAY'S START POINT</span>
-          <span class="start-card-urgency" aria-label="Urgency: ${urgencyText}">
-            ${urgencyIcon} ${urgencyText}
-          </span>
-        </div>
-        <span class="start-card-domain-badge">${rec.domain}</span>
-        <h2 class="start-card-title">${rec.title}</h2>
-        <p class="start-card-reason">${rec.reason}</p>
-        <button class="btn btn--primary btn--xl start-card-cta"
-                data-target="${rec.ctaTarget}"
-                ${rec.ctaGroup ? `data-group="${rec.ctaGroup}"` : ''}>
-          ${rec.ctaLabel} →
-        </button>
-      </div>
-
-      <div class="home-roadmap" aria-label="Today's recommended learning path">
-        <h3 class="home-roadmap-title">
-          <span aria-hidden="true">📋</span>
-          Your child's path today
-          <span class="roadmap-order-hint">· do in order</span>
-        </h3>
-        <div class="home-roadmap-steps">
-          ${roadmapHtml}
-        </div>
-      </div>
+      ${lessonHeroHtml}
 
       ${chipsHtml ? `<div class="progress-snapshot" aria-label="Progress snapshot">${chipsHtml}</div>` : ''}`;
 
-    // Wire up all [data-target] buttons
-    section.querySelectorAll('[data-target]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        this._navigateTo(btn.dataset.target, btn.dataset.group || null);
-      });
+    section.querySelector('#lesson-hero-cta')?.addEventListener('click', () => {
+      this._runLessonStep(next);
     });
+
+    // Award the completion bonus the moment the last step ticks over.
+    const award = (() => { try { return finalizeLessonIfComplete(); } catch (_) { return null; } })();
+    if (award) {
+      this._showToast(`🎉 Today's lesson complete! +${award.bonus} bonus XP`, 'success');
+    }
 
     // Manage section visibility for preschool vs primary layout
     this._manageSectionVisibility(readingBand);
@@ -1911,11 +1890,11 @@ class App {
         levelBadge.style.display = 'none';
       }
 
-      this._renderPrimaryStartHere(startHere);
+      this._renderTodaysLesson(startHere);
       this._renderPrimaryEarlyReadingNote(coreSection);
       this._filterGradeSpecificModules(profile?.primaryGrade || null);
-      // Primary profiles get the 5-step Mission Today (above) — hide the
-      // 3-step early-reading plan so they aren't shown two overlapping cards.
+      // Primary profiles get the guided lesson card above — hide the
+      // early-reading host so they aren't shown two overlapping cards.
       if (todaysPlanHost) todaysPlanHost.style.display = 'none';
     } else if (!layout.questsMilestone) {
       coreSection?.classList.remove('home-section--hidden', 'home-section--collapsed');
@@ -1925,7 +1904,7 @@ class App {
       sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
       if (levelBadge) levelBadge.style.display = 'none';
       if (startHere) startHere.style.display = 'none';
-      this._renderEarlyReadingTodaysPlan(todaysPlanHost);
+      this._renderTodaysLesson(todaysPlanHost);
     } else {
       coreSection?.classList.remove('home-section--hidden', 'home-section--collapsed');
       questsSection?.classList.add('home-section--milestone');
@@ -1935,29 +1914,27 @@ class App {
       sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
       if (levelBadge) levelBadge.style.display = 'none';
       if (startHere) startHere.style.display = 'none';
-      this._renderEarlyReadingTodaysPlan(todaysPlanHost);
+      this._renderTodaysLesson(todaysPlanHost);
     }
   }
 
   /**
-   * Render the 3-step "Today's Plan" card on the early-reading home screen
-   * (K1–P1 / emerging-decoder bands). Mirrors the primary `_renderPrimaryStartHere`
-   * shape but with steps anchored on Review Lane → Daily Challenge → Warm-up.
-   *
-   * Step completion is derived live from existing signals (review-due count,
-   * daily-challenge state, sessionWordsToday) so no extra event plumbing is
-   * needed — ticks update the moment the underlying task is completed.
+   * Render the guided "Today's Lesson with Giri" card — the single daily
+   * surface for BOTH pathways (it replaced the separate Today's Plan and
+   * Today's Mission cards). Steps come from lessonComposer via
+   * lessonRunner: warm-up → teach → practice → review, with completion
+   * read live from the underlying systems.
    */
-  _renderEarlyReadingTodaysPlan(host) {
+  _renderTodaysLesson(host) {
     if (!host) return;
-    let plan;
-    try { plan = getEarlyReadingPlan(); } catch (_) { plan = null; }
-    if (!plan) { host.style.display = 'none'; return; }
+    let lesson;
+    try { lesson = getTodaysLessonView(); } catch (_) { lesson = null; }
+    if (!lesson || lesson.total === 0) { host.style.display = 'none'; return; }
 
     const escAttr = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
     const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
 
-    const stepsHtml = plan.steps.map(step => {
+    const stepsHtml = lesson.steps.map((step, i) => {
       const stateClass = step.done ? 'mission-step--done' : '';
       const aria = step.done
         ? `${step.title}, complete`
@@ -1965,28 +1942,24 @@ class App {
       return `
         <button type="button"
           class="mission-step ${stateClass}"
-          data-step-target="${escAttr(step.target)}"
-          data-step-group="${escAttr(step.group || '')}"
-          data-step-id="${escAttr(step.id)}"
+          data-lesson-step="${i}"
           aria-label="${escAttr(aria)}">
-          <span class="mission-step__num" aria-hidden="true">${step.num}</span>
+          <span class="mission-step__num" aria-hidden="true">${i + 1}</span>
           <span class="mission-step__icon" aria-hidden="true">${escText(step.icon)}</span>
           <span class="mission-step__body">
-            <span class="mission-step__title">${escText(step.title)}</span>
+            <span class="mission-step__title">${escText(step.kindLabel ? `${step.kindLabel} · ` : '')}${escText(step.title)}</span>
             <span class="mission-step__desc">${escText(step.detail)}</span>
           </span>
           <span class="mission-step__progress" aria-hidden="true">${escText(step.progressLabel)}</span>
         </button>`;
     }).join('');
 
-    const headline = plan.complete
-      ? (plan.allCaughtUp
-          ? "🎉 Today's Plan done — all caught up!"
-          : "🎉 Today's Plan complete!")
-      : `🎯 Today's Plan · ${plan.done}/${plan.total} done`;
-    const sub = plan.complete
-      ? 'Come back tomorrow for the next plan.'
-      : '3 small steps · about 10 minutes';
+    const headline = lesson.complete
+      ? "🎉 Today's lesson complete! See you tomorrow."
+      : `🦉 Today's Lesson · ${lesson.done}/${lesson.total} done`;
+    const sub = lesson.complete
+      ? `Every step done — +${LESSON_BONUS_XP} bonus XP earned.`
+      : 'Warm up, learn something new, practise, review — in order, like a real lesson.';
 
     host.style.display = '';
     host.innerHTML = `
@@ -1996,95 +1969,58 @@ class App {
       </div>
       <div class="mission-card" role="list">${stepsHtml}</div>`;
 
-    host.querySelectorAll('.mission-step[data-step-target]').forEach(btn => {
+    host.querySelectorAll('[data-lesson-step]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const target = btn.dataset.stepTarget;
-        const group  = btn.dataset.stepGroup || null;
-        const stepId = btn.dataset.stepId;
-        if (!target) return;
-        if (stepId === 'review') {
-          this._startReviewSession();
-          return;
-        }
-        if (stepId === 'daily' || target === 'daily-challenge') {
-          if (isDailyChallengeComplete()) {
-            this._showToast('Daily challenge already done! Come back tomorrow.', 'info');
-            return;
-          }
-          this._startDailyChallenge();
-          return;
-        }
-        this._navigateTo(target, group);
+        const step = lesson.steps[Number(btn.dataset.lessonStep)];
+        this._runLessonStep(step);
       });
     });
   }
 
-  /**
-   * Render the "Today's Mission" card on the primary home — a five-step
-   * 10-minute English Quest (3 grammar cloze + 3 vocab cloze + 1 comp clue
-   * + 1 sentence correction + 1 yesterday's-slip review). Step progress is
-   * read live from questAttempts so completing tasks inside the modules
-   * ticks chips automatically.
-   */
-  _renderPrimaryStartHere(host) {
-    if (!host) return;
-    let summary;
-    try { summary = getMissionSummary(); } catch (_) { summary = null; }
-    if (!summary) {
-      host.style.display = 'none';
-      return;
-    }
-
-    const escAttr = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-    const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
-
-    const stepsHtml = summary.steps.map(step => {
-      const stateClass = step.done ? 'mission-step--done' : '';
-      const progressLabel = step.goal > 1
-        ? `${Math.min(step.count, step.goal)}/${step.goal}`
-        : (step.done ? '✓' : 'Start');
-      const aria = step.done
-        ? `${step.title}, complete`
-        : `${step.title}, ${progressLabel}`;
-      return `
-        <button type="button"
-          class="mission-step ${stateClass}"
-          data-target="${escAttr(step.target || '')}"
-          data-step-id="${escAttr(step.id)}"
-          aria-label="${escAttr(aria)}">
-          <span class="mission-step__num" aria-hidden="true">${step.num}</span>
-          <span class="mission-step__icon" aria-hidden="true">${escText(step.icon)}</span>
-          <span class="mission-step__body">
-            <span class="mission-step__title">${escText(step.title)}</span>
-            <span class="mission-step__desc">${escText(step.description)}</span>
-          </span>
-          <span class="mission-step__progress" aria-hidden="true">${escText(progressLabel)}</span>
-        </button>`;
-    }).join('');
-
-    const headline = summary.complete
-      ? '🎉 Mission complete! See you tomorrow.'
-      : `🎯 Today's Mission · ${summary.done}/${summary.total} done`;
-
-    host.style.display = '';
-    host.innerHTML = `
-      <div class="home-section-header">
-        <p class="home-section-heading">${headline}</p>
-        <p class="home-section-sub">10 minutes · do them in order for the best lift.</p>
-      </div>
-      <div class="mission-card" role="list">${stepsHtml}</div>`;
-
-    host.querySelectorAll('.mission-step[data-target]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const target = btn.dataset.target;
-        const stepId = btn.dataset.stepId;
-        if (!target) return;
-        if (stepId === 'comprehension-clue') {
-          markMissionStepDone(stepId);
+  /** Dispatch one guided-lesson step to the right activity. */
+  _runLessonStep(step) {
+    if (!step) return;
+    markLessonStarted();
+    const action = step.action || {};
+    switch (action.type) {
+      case 'review':
+        this._startReviewSession();
+        break;
+      case 'daily':
+        if (isDailyChallengeComplete()) {
+          this._showToast('Daily challenge already done! Come back tomorrow.', 'info');
+          break;
         }
-        this._navigateTo(target);
-      });
-    });
+        this._startDailyChallenge();
+        break;
+      case 'teach-phonics':
+        // Force-show the stage mini-lesson, then flow into scoped practice.
+        maybeShowStageLesson(action.group, { force: true }).then(() => {
+          markTeachDone();
+          this._navigateTo(action.target || 'blend', action.group || null);
+        });
+        break;
+      case 'teach-tip':
+        showTipLesson({
+          ...action.tip,
+          onDone: () => {
+            markTeachDone();
+            if (action.followUp?.target) {
+              this._navigateTo(action.followUp.target);
+            } else {
+              this._showScreen(SCREENS.HOME);
+            }
+          },
+        });
+        break;
+      case 'navigate':
+      default:
+        if (!action.target) return;
+        if (action.missionStepId === 'comprehension-clue') {
+          markMissionStepDone(action.missionStepId);
+        }
+        this._navigateTo(action.target, action.group || null);
+    }
   }
 
   /** Mark mode cards and quest banners that have been used before. */

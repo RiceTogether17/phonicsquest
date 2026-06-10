@@ -125,6 +125,63 @@ export function showMiniLesson({ stage, lesson, onDone }) {
   });
 }
 
+/**
+ * One-step tip lesson: Giri teaches a single grammar/vocab rule
+ * (rule + example + strategy) with optional narration. Used by the
+ * guided lesson runner for the primary pathway's teach step.
+ *
+ * @param {object} params
+ * @param {string} params.icon
+ * @param {string} params.label    skill name, e.g. "Subject-Verb Agreement"
+ * @param {string} params.rule
+ * @param {string} params.example
+ * @param {string} [params.tip]
+ * @param {Function} params.onDone
+ */
+export function showTipLesson({ icon, label, rule, example, tip, onDone }) {
+  _removeOverlay();
+  _onDismiss = onDone;
+
+  const overlay = document.createElement('div');
+  overlay.id = OVERLAY_ID;
+  overlay.className = 'mini-lesson-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', `Lesson: ${label}`);
+  document.body.appendChild(overlay);
+  document.addEventListener('keydown', _onKeydown);
+
+  overlay.innerHTML = `
+    <div class="mini-lesson-panel" role="document">
+      <div class="mini-lesson-step-tag">Today's lesson</div>
+      <div class="mini-lesson-mascot" aria-hidden="true">${escapeHtml(icon || '🦉')}</div>
+      <h2 class="mini-lesson-headline">${escapeHtml(label)}</h2>
+      <ol class="mini-lesson-script">
+        <li class="mini-lesson-line"><strong>Rule:</strong> ${escapeHtml(rule)}</li>
+        <li class="mini-lesson-line"><strong>Example:</strong> ${escapeHtml(example)}</li>
+        ${tip ? `<li class="mini-lesson-line"><strong>Strategy:</strong> ${escapeHtml(tip)}</li>` : ''}
+      </ol>
+      <div class="mini-lesson-actions">
+        <button class="btn btn--ghost" id="mini-lesson-listen">🔊 Read it to me</button>
+        <button class="btn btn--primary" id="mini-lesson-done">Got it — let's use it →</button>
+      </div>
+    </div>`;
+
+  overlay.querySelector('#mini-lesson-listen')?.addEventListener('click', async () => {
+    for (const line of [rule, `For example: ${example}`, tip].filter(Boolean)) {
+      if (!document.getElementById(OVERLAY_ID)) return;
+      await audio.speakText(line);
+    }
+  });
+
+  overlay.querySelector('#mini-lesson-done')?.addEventListener('click', () => {
+    _onDismiss = null;
+    _removeOverlay();
+    onDone?.();
+  });
+  overlay.querySelector('#mini-lesson-done')?.focus();
+}
+
 /* ── Step 1: I do (Giri teaches) ─────────────────────────────────── */
 
 function _renderTeachStep(overlay, stage, lesson, onNext) {

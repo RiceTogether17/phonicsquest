@@ -77,6 +77,11 @@ const DEFAULT_STATE = {
   // 'phonics:cvc-a', 'gmcq:articles', 'vmcq:contextInference'.
   lessonsSeen: {},          // { [lessonKey]: isoDate }
 
+  // Today's guided lesson (lessonRunner.js): per-day session state plus a
+  // capped history of completed lessons for the parent report.
+  currentLesson: null,      // { date, startedAt, teachDone, completedAt, bonusAwarded }
+  lessonHistory: [],        // [{ date, band, steps, completedAt }] capped at 30
+
   // Grammar category stats (Cloze Castle)
   grammarCategoryStats: {}, // { [level-category]: { attempts, correct, accuracy } }
 
