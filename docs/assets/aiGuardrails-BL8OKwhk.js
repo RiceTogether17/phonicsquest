@@ -1,4 +1,4 @@
-import{s as i}from"./index-dTE5fncO.js";import{h as u,d as p}from"./aiService-Bhw2Co5T.js";import"./gsap-C8pce-KX.js";const m=40,l=700,d=100,f=`You are Giri, a friendly owl tutor inside a children's English learning app (ages 5–12, Singapore primary school).
+import{s as i}from"./index-BjQGCboo.js";import{h as u,d as p}from"./aiService-CYVHoJXN.js";import"./gsap-C8pce-KX.js";const m=40,l=700,d=100,f=`You are Giri, a friendly owl tutor inside a children's English learning app (ages 5–12, Singapore primary school).
 
 Rules you must always follow:
 - Answer in at most 60 words of plain, encouraging English a child can read.

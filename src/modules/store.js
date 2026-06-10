@@ -85,6 +85,9 @@ const DEFAULT_STATE = {
   // Parent-visible log of child-initiated AI tutor calls (aiGuardrails.js).
   aiUsageLog: [],           // [{ date, at, kind, summary }] capped at 100
 
+  // Read-to-Giri per-story listening stats (storyMode.js).
+  readAloudStats: {},       // { [storyId]: { attempts, lastMatchPct, lastMissedWords, updatedAt } }
+
   // Grammar category stats (Cloze Castle)
   grammarCategoryStats: {}, // { [level-category]: { attempts, correct, accuracy } }
 

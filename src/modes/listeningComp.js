@@ -15,6 +15,7 @@
  */
 
 import { OPEN_COMPREHENSION_PASSAGES } from '../data/openComprehensionPassages.js';
+import { LISTENING_PASSAGES } from '../data/listeningPassages.js';
 import { store } from '../modules/store.js';
 import { escapeHtml } from '../utils/escapeHtml.js';
 
@@ -89,7 +90,17 @@ export function cleanupListeningComp() {
 const LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 
 function _passagesForLevel(level) {
-  return OPEN_COMPREHENSION_PASSAGES.filter(p => p.level === level);
+  // Purpose-written listening sets (auto-marked MCQ) first, then the shared
+  // open-ended passages (self-marked against a model answer).
+  return [
+    ...LISTENING_PASSAGES.filter(p => p.level === level),
+    ...OPEN_COMPREHENSION_PASSAGES.filter(p => p.level === level),
+  ];
+}
+
+/** Listening-set passages carry MCQ options; open-ended ones don't. */
+function _isMcqPassage(p = _currentPassage) {
+  return Array.isArray(p?.questions?.[0]?.options);
 }
 
 // ── Screen: Browser ───────────────────────────────────────────────────────────
@@ -147,11 +158,14 @@ function _renderPassageGrid() {
 
   grid.innerHTML = passages.map(p => {
     const qCount = Array.isArray(p.questions) ? p.questions.length : 0;
+    const kindLabel = _isMcqPassage(p)
+      ? `🎧 Listening set · pick the answer`
+      : `✏️ Open-ended · self-marked`;
     return `
       <button class="lc-passage-card" type="button" data-id="${escapeHtml(p.id)}"
               aria-label="Start ${escapeHtml(p.title)}, ${qCount} question${qCount !== 1 ? 's' : ''}">
         <div class="lc-passage-title">${escapeHtml(p.title)}</div>
-        <div class="lc-passage-meta">${qCount} question${qCount !== 1 ? 's' : ''}</div>
+        <div class="lc-passage-meta">${kindLabel} · ${qCount} question${qCount !== 1 ? 's' : ''}</div>
       </button>`;
   }).join('');
 
@@ -209,7 +223,7 @@ function _renderPassageScreen() {
   const answerWrap = document.getElementById('lc-answer-btn-wrap');
 
   listenBtn?.addEventListener('click', () => {
-    _speak(p.passage);
+    _speak(p.script || p.passage);
     listenBtn.style.display = 'none';
     stopBtn.style.display = '';
     if (_utterance) {
@@ -257,11 +271,105 @@ function _isAllAtOnce() {
 function _renderQuestionsScreen() {
   if (!_container || !_currentPassage) return;
 
-  if (_isAllAtOnce()) {
+  if (_isMcqPassage()) {
+    _renderMcqQuestion(_currentQ);
+  } else if (_isAllAtOnce()) {
     _renderAllQuestions();
   } else {
     _renderSingleQuestion(_currentQ);
   }
+}
+
+/**
+ * One auto-marked multiple-choice question at a time (listening sets).
+ * Tap a choice → instant marking, the authored "how the script gives it
+ * away" explanation, then Next.
+ */
+function _renderMcqQuestion(qIndex) {
+  const p = _currentPassage;
+  const questions = p.questions || [];
+
+  if (qIndex >= questions.length) {
+    _renderResults();
+    return;
+  }
+
+  const q     = questions[qIndex];
+  const total = questions.length;
+
+  _container.innerHTML = `
+    <section class="lc-browser" aria-label="Question ${qIndex + 1} of ${total}">
+      <header style="margin-bottom:var(--space-3,12px)">
+        <button class="btn btn--ghost" type="button" id="lc-back-passage3" style="margin-bottom:var(--space-2,8px)">&#8592; Listen again</button>
+        <h2 style="margin:0">${escapeHtml(p.title)}</h2>
+        <p style="color:var(--text-muted,#888);margin:var(--space-1,4px) 0 0">Question ${qIndex + 1} of ${total}</p>
+      </header>
+
+      <div class="lc-question-box" id="lc-mcq-block">
+        <p style="font-weight:700;margin:0 0 var(--space-2,8px)">
+          Q${qIndex + 1}. ${escapeHtml(q.q || '')}
+        </p>
+        <div class="lc-mcq-options" style="display:flex;flex-direction:column;gap:8px">
+          ${q.options.map(opt => `
+            <button class="btn btn--ghost lc-mcq-option" type="button" data-choice="${escapeHtml(opt)}"
+                    style="text-align:left;justify-content:flex-start">${escapeHtml(opt)}</button>`).join('')}
+        </div>
+        <div id="lc-mcq-feedback" class="lc-model-answer" style="display:none" role="status" aria-live="polite"></div>
+        <div id="lc-mcq-next-wrap" style="display:none;margin-top:var(--space-3,12px)">
+          <button class="btn btn--primary" type="button" id="lc-mcq-next">
+            ${qIndex + 1 >= total ? 'See My Score →' : 'Next →'}
+          </button>
+        </div>
+      </div>
+
+      <footer style="margin-top:var(--space-4,16px)">
+        <button class="btn btn--ghost" type="button" id="lc-btn-home4">&#8592; Back to home</button>
+      </footer>
+    </section>`;
+
+  _container.querySelectorAll('.lc-mcq-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const choice = btn.dataset.choice;
+      const ok = choice === q.answer;
+      _scores[qIndex] = ok ? 1 : 0;
+
+      _container.querySelectorAll('.lc-mcq-option').forEach(b => {
+        b.disabled = true;
+        b.setAttribute('aria-disabled', 'true');
+        if (b.dataset.choice === q.answer) {
+          b.style.borderColor = 'var(--color-success,#22c55e)';
+          b.style.background = 'color-mix(in srgb, var(--color-success,#22c55e) 12%, transparent)';
+        } else if (b === btn && !ok) {
+          b.style.borderColor = 'var(--color-error,#ef4444)';
+        }
+      });
+
+      const fb = document.getElementById('lc-mcq-feedback');
+      if (fb) {
+        fb.style.display = '';
+        fb.innerHTML = `${ok ? '✅ <strong>Correct!</strong>' : `❌ <strong>The answer is:</strong> ${escapeHtml(q.answer)}`}
+          ${q.explain ? `<br>${escapeHtml(q.explain)}` : ''}`;
+      }
+
+      const nextWrap = document.getElementById('lc-mcq-next-wrap');
+      if (nextWrap) nextWrap.style.display = '';
+      document.getElementById('lc-mcq-next')?.focus();
+    });
+  });
+
+  document.getElementById('lc-mcq-next')?.addEventListener('click', () => {
+    _currentQ = qIndex + 1;
+    _renderMcqQuestion(_currentQ);
+  });
+
+  document.getElementById('lc-back-passage3')?.addEventListener('click', () => {
+    _stopSpeaking();
+    _renderPassageScreen();
+  });
+
+  document.getElementById('lc-btn-home4')?.addEventListener('click', () => {
+    _onGoHome?.();
+  });
 }
 
 function _renderAllQuestions() {
