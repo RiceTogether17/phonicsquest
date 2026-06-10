@@ -25,6 +25,9 @@ import {
   getBedtimeStatus,
 } from './modules/bedtimeMode.js';
 import { getMistakesDenSummary, timeAgo as mistakeTimeAgo, MISTAKES_LOOKBACK_DAYS } from './modules/mistakesDen.js';
+import { buildGiriQuestionChips, answerChipOffline, answerChipAi, askGiriFreeText } from './modules/askGiri.js';
+import { attachAskGiriButton } from './components/askGiriButton.js';
+import { hasApiKey } from './modules/aiService.js';
 import { getPersonalBests } from './modules/personalBestWall.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
 import { mascot } from './components/mascot.js';
@@ -712,6 +715,14 @@ class App {
 
     document.querySelectorAll('[data-close="modal-mistakes-den"]').forEach(btn => {
       btn.addEventListener('click', () => modalManager.close('modal-mistakes-den'));
+    });
+
+    document.getElementById('btn-ask-giri')?.addEventListener('click', () => {
+      this._openAskGiri();
+    });
+
+    document.querySelectorAll('[data-close="modal-ask-giri"]').forEach(btn => {
+      btn.addEventListener('click', () => modalManager.close('modal-ask-giri'));
     });
 
     document.getElementById('btn-personal-best')?.addEventListener('click', () => {
@@ -2933,6 +2944,82 @@ class App {
     } else {
       banner.style.display = 'none';
     }
+  }
+
+  /**
+   * Open the Ask Giri modal: question chips built from the child's recent
+   * mistakes, each answered instantly with the authored rule card and —
+   * when an API key is configured — an optional AI re-explanation. P4–P6
+   * profiles with a key also get a typed question box.
+   */
+  _openAskGiri() {
+    const host = document.getElementById('ask-giri-content');
+    if (!host) return;
+    this._renderAskGiri(host);
+    modalManager.open('modal-ask-giri');
+  }
+
+  _renderAskGiri(host) {
+    const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
+    const chips = buildGiriQuestionChips();
+    const profile = getActiveProfile ? getActiveProfile() : null;
+    const grade = Number(String(profile?.primaryGrade || '').replace(/\D/g, '')) || 0;
+    const canType = grade >= 4 && hasApiKey();
+
+    host.innerHTML = `
+      <p class="ask-giri-intro">Tap a question and Giri will explain it. The questions come from things you've found tricky lately.</p>
+      <div class="ask-giri-chips" role="group" aria-label="Suggested questions">
+        ${chips.map(c => `
+          <button class="btn btn--ghost ask-giri-chip" type="button" data-chip-id="${escText(c.id)}">
+            ${escText(c.question)}
+          </button>`).join('')}
+      </div>
+      <div class="ask-giri-answer" id="ask-giri-answer" aria-live="polite"></div>
+      ${canType ? `
+        <div class="ask-giri-typed">
+          <label for="ask-giri-input" class="ask-giri-typed-label">Or type your own English question:</label>
+          <div class="ask-giri-typed-row">
+            <input type="text" id="ask-giri-input" class="settings-input" maxlength="300"
+                   placeholder="e.g. When do I use 'much' and when 'many'?" />
+            <button class="btn btn--primary" type="button" id="ask-giri-send">Ask</button>
+          </div>
+        </div>` : ''}
+    `;
+
+    const answerHost = host.querySelector('#ask-giri-answer');
+
+    host.querySelectorAll('.ask-giri-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const chip = chips.find(c => c.id === btn.dataset.chipId);
+        if (!chip || !answerHost) return;
+        const authored = answerChipOffline(chip);
+        answerHost.innerHTML = `
+          <div class="mcq-rule-section">
+            <p class="mcq-rule-label">📖 ${escText(chip.label)}</p>
+            <p class="mcq-rule-text">${escText(authored.rule)}</p>
+            <p class="mcq-rule-example">${escText(authored.example)}</p>
+            ${authored.tip ? `<p class="mcq-rule-tip">💡 ${escText(authored.tip)}</p>` : ''}
+          </div>`;
+        attachAskGiriButton(answerHost, () => answerChipAi(chip), {
+          label: 'Explain it another way ✨',
+          ariaLabel: 'Ask Giri to explain this in different words',
+        });
+      });
+    });
+
+    host.querySelector('#ask-giri-send')?.addEventListener('click', async () => {
+      const input = /** @type {HTMLInputElement|null} */ (host.querySelector('#ask-giri-input'));
+      const sendBtn = /** @type {HTMLButtonElement|null} */ (host.querySelector('#ask-giri-send'));
+      const q = input?.value?.trim();
+      if (!q || !answerHost || !sendBtn) return;
+      sendBtn.disabled = true;
+      answerHost.innerHTML = '<p class="mcq-ask-giri-answer">🦉 Giri is thinking…</p>';
+      const reply = await askGiriFreeText(q);
+      sendBtn.disabled = false;
+      answerHost.innerHTML = reply
+        ? `<p class="mcq-ask-giri-answer">🦉 ${escText(reply)}</p>`
+        : '<p class="mcq-ask-giri-answer">🦉 Giri can\'t answer right now — try one of the question buttons above!</p>';
+    });
   }
 
   /**

@@ -160,6 +160,67 @@ Give at most 5 findings. If the draft is good, say: GOOD: Well done!`;
 }
 
 /**
+ * Grade a composition against the same 4-dimension rubric the local
+ * evaluator uses (writingEvaluator.js), so the AI bands sit beside the
+ * local bands without inventing a different scale. The local score stays
+ * the source of truth for XP/progression — this is tutor commentary.
+ *
+ * Routed through the aiGuardrails daily cap + usage log, but with its own
+ * marking prompt (a rubric needs more than the 60-word chat persona).
+ *
+ * @param {string} draftText
+ * @param {number|string} level   P1–P6 numeric level
+ * @param {string} [taskDesc]
+ * @returns {Promise<{ dimensions: Record<string, { band: number, comment: string }>, overall: string } | null>}
+ */
+export async function gradeEssayWithRubric(draftText, level, taskDesc = '') {
+  const { canCallAi, logAiUse, sanitizeAiText } = await import('./aiGuardrails.js');
+  if (!canCallAi()) return null;
+  logAiUse('grade', `Essay graded (P${level})`);
+
+  const prompt = `You are a Singapore primary school English teacher grading a P${level} student's composition against a 4-band rubric (4 = Strong, 3 = Secure, 2 = Developing, 1 = Needs Support). Judge against P${level} expectations, not adult standards.
+
+Task: ${taskDesc || 'Write a story or composition.'}
+
+Student's draft:
+"""
+${draftText}
+"""
+
+Grade these four dimensions. Reply EXACTLY in this format, one line each, no other text:
+CONTENT: <band 1-4> | <one short, specific comment in plain English>
+ORGANISATION: <band 1-4> | <one short, specific comment>
+LANGUAGE: <band 1-4> | <one short, specific comment>
+TASK: <band 1-4> | <one short, specific comment>
+OVERALL: <one encouraging sentence naming the single most useful next improvement>`;
+
+  const raw = await callGemini(prompt, { maxTokens: 300, temperature: 0.2 });
+  if (!raw) return null;
+
+  const keyMap = { CONTENT: 'content', ORGANISATION: 'organisation', LANGUAGE: 'language', TASK: 'taskFulfilment' };
+  const dimensions = {};
+  let overall = '';
+  for (const line of raw.split('\n').map(l => l.trim()).filter(Boolean)) {
+    const m = line.match(/^([A-Z]+):\s*(.*)$/);
+    if (!m) continue;
+    if (m[1] === 'OVERALL') {
+      overall = sanitizeAiText(m[2]);
+      continue;
+    }
+    const key = keyMap[m[1]];
+    if (!key) continue;
+    const parts = m[2].split('|');
+    const band = parseInt(parts[0], 10);
+    if (!Number.isInteger(band) || band < 1 || band > 4) continue;
+    dimensions[key] = { band, comment: sanitizeAiText(parts.slice(1).join('|')) };
+  }
+
+  // All four dimensions must parse for the grading to be usable.
+  if (Object.keys(dimensions).length < 4) return null;
+  return { dimensions, overall };
+}
+
+/**
  * Ask Gemini to grade a synthesis/transformation answer.
  * Returns { verdict: 'CORRECT'|'PARTIAL'|'WRONG', feedback: string } or null on failure.
  *

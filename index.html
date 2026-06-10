@@ -161,6 +161,20 @@
           </button>
         </div>
 
+        <!-- Ask Giri — question chips built from recent mistakes (app.js) -->
+        <div class="review-banner" id="ask-giri-banner" role="status">
+          <button class="stories-banner stories-banner--green" id="btn-ask-giri" aria-label="Open Ask Giri">
+            <span class="stories-banner-mascot">
+              <span style="font-size:2rem;line-height:1" aria-hidden="true">🦉</span>
+            </span>
+            <span class="stories-banner-text">
+              <span class="stories-banner-title" id="ask-giri-title">🦉 Ask Giri</span>
+              <span class="stories-banner-sub" id="ask-giri-sub">Stuck on something? Get it explained</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+          </button>
+        </div>
+
         <!-- My Trophy Room — Personal Best Wall (rendered by app.js) -->
         <div class="review-banner" id="personal-best-banner" style="display:none" role="status">
           <button class="stories-banner stories-banner--gold" id="btn-personal-best" aria-label="Open My Trophy Room">
@@ -1093,6 +1107,21 @@
           </button>
         </div>
         <div class="modal-body" id="mistakes-den-content"><!-- Injected by app.js _renderMistakesDen --></div>
+      </div>
+    </div>
+
+    <!-- ASK GIRI MODAL — explain-a-skill question box -->
+    <div class="modal-overlay" id="modal-ask-giri" role="dialog" aria-modal="true" aria-label="Ask Giri — get a skill explained" hidden>
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h2 class="modal-title">🦉 Ask Giri</h2>
+          <button class="modal-close" aria-label="Close Ask Giri" data-close="modal-ask-giri">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body" id="ask-giri-content"><!-- Injected by app.js _renderAskGiri --></div>
       </div>
     </div>
 

@@ -9,7 +9,7 @@ import { isPlanReady, mergeLessonWithPlan, getRemediationPath, getParagraphMissi
 import { renderDrill, collectDrillAnswers, gradeDrills } from '../modules/writingReviseDrills.js';
 import { getTrackProgress, setTrackProgress, migrateLegacyWritingCompleted, getLevelTrackProgress } from '../modules/writingTrackProgress.js';
 import { saveDraft, loadDraft, clearDraft, updatePhase, updateFeedback, updateRevision, saveLegacyDraft, loadLegacyDraft, clearLegacyDraft, getDraftSummary } from '../modules/writingDraftStore.js';
-import { hasApiKey, getWritingCoachFeedback } from '../modules/aiService.js';
+import { hasApiKey, getWritingCoachFeedback, gradeEssayWithRubric } from '../modules/aiService.js';
 
 let _container = null;
 let _onGoHome = null;
@@ -324,6 +324,20 @@ function _renderAiCoachHtml(raw) {
   return `<div class="wq-ai-feedback-wrap"><p class="wq-ai-heading">✨ AI Coach — sentence feedback</p><ul class="wq-ai-list">${items}</ul></div>`;
 }
 
+const _AI_BAND_LABELS = { 4: 'Strong 🌟', 3: 'Secure ✅', 2: 'Developing 📈', 1: 'Needs Support 💪' };
+
+function _renderAiRubricHtml(graded) {
+  const esc = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
+  const rows = Object.entries(graded.dimensions).map(([key, d]) => `
+    <li class="wq-ai-item">${DIMENSION_EMOJIS[key] || ''} <strong>${_dimensionLabel(key)}</strong>:
+      Band ${d.band} — ${_AI_BAND_LABELS[d.band] || ''}${d.comment ? `<span class="wq-ai-tip">${esc(d.comment)}</span>` : ''}</li>`).join('');
+  return `<div class="wq-ai-feedback-wrap">
+    <p class="wq-ai-heading">✨ AI Coach — rubric marking</p>
+    <ul class="wq-ai-list">${rows}</ul>
+    ${graded.overall ? `<p class="wq-ai-good">${esc(graded.overall)}</p>` : ''}
+  </div>`;
+}
+
 async function _submitDraft(item, lessonForEval) {
   const text = document.getElementById('wq-text')?.value?.trim() || '';
   const fb = document.getElementById('wq-feedback');
@@ -373,6 +387,16 @@ async function _submitDraft(item, lessonForEval) {
     getWritingCoachFeedback(text, _level, taskDesc).then(raw => {
       if (!raw || !aiSection.isConnected) return;
       aiSection.innerHTML = _renderAiCoachHtml(raw);
+    });
+
+    // AI rubric grading next to the local bands. Commentary only — the
+    // local score above remains the source of truth for XP/progression.
+    const rubricSection = document.createElement('div');
+    rubricSection.className = 'wq-ai-feedback';
+    fb.appendChild(rubricSection);
+    gradeEssayWithRubric(text, _level, taskDesc).then(graded => {
+      if (!graded || !rubricSection.isConnected) return;
+      rubricSection.innerHTML = _renderAiRubricHtml(graded);
     });
   }
 
