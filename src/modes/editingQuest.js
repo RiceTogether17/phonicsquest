@@ -1,4 +1,6 @@
 import { EDITING_LEVELS, editingPassages } from '../data/editingPassages.js';
+import { attachAskGiriButton } from '../components/askGiriButton.js';
+import { explainTeachBack } from '../modules/aiService.js';
 import { store } from '../modules/store.js';
 import { questMastery } from '../modules/questMastery.js';
 import { audio } from '../modules/audio.js';
@@ -355,7 +357,7 @@ function _submitError(item, error, selectedType, typedCorrection) {
     _showEditingTeachBackOverlay(error, () => {
       _errorIndex++;
       _renderErrorStep();
-    });
+    }, typedCorrection);
     return;
   }
 
@@ -365,7 +367,7 @@ function _submitError(item, error, selectedType, typedCorrection) {
   if (input) input.value = '';
 }
 
-function _showEditingTeachBackOverlay(error, onContinue) {
+function _showEditingTeachBackOverlay(error, onContinue, typed = '') {
   const tb = EDITING_TEACHBACK[error.rule] || EDITING_TEACHBACK[error.type] || EDITING_TEACHBACK.grammar;
   const game = _container.querySelector('.sfq-game');
   if (!game) { onContinue(); return; }
@@ -388,6 +390,17 @@ function _showEditingTeachBackOverlay(error, onContinue) {
     </div>`;
 
   game.appendChild(overlay);
+
+  if (typed) {
+    attachAskGiriButton(overlay.querySelector('.eq-teachback-card'), () => explainTeachBack({
+      skillLabel: error.rule || error.type,
+      exercise: `Fix the ${error.type} error in the word "${error.token}"`,
+      studentAnswer: typed,
+      correctAnswer: error.correction,
+      level: _level ? `P${_level}` : '',
+    }));
+  }
+
   overlay.querySelector('.eq-teachback-continue').addEventListener('click', () => {
     overlay.remove();
     onContinue();

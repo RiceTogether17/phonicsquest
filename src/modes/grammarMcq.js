@@ -5,7 +5,7 @@ import { GRAMMAR_MCQ_ITEMS, GRAMMAR_MCQ_LEVELS, buildGrammarMcqLevel } from '../
 import { GRAMMAR_CATEGORIES, GRAMMAR_CATEGORY_KEYS, categoryAppliesToLevel } from '../data/grammarCategories.js';
 import { checkPostAttempt } from '../modules/remediationRouter.js';
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
-import { buildMcqFeedbackHtml } from './mcqFeedback.js';
+import { buildMcqFeedbackHtml, attachAskGiri, attachGiriHint } from './mcqFeedback.js';
 import { filterMcqItemsForDifficulty, MCQ_DIFFICULTIES, renderMcqDifficultyToggle } from './mcqDifficulty.js';
 import { GRAMMAR_TIPS, getGrammarTip } from '../data/grammarTips.js';
 
@@ -359,7 +359,10 @@ function _renderQuestion() {
         hintText += `<br><span class="mcq-struggling-tip"><strong>📚 Rule reminder:</strong> ${escapeHtml(confusionTip.rule)}<br><em>${escapeHtml(confusionTip.example)}</em></span>`;
       }
 
-      if (hint) hint.innerHTML = hintText;
+      if (hint) {
+        hint.innerHTML = hintText;
+        attachAskGiri(hint, { item, selectedChoice: ans, level: _scope.level || item.level });
+      }
 
       const nextWrap = _container.querySelector('#gmcq-next-wrap');
       const nextBtn = _container.querySelector('#gmcq-next');
@@ -391,6 +394,11 @@ function _renderQuestion() {
           <p class="mcq-hint-rule"><strong>Rule:</strong> ${escapeHtml(tip.rule)}</p>
           <p class="mcq-hint-eg"><em>${escapeHtml(tip.example)}</em></p>
           <p class="mcq-hint-tip">${escapeHtml(tip.tip)}</p>`;
+        attachGiriHint(ruleHintPanel, {
+          item,
+          categoryLabel: GRAMMAR_CATEGORIES[item.category]?.label || item.category,
+          level: _scope.level || item.level,
+        });
       }
     });
   }

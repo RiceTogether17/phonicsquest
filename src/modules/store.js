@@ -82,6 +82,9 @@ const DEFAULT_STATE = {
   currentLesson: null,      // { date, startedAt, teachDone, completedAt, bonusAwarded }
   lessonHistory: [],        // [{ date, band, steps, completedAt }] capped at 30
 
+  // Parent-visible log of child-initiated AI tutor calls (aiGuardrails.js).
+  aiUsageLog: [],           // [{ date, at, kind, summary }] capped at 100
+
   // Grammar category stats (Cloze Castle)
   grammarCategoryStats: {}, // { [level-category]: { attempts, correct, accuracy } }
 

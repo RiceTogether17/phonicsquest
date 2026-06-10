@@ -13,7 +13,8 @@ import { questMastery } from '../modules/questMastery.js';
 import { audio } from '../modules/audio.js';
 import { getLevelInfo } from '../data/curriculum.js';
 import { gradeShortAnswer } from './scoring/shortAnswerGrader.js';
-import { hasApiKey, gradeSynthesisAnswer } from '../modules/aiService.js';
+import { hasApiKey, gradeSynthesisAnswer, explainTeachBack } from '../modules/aiService.js';
+import { attachAskGiriButton } from '../components/askGiriButton.js';
 
 const LEVEL_LABELS = { P4: 'Primary 4', P5: 'Primary 5', P6: 'Primary 6' };
 const SESSION_SIZE = 8;
@@ -401,7 +402,7 @@ async function _checkAnswer(item) {
   _recordOutcome(item, false);
 
   if (_tries >= MAX_TRIES) {
-    _showTeachBackOverlay(item, () => { _qIdx++; _renderQuestion(); });
+    _showTeachBackOverlay(item, () => { _qIdx++; _renderQuestion(); }, typed);
     return;
   }
 
@@ -483,7 +484,7 @@ function _showSuccessCard(item, typed) {
 }
 
 // ── Teach-back overlay (after 2 wrong) ───────────────────────────────────────
-function _showTeachBackOverlay(item, onContinue) {
+function _showTeachBackOverlay(item, onContinue, typed = '') {
   const tb = SQ_TEACHBACK[item.skillKey] || { icon: '📘', rule: item.skill, structure: '', tip: '' };
   const game = _container.querySelector('.sq-game');
   if (!game) { onContinue(); return; }
@@ -509,6 +510,17 @@ function _showTeachBackOverlay(item, onContinue) {
     </div>`;
 
   game.appendChild(overlay);
+
+  if (typed) {
+    attachAskGiriButton(overlay.querySelector('.eq-teachback-card'), () => explainTeachBack({
+      skillLabel: item.skill || item.skillKey,
+      exercise: `Rewrite: "${item.original}"${item.stem ? ` starting with "${item.stem}"` : ''}`,
+      studentAnswer: typed,
+      correctAnswer: item.answer,
+      level: _level,
+    }));
+  }
+
   overlay.querySelector('.eq-teachback-continue').addEventListener('click', () => {
     overlay.remove();
     onContinue();
