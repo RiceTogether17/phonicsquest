@@ -1,4 +1,6 @@
 import { escapeHtml } from '../utils/escapeHtml.js';
+import { explainMistake, getAdaptiveHint } from '../modules/aiService.js';
+import { attachAskGiriButton } from '../components/askGiriButton.js';
 
 function getSelectedOptionExplanation(item, selectedChoice) {
   const explanations = item?.optionExplanations;
@@ -45,4 +47,46 @@ export function buildMcqFeedbackHtml(item, selectedChoice, isCorrect, { showClue
   }
 
   return hintText;
+}
+
+/**
+ * Append an on-demand "Ask Giri why ✨" button below the authored feedback.
+ *
+ * Strictly additive: the authored explanation is already rendered; this
+ * only appears when an API key is configured and asks the AI to elaborate
+ * in child-safe language. Call after setting the feedback element's HTML.
+ *
+ * @param {HTMLElement|null} hintEl  the feedback element
+ * @param {object} params            { item, selectedChoice, level }
+ */
+export function attachAskGiri(hintEl, { item, selectedChoice, level = '' } = {}) {
+  if (!hintEl || !item) return;
+  const authored = item.optionExplanations?.[selectedChoice] || item.explain || '';
+  attachAskGiriButton(hintEl, () => explainMistake({
+    question: item.q,
+    options: item.choices,
+    chosen: selectedChoice,
+    correct: item.answer,
+    authoredExplanation: typeof authored === 'string' ? authored.replace(/<[^>]*>/g, '') : '',
+    level,
+  }));
+}
+
+/**
+ * Append a "Giri's hint ✨" button to the rule-hint panel: a question-specific
+ * nudge that never names a choice. Sits above the authored rule/example/tip
+ * tiers, which remain the offline default.
+ *
+ * @param {HTMLElement|null} panelEl  the opened rule-hint panel
+ * @param {object} params             { item, categoryLabel, level }
+ */
+export function attachGiriHint(panelEl, { item, categoryLabel = '', level = '' } = {}) {
+  if (!panelEl || !item || panelEl.querySelector('.mcq-ask-giri')) return;
+  attachAskGiriButton(panelEl, () => getAdaptiveHint({
+    question: item.q,
+    options: item.choices,
+    correct: item.answer,
+    categoryLabel,
+    level,
+  }), { label: "Giri's hint for this question ✨", ariaLabel: 'Ask Giri for a hint about this question' });
 }

@@ -78,6 +78,9 @@ export function renderDashboard(container, opts = {}) {
     <!-- B5: Recent Pattern Insights -->
     <div id="dash-patterns-section"></div>
 
+    <!-- B6: Tutor activity — guided lessons, read-aloud, AI usage -->
+    <div id="dash-tutor-activity"></div>
+
     <div id="dash-reporting-section"></div>
     <div id="dash-moe-section"></div>
 
@@ -176,6 +179,7 @@ export function renderDashboard(container, opts = {}) {
   _renderLiteracyDomains();
   _renderClueInsights();
   _renderPatternInsights();
+  _renderTutorActivity();
   _renderCategoryReporting();
   _renderMoeOutcomes();
 
@@ -763,6 +767,62 @@ function _renderPatternInsights() {
     <ul class="dash-pattern-list">
       ${insights.map(i => `<li class="dash-pattern-item">💬 ${i}</li>`).join('')}
     </ul>`;
+}
+
+/**
+ * Tutor-style activity report: guided lessons completed, read-aloud
+ * sessions (with words to practise together), and the parent-visible
+ * AI usage log. Each block renders only when there is data.
+ */
+function _renderTutorActivity() {
+  const container = document.getElementById('dash-tutor-activity');
+  if (!container) return;
+
+  const lessons = (store.get('lessonHistory') || []).slice(0, 30);
+  const readAloud = store.get('readAloudStats') || {};
+  const aiLog = (store.get('aiUsageLog') || []).slice(0, 8);
+  const readAloudEntries = Object.entries(readAloud)
+    .sort((a, b) => String(b[1]?.updatedAt || '').localeCompare(String(a[1]?.updatedAt || '')))
+    .slice(0, 5);
+
+  if (!lessons.length && !readAloudEntries.length && !aiLog.length) return;
+
+  const cutoff = Date.now() - 14 * 24 * 60 * 60 * 1000;
+  const lessonsRecent = lessons.filter(l => {
+    const t = new Date(l.completedAt || l.date).getTime();
+    return Number.isFinite(t) && t >= cutoff;
+  }).length;
+
+  const lessonHtml = lessons.length ? `
+    <div class="dash-stat-card">
+      <span class="dash-stat-value">${lessonsRecent}</span>
+      <span class="dash-stat-label">Guided lessons · last 14 days</span>
+    </div>` : '';
+
+  const missedWords = [...new Set(readAloudEntries.flatMap(([, s]) => s?.lastMissedWords || []))].slice(0, 8);
+  const readAloudHtml = readAloudEntries.length ? `
+    <div class="dash-stat-card">
+      <span class="dash-stat-value">${readAloudEntries.reduce((sum, [, s]) => sum + (s?.attempts || 0), 0)}</span>
+      <span class="dash-stat-label">Read-to-Giri story readings</span>
+    </div>` : '';
+
+  const aiKinds = { explain: '❓ Why explained', hint: '💡 Hint', ask: '🦉 Ask Giri', grade: '✍️ Essay marked' };
+  const aiHtml = aiLog.length ? `
+    <details class="dash-ai-log">
+      <summary>✨ AI tutor usage (${aiLog.length} recent) — everything your child asked</summary>
+      <ul class="dash-pattern-list">
+        ${aiLog.map(e => `<li class="dash-pattern-item">${aiKinds[e.kind] || e.kind} · ${escapeHtml(e.summary || '')} <small>(${escapeHtml(e.date || '')})</small></li>`).join('')}
+      </ul>
+    </details>` : '';
+
+  container.innerHTML = `
+    <h3 class="dash-section-title" style="margin-top:24px">Tutor Activity</h3>
+    <div class="dash-stats-grid">
+      ${lessonHtml}
+      ${readAloudHtml}
+    </div>
+    ${missedWords.length ? `<p class="dash-pattern-item" style="margin-top:8px">🔤 <strong>Words to practise together</strong> (flagged while reading aloud): ${missedWords.map(escapeHtml).join(', ')}</p>` : ''}
+    ${aiHtml}`;
 }
 
 // ── Existing chart/mastery/history sections ───────────────────────────────────

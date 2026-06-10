@@ -17,6 +17,8 @@ import { audio } from '../modules/audio.js';
 import { runStoryQuest } from './storyQuest.js';
 import { mapCharIndexToWord, isOffscreen } from '../modules/karaokeUtils.js';
 import { lookupWord as lookupWordForDetective, addWordToReview } from '../modules/wordDetective.js';
+import { isReadAloudSupported, listenToLine, stopListening } from '../modules/readAloudListener.js';
+import { store } from '../modules/store.js';
 import { modalManager } from '../modules/modalManager.js';
 import { unlockFriend, isFriendUnlocked, getRosterSummary, friendFromStory } from '../modules/storyFriends.js';
 import {
@@ -72,6 +74,15 @@ let _boundarySupported = null; // null = untested, true/false after first TTS at
 // Echo-read state
 let _echoLineIdx  = -1;       // current echo-read line index (-1 = not active)
 let _echoStory    = null;     // story reference during echo-read
+
+// Read-to-Giri state (line-by-line listening — see readAloudListener.js)
+let _rtgActive    = false;
+let _rtgLineIdx   = -1;       // index into _rtgLines
+let _rtgLines     = [];       // data-line indexes that contain readable words
+let _rtgNullCount = 0;        // consecutive failed recognitions (degrade at 2)
+let _rtgMisses    = [];       // words flagged for checking this session
+let _rtgMatches   = 0;
+let _rtgTotal     = 0;
 
 // ── Story completion tracking ─────────────────────────────────────────────
 const READ_KEY = 'giri_stories_read';
@@ -205,6 +216,7 @@ export function cleanupStoryMode() {
   _stopTTS();
   _stopFluencyTimer();
   cleanupRecording();
+  _resetReadToGiri();
   _activeWord = null;
   _removeDecodePanel();
   _echoLineIdx = -1;
@@ -710,6 +722,27 @@ function _renderReadAloud(story) {
         </div>
       </details>
 
+      <!-- Read to Giri section (collapsible) — Giri listens while you read -->
+      <details class="story-tool-section rtg-bar" id="rtg-bar">
+        <summary class="story-tool-summary rtg-summary">
+          <span class="rtg-label">🦉 Read to Giri</span>
+          <span class="rtg-hint">Read each line — Giri listens</span>
+        </summary>
+        <div class="story-tool-body">
+          ${isReadAloudSupported() ? /* html */`
+            <div class="rtg-controls" id="rtg-controls">
+              <button class="btn btn--ghost" id="btn-rtg-start">Start</button>
+              <button class="btn btn--primary" id="btn-rtg-listen" hidden>🎙 Read this line</button>
+              <button class="btn btn--ghost" id="btn-rtg-next" hidden>Next line →</button>
+              <button class="btn btn--ghost btn--sm" id="btn-rtg-exit" hidden>✕ Exit</button>
+            </div>
+            <div class="rtg-status" id="rtg-status" aria-live="polite"></div>
+          ` : /* html */`
+            <p class="rtg-status">Giri can't listen in this browser — use 🎙 Record Reading instead and play it back together.</p>
+          `}
+        </div>
+      </details>
+
       <!-- Echo Read section (collapsible) -->
       <details class="story-tool-section echo-read-bar" id="echo-read-bar">
         <summary class="story-tool-summary echo-read-summary">
@@ -815,6 +848,10 @@ function _renderReadAloud(story) {
   // Recording controls
   _wireRecordingControls(story);
 
+  // Read to Giri controls
+  _resetReadToGiri();
+  _wireReadToGiriControls(story);
+
   // Echo Read controls
   _wireEchoReadControls(story);
 
@@ -828,6 +865,200 @@ function _renderReadAloud(story) {
       _renderBrowser();
     });
   });
+}
+
+// ── Read to Giri (line-by-line listening) ─────────────────────────────────
+//
+// The child reads the glowing line; Giri listens (one single-shot recognition
+// per line — continuous recognition is unreliable for children) and lights up
+// the words it heard clearly. Flagged words are framed as "let's check this
+// word together", never as errors, and are added to the spaced-review queue.
+
+function _wireReadToGiriControls(story) {
+  document.getElementById('btn-rtg-start')?.addEventListener('click', () => _startReadToGiri(story));
+  document.getElementById('btn-rtg-listen')?.addEventListener('click', () => _rtgListen(story));
+  document.getElementById('btn-rtg-next')?.addEventListener('click', () => _rtgAdvance(story));
+  document.getElementById('btn-rtg-exit')?.addEventListener('click', () => {
+    _resetReadToGiri();
+    _renderReadAloud(story);
+  });
+}
+
+function _rtgSetStatus(html) {
+  const el = document.getElementById('rtg-status');
+  if (el) el.innerHTML = html;
+}
+
+function _rtgLineEl() {
+  const lineIdx = _rtgLines[_rtgLineIdx];
+  return document.querySelector(`#story-body .sline[data-line="${lineIdx}"]`) || null;
+}
+
+function _startReadToGiri(story) {
+  // Word-level highlighting needs the word spans — switch follow mode if the
+  // reader is in whole-line mode, then resume from the re-rendered DOM.
+  if (_followMode !== 'word') {
+    _followMode = 'word';
+    _persistPref(PREFS_FOLLOW_KEY, _followMode);
+    _renderReadAloud(story);
+    const bar = document.getElementById('rtg-bar');
+    if (bar) bar.open = true;
+  }
+
+  _stopTTS();
+  const lines = Array.from(document.querySelectorAll('#story-body .sline'))
+    .filter(el => el.querySelector('.wf-word'))
+    .map(el => Number(el.dataset.line));
+  if (lines.length === 0) return;
+
+  _rtgActive = true;
+  _rtgLines = lines;
+  _rtgLineIdx = 0;
+  _rtgNullCount = 0;
+  _rtgMisses = [];
+  _rtgMatches = 0;
+  _rtgTotal = 0;
+
+  document.getElementById('btn-rtg-start')?.setAttribute('hidden', '');
+  document.getElementById('btn-rtg-listen')?.removeAttribute('hidden');
+  document.getElementById('btn-rtg-exit')?.removeAttribute('hidden');
+  _rtgHighlightCurrent();
+  _rtgSetStatus('Read the glowing line out loud, then tap <strong>🎙 Read this line</strong>.');
+}
+
+function _rtgHighlightCurrent() {
+  document.querySelectorAll('#story-body .sline--rtg-current')
+    .forEach(el => el.classList.remove('sline--rtg-current'));
+  const el = _rtgLineEl();
+  if (el) {
+    el.classList.add('sline--rtg-current');
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+}
+
+async function _rtgListen(story) {
+  const lineEl = _rtgLineEl();
+  const listenBtn = document.getElementById('btn-rtg-listen');
+  if (!lineEl || !listenBtn || listenBtn.disabled) return;
+
+  const spans = Array.from(lineEl.querySelectorAll('.wf-word'));
+  const expectedText = spans.map(s => (s.textContent || '').trim()).filter(Boolean).join(' ');
+  if (!expectedText) { _rtgAdvance(story); return; }
+
+  listenBtn.disabled = true;
+  listenBtn.textContent = '🦉 Giri is listening…';
+  _rtgSetStatus('Go ahead — read the glowing line now.');
+
+  const result = await listenToLine(expectedText);
+
+  listenBtn.disabled = false;
+  listenBtn.textContent = '🎙 Read this line';
+  if (!_rtgActive) return; // exited while listening
+
+  if (!result) {
+    _rtgNullCount++;
+    if (_rtgNullCount >= 2) {
+      _rtgSetStatus('Giri is having trouble hearing today. You can keep trying, or use <strong>🎙 Record Reading</strong> below and listen back together.');
+    } else {
+      _rtgSetStatus("Giri couldn't hear that — move a little closer to the microphone and try again!");
+    }
+    return;
+  }
+  _rtgNullCount = 0;
+
+  // Light up what Giri heard. Accepted = match or unsure (we never tell a
+  // child they read a word wrongly on shaky evidence); only clear misses are
+  // flagged — gently — for checking together.
+  const flaggedHere = [];
+  result.words.forEach((w, i) => {
+    const span = spans[i];
+    if (!span) return;
+    span.classList.remove('rtg-word--match', 'rtg-word--check');
+    if (w.status === 'miss') {
+      span.classList.add('rtg-word--check');
+      const clean = w.word.replace(/[^a-z]/g, '');
+      if (clean.length > 2) {
+        flaggedHere.push(clean);
+        addWordToReview(clean);
+      }
+    } else {
+      span.classList.add('rtg-word--match');
+    }
+  });
+
+  const accepted = result.words.filter(w => w.status !== 'miss').length;
+  _rtgMatches += accepted;
+  _rtgTotal += result.words.length;
+  _rtgMisses.push(...flaggedHere);
+
+  const isLast = _rtgLineIdx >= _rtgLines.length - 1;
+  if (flaggedHere.length > 0) {
+    _rtgSetStatus(`Nice reading! Let's check the orange ${flaggedHere.length === 1 ? 'word' : 'words'} together — tap ${flaggedHere.length === 1 ? 'it' : 'each one'} to hear it. Then ${isLast ? 'finish up' : 'go on'}!`);
+  } else {
+    _rtgSetStatus('⭐ Great — Giri heard every word!');
+  }
+
+  document.getElementById('btn-rtg-listen')?.setAttribute('hidden', '');
+  const nextBtn = document.getElementById('btn-rtg-next');
+  if (nextBtn) {
+    nextBtn.textContent = isLast ? '🌟 Finish' : 'Next line →';
+    nextBtn.removeAttribute('hidden');
+    nextBtn.focus();
+  }
+}
+
+function _rtgAdvance(story) {
+  if (_rtgLineIdx >= _rtgLines.length - 1) {
+    _rtgFinish(story);
+    return;
+  }
+  _rtgLineIdx++;
+  document.getElementById('btn-rtg-next')?.setAttribute('hidden', '');
+  document.getElementById('btn-rtg-listen')?.removeAttribute('hidden');
+  _rtgHighlightCurrent();
+  _rtgSetStatus('Read the glowing line out loud, then tap <strong>🎙 Read this line</strong>.');
+}
+
+function _rtgFinish(story) {
+  const pct = _rtgTotal > 0 ? Math.round((_rtgMatches / _rtgTotal) * 100) : 0;
+  const missedUnique = [...new Set(_rtgMisses)];
+
+  // Per-story stats for the parent dashboard / report card.
+  const stats = { ...(store.get('readAloudStats') || {}) };
+  const prev = stats[story.id] || { attempts: 0 };
+  stats[story.id] = {
+    attempts: (prev.attempts || 0) + 1,
+    lastMatchPct: pct,
+    lastMissedWords: missedUnique.slice(0, 12),
+    updatedAt: new Date().toISOString(),
+  };
+  store.set('readAloudStats', stats);
+
+  document.querySelectorAll('#story-body .sline--rtg-current')
+    .forEach(el => el.classList.remove('sline--rtg-current'));
+  document.getElementById('btn-rtg-next')?.setAttribute('hidden', '');
+  document.getElementById('btn-rtg-exit')?.setAttribute('hidden', '');
+  const startBtn = document.getElementById('btn-rtg-start');
+  if (startBtn) { startBtn.removeAttribute('hidden'); startBtn.textContent = 'Read it again'; }
+
+  const missNote = missedUnique.length
+    ? ` Words to practise: <strong>${missedUnique.slice(0, 6).join(', ')}</strong> — they've been added to your review pile.`
+    : ' Every word was loud and clear!';
+  _rtgSetStatus(`🌟 You read the whole story to Giri — ${pct}% heard clearly.${missNote}`);
+
+  markStoryRead(story.id);
+  _rtgActive = false;
+}
+
+function _resetReadToGiri() {
+  if (_rtgActive) stopListening();
+  _rtgActive = false;
+  _rtgLineIdx = -1;
+  _rtgLines = [];
+  _rtgNullCount = 0;
+  _rtgMisses = [];
+  _rtgMatches = 0;
+  _rtgTotal = 0;
 }
 
 /**

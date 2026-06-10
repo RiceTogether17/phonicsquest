@@ -39,6 +39,98 @@ export async function callGemini(prompt, { maxTokens = 1024, temperature = 0.3 }
 }
 
 /**
+ * Ask Giri to elaborate on WHY a chosen answer was right or wrong.
+ * Strictly additive: callers always show the authored explanation first
+ * and append this only when it resolves. Returns null without a key,
+ * over the daily cap, or on any failure.
+ *
+ * @param {object} params
+ * @param {string} params.question        the question/stem as shown
+ * @param {string[]} params.options       all choices
+ * @param {string} params.chosen          what the child picked
+ * @param {string} params.correct         the correct answer
+ * @param {string} [params.authoredExplanation]  the built-in explanation (so the AI adds, not repeats)
+ * @param {string|number} [params.level]  P1–P6 level for pitch
+ * @returns {Promise<string|null>}
+ */
+export async function explainMistake({ question, options, chosen, correct, authoredExplanation = '', level = '' }) {
+  const { askGiriConstrained } = await import('./aiGuardrails.js');
+  const wasRight = chosen === correct;
+  const prompt = `A ${level ? `${level} ` : ''}student answered a multiple-choice English question.
+
+Question: ${question}
+Choices: ${options.join(' / ')}
+Student chose: "${chosen}" — ${wasRight ? 'CORRECT' : `wrong (correct answer: "${correct}")`}
+${authoredExplanation ? `The app already told them: "${authoredExplanation}"` : ''}
+
+${wasRight
+    ? 'In 1–2 short sentences, reinforce WHY their answer is right so the idea transfers to the next question.'
+    : 'In 2–3 short sentences, explain the thinking mistake that leads to their choice, then how to spot the right answer next time. Be kind — mistakes are how we learn.'}`;
+
+  return askGiriConstrained('explain', prompt, {
+    maxTokens: 160,
+    logSummary: `Why: ${String(question).slice(0, 80)}`,
+  });
+}
+
+/**
+ * Ask Giri for a nudge-don't-tell hint on the current question.
+ * Returns null without a key, over the daily cap, or on failure.
+ *
+ * @param {object} params
+ * @param {string} params.question
+ * @param {string[]} params.options
+ * @param {string} params.correct        never revealed to the child
+ * @param {string} [params.categoryLabel]
+ * @param {string|number} [params.level]
+ * @returns {Promise<string|null>}
+ */
+export async function getAdaptiveHint({ question, options, correct, categoryLabel = '', level = '' }) {
+  const { askGiriConstrained } = await import('./aiGuardrails.js');
+  const prompt = `A ${level ? `${level} ` : ''}student is stuck on this English question${categoryLabel ? ` about ${categoryLabel}` : ''}:
+
+Question: ${question}
+Choices: ${options.join(' / ')}
+(The correct answer is "${correct}" — you must NOT say it or name any choice.)
+
+Give ONE short hint (max 25 words) that points at the clue in the sentence or the rule to think about, WITHOUT revealing or naming any answer choice.`;
+
+  return askGiriConstrained('hint', prompt, {
+    maxTokens: 80,
+    logSummary: `Hint: ${String(question).slice(0, 80)}`,
+  });
+}
+
+/**
+ * Ask Giri to elaborate on a teach-back moment (cloze passage, synthesis
+ * rewrite, editing correction) where the child has already seen the rule
+ * and the correct answer. Returns null without a key / capped / failure.
+ *
+ * @param {object} params
+ * @param {string} params.skillLabel      e.g. "Past tense", "Passive voice"
+ * @param {string} params.exercise        the sentence/blank/task as shown
+ * @param {string} params.studentAnswer   what the child wrote or picked
+ * @param {string} params.correctAnswer
+ * @param {string|number} [params.level]
+ * @returns {Promise<string|null>}
+ */
+export async function explainTeachBack({ skillLabel, exercise, studentAnswer, correctAnswer, level = '' }) {
+  const { askGiriConstrained } = await import('./aiGuardrails.js');
+  const prompt = `A ${level ? `${level} ` : ''}student is practising ${skillLabel || 'English'} and has tried twice without success. They have already been shown the rule and the correct answer — your job is to make it click.
+
+Exercise: ${exercise}
+Student's answer: "${studentAnswer}"
+Correct answer: "${correctAnswer}"
+
+In 2–3 short sentences, explain the thinking mistake behind their answer and how to spot the right one next time. Be kind — mistakes are how we learn.`;
+
+  return askGiriConstrained('explain', prompt, {
+    maxTokens: 160,
+    logSummary: `Teach-back: ${String(skillLabel || exercise).slice(0, 80)}`,
+  });
+}
+
+/**
  * Get sentence-level writing coach feedback for a student's draft.
  * Returns HTML string with inline <mark> annotations, or null if no key/failure.
  *
@@ -65,6 +157,67 @@ Focus only on: grammar errors, word choice, punctuation, sentence structure.
 Give at most 5 findings. If the draft is good, say: GOOD: Well done!`;
 
   return callGemini(prompt, { maxTokens: 600, temperature: 0.2 });
+}
+
+/**
+ * Grade a composition against the same 4-dimension rubric the local
+ * evaluator uses (writingEvaluator.js), so the AI bands sit beside the
+ * local bands without inventing a different scale. The local score stays
+ * the source of truth for XP/progression — this is tutor commentary.
+ *
+ * Routed through the aiGuardrails daily cap + usage log, but with its own
+ * marking prompt (a rubric needs more than the 60-word chat persona).
+ *
+ * @param {string} draftText
+ * @param {number|string} level   P1–P6 numeric level
+ * @param {string} [taskDesc]
+ * @returns {Promise<{ dimensions: Record<string, { band: number, comment: string }>, overall: string } | null>}
+ */
+export async function gradeEssayWithRubric(draftText, level, taskDesc = '') {
+  const { canCallAi, logAiUse, sanitizeAiText } = await import('./aiGuardrails.js');
+  if (!canCallAi()) return null;
+  logAiUse('grade', `Essay graded (P${level})`);
+
+  const prompt = `You are a Singapore primary school English teacher grading a P${level} student's composition against a 4-band rubric (4 = Strong, 3 = Secure, 2 = Developing, 1 = Needs Support). Judge against P${level} expectations, not adult standards.
+
+Task: ${taskDesc || 'Write a story or composition.'}
+
+Student's draft:
+"""
+${draftText}
+"""
+
+Grade these four dimensions. Reply EXACTLY in this format, one line each, no other text:
+CONTENT: <band 1-4> | <one short, specific comment in plain English>
+ORGANISATION: <band 1-4> | <one short, specific comment>
+LANGUAGE: <band 1-4> | <one short, specific comment>
+TASK: <band 1-4> | <one short, specific comment>
+OVERALL: <one encouraging sentence naming the single most useful next improvement>`;
+
+  const raw = await callGemini(prompt, { maxTokens: 300, temperature: 0.2 });
+  if (!raw) return null;
+
+  const keyMap = { CONTENT: 'content', ORGANISATION: 'organisation', LANGUAGE: 'language', TASK: 'taskFulfilment' };
+  const dimensions = {};
+  let overall = '';
+  for (const line of raw.split('\n').map(l => l.trim()).filter(Boolean)) {
+    const m = line.match(/^([A-Z]+):\s*(.*)$/);
+    if (!m) continue;
+    if (m[1] === 'OVERALL') {
+      overall = sanitizeAiText(m[2]);
+      continue;
+    }
+    const key = keyMap[m[1]];
+    if (!key) continue;
+    const parts = m[2].split('|');
+    const band = parseInt(parts[0], 10);
+    if (!Number.isInteger(band) || band < 1 || band > 4) continue;
+    dimensions[key] = { band, comment: sanitizeAiText(parts.slice(1).join('|')) };
+  }
+
+  // All four dimensions must parse for the grading to be usable.
+  if (Object.keys(dimensions).length < 4) return null;
+  return { dimensions, overall };
 }
 
 /**

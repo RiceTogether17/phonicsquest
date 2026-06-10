@@ -6,6 +6,8 @@
  */
 
 import { inferQuestionContextType } from './mcqItemMetadata.js';
+import { makeFallbackOptionExplanations } from './mcqOptionExplanations.js';
+import { GRAMMAR_TIPS } from './grammarTips.js';
 
 export const GRAMMAR_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 
@@ -4323,9 +4325,10 @@ function buildLevel(level) {
       answer: spec.answer,
       explain: spec.explain,
     };
-    // Pass through optional per-item fields only when the builder provided them,
-    // so items without them stay clean.
-    if (spec.optionExplanations) item.optionExplanations = spec.optionExplanations;
+    // Prefer builder-authored per-choice explanations; otherwise fall back to
+    // generic ones built from the category rule so every wrong answer teaches.
+    item.optionExplanations = spec.optionExplanations
+      || makeFallbackOptionExplanations(item.answer, item.choices, GRAMMAR_TIPS[category]);
     if (spec.clueWords) item.clueWords = spec.clueWords;
     if (spec.reasoning) item.reasoning = spec.reasoning;
     item.contextType = inferQuestionContextType(item.q);

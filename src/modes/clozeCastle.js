@@ -43,6 +43,8 @@ import { mascot } from '../components/mascot.js';
 import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
 import { getUniqueClozeDone, recordClozeCompletion } from './clozeCompletionTracker.js';
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
+import { attachAskGiriButton } from '../components/askGiriButton.js';
+import { explainTeachBack } from '../modules/aiService.js';
 import { renderReadFirstScan } from './readFirstScan.js';
 import { buildScanAttention, renderScanAttention } from './scanTask.js';
 import { buildCopySummaryText, buildParentReport, getModeConfig, getNextStepRecommendation, getSummaryScoreLine, groupWrongLinesBySkill, pickStrongestWeakest } from './clozeSessionSummary.js';
@@ -961,7 +963,7 @@ function _checkPassage(passage) {
           host: _container.querySelector('.cloze-game'),
           title: 'Review Mistakes',
           rows: _buildReviewRows(passage, userAnswers),
-          onContinue: () => _showTeachBackOverlay(passage),
+          onContinue: () => _showTeachBackOverlay(passage, userAnswers),
         });
       }, 800);
     } else {
@@ -979,6 +981,12 @@ function _checkPassage(passage) {
 
 function _renderClozeRuleCard(catKey, onStart) {
   if (!_container) return;
+  // Record the teach event so the lesson planner knows this rule was covered.
+  const seen = { ...(store.get('lessonsSeen') || {}) };
+  if (!seen[`cloze:${catKey}`]) {
+    seen[`cloze:${catKey}`] = new Date().toISOString();
+    store.set('lessonsSeen', seen);
+  }
   const tip = getGrammarTip(catKey);
   const meta = GRAMMAR_CATEGORIES[catKey] || { icon: '🏰', label: catKey };
 
@@ -1016,8 +1024,9 @@ function _renderClozeRuleCard(catKey, onStart) {
  * Show a grammar tip overlay when the learner has failed a passage twice.
  * Displays the rule, an example, and a "Got it, try again" button.
  * @param {object} passage
+ * @param {string[]} [userAnswers]  the child's fills, for the Ask-Giri elaboration
  */
-function _showTeachBackOverlay(passage) {
+function _showTeachBackOverlay(passage, userAnswers = []) {
   if (!_container) return;
 
   const existing = document.getElementById('cloze-teachback-overlay');
@@ -1056,6 +1065,21 @@ function _showTeachBackOverlay(passage) {
     </div>`;
 
   _container.appendChild(overlay);
+
+  // On-demand AI elaboration on the missed blanks (additive — the authored
+  // tip above is always shown; this only appears with a configured key).
+  const wrongBlanks = passage.answers
+    .map((correctAnswer, i) => ({ n: i + 1, correctAnswer, studentAnswer: userAnswers[i] || '(left blank)' }))
+    .filter(w => w.studentAnswer !== w.correctAnswer);
+  if (wrongBlanks.length > 0) {
+    attachAskGiriButton(overlay.querySelector('.ctb-panel'), () => explainTeachBack({
+      skillLabel: catKey ? (GRAMMAR_CATEGORIES[catKey]?.label || catKey) : 'grammar cloze',
+      exercise: `Fill in the blanks: "${passage.text}"`,
+      studentAnswer: wrongBlanks.map(w => `blank ${w.n}: ${w.studentAnswer}`).join(', '),
+      correctAnswer: wrongBlanks.map(w => `blank ${w.n}: ${w.correctAnswer}`).join(', '),
+      level: _currentLevel,
+    }));
+  }
 
   overlay.querySelector('#ctb-try-again')?.addEventListener('click', () => {
     overlay.remove();

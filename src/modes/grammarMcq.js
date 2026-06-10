@@ -5,7 +5,7 @@ import { GRAMMAR_MCQ_ITEMS, GRAMMAR_MCQ_LEVELS, buildGrammarMcqLevel } from '../
 import { GRAMMAR_CATEGORIES, GRAMMAR_CATEGORY_KEYS, categoryAppliesToLevel } from '../data/grammarCategories.js';
 import { checkPostAttempt } from '../modules/remediationRouter.js';
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
-import { buildMcqFeedbackHtml } from './mcqFeedback.js';
+import { buildMcqFeedbackHtml, attachAskGiri, attachGiriHint } from './mcqFeedback.js';
 import { filterMcqItemsForDifficulty, MCQ_DIFFICULTIES, renderMcqDifficultyToggle } from './mcqDifficulty.js';
 import { GRAMMAR_TIPS, getGrammarTip } from '../data/grammarTips.js';
 
@@ -24,6 +24,24 @@ let _missed = [];
 let _isRecovery = false;
 let _sessionSkillStats = {}; // category -> { correct, total }
 let _categoryWrong = {}; // category -> consecutive wrong count
+let _ruleCardsShown = 0; // teach-cards shown this session (capped)
+
+/** Max rule cards to interleave per mixed session — a tutor teaches a few
+ *  new things per sitting, not every concept at once. */
+const MAX_RULE_CARDS_PER_SESSION = 3;
+
+function _lessonKey(category) { return `gmcq:${category}`; }
+
+function _hasBeenTaught(category) {
+  return !!(store.get('lessonsSeen') || {})[_lessonKey(category)];
+}
+
+function _markTaught(category) {
+  const seen = { ...(store.get('lessonsSeen') || {}) };
+  if (seen[_lessonKey(category)]) return;
+  seen[_lessonKey(category)] = new Date().toISOString();
+  store.set('lessonsSeen', seen);
+}
 
 export function initGrammarMcq(container, onGoHome) {
   _container = container;
@@ -200,6 +218,7 @@ function _startScope({ level = null, category = null, label = '', difficulty = _
   _isRecovery = false;
   _answered = false;
   _categoryWrong = {};
+  _ruleCardsShown = 0;
   if (_scope.category && !_isRecovery) {
     _renderRuleCard(_scope.category, () => _renderQuestion());
   } else {
@@ -218,6 +237,7 @@ function _startRecovery() {
   _isRecovery = true;
   _answered = false;
   _categoryWrong = {};
+  _ruleCardsShown = MAX_RULE_CARDS_PER_SESSION; // recovery rounds don't re-teach
   _renderQuestion();
 }
 
@@ -246,6 +266,12 @@ function _renderQuestion() {
   if (!_container) return;
   const item = _items[_idx];
   if (!item) return _renderDone();
+
+  // Teach before practice: the first time this profile meets a category in a
+  // mixed session, show its rule card first (scoped sessions teach at start).
+  if (!_hasBeenTaught(item.category) && _ruleCardsShown < MAX_RULE_CARDS_PER_SESSION) {
+    return _renderRuleCard(item.category, () => _renderQuestion());
+  }
 
   _answered = false;
   const progressPct = Math.round(((_idx) / _items.length) * 100);
@@ -333,7 +359,10 @@ function _renderQuestion() {
         hintText += `<br><span class="mcq-struggling-tip"><strong>📚 Rule reminder:</strong> ${escapeHtml(confusionTip.rule)}<br><em>${escapeHtml(confusionTip.example)}</em></span>`;
       }
 
-      if (hint) hint.innerHTML = hintText;
+      if (hint) {
+        hint.innerHTML = hintText;
+        attachAskGiri(hint, { item, selectedChoice: ans, level: _scope.level || item.level });
+      }
 
       const nextWrap = _container.querySelector('#gmcq-next-wrap');
       const nextBtn = _container.querySelector('#gmcq-next');
@@ -365,6 +394,11 @@ function _renderQuestion() {
           <p class="mcq-hint-rule"><strong>Rule:</strong> ${escapeHtml(tip.rule)}</p>
           <p class="mcq-hint-eg"><em>${escapeHtml(tip.example)}</em></p>
           <p class="mcq-hint-tip">${escapeHtml(tip.tip)}</p>`;
+        attachGiriHint(ruleHintPanel, {
+          item,
+          categoryLabel: GRAMMAR_CATEGORIES[item.category]?.label || item.category,
+          level: _scope.level || item.level,
+        });
       }
     });
   }
@@ -395,6 +429,8 @@ function _renderSkillBreakdown() {
 }
 
 function _renderRuleCard(category, onStart) {
+  _ruleCardsShown += 1;
+  _markTaught(category);
   const tip = getGrammarTip(category);
   const meta = GRAMMAR_CATEGORIES[category] || { icon: '🧠', label: category };
   _container.innerHTML = `

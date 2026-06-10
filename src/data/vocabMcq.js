@@ -5,6 +5,9 @@
  * contextual stems for upper-primary practice.
  */
 
+import { makeFallbackOptionExplanations } from './mcqOptionExplanations.js';
+import { VOCAB_CATEGORIES } from './vocabCategories.js';
+
 export const VOCAB_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 
 const LEVEL_CATEGORY_PLAN = {
@@ -1118,8 +1121,10 @@ function buildLevel(level) {
       answer: spec.answer,
       explain: spec.explain,
     };
-    // Pass through optional per-item fields only when the builder provided them.
-    if (spec.optionExplanations) item.optionExplanations = spec.optionExplanations;
+    // Prefer builder-authored per-choice explanations; otherwise fall back to
+    // generic ones built from the category rule so every wrong answer teaches.
+    item.optionExplanations = spec.optionExplanations
+      || makeFallbackOptionExplanations(item.answer, item.choices, VOCAB_CATEGORIES[item.category]);
     if (spec.clueWords) item.clueWords = spec.clueWords;
     if (spec.reasoning) item.reasoning = spec.reasoning;
     // Two-sentence context items are inherently harder — promote to difficulty 3

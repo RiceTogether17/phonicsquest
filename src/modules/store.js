@@ -72,6 +72,22 @@ const DEFAULT_STATE = {
   // Group mastery (per group accuracy)
   groupMastery: {},         // { [group]: accuracy 0-1 }
 
+  // Explicit-instruction tracking: which mini-lessons / rule cards have been
+  // taught to this profile. Keys are namespaced lesson ids, e.g.
+  // 'phonics:cvc-a', 'gmcq:articles', 'vmcq:contextInference'.
+  lessonsSeen: {},          // { [lessonKey]: isoDate }
+
+  // Today's guided lesson (lessonRunner.js): per-day session state plus a
+  // capped history of completed lessons for the parent report.
+  currentLesson: null,      // { date, startedAt, teachDone, completedAt, bonusAwarded }
+  lessonHistory: [],        // [{ date, band, steps, completedAt }] capped at 30
+
+  // Parent-visible log of child-initiated AI tutor calls (aiGuardrails.js).
+  aiUsageLog: [],           // [{ date, at, kind, summary }] capped at 100
+
+  // Read-to-Giri per-story listening stats (storyMode.js).
+  readAloudStats: {},       // { [storyId]: { attempts, lastMatchPct, lastMissedWords, updatedAt } }
+
   // Grammar category stats (Cloze Castle)
   grammarCategoryStats: {}, // { [level-category]: { attempts, correct, accuracy } }
 

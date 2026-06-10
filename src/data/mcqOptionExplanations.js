@@ -54,3 +54,22 @@ export function makeTenseOptionExplanations(answer, distractors, rule) {
     return `Not quite — “${choice}” is a different tense or verb form. The time clue points to “${answer}”.`;
   });
 }
+
+/**
+ * Generic per-choice explanations for items whose builder did not author
+ * richer ones. Uses the category's rule/tip so the feedback still teaches
+ * the transferable strategy rather than just naming the answer.
+ *
+ * @param {string} answer
+ * @param {string[]} choices    - all choices including the answer
+ * @param {{ rule?: string, tip?: string, label?: string }} categoryTip
+ */
+export function makeFallbackOptionExplanations(answer, choices, categoryTip = {}) {
+  const distractors = choices.filter(c => c !== answer);
+  const rule = categoryTip.rule || '';
+  const tip = categoryTip.tip || '';
+  return optionMap(answer, distractors, (choice, isCorrect) => {
+    if (isCorrect) return `Correct — “${choice}” is the choice that fits this sentence. ${rule}`.trim();
+    return `Not quite — “${choice}” does not fit here; the sentence needs “${answer}”. ${tip || rule}`.trim();
+  });
+}

@@ -127,6 +127,95 @@ class SpeechRecognizer {
     });
   }
 
+  /**
+   * Listen and return the raw transcript alternatives without scoring
+   * against a single target word. Used by the read-aloud listener to
+   * align a whole spoken line against the expected words.
+   *
+   * @param {object} [opts]
+   * @param {number} [opts.timeoutMs]  hard stop — children pause a lot mid-line
+   * @returns {Promise<{ transcripts: { text: string, confidence: number }[] } | null>}
+   *   null if unsupported, disabled, cancelled, or nothing was heard
+   */
+  listenTranscript({ timeoutMs = 12000 } = {}) {
+    if (!this.supported) return Promise.resolve(null);
+    if (store.get('speechEnabled') === false) return Promise.resolve(null);
+
+    return new Promise((resolve) => {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const preferredLocale = store.get('speechLocale') || 'en-SG';
+      const locales = buildSpeechLocales(preferredLocale);
+      let localeIndex = 0;
+
+      const startRecognition = () => {
+        this.stop();
+
+        this._recognition = new SpeechRecognition();
+        this._recognition.lang = locales[localeIndex];
+        this._recognition.continuous = false;
+        this._recognition.interimResults = false;
+        this._recognition.maxAlternatives = 5;
+
+        const timeout = setTimeout(() => {
+          this.stop();
+          resolve(null);
+        }, timeoutMs);
+
+        this._recognition.onresult = (event) => {
+          clearTimeout(timeout);
+          this._listening = false;
+          const transcripts = Array.from(event.results[0]).map(r => ({
+            text: r.transcript.toLowerCase().trim(),
+            confidence: r.confidence,
+          })).filter(t => t.text);
+          resolve(transcripts.length ? { transcripts } : null);
+        };
+
+        this._recognition.onerror = (event) => {
+          clearTimeout(timeout);
+          this._listening = false;
+
+          const canFallback =
+            (event?.error === 'language-not-supported' || event?.error === 'service-not-allowed')
+            && localeIndex < locales.length - 1;
+
+          if (canFallback) {
+            localeIndex += 1;
+            startRecognition();
+            return;
+          }
+
+          resolve(null);
+        };
+
+        this._recognition.onend = () => {
+          clearTimeout(timeout);
+          this._listening = false;
+        };
+
+        this._listening = true;
+        try {
+          this._recognition.start();
+        } catch (err) {
+          devWarn('Recognition start failed:', err.message);
+          clearTimeout(timeout);
+          this._listening = false;
+          resolve(null);
+        }
+      };
+
+      startRecognition();
+    });
+  }
+
+  /**
+   * Public phonetic similarity (0–1) between two single words.
+   * Cached; used by the read-aloud aligner.
+   */
+  phoneticSimilarity(a, b) {
+    return this._phoneticSimilarity((a || '').toLowerCase(), (b || '').toLowerCase());
+  }
+
   /** Stop listening */
   stop() {
     if (this._recognition) {
