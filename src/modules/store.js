@@ -72,6 +72,11 @@ const DEFAULT_STATE = {
   // Group mastery (per group accuracy)
   groupMastery: {},         // { [group]: accuracy 0-1 }
 
+  // Explicit-instruction tracking: which mini-lessons / rule cards have been
+  // taught to this profile. Keys are namespaced lesson ids, e.g.
+  // 'phonics:cvc-a', 'gmcq:articles', 'vmcq:contextInference'.
+  lessonsSeen: {},          // { [lessonKey]: isoDate }
+
   // Grammar category stats (Cloze Castle)
   grammarCategoryStats: {}, // { [level-category]: { attempts, correct, accuracy } }
 

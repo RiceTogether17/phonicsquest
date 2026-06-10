@@ -79,7 +79,14 @@ describe('user-flow: P4 user completes Grammar MCQ', () => {
       // Answer 3 questions. The product no longer auto-advances — after
       // each answer the child sees the explanation and clicks Next/See
       // Results to move on. The test mirrors that explicit flow.
+      // New categories teach first: dismiss any rule card before answering.
       for (let i = 0; i < 3; i += 1) {
+        let ruleStart = root.querySelector('#mcq-rule-start');
+        while (ruleStart) {
+          ruleStart.click();
+          vi.advanceTimersByTime(50);
+          ruleStart = root.querySelector('#mcq-rule-start');
+        }
         const choice = root.querySelector('[data-choice]');
         expect(choice, `question ${i + 1} should render a choice button`).not.toBeNull();
         choice.click();

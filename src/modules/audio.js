@@ -502,6 +502,19 @@ class AudioManager {
   }
 
   /**
+   * Speak an arbitrary instruction or teaching line with the configured
+   * voice. Used by the mini-lesson overlay to narrate Giri's script.
+   * Slightly faster floor than word playback so sentences sound natural.
+   * @param {string} text
+   * @returns {Promise<void>}
+   */
+  speakText(text) {
+    if (!store.get('sfxEnabled')) return Promise.resolve();
+    const rate = Math.max(store.get('voiceSpeed') ?? 0.8, 0.85);
+    return this._speak(text, rate);
+  }
+
+  /**
    * Speak a word at a slower, articulated rate WITHOUT segmenting.
    *
    * For First / Last / Middle Sound modes, the child has to identify

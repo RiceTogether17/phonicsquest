@@ -979,6 +979,12 @@ function _checkPassage(passage) {
 
 function _renderClozeRuleCard(catKey, onStart) {
   if (!_container) return;
+  // Record the teach event so the lesson planner knows this rule was covered.
+  const seen = { ...(store.get('lessonsSeen') || {}) };
+  if (!seen[`cloze:${catKey}`]) {
+    seen[`cloze:${catKey}`] = new Date().toISOString();
+    store.set('lessonsSeen', seen);
+  }
   const tip = getGrammarTip(catKey);
   const meta = GRAMMAR_CATEGORIES[catKey] || { icon: '🏰', label: catKey };
 

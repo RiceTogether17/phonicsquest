@@ -29,6 +29,7 @@ import { getMistakesDenSummary, timeAgo as mistakeTimeAgo, MISTAKES_LOOKBACK_DAY
 import { getPersonalBests } from './modules/personalBestWall.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
 import { mascot } from './components/mascot.js';
+import { findStageForGroup, hasSeenLesson, maybeShowStageLesson } from './components/miniLesson.js';
 import { spinWheel, buildWordAnimation } from './components/wheel.js';
 import { celebrateCorrect, celebrateLevelUp, celebrateStreak, celebrateDailyGoal } from './components/confettiHelper.js';
 import { MODES } from './modes/index.js';
@@ -849,7 +850,7 @@ class App {
     const mode = MODES[this._mode];
     if (!mode) return;
 
-    mode.setup(this._currentWord, {
+    const setupMode = () => mode.setup(this._currentWord, {
       ...this._els,
       onResult: (correct, responseTime) => this._handleResult(correct, responseTime),
       onGroupChange: (group) => {
@@ -858,6 +859,17 @@ class App {
         this._startGame(group || undefined);
       },
     });
+
+    // Explicit instruction first: the first time a child practises a
+    // curriculum stage, Giri teaches it (mini-lesson overlay) before
+    // independent practice begins. Wheel "free play" groups (short-a, …)
+    // don't map to a stage and start immediately.
+    const lessonStage = this._sessionType === 'normal' && group ? findStageForGroup(group) : null;
+    if (lessonStage && !hasSeenLesson(`phonics:${lessonStage.id}`)) {
+      maybeShowStageLesson(group).then(setupMode, setupMode);
+    } else {
+      setupMode();
+    }
   }
 
   _nextWord() {

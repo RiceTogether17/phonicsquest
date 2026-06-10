@@ -147,6 +147,51 @@ export const GRAMMAR_TIPS = {
     example: 'Read the whole sentence. Find the subject, the time clue, and the sentence pattern — they will guide you to the right answer.',
     tip: 'For each blank: (1) What is the subject? (2) What is the time? (3) Is it active or passive? (4) Is there a connector clue?',
   },
+  demonstratives: {
+    rule: 'Demonstratives point to things. Use "this" (one, near) and "these" (many, near); "that" (one, far) and "those" (many, far).',
+    example: '"This book in my hand is new." — "Those birds on the far tree are noisy."',
+    tip: 'Ask two questions: near or far? One or many? Near + one → this. Far + many → those.',
+  },
+  whQuestions: {
+    rule: 'Wh- words ask for different information: who (person), what (thing), when (time), where (place), why (reason), how (way or manner).',
+    example: '"Where is your bag?" — "Why are you late?" — "How did you fix it?"',
+    tip: 'Look at the answer the question expects. A place? Use "where". A reason? Use "why".',
+  },
+  reflexivePronouns: {
+    rule: 'Reflexive pronouns (myself, yourself, himself, herself, itself, ourselves, yourselves, themselves) are used when the subject does something to itself.',
+    example: '"She hurt herself while skating." — "We baked the cake ourselves."',
+    tip: 'Match the reflexive to the subject: I → myself, he → himself, they → themselves. One you → yourself; many you → yourselves.',
+  },
+  homophones: {
+    rule: 'Homophones sound the same but have different spellings and meanings: their/there/they\'re, your/you\'re, to/too/two, hear/here.',
+    example: '"They\'re putting their bags over there." — "I can hear you from here."',
+    tip: 'Say the sentence with the long form ("they are", "you are"). If it still makes sense, use the apostrophe form.',
+  },
+  tagQuestions: {
+    rule: 'A tag question repeats the auxiliary and flips it: a positive sentence takes a negative tag, and a negative sentence takes a positive tag.',
+    example: '"She is coming, isn\'t she?" — "You haven\'t eaten, have you?" — "Tom can swim, can\'t he?"',
+    tip: 'Find the helping verb and the subject, then flip: positive → negative tag, negative → positive tag.',
+  },
+  compoundIndefinite: {
+    rule: 'Compound indefinite pronouns combine some/any/no/every with -one, -body, -thing, -where. Use some- in positive sentences, any- in questions and negatives.',
+    example: '"Someone left a note." — "Is there anything to eat?" — "He went nowhere all day."',
+    tip: 'Positive statement → someone/something. Question or negative → anyone/anything. Remember: these words are singular.',
+  },
+  wordForms: {
+    rule: 'The same base word has different forms: noun (decision), verb (decide), adjective (decisive), adverb (decisively). Choose the form that fits the job in the sentence.',
+    example: '"She made a wise decision." (noun) — "She decided wisely." (verb + adverb)',
+    tip: 'Look at the slot: after "a/an/the" you usually need a noun; describing a noun needs an adjective; describing a verb needs an adverb.',
+  },
+  gerundInfinitive: {
+    rule: 'Some verbs are followed by -ing (enjoy, finish, avoid, keep, mind), and some by to + verb (want, decide, hope, plan, agree).',
+    example: '"I enjoy swimming." — "She wants to swim." — "He avoided answering."',
+    tip: 'Learn the verb pairs: enjoy/finish/avoid + -ing; want/hope/decide + to. After a preposition, always use -ing.',
+  },
+  inversion: {
+    rule: 'After negative openers like "Never", "Rarely", "Not only", or "Hardly", the auxiliary verb comes before the subject, like in a question.',
+    example: '"Never have I seen such rain." — "Not only did she win, but she also set a record."',
+    tip: 'Starts with a negative word like never/rarely/not only? Move the helping verb in front of the subject: "Never have I…", not "Never I have…".',
+  },
 };
 
 /**
