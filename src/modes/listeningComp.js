@@ -297,6 +297,14 @@ function _renderMcqQuestion(qIndex) {
   const q     = questions[qIndex];
   const total = questions.length;
 
+  // Shuffle at render time — authored option order must never be learnable
+  // (e.g. "the first option is always right").
+  const shuffled = [...q.options];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
   _container.innerHTML = `
     <section class="lc-browser" aria-label="Question ${qIndex + 1} of ${total}">
       <header style="margin-bottom:var(--space-3,12px)">
@@ -310,7 +318,7 @@ function _renderMcqQuestion(qIndex) {
           Q${qIndex + 1}. ${escapeHtml(q.q || '')}
         </p>
         <div class="lc-mcq-options" style="display:flex;flex-direction:column;gap:8px">
-          ${q.options.map(opt => `
+          ${shuffled.map(opt => `
             <button class="btn btn--ghost lc-mcq-option" type="button" data-choice="${escapeHtml(opt)}"
                     style="text-align:left;justify-content:flex-start">${escapeHtml(opt)}</button>`).join('')}
         </div>
