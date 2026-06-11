@@ -88,6 +88,10 @@ const DEFAULT_STATE = {
   // Read-to-Giri per-story listening stats (storyMode.js).
   readAloudStats: {},       // { [storyId]: { attempts, lastMatchPct, lastMissedWords, updatedAt } }
 
+  // Home tab state (homeTabs.js): last-used tab, reset to Today each new day.
+  homeTab: null,            // 'today' | 'learn' | 'extra' | 'grownups'
+  homeTabDate: null,        // 'YYYY-MM-DD' the tab was last used
+
   // Grammar category stats (Cloze Castle)
   grammarCategoryStats: {}, // { [level-category]: { attempts, correct, accuracy } }
 

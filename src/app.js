@@ -26,6 +26,7 @@ import {
 } from './modules/bedtimeMode.js';
 import { getMistakesDenSummary, timeAgo as mistakeTimeAgo, MISTAKES_LOOKBACK_DAYS } from './modules/mistakesDen.js';
 import { buildGiriQuestionChips, answerChipOffline, answerChipAi, askGiriFreeText } from './modules/askGiri.js';
+import { initHomeTabs, selectTab, getInitialTab } from './modules/homeTabs.js';
 import { attachAskGiriButton } from './components/askGiriButton.js';
 import { hasApiKey } from './modules/aiService.js';
 import { getPersonalBests } from './modules/personalBestWall.js';
@@ -188,6 +189,7 @@ class App {
 
     settingsController.apply(store);
     restoreActiveProfile();
+    initHomeTabs();
 
     gamification.init();
     mascot.init();
@@ -1028,6 +1030,9 @@ class App {
       this._updatePersonalBestBanner();
       this._renderGuidedJourney();
       this._refreshQuestProgress();
+      // Re-apply tab choice on every return home: covers a day rolling over
+      // mid-session (back to Today) and a profile switch (their last tab).
+      selectTab(getInitialTab(), { persist: false });
     }
   }
 
@@ -1372,7 +1377,7 @@ class App {
                    <div class="ob-bonus-item">🎡 <strong>Random Activity</strong> — spin the wheel for a surprise mode</div>
                    <div class="ob-bonus-item">🔤 <strong>Letter Sounds</strong> — tap any sound to hear it</div>
                  </div>
-                 <p class="ob-bonus-note">Find these in the <strong>Extra Practice</strong> section below the main lesson cards.</p>`,
+                 <p class="ob-bonus-note">Find these in the <strong>🎁 Extra</strong> tab at the top of the home screen.</p>`,
         },
       ],
       'emerging-decoder': [
@@ -1447,7 +1452,7 @@ class App {
                    <div class="ob-bonus-item">🃏 <strong>Sight Words</strong> — flip &amp; match high-frequency words</div>
                    <div class="ob-bonus-item">🎡 <strong>Random Activity</strong> — spin the wheel for variety</div>
                  </div>
-                 <p class="ob-bonus-note">Find these in the <strong>Extra Practice</strong> section below the main lesson cards.</p>`,
+                 <p class="ob-bonus-note">Find these in the <strong>🎁 Extra</strong> tab at the top of the home screen.</p>`,
         },
       ],
     };
