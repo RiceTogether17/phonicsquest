@@ -2861,6 +2861,28 @@ class App {
     } else {
       banner.style.display = 'none';
     }
+    this._updateTodayTabBadge();
+  }
+
+  /**
+   * Small count pill on the 🎯 Today tab: review-due words + recent
+   * mistakes, so a child sees there's something waiting without opening
+   * the tab. Capped at 9+ to stay glanceable.
+   */
+  _updateTodayTabBadge() {
+    const badge = document.getElementById('home-tab-today-badge');
+    if (!badge) return;
+    let count = 0;
+    try { count += progress.getReviewDueCount() || 0; } catch (_) { /* fresh profile */ }
+    try { count += getMistakesDenSummary().count || 0; } catch (_) { /* fresh profile */ }
+    badge.hidden = count === 0;
+    badge.textContent = count > 9 ? '9+' : String(count);
+    const tab = document.getElementById('home-tab-today');
+    if (tab) {
+      tab.setAttribute('aria-label', count > 0
+        ? `Today — your lesson and reviews, ${count} item${count === 1 ? '' : 's'} waiting`
+        : 'Today — your lesson and reviews');
+    }
   }
 
   /**

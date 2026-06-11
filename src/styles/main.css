@@ -8492,6 +8492,27 @@ details.story-tool-section[open] > .story-tool-summary::before {
   outline: 3px solid var(--color-primary, #6c63ff);
   outline-offset: 2px;
 }
+/* Count pill on the Today tab (review-due + recent mistakes) */
+.home-tab__badge {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full, 999px);
+  background: var(--color-warning, #f59e0b);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.home-tab {
+  position: relative;
+}
 .home-tabpanel[hidden] {
   display: none;
 }
