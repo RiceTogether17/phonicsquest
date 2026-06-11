@@ -20,6 +20,7 @@ import {
   findUnknownCapitalised,
   extractCountableTokens,
   GRAPHEME_TIERS,
+  SUFFIX_TIERS,
   STORY_PHASES,
 } from '../modules/decodability.js';
 
@@ -51,13 +52,16 @@ const STORY_SUFFICIENCY_TARGETS = [
   { band: 'B', phase: 'long-e', min: 3 },
   { band: 'B', phase: 'long-i', min: 3 },
   { band: 'B', phase: 'long-o', min: 3 },
+  { band: 'B', phase: 'long-u', min: 3 },
+  { band: 'B', phase: 'short-digraphs', min: 2 },
   { band: 'B', phase: 'extension-sg', min: 5 },
-  { band: 'C', phase: 'r-controlled', min: 5 },
+  { band: 'C', phase: 'r-controlled', min: 7 },
   { band: 'C', phase: 'digraphs', min: 3 },
+  { band: 'C', phase: 'suffixes', min: 1 },
   { band: 'C', phase: 'extension-sg', min: 1 },
-  { band: 'D', phase: 'diphthongs', min: 2 },
-  { band: 'D', phase: 'advanced-vowel', min: 4 },
-  { band: 'D', phase: 'chapter', min: 3 },
+  { band: 'D', phase: 'diphthongs', min: 4 },
+  { band: 'D', phase: 'advanced-vowel', min: 6 },
+  { band: 'D', phase: 'chapter', min: 5 },
 ];
 
 const analyses = new Map(STORIES.map(s => [s.id, analyzeStory(s)]));
@@ -173,7 +177,9 @@ describe('focus honesty (R7)', () => {
     for (const s of STORIES) {
       const { tier } = getStoryPhase(s.phase);
       for (const g of s.targetGraphemes) {
-        const needed = g.length === 1 ? (g === 'y' ? 2 : 1) : GRAPHEME_TIERS[g.toLowerCase()];
+        const needed = g.length === 1
+          ? (g === 'y' ? 2 : 1)
+          : GRAPHEME_TIERS[g.toLowerCase()] ?? SUFFIX_TIERS[g.toLowerCase()];
         expect(needed, `${s.id}: unknown target grapheme "${g}"`).toBeDefined();
         expect(needed, `${s.id}: target "${g}" needs tier ${needed}, phase grants ${tier}`)
           .toBeLessThanOrEqual(tier);

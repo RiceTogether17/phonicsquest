@@ -111,7 +111,7 @@ export const GRAPHEME_TIERS = Object.freeze({
 });
 
 /** Suffixes the scanner may strip, with the tier the suffix itself needs. */
-const SUFFIX_TIERS = Object.freeze({
+export const SUFFIX_TIERS = Object.freeze({
   s: 1, es: 1, ed: 2, ing: 2, er: 2, est: 2,
 });
 
@@ -192,6 +192,19 @@ function requiredTierFromEntry(entry) {
 }
 
 /**
+ * Hand-curated segmentations where the greedy longest-match scan would
+ * chunk across a syllable boundary (the schwa-prefix words: 'away' is
+ * a·way, not aw·ay). Letter-level fallback parsing can't fix these
+ * without destroying the tier signal for real diphthong words, so the
+ * exceptions are listed explicitly.
+ */
+const SEGMENTATION_OVERRIDES = Object.freeze({
+  away: ['a', 'w', 'ay'],
+  awake: ['a', 'w', 'a_e', 'k'],
+  awoke: ['a', 'w', 'o_e', 'k'],
+});
+
+/**
  * Greedy longest-match grapheme scan of an unknown word.
  * Returns the parse (for diagnostics) and the highest tier required.
  *
@@ -204,6 +217,16 @@ function requiredTierFromEntry(entry) {
  * @returns {{ tier: number, parse: string[] }}
  */
 export function scanWord(word) {
+  const override = SEGMENTATION_OVERRIDES[word];
+  if (override) {
+    let max = 1;
+    for (const g of override) {
+      const t = g.length === 1 ? 1 : GRAPHEME_TIERS[g];
+      if (t > max) max = t;
+    }
+    return { tier: max, parse: [...override] };
+  }
+
   const parse = [];
   let tier = 1;
   let i = 0;
