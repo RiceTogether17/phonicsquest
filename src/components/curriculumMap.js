@@ -80,16 +80,15 @@ function _getDomainStatus(domainId) {
   return { status, pct };
 }
 
-export function renderCurriculumMap(container, { onClose } = {}) {
-  if (!container) return;
-
-  const profile      = getActiveProfile();
-  const isPrimary    = profile?.schoolLevel === 'primary';
+/**
+ * Phonics phase cards HTML (status, progress, "You are here!" marker).
+ * Shared by the dashboard curriculum map and the parent Learning Roadmap.
+ * @param {string} [avatar]
+ * @returns {string}
+ */
+export function buildPhaseCardsHtml(avatar = '🦁') {
   const currentPhase = _getCurrentPhase();
-  const avatar       = profile?.avatar || '🦁';
-  const name         = profile?.name?.split(' ')[0] || 'Learner';
-
-  const phaseCards = PHASE_META.map(pm => {
+  return PHASE_META.map(pm => {
     const { status, pct, masteredCount, total } = _getPhaseStatus(pm.phase);
     const isCurrent = pm.phase === currentPhase && status !== 'complete';
     const statusLabel = { complete: 'Complete ✅', 'in-progress': 'In progress', locked: 'Not started yet' }[status] || '';
@@ -116,8 +115,15 @@ export function renderCurriculumMap(container, { onClose } = {}) {
         ` : `<span class="cm-phase-meta cm-phase-meta--locked">${statusLabel}</span>`}
       </div>`;
   }).join('');
+}
 
-  const domainCards = PRIMARY_DOMAINS.map(pd => {
+/**
+ * Primary English domain cards HTML. Shared by the dashboard map and the
+ * parent Learning Roadmap.
+ * @returns {string}
+ */
+export function buildDomainCardsHtml() {
+  return PRIMARY_DOMAINS.map(pd => {
     const { status, pct } = _getDomainStatus(pd.id);
     const statusClass = `cm-domain--${status}`;
     const statusLabel = { strong: 'Strong ✅', building: 'Building', starting: 'Just started', 'not-started': 'Not started yet' }[status] || '';
@@ -135,6 +141,18 @@ export function renderCurriculumMap(container, { onClose } = {}) {
           </div>` : ''}
       </div>`;
   }).join('');
+}
+
+export function renderCurriculumMap(container, { onClose } = {}) {
+  if (!container) return;
+
+  const profile      = getActiveProfile();
+  const isPrimary    = profile?.schoolLevel === 'primary';
+  const avatar       = profile?.avatar || '🦁';
+  const name         = profile?.name?.split(' ')[0] || 'Learner';
+
+  const phaseCards  = buildPhaseCardsHtml(avatar);
+  const domainCards = buildDomainCardsHtml();
 
   container.innerHTML = `
     <div class="cm-wrapper" role="dialog" aria-label="${name}'s learning journey">

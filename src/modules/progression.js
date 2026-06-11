@@ -302,14 +302,17 @@ export function explainLockReason(stageId, snapshot = buildProgressionSnapshot()
   if (failed.length === 0) return null;
   return failed.map(([key, c]) => {
     const label = labels[key] || key;
+    // Count-based checks must format as counts, not percentages — check
+    // these BEFORE the generic ratio branch (uniqueWords/sessionDays carry
+    // actual/required as plain counts).
+    if (c.reason === 'too-few-unique-words')   return `${label}: ${c.actual}/${c.required} words`;
+    if (c.reason === 'too-few-session-days')   return `${label}: ${c.actual}/${c.required} sessions`;
+    if (c.reason === 'no-decoding-data')       return `${label}: practise this stage first`;
     if (c.actual !== undefined && c.required !== undefined) {
       const a = Math.round((c.actual ?? 0) * 100);
       const r = Math.round((c.required ?? 0) * 100);
       return `${label}: ${a}% (need ${r}%)`;
     }
-    if (c.reason === 'too-few-unique-words')   return `${label}: ${c.actual}/${c.required} words`;
-    if (c.reason === 'too-few-session-days')   return `${label}: ${c.actual}/${c.required} sessions`;
-    if (c.reason === 'no-decoding-data')       return `${label}: practise this stage first`;
     return `${label}: not yet`;
   }).join(' · ');
 }
