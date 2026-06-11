@@ -22,6 +22,7 @@ describe('SCREENS', () => {
     expect(SCREENS.WORD_VAULT).toBe('screen-word-vault');
     expect(SCREENS.EDITING_QUEST).toBe('screen-editing-quest');
     expect(SCREENS.WRITING_QUEST).toBe('screen-writing-quest');
+    expect(SCREENS.ROADMAP).toBe('screen-roadmap');
   });
 
   it('is frozen (immutable)', () => {

@@ -26,6 +26,8 @@ import {
 } from './modules/bedtimeMode.js';
 import { getMistakesDenSummary, timeAgo as mistakeTimeAgo, MISTAKES_LOOKBACK_DAYS } from './modules/mistakesDen.js';
 import { buildGiriQuestionChips, answerChipOffline, answerChipAi, askGiriFreeText } from './modules/askGiri.js';
+import { initHomeTabs, selectTab, getInitialTab } from './modules/homeTabs.js';
+import { buildJourneyBarHtml, STAGE_META } from './components/journeyBar.js';
 import { attachAskGiriButton } from './components/askGiriButton.js';
 import { hasApiKey } from './modules/aiService.js';
 import { getPersonalBests } from './modules/personalBestWall.js';
@@ -54,6 +56,7 @@ import { lazyModule } from './modes/lazy.js';
 // Cleanup paths use `.get()?.fn()` so a feature that was never opened is a
 // safe no-op.
 const dashboardMod    = lazyModule(() => import('./components/dashboard.js'));
+const roadmapMod      = lazyModule(() => import('./components/roadmap.js'));
 const storyModeMod    = lazyModule(() => import('./modes/storyMode.js'));
 const sentenceForgeMod = lazyModule(() => import('./modes/sentenceForge.js'));
 const clozeCastleMod  = lazyModule(() => import('./modes/clozeCastle.js'));
@@ -188,6 +191,7 @@ class App {
 
     settingsController.apply(store);
     restoreActiveProfile();
+    initHomeTabs();
 
     gamification.init();
     mascot.init();
@@ -331,6 +335,14 @@ class App {
       storyModeMod.get()?.cleanupStoryMode();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
+    });
+
+    document.getElementById('btn-home-roadmap')?.addEventListener('click', () => {
+      this._openRoadmap();
+    });
+
+    document.getElementById('btn-roadmap-back')?.addEventListener('click', () => {
+      this._showScreen(SCREENS.HOME);
     });
 
     document.getElementById('btn-letter-sounds')?.addEventListener('click', () => {
@@ -1028,6 +1040,9 @@ class App {
       this._updatePersonalBestBanner();
       this._renderGuidedJourney();
       this._refreshQuestProgress();
+      // Re-apply tab choice on every return home: covers a day rolling over
+      // mid-session (back to Today) and a profile switch (their last tab).
+      selectTab(getInitialTab(), { persist: false });
     }
   }
 
@@ -1372,7 +1387,7 @@ class App {
                    <div class="ob-bonus-item">🎡 <strong>Random Activity</strong> — spin the wheel for a surprise mode</div>
                    <div class="ob-bonus-item">🔤 <strong>Letter Sounds</strong> — tap any sound to hear it</div>
                  </div>
-                 <p class="ob-bonus-note">Find these in the <strong>Extra Practice</strong> section below the main lesson cards.</p>`,
+                 <p class="ob-bonus-note">Find these in the <strong>🎁 Extra</strong> tab at the top of the home screen.</p>`,
         },
       ],
       'emerging-decoder': [
@@ -1447,7 +1462,7 @@ class App {
                    <div class="ob-bonus-item">🃏 <strong>Sight Words</strong> — flip &amp; match high-frequency words</div>
                    <div class="ob-bonus-item">🎡 <strong>Random Activity</strong> — spin the wheel for variety</div>
                  </div>
-                 <p class="ob-bonus-note">Find these in the <strong>Extra Practice</strong> section below the main lesson cards.</p>`,
+                 <p class="ob-bonus-note">Find these in the <strong>🎁 Extra</strong> tab at the top of the home screen.</p>`,
         },
       ],
     };
@@ -1745,58 +1760,12 @@ class App {
 
     const chips = getLearnerSummaryChips();
 
-    const stageMeta = {
-      'pre-reader': { icon: '🌱', label: 'Pre-reader Journey', mod: 'pathway-badge--preschool' },
-      'emerging-decoder': { icon: '🧩', label: 'Emerging Decoder Journey', mod: 'pathway-badge--preschool' },
-      'developing-reader': { icon: '📘', label: 'Developing Reader Journey', mod: 'pathway-badge--primary' },
-      reader: { icon: '🏫', label: 'Reader Journey', mod: 'pathway-badge--primary' },
-    };
-    const pathwayIcon  = stageMeta[readingBand]?.icon || '🌱';
-    const pathwayLabel = stageMeta[readingBand]?.label || 'Reading Journey';
-    const pathwayMod   = stageMeta[readingBand]?.mod || 'pathway-badge--preschool';
+    const pathwayIcon  = STAGE_META[readingBand]?.icon || '🌱';
+    const pathwayLabel = STAGE_META[readingBand]?.label || 'Reading Journey';
+    const pathwayMod   = STAGE_META[readingBand]?.mod || 'pathway-badge--preschool';
     const profileName  = profile?.name ? `${profile.name}'s ` : '';
 
-    // Progress bar: each of 4 stages = 25%, plus partial credit from within-stage mastery.
-    const JOURNEY_STAGES = [
-      { key: 'pre-reader',       label: 'Pre-reader',   shortLabel: 'Pre',     desc: 'Learning sounds & letters' },
-      { key: 'emerging-decoder', label: 'Emerging',     shortLabel: 'Emerging', desc: 'Decoding simple words' },
-      { key: 'developing-reader',label: 'Developing',   shortLabel: 'Developing', desc: 'Reading short stories' },
-      { key: 'reader',           label: 'Reader',       shortLabel: 'Reader',  desc: 'Reading fluently' },
-    ];
-    const currentStageIdx = JOURNEY_STAGES.findIndex(s => s.key === readingBand);
-    const safeIdx         = currentStageIdx === -1 ? 0 : currentStageIdx;
-    const groupMastery    = store.get('groupMastery') || {};
-    const masteryValues   = Object.values(groupMastery).filter(v => typeof v === 'number');
-    const avgMastery      = masteryValues.length ? masteryValues.reduce((a, b) => a + b, 0) / masteryValues.length : 0;
-    const withinStagePct  = Math.min(Math.round(avgMastery * 100), 99);
-    const baseProgress    = safeIdx * 25;
-    const totalProgress   = Math.min(baseProgress + Math.round(withinStagePct * 0.25), 100);
-    const nextStage       = JOURNEY_STAGES[safeIdx + 1];
-
-    const journeyStepsHtml = JOURNEY_STAGES.map((s, i) => {
-      const isDone    = i < safeIdx;
-      const isCurrent = i === safeIdx;
-      return `<div class="journey-stage ${isDone ? 'journey-stage--done' : ''} ${isCurrent ? 'journey-stage--current' : ''}"
-                   aria-label="${s.label}${isCurrent ? ' (current)' : isDone ? ' (complete)' : ''}">
-        <div class="journey-stage-dot">${isDone ? '✓' : isCurrent ? stageMeta[readingBand]?.icon || '•' : ''}</div>
-        <span class="journey-stage-name">${s.shortLabel}</span>
-      </div>`;
-    }).join('<div class="journey-stage-connector"></div>');
-
-    const journeyBarHtml = `
-      <div class="reading-journey-bar" aria-label="Reading level progress">
-        <div class="journey-bar-header">
-          <span class="journey-bar-title">Reading Journey</span>
-          <span class="journey-bar-stage">${JOURNEY_STAGES[safeIdx].label} · Stage ${safeIdx + 1} of 4</span>
-        </div>
-        <div class="journey-progress-track" role="progressbar" aria-valuenow="${totalProgress}" aria-valuemin="0" aria-valuemax="100" aria-label="Overall reading level: ${totalProgress}%">
-          <div class="journey-progress-fill" style="width:${totalProgress}%"></div>
-        </div>
-        <div class="journey-stages">
-          ${journeyStepsHtml}
-        </div>
-        ${nextStage ? `<p class="journey-next-goal">Next: <strong>${nextStage.label}</strong> — ${nextStage.desc}</p>` : '<p class="journey-next-goal">🏅 Reading journey complete!</p>'}
-      </div>`;
+    const journeyBarHtml = buildJourneyBarHtml(readingBand, store.get('groupMastery') || {});
 
     const chipsHtml = chips.length
       ? `<div class="progress-chips" aria-label="Progress snapshot">
@@ -1828,10 +1797,11 @@ class App {
     section.innerHTML = `
       ${journeyBarHtml}
 
-      <div class="pathway-badge ${pathwayMod}" aria-label="Learning pathway: ${pathwayLabel}">
+      <button class="pathway-badge ${pathwayMod}" id="pathway-badge-btn" aria-label="Learning pathway: ${pathwayLabel} — open the learning roadmap">
         <span class="pathway-badge-icon" aria-hidden="true">${pathwayIcon}</span>
         <span class="pathway-badge-text">${profileName}${pathwayLabel}</span>
-      </div>
+        <span class="pathway-badge-map" aria-hidden="true">🗺️</span>
+      </button>
 
       ${lessonHeroHtml}
 
@@ -1839,6 +1809,12 @@ class App {
 
     section.querySelector('#lesson-hero-cta')?.addEventListener('click', () => {
       this._runLessonStep(next);
+    });
+
+    // The pathway badge doubles as the roadmap entry (this section is
+    // innerHTML-rebuilt each render, so per-render binding is the pattern).
+    section.querySelector('#pathway-badge-btn')?.addEventListener('click', () => {
+      this._openRoadmap();
     });
 
     // Award the completion bonus the moment the last step ticks over.
@@ -2885,6 +2861,28 @@ class App {
     } else {
       banner.style.display = 'none';
     }
+    this._updateTodayTabBadge();
+  }
+
+  /**
+   * Small count pill on the 🎯 Today tab: review-due words + recent
+   * mistakes, so a child sees there's something waiting without opening
+   * the tab. Capped at 9+ to stay glanceable.
+   */
+  _updateTodayTabBadge() {
+    const badge = document.getElementById('home-tab-today-badge');
+    if (!badge) return;
+    let count = 0;
+    try { count += progress.getReviewDueCount() || 0; } catch (_) { /* fresh profile */ }
+    try { count += getMistakesDenSummary().count || 0; } catch (_) { /* fresh profile */ }
+    badge.hidden = count === 0;
+    badge.textContent = count > 9 ? '9+' : String(count);
+    const tab = document.getElementById('home-tab-today');
+    if (tab) {
+      tab.setAttribute('aria-label', count > 0
+        ? `Today — your lesson and reviews, ${count} item${count === 1 ? '' : 's'} waiting`
+        : 'Today — your lesson and reviews');
+    }
   }
 
   /**
@@ -2944,6 +2942,30 @@ class App {
     } else {
       banner.style.display = 'none';
     }
+  }
+
+  /**
+   * Open the Learning Roadmap — the parent journey map. Deliberately not
+   * behind the parent PIN: it shows motivational progress info and mutates
+   * nothing; detailed scores/exports stay in the PIN-gated dashboard,
+   * reachable from the roadmap footer.
+   */
+  async _openRoadmap() {
+    const host = document.getElementById('roadmap-content');
+    if (!host) return;
+    const m = await roadmapMod.load();
+    m.renderRoadmap(host, {
+      onClose: () => this._showScreen(SCREENS.HOME),
+      onOpenDashboard: () => {
+        this._showScreen(SCREENS.HOME);
+        document.getElementById('dashboard-btn')?.click();
+      },
+      onGoToday: () => {
+        this._showScreen(SCREENS.HOME);
+        selectTab('today');
+      },
+    });
+    this._showScreen(SCREENS.ROADMAP);
   }
 
   /**

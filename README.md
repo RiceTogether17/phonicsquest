@@ -49,11 +49,14 @@ Grouped by school-paper component so parents and teachers can match each module 
 | Comprehension | 📚 Open-ended Comprehension | Paper 2 · Comprehension Open-ended (P3–P6) |
 | Exam Practice Hub | 📋 Full Paper Practice | Practice / Test / Review Mistakes — see below |
 
-P1–P6 profiles see a Primary English-first home screen with:
+The home screen is organised into four tabs so a child always lands on one clear next action:
 
-- A **Start Here Today** strip surfacing a 10-minute task picked from the child's weakest skill
-- The Primary English Quest grid grouped by paper component (Language Use, Vocabulary & Cloze, Sentence Skills, Writing & Editing, Comprehension, Exam Practice Hub)
-- The Early Reading Quest is collapsed below — phonics is still available as a warm-up
+- **🎯 Today** — the guided lesson hero, daily goal, and review banners (Giri's Review Lane, Mistakes Den, Ask Giri). A count pill shows when reviews are waiting.
+- **📚 Learn** — every activity: the Early Reading mode grid and/or the Primary English Quest groups, gated by the child's reading band (P1–P6 profiles see Primary English first with phonics collapsed below as a warm-up).
+- **🎁 Extra** — bonus games: the spin wheel, Daily Challenge, Giri Stories, Sight Words, Letter Sounds, and the Trophy Room.
+- **👪 Grown-ups** — the **Learning Roadmap** (where the child is, what's locked and why, how to help this week — no PIN needed), the PIN-protected Parent Dashboard, and profile management.
+
+The last-used tab is remembered per profile within the day; every new day starts back on Today.
 
 ### 📋 Exam Practice Hub
 
