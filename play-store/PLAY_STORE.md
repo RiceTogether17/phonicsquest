@@ -3,7 +3,7 @@
 PhonicsQuest is already a **PWA** (it ships a `manifest.json`, a service worker, and
 maskable icons). That means we don't rebuild it as a native app — we wrap the live
 website in a thin Android shell called a **Trusted Web Activity (TWA)**. The shell is a
-real, installable Android app that opens `https://jastonchamp.github.io/phonicsquest/`
+real, installable Android app that opens `https://ricetogether17.github.io/phonicsquest/`
 full-screen with no browser UI.
 
 This guide is the end-to-end checklist, tailored to this repo's GitHub Pages setup.
@@ -15,7 +15,7 @@ This guide is the end-to-end checklist, tailored to this repo's GitHub Pages set
 | Item | Cost | Notes |
 | --- | --- | --- |
 | Google Play Console developer account | **US$25 one-time** | Not recurring. This is the only Google account you need — there is no separate "web developer" account. |
-| The app hosted at a public URL | free | Already live at `https://jastonchamp.github.io/phonicsquest/` via GitHub Pages. |
+| The app hosted at a public URL | free | Already live at `https://ricetogether17.github.io/phonicsquest/` via GitHub Pages. |
 | A signed Android `.aab` | free | Generated from the PWA (Step 2). |
 | `assetlinks.json` hosted at the **domain root** | free | Proves you own the site (Step 3). **This is the one tricky step for project pages — read it carefully.** |
 
@@ -40,10 +40,10 @@ This guide is the end-to-end checklist, tailored to this repo's GitHub Pages set
 ### Easiest: PWABuilder (no Android Studio needed)
 
 1. Make sure the PWA is live and the manifest is valid: open
-   `https://jastonchamp.github.io/phonicsquest/` and confirm it installs.
+   `https://ricetogether17.github.io/phonicsquest/` and confirm it installs.
 2. Go to **https://www.pwabuilder.com**, paste the URL, and run the report.
 3. Open the **Android** package options:
-   - **Package ID:** `io.github.jastonchamp.phonicsquest` (must match `assetlinks.json` — see Step 3).
+   - **Package ID:** `io.github.ricetogether17.phonicsquest` (must match `assetlinks.json` — see Step 3).
    - **App name:** PhonicsQuest
    - Leave "signing key" on **Create new** the first time. **Download and back up the
      keystore + passwords it gives you** — losing it means you can never update the app.
@@ -56,7 +56,7 @@ This guide is the end-to-end checklist, tailored to this repo's GitHub Pages set
 
 ```bash
 npm i -g @bubblewrap/cli
-bubblewrap init --manifest https://jastonchamp.github.io/phonicsquest/manifest.json
+bubblewrap init --manifest https://ricetogether17.github.io/phonicsquest/manifest.json
 bubblewrap build      # produces app-release-signed.aab + assetlinks fingerprint
 ```
 
@@ -68,7 +68,7 @@ For the app to open **without** a browser address bar, Google must find a Digita
 Links file at the **scheme + host root**:
 
 ```
-https://jastonchamp.github.io/.well-known/assetlinks.json
+https://ricetogether17.github.io/.well-known/assetlinks.json
 ```
 
 ⚠️ **Note the path.** It is at the *host root*, **not** under `/phonicsquest/`. Because
@@ -78,8 +78,8 @@ this site is a GitHub Pages **project page**, files in *this* repo are served un
 You have three options:
 
 - **Option A (recommended) — user/root Pages repo.** If you own a repo named
-  `jastonchamp.github.io`, add `.well-known/assetlinks.json` there. It will serve at
-  `https://jastonchamp.github.io/.well-known/assetlinks.json`. ✅
+  `ricetogether17.github.io`, add `.well-known/assetlinks.json` there. It will serve at
+  `https://ricetogether17.github.io/.well-known/assetlinks.json`. ✅
 - **Option B — custom domain.** Point a custom domain (e.g. `phonicsquest.app`) at the
   Pages site, then host `assetlinks.json` at that domain's root and change the PWA
   `start_url`/`scope` to the domain root.
@@ -150,8 +150,8 @@ PhonicsQuest is categorised `["education", "kids"]`, so Google's **Families poli
 
 | Thing | Value |
 | --- | --- |
-| Live URL | `https://jastonchamp.github.io/phonicsquest/` |
-| Suggested package ID | `io.github.jastonchamp.phonicsquest` |
-| Asset links location | `https://jastonchamp.github.io/.well-known/assetlinks.json` |
+| Live URL | `https://ricetogether17.github.io/phonicsquest/` |
+| Suggested package ID | `io.github.ricetogether17.phonicsquest` |
+| Asset links location | `https://ricetogether17.github.io/.well-known/assetlinks.json` |
 | Build tools | [PWABuilder](https://www.pwabuilder.com) or [Bubblewrap](https://github.com/GoogleChromeLabs/bubblewrap) |
 | Dev account | https://play.google.com/console/signup ($25 one-time) |
