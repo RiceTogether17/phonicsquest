@@ -232,6 +232,16 @@ function _renderGame(quest, cards) {
     });
   });
 
+  // Graceful fallback: if a decorative card image fails to load (e.g. stale
+  // cache or a deploy that's missing the asset), hide the broken <img> so the
+  // card shows its gradient + number badge instead of a broken-image icon.
+  _container.querySelectorAll('.sm-card-mascot').forEach(img => {
+    const hide = () => { img.style.display = 'none'; };
+    img.addEventListener('error', hide);
+    // Catch images that already errored before this listener was attached.
+    if (img.complete && img.naturalWidth === 0) hide();
+  });
+
   document.getElementById('sm-btn-back-to-quests')?.addEventListener('click', () => {
     showSightBrowser();
   });
