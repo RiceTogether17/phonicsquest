@@ -58,8 +58,8 @@ PhonicsQuest makes practice something they look forward to. Start the quest toda
 | App category | Education |
 | Tags | education, kids, reading, phonics |
 | Email | kingstonchuakokwei@gmail.com |
-| Privacy Policy URL | `https://jastonchamp.github.io/phonicsquest/privacy.html` |
-| Website | `https://jastonchamp.github.io/phonicsquest/` |
+| Privacy Policy URL | `https://ricetogether17.github.io/phonicsquest/privacy.html` |
+| Website | `https://ricetogether17.github.io/phonicsquest/` |
 
 ## Graphics still needed (must be created from the live app)
 - **Feature graphic:** 1024×500 PNG/JPG (banner shown at top of listing)
