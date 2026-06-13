@@ -7,7 +7,7 @@
  *   - Navigation: Network-first with offline fallback to cached shell
  */
 
-const CACHE_VERSION = 'v5';
+const CACHE_VERSION = 'v6';
 const SHELL_CACHE   = `phonicsquest-shell-${CACHE_VERSION}`;
 const ASSET_CACHE   = `phonicsquest-assets-${CACHE_VERSION}`;
 
