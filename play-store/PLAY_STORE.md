@@ -77,9 +77,11 @@ this site is a GitHub Pages **project page**, files in *this* repo are served un
 
 You have three options:
 
-- **Option A (recommended) — user/root Pages repo.** If you own a repo named
-  `ricetogether17.github.io`, add `.well-known/assetlinks.json` there. It will serve at
-  `https://ricetogether17.github.io/.well-known/assetlinks.json`. ✅
+- **Option A (recommended) — user/root Pages repo.** Create a repo named
+  `ricetogether17.github.io` and add `.well-known/assetlinks.json` there; it serves at
+  `https://ricetogether17.github.io/.well-known/assetlinks.json`. ✅ A **ready-to-commit
+  bundle** (asset-links file, `.nojekyll`, landing page, and step-by-step README) is in
+  **`play-store/well-known-repo/`** — just add your fingerprint and push it.
 - **Option B — custom domain.** Point a custom domain (e.g. `phonicsquest.app`) at the
   Pages site, then host `assetlinks.json` at that domain's root and change the PWA
   `start_url`/`scope` to the domain root.
