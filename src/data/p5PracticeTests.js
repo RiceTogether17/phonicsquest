@@ -603,7 +603,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
     sectionC: {
       title: 'Section C: Grammar Cloze',
       marks: 10,
-      instructions: 'Fill in each blank with ONE suitable word from the word bank. Each word may be used only once. Two words will be left over.',
+      instructions: 'Fill in each blank with ONE suitable word from the word bank. You may use a word more than once, and some words will be left over.',
       wordBank: ['whenever', 'had', 'so', 'which', 'being', 'however', 'their', 'have', 'whether', 'one', 'though', 'despite'],
       text:
         'The Queenstown Community Library has been a beloved gathering place for residents for more than forty years. ' +
@@ -618,7 +618,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         'Today, {{9}} year into the renovation, the library has already reopened its ground floor. ' +
         'Residents say the improved lighting and new reading pods have made the space {{10}} inviting that they visit far more often than before.',
       answers: ['Whenever', 'However', 'had', 'had', 'which', 'whether', 'though', 'their', 'one', 'so'],
-      leftOver: ['being', 'despite'],
+      leftOver: ['being', 'have', 'despite'],
       skill: 'mixedGrammar',
       practiseTarget: 'cloze-castle',
     },
@@ -946,12 +946,12 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           explain: '"May have + past participle" expresses possibility about the past; "must" would imply certainty.',
         },
         {
-          q: '___ the museum is large ___ that you can spend an entire day without seeing every exhibit.',
-          choices: ['So / but', 'Such / so', 'So / so', 'Such / that'],
-          answer: 'So / so',
+          q: 'The museum is ___ large ___ you can spend an entire day without seeing every exhibit.',
+          choices: ['such / that', 'so / that', 'so / but', 'such / so'],
+          answer: 'so / that',
           skill: 'conjunctions',
           practiseTarget: 'grammar-mcq',
-          explain: '"So + adjective + so that" — here "so large so that" is informal; the standard is "so large that". The best option is "So / so" where the second "so" = "so that".',
+          explain: '"So + adjective + that" shows a result — the museum is so large that you need a whole day. "Such" goes with a noun ("such a large museum that…"), not straight before an adjective.',
         },
       ],
     },
@@ -1409,7 +1409,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
     sectionC: {
       title: 'Section C: Grammar Cloze',
       marks: 10,
-      instructions: 'Fill in each blank with ONE suitable word from the word bank. Each word may be used only once. Two words will be left over.',
+      instructions: 'Fill in each blank with ONE suitable word from the word bank. You may use a word more than once, and some words will be left over.',
       wordBank: ['not', 'been', 'which', 'had', 'so', 'whether', 'their', 'having', 'as', 'only', 'who', 'though'],
       text:
         'Esports — competitive video gaming — has grown from a niche hobby into a global industry worth billions of dollars. ' +
@@ -1421,7 +1421,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         'Schools have begun to offer esports clubs, recognising that students who are passionate about gaming are {{9}} only developing technical skills but also learning to manage pressure and collaborate under competition conditions. ' +
         '{{10}} competed at a high level, many young gamers report a significant improvement in their ability to focus and solve problems quickly.',
       answers: ['who', 'which', 'not', 'their', 'Though', 'whether', 'as', 'not', 'not', 'Having'],
-      leftOver: ['been', 'had'],
+      leftOver: ['been', 'had', 'so', 'only'],
       skill: 'mixedGrammar',
       practiseTarget: 'cloze-castle',
     },
