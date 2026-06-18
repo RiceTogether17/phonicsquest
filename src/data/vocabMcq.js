@@ -688,8 +688,8 @@ const VOCAB_BUILDERS = {
       ['A reduction in the value of a country\'s currency relative to other currencies is ___.', 'depreciation', ['devaluation', 'deflation', 'recession']],
       ['The practice of managing a country\'s money supply to control inflation is called ___ policy.', 'monetary', ['fiscal', 'trade', 'industrial']],
       ['A group of countries that cooperate on economic and political matters is called a ___.', 'bloc', ['alliance', 'coalition', 'federation']],
-      ['The fair and equal treatment of all people under the law is called ___.', 'justice', ['equality', 'fairness', 'democracy']],
-      ['The right of a country to govern itself without interference from others is called ___.', 'sovereignty', ['autonomy', 'independence', 'self-determination']],
+      ['The upholding of what is right and the punishment of wrongdoing through the law is called ___.', 'justice', ['equality', 'fairness', 'democracy']],
+      ['The right of a country to govern itself without interference from others is called ___.', 'sovereignty', ['democracy', 'diplomacy', 'citizenship']],
       ['The migration of skilled workers from developing countries to developed ones is called brain ___.', 'drain', ['gain', 'shift', 'flow']],
       ['Organisations that operate across multiple countries are called ___ corporations.', 'multinational', ['bilateral', 'regional', 'national']],
     ];

@@ -896,11 +896,11 @@ const GRAMMAR_BUILDERS = {
         'Who': '"Who" asks about identity; here the identity is already known — Auntie is asking about her wellbeing.',
         'Where': '"Where" asks about a place, not someone\'s health.',
       }],
-      ['"___ is the date of the school Sports Day this year?" the pupil asked.', 'When', ['What', 'Where', 'Which'], {
-        'When': '"When" is correct because the pupil wants to know the date (a point in time) of Sports Day.',
-        'What': '"What is the date" is also natural, but "when" more directly asks about time.',
-        'Where': '"Where" asks about a place, not a date.',
-        'Which': '"Which" asks for a selection from a specific set, not a general enquiry about a date.',
+      ['"___ is Sports Day this year — before or after the June holidays?" the pupil asked.', 'When', ['What', 'Where', 'Which'], {
+        'When': '"When" is correct because the pupil is asking about the time of Sports Day — "before or after the June holidays" is a time clue.',
+        'What': '"What" asks about a thing or its identity, not when an event takes place.',
+        'Where': '"Where" asks about a place, but the clue "before or after the holidays" points to time.',
+        'Which': '"Which" asks for a selection from a specific set, not the timing of an event.',
       }],
     ];
     const [q, answer, ds, optionExplanations] = rotate(rows, i);
