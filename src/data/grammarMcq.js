@@ -3886,7 +3886,7 @@ const GRAMMAR_BUILDERS = {
         'whom': '"Whom" is for a person as the object; the neighbour is the subject of "moved in".',
         'whose': '"Whose" shows possession; the clause is about what the neighbour did.',
       }],
-      ['The trophy, ___ was donated by an alumni, is displayed in the school foyer.', 'which', ['that', 'who', 'whose'], {
+      ['The trophy, ___ was donated by a former student, is displayed in the school foyer.', 'which', ['that', 'who', 'whose'], {
         'which': '"Which" is correct because it introduces a non-restrictive relative clause about a thing (the trophy).',
         'that': '"That" is for restrictive clauses; a non-restrictive clause with commas uses "which".',
         'who': '"Who" is for people; the trophy is a thing.',
