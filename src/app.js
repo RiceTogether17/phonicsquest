@@ -101,6 +101,7 @@ import { getQuestUnlockStatus } from './modules/questUnlocks.js';
 import { showPlacementTest } from './modules/placementTest.js';
 const quickCheckMod = lazyModule(() => import('./modules/primaryQuickCheck.js'));
 import { getReadingBand, getHomeLayoutForReadingBand } from './modules/readingStages.js';
+import { isTeacherUnlockActive, tryTeacherUnlock, lockTeacherMode } from './modules/teacherUnlock.js';
 import { showSessionSummary } from './components/sessionSummary.js';
 import { showWeeklyRecap, shouldShowWeeklyRecap } from './components/weeklyRecap.js';
 
@@ -339,6 +340,10 @@ class App {
 
     document.getElementById('btn-home-roadmap')?.addEventListener('click', () => {
       this._openRoadmap();
+    });
+
+    document.getElementById('btn-home-teacher-unlock')?.addEventListener('click', () => {
+      this._toggleTeacherUnlock();
     });
 
     document.getElementById('btn-roadmap-back')?.addEventListener('click', () => {
@@ -822,7 +827,10 @@ class App {
       this._currentWord = null;
 
       const modeDiffs = store.get('modeDifficulty') || {};
-      const effectiveDiff = modeDiffs[this._mode] ?? store.get('difficulty') ?? 1;
+      // Teacher master unlock lifts the level cap so every word is in play.
+      const effectiveDiff = isTeacherUnlockActive()
+        ? 99
+        : (modeDiffs[this._mode] ?? store.get('difficulty') ?? 1);
       const opts = { maxLevel: effectiveDiff, mode: this._mode };
       if (group) opts.group = group;
 
@@ -1903,6 +1911,53 @@ class App {
       if (startHere) startHere.style.display = 'none';
       this._renderTodaysLesson(todaysPlanHost);
     }
+
+    // Teacher master unlock: reveal the Early Reading mode grid AND every
+    // grade's Primary English / Exam modules, on top of whatever layout the
+    // child's band would otherwise show.
+    if (isTeacherUnlockActive()) {
+      coreSection?.classList.remove('home-section--hidden', 'home-section--collapsed');
+      this._filterGradeSpecificModules(null);
+    }
+    this._updateTeacherUnlockButton();
+  }
+
+  /**
+   * Reflect teacher-unlock state on its Grown-ups button and wire its toggle.
+   * Enabling asks for the password; disabling just confirms.
+   */
+  _updateTeacherUnlockButton() {
+    const sub = document.getElementById('teacher-unlock-sub');
+    const btn = document.getElementById('btn-home-teacher-unlock');
+    const active = isTeacherUnlockActive();
+    if (sub) {
+      sub.textContent = active
+        ? '✅ ON — all modes, words & categories unlocked · tap to lock'
+        : 'Unlock every mode, word and category';
+    }
+    if (btn) btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+  }
+
+  /** Toggle the teacher master unlock (password-gated on enable). */
+  _toggleTeacherUnlock() {
+    if (isTeacherUnlockActive()) {
+      if (window.confirm('Lock teacher mode again? The app will return to the normal locked view for this child.')) {
+        lockTeacherMode();
+        this._showToast('Teacher mode locked. Back to normal view.', 'info');
+        this._renderGuidedJourney();
+        this._updateQuestBanners();
+      }
+      return;
+    }
+    const entered = window.prompt('Teacher Unlock — enter password to open every mode, word and category:');
+    if (entered == null) return; // cancelled
+    if (tryTeacherUnlock(entered)) {
+      this._showToast('🔓 Teacher mode ON — everything is unlocked.', 'success');
+      this._renderGuidedJourney();
+      this._updateQuestBanners();
+    } else {
+      this._showToast('Incorrect password.', 'warning');
+    }
   }
 
   /**
@@ -2046,6 +2101,9 @@ class App {
    * @param {?string} grade  e.g. 'P1' / 'P2' / 'P3' / null
    */
   _filterGradeSpecificModules(grade) {
+    // Teacher master unlock shows every grade's modules (P1–P6), not just
+    // the active child's grade.
+    if (isTeacherUnlockActive()) grade = null;
     const buttons = document.querySelectorAll('[data-grade-filter]');
     if (!grade) {
       buttons.forEach((b) => { b.hidden = false; });
@@ -3265,6 +3323,19 @@ class App {
    * Preschool profiles unlock quests as words are mastered (≥6 attempts, ≥80% accuracy).
    */
   _getQuestUnlockStatus() {
+    // Teacher master unlock: every quest/category is open regardless of
+    // mastery, reading band, or grade.
+    if (isTeacherUnlockActive()) {
+      const open = (required) => ({ unlocked: true, required, current: Infinity });
+      return {
+        mastered: Infinity,
+        sentenceForge: open(QUEST_THRESHOLDS.sentenceForge),
+        clozeCastle:   open(QUEST_THRESHOLDS.clozeCastle),
+        wordVault:     open(QUEST_THRESHOLDS.wordVault),
+        editingQuest:  open(QUEST_THRESHOLDS.editingQuest),
+        writingQuest:  open(QUEST_THRESHOLDS.writingQuest),
+      };
+    }
     const profile = getActiveProfile();
     const stats = store.get('wordStats') || {};
     const placementProfile = store.get('placementProfile') || null;
