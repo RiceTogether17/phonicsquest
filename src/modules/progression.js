@@ -37,6 +37,7 @@ import { CURRICULUM } from '../data/curriculum.js';
 import { getTrickyWordsForPhase } from '../data/trickyWords.js';
 import { store } from './store.js';
 import { progress } from './progress.js';
+import { isTeacherUnlockActive } from './teacherUnlock.js';
 
 // ── Public configuration ────────────────────────────────────────────────────
 
@@ -256,6 +257,9 @@ export function getStageReadiness(stageId, snapshot = {}) {
  * @returns {string[]}
  */
 export function getUnlockedStages(snapshot = buildProgressionSnapshot()) {
+  // Teacher master unlock: every curriculum stage is available at once.
+  if (isTeacherUnlockActive()) return CURRICULUM.map(s => s.id);
+
   const unlocked = [];
   for (const stage of CURRICULUM) {
     if (!stage.prerequisite) { unlocked.push(stage.id); continue; }
