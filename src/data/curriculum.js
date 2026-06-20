@@ -99,7 +99,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['short a /ă/', 'short e /ĕ/', 'short i /ĭ/', 'short o /ŏ/', 'short u /ŭ/'],
     sampleWords: ['cat', 'hen', 'big', 'dog', 'bug', 'map', 'pen', 'sit', 'top', 'sun'],
     sentenceExamples: ['The cat sat on a mat.', 'A pig is in the mud.'],
-    recommendedModes: ['oralBlend', 'first', 'last', 'middle', 'soundCount', 'blend', 'segment', 'train'],
+    recommendedModes: ['oralBlend', 'first', 'last', 'middle', 'soundCount', 'blend', 'classicBlend', 'segment', 'hear', 'train'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -127,7 +127,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['-nd', '-nt', '-mp', '-st', '-lt', '-lk', '-lp', '-sk', '-ft', '-nk', '-ng'],
     sampleWords: ['band', 'fast', 'belt', 'gift', 'milk', 'song', 'lost', 'jump', 'dust', 'lamp'],
     sentenceExamples: ['Hand me the lamp.', 'I jump in the dust.'],
-    recommendedModes: ['classicBlend', 'segment', 'last', 'hear', 'missing'],
+    recommendedModes: ['classicBlend', 'blend', 'segment', 'last', 'hear', 'missing'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -141,7 +141,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['sh /ʃ/', 'ch /tʃ/', 'th /θ/', 'th /ð/', 'wh /w/', 'ck /k/', 'ng /ŋ/'],
     sampleWords: ['ship', 'chip', 'that', 'when', 'sing', 'lock', 'fish', 'chop', 'this', 'whip'],
     sentenceExamples: ['The ship has a chip.', 'Wash the dish in the sink.'],
-    recommendedModes: ['hear', 'blend', 'segment', 'last', 'missing'],
+    recommendedModes: ['hear', 'blend', 'segment', 'last', 'missing', 'soundCount'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -155,7 +155,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['stCC-', 'plCC-', 'brCC-', 'spCC-', 'sprCC-', '-mp', '-nd', '-nt', '-st'],
     sampleWords: ['stamp', 'blend', 'print', 'stomp', 'stump', 'blast', 'crest', 'drink', 'frost', 'trust'],
     sentenceExamples: ['Print the brand on the stamp.', 'I trust the stump will hold.'],
-    recommendedModes: ['classicBlend', 'segment', 'hear', 'last', 'missing', 'soundCount'],
+    recommendedModes: ['classicBlend', 'blend', 'segment', 'hear', 'last', 'missing', 'soundCount'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -169,7 +169,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['a_e /eɪ/', 'ai /eɪ/', 'ay /eɪ/', 'ee /iː/', 'ea /iː/', 'i_e /aɪ/', 'igh /aɪ/', 'y /aɪ/', 'o_e /oʊ/', 'oa /oʊ/', 'ow /oʊ/', 'u_e /juː/', 'ue /uː/', 'ew /uː/', 'oo /uː/'],
     sampleWords: ['cake', 'rain', 'play', 'tree', 'beat', 'kite', 'night', 'cry', 'home', 'boat', 'snow', 'cube', 'blue', 'new', 'moon'],
     sentenceExamples: ['The cake is on the plate.', 'I see a bee in the tree.', 'At night the light is bright.'],
-    recommendedModes: ['classicBlend', 'hear', 'middle', 'segment', 'missing'],
+    recommendedModes: ['classicBlend', 'blend', 'hear', 'middle', 'segment', 'missing'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -183,7 +183,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['oi /ɔɪ/', 'oy /ɔɪ/', 'ou /aʊ/', 'ow /aʊ/', 'aw /ɔː/', 'au /ɔː/'],
     sampleWords: ['coin', 'boy', 'out', 'cow', 'paw', 'jaw', 'loud', 'joy', 'town', 'dawn'],
     sentenceExamples: ['The boy found a coin.', 'I saw a paw on the lawn.'],
-    recommendedModes: ['classicBlend', 'hear', 'missing'],
+    recommendedModes: ['classicBlend', 'blend', 'hear', 'middle', 'segment', 'missing'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -197,7 +197,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['CCV', 'CVCC', 'CCVCC', 'multi-blend review'],
     sampleWords: ['float', 'crisp', 'blend', 'sprint', 'blast', 'scrap', 'twist', 'shrink', 'sprout', 'thrust'],
     sentenceExamples: ['Sprint and blast through the crisp grass.', 'Twist the lid and stash the snack.'],
-    recommendedModes: ['classicBlend', 'hear', 'soundCount'],
+    recommendedModes: ['classicBlend', 'blend', 'hear', 'segment', 'soundCount'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -211,7 +211,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['-ing /ɪŋ/', '-ed /d/, /t/, /ɪd/', '-er /ɚ/', '-est /ɪst/'],
     sampleWords: ['running', 'jumped', 'faster', 'tallest', 'helped', 'biggest', 'playing', 'sitting', 'slower', 'eating'],
     sentenceExamples: ['He was running faster than me.', 'The biggest cat jumped highest.'],
-    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    recommendedModes: ['classicBlend', 'blend', 'hear', 'segment'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -225,7 +225,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['re-', 'un-', '-tion', '-able', 'open/closed syllables', 'irregular sight'],
     sampleWords: ['redo', 'untie', 'action', 'readable', 'science', 'market', 'their', 'because', 'enough', 'through'],
     sentenceExamples: ['Their friend is reading because the book is good.', 'I will redo my action plan.'],
-    recommendedModes: ['classicBlend', 'hear'],
+    recommendedModes: ['classicBlend', 'blend', 'hear', 'segment'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 ]);
