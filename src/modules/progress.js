@@ -180,19 +180,32 @@ class Progress {
 
   /**
    * Get a single word using adaptive weighting.
-   * Avoids repeating the last N words.
+   *
+   * Avoids repeating recent words by excluding a recency window that scales
+   * with the candidate pool, so a child cycles through most of the available
+   * words before any repeat. A fixed window (the previous behaviour) let large
+   * free-play groups resurface a word every few rounds and — worse — let small
+   * stages (≤ a handful of decodable words) fall straight back to a word that
+   * had just been shown. The window is capped at `pool.length - 1` so at least
+   * one fresh candidate always remains.
    * @param {object} [opts]
    * @returns {import('../data/words.js').Word}
    */
   getNextWord(opts = {}) {
     const pool = this.getAdaptivePool(20, opts);
-    const history = store.get('wordHistory') || [];
-    const recentIds = history.slice(0, 5).map(h => h.wordId);
+    if (pool.length === 0) return WORDS[0];
 
-    // Try to find a word not recently played
-    const fresh = pool.filter(w => !recentIds.includes(w.id));
-    if (fresh.length > 0) return fresh[0];
-    return pool[0] || WORDS[0];
+    const history = store.get('wordHistory') || [];
+    const windowSize = Math.min(pool.length - 1, Math.max(5, Math.floor(pool.length * 0.6)));
+    const recentIds = new Set(
+      history.slice(0, Math.max(0, windowSize)).map(h => h.wordId)
+    );
+
+    // Highest-weight word not shown recently keeps the adaptive bias while the
+    // wider window guarantees variety; fall back to the pool if every candidate
+    // is (unavoidably, for a tiny stage) within the recency window.
+    const fresh = pool.filter(w => !recentIds.has(w.id));
+    return (fresh.length > 0 ? fresh : pool)[0] || WORDS[0];
   }
 
   /**
