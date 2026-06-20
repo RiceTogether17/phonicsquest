@@ -36,19 +36,27 @@ describe('getNextWord variety', () => {
     }
   });
 
-  it('cycles through every word of a tiny stage before repeating any', () => {
+  it('does not repeat a word within the (pool-scaled) recency window', () => {
     store.set('difficulty', 3);
     const opts = { group: 'ccvcc-e', mode: 'blend' };
     const n = progress.getWordsInGroup('ccvcc-e').length;
+    // The recency window getNextWord applies for a pool of this size.
+    const windowSize = Math.min(n - 1, Math.max(5, Math.floor(n * 0.6)));
 
-    const firstPass = [];
-    for (let round = 0; round < n; round += 1) {
+    const shown = [];
+    for (let round = 0; round < 40; round += 1) {
       const word = progress.getNextWord(opts);
-      firstPass.push(word.id);
+      shown.push(word.id);
       progress.recordAttempt(word.id, true, 'blend');
     }
-    // A pool of n ≤ 6 words rotates as a round-robin — every word appears once
-    // before any repeat, the maximum possible variety for that stage.
-    expect(new Set(firstPass).size).toBe(n);
+    // No word may reappear until it has dropped out of the recency window —
+    // i.e. the gap between two showings of the same word always exceeds it.
+    const lastSeen = {};
+    shown.forEach((id, i) => {
+      if (lastSeen[id] != null) {
+        expect(i - lastSeen[id], `"${id}" repeated within the recency window`).toBeGreaterThan(windowSize);
+      }
+      lastSeen[id] = i;
+    });
   });
 });
