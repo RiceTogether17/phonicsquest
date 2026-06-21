@@ -15,7 +15,7 @@ import { store } from './modules/store.js';
 import { audio } from './modules/audio.js';
 import { gamification } from './modules/gamification.js';
 import { badges } from './modules/badges.js';
-import { progress } from './modules/progress.js';
+import { progress, isStageHiddenForMode } from './modules/progress.js';
 import { estimateMinutes as estimateReviewMinutes, getReviewCapForProfile } from './modules/reviewScheduler.js';
 import { buildWordWorkout } from './modules/wordWorkout.js';
 import {
@@ -2683,7 +2683,11 @@ class App {
    *   the currently active mode.
    */
   _openStagePicker(mode = this._mode) {
-    const stagesForMode = getStagesForMode(mode, CURRICULUM, PHASES);
+    // Drop stages a mode can't actually serve — e.g. the irregular sight-word
+    // stage under Blend It! / Listen & Blend, which can't be sounded out and
+    // would otherwise fall back to the general pool (a misleading dead stage).
+    const stagesForMode = getStagesForMode(mode, CURRICULUM, PHASES)
+      .filter(stage => !isStageHiddenForMode(stage.group, mode));
     if (!stagesForMode.length) {
       // Defensive: should never hit — getStagesForMode falls back to full
       // curriculum when no phase recommends the mode. If it does, just

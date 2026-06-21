@@ -68,10 +68,11 @@ const PHONEME_FILES = {
   long_y:  'long_i',  // final y as long i (cry, fly, sky) → long I sound
   long_ie: 'long_i',  // ie (pie, tie)                    → long I sound
   long_igh:'long_i',  // igh (night, light, high)         → long I sound
-  // long_oo is intentionally absent: long_u.mp3 says /juː/ ("you"), not /uː/ ("oo").
-  // It falls through to PHONEME_TTS where long_oo → 'oo' gives the correct sound.
-  long_ue: 'long_u',  // ue (cube split-digraph, blue)    → long U sound
-  long_ew: 'long_u',  // ew (new, drew, blew)             → long U sound
+  // long_oo, long_ue and long_ew are intentionally absent: long_u.mp3 says
+  // /juː/ ("you"), but these vowel teams say /uː/ ("oo") — blue, true, glue,
+  // flew, grew, chew (see the "/oo/" lessons in curriculum). They fall through
+  // to PHONEME_TTS where long_oo/long_ue/long_ew → 'oo' gives the right sound.
+  // (The u_e split digraph keeps grapheme 'u' → long_u for /juː/: cube, cute.)
   // Diphthongs  (oi covers oi+oy, ow covers ow+ou, aw covers aw+au)
   oi: 'oi', ow: 'ow', aw: 'aw',
   // Soft consonants (used only when explicitly tagged in word data)
@@ -181,7 +182,7 @@ const PHONEME_TTS = {
   long_y:  'eye', long_ie: 'eye', long_igh: 'eye',
   long_oo:  'oo',   // /uː/ as in moon, food, zoo
   short_oo: 'oo',   // /ʊ/  as in book, look, cook (closest TTS match)
-  long_ue: 'you', long_ew: 'oo',
+  long_ue: 'oo', long_ew: 'oo',   // ue/ew vowel teams say /uː/ (blue, flew), not /juː/
   // R-controlled vowels
   ar: 'ar',  or: 'or',  er: 'err',
   ir: 'err', ur: 'err',

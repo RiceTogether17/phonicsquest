@@ -59,6 +59,55 @@ describe('integration — every phonemic-awareness mode gets a non-empty stage l
   });
 });
 
+describe('real curriculum — mode/phase coverage is complete and has no dead stages', () => {
+  async function phasesFor(mode) {
+    const { CURRICULUM: C, PHASES: P } = await import('../src/data/curriculum.js');
+    const stages = getStagesForMode(mode, C, P);
+    return [...new Set(stages.map(s => s.phase))].sort((a, b) => a - b);
+  }
+
+  it('both blending modes span every phase 1–10 (Blend It! and Listen & Blend match)', async () => {
+    const all = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    expect(await phasesFor('blend')).toEqual(all);
+    // classicBlend previously skipped Phase 4 (Digraphs) — guard the gap.
+    expect(await phasesFor('classicBlend')).toEqual(all);
+  });
+
+  it('Segment It covers phases 1–9 but not Phase 10 (its words are PA-excluded)', async () => {
+    // Phase 10 (prefixes, advanced suffixes, multisyllabic, sight) cannot serve
+    // phoneme-level segmenting, so surfacing it would create dead picker stages.
+    expect(await phasesFor('segment')).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  });
+
+  it('phonemic-awareness sound modes keep their intended scope', async () => {
+    expect(await phasesFor('first')).toEqual([1]);
+    expect(await phasesFor('last')).toEqual([1, 2, 3, 4, 5]);
+    expect(await phasesFor('middle')).toEqual([1, 6, 7]);
+  });
+});
+
+describe('real curriculum — blending pickers drop the non-decodable sight stage', () => {
+  it('blend / classicBlend exclude sight-highfreq; other modes keep it', async () => {
+    const { CURRICULUM: C, PHASES: P } = await import('../src/data/curriculum.js');
+    const { isStageHiddenForMode } = await import('../src/modules/progress.js');
+
+    const visibleGroups = (mode) =>
+      getStagesForMode(mode, C, P)
+        .filter(s => !isStageHiddenForMode(s.group, mode))
+        .map(s => s.group);
+
+    // Sight words can't be sounded out, so they must not appear in a blending
+    // picker (they'd fall back to the general pool — a misleading dead stage).
+    expect(visibleGroups('blend')).not.toContain('sight-highfreq');
+    expect(visibleGroups('classicBlend')).not.toContain('sight-highfreq');
+
+    // Non-blending modes are unaffected by the filter.
+    expect(isStageHiddenForMode('sight-highfreq', 'hear')).toBe(false);
+    // Decodable stages are never hidden, even for blending modes.
+    expect(isStageHiddenForMode('long-u-uue', 'blend')).toBe(false);
+  });
+});
+
 describe('real curriculum — Last Sound surfaces beginner phases, not just CVCC', () => {
   it('Last Sound includes Phase 1 (CVC) so children can start on the easiest words', async () => {
     const { CURRICULUM: REAL_CURRICULUM, PHASES: REAL_PHASES } = await import('../src/data/curriculum.js');

@@ -141,7 +141,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['sh /ʃ/', 'ch /tʃ/', 'th /θ/', 'th /ð/', 'wh /w/', 'ck /k/', 'ng /ŋ/'],
     sampleWords: ['ship', 'chip', 'that', 'when', 'sing', 'lock', 'fish', 'chop', 'this', 'whip'],
     sentenceExamples: ['The ship has a chip.', 'Wash the dish in the sink.'],
-    recommendedModes: ['hear', 'blend', 'segment', 'last', 'missing', 'soundCount'],
+    recommendedModes: ['hear', 'blend', 'classicBlend', 'segment', 'last', 'missing', 'soundCount'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -225,7 +225,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['re-', 'un-', '-tion', '-able', 'open/closed syllables', 'irregular sight'],
     sampleWords: ['redo', 'untie', 'action', 'readable', 'science', 'market', 'their', 'because', 'enough', 'through'],
     sentenceExamples: ['Their friend is reading because the book is good.', 'I will redo my action plan.'],
-    recommendedModes: ['classicBlend', 'blend', 'hear', 'segment'],
+    recommendedModes: ['classicBlend', 'blend', 'hear'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 ]);
