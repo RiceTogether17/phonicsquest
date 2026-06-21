@@ -14,8 +14,14 @@ import { MASTERY_THRESHOLD, MIN_ATTEMPTS_FOR_MASTERY } from '../data/curriculum.
 import { normalizeAdaptiveConfig, getWordWeight } from './adaptiveSelection.js';
 import { getDueItems, countDueItems } from './reviewScheduler.js';
 
-const NON_DECODABLE_GROUPS = new Set(['sight-highfreq']);
-const BLENDING_MODES = new Set(['blend', 'classicBlend']);
+export const NON_DECODABLE_GROUPS = new Set(['sight-highfreq']);
+export const BLENDING_MODES = new Set(['blend', 'classicBlend']);
+
+/** Should `group` be hidden from `mode`'s stage picker? Blending modes can't
+ *  sound out non-decodable (irregular sight) words, so those stages are noise. */
+export function isStageHiddenForMode(group, mode) {
+  return BLENDING_MODES.has(mode) && NON_DECODABLE_GROUPS.has(group);
+}
 
 // Groups that should not appear in phonemic-awareness activities because their
 // words are irregular, multisyllabic, or non-decodable at the phoneme level.

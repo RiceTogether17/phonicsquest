@@ -129,6 +129,10 @@ function _renderLearn() {
                 aria-label="Mark this quest as practised">
           ✅ I've practised these words!
         </button>
+        <button class="btn btn--ghost btn--sm" id="sl-btn-spell-direct"
+                aria-label="Practise spelling these words now">
+          🔤 Spell it!
+        </button>
         <button class="btn btn--primary sl-btn-play" id="sl-btn-play-match"
                 aria-label="Start the matching card game for this quest">
           🃏 Ready to play the matching game?
@@ -163,6 +167,11 @@ function _renderLearn() {
     _showToastInside('Great job! Your progress is saved 🌟');
     audio.playSfx('correct');
     _renderLearn(); // re-render to show "Studied" pill
+  });
+
+  document.getElementById('sl-btn-spell-direct')?.addEventListener('click', () => {
+    _autoplayAbort = true;
+    _startSpellIt();
   });
 
   document.getElementById('sl-btn-play-match')?.addEventListener('click', () => {
@@ -494,7 +503,12 @@ function _startSpellIt() {
   if (!_activeQuest) return;
   const panel = document.getElementById('sl-recall');
   if (!panel) return;
+  // Reveal the panel and bring it into view — Spell-It can now be launched
+  // directly from the Learn screen, not just after the quick-recall quiz.
+  panel.hidden = false;
+  _quizActive = false;
   audio.playSfx?.('reveal');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
   startLscwcDrill(panel, _activeQuest.words, {
     onDone: (summary) => _onSpellItDone(summary),
     onCancel: _finishQuiz,

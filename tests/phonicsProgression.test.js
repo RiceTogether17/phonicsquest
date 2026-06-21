@@ -86,6 +86,28 @@ describe('real curriculum — mode/phase coverage is complete and has no dead st
   });
 });
 
+describe('real curriculum — blending pickers drop the non-decodable sight stage', () => {
+  it('blend / classicBlend exclude sight-highfreq; other modes keep it', async () => {
+    const { CURRICULUM: C, PHASES: P } = await import('../src/data/curriculum.js');
+    const { isStageHiddenForMode } = await import('../src/modules/progress.js');
+
+    const visibleGroups = (mode) =>
+      getStagesForMode(mode, C, P)
+        .filter(s => !isStageHiddenForMode(s.group, mode))
+        .map(s => s.group);
+
+    // Sight words can't be sounded out, so they must not appear in a blending
+    // picker (they'd fall back to the general pool — a misleading dead stage).
+    expect(visibleGroups('blend')).not.toContain('sight-highfreq');
+    expect(visibleGroups('classicBlend')).not.toContain('sight-highfreq');
+
+    // Non-blending modes are unaffected by the filter.
+    expect(isStageHiddenForMode('sight-highfreq', 'hear')).toBe(false);
+    // Decodable stages are never hidden, even for blending modes.
+    expect(isStageHiddenForMode('long-u-uue', 'blend')).toBe(false);
+  });
+});
+
 describe('real curriculum — Last Sound surfaces beginner phases, not just CVCC', () => {
   it('Last Sound includes Phase 1 (CVC) so children can start on the easiest words', async () => {
     const { CURRICULUM: REAL_CURRICULUM, PHASES: REAL_PHASES } = await import('../src/data/curriculum.js');
