@@ -188,13 +188,17 @@ export const settingsController = {
       setTimeout(() => { if (status) status.textContent = ''; }, 2500);
     });
 
-    // ── Reset progress ─────────────────────────────────────────────────────
+    // ── Reset progress (lives in the PIN-gated Parent Dashboard) ────────────
+    // Typed confirmation so a curious child can't wipe progress with one tap.
     document.getElementById('reset-progress-btn')?.addEventListener('click', () => {
-      if (confirm('This will erase all progress. Are you sure?')) {
+      const typed = prompt(
+        'This erases ALL progress, badges and XP for this player and cannot be undone.\n\nType RESET to confirm:',
+      );
+      if (typed != null && typed.trim().toUpperCase() === 'RESET') {
         store.reset();
         badges.reset();
         gamification.init();
-        closeModal('modal-settings');
+        closeModal('modal-dashboard');
         onReset();
       }
     });

@@ -1328,6 +1328,10 @@ body.bedtime-on * {
   padding: var(--space-2) var(--space-4);
 }
 .action-bar #btn-skip:hover { opacity: 1; }
+/* Pre-readers recognise actions by their icon, not the label — keep the
+   action glyphs leading and large enough to scan at a glance. */
+.action-bar .action-glyph { font-size: 1.35em; line-height: 1; }
+.action-bar #btn-say-it svg { width: 20px; height: 20px; }
 
 /* ── BUTTONS ── */
 .btn {
@@ -5508,6 +5512,20 @@ details.story-tool-section[open] > .story-tool-summary::before {
   cursor: pointer;
   transition: border-color var(--dur-fast), background var(--dur-fast);
 }
+.cp-level-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+}
+.cp-level-btn__title { font-weight: 800; }
+.cp-level-btn__sub {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.25;
+  opacity: .85;
+}
 .cp-level-btn:hover { border-color: var(--color-primary); }
 .cp-level-btn--selected {
   border-color: var(--color-primary);
@@ -8406,6 +8424,29 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-size: .85rem;
   opacity: .8;
 }
+/* Visual break between child-friendly settings and grown-up-only controls. */
+.settings-grownup-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-5) 0 var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 2px dashed var(--color-border);
+  font-weight: 800;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+/* Pointer note where the Reset button used to live in Settings. */
+.settings-help--note {
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  opacity: .9;
+}
 
 .wv-progress { height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; margin-bottom: 10px; }
 .wv-progress > span { display:block; height:100%; background: linear-gradient(90deg, #34d399, #06b6d4); }
@@ -10237,6 +10278,14 @@ details.story-tool-section[open] > .story-tool-summary::before {
   display: flex;
   align-items: center;
   cursor: pointer;
+}
+/* Destructive reset sits apart from the backup tools and reads as a warning. */
+.dashboard-reset-btn {
+  margin-left: auto;
+  color: var(--color-danger, #dc2626);
+}
+.dashboard-reset-btn:hover {
+  background: color-mix(in srgb, var(--color-danger, #dc2626) 12%, transparent);
 }
 
 
