@@ -783,6 +783,9 @@ class App {
     document.getElementById('btn-home-parent-dashboard')?.addEventListener('click', () => {
       document.getElementById('dashboard-btn')?.click();
     });
+    document.getElementById('btn-home-settings')?.addEventListener('click', () => {
+      this._openModal('modal-settings');
+    });
 
     document.querySelector('[data-close="modal-create-profile"]')?.addEventListener('click', () => {
       this._closeModal('modal-create-profile');

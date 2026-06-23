@@ -253,6 +253,14 @@
               </span>
               <span class="home-parents-btn__arrow" aria-hidden="true">→</span>
             </button>
+            <button class="home-parents-btn" id="btn-home-settings" aria-label="Open settings — sound, voice, theme, difficulty and accessibility">
+              <span class="home-parents-btn__icon" aria-hidden="true">⚙️</span>
+              <span class="home-parents-btn__text">
+                <span class="home-parents-btn__title">Settings</span>
+                <span class="home-parents-btn__sub">Sound, voice, theme, difficulty &amp; accessibility</span>
+              </span>
+              <span class="home-parents-btn__arrow" aria-hidden="true">→</span>
+            </button>
             <button class="home-parents-btn" id="btn-home-teacher-unlock" aria-pressed="false" aria-label="Teacher unlock — open every mode, word and category with a password">
               <span class="home-parents-btn__icon" aria-hidden="true">🔓</span>
               <span class="home-parents-btn__text">
@@ -1132,6 +1140,10 @@
             </div>
           </section>
 
+          <div class="settings-grownup-divider" role="separator">
+            <span aria-hidden="true">👪</span> For grown-ups
+          </div>
+
           <section class="settings-group">
             <h3 class="settings-label">AI Tutor (Giri ✨)</h3>
             <p class="settings-help">Enter a free <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google Gemini API key</a> to unlock optional AI tutoring: "Ask Giri why" explanations after mistakes, question-specific hints, fairer marking of typed answers, and sentence-level feedback on compositions. Everything in the app works without a key — AI replies are extra, kept child-safe, capped per day, and logged for parents in the dashboard.</p>
@@ -1252,10 +1264,12 @@
                  placeholder="Name (e.g. Liam)" aria-label="Player name" autocomplete="off" />
           <div class="cp-level-group" role="group" aria-label="Choose school level" id="cp-level-group">
             <button class="cp-level-btn cp-level-btn--selected" data-level="preschool" aria-pressed="true">
-              🌱 Preschool
+              <span class="cp-level-btn__title">🌱 Preschool</span>
+              <span class="cp-level-btn__sub">Early Reading — letter sounds, blending &amp; sight words (K1–K2 / early P1)</span>
             </button>
             <button class="cp-level-btn" data-level="primary" aria-pressed="false">
-              🏫 Primary School
+              <span class="cp-level-btn__title">🏫 Primary School</span>
+              <span class="cp-level-btn__sub">Grammar, vocabulary, comprehension, writing &amp; exam practice (P1–P6)</span>
             </button>
           </div>
           <div class="cp-grade-group" id="cp-grade-group" role="group" aria-label="Choose primary school grade" style="display:none">
