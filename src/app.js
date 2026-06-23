@@ -1915,6 +1915,18 @@ class App {
       this._renderTodaysLesson(todaysPlanHost);
     }
 
+    // Collapse the Primary English module groups into a short, scannable list
+    // when the profile's pathway changes. Younger (preschool / bridge) profiles
+    // see these as future "milestone" content, so collapse them all; primary
+    // profiles keep the everyday groups open but the long exam-paper list
+    // collapsed. Only re-applied on a pathway change so a parent's own
+    // expand/collapse toggles persist across normal home re-renders.
+    const questLayoutKind = isPrimary ? 'primary' : 'early';
+    if (this._questLayoutKind !== questLayoutKind) {
+      this._questLayoutKind = questLayoutKind;
+      this._applyQuestGroupDefaults(questLayoutKind);
+    }
+
     // Teacher master unlock: reveal the Early Reading mode grid AND every
     // grade's Primary English / Exam modules, on top of whatever layout the
     // child's band would otherwise show.
@@ -1923,6 +1935,28 @@ class App {
       this._filterGradeSpecificModules(null);
     }
     this._updateTeacherUnlockButton();
+  }
+
+  /**
+   * Set the default expand/collapse state of the Primary English module groups
+   * for a pathway. Keeps the Learn tab scannable instead of one long scroll.
+   *
+   *   'early'   – preschool / bridge: collapse every group (milestone content).
+   *   'primary' – open the everyday Language Use + Vocabulary groups; keep the
+   *               heavier Sentence / Writing / Comprehension / Exam groups
+   *               collapsed so parents expand only what they need.
+   *
+   * @param {'early'|'primary'} kind
+   */
+  _applyQuestGroupDefaults(kind) {
+    const openByDefault = new Set(kind === 'primary' ? ['language', 'vocab'] : []);
+    document.querySelectorAll('#home-quests-section .home-group').forEach(group => {
+      if (openByDefault.has(group.getAttribute('data-group'))) {
+        group.setAttribute('open', '');
+      } else {
+        group.removeAttribute('open');
+      }
+    });
   }
 
   /**

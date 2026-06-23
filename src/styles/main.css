@@ -1328,6 +1328,10 @@ body.bedtime-on * {
   padding: var(--space-2) var(--space-4);
 }
 .action-bar #btn-skip:hover { opacity: 1; }
+/* Pre-readers recognise actions by their icon, not the label — keep the
+   action glyphs leading and large enough to scan at a glance. */
+.action-bar .action-glyph { font-size: 1.35em; line-height: 1; }
+.action-bar #btn-say-it svg { width: 20px; height: 20px; }
 
 /* ── BUTTONS ── */
 .btn {
