@@ -1094,7 +1094,10 @@
             <h3 class="settings-label">Accessibility</h3>
             <div class="toggle-row">
               <label for="reduced-motion-toggle">Reduce animations</label>
-              <input type="checkbox" id="reduced-motion-toggle" role="switch" />
+              <span class="toggle-wrap">
+                <input type="checkbox" id="reduced-motion-toggle" role="switch" />
+                <span class="toggle-track" aria-hidden="true"></span>
+              </span>
             </div>
             <div class="slider-row">
               <label for="font-size-scale">Font size</label>
@@ -1139,9 +1142,7 @@
             <span id="gemini-key-status" class="settings-help"></span>
           </section>
 
-          <section class="settings-group">
-            <button class="btn btn--danger" id="reset-progress-btn">Reset All Progress</button>
-          </section>
+          <p class="settings-help settings-help--note">Looking for “Reset all progress”? It now lives in the PIN-protected Parent Dashboard, so it can’t be tapped by mistake.</p>
         </div>
       </div>
     </div>
@@ -1159,7 +1160,7 @@
         </div>
         <div class="modal-body" id="dashboard-content"><!-- Injected by dashboard.js --></div>
         <!-- Export / Import toolbar — always visible at the bottom of the dashboard -->
-        <div class="dashboard-data-row" aria-label="Backup and restore">
+        <div class="dashboard-data-row" aria-label="Backup, restore and reset">
           <button class="btn btn--ghost btn--sm" id="dashboard-export-btn" aria-label="Download progress backup">
             📥 Export backup
           </button>
@@ -1167,6 +1168,9 @@
             📤 Import backup
             <input type="file" id="dashboard-import-input" accept=".json" class="sr-only" tabindex="-1">
           </label>
+          <button class="btn btn--ghost btn--sm dashboard-reset-btn" id="reset-progress-btn" aria-label="Reset all progress for this player">
+            ⚠️ Reset all progress
+          </button>
         </div>
       </div>
     </div>

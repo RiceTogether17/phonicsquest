@@ -8406,6 +8406,14 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-size: .85rem;
   opacity: .8;
 }
+/* Pointer note where the Reset button used to live in Settings. */
+.settings-help--note {
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  opacity: .9;
+}
 
 .wv-progress { height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; margin-bottom: 10px; }
 .wv-progress > span { display:block; height:100%; background: linear-gradient(90deg, #34d399, #06b6d4); }
@@ -10237,6 +10245,14 @@ details.story-tool-section[open] > .story-tool-summary::before {
   display: flex;
   align-items: center;
   cursor: pointer;
+}
+/* Destructive reset sits apart from the backup tools and reads as a warning. */
+.dashboard-reset-btn {
+  margin-left: auto;
+  color: var(--color-danger, #dc2626);
+}
+.dashboard-reset-btn:hover {
+  background: color-mix(in srgb, var(--color-danger, #dc2626) 12%, transparent);
 }
 
 
