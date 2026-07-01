@@ -162,7 +162,14 @@ function _completeRound(els) {
   banner.textContent = cleanRound ? 'All aboard! 🎉' : 'Great picking! 🚂';
   els.modeArea.appendChild(banner);
 
-  setTimeout(() => els.onResult(cleanRound, time), 1600);
+  // Completing the round IS the success condition — the child has collected
+  // every matching carriage. Always report success so the framework advances
+  // to the next round. Reporting `false` on a round the child *finished* (just
+  // with a mid-round mis-tap) would drop into the two-strike "try the hint"
+  // path in _handleResult, which returns without advancing and strands the
+  // already-completed round on screen. The clean/not-clean distinction is
+  // surfaced in the banner above, not as pass/fail.
+  setTimeout(() => els.onResult(true, time), 1600);
 }
 
 /**

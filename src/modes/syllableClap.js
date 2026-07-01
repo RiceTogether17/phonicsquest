@@ -68,7 +68,7 @@ export function setupSyllableClap(word, els) {
     _clapCount++;
     const display = document.getElementById('clap-count-display');
     if (display) display.textContent = String(_clapCount);
-    audio.playSfx('pop');
+    audio.playSfx('clap');
   });
 
   const grid = els.modeArea.querySelector('#syllable-grid');

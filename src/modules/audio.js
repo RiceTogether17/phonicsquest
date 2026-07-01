@@ -650,6 +650,38 @@ class AudioManager {
       case 'pop':
         this._playTone(ctx, 660, 0.08, 'sine', 0.05);
         break;
+      case 'clap':
+        // A hand-clap-like transient: a short, sharp burst of band-passed
+        // noise with a fast decay. Much more audible (and clap-like) than the
+        // faint 'pop' blip, so the Clap-the-Syllables button gives the child
+        // real per-beat feedback. Falls back to a tone where the environment
+        // lacks buffer/filter support (e.g. jsdom test stubs).
+        try {
+          const dur    = 0.09;
+          const frames = Math.max(1, Math.floor(ctx.sampleRate * dur));
+          const buffer = ctx.createBuffer(1, frames, ctx.sampleRate);
+          const data   = buffer.getChannelData(0);
+          for (let i = 0; i < frames; i++) {
+            const env = Math.pow(1 - i / frames, 2.5);   // fast exponential decay
+            data[i] = (Math.random() * 2 - 1) * env;
+          }
+          const src  = ctx.createBufferSource();
+          src.buffer = buffer;
+          const band = ctx.createBiquadFilter();
+          band.type = 'bandpass';
+          band.frequency.value = 1600;
+          band.Q.value = 0.8;
+          const gain = ctx.createGain();
+          gain.gain.value = 0.55;
+          src.connect(band);
+          band.connect(gain);
+          gain.connect(ctx.destination);
+          src.start();
+        } catch (err) {
+          devWarn('Clap SFX fallback to tone:', err.message);
+          this._playTone(ctx, 800, 0.25, 'triangle', 0.08);
+        }
+        break;
       case 'levelUp':
         for (const [freq, t] of [[523,0],[659,0.1],[784,0.2],[1047,0.3]]) {
           setTimeout(() => this._playTone(ctx, freq, 0.15, 'sine'), t * 1000);
