@@ -11,9 +11,12 @@ function stubAudioGlobals() {
   };
   globalThis.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; } };
   globalThis.AudioContext = globalThis.AudioContext || class {
-    constructor() { this.state = 'running'; }
+    constructor() { this.state = 'running'; this.sampleRate = 44100; }
     createOscillator() { return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } }; }
     createGain() { return { connect: vi.fn(), gain: { value: 1, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() } }; }
+    createBuffer(_channels, frames) { return { getChannelData: () => new Float32Array(frames) }; }
+    createBufferSource() { return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), buffer: null }; }
+    createBiquadFilter() { return { connect: vi.fn(), type: '', frequency: { value: 0 }, Q: { value: 0 } }; }
     get destination() { return {}; }
     resume() { return Promise.resolve(); }
   };
