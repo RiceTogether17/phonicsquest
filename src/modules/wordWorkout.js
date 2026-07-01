@@ -26,7 +26,7 @@
  *   • CVC (cat, hen)        → hear → blend → segment → missing
  *   • CCVC (flat, drop)     → blend → segment → missing → soundCount
  *   • CVCC (band, jump)     → blend → segment → last → missing
- *   • CCVCC (stamp, blast)  → blend → segment → soundCount → missing
+ *   • CCVCC (stamp, plank)  → blend → segment → soundCount → missing
  *   • Digraph (ship, chop)  → hear → blend → segment → middle
  *   • Long vowel (cake)     → hear → blend → middle → segment
  *   • Other / unknown       → hear → blend → segment   (3-step fallback)

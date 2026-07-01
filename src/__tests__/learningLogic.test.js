@@ -114,7 +114,7 @@ describe('gamification rewards', () => {
 describe('CVCC / CCVCC filter excludes suffix words', () => {
   const SUFFIX_WORDS = ['jumping', 'landing', 'camping', 'melting', 'resting',
     'jumped', 'landed', 'camped', 'melted', 'rested',
-    'jumper', 'faster', 'blending', 'blended'];
+    'jumper', 'grander', 'blending', 'blended'];
 
   const GROUPS = ['cvcc-a', 'cvcc-e', 'cvcc-u', 'struct-cvcc',
     'ccvcc-a', 'ccvcc-e', 'struct-ccvcc'];
