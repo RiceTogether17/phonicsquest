@@ -39,6 +39,14 @@ export function setupClassicBlend(word, els) {
 
   renderWordImage(word, els.wordEmoji, true);
 
+  // Clear the assembled-word tiles. This mode shows only the emoji + the
+  // labelled phoneme row; it never populates #word-display itself. Without
+  // this, a previous mode/word's buildWordAnimation tiles linger on screen
+  // (e.g. "prong") next to the current word's phoneme tiles (e.g. "list"),
+  // showing two different words at once. _cleanupMode() clears no DOM, so
+  // every mode is responsible for resetting the regions it doesn't own.
+  els.wordDisplay.innerHTML = '';
+
   els.modeInstruction.textContent = 'Listen to each sound — then blend!';
 
   renderPhonemes(word, els.phonemeRow, {
