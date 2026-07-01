@@ -13,10 +13,26 @@ describe('buildMcqFeedbackHtml', () => {
       },
     }, 'a', false);
 
+    expect(html).toContain('Not quite.');
     expect(html).toContain('Correct answer:</strong> an');
     expect(html).toContain('Wrong — &quot;hour&quot; starts with a vowel sound.');
     expect(html).toContain('Use "an" before vowel sounds.');
     expect(html).not.toContain('specific noun');
+  });
+
+  it('adds a re-read strategy after a wrong answer but not a correct one', () => {
+    const item = { q: 'She bought ___ orange.', answer: 'an', explain: 'Use "an" before vowel sounds.' };
+    const wrong = buildMcqFeedbackHtml(item, 'a', false);
+    expect(wrong).toContain('mcq-reread-tip');
+    expect(wrong).toContain('Read the sentence again with the correct word in the blank');
+
+    const right = buildMcqFeedbackHtml(item, 'an', true);
+    expect(right).not.toContain('mcq-reread-tip');
+  });
+
+  it('phrases the re-read strategy for question stems without a blank', () => {
+    const wrong = buildMcqFeedbackHtml({ q: 'Which word means very happy?', answer: 'delighted' }, 'grumpy', false);
+    expect(wrong).toContain('Read the question again with the correct answer');
   });
 
   it('falls back to the existing explanation when option explanations are absent', () => {

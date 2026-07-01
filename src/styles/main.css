@@ -9584,6 +9584,43 @@ details.story-tool-section[open] > .story-tool-summary::before {
   color: var(--text-main, #222);
   font-size: var(--font-size-sm);
 }
+.mcq-task-instruction {
+  margin: var(--space-2, 0.5rem) 0 0;
+  text-align: center;
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted, #667);
+}
+.mcq-reread-tip {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.85em;
+  color: var(--text-muted, #555);
+}
+.mcq-next-step {
+  margin: var(--space-3, 0.75rem) auto;
+  max-width: 520px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md, 8px);
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--color-primary) 20%, var(--border));
+  font-size: var(--font-size-sm, 0.9rem);
+  text-align: left;
+}
+.mcq-browser-hint {
+  margin: 0 0 var(--space-2, 0.5rem);
+  font-size: var(--font-size-sm, 0.9rem);
+  color: var(--text-muted, #667);
+  text-align: center;
+}
+.mcq-rule-intro {
+  margin: 0;
+  text-align: center;
+  color: var(--text-muted, #667);
+  font-size: var(--font-size-sm, 0.9rem);
+}
 .mcq-difficulty-toggle {
   justify-content: center;
   flex-wrap: wrap;

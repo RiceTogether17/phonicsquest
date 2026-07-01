@@ -2,17 +2,17 @@ export const MCQ_DIFFICULTIES = Object.freeze({
   guided: {
     key: 'guided',
     label: 'Learn',
-    hint: 'Rule tip shown before answering; easier mix.',
+    hint: 'See the rule and clue words before you answer — pick this when a skill is new to you.',
   },
   normal: {
     key: 'normal',
     label: 'Practise',
-    hint: 'Post-answer feedback and normal adaptive mix.',
+    hint: 'Answer on your own first, then learn from the feedback after each question.',
   },
   challenge: {
     key: 'challenge',
     label: 'PSLE Challenge',
-    hint: 'Harder items, no clue chips, multi-sentence contexts where available.',
+    hint: 'Exam-style questions with no clue words — trust the rules you have learnt.',
   },
 });
 
