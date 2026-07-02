@@ -104,7 +104,7 @@ export function showGrammarMcqBrowser() {
     _container.innerHTML = `
       <div class="sfq-browser mcq-browser">
         <h2 class="sfq-title">🧠 Grammar MCQ</h2>
-        <p class="sfq-instruction">Choose a level first, then practise grammar concepts within that level.</p>
+        <p class="sfq-instruction">Pick your level and how much support you want, then practise one grammar skill at a time — or mix them all together.</p>
 
         <section class="mcq-browser-section">
           <h3 class="mcq-browser-heading">Step 1 · Select Level</h3>
@@ -125,6 +125,7 @@ export function showGrammarMcqBrowser() {
 
         <section class="mcq-browser-section">
           <h3 class="mcq-browser-heading">Step 3 · ${selectedLevel} Grammar Concepts</h3>
+          <p class="mcq-browser-hint">New to a skill? Tap its card — you'll see the rule and an example before the questions begin.</p>
           <div class="sfq-actions">
             <button class="btn btn--primary" id="gmcq-start-level">Start ${selectedLevel} (All Skills)</button>
           </div>
@@ -257,9 +258,17 @@ function _renderClueWords(item) {
   return `
     <div class="mcq-clue-words">
       <strong>🔍 Clue words:</strong>
-      ${item.clueWords.map(w => `<span class="mcq-clue-chip">${w}</span>`).join(' ')}
+      ${item.clueWords.map(w => `<span class="mcq-clue-chip">${escapeHtml(w)}</span>`).join(' ')}
     </div>
   `;
+}
+
+/** Explicit task instruction, the way a teacher frames a question before pupils
+ *  attempt it. Fill-in-the-blank stems and direct questions need different framing. */
+function _taskInstruction(item) {
+  return /___/.test(item.q || '')
+    ? 'Read the whole sentence first, then choose the word that fits the blank.'
+    : 'Read the question carefully, then choose the best answer.';
 }
 
 function _renderQuestion() {
@@ -289,12 +298,14 @@ function _renderQuestion() {
       </div>
       <div class="sq-progress-bar"><div class="sq-progress-fill" style="width:${progressPct}%"></div></div>
       <p class="mcq-category-tag">${escapeHtml(_categoryLabel(item.category))}${_difficulty === 'challenge' ? ' · PSLE Challenge' : ''}</p>
-      ${_difficulty === 'guided' && item.explain ? `<div class="mcq-learn-tip"><strong>Learn tip:</strong> ${item.explain}</div>` : ''}
+      ${_difficulty === 'guided' && item.explain ? `<div class="mcq-learn-tip"><strong>📖 Before you answer:</strong> ${item.explain}</div>` : ''}
+      <p class="mcq-task-instruction">${_taskInstruction(item)}</p>
       <p class="sfq-instruction">${escapeHtml(item.q)}</p>
+      ${_difficulty === 'guided' ? _renderClueWords(item) : ''}
       <div class="pt-choices" role="group" aria-label="Answer choices">
         ${displayChoices.map(c => `<button class="pt-choice-btn" data-choice="${escapeAttr(c)}" aria-label="Choose ${escapeAttr(c)}">${escapeHtml(c)}</button>`).join('')}
       </div>
-      <button class="mcq-hint-btn" id="gmcq-rule-hint" aria-expanded="false">💡 Show Rule</button>
+      <button class="mcq-hint-btn" id="gmcq-rule-hint" aria-expanded="false">💡 Stuck? Show the rule</button>
       <div class="mcq-hint-panel" id="gmcq-hint-panel" hidden></div>
       <p class="pt-grammar-hint" id="gmcq-hint" role="status" aria-live="polite"></p>
       <div class="vmcq-next-wrap" id="gmcq-next-wrap" style="display:none">
@@ -387,7 +398,7 @@ function _renderQuestion() {
       const wasHidden = ruleHintPanel.hidden;
       ruleHintPanel.hidden = !wasHidden;
       ruleHintBtn.setAttribute('aria-expanded', String(wasHidden));
-      ruleHintBtn.textContent = wasHidden ? '💡 Hide Rule' : '💡 Show Rule';
+      ruleHintBtn.textContent = wasHidden ? '💡 Hide the rule' : '💡 Stuck? Show the rule';
       if (wasHidden) {
         const tip = getGrammarTip(item.category);
         ruleHintPanel.innerHTML = `
@@ -437,6 +448,7 @@ function _renderRuleCard(category, onStart) {
     <div class="mcq-rule-card" role="region" aria-label="Grammar rule for ${escapeAttr(meta.label)}">
       <div class="mcq-rule-icon">${meta.icon}</div>
       <h2 class="mcq-rule-title">${escapeHtml(meta.label)}</h2>
+      <p class="mcq-rule-intro">A quick lesson before you practise — read it once, then try the questions.</p>
       <div class="mcq-rule-body">
         <div class="mcq-rule-section">
           <p class="mcq-rule-label">📖 Rule</p>
@@ -453,7 +465,7 @@ function _renderRuleCard(category, onStart) {
       </div>
       <div class="sfq-actions">
         <button class="btn btn--primary" id="mcq-rule-start">Got it — start quiz →</button>
-        <button class="btn btn--ghost" id="mcq-rule-skip">Skip →</button>
+        <button class="btn btn--ghost" id="mcq-rule-skip">I know this rule — skip →</button>
       </div>
     </div>`;
   _container.querySelector('#mcq-rule-start')?.addEventListener('click', onStart);
@@ -474,6 +486,20 @@ function _renderDone() {
   // Allow another recovery attempt even after a recovery round, so a struggling learner
   // isn't left with no way to retry the questions they got wrong.
   const hasMissed = _missed.length > 0;
+
+  // A teacher always names the next step, not just the score.
+  const nextSteps = [];
+  if (hasMissed) {
+    nextSteps.push(`Start with the Recovery Round — it replays only the ${_missed.length} question${_missed.length === 1 ? '' : 's'} you missed, while they are still fresh in your mind.`);
+  }
+  if (accuracy < 70 && _difficulty !== 'guided') {
+    nextSteps.push('If this round felt hard, switch to Learn mode — you will see each rule before you answer.');
+  } else if (accuracy >= 90 && _difficulty !== 'challenge' && !hasMissed) {
+    nextSteps.push('You have mastered this round — try PSLE Challenge mode for exam-style questions without clue words.');
+  }
+  const nextStepHtml = nextSteps.length
+    ? `<p class="mcq-next-step">🧑‍🏫 <strong>Teacher's tip:</strong> ${nextSteps.join(' ')}</p>`
+    : '';
 
   const skillRows = _renderSkillBreakdown();
 
@@ -500,8 +526,8 @@ function _renderDone() {
       <div class="sfq-stars" aria-label="${stars} stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
       <p class="sfq-instruction">${_correct}/${total} correct · ${accuracy}%</p>
       ${_maxStreak >= 3 ? `<p class="sfq-instruction">${_maxStreak >= 10 ? '🔥' : _maxStreak >= 5 ? '⚡' : '✨'} Best streak: ${_maxStreak} in a row</p>` : ''}
-      <p class="sfq-instruction">${accuracy >= 90 ? 'Outstanding!' : accuracy >= 70 ? 'Great work — keep practising!' : accuracy > 0 ? 'Good effort — replay to improve!' : 'Keep trying — you can do it!'}</p>
-      ${skillRows}${focusTip}
+      <p class="sfq-instruction">${accuracy >= 90 ? 'Outstanding!' : accuracy >= 70 ? 'Great work — keep practising!' : accuracy > 0 ? 'Good effort — mistakes are how we learn!' : 'Keep trying — you can do it!'}</p>
+      ${skillRows}${focusTip}${nextStepHtml}
       <div class="sfq-actions">
         ${hasMissed ? `<button class="btn btn--primary" id="gmcq-recovery">🔄 Recovery Round (${_missed.length})</button>` : ''}
         <button class="btn ${hasMissed ? 'btn--ghost' : 'btn--primary'}" id="gmcq-replay">Replay</button>

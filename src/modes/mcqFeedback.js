@@ -29,7 +29,7 @@ function renderClueWords(clueWords) {
 export function buildMcqFeedbackHtml(item, selectedChoice, isCorrect, { showClueWords = true } = {}) {
   let hintText = isCorrect
     ? '✅ <strong>Correct!</strong>'
-    : `❌ <strong>Correct answer:</strong> ${escapeHtml(item.answer)}`;
+    : `❌ Not quite. <strong>Correct answer:</strong> ${escapeHtml(item.answer)}`;
 
   if (showClueWords) hintText += renderClueWords(item.clueWords);
 
@@ -44,6 +44,15 @@ export function buildMcqFeedbackHtml(item, selectedChoice, isCorrect, { showClue
     hintText += `<br><span class="mcq-reasoning">${item.reasoning}</span>`;
   } else if (item.explain) {
     hintText += `<br>${item.explain}`;
+  }
+
+  // Teacher move: after a mistake, send the child back to the text with the
+  // correct answer in place so the fix is experienced, not just read.
+  if (!isCorrect) {
+    const rereadWhat = /___/.test(item?.q || '')
+      ? 'Read the sentence again with the correct word in the blank'
+      : 'Read the question again with the correct answer';
+    hintText += `<br><span class="mcq-reread-tip">📖 ${rereadWhat} — check that you can explain why it fits.</span>`;
   }
 
   return hintText;
