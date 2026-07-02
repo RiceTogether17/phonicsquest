@@ -123,8 +123,8 @@ describe('deriveDecodableStage / word.decodableStage', () => {
     ['sing',    'digraphs'],
     ['running', 'suffix-ing'],
     ['jumped',  'suffix-ed'],
-    ['faster',  'suffix-er'],
-    ['fastest', 'suffix-est'],
+    ['grander',  'suffix-er'],
+    ['grandest', 'suffix-est'],
   ])('%s → %s (named group)', (id, expected) => {
     expect(wordById(id).decodableStage).toBe(expected);
   });

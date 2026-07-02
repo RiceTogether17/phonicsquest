@@ -114,7 +114,7 @@ describe('gamification rewards', () => {
 describe('CVCC / CCVCC filter excludes suffix words', () => {
   const SUFFIX_WORDS = ['jumping', 'landing', 'camping', 'melting', 'resting',
     'jumped', 'landed', 'camped', 'melted', 'rested',
-    'jumper', 'faster', 'blending', 'blended'];
+    'jumper', 'grander', 'blending', 'blended'];
 
   const GROUPS = ['cvcc-a', 'cvcc-e', 'cvcc-u', 'struct-cvcc',
     'ccvcc-a', 'ccvcc-e', 'struct-ccvcc'];
@@ -128,4 +128,19 @@ describe('CVCC / CCVCC filter excludes suffix words', () => {
       }
     });
   }
+});
+
+describe('CCVC category excludes final-blend (CVCC) words', () => {
+  // Regression: struct-ccvc filtered on the coarse pattern:'blend' flag, which
+  // is set on both initial-blend (CCVC) and final-blend (CVCC) words, so words
+  // like "list"/"gift"/"mint" leaked into the CCVC category.
+  it('includes initial-blend CCVC words but not final-blend CVCC words', () => {
+    const ids = new Set(progress._filterByGroup('struct-ccvc').map(w => w.id));
+    for (const yes of ['flat', 'drop']) {
+      expect(ids.has(yes), `CCVC should include "${yes}"`).toBe(true);
+    }
+    for (const no of ['list', 'gift', 'mint', 'fist', 'milk']) {
+      expect(ids.has(no), `CCVC should NOT include final-blend "${no}"`).toBe(false);
+    }
+  });
 });

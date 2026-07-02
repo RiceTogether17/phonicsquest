@@ -95,7 +95,12 @@ class Progress {
       return WORDS.filter(w => w.pattern === 'CVC' && w.types.includes('sv') && lvl(w));
     }
     if (group === 'struct-ccvc') {
-      return WORDS.filter(w => w.pattern === 'blend' && w.types.includes('sv') && lvl(w));
+      // Structure, not the coarse `pattern:'blend'` flag: that flag is set on
+      // BOTH initial-blend words (CCVC: flat, drop) and final-blend words
+      // (CVCC: list, gift, mint), so filtering on it leaked ~30 CVCC words
+      // into the CCVC category. getWordStructure keeps this consistent with
+      // the vowel-specific ccvc-a…u stages, which already gate on 'CCVC'.
+      return WORDS.filter(w => getWordStructure(w) === 'CCVC' && w.types.includes('sv') && !w.types.includes('sf') && lvl(w));
     }
     if (group === 'struct-cvcc') {
       return WORDS.filter(w => (w.group === 'struct-cvcc' || (getWordStructure(w) === 'CVCC' && w.types.includes('sv') && !w.types.includes('sf'))) && lvl(w));

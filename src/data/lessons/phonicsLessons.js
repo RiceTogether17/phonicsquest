@@ -509,22 +509,22 @@ export const PHONICS_LESSONS = {
     headline: 'The -er ending: comparing two things',
     soundChips: [{ g: 'er', type: 'sf', label: '-er' }],
     script: [
-      'Add "-er" to compare two things: fast → faster, tall → taller.',
-      'Read the base word first, then the ending: fast + er — faster!',
+      'Add "-er" to compare two things: tall → taller, big → bigger.',
+      'Read the base word first, then the ending: tall + er — taller!',
       'Try it: t… a… ll + er — taller!',
     ],
-    weDoWord: 'faster',
+    weDoWord: 'taller',
     confusions: [],
   },
   'suffix-est': {
     headline: 'The -est ending: the MOST of all',
     soundChips: [{ g: 'est', type: 'sf', label: '-est' }],
     script: [
-      'Add "-est" for the most of all: fast → fastest — nobody is faster!',
+      'Add "-est" for the most of all: tall → tallest — nobody is taller!',
       '-er compares two; -est compares everyone: taller than Sam, but the tallest in class.',
-      'Try it: f… a… st + est — fastest!',
+      'Try it: t… a… ll + est — tallest!',
     ],
-    weDoWord: 'fastest',
+    weDoWord: 'tallest',
     confusions: ['-er = comparing two. -est = the champion of all. "Taller" vs "tallest".'],
   },
 
