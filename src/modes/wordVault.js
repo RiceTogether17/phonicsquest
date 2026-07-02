@@ -291,6 +291,7 @@ function _renderCategoryBrowser() {
   html += `<div class="wv-level-context-banner" aria-live="polite">
     Currently practising: <strong>${levelLabel} Vocabulary Cloze</strong>
   </div>`;
+  html += '<p class="cloze-cat-subtitle">Pick a word skill to practise. Each passage is a short story — read it through first, then fill every blank with the best word.</p>';
   if (dueCount > 0) {
     html += `<div class="wv-srs-due-badge" aria-live="polite">📅 ${dueCount} word${dueCount === 1 ? '' : 's'} due for review</div>`;
   }
@@ -341,7 +342,7 @@ function _renderCategoryBrowser() {
   html += `</div>
     <div class="cloze-cat-actions">
       <button class="btn btn--ghost btn--sm" id="wv-mastery-review">Review Weak Words</button>
-      ${weakSkills.length ? `<ul class="cloze-mastery-list">${weakList}</ul>` : '<p class="cloze-cat-subtitle">Read the sentence first. Weak skills will appear here.</p>'}
+      ${weakSkills.length ? `<ul class="cloze-mastery-list">${weakList}</ul>` : '<p class="cloze-cat-subtitle">Complete a few passages and the skills that need more practice will appear here.</p>'}
     </div>
   </div>`;
   _container.innerHTML = html;
@@ -381,7 +382,7 @@ function _renderLevelBrowser(catKey) {
         <span class="cloze-mode-label">Mode:</span>
         <button class="btn btn--ghost btn--sm ${_sessionMode === 'practice' ? 'is-active' : ''}" id="wv-mode-practice" aria-pressed="${_sessionMode === 'practice'}">Practice Mode</button>
         <button class="btn btn--ghost btn--sm ${_sessionMode === 'exam' ? 'is-active' : ''}" id="wv-mode-exam" aria-pressed="${_sessionMode === 'exam'}">Exam Mode</button>
-        <span class="cloze-mode-hint">${_sessionMode === 'practice' ? 'Hints + scan + per-blank feedback.' : 'No hints, timed, review only at the end.'}</span>
+        <span class="cloze-mode-hint">${_sessionMode === 'practice' ? 'Learn as you go: hints, a warm-up read, and feedback after every passage.' : 'Just like the real paper: no hints, timed, and all feedback saved for the end.'}</span>
       </div>
       <div class="wv-level-grid">`;
 
@@ -547,7 +548,7 @@ function _renderVaultScanTaskStep(passage) {
         <span class="wv-game-badge">Scan Step</span>
       </div>
       <h3 class="wv-passage-title">${escapeHtml(passage.title || 'Word Vault')}</h3>
-      <p class="wv-instruction">What clue helps you?</p>
+      <p class="wv-instruction">Warm-up: answer one quick question about the passage before you fill the blanks.</p>
       <div id="wv-scan-host"></div>
     </div>`;
   const host = document.getElementById('wv-scan-host');
@@ -593,7 +594,7 @@ function _renderPassage(passage) {
       ${inClueMode ? _buildClueHuntPanel(passage) : ''}
 
       <p class="wv-instruction" id="wv-instruction">
-        ${inClueMode ? `🔍 ${passage.clueMission || 'Tap the context clue in the passage first!'}` : '🔑 Tap a word to fill the next blank!'}
+        ${inClueMode ? `🔍 ${passage.clueMission || 'Tap the context clue in the passage first!'}` : '🔑 Read the whole passage first, then tap a word to fill each blank.'}
       </p>
 
       ${showLegend ? '<div class="wv-pos-legend">POS: <span class="pos-noun">Noun</span><span class="pos-verb">Verb</span><span class="pos-adjective">Adjective</span><span class="pos-adverb">Adverb (-ly)</span></div>' : ''}
@@ -612,7 +613,7 @@ function _renderPassage(passage) {
         <button class="btn btn--ghost btn--sm" id="wv-listen" aria-label="Listen to passage">🔊 Listen</button>
         ${modeCfg.allowInfoPanel ? '<button class="btn btn--ghost btn--sm" id="wv-info" aria-label="Show definitions panel">ℹ️ Info</button>' : ''}
         ${modeCfg.allowHints ? '<button class="btn btn--ghost btn--sm" id="wv-hint">💡 Hint</button>' : ''}
-        ${modeCfg.allowInfoPanel ? '<button class="btn btn--ghost btn--sm" id="wv-rule-hint" aria-expanded="false">📖 Show Rule</button>' : ''}
+        ${modeCfg.allowInfoPanel ? '<button class="btn btn--ghost btn--sm" id="wv-rule-hint" aria-expanded="false">📖 Stuck? Show the rule</button>' : ''}
         <button class="btn btn--primary" id="wv-check" ${inClueMode ? 'disabled' : ''}>Check ✓</button>
         <button class="btn btn--ghost btn--sm" id="wv-quit">Menu</button>
       </div>
@@ -664,7 +665,7 @@ function _renderPassage(passage) {
     const wasHidden = panel.hidden;
     panel.hidden = !wasHidden;
     btn.setAttribute('aria-expanded', String(wasHidden));
-    btn.textContent = wasHidden ? '📖 Hide Rule' : '📖 Show Rule';
+    btn.textContent = wasHidden ? '📖 Hide the rule' : '📖 Stuck? Show the rule';
     if (wasHidden) {
       const tb = VAULT_TEACHBACK[_currentCat] || VAULT_TEACHBACK.default;
       panel.innerHTML = `
@@ -818,7 +819,7 @@ function _unlockBankAfterClue(passage, result) {
   _sessionClueScore += clueResultToScore(result || 'weak');
 
   const instr = document.getElementById('wv-instruction');
-  if (instr) instr.textContent = '🔑 Now tap a word to fill the blank!';
+  if (instr) instr.textContent = '🔑 Clue found! Now tap the word that fits the blank.';
 
   const wrapper = document.getElementById('wv-bank-wrapper');
   if (wrapper) wrapper.className = 'wv-bank-wrapper';
@@ -1258,7 +1259,7 @@ function _checkPassage(passage) {
         });
       }, 800);
     } else {
-      _showFeedback('❌ Some blanks are wrong – check and try again!', false);
+      _showFeedback('❌ Not quite — the red blanks need another look. Reread those sentences before you try again.', false);
       setTimeout(() => {
         document.querySelectorAll('.wv-blank--wrong').forEach(b => b.classList.remove('wv-blank--wrong'));
         const fb = document.getElementById('wv-feedback');
@@ -1279,6 +1280,7 @@ function _renderVaultRuleCard(catKey, onStart) {
     <div class="mcq-rule-card" role="region" aria-label="Vocabulary tip: ${escapeAttr(meta.label)}">
       <div class="mcq-rule-icon" aria-hidden="true">${tb.icon || meta.icon}</div>
       <h2 class="mcq-rule-title">${escapeHtml(meta.label)}</h2>
+      <p class="mcq-rule-intro">A quick lesson before you start — read it once, then use it in the passage.</p>
       <div class="mcq-rule-body">
         <div class="mcq-rule-section">
           <p class="mcq-rule-label">📖 Rule</p>
@@ -1295,7 +1297,7 @@ function _renderVaultRuleCard(catKey, onStart) {
       </div>
       <div class="sfq-actions">
         <button class="btn btn--primary" id="wv-rule-start">Got it — start passage →</button>
-        <button class="btn btn--ghost" id="wv-rule-skip">Skip →</button>
+        <button class="btn btn--ghost" id="wv-rule-skip">I know this rule — skip →</button>
       </div>
     </div>`;
 
@@ -1325,6 +1327,7 @@ function _showVaultTeachBackOverlay(passage) {
       <p class="wv-tb-rule">${escapeHtml(tb.rule)}</p>
       <div class="wv-tb-example">${escapeHtml(tb.example)}</div>
       <p class="wv-tb-tip">💡 ${escapeHtml(tb.tip)}</p>
+      <p class="cloze-restart-note">Your blanks will be cleared so you can try the whole passage again with this rule in mind.</p>
       <button class="btn btn--primary wv-tb-btn" id="wv-tb-got-it">
         Got it — Try again →
       </button>
@@ -1499,6 +1502,7 @@ function _showSentenceStep(passage, onContinue) {
   overlay.innerHTML = `
     <div class="clue-explanation-card wv-sentence-step">
       <p class="clue-explanation-title">📝 Use the word in a sentence!</p>
+      <p class="clue-explanation-text">Making your own sentence with a new word is the best way to remember it.</p>
       <div class="clue-explanation-body">
         <p class="wv-sentence-step__word">Word: <strong>${escapeHtml(targetWord)}</strong></p>
         <p class="wv-sentence-step__meaning">Meaning: ${escapeHtml(definition)}</p>

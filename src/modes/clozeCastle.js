@@ -122,6 +122,8 @@ function _renderBrowser() {
   const levels    = Object.keys(passages);
 
   let html = '<div class="cloze-browser">';
+  html += '<h3 class="cloze-cat-title">🏰 Cloze Castle</h3>';
+  html += '<p class="cloze-cat-subtitle">Each passage is a short story with missing words. Read it through first, then fill every blank. Pick your level to begin.</p>';
   html += '<div class="cloze-browser-grid">';
 
   for (const lv of levels) {
@@ -165,7 +167,7 @@ function _renderCategoryPicker(level) {
     <button class="btn btn--ghost btn--sm" id="cloze-back-levels" aria-label="Back to levels">← Levels</button>
     <h3 class="cloze-cat-title">${icon} ${CLOZE_LEVEL_LABELS[level]}</h3>
   </div>`;
-  html += `<p class="cloze-cat-subtitle">Choose a grammar topic:</p>`;
+  html += `<p class="cloze-cat-subtitle">Choose one grammar topic to focus on — or Play All to mix them. Topics marked "Recommended" are the ones that need your attention most.</p>`;
   html += '<div class="cloze-cat-grid">';
 
   const recommendedCat = progress.getRecommendedGrammarCategory(level, cats)
@@ -195,7 +197,7 @@ function _renderCategoryPicker(level) {
     <span class="cloze-mode-label">Mode:</span>
     <button class="btn btn--ghost btn--sm ${modeCfg.mode === 'practice' ? 'is-active' : ''}" id="cloze-mode-practice" aria-pressed="${modeCfg.mode === 'practice'}">Practice Mode</button>
     <button class="btn btn--ghost btn--sm ${modeCfg.mode === 'exam' ? 'is-active' : ''}" id="cloze-mode-exam" aria-pressed="${modeCfg.mode === 'exam'}">Exam Mode</button>
-    <span class="cloze-mode-hint">${modeCfg.mode === 'practice' ? 'Hints + scan + per-blank feedback.' : 'No hints, timed, review only at the end.'}</span>
+    <span class="cloze-mode-hint">${modeCfg.mode === 'practice' ? 'Learn as you go: hints, a warm-up read, and feedback after every passage.' : 'Just like the real paper: no hints, timed, and all feedback saved for the end.'}</span>
   </div>`;
 
   const totalAll = cats.reduce((s, c) => s + passages[level][c].length, 0);
@@ -222,7 +224,7 @@ function _renderCategoryPicker(level) {
   html += `<div class="cloze-cat-actions">
     <button class="btn btn--primary btn--lg" id="cloze-play-all">Play All (${totalAll} passages)</button>
     <button class="btn btn--ghost btn--sm" id="cloze-mastery-review">Practise Recommended Topic</button>
-    ${weakSkills.length ? `<ul class="cloze-mastery-list">${masteryRows}</ul>` : '<p class="cloze-cat-subtitle">Mastery tip: complete a few passages to unlock weak-skill hints.</p>'}
+    ${weakSkills.length ? `<ul class="cloze-mastery-list">${masteryRows}</ul>` : '<p class="cloze-cat-subtitle">Complete a few passages and the skills that need more practice will appear here.</p>'}
   </div>`;
 
   html += '</div>';
@@ -363,7 +365,7 @@ function _renderPassage(passage) {
     ? (inClueMode
       ? '🔍 Step 1 of 2 — Tap the clue word in the passage that hints at the answer.'
       : '🏰 Step 2 of 2 — Now tap a word from the bank to fill the next blank.')
-    : '🏰 Tap a word from the bank to fill the next blank.';
+    : '🏰 Read the whole passage first, then tap a word from the bank to fill each blank.';
 
   _container.innerHTML = `
     <div class="cloze-game">
@@ -394,7 +396,7 @@ function _renderPassage(passage) {
       <div class="cloze-actions">
         <button class="btn btn--ghost btn--sm" id="cloze-clear">↺ Clear all</button>
         <button class="btn btn--ghost btn--sm" id="cloze-listen" aria-label="Listen to passage">🔊 Listen</button>
-        ${_sessionMode !== 'exam' ? '<button class="btn btn--ghost btn--sm" id="cloze-rule-hint" aria-expanded="false">💡 Show Rule</button>' : ''}
+        ${_sessionMode !== 'exam' ? '<button class="btn btn--ghost btn--sm" id="cloze-rule-hint" aria-expanded="false">💡 Stuck? Show the rule</button>' : ''}
         <button class="btn btn--primary" id="cloze-check" ${inClueMode ? 'disabled' : ''}>Check ✓</button>
         <button class="btn btn--ghost btn--sm" id="cloze-quit">Menu</button>
       </div>
@@ -435,7 +437,7 @@ function _renderPassage(passage) {
     const wasHidden = panel.hidden;
     panel.hidden = !wasHidden;
     btn.setAttribute('aria-expanded', String(wasHidden));
-    btn.textContent = wasHidden ? '💡 Hide Rule' : '💡 Show Rule';
+    btn.textContent = wasHidden ? '💡 Hide the rule' : '💡 Stuck? Show the rule';
     if (wasHidden) {
       const tipCat = _currentCat !== '__all__' ? _currentCat : null;
       const tip = tipCat ? getGrammarTip(tipCat) : {
@@ -654,7 +656,7 @@ function _unlockBankAfterClue(passage, result) {
 
   // Update instruction
   const instr = document.getElementById('cloze-instruction');
-  if (instr) instr.textContent = '🏰 Now tap a word to fill the blank!';
+  if (instr) instr.textContent = '🏰 Clue found! Now tap the word from the bank that fits the blank.';
 
   // Swap bank wrapper state
   const wrapper = document.getElementById('cloze-bank-wrapper');
@@ -967,7 +969,7 @@ function _checkPassage(passage) {
         });
       }, 800);
     } else {
-      _showFeedback('❌ Some blanks are wrong – try again!', false);
+      _showFeedback('❌ Not quite — the red blanks need another look. Reread those sentences before you try again.', false);
       setTimeout(() => {
         document.querySelectorAll('.cloze-blank--wrong').forEach(b => b.classList.remove('cloze-blank--wrong'));
         const fb = document.getElementById('cloze-feedback');
@@ -994,6 +996,7 @@ function _renderClozeRuleCard(catKey, onStart) {
     <div class="mcq-rule-card" role="region" aria-label="Grammar rule: ${escapeAttr(meta.label)}">
       <div class="mcq-rule-icon" aria-hidden="true">${meta.icon}</div>
       <h2 class="mcq-rule-title">${escapeHtml(meta.label)}</h2>
+      <p class="mcq-rule-intro">A quick lesson before you start — read it once, then use it in the passages.</p>
       <div class="mcq-rule-body">
         <div class="mcq-rule-section">
           <p class="mcq-rule-label">📖 Rule</p>
@@ -1010,7 +1013,7 @@ function _renderClozeRuleCard(catKey, onStart) {
       </div>
       <div class="sfq-actions">
         <button class="btn btn--primary" id="cloze-rule-start">Got it — start passages →</button>
-        <button class="btn btn--ghost" id="cloze-rule-skip">Skip →</button>
+        <button class="btn btn--ghost" id="cloze-rule-skip">I know this rule — skip →</button>
       </div>
     </div>`;
 
@@ -1059,6 +1062,7 @@ function _showTeachBackOverlay(passage, userAnswers = []) {
         <p class="ctb-example-text">${escapeHtml(tip.example)}</p>
       </div>
       ${tip.tip ? `<p class="ctb-memory-tip">💡 ${escapeHtml(tip.tip)}</p>` : ''}
+      <p class="cloze-restart-note">Your blanks will be cleared so you can try the whole passage again with this rule in mind.</p>
       <button class="btn btn--primary ctb-btn" id="ctb-try-again">
         Got it — try again!
       </button>

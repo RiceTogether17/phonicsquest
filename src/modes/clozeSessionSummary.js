@@ -15,9 +15,9 @@ export function getModeConfig(mode = 'practice') {
 }
 
 export function getNextStepRecommendation({ accuracy = 0, skillLabel = 'grammar', hintsUsed = 0 }) {
-  if (accuracy >= 90) return `Great work. Keep this level and refine ${skillLabel} speed.`;
-  if (hintsUsed > 2) return `Strong effort. Retry with fewer hints and focus on ${skillLabel}.`;
-  return `Revise ${skillLabel} clues and attempt one more passage.`;
+  if (accuracy >= 90) return `Excellent! Move up a level, or replay in Exam Mode to test ${skillLabel} without hints.`;
+  if (hintsUsed > 2) return `Strong effort — you used ${hintsUsed} hints. Replay and try to find each clue yourself before asking for help.`;
+  return `Read the rule for ${skillLabel} once more, then try one more passage — a second attempt right away is the fastest way to improve.`;
 }
 
 export function buildCopySummaryText({

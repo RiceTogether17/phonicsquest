@@ -139,7 +139,7 @@ describe('user-flow: P5 user opens Word Vault in Exam Mode', () => {
     // Mode toggle should now reflect Exam Mode and tell the user there are no hints
     const hintLine = root.querySelector('.cloze-mode-hint');
     expect(hintLine).not.toBeNull();
-    expect(hintLine.textContent).toMatch(/No hints/);
+    expect(hintLine.textContent).toMatch(/no hints/i);
 
     cleanupWordVault();
   });

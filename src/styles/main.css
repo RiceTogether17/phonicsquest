@@ -10370,6 +10370,13 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .ctb-example-text  { font-size: var(--font-md); font-style: italic; margin: 0; color: var(--color-text); }
 .ctb-memory-tip    { font-size: var(--font-sm); color: var(--color-text-muted); margin: 0; }
 .ctb-btn { align-self: stretch; }
+/* Shared note in cloze teach-back overlays: warns the child their fills reset on retry */
+.cloze-restart-note {
+  font-size: var(--font-sm, 0.85rem);
+  color: var(--color-text-muted, #667);
+  font-style: italic;
+  margin: 0;
+}
 
 /* ── Phase 3: Sentence Forge Teach-Back Overlay ─────────────────────────── */
 .sfq-teachback-overlay {
