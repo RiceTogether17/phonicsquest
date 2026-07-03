@@ -60,6 +60,11 @@ export function mountQuestJourney(host, opts = {}) {
 
   function _startLesson() {
     state.lesson = buildLesson(state.stageId, { roundsPerMode: ROUNDS_PER_MODE, rng });
+    if (!state.lesson) {
+      // Misconfigured/empty stage — stay on the map rather than dropping
+      // the child into a contentless game loop.
+      return _goMap();
+    }
     state.currentMode = 'soundMatch';
     state.roundIndex = 0;
     state.attemptsThisLesson = 0;

@@ -221,6 +221,18 @@ export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel 
     }
   }
 
+  // Tier 4: static pad so the question can never render with fewer than
+  // 3 distractors — a 1–2 option grid is un-failable and counts toward
+  // mastery all the same.
+  if (distractors.length < 3) {
+    for (const g of ['s', 't', 'm', 'p', 'n', 'd']) {
+      if (seen.has(g)) continue;
+      seen.add(g);
+      distractors.push({ grapheme: g, type: 'c' });
+      if (distractors.length >= 3) break;
+    }
+  }
+
   return distractors;
 }
 

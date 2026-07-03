@@ -142,11 +142,27 @@ function _revealAnswer(word, els) {
 }
 
 /**
+ * Static per-type fallback graphemes so a question can never render with
+ * fewer than 3 distractors (a 1-2 option "MCQ" is un-failable and useless
+ * as assessment). Only used when the word list can't supply enough.
+ */
+const FALLBACK_DISTRACTORS = {
+  sv: ['a', 'e', 'i', 'o', 'u'],
+  lv: ['ee', 'igh', 'oa', 'ai', 'oo'],
+  c:  ['s', 't', 'm', 'p', 'n', 'd'],
+  d:  ['sh', 'ch', 'th', 'ng', 'ck'],
+  bl: ['st', 'bl', 'tr', 'gr', 'fl'],
+  rc: ['ar', 'or', 'er', 'ir', 'ur'],
+  dp: ['oi', 'ow', 'ou', 'oy', 'aw'],
+};
+
+/**
  * Get distractor graphemes of the same phoneme type, bounded to graphemes
  * that actually appear in words at or below `maxLevel`. Falls back to the
- * full word list if the level-restricted pool is empty.
+ * full word list, then to a static per-type pool, so the result always has
+ * at least 3 entries.
  */
-function getPhonemeDistractors(correctGrapheme, type, maxLevel = 3) {
+export function getPhonemeDistractors(correctGrapheme, type, maxLevel = 3) {
   const collect = (pool) => {
     const graphemes = new Set();
     for (const word of pool) {
@@ -159,10 +175,18 @@ function getPhonemeDistractors(correctGrapheme, type, maxLevel = 3) {
     return graphemes;
   };
 
-  const levelGraphemes = collect(WORDS.filter(w => w.level <= maxLevel));
-  if (levelGraphemes.size > 0) return Array.from(levelGraphemes);
-
-  return Array.from(collect(WORDS));
+  const result = collect(WORDS.filter(w => w.level <= maxLevel));
+  if (result.size < 3) {
+    for (const g of collect(WORDS)) result.add(g);
+  }
+  if (result.size < 3) {
+    const fallback = FALLBACK_DISTRACTORS[type] ?? FALLBACK_DISTRACTORS.c;
+    for (const g of fallback) {
+      if (g !== correctGrapheme) result.add(g);
+      if (result.size >= 3) break;
+    }
+  }
+  return Array.from(result);
 }
 
 export function getCurrentWord() {

@@ -30,13 +30,22 @@ function dateSeed(dateStr) {
   return parseInt(dateStr.replace(/-/g, ''), 10);
 }
 
-/** Today's date string (YYYY-MM-DD). */
-function todayStr() {
-  const d = new Date();
+/**
+ * Format a Date as a LOCAL YYYY-MM-DD string. All calendar bookkeeping in
+ * this module uses local dates — never `toISOString()`, which is UTC and
+ * rolls to the wrong day for evening play west of Greenwich (or morning
+ * play east of it).
+ */
+function localDateStr(d) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
+}
+
+/** Today's date string (YYYY-MM-DD, local time). */
+function todayStr() {
+  return localDateStr(new Date());
 }
 
 function pickFrom(pool, count, rng) {
@@ -56,9 +65,33 @@ function pickFrom(pool, count, rng) {
 /**
  * Get today's deterministic daily-challenge word list.
  * Always returns the same words for the same calendar day.
+ *
+ * The first call of the day computes the set (seeded RNG + the child's
+ * current stats) and pins the word ids in the store. Later calls replay
+ * the pinned ids, so practising between visits can't reshuffle "today's
+ * five" — the RNG seed alone can't guarantee that, because the candidate
+ * pool and ordering also depend on mutable wordStats/difficulty.
  * @returns {import('../data/words.js').Word[]}
  */
 export function getDailyChallengeWords() {
+  const today = todayStr();
+
+  const pinned = store.get('dailyChallengeWords');
+  if (pinned && pinned.date === today && Array.isArray(pinned.ids)) {
+    const words = pinned.ids
+      .map(id => WORDS.find(w => w.id === id))
+      .filter(Boolean);
+    if (words.length === DAILY_WORD_COUNT) return words;
+    // Stale ids (e.g. word bank changed between versions) — recompute below.
+  }
+
+  const words = _computeDailyChallengeWords();
+  store.set('dailyChallengeWords', { date: today, ids: words.map(w => w.id) });
+  return words;
+}
+
+/** Compute today's picks from the seeded RNG + current learner stats. */
+function _computeDailyChallengeWords() {
   const seed = dateSeed(todayStr());
   const rng  = mulberry32(seed);
   const wordStats = store.get('wordStats') || {};
@@ -138,7 +171,10 @@ export function getWeeklyStreak() {
   for (let i = 0; i < 7; i++) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
-    if (calendar.includes(d.toISOString().slice(0, 10))) count++;
+    // Compare in LOCAL dates — the calendar is written with localDateStr,
+    // so a UTC comparison would miss today's completion in any timezone
+    // west of UTC after ~5pm.
+    if (calendar.includes(localDateStr(d))) count++;
   }
   return count;
 }

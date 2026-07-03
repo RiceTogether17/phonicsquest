@@ -89,15 +89,17 @@ export function setupSoundCount(word, els) {
 
 /**
  * Generate 4 number choices: the correct count plus 3 nearby distractors.
- * Keeps counts between 1 and 7 to stay realistic.
+ * Keeps counts between 1 and 8 to stay realistic. Walks outward from the
+ * correct answer so edge cases (correct = 1 or 7) still yield a full set
+ * of 4 — a 3-option grid makes the question easier to guess.
  */
-function _getCountChoices(correct) {
+export function _getCountChoices(correct) {
   const set = new Set([correct]);
-  const candidates = [correct - 2, correct - 1, correct + 1, correct + 2]
-    .filter(n => n >= 1 && n <= 7);
-  for (const c of candidates) {
-    set.add(c);
-    if (set.size >= 4) break;
+  for (let offset = 1; set.size < 4 && offset <= 8; offset++) {
+    const below = correct - offset;
+    const above = correct + offset;
+    if (below >= 1) set.add(below);
+    if (set.size < 4 && above <= 8) set.add(above);
   }
   return [...set].sort(() => Math.random() - 0.5);
 }
