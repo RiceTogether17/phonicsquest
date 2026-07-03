@@ -146,4 +146,17 @@ describe('setupTrainCarriages — DOM + completion flow', () => {
     expect(wrong.classList.contains('word-card--wrong')).toBe(true);
     expect(els.onResult).not.toHaveBeenCalled();
   });
+
+  it('a round finished with a mis-tap reports onResult(false) so the word is not promoted', async () => {
+    const els = makeEls();
+    setupTrainCarriages(POOL[0], els);  // target /b/
+
+    // One wrong tap, then collect every match.
+    document.querySelector('.word-card[data-match="false"]').click();
+    document.querySelectorAll('.word-card[data-match="true"]').forEach(c => c.click());
+
+    await new Promise(r => setTimeout(r, 1700));
+    expect(els.onResult).toHaveBeenCalledTimes(1);
+    expect(els.onResult.mock.calls[0][0]).toBe(false);  // real correctness, not always-true
+  }, 4000);
 });

@@ -12,10 +12,10 @@ import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { getDistractors, shuffleArray } from '../data/words.js';
+import { createChoiceRound } from './choiceRound.js';
 
 let currentWord = null;
-let answered = false;
-let startTime = 0;
+let round = null;
 
 /**
  * Set up Hear & Choose mode for a word.
@@ -24,8 +24,6 @@ let startTime = 0;
  */
 export function setupHearChoose(word, els) {
   currentWord = word;
-  answered = false;
-  startTime = Date.now();
 
   renderWordImage(word, els.wordEmoji, false);
   els.wordDisplay.innerHTML = '';
@@ -44,11 +42,21 @@ export function setupHearChoose(word, els) {
     btn.className = 'choice-btn';
     btn.textContent = choice.word;
     btn.dataset.wordId = choice.id;
+    btn.dataset.correct = String(choice.id === word.id);
     btn.setAttribute('aria-label', `Choose ${choice.word}`);
 
-    btn.addEventListener('click', () => handleChoice(choice, btn, word, els, grid));
+    btn.addEventListener('click', () => round?.handleTap(choice.id === word.id, btn));
     grid.appendChild(btn);
   }
+
+  round = createChoiceRound({
+    modeArea: els.modeArea,
+    grid,
+    onResult: els.onResult,
+    retryHint: 'Listen one more time, then pick the word.',
+    onRetry: () => { setTimeout(() => audio.speakWord(word.word), 200); },
+    onReveal: () => _revealAnswer(word, els),
+  });
 
   els.btnSayIt.style.display = '';
   els.btnCheck.style.display = 'none';
@@ -57,40 +65,13 @@ export function setupHearChoose(word, els) {
   setTimeout(() => audio.speakWord(word.word), 400);
 }
 
-function handleChoice(chosen, btn, target, els, grid) {
-  if (answered) return;
-  answered = true;
-  const responseTime = Date.now() - startTime;
-  const correct = chosen.id === target.id;
-
-  grid.querySelectorAll('.choice-btn').forEach(b => {
-    b.disabled = true;
-    if (b.dataset.wordId === target.id) {
-      b.classList.add('correct');
-    }
-  });
-
-  if (!correct) {
-    btn.classList.add('wrong');
-  }
-
+/** Reveal: image + word animation + phoneme tiles + correct-word audio. */
+function _revealAnswer(target, els) {
   renderWordImage(target, els.wordEmoji, true);
   buildWordAnimation(target, els.wordDisplay);
   renderPhonemes(target, els.phonemeRow, { showDiacritics: true });
 
-  // Play correct word
   setTimeout(() => audio.speakWord(target.word), 500);
-
-  const wrap = document.createElement('div');
-  wrap.className = 'vmcq-next-wrap';
-  const nextBtn = document.createElement('button');
-  nextBtn.className = 'btn btn--primary vmcq-next-btn';
-  nextBtn.textContent = 'Next →';
-  nextBtn.setAttribute('aria-label', 'Next word');
-  wrap.appendChild(nextBtn);
-  els.modeArea.appendChild(wrap);
-  nextBtn.addEventListener('click', () => els.onResult(correct, responseTime));
-  nextBtn.focus();
 }
 
 export function getCurrentWord() {
@@ -99,5 +80,5 @@ export function getCurrentWord() {
 
 export function cleanup() {
   currentWord = null;
-  answered = false;
+  round = null;
 }

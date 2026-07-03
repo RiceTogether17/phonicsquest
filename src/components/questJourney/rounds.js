@@ -94,11 +94,15 @@ export function buildBlendBuilderRound(stageId, { wordIndex = 0, rng = Math.rand
 export function buildLesson(stageId, { roundsPerMode = 3, rng = Math.random } = {}) {
   const stage = getStage(stageId);
   if (!stage) return null;
-  const wordIndices = Array.from({ length: Math.min(roundsPerMode, stage.sampleWords?.length ?? 0) }, (_, i) => i);
+  // A stage with no sample words can't produce playable rounds — return
+  // null so the caller can stay on the map instead of flashing the child
+  // through a sequence of empty screens.
+  if (!stage.sampleWords?.length) return null;
+  const wordIndices = Array.from({ length: Math.min(roundsPerMode, stage.sampleWords.length) }, (_, i) => i);
 
-  return {
-    stageId,
-    soundMatch:   wordIndices.map(i => buildSoundMatchRound(stageId,   { wordIndex: i, rng })),
-    blendBuilder: wordIndices.map(i => buildBlendBuilderRound(stageId, { wordIndex: i, rng })),
-  };
+  const soundMatch   = wordIndices.map(i => buildSoundMatchRound(stageId,   { wordIndex: i, rng })).filter(Boolean);
+  const blendBuilder = wordIndices.map(i => buildBlendBuilderRound(stageId, { wordIndex: i, rng })).filter(Boolean);
+  if (!soundMatch.length && !blendBuilder.length) return null;
+
+  return { stageId, soundMatch, blendBuilder };
 }

@@ -25,6 +25,12 @@
  * The scoring functions are pure — give them an attempt object, get back a
  * result object. UI code calls them and renders the feedback; reporting
  * code calls them and rolls them into mastery stats.
+ *
+ * All seven canonical modes now have playable implementations: wordSort,
+ * readAndTap, and fluencySprint gained dedicated UIs (wordSortMode.js,
+ * readAndTapMode.js, fluencySprintMode.js) that consume these scoring/hint
+ * engines. `listenAndSpell` continues to map to `classicBlend` as the
+ * closest existing UI.
  */
 
 import { scoreSoundMatch, getSoundMatchHint } from './scoring/soundMatch.js';
@@ -135,6 +141,7 @@ export const PHONICS_MODES = Object.freeze({
     objective: 'Sort words by their vowel or target spelling pattern.',
     keyboard: true,
     touch: true,
+    impl: 'wordSort',
     errorHints: {
       'vowel-confusion':   'Say the word slowly. What vowel sound do you hear in the middle?',
       'pattern-confusion': 'Look at the letters in the middle. Does it have a_e, ai, or ay?',
@@ -152,6 +159,7 @@ export const PHONICS_MODES = Object.freeze({
     objective: 'Locate a target decodable word inside a connected sentence.',
     keyboard: true,
     touch: true,
+    impl: 'readAndTap',
     errorHints: {
       'tapped-similar-onset': 'Two words start the same. Say each one and listen for the rest.',
       'tapped-rhyme':         'Those words rhyme. Look at how the start is spelled.',
@@ -190,6 +198,7 @@ export const PHONICS_MODES = Object.freeze({
     objective: 'Read familiar words quickly and accurately within a time window.',
     keyboard: true,
     touch: true,
+    impl: 'fluencySprint',
     errorHints: {
       'slow-and-accurate': 'Great accuracy! Read three words a beat faster next time.',
       'fast-and-error':    'Slow down a tiny bit. Accuracy first, speed second.',

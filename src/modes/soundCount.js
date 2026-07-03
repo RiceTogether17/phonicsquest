@@ -18,10 +18,10 @@ import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
+import { createChoiceRound } from './choiceRound.js';
 
 let currentWord = null;
-let answered    = false;
-let startTime   = 0;
+let round       = null;
 
 /**
  * @param {import('../data/words.js').Word} word
@@ -29,8 +29,6 @@ let startTime   = 0;
  */
 export function setupSoundCount(word, els) {
   currentWord = word;
-  answered    = false;
-  startTime   = Date.now();
 
   // Image yes, printed word NO — see the module-level comment on why.
   renderWordImage(word, els.wordEmoji, true);
@@ -61,9 +59,23 @@ export function setupSoundCount(word, els) {
 
     btn.appendChild(numEl);
     btn.appendChild(dotsEl);
-    btn.addEventListener('click', () => _handleChoice(count, btn, word, els, grid));
+    btn.addEventListener('click', () => round?.handleTap(count === correctCount, btn));
     grid.appendChild(btn);
   }
+
+  round = createChoiceRound({
+    modeArea: els.modeArea,
+    grid,
+    onResult: els.onResult,
+    retryHint: 'Count on your fingers as you hear each sound.',
+    onRetry: () => {
+      setTimeout(() => {
+        if (store.get('stretchedSpeech')) audio.speakWordStretched(word);
+        else audio.speakWord(word.word);
+      }, 200);
+    },
+    onReveal: () => _revealAnswer(word, els),
+  });
 
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = '';
@@ -77,55 +89,34 @@ export function setupSoundCount(word, els) {
 
 /**
  * Generate 4 number choices: the correct count plus 3 nearby distractors.
- * Keeps counts between 1 and 7 to stay realistic.
+ * Keeps counts between 1 and 8 to stay realistic. Walks outward from the
+ * correct answer so edge cases (correct = 1 or 7) still yield a full set
+ * of 4 — a 3-option grid makes the question easier to guess.
  */
-function _getCountChoices(correct) {
+export function _getCountChoices(correct) {
   const set = new Set([correct]);
-  const candidates = [correct - 2, correct - 1, correct + 1, correct + 2]
-    .filter(n => n >= 1 && n <= 7);
-  for (const c of candidates) {
-    set.add(c);
-    if (set.size >= 4) break;
+  for (let offset = 1; set.size < 4 && offset <= 8; offset++) {
+    const below = correct - offset;
+    const above = correct + offset;
+    if (below >= 1) set.add(below);
+    if (set.size < 4 && above <= 8) set.add(above);
   }
   return [...set].sort(() => Math.random() - 0.5);
 }
 
-function _handleChoice(count, btn, word, els, grid) {
-  if (answered) return;
-  answered = true;
-  const responseTime = Date.now() - startTime;
-  const correct = count === word.phonemes.length;
-
-  grid.querySelectorAll('.choice-btn').forEach(b => {
-    b.disabled = true;
-    if (b.dataset.correct === 'true') b.classList.add('correct');
-  });
-  if (!correct) btn.classList.add('wrong');
-
-  // Reveal printed word + phoneme tiles so child can see + count the sounds
+/** Reveal printed word + phoneme tiles, then play the phonemes in sequence. */
+function _revealAnswer(word, els) {
   buildWordAnimation(word, els.wordDisplay);
   renderPhonemes(word, els.phonemeRow, { showDiacritics: true, showLabels: true });
 
-  // Play phonemes sequentially to reinforce the count
   setTimeout(async () => {
     await audio.revealPhonemes(word);
   }, 500);
-
-  const wrap = document.createElement('div');
-  wrap.className = 'vmcq-next-wrap';
-  const nextBtn = document.createElement('button');
-  nextBtn.className = 'btn btn--primary vmcq-next-btn';
-  nextBtn.textContent = 'Next →';
-  nextBtn.setAttribute('aria-label', 'Next word');
-  wrap.appendChild(nextBtn);
-  els.modeArea.appendChild(wrap);
-  nextBtn.addEventListener('click', () => els.onResult(correct, responseTime));
-  nextBtn.focus();
 }
 
 export function getCurrentWord() { return currentWord; }
 
 export function cleanup() {
   currentWord = null;
-  answered    = false;
+  round       = null;
 }

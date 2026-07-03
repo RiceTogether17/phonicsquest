@@ -15,10 +15,10 @@ import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { getDistractors, shuffleArray } from '../data/words.js';
+import { createChoiceRound } from './choiceRound.js';
 
 let currentWord = null;
-let answered    = false;
-let startTime   = 0;
+let round       = null;
 
 /**
  * @param {import('../data/words.js').Word} word
@@ -26,8 +26,6 @@ let startTime   = 0;
  */
 export function setupOralBlend(word, els) {
   currentWord = word;
-  answered    = false;
-  startTime   = Date.now();
 
   // No image, no word text during question — pure auditory task
   renderWordImage(word, els.wordEmoji, false);
@@ -61,9 +59,18 @@ export function setupOralBlend(word, els) {
 
     btn.appendChild(emojiEl);
     btn.appendChild(labelEl);
-    btn.addEventListener('click', () => _handleChoice(choice, btn, word, els, grid));
+    btn.addEventListener('click', () => round?.handleTap(choice.id === word.id, btn));
     grid.appendChild(btn);
   }
+
+  round = createChoiceRound({
+    modeArea: els.modeArea,
+    grid,
+    onResult: els.onResult,
+    retryHint: 'Blend the sounds together in your head.',
+    onRetry: () => { setTimeout(() => _playPhonemes(word), 200); },
+    onReveal: () => _revealAnswer(word, els, grid),
+  });
 
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = '';
@@ -82,47 +89,22 @@ async function _playPhonemes(word) {
   }
 }
 
-function _handleChoice(choice, btn, word, els, grid) {
-  if (answered) return;
-  answered = true;
-  const responseTime = Date.now() - startTime;
-  const correct = choice.id === word.id;
-
-  // Reveal word labels on all choices
+/** Reveal: word labels on choices + image + word text + phoneme tiles + audio. */
+function _revealAnswer(word, els, grid) {
   grid.querySelectorAll('.choice-btn-word').forEach(l =>
     l.classList.remove('choice-btn-word--hidden')
   );
 
-  // Disable + highlight
-  grid.querySelectorAll('.choice-btn').forEach(b => {
-    b.disabled = true;
-    if (b.dataset.wordId === word.id) b.classList.add('correct');
-  });
-  if (!correct) btn.classList.add('wrong');
-
-  // Reveal word image, word text, phoneme tiles
   renderWordImage(word, els.wordEmoji, true);
   buildWordAnimation(word, els.wordDisplay);
   renderPhonemes(word, els.phonemeRow, { showDiacritics: true, showLabels: true });
 
-  // Play full word
   setTimeout(() => audio.speakWord(word.word), 400);
-
-  const wrap = document.createElement('div');
-  wrap.className = 'vmcq-next-wrap';
-  const nextBtn = document.createElement('button');
-  nextBtn.className = 'btn btn--primary vmcq-next-btn';
-  nextBtn.textContent = 'Next →';
-  nextBtn.setAttribute('aria-label', 'Next word');
-  wrap.appendChild(nextBtn);
-  els.modeArea.appendChild(wrap);
-  nextBtn.addEventListener('click', () => els.onResult(correct, responseTime));
-  nextBtn.focus();
 }
 
 export function getCurrentWord() { return currentWord; }
 
 export function cleanup() {
   currentWord = null;
-  answered    = false;
+  round       = null;
 }

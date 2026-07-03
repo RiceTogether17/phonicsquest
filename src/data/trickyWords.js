@@ -63,7 +63,7 @@ export const TRICKY_WORDS = [
   { word: 'of',   phase: 2, regular: [],           tricky: ['o','f'],     category: 'fully-irregular', note: '"o" /ŭ/ and "f" /v/ — totally odd' },
   { word: 'for',  phase: 2, regular: ['f'],        tricky: ['or'],        category: 'decodable-soon',  note: '"or" is r-controlled — taught in phase 8',  decodableInPhase: 8 },
   { word: 'by',   phase: 2, regular: ['b'],        tricky: ['y'],         category: 'decodable-soon',  note: 'final-y as /ī/, same pattern as "my"', decodableInPhase: 6 },
-  { word: 'too',  phase: 2, regular: ['t'],        tricky: ['oo'],        category: 'decodable-soon',  note: '"oo" makes /oo/ — taught in Long U · oo', decodableInPhase: 6 },
+  { word: 'too',  phase: 2, regular: ['t'],        tricky: ['oo'],        category: 'decodable-soon',  note: '"oo" makes /oo/ — taught in Vowel team /oo/ · oo', decodableInPhase: 6 },
 
   // ── Phase 3 (CVCC final blends) ──────────────────────────────────────
   { word: 'are',  phase: 3, regular: [],           tricky: ['are'],       category: 'partial',         note: 'whole word /ar/ — silent "e"' },

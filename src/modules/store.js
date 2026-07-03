@@ -132,7 +132,7 @@ const DEFAULT_STATE = {
   wordHistory: [],
 
   // Mascot
-  mascotName: 'Ollie',
+  mascotName: 'Giri',
 
   // ── Placement & onboarding ─────────────────────────────────────────────
   // Set to true after the placement diagnostic has been completed (or skipped).

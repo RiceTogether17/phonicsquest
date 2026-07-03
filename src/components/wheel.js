@@ -22,6 +22,8 @@ class SpinWheel {
     this._spinning = false;
     this._segments = [];
     this._onLand = null;
+    /** Last segment under the pointer — for the tick SFX on changes */
+    this._lastSegIndex = null;
   }
 
   /**
@@ -48,6 +50,9 @@ class SpinWheel {
 
     return new Promise((resolve) => {
       const targetAngle = this._angle + (Math.random() * 3 + 4) * Math.PI * 2;
+      // Seed with the current segment so the very first onUpdate doesn't
+      // fire a spurious tick before the wheel has actually moved.
+      this._lastSegIndex = this._getSelectedIndex();
 
       gsap.to(this, {
         _angle: targetAngle,

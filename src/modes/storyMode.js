@@ -1746,7 +1746,7 @@ function _renderWordDetectiveCard(info) {
   };
   const TYPE_LABEL = {
     c: 'consonant', sv: 'short vowel', lv: 'long vowel', d: 'digraph',
-    bl: 'blend', se: 'silent e', rc: 'r-controlled', dp: 'diphthong',
+    bl: 'blend', se: 'silent e', rc: 'r-controlled', dp: 'sliding vowel',
     sf: 'suffix', p: 'prefix', soft_c: 'soft c', soft_g: 'soft g',
   };
 

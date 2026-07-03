@@ -22,6 +22,25 @@
 
 import { audio } from '../modules/audio.js';
 
+/** Pending auto-play preview timer ids, so a new round (or the child's first
+ *  tap) can cancel previews that haven't fired yet. Without this, timers from
+ *  a finished round keep closured references to the old buttons and stray
+ *  phoneme audio bleeds into the next question. */
+let _previewTimers = [];
+
+/**
+ * Cancel all pending choice-preview timers (and any in-flight TTS utterance).
+ * Called automatically when a new grid renders; modes also call it from
+ * cleanup() and the round controller calls it on the child's first tap.
+ */
+export function cancelChoicePreviews() {
+  _previewTimers.forEach(id => clearTimeout(id));
+  _previewTimers = [];
+  if (typeof window !== 'undefined' && window.speechSynthesis) {
+    try { window.speechSynthesis.cancel(); } catch (_) { /* non-fatal */ }
+  }
+}
+
 /**
  * @typedef {Object} PhonemeChoice
  * @property {string}  grapheme   - the spelling unit, used to look up audio
@@ -52,6 +71,9 @@ export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
     autoPlayStride  = 650,
     autoPlayAfter   = null,
   } = opts;
+
+  // A new grid supersedes any previews still queued from the previous round.
+  cancelChoicePreviews();
 
   container.innerHTML = '<div class="choice-grid choice-grid--phoneme"></div>';
   const grid = container.querySelector('.choice-grid');
@@ -118,7 +140,8 @@ export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
  */
 function _previewChoicesInOrder(buttons, choices, initialDelay, stride) {
   buttons.forEach((btn, i) => {
-    setTimeout(async () => {
+    const timerId = setTimeout(async () => {
+      _previewTimers = _previewTimers.filter(id => id !== timerId);
       if (btn.disabled) return;
       if (i === 0 && typeof window !== 'undefined' && window.speechSynthesis) {
         try { window.speechSynthesis.cancel(); } catch (_) { /* non-fatal */ }
@@ -129,6 +152,7 @@ function _previewChoicesInOrder(buttons, choices, initialDelay, stride) {
       } catch (_) { /* audio failures are non-fatal */ }
       btn.classList.remove('previewing');
     }, initialDelay + i * stride);
+    _previewTimers.push(timerId);
   });
 }
 

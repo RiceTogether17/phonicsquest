@@ -15,7 +15,8 @@
  */
 
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
-import { renderPhonemeChoiceGrid } from '../components/phonemeChoice.js';
+import { renderPhonemeChoiceGrid, cancelChoicePreviews } from '../components/phonemeChoice.js';
+import { createChoiceRound } from './choiceRound.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { WORDS, shuffleArray } from '../data/words.js';
@@ -57,8 +58,7 @@ const CONFUSION_MAP = {
 };
 
 let currentWord = null;
-let answered = false;
-let startTime = 0;
+let round = null;
 
 /**
  * Set up First Sound mode for a word.
@@ -67,8 +67,6 @@ let startTime = 0;
  */
 export function setupFirstSound(word, els) {
   currentWord = word;
-  answered = false;
-  startTime = Date.now();
 
   renderWordImage(word, els.wordEmoji, true);
   els.wordDisplay.innerHTML = '';
@@ -104,11 +102,19 @@ export function setupFirstSound(word, els) {
   const wordPlayed = _waitForWordAudio(word);
 
   renderPhonemeChoiceGrid(els.modeArea, choices, {
-    onChoose: (choice, btn) =>
-      handleChoice(choice, btn, word, els, els.modeArea.querySelector('.choice-grid')),
+    onChoose: (choice, btn) => round?.handleTap(choice.correct, btn),
     autoPlayAfter: wordPlayed,
     autoPlayDelay:  600,   // pause after the word so the child can re-attune to phoneme listening
     autoPlayStride: 800,
+  });
+
+  round = createChoiceRound({
+    modeArea: els.modeArea,
+    grid: els.modeArea.querySelector('.choice-grid'),
+    onResult: els.onResult,
+    retryHint: 'Listen for the very FIRST sound.',
+    onRetry: () => { audio.speakWordArticulated(word.word).catch(() => {}); },
+    onReveal: () => _revealAnswer(word, els),
   });
 
   els.btnCheck.style.display = 'none';
@@ -145,20 +151,8 @@ function _waitForWordAudio(wordData) {
   });
 }
 
-function handleChoice(choice, btn, word, els, grid) {
-  if (answered) return;
-  answered = true;
-  const responseTime = Date.now() - startTime;
-
-  grid.querySelectorAll('.choice-btn').forEach(b => {
-    b.disabled = true;
-    if (b.dataset.correct === 'true') b.classList.add('correct');
-  });
-
-  if (!choice.correct) {
-    btn.classList.add('wrong');
-  }
-
+/** Reveal the full word: animation + labelled phoneme tiles + audio. */
+function _revealAnswer(word, els) {
   buildWordAnimation(word, els.wordDisplay);
   renderPhonemes(word, els.phonemeRow, {
     showDiacritics: true,
@@ -170,17 +164,6 @@ function handleChoice(choice, btn, word, els, grid) {
     await new Promise(r => setTimeout(r, 300));
     await audio.speakWord(word.word);
   }, 300);
-
-  const wrap = document.createElement('div');
-  wrap.className = 'vmcq-next-wrap';
-  const nextBtn = document.createElement('button');
-  nextBtn.className = 'btn btn--primary vmcq-next-btn';
-  nextBtn.textContent = 'Next →';
-  nextBtn.setAttribute('aria-label', 'Next word');
-  wrap.appendChild(nextBtn);
-  els.modeArea.appendChild(wrap);
-  nextBtn.addEventListener('click', () => els.onResult(choice.correct, responseTime));
-  nextBtn.focus();
 }
 
 /**
@@ -238,6 +221,18 @@ export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel 
     }
   }
 
+  // Tier 4: static pad so the question can never render with fewer than
+  // 3 distractors — a 1–2 option grid is un-failable and counts toward
+  // mastery all the same.
+  if (distractors.length < 3) {
+    for (const g of ['s', 't', 'm', 'p', 'n', 'd']) {
+      if (seen.has(g)) continue;
+      seen.add(g);
+      distractors.push({ grapheme: g, type: 'c' });
+      if (distractors.length >= 3) break;
+    }
+  }
+
   return distractors;
 }
 
@@ -247,5 +242,6 @@ export function getCurrentWord() {
 
 export function cleanup() {
   currentWord = null;
-  answered = false;
+  round = null;
+  cancelChoicePreviews();
 }

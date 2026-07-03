@@ -15,6 +15,7 @@ import { audio } from '../modules/audio.js';
 let currentWord = null;
 let selectedLetters = [];
 let segmentsFound = [];
+let wrongGroupings = 0;
 let startTime = 0;
 
 /**
@@ -26,6 +27,7 @@ export function setupSegment(word, els) {
   currentWord = word;
   selectedLetters = [];
   segmentsFound = [];
+  wrongGroupings = 0;
   startTime = Date.now();
 
   renderWordImage(word, els.wordEmoji, true);
@@ -132,7 +134,9 @@ function confirmSegment(word, els) {
       onAllSegmented(word, els);
     }
   } else {
-    // Wrong grouping — shake selected letters
+    // Wrong grouping — shake selected letters. Counted so the round can
+    // report real correctness: a fumbled word must not promote its SR box.
+    wrongGroupings++;
     const lettersContainer = document.getElementById('segment-letters');
     selectedLetters.forEach(l => {
       const btns = lettersContainer.querySelectorAll('.segment-btn');
@@ -159,7 +163,9 @@ function onAllSegmented(word, els) {
   });
 
   setTimeout(() => audio.speakWord(word.word), 300);
-  setTimeout(() => els.onResult(true, responseTime), 1000);
+  // The child always finishes the word (the scaffold only accepts correct
+  // groupings), so correctness = did they get there without a wrong grouping.
+  setTimeout(() => els.onResult(wrongGroupings === 0, responseTime), 1000);
 }
 
 export function getCurrentWord() {
@@ -170,4 +176,5 @@ export function cleanup() {
   currentWord = null;
   selectedLetters = [];
   segmentsFound = [];
+  wrongGroupings = 0;
 }

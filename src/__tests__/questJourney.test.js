@@ -94,6 +94,22 @@ describe('buildLesson', () => {
     const words = lesson.blendBuilder.map(r => r.target.word);
     expect(new Set(words).size).toBe(3);
   });
+
+  it('returns null for an unknown stage', () => {
+    expect(buildLesson('no-such-stage', { rng: seededRng(1) })).toBeNull();
+  });
+
+  it('returns null for a stage with no sample words instead of empty rounds', async () => {
+    const { getStage } = await import('../data/curriculum.js');
+    const stage = getStage('ccvc-a');
+    const saved = stage.sampleWords;
+    try {
+      stage.sampleWords = [];
+      expect(buildLesson('ccvc-a', { rng: seededRng(1) })).toBeNull();
+    } finally {
+      stage.sampleWords = saved;
+    }
+  });
 });
 
 // ── Screen render shape ────────────────────────────────────────────────
@@ -400,6 +416,21 @@ describe('mountQuestJourney — end-to-end slice', () => {
     host.querySelector('[data-action="start"]').click();
     expect(controller.getState().screen).toBe('game');
     expect(controller.getState().currentMode).toBe('soundMatch');
+  });
+
+  it('a stage with no sample words returns to the map instead of an empty game', async () => {
+    const { getStage } = await import('../data/curriculum.js');
+    const stage = getStage(controller.getState().stageId);
+    const saved = stage.sampleWords;
+    try {
+      stage.sampleWords = [];
+      host.querySelector('[data-action="start"]').click(); // welcome → lesson
+      host.querySelector('[data-action="start"]').click(); // lesson → (guarded)
+      expect(controller.getState().screen).toBe('map');
+      expect(controller.getState().lesson).toBeNull();
+    } finally {
+      stage.sampleWords = saved;
+    }
   });
 
   it('plays 3 Sound Match rounds then advances to Blend Builder', () => {

@@ -62,6 +62,32 @@ describe('getDailyChallengeWords', () => {
     }
   });
 
+  it('keeps the same words for the day even when stats change between calls', () => {
+    store.set('difficulty', 3);
+    const first = getDailyChallengeWords().map(w => w.id);
+
+    // Practising between visits mutates the inputs the picker reads.
+    const stats = {};
+    for (const w of WORDS.slice(0, 100)) {
+      stats[w.id] = { attempts: 5, correct: 1, lastSeen: Date.now() };
+    }
+    store.set('wordStats', stats);
+    store.set('difficulty', 1);
+
+    const second = getDailyChallengeWords().map(w => w.id);
+    expect(second).toEqual(first);  // pinned for the day
+  });
+
+  it('re-pins a fresh set when the day rolls over', () => {
+    store.set('difficulty', 3);
+    const day1 = getDailyChallengeWords().map(w => w.id);
+    vi.setSystemTime(FIXED_TOMORROW);
+    const day2 = getDailyChallengeWords().map(w => w.id);
+    expect(day2).not.toEqual(day1);
+    // And day 2's set is itself stable.
+    expect(getDailyChallengeWords().map(w => w.id)).toEqual(day2);
+  });
+
   it('biases the first slots toward weak words when stats exist', () => {
     store.set('difficulty', 3);
     // Mark every word at level 1 as a "weak" word (low accuracy, attempted).
@@ -134,10 +160,16 @@ describe('getWeeklyStreak', () => {
   });
   afterEach(() => { vi.useRealTimers(); });
 
-  function isoDay(offsetDays) {
+  // The calendar is written in LOCAL dates (see completeDailyChallenge),
+  // so the fixtures must be local too — seeding with toISOString() (UTC)
+  // masked the timezone bug this suite now guards against.
+  function localDay(offsetDays) {
     const d = new Date(FIXED_TODAY);
     d.setDate(d.getDate() - offsetDays);
-    return d.toISOString().slice(0, 10);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
   }
 
   it('returns 0 when nothing has been completed', () => {
@@ -146,17 +178,48 @@ describe('getWeeklyStreak', () => {
 
   it('counts only completions within the last 7 days', () => {
     store.set('challengeCalendar', [
-      isoDay(0), isoDay(1), isoDay(3),
-      isoDay(8),  // outside the 7-day window
-      isoDay(20),
+      localDay(0), localDay(1), localDay(3),
+      localDay(8),  // outside the 7-day window
+      localDay(20),
     ]);
     expect(getWeeklyStreak()).toBe(3);
   });
 
   it('caps at 7 even if the calendar contains duplicates', () => {
     store.set('challengeCalendar',
-      [0, 1, 2, 3, 4, 5, 6].map(isoDay)
+      [0, 1, 2, 3, 4, 5, 6].map(localDay)
     );
     expect(getWeeklyStreak()).toBe(7);
+  });
+
+  it('sees a completion written moments earlier, even late in the local evening', () => {
+    // Regression: getWeeklyStreak used to compare with toISOString() (UTC),
+    // so an evening completion west of UTC — stored under the local date —
+    // was never matched on the day it happened.
+    vi.setSystemTime(new Date(2026, 3, 30, 23, 30, 0)); // 23:30 local
+    completeDailyChallenge();
+    expect(getWeeklyStreak()).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('getWeeklyStreak matches the calendar writer across timezones', () => {
+  const ORIGINAL_TZ = process.env.TZ;
+
+  afterEach(() => {
+    if (ORIGINAL_TZ === undefined) delete process.env.TZ;
+    else process.env.TZ = ORIGINAL_TZ;
+    vi.useRealTimers();
+    store.reset();
+  });
+
+  it('counts an evening completion in a US timezone on the same local day', () => {
+    process.env.TZ = 'America/Chicago';
+    store.reset();
+    vi.useFakeTimers();
+    // 20:00 in Chicago = 01:00 UTC the NEXT day — the exact failure window.
+    vi.setSystemTime(new Date('2026-04-30T20:00:00-05:00'));
+
+    completeDailyChallenge();
+    expect(getWeeklyStreak()).toBeGreaterThanOrEqual(1);
   });
 });

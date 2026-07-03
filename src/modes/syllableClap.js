@@ -27,10 +27,10 @@
 import { renderWordImage } from '../components/phonemeDisplay.js';
 import { audio } from '../modules/audio.js';
 import { getSyllableCount, getSyllableBreakdown } from '../modules/syllables.js';
+import { createChoiceRound } from './choiceRound.js';
 
 let _currentWord = null;
-let _answered    = false;
-let _startTime   = 0;
+let _round       = null;
 let _clapCount   = 0;
 
 /**
@@ -39,8 +39,6 @@ let _clapCount   = 0;
  */
 export function setupSyllableClap(word, els) {
   _currentWord = word;
-  _answered    = false;
-  _startTime   = Date.now();
   _clapCount   = 0;
 
   // Image yes, printed word no — same rationale as Sound Count.
@@ -94,9 +92,18 @@ export function setupSyllableClap(word, els) {
 
     btn.appendChild(num);
     btn.appendChild(dots);
-    btn.addEventListener('click', () => _handleChoice(n, btn, word, els, grid));
+    btn.addEventListener('click', () => _round?.handleTap(n === correctCount, btn));
     grid.appendChild(btn);
   }
+
+  _round = createChoiceRound({
+    modeArea: els.modeArea,
+    grid,
+    onResult: els.onResult,
+    retryHint: 'Clap it out slowly, one beat at a time.',
+    onRetry: () => { setTimeout(() => audio.speakWord(word.word), 200); },
+    onReveal: () => _revealAnswer(word, els),
+  });
 
   if (els.btnCheck) els.btnCheck.style.display = 'none';
   if (els.btnSayIt) els.btnSayIt.style.display = '';
@@ -105,21 +112,8 @@ export function setupSyllableClap(word, els) {
   setTimeout(() => audio.speakWord(word.word), 400);
 }
 
-function _handleChoice(value, btn, word, els, grid) {
-  if (_answered) return;
-  _answered = true;
-  const responseTime = Date.now() - _startTime;
-  const correctCount = getSyllableCount(word);
-  const correct      = value === correctCount;
-
-  grid.querySelectorAll('.choice-btn').forEach(b => {
-    b.disabled = true;
-    if (b.dataset.correct === 'true') b.classList.add('correct');
-  });
-  if (!correct) btn.classList.add('wrong');
-
-  // Reveal: printed word + syllable breakdown so the child sees the
-  // beats they just heard.
+/** Reveal: printed word + syllable breakdown, then re-play the word. */
+function _revealAnswer(word, els) {
   const breakdown = getSyllableBreakdown(word);
   els.wordDisplay.innerHTML = `
     <div class="syllable-reveal">
@@ -128,26 +122,13 @@ function _handleChoice(value, btn, word, els, grid) {
     </div>
   `;
 
-  // Re-play the word slowly so child hears each beat one more time.
   setTimeout(() => audio.speakWord(word.word), 500);
-
-  const wrap = document.createElement('div');
-  wrap.className = 'vmcq-next-wrap';
-  const nextBtn = document.createElement('button');
-  nextBtn.type = 'button';
-  nextBtn.className   = 'btn btn--primary vmcq-next-btn';
-  nextBtn.textContent = 'Next →';
-  nextBtn.setAttribute('aria-label', 'Next word');
-  wrap.appendChild(nextBtn);
-  els.modeArea.appendChild(wrap);
-  nextBtn.addEventListener('click', () => els.onResult(correct, responseTime));
-  nextBtn.focus();
 }
 
 export function getCurrentWord() { return _currentWord; }
 
 export function cleanup() {
   _currentWord = null;
-  _answered    = false;
+  _round       = null;
   _clapCount   = 0;
 }
