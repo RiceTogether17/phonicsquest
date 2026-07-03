@@ -160,9 +160,6 @@ class App {
     this._queuedRounds = [];
     /** Word being drilled in the active Word Workout (for results copy). */
     this._workoutWord = null;
-    /** @type {number} correct answers in current queued session */
-    this._queuedCorrect = 0;
-
     /** @type {number} words completed in current session */
     this._sessionWordCount = 0;
 
@@ -922,6 +919,41 @@ class App {
     if (this._resultProcessing) return;
     this._resultProcessing = true;
 
+    // Gentle-nudge retry applies only to self-assess modes (Blend It! /
+    // Listen & Blend), where the child can genuinely re-attempt the same
+    // word from the still-live Yes/Not-yet controls. Commit-on-tap modes
+    // run their own in-round two-try flow (choiceRound.js) and deliver a
+    // FINAL result here — bouncing those back used to strand the round on
+    // a locked screen and record the same wrong answer twice.
+    const canRetry = !correct
+      && MODES[this._mode]?.resultPolicy === 'selfAssess'
+      && this._wrongStrikes === 0
+      && !this._hintUsed;
+
+    if (canRetry) {
+      const phonemeRow = document.getElementById('phoneme-row');
+      phonemeRow?.classList.remove('phoneme-row--shake');
+      void phonemeRow?.offsetWidth;
+      phonemeRow?.classList.add('phoneme-row--shake');
+      setTimeout(() => phonemeRow?.classList.remove('phoneme-row--shake'), 500);
+
+      this._wrongStrikes++;
+      this._setGameMascot('encourage');
+      mascot.encourage();
+      audio.playSfx('wrong');
+      this._showToast('Almost! Have another go — the 💡 Hint plays the first sound.', 'warning');
+      this._els.btnHint?.classList.remove('btn--hint-pulse');
+      void this._els.btnHint?.offsetWidth;
+      this._els.btnHint?.classList.add('btn--hint-pulse');
+      this._els.btnHint?.addEventListener('animationend', () => {
+        this._els.btnHint?.classList.remove('btn--hint-pulse');
+      }, { once: true });
+      // Nothing is recorded on the nudge: mastery counts the final outcome
+      // exactly once, when the child finishes the word.
+      this._resultProcessing = false;
+      return;
+    }
+
     const isNew = progress.isNewWord(word.id);
     progress.recordAttempt(word.id, correct, this._mode, responseTime);
 
@@ -977,21 +1009,6 @@ class App {
 
       this._wrongStrikes++;
       this._setGameMascot('encourage');
-
-      // Two-strike system: first wrong with no hint = gentle nudge, no energy loss.
-      if (this._wrongStrikes === 1 && !this._hintUsed) {
-        mascot.encourage();
-        audio.playSfx('wrong');
-        this._showToast('Almost! Try the 💡 Hint to hear the first sound.', 'warning');
-        this._els.btnHint?.classList.remove('btn--hint-pulse');
-        void this._els.btnHint?.offsetWidth;
-        this._els.btnHint?.classList.add('btn--hint-pulse');
-        this._els.btnHint?.addEventListener('animationend', () => {
-          this._els.btnHint?.classList.remove('btn--hint-pulse');
-        }, { once: true });
-        this._resultProcessing = false;
-        return;
-      }
 
       const result = gamification.recordWrong();
       mascot.encourage();
@@ -2831,7 +2848,6 @@ class App {
   _startDailyChallenge() {
     this._sessionType = 'dailyChallenge';
     this._queuedWords = getDailyChallengeWords();
-    this._queuedCorrect = 0;
     this._mode = 'blend';
     store.set('currentGroup', null);
     this._showToast(`Today's 5 words – go! ⚡`, 'info');
@@ -2854,7 +2870,6 @@ class App {
     }
     this._sessionType = 'review';
     this._queuedWords = dueWords;
-    this._queuedCorrect = 0;
     this._mode = 'blend';
     store.set('currentGroup', null);
     const overflow = totalDue > dueWords.length
@@ -2934,7 +2949,6 @@ class App {
     this._sessionType = 'wordWorkout';
     this._queuedRounds = rounds;
     this._workoutWord = target;
-    this._queuedCorrect = 0;
     store.set('currentGroup', null);
     this._showToast(`Workout: “${target.word}” through ${rounds.length} modes 🎽`, 'info');
     this._startGame();

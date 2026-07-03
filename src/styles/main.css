@@ -1077,6 +1077,61 @@ body.bedtime-on * {
   animation: shake 0.4s ease;
 }
 
+/* ✓/✗ glyph stamped on an answered choice — the non-colour signal for
+   right/wrong, so colour-blind, reduced-motion, and forced-colors users
+   aren't relying on the green/red backgrounds alone. */
+.choice-btn { position: relative; }
+.choice-result-icon {
+  position: absolute;
+  top: -10px;
+  right: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: var(--font-size-md);
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
+  border: 2px solid var(--surface);
+}
+.choice-result-icon--yes { background: var(--color-success); }
+.choice-result-icon--no  { background: var(--color-error); }
+
+/* Two-try feedback strip below the choice grid ("Yes! 🎉" / "Almost! Try
+   again.") — a live region so screen readers announce the outcome. */
+.choice-feedback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 32px;
+  margin-top: var(--space-3);
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  text-align: center;
+}
+.choice-feedback:empty { margin-top: 0; }
+.choice-feedback-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: var(--font-size-sm);
+  flex-shrink: 0;
+}
+.choice-feedback--correct,
+.choice-feedback--reveal { color: var(--color-success); }
+.choice-feedback--correct .choice-feedback-icon,
+.choice-feedback--reveal .choice-feedback-icon { background: var(--color-success); }
+.choice-feedback--retry { color: var(--color-warning-shadow); }
+.choice-feedback--retry .choice-feedback-icon { background: var(--color-error); }
+
 /* ── Oral Blend mode: emoji-only choices ─────────────────────────────── */
 .choice-grid--emoji {
   grid-template-columns: 1fr 1fr;

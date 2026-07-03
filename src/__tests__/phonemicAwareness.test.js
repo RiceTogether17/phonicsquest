@@ -365,8 +365,9 @@ describe('soundCount mode hides the printed word during the question', () => {
     setupSoundCount(word, els);
     expect(els.wordDisplay.innerHTML.trim()).toBe('');
 
-    // Simulate the child picking any answer.
-    const btn = els.modeArea.querySelector('.choice-btn--count');
+    // Simulate the child answering correctly (a first miss now keeps the
+    // question open for a second try instead of revealing straight away).
+    const btn = els.modeArea.querySelector('.choice-btn--count[data-correct="true"]');
     btn.click();
 
     // wordDisplay is populated by buildWordAnimation() in the reveal path.

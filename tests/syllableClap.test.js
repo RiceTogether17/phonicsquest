@@ -126,14 +126,45 @@ describe('setupSyllableClap', () => {
     expect(document.querySelector('#syllable-grid .choice-btn[data-value="5"]')).not.toBeNull();
   });
 
-  it('wrong choice fires onResult(false) and shows correct answer', () => {
+  it('first wrong choice allows a retry: tapped button locks, grid stays live', () => {
     const els = makeEls();
     setupSyllableClap(CAT, els);  // 1 syllable
     const choice3 = document.querySelector('#syllable-grid .choice-btn[data-value="3"]');
     choice3.click();
+
+    // Two-try contract: only the tapped button is disabled, no Next yet.
     expect(choice3.classList.contains('wrong')).toBe(true);
+    expect(choice3.disabled).toBe(true);
+    expect(els.modeArea.querySelector('.vmcq-next-btn')).toBeNull();
+    const correctBtn = document.querySelector('#syllable-grid .choice-btn[data-correct="true"]');
+    expect(correctBtn.disabled).toBe(false);
+    expect(els.modeArea.querySelector('.choice-feedback').textContent).toContain('Almost');
+  });
+
+  it('second tap finishes the round and records first-attempt correctness (false)', () => {
+    const els = makeEls();
+    setupSyllableClap(CAT, els);  // 1 syllable
+    document.querySelector('#syllable-grid .choice-btn[data-value="3"]').click();  // miss
+    const correctBtn = document.querySelector('#syllable-grid .choice-btn[data-correct="true"]');
+    correctBtn.click();  // save on second try
+
+    expect(correctBtn.classList.contains('correct')).toBe(true);
+    expect(document.querySelector('.syllable-reveal-breakdown')).not.toBeNull();
+
+    els.modeArea.querySelector('.vmcq-next-btn').click();
+    // Recorded correctness = FIRST attempt, even though the second tap was right.
+    expect(els.onResult).toHaveBeenCalledWith(false, expect.any(Number));
+  });
+
+  it('two wrong taps reveal the answer and fire onResult(false)', () => {
+    const els = makeEls();
+    setupSyllableClap(CAT, els);  // 1 syllable
+    document.querySelector('#syllable-grid .choice-btn[data-value="3"]').click();
+    document.querySelector('#syllable-grid .choice-btn[data-value="4"]').click();
+
     const correctBtn = document.querySelector('#syllable-grid .choice-btn[data-correct="true"]');
     expect(correctBtn.classList.contains('correct')).toBe(true);
+    expect(correctBtn.disabled).toBe(true);
 
     els.modeArea.querySelector('.vmcq-next-btn').click();
     expect(els.onResult).toHaveBeenCalledWith(false, expect.any(Number));

@@ -31,6 +31,14 @@ import { setupSyllableClap, cleanup as cleanupSyllable, getCurrentWord as getSyl
  * @property {string} icon
  * @property {string} group     – UI grouping: 'blend' | 'phonemic'
  * @property {string} subskill  – specific skill tag for reporting/routing
+ * @property {'final'|'selfAssess'} resultPolicy
+ *   How onResult(correct) should be treated by the app shell:
+ *   'final'      – the mode delivers a single, committed outcome (e.g. after
+ *                  its own in-round two-try flow). Record it exactly once and
+ *                  advance — never bounce back for an app-level retry.
+ *   'selfAssess' – the child self-reports (Yes / Not yet) and can genuinely
+ *                  re-attempt the same word, so the first "Not yet" gets a
+ *                  gentle nudge with nothing recorded.
  * @property {(word: import('../data/words.js').Word, els: Record<string, HTMLElement | null>) => void} setup
  * @property {() => void} cleanup
  * @property {() => import('../data/words.js').Word | null} getCurrentWord
@@ -46,6 +54,7 @@ export const MODES = {
     icon: '🎯',
     group: 'blend',
     subskill: 'phoneme-blending',
+    resultPolicy: 'selfAssess',
     setup: setupBlend,
     cleanup: cleanupBlend,
     getCurrentWord: getBlendWord,
@@ -57,6 +66,7 @@ export const MODES = {
     icon: '🔊',
     group: 'blend',
     subskill: 'phoneme-blending',
+    resultPolicy: 'selfAssess',
     setup: setupClassicBlend,
     cleanup: cleanupClassic,
     getCurrentWord: getClassicWord,
@@ -69,6 +79,7 @@ export const MODES = {
     icon: '👂',
     group: 'phonemic',
     subskill: 'oral-blending',
+    resultPolicy: 'final',
     setup: setupOralBlend,
     cleanup: cleanupOralBlend,
     getCurrentWord: getOralBlendWord,
@@ -80,6 +91,7 @@ export const MODES = {
     icon: '🚀',
     group: 'phonemic',
     subskill: 'initial-phoneme',
+    resultPolicy: 'final',
     setup: setupFirstSound,
     cleanup: cleanupFirst,
     getCurrentWord: getFirstWord,
@@ -91,6 +103,7 @@ export const MODES = {
     icon: '🏁',
     group: 'phonemic',
     subskill: 'final-phoneme',
+    resultPolicy: 'final',
     setup: setupLastSound,
     cleanup: cleanupLast,
     getCurrentWord: getLastWord,
@@ -102,6 +115,7 @@ export const MODES = {
     icon: '🎯',
     group: 'phonemic',
     subskill: 'medial-vowel',
+    resultPolicy: 'final',
     setup: setupMiddleSound,
     cleanup: cleanupMiddle,
     getCurrentWord: getMiddleWord,
@@ -113,6 +127,7 @@ export const MODES = {
     icon: '🔢',
     group: 'phonemic',
     subskill: 'phoneme-segmenting',
+    resultPolicy: 'final',
     setup: setupSoundCount,
     cleanup: cleanupSoundCount,
     getCurrentWord: getSoundCountWord,
@@ -124,6 +139,7 @@ export const MODES = {
     icon: '🚂',
     group: 'phonemic',
     subskill: 'initial-phoneme-collection',
+    resultPolicy: 'final',
     setup: setupTrainCarriages,
     cleanup: cleanupTrain,
     getCurrentWord: getTrainWord,
@@ -135,6 +151,7 @@ export const MODES = {
     icon: '👏',
     group: 'phonemic',
     subskill: 'syllable-counting',
+    resultPolicy: 'final',
     setup: setupSyllableClap,
     cleanup: cleanupSyllable,
     getCurrentWord: getSyllableWord,
@@ -147,6 +164,7 @@ export const MODES = {
     icon: '🔊',
     group: 'phonemic',
     subskill: 'auditory-word-discrimination',
+    resultPolicy: 'final',
     setup: setupHearChoose,
     cleanup: cleanupHear,
     getCurrentWord: getHearWord,
@@ -158,6 +176,7 @@ export const MODES = {
     icon: '🔍',
     group: 'phonemic',
     subskill: 'phoneme-completion',
+    resultPolicy: 'final',
     setup: setupMissingSound,
     cleanup: cleanupMissing,
     getCurrentWord: getMissingWord,
@@ -169,6 +188,7 @@ export const MODES = {
     icon: '✂️',
     group: 'phonemic',
     subskill: 'grapheme-segmenting',
+    resultPolicy: 'final',
     setup: setupSegment,
     cleanup: cleanupSegment,
     getCurrentWord: getSegmentWord,
