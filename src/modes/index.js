@@ -22,6 +22,9 @@ import { setupOralBlend,   cleanup as cleanupOralBlend, getCurrentWord as getOra
 import { setupSoundCount,  cleanup as cleanupSoundCount, getCurrentWord as getSoundCountWord } from './soundCount.js';
 import { setupTrainCarriages, cleanup as cleanupTrain, getCurrentWord as getTrainWord } from './trainCarriages.js';
 import { setupSyllableClap, cleanup as cleanupSyllable, getCurrentWord as getSyllableWord } from './syllableClap.js';
+import { setupWordSort,     cleanup as cleanupWordSort, getCurrentWord as getWordSortWord } from './wordSortMode.js';
+import { setupReadAndTap,   cleanup as cleanupReadTap,  getCurrentWord as getReadTapWord  } from './readAndTapMode.js';
+import { setupFluencySprint, cleanup as cleanupFluency, getCurrentWord as getFluencyWord  } from './fluencySprintMode.js';
 
 /**
  * @typedef {Object} Mode
@@ -29,7 +32,7 @@ import { setupSyllableClap, cleanup as cleanupSyllable, getCurrentWord as getSyl
  * @property {string} name
  * @property {string} desc
  * @property {string} icon
- * @property {string} group     – UI grouping: 'blend' | 'phonemic'
+ * @property {string} group     – UI grouping: 'blend' | 'phonemic' | 'reading'
  * @property {string} subskill  – specific skill tag for reporting/routing
  * @property {'final'|'selfAssess'} resultPolicy
  *   How onResult(correct) should be treated by the app shell:
@@ -192,6 +195,43 @@ export const MODES = {
     setup: setupSegment,
     cleanup: cleanupSegment,
     getCurrentWord: getSegmentWord,
+  },
+  // ── Reading practice (connected text & automaticity) ──────────────────
+  wordSort: {
+    key: 'wordSort',
+    name: 'Word Sort',
+    desc: 'Sort words by their sound pattern',
+    icon: '🗂️',
+    group: 'reading',
+    subskill: 'pattern-sorting',
+    resultPolicy: 'final',
+    setup: setupWordSort,
+    cleanup: cleanupWordSort,
+    getCurrentWord: getWordSortWord,
+  },
+  readAndTap: {
+    key: 'readAndTap',
+    name: 'Read & Tap',
+    desc: 'Find the word inside a sentence',
+    icon: '👆',
+    group: 'reading',
+    subskill: 'sentence-word-location',
+    resultPolicy: 'final',
+    setup: setupReadAndTap,
+    cleanup: cleanupReadTap,
+    getCurrentWord: getReadTapWord,
+  },
+  fluencySprint: {
+    key: 'fluencySprint',
+    name: 'Fluency Sprint',
+    desc: 'Read fast — beat the clock!',
+    icon: '⚡',
+    group: 'reading',
+    subskill: 'word-recognition-fluency',
+    resultPolicy: 'final',
+    setup: setupFluencySprint,
+    cleanup: cleanupFluency,
+    getCurrentWord: getFluencyWord,
   },
 };
 

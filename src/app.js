@@ -274,6 +274,7 @@ class App {
       'blend', 'oralBlend', 'first', 'last', 'middle',
       'soundCount', 'hear', 'missing', 'segment',
       'train',
+      'wordSort', 'readAndTap',
     ]);
 
     document.querySelectorAll('.mode-card').forEach((card, idx) => {

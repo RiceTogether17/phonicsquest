@@ -61,6 +61,9 @@ export const SKILL_BY_MODE = Object.freeze({
   letterSounds: 'decoding',
   sightMatch:   'decoding',
   missing:      'spelling',
+  wordSort:     'spelling',
+  readAndTap:   'decoding',
+  fluencySprint:'decoding',
 });
 
 /** Canonical skill bins, in display order. */

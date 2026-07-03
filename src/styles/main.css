@@ -1136,6 +1136,130 @@ body.bedtime-on * {
 .choice-feedback--retry { color: var(--color-warning-shadow); }
 .choice-feedback--retry .choice-feedback-icon { background: var(--color-error); }
 
+/* ── Word Sort mode ───────────────────────────────────────────────────── */
+.ws-round { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--space-3); }
+.ws-progress { font-size: var(--font-size-sm); font-weight: 800; color: var(--text-muted); }
+.ws-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 0 var(--border);
+}
+.ws-card-emoji { font-size: 2.2rem; line-height: 1; }
+.ws-card-word  { font-size: var(--font-size-2xl); font-weight: 900; letter-spacing: 0.02em; }
+.ws-card-speak {
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+}
+.ws-card-speak:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+.ws-bins { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); width: 100%; max-width: 480px; }
+.ws-bin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 96px;
+  padding: var(--space-3);
+  background: var(--ws-bin-bg, var(--surface-2));
+  border: 3px solid var(--ws-bin-color, var(--border));
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 0 var(--ws-bin-color, var(--border));
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-bounce);
+}
+.ws-bin:hover { transform: translateY(-3px); }
+.ws-bin:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+.ws-bin-icon  { font-size: 1.8rem; line-height: 1; }
+.ws-bin-label { font-size: var(--font-size-md); color: var(--text); text-align: center; }
+.ws-bin--yes { border-color: var(--color-success); background: var(--color-success-light); animation: pulse-correct 0.5s var(--ease-bounce); }
+.ws-bin--no  { border-color: var(--color-error);   background: var(--color-error-light);   animation: shake 0.4s ease; }
+.ws-status { min-height: 28px; font-size: var(--font-size-md); font-weight: 800; text-align: center; }
+.ws-status--yes { color: var(--color-success); }
+.ws-status--no  { color: var(--color-warning-shadow); }
+.ws-summary {
+  width: 100%;
+  max-width: 480px;
+  padding: var(--space-4);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+.ws-summary-headline { font-size: var(--font-size-lg); font-weight: 900; margin-bottom: var(--space-1); }
+.ws-summary-score { font-weight: 800; color: var(--text-muted); }
+.ws-summary-misses { list-style: none; padding: 0; margin: var(--space-2) 0 0; font-weight: 700; }
+.ws-summary-hint { margin: var(--space-2) 0 0; font-weight: 700; color: var(--color-warning-shadow); }
+
+/* ── Read & Tap mode ──────────────────────────────────────────────────── */
+.rt-round { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--space-3); }
+.choice-grid--sentence {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  max-width: 520px;
+}
+.rt-token {
+  min-height: var(--touch-target);
+  min-width: var(--touch-target);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+}
+.rt-token--target {
+  border-color: var(--color-success);
+  background: var(--color-success-light);
+  box-shadow: 0 4px 0 var(--color-success);
+}
+.rt-hint { min-height: 26px; font-size: var(--font-size-md); font-weight: 700; color: var(--color-warning-shadow); text-align: center; }
+
+/* ── Fluency Sprint mode ──────────────────────────────────────────────── */
+.fs-round { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--space-3); }
+.fs-ready { display: flex; flex-direction: column; align-items: center; gap: var(--space-4); padding: var(--space-4); text-align: center; }
+.fs-ready-copy { font-size: var(--font-size-lg); font-weight: 800; max-width: 420px; margin: 0; }
+.fs-hud { display: flex; align-items: center; justify-content: center; gap: var(--space-5); width: 100%; }
+.fs-timer {
+  min-width: 72px;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-2xl);
+  font-weight: 900;
+  text-align: center;
+  border: 3px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+}
+.fs-timer--low { border-color: var(--color-error); color: var(--color-error); animation: pulse-correct 0.6s var(--ease-bounce) infinite alternate; }
+.fs-score { font-size: var(--font-size-xl); font-weight: 900; color: var(--color-success); }
+.fs-live { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--space-3); }
+.fs-cards { width: 100%; max-width: 480px; }
+.fs-card { font-size: var(--font-size-xl); font-weight: 900; }
+.fs-card--yes { border-color: var(--color-success); background: var(--color-success-light); }
+.fs-card--no  { border-color: var(--color-error);   background: var(--color-error-light); }
+.fs-status { min-height: 24px; font-weight: 800; color: var(--color-warning-shadow); }
+.fs-summary {
+  width: 100%;
+  max-width: 480px;
+  padding: var(--space-4);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+.fs-summary-headline { font-size: var(--font-size-xl); font-weight: 900; margin-bottom: var(--space-2); }
+.fs-summary-stats { display: flex; justify-content: center; gap: var(--space-4); flex-wrap: wrap; font-size: var(--font-size-md); }
+.fs-summary-hint { margin: var(--space-3) 0 0; font-weight: 700; color: var(--color-warning-shadow); }
+
 /* ── Oral Blend mode: emoji-only choices ─────────────────────────────── */
 .choice-grid--emoji {
   grid-template-columns: 1fr 1fr;
@@ -13097,9 +13221,18 @@ body.print-mode > *:not(.print-report-wrapper) > * { visibility: hidden; }
   .letter-tile,
   .word-card,
   .segment-btn,
+  .ws-bin,
+  .ws-card-speak,
+  .fs-timer,
   .btn {
     border: 2px solid ButtonText;
     box-shadow: none;
+  }
+  .ws-bin--yes, .fs-card--yes, .rt-token--target {
+    border: 3px solid Highlight;
+  }
+  .ws-bin--no, .fs-card--no {
+    border-style: dashed;
   }
   .choice-btn.correct {
     border: 3px solid Highlight;
