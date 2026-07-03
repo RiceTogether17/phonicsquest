@@ -21,9 +21,9 @@
   <!-- Styles -->
 
   <title>PhonicsQuest – Early Reading & Primary English</title>
-  <script type="module" crossorigin src="/phonicsquest/assets/index-DrgttqLD.js"></script>
+  <script type="module" crossorigin src="/phonicsquest/assets/index-qkED234S.js"></script>
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/gsap-C8pce-KX.js">
-  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-C8bdPb-I.css">
+  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-BBtRuVG4.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -33,7 +33,7 @@
     <!-- APP HEADER -->
     <header class="app-header" role="banner">
       <div class="header-left">
-        <button class="mascot-btn" id="mascot-trigger" aria-label="Ollie the owl – tap to cheer!">
+        <button class="mascot-btn" id="mascot-trigger" aria-label="Giri the owl – tap to cheer!">
           <div class="mascot-mini" id="mascot-mini" aria-hidden="true"></div>
         </button>
         <span class="app-brand" aria-label="PhonicsQuest – Early Reading and Primary English">PhonicsQuest <span class="app-brand-tag" aria-hidden="true">· Early Reading + Primary English</span></span>
@@ -252,6 +252,14 @@
               <span class="home-parents-btn__text">
                 <span class="home-parents-btn__title">Add / Switch Player</span>
                 <span class="home-parents-btn__sub">Create a new profile or pick a different one</span>
+              </span>
+              <span class="home-parents-btn__arrow" aria-hidden="true">→</span>
+            </button>
+            <button class="home-parents-btn" id="btn-home-settings" aria-label="Open settings — sound, voice, theme, difficulty and accessibility">
+              <span class="home-parents-btn__icon" aria-hidden="true">⚙️</span>
+              <span class="home-parents-btn__text">
+                <span class="home-parents-btn__title">Settings</span>
+                <span class="home-parents-btn__sub">Sound, voice, theme, difficulty &amp; accessibility</span>
               </span>
               <span class="home-parents-btn__arrow" aria-hidden="true">→</span>
             </button>
@@ -739,7 +747,7 @@
           <button class="btn btn--hint" id="btn-hint" aria-label="Get a hint — hear the first sound">
             💡 Hint
           </button>
-          <button class="btn btn--primary" id="btn-check" aria-label="Check my answer">Check ✓</button>
+          <button class="btn btn--primary" id="btn-check" aria-label="Check my answer"><span class="action-glyph" aria-hidden="true">✓</span> Check</button>
           <button class="btn btn--ghost" id="btn-skip" aria-label="Skip this word">Skip →</button>
         </div>
 
@@ -1096,7 +1104,10 @@
             <h3 class="settings-label">Accessibility</h3>
             <div class="toggle-row">
               <label for="reduced-motion-toggle">Reduce animations</label>
-              <input type="checkbox" id="reduced-motion-toggle" role="switch" />
+              <span class="toggle-wrap">
+                <input type="checkbox" id="reduced-motion-toggle" role="switch" />
+                <span class="toggle-track" aria-hidden="true"></span>
+              </span>
             </div>
             <div class="slider-row">
               <label for="font-size-scale">Font size</label>
@@ -1131,6 +1142,10 @@
             </div>
           </section>
 
+          <div class="settings-grownup-divider" role="separator">
+            <span aria-hidden="true">👪</span> For grown-ups
+          </div>
+
           <section class="settings-group">
             <h3 class="settings-label">AI Tutor (Giri ✨)</h3>
             <p class="settings-help">Enter a free <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google Gemini API key</a> to unlock optional AI tutoring: "Ask Giri why" explanations after mistakes, question-specific hints, fairer marking of typed answers, and sentence-level feedback on compositions. Everything in the app works without a key — AI replies are extra, kept child-safe, capped per day, and logged for parents in the dashboard.</p>
@@ -1141,9 +1156,7 @@
             <span id="gemini-key-status" class="settings-help"></span>
           </section>
 
-          <section class="settings-group">
-            <button class="btn btn--danger" id="reset-progress-btn">Reset All Progress</button>
-          </section>
+          <p class="settings-help settings-help--note">Looking for “Reset all progress”? It now lives in the PIN-protected Parent Dashboard, so it can’t be tapped by mistake.</p>
         </div>
       </div>
     </div>
@@ -1161,7 +1174,7 @@
         </div>
         <div class="modal-body" id="dashboard-content"><!-- Injected by dashboard.js --></div>
         <!-- Export / Import toolbar — always visible at the bottom of the dashboard -->
-        <div class="dashboard-data-row" aria-label="Backup and restore">
+        <div class="dashboard-data-row" aria-label="Backup, restore and reset">
           <button class="btn btn--ghost btn--sm" id="dashboard-export-btn" aria-label="Download progress backup">
             📥 Export backup
           </button>
@@ -1169,6 +1182,9 @@
             📤 Import backup
             <input type="file" id="dashboard-import-input" accept=".json" class="sr-only" tabindex="-1">
           </label>
+          <button class="btn btn--ghost btn--sm dashboard-reset-btn" id="reset-progress-btn" aria-label="Reset all progress for this player">
+            ⚠️ Reset all progress
+          </button>
         </div>
       </div>
     </div>
@@ -1250,10 +1266,12 @@
                  placeholder="Name (e.g. Liam)" aria-label="Player name" autocomplete="off" />
           <div class="cp-level-group" role="group" aria-label="Choose school level" id="cp-level-group">
             <button class="cp-level-btn cp-level-btn--selected" data-level="preschool" aria-pressed="true">
-              🌱 Preschool
+              <span class="cp-level-btn__title">🌱 Preschool</span>
+              <span class="cp-level-btn__sub">Early Reading — letter sounds, blending &amp; sight words (K1–K2 / early P1)</span>
             </button>
             <button class="cp-level-btn" data-level="primary" aria-pressed="false">
-              🏫 Primary School
+              <span class="cp-level-btn__title">🏫 Primary School</span>
+              <span class="cp-level-btn__sub">Grammar, vocabulary, comprehension, writing &amp; exam practice (P1–P6)</span>
             </button>
           </div>
           <div class="cp-grade-group" id="cp-grade-group" role="group" aria-label="Choose primary school grade" style="display:none">
@@ -1290,7 +1308,7 @@
           <p class="pin-hint" id="pin-hint" aria-live="polite"></p>
           <button class="btn btn--primary" id="pin-confirm-btn">Enter</button>
           <button class="btn btn--ghost btn--sm" id="pin-cancel-btn">Cancel</button>
-          <p class="pin-setup-hint">First time? Use <strong>1234</strong></p>
+          <p class="pin-setup-hint" id="pin-setup-hint" hidden>First time? The 4 digits you enter now become your PIN.</p>
         </div>
       </div>
     </div>

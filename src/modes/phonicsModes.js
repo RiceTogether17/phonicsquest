@@ -25,6 +25,13 @@
  * The scoring functions are pure — give them an attempt object, get back a
  * result object. UI code calls them and renders the feedback; reporting
  * code calls them and rolls them into mastery stats.
+ *
+ * FOLLOW-UP: `wordSort`, `readAndTap`, and `fluencySprint` have no `impl`
+ * (no playable UI) and are not reachable from any menu — they exist only
+ * as scoring/hint engines consumed by the Quest Journey slice and tests.
+ * `listenAndSpell` maps to `classicBlend` as the closest existing UI.
+ * Building dedicated UIs for these three is tracked as future work; do
+ * not list them in user-facing menus until an `impl` exists.
  */
 
 import { scoreSoundMatch, getSoundMatchHint } from './scoring/soundMatch.js';
