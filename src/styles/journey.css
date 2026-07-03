@@ -565,3 +565,15 @@
   padding-left: 1.25em;
   text-align: left;
 }
+
+
+/* High-contrast / forced-colors: keep journey choices legible when the
+   OS overrides the palette — borders carry state, not backgrounds. */
+@media (prefers-contrast: more) {
+  .qj-choice, .qj-bank-tile, .qj-btn, .qj-sound-tile { border-width: 3px; box-shadow: none; }
+}
+@media (forced-colors: active) {
+  .qj-choice, .qj-bank-tile, .qj-btn, .qj-sound-tile { border: 2px solid ButtonText; box-shadow: none; }
+  .qj-sound-tile--selected { border: 3px solid Highlight; }
+  :focus-visible { outline: 3px solid Highlight; }
+}

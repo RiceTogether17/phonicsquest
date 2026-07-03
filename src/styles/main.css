@@ -72,6 +72,10 @@
   --radius-md:   12px;
   --radius-lg:   16px;
   --radius-xl:   24px;
+
+  /* Minimum tap-target size. UX_SPEC §3.5 mandates 48px (not the WCAG
+     44px floor) because the primary audience is five years old. */
+  --touch-target: 48px;
   --radius-full: 9999px;
 
   /* Shadow */
@@ -1454,7 +1458,7 @@ body.bedtime-on * {
   opacity: 0.7;
 }
 
-.btn--sm { padding: var(--space-2) var(--space-4); font-size: var(--font-size-sm); min-height: 44px; }
+.btn--sm { padding: var(--space-2) var(--space-4); font-size: var(--font-size-sm); min-height: var(--touch-target); }
 .btn--xl {
   padding: var(--space-5) var(--space-8);
   font-size: var(--font-size-xl);
@@ -1827,6 +1831,10 @@ body:has(#screen-stories.screen.active) .mascot-float {
   background: var(--border);
   outline: none;
   cursor: pointer;
+}
+.slider-row input[type="range"]:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
 }
 .slider-row input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -2306,7 +2314,7 @@ body:has(#screen-stories.screen.active) .mascot-float {
 @media (min-width: 600px) {
   #app { max-width: 640px; }
 
-  /* Enforce 44px minimum touch targets on interactive elements */
+  /* Enlarged touch targets on tablets (above the 48px base floor) */
   .choice-btn,
   .letter-tile,
   .mode-card,
@@ -2353,7 +2361,7 @@ body:has(#screen-stories.screen.active) .mascot-float {
   .btn { font-size: var(--font-size-base); padding: 12px 22px; }
   .action-bar .btn { min-height: 52px; font-size: var(--font-size-md); padding: 14px 24px; }
   .icon-btn { width: 48px; height: 48px; }
-  .stat-chip { min-height: 44px; }
+  .stat-chip { min-height: var(--touch-target); }
 
   /* Practice paper launcher: 2 cards per row */
   .ptg-launcher-grid { grid-template-columns: repeat(2, 1fr); }
@@ -4062,8 +4070,8 @@ details.story-tool-section[open] > .story-tool-summary::before {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px;
-  height: 44px;
+  min-width: var(--touch-target);
+  height: var(--touch-target);
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--tile-color) 15%, transparent);
   border: 2.5px solid var(--tile-color);
@@ -5124,7 +5132,8 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-size: clamp(1.2rem, 4vw, 1.6rem);
   font-weight: 800;
   padding: 8px 14px;
-  min-width: 44px;
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
   border: 2px solid #c4b5fd;
   border-radius: 10px;
   background: white;
@@ -6635,11 +6644,11 @@ details.story-tool-section[open] > .story-tool-summary::before {
   outline-offset: 2px;
 }
 
-/* Mobile touch targets — bump to ≥ 44px on small screens. */
+/* Mobile touch targets — bump to the kid-first 48px floor on small screens. */
 @media (max-width: 600px) {
   .sfq-word-chip,
   .sfq-answer-chip {
-    min-height: 44px;
+    min-height: var(--touch-target);
     padding: 10px var(--space-4);
     display: inline-flex;
     align-items: center;
@@ -7022,18 +7031,18 @@ details.story-tool-section[open] > .story-tool-summary::before {
   outline-offset: 2px;
 }
 
-/* Mobile touch targets — WCAG suggests ≥ 44px tappable height.
+/* Mobile touch targets — UX_SPEC §3.5 mandates ≥ 48px tappable height.
    Default styles set blanks at 36px and chips at ~32px; bump them on phones. */
 @media (max-width: 600px) {
   .cloze-blank {
-    height: 44px;
+    height: var(--touch-target);
     min-width: 96px;
     font-size: var(--font-size-md);
   }
   .cloze-word-chip {
     padding: 10px var(--space-4);
     font-size: var(--font-size-md);
-    min-height: 44px;
+    min-height: var(--touch-target);
     display: inline-flex;
     align-items: center;
   }
@@ -11046,7 +11055,7 @@ body {
 
 /* More visible keyboard focus and larger tap targets. */
 :where(button, .btn, .icon-btn, .mode-card, .stories-banner, input, select, textarea) {
-  min-height: 44px;
+  min-height: var(--touch-target);
 }
 
 :focus-visible {
@@ -11559,8 +11568,8 @@ textarea:hover {
   gap: var(--space-2);
 }
 .wd-tile {
-  min-width: 44px;
-  min-height: 44px;
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
   padding: var(--space-2) var(--space-3);
   display: inline-flex;
   align-items: center;
@@ -13057,4 +13066,59 @@ body.print-mode > *:not(.print-report-wrapper) > * { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .mini-lesson-overlay { animation: none; }
   .mini-lesson-chip:hover, .mini-lesson-chip:focus-visible { transform: none; }
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   HIGH-CONTRAST & FORCED-COLORS SUPPORT
+   State must never ride on background colour alone: the ✓/✗ glyphs from
+   choiceRound.js carry right/wrong, and these blocks harden the borders
+   so OS-level contrast modes keep every control and answer state legible.
+   ══════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-contrast: more) {
+  .choice-btn,
+  .letter-tile,
+  .word-card,
+  .segment-btn,
+  .btn {
+    border-width: 3px;
+    box-shadow: none;
+  }
+  .choice-btn.correct { background: transparent; border-color: var(--color-success); }
+  .choice-btn.wrong   { background: transparent; border-color: var(--color-error); }
+  .choice-feedback--retry { color: var(--text); }
+}
+
+@media (forced-colors: active) {
+  /* Let the OS palette drive colours; keep state visible through borders,
+     the stamped ✓/✗ icons, and selected-item system colours. */
+  .choice-btn,
+  .letter-tile,
+  .word-card,
+  .segment-btn,
+  .btn {
+    border: 2px solid ButtonText;
+    box-shadow: none;
+  }
+  .choice-btn.correct {
+    border: 3px solid Highlight;
+    forced-color-adjust: none;
+    background: SelectedItem;
+    color: SelectedItemText;
+  }
+  .choice-btn.wrong {
+    border-style: dashed;
+  }
+  .choice-result-icon,
+  .choice-feedback-icon {
+    forced-color-adjust: none;
+    background: SelectedItem;
+    color: SelectedItemText;
+    border-color: CanvasText;
+  }
+  :focus-visible {
+    outline: 3px solid Highlight;
+    box-shadow: none;
+  }
 }

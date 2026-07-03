@@ -681,6 +681,10 @@ class App {
     });
 
     document.getElementById('dashboard-btn')?.addEventListener('click', () => {
+      // Show the first-time hint only while no PIN is set — once parents
+      // have chosen one, the modal gives a reading child no clues.
+      const setupHint = document.getElementById('pin-setup-hint');
+      if (setupHint) setupHint.hidden = !!store.get('parentPin');
       this._openModal('modal-pin');
       setTimeout(() => document.querySelector('.pin-digit')?.focus(), 200);
     });
