@@ -22,7 +22,7 @@ const TYPE_META = {
   d:      { label: 'Digraphs',      short: 'Digrph',color: '#a855f7', bg: '#f3e8ff', order: 4 },
   bl:     { label: 'Blends',        short: 'Blend', color: '#f97316', bg: '#ffedd5', order: 5 },
   rc:     { label: 'R-Controlled',  short: 'R-Ctrl',color: '#ec4899', bg: '#fce7f3', order: 6 },
-  dp:     { label: 'Diphthongs',    short: 'Dipth', color: '#0d9488', bg: '#ccfbf1', order: 7 },
+  dp:     { label: 'Sliding vowels', short: 'Slide', color: '#0d9488', bg: '#ccfbf1', order: 7 },
   se:     { label: 'Silent-E',      short: 'Sil-E', color: '#94a3b8', bg: '#f1f5f9', order: 8 },
   sf:     { label: 'Suffixes',      short: 'Suffix',color: '#d97706', bg: '#fef3c7', order: 9 },
   soft_c: { label: 'Soft C (/s/)',  short: 'Soft C',color: '#06b6d4', bg: '#cffafe', order: 10 },

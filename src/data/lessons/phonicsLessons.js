@@ -246,7 +246,7 @@ export const PHONICS_LESSONS = {
   },
   'ccvcc-o': {
     headline: 'Both-end blends with short O',
-    soundChips: [{ g: 'fr', type: 'bl', label: 'fr' }, { g: 'o', type: 'sv', label: 'ŏ' }, { g: 'st', type: 'bl', label: 'st' }],
+    soundChips: [{ g: 'st', type: 'bl', label: 'st' }, { g: 'o', type: 'sv', label: 'ŏ' }, { g: 'mp', type: 'bl', label: 'mp' }],
     script: [
       'Two friends at the start, round /o/, two friends at the end.',
       'Try this one: s… t… o… m… p — stomp!',
