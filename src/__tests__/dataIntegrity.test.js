@@ -108,3 +108,14 @@ describe('Cloze Castle passage sufficiency', () => {
     });
   }
 });
+
+describe('WORD_GROUPS taxonomy coverage', () => {
+  it('every WORD_GROUPS key resolves to at least one word via progress.getWordsInGroup', async () => {
+    const { WORD_GROUPS } = await import('../data/words.js');
+    const { progress } = await import('../modules/progress.js');
+    for (const key of Object.keys(WORD_GROUPS)) {
+      const words = progress.getWordsInGroup(key);
+      expect(words.length, `group "${key}" has no words`).toBeGreaterThan(0);
+    }
+  });
+});
