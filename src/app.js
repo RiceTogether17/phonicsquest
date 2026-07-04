@@ -273,7 +273,7 @@ class App {
     const PICKER_MODES = new Set([
       'blend', 'oralBlend', 'first', 'last', 'middle',
       'soundCount', 'hear', 'missing', 'segment',
-      'train',
+      'train', 'soundHunt', 'oddOneOut', 'wordCount',
       'wordSort', 'readAndTap',
     ]);
 

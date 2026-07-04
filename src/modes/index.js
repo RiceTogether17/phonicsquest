@@ -25,6 +25,9 @@ import { setupSyllableClap, cleanup as cleanupSyllable, getCurrentWord as getSyl
 import { setupWordSort,     cleanup as cleanupWordSort, getCurrentWord as getWordSortWord } from './wordSortMode.js';
 import { setupReadAndTap,   cleanup as cleanupReadTap,  getCurrentWord as getReadTapWord  } from './readAndTapMode.js';
 import { setupFluencySprint, cleanup as cleanupFluency, getCurrentWord as getFluencyWord  } from './fluencySprintMode.js';
+import { setupSoundHunt,    cleanup as cleanupSoundHunt, getCurrentWord as getSoundHuntWord } from './soundHunt.js';
+import { setupOddOneOut,    cleanup as cleanupOddOneOut, getCurrentWord as getOddOneOutWord } from './oddOneOut.js';
+import { setupWordCount,    cleanup as cleanupWordCount, getCurrentWord as getWordCountWord } from './wordCountMode.js';
 
 /**
  * @typedef {Object} Mode
@@ -147,6 +150,30 @@ export const MODES = {
     cleanup: cleanupTrain,
     getCurrentWord: getTrainWord,
   },
+  oddOneOut: {
+    key: 'oddOneOut',
+    name: 'Odd One Out',
+    desc: 'Which word doesn\'t belong?',
+    icon: '🕵️',
+    group: 'phonemic',
+    subskill: 'initial-phoneme-discrimination',
+    resultPolicy: 'final',
+    setup: setupOddOneOut,
+    cleanup: cleanupOddOneOut,
+    getCurrentWord: getOddOneOutWord,
+  },
+  wordCount: {
+    key: 'wordCount',
+    name: 'Count the Words',
+    desc: 'How many words in the sentence?',
+    icon: '🖐️',
+    group: 'phonemic',
+    subskill: 'sentence-word-counting',
+    resultPolicy: 'final',
+    setup: setupWordCount,
+    cleanup: cleanupWordCount,
+    getCurrentWord: getWordCountWord,
+  },
   syllable: {
     key: 'syllable',
     name: 'Clap the Syllables',
@@ -160,6 +187,18 @@ export const MODES = {
     getCurrentWord: getSyllableWord,
   },
   // ── Sound-to-print bridge (phonics application) ───────────────────────
+  soundHunt: {
+    key: 'soundHunt',
+    name: 'Sound Hunt',
+    desc: 'Hear the sound — tap the letter!',
+    icon: '🔎',
+    group: 'phonemic',
+    subskill: 'sound-letter-recognition',
+    resultPolicy: 'final',
+    setup: setupSoundHunt,
+    cleanup: cleanupSoundHunt,
+    getCurrentWord: getSoundHuntWord,
+  },
   hear: {
     key: 'hear',
     name: 'Hear & Choose',

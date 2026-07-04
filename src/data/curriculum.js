@@ -99,7 +99,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['short a /ă/', 'short e /ĕ/', 'short i /ĭ/', 'short o /ŏ/', 'short u /ŭ/'],
     sampleWords: ['cat', 'hen', 'big', 'dog', 'bug', 'map', 'pen', 'sit', 'top', 'sun'],
     sentenceExamples: ['The cat sat on a mat.', 'A pig is in the mud.'],
-    recommendedModes: ['oralBlend', 'first', 'last', 'middle', 'soundCount', 'blend', 'classicBlend', 'segment', 'hear', 'train'],
+    recommendedModes: ['wordCount', 'oralBlend', 'first', 'last', 'middle', 'soundCount', 'blend', 'classicBlend', 'segment', 'hear', 'train', 'oddOneOut', 'soundHunt'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -113,7 +113,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['bl', 'cl', 'fl', 'gl', 'pl', 'sl', 'br', 'cr', 'dr', 'fr', 'gr', 'pr', 'tr', 'sk', 'sm', 'sn', 'sp', 'st', 'sw'],
     sampleWords: ['flat', 'clap', 'trap', 'step', 'sled', 'flip', 'drip', 'drop', 'stop', 'drum'],
     sentenceExamples: ['I can clap and step.', 'A frog is on the slip mat.'],
-    recommendedModes: ['blend', 'classicBlend', 'segment', 'hear', 'last', 'soundCount', 'missing', 'train'],
+    recommendedModes: ['blend', 'classicBlend', 'segment', 'hear', 'last', 'soundCount', 'missing', 'train', 'oddOneOut', 'soundHunt'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
