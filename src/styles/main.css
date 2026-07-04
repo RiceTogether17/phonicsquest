@@ -1355,6 +1355,98 @@ body.bedtime-on * {
   text-align: center;
 }
 
+/* ── Sound Hunt mode: bare letter cards (sound → print direction) ────── */
+.sound-hunt {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.choice-grid--letter {
+  grid-template-columns: 1fr 1fr;
+}
+
+.choice-btn--letter {
+  min-height: 88px;
+  padding: var(--space-3);
+}
+
+.choice-btn-letter {
+  font-size: var(--font-size-3xl);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+/* ── Odd One Out mode ─────────────────────────────────────────────────── */
+.odd-one-out {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Highlight the card currently being named aloud (same visual language
+   as the phoneme-button preview pulse). */
+.choice-btn--emoji.previewing {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  animation: pulse-correct 0.5s var(--ease-bounce);
+}
+
+/* ── Count the Words mode ─────────────────────────────────────────────── */
+.word-count {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.wc-sentence {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 0;
+  max-width: 480px;
+}
+
+.wc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--surface);
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--text);
+  animation: pulse-correct 0.4s var(--ease-bounce);
+}
+
+.wc-chip-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4em;
+  height: 1.4em;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 900;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .choice-btn--emoji.previewing,
+  .wc-chip { animation: none; }
+}
+
 /* Segment-it: tap-to-segment */
 .segment-word {
   display: flex;

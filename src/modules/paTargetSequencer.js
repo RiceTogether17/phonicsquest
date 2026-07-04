@@ -65,7 +65,10 @@ export function createPaSequencerState() {
 
 /** Return 'first' | 'last' | 'middle' for the PA modes; null otherwise. */
 export function paPositionForMode(mode) {
-  if (mode === 'first' || mode === 'train') return 'first';
+  // Sound Hunt and Odd One Out are first-sound games too: both should walk
+  // the same alphabetical target ladder so every initial letter-sound gets
+  // systematic coverage instead of adaptive bouncing.
+  if (mode === 'first' || mode === 'train' || mode === 'soundHunt' || mode === 'oddOneOut') return 'first';
   if (mode === 'last')   return 'last';
   if (mode === 'middle') return 'middle';
   return null;
