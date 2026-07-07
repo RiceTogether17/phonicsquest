@@ -7,7 +7,7 @@
  *   - Navigation: Network-first with offline fallback to cached shell
  */
 
-const CACHE_VERSION = 'v6';
+const CACHE_VERSION = 'v7';
 const SHELL_CACHE   = `phonicsquest-shell-${CACHE_VERSION}`;
 const ASSET_CACHE   = `phonicsquest-assets-${CACHE_VERSION}`;
 
@@ -37,9 +37,18 @@ const CACHEABLE_PREFIXES = [
 self.addEventListener('install', event => {
   event.waitUntil(
     (async () => {
-      // Cache app shell first
+      // Cache app shell first. Cache each file individually — addAll()
+      // rejects the whole install (and skipWaiting never runs) if any one
+      // URL 404s.
       const shellCache = await caches.open(SHELL_CACHE);
-      await shellCache.addAll(SHELL_FILES);
+      await Promise.all(SHELL_FILES.map(async (url) => {
+        try {
+          const response = await fetch(url);
+          if (response.ok) await shellCache.put(url, response);
+        } catch (_) {
+          // Tolerate a missing shell file; navigation fallback handles it.
+        }
+      }));
 
       // Pre-cache all phoneme audio with progress reporting
       const assetCache = await caches.open(ASSET_CACHE);
@@ -137,8 +146,11 @@ async function networkFirstWithFallback(request) {
   try {
     const response = await fetch(request);
     if (response.ok) {
+      // Store under the canonical shell URL, not the navigated URL: caching
+      // every query-string variant grows the shell cache without bound and
+      // the offline fallback only ever reads the canonical entry anyway.
       const cache = await caches.open(SHELL_CACHE);
-      cache.put(request, response.clone());
+      cache.put('/phonicsquest/', response.clone());
     }
     return response;
   } catch (_) {

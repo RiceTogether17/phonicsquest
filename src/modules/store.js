@@ -14,8 +14,23 @@ const devWarn = (...args) => {
   if (import.meta.env.DEV) console.warn('[Store]', ...args);
 };
 
+/**
+ * Keys whose DEFAULT_STATE value is a structured object with meaningful
+ * sub-keys. A plain top-level spread would replace these wholesale with the
+ * saved copy, silently dropping sub-keys added in newer versions (e.g. a new
+ * quest bucket in questMastery). These are merged one level deep on load.
+ */
+const DEEP_MERGE_KEYS = ['adaptiveConfig', 'questMastery', 'clueStats'];
+
 /** Default application state */
 const DEFAULT_STATE = {
+  /**
+   * Bump when a saved-state migration is needed; _load can then branch on
+   * the version found in storage. Versions before this field existed load
+   * as undefined and are treated as 1.
+   */
+  schemaVersion: 1,
+
   // Gamification
   xp:        0,
   level:     1,
@@ -37,6 +52,7 @@ const DEFAULT_STATE = {
   // The 💡 Hint button in any PA mode uses stretched playback regardless.
   stretchedSpeech: false,
   parentPin:      null,     // hashed PIN
+  geminiApiKey:   null,     // parent-supplied AI key (survives progress reset)
   reducedMotion:  false,    // manual override for prefers-reduced-motion
   speechEnabled:  true,
   speechLocale:   'en-SG',
@@ -228,7 +244,16 @@ class Store {
       raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const repaired = this._repairState(JSON.parse(raw));
-        if (repaired) return { ...DEFAULT_STATE, ...repaired };
+        if (repaired) {
+          const merged = { ...DEFAULT_STATE, ...repaired };
+          // Structured objects merge one level deep so sub-keys added in
+          // newer versions (e.g. a new quest bucket) exist for old saves.
+          for (const key of DEEP_MERGE_KEYS) {
+            merged[key] = { ...DEFAULT_STATE[key], ...(repaired[key] || {}) };
+          }
+          merged.schemaVersion = DEFAULT_STATE.schemaVersion;
+          return merged;
+        }
         devWarn('State unrecoverable, backing up and using defaults');
         this._backupCorruptState(raw);
       }
@@ -371,8 +396,11 @@ class Store {
    * Reset all state to defaults (except PIN).
    */
   reset() {
+    // Parent-level credentials survive a progress reset: wiping a child's
+    // progress must not delete the parent's PIN or their AI key.
     const pin = this._state.parentPin;
-    this._state = { ...DEFAULT_STATE, parentPin: pin };
+    const apiKey = this._state.geminiApiKey;
+    this._state = { ...DEFAULT_STATE, parentPin: pin, geminiApiKey: apiKey };
     this._save();
     this._notify('*', this._state);
   }

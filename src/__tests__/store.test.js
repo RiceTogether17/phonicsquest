@@ -210,6 +210,37 @@ describe('Store', () => {
       expect(mod.store.get('xp')).toBe(0);
       expect(localStorageMock.getItem('phonicsquest_v2__corrupt')).toBe('[1,2,3]');
     });
+
+    it('deep-merges structured objects so new sub-keys reach old saves', async () => {
+      localStorageMock.clear();
+      // A save from a version that predates several questMastery buckets and
+      // only overrode one adaptiveConfig field.
+      localStorageMock.setItem('phonicsquest_v2', JSON.stringify({
+        questMastery: { sentenceForge: { 'skill-1': 0.8 } },
+        adaptiveConfig: { weakWeight: 9 },
+      }));
+      vi.resetModules();
+      const mod = await import('../modules/store.js');
+      const qm = mod.store.get('questMastery');
+      expect(qm.sentenceForge).toEqual({ 'skill-1': 0.8 }); // saved data kept
+      expect(qm.synthesisQuest).toEqual({}); // newer bucket restored
+      const cfg = mod.store.get('adaptiveConfig');
+      expect(cfg.weakWeight).toBe(9); // override kept
+      expect(cfg.strongAccuracy).toBe(0.9); // missing sub-key defaulted
+      expect(mod.store.get('schemaVersion')).toBe(1);
+    });
+  });
+
+  describe('reset', () => {
+    it('preserves parent credentials (PIN and AI key) across a progress reset', () => {
+      store.set('parentPin', 'hashed-pin');
+      store.set('geminiApiKey', 'parent-key');
+      store.set('xp', 500);
+      store.reset();
+      expect(store.get('xp')).toBe(0);
+      expect(store.get('parentPin')).toBe('hashed-pin');
+      expect(store.get('geminiApiKey')).toBe('parent-key');
+    });
   });
 
   describe('checkDailyReset', () => {

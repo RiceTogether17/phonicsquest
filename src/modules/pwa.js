@@ -14,15 +14,18 @@ export function registerServiceWorker() {
       });
       console.log('[PWA] Service worker registered:', reg.scope);
 
-      // Listen for updates
-      reg.addEventListener('updatefound', () => {
-        const newWorker = reg.installing;
-        if (!newWorker) return;
-        newWorker.addEventListener('statechange', () => {
-          if (newWorker.state === 'activated') {
-            showToast('App updated! Refresh for the latest version.', 'info');
-          }
-        });
+      // The SW calls skipWaiting(), so an updated worker takes control
+      // automatically; controllerchange is the reliable "new version live"
+      // signal. Offer a one-tap refresh rather than auto-reloading — a
+      // child may be mid-lesson.
+      let hadController = !!navigator.serviceWorker.controller;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!hadController) {
+          // First install taking control — nothing to refresh.
+          hadController = true;
+          return;
+        }
+        showUpdateToast();
       });
     } catch (err) {
       console.warn('[PWA] Service worker registration failed:', err);
@@ -127,13 +130,23 @@ function _updateNetworkStatus(isOnline) {
   }
 }
 
-/** Simple toast helper for PWA notifications */
-function showToast(message, type = 'info') {
+/** Update notice with a one-tap refresh (the new version is already live). */
+function showUpdateToast() {
   const container = document.getElementById('toast-container');
   if (!container) return;
   const toast = document.createElement('div');
-  toast.className = `toast toast--${type}`;
-  toast.textContent = message;
+  toast.className = 'toast toast--info';
+  toast.setAttribute('role', 'status');
+
+  const label = document.createElement('span');
+  label.textContent = 'App updated! ';
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'btn btn--small';
+  btn.textContent = 'Refresh';
+  btn.addEventListener('click', () => window.location.reload());
+
+  toast.append(label, btn);
   container.appendChild(toast);
-  setTimeout(() => toast.remove(), 3500);
+  setTimeout(() => toast.remove(), 10000);
 }
