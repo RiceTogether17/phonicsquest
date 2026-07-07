@@ -1,5 +1,13 @@
 # PhonicsQuest — Improvement & Debug Work Document
 
+> **Status (2026-07-07):** items #1-16, #20-25 are DONE, plus #27 (html``
+> helper landed; call-site migration is opportunistic), #31 (automatic
+> daily backup + restore), and the safe subset of #17-19 (salted PIN
+> module extracted, shared day-key helpers, journey gate documented).
+> Each landed as its own commit on `claude/phonicsquest-opus-4.8-a2zop2`
+> with tests. **Remaining:** the large refactors in #17 (full app.js
+> decomposition) and #18 (SRS unification), and #26/#28/#29/#30/#32/#33.
+
 ## Context
 
 This document is a full audit of PhonicsQuest structured so it can be executed

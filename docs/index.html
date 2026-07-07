@@ -21,9 +21,9 @@
   <!-- Styles -->
 
   <title>PhonicsQuest – Early Reading & Primary English</title>
-  <script type="module" crossorigin src="/phonicsquest/assets/index-DH_tauIV.js"></script>
+  <script type="module" crossorigin src="/phonicsquest/assets/index-Blm0iG1P.js"></script>
   <link rel="modulepreload" crossorigin href="/phonicsquest/assets/gsap-C8pce-KX.js">
-  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-DPEx_lla.css">
+  <link rel="stylesheet" crossorigin href="/phonicsquest/assets/index-D5nWz-AW.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -300,6 +300,11 @@
             </button>
 
             <p class="mode-section-label">Phoneme Skills</p>
+            <button class="mode-card" data-mode="soundHunt">
+              <span class="mode-icon" aria-hidden="true">🔎</span>
+              <span class="mode-name">Sound Hunt</span>
+              <span class="mode-desc">Hear the sound — tap the letter!</span>
+            </button>
             <button class="mode-card" data-mode="hear">
               <span class="mode-icon" aria-hidden="true">👂</span>
               <span class="mode-name">Hear &amp; Choose</span>
@@ -336,6 +341,16 @@
               <span class="mode-icon" aria-hidden="true">🚂</span>
               <span class="mode-name">Train Carriages</span>
               <span class="mode-desc">Collect words with the same first sound</span>
+            </button>
+            <button class="mode-card" data-mode="oddOneOut">
+              <span class="mode-icon" aria-hidden="true">🕵️</span>
+              <span class="mode-name">Odd One Out</span>
+              <span class="mode-desc">Which word doesn't belong?</span>
+            </button>
+            <button class="mode-card" data-mode="wordCount">
+              <span class="mode-icon" aria-hidden="true">🖐️</span>
+              <span class="mode-name">Count the Words</span>
+              <span class="mode-desc">How many words in the sentence?</span>
             </button>
             <button class="mode-card" data-mode="syllable">
               <span class="mode-icon" aria-hidden="true">👏</span>
@@ -660,6 +675,7 @@
                 SPIN!
               </button>
             </div>
+            <p id="wheel-announcer" class="visually-hidden" aria-live="polite"></p>
           </div>
 
           <!-- Bonus activity banners -->
