@@ -18,6 +18,7 @@
 import { store } from './store.js';
 import { gamification } from './gamification.js';
 import { composeTodaysLesson } from './lessonComposer.js';
+import { localYmd } from '../utils/dates.js';
 
 const STATE_KEY = 'currentLesson';
 const HISTORY_KEY = 'lessonHistory';
@@ -26,10 +27,7 @@ const HISTORY_CAP = 30;
 /** Bonus XP for finishing the whole guided lesson (on top of per-step XP). */
 export const LESSON_BONUS_XP = 40;
 
-function _ymd(date) {
-  const pad = n => String(n).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
+const _ymd = (date) => localYmd(date);
 
 /** Load (or roll over) today's lesson state. */
 export function getLessonState(now = new Date()) {

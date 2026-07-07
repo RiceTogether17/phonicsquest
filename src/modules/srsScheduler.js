@@ -18,30 +18,23 @@
  *     EF change:  EF + (0.1 − (5−1) × (0.08 + (5−1) × 0.02)) = EF − 0.54
  *
  *   easeFactor is clamped to [1.3, ∞], interval is capped at 180 days.
- *   dueAt is stored as a 'YYYY-MM-DD' string (local time).
+ *   dueAt is stored as a UTC 'YYYY-MM-DD' string (see utils/dates.js for
+ *   the local-vs-UTC day-key conventions).
  *
  * Backwards-compatible: old entries lacking repetitions / easeFactor are
  * migrated on first read (repetitions: 0, easeFactor: 2.5).
  */
 
 import { store } from './store.js';
+import { utcYmd, utcYmdAddDays } from '../utils/dates.js';
 
 const STORE_KEY    = 'srsSchedule';
 const INITIAL_EF   = 2.5;
 const MIN_EF       = 1.3;
 const MAX_INTERVAL = 180;
 
-/** Return today's date as a 'YYYY-MM-DD' string (local time). */
-function _today() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-/** Return a 'YYYY-MM-DD' string for today + n days. */
-function _addDays(days) {
-  const d = new Date();
-  d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0, 10);
-}
+const _today = () => utcYmd();
+const _addDays = (days) => utcYmdAddDays(days);
 
 /** Read the full schedule map from the store. */
 function _getSchedule() {

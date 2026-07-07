@@ -245,9 +245,22 @@ export function mountQuestJourney(host, opts = {}) {
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
+/**
+ * Quest Journey's own mastery gate, applied to its per-stage attempt log.
+ *
+ * DELIBERATELY looser than the main app's five-criterion PROGRESSION_GATE
+ * (progression.js: 0.85 decoding accuracy + spelling + unique words +
+ * session days + vowel-confusion checks). The journey slice tracks only
+ * its own stage attempts — it has no word-level or session-day data to
+ * feed the strict gate — and its unlock cadence is meant to feel like a
+ * game map, not a curriculum gate. If the two ever need to converge,
+ * route the journey's attempts through progress.recordAttempt and call
+ * progression.getUnlockedStages instead.
+ */
+const JOURNEY_MASTERY_MIN_ATTEMPTS = 6;
+const JOURNEY_MASTERY_MIN_ACCURACY = 0.8;
+
 function _masteredStageIds(attempts) {
-  // Use the analytics module's mastery logic by inlining the threshold —
-  // we don't want a circular import of summarise here.
   const counts = new Map();
   for (const a of attempts) {
     if (!a?.stageId) continue;
@@ -258,7 +271,9 @@ function _masteredStageIds(attempts) {
   }
   const out = [];
   for (const [id, c] of counts.entries()) {
-    if (c.attempts >= 6 && c.correct / c.attempts >= 0.8) out.push(id);
+    if (c.attempts >= JOURNEY_MASTERY_MIN_ATTEMPTS && c.correct / c.attempts >= JOURNEY_MASTERY_MIN_ACCURACY) {
+      out.push(id);
+    }
   }
   return out;
 }
