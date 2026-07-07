@@ -224,4 +224,91 @@ describe('aiGuardrails', () => {
       expect(fetchMock).not.toHaveBeenCalled();
     });
   });
+
+  describe('callGemini transport', () => {
+    it('sends the API key in a header, never in the URL', async () => {
+      store.set('geminiApiKey', 'secret-key');
+      fetchMock.mockReturnValue(geminiReply('ok'));
+      const { callGemini } = await import('../modules/aiService.js');
+      await callGemini('hello');
+
+      const [url, opts] = fetchMock.mock.calls[0];
+      expect(url).not.toContain('secret-key');
+      expect(url).not.toContain('key=');
+      expect(opts.headers['x-goog-api-key']).toBe('secret-key');
+    });
+  });
+
+  describe('getWritingCoachFeedback', () => {
+    it('returns null without a key and does not fetch', async () => {
+      const { getWritingCoachFeedback } = await import('../modules/aiService.js');
+      expect(await getWritingCoachFeedback('My draft.', 3)).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('parses findings into sanitised structure — HTML in the echoed draft is stripped', async () => {
+      store.set('geminiApiKey', 'test-key');
+      fetchMock.mockReturnValue(geminiReply(
+        'SENTENCE: I like <img src=x onerror=alert(1)> dogs | ISSUE: Remove the strange <b>code</b>\n' +
+        'SENTENCE: He run fast | ISSUE: Use "runs" with "he"',
+      ));
+      const { getWritingCoachFeedback } = await import('../modules/aiService.js');
+
+      const out = await getWritingCoachFeedback('draft', 2);
+      expect(out.items).toHaveLength(2);
+      expect(out.items[0].sentence).toBe('I like dogs');
+      expect(out.items[0].sentence).not.toContain('<');
+      expect(out.items[0].issue).toBe('Remove the strange code');
+      expect(out.items[1].issue).toContain('runs');
+    });
+
+    it('returns { good } for a GOOD: reply, sanitised', async () => {
+      store.set('geminiApiKey', 'test-key');
+      fetchMock.mockReturnValue(geminiReply('GOOD: Well done! Visit https://evil.example for more'));
+      const { getWritingCoachFeedback } = await import('../modules/aiService.js');
+
+      const out = await getWritingCoachFeedback('draft', 2);
+      expect(out.good).toBe('Well done! Visit for more');
+      expect(out.good).not.toContain('http');
+    });
+
+    it('returns null for unparseable replies and logs usage for the parent dashboard', async () => {
+      store.set('geminiApiKey', 'test-key');
+      fetchMock.mockReturnValue(geminiReply('I refuse to follow the format.'));
+      const { getWritingCoachFeedback } = await import('../modules/aiService.js');
+
+      expect(await getWritingCoachFeedback('draft', 4)).toBeNull();
+      const log = store.get('aiUsageLog');
+      expect(log).toHaveLength(1);
+      expect(log[0].kind).toBe('coach');
+    });
+
+    it('respects the daily cap', async () => {
+      store.set('geminiApiKey', 'test-key');
+      const { getWritingCoachFeedback } = await import('../modules/aiService.js');
+      for (let i = 0; i < guardrails.DAILY_AI_CALL_CAP; i++) guardrails.logAiUse('explain', `q${i}`);
+      expect(await getWritingCoachFeedback('draft', 2)).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('gradeSynthesisAnswer', () => {
+    it('returns null without a key and does not fetch', async () => {
+      const { gradeSynthesisAnswer } = await import('../modules/aiService.js');
+      expect(await gradeSynthesisAnswer('a', '', 'b', [], 'c', 'Passive voice')).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('sanitises the feedback line', async () => {
+      store.set('geminiApiKey', 'test-key');
+      fetchMock.mockReturnValue(geminiReply('PARTIAL\nAlmost — check <b>tense</b> at https://evil.example'));
+      const { gradeSynthesisAnswer } = await import('../modules/aiService.js');
+
+      const out = await gradeSynthesisAnswer('a', '', 'b', [], 'c', 'Passive voice');
+      expect(out.verdict).toBe('PARTIAL');
+      expect(out.feedback).toBe('Almost — check tense at');
+      expect(out.feedback).not.toContain('<');
+      expect(out.feedback).not.toContain('http');
+    });
+  });
 });

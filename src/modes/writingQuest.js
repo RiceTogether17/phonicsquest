@@ -10,6 +10,7 @@ import { renderDrill, collectDrillAnswers, gradeDrills } from '../modules/writin
 import { getTrackProgress, setTrackProgress, migrateLegacyWritingCompleted, getLevelTrackProgress } from '../modules/writingTrackProgress.js';
 import { saveDraft, loadDraft, clearDraft, updatePhase, updateFeedback, updateRevision, saveLegacyDraft, loadLegacyDraft, clearLegacyDraft, getDraftSummary } from '../modules/writingDraftStore.js';
 import { hasApiKey, getWritingCoachFeedback, gradeEssayWithRubric } from '../modules/aiService.js';
+import { escapeHtml } from '../utils/escapeHtml.js';
 
 let _container = null;
 let _onGoHome = null;
@@ -311,16 +312,18 @@ function _renderDimensionBreakdown(result) {
   }).join('')}</ul>`;
 }
 
-function _renderAiCoachHtml(raw) {
-  if (raw.startsWith('GOOD:')) {
-    return `<div class="wq-ai-feedback-wrap"><p class="wq-ai-heading">✨ AI Coach</p><p class="wq-ai-good">${raw.replace('GOOD:', '').trim()}</p></div>`;
+function _renderAiCoachHtml(feedback) {
+  // feedback is the sanitised structure from getWritingCoachFeedback, but the
+  // model quotes the child's own draft back, so escape every field anyway —
+  // nothing that passed through the model may reach innerHTML unescaped.
+  if (!feedback) return '';
+  if (feedback.good) {
+    return `<div class="wq-ai-feedback-wrap"><p class="wq-ai-heading">✨ AI Coach</p><p class="wq-ai-good">${escapeHtml(feedback.good)}</p></div>`;
   }
-  const lines = raw.split('\n').map(l => l.trim()).filter(l => l.startsWith('SENTENCE:'));
-  if (!lines.length) return '';
-  const items = lines.map(l => {
-    const [sentPart, issuePart] = l.replace('SENTENCE:', '').split('| ISSUE:');
-    return `<li class="wq-ai-item"><span class="wq-ai-quote">"${(sentPart || '').trim()}"</span><span class="wq-ai-tip">${(issuePart || '').trim()}</span></li>`;
-  }).join('');
+  if (!feedback.items?.length) return '';
+  const items = feedback.items.map(it =>
+    `<li class="wq-ai-item"><span class="wq-ai-quote">"${escapeHtml(it.sentence)}"</span><span class="wq-ai-tip">${escapeHtml(it.issue)}</span></li>`
+  ).join('');
   return `<div class="wq-ai-feedback-wrap"><p class="wq-ai-heading">✨ AI Coach — sentence feedback</p><ul class="wq-ai-list">${items}</ul></div>`;
 }
 
@@ -384,9 +387,11 @@ async function _submitDraft(item, lessonForEval) {
     aiSection.innerHTML = '<p class="wq-ai-loading">✨ AI coach is reading your draft…</p>';
     fb.appendChild(aiSection);
     const taskDesc = item?.title || item?.prompt || '';
-    getWritingCoachFeedback(text, _level, taskDesc).then(raw => {
-      if (!raw || !aiSection.isConnected) return;
-      aiSection.innerHTML = _renderAiCoachHtml(raw);
+    getWritingCoachFeedback(text, _level, taskDesc).then(feedback => {
+      if (!aiSection.isConnected) return;
+      const html = feedback ? _renderAiCoachHtml(feedback) : '';
+      if (html) aiSection.innerHTML = html;
+      else aiSection.remove(); // don't leave the loading message stuck on failure
     });
 
     // AI rubric grading next to the local bands. Commentary only — the
