@@ -174,6 +174,42 @@ describe('Store', () => {
       expect(mod.store.get('xp')).toBe(42);
       expect(mod.store.get('level')).toBe(3);
     });
+
+    it('repairs a single bad field without wiping the rest of the profile', async () => {
+      localStorageMock.clear();
+      localStorageMock.setItem('phonicsquest_v2', JSON.stringify({
+        xp: NaN, // JSON.stringify(NaN) -> null, an invalid xp
+        level: 4,
+        streak: 12,
+        wordStats: { cat: { attempts: 9, correct: 8 } },
+        badges: ['first-word'],
+      }));
+      vi.resetModules();
+      const mod = await import('../modules/store.js');
+      expect(mod.store.get('xp')).toBe(0); // bad field reset to default
+      expect(mod.store.get('level')).toBe(4); // everything else survives
+      expect(mod.store.get('streak')).toBe(12);
+      expect(mod.store.get('wordStats')).toEqual({ cat: { attempts: 9, correct: 8 } });
+      expect(mod.store.get('badges')).toEqual(['first-word']);
+    });
+
+    it('backs up an unparseable payload instead of silently discarding it', async () => {
+      localStorageMock.clear();
+      localStorageMock.setItem('phonicsquest_v2', '{not json at all');
+      vi.resetModules();
+      const mod = await import('../modules/store.js');
+      expect(mod.store.get('xp')).toBe(0); // defaults in use
+      expect(localStorageMock.getItem('phonicsquest_v2__corrupt')).toBe('{not json at all');
+    });
+
+    it('backs up a non-object payload instead of silently discarding it', async () => {
+      localStorageMock.clear();
+      localStorageMock.setItem('phonicsquest_v2', JSON.stringify([1, 2, 3]));
+      vi.resetModules();
+      const mod = await import('../modules/store.js');
+      expect(mod.store.get('xp')).toBe(0);
+      expect(localStorageMock.getItem('phonicsquest_v2__corrupt')).toBe('[1,2,3]');
+    });
   });
 
   describe('checkDailyReset', () => {

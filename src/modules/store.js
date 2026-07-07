@@ -195,43 +195,82 @@ class Store {
   }
 
   /**
-   * Validate critical fields of a saved state object.
-   * Returns false if the data is clearly corrupted.
+   * Repair recoverable damage in a saved state object. One bad field must
+   * never cost the child their whole profile: invalid numeric fields and a
+   * corrupt wordStats bucket are individually reset to defaults while every
+   * other key is kept. Returns the repaired object, or null only when the
+   * payload is not a state object at all.
    * @private
    */
-  _validateState(saved) {
-    if (typeof saved !== 'object' || saved === null) return false;
-    // Check critical numeric fields are numbers (not NaN, not strings)
+  _repairState(saved) {
+    if (typeof saved !== 'object' || saved === null || Array.isArray(saved)) return null;
+    let repaired = false;
     for (const key of ['xp', 'level', 'energy', 'streak', 'dailyGoal', 'dailyDone']) {
       if (key in saved && (typeof saved[key] !== 'number' || !Number.isFinite(saved[key]))) {
-        devWarn(`Invalid ${key}:`, saved[key]);
-        return false;
+        devWarn(`Repairing invalid ${key}:`, saved[key]);
+        saved[key] = DEFAULT_STATE[key];
+        repaired = true;
       }
     }
-    // Check wordStats is an object if present
     if ('wordStats' in saved && (typeof saved.wordStats !== 'object' || saved.wordStats === null)) {
-      devWarn('Invalid wordStats:', typeof saved.wordStats);
-      return false;
+      devWarn('Resetting invalid wordStats:', typeof saved.wordStats);
+      saved.wordStats = {};
+      repaired = true;
     }
-    return true;
+    if (repaired) this._notifyRecovery('Some saved data was damaged and has been repaired.');
+    return saved;
   }
 
   /** Load from localStorage, merging with defaults to handle new keys */
   _load() {
+    let raw = null;
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const saved = JSON.parse(raw);
-        if (!this._validateState(saved)) {
-          devWarn('State failed validation, using defaults');
-          return { ...DEFAULT_STATE };
-        }
-        return { ...DEFAULT_STATE, ...saved };
+        const repaired = this._repairState(JSON.parse(raw));
+        if (repaired) return { ...DEFAULT_STATE, ...repaired };
+        devWarn('State unrecoverable, backing up and using defaults');
+        this._backupCorruptState(raw);
       }
     } catch (err) {
       devWarn('Failed to parse stored state:', err.message);
+      this._backupCorruptState(raw);
     }
     return { ...DEFAULT_STATE };
+  }
+
+  /**
+   * Keep the unreadable payload under a side key instead of silently
+   * overwriting it, so progress can still be recovered by hand.
+   * @private
+   */
+  _backupCorruptState(raw) {
+    if (!raw) return;
+    try {
+      localStorage.setItem(`${STORAGE_KEY}__corrupt`, raw);
+    } catch {
+      // Storage full — nothing more we can do here.
+    }
+    this._notifyRecovery('Saved progress could not be read. A backup copy was kept.');
+  }
+
+  /**
+   * Toast a recovery notice once the DOM is ready. _load runs at module
+   * import time, before #toast-container exists, so defer to the next tick.
+   * @private
+   */
+  _notifyRecovery(message) {
+    if (typeof document === 'undefined') return;
+    setTimeout(() => {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = 'toast toast--warning';
+      toast.setAttribute('role', 'alert');
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 8000);
+    }, 0);
   }
 
   /**
