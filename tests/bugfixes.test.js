@@ -190,18 +190,23 @@ describe('Store debounced persistence', () => {
     localStorageMock.setItem.mockClear();
   });
 
+  // The first flush of a day also writes the __backup key, so count only
+  // writes to the main key when asserting debounce behaviour.
+  const mainKeyWrites = () =>
+    localStorageMock.setItem.mock.calls.filter(([k]) => k === 'phonicsquest_v2');
+
   it('batches multiple set() calls into a single localStorage write', async () => {
     store.set('xp', 10);
     store.set('level', 2);
     store.set('streak', 3);
 
     // Synchronously, no writes should have happened yet beyond the microtask queue
-    const callsBefore = localStorageMock.setItem.mock.calls.length;
+    const callsBefore = mainKeyWrites().length;
 
     // Wait for microtask to flush
     await new Promise(resolve => queueMicrotask(resolve));
 
-    const callsAfter = localStorageMock.setItem.mock.calls.length;
+    const callsAfter = mainKeyWrites().length;
     // Should have batched into 1 write (or at most a few — not 3 separate ones)
     expect(callsAfter - callsBefore).toBeLessThanOrEqual(1);
   });
@@ -212,8 +217,8 @@ describe('Store debounced persistence', () => {
 
     await new Promise(resolve => queueMicrotask(resolve));
 
-    // patch + debounce = 1 write
-    expect(localStorageMock.setItem.mock.calls.length).toBe(1);
+    // patch + debounce = 1 write to the main key
+    expect(mainKeyWrites().length).toBe(1);
   });
 
   it('state is correct after debounced writes', async () => {
@@ -223,7 +228,7 @@ describe('Store debounced persistence', () => {
     await new Promise(resolve => queueMicrotask(resolve));
 
     // Verify the persisted data has both values
-    const lastCall = localStorageMock.setItem.mock.calls.at(-1);
+    const lastCall = mainKeyWrites().at(-1);
     const persisted = JSON.parse(lastCall[1]);
     expect(persisted.xp).toBe(42);
     expect(persisted.streak).toBe(7);

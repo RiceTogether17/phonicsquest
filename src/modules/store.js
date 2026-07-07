@@ -237,6 +237,21 @@ class Store {
     return saved;
   }
 
+  /**
+   * Merge a repaired saved state over the defaults.
+   * @private
+   */
+  _mergeWithDefaults(repaired) {
+    const merged = { ...DEFAULT_STATE, ...repaired };
+    // Structured objects merge one level deep so sub-keys added in
+    // newer versions (e.g. a new quest bucket) exist for old saves.
+    for (const key of DEEP_MERGE_KEYS) {
+      merged[key] = { ...DEFAULT_STATE[key], ...(repaired[key] || {}) };
+    }
+    merged.schemaVersion = DEFAULT_STATE.schemaVersion;
+    return merged;
+  }
+
   /** Load from localStorage, merging with defaults to handle new keys */
   _load() {
     let raw = null;
@@ -244,24 +259,58 @@ class Store {
       raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const repaired = this._repairState(JSON.parse(raw));
-        if (repaired) {
-          const merged = { ...DEFAULT_STATE, ...repaired };
-          // Structured objects merge one level deep so sub-keys added in
-          // newer versions (e.g. a new quest bucket) exist for old saves.
-          for (const key of DEEP_MERGE_KEYS) {
-            merged[key] = { ...DEFAULT_STATE[key], ...(repaired[key] || {}) };
-          }
-          merged.schemaVersion = DEFAULT_STATE.schemaVersion;
-          return merged;
-        }
-        devWarn('State unrecoverable, backing up and using defaults');
+        if (repaired) return this._mergeWithDefaults(repaired);
+        devWarn('State unrecoverable, backing up');
         this._backupCorruptState(raw);
       }
     } catch (err) {
       devWarn('Failed to parse stored state:', err.message);
       this._backupCorruptState(raw);
     }
+    // Main key missing or unreadable — fall back to the automatic daily
+    // backup before surrendering to a blank profile.
+    if (raw) {
+      const restored = this._loadFromBackup();
+      if (restored) {
+        this._notifyRecovery('Progress was restored from the latest backup.');
+        return restored;
+      }
+    }
     return { ...DEFAULT_STATE };
+  }
+
+  /**
+   * Read the automatic backup written by _flushSave. Returns a merged
+   * state object, or null if there is no usable backup.
+   * @private
+   */
+  _loadFromBackup() {
+    try {
+      const raw = localStorage.getItem(`${STORAGE_KEY}__backup`);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      const repaired = this._repairState(parsed?.state);
+      return repaired ? this._mergeWithDefaults(repaired) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * True when the daily backup should be refreshed (missing, unreadable,
+   * or from an earlier day).
+   * @private
+   */
+  _isBackupStale() {
+    try {
+      const raw = localStorage.getItem(`${STORAGE_KEY}__backup`);
+      if (!raw) return true;
+      const { savedAt } = JSON.parse(raw);
+      return typeof savedAt !== 'string'
+        || savedAt.slice(0, 10) !== new Date().toISOString().slice(0, 10);
+    } catch {
+      return true;
+    }
   }
 
   /**
@@ -317,6 +366,21 @@ class Store {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this._state));
       this._saveFailures = 0;
+      // Roll the automatic backup forward once per day, on the first
+      // successful save: a known-good copy from at most yesterday is what
+      // _load falls back to if the main key is ever corrupted.
+      if (this._backupPending === undefined) this._backupPending = this._isBackupStale();
+      if (this._backupPending) {
+        this._backupPending = false;
+        try {
+          localStorage.setItem(
+            `${STORAGE_KEY}__backup`,
+            JSON.stringify({ savedAt: new Date().toISOString(), state: this._state }),
+          );
+        } catch {
+          // Storage full — the main save above still succeeded.
+        }
+      }
     } catch (err) {
       this._saveFailures++;
       devWarn('Save failed:', err.message, `(failure #${this._saveFailures})`);
@@ -413,6 +477,7 @@ class Store {
   setStorageKey(key) {
     this._flushSave(); // flush current state synchronously before switching
     STORAGE_KEY = key;
+    this._backupPending = undefined; // re-evaluate staleness for the new key
     this._state = this._load();
     this._notify('*', this._state);
   }
