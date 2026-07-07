@@ -185,6 +185,25 @@ describe('backward compatibility', () => {
     expect(m.composite).toBeGreaterThan(0);
   });
 
+  it('getWordMastery reads speed from real recorded attempts', () => {
+    // Regression: _speedScore used to look for correct/responseMs inside
+    // event.meta, where recordLearningEvent never puts them, so the speed
+    // dimension was permanently null and its 0.2 composite weight dead.
+    progress.recordAttempt('cat', true, 'blend', 1000);
+    progress.recordAttempt('cat', true, 'blend', 1200);
+    progress.recordAttempt('cat', true, 'blend', 1100);
+    const m = getWordMastery('cat');
+    expect(m.speed).not.toBeNull();
+    expect(m.speed).toBeGreaterThan(0);
+    expect(m.speed).toBeLessThanOrEqual(1);
+  });
+
+  it('getWordMastery speed ignores incorrect attempts and other words', () => {
+    progress.recordAttempt('cat', false, 'blend', 300); // wrong answer: fast guess
+    progress.recordAttempt('dog', true, 'blend', 500);  // different word
+    expect(getWordMastery('cat').speed).toBeNull();
+  });
+
   it('a session that never touches the skill-aware code still works', () => {
     // Simulate the legacy path: mode unknown to SKILL_BY_MODE.
     expect(() => progress.recordAttempt('cat', true, 'mysteryMode', 1500))

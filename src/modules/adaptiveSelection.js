@@ -61,7 +61,9 @@ export function getWordWeight(stat, cfg) {
 
   if (accuracy < cfg.weakAccuracy) return cfg.weakWeight;
   if (accuracy < cfg.mediumAccuracy) return cfg.mediumWeight;
-  if (accuracy > cfg.strongAccuracy && attempts >= cfg.masteryMinAttempts) return cfg.strongWeight;
+  // >= to match the SRS-override branch above: a word at exactly the strong
+  // threshold is strong whether or not it carries a review date.
+  if (accuracy >= cfg.strongAccuracy && attempts >= cfg.masteryMinAttempts) return cfg.strongWeight;
   return cfg.defaultWeight;
 }
 

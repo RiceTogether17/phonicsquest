@@ -167,8 +167,7 @@ export function nextPaWord(state, { mode, group, maxLevel, wordList }) {
       if (state.wordsForTargetSeen.length >= capacity) {
         // Quota met for this target — advance.
         state.targetIdx = (state.targetIdx + 1) % state.targets.length;
-        if (state.targetIdx === 0) state.wordsForTargetSeen = [];
-        else state.wordsForTargetSeen = [];
+        state.wordsForTargetSeen = [];
         continue;
       }
 

@@ -66,6 +66,18 @@ describe('buildSoundMatchRound', () => {
   it('returns null for an unknown stage', () => {
     expect(buildSoundMatchRound('not-a-stage')).toBeNull();
   });
+
+  it('always includes the correct grapheme for non-vowel stages', () => {
+    // "when" starts with w — a grapheme outside the old fixed fallback pool,
+    // which used to make the round unanswerable.
+    for (let seed = 1; seed <= 25; seed++) {
+      const round = buildSoundMatchRound('digraphs', { wordIndex: 3, rng: seededRng(seed) });
+      expect(round.prompt.grapheme).toBe('w');
+      expect(round.choices).toContain('w');
+      expect(round.choices).toHaveLength(4);
+      expect(new Set(round.choices).size).toBe(4);
+    }
+  });
 });
 
 describe('buildBlendBuilderRound', () => {

@@ -666,6 +666,27 @@ function _teacherScore(results, section) {
   return rows.reduce((a, b) => a + b.score, 0) / rows.length;
 }
 
+/** Whether a section was actually administered (has any scored rows). */
+function _hasSection(results, section) {
+  return results.some(r => r.section === section && (typeof r.correct === 'boolean' || typeof r.score === 'number'));
+}
+
+/**
+ * Weighted average over administered sections only. The screener gates and
+ * skips sections, and _accuracy/_teacherScore return 0 for missing ones —
+ * dividing by a fixed denominator would let un-administered sections drag a
+ * composite toward zero and under-place the child. Weights are renormalised
+ * over the entries whose `present` flag is true; all-absent → 0.
+ *
+ * @param {[score: number, weight: number, present: boolean][]} entries
+ */
+function _weightedPresent(entries) {
+  const present = entries.filter(([, , p]) => p);
+  const totalW = present.reduce((sum, [, w]) => sum + w, 0);
+  if (!totalW) return 0;
+  return present.reduce((sum, [s, w]) => sum + s * w, 0) / totalW;
+}
+
 function _phaseFromDecoding(results) {
   const decoding = results.filter(r => r.section === 'decoding');
   if (!decoding.length) return { phase: 1, startGroup: PLACEMENT_PHASES[0].fallbackGroup };
@@ -767,9 +788,10 @@ function _computeStageScores(results) {
 
   const stage1Vocab     = _accuracy(results, 'vocab');
   const stage1Oral      = _teacherScore(results, 'oral');
-  const stage1Composite = (has('vocab') || has('oral'))
-    ? (stage1Vocab * 0.7 + stage1Oral * 0.3)
-    : 0;
+  const stage1Composite = _weightedPresent([
+    [stage1Vocab, 0.7, has('vocab')],
+    [stage1Oral, 0.3, has('oral')],
+  ]);
 
   const stage2 = _accuracy(results, 'knownVocab');
 
@@ -777,7 +799,12 @@ function _computeStageScores(results) {
   const lastS   = _accuracy(results, 'lastSound');
   const middleS = _accuracy(results, 'middleSound');
   const oralBl  = _accuracy(results, 'oralBlending');
-  const paComposite = (firstS + lastS + middleS + oralBl) / 4;
+  const paComposite = _weightedPresent([
+    [firstS, 1, has('firstSound')],
+    [lastS, 1, has('lastSound')],
+    [middleS, 1, has('middleSound')],
+    [oralBl, 1, has('oralBlending')],
+  ]);
 
   const letterSounds = _teacherScore(results, 'letterSounds');
 
@@ -786,16 +813,22 @@ function _computeStageScores(results) {
   const connectedReading = _accuracy(results, 'connectedReading');
   const comprehension    = _accuracy(results, 'comprehension');
   const storyReadiness   = _teacherScore(results, 'storyReadiness');
-  const readingComposite = has('decoding') || has('connectedReading')
-    ? (decoding * 0.4 + sightWords * 0.2 + connectedReading * 0.2 + comprehension * 0.15 + storyReadiness * 0.05)
-    : 0;
+  const readingComposite = _weightedPresent([
+    [decoding, 0.4, has('decoding')],
+    [sightWords, 0.2, has('sightWords')],
+    [connectedReading, 0.2, has('connectedReading')],
+    [comprehension, 0.15, has('comprehension')],
+    [storyReadiness, 0.05, has('storyReadiness')],
+  ]);
 
   const sentenceReady     = _accuracy(results, 'sentenceReady');
   const grammarReady      = _accuracy(results, 'grammarReady');
   const vocabularyReady   = _accuracy(results, 'vocabularyReady');
-  const grammarVocabComposite = (has('sentenceReady') || has('grammarReady') || has('vocabularyReady'))
-    ? (sentenceReady + grammarReady + vocabularyReady) / 3
-    : 0;
+  const grammarVocabComposite = _weightedPresent([
+    [sentenceReady, 1, has('sentenceReady')],
+    [grammarReady, 1, has('grammarReady')],
+    [vocabularyReady, 1, has('vocabularyReady')],
+  ]);
 
   return {
     pictureId: {
@@ -1009,23 +1042,51 @@ export function derivePlacementResult(results, intake = {}, schoolLevel = 'presc
   const grammarReadyScore = _accuracy(results, 'grammarReady');
   const vocabularyReadyScore = _accuracy(results, 'vocabularyReady');
 
+  const hasSec = (section) => _hasSection(results, section);
+
   // Separate child-response scores from teacher-observed scores in Gate A.
   // Child-response items (direct evidence) are weighted more heavily (70/30).
-  const gateAChildScore = (first + last + middle + oralBlending + vocab) / 5;
-  const gateATeacherScore = (letterSounds + oral) / 2;
-  const gateAComposite = gateAChildScore * 0.7 + gateATeacherScore * 0.3;
+  // All composites average administered sections only — see _weightedPresent.
+  const gateAChildScore = _weightedPresent([
+    [first, 1, hasSec('firstSound')],
+    [last, 1, hasSec('lastSound')],
+    [middle, 1, hasSec('middleSound')],
+    [oralBlending, 1, hasSec('oralBlending')],
+    [vocab, 1, hasSec('vocab')],
+  ]);
+  const gateATeacherScore = _weightedPresent([
+    [letterSounds, 1, hasSec('letterSounds')],
+    [oral, 1, hasSec('oral')],
+  ]);
+  const gateAChildPresent = ['firstSound', 'lastSound', 'middleSound', 'oralBlending', 'vocab'].some(hasSec);
+  const gateATeacherPresent = ['letterSounds', 'oral'].some(hasSec);
+  const gateAComposite = _weightedPresent([
+    [gateAChildScore, 0.7, gateAChildPresent],
+    [gateATeacherScore, 0.3, gateATeacherPresent],
+  ]);
   const gateASecure = gateAComposite >= 0.6;
   const gateBSecure = decoding >= 0.6;
   // Gate C: separate child-response (connected reading + comprehension) from teacher observation (read aloud).
-  const gateCChildScore = (connectedReading + comprehension) / 2;
+  const gateCChildScore = _weightedPresent([
+    [connectedReading, 1, hasSec('connectedReading')],
+    [comprehension, 1, hasSec('comprehension')],
+  ]);
   const gateCTeacherScore = readAloud;
-  const gateCComposite = gateCChildScore * 0.7 + gateCTeacherScore * 0.3;
+  const gateCComposite = _weightedPresent([
+    [gateCChildScore, 0.7, hasSec('connectedReading') || hasSec('comprehension')],
+    [gateCTeacherScore, 0.3, hasSec('storyReadiness')],
+  ]);
   const gateCSecure = gateCComposite >= 0.6;
+  const gateDScore = _weightedPresent([
+    [sentenceReadyScore, 1, hasSec('sentenceReady')],
+    [grammarReadyScore, 1, hasSec('grammarReady')],
+    [vocabularyReadyScore, 1, hasSec('vocabularyReady')],
+  ]);
 
   let readingBand = 'pre-reader';
   if (gateASecure) readingBand = 'emerging-decoder';
   if (gateASecure && gateBSecure) readingBand = 'developing-reader';
-  if (gateASecure && gateBSecure && gateCSecure && (sentenceReadyScore + grammarReadyScore + vocabularyReadyScore) / 3 >= 0.6) {
+  if (gateASecure && gateBSecure && gateCSecure && gateDScore >= 0.6) {
     readingBand = 'reader';
   }
 

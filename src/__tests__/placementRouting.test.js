@@ -145,6 +145,33 @@ describe('placement gate adaptivity', () => {
     expect(result.phase).toBe(1);
   });
 
+  it('does not deflate Gate A when only some sections were administered', () => {
+    // A child who aced the four sections the screener actually gave them
+    // must not be dragged below the 0.6 threshold by sections that were
+    // skipped (middleSound, oralBlending, letterSounds were never asked).
+    const partialStrongA = [
+      { section: 'oral', score: 1 },
+      { section: 'vocab', correct: true },
+      { section: 'vocab', correct: true },
+      { section: 'firstSound', correct: true },
+      { section: 'lastSound', correct: true },
+    ];
+
+    const result = derivePlacementResult(partialStrongA, {}, 'preschool');
+    expect(result.gateScores.gateA).toBeGreaterThanOrEqual(0.6);
+    expect(result.readingBand).toBe('emerging-decoder');
+  });
+
+  it('still fails Gate A when administered sections are genuinely weak', () => {
+    const partialWeakA = [
+      { section: 'oral', score: 0 },
+      { section: 'vocab', correct: false },
+      { section: 'firstSound', correct: false },
+    ];
+    const result = derivePlacementResult(partialWeakA, {}, 'preschool');
+    expect(result.readingBand).toBe('pre-reader');
+  });
+
   it('counts letterSounds teacher-scale score toward Gate A', () => {
     // Learner has strong letter-sounds (teacher confirmed) but borderline elsewhere
     // Without the fix, letterSounds = 0, causing Gate A to fail

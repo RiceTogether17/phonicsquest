@@ -73,15 +73,17 @@ function _retentionScore(stat) {
 }
 
 function _speedScore(wordId) {
+  // learningEvents store correct/responseMs at the top level (see
+  // store.recordLearningEvent); only wordId/mode live inside meta.
   const events = (store.get('learningEvents') || [])
     .filter(e =>
       e.eventType === 'word_attempt' &&
       e.meta?.wordId === wordId &&
-      e.meta?.correct === true &&
-      typeof e.meta?.responseMs === 'number'
+      e.correct === true &&
+      typeof e.responseMs === 'number'
     );
   if (!events.length) return null;
-  const times = events.map(e => e.meta.responseMs).sort((a, b) => a - b);
+  const times = events.map(e => e.responseMs).sort((a, b) => a - b);
   const median = times[Math.floor(times.length / 2)];
   return Math.min(1, Math.max(0, 1 - median / (2 * TARGET_SPEED_MS)));
 }
