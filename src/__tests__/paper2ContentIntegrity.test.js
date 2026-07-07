@@ -304,13 +304,13 @@ describe('Paper 2 coverage report', () => {
       ]),
     );
 
-    // eslint-disable-next-line no-console
+     
     console.log('[Coverage] Grammar MCQ by level/category', JSON.stringify(grammarMcqCounts));
-    // eslint-disable-next-line no-console
+     
     console.log('[Coverage] Vocab MCQ by level/category', JSON.stringify(vocabMcqCounts));
-    // eslint-disable-next-line no-console
+     
     console.log('[Coverage] Grammar Cloze by level/category', JSON.stringify(grammarClozeCounts));
-    // eslint-disable-next-line no-console
+     
     console.log('[Coverage] Vocab Cloze by category/level', JSON.stringify(vocabClozeCounts));
 
     expect(Object.keys(grammarMcqCounts).length).toBeGreaterThan(0);

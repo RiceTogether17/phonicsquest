@@ -91,7 +91,7 @@ export const STAGE_IDS = STAGES.map(s => s.id);
  * basic-oral-response teacher items observe attention/comprehension, the
  * same skill the picture-id stage probes from the child side.
  */
-const SECTION_TO_STAGE = {
+const _SECTION_TO_STAGE = {
   oral:             'picture-id',
   pictureId:        'picture-id',
   vocab:            'picture-id',          // legacy section name — kept for back-compat scoring

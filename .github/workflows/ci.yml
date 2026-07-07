@@ -28,6 +28,9 @@ jobs:
         run: |
           npm run check:syntax
 
+      - name: Lint
+        run: npm run lint
+
       - name: Run unit tests
         run: npm run test
 

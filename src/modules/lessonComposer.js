@@ -114,7 +114,7 @@ function _fromEarlyStep(step, kind, kindLabel) {
 }
 
 function _earlyTeachStep() {
-  let stage = null;
+  let stage;
   try { stage = getRecommendedStage(); } catch (_) { stage = null; }
   if (!stage) return null;
 
@@ -164,7 +164,7 @@ function _composePrimary(now) {
 }
 
 function _primaryTeachStep() {
-  let plan = [];
+  let plan;
   try { plan = getRemediationPlan(1) || []; } catch (_) { plan = []; }
   const weakest = plan[0];
   if (!weakest) return null;

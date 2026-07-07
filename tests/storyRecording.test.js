@@ -88,7 +88,7 @@ describe('storyRecording module', () => {
 
   describe('recording lifecycle', () => {
     it('starts and stops recording', async () => {
-      const { startRecording, stopRecording, getRecorderState, cleanupRecording } = await import('../src/modules/storyRecording.js');
+      const { startRecording, stopRecording, cleanupRecording } = await import('../src/modules/storyRecording.js');
       cleanupRecording();
 
       const stateChanges = [];

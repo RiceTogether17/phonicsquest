@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { writingLessonPacks, WRITING_TRACKS, getLessonsForTrack, getTracksForLevel, validateLessonPackSchema } from '../src/data/writingLessonPacks.js';
-import { evaluateWriting, computeMetrics } from '../src/modules/writingEvaluator.js';
+import { evaluateWriting } from '../src/modules/writingEvaluator.js';
 import { createPlanChecks, mergeLessonWithPlan, isPlanReady, getRemediationPath, getParagraphMissionStatus, getPlanDraftMatchReport, _extractPlanKeywords, _expandWithSynonyms, _splitIntoSections, _inferMissionSection } from '../src/modules/writingLessonEngine.js';
-import { renderDrill, gradeDrills, collectDrillAnswers, DRILL_RENDERERS, DRILL_GRADERS } from '../src/modules/writingReviseDrills.js';
+import { renderDrill, gradeDrills, DRILL_RENDERERS } from '../src/modules/writingReviseDrills.js';
 import { store } from '../src/modules/store.js';
 import { getTrackProgress, setTrackProgress, migrateLegacyWritingCompleted, getLevelTrackProgress, isLevelFullyComplete } from '../src/modules/writingTrackProgress.js';
 import { scoreClimaxPresence, scoreResolutionPresence, scoreReflectionEnding, scoreDialoguePurpose, scoreNarrativeArc, scoreChronologicalFlow, computeNarrativeQuality } from '../src/modules/writingNarrativeHelpers.js';

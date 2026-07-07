@@ -102,13 +102,12 @@ describe('Review session does NOT complete daily challenge', () => {
   // These are integration-level assertions against the session type enum.
   // We cannot easily instantiate App, but we test the data layer contract.
 
-  let store, dailyChallengeMod;
+  let dailyChallengeMod;
 
   beforeEach(async () => {
     localStorageMock.clear();
     vi.resetModules();
-    const storeMod = await import('../src/modules/store.js');
-    store = storeMod.store;
+    await import('../src/modules/store.js');
     dailyChallengeMod = await import('../src/modules/dailyChallenge.js');
   });
 

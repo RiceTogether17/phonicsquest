@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Adaptive selection settings and helpers.
  */

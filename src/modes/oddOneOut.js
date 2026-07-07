@@ -174,7 +174,7 @@ export function pickOddOneOutRound(word, pool, fullList = WORDS) {
   const confusable = new Set(
     getFirstSoundDistractors(target, word.types[0], word.level ?? 3).map(d => d.grapheme)
   );
-  let odd =
+  const odd =
     pool.find(w => !seen.has(w.id) && confusable.has(w.graphemes?.[0])) ??
     pool.find(w => !seen.has(w.id) && w.graphemes?.[0] !== target && w.graphemes?.length >= 2) ??
     fullList.find(w => !seen.has(w.id) && w.graphemes?.[0] !== target && Array.isArray(w.graphemes) && w.graphemes.length >= 2);

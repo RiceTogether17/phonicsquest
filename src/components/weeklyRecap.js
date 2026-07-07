@@ -50,12 +50,12 @@ export function showWeeklyRecap({ stats, onClose }) {
   const perfMessages = {
     7: [`Incredible week, ${name}! 7 days straight — you're unstoppable! 🏆`, '🔥'],
     6: [`Amazing effort, ${name}! 6 out of 7 days this week! Keep it up! 🌟`, '⭐'],
-    5: [`Great week, ${name}! 5 days of learning — that\'s real dedication! 💪`, '✨'],
+    5: [`Great week, ${name}! 5 days of learning — that's real dedication! 💪`, '✨'],
     4: [`Solid week, ${name}! 4 days done. Can you do 5 next week? 🎯`, '🎯'],
     3: [`Good start, ${name}! 3 days this week. Every session counts! 🌱`, '🌱'],
   };
   const [message, icon] = perfMessages[stats.daysPlayed]
-    ?? [`A new week begins, ${name}! Let\'s make it a great one! 🚀`, '🚀'];
+    ?? [`A new week begins, ${name}! Let's make it a great one! 🚀`, '🚀'];
 
   const modal = document.createElement('div');
   modal.id        = 'modal-weekly-recap';

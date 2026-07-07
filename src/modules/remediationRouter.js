@@ -82,7 +82,7 @@ export function getWeakSkills() {
   const mastery = store.get('questMastery') || {};
   const results = [];
 
-  for (const [questKey, bucket] of Object.entries(mastery)) {
+  for (const [_questKey, bucket] of Object.entries(mastery)) {
     if (!bucket || typeof bucket !== 'object') continue;
     for (const [skill, score] of Object.entries(bucket)) {
       if (typeof score !== 'number' || score >= WEAK_THRESHOLD) continue;

@@ -39,7 +39,7 @@ let _autoplayAbort  = false;  // signal to stop "Listen to all"
 // Quick Recall state
 let _quizActive     = false;
 let _quizRound      = 0;
-let _quizTotal      = 3;
+const _quizTotal      = 3;
 let _quizCorrect    = 0;
 let _quizTarget     = null;   // current target word
 let _quizChoices    = [];     // word choices on screen

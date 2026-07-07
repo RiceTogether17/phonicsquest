@@ -176,7 +176,6 @@ function _renderCategoryPicker(level) {
   for (const catKey of cats) {
     const cat   = GRAMMAR_CATEGORIES[catKey] || { label: catKey, icon: '📝' };
     const total = passages[level][catKey].length;
-    const doneKey = `${level}-${catKey}`;
     const done  = getUniqueClozeDone({ level, category: catKey, ccqCompletedByPassage: store.get('ccqCompletedByPassage') || {}, ccqCatCompleted: completed });
     const isDone = done >= total;
     const isRecommended = catKey === recommendedCat;
@@ -738,7 +737,7 @@ function _renderBankWords(passage) {
       const nextClue = (passage.clues || [])
         .slice()
         .sort((a, b) => a.blankIndex - b.blankIndex)
-        .find(c => _blankFills[c.blankIndex] === null && !_clueResults.hasOwnProperty(c.blankIndex));
+        .find(c => _blankFills[c.blankIndex] === null && !Object.hasOwn(_clueResults, c.blankIndex));
 
       if (nextClue) {
         _activeBlankIndex = nextClue.blankIndex;

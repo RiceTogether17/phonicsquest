@@ -7,7 +7,7 @@ import { checkPostAttempt } from '../modules/remediationRouter.js';
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 import { buildMcqFeedbackHtml, attachAskGiri, attachGiriHint } from './mcqFeedback.js';
 import { filterMcqItemsForDifficulty, MCQ_DIFFICULTIES, renderMcqDifficultyToggle } from './mcqDifficulty.js';
-import { GRAMMAR_TIPS, getGrammarTip } from '../data/grammarTips.js';
+import { getGrammarTip } from '../data/grammarTips.js';
 
 let _container = null;
 let _onGoHome = null;

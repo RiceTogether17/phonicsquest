@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * PhonicsQuest – motion preference.
  *

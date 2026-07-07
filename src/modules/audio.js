@@ -197,7 +197,7 @@ const PHONEME_TTS = {
 };
 
 /** Sound effect file names */
-const SFX = {
+const _SFX = {
   correct:  'reveal-sound', // reuse existing MP3
   wrong:    null,           // generated via oscillator
   reveal:   'reveal-sound',

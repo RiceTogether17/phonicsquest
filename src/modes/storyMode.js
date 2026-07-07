@@ -20,7 +20,7 @@ import { lookupWord as lookupWordForDetective, addWordToReview } from '../module
 import { isReadAloudSupported, listenToLine, stopListening } from '../modules/readAloudListener.js';
 import { store } from '../modules/store.js';
 import { modalManager } from '../modules/modalManager.js';
-import { unlockFriend, isFriendUnlocked, getRosterSummary, friendFromStory } from '../modules/storyFriends.js';
+import { unlockFriend, getRosterSummary } from '../modules/storyFriends.js';
 import {
   startRecording, stopRecording, playRecording, deleteRecording,
   stopPlayback, cleanupRecording, getRecorderState,
@@ -42,7 +42,7 @@ function lookupWord(token) {
  * @returns {Array<{text:string, type:'word'|'punct'|'space'}>}
  */
 function tokenise(text) {
-  const parts = text.split(/(\s+|["""'',.!?;:()\-]+)/);
+  const parts = text.split(/(\s+|["""'',.!?;:()-]+)/);
   return parts
     .filter(p => p.length > 0)
     .map(p => ({
@@ -254,7 +254,7 @@ function _renderBrowser() {
     </div>
   `;
 
-  let innerHtml = '';
+  let innerHtml;
 
   if (_activeTab === 'band') {
     // ── Band tabs + cards ─────────────────────────────────────────────
@@ -1816,7 +1816,7 @@ function _highlightLine(lineIndex) {
  * @param {SpeechSynthesisUtterance} utt
  */
 function _applyTtsVoice(utt) {
-  let voice = null;
+  let voice;
   try { voice = audio.getTtsVoice?.() || null; } catch (_) { voice = null; }
   if (voice) {
     utt.voice = voice;
@@ -2120,7 +2120,6 @@ function _wireEchoReadControls(story) {
     .filter(l => l.type !== 'label' && l.type !== 'chapter' && l.text);
 
   let currentEchoIdx = -1;
-  let echoRecId = null;
 
   function resetEchoUI() {
     btnStart.hidden = false;
@@ -2177,7 +2176,6 @@ function _wireEchoReadControls(story) {
   btnStart.addEventListener('click', () => {
     btnStart.hidden = true;
     btnExit.hidden = false;
-    echoRecId = null;
     showEchoLine(0);
   });
 
@@ -2288,7 +2286,7 @@ function _stopFluencyTimer(wordCount, story) {
   }
 
   // Benchmark guidance (Hasbrouck & Tindal norms, Grade 1 Spring ≈ 53 WCPM)
-  let level = '';
+  let level;
   if (wcpm >= 60)      level = '🌟 Fluent reader!';
   else if (wcpm >= 40) level = '📈 Building fluency — great progress!';
   else                  level = '📖 Keep practising — try reading it again!';

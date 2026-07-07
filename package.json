@@ -9,8 +9,12 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "check:syntax": "find src -name '*.js' -print0 | xargs -0 -n1 node --check"
+    "check:syntax": "find src -name '*.js' -print0 | xargs -0 -n1 node --check",
+    "audit:stories": "node scripts/audit-stories.mjs",
+    "gen:store-graphics": "node scripts/gen-store-graphics.mjs",
+    "optimize:images": "node scripts/optimize-images.mjs"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.2",
@@ -18,7 +22,10 @@
     "gsap": "^3.12.5"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@vitest/ui": "^4.0.18",
+    "eslint": "^10.6.0",
+    "globals": "^17.7.0",
     "jimp": "^1.6.1",
     "jsdom": "^28.1.0",
     "typescript": "^5.9.3",

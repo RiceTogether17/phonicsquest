@@ -19,7 +19,6 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { CURRICULUM, PHASE_LABELS } from '../data/curriculum.js';
 
 let PLACEMENT_PHASES;
-let GATE_B_ITEMS;
 
 beforeAll(async () => {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
@@ -33,7 +32,6 @@ beforeAll(async () => {
   // For this test we re-derive them from the module's source via the
   // exported PLACEMENT_PHASES table — that's enough for the structural
   // assertions below.
-  GATE_B_ITEMS = null; // intentionally unused; see comment above
 });
 
 describe('curriculum/placement phase alignment', () => {

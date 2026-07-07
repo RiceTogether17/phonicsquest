@@ -6,7 +6,7 @@ import { Chart, registerables } from 'chart.js';
 import { progress } from '../modules/progress.js';
 import { store } from '../modules/store.js';
 import { badges } from '../modules/badges.js';
-import { getActiveProfile, getProfiles } from '../modules/profiles.js';
+import { getActiveProfile } from '../modules/profiles.js';
 import { WORD_GROUPS, GROUP_ORDER, WORDS } from '../data/words.js';
 import { CURRICULUM } from '../data/curriculum.js';
 import { getUnlockedStages, buildProgressionSnapshot } from '../modules/progression.js';
@@ -1199,7 +1199,7 @@ async function _handleCSVImport(file) {
 
   const firstLine = lines[0].trim();
   const isFullCSV = firstLine.includes(',');
-  let words = [];
+  const words = [];
   const existingIds = new Set(WORDS.map(w => w.id));
 
   if (isFullCSV) {

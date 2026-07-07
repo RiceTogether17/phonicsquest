@@ -31,7 +31,6 @@ export function showSessionSummary({ xpEarned, wordsCount, firstTryCount = 0, st
   const firstName    = profile?.name?.split(' ')[0] || 'Great job';
   const avatar       = profile?.avatar || '🦁';
   const level        = store.get('level') || 1;
-  const dailyGoal    = store.get('dailyGoal') || 10;
   const bestStreak   = store.get('bestStreak') || streak;
 
   // Motivational copy based on performance

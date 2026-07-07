@@ -12,7 +12,7 @@
  * outcomes flow through automatically.
  */
 
-import { PHASES, getStage, getPhase, getStagesInPhase, CURRICULUM } from '../../data/curriculum.js';
+import { PHASES, getStage, getPhase, getStagesInPhase } from '../../data/curriculum.js';
 import { PHONICS_MODES } from '../../modes/phonicsModes.js';
 
 // ── Helpers ──────────────────────────────────────────────────────────────
