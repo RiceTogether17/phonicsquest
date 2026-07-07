@@ -84,7 +84,7 @@ function _accuracyOver(stats, wordIds, skill = null) {
     const s = skill ? stats?.[id]?.[skill] : stats?.[id];
     if (!s || !s.attempts) continue;
     attempts += s.attempts;
-    correct  += s.correct;
+    correct  += s.correct || 0;
   }
   return { attempts, correct, accuracy: attempts > 0 ? correct / attempts : null };
 }
@@ -203,9 +203,11 @@ function _checkVowelConfusion(prereqStage, snapshot) {
     return { pass: true, reason: 'no-sibling-data' };
   }
 
-  // Median of siblings — robust against one outlier.
+  // Median of siblings — robust against one outlier. For an even count,
+  // average the two central values (true median).
   const sorted = [...siblings].sort((a, b) => a - b);
-  const median = sorted[Math.floor(sorted.length / 2)];
+  const mid = Math.floor(sorted.length / 2);
+  const median = sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
   const gap = median - myScore;
   const required = PROGRESSION_GATE.MAX_VOWEL_CONFUSION_GAP;
   return {
@@ -260,14 +262,24 @@ export function getUnlockedStages(snapshot = buildProgressionSnapshot()) {
   // Teacher master unlock: every curriculum stage is available at once.
   if (isTeacherUnlockActive()) return CURRICULUM.map(s => s.id);
 
-  const unlocked = [];
-  for (const stage of CURRICULUM) {
-    if (!stage.prerequisite) { unlocked.push(stage.id); continue; }
-    if (!unlocked.includes(stage.prerequisite)) continue;
-    const { unlocked: ok } = getStageReadiness(stage.id, snapshot);
-    if (ok) unlocked.push(stage.id);
+  // Iterate to a fixpoint rather than assuming CURRICULUM is topologically
+  // ordered: a stage defined before its prerequisite still unlocks once the
+  // prerequisite does.
+  const unlocked = new Set();
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const stage of CURRICULUM) {
+      if (unlocked.has(stage.id)) continue;
+      if (stage.prerequisite && !unlocked.has(stage.prerequisite)) continue;
+      const ok = !stage.prerequisite || getStageReadiness(stage.id, snapshot).unlocked;
+      if (ok) {
+        unlocked.add(stage.id);
+        changed = true;
+      }
+    }
   }
-  return unlocked;
+  return CURRICULUM.filter(s => unlocked.has(s.id)).map(s => s.id);
 }
 
 /**

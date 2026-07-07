@@ -149,4 +149,25 @@ describe('speech recognition enhancements', () => {
     expect(colourVsColor).toBeGreaterThan(0.7);
     expect(colourVsColor).toBeGreaterThan(colourVsTable);
   });
+
+  it('stop() settles a pending listen() promise immediately with null', async () => {
+    vi.resetModules();
+    const { store } = await import('../src/modules/store.js');
+    store.reset();
+
+    // A recogniser that hears nothing: without stop(), the promise would
+    // only settle when the 8s hard timeout fires.
+    class SilentRecognition {
+      start() {}
+      stop() { this.onend?.(); }
+    }
+    window.SpeechRecognition = SilentRecognition;
+    window.webkitSpeechRecognition = SilentRecognition;
+    const { speech } = await import('../src/modules/speech.js');
+
+    const pending = speech.listen('cat');
+    speech.stop();
+    await expect(pending).resolves.toBeNull();
+    expect(speech.isListening).toBe(false);
+  });
 });
