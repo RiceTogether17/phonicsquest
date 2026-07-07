@@ -501,32 +501,47 @@ const GATE_A_ITEMS = [
   },
 ];
 
-const GATE_B_ITEMS = [
+/**
+ * Gate B decoding + sight-word item bank (issue #108).
+ *
+ * Coverage contract (enforced by curriculumPlacementAlignment.test.js):
+ * ≥4 decoding items per phonics phase 1-6, every short vowel probed at
+ * least once across the bank, distractors are phonetically plausible
+ * minimal pairs, and every `group` key exists in curriculum.js.
+ * Exported for tests.
+ */
+export const GATE_B_ITEMS = [
   // ── Phase 1: CVC short vowels ─────────────────────────────────────────────
   { id: 'b-cvc-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'CVC decoding', prompt: 'Tap: cat', speak: 'cat', correct: 'cat', phase: 1, group: 'cvc-a', options: ['cat', 'cut', 'cot', 'cap'] },
   { id: 'b-cvc-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: bed', speak: 'bed', correct: 'bed', phase: 1, group: 'cvc-e', options: ['bad', 'bid', 'bed', 'bud'] },
   { id: 'b-cvc-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: sit', speak: 'sit', correct: 'sit', phase: 1, group: 'cvc-i', options: ['sit', 'set', 'sat', 'bit'] },
   { id: 'b-cvc-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: dog', speak: 'dog', correct: 'dog', phase: 1, group: 'cvc-o', options: ['dog', 'dig', 'dug', 'hog'] },
+  { id: 'b-cvc-5', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: sun', speak: 'sun', correct: 'sun', phase: 1, group: 'cvc-u', options: ['sun', 'sin', 'fun', 'set'] },
   // ── Phase 2: Initial blends (CCVC) ────────────────────────────────────────
   { id: 'b-blend-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: flag', speak: 'flag', correct: 'flag', phase: 2, group: 'ccvc-a', options: ['flag', 'flap', 'frog', 'plug'] },
   { id: 'b-blend-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: frog', speak: 'frog', correct: 'frog', phase: 2, group: 'ccvc-o', options: ['frog', 'fog', 'from', 'grog'] },
   { id: 'b-blend-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: step', speak: 'step', correct: 'step', phase: 2, group: 'ccvc-e', options: ['step', 'stem', 'stop', 'skip'] },
+  { id: 'b-blend-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: skip', speak: 'skip', correct: 'skip', phase: 2, group: 'ccvc-i', options: ['skip', 'ship', 'slip', 'skim'] },
   // ── Phase 3: Final blends (CVCC) ──────────────────────────────────────────
   { id: 'b-cvcc-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: best', speak: 'best', correct: 'best', phase: 3, group: 'cvcc-e', options: ['best', 'beast', 'bent', 'belt'] },
   { id: 'b-cvcc-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: lamp', speak: 'lamp', correct: 'lamp', phase: 3, group: 'cvcc-a', options: ['lamp', 'lame', 'camp', 'damp'] },
   { id: 'b-cvcc-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: gift', speak: 'gift', correct: 'gift', phase: 3, group: 'cvcc-i', options: ['gift', 'gist', 'lift', 'sift'] },
+  { id: 'b-cvcc-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: sand', speak: 'sand', correct: 'sand', phase: 3, group: 'cvcc-a', options: ['sand', 'send', 'band', 'said'] },
   // ── Phase 4: Digraphs ─────────────────────────────────────────────────────
   { id: 'b-digraph-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: ship', speak: 'ship', correct: 'ship', phase: 4, group: 'digraphs', options: ['chip', 'shop', 'ship', 'slip'] },
   { id: 'b-digraph-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: chin', speak: 'chin', correct: 'chin', phase: 4, group: 'digraphs', options: ['chin', 'thin', 'shin', 'win'] },
   { id: 'b-digraph-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: that', speak: 'that', correct: 'that', phase: 4, group: 'digraphs', options: ['that', 'chat', 'flat', 'hat'] },
+  { id: 'b-digraph-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: chop', speak: 'chop', correct: 'chop', phase: 4, group: 'digraphs', options: ['chop', 'shop', 'chip', 'cop'] },
   // ── Phase 5: Both-end blends (CCVCC) ──────────────────────────────────────
   { id: 'b-ccvcc-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Both-end blends', prompt: 'Tap: stamp', speak: 'stamp', correct: 'stamp', phase: 5, group: 'ccvcc-a', options: ['stamp', 'stomp', 'stump', 'champ'] },
   { id: 'b-ccvcc-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Both-end blends', prompt: 'Tap: blend', speak: 'blend', correct: 'blend', phase: 5, group: 'ccvcc-e', options: ['blend', 'blond', 'bland', 'bend'] },
   { id: 'b-ccvcc-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Both-end blends', prompt: 'Tap: print', speak: 'print', correct: 'print', phase: 5, group: 'ccvcc-i', options: ['print', 'paint', 'plant', 'pint'] },
+  { id: 'b-ccvcc-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Both-end blends', prompt: 'Tap: crisp', speak: 'crisp', correct: 'crisp', phase: 5, group: 'ccvcc-i', options: ['crisp', 'crust', 'clasp', 'grasp'] },
   // ── Phase 6: Long vowels ──────────────────────────────────────────────────
-  { id: 'b-long-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: cake', speak: 'cake', correct: 'cake', phase: 6, group: 'long-a', options: ['cake', 'cane', 'cook', 'kick'] },
-  { id: 'b-long-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: kite', speak: 'kite', correct: 'kite', phase: 6, group: 'long-i', options: ['kite', 'kit', 'bite', 'site'] },
-  { id: 'b-long-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: home', speak: 'home', correct: 'home', phase: 6, group: 'long-o', options: ['home', 'hone', 'some', 'come'] },
+  { id: 'b-long-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: cake', speak: 'cake', correct: 'cake', phase: 6, group: 'long-a-ae', options: ['cake', 'cane', 'cook', 'kick'] },
+  { id: 'b-long-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: kite', speak: 'kite', correct: 'kite', phase: 6, group: 'long-i-ie', options: ['kite', 'kit', 'bite', 'site'] },
+  { id: 'b-long-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: home', speak: 'home', correct: 'home', phase: 6, group: 'long-o-oe', options: ['home', 'hone', 'some', 'come'] },
+  { id: 'b-long-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: rain', speak: 'rain', correct: 'rain', phase: 6, group: 'long-a-ai', options: ['rain', 'ran', 'rail', 'run'] },
   // ── Sight words ───────────────────────────────────────────────────────────
   { id: 'b-sight-1', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: said', speak: 'said', correct: 'said', options: ['seed', 'said', 'sad', 'sail'] },
   { id: 'b-sight-2', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: the', speak: 'the', correct: 'the', options: ['the', 'then', 'them', 'that'] },
@@ -534,6 +549,10 @@ const GATE_B_ITEMS = [
   { id: 'b-sight-4', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: they', speak: 'they', correct: 'they', options: ['they', 'them', 'then', 'the'] },
   { id: 'b-sight-5', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: have', speak: 'have', correct: 'have', options: ['have', 'gave', 'live', 'cave'] },
   { id: 'b-sight-6', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: look', speak: 'look', correct: 'look', options: ['look', 'took', 'book', 'good'] },
+  { id: 'b-sight-7', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: come', speak: 'come', correct: 'come', options: ['come', 'came', 'some', 'cone'] },
+  { id: 'b-sight-8', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: were', speak: 'were', correct: 'were', options: ['were', 'where', 'wear', 'we'] },
+  { id: 'b-sight-9', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: one', speak: 'one', correct: 'one', options: ['one', 'on', 'own', 'once'] },
+  { id: 'b-sight-10', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: you', speak: 'you', correct: 'you', options: ['you', 'your', 'yes', 'out'] },
 ];
 
 const GATE_C_ITEMS = [
