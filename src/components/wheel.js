@@ -8,6 +8,18 @@
 import gsap from 'gsap';
 import { WORD_GROUPS, GROUP_ORDER } from '../data/words.js';
 import { audio } from '../modules/audio.js';
+import { prefersReducedMotion } from '../utils/motion.js';
+
+/**
+ * Announce the landed category to assistive tech. The wheel is a canvas
+ * with a static aria-label, so without this a screen-reader user never
+ * learns what was selected.
+ */
+function _announceResult(group) {
+  const region = document.getElementById('wheel-announcer');
+  if (!region) return;
+  region.textContent = `Category: ${group.label}`;
+}
 
 /** Which groups are visible on the wheel (subset for cleaner UI) */
 const WHEEL_GROUPS = GROUP_ORDER.slice(0, 10); // 10 segments
@@ -50,6 +62,18 @@ class SpinWheel {
 
     return new Promise((resolve) => {
       const targetAngle = this._angle + (Math.random() * 3 + 4) * Math.PI * 2;
+
+      // Reduced motion: land instantly on the result, no 3.5s spin.
+      if (prefersReducedMotion()) {
+        this._angle = targetAngle;
+        this._draw();
+        this._spinning = false;
+        const group = this._segments[this._getSelectedIndex()];
+        _announceResult(group);
+        resolve(group.key);
+        return;
+      }
+
       // Seed with the current segment so the very first onUpdate doesn't
       // fire a spurious tick before the wheel has actually moved.
       this._lastSegIndex = this._getSelectedIndex();
@@ -73,6 +97,7 @@ class SpinWheel {
           const group = this._segments[idx];
           // Flash the selected segment
           this._flashSegment(idx);
+          _announceResult(group);
           resolve(group.key);
         },
       });
@@ -215,6 +240,17 @@ export function buildWordAnimation(word, container, onLetterLand) {
     container.appendChild(tile);
     return tile;
   });
+
+  // Reduced motion: reveal the tiles in place, still firing the per-letter
+  // callbacks the game logic relies on.
+  if (prefersReducedMotion()) {
+    tiles.forEach((t, i) => {
+      t.classList.add('letter-tile--revealed');
+      t.dataset.landed = 'true';
+      onLetterLand?.(i);
+    });
+    return tiles;
+  }
 
   // Animate: letters start offset + invisible, fly in with stagger
   gsap.set(tiles, {
