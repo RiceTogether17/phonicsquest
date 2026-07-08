@@ -91,7 +91,7 @@ export const STAGE_IDS = STAGES.map(s => s.id);
  * basic-oral-response teacher items observe attention/comprehension, the
  * same skill the picture-id stage probes from the child side.
  */
-const SECTION_TO_STAGE = {
+const _SECTION_TO_STAGE = {
   oral:             'picture-id',
   pictureId:        'picture-id',
   vocab:            'picture-id',          // legacy section name — kept for back-compat scoring
@@ -501,32 +501,47 @@ const GATE_A_ITEMS = [
   },
 ];
 
-const GATE_B_ITEMS = [
+/**
+ * Gate B decoding + sight-word item bank (issue #108).
+ *
+ * Coverage contract (enforced by curriculumPlacementAlignment.test.js):
+ * ≥4 decoding items per phonics phase 1-6, every short vowel probed at
+ * least once across the bank, distractors are phonetically plausible
+ * minimal pairs, and every `group` key exists in curriculum.js.
+ * Exported for tests.
+ */
+export const GATE_B_ITEMS = [
   // ── Phase 1: CVC short vowels ─────────────────────────────────────────────
   { id: 'b-cvc-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'CVC decoding', prompt: 'Tap: cat', speak: 'cat', correct: 'cat', phase: 1, group: 'cvc-a', options: ['cat', 'cut', 'cot', 'cap'] },
   { id: 'b-cvc-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: bed', speak: 'bed', correct: 'bed', phase: 1, group: 'cvc-e', options: ['bad', 'bid', 'bed', 'bud'] },
   { id: 'b-cvc-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: sit', speak: 'sit', correct: 'sit', phase: 1, group: 'cvc-i', options: ['sit', 'set', 'sat', 'bit'] },
   { id: 'b-cvc-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: dog', speak: 'dog', correct: 'dog', phase: 1, group: 'cvc-o', options: ['dog', 'dig', 'dug', 'hog'] },
+  { id: 'b-cvc-5', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: sun', speak: 'sun', correct: 'sun', phase: 1, group: 'cvc-u', options: ['sun', 'sin', 'fun', 'set'] },
   // ── Phase 2: Initial blends (CCVC) ────────────────────────────────────────
   { id: 'b-blend-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: flag', speak: 'flag', correct: 'flag', phase: 2, group: 'ccvc-a', options: ['flag', 'flap', 'frog', 'plug'] },
   { id: 'b-blend-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: frog', speak: 'frog', correct: 'frog', phase: 2, group: 'ccvc-o', options: ['frog', 'fog', 'from', 'grog'] },
   { id: 'b-blend-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: step', speak: 'step', correct: 'step', phase: 2, group: 'ccvc-e', options: ['step', 'stem', 'stop', 'skip'] },
+  { id: 'b-blend-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: skip', speak: 'skip', correct: 'skip', phase: 2, group: 'ccvc-i', options: ['skip', 'ship', 'slip', 'skim'] },
   // ── Phase 3: Final blends (CVCC) ──────────────────────────────────────────
   { id: 'b-cvcc-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: best', speak: 'best', correct: 'best', phase: 3, group: 'cvcc-e', options: ['best', 'beast', 'bent', 'belt'] },
   { id: 'b-cvcc-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: lamp', speak: 'lamp', correct: 'lamp', phase: 3, group: 'cvcc-a', options: ['lamp', 'lame', 'camp', 'damp'] },
   { id: 'b-cvcc-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: gift', speak: 'gift', correct: 'gift', phase: 3, group: 'cvcc-i', options: ['gift', 'gist', 'lift', 'sift'] },
+  { id: 'b-cvcc-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: sand', speak: 'sand', correct: 'sand', phase: 3, group: 'cvcc-a', options: ['sand', 'send', 'band', 'said'] },
   // ── Phase 4: Digraphs ─────────────────────────────────────────────────────
   { id: 'b-digraph-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: ship', speak: 'ship', correct: 'ship', phase: 4, group: 'digraphs', options: ['chip', 'shop', 'ship', 'slip'] },
   { id: 'b-digraph-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: chin', speak: 'chin', correct: 'chin', phase: 4, group: 'digraphs', options: ['chin', 'thin', 'shin', 'win'] },
   { id: 'b-digraph-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: that', speak: 'that', correct: 'that', phase: 4, group: 'digraphs', options: ['that', 'chat', 'flat', 'hat'] },
+  { id: 'b-digraph-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: chop', speak: 'chop', correct: 'chop', phase: 4, group: 'digraphs', options: ['chop', 'shop', 'chip', 'cop'] },
   // ── Phase 5: Both-end blends (CCVCC) ──────────────────────────────────────
   { id: 'b-ccvcc-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Both-end blends', prompt: 'Tap: stamp', speak: 'stamp', correct: 'stamp', phase: 5, group: 'ccvcc-a', options: ['stamp', 'stomp', 'stump', 'champ'] },
   { id: 'b-ccvcc-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Both-end blends', prompt: 'Tap: blend', speak: 'blend', correct: 'blend', phase: 5, group: 'ccvcc-e', options: ['blend', 'blond', 'bland', 'bend'] },
   { id: 'b-ccvcc-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Both-end blends', prompt: 'Tap: print', speak: 'print', correct: 'print', phase: 5, group: 'ccvcc-i', options: ['print', 'paint', 'plant', 'pint'] },
+  { id: 'b-ccvcc-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Both-end blends', prompt: 'Tap: crisp', speak: 'crisp', correct: 'crisp', phase: 5, group: 'ccvcc-i', options: ['crisp', 'crust', 'clasp', 'grasp'] },
   // ── Phase 6: Long vowels ──────────────────────────────────────────────────
-  { id: 'b-long-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: cake', speak: 'cake', correct: 'cake', phase: 6, group: 'long-a', options: ['cake', 'cane', 'cook', 'kick'] },
-  { id: 'b-long-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: kite', speak: 'kite', correct: 'kite', phase: 6, group: 'long-i', options: ['kite', 'kit', 'bite', 'site'] },
-  { id: 'b-long-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: home', speak: 'home', correct: 'home', phase: 6, group: 'long-o', options: ['home', 'hone', 'some', 'come'] },
+  { id: 'b-long-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: cake', speak: 'cake', correct: 'cake', phase: 6, group: 'long-a-ae', options: ['cake', 'cane', 'cook', 'kick'] },
+  { id: 'b-long-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: kite', speak: 'kite', correct: 'kite', phase: 6, group: 'long-i-ie', options: ['kite', 'kit', 'bite', 'site'] },
+  { id: 'b-long-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: home', speak: 'home', correct: 'home', phase: 6, group: 'long-o-oe', options: ['home', 'hone', 'some', 'come'] },
+  { id: 'b-long-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: rain', speak: 'rain', correct: 'rain', phase: 6, group: 'long-a-ai', options: ['rain', 'ran', 'rail', 'run'] },
   // ── Sight words ───────────────────────────────────────────────────────────
   { id: 'b-sight-1', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: said', speak: 'said', correct: 'said', options: ['seed', 'said', 'sad', 'sail'] },
   { id: 'b-sight-2', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: the', speak: 'the', correct: 'the', options: ['the', 'then', 'them', 'that'] },
@@ -534,6 +549,10 @@ const GATE_B_ITEMS = [
   { id: 'b-sight-4', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: they', speak: 'they', correct: 'they', options: ['they', 'them', 'then', 'the'] },
   { id: 'b-sight-5', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: have', speak: 'have', correct: 'have', options: ['have', 'gave', 'live', 'cave'] },
   { id: 'b-sight-6', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: look', speak: 'look', correct: 'look', options: ['look', 'took', 'book', 'good'] },
+  { id: 'b-sight-7', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: come', speak: 'come', correct: 'come', options: ['come', 'came', 'some', 'cone'] },
+  { id: 'b-sight-8', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: were', speak: 'were', correct: 'were', options: ['were', 'where', 'wear', 'we'] },
+  { id: 'b-sight-9', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: one', speak: 'one', correct: 'one', options: ['one', 'on', 'own', 'once'] },
+  { id: 'b-sight-10', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: you', speak: 'you', correct: 'you', options: ['you', 'your', 'yes', 'out'] },
 ];
 
 const GATE_C_ITEMS = [
@@ -666,6 +685,27 @@ function _teacherScore(results, section) {
   return rows.reduce((a, b) => a + b.score, 0) / rows.length;
 }
 
+/** Whether a section was actually administered (has any scored rows). */
+function _hasSection(results, section) {
+  return results.some(r => r.section === section && (typeof r.correct === 'boolean' || typeof r.score === 'number'));
+}
+
+/**
+ * Weighted average over administered sections only. The screener gates and
+ * skips sections, and _accuracy/_teacherScore return 0 for missing ones —
+ * dividing by a fixed denominator would let un-administered sections drag a
+ * composite toward zero and under-place the child. Weights are renormalised
+ * over the entries whose `present` flag is true; all-absent → 0.
+ *
+ * @param {[score: number, weight: number, present: boolean][]} entries
+ */
+function _weightedPresent(entries) {
+  const present = entries.filter(([, , p]) => p);
+  const totalW = present.reduce((sum, [, w]) => sum + w, 0);
+  if (!totalW) return 0;
+  return present.reduce((sum, [s, w]) => sum + s * w, 0) / totalW;
+}
+
 function _phaseFromDecoding(results) {
   const decoding = results.filter(r => r.section === 'decoding');
   if (!decoding.length) return { phase: 1, startGroup: PLACEMENT_PHASES[0].fallbackGroup };
@@ -767,9 +807,10 @@ function _computeStageScores(results) {
 
   const stage1Vocab     = _accuracy(results, 'vocab');
   const stage1Oral      = _teacherScore(results, 'oral');
-  const stage1Composite = (has('vocab') || has('oral'))
-    ? (stage1Vocab * 0.7 + stage1Oral * 0.3)
-    : 0;
+  const stage1Composite = _weightedPresent([
+    [stage1Vocab, 0.7, has('vocab')],
+    [stage1Oral, 0.3, has('oral')],
+  ]);
 
   const stage2 = _accuracy(results, 'knownVocab');
 
@@ -777,7 +818,12 @@ function _computeStageScores(results) {
   const lastS   = _accuracy(results, 'lastSound');
   const middleS = _accuracy(results, 'middleSound');
   const oralBl  = _accuracy(results, 'oralBlending');
-  const paComposite = (firstS + lastS + middleS + oralBl) / 4;
+  const paComposite = _weightedPresent([
+    [firstS, 1, has('firstSound')],
+    [lastS, 1, has('lastSound')],
+    [middleS, 1, has('middleSound')],
+    [oralBl, 1, has('oralBlending')],
+  ]);
 
   const letterSounds = _teacherScore(results, 'letterSounds');
 
@@ -786,16 +832,22 @@ function _computeStageScores(results) {
   const connectedReading = _accuracy(results, 'connectedReading');
   const comprehension    = _accuracy(results, 'comprehension');
   const storyReadiness   = _teacherScore(results, 'storyReadiness');
-  const readingComposite = has('decoding') || has('connectedReading')
-    ? (decoding * 0.4 + sightWords * 0.2 + connectedReading * 0.2 + comprehension * 0.15 + storyReadiness * 0.05)
-    : 0;
+  const readingComposite = _weightedPresent([
+    [decoding, 0.4, has('decoding')],
+    [sightWords, 0.2, has('sightWords')],
+    [connectedReading, 0.2, has('connectedReading')],
+    [comprehension, 0.15, has('comprehension')],
+    [storyReadiness, 0.05, has('storyReadiness')],
+  ]);
 
   const sentenceReady     = _accuracy(results, 'sentenceReady');
   const grammarReady      = _accuracy(results, 'grammarReady');
   const vocabularyReady   = _accuracy(results, 'vocabularyReady');
-  const grammarVocabComposite = (has('sentenceReady') || has('grammarReady') || has('vocabularyReady'))
-    ? (sentenceReady + grammarReady + vocabularyReady) / 3
-    : 0;
+  const grammarVocabComposite = _weightedPresent([
+    [sentenceReady, 1, has('sentenceReady')],
+    [grammarReady, 1, has('grammarReady')],
+    [vocabularyReady, 1, has('vocabularyReady')],
+  ]);
 
   return {
     pictureId: {
@@ -1009,23 +1061,51 @@ export function derivePlacementResult(results, intake = {}, schoolLevel = 'presc
   const grammarReadyScore = _accuracy(results, 'grammarReady');
   const vocabularyReadyScore = _accuracy(results, 'vocabularyReady');
 
+  const hasSec = (section) => _hasSection(results, section);
+
   // Separate child-response scores from teacher-observed scores in Gate A.
   // Child-response items (direct evidence) are weighted more heavily (70/30).
-  const gateAChildScore = (first + last + middle + oralBlending + vocab) / 5;
-  const gateATeacherScore = (letterSounds + oral) / 2;
-  const gateAComposite = gateAChildScore * 0.7 + gateATeacherScore * 0.3;
+  // All composites average administered sections only — see _weightedPresent.
+  const gateAChildScore = _weightedPresent([
+    [first, 1, hasSec('firstSound')],
+    [last, 1, hasSec('lastSound')],
+    [middle, 1, hasSec('middleSound')],
+    [oralBlending, 1, hasSec('oralBlending')],
+    [vocab, 1, hasSec('vocab')],
+  ]);
+  const gateATeacherScore = _weightedPresent([
+    [letterSounds, 1, hasSec('letterSounds')],
+    [oral, 1, hasSec('oral')],
+  ]);
+  const gateAChildPresent = ['firstSound', 'lastSound', 'middleSound', 'oralBlending', 'vocab'].some(hasSec);
+  const gateATeacherPresent = ['letterSounds', 'oral'].some(hasSec);
+  const gateAComposite = _weightedPresent([
+    [gateAChildScore, 0.7, gateAChildPresent],
+    [gateATeacherScore, 0.3, gateATeacherPresent],
+  ]);
   const gateASecure = gateAComposite >= 0.6;
   const gateBSecure = decoding >= 0.6;
   // Gate C: separate child-response (connected reading + comprehension) from teacher observation (read aloud).
-  const gateCChildScore = (connectedReading + comprehension) / 2;
+  const gateCChildScore = _weightedPresent([
+    [connectedReading, 1, hasSec('connectedReading')],
+    [comprehension, 1, hasSec('comprehension')],
+  ]);
   const gateCTeacherScore = readAloud;
-  const gateCComposite = gateCChildScore * 0.7 + gateCTeacherScore * 0.3;
+  const gateCComposite = _weightedPresent([
+    [gateCChildScore, 0.7, hasSec('connectedReading') || hasSec('comprehension')],
+    [gateCTeacherScore, 0.3, hasSec('storyReadiness')],
+  ]);
   const gateCSecure = gateCComposite >= 0.6;
+  const gateDScore = _weightedPresent([
+    [sentenceReadyScore, 1, hasSec('sentenceReady')],
+    [grammarReadyScore, 1, hasSec('grammarReady')],
+    [vocabularyReadyScore, 1, hasSec('vocabularyReady')],
+  ]);
 
   let readingBand = 'pre-reader';
   if (gateASecure) readingBand = 'emerging-decoder';
   if (gateASecure && gateBSecure) readingBand = 'developing-reader';
-  if (gateASecure && gateBSecure && gateCSecure && (sentenceReadyScore + grammarReadyScore + vocabularyReadyScore) / 3 >= 0.6) {
+  if (gateASecure && gateBSecure && gateCSecure && gateDScore >= 0.6) {
     readingBand = 'reader';
   }
 

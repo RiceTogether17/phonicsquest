@@ -245,7 +245,7 @@ export function buildErrorDigest() {
 
   const weakSkills = [];
 
-  for (const [key, stats] of Object.entries(recentByKey)) {
+  for (const [_key, stats] of Object.entries(recentByKey)) {
     if (stats.total < 2) continue;
 
     // Look up mastery score: mastery[quest][skill]

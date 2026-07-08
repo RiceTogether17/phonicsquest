@@ -13,7 +13,6 @@ import { WORDS } from '../data/words.js';
 import {
   getLearnerReadinessSummary,
   getWeeklyDomainPractice,
-  getProgressionReadiness,
   readinessStateLabel,
 } from './masteryEngine.js';
 import {
@@ -119,7 +118,7 @@ export function getLearnerSummary() {
   const weakest = domains[domains.length - 1]?.name
     || (weakestPhonics ? `Phonics (${weakestPhonics.label})` : 'Not enough data yet');
 
-  let currentFocus = 'Building foundations';
+  let currentFocus;
   if (profile?.schoolLevel === 'primary') {
     const sfScore = _avgQuestScore('sentenceForge');
     const ccScore = _avgQuestScore('clozeCastle');
@@ -155,7 +154,6 @@ export function getLearnerSummary() {
  */
 export function getLiteracyDomains() {
   const gm = normalizeGroupMasteryMap(store.get('groupMastery') || {});
-  const cs = store.get('clueStats') || {};
 
   const phonicsScores = SHORT_VOWEL_CANONICAL_GROUPS
     .map(g => gm[g]).filter(s => typeof s === 'number');

@@ -80,7 +80,7 @@ export function getPersonalBests(opts = {}) {
   const storiesFinished = _safeReadStoriesRead().length;
 
   // ── Badges (already a per-profile structure) ─────────────────────────
-  let earnedBadges = [];
+  let earnedBadges;
   try { earnedBadges = badges.getEarned() || []; } catch (_) { earnedBadges = []; }
 
   // ── Profile name ─────────────────────────────────────────────────────

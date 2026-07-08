@@ -4,11 +4,13 @@
  */
 
 import confetti from 'canvas-confetti';
+import { prefersReducedMotion } from '../utils/motion.js';
 
 const canvas = () => document.getElementById('confetti-canvas');
 
 /** Big celebration for correct answers */
 export function celebrateCorrect() {
+  if (prefersReducedMotion()) return;
   const c = canvas();
   if (!c) return;
   const myConfetti = confetti.create(c, { resize: true, useWorker: true });
@@ -26,6 +28,7 @@ export function celebrateCorrect() {
 
 /** Huge celebration for level-ups */
 export function celebrateLevelUp() {
+  if (prefersReducedMotion()) return;
   const c = canvas();
   if (!c) return;
   const myConfetti = confetti.create(c, { resize: true, useWorker: true });
@@ -56,6 +59,7 @@ export function celebrateLevelUp() {
 
 /** Stars/sparkles for streak milestones */
 export function celebrateStreak() {
+  if (prefersReducedMotion()) return;
   const c = canvas();
   if (!c) return;
   const myConfetti = confetti.create(c, { resize: true, useWorker: true });
@@ -74,6 +78,7 @@ export function celebrateStreak() {
 
 /** Daily goal celebration */
 export function celebrateDailyGoal() {
+  if (prefersReducedMotion()) return;
   const c = canvas();
   if (!c) return;
   const myConfetti = confetti.create(c, { resize: true, useWorker: true });

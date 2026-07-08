@@ -18,15 +18,13 @@
  */
 
 import { store } from './store.js';
+import { localYmd } from '../utils/dates.js';
 
 export const HOME_TABS = Object.freeze(['today', 'learn', 'extra', 'grownups']);
 
 const DEFAULT_TAB = 'today';
 
-function _todayISO(now = new Date()) {
-  const pad = n => String(n).padStart(2, '0');
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-}
+const _todayISO = (now = new Date()) => localYmd(now);
 
 function _tabEl(tab) { return document.getElementById(`home-tab-${tab}`); }
 function _panelEl(tab) { return document.getElementById(`home-panel-${tab}`); }

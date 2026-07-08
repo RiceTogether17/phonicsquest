@@ -123,7 +123,7 @@ function _pickWarmup() {
   // Daily plan's first step is the most targeted recommendation; fall back
   // to the headline recommendation if for some reason getDailyPlan returns
   // an empty list.
-  let pick = null;
+  let pick;
   try {
     const plan = getDailyPlan();
     pick = Array.isArray(plan) && plan.length > 0 ? plan[0] : null;

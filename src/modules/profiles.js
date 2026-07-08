@@ -263,7 +263,7 @@ export function exportProfile(id) {
   const profile = profiles.find(p => p.id === id);
   if (!profile) return false;
 
-  let progressData = null;
+  let progressData;
   try {
     const raw = localStorage.getItem(PROFILE_STORAGE_KEY(id));
     progressData = raw ? JSON.parse(raw) : {};

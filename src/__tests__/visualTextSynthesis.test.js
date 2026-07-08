@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { VISUAL_TEXT_ITEMS } from '../data/visualTextItems.js';
 import { SYNTHESIS_ITEMS } from '../data/synthesisItems.js';
 import { OPEN_COMPREHENSION_PASSAGES } from '../data/openComprehensionPassages.js';
-import { buildPlaceholderHtml, PRIMARY_PLACEHOLDER_KINDS } from '../modes/primaryPlaceholders.js';
+import { buildPlaceholderHtml } from '../modes/primaryPlaceholders.js';
 
 describe('VISUAL_TEXT_ITEMS data bank', () => {
   it('has at least 20 items', () => {

@@ -23,6 +23,21 @@ const MAX_HISTORY_PER_STORY = 5;
 
 const _blobStore = new Map();
 
+/**
+ * Cap on in-memory audio blobs. Children re-record freely; without a cap,
+ * a long session accumulates every take in memory. Insertion order = age,
+ * so evicting the first keys drops the oldest takes.
+ */
+const MAX_BLOBS_IN_MEMORY = 10;
+
+function _storeBlob(id, blob) {
+  _blobStore.set(id, blob);
+  while (_blobStore.size > MAX_BLOBS_IN_MEMORY) {
+    const oldest = _blobStore.keys().next().value;
+    _blobStore.delete(oldest);
+  }
+}
+
 // ── Recording state ──────────────────────────────────────────────────────
 
 let _mediaStream   = null;
@@ -94,7 +109,7 @@ export async function startRecording({ storyId, lineIdx, onStateChange } = {}) {
     const blob = new Blob(_chunks, { type: _recorder.mimeType || 'audio/webm' });
     const id = `rec_${storyId}_${lineIdx ?? 'full'}_${Date.now()}`;
     _recordingId = id;
-    _blobStore.set(id, blob);
+    _storeBlob(id, blob);
     _cleanupStream();
     _setState('recorded');
   };
@@ -182,6 +197,16 @@ export function deleteRecording(id) {
 /** Get the id of the last recording made this session. */
 export function getLastRecordingId() {
   return _recordingId;
+}
+
+/**
+ * Get the in-memory audio blob for a recording, or null if it was never
+ * made this session or has been evicted by the blob cap.
+ * @param {string} [id] – defaults to last recording
+ */
+export function getRecordingBlob(id) {
+  const blobId = id ?? _recordingId;
+  return (blobId && _blobStore.get(blobId)) || null;
 }
 
 /** Get the current recorder state. */
@@ -303,8 +328,22 @@ function _getHistory() {
   }
 }
 
+let _storageWarningShown = false;
+
 function _saveHistory(history) {
   try {
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-  } catch { /* storage full — silently fail */ }
+  } catch {
+    // Storage full — tell the user once instead of losing history silently.
+    if (_storageWarningShown) return;
+    _storageWarningShown = true;
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = 'toast toast--warning';
+    toast.setAttribute('role', 'alert');
+    toast.textContent = 'Device storage full — reading history may not be saved.';
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 8000);
+  }
 }

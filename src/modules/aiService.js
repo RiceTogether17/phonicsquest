@@ -22,9 +22,11 @@ export async function callGemini(prompt, { maxTokens = 1024, temperature = 0.3 }
   const key = getApiKey();
   if (!key) return null;
   try {
-    const res = await fetch(`${GEMINI_URL}?key=${encodeURIComponent(key)}`, {
+    // Key goes in a header, never the URL: query strings leak into browser
+    // history, Referer headers and proxy logs.
+    const res = await fetch(GEMINI_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: { maxOutputTokens: maxTokens, temperature },
@@ -132,13 +134,22 @@ In 2–3 short sentences, explain the thinking mistake behind their answer and h
 
 /**
  * Get sentence-level writing coach feedback for a student's draft.
- * Returns HTML string with inline <mark> annotations, or null if no key/failure.
+ *
+ * Returns structured, sanitised data — never raw model text — so callers
+ * can render it safely: `{ good: string }` when the draft passes, or
+ * `{ items: [{ sentence, issue }] }` with per-sentence findings.
+ * Returns null without a key, over the daily cap, or on failure.
  *
  * @param {string} draftText  - student's composition text
  * @param {number} level      - P1–P6 level (1–6)
  * @param {string} [taskDesc] - brief task description
+ * @returns {Promise<{ good: string } | { items: { sentence: string, issue: string }[] } | null>}
  */
 export async function getWritingCoachFeedback(draftText, level, taskDesc = '') {
+  const { canCallAi, logAiUse, sanitizeAiText } = await import('./aiGuardrails.js');
+  if (!canCallAi()) return null;
+  logAiUse('coach', `Draft coached (P${level})`);
+
   const prompt = `You are a Singapore primary school English teacher marking a P${level} student's composition.
 
 Task: ${taskDesc || 'Write a story or composition.'}
@@ -156,7 +167,26 @@ SENTENCE: [exact quote] | ISSUE: [1-sentence tip]
 Focus only on: grammar errors, word choice, punctuation, sentence structure.
 Give at most 5 findings. If the draft is good, say: GOOD: Well done!`;
 
-  return callGemini(prompt, { maxTokens: 600, temperature: 0.2 });
+  const raw = await callGemini(prompt, { maxTokens: 600, temperature: 0.2 });
+  if (!raw) return null;
+
+  // Parse BEFORE sanitising: sanitizeAiText strips the "|" separator the
+  // format relies on, so split fields first, then clean each field.
+  const trimmed = raw.trim();
+  if (trimmed.startsWith('GOOD:')) {
+    const good = sanitizeAiText(trimmed.replace(/^GOOD:/, ''));
+    return good ? { good } : null;
+  }
+  const items = trimmed
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l.startsWith('SENTENCE:'))
+    .map(l => {
+      const [sentPart, issuePart] = l.replace('SENTENCE:', '').split('| ISSUE:');
+      return { sentence: sanitizeAiText(sentPart || ''), issue: sanitizeAiText(issuePart || '') };
+    })
+    .filter(it => it.sentence || it.issue);
+  return items.length ? { items } : null;
 }
 
 /**
@@ -232,6 +262,9 @@ OVERALL: <one encouraging sentence naming the single most useful next improvemen
  * @param {string} skillLabel - e.g. "Passive voice"
  */
 export async function gradeSynthesisAnswer(original, stem, model, alts, typed, skillLabel) {
+  const { canCallAi, logAiUse, sanitizeAiText } = await import('./aiGuardrails.js');
+  if (!canCallAi()) return null;
+
   const altLines = alts.length ? `Also accepted:\n${alts.map(a => `- ${a}`).join('\n')}` : '';
   const prompt = `You are a Singapore PSLE English examiner.
 
@@ -251,10 +284,11 @@ Reply on the FIRST LINE with exactly one word: CORRECT, PARTIAL, or WRONG.
 On the SECOND LINE give one short sentence of feedback (max 15 words, encouraging tone, plain English for a primary student).
 No other text.`;
 
+  logAiUse('grade', `Synthesis graded: ${String(skillLabel || '').slice(0, 80)}`);
   const raw = await callGemini(prompt, { maxTokens: 80, temperature: 0.1 });
   if (!raw) return null;
   const lines = raw.trim().split('\n').map(l => l.trim()).filter(Boolean);
   const verdict = ['CORRECT', 'PARTIAL', 'WRONG'].find(v => lines[0]?.startsWith(v));
   if (!verdict) return null;
-  return { verdict, feedback: lines[1] || '' };
+  return { verdict, feedback: sanitizeAiText(lines[1] || '') };
 }

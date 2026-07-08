@@ -72,18 +72,25 @@ function _retentionScore(stat) {
   return (stat.reviewInterval ?? 0) / (SRS_INTERVALS.length - 1);
 }
 
+/** True median of an ascending-sorted array (averages the two central values). */
+function _median(sorted) {
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
 function _speedScore(wordId) {
+  // learningEvents store correct/responseMs at the top level (see
+  // store.recordLearningEvent); only wordId/mode live inside meta.
   const events = (store.get('learningEvents') || [])
     .filter(e =>
       e.eventType === 'word_attempt' &&
       e.meta?.wordId === wordId &&
-      e.meta?.correct === true &&
-      typeof e.meta?.responseMs === 'number'
+      e.correct === true &&
+      typeof e.responseMs === 'number'
     );
   if (!events.length) return null;
-  const times = events.map(e => e.meta.responseMs).sort((a, b) => a - b);
-  const median = times[Math.floor(times.length / 2)];
-  return Math.min(1, Math.max(0, 1 - median / (2 * TARGET_SPEED_MS)));
+  const times = events.map(e => e.responseMs).sort((a, b) => a - b);
+  return Math.min(1, Math.max(0, 1 - _median(times) / (2 * TARGET_SPEED_MS)));
 }
 
 function _avgQuestScore(questKey) {
@@ -168,8 +175,7 @@ export function getWordSkillMastery(wordId, skill) {
     .sort((a, b) => a - b);
   let fluency = null;
   if (correctTimes.length) {
-    const median = correctTimes[Math.floor(correctTimes.length / 2)];
-    fluency = Math.min(1, Math.max(0, 1 - median / (2 * target)));
+    fluency = Math.min(1, Math.max(0, 1 - _median(correctTimes) / (2 * target)));
   } else if (stat.lastResponseMs && stat.correct > 0) {
     fluency = Math.min(1, Math.max(0, 1 - stat.lastResponseMs / (2 * target)));
   }

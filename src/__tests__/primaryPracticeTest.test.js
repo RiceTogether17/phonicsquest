@@ -224,7 +224,7 @@ describe('Grader honours the section\'s declared marks', () => {
     expect(writingArea, 'P5 T1 should have a writing section at sectionE').toBeTruthy();
     // Jump to sectionE by clicking through prior sections without answering.
     const order = ['sectionA', 'sectionB', 'sectionC', 'sectionD'];
-    for (const key of order) {
+    for (const _key of order) {
       click(root.querySelector('[data-action="check"]'));
       click(root.querySelector('[data-action="next"]'));
     }

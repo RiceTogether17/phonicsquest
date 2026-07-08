@@ -282,7 +282,6 @@ function _renderCategoryBrowser() {
 
   const completed = store.get('wvqCompleted') || {};
 
-  const levelKey   = _getProfileLevelKey();
   const levelLabel = _getProfileLevelLabel();
 
   const dueCount = getDueCount();
@@ -312,7 +311,6 @@ function _renderCategoryBrowser() {
     }));
 
   for (const [key, meta] of Object.entries(VOCAB_CATEGORIES)) {
-    const catCompleted = completed[key] || {};
     const doneLevels = ['p1','p2','p3','p4','p5','p6'].filter((lv) => getUniqueWordVaultDone({ category: key, level: lv, wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {}, wvqCompleted: completed }) > 0).length;
     const levelsForCat = Object.values(vocabPassages[key] || {});
     const totalLevels = levelsForCat.filter(arr => (arr || []).length > 0).length;
@@ -975,7 +973,7 @@ function _renderBank(passage) {
       const nextClue = (passage.clues || [])
         .slice()
         .sort((a, b) => a.blankIndex - b.blankIndex)
-        .find(c => _blankFills[c.blankIndex] === null && !_clueResults.hasOwnProperty(c.blankIndex));
+        .find(c => _blankFills[c.blankIndex] === null && !Object.hasOwn(_clueResults, c.blankIndex));
 
       if (nextClue) {
         _activeBlankIndex = nextClue.blankIndex;

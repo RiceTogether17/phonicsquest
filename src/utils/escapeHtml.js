@@ -1,3 +1,6 @@
+// @ts-check
+
+/** @param {unknown} value */
 export function escapeHtml(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -7,6 +10,7 @@ export function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+/** @param {unknown} value */
 export function escapeAttr(value) {
   return escapeHtml(value).replace(/`/g, '&#96;');
 }

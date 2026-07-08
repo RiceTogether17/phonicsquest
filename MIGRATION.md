@@ -1,5 +1,11 @@
 # PhonicsQuest — Migration Guide (v1 → v2)
 
+> **Historical document.** This describes the one-time v1 → v2 rebuild.
+> The feature list below reflects v2 at launch — the app has grown well
+> beyond it (see README.md for the current picture). The build/deploy
+> commands have been kept current: the production build outputs to
+> `docs/` (GitHub Pages), not `dist/`.
+
 ## Overview
 
 PhonicsQuest v2 is a complete rebuild with modular architecture.
@@ -15,9 +21,8 @@ index.html                →       index.html (new semantic shell)
 script.js (170KB monolith) →       src/ (modular ES modules)
 style.css (67KB)           →       src/styles/main.css (CSS custom properties)
 *.mp3 (root)              →       public/audio/phonemes/*.mp3
-                                   public/audio/sfx/*.mp3
                                    public/images/mascot/*.png
-                                   public/icons/*.svg
+                                   public/icons/*.png
 ```
 
 ## localStorage Key Changes
@@ -110,7 +115,7 @@ To migrate v1 data to v2, run this in the browser console **before** clearing v1
 ## New Features in v2
 
 1. **Modular Vite build** — tree-shaken, code-split, fast HMR
-2. **5 game modes** — Blend It, Hear & Choose, Segment It, Missing Sound, First Sound
+2. **5 game modes at launch** — Blend It, Hear & Choose, Segment It, Missing Sound, First Sound (the mode registry in `src/modes/index.js` has since grown far past this)
 3. **Giri mascot** — reactive character with 11 emotional states
 4. **Spinning category wheel** — Canvas-based with GSAP animation
 5. **Speech recognition** — Web Speech API for pronunciation scoring
@@ -132,13 +137,14 @@ The included GitHub Actions workflow auto-deploys on push to `main`:
 ```bash
 npm install
 npm run build
-# Deploy contents of dist/ to your web server
+# Deploy contents of docs/ to your web server
+# (vite.config.js sets outDir to docs/ for GitHub Pages)
 ```
 
 ## Development
 ```bash
 npm install
 npm run dev     # Start dev server at http://localhost:3000
-npm run build   # Production build to dist/
+npm run build   # Production build to docs/
 npm run preview # Preview production build locally
 ```

@@ -1,13 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import {
-  P5_PRACTICE_TESTS,
   P5_PRACTICE_TEST_TERMS,
   getP5PracticeTest,
   getP5PracticeTests,
   validateP5PracticeTests,
 } from '../data/p5PracticeTests.js';
 import {
-  P6_PRACTICE_TESTS,
   P6_PRACTICE_TEST_TERMS,
   getP6PracticeTest,
   getP6PracticeTests,

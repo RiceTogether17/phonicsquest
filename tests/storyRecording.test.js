@@ -88,7 +88,7 @@ describe('storyRecording module', () => {
 
   describe('recording lifecycle', () => {
     it('starts and stops recording', async () => {
-      const { startRecording, stopRecording, getRecorderState, cleanupRecording } = await import('../src/modules/storyRecording.js');
+      const { startRecording, stopRecording, cleanupRecording } = await import('../src/modules/storyRecording.js');
       cleanupRecording();
 
       const stateChanges = [];
@@ -132,6 +132,26 @@ describe('storyRecording module', () => {
       stopRecording();
       deleteRecording();
       expect(getRecorderState()).toBe('idle');
+      cleanupRecording();
+    });
+
+    it('caps in-memory blobs, evicting the oldest takes first', async () => {
+      const { startRecording, stopRecording, getRecordingBlob, getLastRecordingId, cleanupRecording } =
+        await import('../src/modules/storyRecording.js');
+      cleanupRecording();
+
+      const ids = [];
+      for (let i = 0; i < 14; i++) {
+        await startRecording({ storyId: `story-${i}` });
+        stopRecording();
+        ids.push(getLastRecordingId());
+      }
+
+      // Oldest takes are gone, the most recent are retained.
+      expect(getRecordingBlob(ids[0])).toBeFalsy();
+      expect(getRecordingBlob(ids[ids.length - 1])).toBeTruthy();
+      const retained = ids.filter(id => getRecordingBlob(id));
+      expect(retained.length).toBeLessThanOrEqual(10);
       cleanupRecording();
     });
   });

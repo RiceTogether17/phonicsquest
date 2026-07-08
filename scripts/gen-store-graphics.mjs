@@ -13,7 +13,7 @@ const ICON = 'public/icons/icon-512.png'
 const OUT = 'play-store/assets'
 mkdirSync(OUT, { recursive: true })
 
-const f128 = await loadFont(SANS_128_WHITE)
+const _f128 = await loadFont(SANS_128_WHITE)
 const f64 = await loadFont(SANS_64_WHITE)
 const f32 = await loadFont(SANS_32_WHITE)
 const f16 = await loadFont(SANS_16_WHITE)

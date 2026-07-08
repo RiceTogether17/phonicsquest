@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { passages } from '../data/passages.js';
-import { SPIRAL_MATRIX, getActiveStrands } from '../data/spiralGrammar.js';
+import { getActiveStrands } from '../data/spiralGrammar.js';
 
 /**
  * Validates the spiral grammar progression model.

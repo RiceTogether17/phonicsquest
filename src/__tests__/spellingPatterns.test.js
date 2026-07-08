@@ -15,7 +15,7 @@
  *      teams; oi/oy before ou/ow before aw).
  */
 import { describe, it, expect } from 'vitest';
-import { WORDS, WORD_GROUPS, deriveSpellingPattern } from '../data/words.js';
+import { WORDS, WORD_GROUPS } from '../data/words.js';
 import { CURRICULUM } from '../data/curriculum.js';
 import { progress } from '../modules/progress.js';
 

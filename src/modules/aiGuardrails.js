@@ -17,6 +17,7 @@
 
 import { store } from './store.js';
 import { callGemini, hasApiKey } from './aiService.js';
+import { localYmd } from '../utils/dates.js';
 
 /** Max child-initiated AI calls per day (across features). */
 export const DAILY_AI_CALL_CAP = 40;
@@ -43,10 +44,7 @@ Rules you must always follow:
 Task:
 `;
 
-function _todayKey(now = new Date()) {
-  const pad = n => String(n).padStart(2, '0');
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-}
+const _todayKey = (now = new Date()) => localYmd(now);
 
 /** Remove anything we never want to render from an AI reply. */
 export function sanitizeAiText(raw) {

@@ -27,13 +27,7 @@ beforeAll(async () => {
   };
   const mod = await import('../modules/placementTest.js');
   PLACEMENT_PHASES = mod.PLACEMENT_PHASES;
-  // Gate B isn't directly exported; pull the items via a probe call to the
-  // builder. If that ever changes, just re-export GATE_B_ITEMS from
-  // placementTest.js.
-  // For this test we re-derive them from the module's source via the
-  // exported PLACEMENT_PHASES table — that's enough for the structural
-  // assertions below.
-  GATE_B_ITEMS = null; // intentionally unused; see comment above
+  GATE_B_ITEMS = mod.GATE_B_ITEMS;
 });
 
 describe('curriculum/placement phase alignment', () => {
@@ -93,5 +87,52 @@ describe('curriculum/placement phase alignment', () => {
     for (const stage of CURRICULUM) {
       expect(PHASE_LABELS[stage.phase], `Stage "${stage.id}" has phase ${stage.phase} with no PHASE_LABELS entry`).toBeTruthy();
     }
+  });
+});
+
+describe('Gate B item bank coverage (issue #108)', () => {
+  it('has at least 4 decoding items per phonics phase 1-6', () => {
+    for (let phase = 1; phase <= 6; phase++) {
+      const items = GATE_B_ITEMS.filter(i => i.section === 'decoding' && i.phase === phase);
+      expect(items.length, `phase ${phase} has only ${items.length} decoding items`).toBeGreaterThanOrEqual(4);
+    }
+  });
+
+  it('probes every short vowel at least once in phase 1', () => {
+    const groups = new Set(GATE_B_ITEMS.filter(i => i.phase === 1).map(i => i.group));
+    for (const v of ['a', 'e', 'i', 'o', 'u']) {
+      expect(groups.has(`cvc-${v}`), `no phase-1 item for cvc-${v}`).toBe(true);
+    }
+  });
+
+  it('has at least 8 sight-word items', () => {
+    const sight = GATE_B_ITEMS.filter(i => i.section === 'sightWords');
+    expect(sight.length).toBeGreaterThanOrEqual(8);
+  });
+
+  it('every item is answerable: correct answer among 4 unique options', () => {
+    for (const item of GATE_B_ITEMS) {
+      expect(item.options, item.id).toContain(item.correct);
+      expect(new Set(item.options).size, `${item.id} has duplicate options`).toBe(item.options.length);
+      expect(item.options.length, item.id).toBe(4);
+    }
+  });
+
+  it('every decoding item group maps to a curriculum stage (directly or via normalization)', async () => {
+    const { normalizePhonicsGroupKey } = await import('../modules/phonicsGroupKeys.js');
+    const curriculumGroups = new Set(CURRICULUM.map(s => s.group));
+    const curriculumIds = new Set(CURRICULUM.map(s => s.id));
+    for (const item of GATE_B_ITEMS) {
+      if (item.section !== 'decoding') continue;
+      const key = normalizePhonicsGroupKey(item.group);
+      const reachable = curriculumGroups.has(key) || curriculumIds.has(key)
+        || curriculumGroups.has(item.group) || curriculumIds.has(item.group);
+      expect(reachable, `item ${item.id} group "${item.group}" not reachable from CURRICULUM`).toBe(true);
+    }
+  });
+
+  it('item ids are unique', () => {
+    const ids = GATE_B_ITEMS.map(i => i.id);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 });

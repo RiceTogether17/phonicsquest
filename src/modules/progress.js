@@ -9,7 +9,7 @@
  */
 
 import { store } from './store.js';
-import { WORDS, shuffleArray, getWordsByLevel, getWordStructure, getShortVowelLetter } from '../data/words.js';
+import { WORDS, getWordsByLevel, getWordStructure, getShortVowelLetter } from '../data/words.js';
 import { MASTERY_THRESHOLD, MIN_ATTEMPTS_FOR_MASTERY } from '../data/curriculum.js';
 import { normalizeAdaptiveConfig, getWordWeight } from './adaptiveSelection.js';
 import { getDueItems, countDueItems } from './reviewScheduler.js';

@@ -26,6 +26,8 @@ class SpeechRecognizer {
     /** @type {SpeechRecognition|null} */
     this._recognition = null;
     this._listening = false;
+    /** @type {(() => void)|null} settles the in-flight listen promise on stop() */
+    this._cancelPending = null;
     this.supported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
   }
 
@@ -59,9 +61,17 @@ class SpeechRecognizer {
           this.stop();
           resolve(null);
         }, 8000);
+        // Let an external stop() settle this promise immediately instead of
+        // leaving it (and its closure) hanging until the hard timeout.
+        this._cancelPending = () => {
+          clearTimeout(timeout);
+          this._listening = false;
+          resolve(null);
+        };
 
         this._recognition.onresult = (event) => {
           clearTimeout(timeout);
+          this._cancelPending = null;
           const results = Array.from(event.results[0]);
           const transcripts = results.map(r => ({
             text: r.transcript.toLowerCase().trim(),
@@ -100,10 +110,14 @@ class SpeechRecognizer {
 
           if (canFallback) {
             localeIndex += 1;
+            // Same promise continues in the retry — detach the cancel hook so
+            // the stop() inside startRecognition doesn't resolve it early.
+            this._cancelPending = null;
             startRecognition();
             return;
           }
 
+          this._cancelPending = null;
           resolve(null);
         };
 
@@ -119,6 +133,7 @@ class SpeechRecognizer {
           devWarn('Recognition start failed:', err.message);
           clearTimeout(timeout);
           this._listening = false;
+          this._cancelPending = null;
           resolve(null);
         }
       };
@@ -160,9 +175,17 @@ class SpeechRecognizer {
           this.stop();
           resolve(null);
         }, timeoutMs);
+        // Let an external stop() settle this promise immediately instead of
+        // leaving it (and its closure) hanging until the hard timeout.
+        this._cancelPending = () => {
+          clearTimeout(timeout);
+          this._listening = false;
+          resolve(null);
+        };
 
         this._recognition.onresult = (event) => {
           clearTimeout(timeout);
+          this._cancelPending = null;
           this._listening = false;
           const transcripts = Array.from(event.results[0]).map(r => ({
             text: r.transcript.toLowerCase().trim(),
@@ -181,10 +204,14 @@ class SpeechRecognizer {
 
           if (canFallback) {
             localeIndex += 1;
+            // Same promise continues in the retry — detach the cancel hook so
+            // the stop() inside startRecognition doesn't resolve it early.
+            this._cancelPending = null;
             startRecognition();
             return;
           }
 
+          this._cancelPending = null;
           resolve(null);
         };
 
@@ -200,6 +227,7 @@ class SpeechRecognizer {
           devWarn('Recognition start failed:', err.message);
           clearTimeout(timeout);
           this._listening = false;
+          this._cancelPending = null;
           resolve(null);
         }
       };
@@ -216,13 +244,18 @@ class SpeechRecognizer {
     return this._phoneticSimilarity((a || '').toLowerCase(), (b || '').toLowerCase());
   }
 
-  /** Stop listening */
+  /** Stop listening and settle any pending listen promise with null. */
   stop() {
     if (this._recognition) {
       try { this._recognition.stop(); } catch (err) { devWarn('Stop failed:', err.message); }
       this._recognition = null;
     }
     this._listening = false;
+    if (this._cancelPending) {
+      const cancel = this._cancelPending;
+      this._cancelPending = null;
+      cancel();
+    }
   }
 
   /** @returns {boolean} */

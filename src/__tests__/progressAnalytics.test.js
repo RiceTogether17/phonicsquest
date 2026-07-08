@@ -5,7 +5,7 @@
  * its numbers. Every public function in `progressAnalytics.js` gets a
  * focused test here.
  */
-import { beforeAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   getMasteryByStage,
   getAccuracyByMode,

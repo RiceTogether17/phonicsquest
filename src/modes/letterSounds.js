@@ -11,7 +11,6 @@
 import { audio } from '../modules/audio.js';
 import { WORDS } from '../data/words.js';
 
-const BASE = import.meta.env.BASE_URL;
 
 // ── Phoneme-type metadata ─────────────────────────────────────────────────
 
@@ -136,13 +135,6 @@ function _render() {
         <span class="ls-type-tag">${meta.short ?? meta.label}</span>
       </button>
     `;
-  }).join('');
-
-  // Count per type for the tab badge
-  const tabCountHtml = types.map(t => {
-    if (t === 'all') return '';
-    const count = ALL_CARDS.filter(c => c.type === t).length;
-    return `<span data-count-type="${t}">${count}</span>`;
   }).join('');
 
   _container.innerHTML = /* html */`

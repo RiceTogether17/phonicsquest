@@ -91,7 +91,7 @@ describe('getTopMasteryGaps', () => {
   });
 
   it('exposes the most recent example for the weakest skill', () => {
-    let map = recordMasteryAttempt({
+    const map = recordMasteryAttempt({
       mode: 'wordVault', level: 'P5', category: 'collocationCloze',
       skill: 'collocation', clueType: 'collocationClue', wasWrong: true,
       example: { passageId: 'v9', blankIndex: 1, chosen: 'do', correct: 'make', clueType: 'collocationClue' },

@@ -18,4 +18,18 @@ describe('adaptive selection config', () => {
     const cfg = normalizeAdaptiveConfig({ unseenWeight: 4 });
     expect(getWordWeight(undefined, cfg)).toBe(4);
   });
+
+  it('treats a word at exactly the strong threshold as strong with or without a review date', () => {
+    const cfg = normalizeAdaptiveConfig(); // strongAccuracy 0.9, masteryMinAttempts 6
+    const future = new Date(Date.now() + 86400000).toISOString();
+    // 9/10 = exactly 0.9 — both paths must agree on the boundary.
+    expect(getWordWeight({ attempts: 10, correct: 9 }, cfg)).toBe(cfg.strongWeight);
+    expect(getWordWeight({ attempts: 10, correct: 9, nextReviewDate: future }, cfg)).toBe(cfg.strongWeight);
+  });
+
+  it('boosts a mastered word once its review date has passed', () => {
+    const cfg = normalizeAdaptiveConfig();
+    const past = new Date(Date.now() - 86400000).toISOString();
+    expect(getWordWeight({ attempts: 10, correct: 9, nextReviewDate: past }, cfg)).toBe(cfg.mediumWeight);
+  });
 });

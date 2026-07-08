@@ -34,8 +34,8 @@ import { getPersonalBests } from './modules/personalBestWall.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
 import { mascot } from './components/mascot.js';
 import { findStageForGroup, hasSeenLesson, maybeShowStageLesson, showTipLesson } from './components/miniLesson.js';
-import { spinWheel, buildWordAnimation } from './components/wheel.js';
-import { celebrateCorrect, celebrateLevelUp, celebrateStreak, celebrateDailyGoal } from './components/confettiHelper.js';
+import { spinWheel } from './components/wheel.js';
+import { celebrateCorrect, celebrateLevelUp, celebrateDailyGoal } from './components/confettiHelper.js';
 import { MODES } from './modes/index.js';
 import { getLearnerSummaryChips } from './modules/recommendations.js';
 import { initLetterSounds, cleanupLetterSounds } from './modes/letterSounds.js';
@@ -105,17 +105,7 @@ import { isTeacherUnlockActive, tryTeacherUnlock, lockTeacherMode } from './modu
 import { showSessionSummary } from './components/sessionSummary.js';
 import { showWeeklyRecap, shouldShowWeeklyRecap } from './components/weeklyRecap.js';
 
-async function hashPin(pin) {
-  if (!window.crypto?.subtle) return `plain:${pin}`;
-  const data = new TextEncoder().encode(pin);
-  const digest = await window.crypto.subtle.digest('SHA-256', data);
-  const hex = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
-  return `sha256:${hex}`;
-}
-
-function isHashedPin(value) {
-  return typeof value === 'string' && (value.startsWith('sha256:') || value.startsWith('plain:'));
-}
+import { createPinHash, verifyPin } from './modules/parentPin.js';
 
 class App {
   constructor() {
@@ -1330,19 +1320,20 @@ class App {
       }
 
       const savedPin = store.get('parentPin');
-      const candidateHash = await hashPin(pin);
 
       if (!savedPin) {
-        // First time entering a PIN — store it hashed.
-        store.set('parentPin', candidateHash);
+        // First time entering a PIN — store it salted+hashed.
+        store.set('parentPin', await createPinHash(pin));
         if (hint) hint.textContent = '';
         this._closeModal('modal-pin');
         this._openDashboard();
-      } else if (savedPin === pin || savedPin === candidateHash || savedPin === `plain:${pin}`) {
-        // Migrate legacy plaintext pins to hashed format.
-        if (!isHashedPin(savedPin)) {
-          store.set('parentPin', candidateHash);
-        }
+        return;
+      }
+
+      const { ok, needsUpgrade } = await verifyPin(pin, savedPin);
+      if (ok) {
+        // Upgrade legacy plaintext/unsalted formats on successful entry.
+        if (needsUpgrade) store.set('parentPin', await createPinHash(pin));
         if (hint) hint.textContent = '';
         this._closeModal('modal-pin');
         this._openDashboard();
@@ -1600,7 +1591,6 @@ class App {
    * @param {string|null} [group]
    */
   _navigateTo(target, group = null) {
-    const unlock = this._getQuestUnlockStatus();
     switch (target) {
       case 'blend':
         this._mode = 'blend';
@@ -1811,7 +1801,7 @@ class App {
     // surfaces the next step and a single Start/Continue CTA — the way a
     // tutor opens a sitting — replacing the old start-card + roadmap pair.
     const esc = (s) => String(s ?? '').replace(/[<>&"]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;', '"':'&quot;' }[c]));
-    let lesson = null;
+    let lesson;
     try { lesson = getTodaysLessonView(); } catch (_) { lesson = null; }
     const next = lesson?.nextStep || null;
     const lessonHeroHtml = lesson ? `

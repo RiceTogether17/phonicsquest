@@ -40,10 +40,17 @@ export function buildSoundMatchRound(stageId, { wordIndex = 0, rng = Math.random
   const word = stage.sampleWords?.[wordIndex] ?? stage.sampleWords?.[0] ?? '';
   if (!vowel) {
     // Fallback for non-vowel stages: use the first targetSound as the prompt.
+    // The correct grapheme must always be one of the choices, so force it in
+    // and fill the rest from the distractor pool (same shape as the vowel path).
+    const grapheme = word[0] ?? '';
+    const pool = ['a', 'e', 'i', 'o', 'u', 's', 't'].filter(c => c !== grapheme);
+    const choices = grapheme
+      ? _take([grapheme, ..._take(pool, 3, rng)], 4, rng)
+      : _take(pool, 4, rng);
     return {
       mode: 'soundMatch',
-      prompt: { sound: stage.targetSounds?.[0] ?? '/?/', grapheme: word[0] ?? '' },
-      choices: _take(['a', 'e', 'i', 'o', 'u', 's', 't'], 4, rng),
+      prompt: { sound: stage.targetSounds?.[0] ?? '/?/', grapheme },
+      choices,
       word,
     };
   }

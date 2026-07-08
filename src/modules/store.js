@@ -14,8 +14,23 @@ const devWarn = (...args) => {
   if (import.meta.env.DEV) console.warn('[Store]', ...args);
 };
 
+/**
+ * Keys whose DEFAULT_STATE value is a structured object with meaningful
+ * sub-keys. A plain top-level spread would replace these wholesale with the
+ * saved copy, silently dropping sub-keys added in newer versions (e.g. a new
+ * quest bucket in questMastery). These are merged one level deep on load.
+ */
+const DEEP_MERGE_KEYS = ['adaptiveConfig', 'questMastery', 'clueStats'];
+
 /** Default application state */
 const DEFAULT_STATE = {
+  /**
+   * Bump when a saved-state migration is needed; _load can then branch on
+   * the version found in storage. Versions before this field existed load
+   * as undefined and are treated as 1.
+   */
+  schemaVersion: 1,
+
   // Gamification
   xp:        0,
   level:     1,
@@ -37,6 +52,7 @@ const DEFAULT_STATE = {
   // The 💡 Hint button in any PA mode uses stretched playback regardless.
   stretchedSpeech: false,
   parentPin:      null,     // hashed PIN
+  geminiApiKey:   null,     // parent-supplied AI key (survives progress reset)
   reducedMotion:  false,    // manual override for prefers-reduced-motion
   speechEnabled:  true,
   speechLocale:   'en-SG',
@@ -195,43 +211,140 @@ class Store {
   }
 
   /**
-   * Validate critical fields of a saved state object.
-   * Returns false if the data is clearly corrupted.
+   * Repair recoverable damage in a saved state object. One bad field must
+   * never cost the child their whole profile: invalid numeric fields and a
+   * corrupt wordStats bucket are individually reset to defaults while every
+   * other key is kept. Returns the repaired object, or null only when the
+   * payload is not a state object at all.
    * @private
    */
-  _validateState(saved) {
-    if (typeof saved !== 'object' || saved === null) return false;
-    // Check critical numeric fields are numbers (not NaN, not strings)
+  _repairState(saved) {
+    if (typeof saved !== 'object' || saved === null || Array.isArray(saved)) return null;
+    let repaired = false;
     for (const key of ['xp', 'level', 'energy', 'streak', 'dailyGoal', 'dailyDone']) {
       if (key in saved && (typeof saved[key] !== 'number' || !Number.isFinite(saved[key]))) {
-        devWarn(`Invalid ${key}:`, saved[key]);
-        return false;
+        devWarn(`Repairing invalid ${key}:`, saved[key]);
+        saved[key] = DEFAULT_STATE[key];
+        repaired = true;
       }
     }
-    // Check wordStats is an object if present
     if ('wordStats' in saved && (typeof saved.wordStats !== 'object' || saved.wordStats === null)) {
-      devWarn('Invalid wordStats:', typeof saved.wordStats);
-      return false;
+      devWarn('Resetting invalid wordStats:', typeof saved.wordStats);
+      saved.wordStats = {};
+      repaired = true;
     }
-    return true;
+    if (repaired) this._notifyRecovery('Some saved data was damaged and has been repaired.');
+    return saved;
+  }
+
+  /**
+   * Merge a repaired saved state over the defaults.
+   * @private
+   */
+  _mergeWithDefaults(repaired) {
+    const merged = { ...DEFAULT_STATE, ...repaired };
+    // Structured objects merge one level deep so sub-keys added in
+    // newer versions (e.g. a new quest bucket) exist for old saves.
+    for (const key of DEEP_MERGE_KEYS) {
+      merged[key] = { ...DEFAULT_STATE[key], ...(repaired[key] || {}) };
+    }
+    merged.schemaVersion = DEFAULT_STATE.schemaVersion;
+    return merged;
   }
 
   /** Load from localStorage, merging with defaults to handle new keys */
   _load() {
+    let raw = null;
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const saved = JSON.parse(raw);
-        if (!this._validateState(saved)) {
-          devWarn('State failed validation, using defaults');
-          return { ...DEFAULT_STATE };
-        }
-        return { ...DEFAULT_STATE, ...saved };
+        const repaired = this._repairState(JSON.parse(raw));
+        if (repaired) return this._mergeWithDefaults(repaired);
+        devWarn('State unrecoverable, backing up');
+        this._backupCorruptState(raw);
       }
     } catch (err) {
       devWarn('Failed to parse stored state:', err.message);
+      this._backupCorruptState(raw);
+    }
+    // Main key missing or unreadable — fall back to the automatic daily
+    // backup before surrendering to a blank profile.
+    if (raw) {
+      const restored = this._loadFromBackup();
+      if (restored) {
+        this._notifyRecovery('Progress was restored from the latest backup.');
+        return restored;
+      }
     }
     return { ...DEFAULT_STATE };
+  }
+
+  /**
+   * Read the automatic backup written by _flushSave. Returns a merged
+   * state object, or null if there is no usable backup.
+   * @private
+   */
+  _loadFromBackup() {
+    try {
+      const raw = localStorage.getItem(`${STORAGE_KEY}__backup`);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      const repaired = this._repairState(parsed?.state);
+      return repaired ? this._mergeWithDefaults(repaired) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * True when the daily backup should be refreshed (missing, unreadable,
+   * or from an earlier day).
+   * @private
+   */
+  _isBackupStale() {
+    try {
+      const raw = localStorage.getItem(`${STORAGE_KEY}__backup`);
+      if (!raw) return true;
+      const { savedAt } = JSON.parse(raw);
+      return typeof savedAt !== 'string'
+        || savedAt.slice(0, 10) !== new Date().toISOString().slice(0, 10);
+    } catch {
+      return true;
+    }
+  }
+
+  /**
+   * Keep the unreadable payload under a side key instead of silently
+   * overwriting it, so progress can still be recovered by hand.
+   * @private
+   */
+  _backupCorruptState(raw) {
+    if (!raw) return;
+    try {
+      localStorage.setItem(`${STORAGE_KEY}__corrupt`, raw);
+    } catch {
+      // Storage full — nothing more we can do here.
+    }
+    this._notifyRecovery('Saved progress could not be read. A backup copy was kept.');
+  }
+
+  /**
+   * Toast a recovery notice once the DOM is ready. _load runs at module
+   * import time, before #toast-container exists, so defer to the next tick.
+   * @private
+   */
+  _notifyRecovery(message) {
+    if (typeof document === 'undefined') return;
+    setTimeout(() => {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = 'toast toast--warning';
+      toast.setAttribute('role', 'alert');
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 8000);
+    }, 0);
   }
 
   /**
@@ -253,6 +366,21 @@ class Store {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this._state));
       this._saveFailures = 0;
+      // Roll the automatic backup forward once per day, on the first
+      // successful save: a known-good copy from at most yesterday is what
+      // _load falls back to if the main key is ever corrupted.
+      if (this._backupPending === undefined) this._backupPending = this._isBackupStale();
+      if (this._backupPending) {
+        this._backupPending = false;
+        try {
+          localStorage.setItem(
+            `${STORAGE_KEY}__backup`,
+            JSON.stringify({ savedAt: new Date().toISOString(), state: this._state }),
+          );
+        } catch {
+          // Storage full — the main save above still succeeded.
+        }
+      }
     } catch (err) {
       this._saveFailures++;
       devWarn('Save failed:', err.message, `(failure #${this._saveFailures})`);
@@ -332,8 +460,11 @@ class Store {
    * Reset all state to defaults (except PIN).
    */
   reset() {
+    // Parent-level credentials survive a progress reset: wiping a child's
+    // progress must not delete the parent's PIN or their AI key.
     const pin = this._state.parentPin;
-    this._state = { ...DEFAULT_STATE, parentPin: pin };
+    const apiKey = this._state.geminiApiKey;
+    this._state = { ...DEFAULT_STATE, parentPin: pin, geminiApiKey: apiKey };
     this._save();
     this._notify('*', this._state);
   }
@@ -346,6 +477,7 @@ class Store {
   setStorageKey(key) {
     this._flushSave(); // flush current state synchronously before switching
     STORAGE_KEY = key;
+    this._backupPending = undefined; // re-evaluate staleness for the new key
     this._state = this._load();
     this._notify('*', this._state);
   }

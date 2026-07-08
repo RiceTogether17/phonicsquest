@@ -1718,7 +1718,7 @@ function enrichVocabMetadata() {
 
         const rawWordBank = Array.isArray(passage.wordBank) ? passage.wordBank : [];
         const bankSeen = new Set();
-        let wordBank = rawWordBank.filter((w) => {
+        const wordBank = rawWordBank.filter((w) => {
           const key = String(w || '').trim().toLowerCase();
           if (!key || bankSeen.has(key)) return false;
           bankSeen.add(key);
