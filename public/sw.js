@@ -7,7 +7,7 @@
  *   - Navigation: Network-first with offline fallback to cached shell
  */
 
-const CACHE_VERSION = 'v7';
+const CACHE_VERSION = 'v8';
 const SHELL_CACHE   = `phonicsquest-shell-${CACHE_VERSION}`;
 const ASSET_CACHE   = `phonicsquest-assets-${CACHE_VERSION}`;
 
@@ -20,9 +20,9 @@ const SHELL_FILES = [
 /** All phoneme MP3 files — pre-bundled for offline use */
 const PHONEME_FILES = [
   'a','air','ar','b','c','ch','d','e','ear','er','f','g','h','i','j','k',
-  'l','long_a','long_e','long_i','long_o','long_u','m','n','ng','o','oi',
-  'or','ow','p','q','r','s','sh','soft_c','soft_g','t','th','u','v','w',
-  'x','y','z'
+  'l','long_a','long_e','long_i','long_o','long_oo','long_u','m','n','ng',
+  'o','oi','or','ow','p','q','r','s','sh','short_oo','soft_c','soft_g','t',
+  'th','u','v','w','x','y','z'
 ].map(f => `/phonicsquest/audio/phonemes/${f}.mp3`);
 
 /** Audio and image prefixes to cache on first fetch */

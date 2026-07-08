@@ -147,6 +147,8 @@ const PATTERN_CHECKS = [
   { match: /^long-u-ew$/, test: (w) => /ew/.test(w) },
   // Long U: oo
   { match: /^long-u-oo$/, test: (w) => /oo/.test(w) },
+  // Short oo /ʊ/ (book, look, good)
+  { match: /^short-oo$/, test: (w) => /oo/.test(w) },
 
   // Diphthongs
   { match: /^dip-oi$/, test: (w) => /(oi|oy)/.test(w) },

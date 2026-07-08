@@ -68,11 +68,12 @@ const PHONEME_FILES = {
   long_y:  'long_i',  // final y as long i (cry, fly, sky) → long I sound
   long_ie: 'long_i',  // ie (pie, tie)                    → long I sound
   long_igh:'long_i',  // igh (night, light, high)         → long I sound
-  // long_oo, long_ue and long_ew are intentionally absent: long_u.mp3 says
-  // /juː/ ("you"), but these vowel teams say /uː/ ("oo") — blue, true, glue,
-  // flew, grew, chew (see the "/oo/" lessons in curriculum). They fall through
-  // to PHONEME_TTS where long_oo/long_ue/long_ew → 'oo' gives the right sound.
-  // (The u_e split digraph keeps grapheme 'u' → long_u for /juː/: cube, cute.)
+  // /uː/ and /ʊ/ have their own recordings (long_u.mp3 says /juː/ "you",
+  // which is only right for the u_e split digraph: cube, cute):
+  long_oo:  'long_oo',   // oo /uː/ — moon, food, zoo
+  long_ue:  'long_oo',   // ue vowel team says /uː/ — blue, true, glue
+  long_ew:  'long_oo',   // ew vowel team says /uː/ — flew, grew, chew
+  short_oo: 'short_oo',  // oo /ʊ/ — book, look, good (and u in bush, full, pull)
   // Diphthongs  (oi covers oi+oy, ow covers ow+ou, aw covers aw+au)
   oi: 'oi', ow: 'ow', aw: 'aw',
   // Soft consonants (used only when explicitly tagged in word data)
@@ -381,6 +382,9 @@ class AudioManager {
     // Map grapheme + type to audio key
     let key = grapheme.toLowerCase();
     if (type === 'lv') key = `long_${grapheme.toLowerCase().replace('ee','e').replace('ay','a')}`;
+    // 'oo' typed as a SHORT vowel is the /ʊ/ pattern (book, look, good) —
+    // distinct from the long /uː/ team (moon) which is typed 'lv'.
+    if (type === 'sv' && key === 'oo') key = 'short_oo';
     if (type === 'soft_c') key = 'soft_c';
     if (type === 'soft_g') key = 'soft_g';
     if (type === 'se') return; // silent-e: no sound
@@ -602,8 +606,15 @@ class AudioManager {
     // explicit per-sound reveal in Blend It; PA needs the sounds to flow).
     const INTER_PHONEME_MS = 140;
 
+    const overrides = typeof wordData === 'string' ? null : wordData?.phonemeKeys;
     for (let i = 0; i < graphemes.length; i++) {
       if (i > 0) await this._delay(INTER_PHONEME_MS);
+      // Per-word phoneme override (e.g. the 'u' in bush/full/pull says /ʊ/,
+      // not short-u) — play the named phoneme audio directly.
+      if (overrides?.[i]) {
+        await this._playPhonemeAudio(overrides[i]);
+        continue;
+      }
       await this.speakPhoneme(graphemes[i], types[i], {
         word,
         prevGrapheme: i > 0 ? graphemes[i - 1] : null,
@@ -625,7 +636,12 @@ class AudioManager {
       const type     = wordData.types[i];
       const prevGrapheme = i > 0 ? wordData.graphemes[i - 1] : null;
       onPhoneme?.(i);
-      await this.speakPhoneme(grapheme, type, { word: wordData.word, prevGrapheme });
+      // Per-word phoneme override (see speakWordStretched).
+      if (wordData.phonemeKeys?.[i]) {
+        await this._playPhonemeAudio(wordData.phonemeKeys[i]);
+      } else {
+        await this.speakPhoneme(grapheme, type, { word: wordData.word, prevGrapheme });
+      }
       await this._delay(350);
     }
     // Brief pause then say full word

@@ -80,7 +80,10 @@ describe('real curriculum — mode/phase coverage is complete and has no dead st
   });
 
   it('phonemic-awareness sound modes keep their intended scope', async () => {
-    expect(await phasesFor('first')).toEqual([1]);
+    // First Sound runs through phase 6: isolating the initial phoneme of
+    // blends (fl-), digraphs (sh-) and long-vowel words is standard PA
+    // practice — it was previously (wrongly) capped at CVC.
+    expect(await phasesFor('first')).toEqual([1, 2, 3, 4, 5, 6]);
     expect(await phasesFor('last')).toEqual([1, 2, 3, 4, 5]);
     expect(await phasesFor('middle')).toEqual([1, 6, 7]);
   });

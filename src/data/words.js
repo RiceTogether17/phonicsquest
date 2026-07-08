@@ -99,6 +99,9 @@ export const WORD_GROUPS = {
   'long-u-uue': { label: 'Vowel team /oo/ · ue (blue)', color: '#6366f1', bg: '#e0e7ff', icon: '💙', audioFile: null },
   'long-u-ew':  { label: 'Vowel team /oo/ · ew (new)',  color: '#6366f1', bg: '#e0e7ff', icon: '🆕', audioFile: null },
   'long-u-oo':  { label: 'Vowel team /oo/ · oo (moon)', color: '#6366f1', bg: '#e0e7ff', icon: '🌙', audioFile: null },
+  // Short /ʊ/ — the OTHER sound of oo (book, look, good). Its own set so
+  // children learn oo says two sounds; paired with the short_oo recording.
+  'short-oo':   { label: 'Short oo /ʊ/ (book)', color: '#0ea5e9', bg: '#e0f2fe', icon: '📖', audioFile: 'short_oo' },
 
   // ── Diphthong micro-stages (combine same-sound spellings) ──────────────
   // oi/oy share /ɔɪ/, ou/ow share /aʊ/. aw is its own pattern (technically
@@ -564,6 +567,7 @@ const NAMED_STAGE_GROUPS = Object.freeze(new Set([
   'suffixes-advanced',
   'sight-highfreq',
   'suffix-ing', 'suffix-ed', 'suffix-er', 'suffix-est',
+  'short-oo',
 ]));
 
 /**
@@ -1090,6 +1094,17 @@ export const WORDS = [
   { id:'pool',  word:'pool',  graphemes:['p','oo','l'],  types:['c','lv','c'],  pattern:'other', group:'long-u', level:2, emoji:'🏊' },
   { id:'zoo',   word:'zoo',   graphemes:['z','oo'],      types:['c','lv'],      pattern:'other', group:'long-u', level:2, emoji:'🦁' },
   { id:'boot',  word:'boot',  graphemes:['b','oo','t'],  types:['c','lv','c'],  pattern:'other', group:'long-u', level:2, emoji:'👢' },
+
+  // ── Short oo /ʊ/ — oo's second sound (book), typed 'sv' so the phoneme
+  //    pipeline plays short_oo.mp3 rather than the long /uː/ team ─────────
+  { id:'book',  word:'book',  graphemes:['b','oo','k'],  types:['c','sv','c'],  pattern:'short-oo', group:'short-oo', level:2, emoji:'📖' },
+  { id:'look',  word:'look',  graphemes:['l','oo','k'],  types:['c','sv','c'],  pattern:'short-oo', group:'short-oo', level:2, emoji:'👀' },
+  { id:'cook',  word:'cook',  graphemes:['c','oo','k'],  types:['c','sv','c'],  pattern:'short-oo', group:'short-oo', level:2, emoji:'🍳' },
+  { id:'hook',  word:'hook',  graphemes:['h','oo','k'],  types:['c','sv','c'],  pattern:'short-oo', group:'short-oo', level:2, emoji:'🪝' },
+  { id:'foot',  word:'foot',  graphemes:['f','oo','t'],  types:['c','sv','c'],  pattern:'short-oo', group:'short-oo', level:2, emoji:'🦶' },
+  { id:'good',  word:'good',  graphemes:['g','oo','d'],  types:['c','sv','c'],  pattern:'short-oo', group:'short-oo', level:2, emoji:'👍' },
+  { id:'wood',  word:'wood',  graphemes:['w','oo','d'],  types:['c','sv','c'],  pattern:'short-oo', group:'short-oo', level:2, emoji:'🪵' },
+  { id:'hood',  word:'hood',  graphemes:['h','oo','d'],  types:['c','sv','c'],  pattern:'short-oo', group:'short-oo', level:2, emoji:'🧥' },
   { id:'soon',  word:'soon',  graphemes:['s','oo','n'],  types:['c','lv','c'],  pattern:'other', group:'long-u', level:2, emoji:'⏰' },
   { id:'tool',  word:'tool',  graphemes:['t','oo','l'],  types:['c','lv','c'],  pattern:'other', group:'long-u', level:2, emoji:'🔧' },
   { id:'broom', word:'broom', graphemes:['br','oo','m'], types:['bl','lv','c'], pattern:'other', group:'long-u', level:3, emoji:'🧹' },
@@ -1126,7 +1141,10 @@ export const WORDS = [
   { id:'mash',  word:'mash',  graphemes:['m','a','sh'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🥔' },
   { id:'sash',  word:'sash',  graphemes:['s','a','sh'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🎀' },
   { id:'rush',  word:'rush',  graphemes:['r','u','sh'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'💨' },
-  { id:'bush',  word:'bush',  graphemes:['b','u','sh'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🌿' },
+  // bush/full/pull/bull: the 'u' says /ʊ/ (short oo), not short-u /ʌ/ —
+  // irregularVowel keeps them out of the short-u structural sets and
+  // phonemeKeys plays short_oo.mp3 for the vowel tile during blending.
+  { id:'bush',  word:'bush',  graphemes:['b','u','sh'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🌿', irregularVowel:true, phonemeKeys:{1:'short_oo'} },
   { id:'gush',  word:'gush',  graphemes:['g','u','sh'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'💧' },
   { id:'hush',  word:'hush',  graphemes:['h','u','sh'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🤫' },
   { id:'mush',  word:'mush',  graphemes:['m','u','sh'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🍲' },
@@ -1227,13 +1245,13 @@ export const WORDS = [
   { id:'till',  word:'till',  graphemes:['t','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🏧' },
   { id:'will',  word:'will',  graphemes:['w','i','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'💪' },
   { id:'dull',  word:'dull',  graphemes:['d','u','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'😐' },
-  { id:'full',  word:'full',  graphemes:['f','u','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🍽️' },
+  { id:'full',  word:'full',  graphemes:['f','u','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🍽️', irregularVowel:true, phonemeKeys:{1:'short_oo'} },
   { id:'gull',  word:'gull',  graphemes:['g','u','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🐦' },
   { id:'hull',  word:'hull',  graphemes:['h','u','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🚢' },
   { id:'lull',  word:'lull',  graphemes:['l','u','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'😴' },
   { id:'mull',  word:'mull',  graphemes:['m','u','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🍵' },
-  { id:'pull',  word:'pull',  graphemes:['p','u','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'💪' },
-  { id:'bull',  word:'bull',  graphemes:['b','u','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🐂' },
+  { id:'pull',  word:'pull',  graphemes:['p','u','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'💪', irregularVowel:true, phonemeKeys:{1:'short_oo'} },
+  { id:'bull',  word:'bull',  graphemes:['b','u','ll'],  types:['c','sv','d'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🐂', irregularVowel:true, phonemeKeys:{1:'short_oo'} },
 
   /* ══════════════════════════════════════
      CONSONANT BLENDS  (level 3)
@@ -1363,7 +1381,7 @@ export const WORDS = [
      CCVCC – Short O  (level 2-3)
   ══════════════════════════════════════ */
   { id:'stomp', word:'stomp', graphemes:['st','o','mp'],  types:['bl','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'👣' },
-  { id:'front', word:'front', graphemes:['fr','o','nt'],  types:['bl','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'🚪' },
+  { id:'floss', word:'floss', graphemes:['fl','o','ss'],  types:['bl','sv','d'], pattern:'blend', group:'blends', level:2, emoji:'🦷' },
   { id:'blond', word:'blond', graphemes:['bl','o','nd'],  types:['bl','sv','bl'], pattern:'blend', group:'blends', level:2, emoji:'👱' },
   { id:'prong', word:'prong', graphemes:['pr','o','ng'],  types:['bl','sv','d'],  pattern:'blend', group:'blends', level:3, emoji:'🍴' },
   { id:'frond', word:'frond', graphemes:['fr','o','nd'],  types:['bl','sv','bl'], pattern:'blend', group:'blends', level:3, emoji:'🌿' },
@@ -1566,13 +1584,13 @@ export const WORDS = [
   { id:'plank',  word:'plank',  graphemes:['pl','a','nk'],  types:['bl','sv','bl'], pattern:'CCVCC', group:'struct-ccvcc', level:3, emoji:'🪵' },
   { id:'trust',  word:'trust',  graphemes:['tr','u','st'],  types:['bl','sv','bl'], pattern:'CCVCC', group:'struct-ccvcc', level:3, emoji:'🤝' },
   { id:'grunt',  word:'grunt',  graphemes:['gr','u','nt'],  types:['bl','sv','bl'], pattern:'CCVCC', group:'struct-ccvcc', level:3, emoji:'🐷' },
-  { id:'slant', word:'slant', graphemes:['sl','a','nt'], types:['bl','sv','bl'], pattern:'CCVCC', group:'struct-ccvcc', level:3, emoji:'📐' },
+  { id:'stand', word:'stand', graphemes:['st','a','nd'], types:['bl','sv','bl'], pattern:'CCVCC', group:'struct-ccvcc', level:3, emoji:'🧍' },
   { id:'plump', word:'plump', graphemes:['pl','u','mp'], types:['bl','sv','bl'], pattern:'CCVCC', group:'struct-ccvcc', level:3, emoji:'🍑' },
   { id:'brand', word:'brand', graphemes:['br','a','nd'], types:['bl','sv','bl'], pattern:'CCVCC', group:'struct-ccvcc', level:3, emoji:'🛍️' },
   { id:'cramp', word:'cramp', graphemes:['cr','a','mp'], types:['bl','sv','bl'], pattern:'CCVCC', group:'struct-ccvcc', level:3, emoji:'🦵' },
   { id:'drift', word:'drift', graphemes:['dr','i','ft'], types:['bl','sv','bl'], pattern:'CCVCC', group:'struct-ccvcc', level:3, emoji:'🍂' },
   { id:'brisk', word:'brisk', graphemes:['br','i','sk'], types:['bl','sv','bl'], pattern:'CCVCC', group:'struct-ccvcc', level:3, emoji:'🚶' },
-  { id:'grasp', word:'grasp', graphemes:['gr','a','sp'], types:['bl','sv','bl'], pattern:'CCVCC', group:'struct-ccvcc', level:3, emoji:'✊' },
+  { id:'drank', word:'drank', graphemes:['dr','a','nk'], types:['bl','sv','bl'], pattern:'CCVCC', group:'struct-ccvcc', level:3, emoji:'🥛' },
   { id:'crust', word:'crust', graphemes:['cr','u','st'], types:['bl','sv','bl'], pattern:'CCVCC', group:'struct-ccvcc', level:3, emoji:'🍞' },
 
   /* ══════════════════════════════════════
@@ -1934,9 +1952,9 @@ export const WORDS = [
   { id:'said',  word:'said',  graphemes:['s','ai','d'], types:['c','sv','c'],  pattern:'sight', group:'sight-highfreq', level:2, emoji:'💬' },
   { id:'come',  word:'come',  graphemes:['c','o','me'], types:['c','sv','se'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'👋' },
   { id:'some',  word:'some',  graphemes:['s','o','me'], types:['c','sv','se'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🍪' },
-  { id:'what', word:'what', graphemes:['wh','a','t'], types:['d','sv','c'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'❓' },
+  { id:'what', word:'what', graphemes:['wh','a','t'], types:['d','sv','c'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'❓', irregularVowel:true },
   { id:'were', word:'were', graphemes:['w','ere'], types:['c','rc'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'⏳' },
-  { id:'want', word:'want', graphemes:['w','a','nt'], types:['c','sv','bl'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🙋' },
+  { id:'want', word:'want', graphemes:['w','a','nt'], types:['c','sv','bl'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🙋', irregularVowel:true },
   { id:'does', word:'does', graphemes:['d','oe','s'], types:['c','sv','c'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'❔' },
   { id:'done', word:'done', graphemes:['d','o','ne'], types:['c','sv','se'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🏁' },
   { id:'once', word:'once', graphemes:['o','n','ce'], types:['sv','c','c'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'1️⃣' },
@@ -2049,6 +2067,14 @@ export function getWordStructure(word) {
   const svIdx = types.findIndex(t => t === 'sv');
   if (svIdx < 0) return 'other';
 
+  // Multisyllabic words are never CVC-family structures — without this,
+  // words like pocket (second vowel grapheme) and unplug (prefix tile,
+  // which carries its own syllable) leaked into the single-syllable
+  // short-vowel sets with schwa second syllables.
+  const vowelTypes = types.filter(t => t === 'sv' || t === 'lv' || t === 'rc' || t === 'dp');
+  if (vowelTypes.length > 1) return 'other';
+  if (types.includes('p')) return 'other';
+
   const leadTypes  = types.slice(0, svIdx);
   // Exclude suffix tiles from trailing phonemes
   const trailTypes = types.slice(svIdx + 1).filter(t => t !== 'sf');
@@ -2077,6 +2103,10 @@ export function getWordStructure(word) {
  * @returns {string|null}
  */
 export function getShortVowelLetter(word) {
+  // Words flagged irregularVowel spell a vowel letter that does NOT say
+  // its short sound (what/want → /ɒ/, bush/full/pull/bull → /ʊ/). They
+  // must never be pulled into the letter's short-vowel teaching sets.
+  if (word.irregularVowel) return null;
   const svIdx = word.types.findIndex(t => t === 'sv');
   if (svIdx < 0) return null;
   return word.graphemes[svIdx];
@@ -2085,7 +2115,7 @@ export function getShortVowelLetter(word) {
 /** All unique group keys in curriculum order (used by wheel, dashboard, progress) */
 export const GROUP_ORDER = [
   'short-a','short-e','short-i','short-o','short-u',
-  'long-a','long-e','long-i','long-o','long-u',
+  'long-a','long-e','long-i','long-o','long-u','short-oo',
   'digraphs','blends','diphthongs','r-controlled',
   'prefixes','suffixes-advanced','multisyllable','sight-highfreq',
 ];
