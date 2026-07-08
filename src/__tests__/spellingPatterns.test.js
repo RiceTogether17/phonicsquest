@@ -154,10 +154,13 @@ describe('micro-stage pedagogical ordering', () => {
     }
   });
 
-  it('Phase 6 ends with a long-u stage; phase 7 starts with dip-oi', () => {
+  it('Phase 6 ends with the short-oo contrast stage; phase 7 starts with dip-oi', () => {
     const phase6 = CURRICULUM.filter(s => s.phase === 6);
     const phase7 = CURRICULUM.filter(s => s.phase === 7);
-    expect(phase6.at(-1).id).toMatch(/^long-u/);
+    // short-oo (book /ʊ/) deliberately follows long-u-oo (moon /uː/) so the
+    // two sounds of oo are taught back-to-back as a contrast pair.
+    expect(phase6.at(-1).id).toBe('short-oo');
+    expect(phase6.at(-2).id).toBe('long-u-oo');
     expect(phase7[0].id).toBe('dip-oi');
   });
 });

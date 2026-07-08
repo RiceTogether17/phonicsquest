@@ -433,6 +433,17 @@ export const PHONICS_LESSONS = {
     weDoWord: 'moon',
     confusions: [],
   },
+  'short-oo': {
+    headline: 'OO has a second sound — the short /ʊ/ in book',
+    soundChips: [{ g: 'oo', type: 'sv', label: 'oo' }],
+    script: [
+      'The oo team has TWO sounds. This one is short and bouncy: /ʊ/ — like in book.',
+      'Try it: b… oo… k — book! Your lips barely pucker.',
+      'Book, look, good, foot — short /ʊ/. Moon and food keep the long /oo/. Listen for the difference!',
+    ],
+    weDoWord: 'book',
+    confusions: ['long-u-oo'],
+  },
 
   /* ── Phase 7 · Diphthongs ───────────────────────────────────────── */
   'dip-oi': {
