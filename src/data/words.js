@@ -608,6 +608,15 @@ export function deriveDecodableStage(word) {
   //     The digraphs stage is where it's first decodable.
   if (word.pattern === 'digraph') return 'digraphs';
 
+  // 2c. R-controlled words route to their phase-8 micro-stage by the
+  //     spelling of the r-controlled vowel grapheme (ar/or vs er/ir/ur).
+  if (word.group === 'r-controlled') {
+    const rcIdx = word.types.indexOf('rc');
+    const rc = rcIdx >= 0 ? word.graphemes[rcIdx] : null;
+    if (rc === 'ar' || rc === 'or') return 'rc-ar-or';
+    if (rc === 'er' || rc === 'ir' || rc === 'ur') return 'rc-er-ir-ur';
+  }
+
   // 3. Structural-vowel stage. Even when word.group is the legacy
   //    'short-a' or the generic 'blends', the structure+vowel pin down
   //    the curriculum cell exactly.

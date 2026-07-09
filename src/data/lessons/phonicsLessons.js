@@ -492,6 +492,28 @@ export const PHONICS_LESSONS = {
     weDoWord: 'crisp',
     confusions: ['Three-letter blends hide a middle sound: "spint" is missing the /r/ in "sprint".'],
   },
+  'rc-ar-or': {
+    headline: 'Bossy R: ar and or',
+    soundChips: [{ g: 'ar', type: 'rc', label: 'ar' }, { g: 'or', type: 'rc', label: 'or' }],
+    script: [
+      'The letter r is bossy! When it sits after a vowel, it changes the sound.',
+      'a + r says /ar/ like a pirate: c… ar — car!',
+      'o + r says /or/: f… or… k — fork!',
+    ],
+    weDoWord: 'car',
+    confusions: ['"ar" is NOT /a/ then /r/ — the two letters make one new sound together.'],
+  },
+  'rc-er-ir-ur': {
+    headline: 'Bossy R: er, ir and ur',
+    soundChips: [{ g: 'er', type: 'rc', label: 'er' }, { g: 'ir', type: 'rc', label: 'ir' }, { g: 'ur', type: 'rc', label: 'ur' }],
+    script: [
+      'Here is a secret: er, ir and ur ALL say the same sound — /er/!',
+      'h… er — her. b… ir… d — bird. t… ur… n — turn.',
+      'Say every sound, and remember the bossy r team makes one sound.',
+    ],
+    weDoWord: 'bird',
+    confusions: ['You can\'t HEAR which spelling it is — bird, her and turn all share /er/, so look carefully when spelling.'],
+  },
 
   /* ── Phase 9 · Suffixes ─────────────────────────────────────────── */
   'suffix-ing': {

@@ -129,6 +129,19 @@ class Progress {
       return WORDS.filter(w => w.group === parent && w.spellingPattern === pattern && lvl(w));
     }
 
+    // R-controlled micro-stages: rc-<spelling>[-<spelling>…]
+    //   rc-ar-or     → r-controlled words whose vowel grapheme is ar or or
+    //   rc-er-ir-ur  → r-controlled words whose vowel grapheme is er, ir or ur
+    const rcMatch = group.match(/^rc-([a-z-]+)$/);
+    if (rcMatch) {
+      const spellings = rcMatch[1].split('-');
+      return WORDS.filter(w => {
+        if (w.group !== 'r-controlled' || !lvl(w)) return false;
+        const rcIdx = w.types.indexOf('rc');
+        return rcIdx >= 0 && spellings.includes(w.graphemes[rcIdx]);
+      });
+    }
+
     // Diphthong micro-stages: dip-<spellingPattern>
     //   dip-oi → group:'diphthongs' AND spellingPattern:'oi'  (covers oi+oy)
     //   dip-aw → group:'diphthongs' AND spellingPattern:'aw'
