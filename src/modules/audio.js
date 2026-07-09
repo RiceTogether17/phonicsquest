@@ -426,21 +426,33 @@ class AudioManager {
       }
 
       // 3) Context-dependent -ed pronunciation
-      if (suffix === 'ed' && opts.prevGrapheme) {
-        const prev = opts.prevGrapheme.toLowerCase();
-        const lastChar = prev[prev.length - 1];
-        // /ɪd/ after t or d
-        if (lastChar === 't' || lastChar === 'd') {
-          return this._speak('id', 0.9);
+      if (suffix === 'ed') {
+        // Prefer the preceding grapheme tile; fall back to the base word's
+        // spelling (word minus the -ed) so lesson chips and any caller that
+        // knows the word still get the right variant.
+        let prev = opts.prevGrapheme?.toLowerCase() ?? null;
+        if (!prev && opts.word) {
+          const base = opts.word.toLowerCase().replace(/ed$/, '');
+          if (base) prev = base.slice(-2);
         }
-        // /t/ after voiceless consonants
-        const voicelessEndings = ['p','k','f','s','x'];
-        const voicelessDigraphs = ['sh','ch','th','ck','ss'];
-        if (voicelessEndings.includes(lastChar) || voicelessDigraphs.includes(prev)) {
-          return this._playPhonemeAudio('t');
+        if (prev) {
+          const lastChar = prev[prev.length - 1];
+          // /ɪd/ after t or d (landed, melted) — an extra syllable, played
+          // as cached short-i + d phonemes so every voice says it the same
+          if (lastChar === 't' || lastChar === 'd') {
+            await this._playPhonemeAudio('i');
+            await this._delay(80);
+            return this._playPhonemeAudio('d');
+          }
+          // /t/ after voiceless consonants (jumped, fished, kicked)
+          const voicelessEndings = ['p','k','f','s','x'];
+          const voicelessDigraphs = ['sh','ch','th','ck','ss','tch'];
+          if (voicelessEndings.includes(lastChar) || voicelessDigraphs.includes(prev)) {
+            return this._playPhonemeAudio('t');
+          }
+          // /d/ after voiced sounds (filled, played)
+          return this._playPhonemeAudio('d');
         }
-        // /d/ after voiced consonants
-        return this._playPhonemeAudio('d');
       }
 
       // 4) Fallback: let TTS pronounce the suffix text directly
