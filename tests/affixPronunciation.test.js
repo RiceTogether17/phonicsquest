@@ -201,14 +201,42 @@ describe('affix pronunciation', () => {
     expect(audio._playPhonemeAudio).toHaveBeenCalledWith('t');
   });
 
-  it('still handles -ed after t/d as /ɪd/', async () => {
+  it('still handles -ed after t/d as /ɪd/ (short-i + d phonemes, not TTS)', async () => {
     await audio.speakPhoneme('-ed', 'sf', { prevGrapheme: 'nd' });
-    expect(audio._speak).toHaveBeenCalledWith('id', 0.9);
+    expect(audio._playPhonemeAudio).toHaveBeenCalledTimes(2);
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(1, 'i');
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(2, 'd');
+    expect(audio._speak).not.toHaveBeenCalled();
   });
 
   it('still handles -ed after voiced consonant as /d/', async () => {
     await audio.speakPhoneme('-ed', 'sf', { prevGrapheme: 'ng' });
     expect(audio._playPhonemeAudio).toHaveBeenCalledWith('d');
+  });
+
+  it('handles -ed with no prevGrapheme via the word ending: voiceless → /t/', async () => {
+    await audio.speakPhoneme('-ed', 'sf', { word: 'jumped' });
+    expect(audio._playPhonemeAudio).toHaveBeenCalledTimes(1);
+    expect(audio._playPhonemeAudio).toHaveBeenCalledWith('t');
+    expect(audio._speak).not.toHaveBeenCalled();
+  });
+
+  it('handles -ed with no prevGrapheme via the word ending: t/d → /ɪd/', async () => {
+    await audio.speakPhoneme('-ed', 'sf', { word: 'landed' });
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(1, 'i');
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(2, 'd');
+  });
+
+  it('handles -ed with no prevGrapheme via the word ending: voiced → /d/', async () => {
+    await audio.speakPhoneme('-ed', 'sf', { word: 'filled' });
+    expect(audio._playPhonemeAudio).toHaveBeenCalledTimes(1);
+    expect(audio._playPhonemeAudio).toHaveBeenCalledWith('d');
+  });
+
+  it('falls back to TTS "ed" when no context at all is available', async () => {
+    await audio.speakPhoneme('-ed', 'sf');
+    expect(audio._speak).toHaveBeenCalledWith('ed', 0.9);
+    expect(audio._playPhonemeAudio).not.toHaveBeenCalled();
   });
 
   // ── Phoneme delay between sequence items ───────────────────────────

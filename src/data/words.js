@@ -608,6 +608,15 @@ export function deriveDecodableStage(word) {
   //     The digraphs stage is where it's first decodable.
   if (word.pattern === 'digraph') return 'digraphs';
 
+  // 2c. R-controlled words route to their phase-8 micro-stage by the
+  //     spelling of the r-controlled vowel grapheme (ar/or vs er/ir/ur).
+  if (word.group === 'r-controlled') {
+    const rcIdx = word.types.indexOf('rc');
+    const rc = rcIdx >= 0 ? word.graphemes[rcIdx] : null;
+    if (rc === 'ar' || rc === 'or') return 'rc-ar-or';
+    if (rc === 'er' || rc === 'ir' || rc === 'ur') return 'rc-er-ir-ur';
+  }
+
   // 3. Structural-vowel stage. Even when word.group is the legacy
   //    'short-a' or the generic 'blends', the structure+vowel pin down
   //    the curriculum cell exactly.
@@ -1105,6 +1114,12 @@ export const WORDS = [
   { id:'good',  word:'good',  graphemes:['g','oo','d'],  types:['c','sv','c'],  pattern:'short-oo', group:'short-oo', level:2, emoji:'👍' },
   { id:'wood',  word:'wood',  graphemes:['w','oo','d'],  types:['c','sv','c'],  pattern:'short-oo', group:'short-oo', level:2, emoji:'🪵' },
   { id:'hood',  word:'hood',  graphemes:['h','oo','d'],  types:['c','sv','c'],  pattern:'short-oo', group:'short-oo', level:2, emoji:'🧥' },
+  { id:'took',  word:'took',  graphemes:['t','oo','k'],  types:['c','sv','c'],  pattern:'short-oo', group:'short-oo', level:2, emoji:'🫴' },
+  { id:'wool',  word:'wool',  graphemes:['w','oo','l'],  types:['c','sv','c'],  pattern:'short-oo', group:'short-oo', level:2, emoji:'🐑' },
+  { id:'soot',  word:'soot',  graphemes:['s','oo','t'],  types:['c','sv','c'],  pattern:'short-oo', group:'short-oo', level:2, emoji:'🧹' },
+  { id:'shook', word:'shook', graphemes:['sh','oo','k'], types:['d','sv','c'],  pattern:'short-oo', group:'short-oo', level:2, emoji:'🫨' },
+  { id:'stood', word:'stood', graphemes:['st','oo','d'], types:['bl','sv','c'], pattern:'short-oo', group:'short-oo', level:2, emoji:'🧍' },
+  { id:'brook', word:'brook', graphemes:['br','oo','k'], types:['bl','sv','c'], pattern:'short-oo', group:'short-oo', level:2, emoji:'🏞️' },
   { id:'soon',  word:'soon',  graphemes:['s','oo','n'],  types:['c','lv','c'],  pattern:'other', group:'long-u', level:2, emoji:'⏰' },
   { id:'tool',  word:'tool',  graphemes:['t','oo','l'],  types:['c','lv','c'],  pattern:'other', group:'long-u', level:2, emoji:'🔧' },
   { id:'broom', word:'broom', graphemes:['br','oo','m'], types:['bl','lv','c'], pattern:'other', group:'long-u', level:3, emoji:'🧹' },

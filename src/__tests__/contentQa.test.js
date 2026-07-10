@@ -150,6 +150,10 @@ const PATTERN_CHECKS = [
   // Short oo /ʊ/ (book, look, good)
   { match: /^short-oo$/, test: (w) => /oo/.test(w) },
 
+  // R-controlled vowels
+  { match: /^rc-ar-or$/, test: (w) => /(ar|or)/.test(w) },
+  { match: /^rc-er-ir-ur$/, test: (w) => /(er|ir|ur)/.test(w) },
+
   // Diphthongs
   { match: /^dip-oi$/, test: (w) => /(oi|oy)/.test(w) },
   { match: /^dip-ou$/, test: (w) => /(ou|ow)/.test(w) },
