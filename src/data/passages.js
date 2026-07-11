@@ -21,7 +21,7 @@
 // Category definitions are shared with Grammar MCQ — single source of truth.
 export { GRAMMAR_CATEGORIES } from './grammarCategories.js';
 import { passagesExtra } from './passagesExtra/index.js';
-import { MIN_QUESTIONS_PER_SCOPE, expansionContext, contextualTitle } from './practiceExpansion.js';
+import { MIN_QUESTIONS_PER_SCOPE, passageLead, contextualTitle } from './practiceExpansion.js';
 
 export const CLOZE_LEVEL_LABELS = {
   P1: 'Primary 1',
@@ -2060,7 +2060,7 @@ function _ensureGrammarPassageDepth(targetQuestions = MIN_QUESTIONS_PER_SCOPE) {
           ...src,
           id: `gxp-${level.toLowerCase()}-${category}-${String(counter + 1).padStart(3, '0')}`,
           title: `${src.title} · ${contextualTitle(counter)}`,
-          text: `A language group met ${expansionContext(counter)}. ${src.text}`,
+          text: `${passageLead(counter)} ${src.text}`,
           clues: (src.clues || []).map(clue => ({ ...clue })),
           answers: [...(src.answers || [])],
           wordBank: [...(src.wordBank || [])],

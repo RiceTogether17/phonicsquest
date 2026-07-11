@@ -1,5 +1,5 @@
 import { VOCAB_CATEGORIES } from '../vocabCategories.js';
-import { MIN_QUESTIONS_PER_SCOPE, expansionContext, contextualTitle } from '../practiceExpansion.js';
+import { MIN_QUESTIONS_PER_SCOPE, passageLead, contextualTitle } from '../practiceExpansion.js';
 
 const LEVELS = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
 
@@ -88,7 +88,7 @@ function pick(level, idx, arr) {
 
 function makeText(category, level, idx) {
   const context = pick(level, idx, CONTEXTS[level]);
-  const lead = `The group met ${expansionContext(idx)}. `;
+  const lead = `${passageLead(idx)} `;
   const variants = {
     0: `During ${context}, the path outside was ___. Mei opened her ___ before crossing the courtyard. She stayed under the walkway so her worksheet remained ___.`,
     1: `In ${context}, pupils borrow books in the ___. They buy snacks in the ___. They play tag at the ___.`,
