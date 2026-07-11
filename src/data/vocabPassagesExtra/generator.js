@@ -1,4 +1,5 @@
 import { VOCAB_CATEGORIES } from '../vocabCategories.js';
+import { MIN_QUESTIONS_PER_SCOPE, expansionContext, contextualTitle } from '../practiceExpansion.js';
 
 const LEVELS = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
 
@@ -87,15 +88,16 @@ function pick(level, idx, arr) {
 
 function makeText(category, level, idx) {
   const context = pick(level, idx, CONTEXTS[level]);
+  const lead = `The group met ${expansionContext(idx)}. `;
   const variants = {
     0: `During ${context}, the path outside was ___. Mei opened her ___ before crossing the courtyard. She stayed under the walkway so her worksheet remained ___.`,
     1: `In ${context}, pupils borrow books in the ___. They buy snacks in the ___. They play tag at the ___.`,
     2: `After good news in ${context}, Jia looked ___. The boy who cut the queue was ___. The teacher gave a ___ reminder before dismissal.`,
   };
 
-  if (category === 'definitionMatch') return variants[1];
-  if (category === 'synonymContrast') return variants[2];
-  if (category === 'contextInference') return variants[0];
+  if (category === 'definitionMatch') return lead + variants[1];
+  if (category === 'synonymContrast') return lead + variants[2];
+  if (category === 'contextInference') return lead + variants[0];
 
   const perCategory = {
     morphologicalAffix: [
@@ -155,7 +157,7 @@ function makeText(category, level, idx) {
     ],
   };
 
-  return pick(level, idx, perCategory[category]);
+  return lead + pick(level, idx, perCategory[category]);
 }
 
 function buildLearningAids(text, category, answers) {
@@ -279,7 +281,7 @@ function buildPassage(category, level, idx) {
 
   return {
     id: `vxg-${short}-p${levelNum}-${String(idx + 1).padStart(2, '0')}`,
-    title: `${titleSeed} (${level.toUpperCase()})`,
+    title: `${titleSeed} · ${contextualTitle(idx)} (${level.toUpperCase()})`,
     text,
     answers: [...core.answers],
     wordBank,
@@ -301,7 +303,8 @@ export function buildExtraPassageBank(levels = []) {
     if (!CATEGORY_BANK[category]) continue;
     out[category] = {};
     for (const level of levels) {
-      out[category][level] = Array.from({ length: 12 }, (_, i) => buildPassage(category, level, i));
+      const passageCount = Math.ceil(MIN_QUESTIONS_PER_SCOPE / CATEGORY_BANK[category].answers.length);
+      out[category][level] = Array.from({ length: passageCount }, (_, i) => buildPassage(category, level, i));
     }
   }
   return out;

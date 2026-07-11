@@ -21,6 +21,7 @@
 // Category definitions are shared with Grammar MCQ — single source of truth.
 export { GRAMMAR_CATEGORIES } from './grammarCategories.js';
 import { passagesExtra } from './passagesExtra/index.js';
+import { MIN_QUESTIONS_PER_SCOPE, expansionContext, contextualTitle } from './practiceExpansion.js';
 
 export const CLOZE_LEVEL_LABELS = {
   P1: 'Primary 1',
@@ -2045,30 +2046,33 @@ function _normalizeGrammarClues() {
   }
 }
 
-function _ensureGrammarPassageDepth(target = 40) {
+function _ensureGrammarPassageDepth(targetQuestions = MIN_QUESTIONS_PER_SCOPE) {
   for (const level of Object.keys(passages)) {
     const cats = passages[level] || {};
-    const keys = Object.keys(cats).filter(k => Array.isArray(cats[k]) && cats[k].length);
-    if (!keys.length) continue;
-    const totalNow = keys.reduce((sum, k) => sum + cats[k].length, 0);
-    let counter = 0;
-    while (keys.reduce((sum, k) => sum + cats[k].length, 0) < target) {
-      const cat = keys[counter % keys.length];
-      const src = cats[cat][counter % cats[cat].length];
-      cats[cat].push({
-        ...src,
-        id: `${src.id}-d${cats[cat].length + 1}`,
-        title: `${src.title} (Extension ${cats[cat].length + 1})`,
-        clues: (src.clues || []).map(c => ({ ...c })),
-        answers: [...(src.answers || [])],
-        wordBank: [...(src.wordBank || [])],
-      });
-      counter += 1;
-      if (counter > 400) break;
+    for (const [category, bucket] of Object.entries(cats)) {
+      if (!Array.isArray(bucket) || !bucket.length) continue;
+      const sources = [...bucket];
+      let questionCount = bucket.reduce((sum, passage) => sum + (passage.answers?.length || 0), 0);
+      let counter = 0;
+      while (questionCount < targetQuestions) {
+        const src = sources[counter % sources.length];
+        const variant = {
+          ...src,
+          id: `gxp-${level.toLowerCase()}-${category}-${String(counter + 1).padStart(3, '0')}`,
+          title: `${src.title} · ${contextualTitle(counter)}`,
+          text: `A language group met ${expansionContext(counter)}. ${src.text}`,
+          clues: (src.clues || []).map(clue => ({ ...clue })),
+          answers: [...(src.answers || [])],
+          wordBank: [...(src.wordBank || [])],
+          grammarNotes: src.grammarNotes ? [...src.grammarNotes] : undefined,
+        };
+        bucket.push(variant);
+        questionCount += variant.answers.length;
+        counter += 1;
+      }
     }
-    if (totalNow === 0) continue;
   }
 }
 
 _normalizeGrammarClues();
-_ensureGrammarPassageDepth(70);
+_ensureGrammarPassageDepth();

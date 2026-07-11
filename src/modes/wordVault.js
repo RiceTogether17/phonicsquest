@@ -1,7 +1,7 @@
 /**
  * PhonicsQuest – Word Vault Quest 🔑
  *
- * Vocabulary cloze passages across 7 categories × 6 levels (p1–p6).
+ * Vocabulary cloze passages across all eligible categories × 6 levels (p1–p6).
  * Same tap-to-fill mechanics as Cloze Castle but with a two-step browser:
  *   1. Choose category
  *   2. Choose level
@@ -315,8 +315,9 @@ function _renderCategoryBrowser() {
     const levelsForCat = Object.values(vocabPassages[key] || {});
     const totalLevels = levelsForCat.filter(arr => (arr || []).length > 0).length;
     const totalPassages = levelsForCat.reduce((sum, arr) => sum + ((arr || []).length), 0);
+    const totalQuestions = levelsForCat.reduce((sum, arr) => sum + (arr || []).reduce((n, passage) => n + (passage.answers?.length || 0), 0), 0);
     const donePassages = _getUniquePassageCountForCategory(key);
-    const perLevel = totalLevels ? Math.round(totalPassages / totalLevels) : 0;
+    const perLevel = totalLevels ? Math.round(totalQuestions / totalLevels) : 0;
     const isRecommended = key === recommendedCat;
 
     html += `
@@ -326,7 +327,7 @@ function _renderCategoryBrowser() {
         <span class="wv-cat-icon">${meta.icon}</span>
         <span class="wv-cat-label">${meta.label}</span>
         <span class="wv-cat-desc">${meta.desc}</span>
-        <span class="wv-cat-progress">${doneLevels}/${totalLevels} levels · ${donePassages}/${totalPassages} passages (~${perLevel}/level)${isRecommended ? ' · Recommended' : ''}</span>
+        <span class="wv-cat-progress">${doneLevels}/${totalLevels} levels · ${totalQuestions} questions (~${perLevel}/level) · ${donePassages}/${totalPassages} passages${isRecommended ? ' · Recommended' : ''}</span>
       </button>`;
   }
 
@@ -389,6 +390,7 @@ function _renderLevelBrowser(catKey) {
     const hasPassage = passages && passages.length > 0;
     const isDone = getUniqueWordVaultDone({ category: catKey, level: lv, wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {}, wvqCompleted: store.get('wvqCompleted') || {} }) > 0;
     const uniqueDone = getUniqueWordVaultDone({ category: catKey, level: lv, wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {}, wvqCompleted: store.get('wvqCompleted') || {} });
+    const questionTotal = (passages || []).reduce((sum, passage) => sum + (passage.answers?.length || 0), 0);
 
     html += `
       <button class="wv-level-btn ${isDone ? 'wv-level-btn--done' : ''} ${!hasPassage ? 'wv-level-btn--locked' : ''}"
@@ -398,7 +400,7 @@ function _renderLevelBrowser(catKey) {
               aria-label="${LEVEL_LABELS[lv]}${isDone ? ' – completed' : ''}">
         <span class="wv-level-icon">${isDone ? renderSummaryStars(completed[lv]?.stars || 1) : LEVEL_ICONS[lv]}</span>
         <span class="wv-level-name">${LEVEL_LABELS[lv]}</span>
-        <span class="wv-level-count">${uniqueDone}/${(passages || []).length} passages</span>
+        <span class="wv-level-count">${questionTotal} questions · ${uniqueDone}/${(passages || []).length} passages</span>
       </button>`;
   }
 

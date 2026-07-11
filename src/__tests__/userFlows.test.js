@@ -4,7 +4,7 @@
  * Each test exercises one parent-facing journey:
  *   1. P4 user opens Grammar MCQ, completes questions and sees a summary
  *   2. P5 user opens Word Vault in Exam Mode and does NOT see hints
- *   3. P6 user opens Paper Mode and completes one section (with summary)
+ *   3. P6 user opens Paper Mode and starts a real timed term paper
  *   4. Parent dashboard renders the report card with weak skill +
  *      a Copy Parent Update button
  *   5. Imported profile keeps primaryGrade and readingBand
@@ -145,7 +145,7 @@ describe('user-flow: P5 user opens Word Vault in Exam Mode', () => {
   });
 });
 
-describe('user-flow: P6 user completes a Paper Mode section', () => {
+describe('user-flow: P6 user starts a real paper from Paper Mode', () => {
   beforeEach(() => {
     document.body.innerHTML = '<div id="root"></div>';
     localStorage.clear();
@@ -154,40 +154,42 @@ describe('user-flow: P6 user completes a Paper Mode section', () => {
     vi.resetModules();
   });
 
-  it('starting and marking the first section produces a summary with score and recommendations', async () => {
-    const { initPaperMode, showPaperModeBrowser, buildPaperSummary } =
+  it('launches the interactive timed runner and submits a section without practice feedback', async () => {
+    const { initPaperMode, showPaperModeBrowser } =
       await import('../modes/paperMode.js');
 
-    const launches = [];
     const root = document.getElementById('root');
     initPaperMode(root, {
-      onLaunchSection: (section, level) => launches.push({ section, level }),
+      onLaunchSection: () => {},
       onGoHome: () => {},
     });
     showPaperModeBrowser();
 
-    // Pick P6 level
+    // Choose timed Test Mode, then pick P6.
+    root.querySelector('[data-paper-mode="test"]').click();
     root.querySelector('[data-level="P6"]').click();
-    // Start full paper
+    expect(root.querySelectorAll('[data-start-paper]').length).toBe(4);
+
+    // Start the first complete term paper.
     root.querySelector('#paper-start-all').click();
+    expect(root.querySelector('.ptg[data-paper-mode="test"]')).not.toBeNull();
+    expect(root.querySelector('.ptg-stepper')).not.toBeNull();
+    expect(root.querySelector('.ptg-timer')?.hidden).toBe(false);
+    expect(root.querySelector('[data-action="check"]')?.textContent).toMatch(/Submit section/i);
 
-    // Mark the first section as 4/5
-    root.querySelector('#paper-mark-done').click();
-    root.querySelector('#paper-scored-input').value = '4';
-    root.querySelector('#paper-total-input').value = '5';
-    root.querySelector('#paper-confirm-mark').click();
+    // Answer the first MCQ correctly and submit it. Test Mode records the
+    // mark but withholds inline teaching feedback until the paper summary.
+    const firstAnswer = root.querySelector('input[type="radio"]');
+    const correct = [...root.querySelectorAll(`input[name="${firstAnswer.name}"]`)]
+      .find(input => input.value === firstAnswer.dataset.answer);
+    correct.checked = true;
+    root.querySelector('[data-action="check"]').click();
+    expect(root.querySelectorAll('.ptg-feedback:not([hidden])').length).toBe(0);
+    expect(root.querySelector('[data-action="next"]')?.hidden).toBe(false);
 
-    // The section feedback panel should now be visible
-    const feedback = root.textContent || '';
-    expect(feedback).toMatch(/Section complete/);
-    expect(feedback).toMatch(/Recommended follow-up/);
-
-    const { store } = await import('../modules/store.js');
-    const paperSession = store.get('paperSession') || {};
-    const summary = buildPaperSummary(paperSession);
-    expect(summary.totalScored).toBe(4);
-    expect(summary.totalTotal).toBe(5);
-    expect(summary.accuracy).toBe(80);
+    // Exit returns to the real paper list and stops the timer.
+    root.querySelector('[data-action="exit"]').click();
+    expect(root.querySelectorAll('[data-start-paper]').length).toBe(4);
   });
 });
 

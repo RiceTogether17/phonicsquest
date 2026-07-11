@@ -8,6 +8,7 @@
 import { inferQuestionContextType } from './mcqItemMetadata.js';
 import { makeFallbackOptionExplanations } from './mcqOptionExplanations.js';
 import { GRAMMAR_TIPS } from './grammarTips.js';
+import { MIN_QUESTIONS_PER_SCOPE, contextualizeMcqQuestion } from './practiceExpansion.js';
 
 export const GRAMMAR_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 
@@ -4303,43 +4304,42 @@ const GRAMMAR_BUILDERS = {
 
 function buildLevel(level) {
   const categories = LEVEL_CATEGORY_PLAN[level];
-  const targetCount = 200;
   const items = [];
   const sessionSeed = Math.floor(Math.random() * 10);
-  const categoryCursor = Object.fromEntries(categories.map(c => [c, sessionSeed]));
 
-  for (let i = 0; i < targetCount; i += 1) {
-    const category = categories[i % categories.length];
-    const localIndex = categoryCursor[category];
-    categoryCursor[category] += 1;
-    const spec = GRAMMAR_BUILDERS[category](level, localIndex);
-    const id = `g-${level.toLowerCase()}-${String(i + 1).padStart(3, '0')}`;
-    const item = {
-      id,
-      level,
-      category,
-      subskill: spec.subskill,
-      difficulty: difficultyFor(level, i),
-      q: spec.q,
-      choices: spec.choices,
-      answer: spec.answer,
-      explain: spec.explain,
-    };
-    // Prefer builder-authored per-choice explanations; otherwise fall back to
-    // generic ones built from the category rule so every wrong answer teaches.
-    item.optionExplanations = spec.optionExplanations
-      || makeFallbackOptionExplanations(item.answer, item.choices, GRAMMAR_TIPS[category]);
-    if (spec.clueWords) item.clueWords = spec.clueWords;
-    if (spec.reasoning) item.reasoning = spec.reasoning;
-    item.contextType = inferQuestionContextType(item.q);
-    // Two-sentence context items require reading the first sentence as a clue,
-    // which makes them inherently harder — promote to difficulty 3 regardless
-    // of where they landed in the rotation. P1/P2 cap at difficulty 2 by design.
-    if (item.difficulty < 3 && ['P3', 'P4', 'P5', 'P6'].includes(level) &&
-        /[a-zA-Z][.!?]\s+[A-Z][^.!?]*___/.test(item.q)) {
-      item.difficulty = 3;
+  for (const category of categories) {
+    for (let localOffset = 0; localOffset < MIN_QUESTIONS_PER_SCOPE; localOffset += 1) {
+      const localIndex = sessionSeed + localOffset;
+      const spec = GRAMMAR_BUILDERS[category](level, localIndex);
+      const variant = contextualizeMcqQuestion(spec.q, localOffset, level);
+      const item = {
+        id: `g-${level.toLowerCase()}-${category}-${String(localOffset + 1).padStart(3, '0')}`,
+        level,
+        category,
+        subskill: spec.subskill,
+        difficulty: difficultyFor(level, localOffset),
+        q: variant.question,
+        questionType: variant.questionType,
+        choices: spec.choices,
+        answer: spec.answer,
+        explain: spec.explain,
+      };
+      // Prefer builder-authored per-choice explanations; otherwise fall back to
+      // generic ones built from the category rule so every wrong answer teaches.
+      item.optionExplanations = spec.optionExplanations
+        || makeFallbackOptionExplanations(item.answer, item.choices, GRAMMAR_TIPS[category]);
+      if (spec.clueWords) item.clueWords = spec.clueWords;
+      if (spec.reasoning) item.reasoning = spec.reasoning;
+      item.contextType = inferQuestionContextType(item.q);
+      // Two-sentence context items require reading the first sentence as a clue,
+      // which makes them inherently harder — promote to difficulty 3 regardless
+      // of where they landed in the rotation. P1/P2 cap at difficulty 2 by design.
+      if (item.difficulty < 3 && ['P3', 'P4', 'P5', 'P6'].includes(level) &&
+          /[a-zA-Z][.!?]\s+[A-Z][^.!?]*___/.test(item.q)) {
+        item.difficulty = 3;
+      }
+      items.push(item);
     }
-    items.push(item);
   }
 
   return items;

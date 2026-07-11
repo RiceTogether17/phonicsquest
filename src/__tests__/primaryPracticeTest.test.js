@@ -16,6 +16,7 @@ function mount(paper, opts = {}) {
   mountPracticeTest(root, paper, {
     onClose: () => { calls.closed += 1; },
     onPractiseSkill: (t) => { calls.practised.push(t); },
+    ...opts,
   });
   return { root, calls };
 }
@@ -411,6 +412,34 @@ describe('Summary distinguishes self-assessed writing from the auto-graded total
     const small = root.querySelector('.ptg-header small')?.textContent || '';
     expect(small).toMatch(/auto-graded/);
     expect(small).toMatch(/self-assessed/);
+  });
+});
+
+describe('Test Mode exam conditions', () => {
+  beforeEach(() => { document.body.innerHTML = ''; });
+
+  it('withholds inline feedback and writing support while the timed paper is active', () => {
+    const paper = P5_PRACTICE_TESTS.T1;
+    const { root } = mount(paper, { mode: 'test' });
+
+    expect(root.querySelector('.ptg-timer')?.hidden).toBe(false);
+    expect(root.querySelector('[data-action="check"]')?.textContent).toMatch(/Submit section/i);
+    click(root.querySelector('[data-action="check"]'));
+    expect(root.querySelectorAll('.ptg-feedback:not([hidden])').length).toBe(0);
+
+    // Walk to Situational Writing (Section E). Test Mode must not expose the
+    // model answer or rubric before the learner submits the paper.
+    click(root.querySelector('[data-action="next"]'));
+    for (let i = 0; i < 3; i += 1) {
+      click(root.querySelector('[data-action="check"]'));
+      click(root.querySelector('[data-action="next"]'));
+    }
+    expect(root.querySelector('textarea[data-q-type="writing"]')).toBeTruthy();
+    expect(root.querySelector('.ptg-model-answer')).toBeNull();
+    expect(root.querySelector('.ptg-rubric')).toBeNull();
+
+    // Avoid leaving the test timer alive after the assertion.
+    click(root.querySelector('[data-action="exit"]'));
   });
 });
 
