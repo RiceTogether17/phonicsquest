@@ -6,6 +6,7 @@
  */
 
 import { makeFallbackOptionExplanations } from './mcqOptionExplanations.js';
+import { MIN_QUESTIONS_PER_SCOPE, contextualizeMcqQuestion } from './practiceExpansion.js';
 import { VOCAB_CATEGORIES } from './vocabCategories.js';
 
 export const VOCAB_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
@@ -1099,41 +1100,41 @@ function toCanonicalCategory(cat) {
 }
 
 function buildLevel(level) {
-  const target = 200;
   const cats = LEVEL_CATEGORY_PLAN[level];
   const items = [];
   const sessionSeed = Math.floor(Math.random() * 10);
-  const categoryCursor = Object.fromEntries(cats.map(c => [c, sessionSeed]));
 
-  for (let i = 0; i < target; i += 1) {
-    const baseCat = cats[i % cats.length];
-    const localIndex = categoryCursor[baseCat];
-    categoryCursor[baseCat] += 1;
-    const spec = VOCAB_BUILDERS[baseCat](level, localIndex);
-    const item = {
-      id: `v-${level.toLowerCase()}-${String(i + 1).padStart(3, '0')}`,
-      level,
-      category: toCanonicalCategory(spec.category),
-      subskill: spec.subskill,
-      difficulty: difficultyFor(level, i),
-      q: spec.q,
-      choices: spec.choices,
-      answer: spec.answer,
-      explain: spec.explain,
-    };
-    // Prefer builder-authored per-choice explanations; otherwise fall back to
-    // generic ones built from the category rule so every wrong answer teaches.
-    item.optionExplanations = spec.optionExplanations
-      || makeFallbackOptionExplanations(item.answer, item.choices, VOCAB_CATEGORIES[item.category]);
-    if (spec.clueWords) item.clueWords = spec.clueWords;
-    if (spec.reasoning) item.reasoning = spec.reasoning;
-    // Two-sentence context items are inherently harder — promote to difficulty 3
-    // regardless of rotation position. P1/P2 cap at difficulty 2 by design.
-    if (item.difficulty < 3 && ['P3', 'P4', 'P5', 'P6'].includes(level) &&
-        /[a-zA-Z][.!?]\s+[A-Z][^.!?]*___/.test(item.q)) {
-      item.difficulty = 3;
+  for (const baseCat of cats) {
+    for (let localOffset = 0; localOffset < MIN_QUESTIONS_PER_SCOPE; localOffset += 1) {
+      const localIndex = sessionSeed + localOffset;
+      const spec = VOCAB_BUILDERS[baseCat](level, localIndex);
+      const variant = contextualizeMcqQuestion(spec.q, localOffset, level);
+      const item = {
+        id: `v-${level.toLowerCase()}-${baseCat}-${String(localOffset + 1).padStart(3, '0')}`,
+        level,
+        category: toCanonicalCategory(spec.category),
+        subskill: spec.subskill,
+        difficulty: difficultyFor(level, localOffset),
+        q: variant.question,
+        questionType: variant.questionType,
+        choices: spec.choices,
+        answer: spec.answer,
+        explain: spec.explain,
+      };
+      // Prefer builder-authored per-choice explanations; otherwise fall back to
+      // generic ones built from the category rule so every wrong answer teaches.
+      item.optionExplanations = spec.optionExplanations
+        || makeFallbackOptionExplanations(item.answer, item.choices, VOCAB_CATEGORIES[item.category]);
+      if (spec.clueWords) item.clueWords = spec.clueWords;
+      if (spec.reasoning) item.reasoning = spec.reasoning;
+      // Two-sentence context items are inherently harder — promote to difficulty 3
+      // regardless of rotation position. P1/P2 cap at difficulty 2 by design.
+      if (item.difficulty < 3 && ['P3', 'P4', 'P5', 'P6'].includes(level) &&
+          /[a-zA-Z][.!?]\s+[A-Z][^.!?]*___/.test(item.q)) {
+        item.difficulty = 3;
+      }
+      items.push(item);
     }
-    items.push(item);
   }
 
   return items;

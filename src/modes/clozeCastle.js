@@ -129,6 +129,7 @@ function _renderBrowser() {
   for (const lv of levels) {
     const cats  = Object.keys(passages[lv]);
     const total = cats.reduce((sum, cat) => sum + passages[lv][cat].length, 0);
+    const questionTotal = cats.reduce((sum, cat) => sum + passages[lv][cat].reduce((n, passage) => n + (passage.answers?.length || 0), 0), 0);
     const done  = getUniqueClozeDone({ level: lv, ccqCompletedByPassage: store.get('ccqCompletedByPassage') || {}, ccqCompleted: completed });
     const isDone = done >= total;
     const icon   = CLOZE_LEVEL_ICONS[lv];
@@ -138,7 +139,7 @@ function _renderBrowser() {
               data-level="${lv}" aria-label="${CLOZE_LEVEL_LABELS[lv]}">
         <span class="cloze-level-icon">${isDone ? '⭐' : icon}</span>
         <span class="cloze-level-name">${CLOZE_LEVEL_LABELS[lv]}</span>
-        <span class="cloze-level-count">${cats.length} topics · ${Math.min(done, total)} / ${total} done</span>
+        <span class="cloze-level-count">${cats.length} topics · ${questionTotal} questions · ${Math.min(done, total)} / ${total} passages done</span>
       </button>`;
   }
 
@@ -176,6 +177,7 @@ function _renderCategoryPicker(level) {
   for (const catKey of cats) {
     const cat   = GRAMMAR_CATEGORIES[catKey] || { label: catKey, icon: '📝' };
     const total = passages[level][catKey].length;
+    const questionTotal = passages[level][catKey].reduce((sum, passage) => sum + (passage.answers?.length || 0), 0);
     const done  = getUniqueClozeDone({ level, category: catKey, ccqCompletedByPassage: store.get('ccqCompletedByPassage') || {}, ccqCatCompleted: completed });
     const isDone = done >= total;
     const isRecommended = catKey === recommendedCat;
@@ -185,7 +187,7 @@ function _renderCategoryPicker(level) {
               data-cat="${catKey}" aria-label="${cat.label}${isRecommended ? ' (recommended)' : ''}">
         <span class="cloze-cat-icon">${isDone ? '⭐' : cat.icon}</span>
         <span class="cloze-cat-label">${cat.label}</span>
-        <span class="cloze-cat-count">${Math.min(done, total)} / ${total}${isRecommended ? ' · Recommended' : ''}</span>
+        <span class="cloze-cat-count">${questionTotal} questions · ${Math.min(done, total)} / ${total} passages${isRecommended ? ' · Recommended' : ''}</span>
       </button>`;
   }
 

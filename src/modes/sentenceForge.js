@@ -210,8 +210,8 @@ function _renderBrowser() {
   const categoryMap = getSentenceForgeCategoriesByLevel();
 
   const tracks = [
-    { key: 'word-order', label: 'Word Order (P1–P2)' },
-    { key: 'sentence-combining', label: 'Sentence Combining (P2–P4)' },
+    { key: 'word-order', label: 'Word Order (P1–P6)' },
+    { key: 'sentence-combining', label: 'Sentence Combining (P1–P6)' },
     { key: 'synthesis-transformation', label: 'Synthesis & Transformation (P4–P6)' },
   ];
 

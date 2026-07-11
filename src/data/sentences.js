@@ -1,3 +1,6 @@
+import { MIN_QUESTIONS_PER_SCOPE, contextualizeSentence, expansionContext } from './practiceExpansion.js';
+import { classifySentenceTrack } from '../modules/sentenceForgeTracks.js';
+
 /**
  * PhonicsQuest – Sentence Forge Quest Data
  *
@@ -32,7 +35,7 @@ export const SENTENCE_LEVEL_LABELS = {
 
 export const SENTENCE_LEVEL_ICONS = ['🌱', '🌿', '🌳', '🔥', '💎', '👑'];
 
-export const allSentences = [
+const baseSentences = [
   // ── P1: Core SVO · Noun + be + Adj/Place · Article in noun groups ─────────────
   { id: 's001', sentence: 'The canteen is on the first floor.',          level: 1, sentenceSkills: ['word_order', 'subject_action_clue'], focusLabel: 'Subject + Verb + Place', grammarNote: 'Location sentences use "is" + a place phrase. "The canteen" is the subject, "on the first floor" tells us where.' },
   { id: 's002', sentence: 'I can see the school bus from here.',         level: 1, sentenceSkills: ['word_order', 'modal_order'], focusLabel: 'Modal verb order', grammarNote: 'After a modal like "can", the next verb stays in its base form: "see" (not "sees").' },
@@ -675,3 +678,51 @@ export const allSentences = [
   { id: 's319', sentence: 'In spite of the sweltering heat, the cross-country runners completed the course without complaint.', level: 6, sentenceSkills: ['preposition_clue'], focusLabel: 'Formal preposition "In spite of"', grammarNote: '"In spite of" introduces a contrasting circumstance formally.' },
   { id: 's320', sentence: 'In accordance with the new timetable, recess will be held fifteen minutes earlier starting next term.', level: 6, sentenceSkills: ['preposition_clue'], focusLabel: 'Formal preposition "In accordance with"', grammarNote: '"In accordance with" refers to compliance with an official schedule.' },
 ];
+
+const SENTENCE_TRACKS = ['word-order', 'sentence-combining', 'synthesis-transformation'];
+
+const P4_SYNTHESIS_SEEDS = [
+  { id: 's4syn01', sentence: 'The box was too heavy for Lina to lift by herself.', level: 4, sentenceSkills: ['synthesis_transformation', 'too_to'], focusLabel: 'Too…to transformation', grammarNote: '“Too + adjective + to” shows that the degree prevents an action.' },
+  { id: 's4syn02', sentence: 'Unless Ravi leaves now, he will miss the school bus.', level: 4, sentenceSkills: ['synthesis_transformation', 'unless'], focusLabel: 'If not → unless', grammarNote: '“Unless” means “if not” and introduces the condition.' },
+  { id: 's4syn03', sentence: 'Despite the rain, the football match continued as planned.', level: 4, sentenceSkills: ['synthesis_transformation', 'concession'], focusLabel: 'Although → despite', grammarNote: '“Despite” is followed by a noun phrase and shows contrast.' },
+  { id: 's4syn04', sentence: 'The girl who won the spelling bee is my neighbour.', level: 4, sentenceSkills: ['synthesis_transformation', 'relative_clauses'], focusLabel: 'Relative clause with who', grammarNote: 'Use “who” to add information about a person.' },
+  { id: 's4syn05', sentence: 'The recycled sculpture was created by our art club.', level: 4, sentenceSkills: ['synthesis_transformation', 'passive_voice'], focusLabel: 'Active → passive voice', grammarNote: 'Passive voice uses a form of “be” plus a past participle.' },
+  { id: 's4syn06', sentence: 'Mei said that she would return the library book the next day.', level: 4, sentenceSkills: ['synthesis_transformation', 'reported_speech'], focusLabel: 'Direct → reported speech', grammarNote: 'Reported speech often changes “will” to “would” and adjusts time words.' },
+  { id: 's4syn07', sentence: 'Both the principal and the teachers supported the new reading programme.', level: 4, sentenceSkills: ['synthesis_transformation', 'both_and'], focusLabel: 'Both…and joining', grammarNote: '“Both…and” joins two equal subjects or ideas.' },
+  { id: 's4syn08', sentence: 'The soup was so hot that I could not drink it immediately.', level: 4, sentenceSkills: ['synthesis_transformation', 'so_that'], focusLabel: 'So…that result', grammarNote: '“So + adjective + that” links a strong degree to its result.' },
+];
+
+function buildSentenceVariant(source, level, track, index) {
+  const sentence = contextualizeSentence(source.sentence, index);
+  const firstWord = sentence.replace(/^[“"']?/, '').split(/\s+/)[0].replace(/[.,!?;:]$/, '');
+  return {
+    ...source,
+    id: `sx-p${level}-${track}-${String(index + 1).padStart(3, '0')}`,
+    sentence,
+    acceptableAnswers: (source.acceptableAnswers || []).map(answer => contextualizeSentence(answer, index)),
+    expectedFirstWord: firstWord,
+    firstWordHint: `Begin with the context phrase “${expansionContext(index).replace(/^on /, 'On ')}”.`,
+    grammarNote: `${source.grammarNote || 'Keep the original sentence structure.'} This version adds a fronted time-and-setting phrase followed by a comma.`,
+  };
+}
+
+function expandSentenceScopes(sentences) {
+  const expanded = [...sentences];
+  for (let level = 1; level <= 6; level += 1) {
+    for (const track of SENTENCE_TRACKS) {
+      const sources = sentences.filter(entry => entry.level === level && classifySentenceTrack(entry) === track);
+      if (!sources.length) continue;
+      const existing = expanded.filter(entry => entry.level === level && classifySentenceTrack(entry) === track);
+      let index = 0;
+      while (existing.length < MIN_QUESTIONS_PER_SCOPE) {
+        const variant = buildSentenceVariant(sources[index % sources.length], level, track, index);
+        expanded.push(variant);
+        existing.push(variant);
+        index += 1;
+      }
+    }
+  }
+  return expanded;
+}
+
+export const allSentences = expandSentenceScopes([...baseSentences, ...P4_SYNTHESIS_SEEDS]);

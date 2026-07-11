@@ -3,9 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 /**
  * Learn-tab density: the Primary English module groups collapse to a short,
  * scannable list by pathway. Younger profiles collapse everything (future
- * milestone content); primary profiles keep only the everyday Language Use +
- * Vocabulary groups open and the heavier Sentence/Writing/Comprehension/Exam
- * groups closed.
+ * milestone content); primary profiles expose the complete school-paper
+ * catalogue without requiring six extra expansion taps.
  */
 
 function stubAudioGlobals() {
@@ -50,11 +49,9 @@ describe('_applyQuestGroupDefaults — Learn-tab density', () => {
     expect(openGroups()).toEqual([]);
   });
 
-  it('opens only Language Use + Vocabulary for primary profiles', async () => {
+  it('opens every Primary English group for primary profiles', async () => {
     const { app } = await import('../src/app.js');
     app._applyQuestGroupDefaults('primary');
-    expect(openGroups().sort()).toEqual(['language', 'vocab']);
-    // The dense exam-paper list is collapsed by default.
-    expect(openGroups()).not.toContain('exam');
+    expect(openGroups().sort()).toEqual([...GROUPS].sort());
   });
 });

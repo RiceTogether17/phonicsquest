@@ -7,7 +7,7 @@
  * they got wrong, and routes them into the matching drill module.
  *
  * Public API:
- *   mountPracticeTest(container, paper, opts) → void
+ *   mountPracticeTest(container, paper, opts) → cleanup function
  *
  * Section types supported (each renders an interactive UI):
  *   sectionA / sectionB        — MCQ (radio)
@@ -264,6 +264,12 @@ function renderSituationalWritingSection(section, sectionKey) {
   const rubricTable = rubricRows
     ? `<details class="ptg-rubric"><summary>Marking rubric</summary><table class="ptg-table"><tbody>${rubricRows}</tbody></table></details>`
     : '';
+  const learningSupport = _currentMode === 'test' ? '' : `
+      <details class="ptg-model-answer">
+        <summary>Show model answer</summary>
+        <pre class="ptg-sw-model">${escapeHtml(section.modelAnswer || '')}</pre>
+      </details>
+      ${rubricTable}`;
   return `
     <div class="ptg-situational-writing">
       <div class="ptg-sw-brief">
@@ -280,11 +286,7 @@ function renderSituationalWritingSection(section, sectionKey) {
                 data-skill="situationalWriting"
                 data-practise="writing-quest"
                 placeholder="Write your ${escapeHtml(section.format || 'response')} here…"></textarea>
-      <details class="ptg-model-answer">
-        <summary>Show model answer</summary>
-        <pre class="ptg-sw-model">${escapeHtml(section.modelAnswer || '')}</pre>
-      </details>
-      ${rubricTable}
+      ${learningSupport}
       <div class="ptg-feedback" data-feedback-for="${sectionKey}/0" hidden></div>
     </div>`;
 }
@@ -406,9 +408,11 @@ function renderComprehensionSection(section, sectionKey) {
 
     // type: 'evidence' — requires a direct quote + explanation
     if (q.type === 'evidence') {
-      return `<li>${stem}
+      const scaffold = _currentMode === 'test' ? '' : `
         <p class="ptg-scaffold-hint">📌 Quote a phrase from the passage, then explain what it shows.</p>
-        <p class="ptg-scaffold-example"><em>Example structure:</em> "…" — This shows that…</p>
+        <p class="ptg-scaffold-example"><em>Example structure:</em> "…" — This shows that…</p>`;
+      return `<li>${stem}
+        ${scaffold}
         <textarea class="ptg-input ptg-input--area" rows="3" data-q-key="${qKey}"
           ${_shortAnswerAttrs(q)}
           data-q-type="short" data-marks="${q.marks}"
@@ -418,9 +422,11 @@ function renderComprehensionSection(section, sectionKey) {
 
     // type: 'language-use' — effect of language / figurative expression
     if (q.type === 'language-use') {
-      return `<li>${stem}
+      const scaffold = _currentMode === 'test' ? '' : `
         <p class="ptg-scaffold-hint">💬 State what the word / phrase means or suggests, then explain the effect on the reader.</p>
-        <p class="ptg-scaffold-example"><em>Example structure:</em> The phrase "…" suggests… / The effect on the reader is…</p>
+        <p class="ptg-scaffold-example"><em>Example structure:</em> The phrase "…" suggests… / The effect on the reader is…</p>`;
+      return `<li>${stem}
+        ${scaffold}
         <textarea class="ptg-input ptg-input--area" rows="3" data-q-key="${qKey}"
           ${_shortAnswerAttrs(q)}
           data-q-type="short" data-marks="${q.marks}"
@@ -834,6 +840,7 @@ function renderPaperFrame(paper) {
 export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, mode = 'practice' } = {}) {
   if (!container || !paper) return;
   _currentMode = mode;
+  const isTestMode = mode === 'test';
   const sectionKeys = SECTION_KEYS.filter(k => paper[k]);
   if (!sectionKeys.length) {
     container.innerHTML = '<p>No sections in this paper.</p>';
@@ -850,6 +857,8 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
   const btnNext = container.querySelector('[data-action="next"]');
   const btnFinish = container.querySelector('[data-action="finish"]');
   const btnExit = container.querySelector('[data-action="exit"]');
+  container.querySelector('.ptg')?.setAttribute('data-paper-mode', mode);
+  btnCheck.textContent = isTestMode ? 'Submit section' : 'Check answers';
 
   let idx = 0;
   const sectionResults = []; // collected on Check
@@ -921,7 +930,7 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
     const key = sectionKeys[idx];
     const section = paper[key];
     const result = gradeSection(stageEl, key, section);
-    showFeedback(result.perKey);
+    if (!isTestMode) showFeedback(result.perKey);
     sectionResults[idx] = { ...result, title: section.title, key };
 
     // Disable further input editing in this section
@@ -953,7 +962,7 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
         }
         el.disabled = true;
       });
-      showFeedback(prior.perKey);
+      if (!isTestMode) showFeedback(prior.perKey);
       btnCheck.hidden = true;
       btnNext.hidden = idx === sectionKeys.length - 1;
       btnFinish.hidden = idx !== sectionKeys.length - 1;
@@ -979,27 +988,49 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
       idx = 0;
       sectionResults.length = 0;
       renderCurrentSection();
+      startTimer();
     }));
-    stageEl.querySelectorAll('[data-action="close"]').forEach(b => b.addEventListener('click', () => onClose?.()));
+    stageEl.querySelectorAll('[data-action="close"]').forEach(b => b.addEventListener('click', closePaper));
+  }
+
+  function closePaper() {
+    teardown();
+    onClose?.();
+  }
+
+  function teardown() {
+    clearInterval(timerInterval);
+    container.removeEventListener('click', onRelatedClick);
+  }
+
+  function onRelatedClick(e) {
+    const target = e.target;
+    if (!(target instanceof HTMLElement) || !target.matches('[data-related]')) return;
+    const related = target.getAttribute('data-related');
+    if (!related || !onPractiseSkill) return;
+    clearInterval(timerInterval);
+    container.removeEventListener('click', onRelatedClick);
+    onPractiseSkill(related);
   }
 
   // Event delegation for practise-link buttons (work in both feedback + summary)
-  container.addEventListener('click', (e) => {
-    const target = e.target;
-    if (target instanceof HTMLElement && target.matches('[data-related]')) {
-      const t = target.getAttribute('data-related');
-      if (t && onPractiseSkill) onPractiseSkill(t);
-    }
-  });
+  container.addEventListener('click', onRelatedClick);
 
   btnPrev.addEventListener('click', onPrev);
   btnCheck.addEventListener('click', onCheck);
   btnNext.addEventListener('click', onNext);
   btnFinish.addEventListener('click', onFinish);
-  btnExit.addEventListener('click', () => onClose?.());
+  btnExit.addEventListener('click', closePaper);
 
-  // Countdown timer — only active in Test Mode
-  if (mode === 'test' && timerEl) {
+  function startTimer() {
+    clearInterval(timerInterval);
+    if (!timerEl) return;
+    timerEl.hidden = true;
+    timerEl.className = 'ptg-timer';
+    timerEl.removeAttribute('data-warn-announced');
+    timerEl.setAttribute('aria-live', 'off');
+    if (!isTestMode) return;
+
     const durationMs = parseDurationMs(paper.duration || '');
     if (durationMs > 0) {
       const startedAt = Date.now();
@@ -1041,6 +1072,8 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
   }
 
   renderCurrentSection();
+  startTimer();
+  return teardown;
 }
 
 /**

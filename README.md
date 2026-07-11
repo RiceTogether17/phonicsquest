@@ -6,7 +6,8 @@ PhonicsQuest started as a phonics blender for early readers and now spans the fu
 
 - **🌱 Early Reading Quest** — phonics, blending, sight words, letter sounds, decodable Giri stories. K1–K2 / early P1.
 - **🏫 Primary English Quest** — Grammar MCQ, Vocabulary MCQ, Cloze Castle (Grammar Cloze), Word Vault (Vocabulary Cloze), Comprehension Cloze, Open-ended Comprehension, Visual Text Comprehension, Sentence Forge, Synthesis & Transformation, Editing Quest, Writing Quest and Situational Writing. P1–P6.
-- **📋 Exam Practice Hub** — full-paper practice with **Practice Mode**, **Test Mode** and **Review Mistakes Mode**, section timing, marks, weak-skill tags and follow-up module recommendations.
+- **📚 Deep practice banks** — every selectable grade/category or grade/track in Grammar MCQ, Vocabulary MCQ, Cloze Castle, Word Vault and Sentence Forge contains more than 100 questions, with varied formats and answer-integrity checks.
+- **📋 Exam Practice Hub** — complete interactive P1–P6 term papers with **Practice Mode** and timed **Test Mode**, automatic scoring, weak-skill feedback and follow-up module recommendations.
 - **👨‍👩‍👧 Parent Dashboard** — a parent-friendly Report Card (Strengths · Needs Practice · Recent Mistakes · 10-min recommendation · Teacher's note), a one-click "Copy Parent Update" WhatsApp message, plus full CSV/JSON exports for advanced users.
 
 [Live demo →](https://jastonchamp.github.io/phonicsquest/)
@@ -45,9 +46,9 @@ Grouped by school-paper component so parents and teachers can match each module 
 | Writing & Editing | ✏️ Editing Quest | Paper 2 · Editing for Spelling & Grammar |
 | Writing & Editing | 📝 Writing Quest | Paper 1 · Continuous Writing |
 | Writing & Editing | ✉️ Situational Writing | Paper 1 · Situational Writing (P5–P6) |
-| Comprehension | 🖼️ Visual Text Comprehension | Paper 2 · Visual Text (P3–P6) |
-| Comprehension | 📚 Open-ended Comprehension | Paper 2 · Comprehension Open-ended (P3–P6) |
-| Exam Practice Hub | 📋 Full Paper Practice | Practice / Test / Review Mistakes — see below |
+| Comprehension | 🖼️ Visual Text Comprehension | Paper 2 · Visual Text (P1–P6) |
+| Comprehension | 📚 Open-ended Comprehension | Paper 2 · Comprehension Open-ended (P1–P6) |
+| Exam Practice Hub | 📋 Full Paper Practice | Interactive Practice / timed Test Mode — see below |
 
 The home screen is organised into four tabs so a child always lands on one clear next action:
 
@@ -60,14 +61,13 @@ The last-used tab is remembered per profile within the day; every new day starts
 
 ### 📋 Exam Practice Hub
 
-The Exam Practice Hub turns Paper Mode from a playlist into an exam-revision experience:
+The Exam Practice Hub launches the same complete, scored papers as the grade-specific P1–P6 Practice Test tiles:
 
 - **Practice Mode** — hints + per-section feedback, no timer
-- **Test Mode** — timed, no hints, mirrors the real paper
-- **Review Mistakes Mode** — replay only the questions you got wrong last time
-- Each section shows section timing, marks, question count and completion status (○ / ✓)
-- After each section: score, weak-skill tags, wrong answers and a recommended follow-up module
-- After the full paper: a summary screen with totals, a green/amber/red flag per section, and one-click "Open Grammar MCQ / Cloze Castle / Word Vault" follow-up buttons targeting the weakest sections
+- **Test Mode** — timed, with teaching scaffolds, model answers and inline feedback withheld until the paper is complete
+- Choose from four term papers at P1, P2 and P4–P6, plus three available P3 papers
+- Every section is answered in place and scored automatically; the stepper shows progress through the paper
+- The full-paper summary reports section totals, ranks weak skills and links directly to the matching Grammar, Vocabulary, Cloze, Sentence or Editing practice
 
 ### 👨‍👩‍👧 Parent Dashboard
 
