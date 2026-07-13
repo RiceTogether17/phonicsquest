@@ -13435,3 +13435,23 @@ body.print-mode > *:not(.print-report-wrapper) > * { visibility: hidden; }
   margin-top: 20px;
   background: var(--border, #e2e8f0);
 }
+
+/* Story band soft-gating — not-yet-recommended bands stay tappable */
+.story-tab--not-ready { opacity: 0.6; }
+.story-tab--not-ready .story-tab-lock { font-size: 0.8em; margin-left: 2px; }
+.stories-readiness-note {
+  margin: 6px 2px 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--surface-2, #f8fafc);
+  border: 1px dashed var(--border, #e2e8f0);
+  font-size: 0.85rem;
+  color: var(--text-2, #475569);
+}
+
+/* Phase-interleaved tricky words on curriculum-map cards */
+.cm-phase-sight {
+  font-size: 0.75rem;
+  color: var(--text-2, #64748b);
+  margin: 2px 0 6px;
+}

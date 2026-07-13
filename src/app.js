@@ -2466,10 +2466,14 @@ class App {
       showPrimaryQuickCheck({
         container,
         profile,
-        onComplete: (_payload) => {
+        onComplete: (payload) => {
           // Whether the parent skipped or completed, primary still gets the
           // maxed default placement — Quick Check results are additive to
-          // questMastery and never gate access.
+          // questMastery and never gate access. A completed check may also
+          // carry a gentle practice-level recommendation; persist it so the
+          // level pickers can default to it.
+          const rec = payload?.results?.recommendation;
+          if (rec?.level) store.set('recommendedPracticeLevel', rec.level);
           seedDefaultsAndContinue();
         },
       });

@@ -74,6 +74,30 @@ export function buildPrimaryQuickCheck(grade) {
  *   strongSkills: Array<{ quest: string, skill: string }>,
  * }}
  */
+/** Ordered primary grades for level-recommendation stepping. */
+const GRADES = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
+
+/**
+ * Recommend a practice level from the declared grade and Quick Check
+ * accuracy. Deliberately gentle: never moves more than one grade, never
+ * below P1 or above P6, and stays at the declared grade in the broad
+ * middle band. A struggling child practises one grade down to rebuild
+ * confidence; a child who aces the check may stretch one grade up.
+ *
+ * @param {string} declaredGrade — 'P1'..'P6'
+ * @param {number} accuracy — 0..1 from the Quick Check
+ * @param {number} total — number of questions answered
+ * @returns {{ level: string, direction: 'down'|'same'|'up' }}
+ */
+export function recommendPrimaryLevel(declaredGrade, accuracy, total = 0) {
+  const idx = GRADES.indexOf(String(declaredGrade || '').toUpperCase());
+  const at = idx === -1 ? 2 : idx; // default P3
+  if (total < 4) return { level: GRADES[at], direction: 'same' }; // too little signal
+  if (accuracy <= 0.35 && at > 0) return { level: GRADES[at - 1], direction: 'down' };
+  if (accuracy >= 0.9 && at < GRADES.length - 1) return { level: GRADES[at + 1], direction: 'up' };
+  return { level: GRADES[at], direction: 'same' };
+}
+
 export function applyPrimaryQuickCheckResults(answers) {
   if (!Array.isArray(answers) || answers.length === 0) {
     return { total: 0, correct: 0, accuracy: 0, weakSkills: [], strongSkills: [] };
@@ -256,6 +280,14 @@ export function showPrimaryQuickCheck({ container, profile, onComplete }) {
   function _renderSummary() {
     const results = applyPrimaryQuickCheckResults(answers);
     const pct = Math.round(results.accuracy * 100);
+    const recommendation = recommendPrimaryLevel(grade, results.accuracy, results.total);
+    results.recommendation = recommendation;
+    const levelNote =
+      recommendation.direction === 'down'
+        ? `Giri suggests warming up with <strong>${escText(recommendation.level)}</strong> practice first — quick wins build speed for ${escText(grade)}.`
+        : recommendation.direction === 'up'
+          ? `Wow — Giri thinks you are ready to stretch into <strong>${escText(recommendation.level)}</strong> practice!`
+          : '';
     container.innerHTML = `
       <div class="pqc-card pqc-card--summary">
         <p class="pqc-eyebrow">🎉 All done — thanks for the quick check!</p>
@@ -264,6 +296,7 @@ export function showPrimaryQuickCheck({ container, profile, onComplete }) {
           You answered ${results.correct} of ${results.total} (${pct}%) — but the score doesn't matter.
           What matters is Giri now knows which skills to bring up first.
         </p>
+        ${levelNote ? `<p class="pqc-body pqc-body--level">${levelNote}</p>` : ''}
         <div class="pqc-actions">
           <button class="btn btn--primary btn--lg" data-action="continue">Start exploring</button>
         </div>

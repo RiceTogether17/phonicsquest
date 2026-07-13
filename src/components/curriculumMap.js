@@ -24,6 +24,7 @@ const PHASE_META = PHASES.map(p => ({
   title: p.title,
   icon:  p.icon,
   desc:  p.description,
+  sightWords: p.sightWords || [],
 }));
 
 const PRIMARY_DOMAINS = [
@@ -142,6 +143,7 @@ export function buildPhaseCardsHtml(avatar = '🦁') {
           <span class="cm-phase-badge">${status === 'complete' ? '✅' : status === 'in-progress' ? `${pct}%` : '🔒'}</span>
         </div>
         <p class="cm-phase-desc">${pm.desc}</p>
+        ${pm.sightWords.length ? `<p class="cm-phase-sight">🃏 Tricky words: ${pm.sightWords.join(', ')}</p>` : ''}
         ${status !== 'locked' ? `
           <div class="cm-phase-bar-track" aria-label="${pct}% complete">
             <div class="cm-phase-bar-fill" style="width:${pct}%"></div>

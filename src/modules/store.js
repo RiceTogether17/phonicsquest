@@ -155,6 +155,7 @@ const DEFAULT_STATE = {
   placementComplete: false,
   // Rich placement profile used for reading-stage routing.
   placementProfile: null,
+  recommendedPracticeLevel: null, // 'P1'..'P6' from the Primary Quick Check
 
   // Total sessions ever played (incremented on each session start).
   totalSessions: 0,
