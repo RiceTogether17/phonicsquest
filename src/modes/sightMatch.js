@@ -17,6 +17,7 @@
  */
 
 import { SIGHT_QUESTS, TIER_LABELS, getQuestsByTier } from '../data/sightwords.js';
+import { getStoryForQuest } from '../modules/sightStoryWeave.js';
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 
@@ -106,6 +107,7 @@ function _renderBrowser() {
           : { cls: 'sm-quest-card--new',     label: '✨ Not started' };
 
       const preview = quest.words.slice(0, 3).join(' · ');
+      const linkedStory = getStoryForQuest(quest);
       const ariaQuest =
         `${quest.name} – words: ${quest.words.join(', ')} – ${status.label.replace(/^\W+\s*/, '')}`;
 
@@ -117,6 +119,7 @@ function _renderBrowser() {
             <span class="sm-quest-badge" aria-label="${status.label}">${status.label}</span>
           </div>
           <div class="sm-quest-preview" aria-hidden="true">${preview}…</div>
+          ${linkedStory ? `<div class="sm-quest-story-link">📚 Spot these in “${linkedStory.title}” (Band ${linkedStory.band})</div>` : ''}
           <div class="sm-quest-actions">
             <button class="btn btn--ghost btn--sm sm-quest-action sm-quest-action--learn"
                     data-quest="${quest.id}" data-action="learn"

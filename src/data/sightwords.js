@@ -14,17 +14,23 @@
 /** All quests in order */
 export const SIGHT_QUESTS = [
 
-  /* ── Easy ─────────────────────────────────────────────────────────── */
-  { id: 'e1',  tier: 'easy', name: 'Quest 1',  icon: '⭐', words: ['a',     'about',  'above',  'again',  'all'] },
-  { id: 'e2',  tier: 'easy', name: 'Quest 2',  icon: '⭐', words: ['also',  'are',    'be',     'came',   'day'] },
-  { id: 'e3',  tier: 'easy', name: 'Quest 3',  icon: '⭐', words: ['do',    'does',   'for',    'go',     'he'] },
-  { id: 'e4',  tier: 'easy', name: 'Quest 4',  icon: '⭐', words: ['her',   'his',    'how',    'I',      'in'] },
-  { id: 'e5',  tier: 'easy', name: 'Quest 5',  icon: '⭐', words: ['into',  'is',     'it',     'know',   'many'] },
-  { id: 'e6',  tier: 'easy', name: 'Quest 6',  icon: '⭐', words: ['name',  'not',    'now',    'of',     'on'] },
-  { id: 'e7',  tier: 'easy', name: 'Quest 7',  icon: '⭐', words: ['one',   'over',   'said',   'she',    'so'] },
-  { id: 'e8',  tier: 'easy', name: 'Quest 8',  icon: '⭐', words: ['some',  'story',  'the',    'their',  'then'] },
-  { id: 'e9',  tier: 'easy', name: 'Quest 9',  icon: '⭐', words: ['there', 'this',   'to',     'too',    'want'] },
-  { id: 'e10', tier: 'easy', name: 'Quest 10', icon: '⭐', words: ['was',   'were',   'what',   'when',   'white'] },
+  /* ── Easy — story-aligned sequence ────────────────────────────────────
+     The 50 starter words are ordered by where the child first meets them
+     in the Giri story sequence (Band A minis → Band D bridge readers),
+     so each quest pre-teaches the sight words of the stories the child
+     is about to read. `storyBand` marks the band a quest unlocks;
+     sightStoryWeave.js links the two surfaces. Words that never appear
+     in a story ride along in the final quest. */
+  { id: 'e1',  tier: 'easy', name: 'Quest 1',  icon: '⭐', storyBand: 'A', words: ['a',     'it',    'on',    'the',   'not'] },
+  { id: 'e2',  tier: 'easy', name: 'Quest 2',  icon: '⭐', storyBand: 'A', words: ['then',  'of',    'in',    'his',   'to'] },
+  { id: 'e3',  tier: 'easy', name: 'Quest 3',  icon: '⭐', storyBand: 'B', words: ['he',    'is',    'so',    'for',   'said'] },
+  { id: 'e4',  tier: 'easy', name: 'Quest 4',  icon: '⭐', storyBand: 'B', words: ['day',   'go',    'was',   'too',   'I'] },
+  { id: 'e5',  tier: 'easy', name: 'Quest 5',  icon: '⭐', storyBand: 'B', words: ['all',   'one',   'white', 'now',   'into'] },
+  { id: 'e6',  tier: 'easy', name: 'Quest 6',  icon: '⭐', storyBand: 'B', words: ['again', 'came',  'be',    'do',    'what'] },
+  { id: 'e7',  tier: 'easy', name: 'Quest 7',  icon: '⭐', storyBand: 'C', words: ['know',  'when',  'over',  'above', 'there'] },
+  { id: 'e8',  tier: 'easy', name: 'Quest 8',  icon: '⭐', storyBand: 'C', words: ['were',  'she',   'are',   'this',  'her'] },
+  { id: 'e9',  tier: 'easy', name: 'Quest 9',  icon: '⭐', storyBand: 'D', words: ['about', 'name',  'their', 'story', 'many'] },
+  { id: 'e10', tier: 'easy', name: 'Quest 10', icon: '⭐', storyBand: 'D', words: ['some',  'how',   'also',  'does',  'want'] },
 
   /* ── Medium ───────────────────────────────────────────────────────── */
   { id: 'm1',  tier: 'medium', name: 'Quest 11', icon: '🌟', words: ['no',       'me',       'saw',      'two',      'out'] },

@@ -20,6 +20,7 @@ import { lookupWord as lookupWordForDetective, addWordToReview } from '../module
 import { isReadAloudSupported, listenToLine, stopListening } from '../modules/readAloudListener.js';
 import { store } from '../modules/store.js';
 import { getBandReadiness } from '../modules/storyGating.js';
+import { getSightWordsInStory } from '../modules/sightStoryWeave.js';
 import { modalManager } from '../modules/modalManager.js';
 import { unlockFriend, getRosterSummary } from '../modules/storyFriends.js';
 import {
@@ -433,6 +434,14 @@ function _renderReader(story) {
 
       <!-- Title -->
       <h2 class="story-reader-title">${story.title}</h2>
+
+      ${(() => {
+        const spot = getSightWordsInStory(story);
+        return spot.length ? `
+          <p class="story-spot-words" aria-label="Sight words to spot in this story">
+            ⭐ Words to spot: ${spot.map(w => `<span class="story-spot-word">${w}</span>`).join(' ')}
+          </p>` : '';
+      })()}
 
       <!-- Mode toggle -->
       <div class="story-mode-toggle" role="group" aria-label="Reading mode">
