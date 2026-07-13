@@ -87,6 +87,54 @@ export const REQUIRED_PHASE_FIELDS = Object.freeze([
  * locally. `label` is the short header form ("Phase 1 — CVC"); `title` is
  * the friendly card title; `description` is one parent-facing sentence.
  */
+/**
+ * Pre-phases — the two foundation steps that come BEFORE decoding print.
+ * They are first-class curriculum entries (same field schema as PHASES)
+ * but keep string phase keys ('0a'/'0b') so the numeric phonics phases
+ * 1–10, which are baked into saved progress, placement mapping and
+ * decodability, never shift.
+ *
+ *   0a  Phonemic Awareness — hearing and playing with sounds, no print
+ *   0b  Letter Sounds      — grapheme–phoneme correspondence
+ *
+ * Progress signals are derived in `src/modules/prePhaseProgress.js`.
+ */
+export const PRE_PHASES = Object.freeze([
+  {
+    phase: '0a',
+    id: 'phase-0a-phonemic-awareness',
+    title: 'Phonemic Awareness',
+    label: 'Step 0a — Phonemic Awareness',
+    icon: '👂',
+    description: 'Hearing sounds in spoken words — first, last and middle sounds, clapping syllables, blending sounds by ear. No letters yet.',
+    learningOutcome: 'Hear, count and play with the individual sounds inside spoken words: isolate first/last/middle sounds and orally blend three sounds into a word.',
+    targetSounds: ['first sound isolation', 'last sound isolation', 'middle sound isolation', 'oral blending', 'syllable clapping', 'word counting'],
+    sampleWords: ['cat (/k/ /a/ /t/)', 'sun (/s/ /u/ /n/)', 'map (/m/ /a/ /p/)', 'ti-ger (2 claps)', 'ba-na-na (3 claps)'],
+    sentenceExamples: ['What sound does "sun" start with?', 'Clap the beats in "tiger".', '/d/ /o/ /g/ — what word is that?'],
+    recommendedModes: ['first', 'last', 'middle', 'oralBlend', 'soundCount', 'syllable', 'wordCount', 'oddOneOut', 'train'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+  {
+    phase: '0b',
+    id: 'phase-0b-letter-sounds',
+    title: 'Letter Sounds',
+    label: 'Step 0b — Letter Sounds',
+    icon: '🔡',
+    description: 'Matching each letter to the sound it makes — s says /s/, a says /ă/ — so sounds can be read from print.',
+    learningOutcome: 'Say the most common sound for each single letter quickly and pick the letter that matches a spoken sound.',
+    targetSounds: ['s /s/', 'a /ă/', 't /t/', 'p /p/', 'i /ĭ/', 'n /n/', 'm /m/', 'd /d/', 'g /g/', 'o /ŏ/', 'c /k/', 'k /k/', 'e /ĕ/', 'u /ŭ/', 'r /r/', 'h /h/', 'b /b/', 'f /f/', 'l /l/'],
+    sampleWords: ['s → sun', 'a → apple', 't → top', 'p → pig', 'i → ink', 'n → net'],
+    sentenceExamples: ['Which letter says /sss/?', 'Tap the letter that starts "map".'],
+    recommendedModes: ['letterSounds', 'soundHunt', 'hear'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+]);
+
+/** Look up a pre-phase by its phase key ('0a'/'0b') or id. */
+export function getPrePhase(key) {
+  return PRE_PHASES.find(p => p.phase === key || p.id === key) || null;
+}
+
 export const PHASES = Object.freeze([
   {
     phase: 1,

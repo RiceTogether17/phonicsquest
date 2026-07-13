@@ -9,10 +9,11 @@
  *   renderCurriculumMap(container, { onClose })
  */
 
-import { CURRICULUM, PHASES } from '../data/curriculum.js';
+import { CURRICULUM, PHASES, PRE_PHASES } from '../data/curriculum.js';
 import { store } from '../modules/store.js';
 import { getActiveProfile } from '../modules/profiles.js';
 import { getDomainMastery } from '../modules/masteryEngine.js';
+import { getPrePhaseProgress } from '../modules/prePhaseProgress.js';
 
 // Phase display metadata is derived from the canonical PHASES table in
 // curriculum.js. Don't redefine it here — a parallel table previously drifted
@@ -63,12 +64,46 @@ function _getPhaseStatus(phaseNum) {
 }
 
 function _getCurrentPhase() {
-  // Current phase = highest phase with at least one in-progress stage
+  // Current phase = highest phase with at least one in-progress stage.
   for (let p = PHASE_META.length; p >= 1; p--) {
     const { status } = _getPhaseStatus(p);
     if (status === 'in-progress' || status === 'complete') return p;
   }
+  // No print work yet — the child is still in the foundation steps.
+  // Place them at the first incomplete pre-phase.
+  for (const pre of PRE_PHASES) {
+    if (getPrePhaseProgress(pre.phase).status !== 'complete') return pre.phase;
+  }
   return 1;
+}
+
+/** Foundation step cards (Step 0a/0b) shown ahead of Phase 1. */
+function _buildPrePhaseCardsHtml(currentPhase, avatar) {
+  return PRE_PHASES.map(pre => {
+    const { status, pct } = getPrePhaseProgress(pre.phase);
+    const isCurrent = pre.phase === currentPhase;
+    const statusLabel = { complete: 'Complete ✅', 'in-progress': 'In progress', locked: 'Not started yet' }[status] || '';
+    return `
+      <div class="cm-phase cm-phase--${status} ${isCurrent ? 'cm-phase--current' : ''}"
+           aria-label="${pre.title}${isCurrent ? ' – current stage' : ''}">
+        ${isCurrent ? `<div class="cm-you-are-here">${avatar} You are here!</div>` : ''}
+        <div class="cm-phase-header">
+          <span class="cm-phase-icon">${pre.icon}</span>
+          <div>
+            <span class="cm-phase-label">${pre.label.split(' — ')[0]}</span>
+            <span class="cm-phase-title">${pre.title}</span>
+          </div>
+          <span class="cm-phase-badge">${status === 'complete' ? '✅' : status === 'in-progress' ? `${pct}%` : '🔒'}</span>
+        </div>
+        <p class="cm-phase-desc">${pre.description}</p>
+        ${status !== 'locked' ? `
+          <div class="cm-phase-bar-track" aria-label="${pct}% complete">
+            <div class="cm-phase-bar-fill" style="width:${pct}%"></div>
+          </div>
+          <span class="cm-phase-meta">${statusLabel}</span>
+        ` : `<span class="cm-phase-meta cm-phase-meta--locked">${statusLabel}</span>`}
+      </div>`;
+  }).join('');
 }
 
 function _getDomainStatus(domainId) {
@@ -88,7 +123,7 @@ function _getDomainStatus(domainId) {
  */
 export function buildPhaseCardsHtml(avatar = '🦁') {
   const currentPhase = _getCurrentPhase();
-  return PHASE_META.map(pm => {
+  return _buildPrePhaseCardsHtml(currentPhase, avatar) + PHASE_META.map(pm => {
     const { status, pct, masteredCount, total } = _getPhaseStatus(pm.phase);
     const isCurrent = pm.phase === currentPhase && status !== 'complete';
     const statusLabel = { complete: 'Complete ✅', 'in-progress': 'In progress', locked: 'Not started yet' }[status] || '';

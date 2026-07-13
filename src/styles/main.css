@@ -13347,3 +13347,91 @@ body.print-mode > *:not(.print-report-wrapper) > * { visibility: hidden; }
     box-shadow: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Journey Map — the six-step learning path on the Learn tab
+   (journeyMap.js · data from journeyStages.js)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.journey-map {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 6px 14px;
+  margin: 4px 0 12px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.jm-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 64px;
+  flex: 1 0 auto;
+  text-align: center;
+}
+
+.jm-step-dot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 1.15rem;
+  background: var(--surface-2, #f1f5f9);
+  border: 2px solid var(--border, #e2e8f0);
+}
+
+.jm-step--done .jm-step-dot {
+  background: #dcfce7;
+  border-color: #22c55e;
+  color: #15803d;
+  font-weight: 800;
+}
+
+.jm-step--current .jm-step-dot {
+  background: #ede9fe;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+  animation: jm-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes jm-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15); }
+  50%      { box-shadow: 0 0 0 7px rgba(139, 92, 246, 0.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jm-step--current .jm-step-dot { animation: none; }
+}
+
+.jm-step--upcoming .jm-step-dot { opacity: 0.55; }
+
+.jm-step-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text-2, #475569);
+  max-width: 76px;
+}
+
+.jm-step--current .jm-step-label { color: #6d28d9; }
+
+.jm-step-pct {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #7c3aed;
+  background: #f5f3ff;
+  border-radius: 8px;
+  padding: 1px 6px;
+}
+
+.jm-connector {
+  flex: 0 1 22px;
+  min-width: 10px;
+  height: 2px;
+  margin-top: 20px;
+  background: var(--border, #e2e8f0);
+}

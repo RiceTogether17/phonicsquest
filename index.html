@@ -277,49 +277,19 @@
         <!-- ════ TAB PANEL: LEARN — all activities, band-gated as before ════ -->
         <div class="home-tabpanel" id="home-panel-learn" role="tabpanel" aria-labelledby="home-tab-learn" hidden>
 
-        <!-- Phonics modes (preschool / early reading activities) -->
-        <div class="home-section" id="home-core-section" aria-label="Early Reading Quest activities">
+        <!-- Phonics modes — ordered by the six-step learning journey -->
+        <div class="home-section" id="home-core-section" aria-label="Early Reading Quest — journey steps 1 to 5">
           <div class="home-section-header">
             <p class="home-section-heading">🌱 Early Reading Quest</p>
-            <p class="home-section-sub">Phonics, blending, letter sounds &amp; Giri stories · K1–K2 / early P1</p>
+            <p class="home-section-sub">Six steps from hearing sounds to school English · K1–K2 / early P1</p>
           </div>
-          <nav class="mode-grid" aria-label="Activity modes">
 
-            <p class="mode-section-label">Blending</p>
-            <button class="mode-card mode-card--highlight" data-mode="blend">
-              <span class="mode-icon" aria-hidden="true">🎯</span>
-              <span class="mode-name">Blend It!</span>
-              <span class="mode-desc">Step by step</span>
-            </button>
-            <button class="mode-card" data-mode="classicBlend">
-              <span class="mode-icon" aria-hidden="true">🔊</span>
-              <span class="mode-name">Listen &amp; Blend</span>
-              <span class="mode-desc">Free mode</span>
-            </button>
+          <!-- Journey map — rendered by app.js from journeyStages.js -->
+          <div id="learn-journey-map" aria-label="Your six-step reading journey"></div>
 
-            <p class="mode-section-label">Phoneme Skills</p>
-            <button class="mode-card" data-mode="soundHunt">
-              <span class="mode-icon" aria-hidden="true">🔎</span>
-              <span class="mode-name">Sound Hunt</span>
-              <span class="mode-desc">Hear the sound — tap the letter!</span>
-            </button>
-            <button class="mode-card" data-mode="hear">
-              <span class="mode-icon" aria-hidden="true">👂</span>
-              <span class="mode-name">Hear &amp; Choose</span>
-              <span class="mode-desc">Listen carefully</span>
-            </button>
-            <button class="mode-card" data-mode="segment">
-              <span class="mode-icon" aria-hidden="true">✂️</span>
-              <span class="mode-name">Segment It</span>
-              <span class="mode-desc">Break it apart</span>
-            </button>
-            <button class="mode-card" data-mode="missing">
-              <span class="mode-icon" aria-hidden="true">🔍</span>
-              <span class="mode-name">Missing Sound</span>
-              <span class="mode-desc">Find the gap</span>
-            </button>
+          <nav class="mode-grid" aria-label="Activity modes by journey step">
 
-            <p class="mode-section-label">Phonemic Awareness</p>
+            <p class="mode-section-label">Step 1 · Hear the Sounds — phonemic awareness</p>
             <button class="mode-card" data-mode="first">
               <span class="mode-icon" aria-hidden="true">🚀</span>
               <span class="mode-name">First Sound</span>
@@ -356,7 +326,39 @@
               <span class="mode-desc">How many beats?</span>
             </button>
 
-            <p class="mode-section-label">Reading</p>
+            <p class="mode-section-label">Step 2 · Learn the Letters — letter sounds</p>
+            <button class="mode-card" data-mode="soundHunt">
+              <span class="mode-icon" aria-hidden="true">🔎</span>
+              <span class="mode-name">Sound Hunt</span>
+              <span class="mode-desc">Hear the sound — tap the letter!</span>
+            </button>
+            <button class="mode-card" data-mode="hear">
+              <span class="mode-icon" aria-hidden="true">👂</span>
+              <span class="mode-name">Hear &amp; Choose</span>
+              <span class="mode-desc">Listen carefully</span>
+            </button>
+
+            <p class="mode-section-label">Step 3 · Sound Out Words — blending &amp; decoding</p>
+            <button class="mode-card mode-card--highlight" data-mode="blend">
+              <span class="mode-icon" aria-hidden="true">🎯</span>
+              <span class="mode-name">Blend It!</span>
+              <span class="mode-desc">Step by step</span>
+            </button>
+            <button class="mode-card" data-mode="classicBlend">
+              <span class="mode-icon" aria-hidden="true">🔊</span>
+              <span class="mode-name">Listen &amp; Blend</span>
+              <span class="mode-desc">Free mode</span>
+            </button>
+            <button class="mode-card" data-mode="segment">
+              <span class="mode-icon" aria-hidden="true">✂️</span>
+              <span class="mode-name">Segment It</span>
+              <span class="mode-desc">Break it apart</span>
+            </button>
+            <button class="mode-card" data-mode="missing">
+              <span class="mode-icon" aria-hidden="true">🔍</span>
+              <span class="mode-name">Missing Sound</span>
+              <span class="mode-desc">Find the gap</span>
+            </button>
             <button class="mode-card" data-mode="wordSort">
               <span class="mode-icon" aria-hidden="true">🗂️</span>
               <span class="mode-name">Word Sort</span>
@@ -374,12 +376,51 @@
             </button>
 
           </nav>
+
+          <!-- Step 2 reference + Steps 4 and 5 — the journey continues -->
+          <div class="home-tools-section" aria-label="Journey steps 2, 4 and 5">
+            <button class="stories-banner stories-banner--green" id="btn-letter-sounds" aria-label="Open letter sounds introduction">
+            <span class="stories-banner-mascot">
+            <img src="/phonicsquest/images/mascot/giri-whiteboard.png" alt="" draggable="false" width="44" height="44" style="object-fit:contain"/>
+            </span>
+            <span class="stories-banner-text">
+            <span class="stories-banner-title">🔤 Letter Sounds</span>
+            <span class="stories-banner-sub">Tap any sound to hear it</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+            </button>
+
+            <p class="mode-section-label">Step 4 · Know Words on Sight — sight words</p>
+            <button class="stories-banner stories-banner--blue" id="btn-sight-words" aria-label="Open sight word matching game">
+            <span class="stories-banner-mascot">
+            <span style="font-size:2rem;line-height:1" aria-hidden="true">🃏</span>
+            </span>
+            <span class="stories-banner-text">
+            <span class="stories-banner-title">🔡 Sight Words</span>
+            <span class="stories-banner-sub">35 quests · flip &amp; match</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+            </button>
+
+            <p class="mode-section-label">Step 5 · Read Stories — decodable stories</p>
+            <button class="stories-banner" id="btn-stories" aria-label="Open Giri story library">
+            <span class="stories-banner-mascot">
+            <img src="/phonicsquest/images/mascot/giri-hold-card.png" alt="" draggable="false" width="44" height="44" style="object-fit:contain"/>
+            </span>
+            <span class="stories-banner-text">
+            <span class="stories-banner-title">📚 Giri Stories</span>
+            <span class="stories-banner-sub">16 decodable phonics stories</span>
+            </span>
+            <span class="stories-banner-arrow">→</span>
+            </button>
+          </div>
+
         </div><!-- end home-core-section -->
 
         <!-- Quest banners (primary: exam-hub components; preschool: milestone tracker) -->
         <div class="home-section home-quests-section" id="home-quests-section" aria-label="Primary English Quest modules">
           <div class="home-section-header">
-            <p class="home-section-heading" id="quests-section-heading">🏫 Primary English Quest</p>
+            <p class="home-section-heading" id="quests-section-heading">🏫 Step 6 · Primary English Quest</p>
             <p class="home-section-sub" id="quests-section-sub">School-paper components · P1–P6</p>
           </div>
           <!-- Level context badge — shows 'Practising: P3' for primary profiles -->
@@ -690,38 +731,8 @@
               <span class="stories-banner-arrow" id="daily-banner-arrow">→</span>
             </button>
 
-            <button class="stories-banner stories-banner--blue" id="btn-sight-words" aria-label="Open sight word matching game">
-              <span class="stories-banner-mascot">
-                <span style="font-size:2rem;line-height:1" aria-hidden="true">🃏</span>
-              </span>
-              <span class="stories-banner-text">
-                <span class="stories-banner-title">🔡 Sight Words</span>
-                <span class="stories-banner-sub">35 quests · flip &amp; match</span>
-              </span>
-              <span class="stories-banner-arrow">→</span>
-            </button>
 
-            <button class="stories-banner" id="btn-stories" aria-label="Open Giri story library">
-              <span class="stories-banner-mascot">
-                <img src="/phonicsquest/images/mascot/giri-hold-card.png" alt="" draggable="false" width="44" height="44" style="object-fit:contain"/>
-              </span>
-              <span class="stories-banner-text">
-                <span class="stories-banner-title">📚 Giri Stories</span>
-                <span class="stories-banner-sub">16 decodable phonics stories</span>
-              </span>
-              <span class="stories-banner-arrow">→</span>
-            </button>
 
-            <button class="stories-banner stories-banner--green" id="btn-letter-sounds" aria-label="Open letter sounds introduction">
-              <span class="stories-banner-mascot">
-                <img src="/phonicsquest/images/mascot/giri-whiteboard.png" alt="" draggable="false" width="44" height="44" style="object-fit:contain"/>
-              </span>
-              <span class="stories-banner-text">
-                <span class="stories-banner-title">🔤 Letter Sounds</span>
-                <span class="stories-banner-sub">Tap any sound to hear it</span>
-              </span>
-              <span class="stories-banner-arrow">→</span>
-            </button>
 
           </div><!-- end home-tools-section -->
           </div><!-- end extra-practice-content -->

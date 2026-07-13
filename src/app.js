@@ -28,6 +28,7 @@ import { getMistakesDenSummary, timeAgo as mistakeTimeAgo, MISTAKES_LOOKBACK_DAY
 import { buildGiriQuestionChips, answerChipOffline, answerChipAi, askGiriFreeText } from './modules/askGiri.js';
 import { initHomeTabs, selectTab, getInitialTab } from './modules/homeTabs.js';
 import { buildJourneyBarHtml, STAGE_META } from './components/journeyBar.js';
+import { renderJourneyMap } from './components/journeyMap.js';
 import { attachAskGiriButton } from './components/askGiriButton.js';
 import { hasApiKey } from './modules/aiService.js';
 import { getPersonalBests } from './modules/personalBestWall.js';
@@ -1774,6 +1775,9 @@ class App {
    * Then adjusts section visibility for preschool vs primary layouts.
    */
   _renderGuidedJourney() {
+    // Six-step journey map on the Learn tab — same refresh lifecycle.
+    try { renderJourneyMap(document.getElementById('learn-journey-map'), { avatar: getActiveProfile?.()?.avatar || '🦁' }); } catch (_) { /* non-fatal */ }
+
     const section = document.getElementById('guided-journey-section');
     if (!section) return;
 
