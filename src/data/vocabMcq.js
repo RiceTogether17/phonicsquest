@@ -715,6 +715,14 @@ const VOCAB_BUILDERS = {
       ['The kangaroo carried its joey safely in its ___.', 'pouch', ['shell', 'skin', 'mane']],
       ['The shark sliced through the water using its powerful ___.', 'tail fin', ['front legs', 'gills', 'flippers']],
       ['The frog pushed itself off the lily pad using its strong ___.', 'hind legs', ['fins', 'claws', 'wings']],
+      ['The rabbit twitched its long ___ to listen for danger.', 'ears', ['whiskers', 'paws', 'tails']],
+      ['The crab pinched the fishing net with its strong ___.', 'pincers', ['fins', 'hooves', 'wings']],
+      ['The goat butted the fence with its hard ___.', 'horns', ['antlers', 'tusks', 'hooves']],
+      ['The walrus dug for shellfish using its two long ___.', 'tusks', ['horns', 'antlers', 'fangs']],
+      ['The horse trotted along the track on its hard ___.', 'hooves', ['paws', 'claws', 'fins']],
+      ['The cat used its ___ to feel its way through the narrow gap.', 'whiskers', ['eyelashes', 'ears', 'paws']],
+      ['The eagle grabbed the fish with its sharp ___.', 'talons', ['wings', 'fins', 'feathers']],
+      ['The camel stores fat in the ___ on its back.', 'hump', ['horn', 'shell', 'pouch']],
     ];
     const p3UpperRows = [
       ['As the egret waded silently through the shallows, it dipped its long ___ into the water and emerged with a wriggling fish.', 'beak', ['wing', 'claws', 'feathers']],
@@ -748,6 +756,14 @@ const VOCAB_BUILDERS = {
       ['A ___ of bees buzzed around the hive near our garden.', 'swarm', ['flock', 'colony', 'herd']],
       ['The children found a ___ of kittens behind the shed.', 'litter', ['pack', 'nest', 'flock']],
       ['The ranger spotted a ___ of lions resting under a tree.', 'pride', ['pack', 'herd', 'troop']],
+      ['Grandma gave me a ___ of grapes to share with my cousins.', 'bunch', ['pile', 'loaf', 'sheet']],
+      ['Mum asked me to fetch a ___ of eggs from the provision shop.', 'tray', ['bowl', 'cup', 'stack']],
+      ['We watched a ___ of ants carry crumbs across the pavement.', 'colony', ['herd', 'flock', 'school']],
+      ['The dancer wore a ___ of flowers in her hair on stage.', 'garland', ['bundle', 'row', 'stack']],
+      ['A ___ of stairs led up to the old lighthouse.', 'flight', ['row', 'line', 'ladder']],
+      ['A ___ of ships sailed into the harbour for the naval display.', 'fleet', ['herd', 'flock', 'pack']],
+      ['The choir sang while a ___ of dancers performed on stage.', 'troupe', ['crew', 'gang', 'band']],
+      ['Mum bought a ___ of bread from the bakery.', 'loaf', ['slice', 'bar', 'block']],
     ];
     const p3UpperRows = [
       ['Park rangers reported that a ___ of over two hundred elephants had crossed the river overnight during the annual migration.', 'herd', ['flock', 'school', 'pack']],
@@ -781,6 +797,14 @@ const VOCAB_BUILDERS = {
       ['Scientists conduct experiments in a ___.', 'laboratory', ['workshop', 'studio', 'office']],
       ['Patients stay overnight to recover after surgery in a ___.', 'hospital ward', ['clinic room', 'pharmacy', 'surgery']],
       ['Trees are felled and timber is processed at a ___.', 'sawmill', ['quarry', 'foundry', 'warehouse']],
+      ['We fed the goats and ponies at the ___ during our school trip.', 'farm', ['orchard', 'market', 'nursery']],
+      ['Ships load and unload their cargo at the ___.', 'harbour', ['airport', 'station', 'depot']],
+      ['We watched sharks swim above us in the glass tunnel at the ___.', 'aquarium', ['reservoir', 'museum', 'planetarium']],
+      ['Old paintings and sculptures are displayed at the ___.', 'museum', ['library', 'cinema', 'studio']],
+      ['Dad parked the car in the ___ below our block.', 'car park', ['garage', 'driveway', 'workshop']],
+      ['The gardener bought young plants from the ___.', 'nursery', ['orchard', 'meadow', 'field']],
+      ['The players changed into their jerseys in the ___ before the match.', 'changing room', ['classroom', 'store room', 'staff room']],
+      ['Fresh fish and vegetables are sold at the wet ___.', 'market', ['mall', 'shop', 'stall']],
     ];
     const p3UpperRows = [
       ['Every Saturday morning, our family stops at the neighbourhood ___ to collect freshly baked sourdough loaves and almond croissants.', 'bakery', ['kitchen', 'canteen', 'restaurant']],
@@ -814,6 +838,14 @@ const VOCAB_BUILDERS = {
       ['The puppy ___ at the ball and knocked it across the room.', 'pounced', ['leaped', 'snapped', 'dashed']],
       ['He ___ the wet shirt on the bamboo pole to dry.', 'hung', ['draped', 'placed', 'dropped']],
       ['She ___ the heavy bag over her shoulders before setting off.', 'hoisted', ['carried', 'threw', 'held']],
+      ['Tom ___ the crumpled paper into the bin from across the room.', 'tossed', ['lifted', 'carried', 'pushed']],
+      ['The baby ___ the toy tightly and would not let go.', 'clutched', ['tapped', 'patted', 'poked']],
+      ['Mum ___ the pancake high into the air with the frying pan.', 'flipped', ['rolled', 'stirred', 'spread']],
+      ['The children ___ across the icy floor in their socks.', 'slid', ['hopped', 'stamped', 'marched']],
+      ['She ___ the stamps carefully onto the envelope.', 'stuck', ['drew', 'wrote', 'clipped']],
+      ['The monkey ___ from branch to branch high above us.', 'swung', ['crawled', 'waddled', 'slithered']],
+      ['Grandpa ___ the seeds evenly over the freshly dug soil.', 'scattered', ['piled', 'buried', 'stacked']],
+      ['The goalkeeper ___ across the goal to stop the ball.', 'dived', ['stepped', 'walked', 'turned']],
     ];
     const p3UpperRows = [
       ['The golden retriever ___ its tail so vigorously when it recognises its owner\'s car in the driveway that its whole body shakes.', 'wags', ['flaps', 'waves', 'shakes']],
@@ -847,6 +879,14 @@ const VOCAB_BUILDERS = {
       ['The horse ___ and reared up when it heard the thunderclap.', 'neighed', ['brayed', 'bleated', 'grunted']],
       ['The frog ___ all night, keeping us awake by the pond.', 'croaked', ['chirped', 'howled', 'barked']],
       ['The crowd ___ in delight when the magician pulled a rabbit from his hat.', 'gasped', ['sighed', 'screamed', 'mumbled']],
+      ['The ducks ___ loudly as they waddled towards the pond.', 'quacked', ['clucked', 'crowed', 'cooed']],
+      ['The rooster ___ at dawn and woke the whole village.', 'crowed', ['cawed', 'hooted', 'quacked']],
+      ['The mice ___ behind the cupboard all through the night.', 'squeaked', ['croaked', 'growled', 'brayed']],
+      ['The pigeons ___ softly on the window ledge.', 'cooed', ['quacked', 'honked', 'crowed']],
+      ['The angry dog ___ at the postman through the gate.', 'growled', ['purred', 'cooed', 'bleated']],
+      ['The cat ___ happily as I stroked its soft fur.', 'purred', ['hissed', 'growled', 'yowled']],
+      ['The geese ___ loudly as they flew over the reservoir.', 'honked', ['cooed', 'clucked', 'purred']],
+      ['The hens ___ as they pecked at the grain in the yard.', 'clucked', ['quacked', 'honked', 'hooted']],
     ];
     const p3UpperRows = [
       ['As dawn broke over the nature reserve, dozens of bird species began ___ in the treetops, filling the air with a rich layering of sound.', 'chirping', ['humming', 'cheeping', 'screeching']],
@@ -880,6 +920,14 @@ const VOCAB_BUILDERS = {
       ['She felt ___ when she realised she had been left out of the group project.', 'hurt', ['relieved', 'grateful', 'confused']],
       ['The boy was ___ when he saw the spider crawl towards him.', 'terrified', ['thrilled', 'amused', 'calm']],
       ['She was ___ at herself for forgetting to bring her homework.', 'annoyed', ['pleased', 'proud', 'grateful']],
+      ['Ken was ___ after failing the test even though he had studied hard.', 'disappointed', ['delighted', 'relieved', 'proud']],
+      ['I was ___ to see my lost wallet returned with nothing missing.', 'relieved', ['worried', 'jealous', 'furious']],
+      ['Lila felt ___ of her sister\'s shiny new bicycle.', 'jealous', ['proud', 'fond', 'ashamed']],
+      ['The coach was ___ when the players arrived late again.', 'furious', ['cheerful', 'patient', 'calm']],
+      ['He was ___ of the dark and slept with a night light on.', 'afraid', ['fond', 'proud', 'sure']],
+      ['She felt ___ when she tripped in front of the whole class.', 'embarrassed', ['amused', 'confident', 'cheerful']],
+      ['We were ___ for Grandma\'s help with our costumes.', 'grateful', ['sorry', 'famous', 'careless']],
+      ['The team felt ___ after losing three matches in a row.', 'discouraged', ['hopeful', 'thrilled', 'confident']],
     ];
     const p3UpperRows = [
       ['When the judges announced her name as the first-prize winner, Alison was so ___ that she could barely manage her acceptance speech.', 'delighted', ['upset', 'excited', 'surprised']],
@@ -913,6 +961,14 @@ const VOCAB_BUILDERS = {
       ['The twins are as alike as two peas in a ___.', 'pod', ['bag', 'box', 'basket']],
       ['Her memory is as sharp as a ___ — she never forgets a face.', 'tack', ['knife', 'pin', 'pencil']],
       ['After swimming for an hour, the children were as hungry as ___.', 'wolves', ['birds', 'fish', 'ducks']],
+      ['My hands were as cold as ___ after holding the ice pack.', 'ice', ['fire', 'toast', 'soup']],
+      ['His face turned as red as a ___ when he ran up ten flights of stairs.', 'tomato', ['banana', 'plum', 'grape']],
+      ['Grandpa said the joke was as old as the ___.', 'hills', ['trees', 'roads', 'rocks']],
+      ['After the beach holiday, Dev was as brown as a ___.', 'berry', ['cloud', 'leaf', 'wave']],
+      ['The new pillow was as light as a ___.', 'feather', ['brick', 'stone', 'log']],
+      ['The old treasure chest was as heavy as ___.', 'lead', ['paper', 'cloth', 'straw']],
+      ['The wet floor was as slippery as an ___.', 'eel', ['owl', 'ant', 'egg']],
+      ['The night sky was as black as ___.', 'coal', ['snow', 'milk', 'chalk']],
     ];
     const p3UpperRows = [
       ['Despite receiving several critical remarks during the review, Dennis remained as proud as a ___, refusing to acknowledge any of the feedback.', 'peacock', ['fox', 'eel', 'lion']],
@@ -946,6 +1002,14 @@ const VOCAB_BUILDERS = {
       ['The wounded soldier crawled ___ towards the shelter.', 'painfully', ['comfortably', 'swiftly', 'playfully']],
       ['He practised the piano ___ every evening until he mastered the piece.', 'diligently', ['casually', 'lazily', 'reluctantly']],
       ['The baby slept ___ in her mother\'s arms throughout the journey.', 'peacefully', ['restlessly', 'noisily', 'alertly']],
+      ['The librarian spoke ___ so as not to disturb the readers.', 'softly', ['loudly', 'harshly', 'briskly']],
+      ['The gymnast landed ___ on the mat after her somersault.', 'gracefully', ['clumsily', 'heavily', 'roughly']],
+      ['He waited ___ in line even though the queue was very long.', 'patiently', ['angrily', 'restlessly', 'rudely']],
+      ['The children cheered ___ when the extra holiday was announced.', 'joyfully', ['sadly', 'quietly', 'bitterly']],
+      ['She carried the tray of glasses ___ across the crowded room.', 'carefully', ['carelessly', 'hurriedly', 'roughly']],
+      ['The detective examined the footprints ___ before drawing any conclusions.', 'closely', ['briefly', 'blindly', 'loosely']],
+      ['The knight fought ___ to defend the castle gates.', 'bravely', ['fearfully', 'weakly', 'timidly']],
+      ['He shut the gate ___ behind him so the dog could not escape.', 'firmly', ['loosely', 'lazily', 'faintly']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'mannerAdverbs', subskill: 'adverb_manner', q, choices: buildChoices(answer, ds), answer, explain: 'An adverb of manner describes HOW an action is done — match the adverb to the mood and intensity of the scene.' };
@@ -990,6 +1054,14 @@ const VOCAB_BUILDERS = {
       ['The teacher ___ all the marked test papers back to us.', 'returned', ['sent', 'delivered', 'passed']],
       ['May I ___ this book from the library for two weeks?', 'borrow', ['rent', 'lend', 'take']],
       ['She ___ her grandfather to the clinic and waited with him there.', 'brought', ['fetched', 'sent', 'delivered']],
+      ['Did you ___ the loud thunder last night?', 'hear', ['listen', 'sound', 'watch']],
+      ['We sat quietly to ___ to the principal\'s speech.', 'listen', ['hear', 'sound', 'speak']],
+      ['Grandma likes to ___ us stories about her childhood.', 'tell', ['say', 'speak', 'talk']],
+      ['"Please ___ sorry to your brother," Mum said firmly.', 'say', ['tell', 'speak', 'talk']],
+      ['I ___ television for an hour after finishing my homework.', 'watched', ['saw', 'looked', 'stared']],
+      ['Remember to ___ your homework before playing any games.', 'do', ['make', 'take', 'have']],
+      ['Did you ___ your bed before leaving for school this morning?', 'make', ['do', 'fix', 'set']],
+      ['It is chilly today, so ___ a jacket when you go out.', 'wear', ['put', 'dress', 'carry']],
     ];
     const p3UpperRows = [
       ['Before the examination began, Jun discovered she had forgotten her ruler and had to ___ one from the student sitting in the next row.', 'borrow', ['get', 'lend', 'use']],
@@ -1026,6 +1098,14 @@ const VOCAB_BUILDERS = {
       ['The cat ___ slowly towards the sleeping mouse, making no sound.', 'crept', ['galloped', 'soared', 'bounded']],
       ['The duck ___ gently across the calm lake on a quiet morning.', 'paddled', ['galloped', 'prowled', 'scurried']],
       ['The deer ___ gracefully over the low fence and into the forest.', 'leaped', ['waded', 'lumbered', 'scuttled']],
+      ['The penguin ___ clumsily across the ice towards the sea.', 'waddled', ['galloped', 'slithered', 'soared']],
+      ['The squirrel ___ up the tree the moment the dog barked.', 'darted', ['lumbered', 'waded', 'waddled']],
+      ['The butterfly ___ from flower to flower in the school garden.', 'fluttered', ['stomped', 'crawled', 'plodded']],
+      ['The elephant ___ heavily through the forest, shaking the ground.', 'plodded', ['darted', 'fluttered', 'scuttled']],
+      ['The dolphin ___ out of the water and splashed back into the waves.', 'leapt', ['crept', 'plodded', 'waddled']],
+      ['The worm ___ slowly through the damp soil after the rain.', 'burrowed', ['galloped', 'soared', 'swooped']],
+      ['The lizard ___ quickly up the wall and out of the window.', 'darted', ['plodded', 'waddled', 'lumbered']],
+      ['The swan ___ smoothly across the still surface of the lake.', 'glided', ['stomped', 'scrambled', 'scuttled']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'movementVerbs', subskill: 'animal_movement', q, choices: buildChoices(answer, ds), answer, explain: 'Each animal has its own way of moving — match the verb to how that animal travels.' };
@@ -1046,6 +1126,14 @@ const VOCAB_BUILDERS = {
       ['Please choose ___ option A and option B carefully before answering.', 'between', ['among', 'across', 'within']],
       ['The instructions are printed ___ the back of the worksheet.', 'on', ['at', 'in', 'over']],
       ['She arrived ___ the airport two hours before her flight departed.', 'at', ['in', 'to', 'on']],
+      ['My birthday falls ___ June this year.', 'in', ['on', 'at', 'by']],
+      ['The cat hid ___ the bed during the thunderstorm.', 'under', ['on', 'at', 'above']],
+      ['The ball rolled ___ the drain and disappeared.', 'into', ['onto', 'at', 'above']],
+      ['Hang your jacket ___ the hook behind the door.', 'on', ['in', 'at', 'by']],
+      ['The pupils walked ___ the corridor in a single file.', 'along', ['across', 'between', 'above']],
+      ['She divided the sweets ___ her three children.', 'among', ['between', 'along', 'across']],
+      ['The train passed ___ a long, dark tunnel.', 'through', ['across', 'over', 'along']],
+      ['The dental clinic is ___ the second floor of the building.', 'on', ['in', 'at', 'by']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'grammarPrepositions', subskill: 'preposition_in_context', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the preposition that fits the sentence context.' };
@@ -1068,6 +1156,14 @@ const VOCAB_BUILDERS = {
       ['The teacher gave each student ___ exercise book to write in.', 'an', ['a', 'the', 'some'], { an: '"an" before vowel sounds — "exercise" starts with the vowel /ɛ/.', a: '"a" before consonant sounds — but "exercise" starts with a vowel sound, so use "an".', the: '"the" would mean all students got the same specific book — each got their own new one.', some: '"some" is for uncountable or plural nouns — one book per student uses "an".' }],
       ['They decided to adopt ___ stray cat that appeared at their doorstep.', 'a', ['an', 'the', 'some'], { a: '"a" before consonant sounds — "stray" starts with the consonant /s/.', an: '"an" before vowel sounds — but "stray" starts with /s/, a consonant sound.', the: '"the" would imply the cat was already known to both parties — it has just appeared.', some: '"some" is for quantities or plurals — a single cat uses "a".' }],
       ['___ Pacific Ocean is the largest ocean on Earth.', 'The', ['A', 'An', 'Some'], OE_UPPER],
+      ['We waited for ___ hour before the gates finally opened.', 'an', ['a', 'the', 'some'], { an: '"an" before vowel sounds — the "h" in "hour" is silent, so it starts with a vowel sound.', a: '"a" goes before consonant sounds — "hour" starts with a silent h and sounds like "our".', the: '"the" is for a specific known thing; this is just any hour of waiting.', some: '"some" is for uncountable or plural quantities — "hour" here is one countable unit.' }],
+      ['My uncle works as ___ engineer at the shipyard.', 'an', ['a', 'the', 'some'], { an: '"an" before vowel sounds — "engineer" starts with the vowel sound /ɛ/.', a: '"a" is for consonant sounds — "engineer" begins with a vowel sound.', the: '"the" would mean one specific engineer already known — this just introduces his job.', some: '"some" is for plurals or uncountables — one job title takes "an".' }],
+      ['___ Nile is one of the longest rivers in the world.', 'The', ['A', 'An', 'Some'], OE_UPPER],
+      ['Would you like ___ rice with your chicken curry?', 'some', ['a', 'an', 'the'], OE_SOME],
+      ['She is ___ tallest girl in her class this year.', 'the', ['a', 'an', 'some'], OE_THE],
+      ['I need ___ umbrella; it looks like it is going to pour.', 'an', ['a', 'the', 'some'], { an: '"an" before vowel sounds — "umbrella" starts with the vowel /ʌ/.', a: '"a" is for consonant sounds — "umbrella" begins with a vowel sound.', the: '"the" points to a specific umbrella already known — this is any umbrella.', some: '"some" is for plurals or uncountables — one umbrella takes "an".' }],
+      ['Dad plays ___ game of chess with me every Sunday evening.', 'a', ['an', 'the', 'some'], { a: '"a" before consonant sounds — "game" starts with the consonant /g/.', an: '"an" is for vowel sounds — "game" starts with a consonant.', the: '"the" would mean one particular game already mentioned — this is a new game each week.', some: '"some" is for plurals or uncountables — a single game takes "a".' }],
+      ['There is ___ university near my aunt\'s house.', 'a', ['an', 'the', 'some'], { a: '"a" — "university" starts with the consonant sound /j/ (like "you"), so use "a".', an: '"an" is for vowel sounds — "university" begins with the /j/ consonant sound despite the letter u.', the: '"the" is for a specific known place — this one is being mentioned for the first time.', some: '"some" is for plurals or uncountables — one university takes "a".' }],
     ];
     const [q, answer, ds, optionExplanations] = rotate(rows, i);
     return { category: 'grammarArticles', subskill: 'article_in_context', q, choices: buildChoices(answer, ds), answer, explain: 'Use "a" before consonant sounds, "an" before vowel sounds, "the" for specific nouns, and "some" for uncountable or plural quantities.', optionExplanations };
@@ -1088,6 +1184,14 @@ const VOCAB_BUILDERS = {
       ['Neither of the answers ___ correct according to the marking scheme.', 'is', ['are', 'were', 'have been'], { is: '"is" — "neither of" always takes a singular verb in formal English.', are: '"are" — plural present; "neither of" takes a singular verb even with a plural noun after it.', were: '"were" — plural past; "neither of" is singular and the sentence is present tense.', 'have been': '"have been" — plural present perfect; "neither of" needs simple present singular "is".' }],
       ['The pair of scissors ___ missing from the art room again.', 'is', ['are', 'were', 'have been'], { is: '"is" — "a pair of" is singular; we count one pair, so use a singular verb.', are: '"are" — plural present; "a pair of" is treated as singular — use "is".', were: '"were" — plural past; "a pair of" is singular and the sentence is present tense.', 'have been': '"have been" — plural present perfect; "a pair of" needs singular present tense.' }],
       ['Everyone in the classrooms ___ asked to be quiet during the examination.', 'was', ['were', 'are', 'have been'], OE_WAS_SING],
+      ['The bouquet of roses ___ beautiful on the teacher\'s desk.', 'looks', ['look', 'were', 'have been'], { looks: '"looks" — the subject is "the bouquet" (singular), not "roses", so the verb is singular.', look: '"look" — plural present; the head noun is "bouquet", which is singular.', were: '"were" — plural past; the subject is singular and the sentence is present tense.', 'have been': '"have been" — plural present perfect; the subject "bouquet" is singular.' }],
+      ['Somebody ___ left an umbrella in the classroom.', 'has', ['have', 'were', 'are'], { has: '"has" — indefinite pronouns like "somebody" always take a singular verb.', have: '"have" — plural; "somebody" is singular even though it refers to an unknown person.', were: '"were" — plural past; "somebody" is singular and this needs present perfect.', are: '"are" — plural present; "somebody" needs the singular "has left".' }],
+      ['Bread and butter ___ my usual breakfast before school.', 'is', ['are', 'were', 'have been'], { is: '"is" — "bread and butter" names one single dish, so it takes a singular verb.', are: '"are" — plural; but "bread and butter" here is one meal, not two separate things.', were: '"were" — plural past; the subject is one dish and the sentence is present tense.', 'have been': '"have been" — plural present perfect; one dish takes the singular "is".' }],
+      ['Fifty dollars ___ a lot of money for a Primary 1 pupil.', 'is', ['are', 'were', 'have been'], { is: '"is" — amounts of money are treated as one sum, so the verb is singular.', are: '"are" — plural; but "fifty dollars" is one amount, not fifty separate items.', were: '"were" — plural past; an amount of money takes a singular present verb here.', 'have been': '"have been" — plural present perfect; one sum of money takes "is".' }],
+      ['The scissors ___ kept in the top drawer of the cabinet.', 'are', ['is', 'was', 'has been'], { are: '"are" — "scissors" is always plural on its own (without "a pair of").', is: '"is" — singular; "scissors" on its own takes a plural verb.', was: '"was" — singular past; "scissors" is plural and the sentence is present tense.', 'has been': '"has been" — singular present perfect; "scissors" needs plural "are".' }],
+      ['Each of the puppies ___ found a loving home.', 'has', ['have', 'were', 'are'], { has: '"has" — "each of" is always singular, even when a plural noun follows.', have: '"have" — plural; "each of" takes a singular verb despite "puppies" being plural.', were: '"were" — plural past; "each of" is singular and this needs present perfect.', are: '"are" — plural present; "each of" needs the singular "has found".' }],
+      ['Neither of my parents ___ able to attend the concert tonight.', 'is', ['are', 'were', 'have been'], { is: '"is" — "neither of" always takes a singular verb in formal English.', are: '"are" — plural; "neither of" is singular even though "parents" is plural.', were: '"were" — plural past; "neither of" is singular and the sentence is present tense.', 'have been': '"have been" — plural present perfect; "neither of" takes the singular "is".' }],
+      ['My friend, as well as her cousins, ___ joining us for dinner.', 'is', ['are', 'were', 'have been'], { is: '"is" — "as well as" is a parenthetical phrase; the true subject is "my friend" (singular).', are: '"are" — plural; the real subject is singular "my friend", not the phrase after "as well as".', were: '"were" — plural past; the subject is singular and the sentence is present continuous.', 'have been': '"have been" — plural present perfect; the subject "my friend" is singular.' }],
     ];
     const [q, answer, ds, optionExplanations] = rotate(rows, i);
     return { category: 'grammarSVA', subskill: 'subject_verb_agreement', q, choices: buildChoices(answer, ds), answer, explain: 'Make sure the verb agrees with the subject in number — watch for collective nouns, "each/either/neither", and interrupting phrases.', optionExplanations };
