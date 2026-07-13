@@ -8,7 +8,7 @@
 import { inferQuestionContextType } from './mcqItemMetadata.js';
 import { makeFallbackOptionExplanations } from './mcqOptionExplanations.js';
 import { GRAMMAR_TIPS } from './grammarTips.js';
-import { MIN_QUESTIONS_PER_SCOPE, contextualizeMcqQuestion } from './practiceExpansion.js';
+import { MIN_QUESTIONS_PER_SCOPE, contextualizeMcqQuestion, varyMcqNames } from './practiceExpansion.js';
 
 export const GRAMMAR_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 
@@ -3174,6 +3174,42 @@ const GRAMMAR_BUILDERS = {
         'pecked': '"Pecked" is simple past; "Look!" tells us the action is currently happening.',
         'have pecked': '"Have pecked" is present perfect for past actions with present results; "Look!" points to an ongoing action.',
       }],
+      ['My little sister ___ her spelling list at the moment, so please keep quiet.', 'is reciting', ['recites', 'recited', 'will recite'], {
+        'is reciting': '"Is reciting" is correct because "at the moment" signals an action in progress right now.',
+        'recites': '"Recites" is simple present for habits; "at the moment" points to an action happening now.',
+        'recited': '"Recited" is simple past; "at the moment" tells us the action is still going on.',
+        'will recite': '"Will recite" is future tense; "at the moment" means the action has already begun.',
+      }],
+      ['Two years ago, our family ___ to a flat near the MRT station.', 'moved', ['moves', 'is moving', 'has moved'], {
+        'moved': '"Moved" is correct because "two years ago" pins the action to a finished time in the past.',
+        'moves': '"Moves" is simple present for habits; "two years ago" places the action in the past.',
+        'is moving': '"Is moving" is present continuous; "two years ago" tells us the move is over.',
+        'has moved': '"Has moved" is present perfect, which cannot be used with a finished past time like "two years ago".',
+      }],
+      ['The pupils ___ their books away when the visitor walked in.', 'were packing', ['pack', 'packed', 'have packed'], {
+        'were packing': '"Were packing" is correct because the packing was already in progress when the visitor walked in.',
+        'pack': '"Pack" is simple present; "walked in" sets the scene in the past.',
+        'packed': '"Packed" is simple past, but it does not show the packing was ongoing when the visitor arrived.',
+        'have packed': '"Have packed" is present perfect; both events here happened in the past.',
+      }],
+      ['My uncle ___ in that bakery since it opened five years ago.', 'has worked', ['works', 'worked', 'is working'], {
+        'has worked': '"Has worked" is correct because "since it opened" links a past starting point to the present.',
+        'works': '"Works" is simple present, but "since" needs a perfect tense to show the action began in the past and continues.',
+        'worked': '"Worked" is simple past, which would mean he no longer works there — "since" shows it continues.',
+        'is working': '"Is working" describes only right now; "since it opened" covers the whole period up to now.',
+      }],
+      ['Water ___ at one hundred degrees Celsius.', 'boils', ['boiled', 'is boiling', 'will boil'], {
+        'boils': '"Boils" is correct because scientific facts always use the simple present.',
+        'boiled': '"Boiled" is simple past; a scientific fact is always true, so simple present is needed.',
+        'is boiling': '"Is boiling" describes water boiling right now, not a general fact.',
+        'will boil': '"Will boil" is future tense; facts that are always true take the simple present.',
+      }],
+      ['Hurry! The bus ___ at the interchange in five minutes.', 'is arriving', ['arrived', 'arrives every day', 'has arrived'], {
+        'is arriving': '"Is arriving" is correct because present continuous can describe a fixed arrangement in the near future.',
+        'arrived': '"Arrived" is simple past; "in five minutes" points to the near future.',
+        'arrives every day': '"Arrives every day" describes a general timetable habit, but the sentence is about this one arrival.',
+        'has arrived': '"Has arrived" means the bus is already here, but "in five minutes" says it is still on the way.',
+      }],
     ];
     const upperRows = [
       ['By the time we reached the hall, the programme ___.', 'had started', ['has started', 'was starting', 'starts'], {
@@ -4310,7 +4346,7 @@ function buildLevel(level) {
   for (const category of categories) {
     for (let localOffset = 0; localOffset < MIN_QUESTIONS_PER_SCOPE; localOffset += 1) {
       const localIndex = sessionSeed + localOffset;
-      const spec = GRAMMAR_BUILDERS[category](level, localIndex);
+      const spec = varyMcqNames(GRAMMAR_BUILDERS[category](level, localIndex), localOffset);
       const variant = contextualizeMcqQuestion(spec.q, localOffset, level);
       const item = {
         id: `g-${level.toLowerCase()}-${category}-${String(localOffset + 1).padStart(3, '0')}`,

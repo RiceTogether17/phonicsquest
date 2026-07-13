@@ -6,7 +6,7 @@
  */
 
 import { makeFallbackOptionExplanations } from './mcqOptionExplanations.js';
-import { MIN_QUESTIONS_PER_SCOPE, contextualizeMcqQuestion } from './practiceExpansion.js';
+import { MIN_QUESTIONS_PER_SCOPE, contextualizeMcqQuestion, varyMcqNames } from './practiceExpansion.js';
 import { VOCAB_CATEGORIES } from './vocabCategories.js';
 
 export const VOCAB_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
@@ -1107,7 +1107,7 @@ function buildLevel(level) {
   for (const baseCat of cats) {
     for (let localOffset = 0; localOffset < MIN_QUESTIONS_PER_SCOPE; localOffset += 1) {
       const localIndex = sessionSeed + localOffset;
-      const spec = VOCAB_BUILDERS[baseCat](level, localIndex);
+      const spec = varyMcqNames(VOCAB_BUILDERS[baseCat](level, localIndex), localOffset);
       const variant = contextualizeMcqQuestion(spec.q, localOffset, level);
       const item = {
         id: `v-${level.toLowerCase()}-${baseCat}-${String(localOffset + 1).padStart(3, '0')}`,

@@ -58,6 +58,68 @@ export function expansionContext(index) {
   return `on ${day} during ${setting}`;
 }
 
+const GIRL_NAMES = ['Mei', 'Siti', 'Priya', 'Jia', 'Zara', 'Aisha', 'Nurul', 'Devi', 'Hana', 'Lena', 'Ying', 'Tara', 'Sarah'];
+const BOY_NAMES = ['Ravi', 'Ben', 'Ahmad', 'Ali', 'Farid', 'Arjun', 'Omar', 'Ethan', 'Daniel', 'Tom', 'Kai', 'Wei', 'Sam'];
+const ALL_SWAP_NAMES = [...GIRL_NAMES, ...BOY_NAMES];
+// Kai, Wei and Sam read as either gender, so they only take part in swaps
+// when the item has no gendered pronouns that could contradict the change.
+const GENDER_AMBIGUOUS = new Set(['Kai', 'Wei', 'Sam']);
+const GENDERED_WORDS = /\b(he|she|his|her|him|hers|himself|herself|boy|girl|brother|sister)\b/i;
+
+function collectSpecText(spec) {
+  return [
+    spec.q, spec.answer, spec.explain, spec.reasoning,
+    ...(spec.choices || []),
+    ...Object.values(spec.optionExplanations || {}),
+  ].filter(Boolean).join(' ');
+}
+
+function swapInText(text, mapping) {
+  if (!text) return text;
+  const map = new Map(mapping);
+  const re = new RegExp(`\\b(${mapping.map(([from]) => from).join('|')})\\b`, 'g');
+  return String(text).replace(re, name => map.get(name));
+}
+
+/**
+ * Vary the pupil names inside a repeated seed question so each repeat reads
+ * as fresh content, not the same sentence again. Swaps are gender-consistent
+ * (a name referred to as “she” is only replaced by another girl’s name) and
+ * are skipped entirely when a name appears in the answer choices, where a
+ * swap could break the question.
+ */
+export function varyMcqNames(spec, index) {
+  const found = ALL_SWAP_NAMES.filter(name => new RegExp(`\\b${name}\\b`).test(spec.q));
+  if (!found.length) return spec;
+  const choiceText = [spec.answer, ...(spec.choices || [])].join(' ');
+  if (ALL_SWAP_NAMES.some(name => new RegExp(`\\b${name}\\b`).test(choiceText))) return spec;
+
+  const gendered = GENDERED_WORDS.test(collectSpecText(spec));
+  const mapping = [];
+  for (const name of found) {
+    if (gendered && GENDER_AMBIGUOUS.has(name)) continue;
+    const pool = gendered
+      ? (GIRL_NAMES.includes(name) ? GIRL_NAMES : BOY_NAMES).filter(n => !GENDER_AMBIGUOUS.has(n))
+      : ALL_SWAP_NAMES;
+    const at = pool.indexOf(name);
+    const replacement = pool[(at + index) % pool.length];
+    if (replacement !== name) mapping.push([name, replacement]);
+  }
+  if (!mapping.length) return spec;
+
+  const optionExplanations = spec.optionExplanations
+    ? Object.fromEntries(Object.entries(spec.optionExplanations).map(([k, v]) => [k, swapInText(v, mapping)]))
+    : spec.optionExplanations;
+  return {
+    ...spec,
+    q: swapInText(spec.q, mapping),
+    explain: swapInText(spec.explain, mapping),
+    reasoning: swapInText(spec.reasoning, mapping),
+    clueWords: spec.clueWords ? spec.clueWords.map(word => swapInText(word, mapping)) : spec.clueWords,
+    optionExplanations,
+  };
+}
+
 export function contextualizeMcqQuestion(question, index) {
   const form = MCQ_FORMS[index % MCQ_FORMS.length];
   const name = NAMES[index % NAMES.length];
