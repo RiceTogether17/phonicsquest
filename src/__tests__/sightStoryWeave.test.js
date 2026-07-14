@@ -87,3 +87,25 @@ describe('weave lookups', () => {
     expect(weave.getSightWordsInStory('nope')).toEqual([]);
   });
 });
+
+describe('quest-word story coverage floors', () => {
+  // Pinned from the current corpus (easy 50/50, medium 220/374, hard 1/50).
+  // New stories may only raise these — never let coverage silently regress.
+  // Hard-tier words are P4-P6 spelling vocabulary and are NOT expected in
+  // decodable stories; their floor stays nominal.
+  it('story corpus keeps covering the quest words it covers today', () => {
+    const storyTokens = new Set();
+    for (const story of STORIES) {
+      for (const t of extractCountableTokens(story)) storyTokens.add(t);
+    }
+    const covered = { easy: 0, medium: 0, hard: 0 };
+    for (const quest of SIGHT_QUESTS) {
+      for (const w of quest.words) {
+        if (storyTokens.has(w.toLowerCase())) covered[quest.tier] += 1;
+      }
+    }
+    expect(covered.easy).toBeGreaterThanOrEqual(50);
+    expect(covered.medium).toBeGreaterThanOrEqual(220);
+    expect(covered.hard).toBeGreaterThanOrEqual(1);
+  });
+});
