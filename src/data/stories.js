@@ -978,6 +978,63 @@ export const STORIES = [
     ],
     talkAboutIt: ['What did Giri do when the song went wrong?'],
   },
+
+  // ── Sight-word feature readers (dialogue minis with quest-word focus) ──
+
+  {
+    id: 'core-b-sw-01',
+    band: 'B', level: 2, phase: 'long-o',
+    title: 'No. No. Also No.',
+    emoji: '\ud83e\udd8e',
+    mascotState: 'encourage',
+    illustration: 'giri_level02_story12_cosy-home.jpg',
+    targetGraphemes: ['o_e', 'oa'],
+    allowedHFWTier: 2,
+    targetWordCount: 70,
+    actualWordCount: 79,
+    decodableRatio: 0.92,
+    textType: 'story-reader',
+    refrainCount: 0,
+    lines: [
+      { type: 'intro',   text: 'Mole did not want to go out. "No. It is cold. I will stay home."' },
+      { type: 'label',   text: 'Problem:' },
+      { type: 'beat',    text: '"Come and play," said Giri. "We can jog to the lake." "No. Also no. Still no."' },
+      { type: 'label',   text: 'Attempt:' },
+      { type: 'beat',    text: '"Does Mole want a hot bun? I have two buns from home." A pink nose came out.' },
+      { type: 'label',   text: 'Solution:' },
+      { type: 'beat',    text: '"So... one bun is for me?" "Yes!" Out came Mole. No coat. No hat.' },
+      { type: 'end',     text: '"See? It is fun out here." "The bun is why I came. But yes — also the fun."' },
+    ],
+    talkAboutIt: ['What made Mole come out of his hole in the end?'],
+  },
+
+  {
+    id: 'core-b-sw-02',
+    band: 'B', level: 2, phase: 'long-e',
+    title: 'The Bee and Me',
+    emoji: '\ud83d\udc1d',
+    mascotState: 'celebrate',
+    illustration: 'giri_level02_story03_helps-bee.png.jpg',
+    targetGraphemes: ['ee', 'ea'],
+    allowedHFWTier: 2,
+    targetWordCount: 72,
+    actualWordCount: 80,
+    decodableRatio: 0.94,
+    textType: 'story-reader',
+    refrainCount: 0,
+    lines: [
+      { type: 'intro',   text: '"I see a bee!" said Giri. "And the bee sees me!"' },
+      { type: 'label',   text: 'Problem:' },
+      { type: 'beat',    text: 'The bee went from tree to tree. "Wait for me! I want to see what you can see."' },
+      { type: 'label',   text: 'Attempt:' },
+      { type: 'beat',    text: '"Then keep up! We need to find the sweet spot." Giri did not see it. "Here? Is it here?"' },
+      { type: 'label',   text: 'Solution:' },
+      { type: 'beat',    text: 'The bee sat still on a green stem. "Take a deep sniff." Sweet! A bed of mint!' },
+      { type: 'end',     text: '"Good find! You and me — we make a fine team." "Yes," said the bee. "Buzz!"' },
+    ],
+    talkAboutIt: ['How did the bee help Giri find the sweet spot?'],
+  },
+
   // ╔══════════════════════════════════════════════════════════════════════════╗
   // ║  BAND C — Fluency Readers  (8 books)                                  ║
   // ║  80–140 words · paragraph format · Tier 1–3 HFW · refrain 0–1×       ║
@@ -1393,6 +1450,34 @@ export const STORIES = [
     grammarSpotlight: [
       { pattern: 'Past tense -ed', example: '"helped", "started", "dusted", "folded", "watered", "carried", "decided"', tip: 'Adding -ed to an action word shows it already happened.' },
       { pattern: 'Present action -ing', example: '"washing", "stacking", "helping", "getting", "smiling"', tip: 'Adding -ing shows an action that is happening right now.' },
+    ],
+  },
+
+
+  {
+    id: 'core-c-sw-01',
+    band: 'C', level: 3, phase: 'r-controlled',
+    title: 'Could You? Would You? Should You?',
+    emoji: '\ud83d\udc26',
+    mascotState: 'thinking',
+    illustration: 'giri_level03_story01_big-storm.png.jpg',
+    targetGraphemes: ['ar', 'or', 'ir'],
+    allowedHFWTier: 3,
+    targetWordCount: 115,
+    actualWordCount: 133,
+    decodableRatio: 0.93,
+    textType: 'fluency-reader',
+    refrainCount: 0,
+    lines: [
+      { type: 'paragraph', text: 'A small bird sat on the fence and did not stir. "Could we fly to the barn?" said Giri. "I could," said the bird, "but should I? A storm is coming. I can smell the rain."' },
+      { type: 'paragraph', text: '"Would she come if I marched along?" said Giri. "She could ride on my arm." The bird looked at the dark sky. "We should not go far," she said. "We should get under cover first."' },
+      { type: 'paragraph', text: 'Big drops of water started to fall. Giri and the bird darted under the cart by the farm. The storm passed over them with a roar. Then the sun came back and lit up the yard.' },
+      { type: 'end',       text: '"The bird had it right," said Giri. "Could, would, should — you think hard first!" "Yes," said the bird. "That is why I am a smart bird."' },
+    ],
+    comprehension: [
+      { q: 'Why did the bird not want to fly to the barn?', options: ['A storm was near', 'She was tired', 'She was scared of Giri', 'It was too dark'], answer: 0, type: 'literal' },
+      { q: 'Where did Giri and the bird hide?', options: ['Under the cart', 'In the barn', 'Up a tree', 'In the house'], answer: 0, type: 'literal' },
+      { q: 'What lesson did Giri learn?', options: ['Think hard before you act', 'Run fast in the rain', 'Birds cannot fly', 'Storms are fun'], answer: 0, type: 'inferential' },
     ],
   },
 
@@ -2055,6 +2140,34 @@ export const STORIES = [
     grammarSpotlight: [
       { pattern: 'r-controlled vowels (ar, ir, er)', example: '"garden", "bird", "ranger", "far", "her"', tip: 'When "r" comes after a vowel, the vowel sound changes. These are called r-controlled vowels.' },
       { pattern: 'Conjunctions (joining words)', example: 'The ranger was far away and could not hear.', tip: '"And" joins two ideas in one sentence.' },
+    ],
+  },
+
+
+  {
+    id: 'core-d-sw-01',
+    band: 'D', level: 4, phase: 'diphthongs',
+    title: 'How Giri Found Out',
+    emoji: '\u2601\ufe0f',
+    mascotState: 'thinking',
+    illustration: 'giri_level04_story05_sports-day.jpg',
+    targetGraphemes: ['ou', 'ow', 'oi'],
+    allowedHFWTier: 3,
+    targetWordCount: 160,
+    actualWordCount: 170,
+    decodableRatio: 1.00,
+    textType: 'bridge-reader',
+    refrainCount: 0,
+    lines: [
+      { type: 'paragraph', text: 'A loud sound rolled up from town to the hill where Giri stood. He looked around. A big brown cloud was rolling down the hill — and it was coming his way! "What is that? How big is it? What do I do NOW?"' },
+      { type: 'paragraph', text: '"I must find out about that cloud," said Giri. He did not run. He did not hide. He marched down the road to find out for himself. The sound got louder and louder. The cloud got rounder and rounder. Giri counted his steps out loud to stay brave. "One. Two. Three. Four."' },
+      { type: 'paragraph', text: 'Then Giri saw it. It was not a cloud at all! It was a crowd — a crowd of kids from town, kicking up dust as they bounced a big round ball down the hill. "Come and join us!" they shouted.' },
+      { type: 'end',       text: 'Giri let out a proud shout: "I found out by myself! A thing is not so big when you find out about it." He joined the crowd, and the game was loud, round, and fun.' },
+    ],
+    comprehension: [
+      { q: 'What did Giri think was coming down the hill?', options: ['A big brown cloud', 'A truck', 'A storm', 'A dog'], answer: 0, type: 'literal' },
+      { q: 'What was the cloud really?', options: ['A crowd of kids', 'Smoke', 'Dust from a truck', 'Rain'], answer: 0, type: 'literal' },
+      { q: 'What did Giri learn about scary things?', options: ['They feel smaller when you find out about them', 'They always go away', 'You should hide first', 'You should shout at them'], answer: 0, type: 'inferential' },
     ],
   },
 
