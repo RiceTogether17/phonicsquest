@@ -30,10 +30,22 @@ beforeEach(() => {
   vi.resetModules();
 });
 
+/**
+ * Seed store signals that put the child at the blending journey step —
+ * PA mastered via skill attempts, letter sounds via a placement score —
+ * so the phonics teach step applies (pre-print children skip it).
+ */
+async function seedBlendingStage(store) {
+  for (let i = 0; i < 10; i++) store.recordWordSkillAttempt(`w${i}`, 'segmenting', true);
+  store.set('placementProfile', { stageScores: { letterSounds: { composite: 0.9 } } });
+}
+
 describe('lessonComposer — early reading pathway', () => {
   it('composes warm-up → teach → practice → review for a K1 profile', async () => {
     setProfile({ readingBand: 'emerging-decoder' });
-    const { composeTodaysLesson } = await loadModules();
+    const mods = await loadModules();
+    const { composeTodaysLesson } = mods;
+    await seedBlendingStage(mods.store);
 
     const { band, steps } = composeTodaysLesson();
     expect(band).toBe('early');
@@ -76,6 +88,18 @@ describe('lessonComposer — primary pathway', () => {
   });
 });
 
+describe('lessonComposer — pre-print journey steps', () => {
+  it('skips the phonics teach step for a phonemic-awareness child', async () => {
+    setProfile({ readingBand: 'pre-reader' });
+    const { composeTodaysLesson } = await loadModules();
+    const { steps } = composeTodaysLesson();
+    expect(steps.some(s => s.kind === 'teach')).toBe(false);
+    // The practice slot carries a listening warm-up instead.
+    const practice = steps.find(s => s.kind === 'practice');
+    expect(practice.title).toContain('Hear the Sounds');
+  });
+});
+
 describe('lessonRunner — session state', () => {
   it('rolls the lesson state over to a new day', async () => {
     setProfile({ readingBand: 'pre-reader' });
@@ -92,7 +116,9 @@ describe('lessonRunner — session state', () => {
 
   it('overrides teach-step doneness from the runner flag', async () => {
     setProfile({ readingBand: 'emerging-decoder' });
-    const { getTodaysLessonView, markTeachDone } = await loadModules();
+    const mods = await loadModules();
+    const { getTodaysLessonView, markTeachDone } = mods;
+    await seedBlendingStage(mods.store);
 
     let view = getTodaysLessonView();
     const teachBefore = view.steps.find(s => s.kind === 'teach');

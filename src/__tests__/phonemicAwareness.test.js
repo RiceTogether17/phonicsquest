@@ -171,6 +171,7 @@ describe('PA modes hold the choice previews past the word audio even when TTS re
     // Make every audio call complete instantly so the only thing holding
     // the gate is the wall-clock floor.
     const speakWordSpy    = vi.spyOn(audio, 'speakWord').mockResolvedValue();
+    const twiceClearSpy   = vi.spyOn(audio, 'speakWordTwiceClear').mockResolvedValue();
     const speakPhonemeSpy = vi.spyOn(audio, 'speakPhoneme').mockResolvedValue();
 
     mod[setupName](word, els);
@@ -180,15 +181,17 @@ describe('PA modes hold the choice previews past the word audio even when TTS re
     await vi.advanceTimersByTimeAsync(500);
     expect(speakPhonemeSpy, `${modeName}: phoneme played within 500ms`).not.toHaveBeenCalled();
 
-    // The floor for a short word is ~1100ms PLUS the 600ms autoPlayDelay
-    // PLUS the 350ms pre-speak delay → previews should not begin until ~2.0s.
+    // The double-say floor for a short word is ~2600ms PLUS the 600ms
+    // autoPlayDelay PLUS the 350ms pre-speak delay → previews should not
+    // begin until well past 3s.
     await vi.advanceTimersByTimeAsync(800);
     expect(speakPhonemeSpy, `${modeName}: phoneme played at 1.3s, still inside floor`).not.toHaveBeenCalled();
 
     // After the floor + autoPlay delay we expect at least one preview to run.
-    await vi.advanceTimersByTimeAsync(1500);
+    await vi.advanceTimersByTimeAsync(3500);
     expect(speakPhonemeSpy, `${modeName}: phoneme should have played after the floor`).toHaveBeenCalled();
 
+    twiceClearSpy.mockRestore();
     speakWordSpy.mockRestore();
     speakPhonemeSpy.mockRestore();
   }

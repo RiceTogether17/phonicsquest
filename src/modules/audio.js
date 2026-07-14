@@ -552,7 +552,28 @@ class AudioManager {
   speakWordArticulated(word) {
     if (!store.get('sfxEnabled')) return Promise.resolve();
     const userRate = store.get('voiceSpeed') ?? 0.8;
-    return this._speak(word, Math.min(userRate, 0.55));
+    // Neutral pitch: the playful +10% used for chatter shifts vowel
+    // formants slightly, which matters when the child is trying to hear
+    // WHICH vowel it is. The longer onset delay protects the first
+    // consonant from engine clipping.
+    return this._speak(word, Math.min(userRate, 0.55), { pitch: 1.0, preDelayMs: 150 });
+  }
+
+  /**
+   * The classroom "say it twice" model for phonemic-awareness prompts:
+   * once slow and fully articulated, a beat of silence, then again at a
+   * gentler near-natural rate so the child hears the word both ways
+   * before answering. Neutral pitch throughout.
+   *
+   * @param {string} word
+   * @returns {Promise<void>}
+   */
+  async speakWordTwiceClear(word) {
+    if (!store.get('sfxEnabled')) return;
+    const userRate = store.get('voiceSpeed') ?? 0.8;
+    await this._speak(word, Math.min(userRate, 0.55), { pitch: 1.0, preDelayMs: 150 });
+    await new Promise(r => setTimeout(r, 450));
+    await this._speak(word, Math.min(userRate, 0.7), { pitch: 1.0, preDelayMs: 80 });
   }
 
   /**
@@ -733,13 +754,13 @@ class AudioManager {
   }
 
   /** @private — Web Speech API utterance */
-  _speak(text, rate = 0.8) {
+  _speak(text, rate = 0.8, { pitch = 1.1, preDelayMs = 80 } = {}) {
     return new Promise((resolve) => {
       if (!window.speechSynthesis) { resolve(); return; }
       speechSynthesis.cancel();
       const utt = new SpeechSynthesisUtterance(text);
       utt.rate  = rate;
-      utt.pitch = 1.1;
+      utt.pitch = pitch;
       utt.volume = 1;
       if (this._ttsVoice) utt.voice = this._ttsVoice;
       // Setting `lang` matters even when a voice is selected: on Android the
@@ -773,7 +794,10 @@ class AudioManager {
         if (window.speechSynthesis.paused) window.speechSynthesis.resume();
       }, 250);
 
-      speechSynthesis.speak(utt);
+      // Onset guard: speaking immediately after cancel() clips the first
+      // consonant on Chrome/Android — fatal for First Sound, where that
+      // consonant IS the question. A short gap lets the engine settle.
+      setTimeout(() => speechSynthesis.speak(utt), preDelayMs);
     });
   }
 
