@@ -8,7 +8,7 @@
 import { inferQuestionContextType } from './mcqItemMetadata.js';
 import { makeFallbackOptionExplanations } from './mcqOptionExplanations.js';
 import { GRAMMAR_TIPS } from './grammarTips.js';
-import { MIN_QUESTIONS_PER_SCOPE, contextualizeMcqQuestion } from './practiceExpansion.js';
+import { MIN_QUESTIONS_PER_SCOPE, contextualizeMcqQuestion, varyMcqNames } from './practiceExpansion.js';
 
 export const GRAMMAR_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 
@@ -1156,6 +1156,42 @@ const GRAMMAR_BUILDERS = {
         'announce': '"Announce" is base form present; the past time clause tells us to use past tense.',
         'is announcing': '"Is announcing" is present continuous, but the action happened before assembly in the past.',
       }],
+      ['A moment ago, lightning ___ the old tree beside the field.', 'struck', ['strike', 'strikes', 'is striking'], {
+        'struck': '"Struck" is correct because "a moment ago" signals a completed past action, and "strike" is irregular (strike → struck).',
+        'strike': '"Strike" is base form present; "a moment ago" tells us the action already happened.',
+        'strikes': '"Strikes" is present tense; "a moment ago" requires the past tense.',
+        'is striking': '"Is striking" is present continuous, but the lightning has already struck.',
+      }],
+      ['Last term, our class ___ money for the animal shelter.', 'raised', ['raise', 'raises', 'is raising'], {
+        'raised': '"Raised" is correct because "last term" signals a completed past action; regular verbs add -d.',
+        'raise': '"Raise" is base form present; "last term" tells us the action is in the past.',
+        'raises': '"Raises" is present tense for he/she/it; "last term" requires past tense.',
+        'is raising': '"Is raising" is present continuous, but the fundraising finished last term.',
+      }],
+      ['The audience ___ loudly as the curtains closed last night.', 'cheered', ['cheer', 'cheers', 'is cheering'], {
+        'cheered': '"Cheered" is correct because "last night" places the action in the past; regular verbs add -ed.',
+        'cheer': '"Cheer" is base form present; "last night" tells us to use past tense.',
+        'cheers': '"Cheers" is present tense; the event happened last night.',
+        'is cheering': '"Is cheering" is present continuous, but the performance ended last night.',
+      }],
+      ['During yesterday\'s rehearsal, the choir ___ the school song twice.', 'sang', ['sing', 'sings', 'singing'], {
+        'sang': '"Sang" is correct because the rehearsal was yesterday, and "sing" is irregular (sing → sang).',
+        'sing': '"Sing" is base form present; "yesterday" tells us the action is finished.',
+        'sings': '"Sings" is present tense for he/she/it; "yesterday" requires past tense.',
+        'singing': '"Singing" alone cannot be the main verb — it needs a helper like "was".',
+      }],
+      ['The gardener ___ the hedges neatly before the open house last week.', 'trimmed', ['trim', 'trims', 'is trimming'], {
+        'trimmed': '"Trimmed" is correct because "last week" signals a completed action; short verbs double the final consonant before -ed.',
+        'trim': '"Trim" is base form present; "last week" tells us the work is done.',
+        'trims': '"Trims" is present tense; "last week" requires past tense.',
+        'is trimming': '"Is trimming" is present continuous, but the trimming finished last week.',
+      }],
+      ['Earlier today, Zara ___ her library card somewhere in the canteen.', 'lost', ['lose', 'loses', 'is losing'], {
+        'lost': '"Lost" is correct because "earlier today" points to a completed past action, and "lose" is irregular (lose → lost).',
+        'lose': '"Lose" is base form present; "earlier today" tells us it already happened.',
+        'loses': '"Loses" is present tense for he/she/it; the action is already over.',
+        'is losing': '"Is losing" is present continuous, but the card went missing earlier today.',
+      }],
     ];
     const rows = level === 'P1' ? p1Rows : level === 'P2' ? p2Rows : upperRows;
     const [q, answer, ds, optionExplanations] = rotate(rows, i);
@@ -1540,6 +1576,42 @@ const GRAMMAR_BUILDERS = {
         'beside': '"Beside" means next to one person; "between" means in the middle of both.',
         'with': '"With" shows accompaniment but does not describe position between two people.',
       }],
+      ['The seminar ran ___ two hours without a single break.', 'for', ['since', 'by', 'until'], {
+        'for': '"For" is correct because it goes with a length of time — "two hours" is a duration.',
+        'since': '"Since" goes with a starting point (since Monday), not a length of time.',
+        'by': '"By" marks a deadline, not how long something lasts.',
+        'until': '"Until" marks the end point of an action, not its duration.',
+      }],
+      ['The pupils have been rehearsing ___ the start of the month.', 'since', ['for', 'from', 'by'], {
+        'since': '"Since" is correct because it marks the starting point of an action that is still continuing.',
+        'for': '"For" goes with a duration (for three weeks), not a starting point.',
+        'from': '"From" needs a matching "to" or "until" to show a time range.',
+        'by': '"By" marks a deadline; the rehearsals are ongoing, not due.',
+      }],
+      ['Please stay inside the hall ___ the storm passes.', 'until', ['by', 'since', 'for'], {
+        'until': '"Until" is correct because the waiting continues up to the moment the storm passes.',
+        'by': '"By" marks a deadline for completing something, not continuous waiting.',
+        'since': '"Since" marks a starting point in the past, not a future end point.',
+        'for': '"For" needs a length of time (for an hour), not an event.',
+      }],
+      ['The noticeboard hangs ___ the two classroom doors.', 'between', ['among', 'along', 'across'], {
+        'between': '"Between" is correct because there are exactly two doors.',
+        'among': '"Among" is used for three or more things, but there are only two doors.',
+        'along': '"Along" describes movement or position following a line, not a spot separating two things.',
+        'across': '"Across" means from one side to the other, not in the middle of two objects.',
+      }],
+      ['The prize money was shared ___ the four winning teams.', 'among', ['between', 'along', 'beside'], {
+        'among': '"Among" is correct because the money is divided across more than two groups.',
+        'between': '"Between" is for exactly two parties; here there are four teams.',
+        'along': '"Along" describes position following a line, not sharing.',
+        'beside': '"Beside" means next to, which does not fit dividing money.',
+      }],
+      ['The lost kitten crawled out from ___ the cupboard.', 'behind', ['above', 'across', 'along'], {
+        'behind': '"Behind" is correct because the kitten was hidden at the back of the cupboard.',
+        'above': '"Above" means higher than — a kitten cannot crawl out from the air over a cupboard.',
+        'across': '"Across" means from one side to the other, which does not describe a hiding spot.',
+        'along': '"Along" follows a line or path, which does not fit coming out of a hiding place.',
+      }],
     ];
     const rows = level === 'P1' ? p1Rows : level === 'P2' ? p2Rows : upperRows;
     const [q, answer, ds, optionExplanations] = rotate(rows, i);
@@ -1855,6 +1927,42 @@ const GRAMMAR_BUILDERS = {
         'Several': '"Several" is for countable nouns; homework is uncountable.',
         'A few': '"A few" is for countable nouns; homework is uncountable.',
       }],
+      ['There is not ___ ink left in the printer, so print only what you need.', 'much', ['many', 'few', 'several'], {
+        'much': '"Much" is correct because ink is uncountable, and "not much" means a small amount.',
+        'many': '"Many" is for countable nouns (many pens); ink cannot be counted.',
+        'few': '"Few" is for countable plurals; ink is uncountable.',
+        'several': '"Several" counts individual items; ink is a substance, not items.',
+      }],
+      ['___ of the water in the tank had evaporated by the afternoon.', 'Much', ['Many', 'Few', 'Several'], {
+        'Much': '"Much" is correct because water is uncountable, so we say "much of the water".',
+        'Many': '"Many" is for countable nouns; water cannot be counted one by one.',
+        'Few': '"Few" is for countable plurals; water is uncountable.',
+        'Several': '"Several" counts separate items; water is a substance.',
+      }],
+      ['He has read ___ book in the class library — all forty of them.', 'every', ['all', 'most', 'some'], {
+        'every': '"Every" is correct because it goes with a singular noun ("every book") and means all of them one by one.',
+        'all': '"All" needs a plural noun — "all books", not "all book".',
+        'most': '"Most" needs a plural noun and would also contradict "all forty of them".',
+        'some': '"Some" needs a plural noun and means only part of the collection.',
+      }],
+      ['There are ___ mistakes in your final draft — well done!', 'very few', ['very little', 'very much', 'not much'], {
+        'very few': '"Very few" is correct because mistakes are countable, and the praise tells us there are almost none.',
+        'very little': '"Very little" is for uncountable nouns (very little time), not countable mistakes.',
+        'very much': '"Very much" is for uncountable nouns and does not fit before a plural noun.',
+        'not much': '"Not much" is for uncountable nouns; mistakes can be counted, so use "few".',
+      }],
+      ['___ pupil in the hall received a commemorative badge.', 'Each', ['All', 'Both', 'Many'], {
+        'Each': '"Each" is correct because it goes with a singular noun ("each pupil") and means every one individually.',
+        'All': '"All" needs a plural noun — "all pupils", not "all pupil".',
+        'Both': '"Both" is for exactly two people and needs a plural noun.',
+        'Many': '"Many" needs a plural noun — "many pupils".',
+      }],
+      ['We need ___ more volunteers — at least ten — for the carnival booth.', 'many', ['much', 'little', 'a little'], {
+        'many': '"Many" is correct because volunteers are countable and "at least ten" shows a large number is needed.',
+        'much': '"Much" is for uncountable nouns; volunteers can be counted.',
+        'little': '"Little" is for uncountable nouns and means almost none — the opposite of what is needed.',
+        'a little': '"A little" is for uncountable nouns (a little water), not people.',
+      }],
     ];
     const rows = level === 'P1' ? p1Rows : upperRows;
     const [q, answer, ds, optionExplanations] = rotate(rows, i);
@@ -2075,6 +2183,42 @@ const GRAMMAR_BUILDERS = {
         'much': '"Much" is for uncountable nouns; pupils are countable.',
         'less': '"Less" is for uncountable nouns in comparisons; pupils are countable.',
       }],
+      ['The teacher gave us ___ advice before the oral examination.', 'some', ['a', 'an', 'many'], {
+        'some': '"Some" is correct because "advice" is uncountable — it never takes "a/an" or a number.',
+        'a': '"A" is for singular countable nouns; we cannot say "an advice".',
+        'an': '"An" is for singular countable nouns starting with a vowel sound; "advice" is uncountable.',
+        'many': '"Many" is for countable plurals (many tips); "advice" is uncountable.',
+      }],
+      ['How ___ luggage are you checking in for the flight?', 'much', ['many', 'few', 'a few'], {
+        'much': '"Much" is correct because "luggage" is uncountable — we count bags, not luggage.',
+        'many': '"Many" is for countable nouns; "luggage" has no plural form.',
+        'few': '"Few" is for countable plurals; "luggage" is uncountable.',
+        'a few': '"A few" is for countable plurals (a few bags); "luggage" is uncountable.',
+      }],
+      ['There are ___ slices of watermelon left on the tray.', 'a few', ['a little', 'much', 'little'], {
+        'a few': '"A few" is correct because "slices" are countable — cutting food into slices makes it countable.',
+        'a little': '"A little" is for uncountable nouns (a little watermelon), not counted slices.',
+        'much': '"Much" is for uncountable nouns and questions/negatives; slices are countable.',
+        'little': '"Little" is for uncountable nouns; slices can be counted.',
+      }],
+      ['Grandpa had ___ patience left after waiting a whole hour.', 'little', ['few', 'a few', 'many'], {
+        'little': '"Little" is correct because "patience" is uncountable and "little" means almost none.',
+        'few': '"Few" is for countable plurals; patience cannot be counted.',
+        'a few': '"A few" is for countable plurals; patience is uncountable.',
+        'many': '"Many" is for countable plurals; patience is uncountable.',
+      }],
+      ['The waiter brought us ___ glasses of iced tea.', 'several', ['much', 'a little', 'little'], {
+        'several': '"Several" is correct because "glasses" are countable — pouring a drink into glasses makes it countable.',
+        'much': '"Much" is for uncountable nouns (much tea), not counted glasses.',
+        'a little': '"A little" is for uncountable nouns; glasses can be counted.',
+        'little': '"Little" is for uncountable nouns; glasses can be counted.',
+      }],
+      ['There is only ___ shampoo left in the bottle.', 'a little', ['a few', 'many', 'several'], {
+        'a little': '"A little" is correct because "shampoo" is uncountable — a small amount remains.',
+        'a few': '"A few" is for countable plurals (a few bottles); shampoo itself is uncountable.',
+        'many': '"Many" is for countable plurals; shampoo is uncountable.',
+        'several': '"Several" counts separate items; shampoo is a substance.',
+      }],
     ];
     const [q, answer, ds, optionExplanations] = rotate(rows, i);
     return { subskill: 'countability', q, choices: buildChoices(answer, ds), answer, explain: 'Countable nouns (chairs, bottles, pupils) → many/few/a few/several. Uncountable nouns (rice, noise, time, flour, sugar) → much/little/a little.', optionExplanations };
@@ -2267,6 +2411,42 @@ const GRAMMAR_BUILDERS = {
         'or': '"Or" presents alternatives; the volunteers were both patient and kind.',
         'so': '"So" would mean patience caused kindness; both are separate qualities.',
       }],
+      ['Finish your homework first, ___ then you may watch television.', 'and', ['but', 'or', 'so'], {
+        'and': '"And" is correct because it joins two steps that happen in order — homework first, then television.',
+        'but': '"But" shows contrast, but these two ideas agree with each other.',
+        'or': '"Or" offers a choice, but both actions are meant to happen.',
+        'so': '"So" shows a result; here we are simply adding the next step.',
+      }],
+      ['We stayed indoors ___ the haze was very bad.', 'because', ['although', 'or', 'but'], {
+        'because': '"Because" is correct — the bad haze is the reason for staying indoors.',
+        'although': '"Although" signals contrast, but staying in during haze is expected, not surprising.',
+        'or': '"Or" offers a choice, but the sentence gives a reason.',
+        'but': '"But" shows contrast; the second part explains the first, so use "because".',
+      }],
+      ['Look both ways ___ you cross the road.', 'before', ['after', 'until', 'so'], {
+        'before': '"Before" is correct because checking for traffic must happen earlier than crossing.',
+        'after': '"After" would mean looking once you have already crossed — too late to be safe.',
+        'until': '"Until" means up to a point in time, which does not fit this safety rule.',
+        'so': '"So" shows a result, not the order of two actions.',
+      }],
+      ['The soup was hot, ___ it was not too spicy for me.', 'but', ['and', 'so', 'or'], {
+        'but': '"But" is correct because the second part contrasts with what you might expect from the first.',
+        'and': '"And" simply adds information; the sentence needs a contrast word.',
+        'so': '"So" shows a result; being hot does not cause being not spicy.',
+        'or': '"Or" offers a choice, but the sentence describes the same bowl of soup.',
+      }],
+      ['Wait here ___ the rain stops.', 'until', ['before', 'so', 'and'], {
+        'until': '"Until" is correct because the waiting continues up to the moment the rain stops.',
+        'before': '"Before" would mean waiting must finish earlier than the rain stopping, which makes no sense.',
+        'so': '"So" shows a result and cannot join these two actions in time.',
+        'and': '"And" simply adds ideas; the sentence needs a time connector.',
+      }],
+      ['He saved his pocket money ___ he could buy a gift for Mum.', 'so that', ['although', 'or', 'before'], {
+        'so that': '"So that" is correct because it introduces the purpose of saving the money.',
+        'although': '"Although" signals contrast, but buying a gift is the goal, not a surprise.',
+        'or': '"Or" offers a choice, but the second part explains why he saved.',
+        'before': '"Before" orders two events in time; the sentence expresses purpose instead.',
+      }],
     ];
     const upperRows = [
       ['The proposal was well-researched; ___, it was approved without changes.', 'consequently', ['nevertheless', 'however', 'although'], {
@@ -2328,6 +2508,42 @@ const GRAMMAR_BUILDERS = {
         'Nevertheless': '"Nevertheless" introduces a contrast; both points are positive benefits of the same system.',
         'Consequently': '"Consequently" shows a result; reducing error is an additional benefit, not a result of saving time.',
         'However': '"However" introduces a contrast; the sentence adds another point on the same side.',
+      }],
+      ['The road was flooded; ___, all buses were diverted to the expressway.', 'hence', ['moreover', 'besides', 'likewise'], {
+        'hence': '"Hence" is correct because the diversion is a direct result of the flooding.',
+        'moreover': '"Moreover" adds a further point; it does not show cause and effect.',
+        'besides': '"Besides" adds an extra reason, not a consequence.',
+        'likewise': '"Likewise" compares two similar things; the sentence needs a result word.',
+      }],
+      ['The two proposals differ in cost; ___, they share the same overall goal.', 'nevertheless', ['therefore', 'consequently', 'hence'], {
+        'nevertheless': '"Nevertheless" is correct because the second part contrasts with the difference described first.',
+        'therefore': '"Therefore" shows a result, but sharing a goal is not caused by differing costs.',
+        'consequently': '"Consequently" signals cause and effect, which does not link these two facts.',
+        'hence': '"Hence" also shows result; the sentence needs a contrast connector.',
+      }],
+      ['Bring an umbrella ___ the weather turns bad during the hike.', 'in case', ['so that', 'as though', 'now that'], {
+        'in case': '"In case" is correct because the umbrella is a precaution against something that might happen.',
+        'so that': '"So that" expresses purpose — but the umbrella does not make the weather turn bad.',
+        'as though': '"As though" compares to an imagined situation, which does not fit a precaution.',
+        'now that': '"Now that" means "because now", but the bad weather has not happened yet.',
+      }],
+      ['___ the results were announced, the pupils rushed to the noticeboard.', 'As soon as', ['Even though', 'As if', 'In case'], {
+        'As soon as': '"As soon as" is correct because the rushing happened immediately after the announcement.',
+        'Even though': '"Even though" signals contrast, but there is nothing surprising here.',
+        'As if': '"As if" compares to an imagined situation, not a moment in time.',
+        'In case': '"In case" introduces a precaution, not the timing of an event.',
+      }],
+      ['He speaks ___ he had lived in London for years, yet he has never left Singapore.', 'as though', ['so that', 'in case', 'as long as'], {
+        'as though': '"As though" is correct because it compares his speech to an imagined situation that is not true.',
+        'so that': '"So that" expresses purpose, but the sentence describes a comparison.',
+        'in case': '"In case" introduces a precaution, which does not fit here.',
+        'as long as': '"As long as" sets a condition, but no condition is being made.',
+      }],
+      ['You may borrow my notes ___ you return them before Friday.', 'as long as', ['as though', 'in case', 'even though'], {
+        'as long as': '"As long as" is correct because it sets the condition for borrowing the notes.',
+        'as though': '"As though" compares to an imagined situation, not a condition.',
+        'in case': '"In case" is for precautions; returning the notes is a requirement, not a precaution.',
+        'even though': '"Even though" signals contrast, but the second part is a condition, not a surprise.',
       }],
     ];
     const rows = (level === 'P5' || level === 'P6') ? upperRows : lowerRows;
@@ -2600,6 +2816,42 @@ const GRAMMAR_BUILDERS = {
         'should': '"Should" gives advice; the sentence is about a newly acquired ability.',
         'may': '"May" relates to permission; the sentence is about ability, not permission.',
       }],
+      ['You ___ water the plants today; I have already done it.', 'need not', ['must', 'should', 'shall'], {
+        'need not': '"Need not" is correct because the task is already done, so there is no necessity.',
+        'must': '"Must" expresses obligation, but the second part removes the need entirely.',
+        'should': '"Should" gives advice to do it, which contradicts "I have already done it".',
+        'shall': '"Shall" expresses a promise or future action, which does not fit here.',
+      }],
+      ['___ we go to the library together after school?', 'Shall', ['Must', 'Might', 'Ought'], {
+        'Shall': '"Shall" is correct because "Shall we…?" is the natural way to make a friendly suggestion.',
+        'Must': '"Must we…?" questions an obligation, which sounds reluctant rather than inviting.',
+        'Might': '"Might we…?" is very formal permission-seeking, not a suggestion between friends.',
+        'Ought': '"Ought" needs "to" ("ought we to go") and gives advice, not an invitation.',
+      }],
+      ['When I was six, I ___ already ride a bicycle without training wheels.', 'could', ['can', 'may', 'must'], {
+        'could': '"Could" is correct because it describes an ability in the past ("when I was six").',
+        'can': '"Can" is present ability, but the sentence is about the past.',
+        'may': '"May" expresses permission or possibility, not ability.',
+        'must': '"Must" expresses obligation, not what someone was able to do.',
+      }],
+      ['Visitors ___ sign in at the office before entering the school.', 'must', ['might', 'would', 'shall'], {
+        'must': '"Must" is correct because signing in is a school rule — an obligation.',
+        'might': '"Might" expresses possibility, but rules are not optional.',
+        'would': '"Would" is for hypothetical or polite requests, not rules.',
+        'shall': '"Shall" is used for offers and formal promises, not stating rules about others.',
+      }],
+      ['You ___ eat in the computer lab — it is against the rules.', 'must not', ['need not', 'might not', 'would not'], {
+        'must not': '"Must not" is correct because it expresses prohibition — the rule forbids it.',
+        'need not': '"Need not" means it is not necessary, but the rule makes it forbidden, not optional.',
+        'might not': '"Might not" expresses possibility, not prohibition.',
+        'would not': '"Would not" describes unwillingness, not a rule.',
+      }],
+      ['___ you like some ice water while you wait?', 'Would', ['Should', 'Must', 'Might'], {
+        'Would': '"Would" is correct because "Would you like…?" is the polite way to make an offer.',
+        'Should': '"Should you like…" is not how offers are made in modern English.',
+        'Must': '"Must you like…?" questions an obligation, which makes no sense for an offer.',
+        'Might': '"Might you like…" is unusual and overly formal for a simple offer.',
+      }],
     ];
     const upperRows = [
       ['She ___ her calculator at home — she had to borrow one for the test.', 'must have left', ['should leave', 'must leave', 'could leave'], {
@@ -2661,6 +2913,42 @@ const GRAMMAR_BUILDERS = {
         'must not': '"Must not have" expresses prohibition in the past; the sentence is about possibility.',
         'should not': '"Should not have" expresses moral reproach; the sentence speculates about what he knew.',
         'could': '"Could" is present ability; the sentence needs a past modal form.',
+      }],
+      ['I am not sure where my keys are; I ___ dropped them in the taxi.', 'might have', ['might', 'may', 'will'], {
+        'might have': '"Might have" is correct because it expresses a possible explanation for something in the past.',
+        'might': '"Might" alone needs a base verb ("might drop"); the dropping already happened, so use "might have dropped".',
+        'may': '"May" alone cannot come before "dropped" — a past guess needs "may have dropped".',
+        'will': '"Will" points to the future, but the keys are already missing.',
+      }],
+      ['Look how wet the ground is — it ___ rained heavily overnight.', 'must have', ['must', 'should have', 'would'], {
+        'must have': '"Must have" is correct because the wet ground is strong evidence for a logical conclusion about the past.',
+        'must': '"Must" alone needs a base verb ("must rain"); the rain already fell, so use "must have rained".',
+        'should have': '"Should have" criticises a missed duty; rain has no duties.',
+        'would': '"Would" alone cannot come before "rained" and does not express deduction.',
+      }],
+      ['You ___ have crossed against the red light; it was extremely dangerous.', 'should not', ['must not', 'need not', 'may not'], {
+        'should not': '"Should not have" is correct because it criticises a past action that was wrong.',
+        'must not': '"Must not have" expresses a deduction that something did not happen — but we know the crossing happened.',
+        'need not': '"Need not have" means it was unnecessary, which is too mild for something dangerous.',
+        'may not': '"May not have" expresses uncertainty about the past, but the event is not in doubt.',
+      }],
+      ['She ___ have submitted the essay on time if she had planned her week better.', 'would', ['will', 'shall', 'can'], {
+        'would': '"Would have" is correct in an unreal past conditional — the planning did not happen, so neither did the submission.',
+        'will': '"Will have" is future perfect, but this imagined situation is in the past.',
+        'shall': '"Shall have" is not used in past conditionals.',
+        'can': '"Can have" cannot express an imagined past result; use "would have" or "could have".',
+      }],
+      ['He ___ have taken my umbrella by mistake — ours look identical.', 'may', ['will', 'shall', 'ought'], {
+        'may': '"May have" is correct because it suggests a possible explanation for a past event.',
+        'will': '"Will have" expresses a confident prediction, not a tentative guess.',
+        'shall': '"Shall have" is not used for guessing about the past.',
+        'ought': '"Ought" needs "to" ("ought to have") and gives criticism or advice, not a guess.',
+      }],
+      ['They ___ have missed the announcement; they were in the hall when it was made.', 'cannot', ['must', 'should', 'need'], {
+        'cannot': '"Cannot have" is correct because the evidence makes the missed announcement impossible.',
+        'must': '"Must have missed" would conclude that they DID miss it, which the evidence rules out.',
+        'should': '"Should have missed" criticises them for not missing it, which makes no sense.',
+        'need': '"Need have" is not used in positive statements like this.',
       }],
     ];
     const rows = (level === 'P5' || level === 'P6') ? upperRows : lowerRows;
@@ -3173,6 +3461,42 @@ const GRAMMAR_BUILDERS = {
         'peck': '"Peck" is simple present for habits; "Look!" tells us the action is in progress right now.',
         'pecked': '"Pecked" is simple past; "Look!" tells us the action is currently happening.',
         'have pecked': '"Have pecked" is present perfect for past actions with present results; "Look!" points to an ongoing action.',
+      }],
+      ['My little sister ___ her spelling list at the moment, so please keep quiet.', 'is reciting', ['recites', 'recited', 'will recite'], {
+        'is reciting': '"Is reciting" is correct because "at the moment" signals an action in progress right now.',
+        'recites': '"Recites" is simple present for habits; "at the moment" points to an action happening now.',
+        'recited': '"Recited" is simple past; "at the moment" tells us the action is still going on.',
+        'will recite': '"Will recite" is future tense; "at the moment" means the action has already begun.',
+      }],
+      ['Two years ago, our family ___ to a flat near the MRT station.', 'moved', ['moves', 'is moving', 'has moved'], {
+        'moved': '"Moved" is correct because "two years ago" pins the action to a finished time in the past.',
+        'moves': '"Moves" is simple present for habits; "two years ago" places the action in the past.',
+        'is moving': '"Is moving" is present continuous; "two years ago" tells us the move is over.',
+        'has moved': '"Has moved" is present perfect, which cannot be used with a finished past time like "two years ago".',
+      }],
+      ['The pupils ___ their books away when the visitor walked in.', 'were packing', ['pack', 'packed', 'have packed'], {
+        'were packing': '"Were packing" is correct because the packing was already in progress when the visitor walked in.',
+        'pack': '"Pack" is simple present; "walked in" sets the scene in the past.',
+        'packed': '"Packed" is simple past, but it does not show the packing was ongoing when the visitor arrived.',
+        'have packed': '"Have packed" is present perfect; both events here happened in the past.',
+      }],
+      ['My uncle ___ in that bakery since it opened five years ago.', 'has worked', ['works', 'worked', 'is working'], {
+        'has worked': '"Has worked" is correct because "since it opened" links a past starting point to the present.',
+        'works': '"Works" is simple present, but "since" needs a perfect tense to show the action began in the past and continues.',
+        'worked': '"Worked" is simple past, which would mean he no longer works there — "since" shows it continues.',
+        'is working': '"Is working" describes only right now; "since it opened" covers the whole period up to now.',
+      }],
+      ['Water ___ at one hundred degrees Celsius.', 'boils', ['boiled', 'is boiling', 'will boil'], {
+        'boils': '"Boils" is correct because scientific facts always use the simple present.',
+        'boiled': '"Boiled" is simple past; a scientific fact is always true, so simple present is needed.',
+        'is boiling': '"Is boiling" describes water boiling right now, not a general fact.',
+        'will boil': '"Will boil" is future tense; facts that are always true take the simple present.',
+      }],
+      ['Hurry! The bus ___ at the interchange in five minutes.', 'is arriving', ['arrived', 'arrives every day', 'has arrived'], {
+        'is arriving': '"Is arriving" is correct because present continuous can describe a fixed arrangement in the near future.',
+        'arrived': '"Arrived" is simple past; "in five minutes" points to the near future.',
+        'arrives every day': '"Arrives every day" describes a general timetable habit, but the sentence is about this one arrival.',
+        'has arrived': '"Has arrived" means the bus is already here, but "in five minutes" says it is still on the way.',
       }],
     ];
     const upperRows = [
@@ -4310,7 +4634,7 @@ function buildLevel(level) {
   for (const category of categories) {
     for (let localOffset = 0; localOffset < MIN_QUESTIONS_PER_SCOPE; localOffset += 1) {
       const localIndex = sessionSeed + localOffset;
-      const spec = GRAMMAR_BUILDERS[category](level, localIndex);
+      const spec = varyMcqNames(GRAMMAR_BUILDERS[category](level, localIndex), localOffset);
       const variant = contextualizeMcqQuestion(spec.q, localOffset, level);
       const item = {
         id: `g-${level.toLowerCase()}-${category}-${String(localOffset + 1).padStart(3, '0')}`,

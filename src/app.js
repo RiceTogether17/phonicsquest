@@ -28,6 +28,7 @@ import { getMistakesDenSummary, timeAgo as mistakeTimeAgo, MISTAKES_LOOKBACK_DAY
 import { buildGiriQuestionChips, answerChipOffline, answerChipAi, askGiriFreeText } from './modules/askGiri.js';
 import { initHomeTabs, selectTab, getInitialTab } from './modules/homeTabs.js';
 import { buildJourneyBarHtml, STAGE_META } from './components/journeyBar.js';
+import { renderJourneyMap } from './components/journeyMap.js';
 import { attachAskGiriButton } from './components/askGiriButton.js';
 import { hasApiKey } from './modules/aiService.js';
 import { getPersonalBests } from './modules/personalBestWall.js';
@@ -1774,6 +1775,9 @@ class App {
    * Then adjusts section visibility for preschool vs primary layouts.
    */
   _renderGuidedJourney() {
+    // Six-step journey map on the Learn tab — same refresh lifecycle.
+    try { renderJourneyMap(document.getElementById('learn-journey-map'), { avatar: getActiveProfile?.()?.avatar || '🦁' }); } catch (_) { /* non-fatal */ }
+
     const section = document.getElementById('guided-journey-section');
     if (!section) return;
 
@@ -2462,10 +2466,14 @@ class App {
       showPrimaryQuickCheck({
         container,
         profile,
-        onComplete: (_payload) => {
+        onComplete: (payload) => {
           // Whether the parent skipped or completed, primary still gets the
           // maxed default placement — Quick Check results are additive to
-          // questMastery and never gate access.
+          // questMastery and never gate access. A completed check may also
+          // carry a gentle practice-level recommendation; persist it so the
+          // level pickers can default to it.
+          const rec = payload?.results?.recommendation;
+          if (rec?.level) store.set('recommendedPracticeLevel', rec.level);
           seedDefaultsAndContinue();
         },
       });

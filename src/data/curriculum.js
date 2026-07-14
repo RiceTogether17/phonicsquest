@@ -87,6 +87,54 @@ export const REQUIRED_PHASE_FIELDS = Object.freeze([
  * locally. `label` is the short header form ("Phase 1 — CVC"); `title` is
  * the friendly card title; `description` is one parent-facing sentence.
  */
+/**
+ * Pre-phases — the two foundation steps that come BEFORE decoding print.
+ * They are first-class curriculum entries (same field schema as PHASES)
+ * but keep string phase keys ('0a'/'0b') so the numeric phonics phases
+ * 1–10, which are baked into saved progress, placement mapping and
+ * decodability, never shift.
+ *
+ *   0a  Phonemic Awareness — hearing and playing with sounds, no print
+ *   0b  Letter Sounds      — grapheme–phoneme correspondence
+ *
+ * Progress signals are derived in `src/modules/prePhaseProgress.js`.
+ */
+export const PRE_PHASES = Object.freeze([
+  {
+    phase: '0a',
+    id: 'phase-0a-phonemic-awareness',
+    title: 'Phonemic Awareness',
+    label: 'Step 0a — Phonemic Awareness',
+    icon: '👂',
+    description: 'Hearing sounds in spoken words — first, last and middle sounds, clapping syllables, blending sounds by ear. No letters yet.',
+    learningOutcome: 'Hear, count and play with the individual sounds inside spoken words: isolate first/last/middle sounds and orally blend three sounds into a word.',
+    targetSounds: ['first sound isolation', 'last sound isolation', 'middle sound isolation', 'oral blending', 'syllable clapping', 'word counting'],
+    sampleWords: ['cat (/k/ /a/ /t/)', 'sun (/s/ /u/ /n/)', 'map (/m/ /a/ /p/)', 'ti-ger (2 claps)', 'ba-na-na (3 claps)'],
+    sentenceExamples: ['What sound does "sun" start with?', 'Clap the beats in "tiger".', '/d/ /o/ /g/ — what word is that?'],
+    recommendedModes: ['first', 'last', 'middle', 'oralBlend', 'soundCount', 'syllable', 'wordCount', 'oddOneOut', 'train'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+  {
+    phase: '0b',
+    id: 'phase-0b-letter-sounds',
+    title: 'Letter Sounds',
+    label: 'Step 0b — Letter Sounds',
+    icon: '🔡',
+    description: 'Matching each letter to the sound it makes — s says /s/, a says /ă/ — so sounds can be read from print.',
+    learningOutcome: 'Say the most common sound for each single letter quickly and pick the letter that matches a spoken sound.',
+    targetSounds: ['s /s/', 'a /ă/', 't /t/', 'p /p/', 'i /ĭ/', 'n /n/', 'm /m/', 'd /d/', 'g /g/', 'o /ŏ/', 'c /k/', 'k /k/', 'e /ĕ/', 'u /ŭ/', 'r /r/', 'h /h/', 'b /b/', 'f /f/', 'l /l/'],
+    sampleWords: ['s → sun', 'a → apple', 't → top', 'p → pig', 'i → ink', 'n → net'],
+    sentenceExamples: ['Which letter says /sss/?', 'Tap the letter that starts "map".'],
+    recommendedModes: ['letterSounds', 'soundHunt', 'hear'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+]);
+
+/** Look up a pre-phase by its phase key ('0a'/'0b') or id. */
+export function getPrePhase(key) {
+  return PRE_PHASES.find(p => p.phase === key || p.id === key) || null;
+}
+
 export const PHASES = Object.freeze([
   {
     phase: 1,
@@ -100,6 +148,7 @@ export const PHASES = Object.freeze([
     sampleWords: ['cat', 'hen', 'big', 'dog', 'bug', 'map', 'pen', 'sit', 'top', 'sun'],
     sentenceExamples: ['The cat sat on a mat.', 'A pig is in the mud.'],
     recommendedModes: ['wordCount', 'oralBlend', 'first', 'last', 'middle', 'soundCount', 'blend', 'classicBlend', 'segment', 'hear', 'train', 'oddOneOut', 'soundHunt'],
+    sightWords: ['the', 'to', 'I', 'no', 'go', 'into'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -114,6 +163,7 @@ export const PHASES = Object.freeze([
     sampleWords: ['flat', 'clap', 'trap', 'step', 'sled', 'flip', 'drip', 'drop', 'stop', 'drum'],
     sentenceExamples: ['I can clap and step.', 'A frog is on the slip mat.'],
     recommendedModes: ['blend', 'classicBlend', 'segment', 'hear', 'first', 'last', 'soundCount', 'missing', 'train', 'oddOneOut', 'soundHunt'],
+    sightWords: ['he', 'she', 'we', 'me', 'be'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -128,6 +178,7 @@ export const PHASES = Object.freeze([
     sampleWords: ['band', 'bank', 'belt', 'gift', 'milk', 'song', 'lost', 'jump', 'dust', 'lamp'],
     sentenceExamples: ['Hand me the lamp.', 'I jump in the dust.'],
     recommendedModes: ['classicBlend', 'blend', 'segment', 'first', 'last', 'hear', 'missing'],
+    sightWords: ['was', 'you', 'they', 'all', 'are'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -142,6 +193,7 @@ export const PHASES = Object.freeze([
     sampleWords: ['ship', 'chip', 'that', 'when', 'sing', 'lock', 'fish', 'chop', 'this', 'whip'],
     sentenceExamples: ['The ship has a chip.', 'Wash the dish in the sink.'],
     recommendedModes: ['hear', 'blend', 'classicBlend', 'segment', 'first', 'last', 'missing', 'soundCount'],
+    sightWords: ['my', 'her', 'said', 'have', 'like'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -156,6 +208,7 @@ export const PHASES = Object.freeze([
     sampleWords: ['stamp', 'blend', 'print', 'stomp', 'stump', 'plank', 'crest', 'drink', 'frost', 'trust'],
     sentenceExamples: ['Print the brand on the stamp.', 'I trust the stump will hold.'],
     recommendedModes: ['classicBlend', 'blend', 'segment', 'hear', 'first', 'last', 'missing', 'soundCount'],
+    sightWords: ['so', 'do', 'some', 'come', 'were'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -170,6 +223,7 @@ export const PHASES = Object.freeze([
     sampleWords: ['cake', 'rain', 'play', 'tree', 'beat', 'kite', 'night', 'cry', 'home', 'boat', 'snow', 'cube', 'blue', 'new', 'moon'],
     sentenceExamples: ['The cake is on the plate.', 'I see a bee in the tree.', 'At night the light is bright.'],
     recommendedModes: ['classicBlend', 'blend', 'hear', 'first', 'middle', 'segment', 'missing'],
+    sightWords: ['there', 'little', 'one', 'when', 'what'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -184,6 +238,7 @@ export const PHASES = Object.freeze([
     sampleWords: ['coin', 'boy', 'out', 'cow', 'paw', 'jaw', 'loud', 'joy', 'town', 'dawn'],
     sentenceExamples: ['The boy found a coin.', 'I saw a paw on the lawn.'],
     recommendedModes: ['classicBlend', 'blend', 'hear', 'middle', 'segment', 'missing'],
+    sightWords: ['oh', 'their', 'people', 'looked', 'out'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -198,6 +253,7 @@ export const PHASES = Object.freeze([
     sampleWords: ['float', 'crisp', 'blend', 'sprint', 'plank', 'scrap', 'twist', 'shrink', 'sprout', 'thrust'],
     sentenceExamples: ['Sprint and stamp until the drums thump.', 'The girl saw a bird in the fern.'],
     recommendedModes: ['classicBlend', 'blend', 'hear', 'segment', 'soundCount'],
+    sightWords: ['called', 'asked', 'could', 'should', 'would'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -212,6 +268,7 @@ export const PHASES = Object.freeze([
     sampleWords: ['running', 'jumped', 'grander', 'tallest', 'helped', 'biggest', 'playing', 'sitting', 'slower', 'eating'],
     sentenceExamples: ['He was running faster than me.', 'The biggest cat jumped highest.'],
     recommendedModes: ['classicBlend', 'blend', 'hear', 'segment'],
+    sightWords: ['because', 'once', 'please', 'thought'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -226,9 +283,26 @@ export const PHASES = Object.freeze([
     sampleWords: ['redo', 'untie', 'action', 'readable', 'science', 'market', 'their', 'because', 'enough', 'through'],
     sentenceExamples: ['Their friend is reading because the book is good.', 'I will redo my action plan.'],
     recommendedModes: ['classicBlend', 'blend', 'hear'],
+    sightWords: ['through', 'enough', 'again', 'friend', 'where'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 ]);
+
+/**
+ * High-frequency "tricky" words interleaved into each phonics phase, in
+ * Letters-and-Sounds-style order. Sight words are not a separate silo —
+ * a few are learned alongside each phase's code knowledge.
+ * @param {number} phase
+ * @returns {string[]}
+ */
+export function getSightWordsForPhase(phase) {
+  return PHASES.find(p => p.phase === phase)?.sightWords || [];
+}
+
+/** All phase-interleaved sight words up to and including a phase. */
+export function getSightWordsThroughPhase(phase) {
+  return PHASES.filter(p => p.phase <= phase).flatMap(p => p.sightWords || []);
+}
 
 /** Phase labels for UI display. Derived from PHASES so they cannot drift. */
 export const PHASE_LABELS = Object.freeze(

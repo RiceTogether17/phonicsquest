@@ -1174,6 +1174,17 @@ export function derivePlacementResult(results, intake = {}, schoolLevel = 'presc
   // Legacy fields above are untouched so routing keeps working.
   result.stageScores      = _computeStageScores(results);
   result.skillGaps        = _computeSkillGaps(result.stageScores);
+
+  // Foundation routing: a child who cannot yet hear the sounds in words
+  // starts at Step 0a (phonemic awareness); one who hears sounds but cannot
+  // map letters to them starts at Step 0b (letter sounds). Only then does
+  // Phase 1 blending begin. Keys match curriculum.js PRE_PHASES.
+  const paComposite = result.stageScores?.phonemicAwareness?.composite;
+  const lsComposite = result.stageScores?.letterSounds?.composite;
+  result.startPrePhase =
+    (typeof paComposite === 'number' && paComposite < 0.6) ? '0a'
+    : (typeof lsComposite === 'number' && lsComposite < 0.6) ? '0b'
+    : null;
   result.bandDescription  = BAND_DESCRIPTION[readingBand] || BAND_DESCRIPTION['pre-reader'];
 
   result.recommendedHomePath = _recommendedPath(result);

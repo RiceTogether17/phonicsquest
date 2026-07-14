@@ -19,6 +19,8 @@ import { mapCharIndexToWord, isOffscreen } from '../modules/karaokeUtils.js';
 import { lookupWord as lookupWordForDetective, addWordToReview } from '../modules/wordDetective.js';
 import { isReadAloudSupported, listenToLine, stopListening } from '../modules/readAloudListener.js';
 import { store } from '../modules/store.js';
+import { getBandReadiness } from '../modules/storyGating.js';
+import { getSightWordsInStory } from '../modules/sightStoryWeave.js';
 import { modalManager } from '../modules/modalManager.js';
 import { unlockFriend, getRosterSummary } from '../modules/storyFriends.js';
 import {
@@ -264,14 +266,17 @@ function _renderBrowser() {
     const read = getReadStories();
     const readCount = stories.filter(s => read.includes(s.id)).length;
 
+    const readiness = getBandReadiness();
     const bandTabsHtml = BAND_META.map(m => /* html */`
       <button
-        class="story-tab${m.band === _activeBand ? ' active' : ''}"
+        class="story-tab${m.band === _activeBand ? ' active' : ''}${readiness[m.band]?.ready ? '' : ' story-tab--not-ready'}"
         data-band="${m.band}"
         style="--tab-color:${m.color}"
+        ${readiness[m.band]?.ready ? '' : `title="${readiness[m.band].hint}"`}
       >
         <span class="story-tab-num">${m.band}</span>
         <span class="story-tab-name">${m.label}</span>
+        ${readiness[m.band]?.ready ? '' : '<span class="story-tab-lock" aria-hidden="true">🔓</span>'}
       </button>
     `).join('');
 
@@ -291,6 +296,10 @@ function _renderBrowser() {
           <span class="slstrip-progress-bar" style="--pct:${progressPct}%"></span>
         </span>
       </div>
+      ${readiness[_activeBand]?.ready ? '' : `
+        <p class="stories-readiness-note" role="note">
+          🧭 ${readiness[_activeBand].hint}. You can still read together with a grown-up!
+        </p>`}
       <div class="story-cards-grid">${cardsHtml}</div>
     `;
   } else if (_activeTab === 'singapore') {
@@ -425,6 +434,14 @@ function _renderReader(story) {
 
       <!-- Title -->
       <h2 class="story-reader-title">${story.title}</h2>
+
+      ${(() => {
+        const spot = getSightWordsInStory(story);
+        return spot.length ? `
+          <p class="story-spot-words" aria-label="Sight words to spot in this story">
+            ⭐ Words to spot: ${spot.map(w => `<span class="story-spot-word">${w}</span>`).join(' ')}
+          </p>` : '';
+      })()}
 
       <!-- Mode toggle -->
       <div class="story-mode-toggle" role="group" aria-label="Reading mode">
