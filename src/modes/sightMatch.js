@@ -95,6 +95,11 @@ function _renderBrowser() {
             <div class="sm-tier-desc">${meta.desc}</div>
           </div>
         </div>
+        ${tier === 'hard' ? `
+        <p class="sm-tier-note" role="note">
+          ✏️ These are P4–P6 spelling words — after matching them, spot them
+          misspelled in <button class="sm-tier-link" id="sm-goto-editing">Editing Quest</button>.
+        </p>` : ''}
         <div class="sm-quest-grid">`;
 
     for (const quest of quests) {
@@ -140,6 +145,8 @@ function _renderBrowser() {
 
   html += '</div>';
   _container.innerHTML = html;
+
+  document.getElementById('sm-goto-editing')?.addEventListener('click', () => document.getElementById('btn-editing-quest')?.click());
 
   _container.querySelectorAll('.sm-quest-action').forEach(btn => {
     btn.addEventListener('click', (e) => {

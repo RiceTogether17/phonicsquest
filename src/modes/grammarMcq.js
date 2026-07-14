@@ -1,4 +1,5 @@
 import { questMastery } from '../modules/questMastery.js';
+import { getDefaultPracticeLevel, isRecommendedLevel } from '../modules/practiceDefaults.js';
 import { gamification } from '../modules/gamification.js';
 import { store } from '../modules/store.js';
 import { GRAMMAR_MCQ_ITEMS, GRAMMAR_MCQ_LEVELS, buildGrammarMcqLevel } from '../data/grammarMcq.js';
@@ -97,7 +98,7 @@ export function showGrammarMcqBrowser() {
 
   const levelCounts = getLevelCounts();
   const categoryCounts = getCategoryCounts();
-  let selectedLevel = _scope.level || 'P1';
+  let selectedLevel = _scope.level || getDefaultPracticeLevel();
   let selectedDifficulty = _scope.difficulty || _difficulty || 'normal';
 
   const render = () => {
@@ -111,6 +112,7 @@ export function showGrammarMcqBrowser() {
           <div class="sfq-browser-grid mcq-level-grid">
             ${levelCounts.map(({ level, total }) => `
               <button class="sfq-level-btn mcq-level-card ${level === selectedLevel ? 'mcq-level-card--active' : ''}" data-pick-level="${level}">
+                ${isRecommendedLevel(level) ? '<span class="mcq-level-rec" aria-label="Recommended level">⭐ For you</span>' : ''}
                 <span class="sfq-level-name">${level}</span>
                 <span class="mcq-count-badge">${total} items</span>
               </button>
