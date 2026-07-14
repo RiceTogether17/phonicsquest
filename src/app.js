@@ -2761,7 +2761,14 @@ class App {
 
     const groupMastery = store.get('groupMastery') || {};
     const snapshot     = buildProgressionSnapshot();
-    const unlocked     = getUnlockedStages(snapshot);
+    // Listening-first modes don't require decoding, so the strict decoding
+    // gate would lock out exactly the pre-readers these games exist for.
+    // Every stage stays open; word difficulty still rises stage by stage.
+    const ORAL_MODES = new Set(['first', 'last', 'middle', 'oralBlend', 'soundCount', 'oddOneOut', 'train', 'wordCount']);
+    const isOralMode   = ORAL_MODES.has(mode);
+    const unlocked     = isOralMode
+      ? stagesForMode.map(s => s.id)
+      : getUnlockedStages(snapshot);
     const recommended  = getRecommendedStage(snapshot);
 
     document.getElementById('modal-blend-picker')?.remove();
@@ -2776,7 +2783,8 @@ class App {
     const modeMeta   = MODES[mode] || null;
     const modeIcon   = modeMeta?.icon || '🎯';
     const modeName   = modeMeta?.name || 'Phonics Quest';
-    const modeIntro  = modeMeta?.desc ? `${modeMeta.desc}.` : '';
+    const desc       = modeMeta?.desc || '';
+    const modeIntro  = desc ? (/[.?!]$/.test(desc) ? desc : `${desc}.`) : '';
 
     let stagesHtml = '';
     for (const [phaseNum, stages] of Object.entries(byPhase)) {
@@ -2828,6 +2836,7 @@ class App {
           <button class="modal-close" id="bp-close-btn" aria-label="Close picker">✕</button>
         </div>
         ${modeIntro ? `<p class="bp-intro">${modeIntro} Pick a stage to practise.</p>` : ''}
+        ${typeof isOralMode !== 'undefined' && isOralMode ? '<p class="bp-intro bp-intro--oral">👂 A listening game — every stage is open. Words get trickier as you go!</p>' : ''}
         <div class="bp-stages-list">${stagesHtml}</div>
       </div>`;
 
