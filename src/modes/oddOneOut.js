@@ -117,7 +117,7 @@ function _nameCardsInSequence(cards, grid) {
       if (token !== _namingTimer || !btn.isConnected) return;
       const wordText = btn.getAttribute('aria-label')?.replace('Card: ', '') ?? '';
       btn.classList.add('previewing');
-      try { await audio.speakWord(wordText); } catch { /* keep naming */ }
+      try { await audio.speakWordArticulated(wordText); } catch { /* keep naming */ }
       btn.classList.remove('previewing');
       await new Promise(r => setTimeout(r, 350));
     }

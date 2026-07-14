@@ -1671,6 +1671,14 @@ class App {
         this._openPrimaryPlaceholder(target);
         break;
       default:
+        // Any bare game-mode key (first, last, middle, oddOneOut, syllable,
+        // soundHunt, segment, …) starts that mode directly — journey-aware
+        // warm-up steps navigate this way.
+        if (MODES[target]) {
+          this._mode = target;
+          store.set('currentMode', target);
+          this._startGame();
+        }
         break;
     }
   }

@@ -19,7 +19,7 @@ import { mapCharIndexToWord, isOffscreen } from '../modules/karaokeUtils.js';
 import { lookupWord as lookupWordForDetective, addWordToReview } from '../modules/wordDetective.js';
 import { isReadAloudSupported, listenToLine, stopListening } from '../modules/readAloudListener.js';
 import { store } from '../modules/store.js';
-import { getBandReadiness } from '../modules/storyGating.js';
+import { getBandReadiness, getRecommendedBand } from '../modules/storyGating.js';
 import { getSightWordsInStory } from '../modules/sightStoryWeave.js';
 import { modalManager } from '../modules/modalManager.js';
 import { unlockFriend, getRosterSummary } from '../modules/storyFriends.js';
@@ -58,6 +58,7 @@ function tokenise(text) {
 let _container   = null;
 let _onGoHome    = null;
 let _activeBand  = 'A';       // 'A' | 'B' | 'C' | 'D'
+let _bandAutoPicked = false;  // pick the recommended shelf once per session
 let _activeTab   = 'band';   // 'band' | 'singapore' | 'chapter'
 let _readMode    = 'aloud';   // 'aloud' | 'decode'
 let _speaking    = false;
@@ -259,6 +260,16 @@ function _renderBrowser() {
   let innerHtml;
 
   if (_activeTab === 'band') {
+    // Open on the shelf that matches the child's phonics progress (once
+    // per session — after that, respect whatever tab they tap).
+    if (!_bandAutoPicked) {
+      _bandAutoPicked = true;
+      try {
+        const byBand = {};
+        for (const st of STORIES) (byBand[st.band] ??= []).push(st);
+        _activeBand = getRecommendedBand(getReadStories(), byBand) || _activeBand;
+      } catch (_) { /* keep default */ }
+    }
     // ── Band tabs + cards ─────────────────────────────────────────────
     const bandMeta = BAND_META.find(m => m.band === _activeBand) ?? BAND_META[0];
     const stories = STORIES.filter(s => s.band === _activeBand && s.category !== 'chapter' && s.category !== 'nonfiction-sg');

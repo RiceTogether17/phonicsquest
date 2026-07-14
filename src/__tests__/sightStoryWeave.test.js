@@ -108,4 +108,25 @@ describe('quest-word story coverage floors', () => {
     expect(covered.medium).toBeGreaterThanOrEqual(220);
     expect(covered.hard).toBeGreaterThanOrEqual(1);
   });
+
+  it('every medium quest word appears in a story or a Sentence Forge sentence', async () => {
+    const { allSentences } = await import('../data/sentences.js');
+    const tokens = new Set();
+    for (const story of STORIES) {
+      for (const t of extractCountableTokens(story)) tokens.add(t);
+    }
+    for (const entry of allSentences) {
+      for (const w of String(entry.sentence).toLowerCase().match(/[a-z']+/g) || []) {
+        tokens.add(w.replace(/'/g, ''));
+      }
+    }
+    const missing = [];
+    for (const quest of SIGHT_QUESTS.filter(q => q.tier !== 'hard')) {
+      for (const w of quest.words) {
+        const clean = w.toLowerCase().replace(/'/g, '');
+        if (!tokens.has(w.toLowerCase()) && !tokens.has(clean)) missing.push(w);
+      }
+    }
+    expect(missing, `uncovered quest words: ${missing.join(', ')}`).toEqual([]);
+  });
 });

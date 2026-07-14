@@ -28,6 +28,7 @@ import { store } from './store.js';
 import { getActiveProfile } from './profiles.js';
 import { getReadingBand } from './readingStages.js';
 import { getEarlyReadingPlan } from './todaysPlan.js';
+import { getCurrentJourneyStep } from '../data/journeyStages.js';
 import { getMissionSteps } from './missionToday.js';
 import { getRemediationPlan } from './remediationRouter.js';
 import { getRecommendedStage } from './progression.js';
@@ -114,6 +115,14 @@ function _fromEarlyStep(step, kind, kindLabel) {
 }
 
 function _earlyTeachStep() {
+  // Children still on the pre-print journey steps (hearing sounds,
+  // learning letters) don't get a blending mini-lesson yet — their
+  // journey warm-up IS the day's teaching moment.
+  try {
+    const journeyKey = getCurrentJourneyStep()?.key;
+    if (journeyKey === 'phonemic-awareness' || journeyKey === 'letter-sounds') return null;
+  } catch (_) { /* fall through to the phonics teach step */ }
+
   let stage;
   try { stage = getRecommendedStage(); } catch (_) { stage = null; }
   if (!stage) return null;

@@ -140,11 +140,13 @@ function _waitForWordAudio(wordData) {
   // segmenting it, which is exactly what classroom teachers do.
   return new Promise(resolve => {
     setTimeout(() => {
-      const ttsDone   = audio.speakWordArticulated(text).catch(() => {});
+      const ttsDone   = audio.speakWordTwiceClear(text).catch(() => {});
       // At ~0.55 rate the audio is roughly 45% longer than the default
       // 0.8 path, so the wall-clock floor grows accordingly. Some
       // browsers resolve onend early so the floor is the real guard.
-      const minHoldMs = Math.max(1600, text.length * 220 + 500);
+      // Two utterances (articulated + near-natural repeat) plus the pause
+      // between them — the floor covers the whole double-say.
+      const minHoldMs = Math.max(2600, text.length * 340 + 900);
       const floorHold = new Promise(r => setTimeout(r, minHoldMs));
       Promise.all([ttsDone, floorHold]).finally(resolve);
     }, 350);

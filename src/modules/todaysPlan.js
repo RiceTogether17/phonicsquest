@@ -25,6 +25,7 @@ import { progress } from './progress.js';
 import { isDailyChallengeComplete, DAILY_BONUS_XP } from './dailyChallenge.js';
 import { estimateMinutes } from './reviewScheduler.js';
 import { getRecommendation, getDailyPlan } from './recommendations.js';
+import { getCurrentJourneyStep } from '../data/journeyStages.js';
 
 /** Number of unique words the child needs to play today to complete the warm-up. */
 export const WARMUP_TARGET = 3;
@@ -119,7 +120,74 @@ export function getEarlyReadingPlan() {
  * weakest phonics group for emerging decoders).
  * @private
  */
+/**
+ * Warm-ups for the journey steps that come before (or after) phonics-group
+ * work. A child still on phonemic awareness gets a listening game, not a
+ * print drill; letter-sounds children get sound-to-letter matching; sight
+ * word and story children continue their sequences. Blending-stage
+ * children fall through to the recommendations engine, which already
+ * targets their weakest phonics group.
+ */
+const JOURNEY_WARMUPS = {
+  'phonemic-awareness': {
+    icon: '👂',
+    title: 'Hear the Sounds',
+    detail: 'Listening ears on — no letters needed yet.',
+    modes: [
+      { target: 'first',     label: 'First Sound' },
+      { target: 'last',      label: 'Last Sound' },
+      { target: 'oddOneOut', label: 'Odd One Out' },
+      { target: 'syllable',  label: 'Clap the Syllables' },
+      { target: 'middle',    label: 'Middle Sound' },
+    ],
+  },
+  'letter-sounds': {
+    icon: '🔡',
+    title: 'Letter Sounds',
+    detail: 'Match each sound to its letter.',
+    modes: [
+      { target: 'soundHunt', label: 'Sound Hunt' },
+      { target: 'hear',      label: 'Hear & Choose' },
+    ],
+  },
+  'sight-words': {
+    icon: '🃏',
+    title: 'Sight Words',
+    detail: 'Flip and match the next quest.',
+    modes: [{ target: 'sight-words', label: 'Card quest' }],
+  },
+  stories: {
+    icon: '📚',
+    title: 'Story Time',
+    detail: 'Read a story from your shelf.',
+    modes: [{ target: 'stories', label: 'Read with Giri' }],
+  },
+};
+
+/** Journey-matched warm-up, or null for blending/primary steps. @private */
+function _journeyWarmup(now = new Date()) {
+  let step;
+  try { step = getCurrentJourneyStep(); } catch (_) { return null; }
+  const spec = JOURNEY_WARMUPS[step?.key];
+  if (!spec) return null;
+  // Rotate the activity daily so the same step doesn't feel repetitive.
+  const dayIndex = Math.floor(now.getTime() / 86400000);
+  const mode = spec.modes[dayIndex % spec.modes.length];
+  return {
+    title: `${spec.title}: ${mode.label}`,
+    detail: spec.detail,
+    icon: spec.icon,
+    target: mode.target,
+    group: null,
+  };
+}
+
 function _pickWarmup() {
+  // The child's journey step decides the KIND of warm-up first; only
+  // blending-stage children use the group-targeted recommendation engine.
+  const journey = _journeyWarmup();
+  if (journey) return journey;
+
   // Daily plan's first step is the most targeted recommendation; fall back
   // to the headline recommendation if for some reason getDailyPlan returns
   // an empty list.
@@ -157,4 +225,4 @@ function _pickWarmup() {
   };
 }
 
-export const __TEST__ = { _pickWarmup };
+export const __TEST__ = { _pickWarmup, _journeyWarmup };
