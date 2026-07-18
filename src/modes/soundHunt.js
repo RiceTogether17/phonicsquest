@@ -20,7 +20,7 @@
  * children remember letter sounds" drill from the classroom material.
  */
 
-import { renderPhonemes } from '../components/phonemeDisplay.js';
+import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { createChoiceRound } from './choiceRound.js';
 import { audio } from '../modules/audio.js';
@@ -41,8 +41,9 @@ export function setupSoundHunt(word, els) {
   const targetType     = word.types[0];
 
   // No emoji, no printed word — either would leak the answer before the
-  // child has done the sound-to-letter mapping themselves.
-  els.wordEmoji.innerHTML   = '';
+  // child has done the sound-to-letter mapping themselves. Hide the image
+  // frame too so the stage doesn't show an empty box.
+  renderWordImage(word, els.wordEmoji, false);
   els.wordDisplay.innerHTML = '';
   els.phonemeRow.innerHTML  = '';
 
