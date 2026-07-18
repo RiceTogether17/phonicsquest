@@ -22,6 +22,7 @@ import { audio } from '../modules/audio.js';
 import { WORDS, shuffleArray } from '../data/words.js';
 import { getFirstSoundDistractors } from './firstSound.js';
 import { createChoiceRound } from './choiceRound.js';
+import { renderWordImage } from '../components/phonemeDisplay.js';
 
 let _currentWord = null;
 let _round = null;
@@ -54,7 +55,9 @@ export function setupOddOneOut(word, els) {
     { word: roundData.odd, isOdd: true },
   ]);
 
-  els.wordEmoji.innerHTML   = '';
+  // Hide the word image frame entirely — the pictures live on the choice
+  // cards, so an empty stage box just wastes vertical space.
+  renderWordImage(word, els.wordEmoji, false);
   els.wordDisplay.innerHTML = '';
   els.phonemeRow.innerHTML  = '';
   els.modeInstruction.textContent = 'Three words start with the same sound. Which one doesn\'t belong?';

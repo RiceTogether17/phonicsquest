@@ -300,7 +300,6 @@ class App {
     this._els.btnBack?.addEventListener('click', () => {
       this._cleanupMode();
       this._sessionWordCount = 0;
-      this._hideGameMascot();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
@@ -871,9 +870,6 @@ class App {
     this._showScreen(SCREENS.GAME);
     mascot.think();
 
-    // Show floating mascot in game
-    this._setGameMascot('thinking');
-
     // Set up the mode
     const mode = MODES[this._mode];
     if (!mode) return;
@@ -934,7 +930,6 @@ class App {
       setTimeout(() => phonemeRow?.classList.remove('phoneme-row--shake'), 500);
 
       this._wrongStrikes++;
-      this._setGameMascot('encourage');
       mascot.encourage();
       audio.playSfx('wrong');
       this._showToast('Almost! Have another go — the 💡 Hint plays the first sound.', 'warning');
@@ -973,7 +968,6 @@ class App {
 
       mascot.celebrate(reward.levelUp);
       mascot.setResultState(reward.levelUp ? 'trophy' : 'confetti');
-      this._setGameMascot('celebrate');
 
       if (reward.levelUp) {
         celebrateLevelUp();
@@ -1004,7 +998,6 @@ class App {
       setTimeout(() => phonemeRow?.classList.remove('phoneme-row--shake'), 500);
 
       this._wrongStrikes++;
-      this._setGameMascot('encourage');
 
       const result = gamification.recordWrong();
       mascot.encourage();
@@ -1067,31 +1060,6 @@ class App {
       // Re-apply tab choice on every return home: covers a day rolling over
       // mid-session (back to Today) and a profile switch (their last tab).
       selectTab(getInitialTab(), { persist: false });
-    }
-  }
-
-  _setGameMascot(state) {
-    const el = document.getElementById('game-mascot');
-    if (!el) return;
-    const src = {
-      thinking: 'giri-thinking.png',
-      celebrate: 'giri-celebrate.png',
-      encourage: 'giri-encourage.png',
-      clap: 'giri-clap-frame.png',
-    }[state] || 'giri-neutral.png';
-    const base = import.meta.env.BASE_URL;
-    el.innerHTML = `<img src="${base}images/mascot/${src}" alt="" width="48" height="48" decoding="async" style="object-fit:contain"/>`;
-    el.classList.add('game-mascot--visible');
-    el.classList.remove('game-mascot--celebrate');
-    if (state === 'celebrate' || state === 'clap') {
-      el.classList.add('game-mascot--celebrate');
-    }
-  }
-
-  _hideGameMascot() {
-    const el = document.getElementById('game-mascot');
-    if (el) {
-      el.classList.remove('game-mascot--visible', 'game-mascot--celebrate');
     }
   }
 

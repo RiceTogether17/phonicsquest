@@ -1518,27 +1518,6 @@ body.bedtime-on * {
   color: var(--color-primary);
 }
 
-/* ── GAME MASCOT REACTION ── */
-.game-mascot {
-  position: fixed;
-  bottom: 100px;
-  left: 12px;
-  width: 48px;
-  height: 48px;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity var(--dur-base), transform var(--dur-slow) var(--ease-bounce);
-  transform: translateY(20px);
-  pointer-events: none;
-}
-.game-mascot--visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.game-mascot--celebrate {
-  animation: bob 1.5s ease-in-out 2;
-}
-
 /* ── GAME SESSION PROGRESS ── */
 .game-progress {
   display: flex;

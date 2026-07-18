@@ -128,7 +128,6 @@ describe('speech recognition enhancements', () => {
     app._showScreen = vi.fn();
     app._showToast = vi.fn();
     app._adjustModeDifficulty = vi.fn();
-    app._setGameMascot = vi.fn();
 
     app._applyManualSpeechOverride('manual-word-1');
 

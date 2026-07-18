@@ -68,7 +68,6 @@ describe('_startGame — non-PA modes pick a fresh word every round', () => {
     app._currentWord = { id: 'previous', word: 'bag', graphemes: ['b','a','g'], types: ['c','sv','c'] };
 
     app._showScreen    = vi.fn();
-    app._setGameMascot = vi.fn();
 
     app._startGame('short-a');
 
@@ -94,7 +93,6 @@ describe('_startGame — non-PA modes pick a fresh word every round', () => {
     app._sessionType = 'normal';
     app._currentWord = { id: 'previous', word: 'bag', graphemes: ['b','a','g'], types: ['c','sv','c'] };
     app._showScreen    = vi.fn();
-    app._setGameMascot = vi.fn();
 
     app._startGame('short-a');
     const firstId = app._currentWord.id;

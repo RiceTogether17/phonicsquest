@@ -64,7 +64,6 @@ async function makeApp(mode) {
   vi.spyOn(progress, 'isNewWord').mockReturnValue(false);
   vi.spyOn(app, '_showResultScreen').mockImplementation(() => {});
   vi.spyOn(app, '_adjustModeDifficulty').mockImplementation(() => {});
-  vi.spyOn(app, '_setGameMascot').mockImplementation(() => {});
   vi.spyOn(app, '_showToast').mockImplementation(() => {});
 
   app._mode = mode;
