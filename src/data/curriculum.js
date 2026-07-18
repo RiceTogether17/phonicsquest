@@ -111,7 +111,7 @@ export const PRE_PHASES = Object.freeze([
     targetSounds: ['first sound isolation', 'last sound isolation', 'middle sound isolation', 'oral blending', 'syllable clapping', 'word counting'],
     sampleWords: ['cat (/k/ /a/ /t/)', 'sun (/s/ /u/ /n/)', 'map (/m/ /a/ /p/)', 'ti-ger (2 claps)', 'ba-na-na (3 claps)'],
     sentenceExamples: ['What sound does "sun" start with?', 'Clap the beats in "tiger".', '/d/ /o/ /g/ — what word is that?'],
-    recommendedModes: ['first', 'last', 'middle', 'oralBlend', 'soundCount', 'syllable', 'wordCount', 'oddOneOut', 'train'],
+    recommendedModes: ['first', 'last', 'middle', 'oralBlend', 'soundCount', 'oralSegment', 'syllable', 'wordCount', 'oddOneOut', 'train'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
@@ -147,7 +147,7 @@ export const PHASES = Object.freeze([
     targetSounds: ['short a /ă/', 'short e /ĕ/', 'short i /ĭ/', 'short o /ŏ/', 'short u /ŭ/'],
     sampleWords: ['cat', 'hen', 'big', 'dog', 'bug', 'map', 'pen', 'sit', 'top', 'sun'],
     sentenceExamples: ['The cat sat on a mat.', 'A pig is in the mud.'],
-    recommendedModes: ['wordCount', 'oralBlend', 'first', 'last', 'middle', 'soundCount', 'blend', 'classicBlend', 'segment', 'hear', 'train', 'oddOneOut', 'soundHunt'],
+    recommendedModes: ['wordCount', 'oralBlend', 'first', 'last', 'middle', 'soundCount', 'oralSegment', 'blend', 'classicBlend', 'segment', 'hear', 'train', 'oddOneOut', 'soundHunt'],
     sightWords: ['the', 'to', 'I', 'no', 'go', 'into'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },

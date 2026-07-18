@@ -135,7 +135,14 @@ function _getMiddleVowelIdx(word) {
   for (let i = minI; i <= maxI; i++) {
     if (VOWEL_TYPES.has(word.types[i])) return i;
   }
-  // Fallback: absolute middle index
+  // Word selection excludes words without an interior vowel (see
+  // hasInteriorVowel in progress.js), but replay paths (Mistakes Den,
+  // word workouts) can still hand one in. Target ANY vowel over the
+  // absolute-middle index: the old fallback landed on a consonant for
+  // silent-e words like "ape" (a|p|e → 'p'), making the vowel-choice
+  // question unanswerable.
+  const anyVowel = word.types.findIndex(t => VOWEL_TYPES.has(t));
+  if (anyVowel >= 0) return anyVowel;
   return Math.floor(word.graphemes.length / 2);
 }
 

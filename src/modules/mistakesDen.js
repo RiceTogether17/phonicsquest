@@ -39,6 +39,7 @@ const MODULE_TARGETS = Object.freeze({
   last:         'last',
   middle:       'middle',
   soundCount:   'soundCount',
+  oralSegment:  'oralSegment',
   missing:      'missing',
   segment:      'segment',
   // Primary quests (questAttempts.quest values)
@@ -64,6 +65,7 @@ const MODULE_LABELS = Object.freeze({
   last:           '🏁 Last Sound',
   middle:         '🎯 Middle Sound',
   soundCount:     '🔢 Count the Sounds',
+  oralSegment:    '🥁 Tap the Sounds',
   missing:        '🔍 Missing Sound',
   segment:        '✂️ Segment It',
   clozeCastle:    '🏰 Cloze Castle',

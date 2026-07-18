@@ -28,6 +28,7 @@ import { setupFluencySprint, cleanup as cleanupFluency, getCurrentWord as getFlu
 import { setupSoundHunt,    cleanup as cleanupSoundHunt, getCurrentWord as getSoundHuntWord } from './soundHunt.js';
 import { setupOddOneOut,    cleanup as cleanupOddOneOut, getCurrentWord as getOddOneOutWord } from './oddOneOut.js';
 import { setupWordCount,    cleanup as cleanupWordCount, getCurrentWord as getWordCountWord } from './wordCountMode.js';
+import { setupOralSegment,  cleanup as cleanupOralSegment, getCurrentWord as getOralSegmentWord } from './oralSegment.js';
 
 /**
  * @typedef {Object} Mode
@@ -137,6 +138,18 @@ export const MODES = {
     setup: setupSoundCount,
     cleanup: cleanupSoundCount,
     getCurrentWord: getSoundCountWord,
+  },
+  oralSegment: {
+    key: 'oralSegment',
+    name: 'Tap the Sounds',
+    desc: 'Tap once for every sound — no letters!',
+    icon: '🥁',
+    group: 'phonemic',
+    subskill: 'oral-phoneme-segmenting',
+    resultPolicy: 'final',
+    setup: setupOralSegment,
+    cleanup: cleanupOralSegment,
+    getCurrentWord: getOralSegmentWord,
   },
   train: {
     key: 'train',

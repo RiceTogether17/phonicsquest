@@ -13088,6 +13088,51 @@ textarea:hover {
   letter-spacing: 2px;
 }
 
+/* ============================================================
+   Tap the Sounds mode (oral phoneme segmenting)
+   ============================================================ */
+
+.oral-segment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4, 16px);
+  padding: var(--space-3, 12px) 0;
+}
+
+.oral-segment-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+}
+
+.sound-dots {
+  display: flex;
+  gap: 10px;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.sound-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 3px solid var(--primary, #5a52e0);
+  background: transparent;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.sound-dot--filled {
+  background: var(--primary, #5a52e0);
+  animation: pop 0.3s var(--ease-bounce, ease-out);
+}
+.sound-dot--lit {
+  background: var(--color-success, #22c55e);
+  border-color: var(--color-success, #22c55e);
+  transform: scale(1.2);
+}
+
 /* ── Print Report ─────────────────────────────────────────────── */
 
 /* Print report — screen (hidden by default) */

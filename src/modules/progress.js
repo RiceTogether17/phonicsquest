@@ -23,13 +23,28 @@ export function isStageHiddenForMode(group, mode) {
   return BLENDING_MODES.has(mode) && NON_DECODABLE_GROUPS.has(group);
 }
 
+const VOWEL_TYPES = new Set(['sv', 'lv', 'rc', 'dp']);
+
+/**
+ * Does the word have a genuine medial vowel — a vowel phoneme that is
+ * neither the first nor the last sound? Middle Sound can only ask an
+ * honest question about such words: from the long-vowel stages onward
+ * many words carry their vowel first or last ("ape" /ā/-p, "car" c-/ar/,
+ * "boy" b-/oy/), and quizzing those as "the MIDDLE sound" actually tests
+ * a first or last sound.
+ */
+export function hasInteriorVowel(word) {
+  if (!Array.isArray(word?.types) || word.types.length <= 2) return false;
+  return word.types.slice(1, -1).some(t => VOWEL_TYPES.has(t));
+}
+
 // Groups that should not appear in phonemic-awareness activities because their
 // words are irregular, multisyllabic, or non-decodable at the phoneme level.
 const PA_EXCLUDED_GROUPS = new Set([
   'sight-highfreq', 'multisyllable', 'prefixes', 'suffixes-advanced',
 ]);
 const PHONEMIC_AWARENESS_MODES = new Set([
-  'first', 'last', 'middle', 'oralBlend', 'soundCount', 'missing', 'segment',
+  'first', 'last', 'middle', 'oralBlend', 'soundCount', 'oralSegment', 'missing', 'segment',
 ]);
 
 /**
@@ -54,6 +69,7 @@ export const SKILL_BY_MODE = Object.freeze({
   last:         'segmenting',
   middle:       'segmenting',
   soundCount:   'segmenting',
+  oralSegment:  'segmenting',
   segment:      'segmenting',
   blend:        'decoding',
   classicBlend: 'decoding',
@@ -184,6 +200,13 @@ class Progress {
 
     if (PHONEMIC_AWARENESS_MODES.has(opts.mode)) {
       pool = pool.filter(word => !PA_EXCLUDED_GROUPS.has(word.group));
+    }
+
+    // Middle Sound needs a true medial vowel — see hasInteriorVowel. Every
+    // stage that recommends the mode keeps a healthy pool after this filter,
+    // so it never empties a stage.
+    if (opts.mode === 'middle') {
+      pool = pool.filter(hasInteriorVowel);
     }
 
     if (pool.length === 0) {
