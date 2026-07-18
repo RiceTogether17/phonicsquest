@@ -263,7 +263,7 @@ class App {
     // (lockable) stage picker and launches straight into play.
     const PICKER_MODES = new Set([
       'blend', 'oralBlend', 'first', 'last', 'middle',
-      'soundCount', 'hear', 'missing', 'segment',
+      'soundCount', 'oralSegment', 'hear', 'missing', 'segment',
       'train', 'soundHunt', 'oddOneOut', 'wordCount',
       'wordSort', 'readAndTap',
     ]);
@@ -2732,7 +2732,7 @@ class App {
     // Listening-first modes don't require decoding, so the strict decoding
     // gate would lock out exactly the pre-readers these games exist for.
     // Every stage stays open; word difficulty still rises stage by stage.
-    const ORAL_MODES = new Set(['first', 'last', 'middle', 'oralBlend', 'soundCount', 'oddOneOut', 'train', 'wordCount']);
+    const ORAL_MODES = new Set(['first', 'last', 'middle', 'oralBlend', 'soundCount', 'oralSegment', 'oddOneOut', 'train', 'wordCount']);
     const isOralMode   = ORAL_MODES.has(mode);
     const unlocked     = isOralMode
       ? stagesForMode.map(s => s.id)

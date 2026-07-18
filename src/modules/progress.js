@@ -29,7 +29,7 @@ const PA_EXCLUDED_GROUPS = new Set([
   'sight-highfreq', 'multisyllable', 'prefixes', 'suffixes-advanced',
 ]);
 const PHONEMIC_AWARENESS_MODES = new Set([
-  'first', 'last', 'middle', 'oralBlend', 'soundCount', 'missing', 'segment',
+  'first', 'last', 'middle', 'oralBlend', 'soundCount', 'oralSegment', 'missing', 'segment',
 ]);
 
 /**
@@ -54,6 +54,7 @@ export const SKILL_BY_MODE = Object.freeze({
   last:         'segmenting',
   middle:       'segmenting',
   soundCount:   'segmenting',
+  oralSegment:  'segmenting',
   segment:      'segmenting',
   blend:        'decoding',
   classicBlend: 'decoding',

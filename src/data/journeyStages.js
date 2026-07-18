@@ -30,7 +30,7 @@ export const JOURNEY_STEPS = Object.freeze([
     title: 'Phonemic Awareness',
     childLabel: 'Hear the Sounds',
     desc: 'Hear the sounds inside spoken words — no letters yet.',
-    modes: ['first', 'last', 'middle', 'oralBlend', 'soundCount', 'syllable', 'wordCount', 'oddOneOut', 'train'],
+    modes: ['first', 'last', 'middle', 'oralBlend', 'soundCount', 'oralSegment', 'syllable', 'wordCount', 'oddOneOut', 'train'],
     screens: [],
   },
   {
