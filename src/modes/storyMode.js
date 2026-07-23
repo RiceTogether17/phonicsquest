@@ -454,13 +454,16 @@ function _renderReader(story) {
           </p>` : '';
       })()}
 
-      <!-- Mode toggle -->
+      <!-- Mode toggle — plain-language labels so a grown-up knows which is
+           which: listen together, or tap words to sound them out. -->
       <div class="story-mode-toggle" role="group" aria-label="Reading mode">
         <button class="smode-btn${_readMode === 'aloud'  ? ' active' : ''}" data-mode="aloud"  id="btn-mode-aloud">
-          📖 Read Aloud
+          <span class="smode-btn-title">📖 Listen &amp; Follow</span>
+          <span class="smode-btn-sub">Giri reads · you follow along</span>
         </button>
         <button class="smode-btn${_readMode === 'decode' ? ' active' : ''}" data-mode="decode" id="btn-mode-decode">
-          🔤 Decode Mode
+          <span class="smode-btn-title">🔤 Sound It Out</span>
+          <span class="smode-btn-sub">Tap any word to decode it</span>
         </button>
       </div>
 
@@ -716,80 +719,8 @@ function _renderReadAloud(story) {
         </button>
       </div>
 
-      <!-- Fluency timer section (collapsible) -->
-      <details class="story-tool-section fluency-bar" id="fluency-bar">
-        <summary class="story-tool-summary fluency-summary">
-          <span class="fluency-label">⏱ Fluency Read</span>
-          <span class="fluency-hint">Time your reading speed</span>
-        </summary>
-        <div class="story-tool-body">
-          <div class="fluency-controls">
-            <button class="btn btn--ghost" id="btn-fluency-start">▶ Start timer</button>
-            <span class="fluency-clock" id="fluency-clock" aria-live="polite">0:00</span>
-            <button class="btn btn--primary" id="btn-fluency-done" disabled>✓ Done</button>
-          </div>
-          <div class="fluency-result" id="fluency-result" hidden></div>
-          ${historyHtml}
-        </div>
-      </details>
-
-      <!-- Recording controls (collapsible) -->
-      <details class="story-tool-section recording-bar" id="recording-bar">
-        <summary class="story-tool-summary recording-summary">
-          <span class="recording-label">🎙 Record Reading</span>
-          <span class="recording-hint">Record yourself reading aloud</span>
-        </summary>
-        <div class="story-tool-body">
-          <div class="recording-controls" id="recording-controls">
-            <button class="btn btn--ghost" id="btn-rec-start">🎙 Start Recording</button>
-            <button class="btn btn--ghost btn--danger" id="btn-rec-stop" hidden>⏹ Stop</button>
-            <button class="btn btn--ghost" id="btn-rec-play" hidden>▶ Play Back</button>
-            <button class="btn btn--ghost btn--sm" id="btn-rec-delete" hidden>🗑 Delete</button>
-          </div>
-          <div class="recording-status" id="recording-status"></div>
-        </div>
-      </details>
-
-      <!-- Read to Giri section (collapsible) — Giri listens while you read -->
-      <details class="story-tool-section rtg-bar" id="rtg-bar">
-        <summary class="story-tool-summary rtg-summary">
-          <span class="rtg-label">🦉 Read to Giri</span>
-          <span class="rtg-hint">Read each line — Giri listens</span>
-        </summary>
-        <div class="story-tool-body">
-          ${isReadAloudSupported() ? /* html */`
-            <div class="rtg-controls" id="rtg-controls">
-              <button class="btn btn--ghost" id="btn-rtg-start">Start</button>
-              <button class="btn btn--primary" id="btn-rtg-listen" hidden>🎙 Read this line</button>
-              <button class="btn btn--ghost" id="btn-rtg-next" hidden>Next line →</button>
-              <button class="btn btn--ghost btn--sm" id="btn-rtg-exit" hidden>✕ Exit</button>
-            </div>
-            <div class="rtg-status" id="rtg-status" aria-live="polite"></div>
-          ` : /* html */`
-            <p class="rtg-status">Giri can't listen in this browser — use 🎙 Record Reading instead and play it back together.</p>
-          `}
-        </div>
-      </details>
-
-      <!-- Echo Read section (collapsible) -->
-      <details class="story-tool-section echo-read-bar" id="echo-read-bar">
-        <summary class="story-tool-summary echo-read-summary">
-          <span class="echo-read-label">🔁 Echo Read</span>
-          <span class="echo-read-hint">Listen, then repeat each line</span>
-        </summary>
-        <div class="story-tool-body">
-          <div class="echo-read-controls">
-            <button class="btn btn--ghost" id="btn-echo-start">Start Echo Read</button>
-            <button class="btn btn--ghost" id="btn-echo-next" hidden>Next Line →</button>
-            <button class="btn btn--ghost" id="btn-echo-rec" hidden>🎙 Your Turn</button>
-            <button class="btn btn--ghost" id="btn-echo-play" hidden>▶ Hear Yourself</button>
-            <button class="btn btn--ghost btn--sm" id="btn-echo-stop" hidden>✕ Exit Echo Read</button>
-          </div>
-          <div class="echo-read-status" id="echo-read-status"></div>
-        </div>
-      </details>
-
-      <!-- Story Quest CTA (shown after TTS or fluency) -->
+      <!-- Story Quest CTA (shown after TTS or fluency) — the payoff, kept
+           right by the primary Listen button instead of buried under tools. -->
       ${hasQuest ? /* html */`
         <div class="story-quest-cta" id="story-quest-cta" hidden>
           <div class="sq-cta-inner">
@@ -802,6 +733,91 @@ function _renderReadAloud(story) {
           </div>
         </div>
       ` : ''}
+
+      <!-- Extra practice tools fold into one optional grown-up drawer, so the
+           reader isn't a wall of competing accordions. Listening to the story
+           and sounding words out (Decode mode) are the child-facing basics;
+           these four are for a grown-up choosing to practise reading aloud. -->
+      <details class="story-tool-section story-practice-drawer" id="practice-drawer">
+        <summary class="story-tool-summary practice-summary">
+          <span class="practice-label">🧑‍🏫 More ways to practise</span>
+          <span class="practice-hint">Optional · for grown-ups</span>
+        </summary>
+        <div class="story-tool-body practice-drawer-body">
+          <!-- Fluency timer section (collapsible) -->
+          <details class="story-tool-section fluency-bar" id="fluency-bar">
+            <summary class="story-tool-summary fluency-summary">
+              <span class="fluency-label">⏱ Fluency Read</span>
+              <span class="fluency-hint">Time your reading speed</span>
+            </summary>
+            <div class="story-tool-body">
+              <div class="fluency-controls">
+                <button class="btn btn--ghost" id="btn-fluency-start">▶ Start timer</button>
+                <span class="fluency-clock" id="fluency-clock" aria-live="polite">0:00</span>
+                <button class="btn btn--primary" id="btn-fluency-done" disabled>✓ Done</button>
+              </div>
+              <div class="fluency-result" id="fluency-result" hidden></div>
+              ${historyHtml}
+            </div>
+          </details>
+
+          <!-- Recording controls (collapsible) -->
+          <details class="story-tool-section recording-bar" id="recording-bar">
+            <summary class="story-tool-summary recording-summary">
+              <span class="recording-label">🎙 Record Reading</span>
+              <span class="recording-hint">Record yourself reading aloud</span>
+            </summary>
+            <div class="story-tool-body">
+              <div class="recording-controls" id="recording-controls">
+                <button class="btn btn--ghost" id="btn-rec-start">🎙 Start Recording</button>
+                <button class="btn btn--ghost btn--danger" id="btn-rec-stop" hidden>⏹ Stop</button>
+                <button class="btn btn--ghost" id="btn-rec-play" hidden>▶ Play Back</button>
+                <button class="btn btn--ghost btn--sm" id="btn-rec-delete" hidden>🗑 Delete</button>
+              </div>
+              <div class="recording-status" id="recording-status"></div>
+            </div>
+          </details>
+
+          <!-- Read to Giri section (collapsible) — Giri listens while you read -->
+          <details class="story-tool-section rtg-bar" id="rtg-bar">
+            <summary class="story-tool-summary rtg-summary">
+              <span class="rtg-label">🦉 Read to Giri</span>
+              <span class="rtg-hint">Read each line — Giri listens</span>
+            </summary>
+            <div class="story-tool-body">
+              ${isReadAloudSupported() ? /* html */`
+                <div class="rtg-controls" id="rtg-controls">
+                  <button class="btn btn--ghost" id="btn-rtg-start">Start</button>
+                  <button class="btn btn--primary" id="btn-rtg-listen" hidden>🎙 Read this line</button>
+                  <button class="btn btn--ghost" id="btn-rtg-next" hidden>Next line →</button>
+                  <button class="btn btn--ghost btn--sm" id="btn-rtg-exit" hidden>✕ Exit</button>
+                </div>
+                <div class="rtg-status" id="rtg-status" aria-live="polite"></div>
+              ` : /* html */`
+                <p class="rtg-status">Giri can't listen in this browser — use 🎙 Record Reading instead and play it back together.</p>
+              `}
+            </div>
+          </details>
+
+          <!-- Echo Read section (collapsible) -->
+          <details class="story-tool-section echo-read-bar" id="echo-read-bar">
+            <summary class="story-tool-summary echo-read-summary">
+              <span class="echo-read-label">🔁 Echo Read</span>
+              <span class="echo-read-hint">Listen, then repeat each line</span>
+            </summary>
+            <div class="story-tool-body">
+              <div class="echo-read-controls">
+                <button class="btn btn--ghost" id="btn-echo-start">Start Echo Read</button>
+                <button class="btn btn--ghost" id="btn-echo-next" hidden>Next Line →</button>
+                <button class="btn btn--ghost" id="btn-echo-rec" hidden>🎙 Your Turn</button>
+                <button class="btn btn--ghost" id="btn-echo-play" hidden>▶ Hear Yourself</button>
+                <button class="btn btn--ghost btn--sm" id="btn-echo-stop" hidden>✕ Exit Echo Read</button>
+              </div>
+              <div class="echo-read-status" id="echo-read-status"></div>
+            </div>
+          </details>
+        </div>
+      </details>
     </div>
   `;
 
@@ -929,6 +945,10 @@ function _startReadToGiri(story) {
     _followMode = 'word';
     _persistPref(PREFS_FOLLOW_KEY, _followMode);
     _renderReadAloud(story);
+    // Re-render collapses the tool drawers; reopen the grown-up drawer and
+    // the Read-to-Giri section so the controls the child just started stay put.
+    const drawer = document.getElementById('practice-drawer');
+    if (drawer) drawer.open = true;
     const bar = document.getElementById('rtg-bar');
     if (bar) bar.open = true;
   }
@@ -1187,7 +1207,6 @@ function _lineHtml(line, i, wordSpans = false, story = null) {
     case 'label':     return `<div class="sline sline--label"     data-line="${i}">${content}</div>`;
     case 'beat':      return `<p class="sline sline--beat"        data-line="${i}">${content}</p>`;
     case 'intro':     return `<p class="sline sline--intro"       data-line="${i}">${content}</p>`;
-    case 'refrain':   return `<div class="sline sline--refrain"   data-line="${i}">🫧 ${content}</div>`;
     case 'end':       return `<p class="sline sline--end"         data-line="${i}">${content}</p>`;
     case 'text':      return `<p class="sline sline--text"        data-line="${i}">${content}</p>`;
     case 'paragraph': return `<p class="sline sline--paragraph"   data-line="${i}">${content}</p>`;
@@ -1251,9 +1270,6 @@ function _renderDecodeMode(story) {
   const storyBodyHtml = story.lines.map((line, lineIdx) => {
     if (line.type === 'label') {
       return `<div class="sline sline--label" data-line="${lineIdx}">${line.text}</div>`;
-    }
-    if (line.type === 'refrain') {
-      return `<div class="sline sline--refrain" data-line="${lineIdx}">🫧 ${line.text}</div>`;
     }
     // All other types: tokenise into clickable words
     const tokens = tokenise(line.text);
