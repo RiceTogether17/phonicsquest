@@ -390,23 +390,50 @@ function pretaughtSet(story) {
 }
 
 /**
+ * Sight words a story is allowed to use because they have already been
+ * introduced by the aligned sight-word quests (see sightwords.js and the
+ * sightStoryWeave). A story carries the cumulative list on `sightWords`;
+ * these are pre-taught on cards before the child reads, so they are legal
+ * even when above the story's code tier — the whole point of the
+ * card-game ↔ story weave. Unlike the tier-capped HFW route, this list is
+ * gated by reading position (Story N knows Quests 1…N), not by band.
+ * @param {object} story
+ * @returns {Set<string>}
+ */
+function sightWordSet(story) {
+  const set = new Set();
+  for (const w of story.sightWords ?? []) {
+    const clean = cleanToken(w);
+    if (clean) set.add(clean);
+  }
+  return set;
+}
+
+/**
  * Classify one cleaned token against a story's allowances.
  *
  * Order matters: graphemic decodability at the story's tier comes first
  * (sound-effect words like "tap" and names like "Jay" are still decodable
  * words), then the whitelists, then the sight-word routes (HFW tier,
- * tricky schedule), then story-local pre-teaching. Anything left is a
- * 'stretch' word — readable only above the story's code tier — and is
- * what the ratio floors and stretch budgets in the integrity tests police.
+ * tricky schedule, and quest-introduced sight words), then story-local
+ * pre-teaching. Anything left is a 'stretch' word — readable only above
+ * the story's code tier — and is what the ratio floors and stretch budgets
+ * in the integrity tests police.
  *
  * @param {string} clean  cleaned token (see cleanToken)
  * @param {object} story
  * @param {Set<string>} [pretaught]  memoised pretaughtSet(story)
+ * @param {Set<string>} [sight]      memoised sightWordSet(story)
  * @returns {{ word: string,
- *   status: 'proper'|'onomatopoeia'|'decodable'|'hfw'|'tricky'|'pretaught'|'stretch',
+ *   status: 'proper'|'onomatopoeia'|'decodable'|'hfw'|'tricky'|'sight'|'pretaught'|'stretch',
  *   requiredTier: number }}
  */
-export function classifyWord(clean, story, pretaught = pretaughtSet(story)) {
+export function classifyWord(
+  clean,
+  story,
+  pretaught = pretaughtSet(story),
+  sight = sightWordSet(story),
+) {
   const phase = getStoryPhase(story.phase);
   const tier = requiredTier(clean);
   const make = status => ({ word: clean, status, requiredTier: tier });
@@ -421,6 +448,7 @@ export function classifyWord(clean, story, pretaught = pretaughtSet(story)) {
   const tricky = getTrickyWord(clean);
   if (tricky && phase && tricky.phase <= phase.curriculumPhase) return make('tricky');
 
+  if (sight.has(clean)) return make('sight');
   if (pretaught.has(clean)) return make('pretaught');
   return make('stretch');
 }
@@ -530,12 +558,13 @@ export function findUnknownCapitalised(story) {
 export function analyzeStory(story) {
   const tokens = extractCountableTokens(story);
   const pretaught = pretaughtSet(story);
+  const sight = sightWordSet(story);
   const byStatus = {};
   const stretch = new Map();
   let decodableCount = 0;
 
   for (const token of tokens) {
-    const c = classifyWord(token, story, pretaught);
+    const c = classifyWord(token, story, pretaught, sight);
     byStatus[c.status] = (byStatus[c.status] ?? 0) + 1;
     if (c.status === 'decodable') decodableCount += 1;
     if (c.status === 'stretch') {
