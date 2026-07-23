@@ -14,23 +14,25 @@
 /** All quests in order */
 export const SIGHT_QUESTS = [
 
-  /* ── Easy — story-aligned sequence ────────────────────────────────────
-     The 50 starter words are ordered by where the child first meets them
-     in the Giri story sequence (Band A minis → Band D bridge readers),
-     so each quest pre-teaches the sight words of the stories the child
-     is about to read. `storyBand` marks the band a quest unlocks;
-     sightStoryWeave.js links the two surfaces. Words that never appear
-     in a story ride along in the final quest. */
-  { id: 'e1',  tier: 'easy', name: 'Quest 1',  icon: '⭐', storyBand: 'A', words: ['a',     'it',    'on',    'the',   'not'] },
-  { id: 'e2',  tier: 'easy', name: 'Quest 2',  icon: '⭐', storyBand: 'A', words: ['then',  'of',    'in',    'his',   'to'] },
-  { id: 'e3',  tier: 'easy', name: 'Quest 3',  icon: '⭐', storyBand: 'B', words: ['he',    'is',    'so',    'for',   'said'] },
-  { id: 'e4',  tier: 'easy', name: 'Quest 4',  icon: '⭐', storyBand: 'B', words: ['day',   'go',    'was',   'too',   'I'] },
-  { id: 'e5',  tier: 'easy', name: 'Quest 5',  icon: '⭐', storyBand: 'B', words: ['all',   'one',   'white', 'now',   'into'] },
-  { id: 'e6',  tier: 'easy', name: 'Quest 6',  icon: '⭐', storyBand: 'B', words: ['again', 'came',  'be',    'do',    'what'] },
-  { id: 'e7',  tier: 'easy', name: 'Quest 7',  icon: '⭐', storyBand: 'C', words: ['know',  'when',  'over',  'above', 'there'] },
-  { id: 'e8',  tier: 'easy', name: 'Quest 8',  icon: '⭐', storyBand: 'C', words: ['were',  'she',   'are',   'this',  'her'] },
-  { id: 'e9',  tier: 'easy', name: 'Quest 9',  icon: '⭐', storyBand: 'D', words: ['about', 'name',  'their', 'story', 'many'] },
-  { id: 'e10', tier: 'easy', name: 'Quest 10', icon: '⭐', storyBand: 'D', words: ['some',  'how',   'also',  'does',  'want'] },
+  /* ── Easy — story-aligned 1:1 sequence ────────────────────────────────
+     Each easy quest pre-teaches exactly the sight words introduced in the
+     matching Giri story (Quest N ↔ Band A story N via `storyId`), so the
+     card game teaches the words the child is about to read on that page.
+     Story N's decodable text is written to use these words plus everything
+     introduced in Quests 1…N-1 (cumulative). All 50 starter words live in
+     Band A; `storyBand: 'A'` reflects that. sightStoryWeave.js links the
+     two surfaces; getIntroducedSightWords() below feeds the decodability
+     validator so introduced words are legal in their story. */
+  { id: 'e1',  tier: 'easy', name: 'Quest 1',  icon: '⭐', storyBand: 'A', storyId: 'core-a-01', words: ['a',     'it',    'on',    'the',   'not'] },
+  { id: 'e2',  tier: 'easy', name: 'Quest 2',  icon: '⭐', storyBand: 'A', storyId: 'core-a-02', words: ['then',  'of',    'in',    'his',   'to'] },
+  { id: 'e3',  tier: 'easy', name: 'Quest 3',  icon: '⭐', storyBand: 'A', storyId: 'core-a-03', words: ['he',    'is',    'so',    'for',   'said'] },
+  { id: 'e4',  tier: 'easy', name: 'Quest 4',  icon: '⭐', storyBand: 'A', storyId: 'core-a-04', words: ['day',   'go',    'was',   'too',   'I'] },
+  { id: 'e5',  tier: 'easy', name: 'Quest 5',  icon: '⭐', storyBand: 'A', storyId: 'core-a-05', words: ['all',   'one',   'white', 'now',   'into'] },
+  { id: 'e6',  tier: 'easy', name: 'Quest 6',  icon: '⭐', storyBand: 'A', storyId: 'core-a-06', words: ['again', 'came',  'be',    'do',    'what'] },
+  { id: 'e7',  tier: 'easy', name: 'Quest 7',  icon: '⭐', storyBand: 'A', storyId: 'core-a-07', words: ['know',  'when',  'over',  'above', 'there'] },
+  { id: 'e8',  tier: 'easy', name: 'Quest 8',  icon: '⭐', storyBand: 'A', storyId: 'core-a-08', words: ['were',  'she',   'are',   'this',  'her'] },
+  { id: 'e9',  tier: 'easy', name: 'Quest 9',  icon: '⭐', storyBand: 'A', storyId: 'core-a-09', words: ['about', 'name',  'their', 'story', 'many'] },
+  { id: 'e10', tier: 'easy', name: 'Quest 10', icon: '⭐', storyBand: 'A', storyId: 'core-a-10', words: ['some',  'how',   'also',  'does',  'want'] },
 
   /* ── Medium ───────────────────────────────────────────────────────── */
   { id: 'm1',  tier: 'medium', name: 'Quest 11', icon: '🌟', words: ['no',       'me',       'saw',      'two',      'out'] },
@@ -121,6 +123,23 @@ export const SIGHT_QUESTS = [
   { id: 'h9',  tier: 'hard', name: 'Quest 94', icon: '💎', words: ['dilemma',       'disappear',    'disappoint',    'discipline',    'disease'] },
   { id: 'h10', tier: 'hard', name: 'Quest 95', icon: '💎', words: ['embarrass',     'environment',  'especially',    'exaggerate',    'excellent'] },
 ];
+
+/** Easy quests in reading order (aligned 1:1 to Band A stories). */
+const EASY_QUESTS = SIGHT_QUESTS.filter(q => q.tier === 'easy' && q.storyId);
+
+/**
+ * The cumulative easy sight words a reader knows by the time they reach a
+ * given story — every word from that story's aligned quest and all the
+ * quests before it. Powers the decodability validator's `sight` route so a
+ * story may legally use the words its quests have pre-taught, and no more.
+ * @param {string} storyId  a Band A story id, e.g. 'core-a-03'
+ * @returns {string[]}  lowercased words, quest order, empty if unaligned
+ */
+export function getIntroducedSightWords(storyId) {
+  const idx = EASY_QUESTS.findIndex(q => q.storyId === storyId);
+  if (idx < 0) return [];
+  return EASY_QUESTS.slice(0, idx + 1).flatMap(q => q.words.map(w => w.toLowerCase()));
+}
 
 /** Lookup quest by id */
 export function getQuestById(id) {
