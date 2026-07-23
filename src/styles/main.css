@@ -4010,6 +4010,10 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 
 .smode-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-full);
   border: none;
@@ -4020,11 +4024,41 @@ details.story-tool-section[open] > .story-tool-summary::before {
   cursor: pointer;
   transition: all var(--dur-fast) var(--ease-out);
 }
+.smode-btn-title { line-height: 1.2; }
+.smode-btn-sub {
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  opacity: 0.75;
+}
 .smode-btn:hover { color: var(--color-primary); }
 .smode-btn.active {
   background: var(--color-primary);
   color: #fff;
   box-shadow: 0 2px 8px rgba(108,99,255,0.35);
+}
+.smode-btn.active .smode-btn-sub { opacity: 0.9; }
+
+/* ── Grown-up practice drawer: one optional home for the read-aloud tools ── */
+.story-practice-drawer {
+  border: 1.5px dashed var(--color-border);
+}
+.practice-summary .practice-label { font-weight: 700; }
+.practice-summary .practice-hint {
+  flex: 1;
+  text-align: right;
+  font-size: var(--font-size-xs);
+  opacity: 0.7;
+}
+.practice-drawer-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2);
+}
+/* Nested tool sections read as quieter sub-items inside the drawer. */
+.practice-drawer-body .story-tool-section {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
 }
 
 .story-dynamic { width: 100%; display: flex; flex-direction: column; gap: var(--space-3); }
