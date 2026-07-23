@@ -35,34 +35,34 @@ export const SIGHT_QUESTS = [
   { id: 'e10', tier: 'easy', name: 'Quest 10', icon: '⭐', storyBand: 'A', storyId: 'core-a-10', words: ['some',  'how',   'also',  'does',  'want'] },
 
   /* ── Medium ───────────────────────────────────────────────────────── */
-  { id: 'm1',  tier: 'medium', name: 'Quest 11', icon: '🌟', words: ['no',       'me',       'saw',      'two',      'out'] },
-  { id: 'm2',  tier: 'medium', name: 'Quest 12', icon: '🌟', words: ['take',     'find',     'they',     'here',     'while'] },
-  { id: 'm3',  tier: 'medium', name: 'Quest 13', icon: '🌟', words: ['see',      'would',    'should',   'could',    'good'] },
-  { id: 'm4',  tier: 'medium', name: 'Quest 14', icon: '🌟', words: ['made',     'across',   'come',     'water',    'will'] },
-  { id: 'm5',  tier: 'medium', name: 'Quest 15', icon: '🌟', words: ['under',    'from',     'cold',     'love',     'put'] },
-  { id: 'm6',  tier: 'medium', name: 'Quest 16', icon: '🌟', words: ['other',    'salt',     'because',  'upon',     'before'] },
-  { id: 'm7',  tier: 'medium', name: 'Quest 17', icon: '🌟', words: ['until',    'young',    'you',      'who',      'give'] },
-  { id: 'm8',  tier: 'medium', name: 'Quest 18', icon: '🌟', words: ['mother',   'brother',  'something','become',   'wolf'] },
-  { id: 'm9',  tier: 'medium', name: 'Quest 19', icon: '🌟', words: ['just',     'with',     'must',     'girl',     'boy'] },
-  { id: 'm10', tier: 'medium', name: 'Quest 20', icon: '🌟', words: ['where',    'thought',  'fast',     'down',     'watch'] },
-  { id: 'm11', tier: 'medium', name: 'Quest 21', icon: '🌟', words: ['head',     'may',      'friend',   'maybe',    'has'] },
-  { id: 'm12', tier: 'medium', name: 'Quest 22', icon: '🌟', words: ['have',     'away',     'way',      'make',     'ate'] },
-  { id: 'm13', tier: 'medium', name: 'Quest 23', icon: '🌟', words: ['been',     'same',     'say',      'green',    'people'] },
-  { id: 'm14', tier: 'medium', name: 'Quest 24', icon: '🌟', words: ['each',     'your',     'happy',    'pretty',   'please'] },
-  { id: 'm15', tier: 'medium', name: 'Quest 25', icon: '🌟', words: ['keep',     'leave',    'these',    'sea',      'flies'] },
-  { id: 'm16', tier: 'medium', name: 'Quest 26', icon: '🌟', words: ['fly',      'life',     'light',    'myself',   'time'] },
-  { id: 'm17', tier: 'medium', name: 'Quest 27', icon: '🌟', words: ['why',      'fine',     'high',     'eye',      'nothing'] },
-  { id: 'm18', tier: 'medium', name: 'Quest 28', icon: '🌟', words: ['buy',      'wrote',    'by',       'going',    'own'] },
-  { id: 'm19', tier: 'medium', name: 'Quest 29', icon: '🌟', words: ['only',     'ago',      'very',     'though',   'large'] },
-  { id: 'm20', tier: 'medium', name: 'Quest 30', icon: '🌟', words: ['goes',     'both',     'home',     "don't",    'any'] },
-  { id: 'm21', tier: 'medium', name: 'Quest 31', icon: '🌟', words: ['became',   'began',    'begin',    'change',   'eat'] },
-  { id: 'm22', tier: 'medium', name: 'Quest 32', icon: '🌟', words: ['few',      'knew',     'music',    'really',   'through'] },
-  { id: 'm23', tier: 'medium', name: 'Quest 33', icon: '🌟', words: ['place',    'move',     'brought',  'inside',   'which'] },
-  { id: 'm24', tier: 'medium', name: 'Quest 34', icon: '🌟', words: ['after',    'always',   'aunty',    'work',     'off'] },
-  { id: 'm25', tier: 'medium', name: 'Quest 35', icon: '🌟', words: ['behind',   'body',     'family',   'today',    'open'] },
-  { id: 'm26', tier: 'medium', name: 'Quest 36', icon: '🌟', words: ['below',    'carry',    'finally',  'try',      'along'] },
-  { id: 'm27', tier: 'medium', name: 'Quest 37', icon: '🌟', words: ['between',  'easy',     'funny',    'often',    'done'] },
-  { id: 'm28', tier: 'medium', name: 'Quest 38', icon: '🌟', words: ['city',     'eight',    'feel',     'feet',     'great'] },
+  { id: 'm1',  tier: 'medium', name: 'Quest 11', icon: '🌟', storyId: 'core-b-01', words: ['no',       'me',       'saw',      'two',      'out'] },
+  { id: 'm2',  tier: 'medium', name: 'Quest 12', icon: '🌟', storyId: 'core-b-02', words: ['take',     'find',     'they',     'here',     'while'] },
+  { id: 'm3',  tier: 'medium', name: 'Quest 13', icon: '🌟', storyId: 'core-b-03', words: ['see',      'would',    'should',   'could',    'good'] },
+  { id: 'm4',  tier: 'medium', name: 'Quest 14', icon: '🌟', storyId: 'core-b-04', words: ['made',     'across',   'come',     'water',    'will'] },
+  { id: 'm5',  tier: 'medium', name: 'Quest 15', icon: '🌟', storyId: 'core-b-05', words: ['under',    'from',     'cold',     'love',     'put'] },
+  { id: 'm6',  tier: 'medium', name: 'Quest 16', icon: '🌟', storyId: 'core-b-06', words: ['other',    'salt',     'because',  'upon',     'before'] },
+  { id: 'm7',  tier: 'medium', name: 'Quest 17', icon: '🌟', storyId: 'core-b-07', words: ['until',    'young',    'you',      'who',      'give'] },
+  { id: 'm8',  tier: 'medium', name: 'Quest 18', icon: '🌟', storyId: 'core-b-08', words: ['mother',   'brother',  'something','become',   'wolf'] },
+  { id: 'm9',  tier: 'medium', name: 'Quest 19', icon: '🌟', storyId: 'core-b-09', words: ['just',     'with',     'must',     'girl',     'boy'] },
+  { id: 'm10', tier: 'medium', name: 'Quest 20', icon: '🌟', storyId: 'core-b-10', words: ['where',    'thought',  'fast',     'down',     'watch'] },
+  { id: 'm11', tier: 'medium', name: 'Quest 21', icon: '🌟', storyId: 'core-b-11', words: ['head',     'may',      'friend',   'maybe',    'has'] },
+  { id: 'm12', tier: 'medium', name: 'Quest 22', icon: '🌟', storyId: 'core-b-12', words: ['have',     'away',     'way',      'make',     'ate'] },
+  { id: 'm13', tier: 'medium', name: 'Quest 23', icon: '🌟', storyId: 'core-b-13', words: ['been',     'same',     'say',      'green',    'people'] },
+  { id: 'm14', tier: 'medium', name: 'Quest 24', icon: '🌟', storyId: 'core-b-14', words: ['each',     'your',     'happy',    'pretty',   'please'] },
+  { id: 'm15', tier: 'medium', name: 'Quest 25', icon: '🌟', storyId: 'core-b-15', words: ['keep',     'leave',    'these',    'sea',      'flies'] },
+  { id: 'm16', tier: 'medium', name: 'Quest 26', icon: '🌟', storyId: 'core-b-16', words: ['fly',      'life',     'light',    'myself',   'time'] },
+  { id: 'm17', tier: 'medium', name: 'Quest 27', icon: '🌟', storyId: 'core-b-17', words: ['why',      'fine',     'high',     'eye',      'nothing'] },
+  { id: 'm18', tier: 'medium', name: 'Quest 28', icon: '🌟', storyId: 'core-c-01', words: ['buy',      'wrote',    'by',       'going',    'own'] },
+  { id: 'm19', tier: 'medium', name: 'Quest 29', icon: '🌟', storyId: 'core-c-02', words: ['only',     'ago',      'very',     'though',   'large'] },
+  { id: 'm20', tier: 'medium', name: 'Quest 30', icon: '🌟', storyId: 'core-c-03', words: ['goes',     'both',     'home',     "don't",    'any'] },
+  { id: 'm21', tier: 'medium', name: 'Quest 31', icon: '🌟', storyId: 'core-c-04', words: ['became',   'began',    'begin',    'change',   'eat'] },
+  { id: 'm22', tier: 'medium', name: 'Quest 32', icon: '🌟', storyId: 'core-c-05', words: ['few',      'knew',     'music',    'really',   'through'] },
+  { id: 'm23', tier: 'medium', name: 'Quest 33', icon: '🌟', storyId: 'core-c-06', words: ['place',    'move',     'brought',  'inside',   'which'] },
+  { id: 'm24', tier: 'medium', name: 'Quest 34', icon: '🌟', storyId: 'core-c-07', words: ['after',    'always',   'aunty',    'work',     'off'] },
+  { id: 'm25', tier: 'medium', name: 'Quest 35', icon: '🌟', storyId: 'core-c-08', words: ['behind',   'body',     'family',   'today',    'open'] },
+  { id: 'm26', tier: 'medium', name: 'Quest 36', icon: '🌟', storyId: 'core-c-09', words: ['below',    'carry',    'finally',  'try',      'along'] },
+  { id: 'm27', tier: 'medium', name: 'Quest 37', icon: '🌟', storyId: 'core-c-10', words: ['between',  'easy',     'funny',    'often',    'done'] },
+  { id: 'm28', tier: 'medium', name: 'Quest 38', icon: '🌟', storyId: 'core-c-11', words: ['city',     'eight',    'feel',     'feet',     'great'] },
   { id: 'm29', tier: 'medium', name: 'Quest 39', icon: '🌟', words: ['sleep',    'here',     'without',  'kind',     'might'] },
   { id: 'm30', tier: 'medium', name: 'Quest 40', icon: '🌟', words: ['night',    'nice',     'once',     'rain',     "can't"] },
   { id: 'm31', tier: 'medium', name: 'Quest 41', icon: '🌟', words: ['catch',    'children', "couldn't", 'enough',   'even'] },
@@ -124,21 +124,27 @@ export const SIGHT_QUESTS = [
   { id: 'h10', tier: 'hard', name: 'Quest 95', icon: '💎', words: ['embarrass',     'environment',  'especially',    'exaggerate',    'excellent'] },
 ];
 
-/** Easy quests in reading order (aligned 1:1 to Band A stories). */
-const EASY_QUESTS = SIGHT_QUESTS.filter(q => q.tier === 'easy' && q.storyId);
+/**
+ * Story-aligned quests in reading order — the easy quests (Band A minis,
+ * core-a-01…10) followed by the medium quests aligned to the Band B and
+ * Band C core readers (core-b-01…17, core-c-01…11). Each carries a
+ * `storyId`; the sequence is exactly the order a child reads the stories.
+ */
+const ALIGNED_QUESTS = SIGHT_QUESTS.filter(q => q.storyId);
 
 /**
- * The cumulative easy sight words a reader knows by the time they reach a
- * given story — every word from that story's aligned quest and all the
- * quests before it. Powers the decodability validator's `sight` route so a
- * story may legally use the words its quests have pre-taught, and no more.
- * @param {string} storyId  a Band A story id, e.g. 'core-a-03'
+ * The cumulative sight words a reader knows by the time they reach a given
+ * story — every word from that story's aligned quest and all the quests
+ * before it (Band A easy words carry forward into Bands B and C). Powers
+ * the decodability validator's `sight` route so a story may legally use the
+ * words its quests have pre-taught, and no more.
+ * @param {string} storyId  an aligned story id, e.g. 'core-a-03', 'core-b-05'
  * @returns {string[]}  lowercased words, quest order, empty if unaligned
  */
 export function getIntroducedSightWords(storyId) {
-  const idx = EASY_QUESTS.findIndex(q => q.storyId === storyId);
+  const idx = ALIGNED_QUESTS.findIndex(q => q.storyId === storyId);
   if (idx < 0) return [];
-  return EASY_QUESTS.slice(0, idx + 1).flatMap(q => q.words.map(w => w.toLowerCase()));
+  return ALIGNED_QUESTS.slice(0, idx + 1).flatMap(q => q.words.map(w => w.toLowerCase()));
 }
 
 /** Lookup quest by id */
