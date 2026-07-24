@@ -3560,46 +3560,74 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   GRAPHEME HIGHLIGHTING — target sounds in Giri stories
-   Visual scaffold fades from Band A (bold red) to Band D (no decoration)
-   so beginning readers can lock onto the new pattern, then reading
-   becomes independent as the support is removed.
+   VOWEL SOUND COLOURS — one language everywhere (inline scaffold, Decode
+   panel, Word Detective). A vowel is coloured by the SOUND it makes here,
+   so the same letter reads short (căt), long (cāke) or schwa (əbout).
+   Defined in src/modules/phonemeColors.js (SOUND_META); keep the hexes in
+   sync with that file.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.gph { font-weight: inherit; }
+.vs--short       { --vs-color: #d62828; }
+.vs--long        { --vs-color: #1a7f37; }
+.vs--schwa       { --vs-color: #6b7280; }
+.vs--rcontrolled { --vs-color: #7c3aed; }
+.vs--diphthong   { --vs-color: #ea580c; }
+.vs--silent      { --vs-color: #9aa3af; }
 
-/* Band A — short vowels: bold red (most explicit scaffold) */
-.gph--A.gph-vowel,
-.gph--A.gph-digraph {
-  color: #dc2626;
+/* Inline vowel spans inside running story text — colour + weight only, so
+   the line still reads as words, not tiles. Silent letters fade back. */
+.vs { color: var(--vs-color); font-weight: 700; }
+.vs.vs--silent { font-weight: 500; font-style: italic; opacity: 0.72; }
+
+@media (prefers-color-scheme: dark) {
+  .vs--schwa  { --vs-color: #9aa3af; }
+  .vs--silent { --vs-color: #cbd2dc; }
+  .vs--short  { --vs-color: #f87171; }
+  .vs--long   { --vs-color: #4ade80; }
+}
+:root[data-theme="dark"] .vs--schwa  { --vs-color: #9aa3af; }
+:root[data-theme="dark"] .vs--silent { --vs-color: #cbd2dc; }
+:root[data-theme="dark"] .vs--short  { --vs-color: #f87171; }
+:root[data-theme="dark"] .vs--long   { --vs-color: #4ade80; }
+
+/* Legend under the reading toolbar — what each colour means. */
+.sound-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: var(--font-size-xs);
+}
+.sl-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+.sl-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5em;
+  height: 1.5em;
+  padding: 0 5px;
+  border-radius: 5px;
   font-weight: 800;
+  color: #fff;
+  background: var(--vs-color);
 }
 
-/* Band B — long vowels: medium-saturation blue, slightly subtler */
-.gph--B.gph-vowel,
-.gph--B.gph-digraph {
-  color: #2563eb;
-  font-weight: 700;
-}
-.gph--B.gph-silent {
-  color: #93c5fd;
-  font-weight: 600;
-}
-
-/* Band C — r-controlled + digraphs: faint underline only, no colour */
-.gph--C.gph-vowel,
-.gph--C.gph-digraph {
-  text-decoration: underline;
-  text-decoration-color: rgba(0, 0, 0, 0.25);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
-}
-
-/* Band D — diphthongs / independent reading: no visual scaffold */
-.gph--D.gph-vowel,
-.gph--D.gph-digraph,
-.gph--D.gph-silent {
-  /* intentionally empty — reader is independent at this band */
+/* "Tap a word" hint in the toolbar. */
+.reader-tap-hint {
+  align-self: center;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -11807,6 +11835,7 @@ textarea:hover {
   font-size: 1.4rem;
   font-weight: 800;
   color: #fff;
+  background: var(--tile-color, #2563eb);
   border-radius: var(--radius-md, 12px);
 }
 .wd-actions {
