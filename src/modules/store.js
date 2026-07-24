@@ -51,6 +51,11 @@ const DEFAULT_STATE = {
   // (sound-by-sound with tight gaps) so children can isolate each phoneme.
   // The 💡 Hint button in any PA mode uses stretched playback regardless.
   stretchedSpeech: false,
+  // How blend modes play a word's sounds:
+  //   'simultaneous' — each phoneme separately, then the whole word (/c/ /a/ /t/ → "cat")
+  //   'cumulative'   — successive blending: each new sound is blended with
+  //                    everything so far (/c/ → "ca" → "cat")
+  blendStyle: 'simultaneous',
   parentPin:      null,     // hashed PIN
   geminiApiKey:   null,     // parent-supplied AI key (survives progress reset)
   reducedMotion:  false,    // manual override for prefers-reduced-motion

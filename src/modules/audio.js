@@ -156,6 +156,17 @@ const AFFIX_TTS_OVERRIDES = {
 };
 
 /**
+ * TTS text overrides for cumulative blend chunks (speakChunk) where the raw
+ * partial-word spelling produces the wrong pronunciation. Keyed by the chunk
+ * text (joined graphemes). Kept deliberately small — most mispronunciation
+ * classes (open syllables ending in a short vowel, pending magic-e) are
+ * handled structurally in speakChunk, and blanket overrides would obscure
+ * regressions in the structural rules.
+ */
+const CHUNK_TTS_OVERRIDES = {
+};
+
+/**
  * Phonetic text for TTS fallback.
  * TTS says letter NAMES for single letters (e.g. "bee" for 'b').
  * This map gives phonetic spellings that TTS will pronounce as the sound.
@@ -656,6 +667,68 @@ class AudioManager {
 
     await this._delay(280);
     await this._speak(word, slowRate);
+  }
+
+  /**
+   * Speak a cumulative "build-up" chunk for consecutive (successive)
+   * blending: /c/ → "ca" → "cat". The chunk is the first
+   * `endIndexExclusive` graphemes spoken as ONE blended unit at a
+   * stretched rate, so "ca" sounds blended rather than spelled.
+   *
+   * TTS reads some partial spellings with the wrong vowel, which would
+   * contradict the sound the child just learned:
+   *   • open syllables ending in a short vowel ("li" → "lie")
+   *   • magic-e words whose silent-e isn't in the chunk yet ("cak" → /kak/)
+   * Those chunks fall back to tight-gap phoneme playback (the
+   * speakWordStretched model) — each phoneme is already the correct sound.
+   *
+   * @param {import('../data/words.js').Word} wordData
+   * @param {number} endIndexExclusive  number of leading graphemes in the chunk
+   * @returns {Promise<void>}
+   */
+  async speakChunk(wordData, endIndexExclusive) {
+    if (!store.get('sfxEnabled')) return;
+    const graphemes = wordData?.graphemes;
+    if (!Array.isArray(graphemes) || graphemes.length === 0) {
+      return this.speakWord(wordData?.word || '');
+    }
+
+    const end = Math.max(1, Math.min(endIndexExclusive, graphemes.length));
+
+    // Full word → natural pronunciation.
+    if (end >= graphemes.length) return this.speakWord(wordData.word);
+
+    // Single grapheme → just that phoneme.
+    if (end === 1) {
+      return this.speakPhoneme(graphemes[0], wordData.types?.[0], { word: wordData.word });
+    }
+
+    const chunk    = graphemes.slice(0, end).join('');
+    const slowRate = Math.max(0.4, (store.get('voiceSpeed') ?? 0.8) * 0.7);
+
+    const override = CHUNK_TTS_OVERRIDES[chunk];
+    if (override) return this._speak(override, slowRate);
+
+    const lastType         = wordData.types?.[end - 1];
+    const endsInShortVowel = lastType === 'sv';
+    const pendingSilentE   = (wordData.types || []).slice(end).includes('se');
+
+    if (!endsInShortVowel && !pendingSilentE && window.speechSynthesis) {
+      return this._speak(chunk, slowRate);
+    }
+
+    // Tight-gap phoneme blend fallback.
+    for (let i = 0; i < end; i++) {
+      if (i > 0) await this._delay(80);
+      if (wordData.phonemeKeys?.[i]) {
+        await this._playPhonemeAudio(wordData.phonemeKeys[i]);
+      } else {
+        await this.speakPhoneme(graphemes[i], wordData.types[i], {
+          word: wordData.word,
+          prevGrapheme: i > 0 ? graphemes[i - 1] : null,
+        });
+      }
+    }
   }
 
   /**
