@@ -23,6 +23,7 @@ let currentWord = null;
 let isPlaying   = false;
 let startTime   = 0;
 let _speed      = 'normal'; // 'slow' | 'normal' | 'fast'
+let _blendStyle = 'simultaneous'; // 'simultaneous' | 'cumulative'
 
 /** Inter-phoneme delay (ms) per speed setting */
 const SPEED_DELAY = { slow: 600, normal: 320, fast: 120 };
@@ -36,6 +37,7 @@ export function setupClassicBlend(word, els) {
   currentWord = word;
   isPlaying = false;
   startTime = Date.now();
+  _blendStyle = store.get('blendStyle') || 'simultaneous';
 
   renderWordImage(word, els.wordEmoji, true);
 
@@ -100,6 +102,16 @@ function _renderControls(els, word, played = false) {
     return `<button class="speed-btn ${active}" data-speed="${s}" aria-label="Set speed to ${s}">${label}</button>`;
   }).join('');
 
+  const styleBtns = ['simultaneous', 'cumulative'].map(s => {
+    const label = { simultaneous: '🔤 Sound by Sound', cumulative: '🔗 Build It Up' }[s];
+    const desc  = {
+      simultaneous: 'Play each sound on its own, then the word',
+      cumulative:   'Blend each new sound with the ones before it',
+    }[s];
+    const active = _blendStyle === s ? 'speed-btn--active' : '';
+    return `<button class="speed-btn ${active}" data-blend-style="${s}" aria-label="${desc}" title="${desc}">${label}</button>`;
+  }).join('');
+
   els.modeArea.innerHTML = `
     <div class="classic-blend-wrap">
 
@@ -115,6 +127,12 @@ function _renderControls(els, word, played = false) {
       <div class="speed-row" role="group" aria-label="Playback speed">
         <span class="speed-label">Speed:</span>
         <div class="speed-btns">${speedBtns}</div>
+      </div>
+
+      <!-- Blending style -->
+      <div class="speed-row" role="group" aria-label="Blending style">
+        <span class="speed-label">Blend:</span>
+        <div class="speed-btns">${styleBtns}</div>
       </div>
 
       <!-- Play buttons -->
@@ -176,6 +194,17 @@ function _renderControls(els, word, played = false) {
       });
     });
   });
+
+  // Blend-style buttons
+  els.modeArea.querySelectorAll('[data-blend-style]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      _blendStyle = btn.dataset.blendStyle;
+      store.set('blendStyle', _blendStyle);
+      els.modeArea.querySelectorAll('[data-blend-style]').forEach(b => {
+        b.classList.toggle('speed-btn--active', b.dataset.blendStyle === _blendStyle);
+      });
+    });
+  });
 }
 
 // ── Playback ──────────────────────────────────────────────────────────────
@@ -187,20 +216,37 @@ async function _playSounds(word, els) {
   const tiles = els.phonemeRow.querySelectorAll('.phoneme-tile');
   const delay = SPEED_DELAY[_speed] ?? 320;
 
-  for (let i = 0; i < word.graphemes.length; i++) {
-    // Highlight current tile
-    tiles.forEach((t, ti) => t.classList.toggle('active', ti === i));
+  if (_blendStyle === 'cumulative') {
+    // Successive blending: each step blends everything so far with the next
+    // sound (/l/ → "li" → "list"). The highlight grows with the chunk, and
+    // the final chunk IS the whole word, so no separate word playback.
+    for (let i = 0; i < word.graphemes.length; i++) {
+      tiles.forEach((t, ti) => t.classList.toggle('active', ti <= i));
 
-    // Play this phoneme's audio
-    const prevGrapheme = i > 0 ? word.graphemes[i - 1] : null;
-    await audio.speakPhoneme(word.graphemes[i], word.types[i], { word: word.word, prevGrapheme });
-    await _delay(delay);
+      if (i === 0) {
+        await audio.speakPhoneme(word.graphemes[0], word.types[0], { word: word.word });
+      } else {
+        await audio.speakChunk(word, i + 1);
+      }
+      await _delay(delay);
+    }
+    tiles.forEach(t => t.classList.remove('active'));
+  } else {
+    for (let i = 0; i < word.graphemes.length; i++) {
+      // Highlight current tile
+      tiles.forEach((t, ti) => t.classList.toggle('active', ti === i));
+
+      // Play this phoneme's audio
+      const prevGrapheme = i > 0 ? word.graphemes[i - 1] : null;
+      await audio.speakPhoneme(word.graphemes[i], word.types[i], { word: word.word, prevGrapheme });
+      await _delay(delay);
+    }
+
+    tiles.forEach(t => t.classList.remove('active'));
+
+    await _delay(Math.min(delay, 300));
+    await audio.speakWord(word.word);
   }
-
-  tiles.forEach(t => t.classList.remove('active'));
-
-  await _delay(Math.min(delay, 300));
-  await audio.speakWord(word.word);
 
   isPlaying = false;
 

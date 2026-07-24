@@ -20,6 +20,7 @@ let currentWord   = null;
 let revealedCount = 0;
 let blendStart    = 0;
 let isRevealing   = false;
+let _blendStyle   = 'simultaneous'; // 'simultaneous' | 'cumulative'
 
 // ── Setup ─────────────────────────────────────────────────────────────────
 
@@ -32,6 +33,7 @@ export function setupBlend(word, els) {
   revealedCount = 0;
   blendStart    = Date.now();
   isRevealing   = false;
+  _blendStyle   = store.get('blendStyle') || 'simultaneous';
 
   renderWordImage(word, els.wordEmoji, true);
   els.wordDisplay.innerHTML = '';
@@ -76,6 +78,16 @@ function _renderControls(els, word, stage) {
       ? '▶ First Sound'
       : remaining === 1 ? '▶ Last Sound' : '▶ Next Sound';
 
+    const styleBtns = revealedCount === 0 ? ['simultaneous', 'cumulative'].map(s => {
+      const label = { simultaneous: '🔤 Sound by Sound', cumulative: '🔗 Build It Up' }[s];
+      const desc  = {
+        simultaneous: 'Play each sound on its own, then the word',
+        cumulative:   'Blend each new sound with the ones before it',
+      }[s];
+      const active = _blendStyle === s ? 'speed-btn--active' : '';
+      return `<button class="speed-btn ${active}" data-blend-style="${s}" aria-label="${desc}" title="${desc}">${label}</button>`;
+    }).join('') : '';
+
     els.modeArea.innerHTML = /* html */`
       <div class="blend-guided-wrap">
         <div class="blend-tip" id="blend-tip">
@@ -84,6 +96,12 @@ function _renderControls(els, word, stage) {
             : `Sound ${revealedCount} of ${total} — keep going!`}
         </div>
         ${dotsHtml}
+        ${styleBtns ? `
+        <div class="speed-row" role="group" aria-label="Blending style">
+          <span class="speed-label">Blend:</span>
+          <div class="speed-btns">${styleBtns}</div>
+        </div>
+        ` : ''}
         <button class="btn btn--primary btn--xl blend-next-btn" id="btn-reveal-next"
                 aria-label="${btnLabel}">
           ${btnLabel}
@@ -93,6 +111,16 @@ function _renderControls(els, word, stage) {
 
     document.getElementById('btn-reveal-next')?.addEventListener('click', () => {
       _revealNext(word, els);
+    });
+
+    els.modeArea.querySelectorAll('[data-blend-style]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        _blendStyle = btn.dataset.blendStyle;
+        store.set('blendStyle', _blendStyle);
+        els.modeArea.querySelectorAll('[data-blend-style]').forEach(b => {
+          b.classList.toggle('speed-btn--active', b.dataset.blendStyle === _blendStyle);
+        });
+      });
     });
 
   } else if (stage === 'blend') {
@@ -153,9 +181,14 @@ async function _revealNext(word, els) {
     revealedIndices: Array.from({ length: revealedCount }, (_, i) => i),
   });
 
-  // Play the phoneme
-  const prevGrapheme = idx > 0 ? word.graphemes[idx - 1] : null;
-  await audio.speakPhoneme(word.graphemes[idx], word.types[idx], { word: word.word, prevGrapheme });
+  // Play the new sound — in cumulative (successive-blending) style each
+  // reveal blends everything so far ("li" for l-i) instead of the sound alone.
+  if (_blendStyle === 'cumulative' && idx > 0) {
+    await audio.speakChunk(word, idx + 1);
+  } else {
+    const prevGrapheme = idx > 0 ? word.graphemes[idx - 1] : null;
+    await audio.speakPhoneme(word.graphemes[idx], word.types[idx], { word: word.word, prevGrapheme });
+  }
   await _delay(200);
 
   isRevealing = false;
@@ -205,13 +238,28 @@ async function _animateBlendSweep(phonemeRow, word) {
 
   const perTile = Math.max(200, Math.min(500, 1200 / tiles.length));
 
-  // Sequential highlight
-  for (let i = 0; i < tiles.length; i++) {
-    tiles[i].classList.add('blend-highlight');
-    const prev = i > 0 ? word.graphemes[i - 1] : null;
-    await audio.speakPhoneme(word.graphemes[i], word.types[i], { word: word.word, prevGrapheme: prev });
-    await _delay(perTile);
-    tiles[i].classList.remove('blend-highlight');
+  if (_blendStyle === 'cumulative') {
+    // Successive blending: the highlight bar grows as each step blends the
+    // chunk so far with the next sound (/l/ → "li" → "list").
+    for (let i = 0; i < tiles.length; i++) {
+      tiles[i].classList.add('blend-highlight');
+      if (i === 0) {
+        await audio.speakPhoneme(word.graphemes[0], word.types[0], { word: word.word });
+      } else {
+        await audio.speakChunk(word, i + 1);
+      }
+      await _delay(perTile);
+    }
+    tiles.forEach(t => t.classList.remove('blend-highlight'));
+  } else {
+    // Sequential highlight
+    for (let i = 0; i < tiles.length; i++) {
+      tiles[i].classList.add('blend-highlight');
+      const prev = i > 0 ? word.graphemes[i - 1] : null;
+      await audio.speakPhoneme(word.graphemes[i], word.types[i], { word: word.word, prevGrapheme: prev });
+      await _delay(perTile);
+      tiles[i].classList.remove('blend-highlight');
+    }
   }
 
   // Flash all together for the "blend" moment
