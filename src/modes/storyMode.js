@@ -21,6 +21,7 @@ import { isReadAloudSupported, listenToLine, stopListening } from '../modules/re
 import { store } from '../modules/store.js';
 import { getBandReadiness, getRecommendedBand } from '../modules/storyGating.js';
 import { getSightWordsInStory } from '../modules/sightStoryWeave.js';
+import { soundColoredHtml, graphemeSounds, SOUND_META, VOWEL_LEGEND } from '../modules/phonemeColors.js';
 import { modalManager } from '../modules/modalManager.js';
 import { unlockFriend, getRosterSummary } from '../modules/storyFriends.js';
 import {
@@ -117,15 +118,11 @@ let _fluencyRunning = false;
 const PREFS_GRAPHEMES_KEY = 'giri_show_graphemes';
 const PREFS_RULER_KEY     = 'giri_show_ruler';
 const PREFS_FOLLOW_KEY    = 'giri_follow_mode';
-const PREFS_DETECTIVE_KEY = 'giri_detective_mode';
 const MEET_WORDS_KEY      = 'giri_meet_words';
 const COMP_LOG_KEY        = 'giri_comp_log';
 
 let _showGraphemes = _loadPref(PREFS_GRAPHEMES_KEY, true);
 let _showRuler     = _loadPref(PREFS_RULER_KEY, false);
-// Word Detective is opt-in (default OFF) so the dominant tap-action stays
-// "repeat the word" (karaoke). Turn on to make taps open the breakdown card.
-let _detectiveMode = _loadPref(PREFS_DETECTIVE_KEY, false);
 
 // Hydrate the karaoke follow-mode from prefs now that PREFS_FOLLOW_KEY is in
 // scope. Defaults to 'word' (declared above) so first-run users get karaoke
@@ -679,30 +676,27 @@ function _renderReadAloud(story) {
   dynamic.innerHTML = /* html */`
     <!-- Story text column -->
     <div class="story-content-wrap">
-      <!-- Combined reading toolbar — Scaffolds + Highlight + Tap-a-word.
-           Wraps to multiple rows on phones, lays out horizontally on tablet+
-           so the story body claims its space back (audit findings #5, #6). -->
+      <!-- Reading toolbar. Three tools, each with a clear payoff:
+           Sound colours (teach the vowel sound), Follow along (track the
+           voice), Tap a word (hear it + see its sounds). -->
       <div class="story-reader-toolbar" role="group" aria-label="Reading controls">
         <div class="reader-scaffold-bar" role="group" aria-label="Reading scaffolds">
-          <span class="scaffold-label">Scaffolds</span>
-          <button class="scaffold-toggle" id="btn-toggle-graphemes" aria-pressed="${_showGraphemes}" title="Highlight the target sound in this story">🎨 Show sounds</button>
+          <button class="scaffold-toggle" id="btn-toggle-graphemes" aria-pressed="${_showGraphemes}" title="Colour each vowel by the sound it makes — short, long, schwa, bossy-r or sliding">🎨 Sound colours</button>
           <button class="scaffold-toggle" id="btn-toggle-ruler" aria-pressed="${_showRuler}" title="Underline the line being read to keep your eyes on track">📏 Reading ruler</button>
         </div>
 
         <div class="follow-mode-toggle">
-          <span class="follow-mode-label">Highlight:</span>
+          <span class="follow-mode-label">Follow along:</span>
           <button class="follow-mode-btn${_followMode === 'line' ? ' active' : ''}" data-follow="line"
                   title="Light up the whole line as Giri reads it.">Whole line</button>
           <button class="follow-mode-btn${_followMode === 'word' ? ' active' : ''}" data-follow="word"
                   title="Light up each word as Giri says it — karaoke style.">Word by word</button>
         </div>
 
-        <div class="follow-mode-toggle">
-          <span class="follow-mode-label">Tap a word:</span>
-          <button class="follow-mode-btn${!_detectiveMode ? ' active' : ''}" data-detective="off" title="Tap a word to hear it">🔊 Hear it</button>
-          <button class="follow-mode-btn${_detectiveMode ? ' active' : ''}" data-detective="on" title="Tap a word to see its sounds">🔍 Detective</button>
-        </div>
+        <span class="reader-tap-hint" title="Tap any word in the story to hear it and see its sounds">👆 Tap a word to hear its sounds</span>
       </div>
+
+      ${_showGraphemes ? _soundLegendHtml() : ''}
 
       <div class="story-body story-body--follow-${_followMode}${_showRuler ? ' story-ruler-on' : ''}" id="story-body" aria-live="polite">${linesHtml}</div>
       ${talkHtml}
@@ -830,20 +824,9 @@ function _renderReadAloud(story) {
     });
   });
 
-  // Detective toggle — re-renders so the word spans pick up the new tap
-  // behavior. Persisted so a teacher's "investigate this story together"
-  // session carries across pages.
-  dynamic.querySelectorAll('.follow-mode-btn[data-detective]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      _detectiveMode = btn.dataset.detective === 'on';
-      _persistPref(PREFS_DETECTIVE_KEY, _detectiveMode);
-      _renderReadAloud(story);
-    });
-  });
-
-  // Word tap behaviour: in karaoke mode (default) a tap replays the word
-  // via TTS; in Detective mode it opens the breakdown card. Every span is
-  // keyboard-accessible so the same flow works without a pointer.
+  // Word tap behaviour: one predictable action — a tap hears the word and
+  // opens its Word Detective breakdown (unified sound colours + Review Lane),
+  // no mode to choose. Every span is keyboard-accessible for pointer-free use.
   dynamic.querySelectorAll('.wf-word').forEach(span => {
     span.setAttribute('role', 'button');
     span.setAttribute('tabindex', '0');
@@ -851,12 +834,7 @@ function _renderReadAloud(story) {
       const word = (span.textContent || '').trim();
       if (!word) return;
       ev.preventDefault();
-      if (_detectiveMode) {
-        _openWordDetective(word);
-      } else {
-        _stopTTS();
-        try { audio.speakWord(word); } catch (_) { /* ignore — no SFX */ }
-      }
+      _openWordDetective(word);
     };
     span.addEventListener('click', handle);
     span.addEventListener('keydown', (ev) => {
@@ -1110,83 +1088,34 @@ function _resetReadToGiri() {
 }
 
 /**
- * Wrap target-grapheme substrings in a story-text segment with band-aware
- * spans so beginning readers can attach the eye to the new pattern. Single
- * vowels are matched everywhere; digraphs (ai/ee/oa/igh/oo…) match greedily
- * left-to-right longest-first; split digraphs ('a_e','i_e','o_e','u_e') only
- * match a vowel-consonant-e pattern at a word boundary, and wrap the vowel
- * and the silent e separately (different colours).
+ * Colour the vowels of a story-text segment by the SOUND each one makes here
+ * (short / long / schwa / r-controlled / sliding / silent), so the same
+ * letter reads differently in "căt", "cāke" and "əbout". Delegates to the
+ * shared phonemeColors classifier so the inline scaffold, the Decode panel
+ * and the Word Detective card all speak one colour language. A no-op when
+ * the "Sound colours" scaffold is off. Extra args are accepted (and ignored)
+ * for backward-compatible call sites.
  *
  * @param {string} text
- * @param {string[]} targetGraphemes
- * @param {string}   band  – 'A'|'B'|'C'|'D'
- * @returns {string} HTML with grapheme spans
+ * @returns {string} HTML with sound-coloured vowel spans
  */
-export function _highlightGraphemes(text, targetGraphemes, band) {
-  if (!_showGraphemes || !text || !targetGraphemes?.length || !band) return text;
+export function _highlightGraphemes(text) {
+  if (!_showGraphemes || !text) return text;
+  return soundColoredHtml(text);
+}
 
-  const ALPHA = /[a-z]/;
-  const CONS  = /[bcdfghjklmnpqrstvwxyz]/;
-  const lower = text.toLowerCase();
-
-  const splits   = [];
-  const digraphs = [];
-  const vowels   = [];
-  for (const g of targetGraphemes) {
-    if (!g) continue;
-    if (g.includes('_e')) splits.push(g[0].toLowerCase());
-    else if (g.length >= 2) digraphs.push(g.toLowerCase());
-    else vowels.push(g.toLowerCase());
-  }
-  digraphs.sort((a, b) => b.length - a.length);
-
-  let out = '';
-  let i = 0;
-  while (i < text.length) {
-    // Try split-digraph (e.g. 'a_e' → match v-C-e at word boundary)
-    let matched = false;
-    for (const v of splits) {
-      if (lower[i] === v &&
-          i + 2 < text.length &&
-          CONS.test(lower[i + 1]) &&
-          lower[i + 2] === 'e' &&
-          (i + 3 >= text.length || !ALPHA.test(lower[i + 3]))) {
-        out += `<span class="gph gph--${band} gph-vowel">${text[i]}</span>`;
-        out += text[i + 1];
-        out += `<span class="gph gph--${band} gph-silent">${text[i + 2]}</span>`;
-        i += 3;
-        matched = true;
-        break;
-      }
-    }
-    if (matched) continue;
-
-    // Try digraph (longest first)
-    for (const g of digraphs) {
-      if (lower.slice(i, i + g.length) === g) {
-        out += `<span class="gph gph--${band} gph-digraph">${text.slice(i, i + g.length)}</span>`;
-        i += g.length;
-        matched = true;
-        break;
-      }
-    }
-    if (matched) continue;
-
-    // Try single vowel
-    for (const v of vowels) {
-      if (lower[i] === v) {
-        out += `<span class="gph gph--${band} gph-vowel">${text[i]}</span>`;
-        i += 1;
-        matched = true;
-        break;
-      }
-    }
-    if (matched) continue;
-
-    out += text[i];
-    i += 1;
-  }
-  return out;
+/**
+ * Legend for the "Sound colours" scaffold — one chip per vowel-sound
+ * category so a grown-up and child can read what each colour means
+ * (short ă, long ā, schwa ə, bossy-r, sliding, silent).
+ * @returns {string} HTML
+ */
+function _soundLegendHtml() {
+  const items = VOWEL_LEGEND.map(s => `
+    <span class="sl-item">
+      <span class="sl-chip vs--${s.key}">${s.mark || '•'}</span>${s.label}
+    </span>`).join('');
+  return `<div class="sound-legend" aria-label="What the vowel colours mean">${items}</div>`;
 }
 
 /**
@@ -1299,9 +1228,9 @@ function _renderDecodeMode(story) {
     <div class="story-content-wrap">
       <!-- Reading scaffold toggles -->
       <div class="reader-scaffold-bar" role="group" aria-label="Reading scaffolds">
-        <span class="scaffold-label">Scaffolds</span>
-        <button class="scaffold-toggle" id="btn-toggle-graphemes-decode" aria-pressed="${_showGraphemes}" title="Highlight the target sound in this story">🎨 Show sounds</button>
+        <button class="scaffold-toggle" id="btn-toggle-graphemes-decode" aria-pressed="${_showGraphemes}" title="Colour each vowel by the sound it makes — short, long, schwa, bossy-r or sliding">🎨 Sound colours</button>
       </div>
+      ${_showGraphemes ? _soundLegendHtml() : ''}
 
       <!-- Sight word pre-teach -->
       <div class="hfw-preteach" id="hfw-preteach">
@@ -1511,15 +1440,12 @@ function _showDecodePanel({ type, word, wordObj }) {
     return;
   }
 
-  // type === 'decode'
-  const TYPE_COLORS = {
-    c: '#3b82f6', sv: '#ef4444', lv: '#22c55e', d: '#a855f7',
-    bl: '#f97316', rc: '#ec4899', dp: '#0d9488', se: '#94a3b8',
-  };
-
+  // type === 'decode' — colour each tile by the SOUND it makes, one language
+  // shared with the inline scaffold and the Word Detective card.
+  const sounds = graphemeSounds(wordObj.word, wordObj.graphemes, wordObj.types);
   const tilesHtml = wordObj.graphemes.map((g, i) => {
-    const color = TYPE_COLORS[wordObj.types[i]] ?? '#6c63ff';
-    return `<span class="dp-tile" data-idx="${i}" style="--tile-color:${color}">${g}</span>`;
+    const meta = SOUND_META[sounds[i]] ?? SOUND_META.consonant;
+    return `<span class="dp-tile" data-idx="${i}" style="--tile-color:${meta.color}" title="${meta.label}">${g}</span>`;
   }).join('');
 
   inner.innerHTML = /* html */`
@@ -1758,6 +1684,9 @@ function _openWordDetective(text) {
   host.innerHTML = _renderWordDetectiveCard(info);
   modalManager.open('modal-word-detective');
 
+  // The tap that opened this card also wanted to hear the word — say it.
+  try { audio.speakWord(info.text); } catch (_) { /* ignore — no SFX */ }
+
   host.querySelector('[data-action="hear"]')?.addEventListener('click', () => {
     try { audio.speakWord(info.text); } catch (_) { /* ignore */ }
   });
@@ -1783,22 +1712,13 @@ function _openWordDetective(text) {
  */
 function _renderWordDetectiveCard(info) {
   const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
-  const TYPE_CLASS = {
-    c: 'consonant', sv: 'short-vowel', lv: 'long-vowel', d: 'digraph',
-    bl: 'blend', se: 'silent-e', rc: 'r-control', dp: 'diphthong',
-    sf: 'suffix', p: 'suffix', soft_c: 'consonant', soft_g: 'consonant',
-  };
-  const TYPE_LABEL = {
-    c: 'consonant', sv: 'short vowel', lv: 'long vowel', d: 'digraph',
-    bl: 'blend', se: 'silent e', rc: 'r-controlled', dp: 'sliding vowel',
-    sf: 'suffix', p: 'prefix', soft_c: 'soft c', soft_g: 'soft g',
-  };
 
+  // Colour tiles by the sound each grapheme makes — the same language as the
+  // inline "Sound colours" scaffold and the Decode panel.
+  const sounds = graphemeSounds(info.text, info.graphemes, info.types);
   const tilesHtml = info.graphemes.map((g, i) => {
-    const type = info.types[i] || 'c';
-    const cls = TYPE_CLASS[type] || 'consonant';
-    const label = TYPE_LABEL[type] || 'sound';
-    return `<span class="wd-tile letter-tile letter-tile--${cls}" aria-label="${escText(g)}, ${escText(label)}">${escText(g)}</span>`;
+    const meta = SOUND_META[sounds[i]] ?? SOUND_META.consonant;
+    return `<span class="wd-tile vs--${sounds[i]}" style="--tile-color:${meta.color}" aria-label="${escText(g)}, ${escText(meta.label)}">${escText(g)}</span>`;
   }).join('');
 
   const inBankBlock = info.foundInBank
