@@ -48,6 +48,33 @@ describe('vowel sound classifier', () => {
     expect(tag('there')).toBe('th[er:rcontrolled][e:silent]');
   });
 
+  it('marks second-syllable / final schwa (rules)', () => {
+    expect(tag('sofa')).toBe('s[o:short]f[a:schwa]');    // final consonant+a
+    expect(tag('panda')).toBe('p[a:short]nd[a:schwa]');
+    expect(tag('animal')).toBe('[a:short]n[i:short]m[a:schwa]l'); // -al
+    expect(tag('total')).toBe('t[o:short]t[a:schwa]l');
+  });
+
+  it('silences -le, silent-final-e after teams, and regular -ed', () => {
+    expect(tag('little')).toBe('l[i:short]ttl[e:silent]');   // -le
+    expect(tag('leave')).toBe('l[ea:long]v[e:silent]');      // team + silent e
+    expect(tag('please')).toBe('pl[ea:long]s[e:silent]');
+    expect(tag('house')).toBe('h[ou:diphthong]s[e:silent]'); // bank grouped ending, split
+    expect(tag('reached')).toBe('r[ea:long]ch[e:silent]d');  // past-tense -ed
+    expect(tag('sled')).toBe('sl[e:short]d');                // NOT a suffix — e stays short
+  });
+
+  it('applies team exceptions, tolerant of inflections', () => {
+    expect(tag('head')).toBe('h[ea:short]d');
+    expect(tag('been')).toBe('b[ee:short]n');
+    expect(tag('friend')).toBe('fr[ie:short]nd');
+    expect(tag('know')).toBe('kn[ow:long]');
+    expect(tag('now')).toBe('n[ow:diphthong]');   // stays a diphthong
+    expect(tag('slowly')).toBe('sl[ow:long]l[y:long]'); // slow + ly
+    expect(tag('showed')).toBe('sh[ow:long][e:silent]d');
+    expect(tag('flower')).toBe('fl[ow:diphthong][er:rcontrolled]'); // NOT folded to "flow"
+  });
+
   it('does not colour proper nouns', () => {
     expect(soundColoredHtml('Giri')).toBe('Giri');
     expect(tag('Giri had a hat')).toBe('Giri h[a:short]d [a:schwa] h[a:short]t');

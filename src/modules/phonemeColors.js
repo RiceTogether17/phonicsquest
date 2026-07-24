@@ -61,22 +61,132 @@ const VOWEL_SOUNDS = new Set(['short', 'long', 'schwa', 'rcontrolled', 'diphthon
 // ── Curated overrides ──────────────────────────────────────────────────────
 
 /**
- * True schwa — the reduced /ə/ that spelling never reveals. Keyed word →
- * set of letter indices that are schwa. Kept to the highest-frequency,
- * unambiguous cases a beginning reader meets constantly; extend as needed.
+ * Unstressed a- prefix words whose leading `a` is a reduced /ə/ (about,
+ * above, alone…). Spelling can't reveal this, so the set is explicit.
  */
 const A_SCHWA_PREFIX = new Set([
   'about', 'above', 'again', 'ago', 'along', 'alone', 'around', 'away',
   'aside', 'awake', 'aboard', 'aloud', 'ashore', 'alike', 'asleep', 'amaze',
   'alarm', 'across', 'aware', 'another', 'awhile', 'ahead', 'afraid', 'apart',
+  'alive', 'awoke', 'ajar', 'aloft', 'amount', 'account', 'asleep', 'aglow',
 ]);
 
-/** @returns {Set<number>} letter indices in `word` that are schwa. */
+const CONS_CLASS = 'bcdfghjklmnpqrstvwxyz';
+const reFinalA = new RegExp(`[${CONS_CLASS}]a$`);           // sofa, panda, banana
+const reFinalAl = new RegExp(`[bcdfghjkmnprstvz]al$`);       // animal, total, final, metal
+const reTion = /[ts]ion$/;                                   // action, question, mission
+
+/**
+ * Letter indices in `word` that make a schwa /ə/. Combines the curated a-
+ * prefix and article cases with reliable spelling rules: a word-final
+ * consonant+a (soF-A), the a in a consonant+al ending (anim-AL), and the i
+ * in a -tion / -sion ending (quest-I-on).
+ * @returns {Set<number>|null}
+ */
 function schwaIndices(word) {
-  if (word === 'a') return new Set([0]);
-  if (word === 'the') return new Set([2]);
-  if (A_SCHWA_PREFIX.has(word) && word[0] === 'a') return new Set([0]);
-  return null;
+  const set = new Set();
+  if (word === 'a') set.add(0);
+  else if (word === 'the') set.add(2);
+  else {
+    if (A_SCHWA_PREFIX.has(word) && word[0] === 'a') set.add(0);
+    if (word.length >= 3 && reFinalA.test(word)) set.add(word.length - 1);
+    if (word.length >= 4 && reFinalAl.test(word)) set.add(word.length - 2);
+    if (word.length >= 5 && reTion.test(word)) set.add(word.length - 3); // the 'i'
+  }
+  return set.size ? set : null;
+}
+
+// A handful of words whose final e IS sounded, so the general silent-final-e
+// rule must skip them.
+const FINAL_E_SOUNDS = new Set(['maybe', 'recipe', 'karate', 'sesame', 'ukulele', 'finale']);
+const reFinalCe = new RegExp(`[${CONS_CLASS}]e$`);
+
+/**
+ * Letter indices that are a genuinely silent letter (not sounded):
+ *   - the e of a -le ending (litt-l-E), covered by the general rule below;
+ *   - the o of a -tion / -sion ending (quest-i-O-n);
+ *   - a final consonant+e once the word already has a vowel (leav-E,
+ *     pleas-E, larg-E) — but not open CV words (he, she) or the few that
+ *     sound it (maybe);
+ *   - the e of a regular past-tense -ed (beam-Ed, reach-Ed) — except after
+ *     t/d, where it says /ɪd/ (wanted), or when there's no stem vowel (sled).
+ * Split-digraph silent e (cake) is handled inline by the walker.
+ * @returns {Set<number>|null}
+ */
+function silentIndices(word) {
+  const set = new Set();
+  const n = word.length;
+  if (n >= 5 && reTion.test(word)) set.add(n - 2); // the 'o' of -ion
+  if (
+    n >= 4 && reFinalCe.test(word) &&
+    !FINAL_E_SOUNDS.has(word) && /[aeiou]/.test(word.slice(0, -2))
+  ) {
+    set.add(n - 1);
+  }
+  if (n >= 4 && word.endsWith('ed')) {
+    const before = word[n - 3];
+    if (CONS_CLASS.includes(before) && before !== 't' && before !== 'd' &&
+        /[aeiou]/.test(word.slice(0, -2))) {
+      set.add(n - 2);
+    }
+  }
+  return set.size ? set : null;
+}
+
+// Vowel teams whose usual sound is overridden in a bounded set of words.
+const EA_SHORT = new Set([                                   // ea → short /ɛ/
+  'head', 'bread', 'dead', 'ready', 'heavy', 'instead', 'meant', 'health',
+  'wealth', 'weather', 'feather', 'leather', 'thread', 'spread', 'breath',
+  'death', 'sweat', 'meadow', 'steady', 'already', 'breakfast', 'dread',
+  'heaven', 'peasant', 'pleasant', 'treasure', 'measure',
+]);
+const EE_SHORT = new Set(['been']);                          // ee → short /ɪ/
+const IE_SHORT = new Set(['friend', 'friends']);             // ie → short /ɛ/
+const OW_LONG = new Set([                                    // ow → long /oʊ/
+  'snow', 'show', 'shown', 'low', 'below', 'grow', 'grown', 'blow', 'blown',
+  'glow', 'flow', 'slow', 'throw', 'thrown', 'own', 'owned', 'know', 'known',
+  'yellow', 'follow', 'window', 'arrow', 'narrow', 'elbow', 'rainbow', 'bowl',
+  'sparrow', 'pillow', 'shadow', 'meadow', 'borrow', 'tomorrow', 'below',
+  'row', 'mow', 'sow', 'bow', 'crow', 'flown', 'growth',
+]);
+
+// Inflectional suffixes stripped before a set lookup, so "showed"/"slowly"
+// inherit "show"/"slow". 'er'/'en' are deliberately excluded — they would
+// wrongly fold "flower"/"shower" onto "flow"/"show".
+const INFLECT = ['ing', 'ed', 'ly', 'es', 's', 'n'];
+
+/** Set membership tolerant of a trailing inflection (showed → show). */
+function inSet(set, word) {
+  if (set.has(word)) return true;
+  for (const suf of INFLECT) {
+    if (word.endsWith(suf) && word.length - suf.length >= 2 &&
+        set.has(word.slice(0, -suf.length))) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Apply the bounded team/word exceptions to a base vowel sound. Shared by
+ * every path so the inline scaffold and the tile panels agree.
+ * @param {string} word cleaned word
+ * @param {string} grapheme the grapheme text (e.g. 'ea', 'ow', 'e')
+ * @param {number} idx start letter index of the grapheme
+ * @param {string} base the sound category before refinement
+ * @param {Set<number>|null} schwa
+ * @param {Set<number>|null} silent
+ * @returns {string}
+ */
+function refineVowel(word, grapheme, idx, base, schwa, silent) {
+  if (!VOWEL_SOUNDS.has(base)) return base;
+  if (silent?.has(idx)) return 'silent';
+  if (schwa?.has(idx)) return 'schwa';
+  if (grapheme === 'ea' && inSet(EA_SHORT, word)) return 'short';
+  if (grapheme === 'ee' && inSet(EE_SHORT, word)) return 'short';
+  if (grapheme === 'ie' && inSet(IE_SHORT, word)) return 'short';
+  if (grapheme === 'ow' && inSet(OW_LONG, word)) return 'long';
+  return base;
 }
 
 /**
@@ -103,6 +213,7 @@ const IRREGULAR = new Map([
   ['there', [S, S, 'rcontrolled', 'rcontrolled', 'silent']],
   ['above', ['schwa', S, 'short', S, 'silent']],
   ['become', [S, 'short', S, 'short', S, 'silent']],
+  ['people', [S, 'long', 'silent', S, S, 'silent']],
   // Vowel teams the bank types oddly / that say an irregular sound.
   ['again', ['schwa', S, 'long', 'long', S]],
   ['said',  [S, 'short', 'short', S]],
@@ -149,15 +260,16 @@ export function isVowelSound(sound) {
 export function graphemeSounds(word, graphemes, types) {
   const clean = String(word).toLowerCase().replace(/[^a-z]/g, '');
   const schwa = schwaIndices(clean);
+  const silent = silentIndices(clean);
   const irregular = IRREGULAR.get(clean);
   const out = [];
   let idx = 0;
   for (let k = 0; k < graphemes.length; k++) {
-    const len = (graphemes[k] || '').length || 1;
+    const g = graphemes[k] || '';
+    const len = g.length || 1;
     let sound = soundForType(types[k]);
     if (VOWEL_SOUNDS.has(sound)) {
-      if (schwa?.has(idx)) sound = 'schwa';
-      else if (irregular?.[idx]) sound = irregular[idx];
+      sound = irregular?.[idx] ?? refineVowel(clean, g, idx, sound, schwa, silent);
     }
     out.push(sound);
     idx += len;
@@ -183,12 +295,13 @@ const TEAMS = Object.freeze({
 const TEAM_KEYS = Object.keys(TEAMS).sort((a, b) => b.length - a.length);
 
 /**
- * Segment an unknown word by spelling pattern.
+ * Segment an unknown word by spelling pattern, with the shared refinements.
  * @param {string} word lowercase letters only
- * @param {Set<number>|null} schwa letter indices that are schwa
+ * @param {Set<number>|null} schwa
+ * @param {Set<number>|null} silent
  * @returns {Array<{len:number, sound:string|null}>}
  */
-function fallbackSegments(word, schwa) {
+function fallbackSegments(word, schwa, silent) {
   const segs = [];
   const n = word.length;
   let i = 0;
@@ -198,7 +311,7 @@ function fallbackSegments(word, schwa) {
       i === n - 3 &&
       isVowel(word[i]) && isCons(word[i + 1]) && word[i + 2] === 'e'
     ) {
-      segs.push({ len: 1, sound: schwa?.has(i) ? 'schwa' : 'long' });
+      segs.push({ len: 1, sound: refineVowel(word, word[i], i, 'long', schwa, silent) });
       segs.push({ len: 1, sound: null });
       segs.push({ len: 1, sound: 'silent' });
       break;
@@ -207,20 +320,18 @@ function fallbackSegments(word, schwa) {
     let matched = false;
     for (const team of TEAM_KEYS) {
       if (word.startsWith(team, i)) {
-        segs.push({ len: team.length, sound: schwa?.has(i) ? 'schwa' : TEAMS[team] });
+        segs.push({ len: team.length, sound: refineVowel(word, team, i, TEAMS[team], schwa, silent) });
         i += team.length;
         matched = true;
         break;
       }
     }
     if (matched) continue;
-    // Single vowel (or a vowel-y like "my", "happy").
+    // Single vowel (or a vowel-y like "my", "happy"). Open syllable at the
+    // word end reads long (go, he, my), otherwise short — before refinement.
     if (isVowel(word[i]) || (word[i] === 'y' && i > 0)) {
-      let sound;
-      if (schwa?.has(i)) sound = 'schwa';
-      else if (i === n - 1) sound = 'long';   // open syllable at word end (go, he, my)
-      else sound = 'short';
-      segs.push({ len: 1, sound });
+      const base = i === n - 1 ? 'long' : 'short';
+      segs.push({ len: 1, sound: refineVowel(word, word[i], i, base, schwa, silent) });
       i += 1;
       continue;
     }
@@ -232,20 +343,33 @@ function fallbackSegments(word, schwa) {
 }
 
 /**
- * Segment a known word from its curated graphemes/types, with schwa overlaid.
+ * Segment a known word from its curated graphemes/types, refined.
  * @param {{graphemes:string[], types:string[]}} entry
+ * @param {string} word cleaned word
  * @param {Set<number>|null} schwa
+ * @param {Set<number>|null} silent
  * @returns {Array<{len:number, sound:string|null}>}
  */
-function bankSegments(entry, schwa) {
+function bankSegments(entry, word, schwa, silent) {
   const segs = [];
   let idx = 0;
   for (let k = 0; k < entry.graphemes.length; k++) {
     const g = entry.graphemes[k];
     const len = g.length;
+    // Some bank entries group a trailing consonant+e ("house" = h·ou·se) as
+    // one tile; split it so the silent e reads silent and the consonant plain.
+    if (
+      len === 2 && g[1] === 'e' && CONS_CLASS.includes(g[0]) &&
+      idx + 2 === word.length && silent?.has(idx + 1)
+    ) {
+      segs.push({ len: 1, sound: null });
+      segs.push({ len: 1, sound: 'silent' });
+      idx += 2;
+      continue;
+    }
     let sound = TYPE_SOUND[entry.types[k]] ?? null;
     if (!VOWEL_SOUNDS.has(sound) && sound !== 'silent') sound = null; // plain inline
-    if (VOWEL_SOUNDS.has(sound) && schwa?.has(idx)) sound = 'schwa';
+    sound = refineVowel(word, g, idx, sound, schwa, silent);
     segs.push({ len, sound });
     idx += len;
   }
@@ -276,8 +400,11 @@ export function vowelSegments(rawWord) {
   }
 
   const schwa = schwaIndices(word);
+  const silent = silentIndices(word);
   const entry = BANK.get(word);
-  return entry?.graphemes?.length ? bankSegments(entry, schwa) : fallbackSegments(word, schwa);
+  return entry?.graphemes?.length
+    ? bankSegments(entry, word, schwa, silent)
+    : fallbackSegments(word, schwa, silent);
 }
 
 // ── Inline renderer ────────────────────────────────────────────────────────
