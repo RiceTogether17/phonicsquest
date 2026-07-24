@@ -20,7 +20,7 @@ let currentWord   = null;
 let revealedCount = 0;
 let blendStart    = 0;
 let isRevealing   = false;
-let _blendStyle   = 'simultaneous'; // 'simultaneous' | 'cumulative'
+let _blendStyle   = 'cumulative'; // 'simultaneous' | 'cumulative'
 
 // ── Setup ─────────────────────────────────────────────────────────────────
 
@@ -33,7 +33,7 @@ export function setupBlend(word, els) {
   revealedCount = 0;
   blendStart    = Date.now();
   isRevealing   = false;
-  _blendStyle   = store.get('blendStyle') || 'simultaneous';
+  _blendStyle   = store.get('blendStyle') || 'cumulative';
 
   renderWordImage(word, els.wordEmoji, true);
   els.wordDisplay.innerHTML = '';
