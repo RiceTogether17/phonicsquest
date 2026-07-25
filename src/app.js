@@ -2036,7 +2036,7 @@ class App {
         <p class="home-section-heading">${headline}</p>
         <p class="home-section-sub">${sub}</p>
       </div>
-      <div class="mission-card" role="list">${stepsHtml}</div>`;
+      <div class="mission-card" role="group" aria-label="Today's lesson steps">${stepsHtml}</div>`;
 
     host.querySelectorAll('[data-lesson-step]').forEach(btn => {
       btn.addEventListener('click', () => {

@@ -43,6 +43,12 @@ jobs:
       - name: Bundle-size budget
         run: npm run check:bundle
 
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end smoke & accessibility tests
+        run: npm run test:e2e
+
       - name: Verify build output
         run: |
           echo "--- Build output ---"
