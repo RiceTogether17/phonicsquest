@@ -20,6 +20,11 @@
  *       - modal regret ("should have arrived")
  *       - collective-noun SVA ("a group of sheep is")
  *
+ * All prompts, passages and cloze texts are ORIGINAL content written for
+ * PhonicsQuest. Only the paper format and the skills tested follow the
+ * school-paper convention — no question or passage is reproduced from any
+ * published or school paper.
+ *
  * Every MCQ item carries:
  *   - skill          — category key from grammarCategories.js / vocabCategories.js
  *   - practiseTarget — module key the student should open to drill that skill
@@ -40,25 +45,25 @@ export const P3_PRACTICE_TESTS = Object.freeze({
     id: 'p3-test-term-1', term: 'T1', level: 'P3',
     label: 'Term 1 Practice Test 1 (Basic)',
     duration: '45 minutes', totalMarks: 40,
-    blurb: 'P3 Term 1 paper — past continuous ("was sleeping when..."), polite "Could you", possessive "whose" and an "although / comparative-than" synthesis pair. Comprehension: Leo lost at the MRT station.',
+    blurb: 'P3 Term 1 paper — past continuous ("was sleeping when..."), polite "Could you", possessive "whose" and an "although / comparative-than" synthesis pair. Comprehension: Mira lost at the book fair.',
     sectionA: {
       title: 'Section A: Grammar MCQ', marks: 5,
       items: [
-        { q: 'Isaac ___ under a tree when a branch snapped and struck him on the head.', choices: ['sleep', 'slept', 'is sleeping', 'was sleeping'], answer: 'was sleeping', skill: 'pastCont', practiseTarget: 'grammar-mcq', explain: '"Was sleeping" is past continuous — a longer past action that was interrupted by the branch snapping.' },
-        { q: 'After completing all her homework, Janice had very ___ time left to do anything else.', choices: ['much', 'some', 'many', 'little'], answer: 'little', skill: 'quantifiers', practiseTarget: 'grammar-mcq', explain: '"Very little time" = almost no time. "Little" is the negative quantifier for uncountable nouns.' },
-        { q: '___ a month’s time, we will have to hand in our projects.', choices: ['By', 'In', 'On', 'Before'], answer: 'In', skill: 'prepositions', practiseTarget: 'grammar-mcq', explain: '"In a month\'s time" is a fixed phrase meaning "after one month from now".' },
-        { q: '"___ worksheet is this? There’s no name written on it," Mr Low asked the class.', choices: ['Who', 'What', 'Whose', 'Which'], answer: 'Whose', skill: 'whQuestions', practiseTarget: 'grammar-mcq', explain: '"Whose" asks about ownership; "who" asks about a person.' },
-        { q: '"___ you wait here for me? I won’t take long," Bernie asked.', choices: ['May', 'Could', 'Must', 'Should'], answer: 'Could', skill: 'modals', practiseTarget: 'grammar-mcq', explain: '"Could you...?" is the polite request form when asking someone for a favour.' },
+        { q: 'Halim ___ in the hammock when a sudden clap of thunder woke him.', choices: ['sleep', 'slept', 'is sleeping', 'was sleeping'], answer: 'was sleeping', skill: 'pastCont', practiseTarget: 'grammar-mcq', explain: '"Was sleeping" is past continuous — a longer past action that was interrupted by the thunder.' },
+        { q: 'After finishing all her chores, Rina had very ___ energy left to play.', choices: ['much', 'some', 'many', 'little'], answer: 'little', skill: 'quantifiers', practiseTarget: 'grammar-mcq', explain: '"Very little energy" = almost none. "Little" is the negative quantifier for uncountable nouns.' },
+        { q: '___ a week’s time, we will be sitting for our spelling test.', choices: ['By', 'In', 'On', 'Before'], answer: 'In', skill: 'prepositions', practiseTarget: 'grammar-mcq', explain: '"In a week\'s time" is a fixed phrase meaning "after one week from now".' },
+        { q: '"___ watercolour set is this? There’s no label on it," Mrs Nair asked the class.', choices: ['Who', 'What', 'Whose', 'Which'], answer: 'Whose', skill: 'whQuestions', practiseTarget: 'grammar-mcq', explain: '"Whose" asks about ownership; "who" asks about a person.' },
+        { q: '"___ you hold my bag for a minute? I need to tie my shoelace," Devi asked.', choices: ['May', 'Could', 'Must', 'Should'], answer: 'Could', skill: 'modals', practiseTarget: 'grammar-mcq', explain: '"Could you...?" is the polite request form when asking someone for a favour.' },
       ],
     },
     sectionB: {
       title: 'Section B: Vocabulary MCQ', marks: 5,
       items: [
-        { q: 'Poor Gladys missed a step and ___ down the stairs.', choices: ['tripped', 'slipped', 'dropped', 'tumbled'], answer: 'tumbled', skill: 'actionVerbs', practiseTarget: 'vocab-mcq', explain: '"Tumbled" means fell head-over-heels — the right verb for falling down stairs.' },
-        { q: 'The injured man ___ in pain.', choices: ['sighed', 'groaned', 'mumbled', 'grumbled'], answer: 'groaned', skill: 'soundVerbs', practiseTarget: 'vocab-mcq', explain: '"Groaned" is a deep painful sound. "Mumbled" and "grumbled" are about speech.' },
-        { q: 'Everyone was ___ as no one had expected the judges to choose the weakest contestant as the winner.', choices: ['unsure', 'alarmed', 'puzzled', 'embarrassed'], answer: 'puzzled', skill: 'emotionAdjectives', practiseTarget: 'vocab-mcq', explain: '"Puzzled" matches the surprise of an unexpected, hard-to-understand result.' },
-        { q: 'Stanley ordered the T-bone steak which is a huge ___ of meat.', choices: ['slab', 'lump', 'slice', 'block'], answer: 'slab', skill: 'collectiveNouns', practiseTarget: 'vocab-mcq', explain: 'A "slab" of meat is a thick, flat piece — the term used for a T-bone steak.' },
-        { q: 'Even though many praise him, Max remains ___ and does not boast about his achievements.', choices: ['bold', 'timid', 'humble', 'confident'], answer: 'humble', skill: 'emotionAdjectives', practiseTarget: 'vocab-mcq', explain: '"Humble" means modest — the opposite of boastful.' },
+        { q: 'Poor Alvin lost his footing and ___ down the grassy slope.', choices: ['tripped', 'slipped', 'dropped', 'tumbled'], answer: 'tumbled', skill: 'actionVerbs', practiseTarget: 'vocab-mcq', explain: '"Tumbled" means fell head-over-heels — the right verb for rolling down a slope.' },
+        { q: 'The injured cyclist ___ in pain as he clutched his knee.', choices: ['sighed', 'groaned', 'mumbled', 'grumbled'], answer: 'groaned', skill: 'soundVerbs', practiseTarget: 'vocab-mcq', explain: '"Groaned" is a deep painful sound. "Mumbled" and "grumbled" are about speech.' },
+        { q: 'Everyone was ___ as no one had expected the quietest newcomer to be crowned champion.', choices: ['unsure', 'alarmed', 'puzzled', 'embarrassed'], answer: 'puzzled', skill: 'emotionAdjectives', practiseTarget: 'vocab-mcq', explain: '"Puzzled" matches the surprise of an unexpected, hard-to-understand result.' },
+        { q: 'Uncle Roy bought a huge ___ of beef for the weekend barbecue.', choices: ['slab', 'lump', 'slice', 'block'], answer: 'slab', skill: 'collectiveNouns', practiseTarget: 'vocab-mcq', explain: 'A "slab" of meat is a thick, flat piece — the term used for a large cut of beef.' },
+        { q: 'Despite all the trophies she has won, Xin Yi remains ___ and never brags about her success.', choices: ['bold', 'timid', 'humble', 'confident'], answer: 'humble', skill: 'emotionAdjectives', practiseTarget: 'vocab-mcq', explain: '"Humble" means modest — the opposite of boastful.' },
       ],
     },
     sectionC: {
@@ -66,11 +71,11 @@ export const P3_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in the blanks with a suitable word from the box. Each word can only be used once. Two words will be left over.',
       wordBank: ['herself', 'their', 'she', 'they', 'her', 'them', 'themselves'],
       text:
-        'Tanya was the oldest child in the family. Whenever her parents were not at home, {{1}} had to look after her three siblings. ' +
-        'They were much younger than she was and were not able to look after {{2}}. ' +
-        'Being mature for {{3}} age, Tanya could be trusted to do a good job of taking care of her siblings. ' +
-        'She would cook meals for {{4}}, make sure they bathed and helped them with {{5}} homework. ' +
-        'Her parents need not worry as they knew the younger children were in Tanya’s safe hands.',
+        'Sherry was the eldest child in her family. Whenever her parents worked late, {{1}} had to mind her twin brothers. ' +
+        'They were only four years old and were not able to care for {{2}} yet. ' +
+        'Being sensible for {{3}} age, Sherry could be counted on to keep things running smoothly at home. ' +
+        'She would warm up dinner for {{4}}, remind them to brush their teeth and pack {{5}} school bags for the next day. ' +
+        'Her parents never worried, for they knew the twins were in Sherry’s capable hands.',
       answers: ['she', 'themselves', 'her', 'them', 'their'],
       leftOver: ['herself', 'they'],
       skill: 'pronouns', practiseTarget: 'cloze-castle',
@@ -80,11 +85,11 @@ export const P3_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in the blanks with a suitable word from the box. Each word can only be used once. Two words will be left over.',
       wordBank: ['ability', 'recover', 'skill', 'lose', 'regrow', 'aside', 'apart'],
       text:
-        'Jellyfish are very special creatures. They have several characteristics that set them {{1}} from other animals. ' +
-        'One of the most interesting things about jellyfish is that they do not have brains, bones, hearts or eyes. ' +
-        'Another fascinating characteristic of jellyfish is their {{2}} to regenerate. This means they can {{3}} lost body parts. ' +
-        'It helps them to survive in the oceans for it allows them to {{4}} from injuries and continue living even if they {{5}} a body part. ' +
-        'Jellyfish are no doubt one of the most unique creatures in the oceans.',
+        'Starfish are truly remarkable sea animals. They have several features that set them {{1}} from other creatures. ' +
+        'One surprising fact about starfish is that they have no brain and no blood. ' +
+        'Another amazing feature of starfish is their {{2}} to regenerate. This means they can {{3}} lost arms over time. ' +
+        'This power helps them survive in the wild, for it allows them to {{4}} from attacks and carry on living even if they {{5}} a limb to a hungry predator. ' +
+        'Starfish are without doubt among the most fascinating animals in the sea.',
       answers: ['apart', 'ability', 'regrow', 'recover', 'lose'],
       leftOver: ['skill', 'aside'],
       skill: 'collocationCloze', practiseTarget: 'word-vault',
@@ -93,51 +98,51 @@ export const P3_PRACTICE_TESTS = Object.freeze({
       title: 'Section E: Sentence Combining / Synthesis', marks: 4,
       instructions: 'Rewrite the two sentences as ONE sentence using the connector provided.',
       items: [
-        { originals: ['Mark had a fever.', 'He still went to school.'], connector: 'although', stemPosition: 'middle', model: 'Mark went to school although he had a fever.', skill: 'connectors', explain: '"Although" introduces an unexpected fact — the fever did not stop him.' },
-        { originals: ['Wendy is tall.', 'Her sister is not as tall.'], connector: 'than', stemPosition: 'middle', model: 'Wendy is taller than her sister.', skill: 'comparatives', explain: 'Comparing two people uses "-er than" (or "more ___ than" for longer adjectives).' },
+        { originals: ['Priya had a sprained ankle.', 'She still finished the race.'], connector: 'although', stemPosition: 'middle', model: 'Priya finished the race although she had a sprained ankle.', skill: 'connectors', explain: '"Although" introduces an unexpected fact — the sprain did not stop her.' },
+        { originals: ['Ken is fast.', 'His cousin is not as fast.'], connector: 'than', stemPosition: 'middle', model: 'Ken is faster than his cousin.', skill: 'comparatives', explain: 'Comparing two people uses "-er than" (or "more ___ than" for longer adjectives).' },
       ],
     },
     sectionF: {
       title: 'Section F: Editing', marks: 6,
       instructions: 'Each underlined word contains either a spelling or grammatical mistake. A circle marks a missing or wrong punctuation mark.',
       paragraph:
-        'It was the first time that Sara was going for a ride on a rollercoaster. She was not keen, but her friend Kelly wanted her to come {{1:by}} her. ' +
-        '"I promise you it{{2:o}}ll be fun! You will not regret it," Kelly said. ' +
-        'Sara was not {{3:konvinsed}}. However, she did not want to be a spoilsport so she climbed {{4:to}} the seat next to Kelly. ' +
-        'As the rollercoaster {{5:chuggled}} up the track, Sara closed her eyes. When it started plunging down, Sara began to {{6:srheek}} at the top of her lungs. ' +
-        'Strangely, she lost her fear and began to enjoy the experience.',
+        'It was the first time that Devi was going down the giant zipline at adventure camp. She was not keen, but her friend Priya wanted her to come {{1:by}} her. ' +
+        '"I promise you it{{2:o}}ll be exciting! You will not regret it," Priya said. ' +
+        'Devi was not {{3:konvinsed}}. However, she did not want to be a wet blanket, so she climbed {{4:to}} the harness beside Priya. ' +
+        'As the pulley {{5:wizzed}} along the cable, Devi squeezed her eyes shut. When the ground dropped away below her, Devi began to {{6:srheek}} at the top of her lungs. ' +
+        'Strangely, her fear melted away and she began to enjoy the ride.',
       errors: [
         { num: 1, kind: 'grammar',    wrong: 'by',         correction: 'with',     explain: '"Come with her" — the preposition for accompaniment is "with", not "by".' },
         { num: 2, kind: 'punctuation',wrong: '',           correction: '’',        explain: 'An apostrophe is needed for the contraction "it\'ll" (= it will).' },
         { num: 3, kind: 'spelling',   wrong: 'konvinsed',  correction: 'convinced',explain: 'Correct spelling is "convinced".' },
-        { num: 4, kind: 'grammar',    wrong: 'to',         correction: 'into',     explain: '"Climbed into the seat" — use "into" for movement that ends inside something.' },
-        { num: 5, kind: 'spelling',   wrong: 'chuggled',   correction: 'chugged',  explain: 'Correct spelling is "chugged" (simple past of "chug").' },
+        { num: 4, kind: 'grammar',    wrong: 'to',         correction: 'into',     explain: '"Climbed into the harness" — use "into" for movement that ends inside something.' },
+        { num: 5, kind: 'spelling',   wrong: 'wizzed',     correction: 'whizzed',  explain: 'Correct spelling is "whizzed".' },
         { num: 6, kind: 'spelling',   wrong: 'srheek',     correction: 'shriek',   explain: 'Correct spelling is "shriek".' },
       ],
     },
     sectionG: {
       title: 'Section G: Comprehension Open-ended', marks: 10,
       passage:
-        'Six-year-old Leo was all ready and eager to go on his thrilling excursion. His mother had promised to take him to the Science Centre to view the special dinosaur exhibition. He could not sleep a wink the night before just thinking about today’s trip.\n\n' +
-        'Suddenly, a wave of people surged at the MRT station. Leo was pushed forward. He stumbled, and his hand slipped from his mother’s grip. When he spun around, his mother was nowhere to be seen! She seemed to have been swallowed up by the crowd.\n\n' +
-        'His throat tightened and tears pricked his eyes. "Mum!" he cried, but his voice was drowned out by the noise of passengers rushing past him.\n\n' +
-        'Taking a deep breath, Leo remembered his mum’s words: "If we ever get separated, go to station control and ask the officer on duty for help." He made his way there and luckily for him, kindly Station Manager Mr Kassim was on hand to assist.\n\n' +
-        'After Leo told him what had happened, Mr Kassim spoke into a walkie-talkie. He then made a series of announcements calling for Leo’s mum to approach station control.\n\n' +
-        'Minutes stretched like hours. Through the crowd, Leo saw his mother rushing to the station control with a worried look on her face about ten minutes later. His heart leapt with joy. "Mum!" he screamed, as he ran towards her. She swept him up in a hug, her eyes filled with relief. Both mother and son were finally reunited!\n\n' +
-        'After thanking Mr Kassim, they left the station, hand-in-hand, the Science Centre adventure forgotten. There was just too much excitement for the day!',
+        'Seven-year-old Mira was all set and eager for her exciting outing. Her father had promised to bring her to the giant book fair at the convention centre to hunt for her favourite comic series. She had hardly slept a wink the night before just thinking about the trip.\n\n' +
+        'Suddenly, a stream of shoppers poured out of the lifts at the entrance. Mira was carried along by the crowd. She stumbled, and her fingers slipped out of her father’s hand. When she turned around, her father was nowhere to be seen! He seemed to have melted into the sea of people.\n\n' +
+        'Her chest went tight and tears stung her eyes. "Papa!" she called, but her voice was swallowed by the din of the shoppers bustling past her.\n\n' +
+        'Taking a deep breath, Mira remembered her father’s instructions: "If we ever lose each other, go to the information counter and tell the staff on duty." She threaded her way there, and luckily for her, kindly Customer Service Officer Ms Wong was ready to help.\n\n' +
+        'After Mira explained what had happened, Ms Wong picked up a microphone. She then made several announcements asking Mira’s father to come to the information counter.\n\n' +
+        'Minutes crawled by like hours. Through the crowd, about ten minutes later, Mira spotted her father hurrying towards the counter with a frantic look on his face. Her heart leapt. "Papa!" she cried, dashing towards him. He scooped her up in a tight hug, his eyes brimming with relief. Father and daughter were together again at last!\n\n' +
+        'After thanking Ms Wong, they left the centre hand-in-hand, the book fair forgotten. There had been more than enough excitement for one day!',
       questions: [
-        { type: 'word-meaning', marks: 1, q: 'Which word in paragraph 1 has the same meaning as "excited"?', sentence: 'Six-year-old Leo was all ready and eager to go on his thrilling excursion.', choices: ['eager', 'thrilling'], answer: 'eager', explain: '"Eager" means keen and excited to do something.' },
-        { type: 'short', marks: 1, q: 'What caused Leo to be "pushed forward" in paragraph 2?', model: 'A wave of people surged at the MRT station.', keywords: ['wave', 'surged', 'crowd'] },
-        { type: 'short', marks: 1, q: 'Which four-word phrase in paragraph 2 tells you that Leo’s mother could not be found?', model: 'nowhere to be seen', keywords: ['nowhere to be seen'] },
-        { type: 'short', marks: 2, q: 'What two things did Leo’s mother tell him to do if he got lost?', model: 'Go to station control AND ask the officer on duty for help.', keywords: ['station control', 'officer', 'help'] },
-        { type: 'sequence', marks: 1, q: 'Arrange the events in the correct sequence.', options: ['Leo was overjoyed to see his mother again.', 'The excursion was cancelled.', 'Leo shouted for his mother.'], answer: [3, 1, 2] },
-        { type: 'short', marks: 2, q: 'How did Mr Kassim help Leo?', model: 'He spoke into a walkie-talkie and made a series of announcements calling for Leo’s mum to approach station control.', keywords: ['announcements', 'walkie-talkie', 'mum'] },
+        { type: 'word-meaning', marks: 1, q: 'Which word in paragraph 1 has the same meaning as "excited"?', sentence: 'Seven-year-old Mira was all set and eager for her exciting outing.', choices: ['eager', 'exciting'], answer: 'eager', explain: '"Eager" means keen and excited to do something.' },
+        { type: 'short', marks: 1, q: 'What caused Mira to be "carried along by the crowd" in paragraph 2?', model: 'A stream of shoppers poured out of the lifts at the entrance.', keywords: ['stream', 'shoppers', 'poured'] },
+        { type: 'short', marks: 1, q: 'Which four-word phrase in paragraph 2 tells you that Mira’s father could not be found?', model: 'nowhere to be seen', keywords: ['nowhere to be seen'] },
+        { type: 'short', marks: 2, q: 'What two things did Mira’s father tell her to do if they lost each other?', model: 'Go to the information counter AND tell the staff on duty.', keywords: ['information counter', 'staff'] },
+        { type: 'sequence', marks: 1, q: 'Arrange the events in the correct sequence.', options: ['Mira was overjoyed to see her father again.', 'The book fair trip was called off.', 'Mira called out for her father.'], answer: [2, 3, 1] },
+        { type: 'short', marks: 2, q: 'How did Ms Wong help Mira?', model: 'She picked up a microphone and made several announcements asking Mira’s father to come to the information counter.', keywords: ['announcements', 'microphone', 'father'] },
         {
           type: 'true-false', marks: 2,
           q: 'Read each statement and decide if it is True or False.',
           statements: [
-            { text: 'Leo waited for hours to be reunited with his mother.', answer: false, explain: 'It was about ten minutes — "Minutes stretched like hours" is a simile, not literal hours.' },
-            { text: 'Both Leo and his mother were holding hands when they left the MRT station.', answer: true, explain: 'The passage says they left "hand-in-hand".' },
+            { text: 'Mira waited for hours to be reunited with her father.', answer: false, explain: 'It was about ten minutes — "Minutes crawled by like hours" is a simile, not literal hours.' },
+            { text: 'Mira and her father were holding hands when they left the convention centre.', answer: true, explain: 'The passage says they left "hand-in-hand".' },
           ],
         },
       ],
@@ -148,25 +153,25 @@ export const P3_PRACTICE_TESTS = Object.freeze({
     id: 'p3-test-term-2', term: 'T2', level: 'P3',
     label: 'Term 2 Practice Test 2',
     duration: '45 minutes', totalMarks: 40,
-    blurb: 'P3 Term 2 paper — adds tag questions ("isn\'t he?"), phrasal verbs ("breaking out") and Neither...nor synthesis. Comprehension: Billy in the house of mirrors.',
+    blurb: 'P3 Term 2 paper — adds tag questions ("isn\'t he?"), phrasal verbs ("breaking out") and Neither...nor synthesis. Comprehension: Tara in the mirror maze.',
     sectionA: {
       title: 'Section A: Grammar MCQ', marks: 5,
       items: [
-        { q: 'Jean ___ in the pool for an hour last night.', choices: ['swim', 'swims', 'swam', 'is swimming'], answer: 'swam', skill: 'simplePast', practiseTarget: 'grammar-mcq', explain: '"Last night" — simple past; the irregular past of "swim" is "swam".' },
-        { q: 'Andy is joining us for recess, ___ he?', choices: ['is', 'isn’t', 'does', 'doesn’t'], answer: 'isn’t', skill: 'tagQuestions', practiseTarget: 'grammar-mcq', explain: 'A positive statement takes a negative tag — "is" → "isn\'t he?".' },
-        { q: 'The student asked the teacher, "___ I be allowed to go to the toilet, please?"', choices: ['Will', 'May', 'Must', 'Should'], answer: 'May', skill: 'modals', practiseTarget: 'grammar-mcq', explain: '"May I...?" is the polite form for asking permission.' },
-        { q: '"___ is the best-selling item in this store? Is it the oven or the kettle?" the customer asked the sales staff.', choices: ['Who', 'Where', 'Whose', 'Which'], answer: 'Which', skill: 'whQuestions', practiseTarget: 'grammar-mcq', explain: '"Which" asks the listener to pick from a known set (oven vs kettle).' },
-        { q: 'I must have dropped my key ___. I cannot seem to find it.', choices: ['nowhere', 'anywhere', 'somewhere', 'everywhere'], answer: 'somewhere', skill: 'compoundIndefinite', practiseTarget: 'grammar-mcq', explain: '"Somewhere" — in some unknown place. "Nowhere" would contradict "I must have dropped".' },
+        { q: 'Rita ___ twenty laps at the club pool yesterday evening.', choices: ['swim', 'swims', 'swam', 'is swimming'], answer: 'swam', skill: 'simplePast', practiseTarget: 'grammar-mcq', explain: '"Yesterday evening" — simple past; the irregular past of "swim" is "swam".' },
+        { q: 'Zack is coming along for the picnic, ___ he?', choices: ['is', 'isn’t', 'does', 'doesn’t'], answer: 'isn’t', skill: 'tagQuestions', practiseTarget: 'grammar-mcq', explain: 'A positive statement takes a negative tag — "is" → "isn\'t he?".' },
+        { q: 'The pupil asked the librarian, "___ I be allowed to renew this book, please?"', choices: ['Will', 'May', 'Must', 'Should'], answer: 'May', skill: 'modals', practiseTarget: 'grammar-mcq', explain: '"May I...?" is the polite form for asking permission.' },
+        { q: '"___ is the most popular flavour at this stall? Is it chocolate or vanilla?" the boy asked the vendor.', choices: ['Who', 'Where', 'Whose', 'Which'], answer: 'Which', skill: 'whQuestions', practiseTarget: 'grammar-mcq', explain: '"Which" asks the listener to pick from a known set (chocolate vs vanilla).' },
+        { q: 'I must have left my spectacles ___. I simply cannot find them.', choices: ['nowhere', 'anywhere', 'somewhere', 'everywhere'], answer: 'somewhere', skill: 'compoundIndefinite', practiseTarget: 'grammar-mcq', explain: '"Somewhere" — in some unknown place. "Nowhere" would contradict "must have left".' },
       ],
     },
     sectionB: {
       title: 'Section B: Vocabulary MCQ', marks: 5,
       items: [
-        { q: 'Mrs Teo could not identify the burglar as she had only caught a ___ of his face.', choices: ['look', 'peep', 'view', 'glimpse'], answer: 'glimpse', skill: 'synonymContrast', practiseTarget: 'vocab-mcq', explain: '"A glimpse" is a brief, partial look — fits "could not identify".' },
-        { q: 'The prisoners succeeded in ___ of prison by using a secret underground tunnel.', choices: ['breaking into', 'breaking up', 'breaking out', 'breaking through'], answer: 'breaking out', skill: 'phrasalVerbs', practiseTarget: 'vocab-mcq', explain: '"Break out (of)" means to escape from a place where you are kept.' },
-        { q: 'Our school team won an easy ___ over our competitors in the match with a score of 4 to 1.', choices: ['result', 'defeat', 'victory', 'success'], answer: 'victory', skill: 'definitionMatch', practiseTarget: 'vocab-mcq', explain: '"Victory" is the win itself. "Defeat" is the opposite — what the losers got.' },
-        { q: 'The chef added only a ___ of salt to the dish.', choices: ['grain', 'dash', 'drop', 'pinch'], answer: 'pinch', skill: 'collectiveNouns', practiseTarget: 'vocab-mcq', explain: '"A pinch of salt" — the small amount you take between thumb and forefinger.' },
-        { q: 'Daphne was ___ enough to talk back and challenge the bully.', choices: ['bold', 'strong', 'heroic', 'fearful'], answer: 'bold', skill: 'emotionAdjectives', practiseTarget: 'vocab-mcq', explain: '"Bold" means brave enough to do something risky — fits standing up to a bully.' },
+        { q: 'Mr Raj could not describe the snatch thief as he had only caught a ___ of his back.', choices: ['look', 'peep', 'view', 'glimpse'], answer: 'glimpse', skill: 'synonymContrast', practiseTarget: 'vocab-mcq', explain: '"A glimpse" is a brief, partial look — fits "could not describe".' },
+        { q: 'The circus lion succeeded in ___ of its enclosure through an unlocked gate.', choices: ['breaking into', 'breaking up', 'breaking out', 'breaking through'], answer: 'breaking out', skill: 'phrasalVerbs', practiseTarget: 'vocab-mcq', explain: '"Break out (of)" means to escape from a place where you are kept.' },
+        { q: 'Our debate team clinched a convincing ___ over the defending champions.', choices: ['result', 'defeat', 'victory', 'success'], answer: 'victory', skill: 'definitionMatch', practiseTarget: 'vocab-mcq', explain: '"Victory" is the win itself. "Defeat" is the opposite — what the losers suffered.' },
+        { q: 'Grandpa added just a ___ of salt to the porridge.', choices: ['grain', 'dash', 'drop', 'pinch'], answer: 'pinch', skill: 'collectiveNouns', practiseTarget: 'vocab-mcq', explain: '"A pinch of salt" — the small amount you take between thumb and forefinger.' },
+        { q: 'Wafa was ___ enough to raise her hand and question the visiting speaker.', choices: ['bold', 'strong', 'heroic', 'fearful'], answer: 'bold', skill: 'emotionAdjectives', practiseTarget: 'vocab-mcq', explain: '"Bold" means brave enough to do something daring — fits questioning a speaker.' },
       ],
     },
     sectionC: {
@@ -174,11 +179,11 @@ export const P3_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in the blanks with a suitable word from the box. Each word can only be used once. Two words will be left over.',
       wordBank: ['at', 'along', 'out', 'off', 'through', 'in', 'with'],
       text:
-        'During the holidays, Kenneth decided to explore the jungle nearby. He went {{1}} without telling anyone where he was going. ' +
-        'All he took {{2}} him was a backpack that contained a bottle of water, his wallet and an umbrella. ' +
-        'He did not bring his mobile phone {{3}} as he thought it was unnecessary. ' +
-        'Unfortunately, Kenneth lost his way {{4}} the dense jungle. It was also getting dark. ' +
-        'No matter how hard he tried, he could not find a way {{5}}. Poor Kenneth! He regretted going on this trip alone and leaving his phone behind.',
+        'During the school break, Marcus decided to hike the forest trail behind his estate. He set {{1}} without telling anyone where he was headed. ' +
+        'All he brought {{2}} him was a sling bag holding a water bottle, his wallet and a poncho. ' +
+        'He did not take his phone {{3}} as he thought he would not need it. ' +
+        'Unfortunately, Marcus lost his bearings {{4}} the thick undergrowth. Dusk was falling too. ' +
+        'No matter which path he tried, he could not find a way {{5}}. Poor Marcus! He regretted wandering off alone and leaving his phone at home.',
       answers: ['off', 'with', 'along', 'in', 'out'],
       leftOver: ['at', 'through'],
       skill: 'prepositions', practiseTarget: 'cloze-castle',
@@ -188,11 +193,11 @@ export const P3_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in the blanks with a suitable word from the box. Each word can only be used once. Two words will be left over.',
       wordBank: ['much', 'suffer', 'many', 'able', 'eaten', 'harmful', 'unhealthy'],
       text:
-        'Did you know that chocolate can make your dog ill? Chocolate is {{1}} to dogs as it contains theobromine and caffeine. ' +
-        'The amount of chocolate that is poisonous to a dog depends on the type of chocolate that they have {{2}}. ' +
-        'It also depends on how {{3}} chocolate they ate and the size of the dog. ' +
-        'Dogs that {{4}} from chocolate poisoning may have stomach pain or an upset stomach. ' +
-        'They also may not be {{5}} to walk in a straight line or they may breathe too quickly. If you see such signs, you should take your dog to the vet straight away.',
+        'Did you know that onions can make your cat very sick? Onion is {{1}} to cats as it contains compounds that damage their red blood cells. ' +
+        'The amount that is dangerous to a cat depends on the form of onion that it has {{2}}. ' +
+        'It also depends on how {{3}} onion was swallowed and the size of the cat. ' +
+        'Cats that {{4}} from onion poisoning may seem weak or lose their appetite. ' +
+        'They may also not be {{5}} to run or climb as usual, or they may pant heavily. If you notice such signs, bring your cat to the vet at once.',
       answers: ['harmful', 'eaten', 'much', 'suffer', 'able'],
       leftOver: ['many', 'unhealthy'],
       skill: 'collocationCloze', practiseTarget: 'word-vault',
@@ -201,49 +206,49 @@ export const P3_PRACTICE_TESTS = Object.freeze({
       title: 'Section E: Sentence Combining / Synthesis', marks: 4,
       instructions: 'Rewrite the two sentences as ONE sentence using the connector provided.',
       items: [
-        { originals: ['Gina was angry with John.', 'John did not keep his promise.'], connector: 'because', stemPosition: 'middle', model: 'Gina was angry with John because he did not keep his promise.', skill: 'connectors', explain: '"Because" gives the reason — keep the action first, reason after.' },
-        { originals: ['Lisa does not play badminton.', 'Kate also does not play badminton.'], connector: 'Neither...nor', stemPosition: 'start', model: 'Neither Lisa nor Kate plays badminton.', skill: 'connectors', explain: '"Neither...nor" joins two negative subjects; the verb takes the singular form ("plays").' },
+        { originals: ['Hana was upset with Farid.', 'Farid did not return her book.'], connector: 'because', stemPosition: 'middle', model: 'Hana was upset with Farid because he did not return her book.', skill: 'connectors', explain: '"Because" gives the reason — keep the feeling first, reason after.' },
+        { originals: ['Sam does not play the piano.', 'Jo also does not play the piano.'], connector: 'Neither...nor', stemPosition: 'start', model: 'Neither Sam nor Jo plays the piano.', skill: 'connectors', explain: '"Neither...nor" joins two negative subjects; the verb takes the singular form ("plays").' },
       ],
     },
     sectionF: {
       title: 'Section F: Editing', marks: 6,
       instructions: 'Each underlined word contains either a spelling or grammatical mistake. A circle marks a missing or wrong punctuation mark.',
       paragraph:
-        'It was April Fools’ Day. Frank had been looking forward to this day for almost a week. ' +
-        'He simply loved playing pranks {{1:with}} people. ' +
-        'However{{2:o}} little did he expect that his friends would be the ones taking {{3:rivange}} on him for the tricks he had played on them many times before. ' +
-        'When Frank was not looking, one of his friends Samuel {{4:hiding}} a large fake spider in his bag. ' +
-        'When Frank opened his bag, he screamed, "Eeks! There’s a huge spider{{5:o}}" Everyone laughed. Now Frank had a taste of his own {{6:medecine}}. He now knew how it felt to be scared out of his wits.',
+        'It was the last night of camp. Jamal had been waiting for this evening all week. ' +
+        'He simply loved playing tricks {{1:with}} people. ' +
+        'However{{2:o}} little did he guess that his bunkmates would be the ones taking {{3:rivange}} on him for the jokes he had pulled on them all week long. ' +
+        'While Jamal was at dinner, one of his bunkmates Wei Jie {{4:hiding}} a rubber lizard inside his sleeping bag. ' +
+        'When Jamal slid into bed, he yelled, "Yikes! There’s a lizard in here{{5:o}}" Everyone roared with laughter. Now Jamal had a taste of his own {{6:medecine}}. He finally knew how it felt to be scared out of his wits.',
       errors: [
-        { num: 1, kind: 'grammar',    wrong: 'with',       correction: 'on',       explain: '"Playing pranks on people" — the correct preposition is "on", not "with".' },
+        { num: 1, kind: 'grammar',    wrong: 'with',       correction: 'on',       explain: '"Playing tricks on people" — the correct preposition is "on", not "with".' },
         { num: 2, kind: 'punctuation',wrong: '',           correction: ',',        explain: 'A comma is needed after the connector "However".' },
         { num: 3, kind: 'spelling',   wrong: 'rivange',    correction: 'revenge',  explain: 'Correct spelling is "revenge".' },
         { num: 4, kind: 'grammar',    wrong: 'hiding',     correction: 'hid',      explain: 'Past narrative — use simple past "hid", not the -ing form.' },
-        { num: 5, kind: 'punctuation',wrong: '',           correction: '!',        explain: 'An exclamation mark is needed to close the exclamation "There\'s a huge spider!".' },
+        { num: 5, kind: 'punctuation',wrong: '',           correction: '!',        explain: 'An exclamation mark is needed to close the exclamation "There\'s a lizard in here!".' },
         { num: 6, kind: 'spelling',   wrong: 'medecine',   correction: 'medicine', explain: 'Correct spelling is "medicine".' },
       ],
     },
     sectionG: {
       title: 'Section G: Comprehension Open-ended', marks: 10,
       passage:
-        'Billy’s eyes grew as wide as saucers. The entrance to the house of mirrors was a giant clown. Its mouth gaped like a hungry monster. Inside, there were lots of mirrors that reflected and twisted images. "Wow!" Billy gasped excitedly and ran in without waiting for his father.\n\n' +
-        'Billy chased his reflection, giggling as it did the same. He reached out with his fingers brushing against cool glass. His reflection in the mirror just laughed at him and pointed deeper into the maze. Eager to find out where it would lead him, Billy followed.\n\n' +
-        'Suddenly, Billy stopped giggling. He turned, but only saw endless reflections of himself. They were all wearing the same confused frown. Some of the images in the mirrors were beginning to frighten him. His head had grown to three times its size, his eyes looked crooked and his arms and legs looked like the tentacles of an octopus!\n\n' +
-        'Panic began to grip his chest. "Dad, where are you?" Billy cried out, his voice shaking. He was lost in the maze. There was no one there to help him.\n\n' +
-        'Just then, a familiar hand squeezed Billy’s hand. It was Dad’s! "Don’t be frightened. Here I am," he said and grinned widely. His father led Billy back to the giant clown’s mouth. Billy stepped out hurriedly. Never would he want to visit another funhouse of mirrors ever again!',
+        'Tara’s jaw dropped. The doorway of the mirror maze was shaped like a giant octopus, its long arms curling around the entrance. Inside, rows of mirrors bounced and bent every image. "Amazing!" Tara breathed, and she darted in without waiting for her mother.\n\n' +
+        'Tara raced her reflection, laughing when it copied her every move. She pressed her palm against the cool glass. Her reflection only grinned back and seemed to beckon her deeper into the maze. Curious to see where it would take her, Tara followed.\n\n' +
+        'All at once, Tara stopped laughing. She spun around, but saw only endless copies of herself, each wearing the same worried frown. Some of the images began to scare her. Her neck had stretched as long as a giraffe’s, her chin looked lopsided, and her fingers wriggled like ten little worms!\n\n' +
+        'Fear tightened around her chest. "Mum, where are you?" Tara called out, her voice trembling. She was lost among the mirrors. Nobody answered her.\n\n' +
+        'Just then, a familiar arm wrapped around Tara’s shoulders. It was Mum’s! "Don’t worry. I’m right here," she said with a wide smile. Her mother guided Tara back out through the octopus doorway. Tara scurried out gladly. Never again would she set foot in a mirror maze!',
       questions: [
-        { type: 'mcq', marks: 1, q: 'When Billy first saw the house of mirrors, he was ________________.', choices: ['worried', 'terrified', 'confused', 'surprised'], answer: 'surprised', explain: '"Eyes grew as wide as saucers" + "Wow!" both signal pleased surprise, not fear.' },
-        { type: 'word-meaning', marks: 1, q: 'Which word in paragraph 1 has the same meaning as "caused to be out of shape"?', sentence: 'Inside, there were lots of mirrors that reflected and twisted images.', choices: ['reflected', 'twisted'], answer: 'twisted', explain: '"Twisted" means bent or distorted out of shape.' },
-        { type: 'short', marks: 1, q: 'What does "it" in paragraph 2 line 1 refer to?', model: 'Billy’s reflection (in the mirror).', keywords: ['reflection'] },
-        { type: 'short', marks: 3, q: 'Look at paragraph 3. Why did some of the images in the mirrors frighten Billy? Give three reasons.', model: '(1) His head had grown to three times its size, (2) his eyes looked crooked, and (3) his arms and legs looked like the tentacles of an octopus.', keywords: ['head', 'eyes', 'arms', 'legs', 'octopus'] },
-        { type: 'short', marks: 1, q: 'Which word in paragraph 4 tells you that Billy could not find his way out?', model: 'lost', keywords: ['lost'] },
-        { type: 'sequence', marks: 1, q: 'Arrange the events in the correct sequence.', options: ['Billy’s father found him.', 'Billy followed his reflection.', 'Billy did not wait for his father.'], answer: [3, 2, 1] },
+        { type: 'mcq', marks: 1, q: 'When Tara first saw the mirror maze, she was ________________.', choices: ['worried', 'terrified', 'confused', 'surprised'], answer: 'surprised', explain: '"Jaw dropped" + "Amazing!" both signal pleased surprise, not fear.' },
+        { type: 'word-meaning', marks: 1, q: 'Which word in paragraph 1 has the same meaning as "caused to be out of shape"?', sentence: 'Inside, rows of mirrors bounced and bent every image.', choices: ['bounced', 'bent'], answer: 'bent', explain: '"Bent" means pushed out of its normal shape — distorted.' },
+        { type: 'short', marks: 1, q: 'What does "it" in paragraph 2 line 1 refer to?', model: 'Tara’s reflection (in the mirror).', keywords: ['reflection'] },
+        { type: 'short', marks: 3, q: 'Look at paragraph 3. Why did some of the images in the mirrors scare Tara? Give three reasons.', model: '(1) Her neck had stretched as long as a giraffe’s, (2) her chin looked lopsided, and (3) her fingers wriggled like ten little worms.', keywords: ['neck', 'chin', 'fingers', 'worms'] },
+        { type: 'short', marks: 1, q: 'Which word in paragraph 4 tells you that Tara could not find her way out?', model: 'lost', keywords: ['lost'] },
+        { type: 'sequence', marks: 1, q: 'Arrange the events in the correct sequence.', options: ['Tara’s mother found her.', 'Tara followed her reflection.', 'Tara did not wait for her mother.'], answer: [3, 2, 1] },
         {
           type: 'true-false', marks: 2,
           q: 'Read each statement and decide if it is True or False.',
           statements: [
-            { text: 'Billy followed his reflection as he wanted to discover where it would lead him.', answer: true, explain: 'Paragraph 2 says "Eager to find out where it would lead him, Billy followed."' },
-            { text: 'Billy began to cry when he realised he was lost.', answer: false, explain: 'He "cried out" (shouted) for his Dad but did not weep — the passage says his voice was shaking.' },
+            { text: 'Tara followed her reflection as she was curious to see where it would take her.', answer: true, explain: 'Paragraph 2 says "Curious to see where it would take her, Tara followed."' },
+            { text: 'Tara began to weep when she realised she was lost.', answer: false, explain: 'She called out (shouted) for her mum with a trembling voice, but the passage does not say she wept.' },
           ],
         },
       ],
@@ -258,21 +263,21 @@ export const P3_PRACTICE_TESTS = Object.freeze({
     sectionA: {
       title: 'Section A: Grammar MCQ', marks: 5,
       items: [
-        { q: 'A group of sheep ___ also known as a flock of sheep.', choices: ['is', 'are', 'was', 'were'], answer: 'is', skill: 'svAgreement', practiseTarget: 'grammar-mcq', explain: '"A group of..." takes a singular verb when treated as a single unit.' },
-        { q: 'Mindy wanted to watch the concert, ___ she could not afford to buy the tickets.', choices: ['as', 'but', 'for', 'although'], answer: 'but', skill: 'connectors', practiseTarget: 'cloze-castle', explain: '"But" shows the contrast — she wanted to but could not.' },
-        { q: '"I ___ have arrived earlier so as not to miss the show," Ernest grumbled to himself.', choices: ['would', 'might', 'must', 'should'], answer: 'should', skill: 'modals', practiseTarget: 'grammar-mcq', explain: '"Should have + past participle" expresses regret about a past action.' },
-        { q: '"Pay attention! The principal ___ the announcement right now," said Mr Lee.', choices: ['made', 'makes', 'has made', 'is making'], answer: 'is making', skill: 'presentCont', practiseTarget: 'grammar-mcq', explain: '"Right now" signals an action happening at the moment — use present continuous.' },
-        { q: 'You have watched this movie before, ___ you?', choices: ['did', 'have', 'didn’t', 'haven’t'], answer: 'haven’t', skill: 'tagQuestions', practiseTarget: 'grammar-mcq', explain: 'Tag matches the main auxiliary: "have watched" → "haven\'t you?" (negative tag for positive statement).' },
+        { q: 'A group of lions ___ also known as a pride of lions.', choices: ['is', 'are', 'was', 'were'], answer: 'is', skill: 'svAgreement', practiseTarget: 'grammar-mcq', explain: '"A group of..." takes a singular verb when treated as a single unit, and general truths use the present tense.' },
+        { q: 'Sanjay hoped to join the holiday camp, ___ he could not get his parents’ consent.', choices: ['as', 'but', 'for', 'although'], answer: 'but', skill: 'connectors', practiseTarget: 'cloze-castle', explain: '"But" shows the contrast — he hoped to but could not.' },
+        { q: '"I ___ have set off earlier so as not to miss the kick-off," Farhan muttered to himself.', choices: ['would', 'might', 'must', 'should'], answer: 'should', skill: 'modals', practiseTarget: 'grammar-mcq', explain: '"Should have + past participle" expresses regret about a past action.' },
+        { q: '"Quiet, please! The coach ___ the team announcement right now," said Mr Tan.', choices: ['made', 'makes', 'has made', 'is making'], answer: 'is making', skill: 'presentCont', practiseTarget: 'grammar-mcq', explain: '"Right now" signals an action happening at the moment — use present continuous.' },
+        { q: 'You have tried this dish before, ___ you?', choices: ['did', 'have', 'didn’t', 'haven’t'], answer: 'haven’t', skill: 'tagQuestions', practiseTarget: 'grammar-mcq', explain: 'Tag matches the main auxiliary: "have tried" → "haven\'t you?" (negative tag for positive statement).' },
       ],
     },
     sectionB: {
       title: 'Section B: Vocabulary MCQ', marks: 5,
       items: [
-        { q: 'If you do not want to use the hood, you can ___ it from the jacket.', choices: ['detach', 'loosen', 'release', 'disconnect'], answer: 'detach', skill: 'synonymContrast', practiseTarget: 'vocab-mcq', explain: '"Detach" is the precise verb for separating a removable part (like a hood) from a main item.' },
-        { q: 'Everyone was panicking and running about in all directions, but Joe was ___ and stayed where he was.', choices: ['as smooth as silk', 'as cool as a cucumber', 'as cold as ice', 'as tough as leather'], answer: 'as cool as a cucumber', skill: 'similes', practiseTarget: 'vocab-mcq', explain: '"As cool as a cucumber" is the fixed simile for staying calm under pressure.' },
-        { q: 'The suspicious-looking man had been ___ in the dimly lit alley for a long time.', choices: ['ambling', 'loitering', 'idling', 'dawdling'], answer: 'loitering', skill: 'actionVerbs', practiseTarget: 'vocab-mcq', explain: '"Loitering" means hanging around with no clear purpose — fits "suspicious".' },
-        { q: 'The business deal ___ because both sides could not agree on many matters.', choices: ['fell through', 'fell out', 'fell behind', 'fell over'], answer: 'fell through', skill: 'phrasalVerbs', practiseTarget: 'vocab-mcq', explain: '"Fall through" means (of a plan/deal) to fail to happen.' },
-        { q: 'No one could change Denise’s mind as she ___ refuses to listen to others.', choices: ['boldly', 'obstinately', 'deliberately', 'courageously'], answer: 'obstinately', skill: 'mannerAdverbs', practiseTarget: 'vocab-mcq', explain: '"Obstinately" means stubbornly — refuses to change her mind no matter what.' },
+        { q: 'If you do not need the strap, you can ___ it from the camera bag.', choices: ['detach', 'loosen', 'release', 'disconnect'], answer: 'detach', skill: 'synonymContrast', practiseTarget: 'vocab-mcq', explain: '"Detach" is the precise verb for separating a removable part (like a strap) from a main item.' },
+        { q: 'While everyone else was flustered and shouting, Mei stayed ___ and calmly dialled for help.', choices: ['as smooth as silk', 'as cool as a cucumber', 'as cold as ice', 'as tough as leather'], answer: 'as cool as a cucumber', skill: 'similes', practiseTarget: 'vocab-mcq', explain: '"As cool as a cucumber" is the fixed simile for staying calm under pressure.' },
+        { q: 'The stranger had been ___ near the bicycle racks for over an hour.', choices: ['ambling', 'loitering', 'idling', 'dawdling'], answer: 'loitering', skill: 'actionVerbs', practiseTarget: 'vocab-mcq', explain: '"Loitering" means hanging around with no clear purpose — fits a suspicious stranger.' },
+        { q: 'The plan to build the new clubhouse ___ because the funds could not be raised.', choices: ['fell through', 'fell out', 'fell behind', 'fell over'], answer: 'fell through', skill: 'phrasalVerbs', practiseTarget: 'vocab-mcq', explain: '"Fall through" means (of a plan/deal) to fail to happen.' },
+        { q: 'No one could persuade Grandpa to see the doctor as he ___ refuses to admit he is unwell.', choices: ['boldly', 'obstinately', 'deliberately', 'courageously'], answer: 'obstinately', skill: 'mannerAdverbs', practiseTarget: 'vocab-mcq', explain: '"Obstinately" means stubbornly — refuses to change his mind no matter what.' },
       ],
     },
     sectionC: {
@@ -280,12 +285,12 @@ export const P3_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in the blanks with a suitable word from the box. Each word can only be used once. Two words will be left over.',
       wordBank: ['our', 'they', 'her', 'us', 'their', 'ourselves', 'we'],
       text:
-        'Our form teacher Mrs D’Cotta would be away from school for a whole month. The whole class cheered when {{1}} heard the news. ' +
-        'Mrs D’Cotta was always very strict with {{2}}, so we were glad we would be able to finally let {{3}} hair down. ' +
-        'True enough, when Miss Sim took over, all hell broke loose as we finally had the freedom to do whatever we wanted. ' +
-        'No one listened to {{4}} in class and we broke all the class rules. ' +
-        'It was only after another teacher scolded us and told us that we ought to be ashamed of {{5}}, that we stopped misbehaving. ' +
-        'We never saw Miss Sim again after the month was up.',
+        'Our form teacher Mrs Rahim would be attending a training course for a whole month. The class whooped when {{1}} heard the news. ' +
+        'Mrs Rahim was always very firm with {{2}}, so we were thrilled that we could finally let {{3}} hair down. ' +
+        'Sure enough, when Miss Devi took over, the classroom turned upside down as we did exactly as we pleased. ' +
+        'Nobody listened to {{4}} during lessons and we ignored every class rule. ' +
+        'It was only when the principal dropped by and said we ought to be ashamed of {{5}} that we finally behaved. ' +
+        'We never saw Miss Devi again once the month was over.',
       answers: ['we', 'us', 'our', 'her', 'ourselves'],
       leftOver: ['they', 'their'],
       skill: 'pronouns', practiseTarget: 'cloze-castle',
@@ -295,11 +300,11 @@ export const P3_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in the blanks with a suitable word from the box. Each word can only be used once. Two words will be left over.',
       wordBank: ['filled', 'attack', 'effective', 'weapon', 'important', 'creatures', 'threatened'],
       text:
-        'Whenever you think of skunks, you would immediately think of their reputation as stinky animals. Have you ever wondered why these {{1}} smell so bad? It is all about defence. ' +
-        'Skunks have a secret {{2}} under their tail: stinky spray glands! These glands hold a special liquid {{3}} with chemicals called thiols. ' +
-        'These thiols contain sulphur, which is also what makes rotten eggs smell so awful. ' +
-        'When a skunk feels {{4}} by its predators, it raises its tail and fires this spray with surprising accuracy up to three metres away! ' +
-        'The smell is so strong that it is highly {{5}} in convincing hungry animals to find another dinner. You certainly do not want to mess with a skunk!',
+        'When you think of the bombardier beetle, you may picture a tiny, harmless insect. Have you ever wondered how these little {{1}} defend themselves so well? It is all about chemistry. ' +
+        'Bombardier beetles carry a secret {{2}} at the tip of their body: special spray chambers! These chambers hold liquids {{3}} with reactive chemicals. ' +
+        'When the liquids mix, they heat up almost to boiling in an instant. ' +
+        'When a beetle feels {{4}} by a predator, it takes aim and fires a hot, stinging spray with surprising accuracy. ' +
+        'The blast is so startling that it is highly {{5}} in persuading hungry frogs and ants to hunt elsewhere. You certainly would not want to quarrel with this beetle!',
       answers: ['creatures', 'weapon', 'filled', 'threatened', 'effective'],
       leftOver: ['attack', 'important'],
       skill: 'collocationCloze', practiseTarget: 'word-vault',
@@ -308,17 +313,17 @@ export const P3_PRACTICE_TESTS = Object.freeze({
       title: 'Section E: Comprehension Cloze (open cloze)', marks: 5,
       instructions: 'Fill in each blank with ONE suitable word. There is no word box — use grammar and meaning clues from the passage.',
       text:
-        'Gladys had a terrible fear of lizards. Although her parents kept telling her that lizards were {{1}} as they do not sting, bite or attack people like some other fierce animals, Gladys remained unconvinced. ' +
-        'She would {{2}} her lungs out every time she saw a lizard appear before her. ' +
-        'Once, she even cried and refused to go to the kitchen for an entire month when she {{3}} a family of lizards scuttling across the kitchen floor. ' +
-        'Unfortunately, Gladys’s worst nightmare was about to come {{4}}. While she was sleeping in her bedroom, a lizard fell onto her head. That woke her up. ' +
-        'She screamed when she felt the lizard running through her hair. She jumped out of {{5}} and immediately headed for her bathroom. There, she took a long shower and scrubbed herself as hard as she could.',
+        'Danny had a dreadful fear of moths. Although his parents kept assuring him that moths were {{1}} as they do not sting, bite or chase after people like some insects, Danny would not be persuaded. ' +
+        'He would {{2}} his lungs out whenever a moth fluttered near him. ' +
+        'Once, he even refused to enter the study room for a whole month after he {{3}} two large moths resting on the curtains. ' +
+        'Unfortunately, Danny’s worst nightmare was about to come {{4}}. While he was fast asleep one night, a moth landed on his cheek. He woke with a start. ' +
+        'He shrieked when he felt its wings brushing against his face. He leapt out of {{5}} and bolted straight to the bathroom. There, he splashed water on his face and scrubbed his cheeks until they turned red.',
       blanks: [
-        { num: 1, answer: 'harmless', accept: ['safe'], hint: 'Opposite of "harmful" — fits "do not sting, bite or attack".', explain: '"Harmless" matches the description that lizards do not sting, bite or attack.' },
-        { num: 2, answer: 'scream', accept: ['cry'], hint: 'Verb that fits "___ her lungs out" — a fixed expression.', explain: '"Scream her lungs out" is the standard idiom for shrieking loudly.' },
-        { num: 3, answer: 'saw', accept: ['spotted', 'noticed'], hint: 'Past tense — what she did when the lizards came across the floor.', explain: '"Saw" — past tense of "see"; fits the time of the kitchen incident.' },
+        { num: 1, answer: 'harmless', accept: ['safe'], hint: 'Opposite of "harmful" — fits "do not sting, bite or chase".', explain: '"Harmless" matches the description that moths do not sting, bite or chase people.' },
+        { num: 2, answer: 'scream', accept: ['cry'], hint: 'Verb that fits "___ his lungs out" — a fixed expression.', explain: '"Scream his lungs out" is the standard idiom for shrieking loudly.' },
+        { num: 3, answer: 'saw', accept: ['spotted', 'noticed'], hint: 'Past tense — what he did when the moths were on the curtains.', explain: '"Saw" — past tense of "see"; fits the time of the study-room incident.' },
         { num: 4, answer: 'true', accept: [], hint: 'Fixed phrase meaning "to happen as expected/feared".', explain: '"Come true" — fixed phrase for a wish, dream or nightmare that actually happens.' },
-        { num: 5, answer: 'bed', accept: [], hint: 'Where she was sleeping just moments before.', explain: '"Jumped out of bed" — she sprang up from where she was lying.' },
+        { num: 5, answer: 'bed', accept: [], hint: 'Where he was sleeping just moments before.', explain: '"Leapt out of bed" — he sprang up from where he was lying.' },
       ],
       skill: 'collocationCloze', practiseTarget: 'cloze-castle',
     },
@@ -326,18 +331,18 @@ export const P3_PRACTICE_TESTS = Object.freeze({
       title: 'Section F: Sentence Combining / Synthesis', marks: 4,
       instructions: 'Rewrite the two sentences as ONE sentence using the connector provided.',
       items: [
-        { originals: ['The light was not working.', 'Father repaired the light.'], connector: 'since', stemPosition: 'middle', model: 'Father repaired the light since it was not working.', skill: 'connectors', explain: '"Since" can give a reason just like "because" — keep the action first.' },
-        { originals: ['This is the secret key.', 'It opens every door in the castle.'], connector: 'which', stemPosition: 'middle', model: 'This is the secret key which opens every door in the castle.', skill: 'relativeClauses', explain: '"Which" introduces a relative clause that adds information about the key.' },
+        { originals: ['The tap was leaking.', 'Uncle Bala replaced the washer.'], connector: 'since', stemPosition: 'middle', model: 'Uncle Bala replaced the washer since the tap was leaking.', skill: 'connectors', explain: '"Since" can give a reason just like "because" — keep the action first.' },
+        { originals: ['This is the master switch.', 'It controls every light in the hall.'], connector: 'which', stemPosition: 'middle', model: 'This is the master switch which controls every light in the hall.', skill: 'relativeClauses', explain: '"Which" introduces a relative clause that adds information about the switch.' },
       ],
     },
     sectionG: {
       title: 'Section G: Editing', marks: 5,
       instructions: 'Each underlined word contains either a spelling or grammatical mistake. A circle marks a missing or wrong punctuation mark.',
       paragraph:
-        'According to Irish folktales, {{1:mischeveous}} little creatures called leprechauns are very fond {{2:about}} collecting gold. ' +
-        'Legend also says that these leprechauns {{3:hiding}} their pots of gold at the end of rainbows. ' +
-        'Some people believe that if you{{4:o}}re ever lucky enough to catch a leprechaun, you can make them reveal where they have hidden their gold. ' +
-        'But what are your chances of catching one? That is an even tougher {{5:avanture}} than chasing a rainbow! It looks like it’s highly {{6:unlikly}} that such pots of gold can ever be found.',
+        'According to old European folktales, {{1:mischeveous}} little beings called gnomes are very fond {{2:about}} guarding buried treasure. ' +
+        'Legend also says that these gnomes {{3:hiding}} their chests of jewels beneath the roots of ancient oak trees. ' +
+        'Some people believe that if you{{4:o}}re ever quick enough to catch a gnome, you can make him point out where his treasure lies buried. ' +
+        'But what are your chances of catching one? That is an even tougher {{5:avanture}} than digging up every oak in the forest! It seems highly {{6:unlikly}} that such treasure chests will ever be found.',
       errors: [
         { num: 1, kind: 'spelling',   wrong: 'mischeveous',correction: 'mischievous', explain: 'Correct spelling is "mischievous".' },
         { num: 2, kind: 'grammar',    wrong: 'about',      correction: 'of',          explain: '"Fond of" is the fixed pair — never "fond about".' },
@@ -348,61 +353,61 @@ export const P3_PRACTICE_TESTS = Object.freeze({
       ],
     },
     sectionH: {
-      title: 'Section H: Comprehension Open-ended 1 — Yes and No', marks: 8,
+      title: 'Section H: Comprehension Open-ended 1 — Sun and Moon', marks: 8,
       passage:
-        'Before words were words, a boy named Yes lived in a small village. Yes was good at everything. He was the best, smartest and most liked person in his village. Yes had a brother whose name was No. No was jealous of Yes, because he was not much good at anything himself. Whenever the villagers asked No for help, he refused because he did not like people. On the other hand, whenever someone asked Yes for a favour, he would gladly help.\n\n' +
-        'One day, Yes and No’s father, Okay, went on a long journey. He left his two sons in charge of the animals. Yes took good care of the great guck, the icks, and the three-toed yock. No did not want to be bothered with the boring tasks involved. Instead of helping his brother, No went down to the lake and threw rocks into the water.\n\n' +
-        'A few days after his father had left, Yes asked his brother to watch the three-toed yock while he went to find some food to eat. Instead of doing what Yes asked, No lay down, shut his eyes, and forgot about the yock.\n\n' +
-        'It just so happened that the King was travelling on his personal road nearby. When the three-toed yock wandered onto the road, the King’s carriage was passing by and had to swerve to avoid hitting it. The King was thrown from the carriage and fell to the ground and hurt himself.\n\n' +
-        'The King demanded to know why a three-toed yock had been allowed on his road and asked all the villagers for an explanation. Yes was always honest, so he told the King the entire story.\n\n' +
-        'The King then came up with an idea – Yes and No were to work in the castle as his personal assistants as punishment for what was later referred to as the worst three-toed yock and carriage accident in the kingdom’s history.',
+        'Long ago, in a village by a winding river, there lived a girl named Sun. Sun was skilful at everything. She was the quickest, kindest and best-loved person in her village. Sun had a sister whose name was Moon. Moon was envious of Sun, because she was not much good at anything herself. Whenever the villagers asked Moon for help, she turned them away, for she disliked being disturbed. Yet whenever anyone asked Sun for a favour, she agreed cheerfully.\n\n' +
+        'One day, the sisters’ mother, Sky, set off on a long journey. She left her daughters in charge of the animals. Sun took good care of the humming bramble-hen, the speckled mips, and the curly-horned dof. Moon could not be bothered with such dull chores. Instead of helping her sister, Moon wandered to the meadow and blew dandelion clocks into the wind.\n\n' +
+        'A few days after their mother had left, Sun asked her sister to mind the curly-horned dof while she went to gather berries. Instead of doing as Sun asked, Moon lay down in the grass, closed her eyes, and forgot all about the dof.\n\n' +
+        'It so happened that the Queen was riding along her private road nearby. When the curly-horned dof strayed onto the road, the Queen’s horse reared up to avoid it. The Queen was flung from her saddle and landed hard on the ground, hurting her arm.\n\n' +
+        'The Queen demanded to know why a curly-horned dof had been allowed onto her road and called on all the villagers for an explanation. Sun was always truthful, so she told the Queen the whole story.\n\n' +
+        'The Queen then made a ruling – Sun and Moon were to serve in the palace as her royal attendants as punishment for what came to be known as the worst dof-and-horse accident in the kingdom’s history.',
       questions: [
-        { type: 'mcq', marks: 1, q: 'The brothers Yes and No were ________________.', choices: ['both well-liked in their village', 'good at everything', 'different from each other', 'jealous of each other'], answer: 'different from each other', explain: 'Yes was helpful and liked; No was jealous and refused to help — clear opposites.' },
-        { type: 'short', marks: 2, q: 'When their father left the brothers in charge of the animals, what did No do with them and why?', model: 'No did not want to be bothered with the boring tasks. Instead of helping his brother, he went down to the lake and threw rocks into the water.', keywords: ['lake', 'rocks', 'boring', 'not help'] },
-        { type: 'short', marks: 1, q: 'What does "what Yes asked" in paragraph 3 refer to?', model: 'It refers to Yes asking No to watch the three-toed yock while he went to find food.', keywords: ['watch', 'yock'] },
+        { type: 'mcq', marks: 1, q: 'The sisters Sun and Moon were ________________.', choices: ['both well-liked in their village', 'good at everything', 'different from each other', 'envious of each other'], answer: 'different from each other', explain: 'Sun was helpful and loved; Moon was envious and refused to help — clear opposites.' },
+        { type: 'short', marks: 2, q: 'When their mother left the sisters in charge of the animals, what did Moon do and why?', model: 'Moon could not be bothered with the dull chores. Instead of helping her sister, she wandered to the meadow and blew dandelion clocks into the wind.', keywords: ['meadow', 'dandelion', 'bothered', 'not help'] },
+        { type: 'short', marks: 1, q: 'What does "doing as Sun asked" in paragraph 3 refer to?', model: 'It refers to Sun asking Moon to mind the curly-horned dof while she went to gather berries.', keywords: ['mind', 'dof'] },
         {
           type: 'table', marks: 2,
           q: 'In the table below, write down the person who did each action.',
           rows: [
-            { action: 'went on a long journey', answer: 'Okay (their father)' },
-            { action: 'gave an explanation to the king', answer: 'Yes' },
+            { action: 'set off on a long journey', answer: 'Sky (their mother)' },
+            { action: 'gave an explanation to the Queen', answer: 'Sun' },
           ],
         },
         {
           type: 'true-false', marks: 2,
           q: 'State whether each statement is True or False and give a reason.',
           statements: [
-            { text: 'The King was injured by the three-toed yock.', answer: false, explain: 'The yock did not hit the King — the carriage swerved to avoid it, and the King fell off and hurt himself.' },
-            { text: 'Both brothers were punished by the King.', answer: true, explain: 'Both Yes and No were sent to work in the castle as personal assistants as punishment.' },
+            { text: 'The Queen was injured by the curly-horned dof.', answer: false, explain: 'The dof did not touch the Queen — her horse reared to avoid it, and she fell from her saddle and hurt her arm.' },
+            { text: 'Both sisters were punished by the Queen.', answer: true, explain: 'Both Sun and Moon were sent to serve in the palace as royal attendants as punishment.' },
           ],
         },
       ],
     },
     sectionI: {
-      title: 'Section I: Comprehension Open-ended 2 — Lila and the Sunflowers', marks: 8,
+      title: 'Section I: Comprehension Open-ended 2 — Nia and the Chrysalis', marks: 8,
       passage:
-        'Lila loved flowers. Every morning, she would skip to the window to see if any new flowers had blossomed in Grandma’s garden. Sunflowers, tall and proud, were her favourite. Their bright faces seemed to smile at her. But lately, Lila’s heart felt heavy. Some sunflowers were losing their shine, their petals drooping like tired wings.\n\n' +
-        'One day, a droopy sunflower caught her eye. Tears welled up in Lila’s eyes. "Grandma," she sniffled, "this sunflower looks sad. Is it going to sleep forever?"\n\n' +
-        'With a gentle smile on her face, Grandma knelt beside Lila. "Flowers do have a special kind of sleep, Lila," she explained. "But it’s not the same way that we sleep. They use that time to make tiny seeds."\n\n' +
-        'Lila stopped frowning and began peering with curiosity. "Seeds?"\n\n' +
-        'Grandma pointed to a brown, bumpy head at the sunflower’s centre. "See those? These are seeds. When the flower sleeps, these seeds fall to the ground and wait for spring. Then, poof! They wake up as new sunflowers, just like their parents!"\n\n' +
-        'Lila’s eyes widened. "So, the sleeping isn’t goodbye, but a hello?"\n\n' +
-        '"That’s right!" Grandma grinned. "The sleepy flowers are just taking a break before becoming part of a whole new garden."\n\n' +
-        'From that day on, Lila did not feel sad when sunflowers drooped. Instead, she would whisper, "Sweet dreams, sunflower. I can’t wait to see you next spring and say hello!"',
+        'Nia adored butterflies. Every afternoon, she would hurry to the community garden to watch them dance among Grandpa’s lime trees. The striped ones with golden wings were her favourite. Their flashing colours seemed to wave at her. But lately, Nia’s heart felt heavy. The fat green caterpillars she had been watching were disappearing, one by one.\n\n' +
+        'One day, she found a caterpillar hanging stiff and still inside a strange green case. Tears welled up in Nia’s eyes. "Grandpa," she sniffled, "is it trapped? Will it sleep forever?"\n\n' +
+        'With a gentle smile, Grandpa crouched beside Nia. "Caterpillars do have a special kind of sleep, Nia," he explained. "But it is not like our sleep. They use that time to change into something new."\n\n' +
+        'Nia stopped sniffling and began peering at the case with curiosity. "Change?"\n\n' +
+        'Grandpa pointed at the little green case swaying on the twig. "That is called a chrysalis. While the caterpillar rests inside, its body slowly turns into a butterfly. Then, one fine morning — flutter! Out it comes with brand-new wings."\n\n' +
+        'Nia’s eyes grew round. "So the sleeping isn’t goodbye, but a hello?"\n\n' +
+        '"Exactly!" Grandpa chuckled. "The sleepy caterpillars are just getting ready to join the dance above the lime trees."\n\n' +
+        'From that day on, Nia did not feel sad when a caterpillar vanished into its case. Instead, she would whisper, "Sweet dreams, little one. I can’t wait to meet you and say hello!"',
       questions: [
-        { type: 'short', marks: 1, q: 'Which four-word phrase in paragraph 1 tells you that Lila was feeling sad?', model: 'heart felt heavy', keywords: ['heart felt heavy', 'lately'] },
-        { type: 'short', marks: 1, q: 'What does "that time" in paragraph 3 refer to?', model: 'It refers to the time when flowers are in their special kind of sleep.', keywords: ['sleep', 'special'] },
-        { type: 'word-meaning', marks: 1, q: 'Which word in paragraph 4 has the same meaning as "looking closely"?', sentence: 'Lila stopped frowning and began peering with curiosity.', choices: ['frowning', 'peering'], answer: 'peering', explain: '"Peering" means looking carefully at something to see it clearly.' },
-        { type: 'sequence', marks: 1, q: 'Arrange the events in the correct sequence.', options: ['Lila no longer felt upset when she saw sunflowers drooping.', 'Lila spotted a droopy sunflower.', 'Lila learnt how new sunflowers can grow.'], answer: [3, 1, 2] },
+        { type: 'short', marks: 1, q: 'Which four-word phrase in paragraph 1 tells you that Nia was feeling sad?', model: 'heart felt heavy', keywords: ['heart felt heavy', 'lately'] },
+        { type: 'short', marks: 1, q: 'What does "that time" in paragraph 3 refer to?', model: 'It refers to the time when caterpillars are in their special kind of sleep.', keywords: ['sleep', 'special'] },
+        { type: 'word-meaning', marks: 1, q: 'Which word in paragraph 4 has the same meaning as "looking closely"?', sentence: 'Nia stopped sniffling and began peering at the case with curiosity.', choices: ['sniffling', 'peering'], answer: 'peering', explain: '"Peering" means looking carefully at something to see it clearly.' },
+        { type: 'sequence', marks: 1, q: 'Arrange the events in the correct sequence.', options: ['Nia no longer felt upset when a caterpillar disappeared.', 'Nia found a caterpillar inside a green case.', 'Nia learnt how caterpillars become butterflies.'], answer: [3, 1, 2] },
         {
           type: 'true-false', marks: 2,
           q: 'Read each statement and decide if it is True or False.',
           statements: [
-            { text: 'Lila liked sunflowers best of all.', answer: true, explain: 'Paragraph 1 says "Sunflowers, tall and proud, were her favourite."' },
-            { text: 'In spring, the sunflowers would droop.', answer: false, explain: 'In spring the seeds wake up as new sunflowers — the drooping happens earlier, not in spring.' },
+            { text: 'Nia liked the striped butterflies with golden wings best of all.', answer: true, explain: 'Paragraph 1 says "The striped ones with golden wings were her favourite."' },
+            { text: 'The caterpillar inside the chrysalis was trapped forever.', answer: false, explain: 'Inside the chrysalis the caterpillar changes into a butterfly and comes out with new wings.' },
           ],
         },
-        { type: 'short', marks: 2, q: 'What two things did Lila want to do next spring?', model: 'She wanted to see the new sunflowers and say hello to them.', keywords: ['see', 'say hello', 'sunflower'] },
+        { type: 'short', marks: 2, q: 'What two things did Nia want to do when the butterfly came out?', model: 'She wanted to meet it and say hello to it.', keywords: ['meet', 'say hello'] },
       ],
     },
   },
