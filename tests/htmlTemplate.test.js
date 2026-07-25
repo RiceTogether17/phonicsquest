@@ -35,7 +35,8 @@ describe('html tagged template', () => {
   });
 
   it('renders null/undefined/false as empty (conditional rendering)', () => {
-    expect(String(html`<p>${null}${undefined}${false && 'no'}</p>`)).toBe('<p></p>');
+    const show = false;
+    expect(String(html`<p>${null}${undefined}${show && 'no'}</p>`)).toBe('<p></p>');
     expect(String(html`<p>${0}</p>`)).toBe('<p>0</p>'); // but 0 renders
   });
 

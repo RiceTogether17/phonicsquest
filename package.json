@@ -12,6 +12,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "check:syntax": "find src -name '*.js' -print0 | xargs -0 -n1 node --check",
+    "check:bundle": "node scripts/check-bundle-size.mjs",
+    "test:e2e": "playwright test",
     "audit:stories": "node scripts/audit-stories.mjs",
     "gen:store-graphics": "node scripts/gen-store-graphics.mjs",
     "optimize:images": "node scripts/optimize-images.mjs"
@@ -22,7 +24,9 @@
     "gsap": "^3.12.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.0",
     "@vitest/ui": "^4.0.18",
     "eslint": "^10.6.0",
     "globals": "^17.7.0",
