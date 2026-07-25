@@ -94,13 +94,23 @@ describe('P3 editing sections — every blank tests a real error', () => {
     expect(offenders, offenders.join('\n')).toEqual([]);
   });
 
-  it('P3 T1 passage no longer mentions a non-existent "Carla" — friend name is consistent', () => {
+  it('P3 T1 editing passage uses one consistent friend name throughout', () => {
+    // Regression guard: an earlier version introduced the friend under one
+    // name ("her friend X") but quoted a different name later in the
+    // paragraph. Whatever name follows "her friend" must be the only
+    // capitalised name other than the narrator's used in the paragraph.
     const t1 = getP3PracticeTest('T1');
     const paragraph = t1.sectionF.paragraph;
-    // The original passage said "her friend Carla" but then quoted "Kelly".
-    // After the fix, Carla must be gone and Kelly must appear.
-    expect(paragraph).not.toMatch(/Carla/);
-    expect(paragraph).toMatch(/Kelly/);
+    const m = paragraph.match(/her friend (\w+)/);
+    expect(m, 'paragraph should introduce a friend by name').toBeTruthy();
+    const friend = m[1];
+    // Every later dialogue attribution should use the same friend name.
+    const saidNames = [...paragraph.matchAll(/(\w+) said/g)].map(x => x[1]);
+    for (const name of saidNames) {
+      if (name !== friend) {
+        expect([friend]).toContain(name);
+      }
+    }
   });
 
   it('checkEditingErrors validator flags a fake "No change" entry', async () => {

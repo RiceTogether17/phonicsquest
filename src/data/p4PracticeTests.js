@@ -2,8 +2,10 @@
  * PhonicsQuest – Primary 4 Practice Test Papers
  *
  * Four full school-style P4 English practice papers, one per term.
- * Each paper mirrors the real Singapore P4 English Continual Assessment
- * format used by many primary schools:
+ * Each paper mirrors the common Singapore P4 English Continual Assessment
+ * format used by many primary schools. All prompts, passages and cloze
+ * texts are ORIGINAL content written for PhonicsQuest — only the paper
+ * format and skills tested follow the school-paper convention:
  *
  *   Section A — Grammar MCQ          (10 items, 10 marks)
  *   Section B — Vocabulary MCQ       ( 5 items,  5 marks)
@@ -50,7 +52,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
     label: 'Term 1 Practice Test 1',
     duration: '1 h 10 min',
     totalMarks: 55,
-    blurb: 'P4 Term 1 paper — introduces passive voice (simple present/past) and relative clauses (who/which/whose/that). Comprehension passage about a school visit to a recycling plant.',
+    blurb: 'P4 Term 1 paper — introduces passive voice (simple present/past) and relative clauses (who/which/whose/that). Comprehension passage about a school visit to a water reclamation plant.',
 
     sectionA: {
       title: 'Section A: Grammar MCQ',
@@ -58,15 +60,15 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Choose the best answer and write its letter in the brackets provided.',
       items: [
         {
-          q: 'The windows ______________ every Friday by the cleaners.',
+          q: 'The mirrors ______________ every Monday by the attendants.',
           choices: ['wipe', 'wipes', 'are wiped', 'is wiped'],
           answer: 'are wiped',
           skill: 'passiveVoice',
           practiseTarget: 'grammar-mcq',
-          explain: 'Subject "windows" is plural; the action is repeated, so we use "are wiped" (simple present passive).',
+          explain: 'Subject "mirrors" is plural; the action is repeated, so we use "are wiped" (simple present passive).',
         },
         {
-          q: 'The trophy ______________ by our school last year.',
+          q: 'The championship shield ______________ by our school last year.',
           choices: ['won', 'is won', 'was won', 'has won'],
           answer: 'was won',
           skill: 'passiveVoice',
@@ -74,55 +76,55 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"Last year" signals simple past; passive of "win" is "was won".',
         },
         {
-          q: 'My aunt, ______________ works as a nurse, lives next door.',
+          q: 'My uncle, ______________ works as a chef, lives across the street.',
           choices: ['who', 'which', 'whose', 'that'],
           answer: 'who',
           skill: 'relativeClauses',
           practiseTarget: 'grammar-mcq',
-          explain: '"Who" introduces a relative clause referring to a person ("my aunt").',
+          explain: '"Who" introduces a relative clause referring to a person ("my uncle").',
         },
         {
-          q: 'The book ______________ I borrowed from the library is very interesting.',
+          q: 'The umbrella ______________ I borrowed from the office is very sturdy.',
           choices: ['who', 'whom', 'whose', 'which'],
           answer: 'which',
           skill: 'relativeClauses',
           practiseTarget: 'grammar-mcq',
-          explain: '"Which" is used for things ("the book"); "who" and "whom" are for people.',
+          explain: '"Which" is used for things ("the umbrella"); "who" and "whom" are for people.',
         },
         {
-          q: 'The student ______________ project won first prize received a medal.',
+          q: 'The pupil ______________ painting won first prize received a book voucher.',
           choices: ['who', 'whom', 'whose', 'which'],
           answer: 'whose',
           skill: 'relativeClauses',
           practiseTarget: 'grammar-mcq',
-          explain: '"Whose" shows possession — the project belongs to the student.',
+          explain: '"Whose" shows possession — the painting belongs to the pupil.',
         },
         {
-          q: 'Neither the boys nor the teacher ______________ where the keys are.',
+          q: 'Neither the twins nor their mother ______________ where the spare key is.',
           choices: ['know', 'knows', 'are knowing', 'have known'],
           answer: 'knows',
           skill: 'svAgreement',
           practiseTarget: 'grammar-mcq',
-          explain: 'With "Neither…nor", the verb agrees with the subject closest to it — "the teacher" is singular, so "knows".',
+          explain: 'With "Neither…nor", the verb agrees with the subject closest to it — "their mother" is singular, so "knows".',
         },
         {
-          q: 'The injured bird ______________ by the vet this morning.',
+          q: 'The stray kitten ______________ by the vet this morning.',
           choices: ['treat', 'treats', 'was treated', 'is treating'],
           answer: 'was treated',
           skill: 'passiveVoice',
           practiseTarget: 'grammar-mcq',
-          explain: '"This morning" is a past time signal; the bird receives the action, so we use simple past passive "was treated".',
+          explain: '"This morning" is a past time signal; the kitten receives the action, so we use simple past passive "was treated".',
         },
         {
-          q: 'Each of the students ______________ expected to submit the assignment on time.',
+          q: 'Each of the players ______________ expected to attend the briefing on time.',
           choices: ['are', 'were', 'is', 'have'],
           answer: 'is',
           skill: 'svAgreement',
           practiseTarget: 'grammar-mcq',
-          explain: '"Each of" always takes a singular verb — "each of the students is".',
+          explain: '"Each of" always takes a singular verb — "each of the players is".',
         },
         {
-          q: 'The old bridge ______________ by a modern one next year.',
+          q: 'The old footbridge ______________ by a sheltered linkway next year.',
           choices: ['replaces', 'is replaced', 'will be replaced', 'has replaced'],
           answer: 'will be replaced',
           skill: 'passiveVoice',
@@ -130,7 +132,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"Next year" indicates future; the bridge receives the action, so we use "will be replaced".',
         },
         {
-          q: 'The dog ______________ belongs to our neighbour often barks at night.',
+          q: 'The parrot ______________ belongs to our neighbour often squawks at dawn.',
           choices: ['who', 'whom', 'that', 'whose'],
           answer: 'that',
           skill: 'relativeClauses',
@@ -146,15 +148,15 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Choose the word that best fits the meaning of each sentence.',
       items: [
         {
-          q: 'The old man ______________ slightly as he walked, favouring his injured knee.',
+          q: 'The veteran striker ______________ off the pitch, favouring his bandaged knee.',
           choices: ['strolled', 'marched', 'limped', 'shuffled'],
           answer: 'limped',
           skill: 'synonymContrast',
           practiseTarget: 'vocab-mcq',
-          explain: '"Limped" specifically describes uneven walking due to an injury — the context mentions an injured knee.',
+          explain: '"Limped" specifically describes uneven walking due to an injury — the context mentions a bandaged knee.',
         },
         {
-          q: 'The firefighters had to ______________ precautions before entering the burning building.',
+          q: 'The hikers had to ______________ precautions before entering the flooded trail.',
           choices: ['do', 'make', 'take', 'get'],
           answer: 'take',
           skill: 'collocationCloze',
@@ -162,7 +164,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"Take precautions" is the correct collocation in English — you take, not make or do, precautions.',
         },
         {
-          q: 'Mia could finish any task ______________ — she never needed much time to prepare.',
+          q: 'Zara could organise a games session ______________ — she never needed much time to prepare.',
           choices: ['at the drop of a hat', 'over the moon', 'in the same boat', 'under the weather'],
           answer: 'at the drop of a hat',
           skill: 'idiomaticExpressions',
@@ -170,7 +172,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"At the drop of a hat" means immediately, without hesitation — fits "never needed much time to prepare".',
         },
         {
-          q: 'The scientist made an important ______________ after years of research.',
+          q: 'The archaeologist made a remarkable ______________ after months of digging.',
           choices: ['discover', 'discovers', 'discoverer', 'discovery'],
           answer: 'discovery',
           skill: 'morphologicalAffix',
@@ -194,10 +196,10 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in the blanks with a suitable word from the box. Each word may only be used once. There is one extra word that you will not need.',
       wordBank: ['since', 'although', 'were', 'being', 'are', 'had'],
       text:
-        'Every year, the school organises a Clean-Up Day. Students {{1}} divided into groups and assigned different areas of the school to clean. ' +
-        '{{2}} the work was tiring, everyone took part cheerfully. Some students {{3}} seen picking up litter along the corridors, while others swept the classrooms. ' +
-        'The project {{4}} been running for five years and has become a favourite event. ' +
-        '{{5}} that time, the school has won three awards for cleanliness.',
+        'Every year, the residents’ committee organises a Harvest Morning at the community garden. Helpers {{1}} divided into teams and assigned different plots to tend. ' +
+        '{{2}} the work was tiring, everyone pitched in cheerfully. Some helpers {{3}} seen trimming the herbs along the fence, while others raked the paths. ' +
+        'The programme {{4}} been running for five years and has become a favourite event. ' +
+        '{{5}} that time, the garden has won three community awards.',
       answers: ['were', 'Although', 'were', 'had', 'Since'],
       leftOver: ['being', 'are'],
       skill: 'passiveVoice',
@@ -210,10 +212,10 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in the blanks with a suitable word from the box. Each word may only be used once. There is one extra word that you will not need.',
       wordBank: ['fragile', 'observe', 'magnificent', 'cautiously', 'startled', 'examined'],
       text:
-        'On a field trip to the nature reserve, Mrs Lim asked the class to {{1}} the butterflies without disturbing them. ' +
-        'One student {{2}} a large blue butterfly through her magnifying glass and noticed the delicate patterns on its wings. ' +
-        'She moved {{3}} so as not to frighten it. Suddenly, a younger student sneezed loudly, and the butterfly was {{4}}. ' +
-        'It flew off instantly. The guide reminded the group that butterflies are {{5}} creatures that must be handled with great care.',
+        'On a field trip to the wetlands, Mr Koh asked the class to {{1}} the dragonflies without disturbing them. ' +
+        'One pupil {{2}} a large crimson dragonfly through her binoculars and noticed the fine veins on its wings. ' +
+        'She moved {{3}} so as not to frighten it. Suddenly, a younger pupil dropped his clipboard with a clatter, and the dragonfly was {{4}}. ' +
+        'It darted off instantly. The guide reminded the group that dragonflies are {{5}} creatures that must never be grabbed or handled roughly.',
       answers: ['observe', 'examined', 'cautiously', 'startled', 'fragile'],
       leftOver: ['magnificent'],
       skill: 'contextInference',
@@ -225,14 +227,14 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       marks: 5,
       instructions: 'Each underlined word contains a spelling or grammar mistake. A circle (○) shows a missing or wrong punctuation mark. Write the correct word or punctuation mark in the space provided.',
       paragraph:
-        'Last week, our class {{1:visitted}} the recycling plant near our school. We {{2:was}} given hard hats to wear before entering the building. ' +
-        'Our guide, Mr Tan{{3:o}} showed us how different materials are sorted and processed. ' +
-        'He explained that paper, glass and metal {{4:is}} collected separately. We were {{5:amaze}} by how much waste could be turned into useful products.',
+        'Last week, our class {{1:visitted}} the waterworks near our school. We {{2:was}} given safety vests to wear before entering the plant. ' +
+        'Our guide, Ms Chen{{3:o}} showed us how raw water is filtered and treated. ' +
+        'She explained that sand, gravel and carbon {{4:is}} used in separate stages. We were {{5:amaze}} by how much work goes into every clean drop.',
       errors: [
         { num: 1, kind: 'spelling', wrong: 'visitted', correction: 'visited', explain: '"Visited" has only one "t" — words ending in a consonant-vowel-consonant pattern only double the final consonant when the last syllable is stressed; "visit" is not stress-final.' },
         { num: 2, kind: 'grammar', wrong: 'was', correction: 'were', explain: '"We" is plural and requires "were" in simple past.' },
-        { num: 3, kind: 'punctuation', wrong: '', correction: ',', explain: 'A comma is needed after "Mr Tan" to separate the appositive from the main clause.' },
-        { num: 4, kind: 'grammar', wrong: 'is', correction: 'are', explain: '"Paper, glass and metal" is a plural subject (multiple items joined by "and") — use "are".' },
+        { num: 3, kind: 'punctuation', wrong: '', correction: ',', explain: 'A comma is needed after "Ms Chen" to separate the appositive from the main clause.' },
+        { num: 4, kind: 'grammar', wrong: 'is', correction: 'are', explain: '"Sand, gravel and carbon" is a plural subject (multiple items joined by "and") — use "are".' },
         { num: 5, kind: 'grammar', wrong: 'amaze', correction: 'amazed', explain: 'After "were", we need the past participle "amazed" to form the passive adjective.' },
       ],
     },
@@ -243,41 +245,41 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'For each question, rewrite the sentence(s) using the given word(s). Do not change the meaning. Do not add unnecessary words.',
       items: [
         {
-          q: 'Someone built this temple more than two hundred years ago.\nBegin with: This temple …',
-          stem: 'This temple',
-          answer: 'This temple was built more than two hundred years ago.',
-          alternates: ['This temple was built over two hundred years ago.'],
+          q: 'Someone carved this statue more than a hundred years ago.\nBegin with: This statue …',
+          stem: 'This statue',
+          answer: 'This statue was carved more than a hundred years ago.',
+          alternates: ['This statue was carved over a hundred years ago.'],
           skill: 'passiveVoice',
-          explain: 'Change the active sentence to passive: "was built" + time phrase. The agent ("someone") is dropped.',
+          explain: 'Change the active sentence to passive: "was carved" + time phrase. The agent ("someone") is dropped.',
         },
         {
-          q: 'The girl won the spelling competition. Her handwriting is very neat.\nUse: whose',
-          stem: 'The girl whose',
-          answer: 'The girl whose handwriting is very neat won the spelling competition.',
+          q: 'The boy won the chess tournament. His memory is very sharp.\nUse: whose',
+          stem: 'The boy whose',
+          answer: 'The boy whose memory is very sharp won the chess tournament.',
           alternates: [],
           skill: 'relativeClauses',
-          explain: '"Whose" links the relative clause to the noun "girl" by showing possession of "handwriting".',
+          explain: '"Whose" links the relative clause to the noun "boy" by showing possession of "memory".',
         },
         {
-          q: 'Mr Ali built the fence. He is our caretaker.\nUse: who',
-          stem: 'Mr Ali',
-          answer: 'Mr Ali, who is our caretaker, built the fence.',
-          alternates: ['Mr Ali who is our caretaker built the fence.'],
+          q: 'Mdm Siti sewed the curtains. She is our neighbour.\nUse: who',
+          stem: 'Mdm Siti',
+          answer: 'Mdm Siti, who is our neighbour, sewed the curtains.',
+          alternates: ['Mdm Siti who is our neighbour sewed the curtains.'],
           skill: 'relativeClauses',
-          explain: 'The relative clause "who is our caretaker" adds information about Mr Ali.',
+          explain: 'The relative clause "who is our neighbour" adds information about Mdm Siti.',
         },
         {
-          q: 'The cleaners mop the hall every morning.\nBegin with: The hall …',
-          stem: 'The hall',
-          answer: 'The hall is mopped every morning.',
-          alternates: ['The hall is mopped every morning by the cleaners.'],
+          q: 'The gardeners water the plants every morning.\nBegin with: The plants …',
+          stem: 'The plants',
+          answer: 'The plants are watered every morning.',
+          alternates: ['The plants are watered every morning by the gardeners.'],
           skill: 'passiveVoice',
-          explain: 'Simple present passive: "is mopped" + frequency expression.',
+          explain: 'Simple present passive: "are watered" + frequency expression.',
         },
         {
-          q: 'This is the restaurant. My family and I celebrated my birthday here.\nUse: where',
-          stem: 'This is the restaurant where',
-          answer: 'This is the restaurant where my family and I celebrated my birthday.',
+          q: 'This is the stadium. Our team played its first match here.\nUse: where',
+          stem: 'This is the stadium where',
+          answer: 'This is the stadium where our team played its first match.',
           alternates: [],
           skill: 'relativeClauses',
           explain: '"Where" introduces a relative clause for places.',
@@ -289,11 +291,11 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       title: 'Section G: Comprehension',
       marks: 20,
       passage:
-        'Last Tuesday, Class 4A went on a learning journey to a recycling plant at Tuas. The students were excited because none of them had ever visited such a place before.\n\n' +
-        'Upon arrival, the class was welcomed by the plant manager, Mr Ramasamy. He gave the students a brief introduction on the importance of recycling. "Every day, Singapore produces thousands of tonnes of waste," he said. "If we do not recycle, our landfill will run out of space much sooner than expected."\n\n' +
-        'The students then put on safety helmets and entered the main sorting hall. There, they watched in amazement as conveyor belts carried bags of waste that were torn open by large machines. Workers and machines worked together to sort the waste into groups — paper, plastic, glass and metal.\n\n' +
-        'Mrs Lim, the teacher, pointed to a large bale of crushed aluminium cans. "Did you know that aluminium can be recycled repeatedly without losing quality?" she said. Several students nodded, but others looked surprised.\n\n' +
-        'At the end of the visit, each student was given a small bag made from recycled plastic. "Take this home as a reminder," Mr Ramasamy said with a smile. On the bus ride back, the students were unusually quiet — each lost in thought about how their small everyday choices could make a big difference.',
+        'Last Thursday, Class 4B went on a learning journey to a water reclamation plant in the west of Singapore. The students were excited because none of them had ever set foot in such a place before.\n\n' +
+        'Upon arrival, the class was welcomed by the plant supervisor, Mdm Rosnah. She gave the students a short talk on why every drop of water matters. "Every day, Singapore uses millions of litres of water," she said. "If we do not reuse our water, our reservoirs will run low much faster than expected."\n\n' +
+        'The students then put on safety vests and entered the main treatment hall. There, they watched in wonder as used water flowed through giant tanks and was pushed through rows of fine membranes by powerful pumps. Staff and machines worked together to clean the water in stages — screening, filtering and disinfecting.\n\n' +
+        'Mr Faizal, the teacher, pointed to a display of bottled reclaimed water. "Did you know that reclaimed water is clean enough to pass thousands of quality tests?" he said. Several students nodded, but others looked doubtful.\n\n' +
+        'At the end of the visit, each student was given a small keychain made from recycled bottle caps. "Take this home as a reminder," Mdm Rosnah said with a smile. On the bus ride back, the students were unusually quiet — each lost in thought about how their small everyday habits could make a big difference.',
       questions: [
         {
           type: 'mcq',
@@ -302,52 +304,52 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           choices: [
             'They had visited the plant many times before.',
             'None of them had ever been to such a place before.',
-            'They wanted to meet Mr Ramasamy.',
+            'They wanted to meet Mdm Rosnah.',
             'Their teacher had promised them a special gift.',
           ],
           answer: 'None of them had ever been to such a place before.',
-          explain: 'Paragraph 1 states directly: "none of them had ever visited such a place before".',
+          explain: 'Paragraph 1 states directly: "none of them had ever set foot in such a place before".',
         },
         {
           type: 'mcq',
           marks: 2,
-          q: 'What does Mr Ramasamy\'s warning about the landfill suggest?',
+          q: 'What does Mdm Rosnah\'s warning about the reservoirs suggest?',
           choices: [
-            'Singapore already has no more space for waste.',
-            'The landfill will remain usable for many more decades.',
-            'Recycling is needed to prevent the landfill from filling up too quickly.',
-            'Only large companies should be responsible for recycling.',
+            'Singapore has already run out of water.',
+            'The reservoirs will stay full for many more decades.',
+            'Reusing water is needed to stop the reservoirs from running low too quickly.',
+            'Only factories should be responsible for saving water.',
           ],
-          answer: 'Recycling is needed to prevent the landfill from filling up too quickly.',
-          explain: 'Mr Ramasamy says the landfill will run out sooner if people do not recycle — implying recycling extends its life.',
+          answer: 'Reusing water is needed to stop the reservoirs from running low too quickly.',
+          explain: 'Mdm Rosnah says the reservoirs will run low faster if people do not reuse water — implying that reusing water makes supplies last longer.',
         },
         {
           type: 'short',
           marks: 2,
-          q: 'How did the waste bags get torn open in the sorting hall?',
-          model: 'They were torn open by large machines.',
-          keywords: ['large machines', 'machines'],
+          q: 'How was the used water pushed through the fine membranes?',
+          model: 'It was pushed through by powerful pumps.',
+          keywords: ['powerful pumps', 'pumps'],
         },
         {
           type: 'short',
           marks: 2,
-          q: 'Name two groups into which the waste was sorted in the sorting hall.',
-          model: 'Paper and plastic. (Also acceptable: glass and metal. Any two of: paper, plastic, glass, metal.)',
-          keywords: ['paper', 'plastic', 'glass', 'metal'],
+          q: 'Name two stages in which the water was cleaned in the treatment hall.',
+          model: 'Screening and filtering. (Also acceptable: disinfecting. Any two of: screening, filtering, disinfecting.)',
+          keywords: ['screening', 'filtering', 'disinfecting'],
         },
         {
           type: 'short',
           marks: 2,
-          q: 'What interesting fact did Mrs Lim share about aluminium?',
-          model: 'She said that aluminium can be recycled repeatedly without losing quality.',
-          keywords: ['recycled', 'quality', 'repeatedly'],
+          q: 'What interesting fact did Mr Faizal share about reclaimed water?',
+          model: 'He said that reclaimed water is clean enough to pass thousands of quality tests.',
+          keywords: ['quality tests', 'clean'],
         },
         {
           type: 'vocab',
           marks: 1,
-          q: 'Find a word in paragraph 4 that means "pressed together into a compact block".',
-          model: 'crushed',
-          keywords: ['crushed'],
+          q: 'Find a word in paragraph 3 that means "great surprise and admiration".',
+          model: 'wonder',
+          keywords: ['wonder'],
         },
         {
           type: 'vocab',
@@ -367,8 +369,8 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           type: 'open',
           marks: 6,
           q: 'Do you think learning journeys like this one are useful for students? Give two reasons to support your answer.',
-          model: 'Yes, learning journeys like this are useful. First, students get to see real-life processes (such as recycling) that they cannot experience in the classroom. Second, seeing the effects of waste first-hand makes them more aware of environmental issues and encourages them to make better choices in daily life.',
-          keywords: ['real-life', 'experience', 'classroom', 'awareness', 'environmental', 'choices'],
+          model: 'Yes, learning journeys like this are useful. First, students get to see real-life processes (such as water treatment) that they cannot experience in the classroom. Second, seeing how much effort goes into producing clean water makes them more aware of conservation and encourages them to build better habits in daily life.',
+          keywords: ['real-life', 'experience', 'classroom', 'awareness', 'conservation', 'habits'],
         },
       ],
     },
@@ -384,7 +386,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
     label: 'Term 2 Practice Test 2',
     duration: '1 h 10 min',
     totalMarks: 55,
-    blurb: 'P4 Term 2 paper — reported speech (statements & questions), Type 1 conditionals and modals (would/could/should have). Comprehension passage about a beach clean-up day.',
+    blurb: 'P4 Term 2 paper — reported speech (statements & questions), Type 1 conditionals and modals (would/could/should have). Comprehension passage about a community garden makeover.',
 
     sectionA: {
       title: 'Section A: Grammar MCQ',
@@ -392,7 +394,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Choose the best answer and write its letter in the brackets provided.',
       items: [
         {
-          q: 'Jake said that he ______________ to the library the following day.',
+          q: 'Priya said that she ______________ to the dentist the following day.',
           choices: ['will go', 'would go', 'goes', 'is going'],
           answer: 'would go',
           skill: 'reportedSpeech',
@@ -400,7 +402,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: 'In reported speech, "will" changes to "would" and "tomorrow" changes to "the following day".',
         },
         {
-          q: 'Lily told her mother that she ______________ her homework already.',
+          q: 'Arun told his father that he ______________ his chores already.',
           choices: ['finishes', 'finished', 'had finished', 'has finished'],
           answer: 'had finished',
           skill: 'reportedSpeech',
@@ -408,7 +410,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: 'In reported speech, the present perfect "has finished" shifts back to past perfect "had finished".',
         },
         {
-          q: 'If it rains tomorrow, we ______________ the match indoors.',
+          q: 'If it pours tomorrow, we ______________ the tournament indoors.',
           choices: ['play', 'played', 'will play', 'would play'],
           answer: 'will play',
           skill: 'conditionals',
@@ -416,7 +418,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: 'Type 1 conditional: "if + present simple, will + base verb" — a real possibility.',
         },
         {
-          q: 'If you study hard, you ______________ your exams.',
+          q: 'If you train consistently, you ______________ your fitness test.',
           choices: ['pass', 'passed', 'would pass', 'will pass'],
           answer: 'will pass',
           skill: 'conditionals',
@@ -424,15 +426,15 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: 'Type 1 conditional for a real, likely condition: "if + present, will + base".',
         },
         {
-          q: 'You ______________ apologise. It was not your fault at all.',
+          q: 'You ______________ pay for the repairs. The damage was not caused by you.',
           choices: ['must', 'should', 'need not', 'ought to'],
           answer: 'need not',
           skill: 'modals',
           practiseTarget: 'grammar-mcq',
-          explain: '"Need not" expresses lack of necessity — there is no reason to apologise.',
+          explain: '"Need not" expresses lack of necessity — there is no reason for you to pay.',
         },
         {
-          q: 'Tom said that he ______________ be joining us for the trip.',
+          q: 'Wei Ming said that he ______________ be joining us for dinner.',
           choices: ['will', 'shall', 'might', 'can'],
           answer: 'might',
           skill: 'reportedSpeech',
@@ -440,23 +442,23 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: 'In reported speech, "may" changes to "might" to show uncertainty in the past.',
         },
         {
-          q: 'If you see Sarah, ______________ her I said hello.',
+          q: 'If you meet Aunty Rose, ______________ her I said thank you.',
           choices: ['told', 'tell', 'telling', 'had told'],
           answer: 'tell',
           skill: 'conditionals',
           practiseTarget: 'grammar-mcq',
-          explain: 'Type 1 conditional imperative: "If you see…, tell her…" — command as the result clause.',
+          explain: 'Type 1 conditional imperative: "If you meet…, tell her…" — command as the result clause.',
         },
         {
-          q: 'One of the paintings ______________ stolen from the gallery last night.',
+          q: 'One of the sculptures ______________ damaged during the move last night.',
           choices: ['were', 'is', 'was', 'are'],
           answer: 'was',
           skill: 'svAgreement',
           practiseTarget: 'grammar-mcq',
-          explain: '"One of the paintings" — the subject is "one" (singular), so the verb is "was".',
+          explain: '"One of the sculptures" — the subject is "one" (singular), so the verb is "was".',
         },
         {
-          q: 'She told me that she ______________ nervous about the performance.',
+          q: 'He told me that he ______________ anxious about the audition.',
           choices: ['is', 'are', 'was', 'were'],
           answer: 'was',
           skill: 'reportedSpeech',
@@ -464,12 +466,12 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: 'In reported speech, the present simple "is" shifts to "was" (past simple).',
         },
         {
-          q: 'You ______________ have told me earlier — I would have helped you plan the surprise party.',
+          q: 'You ______________ have called me earlier — I would have helped you carry the groceries.',
           choices: ['must', 'would', 'could', 'should'],
           answer: 'could',
           skill: 'modals',
           practiseTarget: 'grammar-mcq',
-          explain: '"Could have told" expresses a missed opportunity in the past — you had the ability but did not do it.',
+          explain: '"Could have called" expresses a missed opportunity in the past — you had the ability but did not do it.',
         },
       ],
     },
@@ -480,7 +482,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Choose the word that best fits the meaning of each sentence.',
       items: [
         {
-          q: 'The kitten ______________ in the corner, shaking from head to tail.',
+          q: 'The puppy ______________ under the bench, shaking from nose to tail.',
           choices: ['shivered', 'trembled', 'quivered', 'shuddered'],
           answer: 'trembled',
           skill: 'synonymContrast',
@@ -488,7 +490,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"Trembled" describes sustained, noticeable shaking — the most natural fit for a frightened animal. "Shivered" is usually from cold; "quivered" is a fine vibration; "shuddered" is a sudden jolt.',
         },
         {
-          q: 'After the argument, the two friends ______________ friends and forgave each other.',
+          q: 'After the quarrel, the two cousins ______________ friends again and forgave each other.',
           choices: ['made', 'became', 'turned', 'went'],
           answer: 'made',
           skill: 'collocationCloze',
@@ -496,7 +498,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"Made friends" is the correct collocation — you "make" friends, not "became" or "went" friends.',
         },
         {
-          q: 'Ben always ______________ the midnight oil the night before his exams.',
+          q: 'Mei always ______________ the midnight oil the week before her recitals.',
           choices: ['burns', 'lights', 'melts', 'uses'],
           answer: 'burns',
           skill: 'idiomaticExpressions',
@@ -504,7 +506,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"Burn the midnight oil" means to work or study late into the night — "burns" is the correct verb in this idiom.',
         },
         {
-          q: 'The manager praised the team for their ______________ in finishing the project ahead of schedule.',
+          q: 'The supervisor praised the crew for their ______________ in clearing the site ahead of schedule.',
           choices: ['efficient', 'efficiency', 'efficiently', 'efficiencies'],
           answer: 'efficiency',
           skill: 'morphologicalAffix',
@@ -512,7 +514,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"Efficiency" is the noun form of "efficient" — needed here after the possessive "their".',
         },
         {
-          q: 'The word "reluctantly" in the passage tells us that the boy ______________ .',
+          q: 'The word "reluctantly" in the passage tells us that the girl ______________ .',
           choices: ['was eager to help', 'helped without being asked', 'helped but did not really want to', 'refused to help'],
           answer: 'helped but did not really want to',
           skill: 'contextInference',
@@ -528,11 +530,11 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in the blanks with a suitable word from the box. Each word may only be used once. There is one extra word that you will not need.',
       wordBank: ['if', 'unless', 'when', 'before', 'after', 'until'],
       text:
-        'Zara decided to organise a bake sale to raise money for the animal shelter. She told her friends that the sale would only go ahead {{1}} enough people volunteered to help. ' +
-        '{{2}} she had confirmed the date, she designed colourful posters and put them up around school. ' +
-        'On the day of the sale, the team arrived early and set up the stall {{3}} the canteen opened. ' +
-        'They sold baked goods throughout the recess period {{4}} every item was gone. ' +
-        'Zara said she would repeat the event {{5}} the response from the school was this positive.',
+        'Iqbal decided to organise a car-wash to raise funds for the school library. He told his classmates that the event would only go ahead {{1}} enough helpers signed up. ' +
+        '{{2}} he had fixed the date, he designed bright flyers and pinned them up around the estate. ' +
+        'On the morning itself, the team arrived early and set out their buckets {{3}} the first cars drove in. ' +
+        'They scrubbed and rinsed right through the morning {{4}} every booked slot was done. ' +
+        'Iqbal said he would run the event again {{5}} the support from the neighbourhood stayed this strong.',
       answers: ['if', 'After', 'before', 'until', 'if'],
       leftOver: ['unless', 'when'],
       skill: 'conditionals',
@@ -545,11 +547,11 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in the blanks with a suitable word from the box. Each word may only be used once. There is one extra word that you will not need.',
       wordBank: ['gleaming', 'drifted', 'volunteers', 'retrieve', 'heaps', 'cluttered'],
       text:
-        'On Saturday morning, about fifty {{1}} arrived at East Coast Park for the annual beach clean-up. ' +
-        'The beach, which had once been {{2}} with litter from the long weekend, looked shocking. ' +
-        'Plastic bottles, food wrappers and broken sandals were piled in {{3}} along the shoreline. ' +
-        'Some items had even {{4}} into the sea. The team worked quickly to {{5}} what they could before the tide came in. ' +
-        'By noon, the beach looked spotless once more.',
+        'On Sunday morning, about forty {{1}} gathered by the park canal for the quarterly clean-up. ' +
+        'The banks, which had become {{2}} with litter after the festival weekend, were a sorry sight. ' +
+        'Drink cans, plastic bags and torn banners lay in {{3}} along the walkway. ' +
+        'Some rubbish had even {{4}} into the canal itself. The team worked swiftly to {{5}} what they could before the afternoon rain. ' +
+        'By lunchtime, the canal banks looked spotless once more.',
       answers: ['volunteers', 'cluttered', 'heaps', 'drifted', 'retrieve'],
       leftOver: ['gleaming'],
       skill: 'contextInference',
@@ -561,12 +563,12 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       marks: 5,
       instructions: 'Each underlined word contains a spelling or grammar mistake. A circle (○) shows a missing or wrong punctuation mark. Write the correct word or punctuation mark in the space provided.',
       paragraph:
-        'Last Saturday, our family {{1:decid}} to spend the day at the science museum. My brother, who love dinosaurs, was the most excited. ' +
-        'At the entrance{{2:o}} we were handed a map of the exhibits. We {{3:spended}} the first hour at the Dinosaur Discovery Hall. ' +
-        'My brother {{4:taked}} at least thirty photographs. Before we left{{5:o}} we visited the gift shop and bought a dinosaur model.',
+        'Last Sunday, our family {{1:decid}} to spend the day at the bird park. My sister, who loves parrots, was the most excited. ' +
+        'At the gate{{2:o}} we were handed a map of the aviaries. We {{3:spended}} the first hour at the Rainbow Ridge enclosure. ' +
+        'My sister {{4:taked}} at least forty photographs. Before we left{{5:o}} we stopped by the gift shop and bought a penguin plushie.',
       errors: [
         { num: 1, kind: 'spelling', wrong: 'decid', correction: 'decided', explain: '"Decided" is the correct simple past form of "decide" — the "-ed" ending is required.' },
-        { num: 2, kind: 'punctuation', wrong: '', correction: ',', explain: 'A comma is needed after "At the entrance" to separate the adverbial phrase from the main clause.' },
+        { num: 2, kind: 'punctuation', wrong: '', correction: ',', explain: 'A comma is needed after "At the gate" to separate the adverbial phrase from the main clause.' },
         { num: 3, kind: 'grammar', wrong: 'spended', correction: 'spent', explain: '"Spend" is an irregular verb; its simple past form is "spent", not "spended".' },
         { num: 4, kind: 'grammar', wrong: 'taked', correction: 'took', explain: '"Take" is irregular; its simple past form is "took", not "taked".' },
         { num: 5, kind: 'punctuation', wrong: '', correction: ',', explain: 'A comma is needed after the time clause "Before we left" to separate it from the main clause.' },
@@ -579,42 +581,42 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'For each question, rewrite the sentence(s) using the given word(s). Do not change the meaning.',
       items: [
         {
-          q: '"I will bring my camera tomorrow," said Grace.\nBegin with: Grace said that …',
-          stem: 'Grace said that',
-          answer: 'Grace said that she would bring her camera the following day.',
-          alternates: ['Grace said that she would bring her camera the next day.'],
+          q: '"I will bring my guitar tomorrow," said Wen.\nBegin with: Wen said that …',
+          stem: 'Wen said that',
+          answer: 'Wen said that he would bring his guitar the following day.',
+          alternates: ['Wen said that he would bring his guitar the next day.'],
           skill: 'reportedSpeech',
-          explain: 'In reported speech: "I" → "she", "will" → "would", "tomorrow" → "the following day / the next day".',
+          explain: 'In reported speech: "I" → "he", "will" → "would", "tomorrow" → "the following day / the next day".',
         },
         {
-          q: '"I am very proud of my class," the teacher told us.\nBegin with: The teacher told us that …',
-          stem: 'The teacher told us that',
-          answer: 'The teacher told us that she was very proud of her class.',
-          alternates: ['The teacher told us that he was very proud of his class.'],
+          q: '"I am very proud of my team," the coach told us.\nBegin with: The coach told us that …',
+          stem: 'The coach told us that',
+          answer: 'The coach told us that she was very proud of her team.',
+          alternates: ['The coach told us that he was very proud of his team.'],
           skill: 'reportedSpeech',
           explain: '"Am" → "was"; "my" → "her" (or "his") in reported speech.',
         },
         {
-          q: 'Start your revision early. Otherwise you will not finish in time.\nUse: unless',
-          stem: 'You will not finish in time',
-          answer: 'You will not finish in time unless you start your revision early.',
+          q: 'Pack your bag tonight. Otherwise you will not leave on time.\nUse: unless',
+          stem: 'You will not leave on time',
+          answer: 'You will not leave on time unless you pack your bag tonight.',
           alternates: [],
           skill: 'conditionals',
           explain: '"Unless" means "if not" — it introduces the negative condition.',
         },
         {
-          q: 'It is possible for you to borrow this book. Just return it by Friday.\nUse: may',
+          q: 'It is possible for you to use my bicycle. Just oil the chain afterwards.\nUse: may',
           stem: 'You may',
-          answer: 'You may borrow this book as long as you return it by Friday.',
-          alternates: ['You may borrow this book, but please return it by Friday.'],
+          answer: 'You may use my bicycle as long as you oil the chain afterwards.',
+          alternates: ['You may use my bicycle, but please oil the chain afterwards.'],
           skill: 'modals',
-          explain: '"May" expresses permission — combine with the condition about returning the book.',
+          explain: '"May" expresses permission — combine with the condition about oiling the chain.',
         },
         {
-          q: 'Marcus did not revise his notes. He failed the quiz.\nUse: should have',
-          stem: 'Marcus',
-          answer: 'Marcus should have revised his notes.',
-          alternates: ['Marcus should have revised his notes before the quiz.'],
+          q: 'Rita did not check the weather. She was caught in the rain.\nUse: should have',
+          stem: 'Rita',
+          answer: 'Rita should have checked the weather.',
+          alternates: ['Rita should have checked the weather before going out.'],
           skill: 'modals',
           explain: '"Should have + past participle" expresses advice or regret about a past action that was not done.',
         },
@@ -625,66 +627,66 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       title: 'Section G: Comprehension',
       marks: 20,
       passage:
-        'Every year during the June holidays, the residents of Coral Bay come together for their community beach clean-up. This year, for the first time, children from the neighbouring school, Sunridge Primary, were invited to join in.\n\n' +
-        'On the morning of the event, the children arrived at the beach in their bright yellow T-shirts and thick rubber gloves. Their teacher, Mr Osman, reminded them to stay in pairs and not to pick up sharp or dangerous objects without an adult present.\n\n' +
-        '"I did not expect the beach to be this dirty," said Priya, a Primary 4 student, as she gazed at the stretch of sand littered with plastic bags, straws and bottle caps. "My dad always says we should take care of our environment, but seeing this makes it so real."\n\n' +
-        'Within the first hour, the children had already filled twelve large refuse bags. The community volunteers were impressed. "These children work harder than most adults I have seen at previous clean-ups!" laughed Mr Fernandez, one of the organisers.\n\n' +
-        'By midday, the beach had been transformed. The sand was clean, the water looked bluer, and the seabirds seemed to return in greater numbers. As a reward, the volunteers treated the children to cold drinks and sandwiches.\n\n' +
-        '"I want to come back next year," announced Priya. "And I will bring my whole family." The other children cheered in agreement. Mr Osman smiled quietly. He thought to himself that this had been the best learning journey of the year — no textbook could teach what a morning of hard work in the sun had shown them.',
+        'Every year during the December holidays, the residents of Riverbend estate come together to spruce up their community garden. This year, for the first time, pupils from the nearby school, Meadow Primary, were invited to join in.\n\n' +
+        'On the morning of the event, the pupils arrived at the garden in their bright orange caps and sturdy gardening gloves. Their teacher, Mrs Chandra, reminded them to stay with their buddies and not to handle the garden tools without an adult present.\n\n' +
+        '"I did not expect the garden to be this overgrown," said Hakim, a Primary 4 pupil, as he stared at the beds choked with weeds, dead leaves and tangled vines. "My mum always says we should care for our shared spaces, but seeing this makes it so real."\n\n' +
+        'Within the first hour, the pupils had already filled ten large garden bags with weeds. The residents were impressed. "These children work harder than most adults I have seen at previous makeovers!" chuckled Mr Wee, one of the organisers.\n\n' +
+        'By midday, the garden had been transformed. The beds were neat, the paths were clear, and the butterflies seemed to return in greater numbers. As a reward, the residents treated the pupils to iced lemon tea and curry puffs.\n\n' +
+        '"I want to come back next year," announced Hakim. "And I will bring my whole family." The other pupils cheered in agreement. Mrs Chandra smiled quietly. She thought to herself that this had been the best learning journey of the year — no textbook could teach what a morning of honest work under the sun had shown them.',
       questions: [
         {
           type: 'mcq',
           marks: 2,
-          q: 'What was different about this year\'s beach clean-up compared to previous years?',
+          q: 'What was different about this year\'s garden makeover compared to previous years?',
           choices: [
             'The event was held on a different day.',
-            'Children from a school were invited to join for the first time.',
-            'The organisers wore bright yellow T-shirts.',
-            'The beach was cleaner than usual.',
+            'Pupils from a school were invited to join for the first time.',
+            'The organisers wore bright orange caps.',
+            'The garden was tidier than usual.',
           ],
-          answer: 'Children from a school were invited to join for the first time.',
-          explain: 'Paragraph 1 states "for the first time, children from the neighbouring school … were invited to join in".',
+          answer: 'Pupils from a school were invited to join for the first time.',
+          explain: 'Paragraph 1 states "for the first time, pupils from the nearby school … were invited to join in".',
         },
         {
           type: 'mcq',
           marks: 2,
-          q: 'Why did Priya say "seeing this makes it so real"?',
+          q: 'Why did Hakim say "seeing this makes it so real"?',
           choices: [
-            'She had never visited a beach before.',
-            'The beach was much dirtier than she expected.',
-            'She had forgotten what her father had told her.',
-            'She was surprised by how clean the beach was.',
+            'He had never visited a garden before.',
+            'The garden was much more overgrown than he expected.',
+            'He had forgotten what his mother had told him.',
+            'He was surprised by how tidy the garden was.',
           ],
-          answer: 'The beach was much dirtier than she expected.',
-          explain: 'Priya said she "did not expect the beach to be this dirty" — the sight of the litter made the lesson about caring for the environment feel personal and concrete.',
+          answer: 'The garden was much more overgrown than he expected.',
+          explain: 'Hakim said he "did not expect the garden to be this overgrown" — the sight of the choked beds made the lesson about caring for shared spaces feel personal and concrete.',
         },
         {
           type: 'short',
           marks: 2,
-          q: 'What safety instruction did Mr Osman give the children?',
-          model: 'He told them to stay in pairs and not to pick up sharp or dangerous objects without an adult present.',
-          keywords: ['pairs', 'sharp', 'dangerous', 'adult'],
+          q: 'What safety instruction did Mrs Chandra give the pupils?',
+          model: 'She told them to stay with their buddies and not to handle the garden tools without an adult present.',
+          keywords: ['buddies', 'tools', 'adult'],
         },
         {
           type: 'short',
           marks: 2,
-          q: 'How did the beach change by midday? Give two details.',
-          model: 'The sand was clean and the water looked bluer. (Also acceptable: the seabirds seemed to return in greater numbers.)',
-          keywords: ['clean', 'bluer', 'seabirds'],
+          q: 'How did the garden change by midday? Give two details.',
+          model: 'The beds were neat and the paths were clear. (Also acceptable: the butterflies seemed to return in greater numbers.)',
+          keywords: ['neat', 'clear', 'butterflies'],
         },
         {
           type: 'short',
           marks: 2,
-          q: 'How did Mr Fernandez feel about the children\'s work, and what did he say to show this?',
-          model: 'He was impressed. He said "These children work harder than most adults I have seen at previous clean-ups!"',
+          q: 'How did Mr Wee feel about the pupils\' work, and what did he say to show this?',
+          model: 'He was impressed. He said "These children work harder than most adults I have seen at previous makeovers!"',
           keywords: ['impressed', 'harder', 'adults'],
         },
         {
           type: 'vocab',
           marks: 1,
-          q: 'Find a word in paragraph 4 that means "people who offer to do something without being paid".',
-          model: 'volunteers',
-          keywords: ['volunteers'],
+          q: 'Find a word in paragraph 4 that means "people who live in a particular place".',
+          model: 'residents',
+          keywords: ['residents'],
         },
         {
           type: 'vocab',
@@ -696,16 +698,16 @@ export const P4_PRACTICE_TESTS = Object.freeze({
         {
           type: 'tf-reason',
           marks: 2,
-          statement: 'Mr Osman thought the beach clean-up was a more valuable experience than learning from textbooks.',
+          statement: 'Mrs Chandra thought the garden makeover was a more valuable experience than learning from textbooks.',
           answer: 'True',
-          reason: 'The last paragraph states that Mr Osman thought it was "the best learning journey of the year" and that "no textbook could teach what a morning of hard work in the sun had shown them".',
+          reason: 'The last paragraph states that Mrs Chandra thought it was "the best learning journey of the year" and that "no textbook could teach what a morning of honest work under the sun had shown them".',
         },
         {
           type: 'open',
           marks: 6,
-          q: 'What do you think community events like this beach clean-up can teach children? Give two points and explain each one.',
-          model: 'Community events like this can teach children responsibility — they learn that they have a duty to care for public spaces. They also learn teamwork, as they work alongside adults and other children to achieve a shared goal. Seeing the result of their efforts (a clean beach) also motivates them to continue making environmentally friendly choices in daily life.',
-          keywords: ['responsibility', 'teamwork', 'environment', 'shared', 'motivated', 'choices'],
+          q: 'What do you think community events like this garden makeover can teach children? Give two points and explain each one.',
+          model: 'Community events like this can teach children responsibility — they learn that they have a duty to care for shared spaces. They also learn teamwork, as they work alongside adults and other children to achieve a common goal. Seeing the result of their efforts (a tidy, thriving garden) also motivates them to keep caring for their neighbourhood in daily life.',
+          keywords: ['responsibility', 'teamwork', 'shared', 'common', 'motivated', 'neighbourhood'],
         },
       ],
     },
@@ -721,7 +723,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
     label: 'Term 3 Practice Test 3',
     duration: '1 h 10 min',
     totalMarks: 55,
-    blurb: 'P4 Term 3 paper — past perfect (had + past participle), complex connectors (although, despite, unless, not only…but also) and participial phrases. Comprehension passage about a friendship through a school art competition.',
+    blurb: 'P4 Term 3 paper — past perfect (had + past participle), complex connectors (although, despite, unless, not only…but also) and participial phrases. Comprehension passage about a friendship formed at a school science fair.',
 
     sectionA: {
       title: 'Section A: Grammar MCQ',
@@ -729,47 +731,47 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Choose the best answer and write its letter in the brackets provided.',
       items: [
         {
-          q: 'By the time the ambulance arrived, the patient ______________ consciousness.',
+          q: 'By the time the paramedics reached the trail, the hiker ______________ consciousness.',
           choices: ['lost', 'loses', 'has lost', 'had lost'],
           answer: 'had lost',
           skill: 'pastPerfect',
           practiseTarget: 'grammar-mcq',
-          explain: '"Had lost" (past perfect) describes an event that happened before another past event ("arrived").',
+          explain: '"Had lost" (past perfect) describes an event that happened before another past event ("reached").',
         },
         {
-          q: 'We discovered that someone ______________ our tent while we were swimming.',
+          q: 'We realised that someone ______________ our picnic basket while we were flying kites.',
           choices: ['takes', 'took', 'has taken', 'had taken'],
           answer: 'had taken',
           skill: 'pastPerfect',
           practiseTarget: 'grammar-mcq',
-          explain: 'The discovering happened in the past ("discovered"); the taking happened even earlier — use past perfect "had taken".',
+          explain: 'The realising happened in the past ("realised"); the taking happened even earlier — use past perfect "had taken".',
         },
         {
-          q: 'The team played well, ______________ they lost the match in the end.',
+          q: 'The choir sang beautifully, ______________ they missed the top prize in the end.',
           choices: ['so', 'because', 'although', 'unless'],
           answer: 'although',
           skill: 'connectors',
           practiseTarget: 'grammar-mcq',
-          explain: '"Although" introduces a contrast — playing well but still losing is unexpected.',
+          explain: '"Although" introduces a contrast — singing beautifully but still missing the prize is unexpected.',
         },
         {
-          q: '______________ his fear of heights, Kevin climbed to the top of the observation tower.',
+          q: '______________ her fear of water, Lina completed the kayaking course.',
           choices: ['Although', 'Despite', 'Unless', 'Provided that'],
           answer: 'Despite',
           skill: 'connectors',
           practiseTarget: 'grammar-mcq',
-          explain: '"Despite" is followed by a noun phrase ("his fear of heights"), not a clause. "Although" needs a full clause.',
+          explain: '"Despite" is followed by a noun phrase ("her fear of water"), not a clause. "Although" needs a full clause.',
         },
         {
-          q: 'The exhibition will be cancelled ______________ at least fifty tickets are sold.',
+          q: 'The fun fair will be called off ______________ at least a hundred tickets are sold.',
           choices: ['if', 'although', 'unless', 'despite'],
           answer: 'unless',
           skill: 'connectors',
           practiseTarget: 'grammar-mcq',
-          explain: '"Unless" means "if not" — the exhibition will be cancelled if the condition (fifty tickets sold) is not met.',
+          explain: '"Unless" means "if not" — the fair will be called off if the condition (a hundred tickets sold) is not met.',
         },
         {
-          q: 'Not only ______________ she finish first in the race, but she also broke the school record.',
+          q: 'Not only ______________ she top the level in Mathematics, but she also won the art prize.',
           choices: ['she did', 'did she', 'she has', 'has she'],
           answer: 'did she',
           skill: 'connectors',
@@ -777,23 +779,23 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"Not only … but also" requires subject-auxiliary inversion in the first clause: "Not only did she …".',
         },
         {
-          q: 'The students ______________ their experiment twice before they got a clear result.',
+          q: 'The scouts ______________ their knot drill twice before they finally passed the test.',
           choices: ['repeat', 'had repeated', 'have repeated', 'repeated'],
           answer: 'had repeated',
           skill: 'pastPerfect',
           practiseTarget: 'grammar-mcq',
-          explain: 'The repeating happened before they got the result — use past perfect "had repeated".',
+          explain: 'The repeating happened before they passed — use past perfect "had repeated".',
         },
         {
-          q: '______________ tired after the hike, the children still helped set up camp.',
+          q: '______________ soaked after the storm, the campers still pitched the tents.',
           choices: ['Despite being', 'Although being', 'Unless being', 'Even though'],
           answer: 'Despite being',
           skill: 'relativeClauses',
           practiseTarget: 'grammar-mcq',
-          explain: '"Despite + -ing" is a participial phrase showing contrast — the children were tired but still helped.',
+          explain: '"Despite + -ing" is a participial phrase showing contrast — the campers were soaked but still helped.',
         },
         {
-          q: 'You may use the equipment ______________ you handle it with care.',
+          q: 'You may borrow the telescope ______________ you handle it with care.',
           choices: ['although', 'unless', 'provided that', 'despite'],
           answer: 'provided that',
           skill: 'connectors',
@@ -801,12 +803,12 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"Provided that" sets a condition for permission — "you can use it on condition that you are careful".',
         },
         {
-          q: 'Not only ______________ the weather terrible, but the roads were also flooded.',
+          q: 'Not only ______________ the queue endless, but the car park was also full.',
           choices: ['was', 'is', 'were', 'had'],
           answer: 'was',
           skill: 'connectors',
           practiseTarget: 'grammar-mcq',
-          explain: 'With "Not only … but also" inversion, the auxiliary must agree with the subject "the weather" (singular past) → "was".',
+          explain: 'With "Not only … but also" inversion, the auxiliary must agree with the subject "the queue" (singular past) → "was".',
         },
       ],
     },
@@ -817,23 +819,23 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Choose the word that best fits the meaning of each sentence.',
       items: [
         {
-          q: 'The lawyer spoke in a low, steady voice, never once raising it. She was completely ______________ throughout the questioning.',
+          q: 'The surgeon spoke in a low, steady voice, never once hurrying. She remained completely ______________ throughout the operation.',
           choices: ['bold', 'composed', 'timid', 'enthusiastic'],
           answer: 'composed',
           skill: 'synonymContrast',
           practiseTarget: 'vocab-mcq',
-          explain: '"Composed" means calm and in control of one\'s emotions — fits "low, steady voice" and "never once raising it".',
+          explain: '"Composed" means calm and in control of one\'s emotions — fits "low, steady voice" and "never once hurrying".',
         },
         {
-          q: 'The athlete ______________ a new world record at the championship last month.',
+          q: 'The sprinter ______________ a new national record at the trials last month.',
           choices: ['made', 'broke', 'set', 'did'],
           answer: 'set',
           skill: 'collocationCloze',
           practiseTarget: 'vocab-mcq',
-          explain: '"Set a record" is the correct collocation — you "set" a new record (though "broke" fits for surpassing an existing one; here "new world record" makes "set" the best choice).',
+          explain: '"Set a record" is the correct collocation — you "set" a new record (though "broke" fits for surpassing an existing one; here "new national record" makes "set" the best choice).',
         },
         {
-          q: 'After the argument, Daniel realised he had acted too hastily. He decided to ______________ the hatchet and apologise.',
+          q: 'After the quarrel, Imran realised he had spoken too harshly. He decided to ______________ the hatchet and apologise.',
           choices: ['dig up', 'bury', 'drop', 'raise'],
           answer: 'bury',
           skill: 'idiomaticExpressions',
@@ -841,7 +843,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"Bury the hatchet" is an idiom meaning to end a quarrel and make peace.',
         },
         {
-          q: 'The speech was delivered with great ______________, moving many in the audience to tears.',
+          q: 'The farewell song was performed with great ______________, moving many teachers to tears.',
           choices: ['emote', 'emotion', 'emotional', 'emotionally'],
           answer: 'emotion',
           skill: 'morphologicalAffix',
@@ -865,11 +867,11 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in the blanks with a suitable word from the box. Each word may only be used once. There is one extra word that you will not need.',
       wordBank: ['had', 'already', 'despite', 'although', 'since', 'yet'],
       text:
-        'Mei Lin had been looking forward to the school Art Competition for weeks. By the day of the event, she {{1}} prepared three paintings, each one more detailed than the last. ' +
-        '{{2}} her hard work, she felt nervous as she set up her display. ' +
-        'She {{3}} not seen any of her competitors\' work. When she finally did, she was impressed — everyone had produced something beautiful. ' +
-        '{{4}} the other entries were stunning, Mei Lin reminded herself to focus on her own best effort. ' +
-        'The judges {{5}} spent thirty minutes studying each painting before making their decision.',
+        'Jia Hui had been looking forward to the school Science Fair for weeks. By the day of the event, she {{1}} built three working models, each one more intricate than the last. ' +
+        '{{2}} her careful preparation, she felt jittery as she set up her booth. ' +
+        'She {{3}} not seen any of her competitors\' projects. When she finally did, she was impressed — everyone had created something clever. ' +
+        '{{4}} the other booths were dazzling, Jia Hui reminded herself to focus on presenting her own best work. ' +
+        'The judges {{5}} spent twenty minutes questioning each participant before making their decision.',
       answers: ['had', 'Despite', 'had', 'Although', 'had'],
       leftOver: ['already', 'since', 'yet'],
       skill: 'pastPerfect',
@@ -882,11 +884,11 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in the blanks with a suitable word from the box. Each word may only be used once. There is one extra word that you will not need.',
       wordBank: ['approached', 'hesitantly', 'rival', 'genuine', 'admired', 'sceptical'],
       text:
-        'During the competition, a girl named Shu Fen {{1}} Mei Lin\'s display and studied it closely. ' +
-        'Mei Lin expected a cold comment from her {{2}}, but instead Shu Fen smiled warmly. ' +
-        '"Your brushwork on the koi fish is amazing," Shu Fen said, and she sounded {{3}}. ' +
-        'Mei Lin {{4}} replied with a "thank you". She had not expected such kindness. ' +
-        'By the end of the day, the two girls had {{5}} each other\'s work and discovered how much they had in common.',
+        'During the fair, a boy named Ren Jun {{1}} Jia Hui\'s booth and studied her wind turbine closely. ' +
+        'Jia Hui braced herself for a mocking remark from her {{2}}, but instead Ren Jun grinned warmly. ' +
+        '"Your gear design is brilliant," Ren Jun said, and he sounded {{3}}. ' +
+        'Jia Hui {{4}} replied with a "thank you". She had not expected such warmth. ' +
+        'By the end of the day, the two had {{5}} each other\'s projects and discovered how much they had in common.',
       answers: ['approached', 'rival', 'genuine', 'hesitantly', 'admired'],
       leftOver: ['sceptical'],
       skill: 'contextInference',
@@ -898,13 +900,13 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       marks: 5,
       instructions: 'Each underlined word contains a spelling or grammar mistake. A circle (○) shows a missing or wrong punctuation mark. Write the correct word or punctuation mark in the space provided.',
       paragraph:
-        'Mei Lin {{1:suprised}} everyone at the Art Competition by winning the top prize. Before the winners were {{2:announce}}, ' +
-        'she {{3:has}} already packed her paintings, thinking she had not done well enough. ' +
+        'Jia Hui {{1:suprised}} everyone at the Science Fair by clinching the top award. Before the winners were {{2:announce}}, ' +
+        'she {{3:has}} already dismantled part of her booth, thinking she had not done well enough. ' +
         'When her name was called{{4:o}} she gasped in {{5:disbeleif}} and had to be nudged by her friend to walk up to the stage.',
       errors: [
         { num: 1, kind: 'spelling', wrong: 'suprised', correction: 'surprised', explain: '"Surprised" is the correct spelling — the prefix is "sur-", not "sup-".' },
         { num: 2, kind: 'grammar', wrong: 'announce', correction: 'announced', explain: '"Were announced" requires the past participle form "announced" to form the passive voice.' },
-        { num: 3, kind: 'grammar', wrong: 'has', correction: 'had', explain: 'The packing happened before the announcement — use past perfect "had (already packed)".' },
+        { num: 3, kind: 'grammar', wrong: 'has', correction: 'had', explain: 'The dismantling happened before the announcement — use past perfect "had (already dismantled)".' },
         { num: 4, kind: 'punctuation', wrong: '', correction: ',', explain: 'A comma is needed after the time clause "When her name was called" before the main clause.' },
         { num: 5, kind: 'spelling', wrong: 'disbeleif', correction: 'disbelief', explain: '"Disbelief" is the correct spelling — prefix "dis-" + "belief".' },
       ],
@@ -916,44 +918,44 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'For each question, rewrite the sentence(s) using the given word(s). Do not change the meaning.',
       items: [
         {
-          q: 'The team lost the match. They had practised for months.\nUse: although',
+          q: 'The band lost the contest. They had rehearsed for months.\nUse: although',
           stem: 'Although',
-          answer: 'Although the team had practised for months, they lost the match.',
-          alternates: ['The team lost the match although they had practised for months.'],
+          answer: 'Although the band had rehearsed for months, they lost the contest.',
+          alternates: ['The band lost the contest although they had rehearsed for months.'],
           skill: 'connectors',
-          explain: '"Although" introduces the unexpected contrast — hard practice but still a loss.',
+          explain: '"Although" introduces the unexpected contrast — hard rehearsal but still a loss.',
         },
         {
-          q: 'Shu Fen is a talented artist. She is also a dedicated volunteer.\nUse: not only … but also',
+          q: 'Ren Jun is a gifted inventor. He is also a patient mentor.\nUse: not only … but also',
           stem: 'Not only is',
-          answer: 'Not only is Shu Fen a talented artist, but she is also a dedicated volunteer.',
-          alternates: ['Shu Fen is not only a talented artist but also a dedicated volunteer.'],
+          answer: 'Not only is Ren Jun a gifted inventor, but he is also a patient mentor.',
+          alternates: ['Ren Jun is not only a gifted inventor but also a patient mentor.'],
           skill: 'connectors',
-          explain: '"Not only … but also" pairs two qualities. With fronting, inversion is required: "Not only is Shu Fen…".',
+          explain: '"Not only … but also" pairs two qualities. With fronting, inversion is required: "Not only is Ren Jun…".',
         },
         {
-          q: 'Mei Lin had eaten her lunch. She then went to the art room.\nUse: after',
+          q: 'Jia Hui had packed her tools. She then left the hall.\nUse: after',
           stem: 'After',
-          answer: 'After Mei Lin had eaten her lunch, she went to the art room.',
-          alternates: ['After she had eaten her lunch, Mei Lin went to the art room.'],
+          answer: 'After Jia Hui had packed her tools, she left the hall.',
+          alternates: ['After she had packed her tools, Jia Hui left the hall.'],
           skill: 'pastPerfect',
-          explain: '"After + past perfect" correctly sequences the two past events — eating came before going to the art room.',
+          explain: '"After + past perfect" correctly sequences the two past events — packing came before leaving the hall.',
         },
         {
-          q: 'The shop will close early. This is the case unless there are many customers.\nUse: unless',
-          stem: 'The shop will close early',
-          answer: 'The shop will close early unless there are many customers.',
+          q: 'The kiosk will close early. This is the case unless there are many visitors.\nUse: unless',
+          stem: 'The kiosk will close early',
+          answer: 'The kiosk will close early unless there are many visitors.',
           alternates: [],
           skill: 'connectors',
-          explain: '"Unless" means "except if" — the shop closes early except in the case of many customers.',
+          explain: '"Unless" means "except if" — the kiosk closes early except in the case of many visitors.',
         },
         {
-          q: 'The children were tired. They did not give up.\nUse: despite',
+          q: 'The hikers were hungry. They did not stop walking.\nUse: despite',
           stem: 'Despite',
-          answer: 'Despite being tired, the children did not give up.',
-          alternates: ['Despite their tiredness, the children did not give up.'],
+          answer: 'Despite being hungry, the hikers did not stop walking.',
+          alternates: ['Despite their hunger, the hikers did not stop walking.'],
           skill: 'connectors',
-          explain: '"Despite + noun / -ing phrase" contrasts tiredness with perseverance — no clause follows "despite".',
+          explain: '"Despite + noun / -ing phrase" contrasts hunger with perseverance — no clause follows "despite".',
         },
       ],
     },
@@ -962,59 +964,59 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       title: 'Section G: Comprehension',
       marks: 20,
       passage:
-        'The school hall buzzed with excitement on the day of the Art Competition. More than a hundred paintings, sculptures and digital prints were on display, each one the result of weeks of effort and imagination.\n\n' +
-        'Twelve-year-old Mei Lin had entered three oil paintings inspired by the rivers and kampungs of old Singapore. She had worked on them every evening for a month, sometimes staying up past midnight to get the brushstrokes just right. Despite her hard work, she felt a knot of anxiety in her stomach as she saw the quality of the other entries.\n\n' +
-        'It was then that she noticed Shu Fen, a girl from another class whom she had always considered a rival. Shu Fen walked up to Mei Lin\'s display, studied it for a long moment, and said, "These are really beautiful. The way you\'ve captured the light on the water — it looks almost real."\n\n' +
-        'Mei Lin was taken aback. She had expected criticism, not a compliment. "Thank you," she managed. "I like your charcoal portraits too. How did you get the shadows so accurate?"\n\n' +
-        'The two girls talked for half an hour, exchanging tips and admiring each other\'s techniques. By the time the judges announced the results — Mei Lin first place, Shu Fen second — the rivalry felt like a distant memory.\n\n' +
-        '"Art should bring people together, not apart," said the guest judge, a well-known local artist. "Today, I saw exactly that." Mei Lin caught Shu Fen\'s eye across the crowded hall, and both girls smiled.',
+        'The school hall hummed with energy on the day of the Science Fair. More than eighty projects — working models, posters and experiments — filled the tables, each one the product of weeks of tinkering and testing.\n\n' +
+        'Eleven-year-old Jia Hui had entered three working models inspired by clean energy: a wind turbine, a solar oven and a water wheel. She had worked on them every evening for a month, sometimes staying up past midnight to sand and rewire the parts. Despite her preparation, she felt a knot of anxiety in her stomach when she saw the standard of the other booths.\n\n' +
+        'It was then that she noticed Ren Jun, a boy from another class whom she had always considered a rival. Ren Jun walked up to Jia Hui\'s booth, studied her turbine for a long moment, and said, "This is really impressive. The way you\'ve balanced the blades — it spins so smoothly."\n\n' +
+        'Jia Hui was taken aback. She had expected criticism, not a compliment. "Thank you," she managed. "I like your volcano model too. How did you time the eruption so perfectly?"\n\n' +
+        'The two talked for half an hour, exchanging tips and admiring each other\'s designs. By the time the judges announced the results — Jia Hui first place, Ren Jun second — the rivalry felt like a distant memory.\n\n' +
+        '"Science should spark curiosity, not jealousy," said the guest judge, a university professor. "Today, I saw exactly that." Jia Hui caught Ren Jun\'s eye across the crowded hall, and both of them smiled.',
       questions: [
         {
           type: 'mcq',
           marks: 2,
-          q: 'What kinds of artwork were on display at the competition?',
+          q: 'What kinds of projects were on display at the fair?',
           choices: [
-            'Paintings and photographs only.',
-            'Paintings, sculptures and digital prints.',
-            'Oil paintings, charcoal portraits and watercolours.',
-            'Digital prints and sculptures only.',
+            'Working models and photographs only.',
+            'Working models, posters and experiments.',
+            'Wind turbines, volcanoes and posters only.',
+            'Posters and experiments only.',
           ],
-          answer: 'Paintings, sculptures and digital prints.',
-          explain: 'Paragraph 1 lists "paintings, sculptures and digital prints" as the types of artwork on display.',
+          answer: 'Working models, posters and experiments.',
+          explain: 'Paragraph 1 lists "working models, posters and experiments" as the types of projects on display.',
         },
         {
           type: 'mcq',
           marks: 2,
-          q: 'Why did Mei Lin feel anxious despite working hard on her paintings?',
+          q: 'Why did Jia Hui feel anxious despite working hard on her models?',
           choices: [
-            'She had not finished her third painting in time.',
+            'She had not finished her third model in time.',
             'She did not like the judges who were present.',
-            'She saw that the other entries were also of high quality.',
-            'She could not find a good spot to display her work.',
+            'She saw that the other booths were also of a high standard.',
+            'She could not find a good spot to set up her booth.',
           ],
-          answer: 'She saw that the other entries were also of high quality.',
-          explain: 'Paragraph 2 says she felt anxious "as she saw the quality of the other entries".',
+          answer: 'She saw that the other booths were also of a high standard.',
+          explain: 'Paragraph 2 says she felt anxious "when she saw the standard of the other booths".',
         },
         {
           type: 'short',
           marks: 2,
-          q: 'What inspired Mei Lin\'s three oil paintings?',
-          model: 'Her paintings were inspired by the rivers and kampungs of old Singapore.',
-          keywords: ['rivers', 'kampungs', 'old Singapore'],
+          q: 'What inspired Jia Hui\'s three working models?',
+          model: 'Her models were inspired by clean energy — a wind turbine, a solar oven and a water wheel.',
+          keywords: ['clean energy', 'turbine', 'solar'],
         },
         {
           type: 'short',
           marks: 2,
-          q: 'How do you know that Mei Lin was surprised by Shu Fen\'s words? Give two details from the passage.',
+          q: 'How do you know that Jia Hui was surprised by Ren Jun\'s words? Give two details from the passage.',
           model: 'She was "taken aback" and she had expected criticism, not a compliment. She also only "managed" a brief reply, showing she was not expecting kindness.',
           keywords: ['taken aback', 'criticism', 'compliment', 'managed'],
         },
         {
           type: 'short',
           marks: 2,
-          q: 'What did the two girls talk about for half an hour?',
-          model: 'They exchanged tips and admired each other\'s techniques.',
-          keywords: ['tips', 'techniques', 'admired'],
+          q: 'What did the two pupils talk about for half an hour?',
+          model: 'They exchanged tips and admired each other\'s designs.',
+          keywords: ['tips', 'designs', 'admired'],
         },
         {
           type: 'vocab',
@@ -1033,16 +1035,16 @@ export const P4_PRACTICE_TESTS = Object.freeze({
         {
           type: 'tf-reason',
           marks: 2,
-          statement: 'Mei Lin and Shu Fen were friendly towards each other before the competition.',
+          statement: 'Jia Hui and Ren Jun were friendly towards each other before the fair.',
           answer: 'False',
-          reason: 'Paragraph 3 says Mei Lin had "always considered" Shu Fen "a rival", suggesting they were competitors, not friends, before the event.',
+          reason: 'Paragraph 3 says Jia Hui had "always considered" Ren Jun "a rival", suggesting they were competitors, not friends, before the event.',
         },
         {
           type: 'open',
           marks: 6,
-          q: 'The guest judge said "Art should bring people together, not apart." Do you agree? Use examples from the passage and your own experience to support your answer.',
-          model: 'I agree with the judge. In the passage, the competition brought Mei Lin and Shu Fen together — what started as a rivalry ended in friendship as they shared tips and admired each other\'s work. In real life, art classes and exhibitions also allow people of different backgrounds to connect through a shared love of creativity. When people appreciate the same artwork, they find common ground and build understanding.',
-          keywords: ['rivalry', 'friendship', 'connect', 'common', 'share', 'creativity'],
+          q: 'The guest judge said "Science should spark curiosity, not jealousy." Do you agree? Use examples from the passage and your own experience to support your answer.',
+          model: 'I agree with the judge. In the passage, the fair brought Jia Hui and Ren Jun together — what started as a rivalry ended in friendship as they shared tips and admired each other\'s designs. In real life, science clubs and fairs also let people of different backgrounds connect through a shared sense of wonder. When people puzzle over the same question, they find common ground and build understanding.',
+          keywords: ['rivalry', 'friendship', 'connect', 'common', 'share', 'curiosity'],
         },
       ],
     },
@@ -1058,7 +1060,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
     label: 'Term 4 Practice Test 4',
     duration: '1 h 10 min',
     totalMarks: 55,
-    blurb: 'P4 Term 4 review paper — covers all P4 skills: passive voice, reported speech, past perfect, conditionals, modals, connectors and relative clauses. Comprehension passage about a sports day that tests resilience and teamwork.',
+    blurb: 'P4 Term 4 review paper — covers all P4 skills: passive voice, reported speech, past perfect, conditionals, modals, connectors and relative clauses. Comprehension passage about a games carnival that tests resilience and teamwork.',
 
     sectionA: {
       title: 'Section A: Grammar MCQ',
@@ -1066,15 +1068,15 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Choose the best answer and write its letter in the brackets provided.',
       items: [
         {
-          q: 'The announcement ______________ before we reached the hall.',
+          q: 'The results ______________ before we reached the noticeboard.',
           choices: ['was made', 'had been made', 'has been made', 'is made'],
           answer: 'had been made',
           skill: 'pastPerfect',
           practiseTarget: 'grammar-mcq',
-          explain: 'The announcement happened before we reached the hall — use past perfect passive "had been made".',
+          explain: 'The results were released before we reached the noticeboard — use past perfect passive "had been made".',
         },
         {
-          q: 'Ahmad reported that the fire ______________ under control.',
+          q: 'Siti reported that the situation ______________ under control.',
           choices: ['is', 'will be', 'has been', 'was'],
           answer: 'was',
           skill: 'reportedSpeech',
@@ -1082,15 +1084,15 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: 'In reported speech, present simple "is" shifts to past simple "was".',
         },
         {
-          q: 'The documentary ______________ by a famous director and has won many awards.',
+          q: 'The short film ______________ by a local director and has won several awards.',
           choices: ['directs', 'directed', 'was directed', 'is directing'],
           answer: 'was directed',
           skill: 'passiveVoice',
           practiseTarget: 'grammar-mcq',
-          explain: 'The documentary receives the action of directing — past passive "was directed" is correct.',
+          explain: 'The short film receives the action of directing — past passive "was directed" is correct.',
         },
         {
-          q: 'If the bus ______________ on time, we will miss the first part of the performance.',
+          q: 'If the train ______________ on time, we will miss the opening ceremony.',
           choices: ['does not come', 'did not come', 'will not come', 'had not come'],
           answer: 'does not come',
           skill: 'conditionals',
@@ -1098,39 +1100,39 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: 'Type 1 conditional: "if + present simple (does not come), will + base verb".',
         },
         {
-          q: 'The coach ______________ the players that they ought to give their best in the final.',
+          q: 'The captain ______________ the players that they ought to stay focused in the final.',
           choices: ['tells', 'told', 'has told', 'is telling'],
           answer: 'told',
           skill: 'reportedSpeech',
           practiseTarget: 'grammar-mcq',
-          explain: 'The reporting verb "told" is past simple, indicating the coach\'s speech happened in the past.',
+          explain: 'The reporting verb "told" is past simple, indicating the captain\'s speech happened in the past.',
         },
         {
-          q: 'The athlete ______________ all her rivals by the time she reached the finishing line.',
+          q: 'The cyclist ______________ all her rivals by the time she reached the final bend.',
           choices: ['overtakes', 'overtook', 'had overtaken', 'was overtaking'],
           answer: 'had overtaken',
           skill: 'pastPerfect',
           practiseTarget: 'grammar-mcq',
-          explain: 'Overtaking happened before reaching the finishing line — use past perfect "had overtaken".',
+          explain: 'Overtaking happened before reaching the final bend — use past perfect "had overtaken".',
         },
         {
-          q: 'The new library is the building ______________ was opened by the mayor last month.',
+          q: 'The new hall is the building ______________ was opened by the minister last month.',
           choices: ['who', 'whom', 'whose', 'that'],
           answer: 'that',
           skill: 'relativeClauses',
           practiseTarget: 'grammar-mcq',
-          explain: '"That" introduces a relative clause for things — the building was opened by the mayor.',
+          explain: '"That" introduces a relative clause for things — the building was opened by the minister.',
         },
         {
-          q: 'You ______________ bring an umbrella — the sky is very cloudy today.',
+          q: 'You ______________ carry a raincoat — the clouds look heavy today.',
           choices: ['ought not to', 'should', 'need not', 'must not'],
           answer: 'should',
           skill: 'modals',
           practiseTarget: 'grammar-mcq',
-          explain: '"Should" gives advice — bringing an umbrella is advisable given the cloudy sky.',
+          explain: '"Should" gives advice — carrying a raincoat is advisable given the heavy clouds.',
         },
         {
-          q: 'Not only ______________ the students complete the project early, but they also helped their classmates.',
+          q: 'Not only ______________ the scouts finish the trail early, but they also helped the younger group.',
           choices: ['they did', 'did they', 'have they', 'they had'],
           answer: 'did they',
           skill: 'connectors',
@@ -1138,12 +1140,12 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"Not only … but also" with fronting requires subject-auxiliary inversion: "Not only did they …".',
         },
         {
-          q: 'The twins, ______________ parents are both doctors, want to study medicine too.',
+          q: 'The sisters, ______________ parents are both chefs, want to open a café too.',
           choices: ['who', 'whom', 'whose', 'which'],
           answer: 'whose',
           skill: 'relativeClauses',
           practiseTarget: 'grammar-mcq',
-          explain: '"Whose" shows that the parents belong to the twins — possession by a person.',
+          explain: '"Whose" shows that the parents belong to the sisters — possession by a person.',
         },
       ],
     },
@@ -1154,15 +1156,15 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Choose the word that best fits the meaning of each sentence.',
       items: [
         {
-          q: 'The rescue team ______________ through the rubble for hours, searching for survivors.',
+          q: 'The volunteers ______________ through the cluttered storeroom for hours, searching for the old trophies.',
           choices: ['wandered', 'rummaged', 'strolled', 'crept'],
           answer: 'rummaged',
           skill: 'synonymContrast',
           practiseTarget: 'vocab-mcq',
-          explain: '"Rummaged" means searched thoroughly by moving things around — fits "searching through rubble".',
+          explain: '"Rummaged" means searched thoroughly by moving things around — fits digging through a cluttered storeroom.',
         },
         {
-          q: 'The children ______________ a decision after a long discussion.',
+          q: 'The committee ______________ a decision after a lengthy discussion.',
           choices: ['made', 'took', 'did', 'got'],
           answer: 'made',
           skill: 'collocationCloze',
@@ -1170,7 +1172,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"Make a decision" is the correct collocation in English.',
         },
         {
-          q: 'After studying so hard this term, Leon felt he had finally ______________ his stride.',
+          q: 'After weeks of daily practice, Devi felt she had finally ______________ her stride.',
           choices: ['found', 'hit', 'caught', 'made'],
           answer: 'hit',
           skill: 'idiomaticExpressions',
@@ -1178,7 +1180,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"Hit one\'s stride" means to reach a level of comfortable confidence or efficiency — "hit" is the correct verb.',
         },
         {
-          q: 'The scientist\'s explanation was clear and ______________, making it easy for everyone to understand.',
+          q: 'The instructor\'s directions were clear and ______________, making the drill easy for everyone to follow.',
           choices: ['comprehend', 'comprehended', 'comprehensible', 'comprehension'],
           answer: 'comprehensible',
           skill: 'morphologicalAffix',
@@ -1186,7 +1188,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"Comprehensible" is the adjective form meaning "able to be understood" — needed here to describe the explanation.',
         },
         {
-          q: 'The word "persevered" in paragraph 3 tells us that the athlete ______________ .',
+          q: 'The word "persevered" in paragraph 3 tells us that the swimmer ______________ .',
           choices: ['gave up quickly', 'kept trying despite difficulties', 'won without any effort', 'stopped before the end'],
           answer: 'kept trying despite difficulties',
           skill: 'contextInference',
@@ -1202,11 +1204,11 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in the blanks with a suitable word from the box. Each word may only be used once. There is one extra word that you will not need.',
       wordBank: ['had', 'would', 'although', 'despite', 'been', 'if'],
       text:
-        'The school Sports Day {{1}} been postponed twice due to the haze earlier in the year. ' +
-        'When the day finally arrived, the students were thrilled, {{2}} they knew the competition ahead would be tough. ' +
-        'Marcus {{3}} trained every morning for six weeks and was determined to do his best in the relay race. ' +
-        'He told his teammates that he {{4}} run as fast as he could for their sake. ' +
-        '{{5}} the pressure, the team stayed calm and focused at the starting line.',
+        'The school Games Carnival {{1}} been postponed twice due to the wet weather earlier in the term. ' +
+        'When the day finally arrived, the pupils were overjoyed, {{2}} they knew the events ahead would be demanding. ' +
+        'Danish {{3}} trained every morning for two months and was determined to give his all in the sprint relay. ' +
+        'He told his teammates that he {{4}} run flat out for their sake. ' +
+        '{{5}} the pressure, the team stayed calm and composed at the starting line.',
       answers: ['had', 'although', 'had', 'would', 'Despite'],
       leftOver: ['been', 'if'],
       skill: 'pastPerfect',
@@ -1219,11 +1221,11 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in the blanks with a suitable word from the box. Each word may only be used once. There is one extra word that you will not need.',
       wordBank: ['thunderous', 'surged', 'agony', 'collapsed', 'endure', 'triumph'],
       text:
-        'As Marcus ran the final leg of the relay, a wave of {{1}} applause rose from the crowd. ' +
-        'He pushed through the pain in his legs, refusing to let the {{2}} slow him down. ' +
-        'The energy from the cheering crowd {{3}} through him like electricity. ' +
-        'He crossed the finishing line just ahead of his nearest competitor. ' +
-        'In that moment of {{4}}, Marcus\'s legs finally {{5}} beneath him with exhaustion and he sank onto the track, gasping for breath.',
+        'As Danish ran the anchor leg of the relay, a wave of {{1}} cheering rolled down from the stands. ' +
+        'He powered through the burning in his calves, refusing to let the {{2}} slow his stride. ' +
+        'The roar of the crowd {{3}} through him like electricity. ' +
+        'He lunged across the line a step ahead of his nearest rival. ' +
+        'In that moment of {{4}}, Danish\'s legs finally {{5}} beneath him with exhaustion and he sank onto the track, gulping for air.',
       answers: ['thunderous', 'agony', 'surged', 'triumph', 'collapsed'],
       leftOver: ['endure'],
       skill: 'contextInference',
@@ -1235,15 +1237,15 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       marks: 5,
       instructions: 'Each underlined word contains a spelling or grammar mistake. A circle (○) shows a missing or wrong punctuation mark. Write the correct word or punctuation mark in the space provided.',
       paragraph:
-        'The school had {{1:prepaired}} for Sports Day by painting new lines on the track and {{2:set}} up the equipment the previous day. ' +
-        'By the time the students arrived{{3:o}} everything was ready. ' +
-        'The principal, {{4:who}} speech was short but inspiring, reminded everyone to play fair. ' +
-        'Marcus told his teammates that they must give their {{5:upmost}} effort in every event.',
+        'The school had {{1:prepaired}} for the Games Carnival by marking fresh lanes on the track and {{2:set}} up the tentage the evening before. ' +
+        'By the time the pupils streamed in{{3:o}} everything was ready. ' +
+        'The vice-principal, {{4:who}} speech was brief but rousing, reminded everyone to compete graciously. ' +
+        'Danish told his teammates that they must give their {{5:upmost}} effort in every event.',
       errors: [
         { num: 1, kind: 'spelling', wrong: 'prepaired', correction: 'prepared', explain: '"Prepared" is the correct spelling — from the verb "prepare" + "-d"; no doubling of the final consonant.' },
-        { num: 2, kind: 'grammar', wrong: 'set', correction: 'setting', explain: 'The gerund "setting" is needed to parallel "painting" in the structure "by painting … and setting up".' },
-        { num: 3, kind: 'punctuation', wrong: '', correction: ',', explain: 'A comma is needed after the time clause "By the time the students arrived" before the main clause.' },
-        { num: 4, kind: 'grammar', wrong: 'who', correction: 'whose', explain: '"Whose speech" shows possession — the speech belongs to the principal, so "whose" is correct.' },
+        { num: 2, kind: 'grammar', wrong: 'set', correction: 'setting', explain: 'The gerund "setting" is needed to parallel "marking" in the structure "by marking … and setting up".' },
+        { num: 3, kind: 'punctuation', wrong: '', correction: ',', explain: 'A comma is needed after the time clause "By the time the pupils streamed in" before the main clause.' },
+        { num: 4, kind: 'grammar', wrong: 'who', correction: 'whose', explain: '"Whose speech" shows possession — the speech belongs to the vice-principal, so "whose" is correct.' },
         { num: 5, kind: 'spelling', wrong: 'upmost', correction: 'utmost', explain: '"Utmost" (meaning greatest) is the correct word — "upmost" means "highest in position" and is not the intended meaning here.' },
       ],
     },
@@ -1254,42 +1256,42 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'For each question, rewrite the sentence(s) using the given word(s). Do not change the meaning.',
       items: [
         {
-          q: '"We have done our best," Marcus told the team after the race.\nBegin with: Marcus told the team that …',
-          stem: 'Marcus told the team that',
-          answer: 'Marcus told the team that they had done their best.',
+          q: '"We have given our all," Danish told the team after the race.\nBegin with: Danish told the team that …',
+          stem: 'Danish told the team that',
+          answer: 'Danish told the team that they had given their all.',
           alternates: [],
           skill: 'reportedSpeech',
-          explain: '"We" → "they", "have done" (present perfect) → "had done" (past perfect) in reported speech.',
+          explain: '"We" → "they", "have given" (present perfect) → "had given" (past perfect) in reported speech.',
         },
         {
-          q: 'The trophy was heavy. Marcus could barely lift it.\nUse: so … that',
-          stem: 'The trophy was so heavy',
-          answer: 'The trophy was so heavy that Marcus could barely lift it.',
+          q: 'The medal box was heavy. Danish could barely carry it.\nUse: so … that',
+          stem: 'The medal box was so heavy',
+          answer: 'The medal box was so heavy that Danish could barely carry it.',
           alternates: [],
           skill: 'connectors',
-          explain: '"So + adjective + that" expresses a degree or result — the trophy\'s heaviness caused Marcus to barely manage.',
+          explain: '"So + adjective + that" expresses a degree or result — the box\'s heaviness caused Danish to barely manage.',
         },
         {
-          q: 'The games master organised the event. He has worked here for ten years.\nUse: who',
+          q: 'The games master planned the carnival. He has served here for ten years.\nUse: who',
           stem: 'The games master',
-          answer: 'The games master who has worked here for ten years organised the event.',
-          alternates: ['The games master, who has worked here for ten years, organised the event.'],
+          answer: 'The games master who has served here for ten years planned the carnival.',
+          alternates: ['The games master, who has served here for ten years, planned the carnival.'],
           skill: 'relativeClauses',
           explain: '"Who" introduces a relative clause giving information about the games master (a person).',
         },
         {
-          q: 'The referees checked the video recordings. Only then did they make their final decision.\nUse: before',
-          stem: 'The referees checked the video recordings before',
-          answer: 'The referees checked the video recordings before they made their final decision.',
-          alternates: ['The referees checked the video recordings before making their final decision.'],
+          q: 'The judges reviewed the photo finish. Only then did they confirm the winner.\nUse: before',
+          stem: 'The judges reviewed the photo finish before',
+          answer: 'The judges reviewed the photo finish before they confirmed the winner.',
+          alternates: ['The judges reviewed the photo finish before confirming the winner.'],
           skill: 'pastPerfect',
-          explain: '"Before" sequences two events — checking happened before the decision was made.',
+          explain: '"Before" sequences two events — reviewing happened before the winner was confirmed.',
         },
         {
-          q: 'The swim team did not win the trophy. They still celebrated their personal bests.\nUse: although',
+          q: 'The netball team did not lift the cup. They still celebrated their improved scores.\nUse: although',
           stem: 'Although',
-          answer: 'Although the swim team did not win the trophy, they still celebrated their personal bests.',
-          alternates: ['The swim team still celebrated their personal bests although they did not win the trophy.'],
+          answer: 'Although the netball team did not lift the cup, they still celebrated their improved scores.',
+          alternates: ['The netball team still celebrated their improved scores although they did not lift the cup.'],
           skill: 'connectors',
           explain: '"Although" introduces the unexpected contrast — losing but still celebrating is a positive resilience message.',
         },
@@ -1300,57 +1302,57 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       title: 'Section G: Comprehension',
       marks: 20,
       passage:
-        'The sun had barely risen when Marcus laced up his running shoes and headed to the school track. It was Sports Day — the day he had been training for since January. Six weeks of early mornings and burning muscles had led to this moment.\n\n' +
-        'Marcus was the anchor runner of the 4 x 100 m relay team. His job was to receive the baton last and sprint to the finish. Simple in theory, but the pressure was enormous. The previous year, he had dropped the baton during the exchange, costing his team first place. He had replayed that moment in his mind hundreds of times since.\n\n' +
-        '"Don\'t think about last year," his coach, Ms Poh, had told him that morning. "Think about the next ten seconds."\n\n' +
-        'When the starting gun fired, Marcus watched his three teammates run their legs with focus and speed. By the time the baton reached him, his team was in second place. He ran with everything he had — lungs burning, arms pumping. With twenty metres to go, he drew level with the leader. With ten, he pushed ahead.\n\n' +
-        'He crossed the line first. The crowd erupted. Marcus stood at the finish line, hands on his knees, trying to catch his breath. His teammates rushed over and they collapsed into a heap of laughter and exhaustion.\n\n' +
-        '"How did you do it?" his teammate Dinesh shouted above the noise. Marcus glanced at Ms Poh, who gave a quiet nod. "I just thought about the next ten seconds," he grinned.',
+        'The sky was still grey when Danish pulled on his spikes and jogged to the school field. It was the day of the Games Carnival — the day he had been preparing for since the start of the year. Two months of dawn runs and aching legs had brought him to this moment.\n\n' +
+        'Danish was the anchor runner of the 4 x 100 m relay team. His task was to take the baton last and carry it home. Simple on paper, but the weight on his shoulders was heavy. The year before, he had fumbled the baton at the changeover, and his team had lost first place. He had turned that moment over in his head countless times since.\n\n' +
+        '"Forget last year," his coach, Mr Loh, had told him that morning. "Run the race in front of you."\n\n' +
+        'When the whistle blew, Danish watched his three teammates storm around the track with focus and speed. By the time the baton slapped into his palm, his team was lying second. He gave everything he had — chest heaving, legs driving. With twenty metres to go, he drew level with the leader. With ten, he edged in front.\n\n' +
+        'He crossed the line first. The stands erupted. Danish doubled over at the finish, hands on his knees, trying to catch his breath. His teammates rushed over and they collapsed into a heap of laughter and exhaustion.\n\n' +
+        '"How did you do it?" his teammate Kumar shouted above the cheering. Danish glanced at Mr Loh, who gave a quiet nod. "I just ran the race in front of me," he grinned.',
       questions: [
         {
           type: 'mcq',
           marks: 2,
-          q: 'What had cost Marcus\'s team first place the previous year?',
+          q: 'What had cost Danish\'s team first place the previous year?',
           choices: [
-            'Marcus ran too slowly in his leg.',
+            'Danish ran too slowly in his leg.',
             'His teammates were not well prepared.',
-            'Marcus dropped the baton during the exchange.',
+            'Danish fumbled the baton at the changeover.',
             'The team started too late.',
           ],
-          answer: 'Marcus dropped the baton during the exchange.',
-          explain: 'Paragraph 2 says "he had dropped the baton during the exchange, costing his team first place".',
+          answer: 'Danish fumbled the baton at the changeover.',
+          explain: 'Paragraph 2 says "he had fumbled the baton at the changeover, and his team had lost first place".',
         },
         {
           type: 'mcq',
           marks: 2,
-          q: 'What was the purpose of Ms Poh\'s advice to "think about the next ten seconds"?',
+          q: 'What was the purpose of Mr Loh\'s advice to "run the race in front of you"?',
           choices: [
-            'To tell Marcus to run his race in exactly ten seconds.',
-            'To remind Marcus to focus on the present moment instead of past mistakes.',
-            'To warn Marcus that the race would be over in ten seconds.',
-            'To encourage Marcus to start running before the gun fired.',
+            'To tell Danish to run only in the front lane of the track.',
+            'To remind Danish to focus on the present moment instead of past mistakes.',
+            'To warn Danish that the race would be over very quickly.',
+            'To encourage Danish to start running before the whistle blew.',
           ],
-          answer: 'To remind Marcus to focus on the present moment instead of past mistakes.',
-          explain: 'Ms Poh told Marcus not to think about last year — the advice was to stay focused on the immediate task rather than dwelling on his past mistake.',
+          answer: 'To remind Danish to focus on the present moment instead of past mistakes.',
+          explain: 'Mr Loh told Danish to forget last year — the advice was to stay focused on the immediate task rather than dwelling on his past mistake.',
         },
         {
           type: 'short',
           marks: 2,
-          q: 'What was Marcus\'s role in the relay team?',
-          model: 'Marcus was the anchor runner — he received the baton last and sprinted to the finish.',
+          q: 'What was Danish\'s role in the relay team?',
+          model: 'Danish was the anchor runner — he took the baton last and carried it home to the finish.',
           keywords: ['anchor', 'last', 'finish'],
         },
         {
           type: 'short',
           marks: 2,
-          q: 'Describe what happened in the final twenty metres of Marcus\'s race. Give two details.',
-          model: 'With twenty metres to go, Marcus drew level with the leader. With ten metres to go, he pushed ahead and crossed the line first.',
-          keywords: ['drew level', 'pushed ahead', 'first'],
+          q: 'Describe what happened in the final twenty metres of Danish\'s race. Give two details.',
+          model: 'With twenty metres to go, Danish drew level with the leader. With ten metres to go, he edged in front and crossed the line first.',
+          keywords: ['drew level', 'edged in front', 'first'],
         },
         {
           type: 'short',
           marks: 2,
-          q: 'How did Marcus\'s teammates react after he crossed the finishing line?',
+          q: 'How did Danish\'s teammates react after he crossed the finishing line?',
           model: 'They rushed over to him and collapsed into a heap of laughter and exhaustion.',
           keywords: ['rushed', 'collapsed', 'laughter', 'exhaustion'],
         },
@@ -1364,22 +1366,22 @@ export const P4_PRACTICE_TESTS = Object.freeze({
         {
           type: 'vocab',
           marks: 1,
-          q: 'Find a word in paragraph 1 that means "fastened or tied the laces of his shoes".',
-          model: 'laced',
-          keywords: ['laced'],
+          q: 'Find a word in paragraph 1 that means "ran at a slow, steady pace".',
+          model: 'jogged',
+          keywords: ['jogged'],
         },
         {
           type: 'tf-reason',
           marks: 2,
-          statement: 'Marcus had been preparing for Sports Day for only a few weeks.',
+          statement: 'Danish had been preparing for the Games Carnival for only a few days.',
           answer: 'False',
-          reason: 'Paragraph 1 says Marcus had been training "since January" and paragraph 2 mentions "six weeks of early mornings" — his preparation was a sustained effort lasting months, not just a few weeks.',
+          reason: 'Paragraph 1 says Danish had been preparing "since the start of the year" with "two months of dawn runs" — his preparation was a sustained effort lasting months, not days.',
         },
         {
           type: 'open',
           marks: 6,
-          q: 'What do you think made Marcus succeed this year when he had failed the previous year? Use details from the passage and your own ideas.',
-          model: 'Marcus succeeded because he learned from his past mistake and worked hard to avoid repeating it. He trained every morning for six weeks, showing great dedication. His coach\'s advice — to focus on "the next ten seconds" — also helped him stay calm under pressure and not be distracted by memories of the previous year. This mental focus, combined with his physical preparation, helped him perform at his best when it mattered most.',
+          q: 'What do you think made Danish succeed this year when he had failed the previous year? Use details from the passage and your own ideas.',
+          model: 'Danish succeeded because he learned from his past mistake and worked hard to avoid repeating it. He trained every morning for two months, showing great dedication. His coach\'s advice — to "run the race in front of you" — also helped him stay calm under pressure and not be distracted by memories of the previous year. This mental focus, combined with his physical preparation, helped him perform at his best when it mattered most.',
           keywords: ['training', 'dedication', 'focus', 'coach', 'mistake', 'pressure', 'prepared'],
         },
       ],
