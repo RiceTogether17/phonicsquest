@@ -3,7 +3,10 @@
  *
  * Four full PSLE-format P6 English practice papers (Term 1–4).
  * These mirror the Singapore P6 Semestral Assessment / PSLE Preliminary
- * format used by mainstream primary schools.
+ * format used by mainstream primary schools. All prompts, passages and
+ * cloze texts are ORIGINAL content written for PhonicsQuest — only the
+ * paper format and skills tested follow the school-paper convention;
+ * nothing is reproduced from any published or school paper.
  *
  * Section breakdown per paper (total 95 marks, 1 h 50 min):
  *   Section A — Grammar MCQ            10 items  10 marks
@@ -259,13 +262,13 @@ export const P6_PRACTICE_TESTS = Object.freeze({
         'Explain what benefits the programme will bring to the school and environment',
       ],
       wordCount: '150–200 words',
-      modelAnswer: `15 Greenfield Road
+      modelAnswer: `27 Meranti Crescent
 Singapore 123456
 12 January 2026
 
 The Principal
-Greenfield Primary School
-15 Greenfield Road
+Meranti Primary School
+27 Meranti Crescent
 Singapore 123456
 
 Dear Principal,
@@ -394,7 +397,7 @@ Alex Tan`,
 
       Yet there is reason for cautious hope. The National Parks Board has launched a coral nursery programme in which fragments of heat-resistant coral are grown on underwater frames before being transplanted onto degraded reefs. Early results are promising: survival rates for transplanted corals have exceeded seventy percent in some locations. The programme also engages volunteer divers who monitor reef health weekly, feeding data into a national database that guides conservation decisions.
 
-      Scientists warn that reef restoration alone cannot save these ecosystems unless carbon emissions are reduced globally. "We are essentially buying time," said Dr Priya Nair, a marine ecologist at the National University of Singapore. "The nursery gives corals a fighting chance, but without addressing the root cause, we are swimming against the tide."`,
+      Scientists warn that reef restoration alone cannot save these ecosystems unless carbon emissions are reduced globally. "We are essentially buying time," said Dr Elaine Chong, a marine ecologist at the National University of Singapore. "The nursery gives corals a fighting chance, but without addressing the root cause, we are swimming against the tide."`,
 
       questions: [
         {
@@ -439,7 +442,7 @@ Alex Tan`,
         {
           type: 'language-use',
           marks: 1,
-          q: 'In paragraph 5, what does Dr Priya Nair mean when she says the team is "swimming against the tide"?',
+          q: 'In paragraph 5, what does Dr Elaine Chong mean when she says the team is "swimming against the tide"?',
           model: 'She means they are working against a powerful opposing force — their efforts are likely to be overwhelmed by the ongoing problem of carbon emissions unless global action is taken.',
           keywords: ['opposing force', 'overwhelmed', 'carbon emissions', 'tide', 'fighting'],
         },
@@ -462,7 +465,7 @@ Alex Tan`,
       title: 'Section I: Editing for Spelling and Grammar',
       marks: 10,
       instructions: 'The passage below contains 10 errors. Each error is underlined and numbered. Write the correct word or phrase in the box provided.',
-      paragraph: 'Coral reefs are among the most {{1:valueable}} ecosystems on Earth. They {{2:has}} formed over millions of years, yet the damage caused by human activity has accelerated at an alarming rate. In Singapore, reefs {{3:is}} home to nearly a quarter of all local marine species. Rising sea temperature {{4:turn}} large sections of the reef white in a process called bleaching, and without recovery time, corals may {{5:loose}} their ability to survive. Dr Aisha Rahim, a marine {{6:bilogist}} at the National University of Singapore, has spent fifteen years studying this crisis. She {{7:warn}} that the next decade will be crucial for the survival of regional reefs. Her team has made some {{8:progres}}: heat-resistant coral strains have been developed and {{9:transplant}} onto degraded reef areas. "Every coral we save counts," Dr Rahim {{10:say}} at a global conservation summit last November.',
+      paragraph: 'Coral reefs are among the most {{1:valueable}} ecosystems on Earth. They {{2:has}} formed over millions of years, yet the damage caused by human activity has accelerated at an alarming rate. In Singapore, reefs {{3:is}} home to nearly a quarter of all local marine species. Rising sea temperature {{4:turn}} large sections of the reef white in a process called bleaching, and without recovery time, corals may {{5:loose}} their ability to survive. Dr Farah Iskandar, a marine {{6:bilogist}} at the National University of Singapore, has spent fifteen years studying this crisis. She {{7:warn}} that the next decade will be crucial for the survival of regional reefs. Her team has made some {{8:progres}}: heat-resistant coral strains have been developed and {{9:transplant}} onto degraded reef areas. "Every coral we save counts," Dr Iskandar {{10:say}} at a global conservation summit last November.',
       errors: [
         { wrong: 'valueable',  correction: 'valuable',     kind: 'spelling' },
         { wrong: 'has',        correction: 'have',         kind: 'grammar'  },
@@ -684,18 +687,18 @@ Alex Tan`,
       instructions: 'Study the situation below and write your response in about 150–200 words.',
       format: 'Email',
       purpose: 'To inform and advise a friend about staying safe online',
-      audience: 'Your friend, Sam, who has just joined a new social media platform',
-      context: 'Your friend Sam has just told you he has signed up for a popular social media app. You are concerned because you have read about cyberbullying and privacy risks. Write an email to Sam sharing your concerns and advising him on how to stay safe.',
+      audience: 'Your friend, Jordan, who has just joined a new social media platform',
+      context: 'Your friend Jordan has just told you he has signed up for a popular social media app. You are concerned because you have read about cyberbullying and privacy risks. Write an email to Jordan sharing your concerns and advising him on how to stay safe.',
       bullets: [
-        'Share two specific risks Sam should be aware of (e.g. cyberbullying, privacy settings)',
-        'Give Sam two pieces of practical advice on how to stay safe on the platform',
-        'Encourage Sam positively and offer to help him set up his privacy settings',
+        'Share two specific risks Jordan should be aware of (e.g. cyberbullying, privacy settings)',
+        'Give Jordan two pieces of practical advice on how to stay safe on the platform',
+        'Encourage Jordan positively and offer to help him set up his privacy settings',
       ],
       wordCount: '150–200 words',
       modelAnswer: `To: sam@example.com
 Subject: Staying Safe on Your New Social Media App
 
-Hi Sam,
+Hi Jordan,
 
 Congratulations on joining! It sounds like fun, but I wanted to share a few things I have learned about staying safe online — I hope you do not mind.
 
@@ -812,7 +815,7 @@ Jordan`,
 
       For most teenagers today, a smartphone is as essential as a school bag. They use it to stay connected with friends, catch up on homework and consume a constant stream of entertainment. Yet growing evidence suggests that this near-constant connectivity is taking a toll on teenage mental health in ways that researchers are only beginning to understand.
 
-      Dr Aisha Malik, a psychologist at the Institute of Child Development, has spent the past eight years studying how social media affects teenagers between the ages of twelve and seventeen. Her findings are striking. Teenagers who spend more than four hours daily on social media platforms are three times more likely to report symptoms of depression and anxiety than those who spend less than one hour. Moreover, the effects are not equal: girls appear to be significantly more affected than boys, possibly because image-based platforms amplify insecurities about physical appearance.
+      Dr Rebecca Yeo, a psychologist at the Institute of Child Development, has spent the past eight years studying how social media affects teenagers between the ages of twelve and seventeen. Her findings are striking. Teenagers who spend more than four hours daily on social media platforms are three times more likely to report symptoms of depression and anxiety than those who spend less than one hour. Moreover, the effects are not equal: girls appear to be significantly more affected than boys, possibly because image-based platforms amplify insecurities about physical appearance.
 
       The mechanism behind this is partly chemical. Every time a notification arrives — a new like, comment or follower — the brain releases a small surge of dopamine, the same chemical associated with pleasure and reward. Over time, the brain begins to crave this stimulation, making it harder for teenagers to focus on activities that do not offer instant gratification, such as reading a book or having a quiet conversation.
 
@@ -1115,7 +1118,7 @@ The visit made me feel deeply proud of Singapore's multicultural heritage. It st
 From now on, I want to make an effort to visit local hawker stalls rather than fast-food restaurants. Every bowl of noodles I eat is a small act of support for our culture.
 
 Goodnight,
-Wei Ling`,
+Hui Min`,
       rubric: {
         taskFulfillment: 'Covers all three bullets; uses correct diary format (date, salutation, personal sign-off); tone is personal, reflective and sincere.',
         language: 'Varied vocabulary; emotional language appropriate for a diary; minimal grammar errors.',
@@ -1220,21 +1223,21 @@ Wei Ling`,
       marks: 15,
       passage: `A Taste of Home
 
-      It begins before dawn. While most of the city sleeps, Madam Lim Ah Kow is already at her stall in the Maxwell Food Centre, lighting the wok and preparing the ingredients for another day's service. She is eighty-one years old. For the past fifty-eight years, without a single day off, she has been serving the same plate of char kway teow — broad rice noodles stir-fried with eggs, beansprouts, Chinese sausage and fresh cockles — to a loyal following of customers who return week after week, decade after decade.
+      It begins before dawn. While most of the city sleeps, Madam Neo Guat Eng is already at her stall in the Maxwell Food Centre, lighting the wok and preparing the ingredients for another day's service. She is eighty-one years old. For the past fifty-eight years, without a single day off, she has been serving the same plate of char kway teow — broad rice noodles stir-fried with eggs, beansprouts, Chinese sausage and fresh cockles — to a loyal following of customers who return week after week, decade after decade.
 
       "The secret," she says, without looking up from her wok, "is the heat. The wok must be incredibly hot. You cannot rush it." Her hands move with practised precision — each ingredient added at exactly the right moment. The result is a dish with what Singaporeans call "wok hei" — literally "wok breath" — a smoky, slightly charred flavour that is almost impossible to replicate in a home kitchen.
 
-      Madam Lim has no plans to retire. But she has no successor either. Her children have long since moved into professional careers, and her attempts to find an apprentice have been unsuccessful. "Young people do not want to do this work," she says with a shrug. "The hours are too long. The heat is too much." She is not wrong: a hawker's day typically runs from five in the morning to three in the afternoon — ten hours of intense physical labour in sweltering conditions.
+      Madam Neo has no plans to retire. But she has no successor either. Her children have long since moved into professional careers, and her attempts to find an apprentice have been unsuccessful. "Young people do not want to do this work," she says with a shrug. "The hours are too long. The heat is too much." She is not wrong: a hawker's day typically runs from five in the morning to three in the afternoon — ten hours of intense physical labour in sweltering conditions.
 
-      The situation is not unique to Madam Lim. Across Singapore, veteran hawkers are ageing out of the profession without passing on their skills. A government survey found that the average age of hawkers at established centres exceeds sixty, and that fewer than fifteen percent have identified a successor. The government has responded with the Hawker Culture Programme — a grant scheme and training initiative designed to attract younger Singaporeans to the trade.
+      The situation is not unique to Madam Neo. Across Singapore, veteran hawkers are ageing out of the profession without passing on their skills. A government survey found that the average age of hawkers at established centres exceeds sixty, and that fewer than fifteen percent have identified a successor. The government has responded with the Hawker Culture Programme — a grant scheme and training initiative designed to attract younger Singaporeans to the trade.
 
-      Whether such schemes can fully replace the kind of knowledge that takes a lifetime to accumulate is another matter. A dish like char kway teow is not just a recipe — it is a living tradition, shaped by memory, by the quality of ingredients available each morning, and by decades of intuition built up over thousands of repetitions. As Madam Lim herself puts it: "You cannot learn this from a book."`,
+      Whether such schemes can fully replace the kind of knowledge that takes a lifetime to accumulate is another matter. A dish like char kway teow is not just a recipe — it is a living tradition, shaped by memory, by the quality of ingredients available each morning, and by decades of intuition built up over thousands of repetitions. As Madam Neo herself puts it: "You cannot learn this from a book."`,
 
       questions: [
         {
           type: 'factual',
           marks: 1,
-          q: 'How long has Madam Lim been serving char kway teow at her stall?',
+          q: 'How long has Madam Neo been serving char kway teow at her stall?',
           model: 'She has been serving char kway teow for fifty-eight years.',
         },
         {
@@ -1246,7 +1249,7 @@ Wei Ling`,
         {
           type: 'inference',
           marks: 2,
-          q: 'Using evidence from paragraph 3, explain in your own words why Madam Lim has been unable to find an apprentice.',
+          q: 'Using evidence from paragraph 3, explain in your own words why Madam Neo has been unable to find an apprentice.',
           model: 'Younger people are unwilling to take up the hawker trade because the working conditions are extremely demanding — they must start as early as 5am and work for ten hours in intense heat. These conditions make the job unappealing compared to professional careers.',
           keywords: ['hours', 'heat', 'physical labour', 'professional careers', 'conditions', 'demanding'],
         },
@@ -1273,7 +1276,7 @@ Wei Ling`,
           type: 'personal-response',
           marks: 7,
           q: 'Do you think government schemes like the Hawker Culture Programme can successfully preserve Singapore\'s hawker heritage? Use information from the passage and your own ideas to explain your answer.',
-          model: 'Award up to 7 marks. Strong answers take a clear position and argue it with evidence — e.g., grants/training can attract new hawkers (for) vs. Madam Lim\'s warning that "you cannot learn this from a book" and unchanged working conditions (against). High-scoring responses acknowledge the limits of government schemes while suggesting complementary measures.',
+          model: 'Award up to 7 marks. Strong answers take a clear position and argue it with evidence — e.g., grants/training can attract new hawkers (for) vs. Madam Neo\'s warning that "you cannot learn this from a book" and unchanged working conditions (against). High-scoring responses acknowledge the limits of government schemes while suggesting complementary measures.',
         },
       ],
     },
@@ -1282,7 +1285,7 @@ Wei Ling`,
       title: 'Section I: Editing for Spelling and Grammar',
       marks: 10,
       instructions: 'The passage below contains 10 errors. Each error is underlined and numbered. Write the correct word or phrase in the box provided.',
-      paragraph: 'Singapore\'s hawker culture {{1:has receive}} UNESCO recognition as an Intangible Cultural Heritage of Humanity, a distinction that highlights its global significance. Hawker centres, which {{2:is}} found across the island from gleaming food courts to older outdoor stalls, {{3:reflacts}} Singapore\'s rich multicultural history. These spaces bring together people from {{4:commmunities}} of all backgrounds, and for many families, visiting the hawker centre {{5:are}} a weekly tradition. Young hawkers {{6:wants}} to inherit the trade but face many challenges, including long hours and intense heat. Some argue that authenticity is {{7:more importanter}} than innovation, but many veteran hawkers disagree. The government {{8:have}} supported aspiring hawkers through grants and training programmes. Since the scheme began, the number of registered food stall operators {{9:have}} risen steadily. Mr Tan Boon Huat, who opened his {{10:Succesful}} stall thirty years ago, credits the initiative for helping a new generation find their footing.',
+      paragraph: 'Singapore\'s hawker culture {{1:has receive}} UNESCO recognition as an Intangible Cultural Heritage of Humanity, a distinction that highlights its global significance. Hawker centres, which {{2:is}} found across the island from gleaming food courts to older outdoor stalls, {{3:reflacts}} Singapore\'s rich multicultural history. These spaces bring together people from {{4:commmunities}} of all backgrounds, and for many families, visiting the hawker centre {{5:are}} a weekly tradition. Young hawkers {{6:wants}} to inherit the trade but face many challenges, including long hours and intense heat. Some argue that authenticity is {{7:more importanter}} than innovation, but many veteran hawkers disagree. The government {{8:have}} supported aspiring hawkers through grants and training programmes. Since the scheme began, the number of registered food stall operators {{9:have}} risen steadily. Mr Chua Kim Seng, who opened his {{10:Succesful}} stall thirty years ago, credits the initiative for helping a new generation find their footing.',
       errors: [
         { wrong: 'has receive',       correction: 'has received',  kind: 'grammar'  },
         { wrong: 'is',                correction: 'are',           kind: 'grammar'  },
