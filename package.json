@@ -12,6 +12,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "check:syntax": "find src -name '*.js' -print0 | xargs -0 -n1 node --check",
+    "check:bundle": "node scripts/check-bundle-size.mjs",
     "audit:stories": "node scripts/audit-stories.mjs",
     "gen:store-graphics": "node scripts/gen-store-graphics.mjs",
     "optimize:images": "node scripts/optimize-images.mjs"

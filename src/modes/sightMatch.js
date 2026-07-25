@@ -17,7 +17,12 @@
  */
 
 import { SIGHT_QUESTS, TIER_LABELS, getQuestsByTier } from '../data/sightwords.js';
-import { getStoryForQuest } from '../modules/sightStoryWeave.js';
+import { lazyModule } from './lazy.js';
+
+// sightStoryWeave pulls the full decodable-story bank (~135 kB of data) in
+// just to badge quest cards with a linked story. Loading it on browser-open
+// keeps stories.js out of the startup bundle.
+const storyWeaveMod = lazyModule(() => import('../modules/sightStoryWeave.js'));
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 
@@ -73,8 +78,11 @@ export function cleanupSightMatch() {
 
 // ── Browser (quest picker) ─────────────────────────────────────────────────
 
-function _renderBrowser() {
+async function _renderBrowser() {
   if (!_container) return;
+
+  const { getStoryForQuest } = await storyWeaveMod.load();
+  if (!_container || _activeQuest) return; // navigated away while loading
 
   const completedQuests = store.get('sightQuestsCompleted') || {};
   const studiedQuests   = store.get('sightQuestsStudied')   || {};
