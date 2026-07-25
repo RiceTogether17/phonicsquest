@@ -20,7 +20,7 @@ let currentWord   = null;
 let revealedCount = 0;
 let blendStart    = 0;
 let isRevealing   = false;
-let _blendStyle   = 'simultaneous'; // 'simultaneous' | 'cumulative'
+let _blendStyle   = 'cumulative'; // 'simultaneous' | 'cumulative'
 
 // ── Setup ─────────────────────────────────────────────────────────────────
 
@@ -33,7 +33,7 @@ export function setupBlend(word, els) {
   revealedCount = 0;
   blendStart    = Date.now();
   isRevealing   = false;
-  _blendStyle   = store.get('blendStyle') || 'simultaneous';
+  _blendStyle   = store.get('blendStyle') || 'cumulative';
 
   renderWordImage(word, els.wordEmoji, true);
   els.wordDisplay.innerHTML = '';
@@ -182,8 +182,15 @@ async function _revealNext(word, els) {
   });
 
   // Play the new sound — in cumulative (successive-blending) style each
-  // reveal blends everything so far ("li" for l-i) instead of the sound alone.
+  // reveal repeats the chunk so far, says the new sound, then blends them
+  // ("li" · "s(t)" · "list") instead of playing the sound alone.
   if (_blendStyle === 'cumulative' && idx > 0) {
+    await audio.speakChunk(word, idx);
+    await _delay(150);
+    await audio.speakPhoneme(word.graphemes[idx], word.types[idx], {
+      word: word.word, prevGrapheme: word.graphemes[idx - 1],
+    });
+    await _delay(150);
     await audio.speakChunk(word, idx + 1);
   } else {
     const prevGrapheme = idx > 0 ? word.graphemes[idx - 1] : null;
@@ -239,16 +246,29 @@ async function _animateBlendSweep(phonemeRow, word) {
   const perTile = Math.max(200, Math.min(500, 1200 / tiles.length));
 
   if (_blendStyle === 'cumulative') {
-    // Successive blending: the highlight bar grows as each step blends the
-    // chunk so far with the next sound (/l/ → "li" → "list").
-    for (let i = 0; i < tiles.length; i++) {
-      tiles[i].classList.add('blend-highlight');
-      if (i === 0) {
-        await audio.speakPhoneme(word.graphemes[0], word.types[0], { word: word.word });
-      } else {
-        await audio.speakChunk(word, i + 1);
-      }
+    // Successive blending: each step repeats the chunk so far, says the new
+    // sound, then blends them ("l · i · li", "li · s(t) · list"), with the
+    // highlight bar growing as each blended chunk lands.
+    if (tiles.length < 2) {
+      tiles[0].classList.add('blend-highlight');
+      await audio.speakPhoneme(word.graphemes[0], word.types[0], { word: word.word });
       await _delay(perTile);
+    } else {
+      for (let i = 1; i < tiles.length; i++) {
+        tiles.forEach((t, ti) => t.classList.toggle('blend-highlight', ti < i));
+        await audio.speakChunk(word, i);
+        await _delay(150);
+
+        tiles.forEach((t, ti) => t.classList.toggle('blend-highlight', ti === i));
+        await audio.speakPhoneme(word.graphemes[i], word.types[i], {
+          word: word.word, prevGrapheme: word.graphemes[i - 1],
+        });
+        await _delay(150);
+
+        tiles.forEach((t, ti) => t.classList.toggle('blend-highlight', ti <= i));
+        await audio.speakChunk(word, i + 1);
+        await _delay(perTile);
+      }
     }
     tiles.forEach(t => t.classList.remove('blend-highlight'));
   } else {

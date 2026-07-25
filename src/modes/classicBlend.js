@@ -23,7 +23,7 @@ let currentWord = null;
 let isPlaying   = false;
 let startTime   = 0;
 let _speed      = 'normal'; // 'slow' | 'normal' | 'fast'
-let _blendStyle = 'simultaneous'; // 'simultaneous' | 'cumulative'
+let _blendStyle = 'cumulative'; // 'simultaneous' | 'cumulative'
 
 /** Inter-phoneme delay (ms) per speed setting */
 const SPEED_DELAY = { slow: 600, normal: 320, fast: 120 };
@@ -37,7 +37,7 @@ export function setupClassicBlend(word, els) {
   currentWord = word;
   isPlaying = false;
   startTime = Date.now();
-  _blendStyle = store.get('blendStyle') || 'simultaneous';
+  _blendStyle = store.get('blendStyle') || 'cumulative';
 
   renderWordImage(word, els.wordEmoji, true);
 
@@ -217,18 +217,31 @@ async function _playSounds(word, els) {
   const delay = SPEED_DELAY[_speed] ?? 320;
 
   if (_blendStyle === 'cumulative') {
-    // Successive blending: each step blends everything so far with the next
-    // sound (/l/ → "li" → "list"). The highlight grows with the chunk, and
-    // the final chunk IS the whole word, so no separate word playback.
-    for (let i = 0; i < word.graphemes.length; i++) {
-      tiles.forEach((t, ti) => t.classList.toggle('active', ti <= i));
+    // Successive blending: each step repeats the chunk so far, says the new
+    // sound, then blends them — "l · i · li", "li · s(t) · list". The final
+    // blended chunk IS the whole word, so no separate word playback.
+    if (word.graphemes.length < 2) {
+      tiles.forEach(t => t.classList.add('active'));
+      await audio.speakWord(word.word);
+    } else {
+      for (let i = 1; i < word.graphemes.length; i++) {
+        // Chunk so far
+        tiles.forEach((t, ti) => t.classList.toggle('active', ti < i));
+        await audio.speakChunk(word, i);
+        await _delay(Math.min(delay, 200));
 
-      if (i === 0) {
-        await audio.speakPhoneme(word.graphemes[0], word.types[0], { word: word.word });
-      } else {
+        // New sound on its own
+        tiles.forEach((t, ti) => t.classList.toggle('active', ti === i));
+        await audio.speakPhoneme(word.graphemes[i], word.types[i], {
+          word: word.word, prevGrapheme: word.graphemes[i - 1],
+        });
+        await _delay(Math.min(delay, 200));
+
+        // Blend them together
+        tiles.forEach((t, ti) => t.classList.toggle('active', ti <= i));
         await audio.speakChunk(word, i + 1);
+        await _delay(delay);
       }
-      await _delay(delay);
     }
     tiles.forEach(t => t.classList.remove('active'));
   } else {

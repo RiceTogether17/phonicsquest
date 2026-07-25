@@ -211,12 +211,35 @@ describe('Blend It! — cumulative reveal', () => {
     await vi.waitFor(() => expect(speakPhoneme).toHaveBeenCalledTimes(1));
     expect(speakChunk).not.toHaveBeenCalled();
 
-    // Second sound: blended chunk "li" — wait for the post-reveal re-render
-    // (a 200 ms guard ignores clicks while the first reveal is finishing).
+    // Second sound — wait for the post-reveal re-render (a 200 ms guard
+    // ignores clicks while the first reveal is finishing), then expect the
+    // successive-blending triple: chunk-so-far, new sound, blended chunk.
     await vi.waitFor(() =>
       expect(document.getElementById('blend-tip')?.textContent).toContain('Sound 1 of 3'),
     { timeout: 2000 });
     document.getElementById('btn-reveal-next').click();
-    await vi.waitFor(() => expect(speakChunk).toHaveBeenCalledWith(LIST, 2));
+    await vi.waitFor(() => expect(speakChunk).toHaveBeenCalledWith(LIST, 2), { timeout: 2000 });
+    expect(speakChunk).toHaveBeenCalledWith(LIST, 1);          // "l" again
+    expect(speakPhoneme).toHaveBeenCalledTimes(2);             // + the new "i"
+    expect(speakChunk.mock.calls.map(c => c[1])).toEqual([1, 2]);
+  });
+
+  it('plays the full l·i·li / li·st·list sequence in Listen & Blend', async () => {
+    store.set('blendStyle', 'cumulative');
+    const speakPhoneme = vi.spyOn(audio, 'speakPhoneme').mockResolvedValue();
+    const speakChunk   = vi.spyOn(audio, 'speakChunk').mockResolvedValue();
+    const speakWord    = vi.spyOn(audio, 'speakWord').mockResolvedValue();
+
+    const els = makeEls();
+    setupClassicBlend(LIST, els);
+    document.getElementById('btn-classic-play').click();
+
+    // Two triples for a 3-grapheme word: [l, i, li] then [li, st, list]
+    await vi.waitFor(() =>
+      expect(speakChunk.mock.calls.map(c => c[1])).toEqual([1, 2, 2, 3]),
+    { timeout: 4000 });
+    expect(speakPhoneme).toHaveBeenCalledTimes(2); // the new sound of each triple
+    // The final blended chunk IS the word — no separate word playback.
+    expect(speakWord).not.toHaveBeenCalled();
   });
 });

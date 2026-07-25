@@ -55,7 +55,7 @@ const DEFAULT_STATE = {
   //   'simultaneous' — each phoneme separately, then the whole word (/c/ /a/ /t/ → "cat")
   //   'cumulative'   — successive blending: each new sound is blended with
   //                    everything so far (/c/ → "ca" → "cat")
-  blendStyle: 'simultaneous',
+  blendStyle: 'cumulative',
   parentPin:      null,     // hashed PIN
   geminiApiKey:   null,     // parent-supplied AI key (survives progress reset)
   reducedMotion:  false,    // manual override for prefers-reduced-motion
