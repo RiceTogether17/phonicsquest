@@ -96,6 +96,20 @@
   /* Header height */
   --header-h: 60px;
   --level-bar-h: 8px;
+
+  /* ── Token aliases ──────────────────────────────────────────────────────
+     Many later feature blocks reference `--color-text`, `--color-surface`,
+     `--radius`, etc. — names that were never defined, so those declarations
+     silently dropped (transparent backgrounds, currentColor borders, square
+     corners). Aliasing them to the real tokens repairs every such rule at
+     once AND keeps them theme-aware, since var() resolves at use time. */
+  --color-text:       var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-surface:    var(--surface);
+  --color-border:     var(--border);
+  --color-bg:         var(--bg);
+  --radius:           var(--radius-md);
+  --text-2:           var(--text-muted);
 }
 
 /* ── THEMES ── */
@@ -904,9 +918,9 @@ body.bedtime-on * {
 }
 
 .phoneme-symbol {
-  font-size: var(--font-size-xl);
+  font-size: clamp(var(--font-size-xl), 6vw, var(--font-size-2xl));
   font-weight: 700;
-  min-width: 44px;
+  min-width: var(--touch-target);
   text-align: center;
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
@@ -957,13 +971,13 @@ body.bedtime-on * {
 }
 
 .phoneme-diacritic {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   color: var(--text-muted);
   font-weight: 600;
 }
 
 .phoneme-label {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--text-muted);
   text-align: center;
@@ -1034,7 +1048,8 @@ body.bedtime-on * {
   background-repeat: no-repeat;
   background-position: right 0 center;
 }
-.category-select:focus { outline: 2px solid var(--color-primary); border-radius: 4px; }
+.category-select { min-height: 40px; }
+.category-select:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; border-radius: 4px; }
 
 /* Choice buttons (Hear & Choose, Missing Sound, First Sound) */
 .choice-grid {
@@ -3481,7 +3496,15 @@ details.story-tool-section[open] > .story-tool-summary::before {
   border-radius: var(--radius-lg);
   padding: var(--space-2) var(--space-3);
   transition: background var(--dur-fast), box-shadow var(--dur-fast);
-  line-height: 1.65;
+  /* Beginning readers need big print everywhere, not just on desktop:
+     base story text starts at lg and steps up with the viewport (the
+     ≥1024px grid raises it further). */
+  font-size: var(--font-size-lg);
+  line-height: 1.75;
+}
+@media (min-width: 600px) {
+  .sline:not(.sline--label) { font-size: var(--font-size-xl); }
+  .sline--refrain { font-size: var(--font-size-2xl); }
 }
 
 /* Intro — plain large text */
@@ -3537,12 +3560,13 @@ details.story-tool-section[open] > .story-tool-summary::before {
   text-align: center;
 }
 
-/* Active / highlighted line during TTS */
+/* Active / highlighted line during TTS. No transform here: a scale on a
+   bordered text box makes the type shimmer/reflow on every line change —
+   the tint + ring carry the highlight on their own. */
 .sline--active {
   background: color-mix(in srgb, var(--color-primary) 15%, transparent) !important;
   border-color: var(--color-primary) !important;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
-  transform: scale(1.01);
 }
 .sline--label.sline--active {
   color: var(--color-primary);
@@ -3928,8 +3952,8 @@ details.story-tool-section[open] > .story-tool-summary::before {
   justify-content: center;
 }
 .step-dot {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-radius: var(--radius-full);
   background: var(--color-border);
   border: 2px solid transparent;
@@ -3981,6 +4005,8 @@ details.story-tool-section[open] > .story-tool-summary::before {
 
 .blend-assess-btns {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-4);
 }
 
@@ -3991,6 +4017,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .speed-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--space-2);
   width: 100%;
   justify-content: center;
@@ -4002,14 +4029,19 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .speed-btns {
   display: flex;
-  gap: var(--space-1);
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
 }
 .speed-btn {
-  padding: var(--space-1) var(--space-3);
+  /* Comfortable pill on the phones/tablets kids actually use — the old
+     4px-tall padding looked ~26px while the real hit box was 48px. */
+  padding: var(--space-2) var(--space-4);
+  min-height: 40px;
   border-radius: var(--radius-full);
   border: 2px solid var(--color-border);
   background: var(--color-surface);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   font-weight: 700;
   cursor: pointer;
   transition: all var(--dur-fast) var(--ease-out);
@@ -4028,12 +4060,15 @@ details.story-tool-section[open] > .story-tool-summary::before {
 
 .story-mode-toggle {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-2);
   padding: var(--space-1);
   background: var(--color-surface);
   border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-lg);
   width: fit-content;
+  max-width: 100%;
   margin: 0 auto;
 }
 
@@ -4054,9 +4089,8 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .smode-btn-title { line-height: 1.2; }
 .smode-btn-sub {
-  font-size: var(--font-size-xs);
-  font-weight: 500;
-  opacity: 0.75;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
 }
 .smode-btn:hover { color: var(--color-primary); }
 .smode-btn.active {
@@ -4064,7 +4098,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   color: #fff;
   box-shadow: 0 2px 8px rgba(108,99,255,0.35);
 }
-.smode-btn.active .smode-btn-sub { opacity: 0.9; }
+.smode-btn.active .smode-btn-sub { opacity: 1; }
 
 /* ── Grown-up practice drawer: one optional home for the read-aloud tools ── */
 .story-practice-drawer {
@@ -4551,7 +4585,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 
 .sm-quest-icon { font-size: 1.2rem; }
 .sm-quest-name { font-size: var(--font-size-sm); font-weight: 800; color: var(--text); }
-.sm-quest-preview { font-size: var(--font-size-xs); color: var(--text-muted); }
+.sm-quest-preview { font-size: var(--font-size-sm); color: var(--text-muted); }
 
 /* ── Game area ────────────────────────────────────────────────────────── */
 .sm-game {
@@ -4686,7 +4720,9 @@ details.story-tool-section[open] > .story-tool-summary::before {
   background: var(--surface);
   border: 2.5px solid var(--color-primary);
   transform: rotateY(180deg);
-  font-size: clamp(0.8rem, 3vw, 1.1rem);
+  /* The word IS the learning content — size it to fill the 3/4 card.
+     word-break below guards the occasional long word. */
+  font-size: clamp(1.25rem, 5.5vw, 2rem);
   font-weight: 900;
   color: var(--text);
   padding: var(--space-2);
@@ -4954,7 +4990,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .sl-word-card:active { transform: scale(0.97); }
 
 .sl-word-text {
-  font-size: clamp(1.4rem, 4.5vw, 2.2rem);
+  font-size: clamp(1.75rem, 6vw, 2.6rem);
   font-weight: 900;
   color: var(--text);
   line-height: 1.1;
@@ -5078,7 +5114,10 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .sl-quiz-choice {
   padding: var(--space-3);
-  font-size: clamp(1rem, 3vw, 1.3rem);
+  /* Match the study cards the child just read — the quick-check answers
+     shouldn't be the smallest words in the learn→check flow. */
+  font-size: clamp(1.4rem, 4.5vw, 2rem);
+  min-height: var(--touch-target);
   font-weight: 900;
   color: var(--text);
   background: var(--surface);
@@ -5173,7 +5212,8 @@ details.story-tool-section[open] > .story-tool-summary::before {
   .sl-word-card--highlight,
   .sl-quiz-choice--correct,
   .sl-quiz-choice--hint,
-  .sl-inline-toast {
+  .sl-inline-toast,
+  .sm-card-inner {
     animation: none !important;
     transition: none !important;
   }
@@ -6128,11 +6168,12 @@ details.story-tool-section[open] > .story-tool-summary::before {
   color: var(--color-text-muted);
 }
 .follow-mode-btn {
-  padding: var(--space-1) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  min-height: 40px;
   border-radius: var(--radius-full);
   border: 1.5px solid var(--color-border);
   background: var(--color-surface);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--color-text-muted);
   cursor: pointer;
@@ -6148,8 +6189,11 @@ details.story-tool-section[open] > .story-tool-summary::before {
 /* ── Word-follow highlighting + tap-to-repeat (within active line) ────── */
 .wf-word {
   transition: background 0.12s ease, color 0.12s ease;
-  border-radius: 3px;
-  padding: 0 1px;
+  border-radius: 6px;
+  /* Real tap padding — these are "tap any word to hear it" targets, and a
+     3-letter word at glyph width was far below the 48px touch floor. */
+  padding: 4px 5px;
+  margin: -4px -1px;
   cursor: pointer;
   /* Static visual signal that words are tappable in this mode — a thin
      dotted underline in the primary colour, with the gap below the
@@ -6167,8 +6211,10 @@ details.story-tool-section[open] > .story-tool-summary::before {
    that makes "Word by word" mode actually look different from "Whole
    line". Bigger contrast + a soft shadow halo + bumped weight. */
 .wf-word--active {
-  background: color-mix(in srgb, var(--color-primary) 35%, transparent) !important;
-  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 25%, transparent) !important;
+  /* Dark brand text on the light tint — the primary-on-primary-tint combo
+     was ~3.4:1, below AA for the most important text during karaoke. */
+  color: var(--color-primary-dark);
   font-weight: 800;
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 45%, transparent);
   text-decoration: none;
