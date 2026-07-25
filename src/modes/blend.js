@@ -90,7 +90,7 @@ function _renderControls(els, word, stage) {
 
     els.modeArea.innerHTML = /* html */`
       <div class="blend-guided-wrap">
-        <div class="blend-tip" id="blend-tip">
+        <div class="blend-tip" id="blend-tip" aria-live="polite">
           ${revealedCount === 0
             ? '👂 Listen to each sound and say it out loud!'
             : `Sound ${revealedCount} of ${total} — keep going!`}

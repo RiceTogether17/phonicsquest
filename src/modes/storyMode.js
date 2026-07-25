@@ -16,6 +16,7 @@ import { WORDS } from '../data/words.js';
 import { audio } from '../modules/audio.js';
 import { runStoryQuest } from './storyQuest.js';
 import { mapCharIndexToWord, isOffscreen } from '../modules/karaokeUtils.js';
+import { prefersReducedMotion } from '../utils/motion.js';
 import { lookupWord as lookupWordForDetective, addWordToReview } from '../modules/wordDetective.js';
 import { isReadAloudSupported, listenToLine, stopListening } from '../modules/readAloudListener.js';
 import { store } from '../modules/store.js';
@@ -958,7 +959,7 @@ function _rtgHighlightCurrent() {
   const el = _rtgLineEl();
   if (el) {
     el.classList.add('sline--rtg-current');
-    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    el.scrollIntoView({ block: 'center', behavior: _scrollBehavior() });
   }
 }
 
@@ -1743,13 +1744,22 @@ function _renderWordDetectiveCard(info) {
  * and jiggle-free for karaoke highlighting; doesn't fight a manual scroll.
  * @private
  */
+/**
+ * Scroll behavior that honours the OS/app reduced-motion preference —
+ * CSS handles its own animations, but scrollIntoView must check in JS.
+ * @private
+ */
+function _scrollBehavior() {
+  return prefersReducedMotion() ? 'auto' : 'smooth';
+}
+
 function _scrollIntoViewIfNeeded(el) {
   if (!el || typeof el.getBoundingClientRect !== 'function') return;
   try {
     const rect = el.getBoundingClientRect();
     const viewportH = window.innerHeight || document.documentElement.clientHeight;
     if (isOffscreen(rect, viewportH)) {
-      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      el.scrollIntoView({ block: 'center', behavior: _scrollBehavior() });
     }
   } catch (_) { /* JSDOM or older browsers — ignore */ }
 }
@@ -1765,7 +1775,7 @@ function _highlightLine(lineIndex) {
   const el = _container?.querySelector(`[data-line="${lineIndex}"]`);
   if (el) {
     el.classList.add('sline--active');
-    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    el.scrollIntoView({ behavior: _scrollBehavior(), block: 'nearest' });
   }
 }
 
@@ -1851,7 +1861,7 @@ function _showComprehensionCheck(story) {
     <button class="comp-skip" id="comp-skip" type="button">Skip</button>
   `;
   content.appendChild(panel);
-  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  panel.scrollIntoView({ behavior: _scrollBehavior(), block: 'nearest' });
 
   const feedback = panel.querySelector('#comp-feedback');
 
@@ -1873,7 +1883,7 @@ function _showComprehensionCheck(story) {
         feedback.textContent = '💡 Look at the end of the story for clues.';
         // Scroll the last text line into view to support the prompt
         const lastLine = _container?.querySelector('.sline.sline--end, .sline:last-of-type');
-        lastLine?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        lastLine?.scrollIntoView({ behavior: _scrollBehavior(), block: 'center' });
       }
       feedback.hidden = false;
     });
@@ -2109,7 +2119,7 @@ function _wireEchoReadControls(story) {
     const lineEl = _container?.querySelector(`[data-line="${line.idx}"]`);
     if (lineEl) {
       lineEl.classList.add('sline--echo-active');
-      lineEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      lineEl.scrollIntoView({ behavior: _scrollBehavior(), block: 'nearest' });
     }
 
     if (statusEl) {
