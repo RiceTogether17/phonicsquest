@@ -3,7 +3,10 @@
  *
  * Four full school-style P5 English practice papers (Term 1–4).
  * These mirror the Singapore P5 Continual Assessment / Semestral
- * Assessment format used by mainstream primary schools.
+ * Assessment format used by mainstream primary schools. All prompts,
+ * passages and cloze texts are ORIGINAL content written for PhonicsQuest
+ * — only the paper format and skills tested follow the school-paper
+ * convention; nothing is reproduced from any published or school paper.
  *
  * Section breakdown per paper (total 85 marks, 1 h 30 min):
  *   Section A — Grammar MCQ            10 items  10 marks
@@ -243,26 +246,26 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       instructions: 'Study the information below carefully and write your response in about 100–120 words.',
       format: 'Email',
       purpose: 'To invite your school principal to be a guest speaker at your class\'s Environment Awareness Day.',
-      audience: 'Your school principal, Mr Ramesh Pillai',
+      audience: 'Your school principal, Mrs Diana Teo',
       context:
-        'Your class, 5 Integrity, has organised an Environment Awareness Day on 14 March. ' +
-        'You would like Mr Pillai to give a short speech to inspire students to protect the environment. ' +
+        'Your class, 5 Graciousness, has organised an Environment Awareness Day on 21 April. ' +
+        'You would like Mrs Teo to give a short speech to inspire students to protect the environment. ' +
         'The event will be held in the school hall from 9 a.m. to 11 a.m.',
       bullets: [
         'Explain the purpose of the event and why it is important.',
-        'Request Mr Pillai to give a 10-minute opening speech.',
+        'Request Mrs Teo to give a 10-minute opening speech.',
         'Provide details about the event (date, time, venue).',
       ],
       wordCount: '100–120 words',
       modelAnswer:
-        'Dear Mr Pillai,\n\n' +
-        'I am writing on behalf of 5 Integrity to invite you to our Environment Awareness Day. ' +
+        'Dear Mrs Teo,\n\n' +
+        'I am writing on behalf of 5 Graciousness to invite you to our Environment Awareness Day. ' +
         'Our class has organised this event to educate students about pressing environmental issues such as climate change and plastic pollution. ' +
         'We believe that your words of encouragement will inspire our schoolmates to play a greater role in protecting our planet.\n\n' +
         'We would be truly honoured if you could deliver a short 10-minute opening speech at the event. ' +
-        'The Environment Awareness Day will be held in the school hall on 14 March, from 9 a.m. to 11 a.m.\n\n' +
+        'The Environment Awareness Day will be held in the school hall on 21 April, from 9 a.m. to 11 a.m.\n\n' +
         'We sincerely hope you will be able to join us. Thank you for your time and consideration.\n\n' +
-        'Yours sincerely,\nClass Representative, 5 Integrity',
+        'Yours sincerely,\nClass Representative, 5 Graciousness',
       rubric: {
         taskFulfillment: 'All 3 bullet points addressed; email format with correct salutation and sign-off; appropriate formal tone.',
         language: 'Accurate grammar and spelling; varied vocabulary; appropriate formal register throughout.',
@@ -376,16 +379,16 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       marks: 15,
       passage:
         'Deep within the Borneo rainforest, a team of young Singaporean scientists set up camp at the edge of a river. Their mission: to document species that had never before been recorded in this region. The forest hummed with life — a symphony of cicadas, birdsong, and the distant splash of a hornbill diving for fish.\n\n' +
-        'Dr Mei Ling, the team leader, had spent fifteen years studying tropical biodiversity. To her, every leaf and root told a story. She often reminded her students that a single hectare of rainforest could contain more species of insects than the entire continent of Europe. "Most people walk through a forest and see trees," she liked to say. "I see a library."\n\n' +
-        'On the third day of the expedition, a junior researcher named Faizal made a startling discovery. While collecting water samples from a shallow stream, he noticed a translucent frog no larger than his thumbnail perched on a mossy stone. Dr Mei Ling\'s eyes widened when she examined it. Its see-through skin revealed the delicate outline of its tiny organs. After hours of careful comparison with her reference materials, she concluded that it was almost certainly a species new to science.\n\n' +
-        'The team worked methodically, photographing the frog from every angle and recording its call. They were careful not to disturb its habitat. "We are guests here," Dr Mei Ling stressed. "We observe — we do not interfere."\n\n' +
+        'Dr Wen Qi, the team leader, had spent fifteen years studying tropical biodiversity. To her, every leaf and root told a story. She often reminded her students that a single hectare of rainforest could contain more species of insects than the entire continent of Europe. "Most people walk through a forest and see trees," she liked to say. "I see a library."\n\n' +
+        'On the third day of the expedition, a junior researcher named Harith made a startling discovery. While collecting water samples from a shallow stream, he noticed a translucent frog no larger than his thumbnail perched on a mossy stone. Dr Wen Qi\'s eyes widened when she examined it. Its see-through skin revealed the delicate outline of its tiny organs. After hours of careful comparison with her reference materials, she concluded that it was almost certainly a species new to science.\n\n' +
+        'The team worked methodically, photographing the frog from every angle and recording its call. They were careful not to disturb its habitat. "We are guests here," Dr Wen Qi stressed. "We observe — we do not interfere."\n\n' +
         'News of the possible new species caused excitement back in Singapore. Environmental groups urged the government to gazette the surrounding forest as a protected area before logging companies could move in. A spokesperson for the loggers argued that the forest land had already been legally allocated for timber harvesting, and that the discovery of a single frog was insufficient reason to halt operations.\n\n' +
-        'Back at camp, Faizal stared up at the canopy as the sun set behind the treetops. He thought about the frog — a creature that had existed for perhaps millions of years without any human ever knowing about it. He wondered how many other undiscovered wonders the forest still held, and how many would disappear before anyone had a chance to find them.',
+        'Back at camp, Harith stared up at the canopy as the sun set behind the treetops. He thought about the frog — a creature that had existed for perhaps millions of years without any human ever knowing about it. He wondered how many other undiscovered wonders the forest still held, and how many would disappear before anyone had a chance to find them.',
       questions: [
         {
           type: 'mcq',
           marks: 2,
-          q: 'According to paragraph 2, what does Dr Mei Ling mean when she says "I see a library"?',
+          q: 'According to paragraph 2, what does Dr Wen Qi mean when she says "I see a library"?',
           choices: [
             'She thinks forests should be converted into quiet reading areas.',
             'She sees the forest as a vast source of knowledge and information.',
@@ -393,12 +396,12 @@ export const P5_PRACTICE_TESTS = Object.freeze({
             'She believes forests are as organised and structured as libraries.',
           ],
           answer: 'She sees the forest as a vast source of knowledge and information.',
-          explain: 'A library stores knowledge; Dr Mei Ling sees the forest the same way — every element tells a story.',
+          explain: 'A library stores knowledge; Dr Wen Qi sees the forest the same way — every element tells a story.',
         },
         {
           type: 'mcq',
           marks: 2,
-          q: 'What was significant about the frog that Faizal discovered?',
+          q: 'What was significant about the frog that Harith discovered?',
           choices: [
             'It was the smallest frog ever found in Borneo.',
             'It could survive both in water and on land.',
@@ -406,7 +409,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
             'It had unusually bright colours that warned away predators.',
           ],
           answer: 'It appeared to belong to a species previously unknown to science.',
-          explain: 'Dr Mei Ling compared it with her references and concluded it was "almost certainly a species new to science".',
+          explain: 'Dr Wen Qi compared it with her references and concluded it was "almost certainly a species new to science".',
         },
         {
           type: 'short',
@@ -418,7 +421,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         {
           type: 'short',
           marks: 1,
-          q: 'What does the phrase "We are guests here" (paragraph 4) tell you about Dr Mei Ling\'s attitude towards the forest?',
+          q: 'What does the phrase "We are guests here" (paragraph 4) tell you about Dr Wen Qi\'s attitude towards the forest?',
           model: 'It shows that she believes scientists should respect the forest and not disturb it, just as a polite guest would not interfere in someone else\'s home.',
           keywords: ['respect', 'not disturb', 'observe', 'guest'],
         },
@@ -439,15 +442,15 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         {
           type: 'inference',
           marks: 2,
-          q: 'What impression do you get of Faizal from paragraphs 3 and 6? Support your answer with evidence from the passage.',
-          model: 'Faizal comes across as a thoughtful and passionate scientist. In paragraph 3, he made a careful observation by noticing the tiny translucent frog while collecting water samples, showing his attention to detail. In paragraph 6, he reflects on the frog\'s long existence and worries about undiscovered species disappearing, revealing his deep concern for conservation.',
+          q: 'What impression do you get of Harith from paragraphs 3 and 6? Support your answer with evidence from the passage.',
+          model: 'Harith comes across as a thoughtful and passionate scientist. In paragraph 3, he made a careful observation by noticing the tiny translucent frog while collecting water samples, showing his attention to detail. In paragraph 6, he reflects on the frog\'s long existence and worries about undiscovered species disappearing, revealing his deep concern for conservation.',
           keywords: ['thoughtful', 'passionate', 'observation', 'conservation', 'noticed', 'wondered'],
         },
         {
           type: 'open',
           marks: 5,
           q: 'Do you think the logging should be allowed to continue? Use information from the passage to support your view. Also give one reason of your own.',
-          model: 'No — the logging should not be allowed. The discovery of a possible new species suggests the forest is ecologically significant and may contain other undiscovered organisms. Dr Mei Ling notes that a single hectare can contain more insect species than all of Europe, suggesting enormous biodiversity value. Allowing logging would destroy irreplaceable habitat before scientists have even had a chance to study it. Furthermore, once a species is extinct it cannot be recovered, so the potential loss is permanent.',
+          model: 'No — the logging should not be allowed. The discovery of a possible new species suggests the forest is ecologically significant and may contain other undiscovered organisms. Dr Wen Qi notes that a single hectare can contain more insect species than all of Europe, suggesting enormous biodiversity value. Allowing logging would destroy irreplaceable habitat before scientists have even had a chance to study it. Furthermore, once a species is extinct it cannot be recovered, so the potential loss is permanent.',
           keywords: ['new species', 'biodiversity', 'habitat', 'undiscovered', 'destroy', 'extinct'],
         },
       ],
@@ -649,10 +652,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       marks: 15,
       instructions: 'Study the information below carefully and write your response in about 100–120 words.',
       format: 'Formal Letter',
-      purpose: 'To apply for a place in a community art workshop organised by the Taman Jurong Community Club.',
-      audience: 'The Programme Coordinator, Taman Jurong Community Club',
+      purpose: 'To apply for a place in a community art workshop organised by the Cassia Grove Community Club.',
+      audience: 'The Programme Coordinator, Cassia Grove Community Club',
       context:
-        'The Taman Jurong Community Club is offering a six-week mural painting workshop for upper primary students. ' +
+        'The Cassia Grove Community Club is offering a six-week mural painting workshop for upper primary students. ' +
         'Applications close on 30 June. Participants will learn basic techniques from a professional artist and contribute a mural to the club\'s new youth lounge.',
       bullets: [
         'State who you are and why you are applying for the workshop.',
@@ -661,14 +664,14 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       ],
       wordCount: '100–120 words',
       modelAnswer:
-        '15 Buona Vista Drive\nSingapore 129345\n20 June 2026\n\n' +
-        'The Programme Coordinator\nTaman Jurong Community Club\nSingapore 640226\n\n' +
+        '8 Cassia Grove Rise\nSingapore 545118\n18 June 2026\n\n' +
+        'The Programme Coordinator\nCassia Grove Community Club\nSingapore 545220\n\n' +
         'Dear Sir / Madam,\n\n' +
-        'I am writing to apply for a place in the six-week mural painting workshop advertised by your community club. I am a Primary 5 student at Jurong Primary School with a keen interest in visual arts.\n\n' +
+        'I am writing to apply for a place in the six-week mural painting workshop advertised by your community club. I am a Primary 5 student at Cassia Primary School with a keen interest in visual arts.\n\n' +
         'I have been attending my school\'s Art Club for two years and have participated in two inter-school exhibitions. I am eager to learn from a professional artist and develop my skills further.\n\n' +
         'I believe this workshop will not only help me grow as an artist but also allow me to contribute meaningfully to the community by beautifying the new youth lounge.\n\n' +
         'I hope you will consider my application. Thank you.\n\n' +
-        'Yours faithfully,\nLim Jia Yi',
+        'Yours faithfully,\nTan Wei En',
       rubric: {
         taskFulfillment: 'All 3 bullet points addressed; correct formal letter format with address, date, salutation and sign-off.',
         language: 'Formal register maintained; correct grammar; precise and varied vocabulary.',
@@ -682,10 +685,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       instructions: 'For each question, rewrite the sentence(s) so that the meaning stays the same. Use the word(s) given and do not change them.',
       items: [
         {
-          q: '"Did you remember to submit your portfolio before the deadline?" Ms Chen asked Marcus.',
-          stem: 'Ms Chen asked Marcus ___',
-          answer: 'Ms Chen asked Marcus whether he had remembered to submit his portfolio before the deadline.',
-          alternates: ['Ms Chen asked Marcus if he had remembered to submit his portfolio before the deadline.'],
+          q: '"Did you remember to submit your portfolio before the deadline?" Ms Wong asked Julian.',
+          stem: 'Ms Wong asked Julian ___',
+          answer: 'Ms Wong asked Julian whether he had remembered to submit his portfolio before the deadline.',
+          alternates: ['Ms Wong asked Julian if he had remembered to submit his portfolio before the deadline.'],
           requiredGroups: [
             ["whether", "if"],
             ["had remembered", "remembered to submit"],
@@ -778,17 +781,17 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       title: 'Section H: Comprehension',
       marks: 15,
       passage:
-        'In a quiet corner of Woodlands, a small group of senior citizens gather every Tuesday afternoon in a sunlit room at the Woodlands Active Ageing Centre. What draws them together is not a game of mahjong or a fitness class, but an unlikely passion: coding.\n\n' +
-        'The programme, called Silver Coders, was the brainchild of a twenty-three-year-old university student, Priya Nair, who noticed that many elderly residents in her neighbourhood felt excluded from the increasingly digital world. "Everything from hawker payment to hospital appointments has gone online," Priya observed. "Many of my elderly neighbours were struggling to keep up and felt embarrassed to ask for help."\n\n' +
-        'Priya spent six months designing a curriculum specifically for older learners. She avoided jargon, used large fonts, and incorporated familiar scenarios — booking a doctor\'s appointment, paying for hawker meals, video-calling family overseas. She trained a team of student volunteers to assist the participants patiently.\n\n' +
-        'The early sessions were rocky. Mr Lim Ah Kow, 74, recalls gripping the mouse so hard his knuckles turned white. "I kept clicking the wrong thing," he laughs now. "My granddaughter used to fix my mistakes — now I help her with some things."\n\n' +
-        'Today, Silver Coders has expanded to five community centres across Singapore. More than eight hundred seniors have completed the programme. Several participants have gone on to create simple websites for their own small home businesses, selling homemade kaya jam and handmade crafts online.\n\n' +
-        'Priya\'s work has not gone unnoticed. She recently received a national volunteer award, but she insists the real reward is watching participants\' faces light up when they successfully complete a task on their own. "Technology should not be a wall that shuts people out," she says. "It should be a door — open to everyone."',
+        'In a quiet corner of Bedok, a small group of senior citizens gather every Tuesday afternoon in a sunlit room at the Bedok Active Ageing Centre. What draws them together is not a game of mahjong or a fitness class, but an unlikely passion: coding.\n\n' +
+        'The programme, called Golden Keyboards, was the brainchild of a twenty-three-year-old university student, Charmaine Goh, who noticed that many elderly residents in her neighbourhood felt excluded from the increasingly digital world. "Everything from hawker payment to hospital appointments has gone online," Charmaine observed. "Many of my elderly neighbours were struggling to keep up and felt embarrassed to ask for help."\n\n' +
+        'Charmaine spent six months designing a curriculum specifically for older learners. She avoided jargon, used large fonts, and incorporated familiar scenarios — booking a doctor\'s appointment, paying for hawker meals, video-calling family overseas. She trained a team of student volunteers to assist the participants patiently.\n\n' +
+        'The early sessions were rocky. Mr Ong Chin Huat, 74, recalls gripping the mouse so hard his knuckles turned white. "I kept clicking the wrong thing," he laughs now. "My granddaughter used to fix my mistakes — now I help her with some things."\n\n' +
+        'Today, Golden Keyboards has expanded to five community centres across Singapore. More than eight hundred seniors have completed the programme. Several participants have gone on to create simple websites for their own small home businesses, selling homemade kaya jam and handmade crafts online.\n\n' +
+        'Charmaine\'s work has not gone unnoticed. She recently received a national volunteer award, but she insists the real reward is watching participants\' faces light up when they successfully complete a task on their own. "Technology should not be a wall that shuts people out," she says. "It should be a door — open to everyone."',
       questions: [
         {
           type: 'mcq',
           marks: 2,
-          q: 'Why did Priya Nair start the Silver Coders programme?',
+          q: 'Why did Charmaine Goh start the Golden Keyboards programme?',
           choices: [
             'She wanted elderly residents to learn to play online games.',
             'She noticed that elderly residents felt left behind in an increasingly digital world.',
@@ -796,12 +799,12 @@ export const P5_PRACTICE_TESTS = Object.freeze({
             'She wanted to sell technology products to senior citizens.',
           ],
           answer: 'She noticed that elderly residents felt left behind in an increasingly digital world.',
-          explain: 'Paragraph 2: Priya observed that elderly neighbours struggled with digitalisation and felt embarrassed to ask for help.',
+          explain: 'Paragraph 2: Charmaine observed that elderly neighbours struggled with digitalisation and felt embarrassed to ask for help.',
         },
         {
           type: 'mcq',
           marks: 2,
-          q: 'How did Priya make the coding curriculum suitable for older learners?',
+          q: 'How did Charmaine make the coding curriculum suitable for older learners?',
           choices: [
             'She made sessions very short and included many games.',
             'She avoided technical language, used large fonts and relevant real-life examples.',
@@ -821,8 +824,8 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         {
           type: 'short',
           marks: 1,
-          q: 'What does Mr Lim Ah Kow\'s comment "now I help her with some things" (paragraph 4) suggest about his progress?',
-          model: 'It suggests that Mr Lim has improved so much in his digital skills that he can now assist his granddaughter, reversing their earlier roles.',
+          q: 'What does Mr Ong Chin Huat\'s comment "now I help her with some things" (paragraph 4) suggest about his progress?',
+          model: 'It suggests that Mr Ong has improved so much in his digital skills that he can now assist his granddaughter, reversing their earlier roles.',
           keywords: ['improved', 'progress', 'reversed', 'granddaughter'],
         },
         {
@@ -835,22 +838,22 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         {
           type: 'short',
           marks: 1,
-          q: 'What does Priya mean when she says technology should be "a door — open to everyone" (paragraph 6)?',
+          q: 'What does Charmaine mean when she says technology should be "a door — open to everyone" (paragraph 6)?',
           model: 'She means that technology should be inclusive and accessible to all people, including the elderly, not something that excludes or separates them.',
           keywords: ['inclusive', 'accessible', 'excludes', 'all people'],
         },
         {
           type: 'inference',
           marks: 2,
-          q: 'What do you learn about Priya\'s character from the passage? Support your answer with two pieces of evidence.',
-          model: 'Priya is caring and resourceful. First, she noticed that elderly neighbours struggled and took the initiative to help, spending six months designing a curriculum — showing her compassion and dedication. Second, despite receiving a national award, she says the real reward is seeing participants succeed, which shows she is humble and genuinely motivated by helping others rather than personal recognition.',
+          q: 'What do you learn about Charmaine\'s character from the passage? Support your answer with two pieces of evidence.',
+          model: 'Charmaine is caring and resourceful. First, she noticed that elderly neighbours struggled and took the initiative to help, spending six months designing a curriculum — showing her compassion and dedication. Second, despite receiving a national award, she says the real reward is seeing participants succeed, which shows she is humble and genuinely motivated by helping others rather than personal recognition.',
           keywords: ['caring', 'resourceful', 'compassion', 'humble', 'initiative', 'dedicated'],
         },
         {
           type: 'open',
           marks: 5,
           q: 'Do you think schools should do more to help students learn how to support elderly people in their communities? Give two reasons for your view.',
-          model: 'Yes, schools should do more. First, students who volunteer with elderly people develop empathy and an appreciation for different life experiences, which are valuable qualities for the future. Second, as Singapore\'s population ages rapidly, it is increasingly important for young people to understand the challenges faced by seniors and take an active role in building an inclusive community. Priya\'s example shows that even a single young person can make a significant difference.',
+          model: 'Yes, schools should do more. First, students who volunteer with elderly people develop empathy and an appreciation for different life experiences, which are valuable qualities for the future. Second, as Singapore\'s population ages rapidly, it is increasingly important for young people to understand the challenges faced by seniors and take an active role in building an inclusive community. Charmaine\'s example shows that even a single young person can make a significant difference.',
           keywords: ['empathy', 'elderly', 'inclusive', 'community', 'ageing', 'volunteer'],
         },
       ],
@@ -1053,23 +1056,23 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       instructions: 'Study the information below carefully and write your response in about 100–120 words.',
       format: 'Informal Note / Letter',
       purpose: 'To invite your cousin, who lives overseas, to join your family on a heritage trail walk in Singapore.',
-      audience: 'Your overseas cousin, Reuben',
+      audience: 'Your overseas cousin, Marco',
       context:
-        'Your cousin Reuben is visiting Singapore for two weeks in June. ' +
-        'You have planned a self-guided heritage trail walk in Chinatown on 12 June and would like him to join your family. ' +
+        'Your cousin Marco is visiting Singapore for two weeks in June. ' +
+        'You have planned a self-guided heritage trail walk in Chinatown on 19 June and would like him to join your family. ' +
         'The walk will last about two hours and end with a meal at a hawker centre.',
       bullets: [
-        'Invite Reuben warmly and tell him about the heritage trail walk.',
+        'Invite Marco warmly and tell him about the heritage trail walk.',
         'Describe what he can expect to see or learn during the walk.',
         'Suggest what he should bring or wear, and mention the meal afterwards.',
       ],
       wordCount: '100–120 words',
       modelAnswer:
-        'Dear Reuben,\n\n' +
-        'How exciting that you\'re coming to Singapore! I have something fun planned for us on 12 June — a heritage trail walk through Chinatown. I can\'t wait for you to experience it!\n\n' +
+        'Dear Marco,\n\n' +
+        'How exciting that you\'re coming to Singapore! I have something fun planned for us on 19 June — a heritage trail walk through Chinatown. I can\'t wait for you to experience it!\n\n' +
         'During the two-hour walk, we\'ll explore beautifully conserved shophouses, ancient temples, and colourful street markets. You\'ll learn so much about Singapore\'s history and the different communities that shaped it. It will be like stepping back in time!\n\n' +
         'Do wear comfortable walking shoes and bring a water bottle — it can get quite warm. After the walk, we\'ll end with a delicious hawker meal. Trust me, you\'re going to love it.\n\n' +
-        'See you soon!\nYour cousin,\nAlex',
+        'See you soon!\nYour cousin,\nBella',
       rubric: {
         taskFulfillment: 'All 3 bullet points addressed; warm, informal tone suitable for a letter to a cousin; proper opening and sign-off.',
         language: 'Friendly register; correct grammar; natural use of informal expressions.',
@@ -1181,12 +1184,12 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       title: 'Section H: Comprehension',
       marks: 15,
       passage:
-        'Madam Koh Wei Lan is ninety-one years old. She lives in a studio flat in Toa Payoh, surrounded by faded photographs and the smell of freshly brewed chrysanthemum tea. When she speaks, her Mandarin is rich with expressions that few people under the age of sixty still know. To spend an hour with Madam Koh is to step into a Singapore that has all but vanished.\n\n' +
-        'Madam Koh was born in 1935 in a kampong near Geylang. She grew up in a wooden house on stilts, sharing it with her parents, grandparents, and five siblings. Water came from a communal standpipe; light came from oil lamps. Yet she recalls that period not with bitterness but with warmth. "We had nothing," she says, "but we had each other."\n\n' +
-        'Life changed dramatically after Singapore\'s independence in 1965. Madam Koh\'s kampong was demolished in 1972 as part of a nationwide resettlement programme. She and her family were moved to a three-room HDB flat in Toa Payoh. The transition was not easy. "The flat was cleaner and safer," she concedes, "but there was no more catching of fish in the drains, no more gathering under the banyan tree."\n\n' +
-        'Today, Madam Koh participates in an oral history project run by university students. Every month, she sits with a student researcher and recounts her memories, which are recorded, transcribed, and archived. She has described the texture of the grass in the kampong, the sound of the 6 a.m. water pump, and the taste of her mother\'s durian kueh. "I am not talking for myself," she explains. "I am talking for all the people who lived like I did. Someone must remember."\n\n' +
-        'The project coordinator, Dr Siti Mariam, believes that oral history is irreplaceable. Photographs capture moments; documents record facts; but only a living voice can convey the emotional truth of an era. "When Madam Koh describes the scent of attap palm after a monsoon rain," Dr Siti says, "you are transported. No textbook can do that."\n\n' +
-        'Madam Koh has one request for the young researchers who visit her: that they share her stories with their own children one day. "History is not just in books," she says, her eyes bright. "It lives in people. And people don\'t last forever."',
+        'Madam Foo Siew Lan is ninety-one years old. She lives in a studio flat in Toa Payoh, surrounded by faded photographs and the smell of freshly brewed chrysanthemum tea. When she speaks, her Mandarin is rich with expressions that few people under the age of sixty still know. To spend an hour with Madam Foo is to step into a Singapore that has all but vanished.\n\n' +
+        'Madam Foo was born in 1935 in a kampong near Punggol. She grew up in a wooden house on stilts, sharing it with her parents, grandparents, and five siblings. Water came from a communal standpipe; light came from oil lamps. Yet she recalls that period not with bitterness but with warmth. "We had nothing," she says, "but we had each other."\n\n' +
+        'Life changed dramatically after Singapore\'s independence in 1965. Madam Foo\'s kampong was demolished in 1972 as part of a nationwide resettlement programme. She and her family were moved to a three-room HDB flat in Toa Payoh. The transition was not easy. "The flat was cleaner and safer," she concedes, "but there was no more catching of fish in the drains, no more gathering under the banyan tree."\n\n' +
+        'Today, Madam Foo participates in an oral history project run by university students. Every month, she sits with a student researcher and recounts her memories, which are recorded, transcribed, and archived. She has described the texture of the grass in the kampong, the sound of the 6 a.m. water pump, and the taste of her mother\'s durian kueh. "I am not talking for myself," she explains. "I am talking for all the people who lived like I did. Someone must remember."\n\n' +
+        'The project coordinator, Dr Nur Aisyah, believes that oral history is irreplaceable. Photographs capture moments; documents record facts; but only a living voice can convey the emotional truth of an era. "When Madam Foo describes the scent of attap palm after a monsoon rain," Dr Aisyah says, "you are transported. No textbook can do that."\n\n' +
+        'Madam Foo has one request for the young researchers who visit her: that they share her stories with their own children one day. "History is not just in books," she says, her eyes bright. "It lives in people. And people don\'t last forever."',
       questions: [
         {
           type: 'mcq',
@@ -1194,17 +1197,17 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           q: 'What does the phrase "a Singapore that has all but vanished" (paragraph 1) suggest?',
           choices: [
             'Singapore has completely disappeared and no longer exists.',
-            'The Singapore that Madam Koh knew has nearly ceased to exist.',
-            'Madam Koh has forgotten most of what Singapore used to look like.',
+            'The Singapore that Madam Foo knew has nearly ceased to exist.',
+            'Madam Foo has forgotten most of what Singapore used to look like.',
             'Singapore has been replaced by a foreign country.',
           ],
-          answer: 'The Singapore that Madam Koh knew has nearly ceased to exist.',
+          answer: 'The Singapore that Madam Foo knew has nearly ceased to exist.',
           explain: '"All but vanished" means almost completely gone — the old Singapore is nearly, but not entirely, gone.',
         },
         {
           type: 'mcq',
           marks: 2,
-          q: 'Why did Madam Koh say "we had nothing, but we had each other" (paragraph 2)?',
+          q: 'Why did Madam Foo say "we had nothing, but we had each other" (paragraph 2)?',
           choices: [
             'She wanted to criticise the government for neglecting her kampong.',
             'She was explaining that material poverty was offset by close community bonds.',
@@ -1224,36 +1227,36 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         {
           type: 'short',
           marks: 1,
-          q: 'According to paragraph 4, what specific details did Madam Koh share with the student researchers?',
+          q: 'According to paragraph 4, what specific details did Madam Foo share with the student researchers?',
           model: 'She described the texture of the grass in the kampong, the sound of the 6 a.m. water pump, and the taste of her mother\'s durian kueh.',
           keywords: ['grass', 'water pump', 'durian kueh', 'texture', 'sound', 'taste'],
         },
         {
           type: 'short',
           marks: 1,
-          q: 'What does Dr Siti Mariam believe oral history can do that photographs and documents cannot?',
+          q: 'What does Dr Nur Aisyah believe oral history can do that photographs and documents cannot?',
           model: 'She believes oral history can convey the emotional truth of an era — a living voice can transport the listener in a way that photographs and documents cannot.',
           keywords: ['emotional truth', 'living voice', 'transported', 'convey'],
         },
         {
           type: 'short',
           marks: 1,
-          q: 'Why does Madam Koh say "I am not talking for myself" (paragraph 4)?',
+          q: 'Why does Madam Foo say "I am not talking for myself" (paragraph 4)?',
           model: 'She means she is preserving the memories on behalf of all the people who lived in kampongs like she did, not just for her own benefit.',
           keywords: ['on behalf of', 'all people', 'lived like', 'remember'],
         },
         {
           type: 'inference',
           marks: 2,
-          q: 'What do you learn about Madam Koh\'s attitude towards the past from the passage? Support your answer with two pieces of evidence.',
-          model: 'Madam Koh feels nostalgic about the kampong years but does not resent the changes. First, she recalls her childhood "not with bitterness but with warmth", showing she treasures those memories. Second, her request that young researchers share her stories with their own children shows she is forward-looking — she wants the past to live on, not be mourned.',
+          q: 'What do you learn about Madam Foo\'s attitude towards the past from the passage? Support your answer with two pieces of evidence.',
+          model: 'Madam Foo feels nostalgic about the kampong years but does not resent the changes. First, she recalls her childhood "not with bitterness but with warmth", showing she treasures those memories. Second, her request that young researchers share her stories with their own children shows she is forward-looking — she wants the past to live on, not be mourned.',
           keywords: ['nostalgic', 'warmth', 'no bitterness', 'forward-looking', 'treasures', 'share'],
         },
         {
           type: 'open',
           marks: 5,
-          q: 'Madam Koh says "History is not just in books — it lives in people." Do you agree? Give two reasons for your view.',
-          model: 'Yes, I agree strongly. First, personal memories contain details that official records never capture — the feeling of a place, the sounds and smells of daily life, and the emotions of ordinary people. These humanise history in a way that textbooks cannot. Second, the living testimonies of individuals like Madam Koh create a direct emotional connection between the past and the present, inspiring young people to appreciate and preserve their cultural heritage.',
+          q: 'Madam Foo says "History is not just in books — it lives in people." Do you agree? Give two reasons for your view.',
+          model: 'Yes, I agree strongly. First, personal memories contain details that official records never capture — the feeling of a place, the sounds and smells of daily life, and the emotions of ordinary people. These humanise history in a way that textbooks cannot. Second, the living testimonies of individuals like Madam Foo create a direct emotional connection between the past and the present, inspiring young people to appreciate and preserve their cultural heritage.',
           keywords: ['personal memories', 'emotions', 'humanise', 'connection', 'heritage', 'ordinary people'],
         },
       ],
@@ -1577,19 +1580,19 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       title: 'Section H: Comprehension',
       marks: 15,
       passage:
-        'At sixteen, Darren Loh was already ranked among the top fifty esports players in Southeast Asia. His speciality was a real-time strategy game called Fortress Command, which required players to simultaneously manage resources, direct units, and anticipate their opponents\' moves — all within fractions of a second. His bedroom wall was plastered with print-outs of his best strategies, and his sleep schedule was built around international tournament times.\n\n' +
-        'Darren\'s parents, both civil servants, had not objected to his gaming at first. They had assumed it was a phase — something he would grow out of once examinations loomed. But by Secondary Three, it was clear that Darren had no intention of giving up. When his ranking climbed high enough to attract a sponsorship offer from a regional gaming company, they could no longer ignore the question: was this a viable future, or a dangerous distraction?\n\n' +
-        '"We were genuinely torn," admits his mother, Mdm Loh Bee Cheng. "On one hand, we had always told him to pursue his passion. On the other, we worried about his health, his studies, and what would happen if it all came to nothing."\n\n' +
-        'A compromise was reached. Darren would accept the sponsorship but agree to maintain his grades at a minimum of B average and limit his daily practice to six hours. A sports psychologist was brought in to help him manage competition stress and prevent burnout.\n\n' +
-        'Three years later, Darren is now studying computer science at a local university while competing semi-professionally on weekends. He credits the structured approach for keeping him grounded. "Gaming taught me everything I now apply in my studies," he says. "Pattern recognition, resource management, staying calm under pressure — these are life skills."\n\n' +
-        'His story is becoming less exceptional in Singapore, where the government has begun to explore how esports skills might translate into careers in game development, data analytics, and cybersecurity. For Darren, the journey from bedroom gamer to semi-professional competitor has been the most demanding — and most rewarding — experience of his life.',
+        'At sixteen, Jonas Lim was already ranked among the top fifty esports players in Southeast Asia. His speciality was a real-time strategy game called Citadel Rush, which required players to simultaneously manage resources, direct units, and anticipate their opponents\' moves — all within fractions of a second. His bedroom wall was plastered with print-outs of his best strategies, and his sleep schedule was built around international tournament times.\n\n' +
+        'Jonas\'s parents, both civil servants, had not objected to his gaming at first. They had assumed it was a phase — something he would grow out of once examinations loomed. But by Secondary Three, it was clear that Jonas had no intention of giving up. When his ranking climbed high enough to attract a sponsorship offer from a regional gaming company, they could no longer ignore the question: was this a viable future, or a dangerous distraction?\n\n' +
+        '"We were genuinely torn," admits his mother, Mdm Ho Lay Peng. "On one hand, we had always told him to pursue his passion. On the other, we worried about his health, his studies, and what would happen if it all came to nothing."\n\n' +
+        'A compromise was reached. Jonas would accept the sponsorship but agree to maintain his grades at a minimum of B average and limit his daily practice to six hours. A sports psychologist was brought in to help him manage competition stress and prevent burnout.\n\n' +
+        'Three years later, Jonas is now studying computer science at a local university while competing semi-professionally on weekends. He credits the structured approach for keeping him grounded. "Gaming taught me everything I now apply in my studies," he says. "Pattern recognition, resource management, staying calm under pressure — these are life skills."\n\n' +
+        'His story is becoming less exceptional in Singapore, where the government has begun to explore how esports skills might translate into careers in game development, data analytics, and cybersecurity. For Jonas, the journey from bedroom gamer to semi-professional competitor has been the most demanding — and most rewarding — experience of his life.',
       questions: [
         {
           type: 'mcq',
           marks: 2,
-          q: 'Why did Darren\'s parents initially not object to his gaming (paragraph 2)?',
+          q: 'Why did Jonas\'s parents initially not object to his gaming (paragraph 2)?',
           choices: [
-            'They believed gaming would help Darren with his school subjects.',
+            'They believed gaming would help Jonas with his school subjects.',
             'They thought it was a temporary interest that would fade.',
             'They were planning to enroll him in a professional esports academy.',
             'They saw gaming as an important social activity for teenagers.',
@@ -1600,34 +1603,34 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         {
           type: 'mcq',
           marks: 2,
-          q: 'What does "genuinely torn" (paragraph 3) suggest about Darren\'s parents?',
+          q: 'What does "genuinely torn" (paragraph 3) suggest about Jonas\'s parents?',
           choices: [
-            'They were angry with Darren for neglecting his studies.',
+            'They were angry with Jonas for neglecting his studies.',
             'They could not reach a decision and felt deeply conflicted.',
-            'They had decided to support Darren but were hiding their doubts.',
+            'They had decided to support Jonas but were hiding their doubts.',
             'They were excited about the sponsorship offer.',
           ],
           answer: 'They could not reach a decision and felt deeply conflicted.',
-          explain: '"Torn" means divided — they had strong reasons both for and against supporting Darren\'s gaming career.',
+          explain: '"Torn" means divided — they had strong reasons both for and against supporting Jonas\'s gaming career.',
         },
         {
           type: 'short',
           marks: 1,
-          q: 'Find a phrase in paragraph 1 that shows Darren\'s dedication to competitive gaming.',
+          q: 'Find a phrase in paragraph 1 that shows Jonas\'s dedication to competitive gaming.',
           model: 'his sleep schedule was built around international tournament times',
           keywords: ['sleep schedule', 'tournament times', 'print-outs', 'strategies'],
         },
         {
           type: 'short',
           marks: 1,
-          q: 'What conditions did Darren agree to as part of the family compromise (paragraph 4)?',
+          q: 'What conditions did Jonas agree to as part of the family compromise (paragraph 4)?',
           model: 'He agreed to maintain a minimum B average in his studies and limit his daily practice to six hours.',
           keywords: ['B average', 'six hours', 'grades', 'limit'],
         },
         {
           type: 'short',
           marks: 1,
-          q: 'According to Darren (paragraph 5), what skills did gaming teach him that are also useful in life?',
+          q: 'According to Jonas (paragraph 5), what skills did gaming teach him that are also useful in life?',
           model: 'Gaming taught him pattern recognition, resource management, and the ability to stay calm under pressure.',
           keywords: ['pattern recognition', 'resource management', 'calm under pressure'],
         },
@@ -1641,14 +1644,14 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         {
           type: 'inference',
           marks: 2,
-          q: 'What do you learn about the relationship between Darren and his parents from the passage? Support your answer with evidence.',
-          model: 'The relationship is one of mutual respect and open communication. Darren\'s parents did not forbid his gaming outright, but expressed their concerns honestly. Rather than ignoring their worries, Darren agreed to the compromise conditions, suggesting he valued their opinion. The compromise itself — not a ban, but a set of boundaries — shows that both sides were willing to listen.',
+          q: 'What do you learn about the relationship between Jonas and his parents from the passage? Support your answer with evidence.',
+          model: 'The relationship is one of mutual respect and open communication. Jonas\'s parents did not forbid his gaming outright, but expressed their concerns honestly. Rather than ignoring their worries, Jonas agreed to the compromise conditions, suggesting he valued their opinion. The compromise itself — not a ban, but a set of boundaries — shows that both sides were willing to listen.',
           keywords: ['mutual respect', 'communication', 'compromise', 'concerns', 'valued', 'open'],
         },
         {
           type: 'open',
           marks: 5,
-          q: 'Darren says gaming taught him "life skills" such as pattern recognition, resource management, and staying calm under pressure. Do you agree that hobbies can teach important life skills? Give two reasons for your view.',
+          q: 'Jonas says gaming taught him "life skills" such as pattern recognition, resource management, and staying calm under pressure. Do you agree that hobbies can teach important life skills? Give two reasons for your view.',
           model: 'Yes, hobbies absolutely teach important life skills. First, any hobby that involves challenge — whether it is chess, sport, or even cooking — requires persistence. Overcoming difficulties in a hobby builds resilience that transfers to school and work. Second, hobbies that involve planning or strategy, like gaming, coding, or music, develop analytical thinking. These mental skills are directly applicable to problem-solving in academic subjects and future careers.',
           keywords: ['persistence', 'resilience', 'analytical thinking', 'strategy', 'challenge', 'transferable'],
         },
