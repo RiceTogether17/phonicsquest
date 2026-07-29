@@ -5,6 +5,21 @@
  */
 
 import { scheduleAttempt, seedFromLegacy } from './reviewScheduler.js';
+import { idbGet, idbSet, isAvailable as idbAvailable } from './idb.js';
+
+/**
+ * State keys persisted to IndexedDB instead of localStorage.
+ *
+ * Criteria: large, append-only, and non-critical — losing one must degrade
+ * a signal, never a child's progress. `learningEvents` is fine-grained
+ * telemetry feeding the mastery engine's speed dimension; everything that
+ * actually represents learning (wordStats, badges, mastery) stays in
+ * localStorage where it is written synchronously and backed up daily.
+ */
+const OFFLOADED_KEYS = ['learningEvents'];
+
+/** Cap on the fine-grained learning-event log. */
+const MAX_LEARNING_EVENTS = 1000;
 
 const DEFAULT_STORAGE_KEY = 'phonicsquest_v2';
 let STORAGE_KEY = DEFAULT_STORAGE_KEY;
@@ -211,6 +226,22 @@ const DEFAULT_STATE = {
   srsSchedule: {},
 };
 
+/**
+ * A fresh deep copy of the defaults.
+ *
+ * DEFAULT_STATE holds mutable arrays and objects (learningEvents,
+ * wordHistory, questMastery...). Spreading it shallowly hands every new or
+ * reset state the *same* nested references, so anything that mutates one in
+ * place would silently write through to the defaults — and thence into
+ * every profile loaded afterwards. Cloning removes that whole class of
+ * aliasing bug.
+ */
+function freshDefaults() {
+  return typeof structuredClone === 'function'
+    ? structuredClone(DEFAULT_STATE)
+    : JSON.parse(JSON.stringify(DEFAULT_STATE));
+}
+
 class Store {
   constructor() {
     this._state = this._load();
@@ -254,7 +285,7 @@ class Store {
    * @private
    */
   _mergeWithDefaults(repaired) {
-    const merged = { ...DEFAULT_STATE, ...repaired };
+    const merged = { ...freshDefaults(), ...repaired };
     // Structured objects merge one level deep so sub-keys added in
     // newer versions (e.g. a new quest bucket) exist for old saves.
     for (const key of DEEP_MERGE_KEYS) {
@@ -288,7 +319,7 @@ class Store {
         return restored;
       }
     }
-    return { ...DEFAULT_STATE };
+    return freshDefaults();
   }
 
   /**
@@ -376,8 +407,9 @@ class Store {
   /** Actually write to localStorage (called by debounced _save). */
   _flushSave() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this._state));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this._serialisableState()));
       this._saveFailures = 0;
+      this._flushOffloadedKeys();
       // Roll the automatic backup forward once per day, on the first
       // successful save: a known-good copy from at most yesterday is what
       // _load falls back to if the main key is ever corrupted.
@@ -398,6 +430,56 @@ class Store {
       devWarn('Save failed:', err.message, `(failure #${this._saveFailures})`);
       if (this._saveFailures >= 3) {
         this._showStorageWarning();
+      }
+    }
+  }
+
+  /**
+   * State minus the keys offloaded to IndexedDB.
+   *
+   * `learningEvents` alone is up to 1,000 records — re-serialising it into
+   * localStorage on every answer was the single biggest write cost in the
+   * app, and it shares the same ~5 MB quota as the child's actual progress.
+   * @private
+   */
+  _serialisableState() {
+    if (!OFFLOADED_KEYS.length) return this._state;
+    const out = { ...this._state };
+    for (const key of OFFLOADED_KEYS) delete out[key];
+    return out;
+  }
+
+  /**
+   * Write-behind the offloaded keys to IndexedDB. Fire-and-forget: this is
+   * telemetry, and `idbSet` resolves false rather than throwing when
+   * IndexedDB is unavailable (private browsing, older engines).
+   *
+   * When IndexedDB is missing we deliberately do NOT fall back to
+   * localStorage — that would reinstate the very quota pressure this
+   * avoids. The log simply doesn't persist across reloads, which costs the
+   * mastery engine some speed signal and nothing else.
+   * @private
+   */
+  _flushOffloadedKeys() {
+    if (!OFFLOADED_KEYS.length || !idbAvailable()) return;
+    for (const key of OFFLOADED_KEYS) {
+      idbSet(`${STORAGE_KEY}::${key}`, this._state[key]);
+    }
+  }
+
+  /**
+   * Load offloaded keys back into memory. Async, so consumers reading in
+   * the first moments after boot see the default (empty) value and then the
+   * hydrated one — every consumer already guards with `|| []`.
+   * @returns {Promise<void>}
+   */
+  async hydrateOffloadedKeys() {
+    if (!OFFLOADED_KEYS.length || !idbAvailable()) return;
+    for (const key of OFFLOADED_KEYS) {
+      const value = await idbGet(`${STORAGE_KEY}::${key}`);
+      if (Array.isArray(value)) {
+        this._state[key] = value;
+        this._notify(key, value);
       }
     }
   }
@@ -476,7 +558,7 @@ class Store {
     // progress must not delete the parent's PIN or their AI key.
     const pin = this._state.parentPin;
     const apiKey = this._state.geminiApiKey;
-    this._state = { ...DEFAULT_STATE, parentPin: pin, geminiApiKey: apiKey };
+    this._state = { ...freshDefaults(), parentPin: pin, geminiApiKey: apiKey };
     this._save();
     this._notify('*', this._state);
   }
@@ -492,6 +574,10 @@ class Store {
     this._backupPending = undefined; // re-evaluate staleness for the new key
     this._state = this._load();
     this._notify('*', this._state);
+    // Offloaded keys are namespaced per storage key, and _load() resets them
+    // to their defaults, so the incoming profile starts from an empty log
+    // (never the previous child's) and fills in as IndexedDB resolves.
+    this.hydrateOffloadedKeys();
   }
 
   /** Restore to the default storage key (single-profile mode). */
@@ -619,23 +705,25 @@ class Store {
   }
 
   /**
-   * Record a fine-grained learning telemetry event (capped at 1000).
+   * Record a fine-grained learning telemetry event (capped at MAX_LEARNING_EVENTS).
    * @param {{eventType: string, quest?: string, skill?: string, correct?: boolean, responseMs?: number, level?: string|number, meta?: object, timestamp?: string}} entry
    */
   recordLearningEvent(entry) {
-    const events = [
-      {
-        eventType: entry.eventType || 'unknown',
-        quest: entry.quest ?? null,
-        skill: entry.skill ?? null,
-        correct: typeof entry.correct === 'boolean' ? entry.correct : null,
-        responseMs: entry.responseMs ?? null,
-        level: entry.level ?? null,
-        meta: entry.meta ?? null,
-        timestamp: entry.timestamp || new Date().toISOString(),
-      },
-      ...(this._state.learningEvents || []),
-    ].slice(0, 1000);
+    const events = this._state.learningEvents || [];
+    // Mutate in place rather than rebuilding a 1,000-element array on every
+    // answer: unshift + pop is one shift, where the old spread-and-slice
+    // allocated a fresh copy of the whole log per event.
+    events.unshift({
+      eventType: entry.eventType || 'unknown',
+      quest: entry.quest ?? null,
+      skill: entry.skill ?? null,
+      correct: typeof entry.correct === 'boolean' ? entry.correct : null,
+      responseMs: entry.responseMs ?? null,
+      level: entry.level ?? null,
+      meta: entry.meta ?? null,
+      timestamp: entry.timestamp || new Date().toISOString(),
+    });
+    while (events.length > MAX_LEARNING_EVENTS) events.pop();
     this.set('learningEvents', events);
   }
 

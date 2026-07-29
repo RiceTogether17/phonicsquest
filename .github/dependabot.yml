@@ -1,0 +1,22 @@
+# Monthly dependency refresh.
+#
+# The lockfile has drifted before (vite 5.x alongside a 4.x-era vitest);
+# small monthly bumps avoid the painful all-at-once upgrade later. Grouped
+# so CI runs once per ecosystem rather than once per package.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      dev-dependencies:
+        dependency-type: development
+      production-dependencies:
+        dependency-type: production
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly

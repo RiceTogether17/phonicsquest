@@ -1,0 +1,10 @@
+# Build output is committed for GitHub Pages — never reformat it.
+docs/
+node_modules/
+play-store/
+package-lock.json
+
+# Content data files use hand-tuned alignment that Prettier would destroy
+# (column-aligned word tables, curriculum rows). Reformatting them would
+# produce an enormous, unreviewable diff for no readability gain.
+src/data/

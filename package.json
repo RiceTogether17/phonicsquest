@@ -1,7 +1,7 @@
 {
   "name": "phonicsquest",
   "version": "2.0.0",
-  "description": "PhonicsQuest – production-grade phonics learning adventure for early readers",
+  "description": "PhonicsQuest \u2013 production-grade phonics learning adventure for early readers",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,7 +16,10 @@
     "test:e2e": "playwright test",
     "audit:stories": "node scripts/audit-stories.mjs",
     "gen:store-graphics": "node scripts/gen-store-graphics.mjs",
-    "optimize:images": "node scripts/optimize-images.mjs"
+    "optimize:images": "node scripts/optimize-images.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "simple-git-hooks || true"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.2",
@@ -32,8 +35,23 @@
     "globals": "^17.7.0",
     "jimp": "^1.6.1",
     "jsdom": "^28.1.0",
+    "lint-staged": "^17.2.0",
+    "prettier": "^3.9.6",
+    "simple-git-hooks": "^2.13.1",
     "typescript": "^5.9.3",
     "vite": "^5.2.0",
     "vitest": "^4.0.18"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
   }
 }
