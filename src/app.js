@@ -14,6 +14,7 @@
 import { store } from './modules/store.js';
 import { escapeHtml } from './utils/escapeHtml.js';
 import * as homeBanners from './modules/homeBanners.js';
+import * as returnEvents from './modules/returnEvents.js';
 import * as askGiriPanel from './components/panels/askGiriPanel.js';
 import * as mistakesDenPanel from './components/panels/mistakesDenPanel.js';
 import * as trophyRoomPanel from './components/panels/trophyRoomPanel.js';
@@ -105,7 +106,6 @@ const quickCheckMod = lazyModule(() => import('./modules/primaryQuickCheck.js'))
 import { getReadingBand, getHomeLayoutForReadingBand } from './modules/readingStages.js';
 import { isTeacherUnlockActive, tryTeacherUnlock, lockTeacherMode } from './modules/teacherUnlock.js';
 import { showSessionSummary } from './components/sessionSummary.js';
-import { showWeeklyRecap, shouldShowWeeklyRecap } from './components/weeklyRecap.js';
 
 import { createPinHash, verifyPin } from './modules/parentPin.js';
 
@@ -2524,141 +2524,46 @@ class App {
    * Checks: streak freeze notification → comeback session → weekly recap → backup reminder.
    * Each check is mutually exclusive per session to avoid modal stacking.
    */
+  /** @see modules/returnEvents.js */
   _checkReturnEvents() {
-    if (gamification.wasFreezeUsed()) {
-      this._showToast('Streak saved! 🛡️ Your streak freeze was used automatically.', 'success');
-    }
-
-    const daysAway = gamification.getDaysAway();
-    if (daysAway >= 2 && daysAway <= 6) {
-      const last = store.get('comebackShownAt');
-      const today = new Date().toDateString();
-      if (!last || new Date(last).toDateString() !== today) {
-        store.set('comebackShownAt', new Date().toISOString());
-        setTimeout(() => this._showComebackModal(daysAway), 600);
-        return;
-      }
-    }
-
-    if (shouldShowWeeklyRecap()) {
-      const stats = gamification.getWeeklyStats();
-      setTimeout(() => showWeeklyRecap({
-        stats,
-        onClose: () => this._checkBackupReminder(),
-      }), 600);
-      return;
-    }
-
-    this._checkBackupReminder();
+    returnEvents.checkReturnEvents({
+      onToast: (msg, type) => this._showToast(msg, type),
+      onStartWarmUp: () => {
+        this._mode = 'blend';
+        store.set('currentMode', 'blend');
+        this._startGame(store.get('currentGroup') || 'cvc-a');
+      },
+    });
   }
 
   /**
    * Show the "Welcome back" modal after a 2–6 day absence.
    * @param {number} daysAway
    */
+  /** @see modules/returnEvents.js */
   _showComebackModal(daysAway) {
-    const profile  = getActiveProfile();
-    // Escaped: spliced into the comeback modal's innerHTML below.
-    const name     = escapeHtml(profile?.name?.split(' ')[0] || 'there');
-    const existing = document.getElementById('modal-comeback');
-    if (existing) existing.remove();
-
-    const modal = document.createElement('div');
-    modal.id        = 'modal-comeback';
-    modal.className = 'modal-overlay modal-overlay--active';
-    modal.setAttribute('role', 'dialog');
-    modal.setAttribute('aria-modal', 'true');
-    modal.setAttribute('aria-label', 'Welcome back');
-
-    const dayLabel = daysAway === 1 ? 'yesterday' : `${daysAway} days ago`;
-    const streak   = store.get('streak') || 0;
-
-    modal.innerHTML = `
-      <div class="modal-panel cb-panel">
-        <div class="cb-icon" aria-hidden="true">👋</div>
-        <h2 class="cb-title">Welcome back, ${name}!</h2>
-        <p class="cb-body">You last played ${dayLabel}. Let's warm up with a quick 5-question round before diving in.</p>
-        ${streak > 0 ? `<p class="cb-streak">🔥 Your streak is at <strong>${streak} days</strong> — keep it going!</p>` : ''}
-        <div class="cb-actions">
-          <button class="btn btn--primary btn--xl" id="cb-warm-up">Start warm-up →</button>
-          <button class="btn btn--ghost" id="cb-skip">Skip, go to home</button>
-        </div>
-      </div>`;
-
-    document.body.appendChild(modal);
-
-    modal.querySelector('#cb-warm-up')?.addEventListener('click', () => {
-      modal.remove();
-      this._mode = 'blend';
-      store.set('currentMode', 'blend');
-      this._startGame(store.get('currentGroup') || 'cvc-a');
+    returnEvents.showComebackModal(daysAway, {
+      onToast: (msg, type) => this._showToast(msg, type),
+      onStartWarmUp: () => {
+        this._mode = 'blend';
+        store.set('currentMode', 'blend');
+        this._startGame(store.get('currentGroup') || 'cvc-a');
+      },
     });
-    modal.querySelector('#cb-skip')?.addEventListener('click', () => {
-      modal.remove();
-      this._checkBackupReminder();
-    });
-
-    setTimeout(() => modal.querySelector('#cb-warm-up')?.focus(), 100);
   }
 
   /**
    * Show the backup reminder if 7+ days have passed since the last reminder
    * and the profile has meaningful progress.
    */
+  /** @see modules/returnEvents.js */
   _checkBackupReminder() {
-    const last = store.get('lastBackupReminderAt');
-    if (last) {
-      const daysSince = (Date.now() - new Date(last).getTime()) / 86400000;
-      if (daysSince < 7) return;
-    }
-
-    const wordCount = Object.keys(store.get('wordStats') || {}).length;
-    if (wordCount < 10) return;
-
-    store.set('lastBackupReminderAt', new Date().toISOString());
-    this._showBackupReminderModal();
+    returnEvents.checkBackupReminder({ onToast: (m, t) => this._showToast(m, t) });
   }
 
+  /** @see modules/returnEvents.js */
   _showBackupReminderModal() {
-    const existing = document.getElementById('modal-backup-reminder');
-    if (existing) existing.remove();
-
-    const profile  = getActiveProfile();
-    const wordCount = Object.keys(store.get('wordStats') || {}).length;
-
-    const modal = document.createElement('div');
-    modal.id        = 'modal-backup-reminder';
-    modal.className = 'modal-overlay modal-overlay--active';
-    modal.setAttribute('role', 'dialog');
-    modal.setAttribute('aria-modal', 'true');
-    modal.setAttribute('aria-label', 'Backup your progress');
-
-    modal.innerHTML = `
-      <div class="modal-panel br-panel">
-        <div class="br-icon" aria-hidden="true">💾</div>
-        <h2 class="br-title">Back up your progress!</h2>
-        <p class="br-body">
-          ${escapeHtml(profile?.name || 'Your learner')} has practised <strong>${wordCount} words</strong>.
-          If browser data is cleared, this progress could be lost.
-        </p>
-        <p class="br-body">Download a backup file to keep it safe.</p>
-        <div class="br-actions">
-          <button class="btn btn--primary" id="br-export-btn">📥 Download backup</button>
-          <button class="btn btn--ghost" id="br-dismiss-btn">Remind me later</button>
-        </div>
-      </div>`;
-
-    document.body.appendChild(modal);
-
-    modal.querySelector('#br-export-btn')?.addEventListener('click', () => {
-      const activeId = profile?.id;
-      if (activeId) exportProfile(activeId);
-      modal.remove();
-      this._showToast('Backup downloaded! Keep the file somewhere safe.', 'success');
-    });
-    modal.querySelector('#br-dismiss-btn')?.addEventListener('click', () => modal.remove());
-
-    setTimeout(() => modal.querySelector('#br-export-btn')?.focus(), 100);
+    returnEvents.showBackupReminderModal({ onToast: (m, t) => this._showToast(m, t) });
   }
 
   // ── Session Summary ──
