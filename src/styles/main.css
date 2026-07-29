@@ -13678,3 +13678,317 @@ body.print-mode > *:not(.print-report-wrapper) > * { visibility: hidden; }
 
 /* Mini-lesson step tag was 3.2:1 on the translucent chip. */
 .mini-lesson-step-tag { color: #4f46e5; }
+
+/* ── Elkonin sound boxes ──────────────────────────────────────────────────
+   One box per phoneme, filled as the child isolates each sound. Colour is
+   inherited from the shared --c-* sound-type variables (the same language
+   the phoneme tiles use), so these track the default, high-contrast and
+   dyslexia themes without a second palette.
+
+   State is deliberately readable without colour: an empty box is dashed
+   with a faint placeholder, a filled box is solid and shows its grapheme,
+   correct adds a check accent and retry a dotted border. Screen readers get
+   the same information from each box's aria-label. */
+
+.sound-boxes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  width: 100%;
+  margin: var(--space-3) 0;
+}
+
+.sound-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  height: 56px;
+  border: 3px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  transition: background var(--dur-base), border-color var(--dur-base),
+              color var(--dur-base), transform var(--dur-base);
+}
+
+.sound-box__mark { line-height: 1; }
+
+/* The box currently being worked on. Scale + solid border, so the cue is
+   not purely a colour change. */
+.sound-box--active {
+  border-style: solid;
+  border-color: var(--color-primary);
+  transform: scale(1.06);
+}
+
+/* Filled / correct boxes take their sound-type colour. */
+.sound-box--filled,
+.sound-box--correct {
+  border-style: solid;
+  color: var(--text-on-dark);
+}
+
+.sound-box--correct { box-shadow: 0 3px 0 rgba(0,0,0,0.2); }
+
+/* Mistakes are never red here — a dotted border says "have another go",
+   matching the app's charter that mistakes are safe. */
+.sound-box--retry {
+  border-style: dotted;
+  border-color: var(--color-warning, #f59e0b);
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+.sound-box--filled.sound-box--consonant,
+.sound-box--correct.sound-box--consonant   { background: var(--c-consonant);   border-color: var(--c-consonant); }
+.sound-box--filled.sound-box--short-vowel,
+.sound-box--correct.sound-box--short-vowel { background: var(--c-short-vowel); border-color: var(--c-short-vowel); }
+.sound-box--filled.sound-box--long-vowel,
+.sound-box--correct.sound-box--long-vowel  { background: var(--c-long-vowel);  border-color: var(--c-long-vowel); }
+.sound-box--filled.sound-box--digraph,
+.sound-box--correct.sound-box--digraph     { background: var(--c-digraph);     border-color: var(--c-digraph); }
+.sound-box--filled.sound-box--blend,
+.sound-box--correct.sound-box--blend       { background: var(--c-blend);       border-color: var(--c-blend); }
+.sound-box--filled.sound-box--silent-e,
+.sound-box--correct.sound-box--silent-e    { background: var(--c-silent-e);    border-color: var(--c-silent-e); }
+.sound-box--filled.sound-box--r-control,
+.sound-box--correct.sound-box--r-control   { background: var(--c-r-control);   border-color: var(--c-r-control); }
+.sound-box--filled.sound-box--diphthong,
+.sound-box--correct.sound-box--diphthong   { background: var(--c-diphthong);   border-color: var(--c-diphthong); }
+.sound-box--filled.sound-box--suffix,
+.sound-box--correct.sound-box--suffix      { background: var(--c-suffix);      border-color: var(--c-suffix); }
+
+/* Longer words (6–8 sounds) shrink so the track still fits one line on a
+   phone rather than wrapping mid-word, which would break the left-to-right
+   "sounds in order" reading the boxes exist to teach. */
+.sound-boxes--n6 .sound-box,
+.sound-boxes--n7 .sound-box,
+.sound-boxes--n8 .sound-box {
+  min-width: 40px;
+  height: 44px;
+  font-size: var(--font-size-md);
+}
+
+@media (min-width: 768px) {
+  .sound-box { min-width: 68px; height: 68px; font-size: var(--font-size-2xl); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sound-box { transition: none; }
+  .sound-box--active { transform: none; }
+}
+
+/* ── Giri word card ───────────────────────────────────────────────────────
+   Puts Giri inside the lesson rather than only in celebrations: the mascot
+   presents the word's picture. The picture is the word's own emoji, so this
+   works for every word in the bank without per-word artwork. */
+
+.giri-word-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.giri-word-card__giri {
+  width: clamp(48px, 14vw, 88px);
+  height: auto;
+  flex-shrink: 0;
+  /* Giri is scenery: never let the mascot pull attention off the word. */
+  opacity: 0.95;
+  pointer-events: none;
+  user-select: none;
+}
+
+.giri-word-card__frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-2);
+  border: 3px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
+  min-width: 96px;
+}
+
+.giri-word-card__picture {
+  font-size: clamp(2.5rem, 12vw, 4.5rem);
+  line-height: 1;
+}
+
+/* Listening-first modes withhold the picture on purpose. */
+.giri-word-card__picture--hidden {
+  color: var(--text-muted);
+  opacity: 0.55;
+}
+
+.giri-word-card__caption {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Pose-specific framing: a solved word gets a warm border, a retry a gentle
+   amber one. Colour is a reinforcement here, never the only signal — the
+   pose itself and the mode's own copy carry the message. */
+.giri-word-card[data-pose="celebrate"] .giri-word-card__frame {
+  border-color: var(--color-success, #22c55e);
+}
+.giri-word-card[data-pose="encourage"] .giri-word-card__frame {
+  border-color: var(--color-warning, #f59e0b);
+}
+
+@media (max-width: 380px) {
+  /* On the narrowest phones the mascot yields space to the word itself. */
+  .giri-word-card__giri { display: none; }
+}
+
+/* The sound this round asked about (First / Last / Middle Sound). Ringed
+   with an offset outline rather than a colour swap, so it reads on top of
+   whatever sound-type colour the box already carries — and stays visible in
+   the high-contrast theme. */
+.sound-box--target {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+/* The phoneme tile the round asked about (First / Last / Middle Sound),
+   ringed at reveal. Without it the reveal shows every tile equally and the
+   *position* half of the skill goes unreinforced — the child learns which
+   sound it was, but not where it sat in the word.
+
+   An offset outline rather than a colour change, so it layers over the
+   tile's existing sound-type colour and survives the high-contrast theme. */
+.phoneme-tile--target .phoneme-symbol {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+.phoneme-tile--target .phoneme-label {
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+/* ── Giri blending guide ──────────────────────────────────────────────────
+   Giri walks the sound track while blend.js plays the cumulative sweep, so
+   "sounds gathering up left to right" is visible and not carried by audio
+   alone. Decorative and aria-hidden: the tiles and the audio teach. */
+
+.phoneme-row--guided {
+  position: relative;
+  /* Room above the tiles for the guide to sit without overlapping them. */
+  padding-top: 56px;
+}
+
+.giri-blend-guide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 48px;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  transition: transform var(--dur-base) var(--ease-out);
+  will-change: transform;
+}
+
+@media (min-width: 768px) {
+  .phoneme-row--guided { padding-top: 68px; }
+  .giri-blend-guide { width: 60px; }
+}
+
+/* JS also checks prefersReducedMotion() and sets transition:none, but the
+   media query covers the OS preference even if the JS path is bypassed. */
+@media (prefers-reduced-motion: reduce) {
+  .giri-blend-guide { transition: none; }
+}
+
+/* ── Mouth cue (articulation diagram) ─────────────────────────────────────
+   Shows what the mouth does for a sound. Drawn with theme variables rather
+   than fixed colours so it survives the high-contrast and dyslexia themes.
+   See data/articulation.js for the phoneme -> shape mapping. */
+
+.mouth-cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.mouth-cue__diagram {
+  width: clamp(88px, 26vw, 132px);
+  padding: var(--space-2);
+  background: var(--surface-2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.mouth-cue__svg { width: 100%; height: auto; display: block; }
+
+/* Lips: outline only, so the shape reads at small sizes. */
+.mc-lips {
+  fill: none;
+  stroke: var(--c-short-vowel);
+  stroke-width: 4;
+}
+.mc-lips--ghost { opacity: 0.35; stroke-dasharray: 4 3; }
+
+/* The cavity behind the lips. */
+.mc-mouth { fill: var(--text); opacity: 0.82; }
+
+.mc-teeth { fill: #ffffff; stroke: var(--border); stroke-width: 1; }
+
+.mc-tongue { fill: var(--c-r-control); opacity: 0.9; }
+.mc-tongue-line {
+  fill: none;
+  stroke: var(--c-r-control);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+/* The seal on a closed-lip sound, and the puff of air on /h/. */
+.mc-seal {
+  stroke: var(--c-short-vowel);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.mc-air {
+  fill: none;
+  stroke: var(--c-consonant);
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+/* Diphthong glide: the mouth travels from one shape to the next. */
+.mc-arrow {
+  stroke: var(--c-consonant);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.mc-arrow-head { fill: var(--c-consonant); }
+
+.mouth-cue__text {
+  margin: 0;
+  max-width: 22ch;
+  font-size: var(--font-size-sm);
+  line-height: 1.35;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Success feedback text ("Yes! 🎉") was --color-success (#22c55e) on white:
+   2.27:1, under the 3:1 minimum even at 20px bold. The icon chip keeps the
+   brighter green (white-on-green passes comfortably); only the text darkens.
+   Caught by the axe scan on the First Sound reveal. */
+.choice-feedback--correct,
+.choice-feedback--reveal { color: #15803d; }

@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * PhonicsQuest – Multi-Profile Manager
  *
@@ -8,8 +9,24 @@
 
 import { store } from './store.js';
 
+/**
+ * A learner profile as persisted under `phonicsquest_profiles`.
+ * @typedef {object} Profile
+ * @property {string} id
+ * @property {string} name
+ * @property {string} avatar
+ * @property {string} color
+ * @property {'preschool'|'primary'} schoolLevel
+ * @property {string|null} primaryGrade  'P1'-'P6', or null
+ * @property {string|null} readingBand
+ * @property {string} [createdAt] ISO timestamp
+ */
+
+/** Optional extras accepted when creating a profile. @typedef {{ primaryGrade?: unknown, readingBand?: unknown }} ProfileOpts */
+
 const PROFILES_META_KEY = 'phonicsquest_profiles';
 const ACTIVE_PROFILE_KEY = 'phonicsquest_active_profile';
+/** @param {string} id */
 const PROFILE_STORAGE_KEY = (id) => `phonicsquest_profile_${id}`;
 const LEGACY_STORAGE_KEY = 'phonicsquest_v2';
 const LEGACY_MIGRATION_FLAG = 'phonicsquest_legacy_migrated_to_profiles';
@@ -21,6 +38,7 @@ const COLOR_OPTIONS  = ['#6c63ff', '#22c55e', '#f59e0b', '#ef4444', '#0ea5e9', '
 // ── Public API ─────────────────────────────────────────────────────────────
 
 
+/** @param {any} state */
 function _hasProgressData(state) {
   if (!state || typeof state !== 'object') return false;
   if ((state.xp || 0) > 0) return true;
@@ -31,6 +49,7 @@ function _hasProgressData(state) {
   return false;
 }
 
+/** @param {string} id */
 function _maybeMigrateLegacyProgressToProfile(id) {
   try {
     const profiles = getProfiles();
@@ -59,7 +78,10 @@ function _maybeMigrateLegacyProgressToProfile(id) {
   } catch (_) {}
 }
 
-/** Return all profiles, or [] if none. */
+/**
+ * Return all profiles, or [] if none.
+ * @returns {Profile[]}
+ */
 export function getProfiles() {
   try {
     const raw = localStorage.getItem(PROFILES_META_KEY);
@@ -67,7 +89,10 @@ export function getProfiles() {
   } catch (_) { return []; }
 }
 
-/** Save (overwrite) the profiles list. */
+/**
+ * Save (overwrite) the profiles list.
+ * @param {Profile[]} profiles
+ */
 function _saveProfiles(profiles) {
   try {
     localStorage.setItem(PROFILES_META_KEY, JSON.stringify(profiles));
@@ -77,30 +102,106 @@ function _saveProfiles(profiles) {
 const VALID_PRIMARY_GRADES = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 const VALID_READING_BANDS = ['pre-reader', 'emerging-decoder', 'developing-reader', 'reader'];
 
+/**
+ * Storage bound for a profile name.
+ *
+ * Typed input is already capped at 20 by `maxlength` on `#cp-name-input`
+ * (index.html), but that only guards the form — `importProfile()` reads
+ * names straight out of a user-supplied JSON file and needs its own limit.
+ * Set above 20 so an imported name still fits with its ' (imported)' suffix.
+ *
+ * Note the length cap is hygiene, not the security control: escaping at the
+ * render sites is what makes markup inert.
+ */
+export const MAX_PROFILE_NAME_LENGTH = 32;
+
+/** Appended to imported profile names so they're distinguishable. */
+const IMPORT_SUFFIX = ' (imported)';
+
+/**
+ * Normalise a profile name from any source (typed or imported).
+ *
+ * Profile names are rendered in the weekly recap, the home pathway badge
+ * and the parent report card, so a name carrying markup is an XSS vector.
+ * Render sites escape as well (defence in depth) — this keeps the stored
+ * value itself clean and bounded.
+ *
+ * Strips control characters and angle brackets, collapses whitespace, and
+ * clamps length. Angle brackets go because a child's name has no legitimate
+ * use for them — dropping them means even a future render site that forgets
+ * to escape cannot be turned into a tag.
+ *
+ * @param {unknown} raw
+ * @param {number} [maxLength]  defaults to MAX_PROFILE_NAME_LENGTH
+ * @returns {string} cleaned name, or '' when nothing usable remains
+ */
+function _sanitiseName(raw, maxLength = MAX_PROFILE_NAME_LENGTH) {
+  if (typeof raw !== 'string' && typeof raw !== 'number') return '';
+  return String(raw)
+    // eslint-disable-next-line no-control-regex
+    .replace(/[\x00-\x1F\x7F]/g, '')        // control chars
+    .replace(/[<>]/g, '')                   // never valid in a name; kills tags
+    .replace(/\s+/g, ' ')                   // collapse whitespace/newlines
+    .trim()
+    .slice(0, maxLength);
+}
+
+/**
+ * Constrain an avatar to the known emoji set. Imported profiles would
+ * otherwise inject arbitrary text into the markup that renders it.
+ * @param {unknown} avatar
+ */
+function _normaliseAvatar(avatar) {
+  return AVATAR_OPTIONS.includes(/** @type {string} */ (avatar)) ? String(avatar) : AVATAR_OPTIONS[0];
+}
+
+/**
+ * Constrain a colour to the known palette. This value reaches inline
+ * `style` attributes, so an unvalidated string is a CSS-injection vector.
+ * @param {unknown} color
+ */
+function _normaliseColor(color) {
+  return COLOR_OPTIONS.includes(/** @type {string} */ (color)) ? String(color) : COLOR_OPTIONS[0];
+}
+
+/** @param {unknown} grade @returns {string|null} */
 function _normalisePrimaryGrade(grade) {
   if (!grade) return null;
   const upper = String(grade).toUpperCase().trim();
   return VALID_PRIMARY_GRADES.includes(upper) ? upper : null;
 }
 
+/** @param {unknown} band @returns {string|null} */
 function _normaliseReadingBand(band) {
-  if (!band) return null;
+  if (typeof band !== 'string' || !band) return null;
   return VALID_READING_BANDS.includes(band) ? band : null;
 }
 
-/** Create a new profile and return it. */
+/**
+ * Create a new profile and return it.
+ * @param {unknown} name
+ * @param {unknown} [avatar]
+ * @param {unknown} [color]
+ * @param {string} [schoolLevel]
+ * @param {ProfileOpts} [opts]
+ * @returns {Profile}
+ */
 export function createProfile(name, avatar, color, schoolLevel = 'preschool', opts = {}) {
   const id = 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
   const normalisedGrade = _normalisePrimaryGrade(opts.primaryGrade);
   const normalisedBand = _normaliseReadingBand(opts.readingBand);
   // If a primaryGrade is provided we treat the profile as primary, even when
   // the caller forgot to pass schoolLevel='primary'.
-  const resolvedSchoolLevel = (schoolLevel === 'primary' || normalisedGrade) ? 'primary' : 'preschool';
+  const resolvedSchoolLevel = /** @type {'preschool'|'primary'} */ (
+    (schoolLevel === 'primary' || normalisedGrade) ? 'primary' : 'preschool'
+  );
   const profile = {
     id,
-    name: name || 'Player',
-    avatar: avatar || AVATAR_OPTIONS[0],
-    color:  color  || COLOR_OPTIONS[0],
+    // Sanitised here rather than at the call site: createProfile is reached
+    // both from the typed form and from importProfile (arbitrary JSON).
+    name: _sanitiseName(name) || 'Player',
+    avatar: _normaliseAvatar(avatar),
+    color:  _normaliseColor(color),
     // 'primary' bypasses phonics-mastery unlock gates for Sentence Forge,
     // Cloze Castle and Word Vault for legacy profiles. New placement now
     // routes by reading band, but schoolLevel is still kept as metadata.
@@ -120,6 +221,9 @@ export function createProfile(name, avatar, color, schoolLevel = 'preschool', op
  * Update an existing profile in-place. Used by the dashboard / settings
  * to fix a stale primaryGrade or readingBand without having to re-create
  * the profile. Returns the updated profile, or null if the id is unknown.
+ * @param {string} id
+ * @param {Partial<Profile>} [patch]
+ * @returns {Profile|null}
  */
 export function updateProfile(id, patch = {}) {
   const profiles = getProfiles();
@@ -127,9 +231,12 @@ export function updateProfile(id, patch = {}) {
   if (idx < 0) return null;
   const existing = profiles[idx];
   const next = { ...existing };
-  if ('name' in patch && typeof patch.name === 'string' && patch.name.trim()) next.name = patch.name.trim();
-  if ('avatar' in patch && patch.avatar) next.avatar = patch.avatar;
-  if ('color' in patch && patch.color) next.color = patch.color;
+  if ('name' in patch) {
+    const cleaned = _sanitiseName(patch.name);
+    if (cleaned) next.name = cleaned;
+  }
+  if ('avatar' in patch && patch.avatar) next.avatar = _normaliseAvatar(patch.avatar);
+  if ('color' in patch && patch.color) next.color = _normaliseColor(patch.color);
   if ('schoolLevel' in patch) {
     next.schoolLevel = patch.schoolLevel === 'primary' ? 'primary' : 'preschool';
   }
@@ -146,7 +253,10 @@ export function updateProfile(id, patch = {}) {
   return next;
 }
 
-/** Delete a profile and its progress data. */
+/**
+ * Delete a profile and its progress data.
+ * @param {string} id
+ */
 export function deleteProfile(id) {
   const profiles = getProfiles().filter(p => p.id !== id);
   _saveProfiles(profiles);
@@ -199,6 +309,7 @@ const PROFILE_SCOPED_BASE_KEYS = [
   'giri_friends_unlocked',
 ];
 
+/** @param {string} id */
 function _cleanupProfileScopedKeys(id) {
   for (const base of PROFILE_SCOPED_BASE_KEYS) {
     try { localStorage.removeItem(`${base}__${id}`); } catch (_) {}
@@ -208,6 +319,7 @@ function _cleanupProfileScopedKeys(id) {
 /**
  * Activate a profile: switch the store's storage key so all
  * progress reads/writes go to that profile's namespace.
+ * @param {string} id
  */
 export function activateProfile(id) {
   _maybeMigrateLegacyProgressToProfile(id);
@@ -299,6 +411,10 @@ export function exportProfile(id) {
  * @param {string} jsonString  Raw JSON text of the export file
  * @returns {{ profile: object, error?: string }}
  */
+/**
+ * @param {string} jsonString
+ * @returns {{ profile: Profile|null, error: string|null }}
+ */
 export function importProfile(jsonString) {
   let payload;
   try {
@@ -316,6 +432,14 @@ export function importProfile(jsonString) {
   }
 
   const src = payload.profile;
+  // The export file is untrusted input: a name of pure markup/whitespace
+  // must not become a profile. createProfile sanitises again, but bail
+  // early with a clear message rather than silently creating "Player".
+  // Reserve room for the suffix so it survives the length clamp below.
+  const importedName = _sanitiseName(src.name, MAX_PROFILE_NAME_LENGTH - IMPORT_SUFFIX.length);
+  if (!importedName) {
+    return { profile: null, error: 'Export file has an invalid profile name.' };
+  }
   const importedGrade = _normalisePrimaryGrade(src.primaryGrade);
   const importedBand  = _normaliseReadingBand(src.readingBand);
   // If the export had a primaryGrade we treat it as a primary profile even if
@@ -324,9 +448,9 @@ export function importProfile(jsonString) {
 
   // Create a fresh profile (new ID to avoid stomping an existing one)
   const newProfile = createProfile(
-    src.name + ' (imported)',
-    src.avatar || AVATAR_OPTIONS[0],
-    src.color  || COLOR_OPTIONS[0],
+    importedName + IMPORT_SUFFIX,
+    _normaliseAvatar(src.avatar),
+    _normaliseColor(src.color),
     resolvedSchoolLevel,
     {
       primaryGrade: importedGrade,
@@ -355,6 +479,7 @@ export function importProfile(jsonString) {
  * (without writing to localStorage), so callers can verify that fields like
  * primaryGrade and readingBand survive the round-trip.
  */
+/** @param {string} jsonString */
 export function parseProfileImportPayload(jsonString) {
   let payload;
   try {

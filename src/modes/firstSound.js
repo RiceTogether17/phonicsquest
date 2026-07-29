@@ -15,6 +15,7 @@
  */
 
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
+import { renderRevealMouthCue, clearRevealMouthCue } from '../components/mouthCue.js';
 import { renderPhonemeChoiceGrid, cancelChoicePreviews } from '../components/phonemeChoice.js';
 import { createChoiceRound } from './choiceRound.js';
 import { buildWordAnimation } from '../components/wheel.js';
@@ -156,10 +157,15 @@ function _waitForWordAudio(wordData) {
 /** Reveal the full word: animation + labelled phoneme tiles + audio. */
 function _revealAnswer(word, els) {
   buildWordAnimation(word, els.wordDisplay);
+  // Ring the opening tile — this mode asks for the FIRST sound, so the
+  // reveal should show which one that was.
   renderPhonemes(word, els.phonemeRow, {
     showDiacritics: true,
     showLabels: true,
+    targetIndex: 0,
   });
+  // Having named the sound, show what the mouth does to make it.
+  renderRevealMouthCue(word, 0, els);
 
   setTimeout(async () => {
     await audio.speakPhoneme(word.graphemes[0], word.types[0]);
@@ -243,6 +249,7 @@ export function getCurrentWord() {
 }
 
 export function cleanup() {
+  clearRevealMouthCue();
   currentWord = null;
   round = null;
   cancelChoicePreviews();

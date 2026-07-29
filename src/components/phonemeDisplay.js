@@ -6,8 +6,12 @@
 
 import { DIACRITICS } from '../data/words.js';
 
-/** Map phoneme type codes to CSS class names */
-const TYPE_CLASS = {
+/**
+ * Map phoneme type codes to CSS class names.
+ * Exported so other sound-level visuals (soundBoxes.js) inherit exactly the
+ * same colour language rather than defining a second, drifting copy.
+ */
+export const TYPE_CLASS = {
   c:  'consonant',
   sv: 'short-vowel',
   lv: 'long-vowel',
@@ -22,8 +26,8 @@ const TYPE_CLASS = {
   soft_g: 'consonant',
 };
 
-/** Human-readable labels for phoneme types */
-const TYPE_LABEL = {
+/** Human-readable labels for phoneme types (also used in aria-labels). */
+export const TYPE_LABEL = {
   c:  'consonant',
   sv: 'short vowel',
   lv: 'long vowel',
@@ -49,6 +53,10 @@ const TYPE_LABEL = {
  * @param {boolean} [opts.showLabels=false]
  * @param {number[]} [opts.hiddenIndices]  indices to show as "?" (for Missing Sound mode)
  * @param {number[]} [opts.revealedIndices]  only show these (for Blend mode sequential reveal)
+ * @param {number|null} [opts.targetIndex]  the sound the round asked about
+ *   (First / Last / Middle Sound). Ringed at reveal so the child can see
+ *   *which* position they just identified — without it every tile reads
+ *   equally and the position half of the skill goes unreinforced.
  */
 export function renderPhonemes(word, container, opts = {}) {
   const {
@@ -56,6 +64,7 @@ export function renderPhonemes(word, container, opts = {}) {
     showLabels = false,
     hiddenIndices = [],
     revealedIndices = null,
+    targetIndex = null,
   } = opts;
 
   container.innerHTML = '';
@@ -66,9 +75,11 @@ export function renderPhonemes(word, container, opts = {}) {
     const isHidden   = hiddenIndices.includes(i);
     const isRevealed = revealedIndices === null || revealedIndices.includes(i);
 
+    const isTarget = i === targetIndex;
     const tile = document.createElement('div');
-    tile.className = 'phoneme-tile';
+    tile.className = `phoneme-tile${isTarget ? ' phoneme-tile--target' : ''}`;
     tile.setAttribute('role', 'listitem');
+    if (isTarget) tile.dataset.target = 'true';
 
     // Symbol (the grapheme letter)
     const symbol = document.createElement('span');
@@ -84,7 +95,10 @@ export function renderPhonemes(word, container, opts = {}) {
       symbol.setAttribute('aria-label', 'unrevealed sound');
     } else {
       symbol.textContent = grapheme;
-      symbol.setAttribute('aria-label', `${grapheme}, ${TYPE_LABEL[type] || type}`);
+      symbol.setAttribute(
+        'aria-label',
+        `${grapheme}, ${TYPE_LABEL[type] || type}${isTarget ? ', the sound you were listening for' : ''}`,
+      );
     }
 
     tile.appendChild(symbol);

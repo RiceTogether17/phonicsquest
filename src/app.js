@@ -12,11 +12,19 @@
  */
 
 import { store } from './modules/store.js';
+import { escapeHtml } from './utils/escapeHtml.js';
+import * as homeBanners from './modules/homeBanners.js';
+import * as returnEvents from './modules/returnEvents.js';
+import * as onboardingController from './modules/onboardingController.js';
+import * as askGiriPanel from './components/panels/askGiriPanel.js';
+import * as mistakesDenPanel from './components/panels/mistakesDenPanel.js';
+import * as trophyRoomPanel from './components/panels/trophyRoomPanel.js';
+import { html, raw } from './utils/html.js';
 import { audio } from './modules/audio.js';
 import { gamification } from './modules/gamification.js';
 import { badges } from './modules/badges.js';
 import { progress, isStageHiddenForMode } from './modules/progress.js';
-import { estimateMinutes as estimateReviewMinutes, getReviewCapForProfile } from './modules/reviewScheduler.js';
+import { getReviewCapForProfile } from './modules/reviewScheduler.js';
 import { buildWordWorkout } from './modules/wordWorkout.js';
 import {
   isBedtimeActive,
@@ -24,14 +32,9 @@ import {
   applyBedtimeStateToDom,
   getBedtimeStatus,
 } from './modules/bedtimeMode.js';
-import { getMistakesDenSummary, timeAgo as mistakeTimeAgo, MISTAKES_LOOKBACK_DAYS } from './modules/mistakesDen.js';
-import { buildGiriQuestionChips, answerChipOffline, answerChipAi, askGiriFreeText } from './modules/askGiri.js';
 import { initHomeTabs, selectTab, getInitialTab } from './modules/homeTabs.js';
 import { buildJourneyBarHtml, STAGE_META } from './components/journeyBar.js';
 import { renderJourneyMap } from './components/journeyMap.js';
-import { attachAskGiriButton } from './components/askGiriButton.js';
-import { hasApiKey } from './modules/aiService.js';
-import { getPersonalBests } from './modules/personalBestWall.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
 import { mascot } from './components/mascot.js';
 import { findStageForGroup, hasSeenLesson, maybeShowStageLesson, showTipLesson } from './components/miniLesson.js';
@@ -79,7 +82,7 @@ import {
 } from './modules/profiles.js';
 import {
   getDailyChallengeWords, isDailyChallengeComplete,
-  completeDailyChallenge, DAILY_BONUS_XP,
+  completeDailyChallenge,
 } from './modules/dailyChallenge.js';
 import { markMissionStepDone } from './modules/missionToday.js';
 import {
@@ -104,9 +107,7 @@ const quickCheckMod = lazyModule(() => import('./modules/primaryQuickCheck.js'))
 import { getReadingBand, getHomeLayoutForReadingBand } from './modules/readingStages.js';
 import { isTeacherUnlockActive, tryTeacherUnlock, lockTeacherMode } from './modules/teacherUnlock.js';
 import { showSessionSummary } from './components/sessionSummary.js';
-import { showWeeklyRecap, shouldShowWeeklyRecap } from './components/weeklyRecap.js';
 
-import { createPinHash, verifyPin } from './modules/parentPin.js';
 
 class App {
   constructor() {
@@ -1264,58 +1265,12 @@ class App {
 
   // ── PIN Gate ──
 
+  /** @see modules/onboardingController.js */
   _bindPinGate() {
-    const digits = document.querySelectorAll('.pin-digit');
-    const hint = document.getElementById('pin-hint');
-
-    digits.forEach((input, i) => {
-      input.addEventListener('input', (e) => {
-        if (e.target.value && i < digits.length - 1) {
-          digits[i + 1].focus();
-        }
-      });
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Backspace' && !e.target.value && i > 0) {
-          digits[i - 1].focus();
-        }
-      });
-    });
-
-    document.getElementById('pin-confirm-btn')?.addEventListener('click', async () => {
-      const pin = Array.from(digits).map(d => d.value).join('');
-      if (pin.length < 4) {
-        if (hint) hint.textContent = 'Enter all 4 digits';
-        return;
-      }
-
-      const savedPin = store.get('parentPin');
-
-      if (!savedPin) {
-        // First time entering a PIN — store it salted+hashed.
-        store.set('parentPin', await createPinHash(pin));
-        if (hint) hint.textContent = '';
-        this._closeModal('modal-pin');
-        this._openDashboard();
-        return;
-      }
-
-      const { ok, needsUpgrade } = await verifyPin(pin, savedPin);
-      if (ok) {
-        // Upgrade legacy plaintext/unsalted formats on successful entry.
-        if (needsUpgrade) store.set('parentPin', await createPinHash(pin));
-        if (hint) hint.textContent = '';
-        this._closeModal('modal-pin');
-        this._openDashboard();
-      } else {
-        if (hint) hint.textContent = 'Wrong PIN. Try again.';
-        digits.forEach(d => { d.value = ''; });
-        digits[0].focus();
-      }
-    });
-
-    document.getElementById('pin-cancel-btn')?.addEventListener('click', () => {
-      this._closeModal('modal-pin');
-      document.querySelectorAll('.pin-digit').forEach(d => { d.value = ''; });
+    onboardingController.bindPinGate({
+      openModal:  id => this._openModal(id),
+      closeModal: id => this._closeModal(id),
+      onUnlocked: () => this._openDashboard(),
     });
   }
 
@@ -1327,182 +1282,13 @@ class App {
    * Stores a flag so it only shows once per install.
    * @param {object} profile - the newly activated profile
    */
+  /** @see modules/onboardingController.js */
   _showOnboardingTutorial(profile) {
     const readingBand = getReadingBand(profile, store.get('placementProfile') || null);
-    const levelKey = readingBand;
-
-    const TUTORIAL = {
-      'pre-reader': [
-        {
-          icon: '🌱',
-          title: "Your child's Pre-reader Journey",
-          body: `<p class="ob-intro">PhonicsQuest guides your child through three daily activities:</p>
-                 <ul class="ob-list">
-                   <li><strong>👂 First Sound</strong> — listening-first sound awareness</li>
-                   <li><strong>👂 Sound skills</strong> — first, last &amp; middle sounds</li>
-                   <li><strong>🔤 Letter Sounds</strong> — adult-guided sound-to-print bridge</li>
-                 </ul>`,
-        },
-        {
-          icon: '📋',
-          title: 'Follow this order each day',
-          body: `<div class="ob-steps">
-                   <div class="ob-step">
-                     <span class="ob-step-num">1</span>
-                     <div><strong>Start with First Sound</strong><br><small>No-print listening warm-up</small></div>
-                   </div>
-                   <div class="ob-step">
-                     <span class="ob-step-num">2</span>
-                     <div><strong>Practise Hear &amp; Choose</strong><br><small>Sound-to-picture matching</small></div>
-                   </div>
-                   <div class="ob-step">
-                     <span class="ob-step-num">3</span>
-                     <div><strong>Add Letter Sounds</strong><br><small>Teacher-supported print bridge</small></div>
-                   </div>
-                 </div>`,
-        },
-        {
-          icon: '⭐',
-          title: 'Look for this card every day',
-          body: `<div class="ob-highlight-card">
-                   <div class="ob-highlight-eyebrow">TODAY'S START POINT</div>
-                   <p class="ob-highlight-title">Best Next Step</p>
-                   <p class="ob-highlight-body">This card is always first on the home screen. It tells you <strong>exactly which activity</strong> to start with today, based on your child's progress.</p>
-                 </div>
-                 <p class="ob-highlight-hint">👆 Just tap the big button — the app guides you from there.</p>`,
-        },
-        {
-          icon: '🎮',
-          title: 'Bonus activities — use after the main lesson',
-          body: `<div class="ob-bonus-list">
-                   <div class="ob-bonus-item">⚡ <strong>Daily Challenge</strong> — 5-word bonus round, earns extra XP</div>
-                   <div class="ob-bonus-item">🃏 <strong>Sight Words</strong> — flip &amp; match high-frequency words</div>
-                   <div class="ob-bonus-item">🎡 <strong>Random Activity</strong> — spin the wheel for a surprise mode</div>
-                   <div class="ob-bonus-item">🔤 <strong>Letter Sounds</strong> — tap any sound to hear it</div>
-                 </div>
-                 <p class="ob-bonus-note">Find these in the <strong>🎁 Extra</strong> tab at the top of the home screen.</p>`,
-        },
-      ],
-      'emerging-decoder': [
-        {
-          icon: '🧩',
-          title: "Your child's Emerging Decoder Journey",
-          body: `<p class="ob-intro">This stage strengthens early reading fluency:</p>
-                 <ul class="ob-list">
-                   <li><strong>🎯 Blend It!</strong> — decode step by step</li>
-                   <li><strong>🃏 Sight Words</strong> — build automatic word reading</li>
-                   <li><strong>📚 Giri Stories</strong> — short connected reading</li>
-                 </ul>`,
-        },
-      ],
-      'developing-reader': [
-        {
-          icon: '📘',
-          title: "Your child's Developing Reader Bridge",
-          body: `<p class="ob-intro">Keep decoding active while adding sentence work:</p>
-                 <ul class="ob-list">
-                   <li><strong>🎯 Blend It!</strong> — quick phonics review</li>
-                   <li><strong>📚 Giri Stories</strong> — sentence &amp; paragraph reading</li>
-                   <li><strong>🔨 Sentence Forge</strong> — begin sentence building</li>
-                 </ul>`,
-        },
-      ],
-      reader: [
-        {
-          icon: '🏫',
-          title: "Your child's Reader Journey",
-          body: `<p class="ob-intro">PhonicsQuest guides your child through three daily quests:</p>
-                 <ul class="ob-list">
-                   <li><strong>🔨 Sentence Forge</strong> — unscramble &amp; build sentences</li>
-                   <li><strong>🏰 Cloze Castle</strong> — grammar cloze passages P1–P6</li>
-                   <li><strong>🔑 Word Vault</strong> — vocabulary in context</li>
-                 </ul>`,
-        },
-        {
-          icon: '📋',
-          title: 'Follow this order each day',
-          body: `<div class="ob-steps">
-                   <div class="ob-step">
-                     <span class="ob-step-num">1</span>
-                     <div><strong>Start with Sentence Forge</strong><br><small>Build sentence structure skills</small></div>
-                   </div>
-                   <div class="ob-step">
-                     <span class="ob-step-num">2</span>
-                     <div><strong>Do Cloze Castle</strong><br><small>Grammar cloze with clue detection</small></div>
-                   </div>
-                   <div class="ob-step">
-                     <span class="ob-step-num">3</span>
-                     <div><strong>Finish with Word Vault</strong><br><small>Vocabulary in context practice</small></div>
-                   </div>
-                 </div>`,
-        },
-        {
-          icon: '⭐',
-          title: 'Look for this card every day',
-          body: `<div class="ob-highlight-card">
-                   <div class="ob-highlight-eyebrow">TODAY'S START POINT</div>
-                   <p class="ob-highlight-title">Best Next Step</p>
-                   <p class="ob-highlight-body">This card is always first on the home screen. It targets your child's <strong>weakest skill</strong> so every session has a clear, focused starting point.</p>
-                 </div>
-                 <p class="ob-highlight-hint">👆 Just tap the big button — the app guides you from there.</p>`,
-        },
-        {
-          icon: '🎮',
-          title: 'Bonus activities — use after the main lesson',
-          body: `<div class="ob-bonus-list">
-                   <div class="ob-bonus-item">⚡ <strong>Daily Challenge</strong> — 5-word bonus round, earns extra XP</div>
-                   <div class="ob-bonus-item">📚 <strong>Giri Stories</strong> — short decodable phonics stories</div>
-                   <div class="ob-bonus-item">🃏 <strong>Sight Words</strong> — flip &amp; match high-frequency words</div>
-                   <div class="ob-bonus-item">🎡 <strong>Random Activity</strong> — spin the wheel for variety</div>
-                 </div>
-                 <p class="ob-bonus-note">Find these in the <strong>🎁 Extra</strong> tab at the top of the home screen.</p>`,
-        },
-      ],
-    };
-
-    const screens   = TUTORIAL[levelKey] || TUTORIAL['pre-reader'];
-    let   step      = 0;
-
-    const contentEl = document.getElementById('ob-content');
-    const dotsEl    = document.getElementById('ob-dots');
-    const prevBtn   = document.getElementById('ob-prev');
-    const nextBtn   = document.getElementById('ob-next');
-    const skipBtn   = document.getElementById('ob-skip-btn');
-
-    if (!contentEl || !dotsEl || !prevBtn || !nextBtn) return;
-
-    const renderStep = (s) => {
-      const sc = screens[s];
-      contentEl.innerHTML = `
-        <div class="ob-screen">
-          <div class="ob-screen-icon" aria-hidden="true">${sc.icon}</div>
-          <h2 class="ob-screen-title">${sc.title}</h2>
-          <div class="ob-screen-body">${sc.body}</div>
-        </div>`;
-
-      dotsEl.innerHTML = screens.map((_, i) =>
-        `<span class="ob-dot ${i === s ? 'ob-dot--active' : ''}" role="tab" aria-selected="${i === s}"></span>`
-      ).join('');
-
-      prevBtn.hidden = s === 0;
-      nextBtn.textContent = s === screens.length - 1 ? "Let's go! 🚀" : 'Next →';
-    };
-
-    const closeTutorial = () => {
-      store.set('onboardingComplete', true);
-      this._closeModal('modal-onboarding');
-    };
-
-    // Re-attach listeners each open (avoids accumulation across re-opens)
-    prevBtn.onclick = () => { if (step > 0) { step--; renderStep(step); } };
-    nextBtn.onclick = () => {
-      if (step < screens.length - 1) { step++; renderStep(step); }
-      else closeTutorial();
-    };
-    if (skipBtn) skipBtn.onclick = closeTutorial;
-
-    renderStep(0);
-    this._openModal('modal-onboarding');
+    onboardingController.showOnboardingTutorial(readingBand, {
+      openModal:  id => this._openModal(id),
+      closeModal: id => this._closeModal(id),
+    });
   }
 
   async _openDashboard() {
@@ -1766,7 +1552,9 @@ class App {
     const pathwayIcon  = STAGE_META[readingBand]?.icon || '🌱';
     const pathwayLabel = STAGE_META[readingBand]?.label || 'Reading Journey';
     const pathwayMod   = STAGE_META[readingBand]?.mod || 'pathway-badge--preschool';
-    const profileName  = profile?.name ? `${profile.name}'s ` : '';
+    // Escaped: the profile name is user-supplied and can also arrive from an
+    // imported profile file, and this string is spliced into innerHTML below.
+    const profileName  = profile?.name ? `${escapeHtml(profile.name)}'s ` : '';
 
     const journeyBarHtml = buildJourneyBarHtml(readingBand, store.get('groupMastery') || {});
 
@@ -2199,7 +1987,10 @@ class App {
       return;
     }
 
-    grid.innerHTML = profiles.map(p => `
+    // html`` escapes each interpolation, so a profile name carrying markup
+    // (typed, or arriving via an imported profile file) renders as text.
+    // Raw.toString() makes the trailing .join('') safe to keep.
+    grid.innerHTML = profiles.map(p => html`
       <div class="profile-card ${activeProfile?.id === p.id ? 'profile-card--active' : ''}"
            role="listitem">
         <button class="profile-select-btn" data-profile-id="${p.id}"
@@ -2208,9 +1999,9 @@ class App {
             ${p.avatar}
           </span>
           <span class="profile-name">${p.name}</span>
-          ${activeProfile?.id === p.id ? '<span class="profile-active-badge">●</span>' : ''}
+          ${activeProfile?.id === p.id ? raw('<span class="profile-active-badge">●</span>') : ''}
         </button>
-        ${profiles.length > 1 ? `
+        ${profiles.length > 1 ? html`
           <button class="profile-delete-btn" data-delete-id="${p.id}"
                   aria-label="Delete ${p.name}'s profile">✕</button>
         ` : ''}
@@ -2518,140 +2309,46 @@ class App {
    * Checks: streak freeze notification → comeback session → weekly recap → backup reminder.
    * Each check is mutually exclusive per session to avoid modal stacking.
    */
+  /** @see modules/returnEvents.js */
   _checkReturnEvents() {
-    if (gamification.wasFreezeUsed()) {
-      this._showToast('Streak saved! 🛡️ Your streak freeze was used automatically.', 'success');
-    }
-
-    const daysAway = gamification.getDaysAway();
-    if (daysAway >= 2 && daysAway <= 6) {
-      const last = store.get('comebackShownAt');
-      const today = new Date().toDateString();
-      if (!last || new Date(last).toDateString() !== today) {
-        store.set('comebackShownAt', new Date().toISOString());
-        setTimeout(() => this._showComebackModal(daysAway), 600);
-        return;
-      }
-    }
-
-    if (shouldShowWeeklyRecap()) {
-      const stats = gamification.getWeeklyStats();
-      setTimeout(() => showWeeklyRecap({
-        stats,
-        onClose: () => this._checkBackupReminder(),
-      }), 600);
-      return;
-    }
-
-    this._checkBackupReminder();
+    returnEvents.checkReturnEvents({
+      onToast: (msg, type) => this._showToast(msg, type),
+      onStartWarmUp: () => {
+        this._mode = 'blend';
+        store.set('currentMode', 'blend');
+        this._startGame(store.get('currentGroup') || 'cvc-a');
+      },
+    });
   }
 
   /**
    * Show the "Welcome back" modal after a 2–6 day absence.
    * @param {number} daysAway
    */
+  /** @see modules/returnEvents.js */
   _showComebackModal(daysAway) {
-    const profile  = getActiveProfile();
-    const name     = profile?.name?.split(' ')[0] || 'there';
-    const existing = document.getElementById('modal-comeback');
-    if (existing) existing.remove();
-
-    const modal = document.createElement('div');
-    modal.id        = 'modal-comeback';
-    modal.className = 'modal-overlay modal-overlay--active';
-    modal.setAttribute('role', 'dialog');
-    modal.setAttribute('aria-modal', 'true');
-    modal.setAttribute('aria-label', 'Welcome back');
-
-    const dayLabel = daysAway === 1 ? 'yesterday' : `${daysAway} days ago`;
-    const streak   = store.get('streak') || 0;
-
-    modal.innerHTML = `
-      <div class="modal-panel cb-panel">
-        <div class="cb-icon" aria-hidden="true">👋</div>
-        <h2 class="cb-title">Welcome back, ${name}!</h2>
-        <p class="cb-body">You last played ${dayLabel}. Let's warm up with a quick 5-question round before diving in.</p>
-        ${streak > 0 ? `<p class="cb-streak">🔥 Your streak is at <strong>${streak} days</strong> — keep it going!</p>` : ''}
-        <div class="cb-actions">
-          <button class="btn btn--primary btn--xl" id="cb-warm-up">Start warm-up →</button>
-          <button class="btn btn--ghost" id="cb-skip">Skip, go to home</button>
-        </div>
-      </div>`;
-
-    document.body.appendChild(modal);
-
-    modal.querySelector('#cb-warm-up')?.addEventListener('click', () => {
-      modal.remove();
-      this._mode = 'blend';
-      store.set('currentMode', 'blend');
-      this._startGame(store.get('currentGroup') || 'cvc-a');
+    returnEvents.showComebackModal(daysAway, {
+      onToast: (msg, type) => this._showToast(msg, type),
+      onStartWarmUp: () => {
+        this._mode = 'blend';
+        store.set('currentMode', 'blend');
+        this._startGame(store.get('currentGroup') || 'cvc-a');
+      },
     });
-    modal.querySelector('#cb-skip')?.addEventListener('click', () => {
-      modal.remove();
-      this._checkBackupReminder();
-    });
-
-    setTimeout(() => modal.querySelector('#cb-warm-up')?.focus(), 100);
   }
 
   /**
    * Show the backup reminder if 7+ days have passed since the last reminder
    * and the profile has meaningful progress.
    */
+  /** @see modules/returnEvents.js */
   _checkBackupReminder() {
-    const last = store.get('lastBackupReminderAt');
-    if (last) {
-      const daysSince = (Date.now() - new Date(last).getTime()) / 86400000;
-      if (daysSince < 7) return;
-    }
-
-    const wordCount = Object.keys(store.get('wordStats') || {}).length;
-    if (wordCount < 10) return;
-
-    store.set('lastBackupReminderAt', new Date().toISOString());
-    this._showBackupReminderModal();
+    returnEvents.checkBackupReminder({ onToast: (m, t) => this._showToast(m, t) });
   }
 
+  /** @see modules/returnEvents.js */
   _showBackupReminderModal() {
-    const existing = document.getElementById('modal-backup-reminder');
-    if (existing) existing.remove();
-
-    const profile  = getActiveProfile();
-    const wordCount = Object.keys(store.get('wordStats') || {}).length;
-
-    const modal = document.createElement('div');
-    modal.id        = 'modal-backup-reminder';
-    modal.className = 'modal-overlay modal-overlay--active';
-    modal.setAttribute('role', 'dialog');
-    modal.setAttribute('aria-modal', 'true');
-    modal.setAttribute('aria-label', 'Backup your progress');
-
-    modal.innerHTML = `
-      <div class="modal-panel br-panel">
-        <div class="br-icon" aria-hidden="true">💾</div>
-        <h2 class="br-title">Back up your progress!</h2>
-        <p class="br-body">
-          ${profile?.name || 'Your learner'} has practised <strong>${wordCount} words</strong>.
-          If browser data is cleared, this progress could be lost.
-        </p>
-        <p class="br-body">Download a backup file to keep it safe.</p>
-        <div class="br-actions">
-          <button class="btn btn--primary" id="br-export-btn">📥 Download backup</button>
-          <button class="btn btn--ghost" id="br-dismiss-btn">Remind me later</button>
-        </div>
-      </div>`;
-
-    document.body.appendChild(modal);
-
-    modal.querySelector('#br-export-btn')?.addEventListener('click', () => {
-      const activeId = profile?.id;
-      if (activeId) exportProfile(activeId);
-      modal.remove();
-      this._showToast('Backup downloaded! Keep the file somewhere safe.', 'success');
-    });
-    modal.querySelector('#br-dismiss-btn')?.addEventListener('click', () => modal.remove());
-
-    setTimeout(() => modal.querySelector('#br-export-btn')?.focus(), 100);
+    returnEvents.showBackupReminderModal({ onToast: (m, t) => this._showToast(m, t) });
   }
 
   // ── Session Summary ──
@@ -2945,44 +2642,16 @@ class App {
    * are no due items so a brand-new profile sees a clean home; surfaces a
    * minutes estimate (~35s/item) once the queue has anything in it.
    */
-  _updateReviewBanner() {
-    const banner = document.getElementById('review-banner');
-    if (!banner) return;
-    const dueCount = progress.getReviewDueCount();
-    const sub = document.getElementById('review-banner-sub');
-
-    if (dueCount > 0) {
-      banner.style.display = '';
-      const minutes = estimateReviewMinutes(dueCount);
-      if (sub) {
-        sub.textContent = `${dueCount} word${dueCount === 1 ? '' : 's'} due today · about ${minutes} min`;
-      }
-    } else {
-      banner.style.display = 'none';
-    }
-    this._updateTodayTabBadge();
-  }
+  /** @see modules/homeBanners.js */
+  _updateReviewBanner() { homeBanners.updateReviewBanner(); }
 
   /**
    * Small count pill on the 🎯 Today tab: review-due words + recent
    * mistakes, so a child sees there's something waiting without opening
    * the tab. Capped at 9+ to stay glanceable.
    */
-  _updateTodayTabBadge() {
-    const badge = document.getElementById('home-tab-today-badge');
-    if (!badge) return;
-    let count = 0;
-    try { count += progress.getReviewDueCount() || 0; } catch (_) { /* fresh profile */ }
-    try { count += getMistakesDenSummary().count || 0; } catch (_) { /* fresh profile */ }
-    badge.hidden = count === 0;
-    badge.textContent = count > 9 ? '9+' : String(count);
-    const tab = document.getElementById('home-tab-today');
-    if (tab) {
-      tab.setAttribute('aria-label', count > 0
-        ? `Today — your lesson and reviews, ${count} item${count === 1 ? '' : 's'} waiting`
-        : 'Today — your lesson and reviews');
-    }
-  }
+  /** @see modules/homeBanners.js */
+  _updateTodayTabBadge() { homeBanners.updateTodayTabBadge(); }
 
   /**
    * Refresh the Bedtime Mode toggle in the header. Mirrors the persisted
@@ -3008,40 +2677,16 @@ class App {
    * overdue (a workout always pulls a Review Lane item), so a brand-new
    * profile doesn't see a button that would just say "nothing to do".
    */
-  _updateWordWorkoutBanner() {
-    const banner = document.getElementById('word-workout-banner');
-    if (!banner) return;
-    const due = progress.getReviewDueCount();
-    const sub = document.getElementById('word-workout-sub');
-    if (due > 0) {
-      banner.style.display = '';
-      if (sub) sub.textContent = 'Drill one due word through 4 angles';
-    } else {
-      banner.style.display = 'none';
-    }
-  }
+  /** @see modules/homeBanners.js */
+  _updateWordWorkoutBanner() { homeBanners.updateWordWorkoutBanner(); }
 
   /**
    * Refresh the Mistakes Den home tile. Hidden when the last 7 days are
    * blank so a brand-new profile (or one that hasn't slipped at all) sees
    * a clean home rather than a "0 mistakes" guilt-free chip.
    */
-  _updateMistakesDenBanner() {
-    const banner = document.getElementById('mistakes-den-banner');
-    if (!banner) return;
-    let summary;
-    try { summary = getMistakesDenSummary(); } catch (_) { summary = { count: 0 }; }
-    const sub = document.getElementById('mistakes-den-sub');
-
-    if (summary.count > 0) {
-      banner.style.display = '';
-      if (sub) {
-        sub.textContent = `${summary.count} to retry · last ${MISTAKES_LOOKBACK_DAYS} days`;
-      }
-    } else {
-      banner.style.display = 'none';
-    }
-  }
+  /** @see modules/homeBanners.js */
+  _updateMistakesDenBanner() { homeBanners.updateMistakesDenBanner(); }
 
   /**
    * Open the Learning Roadmap — the parent journey map. Deliberately not
@@ -3073,153 +2718,26 @@ class App {
    * when an API key is configured — an optional AI re-explanation. P4–P6
    * profiles with a key also get a typed question box.
    */
-  _openAskGiri() {
-    const host = document.getElementById('ask-giri-content');
-    if (!host) return;
-    this._renderAskGiri(host);
-    modalManager.open('modal-ask-giri');
-  }
+  /** @see components/panels/askGiriPanel.js */
+  _openAskGiri() { askGiriPanel.openAskGiriPanel(); }
 
-  _renderAskGiri(host) {
-    const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
-    const chips = buildGiriQuestionChips();
-    const profile = getActiveProfile ? getActiveProfile() : null;
-    const grade = Number(String(profile?.primaryGrade || '').replace(/\D/g, '')) || 0;
-    const canType = grade >= 4 && hasApiKey();
-
-    host.innerHTML = `
-      <p class="ask-giri-intro">Tap a question and Giri will explain it. The questions come from things you've found tricky lately.</p>
-      <div class="ask-giri-chips" role="group" aria-label="Suggested questions">
-        ${chips.map(c => `
-          <button class="btn btn--ghost ask-giri-chip" type="button" data-chip-id="${escText(c.id)}">
-            ${escText(c.question)}
-          </button>`).join('')}
-      </div>
-      <div class="ask-giri-answer" id="ask-giri-answer" aria-live="polite"></div>
-      ${canType ? `
-        <div class="ask-giri-typed">
-          <label for="ask-giri-input" class="ask-giri-typed-label">Or type your own English question:</label>
-          <div class="ask-giri-typed-row">
-            <input type="text" id="ask-giri-input" class="settings-input" maxlength="300"
-                   placeholder="e.g. When do I use 'much' and when 'many'?" />
-            <button class="btn btn--primary" type="button" id="ask-giri-send">Ask</button>
-          </div>
-        </div>` : ''}
-    `;
-
-    const answerHost = host.querySelector('#ask-giri-answer');
-
-    host.querySelectorAll('.ask-giri-chip').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const chip = chips.find(c => c.id === btn.dataset.chipId);
-        if (!chip || !answerHost) return;
-        const authored = answerChipOffline(chip);
-        answerHost.innerHTML = `
-          <div class="mcq-rule-section">
-            <p class="mcq-rule-label">📖 ${escText(chip.label)}</p>
-            <p class="mcq-rule-text">${escText(authored.rule)}</p>
-            <p class="mcq-rule-example">${escText(authored.example)}</p>
-            ${authored.tip ? `<p class="mcq-rule-tip">💡 ${escText(authored.tip)}</p>` : ''}
-          </div>`;
-        attachAskGiriButton(answerHost, () => answerChipAi(chip), {
-          label: 'Explain it another way ✨',
-          ariaLabel: 'Ask Giri to explain this in different words',
-        });
-      });
-    });
-
-    host.querySelector('#ask-giri-send')?.addEventListener('click', async () => {
-      const input = /** @type {HTMLInputElement|null} */ (host.querySelector('#ask-giri-input'));
-      const sendBtn = /** @type {HTMLButtonElement|null} */ (host.querySelector('#ask-giri-send'));
-      const q = input?.value?.trim();
-      if (!q || !answerHost || !sendBtn) return;
-      sendBtn.disabled = true;
-      answerHost.innerHTML = '<p class="mcq-ask-giri-answer">🦉 Giri is thinking…</p>';
-      const reply = await askGiriFreeText(q);
-      sendBtn.disabled = false;
-      answerHost.innerHTML = reply
-        ? `<p class="mcq-ask-giri-answer">🦉 ${escText(reply)}</p>`
-        : '<p class="mcq-ask-giri-answer">🦉 Giri can\'t answer right now — try one of the question buttons above!</p>';
-    });
-  }
+  /** @see components/panels/askGiriPanel.js */
+  _renderAskGiri(host) { askGiriPanel.renderAskGiriPanel(host); }
 
   /**
    * Open the Mistakes Den modal. Pulls a fresh summary every open so a
    * mid-session retry that just happened isn't shown stale.
    */
-  _openMistakesDen() {
-    const host = document.getElementById('mistakes-den-content');
-    if (!host) return;
-    let summary;
-    try { summary = getMistakesDenSummary(); } catch (_) { summary = { count: 0, mistakes: [], byModule: {} }; }
-    this._renderMistakesDen(host, summary);
-    modalManager.open('modal-mistakes-den');
-  }
+  /** @see components/panels/mistakesDenPanel.js */
+  _openMistakesDen() { mistakesDenPanel.openMistakesDenPanel(t => this._navigateTo(t)); }
 
   /**
    * Render the Mistakes Den modal body — list grouped by module, each row
    * tappable to navigate back to the parent module (where adaptive
    * selection picks up the now-overdue item).
    */
-  _renderMistakesDen(host, summary) {
-    if (!host) return;
-    const escAttr = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-    const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
-
-    if (!summary || summary.count === 0) {
-      host.innerHTML = `
-        <div class="mistakes-den-empty">
-          <p class="mistakes-den-empty__title">🎉 Nothing to retry — all clear!</p>
-          <p class="mistakes-den-empty__sub">Mistakes from the last ${MISTAKES_LOOKBACK_DAYS} days show up here so you can have another go.</p>
-        </div>`;
-      return;
-    }
-
-    // Group rows by moduleLabel so the modal reads as "Grammar MCQ · 4 · …".
-    const byModuleLabel = new Map();
-    for (const m of summary.mistakes) {
-      const key = m.moduleLabel;
-      if (!byModuleLabel.has(key)) byModuleLabel.set(key, []);
-      byModuleLabel.get(key).push(m);
-    }
-
-    const groupsHtml = Array.from(byModuleLabel.entries()).map(([label, items]) => {
-      const rowsHtml = items.map(m => {
-        const countChip = m.count > 1 ? `<span class="mistakes-den-row__count" aria-label="${m.count} mistakes">×${m.count}</span>` : '';
-        const when = mistakeTimeAgo(m.lastMistakeAt);
-        return `
-          <button type="button"
-            class="mistakes-den-row"
-            data-target="${escAttr(m.target || '')}"
-            data-id="${escAttr(m.id)}"
-            aria-label="Retry ${escAttr(m.label)} in ${escAttr(m.moduleLabel)}, ${escAttr(when)}">
-            <span class="mistakes-den-row__label">${escText(m.label)}</span>
-            <span class="mistakes-den-row__when">${escText(when)}</span>
-            ${countChip}
-            <span class="mistakes-den-row__arrow" aria-hidden="true">→</span>
-          </button>`;
-      }).join('');
-
-      return `
-        <div class="mistakes-den-group" role="list">
-          <h3 class="mistakes-den-group__title">${escText(label)} <small>· ${items.length}</small></h3>
-          ${rowsHtml}
-        </div>`;
-    }).join('');
-
-    host.innerHTML = `
-      <p class="mistakes-den-intro">Tap any to retry — Giri's got you. ${escText(summary.count)} slip${summary.count === 1 ? '' : 's'} from the last ${MISTAKES_LOOKBACK_DAYS} days.</p>
-      <div class="mistakes-den-list">${groupsHtml}</div>`;
-
-    host.querySelectorAll('.mistakes-den-row[data-target]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const target = btn.dataset.target;
-        if (!target) return;
-        modalManager.close('modal-mistakes-den');
-        this._navigateTo(target);
-      });
-    });
-  }
+  /** @see components/panels/mistakesDenPanel.js */
+  _renderMistakesDen(host, summary) { mistakesDenPanel.renderMistakesDenPanel(host, summary, t => this._navigateTo(t)); }
 
   /**
    * Refresh the "My Trophy Room" home tile. Only surfaces once the child
@@ -3229,95 +2747,26 @@ class App {
    * personal bests") not aspirational ("Beat your best"), so a slow
    * week never feels like a scold.
    */
-  _updatePersonalBestBanner() {
-    const banner = document.getElementById('personal-best-banner');
-    if (!banner) return;
-    const xp = store.get('xp') || 0;
-    const calendar = Array.isArray(store.get('challengeCalendar')) ? store.get('challengeCalendar') : [];
-    const hasSomethingToShow = xp > 0 || calendar.length > 0;
-
-    if (hasSomethingToShow) {
-      banner.style.display = '';
-      const sub = document.getElementById('personal-best-sub');
-      if (sub) {
-        const bestStreak = store.get('bestStreak') || 0;
-        sub.textContent = bestStreak > 0
-          ? `Best streak ${bestStreak} day${bestStreak === 1 ? '' : 's'} · see your trophies`
-          : 'See your personal bests';
-      }
-    } else {
-      banner.style.display = 'none';
-    }
-  }
+  /** @see modules/homeBanners.js */
+  _updatePersonalBestBanner() { homeBanners.updatePersonalBestBanner(); }
 
   /**
    * Open the trophy room modal — pulls a fresh snapshot every time so a
    * just-earned graduation / streak day shows immediately.
    */
-  _openPersonalBestWall() {
-    const host = document.getElementById('personal-best-content');
-    if (!host) return;
-    let pb;
-    try { pb = getPersonalBests(); } catch (_) { pb = null; }
-    this._renderPersonalBestWall(host, pb);
-    modalManager.open('modal-personal-best');
-  }
+  /** @see components/panels/trophyRoomPanel.js */
+  _openPersonalBestWall() { trophyRoomPanel.openTrophyRoomPanel(); }
 
   /**
    * Render the trophy room body: a grid of cards (numbers + label + sub),
    * a "highlights" strip Giri reads back, and earned badges.
    * Pure HTML build — no chart library, no comparison-to-others framing.
    */
-  _renderPersonalBestWall(host, pb) {
-    if (!host) return;
-    const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
+  /** @see components/panels/trophyRoomPanel.js */
+  _renderPersonalBestWall(host, pb) { trophyRoomPanel.renderTrophyRoomPanel(host, pb); }
 
-    if (!pb) {
-      host.innerHTML = `<p class="trophy-empty">No data yet — play a quest to start your trophy room.</p>`;
-      return;
-    }
-
-    const cardsHtml = pb.cards.map(card => `
-      <div class="trophy-card" role="group" aria-label="${escText(card.label)}, ${escText(card.value)}">
-        <div class="trophy-card__icon" aria-hidden="true">${escText(card.icon)}</div>
-        <div class="trophy-card__value">${escText(card.value)}</div>
-        <div class="trophy-card__label">${escText(card.label)}</div>
-        ${card.sub ? `<div class="trophy-card__sub">${escText(card.sub)}</div>` : ''}
-      </div>`).join('');
-
-    const highlightsHtml = pb.summary?.highlights?.length
-      ? `<ul class="trophy-highlights">${pb.summary.highlights.map(h => `<li>${escText(h)}</li>`).join('')}</ul>`
-      : '';
-
-    const badgesHtml = pb.badges?.length
-      ? `<div class="trophy-badges">
-           <h3 class="trophy-badges__title">🎖️ Badges earned · ${pb.badges.length}</h3>
-           <div class="trophy-badges__list">
-             ${pb.badges.map(b => `<span class="trophy-badge" title="${escText(b.name)}"><span aria-hidden="true">${escText(b.emoji)}</span> ${escText(b.name)}</span>`).join('')}
-           </div>
-         </div>`
-      : '';
-
-    host.innerHTML = `
-      <p class="trophy-intro">Every number here is just <strong>you vs you</strong> — no rankings, no leagues.</p>
-      ${highlightsHtml}
-      <div class="trophy-grid">${cardsHtml}</div>
-      ${badgesHtml}`;
-  }
-
-  _updateDailyBanner() {
-    const done = isDailyChallengeComplete();
-    const title = document.getElementById('daily-banner-title');
-    const sub   = document.getElementById('daily-banner-sub');
-    const arrow = document.getElementById('daily-banner-arrow');
-
-    if (title) title.textContent = done ? '✅ Daily Challenge' : '⚡ Daily Challenge';
-    if (sub)   sub.textContent   = done ? 'Completed today – well done!' : `5 words · earn ${DAILY_BONUS_XP} bonus XP`;
-    if (arrow) arrow.textContent = done ? '✓' : '→';
-
-    const banner = document.getElementById('btn-daily-challenge');
-    if (banner) banner.classList.toggle('stories-banner--done', done);
-  }
+  /** @see modules/homeBanners.js */
+  _updateDailyBanner() { homeBanners.updateDailyBanner(); }
 
   // ── Per-Mode Adaptive Difficulty ──
 
@@ -3383,33 +2832,8 @@ class App {
     return getQuestUnlockStatus(stats, profile, QUEST_THRESHOLDS, placementProfile);
   }
 
-  _updateQuestBanners() {
-    const unlock = this._getQuestUnlockStatus();
-
-    const banners = [
-      { id: 'btn-sentence-forge', quest: unlock.sentenceForge, label: '6 levels · unscramble & build sentences' },
-      { id: 'btn-cloze-castle',   quest: unlock.clozeCastle,   label: 'P1–P6 · grammar cloze passages' },
-      { id: 'btn-word-vault',     quest: unlock.wordVault,     label: '7 categories · vocabulary cloze passages' },
-      { id: 'btn-editing-quest',  quest: unlock.editingQuest,  label: 'Editing and grammar correction tasks' },
-      { id: 'btn-writing-quest',  quest: unlock.writingQuest,  label: 'Guided writing with rubric feedback' },
-    ];
-
-    for (const b of banners) {
-      const el = document.getElementById(b.id);
-      if (!el) continue;
-      const sub = el.querySelector('.stories-banner-sub');
-      const arrow = el.querySelector('.stories-banner-arrow');
-      if (b.quest.unlocked) {
-        if (sub) sub.textContent = b.label;
-        if (arrow) arrow.textContent = '→';
-        el.classList.remove('stories-banner--locked');
-      } else {
-        if (sub) sub.textContent = `🔒 Master ${b.quest.required} words to unlock (${b.quest.current}/${b.quest.required})`;
-        if (arrow) arrow.textContent = '🔒';
-        el.classList.add('stories-banner--locked');
-      }
-    }
-  }
+  /** @see modules/homeBanners.js */
+  _updateQuestBanners() { homeBanners.updateQuestBanners(this._getQuestUnlockStatus()); }
 
 }
 

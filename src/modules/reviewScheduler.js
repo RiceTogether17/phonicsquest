@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * PhonicsQuest – Giri's Review Lane (Spaced Review Engine)
  *
@@ -25,6 +26,25 @@
  * Pure functions — no store reads/writes inside. Caller owns persistence.
  */
 
+/**
+ * Per-word review state as persisted in `store.wordStats`.
+ *
+ * `dueAt` is epoch-ms; `nextReviewDate` is the legacy ISO field kept in
+ * sync by `store.recordWordAttempt` for older consumers.
+ *
+ * @typedef {object} WordStat
+ * @property {number}  [box]            Leitner box 0-6
+ * @property {number}  [dueAt]          epoch ms of the next review
+ * @property {string}  [nextReviewDate] legacy ISO date string
+ * @property {number}  [attempts]
+ * @property {number}  [correct]
+ * @property {number|null} [graduatedAt] epoch ms the word first graduated
+ * @property {'pass'|'demote'} [lastResult]
+ * @property {string}  [lastSeen]       ISO timestamp of the last attempt
+ */
+
+/** @typedef {{ id: string }} ReviewItem  minimal shape the schedulers need */
+
 export const INTERVAL_DAYS = Object.freeze([0, 1, 3, 7, 14, 30, 90]);
 export const MAX_BOX = 6;
 export const GRADUATED_BOX = 6;
@@ -35,13 +55,14 @@ const GRADUATED_FLOOR = 3; // wrong on graduated drops here (+1 week), never to 
 /** Per-band session cap. K1–P1 → 10, P2+ → 20. */
 const BAND_CAPS = Object.freeze({ young: 10, older: 20 });
 
+/** @param {number} days */
 function dayMs(days) {
   return days * DAY_MS;
 }
 
 /**
  * Compute the new box/dueAt for a word after an attempt.
- * @param {object|undefined} stat   existing word stat (may be undefined for first attempt)
+ * @param {WordStat|undefined} stat   existing word stat (may be undefined for first attempt)
  * @param {boolean} correct
  * @param {number} [now]            ms epoch
  * @returns {{ box:number, dueAt:number, lastResult:'pass'|'demote', graduatedAt:number|null }}
@@ -74,7 +95,7 @@ export function scheduleAttempt(stat, correct, now = Date.now()) {
 /**
  * Seed box/dueAt for a stat that pre-dates the engine, so existing learners
  * don't lose ground on upgrade. Idempotent: returns the existing box if set.
- * @param {object|undefined} stat
+ * @param {WordStat|undefined} stat
  * @param {number} [now]
  * @returns {{ box:number, dueAt:number }}
  */
@@ -101,7 +122,7 @@ export function seedFromLegacy(stat, now = Date.now()) {
 
 /**
  * Maturity indicator for a word.
- * @param {object|undefined} stat
+ * @param {WordStat|undefined} stat
  * @returns {{ dots:number, graduated:boolean }}
  */
 export function getMaturity(stat) {
@@ -114,41 +135,57 @@ export function getMaturity(stat) {
 /**
  * Is the item due at `now`? Falls back to the legacy `nextReviewDate` for
  * stats that haven't been re-touched since the engine shipped.
+ * @param {WordStat|undefined} stat
+ * @param {number} [now]
  */
 export function isDue(stat, now = Date.now()) {
-  if (!stat) return false;
-  let dueAt = typeof stat.dueAt === 'number' ? stat.dueAt : null;
-  if (dueAt === null && stat.nextReviewDate) {
+  const dueAt = _resolveDueAt(stat);
+  return dueAt !== null && now >= dueAt;
+}
+
+/**
+ * Resolve a stat's due timestamp, preferring the epoch-ms `dueAt` and
+ * falling back to the legacy ISO `nextReviewDate`. Returns null when the
+ * word has never been scheduled (or carries an unparseable date).
+ * @param {WordStat|undefined} stat
+ * @returns {number|null}
+ */
+function _resolveDueAt(stat) {
+  if (!stat) return null;
+  if (typeof stat.dueAt === 'number') return stat.dueAt;
+  if (stat.nextReviewDate) {
     const t = new Date(stat.nextReviewDate).getTime();
-    dueAt = Number.isFinite(t) ? t : null;
+    return Number.isFinite(t) ? t : null;
   }
-  if (dueAt === null) return false;
-  return now >= dueAt;
+  return null;
 }
 
 /**
  * Return up to `cap` due items, oldest-overdue first.
- * @param {Record<string, object>} wordStats
- * @param {Iterable<{id:string}>} items
+ * @param {Record<string, WordStat>} wordStats
+ * @param {Iterable<ReviewItem>} items
  * @param {{ cap?:number, now?:number }} [opts]
- * @returns {Array<{id:string, item:object, stat:object}>}
+ * @returns {Array<{id:string, item:ReviewItem, stat:WordStat}>}
  */
 export function getDueItems(wordStats, items, opts = {}) {
   const { cap = Infinity, now = Date.now() } = opts;
   const due = [];
   for (const item of items) {
     const stat = wordStats[item.id];
-    if (!isDue(stat, now)) continue;
-    const dueAt = typeof stat.dueAt === 'number'
-      ? stat.dueAt
-      : new Date(stat.nextReviewDate).getTime();
+    const dueAt = _resolveDueAt(stat);
+    if (dueAt === null || now < dueAt) continue;
     due.push({ item, stat, dueAt });
   }
   due.sort((a, b) => a.dueAt - b.dueAt);
   return due.slice(0, cap).map(d => ({ id: d.item.id, item: d.item, stat: d.stat }));
 }
 
-/** Total due (no cap) — for the home-screen tile. */
+/**
+ * Total due (no cap) — for the home-screen tile.
+ * @param {Record<string, WordStat>} wordStats
+ * @param {Iterable<ReviewItem>} items
+ * @param {number} [now]
+ */
 export function countDueItems(wordStats, items, now = Date.now()) {
   let n = 0;
   for (const item of items) {
@@ -160,6 +197,10 @@ export function countDueItems(wordStats, items, now = Date.now()) {
 /**
  * Items at box 5 whose dueAt falls within `withinDays` — they're one
  * correct answer away from graduating.
+ * @param {Record<string, WordStat>} wordStats
+ * @param {Iterable<ReviewItem>} items
+ * @param {number} [withinDays]
+ * @param {number} [now]
  */
 export function getGraduatingSoon(wordStats, items, withinDays = 7, now = Date.now()) {
   const horizon = now + dayMs(withinDays);
@@ -179,6 +220,10 @@ export function getGraduatingSoon(wordStats, items, withinDays = 7, now = Date.n
 
 /**
  * Items demoted in the last `withinDays`. Used in parent dashboard.
+ * @param {Record<string, WordStat>} wordStats
+ * @param {Iterable<ReviewItem>} items
+ * @param {number} [withinDays]
+ * @param {number} [now]
  */
 export function getSlippingRecently(wordStats, items, withinDays = 7, now = Date.now()) {
   const since = now - dayMs(withinDays);
@@ -212,6 +257,8 @@ export function getReviewCapForProfile(profile) {
 /**
  * Estimate session minutes — 35s/item median, rounded up to whole minutes,
  * min 1 when non-empty.
+ * @param {number} count
+ * @param {number} [secondsPerItem]
  */
 export function estimateMinutes(count, secondsPerItem = 35) {
   if (count <= 0) return 0;

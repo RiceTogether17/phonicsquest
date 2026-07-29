@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * PhonicsQuest – SM-2 SRS Scheduler
  *
@@ -28,28 +29,46 @@
 import { store } from './store.js';
 import { utcYmd, utcYmdAddDays } from '../utils/dates.js';
 
+/**
+ * One word's SM-2 state, as persisted under `store.srsSchedule`.
+ * @typedef {object} SrsEntry
+ * @property {number} interval    days until the next review
+ * @property {number} repetitions consecutive correct reviews
+ * @property {number} easeFactor  SM-2 EF, floored at 1.3
+ * @property {string} dueAt       UTC 'YYYY-MM-DD'
+ * @property {number} correct     lifetime correct count
+ * @property {number} wrong       lifetime wrong count
+ */
+
 const STORE_KEY    = 'srsSchedule';
 const INITIAL_EF   = 2.5;
 const MIN_EF       = 1.3;
 const MAX_INTERVAL = 180;
 
 const _today = () => utcYmd();
+/** @param {number} days */
 const _addDays = (days) => utcYmdAddDays(days);
 
-/** Read the full schedule map from the store. */
+/**
+ * Read the full schedule map from the store.
+ * @returns {Record<string, SrsEntry>}
+ */
 function _getSchedule() {
   return store.get(STORE_KEY) || {};
 }
 
-/** Persist the full schedule map to the store. */
+/**
+ * Persist the full schedule map to the store.
+ * @param {Record<string, SrsEntry>} schedule
+ */
 function _setSchedule(schedule) {
   store.set(STORE_KEY, schedule);
 }
 
 /**
  * Migrate a legacy entry (or brand-new blank) to the full SM-2 shape.
- * @param {object|undefined} existing
- * @returns {{ interval: number, repetitions: number, easeFactor: number, dueAt: string, correct: number, wrong: number }}
+ * @param {Partial<SrsEntry>|undefined} existing
+ * @returns {SrsEntry}
  */
 function _ensureSM2Shape(existing) {
   if (!existing) {
@@ -62,8 +81,15 @@ function _ensureSM2Shape(existing) {
       wrong:       0,
     };
   }
+  // Every field is defaulted, not just the two SM-2 additions: a truncated
+  // or hand-edited entry missing `interval` would otherwise propagate NaN
+  // through the interval arithmetic and produce an invalid dueAt.
   return {
     ...existing,
+    interval:    typeof existing.interval    === 'number' ? existing.interval    : 1,
+    dueAt:       typeof existing.dueAt       === 'string' ? existing.dueAt       : _today(),
+    correct:     typeof existing.correct     === 'number' ? existing.correct     : 0,
+    wrong:       typeof existing.wrong       === 'number' ? existing.wrong       : 0,
     repetitions: typeof existing.repetitions === 'number' ? existing.repetitions : 0,
     easeFactor:  typeof existing.easeFactor  === 'number' ? existing.easeFactor  : INITIAL_EF,
   };
@@ -71,7 +97,7 @@ function _ensureSM2Shape(existing) {
 
 /**
  * Apply one SM-2 review step and return the updated entry fields.
- * @param {{ interval: number, repetitions: number, easeFactor: number }} entry
+ * @param {SrsEntry} entry
  * @param {boolean} correct
  * @returns {{ interval: number, repetitions: number, easeFactor: number, dueAt: string }}
  */
@@ -178,7 +204,7 @@ export function getDueCount() {
  * Return the SM-2 status for a given word, or null if never scheduled.
  *
  * @param {string} wordId
- * @returns {{ interval: number, repetitions: number, easeFactor: number, dueAt: string, correct: number, wrong: number } | null}
+ * @returns {SrsEntry | null}
  */
 export function getWordStatus(wordId) {
   if (!wordId) return null;

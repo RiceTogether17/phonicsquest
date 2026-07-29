@@ -151,13 +151,30 @@ GitHub Actions deploys `docs/` to GitHub Pages on push to `main`.
 ## 🧪 Running tests
 
 ```bash
-npm test            # one-shot vitest run
-npm run test:watch  # watch mode
-npm run typecheck   # tsc --noEmit
+npm test             # one-shot vitest run
+npm run test:watch   # watch mode
+npm run test:e2e     # Playwright browser flows + axe accessibility scan
+npm run typecheck    # tsc --noEmit
 npm run check:syntax # node --check across src/
+npm run check:bundle # startup-chunk size budget (run after npm run build)
 ```
 
-The repo ships with 350+ tests covering data integrity, learning logic, mode flows, the Exam Practice Hub framework, parent reporting and several end-to-end user journeys (P4 Grammar MCQ, P5 Word Vault Exam Mode, P6 Paper Mode, parent dashboard, profile import/export, primary-first home).
+The repo ships with ~1,980 unit tests covering data integrity, learning logic, mode flows, the Exam Practice Hub framework, parent reporting and several end-to-end user journeys (P4 Grammar MCQ, P5 Word Vault Exam Mode, P6 Paper Mode, parent dashboard, profile import/export, primary-first home), plus Playwright flows that drive the production build in a real browser — onboarding through the full placement diagnostic into the first lesson, the slide-in panels, and a WCAG 2.0 A/AA axe scan.
+
+`npm run test:e2e` builds to `docs/` and serves it with `vite preview`. If your environment has Chromium installed outside Playwright's registry, point at it with `PW_CHROMIUM_PATH=/path/to/chromium`.
+
+---
+
+## 🎨 Code style
+
+```bash
+npm run format       # prettier --write .
+npm run format:check # report drift without writing
+```
+
+Formatting is **opt-in per file, not enforced repo-wide.** The codebase predates Prettier and ~311 files still differ from it; reformatting them all at once would bury real changes in noise and destroy hand-tuned alignment in `src/data/` (which is Prettier-ignored for that reason). Instead, a `lint-staged` pre-commit hook formats only the files you actually touch, so the repo converges gradually. `npm run format:check` is intentionally **not** in CI.
+
+Linting is enforced (`npm run lint`, zero errors). The one rule with a backlog is the XSS guard that rejects assigning an interpolated template literal to `innerHTML` — use the auto-escaping ``html`` `` tag from `src/utils/html.js` instead. Pre-existing sites are warnings, and `--max-warnings` is pinned to the current count so the backlog can only shrink; lower the number as you migrate files.
 
 ---
 
