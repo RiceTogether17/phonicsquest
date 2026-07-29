@@ -15,6 +15,7 @@ import { store } from './modules/store.js';
 import { escapeHtml } from './utils/escapeHtml.js';
 import * as homeBanners from './modules/homeBanners.js';
 import * as returnEvents from './modules/returnEvents.js';
+import * as onboardingController from './modules/onboardingController.js';
 import * as askGiriPanel from './components/panels/askGiriPanel.js';
 import * as mistakesDenPanel from './components/panels/mistakesDenPanel.js';
 import * as trophyRoomPanel from './components/panels/trophyRoomPanel.js';
@@ -107,7 +108,6 @@ import { getReadingBand, getHomeLayoutForReadingBand } from './modules/readingSt
 import { isTeacherUnlockActive, tryTeacherUnlock, lockTeacherMode } from './modules/teacherUnlock.js';
 import { showSessionSummary } from './components/sessionSummary.js';
 
-import { createPinHash, verifyPin } from './modules/parentPin.js';
 
 class App {
   constructor() {
@@ -1265,58 +1265,12 @@ class App {
 
   // ── PIN Gate ──
 
+  /** @see modules/onboardingController.js */
   _bindPinGate() {
-    const digits = document.querySelectorAll('.pin-digit');
-    const hint = document.getElementById('pin-hint');
-
-    digits.forEach((input, i) => {
-      input.addEventListener('input', (e) => {
-        if (e.target.value && i < digits.length - 1) {
-          digits[i + 1].focus();
-        }
-      });
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Backspace' && !e.target.value && i > 0) {
-          digits[i - 1].focus();
-        }
-      });
-    });
-
-    document.getElementById('pin-confirm-btn')?.addEventListener('click', async () => {
-      const pin = Array.from(digits).map(d => d.value).join('');
-      if (pin.length < 4) {
-        if (hint) hint.textContent = 'Enter all 4 digits';
-        return;
-      }
-
-      const savedPin = store.get('parentPin');
-
-      if (!savedPin) {
-        // First time entering a PIN — store it salted+hashed.
-        store.set('parentPin', await createPinHash(pin));
-        if (hint) hint.textContent = '';
-        this._closeModal('modal-pin');
-        this._openDashboard();
-        return;
-      }
-
-      const { ok, needsUpgrade } = await verifyPin(pin, savedPin);
-      if (ok) {
-        // Upgrade legacy plaintext/unsalted formats on successful entry.
-        if (needsUpgrade) store.set('parentPin', await createPinHash(pin));
-        if (hint) hint.textContent = '';
-        this._closeModal('modal-pin');
-        this._openDashboard();
-      } else {
-        if (hint) hint.textContent = 'Wrong PIN. Try again.';
-        digits.forEach(d => { d.value = ''; });
-        digits[0].focus();
-      }
-    });
-
-    document.getElementById('pin-cancel-btn')?.addEventListener('click', () => {
-      this._closeModal('modal-pin');
-      document.querySelectorAll('.pin-digit').forEach(d => { d.value = ''; });
+    onboardingController.bindPinGate({
+      openModal:  id => this._openModal(id),
+      closeModal: id => this._closeModal(id),
+      onUnlocked: () => this._openDashboard(),
     });
   }
 
@@ -1328,182 +1282,13 @@ class App {
    * Stores a flag so it only shows once per install.
    * @param {object} profile - the newly activated profile
    */
+  /** @see modules/onboardingController.js */
   _showOnboardingTutorial(profile) {
     const readingBand = getReadingBand(profile, store.get('placementProfile') || null);
-    const levelKey = readingBand;
-
-    const TUTORIAL = {
-      'pre-reader': [
-        {
-          icon: '🌱',
-          title: "Your child's Pre-reader Journey",
-          body: `<p class="ob-intro">PhonicsQuest guides your child through three daily activities:</p>
-                 <ul class="ob-list">
-                   <li><strong>👂 First Sound</strong> — listening-first sound awareness</li>
-                   <li><strong>👂 Sound skills</strong> — first, last &amp; middle sounds</li>
-                   <li><strong>🔤 Letter Sounds</strong> — adult-guided sound-to-print bridge</li>
-                 </ul>`,
-        },
-        {
-          icon: '📋',
-          title: 'Follow this order each day',
-          body: `<div class="ob-steps">
-                   <div class="ob-step">
-                     <span class="ob-step-num">1</span>
-                     <div><strong>Start with First Sound</strong><br><small>No-print listening warm-up</small></div>
-                   </div>
-                   <div class="ob-step">
-                     <span class="ob-step-num">2</span>
-                     <div><strong>Practise Hear &amp; Choose</strong><br><small>Sound-to-picture matching</small></div>
-                   </div>
-                   <div class="ob-step">
-                     <span class="ob-step-num">3</span>
-                     <div><strong>Add Letter Sounds</strong><br><small>Teacher-supported print bridge</small></div>
-                   </div>
-                 </div>`,
-        },
-        {
-          icon: '⭐',
-          title: 'Look for this card every day',
-          body: `<div class="ob-highlight-card">
-                   <div class="ob-highlight-eyebrow">TODAY'S START POINT</div>
-                   <p class="ob-highlight-title">Best Next Step</p>
-                   <p class="ob-highlight-body">This card is always first on the home screen. It tells you <strong>exactly which activity</strong> to start with today, based on your child's progress.</p>
-                 </div>
-                 <p class="ob-highlight-hint">👆 Just tap the big button — the app guides you from there.</p>`,
-        },
-        {
-          icon: '🎮',
-          title: 'Bonus activities — use after the main lesson',
-          body: `<div class="ob-bonus-list">
-                   <div class="ob-bonus-item">⚡ <strong>Daily Challenge</strong> — 5-word bonus round, earns extra XP</div>
-                   <div class="ob-bonus-item">🃏 <strong>Sight Words</strong> — flip &amp; match high-frequency words</div>
-                   <div class="ob-bonus-item">🎡 <strong>Random Activity</strong> — spin the wheel for a surprise mode</div>
-                   <div class="ob-bonus-item">🔤 <strong>Letter Sounds</strong> — tap any sound to hear it</div>
-                 </div>
-                 <p class="ob-bonus-note">Find these in the <strong>🎁 Extra</strong> tab at the top of the home screen.</p>`,
-        },
-      ],
-      'emerging-decoder': [
-        {
-          icon: '🧩',
-          title: "Your child's Emerging Decoder Journey",
-          body: `<p class="ob-intro">This stage strengthens early reading fluency:</p>
-                 <ul class="ob-list">
-                   <li><strong>🎯 Blend It!</strong> — decode step by step</li>
-                   <li><strong>🃏 Sight Words</strong> — build automatic word reading</li>
-                   <li><strong>📚 Giri Stories</strong> — short connected reading</li>
-                 </ul>`,
-        },
-      ],
-      'developing-reader': [
-        {
-          icon: '📘',
-          title: "Your child's Developing Reader Bridge",
-          body: `<p class="ob-intro">Keep decoding active while adding sentence work:</p>
-                 <ul class="ob-list">
-                   <li><strong>🎯 Blend It!</strong> — quick phonics review</li>
-                   <li><strong>📚 Giri Stories</strong> — sentence &amp; paragraph reading</li>
-                   <li><strong>🔨 Sentence Forge</strong> — begin sentence building</li>
-                 </ul>`,
-        },
-      ],
-      reader: [
-        {
-          icon: '🏫',
-          title: "Your child's Reader Journey",
-          body: `<p class="ob-intro">PhonicsQuest guides your child through three daily quests:</p>
-                 <ul class="ob-list">
-                   <li><strong>🔨 Sentence Forge</strong> — unscramble &amp; build sentences</li>
-                   <li><strong>🏰 Cloze Castle</strong> — grammar cloze passages P1–P6</li>
-                   <li><strong>🔑 Word Vault</strong> — vocabulary in context</li>
-                 </ul>`,
-        },
-        {
-          icon: '📋',
-          title: 'Follow this order each day',
-          body: `<div class="ob-steps">
-                   <div class="ob-step">
-                     <span class="ob-step-num">1</span>
-                     <div><strong>Start with Sentence Forge</strong><br><small>Build sentence structure skills</small></div>
-                   </div>
-                   <div class="ob-step">
-                     <span class="ob-step-num">2</span>
-                     <div><strong>Do Cloze Castle</strong><br><small>Grammar cloze with clue detection</small></div>
-                   </div>
-                   <div class="ob-step">
-                     <span class="ob-step-num">3</span>
-                     <div><strong>Finish with Word Vault</strong><br><small>Vocabulary in context practice</small></div>
-                   </div>
-                 </div>`,
-        },
-        {
-          icon: '⭐',
-          title: 'Look for this card every day',
-          body: `<div class="ob-highlight-card">
-                   <div class="ob-highlight-eyebrow">TODAY'S START POINT</div>
-                   <p class="ob-highlight-title">Best Next Step</p>
-                   <p class="ob-highlight-body">This card is always first on the home screen. It targets your child's <strong>weakest skill</strong> so every session has a clear, focused starting point.</p>
-                 </div>
-                 <p class="ob-highlight-hint">👆 Just tap the big button — the app guides you from there.</p>`,
-        },
-        {
-          icon: '🎮',
-          title: 'Bonus activities — use after the main lesson',
-          body: `<div class="ob-bonus-list">
-                   <div class="ob-bonus-item">⚡ <strong>Daily Challenge</strong> — 5-word bonus round, earns extra XP</div>
-                   <div class="ob-bonus-item">📚 <strong>Giri Stories</strong> — short decodable phonics stories</div>
-                   <div class="ob-bonus-item">🃏 <strong>Sight Words</strong> — flip &amp; match high-frequency words</div>
-                   <div class="ob-bonus-item">🎡 <strong>Random Activity</strong> — spin the wheel for variety</div>
-                 </div>
-                 <p class="ob-bonus-note">Find these in the <strong>🎁 Extra</strong> tab at the top of the home screen.</p>`,
-        },
-      ],
-    };
-
-    const screens   = TUTORIAL[levelKey] || TUTORIAL['pre-reader'];
-    let   step      = 0;
-
-    const contentEl = document.getElementById('ob-content');
-    const dotsEl    = document.getElementById('ob-dots');
-    const prevBtn   = document.getElementById('ob-prev');
-    const nextBtn   = document.getElementById('ob-next');
-    const skipBtn   = document.getElementById('ob-skip-btn');
-
-    if (!contentEl || !dotsEl || !prevBtn || !nextBtn) return;
-
-    const renderStep = (s) => {
-      const sc = screens[s];
-      contentEl.innerHTML = `
-        <div class="ob-screen">
-          <div class="ob-screen-icon" aria-hidden="true">${sc.icon}</div>
-          <h2 class="ob-screen-title">${sc.title}</h2>
-          <div class="ob-screen-body">${sc.body}</div>
-        </div>`;
-
-      dotsEl.innerHTML = screens.map((_, i) =>
-        `<span class="ob-dot ${i === s ? 'ob-dot--active' : ''}" role="tab" aria-selected="${i === s}"></span>`
-      ).join('');
-
-      prevBtn.hidden = s === 0;
-      nextBtn.textContent = s === screens.length - 1 ? "Let's go! 🚀" : 'Next →';
-    };
-
-    const closeTutorial = () => {
-      store.set('onboardingComplete', true);
-      this._closeModal('modal-onboarding');
-    };
-
-    // Re-attach listeners each open (avoids accumulation across re-opens)
-    prevBtn.onclick = () => { if (step > 0) { step--; renderStep(step); } };
-    nextBtn.onclick = () => {
-      if (step < screens.length - 1) { step++; renderStep(step); }
-      else closeTutorial();
-    };
-    if (skipBtn) skipBtn.onclick = closeTutorial;
-
-    renderStep(0);
-    this._openModal('modal-onboarding');
+    onboardingController.showOnboardingTutorial(readingBand, {
+      openModal:  id => this._openModal(id),
+      closeModal: id => this._closeModal(id),
+    });
   }
 
   async _openDashboard() {
