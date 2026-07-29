@@ -14,6 +14,9 @@
 import { store } from './modules/store.js';
 import { escapeHtml } from './utils/escapeHtml.js';
 import * as homeBanners from './modules/homeBanners.js';
+import * as askGiriPanel from './components/panels/askGiriPanel.js';
+import * as mistakesDenPanel from './components/panels/mistakesDenPanel.js';
+import * as trophyRoomPanel from './components/panels/trophyRoomPanel.js';
 import { html, raw } from './utils/html.js';
 import { audio } from './modules/audio.js';
 import { gamification } from './modules/gamification.js';
@@ -27,14 +30,9 @@ import {
   applyBedtimeStateToDom,
   getBedtimeStatus,
 } from './modules/bedtimeMode.js';
-import { getMistakesDenSummary, timeAgo as mistakeTimeAgo, MISTAKES_LOOKBACK_DAYS } from './modules/mistakesDen.js';
-import { buildGiriQuestionChips, answerChipOffline, answerChipAi, askGiriFreeText } from './modules/askGiri.js';
 import { initHomeTabs, selectTab, getInitialTab } from './modules/homeTabs.js';
 import { buildJourneyBarHtml, STAGE_META } from './components/journeyBar.js';
 import { renderJourneyMap } from './components/journeyMap.js';
-import { attachAskGiriButton } from './components/askGiriButton.js';
-import { hasApiKey } from './modules/aiService.js';
-import { getPersonalBests } from './modules/personalBestWall.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
 import { mascot } from './components/mascot.js';
 import { findStageForGroup, hasSeenLesson, maybeShowStageLesson, showTipLesson } from './components/miniLesson.js';
@@ -3030,153 +3028,26 @@ class App {
    * when an API key is configured — an optional AI re-explanation. P4–P6
    * profiles with a key also get a typed question box.
    */
-  _openAskGiri() {
-    const host = document.getElementById('ask-giri-content');
-    if (!host) return;
-    this._renderAskGiri(host);
-    modalManager.open('modal-ask-giri');
-  }
+  /** @see components/panels/askGiriPanel.js */
+  _openAskGiri() { askGiriPanel.openAskGiriPanel(); }
 
-  _renderAskGiri(host) {
-    const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
-    const chips = buildGiriQuestionChips();
-    const profile = getActiveProfile ? getActiveProfile() : null;
-    const grade = Number(String(profile?.primaryGrade || '').replace(/\D/g, '')) || 0;
-    const canType = grade >= 4 && hasApiKey();
-
-    host.innerHTML = `
-      <p class="ask-giri-intro">Tap a question and Giri will explain it. The questions come from things you've found tricky lately.</p>
-      <div class="ask-giri-chips" role="group" aria-label="Suggested questions">
-        ${chips.map(c => `
-          <button class="btn btn--ghost ask-giri-chip" type="button" data-chip-id="${escText(c.id)}">
-            ${escText(c.question)}
-          </button>`).join('')}
-      </div>
-      <div class="ask-giri-answer" id="ask-giri-answer" aria-live="polite"></div>
-      ${canType ? `
-        <div class="ask-giri-typed">
-          <label for="ask-giri-input" class="ask-giri-typed-label">Or type your own English question:</label>
-          <div class="ask-giri-typed-row">
-            <input type="text" id="ask-giri-input" class="settings-input" maxlength="300"
-                   placeholder="e.g. When do I use 'much' and when 'many'?" />
-            <button class="btn btn--primary" type="button" id="ask-giri-send">Ask</button>
-          </div>
-        </div>` : ''}
-    `;
-
-    const answerHost = host.querySelector('#ask-giri-answer');
-
-    host.querySelectorAll('.ask-giri-chip').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const chip = chips.find(c => c.id === btn.dataset.chipId);
-        if (!chip || !answerHost) return;
-        const authored = answerChipOffline(chip);
-        answerHost.innerHTML = `
-          <div class="mcq-rule-section">
-            <p class="mcq-rule-label">📖 ${escText(chip.label)}</p>
-            <p class="mcq-rule-text">${escText(authored.rule)}</p>
-            <p class="mcq-rule-example">${escText(authored.example)}</p>
-            ${authored.tip ? `<p class="mcq-rule-tip">💡 ${escText(authored.tip)}</p>` : ''}
-          </div>`;
-        attachAskGiriButton(answerHost, () => answerChipAi(chip), {
-          label: 'Explain it another way ✨',
-          ariaLabel: 'Ask Giri to explain this in different words',
-        });
-      });
-    });
-
-    host.querySelector('#ask-giri-send')?.addEventListener('click', async () => {
-      const input = /** @type {HTMLInputElement|null} */ (host.querySelector('#ask-giri-input'));
-      const sendBtn = /** @type {HTMLButtonElement|null} */ (host.querySelector('#ask-giri-send'));
-      const q = input?.value?.trim();
-      if (!q || !answerHost || !sendBtn) return;
-      sendBtn.disabled = true;
-      answerHost.innerHTML = '<p class="mcq-ask-giri-answer">🦉 Giri is thinking…</p>';
-      const reply = await askGiriFreeText(q);
-      sendBtn.disabled = false;
-      answerHost.innerHTML = reply
-        ? `<p class="mcq-ask-giri-answer">🦉 ${escText(reply)}</p>`
-        : '<p class="mcq-ask-giri-answer">🦉 Giri can\'t answer right now — try one of the question buttons above!</p>';
-    });
-  }
+  /** @see components/panels/askGiriPanel.js */
+  _renderAskGiri(host) { askGiriPanel.renderAskGiriPanel(host); }
 
   /**
    * Open the Mistakes Den modal. Pulls a fresh summary every open so a
    * mid-session retry that just happened isn't shown stale.
    */
-  _openMistakesDen() {
-    const host = document.getElementById('mistakes-den-content');
-    if (!host) return;
-    let summary;
-    try { summary = getMistakesDenSummary(); } catch (_) { summary = { count: 0, mistakes: [], byModule: {} }; }
-    this._renderMistakesDen(host, summary);
-    modalManager.open('modal-mistakes-den');
-  }
+  /** @see components/panels/mistakesDenPanel.js */
+  _openMistakesDen() { mistakesDenPanel.openMistakesDenPanel(t => this._navigateTo(t)); }
 
   /**
    * Render the Mistakes Den modal body — list grouped by module, each row
    * tappable to navigate back to the parent module (where adaptive
    * selection picks up the now-overdue item).
    */
-  _renderMistakesDen(host, summary) {
-    if (!host) return;
-    const escAttr = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-    const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
-
-    if (!summary || summary.count === 0) {
-      host.innerHTML = `
-        <div class="mistakes-den-empty">
-          <p class="mistakes-den-empty__title">🎉 Nothing to retry — all clear!</p>
-          <p class="mistakes-den-empty__sub">Mistakes from the last ${MISTAKES_LOOKBACK_DAYS} days show up here so you can have another go.</p>
-        </div>`;
-      return;
-    }
-
-    // Group rows by moduleLabel so the modal reads as "Grammar MCQ · 4 · …".
-    const byModuleLabel = new Map();
-    for (const m of summary.mistakes) {
-      const key = m.moduleLabel;
-      if (!byModuleLabel.has(key)) byModuleLabel.set(key, []);
-      byModuleLabel.get(key).push(m);
-    }
-
-    const groupsHtml = Array.from(byModuleLabel.entries()).map(([label, items]) => {
-      const rowsHtml = items.map(m => {
-        const countChip = m.count > 1 ? `<span class="mistakes-den-row__count" aria-label="${m.count} mistakes">×${m.count}</span>` : '';
-        const when = mistakeTimeAgo(m.lastMistakeAt);
-        return `
-          <button type="button"
-            class="mistakes-den-row"
-            data-target="${escAttr(m.target || '')}"
-            data-id="${escAttr(m.id)}"
-            aria-label="Retry ${escAttr(m.label)} in ${escAttr(m.moduleLabel)}, ${escAttr(when)}">
-            <span class="mistakes-den-row__label">${escText(m.label)}</span>
-            <span class="mistakes-den-row__when">${escText(when)}</span>
-            ${countChip}
-            <span class="mistakes-den-row__arrow" aria-hidden="true">→</span>
-          </button>`;
-      }).join('');
-
-      return `
-        <div class="mistakes-den-group" role="list">
-          <h3 class="mistakes-den-group__title">${escText(label)} <small>· ${items.length}</small></h3>
-          ${rowsHtml}
-        </div>`;
-    }).join('');
-
-    host.innerHTML = `
-      <p class="mistakes-den-intro">Tap any to retry — Giri's got you. ${escText(summary.count)} slip${summary.count === 1 ? '' : 's'} from the last ${MISTAKES_LOOKBACK_DAYS} days.</p>
-      <div class="mistakes-den-list">${groupsHtml}</div>`;
-
-    host.querySelectorAll('.mistakes-den-row[data-target]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const target = btn.dataset.target;
-        if (!target) return;
-        modalManager.close('modal-mistakes-den');
-        this._navigateTo(target);
-      });
-    });
-  }
+  /** @see components/panels/mistakesDenPanel.js */
+  _renderMistakesDen(host, summary) { mistakesDenPanel.renderMistakesDenPanel(host, summary, t => this._navigateTo(t)); }
 
   /**
    * Refresh the "My Trophy Room" home tile. Only surfaces once the child
@@ -3193,56 +3064,16 @@ class App {
    * Open the trophy room modal — pulls a fresh snapshot every time so a
    * just-earned graduation / streak day shows immediately.
    */
-  _openPersonalBestWall() {
-    const host = document.getElementById('personal-best-content');
-    if (!host) return;
-    let pb;
-    try { pb = getPersonalBests(); } catch (_) { pb = null; }
-    this._renderPersonalBestWall(host, pb);
-    modalManager.open('modal-personal-best');
-  }
+  /** @see components/panels/trophyRoomPanel.js */
+  _openPersonalBestWall() { trophyRoomPanel.openTrophyRoomPanel(); }
 
   /**
    * Render the trophy room body: a grid of cards (numbers + label + sub),
    * a "highlights" strip Giri reads back, and earned badges.
    * Pure HTML build — no chart library, no comparison-to-others framing.
    */
-  _renderPersonalBestWall(host, pb) {
-    if (!host) return;
-    const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
-
-    if (!pb) {
-      host.innerHTML = `<p class="trophy-empty">No data yet — play a quest to start your trophy room.</p>`;
-      return;
-    }
-
-    const cardsHtml = pb.cards.map(card => `
-      <div class="trophy-card" role="group" aria-label="${escText(card.label)}, ${escText(card.value)}">
-        <div class="trophy-card__icon" aria-hidden="true">${escText(card.icon)}</div>
-        <div class="trophy-card__value">${escText(card.value)}</div>
-        <div class="trophy-card__label">${escText(card.label)}</div>
-        ${card.sub ? `<div class="trophy-card__sub">${escText(card.sub)}</div>` : ''}
-      </div>`).join('');
-
-    const highlightsHtml = pb.summary?.highlights?.length
-      ? `<ul class="trophy-highlights">${pb.summary.highlights.map(h => `<li>${escText(h)}</li>`).join('')}</ul>`
-      : '';
-
-    const badgesHtml = pb.badges?.length
-      ? `<div class="trophy-badges">
-           <h3 class="trophy-badges__title">🎖️ Badges earned · ${pb.badges.length}</h3>
-           <div class="trophy-badges__list">
-             ${pb.badges.map(b => `<span class="trophy-badge" title="${escText(b.name)}"><span aria-hidden="true">${escText(b.emoji)}</span> ${escText(b.name)}</span>`).join('')}
-           </div>
-         </div>`
-      : '';
-
-    host.innerHTML = `
-      <p class="trophy-intro">Every number here is just <strong>you vs you</strong> — no rankings, no leagues.</p>
-      ${highlightsHtml}
-      <div class="trophy-grid">${cardsHtml}</div>
-      ${badgesHtml}`;
-  }
+  /** @see components/panels/trophyRoomPanel.js */
+  _renderPersonalBestWall(host, pb) { trophyRoomPanel.renderTrophyRoomPanel(host, pb); }
 
   /** @see modules/homeBanners.js */
   _updateDailyBanner() { homeBanners.updateDailyBanner(); }
