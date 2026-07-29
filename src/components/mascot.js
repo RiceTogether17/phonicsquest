@@ -7,8 +7,12 @@
 
 const BASE = import.meta.env.BASE_URL;
 
-/** Mascot image paths keyed by emotional state */
-const STATES = {
+/**
+ * Mascot image paths keyed by emotional state.
+ * Exported so other Giri surfaces (giriWordCard.js) reuse the same pose set
+ * rather than hard-coding a second list of filenames that could drift.
+ */
+export const STATES = {
   neutral:    `${BASE}images/mascot/giri-neutral.png`,
   celebrate:  `${BASE}images/mascot/giri-celebrate.png`,
   confetti:   `${BASE}images/mascot/giri-celebrate-confetti.png`,

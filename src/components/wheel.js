@@ -221,6 +221,11 @@ class SpinWheel {
 export function buildWordAnimation(word, container, onLetterLand) {
   container.innerHTML = '';
 
+  // The container is role="img" with a static "Current word" label in
+  // index.html, which told a screen-reader user nothing. Name it with the
+  // actual word so the tiles' meaning survives them being aria-hidden.
+  container.setAttribute('aria-label', word.word);
+
   const typeClassMap = {
     c:  'consonant',
     sv: 'short-vowel',
@@ -235,8 +240,12 @@ export function buildWordAnimation(word, container, onLetterLand) {
     const tile = document.createElement('div');
     tile.className = `letter-tile letter-tile--${typeClassMap[word.types[i]] || 'consonant'}`;
     tile.textContent = grapheme;
-    tile.setAttribute('role', 'listitem');
-    tile.setAttribute('aria-label', `${grapheme}, ${typeClassMap[word.types[i]] || 'consonant'}`);
+    // No role here: the tiles live inside #word-display, which is itself
+    // role="img", so a role="listitem" child is invalid ARIA (axe flags it
+    // as a critical aria-required-parent violation) and is not exposed to
+    // assistive tech anyway. The container's aria-label below carries the
+    // word instead.
+    tile.setAttribute('aria-hidden', 'true');
     container.appendChild(tile);
     return tile;
   });

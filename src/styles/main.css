@@ -13678,3 +13678,176 @@ body.print-mode > *:not(.print-report-wrapper) > * { visibility: hidden; }
 
 /* Mini-lesson step tag was 3.2:1 on the translucent chip. */
 .mini-lesson-step-tag { color: #4f46e5; }
+
+/* ── Elkonin sound boxes ──────────────────────────────────────────────────
+   One box per phoneme, filled as the child isolates each sound. Colour is
+   inherited from the shared --c-* sound-type variables (the same language
+   the phoneme tiles use), so these track the default, high-contrast and
+   dyslexia themes without a second palette.
+
+   State is deliberately readable without colour: an empty box is dashed
+   with a faint placeholder, a filled box is solid and shows its grapheme,
+   correct adds a check accent and retry a dotted border. Screen readers get
+   the same information from each box's aria-label. */
+
+.sound-boxes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  width: 100%;
+  margin: var(--space-3) 0;
+}
+
+.sound-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  height: 56px;
+  border: 3px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  transition: background var(--dur-base), border-color var(--dur-base),
+              color var(--dur-base), transform var(--dur-base);
+}
+
+.sound-box__mark { line-height: 1; }
+
+/* The box currently being worked on. Scale + solid border, so the cue is
+   not purely a colour change. */
+.sound-box--active {
+  border-style: solid;
+  border-color: var(--color-primary);
+  transform: scale(1.06);
+}
+
+/* Filled / correct boxes take their sound-type colour. */
+.sound-box--filled,
+.sound-box--correct {
+  border-style: solid;
+  color: var(--text-on-dark);
+}
+
+.sound-box--correct { box-shadow: 0 3px 0 rgba(0,0,0,0.2); }
+
+/* Mistakes are never red here — a dotted border says "have another go",
+   matching the app's charter that mistakes are safe. */
+.sound-box--retry {
+  border-style: dotted;
+  border-color: var(--color-warning, #f59e0b);
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+.sound-box--filled.sound-box--consonant,
+.sound-box--correct.sound-box--consonant   { background: var(--c-consonant);   border-color: var(--c-consonant); }
+.sound-box--filled.sound-box--short-vowel,
+.sound-box--correct.sound-box--short-vowel { background: var(--c-short-vowel); border-color: var(--c-short-vowel); }
+.sound-box--filled.sound-box--long-vowel,
+.sound-box--correct.sound-box--long-vowel  { background: var(--c-long-vowel);  border-color: var(--c-long-vowel); }
+.sound-box--filled.sound-box--digraph,
+.sound-box--correct.sound-box--digraph     { background: var(--c-digraph);     border-color: var(--c-digraph); }
+.sound-box--filled.sound-box--blend,
+.sound-box--correct.sound-box--blend       { background: var(--c-blend);       border-color: var(--c-blend); }
+.sound-box--filled.sound-box--silent-e,
+.sound-box--correct.sound-box--silent-e    { background: var(--c-silent-e);    border-color: var(--c-silent-e); }
+.sound-box--filled.sound-box--r-control,
+.sound-box--correct.sound-box--r-control   { background: var(--c-r-control);   border-color: var(--c-r-control); }
+.sound-box--filled.sound-box--diphthong,
+.sound-box--correct.sound-box--diphthong   { background: var(--c-diphthong);   border-color: var(--c-diphthong); }
+.sound-box--filled.sound-box--suffix,
+.sound-box--correct.sound-box--suffix      { background: var(--c-suffix);      border-color: var(--c-suffix); }
+
+/* Longer words (6–8 sounds) shrink so the track still fits one line on a
+   phone rather than wrapping mid-word, which would break the left-to-right
+   "sounds in order" reading the boxes exist to teach. */
+.sound-boxes--n6 .sound-box,
+.sound-boxes--n7 .sound-box,
+.sound-boxes--n8 .sound-box {
+  min-width: 40px;
+  height: 44px;
+  font-size: var(--font-size-md);
+}
+
+@media (min-width: 768px) {
+  .sound-box { min-width: 68px; height: 68px; font-size: var(--font-size-2xl); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sound-box { transition: none; }
+  .sound-box--active { transform: none; }
+}
+
+/* ── Giri word card ───────────────────────────────────────────────────────
+   Puts Giri inside the lesson rather than only in celebrations: the mascot
+   presents the word's picture. The picture is the word's own emoji, so this
+   works for every word in the bank without per-word artwork. */
+
+.giri-word-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.giri-word-card__giri {
+  width: clamp(48px, 14vw, 88px);
+  height: auto;
+  flex-shrink: 0;
+  /* Giri is scenery: never let the mascot pull attention off the word. */
+  opacity: 0.95;
+  pointer-events: none;
+  user-select: none;
+}
+
+.giri-word-card__frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-2);
+  border: 3px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
+  min-width: 96px;
+}
+
+.giri-word-card__picture {
+  font-size: clamp(2.5rem, 12vw, 4.5rem);
+  line-height: 1;
+}
+
+/* Listening-first modes withhold the picture on purpose. */
+.giri-word-card__picture--hidden {
+  color: var(--text-muted);
+  opacity: 0.55;
+}
+
+.giri-word-card__caption {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Pose-specific framing: a solved word gets a warm border, a retry a gentle
+   amber one. Colour is a reinforcement here, never the only signal — the
+   pose itself and the mode's own copy carry the message. */
+.giri-word-card[data-pose="celebrate"] .giri-word-card__frame {
+  border-color: var(--color-success, #22c55e);
+}
+.giri-word-card[data-pose="encourage"] .giri-word-card__frame {
+  border-color: var(--color-warning, #f59e0b);
+}
+
+@media (max-width: 380px) {
+  /* On the narrowest phones the mascot yields space to the word itself. */
+  .giri-word-card__giri { display: none; }
+}

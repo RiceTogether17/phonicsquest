@@ -6,8 +6,12 @@
 
 import { DIACRITICS } from '../data/words.js';
 
-/** Map phoneme type codes to CSS class names */
-const TYPE_CLASS = {
+/**
+ * Map phoneme type codes to CSS class names.
+ * Exported so other sound-level visuals (soundBoxes.js) inherit exactly the
+ * same colour language rather than defining a second, drifting copy.
+ */
+export const TYPE_CLASS = {
   c:  'consonant',
   sv: 'short-vowel',
   lv: 'long-vowel',
@@ -22,8 +26,8 @@ const TYPE_CLASS = {
   soft_g: 'consonant',
 };
 
-/** Human-readable labels for phoneme types */
-const TYPE_LABEL = {
+/** Human-readable labels for phoneme types (also used in aria-labels). */
+export const TYPE_LABEL = {
   c:  'consonant',
   sv: 'short vowel',
   lv: 'long vowel',

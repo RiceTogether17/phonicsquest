@@ -11,6 +11,8 @@
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
+import { renderSoundBoxes, updateSoundBoxes, fillSoundBox } from '../components/soundBoxes.js';
+import { renderGiriWordCard, setGiriPose } from '../components/giriWordCard.js';
 
 let currentWord = null;
 let selectedLetters = [];
@@ -30,7 +32,9 @@ export function setupSegment(word, els) {
   wrongGroupings = 0;
   startTime = Date.now();
 
-  renderWordImage(word, els.wordEmoji, true);
+  // The picture now lives inside the Giri card below, so the shared word
+  // image is hidden to avoid showing the same emoji twice.
+  renderWordImage(word, els.wordEmoji, false);
   buildWordAnimation(word, els.wordDisplay);
   els.phonemeRow.innerHTML = '';
 
@@ -39,20 +43,25 @@ export function setupSegment(word, els) {
   const letters = word.word.split('');
 
   els.modeArea.innerHTML = `
+    <div id="segment-giri-card"></div>
     <div class="segment-word" id="segment-letters" aria-label="Tap letters to group them into sounds"></div>
-    <div class="segment-targets" id="segment-targets" aria-label="Sound groups found"></div>
+    <div id="segment-sound-boxes"></div>
   `;
 
   const lettersContainer = document.getElementById('segment-letters');
-  const targetsContainer = document.getElementById('segment-targets');
 
-  for (let i = 0; i < word.graphemes.length; i++) {
-    const slot = document.createElement('div');
-    slot.className = 'segment-slot';
-    slot.dataset.index = i;
-    slot.setAttribute('aria-label', `Sound ${i + 1}`);
-    targetsContainer.appendChild(slot);
-  }
+  // Giri presents the word while the child works on it.
+  renderGiriWordCard(word, document.getElementById('segment-giri-card'), {
+    pose: 'think',
+    caption: 'How many sounds can you hear?',
+  });
+
+  // Elkonin sound boxes: one per phoneme, filled as each sound is isolated.
+  // This is the scaffold this mode's own comments have described since it
+  // was written; the boxes replace the unstyled slots that stood in for it.
+  renderSoundBoxes(word, document.getElementById('segment-sound-boxes'), {
+    activeIndex: 0,
+  });
 
   letters.forEach((letter, i) => {
     const btn = document.createElement('button');
@@ -117,12 +126,15 @@ function confirmSegment(word, els) {
       btns[l.index].disabled = true;
     });
 
-    const slots = document.querySelectorAll('.segment-slot');
-    const slot = slots[segmentsFound.length - 1];
-    if (slot) {
-      slot.textContent = selectedStr;
-      slot.classList.add('filled');
-    }
+    // Fill the sound box for the phoneme just isolated and advance the
+    // active marker to the next empty box.
+    const boxHost = document.getElementById('segment-sound-boxes');
+    const filledIdx = segmentsFound.length - 1;
+    fillSoundBox(boxHost, filledIdx, selectedStr);
+    updateSoundBoxes(boxHost, {
+      filledIndices: segmentsFound.map((_, n) => n),
+      activeIndex: segmentsFound.length < word.graphemes.length ? segmentsFound.length : null,
+    });
 
     const i = segmentsFound.length - 1;
     const prevGrapheme = i > 0 ? word.graphemes[i - 1] : null;
@@ -145,6 +157,23 @@ function confirmSegment(word, els) {
       setTimeout(() => btns[l.index].classList.remove('wrong'), 500);
     });
     selectedLetters = [];
+
+    // Flag the box being worked on as "try again", never wrong, and have
+    // Giri switch to the encouraging pose — mistakes are safe here.
+    const boxHost = document.getElementById('segment-sound-boxes');
+    const active = segmentsFound.length;
+    updateSoundBoxes(boxHost, {
+      filledIndices: segmentsFound.map((_, n) => n),
+      retryIndices: [active],
+    });
+    setGiriPose(document.getElementById('segment-giri-card'), 'encourage');
+    setTimeout(() => {
+      updateSoundBoxes(boxHost, {
+        filledIndices: segmentsFound.map((_, n) => n),
+        activeIndex: active,
+      });
+      setGiriPose(document.getElementById('segment-giri-card'), 'think');
+    }, 900);
   }
 }
 
@@ -156,6 +185,13 @@ function checkSegmentation(word, els) {
 
 function onAllSegmented(word, els) {
   const responseTime = Date.now() - startTime;
+
+  // Every box confirmed, and Giri celebrates the finished word.
+  updateSoundBoxes(document.getElementById('segment-sound-boxes'), {
+    filledIndices: word.graphemes.map((_, n) => n),
+    correctIndices: word.graphemes.map((_, n) => n),
+  });
+  setGiriPose(document.getElementById('segment-giri-card'), 'celebrate');
 
   renderPhonemes(word, els.phonemeRow, {
     showDiacritics: true,
