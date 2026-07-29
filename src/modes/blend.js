@@ -12,6 +12,9 @@
  */
 
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
+import {
+  mountBlendGuide, unmountBlendGuide, moveGuideTo, celebrateGuide,
+} from '../components/giriBlendGuide.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
@@ -243,6 +246,11 @@ async function _animateBlendSweep(phonemeRow, word) {
   const tiles = phonemeRow.querySelectorAll('.phoneme-tile');
   if (!tiles.length) return;
 
+  // Giri leads the sweep. Purely visual — the audio below still drives all
+  // timing, so the guide can be removed without changing the lesson.
+  mountBlendGuide(phonemeRow);
+  moveGuideTo(phonemeRow, 0);
+
   const perTile = Math.max(200, Math.min(500, 1200 / tiles.length));
 
   if (_blendStyle === 'cumulative') {
@@ -251,6 +259,7 @@ async function _animateBlendSweep(phonemeRow, word) {
     // highlight bar growing as each blended chunk lands.
     if (tiles.length < 2) {
       tiles[0].classList.add('blend-highlight');
+      moveGuideTo(phonemeRow, 0);
       await audio.speakPhoneme(word.graphemes[0], word.types[0], { word: word.word });
       await _delay(perTile);
     } else {
@@ -260,6 +269,7 @@ async function _animateBlendSweep(phonemeRow, word) {
         await _delay(150);
 
         tiles.forEach((t, ti) => t.classList.toggle('blend-highlight', ti === i));
+        moveGuideTo(phonemeRow, i);
         await audio.speakPhoneme(word.graphemes[i], word.types[i], {
           word: word.word, prevGrapheme: word.graphemes[i - 1],
         });
@@ -275,6 +285,7 @@ async function _animateBlendSweep(phonemeRow, word) {
     // Sequential highlight
     for (let i = 0; i < tiles.length; i++) {
       tiles[i].classList.add('blend-highlight');
+      moveGuideTo(phonemeRow, i);
       const prev = i > 0 ? word.graphemes[i - 1] : null;
       await audio.speakPhoneme(word.graphemes[i], word.types[i], { word: word.word, prevGrapheme: prev });
       await _delay(perTile);
@@ -282,8 +293,9 @@ async function _animateBlendSweep(phonemeRow, word) {
     }
   }
 
-  // Flash all together for the "blend" moment
+  // Flash all together for the "blend" moment — the whole word at once.
   tiles.forEach(t => t.classList.add('blend-highlight-all'));
+  celebrateGuide(phonemeRow);
   await _delay(400);
   tiles.forEach(t => t.classList.remove('blend-highlight-all'));
 }
@@ -295,6 +307,7 @@ const _delay = ms => new Promise(r => setTimeout(r, ms));
 export function getCurrentWord() { return currentWord; }
 
 export function cleanup() {
+  unmountBlendGuide(document.getElementById('phoneme-row'));
   currentWord   = null;
   revealedCount = 0;
   isRevealing   = false;

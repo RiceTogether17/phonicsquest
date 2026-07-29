@@ -38,6 +38,9 @@ const EMPTY_MARK = '·';
  * @property {number|null} [activeIndex]  the box currently being worked on
  * @property {number[]} [correctIndices]  boxes confirmed correct
  * @property {number[]} [retryIndices]    boxes to try again (never "wrong")
+ * @property {number|null} [targetIndex]  the sound this round is *about*
+ *   (First/Last/Middle Sound) — ringed so the child sees which position in
+ *   the word they just identified
  * @property {boolean} [showGraphemes]    render the letters in filled boxes
  * @property {string}  [label]            override the group aria-label
  */
@@ -60,6 +63,7 @@ export function renderSoundBoxes(word, host, opts = {}) {
     activeIndex = null,
     correctIndices = [],
     retryIndices = [],
+    targetIndex = null,
     showGraphemes = true,
     label = null,
   } = opts;
@@ -95,9 +99,12 @@ export function renderSoundBoxes(word, host, opts = {}) {
       : i === activeIndex ? 'active'
       : 'empty';
 
-    box.className = `sound-box sound-box--${state} sound-box--${typeClass}`;
+    const isTarget = i === targetIndex;
+    box.className = `sound-box sound-box--${state} sound-box--${typeClass}`
+      + (isTarget ? ' sound-box--target' : '');
     box.dataset.index = String(i);
     box.dataset.state = state;
+    if (isTarget) box.dataset.target = 'true';
 
     // Visible content distinguishes states without relying on colour.
     const mark = document.createElement('span');
@@ -107,7 +114,10 @@ export function renderSoundBoxes(word, host, opts = {}) {
     box.appendChild(mark);
 
     box.setAttribute('role', 'listitem');
-    box.setAttribute('aria-label', _boxLabel(i, count, state, typeName, grapheme, showGraphemes));
+    box.setAttribute(
+      'aria-label',
+      _boxLabel(i, count, state, typeName, grapheme, showGraphemes, isTarget),
+    );
 
     host.appendChild(box);
   }
@@ -182,14 +192,61 @@ export function fillSoundBox(host, index, grapheme) {
   if (mark) mark.textContent = grapheme;
 }
 
+/** Id of the shared container used by the reveal helper. */
+const REVEAL_HOST_ID = 'reveal-sound-boxes';
+
+/**
+ * Show the completed sound track as part of a round's *reveal*.
+ *
+ * The oral phonemic-awareness modes (Sound Count, Tap the Sounds, First /
+ * Last / Middle Sound) deliberately keep the boxes hidden while the child
+ * is answering — `oralSegment.js` puts it plainly: "a visible box count
+ * would leak the answer". So the scaffold belongs after the answer, where
+ * it turns an abstract count into something the child can see.
+ *
+ * Creates (or reuses) a container directly after the phoneme row and fills
+ * every box, since by reveal time the whole word is known.
+ *
+ * @param {import('../data/words.js').Word} word
+ * @param {{ phonemeRow: HTMLElement }} els  the mode's DOM refs
+ * @param {SoundBoxOpts} [opts]  typically { targetIndex } and/or
+ *   { showGraphemes: false } for the grapheme-free modes
+ * @returns {HTMLElement|null} the container, so callers can animate it
+ */
+export function renderRevealBoxes(word, els, opts = {}) {
+  const row = els?.phonemeRow;
+  if (!row || !row.parentNode) return null;
+
+  let host = document.getElementById(REVEAL_HOST_ID);
+  if (!host) {
+    host = document.createElement('div');
+    host.id = REVEAL_HOST_ID;
+    row.parentNode.insertBefore(host, row.nextSibling);
+  }
+
+  const count = soundCount(word);
+  renderSoundBoxes(word, host, {
+    filledIndices: Array.from({ length: count }, (_, i) => i),
+    ...opts,
+  });
+  return host;
+}
+
+/** Remove the reveal track — called from each mode's cleanup(). */
+export function clearRevealBoxes() {
+  document.getElementById(REVEAL_HOST_ID)?.remove();
+}
+
 /** @private */
-function _boxLabel(i, count, state, typeName, grapheme, showGraphemes) {
+function _boxLabel(i, count, state, typeName, grapheme, showGraphemes, isTarget = false) {
   const position = `Sound ${i + 1} of ${count}`;
-  if (state === 'correct') return `${position}: ${showGraphemes ? `${grapheme}, ` : ''}correct`;
-  if (state === 'retry')   return `${position}: try again`;
-  if (state === 'filled')  return `${position}: ${showGraphemes ? `${grapheme}, ` : ''}filled, ${typeName}`;
-  if (state === 'active')  return `${position}: current, empty`;
-  return `${position}: empty`;
+  // The ringed box is what the round asked about, so say so first.
+  const prefix = isTarget ? `${position}, this round's sound` : position;
+  if (state === 'correct') return `${prefix}: ${showGraphemes ? `${grapheme}, ` : ''}correct`;
+  if (state === 'retry')   return `${prefix}: try again`;
+  if (state === 'filled')  return `${prefix}: ${showGraphemes ? `${grapheme}, ` : ''}filled, ${typeName}`;
+  if (state === 'active')  return `${prefix}: current, empty`;
+  return `${prefix}: empty`;
 }
 
 export const __TEST__ = { EMPTY_MARK, _boxLabel };

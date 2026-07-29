@@ -42,8 +42,22 @@ const handlers = () => ({
   onUnlocked: vi.fn(),
 });
 
-/** Let the click handler's awaited hashing settle. */
-const settle = () => new Promise(r => setTimeout(r, 10));
+/**
+ * Wait for the click handler's awaited PIN hashing to finish.
+ *
+ * Polls rather than sleeping a fixed interval: PIN verification runs a
+ * real crypto hash, which takes noticeably longer under full-suite load
+ * than it does with this file alone. A fixed delay passed in isolation and
+ * flaked in CI.
+ *
+ * @param {() => boolean} [done] condition to wait for; defaults to one tick
+ */
+const settle = async (done = null) => {
+  for (let i = 0; i < 100; i++) {
+    await new Promise(r => setTimeout(r, 5));
+    if (!done || done()) return;
+  }
+};
 
 beforeEach(() => {
   stubAudioGlobals();
@@ -152,7 +166,7 @@ describe('parent PIN gate', () => {
 
     typePin('12');
     document.getElementById('pin-confirm-btn').click();
-    await settle();
+    await settle(() => !!document.getElementById('pin-hint').textContent);
 
     expect(document.getElementById('pin-hint').textContent).toMatch(/all 4 digits/i);
     expect(h.onUnlocked).not.toHaveBeenCalled();
@@ -167,7 +181,7 @@ describe('parent PIN gate', () => {
 
     typePin('1234');
     document.getElementById('pin-confirm-btn').click();
-    await settle();
+    await settle(() => !!store.get('parentPin'));
 
     const saved = store.get('parentPin');
     expect(saved).toBeTruthy();
@@ -188,7 +202,7 @@ describe('parent PIN gate', () => {
 
     typePin('0000');
     document.getElementById('pin-confirm-btn').click();
-    await settle();
+    await settle(() => /wrong pin/i.test(document.getElementById('pin-hint').textContent));
     expect(h.onUnlocked).not.toHaveBeenCalled();
     expect(document.getElementById('pin-hint').textContent).toMatch(/wrong pin/i);
     // Boxes are cleared so the next attempt starts fresh.
@@ -196,7 +210,7 @@ describe('parent PIN gate', () => {
 
     typePin('4321');
     document.getElementById('pin-confirm-btn').click();
-    await settle();
+    await settle(() => h.onUnlocked.mock.calls.length > 0);
     expect(h.onUnlocked).toHaveBeenCalledOnce();
   });
 

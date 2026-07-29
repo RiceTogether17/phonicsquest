@@ -13851,3 +13851,144 @@ body.print-mode > *:not(.print-report-wrapper) > * { visibility: hidden; }
   /* On the narrowest phones the mascot yields space to the word itself. */
   .giri-word-card__giri { display: none; }
 }
+
+/* The sound this round asked about (First / Last / Middle Sound). Ringed
+   with an offset outline rather than a colour swap, so it reads on top of
+   whatever sound-type colour the box already carries — and stays visible in
+   the high-contrast theme. */
+.sound-box--target {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+/* The phoneme tile the round asked about (First / Last / Middle Sound),
+   ringed at reveal. Without it the reveal shows every tile equally and the
+   *position* half of the skill goes unreinforced — the child learns which
+   sound it was, but not where it sat in the word.
+
+   An offset outline rather than a colour change, so it layers over the
+   tile's existing sound-type colour and survives the high-contrast theme. */
+.phoneme-tile--target .phoneme-symbol {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+.phoneme-tile--target .phoneme-label {
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+/* ── Giri blending guide ──────────────────────────────────────────────────
+   Giri walks the sound track while blend.js plays the cumulative sweep, so
+   "sounds gathering up left to right" is visible and not carried by audio
+   alone. Decorative and aria-hidden: the tiles and the audio teach. */
+
+.phoneme-row--guided {
+  position: relative;
+  /* Room above the tiles for the guide to sit without overlapping them. */
+  padding-top: 56px;
+}
+
+.giri-blend-guide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 48px;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  transition: transform var(--dur-base) var(--ease-out);
+  will-change: transform;
+}
+
+@media (min-width: 768px) {
+  .phoneme-row--guided { padding-top: 68px; }
+  .giri-blend-guide { width: 60px; }
+}
+
+/* JS also checks prefersReducedMotion() and sets transition:none, but the
+   media query covers the OS preference even if the JS path is bypassed. */
+@media (prefers-reduced-motion: reduce) {
+  .giri-blend-guide { transition: none; }
+}
+
+/* ── Mouth cue (articulation diagram) ─────────────────────────────────────
+   Shows what the mouth does for a sound. Drawn with theme variables rather
+   than fixed colours so it survives the high-contrast and dyslexia themes.
+   See data/articulation.js for the phoneme -> shape mapping. */
+
+.mouth-cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.mouth-cue__diagram {
+  width: clamp(88px, 26vw, 132px);
+  padding: var(--space-2);
+  background: var(--surface-2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.mouth-cue__svg { width: 100%; height: auto; display: block; }
+
+/* Lips: outline only, so the shape reads at small sizes. */
+.mc-lips {
+  fill: none;
+  stroke: var(--c-short-vowel);
+  stroke-width: 4;
+}
+.mc-lips--ghost { opacity: 0.35; stroke-dasharray: 4 3; }
+
+/* The cavity behind the lips. */
+.mc-mouth { fill: var(--text); opacity: 0.82; }
+
+.mc-teeth { fill: #ffffff; stroke: var(--border); stroke-width: 1; }
+
+.mc-tongue { fill: var(--c-r-control); opacity: 0.9; }
+.mc-tongue-line {
+  fill: none;
+  stroke: var(--c-r-control);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+/* The seal on a closed-lip sound, and the puff of air on /h/. */
+.mc-seal {
+  stroke: var(--c-short-vowel);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.mc-air {
+  fill: none;
+  stroke: var(--c-consonant);
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+/* Diphthong glide: the mouth travels from one shape to the next. */
+.mc-arrow {
+  stroke: var(--c-consonant);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.mc-arrow-head { fill: var(--c-consonant); }
+
+.mouth-cue__text {
+  margin: 0;
+  max-width: 22ch;
+  font-size: var(--font-size-sm);
+  line-height: 1.35;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Success feedback text ("Yes! 🎉") was --color-success (#22c55e) on white:
+   2.27:1, under the 3:1 minimum even at 20px bold. The icon chip keeps the
+   brighter green (white-on-green passes comfortably); only the text darkens.
+   Caught by the axe scan on the First Sound reveal. */
+.choice-feedback--correct,
+.choice-feedback--reveal { color: #15803d; }
