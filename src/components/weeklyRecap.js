@@ -12,6 +12,7 @@
 
 import { store }        from '../modules/store.js';
 import { getActiveProfile } from '../modules/profiles.js';
+import { html }         from '../utils/html.js';
 
 const RECAP_INTERVAL_DAYS = 7;
 
@@ -64,7 +65,9 @@ export function showWeeklyRecap({ stats, onClose }) {
   modal.setAttribute('aria-modal', 'true');
   modal.setAttribute('aria-label', 'Weekly learning recap');
 
-  modal.innerHTML = `
+  // html`` escapes every interpolation — `message` embeds the profile name,
+  // which is user-supplied (and reachable from an imported profile file).
+  modal.innerHTML = html`
     <div class="modal-panel wr-panel">
       <div class="wr-header">
         <span class="wr-icon" aria-hidden="true">${icon}</span>

@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 166",
     "typecheck": "tsc --noEmit",
     "check:syntax": "find src -name '*.js' -print0 | xargs -0 -n1 node --check",
     "check:bundle": "node scripts/check-bundle-size.mjs",

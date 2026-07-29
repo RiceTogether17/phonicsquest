@@ -569,9 +569,9 @@ function _renderLearnerSummary() {
 
   container.innerHTML = `
     <div class="dash-learner-summary">
-      <div class="dash-learner-avatar">${s.profileAvatar}</div>
+      <div class="dash-learner-avatar">${escapeHtml(s.profileAvatar)}</div>
       <div class="dash-learner-info">
-        <div class="dash-learner-name">${s.profileName}</div>
+        <div class="dash-learner-name">${escapeHtml(s.profileName)}</div>
         <div class="dash-learner-type-badge">${s.learnerType} Pathway</div>
       </div>
       <div class="dash-learner-stats">

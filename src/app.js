@@ -12,6 +12,8 @@
  */
 
 import { store } from './modules/store.js';
+import { escapeHtml } from './utils/escapeHtml.js';
+import { html, raw } from './utils/html.js';
 import { audio } from './modules/audio.js';
 import { gamification } from './modules/gamification.js';
 import { badges } from './modules/badges.js';
@@ -1766,7 +1768,9 @@ class App {
     const pathwayIcon  = STAGE_META[readingBand]?.icon || '🌱';
     const pathwayLabel = STAGE_META[readingBand]?.label || 'Reading Journey';
     const pathwayMod   = STAGE_META[readingBand]?.mod || 'pathway-badge--preschool';
-    const profileName  = profile?.name ? `${profile.name}'s ` : '';
+    // Escaped: the profile name is user-supplied and can also arrive from an
+    // imported profile file, and this string is spliced into innerHTML below.
+    const profileName  = profile?.name ? `${escapeHtml(profile.name)}'s ` : '';
 
     const journeyBarHtml = buildJourneyBarHtml(readingBand, store.get('groupMastery') || {});
 
@@ -2199,7 +2203,10 @@ class App {
       return;
     }
 
-    grid.innerHTML = profiles.map(p => `
+    // html`` escapes each interpolation, so a profile name carrying markup
+    // (typed, or arriving via an imported profile file) renders as text.
+    // Raw.toString() makes the trailing .join('') safe to keep.
+    grid.innerHTML = profiles.map(p => html`
       <div class="profile-card ${activeProfile?.id === p.id ? 'profile-card--active' : ''}"
            role="listitem">
         <button class="profile-select-btn" data-profile-id="${p.id}"
@@ -2208,9 +2215,9 @@ class App {
             ${p.avatar}
           </span>
           <span class="profile-name">${p.name}</span>
-          ${activeProfile?.id === p.id ? '<span class="profile-active-badge">●</span>' : ''}
+          ${activeProfile?.id === p.id ? raw('<span class="profile-active-badge">●</span>') : ''}
         </button>
-        ${profiles.length > 1 ? `
+        ${profiles.length > 1 ? html`
           <button class="profile-delete-btn" data-delete-id="${p.id}"
                   aria-label="Delete ${p.name}'s profile">✕</button>
         ` : ''}
@@ -2552,7 +2559,8 @@ class App {
    */
   _showComebackModal(daysAway) {
     const profile  = getActiveProfile();
-    const name     = profile?.name?.split(' ')[0] || 'there';
+    // Escaped: spliced into the comeback modal's innerHTML below.
+    const name     = escapeHtml(profile?.name?.split(' ')[0] || 'there');
     const existing = document.getElementById('modal-comeback');
     if (existing) existing.remove();
 
@@ -2631,7 +2639,7 @@ class App {
         <div class="br-icon" aria-hidden="true">💾</div>
         <h2 class="br-title">Back up your progress!</h2>
         <p class="br-body">
-          ${profile?.name || 'Your learner'} has practised <strong>${wordCount} words</strong>.
+          ${escapeHtml(profile?.name || 'Your learner')} has practised <strong>${wordCount} words</strong>.
           If browser data is cleared, this progress could be lost.
         </p>
         <p class="br-body">Download a backup file to keep it safe.</p>

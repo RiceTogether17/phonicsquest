@@ -12,6 +12,7 @@
 import { CURRICULUM, PHASES, PRE_PHASES } from '../data/curriculum.js';
 import { store } from '../modules/store.js';
 import { getActiveProfile } from '../modules/profiles.js';
+import { escapeHtml } from '../utils/escapeHtml.js';
 import { getDomainMastery } from '../modules/masteryEngine.js';
 import { getPrePhaseProgress } from '../modules/prePhaseProgress.js';
 
@@ -186,7 +187,9 @@ export function renderCurriculumMap(container, { onClose } = {}) {
   const profile      = getActiveProfile();
   const isPrimary    = profile?.schoolLevel === 'primary';
   const avatar       = profile?.avatar || '🦁';
-  const name         = profile?.name?.split(' ')[0] || 'Learner';
+  // Escaped once here: this reaches innerHTML in both the aria-label and
+  // the title below, and profile names are user-supplied.
+  const name         = escapeHtml(profile?.name?.split(' ')[0] || 'Learner');
 
   const phaseCards  = buildPhaseCardsHtml(avatar);
   const domainCards = buildDomainCardsHtml();

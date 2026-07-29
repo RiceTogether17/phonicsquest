@@ -12,6 +12,7 @@
 
 import { store }        from '../modules/store.js';
 import { getActiveProfile } from '../modules/profiles.js';
+import { escapeHtml } from '../utils/escapeHtml.js';
 
 /**
  * Show the session summary screen.
@@ -28,7 +29,9 @@ export function showSessionSummary({ xpEarned, wordsCount, firstTryCount = 0, st
   if (!container) { onClose(); return; }
 
   const profile      = getActiveProfile();
-  const firstName    = profile?.name?.split(' ')[0] || 'Great job';
+  // Escaped once here: firstName is spliced into the motivational headings
+  // below, which are assigned to innerHTML.
+  const firstName    = escapeHtml(profile?.name?.split(' ')[0] || 'Great job');
   const avatar       = profile?.avatar || '🦁';
   const level        = store.get('level') || 1;
   const bestStreak   = store.get('bestStreak') || streak;
