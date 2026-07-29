@@ -203,6 +203,12 @@ const DEFAULT_STATE = {
   // Per-lesson draft state: text, plan, feedback, phase, revision data.
   // Keyed by `${trackId}__${lessonIdx}` or `legacy__${level}__${lessonIdx}`.
   writingDraftData: {},
+
+  // ── Word Vault SM-2 schedule ────────────────────────────────────────────
+  // { [wordId]: { interval, repetitions, easeFactor, dueAt, correct, wrong } }.
+  // Written by srsScheduler.js. Declared here so it participates in the
+  // store's schema, reset and backup paths like every other persisted key.
+  srsSchedule: {},
 };
 
 class Store {
