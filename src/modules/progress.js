@@ -13,6 +13,7 @@ import { WORDS, getWordsByLevel, getWordStructure, getShortVowelLetter } from '.
 import { MASTERY_THRESHOLD, MIN_ATTEMPTS_FOR_MASTERY } from '../data/curriculum.js';
 import { normalizeAdaptiveConfig, getWordWeight } from './adaptiveSelection.js';
 import { getDueItems, countDueItems } from './reviewScheduler.js';
+import { evidenceCeilingForMode } from './evidence.js';
 
 export const NON_DECODABLE_GROUPS = new Set(['sight-highfreq']);
 export const BLENDING_MODES = new Set(['blend', 'classicBlend']);
@@ -35,16 +36,26 @@ const VOWEL_TYPES = new Set(['sv', 'lv', 'rc', 'dp']);
  */
 export function hasInteriorVowel(word) {
   if (!Array.isArray(word?.types) || word.types.length <= 2) return false;
-  return word.types.slice(1, -1).some(t => VOWEL_TYPES.has(t));
+  return word.types.slice(1, -1).some((t) => VOWEL_TYPES.has(t));
 }
 
 // Groups that should not appear in phonemic-awareness activities because their
 // words are irregular, multisyllabic, or non-decodable at the phoneme level.
 const PA_EXCLUDED_GROUPS = new Set([
-  'sight-highfreq', 'multisyllable', 'prefixes', 'suffixes-advanced',
+  'sight-highfreq',
+  'multisyllable',
+  'prefixes',
+  'suffixes-advanced',
 ]);
 const PHONEMIC_AWARENESS_MODES = new Set([
-  'first', 'last', 'middle', 'oralBlend', 'soundCount', 'oralSegment', 'missing', 'segment',
+  'first',
+  'last',
+  'middle',
+  'oralBlend',
+  'soundCount',
+  'oralSegment',
+  'missing',
+  'segment',
 ]);
 
 /**
@@ -64,22 +75,22 @@ const PHONEMIC_AWARENESS_MODES = new Set([
  * correct attempts within decoding/segmenting (see masteryEngine).
  */
 export const SKILL_BY_MODE = Object.freeze({
-  oralBlend:    'oralBlend',
-  first:        'segmenting',
-  last:         'segmenting',
-  middle:       'segmenting',
-  soundCount:   'segmenting',
-  oralSegment:  'segmenting',
-  segment:      'segmenting',
-  blend:        'decoding',
+  oralBlend: 'oralBlend',
+  first: 'segmenting',
+  last: 'segmenting',
+  middle: 'segmenting',
+  soundCount: 'segmenting',
+  oralSegment: 'segmenting',
+  segment: 'segmenting',
+  blend: 'decoding',
   classicBlend: 'decoding',
-  hear:         'decoding',
+  hear: 'decoding',
   letterSounds: 'decoding',
-  sightMatch:   'decoding',
-  missing:      'spelling',
-  wordSort:     'spelling',
-  readAndTap:   'decoding',
-  fluencySprint:'decoding',
+  sightMatch: 'decoding',
+  missing: 'spelling',
+  wordSort: 'spelling',
+  readAndTap: 'decoding',
+  fluencySprint: 'decoding',
 });
 
 /** Canonical skill bins, in display order. */
@@ -111,7 +122,7 @@ class Progress {
     const lvl = (w) => maxLevel == null || w.level <= maxLevel;
 
     if (group === 'struct-cvc') {
-      return WORDS.filter(w => w.pattern === 'CVC' && w.types.includes('sv') && lvl(w));
+      return WORDS.filter((w) => w.pattern === 'CVC' && w.types.includes('sv') && lvl(w));
     }
     if (group === 'struct-ccvc') {
       // Structure, not the coarse `pattern:'blend'` flag: that flag is set on
@@ -119,20 +130,46 @@ class Progress {
       // (CVCC: list, gift, mint), so filtering on it leaked ~30 CVCC words
       // into the CCVC category. getWordStructure keeps this consistent with
       // the vowel-specific ccvc-a…u stages, which already gate on 'CCVC'.
-      return WORDS.filter(w => getWordStructure(w) === 'CCVC' && w.types.includes('sv') && !w.types.includes('sf') && lvl(w));
+      return WORDS.filter(
+        (w) =>
+          getWordStructure(w) === 'CCVC' &&
+          w.types.includes('sv') &&
+          !w.types.includes('sf') &&
+          lvl(w),
+      );
     }
     if (group === 'struct-cvcc') {
-      return WORDS.filter(w => (w.group === 'struct-cvcc' || (getWordStructure(w) === 'CVCC' && w.types.includes('sv') && !w.types.includes('sf'))) && lvl(w));
+      return WORDS.filter(
+        (w) =>
+          (w.group === 'struct-cvcc' ||
+            (getWordStructure(w) === 'CVCC' &&
+              w.types.includes('sv') &&
+              !w.types.includes('sf'))) &&
+          lvl(w),
+      );
     }
     if (group === 'struct-ccvcc') {
-      return WORDS.filter(w => (w.group === 'struct-ccvcc' || (getWordStructure(w) === 'CCVCC' && w.types.includes('sv') && !w.types.includes('sf'))) && lvl(w));
+      return WORDS.filter(
+        (w) =>
+          (w.group === 'struct-ccvcc' ||
+            (getWordStructure(w) === 'CCVCC' &&
+              w.types.includes('sv') &&
+              !w.types.includes('sf'))) &&
+          lvl(w),
+      );
     }
 
     const structMatch = group.match(/^(cvc|ccvc|cvcc|ccvcc)-([aeiou])$/);
     if (structMatch) {
       const struct = structMatch[1].toUpperCase();
-      const vowel  = structMatch[2];
-      return WORDS.filter(w => getWordStructure(w) === struct && getShortVowelLetter(w) === vowel && !w.types.includes('sf') && lvl(w));
+      const vowel = structMatch[2];
+      return WORDS.filter(
+        (w) =>
+          getWordStructure(w) === struct &&
+          getShortVowelLetter(w) === vowel &&
+          !w.types.includes('sf') &&
+          lvl(w),
+      );
     }
 
     // Long-vowel micro-stages: <long-X>-<spellingPattern>
@@ -140,9 +177,9 @@ class Progress {
     //   long-o-ow → group:'long-o' AND spellingPattern:'ow'
     const longMatch = group.match(/^(long-[aeiou])-([a-z]+)$/);
     if (longMatch) {
-      const parent  = longMatch[1];
+      const parent = longMatch[1];
       const pattern = longMatch[2];
-      return WORDS.filter(w => w.group === parent && w.spellingPattern === pattern && lvl(w));
+      return WORDS.filter((w) => w.group === parent && w.spellingPattern === pattern && lvl(w));
     }
 
     // R-controlled micro-stages: rc-<spelling>[-<spelling>…]
@@ -151,7 +188,7 @@ class Progress {
     const rcMatch = group.match(/^rc-([a-z-]+)$/);
     if (rcMatch) {
       const spellings = rcMatch[1].split('-');
-      return WORDS.filter(w => {
+      return WORDS.filter((w) => {
         if (w.group !== 'r-controlled' || !lvl(w)) return false;
         const rcIdx = w.types.indexOf('rc');
         return rcIdx >= 0 && spellings.includes(w.graphemes[rcIdx]);
@@ -164,10 +201,12 @@ class Progress {
     const dipMatch = group.match(/^dip-([a-z]+)$/);
     if (dipMatch) {
       const pattern = dipMatch[1];
-      return WORDS.filter(w => w.group === 'diphthongs' && w.spellingPattern === pattern && lvl(w));
+      return WORDS.filter(
+        (w) => w.group === 'diphthongs' && w.spellingPattern === pattern && lvl(w),
+      );
     }
 
-    return WORDS.filter(w => w.group === group && lvl(w));
+    return WORDS.filter((w) => w.group === group && lvl(w));
   }
 
   /**
@@ -182,7 +221,8 @@ class Progress {
   getAdaptivePool(count = 10, opts = {}) {
     const maxLevel = opts.maxLevel ?? store.get('difficulty') ?? 1;
     const isBlendingMode = BLENDING_MODES.has(opts.mode);
-    const requestedGroup = isBlendingMode && NON_DECODABLE_GROUPS.has(opts.group) ? null : opts.group;
+    const requestedGroup =
+      isBlendingMode && NON_DECODABLE_GROUPS.has(opts.group) ? null : opts.group;
     let pool = getWordsByLevel(maxLevel);
 
     if (requestedGroup) {
@@ -195,11 +235,13 @@ class Progress {
     }
 
     if (isBlendingMode) {
-      pool = pool.filter(word => !NON_DECODABLE_GROUPS.has(word.group) && word.pattern !== 'sight');
+      pool = pool.filter(
+        (word) => !NON_DECODABLE_GROUPS.has(word.group) && word.pattern !== 'sight',
+      );
     }
 
     if (PHONEMIC_AWARENESS_MODES.has(opts.mode)) {
-      pool = pool.filter(word => !PA_EXCLUDED_GROUPS.has(word.group));
+      pool = pool.filter((word) => !PA_EXCLUDED_GROUPS.has(word.group));
     }
 
     // Middle Sound needs a true medial vowel — see hasInteriorVowel. Every
@@ -211,7 +253,9 @@ class Progress {
 
     if (pool.length === 0) {
       pool = isBlendingMode
-        ? WORDS.filter(word => !NON_DECODABLE_GROUPS.has(word.group) && word.pattern !== 'sight').slice(0, 20)
+        ? WORDS.filter(
+            (word) => !NON_DECODABLE_GROUPS.has(word.group) && word.pattern !== 'sight',
+          ).slice(0, 20)
         : WORDS.slice(0, 20);
     }
 
@@ -220,7 +264,7 @@ class Progress {
     const adaptiveCfg = normalizeAdaptiveConfig(store.get('adaptiveConfig'));
 
     // Calculate weights
-    const weighted = pool.map(word => {
+    const weighted = pool.map((word) => {
       const s = stats[word.id];
       return { word, weight: getWordWeight(s, adaptiveCfg) };
     });
@@ -247,14 +291,12 @@ class Progress {
 
     const history = store.get('wordHistory') || [];
     const windowSize = Math.min(pool.length - 1, Math.max(5, Math.floor(pool.length * 0.6)));
-    const recentIds = new Set(
-      history.slice(0, Math.max(0, windowSize)).map(h => h.wordId)
-    );
+    const recentIds = new Set(history.slice(0, Math.max(0, windowSize)).map((h) => h.wordId));
 
     // Highest-weight word not shown recently keeps the adaptive bias while the
     // wider window guarantees variety; fall back to the pool if every candidate
     // is (unavoidably, for a tiny stage) within the recency window.
-    const fresh = pool.filter(w => !recentIds.has(w.id));
+    const fresh = pool.filter((w) => !recentIds.has(w.id));
     return (fresh.length > 0 ? fresh : pool)[0] || WORDS[0];
   }
 
@@ -268,37 +310,49 @@ class Progress {
    * speed score has data to work with (the previous code path filtered for
    * `word_attempt` events but nothing was emitting them).
    *
+   * This is the single write path for every phonics word attempt in the app,
+   * which is why the evidence level is resolved here: one place to get right.
+   *
    * @param {string}  wordId
    * @param {boolean} correct
    * @param {string}  mode        which game mode was played
    * @param {number=} responseMs  time-to-answer for fluency scoring
+   * @param {import('./evidence.js').EvidenceLevel=} evidence
+   *   How the answer was obtained. Omit and it falls back to the mode's
+   *   declared ceiling (MODES[mode].evidenceCeiling) — the most generous
+   *   level that mode could possibly justify, with no per-attempt hint or
+   *   retry information factored in. Callers that know about hints (the app
+   *   shell) should pass a level computed by evidence.classifyEvidence().
    */
-  recordAttempt(wordId, correct, mode = 'blend', responseMs = null) {
-    store.recordWordAttempt(wordId, correct);
+  recordAttempt(wordId, correct, mode = 'blend', responseMs = null, evidence = null) {
+    const level = evidence ?? evidenceCeilingForMode(mode);
+    store.recordWordAttempt(wordId, correct, level);
     store.addWordHistory({
       wordId,
       correct,
       mode,
+      evidence: level,
       timestamp: new Date().toISOString(),
     });
 
     // Per-skill breakdown — only when the mode maps to a phonics skill.
     const skill = getSkillForMode(mode);
     if (skill) {
-      store.recordWordSkillAttempt(wordId, skill, correct, responseMs);
+      store.recordWordSkillAttempt(wordId, skill, correct, responseMs, level);
     }
 
     // Telemetry event for downstream scorers (masteryEngine.speed, reporting)
     store.recordLearningEvent({
-      eventType:  'word_attempt',
-      skill:      skill ?? null,
+      eventType: 'word_attempt',
+      skill: skill ?? null,
       correct,
       responseMs: typeof responseMs === 'number' ? responseMs : null,
-      meta:       { wordId, mode },
+      evidence: level,
+      meta: { wordId, mode },
     });
 
     // Update group mastery (both canonical group and structural-vowel cross-cut)
-    const word = WORDS.find(w => w.id === wordId);
+    const word = WORDS.find((w) => w.id === wordId);
     if (word) {
       this._updateGroupMastery(word.group);
       this._updateStructuralGroupMastery(word);
@@ -314,22 +368,22 @@ class Progress {
     const structMatch = group.match(/^(cvc|ccvc|cvcc|ccvcc)-([aeiou])$/);
     if (structMatch) {
       const struct = structMatch[1].toUpperCase();
-      const vowel  = structMatch[2];
-      groupWords = WORDS.filter(w =>
-        getWordStructure(w) === struct && getShortVowelLetter(w) === vowel
+      const vowel = structMatch[2];
+      groupWords = WORDS.filter(
+        (w) => getWordStructure(w) === struct && getShortVowelLetter(w) === vowel,
       );
     } else {
-      groupWords = WORDS.filter(w => w.group === group);
+      groupWords = WORDS.filter((w) => w.group === group);
     }
 
     let totalAttempts = 0;
-    let totalCorrect  = 0;
+    let totalCorrect = 0;
 
     for (const w of groupWords) {
       const s = stats[w.id];
       if (s && s.attempts > 0) {
         totalAttempts += s.attempts;
-        totalCorrect  += s.correct;
+        totalCorrect += s.correct;
       }
     }
 
@@ -358,7 +412,7 @@ class Progress {
       if (!(s && s.attempts > 0)) continue;
       const b = buckets.get(pat) || { attempts: 0, correct: 0 };
       b.attempts += s.attempts;
-      b.correct  += s.correct;
+      b.correct += s.correct;
       buckets.set(pat, b);
     }
     for (const [pattern, b] of buckets) {
@@ -377,7 +431,7 @@ class Progress {
       if (!(s && s.attempts > 0)) continue;
       const b = buckets.get(pat) || { attempts: 0, correct: 0 };
       b.attempts += s.attempts;
-      b.correct  += s.correct;
+      b.correct += s.correct;
       buckets.set(pat, b);
     }
     for (const [pattern, b] of buckets) {
@@ -389,13 +443,12 @@ class Progress {
   /** Update mastery for all structural-vowel groups a word belongs to */
   _updateStructuralGroupMastery(word) {
     const struct = getWordStructure(word);
-    const vowel  = getShortVowelLetter(word);
+    const vowel = getShortVowelLetter(word);
     if (struct !== 'other' && vowel) {
       const structKey = `${struct.toLowerCase()}-${vowel}`; // e.g. 'cvc-a'
       this._updateGroupMastery(structKey);
     }
   }
-
 
   /**
    * Record grammar category accuracy and update mastery recommendation signal.
@@ -480,14 +533,14 @@ class Progress {
     const groupMastery = store.get('groupMastery') || {};
 
     let totalAttempts = 0;
-    let totalCorrect  = 0;
+    let totalCorrect = 0;
     let wordsAttempted = 0;
-    let wordsMastered  = 0;
+    let wordsMastered = 0;
 
     for (const [, s] of Object.entries(stats)) {
       if (s.attempts > 0) {
         totalAttempts += s.attempts;
-        totalCorrect  += s.correct;
+        totalCorrect += s.correct;
         wordsAttempted++;
         if (s.attempts >= MIN_ATTEMPTS_FOR_MASTERY && s.correct / s.attempts >= MASTERY_THRESHOLD) {
           wordsMastered++;
@@ -521,7 +574,7 @@ class Progress {
    */
   getReviewDueWords(opts = {}) {
     const stats = store.get('wordStats') || {};
-    return getDueItems(stats, WORDS, opts).map(d => d.item);
+    return getDueItems(stats, WORDS, opts).map((d) => d.item);
   }
 
   /**
@@ -562,7 +615,10 @@ class Progress {
     if (items.length === 0) return [];
     const k = Math.min(count, items.length);
     return items
-      .map(item => ({ word: item.word, key: Math.pow(Math.random(), 1 / Math.max(item.weight, 0.001)) }))
+      .map((item) => ({
+        word: item.word,
+        key: Math.pow(Math.random(), 1 / Math.max(item.weight, 0.001)),
+      }))
       .sort((a, b) => b.key - a.key)
       .slice(0, k)
       .map(({ word }) => word);

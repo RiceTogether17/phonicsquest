@@ -46,12 +46,12 @@ export const settingsController = {
    */
   bind({ store, badges, gamification, onReset, closeModal }) {
     // ── Theme swatches ─────────────────────────────────────────────────────
-    document.querySelectorAll('.theme-swatch').forEach(swatch => {
+    document.querySelectorAll('.theme-swatch').forEach((swatch) => {
       swatch.addEventListener('click', () => {
         const theme = /** @type {HTMLElement} */ (swatch).dataset.theme;
         this.applyTheme(theme);
         store.set('theme', theme);
-        document.querySelectorAll('.theme-swatch').forEach(s => {
+        document.querySelectorAll('.theme-swatch').forEach((s) => {
           const el = /** @type {HTMLElement} */ (s);
           const active = el.dataset.theme === theme;
           el.classList.toggle('active', active);
@@ -84,7 +84,6 @@ export const settingsController = {
       store.set('stretchedSpeech', /** @type {HTMLInputElement} */ (e.target).checked);
     });
 
-
     const debouncedSensitivity = debounce((threshold) => store.set('speechThreshold', threshold));
     document.getElementById('speech-sensitivity')?.addEventListener('input', (e) => {
       const pct = parseInt(/** @type {HTMLInputElement} */ (e.target).value, 10);
@@ -100,11 +99,11 @@ export const settingsController = {
     });
 
     // ── Difficulty buttons ──────────────────────────────────────────────────
-    document.querySelectorAll('.diff-btn').forEach(btn => {
+    document.querySelectorAll('.diff-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         const diff = parseInt(/** @type {HTMLElement} */ (btn).dataset.diff ?? '1');
         store.set('difficulty', diff);
-        document.querySelectorAll('.diff-btn').forEach(b => {
+        document.querySelectorAll('.diff-btn').forEach((b) => {
           const el = /** @type {HTMLElement} */ (b);
           const active = parseInt(el.dataset.diff ?? '0') === diff;
           el.classList.toggle('active', active);
@@ -140,7 +139,6 @@ export const settingsController = {
       document.documentElement.style.fontSize = `${val}%`;
     });
 
-
     document.getElementById('dyslexia-font-toggle')?.addEventListener('change', (e) => {
       const checked = /** @type {HTMLInputElement} */ (e.target).checked;
       store.set('dyslexiaFontEnabled', checked);
@@ -163,6 +161,10 @@ export const settingsController = {
       }
     });
 
+    document.getElementById('adult-observer-toggle')?.addEventListener('change', (e) => {
+      store.set('adultObserverMode', /** @type {HTMLInputElement} */ (e.target).checked);
+    });
+
     const debouncedChipScale = debounce((val) => store.set('bankChipScale', val));
     document.getElementById('bank-chip-scale')?.addEventListener('input', (e) => {
       const val = parseInt(/** @type {HTMLInputElement} */ (e.target).value, 10);
@@ -180,12 +182,16 @@ export const settingsController = {
 
     // ── Gemini API key ─────────────────────────────────────────────────────
     document.getElementById('gemini-key-save')?.addEventListener('click', () => {
-      const input = /** @type {HTMLInputElement|null} */ (document.getElementById('gemini-api-key'));
+      const input = /** @type {HTMLInputElement|null} */ (
+        document.getElementById('gemini-api-key')
+      );
       const status = document.getElementById('gemini-key-status');
       const key = input?.value?.trim() || '';
       store.set('geminiApiKey', key);
       if (status) status.textContent = key ? '✓ Key saved' : 'Key cleared';
-      setTimeout(() => { if (status) status.textContent = ''; }, 2500);
+      setTimeout(() => {
+        if (status) status.textContent = '';
+      }, 2500);
     });
 
     // ── Reset progress (lives in the PIN-gated Parent Dashboard) ────────────
@@ -214,7 +220,9 @@ export const settingsController = {
     const sfx = /** @type {HTMLInputElement|null} */ (document.getElementById('sfx-toggle'));
     if (sfx) sfx.checked = store.get('sfxEnabled');
 
-    const autoplay = /** @type {HTMLInputElement|null} */ (document.getElementById('autoplay-toggle'));
+    const autoplay = /** @type {HTMLInputElement|null} */ (
+      document.getElementById('autoplay-toggle')
+    );
     if (autoplay) autoplay.checked = store.get('autoplay');
 
     const speed = /** @type {HTMLInputElement|null} */ (document.getElementById('voice-speed'));
@@ -222,20 +230,27 @@ export const settingsController = {
     const speedDisplay = document.getElementById('voice-speed-display');
     if (speedDisplay) speedDisplay.textContent = `${store.get('voiceSpeed')}×`;
 
-    const stretched = /** @type {HTMLInputElement|null} */ (document.getElementById('stretched-speech-toggle'));
+    const stretched = /** @type {HTMLInputElement|null} */ (
+      document.getElementById('stretched-speech-toggle')
+    );
     if (stretched) stretched.checked = !!store.get('stretchedSpeech');
 
     const speechThreshold = Number(store.get('speechThreshold') ?? 0.75);
-    const sensitivity = /** @type {HTMLInputElement|null} */ (document.getElementById('speech-sensitivity'));
+    const sensitivity = /** @type {HTMLInputElement|null} */ (
+      document.getElementById('speech-sensitivity')
+    );
     if (sensitivity) sensitivity.value = String(Math.round(speechThreshold * 100));
     const sensitivityDisplay = document.getElementById('speech-sensitivity-display');
-    if (sensitivityDisplay) sensitivityDisplay.textContent = `${Math.round(speechThreshold * 100)}%`;
+    if (sensitivityDisplay)
+      sensitivityDisplay.textContent = `${Math.round(speechThreshold * 100)}%`;
 
-    const speechAccent = /** @type {HTMLSelectElement|null} */ (document.getElementById('speech-accent-select'));
+    const speechAccent = /** @type {HTMLSelectElement|null} */ (
+      document.getElementById('speech-accent-select')
+    );
     if (speechAccent) speechAccent.value = store.get('speechLocale') || 'en-SG';
 
     const diff = store.get('difficulty') || 1;
-    document.querySelectorAll('.diff-btn').forEach(b => {
+    document.querySelectorAll('.diff-btn').forEach((b) => {
       const el = /** @type {HTMLElement} */ (b);
       const active = parseInt(el.dataset.diff ?? '0') === diff;
       el.classList.toggle('active', active);
@@ -255,35 +270,52 @@ export const settingsController = {
     document.documentElement.classList.toggle('motion-reduced', !!store.get('reducedMotion'));
 
     const fontScale = Number(store.get('fontScale') || 100);
-    const fontScaleEl = /** @type {HTMLInputElement|null} */ (document.getElementById('font-size-scale'));
+    const fontScaleEl = /** @type {HTMLInputElement|null} */ (
+      document.getElementById('font-size-scale')
+    );
     if (fontScaleEl) fontScaleEl.value = String(fontScale);
     const fontScaleDisplay = document.getElementById('font-size-scale-display');
     if (fontScaleDisplay) fontScaleDisplay.textContent = `${fontScale}%`;
     document.documentElement.style.fontSize = `${fontScale}%`;
 
     const dyslexia = !!store.get('dyslexiaFontEnabled') || store.get('theme') === 'dyslexia';
-    const dyslexiaToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('dyslexia-font-toggle'));
+    const dyslexiaToggle = /** @type {HTMLInputElement|null} */ (
+      document.getElementById('dyslexia-font-toggle')
+    );
     if (dyslexiaToggle) dyslexiaToggle.checked = dyslexia;
 
     const highContrast = !!store.get('highContrastEnabled') || store.get('theme') === 'contrast';
-    const highContrastToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('high-contrast-toggle'));
+    const highContrastToggle = /** @type {HTMLInputElement|null} */ (
+      document.getElementById('high-contrast-toggle')
+    );
     if (highContrastToggle) highContrastToggle.checked = highContrast;
     document.documentElement.setAttribute('data-high-contrast', highContrast ? 'true' : 'false');
 
+    const adultObserverToggle = /** @type {HTMLInputElement|null} */ (
+      document.getElementById('adult-observer-toggle')
+    );
+    if (adultObserverToggle) adultObserverToggle.checked = !!store.get('adultObserverMode');
+
     const chipScale = Number(store.get('bankChipScale') || 100);
-    const chipScaleEl = /** @type {HTMLInputElement|null} */ (document.getElementById('bank-chip-scale'));
+    const chipScaleEl = /** @type {HTMLInputElement|null} */ (
+      document.getElementById('bank-chip-scale')
+    );
     if (chipScaleEl) chipScaleEl.value = String(chipScale);
     const chipScaleDisplay = document.getElementById('bank-chip-scale-display');
     if (chipScaleDisplay) chipScaleDisplay.textContent = `${chipScale}%`;
     document.documentElement.style.setProperty('--bank-chip-scale', `${chipScale / 100}`);
 
     const bilingual = !!store.get('bilingualInstructions');
-    const bilingualToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('bilingual-toggle'));
+    const bilingualToggle = /** @type {HTMLInputElement|null} */ (
+      document.getElementById('bilingual-toggle')
+    );
     if (bilingualToggle) bilingualToggle.checked = bilingual;
     document.documentElement.setAttribute('data-bilingual', bilingual ? 'true' : 'false');
 
     const geminiKey = store.get('geminiApiKey') || '';
-    const geminiInput = /** @type {HTMLInputElement|null} */ (document.getElementById('gemini-api-key'));
+    const geminiInput = /** @type {HTMLInputElement|null} */ (
+      document.getElementById('gemini-api-key')
+    );
     if (geminiInput && geminiKey) geminiInput.value = geminiKey;
   },
 

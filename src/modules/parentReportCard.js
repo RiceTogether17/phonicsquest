@@ -18,38 +18,55 @@
  */
 
 import { store } from './store.js';
+import { confidenceFor } from './evidence.js';
 import { GRAMMAR_CATEGORIES } from '../data/grammarCategories.js';
 import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
 
 const PRACTICE_BY_DOMAIN = {
-  grammar:    { target: 'grammar-mcq', label: '🧠 Grammar MCQ' },
-  vocabulary: { target: 'vocab-mcq',   label: '📖 Vocabulary MCQ' },
-  vocab:      { target: 'vocab-mcq',   label: '📖 Vocabulary MCQ' },
+  grammar: { target: 'grammar-mcq', label: '🧠 Grammar MCQ' },
+  vocabulary: { target: 'vocab-mcq', label: '📖 Vocabulary MCQ' },
+  vocab: { target: 'vocab-mcq', label: '📖 Vocabulary MCQ' },
 };
 
 /** Score thresholds (0–100) for the exam-risk traffic-light band. */
 const RISK_THRESHOLDS = Object.freeze({ red: 55, amber: 75 });
 
+/**
+ * Four states, not three.
+ *
+ * "No data" used to map onto the green band and render as "Exam-ready", so a
+ * brand-new profile with zero recorded practice produced a copy-pasteable
+ * message telling a parent their child was ready for the exam. Absence of
+ * evidence is now its own state, and the top band claims what the data can
+ * actually support — that a skill is secure, not that an exam is passed.
+ */
 const RISK_LABELS = Object.freeze({
-  green: '🟢 Exam-ready',
-  amber: '🟡 Watch list',
-  red:   '🔴 Needs attention',
+  unknown: '⚪ Not enough evidence',
+  green: '🟢 Secure',
+  amber: '🟡 Developing',
+  red: '🔴 Needs support',
 });
 
 /**
- * @typedef {'green'|'amber'|'red'} ExamRiskBand
+ * @typedef {'unknown'|'green'|'amber'|'red'} ExamRiskBand
  */
 
 /**
  * Map a 0–100 skill score onto a traffic-light band.
+ * A missing score bands `unknown` — never green.
  * @param {number|null} pct
  * @returns {ExamRiskBand}
  */
 export function bandForPct(pct) {
-  if (pct == null || Number.isNaN(pct)) return 'green';
-  if (pct < RISK_THRESHOLDS.red)   return 'red';
+  if (pct == null || Number.isNaN(pct)) return 'unknown';
+  if (pct < RISK_THRESHOLDS.red) return 'red';
   if (pct < RISK_THRESHOLDS.amber) return 'amber';
   return 'green';
+}
+
+/** Human-readable label for a band. */
+export function bandLabel(band) {
+  return RISK_LABELS[band] || RISK_LABELS.unknown;
 }
 
 /**
@@ -62,29 +79,41 @@ export function bandForPct(pct) {
  */
 export function buildExamRisk(needsPractice = []) {
   if (!Array.isArray(needsPractice) || needsPractice.length === 0) {
+    // An empty weak-skill list means nothing has been measured yet — not
+    // that everything is fine. The summary always said so; the band and
+    // label now agree with it.
     return {
-      band: 'green',
-      label: RISK_LABELS.green,
+      band: 'unknown',
+      label: RISK_LABELS.unknown,
       summary: 'No weak skills detected yet — keep practising to build a clearer picture.',
       skills: [],
     };
   }
 
-  const skills = needsPractice.map(s => ({
+  const skills = needsPractice.map((s) => ({
     label: s.label,
     pct: s.pct,
     band: bandForPct(s.pct),
+    attempts: s.attempts ?? 0,
+    independentAttempts: s.independentAttempts ?? 0,
+    lastPractised: s.lastPractised ?? null,
+    confidence: s.confidence ?? confidenceFor(s.independentAttempts ?? 0),
   }));
 
-  const order = { red: 3, amber: 2, green: 1 };
+  // `unknown` outranks green: an unmeasured skill among measured ones should
+  // pull the headline down to "not enough evidence", not be treated as a pass.
+  const order = { red: 4, unknown: 3, amber: 2, green: 1 };
   const worstBand = skills.reduce((acc, s) => (order[s.band] > order[acc] ? s.band : acc), 'green');
 
   let summary;
   if (worstBand === 'red') {
-    const reds = skills.filter(s => s.band === 'red').map(s => s.label);
+    const reds = skills.filter((s) => s.band === 'red').map((s) => s.label);
     summary = `${_joinList(reds)} below ${RISK_THRESHOLDS.red}% — focused practice this week will lift exam scores.`;
+  } else if (worstBand === 'unknown') {
+    const unknowns = skills.filter((s) => s.band === 'unknown').map((s) => s.label);
+    summary = `Not enough practice yet to judge ${_joinList(unknowns)} — a few short sessions will show where things stand.`;
   } else if (worstBand === 'amber') {
-    const ambers = skills.filter(s => s.band === 'amber').map(s => s.label);
+    const ambers = skills.filter((s) => s.band === 'amber').map((s) => s.label);
     summary = `${_joinList(ambers)} under ${RISK_THRESHOLDS.amber}% — solid practice will close the gap before the next paper.`;
   } else {
     summary = 'Skills look solid for the next paper — keep the rhythm going.';
@@ -118,17 +147,24 @@ function _joinList(items) {
 export function buildParentReportCard(input) {
   const profile = input?.profile || null;
   const weakSkills = Array.isArray(input?.weakSkills) ? input.weakSkills : [];
-  const strengths  = Array.isArray(input?.strengths)  ? input.strengths  : [];
-  const mistakes   = Array.isArray(input?.recentMistakes) ? input.recentMistakes : [];
-  const weekly     = input?.weekly || { days: 0, words: 0, accuracy: 0 };
+  const strengths = Array.isArray(input?.strengths) ? input.strengths : [];
+  const mistakes = Array.isArray(input?.recentMistakes) ? input.recentMistakes : [];
+  const weekly = input?.weekly || { days: 0, words: 0, accuracy: 0 };
 
-  const topWeak = weakSkills.slice(0, 3).map(w => ({
+  const topWeak = weakSkills.slice(0, 3).map((w) => ({
     label: w.label,
-    pct: Math.round((w.score || 0) * 100),
+    // A score with no attempts behind it is not a low score — it is no
+    // score. Keeping it null lets bandForPct band it `unknown` rather than
+    // reporting a confident 0%.
+    pct: (w.attempts ?? 0) > 0 ? Math.round((w.score || 0) * 100) : null,
     domain: w.domain || 'grammar',
+    attempts: w.attempts ?? 0,
+    independentAttempts: w.independentAttempts ?? 0,
+    lastPractised: w.lastPractised ?? null,
+    confidence: w.confidence ?? confidenceFor(w.independentAttempts ?? 0),
   }));
 
-  const topStrong = strengths.slice(0, 3).map(s => ({
+  const topStrong = strengths.slice(0, 3).map((s) => ({
     label: s.label,
     pct: Math.round((s.score || 0) * 100),
   }));
@@ -137,23 +173,29 @@ export function buildParentReportCard(input) {
   const recommendation = _buildRecommendation(topWeak[0], profile);
   const teacherComment = _buildTeacherComment({ topWeak, topStrong, weekly, profile });
 
-  const recentMistakes = mistakes.slice(0, 5).map(m => ({
+  const recentMistakes = mistakes.slice(0, 5).map((m) => ({
     word: String(m.word || '').slice(0, 40),
     mode: m.mode || '',
     when: m.when || '',
   }));
 
   // Tag each weak skill with its band so the dashboard can colour the chip.
-  const needsPractice = topWeak.map(w => ({ ...w, band: bandForPct(w.pct) }));
+  const needsPractice = topWeak.map((w) => ({ ...w, band: bandForPct(w.pct) }));
 
   // Giri's Review Lane signals — surfaced for parents in plain language.
   // Graduating: words about to lock into long-term memory (positive frame).
   // Slipping: words demoted in the last week (gentle nudge to do a review).
   const graduating = Array.isArray(input?.graduatingSoon)
-    ? input.graduatingSoon.slice(0, 5).map(g => ({ word: String(g.word || '').slice(0, 40) })).filter(g => g.word)
+    ? input.graduatingSoon
+        .slice(0, 5)
+        .map((g) => ({ word: String(g.word || '').slice(0, 40) }))
+        .filter((g) => g.word)
     : [];
   const slipping = Array.isArray(input?.slippingRecently)
-    ? input.slippingRecently.slice(0, 5).map(g => ({ word: String(g.word || '').slice(0, 40) })).filter(g => g.word)
+    ? input.slippingRecently
+        .slice(0, 5)
+        .map((g) => ({ word: String(g.word || '').slice(0, 40) }))
+        .filter((g) => g.word)
     : [];
 
   return {
@@ -176,36 +218,57 @@ function _buildRecommendation(topWeak, profile) {
   if (!topWeak) {
     return {
       title: '10-minute warm-up: Grammar MCQ',
-      detail: 'No weak skills detected yet. A short Grammar MCQ session will help us learn what to focus on.',
+      detail:
+        'No weak skills detected yet. A short Grammar MCQ session will help us learn what to focus on.',
       target: 'grammar-mcq',
       targetLabel: '🧠 Grammar MCQ',
     };
   }
   const route = PRACTICE_BY_DOMAIN[topWeak.domain] || PRACTICE_BY_DOMAIN.grammar;
   const grade = profile?.primaryGrade ? ` (${profile.primaryGrade})` : '';
+  const standing =
+    topWeak.pct == null
+      ? 'not enough practice yet to give a score'
+      : `currently ${topWeak.pct}%${_sampleNote(topWeak)}`;
   return {
     title: `10 minutes: ${topWeak.label}${grade}`,
-    detail: `Practise ${topWeak.label} — currently ${topWeak.pct}%. Aim for 8 of 10 correct before bed.`,
+    detail: `Practise ${topWeak.label} — ${standing}. Aim for 8 of 10 correct before bed.`,
     target: route.target,
     targetLabel: route.label,
   };
 }
 
+/**
+ * A short "(from N answers)" note, so a percentage never appears without the
+ * sample size that produced it. Empty when the sample is large enough that
+ * the figure speaks for itself.
+ */
+function _sampleNote(skill) {
+  const n = skill?.attempts ?? 0;
+  if (n <= 0) return '';
+  if (n >= 12) return '';
+  return ` from just ${n} answer${n === 1 ? '' : 's'}`;
+}
+
 function _buildTeacherComment({ topWeak, topStrong, weekly, profile }) {
   const name = profile?.name || 'Your child';
-  const greeting = weekly.days >= 5
-    ? `${name} has been wonderfully consistent this week (${weekly.days} active days).`
-    : weekly.days >= 2
-      ? `${name} practised on ${weekly.days} days this week — a solid rhythm.`
-      : `${name} hasn't practised much this week. Two short sessions will keep skills warm.`;
+  const greeting =
+    weekly.days >= 5
+      ? `${name} has been wonderfully consistent this week (${weekly.days} active days).`
+      : weekly.days >= 2
+        ? `${name} practised on ${weekly.days} days this week — a solid rhythm.`
+        : `${name} hasn't practised much this week. Two short sessions will keep skills warm.`;
 
   const strengthLine = topStrong[0]
     ? ` They are strongest in ${topStrong[0].label}${topStrong[0].pct ? ` (${topStrong[0].pct}%)` : ''}.`
     : '';
   const weaknessLine = topWeak[0]
-    ? ` ${topWeak[0].label} is the area to focus on next — currently ${topWeak[0].pct}%.`
-    : ' No clear weak spots — well done!';
-  const closing = ' Encourage them to read aloud short passages every day to keep building fluency.';
+    ? topWeak[0].pct == null
+      ? ` ${topWeak[0].label} is the area to look at next — there isn't enough practice yet to put a number on it.`
+      : ` ${topWeak[0].label} is the area to focus on next — currently ${topWeak[0].pct}%${_sampleNote(topWeak[0])}.`
+    : ' No weak spots have shown up yet — there may simply not be enough practice recorded to tell.';
+  const closing =
+    ' Encourage them to read aloud short passages every day to keep building fluency.';
 
   return `${greeting}${strengthLine}${weaknessLine}${closing}`;
 }
@@ -226,7 +289,7 @@ const MS_14_DAYS = 14 * 24 * 60 * 60 * 1000;
  * @returns {{ weakSkills: Array<{ quest: string, skill: string, score: number, recentWrong: number }>, generatedAt: string }}
  */
 export function buildErrorDigest() {
-  const mastery  = store.get('questMastery')  || {};
+  const mastery = store.get('questMastery') || {};
   const attempts = store.get('questAttempts') || [];
 
   const cutoff = Date.now() - MS_14_DAYS;
@@ -238,7 +301,8 @@ export function buildErrorDigest() {
     const ts = typeof attempt.ts === 'number' ? attempt.ts : Date.parse(attempt.ts);
     if (!ts || ts < cutoff) continue;
     const key = `${attempt.quest}::${attempt.skill}`;
-    if (!recentByKey[key]) recentByKey[key] = { total: 0, wrong: 0, quest: attempt.quest, skill: attempt.skill };
+    if (!recentByKey[key])
+      recentByKey[key] = { total: 0, wrong: 0, quest: attempt.quest, skill: attempt.skill };
     recentByKey[key].total += 1;
     if (!attempt.correct) recentByKey[key].wrong += 1;
   }
@@ -250,15 +314,16 @@ export function buildErrorDigest() {
 
     // Look up mastery score: mastery[quest][skill]
     const questMastery = mastery[stats.quest];
-    const score = (questMastery && typeof questMastery[stats.skill] === 'number')
-      ? questMastery[stats.skill]
-      : null;
+    const score =
+      questMastery && typeof questMastery[stats.skill] === 'number'
+        ? questMastery[stats.skill]
+        : null;
 
     if (score === null || score >= 0.55) continue;
 
     weakSkills.push({
-      quest:       stats.quest,
-      skill:       stats.skill,
+      quest: stats.quest,
+      skill: stats.skill,
       score,
       recentWrong: stats.wrong,
     });
@@ -306,7 +371,7 @@ export function renderErrorDigest(container) {
   container.innerHTML = '';
 
   const heading = document.createElement('h3');
-  heading.textContent = '📊 This Week\'s Focus Areas';
+  heading.textContent = "📊 This Week's Focus Areas";
   heading.className = 'error-digest__heading';
   container.appendChild(heading);
 
@@ -369,28 +434,51 @@ export function buildWhatsAppMessage(card) {
   if (!card) return '';
   const lines = [];
   lines.push(`📚 ${card.learnerName}'s English update${card.grade ? ` (${card.grade})` : ''}`);
-  lines.push(`This week: ${card.weekly.days} active days · ${card.weekly.words} questions · ${Math.round(card.weekly.accuracy * 100)}% accuracy`);
+  lines.push(
+    `This week: ${card.weekly.days} active days · ${card.weekly.words} questions · ${Math.round(card.weekly.accuracy * 100)}% accuracy`,
+  );
   if (card.strengths?.[0]?.pct) {
     lines.push(`✅ Strength: ${card.strengths[0].label} (${card.strengths[0].pct}%)`);
   } else {
     lines.push('✅ Strength: Steady effort');
   }
   if (card.needsPractice?.[0]) {
-    lines.push(`🎯 Needs practice: ${card.needsPractice[0].label} (${card.needsPractice[0].pct}%)`);
+    const w = card.needsPractice[0];
+    const figure =
+      w.pct == null ? 'not enough practice yet to score' : `${w.pct}%${_sampleNote(w)}`;
+    lines.push(`🎯 Needs practice: ${w.label} (${figure})`);
   }
   if (card.examRisk) {
     lines.push(`🚦 Exam focus: ${card.examRisk.label} — ${card.examRisk.summary}`);
   }
   if (card.recentMistakes?.length) {
-    lines.push(`📝 Recent slips: ${card.recentMistakes.slice(0, 3).map(m => m.word).join(', ')}`);
+    lines.push(
+      `📝 Recent slips: ${card.recentMistakes
+        .slice(0, 3)
+        .map((m) => m.word)
+        .join(', ')}`,
+    );
   }
   if (card.graduatingSoon?.length) {
-    lines.push(`🌱 Graduating soon: ${card.graduatingSoon.slice(0, 3).map(g => g.word).join(', ')}`);
+    lines.push(
+      `🌱 Graduating soon: ${card.graduatingSoon
+        .slice(0, 3)
+        .map((g) => g.word)
+        .join(', ')}`,
+    );
   }
   if (card.slippingRecently?.length) {
-    lines.push(`🍂 Slipping: ${card.slippingRecently.slice(0, 3).map(g => g.word).join(', ')} — a 2-min review tonight will help.`);
+    lines.push(
+      `🍂 Slipping: ${card.slippingRecently
+        .slice(0, 3)
+        .map((g) => g.word)
+        .join(', ')} — a 2-min review tonight will help.`,
+    );
   }
   lines.push(`👉 Today's 10 min: ${card.recommendation.title}`);
-  lines.push(`💬 Teacher's note: ${card.teacherComment}`);
+  // Not "Teacher's note" — no teacher has read this. It is generated from
+  // the child's recorded practice, and calling it a teacher's note lends it
+  // authority it hasn't earned.
+  lines.push(`💬 Automated learning summary: ${card.teacherComment}`);
   return lines.join('\n');
 }

@@ -19,6 +19,8 @@
 
 import { store } from '../modules/store.js';
 import { CURRICULUM } from './curriculum.js';
+import { SIGHT_QUESTS } from './sightwords.js';
+import { STORIES } from './stories.js';
 import { getPaProgress, getLetterSoundProgress } from '../modules/prePhaseProgress.js';
 import { getDomainMastery } from '../modules/masteryEngine.js';
 
@@ -126,16 +128,19 @@ function _sightProgress() {
   const completed = store.get('sightQuestsCompleted') || {};
   const done = Object.keys(completed).length;
   if (!done) return { status: 'locked', pct: 0 };
-  const TOTAL_QUESTS = 35;
-  const pct = Math.min(100, Math.round((done / TOTAL_QUESTS) * 100));
+  // Derived, not hard-coded: this was pinned at 35 against a bank of 95
+  // quests, so the journey read 100% complete at roughly a third done.
+  const total = SIGHT_QUESTS.length || 1;
+  const pct = Math.min(100, Math.round((done / total) * 100));
   return { status: pct >= 100 ? 'complete' : 'in-progress', pct };
 }
 
 function _storyProgress() {
   const read = _storiesReadCount();
   if (!read) return { status: 'locked', pct: 0 };
-  const TOTAL_STORIES = 16;
-  const pct = Math.min(100, Math.round((read / TOTAL_STORIES) * 100));
+  // Was pinned at 16 against 69 real stories — same overstatement as above.
+  const total = STORIES.length || 1;
+  const pct = Math.min(100, Math.round((read / total) * 100));
   return { status: pct >= 100 ? 'complete' : 'in-progress', pct };
 }
 

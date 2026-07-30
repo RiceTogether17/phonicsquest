@@ -41,7 +41,7 @@ import { scoreReadAndTap, getReadAndTapHint } from './scoring/readAndTap.js';
 import { scoreListenAndSpell, getListenAndSpellHint } from './scoring/listenAndSpell.js';
 import { scoreFluencySprint, getFluencySprintHint } from './scoring/fluencySprint.js';
 
-const DEFAULT_MASTERY = Object.freeze({ accuracy: 0.80, minAttempts: 6 });
+const DEFAULT_MASTERY = Object.freeze({ accuracy: 0.8, minAttempts: 6 });
 
 /**
  * Required educational-metadata fields. Asserted in
@@ -85,14 +85,14 @@ export const PHONICS_MODES = Object.freeze({
     touch: true,
     impl: 'hear',
     errorHints: {
-      'voicing-confusion':   'Listen for whether the sound is whispered (/p/) or buzzes (/b/).',
-      'short-vowel-confusion':'Open your mouth a little wider for /ă/ and smile a little for /ĕ/.',
-      'digraph-confusion':   'Two letters can make one sound. Say sh-, ch-, or th- first.',
-      'default':             'Listen again. Say the sound out loud, then look for that letter.',
+      'voicing-confusion': 'Listen for whether the sound is whispered (/p/) or buzzes (/b/).',
+      'short-vowel-confusion': 'Open your mouth a little wider for /ă/ and smile a little for /ĕ/.',
+      'digraph-confusion': 'Two letters can make one sound. Say sh-, ch-, or th- first.',
+      default: 'Listen again. Say the sound out loud, then look for that letter.',
     },
     masteryCriteria: DEFAULT_MASTERY,
     score: scoreSoundMatch,
-    hint:  getSoundMatchHint,
+    hint: getSoundMatchHint,
   },
 
   pictureFirstSound: {
@@ -104,14 +104,15 @@ export const PHONICS_MODES = Object.freeze({
     touch: true,
     impl: 'first',
     errorHints: {
-      'picked-final':   'That sound ends the word. We want the FIRST sound. Say the word slowly.',
-      'picked-medial':  'That sound is in the middle. Say the word and listen for the very first sound.',
-      'blend-skipped':  'Two sounds blend at the start. Listen for both, like /s/–/t/ in star.',
-      'default':        'Say the word out loud. What sound does your mouth make first?',
+      'picked-final': 'That sound ends the word. We want the FIRST sound. Say the word slowly.',
+      'picked-medial':
+        'That sound is in the middle. Say the word and listen for the very first sound.',
+      'blend-skipped': 'Two sounds blend at the start. Listen for both, like /s/–/t/ in star.',
+      default: 'Say the word out loud. What sound does your mouth make first?',
     },
     masteryCriteria: DEFAULT_MASTERY,
     score: scorePictureFirstSound,
-    hint:  getPictureFirstSoundHint,
+    hint: getPictureFirstSoundHint,
   },
 
   blendBuilder: {
@@ -123,15 +124,16 @@ export const PHONICS_MODES = Object.freeze({
     touch: true,
     impl: 'blend',
     errorHints: {
-      'out-of-order':    'The sounds are right, but the order is mixed up. Start with the first sound.',
-      'missing-sound':   'You missed a sound. Say the word slowly and count the sounds.',
-      'extra-sound':     'There is one sound too many. Say the word again and listen carefully.',
-      'wrong-grapheme':  'That sound is right, but a different letter spells it here.',
-      'default':         'Say each sound, then push them together. Slow and steady.',
+      'out-of-order':
+        'The sounds are right, but the order is mixed up. Start with the first sound.',
+      'missing-sound': 'You missed a sound. Say the word slowly and count the sounds.',
+      'extra-sound': 'There is one sound too many. Say the word again and listen carefully.',
+      'wrong-grapheme': 'That sound is right, but a different letter spells it here.',
+      default: 'Say each sound, then push them together. Slow and steady.',
     },
     masteryCriteria: DEFAULT_MASTERY,
     score: scoreBlendBuilder,
-    hint:  getBlendBuilderHint,
+    hint: getBlendBuilderHint,
   },
 
   wordSort: {
@@ -143,13 +145,13 @@ export const PHONICS_MODES = Object.freeze({
     touch: true,
     impl: 'wordSort',
     errorHints: {
-      'vowel-confusion':   'Say the word slowly. What vowel sound do you hear in the middle?',
+      'vowel-confusion': 'Say the word slowly. What vowel sound do you hear in the middle?',
       'pattern-confusion': 'Look at the letters in the middle. Does it have a_e, ai, or ay?',
-      'default':           'Stretch the word out. The middle sound tells you the right box.',
+      default: 'Stretch the word out. The middle sound tells you the right box.',
     },
     masteryCriteria: DEFAULT_MASTERY,
     score: scoreWordSort,
-    hint:  getWordSortHint,
+    hint: getWordSortHint,
   },
 
   readAndTap: {
@@ -162,13 +164,13 @@ export const PHONICS_MODES = Object.freeze({
     impl: 'readAndTap',
     errorHints: {
       'tapped-similar-onset': 'Two words start the same. Say each one and listen for the rest.',
-      'tapped-rhyme':         'Those words rhyme. Look at how the start is spelled.',
-      'tapped-anywhere':      'Read the sentence left to right. Stop when the word sounds the same.',
-      'default':              'Read each word out loud. Tap the one that matches what you heard.',
+      'tapped-rhyme': 'Those words rhyme. Look at how the start is spelled.',
+      'tapped-anywhere': 'Read the sentence left to right. Stop when the word sounds the same.',
+      default: 'Read each word out loud. Tap the one that matches what you heard.',
     },
     masteryCriteria: DEFAULT_MASTERY,
     score: scoreReadAndTap,
-    hint:  getReadAndTapHint,
+    hint: getReadAndTapHint,
   },
 
   listenAndSpell: {
@@ -180,34 +182,39 @@ export const PHONICS_MODES = Object.freeze({
     touch: true,
     impl: 'classicBlend', // closest existing UI; full spelling drill lives in lscwcDrill
     errorHints: {
-      'missing-letter':      'You missed a letter. Say the word and count the sounds.',
-      'transposed-letters':  'The right letters, the wrong order. Say each sound from left to right.',
-      'wrong-vowel':         'Listen to the vowel sound. Try a different vowel and re-read it.',
-      'silent-e-missing':    'The vowel says its name. Add a silent e at the end.',
-      'default':             'Say the word slowly. Tap one letter for each sound you hear.',
+      'missing-letter': 'You missed a letter. Say the word and count the sounds.',
+      'transposed-letters':
+        'The right letters, the wrong order. Say each sound from left to right.',
+      'wrong-vowel': 'Listen to the vowel sound. Try a different vowel and re-read it.',
+      'silent-e-missing': 'The vowel says its name. Add a silent e at the end.',
+      default: 'Say the word slowly. Tap one letter for each sound you hear.',
     },
     masteryCriteria: DEFAULT_MASTERY,
     score: scoreListenAndSpell,
-    hint:  getListenAndSpellHint,
+    hint: getListenAndSpellHint,
   },
 
   fluencySprint: {
     key: 'fluencySprint',
     name: 'Fluency Sprint',
-    instruction: 'Read each word out loud. Keep going as fast as you can.',
-    objective: 'Read familiar words quickly and accurately within a time window.',
+    // Not "as fast as you can": for early readers a speed goal produces
+    // guessing, skipped sounds and anxiety, and teaches that fast reading
+    // is good reading. Response time is still recorded — it just isn't
+    // what the child is asked to optimise.
+    instruction: 'Read each word out loud. Read smoothly and correctly — keep the words flowing.',
+    objective: 'Read familiar words accurately and smoothly, without sounding each one out.',
     keyboard: true,
     touch: true,
     impl: 'fluencySprint',
     errorHints: {
       'slow-and-accurate': 'Great accuracy! Read three words a beat faster next time.',
-      'fast-and-error':    'Slow down a tiny bit. Accuracy first, speed second.',
-      'sound-by-sound':    'These words are familiar. Try reading them as whole chunks.',
-      'default':           'Take a breath, then read three words together as a phrase.',
+      'fast-and-error': 'Slow down a tiny bit. Accuracy first, speed second.',
+      'sound-by-sound': 'These words are familiar. Try reading them as whole chunks.',
+      default: 'Take a breath, then read three words together as a phrase.',
     },
-    masteryCriteria: Object.freeze({ accuracy: 0.90, minAttempts: 10, targetWpm: 30 }),
+    masteryCriteria: Object.freeze({ accuracy: 0.9, minAttempts: 10, targetWpm: 30 }),
     score: scoreFluencySprint,
-    hint:  getFluencySprintHint,
+    hint: getFluencySprintHint,
   },
 });
 

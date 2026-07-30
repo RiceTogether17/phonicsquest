@@ -24,26 +24,42 @@
 
 import { questMastery } from './questMastery.js';
 import { store } from './store.js';
+import { confidenceFor } from './evidence.js';
 import { GRAMMAR_CATEGORIES } from '../data/grammarCategories.js';
 import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
 
-const WEAK_THRESHOLD  = 0.6;   // below this = needs remediation
-const SHAKY_THRESHOLD = 0.75;  // below this = could use reinforcement
+const WEAK_THRESHOLD = 0.6; // below this = needs remediation
+const SHAKY_THRESHOLD = 0.75; // below this = could use reinforcement
 
 // ── Quest chains by domain ─────────────────────────────────────────────
 
 const GRAMMAR_CHAIN = [
-  { quest: 'grammarMcq',    label: 'Grammar MCQ',     target: 'grammar-mcq',     verb: 'Recognise' },
-  { quest: 'clozeCastle',   label: 'Cloze Castle',    target: 'cloze-castle',    verb: 'Apply in context' },
-  { quest: 'sentenceForge', label: 'Sentence Forge',  target: 'sentence-forge',  verb: 'Build sentences' },
-  { quest: 'editingQuest',  label: 'Editing Quest',   target: 'editing-quest',   verb: 'Spot & fix errors' },
+  { quest: 'grammarMcq', label: 'Grammar MCQ', target: 'grammar-mcq', verb: 'Recognise' },
+  { quest: 'clozeCastle', label: 'Cloze Castle', target: 'cloze-castle', verb: 'Apply in context' },
+  {
+    quest: 'sentenceForge',
+    label: 'Sentence Forge',
+    target: 'sentence-forge',
+    verb: 'Build sentences',
+  },
+  {
+    quest: 'editingQuest',
+    label: 'Editing Quest',
+    target: 'editing-quest',
+    verb: 'Spot & fix errors',
+  },
 ];
 
 const VOCAB_CHAIN = [
-  { quest: 'vocabMcq',      label: 'Vocabulary MCQ',  target: 'vocab-mcq',       verb: 'Recognise' },
-  { quest: 'wordVault',     label: 'Word Vault',      target: 'word-vault',      verb: 'Use in context' },
-  { quest: 'editingQuest',  label: 'Editing Quest',   target: 'editing-quest',   verb: 'Spot misuse' },
-  { quest: 'writingQuest',  label: 'Writing Quest',   target: 'writing-quest',   verb: 'Produce in writing' },
+  { quest: 'vocabMcq', label: 'Vocabulary MCQ', target: 'vocab-mcq', verb: 'Recognise' },
+  { quest: 'wordVault', label: 'Word Vault', target: 'word-vault', verb: 'Use in context' },
+  { quest: 'editingQuest', label: 'Editing Quest', target: 'editing-quest', verb: 'Spot misuse' },
+  {
+    quest: 'writingQuest',
+    label: 'Writing Quest',
+    target: 'writing-quest',
+    verb: 'Produce in writing',
+  },
 ];
 
 // ── Helpers ─────────────────────────────────────────────────────────────
@@ -67,19 +83,47 @@ function _chainFor(skillKey) {
 }
 
 function _categoryLabel(skillKey) {
-  return GRAMMAR_CATEGORIES[skillKey]?.label
-      || VOCAB_CATEGORIES[skillKey]?.label
-      || skillKey.replace(/([A-Z])/g, ' $1').trim();
+  return (
+    GRAMMAR_CATEGORIES[skillKey]?.label ||
+    VOCAB_CATEGORIES[skillKey]?.label ||
+    skillKey.replace(/([A-Z])/g, ' $1').trim()
+  );
 }
 
 // ── Public API ──────────────────────────────────────────────────────────
 
 /**
+ * Attempt counts and last-practised date per skill, from the questAttempts
+ * telemetry log. questMastery itself is an EMA and carries no sample size,
+ * so a score of 0.4 from two answers and one from forty look identical
+ * without this.
+ * @returns {Map<string, { attempts: number, lastPractised: string|null }>}
+ */
+function _sampleSizeBySkill() {
+  const out = new Map();
+  for (const a of store.get('questAttempts') || []) {
+    if (!a?.skill) continue;
+    const prev = out.get(a.skill) || { attempts: 0, lastPractised: null };
+    prev.attempts++;
+    if (a.timestamp && (!prev.lastPractised || a.timestamp > prev.lastPractised)) {
+      prev.lastPractised = a.timestamp;
+    }
+    out.set(a.skill, prev);
+  }
+  return out;
+}
+
+/**
  * Get all skills below the weak threshold, sorted weakest-first.
- * Returns: [{ skill, score, domain, label }]
+ *
+ * Each entry carries the sample size behind its score so callers can report
+ * confidence instead of presenting every percentage as equally solid.
+ *
+ * Returns: [{ skill, score, domain, label, attempts, lastPractised, confidence }]
  */
 export function getWeakSkills() {
   const mastery = store.get('questMastery') || {};
+  const samples = _sampleSizeBySkill();
   const results = [];
 
   for (const [_questKey, bucket] of Object.entries(mastery)) {
@@ -87,16 +131,27 @@ export function getWeakSkills() {
     for (const [skill, score] of Object.entries(bucket)) {
       if (typeof score !== 'number' || score >= WEAK_THRESHOLD) continue;
       // Deduplicate: keep the lowest score per skill across quests
-      const existing = results.find(r => r.skill === skill);
+      const existing = results.find((r) => r.skill === skill);
       if (existing) {
         if (score < existing.score) existing.score = score;
         continue;
       }
+      const sample = samples.get(skill) || { attempts: 0, lastPractised: null };
       results.push({
         skill,
         score,
-        domain: _isGrammarSkill(skill) ? 'grammar' : _isVocabSkill(skill) ? 'vocabulary' : 'unknown',
+        domain: _isGrammarSkill(skill)
+          ? 'grammar'
+          : _isVocabSkill(skill)
+            ? 'vocabulary'
+            : 'unknown',
         label: _categoryLabel(skill),
+        attempts: sample.attempts,
+        lastPractised: sample.lastPractised,
+        // Quest modes are objectively scored — no self-report channel to
+        // discount, so every recorded attempt is independent evidence.
+        independentAttempts: sample.attempts,
+        confidence: confidenceFor(sample.attempts),
       });
     }
   }
@@ -114,15 +169,13 @@ export function getWeakSkills() {
 export function getRemediationChain(skillKey) {
   const chain = _chainFor(skillKey);
 
-  return chain.map(step => {
+  return chain.map((step) => {
     const score = questMastery.getSkillScore(step.quest, skillKey);
     let status = 'untried';
     const mastery = store.get('questMastery') || {};
     const bucket = mastery[step.quest] || {};
     if (skillKey in bucket) {
-      status = score < WEAK_THRESHOLD ? 'weak'
-             : score < SHAKY_THRESHOLD ? 'shaky'
-             : 'strong';
+      status = score < WEAK_THRESHOLD ? 'weak' : score < SHAKY_THRESHOLD ? 'shaky' : 'strong';
     }
     return { ...step, score, status, skill: skillKey, skillLabel: _categoryLabel(skillKey) };
   });
@@ -137,11 +190,11 @@ export function getNextRemediationStep(skillKey) {
   const chain = getRemediationChain(skillKey);
 
   // Prefer the first weak or untried step in chain order
-  const needsWork = chain.find(s => s.status === 'weak' || s.status === 'untried');
+  const needsWork = chain.find((s) => s.status === 'weak' || s.status === 'untried');
   if (needsWork) return needsWork;
 
   // Otherwise, return the shakiest step
-  const shaky = chain.filter(s => s.status === 'shaky');
+  const shaky = chain.filter((s) => s.status === 'shaky');
   if (shaky.length) return shaky.sort((a, b) => a.score - b.score)[0];
 
   return null; // skill is strong across all modes
@@ -156,7 +209,7 @@ export function getNextRemediationStep(skillKey) {
 export function getRemediationPlan(limit = 5) {
   const weakSkills = getWeakSkills();
 
-  return weakSkills.slice(0, limit).map(ws => {
+  return weakSkills.slice(0, limit).map((ws) => {
     const nextStep = getNextRemediationStep(ws.skill);
     return {
       skill: ws.skill,

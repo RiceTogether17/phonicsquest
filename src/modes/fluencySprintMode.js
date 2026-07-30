@@ -25,54 +25,56 @@ import { progress } from '../modules/progress.js';
 import { WORDS, getWordsByLevel, getDistractors, shuffleArray } from '../data/words.js';
 import { scoreFluencySprint } from './scoring/fluencySprint.js';
 
-const SPRINT_MS  = 45000;
-const TARGET_WPM = 30;   // matches PHONICS_MODES.fluencySprint.masteryCriteria
-const MIN_POOL   = 6;
+const SPRINT_MS = 45000;
+const TARGET_WPM = 30; // matches PHONICS_MODES.fluencySprint.masteryCriteria
+const MIN_POOL = 6;
 
-let _word          = null;
-let _els           = null;
-let _pool          = [];
-let _queue         = [];
-let _attempts      = [];
-let _sprintStart   = 0;
-let _itemStart     = 0;
+let _word = null;
+let _els = null;
+let _pool = [];
+let _queue = [];
+let _attempts = [];
+let _sprintStart = 0;
+let _itemStart = 0;
 let _currentTarget = null;
-let _lastTargetId  = null;
-let _countdown     = null;
-let _timeouts      = [];
-let _active        = false;
-let _done          = false;
-let _announcedLow  = false;
+let _lastTargetId = null;
+let _countdown = null;
+let _timeouts = [];
+let _active = false;
+let _done = false;
+let _announcedLow = false;
 
 /**
  * @param {import('../data/words.js').Word} word
  * @param {object} els
  */
 export function setupFluencySprint(word, els) {
-  _word         = word;
-  _els          = els;
-  _attempts     = [];
-  _timeouts     = [];
-  _active       = false;
-  _done         = false;
+  _word = word;
+  _els = els;
+  _attempts = [];
+  _timeouts = [];
+  _active = false;
+  _done = false;
   _announcedLow = false;
   _lastTargetId = null;
 
-  _pool  = _buildPool(word);
+  _pool = _buildPool(word);
   _queue = shuffleArray(_pool);
 
   renderWordImage(word, els.wordEmoji, false);
   els.wordDisplay.innerHTML = '';
-  els.phonemeRow.innerHTML  = '';
-  els.modeInstruction.textContent = 'Tap the word you hear — as fast as you can!';
+  els.phonemeRow.innerHTML = '';
+  // Accuracy first: a speed prompt makes early readers guess. Time is still
+  // measured in the background for the fluency score.
+  els.modeInstruction.textContent = 'Tap the word you hear — keep it smooth and steady!';
 
   // Both shell buttons act on the single shell word — wrong mid-sprint.
   if (els.btnCheck) els.btnCheck.style.display = 'none';
   if (els.btnSayIt) els.btnSayIt.style.display = 'none';
-  if (els.btnHint)  els.btnHint.style.display  = 'none';
-  if (els.btnSkip)  els.btnSkip.style.display  = '';
+  if (els.btnHint) els.btnHint.style.display = 'none';
+  if (els.btnSkip) els.btnSkip.style.display = '';
 
-  els.modeArea.innerHTML = /* html */`
+  els.modeArea.innerHTML = /* html */ `
     <div class="fs-round">
       <div class="fs-ready" id="fs-ready">
         <p class="fs-ready-copy">⚡ 45 seconds. Listen, then tap the matching word. Ready?</p>
@@ -91,7 +93,9 @@ export function setupFluencySprint(word, els) {
     </div>
   `;
 
-  document.getElementById('fs-start-btn')?.addEventListener('click', () => _start(), { once: true });
+  document
+    .getElementById('fs-start-btn')
+    ?.addEventListener('click', () => _start(), { once: true });
   document.getElementById('fs-start-btn')?.focus();
 }
 
@@ -100,20 +104,22 @@ function _buildPool(word) {
   const maxLevel = store.get('difficulty') || 1;
   const currentGroup = store.get('currentGroup');
 
-  let base = currentGroup ? progress.getWordsInGroup(currentGroup, maxLevel) : getWordsByLevel(maxLevel);
+  let base = currentGroup
+    ? progress.getWordsInGroup(currentGroup, maxLevel)
+    : getWordsByLevel(maxLevel);
   if (base.length < MIN_POOL) base = getWordsByLevel(maxLevel);
-  if (base.length < MIN_POOL) base = WORDS.filter(w => w.level <= 2);
+  if (base.length < MIN_POOL) base = WORDS.filter((w) => w.level <= 2);
 
   // Fluency = practising KNOWN words: prefer ≥60%-accuracy words when there
   // are enough of them.
   const stats = store.get('wordStats') || {};
-  const strong = base.filter(w => {
+  const strong = base.filter((w) => {
     const s = stats[w.id];
-    return s && s.attempts > 0 && (s.correct / s.attempts) >= 0.6;
+    return s && s.attempts > 0 && s.correct / s.attempts >= 0.6;
   });
   const pool = strong.length >= MIN_POOL ? strong : base;
 
-  return pool.some(w => w.id === word.id) ? pool : [word, ...pool];
+  return pool.some((w) => w.id === word.id) ? pool : [word, ...pool];
 }
 
 function _start() {
@@ -150,11 +156,14 @@ function _nextItem() {
   let target = _queue.pop();
   // Avoid an immediate repeat of the same word when the pool allows it.
   if (target?.id === _lastTargetId && (_queue.length > 0 || _pool.length > 1)) {
-    const alt = _queue.pop() ?? shuffleArray(_pool.filter(w => w.id !== _lastTargetId))[0];
-    if (alt) { if (target) _queue.unshift(target); target = alt; }
+    const alt = _queue.pop() ?? shuffleArray(_pool.filter((w) => w.id !== _lastTargetId))[0];
+    if (alt) {
+      if (target) _queue.unshift(target);
+      target = alt;
+    }
   }
   _currentTarget = target;
-  _lastTargetId  = target?.id ?? null;
+  _lastTargetId = target?.id ?? null;
   if (!target) return _finish();
 
   const maxLevel = store.get('difficulty') || 1;
@@ -177,7 +186,11 @@ function _nextItem() {
   }
 
   _itemStart = Date.now();
-  _timeouts.push(setTimeout(() => { if (_active) audio.speakWord(target.word); }, 150));
+  _timeouts.push(
+    setTimeout(() => {
+      if (_active) audio.speakWord(target.word);
+    }, 150),
+  );
 }
 
 function _onCardTap(btn) {
@@ -193,10 +206,15 @@ function _onCardTap(btn) {
 
   audio.playSfx(correct ? 'correct' : 'wrong');
   btn.classList.add(correct ? 'fs-card--yes' : 'fs-card--no');
-  document.getElementById('fs-cards')?.querySelectorAll('.fs-card').forEach(b => { b.disabled = true; });
+  document
+    .getElementById('fs-cards')
+    ?.querySelectorAll('.fs-card')
+    .forEach((b) => {
+      b.disabled = true;
+    });
 
   const score = document.getElementById('fs-score');
-  if (score) score.textContent = `✓ ${_attempts.filter(a => a.correct).length}`;
+  if (score) score.textContent = `✓ ${_attempts.filter((a) => a.correct).length}`;
 
   _timeouts.push(setTimeout(() => _nextItem(), 250));
 }
@@ -205,7 +223,10 @@ function _finish() {
   if (_done) return;
   _done = true;
   _active = false;
-  if (_countdown) { clearInterval(_countdown); _countdown = null; }
+  if (_countdown) {
+    clearInterval(_countdown);
+    _countdown = null;
+  }
 
   const durationMs = Math.max(1, Date.now() - _sprintStart);
   const result = scoreFluencySprint({ attempts: _attempts, durationMs, targetWpm: TARGET_WPM });
@@ -244,9 +265,13 @@ function _finish() {
   nextBtn.setAttribute('aria-label', 'Finish sprint');
   wrap.appendChild(nextBtn);
   area.appendChild(wrap);
-  nextBtn.addEventListener('click', () => {
-    _els?.onResult(result.correct, durationMs);
-  }, { once: true });
+  nextBtn.addEventListener(
+    'click',
+    () => {
+      _els?.onResult(result.correct, durationMs);
+    },
+    { once: true },
+  );
   nextBtn.focus();
 }
 
@@ -256,12 +281,15 @@ export function getCurrentWord() {
 
 export function cleanup() {
   _active = false;
-  if (_countdown) { clearInterval(_countdown); _countdown = null; }
-  _timeouts.forEach(id => clearTimeout(id));
+  if (_countdown) {
+    clearInterval(_countdown);
+    _countdown = null;
+  }
+  _timeouts.forEach((id) => clearTimeout(id));
   _timeouts = [];
   // Restore the shell buttons — nothing else resets these.
   if (_els?.btnSayIt) _els.btnSayIt.style.display = '';
-  if (_els?.btnHint)  _els.btnHint.style.display  = '';
+  if (_els?.btnHint) _els.btnHint.style.display = '';
   _word = null;
   _els = null;
   _pool = [];

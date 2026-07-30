@@ -39,7 +39,7 @@
  * @property {number}  [attempts]
  * @property {number}  [correct]
  * @property {number|null} [graduatedAt] epoch ms the word first graduated
- * @property {'pass'|'demote'} [lastResult]
+ * @property {'pass'|'hold'|'demote'} [lastResult]
  * @property {string}  [lastSeen]       ISO timestamp of the last attempt
  */
 
@@ -62,32 +62,45 @@ function dayMs(days) {
 
 /**
  * Compute the new box/dueAt for a word after an attempt.
+ *
+ * `promote` exists because the box ladder measures RETENTION, and a word the
+ * app just blended aloud tests nothing. When an attempt is correct but its
+ * evidence level is below `independent` (see modules/evidence.js), the box
+ * holds where it is and the existing due date is kept — so the word stays due
+ * for a real review instead of being pushed out by a modelled answer.
+ * Wrong answers demote regardless: getting it wrong with help is still
+ * getting it wrong.
+ *
  * @param {WordStat|undefined} stat   existing word stat (may be undefined for first attempt)
  * @param {boolean} correct
  * @param {number} [now]            ms epoch
- * @returns {{ box:number, dueAt:number, lastResult:'pass'|'demote', graduatedAt:number|null }}
+ * @param {{promote?: boolean}} [opts]  promote=false holds the box on a correct answer
+ * @returns {{ box:number, dueAt:number, lastResult:'pass'|'hold'|'demote', graduatedAt:number|null }}
  */
-export function scheduleAttempt(stat, correct, now = Date.now()) {
+export function scheduleAttempt(stat, correct, now = Date.now(), { promote = true } = {}) {
   const prev = stat || {};
   const prevBox = typeof prev.box === 'number' ? prev.box : 0;
   const wasGraduated = prevBox >= GRADUATED_BOX;
+  const held = correct && !promote;
 
   let box;
   if (correct) {
-    box = Math.min(prevBox + 1, MAX_BOX);
+    box = held ? prevBox : Math.min(prevBox + 1, MAX_BOX);
   } else {
     box = wasGraduated ? GRADUATED_FLOOR : Math.max(0, prevBox - 1);
   }
 
-  const dueAt = now + dayMs(INTERVAL_DAYS[box]);
-  const graduatedAt = box >= GRADUATED_BOX
-    ? (prev.graduatedAt || now)
-    : null;
+  // A held word keeps its existing due date (already-due stays due). Only a
+  // real promotion or demotion earns a fresh interval.
+  const dueAt =
+    held && typeof prev.dueAt === 'number' ? prev.dueAt : now + dayMs(INTERVAL_DAYS[box]);
+
+  const graduatedAt = box >= GRADUATED_BOX ? prev.graduatedAt || now : null;
 
   return {
     box,
     dueAt,
-    lastResult: correct ? 'pass' : 'demote',
+    lastResult: correct ? (held ? 'hold' : 'pass') : 'demote',
     graduatedAt,
   };
 }
@@ -106,16 +119,16 @@ export function seedFromLegacy(stat, now = Date.now()) {
   }
 
   const attempts = stat.attempts || 0;
-  const correct  = stat.correct  || 0;
+  const correct = stat.correct || 0;
   const accuracy = attempts > 0 ? correct / attempts : 0;
 
   let box;
-  if (attempts === 0)        box = 0;
-  else if (accuracy < 0.5)   box = 0;
-  else if (accuracy < 0.8)   box = 1;
-  else if (accuracy < 0.95)  box = 3;
-  else if (attempts >= 5)    box = 5;
-  else                       box = 3;
+  if (attempts === 0) box = 0;
+  else if (accuracy < 0.5) box = 0;
+  else if (accuracy < 0.8) box = 1;
+  else if (accuracy < 0.95) box = 3;
+  else if (attempts >= 5) box = 5;
+  else box = 3;
 
   return { box, dueAt: now + dayMs(INTERVAL_DAYS[box]) };
 }
@@ -177,7 +190,7 @@ export function getDueItems(wordStats, items, opts = {}) {
     due.push({ item, stat, dueAt });
   }
   due.sort((a, b) => a.dueAt - b.dueAt);
-  return due.slice(0, cap).map(d => ({ id: d.item.id, item: d.item, stat: d.stat }));
+  return due.slice(0, cap).map((d) => ({ id: d.item.id, item: d.item, stat: d.stat }));
 }
 
 /**
@@ -248,9 +261,9 @@ export function getReviewCapForProfile(profile) {
   if (!profile) return BAND_CAPS.young;
   const grade = profile.primaryGrade || '';
   if (/^P[2-6]$/i.test(grade)) return BAND_CAPS.older;
-  if (/^P1$/i.test(grade))     return BAND_CAPS.young;
+  if (/^P1$/i.test(grade)) return BAND_CAPS.young;
   const level = profile.schoolLevel || '';
-  if (/(p2|p3|p4|p5|p6)/i.test(level))   return BAND_CAPS.older;
+  if (/(p2|p3|p4|p5|p6)/i.test(level)) return BAND_CAPS.older;
   return BAND_CAPS.young;
 }
 

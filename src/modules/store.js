@@ -6,6 +6,12 @@
 
 import { scheduleAttempt, seedFromLegacy } from './reviewScheduler.js';
 import { idbGet, idbSet, isAvailable as idbAvailable } from './idb.js';
+import {
+  LEGACY_EVIDENCE,
+  isMasteryEvidence,
+  ensureEvidenceBuckets,
+  addEvidenceCount,
+} from './evidence.js';
 
 /**
  * State keys persisted to IndexedDB instead of localStorage.
@@ -43,25 +49,32 @@ const DEFAULT_STATE = {
    * Bump when a saved-state migration is needed; _load can then branch on
    * the version found in storage. Versions before this field existed load
    * as undefined and are treated as 1.
+   *
+   * v2 — evidence levels (modules/evidence.js). Attempts now record HOW they
+   * were obtained. There is no bulk rewrite: pre-v2 `wordStats` /
+   * `wordSkillStats` entries backfill into the `guided` bucket the first time
+   * they are read or written, so existing learners keep every count and every
+   * unlocked stage while their unverified history stops counting as
+   * independent evidence.
    */
-  schemaVersion: 1,
+  schemaVersion: 2,
 
   // Gamification
-  xp:        0,
-  level:     1,
-  energy:    3,
-  streak:    0,
+  xp: 0,
+  level: 1,
+  energy: 3,
+  streak: 0,
   bestStreak: 0,
   lastPlayDate: null,
   dailyGoal: 10,
   dailyDone: 0,
 
   // Settings
-  theme:          'default',
-  difficulty:     1,        // 1 | 2 | 3
-  sfxEnabled:     true,
-  autoplay:       true,
-  voiceSpeed:     0.8,
+  theme: 'default',
+  difficulty: 1, // 1 | 2 | 3
+  sfxEnabled: true,
+  autoplay: true,
+  voiceSpeed: 0.8,
   // When true, phonemic-awareness modes play the prompt word "stretched"
   // (sound-by-sound with tight gaps) so children can isolate each phoneme.
   // The 💡 Hint button in any PA mode uses stretched playback regardless.
@@ -71,17 +84,23 @@ const DEFAULT_STATE = {
   //   'cumulative'   — successive blending: each new sound is blended with
   //                    everything so far (/c/ → "ca" → "cat")
   blendStyle: 'cumulative',
-  parentPin:      null,     // hashed PIN
-  geminiApiKey:   null,     // parent-supplied AI key (survives progress reset)
-  reducedMotion:  false,    // manual override for prefers-reduced-motion
-  speechEnabled:  true,
-  speechLocale:   'en-SG',
+  parentPin: null, // hashed PIN
+  geminiApiKey: null, // parent-supplied AI key (survives progress reset)
+  reducedMotion: false, // manual override for prefers-reduced-motion
+  speechEnabled: true,
+  speechLocale: 'en-SG',
   speechThreshold: 0.75,
-  fontScale:      100,
+  fontScale: 100,
   bilingualInstructions: false,
   dyslexiaFontEnabled: false,
   highContrastEnabled: false,
   bankChipScale: 100,
+  // When on, a grown-up sitting with the child can mark each answer
+  // (Independent / With a little help / Not yet). An adult verdict is the
+  // only source of `verified` evidence — nothing else can tell whether a
+  // child blended the word or echoed it. Off by default: solo learners
+  // shouldn't see a control meant for someone else.
+  adultObserverMode: false,
 
   // Adaptive selection tuning (can be overridden by educator tooling)
   adaptiveConfig: {
@@ -97,36 +116,36 @@ const DEFAULT_STATE = {
   },
 
   // Progress (per-word stats — cross-skill summary, kept for backward compat)
-  wordStats: {},            // { [wordId]: { attempts, correct, lastSeen, ... } }
+  wordStats: {}, // { [wordId]: { attempts, correct, lastSeen, ... } }
 
   // Per-word per-skill stats (oralBlend / segmenting / decoding / spelling).
   // A child who decodes 'cat' easily but can't orally segment /c/-/a/-/t/
   // shows up here as decoding=high, segmenting=low. Adaptive review reads
   // this map to target the actual gap rather than the cross-skill average.
-  wordSkillStats: {},       // { [wordId]: { [skill]: { attempts, correct, lastSeen, lastResponseMs } } }
+  wordSkillStats: {}, // { [wordId]: { [skill]: { attempts, correct, lastSeen, lastResponseMs } } }
 
   // Group mastery (per group accuracy)
-  groupMastery: {},         // { [group]: accuracy 0-1 }
+  groupMastery: {}, // { [group]: accuracy 0-1 }
 
   // Explicit-instruction tracking: which mini-lessons / rule cards have been
   // taught to this profile. Keys are namespaced lesson ids, e.g.
   // 'phonics:cvc-a', 'gmcq:articles', 'vmcq:contextInference'.
-  lessonsSeen: {},          // { [lessonKey]: isoDate }
+  lessonsSeen: {}, // { [lessonKey]: isoDate }
 
   // Today's guided lesson (lessonRunner.js): per-day session state plus a
   // capped history of completed lessons for the parent report.
-  currentLesson: null,      // { date, startedAt, teachDone, completedAt, bonusAwarded }
-  lessonHistory: [],        // [{ date, band, steps, completedAt }] capped at 30
+  currentLesson: null, // { date, startedAt, teachDone, completedAt, bonusAwarded }
+  lessonHistory: [], // [{ date, band, steps, completedAt }] capped at 30
 
   // Parent-visible log of child-initiated AI tutor calls (aiGuardrails.js).
-  aiUsageLog: [],           // [{ date, at, kind, summary }] capped at 100
+  aiUsageLog: [], // [{ date, at, kind, summary }] capped at 100
 
   // Read-to-Giri per-story listening stats (storyMode.js).
-  readAloudStats: {},       // { [storyId]: { attempts, lastMatchPct, lastMissedWords, updatedAt } }
+  readAloudStats: {}, // { [storyId]: { attempts, lastMatchPct, lastMissedWords, updatedAt } }
 
   // Home tab state (homeTabs.js): last-used tab, reset to Today each new day.
-  homeTab: null,            // 'today' | 'learn' | 'extra' | 'grownups'
-  homeTabDate: null,        // 'YYYY-MM-DD' the tab was last used
+  homeTab: null, // 'today' | 'learn' | 'extra' | 'grownups'
+  homeTabDate: null, // 'YYYY-MM-DD' the tab was last used
 
   // Grammar category stats (Cloze Castle)
   grammarCategoryStats: {}, // { [level-category]: { attempts, correct, accuracy } }
@@ -144,25 +163,25 @@ const DEFAULT_STATE = {
     paperMode: {},
     synthesisQuest: {},
   },
-  questAttempts: [],        // recent quest attempts (capped)
-  learningEvents: [],       // fine-grained telemetry events (capped)
+  questAttempts: [], // recent quest attempts (capped)
+  learningEvents: [], // fine-grained telemetry events (capped)
 
   // Clue detection accuracy (separate from answer accuracy)
   // { attempted: number, strong: number, partial: number, weak: number }
   clueStats: {
     clozeCastle: { attempted: 0, strong: 0, partial: 0, weak: 0 },
-    wordVault:   { attempted: 0, strong: 0, partial: 0, weak: 0 },
+    wordVault: { attempted: 0, strong: 0, partial: 0, weak: 0 },
     sentenceForge: { attempted: 0, correct: 0, incorrect: 0 },
     editingQuest: { attempted: 0, correct: 0, incorrect: 0 },
-    byType: {},             // { [clueType]: { attempted, strong, partial, weak } }
+    byType: {}, // { [clueType]: { attempted, strong, partial, weak } }
   },
 
   // Session
-  currentMode:  'blend',
+  currentMode: 'blend',
   currentGroup: 'cvc-a',
 
   // Per-mode difficulty (auto-adjusts based on performance)
-  modeDifficulty: {},  // { [modeKey]: 1|2|3 }
+  modeDifficulty: {}, // { [modeKey]: 1|2|3 }
 
   // Word history (last 50 words played)
   wordHistory: [],
@@ -349,8 +368,10 @@ class Store {
       const raw = localStorage.getItem(`${STORAGE_KEY}__backup`);
       if (!raw) return true;
       const { savedAt } = JSON.parse(raw);
-      return typeof savedAt !== 'string'
-        || savedAt.slice(0, 10) !== new Date().toISOString().slice(0, 10);
+      return (
+        typeof savedAt !== 'string' ||
+        savedAt.slice(0, 10) !== new Date().toISOString().slice(0, 10)
+      );
     } catch {
       return true;
     }
@@ -494,7 +515,8 @@ class Store {
     const toast = document.createElement('div');
     toast.className = 'toast toast--warning';
     toast.setAttribute('role', 'alert');
-    toast.textContent = 'Device storage full — progress may not be saved. Try clearing browser data.';
+    toast.textContent =
+      'Device storage full — progress may not be saved. Try clearing browser data.';
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 8000);
   }
@@ -546,8 +568,8 @@ class Store {
 
   /** @private */
   _notify(key, value) {
-    this._listeners.get(key)?.forEach(fn => fn(value, key));
-    this._listeners.get('*')?.forEach(fn => fn(value, key));
+    this._listeners.get(key)?.forEach((fn) => fn(value, key));
+    this._listeners.get('*')?.forEach((fn) => fn(value, key));
   }
 
   /**
@@ -594,14 +616,27 @@ class Store {
    * Update per-word stats after an attempt.
    *
    * Each call rides the Leitner box ladder from reviewScheduler:
-   *   correct → advance one box (up to Graduated at box 6)
-   *   wrong   → drop one box (graduated drops to box 3, never to zero)
+   *   correct + independent evidence → advance one box (Graduated at box 6)
+   *   correct + weaker evidence      → hold the box, keep the existing due date
+   *   wrong                          → drop one box (graduated drops to box 3)
+   *
+   * The evidence gate matters: the box ladder is a retention measure, and a
+   * word the app blended aloud before the child tapped "Yes" has not been
+   * retrieved from memory. Such answers still count as attempts and still
+   * earn XP — they just can't push the word further down the review queue.
    *
    * Legacy `reviewInterval` / `nextReviewDate` fields are kept as derived
    * views of the new `box` / `dueAt` so the existing weighted-pick logic in
    * adaptiveSelection.js and the daily-challenge picker keep working.
+   *
+   * @param {string} wordId
+   * @param {boolean} correct
+   * @param {import('./evidence.js').EvidenceLevel} [evidence]
+   *   How the answer was obtained. Defaults to the legacy level so untouched
+   *   callers (and old tests) keep their previous meaning rather than
+   *   silently claiming independence.
    */
-  recordWordAttempt(wordId, correct) {
+  recordWordAttempt(wordId, correct, evidence = LEGACY_EVIDENCE) {
     const stats = { ...this._state.wordStats };
     let existing = stats[wordId] ?? { attempts: 0, correct: 0, lastSeen: null };
 
@@ -613,17 +648,23 @@ class Store {
     }
 
     const newAttempts = existing.attempts + 1;
-    const newCorrect  = existing.correct + (correct ? 1 : 0);
-    const sched = scheduleAttempt(existing, correct);
+    const newCorrect = existing.correct + (correct ? 1 : 0);
+    // Backfill pre-evidence records into the `guided` bucket on first touch,
+    // matching the seedFromLegacy pattern above.
+    const byEvidence = addEvidenceCount(ensureEvidenceBuckets(existing), evidence, correct);
+    const sched = scheduleAttempt(existing, correct, Date.now(), {
+      promote: isMasteryEvidence(evidence),
+    });
 
     stats[wordId] = {
       ...existing,
       attempts: newAttempts,
-      correct:  newCorrect,
+      correct: newCorrect,
       lastSeen: new Date().toISOString(),
-      box:         sched.box,
-      dueAt:       sched.dueAt,
-      lastResult:  sched.lastResult,
+      byEvidence,
+      box: sched.box,
+      dueAt: sched.dueAt,
+      lastResult: sched.lastResult,
       graduatedAt: sched.graduatedAt,
       // Legacy view fields — kept so adaptiveSelection.getWordWeight() and
       // existing analytics keep reading the same shape.
@@ -648,17 +689,39 @@ class Store {
    * skill-specific breakdown stay in sync). `skill` is one of the bins
    * returned by progress.getSkillForMode(); pass null to skip skill recording
    * for modes that don't map to a phonics skill (e.g. grammar quests).
+   *
+   * `independentAttempts` / `independentCorrect` are tracked alongside the
+   * totals so the progression gate and dashboard can ask "what can this child
+   * do unaided?" without re-deriving it from the evidence buckets each time.
+   *
+   * @param {string} wordId
+   * @param {string} skill
+   * @param {boolean} correct
+   * @param {number|null} [responseMs]
+   * @param {import('./evidence.js').EvidenceLevel} [evidence]
    */
-  recordWordSkillAttempt(wordId, skill, correct, responseMs = null) {
+  recordWordSkillAttempt(wordId, skill, correct, responseMs = null, evidence = LEGACY_EVIDENCE) {
     if (!wordId || !skill) return;
     const all = { ...(this._state.wordSkillStats || {}) };
     const forWord = { ...(all[wordId] || {}) };
-    const prev = forWord[skill] || { attempts: 0, correct: 0, lastSeen: null, lastResponseMs: null };
+    const prev = forWord[skill] || {
+      attempts: 0,
+      correct: 0,
+      lastSeen: null,
+      lastResponseMs: null,
+    };
+    const independent = isMasteryEvidence(evidence);
     forWord[skill] = {
-      attempts:       prev.attempts + 1,
-      correct:        prev.correct + (correct ? 1 : 0),
-      lastSeen:       new Date().toISOString(),
+      ...prev,
+      attempts: prev.attempts + 1,
+      correct: prev.correct + (correct ? 1 : 0),
+      lastSeen: new Date().toISOString(),
       lastResponseMs: typeof responseMs === 'number' ? responseMs : prev.lastResponseMs,
+      byEvidence: addEvidenceCount(ensureEvidenceBuckets(prev), evidence, correct),
+      // Pre-evidence records have no independent history — they backfill as
+      // `guided`, so these start at zero rather than inheriting `attempts`.
+      independentAttempts: (prev.independentAttempts || 0) + (independent ? 1 : 0),
+      independentCorrect: (prev.independentCorrect || 0) + (independent && correct ? 1 : 0),
     };
     all[wordId] = forWord;
     this.set('wordSkillStats', all);
@@ -720,6 +783,9 @@ class Store {
       correct: typeof entry.correct === 'boolean' ? entry.correct : null,
       responseMs: entry.responseMs ?? null,
       level: entry.level ?? null,
+      // How the answer was obtained — see modules/evidence.js. Null on events
+      // logged before evidence tracking, and on non-attempt event types.
+      evidence: entry.evidence ?? null,
       meta: entry.meta ?? null,
       timestamp: entry.timestamp || new Date().toISOString(),
     });
@@ -738,15 +804,17 @@ class Store {
     const stats = JSON.parse(JSON.stringify(this._state.clueStats || {}));
 
     // Per-quest bucket
-    if (!stats[quest]) stats[quest] = { attempted: 0, strong: 0, partial: 0, weak: 0, correct: 0, incorrect: 0 };
+    if (!stats[quest])
+      stats[quest] = { attempted: 0, strong: 0, partial: 0, weak: 0, correct: 0, incorrect: 0 };
     stats[quest].attempted = (stats[quest].attempted || 0) + 1;
-    if (result in (stats[quest])) stats[quest][result] = (stats[quest][result] || 0) + 1;
+    if (result in stats[quest]) stats[quest][result] = (stats[quest][result] || 0) + 1;
 
     // Per-type bucket ('correct'/'incorrect' normalised to 'strong'/'weak' for cross-quest consistency)
     const byTypeResult = result === 'correct' ? 'strong' : result === 'incorrect' ? 'weak' : result;
     if (clueType) {
       if (!stats.byType) stats.byType = {};
-      if (!stats.byType[clueType]) stats.byType[clueType] = { attempted: 0, strong: 0, partial: 0, weak: 0 };
+      if (!stats.byType[clueType])
+        stats.byType[clueType] = { attempted: 0, strong: 0, partial: 0, weak: 0 };
       stats.byType[clueType].attempted++;
       if (byTypeResult in stats.byType[clueType]) stats.byType[clueType][byTypeResult]++;
     }
@@ -780,8 +848,8 @@ class Store {
     // Accumulate into rolling weekly log (one entry per calendar day)
     const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
     const cutoff = new Date(Date.now() - 8 * 86400000).toISOString().slice(0, 10);
-    const log = (this._state.weeklyXpLog || []).filter(e => e.date >= cutoff);
-    const todayEntry = log.find(e => e.date === today);
+    const log = (this._state.weeklyXpLog || []).filter((e) => e.date >= cutoff);
+    const todayEntry = log.find((e) => e.date === today);
     if (todayEntry) {
       todayEntry.xp = (todayEntry.xp || 0) + amount;
     } else {

@@ -11,24 +11,96 @@
  */
 
 import { setupBlend, cleanup as cleanupBlend, getCurrentWord as getBlendWord } from './blend.js';
-import { setupClassicBlend, cleanup as cleanupClassic, getCurrentWord as getClassicWord } from './classicBlend.js';
-import { setupHearChoose, cleanup as cleanupHear, getCurrentWord as getHearWord } from './hearChoose.js';
-import { setupSegment, cleanup as cleanupSegment, getCurrentWord as getSegmentWord } from './segment.js';
-import { setupMissingSound, cleanup as cleanupMissing, getCurrentWord as getMissingWord } from './missingSound.js';
-import { setupFirstSound,  cleanup as cleanupFirst,  getCurrentWord as getFirstWord  } from './firstSound.js';
-import { setupLastSound,   cleanup as cleanupLast,   getCurrentWord as getLastWord   } from './lastSound.js';
-import { setupMiddleSound, cleanup as cleanupMiddle, getCurrentWord as getMiddleWord } from './middleSound.js';
-import { setupOralBlend,   cleanup as cleanupOralBlend, getCurrentWord as getOralBlendWord } from './oralBlend.js';
-import { setupSoundCount,  cleanup as cleanupSoundCount, getCurrentWord as getSoundCountWord } from './soundCount.js';
-import { setupTrainCarriages, cleanup as cleanupTrain, getCurrentWord as getTrainWord } from './trainCarriages.js';
-import { setupSyllableClap, cleanup as cleanupSyllable, getCurrentWord as getSyllableWord } from './syllableClap.js';
-import { setupWordSort,     cleanup as cleanupWordSort, getCurrentWord as getWordSortWord } from './wordSortMode.js';
-import { setupReadAndTap,   cleanup as cleanupReadTap,  getCurrentWord as getReadTapWord  } from './readAndTapMode.js';
-import { setupFluencySprint, cleanup as cleanupFluency, getCurrentWord as getFluencyWord  } from './fluencySprintMode.js';
-import { setupSoundHunt,    cleanup as cleanupSoundHunt, getCurrentWord as getSoundHuntWord } from './soundHunt.js';
-import { setupOddOneOut,    cleanup as cleanupOddOneOut, getCurrentWord as getOddOneOutWord } from './oddOneOut.js';
-import { setupWordCount,    cleanup as cleanupWordCount, getCurrentWord as getWordCountWord } from './wordCountMode.js';
-import { setupOralSegment,  cleanup as cleanupOralSegment, getCurrentWord as getOralSegmentWord } from './oralSegment.js';
+import {
+  setupClassicBlend,
+  cleanup as cleanupClassic,
+  getCurrentWord as getClassicWord,
+} from './classicBlend.js';
+import {
+  setupHearChoose,
+  cleanup as cleanupHear,
+  getCurrentWord as getHearWord,
+} from './hearChoose.js';
+import {
+  setupSegment,
+  cleanup as cleanupSegment,
+  getCurrentWord as getSegmentWord,
+} from './segment.js';
+import {
+  setupMissingSound,
+  cleanup as cleanupMissing,
+  getCurrentWord as getMissingWord,
+} from './missingSound.js';
+import {
+  setupFirstSound,
+  cleanup as cleanupFirst,
+  getCurrentWord as getFirstWord,
+} from './firstSound.js';
+import {
+  setupLastSound,
+  cleanup as cleanupLast,
+  getCurrentWord as getLastWord,
+} from './lastSound.js';
+import {
+  setupMiddleSound,
+  cleanup as cleanupMiddle,
+  getCurrentWord as getMiddleWord,
+} from './middleSound.js';
+import {
+  setupOralBlend,
+  cleanup as cleanupOralBlend,
+  getCurrentWord as getOralBlendWord,
+} from './oralBlend.js';
+import {
+  setupSoundCount,
+  cleanup as cleanupSoundCount,
+  getCurrentWord as getSoundCountWord,
+} from './soundCount.js';
+import {
+  setupTrainCarriages,
+  cleanup as cleanupTrain,
+  getCurrentWord as getTrainWord,
+} from './trainCarriages.js';
+import {
+  setupSyllableClap,
+  cleanup as cleanupSyllable,
+  getCurrentWord as getSyllableWord,
+} from './syllableClap.js';
+import {
+  setupWordSort,
+  cleanup as cleanupWordSort,
+  getCurrentWord as getWordSortWord,
+} from './wordSortMode.js';
+import {
+  setupReadAndTap,
+  cleanup as cleanupReadTap,
+  getCurrentWord as getReadTapWord,
+} from './readAndTapMode.js';
+import {
+  setupFluencySprint,
+  cleanup as cleanupFluency,
+  getCurrentWord as getFluencyWord,
+} from './fluencySprintMode.js';
+import {
+  setupSoundHunt,
+  cleanup as cleanupSoundHunt,
+  getCurrentWord as getSoundHuntWord,
+} from './soundHunt.js';
+import {
+  setupOddOneOut,
+  cleanup as cleanupOddOneOut,
+  getCurrentWord as getOddOneOutWord,
+} from './oddOneOut.js';
+import {
+  setupWordCount,
+  cleanup as cleanupWordCount,
+  getCurrentWord as getWordCountWord,
+} from './wordCountMode.js';
+import {
+  setupOralSegment,
+  cleanup as cleanupOralSegment,
+  getCurrentWord as getOralSegmentWord,
+} from './oralSegment.js';
 
 /**
  * @typedef {Object} Mode
@@ -46,6 +118,12 @@ import { setupOralSegment,  cleanup as cleanupOralSegment, getCurrentWord as get
  *   'selfAssess' – the child self-reports (Yes / Not yet) and can genuinely
  *                  re-attempt the same word, so the first "Not yet" gets a
  *                  gentle nudge with nothing recorded.
+ * @property {import('../modules/evidence.js').EvidenceLevel} evidenceCeiling
+ *   The strongest evidence this mode can produce on its own, regardless of
+ *   how cleanly the child answers (see modules/evidence.js). A self-assessed
+ *   blend tops out at 'exposure' because the app says the word first; a mode
+ *   that speaks the target before showing print tops out at 'guided'. Only an
+ *   adult verdict can exceed a mode's ceiling.
  * @property {(word: import('../data/words.js').Word, els: Record<string, HTMLElement | null>) => void} setup
  * @property {() => void} cleanup
  * @property {() => import('../data/words.js').Word | null} getCurrentWord
@@ -62,6 +140,7 @@ export const MODES = {
     group: 'blend',
     subskill: 'phoneme-blending',
     resultPolicy: 'selfAssess',
+    evidenceCeiling: 'exposure',
     setup: setupBlend,
     cleanup: cleanupBlend,
     getCurrentWord: getBlendWord,
@@ -74,6 +153,7 @@ export const MODES = {
     group: 'blend',
     subskill: 'phoneme-blending',
     resultPolicy: 'selfAssess',
+    evidenceCeiling: 'exposure',
     setup: setupClassicBlend,
     cleanup: cleanupClassic,
     getCurrentWord: getClassicWord,
@@ -87,6 +167,7 @@ export const MODES = {
     group: 'phonemic',
     subskill: 'oral-blending',
     resultPolicy: 'final',
+    evidenceCeiling: 'independent',
     setup: setupOralBlend,
     cleanup: cleanupOralBlend,
     getCurrentWord: getOralBlendWord,
@@ -99,6 +180,7 @@ export const MODES = {
     group: 'phonemic',
     subskill: 'initial-phoneme',
     resultPolicy: 'final',
+    evidenceCeiling: 'independent',
     setup: setupFirstSound,
     cleanup: cleanupFirst,
     getCurrentWord: getFirstWord,
@@ -111,6 +193,7 @@ export const MODES = {
     group: 'phonemic',
     subskill: 'final-phoneme',
     resultPolicy: 'final',
+    evidenceCeiling: 'independent',
     setup: setupLastSound,
     cleanup: cleanupLast,
     getCurrentWord: getLastWord,
@@ -123,6 +206,7 @@ export const MODES = {
     group: 'phonemic',
     subskill: 'medial-vowel',
     resultPolicy: 'final',
+    evidenceCeiling: 'independent',
     setup: setupMiddleSound,
     cleanup: cleanupMiddle,
     getCurrentWord: getMiddleWord,
@@ -135,6 +219,7 @@ export const MODES = {
     group: 'phonemic',
     subskill: 'phoneme-segmenting',
     resultPolicy: 'final',
+    evidenceCeiling: 'independent',
     setup: setupSoundCount,
     cleanup: cleanupSoundCount,
     getCurrentWord: getSoundCountWord,
@@ -147,6 +232,7 @@ export const MODES = {
     group: 'phonemic',
     subskill: 'oral-phoneme-segmenting',
     resultPolicy: 'final',
+    evidenceCeiling: 'independent',
     setup: setupOralSegment,
     cleanup: cleanupOralSegment,
     getCurrentWord: getOralSegmentWord,
@@ -159,6 +245,7 @@ export const MODES = {
     group: 'phonemic',
     subskill: 'initial-phoneme-collection',
     resultPolicy: 'final',
+    evidenceCeiling: 'independent',
     setup: setupTrainCarriages,
     cleanup: cleanupTrain,
     getCurrentWord: getTrainWord,
@@ -166,11 +253,12 @@ export const MODES = {
   oddOneOut: {
     key: 'oddOneOut',
     name: 'Odd One Out',
-    desc: 'Which word doesn\'t belong?',
+    desc: "Which word doesn't belong?",
     icon: '🕵️',
     group: 'phonemic',
     subskill: 'initial-phoneme-discrimination',
     resultPolicy: 'final',
+    evidenceCeiling: 'independent',
     setup: setupOddOneOut,
     cleanup: cleanupOddOneOut,
     getCurrentWord: getOddOneOutWord,
@@ -183,6 +271,7 @@ export const MODES = {
     group: 'phonemic',
     subskill: 'sentence-word-counting',
     resultPolicy: 'final',
+    evidenceCeiling: 'independent',
     setup: setupWordCount,
     cleanup: cleanupWordCount,
     getCurrentWord: getWordCountWord,
@@ -195,6 +284,7 @@ export const MODES = {
     group: 'phonemic',
     subskill: 'syllable-counting',
     resultPolicy: 'final',
+    evidenceCeiling: 'independent',
     setup: setupSyllableClap,
     cleanup: cleanupSyllable,
     getCurrentWord: getSyllableWord,
@@ -208,6 +298,7 @@ export const MODES = {
     group: 'phonemic',
     subskill: 'sound-letter-recognition',
     resultPolicy: 'final',
+    evidenceCeiling: 'independent',
     setup: setupSoundHunt,
     cleanup: cleanupSoundHunt,
     getCurrentWord: getSoundHuntWord,
@@ -220,6 +311,11 @@ export const MODES = {
     group: 'phonemic',
     subskill: 'auditory-word-discrimination',
     resultPolicy: 'final',
+    // The target word is spoken before the child chooses, so a correct tap
+    // shows auditory-to-print matching, not independent decoding. Real
+    // evidence — capped at `guided` so it can't be reported as decoding
+    // the child did unaided.
+    evidenceCeiling: 'guided',
     setup: setupHearChoose,
     cleanup: cleanupHear,
     getCurrentWord: getHearWord,
@@ -232,6 +328,7 @@ export const MODES = {
     group: 'phonemic',
     subskill: 'phoneme-completion',
     resultPolicy: 'final',
+    evidenceCeiling: 'independent',
     setup: setupMissingSound,
     cleanup: cleanupMissing,
     getCurrentWord: getMissingWord,
@@ -244,6 +341,7 @@ export const MODES = {
     group: 'phonemic',
     subskill: 'grapheme-segmenting',
     resultPolicy: 'final',
+    evidenceCeiling: 'independent',
     setup: setupSegment,
     cleanup: cleanupSegment,
     getCurrentWord: getSegmentWord,
@@ -257,6 +355,7 @@ export const MODES = {
     group: 'reading',
     subskill: 'pattern-sorting',
     resultPolicy: 'final',
+    evidenceCeiling: 'independent',
     setup: setupWordSort,
     cleanup: cleanupWordSort,
     getCurrentWord: getWordSortWord,
@@ -269,6 +368,7 @@ export const MODES = {
     group: 'reading',
     subskill: 'sentence-word-location',
     resultPolicy: 'final',
+    evidenceCeiling: 'independent',
     setup: setupReadAndTap,
     cleanup: cleanupReadTap,
     getCurrentWord: getReadTapWord,
@@ -281,6 +381,7 @@ export const MODES = {
     group: 'reading',
     subskill: 'word-recognition-fluency',
     resultPolicy: 'final',
+    evidenceCeiling: 'independent',
     setup: setupFluencySprint,
     cleanup: cleanupFluency,
     getCurrentWord: getFluencyWord,

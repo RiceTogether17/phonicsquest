@@ -19,6 +19,7 @@
 
 import { WORDS } from '../data/words.js';
 import { store } from './store.js';
+import { EVIDENCE } from './evidence.js';
 
 /** Normalise a story word: strip surrounding punctuation, lowercase, trim. */
 export function normaliseWordText(text) {
@@ -72,7 +73,7 @@ export function lookupWord(text) {
       word,
       foundInBank: true,
       graphemes: Array.isArray(word.graphemes) ? word.graphemes : [normalised],
-      types:     Array.isArray(word.types)     ? word.types     : [],
+      types: Array.isArray(word.types) ? word.types : [],
       alreadyTracked,
     };
   }
@@ -90,9 +91,14 @@ export function lookupWord(text) {
 }
 
 /**
- * Add a bank word to the Review Lane. Routes through the existing
- * `store.recordWordAttempt(wordId, true)` so the Leitner ladder seeds
- * the item naturally (first correct → box 1, due tomorrow).
+ * Add a bank word to the Review Lane. Routes through
+ * `store.recordWordAttempt` so the Leitner ladder picks the item up.
+ *
+ * Recorded as `exposure`: looking a word up and adding it to review is a
+ * request to practise it, not a demonstration that the child can read it.
+ * The word therefore enters at box 0 and is due immediately — which is what
+ * you want from "I want to work on this one", and avoids a queue-only
+ * bookkeeping call inflating the child's decoding record.
  *
  * @param {string} wordId
  * @returns {boolean} true if the add succeeded, false if wordId unknown
@@ -103,9 +109,9 @@ export function addWordToReview(wordId) {
   // Look up via the index (id matches word text in this bank) — and fall
   // back to a direct WORDS scan if the id doesn't match a text key (some
   // entries have id !== word, e.g. capitalised variants).
-  const inBank = idx.has(wordId) || WORDS.some(w => w?.id === wordId);
+  const inBank = idx.has(wordId) || WORDS.some((w) => w?.id === wordId);
   if (!inBank) return false;
-  store.recordWordAttempt(wordId, true);
+  store.recordWordAttempt(wordId, true, EVIDENCE.EXPOSURE);
   return true;
 }
 

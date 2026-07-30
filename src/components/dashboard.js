@@ -31,6 +31,7 @@ import {
 } from '../modules/reporting.js';
 import { getWeakSkills } from '../modules/remediationRouter.js';
 import { buildParentReportCard, buildWhatsAppMessage } from '../modules/parentReportCard.js';
+import { confidenceLabel } from '../modules/evidence.js';
 import { getGraduatingSoon, getSlippingRecently } from '../modules/reviewScheduler.js';
 import { questMastery } from '../modules/questMastery.js';
 import { GRAMMAR_CATEGORIES, GRAMMAR_CATEGORY_KEYS } from '../data/grammarCategories.js';
@@ -194,7 +195,6 @@ export function renderDashboard(container, opts = {}) {
   _bindActions();
 }
 
-
 function _renderCurriculumMapSection() {
   const container = document.getElementById('dash-curriculum-map');
   if (!container) return;
@@ -219,7 +219,7 @@ function _renderParentReportCard() {
     if (!bucket || typeof bucket !== 'object') continue;
     for (const [skill, score] of Object.entries(bucket)) {
       if (typeof score !== 'number') continue;
-      const existing = allMastery.find(r => r.skill === skill);
+      const existing = allMastery.find((r) => r.skill === skill);
       if (existing) {
         if (score > existing.score) existing.score = score;
       } else {
@@ -228,15 +228,15 @@ function _renderParentReportCard() {
     }
   }
   const strengths = allMastery
-    .filter(s => s.score >= 0.75)
+    .filter((s) => s.score >= 0.75)
     .sort((a, b) => b.score - a.score)
-    .map(s => ({ skill: s.skill, label: _humaniseSkill(s.skill), score: s.score }));
+    .map((s) => ({ skill: s.skill, label: _humaniseSkill(s.skill), score: s.score }));
 
   // Recent mistakes from word history
   const recentMistakes = (stats.recentHistory || [])
-    .filter(h => h && h.correct === false)
+    .filter((h) => h && h.correct === false)
     .slice(0, 5)
-    .map(h => ({ word: h.wordId, mode: h.mode, when: _timeAgo(h.timestamp), correct: false }));
+    .map((h) => ({ word: h.wordId, mode: h.mode, when: _timeAgo(h.timestamp), correct: false }));
 
   const weekly = {
     days: coaching?.weekDays ?? 0,
@@ -248,8 +248,12 @@ function _renderParentReportCard() {
   // per-word stats that drive the home banner. Graduating soon = positive
   // frame; slipping = gentle nudge.
   const wordStats = store.get('wordStats') || {};
-  const graduatingSoon = getGraduatingSoon(wordStats, WORDS).map(g => ({ word: g.item.word || g.id }));
-  const slippingRecently = getSlippingRecently(wordStats, WORDS).map(g => ({ word: g.item.word || g.id }));
+  const graduatingSoon = getGraduatingSoon(wordStats, WORDS).map((g) => ({
+    word: g.item.word || g.id,
+  }));
+  const slippingRecently = getSlippingRecently(wordStats, WORDS).map((g) => ({
+    word: g.item.word || g.id,
+  }));
 
   const card = buildParentReportCard({
     profile,
@@ -269,41 +273,63 @@ function _renderParentReportCard() {
           <h3 class="parent-report-card__title">📋 Report Card · ${escapeHtml(card.learnerName)}${card.grade ? ` <small>(${card.grade})</small>` : ''}</h3>
           <p class="parent-report-card__sub">Parent-friendly snapshot · this week ${card.weekly.days} day${card.weekly.days === 1 ? '' : 's'}, ${card.weekly.words} questions, ${Math.round(card.weekly.accuracy * 100)}% accurate</p>
         </div>
-        ${card.examRisk ? `
+        ${
+          card.examRisk
+            ? `
           <div class="exam-risk exam-risk--${card.examRisk.band}" role="status" aria-label="Exam focus: ${escapeHtml(card.examRisk.label)}">
             <span class="exam-risk__label">${escapeHtml(card.examRisk.label)}</span>
             <span class="exam-risk__summary">${escapeHtml(card.examRisk.summary)}</span>
-          </div>` : ''}
+          </div>`
+            : ''
+        }
       </header>
       <div class="parent-report-card__grid">
         <div class="parent-report-card__cell">
           <h4>✅ Strengths</h4>
           <ul>
-            ${card.strengths.map(s => `<li>${escapeHtml(s.label)}${s.pct ? ` <strong>(${s.pct}%)</strong>` : ''}</li>`).join('') || '<li>Steady effort across the board</li>'}
+            ${card.strengths.map((s) => `<li>${escapeHtml(s.label)}${s.pct ? ` <strong>(${s.pct}%)</strong>` : ''}</li>`).join('') || '<li>Steady effort across the board</li>'}
           </ul>
         </div>
         <div class="parent-report-card__cell">
           <h4>🎯 Needs Practice</h4>
           <ul class="needs-practice-list">
-            ${card.needsPractice.map(s => `<li class="needs-practice-item needs-practice-item--${s.band || 'amber'}"><span class="needs-practice-dot" aria-hidden="true"></span>${escapeHtml(s.label)} <strong>(${s.pct}%)</strong></li>`).join('') || '<li>No major gaps detected</li>'}
+            ${card.needsPractice.map((s) => `<li class="needs-practice-item needs-practice-item--${s.band || 'amber'}"><span class="needs-practice-dot" aria-hidden="true"></span>${escapeHtml(s.label)} <strong>${s.pct == null ? '(not enough practice yet)' : `(${s.pct}%)`}</strong>${_evidenceNote(s)}</li>`).join('') || '<li>Nothing has been measured yet — a few short sessions will show where things stand</li>'}
           </ul>
         </div>
         <div class="parent-report-card__cell">
           <h4>📝 Recent Mistakes</h4>
           <ul>
-            ${card.recentMistakes.map(m => `<li>${escapeHtml(m.word)}${m.mode ? ` <small>· ${escapeHtml(m.mode)}</small>` : ''}${m.when ? ` <small>· ${escapeHtml(m.when)}</small>` : ''}</li>`).join('') || '<li>No recent mistakes recorded</li>'}
+            ${card.recentMistakes.map((m) => `<li>${escapeHtml(m.word)}${m.mode ? ` <small>· ${escapeHtml(m.mode)}</small>` : ''}${m.when ? ` <small>· ${escapeHtml(m.when)}</small>` : ''}</li>`).join('') || '<li>No recent mistakes recorded</li>'}
           </ul>
         </div>
-        ${(card.graduatingSoon?.length || card.slippingRecently?.length) ? `
+        ${
+          card.graduatingSoon?.length || card.slippingRecently?.length
+            ? `
         <div class="parent-report-card__cell parent-report-card__cell--review-lane">
           <h4>🌟 Giri's Review Lane</h4>
-          ${card.graduatingSoon?.length ? `
-            <p class="parent-report-card__detail"><strong>🌱 Graduating soon:</strong> ${card.graduatingSoon.slice(0, 5).map(g => escapeHtml(g.word)).join(', ')} — about to lock into long-term memory.</p>
-          ` : ''}
-          ${card.slippingRecently?.length ? `
-            <p class="parent-report-card__detail"><strong>🍂 Slipping:</strong> ${card.slippingRecently.slice(0, 5).map(g => escapeHtml(g.word)).join(', ')} — a 2-min review tonight will help.</p>
-          ` : ''}
-        </div>` : ''}
+          ${
+            card.graduatingSoon?.length
+              ? `
+            <p class="parent-report-card__detail"><strong>🌱 Graduating soon:</strong> ${card.graduatingSoon
+              .slice(0, 5)
+              .map((g) => escapeHtml(g.word))
+              .join(', ')} — about to lock into long-term memory.</p>
+          `
+              : ''
+          }
+          ${
+            card.slippingRecently?.length
+              ? `
+            <p class="parent-report-card__detail"><strong>🍂 Slipping:</strong> ${card.slippingRecently
+              .slice(0, 5)
+              .map((g) => escapeHtml(g.word))
+              .join(', ')} — a 2-min review tonight will help.</p>
+          `
+              : ''
+          }
+        </div>`
+            : ''
+        }
         <div class="parent-report-card__cell parent-report-card__cell--cta">
           <h4>⏱️ Recommended 10-minute practice</h4>
           <p><strong>${escapeHtml(card.recommendation.title)}</strong></p>
@@ -312,8 +338,9 @@ function _renderParentReportCard() {
         </div>
       </div>
       <div class="parent-report-card__teacher">
-        <h4>💬 Teacher's note</h4>
+        <h4>💬 Automated learning summary</h4>
         <p>${escapeHtml(card.teacherComment)}</p>
+        <p class="parent-report-card__detail"><small>Generated from recorded practice — not reviewed by a teacher.</small></p>
       </div>
       <div class="parent-report-card__actions">
         <button class="btn btn--primary" id="copy-parent-update" data-clip="parent-update">📲 Copy Parent Update (WhatsApp)</button>
@@ -337,7 +364,9 @@ function _renderParentReportCard() {
         await navigator.clipboard.writeText(message);
         copied = true;
       }
-    } catch (_) { /* ignore */ }
+    } catch (_) {
+      /* ignore */
+    }
 
     if (!copied) {
       // Fallback: show the message in a textarea so the parent can copy manually
@@ -350,8 +379,27 @@ function _renderParentReportCard() {
       ta.focus();
       ta.select();
     }
-    if (hint) hint.textContent = copied ? 'Copied! Paste it into WhatsApp.' : 'Select the text below and copy manually.';
+    if (hint)
+      hint.textContent = copied
+        ? 'Copied! Paste it into WhatsApp.'
+        : 'Select the text below and copy manually.';
   });
+}
+
+/**
+ * The evidence behind a reported score: how many answers it rests on and
+ * when the skill was last practised. Rendered small, under the percentage,
+ * so a figure is never shown without the sample size that produced it.
+ */
+function _evidenceNote(skill) {
+  const n = skill?.attempts ?? 0;
+  const bits = [];
+  bits.push(n === 0 ? 'no answers recorded' : `${n} answer${n === 1 ? '' : 's'}`);
+  if (skill?.lastPractised) bits.push(`last practised ${_timeAgo(skill.lastPractised)}`);
+  if (skill?.confidence && skill.confidence !== 'high') {
+    bits.push(escapeHtml(confidenceLabel(skill.confidence)).toLowerCase());
+  }
+  return ` <small class="needs-practice-evidence">· ${escapeHtml(bits.join(' · '))}</small>`;
 }
 
 function _humaniseSkill(key) {
@@ -360,7 +408,7 @@ function _humaniseSkill(key) {
     .replace(/[-_]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
-    .replace(/^./, c => c.toUpperCase());
+    .replace(/^./, (c) => c.toUpperCase());
 }
 
 function escapeHtml(value) {
@@ -378,12 +426,13 @@ function _renderParentCoachingCard() {
 
   const card = getParentCoachingCard();
 
-  const signalClass = {
-    'on-track':       'coaching-card--green',
-    'needs-practice': 'coaching-card--amber',
-    'at-risk':        'coaching-card--red',
-    'no-data':        'coaching-card--grey',
-  }[card.overallSignal] || 'coaching-card--grey';
+  const signalClass =
+    {
+      'on-track': 'coaching-card--green',
+      'needs-practice': 'coaching-card--amber',
+      'at-risk': 'coaching-card--red',
+      'no-data': 'coaching-card--grey',
+    }[card.overallSignal] || 'coaching-card--grey';
 
   // Advancement decision banner (only when there's a clear recommendation)
   const advHtml = card.advancementNote
@@ -394,7 +443,7 @@ function _renderParentCoachingCard() {
   const atRiskHtml = card.domainsAtRisk.length
     ? `<div class="coaching-at-risk">
         <span class="coaching-at-risk-label">🔴 Needs attention:</span>
-        ${card.domainsAtRisk.map(d => `<span class="coaching-domain-chip coaching-chip--red">${d.icon} ${d.label}</span>`).join('')}
+        ${card.domainsAtRisk.map((d) => `<span class="coaching-domain-chip coaching-chip--red">${d.icon} ${d.label}</span>`).join('')}
        </div>`
     : '';
 
@@ -424,20 +473,22 @@ function _renderParentCoachingCard() {
     </div>`;
 
   // Weekly XP (only show when non-zero)
-  const xpStatHtml = card.weekXp > 0
-    ? `<div class="coaching-stat">
+  const xpStatHtml =
+    card.weekXp > 0
+      ? `<div class="coaching-stat">
         <span class="coaching-stat-value">+${card.weekXp}</span>
         <span class="coaching-stat-label">XP this week</span>
        </div>`
-    : '';
+      : '';
 
   // Review note
-  const reviewHtml = card.reviewsDue > 0
-    ? `<div class="coaching-review">
+  const reviewHtml =
+    card.reviewsDue > 0
+      ? `<div class="coaching-review">
         <span class="coaching-review-icon">🔁</span>
         <span class="coaching-review-text">${card.reviewNote}</span>
        </div>`
-    : '';
+      : '';
 
   container.innerHTML = `
     <div class="coaching-card ${signalClass}" aria-label="Parent coaching summary">
@@ -486,10 +537,12 @@ function _renderCategoryReporting() {
   const funnel = getLearningFunnelReport({ days: 7 });
   const lessonQueue = getAdaptiveLessonQueue({ limit: 6 });
 
-  const rowHtml = (rows) => rows.map(r => {
-    const pct = Math.round((r.accuracy || 0) * 100);
-    const cluePct = Math.round((r.clueSuccess || 0) * 100);
-    return `<div class="dash-category-row" title="${r.tooltip}">
+  const rowHtml = (rows) =>
+    rows
+      .map((r) => {
+        const pct = Math.round((r.accuracy || 0) * 100);
+        const cluePct = Math.round((r.clueSuccess || 0) * 100);
+        return `<div class="dash-category-row" title="${r.tooltip}">
       <div class="dash-category-head">
         <span><strong>${r.label}</strong> <small>(${r.loCode})</small></span>
         <span>${pct}%</span>
@@ -497,26 +550,32 @@ function _renderCategoryReporting() {
       <div class="dash-mini-track"><div class="dash-mini-fill" style="width:${pct}%"></div></div>
       <div class="dash-category-meta">Attempts: ${r.attempts} · Clue success: ${cluePct}% · <a href="${r.syllabusLink}" target="_blank" rel="noreferrer">MOE syllabus</a></div>
     </div>`;
-  }).join('');
-
+      })
+      .join('');
 
   const priorityBlock = (title, rows) => `
     <div class="dash-pattern-item">
       <strong>${title}</strong>
-      ${rows.map(r => `<div class="dash-category-row" title="${r.tooltip}">
+      ${rows
+        .map(
+          (r) => `<div class="dash-category-row" title="${r.tooltip}">
         <div class="dash-category-head">
           <span><strong>${r.label}</strong> <small>(${r.loCode})</small></span>
           <span>${Math.round((r.accuracy || 0) * 100)}%</span>
         </div>
         <div class="dash-mini-track"><div class="dash-mini-fill" style="width:${Math.round((r.accuracy || 0) * 100)}%"></div></div>
         <div class="dash-category-meta">Priority score: ${r.priorityScore.toFixed(2)} · <a href="${r.syllabusLink}" target="_blank" rel="noreferrer">MOE syllabus</a></div>
-      </div>`).join('')}
+      </div>`,
+        )
+        .join('')}
     </div>`;
 
-  const scoreHtml = scoreboards.map(s => {
-    const pct = Math.round((s.accuracy || 0) * 100);
-    return `<div class="dash-scoreboard-chip"><strong>${s.quest}</strong><br>${s.correct}/${s.total} · ${pct}%</div>`;
-  }).join('');
+  const scoreHtml = scoreboards
+    .map((s) => {
+      const pct = Math.round((s.accuracy || 0) * 100);
+      return `<div class="dash-scoreboard-chip"><strong>${s.quest}</strong><br>${s.correct}/${s.total} · ${pct}%</div>`;
+    })
+    .join('');
 
   container.innerHTML = `
     <h3 class="dash-section-title" style="margin-top:24px">Quest Category Reporting</h3>
@@ -542,7 +601,7 @@ function _renderCategoryReporting() {
     </div>
     <h4 class="dash-section-title" style="margin-top:16px">Adaptive Next Lesson Queue</h4>
     <ul class="dash-pattern-list">
-      ${lessonQueue.map(item => `<li class="dash-pattern-item"><strong>${item.quest}</strong> · ${item.label} <small>(${item.loCode})</small><br>${item.reason}</li>`).join('')}
+      ${lessonQueue.map((item) => `<li class="dash-pattern-item"><strong>${item.quest}</strong> · ${item.label} <small>(${item.loCode})</small><br>${item.reason}</li>`).join('')}
     </ul>
   `;
 }
@@ -554,7 +613,7 @@ function _renderMoeOutcomes() {
   container.innerHTML = `
     <h3 class="dash-section-title" style="margin-top:24px">MOE Learning Outcome Mapping</h3>
     <ul class="dash-pattern-list">
-      ${rows.map(r => `<li class="dash-pattern-item"><strong>${r.code}</strong> · ${r.focus}</li>`).join('')}
+      ${rows.map((r) => `<li class="dash-pattern-item"><strong>${r.code}</strong> · ${r.focus}</li>`).join('')}
     </ul>`;
 }
 
@@ -602,29 +661,39 @@ function _renderLiteracyDomains() {
   if (!container) return;
 
   const domains = getLiteracyDomains();
-  const hasData = domains.some(d => d.score !== null);
+  const hasData = domains.some((d) => d.score !== null);
 
   container.innerHTML = `
     <h3 class="dash-section-title" style="margin-top:24px">Literacy Domains</h3>
     ${!hasData ? '<p class="dash-no-data">Play more to see domain scores here.</p>' : ''}
     <div class="dash-domains-grid">
-      ${domains.map(d => {
-        const pct = d.score !== null ? Math.round(d.score * 100) : null;
-        const barColor = pct === null ? '#e5e3fa' :
-          pct >= 70 ? 'var(--color-success)' :
-          pct >= 45 ? 'var(--color-warning)' : 'var(--color-error)';
-        return `
+      ${domains
+        .map((d) => {
+          const pct = d.score !== null ? Math.round(d.score * 100) : null;
+          const barColor =
+            pct === null
+              ? '#e5e3fa'
+              : pct >= 70
+                ? 'var(--color-success)'
+                : pct >= 45
+                  ? 'var(--color-warning)'
+                  : 'var(--color-error)';
+          return `
           <div class="dash-domain-card">
             <span class="dash-domain-icon">${d.icon}</span>
             <span class="dash-domain-label">${d.label}</span>
-            ${pct !== null ? `
+            ${
+              pct !== null
+                ? `
               <div class="dash-domain-bar-track">
                 <div class="dash-domain-bar-fill" style="width:${pct}%;background:${d.color}"></div>
               </div>
-              <span class="dash-domain-pct" style="color:${barColor}">${pct}%</span>` :
-              '<span class="dash-domain-pct" style="color:var(--text-muted)">No data yet</span>'}
+              <span class="dash-domain-pct" style="color:${barColor}">${pct}%</span>`
+                : '<span class="dash-domain-pct" style="color:var(--text-muted)">No data yet</span>'
+            }
           </div>`;
-      }).join('')}
+        })
+        .join('')}
     </div>`;
 }
 
@@ -643,10 +712,15 @@ function _renderClueInsights() {
     return;
   }
 
-  const questRows = questInsights.map(qi => {
-    const clueColor = qi.clueAccuracy >= 0.7 ? 'var(--color-success)' :
-      qi.clueAccuracy >= 0.45 ? 'var(--color-warning)' : 'var(--color-error)';
-    return `
+  const questRows = questInsights
+    .map((qi) => {
+      const clueColor =
+        qi.clueAccuracy >= 0.7
+          ? 'var(--color-success)'
+          : qi.clueAccuracy >= 0.45
+            ? 'var(--color-warning)'
+            : 'var(--color-error)';
+      return `
       <div class="dash-clue-row">
         <div class="dash-clue-quest-label">${qi.icon} ${qi.quest}</div>
         <div class="dash-clue-metrics">
@@ -655,23 +729,37 @@ function _renderClueInsights() {
             <span class="dash-clue-metric-val" style="color:${clueColor}">${Math.round(qi.clueAccuracy * 100)}%</span>
             <span class="dash-clue-metric-sub">(${qi.clueAttempted} attempts)</span>
           </div>
-          ${qi.answerAccuracy !== null ? `
+          ${
+            qi.answerAccuracy !== null
+              ? `
             <div class="dash-clue-metric">
               <span class="dash-clue-metric-label">Answer accuracy</span>
               <span class="dash-clue-metric-val">${Math.round(qi.answerAccuracy * 100)}%</span>
-            </div>` : ''}
+            </div>`
+              : ''
+          }
         </div>
         ${qi.interpretation ? `<p class="dash-clue-interpretation">${qi.interpretation}</p>` : ''}
       </div>`;
-  }).join('');
+    })
+    .join('');
 
-  const typeRows = byType.length > 0 ? `
+  const typeRows =
+    byType.length > 0
+      ? `
     <h4 class="dash-clue-type-title">By Clue Type</h4>
     <div class="dash-clue-types">
-      ${byType.slice(0, 5).map(t => {
-        const pct = Math.round(t.accuracy * 100);
-        const col = pct >= 70 ? 'var(--color-success)' : pct >= 45 ? 'var(--color-warning)' : 'var(--color-error)';
-        return `
+      ${byType
+        .slice(0, 5)
+        .map((t) => {
+          const pct = Math.round(t.accuracy * 100);
+          const col =
+            pct >= 70
+              ? 'var(--color-success)'
+              : pct >= 45
+                ? 'var(--color-warning)'
+                : 'var(--color-error)';
+          return `
           <div class="dash-clue-type-row">
             <span class="dash-clue-type-label">${t.type}</span>
             <div class="dash-clue-type-bar-track">
@@ -679,8 +767,10 @@ function _renderClueInsights() {
             </div>
             <span class="dash-clue-type-pct" style="color:${col}">${pct}%</span>
           </div>`;
-      }).join('')}
-    </div>` : '';
+        })
+        .join('')}
+    </div>`
+      : '';
 
   container.innerHTML = `
     <h3 class="dash-section-title" style="margin-top:24px">Clue Detection vs. Answer Accuracy</h3>
@@ -699,7 +789,9 @@ function _renderRecommendedActions() {
   container.innerHTML = `
     <h3 class="dash-section-title" style="margin-top:0">Recommended Next Steps</h3>
     <div class="dash-rec-actions">
-      ${actions.map((a, i) => `
+      ${actions
+        .map(
+          (a, i) => `
         <div class="dash-rec-action">
           <div class="dash-rec-action-num">${i + 1}</div>
           <div class="dash-rec-action-body">
@@ -711,14 +803,16 @@ function _renderRecommendedActions() {
                   ${a.ctaGroup ? `data-group="${a.ctaGroup}"` : ''}>
             ${a.ctaLabel}
           </button>
-        </div>`).join('')}
+        </div>`,
+        )
+        .join('')}
     </div>`;
 
   // Wire CTAs if navigation callback is available
-  container.querySelectorAll('.dash-rec-cta').forEach(btn => {
+  container.querySelectorAll('.dash-rec-cta').forEach((btn) => {
     btn.addEventListener('click', () => {
       const target = btn.dataset.target;
-      const group  = btn.dataset.group || null;
+      const group = btn.dataset.group || null;
       _onNavigate?.({ target, group });
     });
   });
@@ -733,11 +827,15 @@ function _renderStuckWords() {
   const stuckWords = getStuckWords();
   if (!stuckWords.length) return;
 
-  const wordPills = stuckWords.map(w => `
+  const wordPills = stuckWords
+    .map(
+      (w) => `
     <div class="stuck-word-pill" aria-label="${w.word}: ${w.accuracy}% correct after ${w.attempts} tries">
       <span class="stuck-word-text">${w.word}</span>
       <span class="stuck-word-stat">${w.accuracy}%</span>
-    </div>`).join('');
+    </div>`,
+    )
+    .join('');
 
   container.innerHTML = `
     <div class="stuck-words-card" role="alert" aria-label="Words needing attention">
@@ -765,7 +863,7 @@ function _renderPatternInsights() {
   container.innerHTML = `
     <h3 class="dash-section-title" style="margin-top:24px">Recent Learning Patterns</h3>
     <ul class="dash-pattern-list">
-      ${insights.map(i => `<li class="dash-pattern-item">💬 ${i}</li>`).join('')}
+      ${insights.map((i) => `<li class="dash-pattern-item">💬 ${i}</li>`).join('')}
     </ul>`;
 }
 
@@ -788,32 +886,45 @@ function _renderTutorActivity() {
   if (!lessons.length && !readAloudEntries.length && !aiLog.length) return;
 
   const cutoff = Date.now() - 14 * 24 * 60 * 60 * 1000;
-  const lessonsRecent = lessons.filter(l => {
+  const lessonsRecent = lessons.filter((l) => {
     const t = new Date(l.completedAt || l.date).getTime();
     return Number.isFinite(t) && t >= cutoff;
   }).length;
 
-  const lessonHtml = lessons.length ? `
+  const lessonHtml = lessons.length
+    ? `
     <div class="dash-stat-card">
       <span class="dash-stat-value">${lessonsRecent}</span>
       <span class="dash-stat-label">Guided lessons · last 14 days</span>
-    </div>` : '';
+    </div>`
+    : '';
 
-  const missedWords = [...new Set(readAloudEntries.flatMap(([, s]) => s?.lastMissedWords || []))].slice(0, 8);
-  const readAloudHtml = readAloudEntries.length ? `
+  const missedWords = [
+    ...new Set(readAloudEntries.flatMap(([, s]) => s?.lastMissedWords || [])),
+  ].slice(0, 8);
+  const readAloudHtml = readAloudEntries.length
+    ? `
     <div class="dash-stat-card">
       <span class="dash-stat-value">${readAloudEntries.reduce((sum, [, s]) => sum + (s?.attempts || 0), 0)}</span>
       <span class="dash-stat-label">Read-to-Giri story readings</span>
-    </div>` : '';
+    </div>`
+    : '';
 
-  const aiKinds = { explain: '❓ Why explained', hint: '💡 Hint', ask: '🦉 Ask Giri', grade: '✍️ Essay marked' };
-  const aiHtml = aiLog.length ? `
+  const aiKinds = {
+    explain: '❓ Why explained',
+    hint: '💡 Hint',
+    ask: '🦉 Ask Giri',
+    grade: '✍️ Essay marked',
+  };
+  const aiHtml = aiLog.length
+    ? `
     <details class="dash-ai-log">
       <summary>✨ AI tutor usage (${aiLog.length} recent) — everything your child asked</summary>
       <ul class="dash-pattern-list">
-        ${aiLog.map(e => `<li class="dash-pattern-item">${aiKinds[e.kind] || e.kind} · ${escapeHtml(e.summary || '')} <small>(${escapeHtml(e.date || '')})</small></li>`).join('')}
+        ${aiLog.map((e) => `<li class="dash-pattern-item">${aiKinds[e.kind] || e.kind} · ${escapeHtml(e.summary || '')} <small>(${escapeHtml(e.date || '')})</small></li>`).join('')}
       </ul>
-    </details>` : '';
+    </details>`
+    : '';
 
   container.innerHTML = `
     <h3 class="dash-section-title" style="margin-top:24px">Tutor Activity</h3>
@@ -831,26 +942,31 @@ function _renderMasteryChart(stats) {
   const canvas = document.getElementById('chart-mastery');
   if (!canvas) return;
 
-  if (accuracyChart) { accuracyChart.destroy(); accuracyChart = null; }
+  if (accuracyChart) {
+    accuracyChart.destroy();
+    accuracyChart = null;
+  }
 
-  const groups = GROUP_ORDER.filter(g => WORD_GROUPS[g]);
-  const labels = groups.map(g => WORD_GROUPS[g].label);
-  const data   = groups.map(g => Math.round((stats.groupMastery[g] ?? 0) * 100));
-  const colors = groups.map(g => WORD_GROUPS[g].color);
+  const groups = GROUP_ORDER.filter((g) => WORD_GROUPS[g]);
+  const labels = groups.map((g) => WORD_GROUPS[g].label);
+  const data = groups.map((g) => Math.round((stats.groupMastery[g] ?? 0) * 100));
+  const colors = groups.map((g) => WORD_GROUPS[g].color);
 
   accuracyChart = new Chart(canvas, {
     type: 'bar',
     data: {
       labels,
-      datasets: [{
-        label: 'Mastery %',
-        data,
-        backgroundColor: colors.map(c => c + '80'),
-        borderColor: colors,
-        borderWidth: 2,
-        borderRadius: 6,
-        barPercentage: 0.7,
-      }],
+      datasets: [
+        {
+          label: 'Mastery %',
+          data,
+          backgroundColor: colors.map((c) => c + '80'),
+          borderColor: colors,
+          borderWidth: 2,
+          borderRadius: 6,
+          barPercentage: 0.7,
+        },
+      ],
     },
     options: {
       responsive: true,
@@ -858,8 +974,9 @@ function _renderMasteryChart(stats) {
       plugins: { legend: { display: false } },
       scales: {
         y: {
-          beginAtZero: true, max: 100,
-          ticks: { callback: v => v + '%', font: { size: 11 } },
+          beginAtZero: true,
+          max: 100,
+          ticks: { callback: (v) => v + '%', font: { size: 11 } },
           grid: { display: false },
         },
         x: {
@@ -875,7 +992,7 @@ function _renderMasteryBars(stats) {
   const container = document.getElementById('mastery-bars');
   if (!container) return;
 
-  container.innerHTML = GROUP_ORDER.map(group => {
+  container.innerHTML = GROUP_ORDER.map((group) => {
     const meta = WORD_GROUPS[group];
     if (!meta) return '';
     const pct = Math.round((stats.groupMastery[group] ?? 0) * 100);
@@ -896,10 +1013,10 @@ function _renderLearningPath(stats) {
 
   const unlocked = getUnlockedStages(buildProgressionSnapshot());
 
-  container.innerHTML = CURRICULUM.map(stage => {
+  container.innerHTML = CURRICULUM.map((stage) => {
     const isUnlocked = unlocked.includes(stage.id);
     const stageGroups = stage.groups ?? (stage.group ? [stage.group] : []);
-    const groupAccuracies = stageGroups.map(g => stats.groupMastery[g] ?? 0);
+    const groupAccuracies = stageGroups.map((g) => stats.groupMastery[g] ?? 0);
     const avgAccuracy = stageGroups.length
       ? Math.round((groupAccuracies.reduce((a, b) => a + b, 0) / stageGroups.length) * 100)
       : 0;
@@ -919,8 +1036,8 @@ function _renderWordHistory(stats) {
   const tbody = document.getElementById('word-history-body');
   if (!tbody) return;
 
-  const rows = stats.recentHistory.slice(0, 30).map(h => {
-    const word = WORDS.find(w => w.id === h.wordId);
+  const rows = stats.recentHistory.slice(0, 30).map((h) => {
+    const word = WORDS.find((w) => w.id === h.wordId);
     const emoji = word?.emoji || '';
     const timeAgo = _timeAgo(h.timestamp);
     const result = h.correct
@@ -935,7 +1052,9 @@ function _renderWordHistory(stats) {
     </tr>`;
   });
 
-  tbody.innerHTML = rows.join('') || '<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">No history yet</td></tr>';
+  tbody.innerHTML =
+    rows.join('') ||
+    '<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">No history yet</td></tr>';
 }
 
 function _renderBadges() {
@@ -943,38 +1062,53 @@ function _renderBadges() {
   if (!container) return;
 
   const all = badges.getAll();
-  container.setAttribute('aria-label', `${badges.earnedCount} of ${badges.totalCount} badges earned`);
+  container.setAttribute(
+    'aria-label',
+    `${badges.earnedCount} of ${badges.totalCount} badges earned`,
+  );
 
-  container.innerHTML = all.map(b => `
+  container.innerHTML = all
+    .map(
+      (b) => `
     <div class="badge-card ${b.earned ? 'badge-card--earned' : 'badge-card--locked'}"
          title="${b.desc}"
          aria-label="${b.name}${b.earned ? ' — earned' : ' — locked'}">
       <span class="badge-emoji">${b.earned ? b.emoji : '🔒'}</span>
       <span class="badge-name">${b.name}</span>
-    </div>`).join('');
+    </div>`,
+    )
+    .join('');
 }
 
 function _bindActions() {
   document.getElementById('btn-export-csv')?.addEventListener('click', () => {
-    const csv  = progress.exportCSV();
+    const csv = progress.exportCSV();
     const blob = new Blob([csv], { type: 'text/csv' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url; a.download = 'phonicsquest-progress.csv'; a.click();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'phonicsquest-progress.csv';
+    a.click();
     URL.revokeObjectURL(url);
   });
 
   document.getElementById('btn-export-csv-anon')?.addEventListener('click', () => {
-    const csv = progress.exportCSV().split('\n').map((line, idx) => {
-      if (idx === 0 || !line.trim()) return line;
-      const [word, ...rest] = line.split(',');
-      const masked = `${word.slice(0, 1)}***`;
-      return [masked, ...rest].join(',');
-    }).join('\n');
+    const csv = progress
+      .exportCSV()
+      .split('\n')
+      .map((line, idx) => {
+        if (idx === 0 || !line.trim()) return line;
+        const [word, ...rest] = line.split(',');
+        const masked = `${word.slice(0, 1)}***`;
+        return [masked, ...rest].join(',');
+      })
+      .join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'phonicsquest-progress-anonymised.csv'; a.click();
+    a.href = url;
+    a.download = 'phonicsquest-progress-anonymised.csv';
+    a.click();
     URL.revokeObjectURL(url);
   });
 
@@ -1005,8 +1139,13 @@ function _bindActions() {
 
   const dropZone = document.getElementById('csv-drop-zone');
   if (dropZone) {
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dash-import-drop--active'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dash-import-drop--active'));
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dash-import-drop--active');
+    });
+    dropZone.addEventListener('dragleave', () =>
+      dropZone.classList.remove('dash-import-drop--active'),
+    );
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
       dropZone.classList.remove('dash-import-drop--active');
@@ -1016,19 +1155,29 @@ function _bindActions() {
   }
 
   // Adaptive controls
-  const adaptiveWeak = /** @type {HTMLInputElement|null} */ (document.getElementById('adaptive-weak-weight'));
-  const adaptiveUnseen = /** @type {HTMLInputElement|null} */ (document.getElementById('adaptive-unseen-weight'));
+  const adaptiveWeak = /** @type {HTMLInputElement|null} */ (
+    document.getElementById('adaptive-weak-weight')
+  );
+  const adaptiveUnseen = /** @type {HTMLInputElement|null} */ (
+    document.getElementById('adaptive-unseen-weight')
+  );
   const cfg = store.get('adaptiveConfig') || {};
   if (adaptiveWeak) {
     adaptiveWeak.value = String(cfg.weakWeight ?? 5);
     adaptiveWeak.addEventListener('input', () => {
-      store.set('adaptiveConfig', { ...(store.get('adaptiveConfig') || {}), weakWeight: Number(adaptiveWeak.value) });
+      store.set('adaptiveConfig', {
+        ...(store.get('adaptiveConfig') || {}),
+        weakWeight: Number(adaptiveWeak.value),
+      });
     });
   }
   if (adaptiveUnseen) {
     adaptiveUnseen.value = String(cfg.unseenWeight ?? 3);
     adaptiveUnseen.addEventListener('input', () => {
-      store.set('adaptiveConfig', { ...(store.get('adaptiveConfig') || {}), unseenWeight: Number(adaptiveUnseen.value) });
+      store.set('adaptiveConfig', {
+        ...(store.get('adaptiveConfig') || {}),
+        unseenWeight: Number(adaptiveUnseen.value),
+      });
     });
   }
 
@@ -1045,7 +1194,11 @@ function _renderPrintReport() {
   if (!container) return;
 
   // Today's date
-  const today = new Date().toLocaleDateString('en-SG', { day: 'numeric', month: 'long', year: 'numeric' });
+  const today = new Date().toLocaleDateString('en-SG', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 
   // Helper to colour-code a mastery score (0–1)
   function _scoreColor(score) {
@@ -1076,9 +1229,9 @@ function _renderPrintReport() {
   }
 
   // Overall stats from store
-  const xpTotal    = store.get('xp') ?? 0;
-  const streak     = store.get('streak') ?? 0;
-  const dailyGoal  = store.get('dailyGoal') ?? 0;
+  const xpTotal = store.get('xp') ?? 0;
+  const streak = store.get('streak') ?? 0;
+  const dailyGoal = store.get('dailyGoal') ?? 0;
   const daysPlayed = (() => {
     const history = store.get('dailyHistory') || {};
     const now = Date.now();
@@ -1148,13 +1301,13 @@ function _buildParentReport() {
 
 // ── CSV Import (unchanged) ────────────────────────────────────────────────────
 
-const VOWELS     = new Set(['a', 'e', 'i', 'o', 'u']);
+const VOWELS = new Set(['a', 'e', 'i', 'o', 'u']);
 const CONSONANTS = new Set('bcdfghjklmnpqrstvwxyz'.split(''));
 
 function _autoDetectPhonemes(word) {
   const lower = word.toLowerCase();
   const graphemes = lower.split('');
-  const types = graphemes.map(ch => {
+  const types = graphemes.map((ch) => {
     if (VOWELS.has(ch)) return 'sv';
     if (CONSONANTS.has(ch)) return 'c';
     return 'c';
@@ -1163,19 +1316,27 @@ function _autoDetectPhonemes(word) {
 }
 
 function _detectGroup(word) {
-  const vowel = word.toLowerCase().split('').find(ch => VOWELS.has(ch));
+  const vowel = word
+    .toLowerCase()
+    .split('')
+    .find((ch) => VOWELS.has(ch));
   return vowel ? `short-${vowel}` : 'short-a';
 }
 
 function _detectPattern(graphemes, types) {
-  const consonantBefore = [], consonantAfter = [];
+  const consonantBefore = [],
+    consonantAfter = [];
   let foundVowel = false;
   for (const t of types) {
-    if (t === 'sv' || t === 'lv') { foundVowel = true; continue; }
+    if (t === 'sv' || t === 'lv') {
+      foundVowel = true;
+      continue;
+    }
     if (!foundVowel) consonantBefore.push(t);
     else consonantAfter.push(t);
   }
-  const c1 = consonantBefore.length, c2 = consonantAfter.length;
+  const c1 = consonantBefore.length,
+    c2 = consonantAfter.length;
   if (c1 <= 1 && c2 <= 1) return 'CVC';
   if (c1 >= 2 && c2 <= 1) return 'blend';
   if (c1 <= 1 && c2 >= 2) return 'CVCC';
@@ -1184,11 +1345,14 @@ function _detectPattern(graphemes, types) {
 
 async function _handleCSVImport(file) {
   const preview = document.getElementById('csv-import-preview');
-  const status  = document.getElementById('csv-import-status');
+  const status = document.getElementById('csv-import-status');
   if (!preview || !status) return;
 
-  const text  = await file.text();
-  const lines = text.trim().split('\n').filter(l => l.trim());
+  const text = await file.text();
+  const lines = text
+    .trim()
+    .split('\n')
+    .filter((l) => l.trim());
 
   if (!lines.length) {
     status.hidden = false;
@@ -1200,10 +1364,13 @@ async function _handleCSVImport(file) {
   const firstLine = lines[0].trim();
   const isFullCSV = firstLine.includes(',');
   const words = [];
-  const existingIds = new Set(WORDS.map(w => w.id));
+  const existingIds = new Set(WORDS.map((w) => w.id));
 
   if (isFullCSV) {
-    const header  = firstLine.toLowerCase().split(',').map(h => h.trim());
+    const header = firstLine
+      .toLowerCase()
+      .split(',')
+      .map((h) => h.trim());
     const wordIdx = header.indexOf('word');
     if (wordIdx < 0) {
       status.hidden = false;
@@ -1218,19 +1385,24 @@ async function _handleCSVImport(file) {
     const emojiIdx = header.indexOf('emoji');
 
     for (let i = 1; i < lines.length; i++) {
-      const cols = lines[i].split(',').map(c => c.trim());
+      const cols = lines[i].split(',').map((c) => c.trim());
       const w = cols[wordIdx];
       if (!w || existingIds.has(w.toLowerCase())) continue;
 
-      const graphemes = graphIdx >= 0 && cols[graphIdx]
-        ? cols[graphIdx].split(/[|;]/)
-        : _autoDetectPhonemes(w).graphemes;
-      const types = typesIdx >= 0 && cols[typesIdx]
-        ? cols[typesIdx].split(/[|;]/)
-        : _autoDetectPhonemes(w).types;
+      const graphemes =
+        graphIdx >= 0 && cols[graphIdx]
+          ? cols[graphIdx].split(/[|;]/)
+          : _autoDetectPhonemes(w).graphemes;
+      const types =
+        typesIdx >= 0 && cols[typesIdx]
+          ? cols[typesIdx].split(/[|;]/)
+          : _autoDetectPhonemes(w).types;
 
       words.push({
-        id: w.toLowerCase(), word: w.toLowerCase(), graphemes, types,
+        id: w.toLowerCase(),
+        word: w.toLowerCase(),
+        graphemes,
+        types,
         pattern: _detectPattern(graphemes, types),
         group: (groupIdx >= 0 && cols[groupIdx]) || _detectGroup(w),
         level: (levelIdx >= 0 && parseInt(cols[levelIdx])) || 1,
@@ -1243,9 +1415,14 @@ async function _handleCSVImport(file) {
       if (!w || existingIds.has(w)) continue;
       const { graphemes, types } = _autoDetectPhonemes(w);
       words.push({
-        id: w, word: w, graphemes, types,
+        id: w,
+        word: w,
+        graphemes,
+        types,
         pattern: _detectPattern(graphemes, types),
-        group: _detectGroup(w), level: 1, emoji: '',
+        group: _detectGroup(w),
+        level: 1,
+        emoji: '',
       });
     }
   }
@@ -1260,14 +1437,21 @@ async function _handleCSVImport(file) {
   preview.hidden = false;
   preview.innerHTML = `
     <p><strong>${words.length} new word${words.length > 1 ? 's' : ''}</strong> ready to import:</p>
-    <div class="dash-import-word-list">${words.slice(0, 20).map(w =>
-      `<span class="dash-import-word">${w.emoji ? w.emoji + ' ' : ''}${w.word} <small>(${w.group})</small></span>`
-    ).join('')}${words.length > 20 ? `<span class="dash-import-word">…and ${words.length - 20} more</span>` : ''}</div>
+    <div class="dash-import-word-list">${words
+      .slice(0, 20)
+      .map(
+        (w) =>
+          `<span class="dash-import-word">${w.emoji ? w.emoji + ' ' : ''}${w.word} <small>(${w.group})</small></span>`,
+      )
+      .join(
+        '',
+      )}${words.length > 20 ? `<span class="dash-import-word">…and ${words.length - 20} more</span>` : ''}</div>
     <button class="btn btn--primary btn--sm" id="csv-confirm-import">Import ${words.length} Words</button>
     <button class="btn btn--ghost btn--sm" id="csv-cancel-import">Cancel</button>`;
 
   document.getElementById('csv-cancel-import')?.addEventListener('click', () => {
-    preview.hidden = true; status.hidden = true;
+    preview.hidden = true;
+    status.hidden = true;
   });
 
   document.getElementById('csv-confirm-import')?.addEventListener('click', () => {
@@ -1294,5 +1478,8 @@ function _timeAgo(timestamp) {
 
 /** Destroy the chart cleanly when modal closes. */
 export function destroyDashboard() {
-  if (accuracyChart) { accuracyChart.destroy(); accuracyChart = null; }
+  if (accuracyChart) {
+    accuracyChart.destroy();
+    accuracyChart = null;
+  }
 }

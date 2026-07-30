@@ -23,7 +23,10 @@ let GATE_B_ITEMS;
 
 beforeAll(async () => {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
   const mod = await import('../modules/placementTest.js');
   PLACEMENT_PHASES = mod.PLACEMENT_PHASES;
@@ -38,11 +41,15 @@ describe('curriculum/placement phase alignment', () => {
   });
 
   it('every placement-phase fallbackGroup is reachable from CURRICULUM', () => {
-    const curriculumGroups = new Set(CURRICULUM.map(s => s.group));
-    const curriculumIds    = new Set(CURRICULUM.map(s => s.id));
+    const curriculumGroups = new Set(CURRICULUM.map((s) => s.group));
+    const curriculumIds = new Set(CURRICULUM.map((s) => s.id));
     for (const def of PLACEMENT_PHASES) {
-      const reachable = curriculumGroups.has(def.fallbackGroup) || curriculumIds.has(def.fallbackGroup);
-      expect(reachable, `fallbackGroup "${def.fallbackGroup}" for phase ${def.phase} not in CURRICULUM`).toBe(true);
+      const reachable =
+        curriculumGroups.has(def.fallbackGroup) || curriculumIds.has(def.fallbackGroup);
+      expect(
+        reachable,
+        `fallbackGroup "${def.fallbackGroup}" for phase ${def.phase} not in CURRICULUM`,
+      ).toBe(true);
     }
   });
 
@@ -51,7 +58,7 @@ describe('curriculum/placement phase alignment', () => {
     // After the long-vowel/diphthong micro-stage split, the canonical order
     // markers are: digraphs → ccvcc-a → long-a-ae (first long-vowel
     // micro-stage) → dip-oi (first diphthong micro-stage).
-    const stageOrder = CURRICULUM.map(s => s.id);
+    const stageOrder = CURRICULUM.map((s) => s.id);
     const idx = (id) => stageOrder.indexOf(id);
 
     expect(idx('digraphs')).toBeGreaterThan(-1);
@@ -64,28 +71,37 @@ describe('curriculum/placement phase alignment', () => {
     expect(idx('digraphs')).toBeLessThan(idx('dip-oi'));
 
     // Placement order matches: digraphs phase < ccvcc phase < long-vowel phase
-    const phaseOf = (group) => PLACEMENT_PHASES.find(p => p.fallbackGroup === group)?.phase;
+    const phaseOf = (group) => PLACEMENT_PHASES.find((p) => p.fallbackGroup === group)?.phase;
     expect(phaseOf('digraphs')).toBeLessThan(phaseOf('ccvcc-a'));
     expect(phaseOf('ccvcc-a')).toBeLessThan(phaseOf('long-a-ae'));
   });
 
   it('PHASE_LABELS covers every PLACEMENT_PHASES.phase number', () => {
     for (const def of PLACEMENT_PHASES) {
-      expect(PHASE_LABELS[def.phase], `Missing PHASE_LABELS entry for phase ${def.phase}`).toBeTruthy();
+      expect(
+        PHASE_LABELS[def.phase],
+        `Missing PHASE_LABELS entry for phase ${def.phase}`,
+      ).toBeTruthy();
     }
   });
 
   it('curriculum prerequisite chain is intact (no dangling links after the reorder)', () => {
-    const ids = new Set(CURRICULUM.map(s => s.id));
+    const ids = new Set(CURRICULUM.map((s) => s.id));
     for (const stage of CURRICULUM) {
       if (!stage.prerequisite) continue;
-      expect(ids.has(stage.prerequisite), `Stage "${stage.id}" points to missing prereq "${stage.prerequisite}"`).toBe(true);
+      expect(
+        ids.has(stage.prerequisite),
+        `Stage "${stage.id}" points to missing prereq "${stage.prerequisite}"`,
+      ).toBe(true);
     }
   });
 
   it('every curriculum stage has a phase that matches PHASE_LABELS', () => {
     for (const stage of CURRICULUM) {
-      expect(PHASE_LABELS[stage.phase], `Stage "${stage.id}" has phase ${stage.phase} with no PHASE_LABELS entry`).toBeTruthy();
+      expect(
+        PHASE_LABELS[stage.phase],
+        `Stage "${stage.id}" has phase ${stage.phase} with no PHASE_LABELS entry`,
+      ).toBeTruthy();
     }
   });
 });
@@ -93,46 +109,95 @@ describe('curriculum/placement phase alignment', () => {
 describe('Gate B item bank coverage (issue #108)', () => {
   it('has at least 4 decoding items per phonics phase 1-6', () => {
     for (let phase = 1; phase <= 6; phase++) {
-      const items = GATE_B_ITEMS.filter(i => i.section === 'decoding' && i.phase === phase);
-      expect(items.length, `phase ${phase} has only ${items.length} decoding items`).toBeGreaterThanOrEqual(4);
+      const items = GATE_B_ITEMS.filter((i) => i.section === 'decoding' && i.phase === phase);
+      expect(
+        items.length,
+        `phase ${phase} has only ${items.length} decoding items`,
+      ).toBeGreaterThanOrEqual(4);
     }
   });
 
   it('probes every short vowel at least once in phase 1', () => {
-    const groups = new Set(GATE_B_ITEMS.filter(i => i.phase === 1).map(i => i.group));
+    const groups = new Set(GATE_B_ITEMS.filter((i) => i.phase === 1).map((i) => i.group));
     for (const v of ['a', 'e', 'i', 'o', 'u']) {
       expect(groups.has(`cvc-${v}`), `no phase-1 item for cvc-${v}`).toBe(true);
     }
   });
 
   it('has at least 8 sight-word items', () => {
-    const sight = GATE_B_ITEMS.filter(i => i.section === 'sightWords');
+    const sight = GATE_B_ITEMS.filter((i) => i.section === 'sightWords');
     expect(sight.length).toBeGreaterThanOrEqual(8);
   });
 
   it('every item is answerable: correct answer among 4 unique options', () => {
     for (const item of GATE_B_ITEMS) {
       expect(item.options, item.id).toContain(item.correct);
-      expect(new Set(item.options).size, `${item.id} has duplicate options`).toBe(item.options.length);
+      expect(new Set(item.options).size, `${item.id} has duplicate options`).toBe(
+        item.options.length,
+      );
       expect(item.options.length, item.id).toBe(4);
     }
   });
 
   it('every decoding item group maps to a curriculum stage (directly or via normalization)', async () => {
     const { normalizePhonicsGroupKey } = await import('../modules/phonicsGroupKeys.js');
-    const curriculumGroups = new Set(CURRICULUM.map(s => s.group));
-    const curriculumIds = new Set(CURRICULUM.map(s => s.id));
+    const curriculumGroups = new Set(CURRICULUM.map((s) => s.group));
+    const curriculumIds = new Set(CURRICULUM.map((s) => s.id));
     for (const item of GATE_B_ITEMS) {
       if (item.section !== 'decoding') continue;
       const key = normalizePhonicsGroupKey(item.group);
-      const reachable = curriculumGroups.has(key) || curriculumIds.has(key)
-        || curriculumGroups.has(item.group) || curriculumIds.has(item.group);
-      expect(reachable, `item ${item.id} group "${item.group}" not reachable from CURRICULUM`).toBe(true);
+      const reachable =
+        curriculumGroups.has(key) ||
+        curriculumIds.has(key) ||
+        curriculumGroups.has(item.group) ||
+        curriculumIds.has(item.group);
+      expect(reachable, `item ${item.id} group "${item.group}" not reachable from CURRICULUM`).toBe(
+        true,
+      );
     }
   });
 
   it('item ids are unique', () => {
-    const ids = GATE_B_ITEMS.map(i => i.id);
+    const ids = GATE_B_ITEMS.map((i) => i.id);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+});
+
+describe('Gate B does not leak the answer in its prompt', () => {
+  /**
+   * renderWordChoice prints `item.prompt` verbatim above the option buttons.
+   * These items used to read `prompt: 'Tap: cat'`, which meant a child who
+   * could not decode at all could pass the decoding gate by matching the
+   * prompt string to a button — the screener measured string comparison,
+   * not reading. The word must arrive by audio (`speak`) only.
+   */
+  it('no prompt contains its own correct answer', () => {
+    for (const item of GATE_B_ITEMS) {
+      const prompt = String(item.prompt || '').toLowerCase();
+      expect(
+        prompt.includes(String(item.correct).toLowerCase()),
+        `${item.id} prompt "${item.prompt}" gives away the answer "${item.correct}"`,
+      ).toBe(false);
+    }
+  });
+
+  it('no prompt contains any of its options', () => {
+    for (const item of GATE_B_ITEMS) {
+      const prompt = String(item.prompt || '').toLowerCase();
+      for (const opt of item.options || []) {
+        expect(
+          prompt.includes(String(opt).toLowerCase()),
+          `${item.id} prompt "${item.prompt}" names option "${opt}"`,
+        ).toBe(false);
+      }
+    }
+  });
+
+  it('every word-choice item still carries the spoken target', () => {
+    for (const item of GATE_B_ITEMS) {
+      if (item.kind !== 'word-choice') continue;
+      expect(item.speak, `${item.id} has no spoken target`).toBeTruthy();
+      expect(item.speak).toBe(item.correct);
+    }
   });
 });
