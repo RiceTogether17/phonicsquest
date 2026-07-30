@@ -16,6 +16,7 @@ import { escapeHtml } from './utils/escapeHtml.js';
 import * as homeBanners from './modules/homeBanners.js';
 import * as returnEvents from './modules/returnEvents.js';
 import * as onboardingController from './modules/onboardingController.js';
+import * as navigationRouter from './modules/navigationRouter.js';
 import * as askGiriPanel from './components/panels/askGiriPanel.js';
 import * as mistakesDenPanel from './components/panels/mistakesDenPanel.js';
 import * as trophyRoomPanel from './components/panels/trophyRoomPanel.js';
@@ -1345,95 +1346,18 @@ class App {
    * @param {string} target - ctaTarget value from recommendation
    * @param {string|null} [group]
    */
+  /** @see modules/navigationRouter.js */
   _navigateTo(target, group = null) {
-    switch (target) {
-      case 'blend':
-        this._mode = 'blend';
-        store.set('currentMode', 'blend');
-        if (group) {
-          store.set('currentGroup', group);
-          this._startGame(group);
-        } else {
-          this._openBlendPicker();
-        }
-        break;
-      case 'classicBlend':
-        this._mode = 'classicBlend';
-        store.set('currentMode', 'classicBlend');
-        this._startGame(store.get('currentGroup') || undefined);
-        break;
-      case 'first-sound':
-        this._mode = 'first';
-        store.set('currentMode', 'first');
-        this._startGame();
-        break;
-      case 'oral-blend':
-        this._mode = 'oralBlend';
-        store.set('currentMode', 'oralBlend');
-        this._startGame();
-        break;
-      case 'letter-sounds':
-        document.getElementById('btn-letter-sounds')?.click();
-        break;
-      case 'hear':
-        this._mode = 'hear';
-        store.set('currentMode', 'hear');
-        this._startGame();
-        break;
-      case 'sentence-forge':
-        document.getElementById('btn-sentence-forge')?.click();
-        break;
-      case 'grammar-mcq':
-        document.getElementById('btn-grammar-mcq')?.click();
-        break;
-      case 'vocab-mcq':
-        document.getElementById('btn-vocab-mcq')?.click();
-        break;
-      case 'paper-mode':
-        document.getElementById('btn-paper-mode')?.click();
-        break;
-      case 'cloze-castle':
-        document.getElementById('btn-cloze-castle')?.click();
-        break;
-      case 'word-vault':
-        document.getElementById('btn-word-vault')?.click();
-        break;
-      case 'editing-quest':
-        document.getElementById('btn-editing-quest')?.click();
-        break;
-      case 'writing-quest':
-        document.getElementById('btn-writing-quest')?.click();
-        break;
-      case 'sight-words':
-        document.getElementById('btn-sight-words')?.click();
-        break;
-      case 'stories':
-        document.getElementById('btn-stories')?.click();
-        break;
-      case 'visual-text':
-      case 'comprehension-cloze':
-      case 'open-comprehension':
-      case 'synthesis':
-      case 'situational-writing':
-      case 'p1-practice-tests':
-      case 'p2-practice-tests':
-      case 'p3-practice-tests':
-      case 'p4-practice-tests':
-      case 'p5-practice-tests':
-      case 'p6-practice-tests':
-      case 'listening-comp':
-        this._openPrimaryPlaceholder(target);
-        break;
-      default:
-        // Any bare game-mode key (first, last, middle, oddOneOut, syllable,
-        // soundHunt, segment, …) starts that mode directly — journey-aware
-        // warm-up steps navigate this way.
-        if (MODES[target]) {
-          this._mode = target;
-          store.set('currentMode', target);
-          this._startGame();
-        }
-        break;
+    const ok = navigationRouter.navigateTo(target, group, {
+      setMode: (mode) => { this._mode = mode; store.set('currentMode', mode); },
+      setGroup: (g) => store.set('currentGroup', g),
+      getCurrentGroup: () => store.get('currentGroup') || undefined,
+      startGame: (g) => this._startGame(g),
+      openBlendPicker: () => this._openBlendPicker(),
+      openPrimaryPlaceholder: (t) => this._openPrimaryPlaceholder(t),
+    });
+    if (!ok && import.meta.env?.DEV) {
+      console.warn('[Nav] unknown target:', target);
     }
   }
 
