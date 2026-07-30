@@ -25,8 +25,12 @@ function stubBrowserGlobals() {
   if (!globalThis.AudioContext) {
     globalThis.AudioContext = class {
       constructor() {}
-      createOscillator() { return { connect() {}, start() {}, stop() {} }; }
-      createGain() { return { connect() {}, gain: { value: 0 } }; }
+      createOscillator() {
+        return { connect() {}, start() {}, stop() {} };
+      }
+      createGain() {
+        return { connect() {}, gain: { value: 0 } };
+      }
     };
   }
   // Avoid noisy warnings from clipboard checks
@@ -124,10 +128,10 @@ describe('user-flow: P5 user opens Word Vault in Exam Mode', () => {
     initWordVault(root, () => {});
     showVaultBrowser();
 
-    const firstCat = [...root.querySelectorAll('.wv-cat-btn')].find(b => {
+    const firstCat = [...root.querySelectorAll('.wv-cat-btn')].find((b) => {
       const key = b.dataset.cat;
       const levels = vocabPassages[key] || {};
-      return Object.values(levels).some(arr => (arr || []).length);
+      return Object.values(levels).some((arr) => (arr || []).length);
     });
     expect(firstCat).not.toBeNull();
     firstCat.click();
@@ -155,8 +159,7 @@ describe('user-flow: P6 user starts a real paper from Paper Mode', () => {
   });
 
   it('launches the interactive timed runner and submits a section without practice feedback', async () => {
-    const { initPaperMode, showPaperModeBrowser } =
-      await import('../modes/paperMode.js');
+    const { initPaperMode, showPaperModeBrowser } = await import('../modes/paperMode.js');
 
     const root = document.getElementById('root');
     initPaperMode(root, {
@@ -180,8 +183,9 @@ describe('user-flow: P6 user starts a real paper from Paper Mode', () => {
     // Answer the first MCQ correctly and submit it. Test Mode records the
     // mark but withholds inline teaching feedback until the paper summary.
     const firstAnswer = root.querySelector('input[type="radio"]');
-    const correct = [...root.querySelectorAll(`input[name="${firstAnswer.name}"]`)]
-      .find(input => input.value === firstAnswer.dataset.answer);
+    const correct = [...root.querySelectorAll(`input[name="${firstAnswer.name}"]`)].find(
+      (input) => input.value === firstAnswer.dataset.answer,
+    );
     correct.checked = true;
     root.querySelector('[data-action="check"]').click();
     expect(root.querySelectorAll('.ptg-feedback:not([hidden])').length).toBe(0);
@@ -205,8 +209,20 @@ describe('user-flow: parent dashboard report card', () => {
     const card = buildParentReportCard({
       profile: { name: 'Aarav', primaryGrade: 'P4', avatar: '🦊' },
       weakSkills: [
-        { skill: 'svAgreement', label: 'Subject-verb agreement', score: 0.42, domain: 'grammar' },
-        { skill: 'connectorClue', label: 'Connector clue', score: 0.55, domain: 'grammar' },
+        {
+          skill: 'svAgreement',
+          label: 'Subject-verb agreement',
+          score: 0.42,
+          domain: 'grammar',
+          attempts: 24,
+        },
+        {
+          skill: 'connectorClue',
+          label: 'Connector clue',
+          score: 0.55,
+          domain: 'grammar',
+          attempts: 18,
+        },
       ],
       strengths: [{ skill: 'pronouns', label: 'Pronouns', score: 0.92 }],
       recentMistakes: [
@@ -229,7 +245,7 @@ describe('user-flow: parent dashboard report card', () => {
     expect(message).toMatch(/Aarav/);
     expect(message).toMatch(/Subject-verb agreement/);
     expect(message).toMatch(/Today's 10 min/);
-    expect(message).toMatch(/Teacher's note/);
+    expect(message).toMatch(/Automated learning summary/);
   });
 });
 
@@ -243,8 +259,7 @@ describe('user-flow: imported profile keeps primaryGrade and readingBand', () =>
   });
 
   it('importProfile preserves primaryGrade, readingBand and progress', async () => {
-    const { importProfile, parseProfileImportPayload } =
-      await import('../modules/profiles.js');
+    const { importProfile, parseProfileImportPayload } = await import('../modules/profiles.js');
 
     const exportPayload = {
       _type: 'phonicsquest_profile_export',
@@ -262,7 +277,7 @@ describe('user-flow: imported profile keeps primaryGrade and readingBand', () =>
       progressData: {
         xp: 480,
         level: 5,
-        wordStats: { 'cat': { attempts: 6, correct: 5 } },
+        wordStats: { cat: { attempts: 6, correct: 5 } },
         wvWeakSkills: { P5: { collocation: { attempts: 4, wrong: 3, lastSeenAt: 1 } } },
       },
     };
