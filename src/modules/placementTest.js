@@ -33,16 +33,46 @@ import { audio } from './audio.js';
  * Ordered list — index = phase - 1.
  */
 export const PLACEMENT_PHASES = [
-  { phase: 1, label: 'Phase 1 — CVC',            fallbackGroup: 'cvc-a',   seedWords: ['cat', 'bed', 'sit', 'dog', 'map', 'sun'] },
-  { phase: 2, label: 'Phase 2 — Initial blends', fallbackGroup: 'ccvc-a',  seedWords: ['flag', 'frog', 'step', 'skip', 'plan'] },
-  { phase: 3, label: 'Phase 3 — Final blends',   fallbackGroup: 'cvcc-a',  seedWords: ['best', 'lamp', 'gift', 'sand', 'hand'] },
-  { phase: 4, label: 'Phase 4 — Digraphs',       fallbackGroup: 'digraphs', seedWords: ['ship', 'chin', 'that', 'thin', 'chop'] },
-  { phase: 5, label: 'Phase 5 — Both-end blends', fallbackGroup: 'ccvcc-a', seedWords: ['stamp', 'blend', 'print', 'blank', 'crisp'] },
+  {
+    phase: 1,
+    label: 'Phase 1 — CVC',
+    fallbackGroup: 'cvc-a',
+    seedWords: ['cat', 'bed', 'sit', 'dog', 'map', 'sun'],
+  },
+  {
+    phase: 2,
+    label: 'Phase 2 — Initial blends',
+    fallbackGroup: 'ccvc-a',
+    seedWords: ['flag', 'frog', 'step', 'skip', 'plan'],
+  },
+  {
+    phase: 3,
+    label: 'Phase 3 — Final blends',
+    fallbackGroup: 'cvcc-a',
+    seedWords: ['best', 'lamp', 'gift', 'sand', 'hand'],
+  },
+  {
+    phase: 4,
+    label: 'Phase 4 — Digraphs',
+    fallbackGroup: 'digraphs',
+    seedWords: ['ship', 'chin', 'that', 'thin', 'chop'],
+  },
+  {
+    phase: 5,
+    label: 'Phase 5 — Both-end blends',
+    fallbackGroup: 'ccvcc-a',
+    seedWords: ['stamp', 'blend', 'print', 'blank', 'crisp'],
+  },
   // Phase 6 fallback points at the FIRST long-vowel micro-stage (a_e) so
   // a child placed here lands on the easiest entry point — the macro-group
   // `long-a` no longer exists as a curriculum stage after the spelling-
   // pattern split.
-  { phase: 6, label: 'Phase 6 — Long vowels',    fallbackGroup: 'long-a-ae', seedWords: ['cake', 'kite', 'home', 'rain', 'bike'] },
+  {
+    phase: 6,
+    label: 'Phase 6 — Long vowels',
+    fallbackGroup: 'long-a-ae',
+    seedWords: ['cake', 'kite', 'home', 'rain', 'bike'],
+  },
 ];
 
 const MAX_PLACEMENT_PHASE = PLACEMENT_PHASES.length;
@@ -67,23 +97,58 @@ const MAX_PLACEMENT_PHASE = PLACEMENT_PHASES.length;
  * routing logic (gateScores → readingBand → home layout) keeps working.
  */
 export const STAGES = [
-  { id: 'picture-id',         label: 'Picture identification',  icon: '🖼️', legacyGate: 'A',
-    summary: 'Tap the picture I name. Tests attention and basic vocabulary.' },
-  { id: 'known-vocab',        label: 'Known vocabulary',        icon: '📚', legacyGate: 'A',
-    summary: 'Tap a slightly trickier picture from a spoken word.' },
-  { id: 'phonemic-awareness', label: 'Phonemic awareness',      icon: '👂', legacyGate: 'A',
-    summary: 'Hear the first, last and middle sounds in short words.' },
-  { id: 'letter-sounds',      label: 'Letter sounds',           icon: '🔤', legacyGate: 'A',
-    summary: 'Know the sound each letter makes.' },
-  { id: 'blending',           label: 'Sound blending',          icon: '🔗', legacyGate: 'A',
-    summary: 'Hear /c/ /a/ /t/ — blend it into "cat".' },
-  { id: 'reading',            label: 'Reading',                 icon: '📖', legacyGate: 'B',
-    summary: 'Read decodable words and short sentences.' },
-  { id: 'grammar-vocab',      label: 'Grammar & vocabulary',    icon: '✏️', legacyGate: 'D',
-    summary: 'Build sentences, choose grammar, understand words in context.' },
+  {
+    id: 'picture-id',
+    label: 'Picture identification',
+    icon: '🖼️',
+    legacyGate: 'A',
+    summary: 'Tap the picture I name. Tests attention and basic vocabulary.',
+  },
+  {
+    id: 'known-vocab',
+    label: 'Known vocabulary',
+    icon: '📚',
+    legacyGate: 'A',
+    summary: 'Tap a slightly trickier picture from a spoken word.',
+  },
+  {
+    id: 'phonemic-awareness',
+    label: 'Phonemic awareness',
+    icon: '👂',
+    legacyGate: 'A',
+    summary: 'Hear the first, last and middle sounds in short words.',
+  },
+  {
+    id: 'letter-sounds',
+    label: 'Letter sounds',
+    icon: '🔤',
+    legacyGate: 'A',
+    summary: 'Know the sound each letter makes.',
+  },
+  {
+    id: 'blending',
+    label: 'Sound blending',
+    icon: '🔗',
+    legacyGate: 'A',
+    summary: 'Hear /c/ /a/ /t/ — blend it into "cat".',
+  },
+  {
+    id: 'reading',
+    label: 'Reading',
+    icon: '📖',
+    legacyGate: 'B',
+    summary: 'Read decodable words and short sentences.',
+  },
+  {
+    id: 'grammar-vocab',
+    label: 'Grammar & vocabulary',
+    icon: '✏️',
+    legacyGate: 'D',
+    summary: 'Build sentences, choose grammar, understand words in context.',
+  },
 ];
 
-export const STAGE_IDS = STAGES.map(s => s.id);
+export const STAGE_IDS = STAGES.map((s) => s.id);
 
 /**
  * Section → stage map. Every item's `section` (used for scoring) belongs to
@@ -92,24 +157,24 @@ export const STAGE_IDS = STAGES.map(s => s.id);
  * same skill the picture-id stage probes from the child side.
  */
 const _SECTION_TO_STAGE = {
-  oral:             'picture-id',
-  pictureId:        'picture-id',
-  vocab:            'picture-id',          // legacy section name — kept for back-compat scoring
-  knownVocab:       'known-vocab',
-  firstSound:       'phonemic-awareness',
-  lastSound:        'phonemic-awareness',
-  middleSound:      'phonemic-awareness',
-  oralBlending:     'phonemic-awareness',  // oral blend is still PA, not yet print
-  letterSounds:     'letter-sounds',
-  blending:         'blending',
-  decoding:         'reading',
-  sightWords:       'reading',
+  oral: 'picture-id',
+  pictureId: 'picture-id',
+  vocab: 'picture-id', // legacy section name — kept for back-compat scoring
+  knownVocab: 'known-vocab',
+  firstSound: 'phonemic-awareness',
+  lastSound: 'phonemic-awareness',
+  middleSound: 'phonemic-awareness',
+  oralBlending: 'phonemic-awareness', // oral blend is still PA, not yet print
+  letterSounds: 'letter-sounds',
+  blending: 'blending',
+  decoding: 'reading',
+  sightWords: 'reading',
   connectedReading: 'reading',
-  comprehension:    'reading',
-  storyReadiness:   'reading',
-  sentenceReady:    'grammar-vocab',
-  grammarReady:     'grammar-vocab',
-  vocabularyReady:  'grammar-vocab',
+  comprehension: 'reading',
+  storyReadiness: 'reading',
+  sentenceReady: 'grammar-vocab',
+  grammarReady: 'grammar-vocab',
+  vocabularyReady: 'grammar-vocab',
 };
 
 const GATE_A_ITEMS = [
@@ -140,7 +205,7 @@ const GATE_A_ITEMS = [
     id: 'a-pic-1',
     gate: 'A',
     stage: 'picture-id',
-    section: 'vocab',                                  // legacy section name preserved
+    section: 'vocab', // legacy section name preserved
     kind: 'picture-choice',
     title: 'Picture identification',
     prompt: 'Tap the fish.',
@@ -203,9 +268,9 @@ const GATE_A_ITEMS = [
     correct: 'banana',
     options: [
       { id: 'banana', emoji: '🍌', label: 'Banana' },
-      { id: 'truck',  emoji: '🚚', label: 'Truck' },
+      { id: 'truck', emoji: '🚚', label: 'Truck' },
       { id: 'pencil', emoji: '✏️', label: 'Pencil' },
-      { id: 'rain',   emoji: '🌧️', label: 'Rain' },
+      { id: 'rain', emoji: '🌧️', label: 'Rain' },
     ],
   },
   {
@@ -219,10 +284,10 @@ const GATE_A_ITEMS = [
     speak: 'running',
     correct: 'runner',
     options: [
-      { id: 'runner',  emoji: '🏃', label: 'Running' },
-      { id: 'sitter',  emoji: '🧎', label: 'Kneeling' },
+      { id: 'runner', emoji: '🏃', label: 'Running' },
+      { id: 'sitter', emoji: '🧎', label: 'Kneeling' },
       { id: 'sleeper', emoji: '😴', label: 'Sleeping' },
-      { id: 'reader',  emoji: '📖', label: 'Reading' },
+      { id: 'reader', emoji: '📖', label: 'Reading' },
     ],
   },
   {
@@ -236,9 +301,9 @@ const GATE_A_ITEMS = [
     speak: 'hot',
     correct: 'fire',
     options: [
-      { id: 'fire',     emoji: '🔥',  label: 'Fire' },
-      { id: 'ice',      emoji: '🧊',  label: 'Ice' },
-      { id: 'snow',     emoji: '❄️',  label: 'Snow' },
+      { id: 'fire', emoji: '🔥', label: 'Fire' },
+      { id: 'ice', emoji: '🧊', label: 'Ice' },
+      { id: 'snow', emoji: '❄️', label: 'Snow' },
       { id: 'umbrella', emoji: '☂️', label: 'Umbrella' },
     ],
   },
@@ -253,10 +318,10 @@ const GATE_A_ITEMS = [
     speak: 'doctor',
     correct: 'doctor',
     options: [
-      { id: 'doctor',  emoji: '🧑‍⚕️', label: 'Doctor' },
-      { id: 'baker',   emoji: '👨‍🍳', label: 'Cook' },
-      { id: 'farmer',  emoji: '👨‍🌾', label: 'Farmer' },
-      { id: 'driver',  emoji: '🚗', label: 'Driver' },
+      { id: 'doctor', emoji: '🧑‍⚕️', label: 'Doctor' },
+      { id: 'baker', emoji: '👨‍🍳', label: 'Cook' },
+      { id: 'farmer', emoji: '👨‍🌾', label: 'Farmer' },
+      { id: 'driver', emoji: '🚗', label: 'Driver' },
     ],
   },
   // ─────────────────────────────────────────────────────────────────────────
@@ -429,7 +494,8 @@ const GATE_A_ITEMS = [
     section: 'letterSounds',
     kind: 'teacher-scale',
     title: 'Letter-sound knowledge',
-    prompt: 'Teacher score: learner identifies common letter sounds in an adult-led check (no independent print demand).',
+    prompt:
+      'Teacher score: learner identifies common letter sounds in an adult-led check (no independent print demand).',
   },
   {
     id: 'a-letters-2',
@@ -438,7 +504,8 @@ const GATE_A_ITEMS = [
     section: 'letterSounds',
     kind: 'teacher-scale',
     title: 'Letter-sound knowledge',
-    prompt: 'Teacher score: learner identifies vowel sounds (a, e, i, o, u) when letter cards are shown.',
+    prompt:
+      'Teacher score: learner identifies vowel sounds (a, e, i, o, u) when letter cards are shown.',
   },
   // ─────────────────────────────────────────────────────────────────────────
   // STAGE 5 — Oral blending.  Hear separated phonemes, choose the assembled
@@ -509,66 +576,534 @@ const GATE_A_ITEMS = [
  * least once across the bank, distractors are phonetically plausible
  * minimal pairs, and every `group` key exists in curriculum.js.
  * Exported for tests.
+ *
+ * IMPORTANT — the prompt must never contain the target word. These items
+ * used to read `prompt: 'Tap: cat'`, and renderWordChoice prints the prompt
+ * verbatim above the options, so a child who cannot read at all could pass
+ * the decoding gate by matching the prompt string to a button. The word is
+ * delivered by `speak` only (auto-played on render, replayable via 🔊).
+ *
+ * The shared prompt is worded to contain no word that appears as a target or
+ * a distractor anywhere in the bank — "Tap the word you hear" would itself
+ * have leaked `the` (b-sight-2) and `you` (b-sight-10).
+ * curriculumPlacementAlignment.test.js guards both properties.
  */
 export const GATE_B_ITEMS = [
   // ── Phase 1: CVC short vowels ─────────────────────────────────────────────
-  { id: 'b-cvc-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'CVC decoding', prompt: 'Tap: cat', speak: 'cat', correct: 'cat', phase: 1, group: 'cvc-a', options: ['cat', 'cut', 'cot', 'cap'] },
-  { id: 'b-cvc-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: bed', speak: 'bed', correct: 'bed', phase: 1, group: 'cvc-e', options: ['bad', 'bid', 'bed', 'bud'] },
-  { id: 'b-cvc-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: sit', speak: 'sit', correct: 'sit', phase: 1, group: 'cvc-i', options: ['sit', 'set', 'sat', 'bit'] },
-  { id: 'b-cvc-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: dog', speak: 'dog', correct: 'dog', phase: 1, group: 'cvc-o', options: ['dog', 'dig', 'dug', 'hog'] },
-  { id: 'b-cvc-5', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Short vowels', prompt: 'Tap: sun', speak: 'sun', correct: 'sun', phase: 1, group: 'cvc-u', options: ['sun', 'sin', 'fun', 'set'] },
+  {
+    id: 'b-cvc-1',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'CVC decoding',
+    prompt: 'Which word did I say?',
+    speak: 'cat',
+    correct: 'cat',
+    phase: 1,
+    group: 'cvc-a',
+    options: ['cat', 'cut', 'cot', 'cap'],
+  },
+  {
+    id: 'b-cvc-2',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Short vowels',
+    prompt: 'Which word did I say?',
+    speak: 'bed',
+    correct: 'bed',
+    phase: 1,
+    group: 'cvc-e',
+    options: ['bad', 'bid', 'bed', 'bud'],
+  },
+  {
+    id: 'b-cvc-3',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Short vowels',
+    prompt: 'Which word did I say?',
+    speak: 'sit',
+    correct: 'sit',
+    phase: 1,
+    group: 'cvc-i',
+    options: ['sit', 'set', 'sat', 'bit'],
+  },
+  {
+    id: 'b-cvc-4',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Short vowels',
+    prompt: 'Which word did I say?',
+    speak: 'dog',
+    correct: 'dog',
+    phase: 1,
+    group: 'cvc-o',
+    options: ['dog', 'dig', 'dug', 'hog'],
+  },
+  {
+    id: 'b-cvc-5',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Short vowels',
+    prompt: 'Which word did I say?',
+    speak: 'sun',
+    correct: 'sun',
+    phase: 1,
+    group: 'cvc-u',
+    options: ['sun', 'sin', 'fun', 'set'],
+  },
   // ── Phase 2: Initial blends (CCVC) ────────────────────────────────────────
-  { id: 'b-blend-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: flag', speak: 'flag', correct: 'flag', phase: 2, group: 'ccvc-a', options: ['flag', 'flap', 'frog', 'plug'] },
-  { id: 'b-blend-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: frog', speak: 'frog', correct: 'frog', phase: 2, group: 'ccvc-o', options: ['frog', 'fog', 'from', 'grog'] },
-  { id: 'b-blend-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: step', speak: 'step', correct: 'step', phase: 2, group: 'ccvc-e', options: ['step', 'stem', 'stop', 'skip'] },
-  { id: 'b-blend-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Initial blends', prompt: 'Tap: skip', speak: 'skip', correct: 'skip', phase: 2, group: 'ccvc-i', options: ['skip', 'ship', 'slip', 'skim'] },
+  {
+    id: 'b-blend-1',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Initial blends',
+    prompt: 'Which word did I say?',
+    speak: 'flag',
+    correct: 'flag',
+    phase: 2,
+    group: 'ccvc-a',
+    options: ['flag', 'flap', 'frog', 'plug'],
+  },
+  {
+    id: 'b-blend-2',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Initial blends',
+    prompt: 'Which word did I say?',
+    speak: 'frog',
+    correct: 'frog',
+    phase: 2,
+    group: 'ccvc-o',
+    options: ['frog', 'fog', 'from', 'grog'],
+  },
+  {
+    id: 'b-blend-3',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Initial blends',
+    prompt: 'Which word did I say?',
+    speak: 'step',
+    correct: 'step',
+    phase: 2,
+    group: 'ccvc-e',
+    options: ['step', 'stem', 'stop', 'skip'],
+  },
+  {
+    id: 'b-blend-4',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Initial blends',
+    prompt: 'Which word did I say?',
+    speak: 'skip',
+    correct: 'skip',
+    phase: 2,
+    group: 'ccvc-i',
+    options: ['skip', 'ship', 'slip', 'skim'],
+  },
   // ── Phase 3: Final blends (CVCC) ──────────────────────────────────────────
-  { id: 'b-cvcc-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: best', speak: 'best', correct: 'best', phase: 3, group: 'cvcc-e', options: ['best', 'beast', 'bent', 'belt'] },
-  { id: 'b-cvcc-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: lamp', speak: 'lamp', correct: 'lamp', phase: 3, group: 'cvcc-a', options: ['lamp', 'lame', 'camp', 'damp'] },
-  { id: 'b-cvcc-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: gift', speak: 'gift', correct: 'gift', phase: 3, group: 'cvcc-i', options: ['gift', 'gist', 'lift', 'sift'] },
-  { id: 'b-cvcc-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Final blends', prompt: 'Tap: sand', speak: 'sand', correct: 'sand', phase: 3, group: 'cvcc-a', options: ['sand', 'send', 'band', 'said'] },
+  {
+    id: 'b-cvcc-1',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Final blends',
+    prompt: 'Which word did I say?',
+    speak: 'best',
+    correct: 'best',
+    phase: 3,
+    group: 'cvcc-e',
+    options: ['best', 'beast', 'bent', 'belt'],
+  },
+  {
+    id: 'b-cvcc-2',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Final blends',
+    prompt: 'Which word did I say?',
+    speak: 'lamp',
+    correct: 'lamp',
+    phase: 3,
+    group: 'cvcc-a',
+    options: ['lamp', 'lame', 'camp', 'damp'],
+  },
+  {
+    id: 'b-cvcc-3',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Final blends',
+    prompt: 'Which word did I say?',
+    speak: 'gift',
+    correct: 'gift',
+    phase: 3,
+    group: 'cvcc-i',
+    options: ['gift', 'gist', 'lift', 'sift'],
+  },
+  {
+    id: 'b-cvcc-4',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Final blends',
+    prompt: 'Which word did I say?',
+    speak: 'sand',
+    correct: 'sand',
+    phase: 3,
+    group: 'cvcc-a',
+    options: ['sand', 'send', 'band', 'said'],
+  },
   // ── Phase 4: Digraphs ─────────────────────────────────────────────────────
-  { id: 'b-digraph-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: ship', speak: 'ship', correct: 'ship', phase: 4, group: 'digraphs', options: ['chip', 'shop', 'ship', 'slip'] },
-  { id: 'b-digraph-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: chin', speak: 'chin', correct: 'chin', phase: 4, group: 'digraphs', options: ['chin', 'thin', 'shin', 'win'] },
-  { id: 'b-digraph-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: that', speak: 'that', correct: 'that', phase: 4, group: 'digraphs', options: ['that', 'chat', 'flat', 'hat'] },
-  { id: 'b-digraph-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Digraphs', prompt: 'Tap: chop', speak: 'chop', correct: 'chop', phase: 4, group: 'digraphs', options: ['chop', 'shop', 'chip', 'cop'] },
+  {
+    id: 'b-digraph-1',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Digraphs',
+    prompt: 'Which word did I say?',
+    speak: 'ship',
+    correct: 'ship',
+    phase: 4,
+    group: 'digraphs',
+    options: ['chip', 'shop', 'ship', 'slip'],
+  },
+  {
+    id: 'b-digraph-2',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Digraphs',
+    prompt: 'Which word did I say?',
+    speak: 'chin',
+    correct: 'chin',
+    phase: 4,
+    group: 'digraphs',
+    options: ['chin', 'thin', 'shin', 'win'],
+  },
+  {
+    id: 'b-digraph-3',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Digraphs',
+    prompt: 'Which word did I say?',
+    speak: 'that',
+    correct: 'that',
+    phase: 4,
+    group: 'digraphs',
+    options: ['that', 'chat', 'flat', 'hat'],
+  },
+  {
+    id: 'b-digraph-4',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Digraphs',
+    prompt: 'Which word did I say?',
+    speak: 'chop',
+    correct: 'chop',
+    phase: 4,
+    group: 'digraphs',
+    options: ['chop', 'shop', 'chip', 'cop'],
+  },
   // ── Phase 5: Both-end blends (CCVCC) ──────────────────────────────────────
-  { id: 'b-ccvcc-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Both-end blends', prompt: 'Tap: stamp', speak: 'stamp', correct: 'stamp', phase: 5, group: 'ccvcc-a', options: ['stamp', 'stomp', 'stump', 'champ'] },
-  { id: 'b-ccvcc-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Both-end blends', prompt: 'Tap: blend', speak: 'blend', correct: 'blend', phase: 5, group: 'ccvcc-e', options: ['blend', 'blond', 'bland', 'bend'] },
-  { id: 'b-ccvcc-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Both-end blends', prompt: 'Tap: print', speak: 'print', correct: 'print', phase: 5, group: 'ccvcc-i', options: ['print', 'paint', 'plant', 'pint'] },
-  { id: 'b-ccvcc-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Both-end blends', prompt: 'Tap: crisp', speak: 'crisp', correct: 'crisp', phase: 5, group: 'ccvcc-i', options: ['crisp', 'crust', 'clasp', 'grasp'] },
+  {
+    id: 'b-ccvcc-1',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Both-end blends',
+    prompt: 'Which word did I say?',
+    speak: 'stamp',
+    correct: 'stamp',
+    phase: 5,
+    group: 'ccvcc-a',
+    options: ['stamp', 'stomp', 'stump', 'champ'],
+  },
+  {
+    id: 'b-ccvcc-2',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Both-end blends',
+    prompt: 'Which word did I say?',
+    speak: 'blend',
+    correct: 'blend',
+    phase: 5,
+    group: 'ccvcc-e',
+    options: ['blend', 'blond', 'bland', 'bend'],
+  },
+  {
+    id: 'b-ccvcc-3',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Both-end blends',
+    prompt: 'Which word did I say?',
+    speak: 'print',
+    correct: 'print',
+    phase: 5,
+    group: 'ccvcc-i',
+    options: ['print', 'paint', 'plant', 'pint'],
+  },
+  {
+    id: 'b-ccvcc-4',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Both-end blends',
+    prompt: 'Which word did I say?',
+    speak: 'crisp',
+    correct: 'crisp',
+    phase: 5,
+    group: 'ccvcc-i',
+    options: ['crisp', 'crust', 'clasp', 'grasp'],
+  },
   // ── Phase 6: Long vowels ──────────────────────────────────────────────────
-  { id: 'b-long-1', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: cake', speak: 'cake', correct: 'cake', phase: 6, group: 'long-a-ae', options: ['cake', 'cane', 'cook', 'kick'] },
-  { id: 'b-long-2', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: kite', speak: 'kite', correct: 'kite', phase: 6, group: 'long-i-ie', options: ['kite', 'kit', 'bite', 'site'] },
-  { id: 'b-long-3', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: home', speak: 'home', correct: 'home', phase: 6, group: 'long-o-oe', options: ['home', 'hone', 'some', 'come'] },
-  { id: 'b-long-4', gate: 'B', stage: 'reading', section: 'decoding', kind: 'word-choice', title: 'Long vowels', prompt: 'Tap: rain', speak: 'rain', correct: 'rain', phase: 6, group: 'long-a-ai', options: ['rain', 'ran', 'rail', 'run'] },
+  {
+    id: 'b-long-1',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Long vowels',
+    prompt: 'Which word did I say?',
+    speak: 'cake',
+    correct: 'cake',
+    phase: 6,
+    group: 'long-a-ae',
+    options: ['cake', 'cane', 'cook', 'kick'],
+  },
+  {
+    id: 'b-long-2',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Long vowels',
+    prompt: 'Which word did I say?',
+    speak: 'kite',
+    correct: 'kite',
+    phase: 6,
+    group: 'long-i-ie',
+    options: ['kite', 'kit', 'bite', 'site'],
+  },
+  {
+    id: 'b-long-3',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Long vowels',
+    prompt: 'Which word did I say?',
+    speak: 'home',
+    correct: 'home',
+    phase: 6,
+    group: 'long-o-oe',
+    options: ['home', 'hone', 'some', 'come'],
+  },
+  {
+    id: 'b-long-4',
+    gate: 'B',
+    stage: 'reading',
+    section: 'decoding',
+    kind: 'word-choice',
+    title: 'Long vowels',
+    prompt: 'Which word did I say?',
+    speak: 'rain',
+    correct: 'rain',
+    phase: 6,
+    group: 'long-a-ai',
+    options: ['rain', 'ran', 'rail', 'run'],
+  },
   // ── Sight words ───────────────────────────────────────────────────────────
-  { id: 'b-sight-1', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: said', speak: 'said', correct: 'said', options: ['seed', 'said', 'sad', 'sail'] },
-  { id: 'b-sight-2', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: the', speak: 'the', correct: 'the', options: ['the', 'then', 'them', 'that'] },
-  { id: 'b-sight-3', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: was', speak: 'was', correct: 'was', options: ['was', 'saw', 'has', 'gas'] },
-  { id: 'b-sight-4', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: they', speak: 'they', correct: 'they', options: ['they', 'them', 'then', 'the'] },
-  { id: 'b-sight-5', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: have', speak: 'have', correct: 'have', options: ['have', 'gave', 'live', 'cave'] },
-  { id: 'b-sight-6', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: look', speak: 'look', correct: 'look', options: ['look', 'took', 'book', 'good'] },
-  { id: 'b-sight-7', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: come', speak: 'come', correct: 'come', options: ['come', 'came', 'some', 'cone'] },
-  { id: 'b-sight-8', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: were', speak: 'were', correct: 'were', options: ['were', 'where', 'wear', 'we'] },
-  { id: 'b-sight-9', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: one', speak: 'one', correct: 'one', options: ['one', 'on', 'own', 'once'] },
-  { id: 'b-sight-10', gate: 'B', stage: 'reading', section: 'sightWords', kind: 'word-choice', title: 'Sight words', prompt: 'Tap: you', speak: 'you', correct: 'you', options: ['you', 'your', 'yes', 'out'] },
+  {
+    id: 'b-sight-1',
+    gate: 'B',
+    stage: 'reading',
+    section: 'sightWords',
+    kind: 'word-choice',
+    title: 'Sight words',
+    prompt: 'Which word did I say?',
+    speak: 'said',
+    correct: 'said',
+    options: ['seed', 'said', 'sad', 'sail'],
+  },
+  {
+    id: 'b-sight-2',
+    gate: 'B',
+    stage: 'reading',
+    section: 'sightWords',
+    kind: 'word-choice',
+    title: 'Sight words',
+    prompt: 'Which word did I say?',
+    speak: 'the',
+    correct: 'the',
+    options: ['the', 'then', 'them', 'that'],
+  },
+  {
+    id: 'b-sight-3',
+    gate: 'B',
+    stage: 'reading',
+    section: 'sightWords',
+    kind: 'word-choice',
+    title: 'Sight words',
+    prompt: 'Which word did I say?',
+    speak: 'was',
+    correct: 'was',
+    options: ['was', 'saw', 'has', 'gas'],
+  },
+  {
+    id: 'b-sight-4',
+    gate: 'B',
+    stage: 'reading',
+    section: 'sightWords',
+    kind: 'word-choice',
+    title: 'Sight words',
+    prompt: 'Which word did I say?',
+    speak: 'they',
+    correct: 'they',
+    options: ['they', 'them', 'then', 'the'],
+  },
+  {
+    id: 'b-sight-5',
+    gate: 'B',
+    stage: 'reading',
+    section: 'sightWords',
+    kind: 'word-choice',
+    title: 'Sight words',
+    prompt: 'Which word did I say?',
+    speak: 'have',
+    correct: 'have',
+    options: ['have', 'gave', 'live', 'cave'],
+  },
+  {
+    id: 'b-sight-6',
+    gate: 'B',
+    stage: 'reading',
+    section: 'sightWords',
+    kind: 'word-choice',
+    title: 'Sight words',
+    prompt: 'Which word did I say?',
+    speak: 'look',
+    correct: 'look',
+    options: ['look', 'took', 'book', 'good'],
+  },
+  {
+    id: 'b-sight-7',
+    gate: 'B',
+    stage: 'reading',
+    section: 'sightWords',
+    kind: 'word-choice',
+    title: 'Sight words',
+    prompt: 'Which word did I say?',
+    speak: 'come',
+    correct: 'come',
+    options: ['come', 'came', 'some', 'cone'],
+  },
+  {
+    id: 'b-sight-8',
+    gate: 'B',
+    stage: 'reading',
+    section: 'sightWords',
+    kind: 'word-choice',
+    title: 'Sight words',
+    prompt: 'Which word did I say?',
+    speak: 'were',
+    correct: 'were',
+    options: ['were', 'where', 'wear', 'we'],
+  },
+  {
+    id: 'b-sight-9',
+    gate: 'B',
+    stage: 'reading',
+    section: 'sightWords',
+    kind: 'word-choice',
+    title: 'Sight words',
+    prompt: 'Which word did I say?',
+    speak: 'one',
+    correct: 'one',
+    options: ['one', 'on', 'own', 'once'],
+  },
+  {
+    id: 'b-sight-10',
+    gate: 'B',
+    stage: 'reading',
+    section: 'sightWords',
+    kind: 'word-choice',
+    title: 'Sight words',
+    prompt: 'Which word did I say?',
+    speak: 'you',
+    correct: 'you',
+    options: ['you', 'your', 'yes', 'out'],
+  },
 ];
 
 const GATE_C_ITEMS = [
   // ── Decodable word reading ────────────────────────────────────────────────
   {
-    id: 'c-word-1', gate: 'C', stage: 'reading', section: 'connectedReading', kind: 'word-choice', title: 'Decodable reading',
-    prompt: 'Tap: jump', speak: 'jump', correct: 'jump', options: ['jump', 'lump', 'lamp', 'hump'],
+    id: 'c-word-1',
+    gate: 'C',
+    stage: 'reading',
+    section: 'connectedReading',
+    kind: 'word-choice',
+    title: 'Decodable reading',
+    prompt: 'Tap: jump',
+    speak: 'jump',
+    correct: 'jump',
+    options: ['jump', 'lump', 'lamp', 'hump'],
   },
   {
-    id: 'c-word-2', gate: 'C', stage: 'reading', section: 'connectedReading', kind: 'word-choice', title: 'Decodable reading',
-    prompt: 'Tap: help', speak: 'help', correct: 'help', options: ['help', 'held', 'heap', 'helm'],
+    id: 'c-word-2',
+    gate: 'C',
+    stage: 'reading',
+    section: 'connectedReading',
+    kind: 'word-choice',
+    title: 'Decodable reading',
+    prompt: 'Tap: help',
+    speak: 'help',
+    correct: 'help',
+    options: ['help', 'held', 'heap', 'helm'],
   },
   // ── Sentence reading ──────────────────────────────────────────────────────
   {
-    id: 'c-sentence-1', gate: 'C', stage: 'reading', section: 'connectedReading', kind: 'sentence-choice', title: 'Sentence reading',
-    sentence: 'The cat can hop.', prompt: 'Read and choose the matching picture.',
+    id: 'c-sentence-1',
+    gate: 'C',
+    stage: 'reading',
+    section: 'connectedReading',
+    kind: 'sentence-choice',
+    title: 'Sentence reading',
+    sentence: 'The cat can hop.',
+    prompt: 'Read and choose the matching picture.',
     correct: 'cat-hop',
     options: [
       { id: 'cat-hop', emoji: '🐱↗️', label: 'Cat can hop' },
@@ -578,8 +1113,14 @@ const GATE_C_ITEMS = [
     ],
   },
   {
-    id: 'c-sentence-2', gate: 'C', stage: 'reading', section: 'connectedReading', kind: 'sentence-choice', title: 'Sentence reading',
-    sentence: 'The dog sat on the rug.', prompt: 'Read and choose the matching picture.',
+    id: 'c-sentence-2',
+    gate: 'C',
+    stage: 'reading',
+    section: 'connectedReading',
+    kind: 'sentence-choice',
+    title: 'Sentence reading',
+    sentence: 'The dog sat on the rug.',
+    prompt: 'Read and choose the matching picture.',
     correct: 'dog-rug',
     options: [
       { id: 'dog-rug', emoji: '🐶🟫', label: 'Dog on rug' },
@@ -590,19 +1131,35 @@ const GATE_C_ITEMS = [
   },
   // ── Read aloud readiness (teacher-scale) ──────────────────────────────────
   {
-    id: 'c-readaloud-1', gate: 'C', stage: 'reading', section: 'storyReadiness', kind: 'teacher-scale',
+    id: 'c-readaloud-1',
+    gate: 'C',
+    stage: 'reading',
+    section: 'storyReadiness',
+    kind: 'teacher-scale',
     title: 'Read aloud readiness',
     prompt: 'Teacher score: learner reads 1–2 short decodable sentences with support.',
   },
   {
-    id: 'c-readaloud-2', gate: 'C', stage: 'reading', section: 'storyReadiness', kind: 'teacher-scale',
+    id: 'c-readaloud-2',
+    gate: 'C',
+    stage: 'reading',
+    section: 'storyReadiness',
+    kind: 'teacher-scale',
     title: 'Read aloud fluency',
-    prompt: 'Teacher score: learner reads short sentences without heavy sounding-out on every word.',
+    prompt:
+      'Teacher score: learner reads short sentences without heavy sounding-out on every word.',
   },
   // ── Comprehension ─────────────────────────────────────────────────────────
   {
-    id: 'c-comp-1', gate: 'C', stage: 'reading', section: 'comprehension', kind: 'picture-choice', title: 'Comprehension',
-    prompt: 'Listen: "Sam had a red cap." Tap what Sam had.', speak: 'red cap', correct: 'cap',
+    id: 'c-comp-1',
+    gate: 'C',
+    stage: 'reading',
+    section: 'comprehension',
+    kind: 'picture-choice',
+    title: 'Comprehension',
+    prompt: 'Listen: "Sam had a red cap." Tap what Sam had.',
+    speak: 'red cap',
+    correct: 'cap',
     options: [
       { id: 'cap', emoji: '🧢', label: 'Cap' },
       { id: 'bag', emoji: '👜', label: 'Bag' },
@@ -611,8 +1168,15 @@ const GATE_C_ITEMS = [
     ],
   },
   {
-    id: 'c-comp-2', gate: 'C', stage: 'reading', section: 'comprehension', kind: 'picture-choice', title: 'Comprehension',
-    prompt: 'Listen: "The frog sat on a log." Where did the frog sit?', speak: 'log', correct: 'log',
+    id: 'c-comp-2',
+    gate: 'C',
+    stage: 'reading',
+    section: 'comprehension',
+    kind: 'picture-choice',
+    title: 'Comprehension',
+    prompt: 'Listen: "The frog sat on a log." Where did the frog sit?',
+    speak: 'log',
+    correct: 'log',
     options: [
       { id: 'log', emoji: '🪵', label: 'Log' },
       { id: 'rock', emoji: '🪨', label: 'Rock' },
@@ -625,39 +1189,74 @@ const GATE_C_ITEMS = [
 const GATE_D_ITEMS = [
   // ── Sentence building (2 items) ───────────────────────────────────────────
   {
-    id: 'd-sentence-1', gate: 'D', stage: 'grammar-vocab', section: 'sentenceReady', kind: 'word-choice', title: 'Sentence building',
+    id: 'd-sentence-1',
+    gate: 'D',
+    stage: 'grammar-vocab',
+    section: 'sentenceReady',
+    kind: 'word-choice',
+    title: 'Sentence building',
     prompt: 'Pick the best sentence:',
     options: ['She is running.', 'She running is.', 'Running she is.', 'Is she running'],
     correct: 'She is running.',
   },
   {
-    id: 'd-sentence-2', gate: 'D', stage: 'grammar-vocab', section: 'sentenceReady', kind: 'word-choice', title: 'Sentence building',
+    id: 'd-sentence-2',
+    gate: 'D',
+    stage: 'grammar-vocab',
+    section: 'sentenceReady',
+    kind: 'word-choice',
+    title: 'Sentence building',
     prompt: 'Pick the best sentence:',
-    options: ['The boy kicked the ball.', 'Kicked the ball boy.', 'Ball the kicked boy.', 'The kicked boy ball.'],
+    options: [
+      'The boy kicked the ball.',
+      'Kicked the ball boy.',
+      'Ball the kicked boy.',
+      'The kicked boy ball.',
+    ],
     correct: 'The boy kicked the ball.',
   },
   // ── Grammar cloze (2 items) ───────────────────────────────────────────────
   {
-    id: 'd-grammar-1', gate: 'D', stage: 'grammar-vocab', section: 'grammarReady', kind: 'word-choice', title: 'Grammar cloze',
+    id: 'd-grammar-1',
+    gate: 'D',
+    stage: 'grammar-vocab',
+    section: 'grammarReady',
+    kind: 'word-choice',
+    title: 'Grammar cloze',
     prompt: 'He ___ to school yesterday.',
     options: ['go', 'goes', 'went', 'going'],
     correct: 'went',
   },
   {
-    id: 'd-grammar-2', gate: 'D', stage: 'grammar-vocab', section: 'grammarReady', kind: 'word-choice', title: 'Grammar cloze',
+    id: 'd-grammar-2',
+    gate: 'D',
+    stage: 'grammar-vocab',
+    section: 'grammarReady',
+    kind: 'word-choice',
+    title: 'Grammar cloze',
     prompt: 'She ___ two cats at home.',
     options: ['has', 'have', 'having', 'had'],
     correct: 'has',
   },
   // ── Vocabulary in context (2 items) ───────────────────────────────────────
   {
-    id: 'd-vocab-1', gate: 'D', stage: 'grammar-vocab', section: 'vocabularyReady', kind: 'word-choice', title: 'Vocabulary in context',
+    id: 'd-vocab-1',
+    gate: 'D',
+    stage: 'grammar-vocab',
+    section: 'vocabularyReady',
+    kind: 'word-choice',
+    title: 'Vocabulary in context',
     prompt: 'The room was dark, so we turned on the ___.',
     options: ['light', 'spoon', 'shoe', 'rain'],
     correct: 'light',
   },
   {
-    id: 'd-vocab-2', gate: 'D', stage: 'grammar-vocab', section: 'vocabularyReady', kind: 'word-choice', title: 'Vocabulary in context',
+    id: 'd-vocab-2',
+    gate: 'D',
+    stage: 'grammar-vocab',
+    section: 'vocabularyReady',
+    kind: 'word-choice',
+    title: 'Vocabulary in context',
     prompt: 'I was thirsty, so I drank some ___.',
     options: ['water', 'bread', 'paper', 'stone'],
     correct: 'water',
@@ -674,20 +1273,22 @@ function _shuffle(arr) {
 }
 
 function _accuracy(results, section) {
-  const rows = results.filter(r => r.section === section && typeof r.correct === 'boolean');
+  const rows = results.filter((r) => r.section === section && typeof r.correct === 'boolean');
   if (!rows.length) return 0;
-  return rows.filter(r => r.correct).length / rows.length;
+  return rows.filter((r) => r.correct).length / rows.length;
 }
 
 function _teacherScore(results, section) {
-  const rows = results.filter(r => r.section === section && typeof r.score === 'number');
+  const rows = results.filter((r) => r.section === section && typeof r.score === 'number');
   if (!rows.length) return 0;
   return rows.reduce((a, b) => a + b.score, 0) / rows.length;
 }
 
 /** Whether a section was actually administered (has any scored rows). */
 function _hasSection(results, section) {
-  return results.some(r => r.section === section && (typeof r.correct === 'boolean' || typeof r.score === 'number'));
+  return results.some(
+    (r) => r.section === section && (typeof r.correct === 'boolean' || typeof r.score === 'number'),
+  );
 }
 
 /**
@@ -707,7 +1308,7 @@ function _weightedPresent(entries) {
 }
 
 function _phaseFromDecoding(results) {
-  const decoding = results.filter(r => r.section === 'decoding');
+  const decoding = results.filter((r) => r.section === 'decoding');
   if (!decoding.length) return { phase: 1, startGroup: PLACEMENT_PHASES[0].fallbackGroup };
 
   const phaseAccuracy = new Map();
@@ -724,7 +1325,7 @@ function _phaseFromDecoding(results) {
   for (let p = 1; p <= MAX_PLACEMENT_PHASE; p++) {
     const b = phaseAccuracy.get(p);
     if (!b) break;
-    if ((b.correct / b.total) >= 0.6) phase = p;
+    if (b.correct / b.total >= 0.6) phase = p;
     else break;
   }
 
@@ -764,10 +1365,19 @@ function _buildPreSeededStats(phase) {
 
 function _recommendedPath(result) {
   const byBand = {
-    'pre-reader': ['letter-sounds', 'first-sound', 'last-sound', 'middle-sound', 'hear', 'oral-blend', 'sight-words', 'stories'],
+    'pre-reader': [
+      'letter-sounds',
+      'first-sound',
+      'last-sound',
+      'middle-sound',
+      'hear',
+      'oral-blend',
+      'sight-words',
+      'stories',
+    ],
     'emerging-decoder': ['blend', 'classicBlend', 'sight-words', 'stories', 'hear'],
     'developing-reader': ['blend', 'stories', 'sight-words', 'sentence-forge'],
-    'reader': ['sentence-forge', 'cloze-castle', 'word-vault', 'editing-quest'],
+    reader: ['sentence-forge', 'cloze-castle', 'word-vault', 'editing-quest'],
   };
   return byBand[result.readingBand] || byBand['pre-reader'];
 }
@@ -787,10 +1397,10 @@ function _severityFor(score) {
 }
 
 const SEVERITY_LABEL = {
-  strong:          '🟢 Strong',
-  developing:      '🟡 Developing',
-  'needs-practice':'🟠 Needs practice',
-  'not-yet':       '🔴 Not yet',
+  strong: '🟢 Strong',
+  developing: '🟡 Developing',
+  'needs-practice': '🟠 Needs practice',
+  'not-yet': '🔴 Not yet',
 };
 
 /**
@@ -803,10 +1413,10 @@ const SEVERITY_LABEL = {
  * "Not tested yet" rather than "Not yet" — these are different things.
  */
 function _computeStageScores(results) {
-  const has = (section) => results.some(r => r.section === section);
+  const has = (section) => results.some((r) => r.section === section);
 
-  const stage1Vocab     = _accuracy(results, 'vocab');
-  const stage1Oral      = _teacherScore(results, 'oral');
+  const stage1Vocab = _accuracy(results, 'vocab');
+  const stage1Oral = _teacherScore(results, 'oral');
   const stage1Composite = _weightedPresent([
     [stage1Vocab, 0.7, has('vocab')],
     [stage1Oral, 0.3, has('oral')],
@@ -814,10 +1424,10 @@ function _computeStageScores(results) {
 
   const stage2 = _accuracy(results, 'knownVocab');
 
-  const firstS  = _accuracy(results, 'firstSound');
-  const lastS   = _accuracy(results, 'lastSound');
+  const firstS = _accuracy(results, 'firstSound');
+  const lastS = _accuracy(results, 'lastSound');
   const middleS = _accuracy(results, 'middleSound');
-  const oralBl  = _accuracy(results, 'oralBlending');
+  const oralBl = _accuracy(results, 'oralBlending');
   const paComposite = _weightedPresent([
     [firstS, 1, has('firstSound')],
     [lastS, 1, has('lastSound')],
@@ -827,11 +1437,11 @@ function _computeStageScores(results) {
 
   const letterSounds = _teacherScore(results, 'letterSounds');
 
-  const decoding         = _accuracy(results, 'decoding');
-  const sightWords       = _accuracy(results, 'sightWords');
+  const decoding = _accuracy(results, 'decoding');
+  const sightWords = _accuracy(results, 'sightWords');
   const connectedReading = _accuracy(results, 'connectedReading');
-  const comprehension    = _accuracy(results, 'comprehension');
-  const storyReadiness   = _teacherScore(results, 'storyReadiness');
+  const comprehension = _accuracy(results, 'comprehension');
+  const storyReadiness = _teacherScore(results, 'storyReadiness');
   const readingComposite = _weightedPresent([
     [decoding, 0.4, has('decoding')],
     [sightWords, 0.2, has('sightWords')],
@@ -840,9 +1450,9 @@ function _computeStageScores(results) {
     [storyReadiness, 0.05, has('storyReadiness')],
   ]);
 
-  const sentenceReady     = _accuracy(results, 'sentenceReady');
-  const grammarReady      = _accuracy(results, 'grammarReady');
-  const vocabularyReady   = _accuracy(results, 'vocabularyReady');
+  const sentenceReady = _accuracy(results, 'sentenceReady');
+  const grammarReady = _accuracy(results, 'grammarReady');
+  const vocabularyReady = _accuracy(results, 'vocabularyReady');
   const grammarVocabComposite = _weightedPresent([
     [sentenceReady, 1, has('sentenceReady')],
     [grammarReady, 1, has('grammarReady')],
@@ -852,47 +1462,53 @@ function _computeStageScores(results) {
   return {
     pictureId: {
       composite: Number(stage1Composite.toFixed(2)),
-      coverage:  (has('vocab') || has('oral')) ? 'tested' : 'not-tested',
+      coverage: has('vocab') || has('oral') ? 'tested' : 'not-tested',
       pictureChoice: Number(stage1Vocab.toFixed(2)),
-      oralResponse:  Number(stage1Oral.toFixed(2)),
+      oralResponse: Number(stage1Oral.toFixed(2)),
     },
     knownVocab: {
       composite: Number(stage2.toFixed(2)),
-      coverage:  has('knownVocab') ? 'tested' : 'not-tested',
+      coverage: has('knownVocab') ? 'tested' : 'not-tested',
     },
     phonemicAwareness: {
-      composite:    Number(paComposite.toFixed(2)),
-      coverage:     (has('firstSound') || has('lastSound') || has('middleSound') || has('oralBlending')) ? 'tested' : 'not-tested',
-      firstSound:   Number(firstS.toFixed(2)),
-      lastSound:    Number(lastS.toFixed(2)),
-      middleSound:  Number(middleS.toFixed(2)),
+      composite: Number(paComposite.toFixed(2)),
+      coverage:
+        has('firstSound') || has('lastSound') || has('middleSound') || has('oralBlending')
+          ? 'tested'
+          : 'not-tested',
+      firstSound: Number(firstS.toFixed(2)),
+      lastSound: Number(lastS.toFixed(2)),
+      middleSound: Number(middleS.toFixed(2)),
       oralBlending: Number(oralBl.toFixed(2)),
     },
     letterSounds: {
       composite: Number(letterSounds.toFixed(2)),
-      coverage:  has('letterSounds') ? 'tested' : 'not-tested',
+      coverage: has('letterSounds') ? 'tested' : 'not-tested',
     },
     blending: {
       // Stage 5 currently shares items with oralBlending — they're the same
       // probe expressed two ways. Surface it as its own stage so the report
       // can recommend the Blend It! mode independently of the PA group.
       composite: Number(oralBl.toFixed(2)),
-      coverage:  has('oralBlending') ? 'tested' : 'not-tested',
+      coverage: has('oralBlending') ? 'tested' : 'not-tested',
     },
     reading: {
-      composite:        Number(readingComposite.toFixed(2)),
-      coverage:         (has('decoding') || has('connectedReading')) ? 'tested' : 'not-tested',
-      decoding:         Number(decoding.toFixed(2)),
-      sightWords:       Number(sightWords.toFixed(2)),
-      sentenceReading:  Number(connectedReading.toFixed(2)),
-      comprehension:    Number(comprehension.toFixed(2)),
-      readAloud:        Number(storyReadiness.toFixed(2)),
+      composite: Number(readingComposite.toFixed(2)),
+      coverage: has('decoding') || has('connectedReading') ? 'tested' : 'not-tested',
+      decoding: Number(decoding.toFixed(2)),
+      sightWords: Number(sightWords.toFixed(2)),
+      sentenceReading: Number(connectedReading.toFixed(2)),
+      comprehension: Number(comprehension.toFixed(2)),
+      readAloud: Number(storyReadiness.toFixed(2)),
     },
     grammarVocab: {
-      composite:       Number(grammarVocabComposite.toFixed(2)),
-      coverage:        (has('sentenceReady') || has('grammarReady') || has('vocabularyReady')) ? 'tested' : 'not-tested',
-      sentenceReady:   Number(sentenceReady.toFixed(2)),
-      grammarReady:    Number(grammarReady.toFixed(2)),
+      composite: Number(grammarVocabComposite.toFixed(2)),
+      coverage:
+        has('sentenceReady') || has('grammarReady') || has('vocabularyReady')
+          ? 'tested'
+          : 'not-tested',
+      sentenceReady: Number(sentenceReady.toFixed(2)),
+      grammarReady: Number(grammarReady.toFixed(2)),
       vocabularyReady: Number(vocabularyReady.toFixed(2)),
     },
   };
@@ -979,9 +1595,9 @@ const GAP_COPY = {
 };
 
 const SEVERITY_PREFIX = {
-  developing:       'is still developing',
+  developing: 'is still developing',
   'needs-practice': 'needs more practice with',
-  'not-yet':        'has not yet shown',
+  'not-yet': 'has not yet shown',
 };
 
 /**
@@ -1007,42 +1623,118 @@ function _computeSkillGaps(stageScores) {
   };
 
   // Stage 1
-  consider('pictureId', 'pictureChoice', stageScores.pictureId.pictureChoice, stageScores.pictureId.coverage);
-  consider('pictureId', 'oralResponse',  stageScores.pictureId.oralResponse,  stageScores.pictureId.coverage);
+  consider(
+    'pictureId',
+    'pictureChoice',
+    stageScores.pictureId.pictureChoice,
+    stageScores.pictureId.coverage,
+  );
+  consider(
+    'pictureId',
+    'oralResponse',
+    stageScores.pictureId.oralResponse,
+    stageScores.pictureId.coverage,
+  );
   // Stage 2
-  consider('knownVocab', 'knownVocab', stageScores.knownVocab.composite, stageScores.knownVocab.coverage);
+  consider(
+    'knownVocab',
+    'knownVocab',
+    stageScores.knownVocab.composite,
+    stageScores.knownVocab.coverage,
+  );
   // Stage 3
-  consider('phonemicAwareness', 'firstSound',   stageScores.phonemicAwareness.firstSound,   stageScores.phonemicAwareness.coverage);
-  consider('phonemicAwareness', 'lastSound',    stageScores.phonemicAwareness.lastSound,    stageScores.phonemicAwareness.coverage);
-  consider('phonemicAwareness', 'middleSound',  stageScores.phonemicAwareness.middleSound,  stageScores.phonemicAwareness.coverage);
-  consider('phonemicAwareness', 'oralBlending', stageScores.phonemicAwareness.oralBlending, stageScores.phonemicAwareness.coverage);
+  consider(
+    'phonemicAwareness',
+    'firstSound',
+    stageScores.phonemicAwareness.firstSound,
+    stageScores.phonemicAwareness.coverage,
+  );
+  consider(
+    'phonemicAwareness',
+    'lastSound',
+    stageScores.phonemicAwareness.lastSound,
+    stageScores.phonemicAwareness.coverage,
+  );
+  consider(
+    'phonemicAwareness',
+    'middleSound',
+    stageScores.phonemicAwareness.middleSound,
+    stageScores.phonemicAwareness.coverage,
+  );
+  consider(
+    'phonemicAwareness',
+    'oralBlending',
+    stageScores.phonemicAwareness.oralBlending,
+    stageScores.phonemicAwareness.coverage,
+  );
   // Stage 4
-  consider('letterSounds', 'letterSounds', stageScores.letterSounds.composite, stageScores.letterSounds.coverage);
+  consider(
+    'letterSounds',
+    'letterSounds',
+    stageScores.letterSounds.composite,
+    stageScores.letterSounds.coverage,
+  );
   // Stage 5
   consider('blending', 'blending', stageScores.blending.composite, stageScores.blending.coverage);
   // Stage 6
-  consider('reading', 'decoding',        stageScores.reading.decoding,        stageScores.reading.coverage);
-  consider('reading', 'sightWords',      stageScores.reading.sightWords,      stageScores.reading.coverage);
-  consider('reading', 'sentenceReading', stageScores.reading.sentenceReading, stageScores.reading.coverage);
-  consider('reading', 'comprehension',   stageScores.reading.comprehension,   stageScores.reading.coverage);
-  consider('reading', 'readAloud',       stageScores.reading.readAloud,       stageScores.reading.coverage);
+  consider('reading', 'decoding', stageScores.reading.decoding, stageScores.reading.coverage);
+  consider('reading', 'sightWords', stageScores.reading.sightWords, stageScores.reading.coverage);
+  consider(
+    'reading',
+    'sentenceReading',
+    stageScores.reading.sentenceReading,
+    stageScores.reading.coverage,
+  );
+  consider(
+    'reading',
+    'comprehension',
+    stageScores.reading.comprehension,
+    stageScores.reading.coverage,
+  );
+  consider('reading', 'readAloud', stageScores.reading.readAloud, stageScores.reading.coverage);
   // Stage 7
-  consider('grammarVocab', 'sentenceReady',   stageScores.grammarVocab.sentenceReady,   stageScores.grammarVocab.coverage);
-  consider('grammarVocab', 'grammarReady',    stageScores.grammarVocab.grammarReady,    stageScores.grammarVocab.coverage);
-  consider('grammarVocab', 'vocabularyReady', stageScores.grammarVocab.vocabularyReady, stageScores.grammarVocab.coverage);
+  consider(
+    'grammarVocab',
+    'sentenceReady',
+    stageScores.grammarVocab.sentenceReady,
+    stageScores.grammarVocab.coverage,
+  );
+  consider(
+    'grammarVocab',
+    'grammarReady',
+    stageScores.grammarVocab.grammarReady,
+    stageScores.grammarVocab.coverage,
+  );
+  consider(
+    'grammarVocab',
+    'vocabularyReady',
+    stageScores.grammarVocab.vocabularyReady,
+    stageScores.grammarVocab.coverage,
+  );
 
   return gaps;
 }
 
 /** Plain-language description of the reading band, written for parents. */
 const BAND_DESCRIPTION = {
-  'pre-reader':         'Your child is at the very beginning of reading. They are still building oral language, phonemic awareness, and letter-sound knowledge — the foundations they need before reading whole words.',
-  'emerging-decoder':   'Your child knows many letter sounds and is starting to blend them into short words. They are not yet reading sentences on their own.',
-  'developing-reader':  'Your child can decode short words and is starting to read simple sentences. They are building fluency and confidence.',
-  'reader':             'Your child reads short passages independently and is ready to grow vocabulary, grammar, and comprehension at sentence and paragraph level.',
+  'pre-reader':
+    'Your child is at the very beginning of reading. They are still building oral language, phonemic awareness, and letter-sound knowledge — the foundations they need before reading whole words.',
+  'emerging-decoder':
+    'Your child knows many letter sounds and is starting to blend them into short words. They are not yet reading sentences on their own.',
+  'developing-reader':
+    'Your child can decode short words and is starting to read simple sentences. They are building fluency and confidence.',
+  reader:
+    'Your child reads short passages independently and is ready to grow vocabulary, grammar, and comprehension at sentence and paragraph level.',
 };
 
-export { _computeStageScores, _computeSkillGaps, _severityFor, GAP_COPY, BAND_DESCRIPTION, SEVERITY_LABEL };
+export {
+  _computeStageScores,
+  _computeSkillGaps,
+  _severityFor,
+  GAP_COPY,
+  BAND_DESCRIPTION,
+  SEVERITY_LABEL,
+};
 
 export function derivePlacementResult(results, intake = {}, schoolLevel = 'preschool') {
   const oral = _teacherScore(results, 'oral');
@@ -1077,7 +1769,13 @@ export function derivePlacementResult(results, intake = {}, schoolLevel = 'presc
     [letterSounds, 1, hasSec('letterSounds')],
     [oral, 1, hasSec('oral')],
   ]);
-  const gateAChildPresent = ['firstSound', 'lastSound', 'middleSound', 'oralBlending', 'vocab'].some(hasSec);
+  const gateAChildPresent = [
+    'firstSound',
+    'lastSound',
+    'middleSound',
+    'oralBlending',
+    'vocab',
+  ].some(hasSec);
   const gateATeacherPresent = ['letterSounds', 'oral'].some(hasSec);
   const gateAComposite = _weightedPresent([
     [gateAChildScore, 0.7, gateAChildPresent],
@@ -1111,19 +1809,16 @@ export function derivePlacementResult(results, intake = {}, schoolLevel = 'presc
 
   const { phase: phonicsPhase, startGroup } = _phaseFromDecoding(results);
 
-  const storyReadiness = !gateBSecure
-    ? 'not-ready'
-    : gateCSecure
-      ? 'paragraph'
-      : 'sentence';
+  const storyReadiness = !gateBSecure ? 'not-ready' : gateCSecure ? 'paragraph' : 'sentence';
 
-  const sightWordBand = sightWords >= 0.8
-    ? 'strong'
-    : sightWords >= 0.55
-      ? 'developing'
-      : sightWords > 0
-        ? 'early'
-        : 'none';
+  const sightWordBand =
+    sightWords >= 0.8
+      ? 'strong'
+      : sightWords >= 0.55
+        ? 'developing'
+        : sightWords > 0
+          ? 'early'
+          : 'none';
 
   const sentenceReady = readingBand === 'reader' || sentenceReadyScore >= 0.6;
   const grammarReady = readingBand === 'reader' || (gateCSecure && grammarReadyScore >= 0.6);
@@ -1166,14 +1861,16 @@ export function derivePlacementResult(results, intake = {}, schoolLevel = 'presc
       gateATeacherScore: Number(gateATeacherScore.toFixed(2)),
       gateB: Number(decoding.toFixed(2)),
       gateC: Number(gateCComposite.toFixed(2)),
-      gateD: Number((((sentenceReadyScore + grammarReadyScore + vocabularyReadyScore) / 3)).toFixed(2)),
+      gateD: Number(
+        ((sentenceReadyScore + grammarReadyScore + vocabularyReadyScore) / 3).toFixed(2),
+      ),
     },
   };
 
   // Per-stage scores + skill-gap list power the new parent-facing report.
   // Legacy fields above are untouched so routing keeps working.
-  result.stageScores      = _computeStageScores(results);
-  result.skillGaps        = _computeSkillGaps(result.stageScores);
+  result.stageScores = _computeStageScores(results);
+  result.skillGaps = _computeSkillGaps(result.stageScores);
 
   // Foundation routing: a child who cannot yet hear the sounds in words
   // starts at Step 0a (phonemic awareness); one who hears sounds but cannot
@@ -1182,10 +1879,12 @@ export function derivePlacementResult(results, intake = {}, schoolLevel = 'presc
   const paComposite = result.stageScores?.phonemicAwareness?.composite;
   const lsComposite = result.stageScores?.letterSounds?.composite;
   result.startPrePhase =
-    (typeof paComposite === 'number' && paComposite < 0.6) ? '0a'
-    : (typeof lsComposite === 'number' && lsComposite < 0.6) ? '0b'
-    : null;
-  result.bandDescription  = BAND_DESCRIPTION[readingBand] || BAND_DESCRIPTION['pre-reader'];
+    typeof paComposite === 'number' && paComposite < 0.6
+      ? '0a'
+      : typeof lsComposite === 'number' && lsComposite < 0.6
+        ? '0b'
+        : null;
+  result.bandDescription = BAND_DESCRIPTION[readingBand] || BAND_DESCRIPTION['pre-reader'];
 
   result.recommendedHomePath = _recommendedPath(result);
   return result;
@@ -1194,17 +1893,22 @@ export function derivePlacementResult(results, intake = {}, schoolLevel = 'presc
 // ── Parent-facing report renderers ────────────────────────────────────────
 
 const BAND_LABEL = {
-  'pre-reader':        'Pre-reader',
-  'emerging-decoder':  'Emerging decoder',
+  'pre-reader': 'Pre-reader',
+  'emerging-decoder': 'Emerging decoder',
   'developing-reader': 'Developing reader',
-  'reader':            'Reader',
+  reader: 'Reader',
 };
 
-function _pct(score) { return Math.round(score * 100) + '%'; }
+function _pct(score) {
+  return Math.round(score * 100) + '%';
+}
 function _escapeHtml(s) {
   return String(s ?? '')
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 /**
@@ -1217,16 +1921,16 @@ function _escapeHtml(s) {
  * Exported for tests so the report card can be rendered in isolation.
  */
 export function renderPlacementReportHtml(result) {
-  const band  = BAND_LABEL[result.readingBand] || 'Pathway';
-  const desc  = result.bandDescription || BAND_DESCRIPTION[result.readingBand] || '';
+  const band = BAND_LABEL[result.readingBand] || 'Pathway';
+  const desc = result.bandDescription || BAND_DESCRIPTION[result.readingBand] || '';
   const stageScores = result.stageScores || {};
-  const skillGaps   = Array.isArray(result.skillGaps) ? result.skillGaps : [];
+  const skillGaps = Array.isArray(result.skillGaps) ? result.skillGaps : [];
 
   const profileRowsHtml = STAGES.map((stage, idx) => {
     const ss = _stageCompositeFor(stageScores, stage.id);
-    const sev = (ss.coverage === 'not-tested') ? 'not-tested' : _severityFor(ss.composite);
+    const sev = ss.coverage === 'not-tested' ? 'not-tested' : _severityFor(ss.composite);
     const chip = sev === 'not-tested' ? '⚪ Not tested yet' : SEVERITY_LABEL[sev];
-    const pct  = ss.coverage === 'not-tested' ? '—' : _pct(ss.composite);
+    const pct = ss.coverage === 'not-tested' ? '—' : _pct(ss.composite);
     return `
       <li class="pt-profile-row pt-profile-row--${sev}" data-stage="${stage.id}">
         <span class="pt-profile-row__idx">${idx + 1}</span>
@@ -1241,15 +1945,20 @@ export function renderPlacementReportHtml(result) {
     `;
   }).join('');
 
-  const gapCardsHtml = skillGaps.length === 0
-    ? `<div class="pt-gap-empty">🎉 No major gaps — your child is well-placed!</div>`
-    : skillGaps.map(gap => {
-        const stage = STAGES.find(s => _camelStageKey(s.id) === gap.stage);
-        const stageLabel = stage ? `${stage.icon} ${stage.label}` : gap.stage;
-        const modesHtml = gap.recommendedModes.map(m =>
-          `<button class="pt-gap-mode-chip" type="button" data-mode="${_escapeHtml(m)}">${_escapeHtml(m)}</button>`
-        ).join('');
-        return `
+  const gapCardsHtml =
+    skillGaps.length === 0
+      ? `<div class="pt-gap-empty">🎉 No major gaps — your child is well-placed!</div>`
+      : skillGaps
+          .map((gap) => {
+            const stage = STAGES.find((s) => _camelStageKey(s.id) === gap.stage);
+            const stageLabel = stage ? `${stage.icon} ${stage.label}` : gap.stage;
+            const modesHtml = gap.recommendedModes
+              .map(
+                (m) =>
+                  `<button class="pt-gap-mode-chip" type="button" data-mode="${_escapeHtml(m)}">${_escapeHtml(m)}</button>`,
+              )
+              .join('');
+            return `
           <article class="pt-gap-card pt-gap-card--${gap.severity}">
             <header class="pt-gap-card__head">
               <span class="pt-gap-card__stage">${stageLabel}</span>
@@ -1262,7 +1971,8 @@ export function renderPlacementReportHtml(result) {
             </div>
           </article>
         `;
-      }).join('');
+          })
+          .join('');
 
   return `
     <div class="pt-result">
@@ -1300,7 +2010,7 @@ function _stageCompositeFor(stageScores, stageId) {
   if (!s) return { composite: 0, coverage: 'not-tested' };
   return {
     composite: typeof s.composite === 'number' ? s.composite : 0,
-    coverage:  s.coverage || 'not-tested',
+    coverage: s.coverage || 'not-tested',
   };
 }
 
@@ -1319,8 +2029,9 @@ export function openPrintableReport(result) {
   const stageRows = STAGES.map((stage, idx) => {
     const ss = _stageCompositeFor(result.stageScores || {}, stage.id);
     const sev = ss.coverage === 'not-tested' ? 'not-tested' : _severityFor(ss.composite);
-    const chip = sev === 'not-tested' ? 'Not tested yet' : SEVERITY_LABEL[sev].replace(/^[^\s]+\s/, '');
-    const pct  = ss.coverage === 'not-tested' ? '—' : _pct(ss.composite);
+    const chip =
+      sev === 'not-tested' ? 'Not tested yet' : SEVERITY_LABEL[sev].replace(/^[^\s]+\s/, '');
+    const pct = ss.coverage === 'not-tested' ? '—' : _pct(ss.composite);
     return `
       <tr>
         <td>${idx + 1}. ${stage.icon} ${_escapeHtml(stage.label)}</td>
@@ -1331,19 +2042,22 @@ export function openPrintableReport(result) {
   }).join('');
 
   const skillGaps = Array.isArray(result.skillGaps) ? result.skillGaps : [];
-  const gapsHtml = skillGaps.length === 0
-    ? `<p>No major gaps — your child is well-placed.</p>`
-    : skillGaps.map(g => {
-        const stage = STAGES.find(s => _camelStageKey(s.id) === g.stage);
-        const stageLabel = stage ? `${stage.icon} ${stage.label}` : g.stage;
-        return `
+  const gapsHtml =
+    skillGaps.length === 0
+      ? `<p>No major gaps — your child is well-placed.</p>`
+      : skillGaps
+          .map((g) => {
+            const stage = STAGES.find((s) => _camelStageKey(s.id) === g.stage);
+            const stageLabel = stage ? `${stage.icon} ${stage.label}` : g.stage;
+            return `
           <li>
             <strong>${stageLabel} · ${SEVERITY_LABEL[g.severity].replace(/^[^\s]+\s/, '')}</strong><br>
             ${_escapeHtml(g.summary)}<br>
             <em>What helps:</em> ${g.recommendedModes.map(_escapeHtml).join(', ')}
           </li>
         `;
-      }).join('');
+          })
+          .join('');
 
   const intake = result.intake || {};
   const dateStr = new Date().toLocaleDateString();
@@ -1388,14 +2102,18 @@ export function openPrintableReport(result) {
   <ul>${gapsHtml}</ul>
 
   <h2>Decoding placement</h2>
-  <p>Phase: <strong>${_escapeHtml(PLACEMENT_PHASES.find(p => p.phase === result.phonicsPhase)?.label || '—')}</strong><br>
+  <p>Phase: <strong>${_escapeHtml(PLACEMENT_PHASES.find((p) => p.phase === result.phonicsPhase)?.label || '—')}</strong><br>
      Starting group: <strong>${_escapeHtml(result.startGroup || '—')}</strong></p>
 </body></html>`;
   w.document.open();
   w.document.write(docHtml);
   w.document.close();
   // Give the browser a tick to lay out, then open the print dialog.
-  setTimeout(() => { try { w.print(); } catch {} }, 200);
+  setTimeout(() => {
+    try {
+      w.print();
+    } catch {}
+  }, 200);
 }
 
 /**
@@ -1421,7 +2139,13 @@ function _defaultResult(profile) {
     phase: 1,
     startGroup: 'cvc-a',
     preSeededStats: {},
-    soundAwarenessProfile: { firstSound: 0, lastSound: 0, middleSound: 0, oralBlending: 0, letterSounds: 0 },
+    soundAwarenessProfile: {
+      firstSound: 0,
+      lastSound: 0,
+      middleSound: 0,
+      oralBlending: 0,
+      letterSounds: 0,
+    },
     oralLanguageProfile: { basicResponse: 0, receptiveVocabulary: 0 },
     sightWordBand: 'none',
     storyReadiness: 'not-ready',
@@ -1436,7 +2160,7 @@ function _defaultResult(profile) {
 }
 
 export function getNextGateToAppend(baseResult, existingSequence = []) {
-  const gates = new Set(existingSequence.map(i => i.gate));
+  const gates = new Set(existingSequence.map((i) => i.gate));
   const gateA = baseResult?.gateScores?.gateA ?? 0;
   const gateB = baseResult?.gateScores?.gateB ?? 0;
   const gateC = baseResult?.gateScores?.gateC ?? 0;
@@ -1517,12 +2241,15 @@ export function showPlacementTest({ container, profile, onComplete }) {
   }
 
   function bindChoice(item, correctId) {
-    container.querySelectorAll('[data-choice]').forEach(btn => {
+    container.querySelectorAll('[data-choice]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const picked = btn.getAttribute('data-choice');
         const correct = picked === correctId;
         btn.classList.add(correct ? 'pt-choice--correct' : 'pt-choice--wrong');
-        setTimeout(() => answer(item, { correct, selected: picked, phase: item.phase, group: item.group }), 220);
+        setTimeout(
+          () => answer(item, { correct, selected: picked, phase: item.phase, group: item.group }),
+          220,
+        );
       });
     });
 
@@ -1604,8 +2331,10 @@ export function showPlacementTest({ container, profile, onComplete }) {
         </div>
       </div>
     `);
-    container.querySelectorAll('[data-score]').forEach(btn => {
-      btn.addEventListener('click', () => answer(item, { score: Number(btn.getAttribute('data-score')) }));
+    container.querySelectorAll('[data-score]').forEach((btn) => {
+      btn.addEventListener('click', () =>
+        answer(item, { score: Number(btn.getAttribute('data-score')) }),
+      );
     });
   }
 
@@ -1618,12 +2347,16 @@ export function showPlacementTest({ container, profile, onComplete }) {
         <button class="pt-listen-btn" id="pt-listen">🔊 Hear prompt</button>
         <p class="pt-question">${item.prompt}</p>
         <div class="pt-choices" role="group" aria-label="Picture choices">
-          ${opts.map(o => `
+          ${opts
+            .map(
+              (o) => `
             <button class="pt-choice-btn" data-choice="${o.id}" aria-label="${o.label}">
               <span>${o.emoji || ''}</span>
               <small class="${hideText ? 'visually-hidden' : ''}">${o.label}</small>
             </button>
-          `).join('')}
+          `,
+            )
+            .join('')}
         </div>
       </div>
     `);
@@ -1639,11 +2372,13 @@ export function showPlacementTest({ container, profile, onComplete }) {
         <p class="pt-question">${item.prompt}</p>
         ${item.sentence ? `<p class="pt-question pt-question--grammar">${item.sentence}</p>` : ''}
         <div class="pt-choices" role="group">
-          ${opts.map(o => {
-            const value = typeof o === 'string' ? o : o.id;
-            const label = typeof o === 'string' ? o : `${o.emoji || ''} ${o.label}`;
-            return `<button class="pt-choice-btn" data-choice="${value}">${label}</button>`;
-          }).join('')}
+          ${opts
+            .map((o) => {
+              const value = typeof o === 'string' ? o : o.id;
+              const label = typeof o === 'string' ? o : `${o.emoji || ''} ${o.label}`;
+              return `<button class="pt-choice-btn" data-choice="${value}">${label}</button>`;
+            })
+            .join('')}
         </div>
       </div>
     `);
@@ -1680,7 +2415,9 @@ export function showPlacementTest({ container, profile, onComplete }) {
     renderFrame(html, 'Placement Result');
 
     container.querySelector('#pt-start-btn')?.addEventListener('click', () => onComplete(result));
-    container.querySelector('#pt-print-btn')?.addEventListener('click', () => openPrintableReport(result));
+    container
+      .querySelector('#pt-print-btn')
+      ?.addEventListener('click', () => openPrintableReport(result));
   }
 
   renderCurrent();
