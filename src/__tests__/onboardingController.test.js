@@ -125,6 +125,33 @@ describe('onboarding tutorial', () => {
     expect(store.get('onboardingComplete')).toBe(true);
   });
 
+  it('walks all four screens for each band, in the intended order', async () => {
+    const { ONBOARDING_TUTORIAL } = await import('../data/onboardingTutorial.js');
+    const oc = await import('../modules/onboardingController.js');
+
+    for (const band of Object.keys(ONBOARDING_TUTORIAL)) {
+      mountOnboardingDom();
+      oc.showOnboardingTutorial(band, handlers());
+
+      const next = document.getElementById('ob-next');
+      const seen = [];
+      for (let i = 0; i < 4; i++) {
+        seen.push(document.querySelector('.ob-screen-title').textContent.trim());
+        expect(document.querySelectorAll('.ob-dot').length, band).toBe(4);
+        // The active dot must track the step, or the parent loses their place.
+        const dots = [...document.querySelectorAll('.ob-dot')];
+        expect(dots.findIndex(d => d.classList.contains('ob-dot--active')), `${band} step ${i}`).toBe(i);
+        if (i < 3) next.click();
+      }
+
+      // Journey first, then order, then the focus card, then bonuses.
+      expect(seen[0], band).toMatch(/Journey|Bridge/i);
+      expect(seen[1], band).toMatch(/order each day/i);
+      expect(seen[2], band).toMatch(/card every day/i);
+      expect(seen[3], band).toMatch(/Bonus activities/i);
+    }
+  });
+
   it('falls back to the pre-reader deck for an unknown band', async () => {
     mountOnboardingDom();
     const oc = await import('../modules/onboardingController.js');
@@ -140,20 +167,79 @@ describe('onboarding tutorial', () => {
     expect(h.openModal).not.toHaveBeenCalled();
   });
 
-  it('every reading band has at least one authored screen', async () => {
+  it('gives every reading band the same complete 4-screen deck', async () => {
     const { ONBOARDING_TUTORIAL } = await import('../data/onboardingTutorial.js');
-    // NOTE: coverage is currently uneven — pre-reader and reader have the
-    // full 4-screen deck, while emerging-decoder and developing-reader have
-    // only the journey-overview screen. This asserts the floor; see the
-    // module header for the gap.
+    const bands = Object.keys(ONBOARDING_TUTORIAL);
+    expect(bands).toEqual(
+      expect.arrayContaining(['pre-reader', 'emerging-decoder', 'developing-reader', 'reader']),
+    );
+
     for (const [band, screens] of Object.entries(ONBOARDING_TUTORIAL)) {
-      expect(screens.length, band).toBeGreaterThan(0);
+      // Two bands used to ship with only the journey screen, leaving those
+      // parents without the daily order, the Best Next Step explanation or
+      // the bonus-vs-lesson distinction. Pin the full deck so a new band
+      // can't quietly regress to a stub.
+      expect(screens.length, `${band} deck length`).toBe(4);
       for (const s of screens) {
         expect(s.icon, band).toBeTruthy();
         expect(s.title, band).toBeTruthy();
         expect(s.body, band).toBeTruthy();
       }
     }
+  });
+
+  it('orients the adult on order, focus and bonuses in every band', async () => {
+    const { ONBOARDING_TUTORIAL } = await import('../data/onboardingTutorial.js');
+    for (const [band, screens] of Object.entries(ONBOARDING_TUTORIAL)) {
+      const titles = screens.map(s => s.title).join(' | ');
+      expect(titles, band).toMatch(/order each day/i);
+      expect(titles, band).toMatch(/card every day/i);
+      expect(titles, band).toMatch(/bonus activities/i);
+
+      // The daily-order screen must actually lay out numbered steps, and the
+      // bonus screen must say where to find them.
+      const bodies = screens.map(s => s.body).join(' ');
+      expect(bodies, band).toContain('ob-step-num');
+      expect(bodies, band).toMatch(/Extra<\/strong> tab/);
+    }
+  });
+
+  it('only claims Extra-tab activities are in the Extra tab', async () => {
+    // The original decks told parents Sight Words / Stories / Letter Sounds
+    // were in the Extra tab; they are in Learn. Sending an adult to the wrong
+    // tab is a real usability failure, so the copy is pinned to reality.
+    //
+    // Ground truth: of the activities these screens name, only Daily
+    // Challenge, Random Activity and My Trophy Room live under
+    // #home-panel-extra in index.html.
+    const { ONBOARDING_TUTORIAL } = await import('../data/onboardingTutorial.js');
+    const notInExtra = ['Sight Words', 'Giri Stories', 'Letter Sounds', 'Fluency Sprint'];
+
+    for (const [band, screens] of Object.entries(ONBOARDING_TUTORIAL)) {
+      const bonus = screens.find(s => /Bonus activities/i.test(s.title));
+      expect(bonus, `${band} bonus screen`).toBeTruthy();
+
+      // Split the list of Extra-tab items from the trailing note.
+      const list = bonus.body.split('ob-bonus-note')[0];
+      for (const name of notInExtra) {
+        expect(list, `${band}: "${name}" listed as an Extra-tab item`).not.toContain(name);
+      }
+      // And the items it does list are the genuine Extra-tab ones.
+      expect(list, band).toContain('Daily Challenge');
+    }
+  });
+
+  it('names band-appropriate activities rather than generic copy', async () => {
+    const { getTutorialScreens } = await import('../data/onboardingTutorial.js');
+    const bodyOf = band => getTutorialScreens(band).map(s => s.body).join(' ');
+
+    // An emerging decoder is not yet doing sentence construction, and a
+    // reader is not being sent back to letter-sound matching.
+    expect(bodyOf('emerging-decoder')).toMatch(/Blend It!/);
+    expect(bodyOf('emerging-decoder')).not.toMatch(/Cloze Castle|Word Vault/);
+    expect(bodyOf('developing-reader')).toMatch(/Sentence Forge/);
+    expect(bodyOf('reader')).toMatch(/Cloze Castle/);
+    expect(bodyOf('pre-reader')).toMatch(/First Sound|Letter Sounds/);
   });
 });
 
