@@ -26,7 +26,9 @@ import { audio } from './modules/audio.js';
 import { gamification } from './modules/gamification.js';
 import { badges } from './modules/badges.js';
 import { progress, isStageHiddenForMode } from './modules/progress.js';
-import { classifyEvidence } from './modules/evidence.js';
+import { classifyEvidence, EVIDENCE } from './modules/evidence.js';
+import { showBlendConfirm, cleanupBlendConfirm } from './modes/blendConfirm.js';
+import { renderAdultVerdictBar, removeAdultVerdictBar } from './components/adultVerdict.js';
 import {
   isBedtimeActive,
   setBedtimeEnabled,
@@ -909,7 +911,7 @@ class App {
     const mode = MODES[this._mode];
     if (!mode) return;
 
-    const setupMode = () =>
+    const setupMode = () => {
       mode.setup(this._currentWord, {
         ...this._els,
         onResult: (correct, responseTime) => this._handleResult(correct, responseTime),
@@ -919,6 +921,8 @@ class App {
           this._startGame(group || undefined);
         },
       });
+      this._maybeRenderAdultVerdict();
+    };
 
     // Explicit instruction first: the first time a child practises a
     // curriculum stage, Giri teaches it (mini-lesson overlay) before
@@ -930,6 +934,29 @@ class App {
     } else {
       setupMode();
     }
+  }
+
+  /**
+   * Show the grown-up verdict bar when adultObserverMode is on.
+   *
+   * A verdict finishes the word directly: an adult who watched knows more
+   * than any inference we can make from taps, so their mark bypasses both
+   * the mode's evidence ceiling and the blend confirmation round.
+   */
+  _maybeRenderAdultVerdict() {
+    removeAdultVerdictBar();
+    if (!store.get('adultObserverMode')) return;
+
+    renderAdultVerdictBar({
+      anchor: this._els.modeArea,
+      onVerdict: (verdict, correct) => {
+        this._adultVerdict = verdict;
+        const word = this._currentWord;
+        if (!word || this._resultProcessing) return;
+        this._resultProcessing = true;
+        this._commitResult(word, correct, null, null);
+      },
+    });
   }
 
   _nextWord() {
@@ -986,16 +1013,56 @@ class App {
       return;
     }
 
+    // A self-assessed "Yes" is a reflection, not evidence: the app revealed
+    // the phonemes and blended the word aloud before asking. Rather than
+    // bank that claim, ask a question the child has to answer — three
+    // printed words, no audio, no model. That tap is what gets recorded.
+    //
+    // Skipped when a grown-up is marking (their verdict already outranks
+    // anything we could infer) and when the word has no usable distractors.
+    if (correct && MODES[this._mode]?.resultPolicy === 'selfAssess' && !this._adultVerdict) {
+      const shown = showBlendConfirm({
+        word,
+        modeArea: this._els.modeArea,
+        maxLevel: store.get('difficulty') || 1,
+        onDone: (confirmed, confirmMs) =>
+          this._commitResult(word, confirmed, confirmMs, EVIDENCE.INDEPENDENT),
+      });
+      // _resultProcessing stays true so nothing else can commit meanwhile;
+      // _startGame clears it when the next word loads.
+      if (shown) return;
+    }
+
+    this._commitResult(word, correct, responseTime, null);
+  }
+
+  /**
+   * Commit a finished word: record the attempt, then run the reward,
+   * feedback and result-screen flow.
+   *
+   * Split out of _handleResult so the blend confirmation round can defer the
+   * commit until the child has actually answered something.
+   *
+   * @param {object} word
+   * @param {boolean} correct
+   * @param {number} responseTime
+   * @param {import('./modules/evidence.js').EvidenceLevel|null} evidenceOverride
+   *   Set by the confirmation round, whose result IS independent evidence
+   *   regardless of the (self-assessing) mode's own ceiling.
+   */
+  _commitResult(word, correct, responseTime, evidenceOverride = null) {
     const isNew = progress.isNewWord(word.id);
     // Resolve HOW this answer was obtained while the per-word hint and strike
     // state is still live — this is the only point in the app where that
     // context exists alongside the result. See modules/evidence.js.
-    const evidence = classifyEvidence({
-      ceiling: MODES[this._mode]?.evidenceCeiling,
-      hintUsed: this._hintUsed,
-      wrongStrikes: this._wrongStrikes,
-      adultVerdict: this._adultVerdict,
-    });
+    const evidence =
+      evidenceOverride ??
+      classifyEvidence({
+        ceiling: MODES[this._mode]?.evidenceCeiling,
+        hintUsed: this._hintUsed,
+        wrongStrikes: this._wrongStrikes,
+        adultVerdict: this._adultVerdict,
+      });
     progress.recordAttempt(word.id, correct, this._mode, responseTime, evidence);
 
     // First-attempt success = decoded without any wrong strikes or hint use.
@@ -1113,6 +1180,11 @@ class App {
   }
 
   _cleanupMode() {
+    // Drop any pending confirmation-round timer/listener before the mode
+    // tears down its DOM, so a late callback can't commit against a word
+    // that has already been replaced.
+    cleanupBlendConfirm();
+    removeAdultVerdictBar();
     const mode = MODES[this._mode];
     mode?.cleanup();
   }
@@ -2043,18 +2115,18 @@ class App {
               ${activeProfile?.id === p.id ? raw('<span class="profile-active-badge">●</span>') : ''}
             </button>
             ${
-          profiles.length > 1
-            ? html`
-                <button
-                  class="profile-delete-btn"
-                  data-delete-id="${p.id}"
-                  aria-label="Delete ${p.name}'s profile"
-                >
-                  ✕
-                </button>
-              `
-            : ''
-        }
+              profiles.length > 1
+                ? html`
+                    <button
+                      class="profile-delete-btn"
+                      data-delete-id="${p.id}"
+                      aria-label="Delete ${p.name}'s profile"
+                    >
+                      ✕
+                    </button>
+                  `
+                : ''
+            }
           </div>
         `,
       )

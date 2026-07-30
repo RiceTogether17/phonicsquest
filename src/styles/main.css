@@ -17629,3 +17629,94 @@ body.print-mode > *:not(.print-report-wrapper) > * {
 .choice-feedback--reveal {
   color: #15803d;
 }
+
+/* ─── Blend confirmation round ────────────────────────────────────────────
+   Shown after a self-assessed blend: three printed words, no audio, no
+   model. This is where blending earns independent evidence, so it must read
+   as a question rather than a formality. */
+.blend-confirm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+.blend-confirm__prompt {
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+}
+.blend-confirm__grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+.blend-confirm__card {
+  min-width: 116px;
+  min-height: 64px; /* large touch target — UX_SPEC §2 */
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+/* ✓/✗ glyphs carry the signal in .blend-confirm__feedback, so colour here is
+   reinforcement only (colour-blind / forced-colors safe). */
+.blend-confirm__card--yes {
+  border-color: #2e7d32;
+  background: color-mix(in srgb, #2e7d32 14%, #fff);
+}
+.blend-confirm__card--no {
+  border-color: #c62828;
+  background: color-mix(in srgb, #c62828 12%, #fff);
+}
+.blend-confirm__feedback {
+  min-height: 1.5em;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+}
+.blend-confirm__feedback--yes {
+  color: #1f7a3a;
+}
+.blend-confirm__feedback--no {
+  color: #a3271a;
+}
+
+/* ─── Grown-up verdict bar ────────────────────────────────────────────────
+   Only rendered when adultObserverMode is on. Visually separated from the
+   child's own controls so it reads as belonging to the adult. */
+.adult-verdict {
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px dashed var(--border);
+  background: color-mix(in srgb, #718096 6%, #fff);
+}
+.adult-verdict__legend {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+.adult-verdict__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.adult-verdict__btn {
+  flex: 1 1 auto;
+  min-height: 48px;
+  font-size: 0.95rem;
+}
+.adult-verdict__btn--independent {
+  border-color: #2e7d32;
+}
+.adult-verdict__btn--help {
+  border-color: #8a5a00;
+}
+.adult-verdict__btn--not-yet {
+  border-color: #4a5568;
+}
+.adult-verdict__btn[disabled] {
+  opacity: 0.5;
+}
