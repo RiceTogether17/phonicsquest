@@ -151,8 +151,15 @@ export const MODE_EVIDENCE_CEILING = Object.freeze({
 
   // The target is spoken before the child picks from printed options, so a
   // correct tap shows auditory-to-print matching rather than decoding.
+  //
+  // Fluency Sprint and Read & Tap belong here too, despite their framing.
+  // The ⚡ timer and the "Read the sentence" wording make them feel like
+  // reading, but both speak the target word first and then ask the child to
+  // point at it — mechanically identical to Hear & Choose.
   hear: EVIDENCE.GUIDED,
   sightMatch: EVIDENCE.GUIDED,
+  fluencySprint: EVIDENCE.GUIDED,
+  readAndTap: EVIDENCE.GUIDED,
 
   // Objectively scored, answer not supplied in advance.
   oralBlend: EVIDENCE.INDEPENDENT,
@@ -164,8 +171,6 @@ export const MODE_EVIDENCE_CEILING = Object.freeze({
   segment: EVIDENCE.INDEPENDENT,
   missing: EVIDENCE.INDEPENDENT,
   wordSort: EVIDENCE.INDEPENDENT,
-  readAndTap: EVIDENCE.INDEPENDENT,
-  fluencySprint: EVIDENCE.INDEPENDENT,
   letterSounds: EVIDENCE.INDEPENDENT,
   train: EVIDENCE.INDEPENDENT,
   oddOneOut: EVIDENCE.INDEPENDENT,

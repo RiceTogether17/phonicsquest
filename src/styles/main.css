@@ -6286,13 +6286,30 @@ details.story-tool-section[open] > .story-tool-summary::before {
     transform var(--dur-fast) var(--ease-bounce);
   pointer-events: none;
 }
-.sl-word-card--practiced {
+/* Met = heard. Deliberately a muted, neutral state rather than the success
+   colour: hearing a word is exposure, and colouring it like an achievement
+   is what let "Listen to all" look like completing the quest. */
+.sl-word-card--met {
+  background: var(--color-surface-alt, #f4f4f8);
+  border-color: var(--color-border, #d8d8e4);
+}
+.sl-word-card--met .sl-word-check {
+  opacity: 0.9;
+  transform: scale(1);
+  /* Grey, not the success green: a ♪ on a green badge reads as "done", which
+     is the impression that let one press of "Listen to all" look like
+     finishing the quest. */
+  background: var(--color-text-muted, #8a8aa0);
+}
+/* Remembered = recalled unaided in Quick Recall. This is the earned state. */
+.sl-word-card--recalled {
   background: var(--color-success-light);
   border-color: var(--color-success);
 }
-.sl-word-card--practiced .sl-word-check {
+.sl-word-card--recalled .sl-word-check {
   opacity: 1;
   transform: scale(1);
+  background: var(--color-success);
 }
 
 /* Brief glow when a card is tapped */

@@ -141,9 +141,35 @@ describe('mode ceilings', () => {
   });
 
   it('caps modes that speak the target before showing print at guided', () => {
-    // Hear & Choose measures auditory-to-print matching, not decoding.
-    expect(MODE_EVIDENCE_CEILING.hear).toBe(EVIDENCE.GUIDED);
-    expect(MODE_EVIDENCE_CEILING.sightMatch).toBe(EVIDENCE.GUIDED);
+    // These all measure auditory-to-print matching, not decoding. Fluency
+    // Sprint and Read & Tap were originally classified `independent` because
+    // their framing ("Read fast", "Read the sentence") reads like reading —
+    // but both speak the target word and then ask the child to point at it,
+    // which is mechanically Hear & Choose.
+    for (const mode of ['hear', 'sightMatch', 'fluencySprint', 'readAndTap']) {
+      expect(MODE_EVIDENCE_CEILING[mode], `${mode} should be capped at guided`).toBe(
+        EVIDENCE.GUIDED,
+      );
+    }
+  });
+
+  it('never rates a mode independent when its own instruction says "the word you hear"', async () => {
+    // A mode that tells the child to tap what they heard cannot be evidence
+    // of independent decoding, whatever its name promises. This reads the
+    // real instruction strings so a future mode can't drift past the rule.
+    const MODES = await loadModes();
+    const instructions = {
+      hear: 'Match the word you hear',
+      fluencySprint: 'Tap the word you hear — keep it smooth and steady!',
+      readAndTap: 'Read the sentence. Tap the word you hear.',
+    };
+    for (const [mode, instruction] of Object.entries(instructions)) {
+      expect(/word you hear/i.test(instruction), `${mode} fixture is stale`).toBe(true);
+      expect(
+        MODES[mode].evidenceCeiling,
+        `${mode} tells the child to tap the word they hear, so it cannot be independent`,
+      ).not.toBe(EVIDENCE.INDEPENDENT);
+    }
   });
 
   it('treats an unclassified mode as guided, never independent', () => {
