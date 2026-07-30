@@ -26,6 +26,7 @@ import { audio } from './modules/audio.js';
 import { gamification } from './modules/gamification.js';
 import { badges } from './modules/badges.js';
 import { progress, isStageHiddenForMode } from './modules/progress.js';
+import { classifyEvidence } from './modules/evidence.js';
 import {
   isBedtimeActive,
   setBedtimeEnabled,
@@ -37,19 +38,28 @@ import { buildJourneyBarHtml, STAGE_META } from './components/journeyBar.js';
 import { renderJourneyMap } from './components/journeyMap.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
 import { mascot } from './components/mascot.js';
-import { findStageForGroup, hasSeenLesson, maybeShowStageLesson, showTipLesson } from './components/miniLesson.js';
+import {
+  findStageForGroup,
+  hasSeenLesson,
+  maybeShowStageLesson,
+  showTipLesson,
+} from './components/miniLesson.js';
 import { spinWheel } from './components/wheel.js';
-import { celebrateCorrect, celebrateLevelUp, celebrateDailyGoal } from './components/confettiHelper.js';
+import {
+  celebrateCorrect,
+  celebrateLevelUp,
+  celebrateDailyGoal,
+} from './components/confettiHelper.js';
 import { MODES } from './modes/index.js';
 import { getLearnerSummaryChips } from './modules/recommendations.js';
 import { initLetterSounds, cleanupLetterSounds } from './modes/letterSounds.js';
 import {
-  initSightMatch, showSightBrowser, cleanupSightMatch,
+  initSightMatch,
+  showSightBrowser,
+  cleanupSightMatch,
   startSightMatchQuest,
 } from './modes/sightMatch.js';
-import {
-  initSightLearn, showSightLearn, cleanupSightLearn,
-} from './modes/sightLearn.js';
+import { initSightLearn, showSightLearn, cleanupSightLearn } from './modes/sightLearn.js';
 import { getPlaceholderMeta } from './modes/placeholderMeta.js';
 import { lazyModule } from './modes/lazy.js';
 
@@ -59,15 +69,15 @@ import { lazyModule } from './modes/lazy.js';
 // own chunks and fetched on first open instead of bloating the initial bundle.
 // Cleanup paths use `.get()?.fn()` so a feature that was never opened is a
 // safe no-op.
-const dashboardMod    = lazyModule(() => import('./components/dashboard.js'));
-const roadmapMod      = lazyModule(() => import('./components/roadmap.js'));
-const storyModeMod    = lazyModule(() => import('./modes/storyMode.js'));
+const dashboardMod = lazyModule(() => import('./components/dashboard.js'));
+const roadmapMod = lazyModule(() => import('./components/roadmap.js'));
+const storyModeMod = lazyModule(() => import('./modes/storyMode.js'));
 const sentenceForgeMod = lazyModule(() => import('./modes/sentenceForge.js'));
-const clozeCastleMod  = lazyModule(() => import('./modes/clozeCastle.js'));
-const wordVaultMod    = lazyModule(() => import('./modes/wordVault.js'));
-const grammarMcqMod   = lazyModule(() => import('./modes/grammarMcq.js'));
-const vocabMcqMod     = lazyModule(() => import('./modes/vocabMcq.js'));
-const paperModeMod    = lazyModule(() => import('./modes/paperMode.js'));
+const clozeCastleMod = lazyModule(() => import('./modes/clozeCastle.js'));
+const wordVaultMod = lazyModule(() => import('./modes/wordVault.js'));
+const grammarMcqMod = lazyModule(() => import('./modes/grammarMcq.js'));
+const vocabMcqMod = lazyModule(() => import('./modes/vocabMcq.js'));
+const paperModeMod = lazyModule(() => import('./modes/paperMode.js'));
 const editingQuestMod = lazyModule(() => import('./modes/editingQuest.js'));
 const writingQuestMod = lazyModule(() => import('./modes/writingQuest.js'));
 const synthesisQuestMod = lazyModule(() => import('./modes/synthesisQuest.js'));
@@ -75,25 +85,40 @@ const placeholdersMod = lazyModule(() => import('./modes/primaryPlaceholders.js'
 const comprehensionClozeMod = lazyModule(() => import('./modes/comprehensionClozeQuest.js'));
 const listeningCompMod = lazyModule(() => import('./modes/listeningComp.js'));
 import {
-  getProfiles, createProfile, deleteProfile, activateProfile,
-  getActiveProfile, needsProfileSelection, restoreActiveProfile,
-  exportProfile, importProfile,
-  AVATAR_OPTIONS, COLOR_OPTIONS,
+  getProfiles,
+  createProfile,
+  deleteProfile,
+  activateProfile,
+  getActiveProfile,
+  needsProfileSelection,
+  restoreActiveProfile,
+  exportProfile,
+  importProfile,
+  AVATAR_OPTIONS,
+  COLOR_OPTIONS,
 } from './modules/profiles.js';
-import {
-  isDailyChallengeComplete, completeDailyChallenge,
-} from './modules/dailyChallenge.js';
+import { isDailyChallengeComplete, completeDailyChallenge } from './modules/dailyChallenge.js';
 import { markMissionStepDone } from './modules/missionToday.js';
 import {
-  getTodaysLessonView, markLessonStarted, markTeachDone,
-  finalizeLessonIfComplete, LESSON_BONUS_XP,
+  getTodaysLessonView,
+  markLessonStarted,
+  markTeachDone,
+  finalizeLessonIfComplete,
+  LESSON_BONUS_XP,
 } from './modules/lessonRunner.js';
 import { CURRICULUM, PHASES, PHASE_LABELS } from './data/curriculum.js';
 import { getStagesForMode } from './modules/phonicsProgression.js';
 import {
-  buildProgressionSnapshot, getUnlockedStages, getRecommendedStage, explainLockReason,
+  buildProgressionSnapshot,
+  getUnlockedStages,
+  getRecommendedStage,
+  explainLockReason,
 } from './modules/progression.js';
-import { createPaSequencerState, nextPaWord, paPositionForMode } from './modules/paTargetSequencer.js';
+import {
+  createPaSequencerState,
+  nextPaWord,
+  paPositionForMode,
+} from './modules/paTargetSequencer.js';
 import { WORDS } from './data/words.js';
 import { pickSyllableWord } from './data/syllableWords.js';
 import { SCREENS, QUEST_THRESHOLDS } from './constants.js';
@@ -104,9 +129,12 @@ import { getQuestUnlockStatus } from './modules/questUnlocks.js';
 import { showPlacementTest } from './modules/placementTest.js';
 const quickCheckMod = lazyModule(() => import('./modules/primaryQuickCheck.js'));
 import { getReadingBand, getHomeLayoutForReadingBand } from './modules/readingStages.js';
-import { isTeacherUnlockActive, tryTeacherUnlock, lockTeacherMode } from './modules/teacherUnlock.js';
+import {
+  isTeacherUnlockActive,
+  tryTeacherUnlock,
+  lockTeacherMode,
+} from './modules/teacherUnlock.js';
 import { showSessionSummary } from './components/sessionSummary.js';
-
 
 class App {
   constructor() {
@@ -160,6 +188,12 @@ class App {
     this._wrongStrikes = 0;
     /** @type {number} progressive hint tier for current word (0 = none, 1-3 = tiers) */
     this._hintTier = 0;
+    /**
+     * @type {'independent'|'help'|'not-yet'|null}
+     * Grown-up's verdict on the current word, when adultObserverMode is on.
+     * The only source of `verified` evidence — see modules/evidence.js.
+     */
+    this._adultVerdict = null;
 
     /**
      * Guard flag – prevents _handleResult from being called twice for the
@@ -223,29 +257,29 @@ class App {
   /** Cache frequently used DOM elements */
   _cacheElements() {
     this._els = {
-      screenHome:   document.getElementById('screen-home'),
-      screenGame:   document.getElementById('screen-game'),
+      screenHome: document.getElementById('screen-home'),
+      screenGame: document.getElementById('screen-game'),
       screenResult: document.getElementById('screen-result'),
 
-      wordDisplay:    document.getElementById('word-display'),
-      wordEmoji:      document.getElementById('word-emoji'),
-      phonemeRow:     document.getElementById('phoneme-row'),
+      wordDisplay: document.getElementById('word-display'),
+      wordEmoji: document.getElementById('word-emoji'),
+      phonemeRow: document.getElementById('phoneme-row'),
       modeInstruction: document.getElementById('mode-instruction'),
-      modeArea:       document.getElementById('mode-area'),
+      modeArea: document.getElementById('mode-area'),
 
       btnCheck: document.getElementById('btn-check'),
       btnSayIt: document.getElementById('btn-say-it'),
-      btnHint:  document.getElementById('btn-hint'),
-      btnSkip:  document.getElementById('btn-skip'),
-      btnBack:  document.getElementById('btn-back'),
-      btnNext:  document.getElementById('btn-next'),
-      btnMic:   document.getElementById('btn-mic'),
+      btnHint: document.getElementById('btn-hint'),
+      btnSkip: document.getElementById('btn-skip'),
+      btnBack: document.getElementById('btn-back'),
+      btnNext: document.getElementById('btn-next'),
+      btnMic: document.getElementById('btn-mic'),
 
-      resultBadge:   document.getElementById('result-badge'),
+      resultBadge: document.getElementById('result-badge'),
       resultMessage: document.getElementById('result-message'),
-      resultWord:    document.getElementById('result-word-display'),
-      resultXp:      document.getElementById('result-xp'),
-      resultMascot:  document.getElementById('result-mascot'),
+      resultWord: document.getElementById('result-word-display'),
+      resultXp: document.getElementById('result-xp'),
+      resultMascot: document.getElementById('result-mascot'),
 
       speechBubble: document.getElementById('speech-bubble'),
 
@@ -262,10 +296,22 @@ class App {
     // game decoupled from the decoding curriculum, so it skips the
     // (lockable) stage picker and launches straight into play.
     const PICKER_MODES = new Set([
-      'blend', 'oralBlend', 'first', 'last', 'middle',
-      'soundCount', 'oralSegment', 'hear', 'missing', 'segment',
-      'train', 'soundHunt', 'oddOneOut', 'wordCount',
-      'wordSort', 'readAndTap',
+      'blend',
+      'oralBlend',
+      'first',
+      'last',
+      'middle',
+      'soundCount',
+      'oralSegment',
+      'hear',
+      'missing',
+      'segment',
+      'train',
+      'soundHunt',
+      'oddOneOut',
+      'wordCount',
+      'wordSort',
+      'readAndTap',
     ]);
 
     document.querySelectorAll('.mode-card').forEach((card, idx) => {
@@ -306,18 +352,15 @@ class App {
 
     document.getElementById('btn-stories')?.addEventListener('click', async () => {
       const m = await storyModeMod.load();
-      m.initStoryMode(
-        document.getElementById('stories-content'),
-        () => {
-          storyModeMod.get()?.cleanupStoryMode();
-          this._showScreen(SCREENS.HOME);
-          mascot.setHomeState('holdCard');
-        },
-      );
+      m.initStoryMode(document.getElementById('stories-content'), () => {
+        storyModeMod.get()?.cleanupStoryMode();
+        this._showScreen(SCREENS.HOME);
+        mascot.setHomeState('holdCard');
+      });
       m.showBrowser();
       this._showScreen('screen-stories');
       mascot.setState('celebrate');
-      badges.onStoriesOpened().forEach(b => badges.notify(b));
+      badges.onStoriesOpened().forEach((b) => badges.notify(b));
     });
 
     document.getElementById('btn-stories-back')?.addEventListener('click', () => {
@@ -339,14 +382,11 @@ class App {
     });
 
     document.getElementById('btn-letter-sounds')?.addEventListener('click', () => {
-      initLetterSounds(
-        document.getElementById('ls-content'),
-        () => {
-          cleanupLetterSounds();
-          this._showScreen(SCREENS.HOME);
-          mascot.setHomeState('holdCard');
-        },
-      );
+      initLetterSounds(document.getElementById('ls-content'), () => {
+        cleanupLetterSounds();
+        this._showScreen(SCREENS.HOME);
+        mascot.setHomeState('holdCard');
+      });
       this._showScreen('screen-letter-sounds');
       mascot.setState('whiteboard');
     });
@@ -380,9 +420,9 @@ class App {
     const openSightLearn = (quest) => {
       cleanupSightMatch();
       initSightLearn(sightContainer(), {
-        onGoHome:        goHomeFromSight,
+        onGoHome: goHomeFromSight,
         onBackToBrowser: enterSightBrowser,
-        onStartMatch:    (q) => {
+        onStartMatch: (q) => {
           cleanupSightLearn();
           initSightMatch(sightContainer(), goHomeFromSight, openSightLearn);
           startSightMatchQuest(q);
@@ -410,18 +450,18 @@ class App {
     document.getElementById('btn-sentence-forge')?.addEventListener('click', async () => {
       const unlock = this._getQuestUnlockStatus();
       if (!unlock.sentenceForge.unlocked) {
-        this._showToast(`Master ${unlock.sentenceForge.required} words to unlock! (${unlock.sentenceForge.current} so far)`, 'warning');
+        this._showToast(
+          `Master ${unlock.sentenceForge.required} words to unlock! (${unlock.sentenceForge.current} so far)`,
+          'warning',
+        );
         return;
       }
       const m = await sentenceForgeMod.load();
-      m.initSentenceForge(
-        document.getElementById('sentence-forge-content'),
-        () => {
-          sentenceForgeMod.get()?.cleanupSentenceForge();
-          this._showScreen(SCREENS.HOME);
-          mascot.setHomeState('holdCard');
-        },
-      );
+      m.initSentenceForge(document.getElementById('sentence-forge-content'), () => {
+        sentenceForgeMod.get()?.cleanupSentenceForge();
+        this._showScreen(SCREENS.HOME);
+        mascot.setHomeState('holdCard');
+      });
       m.showSentenceBrowser();
       this._showScreen('screen-sentence-forge');
       mascot.setState('celebrate');
@@ -435,14 +475,11 @@ class App {
 
     document.getElementById('btn-grammar-mcq')?.addEventListener('click', async () => {
       const m = await grammarMcqMod.load();
-      m.initGrammarMcq(
-        document.getElementById('grammar-mcq-content'),
-        () => {
-          grammarMcqMod.get()?.cleanupGrammarMcq();
-          this._showScreen(SCREENS.HOME);
-          mascot.setHomeState('holdCard');
-        },
-      );
+      m.initGrammarMcq(document.getElementById('grammar-mcq-content'), () => {
+        grammarMcqMod.get()?.cleanupGrammarMcq();
+        this._showScreen(SCREENS.HOME);
+        mascot.setHomeState('holdCard');
+      });
       m.showGrammarMcqBrowser();
       this._showScreen(SCREENS.GRAMMAR_MCQ);
       mascot.setState('whiteboard');
@@ -455,14 +492,11 @@ class App {
 
     document.getElementById('btn-vocab-mcq')?.addEventListener('click', async () => {
       const m = await vocabMcqMod.load();
-      m.initVocabMcq(
-        document.getElementById('vocab-mcq-content'),
-        () => {
-          vocabMcqMod.get()?.cleanupVocabMcq();
-          this._showScreen(SCREENS.HOME);
-          mascot.setHomeState('holdCard');
-        },
-      );
+      m.initVocabMcq(document.getElementById('vocab-mcq-content'), () => {
+        vocabMcqMod.get()?.cleanupVocabMcq();
+        this._showScreen(SCREENS.HOME);
+        mascot.setHomeState('holdCard');
+      });
       m.showVocabMcqBrowser();
       this._showScreen(SCREENS.VOCAB_MCQ);
       mascot.setState('celebrate');
@@ -499,18 +533,18 @@ class App {
     document.getElementById('btn-cloze-castle')?.addEventListener('click', async () => {
       const unlock = this._getQuestUnlockStatus();
       if (!unlock.clozeCastle.unlocked) {
-        this._showToast(`Master ${unlock.clozeCastle.required} words to unlock! (${unlock.clozeCastle.current} so far)`, 'warning');
+        this._showToast(
+          `Master ${unlock.clozeCastle.required} words to unlock! (${unlock.clozeCastle.current} so far)`,
+          'warning',
+        );
         return;
       }
       const m = await clozeCastleMod.load();
-      m.initClozeCastle(
-        document.getElementById('cloze-castle-content'),
-        () => {
-          clozeCastleMod.get()?.cleanupClozeCastle();
-          this._showScreen(SCREENS.HOME);
-          mascot.setHomeState('holdCard');
-        },
-      );
+      m.initClozeCastle(document.getElementById('cloze-castle-content'), () => {
+        clozeCastleMod.get()?.cleanupClozeCastle();
+        this._showScreen(SCREENS.HOME);
+        mascot.setHomeState('holdCard');
+      });
       m.showClozeBrowser();
       this._showScreen('screen-cloze-castle');
       mascot.setState('celebrate');
@@ -525,18 +559,18 @@ class App {
     document.getElementById('btn-word-vault')?.addEventListener('click', async () => {
       const unlock = this._getQuestUnlockStatus();
       if (!unlock.wordVault.unlocked) {
-        this._showToast(`Master ${unlock.wordVault.required} words to unlock! (${unlock.wordVault.current} so far)`, 'warning');
+        this._showToast(
+          `Master ${unlock.wordVault.required} words to unlock! (${unlock.wordVault.current} so far)`,
+          'warning',
+        );
         return;
       }
       const m = await wordVaultMod.load();
-      m.initWordVault(
-        document.getElementById('word-vault-content'),
-        () => {
-          wordVaultMod.get()?.cleanupWordVault();
-          this._showScreen(SCREENS.HOME);
-          mascot.setHomeState('holdCard');
-        },
-      );
+      m.initWordVault(document.getElementById('word-vault-content'), () => {
+        wordVaultMod.get()?.cleanupWordVault();
+        this._showScreen(SCREENS.HOME);
+        mascot.setHomeState('holdCard');
+      });
       m.showVaultBrowser();
       this._showScreen('screen-word-vault');
       mascot.setState('celebrate');
@@ -551,18 +585,18 @@ class App {
     document.getElementById('btn-editing-quest')?.addEventListener('click', async () => {
       const unlock = this._getQuestUnlockStatus();
       if (!unlock.editingQuest.unlocked) {
-        this._showToast(`Master ${unlock.editingQuest.required} words to unlock! (${unlock.editingQuest.current} so far)`, 'warning');
+        this._showToast(
+          `Master ${unlock.editingQuest.required} words to unlock! (${unlock.editingQuest.current} so far)`,
+          'warning',
+        );
         return;
       }
       const m = await editingQuestMod.load();
-      m.initEditingQuest(
-        document.getElementById('editing-quest-content'),
-        () => {
-          editingQuestMod.get()?.cleanupEditingQuest();
-          this._showScreen(SCREENS.HOME);
-          mascot.setHomeState('holdCard');
-        },
-      );
+      m.initEditingQuest(document.getElementById('editing-quest-content'), () => {
+        editingQuestMod.get()?.cleanupEditingQuest();
+        this._showScreen(SCREENS.HOME);
+        mascot.setHomeState('holdCard');
+      });
       m.showEditingBrowser();
       this._showScreen(SCREENS.EDITING_QUEST);
       mascot.setState('whiteboard');
@@ -577,18 +611,18 @@ class App {
     document.getElementById('btn-writing-quest')?.addEventListener('click', async () => {
       const unlock = this._getQuestUnlockStatus();
       if (!unlock.writingQuest.unlocked) {
-        this._showToast(`Master ${unlock.writingQuest.required} words to unlock! (${unlock.writingQuest.current} so far)`, 'warning');
+        this._showToast(
+          `Master ${unlock.writingQuest.required} words to unlock! (${unlock.writingQuest.current} so far)`,
+          'warning',
+        );
         return;
       }
       const m = await writingQuestMod.load();
-      m.initWritingQuest(
-        document.getElementById('writing-quest-content'),
-        () => {
-          writingQuestMod.get()?.cleanupWritingQuest();
-          this._showScreen(SCREENS.HOME);
-          mascot.setHomeState('holdCard');
-        },
-      );
+      m.initWritingQuest(document.getElementById('writing-quest-content'), () => {
+        writingQuestMod.get()?.cleanupWritingQuest();
+        this._showScreen(SCREENS.HOME);
+        mascot.setHomeState('holdCard');
+      });
       m.showWritingBrowser();
       this._showScreen(SCREENS.WRITING_QUEST);
       mascot.setState('whiteboard');
@@ -605,18 +639,18 @@ class App {
     //    Writing) — first-version implementations so parents can see the full
     //    Primary English pathway in the home screen.
     const placeholderHandlers = [
-      ['btn-visual-text',         'visual-text'],
+      ['btn-visual-text', 'visual-text'],
       ['btn-comprehension-cloze', 'comprehension-cloze'],
-      ['btn-open-comprehension',  'open-comprehension'],
-      ['btn-synthesis',           'synthesis'],
+      ['btn-open-comprehension', 'open-comprehension'],
+      ['btn-synthesis', 'synthesis'],
       ['btn-situational-writing', 'situational-writing'],
-      ['btn-p1-practice-tests',   'p1-practice-tests'],
-      ['btn-p2-practice-tests',   'p2-practice-tests'],
-      ['btn-p3-practice-tests',   'p3-practice-tests'],
-      ['btn-p4-practice-tests',   'p4-practice-tests'],
-      ['btn-p5-practice-tests',   'p5-practice-tests'],
-      ['btn-p6-practice-tests',   'p6-practice-tests'],
-      ['btn-listening-comp',      'listening-comp'],
+      ['btn-p1-practice-tests', 'p1-practice-tests'],
+      ['btn-p2-practice-tests', 'p2-practice-tests'],
+      ['btn-p3-practice-tests', 'p3-practice-tests'],
+      ['btn-p4-practice-tests', 'p4-practice-tests'],
+      ['btn-p5-practice-tests', 'p5-practice-tests'],
+      ['btn-p6-practice-tests', 'p6-practice-tests'],
+      ['btn-listening-comp', 'listening-comp'],
     ];
     placeholderHandlers.forEach(([btnId, kind]) => {
       document.getElementById(btnId)?.addEventListener('click', () => {
@@ -680,14 +714,14 @@ class App {
       setTimeout(() => document.querySelector('.pin-digit')?.focus(), 200);
     });
 
-    document.querySelectorAll('.modal-close').forEach(btn => {
+    document.querySelectorAll('.modal-close').forEach((btn) => {
       btn.addEventListener('click', () => {
         const modalId = btn.dataset.close;
         if (modalId) this._closeModal(modalId);
       });
     });
 
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    document.querySelectorAll('.modal-overlay').forEach((overlay) => {
       overlay.addEventListener('click', (e) => {
         if (e.target === overlay) this._closeModal(overlay.id);
       });
@@ -697,16 +731,16 @@ class App {
       store,
       badges,
       gamification,
-      closeModal : (id) => this._closeModal(id),
-      onReset    : () => this._showToast('Progress reset!', 'warning'),
+      closeModal: (id) => this._closeModal(id),
+      onReset: () => this._showToast('Progress reset!', 'warning'),
     });
 
     this._bindPinGate();
 
     keyboardManager.init({
-      getScreen   : () => this._screen,
-      els         : this._els,
-      onHome      : () => this._showScreen(SCREENS.HOME),
+      getScreen: () => this._screen,
+      els: this._els,
+      onHome: () => this._showScreen(SCREENS.HOME),
       modalManager,
     });
 
@@ -722,7 +756,7 @@ class App {
       this._startWordWorkout();
     });
 
-    document.querySelectorAll('[data-close="modal-mistakes-den"]').forEach(btn => {
+    document.querySelectorAll('[data-close="modal-mistakes-den"]').forEach((btn) => {
       btn.addEventListener('click', () => modalManager.close('modal-mistakes-den'));
     });
 
@@ -730,7 +764,7 @@ class App {
       this._openAskGiri();
     });
 
-    document.querySelectorAll('[data-close="modal-ask-giri"]').forEach(btn => {
+    document.querySelectorAll('[data-close="modal-ask-giri"]').forEach((btn) => {
       btn.addEventListener('click', () => modalManager.close('modal-ask-giri'));
     });
 
@@ -738,7 +772,7 @@ class App {
       this._openPersonalBestWall();
     });
 
-    document.querySelectorAll('[data-close="modal-personal-best"]').forEach(btn => {
+    document.querySelectorAll('[data-close="modal-personal-best"]').forEach((btn) => {
       btn.addEventListener('click', () => modalManager.close('modal-personal-best'));
     });
 
@@ -838,8 +872,8 @@ class App {
         // First / Last / Middle Sound run through the target sequencer so the
         // child meets each target phoneme as a set of exemplars (alphabetical
         // ladder) before moving on, instead of bouncing around adaptively.
-        this._currentWord = nextPaWord(this._paSeqState, { ...opts, wordList: WORDS })
-          || progress.getNextWord(opts);
+        this._currentWord =
+          nextPaWord(this._paSeqState, { ...opts, wordList: WORDS }) || progress.getNextWord(opts);
       } else {
         // Every other mode (blend, segment, hear, missing, soundCount, …)
         // uses the adaptive picker. Must run unconditionally — checking
@@ -860,6 +894,7 @@ class App {
     this._hintUsed = false;
     this._hintTier = 0;
     this._wrongStrikes = 0;
+    this._adultVerdict = null;
     this._resultProcessing = false;
     if (this._els.btnHint) {
       this._els.btnHint.classList.remove('used');
@@ -874,15 +909,16 @@ class App {
     const mode = MODES[this._mode];
     if (!mode) return;
 
-    const setupMode = () => mode.setup(this._currentWord, {
-      ...this._els,
-      onResult: (correct, responseTime) => this._handleResult(correct, responseTime),
-      onGroupChange: (group) => {
-        // Teacher changed category in Listen & Blend — reload immediately
-        this._cleanupMode();
-        this._startGame(group || undefined);
-      },
-    });
+    const setupMode = () =>
+      mode.setup(this._currentWord, {
+        ...this._els,
+        onResult: (correct, responseTime) => this._handleResult(correct, responseTime),
+        onGroupChange: (group) => {
+          // Teacher changed category in Listen & Blend — reload immediately
+          this._cleanupMode();
+          this._startGame(group || undefined);
+        },
+      });
 
     // Explicit instruction first: the first time a child practises a
     // curriculum stage, Giri teaches it (mini-lesson overlay) before
@@ -917,10 +953,11 @@ class App {
     // run their own in-round two-try flow (choiceRound.js) and deliver a
     // FINAL result here — bouncing those back used to strand the round on
     // a locked screen and record the same wrong answer twice.
-    const canRetry = !correct
-      && MODES[this._mode]?.resultPolicy === 'selfAssess'
-      && this._wrongStrikes === 0
-      && !this._hintUsed;
+    const canRetry =
+      !correct &&
+      MODES[this._mode]?.resultPolicy === 'selfAssess' &&
+      this._wrongStrikes === 0 &&
+      !this._hintUsed;
 
     if (canRetry) {
       const phonemeRow = document.getElementById('phoneme-row');
@@ -936,9 +973,13 @@ class App {
       this._els.btnHint?.classList.remove('btn--hint-pulse');
       void this._els.btnHint?.offsetWidth;
       this._els.btnHint?.classList.add('btn--hint-pulse');
-      this._els.btnHint?.addEventListener('animationend', () => {
-        this._els.btnHint?.classList.remove('btn--hint-pulse');
-      }, { once: true });
+      this._els.btnHint?.addEventListener(
+        'animationend',
+        () => {
+          this._els.btnHint?.classList.remove('btn--hint-pulse');
+        },
+        { once: true },
+      );
       // Nothing is recorded on the nudge: mastery counts the final outcome
       // exactly once, when the child finishes the word.
       this._resultProcessing = false;
@@ -946,7 +987,16 @@ class App {
     }
 
     const isNew = progress.isNewWord(word.id);
-    progress.recordAttempt(word.id, correct, this._mode, responseTime);
+    // Resolve HOW this answer was obtained while the per-word hint and strike
+    // state is still live — this is the only point in the app where that
+    // context exists alongside the result. See modules/evidence.js.
+    const evidence = classifyEvidence({
+      ceiling: MODES[this._mode]?.evidenceCeiling,
+      hintUsed: this._hintUsed,
+      wrongStrikes: this._wrongStrikes,
+      adultVerdict: this._adultVerdict,
+    });
+    progress.recordAttempt(word.id, correct, this._mode, responseTime, evidence);
 
     // First-attempt success = decoded without any wrong strikes or hint use.
     if (correct && this._wrongStrikes === 0 && !this._hintUsed) {
@@ -964,7 +1014,7 @@ class App {
         dailyComplete: reward.dailyComplete,
         mode: this._mode,
       });
-      newBadges.forEach(b => badges.notify(b));
+      newBadges.forEach((b) => badges.notify(b));
 
       mascot.celebrate(reward.levelUp);
       mascot.setResultState(reward.levelUp ? 'trophy' : 'confetti');
@@ -987,7 +1037,6 @@ class App {
 
       this._showResultScreen(true, word, reward);
       this._adjustModeDifficulty();
-
     } else {
       // Wrong — shake the phoneme row before transitioning
       const phonemeRow = document.getElementById('phoneme-row');
@@ -1038,7 +1087,7 @@ class App {
   }
 
   _showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(screen => {
+    document.querySelectorAll('.screen').forEach((screen) => {
       if (screen.id === screenId) {
         screen.classList.remove('exit');
         screen.classList.add('active');
@@ -1090,7 +1139,7 @@ class App {
     btn.setAttribute('aria-pressed', 'false');
 
     if (!result) {
-      this._showSpeechBubble('I didn\'t hear anything. Try again!');
+      this._showSpeechBubble("I didn't hear anything. Try again!");
       return;
     }
 
@@ -1103,10 +1152,13 @@ class App {
         }
       }, 1200);
     } else {
-      this._showSpeechBubble(`I heard "${result.heard}" – ${result.score}% match. Try saying "${this._currentWord.word}" more clearly!`, {
-        allowOverride: true,
-        recognisedWordId,
-      });
+      this._showSpeechBubble(
+        `I heard "${result.heard}" – ${result.score}% match. Try saying "${this._currentWord.word}" more clearly!`,
+        {
+          allowOverride: true,
+          recognisedWordId,
+        },
+      );
     }
   }
 
@@ -1165,7 +1217,7 @@ class App {
 
     if (this._hintTier === 1) {
       this._hintUsed = true;
-      const vowelIdx = word.types.findIndex(t => t === 'sv' || t === 'lv');
+      const vowelIdx = word.types.findIndex((t) => t === 'sv' || t === 'lv');
       if (vowelIdx >= 0) {
         const vowelType = word.types[vowelIdx] === 'sv' ? 'short' : 'long';
         this._showToast(`Hint: The vowel makes a ${vowelType} sound`, 'info');
@@ -1183,7 +1235,7 @@ class App {
 
     if (this._hintTier === 2) {
       const firstGrapheme = word.graphemes[0];
-      const firstType     = word.types[0];
+      const firstType = word.types[0];
       await audio.speakPhoneme(firstGrapheme, firstType);
 
       const firstTile = document.querySelector('#phoneme-row .phoneme-tile');
@@ -1192,7 +1244,6 @@ class App {
         setTimeout(() => firstTile.classList.remove('active'), 800);
       }
       if (btn) btn.textContent = '💡 Hint 3';
-
     } else if (this._hintTier >= 3) {
       await audio.speakWord(word.word);
 
@@ -1220,7 +1271,12 @@ class App {
     }
 
     bubble.hidden = false;
-    setTimeout(() => { bubble.hidden = true; }, opts.allowOverride ? 6500 : 4000);
+    setTimeout(
+      () => {
+        bubble.hidden = true;
+      },
+      opts.allowOverride ? 6500 : 4000,
+    );
   }
 
   _applyManualSpeechOverride(recognisedWordId) {
@@ -1267,8 +1323,8 @@ class App {
   /** @see modules/onboardingController.js */
   _bindPinGate() {
     onboardingController.bindPinGate({
-      openModal:  id => this._openModal(id),
-      closeModal: id => this._closeModal(id),
+      openModal: (id) => this._openModal(id),
+      closeModal: (id) => this._closeModal(id),
       onUnlocked: () => this._openDashboard(),
     });
   }
@@ -1285,8 +1341,8 @@ class App {
   _showOnboardingTutorial(profile) {
     const readingBand = getReadingBand(profile, store.get('placementProfile') || null);
     onboardingController.showOnboardingTutorial(readingBand, {
-      openModal:  id => this._openModal(id),
-      closeModal: id => this._closeModal(id),
+      openModal: (id) => this._openModal(id),
+      closeModal: (id) => this._closeModal(id),
     });
   }
 
@@ -1312,7 +1368,10 @@ class App {
           const profile = getActiveProfile();
           if (profile?.id) {
             const ok = exportProfile(profile.id);
-            this._showToast(ok ? '📥 Backup downloaded!' : 'Export failed — please try again.', ok ? 'success' : 'warning');
+            this._showToast(
+              ok ? '📥 Backup downloaded!' : 'Export failed — please try again.',
+              ok ? 'success' : 'warning',
+            );
           }
         });
       }
@@ -1329,7 +1388,10 @@ class App {
             if (error) {
               this._showToast(`Import failed: ${error}`, 'warning');
             } else {
-              this._showToast(`Profile "${newProfile.name}" imported! Switch profiles to use it.`, 'success');
+              this._showToast(
+                `Profile "${newProfile.name}" imported! Switch profiles to use it.`,
+                'success',
+              );
             }
             importInput.value = '';
           };
@@ -1347,7 +1409,10 @@ class App {
   /** @see modules/navigationRouter.js */
   _navigateTo(target, group = null) {
     const ok = navigationRouter.navigateTo(target, group, {
-      setMode: (mode) => { this._mode = mode; store.set('currentMode', mode); },
+      setMode: (mode) => {
+        this._mode = mode;
+        store.set('currentMode', mode);
+      },
       setGroup: (g) => store.set('currentGroup', g),
       getCurrentGroup: () => store.get('currentGroup') || undefined,
       startGame: (g) => this._startGame(g),
@@ -1364,13 +1429,13 @@ class App {
     // listening-comp manages its own header text inside the container
     if (!meta && kind !== 'listening-comp') return;
     const titleEl = document.getElementById('primary-placeholder-title');
-    const iconEl  = document.getElementById('primary-placeholder-icon');
+    const iconEl = document.getElementById('primary-placeholder-icon');
     if (meta) {
       if (titleEl) titleEl.textContent = meta.label;
-      if (iconEl)  iconEl.textContent = meta.icon;
+      if (iconEl) iconEl.textContent = meta.icon;
     } else {
       if (titleEl) titleEl.textContent = 'Listening Comprehension';
-      if (iconEl)  iconEl.textContent = '👂';
+      if (iconEl) iconEl.textContent = '👂';
     }
     const container = document.getElementById('primary-placeholder-content');
     const goHome = () => {
@@ -1406,14 +1471,11 @@ class App {
     const map = {
       'grammar-mcq': async () => {
         const m = await grammarMcqMod.load();
-        m.initGrammarMcq(
-          document.getElementById('grammar-mcq-content'),
-          () => {
-            grammarMcqMod.get()?.cleanupGrammarMcq();
-            this._showScreen(SCREENS.HOME);
-            mascot.setHomeState('holdCard');
-          },
-        );
+        m.initGrammarMcq(document.getElementById('grammar-mcq-content'), () => {
+          grammarMcqMod.get()?.cleanupGrammarMcq();
+          this._showScreen(SCREENS.HOME);
+          mascot.setHomeState('holdCard');
+        });
         this._showScreen(SCREENS.GRAMMAR_MCQ);
         mascot.setState('whiteboard');
         if (level) m.startGrammarMcqLevel(level);
@@ -1421,14 +1483,11 @@ class App {
       },
       'vocab-mcq': async () => {
         const m = await vocabMcqMod.load();
-        m.initVocabMcq(
-          document.getElementById('vocab-mcq-content'),
-          () => {
-            vocabMcqMod.get()?.cleanupVocabMcq();
-            this._showScreen(SCREENS.HOME);
-            mascot.setHomeState('holdCard');
-          },
-        );
+        m.initVocabMcq(document.getElementById('vocab-mcq-content'), () => {
+          vocabMcqMod.get()?.cleanupVocabMcq();
+          this._showScreen(SCREENS.HOME);
+          mascot.setHomeState('holdCard');
+        });
         this._showScreen(SCREENS.VOCAB_MCQ);
         mascot.setState('celebrate');
         if (level) m.startVocabMcqLevel(level);
@@ -1460,29 +1519,35 @@ class App {
    */
   _renderGuidedJourney() {
     // Six-step journey map on the Learn tab — same refresh lifecycle.
-    try { renderJourneyMap(document.getElementById('learn-journey-map'), { avatar: getActiveProfile?.()?.avatar || '🦁' }); } catch (_) { /* non-fatal */ }
+    try {
+      renderJourneyMap(document.getElementById('learn-journey-map'), {
+        avatar: getActiveProfile?.()?.avatar || '🦁',
+      });
+    } catch (_) {
+      /* non-fatal */
+    }
 
     const section = document.getElementById('guided-journey-section');
     if (!section) return;
 
-    const profile   = getActiveProfile ? getActiveProfile() : null;
+    const profile = getActiveProfile ? getActiveProfile() : null;
     const placement = store.get('placementProfile') || null;
     const readingBand = getReadingBand(profile, placement);
 
     const chips = getLearnerSummaryChips();
 
-    const pathwayIcon  = STAGE_META[readingBand]?.icon || '🌱';
+    const pathwayIcon = STAGE_META[readingBand]?.icon || '🌱';
     const pathwayLabel = STAGE_META[readingBand]?.label || 'Reading Journey';
-    const pathwayMod   = STAGE_META[readingBand]?.mod || 'pathway-badge--preschool';
+    const pathwayMod = STAGE_META[readingBand]?.mod || 'pathway-badge--preschool';
     // Escaped: the profile name is user-supplied and can also arrive from an
     // imported profile file, and this string is spliced into innerHTML below.
-    const profileName  = profile?.name ? `${escapeHtml(profile.name)}'s ` : '';
+    const profileName = profile?.name ? `${escapeHtml(profile.name)}'s ` : '';
 
     const journeyBarHtml = buildJourneyBarHtml(readingBand, store.get('groupMastery') || {});
 
     const chipsHtml = chips.length
       ? `<div class="progress-chips" aria-label="Progress snapshot">
-           ${chips.map(c => `<span class="progress-chip">${c}</span>`).join('')}
+           ${chips.map((c) => `<span class="progress-chip">${c}</span>`).join('')}
          </div>`
       : '';
 
@@ -1490,11 +1555,20 @@ class App {
     // renders in the lesson card below (_renderTodaysLesson); this hero
     // surfaces the next step and a single Start/Continue CTA — the way a
     // tutor opens a sitting — replacing the old start-card + roadmap pair.
-    const esc = (s) => String(s ?? '').replace(/[<>&"]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;', '"':'&quot;' }[c]));
+    const esc = (s) =>
+      String(s ?? '').replace(
+        /[<>&"]/g,
+        (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' })[c],
+      );
     let lesson;
-    try { lesson = getTodaysLessonView(); } catch (_) { lesson = null; }
+    try {
+      lesson = getTodaysLessonView();
+    } catch (_) {
+      lesson = null;
+    }
     const next = lesson?.nextStep || null;
-    const lessonHeroHtml = lesson ? `
+    const lessonHeroHtml = lesson
+      ? `
       <div class="home-start-card" aria-label="Today's lesson with Giri">
         <div class="start-card-eyebrow">
           <span class="start-card-label">🦉 TODAY'S LESSON WITH GIRI</span>
@@ -1502,10 +1576,15 @@ class App {
         </div>
         <h2 class="start-card-title">${next ? `${esc(next.icon)} ${esc(next.title)}` : '🎉 Lesson complete — great work!'}</h2>
         <p class="start-card-reason">${next ? esc(next.detail) : `You finished every step today and earned a +${LESSON_BONUS_XP} XP bonus.`}</p>
-        ${next ? `<button class="btn btn--primary btn--xl start-card-cta" id="lesson-hero-cta">
+        ${
+          next
+            ? `<button class="btn btn--primary btn--xl start-card-cta" id="lesson-hero-cta">
           ${lesson.started ? 'Continue lesson' : "Start today's lesson"} →
-        </button>` : ''}
-      </div>` : '';
+        </button>`
+            : ''
+        }
+      </div>`
+      : '';
 
     section.innerHTML = `
       ${journeyBarHtml}
@@ -1531,7 +1610,13 @@ class App {
     });
 
     // Award the completion bonus the moment the last step ticks over.
-    const award = (() => { try { return finalizeLessonIfComplete(); } catch (_) { return null; } })();
+    const award = (() => {
+      try {
+        return finalizeLessonIfComplete();
+      } catch (_) {
+        return null;
+      }
+    })();
     if (award) {
       this._showToast(`🎉 Today's lesson complete! +${award.bonus} bonus XP`, 'success');
     }
@@ -1550,19 +1635,18 @@ class App {
    *            Phonics modes are irrelevant → hide them.
    */
   _manageSectionVisibility(readingBand = 'pre-reader') {
-    const coreSection   = document.getElementById('home-core-section');
+    const coreSection = document.getElementById('home-core-section');
     const questsSection = document.getElementById('home-quests-section');
     const questsHeading = document.getElementById('quests-section-heading');
-    const questsSub     = document.getElementById('quests-section-sub');
-    const levelBadge    = document.getElementById('primary-level-badge');
-    const startHere     = document.getElementById('primary-start-here');
+    const questsSub = document.getElementById('quests-section-sub');
+    const levelBadge = document.getElementById('primary-level-badge');
+    const startHere = document.getElementById('primary-start-here');
 
     const profile = getActiveProfile ? getActiveProfile() : null;
     // P1–P6 primary profiles always get the Primary English-first layout
     // even if their reading band placement hasn't run yet.
-    const isPrimary = !!profile?.primaryGrade
-      || profile?.schoolLevel === 'primary'
-      || readingBand === 'reader';
+    const isPrimary =
+      !!profile?.primaryGrade || profile?.schoolLevel === 'primary' || readingBand === 'reader';
 
     const layout = isPrimary
       ? { hidePhonicsCore: true, questsMilestone: false, spotlightSentenceForge: false }
@@ -1579,13 +1663,12 @@ class App {
       questsSection?.classList.remove('home-section--milestone');
       questsSection?.classList.add('home-section--primary-priority');
       if (questsHeading) questsHeading.textContent = '🏫 Primary English Quest';
-      if (questsSub)     questsSub.textContent     = 'School-paper components · choose a module · P1–P6';
+      if (questsSub) questsSub.textContent = 'School-paper components · choose a module · P1–P6';
       sentenceForgeBtn?.classList.remove('stories-banner--spotlight');
 
       if (levelBadge && profile?.primaryGrade) {
         levelBadge.style.display = '';
-        levelBadge.innerHTML =
-          `<span class="primary-level-badge__text">Practising: <strong>${profile.primaryGrade} English</strong></span>`;
+        levelBadge.innerHTML = `<span class="primary-level-badge__text">Practising: <strong>${profile.primaryGrade} English</strong></span>`;
       } else if (levelBadge) {
         levelBadge.style.display = 'none';
       }
@@ -1600,8 +1683,11 @@ class App {
       coreSection?.classList.remove('home-section--hidden', 'home-section--collapsed');
       questsSection?.classList.remove('home-section--milestone', 'home-section--primary-priority');
       if (questsHeading) questsHeading.textContent = 'Bridge Quests';
-      if (questsSub)     questsSub.textContent     = 'Keep phonics active and begin Sentence Forge first';
-      sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
+      if (questsSub) questsSub.textContent = 'Keep phonics active and begin Sentence Forge first';
+      sentenceForgeBtn?.classList.toggle(
+        'stories-banner--spotlight',
+        layout.spotlightSentenceForge,
+      );
       if (levelBadge) levelBadge.style.display = 'none';
       if (startHere) startHere.style.display = 'none';
       this._renderTodaysLesson(todaysPlanHost);
@@ -1610,8 +1696,11 @@ class App {
       questsSection?.classList.add('home-section--milestone');
       questsSection?.classList.remove('home-section--primary-priority');
       if (questsHeading) questsHeading.textContent = 'Quest Milestones';
-      if (questsSub)     questsSub.textContent     = 'Unlocks as decoding and reading readiness improve';
-      sentenceForgeBtn?.classList.toggle('stories-banner--spotlight', layout.spotlightSentenceForge);
+      if (questsSub) questsSub.textContent = 'Unlocks as decoding and reading readiness improve';
+      sentenceForgeBtn?.classList.toggle(
+        'stories-banner--spotlight',
+        layout.spotlightSentenceForge,
+      );
       if (levelBadge) levelBadge.style.display = 'none';
       if (startHere) startHere.style.display = 'none';
       this._renderTodaysLesson(todaysPlanHost);
@@ -1650,7 +1739,7 @@ class App {
    * @param {'early'|'primary'} kind
    */
   _applyQuestGroupDefaults(kind) {
-    document.querySelectorAll('#home-quests-section .home-group').forEach(group => {
+    document.querySelectorAll('#home-quests-section .home-group').forEach((group) => {
       if (kind === 'primary') {
         group.setAttribute('open', '');
       } else {
@@ -1678,7 +1767,11 @@ class App {
   /** Toggle the teacher master unlock (password-gated on enable). */
   _toggleTeacherUnlock() {
     if (isTeacherUnlockActive()) {
-      if (window.confirm('Lock teacher mode again? The app will return to the normal locked view for this child.')) {
+      if (
+        window.confirm(
+          'Lock teacher mode again? The app will return to the normal locked view for this child.',
+        )
+      ) {
         lockTeacherMode();
         this._showToast('Teacher mode locked. Back to normal view.', 'info');
         this._renderGuidedJourney();
@@ -1686,7 +1779,9 @@ class App {
       }
       return;
     }
-    const entered = window.prompt('Teacher Unlock — enter password to open every mode, word and category:');
+    const entered = window.prompt(
+      'Teacher Unlock — enter password to open every mode, word and category:',
+    );
     if (entered == null) return; // cancelled
     if (tryTeacherUnlock(entered)) {
       this._showToast('🔓 Teacher mode ON — everything is unlocked.', 'success');
@@ -1707,18 +1802,28 @@ class App {
   _renderTodaysLesson(host) {
     if (!host) return;
     let lesson;
-    try { lesson = getTodaysLessonView(); } catch (_) { lesson = null; }
-    if (!lesson || lesson.total === 0) { host.style.display = 'none'; return; }
+    try {
+      lesson = getTodaysLessonView();
+    } catch (_) {
+      lesson = null;
+    }
+    if (!lesson || lesson.total === 0) {
+      host.style.display = 'none';
+      return;
+    }
 
-    const escAttr = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-    const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
+    const escAttr = (s) =>
+      String(s ?? '')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;');
+    const escText = (s) =>
+      String(s ?? '').replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c]);
 
-    const stepsHtml = lesson.steps.map((step, i) => {
-      const stateClass = step.done ? 'mission-step--done' : '';
-      const aria = step.done
-        ? `${step.title}, complete`
-        : `${step.title}, ${step.progressLabel}`;
-      return `
+    const stepsHtml = lesson.steps
+      .map((step, i) => {
+        const stateClass = step.done ? 'mission-step--done' : '';
+        const aria = step.done ? `${step.title}, complete` : `${step.title}, ${step.progressLabel}`;
+        return `
         <button type="button"
           class="mission-step ${stateClass}"
           data-lesson-step="${i}"
@@ -1731,7 +1836,8 @@ class App {
           </span>
           <span class="mission-step__progress" aria-hidden="true">${escText(step.progressLabel)}</span>
         </button>`;
-    }).join('');
+      })
+      .join('');
 
     const headline = lesson.complete
       ? "🎉 Today's lesson complete! See you tomorrow."
@@ -1748,7 +1854,7 @@ class App {
       </div>
       <div class="mission-card" role="group" aria-label="Today's lesson steps">${stepsHtml}</div>`;
 
-    host.querySelectorAll('[data-lesson-step]').forEach(btn => {
+    host.querySelectorAll('[data-lesson-step]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const step = lesson.steps[Number(btn.dataset.lessonStep)];
         this._runLessonStep(step);
@@ -1805,21 +1911,24 @@ class App {
   /** Mark mode cards and quest banners that have been used before. */
   _refreshQuestProgress() {
     const currentMode = store.get('currentMode');
-    document.querySelectorAll('.mode-card').forEach(card => {
-      card.classList.toggle('mode-card--started', !!currentMode && card.dataset.mode === currentMode);
+    document.querySelectorAll('.mode-card').forEach((card) => {
+      card.classList.toggle(
+        'mode-card--started',
+        !!currentMode && card.dataset.mode === currentMode,
+      );
     });
 
     const mastery = store.get('questMastery') || {};
     const questMap = {
-      'btn-grammar-mcq':   'grammarMcq',
-      'btn-vocab-mcq':     'vocabMcq',
-      'btn-cloze-castle':  'clozeCastle',
-      'btn-word-vault':    'wordVault',
-      'btn-sentence-forge':'sentenceForge',
+      'btn-grammar-mcq': 'grammarMcq',
+      'btn-vocab-mcq': 'vocabMcq',
+      'btn-cloze-castle': 'clozeCastle',
+      'btn-word-vault': 'wordVault',
+      'btn-sentence-forge': 'sentenceForge',
       'btn-editing-quest': 'editingQuest',
       'btn-writing-quest': 'writingQuest',
-      'btn-paper-mode':    'paperMode',
-      'btn-stories':       'stories',
+      'btn-paper-mode': 'paperMode',
+      'btn-stories': 'stories',
     };
     Object.entries(questMap).forEach(([btnId, key]) => {
       const btn = document.getElementById(btnId);
@@ -1843,7 +1952,9 @@ class App {
     if (isTeacherUnlockActive()) grade = null;
     const buttons = document.querySelectorAll('[data-grade-filter]');
     if (!grade) {
-      buttons.forEach((b) => { b.hidden = false; });
+      buttons.forEach((b) => {
+        b.hidden = false;
+      });
       return;
     }
     buttons.forEach((b) => {
@@ -1858,7 +1969,8 @@ class App {
     const note = document.createElement('p');
     note.className = 'early-reading-note';
     note.setAttribute('role', 'note');
-    note.textContent = 'Phonics and blending are still available below — open them whenever you want a warm-up before Primary English practice.';
+    note.textContent =
+      'Phonics and blending are still available below — open them whenever you want a warm-up before Primary English practice.';
     section.prepend(note);
   }
 
@@ -1912,25 +2024,43 @@ class App {
     // html`` escapes each interpolation, so a profile name carrying markup
     // (typed, or arriving via an imported profile file) renders as text.
     // Raw.toString() makes the trailing .join('') safe to keep.
-    grid.innerHTML = profiles.map(p => html`
-      <div class="profile-card ${activeProfile?.id === p.id ? 'profile-card--active' : ''}"
-           role="listitem">
-        <button class="profile-select-btn" data-profile-id="${p.id}"
-                aria-label="Play as ${p.name}${activeProfile?.id === p.id ? ' (current)' : ''}">
-          <span class="profile-avatar" style="background:${p.color}20;border-color:${p.color}">
-            ${p.avatar}
-          </span>
-          <span class="profile-name">${p.name}</span>
-          ${activeProfile?.id === p.id ? raw('<span class="profile-active-badge">●</span>') : ''}
-        </button>
-        ${profiles.length > 1 ? html`
-          <button class="profile-delete-btn" data-delete-id="${p.id}"
-                  aria-label="Delete ${p.name}'s profile">✕</button>
-        ` : ''}
-      </div>
-    `).join('');
+    grid.innerHTML = profiles
+      .map(
+        (p) => html`
+          <div
+            class="profile-card ${activeProfile?.id === p.id ? 'profile-card--active' : ''}"
+            role="listitem"
+          >
+            <button
+              class="profile-select-btn"
+              data-profile-id="${p.id}"
+              aria-label="Play as ${p.name}${activeProfile?.id === p.id ? ' (current)' : ''}"
+            >
+              <span class="profile-avatar" style="background:${p.color}20;border-color:${p.color}">
+                ${p.avatar}
+              </span>
+              <span class="profile-name">${p.name}</span>
+              ${activeProfile?.id === p.id ? raw('<span class="profile-active-badge">●</span>') : ''}
+            </button>
+            ${
+          profiles.length > 1
+            ? html`
+                <button
+                  class="profile-delete-btn"
+                  data-delete-id="${p.id}"
+                  aria-label="Delete ${p.name}'s profile"
+                >
+                  ✕
+                </button>
+              `
+            : ''
+        }
+          </div>
+        `,
+      )
+      .join('');
 
-    grid.querySelectorAll('.profile-select-btn').forEach(btn => {
+    grid.querySelectorAll('.profile-select-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         const id = btn.dataset.profileId;
         activateProfile(id);
@@ -1943,11 +2073,11 @@ class App {
       });
     });
 
-    grid.querySelectorAll('.profile-delete-btn').forEach(btn => {
+    grid.querySelectorAll('.profile-delete-btn').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const id = btn.dataset.deleteId;
-        const name = getProfiles().find(p => p.id === id)?.name || 'this player';
+        const name = getProfiles().find((p) => p.id === id)?.name || 'this player';
         if (confirm(`Delete ${name}'s profile and all progress?`)) {
           deleteProfile(id);
           this._renderProfileGrid();
@@ -1959,7 +2089,7 @@ class App {
   _updateProfileChip() {
     const chip = document.getElementById('profile-chip');
     const avatar = document.getElementById('profile-chip-avatar');
-    const name   = document.getElementById('profile-chip-name');
+    const name = document.getElementById('profile-chip-name');
     const profiles = getProfiles();
 
     if (!chip) return;
@@ -1973,7 +2103,7 @@ class App {
       chip.style.display = '';
       chip.setAttribute('aria-label', 'Manage players');
       if (avatar) avatar.textContent = '🧑‍🎓';
-      if (name)   name.textContent   = 'Players';
+      if (name) name.textContent = 'Players';
       return;
     }
 
@@ -1981,22 +2111,24 @@ class App {
     chip.setAttribute('aria-label', profiles.length > 1 ? 'Switch player' : 'Manage players');
     chip.style.setProperty('--profile-color', profile.color);
     if (avatar) avatar.textContent = profile.avatar;
-    if (name)   name.textContent   = profile.name;
+    if (name) name.textContent = profile.name;
   }
 
   _openCreateProfileModal() {
     const row = document.getElementById('cp-avatar-row');
     if (row) {
-      row.innerHTML = AVATAR_OPTIONS.map((av, i) => `
+      row.innerHTML = AVATAR_OPTIONS.map(
+        (av, i) => `
         <button class="cp-avatar-btn ${i === 0 ? 'cp-avatar-btn--selected' : ''}"
                 data-avatar="${av}" aria-label="${av}" aria-pressed="${i === 0}">
           ${av}
         </button>
-      `).join('');
+      `,
+      ).join('');
 
-      row.querySelectorAll('.cp-avatar-btn').forEach(btn => {
+      row.querySelectorAll('.cp-avatar-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
-          row.querySelectorAll('.cp-avatar-btn').forEach(b => {
+          row.querySelectorAll('.cp-avatar-btn').forEach((b) => {
             b.classList.remove('cp-avatar-btn--selected');
             b.setAttribute('aria-pressed', 'false');
           });
@@ -2011,13 +2143,13 @@ class App {
 
     const levelGroup = document.getElementById('cp-level-group');
     const gradeGroup = document.getElementById('cp-grade-group');
-    const levelHint  = document.getElementById('cp-level-hint');
+    const levelHint = document.getElementById('cp-level-hint');
     if (levelGroup) {
       const levelBtns = levelGroup.querySelectorAll('.cp-level-btn');
       const gradeBtns = gradeGroup ? gradeGroup.querySelectorAll('.cp-grade-btn') : [];
 
       const setGrade = (selected) => {
-        gradeBtns.forEach(b => {
+        gradeBtns.forEach((b) => {
           const active = b === selected;
           b.classList.toggle('cp-grade-btn--selected', active);
           b.setAttribute('aria-pressed', String(active));
@@ -2025,7 +2157,7 @@ class App {
       };
 
       const setLevel = (selected) => {
-        levelBtns.forEach(b => {
+        levelBtns.forEach((b) => {
           const active = b === selected;
           b.classList.toggle('cp-level-btn--selected', active);
           b.setAttribute('aria-pressed', String(active));
@@ -2042,8 +2174,8 @@ class App {
 
       // Default to preschool on each open
       setLevel(levelGroup.querySelector('[data-level="preschool"]'));
-      levelBtns.forEach(btn => btn.addEventListener('click', () => setLevel(btn)));
-      gradeBtns.forEach(btn => btn.addEventListener('click', () => setGrade(btn)));
+      levelBtns.forEach((btn) => btn.addEventListener('click', () => setLevel(btn)));
+      gradeBtns.forEach((btn) => btn.addEventListener('click', () => setGrade(btn)));
     }
 
     this._openModal('modal-create-profile');
@@ -2148,7 +2280,10 @@ class App {
       store.set('placementComplete', true);
       this._afterPlacement(profile, primaryPlacement);
     };
-    if (!container) { seedDefaultsAndContinue(); return; }
+    if (!container) {
+      seedDefaultsAndContinue();
+      return;
+    }
     this._showScreen('screen-placement');
     try {
       const { showPrimaryQuickCheck } = await quickCheckMod.load();
@@ -2281,16 +2416,16 @@ class App {
    * @param {{ xpEarned: number }} reward
    */
   _showSessionSummaryScreen(reward) {
-    const wordsToday   = (store.get('sessionWordsToday') || []).length;
+    const wordsToday = (store.get('sessionWordsToday') || []).length;
     const firstTryCount = store.get('sessionFirstTryToday') || 0;
-    const streak       = store.get('streak') || 0;
+    const streak = store.get('streak') || 0;
 
     // Collect any badges that fired today
     const newBadges = badges.getRecentlyEarned?.() || [];
 
     showSessionSummary({
-      xpEarned:    store.get('sessionXpToday') || reward.xpEarned || 0,
-      wordsCount:  wordsToday,
+      xpEarned: store.get('sessionXpToday') || reward.xpEarned || 0,
+      wordsCount: wordsToday,
       firstTryCount,
       streak,
       newBadges,
@@ -2336,8 +2471,9 @@ class App {
     // Drop stages a mode can't actually serve — e.g. the irregular sight-word
     // stage under Blend It! / Listen & Blend, which can't be sounded out and
     // would otherwise fall back to the general pool (a misleading dead stage).
-    const stagesForMode = getStagesForMode(mode, CURRICULUM, PHASES)
-      .filter(stage => !isStageHiddenForMode(stage.group, mode));
+    const stagesForMode = getStagesForMode(mode, CURRICULUM, PHASES).filter(
+      (stage) => !isStageHiddenForMode(stage.group, mode),
+    );
     if (!stagesForMode.length) {
       // Defensive: should never hit — getStagesForMode falls back to full
       // curriculum when no phase recommends the mode. If it does, just
@@ -2347,16 +2483,24 @@ class App {
     }
 
     const groupMastery = store.get('groupMastery') || {};
-    const snapshot     = buildProgressionSnapshot();
+    const snapshot = buildProgressionSnapshot();
     // Listening-first modes don't require decoding, so the strict decoding
     // gate would lock out exactly the pre-readers these games exist for.
     // Every stage stays open; word difficulty still rises stage by stage.
-    const ORAL_MODES = new Set(['first', 'last', 'middle', 'oralBlend', 'soundCount', 'oralSegment', 'oddOneOut', 'train', 'wordCount']);
-    const isOralMode   = ORAL_MODES.has(mode);
-    const unlocked     = isOralMode
-      ? stagesForMode.map(s => s.id)
-      : getUnlockedStages(snapshot);
-    const recommended  = getRecommendedStage(snapshot);
+    const ORAL_MODES = new Set([
+      'first',
+      'last',
+      'middle',
+      'oralBlend',
+      'soundCount',
+      'oralSegment',
+      'oddOneOut',
+      'train',
+      'wordCount',
+    ]);
+    const isOralMode = ORAL_MODES.has(mode);
+    const unlocked = isOralMode ? stagesForMode.map((s) => s.id) : getUnlockedStages(snapshot);
+    const recommended = getRecommendedStage(snapshot);
 
     document.getElementById('modal-blend-picker')?.remove();
 
@@ -2367,11 +2511,11 @@ class App {
       (byPhase[stage.phase] ??= []).push(stage);
     }
 
-    const modeMeta   = MODES[mode] || null;
-    const modeIcon   = modeMeta?.icon || '🎯';
-    const modeName   = modeMeta?.name || 'Phonics Quest';
-    const desc       = modeMeta?.desc || '';
-    const modeIntro  = desc ? (/[.?!]$/.test(desc) ? desc : `${desc}.`) : '';
+    const modeMeta = MODES[mode] || null;
+    const modeIcon = modeMeta?.icon || '🎯';
+    const modeName = modeMeta?.name || 'Phonics Quest';
+    const desc = modeMeta?.desc || '';
+    const modeIntro = desc ? (/[.?!]$/.test(desc) ? desc : `${desc}.`) : '';
 
     let stagesHtml = '';
     for (const [phaseNum, stages] of Object.entries(byPhase)) {
@@ -2380,14 +2524,14 @@ class App {
 
       for (const stage of stages) {
         const isUnlocked = unlocked.includes(stage.id);
-        const isRec      = recommended?.id === stage.id;
-        const mastery    = groupMastery[stage.group] ?? 0;
-        const pct        = Math.round(mastery * 100);
-        const lockedCls  = isUnlocked ? '' : 'bp-stage--locked';
-        const recCls     = isRec      ? 'bp-stage--recommended' : '';
+        const isRec = recommended?.id === stage.id;
+        const mastery = groupMastery[stage.group] ?? 0;
+        const pct = Math.round(mastery * 100);
+        const lockedCls = isUnlocked ? '' : 'bp-stage--locked';
+        const recCls = isRec ? 'bp-stage--recommended' : '';
         // When locked, show *why* — the strict gate's failed checks. Helps
         // a parent see "ah, only 8/12 unique words" rather than a bare 🔒.
-        const lockReason = isUnlocked ? '' : (explainLockReason(stage.id, snapshot) || '');
+        const lockReason = isUnlocked ? '' : explainLockReason(stage.id, snapshot) || '';
 
         stagesHtml += `
           <button class="bp-stage ${lockedCls} ${recCls}"
@@ -2400,13 +2544,19 @@ class App {
                 ${stage.name}${isRec ? '<span class="bp-rec-badge">★ Next</span>' : ''}
               </div>
               <div class="bp-stage-desc">${stage.description}</div>
-              ${isUnlocked ? `
+              ${
+                isUnlocked
+                  ? `
                 <div class="bp-stage-mastery-row">
                   <div class="bp-stage-mastery-wrap">
                     <div class="bp-stage-mastery-bar" style="width:${pct}%"></div>
                   </div>
                   <span class="bp-stage-pct${pct >= 80 ? ' bp-stage-pct--mastered' : ''}">${pct}%</span>
-                </div>` : lockReason ? `<div class="bp-stage-lock-reason">${lockReason}</div>` : ''}
+                </div>`
+                  : lockReason
+                    ? `<div class="bp-stage-lock-reason">${lockReason}</div>`
+                    : ''
+              }
             </div>
           </button>`;
       }
@@ -2414,7 +2564,7 @@ class App {
     }
 
     const modal = document.createElement('div');
-    modal.id        = 'modal-blend-picker';
+    modal.id = 'modal-blend-picker';
     modal.className = 'modal-overlay';
     modal.innerHTML = `
       <div class="modal-panel bp-panel">
@@ -2429,7 +2579,7 @@ class App {
 
     document.body.appendChild(modal);
 
-    modal.querySelectorAll('.bp-stage:not([disabled])').forEach(btn => {
+    modal.querySelectorAll('.bp-stage:not([disabled])').forEach((btn) => {
       btn.addEventListener('click', () => {
         const group = btn.dataset.group;
         store.set('currentGroup', group);
@@ -2439,11 +2589,14 @@ class App {
     });
 
     document.getElementById('bp-close-btn')?.addEventListener('click', () => modal.remove());
-    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.remove();
+    });
 
     // Scroll recommended stage into view
     setTimeout(() => {
-      modal.querySelector('.bp-stage--recommended')
+      modal
+        .querySelector('.bp-stage--recommended')
         ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 120);
   }
@@ -2548,7 +2701,9 @@ class App {
    * minutes estimate (~35s/item) once the queue has anything in it.
    */
   /** @see modules/homeBanners.js */
-  _updateReviewBanner() { homeBanners.updateReviewBanner(); }
+  _updateReviewBanner() {
+    homeBanners.updateReviewBanner();
+  }
 
   /**
    * Small count pill on the 🎯 Today tab: review-due words + recent
@@ -2556,7 +2711,9 @@ class App {
    * the tab. Capped at 9+ to stay glanceable.
    */
   /** @see modules/homeBanners.js */
-  _updateTodayTabBadge() { homeBanners.updateTodayTabBadge(); }
+  _updateTodayTabBadge() {
+    homeBanners.updateTodayTabBadge();
+  }
 
   /**
    * Refresh the Bedtime Mode toggle in the header. Mirrors the persisted
@@ -2583,7 +2740,9 @@ class App {
    * profile doesn't see a button that would just say "nothing to do".
    */
   /** @see modules/homeBanners.js */
-  _updateWordWorkoutBanner() { homeBanners.updateWordWorkoutBanner(); }
+  _updateWordWorkoutBanner() {
+    homeBanners.updateWordWorkoutBanner();
+  }
 
   /**
    * Refresh the Mistakes Den home tile. Hidden when the last 7 days are
@@ -2591,7 +2750,9 @@ class App {
    * a clean home rather than a "0 mistakes" guilt-free chip.
    */
   /** @see modules/homeBanners.js */
-  _updateMistakesDenBanner() { homeBanners.updateMistakesDenBanner(); }
+  _updateMistakesDenBanner() {
+    homeBanners.updateMistakesDenBanner();
+  }
 
   /**
    * Open the Learning Roadmap — the parent journey map. Deliberately not
@@ -2624,17 +2785,23 @@ class App {
    * profiles with a key also get a typed question box.
    */
   /** @see components/panels/askGiriPanel.js */
-  _openAskGiri() { askGiriPanel.openAskGiriPanel(); }
+  _openAskGiri() {
+    askGiriPanel.openAskGiriPanel();
+  }
 
   /** @see components/panels/askGiriPanel.js */
-  _renderAskGiri(host) { askGiriPanel.renderAskGiriPanel(host); }
+  _renderAskGiri(host) {
+    askGiriPanel.renderAskGiriPanel(host);
+  }
 
   /**
    * Open the Mistakes Den modal. Pulls a fresh summary every open so a
    * mid-session retry that just happened isn't shown stale.
    */
   /** @see components/panels/mistakesDenPanel.js */
-  _openMistakesDen() { mistakesDenPanel.openMistakesDenPanel(t => this._navigateTo(t)); }
+  _openMistakesDen() {
+    mistakesDenPanel.openMistakesDenPanel((t) => this._navigateTo(t));
+  }
 
   /**
    * Render the Mistakes Den modal body — list grouped by module, each row
@@ -2642,7 +2809,9 @@ class App {
    * selection picks up the now-overdue item).
    */
   /** @see components/panels/mistakesDenPanel.js */
-  _renderMistakesDen(host, summary) { mistakesDenPanel.renderMistakesDenPanel(host, summary, t => this._navigateTo(t)); }
+  _renderMistakesDen(host, summary) {
+    mistakesDenPanel.renderMistakesDenPanel(host, summary, (t) => this._navigateTo(t));
+  }
 
   /**
    * Refresh the "My Trophy Room" home tile. Only surfaces once the child
@@ -2653,14 +2822,18 @@ class App {
    * week never feels like a scold.
    */
   /** @see modules/homeBanners.js */
-  _updatePersonalBestBanner() { homeBanners.updatePersonalBestBanner(); }
+  _updatePersonalBestBanner() {
+    homeBanners.updatePersonalBestBanner();
+  }
 
   /**
    * Open the trophy room modal — pulls a fresh snapshot every time so a
    * just-earned graduation / streak day shows immediately.
    */
   /** @see components/panels/trophyRoomPanel.js */
-  _openPersonalBestWall() { trophyRoomPanel.openTrophyRoomPanel(); }
+  _openPersonalBestWall() {
+    trophyRoomPanel.openTrophyRoomPanel();
+  }
 
   /**
    * Render the trophy room body: a grid of cards (numbers + label + sub),
@@ -2668,10 +2841,14 @@ class App {
    * Pure HTML build — no chart library, no comparison-to-others framing.
    */
   /** @see components/panels/trophyRoomPanel.js */
-  _renderPersonalBestWall(host, pb) { trophyRoomPanel.renderTrophyRoomPanel(host, pb); }
+  _renderPersonalBestWall(host, pb) {
+    trophyRoomPanel.renderTrophyRoomPanel(host, pb);
+  }
 
   /** @see modules/homeBanners.js */
-  _updateDailyBanner() { homeBanners.updateDailyBanner(); }
+  _updateDailyBanner() {
+    homeBanners.updateDailyBanner();
+  }
 
   // ── Per-Mode Adaptive Difficulty ──
 
@@ -2682,10 +2859,10 @@ class App {
    */
   _adjustModeDifficulty() {
     const history = store.get('wordHistory') || [];
-    const modeHistory = history.filter(h => h.mode === this._mode).slice(0, 10);
+    const modeHistory = history.filter((h) => h.mode === this._mode).slice(0, 10);
     if (modeHistory.length < 10) return; // not enough data yet
 
-    const correct = modeHistory.filter(h => h.correct).length;
+    const correct = modeHistory.filter((h) => h.correct).length;
     const accuracy = correct / modeHistory.length;
 
     const modeDiffs = store.get('modeDifficulty') || {};
@@ -2694,7 +2871,7 @@ class App {
     let next = current;
     if (accuracy >= 0.85 && current < 3) {
       next = current + 1;
-    } else if (accuracy < 0.50 && current > 1) {
+    } else if (accuracy < 0.5 && current > 1) {
       next = current - 1;
     }
 
@@ -2706,7 +2883,7 @@ class App {
         next > current
           ? `Level up! ${labels[next]} difficulty for this mode!`
           : `Easing back to ${labels[next]} for this mode.`,
-        next > current ? 'success' : 'info'
+        next > current ? 'success' : 'info',
       );
     }
   }
@@ -2725,10 +2902,10 @@ class App {
       return {
         mastered: Infinity,
         sentenceForge: open(QUEST_THRESHOLDS.sentenceForge),
-        clozeCastle:   open(QUEST_THRESHOLDS.clozeCastle),
-        wordVault:     open(QUEST_THRESHOLDS.wordVault),
-        editingQuest:  open(QUEST_THRESHOLDS.editingQuest),
-        writingQuest:  open(QUEST_THRESHOLDS.writingQuest),
+        clozeCastle: open(QUEST_THRESHOLDS.clozeCastle),
+        wordVault: open(QUEST_THRESHOLDS.wordVault),
+        editingQuest: open(QUEST_THRESHOLDS.editingQuest),
+        writingQuest: open(QUEST_THRESHOLDS.writingQuest),
       };
     }
     const profile = getActiveProfile();
@@ -2738,9 +2915,9 @@ class App {
   }
 
   /** @see modules/homeBanners.js */
-  _updateQuestBanners() { homeBanners.updateQuestBanners(this._getQuestUnlockStatus()); }
-
+  _updateQuestBanners() {
+    homeBanners.updateQuestBanners(this._getQuestUnlockStatus());
+  }
 }
-
 
 export const app = new App();

@@ -9,9 +9,15 @@ const localStorageMock = (() => {
   let store = {};
   return {
     getItem: vi.fn((key) => store[key] ?? null),
-    setItem: vi.fn((key, val) => { store[key] = String(val); }),
-    removeItem: vi.fn((key) => { delete store[key]; }),
-    clear: vi.fn(() => { store = {}; }),
+    setItem: vi.fn((key, val) => {
+      store[key] = String(val);
+    }),
+    removeItem: vi.fn((key) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
     _store: store,
   };
 })();
@@ -51,11 +57,13 @@ describe('Store', () => {
       localStorageMock.setItem.mockClear();
       store.set('xp', 100);
       // Persistence is debounced via queueMicrotask
-      await new Promise(resolve => queueMicrotask(resolve));
+      await new Promise((resolve) => queueMicrotask(resolve));
       expect(localStorageMock.setItem).toHaveBeenCalled();
       // A daily __backup write may follow the main write — assert on the
       // last write to the main key specifically.
-      const mainWrites = localStorageMock.setItem.mock.calls.filter(([k]) => k === 'phonicsquest_v2');
+      const mainWrites = localStorageMock.setItem.mock.calls.filter(
+        ([k]) => k === 'phonicsquest_v2',
+      );
       const saved = JSON.parse(mainWrites.at(-1)[1]);
       expect(saved.xp).toBe(100);
     });
@@ -180,13 +188,16 @@ describe('Store', () => {
 
     it('repairs a single bad field without wiping the rest of the profile', async () => {
       localStorageMock.clear();
-      localStorageMock.setItem('phonicsquest_v2', JSON.stringify({
-        xp: NaN, // JSON.stringify(NaN) -> null, an invalid xp
-        level: 4,
-        streak: 12,
-        wordStats: { cat: { attempts: 9, correct: 8 } },
-        badges: ['first-word'],
-      }));
+      localStorageMock.setItem(
+        'phonicsquest_v2',
+        JSON.stringify({
+          xp: NaN, // JSON.stringify(NaN) -> null, an invalid xp
+          level: 4,
+          streak: 12,
+          wordStats: { cat: { attempts: 9, correct: 8 } },
+          badges: ['first-word'],
+        }),
+      );
       vi.resetModules();
       const mod = await import('../modules/store.js');
       expect(mod.store.get('xp')).toBe(0); // bad field reset to default
@@ -218,10 +229,13 @@ describe('Store', () => {
       localStorageMock.clear();
       // A save from a version that predates several questMastery buckets and
       // only overrode one adaptiveConfig field.
-      localStorageMock.setItem('phonicsquest_v2', JSON.stringify({
-        questMastery: { sentenceForge: { 'skill-1': 0.8 } },
-        adaptiveConfig: { weakWeight: 9 },
-      }));
+      localStorageMock.setItem(
+        'phonicsquest_v2',
+        JSON.stringify({
+          questMastery: { sentenceForge: { 'skill-1': 0.8 } },
+          adaptiveConfig: { weakWeight: 9 },
+        }),
+      );
       vi.resetModules();
       const mod = await import('../modules/store.js');
       const qm = mod.store.get('questMastery');
@@ -230,7 +244,8 @@ describe('Store', () => {
       const cfg = mod.store.get('adaptiveConfig');
       expect(cfg.weakWeight).toBe(9); // override kept
       expect(cfg.strongAccuracy).toBe(0.9); // missing sub-key defaulted
-      expect(mod.store.get('schemaVersion')).toBe(1);
+      // _mergeWithDefaults stamps the current schema version onto old saves.
+      expect(mod.store.get('schemaVersion')).toBe(2);
     });
   });
 
@@ -261,10 +276,13 @@ describe('Store', () => {
     it('restores from the backup when the main key is unreadable', async () => {
       localStorageMock.clear();
       localStorageMock.setItem('phonicsquest_v2', '{corrupt!!!');
-      localStorageMock.setItem('phonicsquest_v2__backup', JSON.stringify({
-        savedAt: new Date().toISOString(),
-        state: { xp: 321, level: 5, wordStats: { cat: { attempts: 4, correct: 4 } } },
-      }));
+      localStorageMock.setItem(
+        'phonicsquest_v2__backup',
+        JSON.stringify({
+          savedAt: new Date().toISOString(),
+          state: { xp: 321, level: 5, wordStats: { cat: { attempts: 4, correct: 4 } } },
+        }),
+      );
       vi.resetModules();
       const mod = await import('../modules/store.js');
       expect(mod.store.get('xp')).toBe(321);

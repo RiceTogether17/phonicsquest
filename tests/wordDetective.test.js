@@ -82,8 +82,14 @@ describe('addWordToReview — bank-only, routes through the Review Lane', () => 
     const stats = store.get('wordStats') || {};
     expect(stats.cat).toBeDefined();
     expect(stats.cat.attempts).toBe(1);
-    expect(stats.cat.box).toBeGreaterThanOrEqual(1); // first correct → box 1+
+    // Adding a word to review is a request to practise it, not evidence the
+    // child can read it — so it enters at box 0 and is due immediately
+    // rather than being pushed a day out by a fake "correct".
+    expect(stats.cat.box).toBe(0);
+    expect(stats.cat.byEvidence.exposure.attempts).toBe(1);
+    expect(stats.cat.byEvidence.independent.attempts).toBe(0);
     expect(typeof stats.cat.dueAt).toBe('number');
+    expect(stats.cat.dueAt).toBeLessThanOrEqual(Date.now());
   });
 
   it('refuses to add a non-bank word — no pollution of wordStats', () => {
