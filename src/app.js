@@ -17,6 +17,7 @@ import * as homeBanners from './modules/homeBanners.js';
 import * as returnEvents from './modules/returnEvents.js';
 import * as onboardingController from './modules/onboardingController.js';
 import * as navigationRouter from './modules/navigationRouter.js';
+import * as sessionStarters from './modules/sessionStarters.js';
 import * as askGiriPanel from './components/panels/askGiriPanel.js';
 import * as mistakesDenPanel from './components/panels/mistakesDenPanel.js';
 import * as trophyRoomPanel from './components/panels/trophyRoomPanel.js';
@@ -25,8 +26,6 @@ import { audio } from './modules/audio.js';
 import { gamification } from './modules/gamification.js';
 import { badges } from './modules/badges.js';
 import { progress, isStageHiddenForMode } from './modules/progress.js';
-import { getReviewCapForProfile } from './modules/reviewScheduler.js';
-import { buildWordWorkout } from './modules/wordWorkout.js';
 import {
   isBedtimeActive,
   setBedtimeEnabled,
@@ -82,8 +81,7 @@ import {
   AVATAR_OPTIONS, COLOR_OPTIONS,
 } from './modules/profiles.js';
 import {
-  getDailyChallengeWords, isDailyChallengeComplete,
-  completeDailyChallenge,
+  isDailyChallengeComplete, completeDailyChallenge,
 } from './modules/dailyChallenge.js';
 import { markMissionStepDone } from './modules/missionToday.js';
 import {
@@ -2452,12 +2450,15 @@ class App {
 
   // ── Queued Sessions (Daily Challenge / Review) ──
 
+  /** @see modules/sessionStarters.js */
   _startDailyChallenge() {
+    const session = sessionStarters.buildDailyChallengeSession();
+    this._showToast(session.message, session.tone);
+    if (!session.ok) return;
     this._sessionType = 'dailyChallenge';
-    this._queuedWords = getDailyChallengeWords();
+    this._queuedWords = session.words;
     this._mode = 'blend';
     store.set('currentGroup', null);
-    this._showToast(`Today's 5 words – go! ⚡`, 'info');
     this._startGame();
   }
 
@@ -2466,23 +2467,16 @@ class App {
    * the session by the child's reading band (K1–P1: 10, P2+: 20) so a child
    * returning from a missed week isn't avalanched by a 50-item pile.
    */
+  /** @see modules/sessionStarters.js */
   _startReviewSession() {
     const profile = getActiveProfile ? getActiveProfile() : null;
-    const cap = getReviewCapForProfile(profile);
-    const dueWords = progress.getReviewDueWords({ cap });
-    const totalDue = progress.getReviewDueCount();
-    if (dueWords.length === 0) {
-      this._showToast('All caught up! Come back tomorrow.', 'info');
-      return;
-    }
+    const session = sessionStarters.buildReviewSession(profile);
+    this._showToast(session.message, session.tone);
+    if (!session.ok) return;
     this._sessionType = 'review';
-    this._queuedWords = dueWords;
+    this._queuedWords = session.words;
     this._mode = 'blend';
     store.set('currentGroup', null);
-    const overflow = totalDue > dueWords.length
-      ? ` (${totalDue - dueWords.length} more saved for tomorrow)`
-      : '';
-    this._showToast(`Review Lane: ${dueWords.length} word${dueWords.length === 1 ? '' : 's'}${overflow} 🌟`, 'info');
     this._startGame();
   }
 
@@ -2492,33 +2486,34 @@ class App {
    * completeDailyChallenge(); workouts get a bespoke "you took X through
    * N modes!" toast.
    */
+  /** @see modules/sessionStarters.js */
   _finishQueuedSession() {
     const type = this._sessionType;
     this._sessionType = 'normal';
 
+    const bonusXp = type === 'dailyChallenge' ? completeDailyChallenge() : 0;
+    const feedback = sessionStarters.completionFeedback(type, {
+      bonusXp,
+      workoutWord: this._workoutWord?.word,
+    });
+
+    if (feedback) {
+      if (feedback.celebrate) celebrateDailyGoal();
+      if (feedback.sfx) audio.playSfx(feedback.sfx);
+      this._showToast(feedback.message, feedback.tone);
+    }
+
     if (type === 'dailyChallenge') {
-      const bonusXp = completeDailyChallenge();
-      if (bonusXp > 0) {
-        celebrateDailyGoal();
-        audio.playSfx('levelUp');
-        this._showToast(`Daily Challenge done! +${bonusXp} bonus XP!`, 'success');
-      } else {
-        this._showToast('Daily Challenge already claimed today!', 'info');
-      }
       this._updateDailyBanner();
     } else if (type === 'review') {
-      this._showToast('Review session complete! Great revision! 🔄', 'success');
-      audio.playSfx('correct');
       this._updateReviewBanner();
     } else if (type === 'wordWorkout') {
-      const word = this._workoutWord?.word || 'that word';
-      this._showToast(`Workout done! You took “${word}” through every angle. 🎽`, 'success');
-      audio.playSfx('correct');
       this._workoutWord = null;
       this._queuedRounds = [];
       this._updateReviewBanner();
       this._updateWordWorkoutBanner();
     }
+
     // Refresh Today's Plan ticks immediately on return to home so the child
     // sees their step flip to ✓ without waiting for the next render.
     this._renderGuidedJourney();
@@ -2535,29 +2530,15 @@ class App {
    *
    * @param {import('./data/words.js').Word} [word]  optional explicit word
    */
+  /** @see modules/sessionStarters.js */
   _startWordWorkout(word = null) {
-    let target = word;
-    if (!target) {
-      // Pull the most-overdue Review Lane item — the workout's natural
-      // home. If the queue is empty, surface a friendly toast and bail
-      // (the home tile is hidden in that case anyway).
-      const due = progress.getReviewDueWords({ cap: 1 });
-      target = due[0] || null;
-    }
-    if (!target) {
-      this._showToast('No words to work out — try Review Lane after some practice.', 'info');
-      return;
-    }
-    const rounds = buildWordWorkout(target);
-    if (rounds.length === 0) {
-      this._showToast('That word doesn\'t have a workout ladder yet.', 'info');
-      return;
-    }
+    const session = sessionStarters.buildWordWorkoutSession(word);
+    this._showToast(session.message, session.tone);
+    if (!session.ok) return;
     this._sessionType = 'wordWorkout';
-    this._queuedRounds = rounds;
-    this._workoutWord = target;
+    this._queuedRounds = session.rounds;
+    this._workoutWord = session.word;
     store.set('currentGroup', null);
-    this._showToast(`Workout: “${target.word}” through ${rounds.length} modes 🎽`, 'info');
     this._startGame();
   }
 
