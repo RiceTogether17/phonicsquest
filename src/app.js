@@ -1024,6 +1024,22 @@ class App {
       const shown = showBlendConfirm({
         word,
         modeArea: this._els.modeArea,
+        // Everything that would give the answer away. The graphemes and the
+        // picture are still on screen from the blend, and "Say It" speaks
+        // the target outright — leave any of it up and the child matches or
+        // listens instead of reading, the same shortcut that made Gate B of
+        // the placement screener meaningless.
+        conceal: [
+          this._els.phonemeRow,
+          this._els.wordDisplay,
+          this._els.wordEmoji,
+          this._els.modeInstruction,
+          this._els.btnSayIt,
+          this._els.btnHint,
+          this._els.btnCheck,
+          this._els.btnSkip,
+          this._els.btnMic,
+        ],
         maxLevel: store.get('difficulty') || 1,
         onDone: (confirmed, confirmMs) =>
           this._commitResult(word, confirmed, confirmMs, EVIDENCE.INDEPENDENT),

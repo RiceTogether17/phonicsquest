@@ -300,6 +300,65 @@ describe('blend confirmation — a self-report is not evidence on its own', () =
     expect(recordSpy).toHaveBeenCalledTimes(1);
   });
 
+  it('survives a late repaint of the mode area', async () => {
+    // Blend It! repaints #mode-area asynchronously. A double-tap on
+    // "Blend it!" leaves a repaint in flight, and when it landed on top of
+    // the confirmation round it wiped the question away — leaving the word
+    // soft-locked with _resultProcessing stuck true and nothing to tap.
+    const { app, recordSpy } = await makeApp('blend');
+
+    app._handleResult(true, 1500);
+    expect(document.querySelectorAll('.blend-confirm__card').length).toBe(3);
+
+    // Simulate the stray repaint.
+    app._els.modeArea.innerHTML = '<div class="blend-assess-prompt">Did you blend it right?</div>';
+
+    expect(document.querySelectorAll('.blend-confirm__card').length).toBe(3);
+    answerConfirm(true);
+    expect(recordSpy).toHaveBeenCalledTimes(1);
+    // The mode area is handed back once the round is done.
+    expect(app._els.modeArea.dataset.blendConfirmHidden).toBeUndefined();
+    expect(document.getElementById('blend-confirm-host')).toBeNull();
+  });
+
+  it('hides the graphemes and the picture so the child cannot letter-match', async () => {
+    const { app } = await makeApp('blend');
+
+    app._handleResult(true, 1500);
+    // The blend leaves c-a-t and the picture on screen. Leaving them up
+    // turns "which word did you read?" into a matching exercise.
+    //
+    // Asserted on the marker attribute rather than inline display or the
+    // `hidden` property. `[data-blend-confirm-hidden] { display: none
+    // !important }` in main.css does the hiding, because it has to beat both
+    // `.word-display { display: flex }` and the inline `style.display = ''`
+    // that Blend It!'s async repaint writes to the Say It button.
+    // "Say It" speaks the target outright and "Hint" plays its first sound —
+    // either one hands over the answer.
+    for (const el of [
+      app._els.phonemeRow,
+      app._els.wordDisplay,
+      app._els.wordEmoji,
+      app._els.btnSayIt,
+      app._els.btnHint,
+    ]) {
+      expect(el.dataset.blendConfirmHidden).toBe('1');
+    }
+
+    answerConfirm(true);
+
+    // …and everything comes back for the next word.
+    for (const el of [
+      app._els.phonemeRow,
+      app._els.wordDisplay,
+      app._els.wordEmoji,
+      app._els.btnSayIt,
+      app._els.btnHint,
+    ]) {
+      expect(el.dataset.blendConfirmHidden).toBeUndefined();
+    }
+  });
+
   it('falls back to recording the self-report when no round can be built', async () => {
     const { app, recordSpy } = await makeApp('blend');
     // No mode area to render into — the round must be skipped, and skipping

@@ -28,7 +28,48 @@ import { html } from '../utils/html.js';
 /** How many words the child chooses between (target + distractors). */
 const CHOICE_COUNT = 3;
 
+/**
+ * The round gets its own container rather than borrowing the mode's.
+ *
+ * Blend It! renders asynchronously — `_doBlend` awaits audio and then
+ * repaints `#mode-area`. If the child double-taps "Blend it!" (entirely
+ * normal for a five-year-old) a second repaint is still in flight when they
+ * answer, and it would wipe the confirmation round out from under them,
+ * leaving the word soft-locked with nothing to tap. Owning our own node
+ * makes that impossible.
+ */
+const HOST_ID = 'blend-confirm-host';
+
 let _cleanup = null;
+
+/**
+ * Hide an element for the duration of the round.
+ *
+ * Marks it with `data-blend-confirm-hidden`, which the stylesheet hides with
+ * `display: none !important`. Two weaker approaches both fail here:
+ *
+ *   - `el.hidden = true` — the UA rule `[hidden] { display: none }` is a
+ *     single attribute selector and loses to `.word-display { display: flex }`,
+ *     so it looks right in code and does nothing on screen.
+ *   - inline `style.display = 'none'` — Blend It!'s `_doBlend` sets
+ *     `btnSayIt.style.display = ''` *after* an await, so a repaint still in
+ *     flight when the child answers puts "Say It" back and hands them the
+ *     word.
+ *
+ * A stylesheet `!important` declaration beats a normal inline one, so the
+ * marker wins whatever the mode writes. Teardown just drops the attribute —
+ * there is no saved state to restore, and therefore no restore-order bug.
+ *
+ * @param {Element|null|undefined} el
+ * @returns {(() => void)|null} restore function, or null if there was nothing to hide
+ */
+function _hide(el) {
+  if (!(el instanceof HTMLElement)) return null;
+  el.dataset.blendConfirmHidden = '1';
+  return () => {
+    delete el.dataset.blendConfirmHidden;
+  };
+}
 
 /**
  * Show the confirmation round.
@@ -36,6 +77,11 @@ let _cleanup = null;
  * @param {object} opts
  * @param {import('../data/words.js').Word} opts.word   the word just blended
  * @param {HTMLElement} opts.modeArea                   container to render into
+ * @param {Array<HTMLElement|null>} [opts.conceal]
+ *   Elements to hide for the duration — the phoneme tiles, the word display
+ *   and the picture. Without this the question is free: the graphemes are
+ *   still on screen, so the child letter-matches instead of reading, which
+ *   is exactly the failure mode this round exists to close.
  * @param {number} [opts.maxLevel]                      difficulty cap for distractors
  * @param {(correct: boolean, responseMs: number) => void} opts.onDone
  *   Called exactly once, with the child's answer — but ONLY when a round is
@@ -44,7 +90,7 @@ let _cleanup = null;
  *   a wrong answer would invent a failure the child never made.
  * @returns {boolean} true if a round was shown, false if it was skipped
  */
-export function showBlendConfirm({ word, modeArea, maxLevel = 3, onDone }) {
+export function showBlendConfirm({ word, modeArea, conceal = [], maxLevel = 3, onDone }) {
   cleanupBlendConfirm();
   if (!word || !modeArea) return false;
 
@@ -57,7 +103,20 @@ export function showBlendConfirm({ word, modeArea, maxLevel = 3, onDone }) {
   const startedAt = Date.now();
   let answered = false;
 
-  modeArea.innerHTML = html`
+  // Own node, inserted after the mode area, with the mode area hidden for
+  // the duration. A late repaint from the mode then lands harmlessly on a
+  // hidden element instead of destroying the question.
+  const host = document.createElement('div');
+  host.id = HOST_ID;
+  modeArea.insertAdjacentElement('afterend', host);
+
+  // Hide the mode's own UI plus the printed word, the phoneme tiles and the
+  // picture. Each element is marked so the safety net in
+  // cleanupBlendConfirm can restore it even if teardown is skipped — a
+  // permanently blank game screen is far worse than a missed round.
+  const restores = [modeArea, ...conceal].map(_hide).filter(Boolean);
+
+  host.innerHTML = html`
     <div class="blend-confirm" role="group" aria-labelledby="blend-confirm-prompt">
       <p class="blend-confirm__prompt" id="blend-confirm-prompt">Which word did you just read?</p>
       <div class="blend-confirm__grid choice-grid" id="blend-confirm-grid">
@@ -83,8 +142,8 @@ export function showBlendConfirm({ word, modeArea, maxLevel = 3, onDone }) {
     </div>
   `;
 
-  const grid = modeArea.querySelector('#blend-confirm-grid');
-  const feedback = modeArea.querySelector('#blend-confirm-feedback');
+  const grid = host.querySelector('#blend-confirm-grid');
+  const feedback = host.querySelector('#blend-confirm-feedback');
 
   /** @param {HTMLButtonElement} btn */
   function onTap(btn) {
@@ -110,8 +169,17 @@ export function showBlendConfirm({ word, modeArea, maxLevel = 3, onDone }) {
 
     const responseMs = Date.now() - startedAt;
     // Brief pause so the reveal is readable before the round advances.
-    const timer = setTimeout(() => onDone?.(correct, responseMs), correct ? 700 : 1400);
-    _cleanup = () => clearTimeout(timer);
+    const timer = setTimeout(
+      () => {
+        teardown();
+        onDone?.(correct, responseMs);
+      },
+      correct ? 700 : 1400,
+    );
+    _cleanup = () => {
+      clearTimeout(timer);
+      teardown();
+    };
   }
 
   const handler = (e) => {
@@ -120,8 +188,13 @@ export function showBlendConfirm({ word, modeArea, maxLevel = 3, onDone }) {
   };
   grid?.addEventListener('click', handler);
 
-  const prevCleanup = () => grid?.removeEventListener('click', handler);
-  _cleanup = prevCleanup;
+  function teardown() {
+    grid?.removeEventListener('click', handler);
+    host.remove();
+    for (const restore of restores) restore();
+  }
+
+  _cleanup = teardown;
 
   // Move focus to the first choice so keyboard and screen-reader users land
   // on the question rather than wherever the self-assess buttons were.
@@ -132,8 +205,18 @@ export function showBlendConfirm({ word, modeArea, maxLevel = 3, onDone }) {
   return true;
 }
 
-/** Tear down any pending timer/listener from a previous round. */
+/**
+ * Tear down any live round: clears a pending commit timer, removes the host
+ * node and un-hides the mode area. Safe to call when no round is showing.
+ */
 export function cleanupBlendConfirm() {
   _cleanup?.();
   _cleanup = null;
+  // Belt and braces: if a host or a marked element survived an unexpected
+  // teardown path, make sure it can't leave the game screen permanently
+  // blank.
+  document.getElementById(HOST_ID)?.remove();
+  for (const el of document.querySelectorAll('[data-blend-confirm-hidden]')) {
+    if (el instanceof HTMLElement) delete el.dataset.blendConfirmHidden;
+  }
 }

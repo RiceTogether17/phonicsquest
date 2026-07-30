@@ -17630,6 +17630,17 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   color: #15803d;
 }
 
+/* Elements concealed while the blend confirmation round is up: the printed
+   word, the phoneme tiles, the picture and the action buttons ("Say It"
+   speaks the target outright). !important is load-bearing — Blend It!'s
+   _doBlend writes `btnSayIt.style.display = ''` after an await, and a
+   repaint still in flight when the child answers would otherwise hand them
+   the answer mid-question. A stylesheet !important beats a normal inline
+   declaration, so this wins the race. */
+[data-blend-confirm-hidden] {
+  display: none !important;
+}
+
 /* ─── Blend confirmation round ────────────────────────────────────────────
    Shown after a self-assessed blend: three printed words, no audio, no
    model. This is where blending earns independent evidence, so it must read
