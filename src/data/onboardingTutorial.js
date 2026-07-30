@@ -10,20 +10,26 @@
  * onboardingController.js. Keep it that way: never interpolate learner or
  * model text into these strings.
  *
- * KNOWN CONTENT GAP (pre-existing, surfaced when this table was extracted
- * from app.js): coverage is uneven across bands.
+ * All four bands now carry the same 4-screen deck:
+ *   journey · daily order · Best Next Step · bonus activities
  *
- *   pre-reader         4 screens  (journey · daily order · Best Next Step · bonuses)
- *   emerging-decoder   1 screen   (journey only)
- *   developing-reader  1 screen   (journey only)
- *   reader             4 screens  (journey · daily order · Best Next Step · bonuses)
+ * They did not always. emerging-decoder and developing-reader shipped with
+ * only the journey-overview screen, so a parent whose child placed into
+ * either middle band — the most common mid-journey states — never saw the
+ * daily order, the Best Next Step explanation, or which activities are
+ * bonuses rather than the lesson. The missing screens were written to
+ * mirror the pre-reader and reader decks, using each band's own activities
+ * (Blend It! / Sight Words / Stories for emerging, Blend It! / Stories /
+ * Sentence Forge for developing) rather than generic copy.
  *
- * So a parent whose child places into either middle band never sees the
- * "follow this order each day", "Best Next Step" or "bonus activities"
- * orientation that pre-reader and reader parents get — and those two bands
- * are the most common mid-journey states. Writing that copy is a content
- * decision, so it is flagged here rather than invented; the shape to follow
- * is the pre-reader deck below.
+ * If you add a band, give it the full four screens — a test asserts every
+ * band has a deck, and `onboardingController.test.js` pins the count.
+ *
+ * Tab locations in the bonus screens are checked against index.html: only
+ * Daily Challenge, Random Activity and My Trophy Room actually live in the
+ * Extra tab. The original pre-reader and reader decks told parents Sight
+ * Words, Giri Stories and Letter Sounds were there too — they are in the
+ * Learn tab, so every deck now names the right tab for each activity.
  *
  * @typedef {{ icon: string, title: string, body: string }} TutorialScreen
  */
@@ -74,11 +80,10 @@ export const ONBOARDING_TUTORIAL = {
         title: 'Bonus activities — use after the main lesson',
         body: `<div class="ob-bonus-list">
                  <div class="ob-bonus-item">⚡ <strong>Daily Challenge</strong> — 5-word bonus round, earns extra XP</div>
-                 <div class="ob-bonus-item">🃏 <strong>Sight Words</strong> — flip &amp; match high-frequency words</div>
-                 <div class="ob-bonus-item">🎡 <strong>Random Activity</strong> — spin the wheel for a surprise mode</div>
-                 <div class="ob-bonus-item">🔤 <strong>Letter Sounds</strong> — tap any sound to hear it</div>
+                 <div class="ob-bonus-item">🎡 <strong>Random Activity</strong> — spin the wheel for a surprise</div>
+                 <div class="ob-bonus-item">🏆 <strong>My Trophy Room</strong> — your child’s own bests, never a ranking</div>
                </div>
-               <p class="ob-bonus-note">Find these in the <strong>🎁 Extra</strong> tab at the top of the home screen.</p>`,
+               <p class="ob-bonus-note">Find these in the <strong>🎁 Extra</strong> tab. Sight Words and Letter Sounds are in the <strong>📚 Learn</strong> tab.</p>`,
       },
     ],
     'emerging-decoder': [
@@ -92,6 +97,44 @@ export const ONBOARDING_TUTORIAL = {
                  <li><strong>📚 Giri Stories</strong> — short connected reading</li>
                </ul>`,
       },
+      {
+        icon: '📋',
+        title: 'Follow this order each day',
+        body: `<div class="ob-steps">
+                 <div class="ob-step">
+                   <span class="ob-step-num">1</span>
+                   <div><strong>Start with Blend It!</strong><br><small>Sound out words step by step</small></div>
+                 </div>
+                 <div class="ob-step">
+                   <span class="ob-step-num">2</span>
+                   <div><strong>Practise Sight Words</strong><br><small>Words that can't be sounded out</small></div>
+                 </div>
+                 <div class="ob-step">
+                   <span class="ob-step-num">3</span>
+                   <div><strong>Finish with a Giri Story</strong><br><small>Put those words together in real reading</small></div>
+                 </div>
+               </div>`,
+      },
+      {
+        icon: '⭐',
+        title: 'Look for this card every day',
+        body: `<div class="ob-highlight-card">
+                 <div class="ob-highlight-eyebrow">TODAY'S START POINT</div>
+                 <p class="ob-highlight-title">Best Next Step</p>
+                 <p class="ob-highlight-body">This card is always first on the home screen. It tells you <strong>exactly which sound or word group</strong> to practise today, based on what your child has found tricky.</p>
+               </div>
+               <p class="ob-highlight-hint">👆 Just tap the big button — the app guides you from there.</p>`,
+      },
+      {
+        icon: '🎮',
+        title: 'Bonus activities — use after the main lesson',
+        body: `<div class="ob-bonus-list">
+                 <div class="ob-bonus-item">⚡ <strong>Daily Challenge</strong> — 5-word bonus round, earns extra XP</div>
+                 <div class="ob-bonus-item">🎡 <strong>Random Activity</strong> — spin the wheel for a surprise</div>
+                 <div class="ob-bonus-item">🏆 <strong>My Trophy Room</strong> — your child’s own bests, never a ranking</div>
+               </div>
+               <p class="ob-bonus-note">Find these in the <strong>🎁 Extra</strong> tab. Sight Words and Giri Stories are in the <strong>📚 Learn</strong> tab.</p>`,
+      },
     ],
     'developing-reader': [
       {
@@ -103,6 +146,44 @@ export const ONBOARDING_TUTORIAL = {
                  <li><strong>📚 Giri Stories</strong> — sentence &amp; paragraph reading</li>
                  <li><strong>🔨 Sentence Forge</strong> — begin sentence building</li>
                </ul>`,
+      },
+      {
+        icon: '📋',
+        title: 'Follow this order each day',
+        body: `<div class="ob-steps">
+                 <div class="ob-step">
+                   <span class="ob-step-num">1</span>
+                   <div><strong>Warm up with Blend It!</strong><br><small>A quick phonics review keeps decoding sharp</small></div>
+                 </div>
+                 <div class="ob-step">
+                   <span class="ob-step-num">2</span>
+                   <div><strong>Read a Giri Story</strong><br><small>Sentences and paragraphs, not single words</small></div>
+                 </div>
+                 <div class="ob-step">
+                   <span class="ob-step-num">3</span>
+                   <div><strong>Try Sentence Forge</strong><br><small>Start building sentences of their own</small></div>
+                 </div>
+               </div>`,
+      },
+      {
+        icon: '⭐',
+        title: 'Look for this card every day',
+        body: `<div class="ob-highlight-card">
+                 <div class="ob-highlight-eyebrow">TODAY'S START POINT</div>
+                 <p class="ob-highlight-title">Best Next Step</p>
+                 <p class="ob-highlight-body">This card is always first on the home screen. It picks up wherever your child left off — a phonics gap to close, or the next story on their shelf.</p>
+               </div>
+               <p class="ob-highlight-hint">👆 Just tap the big button — the app guides you from there.</p>`,
+      },
+      {
+        icon: '🎮',
+        title: 'Bonus activities — use after the main lesson',
+        body: `<div class="ob-bonus-list">
+                 <div class="ob-bonus-item">⚡ <strong>Daily Challenge</strong> — 5-word bonus round, earns extra XP</div>
+                 <div class="ob-bonus-item">🎡 <strong>Random Activity</strong> — spin the wheel for a surprise</div>
+                 <div class="ob-bonus-item">🏆 <strong>My Trophy Room</strong> — your child’s own bests, never a ranking</div>
+               </div>
+               <p class="ob-bonus-note">Find these in the <strong>🎁 Extra</strong> tab. Giri Stories and Fluency Sprint are in the <strong>📚 Learn</strong> tab.</p>`,
       },
     ],
     reader: [
@@ -149,11 +230,10 @@ export const ONBOARDING_TUTORIAL = {
         title: 'Bonus activities — use after the main lesson',
         body: `<div class="ob-bonus-list">
                  <div class="ob-bonus-item">⚡ <strong>Daily Challenge</strong> — 5-word bonus round, earns extra XP</div>
-                 <div class="ob-bonus-item">📚 <strong>Giri Stories</strong> — short decodable phonics stories</div>
-                 <div class="ob-bonus-item">🃏 <strong>Sight Words</strong> — flip &amp; match high-frequency words</div>
-                 <div class="ob-bonus-item">🎡 <strong>Random Activity</strong> — spin the wheel for variety</div>
+                 <div class="ob-bonus-item">🎡 <strong>Random Activity</strong> — spin the wheel for a surprise</div>
+                 <div class="ob-bonus-item">🏆 <strong>My Trophy Room</strong> — your child’s own bests, never a ranking</div>
                </div>
-               <p class="ob-bonus-note">Find these in the <strong>🎁 Extra</strong> tab at the top of the home screen.</p>`,
+               <p class="ob-bonus-note">Find these in the <strong>🎁 Extra</strong> tab. Giri Stories and Sight Words are in the <strong>📚 Learn</strong> tab.</p>`,
       },
     ],
 };
