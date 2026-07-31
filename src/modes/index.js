@@ -368,7 +368,10 @@ export const MODES = {
     group: 'reading',
     subskill: 'sentence-word-location',
     resultPolicy: 'final',
-    evidenceCeiling: 'independent',
+    // The mode reads the whole sentence aloud and then speaks the target
+    // before the child taps — its own instruction is "Tap the word you
+    // hear". That is auditory-to-print matching, not independent reading.
+    evidenceCeiling: 'guided',
     setup: setupReadAndTap,
     cleanup: cleanupReadTap,
     getCurrentWord: getReadTapWord,
@@ -376,12 +379,19 @@ export const MODES = {
   fluencySprint: {
     key: 'fluencySprint',
     name: 'Fluency Sprint',
-    desc: 'Read fast — beat the clock!',
+    // The activity speaks a word and the child taps its printed match — it
+    // is rapid word RECOGNITION, not reading aloud. "Read fast — beat the
+    // clock!" described neither the action nor a goal we want to set for
+    // early readers.
+    desc: 'Hear it, spot it — keep up the pace!',
     icon: '⚡',
     group: 'reading',
     subskill: 'word-recognition-fluency',
     resultPolicy: 'final',
-    evidenceCeiling: 'independent',
+    // Same shape as Hear & Choose: the target is spoken before the printed
+    // options appear, so a correct tap shows auditory-to-print matching
+    // rather than decoding the child did unaided.
+    evidenceCeiling: 'guided',
     setup: setupFluencySprint,
     cleanup: cleanupFluency,
     getCurrentWord: getFluencyWord,

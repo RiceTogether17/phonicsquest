@@ -5,9 +5,17 @@
  * child plays the matching card game (`sightMatch.js`).
  *
  * Flow inside the screen:
- *   1. Discover  – tap each word card to hear it; "Practiced" badge appears.
- *   2. Quick Recall (unlocks once all 5 are practiced) – hear a word, tap
+ *   1. Meet     – tap each word card to hear it; a "met" badge appears.
+ *   2. Quick Recall (unlocks once all 5 have been met) – hear a word, tap
  *      the correct card. 3 rounds, no penalty, big celebration on finish.
+ *
+ * MET IS NOT PRACTISED. Hearing a word is exposure; recalling it from a
+ * choice of four is the first evidence the child knows it. The screen used
+ * to call both "Practiced", and because "Listen to all" marked every word
+ * in one pass, a child could complete the study step and unlock Quick
+ * Recall without doing anything at all. The two are now counted and
+ * labelled separately — same distinction the evidence model draws for
+ * phonics attempts (see modules/evidence.js).
  *
  * Progress is persisted via the existing `store` module under the key
  * `sightQuestsStudied` (object: { [questId]: true }). Reading from this
@@ -28,51 +36,56 @@ import { startLscwcDrill, cleanupLscwcDrill } from './lscwcDrill.js';
 
 let _container = null;
 /** @type {{ onGoHome?: () => void, onBackToBrowser?: () => void, onStartMatch?: (quest: object) => void }} */
-let _handlers  = {};
+let _handlers = {};
 
-let _activeQuest    = null;   // current SIGHT_QUESTS entry
-let _displayWords   = [];     // possibly-shuffled copy of quest.words
-let _practiced      = new Set(); // words the child has tapped to hear
-let _autoPlaying    = false;  // "Listen to all" sequence in flight
-let _autoplayAbort  = false;  // signal to stop "Listen to all"
+let _activeQuest = null; // current SIGHT_QUESTS entry
+let _displayWords = []; // possibly-shuffled copy of quest.words
+/** Words the child has HEARD — tapped a card, or sat through "Listen to all". */
+let _met = new Set();
+/** Words the child has RECALLED unaided, first try, in Quick Recall. */
+let _recalled = new Set();
+let _autoPlaying = false; // "Listen to all" sequence in flight
+let _autoplayAbort = false; // signal to stop "Listen to all"
 
 // Quick Recall state
-let _quizActive     = false;
-let _quizRound      = 0;
-const _quizTotal      = 3;
-let _quizCorrect    = 0;
-let _quizTarget     = null;   // current target word
-let _quizChoices    = [];     // word choices on screen
-let _quizBusy       = false;  // prevents double-clicks during feedback
+let _quizActive = false;
+let _quizRound = 0;
+const _quizTotal = 3;
+let _quizCorrect = 0;
+let _quizTarget = null; // current target word
+let _quizChoices = []; // word choices on screen
+let _quizBusy = false; // prevents double-clicks during feedback
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
 export function initSightLearn(container, handlers = {}) {
   _container = container;
-  _handlers  = handlers || {};
+  _handlers = handlers || {};
 }
 
 export function showSightLearn(quest) {
   if (!quest) return;
-  _activeQuest  = quest;
+  _activeQuest = quest;
   _displayWords = [...quest.words];
-  _practiced    = new Set();
-  _autoPlaying  = false;
+  _met = new Set();
+  _recalled = new Set();
+  _autoPlaying = false;
   _autoplayAbort = false;
-  _quizActive   = false;
-  _quizRound    = 0;
-  _quizCorrect  = 0;
+  _quizActive = false;
+  _quizRound = 0;
+  _quizCorrect = 0;
   _renderLearn();
 }
 
 export function cleanupSightLearn() {
   _autoplayAbort = true;
-  _autoPlaying   = false;
-  _quizActive    = false;
+  _autoPlaying = false;
+  _quizActive = false;
   cleanupLscwcDrill();
   if (_container) _container.innerHTML = '';
-  _activeQuest   = null;
-  _practiced     = new Set();
+  _activeQuest = null;
+  _met = new Set();
+  _recalled = new Set();
   // intentionally keep _handlers around in case the screen is re-entered;
   // they're replaced on next initSightLearn() anyway.
 }
@@ -109,7 +122,8 @@ function _renderLearn() {
           <span aria-hidden="true">🔀</span> Shuffle
         </button>
         <span class="sl-progress" id="sl-progress" aria-live="polite">
-          Practiced <strong id="sl-progress-count">0</strong> / ${quest.words.length} words
+          Met <strong id="sl-progress-count">0</strong> / ${quest.words.length}
+          &middot; Remembered <strong id="sl-recalled-count">0</strong> / ${quest.words.length}
         </span>
       </div>
 
@@ -144,7 +158,7 @@ function _renderLearn() {
   _container.innerHTML = html;
 
   // Word card taps
-  _container.querySelectorAll('.sl-word-card').forEach(card => {
+  _container.querySelectorAll('.sl-word-card').forEach((card) => {
     card.addEventListener('click', () => _onWordCardTap(card));
     card.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
@@ -184,15 +198,16 @@ function _renderLearn() {
 }
 
 function _renderWordCard(word, index) {
-  const isPracticed = _practiced.has(word);
+  const isMet = _met.has(word);
+  const isRecalled = _recalled.has(word);
   const safe = _escape(word);
   return `
-    <div class="sl-word-card ${isPracticed ? 'sl-word-card--practiced' : ''}"
+    <div class="sl-word-card ${isMet ? 'sl-word-card--met' : ''} ${isRecalled ? 'sl-word-card--recalled' : ''}"
          data-word="${safe}" data-index="${index}"
          role="listitem"
          tabindex="0"
-         aria-label="Sight word ${safe}${isPracticed ? ', practised' : ''}, tap to hear it">
-      <span class="sl-word-check" aria-hidden="true">${isPracticed ? '✓' : ''}</span>
+         aria-label="Sight word ${safe}${isRecalled ? ', remembered' : isMet ? ', heard' : ''}, tap to hear it">
+      <span class="sl-word-check" aria-hidden="true">${isRecalled ? '✓' : isMet ? '♪' : ''}</span>
       <span class="sl-word-text">${safe}</span>
       <span class="sl-word-hear" aria-hidden="true">
         <span class="sl-speaker-icon">🔊</span>
@@ -218,15 +233,12 @@ function _onWordCardTap(cardEl) {
   audio.playSfx('pop');
   audio.speakSightWord(word);
 
-  if (!_practiced.has(word)) {
-    _practiced.add(word);
-    cardEl.classList.add('sl-word-card--practiced');
+  if (!_met.has(word)) {
+    _met.add(word);
+    cardEl.classList.add('sl-word-card--met');
     const check = cardEl.querySelector('.sl-word-check');
-    if (check) check.textContent = '✓';
-    cardEl.setAttribute(
-      'aria-label',
-      `Sight word ${word}, practised, tap to hear it again`,
-    );
+    if (check) check.textContent = '♪';
+    cardEl.setAttribute('aria-label', `Sight word ${word}, practised, tap to hear it again`);
     _updateProgress();
     _maybeUnlockRecall();
   }
@@ -234,7 +246,9 @@ function _onWordCardTap(cardEl) {
 
 function _updateProgress() {
   const el = document.getElementById('sl-progress-count');
-  if (el) el.textContent = String(_practiced.size);
+  if (el) el.textContent = String(_met.size);
+  const rec = document.getElementById('sl-recalled-count');
+  if (rec) rec.textContent = String(_recalled.size);
 }
 
 async function _listenToAll() {
@@ -250,18 +264,16 @@ async function _listenToAll() {
 
   for (const word of _displayWords) {
     if (_autoplayAbort) break;
-    const cardEl = _container?.querySelector(
-      `.sl-word-card[data-word="${_attrEscape(word)}"]`,
-    );
+    const cardEl = _container?.querySelector(`.sl-word-card[data-word="${_attrEscape(word)}"]`);
     cardEl?.classList.add('sl-word-card--highlight');
     audio.playSfx('pop');
     audio.speakSightWord(word);
 
-    if (!_practiced.has(word)) {
-      _practiced.add(word);
-      cardEl?.classList.add('sl-word-card--practiced');
+    if (!_met.has(word)) {
+      _met.add(word);
+      cardEl?.classList.add('sl-word-card--met');
       const check = cardEl?.querySelector('.sl-word-check');
-      if (check) check.textContent = '✓';
+      if (check) check.textContent = '♪';
       _updateProgress();
     }
 
@@ -293,7 +305,7 @@ function _shuffleWords() {
   grid.classList.add('sl-card-grid--shuffling');
   grid.innerHTML = _displayWords.map((w, i) => _renderWordCard(w, i)).join('');
   // re-bind handlers on the new card nodes
-  grid.querySelectorAll('.sl-word-card').forEach(card => {
+  grid.querySelectorAll('.sl-word-card').forEach((card) => {
     card.addEventListener('click', () => _onWordCardTap(card));
     card.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
@@ -310,7 +322,7 @@ function _shuffleWords() {
 
 function _maybeUnlockRecall() {
   if (!_activeQuest) return;
-  if (_practiced.size < _activeQuest.words.length) return;
+  if (_met.size < _activeQuest.words.length) return;
   if (_quizActive) return;
   _renderRecallTeaser();
 }
@@ -389,13 +401,17 @@ function _renderQuizRound() {
       </div>
       <p class="sl-quiz-prompt">Tap the word you hear.</p>
       <div class="sl-quiz-choices" role="list">
-        ${_quizChoices.map(w => `
+        ${_quizChoices
+          .map(
+            (w) => `
           <button class="sl-quiz-choice" type="button"
                   data-word="${_escape(w)}"
                   aria-label="Choice ${_escape(w)}">
             ${_escape(w)}
           </button>
-        `).join('')}
+        `,
+          )
+          .join('')}
       </div>
     </div>
   `;
@@ -404,12 +420,14 @@ function _renderQuizRound() {
     if (_quizTarget) audio.speakSightWord(_quizTarget);
   });
 
-  panel.querySelectorAll('.sl-quiz-choice').forEach(btn => {
+  panel.querySelectorAll('.sl-quiz-choice').forEach((btn) => {
     btn.addEventListener('click', () => _onQuizChoice(btn));
   });
 
   // Speak target after a short beat so the UI is rendered first.
-  setTimeout(() => { if (_quizTarget) audio.speakSightWord(_quizTarget); }, 250);
+  setTimeout(() => {
+    if (_quizTarget) audio.speakSightWord(_quizTarget);
+  }, 250);
 }
 
 function _onQuizChoice(btn) {
@@ -422,6 +440,11 @@ function _onQuizChoice(btn) {
   if (word === _quizTarget) {
     btn.classList.add('sl-quiz-choice--correct');
     _quizCorrect++;
+    // The only place a word earns "remembered": chosen correctly from four,
+    // with nothing on screen naming it. Hearing it in "Listen to all" does
+    // not qualify, however many times.
+    _recalled.add(_quizTarget);
+    _updateProgress();
     audio.playSfx('correct');
   } else {
     btn.classList.add('sl-quiz-choice--wrong');
@@ -532,7 +555,7 @@ function _onSpellItDone(summary) {
         </div>
         <div class="sl-recall-sub">
           You spelled ${firstTry} of ${total} on the first try.
-          ${allFirstTry ? 'You\'re a spelling star!' : 'Keep practising and you\'ll get them all.'}
+          ${allFirstTry ? "You're a spelling star!" : "Keep practising and you'll get them all."}
         </div>
       </div>
       <div class="sl-recall-actions">
@@ -572,7 +595,7 @@ function _isStudied(questId) {
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 function _delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // Escapes content for use inside element text or attribute values.
