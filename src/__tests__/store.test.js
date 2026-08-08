@@ -46,6 +46,7 @@ describe('Store', () => {
       expect(store.get('level')).toBe(1);
       expect(store.get('energy')).toBe(3);
       expect(store.get('theme')).toBe('default');
+      expect(store.get('blendStyle')).toBe('simultaneous');
     });
 
     it('sets and gets a value', () => {

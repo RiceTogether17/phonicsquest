@@ -23,7 +23,7 @@ let currentWord = null;
 let isPlaying   = false;
 let startTime   = 0;
 let _speed      = 'normal'; // 'slow' | 'normal' | 'fast'
-let _blendStyle = 'cumulative'; // 'simultaneous' | 'cumulative'
+let _blendStyle = 'simultaneous'; // 'simultaneous' | 'cumulative'
 
 /** Inter-phoneme delay (ms) per speed setting */
 const SPEED_DELAY = { slow: 600, normal: 320, fast: 120 };
@@ -37,7 +37,7 @@ export function setupClassicBlend(word, els) {
   currentWord = word;
   isPlaying = false;
   startTime = Date.now();
-  _blendStyle = store.get('blendStyle') || 'cumulative';
+  _blendStyle = store.get('blendStyle') || 'simultaneous';
 
   renderWordImage(word, els.wordEmoji, true);
 
