@@ -1,4 +1,5 @@
 import { MCQ_ROUND_SIZE } from '../constants.js';
+import { renderMcqQuickStart } from './mcqBrowserShell.js';
 import { questMastery } from '../modules/questMastery.js';
 import { getDefaultPracticeLevel, isRecommendedLevel } from '../modules/practiceDefaults.js';
 import { gamification } from '../modules/gamification.js';
@@ -124,7 +125,11 @@ export function showVocabMcqBrowser() {
         <h2 class="sfq-title">📖 Vocabulary MCQ</h2>
         <p class="sfq-instruction">Pick your level and how much support you want, then practise one vocabulary skill at a time — or mix them all together.</p>
 
-        <section class="mcq-browser-section">
+        ${renderMcqQuickStart({
+          prefix: 'vmcq',
+          level: selectedLevel,
+          recommended: isRecommendedLevel(selectedLevel),
+          chooserHtml: `<section class="mcq-browser-section">
           <h3 class="mcq-browser-heading">Step 1 · Select Level</h3>
           <div class="sfq-browser-grid mcq-level-grid">
             ${levelCounts
@@ -179,10 +184,15 @@ export function showVocabMcqBrowser() {
               })
               .join('')}
           </div>
-        </section>
+        </section>`,
+        })}
 
         <div class="sfq-actions"><button class="btn btn--ghost" id="vmcq-home">← Home</button></div>
       </div>`;
+
+    _container.querySelector('#vmcq-quick-start')?.addEventListener('click', () => {
+      _startScope({ level: selectedLevel, category: null, difficulty: selectedDifficulty });
+    });
 
     _container.querySelectorAll('[data-pick-level]').forEach((btn) => {
       btn.addEventListener('click', () => {

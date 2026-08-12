@@ -1749,27 +1749,36 @@ class App {
     const week = getWeeklyActivity();
 
     if (!week.hasActivity) {
-      host.innerHTML = `
-        <p class="parent-snapshot__empty">No practice recorded yet. Once ${escapeHtml(
-          getActiveProfile()?.name || 'your child',
-        )} plays a few rounds, this is where you will see how the week went.</p>`;
+      const name = getActiveProfile()?.name || 'your child';
+      host.innerHTML = html`<p class="parent-snapshot__empty">
+        No practice recorded yet. Once ${name} plays a few rounds, this is where you will see how
+        the week went.
+      </p>`;
       return;
     }
 
     const accuracy = week.accuracy === null ? '—' : `${Math.round(week.accuracy * 100)}%`;
     const [habit] = getMisconceptionSummary(1);
 
-    host.innerHTML = `
+    const stat = (value, label) =>
+      html`<div class="parent-snapshot__stat">
+        <span class="parent-snapshot__value">${value}</span>
+        <span class="parent-snapshot__label">${label}</span>
+      </div>`;
+
+    host.innerHTML = html`
       <div class="parent-snapshot__stats">
-        <div class="parent-snapshot__stat"><span class="parent-snapshot__value">${week.days}</span><span class="parent-snapshot__label">days this week</span></div>
-        <div class="parent-snapshot__stat"><span class="parent-snapshot__value">${week.questions}</span><span class="parent-snapshot__label">questions</span></div>
-        <div class="parent-snapshot__stat"><span class="parent-snapshot__value">${accuracy}</span><span class="parent-snapshot__label">accuracy</span></div>
+        ${stat(week.days, 'days this week')} ${stat(week.questions, 'questions')}
+        ${stat(accuracy, 'accuracy')}
       </div>
       ${
         habit
-          ? `<p class="parent-snapshot__habit"><strong>Worth a minute tonight:</strong> ${escapeHtml(habit.childName)} — ${escapeHtml(habit.selfCheck)}</p>`
+          ? html`<p class="parent-snapshot__habit">
+              <strong>Worth a minute tonight:</strong> ${habit.childName} — ${habit.selfCheck}
+            </p>`
           : ''
-      }`;
+      }
+    `;
   }
 
   /**
