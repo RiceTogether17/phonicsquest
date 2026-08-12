@@ -307,6 +307,9 @@ const HOMOPHONE_GROUPS = Object.freeze([
   ['allowed', 'aloud'],
 ]);
 
+/** Words that commonly precede a quantifier without changing which one it is. */
+const QUANTIFIER_MODIFIERS = new Set(['how', 'as', 'a', 'too', 'so', 'very', 'that']);
+
 /** Countable / uncountable quantifier partners. */
 const QUANTIFIER_PAIRS = Object.freeze([
   ['many', 'much'],
@@ -767,8 +770,19 @@ const DETECTORS = [
 
   {
     id: 'countable-uncountable',
-    run: ({ given, correct }) =>
-      pairedIn(QUANTIFIER_PAIRS, given, correct) ? { evidence: null } : null,
+    run: ({ given, correct }) => {
+      // Choices are usually phrases, not bare quantifiers: "how many", "as
+      // much", "a few", "too many". Strip the modifier and pair the heads.
+      const head = (phrase) => {
+        const parts = words(phrase);
+        if (parts.length === 2 && QUANTIFIER_MODIFIERS.has(parts[0])) return parts[1];
+        return parts.length === 1 ? parts[0] : '';
+      };
+      const g = head(given);
+      const c = head(correct);
+      if (!g || !c) return null;
+      return pairedIn(QUANTIFIER_PAIRS, g, c) ? { evidence: null } : null;
+    },
   },
 
   {

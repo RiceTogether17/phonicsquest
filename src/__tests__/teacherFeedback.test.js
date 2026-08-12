@@ -115,6 +115,30 @@ describe('the feedback ladder', () => {
     expect(why.html).toContain('<strong>are</strong>');
   });
 
+  it('does not dress the domain fallback up as a finding', () => {
+    const fb = buildTeacherFeedback({
+      stem: 'The crowd was ___.',
+      given: 'delighted',
+      answer: 'enormous',
+      domain: 'vocab',
+      correct: false,
+      attempt: 2,
+    });
+
+    // No detector matched, so the misconception is a placeholder. Saying
+    // "that is a word that is close in meaning" would be a guess dressed as
+    // a diagnosis.
+    expect(fb.headline).toBe("Let's work through this one");
+    expect(findSection(fb, 'noticed').text).toBe(
+      'You chose "delighted". Let\'s look at why "enormous" fits better.',
+    );
+  });
+
+  it('names the slip when a detector did match', () => {
+    const fb = buildTeacherFeedback({ ...SVA_ITEM, given: 'is', correct: false, attempt: 2 });
+    expect(fb.headline).toContain('matching the verb to the wrong word');
+  });
+
   it('treats a blank answer as its own case', () => {
     const fb = buildTeacherFeedback({ ...SVA_ITEM, given: '', correct: false, attempt: 2 });
     expect(fb.misconceptionId).toBe('no-answer');

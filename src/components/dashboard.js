@@ -296,6 +296,24 @@ function _renderParentReportCard() {
             ${card.needsPractice.map((s) => `<li class="needs-practice-item needs-practice-item--${s.band || 'amber'}"><span class="needs-practice-dot" aria-hidden="true"></span>${escapeHtml(s.label)} <strong>${s.pct == null ? '(not enough practice yet)' : `(${s.pct}%)`}</strong>${_evidenceNote(s)}</li>`).join('') || '<li>Nothing has been measured yet — a few short sessions will show where things stand</li>'}
           </ul>
         </div>
+        ${
+          card.habits?.length
+            ? `
+        <div class="parent-report-card__cell parent-report-card__cell--habits">
+          <h4>🔁 Habits to work on</h4>
+          <ul class="report-habits">
+            ${card.habits
+              .map(
+                (h) => `<li class="report-habit">
+                  <span class="report-habit__name">${escapeHtml(h.label)} <small>· ${h.count} time${h.count === 1 ? '' : 's'}</small></span>
+                  <span class="report-habit__tip">${escapeHtml(h.tip)}</span>
+                </li>`,
+              )
+              .join('')}
+          </ul>
+        </div>`
+            : ''
+        }
         <div class="parent-report-card__cell">
           <h4>📝 Recent Mistakes</h4>
           <ul>

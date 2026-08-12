@@ -18,6 +18,7 @@
  */
 
 import { store } from './store.js';
+import { getMisconceptionSummary } from './teacherFeedback.js';
 import { confidenceFor } from './evidence.js';
 import { GRAMMAR_CATEGORIES } from '../data/grammarCategories.js';
 import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
@@ -198,6 +199,18 @@ export function buildParentReportCard(input) {
         .filter((g) => g.word)
     : [];
 
+  // Recurring misconceptions behind the weak skills. The skill list says
+  // *which topics* are shaky; this says *what the child keeps doing*, which
+  // is the part a parent can act on at home. Empty until something recurs —
+  // a one-off slip is not a habit.
+  const habits = getMisconceptionSummary(3).map((h) => ({
+    id: h.id,
+    label: h.childName,
+    teacherLabel: h.label,
+    count: h.count,
+    tip: h.selfCheck,
+  }));
+
   return {
     learnerName: profile?.name || 'Your child',
     grade: profile?.primaryGrade || null,
@@ -205,6 +218,7 @@ export function buildParentReportCard(input) {
     weekly,
     strengths: topStrong.length ? topStrong : [{ label: 'Steady effort', pct: null }],
     needsPractice,
+    habits,
     recentMistakes,
     recommendation,
     examRisk,

@@ -124,6 +124,15 @@ describe('diagnoseAnswer — grammar', () => {
     expect(d.evidence).toBe('than');
   });
 
+  it('reads the quantifier head out of a phrase choice', () => {
+    const d = diagnoseAnswer({
+      stem: 'Take ___ time as you need to finish the paper.',
+      given: 'how many',
+      correct: 'as much',
+    });
+    expect(d.id).toBe('countable-uncountable');
+  });
+
   it('names countable / uncountable', () => {
     expect(
       diagnoseAnswer({ stem: 'How ___ water is left?', given: 'many', correct: 'much' }).id,

@@ -432,8 +432,14 @@ function _buildReteach({
   /** @type {FeedbackSection[]} */
   const sections = [];
 
+  // When no detector matched, the misconception is the domain fallback — a
+  // placeholder, not a finding. Naming it ("that is a rule that has not
+  // clicked yet") reads as evasion, so say the honest thing instead.
+  const named = diag.matched;
   const noticed = given
-    ? `You chose "${given}". That is ${misconception.childName}.`
+    ? named
+      ? `You chose "${given}". That is ${misconception.childName}.`
+      : `You chose "${given}". Let's look at why "${answer}" fits better.`
     : `This one is about ${misconception.childName}.`;
   sections.push({ kind: 'noticed', text: noticed });
 
@@ -475,7 +481,7 @@ function _buildReteach({
     correct: false,
     revealAnswer: true,
     allowRetry: false,
-    headline: `Let's fix ${misconception.childName}`,
+    headline: named ? `Let's fix ${misconception.childName}` : "Let's work through this one",
     sections,
     misconceptionId: diag.id,
     misconceptionLabel: misconception.label,

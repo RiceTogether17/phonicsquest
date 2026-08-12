@@ -14227,6 +14227,20 @@ details.story-tool-section[open] > .story-tool-summary::before {
   align-self: stretch;
   margin-top: var(--space-1);
 }
+/* Named misconception + next-time habit, added to every teach-back overlay
+   by modules/teacherFeedback.js. */
+.eq-teachback-noticed,
+.eq-teachback-nexttime {
+  font-size: var(--font-xs);
+  margin: 0;
+  color: var(--color-text-muted);
+}
+.eq-teachback-nexttime {
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--surface));
+  color: var(--text-main, #222);
+}
 
 /* ── Parent Coaching Card 2.0 ────────────────────────────────────────────── */
 .coaching-advancement {
@@ -15360,6 +15374,32 @@ textarea:hover {
   border: 1px solid var(--border);
   padding: 10px 12px;
 }
+
+/* Recurring misconceptions behind the "Needs Practice" bars — what the child
+   keeps doing, and the one check that fixes it. From teacherFeedback.js. */
+.report-habits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 4px);
+}
+.report-habit {
+  padding: var(--space-1, 4px) var(--space-2, 8px);
+  border-left: 3px solid var(--color-warning, #f59e0b);
+  border-radius: var(--radius-sm, 6px);
+  background: color-mix(in srgb, var(--color-warning, #f59e0b) 8%, var(--surface));
+}
+.report-habit__name {
+  display: block;
+  font-weight: 700;
+}
+.report-habit__tip {
+  display: block;
+  font-size: var(--font-size-xs, 0.8rem);
+  color: var(--text-muted, #555);
+}
 .parent-report-card__cell h4 {
   margin: 0 0 6px;
   font-size: 0.92rem;
@@ -15958,6 +15998,18 @@ textarea:hover {
   background: #fef2f2;
   color: #b91c1c;
 }
+.ptg-slip,
+.ptg-nexttime {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: inherit;
+}
+.ptg-nexttime {
+  opacity: 0.9;
+  font-weight: 500;
+}
 .ptg-skill-row {
   display: flex;
   flex-wrap: wrap;
@@ -16266,6 +16318,17 @@ textarea:hover {
   color: var(--text, inherit);
   font-size: 0.88rem;
   opacity: 0.95;
+}
+.cc-quest__feedback-slip,
+.cc-quest__feedback-nexttime {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.cc-quest__feedback-nexttime {
+  font-weight: 500;
+  color: var(--text-muted, #555);
 }
 .cc-quest__feedback-skill {
   display: inline-block;
