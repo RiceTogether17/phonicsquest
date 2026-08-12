@@ -2311,6 +2311,65 @@ body.bedtime-on * {
   height: 100%;
 }
 
+/* The floating mascot anchored itself to "the content edge" with
+   `left: max(10px, calc(50% - var(--content-half) + 10px))`, on the assumption
+   that a gutter exists beside the card. It does not: `--shell-max` is 96vw on
+   tablets and 94vw on desktops, so the shell always fills nearly the whole
+   viewport and the 80px overlay lands *on* the content column at every width.
+
+   Measured at 390px and at 1100px, sweeping the full scroll range: it covered
+   module buttons on the Learn tab and the Today's Lesson card. Shrinking and
+   tucking it was not enough — at 48px on a phone it still crossed the card's
+   content edge.
+
+   Giri is not lost. `setState` renders the same character into the header
+   (`mascot-mini`), the home hero (`mascot-home`, 100px) and the result screen
+   (`result-mascot`, 140px) — all in flow, none of them covering anything. Only
+   the overlay copy is gone. */
+.mascot-float {
+  display: none;
+}
+
+/* Giri's reactions still have to land on a phone. `setState` already renders
+   every emotional state into the header mascot, so only the motion was
+   float-only; these give the header copy the same beat. */
+.mascot-mini.celebrate {
+  animation: mascot-mini-cheer 0.9s var(--ease-bounce, ease-out) 2;
+}
+.mascot-mini.peek {
+  animation: mascot-mini-nudge 0.5s ease-in-out 2;
+}
+@keyframes mascot-mini-cheer {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  35% {
+    transform: translateY(-6px) rotate(12deg);
+  }
+  70% {
+    transform: translateY(-2px) rotate(-6deg);
+  }
+}
+@keyframes mascot-mini-nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(-3px);
+  }
+  60% {
+    transform: translateX(3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mascot-mini.celebrate,
+  .mascot-mini.peek {
+    animation: none;
+  }
+}
+
 /* Story Mode owns its own Giri illustration in the hero card; the global
    floating mascot duplicates the character AND consistently overlaps the
    refrain / second story line on every viewport (audit finding #1).
@@ -17198,6 +17257,30 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   margin: 4px 0 12px;
   overflow-x: auto;
   scrollbar-width: thin;
+  /* A horizontal scroller with no visible scrollbar reads as a clipped row,
+     not a scrollable one: on a 390px viewport the six steps measured 538px
+     inside 314px, so "Know Words on Sight" rendered as "Kn… Word… Sig…" with
+     nothing to say the rest was reachable. Snap points plus the edge fade
+     below make the overflow legible. */
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+.jm-step {
+  scroll-snap-align: center;
+}
+/* Fade the right edge while there is more to scroll to. `animation-timeline:
+   scroll()` drives it where supported; elsewhere the fade is simply always on,
+   which is still a better hint than a hard clip. */
+.journey-map {
+  -webkit-mask-image: linear-gradient(to right, #000 85%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 85%, transparent 100%);
+}
+@media (min-width: 560px) {
+  /* Wide enough for the whole path — no overflow, so no fade. */
+  .journey-map {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
 }
 
 .jm-step {
@@ -17261,6 +17344,10 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   line-height: 1.15;
   color: var(--text-2, #475569);
   max-width: 76px;
+  /* Labels are short phrases ("Know Words on Sight"); let them wrap on word
+     boundaries rather than being sliced mid-word by the scroller. */
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .jm-step--current .jm-step-label {
