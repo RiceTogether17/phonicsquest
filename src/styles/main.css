@@ -12196,21 +12196,82 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-weight: 600;
   color: var(--color-primary-dark, var(--color-primary));
 }
-.mcq-reasoning {
-  display: inline-block;
+/* ──────────────────────────────────────────────────────────────────────
+   Teacher feedback (modules/teacherFeedback.js)
+
+   One anatomy for every Primary English mode: a headline verdict followed
+   by labelled rows — cue, rule, worked example, answer, next-time habit.
+   Colour is by *stage*, never by right/wrong alone: a re-teach is blue
+   (we are learning something), not red (you failed). Every row also
+   carries an icon and a word, so the meaning survives without colour.
+   ────────────────────────────────────────────────────────────────────── */
+.tf-feedback {
+  --tf-accent: var(--color-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  border-radius: var(--radius-md, 8px);
+  border-left: 4px solid var(--tf-accent);
+  background: color-mix(in srgb, var(--tf-accent) 7%, var(--surface));
+  color: var(--text-main, #222);
+  font-size: var(--font-size-sm, 0.9rem);
+  text-align: left;
+}
+.tf-feedback--praise,
+.tf-feedback--praise-recovered {
+  --tf-accent: var(--color-success);
+}
+.tf-feedback--coach {
+  --tf-accent: var(--color-warning, #f59e0b);
+}
+.tf-feedback--reteach {
+  --tf-accent: var(--color-primary);
+}
+.tf-headline {
+  margin: 0 0 2px;
+  font-size: var(--font-size-base, 1rem);
+  font-weight: 800;
+  color: var(--tf-accent);
+}
+.tf-section {
+  margin: 0;
+  line-height: 1.45;
+}
+.tf-section__icon {
+  margin-right: 4px;
+}
+.tf-section__label {
+  font-weight: 700;
+}
+/* The cue is the one the child must act on before trying again. */
+.tf-section--cue {
+  font-weight: 600;
+  font-size: var(--font-size-base, 1rem);
+}
+.tf-section--answer {
+  font-weight: 700;
+}
+.tf-section--example {
   font-style: italic;
   color: var(--text-muted, #555);
-  margin-top: 2px;
 }
-.mcq-option-feedback {
-  display: inline-block;
+.tf-section--pattern,
+.tf-section--redirect {
   margin-top: 4px;
   padding: 4px 8px;
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--color-primary) 8%, var(--surface));
-  color: var(--text-main, #222);
+  border-radius: var(--radius-sm, 6px);
+  background: color-mix(in srgb, var(--tf-accent) 12%, var(--surface));
   font-weight: 600;
 }
+.tf-section--transfer {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px dashed color-mix(in srgb, var(--tf-accent) 30%, var(--border));
+  color: var(--text-muted, #555);
+}
+
 .mcq-learn-tip {
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
@@ -12227,12 +12288,6 @@ details.story-tool-section[open] > .story-tool-summary::before {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-muted, #667);
-}
-.mcq-reread-tip {
-  display: inline-block;
-  margin-top: 4px;
-  font-size: 0.85em;
-  color: var(--text-muted, #555);
 }
 .mcq-next-step {
   margin: var(--space-3, 0.75rem) auto;
@@ -12447,16 +12502,6 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 
 /* Inline confusion-detection rule reminder (shown after 2+ consecutive wrongs) */
-.mcq-struggling-tip {
-  display: block;
-  margin-top: var(--space-2, 0.5rem);
-  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
-  background: #fff7ed;
-  border-left: 3px solid var(--color-warning, #f59e0b);
-  border-radius: 0 var(--radius-sm, 4px) var(--radius-sm, 4px) 0;
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
 
 /* Results-screen focus tip for lowest-scoring category */
 .mcq-focus-tip {
