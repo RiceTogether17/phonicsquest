@@ -13,6 +13,8 @@
 
 import { store } from './modules/store.js';
 import { escapeHtml } from './utils/escapeHtml.js';
+import { getWeeklyActivity } from './modules/weeklyActivity.js';
+import { getMisconceptionSummary } from './modules/teacherFeedback.js';
 import * as homeBanners from './modules/homeBanners.js';
 import * as returnEvents from './modules/returnEvents.js';
 import * as onboardingController from './modules/onboardingController.js';
@@ -130,7 +132,11 @@ import { settingsController } from './modules/settingsController.js';
 import { getQuestUnlockStatus } from './modules/questUnlocks.js';
 import { showPlacementTest } from './modules/placementTest.js';
 const quickCheckMod = lazyModule(() => import('./modules/primaryQuickCheck.js'));
-import { getReadingBand, getHomeLayoutForReadingBand } from './modules/readingStages.js';
+import {
+  getReadingBand,
+  getHomeLayoutForReadingBand,
+  isReadingBandMeasured,
+} from './modules/readingStages.js';
 import {
   isTeacherUnlockActive,
   tryTeacherUnlock,
@@ -216,7 +222,14 @@ class App {
 
     settingsController.apply(store);
     restoreActiveProfile();
-    initHomeTabs();
+    // Refresh the Grown-ups snapshot whenever that tab is opened: the home
+    // is not re-rendered on every return from a mode, and a stale "no
+    // practice yet" right after a session is worse than no snapshot at all.
+    initHomeTabs({
+      onChange: (tab) => {
+        if (tab === 'grownups') this._renderParentSnapshot();
+      },
+    });
 
     gamification.init();
     mascot.init();
@@ -1631,7 +1644,9 @@ class App {
     // imported profile file, and this string is spliced into innerHTML below.
     const profileName = profile?.name ? `${escapeHtml(profile.name)}'s ` : '';
 
-    const journeyBarHtml = buildJourneyBarHtml(readingBand, store.get('groupMastery') || {});
+    const journeyBarHtml = buildJourneyBarHtml(readingBand, store.get('groupMastery') || {}, {
+      measured: isReadingBandMeasured(profile, placement),
+    });
 
     const chipsHtml = chips.length
       ? `<div class="progress-chips" aria-label="Progress snapshot">
@@ -1711,6 +1726,59 @@ class App {
 
     // Manage section visibility for preschool vs primary layout
     this._manageSectionVisibility(readingBand);
+    this._renderParentSnapshot();
+  }
+
+  /**
+   * A this-week snapshot at the top of the Grown-ups tab.
+   *
+   * The tab was five router links and no information: a parent tapping it
+   * learned nothing without a further tap and a PIN. This answers "is it
+   * working?" in one glance — days, questions, accuracy, and the single
+   * habit worth working on tonight — and leaves the detail behind the PIN
+   * where it belongs.
+   *
+   * Deliberately not PIN-gated: it is the child's own activity, shown to
+   * whoever is holding the device, and gating a three-number summary would
+   * defeat the point of putting it here.
+   */
+  _renderParentSnapshot() {
+    const host = document.getElementById('parent-snapshot');
+    if (!host) return;
+
+    const week = getWeeklyActivity();
+
+    if (!week.hasActivity) {
+      const name = getActiveProfile()?.name || 'your child';
+      host.innerHTML = html`<p class="parent-snapshot__empty">
+        No practice recorded yet. Once ${name} plays a few rounds, this is where you will see how
+        the week went.
+      </p>`;
+      return;
+    }
+
+    const accuracy = week.accuracy === null ? '—' : `${Math.round(week.accuracy * 100)}%`;
+    const [habit] = getMisconceptionSummary(1);
+
+    const stat = (value, label) =>
+      html`<div class="parent-snapshot__stat">
+        <span class="parent-snapshot__value">${value}</span>
+        <span class="parent-snapshot__label">${label}</span>
+      </div>`;
+
+    host.innerHTML = html`
+      <div class="parent-snapshot__stats">
+        ${stat(week.days, 'days this week')} ${stat(week.questions, 'questions')}
+        ${stat(accuracy, 'accuracy')}
+      </div>
+      ${
+        habit
+          ? html`<p class="parent-snapshot__habit">
+              <strong>Worth a minute tonight:</strong> ${habit.childName} — ${habit.selfCheck}
+            </p>`
+          : ''
+      }
+    `;
   }
 
   /**
@@ -1768,6 +1836,7 @@ class App {
       // early-reading host so they aren't shown two overlapping cards.
       if (todaysPlanHost) todaysPlanHost.style.display = 'none';
     } else if (!layout.questsMilestone) {
+      this._restoreEarlyReadingSection(coreSection);
       coreSection?.classList.remove('home-section--hidden', 'home-section--collapsed');
       questsSection?.classList.remove('home-section--milestone', 'home-section--primary-priority');
       if (questsHeading) questsHeading.textContent = 'Bridge Quests';
@@ -1780,6 +1849,7 @@ class App {
       if (startHere) startHere.style.display = 'none';
       this._renderTodaysLesson(todaysPlanHost);
     } else {
+      this._restoreEarlyReadingSection(coreSection);
       coreSection?.classList.remove('home-section--hidden', 'home-section--collapsed');
       questsSection?.classList.add('home-section--milestone');
       questsSection?.classList.remove('home-section--primary-priority');
@@ -2051,15 +2121,63 @@ class App {
     });
   }
 
+  /**
+   * Turn the Early Reading Quest into the "also available" strip a primary
+   * profile should see: one line of explanation and a closed disclosure.
+   *
+   * `home-section--collapsed` alone never collapsed anything — it set
+   * `opacity: .85` and a dashed border, leaving all six journey steps and
+   * every phonemic-awareness tile expanded above the Primary English hub.
+   * A P4 child opening Learn met "First Sound — what starts it?" before
+   * anything from their own syllabus.
+   *
+   * The disclosure is closed by default and remembers nothing: a primary
+   * child who wants a phonics warm-up opens it, and it starts closed again
+   * next time, because the default for this profile is Primary English.
+   */
   _renderPrimaryEarlyReadingNote(section) {
     if (!section) return;
-    if (section.querySelector('.early-reading-note')) return;
+    if (section.querySelector('.early-reading-toggle')) return;
+
+    const body = document.createElement('div');
+    body.className = 'early-reading-body';
+    body.id = 'early-reading-body';
+    body.hidden = true;
+    // Everything already in the section becomes the collapsible body.
+    while (section.firstChild) body.appendChild(section.firstChild);
+
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'early-reading-toggle';
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-controls', body.id);
+    const label = (open) => `🌱 Phonics warm-ups (Early Reading Quest) ${open ? '▴' : '▾'}`;
+    toggle.textContent = label(false);
+
     const note = document.createElement('p');
     note.className = 'early-reading-note';
     note.setAttribute('role', 'note');
     note.textContent =
-      'Phonics and blending are still available below — open them whenever you want a warm-up before Primary English practice.';
-    section.prepend(note);
+      'Phonics and blending are still here whenever you want a warm-up before Primary English practice.';
+
+    toggle.addEventListener('click', () => {
+      const opening = body.hidden;
+      body.hidden = !opening;
+      toggle.setAttribute('aria-expanded', String(opening));
+      toggle.textContent = label(opening);
+    });
+
+    section.append(toggle, note, body);
+  }
+
+  /** Undo _renderPrimaryEarlyReadingNote when a profile is not on the primary pathway. */
+  _restoreEarlyReadingSection(section) {
+    const body = section?.querySelector('.early-reading-body');
+    if (!body) return;
+    section.querySelector('.early-reading-toggle')?.remove();
+    section.querySelector('.early-reading-note')?.remove();
+    while (body.firstChild) section.appendChild(body.firstChild);
+    body.remove();
   }
 
   // ── Modals ──

@@ -354,6 +354,28 @@ export function getMisconception(id) {
 }
 
 /**
+ * The per-domain fallbacks.
+ *
+ * These are placeholders, not findings: they are what a wrong answer is
+ * labelled when no detector matched. They read acceptably inside a single
+ * re-teach ("let's work through this one") but must never be reported as a
+ * *habit* — "your child keeps making: a rule that has not clicked yet" tells
+ * a parent nothing they can act on.
+ */
+export const FALLBACK_MISCONCEPTION_IDS = Object.freeze([
+  'word-choice-context',
+  'spelling-slip',
+  'evidence-not-checked',
+  'structure-not-followed',
+  'rule-not-applied',
+]);
+
+/** True when an id is a domain placeholder rather than a detected slip. */
+export function isFallbackMisconception(id) {
+  return FALLBACK_MISCONCEPTION_IDS.includes(id);
+}
+
+/**
  * The default misconception for a domain, used when no detector matches but
  * the answer is still wrong. Keeps every wrong answer nameable.
  * @param {string} domain

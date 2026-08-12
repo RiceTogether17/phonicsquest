@@ -13,29 +13,42 @@ const BASE = import.meta.env.BASE_URL;
  * rather than hard-coding a second list of filenames that could drift.
  */
 export const STATES = {
-  neutral:    `${BASE}images/mascot/giri-neutral.png`,
-  celebrate:  `${BASE}images/mascot/giri-celebrate.png`,
-  confetti:   `${BASE}images/mascot/giri-celebrate-confetti.png`,
-  clap:       `${BASE}images/mascot/giri-clap-frame.png`,
-  encourage:  `${BASE}images/mascot/giri-encourage.png`,
-  holdCard:   `${BASE}images/mascot/giri-hold-card.png`,
-  pointLeft:  `${BASE}images/mascot/giri-point-left.png`,
+  neutral: `${BASE}images/mascot/giri-neutral.png`,
+  celebrate: `${BASE}images/mascot/giri-celebrate.png`,
+  confetti: `${BASE}images/mascot/giri-celebrate-confetti.png`,
+  clap: `${BASE}images/mascot/giri-clap-frame.png`,
+  encourage: `${BASE}images/mascot/giri-encourage.png`,
+  holdCard: `${BASE}images/mascot/giri-hold-card.png`,
+  pointLeft: `${BASE}images/mascot/giri-point-left.png`,
   pointRight: `${BASE}images/mascot/giri-point-right.png`,
-  thinking:   `${BASE}images/mascot/giri-thinking.png`,
-  trophy:     `${BASE}images/mascot/giri-trophy.png`,
+  thinking: `${BASE}images/mascot/giri-thinking.png`,
+  trophy: `${BASE}images/mascot/giri-trophy.png`,
   whiteboard: `${BASE}images/mascot/giri-whiteboard.png`,
 };
 
 /** Random encouraging phrases */
 const CHEERS = [
-  'You\'re doing great!', 'Amazing!', 'Keep going!', 'Super reader!',
-  'You rock!', 'Fantastic!', 'Way to go!', 'Brilliant!', 'Wow!',
-  'You\'re a star!', 'Nice work!', 'So proud of you!',
+  "You're doing great!",
+  'Amazing!',
+  'Keep going!',
+  'Super reader!',
+  'You rock!',
+  'Fantastic!',
+  'Way to go!',
+  'Brilliant!',
+  'Wow!',
+  "You're a star!",
+  'Nice work!',
+  'So proud of you!',
 ];
 
 const WRONG_ENCOURAGEMENT = [
-  'Almost there!', 'Try again!', 'You can do it!',
-  'Keep trying!', 'So close!', 'Let\'s try once more!',
+  'Almost there!',
+  'Try again!',
+  'You can do it!',
+  'Keep trying!',
+  'So close!',
+  "Let's try once more!",
 ];
 
 class Mascot {
@@ -93,26 +106,40 @@ class Mascot {
     const state = isLevelUp ? 'trophy' : 'celebrate';
     this.setState(state);
 
-    // Float the mascot up
-    const el = document.getElementById('mascot');
-    if (el) {
-      el.classList.add('celebrate');
-      setTimeout(() => el.classList.remove('celebrate'), 2000);
-    }
+    // Float the mascot up. On phones the float is hidden (it overlapped
+    // content), so the header copy carries the reaction instead.
+    this._react('celebrate', 2000);
   }
 
   /** Trigger the encouraging sequence (wrong answer) */
   encourage() {
     this.setState('encourage');
 
-    const el = document.getElementById('mascot');
-    if (el) {
-      el.classList.add('peek');
-      setTimeout(() => {
-        el.classList.remove('peek');
-        this.setState('neutral');
-      }, 2500);
-    }
+    this._react('peek', 2500, () => this.setState('neutral'));
+  }
+
+  /**
+   * Play a reaction class on both mascot positions.
+   *
+   * The floating mascot is hidden below 640px because it covered tappable
+   * content, so the header mascot has to show the reaction there. Applying
+   * the class to both is simpler than branching on viewport width, and each
+   * one's CSS decides what the class means.
+   *
+   * @param {'celebrate'|'peek'} cls
+   * @param {number} ms
+   * @param {() => void} [after]
+   */
+  _react(cls, ms, after) {
+    const targets = [
+      document.getElementById('mascot'),
+      document.getElementById('mascot-mini'),
+    ].filter(Boolean);
+    for (const el of targets) el.classList.add(cls);
+    setTimeout(() => {
+      for (const el of targets) el.classList.remove(cls);
+      after?.();
+    }, ms);
   }
 
   /** Show thinking state (during phoneme reveal / timer) */
@@ -166,7 +193,7 @@ class Mascot {
     }
 
     img.src = src;
-    img.style.width  = `${size}px`;
+    img.style.width = `${size}px`;
     img.style.height = `${size}px`;
   }
 }

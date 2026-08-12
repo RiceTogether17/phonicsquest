@@ -2311,6 +2311,65 @@ body.bedtime-on * {
   height: 100%;
 }
 
+/* The floating mascot anchored itself to "the content edge" with
+   `left: max(10px, calc(50% - var(--content-half) + 10px))`, on the assumption
+   that a gutter exists beside the card. It does not: `--shell-max` is 96vw on
+   tablets and 94vw on desktops, so the shell always fills nearly the whole
+   viewport and the 80px overlay lands *on* the content column at every width.
+
+   Measured at 390px and at 1100px, sweeping the full scroll range: it covered
+   module buttons on the Learn tab and the Today's Lesson card. Shrinking and
+   tucking it was not enough — at 48px on a phone it still crossed the card's
+   content edge.
+
+   Giri is not lost. `setState` renders the same character into the header
+   (`mascot-mini`), the home hero (`mascot-home`, 100px) and the result screen
+   (`result-mascot`, 140px) — all in flow, none of them covering anything. Only
+   the overlay copy is gone. */
+.mascot-float {
+  display: none;
+}
+
+/* Giri's reactions still have to land on a phone. `setState` already renders
+   every emotional state into the header mascot, so only the motion was
+   float-only; these give the header copy the same beat. */
+.mascot-mini.celebrate {
+  animation: mascot-mini-cheer 0.9s var(--ease-bounce, ease-out) 2;
+}
+.mascot-mini.peek {
+  animation: mascot-mini-nudge 0.5s ease-in-out 2;
+}
+@keyframes mascot-mini-cheer {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  35% {
+    transform: translateY(-6px) rotate(12deg);
+  }
+  70% {
+    transform: translateY(-2px) rotate(-6deg);
+  }
+}
+@keyframes mascot-mini-nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(-3px);
+  }
+  60% {
+    transform: translateX(3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mascot-mini.celebrate,
+  .mascot-mini.peek {
+    animation: none;
+  }
+}
+
 /* Story Mode owns its own Giri illustration in the hero card; the global
    floating mascot duplicates the character AND consistently overlaps the
    refrain / second story line on every viewport (audit finding #1).
@@ -2743,6 +2802,53 @@ body:has(#screen-stories.screen.active) .mascot-float {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+}
+
+/* Parent dashboard disclosure groups.
+   The dashboard used to stack 24 sections into 13,298 px — 15.8 phone
+   screens, nearly all of it "No data yet" on a fresh profile. The snapshot
+   at the top answers the two questions a parent actually has; everything
+   else lives in these, closed. */
+.dash-group {
+  margin-top: var(--space-4, 16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface);
+}
+.dash-group[hidden] {
+  display: none;
+}
+.dash-group__summary {
+  padding: var(--space-3, 12px);
+  font-weight: 800;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+}
+.dash-group__summary::-webkit-details-marker {
+  display: none;
+}
+.dash-group__summary::before {
+  content: '▸';
+  transition: transform 0.15s ease;
+}
+.dash-group[open] > .dash-group__summary::before {
+  transform: rotate(90deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .dash-group__summary::before {
+    transition: none;
+  }
+}
+.dash-group__body {
+  padding: 0 var(--space-3, 12px) var(--space-3, 12px);
+}
+/* First heading inside an open group does not need its stacked top margin. */
+.dash-group__body > div:first-child .dash-section-title,
+.dash-group__body > .dash-section-title:first-child {
+  margin-top: 0;
 }
 
 .mastery-bar-list {
@@ -8307,6 +8413,55 @@ details.story-tool-section[open] > .story-tool-summary::before {
   border-radius: var(--radius-lg);
   padding: var(--space-3);
 }
+
+/* Quick start + collapsed chooser (modes/mcqBrowserShell.js).
+   The browsers used to open on a three-step configuration screen: 3,722 px
+   and 40 buttons on a phone, four taps from home, before a single question. */
+.mcq-quickstart {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-1, 4px);
+  margin-bottom: var(--space-3, 12px);
+}
+.mcq-quickstart__note {
+  margin: 0;
+  text-align: center;
+  font-size: var(--font-size-sm, 0.9rem);
+  color: var(--text-muted, #667);
+}
+.mcq-chooser {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface);
+}
+.mcq-chooser__summary {
+  padding: var(--space-3, 12px);
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+}
+.mcq-chooser__summary::-webkit-details-marker {
+  display: none;
+}
+.mcq-chooser__summary::before {
+  content: '▸';
+  transition: transform 0.15s ease;
+}
+.mcq-chooser[open] > .mcq-chooser__summary::before {
+  transform: rotate(90deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mcq-chooser__summary::before {
+    transition: none;
+  }
+}
+.mcq-chooser__body {
+  padding: 0 var(--space-3, 12px) var(--space-3, 12px);
+}
 .mcq-browser-heading {
   font-size: var(--font-size-sm);
   font-weight: 800;
@@ -11615,6 +11770,51 @@ details.story-tool-section[open] > .story-tool-summary::before {
   display: grid;
   gap: var(--space-3);
 }
+
+/* This-week snapshot at the top of the Grown-ups tab (app.js
+   #_renderParentSnapshot). The tab was five links and no information. */
+.parent-snapshot {
+  margin: var(--space-2, 8px) 0 var(--space-3, 12px);
+}
+.parent-snapshot__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2, 8px);
+}
+.parent-snapshot__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-2, 8px) var(--space-1, 4px);
+  border-radius: var(--radius-md, 8px);
+  background: color-mix(in srgb, var(--color-primary) 7%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--color-primary) 16%, var(--border));
+  text-align: center;
+}
+.parent-snapshot__value {
+  font-size: var(--font-size-lg, 1.15rem);
+  font-weight: 900;
+  color: var(--color-primary-dark, var(--color-primary));
+}
+.parent-snapshot__label {
+  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--text-muted, #555);
+  line-height: 1.2;
+}
+.parent-snapshot__habit {
+  margin: var(--space-2, 8px) 0 0;
+  padding: var(--space-2, 8px);
+  border-left: 3px solid var(--color-warning, #f59e0b);
+  border-radius: var(--radius-sm, 6px);
+  background: color-mix(in srgb, var(--color-warning, #f59e0b) 8%, var(--surface));
+  font-size: var(--font-size-sm, 0.9rem);
+}
+.parent-snapshot__empty {
+  margin: 0;
+  font-size: var(--font-size-sm, 0.9rem);
+  color: var(--text-muted, #555);
+}
 .home-parents-btn {
   display: flex;
   align-items: center;
@@ -14600,11 +14800,41 @@ textarea:hover {
 }
 
 /* ── Primary English: Start Here Today + section visibility ─────────────── */
+/* The Learn panel must be a flex column: `.home-section--primary-priority`
+   below relies on `order`, which browsers ignore on children of a block
+   container. Without this the reorder silently did nothing and a P4 profile
+   met 1,886 px of K1 phonics before its own syllabus. */
+.home-tabpanel {
+  display: flex;
+  flex-direction: column;
+}
+/* `[hidden]` keeps winning on specificity (0,2,0 vs 0,1,0). */
+
 .home-section--collapsed {
-  opacity: 0.85;
   margin-top: var(--space-4, 16px);
   border-top: 1px dashed color-mix(in srgb, var(--border) 80%, transparent);
   padding-top: var(--space-3, 12px);
+}
+/* The "also available" strip: a closed disclosure, not a dimmed wall of
+   tiles. Built by app.js#_renderPrimaryEarlyReadingNote. */
+.early-reading-toggle {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface);
+  font-size: var(--font-size-sm, 0.9rem);
+  font-weight: 700;
+  color: var(--text-main, #222);
+  cursor: pointer;
+}
+.early-reading-toggle:hover {
+  border-color: var(--color-primary);
+}
+.early-reading-body[hidden] {
+  display: none;
 }
 .home-section--collapsed .mode-grid {
   gap: 6px;
@@ -17168,6 +17398,30 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   margin: 4px 0 12px;
   overflow-x: auto;
   scrollbar-width: thin;
+  /* A horizontal scroller with no visible scrollbar reads as a clipped row,
+     not a scrollable one: on a 390px viewport the six steps measured 538px
+     inside 314px, so "Know Words on Sight" rendered as "Kn… Word… Sig…" with
+     nothing to say the rest was reachable. Snap points plus the edge fade
+     below make the overflow legible. */
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+.jm-step {
+  scroll-snap-align: center;
+}
+/* Fade the right edge while there is more to scroll to. `animation-timeline:
+   scroll()` drives it where supported; elsewhere the fade is simply always on,
+   which is still a better hint than a hard clip. */
+.journey-map {
+  -webkit-mask-image: linear-gradient(to right, #000 85%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 85%, transparent 100%);
+}
+@media (min-width: 560px) {
+  /* Wide enough for the whole path — no overflow, so no fade. */
+  .journey-map {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
 }
 
 .jm-step {
@@ -17231,6 +17485,10 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   line-height: 1.15;
   color: var(--text-2, #475569);
   max-width: 76px;
+  /* Labels are short phrases ("Know Words on Sight"); let them wrap on word
+     boundaries rather than being sliced mid-word by the scroller. */
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .jm-step--current .jm-step-label {

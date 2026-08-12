@@ -17,6 +17,8 @@ import {
   renderMcqDifficultyToggle,
 } from './mcqDifficulty.js';
 import { getGrammarTip } from '../data/grammarTips.js';
+import { MCQ_ROUND_SIZE } from '../constants.js';
+import { renderMcqQuickStart } from './mcqBrowserShell.js';
 
 let _container = null;
 let _onGoHome = null;
@@ -115,7 +117,11 @@ export function showGrammarMcqBrowser() {
         <h2 class="sfq-title">🧠 Grammar MCQ</h2>
         <p class="sfq-instruction">Pick your level and how much support you want, then practise one grammar skill at a time — or mix them all together.</p>
 
-        <section class="mcq-browser-section">
+        ${renderMcqQuickStart({
+          prefix: 'gmcq',
+          level: selectedLevel,
+          recommended: isRecommendedLevel(selectedLevel),
+          chooserHtml: `<section class="mcq-browser-section">
           <h3 class="mcq-browser-heading">Step 1 · Select Level</h3>
           <div class="sfq-browser-grid mcq-level-grid">
             ${levelCounts
@@ -166,10 +172,15 @@ export function showGrammarMcqBrowser() {
               })
               .join('')}
           </div>
-        </section>
+        </section>`,
+        })}
 
         <div class="sfq-actions"><button class="btn btn--ghost" id="gmcq-home">← Home</button></div>
       </div>`;
+
+    _container.querySelector('#gmcq-quick-start')?.addEventListener('click', () => {
+      _startScope({ level: selectedLevel, category: null, difficulty: selectedDifficulty });
+    });
 
     _container.querySelectorAll('[data-pick-level]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -233,11 +244,11 @@ function _startScope({ level = null, category = null, label = '', difficulty = _
     }),
   );
 
+  // Paper Mode sets its own length; everything else gets a finishable round
+  // rather than the whole bank. See MCQ_ROUND_SIZE in constants.js.
   const limit = store.get('paperItemLimit');
-  if (limit) {
-    store.set('paperItemLimit', null);
-    _items = _items.slice(0, limit);
-  }
+  store.set('paperItemLimit', null);
+  _items = _items.slice(0, limit || MCQ_ROUND_SIZE);
 
   _idx = 0;
   _correct = 0;

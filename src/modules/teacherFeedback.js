@@ -32,7 +32,7 @@
 import { escapeHtml } from '../utils/escapeHtml.js';
 import { store } from './store.js';
 import { diagnoseAnswer, diagnoseWrittenAnswer } from './answerDiagnosis.js';
-import { getMisconception } from './misconceptions.js';
+import { getMisconception, isFallbackMisconception } from './misconceptions.js';
 
 /** Attempts allowed before the answer is revealed. One free re-think. */
 export const DEFAULT_MAX_ATTEMPTS = 2;
@@ -163,6 +163,8 @@ export function recordMisconceptionsFromReview(rows = [], { mode = '' } = {}) {
  * @param {string} id
  */
 export function getMisconceptionPattern(id) {
+  // Placeholders are not habits — see FALLBACK_MISCONCEPTION_IDS.
+  if (isFallbackMisconception(id)) return null;
   const entry = _readLog()[id];
   if (!entry || typeof entry !== 'object') return null;
   if (_daysSince(entry.lastSeen) > PATTERN_LOOKBACK_DAYS) return null;
@@ -188,6 +190,7 @@ export function getMisconceptionSummary(limit = 5) {
     .filter(
       ([id, entry]) =>
         getMisconception(id) &&
+        !isFallbackMisconception(id) &&
         entry &&
         typeof entry === 'object' &&
         _daysSince(entry.lastSeen) <= PATTERN_LOOKBACK_DAYS &&
