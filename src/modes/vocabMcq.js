@@ -6,15 +6,23 @@ import { VOCAB_MCQ_ITEMS, VOCAB_MCQ_LEVELS, buildVocabMcqLevel } from '../data/v
 import { VOCAB_CATEGORIES, VOCAB_CATEGORY_KEYS } from '../data/vocabCategories.js';
 import { checkPostAttempt } from '../modules/remediationRouter.js';
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
-import { buildMcqFeedbackHtml, attachAskGiri, attachGiriHint } from './mcqFeedback.js';
-import { filterMcqItemsForDifficulty, MCQ_DIFFICULTIES, renderMcqDifficultyToggle } from './mcqDifficulty.js';
+import { attachMcqAnswerLadder, attachGiriHint } from './mcqFeedback.js';
+import {
+  filterMcqItemsForDifficulty,
+  MCQ_DIFFICULTIES,
+  renderMcqDifficultyToggle,
+} from './mcqDifficulty.js';
 
 function _getVocabTip(category) {
   const cat = VOCAB_CATEGORIES[category] || {};
   return {
-    rule: cat.rule || `${cat.label || category} vocabulary questions test word meaning and usage in context.`,
+    rule:
+      cat.rule ||
+      `${cat.label || category} vocabulary questions test word meaning and usage in context.`,
     example: cat.example || 'Choose the word that best fits the sentence.',
-    tip: cat.tip || 'Read the whole sentence carefully and test each option to find which sounds natural.',
+    tip:
+      cat.tip ||
+      'Read the whole sentence carefully and test each option to find which sounds natural.',
   };
 }
 
@@ -23,7 +31,6 @@ let _onGoHome = null;
 let _items = [];
 let _idx = 0;
 let _correct = 0;
-let _answered = false;
 let _scope = { level: null, category: null, label: 'All Skills', difficulty: 'normal' };
 let _difficulty = 'normal';
 
@@ -32,14 +39,15 @@ let _maxStreak = 0;
 let _missed = [];
 let _isRecovery = false;
 let _sessionSkillStats = {}; // category -> { correct, total }
-let _categoryWrong = {}; // category -> consecutive wrong count
 let _ruleCardsShown = 0; // teach-cards shown this session (capped)
 
 /** Max rule cards to interleave per mixed session — a tutor teaches a few
  *  new things per sitting, not every concept at once. */
 const MAX_RULE_CARDS_PER_SESSION = 3;
 
-function _lessonKey(category) { return `vmcq:${category}`; }
+function _lessonKey(category) {
+  return `vmcq:${category}`;
+}
 
 function _hasBeenTaught(category) {
   return !!(store.get('lessonsSeen') || {})[_lessonKey(category)];
@@ -62,12 +70,12 @@ export function cleanupVocabMcq() {
 }
 
 export function getAllItems(bank = VOCAB_MCQ_ITEMS) {
-  return VOCAB_MCQ_LEVELS.flatMap(level => bank[level] || []);
+  return VOCAB_MCQ_LEVELS.flatMap((level) => bank[level] || []);
 }
 
 export function getItemsForScope({ level = null, category = null } = {}, bank = VOCAB_MCQ_ITEMS) {
-  const source = level ? (bank[level] || []) : getAllItems(bank);
-  return category ? source.filter(item => item.category === category) : source;
+  const source = level ? bank[level] || [] : getAllItems(bank);
+  return category ? source.filter((item) => item.category === category) : source;
 }
 
 export function countItemsForScope(scope = {}, bank = VOCAB_MCQ_ITEMS) {
@@ -75,7 +83,7 @@ export function countItemsForScope(scope = {}, bank = VOCAB_MCQ_ITEMS) {
 }
 
 export function getCategoryCounts(bank = VOCAB_MCQ_ITEMS, categories = VOCAB_CATEGORY_KEYS) {
-  return categories.map(category => {
+  return categories.map((category) => {
     const levels = {};
     let total = 0;
     for (const level of VOCAB_MCQ_LEVELS) {
@@ -88,7 +96,7 @@ export function getCategoryCounts(bank = VOCAB_MCQ_ITEMS, categories = VOCAB_CAT
 }
 
 export function getLevelCounts(bank = VOCAB_MCQ_ITEMS, levels = VOCAB_MCQ_LEVELS) {
-  return levels.map(level => ({ level, total: countItemsForScope({ level }, bank) }));
+  return levels.map((level) => ({ level, total: countItemsForScope({ level }, bank) }));
 }
 
 function _categoryLabel(key) {
@@ -118,13 +126,17 @@ export function showVocabMcqBrowser() {
         <section class="mcq-browser-section">
           <h3 class="mcq-browser-heading">Step 1 · Select Level</h3>
           <div class="sfq-browser-grid mcq-level-grid">
-            ${levelCounts.map(({ level, total }) => `
+            ${levelCounts
+              .map(
+                ({ level, total }) => `
               <button class="sfq-level-btn mcq-level-card ${level === selectedLevel ? 'mcq-level-card--active' : ''}" data-pick-level="${level}">
                 ${isRecommendedLevel(level) ? '<span class="mcq-level-rec" aria-label="Recommended level">⭐ For you</span>' : ''}
                 <span class="sfq-level-name">${level}</span>
                 <span class="mcq-count-badge">${total} items</span>
               </button>
-            `).join('')}
+            `,
+              )
+              .join('')}
           </div>
         </section>
 
@@ -140,39 +152,45 @@ export function showVocabMcqBrowser() {
             <button class="btn btn--primary" id="vmcq-start-level">Start ${selectedLevel} (All Skills)</button>
           </div>
           <div class="mcq-skill-grid">
-            ${categoryCounts.map(({ category, levels }) => {
-              const count = levels[selectedLevel] || 0;
-              const meta = VOCAB_CATEGORIES[category] || { icon: '📘', label: category, desc: '' };
+            ${categoryCounts
+              .map(({ category, levels }) => {
+                const count = levels[selectedLevel] || 0;
+                const meta = VOCAB_CATEGORIES[category] || {
+                  icon: '📘',
+                  label: category,
+                  desc: '',
+                };
 
-              if (!count) {
-                return `
+                if (!count) {
+                  return `
                   <button class="mcq-skill-card mcq-skill-card--disabled" disabled>
                     <div class="mcq-skill-title">${meta.icon} ${meta.label}</div>
                     <p class="mcq-skill-sub">Coming soon for ${selectedLevel}</p>
                   </button>`;
-              }
+                }
 
-              return `
+                return `
                 <button class="mcq-skill-card" data-scope-level="${selectedLevel}" data-scope-category="${category}">
                   <div class="mcq-skill-title">${meta.icon} ${meta.label}</div>
                   <p class="mcq-skill-sub">${meta.desc || ''}</p>
                   <p class="mcq-skill-sub"><span class="mcq-count-badge">${count} items in ${selectedLevel}</span></p>
                 </button>`;
-            }).join('')}
+              })
+              .join('')}
           </div>
         </section>
 
         <div class="sfq-actions"><button class="btn btn--ghost" id="vmcq-home">← Home</button></div>
       </div>`;
 
-    _container.querySelectorAll('[data-pick-level]').forEach(btn => {
+    _container.querySelectorAll('[data-pick-level]').forEach((btn) => {
       btn.addEventListener('click', () => {
         selectedLevel = btn.dataset.pickLevel;
         render();
       });
     });
 
-    _container.querySelectorAll('[data-vmcq-difficulty]').forEach(btn => {
+    _container.querySelectorAll('[data-vmcq-difficulty]').forEach((btn) => {
       btn.addEventListener('click', () => {
         selectedDifficulty = btn.dataset.vmcqDifficulty;
         render();
@@ -183,9 +201,13 @@ export function showVocabMcqBrowser() {
       _startScope({ level: selectedLevel, category: null, difficulty: selectedDifficulty });
     });
 
-    _container.querySelectorAll('[data-scope-level][data-scope-category]').forEach(btn => {
+    _container.querySelectorAll('[data-scope-level][data-scope-category]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        _startScope({ level: btn.dataset.scopeLevel, category: btn.dataset.scopeCategory, difficulty: selectedDifficulty });
+        _startScope({
+          level: btn.dataset.scopeLevel,
+          category: btn.dataset.scopeCategory,
+          difficulty: selectedDifficulty,
+        });
       });
     });
 
@@ -199,19 +221,29 @@ function _adaptiveShuffle(items) {
   return [...items].sort((a, b) => {
     const sa = questMastery.getSkillScore('vocabMcq', a.category);
     const sb = questMastery.getSkillScore('vocabMcq', b.category);
-    return (sa - sb) + (Math.random() - 0.5) * 0.3;
+    return sa - sb + (Math.random() - 0.5) * 0.3;
   });
 }
 
 function _startScope({ level = null, category = null, label = '', difficulty = _difficulty } = {}) {
   _difficulty = MCQ_DIFFICULTIES[difficulty]?.key || 'normal';
-  _scope = { level, category, label: label || _scopeLabel({ level, category }), difficulty: _difficulty };
+  _scope = {
+    level,
+    category,
+    label: label || _scopeLabel({ level, category }),
+    difficulty: _difficulty,
+  };
 
   // Rebuild items fresh each session so the random seed varies (not frozen at module load).
   const freshBank = level
     ? { [level]: buildVocabMcqLevel(level) }
-    : Object.fromEntries(VOCAB_MCQ_LEVELS.map(l => [l, VOCAB_MCQ_ITEMS[l]]));
-  _items = _adaptiveShuffle(filterMcqItemsForDifficulty(getItemsForScope({ level, category }, freshBank), { level, difficulty: _difficulty }));
+    : Object.fromEntries(VOCAB_MCQ_LEVELS.map((l) => [l, VOCAB_MCQ_ITEMS[l]]));
+  _items = _adaptiveShuffle(
+    filterMcqItemsForDifficulty(getItemsForScope({ level, category }, freshBank), {
+      level,
+      difficulty: _difficulty,
+    }),
+  );
 
   const limit = store.get('paperItemLimit');
   if (limit) {
@@ -226,8 +258,6 @@ function _startScope({ level = null, category = null, label = '', difficulty = _
   _missed = [];
   _sessionSkillStats = {};
   _isRecovery = false;
-  _answered = false;
-  _categoryWrong = {};
   _ruleCardsShown = 0;
   if (_scope.category && !_isRecovery) {
     _renderRuleCard(_scope.category, () => _renderQuestion());
@@ -245,8 +275,6 @@ function _startRecovery() {
   _missed = [];
   _sessionSkillStats = {};
   _isRecovery = true;
-  _answered = false;
-  _categoryWrong = {};
   _ruleCardsShown = MAX_RULE_CARDS_PER_SESSION; // recovery rounds don't re-teach
   _renderQuestion();
 }
@@ -267,7 +295,7 @@ function _renderClueWords(item) {
   return `
     <div class="mcq-clue-words">
       <strong>🔍 Clue words:</strong>
-      ${item.clueWords.map(w => `<span class="mcq-clue-chip">${escapeHtml(w)}</span>`).join(' ')}
+      ${item.clueWords.map((w) => `<span class="mcq-clue-chip">${escapeHtml(w)}</span>`).join(' ')}
     </div>
   `;
 }
@@ -291,8 +319,7 @@ function _renderQuestion() {
     return _renderRuleCard(item.category, () => _renderQuestion());
   }
 
-  _answered = false;
-  const progressPct = Math.round(((_idx) / _items.length) * 100);
+  const progressPct = Math.round((_idx / _items.length) * 100);
   const roundLabel = _isRecovery ? `Recovery · ${_scope.label}` : _scope.label;
 
   // Shuffle choices at render time so position doesn't become a memory cue on replays.
@@ -312,7 +339,7 @@ function _renderQuestion() {
       <p class="sfq-instruction">${escapeHtml(item.q)}</p>
       ${_difficulty === 'guided' ? _renderClueWords(item) : ''}
       <div class="pt-choices" role="group" aria-label="Answer choices">
-        ${displayChoices.map(c => `<button class="pt-choice-btn" data-choice="${escapeAttr(c)}" aria-label="Choose ${escapeAttr(c)}">${escapeHtml(c)}</button>`).join('')}
+        ${displayChoices.map((c) => `<button class="pt-choice-btn" data-choice="${escapeAttr(c)}" aria-label="Choose ${escapeAttr(c)}">${escapeHtml(c)}</button>`).join('')}
       </div>
       <button class="mcq-hint-btn" id="vmcq-rule-hint" aria-expanded="false">💡 Stuck? Show the rule</button>
       <div class="mcq-hint-panel" id="vmcq-hint-panel" hidden></div>
@@ -322,14 +349,33 @@ function _renderQuestion() {
       </div>
     </div>`;
 
-  _container.querySelectorAll('[data-choice]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (_answered) return;
-      _answered = true;
+  const nextWrap = _container.querySelector('#vmcq-next-wrap');
+  const nextBtn = _container.querySelector('#vmcq-next');
+  if (nextBtn) {
+    const isLast = _idx + 1 >= _items.length;
+    nextBtn.textContent = isLast ? 'See Results →' : 'Next →';
+    nextBtn.setAttribute('aria-label', isLast ? 'See results' : 'Next question');
+    nextBtn.addEventListener('click', () => {
+      _idx += 1;
+      _renderQuestion();
+    });
+  }
 
-      const ans = btn.dataset.choice;
-      const ok = ans === item.answer;
+  attachMcqAnswerLadder({
+    root: _container,
+    item,
+    feedbackEl: _container.querySelector('#vmcq-hint'),
+    nextWrap,
+    nextBtn,
+    mode: 'vocabMcq',
+    domain: 'vocab',
+    skillLabel: _categoryLabel(item.category),
+    level: _scope.level || item.level,
+    showClueWords: _difficulty !== 'challenge',
+    tip: _getVocabTip(item.category),
 
+    // The mark is the first attempt — see the note in mcqFeedback.js.
+    onFirstAttempt: (ok) => {
       if (ok) {
         _correct += 1;
         _streak += 1;
@@ -341,63 +387,29 @@ function _renderQuestion() {
         gamification.recordWrong();
       }
 
-      const stat = _sessionSkillStats[item.category] || (_sessionSkillStats[item.category] = { correct: 0, total: 0 });
+      const stat =
+        _sessionSkillStats[item.category] ||
+        (_sessionSkillStats[item.category] = { correct: 0, total: 0 });
       stat.total += 1;
       if (ok) stat.correct += 1;
 
       questMastery.updateSkill('vocabMcq', item.category, ok);
-      questMastery.recordAttempt({ quest: 'vocabMcq', skill: item.category, correct: ok, level: _scope.level || 'Mixed' });
-
-      _container.querySelectorAll('[data-choice]').forEach(b => {
-        b.disabled = true;
-        b.setAttribute('aria-disabled', 'true');
-        if (b.dataset.choice === item.answer) {
-          b.classList.add('pt-choice--correct');
-        } else if (b === btn && !ok) {
-          b.classList.add('pt-choice--wrong');
-        }
+      questMastery.recordAttempt({
+        quest: 'vocabMcq',
+        skill: item.category,
+        correct: ok,
+        level: _scope.level || 'Mixed',
       });
+    },
 
-      const hint = _container.querySelector('#vmcq-hint');
-      let hintText = buildMcqFeedbackHtml(item, ans, ok, { showClueWords: _difficulty !== 'challenge' });
-
-      if (ok) {
-        _categoryWrong[item.category] = 0;
-      } else {
-        _categoryWrong[item.category] = (_categoryWrong[item.category] || 0) + 1;
+    extraHtml: (_chosen, ok) => {
+      if (ok) return '';
+      const suggestion = checkPostAttempt('vocabMcq', item.category, false);
+      if (suggestion && suggestion.type === 'redirect') {
+        return `<p class="tf-section tf-section--redirect"><span class="tf-section__icon" aria-hidden="true">🧭</span> ${escapeHtml(suggestion.message)}</p>`;
       }
-
-      if (!ok) {
-        const suggestion = checkPostAttempt('vocabMcq', item.category, false);
-        if (suggestion && suggestion.type === 'redirect') {
-          hintText += ` <br>💡 ${escapeHtml(suggestion.message)}`;
-        }
-      }
-
-      if (!ok && _categoryWrong[item.category] >= 2) {
-        const confusionTip = _getVocabTip(item.category);
-        hintText += `<br><span class="mcq-struggling-tip"><strong>📚 Rule reminder:</strong> ${escapeHtml(confusionTip.rule)}<br><em>${escapeHtml(confusionTip.example)}</em></span>`;
-      }
-
-      if (hint) {
-        hint.innerHTML = hintText;
-        attachAskGiri(hint, { item, selectedChoice: ans, level: _scope.level || item.level });
-      }
-
-      const nextWrap = _container.querySelector('#vmcq-next-wrap');
-      const nextBtn = _container.querySelector('#vmcq-next');
-      if (nextWrap && nextBtn) {
-        const isLast = _idx + 1 >= _items.length;
-        nextBtn.textContent = isLast ? 'See Results →' : 'Next →';
-        nextBtn.setAttribute('aria-label', isLast ? 'See results' : 'Next question');
-        nextWrap.style.display = '';
-        nextBtn.addEventListener('click', () => {
-          _idx += 1;
-          _renderQuestion();
-        });
-        nextBtn.focus();
-      }
-    });
+      return '';
+    },
   });
 
   const ruleHintBtn = _container.querySelector('#vmcq-rule-hint');
@@ -432,10 +444,20 @@ function _renderSkillBreakdown() {
   if (entries.length === 0) return '';
 
   const rows = entries
-    .map(([cat, s]) => ({ cat, pct: Math.round((s.correct / s.total) * 100), correct: s.correct, total: s.total }))
+    .map(([cat, s]) => ({
+      cat,
+      pct: Math.round((s.correct / s.total) * 100),
+      correct: s.correct,
+      total: s.total,
+    }))
     .sort((a, b) => a.pct - b.pct)
     .map(({ cat, pct, correct, total }) => {
-      const barColour = pct >= 70 ? 'var(--color-success)' : pct >= 40 ? 'var(--color-primary)' : 'var(--color-error)';
+      const barColour =
+        pct >= 70
+          ? 'var(--color-success)'
+          : pct >= 40
+            ? 'var(--color-primary)'
+            : 'var(--color-error)';
       return `
         <tr class="sq-skill-table-row ${pct < 50 ? 'sq-skill-table-row--weak' : ''}">
           <th scope="row" class="sq-skill-name">${escapeHtml(_categoryLabel(cat))}</th>
@@ -443,7 +465,8 @@ function _renderSkillBreakdown() {
           <td><div class="sq-skill-track" aria-hidden="true"><div class="sq-skill-bar" style="width:${pct}%;background:${barColour}"></div></div></td>
           <td class="sq-skill-pct">${pct}%${pct < 50 ? ' · weak' : ''}</td>
         </tr>`;
-    }).join('');
+    })
+    .join('');
 
   return `<h4 class="sq-skills-heading">Skill breakdown</h4><table class="sq-skills-table"><thead><tr><th>Skill</th><th>Score</th><th>Progress</th><th>Accuracy</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
@@ -499,12 +522,18 @@ function _renderDone() {
   // A teacher always names the next step, not just the score.
   const nextSteps = [];
   if (hasMissed) {
-    nextSteps.push(`Start with the Recovery Round — it replays only the ${_missed.length} question${_missed.length === 1 ? '' : 's'} you missed, while they are still fresh in your mind.`);
+    nextSteps.push(
+      `Start with the Recovery Round — it replays only the ${_missed.length} question${_missed.length === 1 ? '' : 's'} you missed, while they are still fresh in your mind.`,
+    );
   }
   if (accuracy < 70 && _difficulty !== 'guided') {
-    nextSteps.push('If this round felt hard, switch to Learn mode — you will see each rule before you answer.');
+    nextSteps.push(
+      'If this round felt hard, switch to Learn mode — you will see each rule before you answer.',
+    );
   } else if (accuracy >= 90 && _difficulty !== 'challenge' && !hasMissed) {
-    nextSteps.push('You have mastered this round — try PSLE Challenge mode for exam-style questions without clue words.');
+    nextSteps.push(
+      'You have mastered this round — try PSLE Challenge mode for exam-style questions without clue words.',
+    );
   }
   const nextStepHtml = nextSteps.length
     ? `<p class="mcq-next-step">🧑‍🏫 <strong>Teacher's tip:</strong> ${nextSteps.join(' ')}</p>`
@@ -516,7 +545,9 @@ function _renderDone() {
   if (accuracy < 70) {
     const statEntries = Object.entries(_sessionSkillStats).filter(([, s]) => s.total > 0);
     if (statEntries.length > 0) {
-      const [weakCat] = statEntries.sort(([, a], [, b]) => (a.correct / a.total) - (b.correct / b.total))[0];
+      const [weakCat] = statEntries.sort(
+        ([, a], [, b]) => a.correct / a.total - b.correct / b.total,
+      )[0];
       const weakTip = _getVocabTip(weakCat);
       const weakMeta = VOCAB_CATEGORIES[weakCat] || { icon: '📖', label: weakCat };
       focusTip = `
@@ -544,7 +575,8 @@ function _renderDone() {
       </div>
     </div>`;
 
-  if (hasMissed) _container.querySelector('#vmcq-recovery')?.addEventListener('click', () => _startRecovery());
+  if (hasMissed)
+    _container.querySelector('#vmcq-recovery')?.addEventListener('click', () => _startRecovery());
   _container.querySelector('#vmcq-replay')?.addEventListener('click', () => _startScope(_scope));
   _container.querySelector('#vmcq-menu')?.addEventListener('click', () => showVocabMcqBrowser());
 }

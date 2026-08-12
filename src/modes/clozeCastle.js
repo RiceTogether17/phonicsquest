@@ -16,7 +16,12 @@
  *   cleanupClozeCastle()                  – teardown
  */
 
-import { passages, CLOZE_LEVEL_LABELS, CLOZE_LEVEL_ICONS, GRAMMAR_CATEGORIES } from '../data/passages.js';
+import {
+  passages,
+  CLOZE_LEVEL_LABELS,
+  CLOZE_LEVEL_ICONS,
+  GRAMMAR_CATEGORIES,
+} from '../data/passages.js';
 import { getGrammarTip } from '../data/grammarTips.js';
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
@@ -47,27 +52,45 @@ import { attachAskGiriButton } from '../components/askGiriButton.js';
 import { explainTeachBack } from '../modules/aiService.js';
 import { renderReadFirstScan } from './readFirstScan.js';
 import { buildScanAttention, renderScanAttention } from './scanTask.js';
-import { buildCopySummaryText, buildParentReport, getModeConfig, getNextStepRecommendation, getSummaryScoreLine, groupWrongLinesBySkill, pickStrongestWeakest } from './clozeSessionSummary.js';
+import {
+  buildCopySummaryText,
+  buildParentReport,
+  getModeConfig,
+  getNextStepRecommendation,
+  getSummaryScoreLine,
+  groupWrongLinesBySkill,
+  pickStrongestWeakest,
+} from './clozeSessionSummary.js';
 import { incrementHintUsage } from './hintUsage.js';
-import { buildWhyWrongExplanation, getBlankSkillMeta, getClueTypeLabel, getMasteryRecommendation, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
+import {
+  buildWhyWrongExplanation,
+  getBlankSkillMeta,
+  getClueTypeLabel,
+  getMasteryRecommendation,
+  getReviewPromptForSkill,
+  getSkillLabel,
+  normaliseSkillTag,
+} from './examTrainingFramework.js';
+import { stemForBlank } from '../modules/answerDiagnosis.js';
+import { recordMisconceptionsFromReview } from '../modules/teacherFeedback.js';
 import { getTopWeakSkills, recordWeakSkills } from './clozeCompletionTracker.js';
 import { getTopMasteryGaps, recordMasteryAttempt, summariseMasteryGap } from './masteryMap.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
 let _container = null;
-let _onGoHome  = null;
+let _onGoHome = null;
 
-let _currentLevel   = 'P1';
-let _currentCat     = '';
-let _passageIdx     = 0;
-let _levelPassages  = [];
-let _bankWords      = [];   // [{id, word, used}]
-let _blankFills     = [];   // null | bankWordId per blank
-let _sessionCorrect   = 0;
-let _sessionTotal     = 0;
+let _currentLevel = 'P1';
+let _currentCat = '';
+let _passageIdx = 0;
+let _levelPassages = [];
+let _bankWords = []; // [{id, word, used}]
+let _blankFills = []; // null | bankWordId per blank
+let _sessionCorrect = 0;
+let _sessionTotal = 0;
 let _passageWrongCount = 0; // wrong attempts on current passage (for teach-back)
-let _keyHandler       = null;
+let _keyHandler = null;
 
 // ── Clue-mode state ────────────────────────────────────────────────────────
 // activeBlankIndex: which blank is in the clue-hunt phase right now (-1 = all done)
@@ -77,29 +100,29 @@ let _keyHandler       = null;
 // weakAttempts: number of 'weak' selections in the current blank's clue hunt
 
 let _activeBlankIndex = -1;
-let _clueResults      = {};
-let _hintLevel        = 0;
-let _bankLocked       = false;
-let _weakAttempts     = 0;
-let _sessionClueScore = 0;   // accumulated clue points this session
-let _sessionMode      = 'practice';
+let _clueResults = {};
+let _hintLevel = 0;
+let _bankLocked = false;
+let _weakAttempts = 0;
+let _sessionClueScore = 0; // accumulated clue points this session
+let _sessionMode = 'practice';
 let _sessionHintsUsed = 0;
-let _examStartedAt    = 0;
-let _lastUserAnswers  = [];
+let _examStartedAt = 0;
+let _lastUserAnswers = [];
 let _sessionReviewRows = [];
 let _sessionBlankTotal = 0;
 let _sessionBlankCorrect = 0;
 let _readFirstAcknowledged = false;
 let _scanTaskCompleted = false;
 let _sessionScanCorrect = 0;
-let _sessionScanTotal   = 0;
-let _sessionSkillStats  = {}; // skill -> { correct, total, label, lastWrongExamples: [] }
+let _sessionScanTotal = 0;
+let _sessionSkillStats = {}; // skill -> { correct, total, label, lastWrongExamples: [] }
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
 export function initClozeCastle(container, onGoHome) {
   _container = container;
-  _onGoHome  = onGoHome;
+  _onGoHome = onGoHome;
 }
 
 export function showClozeBrowser() {
@@ -108,9 +131,12 @@ export function showClozeBrowser() {
 
 export function cleanupClozeCastle() {
   if (_container) _container.innerHTML = '';
-  _bankWords  = [];
+  _bankWords = [];
   _blankFills = [];
-  if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
+  if (_keyHandler) {
+    document.removeEventListener('keydown', _keyHandler);
+    _keyHandler = null;
+  }
 }
 
 // ── Level Browser ─────────────────────────────────────────────────────────
@@ -119,20 +145,29 @@ function _renderBrowser() {
   if (!_container) return;
 
   const completed = store.get('ccqCompleted') || {};
-  const levels    = Object.keys(passages);
+  const levels = Object.keys(passages);
 
   let html = '<div class="cloze-browser">';
   html += '<h3 class="cloze-cat-title">🏰 Cloze Castle</h3>';
-  html += '<p class="cloze-cat-subtitle">Each passage is a short story with missing words. Read it through first, then fill every blank. Pick your level to begin.</p>';
+  html +=
+    '<p class="cloze-cat-subtitle">Each passage is a short story with missing words. Read it through first, then fill every blank. Pick your level to begin.</p>';
   html += '<div class="cloze-browser-grid">';
 
   for (const lv of levels) {
-    const cats  = Object.keys(passages[lv]);
+    const cats = Object.keys(passages[lv]);
     const total = cats.reduce((sum, cat) => sum + passages[lv][cat].length, 0);
-    const questionTotal = cats.reduce((sum, cat) => sum + passages[lv][cat].reduce((n, passage) => n + (passage.answers?.length || 0), 0), 0);
-    const done  = getUniqueClozeDone({ level: lv, ccqCompletedByPassage: store.get('ccqCompletedByPassage') || {}, ccqCompleted: completed });
+    const questionTotal = cats.reduce(
+      (sum, cat) =>
+        sum + passages[lv][cat].reduce((n, passage) => n + (passage.answers?.length || 0), 0),
+      0,
+    );
+    const done = getUniqueClozeDone({
+      level: lv,
+      ccqCompletedByPassage: store.get('ccqCompletedByPassage') || {},
+      ccqCompleted: completed,
+    });
     const isDone = done >= total;
-    const icon   = CLOZE_LEVEL_ICONS[lv];
+    const icon = CLOZE_LEVEL_ICONS[lv];
 
     html += `
       <button class="cloze-level-btn ${isDone ? 'cloze-level-btn--done' : ''}"
@@ -146,7 +181,7 @@ function _renderBrowser() {
   html += '</div></div>';
   _container.innerHTML = html;
 
-  _container.querySelectorAll('.cloze-level-btn').forEach(btn => {
+  _container.querySelectorAll('.cloze-level-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       _currentLevel = btn.dataset.level;
       _renderCategoryPicker(_currentLevel);
@@ -171,14 +206,23 @@ function _renderCategoryPicker(level) {
   html += `<p class="cloze-cat-subtitle">Choose one grammar topic to focus on — or Play All to mix them. Topics marked "Recommended" are the ones that need your attention most.</p>`;
   html += '<div class="cloze-cat-grid">';
 
-  const recommendedCat = progress.getRecommendedGrammarCategory(level, cats)
-    || questMastery.getRecommendedSkill('clozeCastle', cats);
+  const recommendedCat =
+    progress.getRecommendedGrammarCategory(level, cats) ||
+    questMastery.getRecommendedSkill('clozeCastle', cats);
 
   for (const catKey of cats) {
-    const cat   = GRAMMAR_CATEGORIES[catKey] || { label: catKey, icon: '📝' };
+    const cat = GRAMMAR_CATEGORIES[catKey] || { label: catKey, icon: '📝' };
     const total = passages[level][catKey].length;
-    const questionTotal = passages[level][catKey].reduce((sum, passage) => sum + (passage.answers?.length || 0), 0);
-    const done  = getUniqueClozeDone({ level, category: catKey, ccqCompletedByPassage: store.get('ccqCompletedByPassage') || {}, ccqCatCompleted: completed });
+    const questionTotal = passages[level][catKey].reduce(
+      (sum, passage) => sum + (passage.answers?.length || 0),
+      0,
+    );
+    const done = getUniqueClozeDone({
+      level,
+      category: catKey,
+      ccqCompletedByPassage: store.get('ccqCompletedByPassage') || {},
+      ccqCatCompleted: completed,
+    });
     const isDone = done >= total;
     const isRecommended = catKey === recommendedCat;
 
@@ -202,26 +246,37 @@ function _renderCategoryPicker(level) {
   </div>`;
 
   const totalAll = cats.reduce((s, c) => s + passages[level][c].length, 0);
-  const masteryGaps = getTopMasteryGaps({ mode: 'clozeCastle', level, masteryMap: store.get('masteryMap') || {} });
+  const masteryGaps = getTopMasteryGaps({
+    mode: 'clozeCastle',
+    level,
+    masteryMap: store.get('masteryMap') || {},
+  });
   const weakSkills = masteryGaps.length
     ? masteryGaps
     : getTopWeakSkills({ level, weakSkillsMap: store.get('ccqWeakSkills') || {} }).map((s) => ({
-      skill: s.skill,
-      skillLabel: getSkillLabel(s.skill),
-      attempts: s.attempts,
-      wrong: s.wrong,
-      accuracy: Math.round(((s.attempts - s.wrong) / Math.max(1, s.attempts)) * 100),
-      lastExample: null,
-    }));
-  const masteryRows = weakSkills.map((item) => {
-    const recommendation = item.accuracy != null
-      ? summariseMasteryGap(item)
-      : getMasteryRecommendation({ weakSkills: [item.skill], accuracy: item.accuracy, hintsUsed: 0 });
-    const lastExample = item.lastExample
-      ? ` · Last slip: "${escapeHtml(item.lastExample.chosen || '—')}" → "${escapeHtml(item.lastExample.correct || '?')}"`
-      : '';
-    return `<li>${escapeHtml(item.skillLabel || getSkillLabel(item.skill))}: ${item.wrong}/${item.attempts} · ${escapeHtml(recommendation)}${lastExample}</li>`;
-  }).join('');
+        skill: s.skill,
+        skillLabel: getSkillLabel(s.skill),
+        attempts: s.attempts,
+        wrong: s.wrong,
+        accuracy: Math.round(((s.attempts - s.wrong) / Math.max(1, s.attempts)) * 100),
+        lastExample: null,
+      }));
+  const masteryRows = weakSkills
+    .map((item) => {
+      const recommendation =
+        item.accuracy != null
+          ? summariseMasteryGap(item)
+          : getMasteryRecommendation({
+              weakSkills: [item.skill],
+              accuracy: item.accuracy,
+              hintsUsed: 0,
+            });
+      const lastExample = item.lastExample
+        ? ` · Last slip: "${escapeHtml(item.lastExample.chosen || '—')}" → "${escapeHtml(item.lastExample.correct || '?')}"`
+        : '';
+      return `<li>${escapeHtml(item.skillLabel || getSkillLabel(item.skill))}: ${item.wrong}/${item.attempts} · ${escapeHtml(recommendation)}${lastExample}</li>`;
+    })
+    .join('');
   html += `<div class="cloze-cat-actions">
     <button class="btn btn--primary btn--lg" id="cloze-play-all">Play All (${totalAll} passages)</button>
     <button class="btn btn--ghost btn--sm" id="cloze-mastery-review">Practise Recommended Topic</button>
@@ -241,7 +296,7 @@ function _renderCategoryPicker(level) {
     _renderCategoryPicker(level);
   });
 
-  _container.querySelectorAll('.cloze-cat-btn').forEach(btn => {
+  _container.querySelectorAll('.cloze-cat-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       _currentCat = btn.dataset.cat;
       _startCategory(_currentLevel, _currentCat);
@@ -264,9 +319,9 @@ function _renderCategoryPicker(level) {
 function _startCategory(level, catKey) {
   const raw = passages[level]?.[catKey] || [];
   _levelPassages = [...raw].sort(() => Math.random() - 0.5);
-  _passageIdx    = 0;
+  _passageIdx = 0;
   _sessionCorrect = 0;
-  _sessionTotal   = 0;
+  _sessionTotal = 0;
   _sessionClueScore = 0;
   _sessionHintsUsed = 0;
   _examStartedAt = Date.now();
@@ -287,11 +342,11 @@ function _startCategory(level, catKey) {
 
 function _startAllCategories(level) {
   const cats = Object.keys(passages[level] || {});
-  const all = cats.flatMap(c => passages[level][c]);
+  const all = cats.flatMap((c) => passages[level][c]);
   _levelPassages = [...all].sort(() => Math.random() - 0.5);
-  _passageIdx    = 0;
+  _passageIdx = 0;
   _sessionCorrect = 0;
-  _sessionTotal   = 0;
+  _sessionTotal = 0;
   _sessionClueScore = 0;
   _sessionHintsUsed = 0;
   _examStartedAt = Date.now();
@@ -316,13 +371,13 @@ function _showPassage() {
 
 function _initPassage(passage) {
   const round = createClozeRound(passage);
-  _bankWords  = round.bankWords;
+  _bankWords = round.bankWords;
   _blankFills = round.blankFills;
 
   // Reset clue state
-  _clueResults       = {};
-  _hintLevel         = 0;
-  _weakAttempts      = 0;
+  _clueResults = {};
+  _hintLevel = 0;
+  _weakAttempts = 0;
   _passageWrongCount = 0; // reset per-passage wrong counter for teach-back
 
   // Determine starting mode
@@ -330,10 +385,10 @@ function _initPassage(passage) {
     // Start with the first blank's clue hunt
     const firstClue = [...passage.clues].sort((a, b) => a.blankIndex - b.blankIndex)[0];
     _activeBlankIndex = firstClue?.blankIndex ?? -1;
-    _bankLocked       = true;
+    _bankLocked = true;
   } else {
     _activeBlankIndex = -1;
-    _bankLocked       = false;
+    _bankLocked = false;
   }
 
   _readFirstAcknowledged = false;
@@ -346,26 +401,27 @@ function _initPassage(passage) {
 function _renderPassage(passage) {
   if (!_container) return;
 
-  const icon     = CLOZE_LEVEL_ICONS[_currentLevel];
+  const icon = CLOZE_LEVEL_ICONS[_currentLevel];
   const progress = `${_passageIdx + 1} / ${_levelPassages.length}`;
-  const catInfo  = _currentCat !== '__all__' && GRAMMAR_CATEGORIES[_currentCat]
-    ? `${GRAMMAR_CATEGORIES[_currentCat].icon} ${GRAMMAR_CATEGORIES[_currentCat].label}`
-    : 'All Topics';
+  const catInfo =
+    _currentCat !== '__all__' && GRAMMAR_CATEGORIES[_currentCat]
+      ? `${GRAMMAR_CATEGORIES[_currentCat].icon} ${GRAMMAR_CATEGORIES[_currentCat].label}`
+      : 'All Topics';
 
   const hasClues = passage.clues && passage.clues.length > 0;
   const inClueMode = hasClues && _bankLocked;
   const modeCfg = getModeConfig(_sessionMode);
 
   const phaseBadge = hasClues
-    ? (inClueMode
+    ? inClueMode
       ? '<span class="cloze-badge cloze-badge--phase cloze-badge--phase-clue">🔍 Step 1 · Clue Hunt</span>'
-      : '<span class="cloze-badge cloze-badge--phase cloze-badge--phase-fill">🏰 Step 2 · Fill the Blanks</span>')
+      : '<span class="cloze-badge cloze-badge--phase cloze-badge--phase-fill">🏰 Step 2 · Fill the Blanks</span>'
     : '';
 
   const instructionText = hasClues
-    ? (inClueMode
+    ? inClueMode
       ? '🔍 Step 1 of 2 — Tap the clue word in the passage that hints at the answer.'
-      : '🏰 Step 2 of 2 — Now tap a word from the bank to fill the next blank.')
+      : '🏰 Step 2 of 2 — Now tap a word from the bank to fill the next blank.'
     : '🏰 Read the whole passage first, then tap a word from the bank to fill each blank.';
 
   _container.innerHTML = `
@@ -441,11 +497,14 @@ function _renderPassage(passage) {
     btn.textContent = wasHidden ? '💡 Hide the rule' : '💡 Stuck? Show the rule';
     if (wasHidden) {
       const tipCat = _currentCat !== '__all__' ? _currentCat : null;
-      const tip = tipCat ? getGrammarTip(tipCat) : {
-        rule: 'Read each sentence and look for grammar clues about which word fits best.',
-        example: 'The words around each blank — tense, pronouns, singular/plural — point to the answer.',
-        tip: 'Check tense markers, subject–verb agreement, and pronoun reference.',
-      };
+      const tip = tipCat
+        ? getGrammarTip(tipCat)
+        : {
+            rule: 'Read each sentence and look for grammar clues about which word fits best.',
+            example:
+              'The words around each blank — tense, pronouns, singular/plural — point to the answer.',
+            tip: 'Check tense markers, subject–verb agreement, and pronoun reference.',
+          };
       panel.innerHTML = `
         <p class="mcq-hint-rule"><strong>Rule:</strong> ${escapeHtml(tip.rule)}</p>
         <p class="mcq-hint-eg"><em>${escapeHtml(tip.example)}</em></p>
@@ -461,8 +520,14 @@ function _renderPassage(passage) {
   // Keyboard shortcuts
   if (_keyHandler) document.removeEventListener('keydown', _keyHandler);
   _keyHandler = (e) => {
-    if (e.key === 'Enter' && !_bankLocked) { e.preventDefault(); document.getElementById('cloze-check')?.click(); }
-    if (e.key === 'Escape') { cleanupClozeCastle(); _onGoHome?.(); }
+    if (e.key === 'Enter' && !_bankLocked) {
+      e.preventDefault();
+      document.getElementById('cloze-check')?.click();
+    }
+    if (e.key === 'Escape') {
+      cleanupClozeCastle();
+      _onGoHome?.();
+    }
   };
   document.addEventListener('keydown', _keyHandler);
 }
@@ -523,7 +588,6 @@ function _renderScanTaskStep(passage) {
     },
   });
 }
-
 
 function _renderClueScoreMeter() {
   const scores = Object.values(_clueResults || {}).map(clueResultToScore);
@@ -593,9 +657,12 @@ function _handleClueWordTap(tappedWord, passage) {
   const clueData = _getActiveClueData(passage);
   if (!clueData) return;
 
-  const result   = evaluateClueSelection(tappedWord, clueData);
+  const result = evaluateClueSelection(tappedWord, clueData);
   const feedback = clueResultFeedback(result);
-  const skillTag = normaliseSkillTag(passage.blankSkills?.[_activeBlankIndex] || (_currentCat !== '__all__' ? _currentCat : 'sentenceLogic'));
+  const skillTag = normaliseSkillTag(
+    passage.blankSkills?.[_activeBlankIndex] ||
+      (_currentCat !== '__all__' ? _currentCat : 'sentenceLogic'),
+  );
 
   // Show feedback in clue panel
   const fbEl = document.getElementById('clue-hunt-feedback');
@@ -603,21 +670,21 @@ function _handleClueWordTap(tappedWord, passage) {
     const clueLabel = getClueTypeLabel(clueData.clueType);
     const skillLabel = getSkillLabel(skillTag);
     const whyLine = clueData.explanation || 'Use the clue to choose the best-fitting word.';
-    fbEl.textContent  = `${clueLabel} · ${skillLabel}. ${feedback.message} ${whyLine}`;
-    fbEl.className    = `clue-hunt-feedback ${feedback.cssClass}`;
+    fbEl.textContent = `${clueLabel} · ${skillLabel}. ${feedback.message} ${whyLine}`;
+    fbEl.className = `clue-hunt-feedback ${feedback.cssClass}`;
   }
 
   // Re-render passage with selected word highlighted
   const passageEl = document.getElementById('cloze-passage');
   if (passageEl) {
     renderClueHuntPassage({
-      container:        passageEl,
-      text:             passage.text,
+      container: passageEl,
+      text: passage.text,
       activeBlankIndex: _activeBlankIndex,
-      selectedWord:     tappedWord,
-      selectedResult:   result,
-      filledAnswers:    _blankFills.map((id, i) =>
-        id !== null ? _bankWords.find(w => w.id === id)?.word || '' : ''
+      selectedWord: tappedWord,
+      selectedResult: result,
+      filledAnswers: _blankFills.map((id, i) =>
+        id !== null ? _bankWords.find((w) => w.id === id)?.word || '' : '',
       ),
       onTapWord: (word) => _handleClueWordTap(word, passage),
     });
@@ -657,7 +724,8 @@ function _unlockBankAfterClue(passage, result) {
 
   // Update instruction
   const instr = document.getElementById('cloze-instruction');
-  if (instr) instr.textContent = '🏰 Clue found! Now tap the word from the bank that fits the blank.';
+  if (instr)
+    instr.textContent = '🏰 Clue found! Now tap the word from the bank that fits the blank.';
 
   // Swap bank wrapper state
   const wrapper = document.getElementById('cloze-bank-wrapper');
@@ -679,15 +747,15 @@ function _renderPassageText(passage) {
 
   if (_bankLocked) {
     // Clue hunt phase — render tappable tokens
-    const filled = _blankFills.map(id =>
-      id !== null ? _bankWords.find(w => w.id === id)?.word || '' : ''
+    const filled = _blankFills.map((id) =>
+      id !== null ? _bankWords.find((w) => w.id === id)?.word || '' : '',
     );
     renderClueHuntPassage({
       container,
-      text:             passage.text,
+      text: passage.text,
       activeBlankIndex: _activeBlankIndex,
-      filledAnswers:    filled,
-      onTapWord:        (word) => _handleClueWordTap(word, passage),
+      filledAnswers: filled,
+      onTapWord: (word) => _handleClueWordTap(word, passage),
     });
   } else {
     // Classic fill mode
@@ -718,11 +786,15 @@ function _renderBankWords(passage) {
 
   if (_bankLocked) {
     // Show chips but fully disabled
-    bank.innerHTML = _bankWords.map(w => `
+    bank.innerHTML = _bankWords
+      .map(
+        (w) => `
       <button class="cloze-word-chip cloze-word-chip--locked"
               disabled aria-disabled="true"
               aria-label="${escapeAttr(w.word)}">${escapeHtml(w.word)}</button>
-    `).join('');
+    `,
+      )
+      .join('');
     return;
   }
 
@@ -739,14 +811,19 @@ function _renderBankWords(passage) {
       const nextClue = (passage.clues || [])
         .slice()
         .sort((a, b) => a.blankIndex - b.blankIndex)
-        .find(c => _blankFills[c.blankIndex] === null && !Object.hasOwn(_clueResults, c.blankIndex));
+        .find(
+          (c) => _blankFills[c.blankIndex] === null && !Object.hasOwn(_clueResults, c.blankIndex),
+        );
 
       if (nextClue) {
         _activeBlankIndex = nextClue.blankIndex;
-        _bankLocked       = true;
-        _hintLevel        = 0;
-        _weakAttempts     = 0;
-        console.info('[ClozeCastle] Activating next clue target', { blankIndex: _activeBlankIndex, passageId: passage.id });
+        _bankLocked = true;
+        _hintLevel = 0;
+        _weakAttempts = 0;
+        console.info('[ClozeCastle] Activating next clue target', {
+          blankIndex: _activeBlankIndex,
+          passageId: passage.id,
+        });
         _renderPassage(passage);
       } else {
         _renderPassageText(passage);
@@ -760,39 +837,55 @@ function _renderBankWords(passage) {
 
 function _getActiveClueData(passage) {
   if (!passage.clues) return null;
-  return passage.clues.find(c => c.blankIndex === _activeBlankIndex) || null;
+  return passage.clues.find((c) => c.blankIndex === _activeBlankIndex) || null;
 }
 
 function _getClueDataForBlank(passage, blankIndex) {
   if (!passage.clues) return null;
-  return passage.clues.find(c => c.blankIndex === blankIndex) || null;
+  return passage.clues.find((c) => c.blankIndex === blankIndex) || null;
 }
 
-
 function _buildReviewRows(passage, userAnswers) {
-  const inferredSkill = _currentCat !== '__all__' ? normaliseSkillTag(_currentCat) : 'sentenceLogic';
+  const inferredSkill =
+    _currentCat !== '__all__' ? normaliseSkillTag(_currentCat) : 'sentenceLogic';
   return passage.answers.map((correctAnswer, idx) => {
     const clue = _getClueDataForBlank(passage, idx);
     const studentAnswer = userAnswers[idx] || '';
     const meta = getBlankSkillMeta(passage, idx);
     const skillTag = normaliseSkillTag(meta.primarySkill || inferredSkill);
     const isWrong = studentAnswer !== correctAnswer;
-    const why = isWrong ? buildWhyWrongExplanation({ meta, chosen: studentAnswer, correct: correctAnswer }) : null;
+    // Diagnose against the blank's own sentence, with sibling blanks filled in,
+    // so the detectors can see the subject and the time words around the gap.
+    const why = isWrong
+      ? buildWhyWrongExplanation({
+          meta,
+          chosen: studentAnswer,
+          correct: correctAnswer,
+          stem: stemForBlank(passage.text, idx, passage.answers),
+          domain: 'grammar',
+        })
+      : null;
     return {
       blank: `#${idx + 1}`,
       passageTitle: passage.title,
       studentAnswer,
       correctAnswer,
       status: isWrong ? 'Try again' : 'Correct',
+      skillTag,
       skillLabel: getSkillLabel(skillTag),
       clueTypeLabel: getClueTypeLabel(meta.clueType || clue?.clueType),
       clue: clue?.acceptableSpans?.[0] || '—',
-      explanation: passage.grammarNotes?.[idx] || meta.correctReason || clue?.explanation || 'Read the words before and after the blank.',
+      explanation:
+        passage.grammarNotes?.[idx] ||
+        meta.correctReason ||
+        clue?.explanation ||
+        'Read the words before and after the blank.',
       nextStepPrompt: getReviewPromptForSkill(skillTag),
       whyWrong: why?.whyWrong,
       whyRight: why?.whyRight,
       missedClue: why?.missedClue,
       examTip: meta.examTip || (why ? why.examTip : ''),
+      misconceptionId: why?.misconceptionId || null,
     };
   });
 }
@@ -800,19 +893,25 @@ function _buildReviewRows(passage, userAnswers) {
 // ── Checking ───────────────────────────────────────────────────────────────
 
 function _checkPassage(passage) {
-  if (_blankFills.some(f => f === null)) {
+  if (_blankFills.some((f) => f === null)) {
     _showFeedback('Fill in all the blanks first! 🏰', false);
     return;
   }
 
   const userAnswers = buildUserAnswers(_blankFills, _bankWords);
   _lastUserAnswers = [...userAnswers];
-  const allCorrect  = userAnswers.every((ans, i) => ans === passage.answers[i]);
+  const allCorrect = userAnswers.every((ans, i) => ans === passage.answers[i]);
   const blankCorrect = userAnswers.filter((ans, i) => ans === passage.answers[i]).length;
   const modeCfg = getModeConfig(_sessionMode);
   const skillKey = _currentCat === '__all__' ? 'mixed' : _currentCat;
-  const normalisedSkills = passage.answers.map((_, idx) => normaliseSkillTag(passage.blankSkills?.[idx] || (_currentCat !== '__all__' ? _currentCat : 'sentenceLogic')));
-  const wrongSkillSet = new Set(normalisedSkills.filter((skill, idx) => userAnswers[idx] !== passage.answers[idx]));
+  const normalisedSkills = passage.answers.map((_, idx) =>
+    normaliseSkillTag(
+      passage.blankSkills?.[idx] || (_currentCat !== '__all__' ? _currentCat : 'sentenceLogic'),
+    ),
+  );
+  const wrongSkillSet = new Set(
+    normalisedSkills.filter((skill, idx) => userAnswers[idx] !== passage.answers[idx]),
+  );
 
   questMastery.recordAttempt({
     quest: 'clozeCastle',
@@ -838,12 +937,22 @@ function _checkPassage(passage) {
 
   let masteryMap = store.get('masteryMap') || {};
   const reviewRows = _buildReviewRows(passage, userAnswers);
+  // Only the first submission of a passage feeds the pattern log; a retry of
+  // the same blanks is the child working on the slip, not repeating it.
+  if (_passageWrongCount === 0) {
+    recordMisconceptionsFromReview(reviewRows, { mode: 'clozeCastle' });
+  }
   reviewRows.forEach((row, idx) => {
     const meta = getBlankSkillMeta(passage, idx);
     const wasWrong = row.status !== 'Correct';
     const skillTag = meta.primarySkill;
     if (!_sessionSkillStats[skillTag]) {
-      _sessionSkillStats[skillTag] = { correct: 0, total: 0, label: row.skillLabel || getSkillLabel(skillTag), lastWrongExamples: [] };
+      _sessionSkillStats[skillTag] = {
+        correct: 0,
+        total: 0,
+        label: row.skillLabel || getSkillLabel(skillTag),
+        lastWrongExamples: [],
+      };
     }
     const stat = _sessionSkillStats[skillTag];
     stat.total += 1;
@@ -860,12 +969,12 @@ function _checkPassage(passage) {
       wasWrong,
       example: wasWrong
         ? {
-          passageId: passage.id,
-          blankIndex: idx,
-          chosen: row.studentAnswer,
-          correct: row.correctAnswer,
-          clueType: meta.clueType,
-        }
+            passageId: passage.id,
+            blankIndex: idx,
+            chosen: row.studentAnswer,
+            correct: row.correctAnswer,
+            clueType: meta.clueType,
+          }
         : null,
       current: masteryMap,
     });
@@ -873,14 +982,18 @@ function _checkPassage(passage) {
   store.set('masteryMap', masteryMap);
 
   if (modeCfg.showFinalReviewOnly) {
-    _sessionReviewRows.push(...reviewRows.filter(r => r.status !== 'Correct').map(r => ({
-      passageTitle: r.passageTitle,
-      blank: r.blank,
-      studentAnswer: r.studentAnswer,
-      correctAnswer: r.correctAnswer,
-      explanation: r.explanation,
-      skillLabel: r.skillLabel,
-    })));
+    _sessionReviewRows.push(
+      ...reviewRows
+        .filter((r) => r.status !== 'Correct')
+        .map((r) => ({
+          passageTitle: r.passageTitle,
+          blank: r.blank,
+          studentAnswer: r.studentAnswer,
+          correctAnswer: r.correctAnswer,
+          explanation: r.explanation,
+          skillLabel: r.skillLabel,
+        })),
+    );
     const examAttempts = store.get('ccqExamAttempts') || [];
     examAttempts.push({
       level: _currentLevel,
@@ -919,7 +1032,9 @@ function _checkPassage(passage) {
       store.set('ccqCatCompleted', tracked.nextCatCompleted);
     }
 
-    document.querySelectorAll('.cloze-blank--filled').forEach(b => b.classList.add('cloze-blank--correct'));
+    document
+      .querySelectorAll('.cloze-blank--filled')
+      .forEach((b) => b.classList.add('cloze-blank--correct'));
 
     showAnswerReviewPanel({
       host: _container.querySelector('.cloze-game'),
@@ -927,10 +1042,18 @@ function _checkPassage(passage) {
       rows: _buildReviewRows(passage, userAnswers),
       onContinue: () => {
         if (passage.clues && passage.clues.length > 0) {
-          _showClueExplanation(passage, () => setTimeout(() => { _passageIdx++; _showPassage(); }, 600));
+          _showClueExplanation(passage, () =>
+            setTimeout(() => {
+              _passageIdx++;
+              _showPassage();
+            }, 600),
+          );
         } else {
           _showFeedback('✅ Excellent! All correct!', true);
-          setTimeout(() => { _passageIdx++; _showPassage(); }, 1200);
+          setTimeout(() => {
+            _passageIdx++;
+            _showPassage();
+          }, 1200);
         }
       },
     });
@@ -939,7 +1062,7 @@ function _checkPassage(passage) {
     _passageWrongCount++;
 
     document.querySelectorAll('.cloze-blank--filled').forEach((b, i) => {
-      const userAns = _bankWords.find(w => w.id === _blankFills[i])?.word || '';
+      const userAns = _bankWords.find((w) => w.id === _blankFills[i])?.word || '';
       b.classList.toggle('cloze-blank--wrong', userAns !== passage.answers[i]);
     });
 
@@ -950,16 +1073,21 @@ function _checkPassage(passage) {
         host: _container.querySelector('.cloze-game'),
         title: 'Exam Submission Review',
         rows: _buildReviewRows(passage, userAnswers),
-        onContinue: () => { _passageIdx++; _showPassage(); },
+        onContinue: () => {
+          _passageIdx++;
+          _showPassage();
+        },
       });
       return;
     }
 
     if (_passageWrongCount >= 2) {
       // Second wrong attempt on this passage → teach-back before retry
-      _showFeedback('❌ Let\'s review your answers first.', false);
+      _showFeedback("❌ Let's review your answers first.", false);
       setTimeout(() => {
-        document.querySelectorAll('.cloze-blank--wrong').forEach(b => b.classList.remove('cloze-blank--wrong'));
+        document
+          .querySelectorAll('.cloze-blank--wrong')
+          .forEach((b) => b.classList.remove('cloze-blank--wrong'));
         const fb = document.getElementById('cloze-feedback');
         if (fb) fb.hidden = true;
         showAnswerReviewPanel({
@@ -970,9 +1098,14 @@ function _checkPassage(passage) {
         });
       }, 800);
     } else {
-      _showFeedback('❌ Not quite — the red blanks need another look. Reread those sentences before you try again.', false);
+      _showFeedback(
+        '❌ Not quite — the red blanks need another look. Reread those sentences before you try again.',
+        false,
+      );
       setTimeout(() => {
-        document.querySelectorAll('.cloze-blank--wrong').forEach(b => b.classList.remove('cloze-blank--wrong'));
+        document
+          .querySelectorAll('.cloze-blank--wrong')
+          .forEach((b) => b.classList.remove('cloze-blank--wrong'));
         const fb = document.getElementById('cloze-feedback');
         if (fb) fb.hidden = true;
       }, 1800);
@@ -1037,13 +1170,16 @@ function _showTeachBackOverlay(passage, userAnswers = []) {
   if (existing) existing.remove();
 
   const catKey = _currentCat === '__all__' ? null : _currentCat;
-  const tip    = catKey ? getGrammarTip(catKey) : {
-    rule: 'Read each sentence carefully and look for clues about which word fits best.',
-    example: 'Look at the words around the blank — they often tell you what grammar rule to use.',
-  };
+  const tip = catKey
+    ? getGrammarTip(catKey)
+    : {
+        rule: 'Read each sentence carefully and look for clues about which word fits best.',
+        example:
+          'Look at the words around the blank — they often tell you what grammar rule to use.',
+      };
 
   const overlay = document.createElement('div');
-  overlay.id        = 'cloze-teachback-overlay';
+  overlay.id = 'cloze-teachback-overlay';
   overlay.className = 'cloze-teachback-overlay';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
@@ -1074,16 +1210,22 @@ function _showTeachBackOverlay(passage, userAnswers = []) {
   // On-demand AI elaboration on the missed blanks (additive — the authored
   // tip above is always shown; this only appears with a configured key).
   const wrongBlanks = passage.answers
-    .map((correctAnswer, i) => ({ n: i + 1, correctAnswer, studentAnswer: userAnswers[i] || '(left blank)' }))
-    .filter(w => w.studentAnswer !== w.correctAnswer);
+    .map((correctAnswer, i) => ({
+      n: i + 1,
+      correctAnswer,
+      studentAnswer: userAnswers[i] || '(left blank)',
+    }))
+    .filter((w) => w.studentAnswer !== w.correctAnswer);
   if (wrongBlanks.length > 0) {
-    attachAskGiriButton(overlay.querySelector('.ctb-panel'), () => explainTeachBack({
-      skillLabel: catKey ? (GRAMMAR_CATEGORIES[catKey]?.label || catKey) : 'grammar cloze',
-      exercise: `Fill in the blanks: "${passage.text}"`,
-      studentAnswer: wrongBlanks.map(w => `blank ${w.n}: ${w.studentAnswer}`).join(', '),
-      correctAnswer: wrongBlanks.map(w => `blank ${w.n}: ${w.correctAnswer}`).join(', '),
-      level: _currentLevel,
-    }));
+    attachAskGiriButton(overlay.querySelector('.ctb-panel'), () =>
+      explainTeachBack({
+        skillLabel: catKey ? GRAMMAR_CATEGORIES[catKey]?.label || catKey : 'grammar cloze',
+        exercise: `Fill in the blanks: "${passage.text}"`,
+        studentAnswer: wrongBlanks.map((w) => `blank ${w.n}: ${w.studentAnswer}`).join(', '),
+        correctAnswer: wrongBlanks.map((w) => `blank ${w.n}: ${w.correctAnswer}`).join(', '),
+        level: _currentLevel,
+      }),
+    );
   }
 
   overlay.querySelector('#ctb-try-again')?.addEventListener('click', () => {
@@ -1106,21 +1248,26 @@ function _showClueExplanation(passage, onContinue) {
   const existing = document.getElementById('cloze-explanation-overlay');
   if (existing) existing.remove();
 
-  const lines = passage.answers.map((answer, idx) => {
-    const clue = (passage.clues || []).find(c => c.blankIndex === idx);
-    const result = _clueResults[idx] || 'weak';
-    const feedback = clueResultFeedback(result);
-    const score = clueResultToScore(result);
-    const selected = clue?.acceptableSpans?.[0] || 'Skipped / no clue';
-    const note = passage.grammarNotes?.[idx] || clue?.explanation || `"${answer}" is the best fit for the sentence meaning and grammar.`;
+  const lines = passage.answers
+    .map((answer, idx) => {
+      const clue = (passage.clues || []).find((c) => c.blankIndex === idx);
+      const result = _clueResults[idx] || 'weak';
+      const feedback = clueResultFeedback(result);
+      const score = clueResultToScore(result);
+      const selected = clue?.acceptableSpans?.[0] || 'Skipped / no clue';
+      const note =
+        passage.grammarNotes?.[idx] ||
+        clue?.explanation ||
+        `"${answer}" is the best fit for the sentence meaning and grammar.`;
 
-    return `
+      return `
       <div class="clue-explanation-item">
         <p><strong>Blank ${idx + 1}:</strong> ${escapeHtml(answer)}</p>
         <p>Clue chosen: <span class="clue-result-badge ${feedback.cssClass}">${escapeHtml(selected)}</span> · Score ${Math.round(score * 100)}%</p>
         <p class="clue-explanation-text">${escapeHtml(note)}</p>
       </div>`;
-  }).join('');
+    })
+    .join('');
 
   const overlay = document.createElement('div');
   overlay.id = 'cloze-explanation-overlay';
@@ -1147,7 +1294,10 @@ function _showFeedback(msg, success) {
   el.textContent = msg;
   el.className = `cloze-feedback cloze-feedback--${success ? 'success' : 'error'}`;
   el.hidden = false;
-  if (success) setTimeout(() => { el.hidden = true; }, 1600);
+  if (success)
+    setTimeout(() => {
+      el.hidden = true;
+    }, 1600);
 }
 
 // ── Complete screen ────────────────────────────────────────────────────────
@@ -1160,38 +1310,48 @@ function _showComplete() {
   audio.playSfx('levelUp');
   mascot.celebrate(true);
 
-  const catInfo = _currentCat !== '__all__' && GRAMMAR_CATEGORIES[_currentCat]
-    ? `${GRAMMAR_CATEGORIES[_currentCat].icon} ${GRAMMAR_CATEGORIES[_currentCat].label}`
-    : 'All Topics';
+  const catInfo =
+    _currentCat !== '__all__' && GRAMMAR_CATEGORIES[_currentCat]
+      ? `${GRAMMAR_CATEGORIES[_currentCat].icon} ${GRAMMAR_CATEGORIES[_currentCat].label}`
+      : 'All Topics';
 
-  const acc   = _sessionBlankTotal > 0 ? Math.round((_sessionBlankCorrect / _sessionBlankTotal) * 100) : 100;
+  const acc =
+    _sessionBlankTotal > 0 ? Math.round((_sessionBlankCorrect / _sessionBlankTotal) * 100) : 100;
   const stars = acc >= 90 ? 3 : acc >= 70 ? 2 : 1;
   const modeCfg = getModeConfig(_sessionMode);
   const elapsedSec = Math.max(1, Math.round((Date.now() - (_examStartedAt || Date.now())) / 1000));
-  const recommendation = getNextStepRecommendation({ accuracy: acc, skillLabel: catInfo, hintsUsed: _sessionHintsUsed });
-  const weakSkills = getTopWeakSkills({ level: _currentLevel, weakSkillsMap: store.get('ccqWeakSkills') || {} });
+  const recommendation = getNextStepRecommendation({
+    accuracy: acc,
+    skillLabel: catInfo,
+    hintsUsed: _sessionHintsUsed,
+  });
+  const weakSkills = getTopWeakSkills({
+    level: _currentLevel,
+    weakSkillsMap: store.get('ccqWeakSkills') || {},
+  });
   const weakSkillsLine = weakSkills.length
     ? `<p class="cloze-complete-score">Mastery focus: ${weakSkills.map((s) => `${getSkillLabel(s.skill)} (${s.wrong}/${s.attempts})`).join(' · ')}</p>`
     : '';
-  const wrongLines = _sessionMode === 'exam' && _sessionReviewRows.length
-    ? groupWrongLinesBySkill(_sessionReviewRows)
-    : _sessionReviewRows.map((row) => `- ${row.passageTitle} ${row.blank}: ${row.studentAnswer || '(blank)'} → ${row.correctAnswer}`);
+  const wrongLines =
+    _sessionMode === 'exam' && _sessionReviewRows.length
+      ? groupWrongLinesBySkill(_sessionReviewRows)
+      : _sessionReviewRows.map(
+          (row) =>
+            `- ${row.passageTitle} ${row.blank}: ${row.studentAnswer || '(blank)'} → ${row.correctAnswer}`,
+        );
 
   // Clue accuracy line (only shown if clue mode was used)
   const clueTotal = Object.keys(_clueResults).length;
-  const clueAcc   = clueTotal > 0
-    ? Math.round((_sessionClueScore / clueTotal) * 100)
-    : null;
-  const clueAccLine = clueAcc !== null
-    ? `<p class="cloze-complete-clue">🔍 Clue accuracy: ${clueAcc}%</p>`
-    : '';
+  const clueAcc = clueTotal > 0 ? Math.round((_sessionClueScore / clueTotal) * 100) : null;
+  const clueAccLine =
+    clueAcc !== null ? `<p class="cloze-complete-clue">🔍 Clue accuracy: ${clueAcc}%</p>` : '';
 
-  const scanAcc = _sessionScanTotal > 0
-    ? Math.round((_sessionScanCorrect / _sessionScanTotal) * 100)
-    : null;
-  const scanAccLine = scanAcc !== null
-    ? `<p class="cloze-complete-clue">🔎 Scan accuracy: ${scanAcc}% (${_sessionScanCorrect}/${_sessionScanTotal})</p>`
-    : '';
+  const scanAcc =
+    _sessionScanTotal > 0 ? Math.round((_sessionScanCorrect / _sessionScanTotal) * 100) : null;
+  const scanAccLine =
+    scanAcc !== null
+      ? `<p class="cloze-complete-clue">🔎 Scan accuracy: ${scanAcc}% (${_sessionScanCorrect}/${_sessionScanTotal})</p>`
+      : '';
 
   let focusTip = '';
   if (acc < 70) {
@@ -1199,7 +1359,9 @@ function _showComplete() {
     if (!tipCat) {
       const statEntries = Object.entries(_sessionSkillStats).filter(([, s]) => s.total > 0);
       if (statEntries.length > 0) {
-        tipCat = statEntries.sort(([, a], [, b]) => (a.correct / a.total) - (b.correct / b.total))[0][0];
+        tipCat = statEntries.sort(
+          ([, a], [, b]) => a.correct / a.total - b.correct / b.total,
+        )[0][0];
       }
     }
     if (tipCat) {
@@ -1237,7 +1399,9 @@ function _showComplete() {
       </div>
     </div>`;
 
-  document.getElementById('cloze-back-cat')?.addEventListener('click', () => _renderCategoryPicker(_currentLevel));
+  document
+    .getElementById('cloze-back-cat')
+    ?.addEventListener('click', () => _renderCategoryPicker(_currentLevel));
   document.getElementById('cloze-replay')?.addEventListener('click', () => {
     if (_currentCat === '__all__') _startAllCategories(_currentLevel);
     else _startCategory(_currentLevel, _currentCat);
@@ -1285,7 +1449,7 @@ function _showComplete() {
       accuracy: acc,
       strongest,
       weakest,
-      weakExamples: weakest ? (_sessionSkillStats[weakest.skill]?.lastWrongExamples || []) : [],
+      weakExamples: weakest ? _sessionSkillStats[weakest.skill]?.lastWrongExamples || [] : [],
       recommendation,
     });
     try {
@@ -1297,6 +1461,9 @@ function _showComplete() {
   });
   document.getElementById('cloze-back-levels')?.addEventListener('click', () => _renderBrowser());
 
-  if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
+  if (_keyHandler) {
+    document.removeEventListener('keydown', _keyHandler);
+    _keyHandler = null;
+  }
   setTimeout(() => document.getElementById('cloze-back-cat')?.focus(), 200);
 }

@@ -18,16 +18,17 @@ import { OPEN_COMPREHENSION_PASSAGES } from '../data/openComprehensionPassages.j
 import { LISTENING_PASSAGES } from '../data/listeningPassages.js';
 import { store } from '../modules/store.js';
 import { escapeHtml } from '../utils/escapeHtml.js';
+import { attachMcqAnswerLadder } from './mcqFeedback.js';
 
 // ── Module state ─────────────────────────────────────────────────────────────
 
-let _container  = null;
-let _onGoHome   = null;
+let _container = null;
+let _onGoHome = null;
 let _selectedLevel = 'P3';
 let _currentPassage = null;
 let _hasListened = false;
-let _currentQ  = 0;
-let _scores    = [];
+let _currentQ = 0;
+let _scores = [];
 let _utterance = null;
 
 // ── Speech helpers ────────────────────────────────────────────────────────────
@@ -54,13 +55,13 @@ function _stopSpeaking() {
  */
 export function initListeningComp(container, onGoHome) {
   if (!container) return;
-  _container  = container;
-  _onGoHome   = typeof onGoHome === 'function' ? onGoHome : () => {};
-  _selectedLevel  = 'P3';
+  _container = container;
+  _onGoHome = typeof onGoHome === 'function' ? onGoHome : () => {};
+  _selectedLevel = 'P3';
   _currentPassage = null;
-  _hasListened    = false;
-  _currentQ  = 0;
-  _scores    = [];
+  _hasListened = false;
+  _currentQ = 0;
+  _scores = [];
   _utterance = null;
 }
 
@@ -70,7 +71,7 @@ export function showListeningBrowser() {
   _currentPassage = null;
   _hasListened = false;
   _currentQ = 0;
-  _scores   = [];
+  _scores = [];
   _renderBrowser();
 }
 
@@ -78,11 +79,11 @@ export function showListeningBrowser() {
 export function cleanupListeningComp() {
   _stopSpeaking();
   if (_container) _container.innerHTML = '';
-  _container  = null;
-  _onGoHome   = null;
+  _container = null;
+  _onGoHome = null;
   _currentPassage = null;
   _hasListened = false;
-  _utterance  = null;
+  _utterance = null;
 }
 
 // ── Data helpers ──────────────────────────────────────────────────────────────
@@ -93,8 +94,8 @@ function _passagesForLevel(level) {
   // Purpose-written listening sets (auto-marked MCQ) first, then the shared
   // open-ended passages (self-marked against a model answer).
   return [
-    ...LISTENING_PASSAGES.filter(p => p.level === level),
-    ...OPEN_COMPREHENSION_PASSAGES.filter(p => p.level === level),
+    ...LISTENING_PASSAGES.filter((p) => p.level === level),
+    ...OPEN_COMPREHENSION_PASSAGES.filter((p) => p.level === level),
   ];
 }
 
@@ -108,11 +109,13 @@ function _isMcqPassage(p = _currentPassage) {
 function _renderBrowser() {
   if (!_container) return;
 
-  const levelTabs = LEVELS.map(lv => `
+  const levelTabs = LEVELS.map(
+    (lv) => `
     <button class="btn ${lv === _selectedLevel ? 'btn--primary' : 'btn--ghost'} lc-level-tab"
             type="button" data-level="${lv}" aria-pressed="${lv === _selectedLevel}">
       ${escapeHtml(lv)}
-    </button>`).join('');
+    </button>`,
+  ).join('');
 
   _container.innerHTML = `
     <section class="lc-browser" aria-label="Listening Comprehension">
@@ -132,7 +135,7 @@ function _renderBrowser() {
       </footer>
     </section>`;
 
-  _container.querySelectorAll('.lc-level-tab').forEach(btn => {
+  _container.querySelectorAll('.lc-level-tab').forEach((btn) => {
     btn.addEventListener('click', () => {
       _selectedLevel = btn.dataset.level;
       _renderBrowser();
@@ -152,26 +155,29 @@ function _renderPassageGrid() {
 
   const passages = _passagesForLevel(_selectedLevel);
   if (passages.length === 0) {
-    grid.innerHTML = '<p style="color:var(--text-muted,#888)">No passages available for this level yet.</p>';
+    grid.innerHTML =
+      '<p style="color:var(--text-muted,#888)">No passages available for this level yet.</p>';
     return;
   }
 
-  grid.innerHTML = passages.map(p => {
-    const qCount = Array.isArray(p.questions) ? p.questions.length : 0;
-    const kindLabel = _isMcqPassage(p)
-      ? `🎧 Listening set · pick the answer`
-      : `✏️ Open-ended · self-marked`;
-    return `
+  grid.innerHTML = passages
+    .map((p) => {
+      const qCount = Array.isArray(p.questions) ? p.questions.length : 0;
+      const kindLabel = _isMcqPassage(p)
+        ? `🎧 Listening set · pick the answer`
+        : `✏️ Open-ended · self-marked`;
+      return `
       <button class="lc-passage-card" type="button" data-id="${escapeHtml(p.id)}"
               aria-label="Start ${escapeHtml(p.title)}, ${qCount} question${qCount !== 1 ? 's' : ''}">
         <div class="lc-passage-title">${escapeHtml(p.title)}</div>
         <div class="lc-passage-meta">${kindLabel} · ${qCount} question${qCount !== 1 ? 's' : ''}</div>
       </button>`;
-  }).join('');
+    })
+    .join('');
 
-  grid.querySelectorAll('.lc-passage-card').forEach(card => {
+  grid.querySelectorAll('.lc-passage-card').forEach((card) => {
     card.addEventListener('click', () => {
-      const passage = passages.find(p => p.id === card.dataset.id);
+      const passage = passages.find((p) => p.id === card.dataset.id);
       if (passage) _openPassage(passage);
     });
   });
@@ -218,8 +224,8 @@ function _renderPassageScreen() {
       </footer>
     </section>`;
 
-  const listenBtn  = document.getElementById('lc-btn-listen');
-  const stopBtn    = document.getElementById('lc-btn-stop');
+  const listenBtn = document.getElementById('lc-btn-listen');
+  const stopBtn = document.getElementById('lc-btn-stop');
   const answerWrap = document.getElementById('lc-answer-btn-wrap');
 
   listenBtn?.addEventListener('click', () => {
@@ -247,7 +253,7 @@ function _renderPassageScreen() {
   document.getElementById('lc-btn-to-questions')?.addEventListener('click', () => {
     _stopSpeaking();
     _currentQ = 0;
-    _scores   = [];
+    _scores = [];
     _renderQuestionsScreen();
   });
 
@@ -294,7 +300,7 @@ function _renderMcqQuestion(qIndex) {
     return;
   }
 
-  const q     = questions[qIndex];
+  const q = questions[qIndex];
   const total = questions.length;
 
   // Shuffle at render time — authored option order must never be learnable
@@ -318,9 +324,13 @@ function _renderMcqQuestion(qIndex) {
           Q${qIndex + 1}. ${escapeHtml(q.q || '')}
         </p>
         <div class="lc-mcq-options" style="display:flex;flex-direction:column;gap:8px">
-          ${shuffled.map(opt => `
+          ${shuffled
+            .map(
+              (opt) => `
             <button class="btn btn--ghost lc-mcq-option" type="button" data-choice="${escapeHtml(opt)}"
-                    style="text-align:left;justify-content:flex-start">${escapeHtml(opt)}</button>`).join('')}
+                    style="text-align:left;justify-content:flex-start">${escapeHtml(opt)}</button>`,
+            )
+            .join('')}
         </div>
         <div id="lc-mcq-feedback" class="lc-model-answer" style="display:none" role="status" aria-live="polite"></div>
         <div id="lc-mcq-next-wrap" style="display:none;margin-top:var(--space-3,12px)">
@@ -335,39 +345,28 @@ function _renderMcqQuestion(qIndex) {
       </footer>
     </section>`;
 
-  _container.querySelectorAll('.lc-mcq-option').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const choice = btn.dataset.choice;
-      const ok = choice === q.answer;
-      _scores[qIndex] = ok ? 1 : 0;
-
-      _container.querySelectorAll('.lc-mcq-option').forEach(b => {
-        b.disabled = true;
-        b.setAttribute('aria-disabled', 'true');
-        if (b.dataset.choice === q.answer) {
-          b.style.borderColor = 'var(--color-success,#22c55e)';
-          b.style.background = 'color-mix(in srgb, var(--color-success,#22c55e) 12%, transparent)';
-        } else if (b === btn && !ok) {
-          b.style.borderColor = 'var(--color-error,#ef4444)';
-        }
-      });
-
-      const fb = document.getElementById('lc-mcq-feedback');
-      if (fb) {
-        fb.style.display = '';
-        fb.innerHTML = `${ok ? '✅ <strong>Correct!</strong>' : `❌ <strong>The answer is:</strong> ${escapeHtml(q.answer)}`}
-          ${q.explain ? `<br>${escapeHtml(q.explain)}` : ''}`;
-      }
-
-      const nextWrap = document.getElementById('lc-mcq-next-wrap');
-      if (nextWrap) nextWrap.style.display = '';
-      document.getElementById('lc-mcq-next')?.focus();
-    });
-  });
-
-  document.getElementById('lc-mcq-next')?.addEventListener('click', () => {
+  const nextWrap = document.getElementById('lc-mcq-next-wrap');
+  const nextBtn = document.getElementById('lc-mcq-next');
+  nextBtn?.addEventListener('click', () => {
     _currentQ = qIndex + 1;
     _renderMcqQuestion(_currentQ);
+  });
+
+  attachMcqAnswerLadder({
+    root: _container,
+    item: { q: q.q, answer: q.answer, choices: shuffled, explain: q.explain },
+    feedbackEl: document.getElementById('lc-mcq-feedback'),
+    nextWrap,
+    nextBtn,
+    mode: 'listeningComp',
+    domain: 'comprehension',
+    skillLabel: 'Listening comprehension',
+    // A listener who missed a detail should hear it again, not re-read a page.
+    cue: 'Play that part once more and listen for the answer, then choose again.',
+    // The score is the first attempt; the second listen is for learning.
+    onFirstAttempt: (ok) => {
+      _scores[qIndex] = ok ? 1 : 0;
+    },
   });
 
   document.getElementById('lc-back-passage3')?.addEventListener('click', () => {
@@ -384,7 +383,9 @@ function _renderAllQuestions() {
   const p = _currentPassage;
   const questions = p.questions || [];
 
-  const questionBlocks = questions.map((q, i) => `
+  const questionBlocks = questions
+    .map(
+      (q, i) => `
     <div class="lc-question-box" id="lc-q-block-${i}">
       <p style="font-weight:700;margin:0 0 var(--space-2,8px)">
         Q${i + 1}. ${escapeHtml(q.q || q.question || '')}
@@ -405,7 +406,9 @@ function _renderAllQuestions() {
         </div>
         <p id="lc-marked-${i}" style="display:none;font-size:0.9em;color:var(--text-muted,#888);margin-top:4px"></p>
       </div>
-    </div>`).join('');
+    </div>`,
+    )
+    .join('');
 
   _container.innerHTML = `
     <section class="lc-browser" aria-label="Answer Questions">
@@ -429,7 +432,7 @@ function _renderAllQuestions() {
     </section>`;
 
   // Check-answer buttons
-  _container.querySelectorAll('[data-check]').forEach(btn => {
+  _container.querySelectorAll('[data-check]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const idx = parseInt(btn.dataset.check, 10);
       const reveal = document.getElementById(`lc-reveal-${idx}`);
@@ -439,9 +442,9 @@ function _renderAllQuestions() {
   });
 
   // Self-mark buttons
-  _container.querySelectorAll('[data-mark]').forEach(btn => {
+  _container.querySelectorAll('[data-mark]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      const idx  = parseInt(btn.dataset.qi, 10);
+      const idx = parseInt(btn.dataset.qi, 10);
       const mark = btn.dataset.mark;
       _scores[idx] = mark === 'right' ? 1 : 0;
       const markedEl = document.getElementById(`lc-marked-${idx}`);
@@ -451,7 +454,9 @@ function _renderAllQuestions() {
       }
       // Disable both self-mark buttons for this question
       const block = document.getElementById(`lc-q-block-${idx}`);
-      block?.querySelectorAll('[data-mark]').forEach(b => { b.disabled = true; });
+      block?.querySelectorAll('[data-mark]').forEach((b) => {
+        b.disabled = true;
+      });
     });
   });
 
@@ -482,7 +487,7 @@ function _renderSingleQuestion(qIndex) {
     return;
   }
 
-  const q     = questions[qIndex];
+  const q = questions[qIndex];
   const total = questions.length;
 
   _container.innerHTML = `
@@ -530,8 +535,12 @@ function _renderSingleQuestion(qIndex) {
     _renderSingleQuestion(_currentQ);
   }
 
-  document.getElementById('lc-mark-right')?.addEventListener('click', () => _recordAndAdvance(true));
-  document.getElementById('lc-mark-wrong')?.addEventListener('click', () => _recordAndAdvance(false));
+  document
+    .getElementById('lc-mark-right')
+    ?.addEventListener('click', () => _recordAndAdvance(true));
+  document
+    .getElementById('lc-mark-wrong')
+    ?.addEventListener('click', () => _recordAndAdvance(false));
 
   document.getElementById('lc-back-passage3')?.addEventListener('click', () => {
     _stopSpeaking();
@@ -547,10 +556,10 @@ function _renderSingleQuestion(qIndex) {
 
 function _renderResults() {
   if (!_container || !_currentPassage) return;
-  const p      = _currentPassage;
-  const total  = (p.questions || []).length;
-  const correct = _scores.filter(s => s === 1).length;
-  const pct    = total > 0 ? Math.round((correct / total) * 100) : 0;
+  const p = _currentPassage;
+  const total = (p.questions || []).length;
+  const correct = _scores.filter((s) => s === 1).length;
+  const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
 
   let message;
   if (pct === 100) {
@@ -563,7 +572,8 @@ function _renderResults() {
     message = 'Keep it up! Try listening again and re-reading your answers.';
   }
 
-  const trophyIcon = pct === 100 ? '&#127942;' : pct >= 75 ? '&#11088;' : pct >= 50 ? '&#128077;' : '&#128170;';
+  const trophyIcon =
+    pct === 100 ? '&#127942;' : pct >= 75 ? '&#11088;' : pct >= 50 ? '&#128077;' : '&#128170;';
 
   _container.innerHTML = `
     <section class="lc-browser" aria-label="Results">

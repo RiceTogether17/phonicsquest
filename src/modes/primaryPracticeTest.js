@@ -27,6 +27,8 @@ import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 import { GRAMMAR_CATEGORIES } from '../data/grammarCategories.js';
 import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
 import { gradeShortAnswer } from './scoring/shortAnswerGrader.js';
+import { diagnoseAnswer } from '../modules/answerDiagnosis.js';
+import { recordMisconceptionsFromReview } from '../modules/teacherFeedback.js';
 
 function shuffle(arr) {
   const a = [...arr];
@@ -38,15 +40,25 @@ function shuffle(arr) {
 }
 
 const PRACTISE_TARGET_LABELS = {
-  'grammar-mcq':    '🧠 Grammar MCQ',
-  'vocab-mcq':      '📖 Vocabulary MCQ',
-  'cloze-castle':   '🏰 Cloze Castle',
-  'word-vault':     '🔑 Word Vault',
+  'grammar-mcq': '🧠 Grammar MCQ',
+  'vocab-mcq': '📖 Vocabulary MCQ',
+  'cloze-castle': '🏰 Cloze Castle',
+  'word-vault': '🔑 Word Vault',
   'sentence-forge': '🔨 Sentence Forge',
-  'editing-quest':  '✏️ Editing Quest',
+  'editing-quest': '✏️ Editing Quest',
 };
 
-const SECTION_KEYS = ['sectionA', 'sectionB', 'sectionC', 'sectionD', 'sectionE', 'sectionF', 'sectionG', 'sectionH', 'sectionI'];
+const SECTION_KEYS = [
+  'sectionA',
+  'sectionB',
+  'sectionC',
+  'sectionD',
+  'sectionE',
+  'sectionF',
+  'sectionG',
+  'sectionH',
+  'sectionI',
+];
 
 // Suggested time allocations for a 1 h 50 min paper (110 min total).
 // Based on Singapore PSLE Paper 2 pacing guidance.
@@ -120,10 +132,13 @@ function _defaultPractiseTarget(skill) {
 /* ────────────────────────────────────────────────────────────────────── */
 
 function renderMcqSection(section, sectionKey) {
-  const items = section.items.map((item, i) => {
-    const groupName = `q-${sectionKey}-${i}`;
-    const practise = item.practiseTarget || _defaultPractiseTarget(item.skill);
-    const choices = shuffle(item.choices).map(c => `
+  const items = section.items
+    .map((item, i) => {
+      const groupName = `q-${sectionKey}-${i}`;
+      const practise = item.practiseTarget || _defaultPractiseTarget(item.skill);
+      const choices = shuffle(item.choices)
+        .map(
+          (c) => `
       <label class="ptg-radio">
         <input type="radio" name="${groupName}" value="${escapeAttr(c)}"
                data-q-key="${sectionKey}/${i}"
@@ -131,20 +146,26 @@ function renderMcqSection(section, sectionKey) {
                data-skill="${escapeAttr(item.skill || '')}"
                data-practise="${escapeAttr(practise)}">
         <span>${escapeHtml(c)}</span>
-      </label>`).join('');
-    return `
+      </label>`,
+        )
+        .join('');
+      return `
       <li class="ptg-question" data-q-index="${i}">
         <p class="ptg-q-stem">${escapeHtml(item.q)}</p>
         <div class="ptg-choices">${choices}</div>
         <div class="ptg-feedback" data-feedback-for="${sectionKey}/${i}" hidden></div>
       </li>`;
-  }).join('');
+    })
+    .join('');
   return `<ol class="ptg-mcq">${items}</ol>`;
 }
 
 function renderClozeSection(section, sectionKey) {
-  const practise = section.practiseTarget || _defaultPractiseTarget(section.skill) || 'cloze-castle';
-  const wordBankPills = (section.wordBank || []).map(w => `<span class="ptg-word-pill">${escapeHtml(w)}</span>`).join(' ');
+  const practise =
+    section.practiseTarget || _defaultPractiseTarget(section.skill) || 'cloze-castle';
+  const wordBankPills = (section.wordBank || [])
+    .map((w) => `<span class="ptg-word-pill">${escapeHtml(w)}</span>`)
+    .join(' ');
   const text = escapeHtml(section.text).replace(/\{\{(\d+)\}\}/g, (_, n) => {
     const idx = Number(n) - 1;
     return `<input type="text" class="ptg-input ptg-input--cloze" data-q-key="${sectionKey}/${idx}"
@@ -154,7 +175,9 @@ function renderClozeSection(section, sectionKey) {
             data-practise="${escapeAttr(practise)}"
             aria-label="Blank ${n}" autocomplete="off" />`;
   });
-  const reuse = section.reuseAllowed ? '<p class="ptg-note"><em>You may use the words more than once.</em></p>' : '';
+  const reuse = section.reuseAllowed
+    ? '<p class="ptg-note"><em>You may use the words more than once.</em></p>'
+    : '';
 
   // Section C (Grammar Cloze) has no word bank in the real PSLE exam.
   // In test mode hide it entirely; in practice mode show it with an exam note.
@@ -176,7 +199,8 @@ function renderClozeSection(section, sectionKey) {
 }
 
 function renderOpenClozeSection(section, sectionKey) {
-  const practise = section.practiseTarget || _defaultPractiseTarget(section.skill) || 'cloze-castle';
+  const practise =
+    section.practiseTarget || _defaultPractiseTarget(section.skill) || 'cloze-castle';
   const text = escapeHtml(section.text).replace(/\{\{(\d+)\}\}/g, (_, n) => {
     const idx = Number(n) - 1;
     const blank = section.blanks?.[idx];
@@ -195,9 +219,12 @@ function renderOpenClozeSection(section, sectionKey) {
 }
 
 function renderWordOrderSection(section, sectionKey) {
-  const items = section.items.map((item, i) => {
-    const scrambled = item.scrambled.map(w => `<span class="ptg-tile">${escapeHtml(w)}</span>`).join(' ');
-    return `
+  const items = section.items
+    .map((item, i) => {
+      const scrambled = item.scrambled
+        .map((w) => `<span class="ptg-tile">${escapeHtml(w)}</span>`)
+        .join(' ');
+      return `
       <li class="ptg-question" data-q-index="${i}">
         <p class="ptg-q-stem">${i + 1}. Rearrange: ${scrambled}</p>
         <input type="text" class="ptg-input ptg-input--full" data-q-key="${sectionKey}/${i}"
@@ -208,14 +235,16 @@ function renderWordOrderSection(section, sectionKey) {
                placeholder="Type the full sentence here…" autocomplete="off" />
         <div class="ptg-feedback" data-feedback-for="${sectionKey}/${i}" hidden></div>
       </li>`;
-  }).join('');
+    })
+    .join('');
   return `<p class="ptg-instructions">${escapeHtml(section.instructions || '')}</p><ol class="ptg-word-order">${items}</ol>`;
 }
 
 function renderSentenceCombiningSection(section, sectionKey) {
-  const items = section.items.map((item, i) => {
-    const originals = item.originals.map(o => `<li>${escapeHtml(o)}</li>`).join('');
-    return `
+  const items = section.items
+    .map((item, i) => {
+      const originals = item.originals.map((o) => `<li>${escapeHtml(o)}</li>`).join('');
+      return `
       <li class="ptg-question" data-q-index="${i}">
         <ol class="ptg-orig">${originals}</ol>
         <p>Connector: <code>${escapeHtml(item.connector)}</code></p>
@@ -227,17 +256,20 @@ function renderSentenceCombiningSection(section, sectionKey) {
                   placeholder="Write the combined sentence…"></textarea>
         <div class="ptg-feedback" data-feedback-for="${sectionKey}/${i}" hidden></div>
       </li>`;
-  }).join('');
+    })
+    .join('');
   return `<p class="ptg-instructions">${escapeHtml(section.instructions || '')}</p><ol class="ptg-combining">${items}</ol>`;
 }
 
 function renderSynthesisSection(section, sectionKey) {
-  const items = section.items.map((item, i) => {
-    const alts = (item.alternates || []).join('|');
-    const requiredGroupsAttr = Array.isArray(item.requiredGroups) && item.requiredGroups.length
-      ? JSON.stringify(item.requiredGroups)
-      : '';
-    return `
+  const items = section.items
+    .map((item, i) => {
+      const alts = (item.alternates || []).join('|');
+      const requiredGroupsAttr =
+        Array.isArray(item.requiredGroups) && item.requiredGroups.length
+          ? JSON.stringify(item.requiredGroups)
+          : '';
+      return `
       <li class="ptg-question" data-q-index="${i}">
         <p class="ptg-q-stem">${i + 1}. ${escapeHtml(item.q)}</p>
         <p class="ptg-synthesis-stem"><strong>Begin with:</strong> <code>${escapeHtml(item.stem)}</code></p>
@@ -252,19 +284,28 @@ function renderSynthesisSection(section, sectionKey) {
                   placeholder="Write your transformed sentence…"></textarea>
         <div class="ptg-feedback" data-feedback-for="${sectionKey}/${i}" hidden></div>
       </li>`;
-  }).join('');
+    })
+    .join('');
   return `<p class="ptg-instructions">${escapeHtml(section.instructions || 'Rewrite each sentence using the given beginning. Do not change the meaning.')}</p><ol class="ptg-combining">${items}</ol>`;
 }
 
 function renderSituationalWritingSection(section, sectionKey) {
-  const bullets = (section.bullets || []).map(b => `<li>${escapeHtml(b)}</li>`).join('');
+  const bullets = (section.bullets || []).map((b) => `<li>${escapeHtml(b)}</li>`).join('');
   const rubricRows = section.rubric
-    ? Object.entries(section.rubric).map(([k, v]) => `<tr><td><strong>${escapeHtml(k)}</strong></td><td>${escapeHtml(v)}</td></tr>`).join('')
+    ? Object.entries(section.rubric)
+        .map(
+          ([k, v]) =>
+            `<tr><td><strong>${escapeHtml(k)}</strong></td><td>${escapeHtml(v)}</td></tr>`,
+        )
+        .join('')
     : '';
   const rubricTable = rubricRows
     ? `<details class="ptg-rubric"><summary>Marking rubric</summary><table class="ptg-table"><tbody>${rubricRows}</tbody></table></details>`
     : '';
-  const learningSupport = _currentMode === 'test' ? '' : `
+  const learningSupport =
+    _currentMode === 'test'
+      ? ''
+      : `
       <details class="ptg-model-answer">
         <summary>Show model answer</summary>
         <pre class="ptg-sw-model">${escapeHtml(section.modelAnswer || '')}</pre>
@@ -319,9 +360,10 @@ function renderEditingSection(section, sectionKey) {
 function _shortAnswerAttrs(q) {
   const keywordsAttr = (q.keywords || []).join('|');
   const acceptsAttr = (q.acceptable || []).join('|');
-  const requiredGroupsAttr = Array.isArray(q.requiredGroups) && q.requiredGroups.length
-    ? JSON.stringify(q.requiredGroups)
-    : '';
+  const requiredGroupsAttr =
+    Array.isArray(q.requiredGroups) && q.requiredGroups.length
+      ? JSON.stringify(q.requiredGroups)
+      : '';
   return `data-answer="${escapeAttr(q.model || '')}"
           data-keywords="${escapeAttr(keywordsAttr)}"
           data-accept="${escapeAttr(acceptsAttr)}"
@@ -330,53 +372,65 @@ function _shortAnswerAttrs(q) {
 
 function renderComprehensionSection(section, sectionKey) {
   const passage = `<p class="ptg-passage">${escapeHtml(section.passage)}</p>`;
-  const items = (section.questions || []).map((q, i) => {
-    const qKey = `${sectionKey}/${i}`;
-    const stem = `<p class="ptg-q-stem"><strong>${i + 1}.</strong> ${escapeHtml(q.q)} <small>(${q.marks}m)</small></p>`;
+  const items = (section.questions || [])
+    .map((q, i) => {
+      const qKey = `${sectionKey}/${i}`;
+      const stem = `<p class="ptg-q-stem"><strong>${i + 1}.</strong> ${escapeHtml(q.q)} <small>(${q.marks}m)</small></p>`;
 
-    if (q.type === 'mcq') {
-      const group = `cmcq-${sectionKey}-${i}`;
-      const choices = shuffle(q.choices).map(c => `
+      if (q.type === 'mcq') {
+        const group = `cmcq-${sectionKey}-${i}`;
+        const choices = shuffle(q.choices)
+          .map(
+            (c) => `
         <label class="ptg-radio">
           <input type="radio" name="${group}" value="${escapeAttr(c)}"
                  data-q-key="${qKey}" data-answer="${escapeAttr(q.answer)}"
                  data-q-type="mcq" data-marks="${q.marks}">
           <span>${escapeHtml(c)}</span>
-        </label>`).join('');
-      return `<li>${stem}<div class="ptg-choices">${choices}</div>
+        </label>`,
+          )
+          .join('');
+        return `<li>${stem}<div class="ptg-choices">${choices}</div>
         <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
-    }
+      }
 
-    if (q.type === 'word-meaning') {
-      const group = `cwm-${sectionKey}-${i}`;
-      const sentence = q.sentence ? `<p><em>${escapeHtml(q.sentence)}</em></p>` : '';
-      const choices = shuffle(q.choices).map(c => `
+      if (q.type === 'word-meaning') {
+        const group = `cwm-${sectionKey}-${i}`;
+        const sentence = q.sentence ? `<p><em>${escapeHtml(q.sentence)}</em></p>` : '';
+        const choices = shuffle(q.choices)
+          .map(
+            (c) => `
         <label class="ptg-radio">
           <input type="radio" name="${group}" value="${escapeAttr(c)}"
                  data-q-key="${qKey}" data-answer="${escapeAttr(q.answer)}"
                  data-q-type="mcq" data-marks="${q.marks}">
           <span>${escapeHtml(c)}</span>
-        </label>`).join('');
-      return `<li>${stem}${sentence}<div class="ptg-choices">${choices}</div>
+        </label>`,
+          )
+          .join('');
+        return `<li>${stem}${sentence}<div class="ptg-choices">${choices}</div>
         <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
-    }
+      }
 
-    if (q.type === 'sequence') {
-      const opts = q.options.map((o, idx) => {
-        const select = `<select class="ptg-input ptg-input--inline" data-q-key="${qKey}#${idx}"
+      if (q.type === 'sequence') {
+        const opts = q.options
+          .map((o, idx) => {
+            const select = `<select class="ptg-input ptg-input--inline" data-q-key="${qKey}#${idx}"
           data-answer="${q.answer[idx]}" data-q-type="sequence" data-marks="0">
           <option value="">–</option><option value="1">1</option><option value="2">2</option><option value="3">3</option>
         </select>`;
-        return `<li>${select} ${escapeHtml(o)}</li>`;
-      }).join('');
-      return `<li>${stem}<ul class="ptg-sequence" data-marks="${q.marks}" data-q-key="${qKey}">${opts}</ul>
+            return `<li>${select} ${escapeHtml(o)}</li>`;
+          })
+          .join('');
+        return `<li>${stem}<ul class="ptg-sequence" data-marks="${q.marks}" data-q-key="${qKey}">${opts}</ul>
         <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
-    }
+      }
 
-    if (q.type === 'true-false') {
-      const rows = q.statements.map((s, si) => {
-        const group = `ctf-${sectionKey}-${i}-${si}`;
-        return `<li class="ptg-tf-row">
+      if (q.type === 'true-false') {
+        const rows = q.statements
+          .map((s, si) => {
+            const group = `ctf-${sectionKey}-${i}-${si}`;
+            return `<li class="ptg-tf-row">
           <p>${si + 1}. ${escapeHtml(s.text)}</p>
           <label class="ptg-radio"><input type="radio" name="${group}" value="true"
              data-q-key="${qKey}#${si}" data-answer="${s.answer ? 'true' : 'false'}"
@@ -385,67 +439,79 @@ function renderComprehensionSection(section, sectionKey) {
              data-q-key="${qKey}#${si}" data-answer="${s.answer ? 'true' : 'false'}"
              data-q-type="true-false" data-marks="1"> <span>False</span></label>
         </li>`;
-      }).join('');
-      return `<li>${stem}<ul class="ptg-tf">${rows}</ul>
+          })
+          .join('');
+        return `<li>${stem}<ul class="ptg-tf">${rows}</ul>
         <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
-    }
+      }
 
-    if (q.type === 'table') {
-      const rows = q.rows.map((row, ri) => `
+      if (q.type === 'table') {
+        const rows = q.rows
+          .map(
+            (row, ri) => `
         <tr>
           <td>${escapeHtml(row.action)}</td>
           <td><input type="text" class="ptg-input" data-q-key="${qKey}#${ri}"
                      data-answer="${escapeAttr(row.answer)}" data-q-type="short" data-marks="1"
                      placeholder="Type the person" autocomplete="off"></td>
-        </tr>`).join('');
-      return `<li>${stem}
+        </tr>`,
+          )
+          .join('');
+        return `<li>${stem}
         <table class="ptg-table">
           <thead><tr><th>Action</th><th>Person who did it</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
         <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
-    }
+      }
 
-    // type: 'evidence' — requires a direct quote + explanation
-    if (q.type === 'evidence') {
-      const scaffold = _currentMode === 'test' ? '' : `
+      // type: 'evidence' — requires a direct quote + explanation
+      if (q.type === 'evidence') {
+        const scaffold =
+          _currentMode === 'test'
+            ? ''
+            : `
         <p class="ptg-scaffold-hint">📌 Quote a phrase from the passage, then explain what it shows.</p>
         <p class="ptg-scaffold-example"><em>Example structure:</em> "…" — This shows that…</p>`;
-      return `<li>${stem}
+        return `<li>${stem}
         ${scaffold}
         <textarea class="ptg-input ptg-input--area" rows="3" data-q-key="${qKey}"
           ${_shortAnswerAttrs(q)}
           data-q-type="short" data-marks="${q.marks}"
           placeholder="&quot;[quote from passage]&quot; This shows that…"></textarea>
         <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
-    }
+      }
 
-    // type: 'language-use' — effect of language / figurative expression
-    if (q.type === 'language-use') {
-      const scaffold = _currentMode === 'test' ? '' : `
+      // type: 'language-use' — effect of language / figurative expression
+      if (q.type === 'language-use') {
+        const scaffold =
+          _currentMode === 'test'
+            ? ''
+            : `
         <p class="ptg-scaffold-hint">💬 State what the word / phrase means or suggests, then explain the effect on the reader.</p>
         <p class="ptg-scaffold-example"><em>Example structure:</em> The phrase "…" suggests… / The effect on the reader is…</p>`;
-      return `<li>${stem}
+        return `<li>${stem}
         ${scaffold}
         <textarea class="ptg-input ptg-input--area" rows="3" data-q-key="${qKey}"
           ${_shortAnswerAttrs(q)}
           data-q-type="short" data-marks="${q.marks}"
           placeholder="The word/phrase … suggests… The effect on the reader is…"></textarea>
         <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
-    }
+      }
 
-    // type: 'short' (default — factual / inference / vocabulary / personal-response)
-    const isOneWord = (q.model || '').trim().split(/\s+/).length <= 3;
-    const input = isOneWord
-      ? `<input type="text" class="ptg-input ptg-input--full" data-q-key="${qKey}"
+      // type: 'short' (default — factual / inference / vocabulary / personal-response)
+      const isOneWord = (q.model || '').trim().split(/\s+/).length <= 3;
+      const input = isOneWord
+        ? `<input type="text" class="ptg-input ptg-input--full" data-q-key="${qKey}"
          ${_shortAnswerAttrs(q)}
          data-q-type="short" data-marks="${q.marks}" placeholder="Type your answer" autocomplete="off">`
-      : `<textarea class="ptg-input ptg-input--area" rows="2" data-q-key="${qKey}"
+        : `<textarea class="ptg-input ptg-input--area" rows="2" data-q-key="${qKey}"
          ${_shortAnswerAttrs(q)}
          data-q-type="short" data-marks="${q.marks}" placeholder="Type your answer in a full sentence"></textarea>`;
-    return `<li>${stem}${input}
+      return `<li>${stem}${input}
       <div class="ptg-feedback" data-feedback-for="${qKey}" hidden></div></li>`;
-  }).join('');
+    })
+    .join('');
 
   return `${passage}<ol class="ptg-comprehension">${items}</ol>`;
 }
@@ -478,7 +544,7 @@ const SECTION_RENDERERS = {
   sectionG: (s, k) => _dispatchSection(s, k),
   sectionH: (s, k) => (s.passage ? renderComprehensionSection(s, k) : _dispatchSection(s, k)),
   sectionI: (s, k) => {
-    if (s.passage)   return renderComprehensionSection(s, k);
+    if (s.passage) return renderComprehensionSection(s, k);
     if (s.paragraph) return renderEditingSection(s, k);
     return _dispatchSection(s, k);
   },
@@ -555,9 +621,9 @@ function readSectionMarks(section, sectionKey, numGradableInputs) {
   // this guarantees per-section scored/total = section.marks, so the
   // displayed "/N" matches what was actually rendered.
   if (
-    typeof section?.marks === 'number'
-    && Number.isFinite(section.marks)
-    && numGradableInputs > 0
+    typeof section?.marks === 'number' &&
+    Number.isFinite(section.marks) &&
+    numGradableInputs > 0
   ) {
     return section.marks / numGradableInputs;
   }
@@ -592,6 +658,51 @@ function _countGradableInputs(root, sectionKey) {
   return n;
 }
 
+/**
+ * The question text an input belongs to, for diagnosis.
+ *
+ * Papers wrap each question differently — a `<li>` in comprehension, a block
+ * with `.ptg-q-stem` elsewhere — so take the nearest stem element and fall
+ * back to the question container's own text.
+ *
+ * @param {Element} el  the input being graded
+ * @returns {string}
+ */
+function _stemForInput(el) {
+  const holder = el.closest('li, .ptg-q, .ptg-item, .placeholder-card') || el.parentElement;
+  if (!holder) return '';
+  const stem = holder.querySelector('.ptg-q-stem');
+  return String((stem || holder).textContent || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 300);
+}
+
+/**
+ * Which detector family fits a question: comprehension sections test reading
+ * evidence, vocabulary skills test word choice, everything else is grammar.
+ */
+function _domainForKey(key, skill) {
+  if (String(key).startsWith('comprehension')) return 'comprehension';
+  return VOCAB_CATEGORIES[skill] ? 'vocab' : 'grammar';
+}
+
+/**
+ * Diagnose one graded answer. Returns null when there is nothing to diagnose
+ * (correct, unanswered, or self-assessed).
+ */
+function _diagnoseGraded(info) {
+  if (!info || info.correct || info.selfAssess) return null;
+  if (!String(info.userValue || '').trim()) return null;
+  return diagnoseAnswer({
+    stem: info.stem || '',
+    given: info.userValue,
+    correct: info.expected,
+    skill: info.skill,
+    domain: _domainForKey(info.key, info.skill),
+  });
+}
+
 function gradeSection(root, sectionKey, section) {
   const inputs = root.querySelectorAll(`[data-q-key^="${sectionKey}/"]`);
   const numGradable = _countGradableInputs(root, sectionKey);
@@ -600,7 +711,7 @@ function gradeSection(root, sectionKey, section) {
   const perKey = new Map(); // key → { correct: bool, expected, value, skill, practise }
   const radioGroupsHandled = new Set();
 
-  inputs.forEach(el => {
+  inputs.forEach((el) => {
     if (el.type === 'radio') {
       if (radioGroupsHandled.has(el.name)) return;
       radioGroupsHandled.add(el.name);
@@ -610,7 +721,9 @@ function gradeSection(root, sectionKey, section) {
       const skill = el.getAttribute('data-skill') || '';
       const practise = el.getAttribute('data-practise') || '';
       const qType = el.getAttribute('data-q-type') || '';
-      const marks = Number(el.getAttribute('data-marks')) || (qType === 'true-false' ? 1 : readSectionMarks(section, sectionKey, numGradable));
+      const marks =
+        Number(el.getAttribute('data-marks')) ||
+        (qType === 'true-false' ? 1 : readSectionMarks(section, sectionKey, numGradable));
       total += marks;
       let correct = false;
       let answered = false;
@@ -620,9 +733,13 @@ function gradeSection(root, sectionKey, section) {
       }
       if (correct) scored += marks;
       perKey.set(key, {
-        key, marks, correct, answered,
+        key,
+        marks,
+        correct,
+        answered,
         userValue: checked?.value || '',
         expected,
+        stem: _stemForInput(el),
         skill,
         practise,
         qType,
@@ -637,27 +754,43 @@ function gradeSection(root, sectionKey, section) {
     const grade = gradeInput(el);
     if (grade === null) {
       // self-assessed section (e.g. situational writing) — skip from score
-      perKey.set(key, { key, marks: 0, correct: false, selfAssess: true, answered: true, userValue: el.value || '', expected: '', skill, practise, qType });
+      perKey.set(key, {
+        key,
+        marks: 0,
+        correct: false,
+        selfAssess: true,
+        answered: true,
+        userValue: el.value || '',
+        expected: '',
+        skill,
+        practise,
+        qType,
+      });
       return;
     }
-    const marks = Number(el.getAttribute('data-marks')) || readSectionMarks(section, sectionKey, numGradable);
+    const marks =
+      Number(el.getAttribute('data-marks')) || readSectionMarks(section, sectionKey, numGradable);
     total += marks;
     // Short-answer grader can return a partial-credit object; everything
     // else returns boolean. Roll both into a single 0..1 fraction.
-    const fraction = (typeof grade === 'object' && grade !== null) ? grade.fraction
-      : (grade === true ? 1 : 0);
+    const fraction =
+      typeof grade === 'object' && grade !== null ? grade.fraction : grade === true ? 1 : 0;
     const earned = marks * fraction;
     scored += earned;
     const correct = fraction >= 1;
     const partial = fraction > 0 && fraction < 1;
     perKey.set(key, {
-      key, marks, correct, partial,
+      key,
+      marks,
+      correct,
+      partial,
       earned,
       fraction,
-      trace: (typeof grade === 'object' && grade !== null) ? grade.trace : null,
+      trace: typeof grade === 'object' && grade !== null ? grade.trace : null,
       answered: !!String(el.value || '').trim(),
       userValue: el.value || '',
       expected: el.getAttribute('data-answer') || '',
+      stem: _stemForInput(el),
       skill,
       practise,
       qType,
@@ -666,7 +799,7 @@ function gradeSection(root, sectionKey, section) {
 
   // A section is "self-assessed" when it carries declared marks but no
   // gradable input contributed to the total (e.g. Situational Writing).
-  const selfAssessed = total === 0 && [...perKey.values()].some(v => v.selfAssess);
+  const selfAssessed = total === 0 && [...perKey.values()].some((v) => v.selfAssess);
   return {
     scored,
     total,
@@ -698,18 +831,18 @@ function _markingGuideHtml(info) {
   if (t.reason !== 'required-groups' && t.reason !== 'no-keyword-hit') return '';
   if (!hits.length && !misses.length) return '';
   const hitsHtml = hits.length
-    ? `<li class="ptg-mark-hit">✓ Meaning units found: ${hits.map(h => `<code>${escapeHtml(h)}</code>`).join(', ')}</li>`
+    ? `<li class="ptg-mark-hit">✓ Meaning units found: ${hits.map((h) => `<code>${escapeHtml(h)}</code>`).join(', ')}</li>`
     : '';
   const missHtml = misses.length
-    ? `<li class="ptg-mark-miss">✗ Missing: ${misses.map(m => `<code>${escapeHtml(m)}</code>`).join(', ')}</li>`
+    ? `<li class="ptg-mark-miss">✗ Missing: ${misses.map((m) => `<code>${escapeHtml(m)}</code>`).join(', ')}</li>`
     : '';
   return `<ul class="ptg-marking-guide">${hitsHtml}${missHtml}</ul>`;
 }
 
 function buildSummaryHtml(paper, sectionResults) {
   const autoScored = sectionResults.reduce((a, r) => a + (r.selfAssessed ? 0 : r.scored), 0);
-  const autoTotal  = sectionResults.reduce((a, r) => a + (r.selfAssessed ? 0 : r.total),  0);
-  const selfMarks  = sectionResults.reduce((a, r) => a + (r.selfAssessed ? r.declaredMarks : 0), 0);
+  const autoTotal = sectionResults.reduce((a, r) => a + (r.selfAssessed ? 0 : r.total), 0);
+  const selfMarks = sectionResults.reduce((a, r) => a + (r.selfAssessed ? r.declaredMarks : 0), 0);
 
   // Aggregate weak skills across sections. Self-assessed sections don't
   // contribute (no correct/wrong signal to draw from).
@@ -731,34 +864,40 @@ function buildSummaryHtml(paper, sectionResults) {
     .slice(0, 5);
 
   const weakHtml = ranked.length
-    ? ranked.map(([skill, v]) => {
-        const targetBtn = v.practise && PRACTISE_TARGET_LABELS[v.practise]
-          ? `<button class="ptg-practise" data-related="${v.practise}" type="button">Practise → ${PRACTISE_TARGET_LABELS[v.practise]}</button>`
-          : '';
-        return `<li><span class="ptg-skill-chip">${_skillIcon(skill)} ${escapeHtml(_skillLabel(skill))}</span>
+    ? ranked
+        .map(([skill, v]) => {
+          const targetBtn =
+            v.practise && PRACTISE_TARGET_LABELS[v.practise]
+              ? `<button class="ptg-practise" data-related="${v.practise}" type="button">Practise → ${PRACTISE_TARGET_LABELS[v.practise]}</button>`
+              : '';
+          return `<li><span class="ptg-skill-chip">${_skillIcon(skill)} ${escapeHtml(_skillLabel(skill))}</span>
           <span class="ptg-skill-tally">${v.wrong}/${v.total} missed</span>
           ${targetBtn}</li>`;
-      }).join('')
+        })
+        .join('')
     : '<li>No clear weak skill — you nailed it across the board! 🎉</li>';
 
-  const perSection = sectionResults.map(r => {
-    if (r.selfAssessed) {
-      return `<tr class="ptg-row-self">
+  const perSection = sectionResults
+    .map((r) => {
+      if (r.selfAssessed) {
+        return `<tr class="ptg-row-self">
         <td>${escapeHtml(r.title)}</td>
         <td>Self-assessed: — / ${_fmtMark(r.declaredMarks)}</td>
         <td>—</td>
       </tr>`;
-    }
-    return `<tr>
+      }
+      return `<tr>
       <td>${escapeHtml(r.title)}</td>
       <td>${_fmtMark(r.scored)} / ${_fmtMark(r.total)}</td>
-      <td>${r.total > 0 ? Math.round(100 * r.scored / r.total) : 0}%</td>
+      <td>${r.total > 0 ? Math.round((100 * r.scored) / r.total) : 0}%</td>
     </tr>`;
-  }).join('');
+    })
+    .join('');
 
-  const selfNote = selfMarks > 0
-    ? `<p class="ptg-summary-self"><em>Plus ${_fmtMark(selfMarks)} mark${selfMarks === 1 ? '' : 's'} of self-assessed writing — compare your response against the model answer in that section.</em></p>`
-    : '';
+  const selfNote =
+    selfMarks > 0
+      ? `<p class="ptg-summary-self"><em>Plus ${_fmtMark(selfMarks)} mark${selfMarks === 1 ? '' : 's'} of self-assessed writing — compare your response against the model answer in that section.</em></p>`
+      : '';
 
   return `
     <h3>📊 ${escapeHtml(paper.label)} — Summary</h3>
@@ -837,11 +976,15 @@ function renderPaperFrame(paper) {
     </section>`;
 }
 
-export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, mode = 'practice' } = {}) {
+export function mountPracticeTest(
+  container,
+  paper,
+  { onClose, onPractiseSkill, mode = 'practice' } = {},
+) {
   if (!container || !paper) return;
   _currentMode = mode;
   const isTestMode = mode === 'test';
-  const sectionKeys = SECTION_KEYS.filter(k => paper[k]);
+  const sectionKeys = SECTION_KEYS.filter((k) => paper[k]);
   if (!sectionKeys.length) {
     container.innerHTML = '<p>No sections in this paper.</p>';
     return;
@@ -865,10 +1008,12 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
   let timerInterval = null;
 
   function renderStepper() {
-    stepperEl.innerHTML = sectionKeys.map((k, i) => {
-      const status = i < idx ? 'done' : i === idx ? 'current' : 'pending';
-      return `<span class="ptg-step ptg-step--${status}">${String.fromCharCode(65 + i)}</span>`;
-    }).join('');
+    stepperEl.innerHTML = sectionKeys
+      .map((k, i) => {
+        const status = i < idx ? 'done' : i === idx ? 'current' : 'pending';
+        return `<span class="ptg-step ptg-step--${status}">${String.fromCharCode(65 + i)}</span>`;
+      })
+      .join('');
   }
 
   function renderCurrentSection() {
@@ -898,15 +1043,18 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
       if (!fb) return;
       const skillRow = info.skill
         ? `<div class="ptg-skill-row"><span class="ptg-skill-chip">${_skillIcon(info.skill)} ${escapeHtml(_skillLabel(info.skill))}</span>
-            ${info.practise && PRACTISE_TARGET_LABELS[info.practise]
-              ? `<button class="ptg-practise" data-related="${info.practise}" type="button">Practise → ${PRACTISE_TARGET_LABELS[info.practise]}</button>`
-              : ''}
+            ${
+              info.practise && PRACTISE_TARGET_LABELS[info.practise]
+                ? `<button class="ptg-practise" data-related="${info.practise}" type="button">Practise → ${PRACTISE_TARGET_LABELS[info.practise]}</button>`
+                : ''
+            }
           </div>`
         : '';
       fb.hidden = false;
       if (info.selfAssess) {
         fb.className = 'ptg-feedback ptg-feedback--info';
-        fb.innerHTML = '<span>📝 Self-assess: compare your response to the model answer above. Check format, tone, and that all 3 bullet points are covered.</span>';
+        fb.innerHTML =
+          '<span>📝 Self-assess: compare your response to the model answer above. Check format, tone, and that all 3 bullet points are covered.</span>';
         return;
       }
       const markingGuide = _markingGuideHtml(info);
@@ -920,8 +1068,19 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
         fb.className = 'ptg-feedback ptg-feedback--no';
         fb.innerHTML = `<span>⚠️ Not answered. Correct: <strong>${escapeHtml(info.expected || '')}</strong></span>${skillRow}`;
       } else {
+        // Marking a paper is where a teacher's comments matter most: the child
+        // sees the wrong answer once, at the end, with no chance to retry. So
+        // name the slip and the habit alongside the correct answer.
+        const diagnosis = _diagnoseGraded(info);
+        const slip =
+          diagnosis && diagnosis.matched
+            ? `<span class="ptg-slip">👀 That is ${escapeHtml(diagnosis.misconception.childName)}.</span>`
+            : '';
+        const nextTime = diagnosis
+          ? `<span class="ptg-nexttime">🧭 Next time: ${escapeHtml(diagnosis.misconception.selfCheck)}</span>`
+          : '';
         fb.className = 'ptg-feedback ptg-feedback--no';
-        fb.innerHTML = `<span>❌ Correct answer: <strong>${escapeHtml(info.expected || '')}</strong></span>${markingGuide}${skillRow}`;
+        fb.innerHTML = `<span>❌ Correct answer: <strong>${escapeHtml(info.expected || '')}</strong></span>${slip}${nextTime}${markingGuide}${skillRow}`;
       }
     });
   }
@@ -930,11 +1089,29 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
     const key = sectionKeys[idx];
     const section = paper[key];
     const result = gradeSection(stageEl, key, section);
+
+    // Paper answers feed the same cross-mode pattern log as the quest modes,
+    // in test mode too — the feedback is deferred there, but the mistake is
+    // just as real, and the parent report should see it.
+    recordMisconceptionsFromReview(
+      [...result.perKey.values()].map((info) => {
+        const diagnosis = _diagnoseGraded(info);
+        return {
+          misconceptionId: diagnosis?.id || null,
+          status: info.correct ? 'Correct' : 'Try again',
+          skillTag: info.skill || '',
+        };
+      }),
+      { mode: 'practiceTest' },
+    );
+
     if (!isTestMode) showFeedback(result.perKey);
     sectionResults[idx] = { ...result, title: section.title, key };
 
     // Disable further input editing in this section
-    stageEl.querySelectorAll('input, textarea, select').forEach(el => { el.disabled = true; });
+    stageEl.querySelectorAll('input, textarea, select').forEach((el) => {
+      el.disabled = true;
+    });
 
     btnCheck.hidden = true;
     if (idx < sectionKeys.length - 1) {
@@ -951,7 +1128,7 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
     // Restore prior feedback if section was already graded
     const prior = sectionResults[idx];
     if (prior) {
-      stageEl.querySelectorAll('input, textarea, select').forEach(el => {
+      stageEl.querySelectorAll('input, textarea, select').forEach((el) => {
         const key = el.getAttribute('data-q-key');
         const stored = prior.perKey.get(key);
         if (!stored) return;
@@ -984,13 +1161,17 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
     btnCheck.hidden = true;
     btnNext.hidden = true;
     btnFinish.hidden = true;
-    stageEl.querySelectorAll('[data-action="retry"]').forEach(b => b.addEventListener('click', () => {
-      idx = 0;
-      sectionResults.length = 0;
-      renderCurrentSection();
-      startTimer();
-    }));
-    stageEl.querySelectorAll('[data-action="close"]').forEach(b => b.addEventListener('click', closePaper));
+    stageEl.querySelectorAll('[data-action="retry"]').forEach((b) =>
+      b.addEventListener('click', () => {
+        idx = 0;
+        sectionResults.length = 0;
+        renderCurrentSection();
+        startTimer();
+      }),
+    );
+    stageEl
+      .querySelectorAll('[data-action="close"]')
+      .forEach((b) => b.addEventListener('click', closePaper));
   }
 
   function closePaper() {
@@ -1040,7 +1221,7 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
         const remaining = durationMs - (Date.now() - startedAt);
         if (remaining <= 0) {
           clearInterval(timerInterval);
-          timerEl.textContent = '⏰ Time\'s up!';
+          timerEl.textContent = "⏰ Time's up!";
           timerEl.className = 'ptg-timer ptg-timer--up';
           timerEl.setAttribute('aria-live', 'assertive');
           // Grade the current section silently if not already done
@@ -1082,26 +1263,31 @@ export function mountPracticeTest(container, paper, { onClose, onPractiseSkill, 
  * primary-placeholder body.
  */
 export function buildPaperLauncherHtml({ level, papers, intro }) {
-  const cards = papers.map(p => `
+  const cards = papers
+    .map(
+      (p) => `
     <article class="ptg-launcher-card" data-paper-id="${escapeAttr(p.id)}">
       <h4>${escapeHtml(p.label)}</h4>
       <p><small>${escapeHtml(p.duration)} · ${p.totalMarks} marks</small></p>
       <p>${escapeHtml(p.blurb || '')}</p>
       <button class="btn btn--primary" data-start-paper="${escapeAttr(p.id)}" type="button">Start paper</button>
-    </article>`).join('');
+    </article>`,
+    )
+    .join('');
   const count = papers.length;
   // Honest framing: surface the exact paper count up front so parents see
   // "3 papers available" for P3 rather than assuming it's a full 4-term
   // year bank like the upper-primary levels.
-  const countCaption = count > 0
-    ? `<p class="ptg-launcher-count"><strong>${count} paper${count === 1 ? '' : 's'} available</strong> at ${escapeHtml(level)}.</p>`
-    : '';
+  const countCaption =
+    count > 0
+      ? `<p class="ptg-launcher-count"><strong>${count} paper${count === 1 ? '' : 's'} available</strong> at ${escapeHtml(level)}.</p>`
+      : '';
   return `
     <div class="ptg-mode-picker" role="group" aria-label="Select paper mode">
       <button class="ptg-mode-btn ptg-mode-btn--active" data-mode="practice" type="button">🎯 Practice</button>
       <button class="ptg-mode-btn" data-mode="test" type="button">⏱ Test Mode</button>
     </div>
     ${countCaption}
-    <p>${escapeHtml(intro || "Pick a paper to take the test interactively. Every section is scored — at the end you’ll see which skills to drill.")}</p>
+    <p>${escapeHtml(intro || 'Pick a paper to take the test interactively. Every section is scored — at the end you’ll see which skills to drill.')}</p>
     <div class="ptg-launcher-grid" data-level="${escapeAttr(level)}">${cards}</div>`;
 }

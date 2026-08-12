@@ -45,9 +45,25 @@ import { getUniqueWordVaultDone, recordWordVaultCompletion } from './clozeComple
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { renderReadFirstScan } from './readFirstScan.js';
 import { buildScanTaskForPassage, renderScanTask } from './scanTask.js';
-import { buildCopySummaryText, buildParentReport, getModeConfig, getNextStepRecommendation, groupWrongLinesBySkill, pickStrongestWeakest } from './clozeSessionSummary.js';
+import {
+  buildCopySummaryText,
+  buildParentReport,
+  getModeConfig,
+  getNextStepRecommendation,
+  groupWrongLinesBySkill,
+  pickStrongestWeakest,
+} from './clozeSessionSummary.js';
 import { incrementHintUsage } from './hintUsage.js';
-import { buildWhyWrongExplanation, getBlankSkillMeta, getClueTypeLabel, getReviewPromptForSkill, getSkillLabel, normaliseSkillTag } from './examTrainingFramework.js';
+import {
+  buildWhyWrongExplanation,
+  getBlankSkillMeta,
+  getClueTypeLabel,
+  getReviewPromptForSkill,
+  getSkillLabel,
+  normaliseSkillTag,
+} from './examTrainingFramework.js';
+import { stemForBlank } from '../modules/answerDiagnosis.js';
+import { recordMisconceptionsFromReview } from '../modules/teacherFeedback.js';
 import { getTopWeakSkills, recordWeakSkills } from './clozeCompletionTracker.js';
 import { KNOWN_PREFIXES_EXTENDED, KNOWN_SUFFIXES_EXTENDED } from '../data/words.js';
 import { getTopMasteryGaps, recordMasteryAttempt, summariseMasteryGap } from './masteryMap.js';
@@ -56,31 +72,31 @@ import { scheduleWord, getDueCount } from '../modules/srsScheduler.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
-let _container     = null;
-let _onGoHome      = null;
+let _container = null;
+let _onGoHome = null;
 
-let _currentCat    = null;   // category key
-let _currentLevel  = 'p1';   // 'p1' … 'p6'
-let _bankWords     = [];     // [{id, word, used}]
-let _blankFills    = [];     // null | bankWordId per blank
-let _passage       = null;   // current passage object
+let _currentCat = null; // category key
+let _currentLevel = 'p1'; // 'p1' … 'p6'
+let _bankWords = []; // [{id, word, used}]
+let _blankFills = []; // null | bankWordId per blank
+let _passage = null; // current passage object
 let _sessionCorrect = 0;
-let _sessionTotal   = 0;
+let _sessionTotal = 0;
 let _sessionBlankCorrect = 0;
 let _sessionBlankTotal = 0;
-let _keyHandler     = null;
+let _keyHandler = null;
 
 // ── Clue-mode state ────────────────────────────────────────────────────────
 
 let _activeBlankIndex = -1;
-let _clueResults      = {};
-let _hintLevel        = 0;
-let _bankLocked       = false;
-let _weakAttempts     = 0;
+let _clueResults = {};
+let _hintLevel = 0;
+let _bankLocked = false;
+let _weakAttempts = 0;
 let _sessionClueScore = 0;
 
 const LEVEL_LABELS = { p1: 'P1', p2: 'P2', p3: 'P3', p4: 'P4', p5: 'P5', p6: 'P6' };
-const LEVEL_ICONS  = { p1: '🌱', p2: '🌿', p3: '🌳', p4: '🔥', p5: '💎', p6: '👑' };
+const LEVEL_ICONS = { p1: '🌱', p2: '🌿', p3: '🌳', p4: '🔥', p5: '💎', p6: '👑' };
 
 // Map the active profile's primary grade to a lowercase level key ('p1'–'p6').
 // Falls back to 'p3' if no grade is set, 'p1' for preschool profiles.
@@ -98,7 +114,6 @@ function _getProfileLevelLabel() {
   return LEVEL_LABELS[_getProfileLevelKey()] || 'P3';
 }
 
-
 let _sessionHintsUsed = 0;
 let _sessionMode = 'practice';
 let _examStartedAt = 0;
@@ -113,15 +128,16 @@ let _passageWrongCount = 0;
 let _readFirstAcknowledged = false;
 let _scanTaskCompleted = false;
 let _sessionScanCorrect = 0;
-let _sessionScanTotal   = 0;
-let _sessionSkillStats  = {}; // skill -> { correct, total, label, lastWrongExamples: [] }
+let _sessionScanTotal = 0;
+let _sessionSkillStats = {}; // skill -> { correct, total, label, lastWrongExamples: [] }
 
 // ── Category-specific teach-back content ────────────────────────────────────
 const VAULT_TEACHBACK = {
   morphologicalAffix: {
     icon: '🧩',
     rule: 'Word parts: a PREFIX comes before the root, a SUFFIX comes after it.',
-    example: '"un-" + "happy" = "unhappy" (not happy)  ·  "teach" + "-er" = "teacher" (one who teaches)',
+    example:
+      '"un-" + "happy" = "unhappy" (not happy)  ·  "teach" + "-er" = "teacher" (one who teaches)',
     tip: 'Find the ROOT word meaning first, then choose the affix that changes it in the right direction.',
   },
   synonymContrast: {
@@ -139,7 +155,8 @@ const VAULT_TEACHBACK = {
   connectorClue: {
     icon: '🔗',
     rule: 'Connectors show HOW two ideas relate: contrast, reason, result, sequence, or addition.',
-    example: '"She was tired, SO she rested." (result)  ·  "Although it rained, they played." (contrast)',
+    example:
+      '"She was tired, SO she rested." (result)  ·  "Although it rained, they played." (contrast)',
     tip: 'Contrast: but/although · Reason: because/since · Result: so/therefore · Sequence: then/finally',
   },
   grammaticalRole: {
@@ -151,12 +168,18 @@ const VAULT_TEACHBACK = {
   default: {
     icon: '🔍',
     rule: 'Context clues are hints in the surrounding sentences that help you find the right answer.',
-    example: '"The scientist performed many ___. Each experiment took days." → the blank must be a noun meaning tests.',
+    example:
+      '"The scientist performed many ___. Each experiment took days." → the blank must be a noun meaning tests.',
     tip: 'Read the whole sentence AND the sentence before/after. Together they usually reveal the answer.',
   },
 };
 
-const POS_CLASS_MAP = { noun: 'pos-noun', verb: 'pos-verb', adjective: 'pos-adjective', adverb: 'pos-adverb' };
+const POS_CLASS_MAP = {
+  noun: 'pos-noun',
+  verb: 'pos-verb',
+  adjective: 'pos-adjective',
+  adverb: 'pos-adverb',
+};
 const CONNECTOR_TYPE_LABELS = {
   reason: 'Reason connector (because/since)',
   contrast: 'Contrast connector (although/however)',
@@ -182,23 +205,30 @@ export function buildAffixParts(answer, hint = '') {
   // consistent across the app (helpers, audio, lesson UI).
   const knownPrefixes = KNOWN_PREFIXES_EXTENDED;
   const knownSuffixes = KNOWN_SUFFIXES_EXTENDED;
-  const hintAffix = (hint.match(/(un-|re-|dis-|mis-|in-|im-|-ing|-ed|-ly|-er|-est|-ful|-less|-tion|-sion|-ment|-ness|-able|-ible)/i) || [])[0];
+  const hintAffix = (hint.match(
+    /(un-|re-|dis-|mis-|in-|im-|-ing|-ed|-ly|-er|-est|-ful|-less|-tion|-sion|-ment|-ness|-able|-ible)/i,
+  ) || [])[0];
 
   const normalizedHintAffix = hintAffix ? hintAffix.replace(/^-/, '').replace(/-$/, '') : '';
   if (hintAffix) {
     if (hintAffix.startsWith('-')) {
       const affix = normalizedHintAffix;
-      return { root: answer.slice(0, Math.max(0, answer.length - affix.length)), affix, type: 'suffix' };
+      return {
+        root: answer.slice(0, Math.max(0, answer.length - affix.length)),
+        affix,
+        type: 'suffix',
+      };
     }
     const affix = normalizedHintAffix;
     return { root: answer.slice(affix.length), affix, type: 'prefix' };
   }
 
-  const prefix = knownPrefixes.find(p => lower.startsWith(p) && lower.length > p.length + 2);
+  const prefix = knownPrefixes.find((p) => lower.startsWith(p) && lower.length > p.length + 2);
   if (prefix) return { root: answer.slice(prefix.length), affix: prefix, type: 'prefix' };
 
-  const suffix = knownSuffixes.find(sf => lower.endsWith(sf) && lower.length > sf.length + 2);
-  if (suffix) return { root: answer.slice(0, answer.length - suffix.length), affix: suffix, type: 'suffix' };
+  const suffix = knownSuffixes.find((sf) => lower.endsWith(sf) && lower.length > sf.length + 2);
+  if (suffix)
+    return { root: answer.slice(0, answer.length - suffix.length), affix: suffix, type: 'suffix' };
 
   return { root: answer, affix: '', type: 'suffix' };
 }
@@ -212,7 +242,7 @@ function _isGrammarGuidanceCategory() {
 }
 
 function _getActiveBlankIndex() {
-  const idx = _blankFills.findIndex(f => f === null);
+  const idx = _blankFills.findIndex((f) => f === null);
   return idx === -1 ? _blankFills.length - 1 : idx;
 }
 
@@ -235,14 +265,17 @@ function _recordAffixAttempt(affix, correct) {
 }
 
 function _getUniquePassageCountForCategory(catKey, levels = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6']) {
-  return levels.reduce((sum, lv) => (
-    sum + getUniqueWordVaultDone({
-      category: catKey,
-      level: lv,
-      wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {},
-      wvqCompleted: store.get('wvqCompleted') || {},
-    })
-  ), 0);
+  return levels.reduce(
+    (sum, lv) =>
+      sum +
+      getUniqueWordVaultDone({
+        category: catKey,
+        level: lv,
+        wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {},
+        wvqCompleted: store.get('wvqCompleted') || {},
+      }),
+    0,
+  );
 }
 
 function _buildDefinitionRows(passage) {
@@ -255,12 +288,11 @@ function _buildDefinitionRows(passage) {
   }));
 }
 
-
 // ── Public API ─────────────────────────────────────────────────────────────
 
 export function initWordVault(container, onGoHome) {
   _container = container;
-  _onGoHome  = onGoHome;
+  _onGoHome = onGoHome;
 }
 
 export function showVaultBrowser() {
@@ -269,10 +301,13 @@ export function showVaultBrowser() {
 
 export function cleanupWordVault() {
   if (_container) _container.innerHTML = '';
-  _bankWords  = [];
+  _bankWords = [];
   _blankFills = [];
-  _passage    = null;
-  if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
+  _passage = null;
+  if (_keyHandler) {
+    document.removeEventListener('keydown', _keyHandler);
+    _keyHandler = null;
+  }
 }
 
 // ── Category browser ───────────────────────────────────────────────────────
@@ -290,7 +325,8 @@ function _renderCategoryBrowser() {
   html += `<div class="wv-level-context-banner" aria-live="polite">
     Currently practising: <strong>${levelLabel} Vocabulary Cloze</strong>
   </div>`;
-  html += '<p class="cloze-cat-subtitle">Pick a word skill to practise. Each passage is a short story — read it through first, then fill every blank with the best word.</p>';
+  html +=
+    '<p class="cloze-cat-subtitle">Pick a word skill to practise. Each passage is a short story — read it through first, then fill every blank with the best word.</p>';
   if (dueCount > 0) {
     html += `<div class="wv-srs-due-badge" aria-live="polite">📅 ${dueCount} word${dueCount === 1 ? '' : 's'} due for review</div>`;
   }
@@ -298,24 +334,41 @@ function _renderCategoryBrowser() {
 
   const keys = Object.keys(VOCAB_CATEGORIES);
   const recommendedCat = questMastery.getRecommendedSkill('wordVault', keys);
-  const masteryGaps = getTopMasteryGaps({ mode: 'wordVault', level: levelLabel, masteryMap: store.get('masteryMap') || {} });
+  const masteryGaps = getTopMasteryGaps({
+    mode: 'wordVault',
+    level: levelLabel,
+    masteryMap: store.get('masteryMap') || {},
+  });
   const weakSkills = masteryGaps.length
     ? masteryGaps
-    : getTopWeakSkills({ level: levelLabel, weakSkillsMap: store.get('wvWeakSkills') || {} }).map((s) => ({
-      skill: s.skill,
-      skillLabel: getSkillLabel(s.skill),
-      attempts: s.attempts,
-      wrong: s.wrong,
-      accuracy: Math.round(((s.attempts - s.wrong) / Math.max(1, s.attempts)) * 100),
-      lastExample: null,
-    }));
+    : getTopWeakSkills({ level: levelLabel, weakSkillsMap: store.get('wvWeakSkills') || {} }).map(
+        (s) => ({
+          skill: s.skill,
+          skillLabel: getSkillLabel(s.skill),
+          attempts: s.attempts,
+          wrong: s.wrong,
+          accuracy: Math.round(((s.attempts - s.wrong) / Math.max(1, s.attempts)) * 100),
+          lastExample: null,
+        }),
+      );
 
   for (const [key, meta] of Object.entries(VOCAB_CATEGORIES)) {
-    const doneLevels = ['p1','p2','p3','p4','p5','p6'].filter((lv) => getUniqueWordVaultDone({ category: key, level: lv, wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {}, wvqCompleted: completed }) > 0).length;
+    const doneLevels = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'].filter(
+      (lv) =>
+        getUniqueWordVaultDone({
+          category: key,
+          level: lv,
+          wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {},
+          wvqCompleted: completed,
+        }) > 0,
+    ).length;
     const levelsForCat = Object.values(vocabPassages[key] || {});
-    const totalLevels = levelsForCat.filter(arr => (arr || []).length > 0).length;
-    const totalPassages = levelsForCat.reduce((sum, arr) => sum + ((arr || []).length), 0);
-    const totalQuestions = levelsForCat.reduce((sum, arr) => sum + (arr || []).reduce((n, passage) => n + (passage.answers?.length || 0), 0), 0);
+    const totalLevels = levelsForCat.filter((arr) => (arr || []).length > 0).length;
+    const totalPassages = levelsForCat.reduce((sum, arr) => sum + (arr || []).length, 0);
+    const totalQuestions = levelsForCat.reduce(
+      (sum, arr) => sum + (arr || []).reduce((n, passage) => n + (passage.answers?.length || 0), 0),
+      0,
+    );
     const donePassages = _getUniquePassageCountForCategory(key);
     const perLevel = totalLevels ? Math.round(totalQuestions / totalLevels) : 0;
     const isRecommended = key === recommendedCat;
@@ -331,13 +384,15 @@ function _renderCategoryBrowser() {
       </button>`;
   }
 
-  const weakList = weakSkills.map((item) => {
-    const recommendation = summariseMasteryGap(item);
-    const lastExample = item.lastExample
-      ? ` · Last slip: "${escapeHtml(item.lastExample.chosen || '—')}" → "${escapeHtml(item.lastExample.correct || '?')}"`
-      : '';
-    return `<li>${escapeHtml(item.skillLabel || getSkillLabel(item.skill))}: ${item.wrong}/${item.attempts} · ${escapeHtml(recommendation)}${lastExample}</li>`;
-  }).join('');
+  const weakList = weakSkills
+    .map((item) => {
+      const recommendation = summariseMasteryGap(item);
+      const lastExample = item.lastExample
+        ? ` · Last slip: "${escapeHtml(item.lastExample.chosen || '—')}" → "${escapeHtml(item.lastExample.correct || '?')}"`
+        : '';
+      return `<li>${escapeHtml(item.skillLabel || getSkillLabel(item.skill))}: ${item.wrong}/${item.attempts} · ${escapeHtml(recommendation)}${lastExample}</li>`;
+    })
+    .join('');
   html += `</div>
     <div class="cloze-cat-actions">
       <button class="btn btn--ghost btn--sm" id="wv-mastery-review">Review Weak Words</button>
@@ -346,7 +401,7 @@ function _renderCategoryBrowser() {
   </div>`;
   _container.innerHTML = html;
 
-  _container.querySelectorAll('.wv-cat-btn').forEach(btn => {
+  _container.querySelectorAll('.wv-cat-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       _currentCat = btn.dataset.cat;
       _renderLevelBrowser(_currentCat);
@@ -365,10 +420,10 @@ function _renderCategoryBrowser() {
 function _renderLevelBrowser(catKey) {
   if (!_container) return;
 
-  const meta      = VOCAB_CATEGORIES[catKey];
-  const catData   = vocabPassages[catKey] || {};
+  const meta = VOCAB_CATEGORIES[catKey];
+  const catData = vocabPassages[catKey] || {};
   const completed = (store.get('wvqCompleted') || {})[catKey] || {};
-  const levels    = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
+  const levels = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
 
   let html = `
     <div class="wv-level-browser">
@@ -388,9 +443,23 @@ function _renderLevelBrowser(catKey) {
   for (const lv of levels) {
     const passages = catData[lv];
     const hasPassage = passages && passages.length > 0;
-    const isDone = getUniqueWordVaultDone({ category: catKey, level: lv, wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {}, wvqCompleted: store.get('wvqCompleted') || {} }) > 0;
-    const uniqueDone = getUniqueWordVaultDone({ category: catKey, level: lv, wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {}, wvqCompleted: store.get('wvqCompleted') || {} });
-    const questionTotal = (passages || []).reduce((sum, passage) => sum + (passage.answers?.length || 0), 0);
+    const isDone =
+      getUniqueWordVaultDone({
+        category: catKey,
+        level: lv,
+        wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {},
+        wvqCompleted: store.get('wvqCompleted') || {},
+      }) > 0;
+    const uniqueDone = getUniqueWordVaultDone({
+      category: catKey,
+      level: lv,
+      wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {},
+      wvqCompleted: store.get('wvqCompleted') || {},
+    });
+    const questionTotal = (passages || []).reduce(
+      (sum, passage) => sum + (passage.answers?.length || 0),
+      0,
+    );
 
     html += `
       <button class="wv-level-btn ${isDone ? 'wv-level-btn--done' : ''} ${!hasPassage ? 'wv-level-btn--locked' : ''}"
@@ -407,11 +476,19 @@ function _renderLevelBrowser(catKey) {
   html += '</div></div>';
   _container.innerHTML = html;
 
-  document.getElementById('wv-back-cats')?.addEventListener('click', () => _renderCategoryBrowser());
-  document.getElementById('wv-mode-practice')?.addEventListener('click', () => { _sessionMode = 'practice'; _renderLevelBrowser(catKey); });
-  document.getElementById('wv-mode-exam')?.addEventListener('click', () => { _sessionMode = 'exam'; _renderLevelBrowser(catKey); });
+  document
+    .getElementById('wv-back-cats')
+    ?.addEventListener('click', () => _renderCategoryBrowser());
+  document.getElementById('wv-mode-practice')?.addEventListener('click', () => {
+    _sessionMode = 'practice';
+    _renderLevelBrowser(catKey);
+  });
+  document.getElementById('wv-mode-exam')?.addEventListener('click', () => {
+    _sessionMode = 'exam';
+    _renderLevelBrowser(catKey);
+  });
 
-  _container.querySelectorAll('.wv-level-btn:not([disabled])').forEach(btn => {
+  _container.querySelectorAll('.wv-level-btn:not([disabled])').forEach((btn) => {
     btn.addEventListener('click', () => {
       _currentLevel = btn.dataset.level;
       _startPassage(catKey, _currentLevel);
@@ -425,8 +502,8 @@ function _startPassage(catKey, level) {
   const passageList = (vocabPassages[catKey] || {})[level] || [];
   if (!passageList.length) return;
 
-  _sessionCorrect   = 0;
-  _sessionTotal     = 0;
+  _sessionCorrect = 0;
+  _sessionTotal = 0;
   _sessionClueScore = 0;
   _sessionHintsUsed = 0;
   _sessionScanCorrect = 0;
@@ -438,11 +515,12 @@ function _startPassage(catKey, level) {
 
   const perf = store.get('wvqWordPerformance') || {};
   const weighted = passageList.map((p) => {
-    const avg = (p.answers || []).reduce((acc, ans) => {
-      const st = perf[String(ans || '').toLowerCase()] || { attempts: 0, correct: 0 };
-      const score = st.attempts ? (st.correct / st.attempts) : 0.45;
-      return acc + score;
-    }, 0) / Math.max(1, (p.answers || []).length);
+    const avg =
+      (p.answers || []).reduce((acc, ans) => {
+        const st = perf[String(ans || '').toLowerCase()] || { attempts: 0, correct: 0 };
+        const score = st.attempts ? st.correct / st.attempts : 0.45;
+        return acc + score;
+      }, 0) / Math.max(1, (p.answers || []).length);
     const weight = Math.max(0.2, 1.2 - avg);
     return { passage: p, weight };
   });
@@ -467,9 +545,9 @@ function _startPassage(catKey, level) {
 }
 
 function _initPassage(passage) {
-  const round  = createClozeRound(passage);
-  _bankWords   = round.bankWords;
-  _blankFills  = round.blankFills;
+  const round = createClozeRound(passage);
+  _bankWords = round.bankWords;
+  _blankFills = round.blankFills;
   _affixWrongAttempts = {};
   _affixParts = [];
   _passageWrongCount = 0;
@@ -486,21 +564,25 @@ function _initPassage(passage) {
       };
     });
 
-    _bankWords = _affixParts.map((part, id) => ({ id, word: part.affix ? `${part.type === 'prefix' ? part.affix + '-' : '-' + part.affix}` : 'base', used: false }));
+    _bankWords = _affixParts.map((part, id) => ({
+      id,
+      word: part.affix ? `${part.type === 'prefix' ? part.affix + '-' : '-' + part.affix}` : 'base',
+      used: false,
+    }));
   }
 
   // Reset clue state
-  _clueResults      = {};
-  _hintLevel        = 0;
-  _weakAttempts     = 0;
+  _clueResults = {};
+  _hintLevel = 0;
+  _weakAttempts = 0;
 
   if (passage.clues && passage.clues.length > 0) {
     const firstClue = [...passage.clues].sort((a, b) => a.blankIndex - b.blankIndex)[0];
     _activeBlankIndex = firstClue?.blankIndex ?? -1;
-    _bankLocked       = true;
+    _bankLocked = true;
   } else {
     _activeBlankIndex = -1;
-    _bankLocked       = false;
+    _bankLocked = false;
   }
 
   _readFirstAcknowledged = false;
@@ -573,8 +655,8 @@ function _renderVaultScanTaskStep(passage) {
 function _renderPassage(passage) {
   if (!_container) return;
 
-  const meta      = VOCAB_CATEGORIES[_currentCat];
-  const lv        = _currentLevel;
+  const meta = VOCAB_CATEGORIES[_currentCat];
+  const lv = _currentLevel;
   const inClueMode = passage.clues && passage.clues.length > 0 && _bankLocked;
   const showLegend = _currentCat === 'grammaticalRole';
   const modeCfg = getModeConfig(_sessionMode);
@@ -628,12 +710,16 @@ function _renderPassage(passage) {
 
   if (inClueMode) _attachClueHuntListeners(passage);
 
-  document.getElementById('wv-back-levels')?.addEventListener('click', () => _renderLevelBrowser(_currentCat));
+  document
+    .getElementById('wv-back-levels')
+    ?.addEventListener('click', () => _renderLevelBrowser(_currentCat));
   document.getElementById('wv-clear')?.addEventListener('click', () => {
     clearClozeRound(_bankWords, _blankFills);
     if (_isAffixMode(passage)) {
       _blankFills = Array(passage.answers.length).fill(null);
-      _bankWords.forEach(w => { w.used = false; });
+      _bankWords.forEach((w) => {
+        w.used = false;
+      });
     }
     _renderText(passage);
     _renderBank(passage);
@@ -649,7 +735,11 @@ function _renderPassage(passage) {
   });
   document.getElementById('wv-hint')?.addEventListener('click', () => {
     const idx = _getActiveBlankIndex();
-    const msg = (passage.hints || [])[idx] || (passage.clueType ? (CONNECTOR_TYPE_LABELS[passage.clueType] || passage.clueType) : 'Look for nearby context clues.');
+    const msg =
+      (passage.hints || [])[idx] ||
+      (passage.clueType
+        ? CONNECTOR_TYPE_LABELS[passage.clueType] || passage.clueType
+        : 'Look for nearby context clues.');
     _sessionHintsUsed = incrementHintUsage(_sessionHintsUsed);
     _showFeedback(`💡 ${msg}`, false);
     if (_isAffixMode(passage) && _affixParts[idx]) {
@@ -675,12 +765,21 @@ function _renderPassage(passage) {
     }
   });
   document.getElementById('wv-check')?.addEventListener('click', () => _checkPassage(passage));
-  document.getElementById('wv-quit')?.addEventListener('click', () => { cleanupWordVault(); _onGoHome?.(); });
+  document.getElementById('wv-quit')?.addEventListener('click', () => {
+    cleanupWordVault();
+    _onGoHome?.();
+  });
 
   if (_keyHandler) document.removeEventListener('keydown', _keyHandler);
   _keyHandler = (e) => {
-    if (e.key === 'Enter' && !_bankLocked) { e.preventDefault(); document.getElementById('wv-check')?.click(); }
-    if (e.key === 'Escape') { cleanupWordVault(); _onGoHome?.(); }
+    if (e.key === 'Enter' && !_bankLocked) {
+      e.preventDefault();
+      document.getElementById('wv-check')?.click();
+    }
+    if (e.key === 'Escape') {
+      cleanupWordVault();
+      _onGoHome?.();
+    }
   };
   document.addEventListener('keydown', _keyHandler);
 }
@@ -698,7 +797,6 @@ function _renderInfoPanel(passage) {
   const rows = _buildDefinitionRows(passage);
   panel.innerHTML = `<h4>Word Guide</h4>${rows.map((r) => `<div class="wv-info-row"><strong>${escapeHtml(r.word)}</strong><span>${escapeHtml(r.definition)}</span><small>${escapeHtml(r.pos)}${r.collocationHint ? ` · ${escapeHtml(r.collocationHint)}` : ''}</small></div>`).join('')}`;
 }
-
 
 function _renderClueScoreMeter() {
   const scores = Object.values(_clueResults || {}).map(clueResultToScore);
@@ -766,26 +864,26 @@ function _handleClueWordTap(tappedWord, passage) {
   const clueData = _getActiveClueData(passage);
   if (!clueData) return;
 
-  const result   = evaluateClueSelection(tappedWord, clueData);
+  const result = evaluateClueSelection(tappedWord, clueData);
   const feedback = clueResultFeedback(result);
 
   const fbEl = document.getElementById('clue-hunt-feedback');
   if (fbEl) {
     fbEl.textContent = feedback.message;
-    fbEl.className   = `clue-hunt-feedback ${feedback.cssClass}`;
+    fbEl.className = `clue-hunt-feedback ${feedback.cssClass}`;
   }
 
   // Re-render passage with highlighted selection
   const passageEl = document.getElementById('wv-passage-text');
   if (passageEl) {
     renderClueHuntPassage({
-      container:        passageEl,
-      text:             passage.text,
+      container: passageEl,
+      text: passage.text,
       activeBlankIndex: _activeBlankIndex,
-      selectedWord:     tappedWord,
-      selectedResult:   result,
-      filledAnswers:    _blankFills.map(id =>
-        id !== null ? _bankWords.find(w => w.id === id)?.word || '' : ''
+      selectedWord: tappedWord,
+      selectedResult: result,
+      filledAnswers: _blankFills.map((id) =>
+        id !== null ? _bankWords.find((w) => w.id === id)?.word || '' : '',
       ),
       onTapWord: (word) => _handleClueWordTap(word, passage),
     });
@@ -837,15 +935,15 @@ function _renderText(passage) {
   if (!container) return;
 
   if (_bankLocked) {
-    const filled = _blankFills.map(id =>
-      id !== null ? _bankWords.find(w => w.id === id)?.word || '' : ''
+    const filled = _blankFills.map((id) =>
+      id !== null ? _bankWords.find((w) => w.id === id)?.word || '' : '',
     );
     renderClueHuntPassage({
       container,
-      text:             passage.text,
+      text: passage.text,
       activeBlankIndex: _activeBlankIndex,
-      filledAnswers:    filled,
-      onTapWord:        (word) => _handleClueWordTap(word, passage),
+      filledAnswers: filled,
+      onTapWord: (word) => _handleClueWordTap(word, passage),
     });
     return;
   }
@@ -857,13 +955,17 @@ function _renderText(passage) {
       html += `<span>${part}</span>`;
       if (i < parts.length - 1) {
         const fillId = _blankFills[i];
-        const fill = fillId !== null ? _bankWords.find(w => w.id === fillId) : null;
+        const fill = fillId !== null ? _bankWords.find((w) => w.id === fillId) : null;
         const affix = _affixParts[i];
         if (fill) {
           const label = affix?.answer || '';
           html += `<button class="wv-blank wv-blank--filled" data-blank="${i}" aria-label="Remove ${label}">${label}</button>`;
         } else {
-          const rootLabel = affix ? (affix.type === 'prefix' ? `${affix.root}` : `${affix.root}`) : '';
+          const rootLabel = affix
+            ? affix.type === 'prefix'
+              ? `${affix.root}`
+              : `${affix.root}`
+            : '';
           html += `<button class="wv-blank wv-blank--affix" data-blank="${i}" aria-label="Blank ${i + 1}">${rootLabel}<span class="wv-affix-slot">${affix?.type === 'prefix' ? 'prefix' : 'suffix'}</span></button>`;
         }
       }
@@ -873,7 +975,7 @@ function _renderText(passage) {
       blank.addEventListener('click', () => {
         const idx = parseInt(blank.dataset.blank, 10);
         const id = _blankFills[idx];
-        const item = _bankWords.find(w => w.id === id);
+        const item = _bankWords.find((w) => w.id === id);
         if (item) item.used = false;
         _blankFills[idx] = null;
         _renderText(passage);
@@ -904,36 +1006,46 @@ function _renderBank(passage) {
   if (!bank) return;
 
   if (_bankLocked) {
-    bank.innerHTML = _bankWords.map(w => `
+    bank.innerHTML = _bankWords
+      .map(
+        (w) => `
       <button class="wv-word-chip wv-word-chip--locked"
               disabled aria-disabled="true"
               aria-label="${escapeAttr(w.word)}">${escapeHtml(w.word)}</button>
-    `).join('');
+    `,
+      )
+      .join('');
     return;
   }
 
   const activeBlank = _getActiveBlankIndex();
   const answerForBlank = passage.answers?.[activeBlank] || '';
 
-  bank.innerHTML = _bankWords.map((w) => {
-    const isUsed = w.used;
-    const tone = _getChipToneClass(passage, w.word);
-    const cue = _currentCat === 'collocationCloze' && passage.collocationHintsByWord?.[answerForBlank] && !isUsed
-      ? ` title="${escapeAttr(passage.collocationHintsByWord[w.word] || '')}"`
-      : '';
-    const label = _currentCat === 'collocationCloze' && passage.collocationHintsByWord?.[w.word]
-      ? `${w.word} … ${(passage.collocationHintsByWord[w.word].split('+')[1] || '').trim()}`
-      : w.word;
-    return `<button class="wv-word-chip ${tone} ${isUsed ? 'wv-word-chip--used' : ''}" data-id="${w.id}" ${isUsed ? 'disabled aria-disabled="true"' : ''}${cue} aria-label="${escapeAttr(label)}">${escapeHtml(label)}</button>`;
-  }).join('');
+  bank.innerHTML = _bankWords
+    .map((w) => {
+      const isUsed = w.used;
+      const tone = _getChipToneClass(passage, w.word);
+      const cue =
+        _currentCat === 'collocationCloze' &&
+        passage.collocationHintsByWord?.[answerForBlank] &&
+        !isUsed
+          ? ` title="${escapeAttr(passage.collocationHintsByWord[w.word] || '')}"`
+          : '';
+      const label =
+        _currentCat === 'collocationCloze' && passage.collocationHintsByWord?.[w.word]
+          ? `${w.word} … ${(passage.collocationHintsByWord[w.word].split('+')[1] || '').trim()}`
+          : w.word;
+      return `<button class="wv-word-chip ${tone} ${isUsed ? 'wv-word-chip--used' : ''}" data-id="${w.id}" ${isUsed ? 'disabled aria-disabled="true"' : ''}${cue} aria-label="${escapeAttr(label)}">${escapeHtml(label)}</button>`;
+    })
+    .join('');
 
-  bank.querySelectorAll('.wv-word-chip:not([disabled])').forEach(chip => {
+  bank.querySelectorAll('.wv-word-chip:not([disabled])').forEach((chip) => {
     chip.addEventListener('click', () => {
       const id = parseInt(chip.dataset.id, 10);
-      const chosen = _bankWords.find(w => w.id === id);
+      const chosen = _bankWords.find((w) => w.id === id);
       if (!chosen || chosen.used) return;
 
-      const blankIdx = _blankFills.findIndex(fill => fill === null);
+      const blankIdx = _blankFills.findIndex((fill) => fill === null);
       if (blankIdx === -1) return;
 
       if (_isAffixMode(passage)) {
@@ -941,9 +1053,15 @@ function _renderBank(passage) {
         const chosenAffix = chosen.word.replace(/^-/, '').replace(/-$/, '');
         if (expectedAffix !== chosenAffix) {
           _affixWrongAttempts[blankIdx] = (_affixWrongAttempts[blankIdx] || 0) + 1;
-          _showFeedback(`Not quite. ${chosenAffix || 'That option'} does not fit this root.`, false);
+          _showFeedback(
+            `Not quite. ${chosenAffix || 'That option'} does not fit this root.`,
+            false,
+          );
           if (_affixWrongAttempts[blankIdx] >= 2) {
-            _showFeedback(`💡 Affix meaning: ${_affixParts[blankIdx]?.meaning || 'Use the affix that matches the word meaning.'}`, false);
+            _showFeedback(
+              `💡 Affix meaning: ${_affixParts[blankIdx]?.meaning || 'Use the affix that matches the word meaning.'}`,
+              false,
+            );
           }
           _recordAffixAttempt(chosenAffix, false);
           return;
@@ -959,29 +1077,38 @@ function _renderBank(passage) {
 
       const expected = passage.answers?.[blankIdx];
       if (_currentCat === 'synonymContrast' && chosen.word !== expected) {
-        const pair = (passage.contrastPairs || []).find(p => p.word === chosen.word);
-        if (pair) _showFeedback(pair.explanation || `${pair.word} is linked with ${pair.pair}.`, false);
+        const pair = (passage.contrastPairs || []).find((p) => p.word === chosen.word);
+        if (pair)
+          _showFeedback(pair.explanation || `${pair.word} is linked with ${pair.pair}.`, false);
       }
       if (_currentCat === 'connectorClue' && chosen.word !== expected) {
         const t = passage.clueType || _getClueDataForBlank(passage, blankIdx)?.clueType;
-        _showFeedback(`Connector type mismatch. ${CONNECTOR_TYPE_LABELS[t] || 'Check connector meaning.'}`, false);
+        _showFeedback(
+          `Connector type mismatch. ${CONNECTOR_TYPE_LABELS[t] || 'Check connector meaning.'}`,
+          false,
+        );
       }
       if (_currentCat === 'collocationCloze' && chosen.word !== expected) {
         const good = passage.collocationHintsByWord?.[expected] || passage.collocationHint || '';
         const bad = passage.collocationHintsByWord?.[chosen.word] || '';
-        _showFeedback(`Collocation tip: ${good || `Use ${expected}`}${bad ? ` (not ${bad})` : ''}`, false);
+        _showFeedback(
+          `Collocation tip: ${good || `Use ${expected}`}${bad ? ` (not ${bad})` : ''}`,
+          false,
+        );
       }
 
       const nextClue = (passage.clues || [])
         .slice()
         .sort((a, b) => a.blankIndex - b.blankIndex)
-        .find(c => _blankFills[c.blankIndex] === null && !Object.hasOwn(_clueResults, c.blankIndex));
+        .find(
+          (c) => _blankFills[c.blankIndex] === null && !Object.hasOwn(_clueResults, c.blankIndex),
+        );
 
       if (nextClue) {
         _activeBlankIndex = nextClue.blankIndex;
-        _bankLocked       = true;
-        _hintLevel        = 0;
-        _weakAttempts     = 0;
+        _bankLocked = true;
+        _hintLevel = 0;
+        _weakAttempts = 0;
         _renderPassage(passage);
       } else {
         _renderText(passage);
@@ -993,8 +1120,12 @@ function _renderBank(passage) {
 
 function _getChipToneClass(passage, word) {
   if (_currentCat === 'synonymContrast') {
-    const pair = (passage.contrastPairs || []).find(p => p.word === word);
-    return pair?.type === 'antonym' ? 'wv-word-chip--antonym' : pair?.type === 'synonym' ? 'wv-word-chip--synonym' : '';
+    const pair = (passage.contrastPairs || []).find((p) => p.word === word);
+    return pair?.type === 'antonym'
+      ? 'wv-word-chip--antonym'
+      : pair?.type === 'synonym'
+        ? 'wv-word-chip--synonym'
+        : '';
   }
   if (_currentCat === 'grammaticalRole') {
     const pos = (passage.partOfSpeechMap || {})[word];
@@ -1007,14 +1138,13 @@ function _getChipToneClass(passage, word) {
 
 function _getActiveClueData(passage) {
   if (!passage.clues) return null;
-  return passage.clues.find(c => c.blankIndex === _activeBlankIndex) || null;
+  return passage.clues.find((c) => c.blankIndex === _activeBlankIndex) || null;
 }
 
 function _getClueDataForBlank(passage, blankIndex) {
   if (!passage.clues) return null;
-  return passage.clues.find(c => c.blankIndex === blankIndex) || null;
+  return passage.clues.find((c) => c.blankIndex === blankIndex) || null;
 }
-
 
 function _getVocabSkillLabel() {
   if (_currentCat === 'synonymContrast') return 'synonym';
@@ -1033,10 +1163,22 @@ function _buildVocabReviewRows(passage, userAnswers) {
     const skillTag = normaliseSkillTag(meta.primarySkill || passage.skillTag || fallbackSkill);
     const chosen = userAnswers[idx] || '';
     const isWrong = chosen !== correctAnswer;
-    const why = isWrong ? buildWhyWrongExplanation({ meta, chosen, correct: correctAnswer }) : null;
-    const simpleMeaning = meta.simpleMeaning || (passage.definitions || {})[correctAnswer] || 'Use context clues to find the meaning.';
-    const trapReason = (passage.wrongOptionTraps || []).find((t) => t.option === chosen)?.reason
-      || meta.wrongOptionTraps?.[chosen];
+    const why = isWrong
+      ? buildWhyWrongExplanation({
+          meta,
+          chosen,
+          correct: correctAnswer,
+          stem: stemForBlank(passage.text, idx, passage.answers),
+          domain: 'vocab',
+        })
+      : null;
+    const simpleMeaning =
+      meta.simpleMeaning ||
+      (passage.definitions || {})[correctAnswer] ||
+      'Use context clues to find the meaning.';
+    const trapReason =
+      (passage.wrongOptionTraps || []).find((t) => t.option === chosen)?.reason ||
+      meta.wrongOptionTraps?.[chosen];
 
     const explanationParts = [simpleMeaning];
     if (trapReason) explanationParts.push(`Trap check: ${trapReason}`);
@@ -1052,6 +1194,7 @@ function _buildVocabReviewRows(passage, userAnswers) {
       studentAnswer: chosen,
       correctAnswer,
       status: isWrong ? 'Try again' : 'Correct',
+      skillTag,
       skillLabel: getSkillLabel(skillTag),
       clueTypeLabel: getClueTypeLabel(meta.clueType || clue?.clueType || passage.clueType),
       clue: clue?.acceptableSpans?.[0] || (passage.hints || [])[idx] || 'Look near this blank.',
@@ -1061,6 +1204,7 @@ function _buildVocabReviewRows(passage, userAnswers) {
       whyRight: why?.whyRight,
       missedClue: why?.missedClue,
       examTip: meta.examTip || (why ? why.examTip : ''),
+      misconceptionId: why?.misconceptionId || null,
     };
   });
 }
@@ -1068,25 +1212,32 @@ function _buildVocabReviewRows(passage, userAnswers) {
 // ── Checking ───────────────────────────────────────────────────────────────
 
 function _checkPassage(passage) {
-  if (_blankFills.some(f => f === null)) {
+  if (_blankFills.some((f) => f === null)) {
     _showFeedback('Fill all the blanks first! 🔑', false);
     return;
   }
 
   const userAnswers = _isAffixMode(passage)
     ? _blankFills.map((id, i) => {
-      const item = _bankWords.find(w => w.id === id);
-      const affix = (item?.word || '').replace(/^-/, '').replace(/-$/, '');
-      const part = _affixParts[i];
-      return part ? (part.type === 'prefix' ? `${affix}${part.root}` : `${part.root}${affix}`) : '';
-    })
+        const item = _bankWords.find((w) => w.id === id);
+        const affix = (item?.word || '').replace(/^-/, '').replace(/-$/, '');
+        const part = _affixParts[i];
+        return part
+          ? part.type === 'prefix'
+            ? `${affix}${part.root}`
+            : `${part.root}${affix}`
+          : '';
+      })
     : buildUserAnswers(_blankFills, _bankWords);
 
   const blankCorrect = userAnswers.filter((ans, i) => ans === passage.answers[i]).length;
   const blankTotal = passage.answers.length;
-  const allCorrect  = blankCorrect === blankTotal;
+  const allCorrect = blankCorrect === blankTotal;
   const modeCfg = getModeConfig(_sessionMode);
-  const skillTag = normaliseSkillTag(passage.skillTag || (_currentCat === 'collocationCloze' ? 'collocation' : 'vocabularyInContext'));
+  const skillTag = normaliseSkillTag(
+    passage.skillTag ||
+      (_currentCat === 'collocationCloze' ? 'collocation' : 'vocabularyInContext'),
+  );
 
   _sessionTotal++;
   const weakMap = recordWeakSkills({
@@ -1100,13 +1251,23 @@ function _checkPassage(passage) {
 
   let masteryMap = store.get('masteryMap') || {};
   const vocabRows = _buildVocabReviewRows(passage, userAnswers);
+  // First submission only — a retry of the same blanks is the child working
+  // on the slip, not repeating it.
+  if (_passageWrongCount === 0) {
+    recordMisconceptionsFromReview(vocabRows, { mode: 'wordVault' });
+  }
   const vaultLevel = String(_currentLevel).toUpperCase();
   vocabRows.forEach((row, idx) => {
     const meta = getBlankSkillMeta(passage, idx);
     const wasWrong = row.status !== 'Correct';
     const skillKey = meta.primarySkill || skillTag;
     if (!_sessionSkillStats[skillKey]) {
-      _sessionSkillStats[skillKey] = { correct: 0, total: 0, label: row.skillLabel || getSkillLabel(skillKey), lastWrongExamples: [] };
+      _sessionSkillStats[skillKey] = {
+        correct: 0,
+        total: 0,
+        label: row.skillLabel || getSkillLabel(skillKey),
+        lastWrongExamples: [],
+      };
     }
     const stat = _sessionSkillStats[skillKey];
     stat.total += 1;
@@ -1123,31 +1284,37 @@ function _checkPassage(passage) {
       wasWrong,
       example: wasWrong
         ? {
-          passageId: passage.id,
-          blankIndex: idx,
-          chosen: row.studentAnswer,
-          correct: row.correctAnswer,
-          clueType: meta.clueType,
-        }
+            passageId: passage.id,
+            blankIndex: idx,
+            chosen: row.studentAnswer,
+            correct: row.correctAnswer,
+            clueType: meta.clueType,
+          }
         : null,
       current: masteryMap,
     });
   });
   store.set('masteryMap', masteryMap);
 
-  userAnswers.forEach((ans, i) => _recordVocabPerformance(passage.answers[i], ans === passage.answers[i]));
+  userAnswers.forEach((ans, i) =>
+    _recordVocabPerformance(passage.answers[i], ans === passage.answers[i]),
+  );
 
   if (modeCfg.showFinalReviewOnly) {
     _sessionBlankCorrect = blankCorrect;
     _sessionBlankTotal = blankTotal;
-    _sessionReviewRows.push(...vocabRows.filter(r => r.status !== 'Correct').map(r => ({
-      passageTitle: passage.title,
-      blank: r.blank,
-      studentAnswer: r.studentAnswer,
-      correctAnswer: r.correctAnswer,
-      explanation: r.explanation,
-      skillLabel: r.skillLabel,
-    })));
+    _sessionReviewRows.push(
+      ...vocabRows
+        .filter((r) => r.status !== 'Correct')
+        .map((r) => ({
+          passageTitle: passage.title,
+          blank: r.blank,
+          studentAnswer: r.studentAnswer,
+          correctAnswer: r.correctAnswer,
+          explanation: r.explanation,
+          skillLabel: r.skillLabel,
+        })),
+    );
     const examAttempts = store.get('wvqExamAttempts') || [];
     examAttempts.push({
       category: _currentCat,
@@ -1194,7 +1361,9 @@ function _checkPassage(passage) {
     });
     questMastery.updateSkill('wordVault', _currentCat, true);
 
-    document.querySelectorAll('.wv-blank--filled').forEach(b => b.classList.add('wv-blank--correct'));
+    document
+      .querySelectorAll('.wv-blank--filled')
+      .forEach((b) => b.classList.add('wv-blank--correct'));
 
     _sessionBlankCorrect = blankCorrect;
     _sessionBlankTotal = blankTotal;
@@ -1213,10 +1382,14 @@ function _checkPassage(passage) {
       title: 'Answer Review',
       rows: _buildVocabReviewRows(passage, userAnswers),
       onContinue: () => {
-        if (_isAffixMode(passage)) return _showMorphologySummary(passage, () => setTimeout(() => _advanceToComplete(), 300));
-        if (_currentCat === 'synonymContrast') return _showSynonymReview(passage, () => setTimeout(() => _advanceToComplete(), 300));
-        if (_currentCat === 'collocationCloze') return _showCollocationReview(passage, () => setTimeout(() => _advanceToComplete(), 300));
-        if (passage.clues && passage.clues.length > 0) return _showClueExplanation(passage, () => setTimeout(() => _advanceToComplete(), 400));
+        if (_isAffixMode(passage))
+          return _showMorphologySummary(passage, () => setTimeout(() => _advanceToComplete(), 300));
+        if (_currentCat === 'synonymContrast')
+          return _showSynonymReview(passage, () => setTimeout(() => _advanceToComplete(), 300));
+        if (_currentCat === 'collocationCloze')
+          return _showCollocationReview(passage, () => setTimeout(() => _advanceToComplete(), 300));
+        if (passage.clues && passage.clues.length > 0)
+          return _showClueExplanation(passage, () => setTimeout(() => _advanceToComplete(), 400));
         _advanceToComplete();
       },
     });
@@ -1248,9 +1421,11 @@ function _checkPassage(passage) {
     }
 
     if (_passageWrongCount >= 2) {
-      _showFeedback('❌ Let\'s review the mistakes first.', false);
+      _showFeedback("❌ Let's review the mistakes first.", false);
       setTimeout(() => {
-        document.querySelectorAll('.wv-blank--wrong').forEach(b => b.classList.remove('wv-blank--wrong'));
+        document
+          .querySelectorAll('.wv-blank--wrong')
+          .forEach((b) => b.classList.remove('wv-blank--wrong'));
         showAnswerReviewPanel({
           host: _container.querySelector('.wv-game'),
           title: 'Review Mistakes',
@@ -1259,9 +1434,14 @@ function _checkPassage(passage) {
         });
       }, 800);
     } else {
-      _showFeedback('❌ Not quite — the red blanks need another look. Reread those sentences before you try again.', false);
+      _showFeedback(
+        '❌ Not quite — the red blanks need another look. Reread those sentences before you try again.',
+        false,
+      );
       setTimeout(() => {
-        document.querySelectorAll('.wv-blank--wrong').forEach(b => b.classList.remove('wv-blank--wrong'));
+        document
+          .querySelectorAll('.wv-blank--wrong')
+          .forEach((b) => b.classList.remove('wv-blank--wrong'));
         const fb = document.getElementById('wv-feedback');
         if (fb) fb.hidden = true;
       }, 1800);
@@ -1316,7 +1496,7 @@ function _showVaultTeachBackOverlay(passage) {
   if (existing) existing.remove();
 
   const overlay = document.createElement('div');
-  overlay.id        = 'wv-teachback-overlay';
+  overlay.id = 'wv-teachback-overlay';
   overlay.className = 'wv-teachback-overlay';
   overlay.innerHTML = `
     <div class="wv-tb-panel">
@@ -1338,7 +1518,9 @@ function _showVaultTeachBackOverlay(passage) {
   document.getElementById('wv-tb-got-it')?.addEventListener('click', () => {
     overlay.remove();
     // Reset fills so learner retries from scratch
-    _bankWords.forEach(w => { w.used = false; });
+    _bankWords.forEach((w) => {
+      w.used = false;
+    });
     _blankFills.fill(null);
     _passageWrongCount = 0;
     _renderText(passage);
@@ -1355,8 +1537,8 @@ function _showVaultTeachBackOverlay(passage) {
 function _showClueExplanation(passage, onContinue) {
   if (!_container) return;
 
-  const primaryClue  = passage.clues[0];
-  const clueSpan     = (primaryClue.acceptableSpans || [])[0] || '';
+  const primaryClue = passage.clues[0];
+  const clueSpan = (primaryClue.acceptableSpans || [])[0] || '';
   const playerResult = _clueResults[primaryClue.blankIndex] || 'weak';
   const { cssClass } = clueResultFeedback(playerResult);
 
@@ -1364,7 +1546,7 @@ function _showClueExplanation(passage, onContinue) {
   if (existing) existing.remove();
 
   const overlay = document.createElement('div');
-  overlay.id        = 'wv-explanation-overlay';
+  overlay.id = 'wv-explanation-overlay';
   overlay.className = 'clue-explanation-overlay';
   overlay.innerHTML = `
     <div class="clue-explanation-card">
@@ -1393,7 +1575,6 @@ function _showClueExplanation(passage, onContinue) {
   }, 4000);
 }
 
-
 function _showMorphologySummary(passage, onContinue) {
   const overlay = document.createElement('div');
   overlay.className = 'clue-explanation-overlay';
@@ -1401,7 +1582,10 @@ function _showMorphologySummary(passage, onContinue) {
     <div class="clue-explanation-body">${_affixParts.map((part) => `<p><strong>${escapeHtml(part.answer)}</strong> = ${part.type === 'prefix' ? `${part.affix}- + ${part.root}` : `${part.root} + -${part.affix}`} → ${escapeHtml(part.definition)}</p>`).join('')}</div>
     <button class="btn btn--primary" id="wv-review-next">Continue →</button></div>`;
   _container.querySelector('.wv-game')?.appendChild(overlay);
-  document.getElementById('wv-review-next')?.addEventListener('click', () => { overlay.remove(); onContinue?.(); });
+  document.getElementById('wv-review-next')?.addEventListener('click', () => {
+    overlay.remove();
+    onContinue?.();
+  });
 }
 
 function _showSynonymReview(passage, onContinue) {
@@ -1410,14 +1594,23 @@ function _showSynonymReview(passage, onContinue) {
   overlay.className = 'clue-explanation-overlay';
   overlay.innerHTML = `<div class="clue-explanation-card"><p class="clue-explanation-title">📚 Synonym & Contrast Review</p>
     <div class="clue-explanation-body"><table class="wv-review-table"><thead><tr><th>Answer</th><th>Definition</th><th>Synonym</th><th>Antonym</th></tr></thead>
-    <tbody>${passage.answers.map((word) => {
-      const syn = (passage.contrastPairs || []).find(p => p.word === word && p.type === 'synonym')?.pair || '—';
-      const ant = (passage.contrastPairs || []).find(p => p.word === word && p.type === 'antonym')?.pair || '—';
-      return `<tr><td>${word}</td><td>${escapeHtml(defs[word] || '—')}</td><td>${escapeHtml(syn)}</td><td>${escapeHtml(ant)}</td></tr>`;
-    }).join('')}</tbody></table></div>
+    <tbody>${passage.answers
+      .map((word) => {
+        const syn =
+          (passage.contrastPairs || []).find((p) => p.word === word && p.type === 'synonym')
+            ?.pair || '—';
+        const ant =
+          (passage.contrastPairs || []).find((p) => p.word === word && p.type === 'antonym')
+            ?.pair || '—';
+        return `<tr><td>${word}</td><td>${escapeHtml(defs[word] || '—')}</td><td>${escapeHtml(syn)}</td><td>${escapeHtml(ant)}</td></tr>`;
+      })
+      .join('')}</tbody></table></div>
     <button class="btn btn--primary" id="wv-review-next">Continue →</button></div>`;
   _container.querySelector('.wv-game')?.appendChild(overlay);
-  document.getElementById('wv-review-next')?.addEventListener('click', () => { overlay.remove(); onContinue?.(); });
+  document.getElementById('wv-review-next')?.addEventListener('click', () => {
+    overlay.remove();
+    onContinue?.();
+  });
 }
 
 function _showCollocationReview(passage, onContinue) {
@@ -1427,7 +1620,10 @@ function _showCollocationReview(passage, onContinue) {
     <div class="clue-explanation-body">${passage.answers.map((word) => `<p><strong>${escapeHtml(word)}</strong>: ${escapeHtml((passage.collocationHintsByWord || {})[word] || passage.collocationHint || 'Word partner pattern')}</p>`).join('')}</div>
     <button class="btn btn--primary" id="wv-review-next">Continue →</button></div>`;
   _container.querySelector('.wv-game')?.appendChild(overlay);
-  document.getElementById('wv-review-next')?.addEventListener('click', () => { overlay.remove(); onContinue?.(); });
+  document.getElementById('wv-review-next')?.addEventListener('click', () => {
+    overlay.remove();
+    onContinue?.();
+  });
 }
 
 // ── "Use it in a sentence" step (practice mode only) ──────────────────────
@@ -1440,7 +1636,7 @@ function _showCollocationReview(passage, onContinue) {
 function _getSentenceTargetWord(passage) {
   const defs = passage.definitions || {};
   const answers = passage.answers || [];
-  const withDef = answers.find(a => defs[a]);
+  const withDef = answers.find((a) => defs[a]);
   return withDef || answers[0] || null;
 }
 
@@ -1460,7 +1656,7 @@ function _getModelSentence(passage, targetWord) {
 
   // Grab the text segment that spans the blank
   const before = parts[blankIndex];
-  const after  = parts[blankIndex + 1];
+  const after = parts[blankIndex + 1];
 
   // Find the start of the sentence containing the blank
   const sentenceStartMatch = before.match(/(?:^|[.!?]\s+)([^.!?]*)$/s);
@@ -1483,10 +1679,16 @@ function _getModelSentence(passage, targetWord) {
  * @param {function} onContinue - called after the step resolves
  */
 function _showSentenceStep(passage, onContinue) {
-  if (!_container) { onContinue(); return; }
+  if (!_container) {
+    onContinue();
+    return;
+  }
 
   const targetWord = _getSentenceTargetWord(passage);
-  if (!targetWord) { onContinue(); return; }
+  if (!targetWord) {
+    onContinue();
+    return;
+  }
 
   const defs = passage.definitions || {};
   const definition = defs[targetWord] || 'Use the sentence context to understand this word.';
@@ -1497,7 +1699,7 @@ function _showSentenceStep(passage, onContinue) {
   if (existing) existing.remove();
 
   const overlay = document.createElement('div');
-  overlay.id        = 'wv-sentence-step-overlay';
+  overlay.id = 'wv-sentence-step-overlay';
   overlay.className = 'clue-explanation-overlay';
   overlay.innerHTML = `
     <div class="clue-explanation-card wv-sentence-step">
@@ -1561,7 +1763,10 @@ function _showFeedback(msg, success) {
   el.textContent = msg;
   el.className = `wv-feedback wv-feedback--${success ? 'success' : 'error'}`;
   el.hidden = false;
-  if (success) setTimeout(() => { el.hidden = true; }, 1600);
+  if (success)
+    setTimeout(() => {
+      el.hidden = true;
+    }, 1600);
 }
 
 // ── Complete screen ────────────────────────────────────────────────────────
@@ -1569,7 +1774,7 @@ function _showFeedback(msg, success) {
 function _showComplete(summary = {}) {
   if (!_container) return;
 
-  const meta  = VOCAB_CATEGORIES[_currentCat];
+  const meta = VOCAB_CATEGORIES[_currentCat];
   const levels = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
   const nextLv = levels[levels.indexOf(_currentLevel) + 1] || null;
 
@@ -1579,33 +1784,41 @@ function _showComplete(summary = {}) {
 
   const totalBlanks = summary.blankTotal ?? _sessionBlankTotal ?? _passage?.answers?.length ?? 0;
   const correctBlanks = summary.blankCorrect ?? _sessionBlankCorrect ?? 0;
-  const acc   = totalBlanks > 0 ? Math.round((correctBlanks / totalBlanks) * 100) : 0;
+  const acc = totalBlanks > 0 ? Math.round((correctBlanks / totalBlanks) * 100) : 0;
   const stars = getWordVaultStars({ accuracy: acc, hintsUsed: _sessionHintsUsed });
   const modeCfg = getModeConfig(_sessionMode);
   const elapsedSec = Math.max(1, Math.round((Date.now() - (_examStartedAt || Date.now())) / 1000));
-  const recommendation = getNextStepRecommendation({ accuracy: acc, skillLabel: meta.label, hintsUsed: _sessionHintsUsed });
-  const weakSkills = getTopWeakSkills({ level: String(_currentLevel).toUpperCase(), weakSkillsMap: store.get('wvWeakSkills') || {} });
+  const recommendation = getNextStepRecommendation({
+    accuracy: acc,
+    skillLabel: meta.label,
+    hintsUsed: _sessionHintsUsed,
+  });
+  const weakSkills = getTopWeakSkills({
+    level: String(_currentLevel).toUpperCase(),
+    weakSkillsMap: store.get('wvWeakSkills') || {},
+  });
   const weakSkillsLine = weakSkills.length
     ? `<p class="wv-complete-score">Weak skills: ${weakSkills.map((s) => `${getSkillLabel(s.skill)} ${s.wrong}/${s.attempts}`).join(' · ')}</p>`
     : '';
-  const wrongLines = _sessionMode === 'exam' && _sessionReviewRows.length
-    ? groupWrongLinesBySkill(_sessionReviewRows)
-    : _sessionReviewRows.map((row) => `- ${row.passageTitle} ${row.blank}: ${row.studentAnswer || '(blank)'} → ${row.correctAnswer}`);
+  const wrongLines =
+    _sessionMode === 'exam' && _sessionReviewRows.length
+      ? groupWrongLinesBySkill(_sessionReviewRows)
+      : _sessionReviewRows.map(
+          (row) =>
+            `- ${row.passageTitle} ${row.blank}: ${row.studentAnswer || '(blank)'} → ${row.correctAnswer}`,
+        );
 
   const clueTotal = Object.keys(_clueResults).length;
-  const clueAcc   = clueTotal > 0
-    ? Math.round((_sessionClueScore / clueTotal) * 100)
-    : null;
-  const clueAccLine = clueAcc !== null
-    ? `<p class="wv-complete-clue">🔍 Clue accuracy: ${clueAcc}%</p>`
-    : '';
+  const clueAcc = clueTotal > 0 ? Math.round((_sessionClueScore / clueTotal) * 100) : null;
+  const clueAccLine =
+    clueAcc !== null ? `<p class="wv-complete-clue">🔍 Clue accuracy: ${clueAcc}%</p>` : '';
 
-  const scanAcc = _sessionScanTotal > 0
-    ? Math.round((_sessionScanCorrect / _sessionScanTotal) * 100)
-    : null;
-  const scanAccLine = scanAcc !== null
-    ? `<p class="wv-complete-clue">🔎 Scan accuracy: ${scanAcc}% (${_sessionScanCorrect}/${_sessionScanTotal})</p>`
-    : '';
+  const scanAcc =
+    _sessionScanTotal > 0 ? Math.round((_sessionScanCorrect / _sessionScanTotal) * 100) : null;
+  const scanAccLine =
+    scanAcc !== null
+      ? `<p class="wv-complete-clue">🔎 Scan accuracy: ${scanAcc}% (${_sessionScanCorrect}/${_sessionScanTotal})</p>`
+      : '';
 
   let focusTip = '';
   if (acc < 70 && _currentCat) {
@@ -1633,9 +1846,11 @@ function _showComplete(summary = {}) {
       ${scanAccLine}${focusTip}
       <p class="wv-complete-score">Next Step: ${recommendation}</p>
       <div class="wv-complete-actions">
-        ${nextLv
-          ? `<button class="btn btn--primary btn--lg" id="wv-next-level">${LEVEL_LABELS[nextLv]} →</button>`
-          : ''}
+        ${
+          nextLv
+            ? `<button class="btn btn--primary btn--lg" id="wv-next-level">${LEVEL_LABELS[nextLv]} →</button>`
+            : ''
+        }
         <button class="btn btn--ghost btn--sm" id="wv-replay">Play Again ↺</button>
         <button class="btn btn--ghost btn--sm" id="wv-copy-summary">Copy Summary</button>
         <button class="btn btn--ghost btn--sm" id="wv-copy-parent-report">Copy Parent Report</button>
@@ -1648,7 +1863,9 @@ function _showComplete(summary = {}) {
     _currentLevel = nextLv;
     _startPassage(_currentCat, _currentLevel);
   });
-  document.getElementById('wv-replay')?.addEventListener('click', () => _startPassage(_currentCat, _currentLevel));
+  document
+    .getElementById('wv-replay')
+    ?.addEventListener('click', () => _startPassage(_currentCat, _currentLevel));
   document.getElementById('wv-copy-summary')?.addEventListener('click', async () => {
     const text = buildCopySummaryText({
       modeLabel: modeCfg.label,
@@ -1679,7 +1896,7 @@ function _showComplete(summary = {}) {
       accuracy: acc,
       strongest,
       weakest,
-      weakExamples: weakest ? (_sessionSkillStats[weakest.skill]?.lastWrongExamples || []) : [],
+      weakExamples: weakest ? _sessionSkillStats[weakest.skill]?.lastWrongExamples || [] : [],
       recommendation,
     });
     try {
@@ -1689,9 +1906,20 @@ function _showComplete(summary = {}) {
       _showFeedback('Unable to copy parent report on this device.', false);
     }
   });
-  document.getElementById('wv-back-lvls')?.addEventListener('click', () => _renderLevelBrowser(_currentCat));
-  document.getElementById('wv-back-cats2')?.addEventListener('click', () => _renderCategoryBrowser());
+  document
+    .getElementById('wv-back-lvls')
+    ?.addEventListener('click', () => _renderLevelBrowser(_currentCat));
+  document
+    .getElementById('wv-back-cats2')
+    ?.addEventListener('click', () => _renderCategoryBrowser());
 
-  if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
-  setTimeout(() => (document.getElementById('wv-next-level') || document.getElementById('wv-replay'))?.focus(), 200);
+  if (_keyHandler) {
+    document.removeEventListener('keydown', _keyHandler);
+    _keyHandler = null;
+  }
+  setTimeout(
+    () =>
+      (document.getElementById('wv-next-level') || document.getElementById('wv-replay'))?.focus(),
+    200,
+  );
 }

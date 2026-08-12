@@ -25,6 +25,7 @@ import { store } from '../modules/store.js';
 import { gamification } from '../modules/gamification.js';
 import { questMastery } from '../modules/questMastery.js';
 import { celebrateCorrect } from '../components/confettiHelper.js';
+import { recordMisconception } from '../modules/teacherFeedback.js';
 import { mascot } from '../components/mascot.js';
 import {
   getSkillCluePrompt,
@@ -36,26 +37,26 @@ import { classifySentenceTrack } from '../modules/sentenceForgeTracks.js';
 // ── Module state ────────────────────────────────────────────────────────────
 
 let _container = null;
-let _onGoHome  = null;
+let _onGoHome = null;
 
-let _currentLevel    = 1;
-let _currentTrack    = 'word-order';
-let _levelSentences  = [];
-let _sentenceIdx     = 0;
-let _bankWords       = [];    // [{id, word, used}]
-let _answerSlots     = [];    // bank word ids in answer order
-let _sessionCorrect  = 0;
-let _sessionTotal    = 0;
+let _currentLevel = 1;
+let _currentTrack = 'word-order';
+let _levelSentences = [];
+let _sentenceIdx = 0;
+let _bankWords = []; // [{id, word, used}]
+let _answerSlots = []; // bank word ids in answer order
+let _sessionCorrect = 0;
+let _sessionTotal = 0;
 let _sessionXpEarned = 0;
 let _sessionStreakBonus = 0;
-let _keyHandler      = null;
+let _keyHandler = null;
 
 // Per-sentence-skill attempt tracking for the session
 // { [skillKey]: { correct: number, total: number } }
 let _sessionSkillAttempts = {};
 
 // Clue mission state
-let _clueMissionDone   = false;
+let _clueMissionDone = false;
 let _clueMissionResult = null;
 let _sessionClueCorrect = 0;
 let _sessionClueMissionTotal = 0;
@@ -89,7 +90,8 @@ const SENTENCE_SKILL_TEACHBACK = {
   tense_clue: {
     icon: '⏱️',
     rule: 'The tense shows WHEN something happens. Look for time-clue words first.',
-    example: '"Yesterday, she WALKED home." — "Right now, he IS RUNNING." — "Tomorrow, we WILL travel."',
+    example:
+      '"Yesterday, she WALKED home." — "Right now, he IS RUNNING." — "Tomorrow, we WILL travel."',
     tip: 'Find the time word (yesterday / now / tomorrow / since) — it tells you which tense fits.',
   },
   preposition_clue: {
@@ -113,13 +115,15 @@ const SENTENCE_SKILL_TEACHBACK = {
   first_word_clue: {
     icon: '🔤',
     rule: 'The first word of a sentence often signals the sentence type or clause order.',
-    example: '"After lunch, we played." — "We played after lunch." Capital letter = sentence start.',
+    example:
+      '"After lunch, we played." — "We played after lunch." Capital letter = sentence start.',
     tip: 'Look at time phrases and conjunctions — they often come first, followed by a comma.',
   },
   punctuation_clue: {
     icon: '❗',
     rule: 'Commas, full stops, and question marks guide sentence structure and word order.',
-    example: '"Before eating, wash your hands." — The comma after "eating" signals a clause boundary.',
+    example:
+      '"Before eating, wash your hands." — The comma after "eating" signals a clause boundary.',
     tip: 'Find commas first — they separate phrases and show you where to split the sentence.',
   },
   subject_action_clue: {
@@ -156,9 +160,9 @@ export function getSentenceForgeCategoriesByLevel(sentences = allSentences) {
   for (let lv = 1; lv <= 6; lv++) {
     const skillSet = new Set();
     sentences
-      .filter(s => s.level === lv)
-      .forEach(s => (s.sentenceSkills || []).forEach(skill => skillSet.add(skill)));
-    result[lv] = Object.keys(LEVEL_TAG_LABELS).filter(skill => skillSet.has(skill));
+      .filter((s) => s.level === lv)
+      .forEach((s) => (s.sentenceSkills || []).forEach((skill) => skillSet.add(skill)));
+    result[lv] = Object.keys(LEVEL_TAG_LABELS).filter((skill) => skillSet.has(skill));
   }
   return result;
 }
@@ -173,7 +177,7 @@ export function getScoreboardStats({ correct, total }) {
 
 export function initSentenceForge(container, onGoHome) {
   _container = container;
-  _onGoHome  = onGoHome;
+  _onGoHome = onGoHome;
 }
 
 export function showSentenceBrowser() {
@@ -188,17 +192,20 @@ export function setSentenceForgeTrack(trackKey) {
 
 export function cleanupSentenceForge() {
   if (_container) _container.innerHTML = '';
-  _bankWords   = [];
+  _bankWords = [];
   _answerSlots = [];
   _sessionSkillAttempts = {};
-  _sessionCorrect  = 0;
-  _sessionTotal    = 0;
+  _sessionCorrect = 0;
+  _sessionTotal = 0;
   _sessionXpEarned = 0;
   _sessionStreakBonus = 0;
   _sessionClueCorrect = 0;
   _sessionClueMissionTotal = 0;
   _sentenceWrongCount = 0;
-  if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
+  if (_keyHandler) {
+    document.removeEventListener('keydown', _keyHandler);
+    _keyHandler = null;
+  }
 }
 
 // ── Browser ─────────────────────────────────────────────────────────────────
@@ -217,40 +224,45 @@ function _renderBrowser() {
 
   let html = `<div class="sfq-browser">
     <div class="sfq-actions" style="flex-wrap:wrap">
-      ${tracks.map(t => `<button class="btn ${_currentTrack === t.key ? 'btn--primary' : 'btn--ghost'}" data-track="${t.key}">${t.label}</button>`).join('')}
+      ${tracks.map((t) => `<button class="btn ${_currentTrack === t.key ? 'btn--primary' : 'btn--ghost'}" data-track="${t.key}">${t.label}</button>`).join('')}
     </div>
     <div class="sfq-browser-grid">`;
 
   for (let lv = 1; lv <= 6; lv++) {
-    const total = allSentences.filter(s => s.level === lv && _getSentenceTrack(s) === _currentTrack).length;
-    const done  = completed[lv] || 0;
+    const total = allSentences.filter(
+      (s) => s.level === lv && _getSentenceTrack(s) === _currentTrack,
+    ).length;
+    const done = completed[lv] || 0;
     const isDone = done >= total;
-    const icon   = SENTENCE_LEVEL_ICONS[lv - 1];
+    const icon = SENTENCE_LEVEL_ICONS[lv - 1];
 
     const categorySkills = categoryMap[lv] || [];
-    html += total > 0 ? `
+    html +=
+      total > 0
+        ? `
       <button class="sfq-level-btn ${isDone ? 'sfq-level-btn--done' : ''}"
               data-level="${lv}" aria-label="${SENTENCE_LEVEL_LABELS[lv]}">
         <span class="sfq-level-icon">${isDone ? '⭐' : icon}</span>
         <span class="sfq-level-name">${SENTENCE_LEVEL_LABELS[lv]}</span>
         <span class="sfq-level-count">${Math.min(done, total)} / ${total}</span>
         <span class="sfq-level-categories" aria-label="Sentence categories for level ${lv}">
-          ${categorySkills.map(skill => `<span class="sfq-level-tag">${LEVEL_TAG_LABELS[skill]}</span>`).join('')}
+          ${categorySkills.map((skill) => `<span class="sfq-level-tag">${LEVEL_TAG_LABELS[skill]}</span>`).join('')}
         </span>
-      </button>` : '';
+      </button>`
+        : '';
   }
   console.info('[SentenceForge] Level selector categories', categoryMap);
 
   html += '</div></div>';
   _container.innerHTML = html;
 
-  _container.querySelectorAll('.sfq-level-btn').forEach(btn => {
+  _container.querySelectorAll('.sfq-level-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       _currentLevel = parseInt(btn.dataset.level);
       _startLevel(_currentLevel);
     });
   });
-  _container.querySelectorAll('[data-track]').forEach(btn => {
+  _container.querySelectorAll('[data-track]').forEach((btn) => {
     btn.addEventListener('click', () => {
       _currentTrack = btn.dataset.track;
       _renderBrowser();
@@ -261,11 +273,13 @@ function _renderBrowser() {
 // ── Level flow ───────────────────────────────────────────────────────────────
 
 function _startLevel(level) {
-  const raw = allSentences.filter(s => s.level === level && _getSentenceTrack(s) === _currentTrack);
-  _levelSentences  = [...raw].sort(() => Math.random() - 0.5);
-  _sentenceIdx     = 0;
-  _sessionCorrect  = 0;
-  _sessionTotal    = 0;
+  const raw = allSentences.filter(
+    (s) => s.level === level && _getSentenceTrack(s) === _currentTrack,
+  );
+  _levelSentences = [...raw].sort(() => Math.random() - 0.5);
+  _sentenceIdx = 0;
+  _sessionCorrect = 0;
+  _sessionTotal = 0;
   _sessionXpEarned = 0;
   _sessionStreakBonus = 0;
   _sessionClueCorrect = 0;
@@ -285,7 +299,7 @@ function _showSentence() {
   }
   const entry = _levelSentences[_sentenceIdx];
 
-  _clueMissionDone   = false;
+  _clueMissionDone = false;
   _clueMissionResult = null;
   _skillClueDismissed = false;
   _sentenceWrongCount = 0;
@@ -303,9 +317,9 @@ function _renderClueMission(entry) {
   if (!_container) return;
 
   const mission = entry.clueMission;
-  const words   = entry.sentence.replace(/[.!?]$/, '').split(' ');
-  const icon    = SENTENCE_LEVEL_ICONS[_currentLevel - 1];
-  const prog    = `${_sentenceIdx + 1} / ${_levelSentences.length}`;
+  const words = entry.sentence.replace(/[.!?]$/, '').split(' ');
+  const icon = SENTENCE_LEVEL_ICONS[_currentLevel - 1];
+  const prog = `${_sentenceIdx + 1} / ${_levelSentences.length}`;
 
   _container.innerHTML = `
     <div class="sfq-game">
@@ -323,11 +337,15 @@ function _renderClueMission(entry) {
         <p class="clue-mission-prompt">${mission.prompt}</p>
 
         <div class="clue-mission-words" id="clue-mission-words" aria-label="Tap the clue word">
-          ${words.map((w, i) => `
+          ${words
+            .map(
+              (w, i) => `
             <button class="clue-mission-word-btn" data-index="${i}" data-word="${w.replace(/[^a-zA-Z]/g, '')}"
                     aria-label="Tap ${w}">
               ${w}
-            </button>`).join('')}
+            </button>`,
+            )
+            .join('')}
         </div>
 
         <div class="clue-mission-feedback" id="clue-mission-feedback" aria-live="polite"></div>
@@ -342,45 +360,51 @@ function _renderClueMission(entry) {
       </div>
     </div>`;
 
-  _container.querySelectorAll('.clue-mission-word-btn').forEach(btn => {
+  _container.querySelectorAll('.clue-mission-word-btn').forEach((btn) => {
     btn.addEventListener('click', () => _handleMissionWordTap(btn, entry, words));
   });
 
   document.getElementById('sfq-mission-skip')?.addEventListener('click', () => {
-    _clueMissionDone   = true;
+    _clueMissionDone = true;
     _clueMissionResult = null;
     _setupArrangePhase(entry);
   });
 
   document.getElementById('sfq-quit')?.addEventListener('click', () => {
-    cleanupSentenceForge(); _onGoHome?.();
+    cleanupSentenceForge();
+    _onGoHome?.();
   });
 
-  _rebindKeyHandler(() => { cleanupSentenceForge(); _onGoHome?.(); });
+  _rebindKeyHandler(() => {
+    cleanupSentenceForge();
+    _onGoHome?.();
+  });
 }
 
 function _handleMissionWordTap(btn, entry, words) {
-  const mission    = entry.clueMission;
+  const mission = entry.clueMission;
   const tappedWord = btn.dataset.word.toLowerCase();
-  const acceptable = (mission.acceptableWords || []).map(w => w.toLowerCase());
-  const correct    = acceptable.includes(tappedWord);
+  const acceptable = (mission.acceptableWords || []).map((w) => w.toLowerCase());
+  const correct = acceptable.includes(tappedWord);
 
-  document.querySelectorAll('.clue-mission-word-btn').forEach(b => b.classList.remove('clue-mission-word-btn--selected'));
+  document
+    .querySelectorAll('.clue-mission-word-btn')
+    .forEach((b) => b.classList.remove('clue-mission-word-btn--selected'));
   btn.classList.add(correct ? 'clue-mission-word-btn--correct' : 'clue-mission-word-btn--wrong');
 
   const fbEl = document.getElementById('clue-mission-feedback');
   if (fbEl) {
     if (correct) {
       fbEl.textContent = `✨ ${mission.explanation}`;
-      fbEl.className   = 'clue-mission-feedback clue-mission-feedback--correct';
-      document.querySelectorAll('.clue-mission-word-btn').forEach(b => {
+      fbEl.className = 'clue-mission-feedback clue-mission-feedback--correct';
+      document.querySelectorAll('.clue-mission-word-btn').forEach((b) => {
         if (acceptable.includes(b.dataset.word.toLowerCase())) {
           b.classList.add('clue-mission-word-btn--correct');
         }
       });
     } else {
       fbEl.textContent = `🔴 Not quite! Look for: ${mission.acceptableWords.join(', ')}`;
-      fbEl.className   = 'clue-mission-feedback clue-mission-feedback--wrong';
+      fbEl.className = 'clue-mission-feedback clue-mission-feedback--wrong';
     }
   }
 
@@ -390,7 +414,7 @@ function _handleMissionWordTap(btn, entry, words) {
     clueType: mission.clueType,
   });
 
-  _clueMissionDone   = true;
+  _clueMissionDone = true;
   _clueMissionResult = correct ? 'correct' : 'incorrect';
   _sessionClueMissionTotal++;
   if (correct) _sessionClueCorrect++;
@@ -398,7 +422,9 @@ function _handleMissionWordTap(btn, entry, words) {
   audio.playSfx(correct ? 'correct' : 'wrong');
 
   // Disable all word buttons so student can't re-tap while reading feedback
-  document.querySelectorAll('.clue-mission-word-btn').forEach(b => { b.disabled = true; });
+  document.querySelectorAll('.clue-mission-word-btn').forEach((b) => {
+    b.disabled = true;
+  });
 
   // Replace the skip button with a Continue button so the student controls pacing
   const skipBtn = document.getElementById('sfq-mission-skip');
@@ -416,8 +442,8 @@ function _handleMissionWordTap(btn, entry, words) {
 // ── Arrange Phase ────────────────────────────────────────────────────────────
 
 function _setupArrangePhase(entry) {
-  const clean    = entry.sentence.replace(/[.!?]$/, '');
-  const punct    = entry.sentence.slice(clean.length);
+  const clean = entry.sentence.replace(/[.!?]$/, '');
+  const punct = entry.sentence.slice(clean.length);
   const rawWords = clean.split(' ');
 
   _bankWords = rawWords.map((w, i) => ({ id: i, word: w, used: false }));
@@ -473,9 +499,13 @@ function _renderSkillCluePanel(entry, punct, prompt) {
     _renderGame(entry, punct);
   });
   document.getElementById('sfq-quit')?.addEventListener('click', () => {
-    cleanupSentenceForge(); _onGoHome?.();
+    cleanupSentenceForge();
+    _onGoHome?.();
   });
-  _rebindKeyHandler(() => { cleanupSentenceForge(); _onGoHome?.(); });
+  _rebindKeyHandler(() => {
+    cleanupSentenceForge();
+    _onGoHome?.();
+  });
 }
 
 // ── Game render ──────────────────────────────────────────────────────────────
@@ -483,15 +513,16 @@ function _renderSkillCluePanel(entry, punct, prompt) {
 function _renderGame(entry, punct) {
   if (!_container) return;
 
-  const prog   = `${_sentenceIdx + 1} / ${_levelSentences.length}`;
-  const icon   = SENTENCE_LEVEL_ICONS[_currentLevel - 1];
-  const xpVal  = 10 + _currentLevel * 5;
+  const prog = `${_sentenceIdx + 1} / ${_levelSentences.length}`;
+  const icon = SENTENCE_LEVEL_ICONS[_currentLevel - 1];
+  const xpVal = 10 + _currentLevel * 5;
 
-  const clueBadge = _clueMissionResult === 'correct'
-    ? `<span class="sfq-clue-badge sfq-clue-badge--correct" title="Clue found!">🔍✨</span>`
-    : _clueMissionResult === 'incorrect'
-    ? `<span class="sfq-clue-badge sfq-clue-badge--missed" title="Clue missed">🔍</span>`
-    : '';
+  const clueBadge =
+    _clueMissionResult === 'correct'
+      ? `<span class="sfq-clue-badge sfq-clue-badge--correct" title="Clue found!">🔍✨</span>`
+      : _clueMissionResult === 'incorrect'
+        ? `<span class="sfq-clue-badge sfq-clue-badge--missed" title="Clue missed">🔍</span>`
+        : '';
 
   _container.innerHTML = `
     <div class="sfq-game">
@@ -504,12 +535,16 @@ function _renderGame(entry, punct) {
       </div>
 
       <p class="sfq-instruction">🔨 Tap the words below to build the sentence above.</p>
-      ${entry.synthesisTask ? `
+      ${
+        entry.synthesisTask
+          ? `
       <div class="dash-pattern-item" style="margin-bottom:12px">
         <strong>🧪 Synthesis Task:</strong> ${entry.synthesisTask.prompt}
         ${entry.synthesisTask.connectors?.length ? `<br><em>Use one connector:</em> ${entry.synthesisTask.connectors.join(', ')}` : ''}
         ${entry.synthesisTask.punctuationHint ? `<br><em>Punctuation:</em> ${entry.synthesisTask.punctuationHint}` : ''}
-      </div>` : ''}
+      </div>`
+          : ''
+      }
 
       <span class="sfq-section-label sfq-section-label--answer">Your sentence</span>
       <div class="sfq-answer-area" id="sfq-answer-area" aria-label="Your sentence">
@@ -536,18 +571,26 @@ function _renderGame(entry, punct) {
   _renderAnswer();
 
   document.getElementById('sfq-clear')?.addEventListener('click', () => {
-    _bankWords.forEach(w => (w.used = false));
+    _bankWords.forEach((w) => (w.used = false));
     _answerSlots = [];
     _renderBank();
     _renderAnswer();
   });
 
-  document.getElementById('sfq-listen')?.addEventListener('click', () => audio.speakWord(entry.sentence));
+  document
+    .getElementById('sfq-listen')
+    ?.addEventListener('click', () => audio.speakWord(entry.sentence));
   document.getElementById('sfq-check')?.addEventListener('click', () => _checkAnswer(entry, punct));
-  document.getElementById('sfq-quit')?.addEventListener('click', () => { cleanupSentenceForge(); _onGoHome?.(); });
+  document.getElementById('sfq-quit')?.addEventListener('click', () => {
+    cleanupSentenceForge();
+    _onGoHome?.();
+  });
 
   _rebindKeyHandler(
-    () => { cleanupSentenceForge(); _onGoHome?.(); },
+    () => {
+      cleanupSentenceForge();
+      _onGoHome?.();
+    },
     () => document.getElementById('sfq-check')?.click(),
   );
 
@@ -557,17 +600,21 @@ function _renderGame(entry, punct) {
 function _renderBank() {
   const bank = document.getElementById('sfq-bank');
   if (!bank) return;
-  bank.innerHTML = _bankWords.map(w => `
+  bank.innerHTML = _bankWords
+    .map(
+      (w) => `
     <button class="sfq-word-chip ${w.used ? 'sfq-word-chip--used' : ''}"
             data-id="${w.id}"
             ${w.used ? 'disabled aria-disabled="true"' : ''}
             aria-label="${w.word}">${w.word}</button>
-  `).join('');
+  `,
+    )
+    .join('');
 
-  bank.querySelectorAll('.sfq-word-chip:not([disabled])').forEach(chip => {
+  bank.querySelectorAll('.sfq-word-chip:not([disabled])').forEach((chip) => {
     chip.addEventListener('click', () => {
-      const id   = parseInt(chip.dataset.id);
-      const item = _bankWords.find(w => w.id === id);
+      const id = parseInt(chip.dataset.id);
+      const item = _bankWords.find((w) => w.id === id);
       if (!item || item.used) return;
       item.used = true;
       _answerSlots.push(id);
@@ -580,23 +627,23 @@ function _renderBank() {
 
 function _renderAnswer() {
   const area = document.getElementById('sfq-answer-chips');
-  const ph   = document.getElementById('sfq-placeholder');
+  const ph = document.getElementById('sfq-placeholder');
   if (!area) return;
 
   if (_answerSlots.length === 0) {
     if (ph) ph.hidden = false;
-    area.querySelectorAll('.sfq-answer-chip').forEach(c => c.remove());
+    area.querySelectorAll('.sfq-answer-chip').forEach((c) => c.remove());
     return;
   }
 
   if (ph) ph.hidden = true;
-  area.querySelectorAll('.sfq-answer-chip').forEach(c => c.remove());
+  area.querySelectorAll('.sfq-answer-chip').forEach((c) => c.remove());
 
   _answerSlots.forEach((id, idx) => {
-    const item = _bankWords.find(w => w.id === id);
+    const item = _bankWords.find((w) => w.id === id);
     if (!item) return;
     const chip = document.createElement('button');
-    chip.className   = 'sfq-answer-chip';
+    chip.className = 'sfq-answer-chip';
     chip.textContent = item.word;
     chip.setAttribute('aria-label', `Remove ${item.word}`);
     chip.addEventListener('click', () => {
@@ -617,10 +664,10 @@ function _checkAnswer(entry, punct) {
     return;
   }
 
-  const builtWords  = _answerSlots.map(id => _bankWords.find(w => w.id === id)?.word || '');
+  const builtWords = _answerSlots.map((id) => _bankWords.find((w) => w.id === id)?.word || '');
   const constructed = builtWords.join(' ') + punct;
-  const correct     = constructed === entry.sentence ||
-                      (entry.acceptableAnswers || []).includes(constructed);
+  const correct =
+    constructed === entry.sentence || (entry.acceptableAnswers || []).includes(constructed);
   const cleanTarget = entry.sentence.replace(/[.!?]$/, '').split(' ');
 
   _sessionTotal++;
@@ -628,13 +675,25 @@ function _checkAnswer(entry, punct) {
   // Skills to record — prefer sentenceSkills tags, fall back to word_order
   const skills = entry.sentenceSkills?.length ? entry.sentenceSkills : ['word_order'];
 
+  // The mark is the first attempt. This used to run on every submission, so a
+  // sentence retried three times recorded three attempts against one item —
+  // and a child who fixed it on the retry was recorded as wrong AND right.
+  const isFirstAttempt = _sentenceWrongCount === 0;
+
   if (correct) {
     _sessionCorrect++;
 
-    for (const skill of skills) {
-      questMastery.recordAttempt({ quest: 'sentenceForge', skill, correct: true, level: _currentLevel });
-      questMastery.updateSkill('sentenceForge', skill, true);
-      _recordSessionSkill(skill, true);
+    if (isFirstAttempt) {
+      for (const skill of skills) {
+        questMastery.recordAttempt({
+          quest: 'sentenceForge',
+          skill,
+          correct: true,
+          level: _currentLevel,
+        });
+        questMastery.updateSkill('sentenceForge', skill, true);
+        _recordSessionSkill(skill, true);
+      }
     }
 
     const reward = gamification.recordCorrect(1200, false);
@@ -650,13 +709,22 @@ function _checkAnswer(entry, punct) {
     store.set('sfqCompleted', completed);
 
     _showFeedback('✅ Perfect! Well done!', true);
-    setTimeout(() => { _sentenceIdx++; _showSentence(); }, 1500);
-
+    setTimeout(() => {
+      _sentenceIdx++;
+      _showSentence();
+    }, 1500);
   } else {
-    for (const skill of skills) {
-      questMastery.recordAttempt({ quest: 'sentenceForge', skill, correct: false, level: _currentLevel });
-      questMastery.updateSkill('sentenceForge', skill, false);
-      _recordSessionSkill(skill, false);
+    if (isFirstAttempt) {
+      for (const skill of skills) {
+        questMastery.recordAttempt({
+          quest: 'sentenceForge',
+          skill,
+          correct: false,
+          level: _currentLevel,
+        });
+        questMastery.updateSkill('sentenceForge', skill, false);
+        _recordSessionSkill(skill, false);
+      }
     }
 
     gamification.recordWrong();
@@ -675,7 +743,7 @@ function _checkAnswer(entry, punct) {
 
     // On 2nd wrong attempt: show teach-back overlay instead of inline hint
     if (_sentenceWrongCount >= 2) {
-      _showFeedback('❌ Let\'s look at the rule, then try again!', false);
+      _showFeedback("❌ Let's look at the rule, then try again!", false);
       setTimeout(() => _showSentenceTeachBackOverlay(entry, punct), 1000);
     } else {
       _showFeedback(`❌ ${hint}`, false);
@@ -685,18 +753,39 @@ function _checkAnswer(entry, punct) {
 
 // ── Sentence teach-back overlay ──────────────────────────────────────────────
 
+/**
+ * Sentence-skill tags mapped onto the shared misconception taxonomy, so a
+ * connector misplaced in Sentence Forge and a connector mis-chosen in Cloze
+ * Castle count as the same habit in the parent report.
+ *
+ * Tags with no counterpart — word order, clause boundary, inversion — fall
+ * back to `structure-not-followed`, which is what they are.
+ */
+const SKILL_MISCONCEPTIONS = {
+  tense_clue: 'tense-choice',
+  connector_clue: 'connector-meaning',
+  punctuation_clue: 'punctuation-slip',
+  preposition_clue: 'preposition-collocation',
+  modal_order: 'verb-form-after-helper',
+  comparison_structure: 'comparative-vs-superlative',
+};
+
 function _showSentenceTeachBackOverlay(entry, punct) {
   if (!_container) return;
 
   // Pick the most relevant skill for this sentence
   const primarySkill = (entry.sentenceSkills || [])[0] || 'word_order';
+  recordMisconception(SKILL_MISCONCEPTIONS[primarySkill] || 'structure-not-followed', {
+    skill: primarySkill,
+    mode: 'sentenceForge',
+  });
   const tb = SENTENCE_SKILL_TEACHBACK[primarySkill] || SENTENCE_SKILL_TEACHBACK.word_order;
 
   const existing = document.getElementById('sfq-teachback-overlay');
   if (existing) existing.remove();
 
   const overlay = document.createElement('div');
-  overlay.id        = 'sfq-teachback-overlay';
+  overlay.id = 'sfq-teachback-overlay';
   overlay.className = 'sfq-teachback-overlay';
   overlay.innerHTML = `
     <div class="sfq-tb-panel">
@@ -716,13 +805,15 @@ function _showSentenceTeachBackOverlay(entry, punct) {
   document.getElementById('sfq-tb-got-it')?.addEventListener('click', () => {
     overlay.remove();
     // Reset answer slots so learner can retry with a fresh slate
-    _bankWords.forEach(w => (w.used = false));
+    _bankWords.forEach((w) => (w.used = false));
     _answerSlots = [];
     _sentenceWrongCount = 0;
     _renderBank();
     _renderAnswer();
     const fbEl = document.getElementById('sfq-feedback');
-    if (fbEl) { fbEl.hidden = true; }
+    if (fbEl) {
+      fbEl.hidden = true;
+    }
   });
 
   setTimeout(() => document.getElementById('sfq-tb-got-it')?.focus(), 100);
@@ -740,7 +831,10 @@ function _showFeedback(msg, success) {
   el.textContent = msg;
   el.className = `sfq-feedback sfq-feedback--${success ? 'success' : 'error'}`;
   el.hidden = false;
-  if (success) setTimeout(() => { el.hidden = true; }, 1400);
+  if (success)
+    setTimeout(() => {
+      el.hidden = true;
+    }, 1400);
 }
 
 // ── Complete screen ───────────────────────────────────────────────────────────
@@ -748,11 +842,15 @@ function _showFeedback(msg, success) {
 function _showComplete() {
   if (!_container) return;
 
-  const { accuracy: acc, stars } = getScoreboardStats({ correct: _sessionCorrect, total: _sessionTotal });
-  const icon  = SENTENCE_LEVEL_ICONS[_currentLevel - 1];
+  const { accuracy: acc, stars } = getScoreboardStats({
+    correct: _sessionCorrect,
+    total: _sessionTotal,
+  });
+  const icon = SENTENCE_LEVEL_ICONS[_currentLevel - 1];
   const allLevels = [...LEVEL_SKILL_KEYS];
   const recommendedSkill = questMastery.getRecommendedSkill('sentenceForge', allLevels);
-  const recommendedLevel = Number((recommendedSkill || '').replace('p', '')) || Math.min(6, _currentLevel + 1);
+  const recommendedLevel =
+    Number((recommendedSkill || '').replace('p', '')) || Math.min(6, _currentLevel + 1);
   const hasNextLevel = _currentLevel < 6;
   const currentXp = store.get('xp') || 0;
 
@@ -764,9 +862,14 @@ function _showComplete() {
   const skillLines = skillSummary.scores
     .sort((a, b) => b.score - a.score)
     .slice(0, 5)
-    .map(s => {
-      const pct  = Math.round(s.score * 100);
-      const fill = pct >= 70 ? 'var(--color-success)' : pct >= 45 ? 'var(--color-warning)' : 'var(--color-error)';
+    .map((s) => {
+      const pct = Math.round(s.score * 100);
+      const fill =
+        pct >= 70
+          ? 'var(--color-success)'
+          : pct >= 45
+            ? 'var(--color-warning)'
+            : 'var(--color-error)';
       return `
         <div class="sfq-skill-row">
           <span class="sfq-skill-label">${s.label}</span>
@@ -775,22 +878,28 @@ function _showComplete() {
           </div>
           <span class="sfq-skill-pct">${pct}%</span>
         </div>`;
-    }).join('');
+    })
+    .join('');
 
-  const clueAcc = _sessionClueMissionTotal > 0
-    ? Math.round((_sessionClueCorrect / _sessionClueMissionTotal) * 100)
-    : null;
+  const clueAcc =
+    _sessionClueMissionTotal > 0
+      ? Math.round((_sessionClueCorrect / _sessionClueMissionTotal) * 100)
+      : null;
 
   const strongestLine = skillSummary.strongest
-    ? `<p class="sfq-complete-skill-note">💪 Strongest: <strong>${skillSummary.strongest}</strong></p>` : '';
-  const weakestLine = (skillSummary.weakest && skillSummary.weakest !== skillSummary.strongest)
-    ? `<p class="sfq-complete-skill-note">📈 To improve: <strong>${skillSummary.weakest}</strong></p>` : '';
+    ? `<p class="sfq-complete-skill-note">💪 Strongest: <strong>${skillSummary.strongest}</strong></p>`
+    : '';
+  const weakestLine =
+    skillSummary.weakest && skillSummary.weakest !== skillSummary.strongest
+      ? `<p class="sfq-complete-skill-note">📈 To improve: <strong>${skillSummary.weakest}</strong></p>`
+      : '';
 
-  const resultLine = acc >= 90
-    ? 'Outstanding sentence smithing!'
-    : acc >= 70
-    ? 'Great work — keep climbing!'
-    : 'Good effort — replay to boost mastery!';
+  const resultLine =
+    acc >= 90
+      ? 'Outstanding sentence smithing!'
+      : acc >= 70
+        ? 'Great work — keep climbing!'
+        : 'Good effort — replay to boost mastery!';
 
   _container.innerHTML = `
     <div class="sfq-scoreboard-overlay" role="dialog" aria-label="Sentence Forge session summary">
@@ -805,13 +914,17 @@ function _showComplete() {
         <p class="sfq-complete-meta">Recommended next level: <strong>P${recommendedLevel}</strong></p>
         ${clueAcc !== null ? `<p class="sfq-complete-clue">🔍 Clue accuracy: ${clueAcc}%</p>` : ''}
 
-        ${skillLines ? `
+        ${
+          skillLines
+            ? `
           <div class="sfq-skill-summary">
             <h4 class="sfq-skill-summary-title">Sentence Skills This Level</h4>
             ${skillLines}
             ${strongestLine}
             ${weakestLine}
-          </div>` : ''}
+          </div>`
+            : ''
+        }
 
         <div class="sfq-complete-actions">
           <button class="btn btn--primary btn--lg" id="sfq-replay">Replay Level ↺</button>
@@ -830,12 +943,20 @@ function _showComplete() {
   });
 
   document.getElementById('sfq-next-level')?.addEventListener('click', () => {
-    if (_currentLevel < 6) { _currentLevel++; _startLevel(_currentLevel); }
+    if (_currentLevel < 6) {
+      _currentLevel++;
+      _startLevel(_currentLevel);
+    }
   });
-  document.getElementById('sfq-replay')?.addEventListener('click', () => _startLevel(_currentLevel));
+  document
+    .getElementById('sfq-replay')
+    ?.addEventListener('click', () => _startLevel(_currentLevel));
   document.getElementById('sfq-back-levels')?.addEventListener('click', () => _renderBrowser());
 
-  if (_keyHandler) { document.removeEventListener('keydown', _keyHandler); _keyHandler = null; }
+  if (_keyHandler) {
+    document.removeEventListener('keydown', _keyHandler);
+    _keyHandler = null;
+  }
   setTimeout(() => document.getElementById('sfq-replay')?.focus(), 200);
 }
 
@@ -845,7 +966,10 @@ function _rebindKeyHandler(onEscape, onEnter) {
   if (_keyHandler) document.removeEventListener('keydown', _keyHandler);
   _keyHandler = (e) => {
     if (e.key === 'Escape') onEscape?.();
-    if (e.key === 'Enter' && onEnter) { e.preventDefault(); onEnter(); }
+    if (e.key === 'Enter' && onEnter) {
+      e.preventDefault();
+      onEnter();
+    }
   };
   document.addEventListener('keydown', _keyHandler);
 }

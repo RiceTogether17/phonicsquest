@@ -150,6 +150,12 @@ const DEFAULT_STATE = {
   // Grammar category stats (Cloze Castle)
   grammarCategoryStats: {}, // { [level-category]: { attempts, correct, accuracy } }
 
+  // Recurring misconceptions (modules/teacherFeedback.js). One entry per
+  // named misconception rather than per attempt, so the log stays small
+  // enough for localStorage: it is what lets the feedback say "that is the
+  // third time this fortnight" instead of treating every slip as new.
+  misconceptionLog: {}, // { [misconceptionId]: { count, skills, modes, firstSeen, lastSeen, cleanStreak } }
+
   // Quest mastery + telemetry
   questMastery: {
     sentenceForge: {},
