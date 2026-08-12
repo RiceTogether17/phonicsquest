@@ -1,10 +1,13 @@
 import { EDITING_LEVELS, editingPassages } from '../data/editingPassages.js';
 import { attachAskGiriButton } from '../components/askGiriButton.js';
 import { explainTeachBack } from '../modules/aiService.js';
+import { diagnoseAnswer, stemAroundToken } from '../modules/answerDiagnosis.js';
+import { recordMisconception } from '../modules/teacherFeedback.js';
 import { store } from '../modules/store.js';
 import { questMastery } from '../modules/questMastery.js';
 import { audio } from '../modules/audio.js';
 import { getLevelInfo } from '../data/curriculum.js';
+import { escapeHtml } from '../utils/escapeHtml.js';
 
 // ── Error-specific teach-back content ────────────────────────────────────────
 // Keyed by error.rule (specific) then error.type (grammar|spelling) as fallback.
@@ -19,7 +22,8 @@ const EDITING_TEACHBACK = {
   tense: {
     icon: '⏱️',
     rule: 'Tense shows WHEN something happens. Look for time clues (yesterday, now, soon) to choose the right tense.',
-    example: '"Yesterday, she walked home." — "Right now, he is running." — "Tomorrow, we will leave."',
+    example:
+      '"Yesterday, she walked home." — "Right now, he is running." — "Tomorrow, we will leave."',
     tip: 'Find the time word first — it tells you which tense belongs in the sentence.',
   },
   articles: {
@@ -62,7 +66,8 @@ const EDITING_TEACHBACK = {
   spelling: {
     icon: '🔤',
     rule: 'English spelling often follows patterns. Check vowel pairs, silent letters, and suffix rules.',
-    example: '"receive" (i before e except after c) · "necessary" (one c, double s) · "beautiful" (beauty + ful)',
+    example:
+      '"receive" (i before e except after c) · "necessary" (one c, double s) · "beautiful" (beauty + ful)',
     tip: 'Break the word into syllables. Say each part. Does it match a pattern you know?',
   },
   quantifiers: {
@@ -141,18 +146,20 @@ export function showEditingBrowser() {
   const completed = store.get('editingCompleted') || {};
   _container.innerHTML = `
     <div class="sfq-browser"><div class="sfq-browser-grid">
-      ${Object.entries(EDITING_LEVELS).map(([k, label]) => {
-        const total = (editingPassages[k] || []).length;
-        const done = completed[k] || 0;
-        return `<button class="sfq-level-btn" data-level="${k}">
+      ${Object.entries(EDITING_LEVELS)
+        .map(([k, label]) => {
+          const total = (editingPassages[k] || []).length;
+          const done = completed[k] || 0;
+          return `<button class="sfq-level-btn" data-level="${k}">
           <span class="sfq-level-icon">✏️</span>
           <span class="sfq-level-name">${label}</span>
           <span class="sfq-level-count">${Math.min(done, total)} / ${total}</span>
         </button>`;
-      }).join('')}
+        })
+        .join('')}
     </div></div>`;
 
-  _container.querySelectorAll('[data-level]').forEach(btn => {
+  _container.querySelectorAll('[data-level]').forEach((btn) => {
     btn.addEventListener('click', () => _startLevel(Number(btn.dataset.level)));
   });
 }
@@ -173,7 +180,7 @@ function _prioritisePassages(passages) {
     }, 0);
     return { item, score: weaknesses / Math.max(item.errors.length, 1) };
   });
-  return scored.sort((a, b) => b.score - a.score).map(s => s.item);
+  return scored.sort((a, b) => b.score - a.score).map((s) => s.item);
 }
 
 function _renderCurrentPassage() {
@@ -246,16 +253,19 @@ function _renderErrorStep() {
   const typeButtons = Array.from(document.querySelectorAll('#eq-type-bank .sfq-word-chip'));
   const correctionWrap = document.getElementById('eq-correction-wrap');
 
-  typeButtons.forEach(btn => {
+  typeButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       _attemptState.selectedType = btn.dataset.type;
-      typeButtons.forEach(b => b.classList.toggle('sfq-word-chip--used', b === btn));
+      typeButtons.forEach((b) => b.classList.toggle('sfq-word-chip--used', b === btn));
       if (correctionWrap) correctionWrap.hidden = false;
     });
   });
 
   document.getElementById('eq-submit-correction')?.addEventListener('click', () => {
-    const typed = /** @type {HTMLInputElement|null} */ (document.getElementById('eq-correction-input'))?.value?.trim() || '';
+    const typed =
+      /** @type {HTMLInputElement|null} */ (
+        document.getElementById('eq-correction-input')
+      )?.value?.trim() || '';
     _submitError(item, error, _attemptState.selectedType, typed);
   });
 
@@ -267,8 +277,11 @@ function _renderErrorStep() {
     if (!fb) return;
     fb.hidden = false;
     fb.className = 'sfq-feedback';
-    const firstLetter = error.correction?.[0] || '';
-    fb.textContent = `Hint: this is a ${error.type} item. Correct answer starts with "${firstLetter}".`;
+    // A first letter is an answer, not a hint. Point at the thinking instead:
+    // name the rule this item tests and the check that resolves it.
+    const tb =
+      EDITING_TEACHBACK[error.rule] || EDITING_TEACHBACK[error.type] || EDITING_TEACHBACK.grammar;
+    fb.textContent = `Hint: ${tb.rule} ${tb.tip}`;
   });
 
   document.getElementById('eq-reveal')?.addEventListener('click', function handler() {
@@ -286,6 +299,26 @@ function _renderErrorStep() {
   document.getElementById('eq-quit')?.addEventListener('click', () => {
     cleanupEditingQuest();
     _onGoHome?.();
+  });
+}
+
+/**
+ * What the child's correction got wrong, in the feedback system's terms.
+ *
+ * Editing Quest works on a token inside a paragraph, so the sentence around
+ * that token becomes the stem the detectors read.
+ *
+ * @param {object} error   the error entry ({ token, correction, type, rule })
+ * @param {string} typed   the child's correction
+ * @param {string} paragraph
+ */
+function _diagnoseCorrection(error, typed, paragraph) {
+  return diagnoseAnswer({
+    stem: stemAroundToken(paragraph, error.token),
+    given: typed,
+    correct: error.correction,
+    skill: error.rule || error.type,
+    domain: error.type === 'spelling' ? 'spelling' : 'grammar',
   });
 }
 
@@ -315,7 +348,12 @@ function _registerAttempt(error, correct, forcedAdvance = false) {
   }
 
   questMastery.updateSkill('editingQuest', error.rule || error.type, correct);
-  questMastery.recordAttempt({ quest: 'editingQuest', skill: error.rule || error.type, correct, level: _level });
+  questMastery.recordAttempt({
+    quest: 'editingQuest',
+    skill: error.rule || error.type,
+    correct,
+    level: _level,
+  });
 
   store.recordLearningEvent?.({
     eventType: forcedAdvance ? 'editing_reveal' : 'editing_attempt',
@@ -335,7 +373,7 @@ function _submitError(item, error, selectedType, typedCorrection) {
 
   const accepted = error.accepted || [error.correction];
   const typeCorrect = selectedType === error.type;
-  const correctionCorrect = accepted.some(a => a.toLowerCase() === typedCorrection.toLowerCase());
+  const correctionCorrect = accepted.some((a) => a.toLowerCase() === typedCorrection.toLowerCase());
   const correct = typeCorrect && correctionCorrect;
   _attemptState.tries++;
 
@@ -352,25 +390,53 @@ function _submitError(item, error, selectedType, typedCorrection) {
   }
 
   audio.playSfx('wrong');
-  const attemptsLeft = Math.max(0, 2 - _attemptState.tries);
   if (_attemptState.tries >= 2) {
-    _showEditingTeachBackOverlay(error, () => {
-      _errorIndex++;
-      _renderErrorStep();
-    }, typedCorrection);
+    _showEditingTeachBackOverlay(
+      error,
+      () => {
+        _errorIndex++;
+        _renderErrorStep();
+      },
+      typedCorrection,
+      item.paragraph,
+    );
     return;
   }
 
-  _showFeedback(`❌ Not yet. Type: ${error.type}. Try again (${attemptsLeft} attempt left).`, false);
+  // Getting the fix right but the label wrong is a different lesson from
+  // getting the fix wrong, and deserves to be told apart.
+  if (correctionCorrect && !typeCorrect) {
+    _showFeedback(
+      'Your correction is right — but check the label. Is this word breaking a grammar rule, or is it the letters that are wrong?',
+      false,
+    );
+  } else {
+    const diagnosis = _diagnoseCorrection(error, typedCorrection, item.paragraph);
+    _showFeedback(`Not yet. ${diagnosis.misconception.cue}`, false);
+  }
 
-  const input = /** @type {HTMLInputElement|null} */ (document.getElementById('eq-correction-input'));
+  const input = /** @type {HTMLInputElement|null} */ (
+    document.getElementById('eq-correction-input')
+  );
   if (input) input.value = '';
 }
 
-function _showEditingTeachBackOverlay(error, onContinue, typed = '') {
-  const tb = EDITING_TEACHBACK[error.rule] || EDITING_TEACHBACK[error.type] || EDITING_TEACHBACK.grammar;
+function _showEditingTeachBackOverlay(error, onContinue, typed = '', paragraph = '') {
+  const tb =
+    EDITING_TEACHBACK[error.rule] || EDITING_TEACHBACK[error.type] || EDITING_TEACHBACK.grammar;
   const game = _container.querySelector('.sfq-game');
-  if (!game) { onContinue(); return; }
+  if (!game) {
+    onContinue();
+    return;
+  }
+
+  // Name the slip and add it to the cross-mode pattern log, so a child who
+  // keeps mis-spelling in Editing Quest and mis-choosing in Word Vault sees
+  // one habit rather than two unconnected mistakes.
+  const diagnosis = typed ? _diagnoseCorrection(error, typed, paragraph) : null;
+  if (diagnosis) {
+    recordMisconception(diagnosis.id, { skill: error.rule || error.type, mode: 'editingQuest' });
+  }
 
   const overlay = document.createElement('div');
   overlay.className = 'eq-teachback-overlay';
@@ -386,19 +452,27 @@ function _showEditingTeachBackOverlay(error, onContinue, typed = '') {
       <p class="eq-teachback-tip">💡 <strong>Quick tip:</strong> ${tb.tip}</p>
       <div class="eq-teachback-answer">✅ Correct answer: <strong>${error.correction}</strong></div>
       <p class="eq-teachback-explanation">${error.explanation}</p>
+      ${
+        diagnosis
+          ? `<p class="eq-teachback-noticed">👀 You wrote "${escapeHtml(typed)}" — that is ${escapeHtml(diagnosis.misconception.childName)}.</p>
+      <p class="eq-teachback-nexttime">🧭 <strong>Next time:</strong> ${escapeHtml(diagnosis.misconception.selfCheck)}</p>`
+          : ''
+      }
       <button class="btn btn--primary eq-teachback-continue">Got it — Continue</button>
     </div>`;
 
   game.appendChild(overlay);
 
   if (typed) {
-    attachAskGiriButton(overlay.querySelector('.eq-teachback-card'), () => explainTeachBack({
-      skillLabel: error.rule || error.type,
-      exercise: `Fix the ${error.type} error in the word "${error.token}"`,
-      studentAnswer: typed,
-      correctAnswer: error.correction,
-      level: _level ? `P${_level}` : '',
-    }));
+    attachAskGiriButton(overlay.querySelector('.eq-teachback-card'), () =>
+      explainTeachBack({
+        skillLabel: error.rule || error.type,
+        exercise: `Fix the ${error.type} error in the word "${error.token}"`,
+        studentAnswer: typed,
+        correctAnswer: error.correction,
+        level: _level ? `P${_level}` : '',
+      }),
+    );
   }
 
   overlay.querySelector('.eq-teachback-continue').addEventListener('click', () => {
@@ -414,13 +488,13 @@ function _calculateStars(accuracy, firstTryRate) {
 }
 
 function _finishPassage(item) {
-  const totalGrammar = item.errors.filter(e => e.type === 'grammar').length;
-  const totalSpelling = item.errors.filter(e => e.type === 'spelling').length;
+  const totalGrammar = item.errors.filter((e) => e.type === 'grammar').length;
+  const totalSpelling = item.errors.filter((e) => e.type === 'spelling').length;
   const correctTotal = _passageStats.grammarCorrect + _passageStats.spellingCorrect;
   const accuracy = correctTotal / Math.max(item.errors.length, 1);
   const firstTryRate = _passageStats.firstTryCorrect / Math.max(item.errors.length, 1);
   const stars = _calculateStars(accuracy, firstTryRate);
-  const xpGain = Math.round((item.xp || 50) * (0.6 + (accuracy * 0.4)) + (stars - 1) * 6);
+  const xpGain = Math.round((item.xp || 50) * (0.6 + accuracy * 0.4) + (stars - 1) * 6);
 
   const xp = (store.get('xp') || 0) + xpGain;
   const levelInfo = getLevelInfo(xp);
@@ -455,7 +529,9 @@ function _recommendFocusArea() {
   const spelling = _sessionStats.accuracyByType.spelling;
   const grammarRate = grammar.correct / Math.max(grammar.total, 1);
   const spellingRate = spelling.correct / Math.max(spelling.total, 1);
-  return grammarRate < spellingRate ? 'grammar consistency and tense control' : 'spelling patterns and proofreading';
+  return grammarRate < spellingRate
+    ? 'grammar consistency and tense control'
+    : 'spelling patterns and proofreading';
 }
 
 function _renderComplete() {
@@ -468,20 +544,29 @@ function _renderComplete() {
   const stars = _calculateStars(accuracy, firstTryRate);
 
   // Build per-rule mastery rows from questMastery
-  const rulesEncountered = [...new Set(_list.flatMap(p => p.errors.map(e => e.rule || e.type)))];
-  const ruleRows = rulesEncountered.map(rule => {
-    const score = questMastery.getSkillScore('editingQuest', rule) ?? 0.5;
-    const pct = Math.round(score * 100);
-    const tb = EDITING_TEACHBACK[rule];
-    const label = tb ? `${tb.icon} ${rule}` : rule;
-    const barColour = pct >= 70 ? 'var(--color-success)' : pct >= 40 ? 'var(--color-primary)' : 'var(--color-error)';
-    return `
+  const rulesEncountered = [
+    ...new Set(_list.flatMap((p) => p.errors.map((e) => e.rule || e.type))),
+  ];
+  const ruleRows = rulesEncountered
+    .map((rule) => {
+      const score = questMastery.getSkillScore('editingQuest', rule) ?? 0.5;
+      const pct = Math.round(score * 100);
+      const tb = EDITING_TEACHBACK[rule];
+      const label = tb ? `${tb.icon} ${rule}` : rule;
+      const barColour =
+        pct >= 70
+          ? 'var(--color-success)'
+          : pct >= 40
+            ? 'var(--color-primary)'
+            : 'var(--color-error)';
+      return `
       <div class="sq-skill-row">
         <span class="sq-skill-name">${label}</span>
         <div class="sq-skill-track"><div class="sq-skill-bar" style="width:${pct}%;background:${barColour}"></div></div>
         <span class="sq-skill-pct">${pct}%</span>
       </div>`;
-  }).join('');
+    })
+    .join('');
 
   const grammarTotal = _sessionStats.accuracyByType.grammar.total;
   const grammarCorrect = _sessionStats.accuracyByType.grammar.correct;

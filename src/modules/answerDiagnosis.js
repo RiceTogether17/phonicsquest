@@ -526,8 +526,17 @@ function isRegularPlural(plural, singular) {
 
 // ── Stem reading ──────────────────────────────────────────────────────────
 
-/** Every blank marker a bank uses: ___ , ____, (1), …… */
-const BLANK_RE = /_{2,}|\(\s*\d+\s*\)|…{2,}/;
+/**
+ * Every blank marker the banks use: `___`, `(1)`, `{{1}}`, `……`.
+ *
+ * The cloze banks each mark their gaps differently — Cloze Castle and Word
+ * Vault use underscore runs, Comprehension Cloze uses `{{n}}`, and the
+ * practice papers use bracketed numbers.
+ */
+const BLANK_RE = /_{2,}|\{\{\s*\d+\s*\}\}|\(\s*\d+\s*\)|…{2,}/;
+
+/** Global form of BLANK_RE, for walking every blank in a passage. */
+const BLANK_RE_GLOBAL = new RegExp(BLANK_RE.source, 'g');
 
 /**
  * Words immediately around the gap. Falls back to end-of-stem when the stem
@@ -565,14 +574,36 @@ export function stemForBlank(text, blankIndex, answers = []) {
   const source = String(text ?? '');
   if (!source) return '';
   let seen = -1;
-  const filled = source.replace(/_{2,}/g, () => {
-    seen += 1;
-    if (seen === blankIndex) return '___';
-    return String(answers[seen] ?? '…');
+  const filled = source.replace(BLANK_RE_GLOBAL, (marker) => {
+    // A numbered marker carries its own index; an underscore run does not, so
+    // fall back to counting the order they appear in.
+    const numbered = marker.match(/\d+/);
+    const index = numbered ? Number(numbered[0]) - 1 : seen + 1;
+    seen = index;
+    if (index === blankIndex) return '___';
+    return String(answers[index] ?? '…');
   });
   // Keep only the sentence the blank sits in; a whole passage buries the clue.
   const sentences = filled.split(/(?<=[.!?])\s+/);
   return (sentences.find((s) => s.includes('___')) || filled).trim();
+}
+
+/**
+ * The sentence around a word being corrected, with that word turned into a
+ * blank. Editing Quest works on a token inside a paragraph rather than on a
+ * pre-marked gap, so this gives the detectors the same shape they expect.
+ *
+ * @param {string} text
+ * @param {string} token  the word under correction
+ * @returns {string}
+ */
+export function stemAroundToken(text, token) {
+  const source = String(text ?? '');
+  const target = String(token ?? '').trim();
+  if (!source || !target) return source.trim();
+  const pattern = new RegExp(`\\b${target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
+  if (!pattern.test(source)) return source.trim();
+  return stemForBlank(source.replace(pattern, '___'), 0, []);
 }
 
 /**

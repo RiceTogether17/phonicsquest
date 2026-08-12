@@ -235,6 +235,7 @@ function _stripTags(value) {
  * @param {number} [params.attempt]       1-based attempt number
  * @param {number} [params.maxAttempts]   attempts before the answer is revealed
  * @param {string} [params.authoredExplanation] item-specific explanation (may contain light HTML)
+ * @param {string} [params.cue]           first-attempt cue override (e.g. "Listen again")
  * @param {string} [params.rule]          rule override (e.g. from grammarTips)
  * @param {string} [params.example]       worked-example override
  * @param {string[]} [params.clueWords]   words in the stem that decide the answer
@@ -255,6 +256,7 @@ export function buildTeacherFeedback({
   attempt = 1,
   maxAttempts = DEFAULT_MAX_ATTEMPTS,
   authoredExplanation = '',
+  cue = '',
   rule = '',
   example = '',
   clueWords = [],
@@ -303,7 +305,7 @@ export function buildTeacherFeedback({
         clueWords,
         skillLabel,
       })
-    : _buildCoach({ diag, misconception, clueWords, attemptNo, attemptCap });
+    : _buildCoach({ diag, misconception, cue, clueWords, attemptNo, attemptCap });
 }
 
 function _buildPraise({
@@ -375,9 +377,9 @@ function _buildPraise({
   };
 }
 
-function _buildCoach({ diag, misconception, clueWords, attemptNo, attemptCap }) {
+function _buildCoach({ diag, misconception, cue, clueWords, attemptNo, attemptCap }) {
   /** @type {FeedbackSection[]} */
-  const sections = [{ kind: 'cue', text: misconception.cue }];
+  const sections = [{ kind: 'cue', text: cue || misconception.cue }];
 
   if (diag.evidence) {
     sections.push({

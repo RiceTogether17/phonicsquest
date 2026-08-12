@@ -58,6 +58,7 @@ function stripVerdictPrefix(text) {
  * @param {string} [params.mode]          mode key for the pattern log
  * @param {string} [params.skillLabel]
  * @param {{rule?: string, example?: string}} [params.tip]  category rule card
+ * @param {string} [params.cue]           first-attempt cue override
  * @param {boolean} [params.showClueWords]
  * @returns {import('../modules/teacherFeedback.js').TeacherFeedback}
  */
@@ -71,6 +72,7 @@ export function buildMcqFeedback({
   mode = '',
   skillLabel = '',
   tip = null,
+  cue = '',
   showClueWords = true,
 } = {}) {
   const authored = stripVerdictPrefix(
@@ -90,6 +92,7 @@ export function buildMcqFeedback({
     attempt,
     maxAttempts,
     authoredExplanation: authored,
+    cue,
     rule: tip?.rule || '',
     example: tip?.example || '',
     clueWords: showClueWords ? item?.clueWords || [] : [],
@@ -111,6 +114,7 @@ export function buildMcqFeedback({
  * @param {string} [params.level]
  * @param {boolean} [params.showClueWords]
  * @param {{rule?: string, example?: string}} [params.tip]
+ * @param {string} [params.cue]               first-attempt cue override
  * @param {number} [params.maxAttempts]
  * @param {(correct: boolean, chosen: string) => void} [params.onFirstAttempt]
  *        the measurement hook — fires exactly once, on the first tap
@@ -131,6 +135,7 @@ export function attachMcqAnswerLadder({
   level = '',
   showClueWords = true,
   tip = null,
+  cue = '',
   maxAttempts = DEFAULT_MAX_ATTEMPTS,
   onFirstAttempt = null,
   onResolved = null,
@@ -175,6 +180,7 @@ export function attachMcqAnswerLadder({
       mode,
       skillLabel,
       tip,
+      cue,
       showClueWords,
     });
 
@@ -183,6 +189,9 @@ export function attachMcqAnswerLadder({
       const extra = extraHtml?.(chosen, correct);
       if (extra) html += extra;
       feedbackEl.innerHTML = html;
+      // Modes hide the feedback slot in three different ways; unhide them all.
+      feedbackEl.hidden = false;
+      if (feedbackEl.style.display === 'none') feedbackEl.style.display = '';
       if (feedback.revealAnswer || correct) {
         attachAskGiri(feedbackEl, { item, selectedChoice: chosen, level });
       }

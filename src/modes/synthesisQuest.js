@@ -14,6 +14,8 @@ import { audio } from '../modules/audio.js';
 import { getLevelInfo } from '../data/curriculum.js';
 import { gradeShortAnswer } from './scoring/shortAnswerGrader.js';
 import { hasApiKey, gradeSynthesisAnswer, explainTeachBack } from '../modules/aiService.js';
+import { diagnoseWrittenAnswer } from '../modules/answerDiagnosis.js';
+import { recordMisconception } from '../modules/teacherFeedback.js';
 import { attachAskGiriButton } from '../components/askGiriButton.js';
 
 const LEVEL_LABELS = { P4: 'Primary 4', P5: 'Primary 5', P6: 'Primary 6' };
@@ -43,7 +45,8 @@ const SQ_TEACHBACK = {
   connectorTime: {
     icon: '⏰',
     rule: '"As soon as" and "no sooner…than" show immediate sequence',
-    structure: 'As soon as [past simple], [past simple].  /  No sooner had [subject] [past participle] than [past simple].',
+    structure:
+      'As soon as [past simple], [past simple].  /  No sooner had [subject] [past participle] than [past simple].',
     tip: '"No sooner had…" uses past perfect. No comma is needed when "as soon as" falls in the middle.',
   },
   connectorCondition: {
@@ -91,7 +94,8 @@ const SQ_TEACHBACK = {
   comparison: {
     icon: '⚖️',
     rule: 'Comparison: as…as (equal), not as…as (unequal), more/less…than (different degrees)',
-    structure: '[Subject] is as [adjective] as [comparison].  /  [Subject] is more [adj] than [comparison].',
+    structure:
+      '[Subject] is as [adjective] as [comparison].  /  [Subject] is more [adj] than [comparison].',
     tip: '"The more…the more" shows proportional increase. Both halves use the comparative form.',
   },
   advancedConstruction: {
@@ -171,23 +175,25 @@ function _renderBrowser() {
     <div class="sq-browser">
       <p class="sq-browser-intro">Choose a level to begin an 8-item session. Items are selected to target your weakest patterns first.</p>
       <div class="sq-level-grid">
-        ${levels.map(lv => {
-          const items = SYNTHESIS_ITEMS.filter(i => i.level === lv);
-          const skills = [...new Set(items.map(i => i.skillKey))];
-          const masteredCount = skills.filter(s => (mastery[s] || 0) >= 0.7).length;
-          return `
+        ${levels
+          .map((lv) => {
+            const items = SYNTHESIS_ITEMS.filter((i) => i.level === lv);
+            const skills = [...new Set(items.map((i) => i.skillKey))];
+            const masteredCount = skills.filter((s) => (mastery[s] || 0) >= 0.7).length;
+            return `
           <button class="sq-level-btn" data-level="${lv}">
             <span class="sq-level-badge">${lv}</span>
             <span class="sq-level-name">${LEVEL_LABELS[lv]}</span>
             <span class="sq-level-meta">${items.length} items · ${skills.length} patterns</span>
             ${masteredCount > 0 ? `<span class="sq-level-progress">${masteredCount}/${skills.length} patterns ≥70%</span>` : ''}
           </button>`;
-        }).join('')}
+          })
+          .join('')}
       </div>
       <p class="sq-browser-tip">💡 Weak patterns are shown first. After 2 wrong attempts you see the rule and model answer.</p>
     </div>`;
 
-  _container.querySelectorAll('.sq-level-btn').forEach(btn => {
+  _container.querySelectorAll('.sq-level-btn').forEach((btn) => {
     btn.addEventListener('click', () => _startLevel(btn.dataset.level));
   });
 }
@@ -202,19 +208,22 @@ function _startLevel(level) {
 }
 
 function _buildQueue(level) {
-  const items = SYNTHESIS_ITEMS.filter(i => i.level === level);
-  const scored = items.map(item => {
+  const items = SYNTHESIS_ITEMS.filter((i) => i.level === level);
+  const scored = items.map((item) => {
     const m = questMastery.getSkillScore('synthesisQuest', item.skillKey) ?? 0.5;
     const noise = (Math.random() - 0.5) * 0.12;
-    return { item, score: (1 - m) + noise };
+    return { item, score: 1 - m + noise };
   });
   scored.sort((a, b) => b.score - a.score);
-  return scored.slice(0, SESSION_SIZE).map(s => s.item);
+  return scored.slice(0, SESSION_SIZE).map((s) => s.item);
 }
 
 // ── Question rendering ────────────────────────────────────────────────────────
 function _renderQuestion() {
-  if (_qIdx >= _queue.length) { _renderSummary(); return; }
+  if (_qIdx >= _queue.length) {
+    _renderSummary();
+    return;
+  }
   const item = _queue[_qIdx];
   _tries = 0;
   const progressPct = Math.round((_qIdx / _queue.length) * 100);
@@ -232,11 +241,15 @@ function _renderQuestion() {
       <div class="sq-task-card">
         <p class="sq-task-label">Rewrite without changing the meaning. <small class="sq-task-note">(PSLE format — fill in the blank only)</small></p>
         <p class="sq-original">${_esc(item.original)}</p>
-        ${item.stem ? `
+        ${
+          item.stem
+            ? `
           <div class="sq-psle-prompt" aria-label="Sentence to complete">
             <span class="sq-psle-prefix">${_esc(item.stem)}</span>
             <span class="sq-psle-blank" aria-hidden="true">_______________</span>
-          </div>` : ''}
+          </div>`
+            : ''
+        }
       </div>
 
       <div class="sq-input-wrap">
@@ -265,11 +278,16 @@ function _renderQuestion() {
       </div>
     </div>`;
 
-  const textarea = /** @type {HTMLTextAreaElement|null} */ (document.getElementById('sq-answer-input'));
+  const textarea = /** @type {HTMLTextAreaElement|null} */ (
+    document.getElementById('sq-answer-input')
+  );
 
   document.getElementById('sq-check')?.addEventListener('click', () => _checkAnswer(item));
-  textarea?.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); _checkAnswer(item); }
+  textarea?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      _checkAnswer(item);
+    }
   });
   document.getElementById('sq-hint-btn')?.addEventListener('click', () => _showHint(item));
   document.getElementById('sq-quit')?.addEventListener('click', () => {
@@ -308,7 +326,11 @@ function _stripStem(stem, candidate) {
   // for display. Find the corresponding slice in the original candidate
   // by matching the stem length after trimming.
   const stemLen = stem.trim().length;
-  return candidate.trim().slice(stemLen).replace(/^[\s,]+/, '').trim();
+  return candidate
+    .trim()
+    .slice(stemLen)
+    .replace(/^[\s,]+/, '')
+    .trim();
 }
 
 /**
@@ -352,9 +374,14 @@ function _isCorrect(typed, item) {
 }
 
 async function _checkAnswer(item) {
-  const textarea = /** @type {HTMLTextAreaElement|null} */ (document.getElementById('sq-answer-input'));
+  const textarea = /** @type {HTMLTextAreaElement|null} */ (
+    document.getElementById('sq-answer-input')
+  );
   const typed = textarea?.value?.trim() || '';
-  if (!typed) { _showFeedback('Type your rewritten sentence first.', 'neutral'); return; }
+  if (!typed) {
+    _showFeedback('Type your rewritten sentence first.', 'neutral');
+    return;
+  }
 
   _tries++;
   const result = _grade(typed, item);
@@ -371,7 +398,11 @@ async function _checkAnswer(item) {
 
     const alts = item.alternates || [];
     const ai = await gradeSynthesisAnswer(
-      item.original, item.stem || '', item.answer, alts, typed,
+      item.original,
+      item.stem || '',
+      item.answer,
+      alts,
+      typed,
       item.skill || item.skillKey,
     );
 
@@ -384,7 +415,9 @@ async function _checkAnswer(item) {
     if (ai?.verdict === 'PARTIAL') {
       _recordOutcome(item, false);
       const tb = SQ_TEACHBACK[item.skillKey];
-      const structureHint = tb?.structure ? `Structure: ${tb.structure}` : `Use the "${item.pattern || item.skill}" pattern.`;
+      const structureHint = tb?.structure
+        ? `Structure: ${tb.structure}`
+        : `Use the "${item.pattern || item.skill}" pattern.`;
       const aiFb = ai.feedback ? ` ${ai.feedback}` : '';
       _showFeedback(`◐ Almost!${aiFb} ${structureHint}`, 'hint');
       if (textarea) textarea.value = '';
@@ -402,12 +435,21 @@ async function _checkAnswer(item) {
   _recordOutcome(item, false);
 
   if (_tries >= MAX_TRIES) {
-    _showTeachBackOverlay(item, () => { _qIdx++; _renderQuestion(); }, typed);
+    _showTeachBackOverlay(
+      item,
+      () => {
+        _qIdx++;
+        _renderQuestion();
+      },
+      typed,
+    );
     return;
   }
 
   const tb = SQ_TEACHBACK[item.skillKey];
-  const structureHint = tb?.structure ? `Structure: ${tb.structure}` : `Use the "${item.pattern || item.skill}" pattern.`;
+  const structureHint = tb?.structure
+    ? `Structure: ${tb.structure}`
+    : `Use the "${item.pattern || item.skill}" pattern.`;
   if (partial) {
     const pct = Math.round(result.fraction * 100);
     const hits = result.trace?.hits || [];
@@ -416,31 +458,73 @@ async function _checkAnswer(item) {
     const missText = misses.length ? ` ✗ still need: ${misses.join(', ')}` : '';
     _showFeedback(`◐ Partial (${pct}% structure). ${structureHint}${hitText}${missText}`, 'hint');
   } else {
-    _showFeedback(`❌ Not quite. ${structureHint}`, 'error');
+    const diagnosis = _diagnoseRewrite(item, typed);
+    _showFeedback(`Not yet. ${diagnosis.misconception.cue} ${structureHint}`, 'error');
   }
-  if (textarea) textarea.value = '';
+  // Leave the sentence in the box. Revising your own draft is the skill this
+  // mode teaches; wiping it makes the child start from a blank page instead.
   textarea?.focus();
+  textarea?.select();
+}
+
+/**
+ * The words a rewrite must contain to count as using the pattern asked for —
+ * the given opening ("No sooner…") plus any authored required group.
+ * @param {object} item
+ * @returns {string[]}
+ */
+function _requiredWordsFor(item) {
+  const opening = String(item.stem || '').trim();
+  if (!opening) return [];
+  return opening.split(/\s+/).filter(Boolean);
+}
+
+/** Diagnose a rewrite against the model answer. */
+function _diagnoseRewrite(item, typed) {
+  return diagnoseWrittenAnswer({
+    given: typed,
+    model: item.answer,
+    stem: item.original || '',
+    requiredWords: _requiredWordsFor(item),
+    domain: 'writing',
+  });
 }
 
 function _recordOutcome(item, correct, typed) {
-  const sk = _sessionStats.bySkill[item.skillKey] || { correct: 0, total: 0, label: item.skill };
-  sk.total++;
-  _sessionStats.total++;
-  questMastery.recordAttempt({ quest: 'synthesisQuest', skill: item.skillKey, correct, level: _level });
-  if (correct) {
-    sk.correct++;
-    _sessionStats.correct++;
-    if (_tries === 1) _sessionStats.firstTry++;
-  }
-  _sessionStats.bySkill[item.skillKey] = sk;
-  questMastery.updateSkill('synthesisQuest', item.skillKey, correct);
   audio.playSfx(correct ? 'correct' : 'wrong');
+
+  // Score the first attempt only. This used to run on every try, so an item
+  // the child solved on the second attempt was recorded as one wrong AND one
+  // right — two attempts against a single question. The retry is a teaching
+  // move; the mark belongs to the first answer.
+  if (_tries === 1) {
+    const sk = _sessionStats.bySkill[item.skillKey] || { correct: 0, total: 0, label: item.skill };
+    sk.total++;
+    _sessionStats.total++;
+    questMastery.recordAttempt({
+      quest: 'synthesisQuest',
+      skill: item.skillKey,
+      correct,
+      level: _level,
+    });
+    if (correct) {
+      sk.correct++;
+      _sessionStats.correct++;
+      _sessionStats.firstTry++;
+    }
+    _sessionStats.bySkill[item.skillKey] = sk;
+    questMastery.updateSkill('synthesisQuest', item.skillKey, correct);
+  }
+
   if (correct && typed !== undefined) _showSuccessCard(item, typed);
 }
 
 function _showHint(item) {
   const tb = SQ_TEACHBACK[item.skillKey];
-  _showFeedback(`💡 ${tb?.tip || `Begin your sentence with: "${item.stem || item.pattern}"`}`, 'hint');
+  _showFeedback(
+    `💡 ${tb?.tip || `Begin your sentence with: "${item.stem || item.pattern}"`}`,
+    'hint',
+  );
 }
 
 function _showFeedback(msg, type) {
@@ -448,8 +532,7 @@ function _showFeedback(msg, type) {
   if (!fb) return;
   fb.hidden = false;
   fb.className = `sfq-feedback${
-    type === 'error' ? ' sfq-feedback--error' :
-    type === 'hint'  ? ' sfq-feedback--hint'  : ''
+    type === 'error' ? ' sfq-feedback--error' : type === 'hint' ? ' sfq-feedback--hint' : ''
   }`;
   fb.textContent = msg;
 }
@@ -470,9 +553,11 @@ function _showSuccessCard(item, typed) {
       <h4 class="sq-success-heading">${stars} Correct!</h4>
       ${item.stem ? `<p class="sq-success-stitched"><strong>Full sentence:</strong> <em>${_esc(stitched)}</em></p>` : `<p class="sq-success-your-answer"><em>${_esc(typed)}</em></p>`}
       <p class="sq-success-explain">${_esc(item.explain)}</p>
-      ${item.alternates?.length
-        ? `<p class="sq-success-alts"><strong>Also accepted:</strong> ${item.alternates.map(a => `<em>${_esc(a)}</em>`).join('; ')}</p>`
-        : ''}
+      ${
+        item.alternates?.length
+          ? `<p class="sq-success-alts"><strong>Also accepted:</strong> ${item.alternates.map((a) => `<em>${_esc(a)}</em>`).join('; ')}</p>`
+          : ''
+      }
       <button class="btn btn--primary sq-success-next">Next →</button>
     </div>`;
   game.appendChild(overlay);
@@ -485,9 +570,24 @@ function _showSuccessCard(item, typed) {
 
 // ── Teach-back overlay (after 2 wrong) ───────────────────────────────────────
 function _showTeachBackOverlay(item, onContinue, typed = '') {
-  const tb = SQ_TEACHBACK[item.skillKey] || { icon: '📘', rule: item.skill, structure: '', tip: '' };
+  const tb = SQ_TEACHBACK[item.skillKey] || {
+    icon: '📘',
+    rule: item.skill,
+    structure: '',
+    tip: '',
+  };
   const game = _container.querySelector('.sq-game');
-  if (!game) { onContinue(); return; }
+  if (!game) {
+    onContinue();
+    return;
+  }
+
+  // Name the slip and log it, so a rewrite that ignores the given opening
+  // reads as the same habit whether it happens here or in a practice paper.
+  const diagnosis = typed ? _diagnoseRewrite(item, typed) : null;
+  if (diagnosis) {
+    recordMisconception(diagnosis.id, { skill: item.skillKey, mode: 'synthesisQuest' });
+  }
 
   const overlay = document.createElement('div');
   overlay.className = 'eq-teachback-overlay';
@@ -502,23 +602,33 @@ function _showTeachBackOverlay(item, onContinue, typed = '') {
       ${tb.structure ? `<div class="eq-teachback-example"><strong>Structure:</strong> ${_esc(tb.structure)}</div>` : ''}
       ${tb.tip ? `<p class="eq-teachback-tip">💡 <strong>Remember:</strong> ${_esc(tb.tip)}</p>` : ''}
       <div class="eq-teachback-answer">✅ Model answer: <strong>${_esc(item.answer)}</strong></div>
-      ${item.alternates?.length
-        ? `<p class="eq-teachback-explanation">Also accepted: ${item.alternates.map(a => `<em>${_esc(a)}</em>`).join('; ')}</p>`
-        : ''}
+      ${
+        item.alternates?.length
+          ? `<p class="eq-teachback-explanation">Also accepted: ${item.alternates.map((a) => `<em>${_esc(a)}</em>`).join('; ')}</p>`
+          : ''
+      }
       <p class="eq-teachback-explanation">${_esc(item.explain)}</p>
+      ${
+        diagnosis
+          ? `<p class="eq-teachback-noticed">👀 Your sentence — that is ${_esc(diagnosis.misconception.childName)}.</p>
+      <p class="eq-teachback-nexttime">🧭 <strong>Next time:</strong> ${_esc(diagnosis.misconception.selfCheck)}</p>`
+          : ''
+      }
       <button class="btn btn--primary eq-teachback-continue">Got it — Continue</button>
     </div>`;
 
   game.appendChild(overlay);
 
   if (typed) {
-    attachAskGiriButton(overlay.querySelector('.eq-teachback-card'), () => explainTeachBack({
-      skillLabel: item.skill || item.skillKey,
-      exercise: `Rewrite: "${item.original}"${item.stem ? ` starting with "${item.stem}"` : ''}`,
-      studentAnswer: typed,
-      correctAnswer: item.answer,
-      level: _level,
-    }));
+    attachAskGiriButton(overlay.querySelector('.eq-teachback-card'), () =>
+      explainTeachBack({
+        skillLabel: item.skill || item.skillKey,
+        exercise: `Rewrite: "${item.original}"${item.stem ? ` starting with "${item.stem}"` : ''}`,
+        studentAnswer: typed,
+        correctAnswer: item.answer,
+        level: _level,
+      }),
+    );
   }
 
   overlay.querySelector('.eq-teachback-continue').addEventListener('click', () => {
@@ -540,25 +650,33 @@ function _renderSummary() {
   store.patch({ xp, level: levelInfo.level });
 
   const skillsSorted = Object.entries(bySkill).sort(
-    (a, b) => (a[1].correct / Math.max(a[1].total, 1)) - (b[1].correct / Math.max(b[1].total, 1)),
+    (a, b) => a[1].correct / Math.max(a[1].total, 1) - b[1].correct / Math.max(b[1].total, 1),
   );
 
-  const skillRows = skillsSorted.map(([key, s]) => {
-    const pct = Math.round((s.correct / Math.max(s.total, 1)) * 100);
-    const label = SQ_TEACHBACK[key]?.rule?.split(':')[0]?.split('—')[0]?.trim() || key;
-    const barColour = pct >= 70 ? 'var(--color-success)' : pct >= 40 ? 'var(--color-primary)' : 'var(--color-error)';
-    return `
+  const skillRows = skillsSorted
+    .map(([key, s]) => {
+      const pct = Math.round((s.correct / Math.max(s.total, 1)) * 100);
+      const label = SQ_TEACHBACK[key]?.rule?.split(':')[0]?.split('—')[0]?.trim() || key;
+      const barColour =
+        pct >= 70
+          ? 'var(--color-success)'
+          : pct >= 40
+            ? 'var(--color-primary)'
+            : 'var(--color-error)';
+      return `
       <div class="sq-skill-row">
         <span class="sq-skill-name">${_esc(label)}</span>
         <div class="sq-skill-track"><div class="sq-skill-bar" style="width:${pct}%;background:${barColour}"></div></div>
         <span class="sq-skill-pct">${pct}%</span>
       </div>`;
-  }).join('');
+    })
+    .join('');
 
   const weakSkill = skillsSorted[0];
-  const focusTip = weakSkill && weakSkill[1].correct / Math.max(weakSkill[1].total, 1) < 0.7
-    ? `Review the "${SQ_TEACHBACK[weakSkill[0]]?.rule?.split(':')[0]?.trim() || weakSkill[0]}" pattern.`
-    : 'Great work — try the next level!';
+  const focusTip =
+    weakSkill && weakSkill[1].correct / Math.max(weakSkill[1].total, 1) < 0.7
+      ? `Review the "${SQ_TEACHBACK[weakSkill[0]]?.rule?.split(':')[0]?.trim() || weakSkill[0]}" pattern.`
+      : 'Great work — try the next level!';
 
   _container.innerHTML = `
     <div class="sq-game">
@@ -585,7 +703,8 @@ function _renderSummary() {
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 function _esc(str) {
-  return String(str ?? '').replace(/[<>&"']/g, c =>
-    ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#39;' }[c]),
+  return String(str ?? '').replace(
+    /[<>&"']/g,
+    (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#39;' })[c],
   );
 }

@@ -18,6 +18,8 @@ import {
   COMPREHENSION_CLOZE_LEVELS,
   getComprehensionClozePassages,
 } from '../data/comprehensionClozePassages.js';
+import { diagnoseAnswer, stemForBlank } from '../modules/answerDiagnosis.js';
+import { recordMisconceptionsFromReview } from '../modules/teacherFeedback.js';
 
 let _container = null;
 let _onClose = () => {};
@@ -33,7 +35,7 @@ let _seenPassageIds = new Set();
 export function initComprehensionClozeQuest(container, opts = {}) {
   if (!container) return;
   _container = container;
-  _onClose = typeof opts.onClose === 'function' ? opts.onClose : (() => {});
+  _onClose = typeof opts.onClose === 'function' ? opts.onClose : () => {};
   _currentLevel = null;
   _currentPassage = null;
   _seenPassageIds = new Set();
@@ -74,7 +76,7 @@ function _renderShell() {
 function _renderLevelPicker() {
   const body = _container?.querySelector('#cc-quest-body');
   if (!body) return;
-  const tiles = COMPREHENSION_CLOZE_LEVELS.map(lv => {
+  const tiles = COMPREHENSION_CLOZE_LEVELS.map((lv) => {
     const count = getComprehensionClozePassages(lv).length;
     return `
       <button class="cc-quest__level-btn" type="button" data-level="${lv}" aria-label="Open ${lv} comprehension cloze passages">
@@ -87,7 +89,7 @@ function _renderLevelPicker() {
       <p class="cc-quest__picker-prompt">Choose a level to begin:</p>
       <div class="cc-quest__levels" role="list">${tiles}</div>
     </div>`;
-  body.querySelectorAll('[data-level]').forEach(btn => {
+  body.querySelectorAll('[data-level]').forEach((btn) => {
     btn.addEventListener('click', () => _startLevel(btn.dataset.level));
   });
 }
@@ -106,13 +108,13 @@ function _pickNextPassage() {
   if (!_currentLevel) return null;
   const passages = getComprehensionClozePassages(_currentLevel);
   if (!passages.length) return null;
-  const unseen = passages.filter(p => !_seenPassageIds.has(p.id));
+  const unseen = passages.filter((p) => !_seenPassageIds.has(p.id));
   if (unseen.length) return unseen[0];
   // All passages at this level have been seen — reset, but skip the
   // current one so we never re-render the same passage twice in a row.
   const currentId = _currentPassage?.id || '';
   _seenPassageIds = currentId ? new Set([currentId]) : new Set();
-  const fresh = passages.filter(p => p.id !== currentId);
+  const fresh = passages.filter((p) => p.id !== currentId);
   return fresh[0] || passages[0];
 }
 
@@ -124,15 +126,19 @@ function _renderPassage(passage) {
   if (!body) return;
 
   const segments = _splitText(passage.text);
-  const passageHtml = segments.map(seg => {
-    if (seg.type === 'text') return _escapeHtml(seg.value);
-    return `<span class="cc-quest__blank-wrap">` +
-      `<input class="cc-quest__blank" data-num="${seg.num}" type="text" inputmode="text" ` +
-      `autocomplete="off" autocapitalize="off" spellcheck="false" ` +
-      `aria-label="Blank ${seg.num}: type one word" placeholder="${seg.num}" />` +
-      `<span class="cc-quest__blank-mark" aria-hidden="true"></span>` +
-      `</span>`;
-  }).join('');
+  const passageHtml = segments
+    .map((seg) => {
+      if (seg.type === 'text') return _escapeHtml(seg.value);
+      return (
+        `<span class="cc-quest__blank-wrap">` +
+        `<input class="cc-quest__blank" data-num="${seg.num}" type="text" inputmode="text" ` +
+        `autocomplete="off" autocapitalize="off" spellcheck="false" ` +
+        `aria-label="Blank ${seg.num}: type one word" placeholder="${seg.num}" />` +
+        `<span class="cc-quest__blank-mark" aria-hidden="true"></span>` +
+        `</span>`
+      );
+    })
+    .join('');
 
   body.innerHTML = `
     <article class="cc-quest__passage" data-passage-id="${_escapeAttr(passage.id)}">
@@ -153,13 +159,15 @@ function _renderPassage(passage) {
       <section class="cc-quest__feedback" id="cc-quest-feedback" hidden aria-label="Per-blank explanations"></section>
     </article>`;
 
-  body.querySelector('[data-action="back-to-levels"]')?.addEventListener('click', () => _renderLevelPicker());
+  body
+    .querySelector('[data-action="back-to-levels"]')
+    ?.addEventListener('click', () => _renderLevelPicker());
   body.querySelector('[data-action="hint"]')?.addEventListener('click', () => _toggleHints());
   body.querySelector('[data-action="check"]')?.addEventListener('click', () => _checkAnswers());
   body.querySelector('[data-action="reveal"]')?.addEventListener('click', () => _revealAnswers());
   body.querySelector('[data-action="another"]')?.addEventListener('click', () => _tryAnother());
 
-  body.querySelectorAll('.cc-quest__blank').forEach(input => {
+  body.querySelectorAll('.cc-quest__blank').forEach((input) => {
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -182,9 +190,9 @@ function _toggleHints() {
   host.innerHTML = `
     <h4 class="cc-quest__feedback-title">Hints</h4>
     <ol class="cc-quest__hint-list">
-      ${_currentPassage.blanks.map(b =>
-        `<li><strong>${b.num}.</strong> ${_escapeHtml(b.hint)}</li>`
-      ).join('')}
+      ${_currentPassage.blanks
+        .map((b) => `<li><strong>${b.num}.</strong> ${_escapeHtml(b.hint)}</li>`)
+        .join('')}
     </ol>`;
   host.dataset.populated = 'true';
   host.hidden = false;
@@ -206,11 +214,35 @@ function _checkAnswers() {
         input.classList.add(isCorrect ? 'cc-quest__blank--correct' : 'cc-quest__blank--wrong');
       }
       const mark = input.parentElement?.querySelector('.cc-quest__blank-mark');
-      if (mark) mark.textContent = isCorrect ? '✓' : (userValue ? '✗' : '?');
+      if (mark) mark.textContent = isCorrect ? '✓' : userValue ? '✗' : '?';
     }
     if (isCorrect) correct++;
-    rows.push({ blank, userValue, isCorrect });
+    // Every blank the child got wrong is named, so the explanation says what
+    // they did rather than only what the answer was.
+    const diagnosis = isCorrect
+      ? null
+      : diagnoseAnswer({
+          stem: stemForBlank(
+            _currentPassage.text,
+            blank.num - 1,
+            _currentPassage.blanks.map((b) => b.answer),
+          ),
+          given: userValue,
+          correct: blank.answer,
+          skill: blank.skill,
+          domain: 'comprehension',
+        });
+    rows.push({ blank, userValue, isCorrect, diagnosis });
   }
+
+  recordMisconceptionsFromReview(
+    rows.map(({ blank, isCorrect, diagnosis }) => ({
+      misconceptionId: diagnosis?.id || null,
+      status: isCorrect ? 'Correct' : 'Try again',
+      skillTag: blank.skill,
+    })),
+    { mode: 'comprehensionCloze' },
+  );
 
   const total = _currentPassage.blanks.length;
   const score = _container?.querySelector('#cc-quest-score');
@@ -222,19 +254,33 @@ function _checkAnswers() {
     feedback.innerHTML = `
       <h4 class="cc-quest__feedback-title">Explanations</h4>
       <ol class="cc-quest__feedback-list">
-        ${rows.map(({ blank, userValue, isCorrect }) => `
+        ${rows
+          .map(
+            ({ blank, userValue, isCorrect, diagnosis }) => `
           <li class="cc-quest__feedback-item ${isCorrect ? 'cc-quest__feedback-item--correct' : 'cc-quest__feedback-item--wrong'}">
             <strong>${blank.num}.</strong>
-            ${userValue
-              ? `You typed “<em>${_escapeHtml(userValue)}</em>”.`
-              : 'You left this blank empty.'}
-            ${isCorrect
-              ? ' ✓'
-              : ` The answer is “<em>${_escapeHtml(blank.answer)}</em>”.`}
+            ${
+              userValue
+                ? `You typed “<em>${_escapeHtml(userValue)}</em>”.`
+                : 'You left this blank empty.'
+            }
+            ${isCorrect ? ' ✓' : ` The answer is “<em>${_escapeHtml(blank.answer)}</em>”.`}
+            ${
+              diagnosis && diagnosis.matched
+                ? `<span class="cc-quest__feedback-slip">That is ${_escapeHtml(diagnosis.misconception.childName)}.</span>`
+                : ''
+            }
             <span class="cc-quest__feedback-explanation">${_escapeHtml(blank.explanation)}</span>
+            ${
+              diagnosis
+                ? `<span class="cc-quest__feedback-nexttime">Next time: ${_escapeHtml(diagnosis.misconception.selfCheck)}</span>`
+                : ''
+            }
             <span class="cc-quest__feedback-skill">[${_escapeHtml(blank.skill)}]</span>
           </li>
-        `).join('')}
+        `,
+          )
+          .join('')}
       </ol>`;
   }
 
@@ -262,13 +308,17 @@ function _revealAnswers() {
     feedback.innerHTML = `
       <h4 class="cc-quest__feedback-title">Why these answers fit</h4>
       <ol class="cc-quest__feedback-list">
-        ${_currentPassage.blanks.map(b => `
+        ${_currentPassage.blanks
+          .map(
+            (b) => `
           <li class="cc-quest__feedback-item cc-quest__feedback-item--revealed">
             <strong>${b.num}.</strong> The answer is “<em>${_escapeHtml(b.answer)}</em>”.
             <span class="cc-quest__feedback-explanation">${_escapeHtml(b.explanation)}</span>
             <span class="cc-quest__feedback-skill">[${_escapeHtml(b.skill)}]</span>
           </li>
-        `).join('')}
+        `,
+          )
+          .join('')}
       </ol>`;
   }
 }
@@ -283,11 +333,25 @@ function _tryAnother() {
 // ── pure helpers ────────────────────────────────────────────────────────────
 
 function _isAnswerCorrect(userValue, blank) {
-  const v = String(userValue || '').trim().toLowerCase();
+  const v = String(userValue || '')
+    .trim()
+    .toLowerCase();
   if (!v) return false;
-  if (v === String(blank?.answer || '').trim().toLowerCase()) return true;
+  if (
+    v ===
+    String(blank?.answer || '')
+      .trim()
+      .toLowerCase()
+  )
+    return true;
   const accept = Array.isArray(blank?.accept) ? blank.accept : [];
-  return accept.some(alt => v === String(alt || '').trim().toLowerCase());
+  return accept.some(
+    (alt) =>
+      v ===
+      String(alt || '')
+        .trim()
+        .toLowerCase(),
+  );
 }
 
 function _splitText(text) {
@@ -306,9 +370,17 @@ function _splitText(text) {
 }
 
 function _escapeHtml(s) {
-  return String(s ?? '').replace(/[&<>"']/g, c => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  }[c]));
+  return String(s ?? '').replace(
+    /[&<>"']/g,
+    (c) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      })[c],
+  );
 }
 
 function _escapeAttr(s) {
