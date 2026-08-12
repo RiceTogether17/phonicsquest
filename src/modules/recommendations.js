@@ -7,7 +7,7 @@
 
 import { store } from './store.js';
 import { getActiveProfile } from './profiles.js';
-import { getReadingBand } from './readingStages.js';
+import { getReadingBand, isReadingBandMeasured } from './readingStages.js';
 import {
   SHORT_VOWEL_CANONICAL_GROUPS,
   VOWEL_LABELS,
@@ -17,16 +17,28 @@ import {
 
 export function humaniseSkill(skill) {
   const map = {
-    word_order: 'Word Order', first_word_clue: 'First Word Clue',
-    time_order_clue: 'Time Order', connector_clue: 'Connectors',
-    tense_clue: 'Verb Tense', punctuation_clue: 'Punctuation',
-    subject_action_clue: 'Subject & Action', modal_order: 'Modal Verbs',
-    clause_boundary: 'Clause Boundary', inversion_pattern: 'Inversion',
-    comparison_structure: 'Comparisons', 'connector-clue': 'Connectors',
-    'time-marker': 'Time Markers', 'contrast-clue': 'Contrast',
-    'past-tense': 'Past Tense', comparatives: 'Comparatives',
-    modals: 'Modal Verbs', Animals: 'Animals', Food: 'Food',
-    School: 'School', Home: 'Home', Nature: 'Nature',
+    word_order: 'Word Order',
+    first_word_clue: 'First Word Clue',
+    time_order_clue: 'Time Order',
+    connector_clue: 'Connectors',
+    tense_clue: 'Verb Tense',
+    punctuation_clue: 'Punctuation',
+    subject_action_clue: 'Subject & Action',
+    modal_order: 'Modal Verbs',
+    clause_boundary: 'Clause Boundary',
+    inversion_pattern: 'Inversion',
+    comparison_structure: 'Comparisons',
+    'connector-clue': 'Connectors',
+    'time-marker': 'Time Markers',
+    'contrast-clue': 'Contrast',
+    'past-tense': 'Past Tense',
+    comparatives: 'Comparatives',
+    modals: 'Modal Verbs',
+    Animals: 'Animals',
+    Food: 'Food',
+    School: 'School',
+    Home: 'Home',
+    Nature: 'Nature',
   };
   return map[skill] || String(skill || '').replace(/[-_]/g, ' ');
 }
@@ -42,7 +54,8 @@ function _groupMastery(group) {
 
 function _weakestPhonicsGroup() {
   const gm = normalizeGroupMasteryMap(store.get('groupMastery') || {});
-  let weakest = null, lowest = Infinity;
+  let weakest = null,
+    lowest = Infinity;
   for (const g of SHORT_VOWEL_CANONICAL_GROUPS) {
     const s = gm[g];
     if (typeof s === 'number' && s < lowest) {
@@ -148,7 +161,8 @@ export function getRecommendation() {
   if (readingBand === 'pre-reader') {
     return {
       title: 'Start with no-print sound play',
-      reason: 'This learner is in pre-reader stage. Build oral sounds, letter sounds, and listening first.',
+      reason:
+        'This learner is in pre-reader stage. Build oral sounds, letter sounds, and listening first.',
       ctaLabel: 'Start First Sound',
       ctaTarget: 'first-sound',
       domain: 'Foundations',
@@ -183,9 +197,24 @@ export function getDailyPlan() {
 
   if (readingBand === 'pre-reader') {
     return [
-      { step: 1, label: 'First Sound', detail: 'No-print sound awareness.', ctaTarget: 'first-sound' },
-      { step: 2, label: 'Hear & Choose', detail: 'Listening and picture matching.', ctaTarget: 'hear' },
-      { step: 3, label: 'Letter Sounds', detail: 'Build letter-sound links.', ctaTarget: 'letter-sounds' },
+      {
+        step: 1,
+        label: 'First Sound',
+        detail: 'No-print sound awareness.',
+        ctaTarget: 'first-sound',
+      },
+      {
+        step: 2,
+        label: 'Hear & Choose',
+        detail: 'Listening and picture matching.',
+        ctaTarget: 'hear',
+      },
+      {
+        step: 3,
+        label: 'Letter Sounds',
+        detail: 'Build letter-sound links.',
+        ctaTarget: 'letter-sounds',
+      },
     ];
   }
 
@@ -199,46 +228,86 @@ export function getDailyPlan() {
         ctaTarget: 'blend',
         ctaGroup: weakGroup || undefined,
       },
-      { step: 2, label: 'Sight Words', detail: 'Build automatic word recognition.', ctaTarget: 'sight-words' },
+      {
+        step: 2,
+        label: 'Sight Words',
+        detail: 'Build automatic word recognition.',
+        ctaTarget: 'sight-words',
+      },
       { step: 3, label: 'Giri Stories', detail: 'Short connected reading.', ctaTarget: 'stories' },
     ];
   }
 
   if (readingBand === 'developing-reader') {
     return [
-      { step: 1, label: 'Blend It! review', detail: 'Keep phonics automaticity strong.', ctaTarget: 'blend' },
-      { step: 2, label: 'Giri Stories', detail: 'Read sentence/paragraph-level text.', ctaTarget: 'stories' },
-      { step: 3, label: 'Sentence Forge', detail: 'Begin sentence construction readiness.', ctaTarget: 'sentence-forge' },
+      {
+        step: 1,
+        label: 'Blend It! review',
+        detail: 'Keep phonics automaticity strong.',
+        ctaTarget: 'blend',
+      },
+      {
+        step: 2,
+        label: 'Giri Stories',
+        detail: 'Read sentence/paragraph-level text.',
+        ctaTarget: 'stories',
+      },
+      {
+        step: 3,
+        label: 'Sentence Forge',
+        detail: 'Begin sentence construction readiness.',
+        ctaTarget: 'sentence-forge',
+      },
     ];
   }
 
   return [
-    { step: 1, label: 'Sentence Forge', detail: 'Sentence structure work.', ctaTarget: 'sentence-forge' },
-    { step: 2, label: 'Cloze Castle', detail: 'Grammar cloze passages.', ctaTarget: 'cloze-castle' },
+    {
+      step: 1,
+      label: 'Sentence Forge',
+      detail: 'Sentence structure work.',
+      ctaTarget: 'sentence-forge',
+    },
+    {
+      step: 2,
+      label: 'Cloze Castle',
+      detail: 'Grammar cloze passages.',
+      ctaTarget: 'cloze-castle',
+    },
     { step: 3, label: 'Word Vault', detail: 'Vocabulary in context.', ctaTarget: 'word-vault' },
   ];
 }
 
 export function getLearnerSummaryChips() {
-  const placement   = _placementProfile();
+  const placement = _placementProfile();
   const readingBand = _band();
-  const gm          = normalizeGroupMasteryMap(store.get('groupMastery') || {});
-  const chips       = [];
+  const gm = normalizeGroupMasteryMap(store.get('groupMastery') || {});
+  const chips = [];
 
-  // Outcome-focused stage label
+  // Outcome-focused stage label. These are claims about what the child CAN do,
+  // so they need a measured band behind them: a primary profile is routed to
+  // `reader` by school level alone, and "Reading fluently" is not something to
+  // tell a child before they have read anything here.
   const stageLabels = {
-    'pre-reader':        'Learning sounds & letters',
-    'emerging-decoder':  'Decoding simple words',
+    'pre-reader': 'Learning sounds & letters',
+    'emerging-decoder': 'Decoding simple words',
     'developing-reader': 'Reading short stories',
-    'reader':            'Reading fluently',
+    reader: 'Reading fluently',
   };
-  chips.push(stageLabels[readingBand] || `Stage: ${readingBand.replace(/-/g, ' ')}`);
+  const measured = isReadingBandMeasured(getActiveProfile(), placement);
+  chips.push(
+    measured
+      ? stageLabels[readingBand] || `Stage: ${readingBand.replace(/-/g, ' ')}`
+      : 'Starting out — we are still getting to know you',
+  );
 
   // Mastered phonics groups (accuracy > 75%)
-  const masteredGroups = SHORT_VOWEL_CANONICAL_GROUPS.filter(g => (gm[g] ?? 0) >= 0.75);
+  const masteredGroups = SHORT_VOWEL_CANONICAL_GROUPS.filter((g) => (gm[g] ?? 0) >= 0.75);
   if (masteredGroups.length > 0) {
-    const groupLabels = masteredGroups.map(g => VOWEL_LABELS[g] || g);
-    chips.push(`Can decode: ${groupLabels.slice(0, 2).join(', ')}${groupLabels.length > 2 ? '…' : ''}`);
+    const groupLabels = masteredGroups.map((g) => VOWEL_LABELS[g] || g);
+    chips.push(
+      `Can decode: ${groupLabels.slice(0, 2).join(', ')}${groupLabels.length > 2 ? '…' : ''}`,
+    );
   }
 
   // Story/sentence readiness

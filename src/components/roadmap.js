@@ -15,12 +15,15 @@
 
 import { store } from '../modules/store.js';
 import { getActiveProfile } from '../modules/profiles.js';
-import { getReadingBand } from '../modules/readingStages.js';
+import { isReadingBandMeasured, getReadingBand } from '../modules/readingStages.js';
 import { buildJourneyBarHtml, JOURNEY_STAGES, STAGE_META } from './journeyBar.js';
 import { buildPhaseCardsHtml, buildDomainCardsHtml } from './curriculumMap.js';
 import {
-  buildProgressionSnapshot, getUnlockedStages, getRecommendedStage,
-  explainLockReason, getTrickyWordsForCurrentStage,
+  buildProgressionSnapshot,
+  getUnlockedStages,
+  getRecommendedStage,
+  explainLockReason,
+  getTrickyWordsForCurrentStage,
 } from '../modules/progression.js';
 import { getQuestUnlockStatus } from '../modules/questUnlocks.js';
 import { getLearnerSummaryChips } from '../modules/recommendations.js';
@@ -29,10 +32,14 @@ import { escapeHtml } from '../utils/escapeHtml.js';
 
 /** What each reading band means, in parent language. */
 const BAND_MEANING = {
-  'pre-reader': 'is learning what sounds the letters make — the foundation everything else builds on.',
-  'emerging-decoder': 'can sound out simple words like "cat" and "ship", and is building speed and confidence.',
-  'developing-reader': 'reads short stories and is bridging into sentence-level grammar and vocabulary.',
-  reader: 'reads fluently and is working on primary school English: grammar, vocabulary, comprehension and writing.',
+  'pre-reader':
+    'is learning what sounds the letters make — the foundation everything else builds on.',
+  'emerging-decoder':
+    'can sound out simple words like "cat" and "ship", and is building speed and confidence.',
+  'developing-reader':
+    'reads short stories and is bridging into sentence-level grammar and vocabulary.',
+  reader:
+    'reads fluently and is working on primary school English: grammar, vocabulary, comprehension and writing.',
 };
 
 const QUEST_LABELS = {
@@ -60,7 +67,11 @@ function _lockedStageRows(snapshot) {
 /** Locked primary quests with their progress toward unlock. */
 function _lockedQuestRows(profile) {
   const status = getQuestUnlockStatus(
-    store.get('wordStats') || {}, profile, undefined, store.get('placementProfile') || null);
+    store.get('wordStats') || {},
+    profile,
+    undefined,
+    store.get('placementProfile') || null,
+  );
   return Object.entries(QUEST_LABELS)
     .filter(([key]) => status[key] && !status[key].unlocked)
     .map(([key, label]) => ({
@@ -81,8 +92,10 @@ export function renderRoadmap(container, { onClose, onOpenDashboard, onGoToday }
   const isPrimary = profile?.schoolLevel === 'primary' || readingBand === 'reader';
 
   const snapshot = buildProgressionSnapshot();
-  const journeyBarHtml = buildJourneyBarHtml(readingBand, snapshot.groupMastery || {});
-  const bandLabel = JOURNEY_STAGES.find(s => s.key === readingBand)?.label || 'Pre-reader';
+  const journeyBarHtml = buildJourneyBarHtml(readingBand, snapshot.groupMastery || {}, {
+    measured: isReadingBandMeasured(profile, placement),
+  });
+  const bandLabel = JOURNEY_STAGES.find((s) => s.key === readingBand)?.label || 'Pre-reader';
   const bandIcon = STAGE_META[readingBand]?.icon || '🌱';
 
   const lockedStages = isPrimary ? [] : _lockedStageRows(snapshot);
@@ -91,38 +104,61 @@ export function renderRoadmap(container, { onClose, onOpenDashboard, onGoToday }
   const trickyWords = (getTrickyWordsForCurrentStage(snapshot) || []).slice(0, 8);
   const chips = getLearnerSummaryChips();
 
-  const lockedHtml = (lockedStages.length || lockedQuests.length) ? `
+  const lockedHtml =
+    lockedStages.length || lockedQuests.length
+      ? `
     <div class="roadmap-section">
       <h3 class="cm-section-title"><span class="cm-section-icon">🔓</span> What's locked, and why</h3>
       <p class="cm-section-desc">Nothing is locked forever — each gate opens automatically as ${escapeHtml(name)} practises. Here's exactly what each one is waiting for:</p>
-      ${lockedStages.map(({ stage, reason }) => `
+      ${lockedStages
+        .map(
+          ({ stage, reason }) => `
         <div class="roadmap-lock-card">
           <p class="roadmap-lock-title">${stage.icon} <strong>${escapeHtml(stage.name)}</strong> unlocks when:</p>
           <p class="roadmap-lock-reason">${escapeHtml(reason)}</p>
-        </div>`).join('')}
-      ${lockedQuests.map(q => `
+        </div>`,
+        )
+        .join('')}
+      ${lockedQuests
+        .map(
+          (q) => `
         <div class="roadmap-lock-card">
           <p class="roadmap-lock-title"><strong>${q.label}</strong> opens after <strong>${q.required}</strong> mastered words</p>
           <p class="roadmap-lock-reason">${q.current} mastered so far — every word counts.</p>
-        </div>`).join('')}
-    </div>` : '';
+        </div>`,
+        )
+        .join('')}
+    </div>`
+      : '';
 
   const helpHtml = `
     <div class="roadmap-section">
       <h3 class="cm-section-title"><span class="cm-section-icon">🤝</span> How to help this week</h3>
-      ${recommended && !isPrimary ? `
-        <p class="cm-section-desc">The app recommends focusing on <strong>${recommended.icon} ${escapeHtml(recommended.name)}</strong> — ${escapeHtml(recommended.description || '')}</p>` : `
-        <p class="cm-section-desc">Today's guided lesson always picks the most useful next step automatically — one sitting a day goes a long way.</p>`}
-      ${trickyWords.length ? `
+      ${
+        recommended && !isPrimary
+          ? `
+        <p class="cm-section-desc">The app recommends focusing on <strong>${recommended.icon} ${escapeHtml(recommended.name)}</strong> — ${escapeHtml(recommended.description || '')}</p>`
+          : `
+        <p class="cm-section-desc">Today's guided lesson always picks the most useful next step automatically — one sitting a day goes a long way.</p>`
+      }
+      ${
+        trickyWords.length
+          ? `
         <p class="roadmap-tricky-label">Tricky words to practise out loud together:</p>
         <div class="progress-chips" aria-label="Tricky words to practise">
-          ${trickyWords.map(t => `<span class="progress-chip">${escapeHtml(t.word)}</span>`).join('')}
-        </div>` : ''}
-      ${chips.length ? `
+          ${trickyWords.map((t) => `<span class="progress-chip">${escapeHtml(t.word)}</span>`).join('')}
+        </div>`
+          : ''
+      }
+      ${
+        chips.length
+          ? `
         <p class="roadmap-tricky-label">Progress snapshot:</p>
         <div class="progress-chips" aria-label="Progress snapshot">
-          ${chips.map(c => `<span class="progress-chip">${escapeHtml(c)}</span>`).join('')}
-        </div>` : ''}
+          ${chips.map((c) => `<span class="progress-chip">${escapeHtml(c)}</span>`).join('')}
+        </div>`
+          : ''
+      }
       <button class="btn btn--primary" id="roadmap-go-today">🎯 Start today's lesson together →</button>
     </div>`;
 
@@ -170,5 +206,7 @@ export function renderRoadmap(container, { onClose, onOpenDashboard, onGoToday }
     </div>`;
 
   container.querySelector('#roadmap-go-today')?.addEventListener('click', () => onGoToday?.());
-  container.querySelector('#roadmap-open-dashboard')?.addEventListener('click', () => onOpenDashboard?.());
+  container
+    .querySelector('#roadmap-open-dashboard')
+    ?.addEventListener('click', () => onOpenDashboard?.());
 }

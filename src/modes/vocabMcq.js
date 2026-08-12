@@ -1,3 +1,4 @@
+import { MCQ_ROUND_SIZE } from '../constants.js';
 import { questMastery } from '../modules/questMastery.js';
 import { getDefaultPracticeLevel, isRecommendedLevel } from '../modules/practiceDefaults.js';
 import { gamification } from '../modules/gamification.js';
@@ -245,11 +246,11 @@ function _startScope({ level = null, category = null, label = '', difficulty = _
     }),
   );
 
+  // Paper Mode sets its own length; everything else gets a finishable round
+  // rather than the whole bank. See MCQ_ROUND_SIZE in constants.js.
   const limit = store.get('paperItemLimit');
-  if (limit) {
-    store.set('paperItemLimit', null);
-    _items = _items.slice(0, limit);
-  }
+  store.set('paperItemLimit', null);
+  _items = _items.slice(0, limit || MCQ_ROUND_SIZE);
 
   _idx = 0;
   _correct = 0;

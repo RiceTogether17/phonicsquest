@@ -130,7 +130,11 @@ import { settingsController } from './modules/settingsController.js';
 import { getQuestUnlockStatus } from './modules/questUnlocks.js';
 import { showPlacementTest } from './modules/placementTest.js';
 const quickCheckMod = lazyModule(() => import('./modules/primaryQuickCheck.js'));
-import { getReadingBand, getHomeLayoutForReadingBand } from './modules/readingStages.js';
+import {
+  getReadingBand,
+  getHomeLayoutForReadingBand,
+  isReadingBandMeasured,
+} from './modules/readingStages.js';
 import {
   isTeacherUnlockActive,
   tryTeacherUnlock,
@@ -1631,7 +1635,9 @@ class App {
     // imported profile file, and this string is spliced into innerHTML below.
     const profileName = profile?.name ? `${escapeHtml(profile.name)}'s ` : '';
 
-    const journeyBarHtml = buildJourneyBarHtml(readingBand, store.get('groupMastery') || {});
+    const journeyBarHtml = buildJourneyBarHtml(readingBand, store.get('groupMastery') || {}, {
+      measured: isReadingBandMeasured(profile, placement),
+    });
 
     const chipsHtml = chips.length
       ? `<div class="progress-chips" aria-label="Progress snapshot">
@@ -1768,6 +1774,7 @@ class App {
       // early-reading host so they aren't shown two overlapping cards.
       if (todaysPlanHost) todaysPlanHost.style.display = 'none';
     } else if (!layout.questsMilestone) {
+      this._restoreEarlyReadingSection(coreSection);
       coreSection?.classList.remove('home-section--hidden', 'home-section--collapsed');
       questsSection?.classList.remove('home-section--milestone', 'home-section--primary-priority');
       if (questsHeading) questsHeading.textContent = 'Bridge Quests';
@@ -1780,6 +1787,7 @@ class App {
       if (startHere) startHere.style.display = 'none';
       this._renderTodaysLesson(todaysPlanHost);
     } else {
+      this._restoreEarlyReadingSection(coreSection);
       coreSection?.classList.remove('home-section--hidden', 'home-section--collapsed');
       questsSection?.classList.add('home-section--milestone');
       questsSection?.classList.remove('home-section--primary-priority');
@@ -2051,15 +2059,63 @@ class App {
     });
   }
 
+  /**
+   * Turn the Early Reading Quest into the "also available" strip a primary
+   * profile should see: one line of explanation and a closed disclosure.
+   *
+   * `home-section--collapsed` alone never collapsed anything — it set
+   * `opacity: .85` and a dashed border, leaving all six journey steps and
+   * every phonemic-awareness tile expanded above the Primary English hub.
+   * A P4 child opening Learn met "First Sound — what starts it?" before
+   * anything from their own syllabus.
+   *
+   * The disclosure is closed by default and remembers nothing: a primary
+   * child who wants a phonics warm-up opens it, and it starts closed again
+   * next time, because the default for this profile is Primary English.
+   */
   _renderPrimaryEarlyReadingNote(section) {
     if (!section) return;
-    if (section.querySelector('.early-reading-note')) return;
+    if (section.querySelector('.early-reading-toggle')) return;
+
+    const body = document.createElement('div');
+    body.className = 'early-reading-body';
+    body.id = 'early-reading-body';
+    body.hidden = true;
+    // Everything already in the section becomes the collapsible body.
+    while (section.firstChild) body.appendChild(section.firstChild);
+
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'early-reading-toggle';
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-controls', body.id);
+    const label = (open) => `🌱 Phonics warm-ups (Early Reading Quest) ${open ? '▴' : '▾'}`;
+    toggle.textContent = label(false);
+
     const note = document.createElement('p');
     note.className = 'early-reading-note';
     note.setAttribute('role', 'note');
     note.textContent =
-      'Phonics and blending are still available below — open them whenever you want a warm-up before Primary English practice.';
-    section.prepend(note);
+      'Phonics and blending are still here whenever you want a warm-up before Primary English practice.';
+
+    toggle.addEventListener('click', () => {
+      const opening = body.hidden;
+      body.hidden = !opening;
+      toggle.setAttribute('aria-expanded', String(opening));
+      toggle.textContent = label(opening);
+    });
+
+    section.append(toggle, note, body);
+  }
+
+  /** Undo _renderPrimaryEarlyReadingNote when a profile is not on the primary pathway. */
+  _restoreEarlyReadingSection(section) {
+    const body = section?.querySelector('.early-reading-body');
+    if (!body) return;
+    section.querySelector('.early-reading-toggle')?.remove();
+    section.querySelector('.early-reading-note')?.remove();
+    while (body.firstChild) section.appendChild(body.firstChild);
+    body.remove();
   }
 
   // ── Modals ──

@@ -14600,11 +14600,41 @@ textarea:hover {
 }
 
 /* ── Primary English: Start Here Today + section visibility ─────────────── */
+/* The Learn panel must be a flex column: `.home-section--primary-priority`
+   below relies on `order`, which browsers ignore on children of a block
+   container. Without this the reorder silently did nothing and a P4 profile
+   met 1,886 px of K1 phonics before its own syllabus. */
+.home-tabpanel {
+  display: flex;
+  flex-direction: column;
+}
+/* `[hidden]` keeps winning on specificity (0,2,0 vs 0,1,0). */
+
 .home-section--collapsed {
-  opacity: 0.85;
   margin-top: var(--space-4, 16px);
   border-top: 1px dashed color-mix(in srgb, var(--border) 80%, transparent);
   padding-top: var(--space-3, 12px);
+}
+/* The "also available" strip: a closed disclosure, not a dimmed wall of
+   tiles. Built by app.js#_renderPrimaryEarlyReadingNote. */
+.early-reading-toggle {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface);
+  font-size: var(--font-size-sm, 0.9rem);
+  font-weight: 700;
+  color: var(--text-main, #222);
+  cursor: pointer;
+}
+.early-reading-toggle:hover {
+  border-color: var(--color-primary);
+}
+.early-reading-body[hidden] {
+  display: none;
 }
 .home-section--collapsed .mode-grid {
   gap: 6px;

@@ -17,6 +17,7 @@ import {
   renderMcqDifficultyToggle,
 } from './mcqDifficulty.js';
 import { getGrammarTip } from '../data/grammarTips.js';
+import { MCQ_ROUND_SIZE } from '../constants.js';
 
 let _container = null;
 let _onGoHome = null;
@@ -233,11 +234,11 @@ function _startScope({ level = null, category = null, label = '', difficulty = _
     }),
   );
 
+  // Paper Mode sets its own length; everything else gets a finishable round
+  // rather than the whole bank. See MCQ_ROUND_SIZE in constants.js.
   const limit = store.get('paperItemLimit');
-  if (limit) {
-    store.set('paperItemLimit', null);
-    _items = _items.slice(0, limit);
-  }
+  store.set('paperItemLimit', null);
+  _items = _items.slice(0, limit || MCQ_ROUND_SIZE);
 
   _idx = 0;
   _correct = 0;
