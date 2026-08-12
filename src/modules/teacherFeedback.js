@@ -138,6 +138,26 @@ export function creditMisconception(id) {
 }
 
 /**
+ * Log every named misconception in a batch-marked review.
+ *
+ * The cloze modes mark a whole passage at once rather than one answer at a
+ * time, so they cannot go through `buildTeacherFeedback`'s per-attempt path.
+ * This keeps their slips in the same cross-mode pattern log — a child who
+ * mixes up a/an in Cloze Castle and again in Grammar MCQ should be told it is
+ * the same habit, not two unrelated mistakes.
+ *
+ * @param {Array<{misconceptionId?: string|null, status?: string, skillTag?: string}>} rows
+ * @param {{ mode?: string }} [options]
+ */
+export function recordMisconceptionsFromReview(rows = [], { mode = '' } = {}) {
+  for (const row of rows) {
+    if (!row?.misconceptionId) continue;
+    if (row.status === 'Correct') continue;
+    recordMisconception(row.misconceptionId, { skill: row.skillTag || '', mode });
+  }
+}
+
+/**
  * The live pattern for a misconception, or null when it has not recurred
  * often enough (or has gone stale) to be worth naming.
  * @param {string} id

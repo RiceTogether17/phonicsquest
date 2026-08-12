@@ -549,6 +549,33 @@ export function gapContext(stem) {
 }
 
 /**
+ * The sentence around one blank of a multi-blank cloze passage.
+ *
+ * The detectors read the words on either side of the gap, so they need the
+ * blank they are diagnosing to be the only `___` left standing. Sibling blanks
+ * are filled with their own answers — "The boy of the apples ___ heavy" would
+ * otherwise hide the subject behind another gap.
+ *
+ * @param {string} text          passage text with `___` per blank
+ * @param {number} blankIndex    0-based blank to keep open
+ * @param {string[]} [answers]   answers for the other blanks
+ * @returns {string}
+ */
+export function stemForBlank(text, blankIndex, answers = []) {
+  const source = String(text ?? '');
+  if (!source) return '';
+  let seen = -1;
+  const filled = source.replace(/_{2,}/g, () => {
+    seen += 1;
+    if (seen === blankIndex) return '___';
+    return String(answers[seen] ?? '…');
+  });
+  // Keep only the sentence the blank sits in; a whole passage buries the clue.
+  const sentences = filled.split(/(?<=[.!?])\s+/);
+  return (sentences.find((s) => s.includes('___')) || filled).trim();
+}
+
+/**
  * First time marker present in the stem, with the tense it demands.
  * @param {string} stem
  * @returns {{ phrase: string, tense: string }|null}

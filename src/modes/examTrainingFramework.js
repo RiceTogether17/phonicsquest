@@ -1,13 +1,35 @@
+import { diagnoseAnswer } from '../modules/answerDiagnosis.js';
+
 export const TRAINING_STAGES = Object.freeze(['LEARN', 'GUIDED', 'EXAM', 'REVIEW', 'MASTERY']);
 
 export const CLOZE_SKILL_TAGS = Object.freeze([
-  'gist', 'grammar', 'tense', 'subjectVerbAgreement', 'pronounReference', 'connectorLogic',
-  'contrast', 'causeEffect', 'vocabularyInContext', 'collocation', 'phrasalVerb', 'wordForm', 'spelling', 'sentenceLogic',
+  'gist',
+  'grammar',
+  'tense',
+  'subjectVerbAgreement',
+  'pronounReference',
+  'connectorLogic',
+  'contrast',
+  'causeEffect',
+  'vocabularyInContext',
+  'collocation',
+  'phrasalVerb',
+  'wordForm',
+  'spelling',
+  'sentenceLogic',
 ]);
 
 export const CLUE_TYPES = Object.freeze([
-  'timeClue', 'grammarClue', 'meaningClue', 'contrastClue', 'causeEffectClue',
-  'repeatedIdeaClue', 'wordFamilyClue', 'collocationClue', 'pronounReferenceClue', 'connectorClue',
+  'timeClue',
+  'grammarClue',
+  'meaningClue',
+  'contrastClue',
+  'causeEffectClue',
+  'repeatedIdeaClue',
+  'wordFamilyClue',
+  'collocationClue',
+  'pronounReferenceClue',
+  'connectorClue',
 ]);
 
 const SKILL_LABELS = {
@@ -28,9 +50,16 @@ const SKILL_LABELS = {
 };
 
 const CLUE_LABELS = {
-  timeClue: 'Time clue', grammarClue: 'Grammar clue', meaningClue: 'Meaning clue', contrastClue: 'Contrast clue',
-  causeEffectClue: 'Cause-effect clue', repeatedIdeaClue: 'Repeated idea clue', wordFamilyClue: 'Word family clue',
-  collocationClue: 'Collocation clue', pronounReferenceClue: 'Pronoun reference clue', connectorClue: 'Connector clue',
+  timeClue: 'Time clue',
+  grammarClue: 'Grammar clue',
+  meaningClue: 'Meaning clue',
+  contrastClue: 'Contrast clue',
+  causeEffectClue: 'Cause-effect clue',
+  repeatedIdeaClue: 'Repeated idea clue',
+  wordFamilyClue: 'Word family clue',
+  collocationClue: 'Collocation clue',
+  pronounReferenceClue: 'Pronoun reference clue',
+  connectorClue: 'Connector clue',
 };
 
 const REVIEW_PROMPTS = {
@@ -60,9 +89,11 @@ export function getReviewPromptForSkill(tag) {
 
 export function getMasteryRecommendation({ weakSkills = [], hintsUsed = 0, accuracy = 0 } = {}) {
   const firstWeak = normaliseSkillTag(weakSkills[0]);
-  if (accuracy < 60) return `Retry ${getSkillLabel(firstWeak).toLowerCase()} with one clue at a time.`;
+  if (accuracy < 60)
+    return `Retry ${getSkillLabel(firstWeak).toLowerCase()} with one clue at a time.`;
   if (hintsUsed > 3) return `Do one guided round on ${getSkillLabel(firstWeak).toLowerCase()}.`;
-  if (weakSkills.length > 0) return `Practise ${getSkillLabel(firstWeak).toLowerCase()} in exam mode next.`;
+  if (weakSkills.length > 0)
+    return `Practise ${getSkillLabel(firstWeak).toLowerCase()} in exam mode next.`;
   return 'Great job. Try a harder level for mastery.';
 }
 
@@ -82,7 +113,9 @@ export function getBlankSkillMeta(passage = {}, blankIndex = 0) {
   const rawArray = Array.isArray(passage.blankSkills) ? passage.blankSkills : [];
   let raw = rawArray[blankIndex];
   if (!raw && rawArray.length) {
-    raw = rawArray.find((entry) => entry && typeof entry === 'object' && entry.blankIndex === blankIndex);
+    raw = rawArray.find(
+      (entry) => entry && typeof entry === 'object' && entry.blankIndex === blankIndex,
+    );
   }
 
   let meta = {};
@@ -119,31 +152,66 @@ export function getBlankSkillMeta(passage = {}, blankIndex = 0) {
 /**
  * Build a child-friendly explanation for a wrong answer.
  *
- * Returns four short fields the review UI can stack:
+ * Returns five short fields the review UI can stack:
  *   - whyWrong:   why the chosen option does not fit
  *   - whyRight:   why the correct option fits
  *   - missedClue: which words in the sentence were the clue
  *   - examTip:    one-line study tip
+ *   - misconceptionId: the named slip, for the cross-mode pattern log
  *
- * Falls back to generic skill-level prompts when no rich metadata exists, so
- * older passages still render a useful review.
+ * Authored `wrongOptionTraps` still win — a human sentence about *this*
+ * distractor beats a detected category. Where none exists, the generic
+ * "…does not match the clue in this sentence" is replaced by the named
+ * misconception from `answerDiagnosis`, so the review says what the child
+ * actually did rather than only that it was wrong.
+ *
+ * @param {object} params
+ * @param {object} [params.meta]    per-blank metadata
+ * @param {string} [params.chosen]
+ * @param {string} [params.correct]
+ * @param {string} [params.stem]    the sentence around this blank, `___` for the gap
+ * @param {string} [params.domain]  'grammar' | 'vocab'
  */
-export function buildWhyWrongExplanation({ meta = {}, chosen = '', correct = '' } = {}) {
+export function buildWhyWrongExplanation({
+  meta = {},
+  chosen = '',
+  correct = '',
+  stem = '',
+  domain = 'grammar',
+} = {}) {
   const traps = meta.wrongOptionTraps || {};
   const trap = chosen && Object.prototype.hasOwnProperty.call(traps, chosen) ? traps[chosen] : '';
 
-  const whyWrong = trap
-    || (chosen
+  const diagnosis = diagnoseAnswer({
+    stem,
+    given: chosen,
+    correct,
+    skill: meta.primarySkill || '',
+    domain,
+  });
+  const named = diagnosis.matched ? diagnosis.misconception : null;
+
+  const whyWrong =
+    trap ||
+    (named && chosen ? `"${chosen}" — that is ${named.childName}. ${named.rule}` : '') ||
+    (chosen
       ? `"${chosen}" does not match the clue in this sentence.`
       : 'No answer was chosen for this blank.');
 
-  const whyRight = meta.correctReason
-    || (correct ? `"${correct}" fits the meaning the sentence builds up to.` : 'Re-read the sentence to find the best fit.');
+  const whyRight =
+    meta.correctReason ||
+    (correct
+      ? `"${correct}" fits the meaning the sentence builds up to.`
+      : 'Re-read the sentence to find the best fit.');
 
-  const missedClue = meta.expectedThinking
-    || (meta.clueType ? `Look for the ${getClueTypeLabel(meta.clueType).toLowerCase()} near the blank.` : 'Check the words just before and after the blank.');
+  const missedClue =
+    meta.expectedThinking ||
+    (diagnosis.evidence ? `The clue was "${diagnosis.evidence}".` : '') ||
+    (meta.clueType
+      ? `Look for the ${getClueTypeLabel(meta.clueType).toLowerCase()} near the blank.`
+      : 'Check the words just before and after the blank.');
 
-  const examTip = meta.examTip || getReviewPromptForSkill(meta.primarySkill);
+  const examTip = meta.examTip || named?.selfCheck || getReviewPromptForSkill(meta.primarySkill);
 
-  return { whyWrong, whyRight, missedClue, examTip };
+  return { whyWrong, whyRight, missedClue, examTip, misconceptionId: diagnosis.id };
 }
