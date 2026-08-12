@@ -2804,6 +2804,53 @@ body:has(#screen-stories.screen.active) .mascot-float {
   gap: var(--space-2);
 }
 
+/* Parent dashboard disclosure groups.
+   The dashboard used to stack 24 sections into 13,298 px — 15.8 phone
+   screens, nearly all of it "No data yet" on a fresh profile. The snapshot
+   at the top answers the two questions a parent actually has; everything
+   else lives in these, closed. */
+.dash-group {
+  margin-top: var(--space-4, 16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface);
+}
+.dash-group[hidden] {
+  display: none;
+}
+.dash-group__summary {
+  padding: var(--space-3, 12px);
+  font-weight: 800;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+}
+.dash-group__summary::-webkit-details-marker {
+  display: none;
+}
+.dash-group__summary::before {
+  content: '▸';
+  transition: transform 0.15s ease;
+}
+.dash-group[open] > .dash-group__summary::before {
+  transform: rotate(90deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .dash-group__summary::before {
+    transition: none;
+  }
+}
+.dash-group__body {
+  padding: 0 var(--space-3, 12px) var(--space-3, 12px);
+}
+/* First heading inside an open group does not need its stacked top margin. */
+.dash-group__body > div:first-child .dash-section-title,
+.dash-group__body > .dash-section-title:first-child {
+  margin-top: 0;
+}
+
 .mastery-bar-list {
   display: flex;
   flex-direction: column;
@@ -11673,6 +11720,51 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .home-parents-grid {
   display: grid;
   gap: var(--space-3);
+}
+
+/* This-week snapshot at the top of the Grown-ups tab (app.js
+   #_renderParentSnapshot). The tab was five links and no information. */
+.parent-snapshot {
+  margin: var(--space-2, 8px) 0 var(--space-3, 12px);
+}
+.parent-snapshot__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2, 8px);
+}
+.parent-snapshot__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-2, 8px) var(--space-1, 4px);
+  border-radius: var(--radius-md, 8px);
+  background: color-mix(in srgb, var(--color-primary) 7%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--color-primary) 16%, var(--border));
+  text-align: center;
+}
+.parent-snapshot__value {
+  font-size: var(--font-size-lg, 1.15rem);
+  font-weight: 900;
+  color: var(--color-primary-dark, var(--color-primary));
+}
+.parent-snapshot__label {
+  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--text-muted, #555);
+  line-height: 1.2;
+}
+.parent-snapshot__habit {
+  margin: var(--space-2, 8px) 0 0;
+  padding: var(--space-2, 8px);
+  border-left: 3px solid var(--color-warning, #f59e0b);
+  border-radius: var(--radius-sm, 6px);
+  background: color-mix(in srgb, var(--color-warning, #f59e0b) 8%, var(--surface));
+  font-size: var(--font-size-sm, 0.9rem);
+}
+.parent-snapshot__empty {
+  margin: 0;
+  font-size: var(--font-size-sm, 0.9rem);
+  color: var(--text-muted, #555);
 }
 .home-parents-btn {
   display: flex;

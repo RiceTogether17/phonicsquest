@@ -55,120 +55,118 @@ export function renderDashboard(container, opts = {}) {
   const stats = progress.getOverallStats();
 
   container.innerHTML = `
-    <!-- A0: Parent-friendly Report Card (top of the dashboard for non-technical viewing) -->
+    <!-- ── At a glance ────────────────────────────────────────────────────
+         What a parent came for: is this working, and what do we do tonight.
+         Everything else is behind a disclosure below. This block used to be
+         the first of 24 stacked sections in a 13,298 px page — 15.8 phone
+         screens, every one of them reading "No data yet" on a new profile. -->
     <div id="dash-parent-report-card"></div>
-
-    <!-- B0: Parent Coaching Card -->
-    <div id="dash-coaching-card"></div>
-
-    <!-- B1: Learner Summary -->
-    <div id="dash-learner-summary"></div>
-
-    <!-- B4: Recommended next actions -->
     <div id="dash-actions-section"></div>
-
-    <!-- Stuck words alert -->
     <div id="dash-stuck-words"></div>
 
-    <!-- B2: Literacy Domains -->
-    <div id="dash-domains-section"></div>
-
-    <!-- B3: Clue vs Answer Accuracy -->
-    <div id="dash-clue-section"></div>
-
-    <!-- B5: Recent Pattern Insights -->
-    <div id="dash-patterns-section"></div>
-
-    <!-- B6: Tutor activity — guided lessons, read-aloud, AI usage -->
-    <div id="dash-tutor-activity"></div>
-
-    <div id="dash-reporting-section"></div>
-    <div id="dash-moe-section"></div>
-
-    <!-- Summary Stats (existing) -->
-    <h3 class="dash-section-title" style="margin-top:24px">Progress Summary</h3>
-    <div class="dash-stats-grid">
-      <div class="dash-stat-card">
-        <span class="dash-stat-value">${stats.wordsAttempted}</span>
-        <span class="dash-stat-label">Words practiced</span>
+    <details class="dash-group" id="dash-group-week">
+      <summary class="dash-group__summary">How this week went</summary>
+      <div class="dash-group__body">
+        <div id="dash-coaching-card"></div>
+        <div id="dash-learner-summary"></div>
+        <div id="dash-patterns-section"></div>
+        <div id="dash-tutor-activity"></div>
       </div>
-      <div class="dash-stat-card">
-        <span class="dash-stat-value">${stats.wordsMastered}</span>
-        <span class="dash-stat-label">Words mastered</span>
+    </details>
+
+    <details class="dash-group" id="dash-group-skills">
+      <summary class="dash-group__summary">Skills in detail</summary>
+      <div class="dash-group__body">
+        <div id="dash-domains-section"></div>
+        <div id="dash-clue-section"></div>
+        <div id="dash-reporting-section"></div>
+        <div id="dash-moe-section"></div>
+        <div id="dash-group-mastery">
+          <h3 class="dash-section-title" style="margin-top:24px">Sound groups mastered</h3>
+          <div class="dash-chart-wrap">
+            <canvas id="chart-mastery" aria-label="Sound group mastery chart"></canvas>
+          </div>
+          <div class="mastery-bar-list" id="mastery-bars"></div>
+        </div>
+        <div id="dash-curriculum-map" style="margin-top:24px"></div>
+        <div id="dash-learning-path">
+          <h3 class="dash-section-title" style="margin-top:24px">Where they are in the path</h3>
+          <div id="learning-path"></div>
+        </div>
       </div>
-      <div class="dash-stat-card">
-        <span class="dash-stat-value">${Math.round(stats.overallAccuracy * 100)}%</span>
-        <span class="dash-stat-label">Accuracy</span>
+    </details>
+
+    <details class="dash-group" id="dash-group-records">
+      <summary class="dash-group__summary">Records and tools</summary>
+      <div class="dash-group__body">
+        <h3 class="dash-section-title" style="margin-top:24px">Totals so far</h3>
+        <div class="dash-stats-grid">
+          <div class="dash-stat-card">
+            <span class="dash-stat-value">${stats.wordsAttempted}</span>
+            <span class="dash-stat-label">Words practiced</span>
+          </div>
+          <div class="dash-stat-card">
+            <span class="dash-stat-value">${stats.wordsMastered}</span>
+            <span class="dash-stat-label">Words mastered</span>
+          </div>
+          <div class="dash-stat-card">
+            <span class="dash-stat-value">${Math.round(stats.overallAccuracy * 100)}%</span>
+            <span class="dash-stat-label">Accuracy</span>
+          </div>
+          <div class="dash-stat-card">
+            <span class="dash-stat-value">${stats.bestStreak}</span>
+            <span class="dash-stat-label">Best streak</span>
+          </div>
+        </div>
+
+        <h3 class="dash-section-title" style="margin-top:24px">Recent words practised</h3>
+        <div style="overflow-x:auto;">
+          <table class="word-history-table">
+            <thead><tr><th>Word</th><th>Mode</th><th>Result</th><th>When</th></tr></thead>
+            <tbody id="word-history-body"></tbody>
+          </table>
+        </div>
+
+        <h3 class="dash-section-title" style="margin-top:24px">Badges earned</h3>
+        <div id="badge-grid" class="badge-grid"></div>
+
+        <div class="dash-actions">
+          <button class="btn btn--ghost" id="btn-export-csv">Export CSV</button>
+          <button class="btn btn--ghost" id="btn-export-csv-anon">Export CSV (Anonymised)</button>
+          <button class="btn btn--ghost" id="btn-export-report">Export Parent Report (JSON)</button>
+          <button class="btn btn--ghost" id="btn-import-csv">Import Words (CSV)</button>
+          <button class="btn btn--ghost" id="btn-print-report">🖨️ Print Report</button>
+        </div>
+
+        <!-- Print report wrapper (hidden on screen, shown when printing) -->
+        <div class="print-report-wrapper">
+          <div class="print-report" id="print-report-content"></div>
+        </div>
+
+        <h3 class="dash-section-title" style="margin-top:24px">Practice tuning (advanced)</h3>
+        <div class="dash-stats-grid">
+          <label class="dash-stat-card">Weak-word Weight
+            <input type="range" id="adaptive-weak-weight" min="2" max="8" step="0.5" value="5" />
+          </label>
+          <label class="dash-stat-card">Unseen-word Weight
+            <input type="range" id="adaptive-unseen-weight" min="1" max="6" step="0.5" value="3" />
+          </label>
+        </div>
+
+        <!-- Custom word import panel (hidden by default) -->
+        <div id="csv-import-panel" class="dash-import-panel" hidden>
+          <h4 class="dash-section-title">Import Custom Words</h4>
+          <p class="dash-import-desc">Upload a CSV with columns: <code>word, graphemes, types, group, level, emoji</code><br>
+            Or a simple list with just: <code>word</code> (one per line) — we'll auto-detect phonemes for CVC words.</p>
+          <div class="dash-import-drop" id="csv-drop-zone">
+            <input type="file" id="csv-file-input" accept=".csv,.txt" hidden />
+            <span>Drop CSV file here or <button class="btn btn--ghost btn--sm" id="csv-browse-btn">Browse</button></span>
+          </div>
+          <div id="csv-import-preview" class="dash-import-preview" hidden></div>
+          <div id="csv-import-status" class="dash-import-status" hidden></div>
+        </div>
       </div>
-      <div class="dash-stat-card">
-        <span class="dash-stat-value">${stats.bestStreak}</span>
-        <span class="dash-stat-label">Best streak</span>
-      </div>
-    </div>
-
-    <!-- Accuracy Chart (existing) -->
-    <h3 class="dash-section-title" style="margin-top:24px">Group Mastery</h3>
-    <div class="dash-chart-wrap">
-      <canvas id="chart-mastery" aria-label="Group mastery chart"></canvas>
-    </div>
-    <div class="mastery-bar-list" id="mastery-bars"></div>
-
-    <!-- Curriculum Map -->
-    <div id="dash-curriculum-map" style="margin-top:24px"></div>
-
-    <!-- Learning Path (existing) -->
-    <h3 class="dash-section-title" style="margin-top:24px">Learning Path</h3>
-    <div id="learning-path"></div>
-
-    <!-- Recent Words (existing) -->
-    <h3 class="dash-section-title" style="margin-top:24px">Recent Words</h3>
-    <div style="overflow-x:auto;">
-      <table class="word-history-table">
-        <thead><tr><th>Word</th><th>Mode</th><th>Result</th><th>When</th></tr></thead>
-        <tbody id="word-history-body"></tbody>
-      </table>
-    </div>
-
-    <!-- Badges (existing) -->
-    <h3 class="dash-section-title" style="margin-top:24px">Achievements</h3>
-    <div id="badge-grid" class="badge-grid"></div>
-
-    <!-- Actions (existing) -->
-    <div class="dash-actions">
-      <button class="btn btn--ghost" id="btn-export-csv">Export CSV</button>
-      <button class="btn btn--ghost" id="btn-export-csv-anon">Export CSV (Anonymised)</button>
-      <button class="btn btn--ghost" id="btn-export-report">Export Parent Report (JSON)</button>
-      <button class="btn btn--ghost" id="btn-import-csv">Import Words (CSV)</button>
-      <button class="btn btn--ghost" id="btn-print-report">🖨️ Print Report</button>
-    </div>
-
-    <!-- Print report wrapper (hidden on screen, shown when printing) -->
-    <div class="print-report-wrapper">
-      <div class="print-report" id="print-report-content"></div>
-    </div>
-
-    <h3 class="dash-section-title" style="margin-top:24px">Adaptive Controls</h3>
-    <div class="dash-stats-grid">
-      <label class="dash-stat-card">Weak-word Weight
-        <input type="range" id="adaptive-weak-weight" min="2" max="8" step="0.5" value="5" />
-      </label>
-      <label class="dash-stat-card">Unseen-word Weight
-        <input type="range" id="adaptive-unseen-weight" min="1" max="6" step="0.5" value="3" />
-      </label>
-    </div>
-
-    <!-- Custom word import panel (hidden by default) -->
-    <div id="csv-import-panel" class="dash-import-panel" hidden>
-      <h4 class="dash-section-title">Import Custom Words</h4>
-      <p class="dash-import-desc">Upload a CSV with columns: <code>word, graphemes, types, group, level, emoji</code><br>
-        Or a simple list with just: <code>word</code> (one per line) — we'll auto-detect phonemes for CVC words.</p>
-      <div class="dash-import-drop" id="csv-drop-zone">
-        <input type="file" id="csv-file-input" accept=".csv,.txt" hidden />
-        <span>Drop CSV file here or <button class="btn btn--ghost btn--sm" id="csv-browse-btn">Browse</button></span>
-      </div>
-      <div id="csv-import-preview" class="dash-import-preview" hidden></div>
-      <div id="csv-import-status" class="dash-import-status" hidden></div>
-    </div>
+    </details>
   `;
 
   // Render new insight sections
@@ -193,12 +191,49 @@ export function renderDashboard(container, opts = {}) {
   _renderBadges();
   _renderPrintReport();
   _bindActions();
+  _pruneEmptyGroups();
+}
+
+/**
+ * Mark a section host as having produced no real content.
+ *
+ * Sections that render an explicit "No data yet" placeholder still fill the
+ * page, so on a fresh profile the dashboard was 24 headings of scaffolding.
+ * Flagging them lets `_pruneEmptyGroups` drop a whole disclosure when nothing
+ * inside it has anything to say.
+ *
+ * @param {HTMLElement|null} container
+ * @param {boolean} isEmpty
+ */
+function _markEmpty(container, isEmpty) {
+  if (!container) return;
+  if (isEmpty) container.setAttribute('data-dash-empty', 'true');
+  else container.removeAttribute('data-dash-empty');
+}
+
+/** A host counts as empty when it rendered nothing, or flagged itself. */
+function _hostIsEmpty(host) {
+  if (host.getAttribute('data-dash-empty') === 'true') return true;
+  return host.children.length === 0 && !host.textContent.trim();
+}
+
+/**
+ * Hide any disclosure group whose sections all came back empty, so a parent
+ * opening the dashboard on day one is not offered three empty drawers.
+ */
+function _pruneEmptyGroups() {
+  for (const group of document.querySelectorAll('.dash-group')) {
+    const hosts = group.querySelectorAll('.dash-group__body > div[id]');
+    if (!hosts.length) continue;
+    const allEmpty = Array.from(hosts).every(_hostIsEmpty);
+    group.hidden = allEmpty;
+  }
 }
 
 function _renderCurriculumMapSection() {
   const container = document.getElementById('dash-curriculum-map');
   if (!container) return;
-  container.innerHTML = `<h3 class="dash-section-title">Learning Journey Map</h3><div id="dash-cm-inner"></div>`;
+  container.innerHTML = `<h3 class="dash-section-title">Learning journey</h3><div id="dash-cm-inner"></div>`;
   const inner = document.getElementById('dash-cm-inner');
   if (inner) renderCurriculumMap(inner);
 }
@@ -554,6 +589,7 @@ function _renderCategoryReporting() {
   const priorities = getMoePriorityRecommendations();
   const funnel = getLearningFunnelReport({ days: 7 });
   const lessonQueue = getAdaptiveLessonQueue({ limit: 6 });
+  _markEmpty(container, !vocabRows.length && !grammarRows.length && !scoreboards.length);
 
   const rowHtml = (rows) =>
     rows
@@ -596,7 +632,7 @@ function _renderCategoryReporting() {
     .join('');
 
   container.innerHTML = `
-    <h3 class="dash-section-title" style="margin-top:24px">Quest Category Reporting</h3>
+    <h3 class="dash-section-title" style="margin-top:24px">Results by topic</h3>
     <div class="dash-pattern-list" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       <div class="dash-pattern-item">
         <strong>Vocabulary categories</strong>
@@ -612,12 +648,12 @@ function _renderCategoryReporting() {
       <div class="dash-category-head"><span><strong>7-day Learning Funnel</strong></span><span>${Math.round((funnel.accuracy || 0) * 100)}%</span></div>
       <div class="dash-category-meta">Attempts: ${funnel.attempts} · Correct: ${funnel.correct} · Avg response: ${funnel.avgResponseMs !== null ? `${funnel.avgResponseMs}ms` : 'N/A'}</div>
     </div>
-    <h4 class="dash-section-title" style="margin-top:16px">MOE Priority Recommendations</h4>
+    <h4 class="dash-section-title" style="margin-top:16px">What to work on first</h4>
     <div class="dash-pattern-list" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       ${priorityBlock('Priority vocabulary revision', priorities.vocab)}
       ${priorityBlock('Priority grammar revision', priorities.grammar)}
     </div>
-    <h4 class="dash-section-title" style="margin-top:16px">Adaptive Next Lesson Queue</h4>
+    <h4 class="dash-section-title" style="margin-top:16px">Suggested next lessons</h4>
     <ul class="dash-pattern-list">
       ${lessonQueue.map((item) => `<li class="dash-pattern-item"><strong>${item.quest}</strong> · ${item.label} <small>(${item.loCode})</small><br>${item.reason}</li>`).join('')}
     </ul>
@@ -628,8 +664,9 @@ function _renderMoeOutcomes() {
   const container = document.getElementById('dash-moe-section');
   if (!container) return;
   const rows = getMoeOutcomeMappings();
+  _markEmpty(container, !rows.length);
   container.innerHTML = `
-    <h3 class="dash-section-title" style="margin-top:24px">MOE Learning Outcome Mapping</h3>
+    <h3 class="dash-section-title" style="margin-top:24px">Syllabus coverage</h3>
     <ul class="dash-pattern-list">
       ${rows.map((r) => `<li class="dash-pattern-item"><strong>${r.code}</strong> · ${r.focus}</li>`).join('')}
     </ul>`;
@@ -680,9 +717,10 @@ function _renderLiteracyDomains() {
 
   const domains = getLiteracyDomains();
   const hasData = domains.some((d) => d.score !== null);
+  _markEmpty(container, !hasData);
 
   container.innerHTML = `
-    <h3 class="dash-section-title" style="margin-top:24px">Literacy Domains</h3>
+    <h3 class="dash-section-title" style="margin-top:24px">Skill areas</h3>
     ${!hasData ? '<p class="dash-no-data">Play more to see domain scores here.</p>' : ''}
     <div class="dash-domains-grid">
       ${domains
@@ -722,10 +760,12 @@ function _renderClueInsights() {
   if (!container) return;
 
   const { questInsights, byType } = getClueInsights();
+  _markEmpty(container, false);
 
   if (!questInsights.length && !byType.length) {
+    _markEmpty(container, true);
     container.innerHTML = `
-      <h3 class="dash-section-title" style="margin-top:24px">Clue Detection</h3>
+      <h3 class="dash-section-title" style="margin-top:24px">Finding clues in the text</h3>
       <p class="dash-no-data">Complete quests with clue missions to see clue accuracy here.</p>`;
     return;
   }
@@ -791,7 +831,7 @@ function _renderClueInsights() {
       : '';
 
   container.innerHTML = `
-    <h3 class="dash-section-title" style="margin-top:24px">Clue Detection vs. Answer Accuracy</h3>
+    <h3 class="dash-section-title" style="margin-top:24px">Finding clues vs. getting answers right</h3>
     <div class="dash-clue-list">${questRows}</div>
     ${typeRows}`;
 }
@@ -805,7 +845,7 @@ function _renderRecommendedActions() {
   const actions = getRecommendedActions();
 
   container.innerHTML = `
-    <h3 class="dash-section-title" style="margin-top:0">Recommended Next Steps</h3>
+    <h3 class="dash-section-title" style="margin-top:0">What to do next</h3>
     <div class="dash-rec-actions">
       ${actions
         .map(
@@ -879,7 +919,7 @@ function _renderPatternInsights() {
   if (!insights.length) return;
 
   container.innerHTML = `
-    <h3 class="dash-section-title" style="margin-top:24px">Recent Learning Patterns</h3>
+    <h3 class="dash-section-title" style="margin-top:24px">What we have noticed</h3>
     <ul class="dash-pattern-list">
       ${insights.map((i) => `<li class="dash-pattern-item">💬 ${i}</li>`).join('')}
     </ul>`;
@@ -945,7 +985,7 @@ function _renderTutorActivity() {
     : '';
 
   container.innerHTML = `
-    <h3 class="dash-section-title" style="margin-top:24px">Tutor Activity</h3>
+    <h3 class="dash-section-title" style="margin-top:24px">Lessons and help used</h3>
     <div class="dash-stats-grid">
       ${lessonHtml}
       ${readAloudHtml}

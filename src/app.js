@@ -13,6 +13,8 @@
 
 import { store } from './modules/store.js';
 import { escapeHtml } from './utils/escapeHtml.js';
+import { getWeeklyActivity } from './modules/weeklyActivity.js';
+import { getMisconceptionSummary } from './modules/teacherFeedback.js';
 import * as homeBanners from './modules/homeBanners.js';
 import * as returnEvents from './modules/returnEvents.js';
 import * as onboardingController from './modules/onboardingController.js';
@@ -220,7 +222,14 @@ class App {
 
     settingsController.apply(store);
     restoreActiveProfile();
-    initHomeTabs();
+    // Refresh the Grown-ups snapshot whenever that tab is opened: the home
+    // is not re-rendered on every return from a mode, and a stale "no
+    // practice yet" right after a session is worse than no snapshot at all.
+    initHomeTabs({
+      onChange: (tab) => {
+        if (tab === 'grownups') this._renderParentSnapshot();
+      },
+    });
 
     gamification.init();
     mascot.init();
@@ -1717,6 +1726,50 @@ class App {
 
     // Manage section visibility for preschool vs primary layout
     this._manageSectionVisibility(readingBand);
+    this._renderParentSnapshot();
+  }
+
+  /**
+   * A this-week snapshot at the top of the Grown-ups tab.
+   *
+   * The tab was five router links and no information: a parent tapping it
+   * learned nothing without a further tap and a PIN. This answers "is it
+   * working?" in one glance — days, questions, accuracy, and the single
+   * habit worth working on tonight — and leaves the detail behind the PIN
+   * where it belongs.
+   *
+   * Deliberately not PIN-gated: it is the child's own activity, shown to
+   * whoever is holding the device, and gating a three-number summary would
+   * defeat the point of putting it here.
+   */
+  _renderParentSnapshot() {
+    const host = document.getElementById('parent-snapshot');
+    if (!host) return;
+
+    const week = getWeeklyActivity();
+
+    if (!week.hasActivity) {
+      host.innerHTML = `
+        <p class="parent-snapshot__empty">No practice recorded yet. Once ${escapeHtml(
+          getActiveProfile()?.name || 'your child',
+        )} plays a few rounds, this is where you will see how the week went.</p>`;
+      return;
+    }
+
+    const accuracy = week.accuracy === null ? '—' : `${Math.round(week.accuracy * 100)}%`;
+    const [habit] = getMisconceptionSummary(1);
+
+    host.innerHTML = `
+      <div class="parent-snapshot__stats">
+        <div class="parent-snapshot__stat"><span class="parent-snapshot__value">${week.days}</span><span class="parent-snapshot__label">days this week</span></div>
+        <div class="parent-snapshot__stat"><span class="parent-snapshot__value">${week.questions}</span><span class="parent-snapshot__label">questions</span></div>
+        <div class="parent-snapshot__stat"><span class="parent-snapshot__value">${accuracy}</span><span class="parent-snapshot__label">accuracy</span></div>
+      </div>
+      ${
+        habit
+          ? `<p class="parent-snapshot__habit"><strong>Worth a minute tonight:</strong> ${escapeHtml(habit.childName)} — ${escapeHtml(habit.selfCheck)}</p>`
+          : ''
+      }`;
   }
 
   /**
