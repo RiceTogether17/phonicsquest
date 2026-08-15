@@ -25,6 +25,7 @@ import { P4_PRACTICE_TESTS, P4_PRACTICE_TEST_TERMS } from '../data/p4PracticeTes
 import { P5_PRACTICE_TESTS, P5_PRACTICE_TEST_TERMS } from '../data/p5PracticeTests.js';
 import { P6_PRACTICE_TESTS, P6_PRACTICE_TEST_TERMS } from '../data/p6PracticeTests.js';
 import { mountPracticeTest, buildPaperLauncherHtml } from './primaryPracticeTest.js';
+import { renderOpenResponseHtml, attachOpenResponses } from './openResponse.js';
 
 export const PRIMARY_PLACEHOLDER_KINDS = Object.freeze([
   'visual-text',
@@ -70,57 +71,87 @@ export function buildPlaceholderHtml(kind) {
 function _renderVisualText() {
   const items = VISUAL_TEXT_ITEMS;
   // Group by level for navigation
-  const levels = [...new Set(items.map(i => i.level))].sort();
-  const byLevel = Object.fromEntries(levels.map(l => [l, items.filter(i => i.level === l)]));
-  return levels.map(level => `
+  const levels = [...new Set(items.map((i) => i.level))].sort();
+  const byLevel = Object.fromEntries(levels.map((l) => [l, items.filter((i) => i.level === l)]));
+  return levels
+    .map(
+      (level) => `
     <section class="placeholder-level-group">
       <h3 class="placeholder-level-heading">${level} — ${byLevel[level].length} items</h3>
-      ${byLevel[level].map(s => `
+      ${byLevel[level]
+        .map(
+          (s) => `
         <article class="placeholder-card">
           <h4>${escapeHtml(s.title)} <span class="module-level-badge">${s.type || 'visual'}</span></h4>
           <pre class="placeholder-poster" aria-label="Visual text content">${escapeHtml(s.poster)}</pre>
           <ol class="placeholder-questions">
-            ${s.questions.map(q => `
+            ${s.questions
+              .map(
+                (q, qi) => `
               <li>
                 <p class="ptg-q-stem">${escapeHtml(q.q)}</p>
-                <details><summary>Show model answer</summary><p class="placeholder-answer">${escapeHtml(q.a)}</p></details>
-              </li>`).join('')}
+                ${renderOpenResponseHtml({ id: `vt-${s.id || level}-${qi}`, model: q.a, skill: 'visualText' })}
+              </li>`,
+              )
+              .join('')}
           </ol>
-        </article>`).join('')}
-    </section>`).join('');
+        </article>`,
+        )
+        .join('')}
+    </section>`,
+    )
+    .join('');
 }
 
 function _renderOpenComprehension() {
   const items = OPEN_COMPREHENSION_PASSAGES;
-  const levels = [...new Set(items.map(i => i.level))].sort();
-  const byLevel = Object.fromEntries(levels.map(l => [l, items.filter(i => i.level === l)]));
-  return levels.map(level => `
+  const levels = [...new Set(items.map((i) => i.level))].sort();
+  const byLevel = Object.fromEntries(levels.map((l) => [l, items.filter((i) => i.level === l)]));
+  return levels
+    .map(
+      (level) => `
     <section class="placeholder-level-group">
       <h3 class="placeholder-level-heading">${level} — ${byLevel[level].length} passage${byLevel[level].length > 1 ? 's' : ''}</h3>
-      ${byLevel[level].map(s => `
+      ${byLevel[level]
+        .map(
+          (s) => `
         <article class="placeholder-card">
           <h4>${escapeHtml(s.title)}</h4>
           <p class="placeholder-passage" style="white-space:pre-line">${escapeHtml(s.passage)}</p>
           <ol class="placeholder-questions">
-            ${s.questions.map(q => `
+            ${s.questions
+              .map(
+                (q, qi) => `
               <li>
                 <p class="ptg-q-stem">${escapeHtml(q.q)}</p>
-                <details><summary>Show model answer</summary><p class="placeholder-answer">${escapeHtml(q.model)}</p></details>
-              </li>`).join('')}
+                ${renderOpenResponseHtml({ id: `oc-${s.id || level}-${qi}`, model: q.model, skill: 'openComprehension' })}
+              </li>`,
+              )
+              .join('')}
           </ol>
-        </article>`).join('')}
-    </section>`).join('');
+        </article>`,
+        )
+        .join('')}
+    </section>`,
+    )
+    .join('');
 }
 
 function _renderSynthesis() {
   const items = SYNTHESIS_ITEMS;
-  const patterns = [...new Set(items.map(i => i.pattern || i.skill))];
-  const byPattern = Object.fromEntries(patterns.map(p => [p, items.filter(i => (i.pattern || i.skill) === p)]));
-  return patterns.map(pattern => `
+  const patterns = [...new Set(items.map((i) => i.pattern || i.skill))];
+  const byPattern = Object.fromEntries(
+    patterns.map((p) => [p, items.filter((i) => (i.pattern || i.skill) === p)]),
+  );
+  return patterns
+    .map(
+      (pattern) => `
     <section class="placeholder-level-group">
       <h3 class="placeholder-level-heading">${escapeHtml(pattern)}</h3>
       <ol class="placeholder-questions">
-        ${byPattern[pattern].map(s => `
+        ${byPattern[pattern]
+          .map(
+            (s) => `
           <li class="placeholder-card">
             <p><strong>${escapeHtml(s.skill)}</strong> <span class="module-level-badge">${s.level}</span></p>
             <p>Rewrite: <em>${escapeHtml(s.original)}</em></p>
@@ -129,96 +160,137 @@ function _renderSynthesis() {
               <summary>Show model answer</summary>
               <p class="placeholder-answer">${escapeHtml(s.answer)}</p>
               ${s.explain ? `<p class="placeholder-explain"><em>${escapeHtml(s.explain)}</em></p>` : ''}
-              ${s.alternates?.length ? `<p class="placeholder-explain">Also accepted: ${s.alternates.map(a => `<em>${escapeHtml(a)}</em>`).join(' / ')}</p>` : ''}
+              ${s.alternates?.length ? `<p class="placeholder-explain">Also accepted: ${s.alternates.map((a) => `<em>${escapeHtml(a)}</em>`).join(' / ')}</p>` : ''}
             </details>
-          </li>`).join('')}
+          </li>`,
+          )
+          .join('')}
       </ol>
-    </section>`).join('');
+    </section>`,
+    )
+    .join('');
 }
 
 function _renderSituationalWriting() {
   const items = SITUATIONAL_WRITING_PROMPTS;
-  const formats = [...new Set(items.map(i => i.format))];
-  const byFormat = Object.fromEntries(formats.map(f => [f, items.filter(i => i.format === f)]));
-  return formats.map(format => `
+  const formats = [...new Set(items.map((i) => i.format))];
+  const byFormat = Object.fromEntries(formats.map((f) => [f, items.filter((i) => i.format === f)]));
+  return formats
+    .map(
+      (format) => `
     <section class="placeholder-level-group">
       <h3 class="placeholder-level-heading">${escapeHtml(format)}</h3>
-      ${byFormat[format].map(s => `
+      ${byFormat[format]
+        .map(
+          (s) => `
         <article class="placeholder-card">
           <h4>${escapeHtml(s.title)} <span class="module-level-badge">${s.level}</span></h4>
           <p><strong>Audience:</strong> ${escapeHtml(s.audience)}</p>
           <p><strong>Purpose:</strong> ${escapeHtml(s.purpose)}</p>
           ${s.context ? `<p class="placeholder-context">${escapeHtml(s.context)}</p>` : ''}
           <p><strong>Include all 3 points:</strong></p>
-          <ul>${(s.bullets || []).map(b => `<li>${escapeHtml(b)}</li>`).join('')}</ul>
+          <ul>${(s.bullets || []).map((b) => `<li>${escapeHtml(b)}</li>`).join('')}</ul>
           <p class="ptg-note">Word count: ${escapeHtml(s.wordCount || '100–120 words')}</p>
-          ${s.checklist?.length ? `
+          ${renderOpenResponseHtml({
+            id: `sw-${s.id || s.title || 'prompt'}`,
+            model: s.modelAnswer || '',
+            skill: 'situationalWriting',
+            placeholder: 'Write your letter, email or diary entry here…',
+          })}
+          ${
+            s.checklist?.length
+              ? `
             <details>
               <summary>Self-check list</summary>
-              <ul>${s.checklist.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul>
-            </details>` : ''}
-          ${s.modelAnswer ? `
+              <ul>${s.checklist.map((c) => `<li>${escapeHtml(c)}</li>`).join('')}</ul>
+            </details>`
+              : ''
+          }
+          ${
+            s.modelAnswer
+              ? `
             <details>
               <summary>Show model answer</summary>
               <pre class="placeholder-poster">${escapeHtml(s.modelAnswer)}</pre>
-            </details>` : ''}
-          ${s.rubric ? `
+            </details>`
+              : ''
+          }
+          ${
+            s.rubric
+              ? `
             <details>
               <summary>Marking rubric</summary>
               <table class="ptg-table"><tbody>
-                ${Object.entries(s.rubric).map(([k, v]) => `<tr><td><strong>${escapeHtml(k)}</strong></td><td>${escapeHtml(v)}</td></tr>`).join('')}
+                ${Object.entries(s.rubric)
+                  .map(
+                    ([k, v]) =>
+                      `<tr><td><strong>${escapeHtml(k)}</strong></td><td>${escapeHtml(v)}</td></tr>`,
+                  )
+                  .join('')}
               </tbody></table>
-            </details>` : ''}
-        </article>`).join('')}
-    </section>`).join('');
+            </details>`
+              : ''
+          }
+        </article>`,
+        )
+        .join('')}
+    </section>`,
+    )
+    .join('');
 }
 
 function _renderBody(kind) {
-  if (kind === 'visual-text')       return _renderVisualText();
+  if (kind === 'visual-text') return _renderVisualText();
   if (kind === 'open-comprehension') return _renderOpenComprehension();
-  if (kind === 'synthesis')         return _renderSynthesis();
+  if (kind === 'synthesis') return _renderSynthesis();
   if (kind === 'situational-writing') return _renderSituationalWriting();
 
   if (kind === 'p1-practice-tests') {
     return buildPaperLauncherHtml({
       level: 'P1',
-      papers: P1_PRACTICE_TEST_TERMS.map(t => P1_PRACTICE_TESTS[t]).filter(Boolean),
-      intro: "Pick a P1 paper to take the test interactively. Every section is scored — at the end you'll see which skills to drill.",
+      papers: P1_PRACTICE_TEST_TERMS.map((t) => P1_PRACTICE_TESTS[t]).filter(Boolean),
+      intro:
+        "Pick a P1 paper to take the test interactively. Every section is scored — at the end you'll see which skills to drill.",
     });
   }
   if (kind === 'p2-practice-tests') {
     return buildPaperLauncherHtml({
       level: 'P2',
-      papers: P2_PRACTICE_TEST_TERMS.map(t => P2_PRACTICE_TESTS[t]).filter(Boolean),
-      intro: 'Pick a P2 paper to take the test interactively. Includes Sentence Combining and mixed-error Editing.',
+      papers: P2_PRACTICE_TEST_TERMS.map((t) => P2_PRACTICE_TESTS[t]).filter(Boolean),
+      intro:
+        'Pick a P2 paper to take the test interactively. Includes Sentence Combining and mixed-error Editing.',
     });
   }
   if (kind === 'p3-practice-tests') {
     return buildPaperLauncherHtml({
       level: 'P3',
-      papers: P3_PRACTICE_TEST_TERMS.map(t => P3_PRACTICE_TESTS[t]).filter(Boolean),
-      intro: 'Pick a P3 paper to take the test interactively. Only Terms 1–3 are in this bank (no T4). T3 includes open Comprehension Cloze and two passages.',
+      papers: P3_PRACTICE_TEST_TERMS.map((t) => P3_PRACTICE_TESTS[t]).filter(Boolean),
+      intro:
+        'Pick a P3 paper to take the test interactively. Only Terms 1–3 are in this bank (no T4). T3 includes open Comprehension Cloze and two passages.',
     });
   }
   if (kind === 'p4-practice-tests') {
     return buildPaperLauncherHtml({
       level: 'P4',
-      papers: P4_PRACTICE_TEST_TERMS.map(t => P4_PRACTICE_TESTS[t]).filter(Boolean),
-      intro: 'Pick a P4 paper to take the test interactively. Includes Synthesis & Transformation and longer Comprehension.',
+      papers: P4_PRACTICE_TEST_TERMS.map((t) => P4_PRACTICE_TESTS[t]).filter(Boolean),
+      intro:
+        'Pick a P4 paper to take the test interactively. Includes Synthesis & Transformation and longer Comprehension.',
     });
   }
   if (kind === 'p5-practice-tests') {
     return buildPaperLauncherHtml({
       level: 'P5',
-      papers: P5_PRACTICE_TEST_TERMS.map(t => P5_PRACTICE_TESTS[t]).filter(Boolean),
-      intro: 'Pick a P5 paper. Includes Situational Writing, Comprehension Cloze and evidence-based comprehension questions.',
+      papers: P5_PRACTICE_TEST_TERMS.map((t) => P5_PRACTICE_TESTS[t]).filter(Boolean),
+      intro:
+        'Pick a P5 paper. Includes Situational Writing, Comprehension Cloze and evidence-based comprehension questions.',
     });
   }
   if (kind === 'p6-practice-tests') {
     return buildPaperLauncherHtml({
       level: 'P6',
-      papers: P6_PRACTICE_TEST_TERMS.map(t => P6_PRACTICE_TESTS[t]).filter(Boolean),
-      intro: 'Pick a P6 PSLE-format paper. Full Paper 1 + Paper 2 structure. Every wrong answer routes to the matching drill.',
+      papers: P6_PRACTICE_TEST_TERMS.map((t) => P6_PRACTICE_TESTS[t]).filter(Boolean),
+      intro:
+        'Pick a P6 PSLE-format paper. Full Paper 1 + Paper 2 structure. Every wrong answer routes to the matching drill.',
     });
   }
   return '';
@@ -231,15 +303,18 @@ export function mountPlaceholderModule(container, kind, { onClose, onRelated } =
   if (!container) return;
   container.innerHTML = buildPlaceholderHtml(kind);
   container.querySelector('[data-placeholder-close]')?.addEventListener('click', () => onClose?.());
-  container.querySelectorAll('[data-related]').forEach(btn => {
+  container.querySelectorAll('[data-related]').forEach((btn) => {
     btn.addEventListener('click', () => onRelated?.(btn.dataset.related));
   });
 
+  // The comprehension and writing libraries are answerable, not just readable.
+  attachOpenResponses(container, { quest: kind });
+
   // Mode picker toggle (Practice / Test Mode).
   const modeBtns = container.querySelectorAll('.ptg-mode-btn');
-  modeBtns.forEach(mb => {
+  modeBtns.forEach((mb) => {
     mb.addEventListener('click', () => {
-      modeBtns.forEach(b => b.classList.remove('ptg-mode-btn--active'));
+      modeBtns.forEach((b) => b.classList.remove('ptg-mode-btn--active'));
       mb.classList.add('ptg-mode-btn--active');
     });
   });
@@ -248,10 +323,10 @@ export function mountPlaceholderModule(container, kind, { onClose, onRelated } =
   const startButtons = container.querySelectorAll('[data-start-paper]');
   if (startButtons.length) {
     const paperBank = _lookupPaperBank(kind);
-    startButtons.forEach(btn => {
+    startButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
         const id = btn.getAttribute('data-start-paper');
-        const paper = paperBank.find(p => p.id === id);
+        const paper = paperBank.find((p) => p.id === id);
         if (!paper) return;
         const activeMode = container.querySelector('.ptg-mode-btn--active');
         const mode = activeMode?.getAttribute('data-mode') || 'practice';
@@ -270,11 +345,17 @@ export function mountPlaceholderModule(container, kind, { onClose, onRelated } =
 }
 
 function _lookupPaperBank(kind) {
-  if (kind === 'p1-practice-tests') return P1_PRACTICE_TEST_TERMS.map(t => P1_PRACTICE_TESTS[t]).filter(Boolean);
-  if (kind === 'p2-practice-tests') return P2_PRACTICE_TEST_TERMS.map(t => P2_PRACTICE_TESTS[t]).filter(Boolean);
-  if (kind === 'p3-practice-tests') return P3_PRACTICE_TEST_TERMS.map(t => P3_PRACTICE_TESTS[t]).filter(Boolean);
-  if (kind === 'p4-practice-tests') return P4_PRACTICE_TEST_TERMS.map(t => P4_PRACTICE_TESTS[t]).filter(Boolean);
-  if (kind === 'p5-practice-tests') return P5_PRACTICE_TEST_TERMS.map(t => P5_PRACTICE_TESTS[t]).filter(Boolean);
-  if (kind === 'p6-practice-tests') return P6_PRACTICE_TEST_TERMS.map(t => P6_PRACTICE_TESTS[t]).filter(Boolean);
+  if (kind === 'p1-practice-tests')
+    return P1_PRACTICE_TEST_TERMS.map((t) => P1_PRACTICE_TESTS[t]).filter(Boolean);
+  if (kind === 'p2-practice-tests')
+    return P2_PRACTICE_TEST_TERMS.map((t) => P2_PRACTICE_TESTS[t]).filter(Boolean);
+  if (kind === 'p3-practice-tests')
+    return P3_PRACTICE_TEST_TERMS.map((t) => P3_PRACTICE_TESTS[t]).filter(Boolean);
+  if (kind === 'p4-practice-tests')
+    return P4_PRACTICE_TEST_TERMS.map((t) => P4_PRACTICE_TESTS[t]).filter(Boolean);
+  if (kind === 'p5-practice-tests')
+    return P5_PRACTICE_TEST_TERMS.map((t) => P5_PRACTICE_TESTS[t]).filter(Boolean);
+  if (kind === 'p6-practice-tests')
+    return P6_PRACTICE_TEST_TERMS.map((t) => P6_PRACTICE_TESTS[t]).filter(Boolean);
   return [];
 }
