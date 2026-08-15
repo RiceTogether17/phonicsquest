@@ -122,7 +122,6 @@ export function showVocabMcqBrowser() {
   const render = () => {
     _container.innerHTML = `
       <div class="sfq-browser mcq-browser">
-        <h2 class="sfq-title">📖 Vocabulary MCQ</h2>
         <p class="sfq-instruction">Pick your level and how much support you want, then practise one vocabulary skill at a time — or mix them all together.</p>
 
         ${renderMcqQuickStart({

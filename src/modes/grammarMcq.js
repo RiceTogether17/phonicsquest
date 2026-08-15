@@ -114,7 +114,6 @@ export function showGrammarMcqBrowser() {
   const render = () => {
     _container.innerHTML = `
       <div class="sfq-browser mcq-browser">
-        <h2 class="sfq-title">🧠 Grammar MCQ</h2>
         <p class="sfq-instruction">Pick your level and how much support you want, then practise one grammar skill at a time — or mix them all together.</p>
 
         ${renderMcqQuickStart({

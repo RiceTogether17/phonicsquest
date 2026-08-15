@@ -31,7 +31,7 @@ export function renderMcqQuickStart({ prefix, level, recommended = false, choose
   const safeLevel = escapeHtml(level);
   return `
     <div class="mcq-quickstart">
-      <button class="btn btn--primary btn--xl mcq-quickstart__go" id="${prefix}-quick-start">
+      <button class="btn btn--primary mcq-quickstart__go" id="${prefix}-quick-start">
         Start ${MCQ_ROUND_SIZE} questions · ${safeLevel}
       </button>
       <p class="mcq-quickstart__note">
