@@ -10925,6 +10925,23 @@ details.story-tool-section[open] > .story-tool-summary::before {
   padding: var(--space-2) var(--space-3);
   margin: var(--space-2) 0;
 }
+
+/* The real section score, read from the child's answers. Replaces a form
+   that asked them to type their own marks (modes/paperMode.js). */
+.paper-section-result {
+  margin: var(--space-2, 8px) 0;
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  border-radius: var(--radius-md, 8px);
+  border-left: 4px solid var(--color-success);
+  background: color-mix(in srgb, var(--color-success) 8%, var(--surface));
+}
+.paper-section-result p {
+  margin: 0;
+}
+.paper-section-result__note {
+  font-size: var(--font-size-xs, 0.78rem);
+  color: var(--text-muted, #555);
+}
 .paper-weak-title {
   font-size: var(--font-size-sm);
   font-weight: 700;
