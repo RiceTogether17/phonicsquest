@@ -151,10 +151,12 @@ the passage".
 - **Writing Quest** has its own evaluator (`writingEvaluator.js`) with a
   different shape — rubric bands over long text, not an answer against a key.
   It has not been folded in.
-- The **Practice Library** placeholders (Visual Text, Open-ended Comprehension,
-  Situational Writing) still render content with model answers in expandable
-  sections and no marked response, so there is no answer to diagnose. See
-  `VALIDITY_ROADMAP.md` §2.7.
+- The **Practice Library** modules (Visual Text, Open-ended Comprehension,
+  Situational Writing) are answerable via `modes/openResponse.js`, but they are
+  not auto-marked: their banks carry `{ q, model }` with no marking key, so the
+  child commits an answer, sees the model plus an idea checklist
+  (`scoring/ideaOverlap.js`), and self-marks. A self-mark records at the
+  `guided` evidence ceiling and never supports a mastery claim.
 - Detection is **string- and morphology-based**. It cannot know that "advice"
   is uncountable, so items turning on word knowledge fall back to the authored
   explanation. That is the correct outcome, not a gap to paper over with a
