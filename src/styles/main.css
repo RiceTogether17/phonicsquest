@@ -41,6 +41,14 @@
   --color-card: var(--surface); /* opaque panel surface — mini-lesson & overlays */
   --surface-2: #f1f0fe;
   --border: #e5e3fa;
+  /* Boundary colour for things you can press or type into.
+     `--border` is a *divider* tint: #e5e3fa on white is 1.26:1, which is fine
+     for separating regions but far under the 3:1 WCAG 1.4.11 wants for a UI
+     component's boundary. Level cards, ghost buttons and text inputs drew
+     themselves with it and read as blank white space. Derived from the
+     theme's own text colour so every theme gets a boundary that clears 3:1
+     against its own surface. */
+  --border-control: color-mix(in srgb, var(--text) 56%, var(--surface));
   --text: #1e1b4b;
   --text-muted: #4b5563;
   --text-on-dark: #ffffff;
@@ -157,6 +165,7 @@
   --surface: #ffffff;
   --surface-2: #f0f0f0;
   --border: #000000;
+  --border-control: #000000;
   --text: #000000;
   --text-muted: #333333;
   --c-consonant: #0000cc;
@@ -8424,6 +8433,14 @@ details.story-tool-section[open] > .story-tool-summary::before {
   gap: var(--space-1, 4px);
   margin-bottom: var(--space-3, 12px);
 }
+/* `.btn` is `white-space: nowrap`, so a label this long is clipped at both
+   ends on a 390px viewport rather than wrapped. Let this one wrap. */
+.mcq-quickstart__go {
+  white-space: normal;
+  line-height: 1.25;
+  padding: var(--space-4, 16px) var(--space-4, 16px);
+  font-size: var(--font-size-lg, 1.15rem);
+}
 .mcq-quickstart__note {
   margin: 0;
   text-align: center;
@@ -15871,22 +15888,28 @@ textarea:hover {
 /* Force dark text on every white/light surface inside the placeholder
    screen — the dark-mode theme above sets --text to near-white, which
    would otherwise leak into these cards and make the contents nearly
-   invisible (issue surfaced on the Synthesis & Transformation page). */
+   invisible (issue surfaced on the Synthesis & Transformation page).
+
+   Buttons are excluded. Each .btn variant sets its own foreground/background
+   pair, and overriding just the foreground breaks that pairing: the rule
+   below used to tint every .btn in a launcher card to --color-primary, which
+   on a .btn--primary meant rgb(90,82,224) text on an rgb(90,82,224) fill —
+   a 1:1 contrast ratio. The "Start paper" buttons rendered as blank purple
+   slabs with no readable label. */
 .primary-placeholder .p1pt-paper,
-.primary-placeholder .p1pt-paper *,
+.primary-placeholder .p1pt-paper *:not(.btn):not(.btn *),
 .primary-placeholder .p1pt-cloze,
 .primary-placeholder .p1pt-passage,
 .primary-placeholder .p1pt-editing,
 .primary-placeholder .p1pt-wordbank,
 .primary-placeholder .p1pt-word,
 .primary-placeholder .ptg-stage,
-.primary-placeholder .ptg-stage *,
+.primary-placeholder .ptg-stage *:not(.btn):not(.btn *),
 .primary-placeholder .ptg-launcher-card,
-.primary-placeholder .ptg-launcher-card * {
+.primary-placeholder .ptg-launcher-card *:not(.btn):not(.btn *) {
   color: #1f2937;
 }
 .primary-placeholder .p1pt-paper-toggle > summary,
-.primary-placeholder .ptg-launcher-card .btn,
 .primary-placeholder .placeholder-card details summary {
   color: var(--color-primary);
 }
@@ -18231,4 +18254,41 @@ body.print-mode > *:not(.print-report-wrapper) > * {
 }
 .adult-verdict__btn[disabled] {
   opacity: 0.5;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Control boundaries
+
+   Interactive controls that draw themselves with only a border need that
+   border to be visible. These all used `--border` (1.26:1 on white), which
+   made them read as blank space — a page of "transparent" buttons. Measured
+   across every screen; this is the list that came back flat.
+   ═══════════════════════════════════════════════════════════════════════ */
+.btn--ghost,
+.sfq-level-btn,
+.cloze-level-btn,
+.mcq-skill-card,
+.wv-cat-btn,
+.exam-hub-mode-btn,
+.ptg-mode-btn,
+.mission-step,
+.home-group,
+.mcq-chooser,
+.dash-group,
+.early-reading-toggle,
+.open-response__input,
+.cp-name-input,
+.settings-input {
+  border-color: var(--border-control);
+}
+/* The ghost button's 3px "lip" is part of its edge, so it moves too. */
+.btn--ghost {
+  box-shadow: 0 3px 0 var(--border-control);
+}
+/* Selected states already carry the primary colour — don't fight them. */
+.sfq-level-btn--done,
+.mcq-level-card--active,
+.exam-hub-mode-btn--active,
+.ptg-mode-btn--active {
+  border-color: var(--color-primary);
 }
