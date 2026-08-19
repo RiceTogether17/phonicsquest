@@ -60,6 +60,20 @@ function rotate(arr, idx) {
   return arr[idx % arr.length];
 }
 
+/**
+ * Pick the seed pool for a level's band.
+ *
+ * Several categories used to serve one pool to P1 through P6, which made the
+ * same item simultaneously too hard for a six-year-old and trivial for a
+ * P6 pupil. Each banded category now authors three pools along the spiral:
+ * lower (P1–P2), middle (P3–P4) and upper (P5–P6).
+ */
+function bandRows(level, { lower, middle, upper }) {
+  if (level === 'P1' || level === 'P2') return lower;
+  if (level === 'P3' || level === 'P4') return middle;
+  return upper;
+}
+
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -553,26 +567,47 @@ const VOCAB_BUILDERS = {
     return { category: 'idiomaticExpressions', subskill: 'idiom_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'Idioms are figurative, not literal.' };
   },
   proverbsSayings(level, i) {
-    const rows = [
+    // P1–P2: the handful of sayings a young child will actually have heard.
+    const lower = [
       ['"Practice makes ___."', 'perfect', ['faster', 'silent', 'famous']],
-      ['"Where there is a will, there is a ___."', 'way', ['roadblock', 'ticket', 'raincoat']],
-      ['"Actions speak louder than ___."', 'words', ['coins', 'voices', 'windows']],
-      ['"A stitch in time saves ___."', 'nine', ['mine', 'fine', 'line']],
-      ['"Do not judge a book by its ___."', 'cover', ['content', 'author', 'title']],
       ['"Better late than ___."', 'never', ['later', 'sooner', 'always']],
       ['"Two heads are better than ___."', 'one', ['two', 'none', 'three']],
-      ['"Every cloud has a silver ___."', 'lining', ['edge', 'border', 'frame']],
       ['"Look before you ___."', 'leap', ['run', 'sleep', 'climb']],
       ['"The early bird catches the ___."', 'worm', ['fish', 'fly', 'bug']],
-      ['"All that glitters is not ___."', 'gold', ['bright', 'silver', 'precious']],
+      ['"Honesty is the best ___."', 'policy', ['action', 'virtue', 'lesson']],
+      ['"Actions speak louder than ___."', 'words', ['coins', 'voices', 'windows']],
       ['"A friend in need is a friend ___."', 'indeed', ['always', 'forever', 'truly']],
+    ];
+    // P3–P4: a wider set, still testing the fixed wording.
+    const middle = [
+      ['"Where there is a will, there is a ___."', 'way', ['roadblock', 'ticket', 'raincoat']],
+      ['"A stitch in time saves ___."', 'nine', ['trouble', 'money', 'effort']],
+      ['"Do not judge a book by its ___."', 'cover', ['content', 'author', 'title']],
+      ['"Every cloud has a silver ___."', 'lining', ['edge', 'border', 'frame']],
+      ['"All that glitters is not ___."', 'gold', ['bright', 'silver', 'precious']],
       ['"Too many cooks spoil the ___."', 'broth', ['meal', 'food', 'dish']],
       ['"When in Rome, do as the Romans ___."', 'do', ['say', 'eat', 'sing']],
-      ['"Honesty is the best ___."', 'policy', ['action', 'virtue', 'lesson']],
       ['"The pen is mightier than the ___."', 'sword', ['gun', 'shield', 'arrow']],
     ];
+    // P5–P6: meaning and application, not a memorised ending. A pupil who can
+    // finish a proverb but cannot use it has learnt nothing transferable.
+    const upper = [
+      ['Which situation best shows "a stitch in time saves nine"?', 'Repairing a small roof leak before the monsoon season arrives', ['Sewing nine buttons onto a shirt at once', 'Waiting until the roof collapses before calling a repairman', 'Buying nine spare tiles in case the roof leaks']],
+      ['Which situation best shows "too many cooks spoil the broth"?', 'Six pupils each rewrite the class poster and the message is lost', ['Six pupils each take one clear task and finish early', 'One pupil makes soup for the whole class', 'The canteen hires an extra cook for the lunch rush']],
+      ['Which situation best shows "do not judge a book by its cover"?', 'The quietest boy in class turns out to be the strongest debater', ['The library reorders its books by colour', 'A torn book is thrown away because it cannot be read', 'A pupil chooses a novel because the blurb sounds exciting']],
+      ['Which situation best shows "every cloud has a silver lining"?', 'A cancelled trip means the class finally finishes its mural', ['A rainy day is followed by another rainy day', 'The sky clears just before the sports meet begins', 'A pupil finds a silver coin on the field']],
+      ['Which situation best shows "actions speak louder than words"?', 'He said nothing but quietly cleaned the classroom every day', ['He explained his plan to the class very loudly', 'He promised repeatedly that he would help next week', 'He wrote a long letter about the importance of tidiness']],
+      ['Which situation best shows "the early bird catches the worm"?', 'She queued at dawn and got the last concert ticket', ['She woke early but arrived after the tickets sold out', 'She fed the birds in the school garden before class', 'She stayed up late to finish her project on time']],
+      ['"All that glitters is not gold" warns us that ___.', 'something impressive on the outside may have little real worth', ['gold is often mistaken for cheaper metals', 'valuable things are usually dull in appearance', 'people should not wear expensive jewellery']],
+      ['"When in Rome, do as the Romans do" advises us to ___.', 'follow the customs of the place we are visiting', ['travel to Italy whenever we can', 'copy whatever our closest friends are doing', 'refuse to change our habits when we travel']],
+    ];
+    const rows = bandRows(level, { lower, middle, upper });
     const [q, answer, ds] = rotate(rows, i);
-    return { category: 'proverbsSayings', subskill: 'proverb_completion', q, choices: buildChoices(answer, ds), answer, explain: 'Choose the proverb word that completes the saying correctly.' };
+    const subskill = (level === 'P5' || level === 'P6') ? 'proverb_meaning' : 'proverb_completion';
+    const explain = subskill === 'proverb_meaning'
+      ? 'A proverb is a piece of advice — match the saying to the situation it describes.'
+      : 'Choose the proverb word that completes the saying correctly.';
+    return { category: 'proverbsSayings', subskill, q, choices: buildChoices(answer, ds), answer, explain };
   },
   scienceTechTerms(level, i) {
     const p1p2Rows = [
@@ -678,18 +713,18 @@ const VOCAB_BUILDERS = {
       ['A binding agreement between two countries signed by their leaders is a ___.', 'treaty', ['memorandum', 'charter', 'protocol']],
       ['The movement of people from rural areas to cities is called ___.', 'urbanisation', ['migration', 'industrialisation', 'globalisation']],
       ['Goods and services produced in a country and sold abroad are called ___.', 'exports', ['imports', 'commodities', 'tariffs']],
-      ['The body of international law that protects people affected by armed conflict is ___.', 'humanitarian law', ['trade law', 'maritime law', 'civil law']],
-      ['A tax placed on imported goods to protect domestic industries is a ___.', 'tariff', ['subsidy', 'quota', 'levy']],
+      ['Aid given to people suffering after a disaster or conflict is called ___ relief.', 'humanitarian', ['commercial', 'ceremonial', 'industrial']],
+      ['Buildings and customs passed down from earlier generations are a country\'s ___.', 'heritage', ['scenery', 'territory', 'machinery']],
       ['The idea that every person has basic rights simply by being human is called ___.', 'human rights', ['civil liberties', 'legal rights', 'civil rights']],
       ['The belief that the interests of one\'s own nation come before those of all other nations is ___.', 'nationalism', ['protectionism', 'isolationism', 'globalism']],
-      ['The process by which countries work together on issues that affect the whole world is ___.', 'multilateralism', ['bilateralism', 'unilateralism', 'pluralism']],
-      ['A reduction in the value of a country\'s currency relative to other currencies is ___.', 'depreciation', ['devaluation', 'deflation', 'recession']],
-      ['The practice of managing a country\'s money supply to control inflation is called ___ policy.', 'monetary', ['fiscal', 'trade', 'industrial']],
-      ['A group of countries that cooperate on economic and political matters is called a ___.', 'bloc', ['alliance', 'coalition', 'federation']],
+      ['Living together peacefully despite different races and religions is called racial ___.', 'harmony', ['balance', 'silence', 'variety']],
+      ['Protecting forests, reefs and wildlife from damage is called ___.', 'conservation', ['construction', 'consumption', 'convention']],
+      ['Producing enough of something to meet your own needs is called ___.', 'self-sufficiency', ['self-discipline', 'self-confidence', 'self-expression']],
+      ['The early settlers who built up Singapore\'s trade and industry are called ___.', 'pioneers', ['tourists', 'spectators', 'inspectors']],
       ['The upholding of what is right and the punishment of wrongdoing through the law is called ___.', 'justice', ['equality', 'fairness', 'democracy']],
       ['The right of a country to govern itself without interference from others is called ___.', 'sovereignty', ['democracy', 'diplomacy', 'citizenship']],
-      ['The migration of skilled workers from developing countries to developed ones is called brain ___.', 'drain', ['gain', 'shift', 'flow']],
-      ['Organisations that operate across multiple countries are called ___ corporations.', 'multinational', ['bilateral', 'regional', 'national']],
+      ['Creating new land by filling in part of the sea is called land ___.', 'reclamation', ['formation', 'decoration', 'donation']],
+      ['A system in which people advance according to their own effort and ability is called ___.', 'meritocracy', ['monarchy', 'bureaucracy', 'democracy']],
     ];
     let rows;
     if (level === 'P1' || level === 'P2') rows = p1p2Rows;
@@ -986,54 +1021,102 @@ const VOCAB_BUILDERS = {
     return { category: 'similes', subskill: 'fixed_comparison', q, choices: buildChoices(answer, ds), answer, explain: 'Similes are fixed comparisons — you cannot swap the noun for another animal.' };
   },
   mannerAdverbs(level, i) {
-    const rows = [
-      ['It was so difficult to wake Ian as he was sleeping so ___.', 'soundly', ['drowsily', 'noisily', 'calmly']],
-      ['The pupils sat ___ during the silent reading lesson.', 'quietly', ['loudly', 'lazily', 'roughly']],
-      ['The dog growled ___ when the stranger walked past the gate.', 'fiercely', ['kindly', 'lazily', 'softly']],
-      ['The old man walked ___ down the road, leaning on his stick.', 'slowly', ['hastily', 'rapidly', 'briskly']],
+    // P1–P2: everyday -ly adverbs with an obvious scene clue.
+    const lower = [
+      ['The pupils sat ___ during the silent reading lesson.', 'quietly', ['loudly', 'roughly', 'wildly']],
+      ['The old man walked ___ down the road, leaning on his stick.', 'slowly', ['quickly', 'wildly', 'roughly']],
       ['She thanked the volunteer ___ for helping her cross the road.', 'politely', ['rudely', 'angrily', 'wildly']],
-      ['The boys clapped ___ when their team scored the winning goal.', 'wildly', ['quietly', 'gently', 'softly']],
+      ['She carried the tray of glasses ___ across the crowded room.', 'carefully', ['carelessly', 'roughly', 'wildly']],
+      ['The boys clapped ___ when their team scored the winning goal.', 'loudly', ['quietly', 'softly', 'sadly']],
+      ['The librarian spoke ___ so as not to disturb the readers.', 'softly', ['loudly', 'harshly', 'rudely']],
+      ['The children cheered ___ when the extra holiday was announced.', 'happily', ['sadly', 'quietly', 'angrily']],
+      ['The runner crossed the finish line ___ and won the race.', 'quickly', ['slowly', 'lazily', 'sadly']],
+      ['He shut the gate ___ behind him so the dog could not escape.', 'firmly', ['loosely', 'lazily', 'softly']],
+      ['The kitten purred ___ as the girl stroked its fur.', 'gently', ['roughly', 'angrily', 'loudly']],
+      ['The boy answered ___ because he did not know the answer.', 'quietly', ['proudly', 'loudly', 'firmly']],
+      ['She waited ___ in line even though the queue was very long.', 'patiently', ['angrily', 'rudely', 'noisily']],
+    ];
+    // P3–P4: adverbs that name a mood or intensity, not just volume or speed.
+    const middle = [
+      ['It was so difficult to wake Ian as he was sleeping so ___.', 'soundly', ['drowsily', 'noisily', 'calmly']],
+      ['The dog growled ___ when the stranger walked past the gate.', 'fiercely', ['kindly', 'lazily', 'softly']],
       ['The ambulance sped ___ through the traffic to reach the patient.', 'swiftly', ['calmly', 'lazily', 'carefully']],
-      ['The thief moved ___ through the dark corridor so as not to make a sound.', 'stealthily', ['boldly', 'noisily', 'carelessly']],
+      ['The boys cheered ___ when their team scored in the last minute.', 'wildly', ['quietly', 'gently', 'softly']],
       ['She answered the teacher\'s question ___ without hesitation.', 'confidently', ['shyly', 'reluctantly', 'vaguely']],
+      ['The baby slept ___ in her mother\'s arms throughout the journey.', 'peacefully', ['restlessly', 'noisily', 'alertly']],
+      ['The gymnast landed ___ on the mat after her somersault.', 'gracefully', ['clumsily', 'heavily', 'roughly']],
+      ['The children cheered ___ when the extra holiday was announced.', 'joyfully', ['sadly', 'quietly', 'bitterly']],
+      ['The knight fought ___ to defend the castle gates.', 'bravely', ['fearfully', 'weakly', 'timidly']],
+      ['He accepted the prize ___, thanking everyone who had helped him.', 'modestly', ['boastfully', 'rudely', 'angrily']],
+      ['The lost child looked around ___ for a familiar face.', 'anxiously', ['calmly', 'cheerfully', 'lazily']],
+      ['She read the letter ___ before folding it away again.', 'eagerly', ['reluctantly', 'lazily', 'rudely']],
+    ];
+    // P5–P6: adverbs whose neighbours are all plausible until the clue is weighed.
+    const upper = [
+      ['The thief moved ___ through the dark corridor so as not to make a sound.', 'stealthily', ['boldly', 'noisily', 'carelessly']],
       ['The wounded soldier crawled ___ towards the shelter.', 'painfully', ['comfortably', 'swiftly', 'playfully']],
       ['He practised the piano ___ every evening until he mastered the piece.', 'diligently', ['casually', 'lazily', 'reluctantly']],
-      ['The baby slept ___ in her mother\'s arms throughout the journey.', 'peacefully', ['restlessly', 'noisily', 'alertly']],
-      ['The librarian spoke ___ so as not to disturb the readers.', 'softly', ['loudly', 'harshly', 'briskly']],
-      ['The gymnast landed ___ on the mat after her somersault.', 'gracefully', ['clumsily', 'heavily', 'roughly']],
-      ['He waited ___ in line even though the queue was very long.', 'patiently', ['angrily', 'restlessly', 'rudely']],
-      ['The children cheered ___ when the extra holiday was announced.', 'joyfully', ['sadly', 'quietly', 'bitterly']],
-      ['She carried the tray of glasses ___ across the crowded room.', 'carefully', ['carelessly', 'hurriedly', 'roughly']],
-      ['The detective examined the footprints ___ before drawing any conclusions.', 'closely', ['briefly', 'blindly', 'loosely']],
-      ['The knight fought ___ to defend the castle gates.', 'bravely', ['fearfully', 'weakly', 'timidly']],
-      ['He shut the gate ___ behind him so the dog could not escape.', 'firmly', ['loosely', 'lazily', 'faintly']],
+      ['The detective examined the footprints ___ before drawing any conclusions.', 'meticulously', ['briefly', 'blindly', 'loosely']],
+      ['The witness answered ___, avoiding any detail that might identify her.', 'evasively', ['candidly', 'bluntly', 'eagerly']],
+      ['He apologised ___, clearly meaning every word of it.', 'sincerely', ['grudgingly', 'mockingly', 'carelessly']],
+      ['The chairman spoke ___, refusing to soften the bad news.', 'bluntly', ['tactfully', 'evasively', 'timidly']],
+      ['She agreed to help ___, having already refused twice.', 'grudgingly', ['eagerly', 'sincerely', 'joyfully']],
+      ['The old scholar explained the theory ___ so no one was left behind.', 'patiently', ['hastily', 'carelessly', 'curtly']],
+      ['He glanced at the report ___ and missed the error entirely.', 'cursorily', ['meticulously', 'anxiously', 'diligently']],
+      ['The volunteers worked ___ through the night to fill the sandbags.', 'tirelessly', ['lazily', 'cursorily', 'grudgingly']],
+      ['She declined the invitation ___, so as not to cause offence.', 'tactfully', ['bluntly', 'rudely', 'mockingly']],
     ];
+    const rows = bandRows(level, { lower, middle, upper });
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'mannerAdverbs', subskill: 'adverb_manner', q, choices: buildChoices(answer, ds), answer, explain: 'An adverb of manner describes HOW an action is done — match the adverb to the mood and intensity of the scene.' };
   },
   phrasalVerbs(level, i) {
-    const rows = [
-      ['The prisoners succeeded in ___ of prison by using a secret underground tunnel.', 'breaking out', ['breaking into', 'breaking up', 'breaking through']],
-      ['The business deal ___ because both sides could not agree on many matters.', 'fell through', ['fell out', 'fell behind', 'fell over']],
-      ['Ali is very ___ with his sister — they share everything.', 'close to', ['close with', 'close on', 'close at']],
-      ['Please ___ the music. We can\'t hear ourselves think.', 'turn down', ['turn off', 'turn over', 'turn out']],
-      ['I am ___ to my birthday next week.', 'looking forward', ['looking up', 'looking out', 'looking after']],
-      ['The teacher told us to ___ our textbooks to page 42.', 'turn to', ['turn over', 'turn down', 'turn in']],
+    // P1–P2: everyday phrasal verbs from home and classroom routines.
+    const lower = [
       ['Mum said I had to ___ my room before going out.', 'tidy up', ['give up', 'turn up', 'take up']],
-      ['I ___ my old photo album while clearing the storeroom and found many childhood memories.', 'came across', ['came over', 'came along', 'came through']],
-      ['Despite training hard all year, the team decided to ___ just before the finals.', 'give up', ['give in', 'give out', 'give away']],
-      ['The school concert was ___ because the hall was flooded after the heavy rain.', 'called off', ['called out', 'called up', 'called for']],
-      ['The scientist ___ a series of experiments to test her new theory.', 'carried out', ['carried on', 'carried over', 'carried away']],
-      ['We have ___ milk. Could you buy some on your way home?', 'run out of', ['run into', 'run over', 'run through']],
-      ['The teacher ___ that the answer to question 5 was on the board all along.', 'pointed out', ['pointed at', 'pointed to', 'pointed up']],
-      ['My father ___ his own business after working for a large company for twenty years.', 'set up', ['set off', 'set out', 'set aside']],
-      ['She had to ___ a very difficult period after her grandmother passed away.', 'go through', ['go over', 'go along', 'go into']],
-      ['My sister and I always ___ after an argument — we cannot stay angry at each other for long.', 'make up', ['make out', 'make over', 'make for']],
-      ['My brother decided to ___ swimming as a hobby after watching the Olympics.', 'take up', ['take on', 'take over', 'take off']],
-      ['The manager had to ___ a difficult decision that affected the whole team.', 'face up to', ['face off with', 'face down from', 'face away from']],
-      ['He was so excited that he could not ___ the urge to share the news.', 'hold back', ['hold on', 'hold out', 'hold up']],
-      ['The volunteers ___ enough food to feed the entire shelter for a week.', 'gathered up', ['used up', 'gave out', 'called off']],
+      ['Please ___ the lights when you leave the classroom.', 'turn off', ['turn up', 'turn over', 'turn out']],
+      ['It is cold outside, so ___ your jacket before you go.', 'put on', ['put off', 'put up', 'put down']],
+      ['Could you ___ my little brother while I finish my homework?', 'look after', ['look up', 'look out', 'look into']],
+      ['The teacher asked us to ___ our textbooks to page 42.', 'turn to', ['turn over', 'turn down', 'turn in']],
+      ['I am ___ to my birthday party next week.', 'looking forward', ['looking up', 'looking out', 'looking after']],
+      ['Please ___ the music. We cannot hear ourselves think.', 'turn down', ['turn off', 'turn over', 'turn out']],
+      ['Do not ___ so easily — try the puzzle once more.', 'give up', ['give in', 'give out', 'give away']],
+      ['Remember to ___ your shoes before entering the house.', 'take off', ['take up', 'take on', 'take over']],
+      ['She had to ___ early because the bus leaves at seven.', 'get up', ['get on', 'get over', 'get by']],
+      ['We should ___ the rubbish before the bin overflows.', 'throw away', ['throw up', 'throw on', 'throw over']],
+      ['Please ___ your toys when you have finished playing.', 'put away', ['put on', 'put up', 'put off']],
     ];
+    // P3–P4: phrasal verbs whose meaning is no longer the sum of their parts.
+    const middle = [
+      ['I ___ my old photo album while clearing the storeroom.', 'came across', ['came over', 'came along', 'came through']],
+      ['The school concert was ___ because the hall was flooded.', 'called off', ['called out', 'called up', 'called for']],
+      ['We have ___ milk. Could you buy some on your way home?', 'run out of', ['run into', 'run over', 'run through']],
+      ['The teacher ___ that the answer to question 5 was on the board.', 'pointed out', ['pointed at', 'pointed to', 'pointed up']],
+      ['My brother decided to ___ swimming after watching the Olympics.', 'take up', ['take on', 'take over', 'take off']],
+      ['My sister and I always ___ after an argument.', 'make up', ['make out', 'make over', 'make for']],
+      ['My father ___ his own business after twenty years at a large company.', 'set up', ['set off', 'set out', 'set aside']],
+      ['The prisoners succeeded in ___ of prison through a secret tunnel.', 'breaking out', ['breaking into', 'breaking up', 'breaking through']],
+      ['He was so excited that he could not ___ the urge to share the news.', 'hold back', ['hold on', 'hold out', 'hold up']],
+      ['Please ___ the form and return it to the office by Friday.', 'fill in', ['fill up', 'fill out of', 'fill over']],
+      ['The meeting was ___ until the principal returned from leave.', 'put off', ['put on', 'put away', 'put up']],
+      ['She promised to ___ the matter and report back to the class.', 'look into', ['look after', 'look up', 'look out']],
+    ];
+    // P5–P6: abstract and figurative phrasal verbs of the kind PSLE tests.
+    const upper = [
+      ['The business deal ___ because both sides could not agree.', 'fell through', ['fell out', 'fell behind', 'fell over']],
+      ['The scientist ___ a series of experiments to test her new theory.', 'carried out', ['carried on', 'carried over', 'carried away']],
+      ['The manager had to ___ a difficult decision that affected the team.', 'face up to', ['face off with', 'face away from', 'face down from']],
+      ['She had to ___ a very difficult period after her grandmother died.', 'go through', ['go over', 'go along', 'go into']],
+      ['The committee ___ the proposal in detail before voting on it.', 'went over', ['went off', 'went along', 'went out']],
+      ['Despite the setback, the team ___ with the project as planned.', 'pressed on', ['pressed in', 'pressed out', 'pressed over']],
+      ['His long silence ___ how uncomfortable he was with the question.', 'gave away', ['gave in', 'gave out', 'gave up']],
+      ['The new evidence ___ the theory the class had accepted for weeks.', 'ruled out', ['ruled over', 'ruled on', 'ruled up']],
+      ['The negotiators refused to ___ despite hours of pressure.', 'give in', ['give out', 'give away', 'give off']],
+      ['She ___ her nervousness and delivered the speech beautifully.', 'got over', ['got on', 'got by', 'got up']],
+      ['The scheme was ___ after the funding was unexpectedly withdrawn.', 'wound up', ['wound down', 'wound over', 'wound on']],
+      ['They will have to ___ on luxuries until the loan is repaid.', 'cut back', ['cut in', 'cut off', 'cut up']],
+    ];
+    const rows = bandRows(level, { lower, middle, upper });
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'phrasalVerbs', subskill: 'phrasal_verb_meaning', q, choices: buildChoices(answer, ds), answer, explain: 'Phrasal verbs combine a verb + particle into a fixed meaning — come across (encounter), give up (stop trying), call off (cancel), carry out (perform), run out of (exhaust supply).' };
   },
@@ -1079,31 +1162,52 @@ const VOCAB_BUILDERS = {
     return { category: 'verbDistinction', subskill: 'verb_pair_choice', q, choices: buildChoices(answer, ds), answer, explain: 'These verbs look similar but mean different things — pay attention to who is doing what to whom.' };
   },
   movementVerbs(level, i) {
-    const rows = [
-      ['The snake ___ silently through the tall grass towards the pond.', 'slithered', ['galloped', 'soared', 'waded']],
-      ['The horse ___ gracefully across the open field, kicking up dust.', 'galloped', ['slithered', 'waddled', 'lumbered']],
-      ['The eagle ___ high above the mountains, searching for prey below.', 'soared', ['prowled', 'waded', 'scurried']],
-      ['The rabbit ___ away into the bushes when it heard a loud noise.', 'scurried', ['lumbered', 'soared', 'galloped']],
-      ['The hippopotamus ___ slowly through the muddy river shallows.', 'waded', ['soared', 'galloped', 'scurried']],
-      ['The tiger ___ silently through the jungle, watching the deer.', 'prowled', ['waded', 'scurried', 'galloped']],
-      ['The old bear ___ out of the cave after its long winter sleep.', 'lumbered', ['darted', 'soared', 'prowled']],
-      ['The hawk ___ from the sky and snatched the mouse in its talons.', 'swooped', ['lumbered', 'waded', 'galloped']],
-      ['The frog ___ from one lily pad to the next across the pond.', 'leaped', ['slithered', 'lumbered', 'prowled']],
-      ['The little crab ___ sideways across the sandy beach at low tide.', 'scuttled', ['soared', 'galloped', 'waded']],
-      ['The monkey ___ up the tall tree trunk using its strong limbs.', 'scrambled', ['galloped', 'waded', 'prowled']],
-      ['The kangaroo ___ across the dry plains with powerful bounding leaps.', 'bounded', ['slithered', 'waded', 'lumbered']],
-      ['The cat ___ slowly towards the sleeping mouse, making no sound.', 'crept', ['galloped', 'soared', 'bounded']],
-      ['The duck ___ gently across the calm lake on a quiet morning.', 'paddled', ['galloped', 'prowled', 'scurried']],
-      ['The deer ___ gracefully over the low fence and into the forest.', 'leaped', ['waded', 'lumbered', 'scuttled']],
-      ['The penguin ___ clumsily across the ice towards the sea.', 'waddled', ['galloped', 'slithered', 'soared']],
-      ['The squirrel ___ up the tree the moment the dog barked.', 'darted', ['lumbered', 'waded', 'waddled']],
-      ['The butterfly ___ from flower to flower in the school garden.', 'fluttered', ['stomped', 'crawled', 'plodded']],
-      ['The elephant ___ heavily through the forest, shaking the ground.', 'plodded', ['darted', 'fluttered', 'scuttled']],
-      ['The dolphin ___ out of the water and splashed back into the waves.', 'leapt', ['crept', 'plodded', 'waddled']],
-      ['The worm ___ slowly through the damp soil after the rain.', 'burrowed', ['galloped', 'soared', 'swooped']],
-      ['The lizard ___ quickly up the wall and out of the window.', 'darted', ['plodded', 'waddled', 'lumbered']],
-      ['The swan ___ smoothly across the still surface of the lake.', 'glided', ['stomped', 'scrambled', 'scuttled']],
+    // P1–P2: everyday movement verbs a young child already uses in speech.
+    const lower = [
+      ['The rabbit ___ across the grass on its strong back legs.', 'hopped', ['swam', 'flew', 'dug']],
+      ['The bird ___ high above the trees in the blue sky.', 'flew', ['swam', 'hopped', 'crawled']],
+      ['The fish ___ quickly away when the shadow passed over the pond.', 'swam', ['flew', 'hopped', 'marched']],
+      ['The baby ___ across the floor on her hands and knees.', 'crawled', ['flew', 'swam', 'galloped']],
+      ['The duck ___ from side to side as it walked to the pond.', 'waddled', ['flew', 'swam', 'crawled']],
+      ['The cat ___ quietly towards the sleeping mouse.', 'crept', ['stomped', 'flew', 'swam']],
+      ['The squirrel ___ up the tree the moment the dog barked.', 'darted', ['waddled', 'crawled', 'swam']],
+      ['The butterfly ___ from flower to flower in the school garden.', 'fluttered', ['stomped', 'crawled', 'swam']],
+      ['The elephant ___ heavily through the forest, shaking the ground.', 'stomped', ['darted', 'fluttered', 'hopped']],
+      ['The children ___ to the canteen when the bell rang for recess.', 'ran', ['crawled', 'swam', 'flew']],
+      ['The snail ___ slowly along the wet garden wall.', 'crawled', ['galloped', 'flew', 'hopped']],
+      ['The frog ___ from one lily pad to the next across the pond.', 'leaped', ['crawled', 'stomped', 'swam']],
     ];
+    // P3–P4: precise verbs that name a manner of moving.
+    const middle = [
+      ['The snake ___ silently through the tall grass towards the pond.', 'slithered', ['galloped', 'soared', 'waded']],
+      ['The horse ___ gracefully across the open field, kicking up dust.', 'galloped', ['slithered', 'waddled', 'crept']],
+      ['The eagle ___ high above the mountains, searching for prey below.', 'soared', ['waded', 'scurried', 'crawled']],
+      ['The rabbit ___ away into the bushes when it heard a loud noise.', 'scurried', ['soared', 'galloped', 'waded']],
+      ['The hippopotamus ___ slowly through the muddy river shallows.', 'waded', ['soared', 'galloped', 'scurried']],
+      ['The hawk ___ from the sky and snatched the mouse in its talons.', 'swooped', ['waded', 'galloped', 'scurried']],
+      ['The little crab ___ sideways across the sandy beach at low tide.', 'scuttled', ['soared', 'galloped', 'waded']],
+      ['The monkey ___ up the tall tree trunk using its strong limbs.', 'scrambled', ['galloped', 'waded', 'soared']],
+      ['The duck ___ gently across the calm lake on a quiet morning.', 'paddled', ['galloped', 'soared', 'scurried']],
+      ['The deer ___ gracefully over the low fence and into the forest.', 'leaped', ['waded', 'scuttled', 'paddled']],
+      ['The dolphin ___ out of the water and splashed back into the waves.', 'leapt', ['crept', 'waded', 'waddled']],
+      ['The swan ___ smoothly across the still surface of the lake.', 'glided', ['scrambled', 'scuttled', 'scurried']],
+    ];
+    // P5–P6: verbs whose force and weight must be weighed against near neighbours.
+    const upper = [
+      ['The old bear ___ out of the cave after its long winter sleep.', 'lumbered', ['darted', 'soared', 'prowled']],
+      ['The tiger ___ silently through the jungle, watching the deer.', 'prowled', ['waded', 'scurried', 'lumbered']],
+      ['The kangaroo ___ across the dry plains with powerful bounding leaps.', 'bounded', ['slithered', 'waded', 'lumbered']],
+      ['The worm ___ slowly through the damp soil after the rain.', 'burrowed', ['soared', 'swooped', 'bounded']],
+      ['The elephant ___ heavily along the track, in no hurry at all.', 'plodded', ['darted', 'bounded', 'scuttled']],
+      ['The exhausted climbers ___ the final stretch to the summit.', 'trudged', ['bounded', 'darted', 'soared']],
+      ['The wounded fox ___ back towards its den, dragging one leg.', 'limped', ['bounded', 'soared', 'galloped']],
+      ['The heron ___ motionless in the shallows before striking.', 'waded', ['bounded', 'lumbered', 'burrowed']],
+      ['The panther ___ along the branch without disturbing a single leaf.', 'prowled', ['plodded', 'lumbered', 'trudged']],
+      ['The crowds ___ towards the exits once the concert ended.', 'surged', ['plodded', 'burrowed', 'waded']],
+      ['The lizard ___ across the hot rock and vanished into a crack.', 'darted', ['plodded', 'lumbered', 'trudged']],
+      ['The tortoise ___ steadily onwards while the hare slept.', 'plodded', ['darted', 'bounded', 'surged']],
+    ];
+    const rows = bandRows(level, { lower, middle, upper });
     const [q, answer, ds] = rotate(rows, i);
     return { category: 'movementVerbs', subskill: 'animal_movement', q, choices: buildChoices(answer, ds), answer, explain: 'Each animal has its own way of moving — match the verb to how that animal travels.' };
   },

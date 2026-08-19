@@ -9,6 +9,7 @@ import { inferQuestionContextType } from './mcqItemMetadata.js';
 import { CLUE_CATEGORIES, deriveClueWords, deriveMcqDifficulty, mcqSeedKey } from './mcqItemFeatures.js';
 import { makeFallbackOptionExplanations } from './mcqOptionExplanations.js';
 import { GRAMMAR_TIPS } from './grammarTips.js';
+import { getStrandLevel } from './spiralGrammar.js';
 import { MIN_QUESTIONS_PER_SCOPE, contextualizeMcqQuestion, varyMcqNames } from './practiceExpansion.js';
 
 export const GRAMMAR_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
@@ -4661,6 +4662,14 @@ function buildLevel(level) {
         if (derived.length) item.clueWords = derived;
       }
       if (spec.reasoning) item.reasoning = spec.reasoning;
+      // A strand like Simple Past spans six years of teaching points. Tag the
+      // item with the spiral step it actually belongs to, so a P4 pupil is
+      // taught "Simple Past vs Past Continuous" rather than the P1 intro rule.
+      const step = getStrandLevel(category, level);
+      if (step) {
+        item.spiralStep = `${category}:${level}`;
+        item.spiralLabel = step.label;
+      }
       // Context type reflects the seed sentence, not the presentation wrapper
       // (some wrappers add a sentence of their own).
       item.contextType = inferQuestionContextType(spec.q);

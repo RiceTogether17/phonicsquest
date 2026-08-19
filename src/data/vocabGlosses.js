@@ -95,6 +95,17 @@ export const WORD_GLOSSES = {
   waddled: 'walked with short steps, rocking side to side, like a duck',
   waded: 'walked through water',
 
+  // movement verbs — added with the level-banded pools
+  dug: 'made a hole by moving earth away',
+  flew: 'moved through the air',
+  hopped: 'made short jumps, usually on one or both feet',
+  limped: 'walked unevenly because of an injured leg',
+  marched: 'walked with regular, measured steps',
+  ran: 'moved quickly on foot',
+  surged: 'moved forward suddenly and powerfully, like a wave',
+  swam: 'moved through water',
+  trudged: 'walked slowly and heavily, as if worn out',
+
   // collective nouns and containers
   army: 'the collective noun for ants (an army of ants) or soldiers',
   band: 'a group of musicians playing together',
@@ -420,6 +431,60 @@ export const WORD_GLOSSES = {
   'turn to': 'to open a page, or go to someone for help',
   'turn up': 'to arrive, or increase the volume',
   'used up': 'finished completely so none is left',
+
+  // phrasal verbs — added with the level-banded pools
+  'cut back': 'to reduce the amount of something',
+  'gave away': 'handed over for free, or accidentally revealed a secret',
+  'gave in': 'surrendered to pressure',
+  'gave up': 'stopped trying',
+  'got by': 'managed with only just enough',
+  'got on': 'boarded a vehicle, or made progress',
+  'got up': 'rose from bed or from a seat',
+  'look out': 'to watch for danger',
+  'got over': 'recovered from an illness, shock or difficulty',
+  'look after': 'to take care of someone or something',
+  'look into': 'to investigate a matter',
+  'cut in': 'to interrupt, or to move in front of others in a queue',
+  'cut off': 'to disconnect or separate something',
+  'cut up': 'to cut into pieces',
+  'fill in': 'to complete a form by writing in the blanks',
+  'fill out of': 'not an English expression — a form is "filled in" or "filled out"',
+  'fill over': 'not an English expression',
+  'fill up': 'to make something completely full',
+  'get by': 'to manage with only just enough',
+  'get on': 'to board a vehicle, or to make progress',
+  'get over': 'to recover from an illness, shock or difficulty',
+  'get up': 'to rise from bed or from a seat',
+  'give off': 'to send out a smell, heat or light',
+  'go off': 'to explode or sound an alarm, or to stop working',
+  'go out': 'to leave the house, or to stop burning',
+  'look up': 'to search for information, or to improve',
+  'pressed in': 'not the expression — continuing despite difficulty is "pressed on"',
+  'pressed on': 'continued despite difficulty',
+  'pressed out': 'not the expression for continuing despite difficulty',
+  'pressed over': 'not an English expression',
+  'put away': 'to return something to its proper place',
+  'put down': 'to set something on a surface, or to criticise someone',
+  'put off': 'to postpone something to a later time',
+  'put on': 'to dress yourself in something, or to switch on',
+  'put up': 'to raise or build something, or to give someone a place to stay',
+  'ruled on': 'gave an official decision about something',
+  'ruled out': 'decided that something is impossible and dismissed it',
+  'ruled over': 'governed a country or people',
+  'ruled up': 'not an English expression',
+  'threw away': 'got rid of something as rubbish',
+  'throw away': 'to get rid of something as rubbish',
+  'throw on': 'to put clothing on hastily',
+  'throw over': 'not the expression for discarding — that is "throw away"',
+  'throw up': 'to vomit',
+  'went along': 'accompanied someone, or agreed with a plan',
+  'went off': 'exploded or sounded, or stopped working',
+  'went out': 'left the house, or stopped burning',
+  'went over': 'reviewed or checked something carefully',
+  'wound down': 'gradually reduced an activity towards its end',
+  'wound on': 'not an English expression',
+  'wound over': 'not an English expression',
+  'wound up': 'brought to an end and closed down',
 };
 
 // ── Proverb meanings ──────────────────────────────────────────────────────
@@ -528,6 +593,15 @@ export function makeVocabTeachingExplanations(spec) {
   if (category === 'proverbsSayings') {
     const meaning = proverbMeaningFor(q);
     if (!meaning) return null;
+    // Upper primary asks what the proverb MEANS or which situation shows it,
+    // so the feedback must reason about the situation, not the missing word.
+    if (spec.subskill === 'proverb_meaning') {
+      return build((choice) =>
+        choice === answer
+          ? `Correct — the proverb means ${meaning}, and this is the case that shows it.`
+          : `“${choice}” does not show the proverb at work: it means ${meaning}.`,
+      );
+    }
     return build((choice) =>
       choice === answer
         ? `Correct — the proverb ends with “${answer}”. It means ${meaning}.`

@@ -126,8 +126,37 @@ export function varyMcqNames(spec, index) {
   };
 }
 
+// Frames for stems that are already a direct question (no blank to fill),
+// such as "Which situation best shows …?". The cloze frames above would
+// otherwise produce nonsense like "leaving out one word: …? Which word is
+// missing?" on a stem that has no missing word.
+const MCQ_QUESTION_FORMS = [
+  {
+    type: 'question-response',
+    render: (question, name) => `${name} is working on this question: ${question}`,
+  },
+  {
+    type: 'discussion-choice',
+    render: (question, name) => `Help ${name} answer this: ${question}`,
+  },
+  {
+    type: 'meaning-selection',
+    render: (question, name) => `${name}’s class discussed this question: ${question}`,
+  },
+  {
+    type: 'reasoning-choice',
+    render: (question, name) => `Choose the best answer for ${name}’s question: ${question}`,
+  },
+  {
+    type: 'application-choice',
+    render: (question, name) => `${name} was asked this in class: ${question}`,
+  },
+];
+
 export function contextualizeMcqQuestion(question, index) {
-  const form = MCQ_FORMS[index % MCQ_FORMS.length];
+  const hasBlank = /___/.test(String(question || ''));
+  const forms = hasBlank ? MCQ_FORMS : MCQ_QUESTION_FORMS;
+  const form = forms[index % forms.length];
   const name = NAMES[index % NAMES.length];
   const trimmed = String(question || '').trim();
   const base = /[.?!]["'’”)\]]?$/.test(trimmed) ? trimmed : `${trimmed}.`;

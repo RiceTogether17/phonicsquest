@@ -18,6 +18,7 @@ import {
   renderMcqDifficultyToggle,
 } from './mcqDifficulty.js';
 import { getGrammarTip } from '../data/grammarTips.js';
+import { getStrandLevel } from '../data/spiralGrammar.js';
 import { MCQ_ROUND_SIZE } from '../constants.js';
 import { renderMcqQuickStart } from './mcqBrowserShell.js';
 
@@ -40,8 +41,15 @@ let _ruleCardsShown = 0; // teach-cards shown this session (capped)
  *  new things per sitting, not every concept at once. */
 const MAX_RULE_CARDS_PER_SESSION = 3;
 
-function _lessonKey(category) {
-  return `gmcq:${category}`;
+/**
+ * Lessons are keyed by SPIRAL STEP where one exists, not by category. Simple
+ * Past at P1 ("yesterday + common verbs") and at P4 ("contrast with past
+ * continuous") are different teaching points; being taught the first must not
+ * silence the second.
+ */
+function _lessonKey(category, level = null) {
+  const step = level ? getStrandLevel(category, level) : null;
+  return step ? `gmcq:${category}:${level}` : `gmcq:${category}`;
 }
 
 const RETEACH_AFTER_DAYS = 14;
@@ -53,18 +61,18 @@ const RETEACH_BELOW_SCORE = 0.6;
  * weeks after the lesson gets re-taught, the way a tutor would re-open the
  * rule before drilling on.
  */
-function _hasBeenTaught(category) {
-  const seenAt = (store.get('lessonsSeen') || {})[_lessonKey(category)];
+function _hasBeenTaught(category, level = null) {
+  const seenAt = (store.get('lessonsSeen') || {})[_lessonKey(category, level)];
   if (!seenAt) return false;
   const recentDays = (Date.now() - Date.parse(seenAt)) / 86_400_000;
   if (recentDays < RETEACH_AFTER_DAYS) return true;
   return questMastery.getSkillScore('grammarMcq', category) >= RETEACH_BELOW_SCORE;
 }
 
-function _markTaught(category) {
+function _markTaught(category, level = null) {
   const seen = { ...(store.get('lessonsSeen') || {}) };
   // Always refresh the timestamp — a re-teach restarts the recency window.
-  seen[_lessonKey(category)] = new Date().toISOString();
+  seen[_lessonKey(category, level)] = new Date().toISOString();
   store.set('lessonsSeen', seen);
 }
 
@@ -284,7 +292,7 @@ function _startScope({ level = null, category = null, label = '', difficulty = _
   _isRecovery = false;
   _ruleCardsShown = 0;
   if (_scope.category && !_isRecovery) {
-    _renderRuleCard(_scope.category, () => _renderQuestion());
+    _renderRuleCard(_scope.category, () => _renderQuestion(), level);
   } else {
     _renderQuestion();
   }
@@ -339,8 +347,8 @@ function _renderQuestion() {
 
   // Teach before practice: the first time this profile meets a category in a
   // mixed session, show its rule card first (scoped sessions teach at start).
-  if (!_hasBeenTaught(item.category) && _ruleCardsShown < MAX_RULE_CARDS_PER_SESSION) {
-    return _renderRuleCard(item.category, () => _renderQuestion());
+  if (!_hasBeenTaught(item.category, item.level) && _ruleCardsShown < MAX_RULE_CARDS_PER_SESSION) {
+    return _renderRuleCard(item.category, () => _renderQuestion(), item.level);
   }
 
   const progressPct = Math.round((_idx / _items.length) * 100);
@@ -502,24 +510,32 @@ function _renderSkillBreakdown() {
   return `<h4 class="sq-skills-heading">Skill breakdown</h4><table class="sq-skills-table"><thead><tr><th>Skill</th><th>Score</th><th>Progress</th><th>Accuracy</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-function _renderRuleCard(category, onStart) {
+function _renderRuleCard(category, onStart, level = null) {
   _ruleCardsShown += 1;
-  _markTaught(category);
+  _markTaught(category, level);
   const tip = getGrammarTip(category);
   const meta = GRAMMAR_CATEGORIES[category] || { icon: '🧠', label: category };
+  // Where the spiral defines this level's step, teach THAT: its focus is the
+  // rule for now, and its key forms are the worked examples.
+  const step = level ? getStrandLevel(category, level) : null;
+  const title = step ? step.label : meta.label;
+  const rule = step?.focus || tip.rule;
+  const example = step?.keyForms?.length
+    ? `Forms to watch this year: ${step.keyForms.join(', ')}`
+    : tip.example;
   _container.innerHTML = `
     <div class="mcq-rule-card" role="region" aria-label="Grammar rule for ${escapeAttr(meta.label)}">
       <div class="mcq-rule-icon">${meta.icon}</div>
-      <h2 class="mcq-rule-title">${escapeHtml(meta.label)}</h2>
+      <h2 class="mcq-rule-title">${escapeHtml(title)}</h2>
       <p class="mcq-rule-intro">A quick lesson before you practise — read it once, then try the questions.</p>
       <div class="mcq-rule-body">
         <div class="mcq-rule-section">
           <p class="mcq-rule-label">📖 Rule</p>
-          <p class="mcq-rule-text">${escapeHtml(tip.rule)}</p>
+          <p class="mcq-rule-text">${escapeHtml(rule)}</p>
         </div>
         <div class="mcq-rule-section">
           <p class="mcq-rule-label">✏️ Example</p>
-          <p class="mcq-rule-example">${escapeHtml(tip.example)}</p>
+          <p class="mcq-rule-example">${escapeHtml(example)}</p>
         </div>
         <div class="mcq-rule-section">
           <p class="mcq-rule-label">💡 Tip</p>

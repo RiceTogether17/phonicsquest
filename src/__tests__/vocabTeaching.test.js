@@ -79,3 +79,53 @@ describe('vocabulary teaching explanations', () => {
     }
   });
 });
+
+/**
+ * A category that serves one seed pool to P1 through P6 is simultaneously too
+ * hard for a six-year-old and trivial for a P6 pupil. Every category must
+ * band its pool along the spiral.
+ */
+describe('vocabulary level banding', () => {
+  function seedsFor(level, category) {
+    return new Set(
+      VOCAB_MCQ_ITEMS[level].filter((i) => i.category === category).map((i) => i.seedId),
+    );
+  }
+
+  it('no category serves the same seeds to P1 and P6', () => {
+    const categories = new Set(VOCAB_MCQ_ITEMS.P1.map((i) => i.category));
+    const shared = [];
+    for (const category of categories) {
+      const p1 = seedsFor('P1', category);
+      const p6 = seedsFor('P6', category);
+      if (!p1.size || !p6.size) continue;
+      const overlap = [...p1].filter((s) => p6.has(s)).length;
+      if (overlap / p1.size > 0.5) shared.push(`${category}: ${overlap}/${p1.size} shared`);
+    }
+    expect(shared, shared.join('\n')).toEqual([]);
+  });
+
+  it('upper primary tests what a proverb means, not a memorised ending', () => {
+    for (const level of ['P5', 'P6']) {
+      const items = VOCAB_MCQ_ITEMS[level].filter((i) => i.category === 'proverbsSayings');
+      expect(items.length).toBeGreaterThan(0);
+      expect(items.every((i) => i.subskill === 'proverb_meaning')).toBe(true);
+    }
+    // Lower primary still learns the fixed wording first.
+    const p1 = VOCAB_MCQ_ITEMS.P1.filter((i) => i.category === 'proverbsSayings');
+    expect(p1.every((i) => i.subskill === 'proverb_completion')).toBe(true);
+  });
+
+  it('P5/P6 social studies vocabulary is English, not economics jargon', () => {
+    // These test knowledge of economics or international law, not the word.
+    const JARGON = ['tariff', 'depreciation', 'monetary', 'bloc', 'multilateralism', 'drain'];
+    const found = new Set();
+    for (const level of ['P5', 'P6']) {
+      for (const item of VOCAB_MCQ_ITEMS[level]) {
+        if (item.category !== 'socialStudiesVocab') continue;
+        if (JARGON.includes(item.answer)) found.add(item.answer);
+      }
+    }
+    expect([...found]).toEqual([]);
+  });
+});

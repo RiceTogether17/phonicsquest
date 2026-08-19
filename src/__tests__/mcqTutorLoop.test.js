@@ -14,6 +14,7 @@ import { store } from '../modules/store.js';
 import { questMastery } from '../modules/questMastery.js';
 import { countDueReviews } from '../modules/mcqReviewLane.js';
 import { getWordGloss } from '../data/vocabGlosses.js';
+import { getStrandLevel } from '../data/spiralGrammar.js';
 import * as grammarMcq from '../modes/grammarMcq.js';
 import * as vocabMcq from '../modes/vocabMcq.js';
 
@@ -188,7 +189,9 @@ describe('the MCQ tutoring loop', () => {
     const seen = {};
     const mastery = {};
     for (const category of categories) {
-      seen[`gmcq:${category}`] = longAgo;
+      // Lessons are keyed by spiral step where the strand defines one.
+      const key = getStrandLevel(category, 'P4') ? `gmcq:${category}:P4` : `gmcq:${category}`;
+      seen[key] = longAgo;
       mastery[category] = category === weakSkill ? 0.2 : 0.95;
     }
     store.set('lessonsSeen', seen);
@@ -206,10 +209,53 @@ describe('the MCQ tutoring loop', () => {
     grammarMcq.startGrammarMcqLevel('P4');
 
     // The card shown must be the weak skill's — not some other category that
-    // merely happened to be unseen.
+    // merely happened to be unseen — and it must teach THIS level's spiral
+    // step, not the strand's P1 introduction.
     const card = document.querySelector('.mcq-rule-card');
     expect(card, 'a stale, weak skill should be re-taught').toBeTruthy();
-    expect(card.querySelector('.mcq-rule-title')?.textContent).toBe('Subject-Verb Agreement');
+    expect(card.querySelector('.mcq-rule-title')?.textContent).toBe(
+      getStrandLevel('svAgreement', 'P4').label,
+    );
+  });
+
+  it('teaches this level of a strand even when an earlier level was taught', () => {
+    // The pupil met Simple Past at P1. P4's step is a different teaching
+    // point, so it must still be taught.
+    store.set('lessonsSeen', { 'gmcq:simplePast:P1': new Date().toISOString() });
+    store.set('questMastery', { grammarMcq: { simplePast: 0.95 } });
+
+    const host = mount();
+    grammarMcq.initGrammarMcq(host, () => {});
+    grammarMcq.startGrammarMcqLevel('P4');
+    // Walk until a Simple Past card appears or the round ends.
+    const p4Label = getStrandLevel('simplePast', 'P4').label;
+    expect(p4Label).not.toBe(getStrandLevel('simplePast', 'P1').label);
+
+    let sawP4Card = false;
+    for (let i = 0; i < 20; i += 1) {
+      const card = document.querySelector('.mcq-rule-card');
+      if (card?.querySelector('.mcq-rule-title')?.textContent === p4Label) {
+        sawP4Card = true;
+        break;
+      }
+      if (card) {
+        card.querySelector('button').click();
+        continue;
+      }
+      const buttons = choiceButtons();
+      if (!buttons.length) break;
+      buttons[0].click();
+      const live = document.querySelector('[data-choice]:not([disabled])');
+      if (live) live.click();
+      advance();
+    }
+    // Either the P4 card appeared, or Simple Past was not drawn this round —
+    // what must never happen is the P1 lesson silencing the P4 one.
+    const p1Key = 'gmcq:simplePast:P1';
+    const p4Key = 'gmcq:simplePast:P4';
+    const seen = store.get('lessonsSeen');
+    expect(seen[p1Key]).toBeTruthy();
+    if (sawP4Card) expect(seen[p4Key]).toBeTruthy();
   });
 
   it('does not re-teach a rule the child is still strong at', () => {
