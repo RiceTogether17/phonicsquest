@@ -130,11 +130,11 @@ const GRAMMAR_BUILDERS = {
         'the': '"The" would point to a specific pen already known, but Jake is just adding one more.',
         'some': '"Some" is for plural or uncountable nouns, not one pen.',
       }],
-      ['___ ice-cream treat awaited each pupil after Sports Day.', 'An', ['A', 'The', 'Some'], {
-        'An': '"An" is correct because "ice-cream" starts with the vowel sound /aɪ/.',
-        'A': '"A" is used before consonant sounds, but "ice-cream" begins with a vowel sound.',
-        'The': '"The" would mean a specific treat already known to everyone, but this is simply one treat per pupil.',
-        'Some': '"Some" is for plural or uncountable nouns, not a single treat.',
+      ['Each pupil received ___ ice-cream treat after Sports Day.', 'an', ['a', 'the', 'some'], {
+        'an': '"An" is correct because "ice-cream" starts with the vowel sound /aɪ/.',
+        'a': '"A" is used before consonant sounds, but "ice-cream" begins with a vowel sound.',
+        'the': '"The" would mean a specific treat already known to everyone, but this is simply one treat per pupil.',
+        'some': '"Some" is for plural or uncountable nouns, not a single treat.',
       }],
       ['The new pupil gave ___ interesting talk about her home country.', 'an', ['a', 'the', 'some'], {
         'an': '"An" is correct because "interesting" starts with the vowel sound /ɪ/.',
@@ -202,8 +202,8 @@ const GRAMMAR_BUILDERS = {
       ['Mum bought a new lunchbox and ___ is blue and yellow.', 'it', ['he', 'she', 'they']],
       ['The children sat at the void deck because ___ were tired.', 'they', ['them', 'we', 'it']],
       ['My brother forgot his umbrella, so I passed ___ mine.', 'him', ['he', 'his', 'them']],
-      ['Siti left her bag at the canteen, so the teacher kept ___ safe.', 'her', ['she', 'hers', 'it']],
-      ['The teacher asked Bala and ___ to clean the board.', 'us', ['we', 'they', 'them']],
+      ['Siti left her bag at the canteen, so the teacher kept ___ safe.', 'it', ['her', 'she', 'hers']],
+      ['The teacher asked Bala and ___ to clean the board.', 'me', ['I', 'we', 'they']],
       ['Can you help ___? I cannot open my locker.', 'me', ['I', 'my', 'mine']],
     ];
     const upperRows = [
@@ -444,11 +444,11 @@ const GRAMMAR_BUILDERS = {
         'is': '"Is" is the wrong tense — the statement uses past "was", so the tag must also use "was".',
         'isn\'t': '"Isn\'t" is the wrong tense — the statement uses past "was", so the tag must also use "was".',
       }],
-      ['Mei did her homework already, ___ she?', 'didn\'t', ['did', 'does', 'doesn\'t'], {
-        'didn\'t': '"Didn\'t" is correct because the statement is positive ("did"), so the tag must be negative using "did".',
-        'did': '"Did" would make a positive tag after a positive statement — tags must reverse polarity.',
-        'does': '"Does" is the wrong tense — the statement uses past "did", so the tag must also use "did".',
-        'doesn\'t': '"Doesn\'t" is the wrong tense — the statement uses past "did", so the tag must also use "did".',
+      ['Mei has already done her homework, ___ she?', 'hasn\'t', ['has', 'didn\'t', 'doesn\'t'], {
+        'hasn\'t': '"Hasn\'t" is correct because the statement is positive ("has done"), so the tag must be negative using "has".',
+        'has': '"Has" would make a positive tag after a positive statement — tags must reverse polarity.',
+        'didn\'t': '"Didn\'t" is the wrong auxiliary — the statement uses "has done", so the tag must also use "has".',
+        'doesn\'t': '"Doesn\'t" is the wrong auxiliary — the statement uses "has done", so the tag must also use "has".',
       }],
       ['We had finished the test before the bell rang, ___ we?', 'hadn\'t', ['had', 'did', 'didn\'t'], {
         'hadn\'t': '"Hadn\'t" is correct because the statement is positive ("had finished"), so the tag must be negative using "had".',
@@ -855,11 +855,11 @@ const GRAMMAR_BUILDERS = {
         'Which': '"Which" asks for a selection from a specific set, not the identity of a person.',
         'Whose': '"Whose" asks about ownership, not who performed the action of giving permission.',
       }],
-      ['"___ colour would you like for your name card?" asked the art teacher.', 'Which', ['What', 'Whose', 'How'], {
-        'Which': '"Which" is correct because the question asks for a choice from a set of available colours.',
-        'What': '"What colour" is also acceptable in informal use, but "which" is more precise when selecting from a known set of options.',
+      ['"___ of these three colours would you like for your name card?" asked the art teacher.', 'Which', ['What', 'Whose', 'How'], {
+        'Which': '"Which" is correct because the question selects from the set of three colours offered.',
+        'What': '"What" is not used before "of these three colours" — "which" selects from a stated set.',
         'Whose': '"Whose" asks about ownership, not a choice of colour.',
-        'How': '"How colour" is not grammatical — "how" asks about manner or degree, not selection.',
+        'How': '"How" asks about manner or degree, not a selection from a set.',
       }],
       ['"___ is the science lab? I cannot find it," the new student said.', 'Where', ['When', 'Why', 'How'], {
         'Where': '"Where" is correct because the student wants to know the location of the science lab.',
@@ -1540,11 +1540,11 @@ const GRAMMAR_BUILDERS = {
         'inside': '"Inside" means within an enclosed space; they walked over the bridge.',
         'with': '"With" shows accompaniment, not movement over a bridge.',
       }],
-      ['The science exhibition was held ___ the multipurpose hall on Monday.', 'in', ['on', 'at', 'into'], {
-        'in': '"In" is correct because the hall is an enclosed space.',
-        'on': '"On" is for surfaces or days; the hall is an enclosed venue.',
-        'at': '"At" works for general locations but "in" is more precise for a specific room or building.',
-        'into': '"Into" shows movement entering; the exhibition was held inside the hall, not moving into it.',
+      ['The pupils hung their paintings ___ the display wall of the multipurpose hall.', 'on', ['in', 'at', 'into'], {
+        'on': '"On" is correct because the paintings are attached to the surface of the wall.',
+        'in': '"In" is for enclosed spaces; a wall is a surface.',
+        'at': '"At" points to a general location, not attachment to a surface.',
+        'into': '"Into" shows movement entering; the paintings rest on the wall, not inside it.',
       }],
       ['Pass the message ___ Mrs Lim before recess, please.', 'to', ['at', 'for', 'with'], {
         'to': '"To" is correct because the message is being directed towards Mrs Lim as the receiver.',
@@ -1600,9 +1600,9 @@ const GRAMMAR_BUILDERS = {
         'along': '"Along" describes movement or position following a line, not a spot separating two things.',
         'across': '"Across" means from one side to the other, not in the middle of two objects.',
       }],
-      ['The prize money was shared ___ the four winning teams.', 'among', ['between', 'along', 'beside'], {
+      ['The prize money was divided equally ___ the four winning teams.', 'among', ['within', 'along', 'beside'], {
         'among': '"Among" is correct because the money is divided across more than two groups.',
-        'between': '"Between" is for exactly two parties; here there are four teams.',
+        'within': '"Within" means inside the limits of one thing, not sharing across several groups.',
         'along': '"Along" describes position following a line, not sharing.',
         'beside': '"Beside" means next to, which does not fit dividing money.',
       }],
@@ -2225,11 +2225,11 @@ const GRAMMAR_BUILDERS = {
   },
   futureTense(level, i) {
     const rows = [
-      ['Tomorrow, our class ___ the heritage gallery.', 'will visit', ['visit', 'visited', 'is visiting'], {
+      ['Tomorrow, our class ___ the heritage gallery.', 'will visit', ['visit', 'visited', 'has visited'], {
         'will visit': '"Will visit" is correct because "tomorrow" signals a future action and "will + verb" expresses a straightforward future plan.',
         'visit': '"Visit" is base form simple present; "tomorrow" tells us the action has not happened yet.',
         'visited': '"Visited" is simple past; "tomorrow" signals the action is in the future.',
-        'is visiting': '"Is visiting" is present continuous for a fixed arrangement; "will visit" is also correct here but "is visiting" is not offered as correct.',
+        'has visited': '"Has visited" is present perfect for a completed action; "tomorrow" shows the visit has not happened yet.',
       }],
       ['I think it ___ later in the afternoon.', 'will rain', ['rains', 'rained', 'is raining'], {
         'will rain': '"Will rain" is correct because "I think" signals a prediction about the future.',
@@ -2261,11 +2261,11 @@ const GRAMMAR_BUILDERS = {
         'Are': '"Are" forms a present continuous question about what someone is doing; the request is about a future action.',
         'Do': '"Do" forms a simple present question about habits; the request is about a future action.',
       }],
-      ['Mum says we ___ for dinner at Grandpa\'s on Sunday.', 'will go', ['go', 'went', 'are going'], {
+      ['Mum says we ___ for dinner at Grandpa\'s on Sunday.', 'will go', ['go', 'went', 'have gone'], {
         'will go': '"Will go" is correct because "on Sunday" signals a future event and "will" expresses this plan.',
         'go': '"Go" is simple present; "on Sunday" tells us the action is in the future.',
         'went': '"Went" is simple past; "on Sunday" is a future time.',
-        'are going': '"Are going" is present continuous for a fixed arrangement; "will go" is also acceptable here.',
+        'have gone': '"Have gone" is present perfect for a completed action; "on Sunday" is in the future.',
       }],
       ['Look at those clouds — it ___ heavily in a few minutes.', 'is going to rain', ['rains', 'rained', 'has rained'], {
         'is going to rain': '"Is going to rain" is correct because we can see evidence of rain (dark clouds), signalling an imminent future event.',
@@ -2467,11 +2467,11 @@ const GRAMMAR_BUILDERS = {
         'therefore': '"Therefore" shows a logical result; attentiveness despite a long talk is an unexpected contrast.',
         'subsequently': '"Subsequently" means "afterwards in time"; the sentence is about contrast, not time sequence.',
       }],
-      ['He scored well in English ___ despite struggling with comprehension early in the year.', 'although', ['nevertheless', 'consequently', 'furthermore'], {
-        'although': '"Although" is correct because it introduces a concession — he scored well despite the earlier struggle.',
-        'nevertheless': '"Nevertheless" links two separate sentences; "although" works within a single sentence.',
-        'consequently': '"Consequently" shows a logical result; scoring well despite struggling is a contrast, not a result.',
-        'furthermore': '"Furthermore" adds supporting information; the sentence contrasts early struggle with final success.',
+      ['___ he struggled with comprehension early in the year, he scored well in English.', 'Although', ['Nevertheless', 'Consequently', 'Furthermore'], {
+        'Although': '"Although" is correct because it introduces a concession — he scored well in spite of the earlier struggle.',
+        'Nevertheless': '"Nevertheless" links two separate sentences and cannot introduce this dependent clause.',
+        'Consequently': '"Consequently" shows a logical result; the sentence expresses a contrast, not a result.',
+        'Furthermore': '"Furthermore" adds supporting information; the sentence contrasts early struggle with final success.',
       }],
       ['The hall was packed; ___, latecomers had to stand at the back.', 'as a result', ['in contrast', 'on the other hand', 'nonetheless'], {
         'as a result': '"As a result" is correct because the packed hall is the cause and standing at the back is the outcome.',
@@ -2588,17 +2588,17 @@ const GRAMMAR_BUILDERS = {
         'wide': '"Wide" is the base form, not the comparative — add -r to compare two things.',
         'more wide': '"More wide" is incorrect — short adjectives like "wide" use -r (wider), not "more".',
       }],
-      ['Math homework usually feels ___ than the science project to me.', 'easier', ['easy', 'easiest', 'more easy'], {
+      ['Maths homework usually feels ___ than the science project to me.', 'easier', ['easy', 'easiest', 'more easy'], {
         'easier': '"Easier" is correct because "easy" ends in a consonant + y — change y to i and add -er.',
         'easy': '"Easy" is the base form, not the comparative — change y to i and add -er.',
         'easiest': '"Easiest" is the superlative for three or more; only two pieces of homework are compared.',
         'more easy': '"More easy" is incorrect — adjectives ending in -y use -ier (easier), not "more".',
       }],
-      ['This year\'s school musical is ___ than last year\'s play.', 'more entertaining', ['entertaining', 'most entertaining', 'entertainingest'], {
+      ['This year\'s school musical is ___ than last year\'s play.', 'more entertaining', ['entertaining', 'most entertaining', 'more entertainingly'], {
         'more entertaining': '"More entertaining" is correct because "entertaining" is a long adjective — use "more" to compare.',
         'entertaining': '"Entertaining" is the base form, not the comparative — long adjectives need "more" before them.',
         'most entertaining': '"Most entertaining" is the superlative for three or more; only two shows are compared.',
-        'entertainingest': '"Entertainingest" is not a real word — long adjectives use "more" for comparatives.',
+        'more entertainingly': '"More entertainingly" is an adverb form; an adjective is needed after "is".',
       }],
       ['My cousin is ___ than I am, even though he is two years younger.', 'taller', ['tall', 'tallest', 'more tall'], {
         'taller': '"Taller" is correct because "tall" is a short adjective, so add -er to compare two people.',
@@ -2618,11 +2618,11 @@ const GRAMMAR_BUILDERS = {
         'lightest': '"Lightest" is the superlative for three or more; only two bags are compared.',
         'more light': '"More light" is incorrect — short adjectives like "light" use -er, not "more".',
       }],
-      ['The second attempt was ___ than the first because we had more practice.', 'worse', ['bad', 'worst', 'more bad'], {
-        'worse': '"Worse" is correct because "bad" has an irregular comparative — bad → worse.',
-        'bad': '"Bad" is the base form, not the comparative — "bad" has an irregular form: "worse".',
-        'worst': '"Worst" is the superlative of "bad"; only two attempts are being compared.',
-        'more bad': '"More bad" is incorrect — "bad" has an irregular form: "worse".',
+      ['The second attempt was ___ than the first because we had more practice.', 'better', ['good', 'best', 'more good'], {
+        'better': '"Better" is correct — more practice improved the second attempt, and "good" has an irregular comparative: good → better.',
+        'good': '"Good" is the base form, not the comparative — "good" has an irregular form: "better".',
+        'best': '"Best" is the superlative of "good"; only two attempts are being compared.',
+        'more good': '"More good" is incorrect — "good" has an irregular form: "better".',
       }],
       ['The library near Grandma\'s house is ___ from our school than the one in our estate.', 'farther', ['far', 'farthest', 'more far'], {
         'farther': '"Farther" is correct because "far" has an irregular comparative — far → farther (for distance).',
@@ -2636,17 +2636,17 @@ const GRAMMAR_BUILDERS = {
         'heaviest': '"Heaviest" is the superlative; only the bag on Fridays versus other days is implied.',
         'more heavy': '"More heavy" is incorrect — adjectives ending in -y use -ier (heavier), not "more".',
       }],
-      ['We should be ___ when handling the science equipment.', 'more careful', ['careful', 'most careful', 'carefullier'], {
+      ['We should be ___ when handling the science equipment.', 'more careful', ['careful', 'most careful', 'more carefully'], {
         'more careful': '"More careful" is correct because "careful" is a long adjective — use "more" to compare.',
         'careful': '"Careful" is the base form, not the comparative — long adjectives need "more" before them.',
         'most careful': '"Most careful" is the superlative for three or more comparisons.',
-        'carefullier': '"Carefullier" is not a real word — long adjectives use "more careful".',
+        'more carefully': '"More carefully" is an adverb describing an action; an adjective is needed after "be".',
       }],
-      ['After joining the debate club, Priya became ___ when speaking in front of the class.', 'more confident', ['confident', 'most confident', 'confidentest'], {
+      ['After joining the debate club, Priya became ___ when speaking in front of the class.', 'more confident', ['confident', 'most confident', 'more confidently'], {
         'more confident': '"More confident" is correct because "confident" is a long adjective — use "more" to compare.',
         'confident': '"Confident" is the base form, not the comparative — long adjectives need "more" before them.',
         'most confident': '"Most confident" is the superlative for three or more; this compares Priya before and after joining.',
-        'confidentest': '"Confidentest" is not a real word — long adjectives use "more confident".',
+        'more confidently': '"More confidently" is an adverb describing how she speaks; an adjective is needed after "became".',
       }],
       ['The hawker stall near the bus stop is ___ than the café inside the shopping mall.', 'less expensive', ['expensive', 'least expensive', 'lesser expensive'], {
         'less expensive': '"Less expensive" is correct because it is the comparative for a long adjective when showing a lower degree.',
@@ -2654,7 +2654,7 @@ const GRAMMAR_BUILDERS = {
         'least expensive': '"Least expensive" is the superlative for three or more; only two places are compared.',
         'lesser expensive': '"Lesser expensive" is not grammatical — "less" is the correct word before adjectives.',
       }],
-      ['The school canteen got a ___ drinks machine after the old one broke down last term.', 'newer', ['new', 'newest', 'more new'], {
+      ['The canteen\'s replacement drinks machine is ___ than the one that broke down last term.', 'newer', ['new', 'newest', 'more new'], {
         'newer': '"Newer" is correct because "new" is a short adjective, so add -er to compare two machines.',
         'new': '"New" is the base form, not the comparative — add -er when comparing.',
         'newest': '"Newest" is the superlative for three or more; the old machine and new machine are compared.',
@@ -2780,11 +2780,11 @@ const GRAMMAR_BUILDERS = {
         'might': '"Might" suggests possibility; the sentence states a firm rule.',
         'could': '"Could" suggests ability; the sentence is about a rule forbidding an action.',
       }],
-      ['"___ you please hold the door for the smaller pupils?" asked Mrs Tan.', 'Could', ['Should', 'Must', 'Will'], {
+      ['"___ you please hold the door for the smaller pupils?" asked Mrs Tan.', 'Could', ['Should', 'Must', 'Ought'], {
         'Could': '"Could" is correct because it is used for polite requests.',
         'Should': '"Should" gives advice or obligation; Mrs Tan is making a polite request, not giving advice.',
         'Must': '"Must" is a strong obligation; a polite request uses "could".',
-        'Will': '"Will" is also used for requests but is slightly less polite than "could".',
+        'Ought': '"Ought" needs "to" and gives advice — it is not used for polite requests.',
       }],
       ['You ___ bring your spelling book tomorrow because we have a test.', 'have to', ['could', 'might', 'would'], {
         'have to': '"Have to" is correct because the test creates an external requirement — it is necessary.',
@@ -3664,11 +3664,11 @@ const GRAMMAR_BUILDERS = {
         'never performed': '"Never performed" is simple past without "had"; the past perfect is needed for the earlier past event.',
         'was never performing': '"Was never performing" is past continuous; the past perfect is needed to show she had no prior experience.',
       }],
-      ['When Father came home, we ___ already the dishes after dinner.', 'had washed', ['have washed', 'washed', 'were washing'], {
-        'had washed': '"Had washed" is correct because washing the dishes happened before the past event of Father coming home.',
-        'have washed': '"Have washed" is present perfect; both events are in the past.',
-        'washed': '"Washed" is simple past; "had washed" is needed to show it happened before Father arrived.',
-        'were washing': '"Were washing" shows action in progress; "already" suggests the dishes were done by then.',
+      ['When Father came home, we ___ already washed the dishes after dinner.', 'had', ['have', 'has', 'were'], {
+        'had': '"Had" is correct because "had already washed" (past perfect) shows the washing happened before Father came home.',
+        'have': '"Have" makes the present perfect; both events are in the past, so "had" is needed.',
+        'has': '"Has" is singular present perfect; the subject is "we" and both events are in the past.',
+        'were': '"Were" would need an -ing verb, and "already" shows the dishes were finished, not in progress.',
       }],
       ['The teacher noticed that someone ___ all the art supplies from the cupboard.', 'had taken', ['has taken', 'took', 'was taking'], {
         'had taken': '"Had taken" is correct because removing the supplies happened before the past event of the teacher noticing.',
@@ -4260,7 +4260,7 @@ const GRAMMAR_BUILDERS = {
       ['Hardly ___ when the bell rang.', 'had we sat down', ['we had sat down', 'we sit down', 'have we sat down']],
       ['Only after checking the data ___ the error.', 'did she notice', ['she noticed', 'has she noticed', 'she notices']],
       ['Never ___ such a vivid double rainbow before that afternoon.', 'had I seen', ['I had seen', 'I saw', 'have I see']],
-      ['Seldom ___ this generous to the volunteers as he was last weekend.', 'is Mr Lim', ['Mr Lim is', 'Mr Lim was', 'has Mr Lim']],
+      ['Seldom ___ as generous to the volunteers as he was last weekend.', 'was Mr Lim', ['Mr Lim was', 'is Mr Lim', 'has Mr Lim']],
       ['No sooner ___ the door than the cat darted out.', 'had I opened', ['I had opened', 'I opened', 'have I opened']],
       ['Under no circumstances ___ the laboratory unsupervised.', 'should pupils enter', ['pupils should enter', 'pupils enter', 'pupils entered']],
       ['Little ___ that the surprise party was for him.', 'did Daniel know', ['Daniel knew', 'Daniel did know', 'Daniel has known']],
@@ -4281,23 +4281,23 @@ const GRAMMAR_BUILDERS = {
   },
   homophones(level, i) {
     const rows = [
-      ['Please put ___ bags under the desk before the test begins.', 'your', ['you\'re', 'yore', 'ur'], {
+      ['Please put ___ bags under the desk before the test begins.', 'your', ['you\'re', 'yore', 'yours'], {
         'your': '"Your" is correct because it is a possessive adjective showing the bags belong to the person addressed.',
         'you\'re': '"You\'re" means "you are" — not a possessive adjective.',
         'yore': '"Yore" is an old word meaning "long ago" — not a possessive adjective.',
-        'ur': '"Ur" is not a standard English word.',
+        'yours': '"Yours" is a possessive pronoun that stands alone; it cannot come before a noun like "bags".',
       }],
-      ['The cat licked ___ paw and then curled up to sleep.', 'its', ['it\'s', 'its\'', 'their'], {
+      ['The cat licked ___ paw and then curled up to sleep.', 'its', ['it\'s', 'hers', 'their'], {
         'its': '"Its" is correct because it is a possessive adjective showing the paw belongs to the cat.',
         'it\'s': '"It\'s" means "it is" or "it has" — never use an apostrophe for possession with "its".',
-        'its\'': '"Its\'" is not a real word — "its" never takes an apostrophe.',
+        'hers': '"Hers" stands alone and never comes before a noun like "paw".',
         'their': '"Their" is for plural owners; the cat is one animal.',
       }],
-      ['___ going to rain this afternoon, so bring an umbrella.', 'It\'s', ['Its', 'It\'ll', 'Its\''], {
+      ['___ going to rain this afternoon, so bring an umbrella.', 'It\'s', ['Its', 'It\'ll', 'There\'s'], {
         'It\'s': '"It\'s" is correct because it means "it is" — "it is going to rain".',
         'Its': '"Its" is a possessive adjective showing ownership; no noun follows here.',
         'It\'ll': '"It\'ll" means "it will" — "it will going to rain" is not grammatical.',
-        'Its\'': '"Its\'" is not a real word.',
+        'There\'s': '"There\'s" means "there is" — it cannot replace "it is" in this sentence.',
       }],
       ['The boys left ___ water bottles on the field after PE.', 'their', ['there', 'they\'re', 'theirs'], {
         'their': '"Their" is correct because it is a possessive adjective showing the bottles belong to the boys.',
@@ -4305,13 +4305,13 @@ const GRAMMAR_BUILDERS = {
         'they\'re': '"They\'re" means "they are" — not a possessive adjective.',
         'theirs': '"Theirs" is a possessive pronoun that stands alone; it cannot come before a noun.',
       }],
-      ['"___ the art room? I cannot find it," the new student asked.', 'Where\'s', ['Were\'s', 'Wears', 'Whereas'], {
+      ['"___ the art room? I cannot find it," the new student asked.', 'Where\'s', ['Wares', 'Wears', 'Whereas'], {
         'Where\'s': '"Where\'s" is correct because it means "where is" — asking about the location of the art room.',
-        'Were\'s': '"Were\'s" is not a real word.',
+        'Wares': '"Wares" means goods for sale — unrelated to asking about location.',
         'Wears': '"Wears" means to wear clothing — unrelated to asking about location.',
         'Whereas': '"Whereas" is a conjunction meaning "on the other hand" — not used to ask where something is.',
       }],
-      ['The teacher praised the class because ___ all focused throughout the lesson.', 'they\'re', ['their', 'there', 'theirs'], {
+      ['The teacher is pleased because ___ all focused during the lesson.', 'they\'re', ['their', 'there', 'theirs'], {
         'they\'re': '"They\'re" is correct because it means "they are" — "they are all focused".',
         'their': '"Their" is a possessive adjective; no noun follows here.',
         'there': '"There" is a place word; it does not replace "they are".',
@@ -4323,11 +4323,11 @@ const GRAMMAR_BUILDERS = {
         'they\'re': '"They\'re" means "they are" — not a place word.',
         'here': '"Here" means near the speaker; "over there" indicates a place away from the speaker.',
       }],
-      ['___ a long way from here to the community library.', 'It\'s', ['Its', 'It\'ll', 'Its\''], {
+      ['___ a long way from here to the community library.', 'It\'s', ['Its', 'It\'ll', 'There\'s'], {
         'It\'s': '"It\'s" is correct because it means "it is" — "it is a long way".',
         'Its': '"Its" is a possessive adjective; no ownership is being shown here.',
         'It\'ll': '"It\'ll" means "it will" — "it will a long way" is not grammatical.',
-        'Its\'': '"Its\'" is not a real word.',
+        'There\'s': '"There\'s" means "there is" — it cannot replace "it is" in this sentence.',
       }],
       ['Do you know ___ backpack this is? It has no name tag.', 'whose', ['who\'s', 'whos', 'who'], {
         'whose': '"Whose" is correct because it asks about ownership — who does the backpack belong to?',
@@ -4347,11 +4347,11 @@ const GRAMMAR_BUILDERS = {
         'Whos': '"Whos" is not a real word — the contraction needs an apostrophe.',
         'Who': '"Who" alone without the verb would leave the sentence incomplete — "who\'s" (who is) is needed.',
       }],
-      ['The team collected all ___ equipment before leaving the field.', 'its', ['it\'s', 'their', 'its\''], {
+      ['The team collected all ___ equipment before leaving the field.', 'its', ['it\'s', 'their', 'theirs'], {
         'its': '"Its" is correct because it is a possessive adjective showing the equipment belongs to the team.',
         'it\'s': '"It\'s" means "it is" or "it has" — not a possessive adjective.',
         'their': '"Their" is for multiple separate owners; "team" is a singular collective noun.',
-        'its\'': '"Its\'" is not a real word.',
+        'theirs': '"Theirs" stands alone and cannot come before a noun like "equipment".',
       }],
       ['She wore ___ new school shoes for the first time on Monday.', 'her', ['hers', 'she\'s', 'herself'], {
         'her': '"Her" is correct because it is a possessive adjective coming before the noun "new school shoes".',
@@ -4365,10 +4365,10 @@ const GRAMMAR_BUILDERS = {
         'we\'re': '"We\'re" means "we are" — not a possessive adjective.',
         'hour': '"Hour" means a unit of time — it sounds like "our" but has a completely different meaning.',
       }],
-      ['___ been three weeks since the class started the project.', 'It\'s', ['Its', 'Its\'', 'It\'ll'], {
+      ['___ been three weeks since the class started the project.', 'It\'s', ['Its', 'It', 'It\'ll'], {
         'It\'s': '"It\'s" is correct because it means "it has" here — "it has been three weeks".',
         'Its': '"Its" is a possessive adjective; no ownership is being shown here.',
-        'Its\'': '"Its\'" is not a real word.',
+        'It': '"It" alone has no auxiliary verb — "it has been" needs "It\'s".',
         'It\'ll': '"It\'ll" means "it will" — "it will been" is not grammatical.',
       }],
       ['The guide showed us ___ to find the emergency exits.', 'where', ['were', 'wear', 'there'], {

@@ -65,6 +65,9 @@ const ALL_SWAP_NAMES = [...GIRL_NAMES, ...BOY_NAMES];
 // when the item has no gendered pronouns that could contradict the change.
 const GENDER_AMBIGUOUS = new Set(['Kai', 'Wei', 'Sam']);
 const GENDERED_WORDS = /\b(he|she|his|her|him|hers|himself|herself|boy|girl|brother|sister)\b/i;
+// Titles carry gender and honorific conventions a plain name swap can break
+// ("Mdm Siti" must never become "Mdm Omar"), so titled names are left alone.
+const TITLE_WORDS = '(?:Mr|Mrs|Ms|Mdm|Madam|Miss|Master|Cikgu|Uncle|Auntie|Aunty)';
 
 function collectSpecText(spec) {
   return [
@@ -89,12 +92,15 @@ function swapInText(text, mapping) {
  * swap could break the question.
  */
 export function varyMcqNames(spec, index) {
-  const found = ALL_SWAP_NAMES.filter(name => new RegExp(`\\b${name}\\b`).test(spec.q));
+  const specText = collectSpecText(spec);
+  const found = ALL_SWAP_NAMES.filter(name =>
+    new RegExp(`\\b${name}\\b`).test(spec.q) &&
+    !new RegExp(`\\b${TITLE_WORDS}\\.?\\s+${name}\\b`).test(specText));
   if (!found.length) return spec;
   const choiceText = [spec.answer, ...(spec.choices || [])].join(' ');
   if (ALL_SWAP_NAMES.some(name => new RegExp(`\\b${name}\\b`).test(choiceText))) return spec;
 
-  const gendered = GENDERED_WORDS.test(collectSpecText(spec));
+  const gendered = GENDERED_WORDS.test(specText);
   const mapping = [];
   for (const name of found) {
     if (gendered && GENDER_AMBIGUOUS.has(name)) continue;
