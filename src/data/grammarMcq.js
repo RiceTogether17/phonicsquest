@@ -6,6 +6,7 @@
  */
 
 import { inferQuestionContextType } from './mcqItemMetadata.js';
+import { CLUE_CATEGORIES, deriveClueWords, deriveMcqDifficulty, mcqSeedKey } from './mcqItemFeatures.js';
 import { makeFallbackOptionExplanations } from './mcqOptionExplanations.js';
 import { GRAMMAR_TIPS } from './grammarTips.js';
 import { MIN_QUESTIONS_PER_SCOPE, contextualizeMcqQuestion, varyMcqNames } from './practiceExpansion.js';
@@ -41,12 +42,6 @@ function buildChoices(answer, distractors) {
   // Filter out any distractor that duplicates the answer, then take up to 3.
   const unique = distractors.filter(d => d !== answer).slice(0, 3);
   return shuffle([answer, ...unique]);
-}
-
-function difficultyFor(level, idx) {
-  if (level === 'P1' || level === 'P2') return idx % 5 === 0 ? 2 : 1;
-  if (level === 'P3' || level === 'P4') return idx % 4 === 0 ? 3 : 2;
-  return idx % 3 === 0 ? 3 : 2;
 }
 
 const GRAMMAR_BUILDERS = {
@@ -4641,7 +4636,12 @@ function buildLevel(level) {
         level,
         category,
         subskill: spec.subskill,
-        difficulty: difficultyFor(level, localOffset),
+        // Difficulty comes from the seed's own demands (choice closeness,
+        // reading load) — never from its position in the rotation.
+        difficulty: deriveMcqDifficulty({ q: spec.q, answer: spec.answer, choices: spec.choices, level }),
+        // One identity per seed question: wrapper frames and pupil-name swaps
+        // do not create a "new" question for review scheduling or analytics.
+        seedId: `g:${mcqSeedKey({ q: spec.q, category, answer: spec.answer })}`,
         q: variant.question,
         questionType: variant.questionType,
         choices: spec.choices,
@@ -4652,16 +4652,18 @@ function buildLevel(level) {
       // generic ones built from the category rule so every wrong answer teaches.
       item.optionExplanations = spec.optionExplanations
         || makeFallbackOptionExplanations(item.answer, item.choices, GRAMMAR_TIPS[category]);
-      if (spec.clueWords) item.clueWords = spec.clueWords;
-      if (spec.reasoning) item.reasoning = spec.reasoning;
-      item.contextType = inferQuestionContextType(item.q);
-      // Two-sentence context items require reading the first sentence as a clue,
-      // which makes them inherently harder — promote to difficulty 3 regardless
-      // of where they landed in the rotation. P1/P2 cap at difficulty 2 by design.
-      if (item.difficulty < 3 && ['P3', 'P4', 'P5', 'P6'].includes(level) &&
-          /[a-zA-Z][.!?]\s+[A-Z][^.!?]*___/.test(item.q)) {
-        item.difficulty = 3;
+      if (spec.clueWords) {
+        item.clueWords = spec.clueWords;
+      } else if (CLUE_CATEGORIES.has(category)) {
+        // Derive the evidence words a teacher would underline (time markers,
+        // quantity words, comparison signals) for guided mode and cues.
+        const derived = deriveClueWords(spec.q);
+        if (derived.length) item.clueWords = derived;
       }
+      if (spec.reasoning) item.reasoning = spec.reasoning;
+      // Context type reflects the seed sentence, not the presentation wrapper
+      // (some wrappers add a sentence of their own).
+      item.contextType = inferQuestionContextType(spec.q);
       items.push(item);
     }
   }

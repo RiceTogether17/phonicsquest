@@ -5,7 +5,10 @@
  * contextual stems for upper-primary practice.
  */
 
+import { inferQuestionContextType } from './mcqItemMetadata.js';
+import { deriveMcqDifficulty, mcqSeedKey } from './mcqItemFeatures.js';
 import { makeFallbackOptionExplanations } from './mcqOptionExplanations.js';
+import { makeVocabTeachingExplanations } from './vocabGlosses.js';
 import { MIN_QUESTIONS_PER_SCOPE, contextualizeMcqQuestion, varyMcqNames } from './practiceExpansion.js';
 import { VOCAB_CATEGORIES } from './vocabCategories.js';
 
@@ -67,12 +70,6 @@ function shuffle(arr) {
 
 function buildChoices(answer, distractors) {
   return shuffle([answer, ...distractors].slice(0, 4));
-}
-
-function difficultyFor(level, idx) {
-  if (level === 'P1' || level === 'P2') return idx % 5 === 0 ? 2 : 1;
-  if (level === 'P3' || level === 'P4') return idx % 4 === 0 ? 3 : 2;
-  return idx % 3 === 0 ? 3 : 2;
 }
 
 const VOCAB_BUILDERS = {
@@ -1132,25 +1129,28 @@ function buildLevel(level) {
         level,
         category: toCanonicalCategory(spec.category),
         subskill: spec.subskill,
-        difficulty: difficultyFor(level, localOffset),
+        // Difficulty comes from the seed's own demands (choice closeness,
+        // reading load) — never from its position in the rotation.
+        difficulty: deriveMcqDifficulty({ q: spec.q, answer: spec.answer, choices: spec.choices, level }),
+        // One identity per seed question: wrapper frames and pupil-name swaps
+        // do not create a "new" question for review scheduling or analytics.
+        seedId: `v:${mcqSeedKey({ q: spec.q, category: toCanonicalCategory(spec.category), answer: spec.answer })}`,
         q: variant.question,
         questionType: variant.questionType,
         choices: spec.choices,
         answer: spec.answer,
         explain: spec.explain,
       };
-      // Prefer builder-authored per-choice explanations; otherwise fall back to
-      // generic ones built from the category rule so every wrong answer teaches.
+      // Explanations, best first: builder-authored text, then gloss-driven
+      // teaching explanations (what each word actually means), then the
+      // generic category-rule fallback.
       item.optionExplanations = spec.optionExplanations
+        || makeVocabTeachingExplanations({ ...spec, category: item.category, choices: item.choices })
         || makeFallbackOptionExplanations(item.answer, item.choices, VOCAB_CATEGORIES[item.category]);
       if (spec.clueWords) item.clueWords = spec.clueWords;
       if (spec.reasoning) item.reasoning = spec.reasoning;
-      // Two-sentence context items are inherently harder — promote to difficulty 3
-      // regardless of rotation position. P1/P2 cap at difficulty 2 by design.
-      if (item.difficulty < 3 && ['P3', 'P4', 'P5', 'P6'].includes(level) &&
-          /[a-zA-Z][.!?]\s+[A-Z][^.!?]*___/.test(item.q)) {
-        item.difficulty = 3;
-      }
+      // Context type reflects the seed sentence, not the presentation wrapper.
+      item.contextType = inferQuestionContextType(spec.q);
       items.push(item);
     }
   }

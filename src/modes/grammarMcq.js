@@ -9,6 +9,7 @@ import {
   categoryAppliesToLevel,
 } from '../data/grammarCategories.js';
 import { checkPostAttempt } from '../modules/remediationRouter.js';
+import { getDueReviews, recordMcqAttempt } from '../modules/mcqReviewLane.js';
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 import { attachMcqAnswerLadder, attachGiriHint } from './mcqFeedback.js';
 import {
@@ -43,13 +44,26 @@ function _lessonKey(category) {
   return `gmcq:${category}`;
 }
 
+const RETEACH_AFTER_DAYS = 14;
+const RETEACH_BELOW_SCORE = 0.6;
+
+/**
+ * "Taught" is not forever. A rule card counts as taught while the lesson is
+ * recent OR the skill's mastery holds up; a pupil who is weak on a skill two
+ * weeks after the lesson gets re-taught, the way a tutor would re-open the
+ * rule before drilling on.
+ */
 function _hasBeenTaught(category) {
-  return !!(store.get('lessonsSeen') || {})[_lessonKey(category)];
+  const seenAt = (store.get('lessonsSeen') || {})[_lessonKey(category)];
+  if (!seenAt) return false;
+  const recentDays = (Date.now() - Date.parse(seenAt)) / 86_400_000;
+  if (recentDays < RETEACH_AFTER_DAYS) return true;
+  return questMastery.getSkillScore('grammarMcq', category) >= RETEACH_BELOW_SCORE;
 }
 
 function _markTaught(category) {
   const seen = { ...(store.get('lessonsSeen') || {}) };
-  if (seen[_lessonKey(category)]) return;
+  // Always refresh the timestamp — a re-teach restarts the recency window.
   seen[_lessonKey(category)] = new Date().toISOString();
   store.set('lessonsSeen', seen);
 }
@@ -247,7 +261,19 @@ function _startScope({ level = null, category = null, label = '', difficulty = _
   // rather than the whole bank. See MCQ_ROUND_SIZE in constants.js.
   const limit = store.get('paperItemLimit');
   store.set('paperItemLimit', null);
-  _items = _items.slice(0, limit || MCQ_ROUND_SIZE);
+  const roundSize = limit || MCQ_ROUND_SIZE;
+  _items = _items.slice(0, roundSize);
+
+  // A tutor opens with yesterday's corrections: questions missed in earlier
+  // sessions that are due again lead the round (same scope only).
+  const dueReviews = getDueReviews('grammarMcq', { level, category });
+  if (dueReviews.length) {
+    const reviewSeeds = new Set(dueReviews.map((review) => review.seedId));
+    _items = [...dueReviews, ..._items.filter((it) => !reviewSeeds.has(it.seedId))].slice(
+      0,
+      roundSize,
+    );
+  }
 
   _idx = 0;
   _correct = 0;
@@ -331,7 +357,7 @@ function _renderQuestion() {
         <span class="sfq-progress" aria-label="Question ${_idx + 1} of ${_items.length}">${_idx + 1}/${_items.length}</span>
       </div>
       <div class="sq-progress-bar"><div class="sq-progress-fill" style="width:${progressPct}%"></div></div>
-      <p class="mcq-category-tag">${escapeHtml(_categoryLabel(item.category))}${_difficulty === 'challenge' ? ' · PSLE Challenge' : ''}</p>
+      <p class="mcq-category-tag">${item.isReview ? '🔄 Review · ' : ''}${escapeHtml(_categoryLabel(item.category))}${_difficulty === 'challenge' ? ' · PSLE Challenge' : ''}</p>
       ${_difficulty === 'guided' && item.explain ? `<div class="mcq-learn-tip"><strong>📖 Before you answer:</strong> ${item.explain}</div>` : ''}
       <p class="mcq-task-instruction">${_taskInstruction(item)}</p>
       <p class="sfq-instruction">${escapeHtml(item.q)}</p>
@@ -394,6 +420,10 @@ function _renderQuestion() {
       if (ok) stat.correct += 1;
 
       questMastery.updateSkill('grammarMcq', item.category, ok);
+      // Misses enter the spaced-review lane; recovered items leave it.
+      // Recovery rounds hold the review box: answering correctly seconds
+      // after the miss shows recall with help, not retention.
+      recordMcqAttempt('grammarMcq', item, ok, Date.now(), { promote: !_isRecovery });
       questMastery.recordAttempt({
         quest: 'grammarMcq',
         skill: item.category,
