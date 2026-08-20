@@ -1112,7 +1112,6 @@ export const STORIES = [
 
   {
     id: 'core-c-03',
-    pretaught: ['watched'],
     band: 'C', level: 3, phase: 'digraphs',
     title: 'Giri and the Clever Bird',
     emoji: '🐦',
@@ -1282,7 +1281,6 @@ export const STORIES = [
 
   {
     id: 'core-c-07',
-    pretaught: ['fetch'],
     band: 'C', level: 3, phase: 'digraphs',
     title: 'Giri at the Farm',
     emoji: '🐔',
@@ -1532,7 +1530,6 @@ export const STORIES = [
 
   {
     id: 'core-d-01',
-    pretaught: ['watched'],
     band: 'D', level: 4, phase: 'advanced-vowel',
     title: 'Giri at the Fair',
     emoji: '🎡',
@@ -1744,7 +1741,6 @@ export const STORIES = [
 
   {
     id: 'core-d-06',
-    pretaught: ['photograph'],
     band: 'D', level: 4, phase: 'advanced-vowel',
     title: 'Giri and the Treasure Map',
     emoji: '🗺️',
@@ -1871,7 +1867,6 @@ export const STORIES = [
 
   {
     id: 'core-d-09',
-    pretaught: ['scratched'],
     band: 'D', level: 4, phase: 'advanced-vowel',
     title: 'Giri and Scout',
     emoji: '🐶',

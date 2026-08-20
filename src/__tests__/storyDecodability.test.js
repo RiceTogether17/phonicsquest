@@ -27,6 +27,7 @@ import {
   isWordDecodable,
 } from '../modules/decodability.js';
 import { getHFWTier } from '../data/hfw.js';
+import { CURRICULUM } from '../data/curriculum.js';
 
 /**
  * Regression floors for the computed decodable ratio, pinned from the
@@ -424,21 +425,30 @@ describe('grapheme phase budget', () => {
   });
 
   /**
-   * No lesson in curriculum.js teaches tch, dge or ph — the phase 7-9
-   * sequence is entirely vowel work. So they belong to no phase's budget
-   * and every word needing them must take the pre-teach or sight-word
-   * route. Granting them to a phase would assert a lesson that does not
-   * exist; the honest fix is to author those lessons.
+   * tch, dge and ph were once granted by tier 3 with no lesson behind them:
+   * the curriculum's phase 7-9 sequence was entirely vowel work and taught
+   * those spellings nowhere. curriculum.js now carries cons-tch-dge and
+   * cons-ph at phase 8, so the story-side release has a lesson to point at.
+   * This test is the join between the two banks — if the lessons are ever
+   * removed, the story budget must go with them.
    */
-  it('grants tch/dge/ph to no phase, because no lesson teaches them', () => {
-    for (const phase of STORY_PHASES) {
-      for (const g of ['tch', 'dge', 'ph']) {
-        expect(phase.graphemeBudget ?? [], `${phase.id} grants "${g}"`).not.toContain(g);
-      }
+  it('releases tch/dge/ph only because a lesson now teaches them', () => {
+    const taught = new Set(
+      CURRICULUM.filter((st) => ['cons-tch-dge', 'cons-ph'].includes(st.id)).flatMap((st) =>
+        st.sampleWords.map((w) => w.toLowerCase()),
+      ),
+    );
+    expect(taught.size, 'cons-tch-dge / cons-ph lessons are missing').toBeGreaterThan(0);
+    for (const g of ['tch', 'dge', 'ph']) {
+      expect(
+        [...taught].some((w) => w.includes(g)),
+        `no lesson word contains "${g}"`,
+      ).toBe(true);
     }
-    // So they are stretch everywhere a budget applies, at every tier.
-    expect(isWordDecodable('watch', 'digraphs')).toBe(false);
-    expect(isWordDecodable('photograph', 'advanced-vowel')).toBe(false);
+    // Released by the digraphs phase, and not before it.
+    expect(isWordDecodable('catch', 'r-controlled')).toBe(false);
+    expect(isWordDecodable('catch', 'digraphs')).toBe(true);
+    expect(isWordDecodable('photograph', 'advanced-vowel')).toBe(true);
   });
 
   it('leaves the teacher-supported formats on the full code', () => {

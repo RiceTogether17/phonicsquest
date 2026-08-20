@@ -73,7 +73,7 @@ export const PHONEME_MOUTH = Object.freeze({
   '/m/': 'lips-closed',
 
   // ── Labiodental: top teeth on bottom lip ───────────────────────────────
-  '/f/': 'lips-teeth', '/ff/': 'lips-teeth',
+  '/f/': 'lips-teeth', '/ff/': 'lips-teeth', '/ph/': 'lips-teeth',
   '/v/': 'lips-teeth',
 
   // ── Dental: tongue between the teeth ───────────────────────────────────
@@ -89,8 +89,8 @@ export const PHONEME_MOUTH = Object.freeze({
 
   // ── Post-alveolar: tongue further back, lips pushed forward ────────────
   '/sh/': 'rounded-small',
-  '/ch/': 'rounded-small',
-  '/j/':  'rounded-small',
+  '/ch/': 'rounded-small', '/tch/': 'rounded-small',
+  '/j/':  'rounded-small', '/dge/': 'rounded-small',
   '/r/':  'rounded-small',   // see review note: rounding varies by speaker
 
   // ── Velar: back of the tongue at the soft palate ───────────────────────

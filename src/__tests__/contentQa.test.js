@@ -12,7 +12,10 @@ import { CURRICULUM, PHASES, getStagesInPhase } from '../data/curriculum.js';
 
 beforeAll(() => {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
 });
 
@@ -36,16 +39,22 @@ describe('curriculum completeness', () => {
 
   it('every stage advertises sentenceExamples and they are not the empty string', () => {
     for (const stage of CURRICULUM) {
-      expect(stage.sentenceExamples.every(s => typeof s === 'string' && s.trim().length > 0)).toBe(true);
+      expect(
+        stage.sentenceExamples.every((s) => typeof s === 'string' && s.trim().length > 0),
+      ).toBe(true);
     }
   });
 
   it('every stage advertises learningOutcome that mentions decode, spell, or read', () => {
     // Light heuristic — a learning outcome that doesn't use a learning verb
     // is almost certainly a description, not an outcome.
-    const VERBS = /(decode|spell|read|recognis|recogniz|identify|blend|segment|map|distinguish|discriminate)/i;
+    const VERBS =
+      /(decode|spell|read|recognis|recogniz|identify|blend|segment|map|distinguish|discriminate)/i;
     for (const stage of CURRICULUM) {
-      expect(VERBS.test(stage.learningOutcome), `Stage ${stage.id} outcome is not action-led: "${stage.learningOutcome}"`).toBe(true);
+      expect(
+        VERBS.test(stage.learningOutcome),
+        `Stage ${stage.id} outcome is not action-led: "${stage.learningOutcome}"`,
+      ).toBe(true);
     }
   });
 });
@@ -80,7 +89,9 @@ describe('no duplicate sample words within the same phase', () => {
 // strict enough to catch a long-vowel intruder (which would have two vowel
 // letters) without policing every consonant cluster.
 function _vowelRuns(w) {
-  const m = String(w).toLowerCase().match(/[aeiou]+/g);
+  const m = String(w)
+    .toLowerCase()
+    .match(/[aeiou]+/g);
   return m ? m.length : 0;
 }
 function _hasSingleShortVowel(w, vowel) {
@@ -95,23 +106,32 @@ function _hasSingleShortVowel(w, vowel) {
 // phonics teacher object?" not "is this perfectly classified."
 const PATTERN_CHECKS = [
   // CVC — strict: 3 letters, middle is the named vowel, no other vowels
-  { match: /^cvc-([aeiou])$/, test: (w, [vowel]) =>
-    /^[a-z]{3}$/.test(w) && w[1] === vowel && _hasSingleShortVowel(w, vowel) },
+  {
+    match: /^cvc-([aeiou])$/,
+    test: (w, [vowel]) => /^[a-z]{3}$/.test(w) && w[1] === vowel && _hasSingleShortVowel(w, vowel),
+  },
 
   // CCVC — exactly one short-vowel run = named vowel, ≥ 2 leading consonants
-  { match: /^ccvc-([aeiou])$/, test: (w, [vowel]) =>
-    _hasSingleShortVowel(w, vowel) && /^[^aeiou]{2,3}[aeiou]/.test(w) },
+  {
+    match: /^ccvc-([aeiou])$/,
+    test: (w, [vowel]) => _hasSingleShortVowel(w, vowel) && /^[^aeiou]{2,3}[aeiou]/.test(w),
+  },
 
   // CVCC — exactly one short-vowel run = named vowel, ≥ 2 trailing consonants
-  { match: /^cvcc-([aeiou])$/, test: (w, [vowel]) =>
-    _hasSingleShortVowel(w, vowel) && /[aeiou][^aeiou]{2,3}$/.test(w) },
+  {
+    match: /^cvcc-([aeiou])$/,
+    test: (w, [vowel]) => _hasSingleShortVowel(w, vowel) && /[aeiou][^aeiou]{2,3}$/.test(w),
+  },
 
   // Digraphs — contain at least one of the canonical digraphs
   { match: /^digraphs$/, test: (w) => /sh|ch|th|wh|ck|ng|ph/.test(w) },
 
   // CCVCC — exactly one short-vowel run = named vowel; cluster both ends
-  { match: /^ccvcc-([aeiou])$/, test: (w, [vowel]) =>
-    _hasSingleShortVowel(w, vowel) && /^[^aeiou]{2,3}/.test(w) && /[^aeiou]{2,3}$/.test(w) },
+  {
+    match: /^ccvcc-([aeiou])$/,
+    test: (w, [vowel]) =>
+      _hasSingleShortVowel(w, vowel) && /^[^aeiou]{2,3}/.test(w) && /[^aeiou]{2,3}$/.test(w),
+  },
 
   // Long A: a_e — has a vowel-consonant-e pattern with a
   { match: /^long-a-ae$/, test: (w) => /a[^aeiou]e$/.test(w) },
@@ -159,14 +179,18 @@ const PATTERN_CHECKS = [
   { match: /^dip-ou$/, test: (w) => /(ou|ow)/.test(w) },
   { match: /^dip-aw$/, test: (w) => /(aw|au)/.test(w) },
 
+  // Late consonant spellings
+  { match: /^cons-tch-dge$/, test: (w) => /(tch|dge)/.test(w) },
+  { match: /^cons-ph$/, test: (w) => /ph/.test(w) },
+
   // Suffixes
-  { match: /^suffix-ing$/,  test: (w) => /ing$/.test(w) },
-  { match: /^suffix-ed$/,   test: (w) => /ed$/.test(w) },
-  { match: /^suffix-er$/,   test: (w) => /er$/.test(w) },
-  { match: /^suffix-est$/,  test: (w) => /est$/.test(w) },
+  { match: /^suffix-ing$/, test: (w) => /ing$/.test(w) },
+  { match: /^suffix-ed$/, test: (w) => /ed$/.test(w) },
+  { match: /^suffix-er$/, test: (w) => /er$/.test(w) },
+  { match: /^suffix-est$/, test: (w) => /est$/.test(w) },
 
   // Morphology
-  { match: /^prefixes$/,    test: (w) => /^(re|un)/.test(w) },
+  { match: /^prefixes$/, test: (w) => /^(re|un)/.test(w) },
   { match: /^suffixes-advanced$/, test: (w) => /(tion|sion|able|ible)/.test(w) },
 
   // Stages we accept on faith (mixed-review, multi-syllabic, sight)
@@ -186,8 +210,13 @@ describe('sample words match stage pattern', () => {
     it(`${stage.id} — every sample word fits the declared pattern`, () => {
       const check = findCheck(stage.id);
       expect(check, `No pattern check defined for stage "${stage.id}"`).not.toBeNull();
-      const bad = (stage.sampleWords || []).filter(w => !check.test(String(w).toLowerCase(), check.captures));
-      expect(bad, `Stage ${stage.id} has sample words that don't fit the pattern: ${JSON.stringify(bad)}`).toEqual([]);
+      const bad = (stage.sampleWords || []).filter(
+        (w) => !check.test(String(w).toLowerCase(), check.captures),
+      );
+      expect(
+        bad,
+        `Stage ${stage.id} has sample words that don't fit the pattern: ${JSON.stringify(bad)}`,
+      ).toEqual([]);
     });
   }
 });
@@ -230,7 +259,7 @@ describe('every phonics mode declares both correct and incorrect feedback', () =
 
   it('every mode has at least 2 error categories beyond default', () => {
     for (const key of Object.keys(PHONICS_MODES)) {
-      const keys = Object.keys(PHONICS_MODES[key].errorHints).filter(k => k !== 'default');
+      const keys = Object.keys(PHONICS_MODES[key].errorHints).filter((k) => k !== 'default');
       expect(keys.length, `${key} has only the default error hint`).toBeGreaterThanOrEqual(2);
     }
   });
@@ -266,7 +295,11 @@ describe('scoring logic — sanity', () => {
 
   it('Fluency Sprint requires accuracy AND wpm to master', () => {
     const fast = Array.from({ length: 6 }, () => ({ correct: true, timeMs: 500 }));
-    const r = PHONICS_MODES.fluencySprint.score({ attempts: fast, durationMs: 6 * 500, targetWpm: 30 });
+    const r = PHONICS_MODES.fluencySprint.score({
+      attempts: fast,
+      durationMs: 6 * 500,
+      targetWpm: 30,
+    });
     expect(r.correct).toBe(true);
   });
 });
