@@ -57,26 +57,34 @@ import { getTrickyWord } from '../data/trickyWords.js';
  * banner comments in stories.js) and get the full code + latest cutoff.
  */
 export const STORY_PHASES = Object.freeze([
-  { id: 'short-a',        tier: 1, curriculumPhase: 2 },
-  { id: 'short-ei',       tier: 1, curriculumPhase: 2 },
-  { id: 'short-ou',       tier: 1, curriculumPhase: 2 },
-  { id: 'mixed-short',    tier: 1, curriculumPhase: 4 },
-  { id: 'short-digraphs', tier: 1, curriculumPhase: 4 },
-  { id: 'long-a',         tier: 2, curriculumPhase: 6 },
-  { id: 'long-e',         tier: 2, curriculumPhase: 6 },
-  { id: 'long-i',         tier: 2, curriculumPhase: 6 },
-  { id: 'long-o',         tier: 2, curriculumPhase: 6 },
-  { id: 'long-u',         tier: 2, curriculumPhase: 6 },
-  { id: 'r-controlled',   tier: 3, curriculumPhase: 7 },
-  { id: 'digraphs',       tier: 3, curriculumPhase: 7 },
-  { id: 'suffixes',       tier: 3, curriculumPhase: 7 },
-  { id: 'diphthongs',     tier: 4, curriculumPhase: 8 },
+  // `shortVowels` is a SUB-GATE inside tier 1. Tiers alone cannot separate
+  // the early short-vowel phases — they are all tier 1 — so a story named
+  // "short-a" used to be granted the same code as a digraph story, and the
+  // first four stories a child ever read carried all five short vowels.
+  // A vowel a child has not been taught cannot be sounded out, so the budget
+  // is cumulative and enforced per phase. Only tier-1 phases carry it: above
+  // tier 1 vowels come in teams and split digraphs, where a letter-level
+  // check would misread "rain" as needing both /a/ and /i/.
+  { id: 'short-a', tier: 1, curriculumPhase: 2, shortVowels: 'a' },
+  { id: 'short-ei', tier: 1, curriculumPhase: 2, shortVowels: 'aei' },
+  { id: 'short-ou', tier: 1, curriculumPhase: 2, shortVowels: 'aeiou' },
+  { id: 'mixed-short', tier: 1, curriculumPhase: 4, shortVowels: 'aeiou' },
+  { id: 'short-digraphs', tier: 1, curriculumPhase: 4, shortVowels: 'aeiou' },
+  { id: 'long-a', tier: 2, curriculumPhase: 6 },
+  { id: 'long-e', tier: 2, curriculumPhase: 6 },
+  { id: 'long-i', tier: 2, curriculumPhase: 6 },
+  { id: 'long-o', tier: 2, curriculumPhase: 6 },
+  { id: 'long-u', tier: 2, curriculumPhase: 6 },
+  { id: 'r-controlled', tier: 3, curriculumPhase: 7 },
+  { id: 'digraphs', tier: 3, curriculumPhase: 7 },
+  { id: 'suffixes', tier: 3, curriculumPhase: 7 },
+  { id: 'diphthongs', tier: 4, curriculumPhase: 8 },
   { id: 'advanced-vowel', tier: 5, curriculumPhase: 8 },
-  { id: 'chapter',        tier: 5, curriculumPhase: 8 },
-  { id: 'extension-sg',   tier: 5, curriculumPhase: 8 },
+  { id: 'chapter', tier: 5, curriculumPhase: 8 },
+  { id: 'extension-sg', tier: 5, curriculumPhase: 8 },
 ]);
 
-const PHASE_BY_ID = new Map(STORY_PHASES.map(p => [p.id, p]));
+const PHASE_BY_ID = new Map(STORY_PHASES.map((p) => [p.id, p]));
 
 /** The highest tier any phase grants. */
 export const MAX_TIER = 5;
@@ -95,29 +103,71 @@ export function getStoryPhase(phaseId) {
  */
 export const GRAPHEME_TIERS = Object.freeze({
   // Tier 1 — early code
-  ll: 1, ss: 1, ff: 1, zz: 1, ck: 1, qu: 1,
-  sh: 1, ch: 1, th: 1, wh: 1, ng: 1,
+  ll: 1,
+  ss: 1,
+  ff: 1,
+  zz: 1,
+  ck: 1,
+  qu: 1,
+  sh: 1,
+  ch: 1,
+  th: 1,
+  wh: 1,
+  ng: 1,
   // Tier 2 — long vowels
-  a_e: 2, e_e: 2, i_e: 2, o_e: 2, u_e: 2,
-  ai: 2, ay: 2, ee: 2, ea: 2, ie: 2, igh: 2,
-  oa: 2, ow: 2, ue: 2, ew: 2, oo: 2, y: 2,
+  a_e: 2,
+  e_e: 2,
+  i_e: 2,
+  o_e: 2,
+  u_e: 2,
+  ai: 2,
+  ay: 2,
+  ee: 2,
+  ea: 2,
+  ie: 2,
+  igh: 2,
+  oa: 2,
+  ow: 2,
+  ue: 2,
+  ew: 2,
+  oo: 2,
+  y: 2,
   // Tier 3 — r-controlled + late consonant spellings
-  ar: 3, or: 3, er: 3, ir: 3, ur: 3,
-  tch: 3, dge: 3, ph: 3,
+  ar: 3,
+  or: 3,
+  er: 3,
+  ir: 3,
+  ur: 3,
+  tch: 3,
+  dge: 3,
+  ph: 3,
   // Tier 4 — diphthongs
-  oi: 4, oy: 4, ou: 4, aw: 4, au: 4,
+  oi: 4,
+  oy: 4,
+  ou: 4,
+  aw: 4,
+  au: 4,
   // Tier 5 — advanced vowels
-  air: 5, are: 5, ear: 5, eer: 5, ere: 5,
+  air: 5,
+  are: 5,
+  ear: 5,
+  eer: 5,
+  ere: 5,
 });
 
 /** Suffixes the scanner may strip, with the tier the suffix itself needs. */
 export const SUFFIX_TIERS = Object.freeze({
-  s: 1, es: 1, ed: 2, ing: 2, er: 2, est: 2,
+  s: 1,
+  es: 1,
+  ed: 2,
+  ing: 2,
+  er: 2,
+  est: 2,
 });
 
 // Multi-letter patterns longest-first, for the greedy scan.
 const SCAN_PATTERNS = Object.keys(GRAPHEME_TIERS)
-  .filter(g => !g.includes('_') && g.length > 1)
+  .filter((g) => !g.includes('_') && g.length > 1)
   .sort((a, b) => b.length - a.length);
 
 const VOWELS = 'aeiou';
@@ -131,25 +181,60 @@ const SPLIT_CONSONANTS = 'bcdfghjklmnprstvz'; // mirrors storyMode._highlightGra
  * follow the precedent in hfw.js ('giri', 'hawker', 'neighbour' are
  * flagged "always pre-taught" there).
  */
-export const PROPER_NOUNS = Object.freeze(new Set([
-  'giri', 'jay', 'mei', 'ling', 'tan', 'mrs', 'mr', 'mdm',
-  'mrt', 'may', 'deepavali', 'supertrees', 'singapore',
-  'kueh', 'hawker', 'kopitiam', 'neighbour', 'auntie', 'yoghurt',
-]));
+export const PROPER_NOUNS = Object.freeze(
+  new Set([
+    'giri',
+    'jay',
+    'mei',
+    'ling',
+    'tan',
+    'mrs',
+    'mr',
+    'mdm',
+    'mrt',
+    'may',
+    'deepavali',
+    'supertrees',
+    'singapore',
+    'kueh',
+    'hawker',
+    'kopitiam',
+    'neighbour',
+    'auntie',
+    'yoghurt',
+  ]),
+);
 
 /**
  * Sound-effect words: read aloud expressively with the adult, never asked
  * to be decoded cold. Only the ones that do NOT already decode at their
  * band need listing, but harmless extras are fine.
  */
-export const ONOMATOPOEIA = Object.freeze(new Set([
-  'splish', 'splash', 'ding', 'clink', 'buzz', 'plop', 'pop', 'snap',
-  'slap', 'flap', 'tap', 'pant', 'peck', 'pat', 'clang', 'crunch', 'yum',
-]));
+export const ONOMATOPOEIA = Object.freeze(
+  new Set([
+    'splish',
+    'splash',
+    'ding',
+    'clink',
+    'buzz',
+    'plop',
+    'pop',
+    'snap',
+    'slap',
+    'flap',
+    'tap',
+    'pant',
+    'peck',
+    'pat',
+    'clang',
+    'crunch',
+    'yum',
+  ]),
+);
 
 // ── Word-level analysis ──────────────────────────────────────────────────
 
-const WORDS_BY_WORD = new Map(WORDS.map(w => [w.word.toLowerCase(), w]));
+const WORDS_BY_WORD = new Map(WORDS.map((w) => [w.word.toLowerCase(), w]));
 
 /**
  * Tier required by one curated words.js grapheme, given its type code.
@@ -166,12 +251,21 @@ function curatedGraphemeTier(g, type) {
     return type === 'lv' ? 2 : 1;
   }
   switch (type) {
-    case 'lv': case 'se': return 2;
-    case 'rc':            return 3;
-    case 'dp':            return 4;
-    case 'soft_c': case 'soft_g': return 3;
-    case 'p': case 'sf':  return 2;
-    default:              return 1;
+    case 'lv':
+    case 'se':
+      return 2;
+    case 'rc':
+      return 3;
+    case 'dp':
+      return 4;
+    case 'soft_c':
+    case 'soft_g':
+      return 3;
+    case 'p':
+    case 'sf':
+      return 2;
+    default:
+      return 1;
   }
 }
 
@@ -230,7 +324,9 @@ export function scanWord(word) {
   const parse = [];
   let tier = 1;
   let i = 0;
-  const upgrade = t => { if (t > tier) tier = t; };
+  const upgrade = (t) => {
+    if (t > tier) tier = t;
+  };
 
   while (i < word.length) {
     // Split digraph at word end: v-C-e.
@@ -334,10 +430,32 @@ export function requiredTier(word) {
  * @param {string} phaseId  a STORY_PHASES id
  * @returns {boolean}
  */
+/**
+ * Does this word stay inside the phase's short-vowel budget?
+ *
+ * Always true above tier 1, and true for any phase that declares no budget.
+ * @param {object|null} phase  a STORY_PHASES descriptor
+ * @param {string} clean       a cleaned token
+ */
+export function withinVowelBudget(phase, clean) {
+  if (!phase?.shortVowels || phase.tier !== 1) return true;
+  for (const letter of clean) {
+    if ('aeiou'.includes(letter) && !phase.shortVowels.includes(letter)) return false;
+  }
+  return true;
+}
+
+/**
+ * Is the word decodable at this story phase?
+ * @param {string} word
+ * @param {string} phaseId  a STORY_PHASES id
+ * @returns {boolean}
+ */
 export function isWordDecodable(word, phaseId) {
   const phase = getStoryPhase(phaseId);
   if (!phase) return false;
-  return requiredTier(word) <= phase.tier;
+  const clean = cleanToken(word);
+  return requiredTier(clean) <= phase.tier && withinVowelBudget(phase, clean);
 }
 
 // ── Story-level analysis ─────────────────────────────────────────────────
@@ -436,9 +554,12 @@ export function classifyWord(
 ) {
   const phase = getStoryPhase(story.phase);
   const tier = requiredTier(clean);
-  const make = status => ({ word: clean, status, requiredTier: tier });
+  const make = (status) => ({ word: clean, status, requiredTier: tier });
 
-  if (phase && tier <= phase.tier) return make('decodable');
+  // A word inside the tier but outside the phase's vowel budget is not yet
+  // sound-outable. It can still be legal by another route (sight word, HFW,
+  // tricky word, pre-taught) — it just cannot be called decodable.
+  if (phase && tier <= phase.tier && withinVowelBudget(phase, clean)) return make('decodable');
   if (PROPER_NOUNS.has(clean)) return make('proper');
   if (ONOMATOPOEIA.has(clean)) return make('onomatopoeia');
 
@@ -470,7 +591,7 @@ export const BAND_RULES = Object.freeze({
  * (Both are described as teacher-supported in the stories.js banners.)
  */
 export const FORMAT_RULES = Object.freeze({
-  'extension-sg':   Object.freeze({ min: 40, max: 140, hfwCap: 3 }),
+  'extension-sg': Object.freeze({ min: 40, max: 140, hfwCap: 3 }),
   'chapter-reader': Object.freeze({ min: 80, max: 250, hfwCap: 3 }),
 });
 
@@ -574,7 +695,7 @@ export function analyzeStory(story) {
     }
   }
 
-  const refrainCount = (story.lines ?? []).filter(l => l.type === 'refrain').length;
+  const refrainCount = (story.lines ?? []).filter((l) => l.type === 'refrain').length;
   return {
     storyId: story.id,
     computed: {
