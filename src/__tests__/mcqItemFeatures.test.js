@@ -7,6 +7,8 @@ import {
 } from '../data/mcqItemFeatures.js';
 import { buildGrammarMcqLevel } from '../data/grammarMcq.js';
 import { buildVocabMcqLevel } from '../data/vocabMcq.js';
+import { GRAMMAR_MCQ_ITEMS, GRAMMAR_MCQ_LEVELS } from '../data/grammarMcq.js';
+import { getStrandLevel } from '../data/spiralGrammar.js';
 
 describe('deriveMcqDifficulty', () => {
   it('rates a minimal-pair choice set harder than unrelated words', () => {
@@ -131,5 +133,39 @@ describe('mcqSeedKey', () => {
         'Ravi read this sentence aloud, leaving out one word: The dog ___ loudly. Which word is missing?',
       ),
     ).toBe(normalizeMcqStem('The dog ___ loudly.'));
+  });
+});
+
+/**
+ * A strand like Simple Past spans six years of distinct teaching points. If a
+ * category has no spiral entry, its rule card can only teach one strand-wide
+ * generality for all six levels — which is the thing the spiral exists to fix.
+ */
+describe('spiral step coverage', () => {
+  it('every grammar category the bank serves has a spiral step at every level it serves', () => {
+    const gaps = [];
+    for (const level of GRAMMAR_MCQ_LEVELS) {
+      for (const item of GRAMMAR_MCQ_ITEMS[level]) {
+        if (!getStrandLevel(item.category, level)) gaps.push(`${item.category} @ ${level}`);
+      }
+    }
+    expect([...new Set(gaps)], [...new Set(gaps)].join(', ')).toEqual([]);
+  });
+
+  it('tags every served item with the step it belongs to', () => {
+    const items = buildGrammarMcqLevel('P4');
+    expect(items.every((i) => typeof i.spiralLabel === 'string' && i.spiralLabel.length > 0)).toBe(
+      true,
+    );
+  });
+
+  it('a strand teaches a different step at each level, not one rule for six years', () => {
+    for (const strand of ['simplePast', 'presentCont', 'quantifiers', 'homophones']) {
+      const labels = GRAMMAR_MCQ_LEVELS.map((lv) => getStrandLevel(strand, lv)?.label).filter(
+        Boolean,
+      );
+      expect(labels.length, `${strand} should span several levels`).toBeGreaterThan(2);
+      expect(new Set(labels).size, `${strand} repeats a label across levels`).toBe(labels.length);
+    }
   });
 });
