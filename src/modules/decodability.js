@@ -24,7 +24,14 @@
  *                          teams ai ay ee ea ie igh oa ow ue ew oo,
  *                          vowel-y, and the -ed/-ing/-er/-est suffixes
  *                          (Band B story prose is past tense throughout).
- *   Tier 3  R-controlled   ar or er ir ur, plus tch dge ph.
+ *   Tier 3  R-controlled   ar or er ir ur, plus tch dge ph. NOTE: no
+ *                          lesson in curriculum.js teaches tch, dge or ph,
+ *                          so they belong to no phase's budget and every
+ *                          word needing them ("watch", "trophy") must take
+ *                          the pre-teach or sight-word route. That is a
+ *                          real gap in the lesson bank, recorded here
+ *                          rather than papered over by granting the code
+ *                          to a phase that never taught it.
  *   Tier 4  Diphthongs     oi oy ou aw au (ow /aʊ/ shares its spelling
  *                          with tier-2 ow /oʊ/, so ow words under-require).
  *   Tier 5  Advanced       air are ear eer ere.
@@ -102,7 +109,11 @@ export const STORY_PHASES = Object.freeze([
     curriculumPhase: 8,
     graphemeBudget: ['ar', 'or', 'er', 'ir', 'ur'],
   },
-  { id: 'digraphs', tier: 3, curriculumPhase: 8, graphemeBudget: ['tch', 'dge', 'ph'] },
+  // The 'digraphs' phase is consonant-digraph review — sh ch th wh, all
+  // tier-1 code — so its stage adds no new spelling; it is a fluency stop,
+  // not a new release. It carries an empty budget rather than none at all,
+  // which would exempt it from the gate entirely.
+  { id: 'digraphs', tier: 3, curriculumPhase: 8, graphemeBudget: [] },
   { id: 'suffixes', tier: 3, curriculumPhase: 9, graphemeBudget: [] },
   { id: 'diphthongs', tier: 4, curriculumPhase: 7, graphemeBudget: ['oi', 'oy', 'ou'] },
   {

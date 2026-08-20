@@ -409,8 +409,6 @@ describe('grapheme phase budget', () => {
     expect(isWordDecodable('high', 'long-i')).toBe(true);
     expect(isWordDecodable('cool', 'long-o')).toBe(false);
     expect(isWordDecodable('cool', 'long-u')).toBe(true);
-    expect(isWordDecodable('watch', 'r-controlled')).toBe(false);
-    expect(isWordDecodable('watch', 'digraphs')).toBe(true);
     expect(isWordDecodable('caught', 'diphthongs')).toBe(false);
     expect(isWordDecodable('caught', 'advanced-vowel')).toBe(true);
     // Cumulative: a later phase keeps everything the earlier ones taught.
@@ -423,6 +421,24 @@ describe('grapheme phase budget', () => {
     expect(isWordDecodable('yes', 'long-a')).toBe(true);
     expect(isWordDecodable('cry', 'long-a')).toBe(false);
     expect(isWordDecodable('cry', 'long-i')).toBe(true);
+  });
+
+  /**
+   * No lesson in curriculum.js teaches tch, dge or ph — the phase 7-9
+   * sequence is entirely vowel work. So they belong to no phase's budget
+   * and every word needing them must take the pre-teach or sight-word
+   * route. Granting them to a phase would assert a lesson that does not
+   * exist; the honest fix is to author those lessons.
+   */
+  it('grants tch/dge/ph to no phase, because no lesson teaches them', () => {
+    for (const phase of STORY_PHASES) {
+      for (const g of ['tch', 'dge', 'ph']) {
+        expect(phase.graphemeBudget ?? [], `${phase.id} grants "${g}"`).not.toContain(g);
+      }
+    }
+    // So they are stretch everywhere a budget applies, at every tier.
+    expect(isWordDecodable('watch', 'digraphs')).toBe(false);
+    expect(isWordDecodable('photograph', 'advanced-vowel')).toBe(false);
   });
 
   it('leaves the teacher-supported formats on the full code', () => {
