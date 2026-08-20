@@ -9,6 +9,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { allSentences } from '../data/sentences.js';
+import { classifySentenceTrack } from '../modules/sentenceForgeTracks.js';
 import { describeFirstDivergence } from '../modules/sentenceSkills.js';
 import {
   getUniqueSentencesDone,
@@ -155,5 +156,46 @@ describe('sentence completion tracking', () => {
     expect(getShakySentenceIds({ level: 1, sfqCompletedBySentence: nextBySentence })).toEqual([
       'shaky',
     ]);
+  });
+});
+
+/**
+ * Sentence Forge used to fill every scope by wrapping ~21 authored sentences
+ * in a fronted phrase, so four in five sentences a child met were the same
+ * sentence wearing a different hat. Every scope is now authored outright.
+ */
+describe('Sentence Forge is authored, not padded', () => {
+  it('serves no machine-generated padding in any level/track scope', () => {
+    const padded = allSentences.filter((s) => /^sx-/.test(s.id));
+    expect(
+      padded.length,
+      padded
+        .slice(0, 5)
+        .map((s) => `${s.id}: ${s.sentence}`)
+        .join('\n'),
+    ).toBe(0);
+  });
+
+  it('still fills every selectable scope from authored sentences alone', () => {
+    const scopes = {};
+    for (const entry of allSentences) {
+      const key = `L${entry.level}/${classifySentenceTrack(entry)}`;
+      (scopes[key] ??= []).push(entry);
+    }
+    const short = Object.entries(scopes)
+      .filter(([, entries]) => entries.length <= 100)
+      .map(([key, entries]) => `${key}=${entries.length}`);
+    expect(short, short.join(', ')).toEqual([]);
+  });
+
+  it('keeps each scope varied enough to teach more than one structure', () => {
+    const scopes = {};
+    for (const entry of allSentences) {
+      const key = `L${entry.level}/${classifySentenceTrack(entry)}`;
+      (scopes[key] ??= new Set()).add(entry.focusLabel);
+    }
+    for (const [key, labels] of Object.entries(scopes)) {
+      expect(labels.size, `${key} has too few distinct focuses`).toBeGreaterThanOrEqual(4);
+    }
   });
 });
