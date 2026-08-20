@@ -555,7 +555,7 @@ export const STORIES = [
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-b-03'),
     lines: [
-      { type: 'intro',   text: 'Giri met a weak bee by a green tree. It was too tired to see its way home.' },
+      { type: 'intro',   text: 'Giri met a weak bee by a green tree. It was too weak to see its way home.' },
       { type: 'label',   text: 'Problem:' },
       { type: 'beat',    text: 'The bee could not reach its nest. "I need a good rest," it said with a weep.' },
       { type: 'label',   text: 'Attempt:' },
@@ -1382,7 +1382,7 @@ export const STORIES = [
     lines: [
       { type: 'paragraph', text: 'Giri was at the beach one morning when he spotted a baby turtle stuck in a dip in the sand. The turtle had turned the wrong way. It was far from the water, and the hot sun had made the sand burn below its flippers.' },
       { type: 'paragraph', text: 'Giri worked fast. First, he dug the sand away from the shell. He did not try to carry it; instead he turned the little turtle to face the water. The turtle began to stir. It pushed with its flippers, slid along the wet sand, and swam off into the surf.' },
-      { type: 'end',       text: 'Giri stood and watched until the turtle was finally just a dot in the sea. His first rescue! He walked home with a warm glow inside.' },
+      { type: 'end',       text: 'Giri stood and stared until the turtle was finally just a dot in the sea. His first rescue! He walked home with a warm glow inside.' },
     ],
     comprehension: [
       { q: 'Where was the baby turtle stuck?', options: ['In a dip in the sand', 'In the surf', 'Under a rock', 'In a net'], answer: 0, type: 'literal' },
@@ -1585,7 +1585,7 @@ export const STORIES = [
     textType: 'bridge-reader',
     refrainCount: 0,
     lines: [
-      { type: 'paragraph', text: 'Giri was walking through town when he heard a loud, joyful sound coming from the community hall. He followed the noise and found a crowd of people singing and clapping. A woman with a brown shawl was leading the group.' },
+      { type: 'paragraph', text: 'Giri was walking through town when he heard a loud, joyful sound coming from the community hall. He followed the noise and found a crowd of people singing and clapping. A woman in a brown coat was leading the group.' },
       { type: 'paragraph', text: '"Come and join!" she called out. Giri felt a bit shy. He sat on a stool by the window and listened. The voices bounced around the room — high, low, loud, and soft. The sound made him feel warm inside.' },
       { type: 'paragraph', text: 'At last, Giri stood up and joined in. His voice was small at first, but it grew louder with each note. Soon it rang out loud and proud, bouncing round the hall. The woman gave him a proud nod. The whole group swayed and sang until the sun went down.' },
       { type: 'end',       text: 'Giri walked home humming the tune. He had found something that brought him joy — the power of voices joined together.' },
@@ -1713,7 +1713,7 @@ export const STORIES = [
     refrainCount: 0,
     lines: [
       { type: 'paragraph', text: 'It was Sports Day. The whole school poured out onto the field. Flags snapped in the wind, and the crowd on the bleachers made a joyful roar. Giri was in the relay team. He bounced on his toes at the starting point, trying to shake off the doubt in his stomach.' },
-      { type: 'paragraph', text: 'The whistle blew. The first two runners sprinted down the track. When the baton reached Giri, he gripped it and ran with all his power. Halfway round the bend, his foot caught a mound of soil. He stumbled, fell, and felt the grit sting his knee.' },
+      { type: 'paragraph', text: 'The whistle blew. The first two runners sprinted down the track. When the baton reached Giri, he gripped it and ran with all his power. Halfway round the bend, his foot hit a mound of soil. He stumbled, fell, and felt the grit sting his knee.' },
       { type: 'paragraph', text: 'For a moment the noise around him seemed to fade away. Then the crowd found their voice. "Go, Giri! Get up!" Giri pushed himself to his feet and ran on. He was not the fastest, but he crossed the line with the baton held high.' },
       { type: 'end',       text: 'His team did not win a trophy, but they won something better — the loudest cheer of the day. Giri felt proud. Courage, he decided, was not about never falling down. It was about getting up and carrying on.' },
     ],
@@ -2254,7 +2254,7 @@ export const STORIES = [
     lines: [
       { type: 'paragraph', text: 'A loud sound rolled up from town to the hill where Giri stood. He looked around. A big brown cloud was rolling down the hill — and it was coming his way! "What is that? How big is it? What do I do NOW?"' },
       { type: 'paragraph', text: '"I must find out about that cloud," said Giri. He did not run. He did not hide. He marched down the road to find out for himself. The sound got louder and louder. The cloud got rounder and rounder. Giri counted his steps out loud to stay brave. "One. Two. Three. Four."' },
-      { type: 'paragraph', text: 'Then Giri saw it. It was not a cloud at all! It was a crowd — a crowd of kids from town, kicking up dust as they bounced a big round ball down the hill. "Come and join us!" they shouted.' },
+      { type: 'paragraph', text: 'Then Giri found out. It was not a cloud at all! It was a crowd — a crowd of kids from town, kicking up dust as they bounced a big round ball down the hill. "Come and join us!" they shouted.' },
       { type: 'end',       text: 'Giri let out a proud shout: "I found out by myself! A thing is not so big when you find out about it." He joined the crowd, and the game was loud, round, and fun.' },
     ],
     comprehension: [

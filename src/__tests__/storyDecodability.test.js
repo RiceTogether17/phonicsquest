@@ -55,32 +55,33 @@ const RATIO_FLOORS = { A: 0.84, B: 0.9, C: 0.93, D: 0.95 };
 const VOWEL_BUDGET_FLOORS = { 1: 0.55, 3: 0.8 };
 
 /**
- * The tier-2 equivalent. A long-vowel phase may only use the spellings its
- * stage of phase 6 has reached, so an early long-a story cannot borrow "high"
+ * The same idea above tier 1. A phase may only use the spellings its own
+ * teaching stage has reached, so an early long-a story cannot borrow "high"
  * or "cool" to lift its ratio; the words it loses go to the sight-word route
  * instead. The earlier the stage, the fewer spellings are available, so the
- * floor rises as the budget fills.
+ * floor rises as the budget fills. Keyed by budget size; sizes not listed
+ * here fall through to the band floor, which those phases do clear.
  */
-const LONG_VOWEL_BUDGET_FLOORS = { 3: 0.84, 6: 0.85 };
+const GRAPHEME_BUDGET_FLOORS = { 3: 0.84, 6: 0.85 };
 
 function ratioFloorFor(story) {
   const phase = getStoryPhase(story.phase);
   const budget = phase?.shortVowels?.length;
   if (budget && VOWEL_BUDGET_FLOORS[budget] !== undefined) return VOWEL_BUDGET_FLOORS[budget];
-  const longBudget = cumulativeLongVowels(phase)?.size;
-  if (longBudget && LONG_VOWEL_BUDGET_FLOORS[longBudget] !== undefined) {
-    return LONG_VOWEL_BUDGET_FLOORS[longBudget];
+  const graphemeBudget = cumulativeBudget(phase)?.size;
+  if (graphemeBudget && GRAPHEME_BUDGET_FLOORS[graphemeBudget] !== undefined) {
+    return GRAPHEME_BUDGET_FLOORS[graphemeBudget];
   }
   return RATIO_FLOORS[story.band];
 }
 
-/** Everything a long-vowel phase has been taught, including earlier stages. */
-function cumulativeLongVowels(phase) {
-  if (!phase?.longVowels) return null;
+/** Everything a budgeted phase has been taught, including earlier stages. */
+function cumulativeBudget(phase) {
+  if (!phase?.graphemeBudget) return null;
   const out = new Set();
   for (const p of STORY_PHASES) {
-    if (!p.longVowels) continue;
-    for (const g of p.longVowels) out.add(g);
+    if (!p.graphemeBudget) continue;
+    for (const g of p.graphemeBudget) out.add(g);
     if (p.id === phase.id) return out;
   }
   return out;
@@ -370,32 +371,51 @@ describe('short-vowel phase budget', () => {
 });
 
 /**
- * Tier 2 releases every long-vowel spelling at once, but phase 6 teaches them
- * in sequence — a_e/ai/ay, then ee/ea, then i_e/igh/ie/y, then o_e/oa/ow, then
- * u_e/ue/ew/oo. Without a sub-gate a story named "long-a" could serve "high",
- * "cool" and "soaked", none of which the child has met.
+ * A tier is a coarse release; a phase is a teaching stage inside it. Tier 2
+ * hands over every long-vowel spelling at once, tier 3 every r-controlled
+ * one — so without a sub-gate a story named "long-a" could serve "high" and
+ * "cool", an "r-controlled" story could serve "watched", and a "diphthongs"
+ * story could serve "caught". All four were in the corpus.
  */
-describe('long-vowel phase budget', () => {
-  it('declares a cumulative budget on every tier-2 phase, and nowhere else', () => {
-    for (const phase of STORY_PHASES.filter((p) => p.tier === 2)) {
-      expect(phase.longVowels, `${phase.id} has no long-vowel budget`).toBeTruthy();
+describe('grapheme phase budget', () => {
+  it('declares a cumulative budget on every phase above tier 1', () => {
+    // The teacher-supported formats are the deliberate exception: they get
+    // the full code (see the banner comments in stories.js).
+    const UNGATED = new Set(['chapter', 'extension-sg']);
+    for (const phase of STORY_PHASES.filter((p) => p.tier > 1 && !UNGATED.has(p.id))) {
+      expect(phase.graphemeBudget, `${phase.id} has no grapheme budget`).toBeTruthy();
     }
-    // Tier 3+ carries none on purpose: the curriculum teaches diphthongs
-    // (phase 7) before r-controlled vowels (phase 8), the reverse of the story
-    // tier ladder, so any within-tier order here would be invented.
-    for (const phase of STORY_PHASES.filter((p) => p.tier !== 2)) {
-      expect(phase.longVowels, `${phase.id} must not carry a long-vowel budget`).toBeUndefined();
+    // Tier 1 uses the letter-level short-vowel budget instead.
+    for (const phase of STORY_PHASES.filter((p) => p.tier === 1)) {
+      expect(phase.graphemeBudget, `${phase.id} must not carry one`).toBeUndefined();
     }
   });
 
-  it('rejects a long vowel the phase has not reached, and accepts an earlier one', () => {
-    // Tier 2 for both, so the tier check alone would pass either at long-a.
+  it('never lets a phase spend a grapheme a later phase introduces', () => {
+    // The budget is defined by array order, so a phase whose stage adds a
+    // grapheme must come before every phase that relies on it.
+    const seen = new Set();
+    for (const phase of STORY_PHASES) {
+      for (const g of phase.graphemeBudget || []) {
+        expect(seen.has(g), `${phase.id} re-introduces "${g}"`).toBe(false);
+        seen.add(g);
+      }
+    }
+  });
+
+  it('rejects a spelling the phase has not reached, and accepts an earlier one', () => {
+    // Same tier for each pair, so the tier check alone would pass either.
     expect(isWordDecodable('high', 'long-a')).toBe(false);
     expect(isWordDecodable('high', 'long-i')).toBe(true);
     expect(isWordDecodable('cool', 'long-o')).toBe(false);
     expect(isWordDecodable('cool', 'long-u')).toBe(true);
+    expect(isWordDecodable('watch', 'r-controlled')).toBe(false);
+    expect(isWordDecodable('watch', 'digraphs')).toBe(true);
+    expect(isWordDecodable('caught', 'diphthongs')).toBe(false);
+    expect(isWordDecodable('caught', 'advanced-vowel')).toBe(true);
     // Cumulative: a later phase keeps everything the earlier ones taught.
     expect(isWordDecodable('rain', 'long-u')).toBe(true);
+    expect(isWordDecodable('rain', 'diphthongs')).toBe(true);
   });
 
   it('reads word-initial y as the consonant it is, not a long vowel', () => {
@@ -403,6 +423,43 @@ describe('long-vowel phase budget', () => {
     expect(isWordDecodable('yes', 'long-a')).toBe(true);
     expect(isWordDecodable('cry', 'long-a')).toBe(false);
     expect(isWordDecodable('cry', 'long-i')).toBe(true);
+  });
+
+  it('leaves the teacher-supported formats on the full code', () => {
+    expect(isWordDecodable('caught', 'chapter')).toBe(true);
+    expect(isWordDecodable('caught', 'extension-sg')).toBe(true);
+  });
+});
+
+/**
+ * `tier` and `curriculumPhase` are independent axes: tier follows the band
+ * ladder the stories ship on, curriculumPhase names the lesson phase that
+ * teaches the content and gates tricky words. The two were once transposed
+ * — r-controlled claimed phase 7 (which teaches diphthongs) and vice versa —
+ * so each pointed at the other's tricky-word set.
+ */
+describe('phase ↔ curriculum alignment', () => {
+  it('points each phase at the lesson phase that actually teaches it', () => {
+    const expected = {
+      'r-controlled': 8, // phase-8-advanced: ar, or, er/ir/ur
+      diphthongs: 7, // phase-7-diphthongs: oi/oy, ou/ow, aw/au
+      suffixes: 9, // phase-9-suffixes: -ing, -ed, -er, -est
+    };
+    for (const [id, phase] of Object.entries(expected)) {
+      expect(getStoryPhase(id).curriculumPhase, id).toBe(phase);
+    }
+  });
+
+  it('keeps curriculumPhase non-decreasing along the story ladder, bar the known swap', () => {
+    // Diphthongs are taught (phase 7) before r-controlled (phase 8) but read
+    // after them, so this one inversion is expected and documented.
+    const inversions = [];
+    for (let i = 1; i < STORY_PHASES.length; i += 1) {
+      if (STORY_PHASES[i].curriculumPhase < STORY_PHASES[i - 1].curriculumPhase) {
+        inversions.push(STORY_PHASES[i].id);
+      }
+    }
+    expect(inversions).toEqual(['diphthongs']);
   });
 });
 

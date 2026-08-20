@@ -29,6 +29,16 @@
  *                          with tier-2 ow /oʊ/, so ow words under-require).
  *   Tier 5  Advanced       air are ear eer ere.
  *
+ * Tier order follows the BAND ladder the stories ship on (Band C is
+ * r-controlled, Band D is diphthongs), which is not the order the lesson
+ * curriculum teaches them in (phase 7 diphthongs, phase 8 r-controlled).
+ * These are two independent axes and both are honest: `tier` says what code
+ * a reader at this point in the STORY bank has met, `curriculumPhase` says
+ * which LESSON phase the phase's content belongs to and is used only as the
+ * tricky-word cutoff. Do not derive one from the other — they were once
+ * silently transposed, which handed r-controlled stories the tricky words of
+ * a phase they had not reached.
+ *
  * A word's REQUIRED TIER is the highest tier of any grapheme it contains:
  * curated `graphemes[]` from words.js when the word is known, otherwise a
  * longest-match pattern scan with suffix stripping. A word is decodable at
@@ -70,25 +80,39 @@ export const STORY_PHASES = Object.freeze([
   { id: 'short-ou', tier: 1, curriculumPhase: 2, shortVowels: 'aeiou' },
   { id: 'mixed-short', tier: 1, curriculumPhase: 4, shortVowels: 'aeiou' },
   { id: 'short-digraphs', tier: 1, curriculumPhase: 4, shortVowels: 'aeiou' },
-  // `longVowels` is the tier-2 equivalent of the short-vowel budget above.
-  // Tier 2 releases every long-vowel spelling at once, but the curriculum
-  // teaches them in sequence inside phase 6 — long-a-ae/ai/ay, then
-  // long-e-ee/ea, then long-i-ie/igh/y, then long-o-oe/oa/ow, then
-  // long-u-ue/ew/oo. Without a budget a story named "long-a" could serve
-  // igh, oa and oo, none of which the child has met. Cumulative: each entry
-  // lists only what its stage adds.
-  { id: 'long-a', tier: 2, curriculumPhase: 6, longVowels: ['a_e', 'ai', 'ay'] },
-  { id: 'long-e', tier: 2, curriculumPhase: 6, longVowels: ['ee', 'ea', 'e_e'] },
-  { id: 'long-i', tier: 2, curriculumPhase: 6, longVowels: ['i_e', 'igh', 'ie', 'y'] },
-  { id: 'long-o', tier: 2, curriculumPhase: 6, longVowels: ['o_e', 'oa', 'ow'] },
-  { id: 'long-u', tier: 2, curriculumPhase: 6, longVowels: ['u_e', 'ue', 'ew', 'oo'] },
-  { id: 'r-controlled', tier: 3, curriculumPhase: 7 },
-  { id: 'digraphs', tier: 3, curriculumPhase: 7 },
-  { id: 'suffixes', tier: 3, curriculumPhase: 7 },
-  { id: 'diphthongs', tier: 4, curriculumPhase: 8 },
-  { id: 'advanced-vowel', tier: 5, curriculumPhase: 8 },
-  { id: 'chapter', tier: 5, curriculumPhase: 8 },
-  { id: 'extension-sg', tier: 5, curriculumPhase: 8 },
+  // `graphemeBudget` is the SUB-GATE for tiers 2 and up: a cumulative list of
+  // what each phase's stage ADDS on top of every phase before it in this
+  // array. A tier is a coarse release — tier 2 hands over every long-vowel
+  // spelling at once, tier 3 every r-controlled one — but a phase is a
+  // teaching stage inside it, and a spelling the child has not met cannot be
+  // sounded out. Without the budget a story named "long-a" could serve igh,
+  // oa and oo, and an "r-controlled" story could serve tch and dge.
+  //
+  // Tier 1 uses `shortVowels` instead, because there the unit is a single
+  // vowel LETTER; from tier 2 up vowels come in teams and split digraphs,
+  // where a letter-level check would misread "rain" as needing /a/ and /i/.
+  { id: 'long-a', tier: 2, curriculumPhase: 6, graphemeBudget: ['a_e', 'ai', 'ay'] },
+  { id: 'long-e', tier: 2, curriculumPhase: 6, graphemeBudget: ['ee', 'ea', 'e_e'] },
+  { id: 'long-i', tier: 2, curriculumPhase: 6, graphemeBudget: ['i_e', 'igh', 'ie', 'y'] },
+  { id: 'long-o', tier: 2, curriculumPhase: 6, graphemeBudget: ['o_e', 'oa', 'ow'] },
+  { id: 'long-u', tier: 2, curriculumPhase: 6, graphemeBudget: ['u_e', 'ue', 'ew', 'oo'] },
+  {
+    id: 'r-controlled',
+    tier: 3,
+    curriculumPhase: 8,
+    graphemeBudget: ['ar', 'or', 'er', 'ir', 'ur'],
+  },
+  { id: 'digraphs', tier: 3, curriculumPhase: 8, graphemeBudget: ['tch', 'dge', 'ph'] },
+  { id: 'suffixes', tier: 3, curriculumPhase: 9, graphemeBudget: [] },
+  { id: 'diphthongs', tier: 4, curriculumPhase: 7, graphemeBudget: ['oi', 'oy', 'ou'] },
+  {
+    id: 'advanced-vowel',
+    tier: 5,
+    curriculumPhase: 9,
+    graphemeBudget: ['aw', 'au', 'air', 'are', 'ear', 'eer', 'ere'],
+  },
+  { id: 'chapter', tier: 5, curriculumPhase: 10 },
+  { id: 'extension-sg', tier: 5, curriculumPhase: 10 },
 ]);
 
 const PHASE_BY_ID = new Map(STORY_PHASES.map((p) => [p.id, p]));
@@ -448,23 +472,23 @@ export function requiredTier(word) {
  * Every long-vowel grapheme released by the time a tier-2 phase is reached.
  * Built once: STORY_PHASES is frozen, so the answer never changes.
  */
-const LONG_VOWEL_BUDGETS = (() => {
+const GRAPHEME_BUDGETS = (() => {
   const out = new Map();
   const running = new Set();
   for (const phase of STORY_PHASES) {
-    if (!phase.longVowels) continue;
-    for (const g of phase.longVowels) running.add(g);
+    if (!phase.graphemeBudget) continue;
+    for (const g of phase.graphemeBudget) running.add(g);
     out.set(phase.id, new Set(running));
   }
   return out;
 })();
 
 /**
- * The tier-2 graphemes of a word under each legitimate reading of it —
+ * The above-tier-1 graphemes of a word under each legitimate reading of it —
  * curated entry, raw scan, and suffix-stripped base — mirroring the way
  * requiredTier takes the cheapest route to a word.
  */
-function longVowelReadings(clean) {
+function budgetedReadings(clean) {
   const entry = WORDS_BY_WORD.get(clean);
   const parses = [];
   if (entry?.graphemes?.length) {
@@ -484,20 +508,22 @@ function longVowelReadings(clean) {
   // scanWord already declines to upgrade. Only a later `y` is the long-vowel
   // spelling of "cry" and "happy".
   return parses.map((parse) =>
-    parse.filter((g, idx) => GRAPHEME_TIERS[g] === 2 && !(g === 'y' && idx === 0)),
+    parse.filter((g, idx) => GRAPHEME_TIERS[g] > 1 && !(g === 'y' && idx === 0)),
   );
 }
 
 /**
- * Does this word stay inside a tier-2 phase's long-vowel budget?
- * Always true for phases that declare none.
+ * Does this word stay inside its phase's cumulative grapheme budget?
+ * Always true for phases that declare none (tier 1, which uses the
+ * short-vowel budget, and the teacher-supported chapter/extension formats,
+ * which get the full code).
  * @param {object|null} phase
  * @param {string} clean
  */
-export function withinLongVowelBudget(phase, clean) {
-  const budget = phase && LONG_VOWEL_BUDGETS.get(phase.id);
+export function withinGraphemeBudget(phase, clean) {
+  const budget = phase && GRAPHEME_BUDGETS.get(phase.id);
   if (!budget) return true;
-  return longVowelReadings(clean).some((gs) => gs.every((g) => budget.has(g)));
+  return budgetedReadings(clean).some((gs) => gs.every((g) => budget.has(g)));
 }
 
 export function withinVowelBudget(phase, clean) {
@@ -521,7 +547,7 @@ export function isWordDecodable(word, phaseId) {
   return (
     requiredTier(clean) <= phase.tier &&
     withinVowelBudget(phase, clean) &&
-    withinLongVowelBudget(phase, clean)
+    withinGraphemeBudget(phase, clean)
   );
 }
 
@@ -630,7 +656,7 @@ export function classifyWord(
     phase &&
     tier <= phase.tier &&
     withinVowelBudget(phase, clean) &&
-    withinLongVowelBudget(phase, clean)
+    withinGraphemeBudget(phase, clean)
   ) {
     return make('decodable');
   }
