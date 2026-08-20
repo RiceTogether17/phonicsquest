@@ -42,6 +42,16 @@ export const SCREENS = Object.freeze({
 export const MCQ_ROUND_SIZE = 10;
 
 /**
+ * Sentences served in one Sentence Forge round.
+ *
+ * Every level/track pairing holds 101 sentences, and the mode used to serve
+ * all of them in one sitting: a P4 word-order session opened at "1 / 101" with
+ * no reachable end and no summary. Building a sentence from a word bank is
+ * slower than answering an MCQ, so the round is shorter than MCQ_ROUND_SIZE.
+ */
+export const SENTENCE_FORGE_ROUND_SIZE = 8;
+
+/**
  * Minimum number of mastered words required to unlock each quest mode.
  * A word is "mastered" when it has ≥6 attempts and ≥80% accuracy.
  */

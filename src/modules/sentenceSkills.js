@@ -10,18 +10,18 @@
 
 /** Human-readable labels for sentence skill tags. */
 export const SENTENCE_SKILL_LABELS = {
-  word_order:          'Word Order',
-  first_word_clue:     'First Word',
-  time_order_clue:     'Time Order',
-  connector_clue:      'Connectors',
-  tense_clue:          'Verb Tense',
-  punctuation_clue:    'Punctuation',
+  word_order: 'Word Order',
+  first_word_clue: 'First Word',
+  time_order_clue: 'Time Order',
+  connector_clue: 'Connectors',
+  tense_clue: 'Verb Tense',
+  punctuation_clue: 'Punctuation',
   subject_action_clue: 'Subject & Action',
-  modal_order:         'Modal Verbs',
-  clause_boundary:     'Clause Boundary',
-  inversion_pattern:   'Inversion',
-  comparison_structure:'Comparisons',
-  preposition_clue:    'Prepositions',
+  modal_order: 'Modal Verbs',
+  clause_boundary: 'Clause Boundary',
+  inversion_pattern: 'Inversion',
+  comparison_structure: 'Comparisons',
+  preposition_clue: 'Prepositions',
 };
 
 /**
@@ -80,13 +80,16 @@ export function getSkillCluePrompt(entry) {
   if (skills.includes('preposition_clue')) {
     return {
       prompt: 'Find the preposition phrase. Which word shows position, time, or direction?',
-      detail: entry.grammarNote || 'Prepositions like in/on/under/between link nouns to place and time.',
+      detail:
+        entry.grammarNote || 'Prepositions like in/on/under/between link nouns to place and time.',
     };
   }
   if (skills.includes('inversion_pattern')) {
     return {
       prompt: 'This sentence has an inverted structure. Where does the subject go?',
-      detail: entry.grammarNote || 'In inverted sentences, the verb or auxiliary comes before the subject.',
+      detail:
+        entry.grammarNote ||
+        'In inverted sentences, the verb or auxiliary comes before the subject.',
     };
   }
   return null;
@@ -101,12 +104,57 @@ export function getSkillCluePrompt(entry) {
  * @param {string[]} correctWords - correct word order
  * @returns {string} targeted hint message
  */
+/**
+ * Where the build first departs from the target, described the way a teacher
+ * standing over the desk would: naming the word that is out of place rather
+ * than restating the rule.
+ *
+ * A category hint ("check where the connector goes") is advice about the kind
+ * of sentence. This is advice about THIS attempt, so it comes first — but only
+ * when the child is close enough for the position to mean something. On a
+ * wholly scrambled attempt, pointing at word 1 teaches nothing.
+ *
+ * @param {string[]} builtWords
+ * @param {string[]} correctWords
+ * @returns {string} '' when no useful positional hint applies
+ */
+export function describeFirstDivergence(builtWords, correctWords) {
+  if (!builtWords?.length || !correctWords?.length) return '';
+
+  const firstWrong = correctWords.findIndex((word, i) => builtWords[i] !== word);
+  // Every placed word matches and the sentence is complete.
+  if (firstWrong === -1) return '';
+
+  const placed = firstWrong;
+  const given = builtWords[firstWrong];
+
+  // Nothing right yet: a position hint would just read as "word 1 is wrong".
+  if (placed === 0) return '';
+
+  const soFar = `The first ${placed === 1 ? 'word is' : `${placed} words are`} right.`;
+
+  // The prefix is correct and the child simply has not finished. Never name
+  // the next word here — a child could otherwise press Check repeatedly and
+  // have the whole sentence dictated to them one word at a time.
+  if (given === undefined) {
+    return `${soFar} Keep going — some words are still in the bank.`;
+  }
+
+  // Naming only the misplaced word keeps the answer unrevealed while still
+  // pointing at the decision the child has to make.
+  return `${soFar} "${given}" is not what comes next — look again at that spot.`;
+}
+
 export function diagnoseBuildError(entry, builtWords, correctWords) {
   if (!builtWords.length) return 'Build your sentence first! 🔨';
 
+  // A hint about THIS attempt beats a hint about this kind of sentence.
+  const positional = describeFirstDivergence(builtWords, correctWords);
+  if (positional) return positional;
+
   // First-word mismatch
   if (entry.expectedFirstWord) {
-    const built   = (builtWords[0]  || '').toLowerCase().replace(/[^a-z]/g, '');
+    const built = (builtWords[0] || '').toLowerCase().replace(/[^a-z]/g, '');
     const correct = entry.expectedFirstWord.toLowerCase().replace(/[^a-z]/g, '');
     if (built !== correct) {
       return entry.firstWordHint
@@ -118,8 +166,10 @@ export function diagnoseBuildError(entry, builtWords, correctWords) {
   // Connector placement mismatch
   if (entry.expectedConnector) {
     const conn = entry.expectedConnector.toLowerCase();
-    const correctIdx = correctWords.findIndex(w => w.toLowerCase().replace(/[^a-z]/g, '') === conn);
-    const builtIdx   = builtWords.findIndex(w => w.toLowerCase().replace(/[^a-z]/g, '') === conn);
+    const correctIdx = correctWords.findIndex(
+      (w) => w.toLowerCase().replace(/[^a-z]/g, '') === conn,
+    );
+    const builtIdx = builtWords.findIndex((w) => w.toLowerCase().replace(/[^a-z]/g, '') === conn);
     if (correctIdx !== -1 && correctIdx !== builtIdx) {
       return entry.grammarNote
         ? `"${entry.expectedConnector}" is in the wrong place. ${entry.grammarNote}`
@@ -133,8 +183,7 @@ export function diagnoseBuildError(entry, builtWords, correctWords) {
   if (skills.includes('time_order_clue')) {
     const firstCorrect = correctWords[0];
     if (builtWords[0] !== firstCorrect) {
-      return entry.punctuationHint
-        || 'The time phrase should come at the start, before the comma.';
+      return entry.punctuationHint || 'The time phrase should come at the start, before the comma.';
     }
   }
 
@@ -201,7 +250,7 @@ export function getSkillSummary(skillAttempts) {
   const sorted = [...entries].sort((a, b) => b.score - a.score);
   return {
     strongest: sorted[0].label,
-    weakest:   sorted[sorted.length - 1].label,
-    scores:    entries,
+    weakest: sorted[sorted.length - 1].label,
+    scores: entries,
   };
 }

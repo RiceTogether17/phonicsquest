@@ -1,4 +1,5 @@
 import { MIN_QUESTIONS_PER_SCOPE, contextualizeSentence, expansionContext } from './practiceExpansion.js';
+import { AUTHORED_SENTENCES } from './sentencesAuthored/index.js';
 import { classifySentenceTrack } from '../modules/sentenceForgeTracks.js';
 
 /**
@@ -114,7 +115,7 @@ const baseSentences = [
     },
   },
   {
-    id: 's016', sentence: 'My father took me to the hawker centre yesterday.', acceptableAnswers: ['Yesterday my father took me to the hawker centre.'], level: 2,
+    id: 's016', sentence: 'My father took me to the hawker centre yesterday.', level: 2,
     sentenceSkills: ['tense_clue', 'time_order_clue'],
     grammarNote: '"yesterday" is a past time marker — it confirms the past tense, so we use "took" not "take".',
     focusLabel: 'Past tense signal',
@@ -159,7 +160,7 @@ const baseSentences = [
     },
   },
   {
-    id: 's020', sentence: 'They had a picnic last Saturday morning.', acceptableAnswers: ['Last Saturday morning they had a picnic.'], level: 2,
+    id: 's020', sentence: 'They had a picnic last Saturday morning.', level: 2,
     sentenceSkills: ['tense_clue', 'time_order_clue'],
     grammarNote: '"last Saturday" is a past time expression — it confirms we use "had" (simple past).',
     focusLabel: 'Past time marker',
@@ -404,7 +405,7 @@ const baseSentences = [
     focusLabel: 'Infinitive of purpose',
   },
   {
-    id: 's039', sentence: 'The school will hold its annual sports day next Friday.', acceptableAnswers: ['Next Friday the school will hold its annual sports day.'], level: 4,
+    id: 's039', sentence: 'The school will hold its annual sports day next Friday.', level: 4,
     sentenceSkills: ['tense_clue', 'word_order'],
     grammarNote: '"will hold" is the future tense — "next Friday" is the future time marker that signals this.',
     focusLabel: 'Future tense',
@@ -439,7 +440,7 @@ const baseSentences = [
   { id: 's097', sentence: 'If the rain continues, the coach will cancel practice.', level: 4, sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'If', expectedConnector: 'If', punctuationHint: 'Use a comma between condition and result.', focusLabel: 'Conditional clause', grammarNote: 'First conditional pattern: "If" + present simple, "will" + base verb in the result clause.' },
   { id: 's098', sentence: 'Because we revised together, we solved the questions faster.', level: 4, sentenceSkills: ['connector_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Because', focusLabel: 'Fronted cause clause', grammarNote: 'When "Because" leads the sentence, end its clause with a comma before the main clause.' },
   { id: 's099', sentence: 'You should never post private details online.', level: 4, sentenceSkills: ['modal_order', 'word_order'], focusLabel: 'Modal + adverb order', grammarNote: 'Adverbs like "never" sit between the modal "should" and the main verb "post".' },
-  { id: 's100', sentence: 'The class will present their project next Monday.', acceptableAnswers: ['Next Monday the class will present their project.'], level: 4, sentenceSkills: ['tense_clue', 'word_order'], focusLabel: 'Future signal', grammarNote: '"will" + base verb signals a future action. "next Monday" is the future time marker.' },
+  { id: 's100', sentence: 'The class will present their project next Monday.', level: 4, sentenceSkills: ['tense_clue', 'word_order'], focusLabel: 'Future signal', grammarNote: '"will" + base verb signals a future action. "next Monday" is the future time marker.' },
   { id: 's101', sentence: 'He spoke so clearly that everyone understood the instructions.', level: 4, sentenceSkills: ['connector_clue', 'clause_boundary'], expectedConnector: 'so', focusLabel: 'So…that result structure', grammarNote: '"so + adverb + that" shows a result: the speaking was clear enough to cause understanding.' },
   { id: 's102', sentence: 'Should you need help, please call the office immediately.', level: 4, sentenceSkills: ['modal_order', 'clause_boundary'], focusLabel: 'Formal conditional opening', grammarNote: 'In formal instructions, an auxiliary opening can front the condition clause.' },
 
@@ -452,7 +453,7 @@ const baseSentences = [
   { id: 's046', sentence: 'By the time they arrived, the show had already ended.', level: 5, sentenceSkills: ['time_order_clue', 'first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'By', firstWordHint: '"By the time" starts a time clause — it comes first, before the comma.', focusLabel: 'Time reference clause', grammarNote: '"By the time" + simple past action triggers past perfect ("had ended") for the earlier action.' },
   { id: 's047', sentence: 'He worked so carefully that he did not make a single mistake.', level: 5, sentenceSkills: ['connector_clue', 'clause_boundary'], grammarNote: '"so…that" is a result structure — so + adverb/adjective + that + result clause.', focusLabel: 'So…that structure' },
   { id: 's048', sentence: 'Both the students and their teacher were proud of the result.', level: 5, sentenceSkills: ['connector_clue'], expectedConnector: 'and', grammarNote: '"Both…and" links two subjects — they go before the verb.', focusLabel: 'Both…and structure' },
-  { id: 's049', sentence: 'She practised every day so that she could improve her results.', acceptableAnswers: ['Every day she practised so that she could improve her results.'], level: 5, sentenceSkills: ['connector_clue', 'tense_clue'], expectedConnector: 'so', grammarNote: '"so that" introduces the purpose clause — it follows the main action.', focusLabel: 'Purpose clause' },
+  { id: 's049', sentence: 'She practised every day so that she could improve her results.', level: 5, sentenceSkills: ['connector_clue', 'tense_clue'], expectedConnector: 'so', grammarNote: '"so that" introduces the purpose clause — it follows the main action.', focusLabel: 'Purpose clause' },
   { id: 's050', sentence: 'Having saved enough money, she finally bought the book she wanted.', level: 5, sentenceSkills: ['first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Having', firstWordHint: '"Having saved" is a participial phrase — it comes at the start, before the comma.', punctuationHint: 'A comma follows the participial phrase "Having saved enough money".', focusLabel: 'Fronted participial phrase', grammarNote: '"Having + past participle" forms a participial phrase that shows an earlier action. Comma after the phrase.' },
   { id: 's073', sentence: 'Despite the heavy rain, the netball training continued.', level: 5, sentenceSkills: ['first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Despite', firstWordHint: '"Despite" starts a fronted concessive phrase before the comma.', punctuationHint: 'Use a comma after the concessive phrase.', focusLabel: 'Fronted concessive phrase', grammarNote: '"Despite" + noun phrase (not a clause). Always followed by a comma when fronted.' },
   { id: 's074', sentence: 'Without checking the map, they took the wrong bus home.', level: 5, sentenceSkills: ['first_word_clue', 'punctuation_clue', 'clause_boundary'], expectedFirstWord: 'Without', firstWordHint: '"Without" starts the fronted phrase.', punctuationHint: 'A comma separates the fronted phrase from the main clause.', focusLabel: 'Fronted participial phrase', grammarNote: '"Without + -ing" forms a fronted phrase showing what someone failed to do. Comma before the main clause.' },
@@ -692,17 +693,84 @@ const P4_SYNTHESIS_SEEDS = [
   { id: 's4syn08', sentence: 'The soup was so hot that I could not drink it immediately.', level: 4, sentenceSkills: ['synthesis_transformation', 'so_that'], focusLabel: 'So…that result', grammarNote: '“So + adjective + that” links a strong degree to its result.' },
 ];
 
-function buildSentenceVariant(source, level, track, index) {
-  const sentence = contextualizeSentence(source.sentence, index);
+// A sentence that already fixes its own time cannot take a second one: adding
+// "On Monday morning during recess," to "…took me to the hawker centre
+// yesterday." produces two conflicting time settings, which is not English a
+// child should be asked to build. Such sentences take a place or purpose
+// frame instead.
+const HAS_TIME_PHRASE =
+  /\b(yesterday|tomorrow|tonight|today|last (?:week|night|month|year|term|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)|next (?:week|month|year|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)|every (?:day|morning|afternoon|evening|week|year)|this (?:morning|afternoon|evening)|at noon|after school|before school)\b/i;
+
+// Non-temporal frames, so a sentence that already carries a time phrase still
+// gets a fronted phrase and comma to practise — just not a second clock.
+const PLACE_FRAMES = [
+  'In our classroom',
+  'At the school gate',
+  'In the school hall',
+  'Along the corridor',
+  'Beside the field',
+  'In the library corner',
+  'At the canteen table',
+  'Near the notice board',
+];
+
+// A sentence that already opens with its own fronted phrase ("Yesterday,
+// Ravi played…") gets no frame at all: stacking a second one produces the
+// double-fronted "In our classroom, yesterday, Ravi played…", which is
+// clumsy English even though nothing in it is strictly ungrammatical.
+const ALREADY_FRONTED = /^[^,]{1,40},\s/;
+
+function frameFor(source, index) {
+  if (ALREADY_FRONTED.test(source.sentence)) return null;
+  if (HAS_TIME_PHRASE.test(source.sentence)) {
+    return PLACE_FRAMES[index % PLACE_FRAMES.length];
+  }
+  return expansionContext(index).replace(/^on /, 'On ');
+}
+
+function lowercaseFirst(text) {
+  // Proper nouns and "I" keep their capital when they follow the comma.
+  const first = (String(text).match(/^[“"']?([A-Za-z]+)/) || [])[1] || '';
+  if (first === 'I' || (first && first[0] === first[0].toUpperCase() && first.length > 1 && /^[A-Z][a-z]+$/.test(first) && PROPER_OPENERS.has(first))) {
+    return text;
+  }
+  return String(text).replace(/^([“"']?)([A-Z])/, (_, q, c) => `${q}${c.toLowerCase()}`);
+}
+
+const PROPER_OPENERS = new Set([
+  'I', 'Mei', 'Ahmad', 'Siti', 'Ravi', 'Wei', 'Zara', 'Jia', 'Priya', 'Kai', 'Ben', 'Ali',
+  'Nurul', 'Devi', 'Sam', 'Hana', 'Farid', 'Lena', 'Arjun', 'Ying', 'Omar', 'Tara', 'Ethan',
+  'Aisha', 'Daniel', 'Tom', 'Sarah', 'National', 'Singapore', 'English', 'Mother', 'Father',
+  'Mum', 'Dad', 'Grandma', 'Grandpa',
+]);
+
+function applyFrame(text, frame) {
+  return `${frame}, ${lowercaseFirst(String(text).trim())}`;
+}
+
+function buildSentenceVariant(source, level, track, index, idSeq = index) {
+  const frame = frameFor(source, index);
+  // No frame: the sentence already carries a fronted phrase and stands as it is.
+  if (!frame) {
+    return {
+      ...source,
+      id: `sx-p${level}-${track}-${String(idSeq + 1).padStart(3, '0')}`,
+    };
+  }
+  const timeFramed = frame.startsWith('On ');
+  const sentence = timeFramed
+    ? contextualizeSentence(source.sentence, index)
+    : applyFrame(source.sentence, frame);
   const firstWord = sentence.replace(/^[“"']?/, '').split(/\s+/)[0].replace(/[.,!?;:]$/, '');
   return {
     ...source,
-    id: `sx-p${level}-${track}-${String(index + 1).padStart(3, '0')}`,
+    id: `sx-p${level}-${track}-${String(idSeq + 1).padStart(3, '0')}`,
     sentence,
-    acceptableAnswers: (source.acceptableAnswers || []).map(answer => contextualizeSentence(answer, index)),
+    acceptableAnswers: (source.acceptableAnswers || []).map(answer =>
+      timeFramed ? contextualizeSentence(answer, index) : applyFrame(answer, frame)),
     expectedFirstWord: firstWord,
-    firstWordHint: `Begin with the context phrase “${expansionContext(index).replace(/^on /, 'On ')}”.`,
-    grammarNote: `${source.grammarNote || 'Keep the original sentence structure.'} This version adds a fronted time-and-setting phrase followed by a comma.`,
+    firstWordHint: `Begin with the ${timeFramed ? 'time-and-setting' : 'place'} phrase “${frame}”.`,
+    grammarNote: `${source.grammarNote || 'Keep the original sentence structure.'} This version adds a fronted ${timeFramed ? 'time-and-setting' : 'place'} phrase followed by a comma.`,
   };
 }
 
@@ -713,12 +781,30 @@ function expandSentenceScopes(sentences) {
       const sources = sentences.filter(entry => entry.level === level && classifySentenceTrack(entry) === track);
       if (!sources.length) continue;
       const existing = expanded.filter(entry => entry.level === level && classifySentenceTrack(entry) === track);
+      // Sentences that already open with a fronted phrase are left unframed,
+      // so their "variant" is the source text again. Emitting it would pad the
+      // scope with a literal duplicate, so those are skipped and the next
+      // source is tried instead.
+      const seen = new Set(existing.map(entry => entry.sentence));
+      // Each source walks its OWN frame sequence. Sharing one counter made the
+      // source stride and the frame cycle share a factor, so every source only
+      // ever saw a fifth of the available frames and a scope could run short.
+      const usedPerSource = sources.map(() => 0);
       let index = 0;
-      while (existing.length < MIN_QUESTIONS_PER_SCOPE) {
-        const variant = buildSentenceVariant(sources[index % sources.length], level, track, index);
+      let guard = 0;
+      const maxTries = MIN_QUESTIONS_PER_SCOPE * sources.length * 8;
+      while (existing.length < MIN_QUESTIONS_PER_SCOPE && guard < maxTries) {
+        guard += 1;
+        const sourceIdx = index % sources.length;
+        index += 1;
+        const source = sources[sourceIdx];
+        const frameSeq = usedPerSource[sourceIdx];
+        usedPerSource[sourceIdx] += 1;
+        const variant = buildSentenceVariant(source, level, track, frameSeq, existing.length);
+        if (seen.has(variant.sentence)) continue;
+        seen.add(variant.sentence);
         expanded.push(variant);
         existing.push(variant);
-        index += 1;
       }
     }
   }
@@ -810,4 +896,9 @@ const SIGHT_EXPOSURE_SENTENCES = [
   { id: 'ssw076', sentence: 'Fill in the form with your name and class.', level: 2, sentenceSkills: ['word_order', 'sight_word_exposure'], focusLabel: 'Phrasal verb “fill in”', grammarNote: '“Fill in” is a two-part verb that means complete.' },
 ];
 
-export const allSentences = expandSentenceScopes([...baseSentences, ...P4_SYNTHESIS_SEEDS, ...SIGHT_EXPOSURE_SENTENCES]);
+export const allSentences = expandSentenceScopes([
+  ...baseSentences,
+  ...AUTHORED_SENTENCES,
+  ...P4_SYNTHESIS_SEEDS,
+  ...SIGHT_EXPOSURE_SENTENCES,
+]);

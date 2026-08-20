@@ -33,6 +33,12 @@ import {
   getSkillSummary,
 } from '../modules/sentenceSkills.js';
 import { classifySentenceTrack } from '../modules/sentenceForgeTracks.js';
+import { SENTENCE_FORGE_ROUND_SIZE } from '../constants.js';
+import {
+  getUniqueSentencesDone,
+  recordSentenceCompletion,
+  getShakySentenceIds,
+} from './sentenceForgeCompletion.js';
 
 // ── Module state ────────────────────────────────────────────────────────────
 
@@ -64,8 +70,19 @@ let _sessionClueMissionTotal = 0;
 // Skill clue panel – dismissed once per sentence after "Got it"
 let _skillClueDismissed = false;
 
-// Wrong-attempt counter per sentence — resets each new sentence
+// Wrong-attempt counter per sentence — resets each new sentence. The
+// teach-back clears it so the retry ladder starts fresh, which is why it
+// cannot also be the thing that decides whether the attempt was scored.
 let _sentenceWrongCount = 0;
+
+// Whether THIS sentence has already been recorded against mastery. The mark is
+// the first attempt and there is exactly one per sentence: without this, the
+// teach-back's counter reset made the next attempt look like a first attempt
+// and the same sentence was scored twice.
+let _sentenceScored = false;
+
+// Attempts on this sentence in total, across teach-backs. Drives the reveal.
+let _sentenceAttempts = 0;
 
 // ── Sentence skill teach-back content ───────────────────────────────────────
 const SENTENCE_SKILL_TEACHBACK = {
@@ -202,6 +219,8 @@ export function cleanupSentenceForge() {
   _sessionClueCorrect = 0;
   _sessionClueMissionTotal = 0;
   _sentenceWrongCount = 0;
+  _sentenceScored = false;
+  _sentenceAttempts = 0;
   if (_keyHandler) {
     document.removeEventListener('keydown', _keyHandler);
     _keyHandler = null;
@@ -214,6 +233,7 @@ function _renderBrowser() {
   if (!_container) return;
 
   const completed = store.get('sfqCompleted') || {};
+  const completedBySentence = store.get('sfqCompletedBySentence') || {};
   const categoryMap = getSentenceForgeCategoriesByLevel();
 
   const tracks = [
@@ -232,8 +252,13 @@ function _renderBrowser() {
     const total = allSentences.filter(
       (s) => s.level === lv && _getSentenceTrack(s) === _currentTrack,
     ).length;
-    const done = completed[lv] || 0;
-    const isDone = done >= total;
+    // Count sentences finished, not correct answers given.
+    const done = getUniqueSentencesDone({
+      level: lv,
+      sfqCompletedBySentence: completedBySentence,
+      sfqCompleted: completed,
+    });
+    const isDone = total > 0 && done >= total;
     const icon = SENTENCE_LEVEL_ICONS[lv - 1];
 
     const categorySkills = categoryMap[lv] || [];
@@ -251,8 +276,6 @@ function _renderBrowser() {
       </button>`
         : '';
   }
-  console.info('[SentenceForge] Level selector categories', categoryMap);
-
   html += '</div></div>';
   _container.innerHTML = html;
 
@@ -276,7 +299,23 @@ function _startLevel(level) {
   const raw = allSentences.filter(
     (s) => s.level === level && _getSentenceTrack(s) === _currentTrack,
   );
-  _levelSentences = [...raw].sort(() => Math.random() - 0.5);
+  const shuffled = [...raw].sort(() => Math.random() - 0.5);
+
+  // Sentences finished only after help lead the round, the way a teacher
+  // reopens yesterday's difficult ones before setting new work.
+  const shaky = new Set(
+    getShakySentenceIds({
+      level,
+      sfqCompletedBySentence: store.get('sfqCompletedBySentence') || {},
+    }),
+  );
+  const ordered = shaky.size
+    ? [...shuffled.filter((s) => shaky.has(s.id)), ...shuffled.filter((s) => !shaky.has(s.id))]
+    : shuffled;
+
+  // A round has to be something a child can finish. Every level/track pairing
+  // holds 101 sentences; serving them all left the session with no end.
+  _levelSentences = ordered.slice(0, SENTENCE_FORGE_ROUND_SIZE);
   _sentenceIdx = 0;
   _sessionCorrect = 0;
   _sessionTotal = 0;
@@ -303,6 +342,8 @@ function _showSentence() {
   _clueMissionResult = null;
   _skillClueDismissed = false;
   _sentenceWrongCount = 0;
+  _sentenceScored = false;
+  _sentenceAttempts = 0;
 
   if (entry.clueMission) {
     _renderClueMission(entry);
@@ -675,10 +716,13 @@ function _checkAnswer(entry, punct) {
   // Skills to record — prefer sentenceSkills tags, fall back to word_order
   const skills = entry.sentenceSkills?.length ? entry.sentenceSkills : ['word_order'];
 
-  // The mark is the first attempt. This used to run on every submission, so a
-  // sentence retried three times recorded three attempts against one item —
-  // and a child who fixed it on the retry was recorded as wrong AND right.
-  const isFirstAttempt = _sentenceWrongCount === 0;
+  // The mark is the first attempt, and there is exactly one per sentence.
+  // This used to key off _sentenceWrongCount, which the teach-back resets to
+  // zero — so a child who failed twice, read the rule and then succeeded was
+  // recorded as wrong AND right for the same sentence.
+  _sentenceAttempts += 1;
+  const isFirstAttempt = !_sentenceScored;
+  if (isFirstAttempt) _sentenceScored = true;
 
   if (correct) {
     _sessionCorrect++;
@@ -704,9 +748,17 @@ function _checkAnswer(entry, punct) {
     audio.playSfx('correct');
     mascot.celebrate(false);
 
-    const completed = store.get('sfqCompleted') || {};
-    completed[_currentLevel] = (completed[_currentLevel] || 0) + 1;
-    store.set('sfqCompleted', completed);
+    // Progress counts sentences finished, by id — replaying one sentence must
+    // not advance the level counter.
+    const { nextBySentence, nextCompleted } = recordSentenceCompletion({
+      level: _currentLevel,
+      sentenceId: entry.id,
+      firstTryCorrect: isFirstAttempt,
+      sfqCompletedBySentence: store.get('sfqCompletedBySentence') || {},
+      sfqCompleted: store.get('sfqCompleted') || {},
+    });
+    store.set('sfqCompletedBySentence', nextBySentence);
+    store.set('sfqCompleted', nextCompleted);
 
     _showFeedback('✅ Perfect! Well done!', true);
     setTimeout(() => {
@@ -741,14 +793,82 @@ function _checkAnswer(entry, punct) {
     area?.classList.add('sfq-shake');
     setTimeout(() => area?.classList.remove('sfq-shake'), 500);
 
-    // On 2nd wrong attempt: show teach-back overlay instead of inline hint
-    if (_sentenceWrongCount >= 2) {
+    // The ladder ends somewhere. A child who has had the hint and the rule and
+    // is still stuck gets shown the sentence and reads it back — being left to
+    // guess at a scrambled bank forever teaches nothing.
+    if (_sentenceAttempts >= REVEAL_AFTER_ATTEMPTS) {
+      _showFeedback('❌ Let me show you this one.', false);
+      setTimeout(() => _showAnswerReveal(entry), 800);
+    } else if (_sentenceWrongCount >= 2) {
       _showFeedback("❌ Let's look at the rule, then try again!", false);
       setTimeout(() => _showSentenceTeachBackOverlay(entry, punct), 1000);
     } else {
       _showFeedback(`❌ ${hint}`, false);
     }
   }
+}
+
+/** Attempts on one sentence before the answer is shown and read back. */
+const REVEAL_AFTER_ATTEMPTS = 4;
+
+// ── Answer reveal ────────────────────────────────────────────────────────────
+
+/**
+ * Show the sentence, with the child's last attempt beside it so the difference
+ * is visible, then ask them to read it aloud before moving on. A reveal that
+ * just prints the answer and advances teaches nothing; naming what changed and
+ * saying it back is what a teacher asks for.
+ *
+ * The sentence is already recorded as a miss by this point — the reveal is a
+ * teaching move, not a second chance at the mark, and it never calls
+ * recordSentenceCompletion, so a revealed sentence is not counted as finished.
+ */
+function _showAnswerReveal(entry) {
+  if (!_container) return;
+
+  const built = _answerSlots.map((id) => _bankWords.find((w) => w.id === id)?.word || '').join(' ');
+  const icon = SENTENCE_LEVEL_ICONS[_currentLevel - 1];
+  const prog = `${_sentenceIdx + 1} / ${_levelSentences.length}`;
+  const isLast = _sentenceIdx + 1 >= _levelSentences.length;
+
+  _container.innerHTML = `
+    <div class="sfq-game">
+      <div class="sfq-header">
+        <span class="sfq-badge">${icon} ${SENTENCE_LEVEL_LABELS[_currentLevel]}</span>
+        <span class="sfq-progress">${prog}</span>
+        ${entry.focusLabel ? `<span class="sfq-focus-chip">${entry.focusLabel}</span>` : ''}
+      </div>
+
+      <div class="sfq-reveal">
+        <p class="sfq-reveal-label">Here is the sentence:</p>
+        <p class="sfq-reveal-answer">${entry.sentence}</p>
+        ${built ? `<p class="sfq-reveal-yours"><span>You built:</span> ${built}</p>` : ''}
+        ${entry.grammarNote ? `<p class="sfq-reveal-note">📖 ${entry.grammarNote}</p>` : ''}
+        <p class="sfq-reveal-ask">Read it aloud once, then carry on.</p>
+      </div>
+
+      <div class="sfq-actions">
+        <button class="btn btn--ghost btn--sm" id="sfq-reveal-listen" aria-label="Listen to the sentence">🔊 Listen</button>
+        <button class="btn btn--primary" id="sfq-reveal-next">${isLast ? 'See results →' : 'Next sentence →'}</button>
+        <button class="btn btn--ghost btn--sm" id="sfq-quit">Menu</button>
+      </div>
+    </div>`;
+
+  document
+    .getElementById('sfq-reveal-listen')
+    ?.addEventListener('click', () => audio.speakWord(entry.sentence));
+  document.getElementById('sfq-reveal-next')?.addEventListener('click', () => {
+    _sentenceIdx++;
+    _showSentence();
+  });
+  document.getElementById('sfq-quit')?.addEventListener('click', () => {
+    cleanupSentenceForge();
+    _onGoHome?.();
+  });
+  _rebindKeyHandler(() => {
+    cleanupSentenceForge();
+    _onGoHome?.();
+  });
 }
 
 // ── Sentence teach-back overlay ──────────────────────────────────────────────
@@ -807,6 +927,8 @@ function _showSentenceTeachBackOverlay(entry, punct) {
     // Reset answer slots so learner can retry with a fresh slate
     _bankWords.forEach((w) => (w.used = false));
     _answerSlots = [];
+    // Restart the hint ladder for the retry, but NOT the mark: _sentenceScored
+    // stays true, so this sentence is never scored a second time.
     _sentenceWrongCount = 0;
     _renderBank();
     _renderAnswer();
@@ -933,14 +1055,6 @@ function _showComplete() {
         </div>
       </div>
     </div>`;
-
-  console.info('[SentenceForge] Scoreboard rendered', {
-    correct: _sessionCorrect,
-    total: _sessionTotal,
-    accuracy: acc,
-    stars,
-    recommendedLevel,
-  });
 
   document.getElementById('sfq-next-level')?.addEventListener('click', () => {
     if (_currentLevel < 6) {

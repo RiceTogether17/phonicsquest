@@ -13532,6 +13532,46 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 
 /* ── Phase 3: Sentence Forge Teach-Back Overlay ─────────────────────────── */
+/* Answer reveal — the end of the hint ladder. Reads as a worked example the
+   child copies and says back, not as a failure screen. */
+.sfq-reveal {
+  margin: var(--space-3) 0;
+  padding: var(--space-3);
+  border: 2px solid var(--color-primary, #4f46e5);
+  border-radius: var(--radius-md, 10px);
+  background: color-mix(in srgb, var(--color-primary, #4f46e5) 6%, var(--surface, #fff));
+}
+.sfq-reveal-label {
+  margin: 0 0 4px;
+  font-weight: 700;
+  color: var(--text-muted, #555);
+}
+.sfq-reveal-answer {
+  margin: 0 0 var(--space-2);
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.4;
+  color: var(--color-primary, #4f46e5);
+}
+.sfq-reveal-yours {
+  margin: 0 0 var(--space-2);
+  color: var(--text-muted, #555);
+  text-decoration-line: line-through;
+  text-decoration-color: color-mix(in srgb, var(--color-error, #dc2626) 60%, transparent);
+}
+.sfq-reveal-yours span {
+  font-weight: 700;
+  text-decoration: none;
+}
+.sfq-reveal-note {
+  margin: 0 0 var(--space-2);
+  line-height: 1.45;
+}
+.sfq-reveal-ask {
+  margin: 0;
+  font-weight: 700;
+}
+
 .sfq-teachback-overlay {
   position: absolute;
   inset: 0;
