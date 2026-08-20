@@ -54,11 +54,36 @@ const RATIO_FLOORS = { A: 0.84, B: 0.9, C: 0.93, D: 0.95 };
  */
 const VOWEL_BUDGET_FLOORS = { 1: 0.55, 3: 0.8 };
 
+/**
+ * The tier-2 equivalent. A long-vowel phase may only use the spellings its
+ * stage of phase 6 has reached, so an early long-a story cannot borrow "high"
+ * or "cool" to lift its ratio; the words it loses go to the sight-word route
+ * instead. The earlier the stage, the fewer spellings are available, so the
+ * floor rises as the budget fills.
+ */
+const LONG_VOWEL_BUDGET_FLOORS = { 3: 0.84, 6: 0.85 };
+
 function ratioFloorFor(story) {
   const phase = getStoryPhase(story.phase);
   const budget = phase?.shortVowels?.length;
   if (budget && VOWEL_BUDGET_FLOORS[budget] !== undefined) return VOWEL_BUDGET_FLOORS[budget];
+  const longBudget = cumulativeLongVowels(phase)?.size;
+  if (longBudget && LONG_VOWEL_BUDGET_FLOORS[longBudget] !== undefined) {
+    return LONG_VOWEL_BUDGET_FLOORS[longBudget];
+  }
   return RATIO_FLOORS[story.band];
+}
+
+/** Everything a long-vowel phase has been taught, including earlier stages. */
+function cumulativeLongVowels(phase) {
+  if (!phase?.longVowels) return null;
+  const out = new Set();
+  for (const p of STORY_PHASES) {
+    if (!p.longVowels) continue;
+    for (const g of p.longVowels) out.add(g);
+    if (p.id === phase.id) return out;
+  }
+  return out;
 }
 
 /** Most stretch words a single story may pre-teach via `pretaught`. */
@@ -341,6 +366,43 @@ describe('short-vowel phase budget', () => {
     expect(isWordDecodable('hat', 'short-a')).toBe(true);
     // Above tier 1 the budget must not interfere.
     expect(isWordDecodable('rain', 'long-a')).toBe(true);
+  });
+});
+
+/**
+ * Tier 2 releases every long-vowel spelling at once, but phase 6 teaches them
+ * in sequence — a_e/ai/ay, then ee/ea, then i_e/igh/ie/y, then o_e/oa/ow, then
+ * u_e/ue/ew/oo. Without a sub-gate a story named "long-a" could serve "high",
+ * "cool" and "soaked", none of which the child has met.
+ */
+describe('long-vowel phase budget', () => {
+  it('declares a cumulative budget on every tier-2 phase, and nowhere else', () => {
+    for (const phase of STORY_PHASES.filter((p) => p.tier === 2)) {
+      expect(phase.longVowels, `${phase.id} has no long-vowel budget`).toBeTruthy();
+    }
+    // Tier 3+ carries none on purpose: the curriculum teaches diphthongs
+    // (phase 7) before r-controlled vowels (phase 8), the reverse of the story
+    // tier ladder, so any within-tier order here would be invented.
+    for (const phase of STORY_PHASES.filter((p) => p.tier !== 2)) {
+      expect(phase.longVowels, `${phase.id} must not carry a long-vowel budget`).toBeUndefined();
+    }
+  });
+
+  it('rejects a long vowel the phase has not reached, and accepts an earlier one', () => {
+    // Tier 2 for both, so the tier check alone would pass either at long-a.
+    expect(isWordDecodable('high', 'long-a')).toBe(false);
+    expect(isWordDecodable('high', 'long-i')).toBe(true);
+    expect(isWordDecodable('cool', 'long-o')).toBe(false);
+    expect(isWordDecodable('cool', 'long-u')).toBe(true);
+    // Cumulative: a later phase keeps everything the earlier ones taught.
+    expect(isWordDecodable('rain', 'long-u')).toBe(true);
+  });
+
+  it('reads word-initial y as the consonant it is, not a long vowel', () => {
+    // "yes" must not be gated behind long-i just because it contains a y.
+    expect(isWordDecodable('yes', 'long-a')).toBe(true);
+    expect(isWordDecodable('cry', 'long-a')).toBe(false);
+    expect(isWordDecodable('cry', 'long-i')).toBe(true);
   });
 });
 

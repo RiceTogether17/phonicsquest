@@ -70,11 +70,18 @@ export const STORY_PHASES = Object.freeze([
   { id: 'short-ou', tier: 1, curriculumPhase: 2, shortVowels: 'aeiou' },
   { id: 'mixed-short', tier: 1, curriculumPhase: 4, shortVowels: 'aeiou' },
   { id: 'short-digraphs', tier: 1, curriculumPhase: 4, shortVowels: 'aeiou' },
-  { id: 'long-a', tier: 2, curriculumPhase: 6 },
-  { id: 'long-e', tier: 2, curriculumPhase: 6 },
-  { id: 'long-i', tier: 2, curriculumPhase: 6 },
-  { id: 'long-o', tier: 2, curriculumPhase: 6 },
-  { id: 'long-u', tier: 2, curriculumPhase: 6 },
+  // `longVowels` is the tier-2 equivalent of the short-vowel budget above.
+  // Tier 2 releases every long-vowel spelling at once, but the curriculum
+  // teaches them in sequence inside phase 6 — long-a-ae/ai/ay, then
+  // long-e-ee/ea, then long-i-ie/igh/y, then long-o-oe/oa/ow, then
+  // long-u-ue/ew/oo. Without a budget a story named "long-a" could serve
+  // igh, oa and oo, none of which the child has met. Cumulative: each entry
+  // lists only what its stage adds.
+  { id: 'long-a', tier: 2, curriculumPhase: 6, longVowels: ['a_e', 'ai', 'ay'] },
+  { id: 'long-e', tier: 2, curriculumPhase: 6, longVowels: ['ee', 'ea', 'e_e'] },
+  { id: 'long-i', tier: 2, curriculumPhase: 6, longVowels: ['i_e', 'igh', 'ie', 'y'] },
+  { id: 'long-o', tier: 2, curriculumPhase: 6, longVowels: ['o_e', 'oa', 'ow'] },
+  { id: 'long-u', tier: 2, curriculumPhase: 6, longVowels: ['u_e', 'ue', 'ew', 'oo'] },
   { id: 'r-controlled', tier: 3, curriculumPhase: 7 },
   { id: 'digraphs', tier: 3, curriculumPhase: 7 },
   { id: 'suffixes', tier: 3, curriculumPhase: 7 },
@@ -437,6 +444,62 @@ export function requiredTier(word) {
  * @param {object|null} phase  a STORY_PHASES descriptor
  * @param {string} clean       a cleaned token
  */
+/**
+ * Every long-vowel grapheme released by the time a tier-2 phase is reached.
+ * Built once: STORY_PHASES is frozen, so the answer never changes.
+ */
+const LONG_VOWEL_BUDGETS = (() => {
+  const out = new Map();
+  const running = new Set();
+  for (const phase of STORY_PHASES) {
+    if (!phase.longVowels) continue;
+    for (const g of phase.longVowels) running.add(g);
+    out.set(phase.id, new Set(running));
+  }
+  return out;
+})();
+
+/**
+ * The tier-2 graphemes of a word under each legitimate reading of it —
+ * curated entry, raw scan, and suffix-stripped base — mirroring the way
+ * requiredTier takes the cheapest route to a word.
+ */
+function longVowelReadings(clean) {
+  const entry = WORDS_BY_WORD.get(clean);
+  const parses = [];
+  if (entry?.graphemes?.length) {
+    parses.push(entry.graphemes.map((g) => String(g.g ?? g).toLowerCase()));
+  }
+  parses.push(scanWord(clean).parse);
+  const stripped = stripSuffix(clean);
+  if (stripped) {
+    const baseEntry = WORDS_BY_WORD.get(stripped.base);
+    parses.push(
+      baseEntry?.graphemes?.length
+        ? baseEntry.graphemes.map((g) => String(g.g ?? g).toLowerCase())
+        : scanWord(stripped.base).parse,
+    );
+  }
+  // Word-initial `y` is the consonant /y/ of "yes" — tier-1 code that
+  // scanWord already declines to upgrade. Only a later `y` is the long-vowel
+  // spelling of "cry" and "happy".
+  return parses.map((parse) =>
+    parse.filter((g, idx) => GRAPHEME_TIERS[g] === 2 && !(g === 'y' && idx === 0)),
+  );
+}
+
+/**
+ * Does this word stay inside a tier-2 phase's long-vowel budget?
+ * Always true for phases that declare none.
+ * @param {object|null} phase
+ * @param {string} clean
+ */
+export function withinLongVowelBudget(phase, clean) {
+  const budget = phase && LONG_VOWEL_BUDGETS.get(phase.id);
+  if (!budget) return true;
+  return longVowelReadings(clean).some((gs) => gs.every((g) => budget.has(g)));
+}
+
 export function withinVowelBudget(phase, clean) {
   if (!phase?.shortVowels || phase.tier !== 1) return true;
   for (const letter of clean) {
@@ -455,7 +518,11 @@ export function isWordDecodable(word, phaseId) {
   const phase = getStoryPhase(phaseId);
   if (!phase) return false;
   const clean = cleanToken(word);
-  return requiredTier(clean) <= phase.tier && withinVowelBudget(phase, clean);
+  return (
+    requiredTier(clean) <= phase.tier &&
+    withinVowelBudget(phase, clean) &&
+    withinLongVowelBudget(phase, clean)
+  );
 }
 
 // ── Story-level analysis ─────────────────────────────────────────────────
@@ -559,7 +626,14 @@ export function classifyWord(
   // A word inside the tier but outside the phase's vowel budget is not yet
   // sound-outable. It can still be legal by another route (sight word, HFW,
   // tricky word, pre-taught) — it just cannot be called decodable.
-  if (phase && tier <= phase.tier && withinVowelBudget(phase, clean)) return make('decodable');
+  if (
+    phase &&
+    tier <= phase.tier &&
+    withinVowelBudget(phase, clean) &&
+    withinLongVowelBudget(phase, clean)
+  ) {
+    return make('decodable');
+  }
   if (PROPER_NOUNS.has(clean)) return make('proper');
   if (ONOMATOPOEIA.has(clean)) return make('onomatopoeia');
 
