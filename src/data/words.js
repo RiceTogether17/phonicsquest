@@ -47,6 +47,8 @@ export const WORD_GROUPS = {
   'blends':       { label: 'Blends',       color: '#f97316', bg: '#ffedd5', icon: '🚀', audioFile: null },
   'diphthongs':   { label: 'Diphthongs',   color: '#0d9488', bg: '#ccfbf1', icon: '🌀', audioFile: null },
   'r-controlled': { label: 'R-Controlled', color: '#b45309', bg: '#fef3c7', icon: '🎯', audioFile: null },
+  'cons-tch-dge': { label: 'tch / dge',   color: '#8b5cf6', bg: '#ede9fe', icon: '🪝', audioFile: null },
+  'cons-ph':      { label: 'ph says /f/', color: '#8b5cf6', bg: '#ede9fe', icon: '📱', audioFile: null },
 
   // ── Structural patterns (cross-cut the vowel groups) ──────────────────
   'struct-cvc':   { label: 'CVC',       color: '#64748b', bg: '#f1f5f9', icon: '🔤', audioFile: null },
@@ -567,6 +569,7 @@ const NAMED_STAGE_GROUPS = Object.freeze(new Set([
   'suffixes-advanced',
   'sight-highfreq',
   'suffix-ing', 'suffix-ed', 'suffix-er', 'suffix-est',
+  'cons-tch-dge', 'cons-ph',
   'short-oo',
 ]));
 
@@ -1129,6 +1132,36 @@ export const WORDS = [
      DIGRAPHS  (level 2)
   ══════════════════════════════════════ */
   { id:'ship',  word:'ship',  graphemes:['sh','i','p'],  types:['d','sv','c'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🚢' },
+
+  /* ══════════════════════════════════════
+     tch / dge  — the three-letter spellings after a short vowel
+  ══════════════════════════════════════ */
+  { id:'catch',  word:'catch',  graphemes:['c','a','tch'],      types:['c','sv','d'],       pattern:'digraph', group:'cons-tch-dge', level:2, emoji:'🧤' },
+  { id:'match',  word:'match',  graphemes:['m','a','tch'],      types:['c','sv','d'],       pattern:'digraph', group:'cons-tch-dge', level:2, emoji:'🔥' },
+  { id:'patch',  word:'patch',  graphemes:['p','a','tch'],      types:['c','sv','d'],       pattern:'digraph', group:'cons-tch-dge', level:2, emoji:'🧵' },
+  { id:'hatch',  word:'hatch',  graphemes:['h','a','tch'],      types:['c','sv','d'],       pattern:'digraph', group:'cons-tch-dge', level:2, emoji:'🐣' },
+  { id:'fetch',  word:'fetch',  graphemes:['f','e','tch'],      types:['c','sv','d'],       pattern:'digraph', group:'cons-tch-dge', level:2, emoji:'🐕' },
+  { id:'pitch',  word:'pitch',  graphemes:['p','i','tch'],      types:['c','sv','d'],       pattern:'digraph', group:'cons-tch-dge', level:2, emoji:'⚾' },
+  { id:'ditch',  word:'ditch',  graphemes:['d','i','tch'],      types:['c','sv','d'],       pattern:'digraph', group:'cons-tch-dge', level:2, emoji:'🕳️' },
+  { id:'switch', word:'switch', graphemes:['s','w','i','tch'],  types:['bl','bl','sv','d'], pattern:'digraph', group:'cons-tch-dge', level:2, emoji:'🔌' },
+  { id:'badge',  word:'badge',  graphemes:['b','a','dge'],      types:['c','sv','d'],       pattern:'digraph', group:'cons-tch-dge', level:2, emoji:'🎖️' },
+  { id:'edge',   word:'edge',   graphemes:['e','dge'],          types:['sv','d'],           pattern:'digraph', group:'cons-tch-dge', level:2, emoji:'📐' },
+  { id:'hedge',  word:'hedge',  graphemes:['h','e','dge'],      types:['c','sv','d'],       pattern:'digraph', group:'cons-tch-dge', level:2, emoji:'🌳' },
+  { id:'bridge', word:'bridge', graphemes:['b','r','i','dge'],  types:['bl','bl','sv','d'], pattern:'digraph', group:'cons-tch-dge', level:2, emoji:'🌉' },
+  { id:'judge',  word:'judge',  graphemes:['j','u','dge'],      types:['c','sv','d'],       pattern:'digraph', group:'cons-tch-dge', level:2, emoji:'⚖️' },
+  { id:'dodge',  word:'dodge',  graphemes:['d','o','dge'],      types:['c','sv','d'],       pattern:'digraph', group:'cons-tch-dge', level:2, emoji:'🤾' },
+
+  /* ══════════════════════════════════════
+     ph saying /f/
+  ══════════════════════════════════════ */
+  { id:'phone',    word:'phone',    graphemes:['ph','o','n','e'],             types:['d','lv','c','se'],               pattern:'digraph', group:'cons-ph', level:2, emoji:'📱' },
+  { id:'photo',    word:'photo',    graphemes:['ph','o','t','o'],             types:['d','lv','c','lv'],          pattern:'digraph', group:'cons-ph', level:2, emoji:'📷' },
+  { id:'graph',    word:'graph',    graphemes:['g','r','a','ph'],             types:['bl','bl','sv','d'],         pattern:'digraph', group:'cons-ph', level:2, emoji:'📊' },
+  { id:'dolphin',  word:'dolphin',  graphemes:['d','o','l','ph','i','n'],     types:['c','sv','c','d','sv','c'],  pattern:'digraph', group:'cons-ph', level:2, emoji:'🐬' },
+  { id:'elephant', word:'elephant', graphemes:['e','l','e','ph','a','n','t'], types:['sv','c','sv','d','sv','c','c'], pattern:'digraph', group:'cons-ph', level:2, emoji:'🐘' },
+  { id:'alphabet', word:'alphabet', graphemes:['a','l','ph','a','b','e','t'], types:['sv','c','d','sv','c','sv','c'], pattern:'digraph', group:'cons-ph', level:2, emoji:'🔠' },
+  { id:'trophy',   word:'trophy',   graphemes:['t','r','o','ph','y'],         types:['bl','bl','lv','d','lv'],    pattern:'digraph', group:'cons-ph', level:2, emoji:'🏆' },
+  { id:'phonics',  word:'phonics',  graphemes:['ph','o','n','i','c','s'],     types:['d','sv','c','sv','c','c'],  pattern:'digraph', group:'cons-ph', level:2, emoji:'🔤' },
   { id:'chip',  word:'chip',  graphemes:['ch','i','p'],  types:['d','sv','c'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🍟' },
   { id:'chop',  word:'chop',  graphemes:['ch','o','p'],  types:['d','sv','c'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🔪' },
   { id:'chat',  word:'chat',  graphemes:['ch','a','t'],  types:['d','sv','c'],  pattern:'digraph', group:'digraphs', level:2, emoji:'💬' },

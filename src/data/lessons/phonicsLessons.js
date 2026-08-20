@@ -515,6 +515,29 @@ export const PHONICS_LESSONS = {
     confusions: ['You can\'t HEAR which spelling it is — bird, her and turn all share /er/, so look carefully when spelling.'],
   },
 
+  'cons-tch-dge': {
+    headline: 'tch and dge: the three-letter spellings',
+    soundChips: [{ g: 'tch', type: 'd', label: 'tch' }, { g: 'dge', type: 'd', label: 'dge' }],
+    script: [
+      'After a short vowel, /ch/ is spelled tch and /j/ is spelled dge.',
+      'c\u2026 a\u2026 tch \u2014 catch. b\u2026 a\u2026 dge \u2014 badge.',
+      'Three letters, but only ONE sound. Say it as a single sound.',
+    ],
+    weDoWord: 'catch',
+    confusions: ['The extra letters are silent partners \u2014 tch is just /ch/ and dge is just /j/, never two sounds.'],
+  },
+  'cons-ph': {
+    headline: 'ph says /f/',
+    soundChips: [{ g: 'ph', type: 'd', label: 'ph' }],
+    script: [
+      'When p and h stand together they say /f/, not /p/ and not /h/.',
+      'ph\u2026 o\u2026 n\u2026 e \u2014 phone. g\u2026 r\u2026 a\u2026 ph \u2014 graph.',
+      'Look for ph at the start, the middle or the end of a word.',
+    ],
+    weDoWord: 'phone',
+    confusions: ['Do not sound p and h separately \u2014 together they make one sound, /f/.'],
+  },
+
   /* ── Phase 9 · Suffixes ─────────────────────────────────────────── */
   'suffix-ing': {
     headline: 'The -ing ending: action happening NOW',

@@ -85,19 +85,19 @@ export const STORIES = [
     targetGraphemes: ['a'],
     allowedHFWTier: 1,
     targetWordCount: 42,
-    actualWordCount: 43,
-    decodableRatio: 0.93,
+    actualWordCount: 42,
+    decodableRatio: 0.67,
     textType: 'mini-decodable',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-a-01'),
     lines: [
-      { type: 'text', text: 'Giri had a red hat. It sat on top.' },
-      { type: 'text', text: 'A gust of wind! The hat did not stop.' },
-      { type: 'text', text: 'Giri ran and ran. The hat fell flat.' },
-      { type: 'text', text: 'Plop! It fell on a big cat.' },
-      { type: 'end', text: 'The cat sat on the hat. Giri got it back.' },
+      { type: 'text', text: 'Giri had a hat. It sat on a mat.' },
+      { type: 'text', text: 'A cat ran at the hat. Snap!' },
+      { type: 'text', text: 'The cat sat on the hat. Giri ran.' },
+      { type: 'text', text: 'Giri had a plan. Giri had ham.' },
+      { type: 'end', text: 'The cat ran at the ham. Giri had the hat back.' },
     ],
-    talkAboutIt: ['Where did the hat land at the end?'],
+    talkAboutIt: ['How did Giri get the hat back?'],
   },
 
   {
@@ -110,17 +110,17 @@ export const STORIES = [
     targetGraphemes: ['a'],
     allowedHFWTier: 1,
     targetWordCount: 40,
-    actualWordCount: 44,
-    decodableRatio: 0.93,
+    actualWordCount: 40,
+    decodableRatio: 0.63,
     textType: 'mini-decodable',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-a-02'),
     lines: [
-      { type: 'text', text: 'A cat sat next to Giri.' },
-      { type: 'text', text: 'Giri did a jig. Then the cat did a jig!' },
-      { type: 'text', text: 'Giri had a bit of ham in his bag.' },
-      { type: 'text', text: 'He held it up. The cat ran to it. Snap!' },
-      { type: 'end', text: 'Then the cat sat on his lap. A nap!' },
+      { type: 'text', text: 'A tan cat sat on Giri\'s mat.' },
+      { type: 'text', text: 'Giri had ham in his bag.' },
+      { type: 'text', text: 'Giri sat. Then the cat sat.' },
+      { type: 'text', text: 'The cat ran at the ham. Snap!' },
+      { type: 'end', text: 'Giri sat back. Then the cat sat on his lap. A nap at last!' },
     ],
     talkAboutIt: ['Where did the cat nap at the end?'],
   },
@@ -135,19 +135,19 @@ export const STORIES = [
     targetGraphemes: ['a'],
     allowedHFWTier: 1,
     targetWordCount: 42,
-    actualWordCount: 42,
-    decodableRatio: 0.88,
+    actualWordCount: 45,
+    decodableRatio: 0.58,
     textType: 'mini-decodable',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-a-03'),
     lines: [
       { type: 'text', text: 'Giri had a pan of jam.' },
-      { type: 'text', text: '"This jam is for my ham," he said.' },
-      { type: 'text', text: 'An ant ran up. It sat in the jam!' },
-      { type: 'text', text: 'Giri got a twig. He got the ant off.' },
-      { type: 'end', text: 'So the ant had a bit. It had the rest.' },
+      { type: 'text', text: '"That jam is for the ham," he said.' },
+      { type: 'text', text: 'An ant ran at the jam. It sat in the jam!' },
+      { type: 'text', text: 'Giri had a fan. He can fan the ant.' },
+      { type: 'end', text: 'The ant ran. So Giri had the jam and the ham.' },
     ],
-    talkAboutIt: ['How did Giri get the ant off?'],
+    talkAboutIt: ['How did Giri get the ant to go?'],
   },
 
   {
@@ -160,19 +160,19 @@ export const STORIES = [
     targetGraphemes: ['a'],
     allowedHFWTier: 1,
     targetWordCount: 40,
-    actualWordCount: 43,
-    decodableRatio: 0.91,
+    actualWordCount: 39,
+    decodableRatio: 0.64,
     textType: 'mini-decodable',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-a-04'),
     lines: [
-      { type: 'text', text: 'It was a hot day. Giri had a nap.' },
-      { type: 'text', text: '"I will nap in the sun too," said the cat.' },
-      { type: 'text', text: 'Tap, tap! He sat up fast.' },
-      { type: 'text', text: 'A bug ran on his leg. "I must go!"' },
-      { type: 'end', text: 'The bug ran off. He can nap at last.' },
+      { type: 'text', text: 'It was a day for a nap.' },
+      { type: 'text', text: 'Giri sat on a mat. The cat sat too.' },
+      { type: 'text', text: '"I can nap," said Giri.' },
+      { type: 'text', text: 'Tap, tap! An ant ran at his hand.' },
+      { type: 'end', text: 'Giri and the cat ran. Then a nap at last!' },
     ],
-    talkAboutIt: ['Why did Giri want a nap?'],
+    talkAboutIt: ['What ran at Giri\'s hand?'],
   },
 
   // ── Short-e / i set (4) ───────────────────────────────────────────────────
@@ -188,16 +188,16 @@ export const STORIES = [
     allowedHFWTier: 1,
     targetWordCount: 42,
     actualWordCount: 44,
-    decodableRatio: 0.86,
+    decodableRatio: 0.82,
     textType: 'mini-decodable',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-a-05'),
     lines: [
       { type: 'text', text: 'A white hen sat on ten eggs.' },
-      { type: 'text', text: 'One egg did wiggle. Then it did a big wiggle!' },
+      { type: 'text', text: 'One egg did wiggle. Then a big wiggle!' },
       { type: 'text', text: 'Crack! Now a wet chick! It is pink.' },
-      { type: 'text', text: 'The chick did not sit. It ran into a log.' },
-      { type: 'end', text: 'Giri got it. All is well. One white chick!' },
+      { type: 'text', text: 'The chick did not sit. It ran in a big net.' },
+      { type: 'end', text: 'Giri did get it. All is well. One white chick!' },
     ],
     talkAboutIt: ['What came out of the white egg?'],
   },
@@ -212,16 +212,16 @@ export const STORIES = [
     targetGraphemes: ['i'],
     allowedHFWTier: 1,
     targetWordCount: 42,
-    actualWordCount: 44,
-    decodableRatio: 0.86,
+    actualWordCount: 45,
+    decodableRatio: 0.82,
     textType: 'mini-decodable',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-a-06'),
     lines: [
-      { type: 'text', text: 'Giri dug a big pit. Dig, dig, dig!' },
+      { type: 'text', text: 'Giri did dig a pit. Dig, dig, dig!' },
       { type: 'text', text: 'Clink! What is in the pit? A tin lid!' },
       { type: 'text', text: 'The lid had a map. What can this be?' },
-      { type: 'text', text: '"I must dig again!" So Giri dug and dug.' },
+      { type: 'text', text: '"I will dig again!" So Giri did dig and dig.' },
       { type: 'end', text: 'A red gem! "Do it again!" Giri came back.' },
     ],
     talkAboutIt: ['What did Giri dig up in the end?'],
@@ -238,15 +238,15 @@ export const STORIES = [
     allowedHFWTier: 1,
     targetWordCount: 40,
     actualWordCount: 45,
-    decodableRatio: 0.89,
+    decodableRatio: 0.91,
     textType: 'mini-decodable',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-a-07'),
     lines: [
-      { type: 'text', text: 'Giri had a big rip in his red bed.' },
-      { type: 'text', text: '"I know I can fix it!" He got a pin.' },
+      { type: 'text', text: 'Giri had a rip in his red bed.' },
+      { type: 'text', text: '"I know I can fix it!" He did get a pin.' },
       { type: 'text', text: 'When did he fix it? Fast, fast!' },
-      { type: 'text', text: 'A cat sat above the bed. A moth ran over.' },
+      { type: 'text', text: 'A cat sat above the bed. An ant ran in.' },
       { type: 'end', text: 'There! The rip is hid. The bed is best!' },
     ],
     talkAboutIt: ['How did Giri fix the rip in his bed?'],
@@ -262,16 +262,16 @@ export const STORIES = [
     targetGraphemes: ['i'],
     allowedHFWTier: 1,
     targetWordCount: 38,
-    actualWordCount: 45,
-    decodableRatio: 0.87,
+    actualWordCount: 43,
+    decodableRatio: 0.86,
     textType: 'mini-decodable',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-a-08'),
     lines: [
-      { type: 'text', text: 'The lid fell off the tin. Clink! It hit the rim.' },
+      { type: 'text', text: 'The tin lid fell. Clink! It hit the rim.' },
       { type: 'text', text: 'Giri hit the lid. "This is a bell!" Ding, ding!' },
-      { type: 'text', text: 'A red hen ran up. She can tap!' },
-      { type: 'text', text: 'Her taps and his taps were a song.' },
+      { type: 'text', text: 'A red hen ran in. She can tap!' },
+      { type: 'text', text: 'Her taps and his taps were a hit.' },
       { type: 'end', text: 'Ding! Tap! "We are a band!" said Giri.' },
     ],
     talkAboutIt: ['What did Giri and the hen make with taps?'],
@@ -493,20 +493,20 @@ export const STORIES = [
     targetGraphemes: ['a_e', 'ai', 'ay'],
     allowedHFWTier: 2,
     targetWordCount: 70,
-    actualWordCount: 79,
-    decodableRatio: 0.94,
+    actualWordCount: 80,
+    decodableRatio: 0.91,
     textType: 'story-reader',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-b-01'),
     lines: [
-      { type: 'intro',   text: 'Giri had a great plan. He wanted to bake two cakes for his pal Jay.' },
+      { type: 'intro',   text: 'Giri had a grand plan. He wanted to bake two cakes for his pal Jay.' },
       { type: 'label',   text: 'Problem:' },
-      { type: 'beat',    text: 'But the cake stayed flat in the pan. It did not rise a bit!' },
+      { type: 'beat',    text: 'But the cake stayed flat in the pan. It did not lift a bit!' },
       { type: 'label',   text: 'Attempt:' },
       { type: 'beat',    text: '"Wake up, cake!" Giri gave the pan a brave shake. He saw it stay flat. "Oh no!"' },
       { type: 'label',   text: 'Solution:' },
-      { type: 'beat',    text: 'He did not wait. He took the flat cake out and made a stack: cake, jam, cake, jam!' },
-      { type: 'end',     text: 'Jay ate it by the lake. "Give me two more!" That flat cake was great.' },
+      { type: 'beat',    text: 'He did not wait. He got the flat cake out and made a stack: cake, jam, cake, jam!' },
+      { type: 'end',     text: 'Jay ate it by the lake. "Make me two, Giri!" That flat cake was the best.' },
     ],
     talkAboutIt: ['How did Giri turn a flat cake into a great cake?'],
   },
@@ -549,20 +549,20 @@ export const STORIES = [
     targetGraphemes: ['ee', 'ea'],
     allowedHFWTier: 2,
     targetWordCount: 70,
-    actualWordCount: 80,
-    decodableRatio: 0.91,
+    actualWordCount: 79,
+    decodableRatio: 0.86,
     textType: 'story-reader',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-b-03'),
     lines: [
-      { type: 'intro',   text: 'Giri met a weak bee by a green tree. It was too tired to see its way home.' },
+      { type: 'intro',   text: 'Giri met a weak bee by a green tree. It was too weak to see its way home.' },
       { type: 'label',   text: 'Problem:' },
-      { type: 'beat',    text: 'The bee could not reach its hive. "I need a good rest," it said with a weep.' },
+      { type: 'beat',    text: 'The bee could not reach its nest. "I need a good rest," it said with a weep.' },
       { type: 'label',   text: 'Attempt:' },
-      { type: 'beat',    text: 'Giri had a plan. "Would a leaf help? A leaf could lift you up high!"' },
+      { type: 'beat',    text: 'Giri had a plan. "A leaf can help! A leaf can lift you up!"' },
       { type: 'label',   text: 'Solution:' },
       { type: 'beat',    text: 'He set the bee on a green leaf. "This should reach the tree," said Giri.' },
-      { type: 'end',     text: 'The bee zoomed up to see its home. A good deed, and a good day!' },
+      { type: 'end',     text: 'The bee sped up to see its nest. A good deed, and a good day!' },
     ],
     talkAboutIt: ['How did the bee get up to its tree?'],
   },
@@ -577,7 +577,7 @@ export const STORIES = [
     targetGraphemes: ['i_e', 'igh'],
     allowedHFWTier: 2,
     targetWordCount: 70,
-    actualWordCount: 80,
+    actualWordCount: 79,
     decodableRatio: 0.96,
     textType: 'story-reader',
     refrainCount: 0,
@@ -587,7 +587,7 @@ export const STORIES = [
       { type: 'label',   text: 'Problem:' },
       { type: 'beat',    text: 'But the sky was still. No wind! The kite fell to the side. "Come on, wind!" he sighed.' },
       { type: 'label',   text: 'Attempt:' },
-      { type: 'beat',    text: 'Giri held the line tight. "I will run and make my own wind!" And he did.' },
+      { type: 'beat',    text: 'Giri held the line tight. "I will run to make the wind!" And he did.' },
       { type: 'label',   text: 'Solution:' },
       { type: 'beat',    text: 'His run made the wind rise! The kite went up high, across the bright sky.' },
       { type: 'end',     text: 'By the water, Giri sat with a smile. "Come and see my kite fly!"' },
@@ -606,18 +606,18 @@ export const STORIES = [
     allowedHFWTier: 2,
     targetWordCount: 60,
     actualWordCount: 78,
-    decodableRatio: 0.92,
+    decodableRatio: 0.90,
     textType: 'story-reader',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-b-05'),
     lines: [
-      { type: 'intro',   text: 'Giri met a small snail on the trail one rainy day in May.' },
+      { type: 'intro',   text: 'Giri met a small snail on the trail one wet day in May.' },
       { type: 'label',   text: 'Problem:' },
-      { type: 'beat',    text: 'The snail sat right in the way of a drain. Cold rain ran down from the sky.' },
+      { type: 'beat',    text: 'The snail sat in the way of a drain. Cold rain fell fast on the trail.' },
       { type: 'label',   text: 'Attempt:' },
-      { type: 'beat',    text: '"Wait, snail!" Giri put out his hand and gave it a soft push, under a big leaf.' },
+      { type: 'beat',    text: '"Wait, snail!" Giri put out his hand and gave it a soft push, off the trail.' },
       { type: 'label',   text: 'Solution:' },
-      { type: 'beat',    text: 'The snail slid to safety, out of the cold rain. Giri waited all the way.' },
+      { type: 'beat',    text: 'The snail slid to a safe spot, out of the cold rain. Giri waited all the way.' },
       { type: 'end',     text: 'The snail waved its tail. "I love this snail," said Giri. "It may take all day!"' },
     ],
     talkAboutIt: ['Why did Giri have to wait so long?'],
@@ -634,7 +634,7 @@ export const STORIES = [
     allowedHFWTier: 2,
     targetWordCount: 70,
     actualWordCount: 80,
-    decodableRatio: 0.96,
+    decodableRatio: 0.93,
     textType: 'story-reader',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-b-06'),
@@ -662,19 +662,19 @@ export const STORIES = [
     allowedHFWTier: 2,
     targetWordCount: 65,
     actualWordCount: 74,
-    decodableRatio: 0.92,
+    decodableRatio: 0.91,
     textType: 'story-reader',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-b-07'),
     lines: [
       { type: 'intro',   text: 'Giri went on a bike ride along a wide white lane in the sun.' },
       { type: 'label',   text: 'Problem:' },
-      { type: 'beat',    text: 'The bike hit a stone! Giri slid off and bumped his side. "Who left this here?"' },
+      { type: 'beat',    text: 'The bike hit a rock! Giri slid off and bumped his side. "Who left this here?"' },
       { type: 'label',   text: 'Attempt:' },
       { type: 'beat',    text: 'A young pup came by. "Are you sad?" Giri wiped his face.' },
       { type: 'label',   text: 'Solution:' },
       { type: 'beat',    text: 'He rode on until he felt fine. Then he went back to give the lane a fix.' },
-      { type: 'end',     text: 'Giri rolled the wide stone off the side. "Now the lane is safe to ride!"' },
+      { type: 'end',     text: 'Giri rolled the wide rock off the side. "Now the lane is safe to ride!"' },
     ],
     talkAboutIt: ['Why did Giri roll the stone off the lane?'],
   },
@@ -697,7 +697,7 @@ export const STORIES = [
     lines: [
       { type: 'intro',   text: 'One day, Giri met a goat on a road. It had left its mother and brother.' },
       { type: 'label',   text: 'Problem:' },
-      { type: 'beat',    text: "The goat took a bite of Giri's soft coat! \"That is not something to eat!\"" },
+      { type: 'beat',    text: "The goat had a bite of Giri's soft coat! \"That is not something to eat!\"" },
       { type: 'label',   text: 'Attempt:' },
       { type: 'beat',    text: '"Hold on, friend! Do not become a wolf!" Giri held out a big pile of oats.' },
       { type: 'label',   text: 'Solution:' },
@@ -718,7 +718,7 @@ export const STORIES = [
     allowedHFWTier: 2,
     targetWordCount: 65,
     actualWordCount: 79,
-    decodableRatio: 0.92,
+    decodableRatio: 0.87,
     textType: 'story-reader',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-b-09'),
@@ -745,20 +745,20 @@ export const STORIES = [
     targetGraphemes: ['ai', 'ay'],
     allowedHFWTier: 2,
     targetWordCount: 65,
-    actualWordCount: 80,
-    decodableRatio: 0.93,
+    actualWordCount: 77,
+    decodableRatio: 0.87,
     textType: 'story-reader',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-b-10'),
     lines: [
-      { type: 'intro',   text: 'Giri was on a long gray trail one cool day in May. He thought it would stay dry.' },
+      { type: 'intro',   text: 'Giri was on a long gray trail one calm day in May. He said it would stay hot all day.' },
       { type: 'label',   text: 'Problem:' },
-      { type: 'beat',    text: 'A heavy rain came down fast! "Where can I hide?" Giri got soaked on the muddy trail.' },
+      { type: 'beat',    text: 'A big rain came fast! "Where can I hide?" Giri got wet on the trail.' },
       { type: 'label',   text: 'Attempt:' },
-      { type: 'beat',    text: '"Wait it out!" He hid in a dry cave to watch the rain. Drip, drip, drip.' },
+      { type: 'beat',    text: '"Wait it out!" He hid in a cave to watch the rain. Drip, drip, drip.' },
       { type: 'label',   text: 'Solution:' },
       { type: 'beat',    text: 'The rain stopped. Giri made big mud prints all the way home. Stamp, stamp!' },
-      { type: 'end',     text: 'He looked down at his trail of prints. "Where the rain fell, I had fun!"' },
+      { type: 'end',     text: 'Giri saw his trail of prints. "Where the rain fell, I had fun!"' },
     ],
     talkAboutIt: ['What did Giri make with his feet on the muddy trail?'],
   },
@@ -774,14 +774,14 @@ export const STORIES = [
     allowedHFWTier: 2,
     targetWordCount: 65,
     actualWordCount: 80,
-    decodableRatio: 0.95,
+    decodableRatio: 0.91,
     textType: 'story-reader',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-b-11'),
     lines: [
-      { type: 'intro',   text: 'Giri had a green seed. "Maybe it will grow into a tree," he said.' },
+      { type: 'intro',   text: 'Giri had a green seed. "Maybe it will be a tall tree," he said.' },
       { type: 'label',   text: 'Problem:' },
-      { type: 'beat',    text: 'But the seed did not seem to grow. Giri gave it a nod of his head and waited.' },
+      { type: 'beat',    text: 'But the seed did not seem to wake. Giri gave it a nod of his head and waited.' },
       { type: 'label',   text: 'Attempt:' },
       { type: 'beat',    text: 'His friend came by. "A seed may need a deep drink each day." So Giri gave it a drink.' },
       { type: 'label',   text: 'Solution:' },
@@ -1014,7 +1014,7 @@ export const STORIES = [
       { type: 'beat',    text: '"Then keep up! We need to find the sweet spot." Giri did not see it. "Here? Is it here?"' },
       { type: 'label',   text: 'Solution:' },
       { type: 'beat',    text: 'The bee sat still on a green stem. "Take a deep sniff." Sweet! A bed of mint!' },
-      { type: 'end',     text: '"Good find! You and me — we make a fine team." "Yes," said the bee. "Buzz!"' },
+      { type: 'end',     text: '"Great find! You and me — we make a fine team." "Yes," said the bee. "Buzz!"' },
     ],
     talkAboutIt: ['How did the bee help Giri find the sweet spot?'],
   },
@@ -1061,6 +1061,10 @@ export const STORIES = [
       { pattern: 'r-controlled vowels (ar, or)', example: '"farm", "dark", "barn", "hard", "yard", "storm", "door", "more"', tip: 'When r comes after a vowel, the vowel sound changes: a+r = /ar/, o+r = /or/.' },
       { pattern: 'Past-tense verbs', example: 'The door banged. He pushed and pulled. The storm passed.', tip: 'Add -ed to most verbs to show past tense: bang → banged, push → pushed.' },
     ],
+    talkAboutIt: [
+      "Why did Giri run back into the barn during the storm?",
+      "Giri was glad he had not given up. What does that tell you about him?",
+    ],
   },
 
   {
@@ -1100,6 +1104,10 @@ export const STORIES = [
       { pattern: 'r-controlled vowels (ir, er)', example: '"bird", "chirped", "fern", "river", "under", "over"', tip: 'The letters ir and er often make the same /er/ sound: bird, fern, river.' },
       { pattern: 'Simile with "as if"', example: 'The bird chirped as if to say well done.', tip: '"As if" compares something to something else to help us picture it.' },
     ],
+    talkAboutIt: [
+      "How did Giri feel as he walked home? Which words in the story tell you?",
+      "Why do you think the bird chirped as if to say well done?",
+    ],
   },
 
   {
@@ -1137,6 +1145,10 @@ export const STORIES = [
     grammarSpotlight: [
       { pattern: 'Digraphs (sh, ch, th)', example: '"shell", "sharp", "bushes", "checked", "chirp", "thrush", "thick", "thin", "thanked"', tip: 'Two letters that make one sound: sh = /sh/, ch = /ch/, th = /th/.' },
       { pattern: 'Varied sentence openings', example: 'The thrush gave a chirp. It hopped to a patch. Giri rushed over.', tip: 'Start sentences with different words to make your writing more interesting.' },
+    ],
+    talkAboutIt: [
+      "How did the thrush help Giri find his necklace?",
+      "Why does the story call the bird clever? Do you agree?",
     ],
   },
 
@@ -1176,6 +1188,10 @@ export const STORIES = [
       { pattern: 'r-controlled vowels (er, ar, or)', example: '"her", "corner", "farmer", "market", "jar", "corn", "flowers"', tip: 'The er, ar, and or sounds appear in many everyday words.' },
       { pattern: 'Speech marks for direct speech', example: '"Best herbs here!" the trader called.', tip: 'Use speech marks to show the exact words someone says out loud.' },
     ],
+    talkAboutIt: [
+      "Why did his mother's frown become a big smile?",
+      "What does \"You begin to shop like a pro\" mean?",
+    ],
   },
 
   {
@@ -1213,6 +1229,10 @@ export const STORIES = [
     grammarSpotlight: [
       { pattern: 'Digraphs (ch, sh, th, wh)', example: '"checked", "chart", "chin", "sheets", "pushed", "this", "whether"', tip: 'Two letters, one sound: ch, sh, th, wh are all digraphs.' },
       { pattern: 'Compound sentences with "and"', example: 'He tried once more, and the box went flat with a crunch.', tip: 'Use "and" to join two ideas that go together.' },
+    ],
+    talkAboutIt: [
+      "How did Giri find out that juice boxes could go in the blue bin?",
+      "The box was hard to flatten. Why was Giri still glad at the end?",
     ],
   },
 
@@ -1253,6 +1273,10 @@ export const STORIES = [
       { pattern: 'r-controlled vowels (er, ir, ur)', example: '"her", "turned", "returned", "first", "firm", "burnt", "burst"', tip: 'The sounds er, ir, and ur often sound the same: her, bird, turn.' },
       { pattern: 'Sequence words', example: 'First he stood. Then he hurried.', tip: 'Words like first, then, next, and at last show the order of events.' },
     ],
+    talkAboutIt: [
+      "Why could Mrs Tan not change the light bulb herself?",
+      "Giri stood on his tiptoes before he fetched the stool. What does that show about him?",
+    ],
   },
 
   {
@@ -1290,6 +1314,10 @@ export const STORIES = [
     grammarSpotlight: [
       { pattern: 'Digraphs (sh, ch)', example: '"sheep", "shed", "sheltered", "shut", "chickens", "chased", "cherry", "branch"', tip: 'sh says /sh/ as in sheep. ch says /ch/ as in chicken.' },
       { pattern: 'Time connectives', example: 'After lunch, a chicken got out. At last, he caught it.', tip: 'Words like after, at last, and then show when things happened.' },
+    ],
+    talkAboutIt: [
+      "How did Giri stop the chicken from getting out again?",
+      "Grandfather said \"Sharp thinking\". What did Giri do that was sharp thinking?",
     ],
   },
 
@@ -1330,6 +1358,10 @@ export const STORIES = [
       { pattern: 'r-controlled vowels (ir, er, ur)', example: '"first", "shirt", "bird", "chirped", "helper", "corner", "butter", "curb", "purple", "turn"', tip: 'ir, er, and ur can all make the same /er/ sound.' },
       { pattern: 'Adjectives for feelings', example: 'Giri stirred with nerves. Giri grinned from ear to ear.', tip: 'We can describe how someone feels using action words and phrases.' },
     ],
+    talkAboutIt: [
+      "Why was Giri nervous at the start of the story?",
+      "Giri grinned from ear to ear. Why was he so pleased with himself?",
+    ],
   },
 
   {
@@ -1350,7 +1382,7 @@ export const STORIES = [
     lines: [
       { type: 'paragraph', text: 'Giri was at the beach one morning when he spotted a baby turtle stuck in a dip in the sand. The turtle had turned the wrong way. It was far from the water, and the hot sun had made the sand burn below its flippers.' },
       { type: 'paragraph', text: 'Giri worked fast. First, he dug the sand away from the shell. He did not try to carry it; instead he turned the little turtle to face the water. The turtle began to stir. It pushed with its flippers, slid along the wet sand, and swam off into the surf.' },
-      { type: 'end',       text: 'Giri stood and watched until the turtle was finally just a dot in the sea. His first rescue! He walked home with a warm glow inside.' },
+      { type: 'end',       text: 'Giri stood and stared until the turtle was finally just a dot in the sea. His first rescue! He walked home with a warm glow inside.' },
     ],
     comprehension: [
       { q: 'Where was the baby turtle stuck?', options: ['In a dip in the sand', 'In the surf', 'Under a rock', 'In a net'], answer: 0, type: 'literal' },
@@ -1367,6 +1399,10 @@ export const STORIES = [
     grammarSpotlight: [
       { pattern: 'r-controlled vowels (ur, ir, er)', example: '"turtle", "turned", "burn", "surf", "first", "stir", "under", "flippers"', tip: 'When "r" follows a vowel, they team up to make a new sound: ur, ir, and er all say /er/.' },
       { pattern: 'Time-order words', example: 'First, he dug the sand away. Then he turned the turtle.', tip: 'Words like "first" and "then" show the order things happen in.' },
+    ],
+    talkAboutIt: [
+      "Why did Giri turn the turtle round instead of carrying it?",
+      "What might have happened to the turtle if Giri had not stopped?",
     ],
   },
 
@@ -1406,6 +1442,10 @@ export const STORIES = [
       { pattern: 'r-controlled vowels (ir, ur, er)', example: '"stirred", "dirt", "firm", "first", "turnip", "turned", "perfect", "dinner"', tip: 'ir, ur, and er all make the same /er/ sound in these garden words.' },
       { pattern: 'Comparing with -er', example: 'The tops grew bigger and bigger.', tip: 'Adding -er to a describing word compares things: big, bigger.' },
     ],
+    talkAboutIt: [
+      "Why did Giri feel glum before the big rain?",
+      "Giri gave three turnips to Mrs Tan. What does that show about him?",
+    ],
   },
 
   {
@@ -1444,6 +1484,10 @@ export const STORIES = [
       { pattern: 'Past tense -ed', example: '"helped", "started", "dusted", "folded", "watered", "carried", "decided"', tip: 'Adding -ed to an action word shows it already happened.' },
       { pattern: 'Present action -ing', example: '"washing", "stacking", "helping", "getting", "smiling"', tip: 'Adding -ing shows an action that is happening right now.' },
     ],
+    talkAboutIt: [
+      "Which two jobs did Giri do after lunch?",
+      "Giri's feet were tired but he kept smiling. Why do you think he did?",
+    ],
   },
 
 
@@ -1471,6 +1515,10 @@ export const STORIES = [
       { q: 'Why did the bird not want to fly to the barn?', options: ['A storm was near', 'She was tired', 'She was scared of Giri', 'It was too dark'], answer: 0, type: 'literal' },
       { q: 'Where did Giri and the bird hide?', options: ['Under the cart', 'In the barn', 'Up a tree', 'In the house'], answer: 0, type: 'literal' },
       { q: 'What lesson did Giri learn?', options: ['Think hard before you act', 'Run fast in the rain', 'Birds cannot fly', 'Storms are fun'], answer: 0, type: 'inferential' },
+    ],
+    talkAboutIt: [
+      "Why did the bird say they should not go far?",
+      "What did Giri mean by \"Could, would, should — you think hard first\"?",
     ],
   },
 
@@ -1516,6 +1564,10 @@ export const STORIES = [
       { pattern: 'Diphthongs (oi, oy)', example: '"joy", "joyful", "toys", "joint", "oiled", "pointed"', tip: 'oi and oy make the same sound. oi usually comes in the middle (oil, joint), oy at the end (joy, toy).' },
       { pattern: 'Speech and dialogue', example: '"Would you like to try?" the carpenter asked.', tip: 'Use speech marks and a speech verb (asked, said) to show who is speaking.' },
     ],
+    talkAboutIt: [
+      "What was wrong with the wooden chair at the stall?",
+      "The carpenter said Giri had \"a fair hand for this work\". What did he mean?",
+    ],
   },
 
   {
@@ -1533,7 +1585,7 @@ export const STORIES = [
     textType: 'bridge-reader',
     refrainCount: 0,
     lines: [
-      { type: 'paragraph', text: 'Giri was walking through town when he heard a loud, joyful sound coming from the community hall. He followed the noise and found a crowd of people singing and clapping. A woman with a brown shawl was leading the group.' },
+      { type: 'paragraph', text: 'Giri was walking through town when he heard a loud, joyful sound coming from the community hall. He followed the noise and found a crowd of people singing and clapping. A woman in a brown coat was leading the group.' },
       { type: 'paragraph', text: '"Come and join!" she called out. Giri felt a bit shy. He sat on a stool by the window and listened. The voices bounced around the room — high, low, loud, and soft. The sound made him feel warm inside.' },
       { type: 'paragraph', text: 'At last, Giri stood up and joined in. His voice was small at first, but it grew louder with each note. Soon it rang out loud and proud, bouncing round the hall. The woman gave him a proud nod. The whole group swayed and sang until the sun went down.' },
       { type: 'end',       text: 'Giri walked home humming the tune. He had found something that brought him joy — the power of voices joined together.' },
@@ -1554,6 +1606,10 @@ export const STORIES = [
     grammarSpotlight: [
       { pattern: 'Diphthongs (ou, ow)', example: '"loud", "sound", "around", "found", "brown", "down", "crowd", "bounced"', tip: 'ou and ow make the same /ow/ sound: loud, crowd, brown, found.' },
       { pattern: 'Contrast with "but"', example: 'His voice was small at first, but it grew louder.', tip: '"But" shows a change or contrast between two ideas.' },
+    ],
+    talkAboutIt: [
+      "How did Giri's voice change from the start of the singing to the end?",
+      "Why do you think Giri sat and listened before he joined in?",
     ],
   },
 
@@ -1593,6 +1649,10 @@ export const STORIES = [
       { pattern: 'Vowel patterns (air, are, ear)', example: '"chair", "repair", "stairwell", "air", "bare", "care", "spare", "declared", "wearing"', tip: 'air, are, and ear can all say the /air/ sound: chair, bare, wearing.' },
       { pattern: 'Sequence markers', example: 'First he glued. Then he sanded. Finally he cut.', tip: 'Use first, then, next, finally to put events in order.' },
     ],
+    talkAboutIt: [
+      "What three things did Giri do to repair the chair?",
+      "\"A little care had turned something forgotten into something shared.\" What does that mean?",
+    ],
   },
 
   {
@@ -1631,6 +1691,10 @@ export const STORIES = [
       { pattern: 'Vowel patterns (ear, eer, ere)', example: '"fear", "hear", "near", "cheer", "year", "dear", "tear", "here"', tip: 'ear and eer can say the /ear/ sound: hear, cheer, near, dear.' },
       { pattern: 'Theme or moral', example: 'This was not an ending — it was the beginning of something dear.', tip: 'Stories often end with a lesson or idea that makes us think.' },
     ],
+    talkAboutIt: [
+      "Why did Giri feel a knot of fear at the start of the day?",
+      "Giri decided this was not an ending. What did he think it was instead?",
+    ],
   },
 
   {
@@ -1649,7 +1713,7 @@ export const STORIES = [
     refrainCount: 0,
     lines: [
       { type: 'paragraph', text: 'It was Sports Day. The whole school poured out onto the field. Flags snapped in the wind, and the crowd on the bleachers made a joyful roar. Giri was in the relay team. He bounced on his toes at the starting point, trying to shake off the doubt in his stomach.' },
-      { type: 'paragraph', text: 'The whistle blew. The first two runners sprinted down the track. When the baton reached Giri, he gripped it and ran with all his power. Halfway round the bend, his foot caught a mound of soil. He stumbled, fell, and felt the grit sting his knee.' },
+      { type: 'paragraph', text: 'The whistle blew. The first two runners sprinted down the track. When the baton reached Giri, he gripped it and ran with all his power. Halfway round the bend, his foot hit a mound of soil. He stumbled, fell, and felt the grit sting his knee.' },
       { type: 'paragraph', text: 'For a moment the noise around him seemed to fade away. Then the crowd found their voice. "Go, Giri! Get up!" Giri pushed himself to his feet and ran on. He was not the fastest, but he crossed the line with the baton held high.' },
       { type: 'end',       text: 'His team did not win a trophy, but they won something better — the loudest cheer of the day. Giri felt proud. Courage, he decided, was not about never falling down. It was about getting up and carrying on.' },
     ],
@@ -1668,6 +1732,10 @@ export const STORIES = [
     grammarSpotlight: [
       { pattern: 'Diphthongs (ou, ow, oi, oy)', example: '"poured", "crowd", "found", "mound", "around", "soil", "voice", "joyful", "doubt", "power"', tip: 'ou/ow = /ow/ sound. oi/oy = /oy/ sound. Listen for them as you read.' },
       { pattern: 'Theme statement', example: 'Courage was not about never falling down. It was about getting up.', tip: 'A theme statement tells the big idea of the story in one or two sentences.' },
+    ],
+    talkAboutIt: [
+      "What happened to Giri halfway round the bend?",
+      "Giri decided courage was about getting up and carrying on. Do you agree? Why?",
     ],
   },
 
@@ -1707,6 +1775,10 @@ export const STORIES = [
       { pattern: 'Vowel patterns (aw, au, ear, air)', example: '"jaw", "drawer", "stairway", "crawling", "lawn", "earrings", "pair", "care"', tip: 'aw/au say /aw/: jaw, haul. ear says /ear/: ear, near. air says /air/: pair, stair.' },
       { pattern: 'Letter writing', example: '"To the one who finds this, you have the same spirit of adventure."', tip: 'Letters use a greeting, a message, and sometimes a sign-off. This letter speaks directly to the reader.' },
     ],
+    talkAboutIt: [
+      "What did Giri actually find inside the wooden box?",
+      "Why was the treasure worth more to Giri than gold would have been?",
+    ],
   },
 
   {
@@ -1744,6 +1816,10 @@ export const STORIES = [
     grammarSpotlight: [
       { pattern: 'Diphthongs (ou, ow, oi, oy)', example: '"loud", "round", "doubt", "crowds", "down", "brown", "coins", "toy"', tip: 'ou and ow say /ow/ as in "round" and "brown"; oi and oy say /oy/ as in "coin" and "toy".' },
       { pattern: 'Questions for choices', example: 'A round bun? A cold drink? A small brown mouse toy?', tip: 'Short questions in a row show someone thinking through their choices.' },
+    ],
+    talkAboutIt: [
+      "What did Giri choose to spend his two dollars on?",
+      "Why do you think Giri chose the windmill instead of the bun or the drink?",
     ],
   },
 
@@ -1783,6 +1859,10 @@ export const STORIES = [
       { pattern: 'Vowel patterns (aw, au)', example: '"dawn", "lawn", "crawled", "hawk", "yawning", "saw", "awe", "caught"', tip: 'aw and au make the same sound: dawn, saw, caught.' },
       { pattern: 'Describing with the senses', example: 'The sky was still dark, and the air was cool.', tip: 'Good describing tells what you can see, hear, and feel.' },
     ],
+    talkAboutIt: [
+      "Why did Giri go out to the lawn before the sun came up?",
+      "Giri said the best part of the day was the part most people never saw. What did he mean?",
+    ],
   },
 
   {
@@ -1821,6 +1901,10 @@ export const STORIES = [
       { pattern: 'Vowel patterns (ear, are, air)', example: '"ear", "care", "cared", "caring", "stairs"', tip: 'ear says /ear/ as in "ear"; are and air say /air/ as in "care" and "stairs".' },
       { pattern: 'Contrast with "but"', example: 'He was hard work. But on the second day, something changed.', tip: '"But" signals that the next idea is different from the one before.' },
     ],
+    talkAboutIt: [
+      "What jobs did Giri have to do to take care of Scout?",
+      "How did Giri's feelings about looking after Scout change over the two days?",
+    ],
   },
 
   {
@@ -1858,6 +1942,10 @@ export const STORIES = [
     grammarSpotlight: [
       { pattern: 'Diphthongs (oi, ou, ow)', example: '"coin", "counted", "loud", "proud", "found", "mouth", "flowers", "town"', tip: 'oi says /oy/ as in "coin"; ou and ow say /ow/ as in "loud" and "town".' },
       { pattern: 'Showing feelings without telling', example: 'Her mouth fell open, then curved into the widest smile.', tip: 'Instead of saying "she was happy", the writer shows what her face did.' },
+    ],
+    talkAboutIt: [
+      "What was Giri saving his coins for at the start?",
+      "Why did Giri change his mind about the robot?",
     ],
   },
 
@@ -1907,6 +1995,10 @@ export const STORIES = [
       { pattern: 'Adjectives (describing words)', example: 'The big red MRT was fast.', tip: '"Big" and "red" describe the MRT. These are adjectives!' },
       { pattern: 'Past-tense verbs', example: 'Giri held on to the rod. He slid on the mat.', tip: 'Words like "held" and "slid" tell us what happened in the past.' },
     ],
+    talkAboutIt: [
+      "Why did Giri hold on to the rod?",
+      "How did the kind man help Giri?",
+    ],
   },
 
   {
@@ -1949,6 +2041,10 @@ export const STORIES = [
     grammarSpotlight: [
       { pattern: 'Nouns (naming words)', example: 'Giri had a big red bag, a peg, and a desk.', tip: '"Bag", "peg", and "desk" are nouns. Nouns name people, places, or things.' },
       { pattern: 'Plurals with -s', example: 'pegs, rooms, bags, desks', tip: 'Add -s to most nouns to show more than one: bag → bags, room → rooms.' },
+    ],
+    talkAboutIt: [
+      "Why did Giri run to look in each room?",
+      "How did Giri feel once his bag was hung up?",
     ],
   },
 
@@ -1993,6 +2089,10 @@ export const STORIES = [
       { pattern: 'Past tense with -ed', example: 'The auntie smiled and led him to the stall. Giri waved and paid.', tip: 'Add -ed to show something happened in the past: smile → smiled, wave → waved.' },
       { pattern: 'Nouns in a list', example: 'He saw lanes, stalls, and treats at the hawker centre.', tip: 'Use commas to list nouns, and add "and" before the last one.' },
     ],
+    talkAboutIt: [
+      "How did the auntie help Giri?",
+      "Why did his mum give him a huge smile?",
+    ],
   },
 
   {
@@ -2035,6 +2135,10 @@ export const STORIES = [
     grammarSpotlight: [
       { pattern: 'Exclamation marks (!)', example: '"Mum! Mum!" Giri called out.', tip: 'Use ! when someone shouts or feels something strongly.' },
       { pattern: 'Adjectives before nouns', example: 'the big crowd, the red light, the sweet kueh', tip: 'Adjectives go right before the noun they describe.' },
+    ],
+    talkAboutIt: [
+      "How did Giri find his mum again?",
+      "Why was the lane so full of people?",
     ],
   },
 
@@ -2079,6 +2183,10 @@ export const STORIES = [
       { pattern: 'Verbs (doing words)', example: 'Giri cupped his hands. The auntie lit the lamp. The lane shone bright.', tip: '"Cupped", "lit", and "shone" are verbs. They tell us what someone or something does.' },
       { pattern: '"And" and "but" (joining words)', example: 'The street was bright and busy, but the lamp went out.', tip: '"And" joins ideas that go together. "But" joins ideas that are different.' },
     ],
+    talkAboutIt: [
+      "Why did Giri cup his hands around the lamp?",
+      "How did the auntie help?",
+    ],
   },
 
   {
@@ -2122,6 +2230,10 @@ export const STORIES = [
       { pattern: 'r-controlled vowels (ar, ir, er)', example: '"garden", "bird", "ranger", "far", "her"', tip: 'When "r" comes after a vowel, the vowel sound changes. These are called r-controlled vowels.' },
       { pattern: 'Conjunctions (joining words)', example: 'The ranger was far away and could not hear.', tip: '"And" joins two ideas in one sentence.' },
     ],
+    talkAboutIt: [
+      "How did Giri help the bird get free?",
+      "Why did Giri call the park ranger before he used the stick?",
+    ],
   },
 
 
@@ -2142,13 +2254,17 @@ export const STORIES = [
     lines: [
       { type: 'paragraph', text: 'A loud sound rolled up from town to the hill where Giri stood. He looked around. A big brown cloud was rolling down the hill — and it was coming his way! "What is that? How big is it? What do I do NOW?"' },
       { type: 'paragraph', text: '"I must find out about that cloud," said Giri. He did not run. He did not hide. He marched down the road to find out for himself. The sound got louder and louder. The cloud got rounder and rounder. Giri counted his steps out loud to stay brave. "One. Two. Three. Four."' },
-      { type: 'paragraph', text: 'Then Giri saw it. It was not a cloud at all! It was a crowd — a crowd of kids from town, kicking up dust as they bounced a big round ball down the hill. "Come and join us!" they shouted.' },
+      { type: 'paragraph', text: 'Then Giri found out. It was not a cloud at all! It was a crowd — a crowd of kids from town, kicking up dust as they bounced a big round ball down the hill. "Come and join us!" they shouted.' },
       { type: 'end',       text: 'Giri let out a proud shout: "I found out by myself! A thing is not so big when you find out about it." He joined the crowd, and the game was loud, round, and fun.' },
     ],
     comprehension: [
       { q: 'What did Giri think was coming down the hill?', options: ['A big brown cloud', 'A truck', 'A storm', 'A dog'], answer: 0, type: 'literal' },
       { q: 'What was the cloud really?', options: ['A crowd of kids', 'Smoke', 'Dust from a truck', 'Rain'], answer: 0, type: 'literal' },
       { q: 'What did Giri learn about scary things?', options: ['They feel smaller when you find out about them', 'They always go away', 'You should hide first', 'You should shout at them'], answer: 0, type: 'inferential' },
+    ],
+    talkAboutIt: [
+      "What did Giri think the brown cloud was, and what was it really?",
+      "Giri said a thing is not so big when you find out about it. What did he mean?",
     ],
   },
 
@@ -2196,6 +2312,10 @@ export const STORIES = [
       { pattern: 'Questions and question marks (?)', example: '"Who does this key belong to?" Giri wondered.', tip: 'Use ? at the end of a question.' },
       { pattern: 'Pronouns (I, he, she, it, they)', example: 'Giri found the key. He put it in his pocket.', tip: '"He" takes the place of "Giri" and "it" takes the place of "the key".' },
     ],
+    talkAboutIt: [
+      "Why did Giri take the key to the ranger hut?",
+      "What do you think will happen to the key in the next chapter?",
+    ],
   },
 
   {
@@ -2237,6 +2357,10 @@ export const STORIES = [
       { pattern: 'Speech marks (" ")', example: '"Stop! That is not yours!" Giri called out.', tip: 'Use speech marks to show the exact words someone says out loud.' },
       { pattern: 'Adjectives for feelings', example: 'Giri felt firm and fair.', tip: '"Firm" and "fair" describe how Giri felt.' },
     ],
+    talkAboutIt: [
+      "Why did Giri stop the boy who tried to grab the key?",
+      "Giri felt firm and fair. What does that mean?",
+    ],
   },
 
   {
@@ -2277,6 +2401,10 @@ export const STORIES = [
     grammarSpotlight: [
       { pattern: 'Diphthongs (oi, oy)', example: '"joy", "boy", "shout of joy"', tip: '"Oi" and "oy" make the same sound: coin, boy, join, joy.' },
       { pattern: 'Moral statements (theme)', example: '"A kind act is never too small."', tip: 'The last line tells us the lesson of the story. This is the theme or moral.' },
+    ],
+    talkAboutIt: [
+      "How did they know the key belonged to the old man?",
+      "\"A kind act is never too small.\" What does that mean?",
     ],
   },
 
@@ -2324,6 +2452,10 @@ export const STORIES = [
       { pattern: 'Similes with "like"', example: 'Stalls grew along the road like mushrooms after rain.', tip: 'A simile compares two things using "like" to paint a picture.' },
       { pattern: 'Cliffhanger endings', example: 'Somewhere close by, someone small was crying.', tip: 'A chapter can end on a mystery so you want to read the next one!' },
     ],
+    talkAboutIt: [
+      "What did Giri hear near the last stall?",
+      "What do you think Giri will do next?",
+    ],
   },
 
   {
@@ -2365,6 +2497,10 @@ export const STORIES = [
     grammarSpotlight: [
       { pattern: 'Direct speech in a story', example: '"Hold my hand," he said. "We will find him together."', tip: 'Speech marks show the exact words a character says.' },
       { pattern: 'Endings that echo the title', example: 'The best part of the night was the small hand that had held his.', tip: 'A strong last line ties the whole chapter together.' },
+    ],
+    talkAboutIt: [
+      "How did Giri and the satay man help the girl find her father?",
+      "Why was the best part of the night the small hand that had held his?",
     ],
   },
 

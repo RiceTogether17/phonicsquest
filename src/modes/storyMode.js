@@ -22,13 +22,25 @@ import { isReadAloudSupported, listenToLine, stopListening } from '../modules/re
 import { store } from '../modules/store.js';
 import { getBandReadiness, getRecommendedBand } from '../modules/storyGating.js';
 import { getSightWordsInStory } from '../modules/sightStoryWeave.js';
-import { soundColoredHtml, graphemeSounds, SOUND_META, VOWEL_LEGEND } from '../modules/phonemeColors.js';
+import {
+  soundColoredHtml,
+  graphemeSounds,
+  SOUND_META,
+  VOWEL_LEGEND,
+} from '../modules/phonemeColors.js';
 import { modalManager } from '../modules/modalManager.js';
 import { unlockFriend, getRosterSummary } from '../modules/storyFriends.js';
 import {
-  startRecording, stopRecording, playRecording, deleteRecording,
-  stopPlayback, cleanupRecording, getRecorderState,
-  saveFluencyAttempt, getFluencyHistory, getBestWcpm,
+  startRecording,
+  stopRecording,
+  playRecording,
+  deleteRecording,
+  stopPlayback,
+  cleanupRecording,
+  getRecorderState,
+  saveFluencyAttempt,
+  getFluencyHistory,
+  getBestWcpm,
 } from '../modules/storyRecording.js';
 
 const BASE = import.meta.env.BASE_URL;
@@ -38,7 +50,7 @@ const BASE = import.meta.env.BASE_URL;
 /** Look up a word token in the word bank (case/punct insensitive). */
 function lookupWord(token) {
   const clean = token.toLowerCase().replace(/[^a-z]/g, '');
-  return WORDS.find(w => w.word === clean) ?? null;
+  return WORDS.find((w) => w.word === clean) ?? null;
 }
 
 /**
@@ -48,8 +60,8 @@ function lookupWord(token) {
 function tokenise(text) {
   const parts = text.split(/(\s+|["""'',.!?;:()-]+)/);
   return parts
-    .filter(p => p.length > 0)
-    .map(p => ({
+    .filter((p) => p.length > 0)
+    .map((p) => ({
       text: p,
       type: /^\s+$/.test(p) ? 'space' : /^[^a-zA-Z0-9]+$/.test(p) ? 'punct' : 'word',
     }));
@@ -57,17 +69,17 @@ function tokenise(text) {
 
 // ── Module state ──────────────────────────────────────────────────────────
 
-let _container   = null;
-let _onGoHome    = null;
-let _activeBand  = 'A';       // 'A' | 'B' | 'C' | 'D'
-let _bandAutoPicked = false;  // pick the recommended shelf once per session
-let _activeTab   = 'band';   // 'band' | 'singapore' | 'chapter'
-let _readMode    = 'aloud';   // 'aloud' | 'decode'
-let _speaking    = false;
-let _activeWord  = null;      // for decode panel
-let _decodePanelEl = null;    // ref to the decode panel DOM node
-let _currentStoryVocab = [];  // vocab words for current story (used in decode panel)
-let _currentStory = null;     // story being read (for markStoryRead on TTS finish)
+let _container = null;
+let _onGoHome = null;
+let _activeBand = 'A'; // 'A' | 'B' | 'C' | 'D'
+let _bandAutoPicked = false; // pick the recommended shelf once per session
+let _activeTab = 'band'; // 'band' | 'singapore' | 'chapter'
+let _readMode = 'aloud'; // 'aloud' | 'decode'
+let _speaking = false;
+let _activeWord = null; // for decode panel
+let _decodePanelEl = null; // ref to the decode panel DOM node
+let _currentStoryVocab = []; // vocab words for current story (used in decode panel)
+let _currentStory = null; // story being read (for markStoryRead on TTS finish)
 
 // Word-follow highlighting mode for Read Aloud
 // Karaoke read-aloud follows individual words by default (rule 6 — accessibility
@@ -77,23 +89,27 @@ let _followMode = 'word'; // 'line' | 'word'
 let _boundarySupported = null; // null = untested, true/false after first TTS attempt
 
 // Echo-read state
-let _echoLineIdx  = -1;       // current echo-read line index (-1 = not active)
-let _echoStory    = null;     // story reference during echo-read
+let _echoLineIdx = -1; // current echo-read line index (-1 = not active)
+let _echoStory = null; // story reference during echo-read
 
 // Read-to-Giri state (line-by-line listening — see readAloudListener.js)
-let _rtgActive    = false;
-let _rtgLineIdx   = -1;       // index into _rtgLines
-let _rtgLines     = [];       // data-line indexes that contain readable words
-let _rtgNullCount = 0;        // consecutive failed recognitions (degrade at 2)
-let _rtgMisses    = [];       // words flagged for checking this session
-let _rtgMatches   = 0;
-let _rtgTotal     = 0;
+let _rtgActive = false;
+let _rtgLineIdx = -1; // index into _rtgLines
+let _rtgLines = []; // data-line indexes that contain readable words
+let _rtgNullCount = 0; // consecutive failed recognitions (degrade at 2)
+let _rtgMisses = []; // words flagged for checking this session
+let _rtgMatches = 0;
+let _rtgTotal = 0;
 
 // ── Story completion tracking ─────────────────────────────────────────────
 const READ_KEY = 'giri_stories_read';
 
 function getReadStories() {
-  try { return JSON.parse(localStorage.getItem(READ_KEY) ?? '[]'); } catch { return []; }
+  try {
+    return JSON.parse(localStorage.getItem(READ_KEY) ?? '[]');
+  } catch {
+    return [];
+  }
 }
 
 function markStoryRead(id) {
@@ -109,21 +125,21 @@ function markStoryRead(id) {
 }
 
 // Fluency timer state
-let _fluencyTimer   = null;
-let _fluencyStart   = null;
+let _fluencyTimer = null;
+let _fluencyStart = null;
 let _fluencyRunning = false;
 
 // ── Structured-literacy preferences (per-device localStorage) ─────────────
 // Visual scaffolds — child/teacher can switch them off when no longer needed.
 
 const PREFS_GRAPHEMES_KEY = 'giri_show_graphemes';
-const PREFS_RULER_KEY     = 'giri_show_ruler';
-const PREFS_FOLLOW_KEY    = 'giri_follow_mode';
-const MEET_WORDS_KEY      = 'giri_meet_words';
-const COMP_LOG_KEY        = 'giri_comp_log';
+const PREFS_RULER_KEY = 'giri_show_ruler';
+const PREFS_FOLLOW_KEY = 'giri_follow_mode';
+const MEET_WORDS_KEY = 'giri_meet_words';
+const COMP_LOG_KEY = 'giri_comp_log';
 
 let _showGraphemes = _loadPref(PREFS_GRAPHEMES_KEY, true);
-let _showRuler     = _loadPref(PREFS_RULER_KEY, false);
+let _showRuler = _loadPref(PREFS_RULER_KEY, false);
 
 // Hydrate the karaoke follow-mode from prefs now that PREFS_FOLLOW_KEY is in
 // scope. Defaults to 'word' (declared above) so first-run users get karaoke
@@ -135,11 +151,15 @@ function _loadPref(key, fallback) {
     const raw = localStorage.getItem(key);
     if (raw === null) return fallback;
     return JSON.parse(raw);
-  } catch { return fallback; }
+  } catch {
+    return fallback;
+  }
 }
 
 function _persistPref(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {}
 }
 
 // ── Meet-the-Words gate state ─────────────────────────────────────────────
@@ -157,11 +177,15 @@ function _readMeetWordsMap() {
   try {
     const raw = localStorage.getItem(MEET_WORDS_KEY);
     return raw ? JSON.parse(raw) : {};
-  } catch { return {}; }
+  } catch {
+    return {};
+  }
 }
 
 function _writeMeetWordsMap(map) {
-  try { localStorage.setItem(MEET_WORDS_KEY, JSON.stringify(map)); } catch {}
+  try {
+    localStorage.setItem(MEET_WORDS_KEY, JSON.stringify(map));
+  } catch {}
 }
 
 export function _isMeetWordsCompletedToday(storyId) {
@@ -205,7 +229,7 @@ export function _logComprehensionAttempt(entry) {
 
 export function initStoryMode(container, onGoHome) {
   _container = container;
-  _onGoHome  = onGoHome;
+  _onGoHome = onGoHome;
 }
 
 export function showBrowser() {
@@ -246,11 +270,11 @@ function _renderBrowser() {
   _removeDecodePanel();
 
   // ── Category tabs ──────────────────────────────────────────────────────
-  const categoryTabsHtml = /* html */`
+  const categoryTabsHtml = /* html */ `
     <div class="sb-category-tabs" role="tablist" aria-label="Story categories">
-      <button class="sb-cat-tab${_activeTab === 'band'      ? ' active' : ''}" data-cat="band">📖 By Band</button>
+      <button class="sb-cat-tab${_activeTab === 'band' ? ' active' : ''}" data-cat="band">📖 By Band</button>
       <button class="sb-cat-tab${_activeTab === 'singapore' ? ' active' : ''}" data-cat="singapore">🇸🇬 Singapore</button>
-      <button class="sb-cat-tab${_activeTab === 'chapter'   ? ' active' : ''}" data-cat="chapter">📚 Chapters</button>
+      <button class="sb-cat-tab${_activeTab === 'chapter' ? ' active' : ''}" data-cat="chapter">📚 Chapters</button>
       <button class="sb-cat-tab sb-cat-tab--friends" id="btn-open-friends" type="button" aria-label="Open Giri's Friends">🐾 Friends ${_renderFriendsCount()}</button>
     </div>
   `;
@@ -266,17 +290,22 @@ function _renderBrowser() {
         const byBand = {};
         for (const st of STORIES) (byBand[st.band] ??= []).push(st);
         _activeBand = getRecommendedBand(getReadStories(), byBand) || _activeBand;
-      } catch (_) { /* keep default */ }
+      } catch (_) {
+        /* keep default */
+      }
     }
     // ── Band tabs + cards ─────────────────────────────────────────────
-    const bandMeta = BAND_META.find(m => m.band === _activeBand) ?? BAND_META[0];
-    const stories = STORIES.filter(s => s.band === _activeBand && s.category !== 'chapter' && s.category !== 'nonfiction-sg');
+    const bandMeta = BAND_META.find((m) => m.band === _activeBand) ?? BAND_META[0];
+    const stories = STORIES.filter(
+      (s) => s.band === _activeBand && s.category !== 'chapter' && s.category !== 'nonfiction-sg',
+    );
 
     const read = getReadStories();
-    const readCount = stories.filter(s => read.includes(s.id)).length;
+    const readCount = stories.filter((s) => read.includes(s.id)).length;
 
     const readiness = getBandReadiness();
-    const bandTabsHtml = BAND_META.map(m => /* html */`
+    const bandTabsHtml = BAND_META.map(
+      (m) => /* html */ `
       <button
         class="story-tab${m.band === _activeBand ? ' active' : ''}${readiness[m.band]?.ready ? '' : ' story-tab--not-ready'}"
         data-band="${m.band}"
@@ -287,12 +316,15 @@ function _renderBrowser() {
         <span class="story-tab-name">${m.label}</span>
         ${readiness[m.band]?.ready ? '' : '<span class="story-tab-lock" aria-hidden="true">🔓</span>'}
       </button>
-    `).join('');
+    `,
+    ).join('');
 
-    const cardsHtml = stories.map(s => _storyCardHtml(s, bandMeta, false, read.includes(s.id))).join('');
+    const cardsHtml = stories
+      .map((s) => _storyCardHtml(s, bandMeta, false, read.includes(s.id)))
+      .join('');
     const progressPct = stories.length ? Math.round((readCount / stories.length) * 100) : 0;
 
-    innerHtml = /* html */`
+    innerHtml = /* html */ `
       <div class="stories-tabs" role="tablist" aria-label="Reading bands">${bandTabsHtml}</div>
       <div class="stories-level-strip"
            style="--level-color:${bandMeta.color};--level-bg:${bandMeta.bg}">
@@ -305,22 +337,28 @@ function _renderBrowser() {
           <span class="slstrip-progress-bar" style="--pct:${progressPct}%"></span>
         </span>
       </div>
-      ${readiness[_activeBand]?.ready ? '' : `
+      ${
+        readiness[_activeBand]?.ready
+          ? ''
+          : `
         <p class="stories-readiness-note" role="note">
           🧭 ${readiness[_activeBand].hint}. You can still read together with a grown-up!
-        </p>`}
+        </p>`
+      }
       <div class="story-cards-grid">${cardsHtml}</div>
     `;
   } else if (_activeTab === 'singapore') {
     // ── Singapore specials ─────────────────────────────────────────────
-    const sgStories = STORIES.filter(s => s.category === 'nonfiction-sg');
+    const sgStories = STORIES.filter((s) => s.category === 'nonfiction-sg');
     const read = getReadStories();
-    const cardsHtml = sgStories.map(s => {
-      const meta = BAND_META.find(m => m.band === s.band) ?? BAND_META[0];
-      return _storyCardHtml(s, meta, false, read.includes(s.id));
-    }).join('');
+    const cardsHtml = sgStories
+      .map((s) => {
+        const meta = BAND_META.find((m) => m.band === s.band) ?? BAND_META[0];
+        return _storyCardHtml(s, meta, false, read.includes(s.id));
+      })
+      .join('');
 
-    innerHtml = /* html */`
+    innerHtml = /* html */ `
       <div class="sb-section-header">
         <h3 class="sb-section-title">🇸🇬 Singapore Stories</h3>
         <p class="sb-section-desc">Stories set in Singapore — hawker centres, MRT, festivals & more.</p>
@@ -329,16 +367,18 @@ function _renderBrowser() {
     `;
   } else {
     // ── Chapter stories ────────────────────────────────────────────────
-    const chapterStories = STORIES.filter(s => s.category === 'chapter').sort(
+    const chapterStories = STORIES.filter((s) => s.category === 'chapter').sort(
       (a, b) => (a.chapterNum ?? 0) - (b.chapterNum ?? 0),
     );
     const read = getReadStories();
-    const cardsHtml = chapterStories.map(s => {
-      const meta = BAND_META.find(m => m.band === s.band) ?? BAND_META[0];
-      return _storyCardHtml(s, meta, true, read.includes(s.id));
-    }).join('');
+    const cardsHtml = chapterStories
+      .map((s) => {
+        const meta = BAND_META.find((m) => m.band === s.band) ?? BAND_META[0];
+        return _storyCardHtml(s, meta, true, read.includes(s.id));
+      })
+      .join('');
 
-    innerHtml = /* html */`
+    innerHtml = /* html */ `
       <div class="sb-section-header">
         <h3 class="sb-section-title">📚 The Lost Key</h3>
         <p class="sb-section-desc">A three-chapter story. Read them in order!</p>
@@ -347,7 +387,7 @@ function _renderBrowser() {
     `;
   }
 
-  _container.innerHTML = /* html */`
+  _container.innerHTML = /* html */ `
     <div class="stories-browser">
       ${categoryTabsHtml}
       ${innerHtml}
@@ -356,7 +396,7 @@ function _renderBrowser() {
 
   // Category tab listeners. The Friends pill is a sibling button but
   // doesn't switch tabs — it opens the gallery modal instead.
-  _container.querySelectorAll('.sb-cat-tab[data-cat]').forEach(btn => {
+  _container.querySelectorAll('.sb-cat-tab[data-cat]').forEach((btn) => {
     btn.addEventListener('click', () => {
       _activeTab = btn.dataset.cat;
       _renderBrowser();
@@ -367,7 +407,7 @@ function _renderBrowser() {
   });
 
   // Band tab listeners (only in band tab)
-  _container.querySelectorAll('.story-tab').forEach(btn => {
+  _container.querySelectorAll('.story-tab').forEach((btn) => {
     btn.addEventListener('click', () => {
       _activeBand = btn.dataset.band;
       _renderBrowser();
@@ -375,7 +415,7 @@ function _renderBrowser() {
   });
 
   // Story card click
-  _container.querySelectorAll('.story-card').forEach(btn => {
+  _container.querySelectorAll('.story-card').forEach((btn) => {
     btn.addEventListener('click', () => _showReader(btn.dataset.storyId));
   });
 }
@@ -388,10 +428,8 @@ function _storyCardHtml(story, levelMeta, isChapter = false, isRead = false) {
   const chapterBadge = isChapter
     ? `<span class="story-card-chapter-badge">Ch. ${story.chapterNum}</span>`
     : '';
-  const readBadge = isRead
-    ? '<span class="story-card-read-badge" title="Story read">✓</span>'
-    : '';
-  return /* html */`
+  const readBadge = isRead ? '<span class="story-card-read-badge" title="Story read">✓</span>' : '';
+  return /* html */ `
     <button class="story-card${isChapter ? ' story-card--chapter' : ''}${isRead ? ' story-card--read' : ''}" data-story-id="${story.id}">
       <div class="story-card-illo" style="background:${levelMeta.bg}">
         <img
@@ -416,16 +454,17 @@ function _storyCardHtml(story, levelMeta, isChapter = false, isRead = false) {
 // ── Reader view ───────────────────────────────────────────────────────────
 
 function _showReader(storyId) {
-  const story = STORIES.find(s => s.id === storyId);
+  const story = STORIES.find((s) => s.id === storyId);
   if (!story) return;
   _stopTTS();
   _renderReader(story);
 }
 
 function _renderReader(story) {
-  const levelMeta = BAND_META.find(m => m.band === story.band) ?? BAND_META[(story.level ?? 1) - 1];
+  const levelMeta =
+    BAND_META.find((m) => m.band === story.band) ?? BAND_META[(story.level ?? 1) - 1];
 
-  _container.innerHTML = /* html */`
+  _container.innerHTML = /* html */ `
     <div class="story-reader">
 
       <!-- Illustration header -->
@@ -446,16 +485,18 @@ function _renderReader(story) {
 
       ${(() => {
         const spot = getSightWordsInStory(story);
-        return spot.length ? `
+        return spot.length
+          ? `
           <p class="story-spot-words" aria-label="Sight words to spot in this story">
-            ⭐ Words to spot: ${spot.map(w => `<span class="story-spot-word">${w}</span>`).join(' ')}
-          </p>` : '';
+            ⭐ Words to spot: ${spot.map((w) => `<span class="story-spot-word">${w}</span>`).join(' ')}
+          </p>`
+          : '';
       })()}
 
       <!-- Mode toggle — plain-language labels so a grown-up knows which is
            which: listen together, or tap words to sound them out. -->
       <div class="story-mode-toggle" role="group" aria-label="Reading mode">
-        <button class="smode-btn${_readMode === 'aloud'  ? ' active' : ''}" data-mode="aloud"  id="btn-mode-aloud">
+        <button class="smode-btn${_readMode === 'aloud' ? ' active' : ''}" data-mode="aloud"  id="btn-mode-aloud">
           <span class="smode-btn-title">📖 Listen &amp; Follow</span>
           <span class="smode-btn-sub">Giri reads · you follow along</span>
         </button>
@@ -507,7 +548,7 @@ function _renderModeOrGate(story) {
 }
 
 function _setModeToggle(mode) {
-  document.querySelectorAll('.smode-btn').forEach(btn => {
+  document.querySelectorAll('.smode-btn').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.mode === mode);
   });
 }
@@ -522,8 +563,11 @@ function _renderMeetTheWordsGate(story) {
   const hfwInStory = extractStoryHFW(story);
 
   // Filter vocab to words actually appearing in the story text
-  const storyText = story.lines.map(l => l.text ?? '').join(' ').toLowerCase();
-  const vocabToPreteach = _currentStoryVocab.filter(v => {
+  const storyText = story.lines
+    .map((l) => l.text ?? '')
+    .join(' ')
+    .toLowerCase();
+  const vocabToPreteach = _currentStoryVocab.filter((v) => {
     const firstWord = v.word.toLowerCase().split(/\s+/)[0];
     return storyText.includes(firstWord);
   });
@@ -544,21 +588,29 @@ function _renderMeetTheWordsGate(story) {
   const targetTaps = Math.min(WARMUP_TARGET, totalChips);
   const tapped = new Set();
 
-  const hfwChipsHtml = hfwInStory.map(w => /* html */`
+  const hfwChipsHtml = hfwInStory
+    .map(
+      (w) => /* html */ `
     <button class="hfw-chip" data-tap-id="hfw:${w}" data-word="${w}" aria-label="Hear sight word ${w}">
       ⭐ ${w}
     </button>
-  `).join('');
+  `,
+    )
+    .join('');
 
-  const vocabChipsHtml = vocabToPreteach.map(v => /* html */`
+  const vocabChipsHtml = vocabToPreteach
+    .map(
+      (v) => /* html */ `
     <button class="vocab-chip" data-tap-id="vocab:${v.word}" data-word="${v.word}" aria-label="Key word: ${v.word}">
       <span class="vocab-chip-icon">${v.icon}</span>
       <span class="vocab-chip-word">${v.word}</span>
       <span class="vocab-chip-meaning">${v.meaning}</span>
     </button>
-  `).join('');
+  `,
+    )
+    .join('');
 
-  dynamic.innerHTML = /* html */`
+  dynamic.innerHTML = /* html */ `
     <div class="meet-words-gate" role="region" aria-labelledby="gate-title">
       <h3 id="gate-title">🤝 Meet the Words</h3>
       <p class="gate-hello">
@@ -566,19 +618,27 @@ function _renderMeetTheWordsGate(story) {
         know them. Then read <strong>${story.title}</strong>.
       </p>
 
-      ${hfwChipsHtml ? /* html */`
+      ${
+        hfwChipsHtml
+          ? /* html */ `
         <div class="gate-section">
           <div class="gate-section-title">⭐ Sight words in this story</div>
           <div class="hfw-chip-list">${hfwChipsHtml}</div>
         </div>
-      ` : ''}
+      `
+          : ''
+      }
 
-      ${vocabChipsHtml ? /* html */`
+      ${
+        vocabChipsHtml
+          ? /* html */ `
         <div class="gate-section">
           <div class="gate-section-title">📚 Key words to know</div>
           <div class="vocab-chip-list">${vocabChipsHtml}</div>
         </div>
-      ` : ''}
+      `
+          : ''
+      }
 
       <div class="gate-continue-row">
         <span class="gate-progress" id="gate-progress" aria-live="polite">0 of ${targetTaps} tapped</span>
@@ -595,9 +655,10 @@ function _renderMeetTheWordsGate(story) {
     chip.setAttribute('data-tapped', 'true');
     const progressEl = document.getElementById('gate-progress');
     if (progressEl) {
-      progressEl.textContent = tapped.size >= targetTaps
-        ? `✓ Warmed up (${tapped.size} tapped) — keep going or start the story`
-        : `${tapped.size} of ${targetTaps} tapped`;
+      progressEl.textContent =
+        tapped.size >= targetTaps
+          ? `✓ Warmed up (${tapped.size} tapped) — keep going or start the story`
+          : `${tapped.size} of ${targetTaps} tapped`;
     }
     if (tapped.size >= targetTaps) {
       const continueBtn = document.getElementById('gate-continue');
@@ -606,10 +667,12 @@ function _renderMeetTheWordsGate(story) {
   }
 
   // Wire chip taps (HFW + vocab) — speak the word and mark as tapped.
-  dynamic.querySelectorAll('.hfw-chip, .vocab-chip').forEach(chip => {
+  dynamic.querySelectorAll('.hfw-chip, .vocab-chip').forEach((chip) => {
     chip.addEventListener('click', async () => {
       _flashChip(chip);
-      try { await audio.speakWord(chip.dataset.word); } catch {}
+      try {
+        await audio.speakWord(chip.dataset.word);
+      } catch {}
       recordTap(chip);
     });
   });
@@ -627,7 +690,7 @@ function _renderMeetTheWordsGate(story) {
 /** Count the words in a story's spoken text */
 function _countStoryWords(story) {
   return story.lines
-    .filter(l => l.type !== 'label' && l.type !== 'chapter' && l.text)
+    .filter((l) => l.type !== 'label' && l.type !== 'chapter' && l.text)
     .reduce((acc, l) => acc + l.text.trim().split(/\s+/).length, 0);
 }
 
@@ -642,39 +705,48 @@ function _renderReadAloud(story) {
   // Use word spans when follow mode is 'word'
   const useWordSpans = _followMode === 'word';
   const linesHtml = story.lines.map((line, i) => _lineHtml(line, i, useWordSpans, story)).join('');
-  const hasQuest  = !!story.comprehension?.length;
-  const hasTalk   = !!story.talkAboutIt?.length;
+  const hasQuest = !!story.comprehension?.length;
+  const hasTalk = !!story.talkAboutIt?.length;
 
   // Talk About It section (Band A mini-decodables)
-  const talkHtml = hasTalk ? /* html */`
+  const talkHtml = hasTalk
+    ? /* html */ `
     <div class="story-talk">
       <h3 class="story-talk-title">💬 Talk About It</h3>
       <ul class="story-talk-list">
-        ${story.talkAboutIt.map(q => `<li>${q}</li>`).join('')}
+        ${story.talkAboutIt.map((q) => `<li>${q}</li>`).join('')}
       </ul>
     </div>
-  ` : '';
+  `
+    : '';
 
   // Fluency history for this story
   const historyAttempts = getFluencyHistory(story.id);
   const bestWcpm = getBestWcpm(story.id);
-  const historyHtml = historyAttempts.length > 0 ? /* html */`
+  const historyHtml =
+    historyAttempts.length > 0
+      ? /* html */ `
     <div class="fluency-history" id="fluency-history">
       <div class="fluency-history-header">
         <span class="fluency-history-title">📊 Recent Attempts</span>
         ${bestWcpm !== null ? `<span class="fluency-history-best">Best: <strong>${bestWcpm}</strong> wpm</span>` : ''}
       </div>
       <div class="fluency-history-list">
-        ${historyAttempts.slice().reverse().map(a => {
-          const d = new Date(a.date);
-          const dateStr = `${d.getDate()}/${d.getMonth() + 1}`;
-          return `<span class="fluency-history-item">${dateStr}: <strong>${a.wcpm}</strong> wpm</span>`;
-        }).join('')}
+        ${historyAttempts
+          .slice()
+          .reverse()
+          .map((a) => {
+            const d = new Date(a.date);
+            const dateStr = `${d.getDate()}/${d.getMonth() + 1}`;
+            return `<span class="fluency-history-item">${dateStr}: <strong>${a.wcpm}</strong> wpm</span>`;
+          })
+          .join('')}
       </div>
     </div>
-  ` : '';
+  `
+      : '';
 
-  dynamic.innerHTML = /* html */`
+  dynamic.innerHTML = /* html */ `
     <!-- Story text column -->
     <div class="story-content-wrap">
       <!-- Reading toolbar. Three tools, each with a clear payoff:
@@ -716,7 +788,9 @@ function _renderReadAloud(story) {
 
       <!-- Story Quest CTA (shown after TTS or fluency) — the payoff, kept
            right by the primary Listen button instead of buried under tools. -->
-      ${hasQuest ? /* html */`
+      ${
+        hasQuest
+          ? /* html */ `
         <div class="story-quest-cta" id="story-quest-cta" hidden>
           <div class="sq-cta-inner">
             <span class="sq-cta-icon">🌟</span>
@@ -727,7 +801,9 @@ function _renderReadAloud(story) {
             <button class="btn btn--primary" id="btn-launch-quest">Start Quest →</button>
           </div>
         </div>
-      ` : ''}
+      `
+          : ''
+      }
 
       <!-- Extra practice tools fold into one optional grown-up drawer, so the
            reader isn't a wall of competing accordions. Listening to the story
@@ -780,7 +856,9 @@ function _renderReadAloud(story) {
               <span class="rtg-hint">Read each line — Giri listens</span>
             </summary>
             <div class="story-tool-body">
-              ${isReadAloudSupported() ? /* html */`
+              ${
+                isReadAloudSupported()
+                  ? /* html */ `
                 <div class="rtg-controls" id="rtg-controls">
                   <button class="btn btn--ghost" id="btn-rtg-start">Start</button>
                   <button class="btn btn--primary" id="btn-rtg-listen" hidden>🎙 Read this line</button>
@@ -788,9 +866,11 @@ function _renderReadAloud(story) {
                   <button class="btn btn--ghost btn--sm" id="btn-rtg-exit" hidden>✕ Exit</button>
                 </div>
                 <div class="rtg-status" id="rtg-status" aria-live="polite"></div>
-              ` : /* html */`
+              `
+                  : /* html */ `
                 <p class="rtg-status">Giri can't listen in this browser — use 🎙 Record Reading instead and play it back together.</p>
-              `}
+              `
+              }
             </div>
           </details>
 
@@ -817,7 +897,7 @@ function _renderReadAloud(story) {
   `;
 
   // Follow-mode toggle (persisted so karaoke preference sticks across stories)
-  dynamic.querySelectorAll('.follow-mode-btn[data-follow]').forEach(btn => {
+  dynamic.querySelectorAll('.follow-mode-btn[data-follow]').forEach((btn) => {
     btn.addEventListener('click', () => {
       _followMode = btn.dataset.follow;
       _persistPref(PREFS_FOLLOW_KEY, _followMode);
@@ -828,7 +908,7 @@ function _renderReadAloud(story) {
   // Word tap behaviour: one predictable action — a tap hears the word and
   // opens its Word Detective breakdown (unified sound colours + Review Lane),
   // no mode to choose. Every span is keyboard-accessible for pointer-free use.
-  dynamic.querySelectorAll('.wf-word').forEach(span => {
+  dynamic.querySelectorAll('.wf-word').forEach((span) => {
     span.setAttribute('role', 'button');
     span.setAttribute('tabindex', '0');
     const handle = (ev) => {
@@ -854,7 +934,7 @@ function _renderReadAloud(story) {
   document.getElementById('btn-toggle-ruler')?.addEventListener('click', () => {
     _showRuler = !_showRuler;
     _persistPref(PREFS_RULER_KEY, _showRuler);
-    const btn  = document.getElementById('btn-toggle-ruler');
+    const btn = document.getElementById('btn-toggle-ruler');
     const body = document.getElementById('story-body');
     btn?.setAttribute('aria-pressed', String(_showRuler));
     body?.classList.toggle('story-ruler-on', _showRuler);
@@ -865,8 +945,12 @@ function _renderReadAloud(story) {
 
   // Fluency timer controls
   const wordCount = _countStoryWords(story);
-  document.getElementById('btn-fluency-start')?.addEventListener('click', () => _startFluencyTimer());
-  document.getElementById('btn-fluency-done')?.addEventListener('click', () => _stopFluencyTimer(wordCount, story));
+  document
+    .getElementById('btn-fluency-start')
+    ?.addEventListener('click', () => _startFluencyTimer());
+  document
+    .getElementById('btn-fluency-done')
+    ?.addEventListener('click', () => _stopFluencyTimer(wordCount, story));
 
   // Recording controls
   _wireRecordingControls(story);
@@ -898,7 +982,9 @@ function _renderReadAloud(story) {
 // word together", never as errors, and are added to the spaced-review queue.
 
 function _wireReadToGiriControls(story) {
-  document.getElementById('btn-rtg-start')?.addEventListener('click', () => _startReadToGiri(story));
+  document
+    .getElementById('btn-rtg-start')
+    ?.addEventListener('click', () => _startReadToGiri(story));
   document.getElementById('btn-rtg-listen')?.addEventListener('click', () => _rtgListen(story));
   document.getElementById('btn-rtg-next')?.addEventListener('click', () => _rtgAdvance(story));
   document.getElementById('btn-rtg-exit')?.addEventListener('click', () => {
@@ -934,8 +1020,8 @@ function _startReadToGiri(story) {
 
   _stopTTS();
   const lines = Array.from(document.querySelectorAll('#story-body .sline'))
-    .filter(el => el.querySelector('.wf-word'))
-    .map(el => Number(el.dataset.line));
+    .filter((el) => el.querySelector('.wf-word'))
+    .map((el) => Number(el.dataset.line));
   if (lines.length === 0) return;
 
   _rtgActive = true;
@@ -954,8 +1040,9 @@ function _startReadToGiri(story) {
 }
 
 function _rtgHighlightCurrent() {
-  document.querySelectorAll('#story-body .sline--rtg-current')
-    .forEach(el => el.classList.remove('sline--rtg-current'));
+  document
+    .querySelectorAll('#story-body .sline--rtg-current')
+    .forEach((el) => el.classList.remove('sline--rtg-current'));
   const el = _rtgLineEl();
   if (el) {
     el.classList.add('sline--rtg-current');
@@ -969,8 +1056,14 @@ async function _rtgListen(story) {
   if (!lineEl || !listenBtn || listenBtn.disabled) return;
 
   const spans = Array.from(lineEl.querySelectorAll('.wf-word'));
-  const expectedText = spans.map(s => (s.textContent || '').trim()).filter(Boolean).join(' ');
-  if (!expectedText) { _rtgAdvance(story); return; }
+  const expectedText = spans
+    .map((s) => (s.textContent || '').trim())
+    .filter(Boolean)
+    .join(' ');
+  if (!expectedText) {
+    _rtgAdvance(story);
+    return;
+  }
 
   listenBtn.disabled = true;
   listenBtn.textContent = '🦉 Giri is listening…';
@@ -985,9 +1078,13 @@ async function _rtgListen(story) {
   if (!result) {
     _rtgNullCount++;
     if (_rtgNullCount >= 2) {
-      _rtgSetStatus('Giri is having trouble hearing today. You can keep trying, or use <strong>🎙 Record Reading</strong> below and listen back together.');
+      _rtgSetStatus(
+        'Giri is having trouble hearing today. You can keep trying, or use <strong>🎙 Record Reading</strong> below and listen back together.',
+      );
     } else {
-      _rtgSetStatus("Giri couldn't hear that — move a little closer to the microphone and try again!");
+      _rtgSetStatus(
+        "Giri couldn't hear that — move a little closer to the microphone and try again!",
+      );
     }
     return;
   }
@@ -1013,14 +1110,16 @@ async function _rtgListen(story) {
     }
   });
 
-  const accepted = result.words.filter(w => w.status !== 'miss').length;
+  const accepted = result.words.filter((w) => w.status !== 'miss').length;
   _rtgMatches += accepted;
   _rtgTotal += result.words.length;
   _rtgMisses.push(...flaggedHere);
 
   const isLast = _rtgLineIdx >= _rtgLines.length - 1;
   if (flaggedHere.length > 0) {
-    _rtgSetStatus(`Nice reading! Let's check the orange ${flaggedHere.length === 1 ? 'word' : 'words'} together — tap ${flaggedHere.length === 1 ? 'it' : 'each one'} to hear it. Then ${isLast ? 'finish up' : 'go on'}!`);
+    _rtgSetStatus(
+      `Nice reading! Let's check the orange ${flaggedHere.length === 1 ? 'word' : 'words'} together — tap ${flaggedHere.length === 1 ? 'it' : 'each one'} to hear it. Then ${isLast ? 'finish up' : 'go on'}!`,
+    );
   } else {
     _rtgSetStatus('⭐ Great — Giri heard every word!');
   }
@@ -1061,12 +1160,16 @@ function _rtgFinish(story) {
   };
   store.set('readAloudStats', stats);
 
-  document.querySelectorAll('#story-body .sline--rtg-current')
-    .forEach(el => el.classList.remove('sline--rtg-current'));
+  document
+    .querySelectorAll('#story-body .sline--rtg-current')
+    .forEach((el) => el.classList.remove('sline--rtg-current'));
   document.getElementById('btn-rtg-next')?.setAttribute('hidden', '');
   document.getElementById('btn-rtg-exit')?.setAttribute('hidden', '');
   const startBtn = document.getElementById('btn-rtg-start');
-  if (startBtn) { startBtn.removeAttribute('hidden'); startBtn.textContent = 'Read it again'; }
+  if (startBtn) {
+    startBtn.removeAttribute('hidden');
+    startBtn.textContent = 'Read it again';
+  }
 
   const missNote = missedUnique.length
     ? ` Words to practise: <strong>${missedUnique.slice(0, 6).join(', ')}</strong> — they've been added to your review pile.`
@@ -1112,10 +1215,12 @@ export function _highlightGraphemes(text) {
  * @returns {string} HTML
  */
 function _soundLegendHtml() {
-  const items = VOWEL_LEGEND.map(s => `
+  const items = VOWEL_LEGEND.map(
+    (s) => `
     <span class="sl-item">
       <span class="sl-chip vs--${s.key}">${s.mark || '•'}</span>${s.label}
-    </span>`).join('');
+    </span>`,
+  ).join('');
   return `<div class="sound-legend" aria-label="What the vowel colours mean">${items}</div>`;
 }
 
@@ -1133,14 +1238,22 @@ function _lineHtml(line, i, wordSpans = false, story = null) {
     : baseText;
   const content = wordSpans ? _wordSpanText(baseText, story) : highlighted;
   switch (line.type) {
-    case 'chapter':   return `<div class="sline sline--chapter"   data-line="${i}">📚 ${content}</div>`;
-    case 'label':     return `<div class="sline sline--label"     data-line="${i}">${content}</div>`;
-    case 'beat':      return `<p class="sline sline--beat"        data-line="${i}">${content}</p>`;
-    case 'intro':     return `<p class="sline sline--intro"       data-line="${i}">${content}</p>`;
-    case 'end':       return `<p class="sline sline--end"         data-line="${i}">${content}</p>`;
-    case 'text':      return `<p class="sline sline--text"        data-line="${i}">${content}</p>`;
-    case 'paragraph': return `<p class="sline sline--paragraph"   data-line="${i}">${content}</p>`;
-    default:          return `<p class="sline"                    data-line="${i}">${content}</p>`;
+    case 'chapter':
+      return `<div class="sline sline--chapter"   data-line="${i}">📚 ${content}</div>`;
+    case 'label':
+      return `<div class="sline sline--label"     data-line="${i}">${content}</div>`;
+    case 'beat':
+      return `<p class="sline sline--beat"        data-line="${i}">${content}</p>`;
+    case 'intro':
+      return `<p class="sline sline--intro"       data-line="${i}">${content}</p>`;
+    case 'end':
+      return `<p class="sline sline--end"         data-line="${i}">${content}</p>`;
+    case 'text':
+      return `<p class="sline sline--text"        data-line="${i}">${content}</p>`;
+    case 'paragraph':
+      return `<p class="sline sline--paragraph"   data-line="${i}">${content}</p>`;
+    default:
+      return `<p class="sline"                    data-line="${i}">${content}</p>`;
   }
 }
 
@@ -1149,15 +1262,17 @@ function _wordSpanText(text, story = null) {
   if (!text) return '';
   const tokens = tokenise(text);
   let wordIdx = 0;
-  return tokens.map(tok => {
-    if (tok.type === 'word') {
-      const inner = story
-        ? _highlightGraphemes(tok.text, story.targetGraphemes, story.band)
-        : tok.text;
-      return `<span class="wf-word" data-word-idx="${wordIdx++}">${inner}</span>`;
-    }
-    return tok.text;
-  }).join('');
+  return tokens
+    .map((tok) => {
+      if (tok.type === 'word') {
+        const inner = story
+          ? _highlightGraphemes(tok.text, story.targetGraphemes, story.band)
+          : tok.text;
+        return `<span class="wf-word" data-word-idx="${wordIdx++}">${inner}</span>`;
+      }
+      return tok.text;
+    })
+    .join('');
 }
 
 // ── DECODE mode ───────────────────────────────────────────────────────────
@@ -1176,55 +1291,74 @@ function _renderDecodeMode(story) {
   const hfwInStory = extractStoryHFW(story);
 
   // Pre-teach section — HFW chips
-  const hfwChipsHtml = hfwInStory.map(w => /* html */`
+  const hfwChipsHtml = hfwInStory
+    .map(
+      (w) => /* html */ `
     <button class="hfw-chip" data-word="${w}" aria-label="Hear sight word ${w}">
       ⭐ ${w}
     </button>
-  `).join('');
+  `,
+    )
+    .join('');
 
   // Pre-teach section — Vocab key-word chips (words that appear in story text)
-  const storyText = story.lines.map(l => l.text ?? '').join(' ').toLowerCase();
-  const vocabToPreteach = _currentStoryVocab.filter(v => {
+  const storyText = story.lines
+    .map((l) => l.text ?? '')
+    .join(' ')
+    .toLowerCase();
+  const vocabToPreteach = _currentStoryVocab.filter((v) => {
     const firstWord = v.word.toLowerCase().split(/\s+/)[0];
     return storyText.includes(firstWord);
   });
-  const vocabChipsHtml = vocabToPreteach.map(v => /* html */`
+  const vocabChipsHtml = vocabToPreteach
+    .map(
+      (v) => /* html */ `
     <button class="vocab-chip" data-word="${v.word}" aria-label="Key word: ${v.word}">
       <span class="vocab-chip-icon">${v.icon}</span>
       <span class="vocab-chip-word">${v.word}</span>
       <span class="vocab-chip-meaning">${v.meaning}</span>
     </button>
-  `).join('');
+  `,
+    )
+    .join('');
 
   // Build clickable story body
-  const storyBodyHtml = story.lines.map((line, lineIdx) => {
-    if (line.type === 'label') {
-      return `<div class="sline sline--label" data-line="${lineIdx}">${line.text}</div>`;
-    }
-    // All other types: tokenise into clickable words
-    const tokens = tokenise(line.text);
-    const tokenHtml = tokens.map(tok => {
-      if (tok.type === 'word') {
-        const cleanWord = tok.text.toLowerCase().replace(/[^a-z]/g, '');
-        const hfw = isHFW(cleanWord);
-        const inner = _highlightGraphemes(tok.text, story.targetGraphemes, story.band);
-        return `<button class="decode-word${hfw ? ' decode-hfw' : ''}"
+  const storyBodyHtml = story.lines
+    .map((line, lineIdx) => {
+      if (line.type === 'label') {
+        return `<div class="sline sline--label" data-line="${lineIdx}">${line.text}</div>`;
+      }
+      // All other types: tokenise into clickable words
+      const tokens = tokenise(line.text);
+      const tokenHtml = tokens
+        .map((tok) => {
+          if (tok.type === 'word') {
+            const cleanWord = tok.text.toLowerCase().replace(/[^a-z]/g, '');
+            const hfw = isHFW(cleanWord);
+            const inner = _highlightGraphemes(tok.text, story.targetGraphemes, story.band);
+            return `<button class="decode-word${hfw ? ' decode-hfw' : ''}"
                          data-word="${tok.text}"
                          aria-label="${hfw ? 'Sight word: ' : 'Decode: '}${tok.text}"
                 >${inner}</button>`;
-      }
-      return `<span class="decode-punct">${tok.text}</span>`;
-    }).join('');
+          }
+          return `<span class="decode-punct">${tok.text}</span>`;
+        })
+        .join('');
 
-    const cls = {
-      intro: 'sline--intro', beat: 'sline--beat', end: 'sline--end',
-      text: 'sline--text', paragraph: 'sline--paragraph',
-    }[line.type] ?? '';
+      const cls =
+        {
+          intro: 'sline--intro',
+          beat: 'sline--beat',
+          end: 'sline--end',
+          text: 'sline--text',
+          paragraph: 'sline--paragraph',
+        }[line.type] ?? '';
 
-    return `<p class="sline ${cls} decode-line" data-line="${lineIdx}">${tokenHtml}</p>`;
-  }).join('');
+      return `<p class="sline ${cls} decode-line" data-line="${lineIdx}">${tokenHtml}</p>`;
+    })
+    .join('');
 
-  dynamic.innerHTML = /* html */`
+  dynamic.innerHTML = /* html */ `
     <!-- Story text column -->
     <div class="story-content-wrap">
       <!-- Reading scaffold toggles -->
@@ -1242,15 +1376,19 @@ function _renderDecodeMode(story) {
           </button>
         </div>
         <div id="hfw-chip-list" class="hfw-chip-list">
-          ${hfwChipsHtml.length
-            ? hfwChipsHtml
-            : '<span class="hfw-none">None — all words are fully decodable!</span>'}
+          ${
+            hfwChipsHtml.length
+              ? hfwChipsHtml
+              : '<span class="hfw-none">None — all words are fully decodable!</span>'
+          }
           <p class="hfw-tip">Tap each word to hear it. These words are read aloud in the story.</p>
         </div>
       </div>
 
       <!-- Key vocabulary pre-teach -->
-      ${vocabChipsHtml.length ? /* html */`
+      ${
+        vocabChipsHtml.length
+          ? /* html */ `
       <div class="vocab-preteach" id="vocab-preteach">
         <div class="hfw-preteach-header">
           <span class="hfw-preteach-title">📚 Key Words — tap to hear</span>
@@ -1260,7 +1398,9 @@ function _renderDecodeMode(story) {
         </div>
         <div id="vocab-chip-list" class="vocab-chip-list">${vocabChipsHtml}</div>
       </div>
-      ` : ''}
+      `
+          : ''
+      }
 
       <!-- Decode-mode story body -->
       <div class="story-body decode-body" id="story-body" aria-live="polite">
@@ -1294,9 +1434,9 @@ function _renderDecodeMode(story) {
   // Collapse/expand HFW section
   document.getElementById('btn-hfw-toggle')?.addEventListener('click', () => {
     const list = document.getElementById('hfw-chip-list');
-    const btn  = document.getElementById('btn-hfw-toggle');
+    const btn = document.getElementById('btn-hfw-toggle');
     const expanded = btn.getAttribute('aria-expanded') === 'true';
-    list.hidden  = expanded;
+    list.hidden = expanded;
     btn.setAttribute('aria-expanded', String(!expanded));
     btn.textContent = expanded ? 'Show ▼' : 'Hide ▲';
   });
@@ -1304,15 +1444,15 @@ function _renderDecodeMode(story) {
   // Collapse/expand vocab section
   document.getElementById('btn-vocab-toggle')?.addEventListener('click', () => {
     const list = document.getElementById('vocab-chip-list');
-    const btn  = document.getElementById('btn-vocab-toggle');
+    const btn = document.getElementById('btn-vocab-toggle');
     const expanded = btn.getAttribute('aria-expanded') === 'true';
-    list.hidden  = expanded;
+    list.hidden = expanded;
     btn.setAttribute('aria-expanded', String(!expanded));
     btn.textContent = expanded ? 'Show ▼' : 'Hide ▲';
   });
 
   // HFW chip taps → just read the word aloud
-  dynamic.querySelectorAll('.hfw-chip').forEach(chip => {
+  dynamic.querySelectorAll('.hfw-chip').forEach((chip) => {
     chip.addEventListener('click', () => {
       const w = chip.dataset.word;
       _flashChip(chip);
@@ -1325,7 +1465,7 @@ function _renderDecodeMode(story) {
   });
 
   // Vocab chip taps → read word aloud + expand meaning
-  dynamic.querySelectorAll('.vocab-chip').forEach(chip => {
+  dynamic.querySelectorAll('.vocab-chip').forEach((chip) => {
     chip.addEventListener('click', () => {
       const w = chip.dataset.word;
       _flashChip(chip);
@@ -1357,22 +1497,22 @@ function _renderDecodeMode(story) {
     document.body.appendChild(inlinePanel);
   }
   _decodePanelEl = inlinePanel;
-  dynamic.querySelectorAll('.decode-word').forEach(btn => {
+  dynamic.querySelectorAll('.decode-word').forEach((btn) => {
     btn.addEventListener('click', () => _handleWordTap(btn));
   });
 }
 
 async function _handleWordTap(wordBtn) {
   // Clear previous active
-  document.querySelectorAll('.decode-word.decoding').forEach(b => b.classList.remove('decoding'));
+  document.querySelectorAll('.decode-word.decoding').forEach((b) => b.classList.remove('decoding'));
   wordBtn.classList.add('decoding');
 
   const rawWord = wordBtn.dataset.word;
-  const clean   = rawWord.toLowerCase().replace(/[^a-z]/g, '');
+  const clean = rawWord.toLowerCase().replace(/[^a-z]/g, '');
   // Check word bank first — a word that can be decoded should never be shown
   // as a sight word, even if it also appears in the HFW list.
   const wordObj = lookupWord(rawWord);
-  const hfw     = !wordObj && isHFW(clean);
+  const hfw = !wordObj && isHFW(clean);
 
   const panel = _decodePanelEl;
   if (!panel) return;
@@ -1407,7 +1547,7 @@ function _showDecodePanel({ type, word, wordObj }) {
   if (!inner) return;
 
   if (type === 'hfw') {
-    inner.innerHTML = /* html */`
+    inner.innerHTML = /* html */ `
       <div class="dp-hfw">
         <span class="dp-sight-badge">⭐ Sight Word</span>
         <span class="dp-word">${word}</span>
@@ -1425,7 +1565,7 @@ function _showDecodePanel({ type, word, wordObj }) {
   }
 
   if (type === 'tts') {
-    inner.innerHTML = /* html */`
+    inner.innerHTML = /* html */ `
       <div class="dp-tts">
         <span class="dp-word">${word}</span>
         <button class="dp-hear-btn" id="dp-hear">🔊 Hear again</button>
@@ -1444,12 +1584,14 @@ function _showDecodePanel({ type, word, wordObj }) {
   // type === 'decode' — colour each tile by the SOUND it makes, one language
   // shared with the inline scaffold and the Word Detective card.
   const sounds = graphemeSounds(wordObj.word, wordObj.graphemes, wordObj.types);
-  const tilesHtml = wordObj.graphemes.map((g, i) => {
-    const meta = SOUND_META[sounds[i]] ?? SOUND_META.consonant;
-    return `<span class="dp-tile" data-idx="${i}" style="--tile-color:${meta.color}" title="${meta.label}">${g}</span>`;
-  }).join('');
+  const tilesHtml = wordObj.graphemes
+    .map((g, i) => {
+      const meta = SOUND_META[sounds[i]] ?? SOUND_META.consonant;
+      return `<span class="dp-tile" data-idx="${i}" style="--tile-color:${meta.color}" title="${meta.label}">${g}</span>`;
+    })
+    .join('');
 
-  inner.innerHTML = /* html */`
+  inner.innerHTML = /* html */ `
     <div class="dp-decode">
       <div class="dp-tiles" id="dp-tiles">${tilesHtml}</div>
       <span class="dp-word" id="dp-word-label">${wordObj.word}</span>
@@ -1467,10 +1609,13 @@ async function _speakPhonemes(wordObj) {
   for (let i = 0; i < wordObj.graphemes.length; i++) {
     tiles.forEach((t, ti) => t.classList.toggle('dp-tile--active', ti === i));
     const prevGrapheme = i > 0 ? wordObj.graphemes[i - 1] : null;
-    await audio.speakPhoneme(wordObj.graphemes[i], wordObj.types[i], { word: wordObj.word, prevGrapheme });
+    await audio.speakPhoneme(wordObj.graphemes[i], wordObj.types[i], {
+      word: wordObj.word,
+      prevGrapheme,
+    });
     await _delay(200);
   }
-  tiles.forEach(t => t.classList.remove('dp-tile--active'));
+  tiles.forEach((t) => t.classList.remove('dp-tile--active'));
   await _delay(250);
   // Blend: say the full word
   const wordLabel = document.getElementById('dp-word-label');
@@ -1533,8 +1678,8 @@ function _speakNext(segments, idx) {
   const seg = segments[idx];
   _highlightLine(seg.highlightIdx);
 
-  const utt  = new SpeechSynthesisUtterance(seg.text);
-  utt.rate   = 0.82;
+  const utt = new SpeechSynthesisUtterance(seg.text);
+  utt.rate = 0.82;
   _applyTtsVoice(utt);
   const pauseMs = seg.text.startsWith('Puff') ? 600 : 380;
 
@@ -1543,7 +1688,7 @@ function _speakNext(segments, idx) {
     _attachBoundaryListener(utt, seg.highlightIdx);
   }
 
-  utt.onend  = () => {
+  utt.onend = () => {
     _clearWordHighlight();
     if (_speaking) setTimeout(() => _speakNext(segments, idx + 1), pauseMs);
   };
@@ -1576,7 +1721,7 @@ function _attachBoundaryListener(utt, lineIndex) {
     if (wordIdx < 0 || wordIdx >= wordSpans.length) return;
     if (wordIdx === lastWordIdx) return;
     lastWordIdx = wordIdx;
-    wordSpans.forEach(s => s.classList.remove('wf-word--active'));
+    wordSpans.forEach((s) => s.classList.remove('wf-word--active'));
     const active = wordSpans[wordIdx];
     active.classList.add('wf-word--active');
     _scrollIntoViewIfNeeded(active);
@@ -1604,7 +1749,7 @@ function _attachBoundaryListener(utt, lineIndex) {
     // Use the actual word spans' text for length — story renderer
     // splits on whitespace and punctuation, matching the highlight
     // grain we want.
-    const wordTexts = Array.from(wordSpans, s => (s.textContent || '').trim());
+    const wordTexts = Array.from(wordSpans, (s) => (s.textContent || '').trim());
     let offset = 0;
     for (let i = 0; i < wordSpans.length; i++) {
       const wordIdx = i;
@@ -1686,10 +1831,18 @@ function _openWordDetective(text) {
   modalManager.open('modal-word-detective');
 
   // The tap that opened this card also wanted to hear the word — say it.
-  try { audio.speakWord(info.text); } catch (_) { /* ignore — no SFX */ }
+  try {
+    audio.speakWord(info.text);
+  } catch (_) {
+    /* ignore — no SFX */
+  }
 
   host.querySelector('[data-action="hear"]')?.addEventListener('click', () => {
-    try { audio.speakWord(info.text); } catch (_) { /* ignore */ }
+    try {
+      audio.speakWord(info.text);
+    } catch (_) {
+      /* ignore */
+    }
   });
 
   const addBtn = host.querySelector('[data-action="add-review"]');
@@ -1712,15 +1865,18 @@ function _openWordDetective(text) {
  * @returns {string}
  */
 function _renderWordDetectiveCard(info) {
-  const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
+  const escText = (s) =>
+    String(s ?? '').replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c]);
 
   // Colour tiles by the sound each grapheme makes — the same language as the
   // inline "Sound colours" scaffold and the Decode panel.
   const sounds = graphemeSounds(info.text, info.graphemes, info.types);
-  const tilesHtml = info.graphemes.map((g, i) => {
-    const meta = SOUND_META[sounds[i]] ?? SOUND_META.consonant;
-    return `<span class="wd-tile vs--${sounds[i]}" style="--tile-color:${meta.color}" aria-label="${escText(g)}, ${escText(meta.label)}">${escText(g)}</span>`;
-  }).join('');
+  const tilesHtml = info.graphemes
+    .map((g, i) => {
+      const meta = SOUND_META[sounds[i]] ?? SOUND_META.consonant;
+      return `<span class="wd-tile vs--${sounds[i]}" style="--tile-color:${meta.color}" aria-label="${escText(g)}, ${escText(meta.label)}">${escText(g)}</span>`;
+    })
+    .join('');
 
   const inBankBlock = info.foundInBank
     ? `<button class="btn btn--primary" type="button" data-action="add-review" ${info.alreadyTracked ? 'disabled' : ''}>
@@ -1761,16 +1917,22 @@ function _scrollIntoViewIfNeeded(el) {
     if (isOffscreen(rect, viewportH)) {
       el.scrollIntoView({ block: 'center', behavior: _scrollBehavior() });
     }
-  } catch (_) { /* JSDOM or older browsers — ignore */ }
+  } catch (_) {
+    /* JSDOM or older browsers — ignore */
+  }
 }
 
 /** Remove word-level highlighting from all word spans. */
 function _clearWordHighlight() {
-  _container?.querySelectorAll('.wf-word--active').forEach(el => el.classList.remove('wf-word--active'));
+  _container
+    ?.querySelectorAll('.wf-word--active')
+    .forEach((el) => el.classList.remove('wf-word--active'));
 }
 
 function _highlightLine(lineIndex) {
-  _container?.querySelectorAll('.sline--active').forEach(el => el.classList.remove('sline--active'));
+  _container
+    ?.querySelectorAll('.sline--active')
+    .forEach((el) => el.classList.remove('sline--active'));
   _clearWordHighlight();
   const el = _container?.querySelector(`[data-line="${lineIndex}"]`);
   if (el) {
@@ -1791,7 +1953,11 @@ function _highlightLine(lineIndex) {
  */
 function _applyTtsVoice(utt) {
   let voice;
-  try { voice = audio.getTtsVoice?.() || null; } catch (_) { voice = null; }
+  try {
+    voice = audio.getTtsVoice?.() || null;
+  } catch (_) {
+    voice = null;
+  }
   if (voice) {
     utt.voice = voice;
     utt.lang = voice.lang || 'en-GB';
@@ -1803,14 +1969,18 @@ function _applyTtsVoice(utt) {
 function _stopTTS() {
   _speaking = false;
   window.speechSynthesis?.cancel();
-  _container?.querySelectorAll('.sline--active').forEach(el => el.classList.remove('sline--active'));
+  _container
+    ?.querySelectorAll('.sline--active')
+    .forEach((el) => el.classList.remove('sline--active'));
   _clearWordHighlight();
   _toggleTTSButtons(false);
 }
 
 function _onTTSDone() {
   _speaking = false;
-  _container?.querySelectorAll('.sline--active').forEach(el => el.classList.remove('sline--active'));
+  _container
+    ?.querySelectorAll('.sline--active')
+    .forEach((el) => el.classList.remove('sline--active'));
   _clearWordHighlight();
   _toggleTTSButtons(false);
   // Mark story as read when TTS finishes
@@ -1844,20 +2014,26 @@ function _showComprehensionCheck(story) {
 
   _compShownSession.add(story.id);
   const question = story.talkAboutIt[0];
+  // Stories carry a retrieval question first and a thinking question second
+  // (inference, vocabulary in context, or the story's message). Only one is
+  // ever on screen — two at once is a lot for a young reader — but the second
+  // must be reachable, or authoring it was pointless.
+  const followUp = story.talkAboutIt[1] || '';
 
   const panel = document.createElement('div');
   panel.className = 'comp-check';
   panel.setAttribute('role', 'region');
   panel.setAttribute('aria-label', 'Comprehension check');
-  panel.innerHTML = /* html */`
+  panel.innerHTML = /* html */ `
     <h4>💬 Quick check</h4>
-    <div class="comp-q">${question}</div>
+    <div class="comp-q" id="comp-q">${question}</div>
     <div class="comp-choices">
       <button class="comp-choice" data-resp="confident" type="button">🙂 I can answer this</button>
       <button class="comp-choice" data-resp="reread" type="button">🤔 Let me re-read</button>
       <button class="comp-choice" data-resp="hint" type="button">💭 Show me where</button>
     </div>
     <div class="comp-feedback" id="comp-feedback" hidden></div>
+    ${followUp ? '<button class="comp-more" id="comp-more" type="button" hidden>💬 One more question</button>' : ''}
     <button class="comp-skip" id="comp-skip" type="button">Skip</button>
   `;
   content.appendChild(panel);
@@ -1865,12 +2041,12 @@ function _showComprehensionCheck(story) {
 
   const feedback = panel.querySelector('#comp-feedback');
 
-  panel.querySelectorAll('.comp-choice').forEach(btn => {
+  panel.querySelectorAll('.comp-choice').forEach((btn) => {
     btn.addEventListener('click', () => {
       const resp = btn.dataset.resp;
       _logComprehensionAttempt({ storyId: story.id, question, response: resp });
 
-      panel.querySelectorAll('.comp-choice').forEach(b => b.disabled = true);
+      panel.querySelectorAll('.comp-choice').forEach((b) => (b.disabled = true));
       btn.classList.add('correct'); // green outline regardless — this is a self-check
 
       if (resp === 'confident') {
@@ -1886,6 +2062,25 @@ function _showComprehensionCheck(story) {
         lastLine?.scrollIntoView({ behavior: _scrollBehavior(), block: 'center' });
       }
       feedback.hidden = false;
+      // Offer the thinking question once the first one is answered.
+      const more = panel.querySelector('#comp-more');
+      if (more) more.hidden = false;
+    });
+  });
+
+  panel.querySelector('#comp-more')?.addEventListener('click', () => {
+    const qEl = panel.querySelector('#comp-q');
+    if (qEl) qEl.textContent = followUp;
+    _logComprehensionAttempt({ storyId: story.id, question: followUp, response: 'followup' });
+    panel.querySelector('#comp-more')?.remove();
+    if (feedback) {
+      feedback.textContent = '💭 Have a think, then tell someone your answer.';
+      feedback.hidden = false;
+    }
+    // Re-open the choices so the child can respond to the new question.
+    panel.querySelectorAll('.comp-choice').forEach((b) => {
+      b.disabled = false;
+      b.classList.remove('correct');
     });
   });
 
@@ -1929,7 +2124,8 @@ function _openFriendsGallery() {
   modal.setAttribute('aria-modal', 'true');
   modal.setAttribute('aria-label', "Giri's Friends gallery");
 
-  const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
+  const escText = (s) =>
+    String(s ?? '').replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c]);
 
   // Group by band so the wall reads as a journey
   const byBand = new Map();
@@ -1941,8 +2137,10 @@ function _openFriendsGallery() {
   const sectionsHtml = Array.from(byBand.entries())
     .sort((a, b) => String(a[0]).localeCompare(String(b[0])))
     .map(([band, friends]) => {
-      const unlockedInBand = friends.filter(f => f.unlocked).length;
-      const tilesHtml = friends.map(f => `
+      const unlockedInBand = friends.filter((f) => f.unlocked).length;
+      const tilesHtml = friends
+        .map(
+          (f) => `
         <button class="sf-tile ${f.unlocked ? 'sf-tile--unlocked' : 'sf-tile--locked'}"
                 data-story-id="${escText(f.storyId)}"
                 ${f.unlocked ? '' : 'disabled aria-disabled="true"'}
@@ -1951,17 +2149,21 @@ function _openFriendsGallery() {
           <span class="sf-tile__name">${f.unlocked ? escText(f.name) : '???'}</span>
           ${f.unlocked ? `<span class="sf-tile__story">from ${escText(f.storyTitle)}</span>` : `<span class="sf-tile__story">${escText(f.storyTitle)}</span>`}
         </button>
-      `).join('');
+      `,
+        )
+        .join('');
       return `
         <div class="sf-band">
           <h3 class="sf-band__title">Band ${escText(band)} <small>${unlockedInBand}/${friends.length} met</small></h3>
           <div class="sf-grid">${tilesHtml}</div>
         </div>`;
-    }).join('');
+    })
+    .join('');
 
-  const intro = summary.unlocked === 0
-    ? "🐾 Read a Giri Story and the co-star moves in here. No friends yet — start with Band A!"
-    : `🐾 You've met <strong>${summary.unlocked}</strong> of <strong>${summary.total}</strong>. Tap a friend to re-read their story.`;
+  const intro =
+    summary.unlocked === 0
+      ? '🐾 Read a Giri Story and the co-star moves in here. No friends yet — start with Band A!'
+      : `🐾 You've met <strong>${summary.unlocked}</strong> of <strong>${summary.total}</strong>. Tap a friend to re-read their story.`;
 
   modal.innerHTML = `
     <div class="modal-panel">
@@ -1986,7 +2188,7 @@ function _openFriendsGallery() {
     modalManager.close('modal-story-friends');
     modal.remove();
   });
-  modal.addEventListener('click', e => {
+  modal.addEventListener('click', (e) => {
     if (e.target === modal) {
       modalManager.close('modal-story-friends');
       modal.remove();
@@ -1994,7 +2196,7 @@ function _openFriendsGallery() {
   });
 
   // Tap an unlocked tile → close the modal and open that story.
-  modal.querySelectorAll('.sf-tile--unlocked[data-story-id]').forEach(tile => {
+  modal.querySelectorAll('.sf-tile--unlocked[data-story-id]').forEach((tile) => {
     tile.addEventListener('click', () => {
       const storyId = tile.dataset.storyId;
       if (!storyId) return;
@@ -2009,7 +2211,7 @@ function _toggleTTSButtons(playing) {
   const play = document.getElementById('btn-story-play');
   const stop = document.getElementById('btn-story-stop');
   if (play) play.style.display = playing ? 'none' : '';
-  if (stop) stop.style.display = playing ? ''     : 'none';
+  if (stop) stop.style.display = playing ? '' : 'none';
   // While listening, mark the reader so CSS can collapse the hero
   // illustration and give the story body the space it needs (audit
   // finding #5 — hero is 250px tall on desktop and only matters
@@ -2018,31 +2220,46 @@ function _toggleTTSButtons(playing) {
   if (reader) reader.classList.toggle('story-reader--listening', playing);
 }
 
-const _delay = ms => new Promise(r => setTimeout(r, ms));
+const _delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ── Recording controls ────────────────────────────────────────────────────
 
 function _wireRecordingControls(story) {
-  const btnStart  = document.getElementById('btn-rec-start');
-  const btnStop   = document.getElementById('btn-rec-stop');
-  const btnPlay   = document.getElementById('btn-rec-play');
+  const btnStart = document.getElementById('btn-rec-start');
+  const btnStop = document.getElementById('btn-rec-stop');
+  const btnPlay = document.getElementById('btn-rec-play');
   const btnDelete = document.getElementById('btn-rec-delete');
-  const statusEl  = document.getElementById('recording-status');
+  const statusEl = document.getElementById('recording-status');
   if (!btnStart) return;
 
   function updateUI(state) {
-    btnStart.hidden  = state !== 'idle';
-    btnStop.hidden   = state !== 'recording';
-    btnPlay.hidden   = state !== 'recorded' && state !== 'playing';
+    btnStart.hidden = state !== 'idle';
+    btnStop.hidden = state !== 'recording';
+    btnPlay.hidden = state !== 'recorded' && state !== 'playing';
     btnDelete.hidden = state !== 'recorded' && state !== 'playing';
 
     if (statusEl) {
       switch (state) {
-        case 'recording': statusEl.textContent = '🔴 Recording...'; statusEl.className = 'recording-status recording-status--active'; break;
-        case 'recorded':  statusEl.textContent = '✓ Recording ready'; statusEl.className = 'recording-status recording-status--ready'; break;
-        case 'playing':   statusEl.textContent = '▶ Playing...'; statusEl.className = 'recording-status recording-status--playing'; break;
-        case 'error':     statusEl.textContent = '⚠ Microphone not available — check permissions'; statusEl.className = 'recording-status recording-status--error'; break;
-        default:          statusEl.textContent = ''; statusEl.className = 'recording-status'; break;
+        case 'recording':
+          statusEl.textContent = '🔴 Recording...';
+          statusEl.className = 'recording-status recording-status--active';
+          break;
+        case 'recorded':
+          statusEl.textContent = '✓ Recording ready';
+          statusEl.className = 'recording-status recording-status--ready';
+          break;
+        case 'playing':
+          statusEl.textContent = '▶ Playing...';
+          statusEl.className = 'recording-status recording-status--playing';
+          break;
+        case 'error':
+          statusEl.textContent = '⚠ Microphone not available — check permissions';
+          statusEl.className = 'recording-status recording-status--error';
+          break;
+        default:
+          statusEl.textContent = '';
+          statusEl.className = 'recording-status';
+          break;
       }
     }
 
@@ -2081,17 +2298,17 @@ function _wireRecordingControls(story) {
 
 function _wireEchoReadControls(story) {
   const btnStart = document.getElementById('btn-echo-start');
-  const btnNext  = document.getElementById('btn-echo-next');
-  const btnRec   = document.getElementById('btn-echo-rec');
-  const btnPlay  = document.getElementById('btn-echo-play');
-  const btnExit  = document.getElementById('btn-echo-stop');
+  const btnNext = document.getElementById('btn-echo-next');
+  const btnRec = document.getElementById('btn-echo-rec');
+  const btnPlay = document.getElementById('btn-echo-play');
+  const btnExit = document.getElementById('btn-echo-stop');
   const statusEl = document.getElementById('echo-read-status');
   if (!btnStart) return;
 
   // Filter to speakable lines only
   const speakableLines = story.lines
     .map((l, i) => ({ ...l, idx: i }))
-    .filter(l => l.type !== 'label' && l.type !== 'chapter' && l.text);
+    .filter((l) => l.type !== 'label' && l.type !== 'chapter' && l.text);
 
   let currentEchoIdx = -1;
 
@@ -2101,8 +2318,13 @@ function _wireEchoReadControls(story) {
     btnRec.hidden = true;
     btnPlay.hidden = true;
     btnExit.hidden = true;
-    if (statusEl) { statusEl.textContent = ''; statusEl.className = 'echo-read-status'; }
-    _container?.querySelectorAll('.sline--echo-active').forEach(el => el.classList.remove('sline--echo-active'));
+    if (statusEl) {
+      statusEl.textContent = '';
+      statusEl.className = 'echo-read-status';
+    }
+    _container
+      ?.querySelectorAll('.sline--echo-active')
+      .forEach((el) => el.classList.remove('sline--echo-active'));
     currentEchoIdx = -1;
     _echoLineIdx = -1;
   }
@@ -2110,12 +2332,17 @@ function _wireEchoReadControls(story) {
   function showEchoLine(echoIdx) {
     currentEchoIdx = echoIdx;
     const line = speakableLines[echoIdx];
-    if (!line) { resetEchoUI(); return; }
+    if (!line) {
+      resetEchoUI();
+      return;
+    }
 
     _echoLineIdx = line.idx;
 
     // Highlight the line
-    _container?.querySelectorAll('.sline--echo-active').forEach(el => el.classList.remove('sline--echo-active'));
+    _container
+      ?.querySelectorAll('.sline--echo-active')
+      .forEach((el) => el.classList.remove('sline--echo-active'));
     const lineEl = _container?.querySelector(`[data-line="${line.idx}"]`);
     if (lineEl) {
       lineEl.classList.add('sline--echo-active');
@@ -2165,14 +2392,23 @@ function _wireEchoReadControls(story) {
       onStateChange: (state) => {
         if (state === 'recording') {
           btnRec.textContent = '⏹ Stop Recording';
-          if (statusEl) { statusEl.textContent = '🔴 Recording...'; statusEl.className = 'echo-read-status echo-read-status--recording'; }
+          if (statusEl) {
+            statusEl.textContent = '🔴 Recording...';
+            statusEl.className = 'echo-read-status echo-read-status--recording';
+          }
         } else if (state === 'recorded') {
           btnRec.hidden = true;
           btnPlay.hidden = false;
           btnNext.hidden = currentEchoIdx >= speakableLines.length - 1;
-          if (statusEl) { statusEl.textContent = '✓ Great job!'; statusEl.className = 'echo-read-status echo-read-status--done'; }
+          if (statusEl) {
+            statusEl.textContent = '✓ Great job!';
+            statusEl.className = 'echo-read-status echo-read-status--done';
+          }
         } else if (state === 'error') {
-          if (statusEl) { statusEl.textContent = '⚠ Microphone not available'; statusEl.className = 'echo-read-status echo-read-status--error'; }
+          if (statusEl) {
+            statusEl.textContent = '⚠ Microphone not available';
+            statusEl.className = 'echo-read-status echo-read-status--error';
+          }
         }
       },
     });
@@ -2192,7 +2428,10 @@ function _wireEchoReadControls(story) {
     if (currentEchoIdx + 1 < speakableLines.length) {
       showEchoLine(currentEchoIdx + 1);
     } else {
-      if (statusEl) { statusEl.textContent = '🎉 Echo Read complete!'; statusEl.className = 'echo-read-status echo-read-status--done'; }
+      if (statusEl) {
+        statusEl.textContent = '🎉 Echo Read complete!';
+        statusEl.className = 'echo-read-status echo-read-status--done';
+      }
       btnNext.hidden = true;
       btnRec.hidden = true;
       setTimeout(resetEchoUI, 2000);
@@ -2212,14 +2451,14 @@ function _wireEchoReadControls(story) {
 function _startFluencyTimer() {
   if (_fluencyRunning) return;
   _fluencyRunning = true;
-  _fluencyStart   = Date.now();
+  _fluencyStart = Date.now();
   document.getElementById('btn-fluency-start').disabled = true;
-  document.getElementById('btn-fluency-done').disabled  = false;
+  document.getElementById('btn-fluency-done').disabled = false;
 
   _fluencyTimer = setInterval(() => {
     const elapsed = Math.floor((Date.now() - _fluencyStart) / 1000);
-    const mins  = Math.floor(elapsed / 60);
-    const secs  = elapsed % 60;
+    const mins = Math.floor(elapsed / 60);
+    const secs = elapsed % 60;
     const clock = document.getElementById('fluency-clock');
     if (clock) clock.textContent = `${mins}:${String(secs).padStart(2, '0')}`;
   }, 500);
@@ -2233,11 +2472,11 @@ function _startFluencyTimer() {
 function _stopFluencyTimer(wordCount, story) {
   if (!_fluencyRunning && _fluencyTimer === null) return;
   clearInterval(_fluencyTimer);
-  _fluencyTimer   = null;
+  _fluencyTimer = null;
   _fluencyRunning = false;
 
   document.getElementById('btn-fluency-start').disabled = false;
-  document.getElementById('btn-fluency-done').disabled  = true;
+  document.getElementById('btn-fluency-done').disabled = true;
 
   if (!wordCount || !_fluencyStart) return;
 
@@ -2245,9 +2484,9 @@ function _stopFluencyTimer(wordCount, story) {
   _fluencyStart = null;
   if (elapsedSec < 2) return; // Ignore accidental taps
 
-  const wcpm   = Math.round((wordCount / elapsedSec) * 60);
-  const mins   = Math.floor(elapsedSec / 60);
-  const secs   = Math.round(elapsedSec % 60);
+  const wcpm = Math.round((wordCount / elapsedSec) * 60);
+  const mins = Math.floor(elapsedSec / 60);
+  const secs = Math.round(elapsedSec % 60);
 
   // Save to fluency history
   if (story) {
@@ -2261,14 +2500,14 @@ function _stopFluencyTimer(wordCount, story) {
 
   // Benchmark guidance (Hasbrouck & Tindal norms, Grade 1 Spring ≈ 53 WCPM)
   let level;
-  if (wcpm >= 60)      level = '🌟 Fluent reader!';
+  if (wcpm >= 60) level = '🌟 Fluent reader!';
   else if (wcpm >= 40) level = '📈 Building fluency — great progress!';
-  else                  level = '📖 Keep practising — try reading it again!';
+  else level = '📖 Keep practising — try reading it again!';
 
   const result = document.getElementById('fluency-result');
   if (result) {
     result.hidden = false;
-    result.innerHTML = /* html */`
+    result.innerHTML = /* html */ `
       <div class="fluency-result-inner">
         <span class="fluency-time">Time: ${mins}:${String(secs).padStart(2, '0')}</span>
         <span class="fluency-wcpm"><strong>${wcpm}</strong> words/min</span>

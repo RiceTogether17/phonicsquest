@@ -5017,6 +5017,24 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-size: var(--font-size-sm);
   font-weight: 600;
 }
+/* The follow-up thinking question — offered only after the first is answered,
+   so a young reader never faces two questions at once. */
+.comp-check .comp-more {
+  display: block;
+  margin: var(--space-2) auto 0;
+  padding: 6px 14px;
+  border: 1px solid var(--color-primary, #4f46e5);
+  border-radius: var(--radius-pill, 999px);
+  background: transparent;
+  color: var(--color-primary, #4f46e5);
+  font-weight: 700;
+  cursor: pointer;
+}
+.comp-check .comp-more:hover,
+.comp-check .comp-more:focus-visible {
+  background: color-mix(in srgb, var(--color-primary, #4f46e5) 10%, transparent);
+}
+
 .comp-check .comp-skip {
   background: none;
   border: none;

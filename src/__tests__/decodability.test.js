@@ -97,10 +97,10 @@ describe('stripSuffix', () => {
 
 describe('requiredTier', () => {
   it('uses curated words.js graphemes when available', () => {
-    expect(requiredTier('cat')).toBe(1);   // c-a-t
-    expect(requiredTier('ship')).toBe(1);  // sh-i-p
-    expect(requiredTier('cake')).toBe(2);  // c-a_e-k
-    expect(requiredTier('rain')).toBe(2);  // r-ai-n
+    expect(requiredTier('cat')).toBe(1); // c-a-t
+    expect(requiredTier('ship')).toBe(1); // sh-i-p
+    expect(requiredTier('cake')).toBe(2); // c-a_e-k
+    expect(requiredTier('rain')).toBe(2); // r-ai-n
   });
 
   it('assigns r-controlled, diphthong and advanced patterns their tiers', () => {
@@ -196,7 +196,9 @@ describe('analyzeStory', () => {
   it('computes counts, ratio and stretch list for a synthetic story', () => {
     const story = {
       id: 'synthetic',
-      band: 'A', phase: 'short-a', allowedHFWTier: 1,
+      band: 'A',
+      phase: 'short-a',
+      allowedHFWTier: 1,
       lines: [
         { type: 'text', text: 'The cat sat on a chair.' },
         { type: 'refrain', text: 'Puff puff!' },
@@ -223,12 +225,27 @@ describe('countFocusGrapheme', () => {
 describe('findUnknownCapitalised', () => {
   it('flags unwhitelisted above-tier names but not decodable capitalised words', () => {
     const story = {
-      band: 'A', phase: 'short-a', allowedHFWTier: 1,
+      band: 'A',
+      phase: 'mixed-short',
+      allowedHFWTier: 1,
       lines: [{ type: 'text', text: 'The cat and Pike ran on Sand Hill.' }],
     };
     // 'Pike' needs tier 2 (i_e) and is not whitelisted; 'Sand' and 'Hill'
-    // are tier-1 decodable, so their capitalisation is fine.
+    // are tier-1 decodable once every short vowel is released, so their
+    // capitalisation is fine.
     expect(findUnknownCapitalised(story)).toEqual(['pike']);
+  });
+
+  it('also flags a name whose vowel the phase has not released yet', () => {
+    // At short-a a child has only met /a/, so "Hill" is no more readable
+    // than "Pike" — the vowel budget catches it even though it is tier 1.
+    const story = {
+      band: 'A',
+      phase: 'short-a',
+      allowedHFWTier: 1,
+      lines: [{ type: 'text', text: 'The cat and Pike ran on Sand Hill.' }],
+    };
+    expect(findUnknownCapitalised(story)).toEqual(['pike', 'hill']);
   });
 });
 
