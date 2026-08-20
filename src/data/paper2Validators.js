@@ -125,9 +125,15 @@ export function validateMcqItem(item, ctx) {
   }
 
   if (typeof item.q === 'string') {
+    // A stem is either a cloze with exactly one blank, or a direct question
+    // ("Which situation best shows …?"), which the modes render with
+    // question-appropriate framing and instructions. Anything else is a bug.
     const blanks = _countBlanks(item.q);
-    if (blanks !== 1) {
-      issues.push(`${tag}: question stem must contain exactly one "___" blank (found ${blanks})`);
+    const isDirectQuestion = blanks === 0 && /\?["'’”)\]]?$/.test(item.q.trim());
+    if (blanks !== 1 && !isDirectQuestion) {
+      issues.push(
+        `${tag}: question stem must contain exactly one "___" blank, or be a direct question (found ${blanks} blanks)`,
+      );
     }
     if (BANNED_PRACTICE_LEAKS.test(item.q)) {
       issues.push(`${tag}: question contains banned internal practice label text`);

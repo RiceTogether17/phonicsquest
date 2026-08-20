@@ -12505,6 +12505,15 @@ details.story-tool-section[open] > .story-tool-summary::before {
   border-top: 1px dashed color-mix(in srgb, var(--tf-accent) 30%, var(--border));
   color: var(--text-muted, #555);
 }
+/* The word card teaches the target word on every vocabulary reveal, so it
+   reads as a dictionary line rather than as part of the verdict. */
+.tf-section--wordcard {
+  margin-top: 4px;
+  padding: 4px 8px;
+  border-left: 3px solid color-mix(in srgb, var(--tf-accent) 45%, var(--border));
+  border-radius: var(--radius-sm, 6px);
+  background: color-mix(in srgb, var(--tf-accent) 8%, var(--surface));
+}
 
 .mcq-learn-tip {
   padding: var(--space-2) var(--space-3);
