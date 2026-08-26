@@ -1836,6 +1836,15 @@ body.bedtime-on * {
   animation: pulse-correct 0.4s var(--ease-bounce);
 }
 
+/* While the sentence is playing. Nothing else on this screen moves during
+   playback — the sentence is deliberately unprinted — so without this cue a
+   child who missed the opening word cannot tell audio from silence. */
+.wc-replay.is-speaking {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  animation: pulse-correct 0.9s var(--ease-bounce) infinite alternate;
+}
+
 .wc-chip-num {
   display: inline-flex;
   align-items: center;
@@ -1851,6 +1860,7 @@ body.bedtime-on * {
 
 @media (prefers-reduced-motion: reduce) {
   .choice-btn--emoji.previewing,
+  .wc-replay.is-speaking,
   .wc-chip {
     animation: none;
   }

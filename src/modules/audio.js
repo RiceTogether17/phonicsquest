@@ -571,6 +571,60 @@ class AudioManager {
   }
 
   /**
+   * Speak ONE word of a sentence as its own clearly-articulated token.
+   *
+   * Count the Words plays a sentence word by word, so the child hears four
+   * to seven separate utterances per round instead of one. That turns three
+   * small defaults of `speakWord` into a real listening problem:
+   *
+   *   • the 80 ms onset guard clips the opening consonant on Chrome and
+   *     Android (see `_speak`) — tolerable once, but here it happens on
+   *     EVERY word, and the worst-hit tokens are exactly the short function
+   *     words ("the", "can", "us") the child has to notice in order to
+   *     count them;
+   *   • rate 0.8 renders an isolated monosyllable as a ~250 ms blip with no
+   *     surrounding sentence to disambiguate it;
+   *   • the playful +10% pitch shifts the vowel formants, which is the same
+   *     reason `speakWordArticulated` drops back to neutral.
+   *
+   * So: neutral pitch, a longer onset guard, and a rate ceiling of 0.7 —
+   * slower than conversation, but deliberately NOT the 0.55 stretch used
+   * for phoneme work. A stretched "thuuuuh" stops sounding like a word,
+   * and word counting depends on each token still being heard as a word.
+   *
+   * Honours the user's voiceSpeed setting as a ceiling, never faster.
+   *
+   * @param {string} word
+   * @returns {Promise<void>}
+   */
+  speakSentenceWord(word) {
+    if (!store.get('sfxEnabled')) return Promise.resolve();
+    const key = String(word || '').trim();
+    // Function words carry the sight-word overrides ("a" is the schwa /ə/,
+    // not the letter name /eɪ/) and standing alone is exactly where TTS
+    // reaches for the letter name.
+    const override = SIGHT_WORD_PRONUNCIATIONS[key] || SIGHT_WORD_PRONUNCIATIONS[key.toLowerCase()];
+    if (override?.phoneme) return this._playPhonemeAudio(override.phoneme);
+
+    const userRate = store.get('voiceSpeed') ?? 0.8;
+    const rate = Math.min(userRate, 0.7);
+    return this._speak(override?.tts ?? key, rate, { pitch: 1.0, preDelayMs: 150 });
+  }
+
+  /**
+   * Stop any utterance still in flight.
+   *
+   * `_speak` cancels before it speaks, so a NEXT utterance always clears the
+   * previous one — but nothing clears the last one when a mode is torn down,
+   * leaving the voice talking over the screen the child just moved to.
+   */
+  cancelSpeech() {
+    if (window.speechSynthesis) {
+      try { speechSynthesis.cancel(); } catch (err) { devWarn('Cancel failed:', err.message); }
+    }
+  }
+
+  /**
    * The classroom "say it twice" model for phonemic-awareness prompts:
    * once slow and fully articulated, a beat of silence, then again at a
    * gentler near-natural rate so the child hears the word both ways
