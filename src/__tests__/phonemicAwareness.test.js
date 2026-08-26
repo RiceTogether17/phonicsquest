@@ -223,7 +223,8 @@ describe('first/last/middle sound modes hide print during the question', () => {
     // Choice buttons must not contain the bare letter 'C'.
     const labels = [...els.modeArea.querySelectorAll('.choice-btn-phoneme')].map(e => e.textContent);
     expect(labels.length).toBe(4);
-    expect(labels).toContain('/c/');
+    // The button shows the SOUND the letter makes: "c" says /k/.
+    expect(labels).toContain('/k/');
     for (const label of labels) {
       expect(label).toMatch(/^\/[a-z]+\/$/); // /lowercase-only/
     }

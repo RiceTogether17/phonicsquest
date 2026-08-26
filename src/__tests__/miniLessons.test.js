@@ -20,7 +20,10 @@ import { VOCAB_CATEGORIES, VOCAB_CATEGORY_KEYS } from '../data/vocabCategories.j
 import { buildGrammarMcqLevel, GRAMMAR_MCQ_LEVELS } from '../data/grammarMcq.js';
 import { buildVocabMcqLevel, VOCAB_MCQ_LEVELS } from '../data/vocabMcq.js';
 
-const VALID_CHIP_TYPES = ['c', 'sv', 'lv', 'd', 'bl', 'se', 'rc', 'dp', 'sf', 'p'];
+// soft_c / soft_g are as playable as any other chip type — both have their
+// own MP3 in public/audio/phonemes — they just had no lesson using them
+// until the soft c/g stage existed.
+const VALID_CHIP_TYPES = ['c', 'sv', 'lv', 'd', 'bl', 'se', 'rc', 'dp', 'sf', 'p', 'soft_c', 'soft_g'];
 
 describe('phonics mini-lessons', () => {
   const wordSet = new Set(WORDS.map(w => w.word));

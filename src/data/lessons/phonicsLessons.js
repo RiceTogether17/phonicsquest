@@ -76,6 +76,23 @@ export const PHONICS_LESSONS = {
     weDoWord: 'sun',
     confusions: ['Short U (up) and short O (on) sound close. /u/ is lazy and relaxed; /o/ is round.'],
   },
+  'cvc-mixed': {
+    headline: 'All five short vowels, mixed up',
+    soundChips: [
+      { g: 'a', type: 'sv', label: 'ă' },
+      { g: 'e', type: 'sv', label: 'ĕ' },
+      { g: 'i', type: 'sv', label: 'ĭ' },
+      { g: 'o', type: 'sv', label: 'ŏ' },
+      { g: 'u', type: 'sv', label: 'ŭ' },
+    ],
+    script: [
+      'Until now every word in a set had the SAME middle sound. Not any more!',
+      'Now it could be any of the five: a, e, i, o, u. You have to listen.',
+      'Try it: f… o… g — fog. The middle sound is /o/. Next one might not be!',
+    ],
+    weDoWord: 'fog',
+    confusions: ['Guessing the vowel from the last word is the trap here — this set changes it every time.'],
+  },
 
   /* ── Phase 2 · CCVC initial blends ──────────────────────────────── */
   'ccvc-a': {
@@ -133,6 +150,20 @@ export const PHONICS_LESSONS = {
     weDoWord: 'drum',
     confusions: [],
   },
+  'ccvc-mixed': {
+    headline: 'Blends first, then any short vowel',
+    soundChips: [
+      { g: 'sl', type: 'bl', label: 'sl' },
+      { g: 'i', type: 'sv', label: 'ĭ' },
+    ],
+    script: [
+      'Two consonant friends at the front, and now the middle sound keeps changing.',
+      'Say the blend, then really listen for the vowel: c… l… i… p — clip.',
+      'Slam, bled, slim, clog, stud — five words, five different middle sounds.',
+    ],
+    weDoWord: 'clip',
+    confusions: ['Say both blend sounds, then stop and listen — the vowel is not the one from last time.'],
+  },
 
   /* ── Phase 3 · CVCC final blends ────────────────────────────────── */
   'cvcc-a': {
@@ -189,6 +220,20 @@ export const PHONICS_LESSONS = {
     ],
     weDoWord: 'jump',
     confusions: [],
+  },
+  'cvcc-mixed': {
+    headline: 'Blends at the end, any short vowel',
+    soundChips: [
+      { g: 'a', type: 'sv', label: 'ă' },
+      { g: 'nd', type: 'bl', label: 'nd' },
+    ],
+    script: [
+      'These words end with two consonant friends, and the middle sound is a surprise.',
+      'Listen right through: l… a… n… d — land. Middle sound /a/, ending /nd/.',
+      'Land, lend, fist, fond, gust — the ending changes AND the vowel changes.',
+    ],
+    weDoWord: 'land',
+    confusions: ['Two things move at once here: the vowel and the end blend. Take the word one sound at a time.'],
   },
 
   /* ── Phase 4 · Digraphs ─────────────────────────────────────────── */
@@ -265,6 +310,21 @@ export const PHONICS_LESSONS = {
     ],
     weDoWord: 'trust',
     confusions: [],
+  },
+  'ccvcc-mixed': {
+    headline: 'Blends both ends, any short vowel',
+    soundChips: [
+      { g: 'st', type: 'bl', label: 'st' },
+      { g: 'a', type: 'sv', label: 'ă' },
+      { g: 'nd', type: 'bl', label: 'nd' },
+    ],
+    script: [
+      'The hardest set: two friends at the front, two at the end, any vowel between.',
+      'Go slowly: s… t… a… n… d — stand. Five sounds, all of them count.',
+      'Bland, spend, clink, frond, slump — listen for the middle each time.',
+    ],
+    weDoWord: 'stand',
+    confusions: ['With blends on both sides it is easy to lose the vowel in the middle. Say it out loud on its own.'],
   },
 
   /* ── Phase 6 · Long vowels ──────────────────────────────────────── */
@@ -536,6 +596,22 @@ export const PHONICS_LESSONS = {
     ],
     weDoWord: 'phone',
     confusions: ['Do not sound p and h separately \u2014 together they make one sound, /f/.'],
+  },
+  'cons-soft-cg': {
+    headline: 'When c says /s/ and g says /j/',
+    soundChips: [
+      { g: 'c', type: 'soft_c', label: 's' },
+      { g: 'g', type: 'soft_g', label: 'j' },
+    ],
+    script: [
+      'You know c says /k/ and g says /g/. But look what an e, i or y does!',
+      'Right after c or g, they go soft: c says /s/ and g says /j/.',
+      'r… i… ce — rice, not "rike". p… a… ge — page, not "pag".',
+    ],
+    weDoWord: 'rice',
+    confusions: [
+      'Reading "gem" as /gem/ is the usual slip. Check the next letter: e, i or y means soft.',
+    ],
   },
 
   /* ── Phase 9 · Suffixes ─────────────────────────────────────────── */

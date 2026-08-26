@@ -6,7 +6,9 @@ const wordById = (id) => WORDS.find(w => w.id === id);
 describe('derivePhonemes()', () => {
   describe('regular CVC', () => {
     it('counts each grapheme as one phoneme', () => {
-      expect(derivePhonemes(wordById('cat'))).toEqual(['/c/', '/a/', '/t/']);
+      // Notation is the SOUND, so the "c" of cat reads /k/ — the letter name
+      // is not one of English's phonemes.
+      expect(derivePhonemes(wordById('cat'))).toEqual(['/k/', '/a/', '/t/']);
       expect(derivePhonemes(wordById('hat'))).toEqual(['/h/', '/a/', '/t/']);
     });
   });
@@ -21,7 +23,7 @@ describe('derivePhonemes()', () => {
 
   describe('silent-e words', () => {
     it('drops the silent e from the phoneme count', () => {
-      expect(derivePhonemes(wordById('cake'))).toEqual(['/c/', '/a/', '/k/']);
+      expect(derivePhonemes(wordById('cake'))).toEqual(['/k/', '/a/', '/k/']);
       expect(derivePhonemes(wordById('kite'))).toEqual(['/k/', '/i/', '/t/']);
       expect(derivePhonemes(wordById('tune'))).toEqual(['/t/', '/u/', '/n/']);
     });

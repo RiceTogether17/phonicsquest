@@ -58,6 +58,50 @@ export function isStageHiddenForMode(group, mode) {
 const VOWEL_TYPES = new Set(['sv', 'lv', 'rc', 'dp']);
 
 /**
+ * Does the word contain a digraph tile (sh, ch, th, wh, ck, ng, ph, tch, dge)?
+ *
+ * Digraph words have their own curriculum stage, taught after the blend
+ * stages. Counting a digraph as one sound (see getWordStructure) already
+ * stops "cash" being filed as CVCC, but on its own that would only move it
+ * into cvc-a — a Phase 1 stage, well ahead of where sh is taught. So the
+ * structural short-vowel stages leave digraph words to the stage that owns
+ * them. Nothing is lost: all 220 of them live there.
+ */
+function hasDigraph(word) {
+  return Array.isArray(word?.types) && word.types.includes('d');
+}
+
+/**
+ * Does the word use c or g for its soft sound?
+ *
+ * Soft c and g are a spelling rule of their own — c says /s/ and g says /j/
+ * before e, i and y. Left in the structural short-vowel stages they are
+ * traps: a child working through the short-e CVC set has just been taught
+ * that g says /g/, meets "gem", reads it that way, and is marked wrong.
+ * They now have a stage that teaches the rule before testing it.
+ */
+function hasSoftCG(word) {
+  return Array.isArray(word?.types)
+    && word.types.some((t) => t === 'soft_c' || t === 'soft_g');
+}
+
+const FIVE_SHORT_VOWELS = new Set(['a', 'e', 'i', 'o', 'u']);
+
+/**
+ * Is this one of the five short vowels the structural stages teach?
+ *
+ * `types.includes('sv')` alone is too loose for the mixed-vowel stages: it
+ * also admits the short-oo of "book" and "stood" (which has its own stage)
+ * and irregulars whose grapheme split gives a vowel letter the stage never
+ * meant — "said" as /ai/, "does" as /oe/. The per-vowel stages never saw
+ * these because they match a specific letter; the mixed stages have to say
+ * so explicitly or the jumble stops being a jumble of five.
+ */
+function isFiveShortVowelWord(word) {
+  return FIVE_SHORT_VOWELS.has(getShortVowelLetter(word));
+}
+
+/**
  * Does the word have a genuine medial vowel — a vowel phoneme that is
  * neither the first nor the last sound? Middle Sound can only ask an
  * honest question about such words: from the long-vowel stages onward
@@ -153,7 +197,15 @@ class Progress {
     const lvl = (w) => maxLevel == null || w.level <= maxLevel;
 
     if (group === 'struct-cvc') {
-      return WORDS.filter((w) => w.pattern === 'CVC' && w.types.includes('sv') && lvl(w));
+      return WORDS.filter(
+        (w) =>
+          getWordStructure(w) === 'CVC' &&
+          isFiveShortVowelWord(w) &&
+          !w.types.includes('sf') &&
+          !hasDigraph(w) &&
+          !hasSoftCG(w) &&
+          lvl(w),
+      );
     }
     if (group === 'struct-ccvc') {
       // Structure, not the coarse `pattern:'blend'` flag: that flag is set on
@@ -164,30 +216,41 @@ class Progress {
       return WORDS.filter(
         (w) =>
           getWordStructure(w) === 'CCVC' &&
-          w.types.includes('sv') &&
+          isFiveShortVowelWord(w) &&
           !w.types.includes('sf') &&
+          !hasDigraph(w) &&
+          !hasSoftCG(w) &&
           lvl(w),
       );
     }
     if (group === 'struct-cvcc') {
       return WORDS.filter(
         (w) =>
-          (w.group === 'struct-cvcc' ||
-            (getWordStructure(w) === 'CVCC' &&
-              w.types.includes('sv') &&
-              !w.types.includes('sf'))) &&
+          getWordStructure(w) === 'CVCC' &&
+          isFiveShortVowelWord(w) &&
+          !w.types.includes('sf') &&
+          !hasDigraph(w) &&
+          !hasSoftCG(w) &&
           lvl(w),
       );
     }
     if (group === 'struct-ccvcc') {
       return WORDS.filter(
         (w) =>
-          (w.group === 'struct-ccvcc' ||
-            (getWordStructure(w) === 'CCVCC' &&
-              w.types.includes('sv') &&
-              !w.types.includes('sf'))) &&
+          getWordStructure(w) === 'CCVCC' &&
+          isFiveShortVowelWord(w) &&
+          !w.types.includes('sf') &&
+          !hasDigraph(w) &&
+          !hasSoftCG(w) &&
           lvl(w),
       );
+    }
+
+    // The soft-c/g stage collects the rule wherever it appears, so "race"
+    // and "ice" show up here as well as in their long-vowel stages — that
+    // stage teaches a_e, this one teaches that c says /s/.
+    if (group === 'cons-soft-cg') {
+      return WORDS.filter((w) => hasSoftCG(w) && lvl(w));
     }
 
     const structMatch = group.match(/^(cvc|ccvc|cvcc|ccvcc)-([aeiou])$/);
@@ -199,6 +262,8 @@ class Progress {
           getWordStructure(w) === struct &&
           getShortVowelLetter(w) === vowel &&
           !w.types.includes('sf') &&
+          !hasDigraph(w) &&
+          !hasSoftCG(w) &&
           lvl(w),
       );
     }
@@ -394,18 +459,11 @@ class Progress {
   _updateGroupMastery(group) {
     const stats = store.get('wordStats') || {};
 
-    // Determine which words count toward this group
-    let groupWords;
-    const structMatch = group.match(/^(cvc|ccvc|cvcc|ccvcc)-([aeiou])$/);
-    if (structMatch) {
-      const struct = structMatch[1].toUpperCase();
-      const vowel = structMatch[2];
-      groupWords = WORDS.filter(
-        (w) => getWordStructure(w) === struct && getShortVowelLetter(w) === vowel,
-      );
-    } else {
-      groupWords = WORDS.filter((w) => w.group === group);
-    }
+    // One definition of "the words in this group", shared with the stage
+    // picker. It used to be restated here without the exclusions, so mastery
+    // for cvcc-a was scored over a set that included every digraph word the
+    // stage no longer serves — a bar the child could not move.
+    const groupWords = this._filterByGroup(group);
 
     let totalAttempts = 0;
     let totalCorrect = 0;
