@@ -49,6 +49,7 @@ export const WORD_GROUPS = {
   'r-controlled': { label: 'R-Controlled', color: '#b45309', bg: '#fef3c7', icon: '🎯', audioFile: null },
   'cons-tch-dge': { label: 'tch / dge',   color: '#8b5cf6', bg: '#ede9fe', icon: '🪝', audioFile: null },
   'cons-ph':      { label: 'ph says /f/', color: '#8b5cf6', bg: '#ede9fe', icon: '📱', audioFile: null },
+  'cons-soft-cg': { label: 'soft c / soft g', color: '#8b5cf6', bg: '#ede9fe', icon: '🧊', audioFile: null },
 
   // ── Structural patterns (cross-cut the vowel groups) ──────────────────
   'struct-cvc':   { label: 'CVC',       color: '#64748b', bg: '#f1f5f9', icon: '🔤', audioFile: null },
@@ -264,6 +265,38 @@ const PHONEME_OVERRIDES = Object.freeze({
 });
 
 /**
+ * Spellings whose letters do not name the sound they make.
+ *
+ * Notation should read as the SOUND, because that is what these labels
+ * claim to be: a choice button in the phonemic-awareness modes says "/…/",
+ * so "/ck/" or "/dge/" is a promise it does not keep. The child hears /k/
+ * and /j/. Mirrors the audio aliases in audio.js PHONEME_FILES — same
+ * spellings, same sounds — so what is shown matches what is played.
+ */
+const CONSONANT_SOUNDS = Object.freeze({
+  c:   'k',    // cat, cup — the letter is "c", the sound is /k/
+  ck:  'k',
+  q:   'kw',
+  wh:  'w',
+  ph:  'f',
+  tch: 'ch',
+  dge: 'j',
+  ll:  'l',
+  ss:  's',
+  tt:  't',
+  nn:  'n',
+  gg:  'g',
+  ff:  'f',
+  dd:  'd',
+  zz:  'z',
+  bb:  'b',
+  pp:  'p',
+  mm:  'm',
+  rr:  'r',
+  se:  's',
+});
+
+/**
  * Phonemes contributed by a single grapheme of the given type.
  * @param {string} grapheme
  * @param {string} type
@@ -285,14 +318,20 @@ function _phonemesForGrapheme(grapheme, type) {
     // per-letter if the prefix isn't curated.
     case 'p':  return PREFIX_PHONEMES[grapheme.toLowerCase()]
                   || [...grapheme].map(ch => `/${ch}/`);
-    case 'bl': return [...grapheme].map(ch => `/${ch}/`);    // blend: each letter is one sound
-    case 'c':  return grapheme === 'x' ? ['/k/', '/s/'] : [`/${grapheme}/`];
+    // Blend: each letter is its own sound — and "cl" opens with /k/, not /c/.
+    case 'bl': return [...grapheme].map(ch => `/${CONSONANT_SOUNDS[ch] ?? ch}/`);
+    case 'c':  return grapheme === 'x'
+                  ? ['/k/', '/s/']
+                  : [`/${CONSONANT_SOUNDS[grapheme] ?? grapheme}/`];
     // Soft consonants render as the sound they make, not the letter:
     //   gem  = /j/+/e/+/m/   (not /g/)
     //   rice = /r/+/ī/+/s/   (not /c/)
     case 'soft_c': return ['/s/'];
     case 'soft_g': return ['/j/'];
-    // 'd' digraph, 'dp' diphthong, 'rc' r-controlled, 'sv' short vowel, 'lv' long vowel: 1 sound
+    // 'd' digraph: one sound, but several digraphs are spelled with letters
+    // that name a different sound — ck says /k/, ph says /f/, tch says /ch/.
+    case 'd':  return [`/${CONSONANT_SOUNDS[grapheme] ?? grapheme}/`];
+    // 'dp' diphthong, 'rc' r-controlled, 'sv' short vowel, 'lv' long vowel: 1 sound
     default:   return [`/${grapheme}/`];
   }
 }
@@ -331,6 +370,24 @@ export function derivePhonemes(word) {
     result.push(...chunk);
   }
   return result;
+}
+
+/**
+ * Notation for ONE grapheme, as the sound it makes.
+ *
+ * "g" typed soft_g reads /j/, "ck" reads /k/, "tch" reads /ch/. Used by the
+ * sound-first choice buttons, which would otherwise print the spelling
+ * inside slashes and tell the child that "g" is a sound in "gem".
+ *
+ * Returns an array because a few graphemes are genuinely two phonemes
+ * (x → /k/+/s/); callers rendering a single label can join them.
+ *
+ * @param {string} grapheme
+ * @param {string} type
+ * @returns {string[]}
+ */
+export function phonemeNotation(grapheme, type) {
+  return _phonemesForGrapheme(grapheme, type);
 }
 
 // ── Spelling-pattern derivation (long vowels + diphthongs micro-stages) ─────
@@ -569,7 +626,7 @@ const NAMED_STAGE_GROUPS = Object.freeze(new Set([
   'suffixes-advanced',
   'sight-highfreq',
   'suffix-ing', 'suffix-ed', 'suffix-er', 'suffix-est',
-  'cons-tch-dge', 'cons-ph',
+  'cons-tch-dge', 'cons-ph', 'cons-soft-cg',
   'short-oo',
 ]));
 
@@ -1162,6 +1219,27 @@ export const WORDS = [
   { id:'alphabet', word:'alphabet', graphemes:['a','l','ph','a','b','e','t'], types:['sv','c','d','sv','c','sv','c'], pattern:'digraph', group:'cons-ph', level:2, emoji:'🔠' },
   { id:'trophy',   word:'trophy',   graphemes:['t','r','o','ph','y'],         types:['bl','bl','lv','d','lv'],    pattern:'digraph', group:'cons-ph', level:2, emoji:'🏆' },
   { id:'phonics',  word:'phonics',  graphemes:['ph','o','n','i','c','s'],     types:['d','sv','c','sv','c','c'],  pattern:'digraph', group:'cons-ph', level:2, emoji:'🔤' },
+  // ── Soft c and soft g (Phase 8) ────────────────────────────────────────
+  // c and g say /s/ and /j/ before e, i and y. Until now these words were
+  // scattered — "gem" sat in the short-e CVC set and "gist" in a blend set,
+  // where a child reading them by the rule they had just been taught (c says
+  // /k/, g says /g/) gets them wrong and is told they are wrong. They are a
+  // spelling rule in their own right and now have their own stage.
+  { id:'cent',   word:'cent',   graphemes:['c','e','n','t'],   types:['soft_c','sv','c','c'],       pattern:'CVC',  group:'cons-soft-cg', level:3, emoji:'🪙' },
+  { id:'rice',   word:'rice',   graphemes:['r','i','c','e'],   types:['c','lv','soft_c','se'],      pattern:'CVCe', group:'cons-soft-cg', level:3, emoji:'🍚' },
+  { id:'mice',   word:'mice',   graphemes:['m','i','c','e'],   types:['c','lv','soft_c','se'],      pattern:'CVCe', group:'cons-soft-cg', level:3, emoji:'🐭' },
+  { id:'nice',   word:'nice',   graphemes:['n','i','c','e'],   types:['c','lv','soft_c','se'],      pattern:'CVCe', group:'cons-soft-cg', level:3, emoji:'😊' },
+  { id:'face',   word:'face',   graphemes:['f','a','c','e'],   types:['c','lv','soft_c','se'],      pattern:'CVCe', group:'cons-soft-cg', level:3, emoji:'😀' },
+  { id:'place',  word:'place',  graphemes:['pl','a','c','e'],  types:['bl','lv','soft_c','se'],     pattern:'CVCe', group:'cons-soft-cg', level:3, emoji:'📍' },
+  { id:'space',  word:'space',  graphemes:['sp','a','c','e'],  types:['bl','lv','soft_c','se'],     pattern:'CVCe', group:'cons-soft-cg', level:3, emoji:'🚀' },
+  { id:'dance',  word:'dance',  graphemes:['d','a','n','c','e'], types:['c','sv','c','soft_c','se'], pattern:'CVCe', group:'cons-soft-cg', level:3, emoji:'💃' },
+  { id:'prince', word:'prince', graphemes:['pr','i','n','c','e'], types:['bl','sv','c','soft_c','se'], pattern:'CVCe', group:'cons-soft-cg', level:3, emoji:'🤴' },
+  { id:'cage',   word:'cage',   graphemes:['c','a','g','e'],   types:['c','lv','soft_g','se'],      pattern:'CVCe', group:'cons-soft-cg', level:3, emoji:'🐦' },
+  { id:'page',   word:'page',   graphemes:['p','a','g','e'],   types:['c','lv','soft_g','se'],      pattern:'CVCe', group:'cons-soft-cg', level:3, emoji:'📄' },
+  { id:'stage',  word:'stage',  graphemes:['st','a','g','e'],  types:['bl','lv','soft_g','se'],     pattern:'CVCe', group:'cons-soft-cg', level:3, emoji:'🎭' },
+  { id:'large',  word:'large',  graphemes:['l','ar','g','e'],  types:['c','rc','soft_g','se'],      pattern:'CVCe', group:'cons-soft-cg', level:3, emoji:'🐘' },
+  { id:'hinge',  word:'hinge',  graphemes:['h','i','n','g','e'], types:['c','sv','c','soft_g','se'], pattern:'CVCe', group:'cons-soft-cg', level:3, emoji:'🚪' },
+  { id:'change', word:'change', graphemes:['ch','a','n','g','e'], types:['d','lv','c','soft_g','se'], pattern:'CVCe', group:'cons-soft-cg', level:3, emoji:'🔄' },
   { id:'chip',  word:'chip',  graphemes:['ch','i','p'],  types:['d','sv','c'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🍟' },
   { id:'chop',  word:'chop',  graphemes:['ch','o','p'],  types:['d','sv','c'],  pattern:'digraph', group:'digraphs', level:2, emoji:'🔪' },
   { id:'chat',  word:'chat',  graphemes:['ch','a','t'],  types:['d','sv','c'],  pattern:'digraph', group:'digraphs', level:2, emoji:'💬' },
@@ -2129,12 +2207,19 @@ export function getWordStructure(word) {
 
   if (leadTypes.length === 0 || trailTypes.length === 0) return 'other';
 
-  // soft_c / soft_g are still simple single-grapheme consonants
-  // structurally — only their sound differs from hard c/g.
-  const isSimpleConsonant = (t) => t === 'c' || t === 'soft_c' || t === 'soft_g';
-  const leadComplex  = leadTypes.some(t => t === 'bl' || t === 'd');
+  // Structure is counted in SOUNDS, not letters.
+  //
+  // soft_c / soft_g are simple single-grapheme consonants — only their sound
+  // differs from hard c/g. A digraph is likewise ONE consonant sound: that is
+  // the whole difference between a digraph and a blend. Counting 'd' as
+  // complex made "cash" (c|a|sh) a CVCC word, so the final-blend stages
+  // filled up with words that have no final blend to practise — cvcc-a was
+  // 26 of 36, and a child sent there to work on -nd/-mp/-st mostly met sh
+  // and tch instead. Those words have their own stage.
+  const isSimpleConsonant = (t) => t === 'c' || t === 'soft_c' || t === 'soft_g' || t === 'd';
+  const leadComplex  = leadTypes.some(t => t === 'bl');
   const leadSimple   = leadTypes.length === 1 && isSimpleConsonant(leadTypes[0]);
-  const trailComplex = trailTypes.some(t => t === 'bl' || t === 'd');
+  const trailComplex = trailTypes.some(t => t === 'bl');
   const trailSimple  = trailTypes.length === 1 && isSimpleConsonant(trailTypes[0]);
 
   if (leadSimple  && trailSimple)  return 'CVC';

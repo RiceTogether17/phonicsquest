@@ -182,6 +182,9 @@ const PATTERN_CHECKS = [
   // Late consonant spellings
   { match: /^cons-tch-dge$/, test: (w) => /(tch|dge)/.test(w) },
   { match: /^cons-ph$/, test: (w) => /ph/.test(w) },
+  // Soft c / soft g: the letter must be followed by e, i or y — that is the
+  // rule, and a sample where it isn't would be a hard c or g in disguise.
+  { match: /^cons-soft-cg$/, test: (w) => /[cg][eiy]/.test(w) },
 
   // Suffixes
   { match: /^suffix-ing$/, test: (w) => /ing$/.test(w) },
@@ -192,6 +195,14 @@ const PATTERN_CHECKS = [
   // Morphology
   { match: /^prefixes$/, test: (w) => /^(re|un)/.test(w) },
   { match: /^suffixes-advanced$/, test: (w) => /(tion|sion|able|ible)/.test(w) },
+
+  // Mixed-vowel stages: same single-short-vowel-run rule as the per-vowel
+  // stages, but the vowel is free — and the samples must actually span more
+  // than one, or the set still telegraphs the answer it exists to hide.
+  {
+    match: /^(cvc|ccvc|cvcc|ccvcc)-mixed$/,
+    test: (w) => _vowelRuns(w) === 1 && /^[a-z]+$/.test(w),
+  },
 
   // Stages we accept on faith (mixed-review, multi-syllabic, sight)
   { match: /^(blends-review|blends|multisyllable|sight-highfreq)$/, test: () => true },
@@ -204,6 +215,19 @@ function findCheck(stageId) {
   }
   return null;
 }
+
+describe('mixed-vowel stages really are mixed', () => {
+  for (const stage of CURRICULUM.filter(s => s.id.endsWith('-mixed'))) {
+    it(`${stage.id} — sample words span at least four short vowels`, () => {
+      // The whole point of these stages: a class that meets only short-A
+      // words works out that the answer is always /a/ and stops listening.
+      const vowels = new Set(
+        (stage.sampleWords || []).map(w => (String(w).toLowerCase().match(/[aeiou]+/) || [''])[0]),
+      );
+      expect(vowels.size, `${stage.id} vowels: ${[...vowels]}`).toBeGreaterThanOrEqual(4);
+    });
+  }
+});
 
 describe('sample words match stage pattern', () => {
   for (const stage of CURRICULUM) {

@@ -21,6 +21,7 @@
  */
 
 import { audio } from '../modules/audio.js';
+import { phonemeNotation } from '../data/words.js';
 
 /** Pending auto-play preview timer ids, so a new round (or the child's first
  *  tap) can cancel previews that haven't fired yet. Without this, timers from
@@ -83,7 +84,10 @@ export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
     btn.className = 'choice-btn choice-btn--phoneme';
     btn.dataset.correct  = String(!!choice.correct);
     btn.dataset.grapheme = choice.grapheme;
-    btn.setAttribute('aria-label', `Sound option. Tap to choose.`);
+    btn.setAttribute(
+      'aria-label',
+      `Sound option ${phonemeNotation(choice.grapheme, choice.type).join(' ')}. Tap to choose.`,
+    );
 
     const speaker = document.createElement('span');
     speaker.className = 'choice-btn-speaker';
@@ -92,7 +96,11 @@ export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
 
     const label = document.createElement('span');
     label.className = 'choice-btn-phoneme';
-    label.textContent = `/${choice.grapheme}/`;
+    // The SOUND, not the spelling. These buttons print inside slashes, which
+    // is a claim about sound: "/g/" on the answer to "gem" tells the child
+    // that g says /g/ there, when the button they are about to hear says
+    // /j/. Same for /ck/, /tch/, /dge/, /ph/.
+    label.textContent = phonemeNotation(choice.grapheme, choice.type).join('');
 
     btn.appendChild(speaker);
     btn.appendChild(label);

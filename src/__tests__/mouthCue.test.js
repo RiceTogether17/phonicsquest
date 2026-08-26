@@ -26,7 +26,11 @@ describe('mapping coverage', () => {
 
     const unmapped = [...used].filter(p => !PHONEME_MOUTH[p]);
     expect(unmapped, `unmapped phonemes: ${unmapped.join(' ')}`).toEqual([]);
-    expect(used.size).toBeGreaterThan(60);
+    // The distinct count is a floor, not a target. It dropped from ~66 to 55
+    // when notation moved from spellings to sounds: /ck/ /c/ and /k/ are one
+    // phoneme, as are /ph/ and /f/, /tch/ and /ch/, /dge/ and /j/. Fewer
+    // entries, same coverage — the assertion that matters is `unmapped`.
+    expect(used.size).toBeGreaterThan(50);
   });
 
   it('only references shapes that actually exist', () => {

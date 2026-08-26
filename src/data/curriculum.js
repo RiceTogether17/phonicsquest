@@ -384,6 +384,19 @@ export const CURRICULUM = [
     recommendedModes: ['middle', 'blend', 'segment', 'hear'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
+  {
+    id: 'cvc-mixed', phase: 1,
+    name: 'CVC – Mixed Vowels',
+    description: 'All five short vowels jumbled: cat, pen, pig, dog, bug…',
+    icon: '🎲', group: 'struct-cvc', level: 1,
+    requiredMastery: 0.70, prerequisite: 'cvc-u',
+    learningOutcome: 'Hear and decode any short vowel when the set no longer tells you which one to expect.',
+    targetSounds: ['short a /ă/', 'short e /ĕ/', 'short i /ĭ/', 'short o /ŏ/', 'short u /ŭ/'],
+    sampleWords: ['mat', 'fed', 'dig', 'fog', 'dug', 'sat', 'beg', 'jug'],
+    sentenceExamples: ['A rat sat on the mat.', 'The pup dug in the fog.'],
+    recommendedModes: ['middle', 'first', 'last', 'soundCount', 'segment', 'hear'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
 
   /* ── Phase 2: CCVC by vowel ─────────────────────────────────────── */
   {
@@ -391,7 +404,7 @@ export const CURRICULUM = [
     name: 'CCVC – Short A',
     description: 'Blend at the start: flat, clap, trap…',
     icon: '🚩', group: 'ccvc-a', level: 1,
-    requiredMastery: 0.70, prerequisite: 'cvc-u',
+    requiredMastery: 0.70, prerequisite: 'cvc-mixed',
     learningOutcome: 'Decode short-A words with an initial l-, r- or s-blend without skipping the second consonant.',
     targetSounds: ['bl', 'cl', 'fl', 'pl', 'sl', 'br', 'cr', 'dr', 'fr', 'gr', 'pr', 'tr', 'sk', 'sm', 'sn', 'sp', 'st', 'sw'],
     sampleWords: ['flat', 'clap', 'trap', 'plan', 'snap', 'flag', 'grab', 'stab'],
@@ -451,6 +464,19 @@ export const CURRICULUM = [
     recommendedModes: ['blend', 'classicBlend', 'segment', 'missing'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
+  {
+    id: 'ccvc-mixed', phase: 2,
+    name: 'CCVC – Mixed Vowels',
+    description: 'Initial blends, all five short vowels jumbled: flat, sled, drip, drop, plum…',
+    icon: '🎲', group: 'struct-ccvc', level: 2,
+    requiredMastery: 0.70, prerequisite: 'ccvc-u',
+    learningOutcome: 'Decode initial-blend words across all five short vowels without the set hinting at the vowel.',
+    targetSounds: ['short a /ă/', 'short e /ĕ/', 'short i /ĭ/', 'short o /ŏ/', 'short u /ŭ/'],
+    sampleWords: ['slam', 'bled', 'slim', 'clog', 'stud', 'slap', 'clip', 'scrub'],
+    sentenceExamples: ['I clip the slim twig.', 'Scrub the clog off the step.'],
+    recommendedModes: ['middle', 'first', 'last', 'soundCount', 'segment', 'hear'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
 
   /* ── Phase 3: CVCC by vowel ─────────────────────────────────────── */
   {
@@ -458,7 +484,7 @@ export const CURRICULUM = [
     name: 'CVCC – Short A',
     description: 'Blend at the end: band, fast, camp…',
     icon: '✋', group: 'cvcc-a', level: 2,
-    requiredMastery: 0.70, prerequisite: 'ccvc-u',
+    requiredMastery: 0.70, prerequisite: 'ccvc-mixed',
     learningOutcome: 'Decode short-A words ending in a consonant blend.',
     targetSounds: ['-nd', '-st', '-mp', '-nk', '-sk', '-ft'],
     sampleWords: ['band', 'bank', 'camp', 'hand', 'sand', 'lamp', 'tank', 'ramp'],
@@ -518,6 +544,19 @@ export const CURRICULUM = [
     recommendedModes: ['classicBlend', 'segment', 'last', 'missing'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
+  {
+    id: 'cvcc-mixed', phase: 3,
+    name: 'CVCC – Mixed Vowels',
+    description: 'Final blends, all five short vowels jumbled: band, belt, mint, pond, jump…',
+    icon: '🎲', group: 'struct-cvcc', level: 2,
+    requiredMastery: 0.70, prerequisite: 'cvcc-u',
+    learningOutcome: 'Decode final-blend words across all five short vowels without the set hinting at the vowel.',
+    targetSounds: ['short a /ă/', 'short e /ĕ/', 'short i /ĭ/', 'short o /ŏ/', 'short u /ŭ/'],
+    sampleWords: ['land', 'lend', 'fist', 'fond', 'gust', 'damp', 'mint', 'just'],
+    sentenceExamples: ['A gust hit the damp land.', 'I just held a mint in my fist.'],
+    recommendedModes: ['middle', 'first', 'last', 'soundCount', 'segment', 'hear'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
 
   /* ── Phase 4: Digraphs ───────────────────────────────────────────── */
   {
@@ -525,7 +564,7 @@ export const CURRICULUM = [
     name: 'Digraphs',
     description: 'ship, chip, that, when, sing…',
     icon: '🤝', group: 'digraphs', level: 2,
-    requiredMastery: 0.70, prerequisite: 'cvcc-u',
+    requiredMastery: 0.70, prerequisite: 'cvcc-mixed',
     learningOutcome: 'Treat sh, ch, th, wh, ck and ng as single phonemes when decoding and segmenting.',
     targetSounds: ['sh /ʃ/', 'ch /tʃ/', 'th /θ/', 'th /ð/', 'wh /w/', 'ck /k/', 'ng /ŋ/'],
     sampleWords: ['ship', 'chip', 'that', 'when', 'sing', 'lock', 'fish', 'chop', 'this', 'whip'],
@@ -601,6 +640,19 @@ export const CURRICULUM = [
     recommendedModes: ['classicBlend', 'segment', 'missing', 'soundCount'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
+  {
+    id: 'ccvcc-mixed', phase: 5,
+    name: 'CCVCC – Mixed Vowels',
+    description: 'Blends at both ends, all five short vowels jumbled: stamp, blend, print, stomp, stump…',
+    icon: '🎲', group: 'struct-ccvcc', level: 3,
+    requiredMastery: 0.70, prerequisite: 'ccvcc-u',
+    learningOutcome: 'Decode words with blends at both ends across all five short vowels, with no vowel cue from the set.',
+    targetSounds: ['short a /ă/', 'short e /ĕ/', 'short i /ĭ/', 'short o /ŏ/', 'short u /ŭ/'],
+    sampleWords: ['bland', 'spend', 'clink', 'frond', 'slump', 'stand', 'brink', 'stunk'],
+    sentenceExamples: ['I stand and spend a bit.', 'The glass went clink and then a clunk.'],
+    recommendedModes: ['middle', 'first', 'last', 'soundCount', 'segment', 'hear'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
 
   /* ── Phase 6: Long vowels (split by spelling pattern) ────────────── */
 
@@ -610,7 +662,7 @@ export const CURRICULUM = [
     name: 'Long A · a_e',
     description: 'Split digraph: cake, name, late…',
     icon: '🎂', group: 'long-a-ae', level: 2,
-    requiredMastery: 0.70, prerequisite: 'ccvcc-u',
+    requiredMastery: 0.70, prerequisite: 'ccvcc-mixed',
     learningOutcome: 'Read and spell long-A words with the a_e split-digraph pattern.',
     targetSounds: ['a_e /eɪ/'],
     sampleWords: ['cake', 'name', 'late', 'bake', 'lake', 'gate', 'wave', 'tape'],
@@ -930,6 +982,19 @@ export const CURRICULUM = [
     recommendedModes: ['classicBlend', 'hear', 'segment'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
+  {
+    id: 'cons-soft-cg', phase: 8,
+    name: 'Soft c and soft g',
+    description: 'c says /s/ and g says /j/ before e, i, y: rice, cent, page…',
+    icon: '🧊', group: 'cons-soft-cg', level: 3,
+    requiredMastery: 0.70, prerequisite: 'cons-ph',
+    learningOutcome: 'Read words where c says /s/ and g says /j/, and know that a following e, i or y is what softens them.',
+    targetSounds: ['soft c /s/', 'soft g /dʒ/'],
+    sampleWords: ['rice', 'cent', 'face', 'space', 'page', 'cage', 'stage', 'hinge'],
+    sentenceExamples: ['The mice ate rice on the stage.', 'Turn the page and see a large cage.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment', 'first', 'last', 'middle'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
 
   /* ── Phase 9: Suffixes ──────────────────────────────────────────── */
   {
@@ -937,7 +1002,7 @@ export const CURRICULUM = [
     name: '-ing Words',
     description: 'running, jumping, sitting…',
     icon: '🏃', group: 'suffix-ing', level: 2,
-    requiredMastery: 0.70, prerequisite: 'cons-ph',
+    requiredMastery: 0.70, prerequisite: 'cons-soft-cg',
     learningOutcome: 'Read and spell base + -ing words, including doubled-consonant forms (running, sitting).',
     targetSounds: ['-ing /ɪŋ/'],
     sampleWords: ['running', 'jumping', 'sitting', 'eating', 'playing', 'singing', 'reading', 'going'],
