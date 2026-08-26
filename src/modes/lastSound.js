@@ -67,7 +67,7 @@ export function setupLastSound(word, els) {
 
   els.modeInstruction.textContent = 'Listen to the end of the word… what\'s the LAST sound?';
 
-  const lastIdx      = word.graphemes.length - 1;
+  const lastIdx      = lastSoundedIdx(word);
   const lastGrapheme = word.graphemes[lastIdx];
   const lastType     = word.types[lastIdx];
 
@@ -110,6 +110,36 @@ export function setupLastSound(word, els) {
 }
 
 /**
+ * Index of the last grapheme that actually MAKES a sound.
+ *
+ * A magic-e word is stored as c|a|k|e with types c,lv,c,se, so the last
+ * *grapheme* is a silent e. Targeting it made the question unanswerable:
+ * speakPhoneme returns early for type 'se', so the correct choice played
+ * nothing while every distractor played a real sound — the child could
+ * pick the right answer only by noticing which button was silent, and the
+ * reveal rang a tile that says nothing. Every magic-e word in the bank
+ * (98 of them, across long-a/i/o/u, cons-ph, diphthongs and prefixes)
+ * behaved this way, which is why the long-vowel phases quietly stopped
+ * recommending this mode at all.
+ *
+ * The last SOUND of "cake" is /k/, so walk back past the silent tail.
+ *
+ * Exported for tests.
+ *
+ * @param {import('../data/words.js').Word} word
+ * @returns {number}
+ */
+export function lastSoundedIdx(word) {
+  const types = word?.types ?? [];
+  for (let i = types.length - 1; i >= 0; i--) {
+    if (types[i] !== 'se') return i;
+  }
+  // All-silent is not a real word shape; fall back to the final grapheme
+  // rather than returning -1 and indexing off the end.
+  return Math.max(0, types.length - 1);
+}
+
+/**
  * See firstSound.js — same gating combining TTS-end + wall-clock floor.
  * Duplicated locally to keep each mode file self-contained.
  */
@@ -144,6 +174,15 @@ function _revealAnswer(word, els, lastIdx) {
 }
 
 /**
+ * Which grapheme of a pool word this position draws its distractor from.
+ * Mirrors lastSoundedIdx so a magic-e word contributes its /k/, never its
+ * silent e — a silent distractor is as broken as a silent answer.
+ */
+function _poolIdx(word, position) {
+  return position === 'last' ? lastSoundedIdx(word) : 0;
+}
+
+/**
  * Build distractor pool for the last-sound position.
  *
  * Priority:
@@ -160,14 +199,8 @@ function _getDistractors(correctGrapheme, position, maxLevel = 3, targetType = n
   for (const cg of confusionTargets) {
     if (seen.has(cg)) continue;
     const levelWords = WORDS.filter(w => w.level <= maxLevel);
-    const lastIdx    = position === 'last' ? -1 : 0;
-    const match      = levelWords.find(w => {
-      const idx = lastIdx === -1 ? w.graphemes.length - 1 : 0;
-      return w.graphemes[idx] === cg;
-    });
-    const type = match
-      ? match.types[lastIdx === -1 ? match.graphemes.length - 1 : 0]
-      : (targetType ?? 'c');
+    const match      = levelWords.find(w => w.graphemes[_poolIdx(w, position)] === cg);
+    const type = match ? match.types[_poolIdx(match, position)] : (targetType ?? 'c');
     seen.add(cg);
     distractors.push({ grapheme: cg, type });
     if (distractors.length >= 3) break;
@@ -176,7 +209,7 @@ function _getDistractors(correctGrapheme, position, maxLevel = 3, targetType = n
   // Tier 2: same-type phonemes from word list
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
-      const idx = position === 'last' ? word.graphemes.length - 1 : 0;
+      const idx = _poolIdx(word, position);
       const g = word.graphemes[idx];
       const t = word.types[idx];
       if (!seen.has(g) && (!targetType || t === targetType)) {
@@ -190,7 +223,7 @@ function _getDistractors(correctGrapheme, position, maxLevel = 3, targetType = n
   // Tier 3: any final phoneme (fallback)
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
-      const idx = position === 'last' ? word.graphemes.length - 1 : 0;
+      const idx = _poolIdx(word, position);
       const g = word.graphemes[idx];
       const t = word.types[idx];
       if (!seen.has(g)) {

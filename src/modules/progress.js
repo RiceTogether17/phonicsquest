@@ -18,10 +18,41 @@ import { evidenceCeilingForMode } from './evidence.js';
 export const NON_DECODABLE_GROUPS = new Set(['sight-highfreq']);
 export const BLENDING_MODES = new Set(['blend', 'classicBlend']);
 
-/** Should `group` be hidden from `mode`'s stage picker? Blending modes can't
- *  sound out non-decodable (irregular sight) words, so those stages are noise. */
+/** @type {Map<string, boolean>} memoised per group — WORDS never changes at runtime */
+const _middleEligibleGroups = new Map();
+
+/**
+ * Does this group contain any word Middle Sound can honestly ask about?
+ *
+ * Several long-vowel stages are built entirely from words whose vowel is the
+ * LAST sound — long-a-ay (play, day), long-i-y (cry, fly), long-o-ow (snow),
+ * long-u-ew (new). None of them has a medial vowel, so hasInteriorVowel
+ * empties the pool and word selection falls back to a slice of the whole
+ * bank: the stage says "Long A — ay" and then serves random CVC words.
+ */
+function groupHasMedialVowel(group) {
+  let hit = _middleEligibleGroups.get(group);
+  if (hit === undefined) {
+    hit = progress.getWordsInGroup(group).some(hasInteriorVowel);
+    _middleEligibleGroups.set(group, hit);
+  }
+  return hit;
+}
+
+/** Should `group` be hidden from `mode`'s stage picker?
+ *
+ *  Two rules, both about a stage the mode cannot actually serve:
+ *   - blending modes can't sound out non-decodable (irregular sight) words;
+ *   - Middle Sound needs a medial vowel, and a handful of long-vowel stages
+ *     carry their vowel at the end of every word.
+ *
+ *  A stage a mode can't serve isn't merely noise: word selection falls back
+ *  to the general pool, so the child gets off-stage words under a stage
+ *  heading that promised something else. */
 export function isStageHiddenForMode(group, mode) {
-  return BLENDING_MODES.has(mode) && NON_DECODABLE_GROUPS.has(group);
+  if (BLENDING_MODES.has(mode) && NON_DECODABLE_GROUPS.has(group)) return true;
+  if (mode === 'middle' && !groupHasMedialVowel(group)) return true;
+  return false;
 }
 
 const VOWEL_TYPES = new Set(['sv', 'lv', 'rc', 'dp']);

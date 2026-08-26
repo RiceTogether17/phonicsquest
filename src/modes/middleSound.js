@@ -53,7 +53,11 @@ export function setupMiddleSound(word, els) {
   els.wordDisplay.innerHTML = '';
   els.phonemeRow.innerHTML  = '';
 
-  els.modeInstruction.textContent = 'Stretch the word… what sound is in the MIDDLE?';
+  // Not "Stretch the word…": the prompt audio is deliberately articulated
+  // rather than segmented, because segmenting would play the medial vowel on
+  // its own — which IS the answer. Promising a stretch the app then doesn't
+  // deliver just leaves the child waiting for audio that never comes.
+  els.modeInstruction.textContent = 'Listen to the whole word… what sound is in the MIDDLE?';
 
   const midIdx     = _getMiddleVowelIdx(word);
   const midGrapheme = word.graphemes[midIdx];
@@ -87,7 +91,7 @@ export function setupMiddleSound(word, els) {
     modeArea: els.modeArea,
     grid: els.modeArea.querySelector('.choice-grid'),
     onResult: els.onResult,
-    retryHint: 'Stretch the word out — what is in the MIDDLE?',
+    retryHint: 'Say it slowly yourself — what is in the MIDDLE?',
     onRetry: () => { audio.speakWordArticulated(word.word).catch(() => {}); },
     onReveal: () => _revealAnswer(word, els, midIdx),
   });
