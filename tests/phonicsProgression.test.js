@@ -79,13 +79,24 @@ describe('real curriculum — mode/phase coverage is complete and has no dead st
     expect(await phasesFor('segment')).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
   });
 
-  it('phonemic-awareness sound modes keep their intended scope', async () => {
-    // First Sound runs through phase 6: isolating the initial phoneme of
-    // blends (fl-), digraphs (sh-) and long-vowel words is standard PA
-    // practice — it was previously (wrongly) capped at CVC.
-    expect(await phasesFor('first')).toEqual([1, 2, 3, 4, 5, 6]);
-    expect(await phasesFor('last')).toEqual([1, 2, 3, 4, 5]);
-    expect(await phasesFor('middle')).toEqual([1, 6, 7]);
+  it('the three position modes span the same phases', async () => {
+    // First / Last / Middle Sound ask the same kind of question about the
+    // same words, so they belong on the same phases. They used to disagree
+    // — first 1-6, last 1-5, middle 1,6,7 — which showed up as three modes
+    // offering three different category lists for no stated reason. Each
+    // gap traced to something other than pedagogy: Middle Sound was absent
+    // from the blend and digraph phases although every word there has a
+    // medial vowel, and Last Sound was pulled from the long-vowel phases
+    // because it targeted the silent e (see lastSoundedIdx).
+    //
+    // Phases 1-8 are the phoneme-level phases. Phase 9 (inflectional
+    // suffixes) and Phase 10 (prefixes, advanced suffixes, multisyllabic,
+    // sight) analyse morphemes, not phonemes, and Phase 10's groups are
+    // PA-excluded outright — so both stay off the list.
+    const phonemePhases = [1, 2, 3, 4, 5, 6, 7, 8];
+    expect(await phasesFor('first')).toEqual(phonemePhases);
+    expect(await phasesFor('last')).toEqual(phonemePhases);
+    expect(await phasesFor('middle')).toEqual(phonemePhases);
   });
 });
 

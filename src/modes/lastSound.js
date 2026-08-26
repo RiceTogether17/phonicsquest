@@ -18,6 +18,7 @@ import { createChoiceRound } from './choiceRound.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { WORDS, shuffleArray } from '../data/words.js';
+import { lastPhoneme } from './phonemePosition.js';
 
 /**
  * Common phoneme confusion pairs — especially relevant for final consonants
@@ -67,9 +68,9 @@ export function setupLastSound(word, els) {
 
   els.modeInstruction.textContent = 'Listen to the end of the word… what\'s the LAST sound?';
 
-  const lastIdx      = word.graphemes.length - 1;
-  const lastGrapheme = word.graphemes[lastIdx];
-  const lastType     = word.types[lastIdx];
+  // The last PHONEME, which is not always the last tile: "cake" ends in a
+  // silent e, and "clamp" ends in a two-sound blend whose last sound is /p/.
+  const { grapheme: lastGrapheme, type: lastType, index: lastIdx } = lastPhoneme(word);
 
   const distractors = _getDistractors(lastGrapheme, 'last', word.level, lastType);
   // Phase 1–2 words → alphabetical order (predictable for the teacher, lower
@@ -101,7 +102,7 @@ export function setupLastSound(word, els) {
     onResult: els.onResult,
     retryHint: 'Listen right to the END of the word.',
     onRetry: () => { audio.speakWordArticulated(word.word).catch(() => {}); },
-    onReveal: () => _revealAnswer(word, els, lastIdx),
+    onReveal: () => _revealAnswer(word, els, lastIdx, lastGrapheme, lastType),
   });
 
   els.btnCheck.style.display = 'none';
@@ -128,19 +129,35 @@ function _waitForWordAudio(wordData) {
 }
 
 /** Reveal the full word: animation + labelled phoneme tiles + audio. */
-function _revealAnswer(word, els, lastIdx) {
+function _revealAnswer(word, els, lastIdx, lastGrapheme, lastType) {
   buildWordAnimation(word, els.wordDisplay);
-  // Ring the final tile so the position half of the skill is reinforced.
+  // Ring the final TILE — for "clamp" that is "mp", which is genuinely the
+  // chunk carrying the /p/ the child just named, and showing it tells them
+  // where in the word the sound lives.
   renderPhonemes(word, els.phonemeRow, { showDiacritics: true, showLabels: true, targetIndex: lastIdx });
-  // Having named the sound, show what the mouth does to make it.
-  renderRevealMouthCue(word, lastIdx, els);
+  // The mouth cue is for the SOUND, not the tile: "mp" has no mouth shape.
+  renderRevealMouthCue(word, lastIdx, els, { phoneme: lastGrapheme });
 
   setTimeout(async () => {
     const prevGrapheme = lastIdx > 0 ? word.graphemes[lastIdx - 1] : null;
-    await audio.speakPhoneme(word.graphemes[lastIdx], word.types[lastIdx], { word: word.word, prevGrapheme });
+    await audio.speakPhoneme(lastGrapheme, lastType, { word: word.word, prevGrapheme });
     await new Promise(r => setTimeout(r, 300));
     await audio.speakWord(word.word);
   }, 300);
+}
+
+/**
+ * The phoneme a pool word contributes at this position.
+ *
+ * Runs through the same resolver as the answer, so a magic-e word offers
+ * its /k/ rather than a silent e, and a blend word offers /p/ rather than
+ * /mp/. A distractor that is silent, or that is two sounds when the answer
+ * is one, gives the answer away just as surely as a wrong key does.
+ */
+function _poolPhoneme(word, position) {
+  return position === 'last'
+    ? lastPhoneme(word)
+    : { grapheme: word.graphemes[0], type: word.types[0], index: 0 };
 }
 
 /**
@@ -160,14 +177,8 @@ function _getDistractors(correctGrapheme, position, maxLevel = 3, targetType = n
   for (const cg of confusionTargets) {
     if (seen.has(cg)) continue;
     const levelWords = WORDS.filter(w => w.level <= maxLevel);
-    const lastIdx    = position === 'last' ? -1 : 0;
-    const match      = levelWords.find(w => {
-      const idx = lastIdx === -1 ? w.graphemes.length - 1 : 0;
-      return w.graphemes[idx] === cg;
-    });
-    const type = match
-      ? match.types[lastIdx === -1 ? match.graphemes.length - 1 : 0]
-      : (targetType ?? 'c');
+    const match      = levelWords.find(w => _poolPhoneme(w, position).grapheme === cg);
+    const type = match ? _poolPhoneme(match, position).type : (targetType ?? 'c');
     seen.add(cg);
     distractors.push({ grapheme: cg, type });
     if (distractors.length >= 3) break;
@@ -176,9 +187,7 @@ function _getDistractors(correctGrapheme, position, maxLevel = 3, targetType = n
   // Tier 2: same-type phonemes from word list
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
-      const idx = position === 'last' ? word.graphemes.length - 1 : 0;
-      const g = word.graphemes[idx];
-      const t = word.types[idx];
+      const { grapheme: g, type: t } = _poolPhoneme(word, position);
       if (!seen.has(g) && (!targetType || t === targetType)) {
         seen.add(g);
         distractors.push({ grapheme: g, type: t });
@@ -190,9 +199,7 @@ function _getDistractors(correctGrapheme, position, maxLevel = 3, targetType = n
   // Tier 3: any final phoneme (fallback)
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
-      const idx = position === 'last' ? word.graphemes.length - 1 : 0;
-      const g = word.graphemes[idx];
-      const t = word.types[idx];
+      const { grapheme: g, type: t } = _poolPhoneme(word, position);
       if (!seen.has(g)) {
         seen.add(g);
         distractors.push({ grapheme: g, type: t });

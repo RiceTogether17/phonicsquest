@@ -50,6 +50,19 @@ let round = null;
 let _speakToken = 0;
 
 /**
+ * Finger-counting pace. The old 300 ms ran the words together once the
+ * per-word rate slowed down; ~480 ms is roughly a beat, which is what the
+ * classroom activity gives the child to lift the next finger.
+ */
+const INTER_WORD_MS = 480;
+
+/** Gap between chips during the reveal — the words are printed by then. */
+const REVEAL_GAP_MS = 300;
+
+const REPLAY_IDLE = '🔊 Hear the sentence again';
+const REPLAY_BUSY = '👂 Listening…';
+
+/**
  * @param {import('../data/words.js').Word} word
  * @param {object} els
  */
@@ -69,9 +82,7 @@ export function setupWordCount(word, els) {
 
   els.modeArea.innerHTML = /* html */`
     <div class="word-count">
-      <button class="wc-replay btn btn--ghost btn--sm" type="button">
-        🔊 Hear the sentence again
-      </button>
+      <button class="wc-replay btn btn--ghost btn--sm" type="button"></button>
       <div class="wc-sentence" aria-live="polite"></div>
       <div class="choice-grid choice-grid--count" role="group" aria-label="How many words did you hear?"></div>
     </div>
@@ -92,8 +103,14 @@ export function setupWordCount(word, els) {
     grid.appendChild(btn);
   }
 
-  const speakSentence = () => _speakWordByWord(tokens);
-  els.modeArea.querySelector('.wc-replay')?.addEventListener('click', speakSentence);
+  // Label set from JS rather than in the markup above: interpolating into an
+  // innerHTML template is banned repo-wide (no-restricted-syntax), and the
+  // same helper owns the label for the rest of the round anyway.
+  const replayBtn = els.modeArea.querySelector('.wc-replay');
+  _setReplayState(replayBtn, false);
+
+  const speakSentence = () => _speakWordByWord(tokens, replayBtn);
+  replayBtn?.addEventListener('click', speakSentence);
 
   round = createChoiceRound({
     modeArea: els.modeArea,
@@ -101,7 +118,7 @@ export function setupWordCount(word, els) {
     onResult: els.onResult,
     retryHint: 'Put up one finger for each word you hear.',
     onRetry: () => { setTimeout(speakSentence, 200); },
-    onReveal: () => _revealAnswer(tokens, els),
+    onReveal: () => _revealAnswer(tokens, els, replayBtn),
   });
 
   els.btnCheck.style.display = 'none';
@@ -128,28 +145,55 @@ export function buildCountSentence(template, word) {
 }
 
 /**
+ * Flip the replay button between its resting label and a "playing now"
+ * state. Deliberately does NOT disable the button: a child who taps mid
+ * sentence wants to start over, and disabling a focused control drops
+ * keyboard focus to the body. The label and the pulse are the whole point
+ * — without them nothing on screen moves while the sentence plays, so a
+ * child with the volume down (or who missed the start) has no way to tell
+ * whether audio is running.
+ */
+function _setReplayState(btn, speaking) {
+  if (!btn) return;
+  btn.textContent = speaking ? REPLAY_BUSY : REPLAY_IDLE;
+  btn.classList.toggle('is-speaking', speaking);
+}
+
+/**
  * Speak the sentence one word at a time at finger-counting pace —
  * mirroring how the whole class repeats "I , like, to, go, swimming…"
  * while counting. A token cancels any pass still running when the
  * round is replayed or torn down.
+ *
+ * Each word goes through speakSentenceWord rather than speakWord: standing
+ * alone, a short function word needs the slower rate, the neutral pitch and
+ * above all the longer onset guard, or its opening consonant is clipped and
+ * the child cannot tell that a word was there at all.
+ *
+ * A superseded pass returns WITHOUT restoring the button — whatever bumped
+ * the token owns the button now and will restore it when it finishes.
  */
-function _speakWordByWord(tokens) {
+function _speakWordByWord(tokens, replayBtn) {
   const token = ++_speakToken;
+  _setReplayState(replayBtn, true);
   (async () => {
-    for (const t of tokens) {
+    for (let i = 0; i < tokens.length; i++) {
       if (token !== _speakToken) return;
-      try { await audio.speakWord(t); } catch { /* keep counting */ }
-      await new Promise(r => setTimeout(r, 300));
+      try { await audio.speakSentenceWord(tokens[i]); } catch { /* keep counting */ }
+      if (i < tokens.length - 1) await new Promise(r => setTimeout(r, INTER_WORD_MS));
     }
+    if (token !== _speakToken) return;
+    _setReplayState(replayBtn, false);
   })();
 }
 
 /** Reveal: pop the sentence in chip-by-chip while replaying each word. */
-function _revealAnswer(tokens, els) {
+function _revealAnswer(tokens, els, replayBtn) {
   const holder = els.modeArea.querySelector('.wc-sentence');
   if (!holder) return;
 
   const token = ++_speakToken;
+  _setReplayState(replayBtn, true);
   (async () => {
     for (let i = 0; i < tokens.length; i++) {
       if (token !== _speakToken || !holder.isConnected) return;
@@ -161,9 +205,11 @@ function _revealAnswer(tokens, els) {
       num.textContent = String(i + 1);
       chip.prepend(num);
       holder.appendChild(chip);
-      try { await audio.speakWord(tokens[i]); } catch { /* keep revealing */ }
-      await new Promise(r => setTimeout(r, 250));
+      try { await audio.speakSentenceWord(tokens[i]); } catch { /* keep revealing */ }
+      if (i < tokens.length - 1) await new Promise(r => setTimeout(r, REVEAL_GAP_MS));
     }
+    if (token !== _speakToken) return;
+    _setReplayState(replayBtn, false);
   })();
 }
 
@@ -174,5 +220,8 @@ export function getCurrentWord() {
 export function cleanup() {
   currentWord = null;
   round = null;
+  // Bumping the token stops the loop at its next await, but the word already
+  // handed to the engine keeps talking over whatever screen comes next.
   _speakToken++;
+  audio.cancelSpeech();
 }

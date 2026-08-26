@@ -174,11 +174,14 @@ const REVEAL_CUE_ID = 'reveal-mouth-cue';
  * @param {{ phonemeRow: HTMLElement }} els
  * @returns {HTMLElement|null}
  */
-export function renderRevealMouthCue(word, index, els) {
+export function renderRevealMouthCue(word, index, els, { phoneme: override } = {}) {
   const row = els?.phonemeRow;
   if (!row || !row.parentNode || !word) return null;
 
-  const phoneme = word.phonemes?.[index] || word.graphemes?.[index];
+  // `override` lets a mode name the sound when the tile at `index` is not
+  // itself one phoneme: the last tile of "clamp" is the blend "mp", which
+  // has no single mouth shape, but the sound the child just named is /p/.
+  const phoneme = override || word.phonemes?.[index] || word.graphemes?.[index];
   if (!phoneme) return null;
 
   let host = document.getElementById(REVEAL_CUE_ID);
