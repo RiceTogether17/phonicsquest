@@ -20,6 +20,7 @@
 
 import { audio } from '../modules/audio.js';
 import { WORDS, shuffleArray } from '../data/words.js';
+import { firstPhoneme } from './phonemePosition.js';
 import { getFirstSoundDistractors } from './firstSound.js';
 import { createChoiceRound } from './choiceRound.js';
 import { renderWordImage } from '../components/phonemeDisplay.js';
@@ -135,13 +136,15 @@ function _revealAnswer(oddWord, els) {
   setTimeout(async () => {
     await audio.speakWord(oddWord.word);
     await new Promise(r => setTimeout(r, 300));
-    await audio.speakPhoneme(oddWord.graphemes[0], oddWord.types[0]);
+    // The contrast is the odd word's first SOUND — /k/ for "crab", not /kr/.
+    const { grapheme, type } = firstPhoneme(oddWord);
+    await audio.speakPhoneme(grapheme, type);
   }, 300);
 }
 
 /**
  * Build one Odd One Out round: the sequenced word + 2 more words sharing
- * its first grapheme, plus 1 odd word with a different (ideally
+ * its first phoneme, plus 1 odd word with a different (ideally
  * confusable) first sound.
  *
  * Exposed un-underscored so tests can drive the picker directly.
@@ -156,7 +159,10 @@ function _revealAnswer(oddWord, els) {
  * @returns {{ matches: Word[], odd: Word } | null}
  */
 export function pickOddOneOutRound(word, pool, fullList = WORDS) {
-  const target = word.graphemes[0];
+  // Match on the first PHONEME, not the first tile. Comparing tiles let a
+  // round be built from clap / clip / clop with "crab" as the odd one —
+  // and all four of those start with /k/, so the question had no answer.
+  const target = firstPhoneme(word).grapheme;
   const seen = new Set([word.id]);
 
   // Two more same-first-sound words; fall back to the full word bank so
@@ -165,7 +171,7 @@ export function pickOddOneOutRound(word, pool, fullList = WORDS) {
   for (const source of [pool, fullList]) {
     for (const w of shuffleArray(source)) {
       if (matches.length >= 3) break;
-      if (seen.has(w.id) || w.graphemes?.[0] !== target) continue;
+      if (seen.has(w.id) || firstPhoneme(w).grapheme !== target) continue;
       if (!Array.isArray(w.graphemes) || w.graphemes.length < 2) continue;
       matches.push(w);
       seen.add(w.id);
@@ -175,12 +181,15 @@ export function pickOddOneOutRound(word, pool, fullList = WORDS) {
   // Odd word: prefer a confusion-pair first sound so the discrimination
   // is instructionally meaningful, then any different first sound.
   const confusable = new Set(
-    getFirstSoundDistractors(target, word.types[0], word.level ?? 3).map(d => d.grapheme)
+    getFirstSoundDistractors(target, firstPhoneme(word).type, word.level ?? 3).map(d => d.grapheme)
   );
+  const differs = w => Array.isArray(w.graphemes)
+    && w.graphemes.length >= 2
+    && firstPhoneme(w).grapheme !== target;
   const odd =
-    pool.find(w => !seen.has(w.id) && confusable.has(w.graphemes?.[0])) ??
-    pool.find(w => !seen.has(w.id) && w.graphemes?.[0] !== target && w.graphemes?.length >= 2) ??
-    fullList.find(w => !seen.has(w.id) && w.graphemes?.[0] !== target && Array.isArray(w.graphemes) && w.graphemes.length >= 2);
+    pool.find(w => !seen.has(w.id) && differs(w) && confusable.has(firstPhoneme(w).grapheme)) ??
+    pool.find(w => !seen.has(w.id) && differs(w)) ??
+    fullList.find(w => !seen.has(w.id) && differs(w));
 
   if (matches.length < 2 || !odd) return null;
   return { matches, odd };

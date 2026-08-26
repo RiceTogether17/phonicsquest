@@ -21,6 +21,7 @@ import { createChoiceRound } from './choiceRound.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { WORDS, shuffleArray } from '../data/words.js';
+import { firstPhoneme } from './phonemePosition.js';
 
 /**
  * Common phoneme confusion pairs for initial consonants and short vowels.
@@ -33,6 +34,7 @@ const CONFUSION_MAP = {
   d:  ['b', 't'],
   t:  ['d', 'k'],
   k:  ['g', 't'],
+  c:  ['g', 't'],   // "c" spells the same /k/ — cat, and every cl-/cr- blend
   g:  ['k', 'd'],
   // Fricative / affricate confusions
   f:  ['th', 'v'],
@@ -75,8 +77,9 @@ export function setupFirstSound(word, els) {
 
   els.modeInstruction.textContent = 'Say the word slowly… what\'s the FIRST sound?';
 
-  const firstGrapheme = word.graphemes[0];
-  const firstType     = word.types[0];
+  // The first PHONEME, not the first tile: "clamp" is stored cl|a|mp, but
+  // a blend is two sounds, so the FIRST sound is /k/ — not /kl/.
+  const { grapheme: firstGrapheme, type: firstType } = firstPhoneme(word);
 
   const distractorGraphemes = getFirstSoundDistractors(firstGrapheme, firstType, word.level);
   const distractors = shuffleArray(distractorGraphemes).slice(0, 3);
@@ -115,7 +118,7 @@ export function setupFirstSound(word, els) {
     onResult: els.onResult,
     retryHint: 'Listen for the very FIRST sound.',
     onRetry: () => { audio.speakWordArticulated(word.word).catch(() => {}); },
-    onReveal: () => _revealAnswer(word, els),
+    onReveal: () => _revealAnswer(word, els, firstGrapheme, firstType),
   });
 
   els.btnCheck.style.display = 'none';
@@ -155,20 +158,21 @@ function _waitForWordAudio(wordData) {
 }
 
 /** Reveal the full word: animation + labelled phoneme tiles + audio. */
-function _revealAnswer(word, els) {
+function _revealAnswer(word, els, firstGrapheme, firstType) {
   buildWordAnimation(word, els.wordDisplay);
   // Ring the opening tile — this mode asks for the FIRST sound, so the
-  // reveal should show which one that was.
+  // reveal should show which one that was. For a blend the tile is "cl",
+  // which is where the /k/ lives even though it is not only the /k/.
   renderPhonemes(word, els.phonemeRow, {
     showDiacritics: true,
     showLabels: true,
     targetIndex: 0,
   });
-  // Having named the sound, show what the mouth does to make it.
-  renderRevealMouthCue(word, 0, els);
+  // The mouth cue is for the SOUND: "cl" has no single mouth shape, /k/ does.
+  renderRevealMouthCue(word, 0, els, { phoneme: firstGrapheme });
 
   setTimeout(async () => {
-    await audio.speakPhoneme(word.graphemes[0], word.types[0]);
+    await audio.speakPhoneme(firstGrapheme, firstType);
     await new Promise(r => setTimeout(r, 300));
     await audio.speakWord(word.word);
   }, 300);
@@ -191,10 +195,10 @@ export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel 
   for (const cg of confusionTargets) {
     if (seen.has(cg)) continue;
     // Find this grapheme in the word list to get its type
-    const match = WORDS.find(w => w.level <= maxLevel && w.graphemes[0] === cg);
+    const match = WORDS.find(w => w.level <= maxLevel && firstPhoneme(w).grapheme === cg);
     if (match) {
       seen.add(cg);
-      distractors.push({ grapheme: cg, type: match.types[0] });
+      distractors.push({ grapheme: cg, type: firstPhoneme(match).type });
     } else {
       // Use the correct type as a reasonable approximation
       seen.add(cg);
@@ -206,8 +210,7 @@ export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel 
   // Tier 2: same-type phonemes from the word list
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
-      const g = word.graphemes[0];
-      const t = word.types[0];
+      const { grapheme: g, type: t } = firstPhoneme(word);
       if (!seen.has(g) && t === correctType) {
         seen.add(g);
         distractors.push({ grapheme: g, type: t });
@@ -219,8 +222,7 @@ export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel 
   // Tier 3: any phoneme (fallback)
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
-      const g = word.graphemes[0];
-      const t = word.types[0];
+      const { grapheme: g, type: t } = firstPhoneme(word);
       if (!seen.has(g)) {
         seen.add(g);
         distractors.push({ grapheme: g, type: t });
