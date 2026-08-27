@@ -1,44 +1,85 @@
 // src/modules/aiService.js
-import { store } from './store.js';
+//
+// Feature-level AI prompts. The transport underneath is provider-agnostic:
+// a parent picks Google, Anthropic, OpenAI or Chrome's on-device model in
+// Settings, and every function here works the same way regardless.
+//
+// The contract callers rely on is unchanged: a Promise of text, or null.
+// Null means "the tutor said nothing" for ANY reason, and every caller
+// already renders its authored, offline content first — so a missing key,
+// a wrong key and a flat battery all degrade to the same experience for the
+// child. The reason is recorded for the parent instead (aiConfig.lastError).
 
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+import {
+  activeProviderId,
+  apiKeyFor,
+  isTutorConfigured,
+  modelFor,
+  recordUsage,
+  setLastError,
+} from './aiConfig.js';
+import { AiError, getProvider } from './aiProviders.js';
 
+/** The active provider's key ('' for the on-device model, which needs none). */
 export function getApiKey() {
-  return store.get('geminiApiKey') || '';
+  return apiKeyFor();
 }
 
+/** Is the tutor set up enough to try? */
 export function hasApiKey() {
-  return !!getApiKey();
+  return isTutorConfigured();
 }
 
 /**
- * Call Gemini. Returns the text response string, or null on failure.
+ * Ask the configured provider. Returns the text, or null on any failure.
+ *
  * @param {string} prompt
  * @param {object} [opts]
  * @param {number} [opts.maxTokens]
  * @param {number} [opts.temperature]
+ * @param {string} [opts.system]       provider-native system prompt
+ * @param {AbortSignal} [opts.signal]  cancel when the child leaves the screen
+ * @returns {Promise<string|null>}
  */
-export async function callGemini(prompt, { maxTokens = 1024, temperature = 0.3 } = {}) {
-  const key = getApiKey();
-  if (!key) return null;
+export async function callAi(prompt, { maxTokens = 1024, temperature = 0.3, system = '', signal } = {}) {
+  const providerId = activeProviderId();
+  const provider = getProvider(providerId);
+  if (!provider) return null;
+  if (!isTutorConfigured(providerId)) {
+    setLastError(new AiError('no-key', 'No AI provider is set up yet.'));
+    return null;
+  }
+
+  const model = modelFor(providerId);
   try {
-    // Key goes in a header, never the URL: query strings leak into browser
-    // history, Referer headers and proxy logs.
-    const res = await fetch(GEMINI_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: maxTokens, temperature },
-      }),
+    const { text, usage } = await provider.call({
+      key: apiKeyFor(providerId),
+      model,
+      system,
+      prompt,
+      maxTokens,
+      temperature,
+      signal,
     });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data?.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
-  } catch {
+    if (!text || !text.trim()) {
+      setLastError(new AiError('empty', 'The provider returned an empty answer.'));
+      return null;
+    }
+    recordUsage(usage, model);
+    setLastError(null);
+    return text;
+  } catch (err) {
+    // Cancellation is not a failure worth reporting to a parent.
+    if (err?.name !== 'AbortError') setLastError(err);
     return null;
   }
 }
+
+/**
+ * @deprecated Kept so existing call sites keep working while the tutor is
+ * no longer Gemini-only. Prefer callAi.
+ */
+export const callGemini = callAi;
 
 /**
  * Ask Giri to elaborate on WHY a chosen answer was right or wrong.

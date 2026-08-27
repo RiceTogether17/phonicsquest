@@ -17282,6 +17282,13 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   align-items: center;
   margin-top: 6px;
 }
+/* Inline label beside a settings control (AI provider / model pickers). */
+.settings-inline-label {
+  flex: 0 0 auto;
+  font-weight: 700;
+  font-size: 0.9em;
+  color: var(--text-main, #222);
+}
 
 /* ── Listening Comprehension ─────────────────────────────────────── */
 .lc-browser {

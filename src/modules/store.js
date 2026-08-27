@@ -85,7 +85,14 @@ const DEFAULT_STATE = {
   //                    everything so far (/c/ → "ca" → "cat")
   blendStyle: 'simultaneous',
   parentPin: null, // hashed PIN
-  geminiApiKey: null, // parent-supplied AI key (survives progress reset)
+  geminiApiKey: null, // legacy single-provider key; still read as the Google fallback
+  // Bring-your-own-key AI tutor. The parent picks a provider and pastes
+  // their own key; PhonicsQuest has no server and never sees it.
+  aiProvider: 'google',
+  aiApiKeys: {},   // { [providerId]: key } — parent credentials, survive a progress reset
+  aiModels: {},    // { [providerId]: modelId } — overrides the provider default
+  aiSpend: { inputTokens: 0, outputTokens: 0, estimatedUsd: 0, calls: 0 },
+  aiLastError: null, // why the tutor is quiet, for the parent's eyes only
   reducedMotion: false, // manual override for prefers-reduced-motion
   speechEnabled: true,
   speechLocale: 'en-SG',
@@ -586,7 +593,18 @@ class Store {
     // progress must not delete the parent's PIN or their AI key.
     const pin = this._state.parentPin;
     const apiKey = this._state.geminiApiKey;
-    this._state = { ...freshDefaults(), parentPin: pin, geminiApiKey: apiKey };
+    // Every provider's key is a parent credential, not child progress.
+    const aiApiKeys = this._state.aiApiKeys;
+    const aiProvider = this._state.aiProvider;
+    const aiModels = this._state.aiModels;
+    this._state = {
+      ...freshDefaults(),
+      parentPin: pin,
+      geminiApiKey: apiKey,
+      aiApiKeys,
+      aiProvider,
+      aiModels,
+    };
     this._save();
     this._notify('*', this._state);
   }

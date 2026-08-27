@@ -180,18 +180,67 @@ export const settingsController = {
       document.documentElement.setAttribute('data-bilingual', checked ? 'true' : 'false');
     });
 
-    // ── Gemini API key ─────────────────────────────────────────────────────
-    document.getElementById('gemini-key-save')?.addEventListener('click', () => {
+    // ── AI tutor: provider, key, model ─────────────────────────────────────
+    document.getElementById('ai-provider-select')?.addEventListener('change', async (e) => {
+      const { store: s } = await import('./store.js');
+      s.set('aiProvider', /** @type {HTMLSelectElement} */ (e.target).value);
+      await this._renderAiSettings();
+    });
+
+    document.getElementById('ai-model-select')?.addEventListener('change', async (e) => {
+      const { activeProviderId, setModel } = await import('./aiConfig.js');
+      setModel(activeProviderId(), /** @type {HTMLSelectElement} */ (e.target).value);
+      await this._renderAiSettings();
+    });
+
+    document.getElementById('gemini-key-save')?.addEventListener('click', async () => {
+      const { activeProviderId, setApiKey } = await import('./aiConfig.js');
+      const { validateKeyShape } = await import('./aiProviders.js');
       const input = /** @type {HTMLInputElement|null} */ (
         document.getElementById('gemini-api-key')
       );
       const status = document.getElementById('gemini-key-status');
+      const providerId = activeProviderId();
       const key = input?.value?.trim() || '';
-      store.set('geminiApiKey', key);
-      if (status) status.textContent = key ? '✓ Key saved' : 'Key cleared';
-      setTimeout(() => {
-        if (status) status.textContent = '';
-      }, 2500);
+
+      if (key) {
+        // Catch a mistyped or wrong-provider key here rather than letting the
+        // child hit a silent tutor an hour later.
+        const shape = validateKeyShape(providerId, key);
+        if (!shape.ok) {
+          if (status) status.textContent = `⚠ ${shape.reason}`;
+          return;
+        }
+      }
+      setApiKey(providerId, key);
+      if (status) status.textContent = key ? '✓ Key saved — try "Test the tutor"' : 'Key cleared';
+      await this._renderAiSettings();
+    });
+
+    document.getElementById('ai-test-btn')?.addEventListener('click', async () => {
+      const status = document.getElementById('gemini-key-status');
+      const btn = /** @type {HTMLButtonElement|null} */ (document.getElementById('ai-test-btn'));
+      if (status) status.textContent = 'Asking…';
+      if (btn) btn.disabled = true;
+      try {
+        const { callAi } = await import('./aiService.js');
+        const { lastError } = await import('./aiConfig.js');
+        const reply = await callAi('Reply with exactly: Giri is ready.', { maxTokens: 32, temperature: 0 });
+        if (status) {
+          status.textContent = reply
+            ? `✓ Working — Giri said: "${reply.trim().slice(0, 60)}"`
+            : `⚠ ${lastError()?.message || 'No answer came back.'}`;
+        }
+      } finally {
+        if (btn) btn.disabled = false;
+        await this._renderAiSettings();
+      }
+    });
+
+    document.getElementById('ai-spend-reset')?.addEventListener('click', async () => {
+      const { resetSpend } = await import('./aiConfig.js');
+      resetSpend();
+      await this._renderAiSettings();
     });
 
     // ── Reset progress (lives in the PIN-gated Parent Dashboard) ────────────
@@ -312,11 +361,87 @@ export const settingsController = {
     if (bilingualToggle) bilingualToggle.checked = bilingual;
     document.documentElement.setAttribute('data-bilingual', bilingual ? 'true' : 'false');
 
-    const geminiKey = store.get('geminiApiKey') || '';
-    const geminiInput = /** @type {HTMLInputElement|null} */ (
-      document.getElementById('gemini-api-key')
-    );
-    if (geminiInput && geminiKey) geminiInput.value = geminiKey;
+    this._renderAiSettings();
+  },
+
+  /**
+   * Paint the AI tutor section from the stored config.
+   *
+   * Re-run after every change rather than mutating pieces: the provider
+   * choice drives which controls even make sense (the on-device model has
+   * no key and no model list), so a partial update would leave a key field
+   * on screen for a provider that has no use for one.
+   */
+  async _renderAiSettings() {
+    const [{ AI_PROVIDERS, PROVIDER_ORDER, getProvider }, aiConfig, { html }] = await Promise.all([
+      import('./aiProviders.js'),
+      import('./aiConfig.js'),
+      import('../utils/html.js'),
+    ]);
+    const providerId = aiConfig.activeProviderId();
+    const provider = getProvider(providerId);
+    if (!provider) return;
+
+    const $ = (id) => document.getElementById(id);
+
+    const providerSelect = /** @type {HTMLSelectElement|null} */ ($('ai-provider-select'));
+    if (providerSelect) {
+      providerSelect.innerHTML = html`${PROVIDER_ORDER.map(
+        id => html`<option value="${id}">${AI_PROVIDERS[id].label}</option>`,
+      )}`;
+      providerSelect.value = providerId;
+    }
+
+    const blurb = $('ai-provider-blurb');
+    if (blurb) blurb.textContent = provider.blurb || '';
+
+    // Key row: hidden entirely for a provider that needs no credential.
+    const keyRow = $('ai-key-row');
+    if (keyRow) keyRow.hidden = !provider.needsKey;
+    const keyInput = /** @type {HTMLInputElement|null} */ ($('gemini-api-key'));
+    if (keyInput) {
+      keyInput.value = aiConfig.apiKeyFor(providerId);
+      keyInput.placeholder = provider.keyHint
+        ? `Paste your ${provider.label} key… (${provider.keyHint})`
+        : 'Paste your API key…';
+    }
+    const keyHelp = $('ai-key-help');
+    if (keyHelp) {
+      keyHelp.innerHTML = provider.keyUrl
+        ? html`Create one at <a href="${provider.keyUrl}" target="_blank" rel="noopener">${provider.keyUrl}</a>.`
+        : '';
+      keyHelp.hidden = !provider.needsKey;
+    }
+
+    const modelSelect = /** @type {HTMLSelectElement|null} */ ($('ai-model-select'));
+    if (modelSelect) {
+      modelSelect.innerHTML = html`${(provider.models || []).map(
+        m => html`<option value="${m.id}">${m.label}</option>`,
+      )}`;
+      modelSelect.value = aiConfig.modelFor(providerId);
+      modelSelect.disabled = (provider.models || []).length < 2;
+    }
+
+    const spendLine = $('ai-spend-line');
+    if (spendLine) {
+      const s = aiConfig.spendSummary();
+      const err = aiConfig.lastError();
+      if (err && err.code !== 'no-key') {
+        // A parent looking at this screen is usually here BECAUSE the tutor
+        // went quiet. Lead with the reason, not the running total.
+        spendLine.textContent = `⚠ Last attempt failed: ${err.message}`;
+      } else if (!s.calls) {
+        spendLine.textContent = provider.free
+          ? 'Runs on this device — nothing to pay.'
+          : 'No AI calls yet.';
+      } else if (provider.free) {
+        spendLine.textContent = `${s.calls} tutor answers so far, all on this device — nothing to pay.`;
+      } else {
+        spendLine.textContent = s.priced
+          ? `${s.calls} tutor answers so far — roughly $${s.estimatedUsd.toFixed(3)} on your ${provider.label} account. Your provider's dashboard is the real figure.`
+          : `${s.calls} tutor answers so far (${s.inputTokens + s.outputTokens} tokens). No price on file for this model — check your provider's dashboard.`;
+      }
+    }
   },
 
   /**

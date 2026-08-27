@@ -16,7 +16,7 @@
  */
 
 import { store } from './store.js';
-import { callGemini, hasApiKey } from './aiService.js';
+import { callAi, hasApiKey } from './aiService.js';
 import { localYmd } from '../utils/dates.js';
 
 /** Max child-initiated AI calls per day (across features). */
@@ -41,8 +41,54 @@ Rules you must always follow:
 - Never ask the child for personal information. Never suggest visiting websites or links.
 - No markdown, no HTML, no emoji spam (one emoji is fine).
 
+Teaching stance:
+- Explain, never just assert. A child who is told "it's just how it is" learns nothing they can reuse.
+- Use the SOUND a letter makes, not its name: c in "cat" says /k/, and g in "gem" says /j/.
+- A digraph (sh, ch, th, ck, ng, tch, dge, ph) is ONE sound. A blend (cl, st, mp, nd) is TWO sounds you can hear separately. Never call a blend one sound.
+- Never reveal the answer to a question the child is still working on. Point at what to listen for.
+- Where you can, use a word the child has already met (below) rather than a new one.
+
 Task:
 `;
+
+/**
+ * What Giri knows about THIS child, assembled from the app's own records.
+ *
+ * A tutor that does not know what the child is working on can only give
+ * generic advice, which is the same advice a book gives. The app already
+ * tracks the stage, the difficulty and every recent mistake — passing that
+ * in is the cheapest possible upgrade to answer quality, and it costs a few
+ * dozen tokens.
+ *
+ * Nothing identifying goes in: no name, no age, no device details. A stage
+ * id and a list of missed words is not personal data, and the whole point
+ * of BYO-key is that a parent already trusts the provider they chose.
+ *
+ * Never throws — a fresh profile with no history returns ''.
+ *
+ * @returns {string} a short context block, or '' when there is nothing to say
+ */
+export function learnerContext() {
+  const lines = [];
+  try {
+    const group = store.get('currentGroup');
+    if (group) lines.push(`Currently practising the "${group}" set.`);
+
+    const difficulty = store.get('difficulty');
+    if (difficulty) lines.push(`Difficulty level ${difficulty} of 3.`);
+  } catch { /* fresh profile */ }
+
+  try {
+    // Static import would make aiGuardrails depend on the whole mistakes
+    // subsystem for a feature that is optional by design.
+    const recent = (store.get('mistakesDen') || []).slice(0, 6);
+    const words = recent.map(m => m?.word || m?.label).filter(Boolean);
+    if (words.length) lines.push(`Recently got these wrong: ${words.join(', ')}.`);
+  } catch { /* no mistake history yet */ }
+
+  if (!lines.length) return '';
+  return `\n\nWhat you know about this child (do not read it out to them; use it to pitch your answer):\n${lines.map(l => `- ${l}`).join('\n')}`;
+}
 
 const _todayKey = (now = new Date()) => localYmd(now);
 
@@ -99,12 +145,19 @@ export function logAiUse(kind, summary, now = new Date()) {
 export async function askGiriConstrained(kind, taskPrompt, opts = {}) {
   if (!canCallAi()) return null;
 
-  const { maxTokens = 160, temperature = 0.2, logSummary = '' } = opts;
+  const { maxTokens = 160, temperature = 0.2, logSummary = '', signal } = opts;
   logAiUse(kind, logSummary || taskPrompt.slice(0, 120));
 
-  const raw = await callGemini(GIRI_SYSTEM_PREFIX + taskPrompt, {
+  // The persona goes in the provider's SYSTEM channel rather than glued to
+  // the front of the child's text. Every provider weights system
+  // instructions above user content, which is exactly the property the
+  // safety rules need — a child typing "ignore your instructions" into the
+  // Ask box is arguing with the wrong half of the request.
+  const raw = await callAi(taskPrompt, {
+    system: GIRI_SYSTEM_PREFIX + learnerContext(),
     maxTokens,
     temperature: Math.min(temperature, 0.3),
+    signal,
   });
   if (!raw) return null;
 

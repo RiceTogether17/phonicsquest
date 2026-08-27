@@ -108,7 +108,7 @@ describe('aiGuardrails', () => {
       expect(fetchMock).not.toHaveBeenCalled();
     });
 
-    it('prefixes the Giri persona and sanitises the reply', async () => {
+    it('sends the Giri persona as a system instruction and sanitises the reply', async () => {
       store.set('geminiApiKey', 'test-key');
       fetchMock.mockReturnValue(geminiReply('Use <b>"an"</b> before vowel sounds! See https://x.com'));
 
@@ -116,9 +116,13 @@ describe('aiGuardrails', () => {
       expect(out).toBe('Use "an" before vowel sounds! See');
 
       const body = JSON.parse(fetchMock.mock.calls[0][1].body);
-      const prompt = body.contents[0].parts[0].text;
-      expect(prompt.startsWith(guardrails.GIRI_SYSTEM_PREFIX)).toBe(true);
-      expect(prompt).toContain('Explain a vs an.');
+      // The persona belongs in the system channel, not glued to the front of
+      // the child's text: providers weight system instructions above user
+      // content, which is the property the safety rules need.
+      const system = body.systemInstruction.parts[0].text;
+      expect(system.startsWith(guardrails.GIRI_SYSTEM_PREFIX)).toBe(true);
+      expect(body.contents[0].parts[0].text).toBe('Explain a vs an.');
+      expect(body.contents[0].parts[0].text).not.toContain('You are Giri');
     });
 
     it('caps temperature at 0.3', async () => {

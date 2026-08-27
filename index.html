@@ -1210,12 +1210,34 @@
 
           <section class="settings-group">
             <h3 class="settings-label">AI Tutor (Giri ✨)</h3>
-            <p class="settings-help">Enter a free <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google Gemini API key</a> to unlock optional AI tutoring: "Ask Giri why" explanations after mistakes, question-specific hints, fairer marking of typed answers, and sentence-level feedback on compositions. Everything in the app works without a key — AI replies are extra, kept child-safe, capped per day, and logged for parents in the dashboard.</p>
+            <p class="settings-help">Optional. Giri can add "why did I get that wrong" explanations, question-specific hints, fairer marking of typed answers and feedback on compositions. <strong>Everything in the app works without it</strong> — AI replies are extra, kept child-safe, capped per day, and logged for you in the dashboard.</p>
+            <p class="settings-help">PhonicsQuest has no server and no AI budget, so the tutor runs on <strong>your own account</strong>. Pick where it should run and paste a key from that provider. Note that you cannot use a ChatGPT Plus, Claude Pro or Gemini Advanced <em>subscription</em> here — those are chat products and don't hand out a credential an app can use. An API key is a separate, free-to-create thing on the same provider's developer site.</p>
+
             <div class="settings-row">
-              <input type="password" id="gemini-api-key" class="settings-input" placeholder="Paste your Gemini API key…" autocomplete="off" spellcheck="false" />
+              <label class="settings-inline-label" for="ai-provider-select">Runs on</label>
+              <select id="ai-provider-select" class="category-select" aria-label="AI provider"></select>
+            </div>
+            <p class="settings-help" id="ai-provider-blurb"></p>
+
+            <div class="settings-row" id="ai-key-row">
+              <input type="password" id="gemini-api-key" class="settings-input" placeholder="Paste your API key…" autocomplete="off" spellcheck="false" aria-label="API key" />
               <button class="btn btn--ghost btn--sm" id="gemini-key-save">Save</button>
             </div>
-            <span id="gemini-key-status" class="settings-help"></span>
+            <p class="settings-help" id="ai-key-help"></p>
+
+            <div class="settings-row">
+              <label class="settings-inline-label" for="ai-model-select">Model</label>
+              <select id="ai-model-select" class="category-select" aria-label="AI model"></select>
+            </div>
+
+            <div class="settings-row">
+              <button class="btn btn--ghost btn--sm" id="ai-test-btn">Test the tutor</button>
+              <button class="btn btn--ghost btn--sm" id="ai-spend-reset">Reset cost estimate</button>
+            </div>
+            <span id="gemini-key-status" class="settings-help" role="status" aria-live="polite"></span>
+            <p class="settings-help" id="ai-spend-line"></p>
+
+            <p class="settings-help settings-help--note">Your key is stored only in this browser and is sent only to the provider you picked — never to PhonicsQuest. Anything else running in this browser could read it, so use a key with a spend limit set on the provider's console rather than your main one.</p>
           </section>
 
           <p class="settings-help settings-help--note">Looking for “Reset all progress”? It now lives in the PIN-protected Parent Dashboard, so it can’t be tapped by mistake.</p>
