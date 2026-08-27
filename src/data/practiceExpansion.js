@@ -2,10 +2,10 @@
 
 export const MIN_QUESTIONS_PER_SCOPE = 101;
 
-// 23 names (coprime with the 5 MCQ forms and 5 text types below) so every
-// (name, form) pair is unique across the first 115 indexes — this is what
-// keeps repeated base questions distinct without resorting to artificial
-// scene-setting boilerplate.
+// Used for cloze passage leads and titles ("Mei's recount"), where a name is
+// part of the material, and by varyMcqNames for names already inside a
+// sentence. MCQ stems are no longer wrapped in a name — see
+// contextualizeMcqQuestion.
 const NAMES = [
   'Mei', 'Ravi', 'Siti', 'Ben', 'Zara', 'Ahmad', 'Priya', 'Kai', 'Jia', 'Wei',
   'Ali', 'Nurul', 'Devi', 'Sam', 'Hana', 'Farid', 'Lena', 'Arjun', 'Ying',
@@ -24,32 +24,6 @@ const SETTINGS = [
   'recess', 'the art lesson', 'the science lesson', 'silent reading',
   'the library visit', 'PE', 'music class', 'assembly', 'the spelling test',
   'group work',
-];
-
-// Five short, kid-friendly question frames. Each frame includes the pupil's
-// name so that when a base sentence repeats, the prompt still reads naturally
-// and stays unique.
-const MCQ_FORMS = [
-  {
-    type: 'sentence-completion',
-    render: (question, name) => `Fill in the blank in ${name}’s sentence: ${question}`,
-  },
-  {
-    type: 'proofreading',
-    render: (question, name) => `${name} is checking a sentence. Choose the word that fits the blank: ${question}`,
-  },
-  {
-    type: 'dialogue-completion',
-    render: (question, name) => `${name} read this sentence aloud, leaving out one word: ${question} Which word is missing?`,
-  },
-  {
-    type: 'context-selection',
-    render: (question, name) => `Choose the best word for the blank in ${name}’s sentence: ${question}`,
-  },
-  {
-    type: 'editing-choice',
-    render: (question, name) => `Help ${name} complete this sentence: ${question}`,
-  },
 ];
 
 export function expansionContext(index) {
@@ -126,43 +100,35 @@ export function varyMcqNames(spec, index) {
   };
 }
 
-// Frames for stems that are already a direct question (no blank to fill),
-// such as "Which situation best shows …?". The cloze frames above would
-// otherwise produce nonsense like "leaving out one word: …? Which word is
-// missing?" on a stem that has no missing word.
-const MCQ_QUESTION_FORMS = [
-  {
-    type: 'question-response',
-    render: (question, name) => `${name} is working on this question: ${question}`,
-  },
-  {
-    type: 'discussion-choice',
-    render: (question, name) => `Help ${name} answer this: ${question}`,
-  },
-  {
-    type: 'meaning-selection',
-    render: (question, name) => `${name}’s class discussed this question: ${question}`,
-  },
-  {
-    type: 'reasoning-choice',
-    render: (question, name) => `Choose the best answer for ${name}’s question: ${question}`,
-  },
-  {
-    type: 'application-choice',
-    render: (question, name) => `${name} was asked this in class: ${question}`,
-  },
-];
-
-export function contextualizeMcqQuestion(question, index) {
-  const hasBlank = /___/.test(String(question || ''));
-  const forms = hasBlank ? MCQ_FORMS : MCQ_QUESTION_FORMS;
-  const form = forms[index % forms.length];
-  const name = NAMES[index % NAMES.length];
+/**
+ * Classify an MCQ stem, without wrapping it in anything.
+ *
+ * Every generated question used to be dressed in one of ten scene-setting
+ * frames — "Fill in the blank in Siti's sentence: …", "Help Ben complete
+ * this sentence: …". They existed to make repeated base sentences look
+ * distinct, and they worked: the banks reported 100% unique prompts while
+ * holding roughly one real question for every six shown.
+ *
+ * That was the wrong trade. The frame restates an instruction the screen
+ * already gives ("READ THE WHOLE SENTENCE FIRST, THEN CHOOSE THE WORD THAT
+ * FITS THE BLANK"), introduces a name the question never uses again, and
+ * buries the sentence the child actually has to read under a clause of
+ * admin. The banks are deduplicated to their real seeds instead, so fewer
+ * questions each appear once, unadorned.
+ *
+ * The return shape is unchanged so callers do not have to care.
+ *
+ * @param {string} question
+ * @returns {{ question: string, questionType: string }}
+ */
+export function contextualizeMcqQuestion(question) {
   const trimmed = String(question || '').trim();
-  const base = /[.?!]["'’”)\]]?$/.test(trimmed) ? trimmed : `${trimmed}.`;
+  const base = /[.?!]["'\u2019\u201d)\]]?$/.test(trimmed) ? trimmed : `${trimmed}.`;
   return {
-    question: form.render(base, name),
-    questionType: form.type,
+    question: base,
+    // Still recorded by review scheduling; now describes the stem's own
+    // shape rather than which wrapper it happened to be handed.
+    questionType: /___/.test(base) ? 'sentence-completion' : 'question-response',
   };
 }
 

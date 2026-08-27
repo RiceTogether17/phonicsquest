@@ -1218,6 +1218,28 @@ function toCanonicalCategory(cat) {
   return cat;
 }
 
+/**
+ * Keep one item per seed question, renumbering ids so they stay contiguous.
+ * See the twin in grammarMcq.js for why the banks no longer pad with copies.
+ *
+ * @template {{ seedId: string, id: string }} T
+ * @param {T[]} items
+ * @returns {T[]}
+ */
+function dedupeBySeed(items) {
+  const seen = new Set();
+  const out = [];
+  for (const item of items) {
+    if (seen.has(item.seedId)) continue;
+    seen.add(item.seedId);
+    out.push(item);
+  }
+  return out.map((item, i) => ({
+    ...item,
+    id: item.id.replace(/\d+$/, String(i + 1).padStart(3, '0')),
+  }));
+}
+
 function buildLevel(level) {
   const cats = LEVEL_CATEGORY_PLAN[level];
   const items = [];
@@ -1227,7 +1249,7 @@ function buildLevel(level) {
     for (let localOffset = 0; localOffset < MIN_QUESTIONS_PER_SCOPE; localOffset += 1) {
       const localIndex = sessionSeed + localOffset;
       const spec = varyMcqNames(VOCAB_BUILDERS[baseCat](level, localIndex), localOffset);
-      const variant = contextualizeMcqQuestion(spec.q, localOffset, level);
+      const variant = contextualizeMcqQuestion(spec.q);
       const item = {
         id: `v-${level.toLowerCase()}-${baseCat}-${String(localOffset + 1).padStart(3, '0')}`,
         level,
@@ -1259,7 +1281,7 @@ function buildLevel(level) {
     }
   }
 
-  return items;
+  return dedupeBySeed(items);
 }
 
 export const VOCAB_MCQ_ITEMS = Object.fromEntries(

@@ -1,4 +1,5 @@
 import { MCQ_ROUND_SIZE } from '../constants.js';
+import { attachReadAloudButton } from '../components/readAloudButton.js';
 import { renderMcqQuickStart } from './mcqBrowserShell.js';
 import { questMastery } from '../modules/questMastery.js';
 import { getDefaultPracticeLevel, isRecommendedLevel } from '../modules/practiceDefaults.js';
@@ -378,6 +379,7 @@ function _renderQuestion() {
       <div class="pt-choices" role="group" aria-label="Answer choices">
         ${displayChoices.map((c) => `<button class="pt-choice-btn" data-choice="${escapeAttr(c)}" aria-label="Choose ${escapeAttr(c)}">${escapeHtml(c)}</button>`).join('')}
       </div>
+      <div class="mcq-tools" id="vmcq-tools"></div>
       <button class="mcq-hint-btn" id="vmcq-rule-hint" aria-expanded="false">💡 Stuck? Show the rule</button>
       <div class="mcq-hint-panel" id="vmcq-hint-panel" hidden></div>
       <p class="pt-grammar-hint" id="vmcq-hint" role="status" aria-live="polite"></p>
@@ -385,6 +387,12 @@ function _renderQuestion() {
         <button class="btn btn--primary vmcq-next-btn" id="vmcq-next" aria-label="Next question"></button>
       </div>
     </div>`;
+
+  // Reading the stem must not be what a grammar question tests.
+  attachReadAloudButton(_container.querySelector('#vmcq-tools'), () => ({
+    question: item.q,
+    choices: displayChoices,
+  }));
 
   const nextWrap = _container.querySelector('#vmcq-next-wrap');
   const nextBtn = _container.querySelector('#vmcq-next');

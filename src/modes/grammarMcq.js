@@ -1,4 +1,5 @@
 import { questMastery } from '../modules/questMastery.js';
+import { attachReadAloudButton } from '../components/readAloudButton.js';
 import { getDefaultPracticeLevel, isRecommendedLevel } from '../modules/practiceDefaults.js';
 import { gamification } from '../modules/gamification.js';
 import { store } from '../modules/store.js';
@@ -373,6 +374,7 @@ function _renderQuestion() {
       <div class="pt-choices" role="group" aria-label="Answer choices">
         ${displayChoices.map((c) => `<button class="pt-choice-btn" data-choice="${escapeAttr(c)}" aria-label="Choose ${escapeAttr(c)}">${escapeHtml(c)}</button>`).join('')}
       </div>
+      <div class="mcq-tools" id="gmcq-tools"></div>
       <button class="mcq-hint-btn" id="gmcq-rule-hint" aria-expanded="false">💡 Stuck? Show the rule</button>
       <div class="mcq-hint-panel" id="gmcq-hint-panel" hidden></div>
       <p class="pt-grammar-hint" id="gmcq-hint" role="status" aria-live="polite"></p>
@@ -380,6 +382,12 @@ function _renderQuestion() {
         <button class="btn btn--primary vmcq-next-btn" id="gmcq-next" aria-label="Next question"></button>
       </div>
     </div>`;
+
+  // Reading the stem must not be what a grammar question tests.
+  attachReadAloudButton(_container.querySelector('#gmcq-tools'), () => ({
+    question: item.q,
+    choices: displayChoices,
+  }));
 
   const nextWrap = _container.querySelector('#gmcq-next-wrap');
   const nextBtn = _container.querySelector('#gmcq-next');
