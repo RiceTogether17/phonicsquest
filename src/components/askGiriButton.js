@@ -10,8 +10,9 @@
 
 import { canCallAi } from '../modules/aiGuardrails.js';
 import { escapeHtml } from '../utils/escapeHtml.js';
+import { giriInline, giriImageEl } from './mascot.js';
 
-const FALLBACK_LINE = '🦉 Giri is having a quiet moment — the explanation above has you covered!';
+const FALLBACK_LINE = `${giriInline('neutral')}Giri is having a quiet moment — the explanation above has you covered!`;
 
 /**
  * Append an Ask-Giri button to a host element.
@@ -39,11 +40,11 @@ export function attachAskGiriButton(hostEl, fetchAnswer, { label = 'Ask Giri why
 
   btn.addEventListener('click', () => {
     btn.disabled = true;
-    btn.textContent = '🦉 Giri is thinking…';
+    btn.replaceChildren(giriImageEl('thinking'), document.createTextNode('Giri is thinking…'));
     Promise.resolve(fetchAnswer()).then(answer => {
       if (!wrap.isConnected) return;
       wrap.innerHTML = answer
-        ? `<p class="mcq-ask-giri-answer" role="status">🦉 ${escapeHtml(answer)}</p>`
+        ? `<p class="mcq-ask-giri-answer" role="status">${giriInline('neutral')}${escapeHtml(answer)}</p>`
         : `<p class="mcq-ask-giri-answer" role="status">${FALLBACK_LINE}</p>`;
     }).catch(() => {
       if (!wrap.isConnected) return;

@@ -10,8 +10,9 @@
  * chip text, authored copy and model replies all reach innerHTML.
  */
 
-import { html } from '../../utils/html.js';
+import { html, raw } from '../../utils/html.js';
 import { modalManager } from '../../modules/modalManager.js';
+import { giriInline } from '../mascot.js';
 import { getActiveProfile } from '../../modules/profiles.js';
 import { hasApiKey } from '../../modules/aiService.js';
 import {
@@ -60,7 +61,22 @@ export function renderAskGiriPanel(host) {
           <button class="btn btn--primary" type="button" id="ask-giri-send">Ask</button>
         </div>
       </div>` : ''}
+    ${hasApiKey() ? '' : html`
+      <p class="ask-giri-setup">
+        Giri is answering from his built-in notes. A grown-up can switch on
+        AI answers so he can explain in fresh words each time.
+        <button class="btn btn--ghost btn--sm" type="button" id="ask-giri-setup-btn">Set up the AI tutor</button>
+      </p>`}
   `;
+
+  // The moment a child taps Ask Giri is exactly when a parent finds out the
+  // AI is off — so the offer belongs here, not only buried in Settings.
+  // Close this modal first: stacking Settings on top of it leaves two open
+  // dialogs and an Escape key that dismisses the wrong one.
+  host.querySelector('#ask-giri-setup-btn')?.addEventListener('click', () => {
+    modalManager.close('modal-ask-giri');
+    document.getElementById('btn-home-ai-tutor')?.click();
+  });
 
   const answerHost = host.querySelector('#ask-giri-answer');
 
@@ -92,12 +108,12 @@ export function renderAskGiriPanel(host) {
     if (!q || !answerHost || !sendBtn) return;
 
     sendBtn.disabled = true;
-    answerHost.innerHTML = '<p class="mcq-ask-giri-answer">🦉 Giri is thinking…</p>';
+    answerHost.innerHTML = html`<p class="mcq-ask-giri-answer">${raw(giriInline('thinking'))}Giri is thinking…</p>`;
     const reply = await askGiriFreeText(q);
     sendBtn.disabled = false;
 
     answerHost.innerHTML = reply
-      ? html`<p class="mcq-ask-giri-answer">🦉 ${reply}</p>`
-      : '<p class="mcq-ask-giri-answer">🦉 Giri can\'t answer right now — try one of the question buttons above!</p>';
+      ? html`<p class="mcq-ask-giri-answer">${raw(giriInline('neutral'))}${reply}</p>`
+      : html`<p class="mcq-ask-giri-answer">${raw(giriInline('neutral'))}Giri can't answer right now — try one of the question buttons above!</p>`;
   });
 }

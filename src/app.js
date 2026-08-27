@@ -41,7 +41,7 @@ import { initHomeTabs, selectTab, getInitialTab } from './modules/homeTabs.js';
 import { buildJourneyBarHtml, STAGE_META } from './components/journeyBar.js';
 import { renderJourneyMap } from './components/journeyMap.js';
 import { speech, calculateCalibrationThreshold } from './modules/speech.js';
-import { mascot } from './components/mascot.js';
+import { mascot, giriInline } from './components/mascot.js';
 import {
   findStageForGroup,
   hasSeenLesson,
@@ -826,6 +826,19 @@ class App {
     });
     document.getElementById('btn-home-settings')?.addEventListener('click', () => {
       this._openModal('modal-settings');
+    });
+
+    // Opens Settings already scrolled to the AI section. Landing a parent at
+    // the top of a seven-section modal and expecting them to find the last
+    // one is how this ended up undiscoverable in the first place.
+    document.getElementById('btn-home-ai-tutor')?.addEventListener('click', () => {
+      this._openModal('modal-settings');
+      requestAnimationFrame(() => {
+        const section = document.getElementById('ai-status')?.closest('.settings-group');
+        section?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        section?.classList.add('settings-group--highlight');
+        setTimeout(() => section?.classList.remove('settings-group--highlight'), 2000);
+      });
     });
 
     document.querySelector('[data-close="modal-create-profile"]')?.addEventListener('click', () => {
@@ -1674,7 +1687,7 @@ class App {
       ? `
       <div class="home-start-card" aria-label="Today's lesson with Giri">
         <div class="start-card-eyebrow">
-          <span class="start-card-label">🦉 TODAY'S LESSON WITH GIRI</span>
+          <span class="start-card-label">${giriInline('whiteboard', 18)}TODAY'S LESSON WITH GIRI</span>
           <span class="start-card-urgency">${lesson.complete ? '🎉 Complete' : `${lesson.done}/${lesson.total} steps done`}</span>
         </div>
         <h2 class="start-card-title">${next ? `${esc(next.icon)} ${esc(next.title)}` : '🎉 Lesson complete — great work!'}</h2>
@@ -1742,7 +1755,48 @@ class App {
    * whoever is holding the device, and gating a three-number summary would
    * defeat the point of putting it here.
    */
+  /**
+   * Keep the AI tutor tile's sub-line honest about whether it is actually on.
+   *
+   * "Let Giri explain mistakes" reads as an advert when it is already
+   * running and as an instruction when it is not; a parent should be able to
+   * tell which from the tab, without opening anything.
+   */
+  async _renderAiTutorTile() {
+    const sub = document.getElementById('home-ai-tutor-sub');
+    const badge = document.getElementById('home-ai-tutor-badge');
+    if (!sub && !badge) return;
+    try {
+      const [{ getProvider }, aiConfig] = await Promise.all([
+        import('./modules/aiProviders.js'),
+        import('./modules/aiConfig.js'),
+      ]);
+      const id = aiConfig.activeProviderId();
+      const on = aiConfig.isTutorConfigured(id);
+      const provider = getProvider(id);
+
+      // The badge lives in the title row because phones hide the sub-line —
+      // and on a phone, "is it on?" is the whole reason to look at this tile.
+      if (badge) {
+        badge.textContent = on ? 'On' : 'Off';
+        badge.className = `home-parents-btn__badge home-parents-btn__badge--${on ? 'on' : 'off'}`;
+      }
+      if (sub) {
+        if (!on) sub.textContent = 'Tap to turn on — free options available.';
+        else {
+          sub.textContent = provider?.free
+            ? 'Running free on this device'
+            : `Using your ${provider?.label ?? 'AI'} account`;
+        }
+      }
+    } catch {
+      // The tile still works without its status line.
+    }
+  }
+
   _renderParentSnapshot() {
+    this._renderAiTutorTile();
+
     const host = document.getElementById('parent-snapshot');
     if (!host) return;
 
@@ -1999,7 +2053,7 @@ class App {
 
     const headline = lesson.complete
       ? "🎉 Today's lesson complete! See you tomorrow."
-      : `🦉 Today's Lesson · ${lesson.done}/${lesson.total} done`;
+      : `${giriInline('whiteboard', 18)}Today's Lesson · ${lesson.done}/${lesson.total} done`;
     const sub = lesson.complete
       ? `Every step done — +${LESSON_BONUS_XP} bonus XP earned.`
       : 'Warm up, learn something new, practise, review — in order, like a real lesson.';

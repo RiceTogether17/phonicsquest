@@ -26,6 +26,48 @@ export const STATES = {
   whiteboard: `${BASE}images/mascot/giri-whiteboard.png`,
 };
 
+/**
+ * Giri's portrait sized to sit inside a line of text.
+ *
+ * Several surfaces used a 🦉 emoji as shorthand for Giri — a different owl
+ * from the character the app actually draws, on labels that name him. This
+ * returns markup rather than an emoji so those read as the same character
+ * everywhere.
+ *
+ * The returned string is built entirely from constants in this file, so it
+ * is safe to splice with `raw()` inside an html`` template. Never pass
+ * caller data through it.
+ *
+ * @param {keyof typeof STATES} [pose]
+ * @param {number} [size]  px; matches the surrounding text size
+ * @returns {string} an <img> tag
+ */
+export function giriInline(pose = 'neutral', size = 20) {
+  const src = STATES[pose] || STATES.neutral;
+  const px = Number(size) || 20;
+  return `<img src="${src}" alt="" draggable="false" width="${px}" height="${px}" class="giri-inline" />`;
+}
+
+/**
+ * Giri's portrait as a real element, for the places that set a button's
+ * label directly. Avoids handing innerHTML a template literal just to place
+ * a constant image next to some text.
+ *
+ * @param {keyof typeof STATES} [pose]
+ * @param {number} [size]
+ * @returns {HTMLImageElement}
+ */
+export function giriImageEl(pose = 'neutral', size = 20) {
+  const img = document.createElement('img');
+  img.src = STATES[pose] || STATES.neutral;
+  img.alt = '';
+  img.draggable = false;
+  img.width = Number(size) || 20;
+  img.height = Number(size) || 20;
+  img.className = 'giri-inline';
+  return img;
+}
+
 /** Random encouraging phrases */
 const CHEERS = [
   "You're doing great!",

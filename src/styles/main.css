@@ -17282,6 +17282,66 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   align-items: center;
   margin-top: 6px;
 }
+/* A class-level `display` outranks the UA stylesheet's `[hidden]` rule, so
+   `hidden` on a settings row was doing nothing — the manual key field showed
+   even though "Type it instead" is what reveals it. */
+.settings-row[hidden] {
+  display: none;
+}
+/* Briefly rings the AI section after the Grown-ups tile jumps to it, so a
+   parent's eye lands on the right one of seven. */
+.settings-group--highlight {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 4px;
+  border-radius: var(--radius-md, 10px);
+  transition: outline-color 0.4s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .settings-group--highlight {
+    transition: none;
+  }
+}
+
+/* On/off pill in a Grown-ups tile title. Phones hide the sub-line, so a
+   status that only lived there was invisible on the device most parents
+   are holding. */
+.home-parents-btn__badge {
+  display: inline-block;
+  font-size: 0.7em;
+  font-weight: 800;
+  padding: 1px 8px;
+  border-radius: var(--radius-full, 999px);
+  vertical-align: 2px;
+}
+.home-parents-btn__badge--on {
+  background: var(--color-success-light, #dcfce7);
+  color: var(--color-success-dark, #14532d);
+}
+.home-parents-btn__badge--off {
+  background: var(--surface-alt, #e2e8f0);
+  color: var(--text-muted, #475569);
+}
+.home-parents-btn__badge:empty {
+  display: none;
+}
+
+/* Giri's portrait in the Grown-ups tile, where the others use an emoji. */
+.home-parents-btn__mascot {
+  display: inline-block;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+/* Giri's portrait inline in a run of text, where a 🦉 emoji used to stand
+   in for him. The global reset makes images block-level, so this puts it
+   back inline and drops it to the text baseline. */
+.giri-inline {
+  display: inline-block;
+  vertical-align: -0.25em;
+  object-fit: contain;
+  margin-right: 3px;
+}
+
 /* Giri's portrait sitting inside a modal title, in place of an emoji.
    The global reset sets `img { display: block }`, which would drop the
    heading text onto its own line — so this one goes back to inline, and

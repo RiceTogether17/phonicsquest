@@ -22,6 +22,7 @@ import { CURRICULUM } from '../data/curriculum.js';
 import { WORDS } from '../data/words.js';
 import { renderPhonemes } from './phonemeDisplay.js';
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
+import { giriInline } from './mascot.js';
 
 const OVERLAY_ID = 'mini-lesson-overlay';
 
@@ -154,7 +155,7 @@ export function showTipLesson({ icon, label, rule, example, tip, onDone }) {
   overlay.innerHTML = `
     <div class="mini-lesson-panel" role="document">
       <div class="mini-lesson-step-tag">Today's lesson</div>
-      <div class="mini-lesson-mascot" aria-hidden="true">${escapeHtml(icon || '🦉')}</div>
+      <div class="mini-lesson-mascot" aria-hidden="true">${icon ? escapeHtml(icon) : giriInline('whiteboard', 56)}</div>
       <h2 class="mini-lesson-headline">${escapeHtml(label)}</h2>
       <ol class="mini-lesson-script">
         <li class="mini-lesson-line"><strong>Rule:</strong> ${escapeHtml(rule)}</li>
@@ -200,7 +201,7 @@ function _renderTeachStep(overlay, stage, lesson, onNext) {
   overlay.innerHTML = `
     <div class="mini-lesson-panel" role="document">
       <div class="mini-lesson-step-tag">Lesson · Step 1 of 2</div>
-      <div class="mini-lesson-mascot" aria-hidden="true">🦉</div>
+      <div class="mini-lesson-mascot" aria-hidden="true">${giriInline('whiteboard', 56)}</div>
       <h2 class="mini-lesson-headline">${escapeHtml(lesson.headline)}</h2>
       <p class="mini-lesson-stage">${escapeHtml(stage.name)}</p>
       ${chips ? `<div class="mini-lesson-chips" role="group" aria-label="Tap to hear the sounds">${chips}</div>` : ''}
@@ -247,7 +248,7 @@ function _renderWeDoStep(overlay, stage, lesson, onDone) {
   overlay.innerHTML = `
     <div class="mini-lesson-panel" role="document">
       <div class="mini-lesson-step-tag">Lesson · Step 2 of 2</div>
-      <div class="mini-lesson-mascot" aria-hidden="true">🦉</div>
+      <div class="mini-lesson-mascot" aria-hidden="true">${giriInline('holdCard', 56)}</div>
       <h2 class="mini-lesson-headline">Let's read one together!</h2>
       <p class="mini-lesson-stage">${escapeHtml(stage.name)}</p>
       <div class="mini-lesson-word">

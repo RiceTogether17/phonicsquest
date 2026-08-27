@@ -971,7 +971,7 @@ function _renderTutorActivity() {
   const aiKinds = {
     explain: '❓ Why explained',
     hint: '💡 Hint',
-    ask: '🦉 Ask Giri',
+    ask: 'Ask Giri',
     grade: '✍️ Essay marked',
   };
   const aiHtml = aiLog.length
