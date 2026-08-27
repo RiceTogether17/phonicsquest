@@ -118,13 +118,17 @@ describe('mcqSeedKey', () => {
     expect(a).not.toBe(b);
   });
 
-  it('collapses the rendered banks to far fewer seed identities than items', () => {
+  it('gives every rendered item its own seed identity', () => {
+    // This used to assert the opposite — that seeds were fewer than half the
+    // items — because each authored sentence was shipped about six times
+    // under different scene-setting wrappers. The banks are deduplicated to
+    // their seeds now, so one item means one question.
     const items = buildGrammarMcqLevel('P4');
     const seeds = new Set(items.map((item) => item.seedId));
     expect(items.every((item) => typeof item.seedId === 'string' && item.seedId.length > 3)).toBe(
       true,
     );
-    expect(seeds.size).toBeLessThan(items.length / 2);
+    expect(seeds.size).toBe(items.length);
   });
 
   it('strips the dialogue-completion suffix too', () => {

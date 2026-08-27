@@ -10,14 +10,23 @@ import { classifySentenceTrack } from '../modules/sentenceForgeTracks.js';
 const normalize = value => String(value || '').trim().toLowerCase();
 const blankCount = text => (String(text || '').match(/___/g) || []).length;
 
+// Every category used to report 101 questions. It never held 101: each was a
+// rotation through ~18 authored sentences, repeated six times and disguised
+// by a scene-setting wrapper ("Fill in the blank in Siti's sentence: …").
+// Removing the wrapper removed the disguise, so the banks now report what
+// they actually contain. This floor is the real one — raise it by authoring
+// more sentences in a builder, never by padding with copies again.
+const MIN_QUESTIONS_PER_CATEGORY = 8;
+
 function expectMcqScopes(bank, label) {
   for (const [level, items] of Object.entries(bank)) {
     const scopes = Object.groupBy(items, item => item.category);
     for (const [category, questions] of Object.entries(scopes)) {
       const tag = `${label}/${level}/${category}`;
-      expect(questions.length, tag).toBeGreaterThan(100);
+      expect(questions.length, tag).toBeGreaterThanOrEqual(MIN_QUESTIONS_PER_CATEGORY);
       expect(new Set(questions.map(item => normalize(item.q))).size, `${tag} unique prompts`).toBe(questions.length);
-      expect(new Set(questions.map(item => item.questionType)).size, `${tag} question formats`).toBeGreaterThanOrEqual(5);
+      // One item per seed now, so seed identity and item count match.
+      expect(new Set(questions.map(item => item.seedId)).size, `${tag} distinct seeds`).toBe(questions.length);
       for (const item of questions) {
         expect(item.choices.length, `${item.id} choices`).toBe(4);
         expect(new Set(item.choices.map(normalize)).size, `${item.id} distinct choices`).toBe(4);
@@ -41,13 +50,40 @@ function expectClozeScope(passagesForScope, tag) {
   }
 }
 
-describe('practice banks exceed 100 accurate questions per selectable scope', () => {
-  it('covers every Grammar MCQ grade/category with five question formats', () => {
+describe('practice banks hold accurate, non-repeating questions per selectable scope', () => {
+  it('covers every Grammar MCQ grade/category without repeating a question', () => {
     expectMcqScopes(GRAMMAR_MCQ_ITEMS, 'Grammar MCQ');
   });
 
-  it('covers every Vocabulary MCQ grade/category with five question formats', () => {
+  it('covers every Vocabulary MCQ grade/category without repeating a question', () => {
     expectMcqScopes(VOCAB_MCQ_ITEMS, 'Vocabulary MCQ');
+  });
+
+  it('no MCQ stem carries a scene-setting wrapper', () => {
+    // The wrappers restated the on-screen instruction and buried the sentence
+    // the child has to read. If one comes back, it means a generator started
+    // padding a thin category with disguised copies again.
+    const WRAPPERS = [
+      /Fill in the blank in .+?'s sentence:/i,
+      /is checking a sentence\. Choose the word/i,
+      /read this sentence aloud, leaving out one word/i,
+      /Choose the best word for the blank in/i,
+      /Help .+? complete this sentence:/i,
+      /is working on this question:/i,
+      /Help .+? answer this:/i,
+      /'s class discussed this question:/i,
+      /Choose the best answer for .+?'s question:/i,
+      /was asked this in class:/i,
+    ];
+    const offenders = [];
+    for (const bank of [GRAMMAR_MCQ_ITEMS, VOCAB_MCQ_ITEMS]) {
+      for (const items of Object.values(bank)) {
+        for (const item of items) {
+          if (WRAPPERS.some(re => re.test(item.q))) offenders.push(`${item.id}: ${item.q}`);
+        }
+      }
+    }
+    expect(offenders.slice(0, 5), `${offenders.length} wrapped stems`).toEqual([]);
   });
 
   it('covers every Cloze Castle grade/category with unique, answerable blanks', () => {
@@ -85,7 +121,10 @@ describe('practice banks exceed 100 accurate questions per selectable scope', ()
     }
   });
 
-  it('uses the shared threshold expected by every generator', () => {
+  it('uses the shared rotation depth expected by every generator', () => {
+    // Still 101: generators rotate this many times through their authored
+    // sentences, and the deduplication step keeps whatever distinct
+    // questions that rotation produced.
     expect(MIN_QUESTIONS_PER_SCOPE).toBe(101);
   });
 });

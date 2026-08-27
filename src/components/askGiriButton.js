@@ -11,6 +11,7 @@
 import { canCallAi } from '../modules/aiGuardrails.js';
 import { escapeHtml } from '../utils/escapeHtml.js';
 import { giriInline, giriImageEl } from './mascot.js';
+import { speakGiri } from './speakGiri.js';
 
 const FALLBACK_LINE = `${giriInline('neutral')}Giri is having a quiet moment — the explanation above has you covered!`;
 
@@ -46,6 +47,9 @@ export function attachAskGiriButton(hostEl, fetchAnswer, { label = 'Ask Giri why
       wrap.innerHTML = answer
         ? `<p class="mcq-ask-giri-answer" role="status">${giriInline('neutral')}${escapeHtml(answer)}</p>`
         : `<p class="mcq-ask-giri-answer" role="status">${FALLBACK_LINE}</p>`;
+      // Giri explains out loud as well as on screen. A child who needed the
+      // explanation is often the same child who finds a paragraph hard work.
+      if (answer) speakGiri(answer);
     }).catch(() => {
       if (!wrap.isConnected) return;
       wrap.innerHTML = `<p class="mcq-ask-giri-answer" role="status">${FALLBACK_LINE}</p>`;

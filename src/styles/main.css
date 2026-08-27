@@ -17353,6 +17353,39 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   margin-right: 4px;
 }
 
+/* "Read it to me" on a question. Sits above the rule hint because hearing
+   the sentence is a prerequisite for the question, where the rule is a
+   fallback after trying. */
+.mcq-tools {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-2, 8px);
+}
+.read-aloud-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border: 2px solid var(--border, #e5e3fa);
+  border-radius: var(--radius-full, 999px);
+  background: var(--surface, #fff);
+  color: var(--text-main, #222);
+  font-weight: 700;
+  font-size: 0.9em;
+  cursor: pointer;
+  min-height: 40px;
+}
+.read-aloud-btn:hover,
+.read-aloud-btn:focus-visible {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.read-aloud-btn[data-speaking='true'] {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-light, #ede9fe);
+}
+
 /* ── AI tutor setup ──────────────────────────────────────────────── */
 /* One line answering "is it on?" — the question most parents open this
    screen with, so it sits above every control rather than under them. */

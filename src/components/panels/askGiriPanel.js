@@ -13,6 +13,7 @@
 import { html, raw } from '../../utils/html.js';
 import { modalManager } from '../../modules/modalManager.js';
 import { giriInline } from '../mascot.js';
+import { speakGiri } from '../speakGiri.js';
 import { getActiveProfile } from '../../modules/profiles.js';
 import { hasApiKey } from '../../modules/aiService.js';
 import {
@@ -115,5 +116,6 @@ export function renderAskGiriPanel(host) {
     answerHost.innerHTML = reply
       ? html`<p class="mcq-ask-giri-answer">${raw(giriInline('neutral'))}${reply}</p>`
       : html`<p class="mcq-ask-giri-answer">${raw(giriInline('neutral'))}Giri can't answer right now — try one of the question buttons above!</p>`;
+    if (reply) speakGiri(reply);
   });
 }
