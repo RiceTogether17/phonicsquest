@@ -17282,6 +17282,17 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   align-items: center;
   margin-top: 6px;
 }
+/* Giri's portrait sitting inside a modal title, in place of an emoji.
+   The global reset sets `img { display: block }`, which would drop the
+   heading text onto its own line — so this one goes back to inline, and
+   is baseline-aligned so the text does not shift when it loads. */
+.modal-title-mascot {
+  display: inline-block;
+  vertical-align: -0.35em;
+  object-fit: contain;
+  margin-right: 4px;
+}
+
 /* ── AI tutor setup ──────────────────────────────────────────────── */
 /* One line answering "is it on?" — the question most parents open this
    screen with, so it sits above every control rather than under them. */

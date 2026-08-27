@@ -190,11 +190,16 @@
         <!-- Ask Giri — question chips built from recent mistakes (app.js) -->
         <div class="review-banner" id="ask-giri-banner" role="status">
           <button class="stories-banner stories-banner--green" id="btn-ask-giri" aria-label="Open Ask Giri">
+            <!-- Giri himself, not a stock owl. This is the one banner that is
+                 ABOUT the character, so it should be his portrait — the
+                 thinking pose, which matches "stuck on something?". The other
+                 banners keep emoji because theirs are topic icons, not
+                 characters. -->
             <span class="stories-banner-mascot">
-              <span style="font-size:2rem;line-height:1" aria-hidden="true">🦉</span>
+              <img src="/phonicsquest/images/mascot/giri-thinking.png" alt="" draggable="false" width="40" height="40" style="object-fit:contain" />
             </span>
             <span class="stories-banner-text">
-              <span class="stories-banner-title" id="ask-giri-title">🦉 Ask Giri</span>
+              <span class="stories-banner-title" id="ask-giri-title">Ask Giri</span>
               <span class="stories-banner-sub" id="ask-giri-sub">Stuck on something? Get it explained</span>
             </span>
             <span class="stories-banner-arrow">→</span>
@@ -1323,7 +1328,10 @@
     <div class="modal-overlay" id="modal-ask-giri" role="dialog" aria-modal="true" aria-label="Ask Giri — get a skill explained" hidden>
       <div class="modal-panel">
         <div class="modal-header">
-          <h2 class="modal-title">🦉 Ask Giri</h2>
+          <h2 class="modal-title">
+            <img src="/phonicsquest/images/mascot/giri-thinking.png" alt="" draggable="false" width="28" height="28" class="modal-title-mascot" />
+            Ask Giri
+          </h2>
           <button class="modal-close" aria-label="Close Ask Giri" data-close="modal-ask-giri">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
