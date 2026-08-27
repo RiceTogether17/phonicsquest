@@ -14,6 +14,7 @@ import { STORIES, BAND_META } from '../data/stories.js';
 import { isHFW, extractStoryHFW } from '../data/hfw.js';
 import { WORDS } from '../data/words.js';
 import { audio } from '../modules/audio.js';
+import { giriInline, giriImageEl } from '../components/mascot.js';
 import { runStoryQuest } from './storyQuest.js';
 import { mapCharIndexToWord, isOffscreen } from '../modules/karaokeUtils.js';
 import { prefersReducedMotion } from '../utils/motion.js';
@@ -852,7 +853,7 @@ function _renderReadAloud(story) {
           <!-- Read to Giri section (collapsible) — Giri listens while you read -->
           <details class="story-tool-section rtg-bar" id="rtg-bar">
             <summary class="story-tool-summary rtg-summary">
-              <span class="rtg-label">🦉 Read to Giri</span>
+              <span class="rtg-label">${giriInline('encourage', 18)}Read to Giri</span>
               <span class="rtg-hint">Read each line — Giri listens</span>
             </summary>
             <div class="story-tool-body">
@@ -1066,7 +1067,7 @@ async function _rtgListen(story) {
   }
 
   listenBtn.disabled = true;
-  listenBtn.textContent = '🦉 Giri is listening…';
+  listenBtn.replaceChildren(giriImageEl('encourage'), document.createTextNode('Giri is listening…'));
   _rtgSetStatus('Go ahead — read the glowing line now.');
 
   const result = await listenToLine(expectedText);
