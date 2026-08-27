@@ -131,17 +131,18 @@ export const AI_PROVIDERS = {
     models: [{ id: 'on-device', label: 'Chrome built-in' }],
 
     async available() {
-      const api = globalThis.LanguageModel;
-      if (!api?.availability) return false;
+      const api = onDeviceApi();
+      if (!api) return false;
       try {
-        return (await api.availability()) !== 'unavailable';
-      } catch {
-        return false;
-      }
+        // Newer Chrome exposes availability(); older exposes capabilities().
+        if (api.availability) return (await api.availability()) !== 'unavailable';
+        if (api.capabilities) return (await api.capabilities())?.available !== 'no';
+      } catch { /* treat any probe failure as unavailable */ }
+      return false;
     },
 
     async call({ system, prompt, maxTokens, temperature, signal }) {
-      const api = globalThis.LanguageModel;
+      const api = onDeviceApi();
       if (!api?.create) {
         throw new AiError('unsupported', 'This browser has no built-in AI. Use Chrome on desktop, or choose a provider and paste a key.');
       }
@@ -320,6 +321,38 @@ export const AI_PROVIDERS = {
     },
   },
 };
+
+/**
+ * Chrome's built-in model, under whichever global this browser uses.
+ * It shipped as `window.ai.languageModel` and later moved to a top-level
+ * `LanguageModel`; checking both is the difference between the no-setup
+ * path working on a parent's machine and it silently not existing.
+ */
+function onDeviceApi() {
+  return globalThis.LanguageModel
+    || globalThis.ai?.languageModel
+    || null;
+}
+
+/**
+ * Which provider does this key belong to?
+ *
+ * Every provider stamps its keys with a distinct prefix, so a parent never
+ * has to answer "which provider is this?" — a question they may not even
+ * know they are being asked. They paste; the app works it out.
+ *
+ * @param {string} key
+ * @returns {string|null} provider id, or null if it matches nothing
+ */
+export function detectProviderFromKey(key) {
+  const k = String(key || '').trim();
+  if (!k) return null;
+  // Longest prefix first: an Anthropic key also starts with "sk-".
+  if (k.startsWith('sk-ant-')) return 'anthropic';
+  if (k.startsWith('AIza')) return 'google';
+  if (k.startsWith('sk-')) return 'openai';
+  return null;
+}
 
 /** Provider ids in the order the settings screen should offer them. */
 export const PROVIDER_ORDER = ['chrome', 'google', 'anthropic', 'openai'];

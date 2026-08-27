@@ -193,27 +193,66 @@ export const settingsController = {
       await this._renderAiSettings();
     });
 
+    // One tap: turn on the browser's built-in model. No account, no key.
+    document.getElementById('ai-ondevice-btn')?.addEventListener('click', async () => {
+      const { store: s } = await import('./store.js');
+      s.set('aiProvider', 'chrome');
+      await this._verifyAiSetup('Giri is on — running free on this device.');
+    });
+
+    // One tap: read the key off the clipboard, work out whose it is, verify it.
+    document.getElementById('ai-paste-btn')?.addEventListener('click', async () => {
+      let text = '';
+      try {
+        text = (await navigator.clipboard?.readText?.()) || '';
+      } catch {
+        // Firefox and Safari refuse clipboard reads without a user gesture
+        // they trust. Fall back to the field rather than dead-ending.
+      }
+      if (!text.trim()) {
+        this._revealManualKeyRow('Paste the key here, then press Save.');
+        return;
+      }
+      await this._adoptKey(text);
+    });
+
+    document.getElementById('ai-manual-toggle')?.addEventListener('click', () => {
+      this._revealManualKeyRow('');
+    });
+
+    // Typing or pasting into the field also auto-detects — the Save button
+    // should never be the thing that tells a parent they picked wrong.
+    document.getElementById('gemini-api-key')?.addEventListener('input', async (e) => {
+      const { detectProviderFromKey } = await import('./aiProviders.js');
+      const { store: s } = await import('./store.js');
+      const detected = detectProviderFromKey(/** @type {HTMLInputElement} */ (e.target).value);
+      if (detected && detected !== s.get('aiProvider')) {
+        s.set('aiProvider', detected);
+        await this._renderAiSettings();
+      }
+    });
+
     document.getElementById('gemini-key-save')?.addEventListener('click', async () => {
-      const { activeProviderId, setApiKey } = await import('./aiConfig.js');
-      const { validateKeyShape } = await import('./aiProviders.js');
       const input = /** @type {HTMLInputElement|null} */ (
         document.getElementById('gemini-api-key')
       );
-      const status = document.getElementById('gemini-key-status');
-      const providerId = activeProviderId();
       const key = input?.value?.trim() || '';
-
-      if (key) {
-        // Catch a mistyped or wrong-provider key here rather than letting the
-        // child hit a silent tutor an hour later.
-        const shape = validateKeyShape(providerId, key);
-        if (!shape.ok) {
-          if (status) status.textContent = `⚠ ${shape.reason}`;
-          return;
-        }
+      if (!key) {
+        const { activeProviderId, setApiKey } = await import('./aiConfig.js');
+        setApiKey(activeProviderId(), '');
+        const status = document.getElementById('gemini-key-status');
+        if (status) status.textContent = 'Key cleared';
+        await this._renderAiSettings();
+        return;
       }
-      setApiKey(providerId, key);
-      if (status) status.textContent = key ? '✓ Key saved — try "Test the tutor"' : 'Key cleared';
+      await this._adoptKey(key);
+    });
+
+    document.getElementById('ai-forget-btn')?.addEventListener('click', async () => {
+      const { activeProviderId, setApiKey } = await import('./aiConfig.js');
+      setApiKey(activeProviderId(), '');
+      const status = document.getElementById('gemini-key-status');
+      if (status) status.textContent = 'Signed out — the key has been forgotten.';
       await this._renderAiSettings();
     });
 
@@ -364,6 +403,83 @@ export const settingsController = {
     this._renderAiSettings();
   },
 
+  /** Show the type-it-yourself field (used when the clipboard is unavailable). */
+  _revealManualKeyRow(message) {
+    const row = document.getElementById('ai-key-row');
+    if (row) row.hidden = false;
+    const status = document.getElementById('gemini-key-status');
+    if (status && message) status.textContent = message;
+    /** @type {HTMLInputElement|null} */ (document.getElementById('gemini-api-key'))?.focus();
+  },
+
+  /**
+   * Take a pasted key, work out whose it is, store it and prove it works.
+   *
+   * This is the whole setup flow in one step. A parent should never have to
+   * answer "which provider?" or "which model?" — the key itself says which
+   * provider, and the provider has a sensible default model. What they DO
+   * need is to find out immediately whether it worked, which is why this
+   * spends one real request rather than just saying "saved".
+   *
+   * @param {string} rawKey
+   */
+  async _adoptKey(rawKey) {
+    const [{ detectProviderFromKey, validateKeyShape, getProvider }, aiConfig, { store: s }] =
+      await Promise.all([
+        import('./aiProviders.js'),
+        import('./aiConfig.js'),
+        import('./store.js'),
+      ]);
+    const status = document.getElementById('gemini-key-status');
+    const key = String(rawKey || '').trim();
+
+    const providerId = detectProviderFromKey(key);
+    if (!providerId) {
+      this._revealManualKeyRow('');
+      if (status) {
+        status.textContent =
+          '⚠ That does not look like an AI key. Keys start with AIza (Google), sk-ant- (Anthropic) or sk- (OpenAI).';
+      }
+      return;
+    }
+
+    const shape = validateKeyShape(providerId, key);
+    if (!shape.ok) {
+      this._revealManualKeyRow('');
+      if (status) status.textContent = `⚠ ${shape.reason}`;
+      return;
+    }
+
+    s.set('aiProvider', providerId);
+    aiConfig.setApiKey(providerId, key);
+    await this._verifyAiSetup(`Giri is on, using your ${getProvider(providerId).label} account.`);
+  },
+
+  /**
+   * Prove the tutor actually answers, and say so in one line.
+   *
+   * "Saved" is not the same as "working", and the gap between them is where
+   * a parent gives up: they set it up, nothing visibly changes, and the
+   * first time they find out is when a child asks Giri something and gets
+   * silence. One live request at setup time closes that gap.
+   *
+   * @param {string} successLine
+   */
+  async _verifyAiSetup(successLine) {
+    const status = document.getElementById('gemini-key-status');
+    if (status) status.textContent = 'Checking…';
+    const { callAi } = await import('./aiService.js');
+    const { lastError } = await import('./aiConfig.js');
+
+    const reply = await callAi('Reply with exactly: ready', { maxTokens: 16, temperature: 0 });
+    if (status) {
+      status.textContent = reply
+        ? `✓ ${successLine}`
+        : `⚠ ${lastError()?.message || 'That did not work. Check the key and try again.'}`;
+    }
+    await this._renderAiSettings();
+  },
+
   /**
    * Paint the AI tutor section from the stored config.
    *
@@ -395,22 +511,38 @@ export const settingsController = {
     const blurb = $('ai-provider-blurb');
     if (blurb) blurb.textContent = provider.blurb || '';
 
-    // Key row: hidden entirely for a provider that needs no credential.
-    const keyRow = $('ai-key-row');
-    if (keyRow) keyRow.hidden = !provider.needsKey;
+    // The one line that answers "is it on?" — the only question most
+    // parents open this screen with.
+    const statusEl = $('ai-status');
+    if (statusEl) {
+      const ready = aiConfig.isTutorConfigured(providerId);
+      statusEl.className = `ai-status ai-status--${ready ? 'on' : 'off'}`;
+      statusEl.textContent = ready
+        ? `Giri is on — ${provider.free ? 'running free on this device' : `using your ${provider.label} account`}.`
+        : 'Giri is off. Pick one of the options below to turn it on.';
+    }
+
+    // The zero-setup card only appears when this browser can honour it —
+    // offering a button that turns out not to work is worse than not
+    // offering it, because the parent concludes the whole feature is broken.
+    const onDeviceCard = $('ai-ondevice-card');
+    if (onDeviceCard) {
+      const canRunOnDevice = await AI_PROVIDERS.chrome.available().catch(() => false);
+      onDeviceCard.hidden = !canRunOnDevice || providerId === 'chrome';
+    }
+
     const keyInput = /** @type {HTMLInputElement|null} */ ($('gemini-api-key'));
     if (keyInput) {
       keyInput.value = aiConfig.apiKeyFor(providerId);
       keyInput.placeholder = provider.keyHint
         ? `Paste your ${provider.label} key… (${provider.keyHint})`
-        : 'Paste your API key…';
+        : 'Paste or type your key…';
     }
     const keyHelp = $('ai-key-help');
     if (keyHelp) {
-      keyHelp.innerHTML = provider.keyUrl
-        ? html`Create one at <a href="${provider.keyUrl}" target="_blank" rel="noopener">${provider.keyUrl}</a>.`
+      keyHelp.textContent = provider.needsKey && aiConfig.apiKeyFor(providerId)
+        ? `Signed in with a ${provider.label} key. Paste a different one any time to switch.`
         : '';
-      keyHelp.hidden = !provider.needsKey;
     }
 
     const modelSelect = /** @type {HTMLSelectElement|null} */ ($('ai-model-select'));

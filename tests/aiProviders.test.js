@@ -154,6 +154,32 @@ describe('a parent can find out why the tutor went quiet', () => {
   });
 });
 
+describe('a pasted key identifies its own provider', () => {
+  it.each([
+    { key: 'AIzaSyABCDEF', provider: 'google' },
+    { key: 'sk-ant-api03-abc', provider: 'anthropic' },
+    { key: 'sk-proj-abcdef', provider: 'openai' },
+  ])('$key belongs to $provider', ({ key, provider }) => {
+    expect(providers.detectProviderFromKey(key)).toBe(provider);
+  });
+
+  it('does not mistake an Anthropic key for an OpenAI one', () => {
+    // Both start "sk-", so prefix order matters: longest match first.
+    expect(providers.detectProviderFromKey('sk-ant-abc')).toBe('anthropic');
+    expect(providers.detectProviderFromKey('sk-abc')).toBe('openai');
+  });
+
+  it('returns null for something that is not a key at all', () => {
+    expect(providers.detectProviderFromKey('')).toBeNull();
+    expect(providers.detectProviderFromKey('   ')).toBeNull();
+    expect(providers.detectProviderFromKey('https://example.com')).toBeNull();
+  });
+
+  it('tolerates the whitespace a copy-paste picks up', () => {
+    expect(providers.detectProviderFromKey('  AIzaSyABC\n')).toBe('google');
+  });
+});
+
 describe('key shape is checked before a request is spent', () => {
   it('accepts a well-formed key for each provider', () => {
     expect(providers.validateKeyShape('google', 'AIzaSyABC').ok).toBe(true);

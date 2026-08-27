@@ -17282,6 +17282,61 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   align-items: center;
   margin-top: 6px;
 }
+/* ── AI tutor setup ──────────────────────────────────────────────── */
+/* One line answering "is it on?" — the question most parents open this
+   screen with, so it sits above every control rather than under them. */
+.ai-status {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.9em;
+}
+.ai-status--on {
+  background: var(--color-success-light, #dcfce7);
+  color: var(--color-success-dark, #14532d);
+}
+.ai-status--off {
+  background: var(--surface-alt, #f1f5f9);
+  color: var(--text-main, #222);
+}
+
+.ai-option {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border, #e5e3fa);
+  border-radius: var(--radius-md, 10px);
+}
+.ai-option-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ai-option-title {
+  font-weight: 800;
+}
+.ai-option-tag {
+  font-size: 0.8em;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: var(--radius-full, 999px);
+  background: var(--color-success-light, #dcfce7);
+  color: var(--color-success-dark, #14532d);
+}
+.ai-getkey-row {
+  flex-wrap: wrap;
+}
+.ai-advanced {
+  margin-top: 10px;
+}
+.ai-advanced > summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9em;
+  padding: 4px 0;
+}
+
 /* Inline label beside a settings control (AI provider / model pickers). */
 .settings-inline-label {
   flex: 0 0 auto;
