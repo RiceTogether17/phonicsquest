@@ -160,6 +160,58 @@ describe('digraphs are not blends', () => {
   });
 });
 
+describe('every sound mode reaches every set it can teach', () => {
+  // The modes that ask a question ABOUT SOUNDS. They all analyse the same
+  // words at the same grain, so a phase that suits one suits all of them —
+  // and a mode missing from a phase is a gap, not a curriculum decision.
+  const SOUND_MODES = [
+    'first', 'last', 'middle', 'missing', 'soundCount',
+    'oralBlend', 'oralSegment', 'oddOneOut', 'soundHunt', 'train', 'wordCount',
+  ];
+  // Phases 1-8 work at phoneme level; 9 and 10 analyse morphemes, and 10's
+  // groups are PA-excluded outright.
+  const PHONEME_PHASES = [1, 2, 3, 4, 5, 6, 7, 8];
+
+  let PHASES;
+  beforeAll(async () => {
+    ({ PHASES } = await import('../src/data/curriculum.js'));
+  });
+
+  it.each(SOUND_MODES)('%s is offered on every phoneme-level phase', (mode) => {
+    const offered = PHASES
+      .filter(p => (p.recommendedModes || []).includes(mode))
+      .map(p => p.phase)
+      .sort((a, b) => a - b);
+    expect(offered).toEqual(PHONEME_PHASES);
+  });
+
+  it('Missing Sound covers the CVC phase', () => {
+    // "c_t — which sound is missing?" is the canonical use of this mode, and
+    // it was the one phase the mode did not appear on.
+    const cvc = PHASES.find(p => p.phase === 1);
+    expect(cvc.recommendedModes).toContain('missing');
+  });
+
+  it('no sound mode is offered a stage it cannot serve', async () => {
+    const { CURRICULUM } = await import('../src/data/curriculum.js');
+    const { getStagesForMode } = await import('../src/modules/phonicsProgression.js');
+    const { hasInteriorVowel, isStageHiddenForMode } = await import('../src/modules/progress.js');
+    const PA_EXCLUDED = new Set(['sight-highfreq', 'multisyllable', 'prefixes', 'suffixes-advanced']);
+
+    const dead = [];
+    for (const mode of SOUND_MODES) {
+      const stages = getStagesForMode(mode, CURRICULUM, PHASES)
+        .filter(stage => !isStageHiddenForMode(stage.group, mode));
+      for (const stage of stages) {
+        let pool = progress.getWordsInGroup(stage.group).filter(w => !PA_EXCLUDED.has(w.group));
+        if (mode === 'middle') pool = pool.filter(hasInteriorVowel);
+        if (!pool.length) dead.push(`${mode} → ${stage.id}`);
+      }
+    }
+    expect(dead).toEqual([]);
+  });
+});
+
 describe('no stage is offered with nothing to serve', () => {
   it('every curriculum stage resolves to at least one word', () => {
     const empty = CURRICULUM.filter(s => poolOf(s).length === 0).map(s => s.id);
