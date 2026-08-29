@@ -16908,11 +16908,16 @@ textarea:hover {
   transform: scale(0.92);
 }
 
+/* The train is the thing the child is watching fill up, and this mode gets
+   played on a classroom display as often as on a tablet. At a fixed 44px the
+   engine was a thumbnail on a wall-mounted monitor, so it scales with the
+   viewport like the target sound above it — floor for phones, ceiling so it
+   never dwarfs the word cards it feeds from. */
 .train-track {
   display: flex;
   align-items: center;
-  gap: 6px;
-  min-height: 70px;
+  gap: clamp(6px, 1vw, 16px);
+  min-height: clamp(84px, 12vw, 180px);
   padding: var(--space-2, 8px) var(--space-3, 12px);
   background: var(--surface-2, #f1f0fe);
   border: 2px dashed var(--border, #e5e3fa);
@@ -16921,7 +16926,7 @@ textarea:hover {
 }
 
 .train-engine {
-  font-size: 44px;
+  font-size: clamp(48px, 8vw, 112px);
   flex-shrink: 0;
 }
 
@@ -16934,13 +16939,14 @@ textarea:hover {
   flex-shrink: 0;
 }
 .train-carriage-cargo {
-  font-size: 24px;
+  font-size: clamp(26px, 4.5vw, 60px);
   line-height: 1;
-  margin-bottom: -8px;
+  /* In em so the cargo keeps sitting on the carriage roof at every size. */
+  margin-bottom: -0.22em;
   z-index: 2;
 }
 .train-carriage-body {
-  font-size: 38px;
+  font-size: clamp(42px, 7vw, 96px);
   line-height: 1;
 }
 
