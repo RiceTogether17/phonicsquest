@@ -18,16 +18,16 @@ function tag(word) {
 
 describe('vowel sound classifier', () => {
   it('distinguishes the three jobs of the same letter a', () => {
-    expect(tag('cat')).toBe('c[a:short]t');    // short
+    expect(tag('cat')).toBe('c[a:short]t'); // short
     expect(tag('cake')).toBe('c[a:long]k[e:silent]'); // long + silent e
-    expect(tag('a')).toBe('[a:schwa]');        // schwa (the article)
+    expect(tag('a')).toBe('[a:schwa]'); // schwa (the article)
   });
 
   it('handles every vowel-sound family', () => {
-    expect(tag('car')).toBe('c[ar:rcontrolled]');   // r-controlled
-    expect(tag('coin')).toBe('c[oi:diphthong]n');   // sliding
-    expect(tag('green')).toBe('gr[ee:long]n');      // long vowel team
-    expect(tag('bright')).toBe('br[igh:long]t');    // igh, longest-match
+    expect(tag('car')).toBe('c[ar:rcontrolled]'); // r-controlled
+    expect(tag('coin')).toBe('c[oi:diphthong]n'); // sliding
+    expect(tag('green')).toBe('gr[ee:long]n'); // long vowel team
+    expect(tag('bright')).toBe('br[igh:long]t'); // igh, longest-match
   });
 
   it('marks the a- schwa prefix and "the"', () => {
@@ -49,19 +49,19 @@ describe('vowel sound classifier', () => {
   });
 
   it('marks second-syllable / final schwa (rules)', () => {
-    expect(tag('sofa')).toBe('s[o:short]f[a:schwa]');    // final consonant+a
+    expect(tag('sofa')).toBe('s[o:short]f[a:schwa]'); // final consonant+a
     expect(tag('panda')).toBe('p[a:short]nd[a:schwa]');
     expect(tag('animal')).toBe('[a:short]n[i:short]m[a:schwa]l'); // -al
     expect(tag('total')).toBe('t[o:short]t[a:schwa]l');
   });
 
   it('silences -le, silent-final-e after teams, and regular -ed', () => {
-    expect(tag('little')).toBe('l[i:short]ttl[e:silent]');   // -le
-    expect(tag('leave')).toBe('l[ea:long]v[e:silent]');      // team + silent e
+    expect(tag('little')).toBe('l[i:short]ttl[e:silent]'); // -le
+    expect(tag('leave')).toBe('l[ea:long]v[e:silent]'); // team + silent e
     expect(tag('please')).toBe('pl[ea:long]s[e:silent]');
     expect(tag('house')).toBe('h[ou:diphthong]s[e:silent]'); // bank grouped ending, split
-    expect(tag('reached')).toBe('r[ea:long]ch[e:silent]d');  // past-tense -ed
-    expect(tag('sled')).toBe('sl[e:short]d');                // NOT a suffix — e stays short
+    expect(tag('reached')).toBe('r[ea:long]ch[e:silent]d'); // past-tense -ed
+    expect(tag('sled')).toBe('sl[e:short]d'); // NOT a suffix — e stays short
   });
 
   it('applies team exceptions, tolerant of inflections', () => {
@@ -69,7 +69,7 @@ describe('vowel sound classifier', () => {
     expect(tag('been')).toBe('b[ee:short]n');
     expect(tag('friend')).toBe('fr[ie:short]nd');
     expect(tag('know')).toBe('kn[ow:long]');
-    expect(tag('now')).toBe('n[ow:diphthong]');   // stays a diphthong
+    expect(tag('now')).toBe('n[ow:diphthong]'); // stays a diphthong
     expect(tag('slowly')).toBe('sl[ow:long]l[y:long]'); // slow + ly
     expect(tag('showed')).toBe('sh[ow:long][e:silent]d');
     expect(tag('flower')).toBe('fl[ow:diphthong][er:rcontrolled]'); // NOT folded to "flow"
@@ -113,10 +113,13 @@ describe('shared palette + tile classifier', () => {
 
   it('graphemeSounds colours tiles and overlays schwa', () => {
     // cake: c(consonant) a(long) k(consonant) e(silent)
-    expect(graphemeSounds('cake', ['c', 'a', 'k', 'e'], ['c', 'lv', 'c', 'se']))
-      .toEqual(['consonant', 'long', 'consonant', 'silent']);
+    expect(graphemeSounds('cake', ['c', 'a', 'k', 'e'], ['c', 'lv', 'c', 'se'])).toEqual([
+      'consonant',
+      'long',
+      'consonant',
+      'silent',
+    ]);
     // again: the bank types the first a as short, but it is really schwa
-    expect(graphemeSounds('again', ['a', 'g', 'ai', 'n'], ['sv', 'c', 'sv', 'c'])[0])
-      .toBe('schwa');
+    expect(graphemeSounds('again', ['a', 'g', 'ai', 'n'], ['sv', 'c', 'sv', 'c'])[0]).toBe('schwa');
   });
 });

@@ -15,8 +15,10 @@ export function getModeConfig(mode = 'practice') {
 }
 
 export function getNextStepRecommendation({ accuracy = 0, skillLabel = 'grammar', hintsUsed = 0 }) {
-  if (accuracy >= 90) return `Excellent! Move up a level, or replay in Exam Mode to test ${skillLabel} without hints.`;
-  if (hintsUsed > 2) return `Strong effort — you used ${hintsUsed} hints. Replay and try to find each clue yourself before asking for help.`;
+  if (accuracy >= 90)
+    return `Excellent! Move up a level, or replay in Exam Mode to test ${skillLabel} without hints.`;
+  if (hintsUsed > 2)
+    return `Strong effort — you used ${hintsUsed} hints. Replay and try to find each clue yourself before asking for help.`;
   return `Read the rule for ${skillLabel} once more, then try one more passage — a second attempt right away is the fastest way to improve.`;
 }
 
@@ -47,10 +49,22 @@ export function buildCopySummaryText({
     ...(wrongLines.length ? wrongLines : ['- None']),
     `Next Step: ${nextStep}`,
   ];
-  return lines.map((line) => String(line || '').replace(/\s+/g, ' ').trim()).join('\n');
+  return lines
+    .map((line) =>
+      String(line || '')
+        .replace(/\s+/g, ' ')
+        .trim(),
+    )
+    .join('\n');
 }
 
-export function getSummaryScoreLine({ mode = 'practice', blankCorrect = 0, blankTotal = 0, passageCorrect = 0, passageTotal = 0 }) {
+export function getSummaryScoreLine({
+  mode = 'practice',
+  blankCorrect = 0,
+  blankTotal = 0,
+  passageCorrect = 0,
+  passageTotal = 0,
+}) {
   if (mode === 'exam') return `${blankCorrect}/${blankTotal}`;
   return `${blankCorrect || passageCorrect}/${blankTotal || passageTotal}`;
 }
@@ -61,7 +75,8 @@ export function safeText(value) {
 
 const TEACHER_TIPS = {
   tense: 'Ask your child, "What time word in the sentence is your clue?"',
-  connectorLogic: 'Ask your child, "What does the connector tell you about the two ideas — contrast, reason, or result?"',
+  connectorLogic:
+    'Ask your child, "What does the connector tell you about the two ideas — contrast, reason, or result?"',
   contrast: 'Ask your child, "Which words show the opposite idea?"',
   causeEffect: 'Ask your child, "Which word tells you the reason or the result?"',
   collocation: 'Ask your child, "Which words usually go together in English?"',
@@ -146,7 +161,9 @@ export function buildParentReport({
   recommendation = 'Try one more passage with the scan task on.',
   teacherTip,
 } = {}) {
-  const accuracyLine = Number.isFinite(accuracy) ? `Score: ${scoreLine} (${accuracy}%)` : `Score: ${scoreLine}`;
+  const accuracyLine = Number.isFinite(accuracy)
+    ? `Score: ${scoreLine} (${accuracy}%)`
+    : `Score: ${scoreLine}`;
 
   const strengthLine = strongest
     ? `Strength: Student could identify ${String(strongest.label || strongest.skill).toLowerCase()} clues (${strongest.correct}/${strongest.total}).`

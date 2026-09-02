@@ -10,7 +10,7 @@ describe('VISUAL_TEXT_ITEMS data bank', () => {
   });
 
   it('covers all primary levels P1–P6', () => {
-    const levels = new Set(VISUAL_TEXT_ITEMS.map(i => i.level));
+    const levels = new Set(VISUAL_TEXT_ITEMS.map((i) => i.level));
     for (const l of ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']) {
       expect(levels, `missing level ${l}`).toContain(l);
     }
@@ -37,7 +37,7 @@ describe('VISUAL_TEXT_ITEMS data bank', () => {
   });
 
   it('ids are unique', () => {
-    const ids = VISUAL_TEXT_ITEMS.map(i => i.id);
+    const ids = VISUAL_TEXT_ITEMS.map((i) => i.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
@@ -55,7 +55,7 @@ describe('SYNTHESIS_ITEMS data bank', () => {
   });
 
   it('covers P4, P5 and P6', () => {
-    const levels = new Set(SYNTHESIS_ITEMS.map(i => i.level));
+    const levels = new Set(SYNTHESIS_ITEMS.map((i) => i.level));
     expect(levels).toContain('P4');
     expect(levels).toContain('P5');
     expect(levels).toContain('P6');
@@ -78,7 +78,7 @@ describe('SYNTHESIS_ITEMS data bank', () => {
   });
 
   it('ids are unique', () => {
-    const ids = SYNTHESIS_ITEMS.map(i => i.id);
+    const ids = SYNTHESIS_ITEMS.map((i) => i.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
@@ -95,7 +95,7 @@ describe('OPEN_COMPREHENSION_PASSAGES data bank', () => {
   });
 
   it('covers P1 through P6', () => {
-    const levels = new Set(OPEN_COMPREHENSION_PASSAGES.map(p => p.level));
+    const levels = new Set(OPEN_COMPREHENSION_PASSAGES.map((p) => p.level));
     for (const l of ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']) {
       expect(levels, `missing level ${l}`).toContain(l);
     }
@@ -107,7 +107,9 @@ describe('OPEN_COMPREHENSION_PASSAGES data bank', () => {
       expect(item.title, `${item.id} missing title`).toBeTruthy();
       expect(item.passage, `${item.id} missing passage`).toBeTruthy();
       expect(Array.isArray(item.questions), `${item.id} questions must be array`).toBe(true);
-      expect(item.questions.length, `${item.id} needs at least 2 questions`).toBeGreaterThanOrEqual(2);
+      expect(item.questions.length, `${item.id} needs at least 2 questions`).toBeGreaterThanOrEqual(
+        2,
+      );
     }
   });
 
@@ -121,7 +123,7 @@ describe('OPEN_COMPREHENSION_PASSAGES data bank', () => {
   });
 
   it('ids are unique', () => {
-    const ids = OPEN_COMPREHENSION_PASSAGES.map(p => p.id);
+    const ids = OPEN_COMPREHENSION_PASSAGES.map((p) => p.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 

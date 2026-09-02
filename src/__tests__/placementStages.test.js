@@ -23,14 +23,14 @@ beforeAll(async () => {
     globalThis.window.speechSynthesis = globalThis.window.speechSynthesis || synth;
   }
   const mod = await import('../modules/placementTest.js');
-  derivePlacementResult     = mod.derivePlacementResult;
-  STAGES                    = mod.STAGES;
-  STAGE_IDS                 = mod.STAGE_IDS;
-  _computeStageScores       = mod._computeStageScores;
-  _computeSkillGaps         = mod._computeSkillGaps;
-  _severityFor              = mod._severityFor;
+  derivePlacementResult = mod.derivePlacementResult;
+  STAGES = mod.STAGES;
+  STAGE_IDS = mod.STAGE_IDS;
+  _computeStageScores = mod._computeStageScores;
+  _computeSkillGaps = mod._computeSkillGaps;
+  _severityFor = mod._severityFor;
   renderPlacementReportHtml = mod.renderPlacementReportHtml;
-  BAND_DESCRIPTION          = mod.BAND_DESCRIPTION;
+  BAND_DESCRIPTION = mod.BAND_DESCRIPTION;
 });
 
 // ── Helpers to build synthetic answer sets ────────────────────────────────
@@ -79,10 +79,10 @@ describe('STAGES ladder', () => {
 describe('_severityFor', () => {
   it('buckets scores into the four severity levels', () => {
     expect(_severityFor(0.95)).toBe('strong');
-    expect(_severityFor(0.80)).toBe('strong');
+    expect(_severityFor(0.8)).toBe('strong');
     expect(_severityFor(0.65)).toBe('developing');
     expect(_severityFor(0.45)).toBe('needs-practice');
-    expect(_severityFor(0.10)).toBe('not-yet');
+    expect(_severityFor(0.1)).toBe('not-yet');
     expect(_severityFor(0)).toBe('not-yet');
   });
 });
@@ -90,7 +90,15 @@ describe('_severityFor', () => {
 describe('_computeStageScores', () => {
   it('returns coverage:not-tested for stages without any items', () => {
     const ss = _computeStageScores([]);
-    for (const key of ['pictureId', 'knownVocab', 'phonemicAwareness', 'letterSounds', 'blending', 'reading', 'grammarVocab']) {
+    for (const key of [
+      'pictureId',
+      'knownVocab',
+      'phonemicAwareness',
+      'letterSounds',
+      'blending',
+      'reading',
+      'grammarVocab',
+    ]) {
       expect(ss[key].coverage).toBe('not-tested');
       expect(ss[key].composite).toBe(0);
     }
@@ -98,10 +106,10 @@ describe('_computeStageScores', () => {
 
   it('rolls up first/last/middle/oralBlending into a PA composite', () => {
     const results = [
-      ...makeChildResponses('firstSound',   3, 3),  // 1.0
-      ...makeChildResponses('lastSound',    2, 3),  // 0.67
-      ...makeChildResponses('middleSound',  1, 3),  // 0.33
-      ...makeChildResponses('oralBlending', 3, 3),  // 1.0
+      ...makeChildResponses('firstSound', 3, 3), // 1.0
+      ...makeChildResponses('lastSound', 2, 3), // 0.67
+      ...makeChildResponses('middleSound', 1, 3), // 0.33
+      ...makeChildResponses('oralBlending', 3, 3), // 1.0
     ];
     const ss = _computeStageScores(results);
     expect(ss.phonemicAwareness.firstSound).toBeCloseTo(1.0, 2);
@@ -113,10 +121,10 @@ describe('_computeStageScores', () => {
 
   it('weights reading components: decoding 0.4, sight 0.2, sentence 0.2, comp 0.15, readAloud 0.05', () => {
     const results = [
-      ...makeChildResponses('decoding',         5, 5), // 1.0
-      ...makeChildResponses('sightWords',       0, 5), // 0
+      ...makeChildResponses('decoding', 5, 5), // 1.0
+      ...makeChildResponses('sightWords', 0, 5), // 0
       ...makeChildResponses('connectedReading', 0, 5), // 0
-      ...makeChildResponses('comprehension',    0, 5), // 0
+      ...makeChildResponses('comprehension', 0, 5), // 0
       ...makeTeacherResponses('storyReadiness', 0, 2),
     ];
     const ss = _computeStageScores(results);
@@ -128,36 +136,36 @@ describe('_computeStageScores', () => {
 describe('_computeSkillGaps', () => {
   it('emits no gaps when every stage is strong', () => {
     const ss = _computeStageScores([
-      ...makeChildResponses('vocab',            3, 3),
-      ...makeTeacherResponses('oral',           1, 2),
-      ...makeChildResponses('knownVocab',       4, 4),
-      ...makeChildResponses('firstSound',       3, 3),
-      ...makeChildResponses('lastSound',        3, 3),
-      ...makeChildResponses('middleSound',      3, 3),
-      ...makeChildResponses('oralBlending',     3, 3),
-      ...makeTeacherResponses('letterSounds',   1, 2),
-      ...makeChildResponses('decoding',         18, 18),
-      ...makeChildResponses('sightWords',       6, 6),
+      ...makeChildResponses('vocab', 3, 3),
+      ...makeTeacherResponses('oral', 1, 2),
+      ...makeChildResponses('knownVocab', 4, 4),
+      ...makeChildResponses('firstSound', 3, 3),
+      ...makeChildResponses('lastSound', 3, 3),
+      ...makeChildResponses('middleSound', 3, 3),
+      ...makeChildResponses('oralBlending', 3, 3),
+      ...makeTeacherResponses('letterSounds', 1, 2),
+      ...makeChildResponses('decoding', 18, 18),
+      ...makeChildResponses('sightWords', 6, 6),
       ...makeChildResponses('connectedReading', 4, 4),
-      ...makeChildResponses('comprehension',    2, 2),
+      ...makeChildResponses('comprehension', 2, 2),
       ...makeTeacherResponses('storyReadiness', 1, 2),
-      ...makeChildResponses('sentenceReady',    2, 2),
-      ...makeChildResponses('grammarReady',     2, 2),
-      ...makeChildResponses('vocabularyReady',  2, 2),
+      ...makeChildResponses('sentenceReady', 2, 2),
+      ...makeChildResponses('grammarReady', 2, 2),
+      ...makeChildResponses('vocabularyReady', 2, 2),
     ]);
     expect(_computeSkillGaps(ss)).toEqual([]);
   });
 
   it('emits a gap for each non-strong sub-skill with severity + recommended modes', () => {
     const ss = _computeStageScores([
-      ...makeChildResponses('firstSound',   3, 3),  // 1.0 strong
-      ...makeChildResponses('lastSound',    2, 3),  // 0.67 developing
-      ...makeChildResponses('middleSound',  1, 3),  // 0.33 not-yet
-      ...makeChildResponses('oralBlending', 3, 3),  // 1.0 strong
+      ...makeChildResponses('firstSound', 3, 3), // 1.0 strong
+      ...makeChildResponses('lastSound', 2, 3), // 0.67 developing
+      ...makeChildResponses('middleSound', 1, 3), // 0.33 not-yet
+      ...makeChildResponses('oralBlending', 3, 3), // 1.0 strong
     ]);
     const gaps = _computeSkillGaps(ss);
-    const lastGap   = gaps.find(g => g.skill === 'lastSound');
-    const middleGap = gaps.find(g => g.skill === 'middleSound');
+    const lastGap = gaps.find((g) => g.skill === 'lastSound');
+    const middleGap = gaps.find((g) => g.skill === 'middleSound');
 
     expect(lastGap).toBeDefined();
     expect(lastGap.severity).toBe('developing');
@@ -169,7 +177,7 @@ describe('_computeSkillGaps', () => {
     expect(middleGap.recommendedModes).toContain('middle-sound');
 
     // First sound was strong → must NOT appear
-    expect(gaps.find(g => g.skill === 'firstSound')).toBeUndefined();
+    expect(gaps.find((g) => g.skill === 'firstSound')).toBeUndefined();
   });
 
   it('skips stages whose coverage is not-tested (never tested ≠ failed)', () => {
@@ -209,7 +217,7 @@ describe('renderPlacementReportHtml', () => {
     const html = renderPlacementReportHtml(result);
     expect(html).toContain('Pre-reader');
     expect(html).toContain('Skill profile');
-    expect(html).toMatch(/What.{1,5}s missing/);   // apostrophe form varies
+    expect(html).toMatch(/What.{1,5}s missing/); // apostrophe form varies
     // All 7 stage rows appear (use the data-stage attribute, label may be escaped)
     for (const stage of STAGES) {
       expect(html).toContain(`data-stage="${stage.id}"`);
@@ -229,12 +237,20 @@ describe('renderPlacementReportHtml', () => {
   it('renders one gap card per skillGap entry, with mode chips', () => {
     const result = derivePlacementResult([], {}, 'preschool');
     result.skillGaps = [
-      { stage: 'phonemicAwareness', skill: 'middleSound', severity: 'developing',
+      {
+        stage: 'phonemicAwareness',
+        skill: 'middleSound',
+        severity: 'developing',
         summary: 'Your child is still developing middle-sound awareness.',
-        recommendedModes: ['middle-sound', 'sound-count'] },
-      { stage: 'letterSounds', skill: 'letterSounds', severity: 'not-yet',
+        recommendedModes: ['middle-sound', 'sound-count'],
+      },
+      {
+        stage: 'letterSounds',
+        skill: 'letterSounds',
+        severity: 'not-yet',
         summary: 'Your child has not yet shown letter-sound knowledge.',
-        recommendedModes: ['letter-sounds'] },
+        recommendedModes: ['letter-sounds'],
+      },
     ];
     const html = renderPlacementReportHtml(result);
     expect(html).toContain('middle-sound awareness');
@@ -250,16 +266,16 @@ describe('webapp content alignment', () => {
     // The three blending items in placementTest.js use cat/dog/sun. These
     // are the same CVC nouns the Blend It! mode (`blend.js`) uses, so the
     // screener visibly mirrors the webapp's content.
-    const bank = new Set(WORDS.map(w => w.word));
+    const bank = new Set(WORDS.map((w) => w.word));
     for (const w of ['cat', 'dog', 'sun']) {
       expect(bank.has(w)).toBe(true);
     }
   });
 
   it('Band A reference stories used by Reading items are present in stories.js', () => {
-    const bandA = STORIES.filter(s => s.band === 'A');
+    const bandA = STORIES.filter((s) => s.band === 'A');
     expect(bandA.length).toBeGreaterThanOrEqual(5);
     // core-a-01 is the canonical reference for the screener's reading stage.
-    expect(bandA.find(s => s.id === 'core-a-01')).toBeDefined();
+    expect(bandA.find((s) => s.id === 'core-a-01')).toBeDefined();
   });
 });

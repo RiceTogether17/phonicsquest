@@ -20,15 +20,17 @@
 
 const HINTS = Object.freeze({
   'tapped-similar-onset': 'Two words start the same. Say each one and listen for the rest.',
-  'tapped-rhyme':         'Those words rhyme. Look at how the start is spelled.',
-  'tapped-anywhere':      'Read the sentence left to right. Stop when the word sounds the same.',
-  'default':              'Read each word out loud. Tap the one that matches what you heard.',
+  'tapped-rhyme': 'Those words rhyme. Look at how the start is spelled.',
+  'tapped-anywhere': 'Read the sentence left to right. Stop when the word sounds the same.',
+  default: 'Read each word out loud. Tap the one that matches what you heard.',
 });
 
 const PUNCT_RE = /[^a-z0-9']/gi;
 
 function _norm(w) {
-  return String(w ?? '').toLowerCase().replace(PUNCT_RE, '');
+  return String(w ?? '')
+    .toLowerCase()
+    .replace(PUNCT_RE, '');
 }
 
 /**

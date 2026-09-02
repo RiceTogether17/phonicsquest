@@ -30,7 +30,7 @@ export const BADGE_DEFS = {
     description: 'You included dialogue with correct speech-mark punctuation.',
   },
   'show-dont-tell': {
-    label: 'Show-Don\'t-Tell',
+    label: "Show-Don't-Tell",
     emoji: '🎭',
     description: 'You showed feelings through actions rather than naming emotions directly.',
   },
@@ -64,8 +64,8 @@ export function detectBadges(metrics, text, comparison = null) {
 
   // Strong Opener: first sentence is substantial and avoids clichéd openers.
   // "I went", "I am", "My name" and "Today" are common weak openers in primary writing.
-  const first        = metrics.firstSentence || '';
-  const weakOpeners  = /^(i went|i am|my name is|today i|this is about|one day i went)/i;
+  const first = metrics.firstSentence || '';
+  const weakOpeners = /^(i went|i am|my name is|today i|this is about|one day i went)/i;
   if (first.length > 20 && !weakOpeners.test(first.trim())) {
     earned.push('strong-opener');
   }
@@ -116,9 +116,10 @@ export function detectBadges(metrics, text, comparison = null) {
  * @returns {string}
  */
 export function renderBadgeChips(badgeKeys) {
-  if (!badgeKeys?.length) return '<em style="color:var(--text-muted)">No badges this time — keep practising!</em>';
+  if (!badgeKeys?.length)
+    return '<em style="color:var(--text-muted)">No badges this time — keep practising!</em>';
   return badgeKeys
-    .map(key => {
+    .map((key) => {
       const def = BADGE_DEFS[key];
       if (!def) return '';
       return `<span class="sfq-badge" title="${def.description}" style="margin:2px 4px;display:inline-block">${def.emoji} ${def.label}</span>`;

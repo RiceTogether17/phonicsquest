@@ -14,12 +14,22 @@ globalThis.speechSynthesis = globalThis.speechSynthesis || {
   speak: () => {},
   cancel: () => {},
 };
-globalThis.SpeechSynthesisUtterance = globalThis.SpeechSynthesisUtterance || class { constructor(text){ this.text = text; } };
+globalThis.SpeechSynthesisUtterance =
+  globalThis.SpeechSynthesisUtterance ||
+  class {
+    constructor(text) {
+      this.text = text;
+    }
+  };
 if (!globalThis.AudioContext) {
   globalThis.AudioContext = class {
     constructor() {}
-    createOscillator() { return { connect() {}, start() {}, stop() {} }; }
-    createGain()       { return { connect() {}, gain: { value: 0 } }; }
+    createOscillator() {
+      return { connect() {}, start() {}, stop() {} };
+    }
+    createGain() {
+      return { connect() {}, gain: { value: 0 } };
+    }
   };
 }
 
@@ -40,15 +50,15 @@ const baseEls = () => {
     <button id="btn-skip"></button>
   `;
   return {
-    wordEmoji:       document.getElementById('word-emoji'),
-    wordDisplay:     document.getElementById('word-display'),
-    phonemeRow:      document.getElementById('phoneme-row'),
-    modeArea:        document.getElementById('mode-area'),
+    wordEmoji: document.getElementById('word-emoji'),
+    wordDisplay: document.getElementById('word-display'),
+    phonemeRow: document.getElementById('phoneme-row'),
+    modeArea: document.getElementById('mode-area'),
     modeInstruction: document.getElementById('mode-instruction'),
-    btnCheck:        document.getElementById('btn-check'),
-    btnSayIt:        document.getElementById('btn-sayit'),
-    btnSkip:         document.getElementById('btn-skip'),
-    onResult:        vi.fn(),
+    btnCheck: document.getElementById('btn-check'),
+    btnSayIt: document.getElementById('btn-sayit'),
+    btnSkip: document.getElementById('btn-skip'),
+    onResult: vi.fn(),
   };
 };
 
@@ -64,7 +74,7 @@ afterEach(() => {
 
 describe('renderPhonemeChoiceGrid()', () => {
   const choices = [
-    { grapheme: 'k', type: 'c', correct: true  },
+    { grapheme: 'k', type: 'c', correct: true },
     { grapheme: 'm', type: 'c', correct: false },
     { grapheme: 's', type: 'c', correct: false },
     { grapheme: 't', type: 'c', correct: false },
@@ -77,10 +87,12 @@ describe('renderPhonemeChoiceGrid()', () => {
     const buttons = container.querySelectorAll('.choice-btn--phoneme');
     expect(buttons).toHaveLength(4);
 
-    const labels = [...container.querySelectorAll('.choice-btn-phoneme')].map(el => el.textContent);
+    const labels = [...container.querySelectorAll('.choice-btn-phoneme')].map(
+      (el) => el.textContent,
+    );
     expect(labels).toEqual(['/k/', '/m/', '/s/', '/t/']);
     // No bare uppercase letter labels — those would be print contamination.
-    expect(labels.every(l => l.startsWith('/') && l.endsWith('/'))).toBe(true);
+    expect(labels.every((l) => l.startsWith('/') && l.endsWith('/'))).toBe(true);
   });
 
   it('marks the correct option via dataset.correct so the existing reveal flow keeps working', () => {
@@ -88,8 +100,8 @@ describe('renderPhonemeChoiceGrid()', () => {
     renderPhonemeChoiceGrid(container, choices, { autoPlay: false });
 
     const buttons = [...container.querySelectorAll('.choice-btn--phoneme')];
-    expect(buttons.filter(b => b.dataset.correct === 'true')).toHaveLength(1);
-    expect(buttons.find(b => b.dataset.correct === 'true').dataset.grapheme).toBe('k');
+    expect(buttons.filter((b) => b.dataset.correct === 'true')).toHaveLength(1);
+    expect(buttons.find((b) => b.dataset.correct === 'true').dataset.grapheme).toBe('k');
   });
 
   it('includes a speaker affordance so the button reads as a sound, not a letter', () => {
@@ -102,7 +114,7 @@ describe('renderPhonemeChoiceGrid()', () => {
 
   it('invokes onChoose with the choice and the clicked button', () => {
     const container = document.createElement('div');
-    const onChoose  = vi.fn();
+    const onChoose = vi.fn();
     renderPhonemeChoiceGrid(container, choices, { autoPlay: false, onChoose });
 
     const second = container.querySelectorAll('.choice-btn--phoneme')[1];
@@ -117,7 +129,11 @@ describe('renderPhonemeChoiceGrid()', () => {
     // Helper auto-plays via audio.speakPhoneme; in jsdom this returns without
     // throwing because sfx playback degrades gracefully. We just need to
     // confirm that mounting + advancing timers does not throw.
-    renderPhonemeChoiceGrid(container, choices, { autoPlay: true, autoPlayDelay: 10, autoPlayStride: 10 });
+    renderPhonemeChoiceGrid(container, choices, {
+      autoPlay: true,
+      autoPlayDelay: 10,
+      autoPlayStride: 10,
+    });
     await vi.advanceTimersByTimeAsync(200);
     expect(container.querySelectorAll('.choice-btn--phoneme')).toHaveLength(4);
   });
@@ -127,7 +143,9 @@ describe('renderPhonemeChoiceGrid()', () => {
     const spy = vi.spyOn(audio, 'speakPhoneme').mockResolvedValue();
 
     let resolveGate;
-    const gate = new Promise(r => { resolveGate = r; });
+    const gate = new Promise((r) => {
+      resolveGate = r;
+    });
 
     const container = document.createElement('div');
     renderPhonemeChoiceGrid(container, choices, {
@@ -165,13 +183,13 @@ describe('PA modes hold the choice previews past the word audio even when TTS re
     const { audio } = await import('../modules/audio.js');
     const mod = await import(`../modes/${modeName}.js`);
     const { WORDS } = await import('../data/words.js');
-    const word = WORDS.find(w => w.id === wordId);
-    const els  = baseEls();
+    const word = WORDS.find((w) => w.id === wordId);
+    const els = baseEls();
 
     // Make every audio call complete instantly so the only thing holding
     // the gate is the wall-clock floor.
-    const speakWordSpy    = vi.spyOn(audio, 'speakWord').mockResolvedValue();
-    const twiceClearSpy   = vi.spyOn(audio, 'speakWordTwiceClear').mockResolvedValue();
+    const speakWordSpy = vi.spyOn(audio, 'speakWord').mockResolvedValue();
+    const twiceClearSpy = vi.spyOn(audio, 'speakWordTwiceClear').mockResolvedValue();
     const speakPhonemeSpy = vi.spyOn(audio, 'speakPhoneme').mockResolvedValue();
 
     mod[setupName](word, els);
@@ -185,11 +203,17 @@ describe('PA modes hold the choice previews past the word audio even when TTS re
     // autoPlayDelay PLUS the 350ms pre-speak delay → previews should not
     // begin until well past 3s.
     await vi.advanceTimersByTimeAsync(800);
-    expect(speakPhonemeSpy, `${modeName}: phoneme played at 1.3s, still inside floor`).not.toHaveBeenCalled();
+    expect(
+      speakPhonemeSpy,
+      `${modeName}: phoneme played at 1.3s, still inside floor`,
+    ).not.toHaveBeenCalled();
 
     // After the floor + autoPlay delay we expect at least one preview to run.
     await vi.advanceTimersByTimeAsync(3500);
-    expect(speakPhonemeSpy, `${modeName}: phoneme should have played after the floor`).toHaveBeenCalled();
+    expect(
+      speakPhonemeSpy,
+      `${modeName}: phoneme should have played after the floor`,
+    ).toHaveBeenCalled();
 
     twiceClearSpy.mockRestore();
     speakWordSpy.mockRestore();
@@ -213,15 +237,17 @@ describe('first/last/middle sound modes hide print during the question', () => {
   it('firstSound never shows the printed word until after a choice', async () => {
     const { setupFirstSound } = await import('../modes/firstSound.js');
     const { WORDS } = await import('../data/words.js');
-    const word = WORDS.find(w => w.id === 'cat');
-    const els  = baseEls();
+    const word = WORDS.find((w) => w.id === 'cat');
+    const els = baseEls();
 
     setupFirstSound(word, els);
 
     // Word display must be empty during the question.
     expect(els.wordDisplay.innerHTML.trim()).toBe('');
     // Choice buttons must not contain the bare letter 'C'.
-    const labels = [...els.modeArea.querySelectorAll('.choice-btn-phoneme')].map(e => e.textContent);
+    const labels = [...els.modeArea.querySelectorAll('.choice-btn-phoneme')].map(
+      (e) => e.textContent,
+    );
     expect(labels.length).toBe(4);
     // The button shows the SOUND the letter makes: "c" says /k/.
     expect(labels).toContain('/k/');
@@ -233,8 +259,8 @@ describe('first/last/middle sound modes hide print during the question', () => {
   it('lastSound never shows the printed word until after a choice', async () => {
     const { setupLastSound } = await import('../modes/lastSound.js');
     const { WORDS } = await import('../data/words.js');
-    const word = WORDS.find(w => w.id === 'cat');
-    const els  = baseEls();
+    const word = WORDS.find((w) => w.id === 'cat');
+    const els = baseEls();
 
     setupLastSound(word, els);
     expect(els.wordDisplay.innerHTML.trim()).toBe('');
@@ -244,8 +270,8 @@ describe('first/last/middle sound modes hide print during the question', () => {
   it('middleSound never shows the printed word until after a choice', async () => {
     const { setupMiddleSound } = await import('../modes/middleSound.js');
     const { WORDS } = await import('../data/words.js');
-    const word = WORDS.find(w => w.id === 'cat');
-    const els  = baseEls();
+    const word = WORDS.find((w) => w.id === 'cat');
+    const els = baseEls();
 
     setupMiddleSound(word, els);
     expect(els.wordDisplay.innerHTML.trim()).toBe('');
@@ -253,19 +279,19 @@ describe('first/last/middle sound modes hide print during the question', () => {
   });
 });
 
-describe('missingSound distractors respect the target word\'s level', () => {
-  it('only offers graphemes that appear in some word at or below the target word\'s level', async () => {
+describe("missingSound distractors respect the target word's level", () => {
+  it("only offers graphemes that appear in some word at or below the target word's level", async () => {
     const { setupMissingSound } = await import('../modes/missingSound.js');
     const { WORDS } = await import('../data/words.js');
 
     // 'cat' is a level-1 CVC word. A level-1 learner must not be shown
     // distractor graphemes that only exist in level-2 or level-3 words
     // (e.g. 'oo', 'ar', 'igh').
-    const word = WORDS.find(w => w.id === 'cat');
+    const word = WORDS.find((w) => w.id === 'cat');
     expect(word?.level).toBe(1);
 
     const levelOneGraphemes = new Set();
-    for (const w of WORDS.filter(w => w.level <= word.level)) {
+    for (const w of WORDS.filter((w) => w.level <= word.level)) {
       for (const g of w.graphemes) levelOneGraphemes.add(g);
     }
 
@@ -309,21 +335,21 @@ describe('phonemic-awareness modes have a sufficient word pool', () => {
   let pool;
   beforeEach(async () => {
     const { WORDS } = await import('../data/words.js');
-    pool = WORDS.filter(w => !PA_EXCLUDED.has(w.group) && w.pattern !== 'sight');
+    pool = WORDS.filter((w) => !PA_EXCLUDED.has(w.group) && w.pattern !== 'sight');
   });
 
   it('overall PA-eligible pool is deep enough to keep questions fresh across a session', () => {
     // Each session can play 30+ items; the pool must dwarf that several times
     // over so the adaptive sampler isn't forced to repeat too aggressively.
-    expect(pool.filter(w => w.level === 1).length).toBeGreaterThanOrEqual(150);
-    expect(pool.filter(w => w.level === 2).length).toBeGreaterThanOrEqual(300);
-    expect(pool.filter(w => w.level === 3).length).toBeGreaterThanOrEqual(120);
+    expect(pool.filter((w) => w.level === 1).length).toBeGreaterThanOrEqual(150);
+    expect(pool.filter((w) => w.level === 2).length).toBeGreaterThanOrEqual(300);
+    expect(pool.filter((w) => w.level === 3).length).toBeGreaterThanOrEqual(120);
   });
 
   it('first-sound mode can practise long vowels and diphthongs, not just consonants', () => {
-    const lvFirst = pool.filter(w => w.types[0] === 'lv');
-    const dpFirst = pool.filter(w => w.types[0] === 'dp');
-    const rcFirst = pool.filter(w => w.types[0] === 'rc');
+    const lvFirst = pool.filter((w) => w.types[0] === 'lv');
+    const dpFirst = pool.filter((w) => w.types[0] === 'dp');
+    const rcFirst = pool.filter((w) => w.types[0] === 'rc');
     // Need at least one correct word + three distractors per round; with
     // adaptive replay we want a comfortable surplus over that floor of 4.
     expect(lvFirst.length).toBeGreaterThanOrEqual(10);
@@ -332,15 +358,15 @@ describe('phonemic-awareness modes have a sufficient word pool', () => {
   });
 
   it('last-sound mode has a non-trivial diphthong and long-vowel pool', () => {
-    const lvLast = pool.filter(w => w.types[w.types.length - 1] === 'lv');
-    const dpLast = pool.filter(w => w.types[w.types.length - 1] === 'dp');
+    const lvLast = pool.filter((w) => w.types[w.types.length - 1] === 'lv');
+    const dpLast = pool.filter((w) => w.types[w.types.length - 1] === 'dp');
     expect(lvLast.length).toBeGreaterThanOrEqual(30);
     expect(dpLast.length).toBeGreaterThanOrEqual(10);
   });
 
   it('middle-sound mode has plenty of long-vowel and diphthong medial words', () => {
-    const lvMid = pool.filter(w => w.types[middleIdx(w)] === 'lv');
-    const dpMid = pool.filter(w => w.types[middleIdx(w)] === 'dp');
+    const lvMid = pool.filter((w) => w.types[middleIdx(w)] === 'lv');
+    const dpMid = pool.filter((w) => w.types[middleIdx(w)] === 'dp');
     expect(lvMid.length).toBeGreaterThanOrEqual(150);
     expect(dpMid.length).toBeGreaterThanOrEqual(30);
   });
@@ -350,8 +376,8 @@ describe('soundCount mode hides the printed word during the question', () => {
   it('does not render the printed word on setup', async () => {
     const { setupSoundCount } = await import('../modes/soundCount.js');
     const { WORDS } = await import('../data/words.js');
-    const word = WORDS.find(w => w.id === 'cake'); // silent-e: phoneme≠grapheme count
-    const els  = baseEls();
+    const word = WORDS.find((w) => w.id === 'cake'); // silent-e: phoneme≠grapheme count
+    const els = baseEls();
 
     setupSoundCount(word, els);
     // If the printed word were rendered, wordDisplay would contain letter
@@ -363,8 +389,8 @@ describe('soundCount mode hides the printed word during the question', () => {
   it('reveals the printed word after the child commits a choice', async () => {
     const { setupSoundCount } = await import('../modes/soundCount.js');
     const { WORDS } = await import('../data/words.js');
-    const word = WORDS.find(w => w.id === 'cat');
-    const els  = baseEls();
+    const word = WORDS.find((w) => w.id === 'cat');
+    const els = baseEls();
 
     setupSoundCount(word, els);
     expect(els.wordDisplay.innerHTML.trim()).toBe('');

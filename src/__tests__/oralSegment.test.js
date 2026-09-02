@@ -16,12 +16,22 @@ globalThis.speechSynthesis = globalThis.speechSynthesis || {
   speak: () => {},
   cancel: () => {},
 };
-globalThis.SpeechSynthesisUtterance = globalThis.SpeechSynthesisUtterance || class { constructor(text){ this.text = text; } };
+globalThis.SpeechSynthesisUtterance =
+  globalThis.SpeechSynthesisUtterance ||
+  class {
+    constructor(text) {
+      this.text = text;
+    }
+  };
 if (!globalThis.AudioContext) {
   globalThis.AudioContext = class {
     constructor() {}
-    createOscillator() { return { connect() {}, start() {}, stop() {} }; }
-    createGain()       { return { connect() {}, gain: { value: 0 } }; }
+    createOscillator() {
+      return { connect() {}, start() {}, stop() {} };
+    }
+    createGain() {
+      return { connect() {}, gain: { value: 0 } };
+    }
   };
 }
 
@@ -30,8 +40,14 @@ const { store } = await import('../modules/store.js');
 store.set('sfxEnabled', false);
 
 const WORD = {
-  id: 'cat', word: 'cat', emoji: '🐱', group: 'short-a', level: 1,
-  graphemes: ['c', 'a', 't'], types: ['c', 'sv', 'c'], phonemes: ['c', 'a', 't'],
+  id: 'cat',
+  word: 'cat',
+  emoji: '🐱',
+  group: 'short-a',
+  level: 1,
+  graphemes: ['c', 'a', 't'],
+  types: ['c', 'sv', 'c'],
+  phonemes: ['c', 'a', 't'],
 };
 
 const baseEls = () => {
@@ -46,22 +62,26 @@ const baseEls = () => {
     <button id="btn-skip"></button>
   `;
   return {
-    wordEmoji:       document.getElementById('word-emoji'),
-    wordDisplay:     document.getElementById('word-display'),
-    phonemeRow:      document.getElementById('phoneme-row'),
-    modeArea:        document.getElementById('mode-area'),
+    wordEmoji: document.getElementById('word-emoji'),
+    wordDisplay: document.getElementById('word-display'),
+    phonemeRow: document.getElementById('phoneme-row'),
+    modeArea: document.getElementById('mode-area'),
     modeInstruction: document.getElementById('mode-instruction'),
-    btnCheck:        document.getElementById('btn-check'),
-    btnSayIt:        document.getElementById('btn-sayit'),
-    btnSkip:         document.getElementById('btn-skip'),
-    onResult:        vi.fn(),
+    btnCheck: document.getElementById('btn-check'),
+    btnSayIt: document.getElementById('btn-sayit'),
+    btnSkip: document.getElementById('btn-skip'),
+    onResult: vi.fn(),
   };
 };
 
-const tap  = (els, n) => { for (let i = 0; i < n; i++) els.modeArea.querySelector('#os-tap').click(); };
-const done = (els)    => els.modeArea.querySelector('#os-done').click();
+const tap = (els, n) => {
+  for (let i = 0; i < n; i++) els.modeArea.querySelector('#os-tap').click();
+};
+const done = (els) => els.modeArea.querySelector('#os-done').click();
 
-beforeEach(() => { vi.useFakeTimers(); });
+beforeEach(() => {
+  vi.useFakeTimers();
+});
 
 afterEach(() => {
   cleanup();
@@ -127,8 +147,10 @@ describe('setupOralSegment()', () => {
     const els = baseEls();
     setupOralSegment(WORD, els);
 
-    tap(els, 1); done(els);
-    tap(els, 5); done(els);
+    tap(els, 1);
+    done(els);
+    tap(els, 5);
+    done(els);
 
     expect(els.modeArea.querySelector('#os-tap').disabled).toBe(true);
     els.modeArea.querySelector('.vmcq-next-btn').click();

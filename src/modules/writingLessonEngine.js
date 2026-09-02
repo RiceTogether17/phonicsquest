@@ -6,10 +6,38 @@
  */
 
 const STOPWORDS = new Set([
-  'the', 'and', 'with', 'from', 'that', 'this', 'have', 'your', 'then',
-  'when', 'while', 'into', 'just', 'very', 'they', 'them', 'their',
-  'what', 'were', 'been', 'will', 'about', 'also', 'some', 'more',
-  'than', 'each', 'would', 'could', 'should', 'there', 'where',
+  'the',
+  'and',
+  'with',
+  'from',
+  'that',
+  'this',
+  'have',
+  'your',
+  'then',
+  'when',
+  'while',
+  'into',
+  'just',
+  'very',
+  'they',
+  'them',
+  'their',
+  'what',
+  'were',
+  'been',
+  'will',
+  'about',
+  'also',
+  'some',
+  'more',
+  'than',
+  'each',
+  'would',
+  'could',
+  'should',
+  'there',
+  'where',
 ]);
 
 // ── Simple synonym map for common narrative words ───────────────────────────
@@ -42,7 +70,7 @@ function _getSynonyms(word) {
   // Also check if the word is a synonym pointing back to a root
   for (const [root, syns] of Object.entries(SYNONYM_MAP)) {
     if (syns.includes(lower) && !synonyms.includes(root)) {
-      synonyms.push(root, ...syns.filter(s => s !== lower));
+      synonyms.push(root, ...syns.filter((s) => s !== lower));
     }
   }
   return [...new Set(synonyms)];
@@ -50,7 +78,10 @@ function _getSynonyms(word) {
 
 // ── Plan Readiness ──────────────────────────────────────────────────────────
 
-export function isPlanReady(plan, requiredSections = ['introduction', 'risingAction', 'climax', 'fallingAction', 'conclusion']) {
+export function isPlanReady(
+  plan,
+  requiredSections = ['introduction', 'risingAction', 'climax', 'fallingAction', 'conclusion'],
+) {
   return requiredSections.every((key) => (plan?.[key] || '').trim().length >= 6);
 }
 
@@ -62,17 +93,22 @@ export function isPlanReady(plan, requiredSections = ['introduction', 'risingAct
  */
 function _extractPlanKeywords(text) {
   const lower = (text || '').toLowerCase();
-  const words = lower
-    .split(/[^a-z]+/)
-    .filter(w => w.length >= 4 && !STOPWORDS.has(w));
+  const words = lower.split(/[^a-z]+/).filter((w) => w.length >= 4 && !STOPWORDS.has(w));
 
   // Also extract 2-word phrases from the text
-  const allWords = lower.split(/\s+/).map(w => w.replace(/[^a-z]/g, '')).filter(Boolean);
+  const allWords = lower
+    .split(/\s+/)
+    .map((w) => w.replace(/[^a-z]/g, ''))
+    .filter(Boolean);
   const phrases = [];
   for (let i = 0; i < allWords.length - 1; i++) {
     const phrase = `${allWords[i]} ${allWords[i + 1]}`;
-    if (allWords[i].length >= 3 && allWords[i + 1].length >= 3
-        && !STOPWORDS.has(allWords[i]) && !STOPWORDS.has(allWords[i + 1])) {
+    if (
+      allWords[i].length >= 3 &&
+      allWords[i + 1].length >= 3 &&
+      !STOPWORDS.has(allWords[i]) &&
+      !STOPWORDS.has(allWords[i + 1])
+    ) {
       phrases.push(phrase);
     }
   }
@@ -102,14 +138,15 @@ function _scorePlanSectionMatch(planKeywords, draftText) {
   if (!lower || !planKeywords.words.length) return 0;
 
   const expandedWords = _expandWithSynonyms(planKeywords.words);
-  const wordHits = expandedWords.filter(kw => lower.includes(kw)).length;
+  const wordHits = expandedWords.filter((kw) => lower.includes(kw)).length;
   const wordScore = Math.min(wordHits / Math.max(planKeywords.words.length, 1), 1);
 
   // Phrase overlap bonus
-  const phraseHits = planKeywords.phrases.filter(p => lower.includes(p)).length;
-  const phraseBonus = planKeywords.phrases.length > 0
-    ? Math.min(phraseHits / planKeywords.phrases.length, 1) * 0.20
-    : 0;
+  const phraseHits = planKeywords.phrases.filter((p) => lower.includes(p)).length;
+  const phraseBonus =
+    planKeywords.phrases.length > 0
+      ? Math.min(phraseHits / planKeywords.phrases.length, 1) * 0.2
+      : 0;
 
   return Math.min(wordScore + phraseBonus, 1);
 }
@@ -148,8 +185,9 @@ export function getPlanDraftMatchReport(plan, draftText) {
     if (!value?.trim()) continue;
     const keywords = _extractPlanKeywords(value);
     const score = _scorePlanSectionMatch(keywords, draftText);
-    const matchedWords = _expandWithSynonyms(keywords.words)
-      .filter(kw => (draftText || '').toLowerCase().includes(kw));
+    const matchedWords = _expandWithSynonyms(keywords.words).filter((kw) =>
+      (draftText || '').toLowerCase().includes(kw),
+    );
     sections[key] = { score, matchedWords, totalKeywords: keywords.words.length };
     totalScore += score;
     sectionCount++;
@@ -175,7 +213,10 @@ function _splitIntoSections(text) {
   if (!t) return { opening: '', middle: '', ending: '' };
 
   // Try paragraph-based splitting first
-  const paragraphs = t.split(/\n\s*\n/).map(p => p.trim()).filter(p => p.length > 5);
+  const paragraphs = t
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 5);
 
   if (paragraphs.length >= 3) {
     const openCount = Math.max(1, Math.floor(paragraphs.length * 0.25));
@@ -190,7 +231,7 @@ function _splitIntoSections(text) {
   }
 
   // Fall back to sentence-based splitting
-  const sentences = t.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 3);
+  const sentences = t.split(/(?<=[.!?])\s+/).filter((s) => s.trim().length > 3);
   if (sentences.length >= 3) {
     const openCount = Math.max(1, Math.floor(sentences.length * 0.25));
     const endCount = Math.max(1, Math.floor(sentences.length * 0.25));
@@ -207,13 +248,31 @@ function _splitIntoSections(text) {
 
 // Mission position hints: which section a mission is expected to match
 const POSITION_HINTS = {
-  'open': 'opening', 'opening': 'opening', 'begin': 'opening', 'start': 'opening',
-  'setting': 'opening', 'scene': 'opening', 'introduce': 'opening',
-  'climax': 'middle', 'surprise': 'middle', 'problem': 'middle', 'conflict': 'middle',
-  'build': 'middle', 'action': 'middle', 'dialogue': 'middle',
-  'end': 'ending', 'ending': 'ending', 'conclude': 'ending', 'conclusion': 'ending',
-  'resolution': 'ending', 'resolve': 'ending', 'reflect': 'ending', 'reflection': 'ending',
-  'learn': 'ending', 'lesson': 'ending', 'change': 'ending',
+  open: 'opening',
+  opening: 'opening',
+  begin: 'opening',
+  start: 'opening',
+  setting: 'opening',
+  scene: 'opening',
+  introduce: 'opening',
+  climax: 'middle',
+  surprise: 'middle',
+  problem: 'middle',
+  conflict: 'middle',
+  build: 'middle',
+  action: 'middle',
+  dialogue: 'middle',
+  end: 'ending',
+  ending: 'ending',
+  conclude: 'ending',
+  conclusion: 'ending',
+  resolution: 'ending',
+  resolve: 'ending',
+  reflect: 'ending',
+  reflection: 'ending',
+  learn: 'ending',
+  lesson: 'ending',
+  change: 'ending',
 };
 
 /**
@@ -229,7 +288,11 @@ function _inferMissionSection(missionText) {
 
 function _normaliseMission(mission, idx) {
   if (typeof mission === 'string') {
-    const inferred = mission.toLowerCase().split(/[^a-z]+/).filter((w) => w.length > 4).slice(0, 2);
+    const inferred = mission
+      .toLowerCase()
+      .split(/[^a-z]+/)
+      .filter((w) => w.length > 4)
+      .slice(0, 2);
     return {
       id: `mission-${idx}`,
       text: mission,
@@ -259,17 +322,18 @@ export function getParagraphMissionStatus(lesson, text = '') {
     if (mission.keywordsAny.length === 0) return { ...mission, hit: false, sectionMatch: false };
 
     const expectedSection = mission.expectedSection;
-    const targetText = (expectedSection !== 'any' && sections[expectedSection])
-      ? sections[expectedSection].toLowerCase()
-      : null;
+    const targetText =
+      expectedSection !== 'any' && sections[expectedSection]
+        ? sections[expectedSection].toLowerCase()
+        : null;
 
     // Check target section first
     const sectionHit = targetText
-      ? mission.keywordsAny.some(kw => targetText.includes(kw.toLowerCase()))
+      ? mission.keywordsAny.some((kw) => targetText.includes(kw.toLowerCase()))
       : false;
 
     // Fallback to full-text check
-    const fullHit = mission.keywordsAny.some(kw => lower.includes(kw.toLowerCase()));
+    const fullHit = mission.keywordsAny.some((kw) => lower.includes(kw.toLowerCase()));
 
     return {
       ...mission,
@@ -295,7 +359,9 @@ export function mergeLessonWithPlan(lesson, plan) {
 // ── Remediation Routing ─────────────────────────────────────────────────────
 
 export function getRemediationPath(result) {
-  const missingChecks = (result?.checkResults || []).filter((check) => !check.hit).map((check) => check.label);
+  const missingChecks = (result?.checkResults || [])
+    .filter((check) => !check.hit)
+    .map((check) => check.label);
   const weak = result?.weakest || 'content';
   const missionByWeakness = {
     content: 'Detail Boost Mission: add one sensory clue and one precise action.',
@@ -308,7 +374,9 @@ export function getRemediationPath(result) {
   const nq = result?.metrics?.narrativeQuality || {};
   const narrativePrompts = [];
   if (nq.climax !== undefined && nq.climax < 0.3) {
-    narrativePrompts.push('Add a clear turning point with a surprise marker (e.g. "suddenly", "just then").');
+    narrativePrompts.push(
+      'Add a clear turning point with a surprise marker (e.g. "suddenly", "just then").',
+    );
   }
   if (nq.resolution !== undefined && nq.resolution < 0.3) {
     narrativePrompts.push('Show how the problem was solved at the end.');

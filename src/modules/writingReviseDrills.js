@@ -54,7 +54,8 @@ export function gradeDrills(drills = [], answers = []) {
   return {
     correctCount,
     total: drills.length,
-    passed: drills.length === 0 ? true : correctCount >= Math.max(1, Math.ceil(drills.length * 0.6)),
+    passed:
+      drills.length === 0 ? true : correctCount >= Math.max(1, Math.ceil(drills.length * 0.6)),
     results,
   };
 }
@@ -69,7 +70,9 @@ export function collectDrillAnswers(container, drillCount) {
     const sequenceContainer = container.querySelector(`[data-arrange-drill="${idx}"]`);
     if (sequenceContainer) {
       const items = sequenceContainer.querySelectorAll('.arrange-item');
-      return Array.from(items).map(el => Number(el.dataset.origIndex)).join(',');
+      return Array.from(items)
+        .map((el) => Number(el.dataset.origIndex))
+        .join(',');
     }
 
     // Check for sentence-upgrade textarea
@@ -104,9 +107,15 @@ function _renderSentenceUpgrade(drill, index) {
     <strong>Drill ${index + 1} — Sentence Upgrade</strong>
     <p><em>Weak sentence:</em> "${drill.weakSentence || drill.question}"</p>
     <p>Pick the strongest upgrade${!hasOptions ? ' or write your own' : ''}:</p>
-    ${hasOptions
-      ? drill.options.map((opt, oi) => `<label style="display:block"><input type="radio" name="drill-${index}" value="${oi}"/> ${opt}</label>`).join('')
-      : `<textarea data-drill-upgrade="${index}" class="cp-name-input" rows="2" placeholder="Write your upgraded sentence..."></textarea>`
+    ${
+      hasOptions
+        ? drill.options
+            .map(
+              (opt, oi) =>
+                `<label style="display:block"><input type="radio" name="drill-${index}" value="${oi}"/> ${opt}</label>`,
+            )
+            .join('')
+        : `<textarea data-drill-upgrade="${index}" class="cp-name-input" rows="2" placeholder="Write your upgraded sentence..."></textarea>`
     }
   </div>`;
 }
@@ -124,7 +133,7 @@ function _gradeSentenceUpgrade(drill, answer) {
     const orig = (drill.weakSentence || drill.question || '').toLowerCase();
     return { type: drill.type, correct: text.length > orig.length && text !== orig };
   }
-  const hits = signals.filter(s => text.includes(s.toLowerCase()));
+  const hits = signals.filter((s) => text.includes(s.toLowerCase()));
   return { type: drill.type, correct: hits.length >= Math.max(1, Math.ceil(signals.length * 0.5)) };
 }
 
@@ -136,16 +145,22 @@ function _renderArrangeSequence(drill, index) {
   // Scrambled display order — shuffle but preserve original indices
   const items = (drill.sentences || []).map((s, i) => ({ text: s, origIndex: i }));
   const shuffled = drill.scrambledOrder
-    ? drill.scrambledOrder.map(i => items[i])
+    ? drill.scrambledOrder.map((i) => items[i])
     : _shuffleDeterministic(items, index);
 
   return `<div class="dash-pattern-item" data-drill-type="arrange_sequence">
     <strong>Drill ${index + 1} — Arrange the Story</strong>
     <p>${drill.question || 'Put these sentences in the best story order:'}</p>
     <div data-arrange-drill="${index}" class="arrange-container">
-      ${shuffled.map((item) => `<div class="arrange-item" data-orig-index="${item.origIndex}" style="padding:6px 10px;margin:4px 0;border:1px solid var(--border);border-radius:6px;cursor:pointer;background:var(--bg-card)">
+      ${shuffled
+        .map(
+          (
+            item,
+          ) => `<div class="arrange-item" data-orig-index="${item.origIndex}" style="padding:6px 10px;margin:4px 0;border:1px solid var(--border);border-radius:6px;cursor:pointer;background:var(--bg-card)">
         <span class="arrange-number" style="font-weight:bold;margin-right:6px">?</span> ${item.text}
-      </div>`).join('')}
+      </div>`,
+        )
+        .join('')}
     </div>
     <p style="font-size:0.85em;color:var(--text-muted)">Click items in order (1st, 2nd, 3rd...) to number them.</p>
   </div>`;
@@ -169,12 +184,16 @@ function _gradeArrangeSequence(drill, answer) {
   const correctOrder = drill.correctOrder || drill.sentences?.map((_, i) => i);
   if (!correctOrder) return { type: drill.type, correct: false };
 
-  const studentOrder = (typeof answer === 'string')
-    ? answer.split(',').map(Number)
-    : (Array.isArray(answer) ? answer.map(Number) : []);
+  const studentOrder =
+    typeof answer === 'string'
+      ? answer.split(',').map(Number)
+      : Array.isArray(answer)
+        ? answer.map(Number)
+        : [];
 
-  const correct = correctOrder.length === studentOrder.length
-    && correctOrder.every((v, i) => v === studentOrder[i]);
+  const correct =
+    correctOrder.length === studentOrder.length &&
+    correctOrder.every((v, i) => v === studentOrder[i]);
 
   return { type: drill.type, correct };
 }

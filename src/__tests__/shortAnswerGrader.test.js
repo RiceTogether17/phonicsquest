@@ -18,7 +18,9 @@ describe('hasUnnegatedMatch — negation rejection', () => {
   it('accepts a keyword after a clause break, even if the prior clause negated it', () => {
     // "not urgent." is one clause; "she still hurried" is a new clause and the
     // negation does not carry across the period.
-    expect(hasUnnegatedMatch('It was not urgent. She still hurried, urgent or not.', 'hurried')).toBe(true);
+    expect(
+      hasUnnegatedMatch('It was not urgent. She still hurried, urgent or not.', 'hurried'),
+    ).toBe(true);
   });
 
   it('accepts a positive keyword that just happens to appear after a long sentence', () => {
@@ -33,7 +35,9 @@ describe('hasUnnegatedMatch — negation rejection', () => {
 
   it('handles multiple occurrences — accepts if any unnegated', () => {
     // first hit is negated, second is not
-    expect(hasUnnegatedMatch('It was not urgent at first, but it became urgent later.', 'urgent')).toBe(true);
+    expect(
+      hasUnnegatedMatch('It was not urgent at first, but it became urgent later.', 'urgent'),
+    ).toBe(true);
   });
 
   it('does not carry negation across "but" / "however"', () => {

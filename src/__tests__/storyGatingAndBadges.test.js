@@ -10,7 +10,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 function stubAudioGlobals() {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
 }
 
@@ -121,9 +124,18 @@ describe('recommended band', () => {
 describe('writing badge detection', () => {
   /** Metrics shaped like computeMetrics() output, with nothing earned. */
   const baseMetrics = {
-    firstSentence: '', hasEndPunct: false, sentenceCount: 0, totalDistinct: 0,
-    hasDialogue: false, dialoguePunctOk: false, sensoryHits: 0, emotionTellingCount: 0,
-    hasFormalOpening: false, hasFormalClosing: false, requiredHits: 0, requiredTotal: 0,
+    firstSentence: '',
+    hasEndPunct: false,
+    sentenceCount: 0,
+    totalDistinct: 0,
+    hasDialogue: false,
+    dialoguePunctOk: false,
+    sensoryHits: 0,
+    emotionTellingCount: 0,
+    hasFormalOpening: false,
+    hasFormalClosing: false,
+    requiredHits: 0,
+    requiredTotal: 0,
   };
 
   it('awards nothing for empty writing', async () => {
@@ -151,58 +163,72 @@ describe('writing badge detection', () => {
 
   it('withholds Strong Opener for a very short opener', async () => {
     const { detectBadges } = await import('../modules/writingBadges.js');
-    expect(detectBadges({ ...baseMetrics, firstSentence: 'It rained.' }, ''))
-      .not.toContain('strong-opener');
+    expect(detectBadges({ ...baseMetrics, firstSentence: 'It rained.' }, '')).not.toContain(
+      'strong-opener',
+    );
   });
 
   it('awards Clear Ending only with terminal punctuation and enough sentences', async () => {
     const { detectBadges } = await import('../modules/writingBadges.js');
-    expect(detectBadges({ ...baseMetrics, hasEndPunct: true, sentenceCount: 4 }, ''))
-      .toContain('clear-ending');
-    expect(detectBadges({ ...baseMetrics, hasEndPunct: true, sentenceCount: 3 }, ''))
-      .not.toContain('clear-ending');
+    expect(detectBadges({ ...baseMetrics, hasEndPunct: true, sentenceCount: 4 }, '')).toContain(
+      'clear-ending',
+    );
+    expect(detectBadges({ ...baseMetrics, hasEndPunct: true, sentenceCount: 3 }, '')).not.toContain(
+      'clear-ending',
+    );
   });
 
   it('awards Connector Builder at three distinct connectors', async () => {
     const { detectBadges } = await import('../modules/writingBadges.js');
     expect(detectBadges({ ...baseMetrics, totalDistinct: 3 }, '')).toContain('connector-builder');
-    expect(detectBadges({ ...baseMetrics, totalDistinct: 2 }, '')).not.toContain('connector-builder');
+    expect(detectBadges({ ...baseMetrics, totalDistinct: 2 }, '')).not.toContain(
+      'connector-builder',
+    );
   });
 
   it('requires correct punctuation for Dialogue Hero', async () => {
     const { detectBadges } = await import('../modules/writingBadges.js');
-    expect(detectBadges({ ...baseMetrics, hasDialogue: true, dialoguePunctOk: true }, ''))
-      .toContain('dialogue-hero');
+    expect(
+      detectBadges({ ...baseMetrics, hasDialogue: true, dialoguePunctOk: true }, ''),
+    ).toContain('dialogue-hero');
     // Dialogue attempted but mispunctuated earns nothing — that's the lesson.
-    expect(detectBadges({ ...baseMetrics, hasDialogue: true, dialoguePunctOk: false }, ''))
-      .not.toContain('dialogue-hero');
+    expect(
+      detectBadges({ ...baseMetrics, hasDialogue: true, dialoguePunctOk: false }, ''),
+    ).not.toContain('dialogue-hero');
   });
 
-  it('awards Show-Don\'t-Tell for sensory language with little emotion-naming', async () => {
+  it("awards Show-Don't-Tell for sensory language with little emotion-naming", async () => {
     const { detectBadges } = await import('../modules/writingBadges.js');
-    expect(detectBadges({ ...baseMetrics, sensoryHits: 2, emotionTellingCount: 1 }, ''))
-      .toContain('show-dont-tell');
-    expect(detectBadges({ ...baseMetrics, sensoryHits: 2, emotionTellingCount: 2 }, ''))
-      .not.toContain('show-dont-tell');
+    expect(detectBadges({ ...baseMetrics, sensoryHits: 2, emotionTellingCount: 1 }, '')).toContain(
+      'show-dont-tell',
+    );
+    expect(
+      detectBadges({ ...baseMetrics, sensoryHits: 2, emotionTellingCount: 2 }, ''),
+    ).not.toContain('show-dont-tell');
   });
 
   it('requires both a formal opening and closing for Formal Tone', async () => {
     const { detectBadges } = await import('../modules/writingBadges.js');
-    expect(detectBadges({ ...baseMetrics, hasFormalOpening: true, hasFormalClosing: true }, ''))
-      .toContain('formal-tone');
-    expect(detectBadges({ ...baseMetrics, hasFormalOpening: true }, ''))
-      .not.toContain('formal-tone');
+    expect(
+      detectBadges({ ...baseMetrics, hasFormalOpening: true, hasFormalClosing: true }, ''),
+    ).toContain('formal-tone');
+    expect(detectBadges({ ...baseMetrics, hasFormalOpening: true }, '')).not.toContain(
+      'formal-tone',
+    );
   });
 
   it('awards Task Champion only when every required point is covered', async () => {
     const { detectBadges } = await import('../modules/writingBadges.js');
-    expect(detectBadges({ ...baseMetrics, requiredHits: 3, requiredTotal: 3 }, ''))
-      .toContain('task-champion');
-    expect(detectBadges({ ...baseMetrics, requiredHits: 2, requiredTotal: 3 }, ''))
-      .not.toContain('task-champion');
+    expect(detectBadges({ ...baseMetrics, requiredHits: 3, requiredTotal: 3 }, '')).toContain(
+      'task-champion',
+    );
+    expect(detectBadges({ ...baseMetrics, requiredHits: 2, requiredTotal: 3 }, '')).not.toContain(
+      'task-champion',
+    );
     // No requirements defined → not a free badge.
-    expect(detectBadges({ ...baseMetrics, requiredHits: 0, requiredTotal: 0 }, ''))
-      .not.toContain('task-champion');
+    expect(detectBadges({ ...baseMetrics, requiredHits: 0, requiredTotal: 0 }, '')).not.toContain(
+      'task-champion',
+    );
   });
 
   it('awards Revision Star for a meaningful improvement only', async () => {

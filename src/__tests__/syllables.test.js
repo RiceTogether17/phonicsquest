@@ -9,20 +9,20 @@ import { WORDS } from '../data/words.js';
  */
 
 function findWord(id) {
-  const w = WORDS.find(x => x.id === id);
+  const w = WORDS.find((x) => x.id === id);
   if (!w) throw new Error(`Fixture word "${id}" missing from bank`);
   return w;
 }
 
 describe('getSyllableCount — Phase 1–8 mono-syllable words', () => {
   it.each([
-    ['cat',  1],
-    ['hat',  1],
+    ['cat', 1],
+    ['hat', 1],
     ['ship', 1],
-    ['cake', 1],     // CVCe — silent-e should not add a beat
+    ['cake', 1], // CVCe — silent-e should not add a beat
     ['rain', 1],
   ])('counts %s as %i syllable(s)', (id, expected) => {
-    const w = WORDS.find(x => x.id === id);
+    const w = WORDS.find((x) => x.id === id);
     if (!w) return; // skip if a phase-fixture is renamed
     expect(getSyllableCount(w)).toBe(expected);
   });
@@ -55,8 +55,10 @@ describe('getSyllableCount — Phase 10 morphology', () => {
 describe('getSyllableCount — fallback behaviour', () => {
   it('honours an explicit word.syllables override over the heuristic', () => {
     const overridden = {
-      id: 'fixture', word: 'whatever',
-      graphemes: ['w','a'], types: ['c','sv'],
+      id: 'fixture',
+      word: 'whatever',
+      graphemes: ['w', 'a'],
+      types: ['c', 'sv'],
       syllables: 4,
     };
     expect(getSyllableCount(overridden)).toBe(4);
@@ -69,16 +71,20 @@ describe('getSyllableCount — fallback behaviour', () => {
 
   it('plain -s plural does not add a syllable', () => {
     const cats = {
-      id: 'cats', word: 'cats',
-      graphemes: ['c','a','t','s'], types: ['c','sv','c','sf'],
+      id: 'cats',
+      word: 'cats',
+      graphemes: ['c', 'a', 't', 's'],
+      types: ['c', 'sv', 'c', 'sf'],
     };
     expect(getSyllableCount(cats)).toBe(1);
   });
 
   it('-es plural / 3sg adds a syllable', () => {
     const buses = {
-      id: 'buses', word: 'buses',
-      graphemes: ['b','u','s','es'], types: ['c','sv','c','sf'],
+      id: 'buses',
+      word: 'buses',
+      graphemes: ['b', 'u', 's', 'es'],
+      types: ['c', 'sv', 'c', 'sf'],
     };
     expect(getSyllableCount(buses)).toBe(2);
   });
@@ -96,7 +102,12 @@ describe('getSyllableBreakdown', () => {
   });
 
   it('respects an explicit syllableBreakdown override', () => {
-    const w = { word: 'donkey', graphemes: ['d','o','n','k','ey'], types: ['c','sv','c','c','lv'], syllableBreakdown: 'don-key' };
+    const w = {
+      word: 'donkey',
+      graphemes: ['d', 'o', 'n', 'k', 'ey'],
+      types: ['c', 'sv', 'c', 'c', 'lv'],
+      syllableBreakdown: 'don-key',
+    };
     expect(getSyllableBreakdown(w)).toBe('don-key');
   });
 });

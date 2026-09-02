@@ -117,7 +117,14 @@ describe('due-date queries', () => {
     const { isWordDue, getSchedule } = await loadSrs();
     const { store } = await import('../modules/store.js');
     store.set('srsSchedule', {
-      today: { interval: 1, repetitions: 1, easeFactor: 2.5, dueAt: utcDay(0), correct: 1, wrong: 0 },
+      today: {
+        interval: 1,
+        repetitions: 1,
+        easeFactor: 2.5,
+        dueAt: utcDay(0),
+        correct: 1,
+        wrong: 0,
+      },
     });
     expect(isWordDue('today')).toBe(true);
     expect(getSchedule('today')).not.toBeNull();
@@ -127,7 +134,14 @@ describe('due-date queries', () => {
     const { isWordDue } = await loadSrs();
     const { store } = await import('../modules/store.js');
     store.set('srsSchedule', {
-      later: { interval: 6, repetitions: 2, easeFactor: 2.5, dueAt: utcDay(3), correct: 2, wrong: 0 },
+      later: {
+        interval: 6,
+        repetitions: 2,
+        easeFactor: 2.5,
+        dueAt: utcDay(3),
+        correct: 2,
+        wrong: 0,
+      },
     });
     expect(isWordDue('later')).toBe(false);
   });
@@ -136,7 +150,14 @@ describe('due-date queries', () => {
     const { isWordDue } = await loadSrs();
     const { store } = await import('../modules/store.js');
     store.set('srsSchedule', {
-      stale: { interval: 1, repetitions: 1, easeFactor: 2.5, dueAt: utcDay(-5), correct: 1, wrong: 0 },
+      stale: {
+        interval: 1,
+        repetitions: 1,
+        easeFactor: 2.5,
+        dueAt: utcDay(-5),
+        correct: 1,
+        wrong: 0,
+      },
     });
     expect(isWordDue('stale')).toBe(true);
   });
@@ -146,8 +167,8 @@ describe('due-date queries', () => {
     const { store } = await import('../modules/store.js');
     store.set('srsSchedule', {
       a: { interval: 1, repetitions: 1, easeFactor: 2.5, dueAt: utcDay(-1), correct: 1, wrong: 0 },
-      b: { interval: 6, repetitions: 2, easeFactor: 2.5, dueAt: utcDay(4),  correct: 2, wrong: 0 },
-      c: { interval: 1, repetitions: 1, easeFactor: 2.5, dueAt: utcDay(0),  correct: 1, wrong: 0 },
+      b: { interval: 6, repetitions: 2, easeFactor: 2.5, dueAt: utcDay(4), correct: 2, wrong: 0 },
+      c: { interval: 1, repetitions: 1, easeFactor: 2.5, dueAt: utcDay(0), correct: 1, wrong: 0 },
     });
 
     expect(getDueWords(['a', 'b']).sort()).toEqual(['a']);

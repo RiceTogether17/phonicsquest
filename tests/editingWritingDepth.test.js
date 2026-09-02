@@ -16,7 +16,6 @@ describe('editing and writing depth guardrails', () => {
     }
   });
 
-
   it('includes p1 to p6 levels for editing and writing quests', () => {
     expect(Object.keys(editingPassages)).toEqual(['1', '2', '3', '4', '5', '6']);
     expect(Object.keys(writingPrompts)).toEqual(['1', '2', '3', '4', '5', '6']);

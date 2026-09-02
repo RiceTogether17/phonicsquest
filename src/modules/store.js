@@ -89,8 +89,8 @@ const DEFAULT_STATE = {
   // Bring-your-own-key AI tutor. The parent picks a provider and pastes
   // their own key; PhonicsQuest has no server and never sees it.
   aiProvider: 'google',
-  aiApiKeys: {},   // { [providerId]: key } — parent credentials, survive a progress reset
-  aiModels: {},    // { [providerId]: modelId } — overrides the provider default
+  aiApiKeys: {}, // { [providerId]: key } — parent credentials, survive a progress reset
+  aiModels: {}, // { [providerId]: modelId } — overrides the provider default
   aiSpend: { inputTokens: 0, outputTokens: 0, estimatedUsd: 0, calls: 0 },
   aiLastError: null, // why the tutor is quiet, for the parent's eyes only
   reducedMotion: false, // manual override for prefers-reduced-motion

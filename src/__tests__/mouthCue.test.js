@@ -22,9 +22,9 @@ describe('mapping coverage', () => {
   it('maps every phoneme that appears in the word bank', async () => {
     const { WORDS } = await import('../data/words.js');
     const used = new Set();
-    WORDS.forEach(w => (w.phonemes || []).forEach(p => used.add(p)));
+    WORDS.forEach((w) => (w.phonemes || []).forEach((p) => used.add(p)));
 
-    const unmapped = [...used].filter(p => !PHONEME_MOUTH[p]);
+    const unmapped = [...used].filter((p) => !PHONEME_MOUTH[p]);
     expect(unmapped, `unmapped phonemes: ${unmapped.join(' ')}`).toEqual([]);
     // The distinct count is a floor, not a target. It dropped from ~66 to 55
     // when notation moved from spellings to sounds: /ck/ /c/ and /k/ are one
@@ -56,8 +56,16 @@ describe('mapping coverage', () => {
   });
 
   it('keeps doubled graphemes on the same shape as their single form', () => {
-    const pairs = [['/b/', '/bb/'], ['/f/', '/ff/'], ['/s/', '/ss/'],
-      ['/t/', '/tt/'], ['/l/', '/ll/'], ['/n/', '/nn/'], ['/p/', '/pp/'], ['/g/', '/gg/']];
+    const pairs = [
+      ['/b/', '/bb/'],
+      ['/f/', '/ff/'],
+      ['/s/', '/ss/'],
+      ['/t/', '/tt/'],
+      ['/l/', '/ll/'],
+      ['/n/', '/nn/'],
+      ['/p/', '/pp/'],
+      ['/g/', '/gg/'],
+    ];
     for (const [single, doubled] of pairs) {
       expect(PHONEME_MOUTH[doubled], doubled).toBe(PHONEME_MOUTH[single]);
     }
@@ -109,8 +117,21 @@ describe('rendering', () => {
 
   it('renders a distinct drawing for each shape', () => {
     const drawn = new Set();
-    for (const phoneme of ['/b/', '/f/', '/th/', '/t/', '/k/', '/h/', '/sh/',
-      '/w/', '/a/', '/e/', '/ee/', '/o/', '/oi/']) {
+    for (const phoneme of [
+      '/b/',
+      '/f/',
+      '/th/',
+      '/t/',
+      '/k/',
+      '/h/',
+      '/sh/',
+      '/w/',
+      '/a/',
+      '/e/',
+      '/ee/',
+      '/o/',
+      '/oi/',
+    ]) {
       renderMouthCue(phoneme, host);
       drawn.add(host.querySelector('svg').innerHTML);
     }

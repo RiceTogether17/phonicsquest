@@ -11,19 +11,44 @@
 // ── Climax Detection ────────────────────────────────────────────────────────
 
 const CLIMAX_MARKERS = [
-  'suddenly', 'all at once', 'just then', 'without warning',
-  'at that moment', 'in a flash', 'before i knew it', 'out of nowhere',
+  'suddenly',
+  'all at once',
+  'just then',
+  'without warning',
+  'at that moment',
+  'in a flash',
+  'before i knew it',
+  'out of nowhere',
 ];
 
 const TENSION_VERBS = [
-  'gasped', 'screamed', 'shouted', 'froze', 'stumbled', 'crashed',
-  'slammed', 'burst', 'grabbed', 'yanked', 'sprinted', 'leaped',
-  'dove', 'scrambled', 'jolted', 'lurched',
+  'gasped',
+  'screamed',
+  'shouted',
+  'froze',
+  'stumbled',
+  'crashed',
+  'slammed',
+  'burst',
+  'grabbed',
+  'yanked',
+  'sprinted',
+  'leaped',
+  'dove',
+  'scrambled',
+  'jolted',
+  'lurched',
 ];
 
 const TENSION_PHRASES = [
-  'heart pounded', 'heart raced', 'hands trembled', 'blood ran cold',
-  'couldn\'t believe', 'eyes widened', 'held my breath', 'pulse quickened',
+  'heart pounded',
+  'heart raced',
+  'hands trembled',
+  'blood ran cold',
+  "couldn't believe",
+  'eyes widened',
+  'held my breath',
+  'pulse quickened',
 ];
 
 /**
@@ -31,12 +56,12 @@ const TENSION_PHRASES = [
  * Returns 0..1 where higher = stronger climax signal.
  */
 export function scoreClimaxPresence(lower) {
-  const markerHits = CLIMAX_MARKERS.filter(m => lower.includes(m)).length;
-  const verbHits = TENSION_VERBS.filter(v => lower.includes(v)).length;
-  const phraseHits = TENSION_PHRASES.filter(p => lower.includes(p)).length;
+  const markerHits = CLIMAX_MARKERS.filter((m) => lower.includes(m)).length;
+  const verbHits = TENSION_VERBS.filter((v) => lower.includes(v)).length;
+  const phraseHits = TENSION_PHRASES.filter((p) => lower.includes(p)).length;
 
   // A real climax needs a marker + at least some tension language
-  const markerScore = Math.min(markerHits, 2) * 0.30;
+  const markerScore = Math.min(markerHits, 2) * 0.3;
   const tensionScore = Math.min(verbHits + phraseHits, 3) * 0.13;
   return Math.min(markerScore + tensionScore, 1);
 }
@@ -44,13 +69,29 @@ export function scoreClimaxPresence(lower) {
 // ── Resolution Detection ────────────────────────────────────────────────────
 
 const RESOLUTION_MARKERS = [
-  'in the end', 'finally', 'at last', 'eventually', 'after all',
-  'everything was', 'things returned', 'it turned out', 'we managed',
+  'in the end',
+  'finally',
+  'at last',
+  'eventually',
+  'after all',
+  'everything was',
+  'things returned',
+  'it turned out',
+  'we managed',
 ];
 
 const RESOLUTION_ACTIONS = [
-  'solved', 'fixed', 'saved', 'found', 'returned', 'helped',
-  'repaired', 'calmed', 'settled', 'resolved', 'recovered',
+  'solved',
+  'fixed',
+  'saved',
+  'found',
+  'returned',
+  'helped',
+  'repaired',
+  'calmed',
+  'settled',
+  'resolved',
+  'recovered',
 ];
 
 /**
@@ -58,8 +99,8 @@ const RESOLUTION_ACTIONS = [
  * Returns 0..1.
  */
 export function scoreResolutionPresence(lower) {
-  const markerHits = RESOLUTION_MARKERS.filter(m => lower.includes(m)).length;
-  const actionHits = RESOLUTION_ACTIONS.filter(a => lower.includes(a)).length;
+  const markerHits = RESOLUTION_MARKERS.filter((m) => lower.includes(m)).length;
+  const actionHits = RESOLUTION_ACTIONS.filter((a) => lower.includes(a)).length;
 
   const markerScore = Math.min(markerHits, 2) * 0.35;
   const actionScore = Math.min(actionHits, 2) * 0.15;
@@ -69,10 +110,20 @@ export function scoreResolutionPresence(lower) {
 // ── Reflection / Lesson Ending Detection ────────────────────────────────────
 
 const REFLECTION_MARKERS = [
-  'i learned', 'i realised', 'i realized', 'next time',
-  'i promised', 'i understood', 'i decided', 'from that day',
-  'i knew then', 'that day i', 'looking back', 'i will never forget',
-  'i would always remember', 'it taught me',
+  'i learned',
+  'i realised',
+  'i realized',
+  'next time',
+  'i promised',
+  'i understood',
+  'i decided',
+  'from that day',
+  'i knew then',
+  'that day i',
+  'looking back',
+  'i will never forget',
+  'i would always remember',
+  'it taught me',
 ];
 
 /**
@@ -89,12 +140,12 @@ export function scoreReflectionEnding(text) {
   const lastPortionStart = Math.floor(totalWords * 0.6);
   const lastPortion = words.slice(lastPortionStart).join(' ');
 
-  const markerInEnd = REFLECTION_MARKERS.filter(m => lastPortion.includes(m)).length;
-  const markerAnywhere = REFLECTION_MARKERS.filter(m => lower.includes(m)).length;
+  const markerInEnd = REFLECTION_MARKERS.filter((m) => lastPortion.includes(m)).length;
+  const markerAnywhere = REFLECTION_MARKERS.filter((m) => lower.includes(m)).length;
 
   // Reward markers near end more than markers at start
-  if (markerInEnd > 0) return Math.min(0.50 + markerInEnd * 0.25, 1);
-  if (markerAnywhere > 0) return 0.30;
+  if (markerInEnd > 0) return Math.min(0.5 + markerInEnd * 0.25, 1);
+  if (markerAnywhere > 0) return 0.3;
   return 0;
 }
 
@@ -120,18 +171,19 @@ const WEAK_DIALOGUE_PATTERNS = [
  * or create conflict? Returns 0..1.
  */
 export function scoreDialoguePurpose(text) {
-  const hasDialogue = /[""\u201c\u201d\u2018\u2019]/.test(text)
-    && /\b(said|asked|replied|whispered|shouted|explained|muttered|cried)\b/i.test(text);
+  const hasDialogue =
+    /[""\u201c\u201d\u2018\u2019]/.test(text) &&
+    /\b(said|asked|replied|whispered|shouted|explained|muttered|cried)\b/i.test(text);
   if (!hasDialogue) return 0;
 
-  const purposeHits = DIALOGUE_PURPOSE_PATTERNS.filter(p => p.test(text)).length;
-  const weakHits = WEAK_DIALOGUE_PATTERNS.filter(p => p.test(text)).length;
+  const purposeHits = DIALOGUE_PURPOSE_PATTERNS.filter((p) => p.test(text)).length;
+  const weakHits = WEAK_DIALOGUE_PATTERNS.filter((p) => p.test(text)).length;
 
   // Purposeful dialogue scores higher; weak-only dialogue scores low
   if (purposeHits >= 2) return 1.0;
-  if (purposeHits === 1 && weakHits <= 1) return 0.70;
-  if (purposeHits === 1) return 0.50;
-  if (weakHits > 0 && purposeHits === 0) return 0.20;
+  if (purposeHits === 1 && weakHits <= 1) return 0.7;
+  if (purposeHits === 1) return 0.5;
+  if (weakHits > 0 && purposeHits === 0) return 0.2;
   return 0.35; // has dialogue with tags but no clear purpose signals
 }
 
@@ -157,18 +209,39 @@ export function scoreNarrativeArc(text) {
   const q4 = words.slice(Math.floor(len * 0.75)).join(' ');
 
   // Setup signals (setting, character intro) — expected in first half
-  const setupWords = ['the', 'was', 'were', 'morning', 'day', 'room', 'school', 'house', 'walked', 'sat'];
-  const hasSetup = setupWords.filter(w => q1.includes(w)).length >= 2 || q1.split(/[.!?]/).length >= 2;
+  const setupWords = [
+    'the',
+    'was',
+    'were',
+    'morning',
+    'day',
+    'room',
+    'school',
+    'house',
+    'walked',
+    'sat',
+  ];
+  const hasSetup =
+    setupWords.filter((w) => q1.includes(w)).length >= 2 || q1.split(/[.!?]/).length >= 2;
 
   // Rising action — some tension or action in middle quarters
-  const risingWords = ['but', 'however', 'although', 'worried', 'noticed', 'strange', 'heard', 'saw'];
-  const hasRising = risingWords.some(w => q2.includes(w) || q3.includes(w));
+  const risingWords = [
+    'but',
+    'however',
+    'although',
+    'worried',
+    'noticed',
+    'strange',
+    'heard',
+    'saw',
+  ];
+  const hasRising = risingWords.some((w) => q2.includes(w) || q3.includes(w));
 
   // Climax — tension peak in second half
-  const hasClimax = CLIMAX_MARKERS.some(m => q3.includes(m) || q2.includes(m));
+  const hasClimax = CLIMAX_MARKERS.some((m) => q3.includes(m) || q2.includes(m));
 
   // Resolution — in final quarter
-  const hasResolution = RESOLUTION_MARKERS.some(m => q4.includes(m) || q3.includes(m));
+  const hasResolution = RESOLUTION_MARKERS.some((m) => q4.includes(m) || q3.includes(m));
 
   let score = 0;
   if (hasSetup) score += 0.25;
@@ -238,14 +311,13 @@ export function computeNarrativeQuality(text) {
   const arc = scoreNarrativeArc(text || '');
   const chronology = scoreChronologicalFlow(text || '');
 
-  const combined = (
+  const combined =
     climax * 0.18 +
     resolution * 0.18 +
     reflection * 0.14 +
     dialogue * 0.16 +
     arc * 0.18 +
-    chronology * 0.16
-  );
+    chronology * 0.16;
 
   return { climax, resolution, reflection, dialogue, arc, chronology, combined };
 }

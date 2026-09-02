@@ -8,16 +8,14 @@
  * routing via result.startPrePhase.
  */
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  PRE_PHASES,
-  PHASES,
-  REQUIRED_PHASE_FIELDS,
-  getPrePhase,
-} from '../data/curriculum.js';
+import { PRE_PHASES, PHASES, REQUIRED_PHASE_FIELDS, getPrePhase } from '../data/curriculum.js';
 
 function stubAudioGlobals() {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
 }
 
@@ -32,7 +30,7 @@ beforeAll(async () => {
 
 describe('PRE_PHASES data shape', () => {
   it('defines exactly the two foundation steps, in order', () => {
-    expect(PRE_PHASES.map(p => p.phase)).toEqual(['0a', '0b']);
+    expect(PRE_PHASES.map((p) => p.phase)).toEqual(['0a', '0b']);
   });
 
   it('every PRE_PHASES entry has the same required fields as PHASES', () => {
@@ -47,7 +45,7 @@ describe('PRE_PHASES data shape', () => {
   });
 
   it('pre-phase ids do not collide with numeric phase ids', () => {
-    const phaseIds = new Set(PHASES.map(p => p.id));
+    const phaseIds = new Set(PHASES.map((p) => p.id));
     for (const pre of PRE_PHASES) {
       expect(phaseIds.has(pre.id)).toBe(false);
     }

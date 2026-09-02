@@ -29,16 +29,16 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Default config — overridable by the caller. */
 const DEFAULTS = Object.freeze({
-  topN:                5,
-  historyDays:        14,
-  masteryAccuracy:   0.80,
-  masteryMinAttempts:   6,
+  topN: 5,
+  historyDays: 14,
+  masteryAccuracy: 0.8,
+  masteryMinAttempts: 6,
 });
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
 function _safeList(input) {
-  return Array.isArray(input) ? input.filter(a => a && typeof a === 'object') : [];
+  return Array.isArray(input) ? input.filter((a) => a && typeof a === 'object') : [];
 }
 
 function _startOfDay(ts) {
@@ -66,7 +66,15 @@ export function getMasteryByStage(attempts, opts = {}) {
   const out = {};
   for (const a of list) {
     if (!a.stageId) continue;
-    const row = out[a.stageId] ?? (out[a.stageId] = { attempts: 0, correct: 0, accuracy: 0, mastered: false, lastTimestamp: 0 });
+    const row =
+      out[a.stageId] ??
+      (out[a.stageId] = {
+        attempts: 0,
+        correct: 0,
+        accuracy: 0,
+        mastered: false,
+        lastTimestamp: 0,
+      });
     row.attempts++;
     if (a.correct) row.correct++;
     if (a.timestamp > row.lastTimestamp) row.lastTimestamp = a.timestamp;
@@ -124,7 +132,7 @@ function _byTargetSound(attempts) {
 export function getStrongestSounds(attempts, opts = {}) {
   const { topN } = { ...DEFAULTS, ...opts };
   return _byTargetSound(attempts)
-    .filter(r => r.attempts >= 3)
+    .filter((r) => r.attempts >= 3)
     .sort((a, b) => b.accuracy - a.accuracy || b.attempts - a.attempts)
     .slice(0, topN);
 }
@@ -135,7 +143,7 @@ export function getStrongestSounds(attempts, opts = {}) {
 export function getWeakestSounds(attempts, opts = {}) {
   const { topN } = { ...DEFAULTS, ...opts };
   return _byTargetSound(attempts)
-    .filter(r => r.attempts >= 3)
+    .filter((r) => r.attempts >= 3)
     .sort((a, b) => a.accuracy - b.accuracy || b.attempts - a.attempts)
     .slice(0, topN);
 }
@@ -146,7 +154,7 @@ export function getWeakestSounds(attempts, opts = {}) {
  * Common error categories sorted by frequency, descending.
  */
 export function getCommonErrorTypes(attempts) {
-  const list = _safeList(attempts).filter(a => a.correct === false && a.errorCategory);
+  const list = _safeList(attempts).filter((a) => a.correct === false && a.errorCategory);
   const counts = new Map();
   for (const a of list) {
     counts.set(a.errorCategory, (counts.get(a.errorCategory) ?? 0) + 1);
@@ -207,7 +215,7 @@ export function getSuggestedNext(attempts, curriculum) {
   const list = curriculum ?? [];
   if (!list.length) return null;
   const mastery = getMasteryByStage(attempts);
-  return list.find(s => !mastery[s.id]?.mastered) ?? list[list.length - 1];
+  return list.find((s) => !mastery[s.id]?.mastered) ?? list[list.length - 1];
 }
 
 /**
@@ -217,7 +225,7 @@ export function getMasteryPercent(attempts, curriculum) {
   const list = curriculum ?? [];
   if (!list.length) return 0;
   const mastery = getMasteryByStage(attempts);
-  const mastered = list.filter(s => mastery[s.id]?.mastered).length;
+  const mastered = list.filter((s) => mastery[s.id]?.mastered).length;
   return Math.round((mastered / list.length) * 100);
 }
 
@@ -240,18 +248,20 @@ export function getPrintablePracticeList(attempts, curriculum, opts = {}) {
 
   const mastery = getMasteryByStage(attempts);
   const ranked = list
-    .filter(s => mastery[s.id]) // only include stages with attempts
-    .map(s => ({ stage: s, accuracy: mastery[s.id].accuracy, attempts: mastery[s.id].attempts }))
+    .filter((s) => mastery[s.id]) // only include stages with attempts
+    .map((s) => ({ stage: s, accuracy: mastery[s.id].accuracy, attempts: mastery[s.id].attempts }))
     .sort((a, b) => a.accuracy - b.accuracy || b.attempts - a.attempts);
 
   // Fallback: if no attempts yet, use the first `topN` stages from the
   // curriculum so the print sheet is never empty.
-  const picks = ranked.length ? ranked.slice(0, topN) : list.slice(0, topN).map(s => ({ stage: s, accuracy: 0, attempts: 0 }));
+  const picks = ranked.length
+    ? ranked.slice(0, topN)
+    : list.slice(0, topN).map((s) => ({ stage: s, accuracy: 0, attempts: 0 }));
 
   return picks.map(({ stage }) => ({
     stage,
-    sampleWords:   (stage.sampleWords ?? []).slice(0, 8),
-    sentence:      (stage.sentenceExamples ?? [])[0] ?? '',
+    sampleWords: (stage.sampleWords ?? []).slice(0, 8),
+    sentence: (stage.sentenceExamples ?? [])[0] ?? '',
   }));
 }
 
@@ -264,17 +274,17 @@ export function summarise(attempts, { curriculum, now } = {}) {
   const safe = _safeList(attempts);
   const timeOpts = typeof now === 'number' ? { now } : {};
   return {
-    totalAttempts:        safe.length,
-    correctAttempts:      safe.filter(a => a.correct).length,
-    currentPhase:         getCurrentPhase(safe, curriculum),
-    masteryPercent:       getMasteryPercent(safe, curriculum),
-    masteryByStage:       getMasteryByStage(safe),
-    accuracyByMode:       getAccuracyByMode(safe),
-    strongestSounds:      getStrongestSounds(safe),
-    weakestSounds:        getWeakestSounds(safe),
-    commonErrorTypes:     getCommonErrorTypes(safe),
-    attemptsOverTime:     getAttemptsOverTime(safe, timeOpts),
-    suggestedNext:        getSuggestedNext(safe, curriculum),
+    totalAttempts: safe.length,
+    correctAttempts: safe.filter((a) => a.correct).length,
+    currentPhase: getCurrentPhase(safe, curriculum),
+    masteryPercent: getMasteryPercent(safe, curriculum),
+    masteryByStage: getMasteryByStage(safe),
+    accuracyByMode: getAccuracyByMode(safe),
+    strongestSounds: getStrongestSounds(safe),
+    weakestSounds: getWeakestSounds(safe),
+    commonErrorTypes: getCommonErrorTypes(safe),
+    attemptsOverTime: getAttemptsOverTime(safe, timeOpts),
+    suggestedNext: getSuggestedNext(safe, curriculum),
     printablePracticeList: getPrintablePracticeList(safe, curriculum),
   };
 }
@@ -290,7 +300,7 @@ export const DEFAULT_MAX_ATTEMPTS_STORED = 5000;
  * log so the localStorage quota doesn't explode after months of use.
  */
 export function attemptLog(
-  storage = (typeof localStorage !== 'undefined' ? localStorage : null),
+  storage = typeof localStorage !== 'undefined' ? localStorage : null,
   { maxStored = DEFAULT_MAX_ATTEMPTS_STORED } = {},
 ) {
   function _read() {
@@ -299,14 +309,20 @@ export function attemptLog(
       const raw = storage.getItem(STORAGE_KEY);
       const parsed = raw ? JSON.parse(raw) : [];
       return Array.isArray(parsed) ? parsed : [];
-    } catch { return []; }
+    } catch {
+      return [];
+    }
   }
   function _write(list) {
     if (!storage) return;
-    try { storage.setItem(STORAGE_KEY, JSON.stringify(list)); } catch {}
+    try {
+      storage.setItem(STORAGE_KEY, JSON.stringify(list));
+    } catch {}
   }
   return {
-    list() { return _read(); },
+    list() {
+      return _read();
+    },
     push(attempt) {
       const list = _read();
       list.push({ timestamp: Date.now(), correct: false, ...attempt });
@@ -314,6 +330,8 @@ export function attemptLog(
       _write(list);
       return list[list.length - 1];
     },
-    clear() { _write([]); },
+    clear() {
+      _write([]);
+    },
   };
 }

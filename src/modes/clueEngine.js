@@ -40,9 +40,9 @@ import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
  * @returns {Array<{type: string, value: string, blankIndex?: number}>}
  */
 export function tokenizePassage(text) {
-  const parts   = text.split('___');
-  const tokens  = [];
-  let   blankIdx = 0;
+  const parts = text.split('___');
+  const tokens = [];
+  let blankIdx = 0;
 
   parts.forEach((part, partIdx) => {
     // Split part into space-separated chunks
@@ -67,9 +67,9 @@ export function tokenizePassage(text) {
 
     // Insert blank after every part except the last
     if (partIdx < parts.length - 1) {
-      tokens.push({ type: 'space',  value: ' ' });
-      tokens.push({ type: 'blank',  value: '___', blankIndex: blankIdx });
-      tokens.push({ type: 'space',  value: ' ' });
+      tokens.push({ type: 'space', value: ' ' });
+      tokens.push({ type: 'blank', value: '___', blankIndex: blankIdx });
+      tokens.push({ type: 'space', value: ' ' });
       blankIdx++;
     }
   });
@@ -96,9 +96,7 @@ function norm(w) {
  * @returns {boolean}
  */
 function wordInSpans(normWord, spans) {
-  return (spans || []).some(span =>
-    span.split(/\s+/).some(w => norm(w) === normWord)
-  );
+  return (spans || []).some((span) => span.split(/\s+/).some((w) => norm(w) === normWord));
 }
 
 /**
@@ -112,7 +110,7 @@ export function evaluateClueSelection(tappedWord, clueData) {
   if (!clueData) return 'weak';
   const w = norm(tappedWord);
   if (wordInSpans(w, clueData.acceptableSpans)) return 'strong';
-  if (wordInSpans(w, clueData.partialSpans))    return 'partial';
+  if (wordInSpans(w, clueData.partialSpans)) return 'partial';
   return 'weak';
 }
 
@@ -137,53 +135,55 @@ export function renderClueHuntPassage({
   container,
   text,
   activeBlankIndex = -1,
-  selectedWord     = null,
-  selectedResult   = null,
-  filledAnswers    = [],
+  selectedWord = null,
+  selectedResult = null,
+  filledAnswers = [],
   onTapWord,
 }) {
   const tokens = tokenizePassage(text);
 
-  const html = tokens.map(tok => {
-    switch (tok.type) {
-      case 'space':
-        return ' ';
+  const html = tokens
+    .map((tok) => {
+      switch (tok.type) {
+        case 'space':
+          return ' ';
 
-      case 'punct':
-        return `<span class="clue-punct">${escapeHtml(tok.value)}</span>`;
+        case 'punct':
+          return `<span class="clue-punct">${escapeHtml(tok.value)}</span>`;
 
-      case 'blank': {
-        const isActive = tok.blankIndex === activeBlankIndex;
-        const filled   = filledAnswers[tok.blankIndex];
-        if (filled) {
-          return `<span class="clue-blank-token clue-blank-token--filled">${escapeHtml(filled)}</span>`;
-        }
-        return `<span class="clue-blank-token ${isActive ? 'clue-blank-token--active' : ''}"
+        case 'blank': {
+          const isActive = tok.blankIndex === activeBlankIndex;
+          const filled = filledAnswers[tok.blankIndex];
+          if (filled) {
+            return `<span class="clue-blank-token clue-blank-token--filled">${escapeHtml(filled)}</span>`;
+          }
+          return `<span class="clue-blank-token ${isActive ? 'clue-blank-token--active' : ''}"
                       aria-label="${escapeAttr(isActive ? 'Active blank ' + (tok.blankIndex + 1) : 'Blank ' + (tok.blankIndex + 1))}">
                   ${isActive ? '❓' : '___'}
                 </span>`;
-      }
-
-      case 'word': {
-        const isSelected = selectedWord && norm(tok.value) === norm(selectedWord);
-        let extra = '';
-        if (isSelected && selectedResult) {
-          extra = `clue-word-token--${selectedResult}`;
         }
-        return `<button class="clue-word-token ${extra}"
+
+        case 'word': {
+          const isSelected = selectedWord && norm(tok.value) === norm(selectedWord);
+          let extra = '';
+          if (isSelected && selectedResult) {
+            extra = `clue-word-token--${selectedResult}`;
+          }
+          return `<button class="clue-word-token ${extra}"
                         data-word="${escapeAttr(tok.value)}"
                         aria-label="${escapeAttr(`Tap ${tok.value} as clue`)}">${escapeHtml(tok.value)}</button>`;
-      }
+        }
 
-      default:
-        return '';
-    }
-  }).join('');
+        default:
+          return '';
+      }
+    })
+    .join('');
 
   container.innerHTML = html;
 
   if (onTapWord) {
-    container.querySelectorAll('.clue-word-token').forEach(btn => {
+    container.querySelectorAll('.clue-word-token').forEach((btn) => {
       btn.addEventListener('click', () => onTapWord(btn.dataset.word, btn));
     });
   }
@@ -214,13 +214,13 @@ export function getClueHint(hintLevel, clueData) {
       };
     case 2: {
       const typeHints = {
-        'time-marker':     'Which word tells you when this happened?',
-        'subject-clue':    'Which word tells you about the subject?',
-        'connector-clue':  'Which connector word gives you a hint?',
-        'contrast-clue':   'Find the word that shows a contrast.',
-        'cause-clue':      'Find the word that shows a reason.',
-        'description-clue':'Find a describing word near the blank.',
-        'collocation-clue':'Look for a word that often pairs with the answer.',
+        'time-marker': 'Which word tells you when this happened?',
+        'subject-clue': 'Which word tells you about the subject?',
+        'connector-clue': 'Which connector word gives you a hint?',
+        'contrast-clue': 'Find the word that shows a contrast.',
+        'cause-clue': 'Find the word that shows a reason.',
+        'description-clue': 'Find a describing word near the blank.',
+        'collocation-clue': 'Look for a word that often pairs with the answer.',
       };
       return {
         message: typeHints[clueData.clueType] || 'Look for the key word in the sentence.',
@@ -260,7 +260,7 @@ export function getClueHint(hintLevel, clueData) {
  * @returns {number}
  */
 export function clueResultToScore(result) {
-  if (result === 'strong')  return 1;
+  if (result === 'strong') return 1;
   if (result === 'partial') return 0.5;
   return 0;
 }
@@ -274,18 +274,18 @@ export function clueResultFeedback(result) {
   switch (result) {
     case 'strong':
       return {
-        message:  'Excellent clue! This tells you the answer directly.',
+        message: 'Excellent clue! This tells you the answer directly.',
         cssClass: 'clue-feedback--strong',
       };
     case 'partial':
       return {
-        message:  'Good clue, but there is a stronger one nearby.',
+        message: 'Good clue, but there is a stronger one nearby.',
         cssClass: 'clue-feedback--partial',
       };
     case 'weak':
     default:
       return {
-        message:  'This word does not help enough. Look near the blank.',
+        message: 'This word does not help enough. Look near the blank.',
         cssClass: 'clue-feedback--weak',
       };
   }

@@ -26,21 +26,21 @@ gradients, anything that confuses "delight" with "distraction."
 
 ### 2.1 Brand & semantic (already in main.css `:root`)
 
-| Token                     | Value     | Usage                                |
-|---------------------------|-----------|--------------------------------------|
-| `--color-primary`         | `#6c63ff` | Main CTAs, current-stage highlights  |
-| `--color-primary-light`   | `#ede9fe` | Hover backgrounds, surface tints     |
-| `--color-primary-dark`    | `#4c46c8` | Pressed button shadow, focus outline |
-| `--color-secondary`       | `#ff6b8a` | Accents (badges, milestones)         |
-| `--color-success`         | `#22c55e` | Correct feedback, mastered nodes     |
-| `--color-error`           | `#ef4444` | Reserved — used sparingly            |
-| `--color-warning`         | `#f59e0b` | Hint pill, retry-soon nudge          |
-| `--color-info`            | `#3b82f6` | Parent/teacher view accents          |
+| Token                   | Value     | Usage                                |
+| ----------------------- | --------- | ------------------------------------ |
+| `--color-primary`       | `#6c63ff` | Main CTAs, current-stage highlights  |
+| `--color-primary-light` | `#ede9fe` | Hover backgrounds, surface tints     |
+| `--color-primary-dark`  | `#4c46c8` | Pressed button shadow, focus outline |
+| `--color-secondary`     | `#ff6b8a` | Accents (badges, milestones)         |
+| `--color-success`       | `#22c55e` | Correct feedback, mastered nodes     |
+| `--color-error`         | `#ef4444` | Reserved — used sparingly            |
+| `--color-warning`       | `#f59e0b` | Hint pill, retry-soon nudge          |
+| `--color-info`          | `#3b82f6` | Parent/teacher view accents          |
 
 ### 2.2 Phoneme tile colours (already in main.css)
 
 | Token             | Value     | Skill family             |
-|-------------------|-----------|--------------------------|
+| ----------------- | --------- | ------------------------ |
 | `--c-consonant`   | `#3b82f6` | Consonant graphemes      |
 | `--c-short-vowel` | `#ef4444` | Short vowels (a/e/i/o/u) |
 | `--c-long-vowel`  | `#22c55e` | Long vowels              |
@@ -57,19 +57,19 @@ Added in `src/styles/journey.css` (layered above main.css). These tokens
 exist so the quest journey can evolve its identity without touching the
 core token set:
 
-| Token                  | Value                                 | Usage                          |
-|------------------------|---------------------------------------|--------------------------------|
-| `--qj-bg`              | `linear-gradient(180deg, #fef9ff 0%, #f8f7ff 100%)` | Page background  |
-| `--qj-surface`         | `#ffffff`                             | Cards                          |
-| `--qj-stroke`          | `#ece9ff`                             | 1 px borders on cards          |
-| `--qj-stroke-strong`   | `#c7c1ff`                             | Focused / current node border  |
-| `--qj-node-locked`     | `#e5e3fa`                             | Quest map locked node          |
-| `--qj-node-current`    | `var(--color-primary)`                | Pulsing current node           |
-| `--qj-node-mastered`   | `var(--color-success)`                | Earned-star node               |
-| `--qj-badge-gold`      | `#facc15`                             | Mastery badge fill             |
-| `--qj-feedback-correct`| `#dcfce7`                             | Bottom feedback strip          |
-| `--qj-feedback-wrong`  | `#fef3c7`                             | Calm "try again" — NOT red     |
-| `--qj-tap-min`         | `48px`                                | Minimum tap-target size        |
+| Token                   | Value                                               | Usage                         |
+| ----------------------- | --------------------------------------------------- | ----------------------------- |
+| `--qj-bg`               | `linear-gradient(180deg, #fef9ff 0%, #f8f7ff 100%)` | Page background               |
+| `--qj-surface`          | `#ffffff`                                           | Cards                         |
+| `--qj-stroke`           | `#ece9ff`                                           | 1 px borders on cards         |
+| `--qj-stroke-strong`    | `#c7c1ff`                                           | Focused / current node border |
+| `--qj-node-locked`      | `#e5e3fa`                                           | Quest map locked node         |
+| `--qj-node-current`     | `var(--color-primary)`                              | Pulsing current node          |
+| `--qj-node-mastered`    | `var(--color-success)`                              | Earned-star node              |
+| `--qj-badge-gold`       | `#facc15`                                           | Mastery badge fill            |
+| `--qj-feedback-correct` | `#dcfce7`                                           | Bottom feedback strip         |
+| `--qj-feedback-wrong`   | `#fef3c7`                                           | Calm "try again" — NOT red    |
+| `--qj-tap-min`          | `48px`                                              | Minimum tap-target size       |
 
 > ⚠️ Feedback for "wrong" is amber, never red. Red = error_state in our
 > system, reserved for genuine errors (failed save, network down). A
@@ -80,13 +80,13 @@ core token set:
 All text/background pairs in the journey pass WCAG AA at 4.5:1 for body
 copy and 3:1 for large text. Verified pairs:
 
-| Foreground                  | Background          | Ratio  | Verdict   |
-|-----------------------------|---------------------|--------|-----------|
-| `--text` (#1e1b4b)          | `#ffffff`           | 14.4:1 | AAA       |
-| `--text` (#1e1b4b)          | `--qj-feedback-correct` (#dcfce7) | 13.1:1 | AAA |
-| `--text` (#1e1b4b)          | `--qj-feedback-wrong`   (#fef3c7) | 13.5:1 | AAA |
-| `--color-primary` (#6c63ff) | `#ffffff`           |  4.6:1 | AA        |
-| `#ffffff`                   | `--color-primary`   |  4.6:1 | AA        |
+| Foreground                  | Background                        | Ratio  | Verdict |
+| --------------------------- | --------------------------------- | ------ | ------- |
+| `--text` (#1e1b4b)          | `#ffffff`                         | 14.4:1 | AAA     |
+| `--text` (#1e1b4b)          | `--qj-feedback-correct` (#dcfce7) | 13.1:1 | AAA     |
+| `--text` (#1e1b4b)          | `--qj-feedback-wrong` (#fef3c7)   | 13.5:1 | AAA     |
+| `--color-primary` (#6c63ff) | `#ffffff`                         | 4.6:1  | AA      |
+| `#ffffff`                   | `--color-primary`                 | 4.6:1  | AA      |
 
 ---
 
@@ -94,23 +94,24 @@ copy and 3:1 for large text. Verified pairs:
 
 Already tokenised in `:root`. Documented for completeness:
 
-| Token              | Size      | Used for                                |
-|--------------------|-----------|-----------------------------------------|
-| `--font-size-xs`   | 0.75 rem  | Captions / labels in adult views        |
-| `--font-size-sm`   | 0.875 rem | Secondary copy                          |
-| `--font-size-base` | 1 rem     | Body                                    |
-| `--font-size-md`   | 1.125 rem | Card titles                             |
-| `--font-size-lg`   | 1.25 rem  | Lesson intro sentences                  |
-| `--font-size-xl`   | 1.5 rem   | Section headings                        |
-| `--font-size-2xl`  | 2 rem     | Screen titles                           |
-| `--font-size-3xl`  | 2.5 rem   | Welcome title                           |
-| `--font-size-4xl`  | 3.5 rem   | Sound bubble on the lesson intro        |
+| Token              | Size      | Used for                         |
+| ------------------ | --------- | -------------------------------- |
+| `--font-size-xs`   | 0.75 rem  | Captions / labels in adult views |
+| `--font-size-sm`   | 0.875 rem | Secondary copy                   |
+| `--font-size-base` | 1 rem     | Body                             |
+| `--font-size-md`   | 1.125 rem | Card titles                      |
+| `--font-size-lg`   | 1.25 rem  | Lesson intro sentences           |
+| `--font-size-xl`   | 1.5 rem   | Section headings                 |
+| `--font-size-2xl`  | 2 rem     | Screen titles                    |
+| `--font-size-3xl`  | 2.5 rem   | Welcome title                    |
+| `--font-size-4xl`  | 3.5 rem   | Sound bubble on the lesson intro |
 
 Body font is Nunito (rounded, friendly, legible at small sizes), with a
 system-ui fallback. We do NOT use a separate display font — Nunito at
 size scales is enough.
 
 **Reading rules for child screens:**
+
 - Line length never exceeds 32 characters on tablet portrait.
 - Letter-spacing is _not_ negative anywhere — early readers parse each
   glyph individually and tracking that's too tight slows them down.
@@ -161,12 +162,12 @@ tablets don't get a stuck-hover artefact.
 A 96 × 96 px circle with the stage icon. Four states map to four CSS
 modifier classes:
 
-| Modifier            | Look                                          |
-|---------------------|-----------------------------------------------|
-| `.qj-node--locked`  | Light grey fill, padlock overlay, 0.6 opacity |
-| `.qj-node--available`| White fill, primary border                   |
-| `.qj-node--current` | Primary fill, 2 s gentle pulse animation      |
-| `.qj-node--mastered`| Success fill, gold star overlay               |
+| Modifier              | Look                                          |
+| --------------------- | --------------------------------------------- |
+| `.qj-node--locked`    | Light grey fill, padlock overlay, 0.6 opacity |
+| `.qj-node--available` | White fill, primary border                    |
+| `.qj-node--current`   | Primary fill, 2 s gentle pulse animation      |
+| `.qj-node--mastered`  | Success fill, gold star overlay               |
 
 The pulse is opt-out via `prefers-reduced-motion`: in that case the
 current node shows a static glow ring instead.
@@ -226,13 +227,13 @@ top-left of child screens. Decorative — `aria-hidden="true"`.
 
 ## 6. Accessibility states
 
-| State              | Visual                                          |
-|--------------------|-------------------------------------------------|
-| `:focus-visible`   | 3 px `--color-primary` outline, 2 px offset     |
-| `:disabled`        | 50 % opacity, `cursor: not-allowed`             |
-| `aria-pressed`     | Same selected look as click — never colour-only |
-| `aria-invalid`     | Not used for child screens (no error_state)     |
-| `aria-busy`        | Skeleton shimmer on cards while audio warms up  |
+| State            | Visual                                          |
+| ---------------- | ----------------------------------------------- |
+| `:focus-visible` | 3 px `--color-primary` outline, 2 px offset     |
+| `:disabled`      | 50 % opacity, `cursor: not-allowed`             |
+| `aria-pressed`   | Same selected look as click — never colour-only |
+| `aria-invalid`   | Not used for child screens (no error_state)     |
+| `aria-busy`      | Skeleton shimmer on cards while audio warms up  |
 
 **Reduced motion:** `@media (prefers-reduced-motion: reduce)` disables
 the current-node pulse and the bouncy `--ease-bounce` transitions; flat
@@ -252,25 +253,25 @@ that enforces `min-height: var(--qj-tap-min); min-width: var(--qj-tap-min);`.
 - **Page padding:** `--space-6` (24 px) on mobile, `--space-8` (32 px)
   on tablet+.
 - **Game-mode body:** centred vertically using `min-height: calc(100vh -
-  var(--qj-header-h) - var(--qj-footer-h))`; widget never abuts the
+var(--qj-header-h) - var(--qj-footer-h))`; widget never abuts the
   feedback strip.
 
 ---
 
 ## 8. Before → after notes
 
-| Area                 | Before                                                       | After                                                                       |
-|----------------------|--------------------------------------------------------------|-----------------------------------------------------------------------------|
-| Wrong-answer feedback | Red `--color-error` flash + buzzer SFX in some modes        | Amber `--qj-feedback-wrong`, supportive copy, error-specific hint           |
-| Quest map            | Hard-coded `PHASE_META` in `curriculumMap.js` (7 entries)    | Derived from canonical `PHASES` table — always 10 phases, never drifts      |
-| Mode instructions    | Scattered "desc" strings, sometimes 20+ words                | Enforced ≤ 15 words via `phonicsModes.js` + tested                          |
-| Tap targets          | Some 36 px chip controls in legacy phonemic-awareness modes  | Journey ships `--qj-tap-min: 48px` floor and a `.qj-tap` utility            |
-| Feedback hierarchy   | Same toast for correct + incorrect, only colour differed     | Two distinct `.qj-feedback` variants with bespoke copy and hint slot        |
-| Mastery comms        | Buried in a stat row on the dashboard                        | Dedicated mastery badge screen + per-stage star on the quest map            |
-| Speed messaging      | Speed bonus surfaced as the headline result for fast rounds  | Speed bonus is a tiny chip — accuracy stays the headline                    |
-| Reduced motion       | Bouncy transitions everywhere, no fallback                   | All `--ease-bounce` transitions gated by `prefers-reduced-motion`           |
+| Area                   | Before                                                      | After                                                                                              |
+| ---------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Wrong-answer feedback  | Red `--color-error` flash + buzzer SFX in some modes        | Amber `--qj-feedback-wrong`, supportive copy, error-specific hint                                  |
+| Quest map              | Hard-coded `PHASE_META` in `curriculumMap.js` (7 entries)   | Derived from canonical `PHASES` table — always 10 phases, never drifts                             |
+| Mode instructions      | Scattered "desc" strings, sometimes 20+ words               | Enforced ≤ 15 words via `phonicsModes.js` + tested                                                 |
+| Tap targets            | Some 36 px chip controls in legacy phonemic-awareness modes | Journey ships `--qj-tap-min: 48px` floor and a `.qj-tap` utility                                   |
+| Feedback hierarchy     | Same toast for correct + incorrect, only colour differed    | Two distinct `.qj-feedback` variants with bespoke copy and hint slot                               |
+| Mastery comms          | Buried in a stat row on the dashboard                       | Dedicated mastery badge screen + per-stage star on the quest map                                   |
+| Speed messaging        | Speed bonus surfaced as the headline result for fast rounds | Speed bonus is a tiny chip — accuracy stays the headline                                           |
+| Reduced motion         | Bouncy transitions everywhere, no fallback                  | All `--ease-bounce` transitions gated by `prefers-reduced-motion`                                  |
 | Quest-map current node | Static colour swap                                          | Pulsing animation _that means audio is playing or this is your next stop_ — purposeful motion only |
-| Parent view          | One catch-all dashboard, lots of charts                      | Focused sections: strongest sounds, weakest sounds, suggested next, printable list |
+| Parent view            | One catch-all dashboard, lots of charts                     | Focused sections: strongest sounds, weakest sounds, suggested next, printable list                 |
 
 ---
 

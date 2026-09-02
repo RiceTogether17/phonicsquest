@@ -63,7 +63,7 @@ export function getTodaysLessonView(now = new Date()) {
   const state = getLessonState(now);
   const { band, steps } = composeTodaysLesson(now);
 
-  const merged = steps.map(step => {
+  const merged = steps.map((step) => {
     if (step.kind !== 'teach') return step;
     return {
       ...step,
@@ -72,7 +72,7 @@ export function getTodaysLessonView(now = new Date()) {
     };
   });
 
-  const done = merged.filter(s => s.done).length;
+  const done = merged.filter((s) => s.done).length;
   const total = merged.length;
   return {
     band,
@@ -81,7 +81,7 @@ export function getTodaysLessonView(now = new Date()) {
     total,
     complete: total > 0 && done === total,
     started: !!state.startedAt,
-    nextStep: merged.find(s => !s.done) || null,
+    nextStep: merged.find((s) => !s.done) || null,
   };
 }
 

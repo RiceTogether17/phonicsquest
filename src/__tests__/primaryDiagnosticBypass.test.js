@@ -49,10 +49,19 @@ describe('Primary diagnostic bypass — default placement payload', () => {
   // Inline the same default-payload shape used by App._buildPrimaryDefaultPlacement.
   // If the shape changes, update both this expectation and the app helper.
   const PRIMARY_DEFAULT_KEYS = [
-    'readingBand', 'phonicsPhase', 'phase', 'startGroup', 'preSeededStats',
-    'sightWordBand', 'storyReadiness',
-    'sentenceReady', 'grammarReady', 'vocabularyReady',
-    'bandDescription', 'intake', 'skippedDiagnostic',
+    'readingBand',
+    'phonicsPhase',
+    'phase',
+    'startGroup',
+    'preSeededStats',
+    'sightWordBand',
+    'storyReadiness',
+    'sentenceReady',
+    'grammarReady',
+    'vocabularyReady',
+    'bandDescription',
+    'intake',
+    'skippedDiagnostic',
   ];
 
   function buildPrimaryDefaultPlacement(profile) {

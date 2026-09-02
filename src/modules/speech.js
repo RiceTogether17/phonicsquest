@@ -73,13 +73,13 @@ class SpeechRecognizer {
           clearTimeout(timeout);
           this._cancelPending = null;
           const results = Array.from(event.results[0]);
-          const transcripts = results.map(r => ({
+          const transcripts = results.map((r) => ({
             text: r.transcript.toLowerCase().trim(),
             confidence: r.confidence,
           }));
 
           const target = targetWord.toLowerCase().trim();
-          const exactMatch = transcripts.some(t => t.text === target);
+          const exactMatch = transcripts.some((t) => t.text === target);
 
           let bestMatch = { text: '', score: 0, confidence: 0 };
           for (const t of transcripts) {
@@ -105,8 +105,8 @@ class SpeechRecognizer {
           this._listening = false;
 
           const canFallback =
-            (event?.error === 'language-not-supported' || event?.error === 'service-not-allowed')
-            && localeIndex < locales.length - 1;
+            (event?.error === 'language-not-supported' || event?.error === 'service-not-allowed') &&
+            localeIndex < locales.length - 1;
 
           if (canFallback) {
             localeIndex += 1;
@@ -187,10 +187,12 @@ class SpeechRecognizer {
           clearTimeout(timeout);
           this._cancelPending = null;
           this._listening = false;
-          const transcripts = Array.from(event.results[0]).map(r => ({
-            text: r.transcript.toLowerCase().trim(),
-            confidence: r.confidence,
-          })).filter(t => t.text);
+          const transcripts = Array.from(event.results[0])
+            .map((r) => ({
+              text: r.transcript.toLowerCase().trim(),
+              confidence: r.confidence,
+            }))
+            .filter((t) => t.text);
           resolve(transcripts.length ? { transcripts } : null);
         };
 
@@ -199,8 +201,8 @@ class SpeechRecognizer {
           this._listening = false;
 
           const canFallback =
-            (event?.error === 'language-not-supported' || event?.error === 'service-not-allowed')
-            && localeIndex < locales.length - 1;
+            (event?.error === 'language-not-supported' || event?.error === 'service-not-allowed') &&
+            localeIndex < locales.length - 1;
 
           if (canFallback) {
             localeIndex += 1;
@@ -247,7 +249,11 @@ class SpeechRecognizer {
   /** Stop listening and settle any pending listen promise with null. */
   stop() {
     if (this._recognition) {
-      try { this._recognition.stop(); } catch (err) { devWarn('Stop failed:', err.message); }
+      try {
+        this._recognition.stop();
+      } catch (err) {
+        devWarn('Stop failed:', err.message);
+      }
       this._recognition = null;
     }
     this._listening = false;
@@ -319,27 +325,28 @@ class SpeechRecognizer {
   _computePhoneticSimilarity(a, b) {
     if (a === b) return 1;
 
-    const normalize = (s) => s
-      .replace(/ph/g, 'f')
-      .replace(/ck/g, 'k')
-      .replace(/igh/g, 'i')
-      .replace(/tion/g, 'shun')
-      .replace(/ee/g, 'e')
-      .replace(/oo/g, 'u')
-      .replace(/th/g, 't')
-      .replace(/sh/g, 's')
-      .replace(/ch/g, 'c')
-      .replace(/r\b/g, '')
-      .replace(/er\b/g, 'uh');
+    const normalize = (s) =>
+      s
+        .replace(/ph/g, 'f')
+        .replace(/ck/g, 'k')
+        .replace(/igh/g, 'i')
+        .replace(/tion/g, 'shun')
+        .replace(/ee/g, 'e')
+        .replace(/oo/g, 'u')
+        .replace(/th/g, 't')
+        .replace(/sh/g, 's')
+        .replace(/ch/g, 'c')
+        .replace(/r\b/g, '')
+        .replace(/er\b/g, 'uh');
 
     const na = normalize(a);
     const nb = normalize(b);
 
     const dist = this._levenshtein(na, nb);
     const maxLen = Math.max(na.length, nb.length, 1);
-    const lev = 1 - (dist / maxLen);
+    const lev = 1 - dist / maxLen;
     const metaphone = this._doubleMetaphoneSimilarity(na, nb);
-    return (0.7 * lev) + (0.3 * metaphone);
+    return 0.7 * lev + 0.3 * metaphone;
   }
 
   _levenshtein(a, b) {
@@ -353,11 +360,7 @@ class SpeechRecognizer {
     for (let i = 1; i <= m; i++) {
       for (let j = 1; j <= n; j++) {
         const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-        dp[i][j] = Math.min(
-          dp[i - 1][j] + 1,
-          dp[i][j - 1] + 1,
-          dp[i - 1][j - 1] + cost,
-        );
+        dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
       }
     }
 

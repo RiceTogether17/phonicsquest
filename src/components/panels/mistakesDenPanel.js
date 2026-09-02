@@ -13,7 +13,9 @@
 import { html } from '../../utils/html.js';
 import { modalManager } from '../../modules/modalManager.js';
 import {
-  getMistakesDenSummary, timeAgo as mistakeTimeAgo, MISTAKES_LOOKBACK_DAYS,
+  getMistakesDenSummary,
+  timeAgo as mistakeTimeAgo,
+  MISTAKES_LOOKBACK_DAYS,
 } from '../../modules/mistakesDen.js';
 
 /**
@@ -26,7 +28,11 @@ export function openMistakesDenPanel(onNavigate) {
   if (!host) return;
 
   let summary;
-  try { summary = getMistakesDenSummary(); } catch (_) { summary = { count: 0, mistakes: [], byModule: {} }; }
+  try {
+    summary = getMistakesDenSummary();
+  } catch (_) {
+    summary = { count: 0, mistakes: [], byModule: {} };
+  }
 
   renderMistakesDenPanel(host, summary, onNavigate);
   modalManager.open('modal-mistakes-den');
@@ -60,7 +66,7 @@ export function renderMistakesDenPanel(host, summary, onNavigate) {
   }
 
   const groupsHtml = Array.from(byModuleLabel.entries()).map(([label, items]) => {
-    const rowsHtml = items.map(m => {
+    const rowsHtml = items.map((m) => {
       const when = mistakeTimeAgo(m.lastMistakeAt);
       return html`
         <button type="button"
@@ -86,7 +92,7 @@ export function renderMistakesDenPanel(host, summary, onNavigate) {
     <p class="mistakes-den-intro">Tap any to retry — Giri's got you. ${summary.count} slip${summary.count === 1 ? '' : 's'} from the last ${MISTAKES_LOOKBACK_DAYS} days.</p>
     <div class="mistakes-den-list">${groupsHtml}</div>`;
 
-  host.querySelectorAll('.mistakes-den-row[data-target]').forEach(btn => {
+  host.querySelectorAll('.mistakes-den-row[data-target]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const target = btn.dataset.target;
       if (!target) return;

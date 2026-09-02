@@ -21,11 +21,11 @@
  */
 
 const HINTS = Object.freeze({
-  'missing-sound':   'You missed a sound. Say the word slowly and count the sounds.',
-  'extra-sound':     'There is one sound too many. Say the word again and listen carefully.',
-  'out-of-order':    'The sounds are right, but the order is mixed up. Start with the first sound.',
-  'wrong-grapheme':  'That sound is right, but a different letter spells it here.',
-  'default':         'Say each sound, then push them together. Slow and steady.',
+  'missing-sound': 'You missed a sound. Say the word slowly and count the sounds.',
+  'extra-sound': 'There is one sound too many. Say the word again and listen carefully.',
+  'out-of-order': 'The sounds are right, but the order is mixed up. Start with the first sound.',
+  'wrong-grapheme': 'That sound is right, but a different letter spells it here.',
+  default: 'Say each sound, then push them together. Slow and steady.',
 });
 
 function multisetEqual(a, b) {
@@ -37,7 +37,7 @@ function multisetEqual(a, b) {
     if (!n) return false;
     counts.set(g, n - 1);
   }
-  return [...counts.values()].every(n => n === 0);
+  return [...counts.values()].every((n) => n === 0);
 }
 
 function classify(target = [], placed = []) {
@@ -45,7 +45,7 @@ function classify(target = [], placed = []) {
   if (placed.length > target.length) return 'extra-sound';
   if (multisetEqual(target, placed)) return 'out-of-order';
   const targetSet = new Set(target);
-  if (placed.some(g => !targetSet.has(g))) return 'wrong-grapheme';
+  if (placed.some((g) => !targetSet.has(g))) return 'wrong-grapheme';
   return 'default';
 }
 

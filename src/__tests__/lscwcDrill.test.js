@@ -13,12 +13,16 @@ vi.hoisted(() => {
   globalThis.SpeechSynthesisUtterance = class {
     constructor(text) {
       this.text = text;
-      this.rate = 1; this.pitch = 1; this.volume = 1;
+      this.rate = 1;
+      this.pitch = 1;
+      this.volume = 1;
     }
     addEventListener() {}
   };
   // localStorage is available under jsdom before module imports resolve.
-  try { globalThis.localStorage?.setItem('lscwc_input_mode', 'tap'); } catch {}
+  try {
+    globalThis.localStorage?.setItem('lscwc_input_mode', 'tap');
+  } catch {}
 });
 
 const {
@@ -65,13 +69,13 @@ describe('_shuffleLetters', () => {
 
   it('preserves duplicate letters', () => {
     const letters = _shuffleLetters('all');
-    expect(letters.filter(l => l === 'l').length).toBe(2);
-    expect(letters.filter(l => l === 'a').length).toBe(1);
+    expect(letters.filter((l) => l === 'l').length).toBe(2);
+    expect(letters.filter((l) => l === 'a').length).toBe(1);
   });
 
   it('lowercases the input', () => {
     const letters = _shuffleLetters('HELLO');
-    expect(letters.every(l => l === l.toLowerCase())).toBe(true);
+    expect(letters.every((l) => l === l.toLowerCase())).toBe(true);
   });
 
   it('uses the supplied RNG deterministically', () => {
@@ -133,9 +137,9 @@ describe('_logAttempt + _readStats', () => {
     _logAttempt('newest', true);
     const out = _readStats();
     expect(Object.keys(out).length).toBe(200);
-    expect(out.word0).toBeUndefined();       // oldest dropped
-    expect(out.word199).toBeDefined();       // recent kept
-    expect(out.newest).toBeDefined();        // new entry kept
+    expect(out.word0).toBeUndefined(); // oldest dropped
+    expect(out.word199).toBeDefined(); // recent kept
+    expect(out.newest).toBeDefined(); // new entry kept
   });
 });
 
@@ -185,13 +189,13 @@ describe('startLscwcDrill — orchestration', () => {
     host.querySelector('#lscwc-next-stage').click(); // Say→Cover
     const next = host.querySelector('#lscwc-next-stage');
     next.disabled = false;
-    next.click();                                    // Cover→Write
+    next.click(); // Cover→Write
     expect(host.querySelector('.lscwc-write')).toBeTruthy();
 
     // Tap letters in order: 'c' then 'a'. Bank tiles carry the actual letter.
     const tapLetter = (letter) => {
       const tiles = [...host.querySelectorAll('.lscwc-bank-tile')];
-      const tile = tiles.find(t => t.textContent.trim() === letter && !t.disabled);
+      const tile = tiles.find((t) => t.textContent.trim() === letter && !t.disabled);
       tile?.click();
     };
     tapLetter('c');
@@ -199,7 +203,7 @@ describe('startLscwcDrill — orchestration', () => {
 
     // Auto-advance to Check happens after a small timeout — flush microtasks
     // and timers. The check stage logs the correct attempt as side-effect.
-    return new Promise(r => setTimeout(r, 300)).then(() => {
+    return new Promise((r) => setTimeout(r, 300)).then(() => {
       expect(host.querySelector('.lscwc-check')).toBeTruthy();
       expect(host.querySelector('.lscwc-check--ok')).toBeTruthy();
       const stats = _readStats();
@@ -220,7 +224,7 @@ describe('startLscwcDrill — orchestration', () => {
 
     // Tap a wrong letter first
     const tiles = [...host.querySelectorAll('.lscwc-bank-tile')];
-    const wrongTile = tiles.find(t => t.textContent.trim() === 'b' && !t.disabled);
+    const wrongTile = tiles.find((t) => t.textContent.trim() === 'b' && !t.disabled);
     wrongTile?.click();
 
     // No slot should be filled
@@ -233,7 +237,11 @@ describe('startLscwcDrill — orchestration', () => {
 
   it('emits an empty summary and calls onDone immediately when given no words', () => {
     let summary = null;
-    startLscwcDrill(host, [], { onDone: (s) => { summary = s; } });
+    startLscwcDrill(host, [], {
+      onDone: (s) => {
+        summary = s;
+      },
+    });
     expect(summary).toEqual({ totalWords: 0, correctFirstTry: 0, attempts: 0 });
   });
 

@@ -72,7 +72,9 @@ export const keyboardManager = {
           case 'Enter':
             e.preventDefault();
             // Primary action: reveal next phoneme / check answer.
-            (document.getElementById('btn-reveal-next') || document.getElementById('btn-check'))?.click();
+            (
+              document.getElementById('btn-reveal-next') || document.getElementById('btn-check')
+            )?.click();
             break;
           case 's':
             // "Say it" – hear the whole word.

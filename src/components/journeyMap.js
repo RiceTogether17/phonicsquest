@@ -13,7 +13,11 @@
  *   renderJourneyMap(container, { avatar })
  */
 
-import { JOURNEY_STEPS, getJourneyStageProgress, getCurrentJourneyStep } from '../data/journeyStages.js';
+import {
+  JOURNEY_STEPS,
+  getJourneyStageProgress,
+  getCurrentJourneyStep,
+} from '../data/journeyStages.js';
 
 /**
  * @param {{avatar?: string}} [opts]
@@ -26,7 +30,11 @@ export function buildJourneyMapHtml({ avatar = '🦁' } = {}) {
     const { status, pct } = getJourneyStageProgress(stage.key);
     const isCurrent = stage.key === current.key;
     const isDone = status === 'complete';
-    const stateClass = isDone ? 'jm-step--done' : isCurrent ? 'jm-step--current' : 'jm-step--upcoming';
+    const stateClass = isDone
+      ? 'jm-step--done'
+      : isCurrent
+        ? 'jm-step--current'
+        : 'jm-step--upcoming';
     const badge = isDone ? '✓' : isCurrent ? avatar : stage.icon;
     return `
       <div class="jm-step ${stateClass}" role="listitem"

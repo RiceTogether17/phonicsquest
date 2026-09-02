@@ -10,9 +10,9 @@
  *   showWeeklyRecap({ stats, onClose })
  */
 
-import { store }        from '../modules/store.js';
+import { store } from '../modules/store.js';
 import { getActiveProfile } from '../modules/profiles.js';
-import { html }         from '../utils/html.js';
+import { html } from '../utils/html.js';
 
 const RECAP_INTERVAL_DAYS = 7;
 
@@ -38,11 +38,11 @@ export function showWeeklyRecap({ stats, onClose }) {
   const existing = document.getElementById('modal-weekly-recap');
   if (existing) existing.remove();
 
-  const profile   = getActiveProfile();
-  const name      = profile?.name?.split(' ')[0] || 'Learner';
-  const avatar    = profile?.avatar || '🦁';
-  const streak    = store.get('streak') || 0;
-  const level     = store.get('level') || 1;
+  const profile = getActiveProfile();
+  const name = profile?.name?.split(' ')[0] || 'Learner';
+  const avatar = profile?.avatar || '🦁';
+  const streak = store.get('streak') || 0;
+  const level = store.get('level') || 1;
 
   // Mark as shown
   store.set('lastWeeklyRecapAt', new Date().toISOString());
@@ -55,11 +55,13 @@ export function showWeeklyRecap({ stats, onClose }) {
     4: [`Solid week, ${name}! 4 days done. Can you do 5 next week? 🎯`, '🎯'],
     3: [`Good start, ${name}! 3 days this week. Every session counts! 🌱`, '🌱'],
   };
-  const [message, icon] = perfMessages[stats.daysPlayed]
-    ?? [`A new week begins, ${name}! Let's make it a great one! 🚀`, '🚀'];
+  const [message, icon] = perfMessages[stats.daysPlayed] ?? [
+    `A new week begins, ${name}! Let's make it a great one! 🚀`,
+    '🚀',
+  ];
 
   const modal = document.createElement('div');
-  modal.id        = 'modal-weekly-recap';
+  modal.id = 'modal-weekly-recap';
   modal.className = 'modal-overlay modal-overlay--active';
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-modal', 'true');
@@ -119,7 +121,11 @@ export function showWeeklyRecap({ stats, onClose }) {
 
   // Escape key closes
   const onKeyDown = (e) => {
-    if (e.key === 'Escape') { modal.remove(); onClose(); document.removeEventListener('keydown', onKeyDown); }
+    if (e.key === 'Escape') {
+      modal.remove();
+      onClose();
+      document.removeEventListener('keydown', onKeyDown);
+    }
   };
   document.addEventListener('keydown', onKeyDown);
 

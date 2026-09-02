@@ -20,16 +20,18 @@ import { CURRICULUM } from '../data/curriculum.js';
 /** Fraction of a phase-range's stages mastered (mastery ≥ 0.8). */
 function _masteredFraction(phases) {
   const gm = store.get('groupMastery') || {};
-  const stages = CURRICULUM.filter(s => phases.includes(s.phase));
+  const stages = CURRICULUM.filter((s) => phases.includes(s.phase));
   if (!stages.length) return 0;
-  const mastered = stages.filter(s => (gm[s.group] ?? 0) >= 0.8).length;
+  const mastered = stages.filter((s) => (gm[s.group] ?? 0) >= 0.8).length;
   return mastered / stages.length;
 }
 
 /** True when any stage in the given phases has been practised at all. */
 function _phaseTouched(phases) {
   const gm = store.get('groupMastery') || {};
-  return CURRICULUM.some(s => phases.includes(s.phase) && typeof gm[s.group] === 'number' && gm[s.group] > 0);
+  return CURRICULUM.some(
+    (s) => phases.includes(s.phase) && typeof gm[s.group] === 'number' && gm[s.group] > 0,
+  );
 }
 
 /**
@@ -61,7 +63,7 @@ export function getRecommendedBand(readStoryIds, storiesByBand) {
   for (const band of ['A', 'B', 'C', 'D']) {
     if (!readiness[band].ready) break;
     const stories = storiesByBand?.[band] || [];
-    const unread = stories.some(s => !readStoryIds?.includes(s.id));
+    const unread = stories.some((s) => !readStoryIds?.includes(s.id));
     if (unread || !stories.length) return band;
   }
   return 'A';

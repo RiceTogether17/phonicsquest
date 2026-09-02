@@ -10,72 +10,86 @@ import { store } from './store.js';
 
 const DEFAULT_MASTERY = 0.5;
 
-
 const CROSS_QUEST_SKILL_ALIASES = {
   // ── Grammar: connectors / conjunctions (Cloze ↔ MCQ) ──
   connector_clue: ['connectorClue', 'connectors', 'conditionals', 'conjunctions'],
-  connectorClue:  ['connector_clue', 'connectors', 'conditionals', 'conjunctions'],
-  connectors:     ['connector_clue', 'connectorClue', 'conditionals', 'conjunctions'],
-  conditionals:   ['connector_clue', 'connectorClue', 'connectors', 'conjunctions'],
-  conjunctions:   ['connector_clue', 'connectorClue', 'connectors', 'conditionals'],
+  connectorClue: ['connector_clue', 'connectors', 'conditionals', 'conjunctions'],
+  connectors: ['connector_clue', 'connectorClue', 'conditionals', 'conjunctions'],
+  conditionals: ['connector_clue', 'connectorClue', 'connectors', 'conjunctions'],
+  conjunctions: ['connector_clue', 'connectorClue', 'connectors', 'conditionals'],
 
   // ── Grammar: tenses (Cloze ↔ MCQ) ──
-  tense_clue:               ['simplePast', 'presentCont', 'pastCont', 'futureTense', 'perfectContinuousTenses', 'presentPerfect', 'pastPerfect', 'tenseAwareness'],
-  simplePast:               ['tense_clue', 'presentCont', 'pastCont', 'tenseAwareness'],
-  presentCont:              ['tense_clue', 'simplePast', 'pastCont', 'tenseAwareness'],
-  pastCont:                 ['tense_clue', 'simplePast', 'presentCont', 'tenseAwareness'],
-  presentPerfect:           ['tense_clue', 'pastPerfect', 'tenseAwareness'],
-  pastPerfect:              ['tense_clue', 'presentPerfect', 'tenseAwareness'],
-  tenseAwareness:           ['tense_clue', 'simplePast', 'presentCont', 'pastCont', 'presentPerfect', 'pastPerfect'],
+  tense_clue: [
+    'simplePast',
+    'presentCont',
+    'pastCont',
+    'futureTense',
+    'perfectContinuousTenses',
+    'presentPerfect',
+    'pastPerfect',
+    'tenseAwareness',
+  ],
+  simplePast: ['tense_clue', 'presentCont', 'pastCont', 'tenseAwareness'],
+  presentCont: ['tense_clue', 'simplePast', 'pastCont', 'tenseAwareness'],
+  pastCont: ['tense_clue', 'simplePast', 'presentCont', 'tenseAwareness'],
+  presentPerfect: ['tense_clue', 'pastPerfect', 'tenseAwareness'],
+  pastPerfect: ['tense_clue', 'presentPerfect', 'tenseAwareness'],
+  tenseAwareness: [
+    'tense_clue',
+    'simplePast',
+    'presentCont',
+    'pastCont',
+    'presentPerfect',
+    'pastPerfect',
+  ],
 
   // ── Grammar: modals ──
   modal_order: ['modals'],
-  modals:      ['modal_order'],
+  modals: ['modal_order'],
 
   // ── Grammar: prepositions (Cloze ↔ MCQ ↔ Vocab Cloze) ──
-  preposition_clue:   ['prepositions', 'grammarPrepositions'],
-  prepositions:       ['preposition_clue', 'grammarPrepositions'],
-  grammarPrepositions:['preposition_clue', 'prepositions'],
+  preposition_clue: ['prepositions', 'grammarPrepositions'],
+  prepositions: ['preposition_clue', 'grammarPrepositions'],
+  grammarPrepositions: ['preposition_clue', 'prepositions'],
 
   // ── Grammar: SV agreement (Grammar Cloze ↔ MCQ ↔ Vocab Cloze) ──
   svAgreement: ['grammarSVA'],
-  grammarSVA:  ['svAgreement'],
+  grammarSVA: ['svAgreement'],
 
   // ── Grammar: articles (Grammar Cloze ↔ Vocab Cloze) ──
-  articles:        ['grammarArticles'],
+  articles: ['grammarArticles'],
   grammarArticles: ['articles'],
 
   // ── Grammar: comparatives / superlatives ──
-  comparatives:  ['superlatives'],
-  superlatives:  ['comparatives'],
+  comparatives: ['superlatives'],
+  superlatives: ['comparatives'],
 
   // ── Grammar: passive / reported / relative / inversion ──
-  passiveVoice:    [],
-  reportedSpeech:  [],
+  passiveVoice: [],
+  reportedSpeech: [],
   relativeClauses: [],
-  inversion:       [],
+  inversion: [],
 
   // ── Vocabulary: context & synonyms (Cloze ↔ MCQ) ──
   contextInference: [],
-  definitionMatch:  [],
-  synonymContrast:  [],
+  definitionMatch: [],
+  synonymContrast: [],
 
   // ── Vocabulary: collocations (Cloze ↔ MCQ) ──
   collocationCloze: [],
 
   // ── Vocabulary: word form (Cloze ↔ MCQ) ──
-  grammaticalRole:    ['morphologicalAffix'],
+  grammaticalRole: ['morphologicalAffix'],
   morphologicalAffix: ['grammaticalRole'],
 
   // ── Vocabulary: idioms (Cloze ↔ MCQ) ──
   idiomaticExpressions: ['proverbsSayings'],
-  proverbsSayings:      ['idiomaticExpressions'],
+  proverbsSayings: ['idiomaticExpressions'],
 };
 
 function _allQuestBuckets() {
   return Object.keys(store.get('questMastery') || {});
 }
-
 
 function _clamp(v, min = 0, max = 1) {
   return Math.max(min, Math.min(max, v));
@@ -126,7 +140,9 @@ class QuestMasteryService {
     const normalized = _normalizeSkill(skillKey);
     const aliasKeys = [normalized, ...(CROSS_QUEST_SKILL_ALIASES[normalized] || [])];
     const mastery = store.get('questMastery') || {};
-    const quests = preferredQuest ? [preferredQuest, ..._allQuestBuckets().filter(q => q !== preferredQuest)] : _allQuestBuckets();
+    const quests = preferredQuest
+      ? [preferredQuest, ..._allQuestBuckets().filter((q) => q !== preferredQuest)]
+      : _allQuestBuckets();
 
     let total = 0;
     let count = 0;

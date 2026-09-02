@@ -55,7 +55,13 @@ describe('buildParentReport', () => {
       scoreLine: '6/10',
       accuracy: 60,
       strongest: { skill: 'tense', label: 'Verb tense', correct: 4, total: 4, accuracy: 100 },
-      weakest: { skill: 'connectorLogic', label: 'Connector logic', correct: 1, total: 3, accuracy: 33 },
+      weakest: {
+        skill: 'connectorLogic',
+        label: 'Connector logic',
+        correct: 1,
+        total: 3,
+        accuracy: 33,
+      },
       weakExamples: ['although', 'however'],
       recommendation: 'Practise 5 contrast-clue questions before the next passage.',
     });
@@ -63,8 +69,12 @@ describe('buildParentReport', () => {
     expect(text).toContain('Score: 6/10 (60%)');
     expect(text).toContain('Mode: Practice Mode');
     expect(text).toContain('Strength: Student could identify verb tense clues (4/4).');
-    expect(text).toContain('Weakness: Student missed connector logic clues such as "although" and "however" (1/3).');
-    expect(text).toContain('Next Step: Practise 5 contrast-clue questions before the next passage.');
+    expect(text).toContain(
+      'Weakness: Student missed connector logic clues such as "although" and "however" (1/3).',
+    );
+    expect(text).toContain(
+      'Next Step: Practise 5 contrast-clue questions before the next passage.',
+    );
     expect(text).toContain('Teacher Tip:');
     expect(text).toMatch(/contrast|reason|result/i);
   });

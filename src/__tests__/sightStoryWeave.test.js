@@ -10,7 +10,10 @@ import { beforeAll, describe, expect, it } from 'vitest';
 
 function stubAudioGlobals() {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
 }
 
@@ -35,7 +38,7 @@ function tokensInBands(bands) {
 
 describe('story-aligned easy quests', () => {
   it('every easy quest declares a storyBand in non-decreasing order', () => {
-    const easy = SIGHT_QUESTS.filter(q => q.tier === 'easy');
+    const easy = SIGHT_QUESTS.filter((q) => q.tier === 'easy');
     const order = { A: 1, B: 2, C: 3, D: 4 };
     let last = 0;
     for (const quest of easy) {
@@ -46,7 +49,7 @@ describe('story-aligned easy quests', () => {
   });
 
   it('quest words appear in stories at or before their declared band (few riders allowed)', () => {
-    const easy = SIGHT_QUESTS.filter(q => q.tier === 'easy');
+    const easy = SIGHT_QUESTS.filter((q) => q.tier === 'easy');
     const bandsThrough = { A: ['A'], B: ['A', 'B'], C: ['A', 'B', 'C'], D: ['A', 'B', 'C', 'D'] };
     let riders = 0;
     for (const quest of easy) {
@@ -61,7 +64,9 @@ describe('story-aligned easy quests', () => {
   });
 
   it('reordering preserved all 50 easy words exactly once', () => {
-    const words = SIGHT_QUESTS.filter(q => q.tier === 'easy').flatMap(q => q.words.map(w => w.toLowerCase()));
+    const words = SIGHT_QUESTS.filter((q) => q.tier === 'easy').flatMap((q) =>
+      q.words.map((w) => w.toLowerCase()),
+    );
     expect(words.length).toBe(50);
     expect(new Set(words).size).toBe(50);
   });
@@ -76,7 +81,7 @@ describe('weave lookups', () => {
   });
 
   it('every easy quest links to a story in its band', () => {
-    for (const quest of SIGHT_QUESTS.filter(q => q.tier === 'easy' && q.storyBand)) {
+    for (const quest of SIGHT_QUESTS.filter((q) => q.tier === 'easy' && q.storyBand)) {
       const story = weave.getStoryForQuest(quest);
       expect(story, `${quest.id} has no linked story`).not.toBeNull();
       expect(story.band).toBe(quest.storyBand);
@@ -116,12 +121,14 @@ describe('quest-word story coverage floors', () => {
       for (const t of extractCountableTokens(story)) tokens.add(t);
     }
     for (const entry of allSentences) {
-      for (const w of String(entry.sentence).toLowerCase().match(/[a-z']+/g) || []) {
+      for (const w of String(entry.sentence)
+        .toLowerCase()
+        .match(/[a-z']+/g) || []) {
         tokens.add(w.replace(/'/g, ''));
       }
     }
     const missing = [];
-    for (const quest of SIGHT_QUESTS.filter(q => q.tier !== 'hard')) {
+    for (const quest of SIGHT_QUESTS.filter((q) => q.tier !== 'hard')) {
       for (const w of quest.words) {
         const clean = w.toLowerCase().replace(/'/g, '');
         if (!tokens.has(w.toLowerCase()) && !tokens.has(clean)) missing.push(w);

@@ -2,30 +2,60 @@ import { describe, it, expect } from 'vitest';
 import { passages } from '../data/passages.js';
 import { vocabPassages } from '../data/vocabPassages.js';
 
-const POS_VALUES = new Set(['noun', 'verb', 'adjective', 'adverb', 'word', 'phrase', 'article', 'article/determiner', 'determiner', 'preposition']);
-
+const POS_VALUES = new Set([
+  'noun',
+  'verb',
+  'adjective',
+  'adverb',
+  'word',
+  'phrase',
+  'article',
+  'article/determiner',
+  'determiner',
+  'preposition',
+]);
 
 function buildAffixParts(answer, hint = '') {
   const lower = (answer || '').toLowerCase();
   const knownPrefixes = ['un', 're', 'dis', 'mis', 'in', 'im'];
-  const knownSuffixes = ['ing', 'ed', 'ly', 'er', 'est', 'ful', 'less', 'tion', 'sion', 'ment', 'ness', 'able', 'ible'];
-  const hintAffix = (hint.match(/(un-|re-|dis-|mis-|in-|im-|-ing|-ed|-ly|-er|-est|-ful|-less|-tion|-sion|-ment|-ness|-able|-ible)/i) || [])[0];
+  const knownSuffixes = [
+    'ing',
+    'ed',
+    'ly',
+    'er',
+    'est',
+    'ful',
+    'less',
+    'tion',
+    'sion',
+    'ment',
+    'ness',
+    'able',
+    'ible',
+  ];
+  const hintAffix = (hint.match(
+    /(un-|re-|dis-|mis-|in-|im-|-ing|-ed|-ly|-er|-est|-ful|-less|-tion|-sion|-ment|-ness|-able|-ible)/i,
+  ) || [])[0];
   const normalizedHintAffix = hintAffix ? hintAffix.replace(/^-/, '').replace(/-$/, '') : '';
   if (hintAffix) {
     if (hintAffix.startsWith('-')) {
       const affix = normalizedHintAffix;
-      return { root: answer.slice(0, Math.max(0, answer.length - affix.length)), affix, type: 'suffix' };
+      return {
+        root: answer.slice(0, Math.max(0, answer.length - affix.length)),
+        affix,
+        type: 'suffix',
+      };
     }
     const affix = normalizedHintAffix;
     return { root: answer.slice(affix.length), affix, type: 'prefix' };
   }
-  const prefix = knownPrefixes.find(p => lower.startsWith(p) && lower.length > p.length + 2);
+  const prefix = knownPrefixes.find((p) => lower.startsWith(p) && lower.length > p.length + 2);
   if (prefix) return { root: answer.slice(prefix.length), affix: prefix, type: 'prefix' };
-  const suffix = knownSuffixes.find(sf => lower.endsWith(sf) && lower.length > sf.length + 2);
-  if (suffix) return { root: answer.slice(0, answer.length - suffix.length), affix: suffix, type: 'suffix' };
+  const suffix = knownSuffixes.find((sf) => lower.endsWith(sf) && lower.length > sf.length + 2);
+  if (suffix)
+    return { root: answer.slice(0, answer.length - suffix.length), affix: suffix, type: 'suffix' };
   return { root: answer, affix: '', type: 'suffix' };
 }
-
 
 function checkBase(passage) {
   expect(passage.id).toBeTruthy();
@@ -55,8 +85,10 @@ function checkBase(passage) {
   }
   for (const [key, needed] of answerCounts) {
     const have = bankCounts.get(key) || 0;
-    expect(have >= needed,
-      `wordBank missing copies of "${key}" in ${passage.id} (need ${needed}, have ${have})`).toBe(true);
+    expect(
+      have >= needed,
+      `wordBank missing copies of "${key}" in ${passage.id} (need ${needed}, have ${have})`,
+    ).toBe(true);
   }
 }
 
@@ -67,20 +99,28 @@ function checkBlankSkillsSchema(passage) {
     if (typeof entry === 'string') continue;
     if (typeof entry === 'object') {
       if (Object.prototype.hasOwnProperty.call(entry, 'blankIndex')) {
-        expect(Number.isInteger(entry.blankIndex), `non-integer blankIndex in ${passage.id}`).toBe(true);
-        expect(entry.blankIndex, `blankIndex out of range in ${passage.id}`).toBeGreaterThanOrEqual(0);
+        expect(Number.isInteger(entry.blankIndex), `non-integer blankIndex in ${passage.id}`).toBe(
+          true,
+        );
+        expect(entry.blankIndex, `blankIndex out of range in ${passage.id}`).toBeGreaterThanOrEqual(
+          0,
+        );
         expect(entry.blankIndex).toBeLessThan(passage.answers.length);
       }
       if (entry.wrongOptionTraps !== undefined) {
-        expect(typeof entry.wrongOptionTraps === 'object' && !Array.isArray(entry.wrongOptionTraps),
-          `wrongOptionTraps must be an object map in ${passage.id}`).toBe(true);
+        expect(
+          typeof entry.wrongOptionTraps === 'object' && !Array.isArray(entry.wrongOptionTraps),
+          `wrongOptionTraps must be an object map in ${passage.id}`,
+        ).toBe(true);
       }
     }
   }
 }
 
 function containsWord(text, word) {
-  return new RegExp(`\\b${String(word).replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')}\\b`, 'i').test(text);
+  return new RegExp(`\\b${String(word).replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')}\\b`, 'i').test(
+    text,
+  );
 }
 
 describe('Cloze Castle passage validation', () => {
@@ -90,7 +130,9 @@ describe('Cloze Castle passage validation', () => {
       for (const [catKey, list] of Object.entries(cats || {})) {
         for (const passage of list || []) {
           checkBase(passage);
-          expect(ids.has(passage.id), `duplicate id ${passage.id} in ${level}/${catKey}`).toBe(false);
+          expect(ids.has(passage.id), `duplicate id ${passage.id} in ${level}/${catKey}`).toBe(
+            false,
+          );
           ids.add(passage.id);
 
           if (Array.isArray(passage.clues)) {
@@ -98,14 +140,19 @@ describe('Cloze Castle passage validation', () => {
               expect(clue.blankIndex).toBeGreaterThanOrEqual(0);
               expect(clue.blankIndex).toBeLessThan(passage.answers.length);
               expect(String(clue.prompt || '').trim().length).toBeGreaterThan(0);
-              expect(Array.isArray(clue.acceptableSpans) && clue.acceptableSpans.length > 0).toBe(true);
+              expect(Array.isArray(clue.acceptableSpans) && clue.acceptableSpans.length > 0).toBe(
+                true,
+              );
               expect(String(clue.clueType || '').trim().length).toBeGreaterThan(0);
               if (!clue.allowExternalClue) {
                 for (const span of clue.acceptableSpans) {
                   for (const token of String(span).split(/\s+/).filter(Boolean)) {
                     const clean = token.replace(/[^a-zA-Z'-]/g, '');
                     if (!clean || clean.length <= 1) continue;
-                    expect(containsWord(passage.text, clean), `missing clue token "${clean}" in ${passage.id}`).toBe(true);
+                    expect(
+                      containsWord(passage.text, clean),
+                      `missing clue token "${clean}" in ${passage.id}`,
+                    ).toBe(true);
                   }
                 }
               }
@@ -131,13 +178,18 @@ describe('Word Vault passage validation', () => {
       for (const [level, list] of Object.entries(levels || {})) {
         for (const passage of list || []) {
           checkBase(passage);
-          expect(ids.has(passage.id), `duplicate id ${passage.id} in ${catKey}/${level}`).toBe(false);
+          expect(ids.has(passage.id), `duplicate id ${passage.id} in ${catKey}/${level}`).toBe(
+            false,
+          );
           ids.add(passage.id);
 
           if (passage.definitions) {
             for (const answer of passage.answers) {
               const def = passage.definitions[answer];
-              expect(String(def || '').trim().length, `definition missing for ${answer} in ${passage.id}`).toBeGreaterThan(0);
+              expect(
+                String(def || '').trim().length,
+                `definition missing for ${answer} in ${passage.id}`,
+              ).toBeGreaterThan(0);
             }
           }
 
@@ -165,7 +217,10 @@ describe('Word Vault passage validation', () => {
               const parts = buildAffixParts(answer, hint);
               expect(String(parts.root || '').trim().length).toBeGreaterThan(0);
               if (parts.affix) {
-                const recombined = parts.type === 'prefix' ? `${parts.affix}${parts.root}` : `${parts.root}${parts.affix}`;
+                const recombined =
+                  parts.type === 'prefix'
+                    ? `${parts.affix}${parts.root}`
+                    : `${parts.root}${parts.affix}`;
                 expect(recombined.toLowerCase()).toBe(answer.toLowerCase());
               }
             }

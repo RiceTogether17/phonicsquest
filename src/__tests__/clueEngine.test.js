@@ -11,25 +11,25 @@ import {
 describe('tokenizePassage', () => {
   it('splits a passage into words, blanks and spaces', () => {
     const tokens = tokenizePassage('Last Sunday I went to ___.');
-    const types = tokens.map(t => t.type);
+    const types = tokens.map((t) => t.type);
     expect(types).toContain('word');
     expect(types).toContain('blank');
     expect(types).toContain('space');
-    const words = tokens.filter(t => t.type === 'word').map(t => t.value);
+    const words = tokens.filter((t) => t.type === 'word').map((t) => t.value);
     expect(words).toEqual(['Last', 'Sunday', 'I', 'went', 'to']);
   });
 
   it('numbers blanks consecutively from 0', () => {
     const tokens = tokenizePassage('I ___ to the shop and ___ a cake.');
-    const blanks = tokens.filter(t => t.type === 'blank');
+    const blanks = tokens.filter((t) => t.type === 'blank');
     expect(blanks).toHaveLength(2);
-    expect(blanks.map(b => b.blankIndex)).toEqual([0, 1]);
+    expect(blanks.map((b) => b.blankIndex)).toEqual([0, 1]);
   });
 
   it('separates leading and trailing punctuation from words', () => {
     const tokens = tokenizePassage('"Hello," she said.');
-    const punctValues = tokens.filter(t => t.type === 'punct').map(t => t.value);
-    const wordValues  = tokens.filter(t => t.type === 'word').map(t => t.value);
+    const punctValues = tokens.filter((t) => t.type === 'punct').map((t) => t.value);
+    const wordValues = tokens.filter((t) => t.type === 'word').map((t) => t.value);
     expect(wordValues).toEqual(['Hello', 'she', 'said']);
     expect(punctValues).toContain('"');
     expect(punctValues).toContain(',"');
@@ -37,7 +37,7 @@ describe('tokenizePassage', () => {
 
   it('keeps apostrophes and hyphens inside word tokens', () => {
     const tokens = tokenizePassage("don't worry, it's well-written.");
-    const words = tokens.filter(t => t.type === 'word').map(t => t.value);
+    const words = tokens.filter((t) => t.type === 'word').map((t) => t.value);
     expect(words).toContain("don't");
     expect(words).toContain("it's");
     expect(words).toContain('well-written');
@@ -45,19 +45,21 @@ describe('tokenizePassage', () => {
 
   it('returns no blanks for passages with no ___ markers', () => {
     const tokens = tokenizePassage('Plain sentence with no blanks.');
-    expect(tokens.filter(t => t.type === 'blank')).toHaveLength(0);
+    expect(tokens.filter((t) => t.type === 'blank')).toHaveLength(0);
   });
 });
 
 describe('evaluateClueSelection', () => {
   const clueData = {
     acceptableSpans: ['Last Sunday'],
-    partialSpans:    ['Sunday'],
+    partialSpans: ['Sunday'],
   };
 
   it('returns "strong" for any word inside an acceptable span', () => {
-    expect(evaluateClueSelection('Last',   clueData)).toBe('strong');
-    expect(evaluateClueSelection('SUNDAY', { acceptableSpans: ['last sunday'], partialSpans: [] })).toBe('strong');
+    expect(evaluateClueSelection('Last', clueData)).toBe('strong');
+    expect(
+      evaluateClueSelection('SUNDAY', { acceptableSpans: ['last sunday'], partialSpans: [] }),
+    ).toBe('strong');
   });
 
   it('returns "partial" only when the word is in partialSpans but not acceptableSpans', () => {
@@ -86,7 +88,7 @@ describe('evaluateClueSelection', () => {
   });
 
   it('is case-insensitive', () => {
-    expect(evaluateClueSelection('last',   clueData)).toBe('strong');
+    expect(evaluateClueSelection('last', clueData)).toBe('strong');
     expect(evaluateClueSelection('SUNDAY', clueData)).toBe('strong');
     const partialOnly = { acceptableSpans: ['Yesterday'], partialSpans: ['Sunday'] };
     expect(evaluateClueSelection('SUNDAY', partialOnly)).toBe('partial');
@@ -94,17 +96,17 @@ describe('evaluateClueSelection', () => {
 
   it('handles missing partialSpans / acceptableSpans gracefully', () => {
     expect(evaluateClueSelection('Last', { acceptableSpans: ['Last Sunday'] })).toBe('strong');
-    expect(evaluateClueSelection('foo',  { acceptableSpans: [] })).toBe('weak');
-    expect(evaluateClueSelection('foo',  {})).toBe('weak');
+    expect(evaluateClueSelection('foo', { acceptableSpans: [] })).toBe('weak');
+    expect(evaluateClueSelection('foo', {})).toBe('weak');
   });
 });
 
 describe('getClueHint hint ladder', () => {
   const clueData = {
     acceptableSpans: ['Last Sunday'],
-    partialSpans:    ['Sunday'],
-    clueType:        'time-marker',
-    explanation:     '"Last Sunday" tells us this is past tense.',
+    partialSpans: ['Sunday'],
+    clueType: 'time-marker',
+    explanation: '"Last Sunday" tells us this is past tense.',
   };
 
   it('level 1 is a generic nudge with no reveal', () => {
@@ -114,11 +116,13 @@ describe('getClueHint hint ladder', () => {
   });
 
   it('level 2 returns a clueType-specific nudge for known types', () => {
-    expect(getClueHint(2, { ...clueData, clueType: 'time-marker'    }).message).toMatch(/when/i);
-    expect(getClueHint(2, { ...clueData, clueType: 'connector-clue' }).message).toMatch(/connector/i);
-    expect(getClueHint(2, { ...clueData, clueType: 'contrast-clue'  }).message).toMatch(/contrast/i);
-    expect(getClueHint(2, { ...clueData, clueType: 'cause-clue'     }).message).toMatch(/reason/i);
-    expect(getClueHint(2, { ...clueData, clueType: 'collocation-clue'}).message).toMatch(/pair/i);
+    expect(getClueHint(2, { ...clueData, clueType: 'time-marker' }).message).toMatch(/when/i);
+    expect(getClueHint(2, { ...clueData, clueType: 'connector-clue' }).message).toMatch(
+      /connector/i,
+    );
+    expect(getClueHint(2, { ...clueData, clueType: 'contrast-clue' }).message).toMatch(/contrast/i);
+    expect(getClueHint(2, { ...clueData, clueType: 'cause-clue' }).message).toMatch(/reason/i);
+    expect(getClueHint(2, { ...clueData, clueType: 'collocation-clue' }).message).toMatch(/pair/i);
   });
 
   it('level 2 falls back to a generic message for unknown clue types', () => {
@@ -209,7 +213,7 @@ describe('renderClueHuntPassage', () => {
     });
     const wordBtns = container.querySelectorAll('.clue-word-token');
     expect(wordBtns.length).toBe(5);
-    expect([...wordBtns].map(b => b.dataset.word)).toEqual(['Last', 'Sunday', 'I', 'went', 'to']);
+    expect([...wordBtns].map((b) => b.dataset.word)).toEqual(['Last', 'Sunday', 'I', 'went', 'to']);
     expect(container.querySelector('.clue-blank-token--active')).not.toBeNull();
   });
 

@@ -54,7 +54,9 @@ describe('getNextWord variety', () => {
     const lastSeen = {};
     shown.forEach((id, i) => {
       if (lastSeen[id] != null) {
-        expect(i - lastSeen[id], `"${id}" repeated within the recency window`).toBeGreaterThan(windowSize);
+        expect(i - lastSeen[id], `"${id}" repeated within the recency window`).toBeGreaterThan(
+          windowSize,
+        );
       }
       lastSeen[id] = i;
     });

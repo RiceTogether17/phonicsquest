@@ -9,9 +9,15 @@ const localStorageMock = (() => {
   let store = {};
   return {
     getItem: vi.fn((key) => store[key] ?? null),
-    setItem: vi.fn((key, val) => { store[key] = String(val); }),
-    removeItem: vi.fn((key) => { delete store[key]; }),
-    clear: vi.fn(() => { store = {}; }),
+    setItem: vi.fn((key, val) => {
+      store[key] = String(val);
+    }),
+    removeItem: vi.fn((key) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
   };
 })();
 Object.defineProperty(globalThis, 'localStorage', { value: localStorageMock });
@@ -93,8 +99,7 @@ describe('Gamification', () => {
       gamification.resetEnergy();
       expect(store.get('energy')).toBe(3);
     });
-
-});
+  });
 
   describe('getSessionStats', () => {
     it('tracks session correct and wrong counts', () => {

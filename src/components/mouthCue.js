@@ -103,7 +103,7 @@ const SHAPE_SVG = Object.freeze({
     <circle cx="50" cy="35" r="12" class="mc-mouth"/>`,
 
   // The mouth travels between two shapes — diphthongs and /y/
-  'glide': `
+  glide: `
     <ellipse cx="34" cy="35" rx="16" ry="14" class="mc-lips"/>
     <ellipse cx="34" cy="35" rx="8" ry="7" class="mc-mouth"/>
     <ellipse cx="72" cy="35" rx="14" ry="9" class="mc-lips mc-lips--ghost"/>
@@ -138,9 +138,9 @@ export function renderMouthCue(phoneme, host, opts = {}) {
   wrap.setAttribute('role', 'img');
   wrap.setAttribute('aria-label', `${cue.label}. ${cue.cue}`);
   wrap.innerHTML =
-    `<svg viewBox="${VIEW_BOX}" class="mouth-cue__svg" focusable="false" aria-hidden="true">`
-    + SHAPE_SVG[cue.shape]
-    + '</svg>';
+    `<svg viewBox="${VIEW_BOX}" class="mouth-cue__svg" focusable="false" aria-hidden="true">` +
+    SHAPE_SVG[cue.shape] +
+    '</svg>';
   host.appendChild(wrap);
 
   if (showCue) {

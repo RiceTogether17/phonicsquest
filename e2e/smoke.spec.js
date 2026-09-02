@@ -101,14 +101,10 @@ test('home screen has no critical or serious a11y violations', async ({ page }) 
   await page.goto('./');
   await expect(page.locator('#screen-home')).toHaveClass(/active/);
 
-  const results = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa'])
-    .analyze();
+  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
 
   const blocking = results.violations.filter(
     (v) => v.impact === 'critical' || v.impact === 'serious',
   );
-  expect(
-    blocking.map((v) => `${v.id}: ${v.help} (${v.nodes.length} nodes)`),
-  ).toEqual([]);
+  expect(blocking.map((v) => `${v.id}: ${v.help} (${v.nodes.length} nodes)`)).toEqual([]);
 });

@@ -13,7 +13,11 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
-  renderSoundBoxes, updateSoundBoxes, fillSoundBox, soundCount, __TEST__,
+  renderSoundBoxes,
+  updateSoundBoxes,
+  fillSoundBox,
+  soundCount,
+  __TEST__,
 } from '../components/soundBoxes.js';
 
 /** A word shaped like the entries in data/words.js. */
@@ -23,7 +27,7 @@ function makeWord(graphemes, types, overrides = {}) {
     word: graphemes.join(''),
     graphemes,
     types,
-    phonemes: graphemes.map(g => `/${g}/`),
+    phonemes: graphemes.map((g) => `/${g}/`),
     ...overrides,
   };
 }
@@ -46,7 +50,10 @@ describe('box count', () => {
   it('covers every word length the bank contains (2 to 8 sounds)', () => {
     for (let len = 2; len <= 8; len++) {
       const graphemes = Array.from({ length: len }, (_, i) => String.fromCharCode(97 + i));
-      const word = makeWord(graphemes, graphemes.map(() => 'c'));
+      const word = makeWord(
+        graphemes,
+        graphemes.map(() => 'c'),
+      );
       renderSoundBoxes(word, host);
       expect(host.querySelectorAll('.sound-box').length, `${len} sounds`).toBe(len);
     }
@@ -92,13 +99,16 @@ describe('sound-type colour language', () => {
 
   it('maps the full type vocabulary without falling over', () => {
     const types = ['c', 'sv', 'lv', 'd', 'bl', 'se', 'rc', 'dp', 'sf', 'p', 'soft_c', 'soft_g'];
-    const word = makeWord(types.map((_, i) => String.fromCharCode(97 + i)), types);
+    const word = makeWord(
+      types.map((_, i) => String.fromCharCode(97 + i)),
+      types,
+    );
     renderSoundBoxes(word, host);
     // Every box resolves to a real class — none left unstyled.
     host.querySelectorAll('.sound-box').forEach((box, i) => {
-      const hasType = [...box.classList].some(c =>
-        c.startsWith('sound-box--') &&
-        !/--(empty|active|filled|correct|retry)$/.test(c));
+      const hasType = [...box.classList].some(
+        (c) => c.startsWith('sound-box--') && !/--(empty|active|filled|correct|retry)$/.test(c),
+      );
       expect(hasType, types[i]).toBe(true);
     });
   });
@@ -112,7 +122,7 @@ describe('sound-type colour language', () => {
 describe('states', () => {
   it('starts every box empty with a placeholder, not the answer', () => {
     renderSoundBoxes(CAT, host);
-    host.querySelectorAll('.sound-box').forEach(box => {
+    host.querySelectorAll('.sound-box').forEach((box) => {
       expect(box.dataset.state).toBe('empty');
       expect(box.querySelector('.sound-box__mark').textContent).toBe(__TEST__.EMPTY_MARK);
     });
@@ -134,7 +144,10 @@ describe('states', () => {
 
   it('ranks correct and retry above filled/active', () => {
     renderSoundBoxes(CAT, host, {
-      filledIndices: [0, 1, 2], correctIndices: [0], retryIndices: [1], activeIndex: 2,
+      filledIndices: [0, 1, 2],
+      correctIndices: [0],
+      retryIndices: [1],
+      activeIndex: 2,
     });
     const boxes = host.querySelectorAll('.sound-box');
     expect(boxes[0].dataset.state).toBe('correct');
@@ -164,7 +177,9 @@ describe('states', () => {
   it('fillSoundBox writes a grapheme into one box', () => {
     renderSoundBoxes(CAT, host);
     fillSoundBox(host, 2, 't');
-    expect(host.querySelectorAll('.sound-box')[2].querySelector('.sound-box__mark').textContent).toBe('t');
+    expect(
+      host.querySelectorAll('.sound-box')[2].querySelector('.sound-box__mark').textContent,
+    ).toBe('t');
   });
 
   it('fillSoundBox ignores an out-of-range index', () => {
@@ -210,14 +225,16 @@ describe('accessibility', () => {
 
   it('hides the decorative placeholder glyph from assistive tech', () => {
     renderSoundBoxes(CAT, host);
-    host.querySelectorAll('.sound-box__mark').forEach(mark => {
+    host.querySelectorAll('.sound-box__mark').forEach((mark) => {
       expect(mark.getAttribute('aria-hidden')).toBe('true');
     });
   });
 
   it('does not leak the answer to screen readers before a box is filled', () => {
     renderSoundBoxes(CAT, host);
-    const labels = [...host.querySelectorAll('.sound-box')].map(b => b.getAttribute('aria-label'));
+    const labels = [...host.querySelectorAll('.sound-box')].map((b) =>
+      b.getAttribute('aria-label'),
+    );
     expect(labels.join(' ')).not.toMatch(/\bc\b|\ba\b|\bt\b/);
   });
 });

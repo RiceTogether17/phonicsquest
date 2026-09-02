@@ -9,9 +9,21 @@
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-function setProfile({ primaryGrade = null, readingBand = 'pre-reader', schoolLevel = 'preschool' } = {}) {
+function setProfile({
+  primaryGrade = null,
+  readingBand = 'pre-reader',
+  schoolLevel = 'preschool',
+} = {}) {
   const id = `p_test_${Math.random().toString(36).slice(2)}`;
-  const profile = { id, name: 'Test', avatar: '🦁', color: '#6c63ff', schoolLevel, primaryGrade, readingBand };
+  const profile = {
+    id,
+    name: 'Test',
+    avatar: '🦁',
+    color: '#6c63ff',
+    schoolLevel,
+    primaryGrade,
+    readingBand,
+  };
   localStorage.setItem('phonicsquest_profiles', JSON.stringify([profile]));
   localStorage.setItem('phonicsquest_active_profile', id);
   localStorage.setItem('phonicsquest_legacy_migrated_to_profiles', '1');
@@ -50,10 +62,10 @@ describe('lessonComposer — early reading pathway', () => {
     const { band, steps } = composeTodaysLesson();
     expect(band).toBe('early');
 
-    const kinds = steps.map(s => s.kind);
+    const kinds = steps.map((s) => s.kind);
     expect(kinds).toEqual(['warmup', 'teach', 'practice', 'review']);
 
-    const teach = steps.find(s => s.kind === 'teach');
+    const teach = steps.find((s) => s.kind === 'teach');
     expect(teach.action.type).toBe('teach-phonics');
     // A brand-new profile starts at the first curriculum stage.
     expect(teach.action.stageId).toBe('cvc-a');
@@ -68,7 +80,7 @@ describe('lessonComposer — primary pathway', () => {
 
     const { band, steps } = composeTodaysLesson();
     expect(band).toBe('primary');
-    expect(steps.some(s => s.kind === 'teach')).toBe(false);
+    expect(steps.some((s) => s.kind === 'teach')).toBe(false);
     expect(steps.length).toBe(5); // the five mission steps
     expect(steps[steps.length - 1].kind).toBe('review'); // yesterday's slip
   });
@@ -93,9 +105,9 @@ describe('lessonComposer — pre-print journey steps', () => {
     setProfile({ readingBand: 'pre-reader' });
     const { composeTodaysLesson } = await loadModules();
     const { steps } = composeTodaysLesson();
-    expect(steps.some(s => s.kind === 'teach')).toBe(false);
+    expect(steps.some((s) => s.kind === 'teach')).toBe(false);
     // The practice slot carries a listening warm-up instead.
-    const practice = steps.find(s => s.kind === 'practice');
+    const practice = steps.find((s) => s.kind === 'practice');
     expect(practice.title).toContain('Hear the Sounds');
   });
 });
@@ -121,19 +133,25 @@ describe('lessonRunner — session state', () => {
     await seedBlendingStage(mods.store);
 
     let view = getTodaysLessonView();
-    const teachBefore = view.steps.find(s => s.kind === 'teach');
+    const teachBefore = view.steps.find((s) => s.kind === 'teach');
     expect(teachBefore.done).toBe(false);
 
     markTeachDone();
     view = getTodaysLessonView();
-    const teachAfter = view.steps.find(s => s.kind === 'teach');
+    const teachAfter = view.steps.find((s) => s.kind === 'teach');
     expect(teachAfter.done).toBe(true);
   });
 
   it('awards the completion bonus exactly once and records history', async () => {
     setProfile({ primaryGrade: 'P4', readingBand: 'reader', schoolLevel: 'primary' });
-    const { store, getTodaysLessonView, finalizeLessonIfComplete, markTeachDone, getLessonHistory, LESSON_BONUS_XP } =
-      await loadModules();
+    const {
+      store,
+      getTodaysLessonView,
+      finalizeLessonIfComplete,
+      markTeachDone,
+      getLessonHistory,
+      LESSON_BONUS_XP,
+    } = await loadModules();
 
     // Seed yesterday's slip BEFORE the first mission read (the daily mission
     // snapshot caches the replay pick the first time it is built).
@@ -152,7 +170,12 @@ describe('lessonRunner — session state', () => {
     store.set('questAttempts', [
       { quest: 'grammarMcq', skill: 'articles', correct: false, timestamp: yesterday },
       ...Array(3).fill({ quest: 'clozeCastle', skill: 'articles', correct: true, timestamp: now }),
-      ...Array(3).fill({ quest: 'wordVault', skill: 'contextInference', correct: true, timestamp: now }),
+      ...Array(3).fill({
+        quest: 'wordVault',
+        skill: 'contextInference',
+        correct: true,
+        timestamp: now,
+      }),
       { quest: 'editingQuest', skill: 'spelling', correct: true, timestamp: now },
       { quest: 'grammarMcq', skill: 'articles', correct: true, timestamp: now },
     ]);

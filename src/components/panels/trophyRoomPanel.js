@@ -22,7 +22,11 @@ export function openTrophyRoomPanel() {
   if (!host) return;
 
   let pb;
-  try { pb = getPersonalBests(); } catch (_) { pb = null; }
+  try {
+    pb = getPersonalBests();
+  } catch (_) {
+    pb = null;
+  }
 
   renderTrophyRoomPanel(host, pb);
   modalManager.open('modal-personal-best');
@@ -37,27 +41,30 @@ export function renderTrophyRoomPanel(host, pb) {
   if (!host) return;
 
   if (!pb) {
-    host.innerHTML = '<p class="trophy-empty">No data yet — play a quest to start your trophy room.</p>';
+    host.innerHTML =
+      '<p class="trophy-empty">No data yet — play a quest to start your trophy room.</p>';
     return;
   }
 
-  const cardsHtml = (pb.cards || []).map(card => html`
+  const cardsHtml = (pb.cards || []).map(
+    (card) => html`
     <div class="trophy-card" role="group" aria-label="${card.label}, ${card.value}">
       <div class="trophy-card__icon" aria-hidden="true">${card.icon}</div>
       <div class="trophy-card__value">${card.value}</div>
       <div class="trophy-card__label">${card.label}</div>
       ${card.sub ? html`<div class="trophy-card__sub">${card.sub}</div>` : ''}
-    </div>`);
+    </div>`,
+  );
 
   const highlightsHtml = pb.summary?.highlights?.length
-    ? html`<ul class="trophy-highlights">${pb.summary.highlights.map(h => html`<li>${h}</li>`)}</ul>`
+    ? html`<ul class="trophy-highlights">${pb.summary.highlights.map((h) => html`<li>${h}</li>`)}</ul>`
     : '';
 
   const badgesHtml = pb.badges?.length
     ? html`<div class="trophy-badges">
          <h3 class="trophy-badges__title">🎖️ Badges earned · ${pb.badges.length}</h3>
          <div class="trophy-badges__list">
-           ${pb.badges.map(b => html`<span class="trophy-badge" title="${b.name}"><span aria-hidden="true">${b.emoji}</span> ${b.name}</span>`)}
+           ${pb.badges.map((b) => html`<span class="trophy-badge" title="${b.name}"><span aria-hidden="true">${b.emoji}</span> ${b.name}</span>`)}
          </div>
        </div>`
     : '';

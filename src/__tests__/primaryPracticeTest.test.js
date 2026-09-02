@@ -14,8 +14,12 @@ function mount(paper, opts = {}) {
   const root = document.getElementById('root');
   const calls = { closed: 0, practised: [] };
   mountPracticeTest(root, paper, {
-    onClose: () => { calls.closed += 1; },
-    onPractiseSkill: (t) => { calls.practised.push(t); },
+    onClose: () => {
+      calls.closed += 1;
+    },
+    onPractiseSkill: (t) => {
+      calls.practised.push(t);
+    },
     ...opts,
   });
   return { root, calls };
@@ -29,9 +33,11 @@ function answerAll(root, paper, key, mode = 'correct') {
   const section = paper[key];
   if (key === 'sectionA' || key === 'sectionB') {
     section.items.forEach((item, i) => {
-      const choice = mode === 'correct' ? item.answer : item.choices.find(c => c !== item.answer);
+      const choice = mode === 'correct' ? item.answer : item.choices.find((c) => c !== item.answer);
       const radios = root.querySelectorAll(`input[name="q-${key}-${i}"]`);
-      radios.forEach(r => { if (r.value === choice) r.checked = true; });
+      radios.forEach((r) => {
+        if (r.value === choice) r.checked = true;
+      });
     });
     return;
   }
@@ -78,7 +84,9 @@ function answerAll(root, paper, key, mode = 'correct') {
 }
 
 describe('Practice Test launcher → interactive game mode', () => {
-  beforeEach(() => { document.body.innerHTML = ''; });
+  beforeEach(() => {
+    document.body.innerHTML = '';
+  });
 
   it('renders the section stepper and the first section title on mount', () => {
     const paper = P1_PRACTICE_TESTS.T1;
@@ -107,7 +115,7 @@ describe('Practice Test launcher → interactive game mode', () => {
     const noFeedback = root.querySelectorAll('.ptg-feedback--no');
     expect(noFeedback.length).toBe(5);
     // Correct answer surfaces in the feedback text
-    const fbText = [...noFeedback].map(n => n.textContent).join(' | ');
+    const fbText = [...noFeedback].map((n) => n.textContent).join(' | ');
     expect(fbText).toContain(paper.sectionA.items[0].answer);
   });
 
@@ -117,7 +125,7 @@ describe('Practice Test launcher → interactive game mode', () => {
     answerAll(root, paper, 'sectionA', 'correct');
     click(root.querySelector('[data-action="check"]'));
     const radios = root.querySelectorAll(`input[name="q-sectionA-0"]`);
-    radios.forEach(r => expect(r.disabled).toBe(true));
+    radios.forEach((r) => expect(r.disabled).toBe(true));
   });
 
   it('Next advances through every section to the Finish + Summary', () => {
@@ -148,8 +156,14 @@ describe('Practice Test launcher → interactive game mode', () => {
     expect(practiseBtn).toBeTruthy();
     click(practiseBtn);
     expect(calls.practised.length).toBeGreaterThan(0);
-    expect(['grammar-mcq', 'vocab-mcq', 'cloze-castle', 'word-vault', 'sentence-forge', 'editing-quest'])
-      .toContain(calls.practised[0]);
+    expect([
+      'grammar-mcq',
+      'vocab-mcq',
+      'cloze-castle',
+      'word-vault',
+      'sentence-forge',
+      'editing-quest',
+    ]).toContain(calls.practised[0]);
   });
 
   it('grades a P2 Sentence Combining section (textarea answers)', () => {
@@ -158,7 +172,8 @@ describe('Practice Test launcher → interactive game mode', () => {
     // Walk to Section F (sentence combining)
     const order = ['sectionA', 'sectionB', 'sectionC', 'sectionD', 'sectionE', 'sectionF'];
     for (const key of order) {
-      if (root.querySelector('.ptg-section-title')?.textContent?.includes('Sentence Combining')) break;
+      if (root.querySelector('.ptg-section-title')?.textContent?.includes('Sentence Combining'))
+        break;
       answerAll(root, paper, key, 'correct');
       click(root.querySelector('[data-action="check"]'));
       click(root.querySelector('[data-action="next"]'));
@@ -175,7 +190,8 @@ describe('Practice Test launcher → interactive game mode', () => {
     // Section E is open cloze
     const order = ['sectionA', 'sectionB', 'sectionC', 'sectionD', 'sectionE'];
     for (const key of order) {
-      if (root.querySelector('.ptg-section-title')?.textContent?.includes('Comprehension Cloze')) break;
+      if (root.querySelector('.ptg-section-title')?.textContent?.includes('Comprehension Cloze'))
+        break;
       answerAll(root, paper, key, 'correct');
       click(root.querySelector('[data-action="check"]'));
       click(root.querySelector('[data-action="next"]'));
@@ -195,8 +211,10 @@ describe('Practice Test launcher → interactive game mode', () => {
   });
 });
 
-describe('Grader honours the section\'s declared marks', () => {
-  beforeEach(() => { document.body.innerHTML = ''; });
+describe("Grader honours the section's declared marks", () => {
+  beforeEach(() => {
+    document.body.innerHTML = '';
+  });
 
   it('a P5 Grammar Cloze (10 blanks, marks: 10) scores out of section.marks', () => {
     const paper = P5_PRACTICE_TESTS.T1;
@@ -231,7 +249,10 @@ describe('Grader honours the section\'s declared marks', () => {
     }
     // Now should be on Section E (writing).
     const ta = root.querySelector('textarea[data-q-type="writing"]');
-    expect(ta, 'writing section should render a textarea tagged data-q-type="writing"').toBeTruthy();
+    expect(
+      ta,
+      'writing section should render a textarea tagged data-q-type="writing"',
+    ).toBeTruthy();
     ta.value = 'My short attempt at the email.';
     click(root.querySelector('[data-action="check"]'));
     // Feedback row should explicitly label it as self-assessment.
@@ -244,7 +265,17 @@ describe('Validator regressions — answer-in-choices + duplicate-choice + Secti
   it('P6 totalMarks must include Section I (regression guard)', () => {
     for (const term of ['T1', 'T2', 'T3', 'T4']) {
       const paper = P6_PRACTICE_TESTS[term];
-      const sectionKeys = ['sectionA', 'sectionB', 'sectionC', 'sectionD', 'sectionE', 'sectionF', 'sectionG', 'sectionH', 'sectionI'];
+      const sectionKeys = [
+        'sectionA',
+        'sectionB',
+        'sectionC',
+        'sectionD',
+        'sectionE',
+        'sectionF',
+        'sectionG',
+        'sectionH',
+        'sectionI',
+      ];
       const sum = sectionKeys.reduce((acc, k) => acc + (paper[k]?.marks || 0), 0);
       expect(sum, `P6/${term} declared sections sum`).toBe(paper.totalMarks);
       expect(paper.sectionI?.marks, `P6/${term} sectionI marks`).toBeGreaterThan(0);
@@ -254,23 +285,37 @@ describe('Validator regressions — answer-in-choices + duplicate-choice + Secti
   it('checkMcqItems flags an MCQ whose answer is not among the choices', async () => {
     const { checkMcqItems } = await import('../data/practiceTestValidators.js');
     const issues = [];
-    checkMcqItems(issues, 'TEST', [{
-      q: 'All rubbish must be disposed ___ in designated bins.',
-      choices: ['off', 'in', 'away', 'out'],
-      answer: 'of',
-    }], 4);
-    expect(issues.some(i => /not among choices/.test(i))).toBe(true);
+    checkMcqItems(
+      issues,
+      'TEST',
+      [
+        {
+          q: 'All rubbish must be disposed ___ in designated bins.',
+          choices: ['off', 'in', 'away', 'out'],
+          answer: 'of',
+        },
+      ],
+      4,
+    );
+    expect(issues.some((i) => /not among choices/.test(i))).toBe(true);
   });
 
   it('checkMcqItems flags duplicate choices after case/whitespace normalisation', async () => {
     const { checkMcqItems } = await import('../data/practiceTestValidators.js');
     const issues = [];
-    checkMcqItems(issues, 'TEST', [{
-      q: 'She ___ to school every day.',
-      choices: ['walks', ' Walks ', 'walked', 'walking'],
-      answer: 'walks',
-    }], 4);
-    expect(issues.some(i => /duplicate choice/.test(i))).toBe(true);
+    checkMcqItems(
+      issues,
+      'TEST',
+      [
+        {
+          q: 'She ___ to school every day.',
+          choices: ['walks', ' Walks ', 'walked', 'walking'],
+          answer: 'walks',
+        },
+      ],
+      4,
+    );
+    expect(issues.some((i) => /duplicate choice/.test(i))).toBe(true);
   });
 
   it('checkSectionMarks flags a 15-mark Grammar Cloze with only 10 blanks', async () => {
@@ -282,7 +327,9 @@ describe('Validator regressions — answer-in-choices + duplicate-choice + Secti
 });
 
 describe('Comprehension OE — requiredGroups + negation-aware partial credit', () => {
-  beforeEach(() => { document.body.innerHTML = ''; });
+  beforeEach(() => {
+    document.body.innerHTML = '';
+  });
 
   function mountToComprehension(paper) {
     const { root } = mount(paper);
@@ -307,7 +354,9 @@ describe('Comprehension OE — requiredGroups + negation-aware partial credit', 
     const ta = root.querySelector('textarea[data-q-key="sectionH/3"]');
     expect(ta, 'expected an evidence textarea at sectionH/3').toBeTruthy();
     ta.value = 'It is not bleaching and there is no sedimentation at all.';
-    root.querySelector('[data-action="check"]').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    root
+      .querySelector('[data-action="check"]')
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     const fb = root.querySelector('[data-feedback-for="sectionH/3"]');
     // Negation should disqualify both meaning units → 0 marks → "no" feedback.
     expect(fb?.className).toContain('ptg-feedback--no');
@@ -319,7 +368,9 @@ describe('Comprehension OE — requiredGroups + negation-aware partial credit', 
     const ta = root.querySelector('textarea[data-q-key="sectionH/3"]');
     // Mentions a global threat (bleaching) but no local Singapore threat.
     ta.value = 'Rising sea temperatures cause widespread bleaching across the reefs.';
-    root.querySelector('[data-action="check"]').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    root
+      .querySelector('[data-action="check"]')
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     const fb = root.querySelector('[data-feedback-for="sectionH/3"]');
     expect(fb?.className, fb?.outerHTML).toContain('ptg-feedback--partial');
     // The teacher-style marking guide should call out what was missing.
@@ -330,15 +381,20 @@ describe('Comprehension OE — requiredGroups + negation-aware partial credit', 
     const paper = P6_PRACTICE_TESTS.T1;
     const root = mountToComprehension(paper);
     const ta = root.querySelector('textarea[data-q-key="sectionH/3"]');
-    ta.value = 'Singapore reefs suffer from bleaching driven by rising temperatures, on top of local sedimentation from land reclamation.';
-    root.querySelector('[data-action="check"]').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    ta.value =
+      'Singapore reefs suffer from bleaching driven by rising temperatures, on top of local sedimentation from land reclamation.';
+    root
+      .querySelector('[data-action="check"]')
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     const fb = root.querySelector('[data-feedback-for="sectionH/3"]');
     expect(fb?.className).toContain('ptg-feedback--ok');
   });
 });
 
 describe('Practice Test Section F — PSLE-style partial credit in synthesis', () => {
-  beforeEach(() => { document.body.innerHTML = ''; });
+  beforeEach(() => {
+    document.body.innerHTML = '';
+  });
 
   function jumpToSectionF(paper) {
     const { root } = mount(paper);
@@ -353,11 +409,14 @@ describe('Practice Test Section F — PSLE-style partial credit in synthesis', (
     return root;
   }
 
-  it('every P5/P6 sectionF item declares 2 required groups for the marker\'s 1+1 split', async () => {
+  it("every P5/P6 sectionF item declares 2 required groups for the marker's 1+1 split", async () => {
     const { P5_PRACTICE_TESTS } = await import('../data/p5PracticeTests.js');
     const { P6_PRACTICE_TESTS } = await import('../data/p6PracticeTests.js');
     const offenders = [];
-    for (const [lvl, bank] of [['P5', P5_PRACTICE_TESTS], ['P6', P6_PRACTICE_TESTS]]) {
+    for (const [lvl, bank] of [
+      ['P5', P5_PRACTICE_TESTS],
+      ['P6', P6_PRACTICE_TESTS],
+    ]) {
       for (const term of ['T1', 'T2', 'T3', 'T4']) {
         const items = bank[term]?.sectionF?.items || [];
         items.forEach((it, i) => {
@@ -375,7 +434,10 @@ describe('Practice Test Section F — PSLE-style partial credit in synthesis', (
     const root = jumpToSectionF(paper);
     const ta = root.querySelector('textarea[data-q-type="synthesis"]');
     expect(ta, 'expected at least one synthesis textarea').toBeTruthy();
-    expect(ta.getAttribute('data-required-groups'), 'required-groups attribute must be present').toBeTruthy();
+    expect(
+      ta.getAttribute('data-required-groups'),
+      'required-groups attribute must be present',
+    ).toBeTruthy();
   });
 
   it('awards partial credit (◐) when only one of the two meaning units is preserved', () => {
@@ -387,7 +449,9 @@ describe('Practice Test Section F — PSLE-style partial credit in synthesis', (
     const ta = root.querySelector('textarea[data-q-key="sectionF/1"]');
     expect(ta).toBeTruthy();
     ta.value = 'too severe but the fish managed to swim away';
-    root.querySelector('[data-action="check"]').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    root
+      .querySelector('[data-action="check"]')
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     const fb = root.querySelector('[data-feedback-for="sectionF/1"]');
     expect(fb?.className, fb?.outerHTML).toContain('ptg-feedback--partial');
   });
@@ -397,14 +461,18 @@ describe('Practice Test Section F — PSLE-style partial credit in synthesis', (
     const root = jumpToSectionF(paper);
     const ta = root.querySelector('textarea[data-q-key="sectionF/1"]');
     ta.value = 'severe for the fish to survive in the water';
-    root.querySelector('[data-action="check"]').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    root
+      .querySelector('[data-action="check"]')
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     const fb = root.querySelector('[data-feedback-for="sectionF/1"]');
     expect(fb?.className).toContain('ptg-feedback--ok');
   });
 });
 
 describe('Summary distinguishes self-assessed writing from the auto-graded total', () => {
-  beforeEach(() => { document.body.innerHTML = ''; });
+  beforeEach(() => {
+    document.body.innerHTML = '';
+  });
 
   it('paper header reports auto vs self-assessed marks when the paper has a writing section', () => {
     const paper = P6_PRACTICE_TESTS.T1;
@@ -416,7 +484,9 @@ describe('Summary distinguishes self-assessed writing from the auto-graded total
 });
 
 describe('Test Mode exam conditions', () => {
-  beforeEach(() => { document.body.innerHTML = ''; });
+  beforeEach(() => {
+    document.body.innerHTML = '';
+  });
 
   it('withholds inline feedback and writing support while the timed paper is active', () => {
     const paper = P5_PRACTICE_TESTS.T1;

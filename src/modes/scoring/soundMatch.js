@@ -23,15 +23,20 @@
  */
 
 const VOICED_PAIRS = new Map([
-  ['p', 'b'], ['b', 'p'],
-  ['t', 'd'], ['d', 't'],
-  ['k', 'g'], ['g', 'k'],
-  ['f', 'v'], ['v', 'f'],
-  ['s', 'z'], ['z', 's'],
+  ['p', 'b'],
+  ['b', 'p'],
+  ['t', 'd'],
+  ['d', 't'],
+  ['k', 'g'],
+  ['g', 'k'],
+  ['f', 'v'],
+  ['v', 'f'],
+  ['s', 'z'],
+  ['z', 's'],
 ]);
 
 const SHORT_VOWELS = new Set(['a', 'e', 'i', 'o', 'u']);
-const DIGRAPHS     = new Set(['sh', 'ch', 'th', 'wh', 'ck', 'ng', 'ph']);
+const DIGRAPHS = new Set(['sh', 'ch', 'th', 'wh', 'ck', 'ng', 'ph']);
 
 const FAST_MS = 3000;
 
@@ -51,10 +56,10 @@ function categoriseError(target, chosen) {
 }
 
 const HINTS = Object.freeze({
-  'voicing-confusion':    'Listen for whether the sound is whispered (/p/) or buzzes (/b/).',
-  'short-vowel-confusion':'Open your mouth a little wider for /ă/ and smile a little for /ĕ/.',
-  'digraph-confusion':    'Two letters can make one sound. Say sh-, ch-, or th- first.',
-  'default':              'Listen again. Say the sound out loud, then look for that letter.',
+  'voicing-confusion': 'Listen for whether the sound is whispered (/p/) or buzzes (/b/).',
+  'short-vowel-confusion': 'Open your mouth a little wider for /ă/ and smile a little for /ĕ/.',
+  'digraph-confusion': 'Two letters can make one sound. Say sh-, ch-, or th- first.',
+  default: 'Listen again. Say the sound out loud, then look for that letter.',
 });
 
 export function getSoundMatchHint(attempt = {}) {
@@ -70,8 +75,8 @@ export function scoreSoundMatch(attempt = {}) {
   const timeMs = typeof attempt?.timeMs === 'number' ? attempt.timeMs : null;
 
   const correct = !!target && String(chosen).toLowerCase() === String(target).toLowerCase();
-  const errorCategory = correct ? null : (categoriseError(target, chosen) || 'default');
-  const speedBonus    = correct && timeMs !== null && timeMs <= FAST_MS ? 1 : 0;
+  const errorCategory = correct ? null : categoriseError(target, chosen) || 'default';
+  const speedBonus = correct && timeMs !== null && timeMs <= FAST_MS ? 1 : 0;
 
   return {
     correct,

@@ -31,31 +31,31 @@ import { renderWordImage } from '../components/phonemeDisplay.js';
 import { audio } from '../modules/audio.js';
 
 let _currentWord = null;
-let _taps        = 0;
+let _taps = 0;
 let _firstTryWrong = false;
-let _finished    = false;
-let _startTime   = 0;
+let _finished = false;
+let _startTime = 0;
 
 /**
  * @param {import('../data/words.js').Word} word
  * @param {object} els
  */
 export function setupOralSegment(word, els) {
-  _currentWord   = word;
-  _taps          = 0;
+  _currentWord = word;
+  _taps = 0;
   _firstTryWrong = false;
-  _finished      = false;
-  _startTime     = Date.now();
+  _finished = false;
+  _startTime = Date.now();
 
   // Image yes, printed word no — same rationale as Sound Count.
   renderWordImage(word, els.wordEmoji, true);
   els.wordDisplay.innerHTML = '';
-  els.phonemeRow.innerHTML  = '';
+  els.phonemeRow.innerHTML = '';
   els.modeInstruction.textContent = 'Say the word slowly. Tap once for every sound you hear!';
 
   const correctCount = word.phonemes.length;
 
-  els.modeArea.innerHTML = /* html */`
+  els.modeArea.innerHTML = /* html */ `
     <div class="oral-segment">
       <div class="sound-dots" id="os-dots" aria-live="polite" aria-label="Sounds tapped so far"></div>
       <button class="clap-button" id="os-tap" type="button" aria-label="Tap a sound">
@@ -70,10 +70,10 @@ export function setupOralSegment(word, els) {
     </div>
   `;
 
-  const dotsEl   = els.modeArea.querySelector('#os-dots');
-  const tapBtn   = els.modeArea.querySelector('#os-tap');
+  const dotsEl = els.modeArea.querySelector('#os-dots');
+  const tapBtn = els.modeArea.querySelector('#os-tap');
   const resetBtn = els.modeArea.querySelector('#os-reset');
-  const doneBtn  = els.modeArea.querySelector('#os-done');
+  const doneBtn = els.modeArea.querySelector('#os-done');
   const feedback = els.modeArea.querySelector('#os-feedback');
 
   const setFeedback = (kind, text) => {
@@ -112,8 +112,8 @@ export function setupOralSegment(word, els) {
 
   const finish = (finalCorrect) => {
     _finished = true;
-    tapBtn.disabled   = true;
-    doneBtn.disabled  = true;
+    tapBtn.disabled = true;
+    doneBtn.disabled = true;
     resetBtn.disabled = true;
 
     _revealAnswer(word, dotsEl);
@@ -127,9 +127,13 @@ export function setupOralSegment(word, els) {
     nextBtn.setAttribute('aria-label', 'Next word');
     wrap.appendChild(nextBtn);
     els.modeArea.querySelector('.oral-segment')?.appendChild(wrap);
-    nextBtn.addEventListener('click', () => {
-      els.onResult(finalCorrect, Date.now() - _startTime);
-    }, { once: true });
+    nextBtn.addEventListener(
+      'click',
+      () => {
+        els.onResult(finalCorrect, Date.now() - _startTime);
+      },
+      { once: true },
+    );
     nextBtn.focus();
   };
 
@@ -149,20 +153,20 @@ export function setupOralSegment(word, els) {
       resetDots();
       setTimeout(() => audio.speakWordStretched(word), 300);
     } else {
-      setFeedback('reveal', 'Good try! Listen — let\'s tap it together.');
+      setFeedback('reveal', "Good try! Listen — let's tap it together.");
       finish(false);
     }
   });
 
   if (els.btnCheck) els.btnCheck.style.display = 'none';
   if (els.btnSayIt) els.btnSayIt.style.display = '';
-  if (els.btnSkip)  els.btnSkip.style.display  = '';
+  if (els.btnSkip) els.btnSkip.style.display = '';
 
   // Natural rate first (recognise the word), then stretched (hear every
   // phoneme as a separable beat) — the same double-pass Segment It uses.
   setTimeout(async () => {
     await audio.speakWord(word.word);
-    await new Promise(r => setTimeout(r, 350));
+    await new Promise((r) => setTimeout(r, 350));
     await audio.speakWordStretched(word);
   }, 400);
 }
@@ -193,23 +197,28 @@ function _revealAnswer(word, dotsEl) {
         if (!dots[i].isConnected) return; // mode was torn down mid-reveal
         dots[i].classList.add('sound-dot--lit');
         const prevGrapheme = i > 0 ? word.graphemes[i - 1] : null;
-        await audio.speakPhoneme(word.graphemes[i], word.types[i], { word: word.word, prevGrapheme });
-        await new Promise(r => setTimeout(r, 250));
+        await audio.speakPhoneme(word.graphemes[i], word.types[i], {
+          word: word.word,
+          prevGrapheme,
+        });
+        await new Promise((r) => setTimeout(r, 250));
       }
     } else {
-      dots.forEach(d => d.classList.add('sound-dot--lit'));
+      dots.forEach((d) => d.classList.add('sound-dot--lit'));
       await audio.speakWordStretched(word);
     }
-    await new Promise(r => setTimeout(r, 300));
+    await new Promise((r) => setTimeout(r, 300));
     if (dots[0]?.isConnected) audio.speakWord(word.word);
   }, 400);
 }
 
-export function getCurrentWord() { return _currentWord; }
+export function getCurrentWord() {
+  return _currentWord;
+}
 
 export function cleanup() {
-  _currentWord   = null;
-  _taps          = 0;
+  _currentWord = null;
+  _taps = 0;
   _firstTryWrong = false;
-  _finished      = false;
+  _finished = false;
 }

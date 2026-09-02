@@ -54,7 +54,9 @@ export function setupHearChoose(word, els) {
     grid,
     onResult: els.onResult,
     retryHint: 'Listen one more time, then pick the word.',
-    onRetry: () => { setTimeout(() => audio.speakWord(word.word), 200); },
+    onRetry: () => {
+      setTimeout(() => audio.speakWord(word.word), 200);
+    },
     onReveal: () => _revealAnswer(word, els),
   });
 

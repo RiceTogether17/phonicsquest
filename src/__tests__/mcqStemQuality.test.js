@@ -50,15 +50,20 @@ describe('MCQ stem quality — high diversity per level', () => {
   // If a future generator change drops below these floors, that's a real
   // diversity regression worth catching.
   const MIN_UNIQUE_RATIO = {
-    P1: 0.80, P2: 0.90, P3: 0.90, P4: 0.90, P5: 0.90, P6: 0.90,
+    P1: 0.8,
+    P2: 0.9,
+    P3: 0.9,
+    P4: 0.9,
+    P5: 0.9,
+    P6: 0.9,
   };
 
   it('every grammar MCQ level has enough unique stems', () => {
     for (const level of GRAMMAR_MCQ_LEVELS) {
       const items = GRAMMAR_MCQ_ITEMS[level] || [];
-      const unique = new Set(items.map(it => it.q.trim().toLowerCase()));
+      const unique = new Set(items.map((it) => it.q.trim().toLowerCase()));
       const ratio = unique.size / items.length;
-      const floor = MIN_UNIQUE_RATIO[level] ?? 0.90;
+      const floor = MIN_UNIQUE_RATIO[level] ?? 0.9;
       expect(
         ratio,
         `${level}: only ${unique.size}/${items.length} unique stems (floor ${floor})`,
@@ -71,12 +76,12 @@ describe('MCQ stem quality — high diversity per level', () => {
     // hit ≥90% across every level. Real regression if this drops.
     for (const level of VOCAB_MCQ_LEVELS) {
       const items = VOCAB_MCQ_ITEMS[level] || [];
-      const unique = new Set(items.map(it => it.q.trim().toLowerCase()));
+      const unique = new Set(items.map((it) => it.q.trim().toLowerCase()));
       const ratio = unique.size / items.length;
       expect(
         ratio,
         `${level}: only ${unique.size}/${items.length} unique stems`,
-      ).toBeGreaterThanOrEqual(0.90);
+      ).toBeGreaterThanOrEqual(0.9);
     }
   });
 });
@@ -87,10 +92,17 @@ describe('MCQ stem quality — proper-noun capitalization', () => {
     // lowercase generic starters after it. After decorateStem's removal
     // most stems no longer have a fronted clause, but the rule still
     // applies to any that remain.
-    const tagItems = GRAMMAR_MCQ_ITEMS.P3.filter(it => it.category === 'tagQuestions');
+    const tagItems = GRAMMAR_MCQ_ITEMS.P3.filter((it) => it.category === 'tagQuestions');
     expect(tagItems.length).toBeGreaterThan(0);
-    const offenders = tagItems.filter(it => /,\s+(You|They|She|He|We|It|The|This|That|These|Those|Can|Could|Will|Would|Must|May|Should|Is|Are|Was|Were|Do|Does|Did|Have|Has|Had)\s/.test(it.q));
-    expect(offenders.map(it => it.q), 'capital pronouns/articles after comma').toEqual([]);
+    const offenders = tagItems.filter((it) =>
+      /,\s+(You|They|She|He|We|It|The|This|That|These|Those|Can|Could|Will|Would|Must|May|Should|Is|Are|Was|Were|Do|Does|Did|Have|Has|Had)\s/.test(
+        it.q,
+      ),
+    );
+    expect(
+      offenders.map((it) => it.q),
+      'capital pronouns/articles after comma',
+    ).toEqual([]);
   });
 
   it('proper nouns stay capitalised wherever they appear in the stem', () => {
@@ -99,14 +111,15 @@ describe('MCQ stem quality — proper-noun capitalization', () => {
     // initial, mid-sentence, or follows dialog punctuation.
     const NAMES = ['Tom', 'Mei', 'Sara', 'Tim', 'Jenny'];
     for (const name of NAMES) {
-      const items = GRAMMAR_MCQ_ITEMS.P3.filter(it => it.q.includes(name));
+      const items = GRAMMAR_MCQ_ITEMS.P3.filter((it) => it.q.includes(name));
       for (const it of items) {
-        expect(it.q, `"${name}" should stay capitalised in: ${it.q}`)
-          .not.toMatch(new RegExp('\\b' + name.toLowerCase() + '\\b'));
+        expect(it.q, `"${name}" should stay capitalised in: ${it.q}`).not.toMatch(
+          new RegExp('\\b' + name.toLowerCase() + '\\b'),
+        );
       }
     }
     // At least one level must contain some named items so the loop isn't vacuous
-    const anyNamed = GRAMMAR_MCQ_ITEMS.P3.filter(it => NAMES.some(n => it.q.includes(n)));
+    const anyNamed = GRAMMAR_MCQ_ITEMS.P3.filter((it) => NAMES.some((n) => it.q.includes(n)));
     expect(anyNamed.length).toBeGreaterThan(0);
   });
 });

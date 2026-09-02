@@ -20,12 +20,12 @@
  */
 
 const STORAGE_KEY = 'pq_bedtime_enabled';
-const BODY_CLASS  = 'bedtime-on';
-const HTML_ATTR   = 'data-bedtime';
+const BODY_CLASS = 'bedtime-on';
+const HTML_ATTR = 'data-bedtime';
 
 /** Bedtime starts at 19:00 (7 pm) and runs until 06:00 the next morning. */
 const BEDTIME_START_HOUR = 19;
-const BEDTIME_END_HOUR   = 6;
+const BEDTIME_END_HOUR = 6;
 
 /**
  * Is the given Date inside the bedtime window? Wraps across midnight.
@@ -58,7 +58,11 @@ export function isBedtimeActive() {
  */
 export function setBedtimeEnabled(enabled) {
   const value = !!enabled;
-  try { localStorage.setItem(STORAGE_KEY, value ? '1' : '0'); } catch (_) { /* ignore */ }
+  try {
+    localStorage.setItem(STORAGE_KEY, value ? '1' : '0');
+  } catch (_) {
+    /* ignore */
+  }
   applyBedtimeStateToDom(value);
 }
 
@@ -92,4 +96,10 @@ export function getBedtimeStatus(now = new Date()) {
   return { active, inWindow, suggested: inWindow && !active };
 }
 
-export const __TEST__ = { STORAGE_KEY, BODY_CLASS, HTML_ATTR, BEDTIME_START_HOUR, BEDTIME_END_HOUR };
+export const __TEST__ = {
+  STORAGE_KEY,
+  BODY_CLASS,
+  HTML_ATTR,
+  BEDTIME_START_HOUR,
+  BEDTIME_END_HOUR,
+};

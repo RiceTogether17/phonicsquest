@@ -12,13 +12,20 @@ beforeAll(async () => {
     speak: () => {},
   };
 
-  ({ getSentenceForgeCategoriesByLevel, getScoreboardStats } = await import('../modes/sentenceForge.js'));
+  ({ getSentenceForgeCategoriesByLevel, getScoreboardStats } =
+    await import('../modes/sentenceForge.js'));
 });
 
 describe('Sentence Forge category coverage', () => {
   it('shows new sentence categories in each level selector bucket', () => {
     const categoryMap = getSentenceForgeCategoriesByLevel(allSentences);
-    const required = ['connector_clue', 'comparison_structure', 'modal_order', 'tense_clue', 'preposition_clue'];
+    const required = [
+      'connector_clue',
+      'comparison_structure',
+      'modal_order',
+      'tense_clue',
+      'preposition_clue',
+    ];
 
     for (let lv = 1; lv <= 6; lv++) {
       for (const key of required) {

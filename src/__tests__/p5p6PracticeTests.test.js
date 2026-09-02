@@ -84,7 +84,7 @@ describe('SITUATIONAL_WRITING_PROMPTS data bank', () => {
   });
 
   it('ids are unique when content exists', () => {
-    const ids = SITUATIONAL_WRITING_PROMPTS.map(p => p.id);
+    const ids = SITUATIONAL_WRITING_PROMPTS.map((p) => p.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 

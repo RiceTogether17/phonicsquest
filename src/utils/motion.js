@@ -12,7 +12,9 @@ import { store } from '../modules/store.js';
 /** True when large/decorative motion should be skipped or shortened. */
 export function prefersReducedMotion() {
   if (store.get('reducedMotion')) return true;
-  return typeof window !== 'undefined'
-    && typeof window.matchMedia === 'function'
-    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
 }

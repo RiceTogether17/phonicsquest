@@ -50,7 +50,11 @@ export function checkReturnEvents(handlers = {}) {
   }
 
   const daysAway = gamification.getDaysAway();
-  if (daysAway >= COMEBACK_MIN_DAYS && daysAway <= COMEBACK_MAX_DAYS && !_shownToday('comebackShownAt')) {
+  if (
+    daysAway >= COMEBACK_MIN_DAYS &&
+    daysAway <= COMEBACK_MAX_DAYS &&
+    !_shownToday('comebackShownAt')
+  ) {
     store.set('comebackShownAt', new Date().toISOString());
     setTimeout(() => showComebackModal(daysAway, handlers), MODAL_DELAY_MS);
     return;
@@ -58,10 +62,14 @@ export function checkReturnEvents(handlers = {}) {
 
   if (shouldShowWeeklyRecap()) {
     const stats = gamification.getWeeklyStats();
-    setTimeout(() => showWeeklyRecap({
-      stats,
-      onClose: () => checkBackupReminder(handlers),
-    }), MODAL_DELAY_MS);
+    setTimeout(
+      () =>
+        showWeeklyRecap({
+          stats,
+          onClose: () => checkBackupReminder(handlers),
+        }),
+      MODAL_DELAY_MS,
+    );
     return;
   }
 
@@ -94,10 +102,10 @@ function _makeModal(id, ariaLabel) {
  * @param {ReturnEventHandlers} [handlers]
  */
 export function showComebackModal(daysAway, handlers = {}) {
-  const profile  = getActiveProfile();
-  const name     = profile?.name?.split(' ')[0] || 'there';
+  const profile = getActiveProfile();
+  const name = profile?.name?.split(' ')[0] || 'there';
   const dayLabel = daysAway === 1 ? 'yesterday' : `${daysAway} days ago`;
-  const streak   = store.get('streak') || 0;
+  const streak = store.get('streak') || 0;
 
   const modal = _makeModal('modal-comeback', 'Welcome back');
   modal.innerHTML = html`
@@ -123,7 +131,10 @@ export function showComebackModal(daysAway, handlers = {}) {
     checkBackupReminder(handlers);
   });
 
-  setTimeout(() => /** @type {HTMLElement|null} */ (modal.querySelector('#cb-warm-up'))?.focus(), 100);
+  setTimeout(
+    () => /** @type {HTMLElement|null} */ (modal.querySelector('#cb-warm-up'))?.focus(),
+    100,
+  );
 }
 
 /**
@@ -151,7 +162,7 @@ export function checkBackupReminder(handlers = {}) {
  * @param {ReturnEventHandlers} [handlers]
  */
 export function showBackupReminderModal(handlers = {}) {
-  const profile   = getActiveProfile();
+  const profile = getActiveProfile();
   const wordCount = Object.keys(store.get('wordStats') || {}).length;
 
   const modal = _makeModal('modal-backup-reminder', 'Backup your progress');
@@ -179,5 +190,8 @@ export function showBackupReminderModal(handlers = {}) {
   });
   modal.querySelector('#br-dismiss-btn')?.addEventListener('click', () => modal.remove());
 
-  setTimeout(() => /** @type {HTMLElement|null} */ (modal.querySelector('#br-export-btn'))?.focus(), 100);
+  setTimeout(
+    () => /** @type {HTMLElement|null} */ (modal.querySelector('#br-export-btn'))?.focus(),
+    100,
+  );
 }

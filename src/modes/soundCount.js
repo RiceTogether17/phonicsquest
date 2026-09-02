@@ -21,7 +21,7 @@ import { store } from '../modules/store.js';
 import { createChoiceRound } from './choiceRound.js';
 
 let currentWord = null;
-let round       = null;
+let round = null;
 
 /**
  * @param {import('../data/words.js').Word} word
@@ -38,23 +38,23 @@ export function setupSoundCount(word, els) {
   els.modeInstruction.textContent = 'How many sounds do you hear?';
 
   const correctCount = word.phonemes.length;
-  const choices      = _getCountChoices(correctCount);
+  const choices = _getCountChoices(correctCount);
 
   els.modeArea.innerHTML = '<div class="choice-grid choice-grid--count"></div>';
   const grid = els.modeArea.querySelector('.choice-grid');
 
   for (const count of choices) {
     const btn = document.createElement('button');
-    btn.className        = 'choice-btn choice-btn--count';
-    btn.dataset.correct  = String(count === correctCount);
+    btn.className = 'choice-btn choice-btn--count';
+    btn.dataset.correct = String(count === correctCount);
     btn.setAttribute('aria-label', `${count} sound${count !== 1 ? 's' : ''}`);
 
     const numEl = document.createElement('span');
-    numEl.className   = 'count-number';
+    numEl.className = 'count-number';
     numEl.textContent = count;
 
     const dotsEl = document.createElement('span');
-    dotsEl.className   = 'count-dots';
+    dotsEl.className = 'count-dots';
     dotsEl.textContent = '●'.repeat(count);
 
     btn.appendChild(numEl);
@@ -79,7 +79,7 @@ export function setupSoundCount(word, els) {
 
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = '';
-  els.btnSkip.style.display  = '';
+  els.btnSkip.style.display = '';
 
   setTimeout(() => {
     if (store.get('stretchedSpeech')) audio.speakWordStretched(word);
@@ -114,9 +114,11 @@ function _revealAnswer(word, els) {
   }, 500);
 }
 
-export function getCurrentWord() { return currentWord; }
+export function getCurrentWord() {
+  return currentWord;
+}
 
 export function cleanup() {
   currentWord = null;
-  round       = null;
+  round = null;
 }

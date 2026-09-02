@@ -33,7 +33,14 @@ import { cancelChoicePreviews } from '../components/phonemeChoice.js';
  * @param {() => void} [opts.onReveal] mode-specific reveal (word animation, phoneme tiles, audio)
  * @returns {{ handleTap: (isCorrect: boolean, btn: HTMLButtonElement) => void, isDone: () => boolean }}
  */
-export function createChoiceRound({ modeArea, grid, onResult, retryHint = '', onRetry = null, onReveal = null }) {
+export function createChoiceRound({
+  modeArea,
+  grid,
+  onResult,
+  retryHint = '',
+  onRetry = null,
+  onReveal = null,
+}) {
   const startTime = Date.now();
   let firstTryWrong = false;
   let finished = false;
@@ -72,7 +79,7 @@ export function createChoiceRound({ modeArea, grid, onResult, retryHint = '', on
 
   function finish(finalCorrect) {
     finished = true;
-    grid.querySelectorAll('.choice-btn').forEach(b => {
+    grid.querySelectorAll('.choice-btn').forEach((b) => {
       b.disabled = true;
       if (b.dataset.correct === 'true') markBtn(b, true);
     });
@@ -88,9 +95,13 @@ export function createChoiceRound({ modeArea, grid, onResult, retryHint = '', on
     nextBtn.setAttribute('aria-label', 'Next word');
     wrap.appendChild(nextBtn);
     modeArea.appendChild(wrap);
-    nextBtn.addEventListener('click', () => {
-      onResult(finalCorrect, Date.now() - startTime);
-    }, { once: true });
+    nextBtn.addEventListener(
+      'click',
+      () => {
+        onResult(finalCorrect, Date.now() - startTime);
+      },
+      { once: true },
+    );
     nextBtn.focus();
   }
 

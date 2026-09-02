@@ -14,8 +14,8 @@ describe('PSLE-style editing data', () => {
   it('has at least 1 spelling and 5 grammar targets per passage', () => {
     for (const passages of Object.values(editingPassages)) {
       for (const p of passages) {
-        const grammar = p.errors.filter(e => e.type === 'grammar').length;
-        const spelling = p.errors.filter(e => e.type === 'spelling').length;
+        const grammar = p.errors.filter((e) => e.type === 'grammar').length;
+        const spelling = p.errors.filter((e) => e.type === 'spelling').length;
         expect(grammar).toBeGreaterThanOrEqual(5);
         expect(spelling).toBeGreaterThanOrEqual(1);
       }

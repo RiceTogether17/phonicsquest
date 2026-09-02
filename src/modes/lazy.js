@@ -24,7 +24,11 @@ export function lazyModule(loader) {
     /** Load (or return the cached) module namespace. */
     load() {
       if (mod) return Promise.resolve(mod);
-      if (!pending) pending = loader().then((m) => { mod = m; return m; });
+      if (!pending)
+        pending = loader().then((m) => {
+          mod = m;
+          return m;
+        });
       return pending;
     },
     /**
@@ -32,6 +36,8 @@ export function lazyModule(loader) {
      * Use for cleanup paths: a module that was never opened has nothing to tear
      * down, so `mod.get()?.cleanupX()` is a safe no-op.
      */
-    get() { return mod; },
+    get() {
+      return mod;
+    },
   };
 }

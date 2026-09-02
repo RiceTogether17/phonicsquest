@@ -43,7 +43,11 @@ import { buildWordWorkout } from './wordWorkout.js';
 export function buildDailyChallengeSession() {
   const words = getDailyChallengeWords();
   if (!words?.length) {
-    return { ok: false, message: 'No challenge available today — try again tomorrow.', tone: 'info' };
+    return {
+      ok: false,
+      message: 'No challenge available today — try again tomorrow.',
+      tone: 'info',
+    };
   }
   return { ok: true, words, message: "Today's 5 words – go! ⚡", tone: 'info' };
 }
@@ -66,9 +70,8 @@ export function buildReviewSession(profile) {
 
   // Say plainly that the rest is deferred, not lost — a child who sees
   // "12 due" and gets 10 should know the other two are safe.
-  const overflow = totalDue > dueWords.length
-    ? ` (${totalDue - dueWords.length} more saved for tomorrow)`
-    : '';
+  const overflow =
+    totalDue > dueWords.length ? ` (${totalDue - dueWords.length} more saved for tomorrow)` : '';
 
   return {
     ok: true,
@@ -98,7 +101,7 @@ export function buildWordWorkoutSession(word = null) {
 
   const rounds = buildWordWorkout(target);
   if (!rounds.length) {
-    return { ok: false, message: 'That word doesn\'t have a workout ladder yet.', tone: 'info' };
+    return { ok: false, message: "That word doesn't have a workout ladder yet.", tone: 'info' };
   }
 
   return {
@@ -124,19 +127,25 @@ export function completionFeedback(type, ctx = {}) {
     // implying the session didn't count.
     return bonusXp > 0
       ? {
-        message: `Daily Challenge done! +${bonusXp} bonus XP!`,
-        tone: 'success', celebrate: true, sfx: 'levelUp',
-      }
+          message: `Daily Challenge done! +${bonusXp} bonus XP!`,
+          tone: 'success',
+          celebrate: true,
+          sfx: 'levelUp',
+        }
       : {
-        message: 'Daily Challenge already claimed today!',
-        tone: 'info', celebrate: false, sfx: null,
-      };
+          message: 'Daily Challenge already claimed today!',
+          tone: 'info',
+          celebrate: false,
+          sfx: null,
+        };
   }
 
   if (type === 'review') {
     return {
       message: 'Review session complete! Great revision! 🔄',
-      tone: 'success', celebrate: false, sfx: 'correct',
+      tone: 'success',
+      celebrate: false,
+      sfx: 'correct',
     };
   }
 
@@ -144,7 +153,9 @@ export function completionFeedback(type, ctx = {}) {
     const word = ctx.workoutWord || 'that word';
     return {
       message: `Workout done! You took “${word}” through every angle. 🎽`,
-      tone: 'success', celebrate: false, sfx: 'correct',
+      tone: 'success',
+      celebrate: false,
+      sfx: 'correct',
     };
   }
 

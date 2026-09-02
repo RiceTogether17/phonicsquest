@@ -52,7 +52,8 @@ describe('storyRecording module', () => {
 
   describe('fluency history', () => {
     it('saves and retrieves fluency attempts', async () => {
-      const { saveFluencyAttempt, getFluencyHistory, getBestWcpm } = await import('../src/modules/storyRecording.js');
+      const { saveFluencyAttempt, getFluencyHistory, getBestWcpm } =
+        await import('../src/modules/storyRecording.js');
 
       saveFluencyAttempt({ storyId: 'test-1', wcpm: 45, durationSec: 30, wordCount: 22 });
       saveFluencyAttempt({ storyId: 'test-1', wcpm: 52, durationSec: 25, wordCount: 22 });
@@ -72,7 +73,8 @@ describe('storyRecording module', () => {
     });
 
     it('caps history at 5 entries per story', async () => {
-      const { saveFluencyAttempt, getFluencyHistory } = await import('../src/modules/storyRecording.js');
+      const { saveFluencyAttempt, getFluencyHistory } =
+        await import('../src/modules/storyRecording.js');
 
       for (let i = 0; i < 8; i++) {
         saveFluencyAttempt({ storyId: 's1', wcpm: 40 + i, durationSec: 30, wordCount: 20 });
@@ -88,7 +90,8 @@ describe('storyRecording module', () => {
 
   describe('recording lifecycle', () => {
     it('starts and stops recording', async () => {
-      const { startRecording, stopRecording, cleanupRecording } = await import('../src/modules/storyRecording.js');
+      const { startRecording, stopRecording, cleanupRecording } =
+        await import('../src/modules/storyRecording.js');
       cleanupRecording();
 
       const stateChanges = [];
@@ -125,7 +128,8 @@ describe('storyRecording module', () => {
     });
 
     it('deleteRecording resets state to idle', async () => {
-      const { startRecording, stopRecording, deleteRecording, getRecorderState, cleanupRecording } = await import('../src/modules/storyRecording.js');
+      const { startRecording, stopRecording, deleteRecording, getRecorderState, cleanupRecording } =
+        await import('../src/modules/storyRecording.js');
       cleanupRecording();
 
       await startRecording({ storyId: 'test-1' });
@@ -136,8 +140,13 @@ describe('storyRecording module', () => {
     });
 
     it('caps in-memory blobs, evicting the oldest takes first', async () => {
-      const { startRecording, stopRecording, getRecordingBlob, getLastRecordingId, cleanupRecording } =
-        await import('../src/modules/storyRecording.js');
+      const {
+        startRecording,
+        stopRecording,
+        getRecordingBlob,
+        getLastRecordingId,
+        cleanupRecording,
+      } = await import('../src/modules/storyRecording.js');
       cleanupRecording();
 
       const ids = [];
@@ -150,7 +159,7 @@ describe('storyRecording module', () => {
       // Oldest takes are gone, the most recent are retained.
       expect(getRecordingBlob(ids[0])).toBeFalsy();
       expect(getRecordingBlob(ids[ids.length - 1])).toBeTruthy();
-      const retained = ids.filter(id => getRecordingBlob(id));
+      const retained = ids.filter((id) => getRecordingBlob(id));
       expect(retained.length).toBeLessThanOrEqual(10);
       cleanupRecording();
     });

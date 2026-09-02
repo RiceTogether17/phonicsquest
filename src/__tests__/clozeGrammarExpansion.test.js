@@ -12,7 +12,15 @@ import { getActiveStrands } from '../data/spiralGrammar.js';
  *   3. No level contains advanced categories that belong to higher levels
  */
 
-const CORE_STRANDS_FROM_P1 = ['svAgreement', 'pronouns', 'articles', 'modals', 'tenseAwareness', 'simplePast', 'connectors'];
+const CORE_STRANDS_FROM_P1 = [
+  'svAgreement',
+  'pronouns',
+  'articles',
+  'modals',
+  'tenseAwareness',
+  'simplePast',
+  'connectors',
+];
 // Note: LATER_INTRODUCTIONS tracks strand *introduction* levels from the spiral
 // matrix. Some strands (like conditionals) may exist in passages at lower levels
 // as legacy data; these tests validate the new spiral additions, not legacy data.

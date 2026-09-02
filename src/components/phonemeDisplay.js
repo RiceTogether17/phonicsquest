@@ -12,32 +12,32 @@ import { DIACRITICS } from '../data/words.js';
  * same colour language rather than defining a second, drifting copy.
  */
 export const TYPE_CLASS = {
-  c:  'consonant',
+  c: 'consonant',
   sv: 'short-vowel',
   lv: 'long-vowel',
-  d:  'digraph',
+  d: 'digraph',
   bl: 'blend',
   se: 'silent-e',
   rc: 'r-control',
   dp: 'diphthong',
   sf: 'suffix',
-  p:  'suffix',                // prefix tile reuses the suffix tile colour
+  p: 'suffix', // prefix tile reuses the suffix tile colour
   soft_c: 'consonant',
   soft_g: 'consonant',
 };
 
 /** Human-readable labels for phoneme types (also used in aria-labels). */
 export const TYPE_LABEL = {
-  c:  'consonant',
+  c: 'consonant',
   sv: 'short vowel',
   lv: 'long vowel',
-  d:  'digraph',
+  d: 'digraph',
   bl: 'blend',
   se: 'silent e',
   rc: 'r-controlled',
   dp: 'diphthong',
   sf: 'suffix',
-  p:  'prefix',
+  p: 'prefix',
   soft_c: 'soft c (/s/)',
   soft_g: 'soft g (/j/)',
 };
@@ -71,8 +71,8 @@ export function renderPhonemes(word, container, opts = {}) {
 
   for (let i = 0; i < word.graphemes.length; i++) {
     const grapheme = word.graphemes[i];
-    const type     = word.types[i];
-    const isHidden   = hiddenIndices.includes(i);
+    const type = word.types[i];
+    const isHidden = hiddenIndices.includes(i);
     const isRevealed = revealedIndices === null || revealedIndices.includes(i);
 
     const isTarget = i === targetIndex;

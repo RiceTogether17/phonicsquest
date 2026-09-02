@@ -31,20 +31,32 @@ describe('Comprehension Cloze content integrity', () => {
 
   it('every passage has exactly 5 blanks (text tokens and blanks array agree)', () => {
     for (const p of getAllComprehensionClozePassages()) {
-      const tokens = [...p.text.matchAll(/\{\{(\d+)\}\}/g)].map(m => Number(m[1]));
+      const tokens = [...p.text.matchAll(/\{\{(\d+)\}\}/g)].map((m) => Number(m[1]));
       expect(tokens.length, `${p.id} text blank count`).toBe(5);
       expect(tokens, `${p.id} blank token order`).toEqual([1, 2, 3, 4, 5]);
       expect(p.blanks.length, `${p.id} blanks[] length`).toBe(5);
-      expect(p.blanks.map(b => b.num), `${p.id} blank.num order`).toEqual([1, 2, 3, 4, 5]);
+      expect(
+        p.blanks.map((b) => b.num),
+        `${p.id} blank.num order`,
+      ).toEqual([1, 2, 3, 4, 5]);
     }
   });
 
   it('every blank has answer + hint + explanation', () => {
     for (const p of getAllComprehensionClozePassages()) {
       for (const b of p.blanks) {
-        expect(typeof b.answer === 'string' && b.answer.trim().length, `${p.id} #${b.num} answer`).toBeGreaterThan(0);
-        expect(typeof b.hint === 'string' && b.hint.trim().length, `${p.id} #${b.num} hint`).toBeGreaterThan(0);
-        expect(typeof b.explanation === 'string' && b.explanation.trim().length, `${p.id} #${b.num} explanation`).toBeGreaterThan(0);
+        expect(
+          typeof b.answer === 'string' && b.answer.trim().length,
+          `${p.id} #${b.num} answer`,
+        ).toBeGreaterThan(0);
+        expect(
+          typeof b.hint === 'string' && b.hint.trim().length,
+          `${p.id} #${b.num} hint`,
+        ).toBeGreaterThan(0);
+        expect(
+          typeof b.explanation === 'string' && b.explanation.trim().length,
+          `${p.id} #${b.num} explanation`,
+        ).toBeGreaterThan(0);
       }
     }
   });
@@ -73,14 +85,16 @@ describe('Comprehension Cloze content integrity', () => {
   });
 
   it('no duplicate passage ids across all levels', () => {
-    const ids = getAllComprehensionClozePassages().map(p => p.id);
+    const ids = getAllComprehensionClozePassages().map((p) => p.id);
     expect(new Set(ids).size, 'unique ids').toBe(ids.length);
   });
 
   it('every blank.skill is one of the known tags', () => {
     for (const p of getAllComprehensionClozePassages()) {
       for (const b of p.blanks) {
-        expect(COMPREHENSION_CLOZE_SKILLS, `${p.id} #${b.num} skill "${b.skill}"`).toContain(b.skill);
+        expect(COMPREHENSION_CLOZE_SKILLS, `${p.id} #${b.num} skill "${b.skill}"`).toContain(
+          b.skill,
+        );
       }
     }
   });
@@ -152,8 +166,8 @@ describe('answer checking — _isAnswerCorrect', () => {
 describe('text splitting — _splitText', () => {
   it('separates text and blank segments in passage order', () => {
     const segs = __TEST__._splitText('a {{1}} b {{2}} c');
-    expect(segs.map(s => s.type)).toEqual(['text', 'blank', 'text', 'blank', 'text']);
-    expect(segs.filter(s => s.type === 'blank').map(s => s.num)).toEqual([1, 2]);
+    expect(segs.map((s) => s.type)).toEqual(['text', 'blank', 'text', 'blank', 'text']);
+    expect(segs.filter((s) => s.type === 'blank').map((s) => s.num)).toEqual([1, 2]);
   });
 
   it('returns a single text segment when there are no blanks', () => {
@@ -188,7 +202,7 @@ describe('Comprehension Cloze Quest — DOM rendering', () => {
     initComprehensionClozeQuest(root, {});
     const tiles = root.querySelectorAll('[data-level]');
     expect(tiles.length).toBe(COMPREHENSION_CLOZE_LEVELS.length);
-    expect([...tiles].map(b => b.dataset.level)).toEqual([...COMPREHENSION_CLOZE_LEVELS]);
+    expect([...tiles].map((b) => b.dataset.level)).toEqual([...COMPREHENSION_CLOZE_LEVELS]);
     cleanupComprehensionClozeQuest();
   });
 
@@ -221,10 +235,12 @@ describe('Comprehension Cloze Quest — DOM rendering', () => {
     root.querySelector('[data-level="P3"]').click();
     const passage = getComprehensionClozePassages('P3')[0];
     const inputs = root.querySelectorAll('.cc-quest__blank');
-    inputs.forEach((inp, i) => { inp.value = passage.blanks[i].answer.toUpperCase(); });
+    inputs.forEach((inp, i) => {
+      inp.value = passage.blanks[i].answer.toUpperCase();
+    });
     root.querySelector('[data-action="check"]').click();
     expect(root.querySelector('#cc-quest-score').textContent).toBe('Score: 5 / 5 correct');
-    inputs.forEach(inp => {
+    inputs.forEach((inp) => {
       expect(inp.classList.contains('cc-quest__blank--correct')).toBe(true);
       expect(inp.classList.contains('cc-quest__blank--wrong')).toBe(false);
     });
@@ -235,10 +251,12 @@ describe('Comprehension Cloze Quest — DOM rendering', () => {
     initComprehensionClozeQuest(root, {});
     root.querySelector('[data-level="P3"]').click();
     const inputs = root.querySelectorAll('.cc-quest__blank');
-    inputs.forEach(inp => { inp.value = 'definitelywrong'; });
+    inputs.forEach((inp) => {
+      inp.value = 'definitelywrong';
+    });
     root.querySelector('[data-action="check"]').click();
     expect(root.querySelector('#cc-quest-score').textContent).toBe('Score: 0 / 5 correct');
-    inputs.forEach(inp => {
+    inputs.forEach((inp) => {
       expect(inp.classList.contains('cc-quest__blank--correct')).toBe(false);
       expect(inp.classList.contains('cc-quest__blank--wrong')).toBe(true);
     });
@@ -250,11 +268,11 @@ describe('Comprehension Cloze Quest — DOM rendering', () => {
     root.querySelector('[data-level="P3"]').click();
     const passage = getComprehensionClozePassages('P3')[0];
     const inputs = root.querySelectorAll('.cc-quest__blank');
-    inputs[0].value = passage.blanks[0].answer;                                      // correct
-    inputs[1].value = 'wrong';                                                       // wrong
-    inputs[2].value = passage.blanks[2].answer.toUpperCase();                        // correct (uppercase)
-    inputs[3].value = '';                                                            // wrong (empty)
-    inputs[4].value = `   ${passage.blanks[4].answer}   `;                           // correct (trimmed)
+    inputs[0].value = passage.blanks[0].answer; // correct
+    inputs[1].value = 'wrong'; // wrong
+    inputs[2].value = passage.blanks[2].answer.toUpperCase(); // correct (uppercase)
+    inputs[3].value = ''; // wrong (empty)
+    inputs[4].value = `   ${passage.blanks[4].answer}   `; // correct (trimmed)
     root.querySelector('[data-action="check"]').click();
     expect(root.querySelector('#cc-quest-score').textContent).toBe('Score: 3 / 5 correct');
     cleanupComprehensionClozeQuest();
@@ -265,7 +283,9 @@ describe('Comprehension Cloze Quest — DOM rendering', () => {
     root.querySelector('[data-level="P3"]').click();
     const passage = getComprehensionClozePassages('P3')[0];
     const inputs = root.querySelectorAll('.cc-quest__blank');
-    inputs.forEach((inp, i) => { inp.value = passage.blanks[i].answer; });
+    inputs.forEach((inp, i) => {
+      inp.value = passage.blanks[i].answer;
+    });
     const evt = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
     inputs[0].dispatchEvent(evt);
     expect(root.querySelector('#cc-quest-score').textContent).toBe('Score: 5 / 5 correct');
@@ -313,7 +333,11 @@ describe('Comprehension Cloze Quest — DOM rendering', () => {
 
   it('the in-module Back button fires onClose', () => {
     let closed = false;
-    initComprehensionClozeQuest(root, { onClose: () => { closed = true; } });
+    initComprehensionClozeQuest(root, {
+      onClose: () => {
+        closed = true;
+      },
+    });
     root.querySelector('[data-action="back"]').click();
     expect(closed).toBe(true);
     cleanupComprehensionClozeQuest();

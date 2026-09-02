@@ -25,7 +25,7 @@ import {
 
 function _avgQuestScore(questKey) {
   const bucket = (store.get('questMastery') || {})[questKey] || {};
-  const scores = Object.values(bucket).filter(s => typeof s === 'number');
+  const scores = Object.values(bucket).filter((s) => typeof s === 'number');
   if (!scores.length) return null;
   return scores.reduce((a, b) => a + b, 0) / scores.length;
 }
@@ -43,35 +43,46 @@ function _clueAccuracyRaw(questKey) {
   return {
     accuracy: ((b.strong || 0) + (b.partial || 0) * 0.5) / total,
     attempted: total,
-    strong: b.strong || 0, partial: b.partial || 0, weak: b.weak || 0,
+    strong: b.strong || 0,
+    partial: b.partial || 0,
+    weak: b.weak || 0,
   };
 }
 
 function _weakestQuestSkill(questKey) {
   const bucket = (store.get('questMastery') || {})[questKey] || {};
   if (!Object.keys(bucket).length) return null;
-  let weakest = null, lowest = Infinity;
+  let weakest = null,
+    lowest = Infinity;
   for (const [skill, score] of Object.entries(bucket)) {
-    if (score < lowest) { lowest = score; weakest = skill; }
+    if (score < lowest) {
+      lowest = score;
+      weakest = skill;
+    }
   }
   return weakest ? { skill: weakest, score: lowest } : null;
 }
 
 function _weakestPhonicsGroup() {
   const gm = normalizeGroupMasteryMap(store.get('groupMastery') || {});
-  let weakest = null, lowest = Infinity;
+  let weakest = null,
+    lowest = Infinity;
   for (const g of SHORT_VOWEL_CANONICAL_GROUPS) {
     const s = gm[g];
-    if (typeof s === 'number' && s < lowest) { lowest = s; weakest = g; }
+    if (typeof s === 'number' && s < lowest) {
+      lowest = s;
+      weakest = g;
+    }
   }
   return weakest;
 }
 
 function _recentQuestAccuracy(questKey, n = 10) {
   const attempts = (store.get('questAttempts') || [])
-    .filter(a => a.quest === questKey).slice(0, n);
+    .filter((a) => a.quest === questKey)
+    .slice(0, n);
   if (attempts.length < 3) return null;
-  return attempts.filter(a => a.correct).length / attempts.length;
+  return attempts.filter((a) => a.correct).length / attempts.length;
 }
 
 function _interpretClueVsAnswer(clueAcc, answerAcc) {
@@ -99,24 +110,29 @@ export function getLearnerSummary() {
   const gm = normalizeGroupMasteryMap(store.get('groupMastery') || {});
   const learnerType = profile?.schoolLevel === 'primary' ? 'Primary' : 'Preschool';
 
-  const phonicsEntries = SHORT_VOWEL_CANONICAL_GROUPS
-    .map(g => ({ label: VOWEL_LABELS[g], score: gm[g] ?? null }))
-    .filter(e => e.score !== null);
+  const phonicsEntries = SHORT_VOWEL_CANONICAL_GROUPS.map((g) => ({
+    label: VOWEL_LABELS[g],
+    score: gm[g] ?? null,
+  })).filter((e) => e.score !== null);
 
   const sorted = [...phonicsEntries].sort((a, b) => b.score - a.score);
   const strongestPhonics = sorted[0];
-  const weakestPhonics   = sorted[sorted.length - 1];
+  const weakestPhonics = sorted[sorted.length - 1];
 
   const domains = [
-    { name: 'Grammar Cloze',    score: _avgQuestScore('clozeCastle') },
-    { name: 'Sentence Skills',  score: _avgQuestScore('sentenceForge') },
+    { name: 'Grammar Cloze', score: _avgQuestScore('clozeCastle') },
+    { name: 'Sentence Skills', score: _avgQuestScore('sentenceForge') },
     { name: 'Vocabulary Cloze', score: _avgQuestScore('wordVault') },
-  ].filter(d => d.score !== null).sort((a, b) => b.score - a.score);
+  ]
+    .filter((d) => d.score !== null)
+    .sort((a, b) => b.score - a.score);
 
-  const strongest = domains[0]?.name
-    || (strongestPhonics ? `Phonics (${strongestPhonics.label})` : 'Not enough data yet');
-  const weakest = domains[domains.length - 1]?.name
-    || (weakestPhonics ? `Phonics (${weakestPhonics.label})` : 'Not enough data yet');
+  const strongest =
+    domains[0]?.name ||
+    (strongestPhonics ? `Phonics (${strongestPhonics.label})` : 'Not enough data yet');
+  const weakest =
+    domains[domains.length - 1]?.name ||
+    (weakestPhonics ? `Phonics (${weakestPhonics.label})` : 'Not enough data yet');
 
   let currentFocus;
   if (profile?.schoolLevel === 'primary') {
@@ -140,7 +156,7 @@ export function getLearnerSummary() {
 
   return {
     learnerType,
-    profileName:   profile?.name   || 'Learner',
+    profileName: profile?.name || 'Learner',
     profileAvatar: profile?.avatar || '🦉',
     strongest,
     weakest,
@@ -155,8 +171,9 @@ export function getLearnerSummary() {
 export function getLiteracyDomains() {
   const gm = normalizeGroupMasteryMap(store.get('groupMastery') || {});
 
-  const phonicsScores = SHORT_VOWEL_CANONICAL_GROUPS
-    .map(g => gm[g]).filter(s => typeof s === 'number');
+  const phonicsScores = SHORT_VOWEL_CANONICAL_GROUPS.map((g) => gm[g]).filter(
+    (s) => typeof s === 'number',
+  );
   const phonicsScore = phonicsScores.length
     ? phonicsScores.reduce((a, b) => a + b, 0) / phonicsScores.length
     : null;
@@ -174,13 +191,55 @@ export function getLiteracyDomains() {
     : null;
 
   return [
-    { id: 'phonics',        label: 'Phonics / Decoding',  icon: '🔤', score: phonicsScore,                    color: '#3b82f6' },
-    { id: 'sentenceSkills', label: 'Sentence Skills',      icon: '🔨', score: _avgQuestScore('sentenceForge'), color: '#f97316' },
-    { id: 'grammarCloze',   label: 'Grammar Cloze',        icon: '🏰', score: _avgQuestScore('clozeCastle'),  color: '#a855f7' },
-    { id: 'vocabCloze',     label: 'Vocabulary Cloze',     icon: '🔑', score: _avgQuestScore('wordVault'),    color: '#0d9488' },
-    { id: 'editingQuest',   label: 'Editing Quest',        icon: '✏️', score: _avgQuestScore('editingQuest'), color: '#0ea5e9' },
-    { id: 'writingQuest',   label: 'Writing Quest',        icon: '📝', score: _avgQuestScore('writingQuest'), color: '#7c3aed' },
-    { id: 'clueDetection',  label: 'Clue Detection',       icon: '🔍', score: clueDetection,                  color: '#f59e0b' },
+    {
+      id: 'phonics',
+      label: 'Phonics / Decoding',
+      icon: '🔤',
+      score: phonicsScore,
+      color: '#3b82f6',
+    },
+    {
+      id: 'sentenceSkills',
+      label: 'Sentence Skills',
+      icon: '🔨',
+      score: _avgQuestScore('sentenceForge'),
+      color: '#f97316',
+    },
+    {
+      id: 'grammarCloze',
+      label: 'Grammar Cloze',
+      icon: '🏰',
+      score: _avgQuestScore('clozeCastle'),
+      color: '#a855f7',
+    },
+    {
+      id: 'vocabCloze',
+      label: 'Vocabulary Cloze',
+      icon: '🔑',
+      score: _avgQuestScore('wordVault'),
+      color: '#0d9488',
+    },
+    {
+      id: 'editingQuest',
+      label: 'Editing Quest',
+      icon: '✏️',
+      score: _avgQuestScore('editingQuest'),
+      color: '#0ea5e9',
+    },
+    {
+      id: 'writingQuest',
+      label: 'Writing Quest',
+      icon: '📝',
+      score: _avgQuestScore('writingQuest'),
+      color: '#7c3aed',
+    },
+    {
+      id: 'clueDetection',
+      label: 'Clue Detection',
+      icon: '🔍',
+      score: clueDetection,
+      color: '#f59e0b',
+    },
   ];
 }
 
@@ -195,7 +254,7 @@ export function getClueInsights() {
 
   const quests = [
     { key: 'clozeCastle', label: 'Cloze Castle', icon: '🏰' },
-    { key: 'wordVault',   label: 'Word Vault',   icon: '🔑' },
+    { key: 'wordVault', label: 'Word Vault', icon: '🔑' },
     { key: 'sentenceForge', label: 'Sentence Forge', icon: '🔨' },
     { key: 'editingQuest', label: 'Editing Quest', icon: '✏️' },
     { key: 'writingQuest', label: 'Writing Quest', icon: '📝' },
@@ -204,14 +263,16 @@ export function getClueInsights() {
   for (const { key, label, icon } of quests) {
     const raw = _clueAccuracyRaw(key);
     if (!raw) continue;
-    const ansAttempts = questAttempts.filter(a => a.quest === key);
-    const answerAcc = ansAttempts.length >= 3
-      ? ansAttempts.filter(a => a.correct).length / ansAttempts.length
-      : null;
+    const ansAttempts = questAttempts.filter((a) => a.quest === key);
+    const answerAcc =
+      ansAttempts.length >= 3
+        ? ansAttempts.filter((a) => a.correct).length / ansAttempts.length
+        : null;
     questInsights.push({
-      quest: label, icon,
+      quest: label,
+      icon,
       clueAttempted: raw.attempted,
-      clueAccuracy:  raw.accuracy,
+      clueAccuracy: raw.accuracy,
       answerAccuracy: answerAcc,
       interpretation: _interpretClueVsAnswer(raw.accuracy, answerAcc),
     });
@@ -257,24 +318,28 @@ export function getRecommendedActions() {
       actions.push({
         why: `${VOWEL_LABELS[weak]} decoding accuracy is ${pct}% — below the 65% target.`,
         target: `Phonics – ${VOWEL_LABELS[weak]}`,
-        ctaLabel: 'Practise Blend It!', ctaTarget: 'blend', ctaGroup: weak,
+        ctaLabel: 'Practise Blend It!',
+        ctaTarget: 'blend',
+        ctaGroup: weak,
       });
     }
 
-    const phonicsScores = SHORT_VOWEL_CANONICAL_GROUPS.map(g => gm[g] ?? 0);
+    const phonicsScores = SHORT_VOWEL_CANONICAL_GROUPS.map((g) => gm[g] ?? 0);
     const avg = phonicsScores.reduce((a, b) => a + b, 0) / phonicsScores.length;
     if (avg >= 0.6) {
       actions.push({
         why: 'Phonics foundation is building well. Sight words extend reading fluency.',
         target: 'Sight Words',
-        ctaLabel: 'Try Sight Words', ctaTarget: 'sight-words',
+        ctaLabel: 'Try Sight Words',
+        ctaTarget: 'sight-words',
       });
     }
 
     actions.push({
       why: 'Reading decodable stories reinforces all phonics skills in context.',
       target: 'Giri Stories',
-      ctaLabel: 'Read a Story', ctaTarget: 'stories',
+      ctaLabel: 'Read a Story',
+      ctaTarget: 'stories',
     });
   } else {
     // Primary: quest-focused
@@ -285,7 +350,8 @@ export function getRecommendedActions() {
       actions.push({
         why: `Grammar clue accuracy is ${pct}%.${ccWeak ? ` Weakest area: ${humaniseSkill(ccWeak.skill)}.` : ''}`,
         target: `Cloze Castle${ccWeak ? ` – ${humaniseSkill(ccWeak.skill)}` : ''}`,
-        ctaLabel: 'Practise Cloze Castle', ctaTarget: 'cloze-castle',
+        ctaLabel: 'Practise Cloze Castle',
+        ctaTarget: 'cloze-castle',
       });
     }
 
@@ -297,7 +363,8 @@ export function getRecommendedActions() {
           ? `Sentence skill "${humaniseSkill(sfWeak.skill)}" scores ${Math.round(sfWeak.score * 100)}% — needs practice.`
           : 'Recent sentence building accuracy is below target.',
         target: `Sentence Forge${sfWeak ? ` – ${humaniseSkill(sfWeak.skill)}` : ''}`,
-        ctaLabel: 'Try Sentence Forge', ctaTarget: 'sentence-forge',
+        ctaLabel: 'Try Sentence Forge',
+        ctaTarget: 'sentence-forge',
       });
     }
 
@@ -306,15 +373,26 @@ export function getRecommendedActions() {
       actions.push({
         why: `Vocabulary context clue accuracy is ${Math.round(wvRaw.accuracy * 100)}%.`,
         target: 'Word Vault – Context Clues',
-        ctaLabel: 'Practise Word Vault', ctaTarget: 'word-vault',
+        ctaLabel: 'Practise Word Vault',
+        ctaTarget: 'word-vault',
       });
     }
 
     // Fallback if no weaknesses found
     if (!actions.length) {
       actions.push(
-        { why: 'Keep grammar skills sharp with regular practice.', target: 'Cloze Castle', ctaLabel: 'Open Cloze Castle', ctaTarget: 'cloze-castle' },
-        { why: 'Consistent sentence structure practice builds academic writing.', target: 'Sentence Forge', ctaLabel: 'Open Sentence Forge', ctaTarget: 'sentence-forge' },
+        {
+          why: 'Keep grammar skills sharp with regular practice.',
+          target: 'Cloze Castle',
+          ctaLabel: 'Open Cloze Castle',
+          ctaTarget: 'cloze-castle',
+        },
+        {
+          why: 'Consistent sentence structure practice builds academic writing.',
+          target: 'Sentence Forge',
+          ctaLabel: 'Open Sentence Forge',
+          ctaTarget: 'sentence-forge',
+        },
       );
     }
   }
@@ -336,18 +414,21 @@ export function getRecentPatternInsights() {
   // Accuracy trend: last 7 days vs. prior 7 days
   const now = Date.now();
   const WEEK = 7 * 24 * 60 * 60 * 1000;
-  const recent = wordHistory.filter(h => h.timestamp && now - new Date(h.timestamp).getTime() < WEEK);
-  const prior  = wordHistory.filter(h => {
+  const recent = wordHistory.filter(
+    (h) => h.timestamp && now - new Date(h.timestamp).getTime() < WEEK,
+  );
+  const prior = wordHistory.filter((h) => {
     if (!h.timestamp) return false;
     const age = now - new Date(h.timestamp).getTime();
     return age >= WEEK && age < 2 * WEEK;
   });
 
   if (recent.length >= 5 && prior.length >= 5) {
-    const rAcc = recent.filter(h => h.correct).length / recent.length;
-    const pAcc = prior.filter(h => h.correct).length / prior.length;
-    if (rAcc > pAcc + 0.1)      insights.push('Accuracy has improved over the last 7 days');
-    else if (rAcc < pAcc - 0.1) insights.push('Accuracy has dipped recently — more practice will help');
+    const rAcc = recent.filter((h) => h.correct).length / recent.length;
+    const pAcc = prior.filter((h) => h.correct).length / prior.length;
+    if (rAcc > pAcc + 0.1) insights.push('Accuracy has improved over the last 7 days');
+    else if (rAcc < pAcc - 0.1)
+      insights.push('Accuracy has dipped recently — more practice will help');
   }
 
   // Weak clue types (≥3 attempts, <45% accuracy)
@@ -359,7 +440,7 @@ export function getRecentPatternInsights() {
   if (weakTypes.length > 0) insights.push(`Struggled with ${weakTypes[0]} clues recently`);
 
   // Sentence Forge coverage
-  if (questAttempts.filter(a => a.quest === 'sentenceForge').length < 3) {
+  if (questAttempts.filter((a) => a.quest === 'sentenceForge').length < 3) {
     insights.push('Not enough data yet in Sentence Forge');
   }
 
@@ -379,32 +460,32 @@ export function getRecentPatternInsights() {
 
 /** Generate the parent coaching card with real accumulated data. */
 export function getParentCoachingCard() {
-  const readiness    = getLearnerReadinessSummary();
-  const wordHistory  = store.get('wordHistory') || [];
-  const streak       = store.get('streak') || 0;
-  const now          = Date.now();
-  const WEEK_MS      = 7 * 24 * 3600 * 1000;
+  const readiness = getLearnerReadinessSummary();
+  const wordHistory = store.get('wordHistory') || [];
+  const streak = store.get('streak') || 0;
+  const now = Date.now();
+  const WEEK_MS = 7 * 24 * 3600 * 1000;
   const weekCutoffMs = now - WEEK_MS;
   const weekCutoffDate = new Date(weekCutoffMs).toISOString().slice(0, 10);
 
   // ── True weekly XP from rolling log ──────────────────────────────────────
   const xpLog = store.get('weeklyXpLog') || [];
   const weekXp = xpLog
-    .filter(e => e.date >= weekCutoffDate)
+    .filter((e) => e.date >= weekCutoffDate)
     .reduce((sum, e) => sum + (e.xp || 0), 0);
 
   // ── True weekly words practised from wordHistory timestamps ───────────────
   const recentWords = wordHistory.filter(
-    h => h.timestamp && new Date(h.timestamp).getTime() >= weekCutoffMs
+    (h) => h.timestamp && new Date(h.timestamp).getTime() >= weekCutoffMs,
   );
-  const weekWords = new Set(recentWords.map(h => h.word).filter(Boolean)).size;
+  const weekWords = new Set(recentWords.map((h) => h.word).filter(Boolean)).size;
 
   // ── Days active this week from questAttempts timestamps ───────────────────
   const questAttempts = store.get('questAttempts') || [];
   const activeDays = new Set(
     questAttempts
-      .filter(a => a.timestamp && new Date(a.timestamp).getTime() >= weekCutoffMs)
-      .map(a => new Date(a.timestamp).toDateString())
+      .filter((a) => a.timestamp && new Date(a.timestamp).getTime() >= weekCutoffMs)
+      .map((a) => new Date(a.timestamp).toDateString()),
   );
   // Also include today if lastPlayDate matches
   if (store.get('lastPlayDate') === new Date().toDateString()) {
@@ -417,10 +498,10 @@ export function getParentCoachingCard() {
 
   // ── Signal meta ───────────────────────────────────────────────────────────
   const SIGNAL_META = {
-    'on-track':       { label: 'On track',        emoji: '✅' },
-    'needs-practice': { label: 'Needs practice',  emoji: '⚠️' },
-    'at-risk':        { label: 'Needs attention',  emoji: '🔴' },
-    'no-data':        { label: 'Getting started', emoji: '📊' },
+    'on-track': { label: 'On track', emoji: '✅' },
+    'needs-practice': { label: 'Needs practice', emoji: '⚠️' },
+    'at-risk': { label: 'Needs attention', emoji: '🔴' },
+    'no-data': { label: 'Getting started', emoji: '📊' },
   };
   const sigMeta = SIGNAL_META[readiness.overallSignal] || SIGNAL_META['no-data'];
 
@@ -444,21 +525,23 @@ export function getParentCoachingCard() {
   let weeklyPriority, whyPriority;
   if (concernDomain) {
     weeklyPriority = `Practise ${concernDomain.icon} ${concernDomain.label} this week`;
-    whyPriority    = prog?.decision === 'consolidate'
-      ? 'Securing this area before moving on will build lasting confidence.'
-      : 'Regular short practice sessions will close the gap quickly.';
+    whyPriority =
+      prog?.decision === 'consolidate'
+        ? 'Securing this area before moving on will build lasting confidence.'
+        : 'Regular short practice sessions will close the gap quickly.';
   } else if (readiness.reviewsDue > 0) {
     weeklyPriority = `Complete ${readiness.reviewsDue} spaced review word${readiness.reviewsDue > 1 ? 's' : ''}`;
-    whyPriority    = 'Reviewing words at the right time is how long-term memory forms.';
+    whyPriority = 'Reviewing words at the right time is how long-term memory forms.';
   } else {
     weeklyPriority = 'Keep the daily habit going — all areas are in good shape';
-    whyPriority    = 'Consistency is the most powerful factor in language learning.';
+    whyPriority = 'Consistency is the most powerful factor in language learning.';
   }
 
   // ── Review note ───────────────────────────────────────────────────────────
-  const reviewNote = readiness.reviewsDue > 0
-    ? `${readiness.reviewsDue} word${readiness.reviewsDue > 1 ? 's' : ''} due for review`
-    : 'No review words due today';
+  const reviewNote =
+    readiness.reviewsDue > 0
+      ? `${readiness.reviewsDue} word${readiness.reviewsDue > 1 ? 's' : ''} due for review`
+      : 'No review words due today';
 
   return {
     // Weekly stats (all real-data)
@@ -470,12 +553,12 @@ export function getParentCoachingCard() {
 
     // Overall signal
     overallSignal: readiness.overallSignal,
-    signalLabel:   sigMeta.label,
-    signalEmoji:   sigMeta.emoji,
+    signalLabel: sigMeta.label,
+    signalEmoji: sigMeta.emoji,
 
     // Domains
-    domainsAtRisk:  readiness.domainsAtRisk,
-    needsPractice:  readiness.needsPractice,
+    domainsAtRisk: readiness.domainsAtRisk,
+    needsPractice: readiness.needsPractice,
 
     // Actionable coaching outputs
     mainStrength,
@@ -505,10 +588,10 @@ export function getStuckWords() {
     const s = wordStats[w.id];
     if (!s || s.attempts < 6) continue;
     const accuracy = s.correct / s.attempts;
-    if (accuracy < 0.40) {
+    if (accuracy < 0.4) {
       stuck.push({
-        word:     w.word,
-        group:    w.group,
+        word: w.word,
+        group: w.group,
         attempts: s.attempts,
         accuracy: Math.round(accuracy * 100),
       });

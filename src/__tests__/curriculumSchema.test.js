@@ -27,7 +27,10 @@ import {
 let MODES;
 beforeAll(async () => {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
   ({ MODES } = await import('../modes/index.js'));
 });
@@ -57,17 +60,37 @@ describe('curriculum data shape', () => {
 
   it('every PHASES entry has non-empty target sounds, sample words and sentences', () => {
     for (const phase of PHASES) {
-      expect(Array.isArray(phase.targetSounds), `phase ${phase.phase} targetSounds must be array`).toBe(true);
-      expect(phase.targetSounds.length, `phase ${phase.phase} targetSounds empty`).toBeGreaterThan(0);
+      expect(
+        Array.isArray(phase.targetSounds),
+        `phase ${phase.phase} targetSounds must be array`,
+      ).toBe(true);
+      expect(phase.targetSounds.length, `phase ${phase.phase} targetSounds empty`).toBeGreaterThan(
+        0,
+      );
 
-      expect(Array.isArray(phase.sampleWords), `phase ${phase.phase} sampleWords must be array`).toBe(true);
+      expect(
+        Array.isArray(phase.sampleWords),
+        `phase ${phase.phase} sampleWords must be array`,
+      ).toBe(true);
       expect(phase.sampleWords.length, `phase ${phase.phase} sampleWords empty`).toBeGreaterThan(0);
 
-      expect(Array.isArray(phase.sentenceExamples), `phase ${phase.phase} sentenceExamples must be array`).toBe(true);
-      expect(phase.sentenceExamples.length, `phase ${phase.phase} sentenceExamples empty`).toBeGreaterThan(0);
+      expect(
+        Array.isArray(phase.sentenceExamples),
+        `phase ${phase.phase} sentenceExamples must be array`,
+      ).toBe(true);
+      expect(
+        phase.sentenceExamples.length,
+        `phase ${phase.phase} sentenceExamples empty`,
+      ).toBeGreaterThan(0);
 
-      expect(Array.isArray(phase.recommendedModes), `phase ${phase.phase} recommendedModes must be array`).toBe(true);
-      expect(phase.recommendedModes.length, `phase ${phase.phase} recommendedModes empty`).toBeGreaterThan(0);
+      expect(
+        Array.isArray(phase.recommendedModes),
+        `phase ${phase.phase} recommendedModes must be array`,
+      ).toBe(true);
+      expect(
+        phase.recommendedModes.length,
+        `phase ${phase.phase} recommendedModes empty`,
+      ).toBeGreaterThan(0);
     }
   });
 
@@ -98,7 +121,7 @@ describe('curriculum data shape', () => {
       expect(PHASE_LABELS[phase.phase]).toBe(phase.label);
     }
     // PHASE_LABELS should not declare phases that PHASES doesn't.
-    const phaseNumbers = new Set(PHASES.map(p => p.phase));
+    const phaseNumbers = new Set(PHASES.map((p) => p.phase));
     for (const key of Object.keys(PHASE_LABELS)) {
       expect(phaseNumbers.has(Number(key)), `PHASE_LABELS has stray entry ${key}`).toBe(true);
     }
@@ -126,7 +149,9 @@ describe('curriculum stages', () => {
       expect(typeof stage.learningOutcome).toBe('string');
       expect(stage.learningOutcome.length).toBeGreaterThan(10);
 
-      expect(Array.isArray(stage.targetSounds), `${stage.id} targetSounds must be array`).toBe(true);
+      expect(Array.isArray(stage.targetSounds), `${stage.id} targetSounds must be array`).toBe(
+        true,
+      );
       expect(stage.targetSounds.length, `${stage.id} targetSounds empty`).toBeGreaterThan(0);
     }
   });
@@ -134,20 +159,32 @@ describe('curriculum stages', () => {
   it('every stage has at least 4 sample words and 1 decodable sentence', () => {
     for (const stage of CURRICULUM) {
       expect(Array.isArray(stage.sampleWords), `${stage.id} sampleWords must be array`).toBe(true);
-      expect(stage.sampleWords.length, `${stage.id} sampleWords too short`).toBeGreaterThanOrEqual(4);
-      expect(stage.sampleWords.every(w => typeof w === 'string' && w.length > 0)).toBe(true);
+      expect(stage.sampleWords.length, `${stage.id} sampleWords too short`).toBeGreaterThanOrEqual(
+        4,
+      );
+      expect(stage.sampleWords.every((w) => typeof w === 'string' && w.length > 0)).toBe(true);
 
-      expect(Array.isArray(stage.sentenceExamples), `${stage.id} sentenceExamples must be array`).toBe(true);
-      expect(stage.sentenceExamples.length, `${stage.id} sentenceExamples empty`).toBeGreaterThan(0);
-      expect(stage.sentenceExamples.every(s => typeof s === 'string' && s.length > 0)).toBe(true);
+      expect(
+        Array.isArray(stage.sentenceExamples),
+        `${stage.id} sentenceExamples must be array`,
+      ).toBe(true);
+      expect(stage.sentenceExamples.length, `${stage.id} sentenceExamples empty`).toBeGreaterThan(
+        0,
+      );
+      expect(stage.sentenceExamples.every((s) => typeof s === 'string' && s.length > 0)).toBe(true);
     }
   });
 
   it('every stage.recommendedModes entry refers to a registered mode', () => {
     const registered = new Set(Object.keys(MODES));
     for (const stage of CURRICULUM) {
-      expect(Array.isArray(stage.recommendedModes), `${stage.id} recommendedModes must be array`).toBe(true);
-      expect(stage.recommendedModes.length, `${stage.id} recommendedModes empty`).toBeGreaterThan(0);
+      expect(
+        Array.isArray(stage.recommendedModes),
+        `${stage.id} recommendedModes must be array`,
+      ).toBe(true);
+      expect(stage.recommendedModes.length, `${stage.id} recommendedModes empty`).toBeGreaterThan(
+        0,
+      );
       for (const modeKey of stage.recommendedModes) {
         expect(
           registered.has(modeKey),
@@ -168,14 +205,17 @@ describe('curriculum stages', () => {
   });
 
   it('stage ids are unique', () => {
-    const ids = CURRICULUM.map(s => s.id);
+    const ids = CURRICULUM.map((s) => s.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
   it('every stage.phase exists in PHASES', () => {
-    const phaseNumbers = new Set(PHASES.map(p => p.phase));
+    const phaseNumbers = new Set(PHASES.map((p) => p.phase));
     for (const stage of CURRICULUM) {
-      expect(phaseNumbers.has(stage.phase), `Stage "${stage.id}" has unknown phase ${stage.phase}`).toBe(true);
+      expect(
+        phaseNumbers.has(stage.phase),
+        `Stage "${stage.id}" has unknown phase ${stage.phase}`,
+      ).toBe(true);
     }
   });
 
@@ -201,11 +241,13 @@ describe('curriculum lookup helpers', () => {
   it('getStagesInPhase returns only stages in that phase', () => {
     const phase1Stages = getStagesInPhase(1);
     expect(phase1Stages.length).toBeGreaterThan(0);
-    expect(phase1Stages.every(s => s.phase === 1)).toBe(true);
+    expect(phase1Stages.every((s) => s.phase === 1)).toBe(true);
   });
 
   it('DEFAULT_MASTERY_CRITERIA is exported and immutable', () => {
     expect(DEFAULT_MASTERY_CRITERIA.accuracy).toBeGreaterThan(0);
-    expect(() => { DEFAULT_MASTERY_CRITERIA.accuracy = 0.1; }).toThrow();
+    expect(() => {
+      DEFAULT_MASTERY_CRITERIA.accuracy = 0.1;
+    }).toThrow();
   });
 });

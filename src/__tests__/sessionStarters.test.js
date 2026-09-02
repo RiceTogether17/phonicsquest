@@ -15,11 +15,14 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 function stubAudioGlobals() {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
 }
 
-const fakeWords = n => Array.from({ length: n }, (_, i) => ({ id: `w${i}`, word: `w${i}` }));
+const fakeWords = (n) => Array.from({ length: n }, (_, i) => ({ id: `w${i}`, word: `w${i}` }));
 
 let starters, progressMod;
 beforeEach(async () => {
@@ -116,8 +119,15 @@ describe('review lane', () => {
 
 describe('word workout', () => {
   it('falls back to the most overdue review word', () => {
-    const spy = vi.spyOn(progressMod.progress, 'getReviewDueWords')
-      .mockReturnValue([{ id: 'cat', word: 'cat', graphemes: ['c', 'a', 't'], types: ['c', 'sv', 'c'], phonemes: ['/c/', '/a/', '/t/'] }]);
+    const spy = vi.spyOn(progressMod.progress, 'getReviewDueWords').mockReturnValue([
+      {
+        id: 'cat',
+        word: 'cat',
+        graphemes: ['c', 'a', 't'],
+        types: ['c', 'sv', 'c'],
+        phonemes: ['/c/', '/a/', '/t/'],
+      },
+    ]);
 
     const session = starters.buildWordWorkoutSession();
     expect(spy).toHaveBeenCalledWith({ cap: 1 });

@@ -14,7 +14,9 @@
  */
 import { test, expect } from '@playwright/test';
 
-test('a new child completes intake, the full placement diagnostic, and starts the first lesson', async ({ page }) => {
+test('a new child completes intake, the full placement diagnostic, and starts the first lesson', async ({
+  page,
+}) => {
   test.setTimeout(180_000);
   await page.goto('./');
 
@@ -31,7 +33,10 @@ test('a new child completes intake, the full placement diagnostic, and starts th
   // and the intake form has its own Next button.
   let sawResult = false;
   for (let step = 0; step < 120; step++) {
-    if (await page.locator('#pt-start-btn').count()) { sawResult = true; break; }
+    if (await page.locator('#pt-start-btn').count()) {
+      sawResult = true;
+      break;
+    }
 
     const intakeNext = page.locator('#pt-intake-next');
     if (await intakeNext.count()) {
@@ -88,10 +93,11 @@ test('a new child completes intake, the full placement diagnostic, and starts th
   // is one tap into their first assigned activity.
   await page.waitForTimeout(1500);
   const state = await page.evaluate(() => ({
-    activeScreens: [...document.querySelectorAll('.screen.active')].map(s => s.id),
-    modalOpen: [...document.querySelectorAll('.modal')].some(m =>
-      getComputedStyle(m).display !== 'none' && !m.hasAttribute('hidden')),
+    activeScreens: [...document.querySelectorAll('.screen.active')].map((s) => s.id),
+    modalOpen: [...document.querySelectorAll('.modal')].some(
+      (m) => getComputedStyle(m).display !== 'none' && !m.hasAttribute('hidden'),
+    ),
   }));
-  const leftHome = state.activeScreens.some(id => id !== 'screen-home');
+  const leftHome = state.activeScreens.some((id) => id !== 'screen-home');
   expect(leftHome || state.modalOpen, 'lesson CTA should open an activity').toBe(true);
 });

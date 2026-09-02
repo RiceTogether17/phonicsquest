@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { getStagesForMode } from '../src/modules/phonicsProgression.js';
 
 const CURRICULUM = [
-  { id: 'cvc-a',   group: 'cvc-a',   phase: 1, name: 'CVC – Short A' },
-  { id: 'cvc-i',   group: 'cvc-i',   phase: 1, name: 'CVC – Short I' },
-  { id: 'ccvc-a',  group: 'ccvc-a',  phase: 2, name: 'CCVC – Short A' },
-  { id: 'cvcc-a',  group: 'cvcc-a',  phase: 3, name: 'CVCC – Short A' },
+  { id: 'cvc-a', group: 'cvc-a', phase: 1, name: 'CVC – Short A' },
+  { id: 'cvc-i', group: 'cvc-i', phase: 1, name: 'CVC – Short I' },
+  { id: 'ccvc-a', group: 'ccvc-a', phase: 2, name: 'CCVC – Short A' },
+  { id: 'cvcc-a', group: 'cvcc-a', phase: 3, name: 'CVCC – Short A' },
   { id: 'digra-a', group: 'digra-a', phase: 4, name: 'Digraph A' },
 ];
 
@@ -19,18 +19,18 @@ const PHASES = [
 describe('getStagesForMode — filters CURRICULUM by mode-recommended phases', () => {
   it('returns only stages from phases that recommend the mode', () => {
     const stages = getStagesForMode('first', CURRICULUM, PHASES);
-    expect(stages.map(s => s.id)).toEqual(['cvc-a', 'cvc-i']);
+    expect(stages.map((s) => s.id)).toEqual(['cvc-a', 'cvc-i']);
   });
 
   it('includes every phase that lists the mode', () => {
     const stages = getStagesForMode('segment', CURRICULUM, PHASES);
-    const phases = Array.from(new Set(stages.map(s => s.phase))).sort();
+    const phases = Array.from(new Set(stages.map((s) => s.phase))).sort();
     expect(phases).toEqual([1, 2, 3, 4]);
   });
 
   it('respects per-phase recommendations exactly', () => {
     const stages = getStagesForMode('last', CURRICULUM, PHASES);
-    expect(stages.map(s => s.id)).toEqual(['cvcc-a']);
+    expect(stages.map((s) => s.id)).toEqual(['cvcc-a']);
   });
 
   it('falls back to the full curriculum when a mode is in no phase', () => {
@@ -51,7 +51,16 @@ describe('getStagesForMode — filters CURRICULUM by mode-recommended phases', (
 
 describe('integration — every phonemic-awareness mode gets a non-empty stage list', () => {
   it('first / last / middle / oralBlend / soundCount / hear / missing / segment all have stages', () => {
-    const PA_MODES = ['oralBlend', 'first', 'last', 'middle', 'soundCount', 'hear', 'missing', 'segment'];
+    const PA_MODES = [
+      'oralBlend',
+      'first',
+      'last',
+      'middle',
+      'soundCount',
+      'hear',
+      'missing',
+      'segment',
+    ];
     for (const mode of PA_MODES) {
       const stages = getStagesForMode(mode, CURRICULUM, PHASES);
       expect(stages.length).toBeGreaterThan(0);
@@ -63,7 +72,7 @@ describe('real curriculum — mode/phase coverage is complete and has no dead st
   async function phasesFor(mode) {
     const { CURRICULUM: C, PHASES: P } = await import('../src/data/curriculum.js');
     const stages = getStagesForMode(mode, C, P);
-    return [...new Set(stages.map(s => s.phase))].sort((a, b) => a - b);
+    return [...new Set(stages.map((s) => s.phase))].sort((a, b) => a - b);
   }
 
   it('both blending modes span every phase 1–10 (Blend It! and Listen & Blend match)', async () => {
@@ -107,8 +116,8 @@ describe('real curriculum — blending pickers drop the non-decodable sight stag
 
     const visibleGroups = (mode) =>
       getStagesForMode(mode, C, P)
-        .filter(s => !isStageHiddenForMode(s.group, mode))
-        .map(s => s.group);
+        .filter((s) => !isStageHiddenForMode(s.group, mode))
+        .map((s) => s.group);
 
     // Sight words can't be sounded out, so they must not appear in a blending
     // picker (they'd fall back to the general pool — a misleading dead stage).
@@ -124,9 +133,10 @@ describe('real curriculum — blending pickers drop the non-decodable sight stag
 
 describe('real curriculum — Last Sound surfaces beginner phases, not just CVCC', () => {
   it('Last Sound includes Phase 1 (CVC) so children can start on the easiest words', async () => {
-    const { CURRICULUM: REAL_CURRICULUM, PHASES: REAL_PHASES } = await import('../src/data/curriculum.js');
+    const { CURRICULUM: REAL_CURRICULUM, PHASES: REAL_PHASES } =
+      await import('../src/data/curriculum.js');
     const stages = getStagesForMode('last', REAL_CURRICULUM, REAL_PHASES);
-    const phases = Array.from(new Set(stages.map(s => s.phase))).sort((a, b) => a - b);
+    const phases = Array.from(new Set(stages.map((s) => s.phase))).sort((a, b) => a - b);
 
     // CVC (1) is the single-final-consonant sweet spot for last-sound practice;
     // CCVC (2), CVCC (3), Digraphs (4) and CCVCC (5) all also have a clear final

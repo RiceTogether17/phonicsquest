@@ -13,33 +13,62 @@ const { CURRICULUM } = await import('../data/curriculum.js');
 
 describe('hasInteriorVowel()', () => {
   it('accepts CVC and CCVC words with a medial vowel', () => {
-    expect(hasInteriorVowel({ word: 'cat',  graphemes: ['c','a','t'],    types: ['c','sv','c'] })).toBe(true);
-    expect(hasInteriorVowel({ word: 'rain', graphemes: ['r','ai','n'],   types: ['c','lv','c'] })).toBe(true);
-    expect(hasInteriorVowel({ word: 'stop', graphemes: ['s','t','o','p'], types: ['c','c','sv','c'] })).toBe(true);
+    expect(
+      hasInteriorVowel({ word: 'cat', graphemes: ['c', 'a', 't'], types: ['c', 'sv', 'c'] }),
+    ).toBe(true);
+    expect(
+      hasInteriorVowel({ word: 'rain', graphemes: ['r', 'ai', 'n'], types: ['c', 'lv', 'c'] }),
+    ).toBe(true);
+    expect(
+      hasInteriorVowel({
+        word: 'stop',
+        graphemes: ['s', 't', 'o', 'p'],
+        types: ['c', 'c', 'sv', 'c'],
+      }),
+    ).toBe(true);
   });
 
   it('rejects words whose vowel is the first or last sound', () => {
-    expect(hasInteriorVowel({ word: 'car', graphemes: ['c','ar'],    types: ['c','rc'] })).toBe(false);
-    expect(hasInteriorVowel({ word: 'boy', graphemes: ['b','oy'],    types: ['c','dp'] })).toBe(false);
-    expect(hasInteriorVowel({ word: 'ape', graphemes: ['a','p','e'], types: ['lv','c','se'] })).toBe(false);
-    expect(hasInteriorVowel({ word: 'zoo', graphemes: ['z','oo'],    types: ['c','lv'] })).toBe(false);
+    expect(hasInteriorVowel({ word: 'car', graphemes: ['c', 'ar'], types: ['c', 'rc'] })).toBe(
+      false,
+    );
+    expect(hasInteriorVowel({ word: 'boy', graphemes: ['b', 'oy'], types: ['c', 'dp'] })).toBe(
+      false,
+    );
+    expect(
+      hasInteriorVowel({ word: 'ape', graphemes: ['a', 'p', 'e'], types: ['lv', 'c', 'se'] }),
+    ).toBe(false);
+    expect(hasInteriorVowel({ word: 'zoo', graphemes: ['z', 'oo'], types: ['c', 'lv'] })).toBe(
+      false,
+    );
   });
 });
 
 describe('middle-sound word selection', () => {
-  const middleStages = CURRICULUM.filter(s => s.recommendedModes?.includes('middle'));
+  const middleStages = CURRICULUM.filter((s) => s.recommendedModes?.includes('middle'));
 
   it('every adaptive pool for mode "middle" contains only interior-vowel words', () => {
     for (const stage of middleStages) {
-      const pool = progress.getAdaptivePool(50, { mode: 'middle', group: stage.group, maxLevel: 9 });
-      const bad = pool.filter(w => !hasInteriorVowel(w));
-      expect(bad.map(w => `${stage.group}:${w.word}`), `stage ${stage.group}`).toEqual([]);
+      const pool = progress.getAdaptivePool(50, {
+        mode: 'middle',
+        group: stage.group,
+        maxLevel: 9,
+      });
+      const bad = pool.filter((w) => !hasInteriorVowel(w));
+      expect(
+        bad.map((w) => `${stage.group}:${w.word}`),
+        `stage ${stage.group}`,
+      ).toEqual([]);
     }
   });
 
   it('the filter never empties a stage that recommends the mode', () => {
     for (const stage of middleStages) {
-      const pool = progress.getAdaptivePool(50, { mode: 'middle', group: stage.group, maxLevel: 9 });
+      const pool = progress.getAdaptivePool(50, {
+        mode: 'middle',
+        group: stage.group,
+        maxLevel: 9,
+      });
       expect(pool.length, `stage ${stage.group}`).toBeGreaterThan(0);
     }
   });
@@ -47,7 +76,7 @@ describe('middle-sound word selection', () => {
   it('other modes still receive the full stage pool (no over-filtering)', () => {
     const pool = progress.getAdaptivePool(50, { mode: 'first', group: 'rc-ar-or', maxLevel: 9 });
     // "car"-type words (vowel last) are perfectly valid First Sound words.
-    expect(pool.some(w => !hasInteriorVowel(w))).toBe(true);
+    expect(pool.some((w) => !hasInteriorVowel(w))).toBe(true);
   });
 });
 
@@ -56,9 +85,18 @@ describe('middleSound fallback for replayed words without an interior vowel', ()
     // Exercise via the exported setup path indirectly: the fallback logic is
     // internal, so assert through the mode's rendered correct choice.
     globalThis.speechSynthesis = globalThis.speechSynthesis || {
-      getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+      getVoices: () => [],
+      addEventListener: () => {},
+      speak: () => {},
+      cancel: () => {},
     };
-    globalThis.SpeechSynthesisUtterance = globalThis.SpeechSynthesisUtterance || class { constructor(t){ this.text = t; } };
+    globalThis.SpeechSynthesisUtterance =
+      globalThis.SpeechSynthesisUtterance ||
+      class {
+        constructor(t) {
+          this.text = t;
+        }
+      };
     const { setupMiddleSound, cleanup } = await import('../modes/middleSound.js');
 
     document.body.innerHTML = `
@@ -80,8 +118,16 @@ describe('middleSound fallback for replayed words without an interior vowel', ()
     };
 
     // "ape": old fallback picked index 1 → the consonant 'p'.
-    const ape = { id: 'ape', word: 'ape', emoji: '🦍', group: 'silent-e', level: 3,
-      graphemes: ['a','p','e'], types: ['lv','c','se'], phonemes: ['a','p'] };
+    const ape = {
+      id: 'ape',
+      word: 'ape',
+      emoji: '🦍',
+      group: 'silent-e',
+      level: 3,
+      graphemes: ['a', 'p', 'e'],
+      types: ['lv', 'c', 'se'],
+      phonemes: ['a', 'p'],
+    };
     setupMiddleSound(ape, els);
 
     const correctBtn = els.modeArea.querySelector('[data-correct="true"]');

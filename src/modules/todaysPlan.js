@@ -57,9 +57,10 @@ export function getEarlyReadingPlan() {
     num: 1,
     icon: '🌟',
     title: "Giri's Review Lane",
-    detail: dueCount > 0
-      ? `${dueCount} word${dueCount === 1 ? '' : 's'} due · about ${reviewMins} min`
-      : 'All caught up — nice work!',
+    detail:
+      dueCount > 0
+        ? `${dueCount} word${dueCount === 1 ? '' : 's'} due · about ${reviewMins} min`
+        : 'All caught up — nice work!',
     target: 'review',
     done: reviewDone,
     progressLabel: reviewDone ? '✓' : 'Start',
@@ -89,9 +90,7 @@ export function getEarlyReadingPlan() {
     num: 3,
     icon: warmup.icon || '🎯',
     title: warmup.title,
-    detail: warmupDone
-      ? `${WARMUP_TARGET} of ${WARMUP_TARGET} done today`
-      : warmup.detail,
+    detail: warmupDone ? `${WARMUP_TARGET} of ${WARMUP_TARGET} done today` : warmup.detail,
     target: warmup.target,
     group: warmup.group || undefined,
     done: warmupDone,
@@ -99,7 +98,7 @@ export function getEarlyReadingPlan() {
   };
 
   const steps = [reviewStep, dailyStep, warmupStep];
-  const done = steps.filter(s => s.done).length;
+  const done = steps.filter((s) => s.done).length;
   // "All caught up" — the entire plan is complete AND there was nothing
   // urgent to review (queue was empty from the start). Drives the cheerful
   // empty-state copy on the home card.
@@ -134,11 +133,11 @@ const JOURNEY_WARMUPS = {
     title: 'Hear the Sounds',
     detail: 'Listening ears on — no letters needed yet.',
     modes: [
-      { target: 'first',     label: 'First Sound' },
-      { target: 'last',      label: 'Last Sound' },
+      { target: 'first', label: 'First Sound' },
+      { target: 'last', label: 'Last Sound' },
       { target: 'oddOneOut', label: 'Odd One Out' },
-      { target: 'syllable',  label: 'Clap the Syllables' },
-      { target: 'middle',    label: 'Middle Sound' },
+      { target: 'syllable', label: 'Clap the Syllables' },
+      { target: 'middle', label: 'Middle Sound' },
     ],
   },
   'letter-sounds': {
@@ -147,7 +146,7 @@ const JOURNEY_WARMUPS = {
     detail: 'Match each sound to its letter.',
     modes: [
       { target: 'soundHunt', label: 'Sound Hunt' },
-      { target: 'hear',      label: 'Hear & Choose' },
+      { target: 'hear', label: 'Hear & Choose' },
     ],
   },
   'sight-words': {
@@ -167,7 +166,11 @@ const JOURNEY_WARMUPS = {
 /** Journey-matched warm-up, or null for blending/primary steps. @private */
 function _journeyWarmup(now = new Date()) {
   let step;
-  try { step = getCurrentJourneyStep(); } catch (_) { return null; }
+  try {
+    step = getCurrentJourneyStep();
+  } catch (_) {
+    return null;
+  }
   const spec = JOURNEY_WARMUPS[step?.key];
   if (!spec) return null;
   // Rotate the activity daily so the same step doesn't feel repetitive.
@@ -201,7 +204,9 @@ function _pickWarmup() {
   if (!pick) {
     try {
       const rec = getRecommendation();
-      pick = rec ? { label: rec.title, detail: rec.reason, ctaTarget: rec.ctaTarget, ctaGroup: rec.ctaGroup } : null;
+      pick = rec
+        ? { label: rec.title, detail: rec.reason, ctaTarget: rec.ctaTarget, ctaGroup: rec.ctaGroup }
+        : null;
     } catch (_) {
       pick = null;
     }

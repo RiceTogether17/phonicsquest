@@ -49,12 +49,12 @@ export function mountQuestJourney(host, opts = {}) {
     stageId: opts.stageId ?? SLICE_STAGE,
     learnerName,
     lesson: null,
-    currentMode: null,        // 'soundMatch' | 'blendBuilder'
+    currentMode: null, // 'soundMatch' | 'blendBuilder'
     roundIndex: 0,
     attemptsThisLesson: 0,
     correctThisLesson: 0,
     wordsPractised: [],
-    feedback: null,           // { state, copy, hint }
+    feedback: null, // { state, copy, hint }
     pendingAdvance: false,
   };
 
@@ -105,28 +105,28 @@ export function mountQuestJourney(host, opts = {}) {
     log.push({
       timestamp: Date.now(),
       stageId: state.stageId,
-      group:   state.stageId,
-      mode:    state.currentMode,
+      group: state.stageId,
+      mode: state.currentMode,
       word,
       correct: result.correct,
       errorCategory: result.errorCategory ?? null,
-      timeMs:  answer?.timeMs ?? 0,
+      timeMs: answer?.timeMs ?? 0,
       targetSound: round?.prompt?.sound ?? null,
     });
 
     if (result.correct) {
       state.feedback = {
         state: 'correct',
-        copy:  'Yes! 🎉',
-        hint:  '',
-        cta:   'Next',
+        copy: 'Yes! 🎉',
+        hint: '',
+        cta: 'Next',
       };
     } else {
       state.feedback = {
         state: 'wrong-first',
-        copy:  'Almost! Have another go.',
-        hint:  result.hint || mode.errorHints.default,
-        cta:   'Try again',
+        copy: 'Almost! Have another go.',
+        hint: result.hint || mode.errorHints.default,
+        cta: 'Try again',
       };
     }
     render();
@@ -144,14 +144,13 @@ export function mountQuestJourney(host, opts = {}) {
   }
 
   function _resultsSummary() {
-    const accuracy = state.attemptsThisLesson > 0
-      ? state.correctThisLesson / state.attemptsThisLesson
-      : 0;
+    const accuracy =
+      state.attemptsThisLesson > 0 ? state.correctThisLesson / state.attemptsThisLesson : 0;
     const stars = accuracy >= 0.9 ? 3 : accuracy >= 0.7 ? 2 : accuracy >= 0.4 ? 1 : 0;
     return {
-      name:          state.learnerName,
-      stageId:       state.stageId,
-      totalRounds:   state.attemptsThisLesson,
+      name: state.learnerName,
+      stageId: state.stageId,
+      totalRounds: state.attemptsThisLesson,
       correctRounds: state.correctThisLesson,
       accuracy,
       stars,
@@ -160,17 +159,33 @@ export function mountQuestJourney(host, opts = {}) {
     };
   }
 
-  function _goMap()      { state.screen = 'map';      state.feedback = null; render(); }
-  function _goWelcome()  { state.screen = 'welcome';  render(); }
-  function _goLesson(id) { state.stageId = id; state.screen = 'lesson'; render(); }
-  function _goProgress() { state.screen = 'progress'; render(); }
+  function _goMap() {
+    state.screen = 'map';
+    state.feedback = null;
+    render();
+  }
+  function _goWelcome() {
+    state.screen = 'welcome';
+    render();
+  }
+  function _goLesson(id) {
+    state.stageId = id;
+    state.screen = 'lesson';
+    render();
+  }
+  function _goProgress() {
+    state.screen = 'progress';
+    render();
+  }
 
   function render() {
     switch (state.screen) {
       case 'welcome':
         renderWelcome(host, {
           onStart: () => _goLesson(state.stageId),
-          onPickProfile: () => {/* slice doesn't include profile select */ _goMap(); },
+          onPickProfile: () => {
+            /* slice doesn't include profile select */ _goMap();
+          },
           onAdult: _goProgress,
         });
         break;
@@ -197,14 +212,14 @@ export function mountQuestJourney(host, opts = {}) {
         const round = state.lesson?.[state.currentMode]?.[state.roundIndex];
         const totalRounds = state.lesson?.[state.currentMode]?.length ?? 0;
         renderGameMode(host, {
-          modeKey:      state.currentMode,
+          modeKey: state.currentMode,
           round,
           totalRounds,
           currentRound: state.roundIndex + 1,
-          feedback:     state.feedback,
-          onAnswer:     _scoreAnswer,
-          onPause:      _goMap,
-          onContinue:   _onContinueFromFeedback,
+          feedback: state.feedback,
+          onAnswer: _scoreAnswer,
+          onPause: _goMap,
+          onContinue: _onContinueFromFeedback,
         });
         break;
       }
@@ -218,8 +233,10 @@ export function mountQuestJourney(host, opts = {}) {
       case 'progress':
         renderProgressView(host, {
           summary: summarise(log.list(), { curriculum: CURRICULUM }),
-          onBack:  _goWelcome,
-          onPrint: () => { if (typeof window !== 'undefined' && window.print) window.print(); },
+          onBack: _goWelcome,
+          onPrint: () => {
+            if (typeof window !== 'undefined' && window.print) window.print();
+          },
         });
         break;
       default:
@@ -237,9 +254,15 @@ export function mountQuestJourney(host, opts = {}) {
     /** Force a re-render — primarily for tests */
     render,
     /** Programmatic navigation */
-    goTo: (screen) => { state.screen = screen; render(); },
+    goTo: (screen) => {
+      state.screen = screen;
+      render();
+    },
     /** Tear down — clears the host */
-    destroy: () => { host.innerHTML = ''; host.classList.remove('qj-app'); },
+    destroy: () => {
+      host.innerHTML = '';
+      host.classList.remove('qj-app');
+    },
   };
 }
 
@@ -271,7 +294,10 @@ function _masteredStageIds(attempts) {
   }
   const out = [];
   for (const [id, c] of counts.entries()) {
-    if (c.attempts >= JOURNEY_MASTERY_MIN_ATTEMPTS && c.correct / c.attempts >= JOURNEY_MASTERY_MIN_ACCURACY) {
+    if (
+      c.attempts >= JOURNEY_MASTERY_MIN_ATTEMPTS &&
+      c.correct / c.attempts >= JOURNEY_MASTERY_MIN_ACCURACY
+    ) {
       out.push(id);
     }
   }
@@ -282,7 +308,10 @@ function _unlockedStageIds(masteredIds) {
   const mastered = new Set(masteredIds);
   const unlocked = [];
   for (const stage of CURRICULUM) {
-    if (!stage.prerequisite) { unlocked.push(stage.id); continue; }
+    if (!stage.prerequisite) {
+      unlocked.push(stage.id);
+      continue;
+    }
     if (mastered.has(stage.prerequisite)) unlocked.push(stage.id);
   }
   return unlocked;

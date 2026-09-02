@@ -23,9 +23,9 @@
  */
 
 const HINTS = Object.freeze({
-  'vowel-confusion':   'Say the word slowly. What vowel sound do you hear in the middle?',
+  'vowel-confusion': 'Say the word slowly. What vowel sound do you hear in the middle?',
   'pattern-confusion': 'Look at the letters in the middle. Does it have a_e, ai, or ay?',
-  'default':           'Stretch the word out. The middle sound tells you the right box.',
+  default: 'Stretch the word out. The middle sound tells you the right box.',
 });
 
 /**
@@ -33,12 +33,14 @@ const HINTS = Object.freeze({
  * shuffles the items and the category order via the injected RNG so tests
  * can be deterministic.
  */
-export function buildWordSortRound(items = [], categories = null, { count = items.length, rng = Math.random } = {}) {
-  const safe = Array.isArray(items) ? items.filter(i => i && i.word && i.category) : [];
+export function buildWordSortRound(
+  items = [],
+  categories = null,
+  { count = items.length, rng = Math.random } = {},
+) {
+  const safe = Array.isArray(items) ? items.filter((i) => i && i.word && i.category) : [];
   const picked = _take(safe, count, rng);
-  const cats   = categories?.length
-    ? categories
-    : [...new Set(picked.map(i => i.category))];
+  const cats = categories?.length ? categories : [...new Set(picked.map((i) => i.category))];
   return { items: picked, categories: cats };
 }
 
@@ -60,10 +62,10 @@ function _take(arr, n, rng) {
 function classify(errors) {
   if (!errors.length) return 'default';
 
-  let vowelClash   = 0;
+  let vowelClash = 0;
   let patternClash = 0;
   for (const e of errors) {
-    if (_isShortVowelPair(e.expected, e.placed))    vowelClash++;
+    if (_isShortVowelPair(e.expected, e.placed)) vowelClash++;
     if (_isLongVowelPatternPair(e.expected, e.placed)) patternClash++;
   }
   if (patternClash >= vowelClash && patternClash > 0) return 'pattern-confusion';
@@ -72,8 +74,16 @@ function classify(errors) {
 }
 
 const SHORT_VOWEL_CATS = new Set([
-  'short-a', 'short-e', 'short-i', 'short-o', 'short-u',
-  'cvc-a', 'cvc-e', 'cvc-i', 'cvc-o', 'cvc-u',
+  'short-a',
+  'short-e',
+  'short-i',
+  'short-o',
+  'short-u',
+  'cvc-a',
+  'cvc-e',
+  'cvc-i',
+  'cvc-o',
+  'cvc-u',
 ]);
 
 function _isShortVowelPair(a, b) {
@@ -88,24 +98,24 @@ function _isLongVowelPatternPair(a, b) {
 }
 
 export function getWordSortHint(attempt = {}) {
-  const errors = (attempt?.placements ?? []).filter(p => p.expected !== p.placed);
+  const errors = (attempt?.placements ?? []).filter((p) => p.expected !== p.placed);
   const cat = classify(errors);
   return HINTS[cat] ?? HINTS.default;
 }
 
 export function scoreWordSort(attempt = {}) {
   const placements = Array.isArray(attempt?.placements) ? attempt.placements : [];
-  const total      = placements.length;
-  const correct    = placements.filter(p => p.expected === p.placed).length;
-  const accuracy   = total === 0 ? 0 : correct / total;
-  const errors     = placements.filter(p => p.expected !== p.placed);
+  const total = placements.length;
+  const correct = placements.filter((p) => p.expected === p.placed).length;
+  const accuracy = total === 0 ? 0 : correct / total;
+  const errors = placements.filter((p) => p.expected !== p.placed);
   const errorCategory = errors.length === 0 ? null : classify(errors);
 
   return {
     correct: errors.length === 0 && total > 0,
     errorCategory,
     hint: errors.length === 0 ? '' : (HINTS[errorCategory] ?? HINTS.default),
-    masteryDelta: accuracy >= 0.80 ? 1 : 0,
+    masteryDelta: accuracy >= 0.8 ? 1 : 0,
     scoreBreakdown: { accuracy, correctPlacements: correct, total, errors: errors.length },
   };
 }

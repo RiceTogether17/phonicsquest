@@ -48,16 +48,18 @@ export function getPersonalBests(opts = {}) {
 
   // ── Streak ───────────────────────────────────────────────────────────
   const streakCurrent = store.get('streak') || 0;
-  const streakBest    = Math.max(store.get('bestStreak') || 0, streakCurrent);
+  const streakBest = Math.max(store.get('bestStreak') || 0, streakCurrent);
 
   // ── Level / XP ───────────────────────────────────────────────────────
   const xp = store.get('xp') || 0;
   const { level } = getLevelInfo(xp);
 
   // ── Days played (rolling 30 + lifetime) ──────────────────────────────
-  const challengeCal = Array.isArray(store.get('challengeCalendar')) ? store.get('challengeCalendar') : [];
+  const challengeCal = Array.isArray(store.get('challengeCalendar'))
+    ? store.get('challengeCalendar')
+    : [];
   const cutoff30 = now - 30 * DAY_MS;
-  const daysThisMonth = challengeCal.filter(d => {
+  const daysThisMonth = challengeCal.filter((d) => {
     const t = new Date(d).getTime();
     return Number.isFinite(t) && t >= cutoff30;
   }).length;
@@ -67,28 +69,34 @@ export function getPersonalBests(opts = {}) {
   const cutoff7Iso = new Date(now - 7 * DAY_MS).toISOString().slice(0, 10);
   const weeklyXpLog = Array.isArray(store.get('weeklyXpLog')) ? store.get('weeklyXpLog') : [];
   const xpThisWeek = weeklyXpLog
-    .filter(e => e?.date >= cutoff7Iso)
+    .filter((e) => e?.date >= cutoff7Iso)
     .reduce((sum, e) => sum + (e?.xp || 0), 0);
 
   // ── Words: graduated + total practised ───────────────────────────────
   const wordStats = store.get('wordStats') || {};
   const wordStatList = Object.values(wordStats);
-  const wordsPractised = wordStatList.filter(s => s && (s.attempts || 0) > 0).length;
-  const wordsGraduated = wordStatList.filter(s => s && (s.box || 0) >= GRADUATED_BOX).length;
+  const wordsPractised = wordStatList.filter((s) => s && (s.attempts || 0) > 0).length;
+  const wordsGraduated = wordStatList.filter((s) => s && (s.box || 0) >= GRADUATED_BOX).length;
 
   // ── Stories finished (lives in its own localStorage key) ─────────────
   const storiesFinished = _safeReadStoriesRead().length;
 
   // ── Badges (already a per-profile structure) ─────────────────────────
   let earnedBadges;
-  try { earnedBadges = badges.getEarned() || []; } catch (_) { earnedBadges = []; }
+  try {
+    earnedBadges = badges.getEarned() || [];
+  } catch (_) {
+    earnedBadges = [];
+  }
 
   // ── Profile name ─────────────────────────────────────────────────────
   let profileName = 'You';
   try {
     const active = getActiveProfile();
     if (active?.name) profileName = active.name;
-  } catch (_) { /* ignore — tests or first-run with no profile */ }
+  } catch (_) {
+    /* ignore — tests or first-run with no profile */
+  }
 
   const cards = [
     {
@@ -97,7 +105,10 @@ export function getPersonalBests(opts = {}) {
       label: 'Day Streak',
       value: streakCurrent,
       best: streakBest,
-      sub: streakBest > 0 ? `Best: ${streakBest} day${streakBest === 1 ? '' : 's'}` : 'Play tomorrow to start a streak',
+      sub:
+        streakBest > 0
+          ? `Best: ${streakBest} day${streakBest === 1 ? '' : 's'}`
+          : 'Play tomorrow to start a streak',
     },
     {
       id: 'level',
@@ -151,8 +162,10 @@ export function getPersonalBests(opts = {}) {
   return {
     profileName,
     cards,
-    badges: earnedBadges.map(b => ({ id: b.id, name: b.name, emoji: b.emoji })),
-    summary: { highlights: _pickHighlights({ streakBest, wordsGraduated, storiesFinished, level }) },
+    badges: earnedBadges.map((b) => ({ id: b.id, name: b.name, emoji: b.emoji })),
+    summary: {
+      highlights: _pickHighlights({ streakBest, wordsGraduated, storiesFinished, level }),
+    },
   };
 }
 
@@ -169,10 +182,13 @@ function _safeReadStoriesRead() {
 function _pickHighlights({ streakBest, wordsGraduated, storiesFinished, level }) {
   const lines = [];
   if (streakBest >= 7) lines.push(`🔥 Best streak: ${streakBest} days`);
-  if (wordsGraduated > 0) lines.push(`🌟 ${wordsGraduated} word${wordsGraduated === 1 ? '' : 's'} graduated`);
-  if (storiesFinished > 0) lines.push(`📚 ${storiesFinished} Giri Stor${storiesFinished === 1 ? 'y' : 'ies'} finished`);
+  if (wordsGraduated > 0)
+    lines.push(`🌟 ${wordsGraduated} word${wordsGraduated === 1 ? '' : 's'} graduated`);
+  if (storiesFinished > 0)
+    lines.push(`📚 ${storiesFinished} Giri Stor${storiesFinished === 1 ? 'y' : 'ies'} finished`);
   if (level > 1) lines.push(`⭐ Level ${level}`);
-  if (lines.length === 0) lines.push("✨ Every quest counts — your trophy room is just getting started.");
+  if (lines.length === 0)
+    lines.push('✨ Every quest counts — your trophy room is just getting started.');
   return lines;
 }
 

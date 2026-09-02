@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { buildCopySummaryText, getModeConfig, getSummaryScoreLine } from '../modes/clozeSessionSummary.js';
+import {
+  buildCopySummaryText,
+  getModeConfig,
+  getSummaryScoreLine,
+} from '../modes/clozeSessionSummary.js';
 import { showAnswerReviewPanel } from '../modes/clozeReviewPanel.js';
 import { incrementHintUsage } from '../modes/hintUsage.js';
 
@@ -52,13 +56,15 @@ describe('copy summary', () => {
   });
 
   it('uses blank-level score line for exam mode', () => {
-    expect(getSummaryScoreLine({
-      mode: 'exam',
-      blankCorrect: 8,
-      blankTotal: 10,
-      passageCorrect: 0,
-      passageTotal: 3,
-    })).toBe('8/10');
+    expect(
+      getSummaryScoreLine({
+        mode: 'exam',
+        blankCorrect: 8,
+        blankTotal: 10,
+        passageCorrect: 0,
+        passageTotal: 3,
+      }),
+    ).toBe('8/10');
   });
 });
 
@@ -80,14 +86,16 @@ describe('review panel safety', () => {
     const host = document.getElementById('host');
     showAnswerReviewPanel({
       host,
-      rows: [{
-        blank: '#1',
-        studentAnswer: '<img src=x onerror=alert(1)>',
-        correctAnswer: 'answer',
-        status: 'Try again',
-        clue: '<script>alert(1)</script>',
-        explanation: 'Use <b>context</b>',
-      }],
+      rows: [
+        {
+          blank: '#1',
+          studentAnswer: '<img src=x onerror=alert(1)>',
+          correctAnswer: 'answer',
+          status: 'Try again',
+          clue: '<script>alert(1)</script>',
+          explanation: 'Use <b>context</b>',
+        },
+      ],
     });
 
     expect(host.innerHTML).not.toContain('<script>');

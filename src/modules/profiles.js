@@ -33,10 +33,18 @@ const LEGACY_MIGRATION_FLAG = 'phonicsquest_legacy_migrated_to_profiles';
 
 /** Default avatars for new profiles */
 const AVATAR_OPTIONS = ['🦁', '🐯', '🐻', '🦊', '🐼', '🐨', '🦋', '🐸', '🐬', '🦄', '🐧', '🐙'];
-const COLOR_OPTIONS  = ['#6c63ff', '#22c55e', '#f59e0b', '#ef4444', '#0ea5e9', '#ec4899', '#8b5cf6', '#14b8a6'];
+const COLOR_OPTIONS = [
+  '#6c63ff',
+  '#22c55e',
+  '#f59e0b',
+  '#ef4444',
+  '#0ea5e9',
+  '#ec4899',
+  '#8b5cf6',
+  '#14b8a6',
+];
 
 // ── Public API ─────────────────────────────────────────────────────────────
-
 
 /** @param {any} state */
 function _hasProgressData(state) {
@@ -86,7 +94,9 @@ export function getProfiles() {
   try {
     const raw = localStorage.getItem(PROFILES_META_KEY);
     return raw ? JSON.parse(raw) : [];
-  } catch (_) { return []; }
+  } catch (_) {
+    return [];
+  }
 }
 
 /**
@@ -137,13 +147,15 @@ const IMPORT_SUFFIX = ' (imported)';
  */
 function _sanitiseName(raw, maxLength = MAX_PROFILE_NAME_LENGTH) {
   if (typeof raw !== 'string' && typeof raw !== 'number') return '';
-  return String(raw)
-    // eslint-disable-next-line no-control-regex
-    .replace(/[\x00-\x1F\x7F]/g, '')        // control chars
-    .replace(/[<>]/g, '')                   // never valid in a name; kills tags
-    .replace(/\s+/g, ' ')                   // collapse whitespace/newlines
-    .trim()
-    .slice(0, maxLength);
+  return (
+    String(raw)
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\x00-\x1F\x7F]/g, '') // control chars
+      .replace(/[<>]/g, '') // never valid in a name; kills tags
+      .replace(/\s+/g, ' ') // collapse whitespace/newlines
+      .trim()
+      .slice(0, maxLength)
+  );
 }
 
 /**
@@ -152,7 +164,9 @@ function _sanitiseName(raw, maxLength = MAX_PROFILE_NAME_LENGTH) {
  * @param {unknown} avatar
  */
 function _normaliseAvatar(avatar) {
-  return AVATAR_OPTIONS.includes(/** @type {string} */ (avatar)) ? String(avatar) : AVATAR_OPTIONS[0];
+  return AVATAR_OPTIONS.includes(/** @type {string} */ (avatar))
+    ? String(avatar)
+    : AVATAR_OPTIONS[0];
 }
 
 /**
@@ -193,7 +207,7 @@ export function createProfile(name, avatar, color, schoolLevel = 'preschool', op
   // If a primaryGrade is provided we treat the profile as primary, even when
   // the caller forgot to pass schoolLevel='primary'.
   const resolvedSchoolLevel = /** @type {'preschool'|'primary'} */ (
-    (schoolLevel === 'primary' || normalisedGrade) ? 'primary' : 'preschool'
+    schoolLevel === 'primary' || normalisedGrade ? 'primary' : 'preschool'
   );
   const profile = {
     id,
@@ -201,7 +215,7 @@ export function createProfile(name, avatar, color, schoolLevel = 'preschool', op
     // both from the typed form and from importProfile (arbitrary JSON).
     name: _sanitiseName(name) || 'Player',
     avatar: _normaliseAvatar(avatar),
-    color:  _normaliseColor(color),
+    color: _normaliseColor(color),
     // 'primary' bypasses phonics-mastery unlock gates for Sentence Forge,
     // Cloze Castle and Word Vault for legacy profiles. New placement now
     // routes by reading band, but schoolLevel is still kept as metadata.
@@ -227,7 +241,7 @@ export function createProfile(name, avatar, color, schoolLevel = 'preschool', op
  */
 export function updateProfile(id, patch = {}) {
   const profiles = getProfiles();
-  const idx = profiles.findIndex(p => p.id === id);
+  const idx = profiles.findIndex((p) => p.id === id);
   if (idx < 0) return null;
   const existing = profiles[idx];
   const next = { ...existing };
@@ -258,9 +272,11 @@ export function updateProfile(id, patch = {}) {
  * @param {string} id
  */
 export function deleteProfile(id) {
-  const profiles = getProfiles().filter(p => p.id !== id);
+  const profiles = getProfiles().filter((p) => p.id !== id);
   _saveProfiles(profiles);
-  try { localStorage.removeItem(PROFILE_STORAGE_KEY(id)); } catch (_) {}
+  try {
+    localStorage.removeItem(PROFILE_STORAGE_KEY(id));
+  } catch (_) {}
   if (getActiveProfileId() === id) {
     localStorage.removeItem(ACTIVE_PROFILE_KEY);
   }
@@ -278,7 +294,7 @@ export function getActiveProfileId() {
 export function getActiveProfile() {
   const id = getActiveProfileId();
   if (!id) return null;
-  return getProfiles().find(p => p.id === id) ?? null;
+  return getProfiles().find((p) => p.id === id) ?? null;
 }
 
 /**
@@ -305,14 +321,14 @@ export function getProfileScopedKey(base) {
  * — they're known to leak across profiles and need a separate migration
  * pass (audit follow-up).
  */
-const PROFILE_SCOPED_BASE_KEYS = [
-  'giri_friends_unlocked',
-];
+const PROFILE_SCOPED_BASE_KEYS = ['giri_friends_unlocked'];
 
 /** @param {string} id */
 function _cleanupProfileScopedKeys(id) {
   for (const base of PROFILE_SCOPED_BASE_KEYS) {
-    try { localStorage.removeItem(`${base}__${id}`); } catch (_) {}
+    try {
+      localStorage.removeItem(`${base}__${id}`);
+    } catch (_) {}
   }
 }
 
@@ -340,7 +356,7 @@ export function deactivateProfile() {
 /** Check if a profile needs to be selected before the app starts. */
 export function needsProfileSelection() {
   const profiles = getProfiles();
-  if (profiles.length === 0) return true;   // no profiles → must create one
+  if (profiles.length === 0) return true; // no profiles → must create one
   if (profiles.length === 1) {
     // Auto-activate the only profile if none is active
     if (!getActiveProfileId()) {
@@ -355,7 +371,7 @@ export function needsProfileSelection() {
 /** Restore a previously active profile on page load. */
 export function restoreActiveProfile() {
   const id = getActiveProfileId();
-  if (id && getProfiles().find(p => p.id === id)) {
+  if (id && getProfiles().find((p) => p.id === id)) {
     store.setStorageKey(PROFILE_STORAGE_KEY(id));
     return true;
   }
@@ -372,7 +388,7 @@ export function restoreActiveProfile() {
  */
 export function exportProfile(id) {
   const profiles = getProfiles();
-  const profile = profiles.find(p => p.id === id);
+  const profile = profiles.find((p) => p.id === id);
   if (!profile) return false;
 
   let progressData;
@@ -384,18 +400,18 @@ export function exportProfile(id) {
   }
 
   const exportPayload = {
-    _type:       'phonicsquest_profile_export',
-    _version:    2,
+    _type: 'phonicsquest_profile_export',
+    _version: 2,
     _exportedAt: new Date().toISOString(),
     profile,
     progressData,
   };
 
   const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
   const safeName = profile.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-  a.href     = url;
+  a.href = url;
   a.download = `phonicsquest_${safeName}_${new Date().toISOString().slice(0, 10)}.json`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 5000);
@@ -420,7 +436,10 @@ export function importProfile(jsonString) {
   try {
     payload = JSON.parse(jsonString);
   } catch (_) {
-    return { profile: null, error: 'File could not be read. Make sure it is a valid PhonicsQuest export.' };
+    return {
+      profile: null,
+      error: 'File could not be read. Make sure it is a valid PhonicsQuest export.',
+    };
   }
 
   if (payload?._type !== 'phonicsquest_profile_export') {
@@ -441,10 +460,11 @@ export function importProfile(jsonString) {
     return { profile: null, error: 'Export file has an invalid profile name.' };
   }
   const importedGrade = _normalisePrimaryGrade(src.primaryGrade);
-  const importedBand  = _normaliseReadingBand(src.readingBand);
+  const importedBand = _normaliseReadingBand(src.readingBand);
   // If the export had a primaryGrade we treat it as a primary profile even if
   // the legacy schoolLevel field was missing.
-  const resolvedSchoolLevel = (src.schoolLevel === 'primary' || importedGrade) ? 'primary' : 'preschool';
+  const resolvedSchoolLevel =
+    src.schoolLevel === 'primary' || importedGrade ? 'primary' : 'preschool';
 
   // Create a fresh profile (new ID to avoid stomping an existing one)
   const newProfile = createProfile(
@@ -454,7 +474,7 @@ export function importProfile(jsonString) {
     resolvedSchoolLevel,
     {
       primaryGrade: importedGrade,
-      readingBand:  importedBand,
+      readingBand: importedBand,
     },
   );
 
@@ -464,9 +484,15 @@ export function importProfile(jsonString) {
   // same as the exported one.
   if (payload.progressData && typeof payload.progressData === 'object') {
     try {
-      localStorage.setItem(PROFILE_STORAGE_KEY(newProfile.id), JSON.stringify(payload.progressData));
+      localStorage.setItem(
+        PROFILE_STORAGE_KEY(newProfile.id),
+        JSON.stringify(payload.progressData),
+      );
     } catch (_) {
-      return { profile: newProfile, error: 'Profile created but progress data could not be restored (storage full?).' };
+      return {
+        profile: newProfile,
+        error: 'Profile created but progress data could not be restored (storage full?).',
+      };
     }
   }
 
@@ -492,18 +518,20 @@ export function parseProfileImportPayload(jsonString) {
   }
   const src = payload.profile;
   const importedGrade = _normalisePrimaryGrade(src.primaryGrade);
-  const importedBand  = _normaliseReadingBand(src.readingBand);
-  const resolvedSchoolLevel = (src.schoolLevel === 'primary' || importedGrade) ? 'primary' : 'preschool';
+  const importedBand = _normaliseReadingBand(src.readingBand);
+  const resolvedSchoolLevel =
+    src.schoolLevel === 'primary' || importedGrade ? 'primary' : 'preschool';
   return {
     profile: {
-      name:        src.name,
-      avatar:      src.avatar || AVATAR_OPTIONS[0],
-      color:       src.color || COLOR_OPTIONS[0],
+      name: src.name,
+      avatar: src.avatar || AVATAR_OPTIONS[0],
+      color: src.color || COLOR_OPTIONS[0],
       schoolLevel: resolvedSchoolLevel,
       primaryGrade: resolvedSchoolLevel === 'primary' ? importedGrade : null,
       readingBand: importedBand,
     },
-    progressData: payload.progressData && typeof payload.progressData === 'object' ? payload.progressData : {},
+    progressData:
+      payload.progressData && typeof payload.progressData === 'object' ? payload.progressData : {},
     error: null,
   };
 }

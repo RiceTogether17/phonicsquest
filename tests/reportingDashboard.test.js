@@ -1,6 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { store } from '../src/modules/store.js';
-import { getVocabularyCategoryReport, getGrammarCategoryReport, getLatestQuestScoreboards, getMoePriorityRecommendations, getLearningFunnelReport, getAdaptiveLessonQueue } from '../src/modules/reporting.js';
+import {
+  getVocabularyCategoryReport,
+  getGrammarCategoryReport,
+  getLatestQuestScoreboards,
+  getMoePriorityRecommendations,
+  getLearningFunnelReport,
+  getAdaptiveLessonQueue,
+} from '../src/modules/reporting.js';
 
 describe('reporting module', () => {
   beforeEach(() => {
@@ -22,7 +29,7 @@ describe('reporting module', () => {
 
   it('returns vocabulary rows with LO codes and clue success', () => {
     const rows = getVocabularyCategoryReport();
-    const sci = rows.find(r => r.key === 'scienceTechTerms');
+    const sci = rows.find((r) => r.key === 'scienceTechTerms');
     expect(sci).toBeTruthy();
     expect(sci.loCode).toMatch(/^LO-/);
     expect(sci.clueSuccess).toBeGreaterThan(0);
@@ -30,14 +37,13 @@ describe('reporting module', () => {
 
   it('returns scoreboard snapshots for key quests', () => {
     const rows = getLatestQuestScoreboards();
-    expect(rows.map(r => r.quest)).toEqual(['sentenceForge', 'clozeCastle', 'wordVault']);
+    expect(rows.map((r) => r.quest)).toEqual(['sentenceForge', 'clozeCastle', 'wordVault']);
   });
 
   it('returns grammar rows', () => {
     const rows = getGrammarCategoryReport();
-    expect(rows.find(r => r.key === 'conditionals')).toBeTruthy();
+    expect(rows.find((r) => r.key === 'conditionals')).toBeTruthy();
   });
-
 
   it('returns MOE-priority recommendations weighted by category priority', () => {
     const rec = getMoePriorityRecommendations();
@@ -46,23 +52,42 @@ describe('reporting module', () => {
     expect(rec.grammar[0]).toHaveProperty('priorityScore');
   });
 
-
   it('builds 7-day learning funnel metrics from telemetry', () => {
-    store.recordLearningEvent({ eventType: 'quest_attempt', quest: 'wordVault', skill: 'contextInference', correct: true, responseMs: 1800, level: 'p3' });
-    store.recordLearningEvent({ eventType: 'quest_attempt', quest: 'clozeCastle', skill: 'conditionals', correct: false, responseMs: 4200, level: 'p5' });
+    store.recordLearningEvent({
+      eventType: 'quest_attempt',
+      quest: 'wordVault',
+      skill: 'contextInference',
+      correct: true,
+      responseMs: 1800,
+      level: 'p3',
+    });
+    store.recordLearningEvent({
+      eventType: 'quest_attempt',
+      quest: 'clozeCastle',
+      skill: 'conditionals',
+      correct: false,
+      responseMs: 4200,
+      level: 'p5',
+    });
     const funnel = getLearningFunnelReport({ days: 7 });
     expect(funnel.attempts).toBeGreaterThanOrEqual(2);
-    expect(funnel.byQuest.find(q => q.quest === 'wordVault')?.attempts).toBeGreaterThanOrEqual(1);
+    expect(funnel.byQuest.find((q) => q.quest === 'wordVault')?.attempts).toBeGreaterThanOrEqual(1);
     expect(funnel.avgResponseMs).not.toBeNull();
   });
 
-
   it('builds adaptive lesson queue with deduped tasks', () => {
-    store.recordLearningEvent({ eventType: 'quest_attempt', quest: 'wordVault', skill: 'contextInference', correct: false, responseMs: 5200, level: 'p3' });
+    store.recordLearningEvent({
+      eventType: 'quest_attempt',
+      quest: 'wordVault',
+      skill: 'contextInference',
+      correct: false,
+      responseMs: 5200,
+      level: 'p3',
+    });
     const queue = getAdaptiveLessonQueue({ limit: 4 });
     expect(queue.length).toBeLessThanOrEqual(4);
     expect(queue.length).toBeGreaterThan(0);
-    const uniqueKeys = new Set(queue.map(q => `${q.quest}:${q.skill}`));
+    const uniqueKeys = new Set(queue.map((q) => `${q.quest}:${q.skill}`));
     expect(uniqueKeys.size).toBe(queue.length);
   });
 });

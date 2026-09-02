@@ -47,7 +47,14 @@ describe('P2 Practice Test data bank', () => {
   });
 
   it('every MCQ item is tagged with a known skill and a known practiseTarget', () => {
-    const allowedTargets = ['grammar-mcq', 'vocab-mcq', 'cloze-castle', 'word-vault', 'sentence-forge', 'editing-quest'];
+    const allowedTargets = [
+      'grammar-mcq',
+      'vocab-mcq',
+      'cloze-castle',
+      'word-vault',
+      'sentence-forge',
+      'editing-quest',
+    ];
     for (const test of getP2PracticeTests()) {
       for (const item of test.sectionA.items) {
         expect(GRAMMAR_CATEGORIES[item.skill], `${test.term}/A skill "${item.skill}"`).toBeTruthy();
@@ -63,10 +70,10 @@ describe('P2 Practice Test data bank', () => {
   it('T3 + T4 editing errors cover spelling AND punctuation AND grammar', () => {
     for (const term of ['T3', 'T4']) {
       const errs = P2_PRACTICE_TESTS[term].sectionG.errors;
-      const kinds = new Set(errs.map(e => e.kind));
-      expect(kinds.has('spelling'),    `${term} editing has no spelling errors`).toBe(true);
+      const kinds = new Set(errs.map((e) => e.kind));
+      expect(kinds.has('spelling'), `${term} editing has no spelling errors`).toBe(true);
       expect(kinds.has('punctuation'), `${term} editing has no punctuation errors`).toBe(true);
-      expect(kinds.has('grammar'),     `${term} editing has no grammar errors`).toBe(true);
+      expect(kinds.has('grammar'), `${term} editing has no grammar errors`).toBe(true);
     }
   });
 

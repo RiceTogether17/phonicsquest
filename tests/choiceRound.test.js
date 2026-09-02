@@ -18,7 +18,11 @@ globalThis.speechSynthesis = {
   paused: false,
   resume: () => {},
 };
-globalThis.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; } };
+globalThis.SpeechSynthesisUtterance = class {
+  constructor(t) {
+    this.text = t;
+  }
+};
 
 const { createChoiceRound } = await import('../src/modes/choiceRound.js');
 
@@ -130,7 +134,7 @@ describe('createChoiceRound', () => {
 
   it('re-tapping the disabled wrong button does not consume the second try', () => {
     round.handleTap(false, els.wrongBtns[0]);
-    round.handleTap(false, els.wrongBtns[0]);  // disabled — ignored
+    round.handleTap(false, els.wrongBtns[0]); // disabled — ignored
 
     expect(round.isDone()).toBe(false);
     round.handleTap(true, els.correctBtn);

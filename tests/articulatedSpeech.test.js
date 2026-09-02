@@ -13,12 +13,18 @@ function stubAudioGlobals() {
   globalThis.speechSynthesis = {
     getVoices: () => [],
     addEventListener: () => {},
-    speak: (utt) => { queueMicrotask(() => utt.onend?.()); },
+    speak: (utt) => {
+      queueMicrotask(() => utt.onend?.());
+    },
     cancel: () => {},
     paused: false,
     resume: () => {},
   };
-  globalThis.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; } };
+  globalThis.SpeechSynthesisUtterance = class {
+    constructor(t) {
+      this.text = t;
+    }
+  };
 }
 
 describe('audio.speakWordArticulated', () => {
@@ -97,13 +103,33 @@ describe('Say-It button routing per mode', () => {
       <div id="toast-container"></div>
     `;
     stubAudioGlobals();
-    globalThis.AudioContext = globalThis.AudioContext || class {
-      constructor() { this.state = 'running'; }
-      createOscillator() { return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } }; }
-      createGain() { return { connect: vi.fn(), gain: { value: 1, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() } }; }
-      get destination() { return {}; }
-      resume() { return Promise.resolve(); }
-    };
+    globalThis.AudioContext =
+      globalThis.AudioContext ||
+      class {
+        constructor() {
+          this.state = 'running';
+        }
+        createOscillator() {
+          return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } };
+        }
+        createGain() {
+          return {
+            connect: vi.fn(),
+            gain: {
+              value: 1,
+              setValueAtTime: vi.fn(),
+              exponentialRampToValueAtTime: vi.fn(),
+              linearRampToValueAtTime: vi.fn(),
+            },
+          };
+        }
+        get destination() {
+          return {};
+        }
+        resume() {
+          return Promise.resolve();
+        }
+      };
   });
 
   for (const mode of ['first', 'last', 'middle']) {
@@ -112,13 +138,15 @@ describe('Say-It button routing per mode', () => {
       const { audio } = await import('../src/modules/audio.js');
 
       const articulatedSpy = vi.spyOn(audio, 'speakWordArticulated').mockResolvedValue();
-      const naturalSpy     = vi.spyOn(audio, 'speakWord').mockResolvedValue();
-      const stretchedSpy   = vi.spyOn(audio, 'speakWordStretched').mockResolvedValue();
+      const naturalSpy = vi.spyOn(audio, 'speakWord').mockResolvedValue();
+      const stretchedSpy = vi.spyOn(audio, 'speakWordStretched').mockResolvedValue();
 
       app._mode = mode;
       app._currentWord = {
-        id: 'cat', word: 'cat',
-        graphemes: ['c','a','t'], types: ['c','sv','c'],
+        id: 'cat',
+        word: 'cat',
+        graphemes: ['c', 'a', 't'],
+        types: ['c', 'sv', 'c'],
       };
 
       app._handleSayIt();
@@ -135,10 +163,15 @@ describe('Say-It button routing per mode', () => {
     const { audio } = await import('../src/modules/audio.js');
 
     const articulatedSpy = vi.spyOn(audio, 'speakWordArticulated').mockResolvedValue();
-    const stretchedSpy   = vi.spyOn(audio, 'speakWordStretched').mockResolvedValue();
+    const stretchedSpy = vi.spyOn(audio, 'speakWordStretched').mockResolvedValue();
 
     app._mode = 'segment';
-    app._currentWord = { id: 'cat', word: 'cat', graphemes: ['c','a','t'], types: ['c','sv','c'] };
+    app._currentWord = {
+      id: 'cat',
+      word: 'cat',
+      graphemes: ['c', 'a', 't'],
+      types: ['c', 'sv', 'c'],
+    };
 
     app._handleSayIt();
     expect(stretchedSpy).toHaveBeenCalledTimes(1);
@@ -149,11 +182,16 @@ describe('Say-It button routing per mode', () => {
     const { app } = await import('../src/app.js');
     const { audio } = await import('../src/modules/audio.js');
 
-    const naturalSpy     = vi.spyOn(audio, 'speakWord').mockResolvedValue();
+    const naturalSpy = vi.spyOn(audio, 'speakWord').mockResolvedValue();
     const articulatedSpy = vi.spyOn(audio, 'speakWordArticulated').mockResolvedValue();
 
     app._mode = 'blend';
-    app._currentWord = { id: 'cat', word: 'cat', graphemes: ['c','a','t'], types: ['c','sv','c'] };
+    app._currentWord = {
+      id: 'cat',
+      word: 'cat',
+      graphemes: ['c', 'a', 't'],
+      types: ['c', 'sv', 'c'],
+    };
 
     app._handleSayIt();
     expect(naturalSpy).toHaveBeenCalledTimes(1);

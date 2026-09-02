@@ -217,12 +217,17 @@ function findCheck(stageId) {
 }
 
 describe('mixed-vowel stages really are mixed', () => {
-  for (const stage of CURRICULUM.filter(s => s.id.endsWith('-mixed'))) {
+  for (const stage of CURRICULUM.filter((s) => s.id.endsWith('-mixed'))) {
     it(`${stage.id} — sample words span at least four short vowels`, () => {
       // The whole point of these stages: a class that meets only short-A
       // words works out that the answer is always /a/ and stops listening.
       const vowels = new Set(
-        (stage.sampleWords || []).map(w => (String(w).toLowerCase().match(/[aeiou]+/) || [''])[0]),
+        (stage.sampleWords || []).map(
+          (w) =>
+            (String(w)
+              .toLowerCase()
+              .match(/[aeiou]+/) || [''])[0],
+        ),
       );
       expect(vowels.size, `${stage.id} vowels: ${[...vowels]}`).toBeGreaterThanOrEqual(4);
     });

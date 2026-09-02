@@ -8,9 +8,15 @@ const localStorageMock = (() => {
   let store = {};
   return {
     getItem: vi.fn((key) => store[key] ?? null),
-    setItem: vi.fn((key, val) => { store[key] = String(val); }),
-    removeItem: vi.fn((key) => { delete store[key]; }),
-    clear: vi.fn(() => { store = {}; }),
+    setItem: vi.fn((key, val) => {
+      store[key] = String(val);
+    }),
+    removeItem: vi.fn((key) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
   };
 })();
 Object.defineProperty(globalThis, 'localStorage', { value: localStorageMock });
@@ -42,8 +48,9 @@ describe('aiGuardrails', () => {
     });
 
     it('strips URLs', () => {
-      expect(guardrails.sanitizeAiText('See https://example.com for more and www.evil.com too'))
-        .toBe('See for more and too');
+      expect(
+        guardrails.sanitizeAiText('See https://example.com for more and www.evil.com too'),
+      ).toBe('See for more and too');
     });
 
     it('strips markdown remnants', () => {
@@ -110,7 +117,9 @@ describe('aiGuardrails', () => {
 
     it('sends the Giri persona as a system instruction and sanitises the reply', async () => {
       store.set('geminiApiKey', 'test-key');
-      fetchMock.mockReturnValue(geminiReply('Use <b>"an"</b> before vowel sounds! See https://x.com'));
+      fetchMock.mockReturnValue(
+        geminiReply('Use <b>"an"</b> before vowel sounds! See https://x.com'),
+      );
 
       const out = await guardrails.askGiriConstrained('explain', 'Explain a vs an.');
       expect(out).toBe('Use "an" before vowel sounds! See');
@@ -136,7 +145,9 @@ describe('aiGuardrails', () => {
     it('logs usage for the parent dashboard', async () => {
       store.set('geminiApiKey', 'test-key');
       fetchMock.mockReturnValue(geminiReply('ok'));
-      await guardrails.askGiriConstrained('hint', 'task text', { logSummary: 'Hint: question one' });
+      await guardrails.askGiriConstrained('hint', 'task text', {
+        logSummary: 'Hint: question one',
+      });
       const log = store.get('aiUsageLog');
       expect(log).toHaveLength(1);
       expect(log[0].kind).toBe('hint');
@@ -221,10 +232,20 @@ describe('aiGuardrails', () => {
     });
 
     it('guarded helpers return null without a key', async () => {
-      const { explainMistake, getAdaptiveHint, explainTeachBack } = await import('../modules/aiService.js');
-      expect(await explainMistake({ question: 'q', options: [], chosen: 'a', correct: 'b' })).toBeNull();
+      const { explainMistake, getAdaptiveHint, explainTeachBack } =
+        await import('../modules/aiService.js');
+      expect(
+        await explainMistake({ question: 'q', options: [], chosen: 'a', correct: 'b' }),
+      ).toBeNull();
       expect(await getAdaptiveHint({ question: 'q', options: [], correct: 'b' })).toBeNull();
-      expect(await explainTeachBack({ skillLabel: 's', exercise: 'e', studentAnswer: 'a', correctAnswer: 'b' })).toBeNull();
+      expect(
+        await explainTeachBack({
+          skillLabel: 's',
+          exercise: 'e',
+          studentAnswer: 'a',
+          correctAnswer: 'b',
+        }),
+      ).toBeNull();
       expect(fetchMock).not.toHaveBeenCalled();
     });
   });
@@ -252,10 +273,12 @@ describe('aiGuardrails', () => {
 
     it('parses findings into sanitised structure — HTML in the echoed draft is stripped', async () => {
       store.set('geminiApiKey', 'test-key');
-      fetchMock.mockReturnValue(geminiReply(
-        'SENTENCE: I like <img src=x onerror=alert(1)> dogs | ISSUE: Remove the strange <b>code</b>\n' +
-        'SENTENCE: He run fast | ISSUE: Use "runs" with "he"',
-      ));
+      fetchMock.mockReturnValue(
+        geminiReply(
+          'SENTENCE: I like <img src=x onerror=alert(1)> dogs | ISSUE: Remove the strange <b>code</b>\n' +
+            'SENTENCE: He run fast | ISSUE: Use "runs" with "he"',
+        ),
+      );
       const { getWritingCoachFeedback } = await import('../modules/aiService.js');
 
       const out = await getWritingCoachFeedback('draft', 2);
@@ -268,7 +291,9 @@ describe('aiGuardrails', () => {
 
     it('returns { good } for a GOOD: reply, sanitised', async () => {
       store.set('geminiApiKey', 'test-key');
-      fetchMock.mockReturnValue(geminiReply('GOOD: Well done! Visit https://evil.example for more'));
+      fetchMock.mockReturnValue(
+        geminiReply('GOOD: Well done! Visit https://evil.example for more'),
+      );
       const { getWritingCoachFeedback } = await import('../modules/aiService.js');
 
       const out = await getWritingCoachFeedback('draft', 2);
@@ -290,7 +315,8 @@ describe('aiGuardrails', () => {
     it('respects the daily cap', async () => {
       store.set('geminiApiKey', 'test-key');
       const { getWritingCoachFeedback } = await import('../modules/aiService.js');
-      for (let i = 0; i < guardrails.DAILY_AI_CALL_CAP; i++) guardrails.logAiUse('explain', `q${i}`);
+      for (let i = 0; i < guardrails.DAILY_AI_CALL_CAP; i++)
+        guardrails.logAiUse('explain', `q${i}`);
       expect(await getWritingCoachFeedback('draft', 2)).toBeNull();
       expect(fetchMock).not.toHaveBeenCalled();
     });
@@ -305,7 +331,9 @@ describe('aiGuardrails', () => {
 
     it('sanitises the feedback line', async () => {
       store.set('geminiApiKey', 'test-key');
-      fetchMock.mockReturnValue(geminiReply('PARTIAL\nAlmost — check <b>tense</b> at https://evil.example'));
+      fetchMock.mockReturnValue(
+        geminiReply('PARTIAL\nAlmost — check <b>tense</b> at https://evil.example'),
+      );
       const { gradeSynthesisAnswer } = await import('../modules/aiService.js');
 
       const out = await gradeSynthesisAnswer('a', '', 'b', [], 'c', 'Passive voice');

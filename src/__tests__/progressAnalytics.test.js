@@ -26,13 +26,13 @@ import { CURRICULUM } from '../data/curriculum.js';
 function a(overrides = {}) {
   return {
     timestamp: Date.UTC(2026, 4, 19, 10, 0, 0),
-    stageId:   'cvc-a',
-    group:     'cvc-a',
-    mode:      'soundMatch',
-    word:      'cat',
-    correct:   true,
+    stageId: 'cvc-a',
+    group: 'cvc-a',
+    mode: 'soundMatch',
+    word: 'cat',
+    correct: true,
     errorCategory: null,
-    timeMs:    1200,
+    timeMs: 1200,
     targetSound: 'short a /ă/',
     ...overrides,
   };
@@ -42,9 +42,21 @@ function a(overrides = {}) {
 // in curriculum.js. The real curriculum is exercised by the integration
 // summarise() tests below.
 const TINY = [
-  { id: 's1', phase: 1, name: 'S1', sampleWords: ['cat', 'hat'], sentenceExamples: ['The cat sat.'] },
-  { id: 's2', phase: 1, name: 'S2', sampleWords: ['bed', 'leg'], sentenceExamples: ['The bed is red.'] },
-  { id: 's3', phase: 2, name: 'S3', sampleWords: ['flap'],       sentenceExamples: ['Flap and clap.'] },
+  {
+    id: 's1',
+    phase: 1,
+    name: 'S1',
+    sampleWords: ['cat', 'hat'],
+    sentenceExamples: ['The cat sat.'],
+  },
+  {
+    id: 's2',
+    phase: 1,
+    name: 'S2',
+    sampleWords: ['bed', 'leg'],
+    sentenceExamples: ['The bed is red.'],
+  },
+  { id: 's3', phase: 2, name: 'S3', sampleWords: ['flap'], sentenceExamples: ['Flap and clap.'] },
 ];
 
 // ── Mastery by stage ─────────────────────────────────────────────────────
@@ -131,7 +143,7 @@ describe('getStrongestSounds / getWeakestSounds', () => {
     const top = getStrongestSounds(stream, { topN: 2 });
     expect(top[0].sound).toBe('/ă/');
     expect(top[0].accuracy).toBe(1);
-    expect(top.find(r => r.sound === '/ŏ/')).toBeUndefined();
+    expect(top.find((r) => r.sound === '/ŏ/')).toBeUndefined();
   });
 
   it('weakest mirrors strongest with ascending order', () => {
@@ -149,11 +161,11 @@ describe('getCommonErrorTypes', () => {
       a({ correct: false, errorCategory: 'vowel-confusion' }),
       a({ correct: false, errorCategory: 'vowel-confusion' }),
       a({ correct: false, errorCategory: 'digraph-confusion' }),
-      a({ correct: true,  errorCategory: 'should-be-ignored' }),
+      a({ correct: true, errorCategory: 'should-be-ignored' }),
     ];
     const out = getCommonErrorTypes(stream);
     expect(out).toEqual([
-      { category: 'vowel-confusion',   count: 2 },
+      { category: 'vowel-confusion', count: 2 },
       { category: 'digraph-confusion', count: 1 },
     ]);
   });
@@ -164,11 +176,14 @@ describe('getCommonErrorTypes', () => {
 describe('getAttemptsOverTime', () => {
   it('buckets attempts into days and pads missing days', () => {
     const now = Date.UTC(2026, 4, 19);
-    const out = getAttemptsOverTime([
-      a({ timestamp: Date.UTC(2026, 4, 19, 10) }),
-      a({ timestamp: Date.UTC(2026, 4, 19, 12), correct: false }),
-      a({ timestamp: Date.UTC(2026, 4, 17, 10) }),
-    ], { historyDays: 5, now });
+    const out = getAttemptsOverTime(
+      [
+        a({ timestamp: Date.UTC(2026, 4, 19, 10) }),
+        a({ timestamp: Date.UTC(2026, 4, 19, 12), correct: false }),
+        a({ timestamp: Date.UTC(2026, 4, 17, 10) }),
+      ],
+      { historyDays: 5, now },
+    );
     expect(out).toHaveLength(5);
     // Last bucket should be 2 today, second-from-last should be 0 (the 18th),
     // and third-from-last should be 1 (the 17th).
@@ -223,7 +238,7 @@ describe('getPrintablePracticeList', () => {
 
   it('falls back to the first N curriculum stages when no attempts exist', () => {
     const out = getPrintablePracticeList([], TINY, { topN: 2 });
-    expect(out.map(o => o.stage.id)).toEqual(['s1', 's2']);
+    expect(out.map((o) => o.stage.id)).toEqual(['s1', 's2']);
   });
 });
 
@@ -232,7 +247,9 @@ describe('getPrintablePracticeList', () => {
 describe('summarise (integration with the real curriculum)', () => {
   it('produces a complete dashboard payload', () => {
     const stream = [
-      ...Array.from({ length: 6 }, () => a({ stageId: 'cvc-a', mode: 'soundMatch', correct: true })),
+      ...Array.from({ length: 6 }, () =>
+        a({ stageId: 'cvc-a', mode: 'soundMatch', correct: true }),
+      ),
       a({ stageId: 'cvc-a', mode: 'blendBuilder', correct: false, errorCategory: 'out-of-order' }),
     ];
     const out = summarise(stream, { curriculum: CURRICULUM, now: Date.UTC(2026, 4, 19) });
@@ -241,7 +258,9 @@ describe('summarise (integration with the real curriculum)', () => {
     expect(out.currentPhase).toBeGreaterThanOrEqual(1);
     expect(out.suggestedNext).not.toBeNull();
     expect(out.suggestedNext.id).toMatch(/^cvc-|^ccvc-|^cvcc-/); // first unmastered
-    expect(Object.keys(out.accuracyByMode)).toEqual(expect.arrayContaining(['soundMatch', 'blendBuilder']));
+    expect(Object.keys(out.accuracyByMode)).toEqual(
+      expect.arrayContaining(['soundMatch', 'blendBuilder']),
+    );
     expect(out.attemptsOverTime.length).toBeGreaterThan(0);
     expect(out.commonErrorTypes[0]?.category).toBe('out-of-order');
     expect(Array.isArray(out.printablePracticeList)).toBe(true);
@@ -255,10 +274,18 @@ describe('attemptLog (localStorage wrapper)', () => {
   function makeMemoryStorage() {
     let map = new Map();
     return {
-      getItem(k)        { return map.has(k) ? map.get(k) : null; },
-      setItem(k, v)     { map.set(k, String(v)); },
-      removeItem(k)     { map.delete(k); },
-      clear()           { map = new Map(); },
+      getItem(k) {
+        return map.has(k) ? map.get(k) : null;
+      },
+      setItem(k, v) {
+        map.set(k, String(v));
+      },
+      removeItem(k) {
+        map.delete(k);
+      },
+      clear() {
+        map = new Map();
+      },
     };
   }
 

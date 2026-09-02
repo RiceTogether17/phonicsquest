@@ -23,7 +23,10 @@ describe('Paper Playlist data integrity', () => {
 describe('Vocab Passages data integrity', () => {
   it('every vocabPassages category key exists in VOCAB_CATEGORIES', () => {
     for (const key of Object.keys(vocabPassages)) {
-      expect(VOCAB_CATEGORIES[key], `Category "${key}" in vocabPassages but not in VOCAB_CATEGORIES`).toBeTruthy();
+      expect(
+        VOCAB_CATEGORIES[key],
+        `Category "${key}" in vocabPassages but not in VOCAB_CATEGORIES`,
+      ).toBeTruthy();
     }
   });
 
@@ -32,7 +35,10 @@ describe('Vocab Passages data integrity', () => {
     for (const key of Object.keys(VOCAB_CATEGORIES)) {
       if (mcqOnly.has(key)) continue; // MCQ-only categories have no cloze bank
       const catData = vocabPassages[key];
-      expect(catData, `Category "${key}" in VOCAB_CATEGORIES but no passages in vocabPassages`).toBeTruthy();
+      expect(
+        catData,
+        `Category "${key}" in VOCAB_CATEGORIES but no passages in vocabPassages`,
+      ).toBeTruthy();
       const levelCount = Object.keys(catData).length;
       expect(levelCount, `Category "${key}" has zero levels`).toBeGreaterThan(0);
     }
@@ -104,7 +110,10 @@ describe('Cloze Castle passage sufficiency', () => {
     it(`${category} at ${level} has at least ${min} passages`, () => {
       const cell = clozePassages?.[level]?.[category];
       const count = Array.isArray(cell) ? cell.length : 0;
-      expect(count, `${category}/${level} has only ${count} passage(s); target is ${min}`).toBeGreaterThanOrEqual(min);
+      expect(
+        count,
+        `${category}/${level} has only ${count} passage(s); target is ${min}`,
+      ).toBeGreaterThanOrEqual(min);
     });
   }
 });

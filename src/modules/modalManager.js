@@ -46,8 +46,7 @@ const FOCUSABLE_SELECTOR =
 
 /** Focusable elements inside the modal (skipping hidden subtrees), in DOM order. */
 function _focusableIn(modal) {
-  return [...modal.querySelectorAll(FOCUSABLE_SELECTOR)]
-    .filter(el => !el.closest('[hidden]'));
+  return [...modal.querySelectorAll(FOCUSABLE_SELECTOR)].filter((el) => !el.closest('[hidden]'));
 }
 
 export const modalManager = {

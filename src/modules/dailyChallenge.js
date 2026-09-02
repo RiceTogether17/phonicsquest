@@ -12,15 +12,16 @@ import { gamification } from './gamification.js';
 import { normalizeAdaptiveConfig, getWordWeight } from './adaptiveSelection.js';
 
 const DAILY_WORD_COUNT = 5;
-const DAILY_BONUS_XP   = 50;
+const DAILY_BONUS_XP = 50;
 
 // ── Seeded pseudo-random number generator (mulberry32) ─────────────────────
 
 function mulberry32(seed) {
-  return function() {
-    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+  return function () {
+    seed |= 0;
+    seed = (seed + 0x6d2b79f5) | 0;
     let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = t + Math.imul(t ^ (t >>> 7), 61 | t) ^ t;
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
@@ -78,48 +79,67 @@ export function getDailyChallengeWords() {
 
   const pinned = store.get('dailyChallengeWords');
   if (pinned && pinned.date === today && Array.isArray(pinned.ids)) {
-    const words = pinned.ids
-      .map(id => WORDS.find(w => w.id === id))
-      .filter(Boolean);
+    const words = pinned.ids.map((id) => WORDS.find((w) => w.id === id)).filter(Boolean);
     if (words.length === DAILY_WORD_COUNT) return words;
     // Stale ids (e.g. word bank changed between versions) — recompute below.
   }
 
   const words = _computeDailyChallengeWords();
-  store.set('dailyChallengeWords', { date: today, ids: words.map(w => w.id) });
+  store.set('dailyChallengeWords', { date: today, ids: words.map((w) => w.id) });
   return words;
 }
 
 /** Compute today's picks from the seeded RNG + current learner stats. */
 function _computeDailyChallengeWords() {
   const seed = dateSeed(todayStr());
-  const rng  = mulberry32(seed);
+  const rng = mulberry32(seed);
   const wordStats = store.get('wordStats') || {};
   const maxLevel = store.get('difficulty') || 1;
   const adaptiveCfg = normalizeAdaptiveConfig(store.get('adaptiveConfig'));
 
-  const eligible = WORDS.filter(w => w.level <= maxLevel);
-  const unseen = eligible.filter(w => !wordStats[w.id] || (wordStats[w.id].attempts || 0) === 0);
+  const eligible = WORDS.filter((w) => w.level <= maxLevel);
+  const unseen = eligible.filter((w) => !wordStats[w.id] || (wordStats[w.id].attempts || 0) === 0);
 
   const weightedWeak = eligible
-    .filter(w => !unseen.includes(w))
-    .map(word => ({ word, weight: getWordWeight(wordStats[word.id], adaptiveCfg) }))
+    .filter((w) => !unseen.includes(w))
+    .map((word) => ({ word, weight: getWordWeight(wordStats[word.id], adaptiveCfg) }))
     .sort((a, b) => b.weight - a.weight)
-    .map(x => x.word);
+    .map((x) => x.word);
 
-  const strongerReview = eligible
-    .filter(w => {
-      const s = wordStats[w.id];
-      return s && s.attempts >= adaptiveCfg.masteryMinAttempts && (s.correct / s.attempts) >= adaptiveCfg.strongAccuracy;
-    });
+  const strongerReview = eligible.filter((w) => {
+    const s = wordStats[w.id];
+    return (
+      s &&
+      s.attempts >= adaptiveCfg.masteryMinAttempts &&
+      s.correct / s.attempts >= adaptiveCfg.strongAccuracy
+    );
+  });
 
   const picks = [];
   picks.push(...pickFrom(weightedWeak, 3, rng));
-  picks.push(...pickFrom(unseen.filter(w => !picks.includes(w)), 1, rng));
-  picks.push(...pickFrom(strongerReview.filter(w => !picks.includes(w)), 1, rng));
+  picks.push(
+    ...pickFrom(
+      unseen.filter((w) => !picks.includes(w)),
+      1,
+      rng,
+    ),
+  );
+  picks.push(
+    ...pickFrom(
+      strongerReview.filter((w) => !picks.includes(w)),
+      1,
+      rng,
+    ),
+  );
 
   if (picks.length < DAILY_WORD_COUNT) {
-    picks.push(...pickFrom(eligible.filter(w => !picks.includes(w)), DAILY_WORD_COUNT - picks.length, rng));
+    picks.push(
+      ...pickFrom(
+        eligible.filter((w) => !picks.includes(w)),
+        DAILY_WORD_COUNT - picks.length,
+        rng,
+      ),
+    );
   }
 
   // Deterministic shuffle of selected words to avoid positional bias.

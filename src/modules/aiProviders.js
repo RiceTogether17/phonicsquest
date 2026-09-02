@@ -70,7 +70,10 @@ async function postJson(url, { headers, body, signal }) {
     });
   } catch (err) {
     if (err?.name === 'AbortError') {
-      throw new AiError('network', 'The tutor took too long to answer. Check the connection and try again.');
+      throw new AiError(
+        'network',
+        'The tutor took too long to answer. Check the connection and try again.',
+      );
     }
     throw new AiError('network', 'Could not reach the AI provider. Check the internet connection.');
   } finally {
@@ -89,21 +92,38 @@ async function raiseHttpError(res, providerLabel) {
   try {
     const body = await res.json();
     detail = body?.error?.message || body?.error?.[0]?.message || body?.message || '';
-  } catch { /* non-JSON error body */ }
+  } catch {
+    /* non-JSON error body */
+  }
 
   if (res.status === 401 || res.status === 403) {
-    throw new AiError('auth', `${providerLabel} rejected the key. Check it was copied in full and is still active.`);
+    throw new AiError(
+      'auth',
+      `${providerLabel} rejected the key. Check it was copied in full and is still active.`,
+    );
   }
   if (res.status === 404) {
-    throw new AiError('model', `${providerLabel} does not have that model. Pick another model in Settings.${detail ? ` (${detail})` : ''}`);
+    throw new AiError(
+      'model',
+      `${providerLabel} does not have that model. Pick another model in Settings.${detail ? ` (${detail})` : ''}`,
+    );
   }
   if (res.status === 429) {
-    throw new AiError('rate-limit', `${providerLabel} is rate-limiting this key — either too many requests just now, or the account is out of credit.`);
+    throw new AiError(
+      'rate-limit',
+      `${providerLabel} is rate-limiting this key — either too many requests just now, or the account is out of credit.`,
+    );
   }
   if (res.status >= 500) {
-    throw new AiError('network', `${providerLabel} is having trouble right now. Try again in a minute.`);
+    throw new AiError(
+      'network',
+      `${providerLabel} is having trouble right now. Try again in a minute.`,
+    );
   }
-  throw new AiError('network', detail || `${providerLabel} refused the request (HTTP ${res.status}).`);
+  throw new AiError(
+    'network',
+    detail || `${providerLabel} refused the request (HTTP ${res.status}).`,
+  );
 }
 
 /**
@@ -125,7 +145,8 @@ export const AI_PROVIDERS = {
     label: 'This device (Chrome built-in AI)',
     needsKey: false,
     free: true,
-    blurb: 'Free and private — the model runs inside Chrome and nothing leaves the device. Needs a recent desktop Chrome; the app will tell you if it is unavailable.',
+    blurb:
+      'Free and private — the model runs inside Chrome and nothing leaves the device. Needs a recent desktop Chrome; the app will tell you if it is unavailable.',
     keyUrl: null,
     defaultModel: 'on-device',
     models: [{ id: 'on-device', label: 'Chrome built-in' }],
@@ -137,14 +158,19 @@ export const AI_PROVIDERS = {
         // Newer Chrome exposes availability(); older exposes capabilities().
         if (api.availability) return (await api.availability()) !== 'unavailable';
         if (api.capabilities) return (await api.capabilities())?.available !== 'no';
-      } catch { /* treat any probe failure as unavailable */ }
+      } catch {
+        /* treat any probe failure as unavailable */
+      }
       return false;
     },
 
     async call({ system, prompt, maxTokens, temperature, signal }) {
       const api = onDeviceApi();
       if (!api?.create) {
-        throw new AiError('unsupported', 'This browser has no built-in AI. Use Chrome on desktop, or choose a provider and paste a key.');
+        throw new AiError(
+          'unsupported',
+          'This browser has no built-in AI. Use Chrome on desktop, or choose a provider and paste a key.',
+        );
       }
       let session;
       try {
@@ -158,9 +184,16 @@ export const AI_PROVIDERS = {
         return { text: String(text || ''), usage: null, maxTokens };
       } catch (err) {
         if (err instanceof AiError) throw err;
-        throw new AiError('unsupported', 'The built-in AI could not answer. It may still be downloading — try again shortly.');
+        throw new AiError(
+          'unsupported',
+          'The built-in AI could not answer. It may still be downloading — try again shortly.',
+        );
       } finally {
-        try { session?.destroy?.(); } catch { /* already gone */ }
+        try {
+          session?.destroy?.();
+        } catch {
+          /* already gone */
+        }
       }
     },
   },
@@ -175,7 +208,8 @@ export const AI_PROVIDERS = {
     label: 'Google Gemini',
     needsKey: true,
     free: false,
-    blurb: 'Google AI Studio keys have a free tier that comfortably covers one child. Set a spend limit if you add billing.',
+    blurb:
+      'Google AI Studio keys have a free tier that comfortably covers one child. Set a spend limit if you add billing.',
     keyUrl: 'https://aistudio.google.com/apikey',
     keyHint: 'Starts with AIza…',
     defaultModel: 'gemini-2.5-flash',
@@ -205,9 +239,16 @@ export const AI_PROVIDERS = {
 
       const candidate = data?.candidates?.[0];
       if (candidate?.finishReason === 'SAFETY' || data?.promptFeedback?.blockReason) {
-        throw new AiError('blocked', 'Google’s safety filter blocked that answer. Nothing was shown to the child.');
+        throw new AiError(
+          'blocked',
+          'Google’s safety filter blocked that answer. Nothing was shown to the child.',
+        );
       }
-      const text = candidate?.content?.parts?.map(p => p.text).filter(Boolean).join('') ?? '';
+      const text =
+        candidate?.content?.parts
+          ?.map((p) => p.text)
+          .filter(Boolean)
+          .join('') ?? '';
       return {
         text,
         usage: {
@@ -228,7 +269,8 @@ export const AI_PROVIDERS = {
     label: 'Anthropic Claude',
     needsKey: true,
     free: false,
-    blurb: 'Billed to your Anthropic Console account. Set a monthly spend limit there before using a key in a browser.',
+    blurb:
+      'Billed to your Anthropic Console account. Set a monthly spend limit there before using a key in a browser.',
     keyUrl: 'https://console.anthropic.com/settings/keys',
     keyHint: 'Starts with sk-ant-…',
     defaultModel: 'claude-opus-5',
@@ -262,11 +304,14 @@ export const AI_PROVIDERS = {
 
       // A refusal arrives as a normal 200 — check before reading content.
       if (data?.stop_reason === 'refusal') {
-        throw new AiError('blocked', 'Claude declined to answer that. Nothing was shown to the child.');
+        throw new AiError(
+          'blocked',
+          'Claude declined to answer that. Nothing was shown to the child.',
+        );
       }
       const text = (data?.content || [])
-        .filter(b => b?.type === 'text')
-        .map(b => b.text)
+        .filter((b) => b?.type === 'text')
+        .map((b) => b.text)
         .join('');
       return {
         text,
@@ -281,7 +326,8 @@ export const AI_PROVIDERS = {
     label: 'OpenAI (ChatGPT models)',
     needsKey: true,
     free: false,
-    blurb: 'This is an OpenAI Platform key, which is billed separately from a ChatGPT Plus subscription. Set a usage limit on the platform first.',
+    blurb:
+      'This is an OpenAI Platform key, which is billed separately from a ChatGPT Plus subscription. Set a usage limit on the platform first.',
     keyUrl: 'https://platform.openai.com/api-keys',
     keyHint: 'Starts with sk-…',
     defaultModel: 'gpt-4o-mini',
@@ -309,7 +355,10 @@ export const AI_PROVIDERS = {
 
       const choice = data?.choices?.[0];
       if (choice?.finish_reason === 'content_filter') {
-        throw new AiError('blocked', 'OpenAI’s safety filter blocked that answer. Nothing was shown to the child.');
+        throw new AiError(
+          'blocked',
+          'OpenAI’s safety filter blocked that answer. Nothing was shown to the child.',
+        );
       }
       return {
         text: choice?.message?.content ?? '',
@@ -329,9 +378,7 @@ export const AI_PROVIDERS = {
  * path working on a parent's machine and it silently not existing.
  */
 function onDeviceApi() {
-  return globalThis.LanguageModel
-    || globalThis.ai?.languageModel
-    || null;
+  return globalThis.LanguageModel || globalThis.ai?.languageModel || null;
 }
 
 /**
@@ -380,14 +427,20 @@ export function validateKeyShape(providerId, key) {
 
   const k = String(key || '').trim();
   if (!k) return { ok: false, reason: 'Paste a key first.' };
-  if (/\s/.test(k)) return { ok: false, reason: 'That key has a space in it — it may have been cut short when copying.' };
+  if (/\s/.test(k))
+    return {
+      ok: false,
+      reason: 'That key has a space in it — it may have been cut short when copying.',
+    };
 
   const prefixes = { anthropic: 'sk-ant-', openai: 'sk-', google: 'AIza' };
   const expected = prefixes[providerId];
   if (expected && !k.startsWith(expected)) {
     // Name the provider it DOES look like — pasting the wrong one of three
     // keys is the likeliest mistake once a parent has more than one.
-    const looksLike = Object.entries(prefixes).find(([id, p]) => id !== providerId && k.startsWith(p));
+    const looksLike = Object.entries(prefixes).find(
+      ([id, p]) => id !== providerId && k.startsWith(p),
+    );
     return {
       ok: false,
       reason: looksLike

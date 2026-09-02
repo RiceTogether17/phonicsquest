@@ -27,5 +27,7 @@ export function speakGiri(text) {
       audio.cancelSpeech();
       return audio.speakText(line);
     })
-    .catch(() => { /* silence is an acceptable outcome */ });
+    .catch(() => {
+      /* silence is an acceptable outcome */
+    });
 }

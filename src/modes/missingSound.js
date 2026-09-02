@@ -29,8 +29,8 @@ export function setupMissingSound(word, els) {
 
   // Pick a random phoneme to hide (prefer vowels for educational value)
   const vowelIndices = word.types
-    .map((t, i) => (t === 'sv' || t === 'lv') ? i : -1)
-    .filter(i => i >= 0);
+    .map((t, i) => (t === 'sv' || t === 'lv' ? i : -1))
+    .filter((i) => i >= 0);
 
   if (vowelIndices.length > 0) {
     missingIndex = vowelIndices[Math.floor(Math.random() * vowelIndices.length)];
@@ -51,7 +51,16 @@ export function setupMissingSound(word, els) {
   display.innerHTML = '';
   word.graphemes.forEach((g, i) => {
     const tile = document.createElement('div');
-    const typeClass = {c:'consonant',sv:'short-vowel',lv:'long-vowel',d:'digraph',bl:'blend',se:'silent-e',rc:'r-control'}[word.types[i]] || 'consonant';
+    const typeClass =
+      {
+        c: 'consonant',
+        sv: 'short-vowel',
+        lv: 'long-vowel',
+        d: 'digraph',
+        bl: 'blend',
+        se: 'silent-e',
+        rc: 'r-control',
+      }[word.types[i]] || 'consonant';
     tile.className = `letter-tile letter-tile--${typeClass}`;
     tile.textContent = i === missingIndex ? '?' : g;
     if (i === missingIndex) {
@@ -82,7 +91,7 @@ export function setupMissingSound(word, els) {
   const distractors = shuffleArray(distractorPool).slice(0, 3);
   const choices = shuffleArray([
     { grapheme: correctGrapheme, type: correctType, correct: true },
-    ...distractors.map(g => ({ grapheme: g, type: correctType, correct: false })),
+    ...distractors.map((g) => ({ grapheme: g, type: correctType, correct: false })),
   ]);
 
   // Render choice buttons
@@ -135,8 +144,11 @@ function _revealAnswer(word, els) {
 
   setTimeout(async () => {
     const prevGrapheme = missingIndex > 0 ? word.graphemes[missingIndex - 1] : null;
-    await audio.speakPhoneme(word.graphemes[missingIndex], word.types[missingIndex], { word: word.word, prevGrapheme });
-    await new Promise(r => setTimeout(r, 300));
+    await audio.speakPhoneme(word.graphemes[missingIndex], word.types[missingIndex], {
+      word: word.word,
+      prevGrapheme,
+    });
+    await new Promise((r) => setTimeout(r, 300));
     await audio.speakWord(word.word);
   }, 300);
 }
@@ -149,8 +161,8 @@ function _revealAnswer(word, els) {
 const FALLBACK_DISTRACTORS = {
   sv: ['a', 'e', 'i', 'o', 'u'],
   lv: ['ee', 'igh', 'oa', 'ai', 'oo'],
-  c:  ['s', 't', 'm', 'p', 'n', 'd'],
-  d:  ['sh', 'ch', 'th', 'ng', 'ck'],
+  c: ['s', 't', 'm', 'p', 'n', 'd'],
+  d: ['sh', 'ch', 'th', 'ng', 'ck'],
   bl: ['st', 'bl', 'tr', 'gr', 'fl'],
   rc: ['ar', 'or', 'er', 'ir', 'ur'],
   dp: ['oi', 'ow', 'ou', 'oy', 'aw'],
@@ -175,7 +187,7 @@ export function getPhonemeDistractors(correctGrapheme, type, maxLevel = 3) {
     return graphemes;
   };
 
-  const result = collect(WORDS.filter(w => w.level <= maxLevel));
+  const result = collect(WORDS.filter((w) => w.level <= maxLevel));
   if (result.size < 3) {
     for (const g of collect(WORDS)) result.add(g);
   }

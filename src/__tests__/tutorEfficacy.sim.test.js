@@ -15,11 +15,12 @@
  */
 import { describe, expect, it } from 'vitest';
 import {
-  scheduleAttempt, getDueItems, getMaturity, GRADUATED_BOX,
+  scheduleAttempt,
+  getDueItems,
+  getMaturity,
+  GRADUATED_BOX,
 } from '../modules/reviewScheduler.js';
-import {
-  getWordWeight, normalizeAdaptiveConfig,
-} from '../modules/adaptiveSelection.js';
+import { getWordWeight, normalizeAdaptiveConfig } from '../modules/adaptiveSelection.js';
 
 const DAY_MS = 86_400_000;
 
@@ -27,7 +28,8 @@ const DAY_MS = 86_400_000;
 function makeRng(seed) {
   let a = seed >>> 0;
   return () => {
-    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
     let t = Math.imul(a ^ (a >>> 15), 1 | a);
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
@@ -100,13 +102,17 @@ function simulateLearner({ seed, days, wordCount, newPerDay, reviewCap }) {
 
 describe('tutor efficacy over a 60-day simulated learner', () => {
   const sim = simulateLearner({
-    seed: 20260725, days: 60, wordCount: 120, newPerDay: 3, reviewCap: 20,
+    seed: 20260725,
+    days: 60,
+    wordCount: 120,
+    newPerDay: 3,
+    reviewCap: 20,
   });
 
   it('produces real learning gains: most practised words reach high maturity', () => {
-    const practised = sim.words.filter(w => sim.stats[w.id]);
+    const practised = sim.words.filter((w) => sim.stats[w.id]);
     expect(practised.length).toBeGreaterThanOrEqual(100); // curriculum coverage
-    const mature = practised.filter(w => getMaturity(sim.stats[w.id]).dots >= 3);
+    const mature = practised.filter((w) => getMaturity(sim.stats[w.id]).dots >= 3);
     // At least 70% of everything taught sits at box 3+ (a week+ between reviews).
     expect(mature.length / practised.length).toBeGreaterThan(0.7);
   });
@@ -116,7 +122,7 @@ describe('tutor efficacy over a 60-day simulated learner', () => {
     // design, so it can't happen inside a 60-day course — box 5 (a
     // 30-day interval) is the long-term-retention marker reachable here.
     const early = sim.words.slice(0, 30); // taught in the first two weeks
-    const longTerm = early.filter(w => (sim.stats[w.id]?.box ?? 0) >= GRADUATED_BOX - 1);
+    const longTerm = early.filter((w) => (sim.stats[w.id]?.box ?? 0) >= GRADUATED_BOX - 1);
     expect(longTerm.length / early.length).toBeGreaterThan(0.5);
   });
 
@@ -124,8 +130,8 @@ describe('tutor efficacy over a 60-day simulated learner', () => {
     const end = sim.start + sim.days * DAY_MS;
     // Learner's actual expected recall today, from the memory model.
     const recalls = sim.words
-      .filter(w => sim.memory[w.id])
-      .map(w => {
+      .filter((w) => sim.memory[w.id])
+      .map((w) => {
         const m = sim.memory[w.id];
         return recallProbability(m.strength, (end - m.lastAt) / DAY_MS);
       });
@@ -138,13 +144,13 @@ describe('tutor efficacy over a 60-day simulated learner', () => {
 
   it('spends its attention like a tutor: struggling words get more practice', () => {
     const byAccuracy = sim.words
-      .filter(w => (sim.stats[w.id]?.attempts ?? 0) >= 3)
-      .map(w => ({
+      .filter((w) => (sim.stats[w.id]?.attempts ?? 0) >= 3)
+      .map((w) => ({
         acc: sim.stats[w.id].correct / sim.stats[w.id].attempts,
         n: sim.attemptsByWord[w.id],
       }));
-    const weak = byAccuracy.filter(x => x.acc < 0.7);
-    const strong = byAccuracy.filter(x => x.acc >= 0.9);
+    const weak = byAccuracy.filter((x) => x.acc < 0.7);
+    const strong = byAccuracy.filter((x) => x.acc >= 0.9);
     const avg = (xs) => xs.reduce((a, b) => a + b.n, 0) / xs.length;
     expect(weak.length).toBeGreaterThan(0);
     expect(strong.length).toBeGreaterThan(0);
@@ -156,7 +162,8 @@ describe('tutor efficacy over a 60-day simulated learner', () => {
     const cfg = normalizeAdaptiveConfig();
     const weakStat = { attempts: 10, correct: 4 };
     const strongStat = {
-      attempts: 12, correct: 12,
+      attempts: 12,
+      correct: 12,
       nextReviewDate: new Date(Date.now() + 7 * DAY_MS).toISOString(),
     };
     expect(getWordWeight(weakStat, cfg)).toBeGreaterThan(getWordWeight(strongStat, cfg));

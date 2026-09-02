@@ -4,11 +4,7 @@
  * is introduced exactly once across the ten phases.
  */
 import { describe, expect, it } from 'vitest';
-import {
-  PHASES,
-  getSightWordsForPhase,
-  getSightWordsThroughPhase,
-} from '../data/curriculum.js';
+import { PHASES, getSightWordsForPhase, getSightWordsThroughPhase } from '../data/curriculum.js';
 
 describe('phase sight words', () => {
   it('every phase carries a non-empty sightWords list', () => {
@@ -22,7 +18,10 @@ describe('phase sight words', () => {
     const seen = new Map();
     for (const phase of PHASES) {
       for (const word of phase.sightWords) {
-        expect(seen.has(word), `"${word}" appears in phase ${seen.get(word)} and ${phase.phase}`).toBe(false);
+        expect(
+          seen.has(word),
+          `"${word}" appears in phase ${seen.get(word)} and ${phase.phase}`,
+        ).toBe(false);
         seen.set(word, phase.phase);
       }
     }

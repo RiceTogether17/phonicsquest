@@ -45,7 +45,7 @@ class SpinWheel {
   init(canvas) {
     this._canvas = canvas;
     this._ctx = canvas.getContext('2d');
-    this._segments = WHEEL_GROUPS.map(key => ({
+    this._segments = WHEEL_GROUPS.map((key) => ({
       key,
       ...WORD_GROUPS[key],
     }));
@@ -127,7 +127,7 @@ class SpinWheel {
 
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
-    const r  = Math.min(cx, cy) - 6;
+    const r = Math.min(cx, cy) - 6;
     const segAngle = (Math.PI * 2) / this._segments.length;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -139,7 +139,7 @@ class SpinWheel {
     for (let i = 0; i < this._segments.length; i++) {
       const seg = this._segments[i];
       const startAngle = i * segAngle;
-      const endAngle   = startAngle + segAngle;
+      const endAngle = startAngle + segAngle;
 
       // Segment fill
       ctx.beginPath();
@@ -227,10 +227,10 @@ export function buildWordAnimation(word, container, onLetterLand) {
   container.setAttribute('aria-label', word.word);
 
   const typeClassMap = {
-    c:  'consonant',
+    c: 'consonant',
     sv: 'short-vowel',
     lv: 'long-vowel',
-    d:  'digraph',
+    d: 'digraph',
     bl: 'blend',
     se: 'silent-e',
     rc: 'r-control',
@@ -278,9 +278,9 @@ export function buildWordAnimation(word, container, onLetterLand) {
     stagger: 0.12,
     ease: 'back.out(1.7)',
     onComplete: () => {
-      tiles.forEach(t => t.classList.add('letter-tile--revealed'));
+      tiles.forEach((t) => t.classList.add('letter-tile--revealed'));
     },
-    onUpdate: function() {
+    onUpdate: function () {
       // Call onLetterLand for each tile that becomes visible
       const progress = this.progress();
       const stagger = 0.12;

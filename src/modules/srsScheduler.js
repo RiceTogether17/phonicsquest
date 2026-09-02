@@ -40,9 +40,9 @@ import { utcYmd, utcYmdAddDays } from '../utils/dates.js';
  * @property {number} wrong       lifetime wrong count
  */
 
-const STORE_KEY    = 'srsSchedule';
-const INITIAL_EF   = 2.5;
-const MIN_EF       = 1.3;
+const STORE_KEY = 'srsSchedule';
+const INITIAL_EF = 2.5;
+const MIN_EF = 1.3;
 const MAX_INTERVAL = 180;
 
 const _today = () => utcYmd();
@@ -73,12 +73,12 @@ function _setSchedule(schedule) {
 function _ensureSM2Shape(existing) {
   if (!existing) {
     return {
-      interval:    1,
+      interval: 1,
       repetitions: 0,
-      easeFactor:  INITIAL_EF,
-      dueAt:       _today(),
-      correct:     0,
-      wrong:       0,
+      easeFactor: INITIAL_EF,
+      dueAt: _today(),
+      correct: 0,
+      wrong: 0,
     };
   }
   // Every field is defaulted, not just the two SM-2 additions: a truncated
@@ -86,12 +86,12 @@ function _ensureSM2Shape(existing) {
   // through the interval arithmetic and produce an invalid dueAt.
   return {
     ...existing,
-    interval:    typeof existing.interval    === 'number' ? existing.interval    : 1,
-    dueAt:       typeof existing.dueAt       === 'string' ? existing.dueAt       : _today(),
-    correct:     typeof existing.correct     === 'number' ? existing.correct     : 0,
-    wrong:       typeof existing.wrong       === 'number' ? existing.wrong       : 0,
+    interval: typeof existing.interval === 'number' ? existing.interval : 1,
+    dueAt: typeof existing.dueAt === 'string' ? existing.dueAt : _today(),
+    correct: typeof existing.correct === 'number' ? existing.correct : 0,
+    wrong: typeof existing.wrong === 'number' ? existing.wrong : 0,
     repetitions: typeof existing.repetitions === 'number' ? existing.repetitions : 0,
-    easeFactor:  typeof existing.easeFactor  === 'number' ? existing.easeFactor  : INITIAL_EF,
+    easeFactor: typeof existing.easeFactor === 'number' ? existing.easeFactor : INITIAL_EF,
   };
 }
 
@@ -121,7 +121,7 @@ function _applyReview(entry, correct) {
     interval = Math.min(interval, MAX_INTERVAL);
   } else {
     repetitions = 0;
-    interval    = 1;
+    interval = 1;
   }
 
   return {
@@ -144,14 +144,14 @@ function _applyReview(entry, correct) {
 export function scheduleWord(wordId, correct) {
   if (!wordId) return;
   const schedule = _getSchedule();
-  const entry    = _ensureSM2Shape(schedule[wordId]);
+  const entry = _ensureSM2Shape(schedule[wordId]);
   const reviewed = _applyReview(entry, correct);
 
   schedule[wordId] = {
     ...entry,
     ...reviewed,
     correct: entry.correct + (correct ? 1 : 0),
-    wrong:   entry.wrong   + (correct ? 0 : 1),
+    wrong: entry.wrong + (correct ? 0 : 1),
   };
 
   _setSchedule(schedule);
@@ -169,7 +169,7 @@ export const record = scheduleWord;
 export function isWordDue(wordId) {
   if (!wordId) return false;
   const schedule = _getSchedule();
-  const entry    = schedule[wordId];
+  const entry = schedule[wordId];
   if (!entry) return false;
   return _today() >= entry.dueAt;
 }
@@ -186,9 +186,9 @@ export const isDue = isWordDue;
  */
 export function getDueWords(wordIds) {
   const schedule = _getSchedule();
-  const today    = _today();
-  const source   = Array.isArray(wordIds) ? wordIds : Object.keys(schedule);
-  return source.filter(id => schedule[id] && today >= schedule[id].dueAt);
+  const today = _today();
+  const source = Array.isArray(wordIds) ? wordIds : Object.keys(schedule);
+  return source.filter((id) => schedule[id] && today >= schedule[id].dueAt);
 }
 
 /**
@@ -209,7 +209,7 @@ export function getDueCount() {
 export function getWordStatus(wordId) {
   if (!wordId) return null;
   const schedule = _getSchedule();
-  const entry    = schedule[wordId];
+  const entry = schedule[wordId];
   if (!entry) return null;
   return _ensureSM2Shape(entry);
 }
@@ -228,8 +228,8 @@ export function reset() {
  * Namespace object for callers that use the srsScheduler.* dot-notation API.
  */
 export const srsScheduler = {
-  record:      scheduleWord,
-  isDue:       isWordDue,
+  record: scheduleWord,
+  isDue: isWordDue,
   getDueWords,
   getSchedule: getWordStatus,
   reset,

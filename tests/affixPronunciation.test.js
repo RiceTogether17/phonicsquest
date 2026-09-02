@@ -14,39 +14,63 @@ function installAudioMocks() {
   globalThis.speechSynthesis = {
     getVoices: () => [],
     addEventListener: () => {},
-    speak: vi.fn((utt) => { utt.onend?.(); }),
+    speak: vi.fn((utt) => {
+      utt.onend?.();
+    }),
     cancel: () => {},
     paused: false,
     resume: () => {},
   };
   globalThis.SpeechSynthesisUtterance = class {
-    constructor(text) { this.text = text; this.rate = 1; this.pitch = 1; this.volume = 1; }
+    constructor(text) {
+      this.text = text;
+      this.rate = 1;
+      this.pitch = 1;
+      this.volume = 1;
+    }
   };
   // Minimal AudioContext stub
-  globalThis.AudioContext = globalThis.AudioContext || class {
-    constructor() { this.state = 'running'; this.currentTime = 0; }
-    createBufferSource() {
-      return {
-        connect: vi.fn(), start: vi.fn(), stop: vi.fn(),
-        buffer: null, onended: null,
-      };
-    }
-    createGain() {
-      return {
-        connect: vi.fn(),
-        gain: { value: 1, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() },
-      };
-    }
-    createOscillator() {
-      return {
-        connect: vi.fn(), start: vi.fn(), stop: vi.fn(),
-        type: 'sine', frequency: { value: 0 },
-      };
-    }
-    get destination() { return {}; }
-    resume() { return Promise.resolve(); }
-    decodeAudioData() { return Promise.reject(new Error('no real audio')); }
-  };
+  globalThis.AudioContext =
+    globalThis.AudioContext ||
+    class {
+      constructor() {
+        this.state = 'running';
+        this.currentTime = 0;
+      }
+      createBufferSource() {
+        return {
+          connect: vi.fn(),
+          start: vi.fn(),
+          stop: vi.fn(),
+          buffer: null,
+          onended: null,
+        };
+      }
+      createGain() {
+        return {
+          connect: vi.fn(),
+          gain: { value: 1, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() },
+        };
+      }
+      createOscillator() {
+        return {
+          connect: vi.fn(),
+          start: vi.fn(),
+          stop: vi.fn(),
+          type: 'sine',
+          frequency: { value: 0 },
+        };
+      }
+      get destination() {
+        return {};
+      }
+      resume() {
+        return Promise.resolve();
+      }
+      decodeAudioData() {
+        return Promise.reject(new Error('no real audio'));
+      }
+    };
 }
 
 describe('affix pronunciation', () => {

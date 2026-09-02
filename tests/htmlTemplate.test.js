@@ -8,9 +8,7 @@ import { html, raw } from '../src/utils/html.js';
 describe('html tagged template', () => {
   it('escapes interpolated values by default', () => {
     const evil = '<img src=x onerror=alert(1)>';
-    expect(String(html`<p>${evil}</p>`)).toBe(
-      '<p>&lt;img src=x onerror=alert(1)&gt;</p>',
-    );
+    expect(String(html`<p>${evil}</p>`)).toBe('<p>&lt;img src=x onerror=alert(1)&gt;</p>');
   });
 
   it('leaves the literal template markup intact', () => {
@@ -29,7 +27,7 @@ describe('html tagged template', () => {
 
   it('joins arrays, applying the same rules per element', () => {
     const names = ['a<b', 'c>d'];
-    expect(String(html`<ul>${names.map(n => html`<li>${n}</li>`)}</ul>`)).toBe(
+    expect(String(html`<ul>${names.map((n) => html`<li>${n}</li>`)}</ul>`)).toBe(
       '<ul><li>a&lt;b</li><li>c&gt;d</li></ul>',
     );
   });

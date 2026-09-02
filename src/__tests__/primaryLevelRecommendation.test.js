@@ -7,7 +7,10 @@ import { beforeAll, describe, expect, it } from 'vitest';
 let recommendPrimaryLevel;
 beforeAll(async () => {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
   ({ recommendPrimaryLevel } = await import('../modules/primaryQuickCheck.js'));
 });

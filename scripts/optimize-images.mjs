@@ -25,7 +25,11 @@ async function collect() {
   const out = [];
   for (const dir of dirs) {
     let entries;
-    try { entries = await readdir(dir); } catch { continue; }
+    try {
+      entries = await readdir(dir);
+    } catch {
+      continue;
+    }
     for (const name of entries) {
       if (!name.toLowerCase().endsWith('.png')) continue;
       out.push(join(dir, name));
@@ -35,7 +39,9 @@ async function collect() {
 }
 
 const kb = (n) => `${(n / 1024).toFixed(0)}KB`;
-let before = 0, after = 0, changed = 0;
+let before = 0,
+  after = 0,
+  changed = 0;
 
 for (const file of await collect()) {
   const img = await Jimp.read(file);
@@ -48,8 +54,14 @@ for (const file of await collect()) {
   await img.write(file);
 
   const sizeAfter = (await stat(file)).size;
-  before += sizeBefore; after += sizeAfter; changed++;
-  console.log(`${file}: ${width}×${height} ${kb(sizeBefore)} → ${img.bitmap.width}×${img.bitmap.height} ${kb(sizeAfter)}`);
+  before += sizeBefore;
+  after += sizeAfter;
+  changed++;
+  console.log(
+    `${file}: ${width}×${height} ${kb(sizeBefore)} → ${img.bitmap.width}×${img.bitmap.height} ${kb(sizeAfter)}`,
+  );
 }
 
-console.log(`\n${changed} images optimized: ${kb(before)} → ${kb(after)} (saved ${kb(before - after)})`);
+console.log(
+  `\n${changed} images optimized: ${kb(before)} → ${kb(after)} (saved ${kb(before - after)})`,
+);

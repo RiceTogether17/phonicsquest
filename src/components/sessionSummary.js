@@ -10,7 +10,7 @@
  *     Renders the summary into the #screen-session-summary element.
  */
 
-import { store }        from '../modules/store.js';
+import { store } from '../modules/store.js';
 import { getActiveProfile } from '../modules/profiles.js';
 import { escapeHtml } from '../utils/escapeHtml.js';
 
@@ -24,17 +24,27 @@ import { escapeHtml } from '../utils/escapeHtml.js';
  *   onClose:   () => void,
  * }} opts
  */
-export function showSessionSummary({ xpEarned, wordsCount, firstTryCount = 0, streak, newBadges = [], onClose }) {
+export function showSessionSummary({
+  xpEarned,
+  wordsCount,
+  firstTryCount = 0,
+  streak,
+  newBadges = [],
+  onClose,
+}) {
   const container = document.getElementById('screen-session-summary');
-  if (!container) { onClose(); return; }
+  if (!container) {
+    onClose();
+    return;
+  }
 
-  const profile      = getActiveProfile();
+  const profile = getActiveProfile();
   // Escaped once here: firstName is spliced into the motivational headings
   // below, which are assigned to innerHTML.
-  const firstName    = escapeHtml(profile?.name?.split(' ')[0] || 'Great job');
-  const avatar       = profile?.avatar || '🦁';
-  const level        = store.get('level') || 1;
-  const bestStreak   = store.get('bestStreak') || streak;
+  const firstName = escapeHtml(profile?.name?.split(' ')[0] || 'Great job');
+  const avatar = profile?.avatar || '🦁';
+  const level = store.get('level') || 1;
+  const bestStreak = store.get('bestStreak') || streak;
 
   // Motivational copy based on performance
   const messages = [
@@ -45,34 +55,42 @@ export function showSessionSummary({ xpEarned, wordsCount, firstTryCount = 0, st
   ];
   const heading = messages[Math.floor(Math.random() * messages.length)];
 
-  const streakHtml = streak > 0
-    ? `<div class="ss-streak" aria-label="${streak} day streak">
+  const streakHtml =
+    streak > 0
+      ? `<div class="ss-streak" aria-label="${streak} day streak">
          <span class="ss-streak-fire">🔥</span>
          <strong>${streak}</strong>
          <span class="ss-streak-label">day streak${streak > 1 ? '' : ''}</span>
          ${streak === bestStreak && streak > 1 ? '<span class="ss-best-badge">Best!</span>' : ''}
        </div>`
-    : '';
+      : '';
 
   const badgesHtml = newBadges.length
     ? `<div class="ss-badges" aria-label="New badges earned">
          <p class="ss-badges-title">🏅 New badge${newBadges.length > 1 ? 's' : ''} unlocked!</p>
          <div class="ss-badges-list">
-           ${newBadges.map(b => `
+           ${newBadges
+             .map(
+               (b) => `
              <div class="ss-badge-item">
                <span class="ss-badge-emoji" aria-hidden="true">${b.emoji}</span>
                <span class="ss-badge-name">${b.name}</span>
-             </div>`).join('')}
+             </div>`,
+             )
+             .join('')}
          </div>
        </div>`
     : '';
 
   // First-try rate: colour-code as a quality signal
-  const firstTryPct    = wordsCount > 0 ? Math.round((firstTryCount / wordsCount) * 100) : 0;
+  const firstTryPct = wordsCount > 0 ? Math.round((firstTryCount / wordsCount) * 100) : 0;
   const firstTryColour = firstTryPct >= 70 ? '#22c55e' : firstTryPct >= 50 ? '#f59e0b' : '#ef4444';
-  const firstTryLabel  = firstTryPct >= 70 ? 'Decoded independently'
-                       : firstTryPct >= 50 ? 'Mostly independent'
-                       : 'Needs more practice';
+  const firstTryLabel =
+    firstTryPct >= 70
+      ? 'Decoded independently'
+      : firstTryPct >= 50
+        ? 'Mostly independent'
+        : 'Needs more practice';
 
   const statsHtml = `
     <div class="ss-stats" aria-label="Today's stats">

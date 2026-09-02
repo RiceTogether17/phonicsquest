@@ -11,23 +11,31 @@ import AxeBuilder from '@axe-core/playwright';
 async function seedLearner(page) {
   await page.addInitScript(() => {
     const seen = {};
-    ['cvc-a', 'cvc-e', 'cvc-i', 'cvc-o', 'cvc-u'].forEach(id => {
+    ['cvc-a', 'cvc-e', 'cvc-i', 'cvc-o', 'cvc-u'].forEach((id) => {
       seen[`phonics:${id}`] = new Date().toISOString();
     });
     const profile = {
-      id: 'p_reveal', name: 'Testy', avatar: '🦊', color: '#f97316',
-      schoolLevel: 'preschool', primaryGrade: null, readingBand: 'emerging-decoder',
+      id: 'p_reveal',
+      name: 'Testy',
+      avatar: '🦊',
+      color: '#f97316',
+      schoolLevel: 'preschool',
+      primaryGrade: null,
+      readingBand: 'emerging-decoder',
       createdAt: new Date().toISOString(),
     };
     localStorage.setItem('phonicsquest_profiles', JSON.stringify([profile]));
     localStorage.setItem('phonicsquest_active_profile', profile.id);
     localStorage.setItem('phonicsquest_legacy_migrated_to_profiles', '1');
-    localStorage.setItem(`phonicsquest_profile_${profile.id}`, JSON.stringify({
-      placementComplete: true,
-      placementProfile: { readingBand: 'emerging-decoder' },
-      onboardingComplete: true,
-      lessonsSeen: seen,
-    }));
+    localStorage.setItem(
+      `phonicsquest_profile_${profile.id}`,
+      JSON.stringify({
+        placementComplete: true,
+        placementProfile: { readingBand: 'emerging-decoder' },
+        onboardingComplete: true,
+        lessonsSeen: seen,
+      }),
+    );
   });
 }
 
@@ -95,12 +103,10 @@ test('an articulation cue shows how to make the sound', async ({ page }) => {
 test('the reveal introduces no accessibility violations', async ({ page }) => {
   await revealFirstSound(page);
 
-  const results = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa'])
-    .analyze();
+  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
 
   const blocking = results.violations.filter(
-    v => v.impact === 'critical' || v.impact === 'serious',
+    (v) => v.impact === 'critical' || v.impact === 'serious',
   );
-  expect(blocking.map(v => `${v.id}: ${v.help} (${v.nodes.length} nodes)`)).toEqual([]);
+  expect(blocking.map((v) => `${v.id}: ${v.help} (${v.nodes.length} nodes)`)).toEqual([]);
 });

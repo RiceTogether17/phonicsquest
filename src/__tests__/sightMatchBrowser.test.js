@@ -12,7 +12,10 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 function stubAudioGlobals() {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
 }
 
@@ -31,7 +34,11 @@ let container;
 beforeEach(() => {
   document.body.innerHTML = '<div id="sm-root"></div>';
   container = document.getElementById('sm-root');
-  sightMatch.initSightMatch(container, () => {}, () => {});
+  sightMatch.initSightMatch(
+    container,
+    () => {},
+    () => {},
+  );
 });
 
 describe('showSightBrowser', () => {
@@ -49,10 +56,10 @@ describe('showSightBrowser', () => {
   });
 
   it('does not overwrite an active game if a quest starts before the load resolves', async () => {
-    sightMatch.showSightBrowser();               // async render kicks off
+    sightMatch.showSightBrowser(); // async render kicks off
     sightMatch.startSightMatchQuest(SIGHT_QUESTS[0]); // child jumps straight in
     await flush(() => false); // let the lazy load settle fully
-    expect(container.querySelector('.sm-card')).toBeTruthy();   // game stayed up
+    expect(container.querySelector('.sm-card')).toBeTruthy(); // game stayed up
     expect(container.querySelector('.sm-browser')).toBeFalsy(); // browser skipped
   });
 });

@@ -3,7 +3,11 @@ import { getMorphologyParts, getBaseWord, hasKnownAffix } from '../data/words.js
 
 describe('morphology helpers', () => {
   it('extracts prefix and suffix where possible', () => {
-    expect(getMorphologyParts('unreadable')).toEqual({ prefix: 'un', base: 'read', suffix: 'able' });
+    expect(getMorphologyParts('unreadable')).toEqual({
+      prefix: 'un',
+      base: 'read',
+      suffix: 'able',
+    });
   });
 
   it('extracts suffix from -tion words', () => {

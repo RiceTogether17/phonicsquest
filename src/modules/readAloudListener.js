@@ -37,7 +37,7 @@ export function tokenizeWords(text) {
     .toLowerCase()
     .replace(/[’']/g, "'")
     .split(/[^a-z0-9']+/)
-    .map(w => w.replace(/^'+|'+$/g, ''))
+    .map((w) => w.replace(/^'+|'+$/g, ''))
     .filter(Boolean);
 }
 
@@ -54,7 +54,7 @@ export function alignReading(expected, said, simFn = (a, b) => speech.phoneticSi
   const m = expected.length;
   const n = said.length;
   if (m === 0) return [];
-  if (n === 0) return expected.map(word => ({ word, status: 'miss', heard: null }));
+  if (n === 0) return expected.map((word) => ({ word, status: 'miss', heard: null }));
 
   const GAP = -0.4; // skipping a word costs less than a bad match scores
   const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
@@ -62,23 +62,21 @@ export function alignReading(expected, said, simFn = (a, b) => speech.phoneticSi
   for (let j = 1; j <= n; j++) dp[0][j] = j * GAP;
 
   const sim = Array.from({ length: m }, (_, i) =>
-    Array.from({ length: n }, (_, j) => simFn(expected[i], said[j])));
+    Array.from({ length: n }, (_, j) => simFn(expected[i], said[j])),
+  );
 
   for (let i = 1; i <= m; i++) {
     for (let j = 1; j <= n; j++) {
       // pair score in [-0.5, 0.5]: good matches attract, bad ones repel
       const pair = sim[i - 1][j - 1] - 0.5;
-      dp[i][j] = Math.max(
-        dp[i - 1][j - 1] + pair,
-        dp[i - 1][j] + GAP,
-        dp[i][j - 1] + GAP,
-      );
+      dp[i][j] = Math.max(dp[i - 1][j - 1] + pair, dp[i - 1][j] + GAP, dp[i][j - 1] + GAP);
     }
   }
 
   // Trace back to recover which expected words paired with which heard words
   const result = new Array(m);
-  let i = m, j = n;
+  let i = m,
+    j = n;
   while (i > 0) {
     const pair = j > 0 ? sim[i - 1][j - 1] - 0.5 : -Infinity;
     if (j > 0 && dp[i][j] === dp[i - 1][j - 1] + pair) {
@@ -89,7 +87,8 @@ export function alignReading(expected, said, simFn = (a, b) => speech.phoneticSi
       else if (s >= UNSURE_THRESHOLD || word.length <= SHORT_WORD_LEN) status = 'unsure';
       else status = 'miss';
       result[i - 1] = { word, status, heard: said[j - 1] };
-      i--; j--;
+      i--;
+      j--;
     } else if (j > 0 && dp[i][j] === dp[i][j - 1] + GAP) {
       j--; // extra heard word — ignore (insertions are fine)
     } else {
@@ -119,19 +118,21 @@ export function assessLineReading(lineText, transcripts, simFn) {
   const expected = tokenizeWords(lineText);
   let best = null;
 
-  for (const t of (transcripts || [])) {
+  for (const t of transcripts || []) {
     const words = alignReading(expected, tokenizeWords(t.text), simFn);
-    const matchCount = words.filter(w => w.status === 'match').length;
+    const matchCount = words.filter((w) => w.status === 'match').length;
     if (!best || matchCount > best.matchCount) {
       best = { words, matchCount, total: expected.length };
     }
   }
 
-  return best || {
-    words: expected.map(word => ({ word, status: 'miss', heard: null })),
-    matchCount: 0,
-    total: expected.length,
-  };
+  return (
+    best || {
+      words: expected.map((word) => ({ word, status: 'miss', heard: null })),
+      matchCount: 0,
+      total: expected.length,
+    }
+  );
 }
 
 /** Can this browser/profile do read-aloud listening at all? */

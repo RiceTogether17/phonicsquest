@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { DEFAULT_ADAPTIVE_CONFIG, normalizeAdaptiveConfig, getWordWeight } from '../modules/adaptiveSelection.js';
+import {
+  DEFAULT_ADAPTIVE_CONFIG,
+  normalizeAdaptiveConfig,
+  getWordWeight,
+} from '../modules/adaptiveSelection.js';
 
 describe('adaptive selection config', () => {
   it('uses defaults when config is empty', () => {
@@ -24,12 +28,16 @@ describe('adaptive selection config', () => {
     const future = new Date(Date.now() + 86400000).toISOString();
     // 9/10 = exactly 0.9 — both paths must agree on the boundary.
     expect(getWordWeight({ attempts: 10, correct: 9 }, cfg)).toBe(cfg.strongWeight);
-    expect(getWordWeight({ attempts: 10, correct: 9, nextReviewDate: future }, cfg)).toBe(cfg.strongWeight);
+    expect(getWordWeight({ attempts: 10, correct: 9, nextReviewDate: future }, cfg)).toBe(
+      cfg.strongWeight,
+    );
   });
 
   it('boosts a mastered word once its review date has passed', () => {
     const cfg = normalizeAdaptiveConfig();
     const past = new Date(Date.now() - 86400000).toISOString();
-    expect(getWordWeight({ attempts: 10, correct: 9, nextReviewDate: past }, cfg)).toBe(cfg.mediumWeight);
+    expect(getWordWeight({ attempts: 10, correct: 9, nextReviewDate: past }, cfg)).toBe(
+      cfg.mediumWeight,
+    );
   });
 });

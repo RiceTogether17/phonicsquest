@@ -16,7 +16,9 @@ describe('stretched speech for phonemic awareness', () => {
       resume: vi.fn(),
     };
     globalThis.SpeechSynthesisUtterance = class {
-      constructor(text) { this.text = text; }
+      constructor(text) {
+        this.text = text;
+      }
     };
   });
 
@@ -56,7 +58,7 @@ describe('stretched speech for phonemic awareness', () => {
     store.set('sfxEnabled', true);
 
     const phonemeSpy = vi.spyOn(audio, 'speakPhoneme').mockResolvedValue();
-    const speakSpy   = vi.spyOn(audio, '_speak').mockResolvedValue();
+    const speakSpy = vi.spyOn(audio, '_speak').mockResolvedValue();
 
     await audio.speakWordStretched('the');
 
@@ -72,9 +74,13 @@ describe('stretched speech for phonemic awareness', () => {
     store.set('sfxEnabled', false);
 
     const phonemeSpy = vi.spyOn(audio, 'speakPhoneme').mockResolvedValue();
-    const speakSpy   = vi.spyOn(audio, '_speak').mockResolvedValue();
+    const speakSpy = vi.spyOn(audio, '_speak').mockResolvedValue();
 
-    await audio.speakWordStretched({ word: 'cat', graphemes: ['c','a','t'], types: ['c','sv','c'] });
+    await audio.speakWordStretched({
+      word: 'cat',
+      graphemes: ['c', 'a', 't'],
+      types: ['c', 'sv', 'c'],
+    });
 
     expect(phonemeSpy).not.toHaveBeenCalled();
     expect(speakSpy).not.toHaveBeenCalled();
@@ -107,7 +113,9 @@ describe('stretched speech for phonemic awareness', () => {
     const gamification = { init: vi.fn() };
     settingsController.bind({ store, badges, gamification, onReset: vi.fn(), closeModal: vi.fn() });
 
-    const toggle = /** @type {HTMLInputElement} */ (document.getElementById('stretched-speech-toggle'));
+    const toggle = /** @type {HTMLInputElement} */ (
+      document.getElementById('stretched-speech-toggle')
+    );
     toggle.checked = true;
     toggle.dispatchEvent(new Event('change'));
     expect(store.get('stretchedSpeech')).toBe(true);
@@ -125,20 +133,33 @@ describe('stretched speech for phonemic awareness', () => {
       <div id="toast-container"></div>
     `;
 
-    globalThis.AudioContext = globalThis.AudioContext || class {
-      constructor() { this.state = 'running'; }
-      createOscillator() {
-        return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } };
-      }
-      createGain() {
-        return {
-          connect: vi.fn(),
-          gain: { value: 1, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() },
-        };
-      }
-      get destination() { return {}; }
-      resume() { return Promise.resolve(); }
-    };
+    globalThis.AudioContext =
+      globalThis.AudioContext ||
+      class {
+        constructor() {
+          this.state = 'running';
+        }
+        createOscillator() {
+          return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } };
+        }
+        createGain() {
+          return {
+            connect: vi.fn(),
+            gain: {
+              value: 1,
+              setValueAtTime: vi.fn(),
+              exponentialRampToValueAtTime: vi.fn(),
+              linearRampToValueAtTime: vi.fn(),
+            },
+          };
+        }
+        get destination() {
+          return {};
+        }
+        resume() {
+          return Promise.resolve();
+        }
+      };
 
     const { app } = await import('../src/app.js');
     const { audio } = await import('../src/modules/audio.js');
@@ -146,13 +167,18 @@ describe('stretched speech for phonemic awareness', () => {
     store.reset();
 
     const stretchedSpy = vi.spyOn(audio, 'speakWordStretched').mockResolvedValue();
-    const phonemeSpy   = vi.spyOn(audio, 'speakPhoneme').mockResolvedValue();
-    const wordSpy      = vi.spyOn(audio, 'speakWord').mockResolvedValue();
+    const phonemeSpy = vi.spyOn(audio, 'speakPhoneme').mockResolvedValue();
+    const wordSpy = vi.spyOn(audio, 'speakWord').mockResolvedValue();
 
     app._mode = 'first';
     app._hintTier = 0;
     app._hintUsed = false;
-    app._currentWord = { id: 'pa-1', word: 'sat', graphemes: ['s','a','t'], types: ['c','sv','c'] };
+    app._currentWord = {
+      id: 'pa-1',
+      word: 'sat',
+      graphemes: ['s', 'a', 't'],
+      types: ['c', 'sv', 'c'],
+    };
     app._els = { btnHint: document.getElementById('btn-hint') };
     app._showToast = vi.fn();
 

@@ -18,7 +18,7 @@ import { getDistractors, shuffleArray } from '../data/words.js';
 import { createChoiceRound } from './choiceRound.js';
 
 let currentWord = null;
-let round       = null;
+let round = null;
 
 /**
  * @param {import('../data/words.js').Word} word
@@ -30,12 +30,12 @@ export function setupOralBlend(word, els) {
   // No image, no word text during question — pure auditory task
   renderWordImage(word, els.wordEmoji, false);
   els.wordDisplay.innerHTML = '';
-  els.phonemeRow.innerHTML  = '';
+  els.phonemeRow.innerHTML = '';
 
   els.modeInstruction.textContent = 'Listen to the sounds… which word is it?';
 
   const distractors = getDistractors(word, 3, { maxLevel: word.level });
-  const choices     = shuffleArray([word, ...distractors]);
+  const choices = shuffleArray([word, ...distractors]);
 
   // Render choice buttons: large emoji + word label (hidden until reveal)
   els.modeArea.innerHTML = '<div class="choice-grid choice-grid--emoji"></div>';
@@ -44,17 +44,17 @@ export function setupOralBlend(word, els) {
   for (const choice of choices) {
     const btn = document.createElement('button');
     btn.className = 'choice-btn choice-btn--emoji';
-    btn.dataset.wordId  = choice.id;
+    btn.dataset.wordId = choice.id;
     btn.dataset.correct = String(choice.id === word.id);
     btn.setAttribute('aria-label', `Choose ${choice.word}`);
 
     const emojiEl = document.createElement('span');
-    emojiEl.className   = 'choice-btn-emoji';
+    emojiEl.className = 'choice-btn-emoji';
     emojiEl.textContent = choice.emoji;
     emojiEl.setAttribute('aria-hidden', 'true');
 
     const labelEl = document.createElement('span');
-    labelEl.className   = 'choice-btn-word choice-btn-word--hidden';
+    labelEl.className = 'choice-btn-word choice-btn-word--hidden';
     labelEl.textContent = choice.word;
 
     btn.appendChild(emojiEl);
@@ -68,13 +68,15 @@ export function setupOralBlend(word, els) {
     grid,
     onResult: els.onResult,
     retryHint: 'Blend the sounds together in your head.',
-    onRetry: () => { setTimeout(() => _playPhonemes(word), 200); },
+    onRetry: () => {
+      setTimeout(() => _playPhonemes(word), 200);
+    },
     onReveal: () => _revealAnswer(word, els, grid),
   });
 
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = '';
-  els.btnSkip.style.display  = '';
+  els.btnSkip.style.display = '';
 
   // Play each phoneme with a clear pause between them
   setTimeout(() => _playPhonemes(word), 600);
@@ -83,7 +85,7 @@ export function setupOralBlend(word, els) {
 /** Speak each grapheme in sequence with a pause between. */
 async function _playPhonemes(word) {
   for (let i = 0; i < word.graphemes.length; i++) {
-    if (i > 0) await new Promise(r => setTimeout(r, 300));
+    if (i > 0) await new Promise((r) => setTimeout(r, 300));
     const prevGrapheme = i > 0 ? word.graphemes[i - 1] : null;
     await audio.speakPhoneme(word.graphemes[i], word.types[i], { word: word.word, prevGrapheme });
   }
@@ -91,9 +93,9 @@ async function _playPhonemes(word) {
 
 /** Reveal: word labels on choices + image + word text + phoneme tiles + audio. */
 function _revealAnswer(word, els, grid) {
-  grid.querySelectorAll('.choice-btn-word').forEach(l =>
-    l.classList.remove('choice-btn-word--hidden')
-  );
+  grid
+    .querySelectorAll('.choice-btn-word')
+    .forEach((l) => l.classList.remove('choice-btn-word--hidden'));
 
   renderWordImage(word, els.wordEmoji, true);
   buildWordAnimation(word, els.wordDisplay);
@@ -102,9 +104,11 @@ function _revealAnswer(word, els, grid) {
   setTimeout(() => audio.speakWord(word.word), 400);
 }
 
-export function getCurrentWord() { return currentWord; }
+export function getCurrentWord() {
+  return currentWord;
+}
 
 export function cleanup() {
   currentWord = null;
-  round       = null;
+  round = null;
 }

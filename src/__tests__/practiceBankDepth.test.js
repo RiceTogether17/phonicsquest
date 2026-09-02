@@ -7,8 +7,11 @@ import { allSentences } from '../data/sentences.js';
 import { MIN_QUESTIONS_PER_SCOPE } from '../data/practiceExpansion.js';
 import { classifySentenceTrack } from '../modules/sentenceForgeTracks.js';
 
-const normalize = value => String(value || '').trim().toLowerCase();
-const blankCount = text => (String(text || '').match(/___/g) || []).length;
+const normalize = (value) =>
+  String(value || '')
+    .trim()
+    .toLowerCase();
+const blankCount = (text) => (String(text || '').match(/___/g) || []).length;
 
 // Every category used to report 101 questions. It never held 101: each was a
 // rotation through ~18 authored sentences, repeated six times and disguised
@@ -20,13 +23,18 @@ const MIN_QUESTIONS_PER_CATEGORY = 8;
 
 function expectMcqScopes(bank, label) {
   for (const [level, items] of Object.entries(bank)) {
-    const scopes = Object.groupBy(items, item => item.category);
+    const scopes = Object.groupBy(items, (item) => item.category);
     for (const [category, questions] of Object.entries(scopes)) {
       const tag = `${label}/${level}/${category}`;
       expect(questions.length, tag).toBeGreaterThanOrEqual(MIN_QUESTIONS_PER_CATEGORY);
-      expect(new Set(questions.map(item => normalize(item.q))).size, `${tag} unique prompts`).toBe(questions.length);
+      expect(
+        new Set(questions.map((item) => normalize(item.q))).size,
+        `${tag} unique prompts`,
+      ).toBe(questions.length);
       // One item per seed now, so seed identity and item count match.
-      expect(new Set(questions.map(item => item.seedId)).size, `${tag} distinct seeds`).toBe(questions.length);
+      expect(new Set(questions.map((item) => item.seedId)).size, `${tag} distinct seeds`).toBe(
+        questions.length,
+      );
       for (const item of questions) {
         expect(item.choices.length, `${item.id} choices`).toBe(4);
         expect(new Set(item.choices.map(normalize)).size, `${item.id} distinct choices`).toBe(4);
@@ -40,7 +48,10 @@ function expectMcqScopes(bank, label) {
 function expectClozeScope(passagesForScope, tag) {
   const questionCount = passagesForScope.reduce((sum, passage) => sum + passage.answers.length, 0);
   expect(questionCount, `${tag} question count`).toBeGreaterThan(100);
-  expect(new Set(passagesForScope.map(passage => normalize(passage.text))).size, `${tag} unique passages`).toBe(passagesForScope.length);
+  expect(
+    new Set(passagesForScope.map((passage) => normalize(passage.text))).size,
+    `${tag} unique passages`,
+  ).toBe(passagesForScope.length);
   for (const passage of passagesForScope) {
     expect(blankCount(passage.text), `${passage.id} blank count`).toBe(passage.answers.length);
     const bank = new Set(passage.wordBank.map(normalize));
@@ -79,7 +90,7 @@ describe('practice banks hold accurate, non-repeating questions per selectable s
     for (const bank of [GRAMMAR_MCQ_ITEMS, VOCAB_MCQ_ITEMS]) {
       for (const items of Object.values(bank)) {
         for (const item of items) {
-          if (WRAPPERS.some(re => re.test(item.q))) offenders.push(`${item.id}: ${item.q}`);
+          if (WRAPPERS.some((re) => re.test(item.q))) offenders.push(`${item.id}: ${item.q}`);
         }
       }
     }
@@ -106,12 +117,20 @@ describe('practice banks hold accurate, non-repeating questions per selectable s
     const tracks = ['word-order', 'sentence-combining', 'synthesis-transformation'];
     for (let level = 1; level <= 6; level += 1) {
       for (const track of tracks) {
-        const scope = allSentences.filter(item => item.level === level && classifySentenceTrack(item) === track);
+        const scope = allSentences.filter(
+          (item) => item.level === level && classifySentenceTrack(item) === track,
+        );
         if (!scope.length) continue;
         const tag = `Sentence Forge/P${level}/${track}`;
         expect(scope.length, tag).toBeGreaterThan(100);
-        expect(new Set(scope.map(item => normalize(item.sentence))).size, `${tag} unique sentences`).toBe(scope.length);
-        expect(new Set(scope.map(item => item.focusLabel)).size, `${tag} structural variety`).toBeGreaterThanOrEqual(4);
+        expect(
+          new Set(scope.map((item) => normalize(item.sentence))).size,
+          `${tag} unique sentences`,
+        ).toBe(scope.length);
+        expect(
+          new Set(scope.map((item) => item.focusLabel)).size,
+          `${tag} structural variety`,
+        ).toBeGreaterThanOrEqual(4);
         for (const item of scope) {
           expect(item.sentence, `${item.id} sentence`).toMatch(/[.?!]$/);
           expect(item.sentenceSkills?.length, `${item.id} skills`).toBeGreaterThan(0);
