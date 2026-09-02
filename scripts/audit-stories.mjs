@@ -29,7 +29,7 @@ import {
 const args = process.argv.slice(2);
 const asJson = args.includes('--json');
 const doFix = args.includes('--fix');
-const onlyIds = args.filter(a => !a.startsWith('--'));
+const onlyIds = args.filter((a) => !a.startsWith('--'));
 
 const reports = [];
 for (const story of STORIES) {
@@ -54,7 +54,9 @@ for (const story of STORIES) {
     problems.push(`allowedHFWTier ${story.allowedHFWTier} > cap ${rules.hfwCap}`);
   }
   if (Math.abs(computed.decodableRatio - story.decodableRatio) > 0.02) {
-    problems.push(`decodableRatio ${story.decodableRatio} ≠ computed ${computed.decodableRatio.toFixed(2)}`);
+    problems.push(
+      `decodableRatio ${story.decodableRatio} ≠ computed ${computed.decodableRatio.toFixed(2)}`,
+    );
   }
   if (computed.refrainCount !== story.refrainCount) {
     problems.push(`refrainCount ${story.refrainCount} ≠ computed ${computed.refrainCount}`);
@@ -62,7 +64,9 @@ for (const story of STORIES) {
   const caps = findUnknownCapitalised(story);
   if (caps.length) problems.push(`unwhitelisted name(s): ${caps.join(', ')}`);
   for (const s of computed.stretchWords) {
-    problems.push(`stretch: "${s.word}"×${s.count} needs tier ${s.requiredTier} (story tier ${phase?.tier})`);
+    problems.push(
+      `stretch: "${s.word}"×${s.count} needs tier ${s.requiredTier} (story tier ${phase?.tier})`,
+    );
   }
 
   reports.push({ id: story.id, band: story.band, phase: story.phase, computed, problems });
@@ -95,7 +99,9 @@ if (asJson) {
   for (const r of reports) {
     if (!r.problems.length) continue;
     bad += 1;
-    console.log(`\n■ ${r.id}  [Band ${r.band} · ${r.phase}]  words=${r.computed.wordCount} ratio=${r.computed.decodableRatio.toFixed(2)}`);
+    console.log(
+      `\n■ ${r.id}  [Band ${r.band} · ${r.phase}]  words=${r.computed.wordCount} ratio=${r.computed.decodableRatio.toFixed(2)}`,
+    );
     for (const p of r.problems) console.log(`   - ${p}`);
   }
   const ratios = {};

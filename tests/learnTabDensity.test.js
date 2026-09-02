@@ -9,17 +9,45 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 function stubAudioGlobals() {
   globalThis.speechSynthesis = {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
-    paused: false, resume: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
+    paused: false,
+    resume: () => {},
   };
-  globalThis.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; } };
-  globalThis.AudioContext = globalThis.AudioContext || class {
-    constructor() { this.state = 'running'; }
-    createOscillator() { return { connect() {}, start() {}, stop() {}, frequency: { value: 0 } }; }
-    createGain() { return { connect() {}, gain: { value: 1, setValueAtTime() {}, exponentialRampToValueAtTime() {}, linearRampToValueAtTime() {} } }; }
-    get destination() { return {}; }
-    resume() { return Promise.resolve(); }
+  globalThis.SpeechSynthesisUtterance = class {
+    constructor(t) {
+      this.text = t;
+    }
   };
+  globalThis.AudioContext =
+    globalThis.AudioContext ||
+    class {
+      constructor() {
+        this.state = 'running';
+      }
+      createOscillator() {
+        return { connect() {}, start() {}, stop() {}, frequency: { value: 0 } };
+      }
+      createGain() {
+        return {
+          connect() {},
+          gain: {
+            value: 1,
+            setValueAtTime() {},
+            exponentialRampToValueAtTime() {},
+            linearRampToValueAtTime() {},
+          },
+        };
+      }
+      get destination() {
+        return {};
+      }
+      resume() {
+        return Promise.resolve();
+      }
+    };
 }
 
 const GROUPS = ['language', 'vocab', 'sentences', 'writing', 'comprehension', 'exam'];
@@ -27,14 +55,14 @@ const GROUPS = ['language', 'vocab', 'sentences', 'writing', 'comprehension', 'e
 function buildQuestSection() {
   document.body.innerHTML = `
     <div id="home-quests-section">
-      ${GROUPS.map(g => `<details class="home-group" data-group="${g}" open></details>`).join('')}
+      ${GROUPS.map((g) => `<details class="home-group" data-group="${g}" open></details>`).join('')}
     </div>`;
 }
 
 const openGroups = () =>
   Array.from(document.querySelectorAll('#home-quests-section .home-group'))
-    .filter(d => d.hasAttribute('open'))
-    .map(d => d.getAttribute('data-group'));
+    .filter((d) => d.hasAttribute('open'))
+    .map((d) => d.getAttribute('data-group'));
 
 describe('_applyQuestGroupDefaults — Learn-tab density', () => {
   beforeEach(() => {

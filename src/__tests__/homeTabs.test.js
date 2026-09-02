@@ -8,9 +8,15 @@ const localStorageMock = (() => {
   let store = {};
   return {
     getItem: vi.fn((key) => store[key] ?? null),
-    setItem: vi.fn((key, val) => { store[key] = String(val); }),
-    removeItem: vi.fn((key) => { delete store[key]; }),
-    clear: vi.fn(() => { store = {}; }),
+    setItem: vi.fn((key, val) => {
+      store[key] = String(val);
+    }),
+    removeItem: vi.fn((key) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
   };
 })();
 Object.defineProperty(globalThis, 'localStorage', { value: localStorageMock });
@@ -21,15 +27,19 @@ function buildDom() {
   document.body.innerHTML = `
     <section id="screen-home">
       <div class="home-tabs" role="tablist">
-        ${TABS.map((t, i) => `
+        ${TABS.map(
+          (t, i) => `
           <button class="home-tab" id="home-tab-${t}" role="tab"
                   aria-selected="${i === 0}" aria-controls="home-panel-${t}"
-                  ${i === 0 ? '' : 'tabindex="-1"'}>${t}</button>`).join('')}
+                  ${i === 0 ? '' : 'tabindex="-1"'}>${t}</button>`,
+        ).join('')}
       </div>
-      ${TABS.map((t, i) => `
+      ${TABS.map(
+        (t, i) => `
         <div class="home-tabpanel" id="home-panel-${t}" role="tabpanel" ${i === 0 ? '' : 'hidden'}>
           <button id="inside-${t}">inside ${t}</button>
-        </div>`).join('')}
+        </div>`,
+      ).join('')}
     </section>`;
 }
 
@@ -50,7 +60,7 @@ describe('selectTab', () => {
     homeTabs.selectTab('learn');
 
     expect(document.getElementById('home-panel-learn').hidden).toBe(false);
-    for (const t of TABS.filter(t => t !== 'learn')) {
+    for (const t of TABS.filter((t) => t !== 'learn')) {
       expect(document.getElementById(`home-panel-${t}`).hidden).toBe(true);
     }
     expect(document.getElementById('home-tab-learn').getAttribute('aria-selected')).toBe('true');
@@ -59,7 +69,7 @@ describe('selectTab', () => {
     expect(document.getElementById('home-tab-today').tabIndex).toBe(-1);
   });
 
-  it('persists the choice with today\'s date', () => {
+  it("persists the choice with today's date", () => {
     homeTabs.initHomeTabs();
     homeTabs.selectTab('extra');
     expect(store.get('homeTab')).toBe('extra');
@@ -94,15 +104,18 @@ describe('getInitialTab', () => {
 
 describe('keyboard navigation', () => {
   function press(key) {
-    document.querySelector('.home-tabs').dispatchEvent(
-      new KeyboardEvent('keydown', { key, bubbles: true }));
+    document
+      .querySelector('.home-tabs')
+      .dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
   }
 
   it('ArrowRight moves to the next tab and wraps', () => {
     homeTabs.initHomeTabs();
     press('ArrowRight');
     expect(homeTabs.getActiveTab()).toBe('learn');
-    press('ArrowRight'); press('ArrowRight'); press('ArrowRight');
+    press('ArrowRight');
+    press('ArrowRight');
+    press('ArrowRight');
     expect(homeTabs.getActiveTab()).toBe('today'); // wrapped
   });
 
@@ -130,7 +143,10 @@ describe('hidden panels and programmatic dispatch', () => {
 describe('initHomeTabs', () => {
   it('restores the saved same-day tab on init', () => {
     store.set('homeTab', 'extra');
-    store.set('homeTabDate', `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`);
+    store.set(
+      'homeTabDate',
+      `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`,
+    );
     homeTabs.initHomeTabs();
     expect(homeTabs.getActiveTab()).toBe('extra');
     expect(document.getElementById('home-panel-extra').hidden).toBe(false);

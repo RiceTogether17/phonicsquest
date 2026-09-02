@@ -10,7 +10,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 function stubAudioGlobals() {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
 }
 
@@ -33,7 +36,9 @@ function mountPinDom() {
 }
 
 function typePin(pin) {
-  document.querySelectorAll('.pin-digit').forEach((d, i) => { d.value = pin[i] ?? ''; });
+  document.querySelectorAll('.pin-digit').forEach((d, i) => {
+    d.value = pin[i] ?? '';
+  });
 }
 
 const handlers = () => ({
@@ -54,7 +59,7 @@ const handlers = () => ({
  */
 const settle = async (done = null) => {
   for (let i = 0; i < 100; i++) {
-    await new Promise(r => setTimeout(r, 5));
+    await new Promise((r) => setTimeout(r, 5));
     if (!done || done()) return;
   }
 };
@@ -97,7 +102,9 @@ describe('onboarding tutorial', () => {
     oc.showOnboardingTutorial('pre-reader', handlers());
 
     const next = document.getElementById('ob-next');
-    next.click(); next.click(); next.click(); // to the last of 4
+    next.click();
+    next.click();
+    next.click(); // to the last of 4
     expect(next.textContent).toMatch(/let's go/i);
   });
 
@@ -109,7 +116,10 @@ describe('onboarding tutorial', () => {
     oc.showOnboardingTutorial('pre-reader', h);
 
     const next = document.getElementById('ob-next');
-    next.click(); next.click(); next.click(); next.click();
+    next.click();
+    next.click();
+    next.click();
+    next.click();
 
     expect(store.get('onboardingComplete')).toBe(true);
     expect(h.closeModal).toHaveBeenCalledWith('modal-onboarding');
@@ -140,7 +150,10 @@ describe('onboarding tutorial', () => {
         expect(document.querySelectorAll('.ob-dot').length, band).toBe(4);
         // The active dot must track the step, or the parent loses their place.
         const dots = [...document.querySelectorAll('.ob-dot')];
-        expect(dots.findIndex(d => d.classList.contains('ob-dot--active')), `${band} step ${i}`).toBe(i);
+        expect(
+          dots.findIndex((d) => d.classList.contains('ob-dot--active')),
+          `${band} step ${i}`,
+        ).toBe(i);
         if (i < 3) next.click();
       }
 
@@ -191,14 +204,14 @@ describe('onboarding tutorial', () => {
   it('orients the adult on order, focus and bonuses in every band', async () => {
     const { ONBOARDING_TUTORIAL } = await import('../data/onboardingTutorial.js');
     for (const [band, screens] of Object.entries(ONBOARDING_TUTORIAL)) {
-      const titles = screens.map(s => s.title).join(' | ');
+      const titles = screens.map((s) => s.title).join(' | ');
       expect(titles, band).toMatch(/order each day/i);
       expect(titles, band).toMatch(/card every day/i);
       expect(titles, band).toMatch(/bonus activities/i);
 
       // The daily-order screen must actually lay out numbered steps, and the
       // bonus screen must say where to find them.
-      const bodies = screens.map(s => s.body).join(' ');
+      const bodies = screens.map((s) => s.body).join(' ');
       expect(bodies, band).toContain('ob-step-num');
       expect(bodies, band).toMatch(/Extra<\/strong> tab/);
     }
@@ -216,7 +229,7 @@ describe('onboarding tutorial', () => {
     const notInExtra = ['Sight Words', 'Giri Stories', 'Letter Sounds', 'Fluency Sprint'];
 
     for (const [band, screens] of Object.entries(ONBOARDING_TUTORIAL)) {
-      const bonus = screens.find(s => /Bonus activities/i.test(s.title));
+      const bonus = screens.find((s) => /Bonus activities/i.test(s.title));
       expect(bonus, `${band} bonus screen`).toBeTruthy();
 
       // Split the list of Extra-tab items from the trailing note.
@@ -231,7 +244,10 @@ describe('onboarding tutorial', () => {
 
   it('names band-appropriate activities rather than generic copy', async () => {
     const { getTutorialScreens } = await import('../data/onboardingTutorial.js');
-    const bodyOf = band => getTutorialScreens(band).map(s => s.body).join(' ');
+    const bodyOf = (band) =>
+      getTutorialScreens(band)
+        .map((s) => s.body)
+        .join(' ');
 
     // An emerging decoder is not yet doing sentence construction, and a
     // reader is not being sent back to letter-sound matching.
@@ -292,7 +308,9 @@ describe('parent PIN gate', () => {
     expect(h.onUnlocked).not.toHaveBeenCalled();
     expect(document.getElementById('pin-hint').textContent).toMatch(/wrong pin/i);
     // Boxes are cleared so the next attempt starts fresh.
-    expect(Array.from(document.querySelectorAll('.pin-digit')).every(d => d.value === '')).toBe(true);
+    expect(Array.from(document.querySelectorAll('.pin-digit')).every((d) => d.value === '')).toBe(
+      true,
+    );
 
     typePin('4321');
     document.getElementById('pin-confirm-btn').click();
@@ -311,7 +329,9 @@ describe('parent PIN gate', () => {
 
     expect(h.closeModal).toHaveBeenCalledWith('modal-pin');
     expect(h.onUnlocked).not.toHaveBeenCalled();
-    expect(Array.from(document.querySelectorAll('.pin-digit')).every(d => d.value === '')).toBe(true);
+    expect(Array.from(document.querySelectorAll('.pin-digit')).every((d) => d.value === '')).toBe(
+      true,
+    );
   });
 
   it('advances focus as digits are typed', async () => {

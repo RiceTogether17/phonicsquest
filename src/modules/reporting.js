@@ -28,7 +28,6 @@ const LO_CODE_MAP = {
   grammaticalRole: 'LO-ENG-VOC-10',
 };
 
-
 const PRIORITY_WEIGHTS = {
   // MOE/PSLE-heavy grammar focus
   pronouns: 1.25,
@@ -49,7 +48,7 @@ const PRIORITY_WEIGHTS = {
 function _priorityScore(row) {
   const w = PRIORITY_WEIGHTS[row.key] || 1;
   const attemptsPenalty = row.attempts === 0 ? 0.1 : 0;
-  return ((1 - (row.accuracy || 0)) * w) + attemptsPenalty;
+  return (1 - (row.accuracy || 0)) * w + attemptsPenalty;
 }
 
 const MOE_SYLLABUS_LINK = 'https://www.moe.gov.sg/primary/curriculum/syllabus';
@@ -62,9 +61,9 @@ function _collectQuestAccuracy(quest, categoryKeys) {
   const attempts = store.get('questAttempts') || [];
 
   return categoryKeys.map((key) => {
-    const rows = attempts.filter(a => a.quest === quest && a.skill === key);
+    const rows = attempts.filter((a) => a.quest === quest && a.skill === key);
     const total = rows.length;
-    const correct = rows.filter(a => a.correct).length;
+    const correct = rows.filter((a) => a.correct).length;
     return {
       key,
       attempts: total,
@@ -77,8 +76,14 @@ function _collectQuestAccuracy(quest, categoryKeys) {
 export function getVocabularyCategoryReport() {
   const categories = Object.keys(VOCAB_CATEGORIES);
   const rows = _collectQuestAccuracy('wordVault', categories);
-  const clue = store.get('clueStats')?.wordVault || { attempted: 0, strong: 0, partial: 0, weak: 0 };
-  const clueSuccess = clue.attempted > 0 ? ((clue.strong || 0) + (clue.partial || 0)) / clue.attempted : 0;
+  const clue = store.get('clueStats')?.wordVault || {
+    attempted: 0,
+    strong: 0,
+    partial: 0,
+    weak: 0,
+  };
+  const clueSuccess =
+    clue.attempted > 0 ? ((clue.strong || 0) + (clue.partial || 0)) / clue.attempted : 0;
 
   return rows.map((r) => ({
     ...r,
@@ -93,8 +98,14 @@ export function getVocabularyCategoryReport() {
 export function getGrammarCategoryReport() {
   const categories = Object.keys(GRAMMAR_CATEGORIES);
   const rows = _collectQuestAccuracy('clozeCastle', categories);
-  const clue = store.get('clueStats')?.clozeCastle || { attempted: 0, strong: 0, partial: 0, weak: 0 };
-  const clueSuccess = clue.attempted > 0 ? ((clue.strong || 0) + (clue.partial || 0)) / clue.attempted : 0;
+  const clue = store.get('clueStats')?.clozeCastle || {
+    attempted: 0,
+    strong: 0,
+    partial: 0,
+    weak: 0,
+  };
+  const clueSuccess =
+    clue.attempted > 0 ? ((clue.strong || 0) + (clue.partial || 0)) / clue.attempted : 0;
 
   return rows.map((r) => ({
     ...r,
@@ -106,41 +117,39 @@ export function getGrammarCategoryReport() {
   }));
 }
 
-
 export function getMoePriorityRecommendations() {
   const vocab = getVocabularyCategoryReport()
-    .map(r => ({ ...r, priorityScore: _priorityScore(r) }))
+    .map((r) => ({ ...r, priorityScore: _priorityScore(r) }))
     .sort((a, b) => b.priorityScore - a.priorityScore)
     .slice(0, 3);
 
   const grammar = getGrammarCategoryReport()
-    .map(r => ({ ...r, priorityScore: _priorityScore(r) }))
+    .map((r) => ({ ...r, priorityScore: _priorityScore(r) }))
     .sort((a, b) => b.priorityScore - a.priorityScore)
     .slice(0, 3);
 
   return { vocab, grammar };
 }
 
-
 export function getLearningFunnelReport({ days = 7 } = {}) {
   const events = store.get('learningEvents') || [];
-  const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
-  const recent = events.filter(e => {
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  const recent = events.filter((e) => {
     const ts = Date.parse(e.timestamp || '');
     return Number.isFinite(ts) && ts >= cutoff;
   });
 
-  const attempts = recent.filter(e => e.eventType === 'quest_attempt');
-  const withResponse = attempts.filter(e => typeof e.responseMs === 'number');
-  const correct = attempts.filter(e => e.correct === true).length;
+  const attempts = recent.filter((e) => e.eventType === 'quest_attempt');
+  const withResponse = attempts.filter((e) => typeof e.responseMs === 'number');
+  const correct = attempts.filter((e) => e.correct === true).length;
   const avgResponseMs = withResponse.length
     ? Math.round(withResponse.reduce((sum, e) => sum + e.responseMs, 0) / withResponse.length)
     : null;
 
   const byQuest = ['sentenceForge', 'clozeCastle', 'wordVault'].map((quest) => {
-    const rows = attempts.filter(e => e.quest === quest);
+    const rows = attempts.filter((e) => e.quest === quest);
     const total = rows.length;
-    const right = rows.filter(e => e.correct === true).length;
+    const right = rows.filter((e) => e.correct === true).length;
     return {
       quest,
       attempts: total,
@@ -157,7 +166,6 @@ export function getLearningFunnelReport({ days = 7 } = {}) {
     byQuest,
   };
 }
-
 
 export function getAdaptiveLessonQueue({ limit = 6 } = {}) {
   const { vocab, grammar } = getMoePriorityRecommendations();
@@ -210,13 +218,12 @@ export function getAdaptiveLessonQueue({ limit = 6 } = {}) {
   return deduped;
 }
 
-
 export function getLatestQuestScoreboards() {
   const attempts = store.get('questAttempts') || [];
   const byQuest = ['sentenceForge', 'clozeCastle', 'wordVault'].map((quest) => {
-    const rows = attempts.filter(a => a.quest === quest).slice(0, 12);
+    const rows = attempts.filter((a) => a.quest === quest).slice(0, 12);
     const total = rows.length;
-    const correct = rows.filter(a => a.correct).length;
+    const correct = rows.filter((a) => a.correct).length;
     const accuracy = _accuracy(correct, total);
     return { quest, total, correct, accuracy };
   });

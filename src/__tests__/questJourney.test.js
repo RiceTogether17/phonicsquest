@@ -9,7 +9,10 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 beforeAll(() => {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
 });
 
@@ -82,7 +85,11 @@ describe('buildSoundMatchRound', () => {
 
 describe('buildBlendBuilderRound', () => {
   it('produces a bank that contains every target grapheme', () => {
-    const round = buildBlendBuilderRound('ccvc-a', { wordIndex: 0, addDistractor: false, rng: seededRng(3) });
+    const round = buildBlendBuilderRound('ccvc-a', {
+      wordIndex: 0,
+      addDistractor: false,
+      rng: seededRng(3),
+    });
     expect(round.mode).toBe('blendBuilder');
     // ccvc-a stage ships 4-letter words (flat, clap, trap …).
     expect(round.target.word.length).toBe(4);
@@ -103,7 +110,7 @@ describe('buildLesson', () => {
     const lesson = buildLesson('ccvc-a', { roundsPerMode: 3, rng: seededRng(11) });
     expect(lesson.soundMatch).toHaveLength(3);
     expect(lesson.blendBuilder).toHaveLength(3);
-    const words = lesson.blendBuilder.map(r => r.target.word);
+    const words = lesson.blendBuilder.map((r) => r.target.word);
     expect(new Set(words).size).toBe(3);
   });
 
@@ -152,10 +159,12 @@ describe('renderWelcome', () => {
 describe('renderProfileSelect', () => {
   it('renders a card per profile plus an "Add player" card', () => {
     const host = makeHost();
-    renderProfileSelect(host, { profiles: [
-      { id: 'a', name: 'Aanya', avatar: '🐰', meta: 'Phase 1' },
-      { id: 'r', name: 'Rohan', avatar: '🦊', meta: 'Phase 2' },
-    ] });
+    renderProfileSelect(host, {
+      profiles: [
+        { id: 'a', name: 'Aanya', avatar: '🐰', meta: 'Phase 1' },
+        { id: 'r', name: 'Rohan', avatar: '🦊', meta: 'Phase 2' },
+      ],
+    });
     expect(host.querySelectorAll('[data-profile-id]').length).toBe(2);
     expect(host.querySelector('[data-action="create"]')).not.toBeNull();
   });
@@ -165,7 +174,7 @@ describe('renderProfileSelect', () => {
     let picked = null;
     renderProfileSelect(host, {
       profiles: [{ id: 'p1', name: 'Test' }],
-      onPick: (id) => picked = id,
+      onPick: (id) => (picked = id),
     });
     host.querySelector('[data-profile-id="p1"]').click();
     expect(picked).toBe('p1');
@@ -193,7 +202,7 @@ describe('renderQuestMap', () => {
       currentStageId: 'ccvc-a',
       masteredStageIds: [],
       unlockedStageIds: ['ccvc-a'],
-      onPick: (id) => picked = id,
+      onPick: (id) => (picked = id),
     });
     const locked = host.querySelector('.qj-node--locked');
     locked.click();
@@ -216,7 +225,7 @@ describe('renderLessonIntro', () => {
   it('the start CTA fires onStart with the stage id', () => {
     const host = makeHost();
     let started = null;
-    renderLessonIntro(host, { stageId: 'ccvc-a', onStart: (id) => started = id });
+    renderLessonIntro(host, { stageId: 'ccvc-a', onStart: (id) => (started = id) });
     host.querySelector('[data-action="start"]').click();
     expect(started).toBe('ccvc-a');
   });
@@ -243,7 +252,7 @@ describe('renderGameMode — Sound Match', () => {
     renderGameMode(host, {
       modeKey: 'soundMatch',
       round,
-      onAnswer: (a) => answered = a,
+      onAnswer: (a) => (answered = a),
     });
     host.querySelector('[data-choice="a"]').click();
     expect(answered.chosen).toBe('a');
@@ -282,7 +291,7 @@ describe('renderGameMode — Blend Builder', () => {
   const round = {
     mode: 'blendBuilder',
     target: { word: 'cat', graphemes: ['c', 'a', 't'] },
-    bank:   ['t', 'a', 'c', 's'],
+    bank: ['t', 'a', 'c', 's'],
   };
 
   it('renders one slot per grapheme and a bank chip per bank entry', () => {
@@ -298,10 +307,11 @@ describe('renderGameMode — Blend Builder', () => {
     renderGameMode(host, {
       modeKey: 'blendBuilder',
       round,
-      onAnswer: (a) => answered = a,
+      onAnswer: (a) => (answered = a),
     });
     // Find chips by grapheme — the bank is shuffled so we can't trust index.
-    const chip = (g) => [...host.querySelectorAll('[data-bank-index]')].find(b => b.dataset.grapheme === g);
+    const chip = (g) =>
+      [...host.querySelectorAll('[data-bank-index]')].find((b) => b.dataset.grapheme === g);
     chip('c').click();
     chip('a').click();
     chip('t').click();
@@ -312,7 +322,8 @@ describe('renderGameMode — Blend Builder', () => {
   it('reset clears the slots and re-enables chips', () => {
     const host = makeHost();
     renderGameMode(host, { modeKey: 'blendBuilder', round });
-    const chip = (g) => [...host.querySelectorAll('[data-bank-index]')].find(b => b.dataset.grapheme === g);
+    const chip = (g) =>
+      [...host.querySelectorAll('[data-bank-index]')].find((b) => b.dataset.grapheme === g);
     chip('c').click();
     expect(host.querySelector('.qj-blend__slot--filled')).not.toBeNull();
     host.querySelector('[data-action="blend-reset"]').click();
@@ -324,11 +335,17 @@ describe('renderGameMode — Blend Builder', () => {
 describe('renderResults', () => {
   it('shows the right headline for a mastered run', () => {
     const host = makeHost();
-    renderResults(host, { summary: {
-      name: 'Aanya', stageId: 'ccvc-a',
-      totalRounds: 6, correctRounds: 6, accuracy: 1, stars: 3,
-      wordsPractised: ['cat', 'hat'],
-    } });
+    renderResults(host, {
+      summary: {
+        name: 'Aanya',
+        stageId: 'ccvc-a',
+        totalRounds: 6,
+        correctRounds: 6,
+        accuracy: 1,
+        stars: 3,
+        wordsPractised: ['cat', 'hat'],
+      },
+    });
     const h = host.querySelector('.qj-results__headline');
     expect(h.textContent).toMatch(/mastered/i);
     expect(host.querySelector('.qj-results__stars').textContent.startsWith('★★★')).toBe(true);
@@ -336,11 +353,17 @@ describe('renderResults', () => {
 
   it('uses the supportive headline below 50% accuracy', () => {
     const host = makeHost();
-    renderResults(host, { summary: {
-      name: 'Aanya', stageId: 'ccvc-a',
-      totalRounds: 6, correctRounds: 2, accuracy: 0.33, stars: 0,
-      wordsPractised: ['cat'],
-    } });
+    renderResults(host, {
+      summary: {
+        name: 'Aanya',
+        stageId: 'ccvc-a',
+        totalRounds: 6,
+        correctRounds: 2,
+        accuracy: 0.33,
+        stars: 0,
+        wordsPractised: ['cat'],
+      },
+    });
     const h = host.querySelector('.qj-results__headline').textContent.toLowerCase();
     expect(h).toMatch(/try this one again/);
   });
@@ -361,19 +384,23 @@ describe('renderMasteryBadge', () => {
 describe('renderProgressView', () => {
   it('renders the major sections from a summarise() payload', () => {
     const host = makeHost();
-    renderProgressView(host, { summary: {
-      currentPhase: 1,
-      masteryPercent: 25,
-      strongestSounds: [{ sound: '/ă/', accuracy: 0.9, attempts: 10 }],
-      weakestSounds:   [{ sound: '/ĕ/', accuracy: 0.3, attempts: 6 }],
-      commonErrorTypes: [{ category: 'vowel-confusion', count: 3 }],
-      suggestedNext: { id: 'cvc-e', name: 'CVC – Short E' },
-      printablePracticeList: [{
-        stage: { id: 'cvc-e', name: 'CVC – Short E' },
-        sampleWords: ['bed', 'leg'],
-        sentence: 'The hen is in the pen.',
-      }],
-    } });
+    renderProgressView(host, {
+      summary: {
+        currentPhase: 1,
+        masteryPercent: 25,
+        strongestSounds: [{ sound: '/ă/', accuracy: 0.9, attempts: 10 }],
+        weakestSounds: [{ sound: '/ĕ/', accuracy: 0.3, attempts: 6 }],
+        commonErrorTypes: [{ category: 'vowel-confusion', count: 3 }],
+        suggestedNext: { id: 'cvc-e', name: 'CVC – Short E' },
+        printablePracticeList: [
+          {
+            stage: { id: 'cvc-e', name: 'CVC – Short E' },
+            sampleWords: ['bed', 'leg'],
+            sentence: 'The hen is in the pen.',
+          },
+        ],
+      },
+    });
     expect(host.textContent).toMatch(/Phase 1/);
     expect(host.textContent).toMatch(/CVC – Short E/);
     expect(host.textContent).toMatch(/vowel-confusion/);
@@ -386,10 +413,18 @@ describe('renderProgressView', () => {
 function makeMemoryStorage() {
   const map = new Map();
   return {
-    getItem(k)        { return map.has(k) ? map.get(k) : null; },
-    setItem(k, v)     { map.set(k, String(v)); },
-    removeItem(k)     { map.delete(k); },
-    clear()           { map.clear(); },
+    getItem(k) {
+      return map.has(k) ? map.get(k) : null;
+    },
+    setItem(k, v) {
+      map.set(k, String(v));
+    },
+    removeItem(k) {
+      map.delete(k);
+    },
+    clear() {
+      map.clear();
+    },
   };
 }
 
@@ -471,7 +506,9 @@ describe('mountQuestJourney — end-to-end slice', () => {
     for (let i = 0; i < 3; i++) {
       const round = controller.getState().lesson.blendBuilder[i];
       for (const g of round.target.graphemes) {
-        const chip = [...host.querySelectorAll('[data-bank-index]')].find(b => b.dataset.grapheme === g && !b.hasAttribute('disabled'));
+        const chip = [...host.querySelectorAll('[data-bank-index]')].find(
+          (b) => b.dataset.grapheme === g && !b.hasAttribute('disabled'),
+        );
         chip?.click();
       }
       host.querySelector('[data-action="blend-check"]').click();

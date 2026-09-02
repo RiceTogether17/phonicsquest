@@ -142,7 +142,14 @@ export function updatePhase(trackId, lessonIdx, phase) {
  * @param {Array}  [missionStatus] - Mission hit status
  * @param {Array}  [badges] - Detected badges
  */
-export function updateFeedback(trackId, lessonIdx, feedbackResult, remediation, missionStatus, badges) {
+export function updateFeedback(
+  trackId,
+  lessonIdx,
+  feedbackResult,
+  remediation,
+  missionStatus,
+  badges,
+) {
   const patch = { feedbackResult };
   if (remediation !== undefined) patch.remediation = remediation;
   if (missionStatus !== undefined) patch.missionStatus = missionStatus;
@@ -159,7 +166,14 @@ export function updateFeedback(trackId, lessonIdx, feedbackResult, remediation, 
  * @param {Object} revisionComparison - Before/after comparison
  * @param {Array}  [badges] - Badges from revision
  */
-export function updateRevision(trackId, lessonIdx, revisedDraftText, revisionResult, revisionComparison, badges) {
+export function updateRevision(
+  trackId,
+  lessonIdx,
+  revisedDraftText,
+  revisionResult,
+  revisionComparison,
+  badges,
+) {
   saveDraft(trackId, lessonIdx, {
     revisedDraftText,
     revisionResult,

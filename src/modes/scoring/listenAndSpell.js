@@ -23,14 +23,16 @@
 const VOWELS = new Set(['a', 'e', 'i', 'o', 'u']);
 
 const HINTS = Object.freeze({
-  'missing-letter':      'You missed a letter. Say the word and count the sounds.',
-  'transposed-letters':  'The right letters, the wrong order. Say each sound from left to right.',
-  'wrong-vowel':         'Listen to the vowel sound. Try a different vowel and re-read it.',
-  'silent-e-missing':    'The vowel says its name. Add a silent e at the end.',
-  'default':             'Say the word slowly. Tap one letter for each sound you hear.',
+  'missing-letter': 'You missed a letter. Say the word and count the sounds.',
+  'transposed-letters': 'The right letters, the wrong order. Say each sound from left to right.',
+  'wrong-vowel': 'Listen to the vowel sound. Try a different vowel and re-read it.',
+  'silent-e-missing': 'The vowel says its name. Add a silent e at the end.',
+  default: 'Say the word slowly. Tap one letter for each sound you hear.',
 });
 
-function _norm(s) { return String(s ?? '').toLowerCase(); }
+function _norm(s) {
+  return String(s ?? '').toLowerCase();
+}
 
 function multisetEqual(a, b) {
   if (a.length !== b.length) return false;
@@ -64,7 +66,7 @@ function classify(target, written) {
   // Vowel substitution at vowel positions only
   if (w.length === t.length) {
     let vowelErrors = 0;
-    let consErrors  = 0;
+    let consErrors = 0;
     for (let i = 0; i < t.length; i++) {
       if (t[i] !== w[i]) {
         if (VOWELS.has(t[i]) && VOWELS.has(w[i])) vowelErrors++;

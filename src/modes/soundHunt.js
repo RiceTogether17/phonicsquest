@@ -38,27 +38,27 @@ export function setupSoundHunt(word, els) {
   currentWord = word;
 
   const targetGrapheme = word.graphemes[0];
-  const targetType     = word.types[0];
+  const targetType = word.types[0];
 
   // No emoji, no printed word — either would leak the answer before the
   // child has done the sound-to-letter mapping themselves. Hide the image
   // frame too so the stage doesn't show an empty box.
   renderWordImage(word, els.wordEmoji, false);
   els.wordDisplay.innerHTML = '';
-  els.phonemeRow.innerHTML  = '';
+  els.phonemeRow.innerHTML = '';
 
   els.modeInstruction.textContent = 'Listen… which letter makes that sound?';
 
   const distractors = shuffleArray(
-    getFirstSoundDistractors(targetGrapheme, targetType, word.level ?? 3)
+    getFirstSoundDistractors(targetGrapheme, targetType, word.level ?? 3),
   ).slice(0, 3);
 
   const choices = shuffleArray([
     { grapheme: targetGrapheme, type: targetType, correct: true },
-    ...distractors.map(d => ({ grapheme: d.grapheme, type: d.type, correct: false })),
+    ...distractors.map((d) => ({ grapheme: d.grapheme, type: d.type, correct: false })),
   ]);
 
-  els.modeArea.innerHTML = /* html */`
+  els.modeArea.innerHTML = /* html */ `
     <div class="sound-hunt">
       <button class="sound-hunt-replay btn btn--ghost btn--sm" type="button">
         🔊 Hear the sound again
@@ -70,8 +70,8 @@ export function setupSoundHunt(word, els) {
   const grid = els.modeArea.querySelector('.choice-grid');
   for (const choice of choices) {
     const btn = document.createElement('button');
-    btn.type            = 'button';
-    btn.className       = 'choice-btn choice-btn--letter';
+    btn.type = 'button';
+    btn.className = 'choice-btn choice-btn--letter';
     btn.dataset.correct = String(choice.correct);
     btn.setAttribute('aria-label', `Letter ${choice.grapheme}`);
     btn.innerHTML = `<span class="choice-btn-letter">${choice.grapheme}</span>`;
@@ -87,13 +87,15 @@ export function setupSoundHunt(word, els) {
     grid,
     onResult: els.onResult,
     retryHint: 'Say the sound out loud, then look at each letter.',
-    onRetry: () => { setTimeout(playTarget, 200); },
+    onRetry: () => {
+      setTimeout(playTarget, 200);
+    },
     onReveal: () => _revealAnswer(word, els),
   });
 
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = 'none'; // "Say it" would speak the answer word
-  els.btnSkip.style.display  = '';
+  els.btnSkip.style.display = '';
 
   // Short pause so the phoneme doesn't collide with screen-transition audio.
   setTimeout(playTarget, 400);
@@ -106,7 +108,7 @@ function _revealAnswer(word, els) {
 
   setTimeout(async () => {
     await audio.speakPhoneme(word.graphemes[0], word.types[0]);
-    await new Promise(r => setTimeout(r, 300));
+    await new Promise((r) => setTimeout(r, 300));
     await audio.speakWord(word.word);
   }, 300);
 }

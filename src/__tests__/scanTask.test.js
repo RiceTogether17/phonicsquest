@@ -1,5 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { buildScanTask, buildScanTaskForPassage, renderScanTask, buildScanAttention, renderScanAttention } from '../modes/scanTask.js';
+import {
+  buildScanTask,
+  buildScanTaskForPassage,
+  renderScanTask,
+  buildScanAttention,
+  renderScanAttention,
+} from '../modes/scanTask.js';
 
 function fixedRandom(seq) {
   let i = 0;
@@ -106,8 +112,9 @@ describe('renderScanTask', () => {
       randomFn: fixedRandom([0.1, 0.4, 0.7, 0.2]),
     });
     renderScanTask({ host, task, onAnswer });
-    const correctBtn = [...host.querySelectorAll('.scan-task-option')]
-      .find((b) => b.dataset.correct === '1');
+    const correctBtn = [...host.querySelectorAll('.scan-task-option')].find(
+      (b) => b.dataset.correct === '1',
+    );
     correctBtn.click();
     vi.runAllTimers();
     // Product flow: option-click reveals feedback + a "Got it →" continue

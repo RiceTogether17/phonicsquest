@@ -25,35 +25,34 @@
  */
 
 const DEFAULT_TARGET_WPM = 30;
-const MASTERY_ACCURACY   = 0.90;
-const SOUND_BY_SOUND_MS  = 2500;
+const MASTERY_ACCURACY = 0.9;
+const SOUND_BY_SOUND_MS = 2500;
 
 const HINTS = Object.freeze({
   'slow-and-accurate': 'Great accuracy! Read three words a beat faster next time.',
-  'fast-and-error':    'Slow down a tiny bit. Accuracy first, speed second.',
-  'sound-by-sound':    'These words are familiar. Try reading them as whole chunks.',
-  'default':           'Take a breath, then read three words together as a phrase.',
+  'fast-and-error': 'Slow down a tiny bit. Accuracy first, speed second.',
+  'sound-by-sound': 'These words are familiar. Try reading them as whole chunks.',
+  default: 'Take a breath, then read three words together as a phrase.',
 });
 
 function classify({ accuracy, wpm, avgMs, targetWpm }) {
   if (avgMs > SOUND_BY_SOUND_MS) return 'sound-by-sound';
   if (wpm >= targetWpm && accuracy < MASTERY_ACCURACY) return 'fast-and-error';
-  if (wpm <  targetWpm && accuracy >= MASTERY_ACCURACY) return 'slow-and-accurate';
+  if (wpm < targetWpm && accuracy >= MASTERY_ACCURACY) return 'slow-and-accurate';
   return 'default';
 }
 
 function _summarise(attempt = {}) {
   const list = Array.isArray(attempt?.attempts) ? attempt.attempts : [];
   const total = list.length;
-  const correct = list.filter(a => a?.correct === true).length;
+  const correct = list.filter((a) => a?.correct === true).length;
   const accuracy = total === 0 ? 0 : correct / total;
 
   const summed = list.reduce((acc, a) => acc + (typeof a.timeMs === 'number' ? a.timeMs : 0), 0);
   const avgMs = total === 0 ? 0 : summed / total;
-  const durationMs = typeof attempt.durationMs === 'number' && attempt.durationMs > 0
-    ? attempt.durationMs
-    : summed;
-  const wpm = durationMs > 0 ? (correct / (durationMs / 60000)) : 0;
+  const durationMs =
+    typeof attempt.durationMs === 'number' && attempt.durationMs > 0 ? attempt.durationMs : summed;
+  const wpm = durationMs > 0 ? correct / (durationMs / 60000) : 0;
 
   return { total, correct, accuracy, avgMs, wpm };
 }
@@ -79,10 +78,10 @@ export function scoreFluencySprint(attempt = {}) {
     masteryDelta: mastered ? 1 : 0,
     scoreBreakdown: {
       accuracy: s.accuracy,
-      wpm:      Number(s.wpm.toFixed(1)),
-      avgMs:    Math.round(s.avgMs),
-      correct:  s.correct,
-      total:    s.total,
+      wpm: Number(s.wpm.toFixed(1)),
+      avgMs: Math.round(s.avgMs),
+      correct: s.correct,
+      total: s.total,
       targetWpm,
     },
   };

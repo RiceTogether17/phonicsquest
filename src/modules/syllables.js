@@ -28,12 +28,38 @@ const VOWEL_TYPES = new Set(['sv', 'lv', 'rc', 'dp']);
  * audio.js' speakPhoneme `-ed` branch).
  */
 const SYLLABIC_SUFFIXES = new Set([
-  'ing', 'er', 'est', 'es', 'ly', 'al', 'le', 'el',
-  'tion', 'sion', 'able', 'ible', 'ous', 'ious', 'ture',
-  'ful', 'ness', 'ment', 'ish', 'ant', 'ent',
+  'ing',
+  'er',
+  'est',
+  'es',
+  'ly',
+  'al',
+  'le',
+  'el',
+  'tion',
+  'sion',
+  'able',
+  'ible',
+  'ous',
+  'ious',
+  'ture',
+  'ful',
+  'ness',
+  'ment',
+  'ish',
+  'ant',
+  'ent',
   // Consonant + le endings — each adds a syllable (don't double-count
   // the leading consonant since it's part of the suffix chunk itself).
-  'ble', 'cle', 'dle', 'fle', 'gle', 'kle', 'ple', 'tle', 'zle',
+  'ble',
+  'cle',
+  'dle',
+  'fle',
+  'gle',
+  'kle',
+  'ple',
+  'tle',
+  'zle',
 ]);
 
 /** Letters that signal a prefix chunk contributes its own syllable. */
@@ -52,12 +78,12 @@ export function getSyllableCount(word) {
   }
 
   const graphemes = Array.isArray(word.graphemes) ? word.graphemes : [];
-  const types     = Array.isArray(word.types)     ? word.types     : [];
+  const types = Array.isArray(word.types) ? word.types : [];
   if (graphemes.length === 0) return 1;
 
   let count = 0;
   for (let i = 0; i < graphemes.length; i++) {
-    const g    = String(graphemes[i] || '').toLowerCase();
+    const g = String(graphemes[i] || '').toLowerCase();
     const type = String(types[i] || '').toLowerCase();
 
     if (VOWEL_TYPES.has(type)) {
@@ -117,7 +143,7 @@ export function getSyllableBreakdown(word) {
     return word.syllableBreakdown;
   }
   const count = getSyllableCount(word);
-  const text  = String(word.word);
+  const text = String(word.word);
   if (count <= 1) return text;
 
   // Naive even split — good enough for a celebratory reveal. Words
@@ -126,7 +152,7 @@ export function getSyllableBreakdown(word) {
   const parts = [];
   for (let i = 0; i < count; i++) {
     const start = i * step;
-    const end   = (i === count - 1) ? text.length : Math.min(text.length, start + step);
+    const end = i === count - 1 ? text.length : Math.min(text.length, start + step);
     if (start >= text.length) break;
     parts.push(text.slice(start, end));
   }

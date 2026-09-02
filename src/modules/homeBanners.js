@@ -45,11 +45,14 @@ export function updateReviewBanner() {
 export function updateDailyBanner() {
   const done = isDailyChallengeComplete();
   const title = document.getElementById('daily-banner-title');
-  const sub   = document.getElementById('daily-banner-sub');
+  const sub = document.getElementById('daily-banner-sub');
   const arrow = document.getElementById('daily-banner-arrow');
 
   if (title) title.textContent = done ? '✅ Daily Challenge' : '⚡ Daily Challenge';
-  if (sub)   sub.textContent   = done ? 'Completed today – well done!' : `5 words · earn ${DAILY_BONUS_XP} bonus XP`;
+  if (sub)
+    sub.textContent = done
+      ? 'Completed today – well done!'
+      : `5 words · earn ${DAILY_BONUS_XP} bonus XP`;
   if (arrow) arrow.textContent = done ? '✓' : '→';
 
   const banner = document.getElementById('btn-daily-challenge');
@@ -72,7 +75,11 @@ export function updateMistakesDenBanner() {
   const banner = document.getElementById('mistakes-den-banner');
   if (!banner) return;
   let summary;
-  try { summary = getMistakesDenSummary(); } catch (_) { summary = { count: 0 }; }
+  try {
+    summary = getMistakesDenSummary();
+  } catch (_) {
+    summary = { count: 0 };
+  }
   const sub = document.getElementById('mistakes-den-sub');
 
   if (_setVisible(banner, summary.count > 0) && sub) {
@@ -85,15 +92,18 @@ export function updatePersonalBestBanner() {
   const banner = document.getElementById('personal-best-banner');
   if (!banner) return;
   const xp = store.get('xp') || 0;
-  const calendar = Array.isArray(store.get('challengeCalendar')) ? store.get('challengeCalendar') : [];
+  const calendar = Array.isArray(store.get('challengeCalendar'))
+    ? store.get('challengeCalendar')
+    : [];
 
   if (_setVisible(banner, xp > 0 || calendar.length > 0)) {
     const sub = document.getElementById('personal-best-sub');
     if (sub) {
       const bestStreak = store.get('bestStreak') || 0;
-      sub.textContent = bestStreak > 0
-        ? `Best streak ${bestStreak} day${bestStreak === 1 ? '' : 's'} · see your trophies`
-        : 'See your personal bests';
+      sub.textContent =
+        bestStreak > 0
+          ? `Best streak ${bestStreak} day${bestStreak === 1 ? '' : 's'} · see your trophies`
+          : 'See your personal bests';
     }
   }
 }
@@ -107,11 +117,27 @@ export function updateQuestBanners(unlock) {
   if (!unlock) return;
 
   const banners = [
-    { id: 'btn-sentence-forge', quest: unlock.sentenceForge, label: '6 levels · unscramble & build sentences' },
-    { id: 'btn-cloze-castle',   quest: unlock.clozeCastle,   label: 'P1–P6 · grammar cloze passages' },
-    { id: 'btn-word-vault',     quest: unlock.wordVault,     label: '7 categories · vocabulary cloze passages' },
-    { id: 'btn-editing-quest',  quest: unlock.editingQuest,  label: 'Editing and grammar correction tasks' },
-    { id: 'btn-writing-quest',  quest: unlock.writingQuest,  label: 'Guided writing with rubric feedback' },
+    {
+      id: 'btn-sentence-forge',
+      quest: unlock.sentenceForge,
+      label: '6 levels · unscramble & build sentences',
+    },
+    { id: 'btn-cloze-castle', quest: unlock.clozeCastle, label: 'P1–P6 · grammar cloze passages' },
+    {
+      id: 'btn-word-vault',
+      quest: unlock.wordVault,
+      label: '7 categories · vocabulary cloze passages',
+    },
+    {
+      id: 'btn-editing-quest',
+      quest: unlock.editingQuest,
+      label: 'Editing and grammar correction tasks',
+    },
+    {
+      id: 'btn-writing-quest',
+      quest: unlock.writingQuest,
+      label: 'Guided writing with rubric feedback',
+    },
   ];
 
   for (const b of banners) {
@@ -125,7 +151,8 @@ export function updateQuestBanners(unlock) {
       if (arrow) arrow.textContent = '→';
       el.classList.remove('stories-banner--locked');
     } else {
-      if (sub) sub.textContent = `🔒 Master ${b.quest.required} words to unlock (${b.quest.current}/${b.quest.required})`;
+      if (sub)
+        sub.textContent = `🔒 Master ${b.quest.required} words to unlock (${b.quest.current}/${b.quest.required})`;
       if (arrow) arrow.textContent = '🔒';
       el.classList.add('stories-banner--locked');
     }
@@ -138,16 +165,27 @@ export function updateTodayTabBadge() {
   if (!badge) return;
 
   let count = 0;
-  try { count += progress.getReviewDueCount() || 0; } catch (_) { /* fresh profile */ }
-  try { count += getMistakesDenSummary().count || 0; } catch (_) { /* fresh profile */ }
+  try {
+    count += progress.getReviewDueCount() || 0;
+  } catch (_) {
+    /* fresh profile */
+  }
+  try {
+    count += getMistakesDenSummary().count || 0;
+  } catch (_) {
+    /* fresh profile */
+  }
 
   badge.hidden = count === 0;
   badge.textContent = count > 9 ? '9+' : String(count);
 
   const tab = document.getElementById('home-tab-today');
   if (tab) {
-    tab.setAttribute('aria-label', count > 0
-      ? `Today — your lesson and reviews, ${count} item${count === 1 ? '' : 's'} waiting`
-      : 'Today — your lesson and reviews');
+    tab.setAttribute(
+      'aria-label',
+      count > 0
+        ? `Today — your lesson and reviews, ${count} item${count === 1 ? '' : 's'} waiting`
+        : 'Today — your lesson and reviews',
+    );
   }
 }

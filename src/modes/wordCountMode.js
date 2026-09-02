@@ -35,13 +35,13 @@ import { _getCountChoices } from './soundCount.js';
  * and every slot is a single clean spoken word.
  */
 const SENTENCE_TEMPLATES = [
-  'My word is {w}.',              // 4 words
-  'I can say {w}.',               // 4
-  'Say {w} with me.',             // 4
-  'Now say the word {w}.',        // 5
-  'We can all say {w}.',          // 5
-  'I like the word {w}.',         // 5
-  'Can you say the word {w}?',    // 6
+  'My word is {w}.', // 4 words
+  'I can say {w}.', // 4
+  'Say {w} with me.', // 4
+  'Now say the word {w}.', // 5
+  'We can all say {w}.', // 5
+  'I like the word {w}.', // 5
+  'Can you say the word {w}?', // 6
   'Let us say the word {w} again.', // 7
 ];
 
@@ -70,17 +70,17 @@ export function setupWordCount(word, els) {
   currentWord = word;
 
   const template = SENTENCE_TEMPLATES[Math.floor(Math.random() * SENTENCE_TEMPLATES.length)];
-  const tokens   = buildCountSentence(template, word.word);
-  const correct  = tokens.length;
+  const tokens = buildCountSentence(template, word.word);
+  const correct = tokens.length;
 
   // Picture cue for the featured word is fine — it names the topic, not
   // the answer. The sentence itself stays unprinted until reveal.
   renderWordImage(word, els.wordEmoji, true);
   els.wordDisplay.innerHTML = '';
-  els.phonemeRow.innerHTML  = '';
+  els.phonemeRow.innerHTML = '';
   els.modeInstruction.textContent = 'Listen, count on your fingers… how many words?';
 
-  els.modeArea.innerHTML = /* html */`
+  els.modeArea.innerHTML = /* html */ `
     <div class="word-count">
       <button class="wc-replay btn btn--ghost btn--sm" type="button"></button>
       <div class="wc-sentence" aria-live="polite"></div>
@@ -91,8 +91,8 @@ export function setupWordCount(word, els) {
   const grid = els.modeArea.querySelector('.choice-grid');
   for (const count of _getCountChoices(correct)) {
     const btn = document.createElement('button');
-    btn.type            = 'button';
-    btn.className       = 'choice-btn choice-btn--count';
+    btn.type = 'button';
+    btn.className = 'choice-btn choice-btn--count';
     btn.dataset.correct = String(count === correct);
     btn.setAttribute('aria-label', `${count} word${count !== 1 ? 's' : ''}`);
     btn.innerHTML = `
@@ -117,13 +117,15 @@ export function setupWordCount(word, els) {
     grid,
     onResult: els.onResult,
     retryHint: 'Put up one finger for each word you hear.',
-    onRetry: () => { setTimeout(speakSentence, 200); },
+    onRetry: () => {
+      setTimeout(speakSentence, 200);
+    },
     onReveal: () => _revealAnswer(tokens, els, replayBtn),
   });
 
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = 'none';
-  els.btnSkip.style.display  = '';
+  els.btnSkip.style.display = '';
 
   setTimeout(speakSentence, 400);
 }
@@ -140,7 +142,7 @@ export function buildCountSentence(template, word) {
   return template
     .replace('{w}', word)
     .split(/\s+/)
-    .map(t => t.replace(/[.,!?]/g, ''))
+    .map((t) => t.replace(/[.,!?]/g, ''))
     .filter(Boolean);
 }
 
@@ -179,8 +181,12 @@ function _speakWordByWord(tokens, replayBtn) {
   (async () => {
     for (let i = 0; i < tokens.length; i++) {
       if (token !== _speakToken) return;
-      try { await audio.speakSentenceWord(tokens[i]); } catch { /* keep counting */ }
-      if (i < tokens.length - 1) await new Promise(r => setTimeout(r, INTER_WORD_MS));
+      try {
+        await audio.speakSentenceWord(tokens[i]);
+      } catch {
+        /* keep counting */
+      }
+      if (i < tokens.length - 1) await new Promise((r) => setTimeout(r, INTER_WORD_MS));
     }
     if (token !== _speakToken) return;
     _setReplayState(replayBtn, false);
@@ -198,15 +204,19 @@ function _revealAnswer(tokens, els, replayBtn) {
     for (let i = 0; i < tokens.length; i++) {
       if (token !== _speakToken || !holder.isConnected) return;
       const chip = document.createElement('span');
-      chip.className   = 'wc-chip';
+      chip.className = 'wc-chip';
       chip.textContent = tokens[i];
       const num = document.createElement('span');
-      num.className   = 'wc-chip-num';
+      num.className = 'wc-chip-num';
       num.textContent = String(i + 1);
       chip.prepend(num);
       holder.appendChild(chip);
-      try { await audio.speakSentenceWord(tokens[i]); } catch { /* keep revealing */ }
-      if (i < tokens.length - 1) await new Promise(r => setTimeout(r, REVEAL_GAP_MS));
+      try {
+        await audio.speakSentenceWord(tokens[i]);
+      } catch {
+        /* keep revealing */
+      }
+      if (i < tokens.length - 1) await new Promise((r) => setTimeout(r, REVEAL_GAP_MS));
     }
     if (token !== _speakToken) return;
     _setReplayState(replayBtn, false);

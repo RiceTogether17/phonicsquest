@@ -23,19 +23,21 @@ export function createClozeRound(passage) {
 }
 
 export function clearClozeRound(bankWords, blankFills) {
-  bankWords.forEach(word => { word.used = false; });
+  bankWords.forEach((word) => {
+    word.used = false;
+  });
   blankFills.fill(null);
 }
 
 export function buildUserAnswers(blankFills, bankWords) {
-  return blankFills.map(id => bankWords.find(w => w.id === id)?.word || '');
+  return blankFills.map((id) => bankWords.find((w) => w.id === id)?.word || '');
 }
 
 export function fillNextBlank(bankWords, blankFills, id) {
-  const item = bankWords.find(w => w.id === id);
+  const item = bankWords.find((w) => w.id === id);
   if (!item || item.used) return false;
 
-  const blankIdx = blankFills.findIndex(fill => fill === null);
+  const blankIdx = blankFills.findIndex((fill) => fill === null);
   if (blankIdx === -1) return false;
 
   item.used = true;
@@ -62,7 +64,7 @@ export function renderClozePassage({
     html += `<span>${escapeHtml(part)}</span>`;
     if (i < parts.length - 1) {
       const fillId = blankFills[i];
-      const fill = fillId !== null ? bankWords.find(w => w.id === fillId) : null;
+      const fill = fillId !== null ? bankWords.find((w) => w.id === fillId) : null;
 
       if (fill) {
         html += `<button class="${blankClass} ${filledClass}" data-blank="${i}" aria-label="${escapeAttr(removeBlankAria(fill.word))}">${escapeHtml(fill.word)}</button>`;
@@ -74,11 +76,11 @@ export function renderClozePassage({
 
   container.innerHTML = html;
 
-  container.querySelectorAll(`.${filledClass}`).forEach(blank => {
+  container.querySelectorAll(`.${filledClass}`).forEach((blank) => {
     blank.addEventListener('click', () => {
       const idx = parseInt(blank.dataset.blank, 10);
       const id = blankFills[idx];
-      const item = bankWords.find(w => w.id === id);
+      const item = bankWords.find((w) => w.id === id);
       if (item) item.used = false;
       blankFills[idx] = null;
       onRemoveWord?.();
@@ -86,21 +88,25 @@ export function renderClozePassage({
   });
 
   if (onTapEmpty) {
-    container.querySelectorAll(`.${blankClass}:not(.${filledClass})`).forEach(blank => {
+    container.querySelectorAll(`.${blankClass}:not(.${filledClass})`).forEach((blank) => {
       blank.addEventListener('click', () => onTapEmpty(blank));
     });
   }
 }
 
 export function renderClozeBank({ container, bankWords, chipClass, usedClass, onChooseWord }) {
-  container.innerHTML = bankWords.map(w => `
+  container.innerHTML = bankWords
+    .map(
+      (w) => `
     <button class="${chipClass} ${w.used ? usedClass : ''}"
             data-id="${w.id}"
             ${w.used ? 'disabled aria-disabled="true"' : ''}
             aria-label="${escapeAttr(w.word)}">${escapeHtml(w.word)}</button>
-  `).join('');
+  `,
+    )
+    .join('');
 
-  container.querySelectorAll(`.${chipClass}:not([disabled])`).forEach(chip => {
+  container.querySelectorAll(`.${chipClass}:not([disabled])`).forEach((chip) => {
     chip.addEventListener('click', () => {
       const id = parseInt(chip.dataset.id, 10);
       onChooseWord(id);

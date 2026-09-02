@@ -21,7 +21,11 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { store } from '../modules/store.js';
 import { progress, SKILL_BY_MODE, SKILLS, getSkillForMode } from '../modules/progress.js';
-import { getWordSkillMastery, getWordMasteryBySkill, getWordMastery } from '../modules/masteryEngine.js';
+import {
+  getWordSkillMastery,
+  getWordMasteryBySkill,
+  getWordMastery,
+} from '../modules/masteryEngine.js';
 
 beforeEach(() => {
   localStorage.clear();
@@ -71,11 +75,11 @@ describe('SKILL_BY_MODE / getSkillForMode', () => {
 
 describe('progress.recordAttempt updates per-skill stats', () => {
   it('writes both the cross-skill summary AND the per-skill breakdown', () => {
-    progress.recordAttempt('cat', true,  'blend',  1500);
-    progress.recordAttempt('cat', true,  'blend',  1800);
-    progress.recordAttempt('cat', false, 'first',  4200);
+    progress.recordAttempt('cat', true, 'blend', 1500);
+    progress.recordAttempt('cat', true, 'blend', 1800);
+    progress.recordAttempt('cat', false, 'first', 4200);
 
-    const wordStats     = store.get('wordStats');
+    const wordStats = store.get('wordStats');
     const wordSkillStats = store.get('wordSkillStats');
 
     // Cross-skill summary (unchanged shape — backwards compat)
@@ -98,7 +102,7 @@ describe('progress.recordAttempt updates per-skill stats', () => {
   it('emits a word_attempt learning event so masteryEngine.speed has data', () => {
     progress.recordAttempt('cat', true, 'blend', 1700);
     const events = store.get('learningEvents');
-    const wordEvents = events.filter(e => e.eventType === 'word_attempt');
+    const wordEvents = events.filter((e) => e.eventType === 'word_attempt');
     expect(wordEvents.length).toBe(1);
     expect(wordEvents[0].meta.wordId).toBe('cat');
     expect(wordEvents[0].skill).toBe('decoding');
@@ -137,13 +141,13 @@ describe('masteryEngine.getWordSkillMastery', () => {
 
   it('exposes the gap between two skills on the same word', () => {
     // Decoding: nailed it
-    progress.recordAttempt('cat', true, 'blend',  1500);
-    progress.recordAttempt('cat', true, 'blend',  1400);
-    progress.recordAttempt('cat', true, 'blend',  1600);
+    progress.recordAttempt('cat', true, 'blend', 1500);
+    progress.recordAttempt('cat', true, 'blend', 1400);
+    progress.recordAttempt('cat', true, 'blend', 1600);
     // Segmenting: struggling
     progress.recordAttempt('cat', false, 'first', 4200);
-    progress.recordAttempt('cat', false, 'last',  4500);
-    progress.recordAttempt('cat', true,  'middle', 5000);
+    progress.recordAttempt('cat', false, 'last', 4500);
+    progress.recordAttempt('cat', true, 'middle', 5000);
 
     const split = getWordMasteryBySkill('cat');
     expect(split.decoding.accuracy).toBe(1);
@@ -200,14 +204,13 @@ describe('backward compatibility', () => {
 
   it('getWordMastery speed ignores incorrect attempts and other words', () => {
     progress.recordAttempt('cat', false, 'blend', 300); // wrong answer: fast guess
-    progress.recordAttempt('dog', true, 'blend', 500);  // different word
+    progress.recordAttempt('dog', true, 'blend', 500); // different word
     expect(getWordMastery('cat').speed).toBeNull();
   });
 
   it('a session that never touches the skill-aware code still works', () => {
     // Simulate the legacy path: mode unknown to SKILL_BY_MODE.
-    expect(() => progress.recordAttempt('cat', true, 'mysteryMode', 1500))
-      .not.toThrow();
+    expect(() => progress.recordAttempt('cat', true, 'mysteryMode', 1500)).not.toThrow();
     expect(store.get('wordStats').cat.attempts).toBe(1);
   });
 });

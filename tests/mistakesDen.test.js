@@ -50,7 +50,7 @@ describe('Mistakes Den — recent-mistake aggregation', () => {
     store.set('wordHistory', [
       wordEntry({ wordId: 'cat', mode: 'blend', daysAgo: 1 }),
       wordEntry({ wordId: 'hat', mode: 'blend', correct: true, daysAgo: 1 }), // excluded — correct
-      wordEntry({ wordId: 'mat', mode: 'blend', daysAgo: 10 }),               // excluded — too old
+      wordEntry({ wordId: 'mat', mode: 'blend', daysAgo: 10 }), // excluded — too old
     ]);
     const mistakes = getRecentMistakes();
     expect(mistakes).toHaveLength(1);
@@ -63,7 +63,7 @@ describe('Mistakes Den — recent-mistake aggregation', () => {
     store.set('questAttempts', [
       questEntry({ quest: 'grammarMcq', skill: 'tense', daysAgo: 2 }),
       questEntry({ quest: 'wordVault', skill: 'collocation', correct: true, daysAgo: 0 }), // excluded
-      questEntry({ quest: 'clozeCastle', skill: 'connectorLogic', daysAgo: 30 }),          // excluded
+      questEntry({ quest: 'clozeCastle', skill: 'connectorLogic', daysAgo: 30 }), // excluded
     ]);
     const mistakes = getRecentMistakes();
     expect(mistakes).toHaveLength(1);
@@ -77,8 +77,8 @@ describe('Mistakes Den — recent-mistake aggregation', () => {
     store.set('questAttempts', [questEntry({ quest: 'grammarMcq', skill: 'tense', daysAgo: 1 })]);
     const mistakes = getRecentMistakes();
     expect(mistakes).toHaveLength(2);
-    expect(mistakes[0].kind).toBe('quest');   // newer
-    expect(mistakes[1].kind).toBe('word');    // older
+    expect(mistakes[0].kind).toBe('quest'); // newer
+    expect(mistakes[1].kind).toBe('word'); // older
   });
 
   it('dedupes repeated mistakes on the same (kind, key) into one row with a count', () => {
@@ -95,11 +95,11 @@ describe('Mistakes Den — recent-mistake aggregation', () => {
   it('keeps the same word in different modes as separate rows', () => {
     store.set('wordHistory', [
       wordEntry({ wordId: 'cat', mode: 'blend', daysAgo: 1 }),
-      wordEntry({ wordId: 'cat', mode: 'hear',  daysAgo: 1 }),
+      wordEntry({ wordId: 'cat', mode: 'hear', daysAgo: 1 }),
     ]);
     const mistakes = getRecentMistakes();
     expect(mistakes).toHaveLength(2);
-    expect(mistakes.map(m => m.moduleKey).sort()).toEqual(['blend', 'hear']);
+    expect(mistakes.map((m) => m.moduleKey).sort()).toEqual(['blend', 'hear']);
   });
 
   it('honours a custom days window', () => {
@@ -115,11 +115,9 @@ describe('Mistakes Den — recent-mistake aggregation', () => {
     store.set('wordHistory', [
       wordEntry({ wordId: 'cat', mode: 'blend', daysAgo: 1 }),
       wordEntry({ wordId: 'hat', mode: 'blend', daysAgo: 2 }),
-      wordEntry({ wordId: 'sit', mode: 'hear',  daysAgo: 1 }),
+      wordEntry({ wordId: 'sit', mode: 'hear', daysAgo: 1 }),
     ]);
-    store.set('questAttempts', [
-      questEntry({ quest: 'grammarMcq', skill: 'tense', daysAgo: 1 }),
-    ]);
+    store.set('questAttempts', [questEntry({ quest: 'grammarMcq', skill: 'tense', daysAgo: 1 })]);
     const summary = getMistakesDenSummary();
     expect(summary.count).toBe(4);
     expect(summary.byModule).toEqual({
@@ -131,10 +129,12 @@ describe('Mistakes Den — recent-mistake aggregation', () => {
 
   it('every row carries a navigation target for known modes/quests', () => {
     store.set('wordHistory', [wordEntry({ wordId: 'cat', mode: 'blend', daysAgo: 0 })]);
-    store.set('questAttempts', [questEntry({ quest: 'wordVault', skill: 'collocation', daysAgo: 0 })]);
+    store.set('questAttempts', [
+      questEntry({ quest: 'wordVault', skill: 'collocation', daysAgo: 0 }),
+    ]);
     const mistakes = getRecentMistakes();
-    expect(mistakes.find(m => m.moduleKey === 'blend').target).toBe('blend');
-    expect(mistakes.find(m => m.moduleKey === 'wordVault').target).toBe('word-vault');
+    expect(mistakes.find((m) => m.moduleKey === 'blend').target).toBe('blend');
+    expect(mistakes.find((m) => m.moduleKey === 'wordVault').target).toBe('word-vault');
   });
 
   it('lookback constant matches the parent-dashboard 7-day window', () => {

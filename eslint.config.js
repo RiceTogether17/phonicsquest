@@ -45,11 +45,14 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
-      'no-unused-vars': ['error', {
-        args: 'none',
-        varsIgnorePattern: '^_',
-        caughtErrors: 'none',
-      }],
+      'no-unused-vars': [
+        'error',
+        {
+          args: 'none',
+          varsIgnorePattern: '^_',
+          caughtErrors: 'none',
+        },
+      ],
       eqeqeq: ['error', 'smart'],
       'no-implicit-globals': 'error',
       'no-var': 'error',

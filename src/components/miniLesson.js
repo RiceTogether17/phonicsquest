@@ -29,7 +29,7 @@ const OVERLAY_ID = 'mini-lesson-overlay';
 /** Find the curriculum stage for a word-group key (stage.group or stage.id). */
 export function findStageForGroup(group) {
   if (!group) return null;
-  return CURRICULUM.find(s => s.group === group || s.id === group) ?? null;
+  return CURRICULUM.find((s) => s.group === group || s.id === group) ?? null;
 }
 
 /** Has this child already been taught this lesson? */
@@ -49,7 +49,11 @@ export function markLessonSeen(lessonKey) {
 function _removeOverlay() {
   document.getElementById(OVERLAY_ID)?.remove();
   document.removeEventListener('keydown', _onKeydown);
-  try { window.speechSynthesis?.cancel(); } catch { /* no TTS */ }
+  try {
+    window.speechSynthesis?.cancel();
+  } catch {
+    /* no TTS */
+  }
 }
 
 let _onDismiss = null;
@@ -85,11 +89,15 @@ export async function maybeShowStageLesson(group, { force = false } = {}) {
   const lesson = getPhonicsLesson(stage.id);
   if (!lesson) return false;
 
-  return new Promise(resolve => {
-    showMiniLesson({ stage, lesson, onDone: () => {
-      markLessonSeen(lessonKey);
-      resolve(true);
-    } });
+  return new Promise((resolve) => {
+    showMiniLesson({
+      stage,
+      lesson,
+      onDone: () => {
+        markLessonSeen(lessonKey);
+        resolve(true);
+      },
+    });
   });
 }
 
@@ -186,17 +194,29 @@ export function showTipLesson({ icon, label, rule, example, tip, onDone }) {
 /* ── Step 1: I do (Giri teaches) ─────────────────────────────────── */
 
 function _renderTeachStep(overlay, stage, lesson, onNext) {
-  const chips = (lesson.soundChips || []).map((chip, i) => `
+  const chips = (lesson.soundChips || [])
+    .map(
+      (chip, i) => `
     <button class="mini-lesson-chip mini-lesson-chip--${escapeAttr(chip.type)}" data-chip="${i}"
             aria-label="Play the sound ${escapeAttr(chip.label)}">
       ${escapeHtml(chip.label)} <span aria-hidden="true">🔊</span>
-    </button>`).join('');
+    </button>`,
+    )
+    .join('');
 
-  const scriptLines = lesson.script.map(line => `
-    <li class="mini-lesson-line">${escapeHtml(line)}</li>`).join('');
+  const scriptLines = lesson.script
+    .map(
+      (line) => `
+    <li class="mini-lesson-line">${escapeHtml(line)}</li>`,
+    )
+    .join('');
 
-  const confusions = (lesson.confusions || []).map(c => `
-    <p class="mini-lesson-confusion">⚠️ ${escapeHtml(c)}</p>`).join('');
+  const confusions = (lesson.confusions || [])
+    .map(
+      (c) => `
+    <p class="mini-lesson-confusion">⚠️ ${escapeHtml(c)}</p>`,
+    )
+    .join('');
 
   overlay.innerHTML = `
     <div class="mini-lesson-panel" role="document">
@@ -214,7 +234,7 @@ function _renderTeachStep(overlay, stage, lesson, onNext) {
       <button class="mini-lesson-skip" id="mini-lesson-skip">Skip lesson</button>
     </div>`;
 
-  overlay.querySelectorAll('[data-chip]').forEach(btn => {
+  overlay.querySelectorAll('[data-chip]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const chip = lesson.soundChips[Number(btn.dataset.chip)];
       if (chip) audio.speakPhoneme(chip.g, chip.type);
@@ -243,7 +263,7 @@ function _renderTeachStep(overlay, stage, lesson, onNext) {
 /* ── Step 2: We do (blend one word together) ─────────────────────── */
 
 function _renderWeDoStep(overlay, stage, lesson, onDone) {
-  const word = WORDS.find(w => w.word === lesson.weDoWord);
+  const word = WORDS.find((w) => w.word === lesson.weDoWord);
 
   overlay.innerHTML = `
     <div class="mini-lesson-panel" role="document">

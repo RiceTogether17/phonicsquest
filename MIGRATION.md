@@ -28,6 +28,7 @@ style.css (67KB)           →       src/styles/main.css (CSS custom properties)
 ## localStorage Key Changes
 
 ### v1 keys (old)
+
 ```
 wordSpinnerXP
 wordSpinnerLevel
@@ -42,7 +43,9 @@ wordSpinnerSettings
 ```
 
 ### v2 key (new)
+
 All state is now stored under a single key:
+
 ```
 phonicsquest_v2
 ```
@@ -128,12 +131,15 @@ To migrate v1 data to v2, run this in the browser console **before** clearing v1
 ## Deployment
 
 ### GitHub Pages (recommended)
+
 The included GitHub Actions workflow auto-deploys on push to `main`:
+
 ```
 .github/workflows/deploy.yml
 ```
 
 ### Manual
+
 ```bash
 npm install
 npm run build
@@ -142,6 +148,7 @@ npm run build
 ```
 
 ## Development
+
 ```bash
 npm install
 npm run dev     # Start dev server at http://localhost:3000

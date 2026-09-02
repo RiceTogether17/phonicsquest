@@ -38,6 +38,5 @@ export function getStagesForMode(mode, curriculum, phases) {
   // Mode isn't named anywhere → fall back to the full curriculum rather
   // than render an empty picker (e.g. new experimental modes).
   if (!anyRecommendsThisMode) return [...curriculum];
-  return curriculum.filter(stage => allowedPhases.has(stage.phase));
+  return curriculum.filter((stage) => allowedPhases.has(stage.phase));
 }
-

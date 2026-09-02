@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { WORDS, derivePhonemes } from '../data/words.js';
 
-const wordById = (id) => WORDS.find(w => w.id === id);
+const wordById = (id) => WORDS.find((w) => w.id === id);
 
 describe('derivePhonemes()', () => {
   describe('regular CVC', () => {
@@ -69,7 +69,7 @@ describe('derivePhonemes()', () => {
     });
   });
 
-  describe("-ed suffix follows the /ɪd/ vs /t|d/ rule", () => {
+  describe('-ed suffix follows the /ɪd/ vs /t|d/ rule', () => {
     it("after /t/ or /d/, '-ed' contributes 2 phonemes", () => {
       expect(wordById('landed').phonemes.length).toBe(6);
       expect(wordById('rested').phonemes.length).toBe(6);
@@ -97,11 +97,17 @@ describe('derivePhonemes()', () => {
     // where that produced wrong sound counts. Locking them in here prevents
     // a regression if the mode ever falls back to graphemes again.
     it.each([
-      ['cake', 3], ['kite', 3], ['tune', 3],   // silent-e
-      ['tax', 4], ['wax', 4], ['fox', 4],      // x = /k/+/s/
-      ['flat', 4], ['split', 5],               // blends
-      ['ship', 3], ['chin', 3],                // digraphs (already correct)
-      ['know', 2],                             // silent k
+      ['cake', 3],
+      ['kite', 3],
+      ['tune', 3], // silent-e
+      ['tax', 4],
+      ['wax', 4],
+      ['fox', 4], // x = /k/+/s/
+      ['flat', 4],
+      ['split', 5], // blends
+      ['ship', 3],
+      ['chin', 3], // digraphs (already correct)
+      ['know', 2], // silent k
     ])('%s → %i phonemes', (id, count) => {
       expect(wordById(id).phonemes.length).toBe(count);
     });

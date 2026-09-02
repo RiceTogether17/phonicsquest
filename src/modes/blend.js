@@ -13,17 +13,20 @@
 
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
 import {
-  mountBlendGuide, unmountBlendGuide, moveGuideTo, celebrateGuide,
+  mountBlendGuide,
+  unmountBlendGuide,
+  moveGuideTo,
+  celebrateGuide,
 } from '../components/giriBlendGuide.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 
-let currentWord   = null;
+let currentWord = null;
 let revealedCount = 0;
-let blendStart    = 0;
-let isRevealing   = false;
-let _blendStyle   = 'simultaneous'; // 'simultaneous' | 'cumulative'
+let blendStart = 0;
+let isRevealing = false;
+let _blendStyle = 'simultaneous'; // 'simultaneous' | 'cumulative'
 
 // ── Setup ─────────────────────────────────────────────────────────────────
 
@@ -32,11 +35,11 @@ let _blendStyle   = 'simultaneous'; // 'simultaneous' | 'cumulative'
  * @param {object} els
  */
 export function setupBlend(word, els) {
-  currentWord   = word;
+  currentWord = word;
   revealedCount = 0;
-  blendStart    = Date.now();
-  isRevealing   = false;
-  _blendStyle   = store.get('blendStyle') || 'simultaneous';
+  blendStart = Date.now();
+  isRevealing = false;
+  _blendStyle = store.get('blendStyle') || 'simultaneous';
 
   renderWordImage(word, els.wordEmoji, true);
   els.wordDisplay.innerHTML = '';
@@ -50,7 +53,7 @@ export function setupBlend(word, els) {
 
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = 'none';
-  els.btnSkip.style.display  = '';
+  els.btnSkip.style.display = '';
 
   if (store.get('autoplay')) {
     setTimeout(() => _revealNext(word, els), 700);
@@ -77,34 +80,44 @@ function _renderControls(els, word, stage) {
 
   if (stage === 'initial' || stage === 'revealing') {
     const remaining = total - revealedCount;
-    const btnLabel  = revealedCount === 0
-      ? '▶ First Sound'
-      : remaining === 1 ? '▶ Last Sound' : '▶ Next Sound';
+    const btnLabel =
+      revealedCount === 0 ? '▶ First Sound' : remaining === 1 ? '▶ Last Sound' : '▶ Next Sound';
 
-    const styleBtns = revealedCount === 0 ? ['simultaneous', 'cumulative'].map(s => {
-      const label = { simultaneous: '🔤 Sound by Sound', cumulative: '🔗 Build It Up' }[s];
-      const desc  = {
-        simultaneous: 'Play each sound on its own, then the word',
-        cumulative:   'Blend each new sound with the ones before it',
-      }[s];
-      const active = _blendStyle === s ? 'speed-btn--active' : '';
-      return `<button class="speed-btn ${active}" data-blend-style="${s}" aria-label="${desc}" title="${desc}">${label}</button>`;
-    }).join('') : '';
+    const styleBtns =
+      revealedCount === 0
+        ? ['simultaneous', 'cumulative']
+            .map((s) => {
+              const label = { simultaneous: '🔤 Sound by Sound', cumulative: '🔗 Build It Up' }[s];
+              const desc = {
+                simultaneous: 'Play each sound on its own, then the word',
+                cumulative: 'Blend each new sound with the ones before it',
+              }[s];
+              const active = _blendStyle === s ? 'speed-btn--active' : '';
+              return `<button class="speed-btn ${active}" data-blend-style="${s}" aria-label="${desc}" title="${desc}">${label}</button>`;
+            })
+            .join('')
+        : '';
 
-    els.modeArea.innerHTML = /* html */`
+    els.modeArea.innerHTML = /* html */ `
       <div class="blend-guided-wrap">
         <div class="blend-tip" id="blend-tip" aria-live="polite">
-          ${revealedCount === 0
-            ? '👂 Listen to each sound and say it out loud!'
-            : `Sound ${revealedCount} of ${total} — keep going!`}
+          ${
+            revealedCount === 0
+              ? '👂 Listen to each sound and say it out loud!'
+              : `Sound ${revealedCount} of ${total} — keep going!`
+          }
         </div>
         ${dotsHtml}
-        ${styleBtns ? `
+        ${
+          styleBtns
+            ? `
         <div class="speed-row" role="group" aria-label="Blending style">
           <span class="speed-label">Blend:</span>
           <div class="speed-btns">${styleBtns}</div>
         </div>
-        ` : ''}
+        `
+            : ''
+        }
         <button class="btn btn--primary btn--xl blend-next-btn" id="btn-reveal-next"
                 aria-label="${btnLabel}">
           ${btnLabel}
@@ -116,18 +129,17 @@ function _renderControls(els, word, stage) {
       _revealNext(word, els);
     });
 
-    els.modeArea.querySelectorAll('[data-blend-style]').forEach(btn => {
+    els.modeArea.querySelectorAll('[data-blend-style]').forEach((btn) => {
       btn.addEventListener('click', () => {
         _blendStyle = btn.dataset.blendStyle;
         store.set('blendStyle', _blendStyle);
-        els.modeArea.querySelectorAll('[data-blend-style]').forEach(b => {
+        els.modeArea.querySelectorAll('[data-blend-style]').forEach((b) => {
           b.classList.toggle('speed-btn--active', b.dataset.blendStyle === _blendStyle);
         });
       });
     });
-
   } else if (stage === 'blend') {
-    els.modeArea.innerHTML = /* html */`
+    els.modeArea.innerHTML = /* html */ `
       <div class="blend-guided-wrap">
         <div class="blend-blend-cta" id="blend-cta">
           🔗 Now put them together!
@@ -147,9 +159,8 @@ function _renderControls(els, word, stage) {
     if (store.get('autoplay')) {
       setTimeout(() => _doBlend(word, els), 500);
     }
-
   } else if (stage === 'assess') {
-    els.modeArea.innerHTML = /* html */`
+    els.modeArea.innerHTML = /* html */ `
       <div class="blend-guided-wrap">
         <div class="blend-assess-prompt">Did you blend it right?</div>
         ${dotsHtml}
@@ -191,13 +202,17 @@ async function _revealNext(word, els) {
     await audio.speakChunk(word, idx);
     await _delay(150);
     await audio.speakPhoneme(word.graphemes[idx], word.types[idx], {
-      word: word.word, prevGrapheme: word.graphemes[idx - 1],
+      word: word.word,
+      prevGrapheme: word.graphemes[idx - 1],
     });
     await _delay(150);
     await audio.speakChunk(word, idx + 1);
   } else {
     const prevGrapheme = idx > 0 ? word.graphemes[idx - 1] : null;
-    await audio.speakPhoneme(word.graphemes[idx], word.types[idx], { word: word.word, prevGrapheme });
+    await audio.speakPhoneme(word.graphemes[idx], word.types[idx], {
+      word: word.word,
+      prevGrapheme,
+    });
   }
   await _delay(200);
 
@@ -271,7 +286,8 @@ async function _animateBlendSweep(phonemeRow, word) {
         tiles.forEach((t, ti) => t.classList.toggle('blend-highlight', ti === i));
         moveGuideTo(phonemeRow, i);
         await audio.speakPhoneme(word.graphemes[i], word.types[i], {
-          word: word.word, prevGrapheme: word.graphemes[i - 1],
+          word: word.word,
+          prevGrapheme: word.graphemes[i - 1],
         });
         await _delay(150);
 
@@ -280,35 +296,40 @@ async function _animateBlendSweep(phonemeRow, word) {
         await _delay(perTile);
       }
     }
-    tiles.forEach(t => t.classList.remove('blend-highlight'));
+    tiles.forEach((t) => t.classList.remove('blend-highlight'));
   } else {
     // Sequential highlight
     for (let i = 0; i < tiles.length; i++) {
       tiles[i].classList.add('blend-highlight');
       moveGuideTo(phonemeRow, i);
       const prev = i > 0 ? word.graphemes[i - 1] : null;
-      await audio.speakPhoneme(word.graphemes[i], word.types[i], { word: word.word, prevGrapheme: prev });
+      await audio.speakPhoneme(word.graphemes[i], word.types[i], {
+        word: word.word,
+        prevGrapheme: prev,
+      });
       await _delay(perTile);
       tiles[i].classList.remove('blend-highlight');
     }
   }
 
   // Flash all together for the "blend" moment — the whole word at once.
-  tiles.forEach(t => t.classList.add('blend-highlight-all'));
+  tiles.forEach((t) => t.classList.add('blend-highlight-all'));
   celebrateGuide(phonemeRow);
   await _delay(400);
-  tiles.forEach(t => t.classList.remove('blend-highlight-all'));
+  tiles.forEach((t) => t.classList.remove('blend-highlight-all'));
 }
 
-const _delay = ms => new Promise(r => setTimeout(r, ms));
+const _delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ── Exports ───────────────────────────────────────────────────────────────
 
-export function getCurrentWord() { return currentWord; }
+export function getCurrentWord() {
+  return currentWord;
+}
 
 export function cleanup() {
   unmountBlendGuide(document.getElementById('phoneme-row'));
-  currentWord   = null;
+  currentWord = null;
   revealedCount = 0;
-  isRevealing   = false;
+  isRevealing = false;
 }

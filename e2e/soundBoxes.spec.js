@@ -13,27 +13,53 @@ import AxeBuilder from '@axe-core/playwright';
 async function seedLearner(page) {
   await page.addInitScript(() => {
     const profile = {
-      id: 'p_boxes', name: 'Testy', avatar: '🦊', color: '#f97316',
-      schoolLevel: 'preschool', primaryGrade: null, readingBand: 'emerging-decoder',
+      id: 'p_boxes',
+      name: 'Testy',
+      avatar: '🦊',
+      color: '#f97316',
+      schoolLevel: 'preschool',
+      primaryGrade: null,
+      readingBand: 'emerging-decoder',
       createdAt: new Date().toISOString(),
     };
     localStorage.setItem('phonicsquest_profiles', JSON.stringify([profile]));
     localStorage.setItem('phonicsquest_active_profile', profile.id);
     localStorage.setItem('phonicsquest_legacy_migrated_to_profiles', '1');
-    localStorage.setItem(`phonicsquest_profile_${profile.id}`, JSON.stringify({
-      placementComplete: true,
-      placementProfile: { readingBand: 'emerging-decoder' },
-      onboardingComplete: true,
-      xp: 120, level: 2,
-      // Mark every phonics stage lesson as seen. A first encounter opens a
-      // mini-lesson overlay before the round starts, and these tests are
-      // about the in-round visuals, not the lesson gate.
-      lessonsSeen: Object.fromEntries(
-        ['cvc-a','cvc-e','cvc-i','cvc-o','cvc-u','ccvc-a','ccvc-e','ccvc-i','ccvc-o','ccvc-u',
-         'cvcc-a','cvcc-e','cvcc-i','cvcc-o','cvcc-u','digraph-sh','digraph-ch','digraph-th']
-          .map(id => [`phonics:${id}`, new Date().toISOString()]),
-      ),
-    }));
+    localStorage.setItem(
+      `phonicsquest_profile_${profile.id}`,
+      JSON.stringify({
+        placementComplete: true,
+        placementProfile: { readingBand: 'emerging-decoder' },
+        onboardingComplete: true,
+        xp: 120,
+        level: 2,
+        // Mark every phonics stage lesson as seen. A first encounter opens a
+        // mini-lesson overlay before the round starts, and these tests are
+        // about the in-round visuals, not the lesson gate.
+        lessonsSeen: Object.fromEntries(
+          [
+            'cvc-a',
+            'cvc-e',
+            'cvc-i',
+            'cvc-o',
+            'cvc-u',
+            'ccvc-a',
+            'ccvc-e',
+            'ccvc-i',
+            'ccvc-o',
+            'ccvc-u',
+            'cvcc-a',
+            'cvcc-e',
+            'cvcc-i',
+            'cvcc-o',
+            'cvcc-u',
+            'digraph-sh',
+            'digraph-ch',
+            'digraph-th',
+          ].map((id) => [`phonics:${id}`, new Date().toISOString()]),
+        ),
+      }),
+    );
   });
 }
 
@@ -76,8 +102,8 @@ test('sound boxes render one box per sound, all empty to start', async ({ page }
   expect(count).toBeGreaterThanOrEqual(2);
 
   // The track must not give the answer away before the child works.
-  const states = await boxes.evaluateAll(els => els.map(e => e.dataset.state));
-  expect(states.filter(s => s === 'filled' || s === 'correct')).toHaveLength(0);
+  const states = await boxes.evaluateAll((els) => els.map((e) => e.dataset.state));
+  expect(states.filter((s) => s === 'filled' || s === 'correct')).toHaveLength(0);
   expect(states).toContain('active');
 });
 
@@ -90,7 +116,10 @@ test('the sound track is described to assistive tech', async ({ page }) => {
 
   // Each box carries its own position/state label, so state is never
   // communicated by colour alone.
-  const firstLabel = await page.locator('#segment-sound-boxes .sound-box').first().getAttribute('aria-label');
+  const firstLabel = await page
+    .locator('#segment-sound-boxes .sound-box')
+    .first()
+    .getAttribute('aria-label');
   expect(firstLabel).toMatch(/^Sound 1 of \d+:/);
 });
 
@@ -135,12 +164,10 @@ test('boxes fill as the child groups letters', async ({ page }) => {
 test('Segment It has no critical or serious a11y violations', async ({ page }) => {
   await openSegmentIt(page);
 
-  const results = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa'])
-    .analyze();
+  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
 
   const blocking = results.violations.filter(
-    v => v.impact === 'critical' || v.impact === 'serious',
+    (v) => v.impact === 'critical' || v.impact === 'serious',
   );
-  expect(blocking.map(v => `${v.id}: ${v.help} (${v.nodes.length} nodes)`)).toEqual([]);
+  expect(blocking.map((v) => `${v.id}: ${v.help} (${v.nodes.length} nodes)`)).toEqual([]);
 });

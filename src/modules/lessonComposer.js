@@ -70,7 +70,7 @@ export function composeTodaysLesson(now = new Date()) {
 
 function _composeEarly() {
   const plan = getEarlyReadingPlan();
-  const byId = Object.fromEntries(plan.steps.map(s => [s.id, s]));
+  const byId = Object.fromEntries(plan.steps.map((s) => [s.id, s]));
 
   const steps = [];
 
@@ -106,11 +106,12 @@ function _fromEarlyStep(step, kind, kindLabel) {
     detail: step.detail,
     done: step.done,
     progressLabel: step.progressLabel,
-    action: step.id === 'review'
-      ? { type: 'review' }
-      : step.id === 'daily'
-        ? { type: 'daily' }
-        : { type: 'navigate', target: step.target, group: step.group || null },
+    action:
+      step.id === 'review'
+        ? { type: 'review' }
+        : step.id === 'daily'
+          ? { type: 'daily' }
+          : { type: 'navigate', target: step.target, group: step.group || null },
   };
 }
 
@@ -121,10 +122,16 @@ function _earlyTeachStep() {
   try {
     const journeyKey = getCurrentJourneyStep()?.key;
     if (journeyKey === 'phonemic-awareness' || journeyKey === 'letter-sounds') return null;
-  } catch (_) { /* fall through to the phonics teach step */ }
+  } catch (_) {
+    /* fall through to the phonics teach step */
+  }
 
   let stage;
-  try { stage = getRecommendedStage(); } catch (_) { stage = null; }
+  try {
+    stage = getRecommendedStage();
+  } catch (_) {
+    stage = null;
+  }
   if (!stage) return null;
 
   return {
@@ -164,7 +171,12 @@ function _composePrimary(now) {
       title: step.title,
       detail: step.description,
       done: step.done,
-      progressLabel: step.goal > 1 ? `${Math.min(step.count, step.goal)}/${step.goal}` : (step.done ? '✓' : 'Start'),
+      progressLabel:
+        step.goal > 1
+          ? `${Math.min(step.count, step.goal)}/${step.goal}`
+          : step.done
+            ? '✓'
+            : 'Start',
       action: { type: 'navigate', target: step.target, missionStepId: step.id },
     });
   }
@@ -174,7 +186,11 @@ function _composePrimary(now) {
 
 function _primaryTeachStep() {
   let plan;
-  try { plan = getRemediationPlan(1) || []; } catch (_) { plan = []; }
+  try {
+    plan = getRemediationPlan(1) || [];
+  } catch (_) {
+    plan = [];
+  }
   const weakest = plan[0];
   if (!weakest) return null;
 
@@ -182,7 +198,9 @@ function _primaryTeachStep() {
   const meta = isGrammar ? GRAMMAR_CATEGORIES[weakest.skill] : VOCAB_CATEGORIES[weakest.skill];
   const tip = isGrammar
     ? getGrammarTip(weakest.skill)
-    : (meta && meta.rule ? { rule: meta.rule, example: meta.example, tip: meta.tip } : null);
+    : meta && meta.rule
+      ? { rule: meta.rule, example: meta.example, tip: meta.tip }
+      : null;
   if (!tip) return null;
 
   const followUp = weakest.nextStep

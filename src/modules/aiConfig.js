@@ -102,10 +102,13 @@ export function configuredProviders() {
 export function recordUsage(usage, model) {
   if (!usage) return;
   const price = PRICE_PER_MTOK[model];
-  const spend = price
-    ? (usage.input / 1e6) * price.input + (usage.output / 1e6) * price.output
-    : 0;
-  const totals = store.get('aiSpend') || { inputTokens: 0, outputTokens: 0, estimatedUsd: 0, calls: 0 };
+  const spend = price ? (usage.input / 1e6) * price.input + (usage.output / 1e6) * price.output : 0;
+  const totals = store.get('aiSpend') || {
+    inputTokens: 0,
+    outputTokens: 0,
+    estimatedUsd: 0,
+    calls: 0,
+  };
   store.set('aiSpend', {
     inputTokens: totals.inputTokens + (usage.input || 0),
     outputTokens: totals.outputTokens + (usage.output || 0),
@@ -135,7 +138,10 @@ export function resetSpend() {
  * The child never sees this — features fall back to their authored content.
  */
 export function setLastError(err) {
-  store.set('aiLastError', err ? { code: err.code || 'network', message: err.message || '', at: Date.now() } : null);
+  store.set(
+    'aiLastError',
+    err ? { code: err.code || 'network', message: err.message || '', at: Date.now() } : null,
+  );
 }
 
 /** @returns {{ code: string, message: string, at: number }|null} */

@@ -30,8 +30,8 @@ import { getSyllableCount, getSyllableBreakdown } from '../modules/syllables.js'
 import { createChoiceRound } from './choiceRound.js';
 
 let _currentWord = null;
-let _round       = null;
-let _clapCount   = 0;
+let _round = null;
+let _clapCount = 0;
 
 /**
  * @param {import('../data/words.js').Word} word
@@ -39,17 +39,17 @@ let _clapCount   = 0;
  */
 export function setupSyllableClap(word, els) {
   _currentWord = word;
-  _clapCount   = 0;
+  _clapCount = 0;
 
   // Image yes, printed word no — same rationale as Sound Count.
   renderWordImage(word, els.wordEmoji, true);
   els.wordDisplay.innerHTML = '';
-  els.phonemeRow.innerHTML  = '';
+  els.phonemeRow.innerHTML = '';
   els.modeInstruction.textContent = 'Clap the syllables — how many beats?';
 
   const correctCount = getSyllableCount(word);
 
-  els.modeArea.innerHTML = /* html */`
+  els.modeArea.innerHTML = /* html */ `
     <div class="syllable-mode">
       <button class="clap-button" id="clap-btn" type="button" aria-label="Tap to clap">
         <span class="clap-button-emoji" aria-hidden="true">👏</span>
@@ -77,17 +77,17 @@ export function setupSyllableClap(word, els) {
   for (let n = 1; n <= maxChoice; n++) {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className       = 'choice-btn choice-btn--count';
+    btn.className = 'choice-btn choice-btn--count';
     btn.dataset.correct = String(n === correctCount);
-    btn.dataset.value   = String(n);
+    btn.dataset.value = String(n);
     btn.setAttribute('aria-label', `${n} syllable${n !== 1 ? 's' : ''}`);
 
     const num = document.createElement('span');
-    num.className   = 'count-number';
+    num.className = 'count-number';
     num.textContent = String(n);
 
     const dots = document.createElement('span');
-    dots.className   = 'count-dots';
+    dots.className = 'count-dots';
     dots.textContent = '●'.repeat(n);
 
     btn.appendChild(num);
@@ -101,13 +101,15 @@ export function setupSyllableClap(word, els) {
     grid,
     onResult: els.onResult,
     retryHint: 'Clap it out slowly, one beat at a time.',
-    onRetry: () => { setTimeout(() => audio.speakWord(word.word), 200); },
+    onRetry: () => {
+      setTimeout(() => audio.speakWord(word.word), 200);
+    },
     onReveal: () => _revealAnswer(word, els),
   });
 
   if (els.btnCheck) els.btnCheck.style.display = 'none';
   if (els.btnSayIt) els.btnSayIt.style.display = '';
-  if (els.btnSkip)  els.btnSkip.style.display  = '';
+  if (els.btnSkip) els.btnSkip.style.display = '';
 
   setTimeout(() => audio.speakWord(word.word), 400);
 }
@@ -125,10 +127,12 @@ function _revealAnswer(word, els) {
   setTimeout(() => audio.speakWord(word.word), 500);
 }
 
-export function getCurrentWord() { return _currentWord; }
+export function getCurrentWord() {
+  return _currentWord;
+}
 
 export function cleanup() {
   _currentWord = null;
-  _round       = null;
-  _clapCount   = 0;
+  _round = null;
+  _clapCount = 0;
 }

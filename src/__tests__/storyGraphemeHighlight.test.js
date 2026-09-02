@@ -41,7 +41,7 @@ describe('_highlightGraphemes (sound-colour scaffold)', () => {
 
   it('leaves consonants and spacing intact', () => {
     const out = _highlightGraphemes('the cat sat');
-    expect(out).toContain('vs--schwa">e</span>');            // schwa e in "the"
-    expect(out.replace(/<[^>]+>/g, '')).toBe('the cat sat');  // strip spans → original text
+    expect(out).toContain('vs--schwa">e</span>'); // schwa e in "the"
+    expect(out.replace(/<[^>]+>/g, '')).toBe('the cat sat'); // strip spans → original text
   });
 });

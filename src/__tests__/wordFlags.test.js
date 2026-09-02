@@ -20,7 +20,7 @@ import { describe, it, expect } from 'vitest';
 import { WORDS, deriveFlags, deriveDecodableStage } from '../data/words.js';
 import { CURRICULUM } from '../data/curriculum.js';
 
-const wordById = (id) => WORDS.find(w => w.id === id);
+const wordById = (id) => WORDS.find((w) => w.id === id);
 
 // ── Flags ───────────────────────────────────────────────────────────────────
 
@@ -32,19 +32,21 @@ describe('deriveFlags / word.flags', () => {
   });
 
   it("'multi-phoneme-x' covers every word whose grapheme list contains 'x'", () => {
-    const xWords = WORDS.filter(w => w.graphemes.includes('x'));
+    const xWords = WORDS.filter((w) => w.graphemes.includes('x'));
     expect(xWords.length).toBeGreaterThan(0);
     for (const w of xWords) {
-      expect(w.flags, `${w.id} has 'x' but missing multi-phoneme-x flag`).toContain('multi-phoneme-x');
+      expect(w.flags, `${w.id} has 'x' but missing multi-phoneme-x flag`).toContain(
+        'multi-phoneme-x',
+      );
     }
     // And the count is the same: nothing else got the flag.
-    const flagged = WORDS.filter(w => w.flags.includes('multi-phoneme-x'));
+    const flagged = WORDS.filter((w) => w.flags.includes('multi-phoneme-x'));
     expect(flagged.length).toBe(xWords.length);
   });
 
   it("'silent-letter' covers silent-e and silent-kn words", () => {
-    expect(wordById('cake').flags).toContain('silent-letter');  // CVCe
-    expect(wordById('know').flags).toContain('silent-letter');  // kn
+    expect(wordById('cake').flags).toContain('silent-letter'); // CVCe
+    expect(wordById('know').flags).toContain('silent-letter'); // kn
     expect(wordById('cat').flags).not.toContain('silent-letter');
   });
 
@@ -59,7 +61,7 @@ describe('deriveFlags / word.flags', () => {
 
   it("'soft-g' flag is applied via the curated override list", () => {
     // Whatever words are in the SOFT_G_WORDS override should be flagged.
-    const flagged = WORDS.filter(w => w.flags.includes('soft-g')).map(w => w.id);
+    const flagged = WORDS.filter((w) => w.flags.includes('soft-g')).map((w) => w.id);
     expect(flagged.length).toBeGreaterThan(0);
     // Words like 'get' / 'give' / 'girl' use HARD /g/ and must NOT be flagged.
     expect(wordById('get')?.flags).not.toContain('soft-g');
@@ -100,30 +102,34 @@ describe('pattern preservation under flagging', () => {
 
 describe('deriveDecodableStage / word.decodableStage', () => {
   it('every WORD gets a non-null decodableStage', () => {
-    const unrouted = WORDS.filter(w => !w.decodableStage).map(w => w.id);
+    const unrouted = WORDS.filter((w) => !w.decodableStage).map((w) => w.id);
     expect(unrouted, `Words without decodableStage: ${unrouted.join(', ')}`).toEqual([]);
   });
 
   it.each([
     // Structural-vowel inference.
-    ['cat',  'cvc-a'],   ['hat',  'cvc-a'],
-    ['bed',  'cvc-e'],
-    ['flat', 'ccvc-a'],  ['step', 'ccvc-e'],
-    ['lamp', 'cvcc-a'],  ['best', 'cvcc-e'],
-    ['stamp','ccvcc-a'], ['print','ccvcc-i'],
+    ['cat', 'cvc-a'],
+    ['hat', 'cvc-a'],
+    ['bed', 'cvc-e'],
+    ['flat', 'ccvc-a'],
+    ['step', 'ccvc-e'],
+    ['lamp', 'cvcc-a'],
+    ['best', 'cvcc-e'],
+    ['stamp', 'ccvcc-a'],
+    ['print', 'ccvcc-i'],
   ])('%s → %s (structural)', (id, expected) => {
     expect(wordById(id).decodableStage).toBe(expected);
   });
 
   it.each([
     // Named-stage groups beat structural inference.
-    ['ship',    'digraphs'],
-    ['chin',    'digraphs'],
-    ['that',    'digraphs'],
-    ['sing',    'digraphs'],
+    ['ship', 'digraphs'],
+    ['chin', 'digraphs'],
+    ['that', 'digraphs'],
+    ['sing', 'digraphs'],
     ['running', 'suffix-ing'],
-    ['jumped',  'suffix-ed'],
-    ['grander',  'suffix-er'],
+    ['jumped', 'suffix-ed'],
+    ['grander', 'suffix-er'],
     ['grandest', 'suffix-est'],
   ])('%s → %s (named group)', (id, expected) => {
     expect(wordById(id).decodableStage).toBe(expected);
@@ -133,30 +139,30 @@ describe('deriveDecodableStage / word.decodableStage', () => {
     // Long-vowel and diphthong micro-stages.
     ['cake', 'long-a-ae'],
     ['rain', 'long-a-ai'],
-    ['day',  'long-a-ay'],
+    ['day', 'long-a-ay'],
     ['tree', 'long-e-ee'],
     ['beat', 'long-e-ea'],
     ['kite', 'long-i-ie'],
     ['high', 'long-i-igh'],
-    ['cry',  'long-i-y'],
+    ['cry', 'long-i-y'],
     ['home', 'long-o-oe'],
     ['boat', 'long-o-oa'],
     ['snow', 'long-o-ow'],
     ['cube', 'long-u-ue'],
     ['blue', 'long-u-uue'],
-    ['new',  'long-u-ew'],
+    ['new', 'long-u-ew'],
     ['moon', 'long-u-oo'],
     ['coin', 'dip-oi'],
-    ['cow',  'dip-ou'],
-    ['paw',  'dip-aw'],
+    ['cow', 'dip-ou'],
+    ['paw', 'dip-aw'],
   ])('%s → %s (micro-stage)', (id, expected) => {
     expect(wordById(id).decodableStage).toBe(expected);
   });
 
   it('words whose stage exists in CURRICULUM resolve to a real stage id', () => {
-    const curriculumIds = new Set(CURRICULUM.map(s => s.id));
+    const curriculumIds = new Set(CURRICULUM.map((s) => s.id));
     // Words mapping to a curriculum stage id must match an actual stage.
-    const stageWords = WORDS.filter(w => curriculumIds.has(w.decodableStage));
+    const stageWords = WORDS.filter((w) => curriculumIds.has(w.decodableStage));
     expect(stageWords.length).toBeGreaterThan(WORDS.length * 0.7); // most words
 
     // The non-curriculum-stage values are documented routing keys.
@@ -166,9 +172,10 @@ describe('deriveDecodableStage / word.decodableStage', () => {
     const ALLOWED_NON_STAGE_KEYS = new Set(['r-controlled', 'blends']);
     for (const w of WORDS) {
       if (curriculumIds.has(w.decodableStage)) continue;
-      expect(ALLOWED_NON_STAGE_KEYS.has(w.decodableStage),
-        `${w.id} routes to "${w.decodableStage}" which is neither a curriculum stage nor a documented routing key`)
-        .toBe(true);
+      expect(
+        ALLOWED_NON_STAGE_KEYS.has(w.decodableStage),
+        `${w.id} routes to "${w.decodableStage}" which is neither a curriculum stage nor a documented routing key`,
+      ).toBe(true);
     }
   });
 });
@@ -177,17 +184,32 @@ describe('deriveDecodableStage / word.decodableStage', () => {
 
 describe('deriver helpers (independent of WORDS)', () => {
   it('deriveFlags returns [] for the simplest CVC word', () => {
-    expect(deriveFlags({ id: 'cat', word: 'cat', graphemes: ['c','a','t'], types: ['c','sv','c'], pattern: 'CVC', group: 'short-a' }))
-      .toEqual([]);
+    expect(
+      deriveFlags({
+        id: 'cat',
+        word: 'cat',
+        graphemes: ['c', 'a', 't'],
+        types: ['c', 'sv', 'c'],
+        pattern: 'CVC',
+        group: 'short-a',
+      }),
+    ).toEqual([]);
   });
 
   it('deriveFlags catches multi-phoneme x at any position', () => {
-    expect(deriveFlags({ id: 'tax', word: 'tax', graphemes: ['t','a','x'], types: ['c','sv','c'] }))
-      .toContain('multi-phoneme-x');
+    expect(
+      deriveFlags({ id: 'tax', word: 'tax', graphemes: ['t', 'a', 'x'], types: ['c', 'sv', 'c'] }),
+    ).toContain('multi-phoneme-x');
   });
 
   it('deriveDecodableStage prefers spellingPattern over group fallback', () => {
-    const word = { word: 'cake', group: 'long-a', spellingPattern: 'ae', graphemes: ['c','a','k','e'], types: ['c','lv','c','se'] };
+    const word = {
+      word: 'cake',
+      group: 'long-a',
+      spellingPattern: 'ae',
+      graphemes: ['c', 'a', 'k', 'e'],
+      types: ['c', 'lv', 'c', 'se'],
+    };
     expect(deriveDecodableStage(word)).toBe('long-a-ae');
   });
 });

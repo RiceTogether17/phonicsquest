@@ -24,28 +24,28 @@ import { tokenizeSentence, getReadAndTapHint } from './scoring/readAndTap.js';
 import { createChoiceRound } from './choiceRound.js';
 
 const TEMPLATES = [
-  w => `I can see the ${w}.`,
-  w => `Look at the ${w}!`,
-  w => `The ${w} is here.`,
+  (w) => `I can see the ${w}.`,
+  (w) => `Look at the ${w}!`,
+  (w) => `The ${w} is here.`,
 ];
 
-let _word      = null;
-let _els       = null;
-let _sentence  = '';
-let _round     = null;
-let _firstTap  = null;   // { word, index } — the scorer's tappedWord/tappedIndex
+let _word = null;
+let _els = null;
+let _sentence = '';
+let _round = null;
+let _firstTap = null; // { word, index } — the scorer's tappedWord/tappedIndex
 let _startTime = 0;
-let _timeouts  = [];
+let _timeouts = [];
 
 /**
  * @param {import('../data/words.js').Word} word
  * @param {object} els
  */
 export function setupReadAndTap(word, els) {
-  _word      = word;
-  _els       = els;
-  _firstTap  = null;
-  _timeouts  = [];
+  _word = word;
+  _els = els;
+  _firstTap = null;
+  _timeouts = [];
   _startTime = Date.now();
 
   const target = tokenizeSentence(word.word)[0]?.word ?? word.word.toLowerCase();
@@ -53,16 +53,16 @@ export function setupReadAndTap(word, els) {
 
   renderWordImage(word, els.wordEmoji, false);
   els.wordDisplay.innerHTML = '';
-  els.phonemeRow.innerHTML  = '';
+  els.phonemeRow.innerHTML = '';
   els.modeInstruction.textContent = 'Read the sentence. Tap the word you hear.';
 
   // Say-It stays visible: the target IS the shell word, so the shell's
   // replay button remains truthful in this mode.
   if (els.btnCheck) els.btnCheck.style.display = 'none';
   if (els.btnSayIt) els.btnSayIt.style.display = '';
-  if (els.btnSkip)  els.btnSkip.style.display  = '';
+  if (els.btnSkip) els.btnSkip.style.display = '';
 
-  els.modeArea.innerHTML = /* html */`
+  els.modeArea.innerHTML = /* html */ `
     <div class="rt-round">
       <div class="rt-sentence choice-grid choice-grid--sentence" id="rt-sentence"
            role="group" aria-label="Sentence — tap the word you hear"></div>
@@ -104,20 +104,32 @@ export function setupReadAndTap(word, els) {
           timeMs: Date.now() - _startTime,
         })}`;
       }
-      _timeouts.push(setTimeout(() => {
-        audio.speakText(_sentence).then(() => audio.speakWord(word.word)).catch(() => {});
-      }, 250));
+      _timeouts.push(
+        setTimeout(() => {
+          audio
+            .speakText(_sentence)
+            .then(() => audio.speakWord(word.word))
+            .catch(() => {});
+        }, 250),
+      );
     },
     onReveal: () => {
-      grid.querySelectorAll('[data-correct="true"]').forEach(b => b.classList.add('rt-token--target'));
+      grid
+        .querySelectorAll('[data-correct="true"]')
+        .forEach((b) => b.classList.add('rt-token--target'));
       _timeouts.push(setTimeout(() => audio.speakWord(word.word), 500));
     },
   });
 
   // Read the sentence, then announce the word to find.
-  _timeouts.push(setTimeout(() => {
-    audio.speakText(_sentence).then(() => audio.speakWord(word.word)).catch(() => {});
-  }, 400));
+  _timeouts.push(
+    setTimeout(() => {
+      audio
+        .speakText(_sentence)
+        .then(() => audio.speakWord(word.word))
+        .catch(() => {});
+    }, 400),
+  );
 }
 
 /**
@@ -126,11 +138,12 @@ export function setupReadAndTap(word, els) {
  */
 function _pickSentence(word, target) {
   const stageGroup = store.get('currentGroup') || word.group;
-  const stage = CURRICULUM.find(s => s.group === stageGroup || s.id === stageGroup)
-    || findStageForGroup(word.group);
+  const stage =
+    CURRICULUM.find((s) => s.group === stageGroup || s.id === stageGroup) ||
+    findStageForGroup(word.group);
 
   for (const s of stage?.sentenceExamples ?? []) {
-    if (tokenizeSentence(s).some(t => t.word === target)) return s;
+    if (tokenizeSentence(s).some((t) => t.word === target)) return s;
   }
 
   // Deterministic template by word id so the same word always reads the same.
@@ -144,7 +157,7 @@ export function getCurrentWord() {
 }
 
 export function cleanup() {
-  _timeouts.forEach(id => clearTimeout(id));
+  _timeouts.forEach((id) => clearTimeout(id));
   _timeouts = [];
   _word = null;
   _els = null;

@@ -22,21 +22,22 @@ const DOM_HTML = `
 function makeEls() {
   document.body.innerHTML = DOM_HTML;
   return {
-    wordEmoji:       document.getElementById('word-emoji'),
-    wordDisplay:     document.getElementById('word-display'),
-    phonemeRow:      document.getElementById('phoneme-row'),
+    wordEmoji: document.getElementById('word-emoji'),
+    wordDisplay: document.getElementById('word-display'),
+    phonemeRow: document.getElementById('phoneme-row'),
     modeInstruction: document.getElementById('mode-instruction'),
-    modeArea:        document.getElementById('mode-area'),
-    btnCheck:        document.getElementById('btn-check'),
-    btnSayIt:        document.getElementById('btn-say-it'),
-    btnSkip:         document.getElementById('btn-skip'),
-    onResult:        vi.fn(),
+    modeArea: document.getElementById('mode-area'),
+    btnCheck: document.getElementById('btn-check'),
+    btnSayIt: document.getElementById('btn-say-it'),
+    btnSkip: document.getElementById('btn-skip'),
+    onResult: vi.fn(),
   };
 }
 
 function readRenderedGraphemes() {
-  return Array.from(document.querySelectorAll('#mode-area .choice-btn'))
-    .map(b => b.dataset.grapheme);
+  return Array.from(document.querySelectorAll('#mode-area .choice-btn')).map(
+    (b) => b.dataset.grapheme,
+  );
 }
 
 beforeEach(() => {
@@ -49,7 +50,11 @@ beforeEach(() => {
     paused: false,
     resume: () => {},
   };
-  globalThis.SpeechSynthesisUtterance = class { constructor(text) { this.text = text; } };
+  globalThis.SpeechSynthesisUtterance = class {
+    constructor(text) {
+      this.text = text;
+    }
+  };
 });
 
 describe('First Sound — choice ordering', () => {
@@ -57,7 +62,7 @@ describe('First Sound — choice ordering', () => {
     const { setupFirstSound, cleanup } = await import('../src/modes/firstSound.js');
     const els = makeEls();
     setupFirstSound(
-      { id: 't', word: 'cat', level: 1, graphemes: ['c','a','t'], types: ['c','sv','c'] },
+      { id: 't', word: 'cat', level: 1, graphemes: ['c', 'a', 't'], types: ['c', 'sv', 'c'] },
       els,
     );
     const order = readRenderedGraphemes();
@@ -73,7 +78,13 @@ describe('First Sound — choice ordering', () => {
     for (let i = 0; i < 30 && !sawUnsorted; i++) {
       const els = makeEls();
       setupFirstSound(
-        { id: 'bel', word: 'belt', level: 3, graphemes: ['b','e','l','t'], types: ['c','sv','c','c'] },
+        {
+          id: 'bel',
+          word: 'belt',
+          level: 3,
+          graphemes: ['b', 'e', 'l', 't'],
+          types: ['c', 'sv', 'c', 'c'],
+        },
         els,
       );
       const order = readRenderedGraphemes();
@@ -90,7 +101,7 @@ describe('Last Sound — choice ordering', () => {
     const { setupLastSound, cleanup } = await import('../src/modes/lastSound.js');
     const els = makeEls();
     setupLastSound(
-      { id: 'd', word: 'dog', level: 1, graphemes: ['d','o','g'], types: ['c','sv','c'] },
+      { id: 'd', word: 'dog', level: 1, graphemes: ['d', 'o', 'g'], types: ['c', 'sv', 'c'] },
       els,
     );
     const order = readRenderedGraphemes();
@@ -106,7 +117,7 @@ describe('Middle Sound — choice ordering', () => {
     const { setupMiddleSound, cleanup } = await import('../src/modes/middleSound.js');
     const els = makeEls();
     setupMiddleSound(
-      { id: 'cat', word: 'cat', level: 1, graphemes: ['c','a','t'], types: ['c','sv','c'] },
+      { id: 'cat', word: 'cat', level: 1, graphemes: ['c', 'a', 't'], types: ['c', 'sv', 'c'] },
       els,
     );
     const order = readRenderedGraphemes();

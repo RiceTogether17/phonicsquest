@@ -18,7 +18,13 @@ import { GRAMMAR_CATEGORIES } from '../data/grammarCategories.js';
 import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
 
 /** Quests whose skill keys are grammar categories. */
-const GRAMMAR_QUESTS = new Set(['grammarMcq', 'clozeCastle', 'editingQuest', 'sentenceForge', 'synthesisQuest']);
+const GRAMMAR_QUESTS = new Set([
+  'grammarMcq',
+  'clozeCastle',
+  'editingQuest',
+  'sentenceForge',
+  'synthesisQuest',
+]);
 /** Quests whose skill keys are vocabulary categories. */
 const VOCAB_QUESTS = new Set(['vocabMcq', 'wordVault']);
 
@@ -79,7 +85,11 @@ export function buildGiriQuestionChips({ limit = 6 } = {}) {
   };
 
   let mistakes = [];
-  try { mistakes = getRecentMistakes(); } catch (_) { /* fresh profile */ }
+  try {
+    mistakes = getRecentMistakes();
+  } catch (_) {
+    /* fresh profile */
+  }
   for (const m of mistakes) {
     const skill = _skillFromMistake(m);
     if (skill) push(skill);
@@ -101,7 +111,9 @@ export function answerChipOffline(chip) {
   if (chip.domain === 'vocab') {
     const cat = VOCAB_CATEGORIES[chip.skillKey] || {};
     return {
-      rule: cat.rule || `${cat.label || chip.skillKey} questions test word meaning and usage in context.`,
+      rule:
+        cat.rule ||
+        `${cat.label || chip.skillKey} questions test word meaning and usage in context.`,
       example: cat.example || 'Read the whole sentence and test each option in the blank.',
       tip: cat.tip || 'Look for clue words around the gap before choosing.',
     };
@@ -141,13 +153,19 @@ Explain the same idea AGAIN but in different, even simpler words, with ONE new e
  * @returns {Promise<string|null>}
  */
 export async function askGiriFreeText(question) {
-  const q = String(question || '').trim().slice(0, 300);
+  const q = String(question || '')
+    .trim()
+    .slice(0, 300);
   if (!q) return null;
   const { askGiriConstrained } = await import('./aiGuardrails.js');
-  return askGiriConstrained('ask', `The student asks: "${q}"
+  return askGiriConstrained(
+    'ask',
+    `The student asks: "${q}"
 
-Answer the question if it is about English learning. Otherwise use your standard redirect line.`, {
-    maxTokens: 160,
-    logSummary: `Ask (typed): ${q.slice(0, 80)}`,
-  });
+Answer the question if it is about English learning. Otherwise use your standard redirect line.`,
+    {
+      maxTokens: 160,
+      logSummary: `Ask (typed): ${q.slice(0, 80)}`,
+    },
+  );
 }

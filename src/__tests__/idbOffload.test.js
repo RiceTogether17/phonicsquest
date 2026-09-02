@@ -14,12 +14,15 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 function stubAudioGlobals() {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
 }
 
 /** Flush the store's queueMicrotask-debounced save. */
-const flushSave = () => new Promise(r => setTimeout(r, 0));
+const flushSave = () => new Promise((r) => setTimeout(r, 0));
 
 beforeEach(() => {
   stubAudioGlobals();
@@ -116,7 +119,7 @@ describe('store offloading', () => {
 });
 
 describe('default-state aliasing', () => {
-  it('does not let one profile\'s events leak into the defaults', async () => {
+  it("does not let one profile's events leak into the defaults", async () => {
     const { store } = await import('../modules/store.js');
 
     store.setStorageKey('phonicsquest_profile_a');

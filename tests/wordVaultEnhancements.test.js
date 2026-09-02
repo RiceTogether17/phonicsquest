@@ -4,7 +4,12 @@ import { vocabPassages } from '../src/data/vocabPassages.js';
 describe('word vault enhancements', () => {
   it('computes star ratings with hint-sensitive thresholds', async () => {
     vi.resetModules();
-    globalThis.speechSynthesis = { getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {} };
+    globalThis.speechSynthesis = {
+      getVoices: () => [],
+      addEventListener: () => {},
+      speak: () => {},
+      cancel: () => {},
+    };
     const { getWordVaultStars, renderSummaryStars } = await import('../src/modes/wordVault.js');
 
     expect(getWordVaultStars({ accuracy: 95, hintsUsed: 0 })).toBe(3);
@@ -15,11 +20,24 @@ describe('word vault enhancements', () => {
 
   it('builds affix parts from answers and hints', async () => {
     vi.resetModules();
-    globalThis.speechSynthesis = { getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {} };
+    globalThis.speechSynthesis = {
+      getVoices: () => [],
+      addEventListener: () => {},
+      speak: () => {},
+      cancel: () => {},
+    };
     const { buildAffixParts } = await import('../src/modes/wordVault.js');
 
-    expect(buildAffixParts('unhappy', 'Prefix un- means not')).toEqual({ root: 'happy', affix: 'un', type: 'prefix' });
-    expect(buildAffixParts('careful', 'Suffix -ful means full of')).toEqual({ root: 'care', affix: 'ful', type: 'suffix' });
+    expect(buildAffixParts('unhappy', 'Prefix un- means not')).toEqual({
+      root: 'happy',
+      affix: 'un',
+      type: 'prefix',
+    });
+    expect(buildAffixParts('careful', 'Suffix -ful means full of')).toEqual({
+      root: 'care',
+      affix: 'ful',
+      type: 'suffix',
+    });
   });
 
   it('enriches vocab metadata and ensures minimum category content', () => {

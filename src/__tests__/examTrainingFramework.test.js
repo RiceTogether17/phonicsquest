@@ -11,7 +11,6 @@ import {
 } from '../modes/examTrainingFramework.js';
 
 describe('examTrainingFramework', () => {
-
   it('exports the full learn-to-mastery stage sequence', () => {
     expect(TRAINING_STAGES).toEqual(['LEARN', 'GUIDED', 'EXAM', 'REVIEW', 'MASTERY']);
   });
@@ -28,22 +27,28 @@ describe('examTrainingFramework', () => {
 
   it('returns review prompts and recommendation text', () => {
     expect(getReviewPromptForSkill('connectorLogic')).toContain('contrast');
-    expect(getMasteryRecommendation({ weakSkills: ['tense'], hintsUsed: 0, accuracy: 55 })).toContain('Retry');
-    expect(getMasteryRecommendation({ weakSkills: [], hintsUsed: 0, accuracy: 95 })).toContain('harder level');
+    expect(
+      getMasteryRecommendation({ weakSkills: ['tense'], hintsUsed: 0, accuracy: 55 }),
+    ).toContain('Retry');
+    expect(getMasteryRecommendation({ weakSkills: [], hintsUsed: 0, accuracy: 95 })).toContain(
+      'harder level',
+    );
   });
 });
 
 describe('getBlankSkillMeta', () => {
   it('reads the rich object form positionally', () => {
     const passage = {
-      blankSkills: [{
-        primarySkill: 'connectorLogic',
-        clueType: 'contrastClue',
-        expectedThinking: 'The word "although" shows an opposite idea.',
-        correctReason: 'The answer must show disappointment.',
-        wrongOptionTraps: { excited: 'Opposite meaning.' },
-        examTip: 'Look for connectors before choosing.',
-      }],
+      blankSkills: [
+        {
+          primarySkill: 'connectorLogic',
+          clueType: 'contrastClue',
+          expectedThinking: 'The word "although" shows an opposite idea.',
+          correctReason: 'The answer must show disappointment.',
+          wrongOptionTraps: { excited: 'Opposite meaning.' },
+          examTip: 'Look for connectors before choosing.',
+        },
+      ],
     };
     const meta = getBlankSkillMeta(passage, 0);
     expect(meta.primarySkill).toBe('connectorLogic');
@@ -55,9 +60,7 @@ describe('getBlankSkillMeta', () => {
 
   it('finds rich entries by blankIndex when sparsely positioned', () => {
     const passage = {
-      blankSkills: [
-        { blankIndex: 2, primarySkill: 'tense', clueType: 'timeClue' },
-      ],
+      blankSkills: [{ blankIndex: 2, primarySkill: 'tense', clueType: 'timeClue' }],
     };
     const meta = getBlankSkillMeta(passage, 2);
     expect(meta.primarySkill).toBe('tense');
@@ -67,7 +70,14 @@ describe('getBlankSkillMeta', () => {
   it('falls back to clue + passage-level fields and string tags', () => {
     const passage = {
       blankSkills: ['tense'],
-      clues: [{ blankIndex: 0, clueType: 'timeClue', prompt: 'Find the time word.', explanation: 'past tense fits.' }],
+      clues: [
+        {
+          blankIndex: 0,
+          clueType: 'timeClue',
+          prompt: 'Find the time word.',
+          explanation: 'past tense fits.',
+        },
+      ],
       simpleMeaning: 'felt sad',
       partOfSpeech: 'verb',
       wrongOptionTraps: [{ option: 'happy', reason: 'wrong tone' }],

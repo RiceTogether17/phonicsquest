@@ -89,16 +89,16 @@ describe('modalManager', () => {
 
   it('does NOT accumulate Escape handlers when opened twice', () => {
     makeModal('modal-test');
-    const addSpy    = vi.spyOn(document, 'addEventListener');
+    const addSpy = vi.spyOn(document, 'addEventListener');
     const removeSpy = vi.spyOn(document, 'removeEventListener');
 
     modalManager.open('modal-test');
     modalManager.open('modal-test'); // second open should remove the first handler
 
     // One removal (the first handler) + one addition.
-    const keydownAdds    = addSpy.mock.calls.filter(c => c[0] === 'keydown').length;
-    const keydownRemoves = removeSpy.mock.calls.filter(c => c[0] === 'keydown').length;
-    expect(keydownAdds).toBe(2);    // one per open call
+    const keydownAdds = addSpy.mock.calls.filter((c) => c[0] === 'keydown').length;
+    const keydownRemoves = removeSpy.mock.calls.filter((c) => c[0] === 'keydown').length;
+    expect(keydownAdds).toBe(2); // one per open call
     expect(keydownRemoves).toBe(1); // previous handler cleaned up on second open
 
     addSpy.mockRestore();

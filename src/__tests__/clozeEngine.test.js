@@ -21,7 +21,10 @@ describe('createClozeRound', () => {
 
 describe('fillNextBlank', () => {
   it('fills first empty blank', () => {
-    const bankWords = [{ id: 0, word: 'a', used: false }, { id: 1, word: 'b', used: false }];
+    const bankWords = [
+      { id: 0, word: 'a', used: false },
+      { id: 1, word: 'b', used: false },
+    ];
     const blankFills = [null, null];
     expect(fillNextBlank(bankWords, blankFills, 1)).toBe(true);
     expect(blankFills).toEqual([1, null]);

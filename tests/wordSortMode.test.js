@@ -9,17 +9,48 @@ function stubAudioGlobals() {
     paused: false,
     resume: () => {},
   };
-  globalThis.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; } };
-  globalThis.AudioContext = globalThis.AudioContext || class {
-    constructor() { this.state = 'running'; this.sampleRate = 44100; }
-    createOscillator() { return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } }; }
-    createGain() { return { connect: vi.fn(), gain: { value: 1, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() } }; }
-    createBuffer(_c, frames) { return { getChannelData: () => new Float32Array(frames) }; }
-    createBufferSource() { return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), buffer: null }; }
-    createBiquadFilter() { return { connect: vi.fn(), type: '', frequency: { value: 0 }, Q: { value: 0 } }; }
-    get destination() { return {}; }
-    resume() { return Promise.resolve(); }
+  globalThis.SpeechSynthesisUtterance = class {
+    constructor(t) {
+      this.text = t;
+    }
   };
+  globalThis.AudioContext =
+    globalThis.AudioContext ||
+    class {
+      constructor() {
+        this.state = 'running';
+        this.sampleRate = 44100;
+      }
+      createOscillator() {
+        return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } };
+      }
+      createGain() {
+        return {
+          connect: vi.fn(),
+          gain: {
+            value: 1,
+            setValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+            linearRampToValueAtTime: vi.fn(),
+          },
+        };
+      }
+      createBuffer(_c, frames) {
+        return { getChannelData: () => new Float32Array(frames) };
+      }
+      createBufferSource() {
+        return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), buffer: null };
+      }
+      createBiquadFilter() {
+        return { connect: vi.fn(), type: '', frequency: { value: 0 }, Q: { value: 0 } };
+      }
+      get destination() {
+        return {};
+      }
+      resume() {
+        return Promise.resolve();
+      }
+    };
 }
 
 stubAudioGlobals();
@@ -27,7 +58,7 @@ const { setupWordSort, cleanup, getCurrentWord } = await import('../src/modes/wo
 const { store } = await import('../src/modules/store.js');
 const { WORDS } = await import('../src/data/words.js');
 
-const CAT = WORDS.find(w => w.id === 'cat');
+const CAT = WORDS.find((w) => w.id === 'cat');
 
 describe('Word Sort mode', () => {
   beforeEach(() => {
@@ -51,28 +82,31 @@ describe('Word Sort mode', () => {
 
   function makeEls() {
     return {
-      wordEmoji:       document.getElementById('word-emoji'),
-      wordDisplay:     document.getElementById('word-display'),
-      phonemeRow:      document.getElementById('phoneme-row'),
+      wordEmoji: document.getElementById('word-emoji'),
+      wordDisplay: document.getElementById('word-display'),
+      phonemeRow: document.getElementById('phoneme-row'),
       modeInstruction: document.getElementById('mode-instruction'),
-      modeArea:        document.getElementById('mode-area'),
-      btnCheck:        document.getElementById('btn-check'),
-      btnSayIt:        document.getElementById('btn-say-it'),
-      btnHint:         document.getElementById('btn-hint'),
-      btnSkip:         document.getElementById('btn-skip'),
-      onResult:        vi.fn(),
+      modeArea: document.getElementById('mode-area'),
+      btnCheck: document.getElementById('btn-check'),
+      btnSayIt: document.getElementById('btn-say-it'),
+      btnHint: document.getElementById('btn-hint'),
+      btnSkip: document.getElementById('btn-skip'),
+      onResult: vi.fn(),
     };
   }
 
   /** Tap the bin matching (or mismatching) the current card's word. */
   function tapBin({ correct }) {
     const cardWord = document.querySelector('.ws-card-word').textContent;
-    const wordObj = WORDS.find(w => w.word === cardWord);
+    const wordObj = WORDS.find((w) => w.word === cardWord);
     const bins = [...document.querySelectorAll('.ws-bin')];
-    const rightBin = bins.find(b => b.dataset.scorerKey === wordObj.group
-      || b.dataset.group === wordObj.group
-      || b.dataset.scorerKey === `short-${(wordObj.group.match(/-([aeiou])$/) || [])[1]}`);
-    const target = correct ? rightBin : bins.find(b => b !== rightBin);
+    const rightBin = bins.find(
+      (b) =>
+        b.dataset.scorerKey === wordObj.group ||
+        b.dataset.group === wordObj.group ||
+        b.dataset.scorerKey === `short-${(wordObj.group.match(/-([aeiou])$/) || [])[1]}`,
+    );
+    const target = correct ? rightBin : bins.find((b) => b !== rightBin);
     target.click();
   }
 
@@ -133,7 +167,7 @@ describe('Word Sort mode', () => {
 
       const next = document.querySelector('.vmcq-next-btn');
       next.click();
-      next.click();  // double-click guard ({once:true})
+      next.click(); // double-click guard ({once:true})
       expect(els.onResult).toHaveBeenCalledTimes(1);
       expect(els.onResult).toHaveBeenCalledWith(true, expect.any(Number));
     } finally {
@@ -146,10 +180,10 @@ describe('Word Sort mode', () => {
     try {
       const els = makeEls();
       setupWordSort(CAT, els);
-      playRound(1);  // one deliberate wrong bin
+      playRound(1); // one deliberate wrong bin
 
       const summary = document.querySelector('.ws-summary');
-      expect(summary.textContent).toMatch(/vowel/i);          // getWordSortHint parity
+      expect(summary.textContent).toMatch(/vowel/i); // getWordSortHint parity
       expect(summary.querySelector('.ws-summary-misses')).not.toBeNull();
 
       document.querySelector('.vmcq-next-btn').click();
@@ -183,7 +217,7 @@ describe('Word Sort mode', () => {
     vi.useFakeTimers();
     try {
       setupWordSort(CAT, makeEls());
-      tapBin({ correct: true });   // queues the 700ms advance
+      tapBin({ correct: true }); // queues the 700ms advance
       cleanup();
       expect(() => vi.advanceTimersByTime(5000)).not.toThrow();
       // A fresh setup still works after mid-round teardown.

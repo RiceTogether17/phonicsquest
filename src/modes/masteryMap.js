@@ -70,7 +70,10 @@ export function recordMasteryAttempt({
       clueType: String(example.clueType ?? clueType ?? ''),
       at: Number(example.at ?? now),
     };
-    skillBucket.recentExamples = [safeExample, ...(skillBucket.recentExamples || [])].slice(0, RECENT_LIMIT);
+    skillBucket.recentExamples = [safeExample, ...(skillBucket.recentExamples || [])].slice(
+      0,
+      RECENT_LIMIT,
+    );
   }
 
   return next;
@@ -111,7 +114,7 @@ export function getTopMasteryGaps({ mode, level, masteryMap = {}, limit = 3 } = 
       };
     })
     .filter((row) => row.attempts > 0)
-    .sort((a, b) => (b.errorRate - a.errorRate) || (b.wrong - a.wrong))
+    .sort((a, b) => b.errorRate - a.errorRate || b.wrong - a.wrong)
     .slice(0, limit);
 }
 
@@ -121,7 +124,8 @@ export function getTopMasteryGaps({ mode, level, masteryMap = {}, limit = 3 } = 
 export function summariseMasteryGap(entry = {}) {
   const label = entry.skillLabel || getSkillLabel(entry.skill || 'sentenceLogic');
   if (!entry.attempts) return `Try one ${label.toLowerCase()} passage to start tracking.`;
-  if (entry.accuracy >= 80) return `Almost mastered — keep ${label.toLowerCase()} sharp with one more passage.`;
+  if (entry.accuracy >= 80)
+    return `Almost mastered — keep ${label.toLowerCase()} sharp with one more passage.`;
   if (entry.accuracy >= 50) return `Practise ${label.toLowerCase()} with the scan task on.`;
   return `Drill ${label.toLowerCase()} slowly — read the clue twice before answering.`;
 }

@@ -66,7 +66,7 @@ export function lastSoundedIdx(word) {
  */
 export function firstPhoneme(word) {
   const grapheme = word?.graphemes?.[0] ?? '';
-  const type     = word?.types?.[0] ?? 'c';
+  const type = word?.types?.[0] ?? 'c';
   if (type !== 'bl') return { grapheme, type, index: 0 };
 
   const onset = INITIAL_BLEND_ONSETS[grapheme.toLowerCase()] ?? grapheme[0];
@@ -79,9 +79,9 @@ export function firstPhoneme(word) {
  * @returns {PositionedPhoneme}
  */
 export function lastPhoneme(word) {
-  const index    = lastSoundedIdx(word);
+  const index = lastSoundedIdx(word);
   const grapheme = word?.graphemes?.[index] ?? '';
-  const type     = word?.types?.[index] ?? 'c';
+  const type = word?.types?.[index] ?? 'c';
   if (type !== 'bl') return { grapheme, type, index };
 
   // Every final blend in the bank ends in a plain consonant letter that is

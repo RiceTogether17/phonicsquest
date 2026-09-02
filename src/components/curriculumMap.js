@@ -19,21 +19,26 @@ import { getPrePhaseProgress } from '../modules/prePhaseProgress.js';
 // Phase display metadata is derived from the canonical PHASES table in
 // curriculum.js. Don't redefine it here — a parallel table previously drifted
 // out of sync (7 entries vs the curriculum's 10) and mislabelled stages.
-const PHASE_META = PHASES.map(p => ({
+const PHASE_META = PHASES.map((p) => ({
   phase: p.phase,
   label: `Phase ${p.phase}`,
   title: p.title,
-  icon:  p.icon,
-  desc:  p.description,
+  icon: p.icon,
+  desc: p.description,
   sightWords: p.sightWords || [],
 }));
 
 const PRIMARY_DOMAINS = [
-  { id: 'sentenceSkills', label: 'Sentence Forge',   icon: '🔨', desc: 'Build and arrange sentences' },
-  { id: 'grammarCloze',   label: 'Cloze Castle',     icon: '🏰', desc: 'Grammar in context' },
-  { id: 'vocabCloze',     label: 'Word Vault',       icon: '🔑', desc: 'Vocabulary in context' },
-  { id: 'editingQuest',   label: 'Editing Quest',    icon: '✏️', desc: 'Spot and fix errors' },
-  { id: 'writingQuest',   label: 'Writing Quest',    icon: '📝', desc: 'Extended writing tasks' },
+  {
+    id: 'sentenceSkills',
+    label: 'Sentence Forge',
+    icon: '🔨',
+    desc: 'Build and arrange sentences',
+  },
+  { id: 'grammarCloze', label: 'Cloze Castle', icon: '🏰', desc: 'Grammar in context' },
+  { id: 'vocabCloze', label: 'Word Vault', icon: '🔑', desc: 'Vocabulary in context' },
+  { id: 'editingQuest', label: 'Editing Quest', icon: '✏️', desc: 'Spot and fix errors' },
+  { id: 'writingQuest', label: 'Writing Quest', icon: '📝', desc: 'Extended writing tasks' },
 ];
 
 function _getGroupMastery(groupKey) {
@@ -42,7 +47,7 @@ function _getGroupMastery(groupKey) {
 }
 
 function _getPhaseStatus(phaseNum) {
-  const stages = CURRICULUM.filter(s => s.phase === phaseNum);
+  const stages = CURRICULUM.filter((s) => s.phase === phaseNum);
   if (!stages.length) return { status: 'locked', pct: 0, masteredCount: 0, total: 0 };
 
   let masteredCount = 0;
@@ -50,12 +55,12 @@ function _getPhaseStatus(phaseNum) {
   for (const stage of stages) {
     const score = _getGroupMastery(stage.group);
     if (score === null) continue;
-    if (score >= 0.80) masteredCount++;
+    if (score >= 0.8) masteredCount++;
     else if (score > 0) inProgressCount++;
   }
 
   const total = stages.length;
-  const pct   = Math.round((masteredCount / total) * 100);
+  const pct = Math.round((masteredCount / total) * 100);
 
   let status;
   if (masteredCount === total) status = 'complete';
@@ -81,10 +86,13 @@ function _getCurrentPhase() {
 
 /** Foundation step cards (Step 0a/0b) shown ahead of Phase 1. */
 function _buildPrePhaseCardsHtml(currentPhase, avatar) {
-  return PRE_PHASES.map(pre => {
+  return PRE_PHASES.map((pre) => {
     const { status, pct } = getPrePhaseProgress(pre.phase);
     const isCurrent = pre.phase === currentPhase;
-    const statusLabel = { complete: 'Complete ✅', 'in-progress': 'In progress', locked: 'Not started yet' }[status] || '';
+    const statusLabel =
+      { complete: 'Complete ✅', 'in-progress': 'In progress', locked: 'Not started yet' }[
+        status
+      ] || '';
     return `
       <div class="cm-phase cm-phase--${status} ${isCurrent ? 'cm-phase--current' : ''}"
            aria-label="${pre.title}${isCurrent ? ' – current stage' : ''}">
@@ -98,22 +106,27 @@ function _buildPrePhaseCardsHtml(currentPhase, avatar) {
           <span class="cm-phase-badge">${status === 'complete' ? '✅' : status === 'in-progress' ? `${pct}%` : '🔒'}</span>
         </div>
         <p class="cm-phase-desc">${pre.description}</p>
-        ${status !== 'locked' ? `
+        ${
+          status !== 'locked'
+            ? `
           <div class="cm-phase-bar-track" aria-label="${pct}% complete">
             <div class="cm-phase-bar-fill" style="width:${pct}%"></div>
           </div>
           <span class="cm-phase-meta">${statusLabel}</span>
-        ` : `<span class="cm-phase-meta cm-phase-meta--locked">${statusLabel}</span>`}
+        `
+            : `<span class="cm-phase-meta cm-phase-meta--locked">${statusLabel}</span>`
+        }
       </div>`;
   }).join('');
 }
 
 function _getDomainStatus(domainId) {
   const domains = getDomainMastery();
-  const d = domains.find(x => x.id === domainId);
+  const d = domains.find((x) => x.id === domainId);
   if (!d || d.composite === null) return { status: 'not-started', pct: 0 };
   const pct = Math.round((d.composite ?? 0) * 100);
-  const status = pct >= 80 ? 'strong' : pct >= 50 ? 'building' : pct > 0 ? 'starting' : 'not-started';
+  const status =
+    pct >= 80 ? 'strong' : pct >= 50 ? 'building' : pct > 0 ? 'starting' : 'not-started';
   return { status, pct };
 }
 
@@ -125,13 +138,18 @@ function _getDomainStatus(domainId) {
  */
 export function buildPhaseCardsHtml(avatar = '🦁') {
   const currentPhase = _getCurrentPhase();
-  return _buildPrePhaseCardsHtml(currentPhase, avatar) + PHASE_META.map(pm => {
-    const { status, pct, masteredCount, total } = _getPhaseStatus(pm.phase);
-    const isCurrent = pm.phase === currentPhase && status !== 'complete';
-    const statusLabel = { complete: 'Complete ✅', 'in-progress': 'In progress', locked: 'Not started yet' }[status] || '';
-    const statusClass = `cm-phase--${status}`;
+  return (
+    _buildPrePhaseCardsHtml(currentPhase, avatar) +
+    PHASE_META.map((pm) => {
+      const { status, pct, masteredCount, total } = _getPhaseStatus(pm.phase);
+      const isCurrent = pm.phase === currentPhase && status !== 'complete';
+      const statusLabel =
+        { complete: 'Complete ✅', 'in-progress': 'In progress', locked: 'Not started yet' }[
+          status
+        ] || '';
+      const statusClass = `cm-phase--${status}`;
 
-    return `
+      return `
       <div class="cm-phase ${statusClass} ${isCurrent ? 'cm-phase--current' : ''}"
            aria-label="${pm.title}${isCurrent ? ' – current stage' : ''}">
         ${isCurrent ? `<div class="cm-you-are-here">${avatar} You are here!</div>` : ''}
@@ -145,14 +163,19 @@ export function buildPhaseCardsHtml(avatar = '🦁') {
         </div>
         <p class="cm-phase-desc">${pm.desc}</p>
         ${pm.sightWords.length ? `<p class="cm-phase-sight">🃏 Tricky words: ${pm.sightWords.join(', ')}</p>` : ''}
-        ${status !== 'locked' ? `
+        ${
+          status !== 'locked'
+            ? `
           <div class="cm-phase-bar-track" aria-label="${pct}% complete">
             <div class="cm-phase-bar-fill" style="width:${pct}%"></div>
           </div>
           <span class="cm-phase-meta">${masteredCount} / ${total} groups · ${statusLabel}</span>
-        ` : `<span class="cm-phase-meta cm-phase-meta--locked">${statusLabel}</span>`}
+        `
+            : `<span class="cm-phase-meta cm-phase-meta--locked">${statusLabel}</span>`
+        }
       </div>`;
-  }).join('');
+    }).join('')
+  );
 }
 
 /**
@@ -161,10 +184,16 @@ export function buildPhaseCardsHtml(avatar = '🦁') {
  * @returns {string}
  */
 export function buildDomainCardsHtml() {
-  return PRIMARY_DOMAINS.map(pd => {
+  return PRIMARY_DOMAINS.map((pd) => {
     const { status, pct } = _getDomainStatus(pd.id);
     const statusClass = `cm-domain--${status}`;
-    const statusLabel = { strong: 'Strong ✅', building: 'Building', starting: 'Just started', 'not-started': 'Not started yet' }[status] || '';
+    const statusLabel =
+      {
+        strong: 'Strong ✅',
+        building: 'Building',
+        starting: 'Just started',
+        'not-started': 'Not started yet',
+      }[status] || '';
     return `
       <div class="cm-domain ${statusClass}" aria-label="${pd.label}: ${statusLabel}">
         <div class="cm-domain-header">
@@ -173,10 +202,14 @@ export function buildDomainCardsHtml() {
           <span class="cm-domain-pct">${status !== 'not-started' ? `${pct}%` : '—'}</span>
         </div>
         <p class="cm-domain-desc">${pd.desc}</p>
-        ${status !== 'not-started' ? `
+        ${
+          status !== 'not-started'
+            ? `
           <div class="cm-phase-bar-track">
             <div class="cm-phase-bar-fill" style="width:${pct}%"></div>
-          </div>` : ''}
+          </div>`
+            : ''
+        }
       </div>`;
   }).join('');
 }
@@ -184,14 +217,14 @@ export function buildDomainCardsHtml() {
 export function renderCurriculumMap(container, { onClose } = {}) {
   if (!container) return;
 
-  const profile      = getActiveProfile();
-  const isPrimary    = profile?.schoolLevel === 'primary';
-  const avatar       = profile?.avatar || '🦁';
+  const profile = getActiveProfile();
+  const isPrimary = profile?.schoolLevel === 'primary';
+  const avatar = profile?.avatar || '🦁';
   // Escaped once here: this reaches innerHTML in both the aria-label and
   // the title below, and profile names are user-supplied.
-  const name         = escapeHtml(profile?.name?.split(' ')[0] || 'Learner');
+  const name = escapeHtml(profile?.name?.split(' ')[0] || 'Learner');
 
-  const phaseCards  = buildPhaseCardsHtml(avatar);
+  const phaseCards = buildPhaseCardsHtml(avatar);
   const domainCards = buildDomainCardsHtml();
 
   container.innerHTML = `

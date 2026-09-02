@@ -37,7 +37,9 @@ describe('TRICKY_WORDS data integrity', () => {
       expect(Number.isInteger(t.phase)).toBe(true);
       expect(t.phase).toBeGreaterThanOrEqual(1);
       expect(t.phase).toBeLessThanOrEqual(8);
-      expect(VALID_CATEGORIES.has(t.category), `bad category for ${t.word}: ${t.category}`).toBe(true);
+      expect(VALID_CATEGORIES.has(t.category), `bad category for ${t.word}: ${t.category}`).toBe(
+        true,
+      );
       expect(Array.isArray(t.regular)).toBe(true);
       expect(Array.isArray(t.tricky)).toBe(true);
       expect(typeof t.note).toBe('string');
@@ -48,7 +50,10 @@ describe('TRICKY_WORDS data integrity', () => {
   it("'decodable-soon' entries declare which phase they'll be decodable in", () => {
     for (const t of TRICKY_WORDS) {
       if (t.category !== 'decodable-soon') continue;
-      expect(t.decodableInPhase, `${t.word} is decodable-soon but missing decodableInPhase`).toBeDefined();
+      expect(
+        t.decodableInPhase,
+        `${t.word} is decodable-soon but missing decodableInPhase`,
+      ).toBeDefined();
       expect(t.decodableInPhase).toBeGreaterThanOrEqual(t.phase);
     }
   });
@@ -69,7 +74,7 @@ describe('TRICKY_WORDS data integrity', () => {
   });
 
   it('phase 1 contains the bootstrapping bundle for early decodable sentences', () => {
-    const phase1 = getTrickyWordsForPhase(1).map(t => t.word);
+    const phase1 = getTrickyWordsForPhase(1).map((t) => t.word);
     // The minimum set so a child can read "I said the cat was my…" in phase 1.
     for (const required of ['the', 'a', 'I', 'to', 'was', 'said', 'you', 'my']) {
       expect(phase1, `phase 1 missing ${required}`).toContain(required);
@@ -81,19 +86,22 @@ describe('TRICKY_WORDS data integrity', () => {
     // bootstrapping batch which has to seed early reading.
     for (let p = 1; p <= 8; p++) {
       const n = getTrickyWordsForPhase(p).length;
-      expect(n, `phase ${p} has ${n} tricky words — cognitive load too high`).toBeLessThanOrEqual(8);
+      expect(n, `phase ${p} has ${n} tricky words — cognitive load too high`).toBeLessThanOrEqual(
+        8,
+      );
     }
   });
 
-  it("regular + tricky parts together cover every letter of the word", () => {
+  it('regular + tricky parts together cover every letter of the word', () => {
     for (const t of TRICKY_WORDS) {
       const parts = [...t.regular, ...t.tricky];
       const concatenated = parts.join('').toLowerCase();
-      const wordLetters  = t.word.toLowerCase();
+      const wordLetters = t.word.toLowerCase();
       // The parts should produce the same multiset of letters as the word.
-      expect(concatenated.split('').sort().join(''),
-        `${t.word}: regular+tricky parts (${parts.join('+')}) don't cover the word`)
-        .toBe(wordLetters.split('').sort().join(''));
+      expect(
+        concatenated.split('').sort().join(''),
+        `${t.word}: regular+tricky parts (${parts.join('+')}) don't cover the word`,
+      ).toBe(wordLetters.split('').sort().join(''));
     }
   });
 });
@@ -114,10 +122,10 @@ describe('lookup helpers', () => {
 
   it('getTrickyWordsUpToPhase is cumulative', () => {
     const upTo3 = getTrickyWordsUpToPhase(3);
-    const ids   = upTo3.map(t => t.word);
-    expect(ids).toContain('the');     // phase 1
-    expect(ids).toContain('have');    // phase 2
-    expect(ids).toContain('are');     // phase 3
+    const ids = upTo3.map((t) => t.word);
+    expect(ids).toContain('the'); // phase 1
+    expect(ids).toContain('have'); // phase 2
+    expect(ids).toContain('are'); // phase 3
     expect(ids).not.toContain('they'); // phase 4
   });
 
@@ -131,32 +139,32 @@ describe('lookup helpers', () => {
 describe('highlightTrickyParts', () => {
   it("splits 'said' into s · ai · d with ai marked tricky", () => {
     expect(highlightTrickyParts('said')).toEqual([
-      { text: 's',  isTricky: false },
-      { text: 'ai', isTricky: true  },
-      { text: 'd',  isTricky: false },
+      { text: 's', isTricky: false },
+      { text: 'ai', isTricky: true },
+      { text: 'd', isTricky: false },
     ]);
   });
 
   it("marks both 'a' and 's' as tricky in 'was' (two irregular phonemes)", () => {
     expect(highlightTrickyParts('was')).toEqual([
       { text: 'w', isTricky: false },
-      { text: 'a', isTricky: true  },
-      { text: 's', isTricky: true  },
+      { text: 'a', isTricky: true },
+      { text: 's', isTricky: true },
     ]);
   });
 
   it("marks 'one' as a single tricky chunk (whole-word irregular)", () => {
-    expect(highlightTrickyParts('one')).toEqual([
-      { text: 'one', isTricky: true },
-    ]);
+    expect(highlightTrickyParts('one')).toEqual([{ text: 'one', isTricky: true }]);
   });
 
-  it("every tricky word in the list round-trips: reconstructed text matches the word", () => {
+  it('every tricky word in the list round-trips: reconstructed text matches the word', () => {
     for (const t of TRICKY_WORDS) {
       const segs = highlightTrickyParts(t.word);
       expect(segs).not.toBeNull();
-      const reconstructed = segs.map(s => s.text).join('');
-      expect(reconstructed.toLowerCase(), `${t.word} reconstruction mismatch`).toBe(t.word.toLowerCase());
+      const reconstructed = segs.map((s) => s.text).join('');
+      expect(reconstructed.toLowerCase(), `${t.word} reconstruction mismatch`).toBe(
+        t.word.toLowerCase(),
+      );
     }
   });
 
@@ -169,7 +177,7 @@ describe('progression integration', () => {
   it('getTrickyWordsForCurrentStage returns the phase-1 batch for a fresh learner', () => {
     // Empty snapshot → recommended stage is cvc-a (phase 1) → phase-1 tricky words.
     const tricky = getTrickyWordsForCurrentStage({});
-    const words  = tricky.map(t => t.word);
+    const words = tricky.map((t) => t.word);
     expect(words).toContain('the');
     expect(words).toContain('was');
   });

@@ -18,37 +18,37 @@ PhonicsQuest started as a phonics blender for early readers and now spans the fu
 
 ### 🌱 Early Reading Quest (K1–K2 / early P1)
 
-| Mode | What it does |
-|------|-------------|
-| **Blend It!** | Guided step-by-step phoneme reveal — perfect for beginners |
-| **Listen & Blend** | All tiles visible; teacher-friendly with speed control |
-| **Hear & Choose** | Listen to a word, pick it from 4 choices |
-| **Segment It** | Tap individual letters to group them into phoneme chunks |
-| **Missing Sound** | Identify the hidden phoneme |
-| **First / Last / Middle Sound** | Phonemic awareness drills |
-| **Sight Words** | 35 high-frequency word matching games |
-| **Letter Sounds** | Tap any grapheme to hear it (consonants, vowels, digraphs, blends, diphthongs) |
-| **Giri Stories** | 16 decodable phonics stories in Read-Aloud + Decode mode |
+| Mode                            | What it does                                                                   |
+| ------------------------------- | ------------------------------------------------------------------------------ |
+| **Blend It!**                   | Guided step-by-step phoneme reveal — perfect for beginners                     |
+| **Listen & Blend**              | All tiles visible; teacher-friendly with speed control                         |
+| **Hear & Choose**               | Listen to a word, pick it from 4 choices                                       |
+| **Segment It**                  | Tap individual letters to group them into phoneme chunks                       |
+| **Missing Sound**               | Identify the hidden phoneme                                                    |
+| **First / Last / Middle Sound** | Phonemic awareness drills                                                      |
+| **Sight Words**                 | 35 high-frequency word matching games                                          |
+| **Letter Sounds**               | Tap any grapheme to hear it (consonants, vowels, digraphs, blends, diphthongs) |
+| **Giri Stories**                | 16 decodable phonics stories in Read-Aloud + Decode mode                       |
 
 ### 🏫 Primary English Quest (P1–P6)
 
 Grouped by school-paper component so parents and teachers can match each module to a real exam section:
 
-| Group | Module | Helps with (paper component) |
-|-------|--------|------------------------------|
-| Language Use | 🧠 Grammar MCQ | Paper 2 Booklet A · Grammar MCQ |
-| Vocabulary & Cloze | 📖 Vocabulary MCQ | Paper 2 Booklet A · Vocabulary MCQ |
-| Vocabulary & Cloze | 🏰 Cloze Castle | Paper 2 · Grammar Cloze |
-| Vocabulary & Cloze | 🔑 Word Vault | Paper 2 · Vocabulary Cloze |
-| Vocabulary & Cloze | 📰 Comprehension Cloze | Paper 2 · Comprehension Cloze (P3–P6) |
-| Sentence Skills | 🔨 Sentence Forge | Word order & sentence building |
-| Sentence Skills | 🔁 Synthesis & Transformation | Paper 2 Booklet B · Synthesis (P4–P6) |
-| Writing & Editing | ✏️ Editing Quest | Paper 2 · Editing for Spelling & Grammar |
-| Writing & Editing | 📝 Writing Quest | Paper 1 · Continuous Writing |
-| Writing & Editing | ✉️ Situational Writing | Paper 1 · Situational Writing (P5–P6) |
-| Comprehension | 🖼️ Visual Text Comprehension | Paper 2 · Visual Text (P1–P6) |
-| Comprehension | 📚 Open-ended Comprehension | Paper 2 · Comprehension Open-ended (P1–P6) |
-| Exam Practice Hub | 📋 Full Paper Practice | Interactive Practice / timed Test Mode — see below |
+| Group              | Module                        | Helps with (paper component)                       |
+| ------------------ | ----------------------------- | -------------------------------------------------- |
+| Language Use       | 🧠 Grammar MCQ                | Paper 2 Booklet A · Grammar MCQ                    |
+| Vocabulary & Cloze | 📖 Vocabulary MCQ             | Paper 2 Booklet A · Vocabulary MCQ                 |
+| Vocabulary & Cloze | 🏰 Cloze Castle               | Paper 2 · Grammar Cloze                            |
+| Vocabulary & Cloze | 🔑 Word Vault                 | Paper 2 · Vocabulary Cloze                         |
+| Vocabulary & Cloze | 📰 Comprehension Cloze        | Paper 2 · Comprehension Cloze (P3–P6)              |
+| Sentence Skills    | 🔨 Sentence Forge             | Word order & sentence building                     |
+| Sentence Skills    | 🔁 Synthesis & Transformation | Paper 2 Booklet B · Synthesis (P4–P6)              |
+| Writing & Editing  | ✏️ Editing Quest              | Paper 2 · Editing for Spelling & Grammar           |
+| Writing & Editing  | 📝 Writing Quest              | Paper 1 · Continuous Writing                       |
+| Writing & Editing  | ✉️ Situational Writing        | Paper 1 · Situational Writing (P5–P6)              |
+| Comprehension      | 🖼️ Visual Text Comprehension  | Paper 2 · Visual Text (P1–P6)                      |
+| Comprehension      | 📚 Open-ended Comprehension   | Paper 2 · Comprehension Open-ended (P1–P6)         |
+| Exam Practice Hub  | 📋 Full Paper Practice        | Interactive Practice / timed Test Mode — see below |
 
 The home screen is organised into four tabs so a child always lands on one clear next action:
 
@@ -73,13 +73,13 @@ The Exam Practice Hub launches the same complete, scored papers as the grade-spe
 
 The dashboard now opens with a **Parent Report Card** designed for non-technical parents:
 
-| Cell | What it shows |
-|------|---------------|
-| ✅ Strengths | Up to three strongest skills with mastery % |
-| 🎯 Needs Practice | Up to three weak skills with current % |
-| 📝 Recent Mistakes | Last 5 wrong answers with mode and time |
-| ⏱️ Recommended 10-min practice | One specific module the child should open |
-| 💬 Teacher's note | A short, encouraging written summary |
+| Cell                           | What it shows                               |
+| ------------------------------ | ------------------------------------------- |
+| ✅ Strengths                   | Up to three strongest skills with mastery % |
+| 🎯 Needs Practice              | Up to three weak skills with current %      |
+| 📝 Recent Mistakes             | Last 5 wrong answers with mode and time     |
+| ⏱️ Recommended 10-min practice | One specific module the child should open   |
+| 💬 Teacher's note              | A short, encouraging written summary        |
 
 A **📲 Copy Parent Update** button generates a WhatsApp-ready message that captures the same information in plain language. CSV and JSON exports are still available for power users but are no longer the headline parent feature.
 
@@ -174,18 +174,18 @@ npm run format:check # report drift without writing
 
 Formatting is **opt-in per file, not enforced repo-wide.** The codebase predates Prettier and ~311 files still differ from it; reformatting them all at once would bury real changes in noise and destroy hand-tuned alignment in `src/data/` (which is Prettier-ignored for that reason). Instead, a `lint-staged` pre-commit hook formats only the files you actually touch, so the repo converges gradually. `npm run format:check` is intentionally **not** in CI.
 
-Linting is enforced (`npm run lint`, zero errors). The one rule with a backlog is the XSS guard that rejects assigning an interpolated template literal to `innerHTML` — use the auto-escaping ``html`` `` tag from `src/utils/html.js` instead. Pre-existing sites are warnings, and `--max-warnings` is pinned to the current count so the backlog can only shrink; lower the number as you migrate files.
+Linting is enforced (`npm run lint`, zero errors). The one rule with a backlog is the XSS guard that rejects assigning an interpolated template literal to `innerHTML` — use the auto-escaping `html` `` tag from `src/utils/html.js` instead. Pre-existing sites are warnings, and `--max-warnings` is pinned to the current count so the backlog can only shrink; lower the number as you migrate files.
 
 ---
 
 ## ⌨️ Keyboard Shortcuts
 
-| Key | Screen | Action |
-|-----|--------|--------|
-| `S` | Game | Replay word audio (Say It) |
-| `Space` / `Enter` | Blend It! | Reveal next sound |
-| `Escape` | Game | Back to menu |
-| `N` | Result | Next word |
+| Key               | Screen    | Action                     |
+| ----------------- | --------- | -------------------------- |
+| `S`               | Game      | Replay word audio (Say It) |
+| `Space` / `Enter` | Blend It! | Reveal next sound          |
+| `Escape`          | Game      | Back to menu               |
+| `N`               | Result    | Next word                  |
 
 ---
 
@@ -229,11 +229,11 @@ phonicsquest/
 
 ### Supported levels
 
-| Pathway | Levels |
-|---------|--------|
-| Early Reading Quest | K1–K2, early P1 (decoding, blending, sight words) |
-| Primary English Quest | P1–P6 (grouped by school-paper component) |
-| Exam Practice Hub | P1–P6 (PSLE-aligned playlists for P3–P6) |
+| Pathway               | Levels                                            |
+| --------------------- | ------------------------------------------------- |
+| Early Reading Quest   | K1–K2, early P1 (decoding, blending, sight words) |
+| Primary English Quest | P1–P6 (grouped by school-paper component)         |
+| Exam Practice Hub     | P1–P6 (PSLE-aligned playlists for P3–P6)          |
 
 ### State management
 
@@ -241,12 +241,12 @@ A single reactive store (`store.js`) backed by one per-profile localStorage key.
 
 ### Tech stack
 
-| Library | Version | Purpose |
-|---------|---------|---------|
-| [Vite](https://vitejs.dev) | 5.x | Build tool + dev server |
-| [GSAP](https://gsap.com) | 3.x | Mascot & wheel animations |
-| [canvas-confetti](https://github.com/catdad/canvas-confetti) | 1.x | Celebration effects |
-| [Chart.js](https://chartjs.org) | 4.x | Dashboard mastery charts |
+| Library                                                      | Version | Purpose                   |
+| ------------------------------------------------------------ | ------- | ------------------------- |
+| [Vite](https://vitejs.dev)                                   | 5.x     | Build tool + dev server   |
+| [GSAP](https://gsap.com)                                     | 3.x     | Mascot & wheel animations |
+| [canvas-confetti](https://github.com/catdad/canvas-confetti) | 1.x     | Celebration effects       |
+| [Chart.js](https://chartjs.org)                              | 4.x     | Dashboard mastery charts  |
 
 Vanilla JS + ES modules. No UI framework.
 
@@ -269,4 +269,4 @@ Pull requests welcome. Please:
 
 ---
 
-*Built for early readers and primary English learners everywhere.*
+_Built for early readers and primary English learners everywhere._

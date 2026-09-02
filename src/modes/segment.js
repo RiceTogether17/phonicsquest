@@ -86,7 +86,7 @@ export function setupSegment(word, els) {
   // forced-on inside this mode — it directly serves the task.
   setTimeout(async () => {
     await audio.speakWord(word.word);
-    await new Promise(r => setTimeout(r, 350));
+    await new Promise((r) => setTimeout(r, 350));
     await audio.speakWordStretched(word);
   }, 400);
 }
@@ -94,7 +94,7 @@ export function setupSegment(word, els) {
 function handleLetterTap(index, letter, btn, word, els) {
   if (btn.classList.contains('selected')) {
     btn.classList.remove('selected');
-    selectedLetters = selectedLetters.filter(l => l.index !== index);
+    selectedLetters = selectedLetters.filter((l) => l.index !== index);
   } else {
     btn.classList.add('selected');
     selectedLetters.push({ index, letter });
@@ -102,7 +102,7 @@ function handleLetterTap(index, letter, btn, word, els) {
   }
 
   // Auto-submit when the selection matches the next expected grapheme.
-  const selectedStr = selectedLetters.map(l => l.letter).join('');
+  const selectedStr = selectedLetters.map((l) => l.letter).join('');
   const nextGrapheme = word.graphemes[segmentsFound.length];
   if (nextGrapheme && selectedStr === nextGrapheme) {
     confirmSegment(word, els);
@@ -112,14 +112,14 @@ function handleLetterTap(index, letter, btn, word, els) {
 function confirmSegment(word, els) {
   if (selectedLetters.length === 0) return;
 
-  const selectedStr = selectedLetters.map(l => l.letter).join('');
+  const selectedStr = selectedLetters.map((l) => l.letter).join('');
   const expectedGrapheme = word.graphemes[segmentsFound.length];
 
   if (selectedStr === expectedGrapheme) {
     segmentsFound.push(selectedStr);
 
     const lettersContainer = document.getElementById('segment-letters');
-    selectedLetters.forEach(l => {
+    selectedLetters.forEach((l) => {
       const btns = lettersContainer.querySelectorAll('.segment-btn');
       btns[l.index].classList.remove('selected');
       btns[l.index].classList.add('matched');
@@ -150,7 +150,7 @@ function confirmSegment(word, els) {
     // report real correctness: a fumbled word must not promote its SR box.
     wrongGroupings++;
     const lettersContainer = document.getElementById('segment-letters');
-    selectedLetters.forEach(l => {
+    selectedLetters.forEach((l) => {
       const btns = lettersContainer.querySelectorAll('.segment-btn');
       btns[l.index].classList.add('wrong');
       btns[l.index].classList.remove('selected');

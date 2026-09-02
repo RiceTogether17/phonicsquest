@@ -17,7 +17,10 @@ import { speakGiri } from '../speakGiri.js';
 import { getActiveProfile } from '../../modules/profiles.js';
 import { hasApiKey } from '../../modules/aiService.js';
 import {
-  buildGiriQuestionChips, answerChipOffline, answerChipAi, askGiriFreeText,
+  buildGiriQuestionChips,
+  answerChipOffline,
+  answerChipAi,
+  askGiriFreeText,
 } from '../../modules/askGiri.js';
 import { attachAskGiriButton } from '../askGiriButton.js';
 
@@ -47,13 +50,17 @@ export function renderAskGiriPanel(host) {
   host.innerHTML = html`
     <p class="ask-giri-intro">Tap a question and Giri will explain it. The questions come from things you've found tricky lately.</p>
     <div class="ask-giri-chips" role="group" aria-label="Suggested questions">
-      ${chips.map(c => html`
+      ${chips.map(
+        (c) => html`
         <button class="btn btn--ghost ask-giri-chip" type="button" data-chip-id="${c.id}">
           ${c.question}
-        </button>`)}
+        </button>`,
+      )}
     </div>
     <div class="ask-giri-answer" id="ask-giri-answer" aria-live="polite"></div>
-    ${canType ? html`
+    ${
+      canType
+        ? html`
       <div class="ask-giri-typed">
         <label for="ask-giri-input" class="ask-giri-typed-label">Or type your own English question:</label>
         <div class="ask-giri-typed-row">
@@ -61,13 +68,19 @@ export function renderAskGiriPanel(host) {
                  placeholder="e.g. When do I use 'much' and when 'many'?" />
           <button class="btn btn--primary" type="button" id="ask-giri-send">Ask</button>
         </div>
-      </div>` : ''}
-    ${hasApiKey() ? '' : html`
+      </div>`
+        : ''
+    }
+    ${
+      hasApiKey()
+        ? ''
+        : html`
       <p class="ask-giri-setup">
         Giri is answering from his built-in notes. A grown-up can switch on
         AI answers so he can explain in fresh words each time.
         <button class="btn btn--ghost btn--sm" type="button" id="ask-giri-setup-btn">Set up the AI tutor</button>
-      </p>`}
+      </p>`
+    }
   `;
 
   // The moment a child taps Ask Giri is exactly when a parent finds out the
@@ -81,9 +94,9 @@ export function renderAskGiriPanel(host) {
 
   const answerHost = host.querySelector('#ask-giri-answer');
 
-  host.querySelectorAll('.ask-giri-chip').forEach(btn => {
+  host.querySelectorAll('.ask-giri-chip').forEach((btn) => {
     btn.addEventListener('click', () => {
-      const chip = chips.find(c => c.id === btn.dataset.chipId);
+      const chip = chips.find((c) => c.id === btn.dataset.chipId);
       if (!chip || !answerHost) return;
 
       const authored = answerChipOffline(chip);

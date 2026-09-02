@@ -53,7 +53,11 @@ describe('scheduleAttempt — Leitner ladder', () => {
   });
 
   it('graduated items only drop to box 3 — momentum protection', () => {
-    const stat = scheduleAttempt({ box: GRADUATED_BOX, dueAt: NOW, graduatedAt: NOW - 5 * DAY }, false, NOW);
+    const stat = scheduleAttempt(
+      { box: GRADUATED_BOX, dueAt: NOW, graduatedAt: NOW - 5 * DAY },
+      false,
+      NOW,
+    );
     expect(stat.box).toBe(__TEST__.GRADUATED_FLOOR);
     expect(stat.box).toBe(3);
   });
@@ -128,12 +132,7 @@ describe('getMaturity — 5-dot indicator', () => {
 });
 
 describe('isDue / countDueItems / getDueItems', () => {
-  const items = [
-    { id: 'cat' },
-    { id: 'hat' },
-    { id: 'mat' },
-    { id: 'sit' },
-  ];
+  const items = [{ id: 'cat' }, { id: 'hat' }, { id: 'mat' }, { id: 'sit' }];
 
   it('treats stats with no dueAt as not-due', () => {
     expect(isDue({ box: 0, attempts: 0 }, NOW)).toBe(false);
@@ -146,13 +145,13 @@ describe('isDue / countDueItems / getDueItems', () => {
 
   it('returns oldest-overdue first', () => {
     const wordStats = {
-      cat: { box: 1, dueAt: NOW - DAY },         // 1 day overdue
-      hat: { box: 2, dueAt: NOW - 3 * DAY },     // 3 days overdue
-      mat: { box: 0, dueAt: NOW + DAY },         // not due yet
-      sit: { box: 3, dueAt: NOW },               // due right now
+      cat: { box: 1, dueAt: NOW - DAY }, // 1 day overdue
+      hat: { box: 2, dueAt: NOW - 3 * DAY }, // 3 days overdue
+      mat: { box: 0, dueAt: NOW + DAY }, // not due yet
+      sit: { box: 3, dueAt: NOW }, // due right now
     };
     const due = getDueItems(wordStats, items, { now: NOW });
-    expect(due.map(d => d.id)).toEqual(['hat', 'cat', 'sit']);
+    expect(due.map((d) => d.id)).toEqual(['hat', 'cat', 'sit']);
   });
 
   it('honours the cap (avalanche prevention)', () => {
@@ -172,22 +171,22 @@ describe('getGraduatingSoon / getSlippingRecently — parent dashboard', () => {
 
   it('lists items at box 5 due within the horizon', () => {
     const wordStats = {
-      cat: { box: 5, dueAt: NOW + 3 * DAY },      // due in 3 days → graduating soon
-      hat: { box: 5, dueAt: NOW + 30 * DAY },     // due in 30 days → not yet
-      mat: { box: 4, dueAt: NOW + 2 * DAY },      // not at box 5
+      cat: { box: 5, dueAt: NOW + 3 * DAY }, // due in 3 days → graduating soon
+      hat: { box: 5, dueAt: NOW + 30 * DAY }, // due in 30 days → not yet
+      mat: { box: 4, dueAt: NOW + 2 * DAY }, // not at box 5
     };
     const grads = getGraduatingSoon(wordStats, items, 7, NOW);
-    expect(grads.map(g => g.id)).toEqual(['cat']);
+    expect(grads.map((g) => g.id)).toEqual(['cat']);
   });
 
   it('lists items demoted in the last 7 days', () => {
     const wordStats = {
       cat: { lastResult: 'demote', lastSeen: new Date(NOW - 2 * DAY).toISOString() },
-      hat: { lastResult: 'pass',   lastSeen: new Date(NOW - 1 * DAY).toISOString() },
+      hat: { lastResult: 'pass', lastSeen: new Date(NOW - 1 * DAY).toISOString() },
       mat: { lastResult: 'demote', lastSeen: new Date(NOW - 30 * DAY).toISOString() },
     };
     const slips = getSlippingRecently(wordStats, items, 7, NOW);
-    expect(slips.map(g => g.id)).toEqual(['cat']);
+    expect(slips.map((g) => g.id)).toEqual(['cat']);
   });
 });
 

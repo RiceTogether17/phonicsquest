@@ -24,9 +24,17 @@ function _el(host, html) {
 }
 
 function _escape(s) {
-  return String(s ?? '').replace(/[&<>"']/g, c => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  }[c]));
+  return String(s ?? '').replace(
+    /[&<>"']/g,
+    (c) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      })[c],
+  );
 }
 
 function _safeOn(host, selector, event, handler) {
@@ -38,7 +46,9 @@ function _safeOn(host, selector, event, handler) {
 // ── 1. Welcome ───────────────────────────────────────────────────────────
 
 export function renderWelcome(host, { onStart, onPickProfile, onAdult } = {}) {
-  _el(host, `
+  _el(
+    host,
+    `
     <main class="qj-page" role="main">
       <section class="qj-card qj-card--hero" aria-labelledby="qj-welcome-title">
         <div aria-hidden="true" style="font-size:3rem">🐉</div>
@@ -54,26 +64,33 @@ export function renderWelcome(host, { onStart, onPickProfile, onAdult } = {}) {
         </div>
       </section>
     </main>
-  `);
-  _safeOn(host, '[data-action="start"]',    'click', () => onStart?.());
+  `,
+  );
+  _safeOn(host, '[data-action="start"]', 'click', () => onStart?.());
   _safeOn(host, '[data-action="profiles"]', 'click', () => onPickProfile?.());
-  _safeOn(host, '[data-action="adult"]',    'click', () => onAdult?.());
+  _safeOn(host, '[data-action="adult"]', 'click', () => onAdult?.());
   return host;
 }
 
 // ── 2. Profile select ────────────────────────────────────────────────────
 
 export function renderProfileSelect(host, { profiles = [], onPick, onCreate } = {}) {
-  const cards = (profiles || []).map(p => `
+  const cards = (profiles || [])
+    .map(
+      (p) => `
     <button class="qj-profile-card qj-tap" data-profile-id="${_escape(p.id)}"
             aria-label="Play as ${_escape(p.name)} — ${_escape(p.meta || '')}">
       <span class="qj-profile-card__avatar" aria-hidden="true">${_escape(p.avatar || '🦁')}</span>
       <span class="qj-profile-card__name">${_escape(p.name)}</span>
       <span class="qj-profile-card__meta">${_escape(p.meta || 'New player')}</span>
     </button>
-  `).join('');
+  `,
+    )
+    .join('');
 
-  _el(host, `
+  _el(
+    host,
+    `
     <main class="qj-page" role="main">
       <h1 class="qj-welcome__title">Who's playing?</h1>
       <p class="qj-welcome__subtitle">Pick your card to start.</p>
@@ -87,9 +104,10 @@ export function renderProfileSelect(host, { profiles = [], onPick, onCreate } = 
         </button>
       </div>
     </main>
-  `);
+  `,
+  );
 
-  host.querySelectorAll('[data-profile-id]').forEach(btn => {
+  host.querySelectorAll('[data-profile-id]').forEach((btn) => {
     btn.addEventListener('click', () => onPick?.(btn.dataset.profileId));
   });
   _safeOn(host, '[data-action="create"]', 'click', () => onCreate?.());
@@ -106,42 +124,48 @@ export function renderProfileSelect(host, { profiles = [], onPick, onCreate } = 
  * @param {(stageId: string) => void} props.onPick
  * @param {() => void} props.onAdult
  */
-export function renderQuestMap(host, {
-  currentStageId,
-  masteredStageIds = [],
-  unlockedStageIds = [],
-  onPick,
-  onAdult,
-} = {}) {
+export function renderQuestMap(
+  host,
+  { currentStageId, masteredStageIds = [], unlockedStageIds = [], onPick, onAdult } = {},
+) {
   const mastered = new Set(masteredStageIds);
   const unlocked = new Set([...(unlockedStageIds || []), currentStageId].filter(Boolean));
   const currentPhase = currentStageId ? getStage(currentStageId)?.phase : 1;
 
-  const phaseBar = PHASES.map(p => {
+  const phaseBar = PHASES.map((p) => {
     let mod = '';
     if (currentPhase && p.phase < currentPhase) mod = 'qj-map__phase-bar-item--mastered';
     else if (p.phase === currentPhase) mod = 'qj-map__phase-bar-item--current';
     return `<li class="qj-map__phase-bar-item ${mod}" aria-hidden="true"></li>`;
   }).join('');
 
-  const phaseBlocks = PHASES.map(phase => {
+  const phaseBlocks = PHASES.map((phase) => {
     const stages = getStagesInPhase(phase.phase);
-    const nodes = stages.map(stage => {
-      let stateClass = 'qj-node--locked';
-      let statusText = 'Locked';
-      if (mastered.has(stage.id))             { stateClass = 'qj-node--mastered';  statusText = 'Mastered'; }
-      else if (stage.id === currentStageId)   { stateClass = 'qj-node--current';   statusText = 'You are here'; }
-      else if (unlocked.has(stage.id))        { stateClass = 'qj-node--available'; statusText = 'Available'; }
-      const ariaLabel = `${_escape(stage.name)} — ${statusText}`;
-      const disabled = stateClass === 'qj-node--locked' ? 'disabled aria-disabled="true"' : '';
-      return `
+    const nodes = stages
+      .map((stage) => {
+        let stateClass = 'qj-node--locked';
+        let statusText = 'Locked';
+        if (mastered.has(stage.id)) {
+          stateClass = 'qj-node--mastered';
+          statusText = 'Mastered';
+        } else if (stage.id === currentStageId) {
+          stateClass = 'qj-node--current';
+          statusText = 'You are here';
+        } else if (unlocked.has(stage.id)) {
+          stateClass = 'qj-node--available';
+          statusText = 'Available';
+        }
+        const ariaLabel = `${_escape(stage.name)} — ${statusText}`;
+        const disabled = stateClass === 'qj-node--locked' ? 'disabled aria-disabled="true"' : '';
+        return `
         <button class="qj-node ${stateClass} qj-tap" data-stage-id="${_escape(stage.id)}"
                 aria-label="${ariaLabel}" ${disabled}>
           <span class="qj-node__icon" aria-hidden="true">${_escape(stage.icon ?? '⭐')}</span>
           <span class="qj-node__name">${_escape(stage.name)}</span>
           <span class="qj-node__status">${statusText}</span>
         </button>`;
-    }).join('');
+      })
+      .join('');
 
     return `
       <section class="qj-map__phase" aria-labelledby="qj-phase-${phase.phase}-title">
@@ -155,7 +179,9 @@ export function renderQuestMap(host, {
       </section>`;
   }).join('');
 
-  _el(host, `
+  _el(
+    host,
+    `
     <header class="qj-header" role="banner">
       <span class="qj-header__mascot" aria-hidden="true">🦁</span>
       <h1 class="qj-header__title">Your quest map</h1>
@@ -166,9 +192,10 @@ export function renderQuestMap(host, {
       <ul class="qj-map__phase-bar" aria-label="Curriculum progress by phase">${phaseBar}</ul>
       ${phaseBlocks}
     </main>
-  `);
+  `,
+  );
 
-  host.querySelectorAll('[data-stage-id]').forEach(btn => {
+  host.querySelectorAll('[data-stage-id]').forEach((btn) => {
     if (btn.hasAttribute('disabled')) return;
     btn.addEventListener('click', () => onPick?.(btn.dataset.stageId));
   });
@@ -182,13 +209,15 @@ export function renderLessonIntro(host, { stageId, onStart, onBack, onReplay } =
   const stage = getStage(stageId);
   if (!stage) return _el(host, `<main class="qj-page"><p>Stage not found.</p></main>`);
   const sampleWord = stage.sampleWords?.[0] ?? '';
-  const sentence   = stage.sentenceExamples?.[0] ?? '';
-  const phase      = getPhase(stage.phase);
+  const sentence = stage.sentenceExamples?.[0] ?? '';
+  const phase = getPhase(stage.phase);
   const targetSoundLabel = stage.targetSounds?.[0] ?? phase?.targetSounds?.[0] ?? '';
   // Pull the bracketed sound bubble — e.g. "/ă/" — out of the label.
-  const bubbleText = (/[/](.+?)[/]/.exec(targetSoundLabel)?.[0]) ?? stage.icon ?? '🔊';
+  const bubbleText = /[/](.+?)[/]/.exec(targetSoundLabel)?.[0] ?? stage.icon ?? '🔊';
 
-  _el(host, `
+  _el(
+    host,
+    `
     <header class="qj-header" role="banner">
       <button class="qj-header__back qj-tap" data-action="back" aria-label="Back to quest map">← Map</button>
       <h1 class="qj-header__title">${_escape(stage.name)}</h1>
@@ -205,11 +234,12 @@ export function renderLessonIntro(host, { stageId, onStart, onBack, onReplay } =
       <button class="btn--qj-cta qj-tap" data-action="start"
               aria-label="Start the lesson for ${_escape(stage.name)}">Let's go!</button>
     </main>
-  `);
+  `,
+  );
 
-  _safeOn(host, '[data-action="back"]',   'click', () => onBack?.());
+  _safeOn(host, '[data-action="back"]', 'click', () => onBack?.());
   _safeOn(host, '[data-action="replay"]', 'click', () => onReplay?.(bubbleText));
-  _safeOn(host, '[data-action="start"]',  'click', () => onStart?.(stageId));
+  _safeOn(host, '[data-action="start"]', 'click', () => onStart?.(stageId));
   return host;
 }
 
@@ -228,36 +258,44 @@ export function renderLessonIntro(host, { stageId, onStart, onBack, onReplay } =
  *   onAnswer(answerPayload) — answer shape mirrors the score function input
  *   onPause()
  */
-export function renderGameMode(host, {
-  modeKey,
-  round,
-  totalRounds = 3,
-  currentRound = 1,
-  feedback,    // { state: 'correct'|'wrong-first'|'wrong-second', copy, hint }
-  onAnswer,
-  onPause,
-  onContinue,
-} = {}) {
+export function renderGameMode(
+  host,
+  {
+    modeKey,
+    round,
+    totalRounds = 3,
+    currentRound = 1,
+    feedback, // { state: 'correct'|'wrong-first'|'wrong-second', copy, hint }
+    onAnswer,
+    onPause,
+    onContinue,
+  } = {},
+) {
   const mode = PHONICS_MODES[modeKey];
   if (!mode || !round) {
     return _el(host, `<main class="qj-page"><p>Round not found.</p></main>`);
   }
 
   const dots = Array.from({ length: totalRounds }, (_, i) => {
-    if (i + 1 < currentRound) return `<li class="qj-dots__dot qj-dots__dot--done" aria-label="Round ${i + 1} of ${totalRounds} — done"></li>`;
-    if (i + 1 === currentRound) return `<li class="qj-dots__dot qj-dots__dot--current" aria-label="Round ${i + 1} of ${totalRounds} — current"></li>`;
+    if (i + 1 < currentRound)
+      return `<li class="qj-dots__dot qj-dots__dot--done" aria-label="Round ${i + 1} of ${totalRounds} — done"></li>`;
+    if (i + 1 === currentRound)
+      return `<li class="qj-dots__dot qj-dots__dot--current" aria-label="Round ${i + 1} of ${totalRounds} — current"></li>`;
     return `<li class="qj-dots__dot" aria-label="Round ${i + 1} of ${totalRounds}"></li>`;
   }).join('');
 
-  const widget = modeKey === 'soundMatch'
-    ? _renderSoundMatchWidget(round)
-    : modeKey === 'blendBuilder'
-      ? _renderBlendBuilderWidget(round)
-      : `<p>Mode not supported in slice: ${_escape(modeKey)}</p>`;
+  const widget =
+    modeKey === 'soundMatch'
+      ? _renderSoundMatchWidget(round)
+      : modeKey === 'blendBuilder'
+        ? _renderBlendBuilderWidget(round)
+        : `<p>Mode not supported in slice: ${_escape(modeKey)}</p>`;
 
   const feedbackBlock = feedback ? _renderFeedbackBlock(feedback) : '';
 
-  _el(host, `
+  _el(
+    host,
+    `
     <header class="qj-header" role="banner">
       <span class="qj-header__mascot" aria-hidden="true">🦁</span>
       <ul class="qj-dots" aria-label="Lesson progress">${dots}</ul>
@@ -269,19 +307,22 @@ export function renderGameMode(host, {
       ${widget}
       ${feedbackBlock}
     </main>
-  `);
+  `,
+  );
 
   _safeOn(host, '[data-action="pause"]', 'click', () => onPause?.());
   _safeOn(host, '[data-action="continue"]', 'click', () => onContinue?.());
 
   if (modeKey === 'soundMatch') {
-    host.querySelectorAll('[data-choice]').forEach(btn => {
-      btn.addEventListener('click', () => onAnswer?.({
-        prompt: round.prompt,
-        chosen: btn.dataset.choice,
-        choices: round.choices,
-        timeMs: 0,
-      }));
+    host.querySelectorAll('[data-choice]').forEach((btn) => {
+      btn.addEventListener('click', () =>
+        onAnswer?.({
+          prompt: round.prompt,
+          chosen: btn.dataset.choice,
+          choices: round.choices,
+          timeMs: 0,
+        }),
+      );
     });
   }
 
@@ -293,11 +334,15 @@ export function renderGameMode(host, {
 }
 
 function _renderSoundMatchWidget(round) {
-  const choices = (round.choices || []).map(c => `
+  const choices = (round.choices || [])
+    .map(
+      (c) => `
     <button class="qj-sound-tile qj-tap ${/^[aeiou]+$/.test(c) ? 'qj-sound-tile--vowel' : ''}"
             data-choice="${_escape(c)}"
             aria-label="Choose ${_escape(c)}">${_escape(c)}</button>
-  `).join('');
+  `,
+    )
+    .join('');
   return `
     <div class="qj-card qj-card--hero" style="padding:var(--space-6)">
       <p class="qj-welcome__subtitle" style="margin-bottom:var(--space-2)">Listen for the sound</p>
@@ -312,14 +357,21 @@ function _renderSoundMatchWidget(round) {
 
 function _renderBlendBuilderWidget(round) {
   const graphemes = round.target.graphemes || [];
-  const slots = graphemes.map((_, i) =>
-    `<div class="qj-blend__slot" data-slot="${i}" aria-label="Sound slot ${i + 1} of ${graphemes.length}"></div>`
-  ).join('');
-  const bank = (round.bank || []).map((g, i) => `
+  const slots = graphemes
+    .map(
+      (_, i) =>
+        `<div class="qj-blend__slot" data-slot="${i}" aria-label="Sound slot ${i + 1} of ${graphemes.length}"></div>`,
+    )
+    .join('');
+  const bank = (round.bank || [])
+    .map(
+      (g, i) => `
     <button class="qj-blend__chip qj-tap ${/^[aeiou]+$/.test(g) ? 'qj-blend__chip--vowel' : ''}"
             data-bank-index="${i}" data-grapheme="${_escape(g)}"
             aria-label="Sound ${_escape(g)}">${_escape(g)}</button>
-  `).join('');
+  `,
+    )
+    .join('');
 
   return `
     <div class="qj-blend" role="group" aria-label="Build the word ${_escape(round.target.word)}">
@@ -349,7 +401,7 @@ function _wireBlendBuilder(host, round, onAnswer) {
     });
   }
 
-  host.querySelectorAll('[data-bank-index]').forEach(chip => {
+  host.querySelectorAll('[data-bank-index]').forEach((chip) => {
     chip.addEventListener('click', () => {
       if (chip.hasAttribute('disabled')) return;
       if (placed.length >= totalSlots) return;
@@ -361,7 +413,7 @@ function _wireBlendBuilder(host, round, onAnswer) {
 
   _safeOn(host, '[data-action="blend-reset"]', 'click', () => {
     placed.length = 0;
-    host.querySelectorAll('[data-bank-index]').forEach(c => c.removeAttribute('disabled'));
+    host.querySelectorAll('[data-bank-index]').forEach((c) => c.removeAttribute('disabled'));
     paintSlots();
   });
 
@@ -378,8 +430,10 @@ function _renderFeedbackBlock(feedback) {
   if (!feedback) return '';
   const isCorrect = feedback.state === 'correct';
   const variant = isCorrect ? 'qj-feedback--correct' : 'qj-feedback--wrong';
-  const headline = isCorrect ? (feedback.copy || 'Yes!') : (feedback.copy || 'Almost!');
-  const hint = feedback.hint ? `<span class="qj-feedback__hint">${_escape(feedback.hint)}</span>` : '';
+  const headline = isCorrect ? feedback.copy || 'Yes!' : feedback.copy || 'Almost!';
+  const hint = feedback.hint
+    ? `<span class="qj-feedback__hint">${_escape(feedback.hint)}</span>`
+    : '';
   const cta = feedback.cta || (isCorrect ? 'Next' : 'Try again');
   return `
     <div class="qj-feedback ${variant}" role="status" aria-live="polite">
@@ -412,15 +466,15 @@ export function renderResults(host, { summary, onContinue, onBackToMap } = {}) {
   const stage = getStage(summary?.stageId);
 
   let headline;
-  if (summary?.accuracy >= 0.8)      headline = `You mastered the ${stage?.name ?? 'lesson'}!`;
+  if (summary?.accuracy >= 0.8) headline = `You mastered the ${stage?.name ?? 'lesson'}!`;
   else if (summary?.accuracy >= 0.5) headline = "You're getting closer!";
-  else                                headline = "Let's try this one again together.";
+  else headline = "Let's try this one again together.";
 
-  const words = (summary?.wordsPractised ?? []).map(w =>
-    `<li>${_escape(w)}</li>`
-  ).join('');
+  const words = (summary?.wordsPractised ?? []).map((w) => `<li>${_escape(w)}</li>`).join('');
 
-  _el(host, `
+  _el(
+    host,
+    `
     <header class="qj-header" role="banner">
       <span class="qj-header__mascot" aria-hidden="true">🦁</span>
       <h1 class="qj-header__title">Great quest, ${_escape(summary?.name ?? 'Learner')}!</h1>
@@ -448,10 +502,11 @@ export function renderResults(host, { summary, onContinue, onBackToMap } = {}) {
       <button type="button" class="qj-header__back qj-tap" data-action="map"
               aria-label="Open the quest map">Quest map ›</button>
     </main>
-  `);
+  `,
+  );
 
   _safeOn(host, '[data-action="continue"]', 'click', () => onContinue?.());
-  _safeOn(host, '[data-action="map"]',      'click', () => onBackToMap?.());
+  _safeOn(host, '[data-action="map"]', 'click', () => onBackToMap?.());
   return host;
 }
 
@@ -460,8 +515,10 @@ export function renderResults(host, { summary, onContinue, onBackToMap } = {}) {
 export function renderMasteryBadge(host, { phaseNumber, skills = [], onContinue } = {}) {
   const phase = getPhase(phaseNumber);
   if (!phase) return _el(host, `<main class="qj-page"><p>Badge not found.</p></main>`);
-  const skillList = skills.map(s => `<li>${_escape(s)}</li>`).join('');
-  _el(host, `
+  const skillList = skills.map((s) => `<li>${_escape(s)}</li>`).join('');
+  _el(
+    host,
+    `
     <main class="qj-page qj-results" role="main" aria-labelledby="qj-badge-title">
       <div class="qj-card qj-card--hero" style="background:var(--qj-badge-gold);color:var(--text)">
         <div style="font-size:5rem" role="img" aria-label="${_escape(phase.title)} badge">${_escape(phase.icon)}</div>
@@ -472,7 +529,8 @@ export function renderMasteryBadge(host, { phaseNumber, skills = [], onContinue 
       <button class="btn--qj-cta qj-tap" data-action="continue"
               aria-label="Add the badge to my map">Add to my map!</button>
     </main>
-  `);
+  `,
+  );
   _safeOn(host, '[data-action="continue"]', 'click', () => onContinue?.());
   return host;
 }
@@ -484,27 +542,45 @@ export function renderProgressView(host, { summary, onBack, onPrint } = {}) {
     return _el(host, `<main class="qj-page"><p>No progress yet.</p></main>`);
   }
 
-  const strongest = (summary.strongestSounds ?? []).slice(0, 5).map(s =>
-    `<li>${_escape(s.sound)} — ${Math.round(s.accuracy * 100)}% (${s.attempts} attempts)</li>`
-  ).join('') || '<li>Not enough attempts yet.</li>';
+  const strongest =
+    (summary.strongestSounds ?? [])
+      .slice(0, 5)
+      .map(
+        (s) =>
+          `<li>${_escape(s.sound)} — ${Math.round(s.accuracy * 100)}% (${s.attempts} attempts)</li>`,
+      )
+      .join('') || '<li>Not enough attempts yet.</li>';
 
-  const weakest = (summary.weakestSounds ?? []).slice(0, 5).map(s =>
-    `<li>${_escape(s.sound)} — ${Math.round(s.accuracy * 100)}% (${s.attempts} attempts)</li>`
-  ).join('') || '<li>No weak spots yet.</li>';
+  const weakest =
+    (summary.weakestSounds ?? [])
+      .slice(0, 5)
+      .map(
+        (s) =>
+          `<li>${_escape(s.sound)} — ${Math.round(s.accuracy * 100)}% (${s.attempts} attempts)</li>`,
+      )
+      .join('') || '<li>No weak spots yet.</li>';
 
-  const errs = (summary.commonErrorTypes ?? []).slice(0, 5).map(e =>
-    `<li>${_escape(e.category)} — ${e.count}</li>`
-  ).join('') || '<li>No errors logged.</li>';
+  const errs =
+    (summary.commonErrorTypes ?? [])
+      .slice(0, 5)
+      .map((e) => `<li>${_escape(e.category)} — ${e.count}</li>`)
+      .join('') || '<li>No errors logged.</li>';
 
-  const print = (summary.printablePracticeList ?? []).map(p => `
+  const print = (summary.printablePracticeList ?? [])
+    .map(
+      (p) => `
     <section class="qj-card" style="margin-bottom:var(--space-4)">
       <h3 style="margin:0 0 var(--space-2)">${_escape(p.stage.name)}</h3>
       <p>Words: ${(p.sampleWords || []).map(_escape).join(' · ')}</p>
       ${p.sentence ? `<p><em>${_escape(p.sentence)}</em></p>` : ''}
     </section>
-  `).join('');
+  `,
+    )
+    .join('');
 
-  _el(host, `
+  _el(
+    host,
+    `
     <header class="qj-header" role="banner">
       <button class="qj-header__back qj-tap" data-action="back" aria-label="Back to child view">← Child view</button>
       <h1 class="qj-header__title">Progress</h1>
@@ -529,9 +605,11 @@ export function renderProgressView(host, { summary, onBack, onPrint } = {}) {
 
       <section class="qj-card" style="margin-bottom:var(--space-6)" aria-labelledby="qj-next-title">
         <h2 id="qj-next-title" style="margin-top:0">Suggested next activity</h2>
-        <p>${summary.suggestedNext
-          ? `Start with <strong>${_escape(summary.suggestedNext.name)}</strong>.`
-          : 'All done — pick any stage for review.'}</p>
+        <p>${
+          summary.suggestedNext
+            ? `Start with <strong>${_escape(summary.suggestedNext.name)}</strong>.`
+            : 'All done — pick any stage for review.'
+        }</p>
       </section>
 
       <section class="qj-card" style="margin-bottom:var(--space-6)" aria-labelledby="qj-errs-title">
@@ -544,9 +622,10 @@ export function renderProgressView(host, { summary, onBack, onPrint } = {}) {
         ${print}
       </section>
     </main>
-  `);
+  `,
+  );
 
-  _safeOn(host, '[data-action="back"]',  'click', () => onBack?.());
+  _safeOn(host, '[data-action="back"]', 'click', () => onBack?.());
   _safeOn(host, '[data-action="print"]', 'click', () => onPrint?.());
   return host;
 }

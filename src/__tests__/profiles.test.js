@@ -43,7 +43,10 @@ describe('profiles legacy progress migration', () => {
   });
 
   it('does not overwrite an existing profile save during activation', () => {
-    localStorage.setItem(LEGACY_KEY, JSON.stringify({ xp: 999, wordStats: { sun: { attempts: 9, correct: 9 } } }));
+    localStorage.setItem(
+      LEGACY_KEY,
+      JSON.stringify({ xp: 999, wordStats: { sun: { attempts: 9, correct: 9 } } }),
+    );
 
     const profile = createProfile('Bea', '🐼', '#22c55e');
     const existing = { xp: 10, wordStats: { map: { attempts: 2, correct: 2 } } };

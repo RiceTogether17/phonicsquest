@@ -18,7 +18,10 @@ const SVG_PAYLOAD = '<svg onload=alert(1)>';
 
 function stubAudioGlobals() {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
 }
 
@@ -84,9 +87,7 @@ describe('profile name sanitisation at the boundary', () => {
 describe('render sites treat a malicious name as text', () => {
   it('weekly recap renders markup inertly', async () => {
     profiles.createProfile(SVG_PAYLOAD, '🦁', '#6c63ff');
-    const [{ showWeeklyRecap }] = await Promise.all([
-      import('../components/weeklyRecap.js'),
-    ]);
+    const [{ showWeeklyRecap }] = await Promise.all([import('../components/weeklyRecap.js')]);
     // Activate the profile so the recap picks it up.
     const all = profiles.getProfiles();
     profiles.activateProfile(all[0].id);
@@ -109,14 +110,17 @@ describe('render sites treat a malicious name as text', () => {
   it('profile grid renders markup inertly', async () => {
     // Names are sanitised on the way in, so simulate a pre-existing
     // hostile record written by an older build to prove the render escapes.
-    localStorage.setItem('phonicsquest_profiles', JSON.stringify([
-      { id: 'p_x', name: XSS_NAME, avatar: '🦁', color: '#6c63ff', schoolLevel: 'preschool' },
-    ]));
+    localStorage.setItem(
+      'phonicsquest_profiles',
+      JSON.stringify([
+        { id: 'p_x', name: XSS_NAME, avatar: '🦁', color: '#6c63ff', schoolLevel: 'preschool' },
+      ]),
+    );
 
     const { html } = await import('../utils/html.js');
     const grid = document.createElement('div');
     const list = JSON.parse(localStorage.getItem('phonicsquest_profiles'));
-    grid.innerHTML = list.map(p => html`<span class="profile-name">${p.name}</span>`).join('');
+    grid.innerHTML = list.map((p) => html`<span class="profile-name">${p.name}</span>`).join('');
 
     expect(grid.querySelector('img')).toBeNull();
     expect(grid.textContent).toContain('<img');

@@ -58,8 +58,8 @@ describe('P3 Practice Test data bank', () => {
   });
 
   it('exercises the newly registered P3 categories (tagQuestions / phrasalVerbs / compoundIndefinite)', () => {
-    const allASkills = getP3PracticeTests().flatMap(t => t.sectionA.items.map(i => i.skill));
-    const allBSkills = getP3PracticeTests().flatMap(t => t.sectionB.items.map(i => i.skill));
+    const allASkills = getP3PracticeTests().flatMap((t) => t.sectionA.items.map((i) => i.skill));
+    const allBSkills = getP3PracticeTests().flatMap((t) => t.sectionB.items.map((i) => i.skill));
     expect(allASkills).toContain('tagQuestions');
     expect(allASkills).toContain('compoundIndefinite');
     expect(allBSkills).toContain('phrasalVerbs');
@@ -68,8 +68,8 @@ describe('P3 Practice Test data bank', () => {
   it('comprehension supports tabular + true-false question types in T3', () => {
     const t3 = getP3PracticeTest('T3');
     const allTypes = [
-      ...t3.sectionH.questions.map(q => q.type),
-      ...t3.sectionI.questions.map(q => q.type),
+      ...t3.sectionH.questions.map((q) => q.type),
+      ...t3.sectionI.questions.map((q) => q.type),
     ];
     expect(allTypes).toContain('table');
     expect(allTypes).toContain('true-false');
@@ -84,10 +84,16 @@ describe('P3 editing sections — every blank tests a real error', () => {
       const edit = test[editKey];
       if (!edit?.errors) continue;
       for (const e of edit.errors) {
-        const w = String(e.wrong ?? '').trim().toLowerCase();
-        const c = String(e.correction ?? '').trim().toLowerCase();
+        const w = String(e.wrong ?? '')
+          .trim()
+          .toLowerCase();
+        const c = String(e.correction ?? '')
+          .trim()
+          .toLowerCase();
         if (w && c && w === c) {
-          offenders.push(`${test.term}/${editKey} num=${e.num}: "${e.wrong}" === "${e.correction}"`);
+          offenders.push(
+            `${test.term}/${editKey} num=${e.num}: "${e.wrong}" === "${e.correction}"`,
+          );
         }
       }
     }
@@ -105,7 +111,7 @@ describe('P3 editing sections — every blank tests a real error', () => {
     expect(m, 'paragraph should introduce a friend by name').toBeTruthy();
     const friend = m[1];
     // Every later dialogue attribution should use the same friend name.
-    const saidNames = [...paragraph.matchAll(/(\w+) said/g)].map(x => x[1]);
+    const saidNames = [...paragraph.matchAll(/(\w+) said/g)].map((x) => x[1]);
     for (const name of saidNames) {
       if (name !== friend) {
         expect([friend]).toContain(name);

@@ -16,10 +16,21 @@ import { giriImageEl } from './mascot.js';
 // Loaded on first tap, not at import time. The MCQ modes had no audio
 // dependency before this button existed, and a static import would pull the
 // whole speech manager into their chunk for a feature most rounds never use.
-const getAudio = () => import('../modules/audio.js').then(m => m.audio);
+const getAudio = () => import('../modules/audio.js').then((m) => m.audio);
 
 const IDLE_LABEL = 'Read it to me';
 const BUSY_LABEL = 'Reading…';
+
+/**
+ * One voice, shared across every read-aloud button on the page.
+ *
+ * Deliberately module-level rather than per-button: each question is a NEW
+ * button (the MCQ modes rebuild the whole card), so a per-button counter can
+ * never see that a different button has taken over the speakers. A child who
+ * moves on mid-sentence would still hear the old question's choices read out
+ * over the new one.
+ */
+let _readerToken = 0;
 
 /**
  * Turn a written stem into something worth hearing.
@@ -32,13 +43,15 @@ const BUSY_LABEL = 'Reading…';
  * @returns {string}
  */
 export function speakableStem(text) {
-  return String(text || '')
-    .replace(/_{2,}/g, ' blank ')
-    .replace(/\s{2,}/g, ' ')
-    // The substitution leaves a space before any punctuation that followed
-    // the blank ("is blank ."), which some engines read as a pause.
-    .replace(/\s+([.,!?;:])/g, '$1')
-    .trim();
+  return (
+    String(text || '')
+      .replace(/_{2,}/g, ' blank ')
+      .replace(/\s{2,}/g, ' ')
+      // The substitution leaves a space before any punctuation that followed
+      // the blank ("is blank ."), which some engines read as a pause.
+      .replace(/\s+([.,!?;:])/g, '$1')
+      .trim()
+  );
 }
 
 /**
@@ -78,11 +91,10 @@ export function attachReadAloudButton(host, getContent) {
   };
   setLabel(IDLE_LABEL, 'neutral');
 
-  let token = 0;
   btn.addEventListener('click', async () => {
     // A second tap stops rather than queues: a child who taps twice wants it
     // to start again, not to hear the sentence twice back to back.
-    const mine = ++token;
+    const mine = ++_readerToken;
     const audio = await getAudio();
     if (btn.dataset.speaking === 'true') {
       audio.cancelSpeech();
@@ -93,17 +105,30 @@ export function attachReadAloudButton(host, getContent) {
 
     btn.dataset.speaking = 'true';
     setLabel(BUSY_LABEL, 'encourage');
+    // Superseded, or the question it belongs to has been replaced. Either way
+    // this reader owns the voice only while it is still the newest one, so a
+    // newer reader's audio is never cut off by an older one giving up.
+    const stale = () => mine !== _readerToken || !btn.isConnected;
     try {
       const { question, choices } = getContent() || {};
       for (const line of buildReadAloudScript(question, choices)) {
-        if (mine !== token) return;
+        if (stale()) break;
         await audio.speakText(line);
-        if (mine !== token) return;
-        await new Promise(r => setTimeout(r, 250));
+        if (stale()) break;
+        await new Promise((r) => setTimeout(r, 250));
       }
-    } catch { /* a silent tutor is the same as no button */ }
+    } catch {
+      /* a silent tutor is the same as no button */
+    }
 
-    if (mine !== token || !btn.isConnected) return;
+    if (mine !== _readerToken) return;
+    // The MCQ modes rebuild the question with innerHTML, which detaches this
+    // button mid-script without telling it. Without this, the previous
+    // question's choices carry on being read over the new one.
+    if (!btn.isConnected) {
+      audio.cancelSpeech();
+      return;
+    }
     btn.dataset.speaking = 'false';
     setLabel(IDLE_LABEL, 'neutral');
   });

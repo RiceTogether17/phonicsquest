@@ -9,14 +9,38 @@ function stubAudioGlobals() {
     paused: false,
     resume: () => {},
   };
-  globalThis.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; } };
-  globalThis.AudioContext = globalThis.AudioContext || class {
-    constructor() { this.state = 'running'; }
-    createOscillator() { return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } }; }
-    createGain() { return { connect: vi.fn(), gain: { value: 1, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() } }; }
-    get destination() { return {}; }
-    resume() { return Promise.resolve(); }
+  globalThis.SpeechSynthesisUtterance = class {
+    constructor(t) {
+      this.text = t;
+    }
   };
+  globalThis.AudioContext =
+    globalThis.AudioContext ||
+    class {
+      constructor() {
+        this.state = 'running';
+      }
+      createOscillator() {
+        return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } };
+      }
+      createGain() {
+        return {
+          connect: vi.fn(),
+          gain: {
+            value: 1,
+            setValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+            linearRampToValueAtTime: vi.fn(),
+          },
+        };
+      }
+      get destination() {
+        return {};
+      }
+      resume() {
+        return Promise.resolve();
+      }
+    };
 }
 
 stubAudioGlobals();
@@ -25,21 +49,36 @@ const { store } = await import('../src/modules/store.js');
 const { setupClassicBlend, cleanup } = await import('../src/modes/classicBlend.js');
 
 const LIST = {
-  id: 'list', word: 'list',
-  graphemes: ['l', 'i', 'st'], types: ['c', 'sv', 'bl'],
-  pattern: 'CVCC', group: 'struct-cvcc', level: 2, emoji: '📋',
+  id: 'list',
+  word: 'list',
+  graphemes: ['l', 'i', 'st'],
+  types: ['c', 'sv', 'bl'],
+  pattern: 'CVCC',
+  group: 'struct-cvcc',
+  level: 2,
+  emoji: '📋',
 };
 
 const CAKE = {
-  id: 'cake', word: 'cake',
-  graphemes: ['c', 'a', 'k', 'e'], types: ['c', 'lv', 'c', 'se'],
-  pattern: 'CVCe', group: 'magic-e-a', level: 2, emoji: '🎂',
+  id: 'cake',
+  word: 'cake',
+  graphemes: ['c', 'a', 'k', 'e'],
+  types: ['c', 'lv', 'c', 'se'],
+  pattern: 'CVCe',
+  group: 'magic-e-a',
+  level: 2,
+  emoji: '🎂',
 };
 
 const PRONG = {
-  id: 'prong', word: 'prong',
-  graphemes: ['pr', 'o', 'ng'], types: ['bl', 'sv', 'd'],
-  pattern: 'CCVC', group: 'cvc-o', level: 2, emoji: '🍴',
+  id: 'prong',
+  word: 'prong',
+  graphemes: ['pr', 'o', 'ng'],
+  types: ['bl', 'sv', 'd'],
+  pattern: 'CCVC',
+  group: 'cvc-o',
+  level: 2,
+  emoji: '🍴',
 };
 
 describe('audio.speakChunk (consecutive blending)', () => {
@@ -69,9 +108,14 @@ describe('audio.speakChunk (consecutive blending)', () => {
     // Build a word where the 2-grapheme chunk ends in a consonant: "lis" of list?
     // 'l'+'i' ends in sv; use a VC-start word instead.
     const AND = {
-      id: 'and', word: 'and',
-      graphemes: ['a', 'n', 'd'], types: ['sv', 'c', 'c'],
-      pattern: 'VCC', group: 'cvc-a', level: 1, emoji: '➕',
+      id: 'and',
+      word: 'and',
+      graphemes: ['a', 'n', 'd'],
+      types: ['sv', 'c', 'c'],
+      pattern: 'VCC',
+      group: 'cvc-a',
+      level: 1,
+      emoji: '➕',
     };
     await audio.speakChunk(AND, 2); // "an" ends in a consonant → TTS
     expect(speak).toHaveBeenCalled();
@@ -125,16 +169,16 @@ describe('Listen & Blend — blend-style toggle', () => {
 
   function makeEls() {
     return {
-      wordEmoji:       document.getElementById('word-emoji'),
-      wordDisplay:     document.getElementById('word-display'),
-      phonemeRow:      document.getElementById('phoneme-row'),
+      wordEmoji: document.getElementById('word-emoji'),
+      wordDisplay: document.getElementById('word-display'),
+      phonemeRow: document.getElementById('phoneme-row'),
       modeInstruction: document.getElementById('mode-instruction'),
-      modeArea:        document.getElementById('mode-area'),
-      btnCheck:        document.getElementById('btn-check'),
-      btnSayIt:        document.getElementById('btn-say-it'),
-      btnSkip:         document.getElementById('btn-skip'),
-      onResult:        vi.fn(),
-      onGroupChange:   vi.fn(),
+      modeArea: document.getElementById('mode-area'),
+      btnCheck: document.getElementById('btn-check'),
+      btnSayIt: document.getElementById('btn-say-it'),
+      btnSkip: document.getElementById('btn-skip'),
+      onResult: vi.fn(),
+      onGroupChange: vi.fn(),
     };
   }
 
@@ -175,15 +219,15 @@ describe('Blend It! — cumulative reveal', () => {
 
   function makeEls() {
     return {
-      wordEmoji:       document.getElementById('word-emoji'),
-      wordDisplay:     document.getElementById('word-display'),
-      phonemeRow:      document.getElementById('phoneme-row'),
+      wordEmoji: document.getElementById('word-emoji'),
+      wordDisplay: document.getElementById('word-display'),
+      phonemeRow: document.getElementById('phoneme-row'),
       modeInstruction: document.getElementById('mode-instruction'),
-      modeArea:        document.getElementById('mode-area'),
-      btnCheck:        document.getElementById('btn-check'),
-      btnSayIt:        document.getElementById('btn-say-it'),
-      btnSkip:         document.getElementById('btn-skip'),
-      onResult:        vi.fn(),
+      modeArea: document.getElementById('mode-area'),
+      btnCheck: document.getElementById('btn-check'),
+      btnSayIt: document.getElementById('btn-say-it'),
+      btnSkip: document.getElementById('btn-skip'),
+      onResult: vi.fn(),
     };
   }
 
@@ -201,7 +245,7 @@ describe('Blend It! — cumulative reveal', () => {
     blendCleanup();
 
     const speakPhoneme = vi.spyOn(audio, 'speakPhoneme').mockResolvedValue();
-    const speakChunk   = vi.spyOn(audio, 'speakChunk').mockResolvedValue();
+    const speakChunk = vi.spyOn(audio, 'speakChunk').mockResolvedValue();
 
     const els = makeEls();
     setupBlend(LIST, els);
@@ -214,30 +258,31 @@ describe('Blend It! — cumulative reveal', () => {
     // Second sound — wait for the post-reveal re-render (a 200 ms guard
     // ignores clicks while the first reveal is finishing), then expect the
     // successive-blending triple: chunk-so-far, new sound, blended chunk.
-    await vi.waitFor(() =>
-      expect(document.getElementById('blend-tip')?.textContent).toContain('Sound 1 of 3'),
-    { timeout: 2000 });
+    await vi.waitFor(
+      () => expect(document.getElementById('blend-tip')?.textContent).toContain('Sound 1 of 3'),
+      { timeout: 2000 },
+    );
     document.getElementById('btn-reveal-next').click();
     await vi.waitFor(() => expect(speakChunk).toHaveBeenCalledWith(LIST, 2), { timeout: 2000 });
-    expect(speakChunk).toHaveBeenCalledWith(LIST, 1);          // "l" again
-    expect(speakPhoneme).toHaveBeenCalledTimes(2);             // + the new "i"
-    expect(speakChunk.mock.calls.map(c => c[1])).toEqual([1, 2]);
+    expect(speakChunk).toHaveBeenCalledWith(LIST, 1); // "l" again
+    expect(speakPhoneme).toHaveBeenCalledTimes(2); // + the new "i"
+    expect(speakChunk.mock.calls.map((c) => c[1])).toEqual([1, 2]);
   });
 
   it('plays the full l·i·li / li·st·list sequence in Listen & Blend', async () => {
     store.set('blendStyle', 'cumulative');
     const speakPhoneme = vi.spyOn(audio, 'speakPhoneme').mockResolvedValue();
-    const speakChunk   = vi.spyOn(audio, 'speakChunk').mockResolvedValue();
-    const speakWord    = vi.spyOn(audio, 'speakWord').mockResolvedValue();
+    const speakChunk = vi.spyOn(audio, 'speakChunk').mockResolvedValue();
+    const speakWord = vi.spyOn(audio, 'speakWord').mockResolvedValue();
 
     const els = makeEls();
     setupClassicBlend(LIST, els);
     document.getElementById('btn-classic-play').click();
 
     // Two triples for a 3-grapheme word: [l, i, li] then [li, st, list]
-    await vi.waitFor(() =>
-      expect(speakChunk.mock.calls.map(c => c[1])).toEqual([1, 2, 2, 3]),
-    { timeout: 4000 });
+    await vi.waitFor(() => expect(speakChunk.mock.calls.map((c) => c[1])).toEqual([1, 2, 2, 3]), {
+      timeout: 4000,
+    });
     expect(speakPhoneme).toHaveBeenCalledTimes(2); // the new sound of each triple
     // The final blended chunk IS the word — no separate word playback.
     expect(speakWord).not.toHaveBeenCalled();

@@ -29,35 +29,35 @@ import { firstPhoneme } from './phonemePosition.js';
  */
 const CONFUSION_MAP = {
   // Stop consonant pairs (voicing & place)
-  b:  ['p', 'd'],
-  p:  ['b', 't'],
-  d:  ['b', 't'],
-  t:  ['d', 'k'],
-  k:  ['g', 't'],
-  c:  ['g', 't'],   // "c" spells the same /k/ — cat, and every cl-/cr- blend
-  g:  ['k', 'd'],
+  b: ['p', 'd'],
+  p: ['b', 't'],
+  d: ['b', 't'],
+  t: ['d', 'k'],
+  k: ['g', 't'],
+  c: ['g', 't'], // "c" spells the same /k/ — cat, and every cl-/cr- blend
+  g: ['k', 'd'],
   // Fricative / affricate confusions
-  f:  ['th', 'v'],
-  v:  ['f', 'b'],
+  f: ['th', 'v'],
+  v: ['f', 'b'],
   th: ['f', 'd'],
-  s:  ['z', 'sh'],
-  z:  ['s', 'j'],
+  s: ['z', 'sh'],
+  z: ['s', 'j'],
   sh: ['s', 'ch'],
   ch: ['sh', 'j'],
-  j:  ['ch', 'g'],
+  j: ['ch', 'g'],
   // Nasal / liquid
-  m:  ['n', 'b'],
-  n:  ['m', 'ng'],
+  m: ['n', 'b'],
+  n: ['m', 'ng'],
   ng: ['n', 'm'],
-  r:  ['w', 'l'],
-  w:  ['r', 'v'],
-  l:  ['r', 'n'],
+  r: ['w', 'l'],
+  w: ['r', 'v'],
+  l: ['r', 'n'],
   // Short vowel confusions (medial, but also appear as first grapheme in some words)
-  a:  ['u', 'o'],
-  e:  ['i', 'a'],
-  i:  ['e', 'a'],
-  o:  ['u', 'a'],
-  u:  ['a', 'o'],
+  a: ['u', 'o'],
+  e: ['i', 'a'],
+  i: ['e', 'a'],
+  o: ['u', 'a'],
+  u: ['a', 'o'],
 };
 
 let currentWord = null;
@@ -75,7 +75,7 @@ export function setupFirstSound(word, els) {
   els.wordDisplay.innerHTML = '';
   els.phonemeRow.innerHTML = '';
 
-  els.modeInstruction.textContent = 'Say the word slowly… what\'s the FIRST sound?';
+  els.modeInstruction.textContent = "Say the word slowly… what's the FIRST sound?";
 
   // The first PHONEME, not the first tile: "clamp" is stored cl|a|mp, but
   // a blend is two sounds, so the FIRST sound is /k/ — not /kl/.
@@ -90,11 +90,12 @@ export function setupFirstSound(word, els) {
   // so finding the answer is a genuine auditory discrimination task again.
   const baseChoices = [
     { grapheme: firstGrapheme, type: firstType, correct: true },
-    ...distractors.map(g => ({ grapheme: g.grapheme, type: g.type, correct: false })),
+    ...distractors.map((g) => ({ grapheme: g.grapheme, type: g.type, correct: false })),
   ];
-  const choices = (word.level ?? 1) <= 2
-    ? [...baseChoices].sort((a, b) => a.grapheme.localeCompare(b.grapheme))
-    : shuffleArray(baseChoices);
+  const choices =
+    (word.level ?? 1) <= 2
+      ? [...baseChoices].sort((a, b) => a.grapheme.localeCompare(b.grapheme))
+      : shuffleArray(baseChoices);
 
   // Play the target word FIRST and wait for it to finish before previewing
   // the choice phonemes — overlapping the two makes the question unlistenable
@@ -108,7 +109,7 @@ export function setupFirstSound(word, els) {
   renderPhonemeChoiceGrid(els.modeArea, choices, {
     onChoose: (choice, btn) => round?.handleTap(choice.correct, btn),
     autoPlayAfter: wordPlayed,
-    autoPlayDelay:  600,   // pause after the word so the child can re-attune to phoneme listening
+    autoPlayDelay: 600, // pause after the word so the child can re-attune to phoneme listening
     autoPlayStride: 800,
   });
 
@@ -117,7 +118,9 @@ export function setupFirstSound(word, els) {
     grid: els.modeArea.querySelector('.choice-grid'),
     onResult: els.onResult,
     retryHint: 'Listen for the very FIRST sound.',
-    onRetry: () => { audio.speakWordArticulated(word.word).catch(() => {}); },
+    onRetry: () => {
+      audio.speakWordArticulated(word.word).catch(() => {});
+    },
     onReveal: () => _revealAnswer(word, els, firstGrapheme, firstType),
   });
 
@@ -142,16 +145,16 @@ function _waitForWordAudio(wordData) {
   // which IS the first/last/middle sound the child is being asked to
   // identify). Articulated mode slows the whole word right down without
   // segmenting it, which is exactly what classroom teachers do.
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(() => {
-      const ttsDone   = audio.speakWordTwiceClear(text).catch(() => {});
+      const ttsDone = audio.speakWordTwiceClear(text).catch(() => {});
       // At ~0.55 rate the audio is roughly 45% longer than the default
       // 0.8 path, so the wall-clock floor grows accordingly. Some
       // browsers resolve onend early so the floor is the real guard.
       // Two utterances (articulated + near-natural repeat) plus the pause
       // between them — the floor covers the whole double-say.
       const minHoldMs = Math.max(2600, text.length * 340 + 900);
-      const floorHold = new Promise(r => setTimeout(r, minHoldMs));
+      const floorHold = new Promise((r) => setTimeout(r, minHoldMs));
       Promise.all([ttsDone, floorHold]).finally(resolve);
     }, 350);
   });
@@ -173,7 +176,7 @@ function _revealAnswer(word, els, firstGrapheme, firstType) {
 
   setTimeout(async () => {
     await audio.speakPhoneme(firstGrapheme, firstType);
-    await new Promise(r => setTimeout(r, 300));
+    await new Promise((r) => setTimeout(r, 300));
     await audio.speakWord(word.word);
   }, 300);
 }
@@ -187,7 +190,7 @@ function _revealAnswer(word, els, firstGrapheme, firstType) {
  *   3. Any phoneme from the word list (fallback).
  */
 export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel = 3) {
-  const seen        = new Set([correctGrapheme]);
+  const seen = new Set([correctGrapheme]);
   const distractors = [];
 
   // Tier 1: confusion-pair phonemes — the most instructionally useful distractors
@@ -195,7 +198,7 @@ export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel 
   for (const cg of confusionTargets) {
     if (seen.has(cg)) continue;
     // Find this grapheme in the word list to get its type
-    const match = WORDS.find(w => w.level <= maxLevel && firstPhoneme(w).grapheme === cg);
+    const match = WORDS.find((w) => w.level <= maxLevel && firstPhoneme(w).grapheme === cg);
     if (match) {
       seen.add(cg);
       distractors.push({ grapheme: cg, type: firstPhoneme(match).type });
@@ -209,7 +212,7 @@ export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel 
 
   // Tier 2: same-type phonemes from the word list
   if (distractors.length < 3) {
-    for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
+    for (const word of shuffleArray(WORDS.filter((w) => w.level <= maxLevel))) {
       const { grapheme: g, type: t } = firstPhoneme(word);
       if (!seen.has(g) && t === correctType) {
         seen.add(g);
@@ -221,7 +224,7 @@ export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel 
 
   // Tier 3: any phoneme (fallback)
   if (distractors.length < 3) {
-    for (const word of shuffleArray(WORDS.filter(w => w.level <= maxLevel))) {
+    for (const word of shuffleArray(WORDS.filter((w) => w.level <= maxLevel))) {
       const { grapheme: g, type: t } = firstPhoneme(word);
       if (!seen.has(g)) {
         seen.add(g);

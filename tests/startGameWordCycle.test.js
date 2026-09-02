@@ -36,25 +36,54 @@ describe('_startGame — non-PA modes pick a fresh word every round', () => {
       paused: false,
       resume: () => {},
     };
-    globalThis.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; } };
-    globalThis.AudioContext = globalThis.AudioContext || class {
-      constructor() { this.state = 'running'; }
-      createOscillator() { return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } }; }
-      createGain() { return { connect: vi.fn(), gain: { value: 1, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() } }; }
-      get destination() { return {}; }
-      resume() { return Promise.resolve(); }
+    globalThis.SpeechSynthesisUtterance = class {
+      constructor(t) {
+        this.text = t;
+      }
     };
+    globalThis.AudioContext =
+      globalThis.AudioContext ||
+      class {
+        constructor() {
+          this.state = 'running';
+        }
+        createOscillator() {
+          return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } };
+        }
+        createGain() {
+          return {
+            connect: vi.fn(),
+            gain: {
+              value: 1,
+              setValueAtTime: vi.fn(),
+              exponentialRampToValueAtTime: vi.fn(),
+              linearRampToValueAtTime: vi.fn(),
+            },
+          };
+        }
+        get destination() {
+          return {};
+        }
+        resume() {
+          return Promise.resolve();
+        }
+      };
   });
 
   it('segment mode calls progress.getNextWord on every round, even when _currentWord is already set', async () => {
     const { app } = await import('../src/app.js');
     const { progress } = await import('../src/modules/progress.js');
-    const { MODES }  = await import('../src/modes/index.js');
+    const { MODES } = await import('../src/modes/index.js');
 
     const getNextSpy = vi.spyOn(progress, 'getNextWord').mockImplementation(() => ({
-      id: `w-${Math.random()}`, word: 'mock', graphemes: ['m','o','c','k'],
-      types: ['c','sv','c','c'], emoji: '🃏', group: 'short-o', level: 1,
-      phonemes: ['m','o','k'],
+      id: `w-${Math.random()}`,
+      word: 'mock',
+      graphemes: ['m', 'o', 'c', 'k'],
+      types: ['c', 'sv', 'c', 'c'],
+      emoji: '🃏',
+      group: 'short-o',
+      level: 1,
+      phonemes: ['m', 'o', 'k'],
     }));
 
     // Stub the segment mode's setup so the test exercises only the
@@ -65,9 +94,14 @@ describe('_startGame — non-PA modes pick a fresh word every round', () => {
     // already populated from the prior round and _sessionType='normal'.
     app._mode = 'segment';
     app._sessionType = 'normal';
-    app._currentWord = { id: 'previous', word: 'bag', graphemes: ['b','a','g'], types: ['c','sv','c'] };
+    app._currentWord = {
+      id: 'previous',
+      word: 'bag',
+      graphemes: ['b', 'a', 'g'],
+      types: ['c', 'sv', 'c'],
+    };
 
-    app._showScreen    = vi.fn();
+    app._showScreen = vi.fn();
 
     app._startGame('short-a');
 
@@ -79,20 +113,30 @@ describe('_startGame — non-PA modes pick a fresh word every round', () => {
   it('blend mode also picks fresh every round (same bug surface)', async () => {
     const { app } = await import('../src/app.js');
     const { progress } = await import('../src/modules/progress.js');
-    const { MODES }  = await import('../src/modes/index.js');
+    const { MODES } = await import('../src/modes/index.js');
 
     let calls = 0;
     vi.spyOn(progress, 'getNextWord').mockImplementation(() => ({
-      id: `b-${++calls}`, word: 'cat', graphemes: ['c','a','t'],
-      types: ['c','sv','c'], emoji: '🐱', group: 'short-a', level: 1,
-      phonemes: ['c','a','t'],
+      id: `b-${++calls}`,
+      word: 'cat',
+      graphemes: ['c', 'a', 't'],
+      types: ['c', 'sv', 'c'],
+      emoji: '🐱',
+      group: 'short-a',
+      level: 1,
+      phonemes: ['c', 'a', 't'],
     }));
     vi.spyOn(MODES.blend, 'setup').mockImplementation(() => {});
 
     app._mode = 'blend';
     app._sessionType = 'normal';
-    app._currentWord = { id: 'previous', word: 'bag', graphemes: ['b','a','g'], types: ['c','sv','c'] };
-    app._showScreen    = vi.fn();
+    app._currentWord = {
+      id: 'previous',
+      word: 'bag',
+      graphemes: ['b', 'a', 'g'],
+      types: ['c', 'sv', 'c'],
+    };
+    app._showScreen = vi.fn();
 
     app._startGame('short-a');
     const firstId = app._currentWord.id;

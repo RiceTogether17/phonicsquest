@@ -29,8 +29,8 @@ let _targetGrapheme = null;
 let _targetType = null;
 let _startTime = 0;
 let _strikes = 0;
-let _collected = [];   // word ids matched so far this round
-let _cards = [];       // [{ word, isMatch, btn }]
+let _collected = []; // word ids matched so far this round
+let _cards = []; // [{ word, isMatch, btn }]
 let _completed = false;
 
 /**
@@ -38,19 +38,18 @@ let _completed = false;
  * @param {object} els
  */
 export function setupTrainCarriages(word, els) {
-  _currentWord    = word;
+  _currentWord = word;
   _targetGrapheme = word.graphemes[0];
-  _targetType     = word.types[0];
-  _startTime      = Date.now();
-  _strikes        = 0;
-  _collected      = [];
-  _completed      = false;
+  _targetType = word.types[0];
+  _startTime = Date.now();
+  _strikes = 0;
+  _collected = [];
+  _completed = false;
 
   // Build the round pool from the same stage. Drop sight-only words —
   // they don't carry a phoneme tag and confuse the first-sound game.
-  const stagePool = WORDS.filter(w =>
-    w.group === word.group &&
-    Array.isArray(w.graphemes) && w.graphemes.length >= 2
+  const stagePool = WORDS.filter(
+    (w) => w.group === word.group && Array.isArray(w.graphemes) && w.graphemes.length >= 2,
   );
   const round = pickTrainRound(_targetGrapheme, _targetType, stagePool, {
     cardCount: ROUND_CARD_COUNT,
@@ -58,18 +57,17 @@ export function setupTrainCarriages(word, els) {
   });
 
   _cards = shuffleArray([
-    ...round.matches.map(w => ({ word: w, isMatch: true,  btn: null })),
-    ...round.distractors.map(w => ({ word: w, isMatch: false, btn: null })),
+    ...round.matches.map((w) => ({ word: w, isMatch: true, btn: null })),
+    ...round.distractors.map((w) => ({ word: w, isMatch: false, btn: null })),
   ]);
 
   // Top bar: hide the per-word phoneme tiles and emoji from other modes.
   renderWordImage(word, els.wordEmoji, false);
   els.wordDisplay.innerHTML = '';
-  els.phonemeRow.innerHTML  = '';
-  els.modeInstruction.textContent =
-    `Find the words that start with /${_targetGrapheme}/`;
+  els.phonemeRow.innerHTML = '';
+  els.modeInstruction.textContent = `Find the words that start with /${_targetGrapheme}/`;
 
-  els.modeArea.innerHTML = /* html */`
+  els.modeArea.innerHTML = /* html */ `
     <div class="train-mode">
       <div class="train-target">
         <button class="train-replay" type="button" aria-label="Hear the target sound again">🔊</button>
@@ -87,9 +85,9 @@ export function setupTrainCarriages(word, els) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'word-card';
-    btn.dataset.idx     = String(idx);
-    btn.dataset.match   = String(card.isMatch);
-    btn.dataset.wordId  = card.word.id;
+    btn.dataset.idx = String(idx);
+    btn.dataset.match = String(card.isMatch);
+    btn.dataset.wordId = card.word.id;
     btn.setAttribute('aria-label', `Card: ${card.word.word}`);
     btn.innerHTML = `
       <span class="word-card-emoji" aria-hidden="true">${card.word.emoji ?? '🃏'}</span>
@@ -111,7 +109,7 @@ export function setupTrainCarriages(word, els) {
   // Hide the framework's Check / Say-it buttons (Train doesn't need them).
   if (els.btnCheck) els.btnCheck.style.display = 'none';
   if (els.btnSayIt) els.btnSayIt.style.display = 'none';
-  if (els.btnSkip)  els.btnSkip.style.display  = '';
+  if (els.btnSkip) els.btnSkip.style.display = '';
 }
 
 function _handleCardTap(card, btn, els) {
@@ -124,7 +122,7 @@ function _handleCardTap(card, btn, els) {
     _collected.push(card.word.id);
     _addCarriage(card.word);
 
-    const totalMatches = _cards.filter(c => c.isMatch).length;
+    const totalMatches = _cards.filter((c) => c.isMatch).length;
     if (_collected.length >= totalMatches) {
       _completeRound(els);
     }
@@ -182,11 +180,11 @@ function _completeRound(els) {
  * @returns {{ matches: Word[], distractors: Word[] }}
  */
 export function pickTrainRound(targetGrapheme, targetType, pool, opts = {}) {
-  const cardCount  = opts.cardCount  ?? ROUND_CARD_COUNT;
+  const cardCount = opts.cardCount ?? ROUND_CARD_COUNT;
   const matchCount = opts.matchCount ?? ROUND_MATCH_COUNT;
 
   const matchCandidates = pool
-    .filter(w => w.graphemes?.[0] === targetGrapheme)
+    .filter((w) => w.graphemes?.[0] === targetGrapheme)
     .sort((a, b) => a.word.localeCompare(b.word));
   const matches = matchCandidates.slice(0, Math.min(matchCount, matchCandidates.length));
 
@@ -194,7 +192,7 @@ export function pickTrainRound(targetGrapheme, targetType, pool, opts = {}) {
     return { matches: [], distractors: [] };
   }
 
-  const seen = new Set(matches.map(m => m.id));
+  const seen = new Set(matches.map((m) => m.id));
   const distractors = [];
   const need = cardCount - matches.length;
 
@@ -202,8 +200,11 @@ export function pickTrainRound(targetGrapheme, targetType, pool, opts = {}) {
   const distractorGraphemes = getFirstSoundDistractors(targetGrapheme, targetType, 3);
   for (const dg of distractorGraphemes) {
     if (distractors.length >= need) break;
-    const w = pool.find(x => x.graphemes?.[0] === dg.grapheme && !seen.has(x.id));
-    if (w) { distractors.push(w); seen.add(w.id); }
+    const w = pool.find((x) => x.graphemes?.[0] === dg.grapheme && !seen.has(x.id));
+    if (w) {
+      distractors.push(w);
+      seen.add(w.id);
+    }
   }
 
   // Tier 2: top up with any non-matching pool word.
@@ -211,7 +212,8 @@ export function pickTrainRound(targetGrapheme, targetType, pool, opts = {}) {
     for (const w of shuffleArray(pool)) {
       if (distractors.length >= need) break;
       if (seen.has(w.id) || w.graphemes?.[0] === targetGrapheme) continue;
-      distractors.push(w); seen.add(w.id);
+      distractors.push(w);
+      seen.add(w.id);
     }
   }
 
@@ -223,11 +225,11 @@ export function getCurrentWord() {
 }
 
 export function cleanup() {
-  _currentWord    = null;
+  _currentWord = null;
   _targetGrapheme = null;
-  _targetType     = null;
-  _collected      = [];
-  _cards          = [];
-  _strikes        = 0;
-  _completed      = false;
+  _targetType = null;
+  _collected = [];
+  _cards = [];
+  _strikes = 0;
+  _completed = false;
 }

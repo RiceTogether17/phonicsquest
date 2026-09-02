@@ -1067,7 +1067,10 @@ async function _rtgListen(story) {
   }
 
   listenBtn.disabled = true;
-  listenBtn.replaceChildren(giriImageEl('encourage'), document.createTextNode('Giri is listening…'));
+  listenBtn.replaceChildren(
+    giriImageEl('encourage'),
+    document.createTextNode('Giri is listening…'),
+  );
   _rtgSetStatus('Go ahead — read the glowing line now.');
 
   const result = await listenToLine(expectedText);

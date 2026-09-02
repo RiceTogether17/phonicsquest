@@ -52,7 +52,9 @@ export function registerServiceWorker() {
         indicator.innerHTML = `<span class="offline-indicator__icon">⚠</span> ${total - failed}/${total} audio cached`;
         indicator.className = 'offline-indicator offline-indicator--partial';
       }
-      setTimeout(() => { indicator.hidden = true; }, 4000);
+      setTimeout(() => {
+        indicator.hidden = true;
+      }, 4000);
     }
   });
 
@@ -64,17 +66,20 @@ export function registerServiceWorker() {
 /** Show an "Add to Home Screen" banner so parents can install the app */
 export function initInstallPrompt() {
   // Already running as an installed PWA — nothing to do
-  if (window.matchMedia('(display-mode: standalone)').matches ||
-      window.navigator.standalone === true) return;
+  if (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true
+  )
+    return;
 
   // Respect a recent dismiss (hidden for 14 days)
   const dismissed = localStorage.getItem('pwa-install-dismissed');
   if (dismissed && Date.now() - Number(dismissed) < 14 * 24 * 60 * 60 * 1000) return;
 
-  const banner   = document.getElementById('install-banner');
-  const btn      = document.getElementById('install-btn');
+  const banner = document.getElementById('install-banner');
+  const btn = document.getElementById('install-btn');
   const closeBtn = document.getElementById('install-dismiss');
-  const subText  = document.getElementById('install-banner-sub');
+  const subText = document.getElementById('install-banner-sub');
   if (!banner || !btn || !closeBtn) return;
 
   function dismiss() {
@@ -89,7 +94,9 @@ export function initInstallPrompt() {
     if (subText) subText.textContent = 'Tap Share ⎙ then "Add to Home Screen"';
     btn.textContent = 'Got it';
     btn.addEventListener('click', dismiss);
-    setTimeout(() => { banner.hidden = false; }, 2500);
+    setTimeout(() => {
+      banner.hidden = false;
+    }, 2500);
     return;
   }
 
@@ -98,7 +105,9 @@ export function initInstallPrompt() {
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    setTimeout(() => { banner.hidden = false; }, 2000);
+    setTimeout(() => {
+      banner.hidden = false;
+    }, 2000);
   });
 
   btn.addEventListener('click', async () => {

@@ -16,9 +16,9 @@ import { isBedtimeActive } from './bedtimeMode.js';
 
 class Gamification {
   constructor() {
-    this._sessionCorrect        = 0;
-    this._sessionStreak         = 0;
-    this._sessionWrong          = 0;
+    this._sessionCorrect = 0;
+    this._sessionStreak = 0;
+    this._sessionWrong = 0;
     this._freezeUsedThisSession = false;
   }
 
@@ -38,8 +38,8 @@ class Gamification {
    */
   _checkStreak() {
     const today = new Date().toDateString();
-    const last  = store.get('lastPlayDate');
-    if (!last) return;          // first-ever session — nothing to evaluate
+    const last = store.get('lastPlayDate');
+    if (!last) return; // first-ever session — nothing to evaluate
     if (last === today) return; // already played today — streak already counted
 
     const yesterday = new Date(Date.now() - 86400000).toDateString();
@@ -48,9 +48,9 @@ class Gamification {
     // Missed at least one day. Refresh weekly freeze token first.
     this._refreshWeeklyFreeze();
 
-    const freezes    = store.get('streakFreezes') ?? 0;
-    const calendarGap = this._daysBetween(last, today);   // e.g. Mon→Wed = 2
-    const skippedDays = calendarGap - 1;                   // days actually missed
+    const freezes = store.get('streakFreezes') ?? 0;
+    const calendarGap = this._daysBetween(last, today); // e.g. Mon→Wed = 2
+    const skippedDays = calendarGap - 1; // days actually missed
 
     // Apply a freeze token if exactly 1 day was skipped and a token is available.
     if (skippedDays === 1 && freezes > 0) {
@@ -67,14 +67,14 @@ class Gamification {
 
   /** Refresh the weekly streak-freeze token on Sunday. */
   _refreshWeeklyFreeze() {
-    const now       = new Date();
-    const isSunday  = now.getDay() === 0;
+    const now = new Date();
+    const isSunday = now.getDay() === 0;
     const lastReset = store.get('weeklyFreezeResetAt');
-    const lastDate  = lastReset ? new Date(lastReset).toDateString() : null;
+    const lastDate = lastReset ? new Date(lastReset).toDateString() : null;
 
     if (isSunday && lastDate !== now.toDateString()) {
       store.patch({
-        streakFreezes:       1,
+        streakFreezes: 1,
         weeklyFreezeResetAt: now.toISOString(),
       });
     }
@@ -88,7 +88,7 @@ class Gamification {
    */
   _daysBetween(fromDateStr, toDateStr) {
     const from = new Date(fromDateStr).getTime();
-    const to   = new Date(toDateStr).getTime();
+    const to = new Date(toDateStr).getTime();
     return Math.round(Math.abs(to - from) / 86400000);
   }
 
@@ -113,7 +113,8 @@ class Gamification {
    * @returns {{ newXP: number, levelUp: boolean, newLevel: number }}
    */
   awardXp(amount, reason = '') {
-    if (!amount || amount <= 0) return { newXP: store.get('xp'), levelUp: false, newLevel: store.get('level') };
+    if (!amount || amount <= 0)
+      return { newXP: store.get('xp'), levelUp: false, newLevel: store.get('level') };
 
     // Bedtime Mode honours the "not every minute needs XP" charter rule.
     // When it's on, attempts are still recorded (so the SR ladder and
@@ -124,7 +125,7 @@ class Gamification {
     }
 
     const oldLevel = store.get('level');
-    const newXP    = store.get('xp') + amount;
+    const newXP = store.get('xp') + amount;
     const { level: newLevel } = getLevelInfo(newXP);
 
     store.patch({ xp: newXP, level: newLevel });
@@ -240,19 +241,20 @@ class Gamification {
   getSessionStats() {
     return {
       correct: this._sessionCorrect,
-      wrong:   this._sessionWrong,
-      total:   this._sessionCorrect + this._sessionWrong,
-      accuracy: this._sessionCorrect + this._sessionWrong > 0
-        ? this._sessionCorrect / (this._sessionCorrect + this._sessionWrong)
-        : 0,
+      wrong: this._sessionWrong,
+      total: this._sessionCorrect + this._sessionWrong,
+      accuracy:
+        this._sessionCorrect + this._sessionWrong > 0
+          ? this._sessionCorrect / (this._sessionCorrect + this._sessionWrong)
+          : 0,
     };
   }
 
   /** Reset session counters */
   resetSession() {
-    this._sessionCorrect  = 0;
-    this._sessionStreak   = 0;
-    this._sessionWrong    = 0;
+    this._sessionCorrect = 0;
+    this._sessionStreak = 0;
+    this._sessionWrong = 0;
     this._freezeUsedThisSession = false;
   }
 
@@ -270,38 +272,38 @@ class Gamification {
    * @returns {{ daysPlayed:number, xpThisWeek:number, wordsThisWeek:number, questsThisWeek:number, newBadgesThisWeek:string[] }}
    */
   getWeeklyStats() {
-    const events    = store.get('learningEvents') || [];
-    const calendar  = store.get('challengeCalendar') || [];
-    const cutoff    = Date.now() - 7 * 86400000;
+    const events = store.get('learningEvents') || [];
+    const calendar = store.get('challengeCalendar') || [];
+    const cutoff = Date.now() - 7 * 86400000;
 
-    const recentEvents = events.filter(e => {
+    const recentEvents = events.filter((e) => {
       const t = e.timestamp ? new Date(e.timestamp).getTime() : 0;
       return t >= cutoff;
     });
 
     const wordsSeen = new Set(
       recentEvents
-        .filter(e => e.eventType === 'word_attempt' && e.meta?.wordId)
-        .map(e => e.meta.wordId)
+        .filter((e) => e.eventType === 'word_attempt' && e.meta?.wordId)
+        .map((e) => e.meta.wordId),
     );
 
-    const questsCompleted = recentEvents.filter(e => e.eventType === 'quest_complete').length;
+    const questsCompleted = recentEvents.filter((e) => e.eventType === 'quest_complete').length;
 
     // Days played is estimated from the challengeCalendar + lastPlayDate
-    const today   = new Date().toDateString();
+    const today = new Date().toDateString();
     const daysAgo = (dStr) => {
       const d = new Date(dStr);
       return isNaN(d) ? Infinity : Math.floor((Date.now() - d.getTime()) / 86400000);
     };
     const daysPlayed = new Set(
-      calendar.filter(d => daysAgo(d) < 7).concat(
-        store.get('lastPlayDate') === today ? [today] : []
-      )
+      calendar
+        .filter((d) => daysAgo(d) < 7)
+        .concat(store.get('lastPlayDate') === today ? [today] : []),
     ).size;
 
     // XP gained this week: sum of xpEarned in recent events
     const xpThisWeek = recentEvents
-      .filter(e => typeof e.meta?.xpEarned === 'number')
+      .filter((e) => typeof e.meta?.xpEarned === 'number')
       .reduce((sum, e) => sum + e.meta.xpEarned, 0);
 
     return {
@@ -331,33 +333,38 @@ class Gamification {
     chip.classList.remove('stat-chip--bump');
     void chip.offsetWidth; // reflow to restart animation
     chip.classList.add('stat-chip--bump');
-    chip.addEventListener('animationend', () => chip.classList.remove('stat-chip--bump'), { once: true });
+    chip.addEventListener('animationend', () => chip.classList.remove('stat-chip--bump'), {
+      once: true,
+    });
   }
 
   /** Update all header UI elements */
   _updateUI() {
-    const energyEl  = document.getElementById('energy-display');
-    const streakEl  = document.getElementById('streak-val');
-    const xpEl      = document.getElementById('xp-val');
+    const energyEl = document.getElementById('energy-display');
+    const streakEl = document.getElementById('streak-val');
+    const xpEl = document.getElementById('xp-val');
     const streakChip = document.getElementById('streak-chip');
-    const levelEl   = document.getElementById('level-val');
-    const nextEl    = document.getElementById('level-next-val');
-    const barEl     = document.getElementById('level-bar-fill');
-    const goalFill  = document.getElementById('goal-fill');
-    const goalDone  = document.getElementById('goal-done');
+    const levelEl = document.getElementById('level-val');
+    const nextEl = document.getElementById('level-next-val');
+    const barEl = document.getElementById('level-bar-fill');
+    const goalFill = document.getElementById('goal-fill');
+    const goalDone = document.getElementById('goal-done');
     const goalTotal = document.getElementById('goal-total');
 
     const prevEnergy = energyEl ? energyEl.querySelectorAll('.energy-star--full').length : null;
-    const prevXp     = xpEl     ? Number(xpEl.textContent) : null;
-    const prevStreak = streakEl  ? Number(streakEl.textContent) : null;
+    const prevXp = xpEl ? Number(xpEl.textContent) : null;
+    const prevStreak = streakEl ? Number(streakEl.textContent) : null;
 
     // Render energy stars
     const energy = store.get('energy') ?? 3;
     if (energyEl) {
-      energyEl.innerHTML = [0, 1, 2].map(i =>
-        `<span class="energy-star ${i < energy ? 'energy-star--full' : 'energy-star--empty'}"
-               aria-hidden="true">${i < energy ? '⭐' : '✩'}</span>`
-      ).join('');
+      energyEl.innerHTML = [0, 1, 2]
+        .map(
+          (i) =>
+            `<span class="energy-star ${i < energy ? 'energy-star--full' : 'energy-star--empty'}"
+               aria-hidden="true">${i < energy ? '⭐' : '✩'}</span>`,
+        )
+        .join('');
       energyEl.setAttribute('aria-label', `Giri energy: ${energy} of 3 stars`);
     }
 
@@ -387,7 +394,7 @@ class Gamification {
     if (nextEl) nextEl.textContent = level + 1;
     if (barEl) barEl.style.width = `${Math.round(progress * 100)}%`;
 
-    const done  = store.get('dailyDone');
+    const done = store.get('dailyDone');
     const total = store.get('dailyGoal');
     if (goalFill) goalFill.style.width = `${Math.min(100, Math.round((done / total) * 100))}%`;
     if (goalDone) goalDone.textContent = done;

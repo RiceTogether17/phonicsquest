@@ -43,7 +43,7 @@ export function buildSoundMatchRound(stageId, { wordIndex = 0, rng = Math.random
     // The correct grapheme must always be one of the choices, so force it in
     // and fill the rest from the distractor pool (same shape as the vowel path).
     const grapheme = word[0] ?? '';
-    const pool = ['a', 'e', 'i', 'o', 'u', 's', 't'].filter(c => c !== grapheme);
+    const pool = ['a', 'e', 'i', 'o', 'u', 's', 't'].filter((c) => c !== grapheme);
     const choices = grapheme
       ? _take([grapheme, ..._take(pool, 3, rng)], 4, rng)
       : _take(pool, 4, rng);
@@ -54,7 +54,7 @@ export function buildSoundMatchRound(stageId, { wordIndex = 0, rng = Math.random
       word,
     };
   }
-  const distractors = SHORT_VOWEL_DISTRACTORS.filter(v => v !== vowel);
+  const distractors = SHORT_VOWEL_DISTRACTORS.filter((v) => v !== vowel);
   const chosenDistractors = _take(distractors, 3, rng);
   const choices = _take([vowel, ...chosenDistractors], 4, rng);
   const soundLabel = `/${vowel}/`;
@@ -71,7 +71,10 @@ export function buildSoundMatchRound(stageId, { wordIndex = 0, rng = Math.random
  * are the letters of the word (cvc-a stages are all 3-letter) and the bank
  * is the same letters plus 0–1 plausible distractor.
  */
-export function buildBlendBuilderRound(stageId, { wordIndex = 0, rng = Math.random, addDistractor = true } = {}) {
+export function buildBlendBuilderRound(
+  stageId,
+  { wordIndex = 0, rng = Math.random, addDistractor = true } = {},
+) {
   const stage = getStage(stageId);
   if (!stage) return null;
   const word = stage.sampleWords?.[wordIndex] ?? stage.sampleWords?.[0] ?? '';
@@ -79,12 +82,15 @@ export function buildBlendBuilderRound(stageId, { wordIndex = 0, rng = Math.rand
 
   const all = new Set(graphemes);
   const vowel = _vowelOf(stageId);
-  const distractorPool = ['s', 't', 'm', 'p', 'n', 'b'].filter(c => !all.has(c));
-  const distractor = addDistractor && distractorPool.length
-    ? _take(distractorPool, 1, rng)[0]
-    : null;
+  const distractorPool = ['s', 't', 'm', 'p', 'n', 'b'].filter((c) => !all.has(c));
+  const distractor =
+    addDistractor && distractorPool.length ? _take(distractorPool, 1, rng)[0] : null;
 
-  const bank = _take(distractor ? [...graphemes, distractor] : [...graphemes], graphemes.length + (distractor ? 1 : 0), rng);
+  const bank = _take(
+    distractor ? [...graphemes, distractor] : [...graphemes],
+    graphemes.length + (distractor ? 1 : 0),
+    rng,
+  );
 
   return {
     mode: 'blendBuilder',
@@ -105,10 +111,17 @@ export function buildLesson(stageId, { roundsPerMode = 3, rng = Math.random } = 
   // null so the caller can stay on the map instead of flashing the child
   // through a sequence of empty screens.
   if (!stage.sampleWords?.length) return null;
-  const wordIndices = Array.from({ length: Math.min(roundsPerMode, stage.sampleWords.length) }, (_, i) => i);
+  const wordIndices = Array.from(
+    { length: Math.min(roundsPerMode, stage.sampleWords.length) },
+    (_, i) => i,
+  );
 
-  const soundMatch   = wordIndices.map(i => buildSoundMatchRound(stageId,   { wordIndex: i, rng })).filter(Boolean);
-  const blendBuilder = wordIndices.map(i => buildBlendBuilderRound(stageId, { wordIndex: i, rng })).filter(Boolean);
+  const soundMatch = wordIndices
+    .map((i) => buildSoundMatchRound(stageId, { wordIndex: i, rng }))
+    .filter(Boolean);
+  const blendBuilder = wordIndices
+    .map((i) => buildBlendBuilderRound(stageId, { wordIndex: i, rng }))
+    .filter(Boolean);
   if (!soundMatch.length && !blendBuilder.length) return null;
 
   return { stageId, soundMatch, blendBuilder };

@@ -11,26 +11,30 @@ const KINDS = ['story', 'announcement', 'conversation', 'instruction', 'news'];
 
 /** Generous per-level script word bounds (listening, not reading, lengths). */
 const SCRIPT_BOUNDS = {
-  P1: [40, 110], P2: [60, 150], P3: [90, 220],
-  P4: [130, 260], P5: [170, 320], P6: [200, 380],
+  P1: [40, 110],
+  P2: [60, 150],
+  P3: [90, 220],
+  P4: [130, 260],
+  P5: [170, 320],
+  P6: [200, 380],
 };
 
 const wordCount = (s) => String(s).trim().split(/\s+/).length;
 
 describe('listening passages bank', () => {
   it('has unique ids', () => {
-    const ids = LISTENING_PASSAGES.map(p => p.id);
+    const ids = LISTENING_PASSAGES.map((p) => p.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
   it('covers every level with at least 4 passages', () => {
     for (const level of LEVELS) {
-      const count = LISTENING_PASSAGES.filter(p => p.level === level).length;
+      const count = LISTENING_PASSAGES.filter((p) => p.level === level).length;
       expect(count, `${level} should have ≥4 passages`).toBeGreaterThanOrEqual(4);
     }
   });
 
-  it.each(LISTENING_PASSAGES.map(p => [p.id, p]))('%s is well-formed', (_id, p) => {
+  it.each(LISTENING_PASSAGES.map((p) => [p.id, p]))('%s is well-formed', (_id, p) => {
     expect(LEVELS).toContain(p.level);
     expect(KINDS).toContain(p.kind);
     expect(p.title.length).toBeGreaterThan(0);
@@ -55,7 +59,7 @@ describe('listening passages bank', () => {
 
   it('keeps question counts in line with the level', () => {
     for (const p of LISTENING_PASSAGES) {
-      const expected = (p.level === 'P1' || p.level === 'P2') ? 3 : 4;
+      const expected = p.level === 'P1' || p.level === 'P2' ? 3 : 4;
       expect(p.questions.length, `${p.id} question count`).toBe(expected);
     }
   });

@@ -28,12 +28,12 @@ describe('quest unlock logic', () => {
   });
 
   it('does not auto-unlock grammar quests for weak primary readers when placement says pre-reader', () => {
-    const unlock = getQuestUnlockStatus(
-      {},
-      { schoolLevel: 'primary' },
-      undefined,
-      { readingBand: 'pre-reader', sentenceReady: false, grammarReady: false, vocabularyReady: false }
-    );
+    const unlock = getQuestUnlockStatus({}, { schoolLevel: 'primary' }, undefined, {
+      readingBand: 'pre-reader',
+      sentenceReady: false,
+      grammarReady: false,
+      vocabularyReady: false,
+    });
 
     expect(unlock.sentenceForge.unlocked).toBe(false);
     expect(unlock.clozeCastle.unlocked).toBe(false);
@@ -41,24 +41,24 @@ describe('quest unlock logic', () => {
   });
 
   it('unlocks Sentence Forge for developing readers but keeps grammar gated', () => {
-    const unlock = getQuestUnlockStatus(
-      {},
-      { schoolLevel: 'primary' },
-      undefined,
-      { readingBand: 'developing-reader', sentenceReady: true, grammarReady: false, vocabularyReady: false }
-    );
+    const unlock = getQuestUnlockStatus({}, { schoolLevel: 'primary' }, undefined, {
+      readingBand: 'developing-reader',
+      sentenceReady: true,
+      grammarReady: false,
+      vocabularyReady: false,
+    });
 
     expect(unlock.sentenceForge.unlocked).toBe(true);
     expect(unlock.clozeCastle.unlocked).toBe(false);
   });
 
   it('fully unlocks language quests for reader band', () => {
-    const unlock = getQuestUnlockStatus(
-      {},
-      { schoolLevel: 'preschool' },
-      undefined,
-      { readingBand: 'reader', sentenceReady: true, grammarReady: true, vocabularyReady: true }
-    );
+    const unlock = getQuestUnlockStatus({}, { schoolLevel: 'preschool' }, undefined, {
+      readingBand: 'reader',
+      sentenceReady: true,
+      grammarReady: true,
+      vocabularyReady: true,
+    });
 
     expect(unlock.sentenceForge.unlocked).toBe(true);
     expect(unlock.clozeCastle.unlocked).toBe(true);
@@ -81,7 +81,6 @@ describe('progress summary', () => {
   });
 });
 
-
 describe('blending content filters', () => {
   beforeEach(() => resetState());
 
@@ -93,7 +92,9 @@ describe('blending content filters', () => {
     });
 
     expect(pool.length).toBeGreaterThan(0);
-    expect(pool.every(word => word.group !== 'sight-highfreq' && word.pattern !== 'sight')).toBe(true);
+    expect(pool.every((word) => word.group !== 'sight-highfreq' && word.pattern !== 'sight')).toBe(
+      true,
+    );
   });
 });
 
@@ -112,17 +113,37 @@ describe('gamification rewards', () => {
 });
 
 describe('CVCC / CCVCC filter excludes suffix words', () => {
-  const SUFFIX_WORDS = ['jumping', 'landing', 'camping', 'melting', 'resting',
-    'jumped', 'landed', 'camped', 'melted', 'rested',
-    'jumper', 'grander', 'blending', 'blended'];
+  const SUFFIX_WORDS = [
+    'jumping',
+    'landing',
+    'camping',
+    'melting',
+    'resting',
+    'jumped',
+    'landed',
+    'camped',
+    'melted',
+    'rested',
+    'jumper',
+    'grander',
+    'blending',
+    'blended',
+  ];
 
-  const GROUPS = ['cvcc-a', 'cvcc-e', 'cvcc-u', 'struct-cvcc',
-    'ccvcc-a', 'ccvcc-e', 'struct-ccvcc'];
+  const GROUPS = [
+    'cvcc-a',
+    'cvcc-e',
+    'cvcc-u',
+    'struct-cvcc',
+    'ccvcc-a',
+    'ccvcc-e',
+    'struct-ccvcc',
+  ];
 
   for (const group of GROUPS) {
     it(`${group} contains no suffix words`, () => {
       const words = progress._filterByGroup(group);
-      const ids = new Set(words.map(w => w.id));
+      const ids = new Set(words.map((w) => w.id));
       for (const sf of SUFFIX_WORDS) {
         expect(ids.has(sf), `"${sf}" should not appear in ${group}`).toBe(false);
       }
@@ -135,7 +156,7 @@ describe('CCVC category excludes final-blend (CVCC) words', () => {
   // is set on both initial-blend (CCVC) and final-blend (CVCC) words, so words
   // like "list"/"gift"/"mint" leaked into the CCVC category.
   it('includes initial-blend CCVC words but not final-blend CVCC words', () => {
-    const ids = new Set(progress._filterByGroup('struct-ccvc').map(w => w.id));
+    const ids = new Set(progress._filterByGroup('struct-ccvc').map((w) => w.id));
     for (const yes of ['flat', 'drop']) {
       expect(ids.has(yes), `CCVC should include "${yes}"`).toBe(true);
     }

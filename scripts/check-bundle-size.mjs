@@ -17,7 +17,7 @@ const ASSETS_DIR = new URL('../docs/assets/', import.meta.url).pathname;
 
 // Minified (pre-gzip) byte budgets.
 const STARTUP_BUDGET = 700 * 1024; // index-*.js — currently ~623 kB
-const LAZY_BUDGET    = 450 * 1024; // any single lazy chunk — largest today ~360 kB
+const LAZY_BUDGET = 450 * 1024; // any single lazy chunk — largest today ~360 kB
 
 let failed = false;
 const rows = [];
@@ -30,7 +30,9 @@ for (const file of readdirSync(ASSETS_DIR).sort()) {
   const over = size > budget;
   if (over) failed = true;
   if (over || isStartup) {
-    rows.push(`${over ? '✗' : '✓'} ${file}  ${(size / 1024).toFixed(1)} kB (budget ${(budget / 1024).toFixed(0)} kB)`);
+    rows.push(
+      `${over ? '✗' : '✓'} ${file}  ${(size / 1024).toFixed(1)} kB (budget ${(budget / 1024).toFixed(0)} kB)`,
+    );
   }
 }
 

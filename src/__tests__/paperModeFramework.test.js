@@ -24,13 +24,17 @@ describe('exam-format data scaffolds', () => {
       const playlist = PAPER_MODE_PLAYLISTS[level] || [];
       expect(playlist).toContain('grammar-mcq');
       expect(playlist).toContain('vocab-mcq');
-      expect(playlist.some(s => s.startsWith('sentence-forge-'))).toBe(true);
+      expect(playlist.some((s) => s.startsWith('sentence-forge-'))).toBe(true);
     }
   });
 
   it('classifies sentence tracks by sentence skills first', () => {
     expect(classifySentenceTrack({ level: 6, sentenceSkills: ['word_order'] })).toBe('word-order');
-    expect(classifySentenceTrack({ level: 1, sentenceSkills: ['connector_clue'] })).toBe('sentence-combining');
-    expect(classifySentenceTrack({ level: 3, sentenceSkills: ['inversion'] })).toBe('synthesis-transformation');
+    expect(classifySentenceTrack({ level: 1, sentenceSkills: ['connector_clue'] })).toBe(
+      'sentence-combining',
+    );
+    expect(classifySentenceTrack({ level: 3, sentenceSkills: ['inversion'] })).toBe(
+      'synthesis-transformation',
+    );
   });
 });

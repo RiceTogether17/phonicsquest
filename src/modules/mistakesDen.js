@@ -31,53 +31,53 @@ const DAY_MS = 86_400_000;
  */
 const MODULE_TARGETS = Object.freeze({
   // Phonics modes (wordHistory.mode values)
-  blend:        'blend',
+  blend: 'blend',
   classicBlend: 'classicBlend',
-  hear:         'hear',
-  oralBlend:    'oralBlend',
-  first:        'first',
-  last:         'last',
-  middle:       'middle',
-  soundCount:   'soundCount',
-  oralSegment:  'oralSegment',
-  missing:      'missing',
-  segment:      'segment',
+  hear: 'hear',
+  oralBlend: 'oralBlend',
+  first: 'first',
+  last: 'last',
+  middle: 'middle',
+  soundCount: 'soundCount',
+  oralSegment: 'oralSegment',
+  missing: 'missing',
+  segment: 'segment',
   // Primary quests (questAttempts.quest values)
-  clozeCastle:    'cloze-castle',
-  wordVault:      'word-vault',
-  grammarMcq:     'grammar-mcq',
-  vocabMcq:       'vocab-mcq',
-  editingQuest:   'editing-quest',
-  sentenceForge:  'sentence-forge',
-  writingQuest:   'writing-quest',
+  clozeCastle: 'cloze-castle',
+  wordVault: 'word-vault',
+  grammarMcq: 'grammar-mcq',
+  vocabMcq: 'vocab-mcq',
+  editingQuest: 'editing-quest',
+  sentenceForge: 'sentence-forge',
+  writingQuest: 'writing-quest',
   synthesisQuest: 'synthesis-quest',
-  paperMode:      'paper-mode',
-  stories:        'stories',
+  paperMode: 'paper-mode',
+  stories: 'stories',
 });
 
 /** Human-readable label per module/quest. */
 const MODULE_LABELS = Object.freeze({
-  blend:          '🎯 Blend It!',
-  classicBlend:   '🔊 Listen & Blend',
-  hear:           '👂 Hear & Choose',
-  oralBlend:      '🗣️ Oral Blend',
-  first:          '🚀 First Sound',
-  last:           '🏁 Last Sound',
-  middle:         '🎯 Middle Sound',
-  soundCount:     '🔢 Count the Sounds',
-  oralSegment:    '🥁 Tap the Sounds',
-  missing:        '🔍 Missing Sound',
-  segment:        '✂️ Segment It',
-  clozeCastle:    '🏰 Cloze Castle',
-  wordVault:      '🔑 Word Vault',
-  grammarMcq:     '🧠 Grammar MCQ',
-  vocabMcq:       '📖 Vocabulary MCQ',
-  editingQuest:   '✏️ Editing Quest',
-  sentenceForge:  '🔨 Sentence Forge',
-  writingQuest:   '📝 Writing Quest',
+  blend: '🎯 Blend It!',
+  classicBlend: '🔊 Listen & Blend',
+  hear: '👂 Hear & Choose',
+  oralBlend: '🗣️ Oral Blend',
+  first: '🚀 First Sound',
+  last: '🏁 Last Sound',
+  middle: '🎯 Middle Sound',
+  soundCount: '🔢 Count the Sounds',
+  oralSegment: '🥁 Tap the Sounds',
+  missing: '🔍 Missing Sound',
+  segment: '✂️ Segment It',
+  clozeCastle: '🏰 Cloze Castle',
+  wordVault: '🔑 Word Vault',
+  grammarMcq: '🧠 Grammar MCQ',
+  vocabMcq: '📖 Vocabulary MCQ',
+  editingQuest: '✏️ Editing Quest',
+  sentenceForge: '🔨 Sentence Forge',
+  writingQuest: '📝 Writing Quest',
   synthesisQuest: '🔁 Synthesis & Transformation',
-  paperMode:      '📋 Exam Practice Hub',
-  stories:        '📚 Giri Stories',
+  paperMode: '📋 Exam Practice Hub',
+  stories: '📚 Giri Stories',
 });
 
 function moduleLabel(key) {
@@ -95,7 +95,7 @@ function _humanise(key) {
     .replace(/[-_]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
-    .replace(/^./, c => c.toUpperCase());
+    .replace(/^./, (c) => c.toUpperCase());
 }
 
 /**

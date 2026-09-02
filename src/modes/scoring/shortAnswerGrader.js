@@ -23,7 +23,8 @@
  * a teacher would never award.
  */
 
-const NEGATION_RE = /^(not|never|no|none|neither|nothing|nobody|nor|cannot|n't|didn't|doesn't|don't|isn't|aren't|wasn't|weren't|hasn't|haven't|hadn't|won't|wouldn't|shouldn't|couldn't|can't|mustn't|mightn't)$/i;
+const NEGATION_RE =
+  /^(not|never|no|none|neither|nothing|nobody|nor|cannot|n't|didn't|doesn't|don't|isn't|aren't|wasn't|weren't|hasn't|haven't|hadn't|won't|wouldn't|shouldn't|couldn't|can't|mustn't|mightn't)$/i;
 const CLAUSE_BREAK_RE = /[.;!?]|\b(but|however|although|though|whereas|yet)\b/i;
 const NEG_LOOKBACK_WORDS = 2;
 
@@ -65,7 +66,10 @@ function isNegated(text, position) {
   const breakMatch = before.match(new RegExp(`.*(${CLAUSE_BREAK_RE.source})`, 'i'));
   const clauseStart = breakMatch ? breakMatch.index + breakMatch[0].length : 0;
   const clause = before.slice(clauseStart);
-  const words = clause.trim().split(/[\s,]+/).filter(Boolean);
+  const words = clause
+    .trim()
+    .split(/[\s,]+/)
+    .filter(Boolean);
   const window = words.slice(-NEG_LOOKBACK_WORDS);
   for (const w of window) {
     const isNeg = NEGATION_RE.test(w) || /n't$/i.test(w);
@@ -149,15 +153,16 @@ export function gradeShortAnswer(userValue, opts = {}) {
     const hits = [];
     const misses = [];
     for (const group of requiredGroups) {
-      const hit = (group || []).find(k => hasUnnegatedMatch(u, k));
-      if (hit) hits.push(hit); else misses.push((group || [])[0] || '');
+      const hit = (group || []).find((k) => hasUnnegatedMatch(u, k));
+      if (hit) hits.push(hit);
+      else misses.push((group || [])[0] || '');
     }
     const fraction = hits.length / requiredGroups.length;
     return { fraction, trace: { reason: 'required-groups', hits, misses } };
   }
 
   if (Array.isArray(keywords) && keywords.length > 0) {
-    const hits = keywords.filter(k => hasUnnegatedMatch(u, k));
+    const hits = keywords.filter((k) => hasUnnegatedMatch(u, k));
     if (hits.length > 0) {
       return { fraction: 1, trace: { reason: 'keyword-match', hits, misses: [] } };
     }

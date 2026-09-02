@@ -45,8 +45,8 @@ describe('tokenizeWords', () => {
 describe('alignReading', () => {
   it('matches a perfect reading word for word', () => {
     const out = alignReading(['the', 'cat', 'sat'], ['the', 'cat', 'sat'], simpleSim);
-    expect(out.map(w => w.status)).toEqual(['match', 'match', 'match']);
-    expect(out.map(w => w.heard)).toEqual(['the', 'cat', 'sat']);
+    expect(out.map((w) => w.status)).toEqual(['match', 'match', 'match']);
+    expect(out.map((w) => w.heard)).toEqual(['the', 'cat', 'sat']);
   });
 
   it('flags a clearly skipped long word as miss', () => {
@@ -65,8 +65,12 @@ describe('alignReading', () => {
   });
 
   it('survives extra inserted words without penalising later matches', () => {
-    const out = alignReading(['sam', 'ran', 'fast'], ['um', 'sam', 'like', 'ran', 'fast'], simpleSim);
-    expect(out.map(w => w.status)).toEqual(['match', 'match', 'match']);
+    const out = alignReading(
+      ['sam', 'ran', 'fast'],
+      ['um', 'sam', 'like', 'ran', 'fast'],
+      simpleSim,
+    );
+    expect(out.map((w) => w.status)).toEqual(['match', 'match', 'match']);
   });
 
   it('uses similarity, not equality, so near pronunciations stay kind', () => {
@@ -83,7 +87,7 @@ describe('alignReading', () => {
 
   it('marks everything miss when nothing was heard', () => {
     const out = alignReading(['the', 'big', 'dog'], [], simpleSim);
-    expect(out.every(w => w.status === 'miss')).toBe(true);
+    expect(out.every((w) => w.status === 'miss')).toBe(true);
   });
 
   it('returns empty for an empty expected line', () => {
@@ -98,10 +102,7 @@ describe('alignReading', () => {
 
 describe('assessLineReading', () => {
   it('keeps the kindest result across transcript alternatives', () => {
-    const transcripts = [
-      { text: 'the bat sat' },
-      { text: 'the cat sat' },
-    ];
+    const transcripts = [{ text: 'the bat sat' }, { text: 'the cat sat' }];
     const out = assessLineReading('The cat sat.', transcripts, simpleSim);
     expect(out.matchCount).toBe(3);
     expect(out.total).toBe(3);
@@ -111,6 +112,6 @@ describe('assessLineReading', () => {
     const out = assessLineReading('The cat sat.', [], simpleSim);
     expect(out.matchCount).toBe(0);
     expect(out.total).toBe(3);
-    expect(out.words.every(w => w.status === 'miss')).toBe(true);
+    expect(out.words.every((w) => w.status === 'miss')).toBe(true);
   });
 });

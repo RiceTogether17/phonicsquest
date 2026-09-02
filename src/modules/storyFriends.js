@@ -30,7 +30,9 @@ import { getProfileScopedKey } from './profiles.js';
  * registry in profiles.js can reference it.
  */
 const STORAGE_BASE = 'giri_friends_unlocked';
-function storageKey() { return getProfileScopedKey(STORAGE_BASE); }
+function storageKey() {
+  return getProfileScopedKey(STORAGE_BASE);
+}
 
 /**
  * Names that don't strip cleanly from the title patterns (e.g.
@@ -39,11 +41,11 @@ function storageKey() { return getProfileScopedKey(STORAGE_BASE); }
  * here falls through to the regex deriver below.
  */
 const NAME_OVERRIDES = Object.freeze({
-  'core-a-14': 'Wet Boots',     // Giri Gets Wet
-  'core-a-16': 'Fast Feet',     // Giri's Big Run
-  'core-b-04': 'Sun Day',       // Giri's Big Day
-  'core-a-06': 'Shovel',        // Giri's Big Dig
-  'core-a-04': 'Pillow',        // Giri's Nap
+  'core-a-14': 'Wet Boots', // Giri Gets Wet
+  'core-a-16': 'Fast Feet', // Giri's Big Run
+  'core-b-04': 'Sun Day', // Giri's Big Day
+  'core-a-06': 'Shovel', // Giri's Big Dig
+  'core-a-04': 'Pillow', // Giri's Nap
 });
 
 /**
@@ -56,13 +58,14 @@ const NAME_OVERRIDES = Object.freeze({
  */
 export function deriveFriendName(title) {
   if (typeof title !== 'string' || !title.trim()) return '';
-  return title
-    .replace(/^Giri's\s+/i, '')
-    .replace(/^Giri\s+and\s+the\s+/i, '')
-    .replace(/^Giri\s+and\s+/i, '')
-    .replace(/^Giri\s+/i, '')
-    .trim()
-    || title;
+  return (
+    title
+      .replace(/^Giri's\s+/i, '')
+      .replace(/^Giri\s+and\s+the\s+/i, '')
+      .replace(/^Giri\s+and\s+/i, '')
+      .replace(/^Giri\s+/i, '')
+      .trim() || title
+  );
 }
 
 /**
@@ -103,7 +106,9 @@ export function getUnlockedSet() {
 function _saveUnlockedSet(set) {
   try {
     localStorage.setItem(storageKey(), JSON.stringify(Array.from(set)));
-  } catch (_) { /* storage full / disabled — ignore */ }
+  } catch (_) {
+    /* storage full / disabled — ignore */
+  }
 }
 
 /**
@@ -152,7 +157,7 @@ export function getRoster(stories) {
 /** Compact summary for the home / stories browser tile. */
 export function getRosterSummary(stories) {
   const roster = getRoster(stories);
-  const unlocked = roster.filter(r => r.unlocked).length;
+  const unlocked = roster.filter((r) => r.unlocked).length;
   return { unlocked, total: roster.length, roster };
 }
 

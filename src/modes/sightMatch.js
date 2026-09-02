@@ -30,22 +30,22 @@ const BASE = import.meta.env.BASE_URL;
 
 // ── Module state ───────────────────────────────────────────────────────────
 
-let _container    = null;
-let _onGoHome     = null;
+let _container = null;
+let _onGoHome = null;
 let _onLearnQuest = null; // called when child taps "Learn Words" in browser
 
-let _activeQuest   = null;  // current SIGHT_QUESTS entry
-let _flipped       = [];    // indices of currently face-up (unmatched) cards
-let _matched       = new Set(); // indices of matched cards
-let _busy          = false; // prevents double-flip during delay
-let _moveCount     = 0;
+let _activeQuest = null; // current SIGHT_QUESTS entry
+let _flipped = []; // indices of currently face-up (unmatched) cards
+let _matched = new Set(); // indices of matched cards
+let _busy = false; // prevents double-flip during delay
+let _moveCount = 0;
 let _fullscreenListener = null;
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
 export function initSightMatch(container, onGoHome, onLearnQuest) {
-  _container    = container;
-  _onGoHome     = onGoHome;
+  _container = container;
+  _onGoHome = onGoHome;
   _onLearnQuest = onLearnQuest || null;
 }
 
@@ -85,13 +85,13 @@ async function _renderBrowser() {
   if (!_container || _activeQuest) return; // navigated away while loading
 
   const completedQuests = store.get('sightQuestsCompleted') || {};
-  const studiedQuests   = store.get('sightQuestsStudied')   || {};
+  const studiedQuests = store.get('sightQuestsStudied') || {};
 
   const tiers = ['easy', 'medium', 'hard'];
   let html = '<div class="sm-browser">';
 
   for (const tier of tiers) {
-    const meta   = TIER_LABELS[tier];
+    const meta = TIER_LABELS[tier];
     const quests = getQuestsByTier(tier);
 
     html += `
@@ -103,26 +103,29 @@ async function _renderBrowser() {
             <div class="sm-tier-desc">${meta.desc}</div>
           </div>
         </div>
-        ${tier === 'hard' ? `
+        ${
+          tier === 'hard'
+            ? `
         <p class="sm-tier-note" role="note">
           ✏️ These are P4–P6 spelling words — after matching them, spot them
           misspelled in <button class="sm-tier-link" id="sm-goto-editing">Editing Quest</button>.
-        </p>` : ''}
+        </p>`
+            : ''
+        }
         <div class="sm-quest-grid">`;
 
     for (const quest of quests) {
-      const done    = Boolean(completedQuests[quest.id]);
+      const done = Boolean(completedQuests[quest.id]);
       const studied = Boolean(studiedQuests[quest.id]);
-      const status  = done
-        ? { cls: 'sm-quest-card--done',    label: '✅ Completed' }
+      const status = done
+        ? { cls: 'sm-quest-card--done', label: '✅ Completed' }
         : studied
           ? { cls: 'sm-quest-card--studied', label: '📖 Studied' }
-          : { cls: 'sm-quest-card--new',     label: '✨ Not started' };
+          : { cls: 'sm-quest-card--new', label: '✨ Not started' };
 
       const preview = quest.words.slice(0, 3).join(' · ');
       const linkedStory = getStoryForQuest(quest);
-      const ariaQuest =
-        `${quest.name} – words: ${quest.words.join(', ')} – ${status.label.replace(/^\W+\s*/, '')}`;
+      const ariaQuest = `${quest.name} – words: ${quest.words.join(', ')} – ${status.label.replace(/^\W+\s*/, '')}`;
 
       html += `
         <div class="sm-quest-card ${status.cls}" data-quest="${quest.id}">
@@ -154,12 +157,14 @@ async function _renderBrowser() {
   html += '</div>';
   _container.innerHTML = html;
 
-  document.getElementById('sm-goto-editing')?.addEventListener('click', () => document.getElementById('btn-editing-quest')?.click());
+  document
+    .getElementById('sm-goto-editing')
+    ?.addEventListener('click', () => document.getElementById('btn-editing-quest')?.click());
 
-  _container.querySelectorAll('.sm-quest-action').forEach(btn => {
+  _container.querySelectorAll('.sm-quest-action').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const quest = SIGHT_QUESTS.find(q => q.id === btn.dataset.quest);
+      const quest = SIGHT_QUESTS.find((q) => q.id === btn.dataset.quest);
       if (!quest) return;
       if (btn.dataset.action === 'learn') {
         if (_onLearnQuest) _onLearnQuest(quest);
@@ -175,15 +180,15 @@ async function _renderBrowser() {
 
 function _startQuest(quest) {
   _activeQuest = quest;
-  _flipped   = [];
-  _matched   = new Set();
-  _busy      = false;
+  _flipped = [];
+  _matched = new Set();
+  _busy = false;
   _moveCount = 0;
 
   // Build 10 cards: each word appears twice (as 'A' and 'B' pair)
   const cards = [];
   quest.words.forEach((word, i) => {
-    cards.push({ word, pairId: i, cardId: i * 2     });
+    cards.push({ word, pairId: i, cardId: i * 2 });
     cards.push({ word, pairId: i, cardId: i * 2 + 1 });
   });
 
@@ -240,7 +245,7 @@ function _renderGame(quest, cards) {
   _container.innerHTML = html;
 
   // Bind card clicks
-  _container.querySelectorAll('.sm-card').forEach(card => {
+  _container.querySelectorAll('.sm-card').forEach((card) => {
     card.addEventListener('click', () => _onCardClick(card));
     card.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
@@ -253,8 +258,10 @@ function _renderGame(quest, cards) {
   // Graceful fallback: if a decorative card image fails to load (e.g. stale
   // cache or a deploy that's missing the asset), hide the broken <img> so the
   // card shows its gradient + number badge instead of a broken-image icon.
-  _container.querySelectorAll('.sm-card-mascot').forEach(img => {
-    const hide = () => { img.style.display = 'none'; };
+  _container.querySelectorAll('.sm-card-mascot').forEach((img) => {
+    const hide = () => {
+      img.style.display = 'none';
+    };
     img.addEventListener('error', hide);
     // Catch images that already errored before this listener was attached.
     if (img.complete && img.naturalWidth === 0) hide();
@@ -308,8 +315,8 @@ function _onCardClick(cardEl) {
   if (_busy) return;
 
   const idx = parseInt(cardEl.dataset.idx);
-  if (_matched.has(idx)) return;          // already matched
-  if (_flipped.includes(idx)) return;     // already face-up
+  if (_matched.has(idx)) return; // already matched
+  if (_flipped.includes(idx)) return; // already face-up
 
   // Flip this card
   cardEl.classList.add('sm-card--flipped');
@@ -345,7 +352,8 @@ function _onCardClick(cardEl) {
 
       const matchCount = _matched.size / 2;
       const progressEl = document.getElementById('sm-progress');
-      if (progressEl) progressEl.textContent = `Matches: ${matchCount} / ${_activeQuest.words.length}`;
+      if (progressEl)
+        progressEl.textContent = `Matches: ${matchCount} / ${_activeQuest.words.length}`;
 
       if (_matched.size === _activeQuest.words.length * 2) {
         _onQuestComplete();
@@ -384,7 +392,7 @@ function _onQuestComplete() {
       <p class="sm-complete-sub">You matched all ${_activeQuest.words.length} sight words</p>
       <p class="sm-complete-moves">in ${_moveCount} moves</p>
       <div class="sm-complete-words">
-        ${_activeQuest.words.map(w => `<span class="sm-word-chip">${w}</span>`).join('')}
+        ${_activeQuest.words.map((w) => `<span class="sm-word-chip">${w}</span>`).join('')}
       </div>
       <div class="sm-complete-actions">
         <button class="btn btn--primary" id="sm-btn-next-quest">Next Quest →</button>
@@ -396,7 +404,7 @@ function _onQuestComplete() {
   audio.playSfx('levelUp');
 
   document.getElementById('sm-btn-next-quest')?.addEventListener('click', () => {
-    const currentIdx = SIGHT_QUESTS.findIndex(q => q.id === _activeQuest.id);
+    const currentIdx = SIGHT_QUESTS.findIndex((q) => q.id === _activeQuest.id);
     const next = SIGHT_QUESTS[currentIdx + 1];
     if (next) {
       _startQuest(next);

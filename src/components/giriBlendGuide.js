@@ -74,7 +74,7 @@ export function moveGuideTo(phonemeRow, index, opts = {}) {
   // survives wrapping and the responsive tile sizes.
   const rowBox = phonemeRow.getBoundingClientRect();
   const tileBox = tile.getBoundingClientRect();
-  const x = (tileBox.left - rowBox.left) + (tileBox.width / 2);
+  const x = tileBox.left - rowBox.left + tileBox.width / 2;
 
   guide.style.transition = prefersReducedMotion() ? 'none' : '';
   guide.style.transform = `translateX(${x}px) translateX(-50%)`;

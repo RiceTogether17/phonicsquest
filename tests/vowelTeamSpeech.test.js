@@ -17,12 +17,18 @@ function stubAudioGlobals() {
   globalThis.speechSynthesis = {
     getVoices: () => [],
     addEventListener: () => {},
-    speak: (utt) => { queueMicrotask(() => utt.onend?.()); },
+    speak: (utt) => {
+      queueMicrotask(() => utt.onend?.());
+    },
     cancel: () => {},
     paused: false,
     resume: () => {},
   };
-  globalThis.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; } };
+  globalThis.SpeechSynthesisUtterance = class {
+    constructor(t) {
+      this.text = t;
+    }
+  };
 }
 
 describe('long-U vowel-team pronunciation (speakPhoneme)', () => {

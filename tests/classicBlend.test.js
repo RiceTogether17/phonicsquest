@@ -9,14 +9,38 @@ function stubAudioGlobals() {
     paused: false,
     resume: () => {},
   };
-  globalThis.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; } };
-  globalThis.AudioContext = globalThis.AudioContext || class {
-    constructor() { this.state = 'running'; }
-    createOscillator() { return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } }; }
-    createGain() { return { connect: vi.fn(), gain: { value: 1, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() } }; }
-    get destination() { return {}; }
-    resume() { return Promise.resolve(); }
+  globalThis.SpeechSynthesisUtterance = class {
+    constructor(t) {
+      this.text = t;
+    }
   };
+  globalThis.AudioContext =
+    globalThis.AudioContext ||
+    class {
+      constructor() {
+        this.state = 'running';
+      }
+      createOscillator() {
+        return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } };
+      }
+      createGain() {
+        return {
+          connect: vi.fn(),
+          gain: {
+            value: 1,
+            setValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+            linearRampToValueAtTime: vi.fn(),
+          },
+        };
+      }
+      get destination() {
+        return {};
+      }
+      resume() {
+        return Promise.resolve();
+      }
+    };
 }
 
 stubAudioGlobals();
@@ -32,9 +56,14 @@ const { setupClassicBlend, cleanup } = await import('../src/modes/classicBlend.j
  */
 
 const LIST = {
-  id: 'list', word: 'list',
-  graphemes: ['l', 'i', 'st'], types: ['c', 'sv', 'bl'],
-  pattern: 'CVCC', group: 'struct-cvcc', level: 2, emoji: '📋',
+  id: 'list',
+  word: 'list',
+  graphemes: ['l', 'i', 'st'],
+  types: ['c', 'sv', 'bl'],
+  pattern: 'CVCC',
+  group: 'struct-cvcc',
+  level: 2,
+  emoji: '📋',
 };
 
 describe('setupClassicBlend', () => {
@@ -55,16 +84,16 @@ describe('setupClassicBlend', () => {
 
   function makeEls() {
     return {
-      wordEmoji:       document.getElementById('word-emoji'),
-      wordDisplay:     document.getElementById('word-display'),
-      phonemeRow:      document.getElementById('phoneme-row'),
+      wordEmoji: document.getElementById('word-emoji'),
+      wordDisplay: document.getElementById('word-display'),
+      phonemeRow: document.getElementById('phoneme-row'),
       modeInstruction: document.getElementById('mode-instruction'),
-      modeArea:        document.getElementById('mode-area'),
-      btnCheck:        document.getElementById('btn-check'),
-      btnSayIt:        document.getElementById('btn-say-it'),
-      btnSkip:         document.getElementById('btn-skip'),
-      onResult:        vi.fn(),
-      onGroupChange:   vi.fn(),
+      modeArea: document.getElementById('mode-area'),
+      btnCheck: document.getElementById('btn-check'),
+      btnSayIt: document.getElementById('btn-say-it'),
+      btnSkip: document.getElementById('btn-skip'),
+      onResult: vi.fn(),
+      onGroupChange: vi.fn(),
     };
   }
 

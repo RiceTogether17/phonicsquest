@@ -11,15 +11,29 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 function stubAudioGlobals() {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
 }
 
 function setProfile({ schoolLevel = 'preschool', name = 'Testy' } = {}) {
   const id = 'p_di_test';
-  localStorage.setItem('phonicsquest_profiles', JSON.stringify([
-    { id, name, avatar: '🦊', color: '#6c63ff', schoolLevel, primaryGrade: null, readingBand: null },
-  ]));
+  localStorage.setItem(
+    'phonicsquest_profiles',
+    JSON.stringify([
+      {
+        id,
+        name,
+        avatar: '🦊',
+        color: '#6c63ff',
+        schoolLevel,
+        primaryGrade: null,
+        readingBand: null,
+      },
+    ]),
+  );
   localStorage.setItem('phonicsquest_active_profile', id);
   localStorage.setItem('phonicsquest_legacy_migrated_to_profiles', '1');
   return id;
@@ -98,7 +112,7 @@ describe('literacy domains', () => {
     store.set('groupMastery', { 'cvc-a': 0.8, 'cvc-e': 0.6 });
 
     const { getLiteracyDomains } = await import('../modules/dashboardInsights.js');
-    const phonics = getLiteracyDomains().find(d => d.id === 'phonics');
+    const phonics = getLiteracyDomains().find((d) => d.id === 'phonics');
     expect(typeof phonics.score).toBe('number');
     expect(phonics.score).toBeGreaterThan(0);
   });
@@ -136,7 +150,9 @@ describe('recent pattern insights', () => {
     const DAY = 86_400_000;
     const now = Date.now();
     const entry = (daysAgo, correct) => ({
-      word: 'cat', correct, timestamp: new Date(now - daysAgo * DAY).toISOString(),
+      word: 'cat',
+      correct,
+      timestamp: new Date(now - daysAgo * DAY).toISOString(),
     });
     store.set('wordHistory', [
       // Last week: strong (8/8). Needs >= 5 entries in each window.
@@ -156,7 +172,9 @@ describe('recent pattern insights', () => {
     const DAY = 86_400_000;
     const now = Date.now();
     const entry = (daysAgo, correct) => ({
-      word: 'cat', correct, timestamp: new Date(now - daysAgo * DAY).toISOString(),
+      word: 'cat',
+      correct,
+      timestamp: new Date(now - daysAgo * DAY).toISOString(),
     });
     store.set('wordHistory', [
       ...Array.from({ length: 8 }, () => entry(9, false)),
@@ -190,7 +208,10 @@ describe('recent pattern insights', () => {
   it('ignores history entries with no timestamp rather than throwing', async () => {
     setProfile();
     const { store } = await import('../modules/store.js');
-    store.set('wordHistory', [{ word: 'x', correct: true }, { word: 'y', correct: false }]);
+    store.set('wordHistory', [
+      { word: 'x', correct: true },
+      { word: 'y', correct: false },
+    ]);
 
     const { getRecentPatternInsights } = await import('../modules/dashboardInsights.js');
     expect(() => getRecentPatternInsights()).not.toThrow();
@@ -241,7 +262,7 @@ describe('stuck words', () => {
     store.set('wordStats', { [easy.id]: { attempts: 10, correct: 10 } });
 
     const { getStuckWords } = await import('../modules/dashboardInsights.js');
-    expect(getStuckWords().some(w => w.word === easy.word)).toBe(false);
+    expect(getStuckWords().some((w) => w.word === easy.word)).toBe(false);
   });
 
   it('ignores words with too few attempts to judge', async () => {

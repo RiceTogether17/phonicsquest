@@ -26,7 +26,11 @@ const FALLBACK_LINE = `${giriInline('neutral')}Giri is having a quiet moment —
  * @param {string} [opts.ariaLabel]
  * @returns {HTMLElement|null} the appended wrapper, or null when AI is unavailable
  */
-export function attachAskGiriButton(hostEl, fetchAnswer, { label = 'Ask Giri why ✨', ariaLabel = 'Ask Giri to explain this answer' } = {}) {
+export function attachAskGiriButton(
+  hostEl,
+  fetchAnswer,
+  { label = 'Ask Giri why ✨', ariaLabel = 'Ask Giri to explain this answer' } = {},
+) {
   if (!hostEl || typeof fetchAnswer !== 'function' || !canCallAi()) return null;
 
   const wrap = document.createElement('div');
@@ -39,22 +43,28 @@ export function attachAskGiriButton(hostEl, fetchAnswer, { label = 'Ask Giri why
   wrap.appendChild(btn);
   hostEl.appendChild(wrap);
 
-  btn.addEventListener('click', () => {
-    btn.disabled = true;
-    btn.replaceChildren(giriImageEl('thinking'), document.createTextNode('Giri is thinking…'));
-    Promise.resolve(fetchAnswer()).then(answer => {
-      if (!wrap.isConnected) return;
-      wrap.innerHTML = answer
-        ? `<p class="mcq-ask-giri-answer" role="status">${giriInline('neutral')}${escapeHtml(answer)}</p>`
-        : `<p class="mcq-ask-giri-answer" role="status">${FALLBACK_LINE}</p>`;
-      // Giri explains out loud as well as on screen. A child who needed the
-      // explanation is often the same child who finds a paragraph hard work.
-      if (answer) speakGiri(answer);
-    }).catch(() => {
-      if (!wrap.isConnected) return;
-      wrap.innerHTML = `<p class="mcq-ask-giri-answer" role="status">${FALLBACK_LINE}</p>`;
-    });
-  }, { once: true });
+  btn.addEventListener(
+    'click',
+    () => {
+      btn.disabled = true;
+      btn.replaceChildren(giriImageEl('thinking'), document.createTextNode('Giri is thinking…'));
+      Promise.resolve(fetchAnswer())
+        .then((answer) => {
+          if (!wrap.isConnected) return;
+          wrap.innerHTML = answer
+            ? `<p class="mcq-ask-giri-answer" role="status">${giriInline('neutral')}${escapeHtml(answer)}</p>`
+            : `<p class="mcq-ask-giri-answer" role="status">${FALLBACK_LINE}</p>`;
+          // Giri explains out loud as well as on screen. A child who needed the
+          // explanation is often the same child who finds a paragraph hard work.
+          if (answer) speakGiri(answer);
+        })
+        .catch(() => {
+          if (!wrap.isConnected) return;
+          wrap.innerHTML = `<p class="mcq-ask-giri-answer" role="status">${FALLBACK_LINE}</p>`;
+        });
+    },
+    { once: true },
+  );
 
   return wrap;
 }

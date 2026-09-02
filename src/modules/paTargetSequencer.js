@@ -41,7 +41,7 @@
 // target — so the sequencer hands the framework one word per round, just
 // to drive the alphabetical target advancement.
 const WORDS_PER_TARGET = { first: 3, last: 3, middle: 4, train: 1 };
-const RECENT_LOOKBACK   = 10;
+const RECENT_LOOKBACK = 10;
 
 /**
  * @typedef {object} PaSequencerState
@@ -68,8 +68,9 @@ export function paPositionForMode(mode) {
   // Sound Hunt and Odd One Out are first-sound games too: both should walk
   // the same alphabetical target ladder so every initial letter-sound gets
   // systematic coverage instead of adaptive bouncing.
-  if (mode === 'first' || mode === 'train' || mode === 'soundHunt' || mode === 'oddOneOut') return 'first';
-  if (mode === 'last')   return 'last';
+  if (mode === 'first' || mode === 'train' || mode === 'soundHunt' || mode === 'oddOneOut')
+    return 'first';
+  if (mode === 'last') return 'last';
   if (mode === 'middle') return 'middle';
   return null;
 }
@@ -86,10 +87,12 @@ export function paPositionForMode(mode) {
 function targetGraphemeOf(word, position) {
   const gs = word.graphemes;
   if (position === 'first') return gs[0];
-  if (position === 'last')  return gs[gs.length - 1];
+  if (position === 'last') return gs[gs.length - 1];
   // middle — prefer the leftmost vowel; if no type info, fall back to centre.
   if (Array.isArray(word.types)) {
-    const vowelIdx = word.types.findIndex(t => t === 'sv' || t === 'lv' || t === 'rc' || t === 'dp');
+    const vowelIdx = word.types.findIndex(
+      (t) => t === 'sv' || t === 'lv' || t === 'rc' || t === 'dp',
+    );
     if (vowelIdx >= 0) return gs[vowelIdx];
   }
   return gs[Math.floor((gs.length - 1) / 2)];
@@ -101,10 +104,12 @@ function targetGraphemeOf(word, position) {
  * single-grapheme sight words in a PA exercise).
  */
 function buildPool(wordList, group, maxLevel) {
-  return wordList.filter(w =>
-    (!group || w.group === group) &&
-    (typeof maxLevel !== 'number' || (w.level ?? 1) <= maxLevel) &&
-    Array.isArray(w.graphemes) && w.graphemes.length >= 2
+  return wordList.filter(
+    (w) =>
+      (!group || w.group === group) &&
+      (typeof maxLevel !== 'number' || (w.level ?? 1) <= maxLevel) &&
+      Array.isArray(w.graphemes) &&
+      w.graphemes.length >= 2,
   );
 }
 
@@ -143,7 +148,7 @@ export function nextPaWord(state, { mode, group, maxLevel, wordList }) {
   if (pool.length === 0) return null;
 
   if (!state.targets) {
-    const uniques = new Set(pool.map(w => targetGraphemeOf(w, position)));
+    const uniques = new Set(pool.map((w) => targetGraphemeOf(w, position)));
     state.targets = [...uniques].sort((a, b) => a.localeCompare(b));
     state.targetIdx = 0;
     state.wordsForTargetSeen = [];
@@ -160,7 +165,7 @@ export function nextPaWord(state, { mode, group, maxLevel, wordList }) {
     for (let step = 0; step < state.targets.length; step++) {
       const target = state.targets[state.targetIdx];
       const candidates = pool
-        .filter(w => targetGraphemeOf(w, position) === target)
+        .filter((w) => targetGraphemeOf(w, position) === target)
         .sort((a, b) => a.word.localeCompare(b.word));
 
       const capacity = Math.min(quota, candidates.length);
@@ -171,9 +176,8 @@ export function nextPaWord(state, { mode, group, maxLevel, wordList }) {
         continue;
       }
 
-      const fresh = candidates.find(w =>
-        !state.wordsForTargetSeen.includes(w.id) &&
-        (relax === 1 || !recent.includes(w.id))
+      const fresh = candidates.find(
+        (w) => !state.wordsForTargetSeen.includes(w.id) && (relax === 1 || !recent.includes(w.id)),
       );
       if (fresh) {
         state.wordsForTargetSeen.push(fresh.id);

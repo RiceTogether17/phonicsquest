@@ -16,7 +16,11 @@ globalThis.speechSynthesis = {
   paused: false,
   resume: () => {},
 };
-globalThis.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; } };
+globalThis.SpeechSynthesisUtterance = class {
+  constructor(t) {
+    this.text = t;
+  }
+};
 
 let speakableStem, buildReadAloudScript, contextualizeMcqQuestion;
 let GRAMMAR_MCQ_ITEMS, VOCAB_MCQ_ITEMS;
@@ -40,16 +44,23 @@ describe('questions are no longer wrapped in admin', () => {
   });
 
   it('classifies by the stem itself, not by a wrapper it was given', () => {
-    expect(contextualizeMcqQuestion('The dog ___ loudly.').questionType).toBe('sentence-completion');
-    expect(contextualizeMcqQuestion('Which word means happy?').questionType).toBe('question-response');
+    expect(contextualizeMcqQuestion('The dog ___ loudly.').questionType).toBe(
+      'sentence-completion',
+    );
+    expect(contextualizeMcqQuestion('Which word means happy?').questionType).toBe(
+      'question-response',
+    );
   });
 
   it('ships no question twice', () => {
     // The banks used to hold ~6 copies of every sentence, told apart only by
     // the wrapper. A repeat here means padding has crept back in.
-    for (const [label, bank] of [['grammar', GRAMMAR_MCQ_ITEMS], ['vocab', VOCAB_MCQ_ITEMS]]) {
+    for (const [label, bank] of [
+      ['grammar', GRAMMAR_MCQ_ITEMS],
+      ['vocab', VOCAB_MCQ_ITEMS],
+    ]) {
       for (const [level, items] of Object.entries(bank)) {
-        const stems = items.map(i => i.q.trim().toLowerCase());
+        const stems = items.map((i) => i.q.trim().toLowerCase());
         expect(new Set(stems).size, `${label}/${level}`).toBe(items.length);
       }
     }
@@ -81,13 +92,12 @@ describe('what Giri says when he reads a question', () => {
   it('reads the choices out too', () => {
     // A child listening rather than reading cannot scan the four buttons.
     const script = buildReadAloudScript('I drank ___ water.', ['much', 'many', 'any', 'some']);
-    expect(script).toEqual([
-      'I drank blank water.',
-      'Your choices are: much, many, any, some.',
-    ]);
+    expect(script).toEqual(['I drank blank water.', 'Your choices are: much, many, any, some.']);
   });
 
   it('reads a question with no choices without inventing a line', () => {
-    expect(buildReadAloudScript('Which word means happy?', [])).toEqual(['Which word means happy?']);
+    expect(buildReadAloudScript('Which word means happy?', [])).toEqual([
+      'Which word means happy?',
+    ]);
   });
 });

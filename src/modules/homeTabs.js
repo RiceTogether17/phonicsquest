@@ -26,8 +26,12 @@ const DEFAULT_TAB = 'today';
 
 const _todayISO = (now = new Date()) => localYmd(now);
 
-function _tabEl(tab) { return document.getElementById(`home-tab-${tab}`); }
-function _panelEl(tab) { return document.getElementById(`home-panel-${tab}`); }
+function _tabEl(tab) {
+  return document.getElementById(`home-tab-${tab}`);
+}
+function _panelEl(tab) {
+  return document.getElementById(`home-panel-${tab}`);
+}
 
 /**
  * Which tab to show right now: a new day resets to Today; otherwise the
@@ -75,7 +79,7 @@ export function selectTab(tab, { persist = true, focus = false } = {}) {
 
 /** Currently selected tab (from the DOM, not the store). */
 export function getActiveTab() {
-  return HOME_TABS.find(t => _tabEl(t)?.getAttribute('aria-selected') === 'true') || DEFAULT_TAB;
+  return HOME_TABS.find((t) => _tabEl(t)?.getAttribute('aria-selected') === 'true') || DEFAULT_TAB;
 }
 
 /**
@@ -100,7 +104,8 @@ export function initHomeTabs({ onChange } = {}) {
     const idx = HOME_TABS.indexOf(getActiveTab());
     let next = null;
     if (ev.key === 'ArrowRight') next = HOME_TABS[(idx + 1) % HOME_TABS.length];
-    else if (ev.key === 'ArrowLeft') next = HOME_TABS[(idx - 1 + HOME_TABS.length) % HOME_TABS.length];
+    else if (ev.key === 'ArrowLeft')
+      next = HOME_TABS[(idx - 1 + HOME_TABS.length) % HOME_TABS.length];
     else if (ev.key === 'Home') next = HOME_TABS[0];
     else if (ev.key === 'End') next = HOME_TABS[HOME_TABS.length - 1];
     if (next) {

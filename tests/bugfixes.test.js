@@ -12,9 +12,15 @@ const localStorageMock = (() => {
   let store = {};
   return {
     getItem: vi.fn((key) => store[key] ?? null),
-    setItem: vi.fn((key, val) => { store[key] = String(val); }),
-    removeItem: vi.fn((key) => { delete store[key]; }),
-    clear: vi.fn(() => { store = {}; }),
+    setItem: vi.fn((key, val) => {
+      store[key] = String(val);
+    }),
+    removeItem: vi.fn((key) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
   };
 })();
 Object.defineProperty(globalThis, 'localStorage', { value: localStorageMock });
@@ -37,8 +43,8 @@ describe('Streak logic (gamification._checkStreak)', () => {
     localStorageMock.setItem.mockClear();
     vi.resetModules();
     const storeMod = await import('../src/modules/store.js');
-    const gamMod   = await import('../src/modules/gamification.js');
-    store        = storeMod.store;
+    const gamMod = await import('../src/modules/gamification.js');
+    store = storeMod.store;
     gamification = gamMod.gamification;
   });
 
@@ -69,7 +75,7 @@ describe('Streak logic (gamification._checkStreak)', () => {
     store.set('lastPlayDate', daysAgo(2)); // 2 days ago = 1 skipped
     store.set('streakFreezes', 1);
     gamification._checkStreak();
-    expect(store.get('streak')).toBe(5);       // preserved
+    expect(store.get('streak')).toBe(5); // preserved
     expect(store.get('streakFreezes')).toBe(0); // token consumed
     expect(gamification.wasFreezeUsed()).toBe(true);
   });
@@ -79,7 +85,7 @@ describe('Streak logic (gamification._checkStreak)', () => {
     store.set('lastPlayDate', daysAgo(4)); // 4 days ago = 3 skipped
     store.set('streakFreezes', 1);
     gamification._checkStreak();
-    expect(store.get('streak')).toBe(0);       // reset
+    expect(store.get('streak')).toBe(0); // reset
     expect(store.get('streakFreezes')).toBe(1); // token NOT consumed
   });
 
@@ -137,8 +143,8 @@ describe('gamification.awardXp() centralized pipeline', () => {
     localStorageMock.clear();
     vi.resetModules();
     const storeMod = await import('../src/modules/store.js');
-    const gamMod   = await import('../src/modules/gamification.js');
-    store        = storeMod.store;
+    const gamMod = await import('../src/modules/gamification.js');
+    store = storeMod.store;
     gamification = gamMod.gamification;
   });
 
@@ -204,7 +210,7 @@ describe('Store debounced persistence', () => {
     const callsBefore = mainKeyWrites().length;
 
     // Wait for microtask to flush
-    await new Promise(resolve => queueMicrotask(resolve));
+    await new Promise((resolve) => queueMicrotask(resolve));
 
     const callsAfter = mainKeyWrites().length;
     // Should have batched into 1 write (or at most a few — not 3 separate ones)
@@ -215,7 +221,7 @@ describe('Store debounced persistence', () => {
     localStorageMock.setItem.mockClear();
     store.patch({ xp: 99, level: 5, streak: 10 });
 
-    await new Promise(resolve => queueMicrotask(resolve));
+    await new Promise((resolve) => queueMicrotask(resolve));
 
     // patch + debounce = 1 write to the main key
     expect(mainKeyWrites().length).toBe(1);
@@ -225,7 +231,7 @@ describe('Store debounced persistence', () => {
     store.set('xp', 42);
     store.set('streak', 7);
 
-    await new Promise(resolve => queueMicrotask(resolve));
+    await new Promise((resolve) => queueMicrotask(resolve));
 
     // Verify the persisted data has both values
     const lastCall = mainKeyWrites().at(-1);

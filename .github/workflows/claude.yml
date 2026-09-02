@@ -37,4 +37,4 @@ jobs:
           direct_prompt: |
             ${{ github.event_name == 'pull_request' && 'Review this pull request. Check for code quality, bugs, security, and performance. Be constructive.' || '' }}
             ${{ github.event_name == 'issues' && 'Analyze this issue. Provide an assessment, suggest an approach, and ask clarifying questions if needed.' || '' }}
-          claude_args: "--max-turns 10"
+          claude_args: '--max-turns 10'

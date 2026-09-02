@@ -9,7 +9,9 @@ describe('questMastery cross-quest recommendations', () => {
       sentenceForge: { connector_clue: 0.75 },
       clozeCastle: { conditionals: 0.7, relativeClauses: 0.9 },
       wordVault: { connectorClue: 0.2, synonymContrast: 0.8 },
-      stories: {}, editingQuest: {}, writingQuest: {},
+      stories: {},
+      editingQuest: {},
+      writingQuest: {},
     });
   });
 
@@ -19,7 +21,10 @@ describe('questMastery cross-quest recommendations', () => {
   });
 
   it('recommends the globally weakest skill alias', () => {
-    const rec = questMastery.getRecommendedSkill('clozeCastle', ['conditionals', 'relativeClauses']);
+    const rec = questMastery.getRecommendedSkill('clozeCastle', [
+      'conditionals',
+      'relativeClauses',
+    ]);
     expect(rec).toBe('conditionals');
   });
 });

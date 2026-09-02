@@ -12,7 +12,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 function stubAudioGlobals() {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
 }
 
@@ -96,7 +99,7 @@ describe('game modes', () => {
     // Skip the targets with their own branch above (blend opens a picker,
     // classicBlend resumes a group) so this covers the generic path.
     const special = new Set(['blend', 'classicBlend']);
-    const plainModes = Object.keys(MODES).filter(m => !special.has(m));
+    const plainModes = Object.keys(MODES).filter((m) => !special.has(m));
     expect(plainModes.length).toBeGreaterThan(0);
 
     for (const mode of plainModes.slice(0, 5)) {
@@ -164,8 +167,18 @@ describe('coverage of targets the app actually emits', () => {
   it('handles the journey warm-up targets from todaysPlan', async () => {
     const known = new Set(router.knownTargets());
     // These are the literal targets in JOURNEY_WARMUPS (modules/todaysPlan.js).
-    for (const target of ['first', 'last', 'oddOneOut', 'syllable', 'middle',
-      'soundHunt', 'hear', 'sight-words', 'stories', 'blend']) {
+    for (const target of [
+      'first',
+      'last',
+      'oddOneOut',
+      'syllable',
+      'middle',
+      'soundHunt',
+      'hear',
+      'sight-words',
+      'stories',
+      'blend',
+    ]) {
       expect(known.has(target), `warm-up target "${target}" unroutable`).toBe(true);
     }
   });
@@ -173,8 +186,15 @@ describe('coverage of targets the app actually emits', () => {
   it('handles the remediation-chain targets', () => {
     const known = new Set(router.knownTargets());
     // From GRAMMAR_CHAIN / VOCAB_CHAIN in modules/remediationRouter.js.
-    for (const target of ['grammar-mcq', 'cloze-castle', 'sentence-forge',
-      'editing-quest', 'vocab-mcq', 'word-vault', 'writing-quest']) {
+    for (const target of [
+      'grammar-mcq',
+      'cloze-castle',
+      'sentence-forge',
+      'editing-quest',
+      'vocab-mcq',
+      'word-vault',
+      'writing-quest',
+    ]) {
       expect(known.has(target), `remediation target "${target}" unroutable`).toBe(true);
     }
   });

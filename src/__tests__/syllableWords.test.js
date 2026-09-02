@@ -16,7 +16,7 @@ describe('SYLLABLE_WORDS pool', () => {
   });
 
   it('ids are unique', () => {
-    const ids = SYLLABLE_WORDS.map(w => w.id);
+    const ids = SYLLABLE_WORDS.map((w) => w.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
@@ -28,15 +28,15 @@ describe('SYLLABLE_WORDS pool', () => {
   });
 
   it('spans the full 1–4 syllable range', () => {
-    const counts = new Set(SYLLABLE_WORDS.map(w => w.syllables));
+    const counts = new Set(SYLLABLE_WORDS.map((w) => w.syllables));
     expect(counts).toEqual(new Set([1, 2, 3, 4]));
   });
 
   it('getSyllableCount / getSyllableBreakdown resolve from the explicit override', () => {
-    const donkey = SYLLABLE_WORDS.find(w => w.id === 'syl-donkey');
+    const donkey = SYLLABLE_WORDS.find((w) => w.id === 'syl-donkey');
     expect(getSyllableCount(donkey)).toBe(2);
     expect(getSyllableBreakdown(donkey)).toBe('don-key');
-    const cat = SYLLABLE_WORDS.find(w => w.id === 'syl-cat');
+    const cat = SYLLABLE_WORDS.find((w) => w.id === 'syl-cat');
     expect(getSyllableCount(cat)).toBe(1);
   });
 });
@@ -49,13 +49,13 @@ describe('pickSyllableWord', () => {
 
   it('avoids recently-seen ids when fresh words remain', () => {
     // Mark all but one word as recent — the one fresh word must be returned.
-    const recent = SYLLABLE_WORDS.slice(1).map(w => w.id);
+    const recent = SYLLABLE_WORDS.slice(1).map((w) => w.id);
     const w = pickSyllableWord(recent);
     expect(w.id).toBe(SYLLABLE_WORDS[0].id);
   });
 
   it('falls back to the full pool when everything is recent', () => {
-    const recent = SYLLABLE_WORDS.map(w => w.id);
+    const recent = SYLLABLE_WORDS.map((w) => w.id);
     const w = pickSyllableWord(recent);
     expect(SYLLABLE_WORDS).toContain(w);
   });

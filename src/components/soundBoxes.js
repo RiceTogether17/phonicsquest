@@ -93,15 +93,20 @@ export function renderSoundBoxes(word, host, opts = {}) {
     const isFilled = filled.has(i);
     const box = document.createElement('div');
 
-    const state = correct.has(i) ? 'correct'
-      : retry.has(i) ? 'retry'
-      : isFilled ? 'filled'
-      : i === activeIndex ? 'active'
-      : 'empty';
+    const state = correct.has(i)
+      ? 'correct'
+      : retry.has(i)
+        ? 'retry'
+        : isFilled
+          ? 'filled'
+          : i === activeIndex
+            ? 'active'
+            : 'empty';
 
     const isTarget = i === targetIndex;
-    box.className = `sound-box sound-box--${state} sound-box--${typeClass}`
-      + (isTarget ? ' sound-box--target' : '');
+    box.className =
+      `sound-box sound-box--${state} sound-box--${typeClass}` +
+      (isTarget ? ' sound-box--target' : '');
     box.dataset.index = String(i);
     box.dataset.state = state;
     if (isTarget) box.dataset.target = 'true';
@@ -146,12 +151,7 @@ export function soundCount(word) {
  */
 export function updateSoundBoxes(host, opts = {}) {
   if (!host) return;
-  const {
-    filledIndices = [],
-    activeIndex = null,
-    correctIndices = [],
-    retryIndices = [],
-  } = opts;
+  const { filledIndices = [], activeIndex = null, correctIndices = [], retryIndices = [] } = opts;
 
   const filled = new Set(filledIndices);
   const correct = new Set(correctIndices);
@@ -159,14 +159,21 @@ export function updateSoundBoxes(host, opts = {}) {
   const boxes = host.querySelectorAll('.sound-box');
 
   boxes.forEach((box, i) => {
-    const state = correct.has(i) ? 'correct'
-      : retry.has(i) ? 'retry'
-      : filled.has(i) ? 'filled'
-      : i === activeIndex ? 'active'
-      : 'empty';
+    const state = correct.has(i)
+      ? 'correct'
+      : retry.has(i)
+        ? 'retry'
+        : filled.has(i)
+          ? 'filled'
+          : i === activeIndex
+            ? 'active'
+            : 'empty';
 
     // Swap only the state class, preserving the type colour class.
-    box.className = box.className.replace(/sound-box--(empty|active|filled|correct|retry)/, `sound-box--${state}`);
+    box.className = box.className.replace(
+      /sound-box--(empty|active|filled|correct|retry)/,
+      `sound-box--${state}`,
+    );
     box.dataset.state = state;
 
     const mark = box.querySelector('.sound-box__mark');
@@ -243,9 +250,10 @@ function _boxLabel(i, count, state, typeName, grapheme, showGraphemes, isTarget 
   // The ringed box is what the round asked about, so say so first.
   const prefix = isTarget ? `${position}, this round's sound` : position;
   if (state === 'correct') return `${prefix}: ${showGraphemes ? `${grapheme}, ` : ''}correct`;
-  if (state === 'retry')   return `${prefix}: try again`;
-  if (state === 'filled')  return `${prefix}: ${showGraphemes ? `${grapheme}, ` : ''}filled, ${typeName}`;
-  if (state === 'active')  return `${prefix}: current, empty`;
+  if (state === 'retry') return `${prefix}: try again`;
+  if (state === 'filled')
+    return `${prefix}: ${showGraphemes ? `${grapheme}, ` : ''}filled, ${typeName}`;
+  if (state === 'active') return `${prefix}: current, empty`;
   return `${prefix}: empty`;
 }
 

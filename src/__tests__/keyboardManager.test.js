@@ -52,18 +52,18 @@ describe('keyboardManager', () => {
     screen = 'screen-home';
 
     els = {
-      btnSayIt : makeBtn('btn-say-it'),
-      btnHint  : makeBtn('btn-hint'),
-      btnBack  : makeBtn('btn-back'),
-      btnNext  : makeBtn('btn-next'),
+      btnSayIt: makeBtn('btn-say-it'),
+      btnHint: makeBtn('btn-hint'),
+      btnBack: makeBtn('btn-back'),
+      btnNext: makeBtn('btn-next'),
     };
 
     makeBtn('btn-reveal-next');
 
     keyboardManager.init({
-      getScreen   : () => screen,
+      getScreen: () => screen,
       els,
-      onHome      : vi.fn(),
+      onHome: vi.fn(),
       modalManager: modalStub(false),
     });
   });
@@ -149,9 +149,9 @@ describe('keyboardManager', () => {
 
     // Re-init with modal open.
     keyboardManager.init({
-      getScreen   : () => screen,
+      getScreen: () => screen,
       els,
-      onHome      : vi.fn(),
+      onHome: vi.fn(),
       modalManager: modalStub(true),
     });
 
@@ -191,7 +191,7 @@ describe('keyboardManager', () => {
   it('does not trigger any shortcut on screen-home', () => {
     screen = 'screen-home';
     const revealSpy = vi.fn();
-    const nextSpy   = vi.fn();
+    const nextSpy = vi.fn();
     document.getElementById('btn-reveal-next').addEventListener('click', revealSpy);
     els.btnNext.addEventListener('click', nextSpy);
 

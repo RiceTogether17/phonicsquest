@@ -21,24 +21,24 @@ const STORAGE_KEY = 'dailyMission';
 
 /** Quest key → home-screen navigation target used by app._navigateTo. */
 const QUEST_TO_TARGET = Object.freeze({
-  clozeCastle:   'cloze-castle',
-  wordVault:     'word-vault',
-  grammarMcq:    'grammar-mcq',
-  vocabMcq:      'vocab-mcq',
-  editingQuest:  'editing-quest',
+  clozeCastle: 'cloze-castle',
+  wordVault: 'word-vault',
+  grammarMcq: 'grammar-mcq',
+  vocabMcq: 'vocab-mcq',
+  editingQuest: 'editing-quest',
   sentenceForge: 'sentence-forge',
-  writingQuest:  'writing-quest',
+  writingQuest: 'writing-quest',
 });
 
 /** Quest key → human-readable module name. */
 const QUEST_TO_LABEL = Object.freeze({
-  clozeCastle:   'Cloze Castle',
-  wordVault:     'Word Vault',
-  grammarMcq:    'Grammar MCQ',
-  vocabMcq:      'Vocabulary MCQ',
-  editingQuest:  'Editing Quest',
+  clozeCastle: 'Cloze Castle',
+  wordVault: 'Word Vault',
+  grammarMcq: 'Grammar MCQ',
+  vocabMcq: 'Vocabulary MCQ',
+  editingQuest: 'Editing Quest',
   sentenceForge: 'Sentence Forge',
-  writingQuest:  'Writing Quest',
+  writingQuest: 'Writing Quest',
 });
 
 /** Five steps that compose a single 10-minute English mission. */
@@ -96,7 +96,9 @@ const MISSION_TEMPLATE = Object.freeze([
   },
 ]);
 
-function pad2(n) { return String(n).padStart(2, '0'); }
+function pad2(n) {
+  return String(n).padStart(2, '0');
+}
 
 function ymd(date) {
   return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
@@ -119,19 +121,21 @@ function pickYesterdayMistake(questAttempts, now) {
   if (!Array.isArray(questAttempts) || questAttempts.length === 0) return null;
   const yesterday = ymd(addDays(now, -1));
   const wrongYesterday = questAttempts.find(
-    a => a && a.correct === false && dayOf(a.timestamp) === yesterday && QUEST_TO_TARGET[a.quest]
+    (a) => a && a.correct === false && dayOf(a.timestamp) === yesterday && QUEST_TO_TARGET[a.quest],
   );
   if (wrongYesterday) return wrongYesterday;
 
   // Fall back: most recent wrong attempt in the past 7 days that maps to a
   // module we can navigate to.
   const cutoff = addDays(now, -7);
-  return questAttempts.find(a => {
-    if (!a || a.correct !== false) return false;
-    if (!QUEST_TO_TARGET[a.quest]) return false;
-    const t = a.timestamp ? new Date(a.timestamp) : null;
-    return t && !Number.isNaN(t.getTime()) && t >= cutoff;
-  }) || null;
+  return (
+    questAttempts.find((a) => {
+      if (!a || a.correct !== false) return false;
+      if (!QUEST_TO_TARGET[a.quest]) return false;
+      const t = a.timestamp ? new Date(a.timestamp) : null;
+      return t && !Number.isNaN(t.getTime()) && t >= cutoff;
+    }) || null
+  );
 }
 
 function loadOrCreateState(now) {
@@ -173,9 +177,9 @@ export function getMissionSteps(now = new Date()) {
   const state = loadOrCreateState(now);
   const today = state.date;
   const questAttempts = store.get('questAttempts') || [];
-  const todayAttempts = questAttempts.filter(a => a && dayOf(a.timestamp) === today);
+  const todayAttempts = questAttempts.filter((a) => a && dayOf(a.timestamp) === today);
 
-  return MISSION_TEMPLATE.map(step => {
+  return MISSION_TEMPLATE.map((step) => {
     const enriched = { ...step };
 
     if (step.id === 'yesterday-review') {
@@ -196,7 +200,7 @@ export function getMissionSteps(now = new Date()) {
 
     let count = 0;
     if (enriched.quest && !enriched.manual) {
-      count = todayAttempts.filter(a => {
+      count = todayAttempts.filter((a) => {
         if (a.quest !== enriched.quest) return false;
         if (enriched.replaySkill) return a.skill === enriched.replaySkill;
         return true;
@@ -227,7 +231,7 @@ export function markMissionStepDone(stepId, now = new Date()) {
  */
 export function getMissionSummary(now = new Date()) {
   const steps = getMissionSteps(now);
-  const done = steps.filter(s => s.done).length;
+  const done = steps.filter((s) => s.done).length;
   return {
     steps,
     done,

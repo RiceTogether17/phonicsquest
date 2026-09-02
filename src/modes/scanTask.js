@@ -40,7 +40,12 @@ function _shuffle(list, randomFn) {
  *
  * Each option carries `{ value, label, isCorrect }`.
  */
-export function buildScanTask({ blankIndex = 0, meta = {}, distractorCount = 3, randomFn = Math.random } = {}) {
+export function buildScanTask({
+  blankIndex = 0,
+  meta = {},
+  distractorCount = 3,
+  randomFn = Math.random,
+} = {}) {
   const expected = _resolveExpectedClueType(meta);
   if (!expected) return null;
 
@@ -132,7 +137,10 @@ function _buildHighlightedSentence(sentence) {
  * fires onContinue when they tap "Got it".
  */
 export function renderScanAttention({ host, attention, onContinue, onSkip, allowSkip = true }) {
-  if (!host || !attention) { onContinue?.(); return; }
+  if (!host || !attention) {
+    onContinue?.();
+    return;
+  }
 
   const sentenceHtml = _buildHighlightedSentence(attention.blankSentence);
 
@@ -178,7 +186,9 @@ export function renderScanTask({ host, task, onAnswer, onSkip, allowSkip = true 
   overlay.setAttribute('aria-modal', 'true');
   overlay.setAttribute('aria-label', 'Scan task');
 
-  const optionButtons = task.options.map((opt, idx) => `
+  const optionButtons = task.options
+    .map(
+      (opt, idx) => `
     <button class="btn btn--ghost scan-task-option"
             data-value="${escapeHtml(opt.value)}"
             data-correct="${opt.isCorrect ? '1' : '0'}"
@@ -186,7 +196,9 @@ export function renderScanTask({ host, task, onAnswer, onSkip, allowSkip = true 
       <span class="scan-task-option-letter">${String.fromCharCode(65 + idx)}.</span>
       <span class="scan-task-option-label">${escapeHtml(opt.label)}</span>
     </button>
-  `).join('');
+  `,
+    )
+    .join('');
 
   overlay.innerHTML = `
     <div class="scan-task-card">

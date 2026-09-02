@@ -35,10 +35,14 @@ let _previewTimers = [];
  * cleanup() and the round controller calls it on the child's first tap.
  */
 export function cancelChoicePreviews() {
-  _previewTimers.forEach(id => clearTimeout(id));
+  _previewTimers.forEach((id) => clearTimeout(id));
   _previewTimers = [];
   if (typeof window !== 'undefined' && window.speechSynthesis) {
-    try { window.speechSynthesis.cancel(); } catch (_) { /* non-fatal */ }
+    try {
+      window.speechSynthesis.cancel();
+    } catch (_) {
+      /* non-fatal */
+    }
   }
 }
 
@@ -67,10 +71,10 @@ export function cancelChoicePreviews() {
 export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
   const {
     onChoose,
-    autoPlay        = true,
-    autoPlayDelay   = 400,
-    autoPlayStride  = 650,
-    autoPlayAfter   = null,
+    autoPlay = true,
+    autoPlayDelay = 400,
+    autoPlayStride = 650,
+    autoPlayAfter = null,
   } = opts;
 
   // A new grid supersedes any previews still queued from the previous round.
@@ -79,10 +83,10 @@ export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
   container.innerHTML = '<div class="choice-grid choice-grid--phoneme"></div>';
   const grid = container.querySelector('.choice-grid');
 
-  const buttons = choices.map(choice => {
+  const buttons = choices.map((choice) => {
     const btn = document.createElement('button');
     btn.className = 'choice-btn choice-btn--phoneme';
-    btn.dataset.correct  = String(!!choice.correct);
+    btn.dataset.correct = String(!!choice.correct);
     btn.dataset.grapheme = choice.grapheme;
     btn.setAttribute(
       'aria-label',
@@ -148,18 +152,27 @@ export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
  */
 function _previewChoicesInOrder(buttons, choices, initialDelay, stride) {
   buttons.forEach((btn, i) => {
-    const timerId = setTimeout(async () => {
-      _previewTimers = _previewTimers.filter(id => id !== timerId);
-      if (btn.disabled) return;
-      if (i === 0 && typeof window !== 'undefined' && window.speechSynthesis) {
-        try { window.speechSynthesis.cancel(); } catch (_) { /* non-fatal */ }
-      }
-      btn.classList.add('previewing');
-      try {
-        await audio.speakPhoneme(choices[i].grapheme, choices[i].type);
-      } catch (_) { /* audio failures are non-fatal */ }
-      btn.classList.remove('previewing');
-    }, initialDelay + i * stride);
+    const timerId = setTimeout(
+      async () => {
+        _previewTimers = _previewTimers.filter((id) => id !== timerId);
+        if (btn.disabled) return;
+        if (i === 0 && typeof window !== 'undefined' && window.speechSynthesis) {
+          try {
+            window.speechSynthesis.cancel();
+          } catch (_) {
+            /* non-fatal */
+          }
+        }
+        btn.classList.add('previewing');
+        try {
+          await audio.speakPhoneme(choices[i].grapheme, choices[i].type);
+        } catch (_) {
+          /* audio failures are non-fatal */
+        }
+        btn.classList.remove('previewing');
+      },
+      initialDelay + i * stride,
+    );
     _previewTimers.push(timerId);
   });
 }

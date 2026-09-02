@@ -130,7 +130,11 @@ import { modalManager } from './modules/modalManager.js';
 import { keyboardManager } from './modules/keyboardManager.js';
 import { settingsController } from './modules/settingsController.js';
 import { getQuestUnlockStatus } from './modules/questUnlocks.js';
-import { showPlacementTest } from './modules/placementTest.js';
+// The placement diagnostic runs once, for a brand-new profile, and carries
+// ~76 kB of its own item bank. Statically imported it sat in the startup
+// chunk for every returning child who will never see it again — so it loads
+// on demand, like the Quick Check it sits beside.
+const placementTestMod = lazyModule(() => import('./modules/placementTest.js'));
 const quickCheckMod = lazyModule(() => import('./modules/primaryQuickCheck.js'));
 import {
   getReadingBand,
@@ -2574,9 +2578,18 @@ class App {
    * Renders into #screen-placement and calls _afterPlacement when done.
    * @param {object} profile
    */
-  _runPlacementTest(profile) {
+  async _runPlacementTest(profile) {
     const container = document.getElementById('screen-placement');
     if (!container) {
+      this._afterPlacement(profile, null);
+      return;
+    }
+    let showPlacementTest;
+    try {
+      ({ showPlacementTest } = await placementTestMod.load());
+    } catch {
+      // The diagnostic is a nicety; being unable to fetch its chunk must
+      // never leave a new child stranded on a blank placement screen.
       this._afterPlacement(profile, null);
       return;
     }

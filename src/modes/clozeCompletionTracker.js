@@ -1,4 +1,10 @@
-export function getUniqueClozeDone({ level, category, ccqCompletedByPassage, ccqCompleted, ccqCatCompleted }) {
+export function getUniqueClozeDone({
+  level,
+  category,
+  ccqCompletedByPassage,
+  ccqCompleted,
+  ccqCatCompleted,
+}) {
   const byLevel = ccqCompletedByPassage?.[level] || {};
   const categoryMap = byLevel?.[category] || {};
   const unique = Object.keys(categoryMap).length;
@@ -10,7 +16,16 @@ export function getUniqueClozeDone({ level, category, ccqCompletedByPassage, ccq
   return Number(ccqCompleted?.[level] || 0);
 }
 
-export function recordClozeCompletion({ level, category, passageId, accuracy = 100, now = Date.now(), ccqCompletedByPassage = {}, ccqCompleted = {}, ccqCatCompleted = {} }) {
+export function recordClozeCompletion({
+  level,
+  category,
+  passageId,
+  accuracy = 100,
+  now = Date.now(),
+  ccqCompletedByPassage = {},
+  ccqCompleted = {},
+  ccqCatCompleted = {},
+}) {
   const nextByPassage = structuredClone(ccqCompletedByPassage || {});
   if (!nextByPassage[level]) nextByPassage[level] = {};
   if (!nextByPassage[level][category]) nextByPassage[level][category] = {};
@@ -46,7 +61,16 @@ export function getUniqueWordVaultDone({ category, level, wvqCompletedByPassage,
   return 0;
 }
 
-export function recordWordVaultCompletion({ category, level, passageId, stars = 1, accuracy = 100, now = Date.now(), wvqCompletedByPassage = {}, wvqCompleted = {} }) {
+export function recordWordVaultCompletion({
+  category,
+  level,
+  passageId,
+  stars = 1,
+  accuracy = 100,
+  now = Date.now(),
+  wvqCompletedByPassage = {},
+  wvqCompleted = {},
+}) {
   const nextByPassage = structuredClone(wvqCompletedByPassage || {});
   if (!nextByPassage[category]) nextByPassage[category] = {};
   if (!nextByPassage[category][level]) nextByPassage[category][level] = {};
@@ -67,7 +91,6 @@ export function recordWordVaultCompletion({ category, level, passageId, stars = 
   return { nextByPassage, nextCompleted };
 }
 
-
 function _upsertWeakSkillBucket(current, level, skill, wasWrong, now) {
   const next = structuredClone(current || {});
   if (!next[level]) next[level] = {};
@@ -80,7 +103,14 @@ function _upsertWeakSkillBucket(current, level, skill, wasWrong, now) {
   return next;
 }
 
-export function recordWeakSkills({ storageKey, level, skills = [], wrongSkillSet = new Set(), now = Date.now(), current = {} }) {
+export function recordWeakSkills({
+  storageKey,
+  level,
+  skills = [],
+  wrongSkillSet = new Set(),
+  now = Date.now(),
+  current = {},
+}) {
   let next = structuredClone(current || {});
   skills.forEach((skill) => {
     next = _upsertWeakSkillBucket(next, level, skill, wrongSkillSet.has(skill), now);
@@ -91,7 +121,14 @@ export function recordWeakSkills({ storageKey, level, skills = [], wrongSkillSet
 export function getTopWeakSkills({ level, weakSkillsMap = {}, limit = 3 }) {
   const entries = Object.entries(weakSkillsMap?.[level] || {});
   return entries
-    .map(([skill, stats]) => ({ skill, attempts: Number(stats.attempts || 0), wrong: Number(stats.wrong || 0) }))
-    .sort((a, b) => ((b.wrong / Math.max(1, b.attempts)) - (a.wrong / Math.max(1, a.attempts))) || (b.wrong - a.wrong))
+    .map(([skill, stats]) => ({
+      skill,
+      attempts: Number(stats.attempts || 0),
+      wrong: Number(stats.wrong || 0),
+    }))
+    .sort(
+      (a, b) =>
+        b.wrong / Math.max(1, b.attempts) - a.wrong / Math.max(1, a.attempts) || b.wrong - a.wrong,
+    )
     .slice(0, limit);
 }

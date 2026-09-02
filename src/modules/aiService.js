@@ -41,7 +41,10 @@ export function hasApiKey() {
  * @param {AbortSignal} [opts.signal]  cancel when the child leaves the screen
  * @returns {Promise<string|null>}
  */
-export async function callAi(prompt, { maxTokens = 1024, temperature = 0.3, system = '', signal } = {}) {
+export async function callAi(
+  prompt,
+  { maxTokens = 1024, temperature = 0.3, system = '', signal } = {},
+) {
   const providerId = activeProviderId();
   const provider = getProvider(providerId);
   if (!provider) return null;
@@ -96,7 +99,14 @@ export const callGemini = callAi;
  * @param {string|number} [params.level]  P1–P6 level for pitch
  * @returns {Promise<string|null>}
  */
-export async function explainMistake({ question, options, chosen, correct, authoredExplanation = '', level = '' }) {
+export async function explainMistake({
+  question,
+  options,
+  chosen,
+  correct,
+  authoredExplanation = '',
+  level = '',
+}) {
   const { askGiriConstrained } = await import('./aiGuardrails.js');
   const wasRight = chosen === correct;
   const prompt = `A ${level ? `${level} ` : ''}student answered a multiple-choice English question.
@@ -106,9 +116,11 @@ Choices: ${options.join(' / ')}
 Student chose: "${chosen}" — ${wasRight ? 'CORRECT' : `wrong (correct answer: "${correct}")`}
 ${authoredExplanation ? `The app already told them: "${authoredExplanation}"` : ''}
 
-${wasRight
+${
+  wasRight
     ? 'In 1–2 short sentences, reinforce WHY their answer is right so the idea transfers to the next question.'
-    : 'In 2–3 short sentences, explain the thinking mistake that leads to their choice, then how to spot the right answer next time. Be kind — mistakes are how we learn.'}`;
+    : 'In 2–3 short sentences, explain the thinking mistake that leads to their choice, then how to spot the right answer next time. Be kind — mistakes are how we learn.'
+}`;
 
   return askGiriConstrained('explain', prompt, {
     maxTokens: 160,
@@ -128,7 +140,13 @@ ${wasRight
  * @param {string|number} [params.level]
  * @returns {Promise<string|null>}
  */
-export async function getAdaptiveHint({ question, options, correct, categoryLabel = '', level = '' }) {
+export async function getAdaptiveHint({
+  question,
+  options,
+  correct,
+  categoryLabel = '',
+  level = '',
+}) {
   const { askGiriConstrained } = await import('./aiGuardrails.js');
   const prompt = `A ${level ? `${level} ` : ''}student is stuck on this English question${categoryLabel ? ` about ${categoryLabel}` : ''}:
 
@@ -157,7 +175,13 @@ Give ONE short hint (max 25 words) that points at the clue in the sentence or th
  * @param {string|number} [params.level]
  * @returns {Promise<string|null>}
  */
-export async function explainTeachBack({ skillLabel, exercise, studentAnswer, correctAnswer, level = '' }) {
+export async function explainTeachBack({
+  skillLabel,
+  exercise,
+  studentAnswer,
+  correctAnswer,
+  level = '',
+}) {
   const { askGiriConstrained } = await import('./aiGuardrails.js');
   const prompt = `A ${level ? `${level} ` : ''}student is practising ${skillLabel || 'English'} and has tried twice without success. They have already been shown the rule and the correct answer — your job is to make it click.
 
@@ -220,13 +244,13 @@ Give at most 5 findings. If the draft is good, say: GOOD: Well done!`;
   }
   const items = trimmed
     .split('\n')
-    .map(l => l.trim())
-    .filter(l => l.startsWith('SENTENCE:'))
-    .map(l => {
+    .map((l) => l.trim())
+    .filter((l) => l.startsWith('SENTENCE:'))
+    .map((l) => {
       const [sentPart, issuePart] = l.replace('SENTENCE:', '').split('| ISSUE:');
       return { sentence: sanitizeAiText(sentPart || ''), issue: sanitizeAiText(issuePart || '') };
     })
-    .filter(it => it.sentence || it.issue);
+    .filter((it) => it.sentence || it.issue);
   return items.length ? { items } : null;
 }
 
@@ -268,10 +292,18 @@ OVERALL: <one encouraging sentence naming the single most useful next improvemen
   const raw = await callGemini(prompt, { maxTokens: 300, temperature: 0.2 });
   if (!raw) return null;
 
-  const keyMap = { CONTENT: 'content', ORGANISATION: 'organisation', LANGUAGE: 'language', TASK: 'taskFulfilment' };
+  const keyMap = {
+    CONTENT: 'content',
+    ORGANISATION: 'organisation',
+    LANGUAGE: 'language',
+    TASK: 'taskFulfilment',
+  };
   const dimensions = {};
   let overall = '';
-  for (const line of raw.split('\n').map(l => l.trim()).filter(Boolean)) {
+  for (const line of raw
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)) {
     const m = line.match(/^([A-Z]+):\s*(.*)$/);
     if (!m) continue;
     if (m[1] === 'OVERALL') {
@@ -306,7 +338,7 @@ export async function gradeSynthesisAnswer(original, stem, model, alts, typed, s
   const { canCallAi, logAiUse, sanitizeAiText } = await import('./aiGuardrails.js');
   if (!canCallAi()) return null;
 
-  const altLines = alts.length ? `Also accepted:\n${alts.map(a => `- ${a}`).join('\n')}` : '';
+  const altLines = alts.length ? `Also accepted:\n${alts.map((a) => `- ${a}`).join('\n')}` : '';
   const prompt = `You are a Singapore PSLE English examiner.
 
 Task type: ${skillLabel}
@@ -328,8 +360,12 @@ No other text.`;
   logAiUse('grade', `Synthesis graded: ${String(skillLabel || '').slice(0, 80)}`);
   const raw = await callGemini(prompt, { maxTokens: 80, temperature: 0.1 });
   if (!raw) return null;
-  const lines = raw.trim().split('\n').map(l => l.trim()).filter(Boolean);
-  const verdict = ['CORRECT', 'PARTIAL', 'WRONG'].find(v => lines[0]?.startsWith(v));
+  const lines = raw
+    .trim()
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
+  const verdict = ['CORRECT', 'PARTIAL', 'WRONG'].find((v) => lines[0]?.startsWith(v));
   if (!verdict) return null;
   return { verdict, feedback: sanitizeAiText(lines[1] || '') };
 }

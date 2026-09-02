@@ -16,7 +16,11 @@ globalThis.speechSynthesis = {
   paused: false,
   resume: () => {},
 };
-globalThis.SpeechSynthesisUtterance = class { constructor(text) { this.text = text; } };
+globalThis.SpeechSynthesisUtterance = class {
+  constructor(text) {
+    this.text = text;
+  }
+};
 
 let pickOddOneOutRound, buildCountSentence, MODES, paPositionForMode, WORDS;
 beforeAll(async () => {
@@ -27,8 +31,15 @@ beforeAll(async () => {
   ({ WORDS } = await import('../src/data/words.js'));
 });
 
-const w = (id, word, graphemes, types, group = 'cvc-a', level = 1) =>
-  ({ id, word, graphemes, types, group, level, emoji: '🃏' });
+const w = (id, word, graphemes, types, group = 'cvc-a', level = 1) => ({
+  id,
+  word,
+  graphemes,
+  types,
+  group,
+  level,
+  emoji: '🃏',
+});
 
 describe('pickOddOneOutRound', () => {
   const pool = [
@@ -49,7 +60,7 @@ describe('pickOddOneOutRound', () => {
 
   it('always includes the sequenced word among the matches', () => {
     const round = pickOddOneOutRound(pool[1], pool, pool);
-    expect(round.matches.map(m => m.id)).toContain('b2');
+    expect(round.matches.map((m) => m.id)).toContain('b2');
   });
 
   it('prefers a confusable first sound for the odd word (p for b)', () => {
@@ -79,8 +90,8 @@ describe('pickOddOneOutRound', () => {
   });
 
   it('builds a playable round for every real CVC word in the bank', () => {
-    const cvcPool = WORDS.filter(x =>
-      x.group?.startsWith('cvc-') && Array.isArray(x.graphemes) && x.graphemes.length >= 2
+    const cvcPool = WORDS.filter(
+      (x) => x.group?.startsWith('cvc-') && Array.isArray(x.graphemes) && x.graphemes.length >= 2,
     );
     for (const word of cvcPool) {
       const round = pickOddOneOutRound(word, cvcPool, WORDS);
@@ -92,19 +103,18 @@ describe('pickOddOneOutRound', () => {
 
 describe('buildCountSentence', () => {
   it('substitutes the word and splits into clean tokens', () => {
-    expect(buildCountSentence('I can say {w}.', 'cat'))
-      .toEqual(['I', 'can', 'say', 'cat']);
+    expect(buildCountSentence('I can say {w}.', 'cat')).toEqual(['I', 'can', 'say', 'cat']);
   });
 
   it('strips question marks and never yields empty tokens', () => {
     const tokens = buildCountSentence('Can you say the word {w}?', 'sun');
     expect(tokens).toEqual(['Can', 'you', 'say', 'the', 'word', 'sun']);
-    expect(tokens.every(t => t.length > 0)).toBe(true);
+    expect(tokens.every((t) => t.length > 0)).toBe(true);
   });
 });
 
 describe('mode registry wiring', () => {
-  it.each(['soundHunt', 'oddOneOut', 'wordCount'])('%s is registered with full metadata', key => {
+  it.each(['soundHunt', 'oddOneOut', 'wordCount'])('%s is registered with full metadata', (key) => {
     const mode = MODES[key];
     expect(mode).toBeDefined();
     expect(mode.key).toBe(key);

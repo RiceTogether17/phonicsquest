@@ -10,12 +10,18 @@ function stubAudioGlobals() {
   globalThis.speechSynthesis = {
     getVoices: () => [],
     addEventListener: () => {},
-    speak: (utt) => { queueMicrotask(() => utt.onend?.()); },
+    speak: (utt) => {
+      queueMicrotask(() => utt.onend?.());
+    },
     cancel: () => {},
     paused: false,
     resume: () => {},
   };
-  globalThis.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; } };
+  globalThis.SpeechSynthesisUtterance = class {
+    constructor(t) {
+      this.text = t;
+    }
+  };
 }
 
 describe('short/long oo phoneme audio', () => {
@@ -64,7 +70,7 @@ describe('short/long oo phoneme audio', () => {
   it('bush plays short_oo.mp3 for its u tile during stretched playback', async () => {
     const { audio, loadSpy } = await setup();
     const { WORDS } = await import('../src/data/words.js');
-    const bush = WORDS.find(w => w.id === 'bush');
+    const bush = WORDS.find((w) => w.id === 'bush');
     expect(bush.phonemeKeys).toEqual({ 1: 'short_oo' });
     await audio.speakWordStretched(bush);
     expect(loadSpy.mock.calls.some(([p]) => /short_oo\.mp3$/.test(p))).toBe(true);
@@ -75,14 +81,14 @@ describe('short/long oo phoneme audio', () => {
   it('revealPhonemes honours the override too', async () => {
     const { audio, loadSpy } = await setup();
     const { WORDS } = await import('../src/data/words.js');
-    const full = WORDS.find(w => w.id === 'full');
+    const full = WORDS.find((w) => w.id === 'full');
     await audio.revealPhonemes(full);
     expect(loadSpy.mock.calls.some(([p]) => /short_oo\.mp3$/.test(p))).toBe(true);
   });
 
   it('the short-oo word set exists with 8 decodable oo words', async () => {
     const { WORDS, WORD_GROUPS, GROUP_ORDER } = await import('../src/data/words.js');
-    const set = WORDS.filter(w => w.group === 'short-oo');
+    const set = WORDS.filter((w) => w.group === 'short-oo');
     expect(set.length).toBeGreaterThanOrEqual(8);
     for (const w of set) {
       const i = w.graphemes.indexOf('oo');

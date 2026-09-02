@@ -16,7 +16,10 @@ import { beforeAll, describe, expect, it } from 'vitest';
 
 beforeAll(() => {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
 });
 
@@ -28,10 +31,17 @@ import {
   getPhonicsMode,
 } from '../modes/phonicsModes.js';
 import { scoreSoundMatch, getSoundMatchHint } from '../modes/scoring/soundMatch.js';
-import { scorePictureFirstSound, getPictureFirstSoundHint } from '../modes/scoring/pictureFirstSound.js';
+import {
+  scorePictureFirstSound,
+  getPictureFirstSoundHint,
+} from '../modes/scoring/pictureFirstSound.js';
 import { scoreBlendBuilder, getBlendBuilderHint } from '../modes/scoring/blendBuilder.js';
 import { scoreWordSort, getWordSortHint, buildWordSortRound } from '../modes/scoring/wordSort.js';
-import { scoreReadAndTap, getReadAndTapHint, tokenizeSentence } from '../modes/scoring/readAndTap.js';
+import {
+  scoreReadAndTap,
+  getReadAndTapHint,
+  tokenizeSentence,
+} from '../modes/scoring/readAndTap.js';
 import { scoreListenAndSpell, getListenAndSpellHint } from '../modes/scoring/listenAndSpell.js';
 import { scoreFluencySprint, getFluencySprintHint } from '../modes/scoring/fluencySprint.js';
 
@@ -59,14 +69,17 @@ describe('phonics-mode registry', () => {
     for (const key of PHONICS_MODE_ORDER) {
       const m = PHONICS_MODES[key];
       const wordCount = m.instruction.trim().split(/\s+/).length;
-      expect(wordCount, `mode "${key}" instruction too long: "${m.instruction}"`).toBeLessThanOrEqual(MAX_INSTRUCTION_WORDS);
+      expect(
+        wordCount,
+        `mode "${key}" instruction too long: "${m.instruction}"`,
+      ).toBeLessThanOrEqual(MAX_INSTRUCTION_WORDS);
     }
   });
 
   it('every mode supports both keyboard and touch input', () => {
     for (const key of PHONICS_MODE_ORDER) {
       expect(PHONICS_MODES[key].keyboard, `mode "${key}" missing keyboard support`).toBe(true);
-      expect(PHONICS_MODES[key].touch,    `mode "${key}" missing touch support`).toBe(true);
+      expect(PHONICS_MODES[key].touch, `mode "${key}" missing touch support`).toBe(true);
     }
   });
 
@@ -150,7 +163,11 @@ describe('Picture First Sound scoring', () => {
   });
 
   it('flags picking the inner letter of an initial blend (star → /t/)', () => {
-    const star = { prompt: { word: 'star' }, phonemes: ['/s/', '/t/', '/a/', '/r/'], chosen: '/t/' };
+    const star = {
+      prompt: { word: 'star' },
+      phonemes: ['/s/', '/t/', '/a/', '/r/'],
+      chosen: '/t/',
+    };
     const r = scorePictureFirstSound(star);
     expect(r.errorCategory).toBe('blend-skipped');
   });
@@ -163,41 +180,41 @@ describe('Picture First Sound scoring', () => {
 // ── Blend Builder ────────────────────────────────────────────────────────
 
 describe('Blend Builder scoring', () => {
-  const flat = { target: { word: 'flat', graphemes: ['f','l','a','t'] } };
+  const flat = { target: { word: 'flat', graphemes: ['f', 'l', 'a', 't'] } };
 
   it('marks an exact placement correct', () => {
-    const r = scoreBlendBuilder({ ...flat, placed: ['f','l','a','t'] });
+    const r = scoreBlendBuilder({ ...flat, placed: ['f', 'l', 'a', 't'] });
     expect(r.correct).toBe(true);
     expect(r.scoreBreakdown.accuracy).toBe(1);
   });
 
   it('flags missing sounds', () => {
-    const r = scoreBlendBuilder({ ...flat, placed: ['f','l','a'] });
+    const r = scoreBlendBuilder({ ...flat, placed: ['f', 'l', 'a'] });
     expect(r.errorCategory).toBe('missing-sound');
   });
 
   it('flags extra sounds', () => {
-    const r = scoreBlendBuilder({ ...flat, placed: ['f','l','a','t','s'] });
+    const r = scoreBlendBuilder({ ...flat, placed: ['f', 'l', 'a', 't', 's'] });
     expect(r.errorCategory).toBe('extra-sound');
   });
 
   it('flags out-of-order placements', () => {
-    const r = scoreBlendBuilder({ ...flat, placed: ['l','f','a','t'] });
+    const r = scoreBlendBuilder({ ...flat, placed: ['l', 'f', 'a', 't'] });
     expect(r.errorCategory).toBe('out-of-order');
   });
 
   it('flags wrong graphemes when count matches', () => {
-    const r = scoreBlendBuilder({ ...flat, placed: ['f','r','a','t'] });
+    const r = scoreBlendBuilder({ ...flat, placed: ['f', 'r', 'a', 't'] });
     expect(r.errorCategory).toBe('wrong-grapheme');
   });
 
   it('returns partial-credit accuracy for near-misses', () => {
-    const r = scoreBlendBuilder({ ...flat, placed: ['f','l','a','p'] });
+    const r = scoreBlendBuilder({ ...flat, placed: ['f', 'l', 'a', 'p'] });
     expect(r.scoreBreakdown.accuracy).toBeCloseTo(3 / 4);
   });
 
   it('hint returns empty string on full match', () => {
-    expect(getBlendBuilderHint({ ...flat, placed: ['f','l','a','t'] })).toBe('');
+    expect(getBlendBuilderHint({ ...flat, placed: ['f', 'l', 'a', 't'] })).toBe('');
   });
 });
 
@@ -245,10 +262,10 @@ describe('Word Sort scoring', () => {
     ];
     let i = 0;
     const seq = [0.1, 0.9, 0.5, 0.2]; // deterministic RNG
-    const rng = () => seq[(i++) % seq.length];
+    const rng = () => seq[i++ % seq.length];
     const round = buildWordSortRound(items, null, { count: 3, rng });
     expect(round.items.length).toBe(3);
-    expect(round.categories.sort()).toEqual(['short-a','short-e','short-i']);
+    expect(round.categories.sort()).toEqual(['short-a', 'short-e', 'short-i']);
   });
 
   it('hint reflects vowel confusion', () => {
@@ -336,7 +353,9 @@ describe('Listen and Spell scoring', () => {
 describe('Fluency Sprint scoring', () => {
   it('marks a run mastered with high accuracy and above-target WPM', () => {
     const attempts = Array.from({ length: 30 }, (_, i) => ({
-      word: `w${i}`, correct: true, timeMs: 800,
+      word: `w${i}`,
+      correct: true,
+      timeMs: 800,
     }));
     const r = scoreFluencySprint({ attempts, durationMs: 30 * 800, targetWpm: 30 });
     expect(r.correct).toBe(true);
@@ -382,7 +401,7 @@ describe('Fluency Sprint scoring', () => {
   it('hint mirrors the error category', () => {
     const attempts = [
       { word: 'cat', correct: false, timeMs: 600 },
-      { word: 'hat', correct: true,  timeMs: 600 },
+      { word: 'hat', correct: true, timeMs: 600 },
     ];
     const h = getFluencySprintHint({ attempts, durationMs: 1200, targetWpm: 30 });
     expect(typeof h).toBe('string');

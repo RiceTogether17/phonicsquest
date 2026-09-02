@@ -149,10 +149,10 @@ describe('feedback and revision updates', () => {
     updateRevision('t1', 0, 'after', { score: 9 }, { improved: true });
 
     const rec = loadDraft('t1', 0);
-    expect(rec.firstDraftText).toBe('before');   // original preserved
+    expect(rec.firstDraftText).toBe('before'); // original preserved
     expect(rec.revisedDraftText).toBe('after');
     expect(rec.revisionComparison).toEqual({ improved: true });
-    expect(rec.badges).toEqual([]);              // defaults when omitted
+    expect(rec.badges).toEqual([]); // defaults when omitted
   });
 });
 

@@ -8,9 +8,15 @@ const localStorageMock = (() => {
   let store = {};
   return {
     getItem: vi.fn((key) => store[key] ?? null),
-    setItem: vi.fn((key, val) => { store[key] = String(val); }),
-    removeItem: vi.fn((key) => { delete store[key]; }),
-    clear: vi.fn(() => { store = {}; }),
+    setItem: vi.fn((key, val) => {
+      store[key] = String(val);
+    }),
+    removeItem: vi.fn((key) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
   };
 })();
 Object.defineProperty(globalThis, 'localStorage', { value: localStorageMock });
@@ -62,7 +68,7 @@ describe('renderRoadmap', () => {
 
     const text = host.textContent;
     expect(text).toContain('Learning Roadmap');
-    expect(text).toContain('is now');                  // where they are
+    expect(text).toContain('is now'); // where they are
     expect(text).toContain('Phonics foundations');
     expect(text).toContain('How to help this week');
     expect(text).toContain('Primary English skills');

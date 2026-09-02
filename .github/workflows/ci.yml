@@ -31,6 +31,12 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # The pre-commit hook formats staged files, so this should never fire
+      # for anyone committing normally. It is here to catch the cases the
+      # hook cannot: --no-verify, a web edit, a merge resolved by hand.
+      - name: Formatting
+        run: npm run format:check
+
       - name: Run unit tests
         run: npm run test
 

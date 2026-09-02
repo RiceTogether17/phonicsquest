@@ -38,9 +38,8 @@ export function setupOddOneOut(word, els) {
 
   // Same-stage pool, phoneme-tagged words only (sight words carry no
   // usable first-sound information).
-  const stagePool = WORDS.filter(w =>
-    w.group === word.group &&
-    Array.isArray(w.graphemes) && w.graphemes.length >= 2
+  const stagePool = WORDS.filter(
+    (w) => w.group === word.group && Array.isArray(w.graphemes) && w.graphemes.length >= 2,
   );
   const roundData = pickOddOneOutRound(word, stagePool, WORDS);
   if (!roundData) {
@@ -52,7 +51,7 @@ export function setupOddOneOut(word, els) {
     return;
   }
   const cards = shuffleArray([
-    ...roundData.matches.map(w => ({ word: w, isOdd: false })),
+    ...roundData.matches.map((w) => ({ word: w, isOdd: false })),
     { word: roundData.odd, isOdd: true },
   ]);
 
@@ -60,10 +59,11 @@ export function setupOddOneOut(word, els) {
   // cards, so an empty stage box just wastes vertical space.
   renderWordImage(word, els.wordEmoji, false);
   els.wordDisplay.innerHTML = '';
-  els.phonemeRow.innerHTML  = '';
-  els.modeInstruction.textContent = 'Three words start with the same sound. Which one doesn\'t belong?';
+  els.phonemeRow.innerHTML = '';
+  els.modeInstruction.textContent =
+    "Three words start with the same sound. Which one doesn't belong?";
 
-  els.modeArea.innerHTML = /* html */`
+  els.modeArea.innerHTML = /* html */ `
     <div class="odd-one-out">
       <button class="ooo-replay btn btn--ghost btn--sm" type="button">
         🔊 Hear the words again
@@ -75,8 +75,8 @@ export function setupOddOneOut(word, els) {
   const grid = els.modeArea.querySelector('.choice-grid');
   for (const card of cards) {
     const btn = document.createElement('button');
-    btn.type            = 'button';
-    btn.className       = 'choice-btn choice-btn--emoji';
+    btn.type = 'button';
+    btn.className = 'choice-btn choice-btn--emoji';
     btn.dataset.correct = String(card.isOdd);
     btn.setAttribute('aria-label', `Card: ${card.word.word}`);
     btn.innerHTML = `
@@ -95,13 +95,15 @@ export function setupOddOneOut(word, els) {
     grid,
     onResult: els.onResult,
     retryHint: 'Say each word slowly — listen to the very first sound.',
-    onRetry: () => { setTimeout(nameCards, 200); },
+    onRetry: () => {
+      setTimeout(nameCards, 200);
+    },
     onReveal: () => _revealAnswer(roundData.odd, els),
   });
 
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = 'none';
-  els.btnSkip.style.display  = '';
+  els.btnSkip.style.display = '';
 
   setTimeout(nameCards, 400);
 }
@@ -121,21 +123,26 @@ function _nameCardsInSequence(cards, grid) {
       if (token !== _namingTimer || !btn.isConnected) return;
       const wordText = btn.getAttribute('aria-label')?.replace('Card: ', '') ?? '';
       btn.classList.add('previewing');
-      try { await audio.speakWordArticulated(wordText); } catch { /* keep naming */ }
+      try {
+        await audio.speakWordArticulated(wordText);
+      } catch {
+        /* keep naming */
+      }
       btn.classList.remove('previewing');
-      await new Promise(r => setTimeout(r, 350));
+      await new Promise((r) => setTimeout(r, 350));
     }
   })();
 }
 
 /** Reveal: show the word labels and contrast the odd word's first sound. */
 function _revealAnswer(oddWord, els) {
-  els.modeArea.querySelectorAll('.choice-btn-word--hidden')
-    .forEach(el => el.classList.remove('choice-btn-word--hidden'));
+  els.modeArea
+    .querySelectorAll('.choice-btn-word--hidden')
+    .forEach((el) => el.classList.remove('choice-btn-word--hidden'));
 
   setTimeout(async () => {
     await audio.speakWord(oddWord.word);
-    await new Promise(r => setTimeout(r, 300));
+    await new Promise((r) => setTimeout(r, 300));
     // The contrast is the odd word's first SOUND — /k/ for "crab", not /kr/.
     const { grapheme, type } = firstPhoneme(oddWord);
     await audio.speakPhoneme(grapheme, type);
@@ -181,15 +188,16 @@ export function pickOddOneOutRound(word, pool, fullList = WORDS) {
   // Odd word: prefer a confusion-pair first sound so the discrimination
   // is instructionally meaningful, then any different first sound.
   const confusable = new Set(
-    getFirstSoundDistractors(target, firstPhoneme(word).type, word.level ?? 3).map(d => d.grapheme)
+    getFirstSoundDistractors(target, firstPhoneme(word).type, word.level ?? 3).map(
+      (d) => d.grapheme,
+    ),
   );
-  const differs = w => Array.isArray(w.graphemes)
-    && w.graphemes.length >= 2
-    && firstPhoneme(w).grapheme !== target;
+  const differs = (w) =>
+    Array.isArray(w.graphemes) && w.graphemes.length >= 2 && firstPhoneme(w).grapheme !== target;
   const odd =
-    pool.find(w => !seen.has(w.id) && differs(w) && confusable.has(firstPhoneme(w).grapheme)) ??
-    pool.find(w => !seen.has(w.id) && differs(w)) ??
-    fullList.find(w => !seen.has(w.id) && differs(w));
+    pool.find((w) => !seen.has(w.id) && differs(w) && confusable.has(firstPhoneme(w).grapheme)) ??
+    pool.find((w) => !seen.has(w.id) && differs(w)) ??
+    fullList.find((w) => !seen.has(w.id) && differs(w));
 
   if (matches.length < 2 || !odd) return null;
   return { matches, odd };

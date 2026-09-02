@@ -11,18 +11,20 @@ describe('review enrichment', () => {
     const host = document.getElementById('host');
     showAnswerReviewPanel({
       host,
-      rows: [{
-        passageTitle: '<img onerror=1>',
-        blank: '1',
-        studentAnswer: '<script>x</script>',
-        correctAnswer: 'went',
-        skillLabel: 'Verb tense',
-        clueTypeLabel: 'Time clue',
-        clue: 'yesterday',
-        explanation: 'past action',
-        nextStepPrompt: 'Look for time words.',
-        examTip: 'Look for time words.',
-      }],
+      rows: [
+        {
+          passageTitle: '<img onerror=1>',
+          blank: '1',
+          studentAnswer: '<script>x</script>',
+          correctAnswer: 'went',
+          skillLabel: 'Verb tense',
+          clueTypeLabel: 'Time clue',
+          clue: 'yesterday',
+          explanation: 'past action',
+          nextStepPrompt: 'Look for time words.',
+          examTip: 'Look for time words.',
+        },
+      ],
     });
 
     const html = host.innerHTML;
@@ -37,19 +39,21 @@ describe('review enrichment', () => {
     const host = document.getElementById('host');
     showAnswerReviewPanel({
       host,
-      rows: [{
-        passageTitle: 'Stormy Night',
-        blank: '#2',
-        studentAnswer: 'excited',
-        correctAnswer: 'nervous',
-        skillLabel: 'Connector logic',
-        clueTypeLabel: 'Contrast clue',
-        clue: 'although',
-        whyWrong: 'Opposite <bad> meaning of the contrast.',
-        whyRight: '"Nervous" matches the trembling clue.',
-        missedClue: '"hands were trembling" shows fear.',
-        examTip: 'Look for connectors first.',
-      }],
+      rows: [
+        {
+          passageTitle: 'Stormy Night',
+          blank: '#2',
+          studentAnswer: 'excited',
+          correctAnswer: 'nervous',
+          skillLabel: 'Connector logic',
+          clueTypeLabel: 'Contrast clue',
+          clue: 'although',
+          whyWrong: 'Opposite <bad> meaning of the contrast.',
+          whyRight: '"Nervous" matches the trembling clue.',
+          missedClue: '"hands were trembling" shows fear.',
+          examTip: 'Look for connectors first.',
+        },
+      ],
     });
     const html = host.innerHTML;
     expect(html).toContain('Why wrong:');
@@ -63,17 +67,19 @@ describe('review enrichment', () => {
     const host = document.getElementById('host');
     showAnswerReviewPanel({
       host,
-      rows: [{
-        passageTitle: 'Vault <b>1</b>',
-        blank: '2',
-        studentAnswer: 'assured',
-        correctAnswer: 'lamented',
-        skillLabel: 'Meaning in context',
-        clueTypeLabel: 'Meaning clue',
-        clue: 'It was hopeless',
-        explanation: 'Trap check: positive meaning mismatches sad context.',
-        nextStepPrompt: 'Use sentence clues. POS: verb. Writing tip: Use for disappointment.',
-      }],
+      rows: [
+        {
+          passageTitle: 'Vault <b>1</b>',
+          blank: '2',
+          studentAnswer: 'assured',
+          correctAnswer: 'lamented',
+          skillLabel: 'Meaning in context',
+          clueTypeLabel: 'Meaning clue',
+          clue: 'It was hopeless',
+          explanation: 'Trap check: positive meaning mismatches sad context.',
+          nextStepPrompt: 'Use sentence clues. POS: verb. Writing tip: Use for disappointment.',
+        },
+      ],
     });
     const html = host.innerHTML;
     expect(html).toContain('Meaning clue');
@@ -103,12 +109,14 @@ describe('weak skills tracking', () => {
   it('returns top 3 weak skills', () => {
     const top = getTopWeakSkills({
       level: 'P4',
-      weakSkillsMap: { P4: {
-        tense: { attempts: 4, wrong: 3 },
-        connectorLogic: { attempts: 5, wrong: 2 },
-        collocation: { attempts: 2, wrong: 2 },
-        grammar: { attempts: 8, wrong: 1 },
-      } },
+      weakSkillsMap: {
+        P4: {
+          tense: { attempts: 4, wrong: 3 },
+          connectorLogic: { attempts: 5, wrong: 2 },
+          collocation: { attempts: 2, wrong: 2 },
+          grammar: { attempts: 8, wrong: 1 },
+        },
+      },
     });
     expect(top).toHaveLength(3);
     expect(top[0].skill).toBe('collocation');

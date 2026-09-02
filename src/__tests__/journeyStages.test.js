@@ -8,7 +8,10 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 function stubAudioGlobals() {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
 }
 
@@ -21,9 +24,13 @@ beforeAll(async () => {
 
 describe('JOURNEY_STEPS shape', () => {
   it('defines the six pedagogy steps in order', () => {
-    expect(JOURNEY_STEPS.map(s => s.key)).toEqual([
-      'phonemic-awareness', 'letter-sounds', 'blending',
-      'sight-words', 'stories', 'primary',
+    expect(JOURNEY_STEPS.map((s) => s.key)).toEqual([
+      'phonemic-awareness',
+      'letter-sounds',
+      'blending',
+      'sight-words',
+      'stories',
+      'primary',
     ]);
     JOURNEY_STEPS.forEach((s, i) => expect(s.step).toBe(i + 1));
   });
@@ -40,7 +47,9 @@ describe('JOURNEY_STEPS shape', () => {
     const seen = new Map();
     for (const stage of JOURNEY_STEPS) {
       for (const key of [...stage.modes, ...stage.screens]) {
-        expect(seen.has(key), `"${key}" appears in both ${seen.get(key)} and ${stage.key}`).toBe(false);
+        expect(seen.has(key), `"${key}" appears in both ${seen.get(key)} and ${stage.key}`).toBe(
+          false,
+        );
         seen.set(key, stage.key);
       }
     }

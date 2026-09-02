@@ -20,7 +20,11 @@ globalThis.speechSynthesis = {
   paused: false,
   resume: () => {},
 };
-globalThis.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; } };
+globalThis.SpeechSynthesisUtterance = class {
+  constructor(t) {
+    this.text = t;
+  }
+};
 
 let WORDS, CURRICULUM, PHASES, progress, hasInteriorVowel, isStageHiddenForMode;
 let lastSoundedIdx, firstPhoneme, lastPhoneme;
@@ -28,7 +32,8 @@ let lastSoundedIdx, firstPhoneme, lastPhoneme;
 beforeAll(async () => {
   ({ WORDS } = await import('../src/data/words.js'));
   ({ CURRICULUM, PHASES } = await import('../src/data/curriculum.js'));
-  ({ progress, hasInteriorVowel, isStageHiddenForMode } = await import('../src/modules/progress.js'));
+  ({ progress, hasInteriorVowel, isStageHiddenForMode } =
+    await import('../src/modules/progress.js'));
   ({ lastSoundedIdx, firstPhoneme, lastPhoneme } = await import('../src/modes/phonemePosition.js'));
 });
 
@@ -52,9 +57,10 @@ function phonemeTables() {
     }
     throw new Error(`${name} never closed`);
   };
-  const keys = (name) => new Set(
-    [...objectAfter(name).matchAll(/(?:^|[{,\s])'?([A-Za-z_ə][\w]*)'?\s*:/g)].map(m => m[1]),
-  );
+  const keys = (name) =>
+    new Set(
+      [...objectAfter(name).matchAll(/(?:^|[{,\s])'?([A-Za-z_ə][\w]*)'?\s*:/g)].map((m) => m[1]),
+    );
   return { files: keys('PHONEME_FILES'), tts: keys('PHONEME_TTS') };
 }
 
@@ -64,7 +70,7 @@ function audioKeyFor(grapheme, type) {
   if (type === 'lv') key = `long_${key.replace('ee', 'e').replace('ay', 'a')}`;
   if (type === 'sv' && key === 'oo') key = 'short_oo';
   if (type === 'soft_c' || type === 'soft_g') key = type;
-  if (type === 'dp') key = ({ oy: 'oi', ou: 'ow', au: 'aw' })[key] ?? key;
+  if (type === 'dp') key = { oy: 'oi', ou: 'ow', au: 'aw' }[key] ?? key;
   return key;
 }
 
@@ -130,8 +136,8 @@ describe('Last Sound targets a sound, not a letter', () => {
   });
 
   it('never targets a silent grapheme anywhere in the word bank', () => {
-    const bad = WORDS.filter(w => w.types?.[lastSoundedIdx(w)] === 'se');
-    expect(bad.map(w => w.word)).toEqual([]);
+    const bad = WORDS.filter((w) => w.types?.[lastSoundedIdx(w)] === 'se');
+    expect(bad.map((w) => w.word)).toEqual([]);
   });
 });
 
@@ -139,16 +145,31 @@ describe('a blend is two phonemes, not one', () => {
   const w = (word, graphemes, types) => ({ word, graphemes, types });
 
   it.each([
-    { word: 'clamp', graphemes: ['cl', 'a', 'mp'], types: ['bl', 'sv', 'bl'], first: 'c', last: 'p' },
-    { word: 'stamp', graphemes: ['st', 'a', 'mp'], types: ['bl', 'sv', 'bl'], first: 's', last: 'p' },
-    { word: 'jump',  graphemes: ['j', 'u', 'mp'],  types: ['c', 'sv', 'bl'],  first: 'j', last: 'p' },
-    { word: 'flat',  graphemes: ['fl', 'a', 't'],  types: ['bl', 'sv', 'c'],  first: 'f', last: 't' },
-    { word: 'milk',  graphemes: ['m', 'i', 'lk'],  types: ['c', 'sv', 'bl'],  first: 'm', last: 'k' },
-  ])('$word reads inside the blend tile: /$first/ … /$last/', ({ word, graphemes, types, first, last }) => {
-    const data = w(word, graphemes, types);
-    expect(firstPhoneme(data).grapheme).toBe(first);
-    expect(lastPhoneme(data).grapheme).toBe(last);
-  });
+    {
+      word: 'clamp',
+      graphemes: ['cl', 'a', 'mp'],
+      types: ['bl', 'sv', 'bl'],
+      first: 'c',
+      last: 'p',
+    },
+    {
+      word: 'stamp',
+      graphemes: ['st', 'a', 'mp'],
+      types: ['bl', 'sv', 'bl'],
+      first: 's',
+      last: 'p',
+    },
+    { word: 'jump', graphemes: ['j', 'u', 'mp'], types: ['c', 'sv', 'bl'], first: 'j', last: 'p' },
+    { word: 'flat', graphemes: ['fl', 'a', 't'], types: ['bl', 'sv', 'c'], first: 'f', last: 't' },
+    { word: 'milk', graphemes: ['m', 'i', 'lk'], types: ['c', 'sv', 'bl'], first: 'm', last: 'k' },
+  ])(
+    '$word reads inside the blend tile: /$first/ … /$last/',
+    ({ word, graphemes, types, first, last }) => {
+      const data = w(word, graphemes, types);
+      expect(firstPhoneme(data).grapheme).toBe(first);
+      expect(lastPhoneme(data).grapheme).toBe(last);
+    },
+  );
 
   it('keeps a digraph whole — "sh" and "tch" really are one sound', () => {
     const ship = w('ship', ['sh', 'i', 'p'], ['d', 'sv', 'c']);
@@ -164,16 +185,16 @@ describe('a blend is two phonemes, not one', () => {
   });
 
   it('never offers a blend as the answer anywhere in the word bank', () => {
-    const firstBlends = WORDS.filter(x => firstPhoneme(x).type === 'bl');
-    const lastBlends  = WORDS.filter(x => lastPhoneme(x).type === 'bl');
-    expect(firstBlends.map(x => x.word)).toEqual([]);
-    expect(lastBlends.map(x => x.word)).toEqual([]);
+    const firstBlends = WORDS.filter((x) => firstPhoneme(x).type === 'bl');
+    const lastBlends = WORDS.filter((x) => lastPhoneme(x).type === 'bl');
+    expect(firstBlends.map((x) => x.word)).toEqual([]);
+    expect(lastBlends.map((x) => x.word)).toEqual([]);
   });
 
   it('resolves the containing tile, so the reveal can still ring it', () => {
     const clamp = w('clamp', ['cl', 'a', 'mp'], ['bl', 'sv', 'bl']);
-    expect(lastPhoneme(clamp).index).toBe(2);   // the "mp" tile
-    expect(firstPhoneme(clamp).index).toBe(0);  // the "cl" tile
+    expect(lastPhoneme(clamp).index).toBe(2); // the "mp" tile
+    expect(firstPhoneme(clamp).index).toBe(0); // the "cl" tile
   });
 });
 
@@ -187,18 +208,22 @@ describe('Odd One Out contrasts sounds, not spellings', () => {
     // clap / clip / clop with "crab" as the odd one is four words starting
     // /k/ — a question with no answer. Drive the real bank repeatedly so a
     // blend target actually comes up.
-    const blendWords = WORDS.filter(x => x.types?.[0] === 'bl' && x.level <= 3);
+    const blendWords = WORDS.filter((x) => x.types?.[0] === 'bl' && x.level <= 3);
     expect(blendWords.length).toBeGreaterThan(0);
 
     for (const target of blendWords.slice(0, 40)) {
-      const round = pickOddOneOutRound(target, WORDS.filter(x => x.level <= 3));
+      const round = pickOddOneOutRound(
+        target,
+        WORDS.filter((x) => x.level <= 3),
+      );
       if (!round) continue;
       const targetSound = firstPhoneme(target).grapheme;
       for (const m of round.matches) {
         expect(firstPhoneme(m).grapheme, `${m.word} should match ${target.word}`).toBe(targetSound);
       }
-      expect(firstPhoneme(round.odd).grapheme, `${round.odd.word} vs ${target.word}`)
-        .not.toBe(targetSound);
+      expect(firstPhoneme(round.odd).grapheme, `${round.odd.word} vs ${target.word}`).not.toBe(
+        targetSound,
+      );
     }
   });
 });
@@ -210,29 +235,31 @@ describe('position modes are offered consistently', () => {
     // The three modes ask the same kind of question about the same words.
     // A phase that offers First and Last but not Middle is a gap, not a
     // curriculum decision — that asymmetry is what this pins.
-    const split = PHASES
-      .map(p => ({
-        phase: p.phase,
-        title: p.title,
-        offered: POSITION_MODES.filter(m => (p.recommendedModes || []).includes(m)),
-      }))
-      .filter(p => p.offered.length > 0 && p.offered.length < POSITION_MODES.length);
+    const split = PHASES.map((p) => ({
+      phase: p.phase,
+      title: p.title,
+      offered: POSITION_MODES.filter((m) => (p.recommendedModes || []).includes(m)),
+    })).filter((p) => p.offered.length > 0 && p.offered.length < POSITION_MODES.length);
 
-    expect(split.map(p => `phase ${p.phase} ${p.title}: only [${p.offered}]`)).toEqual([]);
+    expect(split.map((p) => `phase ${p.phase} ${p.title}: only [${p.offered}]`)).toEqual([]);
   });
 
   it('a phase offering the position modes has words they can serve', () => {
     for (const phase of PHASES) {
       if (!(phase.recommendedModes || []).includes('middle')) continue;
-      const stages = CURRICULUM
-        .filter(s => s.phase === phase.phase)
-        .filter(s => !isStageHiddenForMode(s.group, 'middle'));
-      expect(stages.length, `phase ${phase.phase} has no stage Middle Sound can serve`)
-        .toBeGreaterThan(0);
+      const stages = CURRICULUM.filter((s) => s.phase === phase.phase).filter(
+        (s) => !isStageHiddenForMode(s.group, 'middle'),
+      );
+      expect(
+        stages.length,
+        `phase ${phase.phase} has no stage Middle Sound can serve`,
+      ).toBeGreaterThan(0);
       for (const stage of stages) {
         const pool = progress.getWordsInGroup(stage.group).filter(hasInteriorVowel);
-        expect(pool.length, `${stage.id} is offered to Middle Sound with an empty pool`)
-          .toBeGreaterThan(0);
+        expect(
+          pool.length,
+          `${stage.id} is offered to Middle Sound with an empty pool`,
+        ).toBeGreaterThan(0);
       }
     }
   });

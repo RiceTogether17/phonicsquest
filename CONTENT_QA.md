@@ -59,16 +59,16 @@ sounds — confusing and wrong.
 **What we guarantee.** Every `sampleWords` entry matches the broad
 pattern its stage advertises:
 
-| Stage prefix     | Test                                          |
-|------------------|-----------------------------------------------|
-| `cvc-X`          | 3 letters · vowel matches X · no blend/digraph at the boundaries |
-| `ccvc-X`         | Starts with 2 consonants · vowel matches X    |
-| `cvcc-X`         | Ends with 2 consonants · vowel matches X      |
-| `digraphs`       | Contains one of sh / ch / th / wh / ck / ng   |
-| `long-a-ae`      | Has the `a_e` split-digraph pattern           |
-| `long-a-ai`      | Contains `ai`                                 |
-| `dip-oi`         | Contains `oi` or `oy`                         |
-| (… similar checks for the rest)                                  |
+| Stage prefix                    | Test                                                             |
+| ------------------------------- | ---------------------------------------------------------------- |
+| `cvc-X`                         | 3 letters · vowel matches X · no blend/digraph at the boundaries |
+| `ccvc-X`                        | Starts with 2 consonants · vowel matches X                       |
+| `cvcc-X`                        | Ends with 2 consonants · vowel matches X                         |
+| `digraphs`                      | Contains one of sh / ch / th / wh / ck / ng                      |
+| `long-a-ae`                     | Has the `a_e` split-digraph pattern                              |
+| `long-a-ai`                     | Contains `ai`                                                    |
+| `dip-oi`                        | Contains `oi` or `oy`                                            |
+| (… similar checks for the rest) |
 
 The rules are conservative — they don't claim phonological perfection,
 they catch the obvious mistakes (e.g. a long-vowel word smuggled into a
@@ -85,6 +85,7 @@ hint becomes a child who thinks "feet" is a short-E word.
 ## 4. Every game mode has child-friendly instructions
 
 **What we guarantee.** Every entry in `PHONICS_MODES` ships:
+
 - `instruction` ≤ 15 words.
 - `objective` ≥ 1 sentence (parent-facing).
 - Both `keyboard` and `touch` flags = true.
@@ -101,6 +102,7 @@ an earlier branch.
 ## 5. Every activity has correct and incorrect feedback
 
 **What we guarantee.** Every mode in `PHONICS_MODES` ships:
+
 - A `score` function that returns `{ correct, errorCategory, hint, ... }`.
 - An `errorHints` map with a non-empty `default` key.
 - At least 2 error categories beyond `default` so feedback can be
@@ -117,6 +119,7 @@ is the whole point of phonics-aware tutoring.
 ## 6. Scoring logic — golden cases
 
 **What we guarantee.** For every mode, golden tests cover:
+
 - A correct attempt → `correct: true`, `masteryDelta: 1`.
 - Each defined error category → returns that category + matching hint.
 - A clean "no answer" attempt → returns the default hint, no crash.
@@ -131,6 +134,7 @@ tests, not by parents reading a wrong report.
 ## 7. Progress tracking
 
 **What we guarantee.** The progress model in `progressAnalytics.js`:
+
 - Computes `accuracyByMode` correctly from a stream of attempts.
 - Identifies the top N strongest and weakest sounds.
 - Surfaces the recommended next practice (first stage below mastery).
@@ -152,6 +156,7 @@ numbers = wrong intervention.
 
 **What we guarantee.** Critical UI controls render with the right
 ARIA attributes:
+
 - `aria-label` present on every icon-only button.
 - `role="img"` + alt-style text on every badge.
 - `aria-live="polite"` on every feedback strip.

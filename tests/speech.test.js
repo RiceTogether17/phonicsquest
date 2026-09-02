@@ -11,7 +11,9 @@ function installMockSpeechRecognition(transcriptsByLocale = {}) {
 
     start() {
       queueMicrotask(() => {
-        const alternatives = (transcriptsByLocale[this.lang] || [{ transcript: '', confidence: 0.1 }]).map(item => ({
+        const alternatives = (
+          transcriptsByLocale[this.lang] || [{ transcript: '', confidence: 0.1 }]
+        ).map((item) => ({
           transcript: item.transcript,
           confidence: item.confidence ?? 0.8,
         }));
@@ -89,13 +91,33 @@ describe('speech recognition enhancements', () => {
     };
 
     // Mock AudioContext for playSfx
-    globalThis.AudioContext = globalThis.AudioContext || class {
-      constructor() { this.state = 'running'; }
-      createOscillator() { return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } }; }
-      createGain() { return { connect: vi.fn(), gain: { value: 1, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() } }; }
-      get destination() { return {}; }
-      resume() { return Promise.resolve(); }
-    };
+    globalThis.AudioContext =
+      globalThis.AudioContext ||
+      class {
+        constructor() {
+          this.state = 'running';
+        }
+        createOscillator() {
+          return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } };
+        }
+        createGain() {
+          return {
+            connect: vi.fn(),
+            gain: {
+              value: 1,
+              setValueAtTime: vi.fn(),
+              exponentialRampToValueAtTime: vi.fn(),
+              linearRampToValueAtTime: vi.fn(),
+            },
+          };
+        }
+        get destination() {
+          return {};
+        }
+        resume() {
+          return Promise.resolve();
+        }
+      };
 
     // Provide minimal DOM for _handleResult
     document.body.innerHTML += `
@@ -113,7 +135,13 @@ describe('speech recognition enhancements', () => {
     const { app } = await import('../src/app.js');
 
     app._mode = 'blend';
-    app._currentWord = { id: 'manual-word-1', word: 'cat', emoji: '🐱', graphemes: ['c','a','t'], types: ['c','sv','c'] };
+    app._currentWord = {
+      id: 'manual-word-1',
+      word: 'cat',
+      emoji: '🐱',
+      graphemes: ['c', 'a', 't'],
+      types: ['c', 'sv', 'c'],
+    };
     app._resultProcessing = false;
     app._els = {
       speechBubble: document.getElementById('speech-bubble'),
@@ -158,7 +186,9 @@ describe('speech recognition enhancements', () => {
     // only settle when the 8s hard timeout fires.
     class SilentRecognition {
       start() {}
-      stop() { this.onend?.(); }
+      stop() {
+        this.onend?.();
+      }
     }
     window.SpeechRecognition = SilentRecognition;
     window.webkitSpeechRecognition = SilentRecognition;

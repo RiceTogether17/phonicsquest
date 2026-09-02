@@ -22,17 +22,17 @@ import { MODES } from '../modes/index.js';
  * keeps that logic in one place rather than duplicating it here.
  */
 export const BUTTON_TARGETS = Object.freeze({
-  'letter-sounds':  'btn-letter-sounds',
+  'letter-sounds': 'btn-letter-sounds',
   'sentence-forge': 'btn-sentence-forge',
-  'grammar-mcq':    'btn-grammar-mcq',
-  'vocab-mcq':      'btn-vocab-mcq',
-  'paper-mode':     'btn-paper-mode',
-  'cloze-castle':   'btn-cloze-castle',
-  'word-vault':     'btn-word-vault',
-  'editing-quest':  'btn-editing-quest',
-  'writing-quest':  'btn-writing-quest',
-  'sight-words':    'btn-sight-words',
-  'stories':        'btn-stories',
+  'grammar-mcq': 'btn-grammar-mcq',
+  'vocab-mcq': 'btn-vocab-mcq',
+  'paper-mode': 'btn-paper-mode',
+  'cloze-castle': 'btn-cloze-castle',
+  'word-vault': 'btn-word-vault',
+  'editing-quest': 'btn-editing-quest',
+  'writing-quest': 'btn-writing-quest',
+  'sight-words': 'btn-sight-words',
+  stories: 'btn-stories',
 });
 
 /**
@@ -41,9 +41,9 @@ export const BUTTON_TARGETS = Object.freeze({
  */
 export const MODE_ALIASES = Object.freeze({
   'first-sound': 'first',
-  'oral-blend':  'oralBlend',
-  'classicBlend': 'classicBlend',
-  'hear':        'hear',
+  'oral-blend': 'oralBlend',
+  classicBlend: 'classicBlend',
+  hear: 'hear',
 });
 
 /**
@@ -53,12 +53,22 @@ export const MODE_ALIASES = Object.freeze({
 const GROUP_RESUMING_TARGETS = Object.freeze(new Set(['classicBlend']));
 
 /** Primary-English screens that share the placeholder host. */
-export const PLACEHOLDER_TARGETS = Object.freeze(new Set([
-  'visual-text', 'comprehension-cloze', 'open-comprehension', 'synthesis',
-  'situational-writing', 'listening-comp',
-  'p1-practice-tests', 'p2-practice-tests', 'p3-practice-tests',
-  'p4-practice-tests', 'p5-practice-tests', 'p6-practice-tests',
-]));
+export const PLACEHOLDER_TARGETS = Object.freeze(
+  new Set([
+    'visual-text',
+    'comprehension-cloze',
+    'open-comprehension',
+    'synthesis',
+    'situational-writing',
+    'listening-comp',
+    'p1-practice-tests',
+    'p2-practice-tests',
+    'p3-practice-tests',
+    'p4-practice-tests',
+    'p5-practice-tests',
+    'p6-practice-tests',
+  ]),
+);
 
 /**
  * @typedef {object} NavHandlers

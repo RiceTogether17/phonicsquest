@@ -9,17 +9,48 @@ function stubAudioGlobals() {
     paused: false,
     resume: () => {},
   };
-  globalThis.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; } };
-  globalThis.AudioContext = globalThis.AudioContext || class {
-    constructor() { this.state = 'running'; this.sampleRate = 44100; }
-    createOscillator() { return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } }; }
-    createGain() { return { connect: vi.fn(), gain: { value: 1, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() } }; }
-    createBuffer(_channels, frames) { return { getChannelData: () => new Float32Array(frames) }; }
-    createBufferSource() { return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), buffer: null }; }
-    createBiquadFilter() { return { connect: vi.fn(), type: '', frequency: { value: 0 }, Q: { value: 0 } }; }
-    get destination() { return {}; }
-    resume() { return Promise.resolve(); }
+  globalThis.SpeechSynthesisUtterance = class {
+    constructor(t) {
+      this.text = t;
+    }
   };
+  globalThis.AudioContext =
+    globalThis.AudioContext ||
+    class {
+      constructor() {
+        this.state = 'running';
+        this.sampleRate = 44100;
+      }
+      createOscillator() {
+        return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } };
+      }
+      createGain() {
+        return {
+          connect: vi.fn(),
+          gain: {
+            value: 1,
+            setValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+            linearRampToValueAtTime: vi.fn(),
+          },
+        };
+      }
+      createBuffer(_channels, frames) {
+        return { getChannelData: () => new Float32Array(frames) };
+      }
+      createBufferSource() {
+        return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), buffer: null };
+      }
+      createBiquadFilter() {
+        return { connect: vi.fn(), type: '', frequency: { value: 0 }, Q: { value: 0 } };
+      }
+      get destination() {
+        return {};
+      }
+      resume() {
+        return Promise.resolve();
+      }
+    };
 }
 
 stubAudioGlobals();
@@ -30,16 +61,23 @@ const { setupSyllableClap, cleanup } = await import('../src/modes/syllableClap.j
  */
 
 const RUNNING = {
-  id: 'running', word: 'running',
-  graphemes: ['r','u','nn','-ing'],
-  types: ['c','sv','c','sf'],
-  group: 'suffix-ing', level: 3, emoji: '🏃',
+  id: 'running',
+  word: 'running',
+  graphemes: ['r', 'u', 'nn', '-ing'],
+  types: ['c', 'sv', 'c', 'sf'],
+  group: 'suffix-ing',
+  level: 3,
+  emoji: '🏃',
 };
 
 const CAT = {
-  id: 'cat', word: 'cat',
-  graphemes: ['c','a','t'], types: ['c','sv','c'],
-  group: 'short-a', level: 1, emoji: '🐱',
+  id: 'cat',
+  word: 'cat',
+  graphemes: ['c', 'a', 't'],
+  types: ['c', 'sv', 'c'],
+  group: 'short-a',
+  level: 1,
+  emoji: '🐱',
 };
 
 describe('setupSyllableClap', () => {
@@ -60,15 +98,15 @@ describe('setupSyllableClap', () => {
 
   function makeEls() {
     return {
-      wordEmoji:       document.getElementById('word-emoji'),
-      wordDisplay:     document.getElementById('word-display'),
-      phonemeRow:      document.getElementById('phoneme-row'),
+      wordEmoji: document.getElementById('word-emoji'),
+      wordDisplay: document.getElementById('word-display'),
+      phonemeRow: document.getElementById('phoneme-row'),
       modeInstruction: document.getElementById('mode-instruction'),
-      modeArea:        document.getElementById('mode-area'),
-      btnCheck:        document.getElementById('btn-check'),
-      btnSayIt:        document.getElementById('btn-say-it'),
-      btnSkip:         document.getElementById('btn-skip'),
-      onResult:        vi.fn(),
+      modeArea: document.getElementById('mode-area'),
+      btnCheck: document.getElementById('btn-check'),
+      btnSayIt: document.getElementById('btn-say-it'),
+      btnSkip: document.getElementById('btn-skip'),
+      onResult: vi.fn(),
     };
   }
 
@@ -89,7 +127,7 @@ describe('setupSyllableClap', () => {
 
   it('correct choice fires onResult(true) and reveals the breakdown', () => {
     const els = makeEls();
-    setupSyllableClap(RUNNING, els);  // 2 syllables
+    setupSyllableClap(RUNNING, els); // 2 syllables
     const choice2 = document.querySelector('#syllable-grid .choice-btn[data-value="2"]');
     choice2.click();
     expect(els.modeArea.querySelector('.vmcq-next-btn')).not.toBeNull();
@@ -101,13 +139,16 @@ describe('setupSyllableClap', () => {
 
   it('works with a phonological pool word (3-syllable elephant) and shows up-to-4 choices', () => {
     const elephant = {
-      id: 'syl-elephant', word: 'elephant', emoji: '🐘',
-      syllables: 3, syllableBreakdown: 'el-e-phant',
+      id: 'syl-elephant',
+      word: 'elephant',
+      emoji: '🐘',
+      syllables: 3,
+      syllableBreakdown: 'el-e-phant',
     };
     const els = makeEls();
     setupSyllableClap(elephant, els);
     const choices = document.querySelectorAll('#syllable-grid .choice-btn');
-    expect(choices.length).toBe(4);  // min(6, max(4, 3+1)) = 4
+    expect(choices.length).toBe(4); // min(6, max(4, 3+1)) = 4
     const choice3 = document.querySelector('#syllable-grid .choice-btn[data-value="3"]');
     choice3.click();
     expect(document.querySelector('.syllable-reveal-breakdown').textContent).toBe('el-e-phant');
@@ -117,18 +158,21 @@ describe('setupSyllableClap', () => {
 
   it('a 4-syllable word offers a choice up to 5', () => {
     const caterpillar = {
-      id: 'syl-caterpillar', word: 'caterpillar', emoji: '🐛',
-      syllables: 4, syllableBreakdown: 'cat-er-pil-lar',
+      id: 'syl-caterpillar',
+      word: 'caterpillar',
+      emoji: '🐛',
+      syllables: 4,
+      syllableBreakdown: 'cat-er-pil-lar',
     };
     setupSyllableClap(caterpillar, makeEls());
     const choices = document.querySelectorAll('#syllable-grid .choice-btn');
-    expect(choices.length).toBe(5);  // min(6, max(4, 4+1)) = 5
+    expect(choices.length).toBe(5); // min(6, max(4, 4+1)) = 5
     expect(document.querySelector('#syllable-grid .choice-btn[data-value="5"]')).not.toBeNull();
   });
 
   it('first wrong choice allows a retry: tapped button locks, grid stays live', () => {
     const els = makeEls();
-    setupSyllableClap(CAT, els);  // 1 syllable
+    setupSyllableClap(CAT, els); // 1 syllable
     const choice3 = document.querySelector('#syllable-grid .choice-btn[data-value="3"]');
     choice3.click();
 
@@ -143,10 +187,10 @@ describe('setupSyllableClap', () => {
 
   it('second tap finishes the round and records first-attempt correctness (false)', () => {
     const els = makeEls();
-    setupSyllableClap(CAT, els);  // 1 syllable
-    document.querySelector('#syllable-grid .choice-btn[data-value="3"]').click();  // miss
+    setupSyllableClap(CAT, els); // 1 syllable
+    document.querySelector('#syllable-grid .choice-btn[data-value="3"]').click(); // miss
     const correctBtn = document.querySelector('#syllable-grid .choice-btn[data-correct="true"]');
-    correctBtn.click();  // save on second try
+    correctBtn.click(); // save on second try
 
     expect(correctBtn.classList.contains('correct')).toBe(true);
     expect(document.querySelector('.syllable-reveal-breakdown')).not.toBeNull();
@@ -158,7 +202,7 @@ describe('setupSyllableClap', () => {
 
   it('two wrong taps reveal the answer and fire onResult(false)', () => {
     const els = makeEls();
-    setupSyllableClap(CAT, els);  // 1 syllable
+    setupSyllableClap(CAT, els); // 1 syllable
     document.querySelector('#syllable-grid .choice-btn[data-value="3"]').click();
     document.querySelector('#syllable-grid .choice-btn[data-value="4"]').click();
 

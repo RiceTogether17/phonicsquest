@@ -9,17 +9,48 @@ function stubAudioGlobals() {
     paused: false,
     resume: () => {},
   };
-  globalThis.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; } };
-  globalThis.AudioContext = globalThis.AudioContext || class {
-    constructor() { this.state = 'running'; this.sampleRate = 44100; }
-    createOscillator() { return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } }; }
-    createGain() { return { connect: vi.fn(), gain: { value: 1, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() } }; }
-    createBuffer(_c, frames) { return { getChannelData: () => new Float32Array(frames) }; }
-    createBufferSource() { return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), buffer: null }; }
-    createBiquadFilter() { return { connect: vi.fn(), type: '', frequency: { value: 0 }, Q: { value: 0 } }; }
-    get destination() { return {}; }
-    resume() { return Promise.resolve(); }
+  globalThis.SpeechSynthesisUtterance = class {
+    constructor(t) {
+      this.text = t;
+    }
   };
+  globalThis.AudioContext =
+    globalThis.AudioContext ||
+    class {
+      constructor() {
+        this.state = 'running';
+        this.sampleRate = 44100;
+      }
+      createOscillator() {
+        return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), frequency: { value: 0 } };
+      }
+      createGain() {
+        return {
+          connect: vi.fn(),
+          gain: {
+            value: 1,
+            setValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+            linearRampToValueAtTime: vi.fn(),
+          },
+        };
+      }
+      createBuffer(_c, frames) {
+        return { getChannelData: () => new Float32Array(frames) };
+      }
+      createBufferSource() {
+        return { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), buffer: null };
+      }
+      createBiquadFilter() {
+        return { connect: vi.fn(), type: '', frequency: { value: 0 }, Q: { value: 0 } };
+      }
+      get destination() {
+        return {};
+      }
+      resume() {
+        return Promise.resolve();
+      }
+    };
 }
 
 stubAudioGlobals();
@@ -27,7 +58,7 @@ const { setupFluencySprint, cleanup } = await import('../src/modes/fluencySprint
 const { store } = await import('../src/modules/store.js');
 const { WORDS } = await import('../src/data/words.js');
 
-const CAT = WORDS.find(w => w.id === 'cat');
+const CAT = WORDS.find((w) => w.id === 'cat');
 
 describe('Fluency Sprint mode', () => {
   beforeEach(() => {
@@ -56,26 +87,26 @@ describe('Fluency Sprint mode', () => {
 
   function makeEls() {
     return {
-      wordEmoji:       document.getElementById('word-emoji'),
-      wordDisplay:     document.getElementById('word-display'),
-      phonemeRow:      document.getElementById('phoneme-row'),
+      wordEmoji: document.getElementById('word-emoji'),
+      wordDisplay: document.getElementById('word-display'),
+      phonemeRow: document.getElementById('phoneme-row'),
       modeInstruction: document.getElementById('mode-instruction'),
-      modeArea:        document.getElementById('mode-area'),
-      btnCheck:        document.getElementById('btn-check'),
-      btnSayIt:        document.getElementById('btn-say-it'),
-      btnHint:         document.getElementById('btn-hint'),
-      btnSkip:         document.getElementById('btn-skip'),
-      onResult:        vi.fn(),
+      modeArea: document.getElementById('mode-area'),
+      btnCheck: document.getElementById('btn-check'),
+      btnSayIt: document.getElementById('btn-say-it'),
+      btnHint: document.getElementById('btn-hint'),
+      btnSkip: document.getElementById('btn-skip'),
+      onResult: vi.fn(),
     };
   }
 
   function tap({ correct }) {
-    vi.advanceTimersByTime(200);   // let the item's speak timer fire
+    vi.advanceTimersByTime(200); // let the item's speak timer fire
     const btn = correct
       ? document.querySelector('.fs-card[data-correct="true"]')
       : document.querySelector('.fs-card[data-correct="false"]');
     btn.click();
-    vi.advanceTimersByTime(300);   // 250ms advance to the next item
+    vi.advanceTimersByTime(300); // 250ms advance to the next item
   }
 
   it('shows a Start gate — no cards or countdown before the child begins', () => {
@@ -114,7 +145,7 @@ describe('Fluency Sprint mode', () => {
     expect(document.getElementById('fs-score').textContent).toBe('✓ 1');
     const cards = document.querySelectorAll('.fs-card');
     expect(cards.length).toBe(3);
-    expect([...cards].every(c => !c.disabled)).toBe(true);
+    expect([...cards].every((c) => !c.disabled)).toBe(true);
   });
 
   it('a fast accurate run masters the sprint: onResult(true, ≥45s)', () => {
@@ -124,7 +155,7 @@ describe('Fluency Sprint mode', () => {
 
     // ~500ms of fake time per item → 30 correct in ~15s → wpm ≈ 40 ≥ 30.
     for (let i = 0; i < 30; i++) tap({ correct: true });
-    vi.advanceTimersByTime(45000);   // run out the clock
+    vi.advanceTimersByTime(45000); // run out the clock
 
     const summary = document.querySelector('.fs-summary');
     expect(summary).not.toBeNull();

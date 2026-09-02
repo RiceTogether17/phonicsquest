@@ -8,47 +8,88 @@
  */
 
 const CACHE_VERSION = 'v8';
-const SHELL_CACHE   = `phonicsquest-shell-${CACHE_VERSION}`;
-const ASSET_CACHE   = `phonicsquest-assets-${CACHE_VERSION}`;
+const SHELL_CACHE = `phonicsquest-shell-${CACHE_VERSION}`;
+const ASSET_CACHE = `phonicsquest-assets-${CACHE_VERSION}`;
 
 /** App shell files — always cache on install */
-const SHELL_FILES = [
-  '/phonicsquest/',
-  '/phonicsquest/index.html',
-];
+const SHELL_FILES = ['/phonicsquest/', '/phonicsquest/index.html'];
 
 /** All phoneme MP3 files — pre-bundled for offline use */
 const PHONEME_FILES = [
-  'a','air','ar','b','c','ch','d','e','ear','er','f','g','h','i','j','k',
-  'l','long_a','long_e','long_i','long_o','long_oo','long_u','m','n','ng',
-  'o','oi','or','ow','p','q','r','s','sh','short_oo','soft_c','soft_g','t',
-  'th','u','v','w','x','y','z'
-].map(f => `/phonicsquest/audio/phonemes/${f}.mp3`);
+  'a',
+  'air',
+  'ar',
+  'b',
+  'c',
+  'ch',
+  'd',
+  'e',
+  'ear',
+  'er',
+  'f',
+  'g',
+  'h',
+  'i',
+  'j',
+  'k',
+  'l',
+  'long_a',
+  'long_e',
+  'long_i',
+  'long_o',
+  'long_oo',
+  'long_u',
+  'm',
+  'n',
+  'ng',
+  'o',
+  'oi',
+  'or',
+  'ow',
+  'p',
+  'q',
+  'r',
+  's',
+  'sh',
+  'short_oo',
+  'soft_c',
+  'soft_g',
+  't',
+  'th',
+  'u',
+  'v',
+  'w',
+  'x',
+  'y',
+  'z',
+].map((f) => `/phonicsquest/audio/phonemes/${f}.mp3`);
 
 /** Audio and image prefixes to cache on first fetch */
 const CACHEABLE_PREFIXES = [
   '/phonicsquest/audio/',
   '/phonicsquest/images/',
   '/phonicsquest/icons/',
-  '/phonicsquest/assets/',  // Vite-bundled JS/CSS chunks
+  '/phonicsquest/assets/', // Vite-bundled JS/CSS chunks
 ];
 
 // ── Install: pre-cache app shell + all phoneme audio ────────────────────────
-self.addEventListener('install', event => {
+self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
       // Cache app shell first. Cache each file individually — addAll()
       // rejects the whole install (and skipWaiting never runs) if any one
       // URL 404s.
       const shellCache = await caches.open(SHELL_CACHE);
-      await Promise.all(SHELL_FILES.map(async (url) => {
-        try {
-          const response = await fetch(url);
-          if (response.ok) await shellCache.put(url, response);
-        } catch (_) {
-          // Tolerate a missing shell file; navigation fallback handles it.
-        }
-      }));
+      await Promise.all(
+        SHELL_FILES.map(async (url) => {
+          try {
+            const response = await fetch(url);
+            if (response.ok) await shellCache.put(url, response);
+          } catch (_) {
+            // Tolerate a missing shell file; navigation fallback handles it.
+          }
+        }),
+      );
 
       // Pre-cache all phoneme audio with progress reporting
       const assetCache = await caches.open(ASSET_CACHE);
@@ -56,33 +97,35 @@ self.addEventListener('install', event => {
       let cached = 0;
       let failed = 0;
 
-      await Promise.all(PHONEME_FILES.map(async (url) => {
-        try {
-          const existing = await assetCache.match(url);
-          if (!existing) {
-            const response = await fetch(url);
-            if (response.ok) {
-              await assetCache.put(url, response);
-            } else {
-              failed++;
+      await Promise.all(
+        PHONEME_FILES.map(async (url) => {
+          try {
+            const existing = await assetCache.match(url);
+            if (!existing) {
+              const response = await fetch(url);
+              if (response.ok) {
+                await assetCache.put(url, response);
+              } else {
+                failed++;
+              }
             }
+          } catch (_) {
+            failed++;
           }
-        } catch (_) {
-          failed++;
-        }
-        cached++;
-        broadcastProgress({ type: 'audio-cache-progress', cached, total, failed });
-      }));
+          cached++;
+          broadcastProgress({ type: 'audio-cache-progress', cached, total, failed });
+        }),
+      );
 
       broadcastProgress({ type: 'audio-cache-complete', total, failed });
       await self.skipWaiting();
-    })().catch(err => console.warn('[SW] Install failed:', err))
+    })().catch((err) => console.warn('[SW] Install failed:', err)),
   );
 });
 
 /** Send a message to all connected clients */
 function broadcastProgress(msg) {
-  self.clients.matchAll({ type: 'window' }).then(clients => {
+  self.clients.matchAll({ type: 'window' }).then((clients) => {
     for (const client of clients) {
       client.postMessage(msg);
     }
@@ -90,19 +133,20 @@ function broadcastProgress(msg) {
 }
 
 // ── Activate: delete old caches ─────────────────────────────────────────────
-self.addEventListener('activate', event => {
+self.addEventListener('activate', (event) => {
   const kept = [SHELL_CACHE, ASSET_CACHE];
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(k => !kept.includes(k)).map(k => caches.delete(k))
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(keys.filter((k) => !kept.includes(k)).map((k) => caches.delete(k))),
       )
-    ).then(() => self.clients.claim())
+      .then(() => self.clients.claim()),
   );
 });
 
 // ── Fetch: route requests ────────────────────────────────────────────────────
-self.addEventListener('fetch', event => {
+self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
@@ -110,7 +154,7 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
   // Audio + images + built assets → cache-first
-  if (CACHEABLE_PREFIXES.some(p => url.pathname.startsWith(p))) {
+  if (CACHEABLE_PREFIXES.some((p) => url.pathname.startsWith(p))) {
     event.respondWith(cacheFirst(request, ASSET_CACHE));
     return;
   }
@@ -154,18 +198,20 @@ async function networkFirstWithFallback(request) {
     }
     return response;
   } catch (_) {
-    const cached = await caches.match('/phonicsquest/') ||
-                   await caches.match('/phonicsquest/index.html');
+    const cached =
+      (await caches.match('/phonicsquest/')) || (await caches.match('/phonicsquest/index.html'));
     return cached || new Response('Offline', { status: 503 });
   }
 }
 
 async function staleWhileRevalidate(request, cacheName) {
-  const cache  = await caches.open(cacheName);
+  const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
-  const fetchPromise = fetch(request).then(response => {
-    if (response.ok) cache.put(request, response.clone());
-    return response;
-  }).catch(() => cached);
+  const fetchPromise = fetch(request)
+    .then((response) => {
+      if (response.ok) cache.put(request, response.clone());
+      return response;
+    })
+    .catch(() => cached);
   return cached || fetchPromise;
 }

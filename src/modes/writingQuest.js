@@ -1,14 +1,47 @@
 import { WRITING_LEVELS, writingPrompts } from '../data/writingPrompts.js';
-import { WRITING_TRACKS, getTracksForLevel, getLessonsForTrack } from '../data/writingLessonPacks.js';
+import {
+  WRITING_TRACKS,
+  getTracksForLevel,
+  getLessonsForTrack,
+} from '../data/writingLessonPacks.js';
 import { store } from '../modules/store.js';
 import { questMastery } from '../modules/questMastery.js';
 import { getLevelInfo } from '../data/curriculum.js';
-import { evaluateWriting, getLiveHint, compareRevisions, getDimensionFeedback, DIMENSION_LABELS, DIMENSION_EMOJIS, getRubricBand, getDimensionBandLabel } from '../modules/writingEvaluator.js';
+import {
+  evaluateWriting,
+  getLiveHint,
+  compareRevisions,
+  getDimensionFeedback,
+  DIMENSION_LABELS,
+  DIMENSION_EMOJIS,
+  getRubricBand,
+  getDimensionBandLabel,
+} from '../modules/writingEvaluator.js';
 import { detectBadges, renderBadgeChips } from '../modules/writingBadges.js';
-import { isPlanReady, mergeLessonWithPlan, getRemediationPath, getParagraphMissionStatus } from '../modules/writingLessonEngine.js';
+import {
+  isPlanReady,
+  mergeLessonWithPlan,
+  getRemediationPath,
+  getParagraphMissionStatus,
+} from '../modules/writingLessonEngine.js';
 import { renderDrill, collectDrillAnswers, gradeDrills } from '../modules/writingReviseDrills.js';
-import { getTrackProgress, setTrackProgress, migrateLegacyWritingCompleted } from '../modules/writingTrackProgress.js';
-import { saveDraft, loadDraft, clearDraft, updatePhase, updateFeedback, updateRevision, saveLegacyDraft, loadLegacyDraft, clearLegacyDraft, getDraftSummary } from '../modules/writingDraftStore.js';
+import {
+  getTrackProgress,
+  setTrackProgress,
+  migrateLegacyWritingCompleted,
+} from '../modules/writingTrackProgress.js';
+import {
+  saveDraft,
+  loadDraft,
+  clearDraft,
+  updatePhase,
+  updateFeedback,
+  updateRevision,
+  saveLegacyDraft,
+  loadLegacyDraft,
+  clearLegacyDraft,
+  getDraftSummary,
+} from '../modules/writingDraftStore.js';
 import { hasApiKey, getWritingCoachFeedback, gradeEssayWithRubric } from '../modules/aiService.js';
 import { escapeHtml } from '../utils/escapeHtml.js';
 
@@ -32,17 +65,25 @@ export function initWritingQuest(container, onGoHome) {
   _onGoHome = onGoHome;
 }
 
-function _dimensionLabel(key) { return DIMENSION_LABELS[key] || key; }
+function _dimensionLabel(key) {
+  return DIMENSION_LABELS[key] || key;
+}
 
 export function showWritingBrowser() {
   if (!_container) return;
-  _container.innerHTML = `<div class="sfq-browser"><div class="sfq-browser-grid">${Object.entries(WRITING_LEVELS).map(([k, label]) => {
-    const level = Number(k);
-    const tracks = getTracksForLevel(level);
-    const { done, total } = _getLevelProgress(level, tracks);
-    return `<button class="sfq-level-btn" data-level="${k}"><span class="sfq-level-icon">📝</span><span class="sfq-level-name">${label}</span><span class="sfq-level-count">${Math.min(done, total)} / ${total}</span></button>`;
-  }).join('')}</div></div>`;
-  _container.querySelectorAll('[data-level]').forEach((btn) => btn.addEventListener('click', () => _chooseLevel(Number(btn.dataset.level))));
+  _container.innerHTML = `<div class="sfq-browser"><div class="sfq-browser-grid">${Object.entries(
+    WRITING_LEVELS,
+  )
+    .map(([k, label]) => {
+      const level = Number(k);
+      const tracks = getTracksForLevel(level);
+      const { done, total } = _getLevelProgress(level, tracks);
+      return `<button class="sfq-level-btn" data-level="${k}"><span class="sfq-level-icon">📝</span><span class="sfq-level-name">${label}</span><span class="sfq-level-count">${Math.min(done, total)} / ${total}</span></button>`;
+    })
+    .join('')}</div></div>`;
+  _container
+    .querySelectorAll('[data-level]')
+    .forEach((btn) => btn.addEventListener('click', () => _chooseLevel(Number(btn.dataset.level))));
 }
 
 /**
@@ -53,7 +94,7 @@ export function showWritingBrowser() {
 function _getLevelProgress(level, tracks) {
   if (tracks.length) {
     // Ensure migration has run for all tracks at this level
-    tracks.forEach(t => migrateLegacyWritingCompleted([t.id], t.lessonIds.length, level));
+    tracks.forEach((t) => migrateLegacyWritingCompleted([t.id], t.lessonIds.length, level));
     const total = tracks.reduce((sum, t) => sum + t.lessonIds.length, 0);
     const done = tracks.reduce((sum, t) => sum + (getTrackProgress(t.id).completedLessons || 0), 0);
     return { done, total };
@@ -79,7 +120,7 @@ function _chooseLevel(level) {
 
 function _renderTrackBrowser(level) {
   // Migrate before reading progress so counts are up-to-date
-  _tracksForLevel.forEach(t => migrateLegacyWritingCompleted([t.id], t.lessonIds.length, level));
+  _tracksForLevel.forEach((t) => migrateLegacyWritingCompleted([t.id], t.lessonIds.length, level));
 
   // Sort tracks by term order (T1 before T2, etc.)
   const sortedTracks = [..._tracksForLevel].sort((a, b) => {
@@ -90,15 +131,19 @@ function _renderTrackBrowser(level) {
 
   _container.innerHTML = `<div class="sfq-game"><h3 class="cloze-title">Choose your writing track</h3>
   <p class="sfq-instruction">${WRITING_LEVELS[level]} has multiple term tracks.</p>
-  <div class="sfq-browser-grid">${sortedTracks.map((track) => {
-    const progress = getTrackProgress(track.id);
-    const completed = progress.completedLessons || 0;
-    const total = track.lessonIds.length;
-    const statusLabel = completed >= total ? ' (Complete)' : '';
-    return `<button class="sfq-level-btn" data-track="${track.id}"><span class="sfq-level-icon">📚</span><span class="sfq-level-name">${track.track}${statusLabel}</span><span class="sfq-level-count">${completed}/${total}</span></button>`;
-  }).join('')}</div>
+  <div class="sfq-browser-grid">${sortedTracks
+    .map((track) => {
+      const progress = getTrackProgress(track.id);
+      const completed = progress.completedLessons || 0;
+      const total = track.lessonIds.length;
+      const statusLabel = completed >= total ? ' (Complete)' : '';
+      return `<button class="sfq-level-btn" data-track="${track.id}"><span class="sfq-level-icon">📚</span><span class="sfq-level-name">${track.track}${statusLabel}</span><span class="sfq-level-count">${completed}/${total}</span></button>`;
+    })
+    .join('')}</div>
   <div class="sfq-actions" style="margin-top:10px"><button class="btn btn--ghost btn--sm" id="wq-level-back">Back</button></div></div>`;
-  _container.querySelectorAll('[data-track]').forEach((btn) => btn.addEventListener('click', () => _startTrack(btn.dataset.track)));
+  _container
+    .querySelectorAll('[data-track]')
+    .forEach((btn) => btn.addEventListener('click', () => _startTrack(btn.dataset.track)));
   document.getElementById('wq-level-back')?.addEventListener('click', showWritingBrowser);
 }
 
@@ -161,7 +206,9 @@ function _renderLearn(item) {
   // Check if there's a saved draft for this lesson (to offer resume)
   const saved = _track ? loadDraft(_track.id, _idx) : null;
   const summary = getDraftSummary(saved);
-  const resumeHtml = summary && summary.hasText ? `<div class="wq-resume-banner">
+  const resumeHtml =
+    summary && summary.hasText
+      ? `<div class="wq-resume-banner">
     <p><strong>You have a saved draft for this lesson.</strong></p>
     <p>Phase: ${summary.phase} ${summary.hasFeedback ? ' · Feedback saved' : ''} ${summary.hasRevision ? ' · Revision saved' : ''}</p>
     <p style="font-size:0.85em;color:var(--text-muted)">Last worked on: ${summary.updatedAt ? new Date(summary.updatedAt).toLocaleDateString() : 'unknown'}</p>
@@ -169,7 +216,8 @@ function _renderLearn(item) {
       <button class="btn btn--primary btn--sm" id="wq-resume">Continue Where You Left Off</button>
       <button class="btn btn--ghost btn--sm" id="wq-start-fresh">Start Fresh</button>
     </div>
-  </div>` : '';
+  </div>`
+      : '';
 
   _container.innerHTML = `<div class="sfq-game"><div class="sfq-header"><span class="sfq-badge">🧭 ${WRITING_TRACKS[item.track].track}</span><span class="sfq-progress">${_idx + 1}/${_list.length}</span></div>
     <h3 class="cloze-title">Learn: ${item.lessonTitle}</h3>
@@ -199,13 +247,18 @@ function _renderLearn(item) {
 
   document.getElementById('wq-next')?.addEventListener('click', () => {
     const selected = _container.querySelector('input[name="starter"]:checked');
-    _selectedStarter = selected ? item.storyStarterChoices?.[Number(selected.value)] : (item.storyStarterChoices?.[0] || '');
+    _selectedStarter = selected
+      ? item.storyStarterChoices?.[Number(selected.value)]
+      : item.storyStarterChoices?.[0] || '';
     _phase = 'revise';
     // Persist starter choice and phase
     if (_track) saveDraft(_track.id, _idx, { selectedStarter: _selectedStarter, phase: 'revise' });
     _render();
   });
-  document.getElementById('wq-menu')?.addEventListener('click', () => { cleanupWritingQuest(); _onGoHome?.(); });
+  document.getElementById('wq-menu')?.addEventListener('click', () => {
+    cleanupWritingQuest();
+    _onGoHome?.();
+  });
 }
 
 function _renderRevisePrep(item) {
@@ -222,7 +275,8 @@ function _renderRevisePrep(item) {
     const result = gradeDrills(drills, answers);
     const msg = document.getElementById('wq-drill-msg');
     if (!result.passed) {
-      if (msg) msg.textContent = `You scored ${result.correctCount}/${result.total}. Try again to unlock planning.`;
+      if (msg)
+        msg.textContent = `You scored ${result.correctCount}/${result.total}. Try again to unlock planning.`;
       return;
     }
     if (msg) msg.textContent = `Great! ${result.correctCount}/${result.total}. Planning unlocked.`;
@@ -230,11 +284,20 @@ function _renderRevisePrep(item) {
     if (_track) updatePhase(_track.id, _idx, 'plan');
     setTimeout(_render, 500);
   });
-  document.getElementById('wq-menu')?.addEventListener('click', () => { cleanupWritingQuest(); _onGoHome?.(); });
+  document.getElementById('wq-menu')?.addEventListener('click', () => {
+    cleanupWritingQuest();
+    _onGoHome?.();
+  });
 }
 
 function _renderPlan(item) {
-  const fields = item.plotPlanTemplate || ['introduction', 'risingAction', 'climax', 'fallingAction', 'conclusion'];
+  const fields = item.plotPlanTemplate || [
+    'introduction',
+    'risingAction',
+    'climax',
+    'fallingAction',
+    'conclusion',
+  ];
   _container.innerHTML = `<div class="sfq-game"><h3 class="cloze-title">Plan: Plot Builder</h3>
     <p class="sfq-instruction">Fill every core box before drafting.</p>
     <div class="dash-pattern-item">${fields.map((field) => `<label style="display:block;margin:8px 0"><strong>${field}</strong><textarea data-plan="${field}" class="cp-name-input" rows="2" placeholder="Plan this part..."></textarea></label>`).join('')}</div>
@@ -242,7 +305,7 @@ function _renderPlan(item) {
     <div id="wq-plan-msg" class="dash-pattern-item">All core plot boxes need at least one short sentence.</div></div>`;
   // Restore saved plan values if resuming
   if (_currentPlan && Object.keys(_currentPlan).length) {
-    fields.forEach(field => {
+    fields.forEach((field) => {
       const el = _container.querySelector(`[data-plan="${field}"]`);
       if (el && _currentPlan[field]) el.value = _currentPlan[field];
     });
@@ -250,7 +313,9 @@ function _renderPlan(item) {
 
   document.getElementById('wq-plan-next')?.addEventListener('click', () => {
     const plan = {};
-    _container.querySelectorAll('[data-plan]').forEach((el) => { plan[el.dataset.plan] = el.value.trim(); });
+    _container.querySelectorAll('[data-plan]').forEach((el) => {
+      plan[el.dataset.plan] = el.value.trim();
+    });
     _currentPlan = plan;
     if (!isPlanReady(plan, fields.slice(0, 5))) {
       const msg = document.getElementById('wq-plan-msg');
@@ -290,9 +355,13 @@ function _renderDraft(item) {
     const missionStatus = getParagraphMissionStatus(item, text);
     _lastMissionStatus = missionStatus;
     const detector = document.getElementById('wq-live-detector');
-    if (detector) detector.innerHTML = `🧠 ${hint.words}/${hint.target} words · ${(hint.score * 100).toFixed(0)}% · focus ${_dimensionLabel(hint.weakest)} · missions ${missionStatus.filter((m) => m.hit).length}/${missionStatus.length}`;
+    if (detector)
+      detector.innerHTML = `🧠 ${hint.words}/${hint.target} words · ${(hint.score * 100).toFixed(0)}% · focus ${_dimensionLabel(hint.weakest)} · missions ${missionStatus.filter((m) => m.hit).length}/${missionStatus.length}`;
     const missionList = document.getElementById('wq-mission-list');
-    if (missionList) missionList.innerHTML = missionStatus.map((m) => `<li>${m.hit ? '✅' : '⬜'} ${m.text}</li>`).join('');
+    if (missionList)
+      missionList.innerHTML = missionStatus
+        .map((m) => `<li>${m.hit ? '✅' : '⬜'} ${m.text}</li>`)
+        .join('');
 
     // Auto-save draft text every 2 seconds of inactivity
     clearTimeout(_draftSaveTimer);
@@ -301,15 +370,19 @@ function _renderDraft(item) {
     }, 2000);
   });
 
-  document.getElementById('wq-submit')?.addEventListener('click', () => _submitDraft(item, lessonForEval));
+  document
+    .getElementById('wq-submit')
+    ?.addEventListener('click', () => _submitDraft(item, lessonForEval));
   _bindFeedbackReviewToggle();
 }
 
 function _renderDimensionBreakdown(result) {
-  return `<ul class="wq-dimension-list">${Object.entries(result.dimensions).map(([key, val]) => {
-    const band = getDimensionBandLabel(val);
-    return `<li>${DIMENSION_EMOJIS[key] || ''} <strong>${_dimensionLabel(key)}</strong>: <span class="wq-dim-band wq-dim-band--${band.replace(/\s/g, '-').toLowerCase()}">${band}</span> — ${result.feedback?.[key] || getDimensionFeedback(key, val)}</li>`;
-  }).join('')}</ul>`;
+  return `<ul class="wq-dimension-list">${Object.entries(result.dimensions)
+    .map(([key, val]) => {
+      const band = getDimensionBandLabel(val);
+      return `<li>${DIMENSION_EMOJIS[key] || ''} <strong>${_dimensionLabel(key)}</strong>: <span class="wq-dim-band wq-dim-band--${band.replace(/\s/g, '-').toLowerCase()}">${band}</span> — ${result.feedback?.[key] || getDimensionFeedback(key, val)}</li>`;
+    })
+    .join('')}</ul>`;
 }
 
 function _renderAiCoachHtml(feedback) {
@@ -321,19 +394,32 @@ function _renderAiCoachHtml(feedback) {
     return `<div class="wq-ai-feedback-wrap"><p class="wq-ai-heading">✨ AI Coach</p><p class="wq-ai-good">${escapeHtml(feedback.good)}</p></div>`;
   }
   if (!feedback.items?.length) return '';
-  const items = feedback.items.map(it =>
-    `<li class="wq-ai-item"><span class="wq-ai-quote">"${escapeHtml(it.sentence)}"</span><span class="wq-ai-tip">${escapeHtml(it.issue)}</span></li>`
-  ).join('');
+  const items = feedback.items
+    .map(
+      (it) =>
+        `<li class="wq-ai-item"><span class="wq-ai-quote">"${escapeHtml(it.sentence)}"</span><span class="wq-ai-tip">${escapeHtml(it.issue)}</span></li>`,
+    )
+    .join('');
   return `<div class="wq-ai-feedback-wrap"><p class="wq-ai-heading">✨ AI Coach — sentence feedback</p><ul class="wq-ai-list">${items}</ul></div>`;
 }
 
-const _AI_BAND_LABELS = { 4: 'Strong 🌟', 3: 'Secure ✅', 2: 'Developing 📈', 1: 'Needs Support 💪' };
+const _AI_BAND_LABELS = {
+  4: 'Strong 🌟',
+  3: 'Secure ✅',
+  2: 'Developing 📈',
+  1: 'Needs Support 💪',
+};
 
 function _renderAiRubricHtml(graded) {
-  const esc = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
-  const rows = Object.entries(graded.dimensions).map(([key, d]) => `
+  const esc = (s) =>
+    String(s ?? '').replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c]);
+  const rows = Object.entries(graded.dimensions)
+    .map(
+      ([key, d]) => `
     <li class="wq-ai-item">${DIMENSION_EMOJIS[key] || ''} <strong>${_dimensionLabel(key)}</strong>:
-      Band ${d.band} — ${_AI_BAND_LABELS[d.band] || ''}${d.comment ? `<span class="wq-ai-tip">${esc(d.comment)}</span>` : ''}</li>`).join('');
+      Band ${d.band} — ${_AI_BAND_LABELS[d.band] || ''}${d.comment ? `<span class="wq-ai-tip">${esc(d.comment)}</span>` : ''}</li>`,
+    )
+    .join('');
   return `<div class="wq-ai-feedback-wrap">
     <p class="wq-ai-heading">✨ AI Coach — rubric marking</p>
     <ul class="wq-ai-list">${rows}</ul>
@@ -387,7 +473,7 @@ async function _submitDraft(item, lessonForEval) {
     aiSection.innerHTML = '<p class="wq-ai-loading">✨ AI coach is reading your draft…</p>';
     fb.appendChild(aiSection);
     const taskDesc = item?.title || item?.prompt || '';
-    getWritingCoachFeedback(text, _level, taskDesc).then(feedback => {
+    getWritingCoachFeedback(text, _level, taskDesc).then((feedback) => {
       if (!aiSection.isConnected) return;
       const html = feedback ? _renderAiCoachHtml(feedback) : '';
       if (html) aiSection.innerHTML = html;
@@ -399,7 +485,7 @@ async function _submitDraft(item, lessonForEval) {
     const rubricSection = document.createElement('div');
     rubricSection.className = 'wq-ai-feedback';
     fb.appendChild(rubricSection);
-    gradeEssayWithRubric(text, _level, taskDesc).then(graded => {
+    gradeEssayWithRubric(text, _level, taskDesc).then((graded) => {
       if (!graded || !rubricSection.isConnected) return;
       rubricSection.innerHTML = _renderAiRubricHtml(graded);
     });
@@ -413,7 +499,11 @@ async function _submitDraft(item, lessonForEval) {
 }
 
 function _renderRepair(item) {
-  const remediation = _lastDraftRemediation || { missingChecks: [], narrativePrompts: [], title: 'Polish your draft.' };
+  const remediation = _lastDraftRemediation || {
+    missingChecks: [],
+    narrativePrompts: [],
+    title: 'Polish your draft.',
+  };
   const firstBand = _firstResult ? getRubricBand(_firstResult.score || 0) : null;
   const firstScore = firstBand ? `Band ${firstBand.band} – ${firstBand.label}` : '?';
   const weakDim = remediation.weakestDimension || _firstResult?.weakest || 'content';
@@ -422,11 +512,14 @@ function _renderRepair(item) {
 
   // Build checklist items from missing checks + narrative prompts
   const checklistItems = [
-    ...remediation.missingChecks.map(c => ({ text: c, type: 'checkpoint' })),
-    ...remediation.narrativePrompts.map(p => ({ text: p, type: 'narrative' })),
+    ...remediation.missingChecks.map((c) => ({ text: c, type: 'checkpoint' })),
+    ...remediation.narrativePrompts.map((p) => ({ text: p, type: 'narrative' })),
   ];
   if (checklistItems.length === 0) {
-    checklistItems.push({ text: 'Polish language and flow — all checkpoints met.', type: 'polish' });
+    checklistItems.push({
+      text: 'Polish language and flow — all checkpoints met.',
+      type: 'polish',
+    });
   }
 
   _container.innerHTML = `<div class="sfq-game"><h3 class="cloze-title">Revise: Repair Mission</h3>
@@ -463,12 +556,12 @@ function _renderRepair(item) {
     const scoreDiff = currentResult.score - (_firstResult?.score || 0);
     if (liveEl) {
       const liveRubric = getRubricBand(currentResult.score);
-      liveEl.innerHTML = `🔧 ${hint.words} words · ${liveRubric.emoji} ${liveRubric.label} (${scoreDiff >= 0 ? '+' : ''}${(scoreDiff * 100).toFixed(0)}%) · Missions: ${missionStatus.filter(m => m.hit).length}/${missionStatus.length}`;
+      liveEl.innerHTML = `🔧 ${hint.words} words · ${liveRubric.emoji} ${liveRubric.label} (${scoreDiff >= 0 ? '+' : ''}${(scoreDiff * 100).toFixed(0)}%) · Missions: ${missionStatus.filter((m) => m.hit).length}/${missionStatus.length}`;
     }
 
     // Update checklist — mark items that are now satisfied
     const checkResults = currentResult.checkResults || [];
-    const missingNow = new Set(checkResults.filter(c => !c.hit).map(c => c.label));
+    const missingNow = new Set(checkResults.filter((c) => !c.hit).map((c) => c.label));
     checklistItems.forEach((c, i) => {
       const el = document.getElementById(`repair-check-${i}`);
       if (!el) return;
@@ -477,16 +570,19 @@ function _renderRepair(item) {
       } else if (c.type === 'narrative') {
         // Re-evaluate narrative quality for narrative prompts
         const nq = currentResult.metrics?.narrativeQuality || {};
-        const satisfied = (nq.climax > 0.3 || !c.text.includes('turning point'))
-          && (nq.resolution > 0.3 || !c.text.includes('problem was solved'))
-          && (nq.reflection > 0.3 || !c.text.includes('learned or felt'))
-          && (nq.dialogue > 0.3 || !c.text.includes('dialogue'));
+        const satisfied =
+          (nq.climax > 0.3 || !c.text.includes('turning point')) &&
+          (nq.resolution > 0.3 || !c.text.includes('problem was solved')) &&
+          (nq.reflection > 0.3 || !c.text.includes('learned or felt')) &&
+          (nq.dialogue > 0.3 || !c.text.includes('dialogue'));
         el.textContent = satisfied ? `✅ ${c.text}` : `❌ ${c.text}`;
       }
     });
   });
 
-  document.getElementById('wq-submit-revision')?.addEventListener('click', () => _submitRevision(item));
+  document
+    .getElementById('wq-submit-revision')
+    ?.addEventListener('click', () => _submitRevision(item));
   _bindFeedbackReviewToggle();
 }
 
@@ -516,17 +612,21 @@ function _submitRevision(item) {
   }
 
   // Build before/after comparison summary
-  const beforeBand  = _firstResult ? getRubricBand(_firstResult.score) : null;
-  const afterBand   = getRubricBand(result.score);
+  const beforeBand = _firstResult ? getRubricBand(_firstResult.score) : null;
+  const afterBand = getRubricBand(result.score);
   const beforeWords = _firstResult?.metrics?.words || 0;
-  const afterWords  = result.metrics?.words || 0;
+  const afterWords = result.metrics?.words || 0;
 
-  const dimComparison = cmp ? Object.entries(cmp.improved).map(([k, v]) => {
-    const before = _firstResult?.dimensions?.[k] || 0;
-    const after  = result.dimensions?.[k] || 0;
-    const arrow  = v > 0.02 ? '⬆️' : v < -0.02 ? '⬇️' : '➡️';
-    return `<li>${DIMENSION_EMOJIS[k] || ''} ${_dimensionLabel(k)}: ${getDimensionBandLabel(before)} ${arrow} ${getDimensionBandLabel(after)}</li>`;
-  }).join('') : '';
+  const dimComparison = cmp
+    ? Object.entries(cmp.improved)
+        .map(([k, v]) => {
+          const before = _firstResult?.dimensions?.[k] || 0;
+          const after = result.dimensions?.[k] || 0;
+          const arrow = v > 0.02 ? '⬆️' : v < -0.02 ? '⬇️' : '➡️';
+          return `<li>${DIMENSION_EMOJIS[k] || ''} ${_dimensionLabel(k)}: ${getDimensionBandLabel(before)} ${arrow} ${getDimensionBandLabel(after)}</li>`;
+        })
+        .join('')
+    : '';
 
   const fb = document.getElementById('wq-feedback');
   if (fb) {
@@ -563,13 +663,28 @@ function _submitRevision(item) {
 function _awardLessonRewards(item, result, cmp, badges, missionStatus = []) {
   const skill = item.lessonType || item.mode || 'composition';
   questMastery.updateSkill('writingQuest', skill, result.passed);
-  questMastery.recordAttempt({ quest: 'writingQuest', skill, correct: result.passed, level: _level });
-  const missionBonus = missionStatus.length ? Math.round((missionStatus.filter((m) => m.hit).length / missionStatus.length) * 10) : 0;
+  questMastery.recordAttempt({
+    quest: 'writingQuest',
+    skill,
+    correct: result.passed,
+    level: _level,
+  });
+  const missionBonus = missionStatus.length
+    ? Math.round((missionStatus.filter((m) => m.hit).length / missionStatus.length) * 10)
+    : 0;
   const baseXp = item.rewards?.xp || item.xp || 30;
-  const xpGain = Math.round(baseXp * (0.6 + result.score * 0.4) + (cmp?.revisionBonus || 0) + missionBonus);
+  const xpGain = Math.round(
+    baseXp * (0.6 + result.score * 0.4) + (cmp?.revisionBonus || 0) + missionBonus,
+  );
   const xp = (store.get('xp') || 0) + xpGain;
   const levelInfo = getLevelInfo(xp);
-  const collectibles = [...new Set([...(store.get('writingCollectibles') || []), ...(item.rewards?.collectibles || []), ...badges])];
+  const collectibles = [
+    ...new Set([
+      ...(store.get('writingCollectibles') || []),
+      ...(item.rewards?.collectibles || []),
+      ...badges,
+    ]),
+  ];
   store.patch({ xp, level: levelInfo.level, writingCollectibles: collectibles });
 }
 
@@ -587,7 +702,10 @@ function _renderLessonComplete(item) {
     const cmp = saved.revisionComparison;
     feedbackSummaryHtml = `<div class="wq-feedback-review-panel">
       <strong>Lesson Feedback Summary</strong>
-      ${(() => { const rb = getRubricBand(r.score || 0); return `<p>${rb.emoji} Band ${rb.band}: ${rb.label} ${'⭐'.repeat(r.stars || 0)}</p>`; })()}
+      ${(() => {
+        const rb = getRubricBand(r.score || 0);
+        return `<p>${rb.emoji} Band ${rb.band}: ${rb.label} ${'⭐'.repeat(r.stars || 0)}</p>`;
+      })()}
       <p>${r.encouragement || ''}</p>
       ${_renderDimensionBreakdown(r)}
       ${cmp?.netImproved ? `<p>📈 Revision improved your writing!</p>` : ''}
@@ -683,7 +801,7 @@ function _gradeBossConstructedItem(ci, response) {
     // Check that response contains at least one required signal
     const signals = ci.requiredSignals || [];
     if (signals.length === 0) return response.length >= 8;
-    return signals.some(s => lower.includes(s.toLowerCase()));
+    return signals.some((s) => lower.includes(s.toLowerCase()));
   }
 
   if (ci.type === 'mini_revision') {
@@ -693,7 +811,7 @@ function _gradeBossConstructedItem(ci, response) {
     // Check for improvement signals
     const signals = ci.improvementSignals || [];
     if (signals.length === 0) return response.length > original.length;
-    return signals.some(s => lower.includes(s.toLowerCase()));
+    return signals.some((s) => lower.includes(s.toLowerCase()));
   }
 
   return false;
@@ -791,8 +909,11 @@ function _renderFeedbackReviewPanel() {
     </button>
     <div class="wq-review-body" id="wq-review-body" hidden>
       <p><strong>${r.encouragement || ''}</strong></p>
-      ${(() => { const rb = getRubricBand(r.score || 0); return `<p>${rb.emoji} Band ${rb.band}: ${rb.label} ${'⭐'.repeat(r.stars || 0)}</p>`; })()}
-      <p>Mission Progress: ${ms.filter(m => m.hit).length}/${ms.length}</p>
+      ${(() => {
+        const rb = getRubricBand(r.score || 0);
+        return `<p>${rb.emoji} Band ${rb.band}: ${rb.label} ${'⭐'.repeat(r.stars || 0)}</p>`;
+      })()}
+      <p>Mission Progress: ${ms.filter((m) => m.hit).length}/${ms.length}</p>
       ${rem?.title ? `<p>Revision Mission: ${rem.title}</p>` : ''}
       ${rem?.missingChecks?.length ? `<p>Missing: ${rem.missingChecks.join(' · ')}</p>` : ''}
       ${_renderDimensionBreakdown(r)}

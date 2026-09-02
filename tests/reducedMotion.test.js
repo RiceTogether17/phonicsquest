@@ -8,7 +8,12 @@ import { prefersReducedMotion } from '../src/utils/motion.js';
 
 beforeAll(() => {
   // wheel.js pulls in audio.js, which touches speechSynthesis at import time.
-  const synth = { getVoices: () => [], addEventListener: () => {}, cancel: () => {}, speak: () => {} };
+  const synth = {
+    getVoices: () => [],
+    addEventListener: () => {},
+    cancel: () => {},
+    speak: () => {},
+  };
   globalThis.speechSynthesis = globalThis.speechSynthesis || synth;
   if (globalThis.window) window.speechSynthesis = window.speechSynthesis || synth;
 });

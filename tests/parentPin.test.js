@@ -26,7 +26,9 @@ describe('verifyPin', () => {
   it('verifies a legacy unsalted sha256 hash and flags it for upgrade', async () => {
     // sha256('1234')
     const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('1234'));
-    const hex = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+    const hex = Array.from(new Uint8Array(digest))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
     const res = await verifyPin('1234', `sha256:${hex}`);
     expect(res.ok).toBe(true);
     expect(res.needsUpgrade).toBe(true);

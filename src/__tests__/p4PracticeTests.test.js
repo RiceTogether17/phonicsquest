@@ -58,7 +58,7 @@ describe('P4 Practice Test data bank', () => {
 
   it('every paper has a comprehension section with a passage', () => {
     for (const test of getP4PracticeTests()) {
-      const compKey = Object.keys(test).find(k => test[k]?.passage);
+      const compKey = Object.keys(test).find((k) => test[k]?.passage);
       expect(compKey, 'no comprehension section').toBeTruthy();
     }
   });

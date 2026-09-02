@@ -14,15 +14,31 @@ describe('recordMasteryAttempt', () => {
 
   it('builds nested structure on first call and bumps counters on second', () => {
     let map = recordMasteryAttempt({
-      mode: 'clozeCastle', level: 'P4', category: 'tense',
-      skill: 'tense', clueType: 'timeClue', wasWrong: true,
-      example: { passageId: 'p1', blankIndex: 0, chosen: 'walk', correct: 'walked', clueType: 'timeClue' },
-      now: 1000, current: {},
+      mode: 'clozeCastle',
+      level: 'P4',
+      category: 'tense',
+      skill: 'tense',
+      clueType: 'timeClue',
+      wasWrong: true,
+      example: {
+        passageId: 'p1',
+        blankIndex: 0,
+        chosen: 'walk',
+        correct: 'walked',
+        clueType: 'timeClue',
+      },
+      now: 1000,
+      current: {},
     });
     map = recordMasteryAttempt({
-      mode: 'clozeCastle', level: 'P4', category: 'tense',
-      skill: 'tense', clueType: 'timeClue', wasWrong: false,
-      now: 2000, current: map,
+      mode: 'clozeCastle',
+      level: 'P4',
+      category: 'tense',
+      skill: 'tense',
+      clueType: 'timeClue',
+      wasWrong: false,
+      now: 2000,
+      current: map,
     });
     const skill = map.clozeCastle.P4.tense;
     expect(skill.attempts).toBe(2);
@@ -38,10 +54,21 @@ describe('recordMasteryAttempt', () => {
     let map = {};
     for (let i = 0; i < 7; i++) {
       map = recordMasteryAttempt({
-        mode: 'clozeCastle', level: 'P5', category: 'connectors',
-        skill: 'connectorLogic', clueType: 'connectorClue', wasWrong: true,
-        example: { passageId: `p${i}`, blankIndex: i, chosen: 'and', correct: 'although', clueType: 'connectorClue' },
-        now: 1000 + i, current: map,
+        mode: 'clozeCastle',
+        level: 'P5',
+        category: 'connectors',
+        skill: 'connectorLogic',
+        clueType: 'connectorClue',
+        wasWrong: true,
+        example: {
+          passageId: `p${i}`,
+          blankIndex: i,
+          chosen: 'and',
+          correct: 'although',
+          clueType: 'connectorClue',
+        },
+        now: 1000 + i,
+        current: map,
       });
     }
     const examples = map.clozeCastle.P5.connectorLogic.recentExamples;
@@ -52,11 +79,24 @@ describe('recordMasteryAttempt', () => {
 
   it('does not erase tracking for other modes or levels', () => {
     let map = recordMasteryAttempt({
-      mode: 'clozeCastle', level: 'P3', skill: 'tense', wasWrong: false, current: {},
+      mode: 'clozeCastle',
+      level: 'P3',
+      skill: 'tense',
+      wasWrong: false,
+      current: {},
     });
     map = recordMasteryAttempt({
-      mode: 'wordVault', level: 'P5', skill: 'collocation', wasWrong: true,
-      example: { passageId: 'v1', blankIndex: 0, chosen: 'do', correct: 'make', clueType: 'collocationClue' },
+      mode: 'wordVault',
+      level: 'P5',
+      skill: 'collocation',
+      wasWrong: true,
+      example: {
+        passageId: 'v1',
+        blankIndex: 0,
+        chosen: 'do',
+        correct: 'make',
+        clueType: 'collocationClue',
+      },
       current: map,
     });
     expect(map.clozeCastle.P3.tense.attempts).toBe(1);
@@ -92,9 +132,19 @@ describe('getTopMasteryGaps', () => {
 
   it('exposes the most recent example for the weakest skill', () => {
     const map = recordMasteryAttempt({
-      mode: 'wordVault', level: 'P5', category: 'collocationCloze',
-      skill: 'collocation', clueType: 'collocationClue', wasWrong: true,
-      example: { passageId: 'v9', blankIndex: 1, chosen: 'do', correct: 'make', clueType: 'collocationClue' },
+      mode: 'wordVault',
+      level: 'P5',
+      category: 'collocationCloze',
+      skill: 'collocation',
+      clueType: 'collocationClue',
+      wasWrong: true,
+      example: {
+        passageId: 'v9',
+        blankIndex: 1,
+        chosen: 'do',
+        correct: 'make',
+        clueType: 'collocationClue',
+      },
       current: {},
     });
     const top = getTopMasteryGaps({ mode: 'wordVault', level: 'P5', masteryMap: map });
@@ -104,27 +154,48 @@ describe('getTopMasteryGaps', () => {
 
 describe('summariseMasteryGap', () => {
   it('returns empty-state copy when no attempts have been made', () => {
-    expect(summariseMasteryGap({ skill: 'tense', skillLabel: 'Verb tense', attempts: 0 }))
-      .toMatch(/start tracking/i);
+    expect(summariseMasteryGap({ skill: 'tense', skillLabel: 'Verb tense', attempts: 0 })).toMatch(
+      /start tracking/i,
+    );
   });
 
   it('encourages refinement when accuracy is high', () => {
-    expect(summariseMasteryGap({ skill: 'tense', skillLabel: 'Verb tense', attempts: 4, accuracy: 90 }))
-      .toMatch(/almost mastered/i);
+    expect(
+      summariseMasteryGap({ skill: 'tense', skillLabel: 'Verb tense', attempts: 4, accuracy: 90 }),
+    ).toMatch(/almost mastered/i);
   });
 
   it('drills slowly when accuracy is low', () => {
-    expect(summariseMasteryGap({ skill: 'tense', skillLabel: 'Verb tense', attempts: 4, accuracy: 25 }))
-      .toMatch(/drill/i);
+    expect(
+      summariseMasteryGap({ skill: 'tense', skillLabel: 'Verb tense', attempts: 4, accuracy: 25 }),
+    ).toMatch(/drill/i);
   });
 });
 
 describe('groupWrongLinesBySkill', () => {
   it('groups exam-mode wrong rows under their skillLabel header', () => {
     const lines = groupWrongLinesBySkill([
-      { skillLabel: 'Verb tense', passageTitle: 'Storm Day', blank: '#1', studentAnswer: 'walk', correctAnswer: 'walked' },
-      { skillLabel: 'Verb tense', passageTitle: 'Storm Day', blank: '#2', studentAnswer: 'run', correctAnswer: 'ran' },
-      { skillLabel: 'Connector logic', passageTitle: 'School Trip', blank: '#1', studentAnswer: 'and', correctAnswer: 'although' },
+      {
+        skillLabel: 'Verb tense',
+        passageTitle: 'Storm Day',
+        blank: '#1',
+        studentAnswer: 'walk',
+        correctAnswer: 'walked',
+      },
+      {
+        skillLabel: 'Verb tense',
+        passageTitle: 'Storm Day',
+        blank: '#2',
+        studentAnswer: 'run',
+        correctAnswer: 'ran',
+      },
+      {
+        skillLabel: 'Connector logic',
+        passageTitle: 'School Trip',
+        blank: '#1',
+        studentAnswer: 'and',
+        correctAnswer: 'although',
+      },
     ]);
     expect(lines[0]).toContain('Verb tense (2 wrong)');
     expect(lines[3]).toContain('Connector logic (1 wrong)');

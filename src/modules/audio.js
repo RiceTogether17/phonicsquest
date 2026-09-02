@@ -234,6 +234,8 @@ class AudioManager {
     /** @type {Map<string, HTMLAudioElement>} */
     this._elements = new Map();
     this._ttsVoice = null;
+    /** Bumped on every _speak and every cancelSpeech — see _speak's onset guard. */
+    this._speakGeneration = 0;
     this._initTTS();
   }
 
@@ -627,6 +629,9 @@ class AudioManager {
    * leaving the voice talking over the screen the child just moved to.
    */
   cancelSpeech() {
+    // Bump first: an utterance still inside its onset guard has not reached
+    // the engine, so cancel() alone would let it start a moment later.
+    this._speakGeneration++;
     if (window.speechSynthesis) {
       try { speechSynthesis.cancel(); } catch (err) { devWarn('Cancel failed:', err.message); }
     }
@@ -890,6 +895,11 @@ class AudioManager {
 
   /** @private — Web Speech API utterance */
   _speak(text, rate = 0.8, { pitch = 1.1, preDelayMs = 80 } = {}) {
+    // Bumped by every _speak and by cancelSpeech. An utterance still inside
+    // its onset guard has not reached the engine yet, so speechSynthesis
+    // .cancel() has nothing to cancel — the generation is what lets the
+    // queued speak() see that it has been superseded and drop itself.
+    const generation = ++this._speakGeneration;
     return new Promise((resolve) => {
       if (!window.speechSynthesis) { resolve(); return; }
       speechSynthesis.cancel();
@@ -932,7 +942,13 @@ class AudioManager {
       // Onset guard: speaking immediately after cancel() clips the first
       // consonant on Chrome/Android — fatal for First Sound, where that
       // consonant IS the question. A short gap lets the engine settle.
-      setTimeout(() => speechSynthesis.speak(utt), preDelayMs);
+      setTimeout(() => {
+        // Superseded during the guard (a new utterance, or a teardown that
+        // called cancelSpeech). Starting now would talk over whatever screen
+        // the child is on, and nothing would be left to cancel it.
+        if (generation !== this._speakGeneration) { done(); return; }
+        speechSynthesis.speak(utt);
+      }, preDelayMs);
     });
   }
 

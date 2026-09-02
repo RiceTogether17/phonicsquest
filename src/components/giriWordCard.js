@@ -33,11 +33,11 @@ import { STATES } from './mascot.js';
  * as intent ('present this word') rather than as art direction.
  */
 export const CARD_POSES = Object.freeze({
-  present:   STATES.holdCard,    // introducing the word
-  think:     STATES.thinking,    // child is working on it
-  point:     STATES.pointRight,  // drawing attention to the sound track
-  encourage: STATES.encourage,   // after a retry
-  celebrate: STATES.celebrate,   // solved
+  present: STATES.holdCard, // introducing the word
+  think: STATES.thinking, // child is working on it
+  point: STATES.pointRight, // drawing attention to the sound track
+  encourage: STATES.encourage, // after a retry
+  celebrate: STATES.celebrate, // solved
 });
 
 /** Poses that should not animate in (celebration handles its own motion). */

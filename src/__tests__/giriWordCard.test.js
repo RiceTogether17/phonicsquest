@@ -52,7 +52,9 @@ describe('rendering', () => {
 
   it('renders an optional caption', () => {
     renderGiriWordCard(CAT, host, { caption: 'Tap the sounds you hear' });
-    expect(host.querySelector('.giri-word-card__caption').textContent).toBe('Tap the sounds you hear');
+    expect(host.querySelector('.giri-word-card__caption').textContent).toBe(
+      'Tap the sounds you hear',
+    );
   });
 
   it('omits the caption element entirely when not given one', () => {

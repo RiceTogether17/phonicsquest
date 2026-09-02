@@ -7,7 +7,9 @@ import {
   markMissionStepDone,
 } from '../src/modules/missionToday.js';
 
-function pad2(n) { return String(n).padStart(2, '0'); }
+function pad2(n) {
+  return String(n).padStart(2, '0');
+}
 function ymd(d) {
   return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 }
@@ -30,19 +32,19 @@ describe('missionToday', () => {
 
   it('exposes five steps in fixed order', () => {
     const steps = getMissionSteps(NOW);
-    expect(steps.map(s => s.id)).toEqual([
+    expect(steps.map((s) => s.id)).toEqual([
       'grammar-cloze',
       'vocab-cloze',
       'comprehension-clue',
       'sentence-correction',
       'yesterday-review',
     ]);
-    expect(steps.every(s => typeof s.title === 'string' && s.title.length > 0)).toBe(true);
+    expect(steps.every((s) => typeof s.title === 'string' && s.title.length > 0)).toBe(true);
   });
 
   it('routes each step to the right module target', () => {
     const steps = getMissionSteps(NOW);
-    const byId = Object.fromEntries(steps.map(s => [s.id, s]));
+    const byId = Object.fromEntries(steps.map((s) => [s.id, s]));
     expect(byId['grammar-cloze'].target).toBe('cloze-castle');
     expect(byId['vocab-cloze'].target).toBe('word-vault');
     expect(byId['comprehension-clue'].target).toBe('comprehension-cloze');
@@ -51,7 +53,7 @@ describe('missionToday', () => {
     expect(byId['yesterday-review'].target).toBe('grammar-mcq');
   });
 
-  it('counts today\'s questAttempts toward the matching step', () => {
+  it("counts today's questAttempts toward the matching step", () => {
     store.set('questAttempts', [
       attemptAt(NOW, { quest: 'clozeCastle', skill: 'tense', correct: true }),
       attemptAt(NOW, { quest: 'clozeCastle', skill: 'tense', correct: false }),
@@ -59,10 +61,10 @@ describe('missionToday', () => {
       attemptAt(YESTERDAY, { quest: 'clozeCastle', skill: 'tense', correct: true }),
     ]);
     const steps = getMissionSteps(NOW);
-    const grammar = steps.find(s => s.id === 'grammar-cloze');
-    const vocab   = steps.find(s => s.id === 'vocab-cloze');
+    const grammar = steps.find((s) => s.id === 'grammar-cloze');
+    const vocab = steps.find((s) => s.id === 'vocab-cloze');
     expect(grammar.count).toBe(2);
-    expect(grammar.done).toBe(false);            // goal is 3
+    expect(grammar.done).toBe(false); // goal is 3
     expect(vocab.count).toBe(1);
     expect(vocab.done).toBe(false);
   });
@@ -75,13 +77,13 @@ describe('missionToday', () => {
       attemptAt(NOW, { quest: 'editingQuest', skill: 'spelling', correct: false }),
     ]);
     const steps = getMissionSteps(NOW);
-    const byId = Object.fromEntries(steps.map(s => [s.id, s]));
+    const byId = Object.fromEntries(steps.map((s) => [s.id, s]));
     expect(byId['grammar-cloze'].done).toBe(true);
     expect(byId['sentence-correction'].count).toBe(1);
     expect(byId['sentence-correction'].done).toBe(true);
   });
 
-  it('picks yesterday\'s wrong attempt for the review step', () => {
+  it("picks yesterday's wrong attempt for the review step", () => {
     store.set('questAttempts', [
       // Most recent first (matches store.recordQuestAttempt ordering)
       attemptAt(NOW, { quest: 'wordVault', skill: 'synonym', correct: true }),
@@ -89,7 +91,7 @@ describe('missionToday', () => {
       attemptAt(YESTERDAY, { quest: 'clozeCastle', skill: 'tense', correct: true }),
     ]);
     const steps = getMissionSteps(NOW);
-    const review = steps.find(s => s.id === 'yesterday-review');
+    const review = steps.find((s) => s.id === 'yesterday-review');
     expect(review.target).toBe('word-vault');
     expect(review.replaySkill).toBe('connectorClue');
     expect(review.title).toContain('Word Vault');
@@ -100,7 +102,7 @@ describe('missionToday', () => {
       attemptAt(YESTERDAY, { quest: 'wordVault', skill: 'connectorClue', correct: false }),
     ]);
     let steps = getMissionSteps(NOW);
-    expect(steps.find(s => s.id === 'yesterday-review').done).toBe(false);
+    expect(steps.find((s) => s.id === 'yesterday-review').done).toBe(false);
 
     // Add a same-skill attempt today; review step should now be done.
     store.set('questAttempts', [
@@ -108,14 +110,14 @@ describe('missionToday', () => {
       attemptAt(YESTERDAY, { quest: 'wordVault', skill: 'connectorClue', correct: false }),
     ]);
     steps = getMissionSteps(NOW);
-    expect(steps.find(s => s.id === 'yesterday-review').done).toBe(true);
+    expect(steps.find((s) => s.id === 'yesterday-review').done).toBe(true);
   });
 
-  it('persists today\'s mistake selection across calls', () => {
+  it("persists today's mistake selection across calls", () => {
     store.set('questAttempts', [
       attemptAt(YESTERDAY, { quest: 'clozeCastle', skill: 'tense', correct: false }),
     ]);
-    const first  = getTodaysMission(NOW);
+    const first = getTodaysMission(NOW);
     // Mutate questAttempts after generation — selection should be stable.
     store.set('questAttempts', [
       attemptAt(YESTERDAY, { quest: 'editingQuest', skill: 'spelling', correct: false }),
@@ -140,12 +142,12 @@ describe('missionToday', () => {
 
   it('markMissionStepDone marks placeholder steps complete', () => {
     let steps = getMissionSteps(NOW);
-    expect(steps.find(s => s.id === 'comprehension-clue').done).toBe(false);
+    expect(steps.find((s) => s.id === 'comprehension-clue').done).toBe(false);
 
     markMissionStepDone('comprehension-clue', NOW);
 
     steps = getMissionSteps(NOW);
-    expect(steps.find(s => s.id === 'comprehension-clue').done).toBe(true);
+    expect(steps.find((s) => s.id === 'comprehension-clue').done).toBe(true);
   });
 
   it('summary reports done/total and complete flag', () => {

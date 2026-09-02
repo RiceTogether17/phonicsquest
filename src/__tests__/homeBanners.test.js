@@ -10,7 +10,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 function stubAudioGlobals() {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
 }
 
@@ -95,7 +98,9 @@ describe('daily challenge banner', () => {
     expect(document.getElementById('daily-banner-title').textContent).toContain('Daily Challenge');
     expect(document.getElementById('daily-banner-sub').textContent).toMatch(/bonus XP/);
     expect(document.getElementById('daily-banner-arrow').textContent).toBe('→');
-    expect(document.getElementById('btn-daily-challenge').classList.contains('stories-banner--done')).toBe(false);
+    expect(
+      document.getElementById('btn-daily-challenge').classList.contains('stories-banner--done'),
+    ).toBe(false);
   });
 
   it('switches to a completed state once done', async () => {
@@ -107,7 +112,9 @@ describe('daily challenge banner', () => {
 
     expect(document.getElementById('daily-banner-sub').textContent).toMatch(/well done/i);
     expect(document.getElementById('daily-banner-arrow').textContent).toBe('✓');
-    expect(document.getElementById('btn-daily-challenge').classList.contains('stories-banner--done')).toBe(true);
+    expect(
+      document.getElementById('btn-daily-challenge').classList.contains('stories-banner--done'),
+    ).toBe(true);
   });
 });
 
@@ -187,7 +194,9 @@ describe('today tab badge', () => {
     const badge = document.getElementById('home-tab-today-badge');
     expect(badge.hidden).toBe(false);
     expect(badge.textContent).toBe('3');
-    expect(document.getElementById('home-tab-today').getAttribute('aria-label')).toContain('3 items waiting');
+    expect(document.getElementById('home-tab-today').getAttribute('aria-label')).toContain(
+      '3 items waiting',
+    );
   });
 
   it('caps the badge at 9+ so it stays readable', async () => {

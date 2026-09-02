@@ -81,8 +81,7 @@ function hasDigraph(word) {
  * They now have a stage that teaches the rule before testing it.
  */
 function hasSoftCG(word) {
-  return Array.isArray(word?.types)
-    && word.types.some((t) => t === 'soft_c' || t === 'soft_g');
+  return Array.isArray(word?.types) && word.types.some((t) => t === 'soft_c' || t === 'soft_g');
 }
 
 const FIVE_SHORT_VOWELS = new Set(['a', 'e', 'i', 'o', 'u']);

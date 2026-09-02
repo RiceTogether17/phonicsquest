@@ -88,7 +88,7 @@ export function getLevelTrackProgress(tracks) {
  * Check if all tracks at a given level are complete.
  */
 export function isLevelFullyComplete(tracks) {
-  return tracks.every(t => {
+  return tracks.every((t) => {
     const p = getTrackProgress(t.id);
     return p.completed;
   });

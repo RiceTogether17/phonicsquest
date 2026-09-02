@@ -13,10 +13,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const localStorageMock = (() => {
   let data = {};
   return {
-    getItem: vi.fn(k => data[k] ?? null),
-    setItem: vi.fn((k, v) => { data[k] = String(v); }),
-    removeItem: vi.fn(k => { delete data[k]; }),
-    clear: vi.fn(() => { data = {}; }),
+    getItem: vi.fn((k) => data[k] ?? null),
+    setItem: vi.fn((k, v) => {
+      data[k] = String(v);
+    }),
+    removeItem: vi.fn((k) => {
+      delete data[k];
+    }),
+    clear: vi.fn(() => {
+      data = {};
+    }),
   };
 })();
 Object.defineProperty(globalThis, 'localStorage', { value: localStorageMock });
@@ -34,14 +40,16 @@ beforeEach(async () => {
   providers = await import('../src/modules/aiProviders.js');
 });
 
-const okJson = (body) => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(body) });
+const okJson = (body) =>
+  Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(body) });
 const errJson = (status, body = {}) =>
   Promise.resolve({ ok: false, status, json: () => Promise.resolve(body) });
 
-const geminiOk = (text) => okJson({
-  candidates: [{ content: { parts: [{ text }] } }],
-  usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 5 },
-});
+const geminiOk = (text) =>
+  okJson({
+    candidates: [{ content: { parts: [{ text }] } }],
+    usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 5 },
+  });
 
 function useProvider(id, key, model) {
   store.set('aiProvider', id);
@@ -64,10 +72,12 @@ describe('each provider is reachable with the parent’s own key', () => {
 
   it('Anthropic opts in to browser access and sends the version header', async () => {
     useProvider('anthropic', 'sk-ant-TESTKEY');
-    fetchMock.mockReturnValue(okJson({
-      content: [{ type: 'text', text: 'hello' }],
-      usage: { input_tokens: 10, output_tokens: 5 },
-    }));
+    fetchMock.mockReturnValue(
+      okJson({
+        content: [{ type: 'text', text: 'hello' }],
+        usage: { input_tokens: 10, output_tokens: 5 },
+      }),
+    );
 
     expect(await aiService.callAi('hi')).toBe('hello');
 
@@ -81,10 +91,12 @@ describe('each provider is reachable with the parent’s own key', () => {
 
   it('OpenAI sends a bearer token', async () => {
     useProvider('openai', 'sk-TESTKEY');
-    fetchMock.mockReturnValue(okJson({
-      choices: [{ message: { content: 'hello' }, finish_reason: 'stop' }],
-      usage: { prompt_tokens: 10, completion_tokens: 5 },
-    }));
+    fetchMock.mockReturnValue(
+      okJson({
+        choices: [{ message: { content: 'hello' }, finish_reason: 'stop' }],
+        usage: { prompt_tokens: 10, completion_tokens: 5 },
+      }),
+    );
 
     expect(await aiService.callAi('hi')).toBe('hello');
     expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe('Bearer sk-TESTKEY');
@@ -206,10 +218,12 @@ describe('key shape is checked before a request is spent', () => {
 describe('the parent can see what it is costing', () => {
   it('accumulates tokens and an estimate across calls', async () => {
     useProvider('anthropic', 'sk-ant-KEY', 'claude-haiku-4-5');
-    fetchMock.mockReturnValue(okJson({
-      content: [{ type: 'text', text: 'hi' }],
-      usage: { input_tokens: 1000, output_tokens: 1000 },
-    }));
+    fetchMock.mockReturnValue(
+      okJson({
+        content: [{ type: 'text', text: 'hi' }],
+        usage: { input_tokens: 1000, output_tokens: 1000 },
+      }),
+    );
 
     await aiService.callAi('a');
     await aiService.callAi('b');
@@ -223,10 +237,12 @@ describe('the parent can see what it is costing', () => {
 
   it('says "unknown" rather than "$0.00" for a model with no price on file', async () => {
     useProvider('anthropic', 'sk-ant-KEY', 'some-future-model');
-    fetchMock.mockReturnValue(okJson({
-      content: [{ type: 'text', text: 'hi' }],
-      usage: { input_tokens: 100, output_tokens: 100 },
-    }));
+    fetchMock.mockReturnValue(
+      okJson({
+        content: [{ type: 'text', text: 'hi' }],
+        usage: { input_tokens: 100, output_tokens: 100 },
+      }),
+    );
     await aiService.callAi('a');
 
     const spend = aiConfig.spendSummary();

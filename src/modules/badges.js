@@ -91,7 +91,7 @@ const BADGE_DEFINITIONS = [
     id: 'week_warrior',
     emoji: '🗓️',
     name: 'Week Warrior',
-    desc: '7-day streak — you\'re amazing!',
+    desc: "7-day streak — you're amazing!",
     check: (s) => s.dayStreak >= 7,
   },
   {
@@ -136,7 +136,9 @@ class BadgeManager {
           dailyGoalsCompleted: parsed.dailyGoalsCompleted ?? 0,
         };
       }
-    } catch (err) { devWarn('Failed to load badge state:', err.message); }
+    } catch (err) {
+      devWarn('Failed to load badge state:', err.message);
+    }
     return {
       earned: new Set(),
       totalCorrect: 0,
@@ -149,14 +151,19 @@ class BadgeManager {
   /** Persist badge state to localStorage */
   _save() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        earned: [...this._state.earned],
-        totalCorrect: this._state.totalCorrect,
-        modesPlayed: [...this._state.modesPlayed],
-        storiesOpened: this._state.storiesOpened,
-        dailyGoalsCompleted: this._state.dailyGoalsCompleted,
-      }));
-    } catch (err) { devWarn('Failed to save badge state:', err.message); }
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          earned: [...this._state.earned],
+          totalCorrect: this._state.totalCorrect,
+          modesPlayed: [...this._state.modesPlayed],
+          storiesOpened: this._state.storiesOpened,
+          dailyGoalsCompleted: this._state.dailyGoalsCompleted,
+        }),
+      );
+    } catch (err) {
+      devWarn('Failed to save badge state:', err.message);
+    }
   }
 
   /**
@@ -172,7 +179,14 @@ class BadgeManager {
    * @returns {Array<{emoji,name,desc}>} newly earned badges
    */
   onCorrect(ctx) {
-    const { fast = false, sessionStreak = 0, level = 1, dayStreak = 0, dailyComplete = false, mode = '' } = ctx;
+    const {
+      fast = false,
+      sessionStreak = 0,
+      level = 1,
+      dayStreak = 0,
+      dailyComplete = false,
+      mode = '',
+    } = ctx;
 
     // Update state
     this._state.totalCorrect++;
@@ -226,12 +240,12 @@ class BadgeManager {
 
   /** Get all earned badge definitions */
   getEarned() {
-    return BADGE_DEFINITIONS.filter(b => this._state.earned.has(b.id));
+    return BADGE_DEFINITIONS.filter((b) => this._state.earned.has(b.id));
   }
 
   /** Get all badge definitions (for dashboard display) */
   getAll() {
-    return BADGE_DEFINITIONS.map(b => ({ ...b, earned: this._state.earned.has(b.id) }));
+    return BADGE_DEFINITIONS.map((b) => ({ ...b, earned: this._state.earned.has(b.id) }));
   }
 
   /** Show a toast notification for a newly earned badge */

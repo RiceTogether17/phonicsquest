@@ -9,9 +9,15 @@ const localStorageMock = (() => {
   let store = {};
   return {
     getItem: vi.fn((key) => store[key] ?? null),
-    setItem: vi.fn((key, val) => { store[key] = String(val); }),
-    removeItem: vi.fn((key) => { delete store[key]; }),
-    clear: vi.fn(() => { store = {}; }),
+    setItem: vi.fn((key, val) => {
+      store[key] = String(val);
+    }),
+    removeItem: vi.fn((key) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
   };
 })();
 Object.defineProperty(globalThis, 'localStorage', { value: localStorageMock });
@@ -65,11 +71,18 @@ describe('buildGiriQuestionChips', () => {
     seedQuestMistake('grammarMcq', 'articles');
     seedQuestMistake('clozeCastle', 'articles');
     const chips = askGiri.buildGiriQuestionChips();
-    expect(chips.filter(c => c.skillKey === 'articles')).toHaveLength(1);
+    expect(chips.filter((c) => c.skillKey === 'articles')).toHaveLength(1);
   });
 
   it('respects the chip limit', () => {
-    for (const skill of ['articles', 'pronouns', 'svAgreement', 'simplePast', 'presentCont', 'pastCont']) {
+    for (const skill of [
+      'articles',
+      'pronouns',
+      'svAgreement',
+      'simplePast',
+      'presentCont',
+      'pastCont',
+    ]) {
       seedQuestMistake('grammarMcq', skill);
     }
     expect(askGiri.buildGiriQuestionChips({ limit: 4 })).toHaveLength(4);
@@ -110,13 +123,17 @@ describe('gradeEssayWithRubric', () => {
 
   it('parses the four-dimension line protocol', async () => {
     store.set('geminiApiKey', 'test-key');
-    fetchMock.mockReturnValue(geminiReply([
-      'CONTENT: 3 | Good ideas with one vivid moment.',
-      'ORGANISATION: 2 | The middle jumps in time — add a connector.',
-      'LANGUAGE: 3 | Mostly accurate tenses.',
-      'TASK: 4 | All required points covered.',
-      'OVERALL: Lovely start — smooth out the middle next.',
-    ].join('\n')));
+    fetchMock.mockReturnValue(
+      geminiReply(
+        [
+          'CONTENT: 3 | Good ideas with one vivid moment.',
+          'ORGANISATION: 2 | The middle jumps in time — add a connector.',
+          'LANGUAGE: 3 | Mostly accurate tenses.',
+          'TASK: 4 | All required points covered.',
+          'OVERALL: Lovely start — smooth out the middle next.',
+        ].join('\n'),
+      ),
+    );
 
     const { gradeEssayWithRubric } = await import('../modules/aiService.js');
     const out = await gradeEssayWithRubric('My story...', 4, 'Write about a rainy day');
@@ -142,9 +159,17 @@ describe('gradeEssayWithRubric', () => {
 
   it('logs the grading to the parent-visible usage log', async () => {
     store.set('geminiApiKey', 'test-key');
-    fetchMock.mockReturnValue(geminiReply([
-      'CONTENT: 3 | a', 'ORGANISATION: 3 | b', 'LANGUAGE: 3 | c', 'TASK: 3 | d', 'OVERALL: e',
-    ].join('\n')));
+    fetchMock.mockReturnValue(
+      geminiReply(
+        [
+          'CONTENT: 3 | a',
+          'ORGANISATION: 3 | b',
+          'LANGUAGE: 3 | c',
+          'TASK: 3 | d',
+          'OVERALL: e',
+        ].join('\n'),
+      ),
+    );
     const { gradeEssayWithRubric } = await import('../modules/aiService.js');
     await gradeEssayWithRubric('text', 5);
     const log = store.get('aiUsageLog');

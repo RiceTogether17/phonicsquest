@@ -11,7 +11,11 @@ globalThis.speechSynthesis = {
   cancel: () => {},
   speak: () => {},
 };
-globalThis.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; } };
+globalThis.SpeechSynthesisUtterance = class {
+  constructor(t) {
+    this.text = t;
+  }
+};
 
 const { audio } = await import('../modules/audio.js');
 const { store } = await import('../modules/store.js');
@@ -35,8 +39,12 @@ describe('audio.speakSightWord', () => {
     store.set('sfxEnabled', true);
     phonemeCalls = [];
     ttsCalls = [];
-    audio._playPhonemeAudio = vi.fn(async (key) => { phonemeCalls.push(key); });
-    audio._speak = vi.fn(async (text) => { ttsCalls.push(text); });
+    audio._playPhonemeAudio = vi.fn(async (key) => {
+      phonemeCalls.push(key);
+    });
+    audio._speak = vi.fn(async (text) => {
+      ttsCalls.push(text);
+    });
   });
 
   it('plays the schwa phoneme (mapped to short-u MP3) when asked to speak "a"', async () => {

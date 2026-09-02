@@ -84,7 +84,11 @@ describe('placement gate adaptivity', () => {
     ];
 
     const result = derivePlacementResult(strongAB, {}, 'primary');
-    const nextGate = getNextGateToAppend(result, [{ gate: 'INTAKE' }, { gate: 'A' }, { gate: 'B' }]);
+    const nextGate = getNextGateToAppend(result, [
+      { gate: 'INTAKE' },
+      { gate: 'A' },
+      { gate: 'B' },
+    ]);
 
     expect(result.readingBand).toBe('developing-reader');
     expect(nextGate).toBe('C');
@@ -108,7 +112,12 @@ describe('placement gate adaptivity', () => {
     ];
 
     const result = derivePlacementResult(strongABC, {}, 'primary');
-    const nextGate = getNextGateToAppend(result, [{ gate: 'INTAKE' }, { gate: 'A' }, { gate: 'B' }, { gate: 'C' }]);
+    const nextGate = getNextGateToAppend(result, [
+      { gate: 'INTAKE' },
+      { gate: 'A' },
+      { gate: 'B' },
+      { gate: 'C' },
+    ]);
 
     expect(result.readingBand).toBe('developing-reader');
     expect(nextGate).toBe('D');
@@ -123,7 +132,9 @@ describe('placement gate adaptivity', () => {
     // Valid set tracks PLACEMENT_PHASES.fallbackGroup. CCVCC was missing
     // from the screener entirely before the curriculum/placement alignment
     // fix; it now gates phase 5 between digraphs and long vowels.
-    expect(['cvc-a', 'ccvc-a', 'cvcc-a', 'digraphs', 'ccvcc-a', 'long-a']).toContain(result.startGroup);
+    expect(['cvc-a', 'ccvc-a', 'cvcc-a', 'digraphs', 'ccvcc-a', 'long-a']).toContain(
+      result.startGroup,
+    );
   });
 
   it('returns valid startGroup and phonicsPhase when no decoding data is present', () => {
@@ -181,7 +192,7 @@ describe('placement gate adaptivity', () => {
       { section: 'firstSound', correct: true },
       { section: 'lastSound', correct: false },
       { section: 'middleSound', correct: false },
-      { section: 'letterSounds', score: 1 },   // teacher-scale: strong
+      { section: 'letterSounds', score: 1 }, // teacher-scale: strong
       { section: 'oralBlending', correct: true },
     ];
     // gateA = (0.5 + 1 + 1 + 0 + 0 + 1 + 1) / 7 ≈ 0.643 → should pass with letterSounds counted
@@ -209,7 +220,7 @@ describe('reading-band routing', () => {
 
     expect(rec.ctaTarget).toBe('first-sound');
     expect(plan[0].ctaTarget).toBe('first-sound');
-    expect(plan.some(step => step.ctaTarget === 'letter-sounds')).toBe(true);
+    expect(plan.some((step) => step.ctaTarget === 'letter-sounds')).toBe(true);
   });
 
   it('returns developing-reader hybrid home layout', () => {
@@ -268,7 +279,7 @@ describe('reading-band routing', () => {
     expect(result.gateScores.gateA).toBeGreaterThanOrEqual(0.6);
     // New fields are present + middle-sound shows up as a gap
     expect(result.stageScores.phonemicAwareness.middleSound).toBeCloseTo(0, 1);
-    expect(result.skillGaps.some(g => g.skill === 'middleSound')).toBe(true);
+    expect(result.skillGaps.some((g) => g.skill === 'middleSound')).toBe(true);
     expect(typeof result.bandDescription).toBe('string');
   });
 });

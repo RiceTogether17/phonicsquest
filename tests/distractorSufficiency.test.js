@@ -14,7 +14,11 @@ globalThis.speechSynthesis = {
   paused: false,
   resume: () => {},
 };
-globalThis.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; } };
+globalThis.SpeechSynthesisUtterance = class {
+  constructor(t) {
+    this.text = t;
+  }
+};
 
 const { _getCountChoices } = await import('../src/modes/soundCount.js');
 const { getPhonemeDistractors } = await import('../src/modes/missingSound.js');
@@ -50,7 +54,12 @@ describe('soundCount _getCountChoices', () => {
 
 describe('missingSound getPhonemeDistractors', () => {
   it('returns at least 3 distractors for common types at every level cap', () => {
-    for (const [grapheme, type] of [['a', 'sv'], ['sh', 'd'], ['t', 'c'], ['ee', 'lv']]) {
+    for (const [grapheme, type] of [
+      ['a', 'sv'],
+      ['sh', 'd'],
+      ['t', 'c'],
+      ['ee', 'lv'],
+    ]) {
       for (const maxLevel of [1, 2, 3]) {
         const pool = getPhonemeDistractors(grapheme, type, maxLevel);
         expect(pool.length).toBeGreaterThanOrEqual(3);
@@ -78,7 +87,7 @@ describe('firstSound getFirstSoundDistractors', () => {
     for (const [grapheme, type] of initials) {
       const pool = getFirstSoundDistractors(grapheme, type, 1);
       expect(pool.length, `initial /${grapheme}/ at level 1`).toBeGreaterThanOrEqual(3);
-      expect(pool.map(d => d.grapheme)).not.toContain(grapheme);
+      expect(pool.map((d) => d.grapheme)).not.toContain(grapheme);
     }
   });
 });
@@ -87,7 +96,8 @@ describe('phonemeChoice preview timers are cancellable', () => {
   it('cancelChoicePreviews stops queued previews from firing', async () => {
     vi.useFakeTimers();
     try {
-      const { renderPhonemeChoiceGrid, cancelChoicePreviews } = await import('../src/components/phonemeChoice.js');
+      const { renderPhonemeChoiceGrid, cancelChoicePreviews } =
+        await import('../src/components/phonemeChoice.js');
       const { audio } = await import('../src/modules/audio.js');
       const spy = vi.spyOn(audio, 'speakPhoneme').mockResolvedValue();
 
@@ -97,7 +107,11 @@ describe('phonemeChoice preview timers are cancellable', () => {
         { grapheme: 'a', type: 'sv', correct: false },
         { grapheme: 't', type: 'c', correct: false },
       ];
-      renderPhonemeChoiceGrid(container, choices, { autoPlay: true, autoPlayDelay: 50, autoPlayStride: 50 });
+      renderPhonemeChoiceGrid(container, choices, {
+        autoPlay: true,
+        autoPlayDelay: 50,
+        autoPlayStride: 50,
+      });
 
       cancelChoicePreviews();
       await vi.advanceTimersByTimeAsync(1000);
@@ -119,14 +133,22 @@ describe('phonemeChoice preview timers are cancellable', () => {
       const container = document.createElement('div');
       const round1 = [{ grapheme: 'b', type: 'c', correct: true }];
       const round2 = [{ grapheme: 'z', type: 'c', correct: true }];
-      renderPhonemeChoiceGrid(container, round1, { autoPlay: true, autoPlayDelay: 500, autoPlayStride: 50 });
+      renderPhonemeChoiceGrid(container, round1, {
+        autoPlay: true,
+        autoPlayDelay: 500,
+        autoPlayStride: 50,
+      });
       // New round renders before round 1's preview ever fires.
-      renderPhonemeChoiceGrid(container, round2, { autoPlay: true, autoPlayDelay: 10, autoPlayStride: 50 });
+      renderPhonemeChoiceGrid(container, round2, {
+        autoPlay: true,
+        autoPlayDelay: 10,
+        autoPlayStride: 50,
+      });
 
       await vi.advanceTimersByTimeAsync(2000);
-      const spoken = spy.mock.calls.map(c => c[0]);
+      const spoken = spy.mock.calls.map((c) => c[0]);
       expect(spoken).toContain('z');
-      expect(spoken).not.toContain('b');  // stale round-1 audio never bleeds through
+      expect(spoken).not.toContain('b'); // stale round-1 audio never bleeds through
 
       spy.mockRestore();
     } finally {

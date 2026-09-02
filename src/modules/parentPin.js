@@ -15,7 +15,9 @@
 
 /** @param {Uint8Array} bytes */
 function _toHex(bytes) {
-  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
 /** @param {string} text */
@@ -53,7 +55,8 @@ export async function verifyPin(pin, saved) {
 
   if (saved.startsWith('sha256s:')) {
     const [, saltHex, hashHex] = saved.split(':');
-    if (!saltHex || !hashHex || !globalThis.crypto?.subtle) return { ok: false, needsUpgrade: false };
+    if (!saltHex || !hashHex || !globalThis.crypto?.subtle)
+      return { ok: false, needsUpgrade: false };
     const candidate = await _digestHex(`${saltHex}:${pin}`);
     return { ok: candidate === hashHex, needsUpgrade: false };
   }

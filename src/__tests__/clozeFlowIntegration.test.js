@@ -10,7 +10,15 @@ function stubBrowserGlobals() {
     cancel: () => {},
   };
   if (!globalThis.AudioContext) {
-    globalThis.AudioContext = class { constructor() {} createOscillator() { return { connect() {}, start() {}, stop() {} }; } createGain() { return { connect() {}, gain: { value: 0 } }; } };
+    globalThis.AudioContext = class {
+      constructor() {}
+      createOscillator() {
+        return { connect() {}, start() {}, stop() {} };
+      }
+      createGain() {
+        return { connect() {}, gain: { value: 0 } };
+      }
+    };
   }
 }
 
@@ -23,7 +31,8 @@ describe('Cloze Castle integration flow', () => {
   });
 
   it('renders the level browser via showClozeBrowser', async () => {
-    const { initClozeCastle, showClozeBrowser, cleanupClozeCastle } = await import('../modes/clozeCastle.js');
+    const { initClozeCastle, showClozeBrowser, cleanupClozeCastle } =
+      await import('../modes/clozeCastle.js');
     const root = document.getElementById('root');
     initClozeCastle(root, () => {});
     showClozeBrowser();
@@ -33,7 +42,8 @@ describe('Cloze Castle integration flow', () => {
   });
 
   it('shows the Practice/Exam mode toggle once a level is selected', async () => {
-    const { initClozeCastle, showClozeBrowser, cleanupClozeCastle } = await import('../modes/clozeCastle.js');
+    const { initClozeCastle, showClozeBrowser, cleanupClozeCastle } =
+      await import('../modes/clozeCastle.js');
     const root = document.getElementById('root');
     initClozeCastle(root, () => {});
     showClozeBrowser();
@@ -47,7 +57,8 @@ describe('Cloze Castle integration flow', () => {
 
   it('renders the Read-First Scan with the passage text when a category is opened', async () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
-    const { initClozeCastle, showClozeBrowser, cleanupClozeCastle } = await import('../modes/clozeCastle.js');
+    const { initClozeCastle, showClozeBrowser, cleanupClozeCastle } =
+      await import('../modes/clozeCastle.js');
     const root = document.getElementById('root');
     initClozeCastle(root, () => {});
     showClozeBrowser();
@@ -70,7 +81,8 @@ describe('Cloze Castle integration flow', () => {
 
   it('advances past Read-First Scan to either the scan task or the bank', async () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
-    const { initClozeCastle, showClozeBrowser, cleanupClozeCastle } = await import('../modes/clozeCastle.js');
+    const { initClozeCastle, showClozeBrowser, cleanupClozeCastle } =
+      await import('../modes/clozeCastle.js');
     const root = document.getElementById('root');
     initClozeCastle(root, () => {});
     showClozeBrowser();
@@ -102,7 +114,8 @@ describe('Word Vault integration flow', () => {
   });
 
   it('renders the category browser via showVaultBrowser', async () => {
-    const { initWordVault, showVaultBrowser, cleanupWordVault } = await import('../modes/wordVault.js');
+    const { initWordVault, showVaultBrowser, cleanupWordVault } =
+      await import('../modes/wordVault.js');
     const root = document.getElementById('root');
     initWordVault(root, () => {});
     showVaultBrowser();
@@ -111,7 +124,8 @@ describe('Word Vault integration flow', () => {
   });
 
   it('shows Practice/Exam toggle on the level browser of a category', async () => {
-    const { initWordVault, showVaultBrowser, cleanupWordVault } = await import('../modes/wordVault.js');
+    const { initWordVault, showVaultBrowser, cleanupWordVault } =
+      await import('../modes/wordVault.js');
     const root = document.getElementById('root');
     initWordVault(root, () => {});
     showVaultBrowser();
@@ -129,7 +143,8 @@ describe('Word Vault integration flow', () => {
 
   it('renders the Read-First Vault Scan with the passage text when a level is opened', async () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
-    const { initWordVault, showVaultBrowser, cleanupWordVault } = await import('../modes/wordVault.js');
+    const { initWordVault, showVaultBrowser, cleanupWordVault } =
+      await import('../modes/wordVault.js');
     const root = document.getElementById('root');
     initWordVault(root, () => {});
     showVaultBrowser();

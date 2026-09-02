@@ -26,54 +26,54 @@ import { CURRICULUM } from '../data/curriculum.js';
 import { buildWordSortRound, scoreWordSort } from './scoring/wordSort.js';
 
 const WORDS_PER_BIN = 3;
-const ADVANCE_MS    = 700;
+const ADVANCE_MS = 700;
 
-let _word       = null;   // shell word — recording target
-let _els        = null;
-let _queue      = [];     // [{ word, wordObj, expected }]
-let _idx        = 0;
+let _word = null; // shell word — recording target
+let _els = null;
+let _queue = []; // [{ word, wordObj, expected }]
+let _idx = 0;
 let _placements = [];
-let _bins       = [];     // [{ group, scorerKey, label, icon, color, bg }]
-let _startTime  = 0;
-let _timeouts   = [];
-let _locked     = false;
-let _done       = false;
+let _bins = []; // [{ group, scorerKey, label, icon, color, bg }]
+let _startTime = 0;
+let _timeouts = [];
+let _locked = false;
+let _done = false;
 
 const SHORT_STAGE_RE = /^(?:cvc|ccvc|cvcc|ccvcc)-([aeiou])$/;
 const SHORT_GROUP_RE = /^short-([aeiou])$/;
-const LONG_STAGE_RE  = /^long-([aeiou])-/;
+const LONG_STAGE_RE = /^long-([aeiou])-/;
 
 /**
  * @param {import('../data/words.js').Word} word
  * @param {object} els
  */
 export function setupWordSort(word, els) {
-  _word       = word;
-  _els        = els;
-  _idx        = 0;
+  _word = word;
+  _els = els;
+  _idx = 0;
   _placements = [];
-  _timeouts   = [];
-  _locked     = false;
-  _done       = false;
-  _startTime  = Date.now();
+  _timeouts = [];
+  _locked = false;
+  _done = false;
+  _startTime = Date.now();
 
   const stageGroup = store.get('currentGroup') || word.group;
-  _bins  = _deriveBins(stageGroup, word);
+  _bins = _deriveBins(stageGroup, word);
   _queue = _buildQueue(word, _bins);
 
   // Standard word-card header stays empty — the round has its own card.
   renderWordImage(word, els.wordEmoji, false);
   els.wordDisplay.innerHTML = '';
-  els.phonemeRow.innerHTML  = '';
+  els.phonemeRow.innerHTML = '';
   els.modeInstruction.textContent = 'Put each word in the box that matches its sound.';
 
   // Hide the shell's Say-It: it always speaks the shell word, which is
   // wrong for every card after the first — the round card has its own 🔊.
   if (els.btnCheck) els.btnCheck.style.display = 'none';
   if (els.btnSayIt) els.btnSayIt.style.display = 'none';
-  if (els.btnSkip)  els.btnSkip.style.display  = '';
+  if (els.btnSkip) els.btnSkip.style.display = '';
 
-  els.modeArea.innerHTML = /* html */`
+  els.modeArea.innerHTML = /* html */ `
     <div class="ws-round">
       <div class="ws-progress" id="ws-progress" aria-live="polite"></div>
       <div class="ws-card" id="ws-card"></div>
@@ -110,20 +110,20 @@ export function setupWordSort(word, els) {
  */
 function _deriveBins(stageGroup, word) {
   const maxLevel = store.get('difficulty') || 1;
-  const poolSize = g => {
+  const poolSize = (g) => {
     const capped = progress.getWordsInGroup(g, maxLevel);
     return (capped.length >= 2 ? capped : progress.getWordsInGroup(g, null)).length;
   };
   const mk = (group, scorerKey) => {
-    const meta  = WORD_GROUPS[group] || {};
-    const stage = CURRICULUM.find(s => s.group === group || s.id === group);
+    const meta = WORD_GROUPS[group] || {};
+    const stage = CURRICULUM.find((s) => s.group === group || s.id === group);
     return {
       group,
       scorerKey,
       label: meta.label || stage?.name || group,
-      icon:  meta.icon  || stage?.icon || '📦',
+      icon: meta.icon || stage?.icon || '📦',
       color: meta.color || 'var(--color-primary)',
-      bg:    meta.bg    || 'var(--surface-2)',
+      bg: meta.bg || 'var(--surface-2)',
     };
   };
 
@@ -131,9 +131,9 @@ function _deriveBins(stageGroup, word) {
   if (shortMatch) {
     // Sibling = same structure, different vowel. Scorer keys canonicalized
     // to short-<vowel> so the vowel-confusion classifier can fire.
-    const vowel  = shortMatch[1];
+    const vowel = shortMatch[1];
     const prefix = stageGroup.slice(0, stageGroup.lastIndexOf('-'));
-    for (const v of shuffleArray(['a', 'e', 'i', 'o', 'u'].filter(x => x !== vowel))) {
+    for (const v of shuffleArray(['a', 'e', 'i', 'o', 'u'].filter((x) => x !== vowel))) {
       const sibling = `${prefix}-${v}`;
       if (poolSize(sibling) >= 2) {
         return [mk(stageGroup, `short-${vowel}`), mk(sibling, `short-${v}`)];
@@ -145,8 +145,9 @@ function _deriveBins(stageGroup, word) {
   if (longMatch) {
     // Sibling = same vowel, different spelling pattern (long-a-ae vs long-a-ai)
     // — this exercises the scorer's pattern-confusion path.
-    const siblings = Object.keys(WORD_GROUPS)
-      .filter(k => k !== stageGroup && LONG_STAGE_RE.exec(k)?.[1] === longMatch[1]);
+    const siblings = Object.keys(WORD_GROUPS).filter(
+      (k) => k !== stageGroup && LONG_STAGE_RE.exec(k)?.[1] === longMatch[1],
+    );
     for (const sibling of shuffleArray(siblings)) {
       if (poolSize(sibling) >= 2) {
         return [mk(stageGroup, stageGroup), mk(sibling, sibling)];
@@ -156,13 +157,16 @@ function _deriveBins(stageGroup, word) {
 
   // Fallback: any other stage group at the word's level with words available.
   const level = word.level ?? 1;
-  for (const stage of shuffleArray(CURRICULUM.filter(s => s.group !== stageGroup && s.level === level))) {
+  for (const stage of shuffleArray(
+    CURRICULUM.filter((s) => s.group !== stageGroup && s.level === level),
+  )) {
     if (poolSize(stage.group) >= 2) {
       return [mk(stageGroup, stageGroup), mk(stage.group, stage.group)];
     }
   }
   // Last resort: any group with words at all.
-  const any = Object.keys(WORD_GROUPS).find(g => g !== stageGroup && poolSize(g) >= 2) || stageGroup;
+  const any =
+    Object.keys(WORD_GROUPS).find((g) => g !== stageGroup && poolSize(g) >= 2) || stageGroup;
   return [mk(stageGroup, stageGroup), mk(any, any)];
 }
 
@@ -185,16 +189,18 @@ function _buildQueue(word, bins) {
   // Shell word first so the app's recordAttempt target genuinely appeared.
   add(word, bins[0].scorerKey);
   for (const w of shuffleArray(pull(bins[0].group))) {
-    if (items.filter(i => i.category === bins[0].scorerKey).length >= WORDS_PER_BIN) break;
+    if (items.filter((i) => i.category === bins[0].scorerKey).length >= WORDS_PER_BIN) break;
     add(w, bins[0].scorerKey);
   }
   for (const w of shuffleArray(pull(bins[1].group))) {
-    if (items.filter(i => i.category === bins[1].scorerKey).length >= WORDS_PER_BIN) break;
+    if (items.filter((i) => i.category === bins[1].scorerKey).length >= WORDS_PER_BIN) break;
     add(w, bins[1].scorerKey);
   }
 
-  const round = buildWordSortRound(items, [bins[0].scorerKey, bins[1].scorerKey], { count: items.length });
-  return round.items.map(i => ({ word: i.word, wordObj: i.wordObj, expected: i.category }));
+  const round = buildWordSortRound(items, [bins[0].scorerKey, bins[1].scorerKey], {
+    count: items.length,
+  });
+  return round.items.map((i) => ({ word: i.word, wordObj: i.wordObj, expected: i.category }));
 }
 
 function _renderCurrent() {
@@ -218,7 +224,11 @@ function _renderCurrent() {
 
   document.getElementById('ws-status')?.replaceChildren();
   _locked = false;
-  _timeouts.push(setTimeout(() => { if (!_done) audio.speakWord(item.word); }, 400));
+  _timeouts.push(
+    setTimeout(() => {
+      if (!_done) audio.speakWord(item.word);
+    }, 400),
+  );
 }
 
 function _onBinTap(bin, btn) {
@@ -236,17 +246,19 @@ function _onBinTap(bin, btn) {
 
   const status = document.getElementById('ws-status');
   if (status) {
-    const rightBin = _bins.find(b => b.scorerKey === item.expected);
+    const rightBin = _bins.find((b) => b.scorerKey === item.expected);
     status.textContent = correct
       ? `✓ Yes! “${item.word}” goes in ${bin.label}.`
       : `✗ “${item.word}” belongs in ${rightBin?.label ?? 'the other box'}.`;
     status.className = `ws-status ${correct ? 'ws-status--yes' : 'ws-status--no'}`;
   }
 
-  _timeouts.push(setTimeout(() => {
-    _idx++;
-    _renderCurrent();
-  }, ADVANCE_MS));
+  _timeouts.push(
+    setTimeout(() => {
+      _idx++;
+      _renderCurrent();
+    }, ADVANCE_MS),
+  );
 }
 
 function _finishRound() {
@@ -254,7 +266,7 @@ function _finishRound() {
   _done = true;
 
   const elapsed = Date.now() - _startTime;
-  const result  = scoreWordSort({ placements: _placements, timeMs: elapsed });
+  const result = scoreWordSort({ placements: _placements, timeMs: elapsed });
   const { correctPlacements, total } = result.scoreBreakdown;
 
   if (result.correct) {
@@ -262,11 +274,13 @@ function _finishRound() {
     audio.playSfx('correct');
   }
 
-  const misplaced = _placements.filter(p => p.expected !== p.placed);
-  const missList = misplaced.map(p => {
-    const rightBin = _bins.find(b => b.scorerKey === p.expected);
-    return `<li>“${p.word}” → ${rightBin?.label ?? p.expected}</li>`;
-  }).join('');
+  const misplaced = _placements.filter((p) => p.expected !== p.placed);
+  const missList = misplaced
+    .map((p) => {
+      const rightBin = _bins.find((b) => b.scorerKey === p.expected);
+      return `<li>“${p.word}” → ${rightBin?.label ?? p.expected}</li>`;
+    })
+    .join('');
 
   const area = _els?.modeArea;
   if (!area) return;
@@ -290,9 +304,13 @@ function _finishRound() {
   nextBtn.setAttribute('aria-label', 'Next round');
   wrap.appendChild(nextBtn);
   area.appendChild(wrap);
-  nextBtn.addEventListener('click', () => {
-    _els?.onResult(result.correct, elapsed);
-  }, { once: true });
+  nextBtn.addEventListener(
+    'click',
+    () => {
+      _els?.onResult(result.correct, elapsed);
+    },
+    { once: true },
+  );
   nextBtn.focus();
 }
 
@@ -301,7 +319,7 @@ export function getCurrentWord() {
 }
 
 export function cleanup() {
-  _timeouts.forEach(id => clearTimeout(id));
+  _timeouts.forEach((id) => clearTimeout(id));
   _timeouts = [];
   // Restore the shell's Say-It for the next mode.
   if (_els?.btnSayIt) _els.btnSayIt.style.display = '';

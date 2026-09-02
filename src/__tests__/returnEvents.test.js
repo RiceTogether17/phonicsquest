@@ -11,15 +11,19 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 function stubAudioGlobals() {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
-    getVoices: () => [], addEventListener: () => {}, speak: () => {}, cancel: () => {},
+    getVoices: () => [],
+    addEventListener: () => {},
+    speak: () => {},
+    cancel: () => {},
   };
 }
 
 function setProfile(name = 'Testy') {
   const id = 'p_return';
-  localStorage.setItem('phonicsquest_profiles', JSON.stringify([
-    { id, name, avatar: '🦊', color: '#6c63ff', schoolLevel: 'preschool' },
-  ]));
+  localStorage.setItem(
+    'phonicsquest_profiles',
+    JSON.stringify([{ id, name, avatar: '🦊', color: '#6c63ff', schoolLevel: 'preschool' }]),
+  );
   localStorage.setItem('phonicsquest_active_profile', id);
   localStorage.setItem('phonicsquest_legacy_migrated_to_profiles', '1');
   return id;

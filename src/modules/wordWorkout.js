@@ -41,7 +41,7 @@
 export function pickWorkoutModes(word) {
   if (!word) return [];
   const pattern = String(word.pattern || '').toUpperCase();
-  const group   = String(word.group   || '').toLowerCase();
+  const group = String(word.group || '').toLowerCase();
 
   // Long-vowel / digraph words: anchor on middle / vowel-pattern work.
   if (group.startsWith('long-') || group === 'digraphs') {
@@ -52,12 +52,18 @@ export function pickWorkoutModes(word) {
   }
 
   switch (pattern) {
-    case 'CVC':    return ['hear', 'blend', 'segment', 'missing'];
-    case 'CCVC':   return ['blend', 'segment', 'missing', 'soundCount'];
-    case 'CVCC':   return ['blend', 'segment', 'last', 'missing'];
-    case 'CCVCC':  return ['blend', 'segment', 'soundCount', 'missing'];
-    case 'DIGRAPH':return ['hear', 'blend', 'segment', 'middle'];
-    default:       return ['hear', 'blend', 'segment'];
+    case 'CVC':
+      return ['hear', 'blend', 'segment', 'missing'];
+    case 'CCVC':
+      return ['blend', 'segment', 'missing', 'soundCount'];
+    case 'CVCC':
+      return ['blend', 'segment', 'last', 'missing'];
+    case 'CCVCC':
+      return ['blend', 'segment', 'soundCount', 'missing'];
+    case 'DIGRAPH':
+      return ['hear', 'blend', 'segment', 'middle'];
+    default:
+      return ['hear', 'blend', 'segment'];
   }
 }
 
@@ -71,6 +77,5 @@ export function pickWorkoutModes(word) {
  */
 export function buildWordWorkout(word) {
   if (!word || !word.id) return [];
-  return pickWorkoutModes(word).map(mode => ({ word, mode }));
+  return pickWorkoutModes(word).map((mode) => ({ word, mode }));
 }
-

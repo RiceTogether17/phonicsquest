@@ -36,7 +36,7 @@ describe('Comprehension micro-check log', () => {
     _logComprehensionAttempt({ storyId: 's1', response: 'confident' });
     _logComprehensionAttempt({ storyId: 's2', response: 'hint' });
     const log = JSON.parse(localStorage.getItem(LOG_KEY));
-    expect(log.map(e => e.response)).toEqual(['reread', 'confident', 'hint']);
+    expect(log.map((e) => e.response)).toEqual(['reread', 'confident', 'hint']);
   });
 
   it('caps the log at 100 entries (FIFO eviction)', () => {
@@ -56,6 +56,6 @@ describe('Comprehension micro-check log', () => {
       _logComprehensionAttempt({ storyId: 's', response: r });
     }
     const log = JSON.parse(localStorage.getItem(LOG_KEY));
-    expect(log.map(e => e.response)).toEqual(responses);
+    expect(log.map((e) => e.response)).toEqual(responses);
   });
 });

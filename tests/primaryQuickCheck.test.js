@@ -16,9 +16,9 @@ describe('buildPrimaryQuickCheck — diagnostic bank assembly', () => {
     const check = buildPrimaryQuickCheck('P4');
     expect(check.grade).toBe('P4');
     expect(check.items).toHaveLength(QUICK_CHECK_PER_DOMAIN * 2);
-    const sources = check.items.map(i => i.source);
-    expect(sources.filter(s => s === 'grammarMcq')).toHaveLength(QUICK_CHECK_PER_DOMAIN);
-    expect(sources.filter(s => s === 'vocabMcq')).toHaveLength(QUICK_CHECK_PER_DOMAIN);
+    const sources = check.items.map((i) => i.source);
+    expect(sources.filter((s) => s === 'grammarMcq')).toHaveLength(QUICK_CHECK_PER_DOMAIN);
+    expect(sources.filter((s) => s === 'vocabMcq')).toHaveLength(QUICK_CHECK_PER_DOMAIN);
   });
 
   it('orders grammar before vocab so the flow opens with familiar territory', () => {
@@ -41,16 +41,14 @@ describe('buildPrimaryQuickCheck — diagnostic bank assembly', () => {
 
   it('every grammar item picks a distinct category (broad coverage)', () => {
     const check = buildPrimaryQuickCheck('P6');
-    const cats = check.items
-      .filter(i => i.source === 'grammarMcq')
-      .map(i => i.category);
+    const cats = check.items.filter((i) => i.source === 'grammarMcq').map((i) => i.category);
     expect(new Set(cats).size).toBe(cats.length);
   });
 
   it('is deterministic — same grade twice returns the same items', () => {
     const a = buildPrimaryQuickCheck('P2');
     const b = buildPrimaryQuickCheck('P2');
-    expect(a.items.map(i => i.q)).toEqual(b.items.map(i => i.q));
+    expect(a.items.map((i) => i.q)).toEqual(b.items.map((i) => i.q));
   });
 
   it('falls back to P3 for unknown / malformed grades', () => {
@@ -63,9 +61,9 @@ describe('buildPrimaryQuickCheck — diagnostic bank assembly', () => {
 describe('applyPrimaryQuickCheckResults — seeds questMastery + questAttempts', () => {
   it('records each answer through questMastery so dashboards have signal', () => {
     const answers = [
-      { source: 'grammarMcq', category: 'svAgreement',   correct: true,  level: 'P4' },
-      { source: 'grammarMcq', category: 'connectors',    correct: false, level: 'P4' },
-      { source: 'vocabMcq',   category: 'contextInference', correct: true, level: 'P4' },
+      { source: 'grammarMcq', category: 'svAgreement', correct: true, level: 'P4' },
+      { source: 'grammarMcq', category: 'connectors', correct: false, level: 'P4' },
+      { source: 'vocabMcq', category: 'contextInference', correct: true, level: 'P4' },
     ];
     const summary = applyPrimaryQuickCheckResults(answers);
     expect(summary.total).toBe(3);
@@ -96,12 +94,14 @@ describe('applyPrimaryQuickCheckResults — seeds questMastery + questAttempts',
   it('partitions weak vs strong skills for the summary card', () => {
     const summary = applyPrimaryQuickCheckResults([
       { source: 'grammarMcq', category: 'svAgreement', correct: true },
-      { source: 'grammarMcq', category: 'connectors',  correct: false },
-      { source: 'vocabMcq',   category: 'idiomaticExpressions', correct: false },
+      { source: 'grammarMcq', category: 'connectors', correct: false },
+      { source: 'vocabMcq', category: 'idiomaticExpressions', correct: false },
     ]);
-    expect(summary.strongSkills.map(s => s.skill)).toEqual(['svAgreement']);
-    expect(summary.weakSkills.map(s => s.skill).sort())
-      .toEqual(['connectors', 'idiomaticExpressions']);
+    expect(summary.strongSkills.map((s) => s.skill)).toEqual(['svAgreement']);
+    expect(summary.weakSkills.map((s) => s.skill).sort()).toEqual([
+      'connectors',
+      'idiomaticExpressions',
+    ]);
   });
 
   it('returns an empty summary for an empty input (no side effects)', () => {
@@ -110,17 +110,24 @@ describe('applyPrimaryQuickCheckResults — seeds questMastery + questAttempts',
     expect(summary.correct).toBe(0);
     expect(summary.accuracy).toBe(0);
     expect(store.get('questMastery')).toEqual({
-      sentenceForge: {}, clozeCastle: {}, wordVault: {},
-      stories: {}, editingQuest: {}, writingQuest: {},
-      grammarMcq: {}, vocabMcq: {}, paperMode: {}, synthesisQuest: {},
+      sentenceForge: {},
+      clozeCastle: {},
+      wordVault: {},
+      stories: {},
+      editingQuest: {},
+      writingQuest: {},
+      grammarMcq: {},
+      vocabMcq: {},
+      paperMode: {},
+      synthesisQuest: {},
     });
   });
 
   it('skips malformed entries without throwing', () => {
     const summary = applyPrimaryQuickCheckResults([
       null,
-      { source: 'grammarMcq' },                       // no category
-      { category: 'foo', correct: true },              // no source
+      { source: 'grammarMcq' }, // no category
+      { category: 'foo', correct: true }, // no source
       { source: 'grammarMcq', category: 'connectors', correct: true },
     ]);
     expect(summary.total).toBe(4); // total counts all input rows
@@ -140,8 +147,8 @@ describe('_pickPerCategory — selection helper', () => {
     ];
     const picked = __TEST__._pickPerCategory(bank, 5, 'grammarMcq');
     expect(picked).toHaveLength(3);
-    expect(picked.map(p => p.category)).toEqual(['a', 'b', 'c']);
-    expect(picked.every(p => p.source === 'grammarMcq')).toBe(true);
+    expect(picked.map((p) => p.category)).toEqual(['a', 'b', 'c']);
+    expect(picked.every((p) => p.source === 'grammarMcq')).toBe(true);
   });
 
   it('stops at `count` even if more distinct categories are available', () => {

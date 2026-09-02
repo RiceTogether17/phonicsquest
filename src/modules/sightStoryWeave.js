@@ -21,7 +21,7 @@ import { extractCountableTokens } from './decodability.js';
 /** quest-order position of every quest word (lowercased). */
 const _wordOrder = new Map();
 SIGHT_QUESTS.forEach((quest, qi) => {
-  quest.words.forEach(w => {
+  quest.words.forEach((w) => {
     const clean = w.toLowerCase();
     if (!_wordOrder.has(clean)) _wordOrder.set(clean, qi);
   });
@@ -66,10 +66,11 @@ export function getSightWordsInStory(storyOrId, limit = 6) {
  */
 export function getStoryForQuest(quest, minHits = 2) {
   if (!quest?.words?.length) return null;
-  const target = new Set(quest.words.map(w => w.toLowerCase()));
+  const target = new Set(quest.words.map((w) => w.toLowerCase()));
   const bands = ['A', 'B', 'C', 'D'];
-  const candidates = STORIES
-    .filter(s => bands.includes(s.band) && (!quest.storyBand || s.band === quest.storyBand));
+  const candidates = STORIES.filter(
+    (s) => bands.includes(s.band) && (!quest.storyBand || s.band === quest.storyBand),
+  );
   // Prefer a story using several quest words; fall back to a single hit
   // (the last quests carry ride-along words that appear nowhere).
   for (const threshold of [minHits, 1]) {

@@ -38,10 +38,10 @@ export function showOnboardingTutorial(readingBand, handlers) {
   const screens = getTutorialScreens(readingBand);
 
   const contentEl = document.getElementById('ob-content');
-  const dotsEl    = document.getElementById('ob-dots');
-  const prevBtn   = /** @type {HTMLButtonElement|null} */ (document.getElementById('ob-prev'));
-  const nextBtn   = /** @type {HTMLButtonElement|null} */ (document.getElementById('ob-next'));
-  const skipBtn   = /** @type {HTMLButtonElement|null} */ (document.getElementById('ob-skip-btn'));
+  const dotsEl = document.getElementById('ob-dots');
+  const prevBtn = /** @type {HTMLButtonElement|null} */ (document.getElementById('ob-prev'));
+  const nextBtn = /** @type {HTMLButtonElement|null} */ (document.getElementById('ob-next'));
+  const skipBtn = /** @type {HTMLButtonElement|null} */ (document.getElementById('ob-skip-btn'));
 
   if (!contentEl || !dotsEl || !prevBtn || !nextBtn) return;
 
@@ -58,9 +58,12 @@ export function showOnboardingTutorial(readingBand, handlers) {
         <div class="ob-screen-body">${raw(sc.body)}</div>
       </div>`;
 
-    dotsEl.innerHTML = screens.map((_, i) => html`
-      <span class="ob-dot ${i === s ? 'ob-dot--active' : ''}" role="tab" aria-selected="${i === s}"></span>`
-    ).join('');
+    dotsEl.innerHTML = screens
+      .map(
+        (_, i) => html`
+      <span class="ob-dot ${i === s ? 'ob-dot--active' : ''}" role="tab" aria-selected="${i === s}"></span>`,
+      )
+      .join('');
 
     prevBtn.hidden = s === 0;
     nextBtn.textContent = s === screens.length - 1 ? "Let's go! 🚀" : 'Next →';
@@ -72,10 +75,17 @@ export function showOnboardingTutorial(readingBand, handlers) {
   };
 
   // Assigned (not addEventListener) so re-opening never stacks handlers.
-  prevBtn.onclick = () => { if (step > 0) { step--; renderStep(step); } };
+  prevBtn.onclick = () => {
+    if (step > 0) {
+      step--;
+      renderStep(step);
+    }
+  };
   nextBtn.onclick = () => {
-    if (step < screens.length - 1) { step++; renderStep(step); }
-    else closeTutorial();
+    if (step < screens.length - 1) {
+      step++;
+      renderStep(step);
+    } else closeTutorial();
   };
   if (skipBtn) skipBtn.onclick = closeTutorial;
 
@@ -92,13 +102,19 @@ export function showOnboardingTutorial(readingBand, handlers) {
  * @param {OnboardingHandlers} handlers
  */
 export function bindPinGate(handlers) {
-  const digits = /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('.pin-digit'));
+  const digits = /** @type {NodeListOf<HTMLInputElement>} */ (
+    document.querySelectorAll('.pin-digit')
+  );
   const hint = document.getElementById('pin-hint');
   if (!digits.length) return;
 
-  const setHint = (msg) => { if (hint) hint.textContent = msg; };
+  const setHint = (msg) => {
+    if (hint) hint.textContent = msg;
+  };
   const clearDigits = () => {
-    digits.forEach(d => { d.value = ''; });
+    digits.forEach((d) => {
+      d.value = '';
+    });
     digits[0]?.focus();
   };
 
@@ -110,14 +126,16 @@ export function bindPinGate(handlers) {
     });
     input.addEventListener('keydown', (e) => {
       const ke = /** @type {KeyboardEvent} */ (e);
-      if (ke.key === 'Backspace' && !(/** @type {HTMLInputElement} */ (ke.target)).value && i > 0) {
+      if (ke.key === 'Backspace' && !(/** @type {HTMLInputElement} */ (ke.target).value) && i > 0) {
         digits[i - 1].focus();
       }
     });
   });
 
   document.getElementById('pin-confirm-btn')?.addEventListener('click', async () => {
-    const pin = Array.from(digits).map(d => d.value).join('');
+    const pin = Array.from(digits)
+      .map((d) => d.value)
+      .join('');
     if (pin.length < PIN_LENGTH) {
       setHint(`Enter all ${PIN_LENGTH} digits`);
       return;

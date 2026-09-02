@@ -50,8 +50,16 @@ export const QUICK_CHECK_PER_DOMAIN = 3;
  */
 export function buildPrimaryQuickCheck(grade) {
   const normalised = _normaliseGrade(grade);
-  const grammar = _pickPerCategory(GRAMMAR_MCQ_ITEMS[normalised] || [], QUICK_CHECK_PER_DOMAIN, 'grammarMcq');
-  const vocab   = _pickPerCategory(VOCAB_MCQ_ITEMS[normalised]   || [], QUICK_CHECK_PER_DOMAIN, 'vocabMcq');
+  const grammar = _pickPerCategory(
+    GRAMMAR_MCQ_ITEMS[normalised] || [],
+    QUICK_CHECK_PER_DOMAIN,
+    'grammarMcq',
+  );
+  const vocab = _pickPerCategory(
+    VOCAB_MCQ_ITEMS[normalised] || [],
+    QUICK_CHECK_PER_DOMAIN,
+    'vocabMcq',
+  );
   return {
     grade: normalised,
     items: [...grammar, ...vocab],
@@ -170,8 +178,12 @@ export const __TEST__ = { _normaliseGrade, _pickPerCategory };
 // the same placement screen.
 // ────────────────────────────────────────────────────────────────────
 
-const escText = (s) => String(s ?? '').replace(/[<>&]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;' }[c]));
-const escAttr = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+const escText = (s) =>
+  String(s ?? '').replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c]);
+const escAttr = (s) =>
+  String(s ?? '')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;');
 
 /**
  * Mount the Primary Quick Check experience into `container`.
@@ -190,7 +202,7 @@ export function showPrimaryQuickCheck({ container, profile, onComplete }) {
   const name = profile?.name || 'Friend';
   const { items } = buildPrimaryQuickCheck(grade);
   const answers = [];
-  let phase = 'intro';      // 'intro' | 'questions' | 'summary'
+  let phase = 'intro'; // 'intro' | 'questions' | 'summary'
   let qIndex = 0;
   let lockChoices = false;
 
@@ -226,21 +238,28 @@ export function showPrimaryQuickCheck({ container, profile, onComplete }) {
 
   function _renderQuestion() {
     const item = items[qIndex];
-    if (!item) { phase = 'summary'; return render(); }
+    if (!item) {
+      phase = 'summary';
+      return render();
+    }
     const progress = `${qIndex + 1} / ${items.length}`;
     container.innerHTML = `
       <div class="pqc-card pqc-card--question">
         <div class="pqc-progress" role="status">${escText(progress)}</div>
         <p class="pqc-prompt">${escText(item.q)}</p>
         <div class="pqc-choices" role="group" aria-label="Choices">
-          ${item.choices.map(c => `
+          ${item.choices
+            .map(
+              (c) => `
             <button class="pqc-choice" type="button" data-choice="${escAttr(c)}">${escText(c)}</button>
-          `).join('')}
+          `,
+            )
+            .join('')}
         </div>
         <div class="pqc-feedback" id="pqc-feedback" aria-live="polite"></div>
       </div>`;
     lockChoices = false;
-    container.querySelectorAll('.pqc-choice').forEach(btn => {
+    container.querySelectorAll('.pqc-choice').forEach((btn) => {
       btn.addEventListener('click', () => _onChoice(btn));
     });
   }
@@ -258,7 +277,7 @@ export function showPrimaryQuickCheck({ container, profile, onComplete }) {
       correct: ok,
     });
     // Charter-safe feedback: green tick for right, amber "Almost!" for wrong.
-    container.querySelectorAll('.pqc-choice').forEach(b => {
+    container.querySelectorAll('.pqc-choice').forEach((b) => {
       if (b.dataset.choice === item.answer) b.classList.add('pqc-choice--correct');
       else if (b === btn && !ok) b.classList.add('pqc-choice--wrong');
       b.disabled = true;
@@ -272,7 +291,9 @@ export function showPrimaryQuickCheck({ container, profile, onComplete }) {
     }
     setTimeout(() => {
       qIndex++;
-      if (qIndex >= items.length) { phase = 'summary'; }
+      if (qIndex >= items.length) {
+        phase = 'summary';
+      }
       render();
     }, 1100);
   }

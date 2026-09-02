@@ -10,10 +10,8 @@ vi.hoisted(() => {
   };
 });
 
-const {
-  _isMeetWordsCompletedToday,
-  _setMeetWordsCompleted,
-} = await import('../modes/storyMode.js');
+const { _isMeetWordsCompletedToday, _setMeetWordsCompleted } =
+  await import('../modes/storyMode.js');
 
 const KEY = 'giri_meet_words';
 
@@ -45,12 +43,14 @@ describe('Meet-the-Words gate state', () => {
   });
 
   it('drops entries older than 30 days when writing a new completion', () => {
-    const stale = new Date(Date.now() - 40 * 24 * 60 * 60 * 1000)
-      .toISOString().slice(0, 10);
-    localStorage.setItem(KEY, JSON.stringify({
-      'old-story': stale,
-      'recent-story': new Date().toISOString().slice(0, 10),
-    }));
+    const stale = new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    localStorage.setItem(
+      KEY,
+      JSON.stringify({
+        'old-story': stale,
+        'recent-story': new Date().toISOString().slice(0, 10),
+      }),
+    );
     _setMeetWordsCompleted('core-a-05');
     const map = JSON.parse(localStorage.getItem(KEY));
     expect(map['old-story']).toBeUndefined();
@@ -59,8 +59,7 @@ describe('Meet-the-Words gate state', () => {
   });
 
   it('treats a stale entry (yesterday or older) as not completed', () => {
-    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000)
-      .toISOString().slice(0, 10);
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
     localStorage.setItem(KEY, JSON.stringify({ 'core-a-06': yesterday }));
     // Note: session-scoped flag may still leak from a prior call. Use a
     // fresh story id that has no session-side effect from earlier tests.

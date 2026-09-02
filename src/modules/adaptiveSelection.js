@@ -46,11 +46,7 @@ export function getWordWeight(stat, cfg) {
   // Spaced-repetition override: if a previously mastered word is due for
   // review (its nextReviewDate has passed), boost its weight so the adaptive
   // pool surfaces it regardless of historical accuracy.
-  if (
-    stat.nextReviewDate &&
-    accuracy >= cfg.strongAccuracy &&
-    attempts >= cfg.masteryMinAttempts
-  ) {
+  if (stat.nextReviewDate && accuracy >= cfg.strongAccuracy && attempts >= cfg.masteryMinAttempts) {
     const due = new Date(stat.nextReviewDate).getTime();
     if (!isNaN(due) && Date.now() >= due) {
       // Due for review — treat like a medium-weight word to surface it

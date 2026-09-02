@@ -31,21 +31,21 @@ import { audio } from '../modules/audio.js';
 
 // ── Persistence keys ──────────────────────────────────────────────────────
 
-const STATS_KEY      = 'lscwc_stats';
+const STATS_KEY = 'lscwc_stats';
 const INPUT_MODE_KEY = 'lscwc_input_mode';
-const STATS_CAP      = 200;
+const STATS_CAP = 200;
 
 // ── Module state ──────────────────────────────────────────────────────────
 
 let _container = null;
 /** @type {string[]} */
-let _words   = [];
+let _words = [];
 let _wordIdx = 0;
 /** @type {'look'|'say'|'cover'|'write'|'check'} */
-let _stage   = 'look';
-let _typed   = '';
+let _stage = 'look';
+let _typed = '';
 /** @type {string[]} – shuffled letter bank for tap mode (current word) */
-let _bank    = [];
+let _bank = [];
 /** @type {boolean[]} – which bank slots are consumed (true = already tapped) */
 let _bankUsed = [];
 /** @type {'type'|'tap'} */
@@ -55,21 +55,21 @@ let _onCancel = null;
 let _coverTimer = null;
 /** Stage transitions per word — used by the completion summary. */
 let _attemptsThisWord = 0;
-let _correctFirstTry  = 0;
+let _correctFirstTry = 0;
 
 // ── Public API ────────────────────────────────────────────────────────────
 
 export function startLscwcDrill(container, words, { onDone, onCancel } = {}) {
   cleanupLscwcDrill();
   _container = container;
-  _words     = (words || []).map(w => String(w).trim()).filter(Boolean);
-  _wordIdx   = 0;
-  _stage     = 'look';
-  _typed     = '';
-  _onDone    = onDone;
-  _onCancel  = onCancel;
+  _words = (words || []).map((w) => String(w).trim()).filter(Boolean);
+  _wordIdx = 0;
+  _stage = 'look';
+  _typed = '';
+  _onDone = onDone;
+  _onCancel = onCancel;
   _attemptsThisWord = 0;
-  _correctFirstTry  = 0;
+  _correctFirstTry = 0;
 
   if (!_container || _words.length === 0) {
     _onDone?.({ totalWords: 0, correctFirstTry: 0, attempts: 0 });
@@ -80,7 +80,10 @@ export function startLscwcDrill(container, words, { onDone, onCancel } = {}) {
 }
 
 export function cleanupLscwcDrill() {
-  if (_coverTimer) { clearTimeout(_coverTimer); _coverTimer = null; }
+  if (_coverTimer) {
+    clearTimeout(_coverTimer);
+    _coverTimer = null;
+  }
   _container = null;
   _words = [];
   _wordIdx = 0;
@@ -131,9 +134,7 @@ export function _logAttempt(word, correct) {
     // Cap the number of distinct words tracked (drop oldest by lastTs).
     const keys = Object.keys(stats);
     if (keys.length > STATS_CAP) {
-      const sorted = keys
-        .map(k => ({ k, ts: stats[k].lastTs ?? 0 }))
-        .sort((a, b) => a.ts - b.ts);
+      const sorted = keys.map((k) => ({ k, ts: stats[k].lastTs ?? 0 })).sort((a, b) => a.ts - b.ts);
       const dropCount = keys.length - STATS_CAP;
       for (let i = 0; i < dropCount; i++) delete stats[sorted[i].k];
     }
@@ -145,7 +146,9 @@ export function _readStats() {
   try {
     const raw = localStorage.getItem(STATS_KEY);
     return raw ? JSON.parse(raw) : {};
-  } catch { return {}; }
+  } catch {
+    return {};
+  }
 }
 
 // ── Internal: state transitions + rendering ───────────────────────────────
@@ -155,20 +158,24 @@ function _currentWord() {
 }
 
 function _resetBankFor(word) {
-  _bank     = _shuffleLetters(word);
+  _bank = _shuffleLetters(word);
   _bankUsed = _bank.map(() => false);
-  _typed    = '';
+  _typed = '';
 }
 
 function _loadInputMode() {
   try {
     const raw = localStorage.getItem(INPUT_MODE_KEY);
     return raw === 'tap' ? 'tap' : 'type';
-  } catch { return 'type'; }
+  } catch {
+    return 'type';
+  }
 }
 
 function _persistInputMode() {
-  try { localStorage.setItem(INPUT_MODE_KEY, _inputMode); } catch {}
+  try {
+    localStorage.setItem(INPUT_MODE_KEY, _inputMode);
+  } catch {}
 }
 
 function _renderCurrent() {
@@ -179,16 +186,18 @@ function _renderCurrent() {
   // Stage progress dots — Check is rendered as the final pip too.
   const stages = ['look', 'say', 'cover', 'write', 'check'];
   const stageLabels = { look: 'Look', say: 'Say', cover: 'Cover', write: 'Write', check: 'Check' };
-  const dotsHtml = stages.map(s => {
-    const idx = stages.indexOf(s);
-    const cur = stages.indexOf(_stage);
-    const cls = idx < cur ? 'done' : idx === cur ? 'active' : '';
-    return `<li class="lscwc-dot ${cls}" data-stage="${s}">${stageLabels[s]}</li>`;
-  }).join('');
+  const dotsHtml = stages
+    .map((s) => {
+      const idx = stages.indexOf(s);
+      const cur = stages.indexOf(_stage);
+      const cls = idx < cur ? 'done' : idx === cur ? 'active' : '';
+      return `<li class="lscwc-dot ${cls}" data-stage="${s}">${stageLabels[s]}</li>`;
+    })
+    .join('');
 
   const bodyHtml = _renderStage(_currentWord());
 
-  _container.innerHTML = /* html */`
+  _container.innerHTML = /* html */ `
     <div class="lscwc-panel" role="region" aria-label="Spell-It drill">
       <header class="lscwc-header">
         <div class="lscwc-progress" aria-live="polite">
@@ -212,17 +221,23 @@ function _renderCurrent() {
 
 function _renderStage(word) {
   switch (_stage) {
-    case 'look':  return _renderLook(word);
-    case 'say':   return _renderSay(word);
-    case 'cover': return _renderCover(word);
-    case 'write': return _renderWrite(word);
-    case 'check': return _renderCheck(word);
-    default:      return '';
+    case 'look':
+      return _renderLook(word);
+    case 'say':
+      return _renderSay(word);
+    case 'cover':
+      return _renderCover(word);
+    case 'write':
+      return _renderWrite(word);
+    case 'check':
+      return _renderCheck(word);
+    default:
+      return '';
   }
 }
 
 function _renderLook(word) {
-  return /* html */`
+  return /* html */ `
     <div class="lscwc-stage lscwc-look">
       <h3 class="lscwc-stage-title">👀 Look</h3>
       <p class="lscwc-stage-hint">Look at every letter and listen.</p>
@@ -239,7 +254,7 @@ function _renderLook(word) {
 }
 
 function _renderSay(word) {
-  return /* html */`
+  return /* html */ `
     <div class="lscwc-stage lscwc-say">
       <h3 class="lscwc-stage-title">🗣️ Say</h3>
       <p class="lscwc-stage-hint">Say the word out loud. You can whisper if you like.</p>
@@ -257,7 +272,7 @@ function _renderSay(word) {
 
 function _renderCover(word) {
   // Word starts visible and fades to invisible via CSS animation.
-  return /* html */`
+  return /* html */ `
     <div class="lscwc-stage lscwc-cover">
       <h3 class="lscwc-stage-title">🫥 Cover</h3>
       <p class="lscwc-stage-hint">Picture the word in your mind…</p>
@@ -275,25 +290,36 @@ function _renderCover(word) {
 
 function _renderWrite(word) {
   // Empty slots — one per letter of target.
-  const slotsHtml = word.split('').map((_, i) => /* html */`
+  const slotsHtml = word
+    .split('')
+    .map(
+      (_, i) => /* html */ `
     <span class="lscwc-slot" data-slot-idx="${i}" aria-hidden="true"></span>
-  `).join('');
+  `,
+    )
+    .join('');
 
-  const bankHtml = _bank.map((ltr, i) => /* html */`
+  const bankHtml = _bank
+    .map(
+      (ltr, i) => /* html */ `
     <button class="lscwc-bank-tile" data-bank-idx="${i}" type="button"
             aria-label="Letter ${ltr}" ${_bankUsed[i] ? 'disabled' : ''}>
       ${ltr}
     </button>
-  `).join('');
+  `,
+    )
+    .join('');
 
-  const inputModeChip = _inputMode === 'type'
-    ? `<button class="lscwc-mode-chip" id="lscwc-mode-toggle" type="button"
+  const inputModeChip =
+    _inputMode === 'type'
+      ? `<button class="lscwc-mode-chip" id="lscwc-mode-toggle" type="button"
                aria-pressed="false">⌨️ Type · tap to switch</button>`
-    : `<button class="lscwc-mode-chip" id="lscwc-mode-toggle" type="button"
+      : `<button class="lscwc-mode-chip" id="lscwc-mode-toggle" type="button"
                aria-pressed="true">👆 Tap · tap to switch</button>`;
 
-  const inputArea = _inputMode === 'type'
-    ? /* html */`
+  const inputArea =
+    _inputMode === 'type'
+      ? /* html */ `
         <div class="lscwc-write-input">
           <label for="lscwc-input" class="visually-hidden">Spell the word</label>
           <input type="text" id="lscwc-input" class="lscwc-input"
@@ -305,7 +331,7 @@ function _renderWrite(word) {
                   aria-label="Delete last letter">⌫</button>
         </div>
       `
-    : /* html */`
+      : /* html */ `
         <div class="lscwc-write-bank" role="group" aria-label="Tap letters in order">
           ${bankHtml}
         </div>
@@ -313,12 +339,12 @@ function _renderWrite(word) {
                 aria-label="Delete last letter">⌫ Undo last</button>
       `;
 
-  return /* html */`
+  return /* html */ `
     <div class="lscwc-stage lscwc-write">
       <h3 class="lscwc-stage-title">✍️ Write</h3>
-      <p class="lscwc-stage-hint">${_inputMode === 'type'
-        ? 'Type the word.'
-        : 'Tap the letters in the right order.'}</p>
+      <p class="lscwc-stage-hint">${
+        _inputMode === 'type' ? 'Type the word.' : 'Tap the letters in the right order.'
+      }</p>
       <div class="lscwc-slots" id="lscwc-slots" aria-live="polite">${slotsHtml}</div>
       <div class="lscwc-write-toolbar">
         ${inputModeChip}
@@ -331,31 +357,34 @@ function _renderWrite(word) {
 function _renderCheck(word) {
   const typed = _typed;
   const allRight = typed.toLowerCase() === word.toLowerCase();
-  const slotsHtml = word.split('').map((expected, i) => {
-    const got = typed[i] ?? '';
-    const right = got && got.toLowerCase() === expected.toLowerCase();
-    return /* html */`
+  const slotsHtml = word
+    .split('')
+    .map((expected, i) => {
+      const got = typed[i] ?? '';
+      const right = got && got.toLowerCase() === expected.toLowerCase();
+      return /* html */ `
       <span class="lscwc-check-slot ${got ? (right ? 'right' : 'wrong') : 'missing'}"
             aria-label="${right ? 'correct' : 'wrong'}: ${expected}">
         <span class="lscwc-check-got">${got || '·'}</span>
         <span class="lscwc-check-exp">${expected}</span>
       </span>
     `;
-  }).join('');
+    })
+    .join('');
 
   const isLast = _wordIdx >= _words.length - 1;
   const cta = allRight
-    ? (isLast
-        ? `<button class="btn btn--primary" id="lscwc-next-stage" type="button">🎉 Finish!</button>`
-        : `<button class="btn btn--primary" id="lscwc-next-stage" type="button">Next word →</button>`)
-    : /* html */`
+    ? isLast
+      ? `<button class="btn btn--primary" id="lscwc-next-stage" type="button">🎉 Finish!</button>`
+      : `<button class="btn btn--primary" id="lscwc-next-stage" type="button">Next word →</button>`
+    : /* html */ `
         <button class="btn btn--ghost" id="lscwc-retry" type="button">🔁 Try again</button>
         <button class="btn btn--primary" id="lscwc-next-stage" type="button">
           ${isLast ? 'Finish' : 'Next word →'}
         </button>
       `;
 
-  return /* html */`
+  return /* html */ `
     <div class="lscwc-stage lscwc-check ${allRight ? 'lscwc-check--ok' : 'lscwc-check--bad'}">
       <h3 class="lscwc-stage-title">${allRight ? '🎉 Check' : '🤔 Check'}</h3>
       <p class="lscwc-stage-hint">
@@ -369,7 +398,10 @@ function _renderCheck(word) {
 
 /** Letter-by-letter span rendering used in Look / Say / Cover stages. */
 function _wordLetters(word) {
-  return word.split('').map(l => `<span class="lscwc-letter">${l}</span>`).join('');
+  return word
+    .split('')
+    .map((l) => `<span class="lscwc-letter">${l}</span>`)
+    .join('');
 }
 
 // ── Internal: per-stage wiring ────────────────────────────────────────────
@@ -381,11 +413,16 @@ function _wireStage(word) {
   }
 
   switch (_stage) {
-    case 'look':  return _wireLook();
-    case 'say':   return _wireSay();
-    case 'cover': return _wireCover();
-    case 'write': return _wireWrite(word);
-    case 'check': return _wireCheck(word);
+    case 'look':
+      return _wireLook();
+    case 'say':
+      return _wireSay();
+    case 'cover':
+      return _wireCover();
+    case 'write':
+      return _wireWrite(word);
+    case 'check':
+      return _wireCheck(word);
   }
 }
 
@@ -489,7 +526,7 @@ function _wireWrite(word) {
   }
 
   // Tap mode: letter-bank buttons
-  _container?.querySelectorAll('.lscwc-bank-tile').forEach(btn => {
+  _container?.querySelectorAll('.lscwc-bank-tile').forEach((btn) => {
     btn.addEventListener('click', () => {
       if (btn.disabled) return;
       const idx = Number(btn.dataset.bankIdx);
@@ -519,7 +556,10 @@ function _wireWrite(word) {
         if (_bankUsed[i] && _bank[i] === removed) {
           _bankUsed[i] = false;
           const tile = _container?.querySelector(`.lscwc-bank-tile[data-bank-idx="${i}"]`);
-          if (tile) { tile.disabled = false; tile.classList.remove('used'); }
+          if (tile) {
+            tile.disabled = false;
+            tile.classList.remove('used');
+          }
           break;
         }
       }

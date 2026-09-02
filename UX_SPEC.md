@@ -143,7 +143,7 @@ objective, error hints, scoring).
   outcome:
 
   | Outcome             | Top line                             |
-  |---------------------|--------------------------------------|
+  | ------------------- | ------------------------------------ |
   | Mastered (≥80%)     | "You mastered the short A sound!"    |
   | Improved (≥50%)     | "You're getting closer!"             |
   | Needs review (<50%) | "Let's try this one again together." |
@@ -193,15 +193,18 @@ objective, error hints, scoring).
 ## 3. Cross-screen patterns
 
 ### 3.1 Persistent UI
+
 - **Top bar (child screens):** mascot · lesson dots · pause.
 - **Top bar (adult screens):** breadcrumb · "Back to child mode".
 - **Bottom strip (game-mode only):** feedback + hint button.
 
 ### 3.2 Audio
+
 - Every instruction has an audio twin. Auto-play on first land; replayable
   via a 🔊 button. Mute toggle persists per profile.
 
 ### 3.3 Mistakes-are-safe contract
+
 - First wrong → calm hint, no sound effect, try again.
 - Second wrong → reveal the correct answer with a why ("This one is /ă/
   because A in cat makes the same sound").
@@ -209,12 +212,14 @@ objective, error hints, scoring).
   the question — the journey never branches into a dead end.
 
 ### 3.4 Progress visibility
+
 - **Within a lesson:** 3 dots in the header fill as rounds complete.
 - **Within a stage:** progress ring on the quest-map node.
 - **Within a phase:** the phase bar at the top of the quest map.
 - **Within the whole curriculum:** the badge wall on the progress view.
 
 ### 3.5 Tablet & laptop layout
+
 - Base unit: 4 px. Container max-width 960 px on tablet, 1100 px on
   laptop. All tap targets ≥ 48 × 48 px (≥ 44 px is WCAG floor; we go
   higher because the audience is 5).
@@ -258,12 +263,14 @@ Out of slice (planned, not built this pass): mastery badge screen,
 parent progress view (the data model is shipped, the UI is not).
 
 ### 4.1 Data the slice consumes
+
 - `CURRICULUM` stage `ccvc-a` for outcome, sample words, sentences.
 - `PHONICS_MODES.soundMatch` / `.blendBuilder` for instructions,
   objectives, error hints, scoring.
 - `progressAnalytics` (new module) for read/write of attempts.
 
 ### 4.2 Code organisation
+
 - `src/components/questJourney/` — one render-fn per screen + a tiny
   controller that maps state → screen.
 - `src/styles/journey.css` — screen-specific layout on top of the
@@ -273,7 +280,9 @@ parent progress view (the data model is shipped, the UI is not).
   wires them together so each screen can be unit-tested in isolation.
 
 ### 4.3 Acceptance criteria for the slice
+
 A child can:
+
 1. Land on Welcome → press Start.
 2. Pick a profile (or skip if one exists).
 3. See the quest map with `ccvc-a` pulsing.
@@ -284,6 +293,7 @@ A child can:
 8. Return to the quest map with `ccvc-a` now showing progress.
 
 A developer can:
+
 1. `npm test` → schema, mode, content, and progress tests all pass.
 2. `import { mountQuestJourney } from './components/questJourney'` and
    mount the slice without booting the rest of the app.

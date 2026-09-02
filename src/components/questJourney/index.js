@@ -9,8 +9,4 @@ export {
   renderMasteryBadge,
   renderProgressView,
 } from './screens.js';
-export {
-  buildSoundMatchRound,
-  buildBlendBuilderRound,
-  buildLesson,
-} from './rounds.js';
+export { buildSoundMatchRound, buildBlendBuilderRound, buildLesson } from './rounds.js';

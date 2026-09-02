@@ -40,12 +40,12 @@ function _storeBlob(id, blob) {
 
 // ── Recording state ──────────────────────────────────────────────────────
 
-let _mediaStream   = null;
-let _recorder      = null;
-let _chunks        = [];
-let _recordingId   = null;
-let _recordStart   = null;
-let _onStateChange = null;   // callback(state)  state: 'idle'|'recording'|'recorded'|'playing'|'error'
+let _mediaStream = null;
+let _recorder = null;
+let _chunks = [];
+let _recordingId = null;
+let _recordStart = null;
+let _onStateChange = null; // callback(state)  state: 'idle'|'recording'|'recorded'|'playing'|'error'
 
 /** Current state: 'idle' | 'recording' | 'recorded' | 'playing' | 'error' */
 let _state = 'idle';
@@ -64,7 +64,7 @@ export async function requestMicPermission() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     // Stop tracks immediately — we just wanted the permission grant
-    stream.getTracks().forEach(t => t.stop());
+    stream.getTracks().forEach((t) => t.stop());
     return true;
   } catch {
     return false;
@@ -285,7 +285,7 @@ export function getFluencyHistory(storyId) {
 export function getBestWcpm(storyId) {
   const attempts = getFluencyHistory(storyId);
   if (attempts.length === 0) return null;
-  return Math.max(...attempts.map(a => a.wcpm));
+  return Math.max(...attempts.map((a) => a.wcpm));
 }
 
 // ── Private helpers ──────────────────────────────────────────────────────
@@ -300,22 +300,19 @@ function _setState(newState) {
 
 function _cleanupStream() {
   if (_mediaStream) {
-    _mediaStream.getTracks().forEach(t => t.stop());
+    _mediaStream.getTracks().forEach((t) => t.stop());
     _mediaStream = null;
   }
 }
 
 function _pickMimeType() {
-  const candidates = [
-    'audio/webm;codecs=opus',
-    'audio/webm',
-    'audio/ogg;codecs=opus',
-    'audio/mp4',
-  ];
+  const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4'];
   for (const mime of candidates) {
     try {
       if (MediaRecorder.isTypeSupported(mime)) return mime;
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
   return '';
 }

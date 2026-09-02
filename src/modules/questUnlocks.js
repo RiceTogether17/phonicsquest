@@ -30,17 +30,22 @@ export function countMasteredWords(wordStats = {}, minAttempts = 6, masteryThres
  * @param {{ sentenceForge:number, clozeCastle:number, wordVault:number, editingQuest:number, writingQuest:number }} [thresholds]
  * @param {{ readingBand?: string, sentenceReady?: boolean, grammarReady?: boolean, vocabularyReady?: boolean }|null} [placementProfile]
  */
-export function getQuestUnlockStatus(wordStats = {}, profile = null, thresholds = QUEST_THRESHOLDS, placementProfile = null) {
+export function getQuestUnlockStatus(
+  wordStats = {},
+  profile = null,
+  thresholds = QUEST_THRESHOLDS,
+  placementProfile = null,
+) {
   const readingBand = placementProfile?.readingBand || profile?.readingBand || null;
 
   if (readingBand === 'reader') {
     return {
       mastered: Infinity,
       sentenceForge: { unlocked: true, required: thresholds.sentenceForge, current: Infinity },
-      clozeCastle:   { unlocked: true, required: thresholds.clozeCastle,   current: Infinity },
-      wordVault:     { unlocked: true, required: thresholds.wordVault,     current: Infinity },
-      editingQuest:  { unlocked: true, required: thresholds.editingQuest,  current: Infinity },
-      writingQuest:  { unlocked: true, required: thresholds.writingQuest,  current: Infinity },
+      clozeCastle: { unlocked: true, required: thresholds.clozeCastle, current: Infinity },
+      wordVault: { unlocked: true, required: thresholds.wordVault, current: Infinity },
+      editingQuest: { unlocked: true, required: thresholds.editingQuest, current: Infinity },
+      writingQuest: { unlocked: true, required: thresholds.writingQuest, current: Infinity },
     };
   }
 

@@ -264,7 +264,10 @@ export const settingsController = {
       try {
         const { callAi } = await import('./aiService.js');
         const { lastError } = await import('./aiConfig.js');
-        const reply = await callAi('Reply with exactly: Giri is ready.', { maxTokens: 32, temperature: 0 });
+        const reply = await callAi('Reply with exactly: Giri is ready.', {
+          maxTokens: 32,
+          temperature: 0,
+        });
         if (status) {
           status.textContent = reply
             ? `✓ Working — Giri said: "${reply.trim().slice(0, 60)}"`
@@ -503,7 +506,7 @@ export const settingsController = {
     const providerSelect = /** @type {HTMLSelectElement|null} */ ($('ai-provider-select'));
     if (providerSelect) {
       providerSelect.innerHTML = html`${PROVIDER_ORDER.map(
-        id => html`<option value="${id}">${AI_PROVIDERS[id].label}</option>`,
+        (id) => html`<option value="${id}">${AI_PROVIDERS[id].label}</option>`,
       )}`;
       providerSelect.value = providerId;
     }
@@ -540,15 +543,16 @@ export const settingsController = {
     }
     const keyHelp = $('ai-key-help');
     if (keyHelp) {
-      keyHelp.textContent = provider.needsKey && aiConfig.apiKeyFor(providerId)
-        ? `Signed in with a ${provider.label} key. Paste a different one any time to switch.`
-        : '';
+      keyHelp.textContent =
+        provider.needsKey && aiConfig.apiKeyFor(providerId)
+          ? `Signed in with a ${provider.label} key. Paste a different one any time to switch.`
+          : '';
     }
 
     const modelSelect = /** @type {HTMLSelectElement|null} */ ($('ai-model-select'));
     if (modelSelect) {
       modelSelect.innerHTML = html`${(provider.models || []).map(
-        m => html`<option value="${m.id}">${m.label}</option>`,
+        (m) => html`<option value="${m.id}">${m.label}</option>`,
       )}`;
       modelSelect.value = aiConfig.modelFor(providerId);
       modelSelect.disabled = (provider.models || []).length < 2;

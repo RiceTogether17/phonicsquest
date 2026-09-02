@@ -16,13 +16,18 @@
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
-import { WORD_GROUPS, BLENDING_GROUP_ORDER, STRUCT_GROUP_ORDER, SUFFIX_GROUP_ORDER } from '../data/words.js';
+import {
+  WORD_GROUPS,
+  BLENDING_GROUP_ORDER,
+  STRUCT_GROUP_ORDER,
+  SUFFIX_GROUP_ORDER,
+} from '../data/words.js';
 
 /** @type {import('../data/words.js').Word|null} */
 let currentWord = null;
-let isPlaying   = false;
-let startTime   = 0;
-let _speed      = 'normal'; // 'slow' | 'normal' | 'fast'
+let isPlaying = false;
+let startTime = 0;
+let _speed = 'normal'; // 'slow' | 'normal' | 'fast'
 let _blendStyle = 'simultaneous'; // 'simultaneous' | 'cumulative'
 
 /** Inter-phoneme delay (ms) per speed setting */
@@ -82,13 +87,13 @@ function _buildGroupOptions() {
   return [
     `<option value="" ${allSelected}>🔤 All Words</option>`,
     `<optgroup label="── By Vowel Sound ──">`,
-    ...BLENDING_GROUP_ORDER.map(key => opt(key, WORD_GROUPS[key])),
+    ...BLENDING_GROUP_ORDER.map((key) => opt(key, WORD_GROUPS[key])),
     `</optgroup>`,
     `<optgroup label="── By Word Pattern ──">`,
-    ...STRUCT_GROUP_ORDER.map(key => opt(key, WORD_GROUPS[key])),
+    ...STRUCT_GROUP_ORDER.map((key) => opt(key, WORD_GROUPS[key])),
     `</optgroup>`,
     `<optgroup label="── By Suffix ──">`,
-    ...SUFFIX_GROUP_ORDER.map(key => opt(key, WORD_GROUPS[key])),
+    ...SUFFIX_GROUP_ORDER.map((key) => opt(key, WORD_GROUPS[key])),
     `</optgroup>`,
   ].join('');
 }
@@ -96,21 +101,25 @@ function _buildGroupOptions() {
 // ── Controls rendering ────────────────────────────────────────────────────
 
 function _renderControls(els, word, played = false) {
-  const speedBtns = ['slow', 'normal', 'fast'].map(s => {
-    const label = { slow: '🐢 Slow', normal: '▶ Normal', fast: '⚡ Fast' }[s];
-    const active = _speed === s ? 'speed-btn--active' : '';
-    return `<button class="speed-btn ${active}" data-speed="${s}" aria-label="Set speed to ${s}">${label}</button>`;
-  }).join('');
+  const speedBtns = ['slow', 'normal', 'fast']
+    .map((s) => {
+      const label = { slow: '🐢 Slow', normal: '▶ Normal', fast: '⚡ Fast' }[s];
+      const active = _speed === s ? 'speed-btn--active' : '';
+      return `<button class="speed-btn ${active}" data-speed="${s}" aria-label="Set speed to ${s}">${label}</button>`;
+    })
+    .join('');
 
-  const styleBtns = ['simultaneous', 'cumulative'].map(s => {
-    const label = { simultaneous: '🔤 Sound by Sound', cumulative: '🔗 Build It Up' }[s];
-    const desc  = {
-      simultaneous: 'Play each sound on its own, then the word',
-      cumulative:   'Blend each new sound with the ones before it',
-    }[s];
-    const active = _blendStyle === s ? 'speed-btn--active' : '';
-    return `<button class="speed-btn ${active}" data-blend-style="${s}" aria-label="${desc}" title="${desc}">${label}</button>`;
-  }).join('');
+  const styleBtns = ['simultaneous', 'cumulative']
+    .map((s) => {
+      const label = { simultaneous: '🔤 Sound by Sound', cumulative: '🔗 Build It Up' }[s];
+      const desc = {
+        simultaneous: 'Play each sound on its own, then the word',
+        cumulative: 'Blend each new sound with the ones before it',
+      }[s];
+      const active = _blendStyle === s ? 'speed-btn--active' : '';
+      return `<button class="speed-btn ${active}" data-blend-style="${s}" aria-label="${desc}" title="${desc}">${label}</button>`;
+    })
+    .join('');
 
   els.modeArea.innerHTML = `
     <div class="classic-blend-wrap">
@@ -140,15 +149,21 @@ function _renderControls(els, word, played = false) {
         <button class="btn btn--primary btn--xl" id="btn-classic-play" aria-label="Play all sounds">
           ▶ Play Sounds
         </button>
-        ${played ? `
+        ${
+          played
+            ? `
         <button class="btn btn--ghost btn--xl" id="btn-classic-again" aria-label="Play again">
           🔁 Again
         </button>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
 
       <!-- Self-assessment (after first play) -->
-      ${played ? `
+      ${
+        played
+          ? `
       <div class="classic-assess-row">
         <button class="btn btn--success btn--xl" id="btn-self-yes" aria-label="Yes, I blended it!">
           Yes! ✓
@@ -157,7 +172,9 @@ function _renderControls(els, word, played = false) {
           Not yet
         </button>
       </div>
-      ` : ''}
+      `
+          : ''
+      }
 
     </div>
   `;
@@ -186,21 +203,21 @@ function _renderControls(els, word, played = false) {
   });
 
   // Speed buttons
-  els.modeArea.querySelectorAll('.speed-btn').forEach(btn => {
+  els.modeArea.querySelectorAll('.speed-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       _speed = btn.dataset.speed;
-      els.modeArea.querySelectorAll('.speed-btn').forEach(b => {
+      els.modeArea.querySelectorAll('.speed-btn').forEach((b) => {
         b.classList.toggle('speed-btn--active', b.dataset.speed === _speed);
       });
     });
   });
 
   // Blend-style buttons
-  els.modeArea.querySelectorAll('[data-blend-style]').forEach(btn => {
+  els.modeArea.querySelectorAll('[data-blend-style]').forEach((btn) => {
     btn.addEventListener('click', () => {
       _blendStyle = btn.dataset.blendStyle;
       store.set('blendStyle', _blendStyle);
-      els.modeArea.querySelectorAll('[data-blend-style]').forEach(b => {
+      els.modeArea.querySelectorAll('[data-blend-style]').forEach((b) => {
         b.classList.toggle('speed-btn--active', b.dataset.blendStyle === _blendStyle);
       });
     });
@@ -221,7 +238,7 @@ async function _playSounds(word, els) {
     // sound, then blends them — "l · i · li", "li · s(t) · list". The final
     // blended chunk IS the whole word, so no separate word playback.
     if (word.graphemes.length < 2) {
-      tiles.forEach(t => t.classList.add('active'));
+      tiles.forEach((t) => t.classList.add('active'));
       await audio.speakWord(word.word);
     } else {
       for (let i = 1; i < word.graphemes.length; i++) {
@@ -233,7 +250,8 @@ async function _playSounds(word, els) {
         // New sound on its own
         tiles.forEach((t, ti) => t.classList.toggle('active', ti === i));
         await audio.speakPhoneme(word.graphemes[i], word.types[i], {
-          word: word.word, prevGrapheme: word.graphemes[i - 1],
+          word: word.word,
+          prevGrapheme: word.graphemes[i - 1],
         });
         await _delay(Math.min(delay, 200));
 
@@ -243,7 +261,7 @@ async function _playSounds(word, els) {
         await _delay(delay);
       }
     }
-    tiles.forEach(t => t.classList.remove('active'));
+    tiles.forEach((t) => t.classList.remove('active'));
   } else {
     for (let i = 0; i < word.graphemes.length; i++) {
       // Highlight current tile
@@ -255,7 +273,7 @@ async function _playSounds(word, els) {
       await _delay(delay);
     }
 
-    tiles.forEach(t => t.classList.remove('active'));
+    tiles.forEach((t) => t.classList.remove('active'));
 
     await _delay(Math.min(delay, 300));
     await audio.speakWord(word.word);
@@ -267,7 +285,7 @@ async function _playSounds(word, els) {
   els.btnSayIt.style.display = '';
 }
 
-const _delay = ms => new Promise(r => setTimeout(r, ms));
+const _delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /** @returns {import('../data/words.js').Word|null} */
 export function getCurrentWord() {

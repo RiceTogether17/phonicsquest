@@ -23,29 +23,35 @@ export function runStoryQuest(container, story, onDone) {
   }
 
   const state = {
-    phase: 'intro',        // intro | comprehension | openEnded | vocab | grammar | done
-    qIndex: 0,             // current comprehension question
-    vocabIndex: 0,         // current vocab card
-    correct: 0,            // correct comprehension answers
+    phase: 'intro', // intro | comprehension | openEnded | vocab | grammar | done
+    qIndex: 0, // current comprehension question
+    vocabIndex: 0, // current vocab card
+    correct: 0, // correct comprehension answers
     total: story.comprehension.length,
-    flipped: false,        // for vocab card
+    flipped: false, // for vocab card
   };
 
   function render() {
     switch (state.phase) {
-      case 'intro':        return _renderIntro();
-      case 'comprehension':return _renderComprehension();
-      case 'vocab':        return _renderVocab();
-      case 'openEnded':    return _renderOpenEnded();
-      case 'grammar':      return _renderGrammar();
-      case 'done':         return _renderDone();
+      case 'intro':
+        return _renderIntro();
+      case 'comprehension':
+        return _renderComprehension();
+      case 'vocab':
+        return _renderVocab();
+      case 'openEnded':
+        return _renderOpenEnded();
+      case 'grammar':
+        return _renderGrammar();
+      case 'done':
+        return _renderDone();
     }
   }
 
   // ── Intro ──────────────────────────────────────────────────────────────
 
   function _renderIntro() {
-    container.innerHTML = /* html */`
+    container.innerHTML = /* html */ `
       <div class="sq-screen sq-intro">
         <div class="sq-mascot-emoji">🌟</div>
         <h2 class="sq-title">Story Quest!</h2>
@@ -78,7 +84,7 @@ export function runStoryQuest(container, story, onDone) {
     const qNum = state.qIndex + 1;
     const total = state.total;
 
-    container.innerHTML = /* html */`
+    container.innerHTML = /* html */ `
       <div class="sq-screen sq-comprehension">
         <div class="sq-progress-bar">
           <div class="sq-progress-fill" style="width:${(qNum / total) * 100}%"></div>
@@ -91,12 +97,16 @@ export function runStoryQuest(container, story, onDone) {
         </div>
 
         <div class="sq-options" id="sq-options">
-          ${q.options.map((opt, i) => /* html */`
+          ${q.options
+            .map(
+              (opt, i) => /* html */ `
             <button class="sq-option" data-idx="${i}" aria-label="${opt}">
               <span class="sq-option-letter">${String.fromCharCode(65 + i)}</span>
               <span class="sq-option-text">${opt}</span>
             </button>
-          `).join('')}
+          `,
+            )
+            .join('')}
         </div>
 
         <div class="sq-feedback" id="sq-feedback" hidden></div>
@@ -106,7 +116,7 @@ export function runStoryQuest(container, story, onDone) {
       </div>
     `;
 
-    document.querySelectorAll('.sq-option').forEach(btn => {
+    document.querySelectorAll('.sq-option').forEach((btn) => {
       btn.addEventListener('click', () => _handleAnswer(btn, q));
     });
   }
@@ -143,7 +153,11 @@ export function runStoryQuest(container, story, onDone) {
           // Move to vocab or grammar or done
           state.phase = story.openEnded?.length
             ? 'openEnded'
-            : (story.vocab?.length ? 'vocab' : (story.grammarSpotlight?.length ? 'grammar' : 'done'));
+            : story.vocab?.length
+              ? 'vocab'
+              : story.grammarSpotlight?.length
+                ? 'grammar'
+                : 'done';
           state.vocabIndex = 0;
           render();
         }
@@ -154,15 +168,21 @@ export function runStoryQuest(container, story, onDone) {
   function _renderOpenEnded() {
     const prompts = story.openEnded || [];
     if (!prompts.length) {
-      state.phase = story.vocab?.length ? 'vocab' : (story.grammarSpotlight?.length ? 'grammar' : 'done');
+      state.phase = story.vocab?.length
+        ? 'vocab'
+        : story.grammarSpotlight?.length
+          ? 'grammar'
+          : 'done';
       render();
       return;
     }
 
-    container.innerHTML = /* html */`
+    container.innerHTML = /* html */ `
       <div class="sq-screen sq-comprehension">
         <p class="sq-phase-label">🗣️ Open-ended response</p>
-        ${prompts.map((p, i) => `
+        ${prompts
+          .map(
+            (p, i) => `
           <div class="sq-question-card" style="margin-bottom:12px">
             <p class="sq-question-text">${i + 1}. ${p.q}</p>
             <textarea class="cp-name-input" rows="3" placeholder="Type your answer..."></textarea>
@@ -170,12 +190,18 @@ export function runStoryQuest(container, story, onDone) {
               <p><strong>Sample:</strong> ${p.sampleAnswer}</p>
               <p><strong>Guide:</strong> ${p.markingGuide}</p>
             </details>
-          </div>`).join('')}
+          </div>`,
+          )
+          .join('')}
         <button class="btn btn--primary btn--xl" id="sq-open-next">Continue →</button>
       </div>`;
 
     document.getElementById('sq-open-next')?.addEventListener('click', () => {
-      state.phase = story.vocab?.length ? 'vocab' : (story.grammarSpotlight?.length ? 'grammar' : 'done');
+      state.phase = story.vocab?.length
+        ? 'vocab'
+        : story.grammarSpotlight?.length
+          ? 'grammar'
+          : 'done';
       render();
     });
   }
@@ -187,7 +213,7 @@ export function runStoryQuest(container, story, onDone) {
     const total = story.vocab.length;
     const cardNum = state.vocabIndex + 1;
 
-    container.innerHTML = /* html */`
+    container.innerHTML = /* html */ `
       <div class="sq-screen sq-vocab">
         <p class="sq-phase-label">📖 Word ${cardNum} of ${total}</p>
 
@@ -204,15 +230,19 @@ export function runStoryQuest(container, story, onDone) {
         </div>
 
         <div class="sq-vocab-controls">
-          ${state.flipped ? /* html */`
+          ${
+            state.flipped
+              ? /* html */ `
             <button class="btn btn--primary btn--xl" id="sq-vocab-next">
               ${cardNum < total ? 'Next word →' : 'Done with words!'}
             </button>
-          ` : `
+          `
+              : `
             <button class="btn btn--ghost btn--xl" id="sq-flip-btn">
               👀 Flip card
             </button>
-          `}
+          `
+          }
         </div>
         <button class="btn btn--ghost sq-skip-btn" id="sq-vocab-skip">
           Skip vocab
@@ -226,7 +256,9 @@ export function runStoryQuest(container, story, onDone) {
       render();
     };
     flipCard?.addEventListener('click', flipFn);
-    flipCard?.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') flipFn(); });
+    flipCard?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') flipFn();
+    });
     document.getElementById('sq-flip-btn')?.addEventListener('click', flipFn);
 
     document.getElementById('sq-vocab-next')?.addEventListener('click', () => {
@@ -251,7 +283,9 @@ export function runStoryQuest(container, story, onDone) {
   function _renderGrammar() {
     const spots = story.grammarSpotlight ?? [];
 
-    const spotsHtml = spots.map((s, i) => /* html */`
+    const spotsHtml = spots
+      .map(
+        (s, i) => /* html */ `
       <div class="sq-grammar-card">
         <div class="sq-grammar-num">${i + 1}</div>
         <h3 class="sq-grammar-pattern">${s.pattern}</h3>
@@ -261,9 +295,11 @@ export function runStoryQuest(container, story, onDone) {
         </div>
         <p class="sq-grammar-tip">💡 ${s.tip}</p>
       </div>
-    `).join('');
+    `,
+      )
+      .join('');
 
-    container.innerHTML = /* html */`
+    container.innerHTML = /* html */ `
       <div class="sq-screen sq-grammar">
         <p class="sq-phase-label">✏️ Grammar Spotlight</p>
         <div class="sq-grammar-list">${spotsHtml}</div>
@@ -294,7 +330,7 @@ export function runStoryQuest(container, story, onDone) {
     ];
     const msg = stars === 3 ? messages[2] : stars === 2 ? messages[1] : messages[0];
 
-    container.innerHTML = /* html */`
+    container.innerHTML = /* html */ `
       <div class="sq-screen sq-done">
         <div class="sq-done-stars">${starsHtml}</div>
         <h2 class="sq-title">Story Quest complete!</h2>

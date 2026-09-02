@@ -12,19 +12,30 @@ import { test, expect } from '@playwright/test';
 async function seedLearner(page) {
   await page.addInitScript(() => {
     const profile = {
-      id: 'p_panels', name: 'Testy', avatar: '🦊', color: '#f97316',
-      schoolLevel: 'preschool', primaryGrade: null, readingBand: 'emerging-decoder',
+      id: 'p_panels',
+      name: 'Testy',
+      avatar: '🦊',
+      color: '#f97316',
+      schoolLevel: 'preschool',
+      primaryGrade: null,
+      readingBand: 'emerging-decoder',
       createdAt: new Date().toISOString(),
     };
     localStorage.setItem('phonicsquest_profiles', JSON.stringify([profile]));
     localStorage.setItem('phonicsquest_active_profile', profile.id);
     localStorage.setItem('phonicsquest_legacy_migrated_to_profiles', '1');
-    localStorage.setItem(`phonicsquest_profile_${profile.id}`, JSON.stringify({
-      placementComplete: true,
-      placementProfile: { readingBand: 'emerging-decoder' },
-      xp: 240, level: 3, streak: 4, bestStreak: 6,
-      challengeCalendar: [new Date().toISOString().slice(0, 10)],
-    }));
+    localStorage.setItem(
+      `phonicsquest_profile_${profile.id}`,
+      JSON.stringify({
+        placementComplete: true,
+        placementProfile: { readingBand: 'emerging-decoder' },
+        xp: 240,
+        level: 3,
+        streak: 4,
+        bestStreak: 6,
+        challengeCalendar: [new Date().toISOString().slice(0, 10)],
+      }),
+    );
   });
 }
 
@@ -62,7 +73,7 @@ test('Ask Giri panel opens with answerable question chips', async ({ page }) => 
   await expect(modal.locator('#ask-giri-answer .mcq-rule-text')).toBeVisible();
 });
 
-test('Trophy Room opens and shows the child\'s own bests', async ({ page }) => {
+test("Trophy Room opens and shows the child's own bests", async ({ page }) => {
   // The trophy tile lives on the Extra tab, not Today.
   await page.locator('#home-tab-extra').click();
   const btn = page.locator('#btn-personal-best');
@@ -76,7 +87,9 @@ test('Trophy Room opens and shows the child\'s own bests', async ({ page }) => {
   await expect(modal.locator('.trophy-intro')).toContainText('you vs you');
 });
 
-test('Mistakes Den opens and reports an all-clear when there is nothing to retry', async ({ page }) => {
+test('Mistakes Den opens and reports an all-clear when there is nothing to retry', async ({
+  page,
+}) => {
   // The banner only shows when mistakes exist; drive the panel directly so
   // the empty state is covered too.
   await page.evaluate(() => document.getElementById('btn-mistakes-den')?.click());

@@ -26,14 +26,14 @@ describe("Today's Plan — early-reading 3-step daily quest", () => {
   it('exposes three steps in fixed order: review → daily → warm-up', () => {
     const plan = getEarlyReadingPlan();
     expect(plan.steps).toHaveLength(3);
-    expect(plan.steps.map(s => s.id)).toEqual(['review', 'daily', 'warmup']);
+    expect(plan.steps.map((s) => s.id)).toEqual(['review', 'daily', 'warmup']);
     expect(plan.total).toBe(3);
   });
 
   it('marks the Review Lane step done when there are no due items (empty queue)', () => {
     // Brand-new profile with no wordStats → no due items → "all caught up".
     const plan = getEarlyReadingPlan();
-    const review = plan.steps.find(s => s.id === 'review');
+    const review = plan.steps.find((s) => s.id === 'review');
     expect(review.done).toBe(true);
     expect(review.detail).toMatch(/caught up/i);
   });
@@ -43,12 +43,18 @@ describe("Today's Plan — early-reading 3-step daily quest", () => {
     const dueAt = NOW.getTime() - 86_400_000; // yesterday
     const stats = {};
     for (const w of WORDS.slice(0, 5)) {
-      stats[w.id] = { box: 1, dueAt, attempts: 2, correct: 1, lastSeen: new Date(dueAt).toISOString() };
+      stats[w.id] = {
+        box: 1,
+        dueAt,
+        attempts: 2,
+        correct: 1,
+        lastSeen: new Date(dueAt).toISOString(),
+      };
     }
     store.set('wordStats', stats);
 
     const plan = getEarlyReadingPlan();
-    const review = plan.steps.find(s => s.id === 'review');
+    const review = plan.steps.find((s) => s.id === 'review');
     expect(review.done).toBe(false);
     expect(review.detail).toMatch(/5 words? due/i);
     expect(review.detail).toMatch(/about \d+ min/);
@@ -57,7 +63,7 @@ describe("Today's Plan — early-reading 3-step daily quest", () => {
   it('marks the Daily Challenge step done when isDailyChallengeComplete()', () => {
     store.set('dailyChallenge', { date: '2026-05-23', complete: true });
     const plan = getEarlyReadingPlan();
-    const daily = plan.steps.find(s => s.id === 'daily');
+    const daily = plan.steps.find((s) => s.id === 'daily');
     expect(daily.done).toBe(true);
     expect(daily.detail).toMatch(new RegExp(`\\+${DAILY_BONUS_XP}`));
   });
@@ -65,7 +71,7 @@ describe("Today's Plan — early-reading 3-step daily quest", () => {
   it('marks the Warm-up step done after sessionWordsToday hits the target', () => {
     store.set('sessionWordsToday', ['cat', 'hat', 'mat']);
     const plan = getEarlyReadingPlan();
-    const warmup = plan.steps.find(s => s.id === 'warmup');
+    const warmup = plan.steps.find((s) => s.id === 'warmup');
     expect(warmup.done).toBe(true);
     expect(warmup.progressLabel).toBe('✓');
   });
@@ -73,7 +79,7 @@ describe("Today's Plan — early-reading 3-step daily quest", () => {
   it('Warm-up shows partial progress (X/3) when below target', () => {
     store.set('sessionWordsToday', ['cat']);
     const plan = getEarlyReadingPlan();
-    const warmup = plan.steps.find(s => s.id === 'warmup');
+    const warmup = plan.steps.find((s) => s.id === 'warmup');
     expect(warmup.done).toBe(false);
     expect(warmup.progressLabel).toBe(`1/${WARMUP_TARGET}`);
   });
@@ -115,7 +121,7 @@ describe("Today's Plan — early-reading 3-step daily quest", () => {
   it('Warm-up falls back to a safe default when recommendations are unavailable', () => {
     // Empty store + reset → recommendations should still produce a step.
     const plan = getEarlyReadingPlan();
-    const warmup = plan.steps.find(s => s.id === 'warmup');
+    const warmup = plan.steps.find((s) => s.id === 'warmup');
     expect(warmup).toBeDefined();
     expect(warmup.target).toBeTruthy();
     expect(warmup.title).toBeTruthy();
