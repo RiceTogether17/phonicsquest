@@ -22,9 +22,11 @@ src/modules/audio.js
 src/modules/phonemeColors.js
 src/modes/letterSounds.js
 
-# The app shell. Prettier re-indents all 1,456 lines (everything inside
-# <html> shifts two spaces) and explodes every element with more than one
-# attribute — ~1,550 changed lines for no readability gain on a file that is
-# already consistently formatted, just to a tighter convention. It is also
-# the one hand-written file whose exact markup is what ships.
-index.html
+# Hand-written HTML ships as-is, and Prettier rewrites it wholesale: on
+# index.html it re-indents all 1,456 lines (everything inside <html> shifts
+# two spaces) and explodes every element carrying more than one attribute —
+# some 1,550 changed lines for no readability gain on a file that is already
+# consistently formatted, just to a tighter convention than Prettier's.
+# Prettier still formats the JS, CSS, JSON and Markdown, which is where
+# consistent formatting actually earns its keep.
+*.html
