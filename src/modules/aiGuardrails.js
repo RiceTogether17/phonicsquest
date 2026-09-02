@@ -76,18 +76,30 @@ export function learnerContext() {
 
     const difficulty = store.get('difficulty');
     if (difficulty) lines.push(`Difficulty level ${difficulty} of 3.`);
-  } catch { /* fresh profile */ }
+  } catch {
+    /* fresh profile */
+  }
 
   try {
-    // Static import would make aiGuardrails depend on the whole mistakes
-    // subsystem for a feature that is optional by design.
-    const recent = (store.get('mistakesDen') || []).slice(0, 6);
-    const words = recent.map(m => m?.word || m?.label).filter(Boolean);
+    // Straight from `wordHistory`, which is the store's own record of every
+    // attempt and is written on every answer. (An earlier version read a
+    // `mistakesDen` key — nothing has ever written one, so this block was
+    // silently empty and Giri never learned what the child had missed.
+    // mistakesDen.js derives its view from this same log.)
+    const history = store.get('wordHistory');
+    const words = [];
+    for (const h of Array.isArray(history) ? history : []) {
+      if (h?.correct !== false || !h.wordId) continue;
+      if (!words.includes(h.wordId)) words.push(h.wordId);
+      if (words.length >= 6) break;
+    }
     if (words.length) lines.push(`Recently got these wrong: ${words.join(', ')}.`);
-  } catch { /* no mistake history yet */ }
+  } catch {
+    /* no mistake history yet */
+  }
 
   if (!lines.length) return '';
-  return `\n\nWhat you know about this child (do not read it out to them; use it to pitch your answer):\n${lines.map(l => `- ${l}`).join('\n')}`;
+  return `\n\nWhat you know about this child (do not read it out to them; use it to pitch your answer):\n${lines.map((l) => `- ${l}`).join('\n')}`;
 }
 
 const _todayKey = (now = new Date()) => localYmd(now);
@@ -96,10 +108,10 @@ const _todayKey = (now = new Date()) => localYmd(now);
 export function sanitizeAiText(raw) {
   if (typeof raw !== 'string') return '';
   let text = raw
-    .replace(/<[^>]*>/g, ' ')                 // HTML tags
-    .replace(/https?:\/\/\S+/gi, '')          // URLs
+    .replace(/<[^>]*>/g, ' ') // HTML tags
+    .replace(/https?:\/\/\S+/gi, '') // URLs
     .replace(/www\.\S+/gi, '')
-    .replace(/[*_#`>|]/g, '')                 // markdown remnants
+    .replace(/[*_#`>|]/g, '') // markdown remnants
     .replace(/\s{2,}/g, ' ')
     .trim();
   if (text.length > MAX_RESPONSE_CHARS) {
@@ -111,7 +123,7 @@ export function sanitizeAiText(raw) {
 /** How many AI calls the child has made today. */
 export function aiCallsToday(now = new Date()) {
   const today = _todayKey(now);
-  return (store.get('aiUsageLog') || []).filter(e => e && e.date === today).length;
+  return (store.get('aiUsageLog') || []).filter((e) => e && e.date === today).length;
 }
 
 /** Is another child-initiated AI call allowed right now? */

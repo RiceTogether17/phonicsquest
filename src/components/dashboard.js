@@ -1247,6 +1247,33 @@ function _bindActions() {
   });
 }
 
+/**
+ * How many of the last seven days the child actually played on.
+ *
+ * Reads `weeklyXpLog`, the rolling per-day XP ledger the store writes on
+ * every award and prunes to eight days. The printed report used to count a
+ * `dailyHistory` key instead — nothing in the app has ever written one, so
+ * a report handed to a parent said "Days played this week: 0" however much
+ * their child had done.
+ *
+ * @param {Array<{date: string, xp: number}>|unknown} log  store's weeklyXpLog
+ * @param {number} [now]  ms epoch, for tests
+ * @returns {number} 0–7
+ */
+export function countDaysPlayedThisWeek(log, now = Date.now()) {
+  if (!Array.isArray(log)) return 0;
+  const msPerDay = 86_400_000;
+  const week = new Set();
+  for (let i = 0; i < 7; i++) {
+    week.add(new Date(now - i * msPerDay).toISOString().slice(0, 10));
+  }
+  const played = new Set();
+  for (const entry of log) {
+    if (week.has(entry?.date) && (entry.xp || 0) > 0) played.add(entry.date);
+  }
+  return played.size;
+}
+
 function _renderPrintReport() {
   const container = document.getElementById('print-report-content');
   if (!container) return;
@@ -1290,17 +1317,7 @@ function _renderPrintReport() {
   const xpTotal = store.get('xp') ?? 0;
   const streak = store.get('streak') ?? 0;
   const dailyGoal = store.get('dailyGoal') ?? 0;
-  const daysPlayed = (() => {
-    const history = store.get('dailyHistory') || {};
-    const now = Date.now();
-    const msPerDay = 86400000;
-    let count = 0;
-    for (let i = 0; i < 7; i++) {
-      const day = new Date(now - i * msPerDay).toISOString().slice(0, 10);
-      if (history[day]) count++;
-    }
-    return count;
-  })();
+  const daysPlayed = countDaysPlayedThisWeek(store.get('weeklyXpLog'));
 
   container.innerHTML = `
     <div style="font-family:serif;padding:24px;max-width:700px;margin:0 auto;color:#1e1b4b">
