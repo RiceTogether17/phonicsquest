@@ -8,3 +8,23 @@ package-lock.json
 # (column-aligned word tables, curriculum rows). Reformatting them would
 # produce an enormous, unreviewable diff for no readability gain.
 src/data/
+
+# Data tables that happen to live outside src/data/. Same rule, same reason:
+# each of these is a hand-maintained lookup table where the column alignment
+# IS the readability, and Prettier rewrites every row onto its own line.
+#   audio.js         grapheme → MP3 file, and grapheme → TTS spelling. Two
+#                    tables of ~150 entries; flattened they run to 400 lines
+#                    and you can no longer see at a glance which sounds have
+#                    a recording and which fall back to speech.
+#   phonemeColors.js sound type → label, colour and diacritic mark.
+#   letterSounds.js  phoneme type → label, short label, colour, bg, order.
+src/modules/audio.js
+src/modules/phonemeColors.js
+src/modes/letterSounds.js
+
+# The app shell. Prettier re-indents all 1,456 lines (everything inside
+# <html> shifts two spaces) and explodes every element with more than one
+# attribute — ~1,550 changed lines for no readability gain on a file that is
+# already consistently formatted, just to a tighter convention. It is also
+# the one hand-written file whose exact markup is what ships.
+index.html
