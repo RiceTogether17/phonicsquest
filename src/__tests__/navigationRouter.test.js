@@ -56,6 +56,38 @@ describe('blend', () => {
   });
 });
 
+describe('listenAndSpell (stage-scoped, like blend)', () => {
+  /**
+   * The daily plan alternates reading and spelling on the SAME weak group,
+   * so the group has to survive the trip. The generic bare-mode-key path
+   * calls `startGame(undefined)` and would drop it — the plan would promise
+   * "Listen & Spell – Short A" and serve an unrelated word.
+   */
+  it('starts on the group it was given', () => {
+    const h = makeHandlers();
+    expect(router.navigateTo('listenAndSpell', 'cvc-a', h)).toBe(true);
+
+    expect(h.setMode).toHaveBeenCalledWith('listenAndSpell');
+    expect(h.setGroup).toHaveBeenCalledWith('cvc-a');
+    expect(h.startGame).toHaveBeenCalledWith('cvc-a');
+  });
+
+  it('opens its own stage picker when no group is given', () => {
+    const h = { ...makeHandlers(), openStagePicker: vi.fn() };
+    router.navigateTo('listenAndSpell', null, h);
+
+    expect(h.openStagePicker).toHaveBeenCalledWith('listenAndSpell');
+    expect(h.startGame).not.toHaveBeenCalled();
+  });
+
+  it('falls back to the Blend picker for handler sets without one', () => {
+    const h = makeHandlers(); // no openStagePicker
+    router.navigateTo('listenAndSpell', null, h);
+
+    expect(h.openBlendPicker).toHaveBeenCalledOnce();
+  });
+});
+
 describe('button targets', () => {
   it('clicks the matching home-screen button', () => {
     const h = makeHandlers();
@@ -96,9 +128,10 @@ describe('game modes', () => {
 
   it('starts a bare mode key directly', async () => {
     const { MODES } = await import('../modes/index.js');
-    // Skip the targets with their own branch above (blend opens a picker,
-    // classicBlend resumes a group) so this covers the generic path.
-    const special = new Set(['blend', 'classicBlend']);
+    // Skip the targets with their own branch above (blend and listenAndSpell
+    // are stage-scoped and open a picker, classicBlend resumes a group) so
+    // this covers the generic path.
+    const special = new Set(['blend', 'listenAndSpell', 'classicBlend']);
     const plainModes = Object.keys(MODES).filter((m) => !special.has(m));
     expect(plainModes.length).toBeGreaterThan(0);
 

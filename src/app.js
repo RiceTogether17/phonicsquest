@@ -1535,6 +1535,7 @@ class App {
       getCurrentGroup: () => store.get('currentGroup') || undefined,
       startGame: (g) => this._startGame(g),
       openBlendPicker: () => this._openBlendPicker(),
+      openStagePicker: (mode) => this._openStagePicker(mode),
       openPrimaryPlaceholder: (t) => this._openPrimaryPlaceholder(t),
     });
     if (!ok && import.meta.env?.DEV) {

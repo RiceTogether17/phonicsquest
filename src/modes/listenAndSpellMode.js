@@ -44,20 +44,27 @@
  * production, so a clean first attempt is evidence of encoding. Hints and
  * second tries are downgraded by the shell in the usual way.
  *
- * ── Tiles, and the words that don't fit ──────────────────────────────────
+ * ── Tiles, and the words where sounds outnumber them ─────────────────────
  *
  * Blends are expanded — `st` is two letters making two sounds, and you spell
  * it one sound at a time — while a silent e stays its own tile, because
  * letters exceeding sounds is exactly what a split digraph is and naming
  * that is the lesson.
  *
- * A few words have no one-tile-per-sound reading: `fox` (x spells /k/+/s/ in
- * one letter) and the prefix/suffix tiles, which carry several sounds as a
- * single spelling unit. They are still spelled here — what is dropped is the
- * counting step, because that is the only part that would have to lie. They
- * are NOT swapped for a neater word: the shell records every attempt against
- * the word IT chose, so handing back a substitute would file the result
- * under a word the child never saw.
+ * Tiles and sounds are not always one to one, and `soundsPerTile` keeps the
+ * per-tile counts rather than flattening them, so the cases where they part
+ * company can be taught instead of dodged: a silent e makes no sound, `x`
+ * makes two in one letter, `-ing` makes two as one spelling unit. The child
+ * is told the true sound count and then told that one part of the word
+ * carries two of them — without being told WHICH part, which would spell a
+ * piece of the word for them.
+ *
+ * Where the per-grapheme table and `derivePhonemes` genuinely disagree (the
+ * `-ed` suffix shifts with the sound before it), the counting step is
+ * dropped rather than guessed at — about 2% of the bank. Those words are NOT
+ * swapped for neater ones: the shell records every attempt against the word
+ * IT chose, so handing back a substitute would file the result under a word
+ * the child never saw.
  */
 
 import { renderWordImage } from '../components/phonemeDisplay.js';
@@ -65,7 +72,7 @@ import { celebrateCorrect } from '../components/confettiHelper.js';
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 import { progress } from '../modules/progress.js';
-import { WORDS, derivePhonemes, shuffleArray } from '../data/words.js';
+import { WORDS, derivePhonemes, phonemeNotation, shuffleArray } from '../data/words.js';
 import { html } from '../utils/html.js';
 import { scoreListenAndSpell, alternativeSpellings } from './scoring/listenAndSpell.js';
 
@@ -87,7 +94,9 @@ let _placed = [];
 /** @type {'count'|'build'|'done'} */
 let _stage = 'count';
 let _soundCount = 0;
-/** Whether this word's tiles and sounds agree well enough to ask the count. */
+/** @type {number[]|null} – sounds each tile makes; null = can't ask the count */
+let _tileSounds = null;
+/** Whether the mode can honestly ask "how many sounds?" for this word. */
 let _askCount = true;
 let _startTime = 0;
 let _firstTryCorrect = null;
@@ -130,34 +139,42 @@ export function spellingTilesFor(word) {
 }
 
 /**
- * Does this word have exactly one tile per sound?
+ * How many sounds each tile makes — or `null` when that cannot be told
+ * honestly.
  *
- * Only when it does can the mode honestly ask "how many sounds do you hear?"
- * and have the answer match the tiles the child is about to place. `fox` is
- * the counterexample: three letters, four sounds, because `x` spells /k/+/s/
- * in one letter. The morphology tiles (`-ing`, `un-`) are the other: each
- * carries several sounds as a single spelling unit.
+ * The counting step asks "how many sounds do you hear?", so the mode has to
+ * know how the answer maps onto the tiles the child is about to place. It is
+ * usually one each, but not always:
  *
- * A trailing silent e is not a break — it is a letter with no sound of its
- * own — which is why it is subtracted before comparing.
+ *   - a silent e makes none (`cake` → [1, 1, 1, 0])
+ *   - `x` makes two in one letter (`fox` → [1, 1, 2])
+ *   - `-ing` makes two as one spelling unit (`jumping` → [1, 1, 1, 1, 2])
  *
- * Words that fail are still perfectly spellable, so they are NOT swapped out:
- * the shell records every attempt against the word IT chose, so handing back
- * a different word would file the result under the wrong id. The mode skips
- * the counting step for them instead, and asks only what it can answer.
+ * Those last two are worth teaching rather than hiding, which is why the
+ * counts are returned per tile instead of being flattened to a yes/no: the
+ * mode can ask the true sound count and tell the child that one part of the
+ * word carries two of them.
+ *
+ * The per-grapheme table and `derivePhonemes` can still disagree — `-ed`
+ * shifts with the sound before it (`jumped` /t/ vs `landed` /ɪd/), and
+ * `derivePhonemes` adjusts for that where a standalone grapheme lookup
+ * cannot. When the two don't reconcile this returns null and the mode drops
+ * the counting step rather than teach a number it isn't sure of. That is
+ * about 2% of the bank.
+ *
+ * Words it returns null for are still perfectly spellable, and are NOT
+ * swapped out: the shell records every attempt against the word IT chose, so
+ * handing back a different word would file the result under the wrong id.
  *
  * @param {import('../data/words.js').Word} word
- * @returns {boolean}
+ * @returns {number[]|null}
  */
-export function hasOneTilePerSound(word) {
-  const types = Array.isArray(word?.types) ? word.types : [];
-  if (!types.length) return false;
-  if (types.some((t) => t === 'p' || t === 'sf')) return false;
-
+export function soundsPerTile(word) {
   const tiles = spellingTilesFor(word);
-  if (!tiles.length) return false;
-  const silentEs = tiles.filter((t) => t.type === 'se').length;
-  return tiles.length - silentEs === derivePhonemes(word).length;
+  if (!tiles.length) return null;
+  const counts = tiles.map((t) => phonemeNotation(t.g, t.type).length);
+  const total = counts.reduce((sum, n) => sum + n, 0);
+  return total === derivePhonemes(word).length ? counts : null;
 }
 
 /**
@@ -254,7 +271,8 @@ export function setupListenAndSpell(word, els) {
   _targetTiles = spellingTilesFor(_word);
   _soundCount = derivePhonemes(_word).length || _targetTiles.length;
   _bank = _buildBank(_targetTiles);
-  _askCount = hasOneTilePerSound(_word);
+  _tileSounds = soundsPerTile(_word);
+  _askCount = _tileSounds !== null;
   _stage = _askCount ? 'count' : 'build';
 
   // The picture stays (it names the word, never its spelling). The print and
@@ -343,12 +361,48 @@ function _onCount(n, btn) {
     feedback.className = `las-feedback las-feedback--${right ? 'yes' : 'coach'}`;
     // The count is a scaffold, so a miss is corrected out loud and the child
     // carries on — being wrong here must not cost the spelling attempt.
-    feedback.textContent = right
-      ? `✓ Yes — ${_soundCount} sounds. Now spell it!`
-      : `Let's count together: ${_soundCount} sounds. Now spell it!`;
+    const opener = right
+      ? `✓ Yes — ${_soundCount} sounds.`
+      : `Let's count together: ${_soundCount} sounds.`;
+    feedback.textContent = `${opener} ${_countBridge()}`;
   }
 
-  _timeouts.push(setTimeout(() => _renderBuild(), right ? 700 : 1400));
+  // A word that needs the two-sounds-one-part explanation gets longer to
+  // read it — it is the lesson, not a consolation line.
+  const dwell = _multiSoundTile() ? 2200 : right ? 700 : 1400;
+  _timeouts.push(setTimeout(() => _renderBuild(), dwell));
+}
+
+/** True when some tile makes more than one sound (`x`, `-ing`). */
+function _multiSoundTile() {
+  return Array.isArray(_tileSounds) && _tileSounds.some((n) => n > 1);
+}
+
+/**
+ * The line between counting and spelling.
+ *
+ * When every sound gets its own tile this is just "now spell it". When one
+ * tile carries two — `x` in `fox`, `-ing` in `jumping` — the child who
+ * counted correctly is about to place FEWER tiles than sounds, and without
+ * being told why, that reads as having been wrong. Saying it is the lesson:
+ * one part of this word makes two sounds. The part is deliberately not
+ * named, because naming it would spell a piece of the word.
+ *
+ * Pure so the copy can be tested against tile counts directly, rather than
+ * by hunting for an x-word in a live round.
+ *
+ * @param {number[]|null} tileSounds  sounds each tile makes
+ * @param {number} tileCount          how many tiles the child will place
+ * @returns {string}
+ */
+export function countBridge(tileSounds, tileCount) {
+  const multi = Array.isArray(tileSounds) && tileSounds.some((n) => n > 1);
+  if (!multi) return 'Now spell it!';
+  return `One part makes two sounds — so you'll tap ${tileCount}.`;
+}
+
+function _countBridge() {
+  return countBridge(_tileSounds, _targetTiles.length);
 }
 
 // ── Stage 2: build the spelling ───────────────────────────────────────────
@@ -553,6 +607,7 @@ export function cleanup() {
   _placed = [];
   _stage = 'count';
   _askCount = true;
+  _tileSounds = null;
   _soundCount = 0;
   _checks = 0;
   _firstTryCorrect = null;

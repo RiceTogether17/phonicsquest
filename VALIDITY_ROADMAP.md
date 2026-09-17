@@ -166,11 +166,33 @@ in `race`; a flat list would call "sat" a plausible spelling of "cat". The
 words.js `types` tag disambiguates, which is also what keeps `y` from being
 offered vowel spellings in `yam`.
 
-Remaining: the mode drops the sound-count step for words with no
-one-tile-per-sound reading (`fox`, the morphology tiles) rather than
-substituting a neater word, because the shell records against the word IT
-chose. Giving those words an honest count needs per-grapheme phoneme counts
-on the tiles, which is 1.1 territory.
+**Counting where tiles and sounds part company.** `soundsPerTile` keeps a
+per-tile phoneme count rather than a one-tile-per-sound yes/no, so the cases
+where the two differ are taught instead of skipped: a silent e makes no
+sound, `x` makes two in one letter, `-ing` makes two as one spelling unit.
+The child is told the true sound count and then that one part of the word
+carries two of them — never _which_ part, which would spell a piece of the
+word for them. This took the counting step from 972 to 1095 of the 1117-word
+bank, recovering every morphology group (phases 9–10) and the x-words. Where
+the per-grapheme table and `derivePhonemes` genuinely disagree (`-ed` shifts
+with the sound before it) the step is dropped rather than guessed at — 22
+words.
+
+**Routing.** Being a mode is not the same as being reachable. Every step of
+every `getDailyPlan` band used to be reading, so the day never asked a child
+to produce a spelling. Spelling now alternates into the existing FIRST step
+on the same weak group — read it today, spell it tomorrow — rather than being
+appended as a fourth step, because a K1/K2 session should be getting shorter
+(see 2.4). Pre-readers are untouched: no letters learned, nothing to spell.
+`navigationRouter` grew a `STAGE_SCOPED_TARGETS` set for this: the generic
+bare-mode-key path calls `startGame(undefined)` and drops the group, so a
+plan promising "Listen & Spell – Short A" would have served an unrelated
+word. `PHASES.recommendedModes` lists the mode for phases 1–10, which is what
+filters its stage picker.
+
+Remaining: `wordSort`, `readAndTap` and `fluencySprint` are still absent from
+every `recommendedModes`, so `getStagesForMode` falls back to the full
+curriculum for them and their stage pickers are unfiltered.
 
 ---
 

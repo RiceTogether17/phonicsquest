@@ -237,6 +237,74 @@ test('a wrong spelling coaches once before revealing', async ({ page }) => {
   await expect(page.locator('.vmcq-next-btn')).toBeVisible();
 });
 
+/**
+ * The daily lesson is where a child actually goes. Every step of every plan
+ * used to be reading, so spelling now alternates into the first step — same
+ * weak group, read it one day and spell it the next, without the session
+ * getting longer. Clock is fixed rather than mocked wholesale: the app leans
+ * on timers, and only `Date.now()` decides which half of the pair is due.
+ */
+test.describe("today's lesson alternates reading and spelling", () => {
+  const SPELLING_DAY = new Date('2026-01-02T09:00:00Z');
+  const READING_DAY = new Date('2026-01-03T09:00:00Z');
+
+  /**
+   * Put the child on the BLENDING journey step. Earlier steps get a listening
+   * or letter-sound warm-up and never consult the daily plan at all, which is
+   * correct — a child who has not learned letters is not asked to spell — but
+   * it means the alternation only shows up once those steps are complete.
+   */
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      const raw = localStorage.getItem('phonicsquest_profile_p_spell');
+      const state = raw ? JSON.parse(raw) : {};
+      state.placementProfile = {
+        readingBand: 'emerging-decoder',
+        stageScores: {
+          phonemicAwareness: { composite: 1 },
+          letterSounds: { composite: 1 },
+        },
+      };
+      // One weak group so the plan has something to name, and so the reading
+      // and spelling days can be compared on the same target.
+      state.groupMastery = { 'cvc-a': 0.2, 'cvc-e': 0.95 };
+      localStorage.setItem('phonicsquest_profile_p_spell', JSON.stringify(state));
+    });
+  });
+
+  async function openHome(page) {
+    await page.goto('./');
+    await expect(page.locator('#screen-home')).toHaveClass(/active/);
+    const tour = page.locator('#modal-onboarding');
+    await page.waitForTimeout(900);
+    if (await tour.isVisible().catch(() => false)) {
+      await page.locator('#ob-skip-btn').click();
+      await expect(tour).toBeHidden();
+    }
+    return (await page.locator('.mission-step__title').allTextContents()).join(' | ');
+  }
+
+  test('offers spelling on a spelling day, and it opens the mode', async ({ page }) => {
+    await page.clock.setFixedTime(SPELLING_DAY);
+    const titles = await openHome(page);
+    expect(titles).toMatch(/Listen & Spell/);
+
+    await page.locator('[data-lesson-step]').filter({ hasText: 'Listen & Spell' }).first().click();
+
+    // It has to land in the encoding mode, not just say so on the card.
+    await expect(page.locator('#screen-game')).toHaveClass(/active/);
+    await expect(page.locator('#las-replay')).toBeVisible();
+    await expect(page.locator('#word-display')).toBeEmpty();
+  });
+
+  test('offers reading on a reading day', async ({ page }) => {
+    await page.clock.setFixedTime(READING_DAY);
+    const titles = await openHome(page);
+    expect(titles).toMatch(/Blend It!/);
+    expect(titles).not.toMatch(/Listen & Spell/);
+  });
+});
+
 test('Listen & Spell has no critical or serious a11y violations', async ({ page }) => {
   await openListenAndSpell(page);
   await passCountStep(page);

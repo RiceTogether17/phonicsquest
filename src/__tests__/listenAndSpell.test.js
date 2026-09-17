@@ -9,9 +9,9 @@
  *
  * Four things carry the pedagogy and are pinned here:
  *
- *   1. One tile per sound, wherever the mode claims it. A word that cannot
- *      honour it (`fox` — three letters, four sounds) is spelled without the
- *      counting step rather than being asked a question with a wrong answer.
+ *   1. The tile-to-sound map is honest. A silent e makes no sound, `x` makes
+ *      two in one letter, `-ing` makes two as one unit — so the counting step
+ *      teaches those rather than skipping them, and drops out where unsure.
  *   2. Blends split, digraphs don't. `st` is two letters making two sounds
  *      and is spelled one sound at a time; `sh` is one sound and one choice.
  *   3. A plausible misspelling is diagnosed as one. "caik" means the child
@@ -36,7 +36,7 @@ import { WORDS, derivePhonemes } from '../data/words.js';
 
 // The mode pulls in audio.js at module load, which touches speechSynthesis —
 // so it is imported after the stub, not at the top of the file.
-let MODES, spellingTilesFor, hasOneTilePerSound;
+let MODES, spellingTilesFor, soundsPerTile, countBridge;
 beforeAll(async () => {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
     getVoices: () => [],
@@ -44,7 +44,8 @@ beforeAll(async () => {
     speak: () => {},
     cancel: () => {},
   };
-  ({ spellingTilesFor, hasOneTilePerSound } = await import('../modes/listenAndSpellMode.js'));
+  ({ spellingTilesFor, soundsPerTile, countBridge } =
+    await import('../modes/listenAndSpellMode.js'));
   ({ MODES } = await import('../modes/index.js'));
 });
 
@@ -75,60 +76,95 @@ describe('spellingTilesFor', () => {
 
 // ── 2. When the counting step can be asked honestly ───────────────────────
 
-describe('hasOneTilePerSound', () => {
-  it('holds for the ordinary cases', () => {
-    for (const id of ['cat', 'ship', 'flag', 'stamp', 'cake', 'rain', 'star']) {
-      expect(hasOneTilePerSound(word(id)), `${id}`).toBe(true);
+describe('soundsPerTile', () => {
+  it('gives one sound per tile in the ordinary cases', () => {
+    for (const id of ['cat', 'ship', 'flag', 'stamp', 'rain', 'star']) {
+      const counts = soundsPerTile(word(id));
+      expect(counts, `${id}`).not.toBeNull();
+      expect(
+        counts.every((n) => n === 1),
+        `${id}: ${counts}`,
+      ).toBe(true);
     }
   });
 
-  it('fails for x-words — one letter, two sounds, so the count step would lie', () => {
-    expect(derivePhonemes(word('fox'))).toHaveLength(4);
-    expect(spellingTilesFor(word('fox'))).toHaveLength(3);
-    expect(hasOneTilePerSound(word('fox'))).toBe(false);
+  it('gives the silent e no sound of its own', () => {
+    expect(soundsPerTile(word('cake'))).toEqual([1, 1, 1, 0]);
   });
 
-  it('fails for morphology tiles — a suffix carries several sounds at once', () => {
-    const affixed = WORDS.filter((w) => (w.types || []).some((t) => t === 'p' || t === 'sf'));
-    expect(affixed.length).toBeGreaterThan(0);
-    for (const w of affixed) expect(hasOneTilePerSound(w), `${w.id}`).toBe(false);
+  it('gives x two sounds in one letter', () => {
+    expect(soundsPerTile(word('fox'))).toEqual([1, 1, 2]);
+    expect(derivePhonemes(word('fox'))).toHaveLength(4);
+    expect(spellingTilesFor(word('fox'))).toHaveLength(3);
+  });
+
+  it('gives a suffix its sounds as one spelling unit', () => {
+    // `-ing` is /i/ + /ng/ on a single tile — the child taps 5 for 6 sounds,
+    // which is exactly what the counting step now explains rather than skips.
+    expect(soundsPerTile(word('jumping'))).toEqual([1, 1, 1, 1, 2]);
   });
 
   /**
    * The invariant the counting step rests on, checked across the entire bank
    * rather than on a handful of examples: wherever the mode asks "how many
-   * sounds?", the tiles (minus any silent e, which has no sound) number
-   * exactly that many.
+   * sounds?", the per-tile counts add up to exactly that many.
    */
-  it('means the tiles really do number the sounds, for every word it holds for', () => {
-    const pool = WORDS.filter(hasOneTilePerSound);
-    expect(pool.length).toBeGreaterThan(200);
+  it('always adds up to the word’s real sound count', () => {
+    const pool = WORDS.filter((w) => soundsPerTile(w) !== null);
+    expect(pool.length).toBeGreaterThan(1000);
     for (const w of pool) {
-      const tiles = spellingTilesFor(w);
-      const silentEs = tiles.filter((t) => t.type === 'se').length;
-      expect(tiles.length - silentEs, `${w.id}: ${tiles.map((t) => t.g).join('·')}`).toBe(
+      const counts = soundsPerTile(w);
+      const total = counts.reduce((sum, n) => sum + n, 0);
+      expect(total, `${w.id}: ${spellingTilesFor(w).map((t) => t.g)} → ${counts}`).toBe(
         derivePhonemes(w).length,
       );
     }
   });
 
+  it('returns null rather than guess where the tables genuinely disagree', () => {
+    // `-ed` shifts with the sound before it (`jumped` /t/, `landed` /ɪd/), and
+    // a standalone grapheme lookup cannot see that. Those words drop the
+    // counting step instead of teaching a number the mode isn't sure of.
+    const unresolved = WORDS.filter((w) => soundsPerTile(w) === null);
+    expect(unresolved.length).toBeGreaterThan(0);
+    // Small enough that the counting step is the norm, not the exception.
+    expect(unresolved.length / WORDS.length).toBeLessThan(0.05);
+  });
+
   /**
-   * The words it fails for are not dropped — they are spelled without the
+   * Words it returns null for are not dropped — they are spelled without the
    * counting step. Swapping in a neater word would be worse than a missing
    * question: `_handleResult` records against the word the SHELL chose, so a
    * substitution would file the attempt under a word the child never saw.
    */
-  it('still leaves every word spellable from its own tiles', () => {
-    for (const id of ['fox', 'box', 'six']) {
-      const w = word(id);
-      if (!w) continue;
-      expect(hasOneTilePerSound(w)).toBe(false);
+  it('leaves every word it cannot count spellable from its own tiles', () => {
+    for (const w of WORDS.filter((x) => soundsPerTile(x) === null)) {
       expect(
         spellingTilesFor(w)
           .map((t) => t.g)
           .join(''),
+        `${w.id}`,
       ).toBe(w.word.toLowerCase());
     }
+  });
+
+  it('explains a tile that carries two sounds, without naming it', () => {
+    // fox: 4 sounds, 3 tiles. A child who counted 4 correctly is about to
+    // place 3, which without explanation reads as having been wrong.
+    const fox = word('fox');
+    const line = countBridge(soundsPerTile(fox), spellingTilesFor(fox).length);
+    expect(line).toMatch(/two sounds/i);
+    expect(line).toContain('3');
+    // Naming the letter would spell part of the word for them.
+    expect(line.toLowerCase()).not.toContain('x');
+  });
+
+  it('says nothing extra when every sound has its own tile', () => {
+    const cat = word('cat');
+    expect(countBridge(soundsPerTile(cat), spellingTilesFor(cat).length)).toBe('Now spell it!');
+    // A silent e is not a two-sound tile — the build prompt already names it.
+    const cake = word('cake');
+    expect(countBridge(soundsPerTile(cake), spellingTilesFor(cake).length)).toBe('Now spell it!');
   });
 
   it('tiles always reassemble into the word, across the whole bank', () => {
