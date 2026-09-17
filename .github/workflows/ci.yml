@@ -43,6 +43,12 @@ jobs:
       - name: TypeScript type check
         run: npm run typecheck
 
+      # SCOPE_AND_SEQUENCE.md is generated from the curriculum data. A stale
+      # copy is a false claim about the app, not a formatting nit, so it
+      # fails the build rather than waiting to be noticed.
+      - name: Scope & sequence is current
+        run: npm run check:scope
+
       - name: Build
         run: npm run build
 

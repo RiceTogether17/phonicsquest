@@ -30,3 +30,8 @@ src/modes/letterSounds.js
 # Prettier still formats the JS, CSS, JSON and Markdown, which is where
 # consistent formatting actually earns its keep.
 *.html
+
+# Generated from the curriculum data by scripts/gen-scope-sequence.mjs and
+# compared byte-for-byte by scopeSequence.test.js — reformatting it here
+# would make the staleness guard fail on a file nobody edited.
+SCOPE_AND_SEQUENCE.md
