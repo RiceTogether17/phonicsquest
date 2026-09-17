@@ -124,9 +124,14 @@ test('the word is spoken, never printed', async ({ page }) => {
   await expect(page.locator('#phoneme-row')).toBeEmpty();
 
   // And the word must not be sitting anywhere else on the game screen.
+  //
+  // Matched on word boundaries, not as a substring: the prompt reads "How
+  // MANy sounds?" and `man` is a short-a word, so a substring check fails
+  // whenever the round happens to pick it — intermittently, and for a reason
+  // that has nothing to do with the word being leaked.
   const word = await targetWord(page);
   const body = await page.locator('#screen-game').innerText();
-  expect(body.toLowerCase()).not.toContain(word);
+  expect(body.toLowerCase()).not.toMatch(new RegExp(`\\b${word}\\b`));
 
   // Replay is the mode's core affordance, so it has to be reachable.
   await expect(page.locator('#las-replay')).toBeVisible();

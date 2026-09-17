@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { getStagesForMode } from '../src/modules/phonicsProgression.js';
+import {
+  getStagesForMode,
+  PICKER_MODES,
+  usesStagePicker,
+} from '../src/modules/phonicsProgression.js';
 
 const CURRICULUM = [
   { id: 'cvc-a', group: 'cvc-a', phase: 1, name: 'CVC – Short A' },
@@ -144,5 +148,73 @@ describe('real curriculum — Last Sound surfaces beginner phases, not just CVCC
     // beginners hit a locked-stage wall (the original bug).
     expect(phases).toEqual(expect.arrayContaining([1, 2, 3, 4, 5]));
     expect(stages.length).toBeGreaterThan(0);
+  });
+});
+
+describe('real curriculum — every picker mode has a filtered picker', () => {
+  async function real() {
+    return await import('../src/data/curriculum.js');
+  }
+
+  async function phasesFor(mode) {
+    const { CURRICULUM: C, PHASES: P } = await real();
+    return [...new Set(getStagesForMode(mode, C, P).map((s) => s.phase))].sort((a, b) => a - b);
+  }
+
+  /**
+   * The guard this block exists for.
+   *
+   * `getStagesForMode` falls back to the WHOLE curriculum for a mode no phase
+   * names — a deliberate kindness so a new mode never renders an empty
+   * picker, but silent. Word Sort, Read & Tap and Fluency Sprint all sat in
+   * that fallback: each opened a picker offering every stage from CVC to
+   * multisyllable, and nothing said so. The fallback is still right for a
+   * mode with no picker; it is never right for one that has a picker.
+   */
+  it('no mode that opens a picker is left in the unfiltered fallback', async () => {
+    const { CURRICULUM: C, PHASES: P } = await real();
+    const named = new Set(P.flatMap((p) => p.recommendedModes || []));
+
+    for (const mode of PICKER_MODES) {
+      expect(named.has(mode), `"${mode}" opens a stage picker but no phase recommends it`).toBe(
+        true,
+      );
+      // Being named is the whole guard: the fallback fires only when nothing
+      // names the mode. It is NOT "the list must be shorter than the
+      // curriculum" — Blend It! is recommended everywhere and legitimately
+      // shows every stage, which looks identical to the fallback from the
+      // outside. The two are told apart by intent, not by length.
+      expect(getStagesForMode(mode, C, P).length, `"${mode}" picker is empty`).toBeGreaterThan(0);
+    }
+  });
+
+  it('usesStagePicker matches the set, and excludes the two documented opt-outs', () => {
+    expect(usesStagePicker('blend')).toBe(true);
+    expect(usesStagePicker('listenAndSpell')).toBe(true);
+    // Clap the Syllables is decoupled from the decoding curriculum; Classic
+    // Blend sets the group itself through its own dropdown.
+    expect(usesStagePicker('syllable')).toBe(false);
+    expect(usesStagePicker('classicBlend')).toBe(false);
+  });
+
+  it('Word Sort covers the sound-pattern phases, and stops before morphology', async () => {
+    // Word Sort contrasts two sound patterns, and its bins are a sibling
+    // stage: a different vowel in the structural phases, a different spelling
+    // of the same vowel in Phase 6. Phases 9 and 10 study the morpheme, not
+    // the sound pattern, so a sort there has no principled second bin.
+    expect(await phasesFor('wordSort')).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+  });
+
+  it('Read & Tap and Fluency Sprint span every phase', async () => {
+    // Both work on whole printed words in a stage's pool, which every phase
+    // has — connected text and automaticity are worth practising from CVC
+    // right through multisyllable words.
+    const all = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    expect(await phasesFor('readAndTap')).toEqual(all);
+    expect(await phasesFor('fluencySprint')).toEqual(all);
+  });
+
+  it('Listen & Spell spans every phase — you spell what you can read', async () => {
+    expect(await phasesFor('listenAndSpell')).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   });
 });

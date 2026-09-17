@@ -111,7 +111,7 @@ import {
   LESSON_BONUS_XP,
 } from './modules/lessonRunner.js';
 import { CURRICULUM, PHASES, PHASE_LABELS } from './data/curriculum.js';
-import { getStagesForMode } from './modules/phonicsProgression.js';
+import { getStagesForMode, usesStagePicker } from './modules/phonicsProgression.js';
 import {
   buildProgressionSnapshot,
   getUnlockedStages,
@@ -308,37 +308,15 @@ class App {
 
   /** Bind all event listeners */
   _bindEvents() {
-    // Phonics modes that get the curriculum-stage picker before play
-    // starts. Classic Blend keeps its built-in dropdown (it sets the
-    // group itself), so it's excluded.
-    // Clap the Syllables is intentionally NOT here — it's a phonological
-    // game decoupled from the decoding curriculum, so it skips the
-    // (lockable) stage picker and launches straight into play.
-    const PICKER_MODES = new Set([
-      'blend',
-      'oralBlend',
-      'first',
-      'last',
-      'middle',
-      'soundCount',
-      'oralSegment',
-      'hear',
-      'missing',
-      'segment',
-      'train',
-      'soundHunt',
-      'oddOneOut',
-      'wordCount',
-      'wordSort',
-      'readAndTap',
-    ]);
-
     document.querySelectorAll('.mode-card').forEach((card, idx) => {
       card.style.setProperty('--i', String(idx));
       card.addEventListener('click', () => {
         this._mode = card.dataset.mode;
         store.set('currentMode', this._mode);
-        if (PICKER_MODES.has(this._mode)) {
+        // Which modes pick a stage first lives in phonicsProgression.js,
+        // beside the function that filters that picker — the two have to
+        // agree, and a test now holds them together.
+        if (usesStagePicker(this._mode)) {
           // Phonemic-awareness and segmenting modes now share Blend It!'s
           // phase-by-phase progression — pick a stage, get a mastery bar.
           this._openStagePicker(this._mode);

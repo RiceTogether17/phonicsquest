@@ -190,9 +190,22 @@ plan promising "Listen & Spell – Short A" would have served an unrelated
 word. `PHASES.recommendedModes` lists the mode for phases 1–10, which is what
 filters its stage picker.
 
-Remaining: `wordSort`, `readAndTap` and `fluencySprint` are still absent from
-every `recommendedModes`, so `getStagesForMode` falls back to the full
-curriculum for them and their stage pickers are unfiltered.
+**The same gap in three older modes, closed.** `wordSort`, `readAndTap` and
+`fluencySprint` were in no phase's `recommendedModes` either, so
+`getStagesForMode` fell back to the full curriculum and each opened a picker
+offering every stage from CVC to multisyllable. That fallback is a deliberate
+kindness — a new mode never renders an empty picker — but it is silent, and
+it is never right for a mode that actually has a picker. Word Sort now covers
+phases 1–8 (its second bin is a sibling stage, and phases 9–10 study the
+morpheme, not the sound pattern, so a sort there has no principled contrast);
+Read & Tap and Fluency Sprint cover 1–10.
+
+`PICKER_MODES` moved out of `app.js` into `phonicsProgression.js`, beside the
+function that filters the picker, because the two only make sense together —
+and `tests/phonicsProgression.test.js` now fails if a mode is added to one
+without the other. Fluency Sprint and Listen & Spell were added to it: both
+are stage-scoped in every other respect, but both used to start on whatever
+group was last touched, with no stage progression and no mastery bar.
 
 ---
 
