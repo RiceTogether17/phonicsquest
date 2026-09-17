@@ -1,11 +1,11 @@
-import{b as B,s as m,x as Q,o as U,y as W,z as x,J as T,A as j,B as M,D as N,E as _,F as t,m as I,C as F,H as q,I as z}from"./index-bMaFWtG7.js";import{b as J,a as V}from"./curriculumMap-BuMk1t3j.js";import"./gsap-C8pce-KX.js";import"./stories-BYImWThp.js";const E={"pre-reader":"is learning what sounds the letters make — the foundation everything else builds on.","emerging-decoder":'can sound out simple words like "cat" and "ship", and is building speed and confidence.',"developing-reader":"reads short stories and is bridging into sentence-level grammar and vocabulary.",reader:"reads fluently and is working on primary school English: grammar, vocabulary, comprehension and writing."},Y={sentenceForge:"🔨 Sentence Forge",clozeCastle:"🏰 Cloze Castle",wordVault:"🔑 Word Vault",editingQuest:"✏️ Editing Quest",writingQuest:"📝 Writing Quest"};function D(n){const r=new Set(I(n)),e=[];for(const o of F){if(r.has(o.id))continue;const s=q(o.id,n);if(s&&(e.push({stage:o,reason:s}),e.length>=2))break}return e}function G(n){const r=z(m.get("wordStats")||{},n,void 0,m.get("placementProfile")||null);return Object.entries(Y).filter(([e])=>r[e]&&!r[e].unlocked).map(([e,o])=>({label:o,current:r[e].current,required:r[e].required}))}function ss(n,{onClose:r,onOpenDashboard:e,onGoToday:o}={}){var $,y,w,f,S;if(!n)return;const s=B(),g=m.get("placementProfile")||null,c=Q(s,g),i=(($=s==null?void 0:s.name)==null?void 0:$.split(" ")[0])||"Your child",h=(s==null?void 0:s.avatar)||"🦁",d=(s==null?void 0:s.schoolLevel)==="primary"||c==="reader",l=U(),P=W(c,l.groupMastery||{},{measured:x(s,g)}),C=((y=T.find(a=>a.key===c))==null?void 0:y.label)||"Pre-reader",H=((w=j[c])==null?void 0:w.icon)||"🌱",u=d?[]:D(l),v=G(s),p=M(l),k=(N(l)||[]).slice(0,8),b=_(),L=u.length||v.length?`
+import{b as U,s as m,D as W,w as A,E as B,F as M,J as N,H as T,I as j,K as x,L as _,M as t,v as I,C as F,N as q,O as J}from"./index-C93YFSgD.js";import{b as z,a as V}from"./curriculumMap-j9iutPAO.js";import"./gsap-C8pce-KX.js";import"./stories-BYImWThp.js";const E={"pre-reader":"is learning what sounds the letters make — the foundation everything else builds on.","emerging-decoder":'can sound out simple words like "cat" and "ship", and is building speed and confidence.',"developing-reader":"reads short stories and is bridging into sentence-level grammar and vocabulary.",reader:"reads fluently and is working on primary school English: grammar, vocabulary, comprehension and writing."},Y={sentenceForge:"🔨 Sentence Forge",clozeCastle:"🏰 Cloze Castle",wordVault:"🔑 Word Vault",editingQuest:"✏️ Editing Quest",writingQuest:"📝 Writing Quest"};function D(n){const r=new Set(I(n)),e=[];for(const o of F){if(r.has(o.id))continue;const s=q(o.id,n);if(s&&(e.push({stage:o,reason:s}),e.length>=2))break}return e}function K(n){const r=J(m.get("wordStats")||{},n,void 0,m.get("placementProfile")||null);return Object.entries(Y).filter(([e])=>r[e]&&!r[e].unlocked).map(([e,o])=>({label:o,current:r[e].current,required:r[e].required}))}function ss(n,{onClose:r,onOpenDashboard:e,onGoToday:o}={}){var $,w,y,f,S;if(!n)return;const s=U(),g=m.get("placementProfile")||null,c=W(s,g),i=(($=s==null?void 0:s.name)==null?void 0:$.split(" ")[0])||"Your child",h=(s==null?void 0:s.avatar)||"🦁",d=(s==null?void 0:s.schoolLevel)==="primary"||c==="reader",l=A(),P=B(c,l.groupMastery||{},{measured:M(s,g)}),L=((w=N.find(a=>a.key===c))==null?void 0:w.label)||"Pre-reader",C=((y=T[c])==null?void 0:y.icon)||"🌱",u=d?[]:D(l),v=K(s),p=j(l),k=(x(l)||[]).slice(0,8),b=_(),H=u.length||v.length?`
     <div class="roadmap-section">
       <h3 class="cm-section-title"><span class="cm-section-icon">🔓</span> What's locked, and why</h3>
       <p class="cm-section-desc">Nothing is locked forever — each gate opens automatically as ${t(i)} practises. Here's exactly what each one is waiting for:</p>
-      ${u.map(({stage:a,reason:A})=>`
+      ${u.map(({stage:a,reason:Q})=>`
         <div class="roadmap-lock-card">
           <p class="roadmap-lock-title">${a.icon} <strong>${t(a.name)}</strong> unlocks when:</p>
-          <p class="roadmap-lock-reason">${t(A)}</p>
+          <p class="roadmap-lock-reason">${t(Q)}</p>
         </div>`).join("")}
       ${v.map(a=>`
         <div class="roadmap-lock-card">
@@ -42,18 +42,18 @@ import{b as B,s as m,x as Q,o as U,y as W,z as x,J as T,A as j,B as M,D as N,E a
       </div>
 
       <div class="roadmap-section">
-        <h3 class="cm-section-title"><span class="cm-section-icon">${H}</span> Where ${t(i)} is now</h3>
+        <h3 class="cm-section-title"><span class="cm-section-icon">${C}</span> Where ${t(i)} is now</h3>
         ${P}
-        <p class="roadmap-band-meaning"><strong>${C}</strong> means ${t(i)} ${E[c]||E["pre-reader"]}</p>
+        <p class="roadmap-band-meaning"><strong>${L}</strong> means ${t(i)} ${E[c]||E["pre-reader"]}</p>
       </div>
 
       <div class="roadmap-section">
         <h3 class="cm-section-title"><span class="cm-section-icon">🔤</span> Phonics foundations</h3>
         <p class="cm-section-desc">Each phase builds on the last. ✅ mastered · % in progress · 🔒 coming up.</p>
-        <div class="cm-phase-grid">${J(h)}</div>
+        <div class="cm-phase-grid">${z(h)}</div>
       </div>
 
-      ${L}
+      ${H}
 
       ${R}
 

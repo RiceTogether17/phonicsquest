@@ -433,7 +433,44 @@ examiner claims, and a school setting that disables external AI entirely.
 Keeping the local evaluator as the source of truth is a good existing
 safeguard.
 
-### 3.5 Teacher workflows and optional sync
+### 3.5 Teacher workflows and optional sync — grouping ✅ DONE
+
+> **"Grouping by misconception" landed** (`src/modules/classSnapshot.js`,
+> surfaced in the dashboard). Everything else in the app answers "how is this
+> child doing?"; an adult with several children on one device needs "which of
+> them need the same lesson?", and answering it by opening four dashboards
+> and holding the answers in your head is the work this saves.
+>
+> No new measurement — it reads ACROSS profiles instead of down one, using
+> `misconceptionLog` and `groupMastery` that already exist per child. Cards
+> are ordered biggest group first, each carrying the misconception's own
+> `cue` (written to be said out loud before the answer is revealed, which is
+> exactly what a small-group teacher needs in their hand) and a one-tap route
+> into the matching practice.
+>
+> **Read-only by construction.** `store` is bound to one profile at a time,
+> so the obvious implementation — switch profile, read, switch back — writes
+> another child's namespace into the live store and strands the app on a
+> sibling if anything throws in between. Every read parses the profile's
+> storage blob directly and never touches `store`; a unit test and an e2e
+> both assert the active profile is untouched, because the safe version and
+> the dangerous one look identical from outside.
+>
+> **Behind the parent PIN.** It names other children and what they cannot yet
+> do, and on a shared tablet a child must not be able to read that about a
+> classmate. The dashboard is already gated, so that is where it lives.
+>
+> **Findings that would be false are excluded and tested:** a stage at 0%
+> ("not there yet" is not "practised and stuck"), a misconception older than
+> the 14-day window, a single slip that never became a habit, and the
+> per-domain fallback labels — which ARE in the taxonomy, so grouping on them
+> would invent a shared problem out of the absence of a diagnosis.
+>
+> **Still open below:** assignments, deadlines, hint-locking, item analysis,
+> score override, MOE export, printable worksheets, and any cloud sync. The
+> local-first default is unchanged — this needs no account and no network.
+
+_Original item:_
 
 Assignments, deadlines, hint-locking in Test Mode, item analysis, first-vs-
 corrected attempt comparison, teacher comments, score override, MOE-style
