@@ -25,6 +25,8 @@ import {
   PROPER_NOUNS,
   ONOMATOPOEIA,
   isWordDecodable,
+  supportWords,
+  storySupportLevel,
 } from '../modules/decodability.js';
 import { getHFWTier } from '../data/hfw.js';
 import { CURRICULUM } from '../data/curriculum.js';
@@ -526,6 +528,92 @@ describe('comprehension questions', () => {
         expect(q.trim().endsWith('?'), `${story.id}: "${q}"`).toBe(true);
         expect(q.length, `${story.id}: "${q}" is too terse`).toBeGreaterThan(15);
       }
+    }
+  });
+});
+
+describe('pre-teach words (R10) — what a child must know before reading alone', () => {
+  /**
+   * The roadmap (1.4) asks for these to be shown BEFORE the story rather
+   * than only inside the validator. The reader used to print
+   * `getSightWordsInStory` instead — a different set, drawn from the
+   * sight-word quest weave and capped at six.
+   */
+  it('lists exactly the words that are legal by a route other than decoding', () => {
+    for (const story of STORIES) {
+      const listed = new Set(supportWords(story).map((w) => w.word));
+      const { computed } = analyzeStory(story);
+      const expected =
+        (computed.byStatus.hfw ?? 0) +
+        (computed.byStatus.tricky ?? 0) +
+        (computed.byStatus.sight ?? 0) +
+        (computed.byStatus.pretaught ?? 0);
+      // Counts are per token and the list is per distinct word, so the list
+      // can be shorter — but never longer, and never empty when there are
+      // support tokens to cover.
+      expect(listed.size, `${story.id}`).toBeLessThanOrEqual(expected);
+      if (expected > 0) expect(listed.size, `${story.id}`).toBeGreaterThan(0);
+      if (expected === 0) expect(listed.size, `${story.id}`).toBe(0);
+    }
+  });
+
+  it('never lists a word the child could sound out', () => {
+    // The old panel spent slots on decodable words like "back" and "plan"
+    // while omitting ones the child genuinely needed.
+    for (const story of STORIES) {
+      for (const { word } of supportWords(story)) {
+        expect(isWordDecodable(word, story.phase), `${story.id}: "${word}"`).toBe(false);
+      }
+    }
+  });
+
+  it('leaves Giri and the noises out — they are not homework', () => {
+    for (const story of STORIES) {
+      const listed = supportWords(story).map((w) => w.word);
+      for (const w of listed) {
+        expect(PROPER_NOUNS.has(w), `${story.id}: "${w}" is a proper noun`).toBe(false);
+        expect(ONOMATOPOEIA.has(w), `${story.id}: "${w}" is onomatopoeia`).toBe(false);
+      }
+    }
+  });
+
+  it('prints the pronoun I as a capital', () => {
+    // The classifier lowercases every token, and a panel teaching a child to
+    // recognise a word on sight must not show them the wrong shape.
+    const withI = STORIES.flatMap((s) => supportWords(s)).filter((w) => w.word === 'i');
+    expect(withI.length).toBeGreaterThan(0);
+    for (const w of withI) expect(w.display).toBe('I');
+    // Every other word prints as itself.
+    for (const story of STORIES) {
+      for (const w of supportWords(story)) {
+        if (w.word !== 'i') expect(w.display).toBe(w.word);
+      }
+    }
+  });
+
+  it('keeps the list short enough for a child to meet in one sitting', () => {
+    for (const story of STORIES) {
+      expect(supportWords(story).length, `${story.id}`).toBeLessThanOrEqual(12);
+    }
+  });
+});
+
+describe('support level (R11) — the two labels', () => {
+  it('marks exactly the teacher-supported formats as adult-supported', () => {
+    // These play by looser rules than the shelf they sit on: FORMAT_RULES
+    // lifts their HFW cap and STORY_PHASES grants them the full code. Both
+    // facts were documented only in code comments.
+    const adult = STORIES.filter((s) => storySupportLevel(s) === 'adult-supported');
+    const byType = {};
+    for (const s of adult) byType[s.textType] = (byType[s.textType] ?? 0) + 1;
+    expect(byType).toEqual({ 'extension-sg': 6, 'chapter-reader': 5 });
+  });
+
+  it('marks every tightly-controlled reader as independent', () => {
+    const independent = STORIES.filter((s) => storySupportLevel(s) === 'independent');
+    expect(independent.length).toBe(STORIES.length - 11);
+    for (const s of independent) {
+      expect(['extension-sg', 'chapter-reader']).not.toContain(s.textType);
     }
   });
 });

@@ -22,7 +22,8 @@ import { lookupWord as lookupWordForDetective, addWordToReview } from '../module
 import { isReadAloudSupported, listenToLine, stopListening } from '../modules/readAloudListener.js';
 import { store } from '../modules/store.js';
 import { getBandReadiness, getRecommendedBand } from '../modules/storyGating.js';
-import { getSightWordsInStory } from '../modules/sightStoryWeave.js';
+import { supportWords, storySupportLevel } from '../modules/decodability.js';
+import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 import {
   soundColoredHtml,
   graphemeSounds,
@@ -447,6 +448,18 @@ function _storyCardHtml(story, levelMeta, isChapter = false, isRead = false) {
       <div class="story-card-meta">
         <span class="story-card-level" style="color:${levelMeta.color}">Band ${story.band ?? 'A'}</span>
         ${questBadge}
+        ${
+          // Two things a grown-up wants before opening it: is this one the
+          // child can take on alone, and how many words need meeting first.
+          storySupportLevel(story) === 'adult-supported'
+            ? '<span class="story-card-support" data-support="adult">🧑‍🏫 With a grown-up</span>'
+            : (() => {
+                const n = supportWords(story).length;
+                return n
+                  ? `<span class="story-card-support" data-support="independent">👀 ${n} new ${n === 1 ? 'word' : 'words'}</span>`
+                  : '<span class="story-card-support" data-support="independent">🙋 Read by myself</span>';
+              })()
+        }
       </div>
     </button>
   `;
@@ -479,19 +492,51 @@ function _renderReader(story) {
       <div class="story-meta-bar" style="--level-color:${levelMeta.color}">
         <button class="btn btn--ghost story-lib-btn" id="btn-reader-back">← Library</button>
         <span class="story-meta-badge">Band ${story.band ?? 'A'} · ${levelMeta.label}</span>
+        ${
+          // Teacher-supported formats sit on the same shelf as the tightly
+          // controlled readers while playing by looser rules (FORMAT_RULES
+          // lifts their HFW cap; STORY_PHASES grants them the full code).
+          // Saying so is the whole point of the two labels.
+          storySupportLevel(story) === 'adult-supported'
+            ? `<span class="story-meta-badge story-meta-badge--supported">🧑‍🏫 Read with a grown-up</span>`
+            : `<span class="story-meta-badge story-meta-badge--independent">🙋 Read by myself</span>`
+        }
       </div>
 
       <!-- Title -->
       <h2 class="story-reader-title">${story.title}</h2>
 
       ${(() => {
-        const spot = getSightWordsInStory(story);
-        return spot.length
-          ? `
-          <p class="story-spot-words" aria-label="Sight words to spot in this story">
-            ⭐ Words to spot: ${spot.map((w) => `<span class="story-spot-word">${w}</span>`).join(' ')}
-          </p>`
-          : '';
+        // The words this story cannot be sounded out from — shown BEFORE it
+        // is read, so an adult can pre-teach them and a child is not
+        // ambushed mid-sentence (VALIDITY_ROADMAP 1.4).
+        //
+        // This used to print `getSightWordsInStory`, which comes from the
+        // sight-word quest weave and is capped at six. That is a different
+        // set: across the bank it omitted 110 words children actually need
+        // while spending slots on decodable ones like "back" and "plan".
+        const prep = supportWords(story);
+        if (!prep.length) {
+          return `
+          <p class="story-prep story-prep--none">
+            ✅ You can sound out every word in this story.
+          </p>`;
+        }
+        const chips = prep
+          .map(
+            ({ word, display, status }) =>
+              `<button type="button" class="story-prep-word" data-prep-word="${escapeAttr(word)}"
+                       data-status="${escapeAttr(status)}" aria-label="Hear the word ${escapeAttr(display)}"
+                >${escapeHtml(display)}</button>`,
+          )
+          .join('');
+        return `
+          <div class="story-prep" aria-labelledby="story-prep-title">
+            <p class="story-prep-title" id="story-prep-title">
+              👀 Words to know first — tap to hear
+            </p>
+            <div class="story-prep-words">${chips}</div>
+          </div>`;
       })()}
 
       <!-- Mode toggle — plain-language labels so a grown-up knows which is
@@ -516,6 +561,17 @@ function _renderReader(story) {
   document.getElementById('btn-reader-back')?.addEventListener('click', () => {
     _stopTTS();
     _renderBrowser();
+  });
+
+  // Pre-teach words speak on tap. These are the words that cannot be sounded
+  // out, so hearing one is the only way to meet it — reading it aloud IS the
+  // teaching step.
+  _container.querySelectorAll('[data-prep-word]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      audio.speakSightWord(btn.dataset.prepWord)?.catch?.(() => {});
+      btn.classList.add('story-prep-word--said');
+      setTimeout(() => btn.classList.remove('story-prep-word--said'), 600);
+    });
   });
 
   document.getElementById('btn-mode-aloud')?.addEventListener('click', () => {

@@ -120,7 +120,52 @@ Note also `src/data/hfw.js:23-42` (band gating) and
 `src/data/words.js:551` (`deriveFlags` → `'irregular'`) as third and fourth
 partial classifications of the same question.
 
-### 1.4 Split stories into independent vs adult-supported
+### 1.4 Split stories into independent vs adult-supported — ✅ MOSTLY DONE
+
+> **Correction first, because the item below overstates the problem.**
+> `decodableRatio` counts only words a child can sound out **from the code
+> alone**. It is not a readability score. Every other word is legal by a
+> taught route — HFW tier, tricky word, pre-taught sight word — and
+> `storyDecodability.test.js` R3 ("the core promise") already proves there
+> are **zero** stretch words in the bank. Across all 6213 tokens: 95.6%
+> decodable, 1.5% proper nouns, and 2.8% HFW/tricky/sight. The low per-story
+> numbers (0.58 on the first short-a minis) are `the`, `a` and `and`
+> dominating a 42-word text, which is unavoidable in any first reader. So
+> "aim for ≥95%" below is measuring the wrong thing, and the floors were
+> not changed.
+>
+> What was genuinely missing is the second half of the item — showing the
+> pre-teach words — and the labels.
+>
+> **Pre-teach words** (`supportWords` in `decodability.js`). The reader did
+> print a list, but it came from `getSightWordsInStory` — the sight-word
+> quest weave, capped at six. That is a different set, and the gap was not
+> academic: it omitted **110 needed words across 37 of 69 stories** while
+> spending slots on decodable words like "back" and "plan". `Giri's Nap`
+> showed six and needed ten. The panel now lists exactly the words that are
+> legal by a non-decoding route, in story order, each tappable to hear,
+> excluding proper nouns and onomatopoeia (Giri is on the cover; "Snap!" is
+> the plot). The pronoun `I` prints as a capital — the classifier
+> lowercases every token, and a panel teaching sight recognition must not
+> show the wrong shape.
+>
+> **Two labels** (`storySupportLevel`). The 11 `extension-sg` and
+> `chapter-reader` stories are teacher-supported formats: `FORMAT_RULES`
+> lifts their HFW cap to tier 3 and `STORY_PHASES` grants them the full code
+> regardless of the band they are shelved in. Both facts lived only in code
+> comments while the stories sat beside tightly-controlled readers looking
+> identical. They now carry "🧑‍🏫 Read with a grown-up"; the other 58 carry
+> "🙋 Read by myself", and library cards show the pre-teach count.
+>
+> Worth recording: measured against their _own band's_ phase, those 11 run
+> only 0–3 words beyond it. They are adult-supported for their language and
+> multi-sitting structure, not their code load — which is why the rule keys
+> off the format rather than a decodability threshold.
+>
+> **Still open:** the `proper`/`onomatopoeia` allowances are unbounded — a
+> word in either set counts as legal however hard it is to decode.
+
+_Original item:_
 
 Band A is labelled "Core Decodable Minis", but the first ten stories declare
 decodable ratios of 0.86–0.93 (`src/data/stories.js:89-309`) against a test

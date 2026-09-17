@@ -782,6 +782,81 @@ export function findUnknownCapitalised(story) {
  *   },
  * }}
  */
+/**
+ * Statuses that mean "legal, but NOT sound-outable here". These are exactly
+ * the words a child has to already know before they can read the story
+ * unaided.
+ *
+ * `proper` and `onomatopoeia` are deliberately excluded: Giri's name is on
+ * the cover beside his picture, and "Snap!" is the noise the story is about.
+ * Listing them as homework would bury the three words that are.
+ */
+const SUPPORT_STATUSES = Object.freeze(new Set(['hfw', 'tricky', 'sight', 'pretaught']));
+
+/**
+ * The words a child must already know to read this story by themselves —
+ * every word that is legal by a route other than sounding it out.
+ *
+ * This is the list the roadmap (1.4) asks to be shown BEFORE the story
+ * rather than only inside the validator. The reader used to print a
+ * different list: `getSightWordsInStory`, which is drawn from the
+ * sight-word quest weave and capped at six. Those are not the same set, and
+ * the difference is not academic — across the bank that panel omitted 110
+ * needed words over 37 stories, while spending slots on words like "back"
+ * and "plan" that the child can sound out perfectly well.
+ *
+ * Returned in the order they appear in the story, deduplicated, so the list
+ * reads in the order the child will meet them.
+ *
+ * `word` is the canonical lowercase key (what the classifier matches on);
+ * `display` is how it should be printed. They differ for exactly one word
+ * in English — the pronoun "I" — and printing a lowercase "i" in a panel
+ * whose whole job is teaching a child to recognise a word on sight would be
+ * teaching them the wrong shape.
+ *
+ * @param {object} story
+ * @returns {Array<{ word: string, display: string, status: string }>}
+ */
+export function supportWords(story) {
+  if (!story) return [];
+  const pretaught = pretaughtSet(story);
+  const sight = sightWordSet(story);
+  /** @type {Map<string, string>} word → status, first occurrence wins */
+  const seen = new Map();
+  for (const token of extractCountableTokens(story)) {
+    const c = classifyWord(token, story, pretaught, sight);
+    if (SUPPORT_STATUSES.has(c.status) && !seen.has(c.word)) seen.set(c.word, c.status);
+  }
+  return [...seen].map(([word, status]) => ({
+    word,
+    display: word === 'i' ? 'I' : word,
+    status,
+  }));
+}
+
+/**
+ * How much of a grown-up this story expects.
+ *
+ * `extension-sg` (Singapore local-interest readers) and `chapter-reader`
+ * are described as teacher-supported in the stories.js banners, and the
+ * validator already treats them differently: FORMAT_RULES lifts their HFW
+ * cap to tier 3 and STORY_PHASES grants them the full code regardless of
+ * the band they sit in. So they are shelved beside tightly-controlled
+ * stories while playing by looser rules, and nothing on screen said so.
+ *
+ * Note this is about LANGUAGE, not code load: measured against their own
+ * band's phase, these stories run 0–3 words beyond it. What makes them
+ * adult-supported is richer sentence structure, culture-specific
+ * vocabulary and multi-sitting narrative — which is why the rule keys off
+ * the format rather than a decodability threshold.
+ *
+ * @param {object} story
+ * @returns {'independent'|'adult-supported'}
+ */
+export function storySupportLevel(story) {
+  return FORMAT_RULES[story?.textType] ? 'adult-supported' : 'independent';
+}
+
 export function analyzeStory(story) {
   const tokens = extractCountableTokens(story);
   const pretaught = pretaughtSet(story);

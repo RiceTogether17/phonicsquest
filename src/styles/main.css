@@ -18669,3 +18669,77 @@ body.print-mode > *:not(.print-report-wrapper) > * {
 .ptg-mode-btn--active {
   border-color: var(--color-primary);
 }
+
+/* ── Story pre-teach panel + support labels ──────────────────────────────
+   The words a story cannot be sounded out from, shown before it is read
+   (VALIDITY_ROADMAP 1.4), and the label saying whether it is a read-alone
+   story or a teacher-supported format. */
+.story-prep {
+  margin: 4px 14px 10px;
+  padding: var(--space-3);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  text-align: center;
+}
+.story-prep--none {
+  margin: 4px 14px 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-success);
+  text-align: center;
+}
+.story-prep-title {
+  margin: 0 0 var(--space-2);
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--text-2, #475569);
+}
+.story-prep-words {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+.story-prep-word {
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  font-weight: 800;
+  padding: 4px 12px;
+  border: 2px solid var(--color-warning);
+  border-radius: var(--radius-md);
+  background: var(--color-warning-light);
+  color: var(--text);
+  cursor: pointer;
+}
+.story-prep-word:hover {
+  filter: brightness(0.97);
+}
+.story-prep-word--said {
+  border-color: var(--color-success);
+  background: var(--color-success-light);
+}
+
+/* Support labels. Text carries the meaning — the emoji is decorative and
+   the colour is never the only signal. */
+.story-meta-badge--supported,
+.story-meta-badge--independent {
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.story-meta-badge--supported {
+  color: var(--color-warning-shadow);
+}
+.story-meta-badge--independent {
+  color: var(--color-success);
+}
+.story-card-support {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-2, #475569);
+}
+.story-card-support[data-support='adult'] {
+  color: var(--color-warning-shadow);
+}
