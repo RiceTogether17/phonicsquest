@@ -25,8 +25,12 @@ import {
   PROPER_NOUNS,
   ONOMATOPOEIA,
   isWordDecodable,
+  requiredTier,
   supportWords,
   storySupportLevel,
+  allowanceWords,
+  MAX_ALLOWANCE_WORDS,
+  MASCOT_NAME,
 } from '../modules/decodability.js';
 import { getHFWTier } from '../data/hfw.js';
 import { CURRICULUM } from '../data/curriculum.js';
@@ -567,12 +571,21 @@ describe('pre-teach words (R10) — what a child must know before reading alone'
     }
   });
 
-  it('leaves Giri and the noises out — they are not homework', () => {
+  it('leaves the noises out, and every name the child can sound out', () => {
+    // A sound effect is read expressively with the adult, not memorised.
+    // A name is only homework when it is genuinely un-decodable here — see
+    // R12 for the one that is, and for the mascot exception.
     for (const story of STORIES) {
-      const listed = supportWords(story).map((w) => w.word);
-      for (const w of listed) {
-        expect(PROPER_NOUNS.has(w), `${story.id}: "${w}" is a proper noun`).toBe(false);
-        expect(ONOMATOPOEIA.has(w), `${story.id}: "${w}" is onomatopoeia`).toBe(false);
+      const phase = getStoryPhase(story.phase);
+      for (const { word } of supportWords(story)) {
+        expect(ONOMATOPOEIA.has(word), `${story.id}: "${word}" is onomatopoeia`).toBe(false);
+        if (PROPER_NOUNS.has(word)) {
+          expect(word, `${story.id}: mascot listed`).not.toBe(MASCOT_NAME);
+          expect(
+            requiredTier(word) > phase.tier,
+            `${story.id}: "${word}" is a name the child could sound out`,
+          ).toBe(true);
+        }
       }
     }
   });
@@ -614,6 +627,88 @@ describe('support level (R11) — the two labels', () => {
     expect(independent.length).toBe(STORIES.length - 11);
     for (const s of independent) {
       expect(['extension-sg', 'chapter-reader']).not.toContain(s.textType);
+    }
+  });
+});
+
+describe('allowance hygiene (R12) — the validator\u2019s one unbounded escape', () => {
+  /**
+   * `classifyWord` clears PROPER_NOUNS and ONOMATOPOEIA *before* it checks
+   * the tier, so a word in either set is legal however hard it is to decode.
+   * Nothing bounded that: a story could have been name soup, and a hard word
+   * could have been waved through by appending it to a list.
+   *
+   * The exposure was never large — the heaviest story leans on one — so
+   * these tests exist to keep it that way rather than to repair anything.
+   */
+  it('no story leans on more than a handful of allowance words', () => {
+    for (const story of STORIES) {
+      const words = allowanceWords(story);
+      expect(
+        words.length,
+        `${story.id}: ${words.map((w) => w.word).join(', ')}`,
+      ).toBeLessThanOrEqual(MAX_ALLOWANCE_WORDS);
+    }
+  });
+
+  it('only the mascot and one Band C name are ever above their story tier', () => {
+    // A new name here is not a bug to route around — it is a decision to
+    // make deliberately. If this list grows, justify the addition: the word
+    // has to be genuinely pre-taught on the cover or in the picture walk.
+    const over = new Set();
+    for (const story of STORIES) {
+      for (const w of allowanceWords(story)) if (w.overTier) over.add(w.word);
+    }
+    expect([...over].sort()).toEqual([MASCOT_NAME, 'neighbour'].sort());
+  });
+
+  /**
+   * The rule that actually closes the escape. An entry nobody uses is a
+   * standing permission slip: today it is harmless, but the moment a story
+   * reaches for it the word is legal with no further review. Requiring
+   * unused entries to be easy words means a hard one cannot be parked in
+   * the list ahead of time — it has to arrive with the story that needs it,
+   * where the over-tier test above will see it.
+   */
+  it('an unused whitelist entry can never be a hard word', () => {
+    const used = new Set();
+    for (const story of STORIES) for (const t of extractCountableTokens(story)) used.add(t);
+
+    for (const set of [PROPER_NOUNS, ONOMATOPOEIA]) {
+      for (const word of set) {
+        if (used.has(word)) continue;
+        expect(
+          requiredTier(word),
+          `"${word}" is whitelisted, unused, and needs tier ${requiredTier(word)}`,
+        ).toBeLessThanOrEqual(2);
+      }
+    }
+  });
+
+  it('a name the child cannot sound out is pre-taught like any other word', () => {
+    // `neighbour` in a Band C reader is homework exactly as `said` is.
+    const bandC = STORIES.find((s) =>
+      allowanceWords(s).some((w) => w.overTier && w.word !== MASCOT_NAME),
+    );
+    expect(bandC, 'expected a story with an over-tier non-mascot name').toBeTruthy();
+    expect(supportWords(bandC).map((w) => w.word)).toContain('neighbour');
+  });
+
+  it('the mascot stays off the list — his name is in the title above it', () => {
+    for (const story of STORIES) {
+      expect(
+        supportWords(story).map((w) => w.word),
+        `${story.id}`,
+      ).not.toContain(MASCOT_NAME);
+    }
+  });
+
+  it('a sound effect is never listed as homework', () => {
+    // Read aloud expressively with the adult, not memorised on sight.
+    for (const story of STORIES) {
+      for (const { word } of supportWords(story)) {
+        expect(ONOMATOPOEIA.has(word), `${story.id}: "${word}"`).toBe(false);
+      }
     }
   });
 });

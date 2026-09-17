@@ -787,11 +787,67 @@ export function findUnknownCapitalised(story) {
  * the words a child has to already know before they can read the story
  * unaided.
  *
- * `proper` and `onomatopoeia` are deliberately excluded: Giri's name is on
- * the cover beside his picture, and "Snap!" is the noise the story is about.
- * Listing them as homework would bury the three words that are.
+ * `onomatopoeia` is deliberately excluded: "Snap!" is the noise the story is
+ * about, read aloud expressively with the adult rather than memorised, and
+ * listing it as homework would bury the three words that are.
+ *
+ * `proper` is excluded only where it costs nothing — see `supportWords`. A
+ * name the child cannot sound out is a sight word like any other.
  */
 const SUPPORT_STATUSES = Object.freeze(new Set(['hfw', 'tricky', 'sight', 'pretaught']));
+
+/**
+ * The mascot. His name is the one proper noun that needs no pre-teaching
+ * panel entry: it is in the story's title, on the cover illustration
+ * directly above the panel, and spoken in every audio prompt in the app.
+ * Every other name a child cannot sound out is a sight word like any other.
+ */
+export const MASCOT_NAME = 'giri';
+
+/**
+ * Most distinct proper nouns and sound effects one story may lean on.
+ *
+ * `classifyWord` clears these two sets before it checks the tier, so they
+ * are the only unbounded escape in the validator: a word in either set is
+ * legal however hard it is to decode. Today that is barely exercised — the
+ * heaviest story uses ONE, and only `giri` and `neighbour` are ever above
+ * their story's tier — but nothing stopped a story becoming name soup, or
+ * a hard word being waved through by adding it to a list.
+ *
+ * Three is headroom over the current maximum of one without being a rubber
+ * stamp. `storyDecodability.test.js` R12 enforces it.
+ */
+export const MAX_ALLOWANCE_WORDS = 3;
+
+/**
+ * The proper nouns and sound effects a story leans on, with whether each is
+ * actually beyond the code the story has released.
+ *
+ * `overTier` is the interesting flag: an allowance word that decodes at the
+ * story's own tier costs nothing, and only the ones above it are genuinely
+ * being waved through.
+ *
+ * @param {object} story
+ * @returns {Array<{ word: string, status: string, requiredTier: number, overTier: boolean }>}
+ */
+export function allowanceWords(story) {
+  if (!story) return [];
+  const phase = getStoryPhase(story.phase);
+  const pretaught = pretaughtSet(story);
+  const sight = sightWordSet(story);
+  /** @type {Map<string, string>} */
+  const seen = new Map();
+  for (const token of extractCountableTokens(story)) {
+    const c = classifyWord(token, story, pretaught, sight);
+    if ((c.status === 'proper' || c.status === 'onomatopoeia') && !seen.has(c.word)) {
+      seen.set(c.word, c.status);
+    }
+  }
+  return [...seen].map(([word, status]) => {
+    const tier = requiredTier(word);
+    return { word, status, requiredTier: tier, overTier: !!phase && tier > phase.tier };
+  });
+}
 
 /**
  * The words a child must already know to read this story by themselves —
@@ -821,11 +877,24 @@ export function supportWords(story) {
   if (!story) return [];
   const pretaught = pretaughtSet(story);
   const sight = sightWordSet(story);
+  const phase = getStoryPhase(story.phase);
   /** @type {Map<string, string>} word → status, first occurrence wins */
   const seen = new Map();
   for (const token of extractCountableTokens(story)) {
     const c = classifyWord(token, story, pretaught, sight);
-    if (SUPPORT_STATUSES.has(c.status) && !seen.has(c.word)) seen.set(c.word, c.status);
+    if (seen.has(c.word)) continue;
+    if (SUPPORT_STATUSES.has(c.status)) {
+      seen.set(c.word, c.status);
+      continue;
+    }
+    // A name above the story's tier cannot be sounded out, so it belongs on
+    // the list — `neighbour` in a Band C reader is homework exactly like
+    // `said` is. The mascot is the one exception: his name is in the title
+    // directly above this panel, so listing it teaches nothing.
+    const overTier = !!phase && requiredTier(c.word) > phase.tier;
+    if (c.status === 'proper' && overTier && c.word !== MASCOT_NAME) {
+      seen.set(c.word, c.status);
+    }
   }
   return [...seen].map(([word, status]) => ({
     word,

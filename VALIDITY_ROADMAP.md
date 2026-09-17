@@ -120,7 +120,7 @@ Note also `src/data/hfw.js:23-42` (band gating) and
 `src/data/words.js:551` (`deriveFlags` → `'irregular'`) as third and fourth
 partial classifications of the same question.
 
-### 1.4 Split stories into independent vs adult-supported — ✅ MOSTLY DONE
+### 1.4 Split stories into independent vs adult-supported — ✅ DONE
 
 > **Correction first, because the item below overstates the problem.**
 > `decodableRatio` counts only words a child can sound out **from the code
@@ -162,8 +162,29 @@ partial classifications of the same question.
 > multi-sitting structure, not their code load — which is why the rule keys
 > off the format rather than a decodability threshold.
 >
-> **Still open:** the `proper`/`onomatopoeia` allowances are unbounded — a
-> word in either set counts as legal however hard it is to decode.
+> **The allowance escape, closed.** `classifyWord` clears `PROPER_NOUNS`
+> and `ONOMATOPOEIA` _before_ it checks the tier, so a word in either set
+> was legal however hard it was to decode, with nothing bounding it. The
+> exposure was never large — the heaviest story leans on **one** such word,
+> and only `giri` and `neighbour` are ever above their story's tier — so
+> `allowanceWords()` plus R12 exist to keep it that way, not to repair
+> anything:
+>
+> - `MAX_ALLOWANCE_WORDS` (3) caps how many a story may lean on.
+> - The over-tier set is pinned to exactly `{giri, neighbour}`, so a new
+>   hard name is a deliberate, reviewed act rather than a silent one.
+> - **An unused whitelist entry must require tier ≤ 2.** This is the rule
+>   that actually closes the escape: an unused entry is a standing
+>   permission slip, harmless today but legal with no further review the
+>   moment a story reaches for it. A hard word can no longer be parked in
+>   the list ahead of time — it has to arrive with the story that needs it,
+>   where the over-tier pin will see it. Both guards were verified to fail
+>   on an injected regression, not just to pass.
+>
+> A name above the story's tier is now pre-taught like any other word
+> (`neighbour` appears in that Band C reader's panel). The mascot is the one
+> exception, and a named one: `MASCOT_NAME` is in the story title directly
+> above the panel, so listing it teaches nothing.
 
 _Original item:_
 
