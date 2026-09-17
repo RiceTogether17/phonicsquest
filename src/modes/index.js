@@ -101,6 +101,11 @@ import {
   cleanup as cleanupOralSegment,
   getCurrentWord as getOralSegmentWord,
 } from './oralSegment.js';
+import {
+  setupListenAndSpell,
+  cleanup as cleanupListenAndSpell,
+  getCurrentWord as getListenAndSpellWord,
+} from './listenAndSpellMode.js';
 
 /**
  * @typedef {Object} Mode
@@ -395,6 +400,24 @@ export const MODES = {
     setup: setupFluencySprint,
     cleanup: cleanupFluency,
     getCurrentWord: getFluencyWord,
+  },
+  listenAndSpell: {
+    key: 'listenAndSpell',
+    name: 'Listen & Spell',
+    desc: 'Hear the word — build it sound by sound',
+    icon: '✏️',
+    group: 'reading',
+    subskill: 'phoneme-grapheme-encoding',
+    resultPolicy: 'final',
+    // The only mode in the bank that asks the child to PRODUCE print rather
+    // than pick it. Hear & Choose and Fluency Sprint are capped at `guided`
+    // because the answer is on screen among the options; here the bank holds
+    // graphemes, never the word, so the child has to select and order them.
+    // That is encoding, and a clean first attempt is evidence of it.
+    evidenceCeiling: 'independent',
+    setup: setupListenAndSpell,
+    cleanup: cleanupListenAndSpell,
+    getCurrentWord: getListenAndSpellWord,
   },
 };
 

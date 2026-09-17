@@ -24,6 +24,7 @@ PhonicsQuest started as a phonics blender for early readers and now spans the fu
 | **Listen & Blend**              | All tiles visible; teacher-friendly with speed control                         |
 | **Hear & Choose**               | Listen to a word, pick it from 4 choices                                       |
 | **Segment It**                  | Tap individual letters to group them into phoneme chunks                       |
+| **Listen & Spell**              | Hear a word, count its sounds, then build the spelling from a letter bank      |
 | **Missing Sound**               | Identify the hidden phoneme                                                    |
 | **First / Last / Middle Sound** | Phonemic awareness drills                                                      |
 | **Sight Words**                 | 35 high-frequency word matching games                                          |

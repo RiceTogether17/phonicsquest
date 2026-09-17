@@ -26,11 +26,14 @@
  * result object. UI code calls them and renders the feedback; reporting
  * code calls them and rolls them into mastery stats.
  *
- * All seven canonical modes now have playable implementations: wordSort,
- * readAndTap, and fluencySprint gained dedicated UIs (wordSortMode.js,
- * readAndTapMode.js, fluencySprintMode.js) that consume these scoring/hint
- * engines. `listenAndSpell` continues to map to `classicBlend` as the
- * closest existing UI.
+ * All seven canonical modes now have dedicated UIs that consume these
+ * scoring/hint engines: wordSortMode.js, readAndTapMode.js,
+ * fluencySprintMode.js and listenAndSpellMode.js.
+ *
+ * `listenAndSpell` used to point at `classicBlend` as "the closest existing
+ * UI". It was not close: Classic Blend is print → sound → word and Listen
+ * and Spell is word → sound → print, so the app shipped the reading half of
+ * a reciprocal pair twice and measured encoding nowhere.
  */
 
 import { scoreSoundMatch, getSoundMatchHint } from './scoring/soundMatch.js';
@@ -180,13 +183,15 @@ export const PHONICS_MODES = Object.freeze({
     objective: 'Map every phoneme in a spoken word to its correct grapheme.',
     keyboard: true,
     touch: true,
-    impl: 'classicBlend', // closest existing UI; full spelling drill lives in lscwcDrill
+    impl: 'listenAndSpell',
     errorHints: {
       'missing-letter': 'You missed a letter. Say the word and count the sounds.',
       'transposed-letters':
         'The right letters, the wrong order. Say each sound from left to right.',
       'wrong-vowel': 'Listen to the vowel sound. Try a different vowel and re-read it.',
       'silent-e-missing': 'The vowel says its name. Add a silent e at the end.',
+      'plausible-spelling':
+        'Great sounding out! Every sound is right — this word just uses a different spelling.',
       default: 'Say the word slowly. Tap one letter for each sound you hear.',
     },
     masteryCriteria: DEFAULT_MASTERY,

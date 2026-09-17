@@ -139,17 +139,38 @@ graphemic, not phonemic, so `was` parses w-a-s and counts as decodable.
 Not yet verified in this pass. `tests/shortVowelPurity.test.js` and
 `tests/articulatedSpeech.test.js` are the existing hooks.
 
-### 1.6 Build a true Listen and Spell mode
+### 1.6 Build a true Listen and Spell mode ✅ DONE
 
-`src/modes/phonicsModes.js:181` maps `listenAndSpell` to `classicBlend` as
-"the closest existing UI". The two skills are opposites — Classic Blend is
-print → sound → word; Listen and Spell is spoken word → phonemes → graphemes.
-The two registries also disagree on that implementation's display name
-(`modes/index.js:66-77` calls it "Listen & Blend").
+`src/modes/listenAndSpellMode.js` is the mode: the word is spoken and never
+printed, the child is asked for a sound count, a controlled grapheme bank is
+tapped into a build strip, and the canonical scorer coaches once before
+revealing. `phonicsModes.js` now points `impl` at it instead of at
+`classicBlend`, and both registries call it "Listen & Spell".
 
-A real mode should play the word without showing it, ask for a sound count,
-offer a controlled grapheme bank, let the child build the spelling, and
-distinguish phonologically plausible errors from impossible ones.
+**Why this mattered beyond the missing mode.** `progression.js` criterion 2
+requires spelling accuracy ≥ 80%, but the only spelling-binned modes were
+Missing Sound and Word Sort — both _selection_ tasks. With no mode that asked
+a child to produce a spelling, the criterion passed essentially every profile
+as `insufficient-spelling-data`, so the strictest check in the gate was
+measuring nothing. `SKILL_BY_MODE.listenAndSpell = 'spelling'`
+(`src/modules/progress.js`) is what closes that loop.
+
+**Plausible vs impossible errors** (`scoring/listenAndSpell.js`). "caik" and
+"cadk" are both wrong, and a percentage calls them equal. The scorer does
+not: `plausible-spelling` means every sound was spelled with a grapheme that
+really spells that sound, so the segmenting was right and only the
+orthographic choice was wrong — a different lesson from a broken
+segmentation. Substitutions are resolved through the _sound_, not through a
+flat list of interchangeable letters, because `c` spells /k/ in `cat` and /s/
+in `race`; a flat list would call "sat" a plausible spelling of "cat". The
+words.js `types` tag disambiguates, which is also what keeps `y` from being
+offered vowel spellings in `yam`.
+
+Remaining: the mode drops the sound-count step for words with no
+one-tile-per-sound reading (`fox`, the morphology tiles) rather than
+substituting a neater word, because the shell records against the word IT
+chose. Giving those words an honest count needs per-grapheme phoneme counts
+on the tiles, which is 1.1 territory.
 
 ---
 
@@ -290,12 +311,12 @@ question models, reporting calculations. `package.json` allows
 
 ---
 
-## Known failing check
+## Known failing check — resolved
 
-`npm run check:bundle` fails: the main chunk is ~744 kB against a 700 kB
-budget. **This predates the Priority 0 work** — `main` measures 740.8 kB. Per
-`scripts/check-bundle-size.mjs`, the fix is to split a data bank into a lazy
-chunk (see `src/modes/lazy.js`) rather than raise the budget.
+`npm run check:bundle` used to fail at ~744 kB against a 700 kB budget. It
+passes now (665 kB), by the route this section prescribed: data banks split
+into lazy chunks rather than the budget raised. Noted here because the entry
+outlived the problem.
 
 ---
 

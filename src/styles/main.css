@@ -1667,6 +1667,134 @@ body.bedtime-on * {
   color: var(--color-warning-shadow);
 }
 
+/* ── Listen & Spell mode (encoding) ──────────────────────────────────── */
+.las-round {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+.las-replay {
+  font-size: var(--font-size-md);
+  font-weight: 800;
+}
+.las-stage {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+.las-prompt {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  text-align: center;
+}
+.las-counts {
+  width: 100%;
+  max-width: 360px;
+}
+.las-count--yes,
+.las-count--target {
+  border-color: var(--color-success);
+  background: var(--color-success-light);
+}
+.las-count--no {
+  border-color: var(--color-error);
+  background: var(--color-error-light);
+}
+
+/* The build strip — where the child's spelling accumulates. */
+.las-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 72px;
+  width: 100%;
+  max-width: 480px;
+  padding: var(--space-3);
+  border: 3px dashed var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.las-strip--plausible {
+  /* Right sounds, wrong spelling: warn, never fail. */
+  border-style: solid;
+  border-color: var(--color-warning);
+  background: var(--color-warning-light);
+}
+.las-strip-empty {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.las-cell {
+  min-width: 48px;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-2xl);
+  font-weight: 900;
+  text-align: center;
+  border: 3px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+}
+.las-controls {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.las-bank {
+  width: 100%;
+  max-width: 480px;
+}
+.las-tile {
+  font-size: var(--font-size-xl);
+  font-weight: 900;
+  min-height: 56px;
+}
+
+/* Feedback strip. Every state names itself in text — colour is never the
+   only signal (a reduced-motion, high-contrast or screen-reader child gets
+   the same information). */
+.las-feedback {
+  min-height: 28px;
+  max-width: 480px;
+  text-align: center;
+  font-size: var(--font-size-md);
+  font-weight: 800;
+}
+.las-feedback--yes {
+  color: var(--color-success);
+}
+.las-feedback--coach {
+  color: var(--color-warning-shadow);
+}
+.las-feedback--reveal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.las-reveal-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+.las-reveal-word {
+  font-size: var(--font-size-2xl);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+}
+.las-reveal-hint {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-warning-shadow);
+}
+
 /* ── Oral Blend mode: emoji-only choices ─────────────────────────────── */
 .choice-grid--emoji {
   grid-template-columns: 1fr 1fr;
