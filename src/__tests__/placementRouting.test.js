@@ -84,10 +84,13 @@ describe('placement gate adaptivity', () => {
     ];
 
     const result = derivePlacementResult(strongAB, {}, 'primary');
+    // B2 (the nonword probe) now sits between B and C, so a child who has
+    // already done it is the one who progresses to C.
     const nextGate = getNextGateToAppend(result, [
       { gate: 'INTAKE' },
       { gate: 'A' },
       { gate: 'B' },
+      { gate: 'B2' },
     ]);
 
     expect(result.readingBand).toBe('developing-reader');
@@ -116,6 +119,7 @@ describe('placement gate adaptivity', () => {
       { gate: 'INTAKE' },
       { gate: 'A' },
       { gate: 'B' },
+      { gate: 'B2' },
       { gate: 'C' },
     ]);
 

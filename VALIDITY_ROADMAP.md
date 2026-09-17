@@ -365,7 +365,52 @@ unavailable (`:452-462`). The anti-binge check then has nothing to read.
 Priority 0 marks that state `provisional` so it no longer reports as a clean
 pass, but the underlying gap remains.
 
-### 3.3 Placement covers only phases 1–6
+### 3.3 Placement covers only phases 1–6 — pseudoword probe ✅ DONE
+
+> **Pseudoword decoding landed** (`PSEUDOWORD_ITEMS` in `placementTest.js`).
+> The section below is right that Gate B "measures auditory-to-print
+> matching": every decoding item speaks the word and asks the child to pick
+> it from four printed options, so a child who knows `cat`, `bed` and `ship`
+> on sight passes without decoding anything. `decoding` was an upper bound
+> on decoding, never a measure of it — the confusion `evidence.js` exists to
+> prevent, untested in the one place the app makes its strongest claim.
+>
+> Twelve nonwords now cover placement phases 1–6. A nonword cannot be
+> memorised, so it separates the two. Three things follow:
+>
+> - **Gate B takes the weaker of the two.** A child at 100% on real words and
+>   0% on nonwords is no longer `developing-reader` with stories unlocked.
+> - **The report names it.** Real-word and nonword scores side by side, plus
+>   a plain-language line when the gap is ≥ 0.3 ("familiar words are being
+>   recognised on sight rather than sounded out").
+> - **`sightRecallGap`** is on `stageScores.reading`, null when the probe did
+>   not run.
+>
+> **An adult scores it, by necessity not preference.** Pseudoword decoding is
+> print → sound, so the child must SAY it. TTS mispronounces nonwords and
+> speech recognition maps them onto the nearest real word — `readAloudListener`
+> is deliberately lenient with child voices, which makes it useless here.
+> Making it listen-and-choose instead would measure sound → print, which is
+> what Gate B already does. Gate A already has six teacher-scale items, so
+> this adds no new requirement.
+>
+> **The bank is hand-written and frozen.** Nonwords are never generated at
+> runtime: a generator cannot be reviewed, and plausible English letter
+> patterns produce crude and offensive strings readily. Each word is
+> validated against the story bank's own code model (`isWordDecodable`), which
+> caught a real error — `zake` first sat at `long-a`, whose budget releases
+> `a_e` but not the `o_e`/`i_e`/`u_e` its distractors needed.
+>
+> **Backward compatible.** `_weightedPresent` renormalises over administered
+> sections, so splitting decoding's 0.4 share unconditionally would have
+> quietly lowered the reading composite of every profile recorded before the
+> probe existed. The carve to 0.25/0.15 only happens when the probe ran.
+>
+> **Still open below:** phases 7–10 remain unreachable from the screener, and
+> the other instruments the section names (grapheme recall, cold word
+> reading, encoding, connected reading) are not built.
+
+_Original item:_
 
 `src/modules/placementTest.js:35-46` — phases 7–10 are unreachable from the
 screener.

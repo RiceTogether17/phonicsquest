@@ -18743,3 +18743,40 @@ body.print-mode > *:not(.print-report-wrapper) > * {
 .story-card-support[data-support='adult'] {
   color: var(--color-warning-shadow);
 }
+
+/* ── Placement: nonword decoding probe ───────────────────────────────────
+   Printed large and never spoken — the child has to turn print into sound,
+   which is the one thing sight recall cannot do for them. */
+.pt-pseudo-word {
+  margin: var(--space-4) 0;
+  font-size: clamp(2.5rem, 12vw, 4rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-align: center;
+  color: var(--color-primary);
+  font-family: var(--font-reading, inherit);
+}
+.pt-item--pseudo .pt-grammar-hint {
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+/* Nonsense-word finding in the placement report. It can contradict the
+   headline band, so it reads as its own section rather than a footnote. */
+.pt-nonword {
+  margin: var(--space-4) 0;
+  padding: var(--space-3);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.pt-nonword-scores {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-md);
+}
+.pt-nonword-note {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-2, #475569);
+}
