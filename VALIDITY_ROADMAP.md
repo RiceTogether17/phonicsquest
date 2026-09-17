@@ -120,7 +120,73 @@ Note also `src/data/hfw.js:23-42` (band gating) and
 `src/data/words.js:551` (`deriveFlags` → `'irregular'`) as third and fourth
 partial classifications of the same question.
 
-### 1.4 Split stories into independent vs adult-supported
+### 1.4 Split stories into independent vs adult-supported — ✅ DONE
+
+> **Correction first, because the item below overstates the problem.**
+> `decodableRatio` counts only words a child can sound out **from the code
+> alone**. It is not a readability score. Every other word is legal by a
+> taught route — HFW tier, tricky word, pre-taught sight word — and
+> `storyDecodability.test.js` R3 ("the core promise") already proves there
+> are **zero** stretch words in the bank. Across all 6213 tokens: 95.6%
+> decodable, 1.5% proper nouns, and 2.8% HFW/tricky/sight. The low per-story
+> numbers (0.58 on the first short-a minis) are `the`, `a` and `and`
+> dominating a 42-word text, which is unavoidable in any first reader. So
+> "aim for ≥95%" below is measuring the wrong thing, and the floors were
+> not changed.
+>
+> What was genuinely missing is the second half of the item — showing the
+> pre-teach words — and the labels.
+>
+> **Pre-teach words** (`supportWords` in `decodability.js`). The reader did
+> print a list, but it came from `getSightWordsInStory` — the sight-word
+> quest weave, capped at six. That is a different set, and the gap was not
+> academic: it omitted **110 needed words across 37 of 69 stories** while
+> spending slots on decodable words like "back" and "plan". `Giri's Nap`
+> showed six and needed ten. The panel now lists exactly the words that are
+> legal by a non-decoding route, in story order, each tappable to hear,
+> excluding proper nouns and onomatopoeia (Giri is on the cover; "Snap!" is
+> the plot). The pronoun `I` prints as a capital — the classifier
+> lowercases every token, and a panel teaching sight recognition must not
+> show the wrong shape.
+>
+> **Two labels** (`storySupportLevel`). The 11 `extension-sg` and
+> `chapter-reader` stories are teacher-supported formats: `FORMAT_RULES`
+> lifts their HFW cap to tier 3 and `STORY_PHASES` grants them the full code
+> regardless of the band they are shelved in. Both facts lived only in code
+> comments while the stories sat beside tightly-controlled readers looking
+> identical. They now carry "🧑‍🏫 Read with a grown-up"; the other 58 carry
+> "🙋 Read by myself", and library cards show the pre-teach count.
+>
+> Worth recording: measured against their _own band's_ phase, those 11 run
+> only 0–3 words beyond it. They are adult-supported for their language and
+> multi-sitting structure, not their code load — which is why the rule keys
+> off the format rather than a decodability threshold.
+>
+> **The allowance escape, closed.** `classifyWord` clears `PROPER_NOUNS`
+> and `ONOMATOPOEIA` _before_ it checks the tier, so a word in either set
+> was legal however hard it was to decode, with nothing bounding it. The
+> exposure was never large — the heaviest story leans on **one** such word,
+> and only `giri` and `neighbour` are ever above their story's tier — so
+> `allowanceWords()` plus R12 exist to keep it that way, not to repair
+> anything:
+>
+> - `MAX_ALLOWANCE_WORDS` (3) caps how many a story may lean on.
+> - The over-tier set is pinned to exactly `{giri, neighbour}`, so a new
+>   hard name is a deliberate, reviewed act rather than a silent one.
+> - **An unused whitelist entry must require tier ≤ 2.** This is the rule
+>   that actually closes the escape: an unused entry is a standing
+>   permission slip, harmless today but legal with no further review the
+>   moment a story reaches for it. A hard word can no longer be parked in
+>   the list ahead of time — it has to arrive with the story that needs it,
+>   where the over-tier pin will see it. Both guards were verified to fail
+>   on an injected regression, not just to pass.
+>
+> A name above the story's tier is now pre-taught like any other word
+> (`neighbour` appears in that Band C reader's panel). The mascot is the one
+> exception, and a named one: `MASCOT_NAME` is in the story title directly
+> above the panel, so listing it teaches nothing.
+
+_Original item:_
 
 Band A is labelled "Core Decodable Minis", but the first ten stories declare
 decodable ratios of 0.86–0.93 (`src/data/stories.js:89-309`) against a test
@@ -139,17 +205,73 @@ graphemic, not phonemic, so `was` parses w-a-s and counts as decodable.
 Not yet verified in this pass. `tests/shortVowelPurity.test.js` and
 `tests/articulatedSpeech.test.js` are the existing hooks.
 
-### 1.6 Build a true Listen and Spell mode
+### 1.6 Build a true Listen and Spell mode ✅ DONE
 
-`src/modes/phonicsModes.js:181` maps `listenAndSpell` to `classicBlend` as
-"the closest existing UI". The two skills are opposites — Classic Blend is
-print → sound → word; Listen and Spell is spoken word → phonemes → graphemes.
-The two registries also disagree on that implementation's display name
-(`modes/index.js:66-77` calls it "Listen & Blend").
+`src/modes/listenAndSpellMode.js` is the mode: the word is spoken and never
+printed, the child is asked for a sound count, a controlled grapheme bank is
+tapped into a build strip, and the canonical scorer coaches once before
+revealing. `phonicsModes.js` now points `impl` at it instead of at
+`classicBlend`, and both registries call it "Listen & Spell".
 
-A real mode should play the word without showing it, ask for a sound count,
-offer a controlled grapheme bank, let the child build the spelling, and
-distinguish phonologically plausible errors from impossible ones.
+**Why this mattered beyond the missing mode.** `progression.js` criterion 2
+requires spelling accuracy ≥ 80%, but the only spelling-binned modes were
+Missing Sound and Word Sort — both _selection_ tasks. With no mode that asked
+a child to produce a spelling, the criterion passed essentially every profile
+as `insufficient-spelling-data`, so the strictest check in the gate was
+measuring nothing. `SKILL_BY_MODE.listenAndSpell = 'spelling'`
+(`src/modules/progress.js`) is what closes that loop.
+
+**Plausible vs impossible errors** (`scoring/listenAndSpell.js`). "caik" and
+"cadk" are both wrong, and a percentage calls them equal. The scorer does
+not: `plausible-spelling` means every sound was spelled with a grapheme that
+really spells that sound, so the segmenting was right and only the
+orthographic choice was wrong — a different lesson from a broken
+segmentation. Substitutions are resolved through the _sound_, not through a
+flat list of interchangeable letters, because `c` spells /k/ in `cat` and /s/
+in `race`; a flat list would call "sat" a plausible spelling of "cat". The
+words.js `types` tag disambiguates, which is also what keeps `y` from being
+offered vowel spellings in `yam`.
+
+**Counting where tiles and sounds part company.** `soundsPerTile` keeps a
+per-tile phoneme count rather than a one-tile-per-sound yes/no, so the cases
+where the two differ are taught instead of skipped: a silent e makes no
+sound, `x` makes two in one letter, `-ing` makes two as one spelling unit.
+The child is told the true sound count and then that one part of the word
+carries two of them — never _which_ part, which would spell a piece of the
+word for them. This took the counting step from 972 to 1095 of the 1117-word
+bank, recovering every morphology group (phases 9–10) and the x-words. Where
+the per-grapheme table and `derivePhonemes` genuinely disagree (`-ed` shifts
+with the sound before it) the step is dropped rather than guessed at — 22
+words.
+
+**Routing.** Being a mode is not the same as being reachable. Every step of
+every `getDailyPlan` band used to be reading, so the day never asked a child
+to produce a spelling. Spelling now alternates into the existing FIRST step
+on the same weak group — read it today, spell it tomorrow — rather than being
+appended as a fourth step, because a K1/K2 session should be getting shorter
+(see 2.4). Pre-readers are untouched: no letters learned, nothing to spell.
+`navigationRouter` grew a `STAGE_SCOPED_TARGETS` set for this: the generic
+bare-mode-key path calls `startGame(undefined)` and drops the group, so a
+plan promising "Listen & Spell – Short A" would have served an unrelated
+word. `PHASES.recommendedModes` lists the mode for phases 1–10, which is what
+filters its stage picker.
+
+**The same gap in three older modes, closed.** `wordSort`, `readAndTap` and
+`fluencySprint` were in no phase's `recommendedModes` either, so
+`getStagesForMode` fell back to the full curriculum and each opened a picker
+offering every stage from CVC to multisyllable. That fallback is a deliberate
+kindness — a new mode never renders an empty picker — but it is silent, and
+it is never right for a mode that actually has a picker. Word Sort now covers
+phases 1–8 (its second bin is a sibling stage, and phases 9–10 study the
+morpheme, not the sound pattern, so a sort there has no principled contrast);
+Read & Tap and Fluency Sprint cover 1–10.
+
+`PICKER_MODES` moved out of `app.js` into `phonicsProgression.js`, beside the
+function that filters the picker, because the two only make sense together —
+and `tests/phonicsProgression.test.js` now fails if a mode is added to one
+without the other. Fluency Sprint and Listen & Spell were added to it: both
+are stage-scoped in every other respect, but both used to start on whatever
+group was last touched, with no stage progression and no mastery bar.
 
 ---
 
@@ -243,7 +365,52 @@ unavailable (`:452-462`). The anti-binge check then has nothing to read.
 Priority 0 marks that state `provisional` so it no longer reports as a clean
 pass, but the underlying gap remains.
 
-### 3.3 Placement covers only phases 1–6
+### 3.3 Placement covers only phases 1–6 — pseudoword probe ✅ DONE
+
+> **Pseudoword decoding landed** (`PSEUDOWORD_ITEMS` in `placementTest.js`).
+> The section below is right that Gate B "measures auditory-to-print
+> matching": every decoding item speaks the word and asks the child to pick
+> it from four printed options, so a child who knows `cat`, `bed` and `ship`
+> on sight passes without decoding anything. `decoding` was an upper bound
+> on decoding, never a measure of it — the confusion `evidence.js` exists to
+> prevent, untested in the one place the app makes its strongest claim.
+>
+> Twelve nonwords now cover placement phases 1–6. A nonword cannot be
+> memorised, so it separates the two. Three things follow:
+>
+> - **Gate B takes the weaker of the two.** A child at 100% on real words and
+>   0% on nonwords is no longer `developing-reader` with stories unlocked.
+> - **The report names it.** Real-word and nonword scores side by side, plus
+>   a plain-language line when the gap is ≥ 0.3 ("familiar words are being
+>   recognised on sight rather than sounded out").
+> - **`sightRecallGap`** is on `stageScores.reading`, null when the probe did
+>   not run.
+>
+> **An adult scores it, by necessity not preference.** Pseudoword decoding is
+> print → sound, so the child must SAY it. TTS mispronounces nonwords and
+> speech recognition maps them onto the nearest real word — `readAloudListener`
+> is deliberately lenient with child voices, which makes it useless here.
+> Making it listen-and-choose instead would measure sound → print, which is
+> what Gate B already does. Gate A already has six teacher-scale items, so
+> this adds no new requirement.
+>
+> **The bank is hand-written and frozen.** Nonwords are never generated at
+> runtime: a generator cannot be reviewed, and plausible English letter
+> patterns produce crude and offensive strings readily. Each word is
+> validated against the story bank's own code model (`isWordDecodable`), which
+> caught a real error — `zake` first sat at `long-a`, whose budget releases
+> `a_e` but not the `o_e`/`i_e`/`u_e` its distractors needed.
+>
+> **Backward compatible.** `_weightedPresent` renormalises over administered
+> sections, so splitting decoding's 0.4 share unconditionally would have
+> quietly lowered the reading composite of every profile recorded before the
+> probe existed. The carve to 0.25/0.15 only happens when the probe ran.
+>
+> **Still open below:** phases 7–10 remain unreachable from the screener, and
+> the other instruments the section names (grapheme recall, cold word
+> reading, encoding, connected reading) are not built.
+
+_Original item:_
 
 `src/modules/placementTest.js:35-46` — phases 7–10 are unreachable from the
 screener.
@@ -290,12 +457,12 @@ question models, reporting calculations. `package.json` allows
 
 ---
 
-## Known failing check
+## Known failing check — resolved
 
-`npm run check:bundle` fails: the main chunk is ~744 kB against a 700 kB
-budget. **This predates the Priority 0 work** — `main` measures 740.8 kB. Per
-`scripts/check-bundle-size.mjs`, the fix is to split a data bank into a lazy
-chunk (see `src/modes/lazy.js`) rather than raise the budget.
+`npm run check:bundle` used to fail at ~744 kB against a 700 kB budget. It
+passes now (665 kB), by the route this section prescribed: data banks split
+into lazy chunks rather than the budget raised. Noted here because the entry
+outlived the problem.
 
 ---
 

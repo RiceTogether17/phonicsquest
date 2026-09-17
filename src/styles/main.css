@@ -1667,6 +1667,134 @@ body.bedtime-on * {
   color: var(--color-warning-shadow);
 }
 
+/* ── Listen & Spell mode (encoding) ──────────────────────────────────── */
+.las-round {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+.las-replay {
+  font-size: var(--font-size-md);
+  font-weight: 800;
+}
+.las-stage {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+.las-prompt {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  text-align: center;
+}
+.las-counts {
+  width: 100%;
+  max-width: 360px;
+}
+.las-count--yes,
+.las-count--target {
+  border-color: var(--color-success);
+  background: var(--color-success-light);
+}
+.las-count--no {
+  border-color: var(--color-error);
+  background: var(--color-error-light);
+}
+
+/* The build strip — where the child's spelling accumulates. */
+.las-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 72px;
+  width: 100%;
+  max-width: 480px;
+  padding: var(--space-3);
+  border: 3px dashed var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.las-strip--plausible {
+  /* Right sounds, wrong spelling: warn, never fail. */
+  border-style: solid;
+  border-color: var(--color-warning);
+  background: var(--color-warning-light);
+}
+.las-strip-empty {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.las-cell {
+  min-width: 48px;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-2xl);
+  font-weight: 900;
+  text-align: center;
+  border: 3px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+}
+.las-controls {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.las-bank {
+  width: 100%;
+  max-width: 480px;
+}
+.las-tile {
+  font-size: var(--font-size-xl);
+  font-weight: 900;
+  min-height: 56px;
+}
+
+/* Feedback strip. Every state names itself in text — colour is never the
+   only signal (a reduced-motion, high-contrast or screen-reader child gets
+   the same information). */
+.las-feedback {
+  min-height: 28px;
+  max-width: 480px;
+  text-align: center;
+  font-size: var(--font-size-md);
+  font-weight: 800;
+}
+.las-feedback--yes {
+  color: var(--color-success);
+}
+.las-feedback--coach {
+  color: var(--color-warning-shadow);
+}
+.las-feedback--reveal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.las-reveal-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+.las-reveal-word {
+  font-size: var(--font-size-2xl);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+}
+.las-reveal-hint {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-warning-shadow);
+}
+
 /* ── Oral Blend mode: emoji-only choices ─────────────────────────────── */
 .choice-grid--emoji {
   grid-template-columns: 1fr 1fr;
@@ -18540,4 +18668,115 @@ body.print-mode > *:not(.print-report-wrapper) > * {
 .exam-hub-mode-btn--active,
 .ptg-mode-btn--active {
   border-color: var(--color-primary);
+}
+
+/* ── Story pre-teach panel + support labels ──────────────────────────────
+   The words a story cannot be sounded out from, shown before it is read
+   (VALIDITY_ROADMAP 1.4), and the label saying whether it is a read-alone
+   story or a teacher-supported format. */
+.story-prep {
+  margin: 4px 14px 10px;
+  padding: var(--space-3);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  text-align: center;
+}
+.story-prep--none {
+  margin: 4px 14px 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-success);
+  text-align: center;
+}
+.story-prep-title {
+  margin: 0 0 var(--space-2);
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--text-2, #475569);
+}
+.story-prep-words {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+.story-prep-word {
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  font-weight: 800;
+  padding: 4px 12px;
+  border: 2px solid var(--color-warning);
+  border-radius: var(--radius-md);
+  background: var(--color-warning-light);
+  color: var(--text);
+  cursor: pointer;
+}
+.story-prep-word:hover {
+  filter: brightness(0.97);
+}
+.story-prep-word--said {
+  border-color: var(--color-success);
+  background: var(--color-success-light);
+}
+
+/* Support labels. Text carries the meaning — the emoji is decorative and
+   the colour is never the only signal. */
+.story-meta-badge--supported,
+.story-meta-badge--independent {
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.story-meta-badge--supported {
+  color: var(--color-warning-shadow);
+}
+.story-meta-badge--independent {
+  color: var(--color-success);
+}
+.story-card-support {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-2, #475569);
+}
+.story-card-support[data-support='adult'] {
+  color: var(--color-warning-shadow);
+}
+
+/* ── Placement: nonword decoding probe ───────────────────────────────────
+   Printed large and never spoken — the child has to turn print into sound,
+   which is the one thing sight recall cannot do for them. */
+.pt-pseudo-word {
+  margin: var(--space-4) 0;
+  font-size: clamp(2.5rem, 12vw, 4rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-align: center;
+  color: var(--color-primary);
+  font-family: var(--font-reading, inherit);
+}
+.pt-item--pseudo .pt-grammar-hint {
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+/* Nonsense-word finding in the placement report. It can contradict the
+   headline band, so it reads as its own section rather than a footnote. */
+.pt-nonword {
+  margin: var(--space-4) 0;
+  padding: var(--space-3);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.pt-nonword-scores {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-md);
+}
+.pt-nonword-note {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-2, #475569);
 }

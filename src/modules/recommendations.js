@@ -192,8 +192,31 @@ export function getRecommendation() {
   return _readerRec();
 }
 
-export function getDailyPlan() {
+/**
+ * Which half of the reading/spelling pair today's plan leads with.
+ *
+ * Reading and spelling are reciprocal — a child who reads `cake` but writes
+ * `cak` has not mastered the split digraph — but every step of every plan
+ * here used to be reading, so the day never asked the child to produce a
+ * spelling. Spelling ALTERNATES into the existing first step rather than
+ * being appended as a fourth: it lands on the same weak group the blending
+ * step targets (read it today, spell it tomorrow), and a K1/K2 session
+ * should be getting shorter, not longer (VALIDITY_ROADMAP 2.4).
+ *
+ * @param {Date} now
+ * @returns {boolean} true on spelling days
+ */
+function _isSpellingDay(now) {
+  return Math.floor(now.getTime() / 86400000) % 2 === 1;
+}
+
+/**
+ * @param {Date} [now] injected so the alternation is testable without
+ *   waiting a day; callers pass nothing.
+ */
+export function getDailyPlan(now = new Date()) {
   const readingBand = _band();
+  const spellingDay = _isSpellingDay(now);
 
   if (readingBand === 'pre-reader') {
     return [
@@ -220,14 +243,23 @@ export function getDailyPlan() {
 
   if (readingBand === 'emerging-decoder') {
     const weakGroup = _weakestPhonicsGroup();
+    const groupLabel = weakGroup ? VOWEL_LABELS[weakGroup] || weakGroup : '';
     return [
-      {
-        step: 1,
-        label: weakGroup ? `Blend It! – ${VOWEL_LABELS[weakGroup] || weakGroup}` : 'Blend It!',
-        detail: 'Target the weakest decoding group.',
-        ctaTarget: 'blend',
-        ctaGroup: weakGroup || undefined,
-      },
+      spellingDay
+        ? {
+            step: 1,
+            label: groupLabel ? `Listen & Spell – ${groupLabel}` : 'Listen & Spell',
+            detail: 'Write the sounds you have been reading.',
+            ctaTarget: 'listenAndSpell',
+            ctaGroup: weakGroup || undefined,
+          }
+        : {
+            step: 1,
+            label: groupLabel ? `Blend It! – ${groupLabel}` : 'Blend It!',
+            detail: 'Target the weakest decoding group.',
+            ctaTarget: 'blend',
+            ctaGroup: weakGroup || undefined,
+          },
       {
         step: 2,
         label: 'Sight Words',
@@ -240,12 +272,19 @@ export function getDailyPlan() {
 
   if (readingBand === 'developing-reader') {
     return [
-      {
-        step: 1,
-        label: 'Blend It! review',
-        detail: 'Keep phonics automaticity strong.',
-        ctaTarget: 'blend',
-      },
+      spellingDay
+        ? {
+            step: 1,
+            label: 'Listen & Spell review',
+            detail: 'Spelling is the harder half — check it holds.',
+            ctaTarget: 'listenAndSpell',
+          }
+        : {
+            step: 1,
+            label: 'Blend It! review',
+            detail: 'Keep phonics automaticity strong.',
+            ctaTarget: 'blend',
+          },
       {
         step: 2,
         label: 'Giri Stories',

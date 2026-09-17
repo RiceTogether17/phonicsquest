@@ -162,6 +162,11 @@ export const MODE_EVIDENCE_CEILING = Object.freeze({
   readAndTap: EVIDENCE.GUIDED,
 
   // Objectively scored, answer not supplied in advance.
+  //
+  // Listen & Spell is the strongest of these: the others ask the child to
+  // pick the right option, it asks them to produce the spelling from a bank
+  // of graphemes that never contains the word.
+  listenAndSpell: EVIDENCE.INDEPENDENT,
   oralBlend: EVIDENCE.INDEPENDENT,
   oralSegment: EVIDENCE.INDEPENDENT,
   first: EVIDENCE.INDEPENDENT,

@@ -165,6 +165,12 @@ export const SKILL_BY_MODE = Object.freeze({
   wordSort: 'spelling',
   readAndTap: 'decoding',
   fluencySprint: 'decoding',
+  // The only mode that asks the child to PRODUCE a spelling rather than
+  // recognise one. Until it existed, `progression.js` criterion 2 (spelling
+  // accuracy ≥ 80%) had no real source: Missing Sound and Word Sort are
+  // both selection tasks, so the gate passed almost every child as
+  // `insufficient-spelling-data`.
+  listenAndSpell: 'spelling',
 });
 
 /** Canonical skill bins, in display order. */

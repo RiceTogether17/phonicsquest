@@ -84,10 +84,13 @@ describe('placement gate adaptivity', () => {
     ];
 
     const result = derivePlacementResult(strongAB, {}, 'primary');
+    // B2 (the nonword probe) now sits between B and C, so a child who has
+    // already done it is the one who progresses to C.
     const nextGate = getNextGateToAppend(result, [
       { gate: 'INTAKE' },
       { gate: 'A' },
       { gate: 'B' },
+      { gate: 'B2' },
     ]);
 
     expect(result.readingBand).toBe('developing-reader');
@@ -116,6 +119,7 @@ describe('placement gate adaptivity', () => {
       { gate: 'INTAKE' },
       { gate: 'A' },
       { gate: 'B' },
+      { gate: 'B2' },
       { gate: 'C' },
     ]);
 
@@ -221,6 +225,72 @@ describe('reading-band routing', () => {
     expect(rec.ctaTarget).toBe('first-sound');
     expect(plan[0].ctaTarget).toBe('first-sound');
     expect(plan.some((step) => step.ctaTarget === 'letter-sounds')).toBe(true);
+  });
+
+  /**
+   * Every step of every daily plan used to be reading — the day never once
+   * asked the child to produce a spelling, which is the half that actually
+   * proves the code is known. Spelling alternates into the EXISTING first
+   * step rather than being appended as a fourth: it lands on the same weak
+   * group the blending step targets (read it today, spell it tomorrow), and
+   * a K1/K2 session should be getting shorter, not longer.
+   */
+  it('alternates reading and spelling on the same weak group, without lengthening the day', () => {
+    const p = createProfile('Rei', '🦊', '#f97316', 'preschool');
+    activateProfile(p.id);
+    store.set('placementProfile', {
+      readingBand: 'emerging-decoder',
+      sentenceReady: false,
+      grammarReady: false,
+      vocabularyReady: false,
+    });
+    store.set('groupMastery', { 'cvc-a': 0.2, 'cvc-e': 0.9, 'cvc-i': 0.9 });
+
+    const dayA = new Date('2026-01-01T09:00:00Z');
+    const dayB = new Date('2026-01-02T09:00:00Z');
+    const planA = getDailyPlan(dayA);
+    const planB = getDailyPlan(dayB);
+
+    expect([planA[0].ctaTarget, planB[0].ctaTarget].sort()).toEqual(['blend', 'listenAndSpell']);
+    // The same code, read one day and spelled the next.
+    expect(planA[0].ctaGroup).toBe(planB[0].ctaGroup);
+    // The rest of the plan is untouched, and it is still three steps.
+    expect(planA).toHaveLength(3);
+    expect(planB).toHaveLength(3);
+    expect(planA.slice(1)).toEqual(planB.slice(1));
+  });
+
+  it('gives developing readers the same spelling alternation', () => {
+    const p = createProfile('Tam', '🐨', '#22c55e', 'primary');
+    activateProfile(p.id);
+    store.set('placementProfile', {
+      readingBand: 'developing-reader',
+      sentenceReady: false,
+      grammarReady: false,
+      vocabularyReady: false,
+    });
+
+    const targets = [
+      getDailyPlan(new Date('2026-01-01T09:00:00Z'))[0].ctaTarget,
+      getDailyPlan(new Date('2026-01-02T09:00:00Z'))[0].ctaTarget,
+    ].sort();
+    expect(targets).toEqual(['blend', 'listenAndSpell']);
+  });
+
+  it('never asks a pre-reader to spell — no letters learned yet', () => {
+    const p = createProfile('Nila', '🐣', '#6c63ff', 'preschool');
+    activateProfile(p.id);
+    store.set('placementProfile', {
+      readingBand: 'pre-reader',
+      sentenceReady: false,
+      grammarReady: false,
+      vocabularyReady: false,
+    });
+
+    for (const day of ['2026-01-01T09:00:00Z', '2026-01-02T09:00:00Z']) {
+      const plan = getDailyPlan(new Date(day));
+      expect(plan.some((s) => s.ctaTarget === 'listenAndSpell')).toBe(false);
+    }
   });
 
   it('returns developing-reader hybrid home layout', () => {

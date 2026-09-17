@@ -52,6 +52,20 @@ export const MODE_ALIASES = Object.freeze({
  */
 const GROUP_RESUMING_TARGETS = Object.freeze(new Set(['classicBlend']));
 
+/**
+ * Modes scoped to a curriculum stage: given a group they start on it, given
+ * none the child picks a stage first.
+ *
+ * Blend It! was the only one for a long time, and the branch was written
+ * around it by name. Listen & Spell needs the same treatment for a reason
+ * worth stating: the daily plan alternates reading and spelling on the SAME
+ * weak group, and a bare mode key takes the generic path, which calls
+ * `startGame(undefined)` and drops the group on the floor. Routed that way
+ * the plan would say "Listen & Spell – Short A" and then serve whatever word
+ * the mode picked.
+ */
+const STAGE_SCOPED_TARGETS = Object.freeze(new Set(['blend', 'listenAndSpell']));
+
 /** Primary-English screens that share the placeholder host. */
 export const PLACEHOLDER_TARGETS = Object.freeze(
   new Set([
@@ -74,8 +88,9 @@ export const PLACEHOLDER_TARGETS = Object.freeze(
  * @typedef {object} NavHandlers
  * @property {(mode: string) => void} setMode          record the active mode
  * @property {(group?: string) => void} startGame
- * @property {() => void} openBlendPicker
+ * @property {() => void} openBlendPicker            legacy; Blend It! only
  * @property {(target: string) => void} openPrimaryPlaceholder
+ * @property {(mode: string) => void} [openStagePicker]  picker for any mode
  * @property {(group: string) => void} [setGroup]
  * @property {() => string|undefined} [getCurrentGroup]
  */
@@ -91,14 +106,17 @@ export const PLACEHOLDER_TARGETS = Object.freeze(
 export function navigateTo(target, group, handlers) {
   if (!target || !handlers) return false;
 
-  // Blend is the one target with a picker fallback: with a group it starts
-  // straight away, without one the child chooses a stage first.
-  if (target === 'blend') {
-    handlers.setMode('blend');
+  // Stage-scoped modes: with a group they start straight away, without one
+  // the child chooses a stage first.
+  if (STAGE_SCOPED_TARGETS.has(target)) {
+    handlers.setMode(target);
     if (group) {
       handlers.setGroup?.(group);
       handlers.startGame(group);
+    } else if (handlers.openStagePicker) {
+      handlers.openStagePicker(target);
     } else {
+      // Older handler sets only know about Blend It!'s picker.
       handlers.openBlendPicker();
     }
     return true;

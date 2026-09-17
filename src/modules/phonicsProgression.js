@@ -13,6 +13,49 @@
  */
 
 /**
+ * Modes that choose a curriculum stage before play starts.
+ *
+ * Lives here, beside `getStagesForMode`, because the two facts only make
+ * sense together: a mode in this set shows a picker, and that picker is
+ * filtered by the phases naming the mode. A mode that is in this set but in
+ * no phase's `recommendedModes` gets the whole curriculum — every stage from
+ * CVC to multisyllable, whether or not the mode suits it. That is the
+ * fallback below doing its job, not a working picker, and
+ * `phonicsProgression.test.js` fails when the two lists drift apart.
+ *
+ * Clap the Syllables is deliberately absent: it is a phonological game
+ * decoupled from the decoding curriculum, so it skips the (lockable) picker
+ * and launches straight into play. Classic Blend has its own dropdown.
+ */
+export const PICKER_MODES = Object.freeze(
+  new Set([
+    'blend',
+    'oralBlend',
+    'first',
+    'last',
+    'middle',
+    'soundCount',
+    'oralSegment',
+    'hear',
+    'missing',
+    'segment',
+    'train',
+    'soundHunt',
+    'oddOneOut',
+    'wordCount',
+    'wordSort',
+    'readAndTap',
+    'fluencySprint',
+    'listenAndSpell',
+  ]),
+);
+
+/** Does `mode` pick a curriculum stage before play starts? */
+export function usesStagePicker(mode) {
+  return PICKER_MODES.has(mode);
+}
+
+/**
  * Stages where `mode` belongs, in curriculum order.
  * A stage is included if the phase it belongs to lists `mode` in its
  * `recommendedModes` array (the source of truth in PHASES). When a mode

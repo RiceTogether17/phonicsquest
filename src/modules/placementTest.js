@@ -168,6 +168,7 @@ const _SECTION_TO_STAGE = {
   letterSounds: 'letter-sounds',
   blending: 'blending',
   decoding: 'reading',
+  pseudoword: 'reading',
   sightWords: 'reading',
   connectedReading: 'reading',
   comprehension: 'reading',
@@ -177,7 +178,8 @@ const _SECTION_TO_STAGE = {
   vocabularyReady: 'grammar-vocab',
 };
 
-const GATE_A_ITEMS = [
+/** Exported for tests, as GATE_B_ITEMS is — see the note on that bank. */
+export const GATE_A_ITEMS = [
   // ─────────────────────────────────────────────────────────────────────────
   // STAGE 1 — Picture identification.  Tests attention + basic vocabulary.
   // Oral-language teacher observations live here too so a teacher can mark
@@ -1068,6 +1070,214 @@ export const GATE_B_ITEMS = [
   },
 ];
 
+/**
+ * Pseudoword decoding probe — the one item type a child cannot pass on sight.
+ *
+ * Every Gate B decoding item speaks the word and asks the child to pick it
+ * from four printed options. A child who knows `cat`, `bed` and `ship` by
+ * sight passes without decoding anything, so `decoding` has always been an
+ * upper bound on decoding rather than a measure of it. `evidence.js` was
+ * built to keep exactly this distinction; nothing in the screener tested it.
+ *
+ * A nonword cannot be memorised. `zaf` has never been seen before, so the
+ * only way to read it is to map z-a-f onto /z/-/a/-/f/ — which is what the
+ * curriculum claims to teach.
+ *
+ * ── Why an adult scores this ─────────────────────────────────────────────
+ *
+ * Pseudoword decoding is print → sound, so the child has to SAY it. The two
+ * automatic routes both fail on nonwords: TTS mispronounces them (voices
+ * differ, and there is no dictionary entry to fall back on), and speech
+ * recognition maps them onto the nearest real word — `readAloudListener`
+ * is deliberately lenient with child voices, which makes it useless here.
+ * Turning it into a listen-and-choose item instead would measure sound →
+ * print, which is a different skill and is what Gate B already does.
+ *
+ * So an adult marks it, using the same three-point scale as the other
+ * observed items. The screener already assumes an adult is present — Gate A
+ * has six teacher-scale items — so this adds no new requirement.
+ *
+ * ── The bank is hand-written on purpose ──────────────────────────────────
+ *
+ * Nonwords are NOT generated at runtime. A generator cannot be reviewed,
+ * and in a children's app an unreviewed string is a liability: plausible
+ * letter patterns produce slurs and crude words readily. Every entry below
+ * has been read aloud and checked by a person, and `placementPseudowords.
+ * test.js` pins the bank as a fixed constant so a future generator cannot
+ * be slipped in behind the same API.
+ *
+ * Each `word` is validated against the SAME code model the story bank uses
+ * (`isWordDecodable` from decodability.js) at the story phase named in
+ * `codePhase`, so a probe can never ask for a grapheme the phase has not
+ * released. `phase` is the placement phase it reports against.
+ */
+export const PSEUDOWORD_ITEMS = Object.freeze([
+  // ── Placement phase 1: CVC, short vowels ─────────────────────────────────
+  {
+    id: 'p-cvc-1',
+    gate: 'B',
+    stage: 'reading',
+    section: 'pseudoword',
+    kind: 'pseudoword',
+    title: 'Nonsense word reading',
+    prompt: 'Read this made-up word out loud.',
+    word: 'zaf',
+    sounds: 'z – a – f',
+    phase: 1,
+    codePhase: 'mixed-short',
+  },
+  {
+    id: 'p-cvc-2',
+    gate: 'B',
+    stage: 'reading',
+    section: 'pseudoword',
+    kind: 'pseudoword',
+    title: 'Nonsense word reading',
+    prompt: 'Read this made-up word out loud.',
+    word: 'mub',
+    sounds: 'm – u – b',
+    phase: 1,
+    codePhase: 'mixed-short',
+  },
+  {
+    id: 'p-cvc-3',
+    gate: 'B',
+    stage: 'reading',
+    section: 'pseudoword',
+    kind: 'pseudoword',
+    title: 'Nonsense word reading',
+    prompt: 'Read this made-up word out loud.',
+    word: 'vok',
+    sounds: 'v – o – k',
+    phase: 1,
+    codePhase: 'mixed-short',
+  },
+  // ── Placement phase 2: initial blends ────────────────────────────────────
+  {
+    id: 'p-ccvc-1',
+    gate: 'B',
+    stage: 'reading',
+    section: 'pseudoword',
+    kind: 'pseudoword',
+    title: 'Nonsense word reading',
+    prompt: 'Read this made-up word out loud.',
+    word: 'plov',
+    sounds: 'p – l – o – v',
+    phase: 2,
+    codePhase: 'mixed-short',
+  },
+  {
+    id: 'p-ccvc-2',
+    gate: 'B',
+    stage: 'reading',
+    section: 'pseudoword',
+    kind: 'pseudoword',
+    title: 'Nonsense word reading',
+    prompt: 'Read this made-up word out loud.',
+    word: 'trub',
+    sounds: 't – r – u – b',
+    phase: 2,
+    codePhase: 'mixed-short',
+  },
+  // ── Placement phase 3: final blends ──────────────────────────────────────
+  {
+    id: 'p-cvcc-1',
+    gate: 'B',
+    stage: 'reading',
+    section: 'pseudoword',
+    kind: 'pseudoword',
+    title: 'Nonsense word reading',
+    prompt: 'Read this made-up word out loud.',
+    word: 'nelp',
+    sounds: 'n – e – l – p',
+    phase: 3,
+    codePhase: 'mixed-short',
+  },
+  {
+    id: 'p-cvcc-2',
+    gate: 'B',
+    stage: 'reading',
+    section: 'pseudoword',
+    kind: 'pseudoword',
+    title: 'Nonsense word reading',
+    prompt: 'Read this made-up word out loud.',
+    word: 'fesk',
+    sounds: 'f – e – s – k',
+    phase: 3,
+    codePhase: 'mixed-short',
+  },
+  // ── Placement phase 4: consonant digraphs ────────────────────────────────
+  {
+    id: 'p-dig-1',
+    gate: 'B',
+    stage: 'reading',
+    section: 'pseudoword',
+    kind: 'pseudoword',
+    title: 'Nonsense word reading',
+    prompt: 'Read this made-up word out loud.',
+    word: 'chig',
+    sounds: 'ch – i – g',
+    phase: 4,
+    codePhase: 'short-digraphs',
+  },
+  {
+    id: 'p-dig-2',
+    gate: 'B',
+    stage: 'reading',
+    section: 'pseudoword',
+    kind: 'pseudoword',
+    title: 'Nonsense word reading',
+    prompt: 'Read this made-up word out loud.',
+    word: 'thop',
+    sounds: 'th – o – p',
+    phase: 4,
+    codePhase: 'short-digraphs',
+  },
+  // ── Placement phase 5: both-end blends ───────────────────────────────────
+  {
+    id: 'p-ccvcc-1',
+    gate: 'B',
+    stage: 'reading',
+    section: 'pseudoword',
+    kind: 'pseudoword',
+    title: 'Nonsense word reading',
+    prompt: 'Read this made-up word out loud.',
+    word: 'pland',
+    sounds: 'p – l – a – n – d',
+    phase: 5,
+    codePhase: 'short-digraphs',
+  },
+  // ── Placement phase 6: long vowels ───────────────────────────────────────
+  {
+    id: 'p-long-1',
+    gate: 'B',
+    stage: 'reading',
+    section: 'pseudoword',
+    kind: 'pseudoword',
+    title: 'Nonsense word reading',
+    prompt: 'Read this made-up word out loud.',
+    word: 'zake',
+    // The split digraph is the whole point of the item, so the adult prompt
+    // names it rather than spelling out four separate letters.
+    sounds: 'z – a_e – k  (the e makes the a say its name)',
+    phase: 6,
+    codePhase: 'long-u',
+  },
+  {
+    id: 'p-long-2',
+    gate: 'B',
+    stage: 'reading',
+    section: 'pseudoword',
+    kind: 'pseudoword',
+    title: 'Nonsense word reading',
+    prompt: 'Read this made-up word out loud.',
+    word: 'feen',
+    sounds: 'f – ee – n',
+    phase: 6,
+    codePhase: 'long-u',
+  },
+]);
+
 const GATE_C_ITEMS = [
   // ── Decodable word reading ────────────────────────────────────────────────
   {
@@ -1438,12 +1648,23 @@ function _computeStageScores(results) {
   const letterSounds = _teacherScore(results, 'letterSounds');
 
   const decoding = _accuracy(results, 'decoding');
+  const pseudoword = _teacherScore(results, 'pseudoword');
   const sightWords = _accuracy(results, 'sightWords');
   const connectedReading = _accuracy(results, 'connectedReading');
   const comprehension = _accuracy(results, 'comprehension');
   const storyReadiness = _teacherScore(results, 'storyReadiness');
+  // Nonword reading carries real weight, carved OUT of the real-word
+  // decoding share rather than added on top — the two measure the same
+  // claim, and only the nonword one is immune to sight recall.
+  //
+  // The carve is conditional because `_weightedPresent` renormalises over
+  // administered sections: splitting the share unconditionally would have
+  // quietly lowered the reading composite of every profile recorded before
+  // the probe existed, which is a silent rescoring of real children.
+  const hasPseudoword = has('pseudoword');
   const readingComposite = _weightedPresent([
-    [decoding, 0.4, has('decoding')],
+    [decoding, hasPseudoword ? 0.25 : 0.4, has('decoding')],
+    [pseudoword, 0.15, hasPseudoword],
     [sightWords, 0.2, has('sightWords')],
     [connectedReading, 0.2, has('connectedReading')],
     [comprehension, 0.15, has('comprehension')],
@@ -1496,6 +1717,10 @@ function _computeStageScores(results) {
       composite: Number(readingComposite.toFixed(2)),
       coverage: has('decoding') || has('connectedReading') ? 'tested' : 'not-tested',
       decoding: Number(decoding.toFixed(2)),
+      pseudoword: Number(pseudoword.toFixed(2)),
+      // Positive means real words are read better than nonwords — the size
+      // of the gap is how much of `decoding` is sight recall.
+      sightRecallGap: hasPseudoword ? Number((decoding - pseudoword).toFixed(2)) : null,
       sightWords: Number(sightWords.toFixed(2)),
       sentenceReading: Number(connectedReading.toFixed(2)),
       comprehension: Number(comprehension.toFixed(2)),
@@ -1745,6 +1970,7 @@ export function derivePlacementResult(results, intake = {}, schoolLevel = 'presc
   const oralBlending = _accuracy(results, 'oralBlending');
   const vocab = _accuracy(results, 'vocab');
   const decoding = _accuracy(results, 'decoding');
+  const pseudoword = _teacherScore(results, 'pseudoword');
   const sightWords = _accuracy(results, 'sightWords');
   const connectedReading = _accuracy(results, 'connectedReading');
   const comprehension = _accuracy(results, 'comprehension');
@@ -1782,7 +2008,13 @@ export function derivePlacementResult(results, intake = {}, schoolLevel = 'presc
     [gateATeacherScore, 0.3, gateATeacherPresent],
   ]);
   const gateASecure = gateAComposite >= 0.6;
-  const gateBSecure = decoding >= 0.6;
+  // Gate B used to rest on `decoding` alone, which speaks the word and asks
+  // the child to pick it from four printed options — a child who knows those
+  // words by sight passes without decoding anything. When the nonword probe
+  // has been administered the weaker of the two governs, because a child who
+  // reads `cat` but not `zaf` has not secured the code, however the
+  // real-word score looks.
+  const gateBSecure = hasSec('pseudoword') ? decoding >= 0.6 && pseudoword >= 0.6 : decoding >= 0.6;
   // Gate C: separate child-response (connected reading + comprehension) from teacher observation (read aloud).
   const gateCChildScore = _weightedPresent([
     [connectedReading, 1, hasSec('connectedReading')],
@@ -1945,6 +2177,35 @@ export function renderPlacementReportHtml(result) {
     `;
   }).join('');
 
+  /**
+   * The nonword finding, stated plainly.
+   *
+   * A score nobody reads changes nothing, and this is the one number in the
+   * report that can contradict the headline: a child can read every real
+   * word on the screener and still not have the code. Only shown when the
+   * probe actually ran — silence is better than a guess.
+   */
+  const reading = stageScores.reading || {};
+  const gap = reading.sightRecallGap;
+  const nonwordHtml =
+    typeof gap !== 'number'
+      ? ''
+      : `
+      <section class="pt-nonword" aria-label="Nonsense word reading">
+        <h3 class="pt-section-title">Nonsense word reading</h3>
+        <p class="pt-nonword-scores">
+          Real words <strong>${_pct(reading.decoding)}</strong> ·
+          Made-up words <strong>${_pct(reading.pseudoword)}</strong>
+        </p>
+        <p class="pt-nonword-note">${
+          gap >= 0.3
+            ? 'Real words are read well, made-up ones are not. That usually means familiar words are being recognised on sight rather than sounded out — so keep phonics teaching going even though the reading looks fluent.'
+            : gap <= -0.3
+              ? 'Made-up words are read more confidently than real ones — the code is solid. Familiar-word practice and reading for meaning are the next step.'
+              : 'Real and made-up words are read about equally well, which is what secure decoding looks like.'
+        }</p>
+      </section>`;
+
   const gapCardsHtml =
     skillGaps.length === 0
       ? `<div class="pt-gap-empty">🎉 No major gaps — your child is well-placed!</div>`
@@ -1985,6 +2246,8 @@ export function renderPlacementReportHtml(result) {
         <h3 class="pt-section-title">Skill profile</h3>
         <ol class="pt-profile-list" role="list">${profileRowsHtml}</ol>
       </section>
+
+      ${nonwordHtml}
 
       <section class="pt-gaps" aria-label="Skill gaps and recommendations">
         <h3 class="pt-section-title">What's missing — and what helps</h3>
@@ -2166,6 +2429,11 @@ export function getNextGateToAppend(baseResult, existingSequence = []) {
   const gateC = baseResult?.gateScores?.gateC ?? 0;
 
   if (!gates.has('B') && gateA >= 0.55) return 'B';
+  // The nonword probe only follows real-word decoding that is already
+  // working. Below that floor the code plainly is not secure, so the probe
+  // would add no information and would hand a struggling child a page of
+  // words that mean nothing — the most discouraging thing in the screener.
+  if (!gates.has('B2') && gateA >= 0.55 && gateB >= 0.5) return 'B2';
   if (!gates.has('C') && gateA >= 0.55 && gateB >= 0.55) return 'C';
   if (!gates.has('D') && gateA >= 0.55 && gateB >= 0.55 && gateC >= 0.6) return 'D';
   return null;
@@ -2338,6 +2606,39 @@ export function showPlacementTest({ container, profile, onComplete }) {
     });
   }
 
+  /**
+   * Nonword reading, scored by the adult.
+   *
+   * The word is PRINTED and never spoken — speaking it would turn the item
+   * into the listen-and-choose task Gate B already runs, and would measure
+   * sound → print instead of print → sound. There is no 🔊 button for the
+   * same reason.
+   */
+  function renderPseudoword(item) {
+    renderFrame(`
+      <div class="pt-item pt-item--pseudo">
+        <div class="pt-phase-tag">Gate B · ${item.title}</div>
+        <span class="pt-teacher-badge">Adult observation</span>
+        <p class="pt-question">${item.prompt}</p>
+        <p class="pt-pseudo-word" lang="en" aria-label="Made-up word: ${item.word.split('').join(' ')}">${item.word}</p>
+        <p class="pt-grammar-hint">
+          Grown-up: it is not a real word — that is the point. Mark what the
+          child does with it. Sounds: <strong>${item.sounds}</strong>
+        </p>
+        <div class="pt-choices" role="group" aria-label="Adult scoring options">
+          <button class="pt-choice-btn" data-score="0">Could not read it</button>
+          <button class="pt-choice-btn" data-score="0.5">Sounded it out with help</button>
+          <button class="pt-choice-btn" data-score="1">Read it on their own</button>
+        </div>
+      </div>
+    `);
+    container.querySelectorAll('[data-score]').forEach((btn) => {
+      btn.addEventListener('click', () =>
+        answer(item, { score: Number(btn.getAttribute('data-score')) }),
+      );
+    });
+  }
+
   function renderPictureChoice(item) {
     const opts = _shuffle(item.options);
     const hideText = item.gate === 'A';
@@ -2390,6 +2691,7 @@ export function showPlacementTest({ container, profile, onComplete }) {
     if (!item) return finish();
     if (item.kind === 'intake') return renderIntake();
     if (item.kind === 'teacher-scale') return renderTeacherScale(item);
+    if (item.kind === 'pseudoword') return renderPseudoword(item);
     if (item.kind === 'picture-choice') return renderPictureChoice(item);
     return renderWordChoice(item);
   }
@@ -2399,6 +2701,10 @@ export function showPlacementTest({ container, profile, onComplete }) {
     const nextGate = getNextGateToAppend(baseResult, sequence);
     if (nextGate === 'B') {
       sequence = [...sequence, ...GATE_B_ITEMS];
+      return renderCurrent();
+    }
+    if (nextGate === 'B2') {
+      sequence = [...sequence, ...PSEUDOWORD_ITEMS.map((i) => ({ ...i, gate: 'B2' }))];
       return renderCurrent();
     }
     if (nextGate === 'C') {

@@ -25,6 +25,12 @@ import {
   PROPER_NOUNS,
   ONOMATOPOEIA,
   isWordDecodable,
+  requiredTier,
+  supportWords,
+  storySupportLevel,
+  allowanceWords,
+  MAX_ALLOWANCE_WORDS,
+  MASCOT_NAME,
 } from '../modules/decodability.js';
 import { getHFWTier } from '../data/hfw.js';
 import { CURRICULUM } from '../data/curriculum.js';
@@ -525,6 +531,183 @@ describe('comprehension questions', () => {
       for (const q of story.talkAboutIt || []) {
         expect(q.trim().endsWith('?'), `${story.id}: "${q}"`).toBe(true);
         expect(q.length, `${story.id}: "${q}" is too terse`).toBeGreaterThan(15);
+      }
+    }
+  });
+});
+
+describe('pre-teach words (R10) — what a child must know before reading alone', () => {
+  /**
+   * The roadmap (1.4) asks for these to be shown BEFORE the story rather
+   * than only inside the validator. The reader used to print
+   * `getSightWordsInStory` instead — a different set, drawn from the
+   * sight-word quest weave and capped at six.
+   */
+  it('lists exactly the words that are legal by a route other than decoding', () => {
+    for (const story of STORIES) {
+      const listed = new Set(supportWords(story).map((w) => w.word));
+      const { computed } = analyzeStory(story);
+      const expected =
+        (computed.byStatus.hfw ?? 0) +
+        (computed.byStatus.tricky ?? 0) +
+        (computed.byStatus.sight ?? 0) +
+        (computed.byStatus.pretaught ?? 0);
+      // Counts are per token and the list is per distinct word, so the list
+      // can be shorter — but never longer, and never empty when there are
+      // support tokens to cover.
+      expect(listed.size, `${story.id}`).toBeLessThanOrEqual(expected);
+      if (expected > 0) expect(listed.size, `${story.id}`).toBeGreaterThan(0);
+      if (expected === 0) expect(listed.size, `${story.id}`).toBe(0);
+    }
+  });
+
+  it('never lists a word the child could sound out', () => {
+    // The old panel spent slots on decodable words like "back" and "plan"
+    // while omitting ones the child genuinely needed.
+    for (const story of STORIES) {
+      for (const { word } of supportWords(story)) {
+        expect(isWordDecodable(word, story.phase), `${story.id}: "${word}"`).toBe(false);
+      }
+    }
+  });
+
+  it('leaves the noises out, and every name the child can sound out', () => {
+    // A sound effect is read expressively with the adult, not memorised.
+    // A name is only homework when it is genuinely un-decodable here — see
+    // R12 for the one that is, and for the mascot exception.
+    for (const story of STORIES) {
+      const phase = getStoryPhase(story.phase);
+      for (const { word } of supportWords(story)) {
+        expect(ONOMATOPOEIA.has(word), `${story.id}: "${word}" is onomatopoeia`).toBe(false);
+        if (PROPER_NOUNS.has(word)) {
+          expect(word, `${story.id}: mascot listed`).not.toBe(MASCOT_NAME);
+          expect(
+            requiredTier(word) > phase.tier,
+            `${story.id}: "${word}" is a name the child could sound out`,
+          ).toBe(true);
+        }
+      }
+    }
+  });
+
+  it('prints the pronoun I as a capital', () => {
+    // The classifier lowercases every token, and a panel teaching a child to
+    // recognise a word on sight must not show them the wrong shape.
+    const withI = STORIES.flatMap((s) => supportWords(s)).filter((w) => w.word === 'i');
+    expect(withI.length).toBeGreaterThan(0);
+    for (const w of withI) expect(w.display).toBe('I');
+    // Every other word prints as itself.
+    for (const story of STORIES) {
+      for (const w of supportWords(story)) {
+        if (w.word !== 'i') expect(w.display).toBe(w.word);
+      }
+    }
+  });
+
+  it('keeps the list short enough for a child to meet in one sitting', () => {
+    for (const story of STORIES) {
+      expect(supportWords(story).length, `${story.id}`).toBeLessThanOrEqual(12);
+    }
+  });
+});
+
+describe('support level (R11) — the two labels', () => {
+  it('marks exactly the teacher-supported formats as adult-supported', () => {
+    // These play by looser rules than the shelf they sit on: FORMAT_RULES
+    // lifts their HFW cap and STORY_PHASES grants them the full code. Both
+    // facts were documented only in code comments.
+    const adult = STORIES.filter((s) => storySupportLevel(s) === 'adult-supported');
+    const byType = {};
+    for (const s of adult) byType[s.textType] = (byType[s.textType] ?? 0) + 1;
+    expect(byType).toEqual({ 'extension-sg': 6, 'chapter-reader': 5 });
+  });
+
+  it('marks every tightly-controlled reader as independent', () => {
+    const independent = STORIES.filter((s) => storySupportLevel(s) === 'independent');
+    expect(independent.length).toBe(STORIES.length - 11);
+    for (const s of independent) {
+      expect(['extension-sg', 'chapter-reader']).not.toContain(s.textType);
+    }
+  });
+});
+
+describe('allowance hygiene (R12) — the validator\u2019s one unbounded escape', () => {
+  /**
+   * `classifyWord` clears PROPER_NOUNS and ONOMATOPOEIA *before* it checks
+   * the tier, so a word in either set is legal however hard it is to decode.
+   * Nothing bounded that: a story could have been name soup, and a hard word
+   * could have been waved through by appending it to a list.
+   *
+   * The exposure was never large — the heaviest story leans on one — so
+   * these tests exist to keep it that way rather than to repair anything.
+   */
+  it('no story leans on more than a handful of allowance words', () => {
+    for (const story of STORIES) {
+      const words = allowanceWords(story);
+      expect(
+        words.length,
+        `${story.id}: ${words.map((w) => w.word).join(', ')}`,
+      ).toBeLessThanOrEqual(MAX_ALLOWANCE_WORDS);
+    }
+  });
+
+  it('only the mascot and one Band C name are ever above their story tier', () => {
+    // A new name here is not a bug to route around — it is a decision to
+    // make deliberately. If this list grows, justify the addition: the word
+    // has to be genuinely pre-taught on the cover or in the picture walk.
+    const over = new Set();
+    for (const story of STORIES) {
+      for (const w of allowanceWords(story)) if (w.overTier) over.add(w.word);
+    }
+    expect([...over].sort()).toEqual([MASCOT_NAME, 'neighbour'].sort());
+  });
+
+  /**
+   * The rule that actually closes the escape. An entry nobody uses is a
+   * standing permission slip: today it is harmless, but the moment a story
+   * reaches for it the word is legal with no further review. Requiring
+   * unused entries to be easy words means a hard one cannot be parked in
+   * the list ahead of time — it has to arrive with the story that needs it,
+   * where the over-tier test above will see it.
+   */
+  it('an unused whitelist entry can never be a hard word', () => {
+    const used = new Set();
+    for (const story of STORIES) for (const t of extractCountableTokens(story)) used.add(t);
+
+    for (const set of [PROPER_NOUNS, ONOMATOPOEIA]) {
+      for (const word of set) {
+        if (used.has(word)) continue;
+        expect(
+          requiredTier(word),
+          `"${word}" is whitelisted, unused, and needs tier ${requiredTier(word)}`,
+        ).toBeLessThanOrEqual(2);
+      }
+    }
+  });
+
+  it('a name the child cannot sound out is pre-taught like any other word', () => {
+    // `neighbour` in a Band C reader is homework exactly as `said` is.
+    const bandC = STORIES.find((s) =>
+      allowanceWords(s).some((w) => w.overTier && w.word !== MASCOT_NAME),
+    );
+    expect(bandC, 'expected a story with an over-tier non-mascot name').toBeTruthy();
+    expect(supportWords(bandC).map((w) => w.word)).toContain('neighbour');
+  });
+
+  it('the mascot stays off the list — his name is in the title above it', () => {
+    for (const story of STORIES) {
+      expect(
+        supportWords(story).map((w) => w.word),
+        `${story.id}`,
+      ).not.toContain(MASCOT_NAME);
+    }
+  });
+
+  it('a sound effect is never listed as homework', () => {
+    // Read aloud expressively with the adult, not memorised on sight.
+    for (const story of STORIES) {
+      for (const { word } of supportWords(story)) {
+        expect(ONOMATOPOEIA.has(word), `${story.id}: "${word}"`).toBe(false);
       }
     }
   });

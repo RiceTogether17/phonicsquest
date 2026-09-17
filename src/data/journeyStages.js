@@ -52,7 +52,7 @@ export const JOURNEY_STEPS = Object.freeze([
     title: 'Blending & Decoding',
     childLabel: 'Sound Out Words',
     desc: 'Blend letter sounds into words, from cat to strongest.',
-    modes: ['blend', 'classicBlend', 'segment', 'missing', 'wordSort', 'readAndTap', 'fluencySprint'],
+    modes: ['blend', 'classicBlend', 'segment', 'missing', 'wordSort', 'readAndTap', 'fluencySprint', 'listenAndSpell'],
     screens: [],
   },
   {
