@@ -33,6 +33,8 @@ import { getWeakSkills } from '../modules/remediationRouter.js';
 import { buildParentReportCard, buildWhatsAppMessage } from '../modules/parentReportCard.js';
 import { confidenceLabel } from '../modules/evidence.js';
 import { getGraduatingSoon, getSlippingRecently } from '../modules/reviewScheduler.js';
+import { getClassSnapshot, hasClassToShow } from '../modules/classSnapshot.js';
+import { html, raw } from '../utils/html.js';
 import { questMastery } from '../modules/questMastery.js';
 import { GRAMMAR_CATEGORIES, GRAMMAR_CATEGORY_KEYS } from '../data/grammarCategories.js';
 import { VOCAB_CATEGORIES, VOCAB_CATEGORY_KEYS } from '../data/vocabCategories.js';
@@ -63,6 +65,7 @@ export function renderDashboard(container, opts = {}) {
     <div id="dash-parent-report-card"></div>
     <div id="dash-actions-section"></div>
     <div id="dash-stuck-words"></div>
+    <div id="dash-class-snapshot"></div>
 
     <details class="dash-group" id="dash-group-week">
       <summary class="dash-group__summary">How this week went</summary>
@@ -175,6 +178,7 @@ export function renderDashboard(container, opts = {}) {
   _renderLearnerSummary();
   _renderRecommendedActions();
   _renderStuckWords();
+  _renderClassSnapshot();
   _renderLiteracyDomains();
   _renderClueInsights();
   _renderPatternInsights();
@@ -873,6 +877,72 @@ function _renderRecommendedActions() {
       const group = btn.dataset.group || null;
       _onNavigate?.({ target, group });
     });
+  });
+}
+
+// ── Class snapshot ───────────────────────────────────────────────────────────
+
+/**
+ * Who on this device needs the same lesson.
+ *
+ * Lives inside the dashboard because the dashboard is PIN-gated: this names
+ * other children and what they cannot yet do, and on a shared tablet a child
+ * should not be able to read that about a classmate.
+ *
+ * Silent for a single-child device, and silent when nobody shares a
+ * difficulty — an empty "no groups found" card would be a worse answer than
+ * no card, because it invites the reader to look for a problem.
+ */
+function _renderClassSnapshot() {
+  const container = document.getElementById('dash-class-snapshot');
+  if (!container) return;
+  if (!hasClassToShow()) return;
+
+  const { groups, childCount } = getClassSnapshot();
+  if (!groups.length) return;
+
+  const cards = groups
+    .map((g) => {
+      const names = g.children
+        .map(
+          (c) =>
+            `<span class="cs-child">${escapeHtml(c.avatar || '')} ${escapeHtml(c.name)}</span>`,
+        )
+        .join('');
+      const action = g.action
+        ? `<button type="button" class="cs-action" data-target="${escapeHtml(g.action.target)}" data-group="${escapeHtml(g.action.group)}">Open ${escapeHtml(g.title)} practice →</button>`
+        : '';
+      return `
+      <article class="cs-card cs-card--${g.kind}">
+        <header class="cs-card__head">
+          <span class="cs-count">${g.children.length} of ${childCount}</span>
+          <h4 class="cs-card__title">${escapeHtml(g.title)}</h4>
+        </header>
+        <div class="cs-children">${names}</div>
+        <p class="cs-detail">${escapeHtml(g.detail)}</p>
+        <p class="cs-teach"><strong>Try this:</strong> ${escapeHtml(g.teach)}</p>
+        ${action}
+      </article>`;
+    })
+    .join('');
+
+  // `cards` is markup this function already escaped, so it is spliced with
+  // raw(); everything else goes through the auto-escaping tag.
+  container.innerHTML = html`
+    <section class="cs-section" aria-label="Who needs the same lesson">
+      <h3 class="dash-section-title">👥 Who needs the same thing</h3>
+      <p class="cs-intro">
+        Across the ${childCount} children on this device. Each card is one lesson worth teaching
+        once, to everyone named on it.
+      </p>
+      <div class="cs-list">${raw(cards)}</div>
+    </section>
+  `;
+
+  container.querySelectorAll('.cs-action').forEach((btn) => {
+    btn.addEventListener('click', () =>
+      _onNavigate?.({ target: btn.dataset.target, group: btn.dataset.group }),
+    );
   });
 }
 

@@ -10,7 +10,13 @@ PhonicsQuest started as a phonics blender for early readers and now spans the fu
 - **📋 Exam Practice Hub** — complete interactive P1–P6 term papers with **Practice Mode** and timed **Test Mode**, automatic scoring, weak-skill feedback and follow-up module recommendations.
 - **👨‍👩‍👧 Parent Dashboard** — a parent-friendly Report Card (Strengths · Needs Practice · Recent Mistakes · 10-min recommendation · Teacher's note), a one-click "Copy Parent Update" WhatsApp message, plus full CSV/JSON exports for advanced users.
 
-[Live demo →](https://jastonchamp.github.io/phonicsquest/)
+[Live demo →](https://jastonchamp.github.io/phonicsquest/) · [Scope & Sequence →](SCOPE_AND_SEQUENCE.md)
+
+> **For teachers and curriculum specialists:** [`SCOPE_AND_SEQUENCE.md`](SCOPE_AND_SEQUENCE.md)
+> lists every phase, stage, target sound, mastery bar and progression
+> criterion — generated from the curriculum data and checked by a test, so it
+> cannot drift from the app. It also states plainly what the app does _not_
+> claim.
 
 ---
 

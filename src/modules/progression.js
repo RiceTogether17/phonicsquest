@@ -47,19 +47,15 @@ import { store } from './store.js';
 import { progress } from './progress.js';
 import { isTeacherUnlockActive } from './teacherUnlock.js';
 import { confidenceFor } from './evidence.js';
+import { PROGRESSION_GATE } from './progressionGate.js';
 
 // ── Public configuration ────────────────────────────────────────────────────
 
-export const PROGRESSION_GATE = Object.freeze({
-  MIN_DECODING_ACCURACY: 0.85,
-  MIN_SPELLING_ACCURACY: 0.8,
-  MIN_UNIQUE_WORDS: 12,
-  MIN_SESSION_DAYS: 2,
-  MIN_SPELLING_ATTEMPTS: 6, // before we have this many spelling attempts, treat as no-data
-  MIN_DECODING_ATTEMPTS: 6, // need at least this many decoding attempts to judge
-  MAX_VOWEL_CONFUSION_GAP: 0.2, // prereq accuracy must not be more than 20 pts below sibling-median
-  GROUP_SIZE_FRACTION: 0.75, // small groups: required unique = min(MIN_UNIQUE_WORDS, floor(size * this))
-});
+// The numbers live in `progressionGate.js` — pure policy, no runtime
+// dependencies, so tooling outside the browser can read them without
+// pulling in the store. Re-exported here so every existing import still
+// resolves against the module that enforces them.
+export { PROGRESSION_GATE } from './progressionGate.js';
 
 const STRUCTURAL_VOWEL_RE = /^(cvc|ccvc|cvcc|ccvcc)-([aeiou])$/;
 

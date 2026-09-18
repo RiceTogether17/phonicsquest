@@ -19,7 +19,9 @@
     "optimize:images": "node scripts/optimize-images.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "simple-git-hooks || true"
+    "prepare": "simple-git-hooks || true",
+    "gen:scope": "node scripts/gen-scope-sequence.mjs",
+    "check:scope": "node scripts/gen-scope-sequence.mjs --check"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.2",
