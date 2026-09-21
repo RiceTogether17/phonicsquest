@@ -1667,6 +1667,16 @@ body.bedtime-on * {
   color: var(--color-warning-shadow);
 }
 
+/* Says what the timed figure actually measures, beside the figure itself.
+   Audit 2026-09-19, finding 14. */
+.fs-summary-scope {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
 /* ── Listen & Spell mode (encoding) ──────────────────────────────────── */
 .las-round {
   width: 100%;

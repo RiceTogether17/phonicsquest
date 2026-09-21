@@ -28,7 +28,7 @@ import { audio } from './modules/audio.js';
 import { gamification } from './modules/gamification.js';
 import { badges } from './modules/badges.js';
 import { progress, isStageHiddenForMode } from './modules/progress.js';
-import { classifyEvidence, EVIDENCE } from './modules/evidence.js';
+import { classifyEvidence, EVIDENCE, usesStretchedSpeechSupport } from './modules/evidence.js';
 import { showBlendConfirm, cleanupBlendConfirm } from './modes/blendConfirm.js';
 import { renderAdultVerdictBar, removeAdultVerdictBar } from './components/adultVerdict.js';
 import {
@@ -1086,6 +1086,11 @@ class App {
         hintUsed: this._hintUsed,
         wrongStrikes: this._wrongStrikes,
         adultVerdict: this._adultVerdict,
+        // Stretched speech segments the word aloud, handing the child the
+        // phoneme boundaries that sound-counting asks them to find. That is
+        // support, so the result cannot be independent evidence while it is on.
+        // Audit 2026-09-19, finding 14.
+        supportUsed: usesStretchedSpeechSupport(this._mode) && !!store.get('stretchedSpeech'),
       });
     progress.recordAttempt(word.id, correct, this._mode, responseTime, evidence);
 
