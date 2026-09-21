@@ -631,20 +631,63 @@ class Store {
     }
   }
 
-  /** Show a user-visible warning when storage is persistently failing */
+  /**
+   * Show a user-visible warning when storage is persistently failing.
+   *
+   * Audit 2026-09-19, finding 22. The advice used to be "Device storage full
+   * — progress may not be saved. Try clearing browser data." Clearing browser
+   * data for this site is what deletes the child's progress: every profile,
+   * every mastery record and every badge lives in this device's localStorage
+   * and nowhere else. The app was telling a parent whose saves were already
+   * failing to destroy the saves that had worked.
+   *
+   * So the offer comes first. "Save a backup" writes the same
+   * credential-free export the dashboard produces (finding 5: no PIN, no AI
+   * key), after which clearing site data is a recoverable act rather than a
+   * final one. The toast stays until it is dismissed — an eight-second
+   * warning about losing a term's work is not a warning.
+   */
   _showStorageWarning() {
     const container = document.getElementById('toast-container');
     if (!container) return;
     // Only show once per session
     if (this._storageWarningShown) return;
     this._storageWarningShown = true;
+
     const toast = document.createElement('div');
     toast.className = 'toast toast--warning';
     toast.setAttribute('role', 'alert');
-    toast.textContent =
-      'Device storage full — progress may not be saved. Try clearing browser data.';
+
+    const label = document.createElement('span');
+    label.textContent =
+      'Device storage is full, so new progress is not being saved. ' +
+      "This app keeps progress on this device only — save a backup before clearing anything, or it's gone. ";
+
+    const save = document.createElement('button');
+    save.type = 'button';
+    save.className = 'btn btn--small';
+    save.textContent = 'Save a backup';
+    save.addEventListener('click', async () => {
+      // Imported here rather than at the top: profiles.js imports this
+      // module, so a static import would be a cycle.
+      try {
+        const { getActiveProfile, exportProfile } = await import('./profiles.js');
+        const active = getActiveProfile();
+        save.textContent = active && exportProfile(active.id) ? 'Backup saved' : 'Could not save';
+      } catch (_) {
+        save.textContent = 'Could not save';
+      }
+      save.disabled = true;
+    });
+
+    const dismiss = document.createElement('button');
+    dismiss.type = 'button';
+    dismiss.className = 'btn btn--small btn--ghost';
+    dismiss.textContent = 'Dismiss';
+    dismiss.addEventListener('click', () => toast.remove());
+
+    toast.append(label, save, dismiss);
     container.appendChild(toast);
-    setTimeout(() => toast.remove(), 8000);
   }
 
   /**

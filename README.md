@@ -160,6 +160,18 @@ https://jastonchamp.github.io/phonicsquest/
 
 No install needed. Works on desktop and mobile. Add to home screen for offline play (PWA).
 
+**What "offline" covers.** On the first visit the service worker saves the app
+shell, every activity's code and every phoneme MP3 — about 4 MB — and only then
+does the indicator say the app is ready offline. After that, every activity
+opens with no connection, including ones the child has never opened before.
+Story illustrations (21 MB) are the exception: they are cached the first time
+they are seen, so a story never opened online may appear without its pictures.
+The AI tutor, which is off by default, needs a connection.
+
+Progress lives in this browser's storage on this device and is never uploaded.
+Clearing site data deletes it, so export a backup first — Grown-ups → Parent
+Dashboard, or the button on the storage-full warning.
+
 ### Option B — Run locally
 
 ```bash
