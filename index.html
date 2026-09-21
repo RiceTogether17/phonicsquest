@@ -1270,6 +1270,24 @@
                 <span class="ai-option-title">🔑 Use your own AI account</span>
               </div>
               <p class="settings-help">Get a free key from any one of these, then come back and paste it. Giri works out the rest.</p>
+              <!--
+                Audit 2026-09-19, finding 6: privacy.html said learner
+                information never leaves the device while these features send
+                composition drafts to an external provider. An adult choosing
+                this path needs to know that before they choose it, not
+                afterwards in a policy page.
+              -->
+              <div class="ai-disclosure" role="note">
+                <p><strong>Before you turn this on.</strong> Using your own AI account sends
+                text from this device straight to the provider you pick. That includes
+                <strong>your child's full composition</strong> when writing feedback is used,
+                and the question plus their answer when they ask for a hint.</p>
+                <p>The profile name and age are never added to those requests, but anything
+                your child writes into a story is sent as they wrote it. What the provider
+                does with that text is covered by their terms, not ours.</p>
+                <p>Every activity works without this. Leaving it off costs hints and automated
+                writing feedback, and nothing else. <a href="privacy.html" target="_blank" rel="noopener">Read the privacy policy</a>.</p>
+              </div>
               <div class="settings-row ai-getkey-row">
                 <a class="btn btn--ghost btn--sm" id="ai-getkey-google" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google Gemini — free ↗</a>
                 <a class="btn btn--ghost btn--sm" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Anthropic ↗</a>

@@ -17563,6 +17563,32 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   border: 1px solid var(--border, #e5e3fa);
   border-radius: var(--radius-md, 10px);
 }
+/* Adult-facing note shown before cloud AI is enabled, saying what leaves the
+   device. Audit 2026-09-19, finding 6. */
+.ai-disclosure {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--color-warning);
+  border-radius: var(--radius-sm, 6px);
+  background: var(--color-warning-light);
+  /* The warning tint is a fixed light value, as it is everywhere else it is
+     used, so pin the text dark rather than inherit a dark-mode foreground
+     that would be unreadable on it. */
+  color: #422006;
+  font-size: var(--font-size-sm, 0.875rem);
+  line-height: 1.5;
+}
+.ai-disclosure a {
+  color: #7c3d00;
+  text-decoration: underline;
+}
+.ai-disclosure p {
+  margin: 0 0 0.5em;
+}
+.ai-disclosure p:last-child {
+  margin-bottom: 0;
+}
+
 .ai-option-head {
   display: flex;
   align-items: baseline;
