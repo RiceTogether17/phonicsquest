@@ -43,6 +43,77 @@ const devWarn = (...args) => {
  */
 const DEEP_MERGE_KEYS = ['adaptiveConfig', 'questMastery', 'clueStats'];
 
+/**
+ * Keys that must never leave the device in a progress export.
+ *
+ * Audit 2026-09-19, finding 5: `exportProfile` serialised the whole saved
+ * state as `progressData`, so an ordinary "send my child's progress to the
+ * teacher" file carried the parent's AI provider credential and their PIN
+ * hash. Two categories are held back:
+ *
+ *   credentials / PIN   secrets. A progress file is routinely shared by
+ *                       email or chat; a key in it is a disclosed key.
+ *   provider config     which AI provider, model, spend and error history
+ *                       belong to the device and the bill-payer, not to the
+ *                       child's learning record. Carrying them between
+ *                       devices on import would silently reconfigure the
+ *                       destination.
+ */
+export const NON_EXPORTABLE_STATE_KEYS = Object.freeze([
+  'parentPin',
+  'geminiApiKey',
+  'aiProvider',
+  'aiApiKeys',
+  'aiModels',
+  'aiSpend',
+  'aiLastError',
+  'aiUsageLog',
+]);
+
+/**
+ * Second line of defence: anything key-, token-, secret-, PIN- or
+ * password-shaped is withheld even if nobody remembered to list it above.
+ *
+ * Why this exists rather than a plain allowlist of progress keys: roughly a
+ * third of a learner's record is written under keys that never appear in
+ * DEFAULT_STATE (`wvWeakSkills`, `ccqCompletedByPassage`, `masteryMap`,
+ * `paperMode` and ~20 more are created on first use). An allowlist derived
+ * from DEFAULT_STATE drops those on export, which is silent loss of a
+ * child's progress — the failure the audit's own acceptance criterion
+ * ("ordinary progress round-trips without loss") rules out. So progress is
+ * carried by default and secrecy is enforced by name, with
+ * `storeExportPolicy.test.js` requiring that every secret-shaped key in
+ * DEFAULT_STATE has been classified deliberately.
+ */
+const SECRET_KEY_PATTERN = /(api|secret|token|password|passcode|credential|pin\b|pinhash)/i;
+
+/** True when a state key must not appear in an export. */
+export function isNonExportableStateKey(key) {
+  return NON_EXPORTABLE_STATE_KEYS.includes(key) || SECRET_KEY_PATTERN.test(key);
+}
+
+/** The DEFAULT_STATE keys an export carries. */
+export function exportableStateKeys() {
+  return Object.keys(DEFAULT_STATE).filter((k) => !isNonExportableStateKey(k));
+}
+
+/**
+ * Copy a saved-state object minus anything withheld.
+ * Applied on the way out (export) and on the way in (import), so restoring
+ * an export written before this policy existed cannot reinstate a credential
+ * or silently repoint this device's AI provider.
+ * @param {object} state
+ * @returns {object}
+ */
+export function pickExportableState(state) {
+  if (!state || typeof state !== 'object') return {};
+  const out = {};
+  for (const key of Object.keys(state)) {
+    if (!isNonExportableStateKey(key)) out[key] = state[key];
+  }
+  return out;
+}
+
 /** Default application state */
 const DEFAULT_STATE = {
   /**

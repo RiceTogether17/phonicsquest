@@ -7,7 +7,7 @@
  * App settings (theme, audio, parentPin) remain global.
  */
 
-import { store } from './store.js';
+import { store, pickExportableState } from './store.js';
 
 /**
  * A learner profile as persisted under `phonicsquest_profiles`.
@@ -394,14 +394,17 @@ export function exportProfile(id) {
   let progressData;
   try {
     const raw = localStorage.getItem(PROFILE_STORAGE_KEY(id));
-    progressData = raw ? JSON.parse(raw) : {};
+    // Allowlist, not the whole saved state: this file gets emailed to a
+    // teacher or carried on a USB stick, and used to include the parent's AI
+    // key and PIN hash. Audit 2026-09-19, finding 5.
+    progressData = pickExportableState(raw ? JSON.parse(raw) : {});
   } catch (_) {
     progressData = {};
   }
 
   const exportPayload = {
     _type: 'phonicsquest_profile_export',
-    _version: 2,
+    _version: 3,
     _exportedAt: new Date().toISOString(),
     profile,
     progressData,
@@ -484,9 +487,13 @@ export function importProfile(jsonString) {
   // same as the exported one.
   if (payload.progressData && typeof payload.progressData === 'object') {
     try {
+      // Filtered on the way in as well. A file exported before the allowlist
+      // existed still carries aiApiKeys/parentPin, and restoring it must not
+      // reinstate a credential — or silently repoint this device's AI
+      // provider at the exporting parent's account.
       localStorage.setItem(
         PROFILE_STORAGE_KEY(newProfile.id),
-        JSON.stringify(payload.progressData),
+        JSON.stringify(pickExportableState(payload.progressData)),
       );
     } catch (_) {
       return {
@@ -531,7 +538,9 @@ export function parseProfileImportPayload(jsonString) {
       readingBand: importedBand,
     },
     progressData:
-      payload.progressData && typeof payload.progressData === 'object' ? payload.progressData : {},
+      payload.progressData && typeof payload.progressData === 'object'
+        ? pickExportableState(payload.progressData)
+        : {},
     error: null,
   };
 }
