@@ -4,6 +4,7 @@
  * No framework needed – subscribe to keys and get notified on change.
  */
 
+import { localDayKey, localDayKeyBefore } from '../utils/localDay.js';
 import { scheduleAttempt, seedFromLegacy } from './reviewScheduler.js';
 import { idbGet, idbSet, isAvailable as idbAvailable } from './idb.js';
 import {
@@ -1030,9 +1031,16 @@ class Store {
     if (!amount || amount <= 0) return;
     this.set('sessionXpToday', (this._state.sessionXpToday || 0) + amount);
 
-    // Accumulate into rolling weekly log (one entry per calendar day)
-    const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
-    const cutoff = new Date(Date.now() - 8 * 86400000).toISOString().slice(0, 10);
+    // Accumulate into rolling weekly log (one entry per calendar day).
+    //
+    // Audit 2026-09-19, finding 23: "calendar day" was the UTC date. In
+    // Singapore a child playing before 8am local is filed under the previous
+    // day, so one local day splits across two entries and the week's XP is
+    // attributed to days the child did not play. Local keys, from the same
+    // helper the progress chart uses, so the two cannot disagree about what
+    // day it is.
+    const today = localDayKey();
+    const cutoff = localDayKeyBefore(Date.now(), 8);
     const log = (this._state.weeklyXpLog || []).filter((e) => e.date >= cutoff);
     const todayEntry = log.find((e) => e.date === today);
     if (todayEntry) {

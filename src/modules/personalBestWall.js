@@ -20,6 +20,7 @@ import { getProfileScopedKey } from './profiles.js';
  *     stories localStorage key.
  */
 
+import { localDayKeyBefore } from '../utils/localDay.js';
 import { store } from './store.js';
 import { badges } from './badges.js';
 import { getActiveProfile } from './profiles.js';
@@ -76,7 +77,10 @@ export function getPersonalBests(opts = {}) {
   const dailyChallengesEver = challengeCal.length;
 
   // ── XP this week (from rolling daily ledger) ─────────────────────────
-  const cutoff7Iso = new Date(now - 7 * DAY_MS).toISOString().slice(0, 10);
+  // The ledger is keyed by LOCAL calendar day (audit 2026-09-19, finding 23),
+  // so the cutoff has to be too — a UTC-derived bound against local keys is
+  // off by one day for part of every day east of Greenwich.
+  const cutoff7Iso = localDayKeyBefore(now, 7);
   const weeklyXpLog = Array.isArray(store.get('weeklyXpLog')) ? store.get('weeklyXpLog') : [];
   const xpThisWeek = weeklyXpLog
     .filter((e) => e?.date >= cutoff7Iso)
