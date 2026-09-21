@@ -84,10 +84,13 @@ const GRAMMAR_BUILDERS = {
         'the': '"The" would mean a specific orange already known to both speaker and listener.',
         'some': '"Some" is for plural or uncountable nouns, not one orange.',
       }],
-      ['Please pass me ___ ruler so I can draw a margin.', 'a', ['an', 'the', 'some'], {
-        'a': '"A" is correct because "ruler" starts with the consonant sound /r/.',
+      // Audit 2026-09-19, finding 11: both "a" and "the" were possible, since
+      // nothing established whether a specific ruler was meant. "any ruler will
+      // do" makes it indefinite.
+      ['Please pass me ___ ruler — any ruler will do — so I can draw a margin.', 'a', ['an', 'the', 'some'], {
+        'a': '"A" is correct: "any ruler will do" means no particular ruler, and "ruler" starts with the consonant sound /r/.',
         'an': '"An" is used before vowel sounds, but "ruler" begins with the consonant /r/.',
-        'the': '"The" would mean a specific ruler the listener already knows about.',
+        'the': '"The" would point to one specific ruler, but "any ruler will do" says it does not matter which.',
         'some': '"Some" is for plural or uncountable nouns, not one ruler.',
       }],
       ['___ uniform with the school crest hung in the display case.', 'A', ['An', 'The', 'Some'], {
@@ -948,10 +951,14 @@ const GRAMMAR_BUILDERS = {
         'had': '"Had" is past tense, but the sentence is in the present.',
         'having': '"Having" alone cannot be the main verb — it needs a helper like "is".',
       }],
-      ['Both the teacher and the principal ___ the new timetable.', 'support', ['supports', 'supported', 'is supporting'], {
-        'support': '"Support" is correct because "both...and" joins two people, making the subject plural.',
+      // Audit 2026-09-19, finding 11: the stem was "Both the teacher and the
+      // principal ___ the new timetable." with both "support" and "supported"
+      // offered and no time context to choose between them. "supported" was
+      // marked wrong for a defensible answer. The clause now fixes the time.
+      ['Both the teacher and the principal ___ the new timetable, which begins this Monday.', 'support', ['supports', 'supported', 'is supporting'], {
+        'support': '"Support" is correct because "both...and" joins two people, making the subject plural — and "begins this Monday" places the sentence in the present.',
         'supports': '"Supports" is for singular subjects, but "both the teacher and the principal" is plural.',
-        'supported': '"Supported" is simple past, but the sentence is in the present.',
+        'supported': '"Supported" is simple past, but "which begins this Monday" is still ahead of us.',
         'is supporting': '"Is supporting" uses a singular auxiliary "is", but the subject is plural.',
       }],
       ['A box of crayons ___ been left in the art room.', 'has', ['have', 'had', 'having'], {
@@ -966,10 +973,13 @@ const GRAMMAR_BUILDERS = {
         'were': '"Were" is plural past tense, but the sentence is in the present.',
         'be': '"Be" is a base form and cannot be used as a main verb without a helper.',
       }],
-      ['The news about the school trip ___ very exciting.', 'is', ['are', 'was', 'be'], {
-        'is': '"Is" is correct because "news" is an uncountable noun that is always singular.',
+      // Audit 2026-09-19, finding 11: "is" and "was" were both offered with no
+      // tense clue in the stem, so "was" was a defensible answer marked wrong.
+      // "we leave on Friday" now settles it.
+      ['The news about the school trip ___ very exciting — we leave on Friday!', 'is', ['are', 'was', 'be'], {
+        'is': '"Is" is correct because "news" is an uncountable noun that is always singular, and "we leave on Friday" shows this is happening now.',
         'are': '"Are" is for plural subjects, but "news" is always singular even though it ends in -s.',
-        'was': '"Was" is singular past tense, but the sentence describes a present state.',
+        'was': '"Was" is past tense, but the trip is still to come — "we leave on Friday".',
         'be': '"Be" is a base form and cannot be used as a main verb without a helper.',
       }],
       ['Not a single pupil ___ absent on Picture Day.', 'was', ['were', 'is', 'are'], {
