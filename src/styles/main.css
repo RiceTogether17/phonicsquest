@@ -10,6 +10,13 @@
   --color-primary: #5a52e0;
   --color-primary-light: #ede9fe;
   --color-primary-dark: #4c46c8;
+  /* Text colour for a pill sitting on an 18%-primary tint.
+     Audit 2026-09-19, finding 20: .placeholder-paper-link used
+     --color-primary on that tint, which fails WCAG AA small-text 4.5:1 in
+     every theme (default 4.37, sky 2.19, green 1.88, orange 2.21).
+     --color-primary-dark was not enough either — it still failed in three of
+     the four. A token per theme, rather than a per-screen override. */
+  --color-primary-on-tint: #4e45de;
   --color-secondary: #ff6b8a;
   --color-success: #22c55e;
   --color-success-light: #dcfce7;
@@ -125,6 +132,7 @@
   --color-primary: #0ea5e9;
   --color-primary-light: #e0f2fe;
   --color-primary-dark: #0284c7;
+  --color-primary-on-tint: #096690;
   --bg: #f0f9ff;
   --surface-2: #e0f2fe;
   --border: #bae6fd;
@@ -137,6 +145,7 @@
   --color-primary: #22c55e;
   --color-primary-light: #dcfce7;
   --color-primary-dark: #16a34a;
+  --color-primary-on-tint: #137036;
   --bg: #f0fdf4;
   --surface-2: #dcfce7;
   --border: #bbf7d0;
@@ -149,6 +158,7 @@
   --color-primary: #f97316;
   --color-primary-light: #ffedd5;
   --color-primary-dark: #ea580c;
+  --color-primary-on-tint: #a04404;
   --bg: #fff7ed;
   --surface-2: #ffedd5;
   --border: #fed7aa;
@@ -233,6 +243,10 @@
   :root:not([data-theme='contrast']) {
     --bg: #0f0e1a;
     --surface: #1a1830;
+    /* The 18% tint is dark here, so the pill text flips light. Each theme's
+       existing --color-primary-light clears 11:1 on it.
+       Audit 2026-09-19, finding 20. */
+    --color-primary-on-tint: var(--color-primary-light);
     --surface-2: #252340;
     --border: #2d2b55;
     --text: #e8e6ff;
@@ -15963,7 +15977,7 @@ textarea:hover {
   display: inline-block;
   font-size: 0.78rem;
   background: color-mix(in srgb, var(--color-primary) 18%, transparent);
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   padding: 2px 8px;
   border-radius: 999px;
 }
@@ -16718,6 +16732,17 @@ textarea:hover {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 10px;
+  /* Real <ul>/<li> now, for the item count a screen reader announces.
+     Audit 2026-09-19, finding 20. */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cc-quest__level-item {
+  display: flex;
+}
+.cc-quest__level-item > .cc-quest__level-btn {
+  width: 100%;
 }
 .cc-quest__level-btn {
   display: flex;

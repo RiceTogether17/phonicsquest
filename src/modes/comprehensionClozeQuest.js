@@ -104,15 +104,22 @@ function _renderLevelPicker() {
   const tiles = COMPREHENSION_CLOZE_LEVELS.map((lv) => {
     const count = getComprehensionClozePassages(lv).length;
     return `
-      <button class="cc-quest__level-btn" type="button" data-level="${lv}" aria-label="Open ${lv} comprehension cloze passages">
-        <span class="cc-quest__level-name">${lv}</span>
-        <span class="cc-quest__level-count">${count} passage${count === 1 ? '' : 's'}</span>
-      </button>`;
+      <li class="cc-quest__level-item">
+        <button class="cc-quest__level-btn" type="button" data-level="${lv}" aria-label="Open ${lv} comprehension cloze passages">
+          <span class="cc-quest__level-name">${lv}</span>
+          <span class="cc-quest__level-count">${count} passage${count === 1 ? '' : 's'}</span>
+        </button>
+      </li>`;
   }).join('');
+  // Audit 2026-09-19, finding 20: this was a <div role="list"> whose children
+  // were bare <button>s, which axe reports as a critical
+  // aria-required-children violation — a list that promises list items and has
+  // none leaves a screen-reader user with no item count and no way to navigate
+  // it as a list. Real <ul>/<li> markup with the buttons inside gives both.
   body.innerHTML = `
     <div class="cc-quest__picker">
-      <p class="cc-quest__picker-prompt">Choose a level to begin:</p>
-      <div class="cc-quest__levels" role="list">${tiles}</div>
+      <p class="cc-quest__picker-prompt" id="cc-quest-picker-prompt">Choose a level to begin:</p>
+      <ul class="cc-quest__levels" aria-labelledby="cc-quest-picker-prompt">${tiles}</ul>
     </div>`;
   body.querySelectorAll('[data-level]').forEach((btn) => {
     btn.addEventListener('click', () => _startLevel(btn.dataset.level));
