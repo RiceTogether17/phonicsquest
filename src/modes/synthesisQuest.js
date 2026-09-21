@@ -23,7 +23,7 @@ const SESSION_SIZE = 8;
 const MAX_TRIES = 2;
 
 // ── Teach-back content per skillKey ─────────────────────────────────────────
-const SQ_TEACHBACK = {
+export const SQ_TEACHBACK = {
   connectorContrast: {
     icon: '⚡',
     rule: 'Contrast connectors join two opposing ideas',
@@ -51,9 +51,13 @@ const SQ_TEACHBACK = {
   },
   connectorCondition: {
     icon: '🔐',
+    // Audit 2026-09-19, finding 10: the tip said never pair "unless" with
+    // "not" in the same clause. That is a useful habit, not a rule of
+    // grammar -- "unless you don't mind" is ordinary English. Stated as a
+    // never, it teaches a child to mark correct sentences wrong.
     rule: '"Unless" means "if not"; "provided that" means "on the condition that"',
     structure: '[Main clause] unless [condition].  /  [Main clause] provided that [condition].',
-    tip: 'Never pair "unless" with "not" in the same clause — "unless" already contains the negative.',
+    tip: 'Because "unless" already carries the "not", adding another one usually reverses your meaning by accident: "unless you do not hurry" says the opposite of what you meant. Say the condition positively — "unless you hurry". (Some sentences genuinely need both, as in "unless you don\'t mind waiting", so check the meaning rather than counting negatives.)',
   },
   activeToPassive: {
     icon: '🔄',
@@ -100,9 +104,14 @@ const SQ_TEACHBACK = {
   },
   advancedConstruction: {
     icon: '🏆',
-    rule: 'Fronted negative/emphatic elements require subject-verb inversion',
-    structure: '[Never/Seldom/Not until] + [auxiliary] + [subject] + [main verb].',
-    tip: '"It was not until…that" and fronted negatives (never/seldom/rarely) all trigger inversion.',
+    // Audit 2026-09-19, finding 10: the tip said "It was not until…that" and
+    // fronted negatives "all trigger inversion". The cleft does the opposite --
+    // it exists so the clause can keep normal word order. Teaching them as one
+    // rule produces "It was not until noon that did he arrive".
+    rule: 'A fronted negative inverts the verb; the "It was not until…that" cleft does not',
+    structure:
+      'Fronted: [Never/Seldom/Not until …] + [auxiliary] + [subject] + [verb].  /  Cleft: It was not until [time] that + [subject] + [verb].',
+    tip: 'Compare: "Not until noon did he arrive." (fronted — inverted) with "It was not until noon that he arrived." (cleft — normal order). Same meaning, and only the fronted one inverts.',
   },
   causativeHave: {
     icon: '🛠️',
