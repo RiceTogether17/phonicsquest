@@ -143,7 +143,20 @@ const DEFAULT_STATE = {
   // Settings
   theme: 'default',
   difficulty: 1, // 1 | 2 | 3
+  // Reward and interface noises only: the celebration chime, the tap click.
+  // Audit 2026-09-19, finding 8: this flag also gated every instructional
+  // voice method in audio.js, so a teacher turning off reward noises silenced
+  // the spoken stimulus that phonemic-awareness tasks require the child to
+  // hear before they can answer. Teaching audio has its own switch below.
   sfxEnabled: true,
+
+  // The spoken stimulus: phonemes, words, sentences, stretched and
+  // articulated speech. A child cannot answer "what sound does this start
+  // with?" without it, so it is deliberately separate from effects and
+  // defaults on. When it is off, audio-dependent assessment must not present
+  // itself as answerable -- see `isTeachingAudioAvailable` in audio.js.
+  teachingAudioEnabled: true,
+
   autoplay: true,
   voiceSpeed: 0.8,
   // When true, phonemic-awareness modes play the prompt word "stretched"

@@ -60,9 +60,16 @@ export const settingsController = {
       });
     });
 
-    // ── SFX toggle ─────────────────────────────────────────────────────────
+    // ── SFX toggle (reward/interface noises only) ──────────────────────────
     document.getElementById('sfx-toggle')?.addEventListener('change', (e) => {
       store.set('sfxEnabled', /** @type {HTMLInputElement} */ (e.target).checked);
+    });
+
+    // ── Teaching-voice toggle ─────────────────────────────────────────────
+    // Separate from effects: audit 2026-09-19 finding 8 found one switch
+    // labelled "Sound Effects" silencing the spoken stimulus as well.
+    document.getElementById('teaching-audio-toggle')?.addEventListener('change', (e) => {
+      store.set('teachingAudioEnabled', /** @type {HTMLInputElement} */ (e.target).checked);
     });
 
     // ── Autoplay toggle ────────────────────────────────────────────────────
@@ -310,6 +317,11 @@ export const settingsController = {
   apply(store) {
     const sfx = /** @type {HTMLInputElement|null} */ (document.getElementById('sfx-toggle'));
     if (sfx) sfx.checked = store.get('sfxEnabled');
+
+    const teachingAudio = /** @type {HTMLInputElement|null} */ (
+      document.getElementById('teaching-audio-toggle')
+    );
+    if (teachingAudio) teachingAudio.checked = store.get('teachingAudioEnabled');
 
     const autoplay = /** @type {HTMLInputElement|null} */ (
       document.getElementById('autoplay-toggle')

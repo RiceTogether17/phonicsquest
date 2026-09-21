@@ -398,7 +398,7 @@ class AudioManager {
    * @returns {Promise<void>}
    */
   async speakPhoneme(grapheme, type, opts = {}) {
-    if (!store.get('sfxEnabled')) return;
+    if (!store.get('teachingAudioEnabled')) return;
 
     // Map grapheme + type to audio key
     let key = grapheme.toLowerCase();
@@ -535,7 +535,7 @@ class AudioManager {
    * @returns {Promise<void>}
    */
   speakWord(word) {
-    if (!store.get('sfxEnabled')) return Promise.resolve();
+    if (!store.get('teachingAudioEnabled')) return Promise.resolve();
     return this._speak(word, store.get('voiceSpeed') ?? 0.8);
   }
 
@@ -547,7 +547,7 @@ class AudioManager {
    * @returns {Promise<void>}
    */
   speakText(text) {
-    if (!store.get('sfxEnabled')) return Promise.resolve();
+    if (!store.get('teachingAudioEnabled')) return Promise.resolve();
     const rate = Math.max(store.get('voiceSpeed') ?? 0.8, 0.85);
     return this._speak(text, rate);
   }
@@ -571,7 +571,7 @@ class AudioManager {
    * @returns {Promise<void>}
    */
   speakWordArticulated(word) {
-    if (!store.get('sfxEnabled')) return Promise.resolve();
+    if (!store.get('teachingAudioEnabled')) return Promise.resolve();
     const userRate = store.get('voiceSpeed') ?? 0.8;
     // Neutral pitch: the playful +10% used for chatter shifts vowel
     // formants slightly, which matters when the child is trying to hear
@@ -608,7 +608,7 @@ class AudioManager {
    * @returns {Promise<void>}
    */
   speakSentenceWord(word) {
-    if (!store.get('sfxEnabled')) return Promise.resolve();
+    if (!store.get('teachingAudioEnabled')) return Promise.resolve();
     const key = String(word || '').trim();
     // Function words carry the sight-word overrides ("a" is the schwa /ə/,
     // not the letter name /eɪ/) and standing alone is exactly where TTS
@@ -647,7 +647,7 @@ class AudioManager {
    * @returns {Promise<void>}
    */
   async speakWordTwiceClear(word) {
-    if (!store.get('sfxEnabled')) return;
+    if (!store.get('teachingAudioEnabled')) return;
     const userRate = store.get('voiceSpeed') ?? 0.8;
     await this._speak(word, Math.min(userRate, 0.55), { pitch: 1.0, preDelayMs: 150 });
     await new Promise(r => setTimeout(r, 450));
@@ -672,7 +672,7 @@ class AudioManager {
    * @returns {Promise<void>}
    */
   speakSightWord(word) {
-    if (!store.get('sfxEnabled')) return Promise.resolve();
+    if (!store.get('teachingAudioEnabled')) return Promise.resolve();
     const key = String(word || '').trim();
     const override = SIGHT_WORD_PRONUNCIATIONS[key] || SIGHT_WORD_PRONUNCIATIONS[key.toLowerCase()];
     if (override?.phoneme) {
@@ -701,7 +701,7 @@ class AudioManager {
    * @returns {Promise<void>}
    */
   async speakWordStretched(wordData) {
-    if (!store.get('sfxEnabled')) return;
+    if (!store.get('teachingAudioEnabled')) return;
 
     const word      = typeof wordData === 'string' ? wordData : wordData?.word;
     const graphemes = typeof wordData === 'string' ? null     : wordData?.graphemes;
@@ -754,7 +754,7 @@ class AudioManager {
    * @returns {Promise<void>}
    */
   async speakChunk(wordData, endIndexExclusive) {
-    if (!store.get('sfxEnabled')) return;
+    if (!store.get('teachingAudioEnabled')) return;
     const graphemes = wordData?.graphemes;
     if (!Array.isArray(graphemes) || graphemes.length === 0) {
       return this.speakWord(wordData?.word || '');
@@ -822,7 +822,27 @@ class AudioManager {
     await this.speakWord(wordData.word);
   }
 
-  /** Play a UI sound effect */
+  /**
+   * Whether the spoken stimulus is available right now.
+   *
+   * Audio-dependent tasks must consult this before presenting themselves as
+   * answerable. "What sound does this word start with?" with the voice off is
+   * not a hard question, it is an unanswerable one, and a wrong answer
+   * recorded against it is a measurement of the setting rather than the
+   * child. Audit 2026-09-19, finding 8.
+   *
+   * @returns {boolean}
+   */
+  isTeachingAudioAvailable() {
+    return !!store.get('teachingAudioEnabled');
+  }
+
+  /**
+   * Play a reward or interface sound effect.
+   *
+   * Gated on `sfxEnabled` alone. This is the only method that switch governs:
+   * silencing celebrations must never silence teaching.
+   */
   async playSfx(name) {
     if (!store.get('sfxEnabled')) return;
     const ctx = this._ensureCtx();

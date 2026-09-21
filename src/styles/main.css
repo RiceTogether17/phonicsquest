@@ -2755,6 +2755,24 @@ body:has(#screen-stories.screen.active) .mascot-float {
   cursor: pointer;
 }
 
+/* Sub-label under a toggle name, e.g. what "Teaching voice" actually controls.
+   Audit 2026-09-19 finding 8: an unexplained "Sound Effects" switch was
+   silencing the spoken stimulus, so each audio switch now says what it does. */
+.toggle-row > span:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding-right: var(--space-3);
+}
+
+.toggle-hint {
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--color-text-muted, #6b7280);
+}
+
 .toggle-wrap {
   position: relative;
   flex-shrink: 0;
