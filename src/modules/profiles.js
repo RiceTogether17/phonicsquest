@@ -316,12 +316,74 @@ export function getProfileScopedKey(base) {
  * Adding a new profile-scoped module? Add its BASE key here so the
  * scoped variant gets cleaned up cleanly.
  *
- * Pre-existing globally-keyed storage (giri_stories_read, giri_meet_words,
- * giri_comp_log, phonicsquest_badges, lscwc_stats) is NOT cleaned up here
- * — they're known to leak across profiles and need a separate migration
- * pass (audit follow-up).
+ * The five keys below giri_friends_unlocked were global until audit
+ * 2026-09-19, finding 4: story reads, word preparation, comprehension logs,
+ * spelling-drill stats and badges were shared by every child on the device, so
+ * a report could describe a mixture of learners and a second child could
+ * inherit the first one's read stories. They are now scoped like the rest, and
+ * registered here so deleting a learner removes them.
  */
-const PROFILE_SCOPED_BASE_KEYS = ['giri_friends_unlocked'];
+const PROFILE_SCOPED_BASE_KEYS = [
+  'giri_friends_unlocked',
+  'giri_stories_read',
+  'giri_meet_words',
+  'giri_comp_log',
+  'lscwc_stats',
+  'phonicsquest_badges',
+];
+
+/**
+ * Marker recording that the one-time legacy adoption below has run.
+ * Global by design: it is a device-level fact, not a learner record.
+ */
+const LEGACY_ADOPTION_KEY = 'phonicsquest_legacy_records_assigned';
+
+/**
+ * Assign pre-existing global records to exactly one profile, once.
+ *
+ * Before finding 4 these keys were global, so on an existing install there is
+ * one pile of records and no way to know whose they are. The audit is explicit
+ * that they must be migrated "with an explicit assignment strategy rather than
+ * duplicating them into every child" — copying them to every profile would
+ * manufacture evidence that several children had each read those stories.
+ *
+ * The strategy: the profile active at the moment of migration adopts them, and
+ * the global keys are then removed so no one else can inherit them. On a
+ * single-child install that is the right owner. On a shared device it is a
+ * guess, but a guess confined to one learner and made once, rather than a
+ * fiction repeated across all of them. Every other profile starts clean.
+ *
+ * @param {string} profileId — the profile adopting the legacy records
+ */
+export function adoptLegacyGlobalRecords(profileId) {
+  if (!profileId) return { adopted: [], alreadyRun: false };
+  try {
+    if (localStorage.getItem(LEGACY_ADOPTION_KEY)) {
+      return { adopted: [], alreadyRun: true };
+    }
+
+    const adopted = [];
+    for (const base of PROFILE_SCOPED_BASE_KEYS) {
+      const legacy = localStorage.getItem(base);
+      if (legacy === null) continue;
+
+      // Never overwrite a record the profile already has of its own.
+      const scoped = `${base}__${profileId}`;
+      if (localStorage.getItem(scoped) === null) {
+        localStorage.setItem(scoped, legacy);
+        adopted.push(base);
+      }
+      // Removed either way: leaving it behind is what lets the next child
+      // inherit it.
+      localStorage.removeItem(base);
+    }
+
+    localStorage.setItem(LEGACY_ADOPTION_KEY, new Date().toISOString());
+    return { adopted, alreadyRun: false };
+  } catch (_) {
+    return { adopted: [], alreadyRun: false };
+  }
+}
 
 /** @param {string} id */
 function _cleanupProfileScopedKeys(id) {
@@ -341,6 +403,10 @@ export function activateProfile(id) {
   _maybeMigrateLegacyProgressToProfile(id);
   localStorage.setItem(ACTIVE_PROFILE_KEY, id);
   store.setStorageKey(PROFILE_STORAGE_KEY(id));
+  // Stories, word prep, comprehension logs, spelling stats and badges were
+  // global before finding 4. One profile adopts whatever is already there,
+  // once, and the global copies go. See adoptLegacyGlobalRecords.
+  adoptLegacyGlobalRecords(id);
 }
 
 /**
@@ -373,6 +439,9 @@ export function restoreActiveProfile() {
   const id = getActiveProfileId();
   if (id && getProfiles().find((p) => p.id === id)) {
     store.setStorageKey(PROFILE_STORAGE_KEY(id));
+    // Covers the returning user who never re-activates: on an existing install
+    // this is the path that actually runs on page load.
+    adoptLegacyGlobalRecords(id);
     return true;
   }
   return false;

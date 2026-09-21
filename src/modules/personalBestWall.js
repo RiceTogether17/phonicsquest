@@ -1,3 +1,4 @@
+import { getProfileScopedKey } from './profiles.js';
 /**
  * PhonicsQuest – Personal Best Wall
  *
@@ -26,7 +27,16 @@ import { getLevelInfo } from '../data/curriculum.js';
 import { GRADUATED_BOX } from './reviewScheduler.js';
 
 const DAY_MS = 86_400_000;
-const STORIES_READ_KEY = 'giri_stories_read';
+/*
+ * Audit 2026-09-19, finding 4: this key was global, so every child on a shared
+ * device saw the same records. Scoped per profile via getProfileScopedKey, the
+ * mechanism giri_friends_unlocked already used. profiles.js registers the base
+ * name so deleting a profile cleans it up.
+ */
+const STORIES_READ_KEY_BASE = 'giri_stories_read';
+function storiesReadKey() {
+  return getProfileScopedKey(STORIES_READ_KEY_BASE);
+}
 
 /**
  * Build the full Personal Best Wall snapshot for the current profile.
@@ -171,7 +181,7 @@ export function getPersonalBests(opts = {}) {
 
 function _safeReadStoriesRead() {
   try {
-    const raw = localStorage.getItem(STORIES_READ_KEY);
+    const raw = localStorage.getItem(storiesReadKey());
     const arr = raw ? JSON.parse(raw) : [];
     return Array.isArray(arr) ? arr : [];
   } catch (_) {
@@ -192,4 +202,4 @@ function _pickHighlights({ streakBest, wordsGraduated, storiesFinished, level })
   return lines;
 }
 
-export const __TEST__ = { STORIES_READ_KEY, _safeReadStoriesRead, _pickHighlights };
+export const __TEST__ = { storiesReadKey, _safeReadStoriesRead, _pickHighlights };

@@ -1,3 +1,4 @@
+import { getProfileScopedKey } from '../modules/profiles.js';
 /**
  * Giri Stories — Story browser and reader
  *
@@ -104,11 +105,20 @@ let _rtgMatches = 0;
 let _rtgTotal = 0;
 
 // ── Story completion tracking ─────────────────────────────────────────────
-const READ_KEY = 'giri_stories_read';
+/*
+ * Audit 2026-09-19, finding 4: this key was global, so every child on a shared
+ * device saw the same records. Scoped per profile via getProfileScopedKey, the
+ * mechanism giri_friends_unlocked already used. profiles.js registers the base
+ * name so deleting a profile cleans it up.
+ */
+const READ_KEY_BASE = 'giri_stories_read';
+function readKey() {
+  return getProfileScopedKey(READ_KEY_BASE);
+}
 
 function getReadStories() {
   try {
-    return JSON.parse(localStorage.getItem(READ_KEY) ?? '[]');
+    return JSON.parse(localStorage.getItem(readKey()) ?? '[]');
   } catch {
     return [];
   }
@@ -118,7 +128,7 @@ function markStoryRead(id) {
   const read = getReadStories();
   if (!read.includes(id)) {
     read.push(id);
-    localStorage.setItem(READ_KEY, JSON.stringify(read));
+    localStorage.setItem(readKey(), JSON.stringify(read));
   }
   // C3 — every story has a co-star. Finishing the story unlocks the
   // friend (a one-shot narrative reward; pure charter-safe collectible
@@ -137,8 +147,26 @@ let _fluencyRunning = false;
 const PREFS_GRAPHEMES_KEY = 'giri_show_graphemes';
 const PREFS_RULER_KEY = 'giri_show_ruler';
 const PREFS_FOLLOW_KEY = 'giri_follow_mode';
-const MEET_WORDS_KEY = 'giri_meet_words';
-const COMP_LOG_KEY = 'giri_comp_log';
+/*
+ * Audit 2026-09-19, finding 4: this key was global, so every child on a shared
+ * device saw the same records. Scoped per profile via getProfileScopedKey, the
+ * mechanism giri_friends_unlocked already used. profiles.js registers the base
+ * name so deleting a profile cleans it up.
+ */
+const MEET_WORDS_KEY_BASE = 'giri_meet_words';
+function meetWordsKey() {
+  return getProfileScopedKey(MEET_WORDS_KEY_BASE);
+}
+/*
+ * Audit 2026-09-19, finding 4: this key was global, so every child on a shared
+ * device saw the same records. Scoped per profile via getProfileScopedKey, the
+ * mechanism giri_friends_unlocked already used. profiles.js registers the base
+ * name so deleting a profile cleans it up.
+ */
+const COMP_LOG_KEY_BASE = 'giri_comp_log';
+function compLogKey() {
+  return getProfileScopedKey(COMP_LOG_KEY_BASE);
+}
 
 let _showGraphemes = _loadPref(PREFS_GRAPHEMES_KEY, true);
 let _showRuler = _loadPref(PREFS_RULER_KEY, false);
@@ -177,7 +205,7 @@ function _todayStr() {
 
 function _readMeetWordsMap() {
   try {
-    const raw = localStorage.getItem(MEET_WORDS_KEY);
+    const raw = localStorage.getItem(meetWordsKey());
     return raw ? JSON.parse(raw) : {};
   } catch {
     return {};
@@ -186,7 +214,7 @@ function _readMeetWordsMap() {
 
 function _writeMeetWordsMap(map) {
   try {
-    localStorage.setItem(MEET_WORDS_KEY, JSON.stringify(map));
+    localStorage.setItem(meetWordsKey(), JSON.stringify(map));
   } catch {}
 }
 
@@ -219,11 +247,11 @@ const COMP_LOG_CAP = 100;
 
 export function _logComprehensionAttempt(entry) {
   try {
-    const raw = localStorage.getItem(COMP_LOG_KEY);
+    const raw = localStorage.getItem(compLogKey());
     const list = raw ? JSON.parse(raw) : [];
     list.push({ ts: Date.now(), ...entry });
     while (list.length > COMP_LOG_CAP) list.shift();
-    localStorage.setItem(COMP_LOG_KEY, JSON.stringify(list));
+    localStorage.setItem(compLogKey(), JSON.stringify(list));
   } catch {}
 }
 
