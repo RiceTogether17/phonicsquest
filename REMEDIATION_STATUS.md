@@ -8,19 +8,19 @@ Audited commit: `79dff37`. Findings: 26 (12 P1, 13 P2, 1 P3).
 
 ## Summary
 
-**All 12 P1 findings are addressed**, plus nine P2 findings: the four of the
+**All 12 P1 findings are addressed**, plus eleven P2 findings: the four of the
 audit's work package 4 (the remaining ones that produce a number a parent or
 teacher reads), the accessibility failures, the timezone bug, the two
-learning-experience findings, and the practice-bank counting. P1 is the audit's
-bar for "before assessment use or wider unsupervised rollout": incorrect
-marking or teaching, misleading assessment claims, cross-learner records,
-credential disclosure.
+learning-experience findings, the practice-bank counting, offline support and
+the AI request boundary. P1 is the audit's bar for "before assessment use or
+wider unsupervised rollout": incorrect marking or teaching, misleading
+assessment claims, cross-learner records, credential disclosure.
 
-**Every figure the audit named as overstated is now correct or gone.** Four P2
-findings and the one P3 remain; none of them produces a number anyone reads.
-They are real and two affect daily use.
+**Every figure the audit named as overstated is now correct or gone.** Two P2
+findings and the one P3 remain: MOE alignment, which the audit could not
+establish either, and engineering debt.
 
-Verification on the current head: 212 test files, 2,790 unit tests, 48 browser
+Verification on the current head: 214 test files, 2,835 unit tests, 51 browser
 tests, typecheck, lint (0 errors), formatting, scope/sequence check and bundle
 budget all pass.
 
@@ -65,23 +65,21 @@ produced a figure someone would read as a result.
 
 ## P2 — also done
 
-| #   | Finding                      | What changed                                                                                                                                                                                                                                                                                                        |
-| --- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 20  | Accessibility failures       | Cloze level picker is real `<ul>`/`<li>` markup. `--color-primary-on-tint` per theme, computed to clear 5:1 (all four themes failed before, worst 1.88:1), with dark mode mapped to `--color-primary-light`. CI now scans the five primary sections: 42 → 48.                                                       |
-| 23  | Timezone day labels          | Day keys are learner-local throughout, from one shared helper used by the chart, the XP ledger and its cutoff. Calendar stepping replaces fixed 24-hour blocks. Verified under five zones.                                                                                                                          |
-| 12  | Bank size overstates variety | Every generated item names the authored one it re-presents. Coverage counts those; repeats are shown as "revision rounds". P1 Articles reads "15 questions · 0 / 4 passages · +23 revision rounds" where it read "102 questions · 0 / 27 passages". README numbers now come from the live banks and a test says so. |
+| #   | Finding                      | What changed                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| --- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 20  | Accessibility failures       | Cloze level picker is real `<ul>`/`<li>` markup. `--color-primary-on-tint` per theme, computed to clear 5:1 (all four themes failed before, worst 1.88:1), with dark mode mapped to `--color-primary-light`. CI now scans the five primary sections: 42 → 48.                                                                                                                                                                                       |
+| 23  | Timezone day labels          | Day keys are learner-local throughout, from one shared helper used by the chart, the XP ledger and its cutoff. Calendar stepping replaces fixed 24-hour blocks. Verified under five zones.                                                                                                                                                                                                                                                          |
+| 22  | Offline support and recovery | The worker precaches every built chunk from a build manifest, so a module never opened online still opens offline; cache cleanup is namespaced, so another app on the origin survives; the cache version is a content hash the build stamps in, not a number to remember; a stale chunk after a deploy reloads itself once; the storage-full warning offers a backup instead of telling a parent to clear the data their child's progress lives in. |
+| 24  | AI guardrails inconsistent   | One `askStructured` boundary for every marking feature: shared policy in the system channel, the child's writing fenced with a per-request id, a declared reply schema, and validation that drops anything else. A quoted sentence must be in the draft. An AI verdict marks a synthesis answer right for the child but records guided evidence, so it cannot become mastery.                                                                       |
+| 12  | Bank size overstates variety | Every generated item names the authored one it re-presents. Coverage counts those; repeats are shown as "revision rounds". P1 Articles reads "15 questions · 0 / 4 passages · +23 revision rounds" where it read "102 questions · 0 / 27 passages". README numbers now come from the live banks and a test says so.                                                                                                                                 |
 
 ## Not done — P2 and P3
 
-These are unaddressed. Nothing below has been started.
-
-| #   | Finding                               | Why it matters                                                                                                                                                            |
-| --- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 19  | Writing feedback uses shallow signals | `lower.includes()` credits connectors found inside other words. Partly mitigated: writingQuest's heuristic result is now recorded as guided, so it cannot become mastery. |
-| 22  | Offline support and recovery          | Service worker deletes every cache but its own; unopened modules are not guaranteed offline.                                                                              |
-| 24  | AI guardrails inconsistent            | Writing coaching and synthesis grading bypass the shared system policy.                                                                                                   |
-| 25  | MOE alignment not established         | `SCOPE_AND_SEQUENCE.md` already says the Learning Outcomes are the app's own.                                                                                             |
-| 26  | Engineering debt                      | `app.js` 3,175 lines; `main.css` 18,871; parallel registries. Includes the dormant Quest Journey prototype that derives a digraph answer from a word's first letter.      |
+| #   | Finding                               | Why it matters                                                                                                                                                        |
+| --- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 19  | Writing feedback uses shallow signals | `lower.includes()` credits connectors found inside other words. Partly mitigated: writingQuest's heuristic result is recorded as guided, so it cannot become mastery. |
+| 25  | MOE alignment not established         | `SCOPE_AND_SEQUENCE.md` already says the Learning Outcomes are the app's own. The audit could not retrieve the MOE syllabus either.                                   |
+| 26  | Engineering debt                      | `app.js` 3,175 lines; `main.css` 18,871; parallel registries. Includes the dormant Quest Journey prototype that derives a digraph answer from a word's first letter.  |
 
 ## Two things the audit reported that could not be confirmed here
 
@@ -134,19 +132,32 @@ did not answer and neither does this change.
 Work packages 1, 2 and 4 are complete, along with the parts of 3 and 5 the P1
 findings covered.
 
-Finding 12's counting half is done; its content half is not. The banks now
-report their real size, and that size is small in places — three distinct
-passages in the thinnest Cloze Castle scope. Authoring more passages is the
-only way to raise it, and the tests are written so that padding with copies
-cannot.
+**Finding 19** is the last correctness item. `lower.includes()` credits a
+connector found inside another word, so "however" is scored for a draft
+containing "whoever". Its effect on the numbers is already contained — the
+heuristic result is recorded as guided and cannot become mastery — but the
+feedback a child reads is still wrong.
 
-Findings 22 and 24 are the next largest: the service worker deletes every
-cache but its own, which can remove another app's data on a shared origin, and
-writing coaching and synthesis grading bypass the shared AI system policy.
-Neither shows up in a lesson, but both are the kind of thing that is much
-cheaper to fix before a wider rollout than after one.
+**Finding 12's content half** is open by design. The banks now report their
+real size, and that size is small in places: three distinct passages in the
+thinnest Cloze Castle scope. Only authoring more raises it, and the tests are
+written so padding with copies cannot.
+
+**Finding 26** is the largest remaining piece of work and the one most likely
+to cause the next defect. It includes the dormant Quest Journey prototype,
+which derives a digraph answer from a word's first letter — wrong teaching,
+currently unreachable.
 
 Accessibility is scanned but not certified. The five primary sections are
 covered at their landing state; task, feedback, modal and result states in each
 theme still need passes, as do keyboard and screen-reader checks on a real
 device.
+
+Two limits worth restating before any wider rollout: the AI boundary makes
+prompt injection much harder and makes a malformed or redirected reply fail
+safely, but no test can prove a model will never comply with an instruction a
+child writes into their own composition — what is proved is that a reply which
+does not validate is discarded, and that no mark or score moves on AI text
+alone. And offline coverage is every activity and every sound, not every
+story illustration; that exclusion is recorded in the build manifest so the
+wording and the behaviour cannot drift apart.

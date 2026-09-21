@@ -16,6 +16,7 @@ import { gradeShortAnswer } from './scoring/shortAnswerGrader.js';
 import { hasApiKey, gradeSynthesisAnswer, explainTeachBack } from '../modules/aiService.js';
 import { diagnoseWrittenAnswer } from '../modules/answerDiagnosis.js';
 import { recordMisconception } from '../modules/teacherFeedback.js';
+import { EVIDENCE } from '../modules/evidence.js';
 import { attachAskGiriButton } from '../components/askGiriButton.js';
 
 const LEVEL_LABELS = { P4: 'Primary 4', P5: 'Primary 5', P6: 'Primary 6' };
@@ -609,7 +610,17 @@ async function _checkAnswer(item) {
     if (checkBtn) checkBtn.disabled = false;
 
     if (ai?.verdict === 'CORRECT') {
-      _recordOutcome(item, true, typed);
+      // The child gets the tick: their wording may be perfectly good English
+      // that the authored alternates simply do not list, and marking it wrong
+      // would teach them to guess at the phrasing rather than the grammar.
+      //
+      // The mastery score does not move, though. Audit 2026-09-19, finding
+      // 24: no score may change solely because AI text says so. An
+      // adjudication by a language model is not the app's own evidence that
+      // this child can do this transformation, so it is banked as guided —
+      // it still informs what to practise next, and it cannot be cited as
+      // mastery. `evidence.js` has the four levels and what each one means.
+      _recordOutcome(item, true, typed, EVIDENCE.GUIDED);
       return;
     }
     if (ai?.verdict === 'PARTIAL') {
@@ -690,7 +701,15 @@ function _diagnoseRewrite(item, typed) {
   });
 }
 
-function _recordOutcome(item, correct, typed) {
+/**
+ * @param {object} item
+ * @param {boolean} correct
+ * @param {string} [typed]
+ * @param {string} [evidence]  how the judgement was reached; defaults to the
+ *   app's own grader, which is independent evidence. An AI adjudication
+ *   passes `guided` — see the call site.
+ */
+function _recordOutcome(item, correct, typed, evidence = EVIDENCE.INDEPENDENT) {
   audio.playSfx(correct ? 'correct' : 'wrong');
 
   // Score the first attempt only. This used to run on every try, so an item
@@ -713,7 +732,7 @@ function _recordOutcome(item, correct, typed) {
       _sessionStats.firstTry++;
     }
     _sessionStats.bySkill[item.skillKey] = sk;
-    questMastery.updateSkill('synthesisQuest', item.skillKey, correct);
+    questMastery.updateSkill('synthesisQuest', item.skillKey, correct, { evidence });
   }
 
   if (correct && typed !== undefined) _showSuccessCard(item, typed);
