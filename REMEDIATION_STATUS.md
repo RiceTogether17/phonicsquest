@@ -8,14 +8,16 @@ Audited commit: `79dff37`. Findings: 26 (12 P1, 13 P2, 1 P3).
 
 ## Summary
 
-**All 12 P1 findings are addressed.** P1 is the audit's bar for "before
-assessment use or wider unsupervised rollout": incorrect marking or teaching,
-misleading assessment claims, cross-learner records, credential disclosure.
+**All 12 P1 findings are addressed**, plus the four P2 findings of the audit's
+work package 4 — the remaining ones that produce a number a parent or teacher
+reads. P1 is the audit's bar for "before assessment use or wider unsupervised
+rollout": incorrect marking or teaching, misleading assessment claims,
+cross-learner records, credential disclosure.
 
-The 13 P2 and 1 P3 findings are **not** addressed. They are real and several
-affect daily use.
+Nine P2 findings and the one P3 remain. They are real and several affect daily
+use.
 
-Verification on the current head: 204 test files, 2,715 unit tests, 42 browser
+Verification on the current head: 208 test files, 2,741 unit tests, 42 browser
 tests, typecheck, lint (0 errors), formatting, scope/sequence check and bundle
 budget all pass.
 
@@ -46,6 +48,18 @@ mastery store rather than asserted in a comment.
 | 11  | Items with more than one defensible answer | The six named items fixed — context added to force the keyed answer, one genuinely-correct distractor replaced, two open-cloze blanks now accept the alternatives.                                                                                                                                            |
 | 21  | Deployment independent of verification     | Deployment triggers on CI succeeding and ships the artifact CI verified, not a rebuild. A manual deploy re-runs the suite first.                                                                                                                                                                              |
 
+## P2 work package 4 — done
+
+The audit's own next block after the P1 set, and the four findings that still
+produced a figure someone would read as a result.
+
+| #   | Finding                                         | What changed                                                                                                                                                                                                                 |
+| --- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 13  | Blend confirmation is recognition, not decoding | Commits at `guided` rather than `independent`. The app blended the word aloud seconds earlier, which is evidence.js's own definition of guided, so it cannot carry a decoding mastery claim.                                 |
+| 14  | Fluency and supported sound work overclaim      | "Sprint mastered!" → "Target pace reached!", "words/min" → "words matched/min", with a line saying it is not a reading-aloud speed. `classifyEvidence` gained `supportUsed`, so stretched speech drops soundCount to guided. |
+| 15  | Primary mastery merges skills and evidence      | Aliases split into same-construct (blended) and related (recommendation only), so comparatives no longer establish superlatives. Independent attempts counted; the printed report labels a thin score "early indication".    |
+| 16  | Cloze and Listening reporting gaps              | Both commit through the shared services, once per passage. Hints or a reveal drop the cloze evidence to guided; listening commits auto-marked and self-marked answers separately.                                            |
+
 ## Not done — P2 and P3
 
 These are unaddressed. Nothing below has been started.
@@ -53,10 +67,6 @@ These are unaddressed. Nothing below has been started.
 | #   | Finding                                            | Why it matters                                                                                                                                                            |
 | --- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 12  | Practice-bank size overstates variety              | P1 Articles' 27 passages reduce to four unique bodies. README still promises 100+ per category against actual 8–23.                                                       |
-| 13  | Blend confirmation is recognition, not decoding    | Identifying a just-modelled word is committed as independent evidence.                                                                                                    |
-| 14  | Fluency and supported sound work overclaim         | "Sprint mastered!" and words/min shown for audio-to-print matching.                                                                                                       |
-| 15  | Primary mastery merges skills and evidence         | Cross-quest aliases mix simple past with continuous, comparatives with superlatives.                                                                                      |
-| 16  | Cloze and Listening reporting gaps                 | Comprehension Cloze and Listening do not persist attempts, so a daily plan cannot know what was completed.                                                                |
 | 17  | Open-ended sections too large, grade-blind         | A P6 profile opens Open-ended Comprehension at P1 with 107 answer boxes.                                                                                                  |
 | 18  | Visual Text is text-only                           | Posters rendered in `<pre>`; the official component is multimodal.                                                                                                        |
 | 19  | Writing feedback uses shallow signals              | `lower.includes()` credits connectors found inside other words. Partly mitigated: writingQuest's heuristic result is now recorded as guided, so it cannot become mastery. |
@@ -90,24 +100,38 @@ enough to certify that a rebuilt paper does. Completing it needs the PDF.
 Per the brief's rule — a number a parent or teacher reads must be correct
 before it is shown, or not shown:
 
-- **Primary mastery percentages** still merge related-but-different skills and
-  do not carry evidence provenance (finding 15). Mastery can no longer be
-  created by a self-report or a heuristic, which was the worst of it, but the
-  cross-quest aliasing is untouched.
-- **Fluency words/min** still presents audio-to-print matching speed as a
-  reading rate (finding 14).
 - **Completion counters** still count surface variants as distinct coverage
-  (finding 12).
-- **Blend It! decoding evidence** still rests on recognising a just-modelled
-  word (finding 13).
+  (finding 12). A bank of 27 passages reducing to four unique bodies reports as
+  27 completions. This is the last figure on a parent-facing surface that
+  overstates what happened, and it is the only one of the four originally
+  listed here that is still open.
+- **Daily "today" labels** can name the wrong day outside UTC (finding 23).
+  Not a mastery figure, but it is on a chart a parent reads.
 
-The P6 paper score is now safe to show, because it says what it is.
+Fixed since the first pass: primary mastery percentages no longer merge unlike
+skills and now carry their sample size; the fluency figure says what it timed;
+Blend It! confirmation is recorded as guided recognition rather than
+independent decoding. The P6 paper score says what it is.
+
+Worth being plain about what "fixed" means for mastery: the numbers are now
+honest about their own basis, not that every skill has enough evidence behind
+it. A score labelled "early indication — 1 independent attempt" is doing its
+job by telling you not to lean on it.
 
 ## Suggested next step
 
-The audit's own implementation order puts work packages 1 and 2 first; those
-are complete, along with the parts of 3 and 5 that the P1 findings covered.
-Package 4 — unify attempts, evidence, grade and seed identity, and connect the
-cloze and listening reports — is the next block, and findings 13, 14, 15 and 16
-all fall inside it. Finding 20 (accessibility) is the other candidate, since it
-affects every session rather than a reported number.
+Work packages 1, 2 and 4 are complete, along with the parts of 3 and 5 the P1
+findings covered.
+
+The two best candidates now are both smaller and self-contained:
+
+- **Finding 20 (accessibility).** Affects every session rather than a reported
+  number: a critical `aria-required-children` violation on the Comprehension
+  Cloze picker and serious contrast failures on four screens. Re-scan on the
+  pinned browser first — see the note above about Chromium versions.
+- **Finding 23 (timezone).** `_startOfDay` uses local midnight and `_isoDay`
+  labels it as a UTC date, so in Singapore a parent-facing "today" can carry
+  the previous day's label. Small, and it is on a chart people read.
+
+After those, findings 17 and 18 (grade-blind section loading, text-only Visual
+Text) are the largest remaining effect on how a session actually feels.
