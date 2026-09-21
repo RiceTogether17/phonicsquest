@@ -8,16 +8,17 @@ Audited commit: `79dff37`. Findings: 26 (12 P1, 13 P2, 1 P3).
 
 ## Summary
 
-**All 12 P1 findings are addressed**, plus six P2 findings: the four of the
+**All 12 P1 findings are addressed**, plus eight P2 findings: the four of the
 audit's work package 4 (the remaining ones that produce a number a parent or
-teacher reads), the accessibility failures, and the timezone bug. P1 is the audit's bar for "before assessment use or wider unsupervised
+teacher reads), the accessibility failures, the timezone bug, and the two
+learning-experience findings. P1 is the audit's bar for "before assessment use or wider unsupervised
 rollout": incorrect marking or teaching, misleading assessment claims,
 cross-learner records, credential disclosure.
 
-Seven P2 findings and the one P3 remain. They are real and several affect daily
+Five P2 findings and the one P3 remain. They are real and several affect daily
 use.
 
-Verification on the current head: 209 test files, 2,752 unit tests, 48 browser
+Verification on the current head: 210 test files, 2,769 unit tests, 48 browser
 tests, typecheck, lint (0 errors), formatting, scope/sequence check and bundle
 budget all pass.
 
@@ -71,16 +72,14 @@ produced a figure someone would read as a result.
 
 These are unaddressed. Nothing below has been started.
 
-| #   | Finding                                    | Why it matters                                                                                                                                                            |
-| --- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 12  | Practice-bank size overstates variety      | P1 Articles' 27 passages reduce to four unique bodies. README still promises 100+ per category against actual 8–23.                                                       |
-| 17  | Open-ended sections too large, grade-blind | A P6 profile opens Open-ended Comprehension at P1 with 107 answer boxes.                                                                                                  |
-| 18  | Visual Text is text-only                   | Posters rendered in `<pre>`; the official component is multimodal.                                                                                                        |
-| 19  | Writing feedback uses shallow signals      | `lower.includes()` credits connectors found inside other words. Partly mitigated: writingQuest's heuristic result is now recorded as guided, so it cannot become mastery. |
-| 22  | Offline support and recovery               | Service worker deletes every cache but its own; unopened modules are not guaranteed offline.                                                                              |
-| 24  | AI guardrails inconsistent                 | Writing coaching and synthesis grading bypass the shared system policy.                                                                                                   |
-| 25  | MOE alignment not established              | `SCOPE_AND_SEQUENCE.md` already says the Learning Outcomes are the app's own.                                                                                             |
-| 26  | Engineering debt                           | `app.js` 3,175 lines; `main.css` 18,871; parallel registries. Includes the dormant Quest Journey prototype that derives a digraph answer from a word's first letter.      |
+| #   | Finding                               | Why it matters                                                                                                                                                            |
+| --- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 12  | Practice-bank size overstates variety | P1 Articles' 27 passages reduce to four unique bodies. README still promises 100+ per category against actual 8–23.                                                       |
+| 19  | Writing feedback uses shallow signals | `lower.includes()` credits connectors found inside other words. Partly mitigated: writingQuest's heuristic result is now recorded as guided, so it cannot become mastery. |
+| 22  | Offline support and recovery          | Service worker deletes every cache but its own; unopened modules are not guaranteed offline.                                                                              |
+| 24  | AI guardrails inconsistent            | Writing coaching and synthesis grading bypass the shared system policy.                                                                                                   |
+| 25  | MOE alignment not established         | `SCOPE_AND_SEQUENCE.md` already says the Learning Outcomes are the app's own.                                                                                             |
+| 26  | Engineering debt                      | `app.js` 3,175 lines; `main.css` 18,871; parallel registries. Includes the dormant Quest Journey prototype that derives a digraph answer from a word's first letter.      |
 
 ## Two things the audit reported that could not be confirmed here
 
@@ -128,13 +127,16 @@ job by telling you not to lean on it.
 Work packages 1, 2 and 4 are complete, along with the parts of 3 and 5 the P1
 findings covered.
 
-Findings 17 and 18 — a P6 profile opening Open-ended Comprehension at P1 with
-107 answer boxes, and Visual Text rendering posters in `<pre>` — are now the
-largest remaining effect on how a session actually feels, and both are squarely
-"learning experience" rather than correctness.
-
 Finding 12 is the one remaining correctness item on a parent-facing surface:
-completion counters still treat surface variants as distinct coverage.
+completion counters still treat surface variants as distinct coverage, and the
+README still promises more than 100 questions per category against actual
+sizes of 8–23. It is partly content work and partly a counting change.
+
+Findings 22 and 24 are the next largest: the service worker deletes every
+cache but its own, which can remove another app's data on a shared origin, and
+writing coaching and synthesis grading bypass the shared AI system policy.
+Neither shows up in a lesson, but both are the kind of thing that is much
+cheaper to fix before a wider rollout than after one.
 
 Accessibility is scanned but not certified. The five primary sections are
 covered at their landing state; task, feedback, modal and result states in each
