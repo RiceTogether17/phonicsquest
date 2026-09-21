@@ -1,7 +1,28 @@
 name: Deploy to GitHub Pages
 
+# Audit 2026-09-19, finding 21. This workflow used to run on every push to
+# main, doing npm ci, a syntax check and a build, with no dependency on ci.yml.
+# Since a build succeeds whether or not the tests pass, a commit that broke an
+# assessment regression test or failed the axe accessibility checks deployed
+# anyway -- to an app used with real children.
+#
+# Two changes close that:
+#
+#   1. Deployment is triggered by CI *completing successfully* on main, not by
+#      the push. A red suite means no deploy, with nothing extra to remember
+#      and no dependency on branch-protection configuration.
+#   2. The bytes deployed are the artifact CI already built and checked, not a
+#      fresh rebuild. "The same checked commit and artifact are the ones
+#      deployed" is one of the audit's release checks, and rebuilding here
+#      would mean shipping something no test has seen.
+#
+# A manual run still cannot skip verification: it re-runs the full suite inline
+# before it is allowed to publish.
+
 on:
-  push:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
     branches: [main, master]
   workflow_dispatch:
     inputs:
@@ -10,42 +31,92 @@ on:
         required: false
         default: 'Manual trigger'
 
-# Sets permissions of the GITHUB_TOKEN to allow GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
+  # Needed to download the build artifact from the CI run that triggered this.
+  actions: read
 
-# Allow only one concurrent deployment
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
-  build:
-    name: Build
+  package:
+    name: Package verified build
     runs-on: ubuntu-latest
+    # The gate. A CI run that failed, was cancelled or timed out never reaches
+    # the deploy step -- without this condition `workflow_run` fires on every
+    # completion, failures included.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
 
     steps:
+      - name: Report what is being deployed
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual deploy: ${{ inputs.reason }}"
+            echo "Full verification runs below before publishing."
+          else
+            echo "Deploying artifact from CI run ${{ github.event.workflow_run.id }}"
+            echo "Commit:     ${{ github.event.workflow_run.head_sha }}"
+            echo "Conclusion: ${{ github.event.workflow_run.conclusion }}"
+          fi
+
+      # -- Path A: deploy the artifact CI verified -------------------------
+      - name: Download verified build from CI
+        if: github.event_name == 'workflow_run'
+        uses: actions/download-artifact@v4
+        with:
+          name: phonicsquest-build
+          path: docs
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Confirm the artifact looks like a build
+        if: github.event_name == 'workflow_run'
+        run: |
+          test -f docs/index.html || { echo "::error::docs/index.html missing from CI artifact"; exit 1; }
+          test -d docs/assets     || { echo "::error::docs/assets missing from CI artifact"; exit 1; }
+          echo "OK: verified artifact from CI run ${{ github.event.workflow_run.id }}"
+
+      # -- Path B: a manual deploy verifies before it publishes ------------
       - name: Checkout
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/checkout@v4
 
       - name: Setup Node.js
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
+        if: github.event_name == 'workflow_dispatch'
         run: npm ci
 
-      - name: Syntax check source modules
+      - name: Verify (same checks as CI)
+        if: github.event_name == 'workflow_dispatch'
         run: |
           npm run check:syntax
+          npm run lint
+          npm run format:check
+          npm run test
+          npm run typecheck
+          npm run check:scope
 
       - name: Build
+        if: github.event_name == 'workflow_dispatch'
         run: npm run build
 
+      - name: Bundle-size budget
+        if: github.event_name == 'workflow_dispatch'
+        run: npm run check:bundle
+
+      # -- Publish ---------------------------------------------------------
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v4
 
@@ -56,7 +127,7 @@ jobs:
 
   deploy:
     name: Deploy
-    needs: build
+    needs: package
     runs-on: ubuntu-latest
     environment:
       name: github-pages
