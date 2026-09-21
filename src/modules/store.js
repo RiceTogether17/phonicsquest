@@ -263,6 +263,11 @@ const DEFAULT_STATE = {
   questAttempts: [], // recent quest attempts (capped)
   learningEvents: [], // fine-grained telemetry events (capped)
 
+  // Listening passages finished, so the section contributes to the same
+  // activity counts as the rest. Audit 2026-09-19, finding 16.
+  // { [passageId]: ISO timestamp }
+  listeningCompleted: {},
+
   // Practice accuracy for work that did NOT meet the independent-evidence
   // bar (self-marks, heuristic writing feedback, supported prompts). Kept
   // apart from questMastery so a report can say "practised 12, 9 right"
