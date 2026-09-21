@@ -8,16 +8,16 @@ Audited commit: `79dff37`. Findings: 26 (12 P1, 13 P2, 1 P3).
 
 ## Summary
 
-**All 12 P1 findings are addressed**, plus the four P2 findings of the audit's
-work package 4 — the remaining ones that produce a number a parent or teacher
-reads. P1 is the audit's bar for "before assessment use or wider unsupervised
+**All 12 P1 findings are addressed**, plus six P2 findings: the four of the
+audit's work package 4 (the remaining ones that produce a number a parent or
+teacher reads), the accessibility failures, and the timezone bug. P1 is the audit's bar for "before assessment use or wider unsupervised
 rollout": incorrect marking or teaching, misleading assessment claims,
 cross-learner records, credential disclosure.
 
-Nine P2 findings and the one P3 remain. They are real and several affect daily
+Seven P2 findings and the one P3 remain. They are real and several affect daily
 use.
 
-Verification on the current head: 208 test files, 2,741 unit tests, 42 browser
+Verification on the current head: 209 test files, 2,752 unit tests, 48 browser
 tests, typecheck, lint (0 errors), formatting, scope/sequence check and bundle
 budget all pass.
 
@@ -60,33 +60,41 @@ produced a figure someone would read as a result.
 | 15  | Primary mastery merges skills and evidence      | Aliases split into same-construct (blended) and related (recommendation only), so comparatives no longer establish superlatives. Independent attempts counted; the printed report labels a thin score "early indication".    |
 | 16  | Cloze and Listening reporting gaps              | Both commit through the shared services, once per passage. Hints or a reveal drop the cloze evidence to guided; listening commits auto-marked and self-marked answers separately.                                            |
 
+## P2 — also done
+
+| #   | Finding                | What changed                                                                                                                                                                                                                                                  |
+| --- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 20  | Accessibility failures | Cloze level picker is real `<ul>`/`<li>` markup. `--color-primary-on-tint` per theme, computed to clear 5:1 (all four themes failed before, worst 1.88:1), with dark mode mapped to `--color-primary-light`. CI now scans the five primary sections: 42 → 48. |
+| 23  | Timezone day labels    | Day keys are learner-local throughout, from one shared helper used by the chart, the XP ledger and its cutoff. Calendar stepping replaces fixed 24-hour blocks. Verified under five zones.                                                                    |
+
 ## Not done — P2 and P3
 
 These are unaddressed. Nothing below has been started.
 
-| #   | Finding                                            | Why it matters                                                                                                                                                            |
-| --- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 12  | Practice-bank size overstates variety              | P1 Articles' 27 passages reduce to four unique bodies. README still promises 100+ per category against actual 8–23.                                                       |
-| 17  | Open-ended sections too large, grade-blind         | A P6 profile opens Open-ended Comprehension at P1 with 107 answer boxes.                                                                                                  |
-| 18  | Visual Text is text-only                           | Posters rendered in `<pre>`; the official component is multimodal.                                                                                                        |
-| 19  | Writing feedback uses shallow signals              | `lower.includes()` credits connectors found inside other words. Partly mitigated: writingQuest's heuristic result is now recorded as guided, so it cannot become mastery. |
-| 20  | Accessibility failures                             | Comprehension Cloze picker has a critical `aria-required-children` violation; four screens have serious contrast failures. See note below.                                |
-| 22  | Offline support and recovery                       | Service worker deletes every cache but its own; unopened modules are not guaranteed offline.                                                                              |
-| 23  | Daily analytics mix local midnight with UTC labels | Parent-facing "today" can be the wrong day.                                                                                                                               |
-| 24  | AI guardrails inconsistent                         | Writing coaching and synthesis grading bypass the shared system policy.                                                                                                   |
-| 25  | MOE alignment not established                      | `SCOPE_AND_SEQUENCE.md` already says the Learning Outcomes are the app's own.                                                                                             |
-| 26  | Engineering debt                                   | `app.js` 3,175 lines; `main.css` 18,871; parallel registries. Includes the dormant Quest Journey prototype that derives a digraph answer from a word's first letter.      |
+| #   | Finding                                    | Why it matters                                                                                                                                                            |
+| --- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 12  | Practice-bank size overstates variety      | P1 Articles' 27 passages reduce to four unique bodies. README still promises 100+ per category against actual 8–23.                                                       |
+| 17  | Open-ended sections too large, grade-blind | A P6 profile opens Open-ended Comprehension at P1 with 107 answer boxes.                                                                                                  |
+| 18  | Visual Text is text-only                   | Posters rendered in `<pre>`; the official component is multimodal.                                                                                                        |
+| 19  | Writing feedback uses shallow signals      | `lower.includes()` credits connectors found inside other words. Partly mitigated: writingQuest's heuristic result is now recorded as guided, so it cannot become mastery. |
+| 22  | Offline support and recovery               | Service worker deletes every cache but its own; unopened modules are not guaranteed offline.                                                                              |
+| 24  | AI guardrails inconsistent                 | Writing coaching and synthesis grading bypass the shared system policy.                                                                                                   |
+| 25  | MOE alignment not established              | `SCOPE_AND_SEQUENCE.md` already says the Learning Outcomes are the app's own.                                                                                             |
+| 26  | Engineering debt                           | `app.js` 3,175 lines; `main.css` 18,871; parallel registries. Includes the dormant Quest Journey prototype that derives a digraph answer from a word's first letter.      |
 
 ## Two things the audit reported that could not be confirmed here
 
-**The failing browser test (finding 20).** The audit found Segment It failing an
-axe colour-contrast check. On the current head all 42 browser tests pass,
-including that one. The audit used headless Chromium 153 because the pinned
-build failed to download; this run used the environment's Chromium 1194. A
-contrast result can differ between engine versions, so treat finding 20's other
-items — the Comprehension Cloze `aria-required-children` violation and the
-`.placeholder-paper-link` contrast failures — as still open until re-scanned on
-the pinned browser. They were not fixed.
+**The failing browser test (finding 20).** The audit found Segment It failing
+an axe colour-contrast check; all 48 browser tests pass here. The audit used
+headless Chromium 153 because the pinned build failed to download, and this
+environment ran Chromium 1194.
+
+Finding 20's other items are now fixed and scanned by CI — but one discrepancy
+is worth recording. With `role="list"` deliberately reinstated, this
+environment's axe did **not** report the `aria-required-children` violation the
+audit found, although the structural test caught it. So the markup fix rests on
+its own merits rather than on a reproduced axe failure. The contrast failures
+did reproduce exactly, on the four screens the audit named.
 
 **The official PSLE blueprint.** `seab.gov.sg` and the linked specification PDF
 are both unreachable from this environment, so `examBlueprints.js` records only
@@ -102,11 +110,8 @@ before it is shown, or not shown:
 
 - **Completion counters** still count surface variants as distinct coverage
   (finding 12). A bank of 27 passages reducing to four unique bodies reports as
-  27 completions. This is the last figure on a parent-facing surface that
-  overstates what happened, and it is the only one of the four originally
-  listed here that is still open.
-- **Daily "today" labels** can name the wrong day outside UTC (finding 23).
-  Not a mastery figure, but it is on a chart a parent reads.
+  27 completions. This is now the **only** figure on a parent-facing surface
+  that overstates what happened.
 
 Fixed since the first pass: primary mastery percentages no longer merge unlike
 skills and now carry their sample size; the fluency figure says what it timed;
@@ -123,15 +128,15 @@ job by telling you not to lean on it.
 Work packages 1, 2 and 4 are complete, along with the parts of 3 and 5 the P1
 findings covered.
 
-The two best candidates now are both smaller and self-contained:
+Findings 17 and 18 — a P6 profile opening Open-ended Comprehension at P1 with
+107 answer boxes, and Visual Text rendering posters in `<pre>` — are now the
+largest remaining effect on how a session actually feels, and both are squarely
+"learning experience" rather than correctness.
 
-- **Finding 20 (accessibility).** Affects every session rather than a reported
-  number: a critical `aria-required-children` violation on the Comprehension
-  Cloze picker and serious contrast failures on four screens. Re-scan on the
-  pinned browser first — see the note above about Chromium versions.
-- **Finding 23 (timezone).** `_startOfDay` uses local midnight and `_isoDay`
-  labels it as a UTC date, so in Singapore a parent-facing "today" can carry
-  the previous day's label. Small, and it is on a chart people read.
+Finding 12 is the one remaining correctness item on a parent-facing surface:
+completion counters still treat surface variants as distinct coverage.
 
-After those, findings 17 and 18 (grade-blind section loading, text-only Visual
-Text) are the largest remaining effect on how a session actually feels.
+Accessibility is scanned but not certified. The five primary sections are
+covered at their landing state; task, feedback, modal and result states in each
+theme still need passes, as do keyboard and screen-reader checks on a real
+device.
