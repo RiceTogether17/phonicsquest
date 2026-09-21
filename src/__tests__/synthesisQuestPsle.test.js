@@ -19,8 +19,13 @@ globalThis.speechSynthesis = _speechSynthesisStub;
 if (typeof window !== 'undefined') window.speechSynthesis = _speechSynthesisStub;
 
 const { SYNTHESIS_ITEMS } = await import('../data/synthesisItems.js');
-const { buildAcceptableAnswers, initSynthesisQuest, showSynthesisBrowser, cleanupSynthesisQuest } =
-  await import('../modes/synthesisQuest.js');
+const {
+  buildAcceptableAnswers,
+  checkTaskConstraints,
+  initSynthesisQuest,
+  showSynthesisBrowser,
+  cleanupSynthesisQuest,
+} = await import('../modes/synthesisQuest.js');
 
 function mountQuest() {
   document.body.innerHTML = '<div id="root"></div>';
@@ -74,18 +79,31 @@ describe('buildAcceptableAnswers — accepts both PSLE continuation and full-sen
     expect(accepts).toContain(item.answer);
   });
 
-  it('preserves alternates that DO NOT start with the stem (clause-reversed forms)', () => {
+  it('excludes clause-reversed forms, which do not complete the given stem', () => {
     const item = {
       id: 'fixture-2',
       stem: 'Although',
       answer: 'Although Siti was tired, she finished her work.',
       alternates: ['Siti finished her work although she was tired.'],
     };
+    const reversed = 'Siti finished her work although she was tired.';
     const accepts = buildAcceptableAnswers(item);
-    // The reversed-clause form must still appear in full — it doesn't start
-    // with "Although" so there's nothing to strip, but a student who types it
-    // anyway should still get credit.
-    expect(accepts).toContain('Siti finished her work although she was tired.');
+
+    // This test previously required the reversed form to be credited, on the
+    // reasoning that a student who types it anyway deserves the mark. Audit
+    // 2026-09-19 finding 9 reversed that: the task shows "Although ______" and
+    // asks what fills the blank, and substituting this form there produces
+    // "Although Siti finished her work although she was tired." Crediting it
+    // teaches that the instruction was decorative.
+    expect(accepts).not.toContain(reversed);
+
+    // It is not treated as simply wrong, though. The connector is correct and
+    // the child has the pattern; only its position is off, and the feedback
+    // says exactly that.
+    const check = checkTaskConstraints(reversed, item);
+    expect(check.ok).toBe(false);
+    expect(check.violation).toBe('connector-position');
+    expect(check.message).toMatch(/begin the sentence with it/);
   });
 
   it('de-duplicates entries that normalise to the same string', () => {

@@ -334,14 +334,180 @@ function _stripStem(stem, candidate) {
 }
 
 /**
+ * The task constraints an answer must satisfy, independently of meaning.
+ *
+ * Audit 2026-09-19, finding 9. `st-conn-1` gives the stem "Although" and asks
+ * the child to rewrite with it, but listed "Even though Siti was feeling very
+ * tired, she completed all her chores." as an acceptable alternate. Typing
+ * that passed. It is a perfectly good sentence and a perfectly good
+ * combination — it is just not the transformation the task set, and accepting
+ * it teaches that the instruction was decorative.
+ *
+ * Across the bank: 58 items, every one with a stem, every authored `answer`
+ * satisfying its own stem, and 31 items carrying at least one alternate that
+ * does not. So the constraint is derivable and the alternates are the defect.
+ *
+ * `requiredStart` defaults to the stem. An item can override it, or set
+ * `allowAnyStructure: true` to declare itself open sentence-combining practice
+ * where any valid combination counts — the distinction the audit asks for
+ * between constrained transformation and open combining.
+ *
+ * @param {object} item
+ * @returns {{requiredStart: string|null, requiredConnector: string|null}}
+ */
+export function getTaskConstraints(item) {
+  if (item.allowAnyStructure) return { requiredStart: null, requiredConnector: null };
+  return {
+    requiredStart: item.requiredStart ?? item.stem ?? null,
+    requiredConnector: item.requiredConnector ?? null,
+  };
+}
+
+/**
+ * Check an answer against the task constraints before any meaning check.
+ *
+ * A child may type the full sentence or, PSLE-style, just the continuation;
+ * a continuation trivially satisfies a required opening it was not asked to
+ * repeat, so only a full-sentence attempt is held to `requiredStart`.
+ *
+ * @param {string} typed
+ * @param {object} item
+ * @returns {{ok: boolean, violation: string|null, message: string|null}}
+ */
+export function checkTaskConstraints(typed, item) {
+  const { requiredStart, requiredConnector } = getTaskConstraints(item);
+  const nt = _normalise(typed || '');
+  if (!nt) return { ok: true, violation: null, message: null };
+
+  if (requiredConnector && !nt.includes(_normalise(requiredConnector))) {
+    return {
+      ok: false,
+      violation: 'connector',
+      message: `This one asks you to use "${requiredConnector}".`,
+    };
+  }
+
+  if (requiredStart) {
+    const ns = _normalise(requiredStart);
+    if (nt.startsWith(ns)) return { ok: true, violation: null, message: null };
+
+    // Not starting with the stem is usually fine: the UI shows the stem and
+    // labels the box "Type what fills the blank", so a bare continuation is
+    // the expected form and cannot be asked to repeat the stem it follows.
+    //
+    // What must be caught is the other case — a full sentence that restates
+    // the whole transformation using a DIFFERENT opening. Detected by the
+    // opening the child typed, not by length: a continuation starts with the
+    // sentence's own subject ("Siti was feeling..."), while an off-task
+    // rewrite starts with a competing subordinator ("Even though...").
+    //
+    // Detected by subordinator, not by the item's alternates: the off-task
+    // alternate "Siti completed all her chores although..." and the legitimate
+    // continuation "Siti was feeling very tired..." open with the same word, so
+    // comparing openings against the alternates cannot tell them apart. A
+    // competing subordinator can.
+    //
+    // Only when the STEM is itself a subordinator, though. `st-conn-10` gives
+    // the main clause as its stem ("Students can use the computer lab after
+    // school") and its continuation properly begins "provided that ..." — there
+    // a leading connector is the right answer, not a competing structure.
+    const stemIsSubordinator = COMMON_SUBORDINATORS.some((c) => ns === c || ns.startsWith(`${c} `));
+    if (stemIsSubordinator) {
+      // The connector is right but sits mid-sentence, e.g. "Siti finished her
+      // work although she was tired" for the stem "Although". A valid
+      // combination, and it shows the pattern — but it does not complete this
+      // stem: substituted into the blank it reads "Although Siti finished her
+      // work although she was tired". Worth its own feedback rather than a
+      // bare cross, because the child has the skill and missed the instruction.
+      if (nt.includes(` ${ns} `)) {
+        return {
+          ok: false,
+          violation: 'connector-position',
+          message: `You used "${requiredStart}" correctly — but this task asks you to begin the sentence with it. Move it to the front and rewrite.`,
+        };
+      }
+
+      const startsWithCompetingSubordinator = COMMON_SUBORDINATORS.some(
+        (c) => nt.startsWith(`${c} `) && !ns.startsWith(c),
+      );
+      if (startsWithCompetingSubordinator) {
+        return {
+          ok: false,
+          violation: 'start',
+          message: `Good sentence — but this task asks you to begin with "${requiredStart}". Try again starting there.`,
+        };
+      }
+    }
+  }
+
+  return { ok: true, violation: null, message: null };
+}
+
+/**
+ * Openings that signal a full rewrite rather than a continuation. Only used to
+ * catch a competing structure the item's own alternates did not enumerate.
+ */
+const COMMON_SUBORDINATORS = Object.freeze([
+  'although',
+  'though',
+  'even though',
+  'even if',
+  'despite',
+  'in spite of',
+  'because',
+  'since',
+  'as soon as',
+  'unless',
+  'until',
+  'whereas',
+  'while',
+  'if',
+  'not only',
+  'no sooner',
+  'hardly',
+  'provided that',
+  'so that',
+  'in order to',
+  'after',
+  'before',
+  'when',
+  'whenever',
+]);
+
+/**
+ * Full answers that are valid combinations but break this task's constraints.
+ *
+ * Kept rather than deleted: "that works as a sentence, but the task asked you
+ * to start with X" is a better lesson than a bare cross, and these are the
+ * alternates the item already authored.
+ *
+ * @param {object} item
+ * @returns {string[]}
+ */
+export function offTaskAlternates(item) {
+  const { requiredStart } = getTaskConstraints(item);
+  if (!requiredStart) return [];
+  const ns = _normalise(requiredStart);
+  return (item.alternates || []).filter((a) => !_normalise(a).startsWith(ns));
+}
+
+/**
  * Build the acceptable-answer set for an item.
  *
  * Returns every form a marker would award — the full rewritten sentence(s),
  * and (when the answer starts with the stem) the bare continuation. The
  * student is free to type either form.
+ *
+ * Full answers that break the task's constraints are excluded: see
+ * `getTaskConstraints`. Their stem-stripped continuations are excluded with
+ * them, since a continuation of a differently-structured sentence does not
+ * complete this stem either.
  */
 export function buildAcceptableAnswers(item) {
-  const fulls = [item.answer, ...(item.alternates || [])].filter(Boolean);
+  const offTask = new Set(offTaskAlternates(item).map((a) => _normalise(a)));
+  const fulls = [item.answer, ...(item.alternates || [])]
+    .filter(Boolean)
+    .filter((f) => !offTask.has(_normalise(f)));
   const completions = [];
   for (const full of fulls) {
     const c = _stripStem(item.stem, full);
@@ -384,6 +550,31 @@ async function _checkAnswer(item) {
   }
 
   _tries++;
+
+  // Task constraints come first, and gate the AI path as well as the local
+  // one. An equivalent sentence that ignores the required opening is not a
+  // borderline case for a model to adjudicate — it did not do the task.
+  // Audit 2026-09-19, finding 9.
+  const constraint = checkTaskConstraints(typed, item);
+  if (!constraint.ok) {
+    _recordOutcome(item, false);
+    if (_tries >= MAX_TRIES) {
+      _showTeachBackOverlay(
+        item,
+        () => {
+          _qIdx++;
+          _renderQuestion();
+        },
+        typed,
+      );
+      return;
+    }
+    _showFeedback(`◐ ${constraint.message}`, 'hint');
+    textarea?.focus();
+    textarea?.select();
+    return;
+  }
+
   const result = _grade(typed, item);
   const localCorrect = result.fraction >= 1;
   const partial = result.fraction > 0 && result.fraction < 1;
