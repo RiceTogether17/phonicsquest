@@ -179,6 +179,19 @@ const DEFAULT_STATE = {
   questAttempts: [], // recent quest attempts (capped)
   learningEvents: [], // fine-grained telemetry events (capped)
 
+  // Practice accuracy for work that did NOT meet the independent-evidence
+  // bar (self-marks, heuristic writing feedback, supported prompts). Kept
+  // apart from questMastery so a report can say "practised 12, 9 right"
+  // without that ever being readable as a mastery claim.
+  // { [questKey]: { [skillKey]: { attempts, correct } } }
+  questPractice: {},
+
+  // Attempt IDs already banked, so one committed response cannot be counted
+  // twice by a repeated tap or a rerender. Stores the outcome applied, which
+  // is what lets a changed self-mark REPLACE its predecessor rather than add
+  // a second reflection. { [attemptId]: { quest, skill, correct } }
+  questAppliedAttempts: {},
+
   // Clue detection accuracy (separate from answer accuracy)
   // { attempted: number, strong: number, partial: number, weak: number }
   clueStats: {
@@ -770,6 +783,42 @@ class Store {
     bucket[skillKey] = Math.max(0, Math.min(1, accuracy));
     next[questKey] = bucket;
     this.set('questMastery', next);
+  }
+
+  /**
+   * Bump practice-accuracy counters for work below the independent-evidence
+   * bar. `delta` of -1 removes a previously banked reflection, which is how a
+   * changed self-mark replaces its predecessor instead of stacking on it.
+   */
+  updateQuestPractice(questKey, skillKey, correct, delta = 1) {
+    const next = { ...(this._state.questPractice || {}) };
+    const bucket = { ...(next[questKey] || {}) };
+    const prev = bucket[skillKey] || { attempts: 0, correct: 0 };
+    bucket[skillKey] = {
+      attempts: Math.max(0, prev.attempts + delta),
+      correct: Math.max(0, prev.correct + (correct ? delta : 0)),
+    };
+    next[questKey] = bucket;
+    this.set('questPractice', next);
+  }
+
+  /** The outcome already banked for an attempt ID, or null. */
+  getAppliedAttempt(attemptId) {
+    return (this._state.questAppliedAttempts || {})[attemptId] || null;
+  }
+
+  /**
+   * Remember that an attempt ID has been banked. Capped at 200 entries: this
+   * is replay protection for a live session, not an audit log.
+   */
+  setAppliedAttempt(attemptId, record) {
+    const applied = { ...(this._state.questAppliedAttempts || {}) };
+    applied[attemptId] = record;
+    const keys = Object.keys(applied);
+    if (keys.length > 200) {
+      for (const stale of keys.slice(0, keys.length - 200)) delete applied[stale];
+    }
+    this.set('questAppliedAttempts', applied);
   }
 
   /**

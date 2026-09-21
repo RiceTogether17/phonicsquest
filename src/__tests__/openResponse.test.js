@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { store } from '../modules/store.js';
+import { questMastery } from '../modules/questMastery.js';
 import { attachOpenResponses, renderOpenResponseHtml, SELF_MARKS } from '../modes/openResponse.js';
 
 /**
@@ -103,7 +104,16 @@ describe('attachOpenResponses', () => {
     dom.check().click();
     document.querySelector('[data-or-mark="got"]').click();
 
-    expect(store.get('questMastery')['open-comprehension'].openComprehension).toBeGreaterThan(0.5);
+    // "Never as proof" means the mastery score does not move. This assertion
+    // used to require the opposite (> 0.5) while the title said this; audit
+    // 2026-09-19 finding 3 resolved the contradiction in favour of the title.
+    // The work is still recorded — as practice accuracy, below.
+    expect(questMastery.getSkillScore('open-comprehension', 'openComprehension')).toBe(0.5);
+    expect(questMastery.getPracticeRecord('open-comprehension', 'openComprehension')).toEqual({
+      attempts: 1,
+      correct: 1,
+    });
+
     const [event] = store.get('learningEvents');
     expect(event.eventType).toBe('open_response_self_mark');
     expect(event.evidence).toBe('guided');

@@ -6,6 +6,7 @@ import {
 } from '../data/writingLessonPacks.js';
 import { store } from '../modules/store.js';
 import { questMastery } from '../modules/questMastery.js';
+import { EVIDENCE } from '../modules/evidence.js';
 import { getLevelInfo } from '../data/curriculum.js';
 import {
   evaluateWriting,
@@ -662,7 +663,13 @@ function _submitRevision(item) {
 
 function _awardLessonRewards(item, result, cmp, badges, missionStatus = []) {
   const skill = item.lessonType || item.mode || 'composition';
-  questMastery.updateSkill('writingQuest', skill, result.passed);
+  // `result.passed` comes from writingEvaluator's text heuristics — connector
+  // spotting, length, word variety. That file says plainly it is not
+  // authoritative assessment, so it is recorded as guided practice and cannot
+  // become a mastery claim. Audit 2026-09-19, findings 3 and 19.
+  questMastery.updateSkill('writingQuest', skill, result.passed, {
+    evidence: EVIDENCE.GUIDED,
+  });
   questMastery.recordAttempt({
     quest: 'writingQuest',
     skill,

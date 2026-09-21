@@ -7,6 +7,7 @@
  */
 
 import { store } from './store.js';
+import { EVIDENCE, isMasteryEvidence } from './evidence.js';
 
 const DEFAULT_MASTERY = 0.5;
 
@@ -100,17 +101,78 @@ function _normalizeSkill(skillKey) {
 }
 
 class QuestMasteryService {
+  /**
+   * Fold one result into a quest-skill score.
+   *
+   * @param {string} questKey
+   * @param {string} skillKey
+   * @param {boolean} correct
+   * @param {object} [opts]
+   * @param {number} [opts.alpha]        EMA weight (0.05..0.95)
+   * @param {string} [opts.evidence]     how the answer was obtained; see
+   *   `evidence.js`. Anything below `independent` is recorded as practice
+   *   accuracy and leaves the mastery score untouched. Defaults to
+   *   `independent`, which is what an unannotated answer-a-question mode
+   *   already meant — callers whose result is self-reported, modelled or
+   *   heuristic must say so explicitly.
+   * @param {string} [opts.attemptId]    stable ID for one committed response.
+   *   Supplying it makes the call idempotent: a repeated tap or a rerender
+   *   cannot bank the same response twice, and a changed judgement replaces
+   *   the previous one.
+   * @returns {number} the mastery score after the call
+   */
   updateSkill(questKey, skillKey, correct, opts = {}) {
     const alpha = typeof opts.alpha === 'number' ? _clamp(opts.alpha, 0.05, 0.95) : 0.2;
     const skill = _normalizeSkill(skillKey);
+    const evidence = opts.evidence || EVIDENCE.INDEPENDENT;
+    const attemptId = opts.attemptId || null;
+    const isCorrect = !!correct;
 
-    const mastery = store.get('questMastery') || {};
-    const bucket = mastery[questKey] || {};
-    const prev = typeof bucket[skill] === 'number' ? bucket[skill] : DEFAULT_MASTERY;
-    const next = prev * (1 - alpha) + (correct ? 1 : 0) * alpha;
+    const scoreNow = () => this.getSkillScore(questKey, skill);
+
+    // ── Idempotency ───────────────────────────────────────────────────────
+    // One committed response, one record. Ten clicks of "I got this" are ten
+    // renderings of a single judgement, not ten pieces of evidence.
+    let priorOutcome = null;
+    if (attemptId) {
+      const applied = store.getAppliedAttempt(attemptId);
+      if (applied) {
+        if (applied.correct === isCorrect) return scoreNow(); // nothing changed
+        priorOutcome = applied.correct; // judgement revised — replace it
+      }
+      store.setAppliedAttempt(attemptId, { quest: questKey, skill, correct: isCorrect });
+    }
+
+    // ── Evidence gate ─────────────────────────────────────────────────────
+    // Supported, modelled, self-reported and heuristic results are practice.
+    // They inform adaptive selection through `getPracticeRecord`, but they
+    // may not be cited as mastery, so they never touch the mastery score.
+    if (!isMasteryEvidence(evidence)) {
+      if (priorOutcome !== null) {
+        store.updateQuestPractice(questKey, skill, priorOutcome, -1);
+      }
+      store.updateQuestPractice(questKey, skill, isCorrect, 1);
+      return scoreNow();
+    }
+
+    const prev = scoreNow();
+    const next = prev * (1 - alpha) + (isCorrect ? 1 : 0) * alpha;
 
     store.updateQuestMastery(questKey, skill, next);
     return next;
+  }
+
+  /**
+   * Practice accuracy below the independent-evidence bar.
+   * @returns {{attempts: number, correct: number}}
+   */
+  getPracticeRecord(questKey, skillKey) {
+    const practice = store.get('questPractice') || {};
+    const rec = practice?.[questKey]?.[_normalizeSkill(skillKey)];
+    return {
+      attempts: rec?.attempts || 0,
+      correct: rec?.correct || 0,
+    };
   }
 
   recordAttempt({ quest, skill, correct, responseMs = null, level = null }) {
