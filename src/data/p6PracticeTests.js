@@ -464,12 +464,27 @@ Alex Tan`,
           marks: 1,
           q: 'What percentage of the world\'s coral reefs have been lost since the 1950s?',
           model: 'Half (fifty percent / 50%) of the world\'s coral reefs.',
+          // Audit 2026-09-19, finding 2: a child who wrote "50%" scored zero,
+          // because the only thing to compare against was the whole model
+          // sentence. A one-mark factual answer needs the acceptable forms
+          // listed, not a paragraph.
+          acceptable: [
+            'half',
+            '50%',
+            '50 percent',
+            'fifty percent',
+            'about half',
+            'around half',
+            'half of them',
+            "half of the world's coral reefs",
+          ],
         },
         {
           type: 'vocabulary',
           marks: 1,
           q: 'Find a word in paragraph 2 that means "destroys completely and causes great damage to".',
           model: 'devastate (accept: devastates)',
+          acceptable: ['devastate', 'devastates', 'devastated', 'devastating'],
         },
         {
           type: 'evidence',
@@ -497,7 +512,25 @@ Alex Tan`,
           marks: 1,
           q: 'In paragraph 5, what does Dr Elaine Chong mean when she says the team is "swimming against the tide"?',
           model: 'She means they are working against a powerful opposing force — their efforts are likely to be overwhelmed by the ongoing problem of carbon emissions unless global action is taken.',
-          keywords: ['opposing force', 'overwhelmed', 'carbon emissions', 'tide', 'fighting'],
+          // Audit 2026-09-19, finding 2: "tide" alone scored full marks here.
+          // It was in the keyword list, but it is the idiom's own word --
+          // repeating it explains nothing, which is exactly what this question
+          // asks for. Dropped, and the remaining terms are grouped so the child
+          // has to express the opposing-force idea rather than echo the phrase.
+          requiredGroups: [
+            [
+              'opposing force',
+              'powerful force',
+              'overwhelmed',
+              'losing battle',
+              'uphill battle',
+              'too strong',
+              'outmatched',
+              'cannot keep up',
+              "can't keep up",
+              'working against',
+            ],
+          ],
         },
         {
           type: 'inference',
