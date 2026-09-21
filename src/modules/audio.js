@@ -10,6 +10,7 @@
  */
 
 import { store } from './store.js';
+import { TH_VOICED_WORDS } from '../data/words.js';
 
 /** Dev-mode logging helper */
 const devWarn = (...args) => {
@@ -85,9 +86,40 @@ const PHONEME_FILES = {
   oi: 'oi', ow: 'ow', aw: 'aw',
   // Soft consonants (used only when explicitly tagged in word data)
   soft_g: 'soft_g', soft_c: 'soft_c',
-  // Schwa (used in affix phoneme sequences)
-  'ə': 'u',  // schwa maps to short-u audio as closest match
+  // Schwa (used in affix phoneme sequences). See APPROXIMATE_PHONEME_AUDIO.
+  'ə': 'u',
+  // NOTE: `th_voiced` is deliberately absent. There is only one th.mp3, and it
+  // is the unvoiced /θ/. Pointing voiced th at it would play the wrong sound;
+  // leaving it out routes it to the TTS fallback below, which says "the" and
+  // produces a genuine /ð/. Audit 2026-09-19, finding 7.
 };
+
+/**
+ * Phoneme keys whose audio is a STAND-IN for a different sound.
+ *
+ * Audit 2026-09-19, finding 7. The schwa plays the short-u clip "as closest
+ * match": /ə/ is shorter and unstressed, and a child hearing /ʌ/ is not
+ * hearing a schwa. There is no schwa recording to use instead.
+ *
+ * Recording one is a content task. What is fixed here is the silence about it:
+ * the substitution is declared, and `isApproximatePhonemeAudio` lets an
+ * activity that DEPENDS on the distinction — minimal pairs, "which sound do
+ * you hear", sound sorting — decline to present itself rather than mark a
+ * child wrong for failing to hear a difference that was never played.
+ *
+ * Voiced th used to be on this list. It is not any more: rather than play the
+ * unvoiced clip, it now falls through to TTS, which says the word "the" and
+ * produces an actual /ð/. That is a real sound rather than a near miss, so the
+ * distinction the curriculum teaches between thin and that is now audible.
+ */
+export const APPROXIMATE_PHONEME_AUDIO = Object.freeze({
+  'ə': 'Plays the short-u clip. A true schwa is shorter and unstressed, and no schwa recording exists.',
+});
+
+/** True when this phoneme's audio is a stand-in rather than the sound itself. */
+export function isApproximatePhonemeAudio(key) {
+  return Object.prototype.hasOwnProperty.call(APPROXIMATE_PHONEME_AUDIO, key);
+}
 
 /**
  * Pronunciation map for PREFIX tiles (type 'p' on the word entry).
@@ -116,18 +148,24 @@ const PREFIX_PRONUNCIATION = {
  * The special key 'ə' represents the schwa sound.
  */
 const AFFIX_PRONUNCIATION = {
-  // Consonant + le endings → consonant, /l/, /ə/
-  ble: ['b', 'l', 'ə'],
-  cle: ['c', 'l', 'ə'],
-  dle: ['d', 'l', 'ə'],
-  fle: ['f', 'l', 'ə'],
-  gle: ['g', 'l', 'ə'],
-  kle: ['k', 'l', 'ə'],
-  ple: ['p', 'l', 'ə'],
-  tle: ['t', 'l', 'ə'],
-  zle: ['z', 'l', 'ə'],
+  // Consonant + le endings → consonant, /ə/, /l/.
+  //
+  // Audit 2026-09-19, finding 7: these read [consonant, 'l', 'ə'], playing the
+  // /l/ before the schwa. "table" is /ˈteɪ.bəl/ and "little" is /ˈlɪt.əl/ —
+  // the vowel comes first and the /l/ closes the syllable. Playing it the other
+  // way teaches the ending backwards. The `al`/`el` rows below already had the
+  // right order, which is what made the inconsistency visible.
+  ble: ['b', 'ə', 'l'],
+  cle: ['c', 'ə', 'l'],
+  dle: ['d', 'ə', 'l'],
+  fle: ['f', 'ə', 'l'],
+  gle: ['g', 'ə', 'l'],
+  kle: ['k', 'ə', 'l'],
+  ple: ['p', 'ə', 'l'],
+  tle: ['t', 'ə', 'l'],
+  zle: ['z', 'ə', 'l'],
   // Bare -le suffix (e.g. "unable" → ['un','a','b','le'])
-  le:  ['l', 'ə'],
+  le:  ['ə', 'l'],
   // Schwa-reduced endings
   al: ['ə', 'l'],
   el: ['ə', 'l'],
@@ -186,6 +224,9 @@ const PHONEME_TTS = {
   y: 'yuh',  z: 'zzz',
   // Digraphs
   sh: 'shh',  ch: 'chuh',  th: 'thuh',  ng: 'ing',
+  // Voiced th /ð/. "the" makes TTS produce the voiced sound; "thuh" above is
+  // the unvoiced /θ/ of thin. Audit 2026-09-19, finding 7.
+  th_voiced: 'the',
   wh: 'wuh',  ck: 'kuh',  ll: 'lll',  se: 'sss',
   tch: 'chuh', dge: 'juh', ph: 'fff',
   ss: 'sss',  tt: 'tuh',  nn: 'nnn',  gg: 'guh',
@@ -413,6 +454,13 @@ class AudioManager {
     // Ensure hard /g/ for consonant 'g' — always use 'g' (hard g) audio.
     // Words like get, give, gift, girl use hard g despite preceding e/i.
     if (key === 'g' && type === 'c') key = 'g';
+
+    // Voiced th /ð/ (that, them, with) vs unvoiced /θ/ (thin, cloth). Voicing
+    // is lexical, so it needs the word, not just the grapheme. One source of
+    // truth with the word data. Audit 2026-09-19, finding 7.
+    if (key === 'th' && opts.word && TH_VOICED_WORDS.has(String(opts.word).toLowerCase())) {
+      key = 'th_voiced';
+    }
 
     // Diphthong: normalise oy→oi, ou→ow, au→aw so they share one audio file each
     if (type === 'dp') {

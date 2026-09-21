@@ -238,7 +238,11 @@ const PHONEME_OVERRIDES = Object.freeze({
   enough:  ['/i/', '/n/', '/u/', '/f/'],
   should:  ['/sh/', '/oo/', '/d/'],  // /ʃʊd/ — silent l, short oo
   could:   ['/k/', '/oo/', '/d/'],   // /kʊd/ — silent l, short oo
-  their:   ['/th/', '/air/'],        // /ðer/ — r-controlled air sound
+  // Audit 2026-09-19, finding 7: this read ['/th/', '/air/'] while the comment
+  // beside it already said /ðer/ — the table knew the sound was voiced and the
+  // token said otherwise. Per-word overrides are consulted before grapheme
+  // derivation, so this entry silently outranked the voicing fix.
+  their:   ['/th_voiced/', '/air/'],  // /ðer/ — voiced th, r-controlled air sound
   would:   ['/w/', '/oo/', '/d/'],   // /wʊd/ — silent l, short oo
   said:    ['/s/', '/e/', '/d/'],    // /sed/ — 'ai' says short e
   come:    ['/c/', '/u/', '/m/'],    // /kʌm/ — irregular o, silent e
@@ -297,13 +301,55 @@ const CONSONANT_SOUNDS = Object.freeze({
 });
 
 /**
+ * Words in this bank whose `th` is VOICED /ð/ rather than unvoiced /θ/.
+ *
+ * Audit 2026-09-19, finding 7: the curriculum names both /θ/ and /ð/, but the
+ * word and audio paths used one `th` token for thin and that alike, so an
+ * activity could not select the right target. Voicing is lexical, not
+ * predictable from spelling, so it is listed. Fourteen words in the bank carry
+ * a `th` tile; these are the voiced ones.
+ *
+ * "with" varies by speaker — /wɪð/ in most British and Singapore English,
+ * /wɪθ/ for many American speakers. Listed as voiced to match the intended
+ * audience; a teacher who says /wɪθ/ should move it.
+ */
+export const TH_VOICED_WORDS = new Set(['them', 'then', 'that', 'than', 'their', 'with']);
+
+/**
+ * Graphemes whose phoneme identity is not derivable from their letters.
+ *
+ * Audit 2026-09-19, finding 7: `nk` is typed as a blend, and the blend branch
+ * maps letter by letter, so bank came out as /b/ /a/ /n/ /k/. The nasal before
+ * /k/ is /ŋ/, not /n/ — the tongue is at the back of the mouth, and a child
+ * asked to find the /n/ in "bank" is being taught a sound that is not there.
+ * Twenty entries carry an `nk` tile.
+ *
+ * The count was right even when the identity was wrong, which is why the
+ * existing data-integrity tests did not catch it: they check how many
+ * phonemes a word has, not which.
+ */
+const GRAPHEME_PHONEME_OVERRIDES = Object.freeze({
+  nk: ['/ng/', '/k/'],
+});
+
+/**
  * Phonemes contributed by a single grapheme of the given type.
  * @param {string} grapheme
  * @param {string} type
+ * @param {string} [wordText]  the whole word, for graphemes whose sound is lexical
  * @returns {string[]}
  */
-function _phonemesForGrapheme(grapheme, type) {
+function _phonemesForGrapheme(grapheme, type, wordText = '') {
   if (!grapheme) return [];
+
+  const override = GRAPHEME_PHONEME_OVERRIDES[grapheme];
+  if (override) return [...override];
+
+  // Voicing of `th` is a property of the word, not the spelling.
+  if (grapheme === 'th') {
+    return TH_VOICED_WORDS.has(String(wordText).toLowerCase()) ? ['/th_voiced/'] : ['/th/'];
+  }
+
   switch (type) {
     case 'se': return [];                                    // silent e
     // Suffix lookup: tolerate both '-ing' and 'ing' as the grapheme
@@ -363,7 +409,7 @@ export function derivePhonemes(word) {
   const result    = [];
   const n = Math.min(graphemes.length, types.length);
   for (let i = 0; i < n; i++) {
-    let chunk = _phonemesForGrapheme(graphemes[i], types[i]);
+    let chunk = _phonemesForGrapheme(graphemes[i], types[i], word.word);
     if (graphemes[i] === '-ed' && types[i] === 'sf') {
       chunk = _adjustEdSuffix(chunk, result[result.length - 1]);
     }
@@ -384,10 +430,12 @@ export function derivePhonemes(word) {
  *
  * @param {string} grapheme
  * @param {string} type
+ * @param {string} [wordText]  the whole word; needed where the sound is lexical
+ *   rather than spelling-derived, as with voiced vs unvoiced `th`.
  * @returns {string[]}
  */
-export function phonemeNotation(grapheme, type) {
-  return _phonemesForGrapheme(grapheme, type);
+export function phonemeNotation(grapheme, type, wordText = '') {
+  return _phonemesForGrapheme(grapheme, type, wordText);
 }
 
 // ── Spelling-pattern derivation (long vowels + diphthongs micro-stages) ─────
