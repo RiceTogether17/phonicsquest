@@ -899,9 +899,18 @@ function buildSummaryHtml(paper, sectionResults) {
       ? `<p class="ptg-summary-self"><em>Plus ${_fmtMark(selfMarks)} mark${selfMarks === 1 ? '' : 's'} of self-assessed writing — compare your response against the model answer in that section.</em></p>`
       : '';
 
+  // A total a parent or teacher reads must say what it is a total OF. Papers
+  // that are not in the official examination format carry that on the figure
+  // itself, not three screens away. Audit 2026-09-19, finding 1.
+  const alignmentNote =
+    paper.examAlignment && paper.examAlignment.matchesOfficialFormat === false
+      ? `<p class="ptg-summary-caveat"><em>${escapeHtml(paper.examAlignment.scoreCaveat)}</em></p>`
+      : '';
+
   return `
     <h3>📊 ${escapeHtml(paper.label)} — Summary</h3>
     <p class="ptg-summary-total"><strong>Auto-graded total:</strong> ${_fmtMark(autoScored)} / ${_fmtMark(autoTotal)}</p>
+    ${alignmentNote}
     ${selfNote}
     <p class="ptg-note"><em>Open-ended comprehension answers were graded with keyword matching — re-read the model answer if you're unsure.</em></p>
     <table class="ptg-summary-table">
