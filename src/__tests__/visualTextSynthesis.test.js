@@ -41,11 +41,17 @@ describe('VISUAL_TEXT_ITEMS data bank', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('renders visual-text placeholder html with items', () => {
+  it('renders the visual-text section header and a host for its items', () => {
+    // Audit 2026-09-19, finding 17: this used to assert that an item title
+    // appeared in the static HTML, because every item of every grade was
+    // rendered into one page — 63 answer boxes, starting at P1 whatever grade
+    // the child is in. Items now paint after mount, one at a time, so the
+    // static body carries the header and the runner's host. The items
+    // themselves are covered in primarySectionRunner.test.js, through the real
+    // mount path.
     const html = buildPlaceholderHtml('visual-text');
     expect(html).toContain('Visual Text Comprehension');
-    // At least one item title should appear
-    expect(html).toContain(VISUAL_TEXT_ITEMS[0].title);
+    expect(html).toContain('data-section-runner');
   });
 });
 
@@ -127,9 +133,11 @@ describe('OPEN_COMPREHENSION_PASSAGES data bank', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('renders open-comprehension placeholder html', () => {
+  it('renders the open-comprehension header and a host for its passages', () => {
+    // Same change as Visual Text above: 107 answer boxes became one passage at
+    // a time. Audit 2026-09-19, finding 17.
     const html = buildPlaceholderHtml('open-comprehension');
     expect(html).toContain('Open-ended Comprehension');
-    expect(html).toContain(OPEN_COMPREHENSION_PASSAGES[0].title);
+    expect(html).toContain('data-section-runner');
   });
 });

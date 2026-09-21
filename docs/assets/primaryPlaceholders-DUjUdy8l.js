@@ -1,4 +1,4 @@
-import{z as N,X as T,s as $,M as i,$ as w,aw as x}from"./index-CYQu5mDr.js";import{ax as ge}from"./index-CYQu5mDr.js";import{O as F}from"./openComprehensionPassages-ptKvqu40.js";import{S as Y}from"./synthesisItems-BI7gkXfp.js";import{m as _,l as g,j as I,k as P,h as E,i as A,f as C,g as R,d as H,e as M,b as q,c as L,P as O,a as W}from"./primaryPracticeTest-CZCzYC8o.js";import"./gsap-C8pce-KX.js";import"./stories-BYImWThp.js";import"./shortAnswerGrader-zj_e83SX.js";const B=Object.freeze([{id:"vt-notice-P1-1",level:"P1",type:"notice",title:"Classroom Rules Notice",poster:["OUR CLASSROOM RULES","1. Raise your hand before speaking.","2. Keep your desk clean and tidy.","3. Walk, do not run, inside the classroom.","4. Be kind and helpful to your classmates.","5. Listen when your teacher is talking.","","Let us learn and grow together!"].join(`
+import{z as X,X as $,s as Z,M as s,$ as P,b as M,aw as ee}from"./index-Cn4PbYeT.js";import{ax as Ne}from"./index-Cn4PbYeT.js";import{O as te}from"./openComprehensionPassages-ptKvqu40.js";import{S as ae}from"./synthesisItems-BI7gkXfp.js";import{m as oe,l as T,j as L,k as O,h as x,i as D,f as W,g as N,d as F,e as _,b as B,c as Y,P as G,a as j}from"./primaryPracticeTest-Bma1jnM2.js";import"./gsap-C8pce-KX.js";import"./stories-BYImWThp.js";import"./shortAnswerGrader-zj_e83SX.js";const re=Object.freeze([{id:"vt-notice-P1-1",level:"P1",type:"notice",title:"Classroom Rules Notice",poster:["OUR CLASSROOM RULES","1. Raise your hand before speaking.","2. Keep your desk clean and tidy.","3. Walk, do not run, inside the classroom.","4. Be kind and helpful to your classmates.","5. Listen when your teacher is talking.","","Let us learn and grow together!"].join(`
 `),questions:[{q:"What is the purpose of this notice?",a:"To remind pupils of the rules they must follow in the classroom."},{q:"How many rules are listed on the notice?",a:"Five rules are listed."},{q:"What should a pupil do before speaking in class?",a:"The pupil should raise his or her hand."}]},{id:"vt-poster-P1-2",level:"P1",type:"poster",title:"Sports Day Poster",poster:["SPORTS DAY 2025","Friday, 25 April · 7:30 a.m. – 12:00 p.m.","School Field","","Events:","  Running · Beanbag Throw · Long Jump · Skipping","","Wear your house colour T-shirt.","Bring water and a hat.","","Parents are welcome to cheer!"].join(`
 `),questions:[{q:"Where will Sports Day be held?",a:"On the school field."},{q:"What should pupils wear on Sports Day?",a:"Their house colour T-shirt."},{q:"What time will Sports Day end?",a:"It will end at 12:00 p.m."}]},{id:"vt-schedule-P2-3",level:"P2",type:"schedule",title:"School Day Timetable",poster:["PRIMARY 2 SUNSHINE CLASS — DAILY TIMETABLE","","7:30 a.m.  Assembly","8:00 a.m.  English","9:00 a.m.  Mathematics","10:00 a.m. Recess","10:30 a.m. Mother Tongue","11:30 a.m. Art","12:30 p.m. Dismissal","","Friday: PE replaces Art (12:30 p.m.)"].join(`
 `),questions:[{q:"How long is the recess period?",a:"Recess lasts 30 minutes, from 10:00 a.m. to 10:30 a.m."},{q:"On which day is PE held, and what lesson does it replace?",a:"PE is held on Friday and it replaces Art."},{q:"What is the first lesson after assembly?",a:"English is the first lesson after assembly."}]},{id:"vt-poster-P2-4",level:"P2",type:"poster",title:"Birthday Party Invitation",poster:["YOU'RE INVITED!","","It's Maya's 8th Birthday Party!","","Date:   Saturday, 10 May 2025","Time:   2:00 p.m. – 5:00 p.m.","Place:  Maya's house, 12 Jasmine Street","","Fun activities: Games · Face painting · Magic show","","Please RSVP to Mum (Mrs Teo) by 5 May:","Call / WhatsApp: 9123 4567","","Dress code: Wear something COLOURFUL!"].join(`
@@ -19,7 +19,7 @@ import{z as N,X as T,s as $,M as i,$ as w,aw as x}from"./index-CYQu5mDr.js";impo
 `),questions:[{q:"At what time do all three venues pause their activities simultaneously?",a:"All three venues have a lunch break at 12:00 p.m."},{q:"A pupil wants to attend the STEM workshop. What must he do before 10 June?",a:"He must pre-register at the school office, as Hall B workshops require pre-registration."},{q:"What can you infer about the age group targeted by the Art workshop?",a:"The Art workshop is designed for younger children aged 7 to 9, suggesting the organisers have planned age-appropriate activities for different groups across the carnival."}]},{id:"vt-notice-P6-19",level:"P6",type:"notice",title:"Public Advisory — Road Safety Rules",poster:["PUBLIC ADVISORY","ROAD SAFETY AT SCHOOL ZONES","Issued by: Land Transport Authority (LTA)","","To ensure the safety of all pupils and pedestrians,","the following rules apply within 500 m of all schools:","","RULES FOR MOTORISTS:","  1. Speed limit is strictly 40 km/h during school hours","     (6:30 – 9:30 a.m. and 12:00 – 3:00 p.m.).","  2. Stopping or parking is prohibited at yellow-box","     markings in front of schools at all times.","  3. Do not use a mobile phone while driving.","  4. Give way to pedestrians at zebra crossings.","  5. Do not make a U-turn at designated school pick-up","     and drop-off points.","","PENALTIES:","  Speeding fines start from $150.","  Illegal parking: $70 – $120 demerit fine.","","Your cooperation keeps every child safe.","Report unsafe driving: 1800-CALL-LTA"].join(`
 `),questions:[{q:"During which hours does the 40 km/h speed limit apply in school zones?",a:"The speed limit applies from 6:30 to 9:30 a.m. and from 12:00 to 3:00 p.m., which are the school hours."},{q:'What does "prohibited" mean in this context?',a:'"Prohibited" means that an action is officially not allowed — in this case, stopping or parking at yellow-box markings is forbidden by law.'},{q:"Why do you think the LTA issued this advisory specifically for school zones?",a:"School zones have many children who may not fully understand road dangers. The advisory is issued to make drivers extra cautious and to protect vulnerable young pedestrians from traffic accidents."}]},{id:"vt-form-P6-20",level:"P6",type:"form",title:"Formal School Letter with Embedded Fee Table",poster:["GREENFIELD PRIMARY SCHOOL","10 Greenfield Road, Singapore 520010","Tel: 6234 5678  |  greenfield@moe.edu.sg","","15 April 2025","","Dear Parents and Guardians,","","RE: P6 GRADUATION NIGHT 2025","","We are pleased to inform you that the Primary 6 Graduation","Night will be held on Friday, 14 November 2025, at the","school hall from 6:00 p.m. to 9:00 p.m.","","This is a formal event. Pupils are encouraged to dress smartly.","Dinner will be provided.","","PACKAGE OPTIONS:","","Package | Includes                          | Price","--------|-----------------------------------|-------","A       | Pupil + 2 guests (dinner)         | $60","B       | Pupil + 2 guests + souvenir book  | $80","C       | Pupil only (no guests)            | $15","","Payment must be made via PayNow by 30 April 2025.","PayNow UEN: 198800123X","","Please complete the reply slip attached and return it to","your form teacher by 25 April 2025.","","We look forward to celebrating this milestone with you.","","Yours sincerely,","Mrs S. Pillai","Principal, Greenfield Primary School"].join(`
 `),questions:[{q:"What is the difference in price between Package B and Package C?",a:"Package B costs $80 and Package C costs $15, so the difference is $65."},{q:"What must parents do by 25 April 2025?",a:"They must return the completed reply slip to their child's form teacher."},{q:'What does the phrase "celebrate this milestone" suggest about the Graduation Night?',a:"It suggests that the school views the completion of Primary 6 as an important achievement in a pupil's life — a significant moment worth marking formally."}]},{id:"vt-infographic-P6-21",level:"P6",type:"infographic",title:"Screen Time and Health — Research Summary",poster:["SCREEN TIME & CHILDREN'S HEALTH","Key findings from a 2024 MOH-commissioned study","Participants: 1,200 Singapore children aged 8–15","","AVERAGE DAILY SCREEN TIME:","  School days:     3.2 hours","  Weekend days:    6.1 hours","","RECOMMENDED LIMIT (WHO):","  Under 12 years:  ≤ 2 hours recreational screen time per day","","HEALTH EFFECTS REPORTED:","  Eye strain                           68% of respondents","  Difficulty sleeping                  54%","  Reduced physical activity            47%","  Difficulty concentrating in school   39%","","LINK TO ACADEMIC PERFORMANCE:","  Children with < 2 hrs screen time scored, on average,","  15% higher on standardised reading tests than those","  with > 5 hrs screen time.","","RECOMMENDATIONS:","  1. Establish screen-free periods (meals, 1 hr before bed).","  2. Replace some screen time with outdoor or creative play.","  3. Use parental controls to set daily screen limits.","","Source: Ministry of Health Singapore / National University of Singapore, 2024"].join(`
-`),questions:[{q:"How much more screen time do children in this study spend on weekends compared to school days?",a:"Children spend 6.1 hours on weekends versus 3.2 hours on school days — that is 2.9 hours more on weekends."},{q:"What does the data on academic performance suggest about the relationship between screen time and reading scores?",a:"It suggests that excessive screen time is linked to lower reading performance. Children with less than 2 hours of screen time scored 15% higher on reading tests than those with more than 5 hours, indicating that high screen time may negatively affect academic achievement."},{q:"Evaluate: Who would find this infographic most useful, and why?",a:"Parents and school counsellors would find this most useful because it provides research-backed data on the health and academic risks of excessive screen time, giving them specific facts to help children manage their screen habits effectively."}]}]),j=Object.freeze([{id:"sw-1",level:"P5",title:"Email to form teacher: excuse from school camp",format:"Email",purpose:"To inform your form teacher that you cannot attend tomorrow's school camp due to illness, and to apologise for your absence.",audience:"Mrs Lim — your form teacher",context:"You have been diagnosed with a fever and the doctor has given you a medical certificate advising two days' rest. The school camp starts tomorrow morning and lasts three days. You are disappointed to miss it.",bullets:["Explain the reason you cannot attend camp","Apologise sincerely for the absence","Promise to complete any missed work when you return"],wordCount:"100–120 words",register:"semi-formal",modelAnswer:`Dear Mrs Lim,
+`),questions:[{q:"How much more screen time do children in this study spend on weekends compared to school days?",a:"Children spend 6.1 hours on weekends versus 3.2 hours on school days — that is 2.9 hours more on weekends."},{q:"What does the data on academic performance suggest about the relationship between screen time and reading scores?",a:"It suggests that excessive screen time is linked to lower reading performance. Children with less than 2 hours of screen time scored 15% higher on reading tests than those with more than 5 hours, indicating that high screen time may negatively affect academic achievement."},{q:"Evaluate: Who would find this infographic most useful, and why?",a:"Parents and school counsellors would find this most useful because it provides research-backed data on the health and academic risks of excessive screen time, giving them specific facts to help children manage their screen habits effectively."}]}]),se=Object.freeze([{id:"sw-1",level:"P5",title:"Email to form teacher: excuse from school camp",format:"Email",purpose:"To inform your form teacher that you cannot attend tomorrow's school camp due to illness, and to apologise for your absence.",audience:"Mrs Lim — your form teacher",context:"You have been diagnosed with a fever and the doctor has given you a medical certificate advising two days' rest. The school camp starts tomorrow morning and lasts three days. You are disappointed to miss it.",bullets:["Explain the reason you cannot attend camp","Apologise sincerely for the absence","Promise to complete any missed work when you return"],wordCount:"100–120 words",register:"semi-formal",modelAnswer:`Dear Mrs Lim,
 
 I am writing to inform you that I am unable to attend the school camp starting tomorrow. I visited the doctor this morning and was diagnosed with a fever. He has advised me to rest for two days and has issued a medical certificate, which my mother will send to the school office.
 
@@ -253,116 +253,164 @@ Students who are not at Gate 1 by 6:50 a.m. will not be able to board the bus. P
 Thank you for your attention.
 
 Transport Department
-Riverside Primary School`,checklist:["Have I clearly stated which route is affected and when the changes begin (first bullet)?","Have I given the exact new time and new location (second bullet)?","Have I included a reminder to inform parents and a warning about being late (third bullet)?","Is the notice clearly formatted with a heading, date, recipient and sign-off?"],rubric:{taskFulfillment:"All three bullets addressed: route and start date, new time and location stated precisely, and both the parental reminder and late-arrival consequence included.",language:'Formal and precise. No unnecessary language. Key details are easy to identify. Appropriate use of "Please be informed" and "with effect from."',organisation:"Correct notice format: heading, date, recipient, body in clear paragraphs, sign-off from the issuing department. Information is logically ordered for easy reading."}}]),G=new Set(["a","an","the","and","or","but","so","if","then","than","that","this","these","those","is","are","was","were","be","been","being","am","do","does","did","have","has","had","will","would","shall","should","can","could","may","might","must","to","of","in","on","at","by","for","with","from","as","into","about","it","its","he","she","they","them","his","her","their","we","us","our","you","your","i","me","my","who","what","when","where","why","how","not","no","there","here","also","very","too","more","most","some","any","all","each","because","while","after","before"]),U=Object.freeze({1:"one",2:"two",3:"three",4:"four",5:"five",6:"six",7:"seven",8:"eight",9:"nine",10:"ten"});function b(o){return String(o??"").toLowerCase().replace(/[‘’]/g,"'").replace(/[^a-z0-9'\s-]/g," ").split(/[\s-]+/).filter(Boolean)}function v(o){let e=U[o]||o;const r=["ing","ed","es","ly","s"].find(a=>e.length>a.length+2&&e.endsWith(a));return r&&(e=e.slice(0,-r.length),/([bdfglmnprt])\1$/.test(e)&&(e=e.slice(0,-1)),e=e.replace(/i$/,"y")),e.length<=5?e:e.slice(0,5)}function z(o){const e=new Set,r=[];for(const a of b(o)){if(G.has(a)||a.length<3&&!/^\d+$/.test(a))continue;const t=v(a);e.has(t)||(e.add(t),r.push(a))}return r}function J(o,e){const r=b(o).length>0,a=z(e);if(!a.length)return{covered:[],missing:[],ratio:0,answered:r};const t=new Set(b(o).map(v)),s=[],n=[];for(const l of a)t.has(v(l))?s.push(l):n.push(l);return{covered:s,missing:n,ratio:s.length/a.length,answered:r}}const D=Object.freeze([{key:"got",label:"✅ I got this",value:1},{key:"partly",label:"◐ Partly — I missed something",value:.5},{key:"not-yet",label:"○ Not yet",value:0}]);function k({id:o,model:e,skill:r="",placeholder:a="Write your answer…"}){const t=w(o);return`
-    <div class="open-response" data-open-response="${t}" data-model="${w(e)}" data-skill="${w(r)}">
-      <label class="open-response__label" for="or-input-${t}">Your answer</label>
-      <textarea id="or-input-${t}" class="open-response__input" rows="3"
-                placeholder="${w(a)}"></textarea>
+Riverside Primary School`,checklist:["Have I clearly stated which route is affected and when the changes begin (first bullet)?","Have I given the exact new time and new location (second bullet)?","Have I included a reminder to inform parents and a warning about being late (third bullet)?","Is the notice clearly formatted with a heading, date, recipient and sign-off?"],rubric:{taskFulfillment:"All three bullets addressed: route and start date, new time and location stated precisely, and both the parental reminder and late-arrival consequence included.",language:'Formal and precise. No unnecessary language. Key details are easy to identify. Appropriate use of "Please be informed" and "with effect from."',organisation:"Correct notice format: heading, date, recipient, body in clear paragraphs, sign-off from the issuing department. Information is logically ordered for easy reading."}}]),ne=new Set(["a","an","the","and","or","but","so","if","then","than","that","this","these","those","is","are","was","were","be","been","being","am","do","does","did","have","has","had","will","would","shall","should","can","could","may","might","must","to","of","in","on","at","by","for","with","from","as","into","about","it","its","he","she","they","them","his","her","their","we","us","our","you","your","i","me","my","who","what","when","where","why","how","not","no","there","here","also","very","too","more","most","some","any","all","each","because","while","after","before"]),ie=Object.freeze({1:"one",2:"two",3:"three",4:"four",5:"five",6:"six",7:"seven",8:"eight",9:"nine",10:"ten"});function A(e){return String(e??"").toLowerCase().replace(/[‘’]/g,"'").replace(/[^a-z0-9'\s-]/g," ").split(/[\s-]+/).filter(Boolean)}function E(e){let t=ie[e]||e;const o=["ing","ed","es","ly","s"].find(a=>t.length>a.length+2&&t.endsWith(a));return o&&(t=t.slice(0,-o.length),/([bdfglmnprt])\1$/.test(t)&&(t=t.slice(0,-1)),t=t.replace(/i$/,"y")),t.length<=5?t:t.slice(0,5)}function le(e){const t=new Set,o=[];for(const a of A(e)){if(ne.has(a)||a.length<3&&!/^\d+$/.test(a))continue;const r=E(a);t.has(r)||(t.add(r),o.push(a))}return o}function de(e,t){const o=A(e).length>0,a=le(t);if(!a.length)return{covered:[],missing:[],ratio:0,answered:o};const r=new Set(A(e).map(E)),l=[],c=[];for(const n of a)r.has(E(n))?l.push(n):c.push(n);return{covered:l,missing:c,ratio:l.length/a.length,answered:o}}const U=Object.freeze([{key:"got",label:"✅ I got this",value:1},{key:"partly",label:"◐ Partly — I missed something",value:.5},{key:"not-yet",label:"○ Not yet",value:0}]);function C({id:e,model:t,skill:o="",placeholder:a="Write your answer…"}){const r=P(e);return`
+    <div class="open-response" data-open-response="${r}" data-model="${P(t)}" data-skill="${P(o)}">
+      <label class="open-response__label" for="or-input-${r}">Your answer</label>
+      <textarea id="or-input-${r}" class="open-response__input" rows="3"
+                placeholder="${P(a)}"></textarea>
       <div class="open-response__actions">
         <button type="button" class="btn btn--primary btn--sm" data-or-check>Check my answer</button>
       </div>
       <div class="open-response__result" data-or-result hidden aria-live="polite"></div>
-    </div>`}function V(o,e){const{covered:r,missing:a,answered:t}=J(o,e);if(!t)return'<p class="open-response__empty">Write something first — even a partial answer is worth more than a blank.</p>';const s=(l,d)=>l.map(f=>`<span class="open-response__idea open-response__idea--${d}">${i(f)}</span>`).join(" "),n=r.length||a.length?`
+    </div>`}function ce(e,t){const{covered:o,missing:a,answered:r}=de(e,t);if(!r)return'<p class="open-response__empty">Write something first — even a partial answer is worth more than a blank.</p>';const l=(n,i)=>n.map(h=>`<span class="open-response__idea open-response__idea--${i}">${s(h)}</span>`).join(" "),c=o.length||a.length?`
       <div class="open-response__ideas">
         <p class="open-response__ideas-title">Ideas from the model answer</p>
-        ${r.length?`<p class="open-response__ideas-row">✓ In your answer: ${s(r,"covered")}</p>`:""}
-        ${a.length?`<p class="open-response__ideas-row">• Not mentioned: ${s(a,"missing")}</p>`:""}
+        ${o.length?`<p class="open-response__ideas-row">✓ In your answer: ${l(o,"covered")}</p>`:""}
+        ${a.length?`<p class="open-response__ideas-row">• Not mentioned: ${l(a,"missing")}</p>`:""}
         <p class="open-response__ideas-note">This is a word check, not a mark — you can express the same idea in different words. Read both answers and decide for yourself.</p>
       </div>`:"";return`
-    <p class="open-response__yours"><strong>You wrote:</strong> ${i(o)}</p>
-    <p class="open-response__model"><strong>Model answer:</strong> ${i(e)}</p>
-    ${n}
+    <p class="open-response__yours"><strong>You wrote:</strong> ${s(e)}</p>
+    <p class="open-response__model"><strong>Model answer:</strong> ${s(t)}</p>
+    ${c}
     <fieldset class="open-response__mark">
       <legend class="open-response__mark-legend">How did yours compare?</legend>
-      ${D.map(l=>`<button type="button" class="btn btn--ghost btn--sm open-response__mark-btn" data-or-mark="${l.key}">${l.label}</button>`).join("")}
-    </fieldset>`}function K(o,{quest:e="openResponse",level:r=null,onMark:a}={}){if(o)for(const t of o.querySelectorAll("[data-open-response]")){const s=t.querySelector(".open-response__input"),n=t.querySelector("[data-or-result]"),l=t.querySelector("[data-or-check]");!s||!n||!l||l.addEventListener("click",()=>{const d=s.value.trim(),f=t.getAttribute("data-model")||"";if(n.hidden=!1,n.innerHTML=V(d,f),!d){s.focus();return}s.readOnly=!0,l.disabled=!0,t.classList.add("open-response--checked");for(const c of n.querySelectorAll("[data-or-mark]"))c.addEventListener("click",()=>{var p,S;const y=c.getAttribute("data-or-mark"),h=D.find(m=>m.key===y);if(!h)return;for(const m of n.querySelectorAll("[data-or-mark]"))m.classList.toggle("open-response__mark-btn--picked",m===c),m.setAttribute("aria-pressed",String(m===c));const u=t.getAttribute("data-skill")||"comprehension";N.updateSkill(e,u,h.value>=1,{evidence:T.GUIDED,attemptId:`${e}:${t.getAttribute("data-open-response")||""}`}),(S=(p=$).recordLearningEvent)==null||S.call(p,{eventType:"open_response_self_mark",quest:e,skill:u,correct:h.value>=1,level:r,evidence:T.GUIDED,meta:{mark:h.key,selfAssessed:!0}}),a==null||a({id:t.getAttribute("data-open-response")||"",mark:h.key,value:h.value,skill:u})})})}}const ce=Object.freeze(["visual-text","open-comprehension","synthesis","situational-writing","p1-practice-tests","p2-practice-tests","p3-practice-tests","p4-practice-tests","p5-practice-tests","p6-practice-tests"]);function Q(o){const e=x[o];if(!e)return"";const r=ae(o),a=e.related?`<p class="placeholder-related">Also useful: <button class="btn btn--ghost btn--sm" data-related="${e.related.target}">${e.related.label}</button>.</p>`:"";return`
-    <div class="primary-placeholder" data-kind="${o}" role="region" aria-label="${e.label}">
+      ${U.map(n=>`<button type="button" class="btn btn--ghost btn--sm open-response__mark-btn" data-or-mark="${n.key}">${n.label}</button>`).join("")}
+    </fieldset>`}function H(e,{quest:t="openResponse",level:o=null,onMark:a}={}){if(e)for(const r of e.querySelectorAll("[data-open-response]")){const l=r.querySelector(".open-response__input"),c=r.querySelector("[data-or-result]"),n=r.querySelector("[data-or-check]");!l||!c||!n||n.addEventListener("click",()=>{const i=l.value.trim(),h=r.getAttribute("data-model")||"";if(c.hidden=!1,c.innerHTML=ce(i,h),!i){l.focus();return}l.readOnly=!0,n.disabled=!0,r.classList.add("open-response--checked");for(const g of c.querySelectorAll("[data-or-mark]"))g.addEventListener("click",()=>{var S,b;const v=g.getAttribute("data-or-mark"),w=U.find(f=>f.key===v);if(!w)return;for(const f of c.querySelectorAll("[data-or-mark]"))f.classList.toggle("open-response__mark-btn--picked",f===g),f.setAttribute("aria-pressed",String(f===g));const m=r.getAttribute("data-skill")||"comprehension";X.updateSkill(t,m,w.value>=1,{evidence:$.GUIDED,attemptId:`${t}:${r.getAttribute("data-open-response")||""}`}),(b=(S=Z).recordLearningEvent)==null||b.call(S,{eventType:"open_response_self_mark",quest:t,skill:m,correct:w.value>=1,level:o,evidence:$.GUIDED,meta:{mark:w.key,selfAssessed:!0}}),a==null||a({id:r.getAttribute("data-open-response")||"",mark:w.key,value:w.value,skill:m})})})}}const y=["P1","P2","P3","P4","P5","P6"];function he(e,t=null){var r;const o=y.filter(l=>e.includes(l));if(!o.length)return e[0]??"";const a=t||((r=M())==null?void 0:r.primaryGrade)||null;if(a&&o.includes(a))return a;if(a&&y.includes(a)){const l=o.filter(c=>y.indexOf(c)<=y.indexOf(a));if(l.length)return l[l.length-1]}return o[0]}function ue(e,{items:t,kind:o,unit:a,renderItem:r,onItemMounted:l}){if(!e)return;const c=[...new Set(t.map(d=>d.level))].sort();let n=he(c),i=-1;const h=new Map,g=()=>t.filter(d=>d.level===n);function v(){e.querySelectorAll('textarea[id], input[type="text"][id]').forEach(d=>{d.value?h.set(d.id,d.value):h.delete(d.id)})}function w(){e.querySelectorAll('textarea[id], input[type="text"][id]').forEach(d=>{const p=h.get(d.id);p!==void 0&&!d.value&&(d.value=p)})}function m(){var I;const d=g(),p=(I=M())==null?void 0:I.primaryGrade,k=p&&p===n;e.innerHTML=`
+      <div class="psr" data-psr-view="catalogue">
+        <div class="psr-levelbar" role="group" aria-label="Choose a level">
+          ${c.map(u=>`
+            <button type="button" class="psr-level ${u===n?"psr-level--active":""}"
+                    data-psr-level="${P(u)}" aria-pressed="${u===n}">
+              ${s(u)}${p===u?'<span class="psr-level-mine"> · yours</span>':""}
+            </button>`).join("")}
+        </div>
+
+        <p class="psr-intro">
+          ${k?`Showing ${s(n)} — your level. ${d.length} ${s(a)}${d.length===1?"":"s"} to choose from.`:`Showing ${s(n)}. ${d.length} ${s(a)}${d.length===1?"":"s"}${p?` — your level is ${s(p)}.`:"."}`}
+        </p>
+
+        <ul class="psr-catalogue">
+          ${d.map((u,R)=>`
+            <li class="psr-catalogue-item">
+              <button type="button" class="psr-open" data-psr-open="${R}">
+                <span class="psr-open-title">${s(u.title||`${a} ${R+1}`)}</span>
+                <span class="psr-open-meta">${(u.questions||[]).length||1} question${((u.questions||[]).length||1)===1?"":"s"}</span>
+              </button>
+            </li>`).join("")}
+        </ul>
+      </div>`,e.querySelectorAll("[data-psr-level]").forEach(u=>{u.addEventListener("click",()=>{v(),n=u.getAttribute("data-psr-level"),i=-1,m()})}),e.querySelectorAll("[data-psr-open]").forEach(u=>{u.addEventListener("click",()=>{i=Number(u.getAttribute("data-psr-open")),b()})})}function S(){var p;const d=e.querySelector(".psr-progress");if(d)try{(p=d.scrollIntoView)==null||p.call(d,{block:"start"})}catch{}}function b(){var k,I,u;const d=g(),p=d[i];if(!p){i=-1,m();return}e.innerHTML=`
+      <div class="psr" data-psr-view="item">
+        <div class="psr-taskbar">
+          <button type="button" class="btn btn--ghost btn--sm" data-psr-back>← All ${s(a)}s</button>
+          <p class="psr-progress" aria-live="polite">
+            ${s(n)} · ${s(a)} ${i+1} of ${d.length}
+          </p>
+        </div>
+
+        <article class="placeholder-card psr-item">
+          ${r(p,i)}
+        </article>
+
+        <nav class="psr-nav" aria-label="Move between ${s(a)}s">
+          <button type="button" class="btn btn--ghost" data-psr-prev ${i===0?"disabled":""}>
+            ← Previous
+          </button>
+          <button type="button" class="btn btn--primary" data-psr-next>
+            ${i===d.length-1?"Finish":"Next →"}
+          </button>
+        </nav>
+      </div>`,w(),l==null||l(e),(k=e.querySelector("[data-psr-back]"))==null||k.addEventListener("click",()=>{v(),i=-1,m()}),(I=e.querySelector("[data-psr-prev]"))==null||I.addEventListener("click",()=>{v(),i>0&&(i-=1),b(),S()}),(u=e.querySelector("[data-psr-next]"))==null||u.addEventListener("click",()=>{if(v(),i>=d.length-1){f(d.length);return}i+=1,b(),S()})}function f(d){var p,k;e.innerHTML=`
+      <div class="psr" data-psr-view="done">
+        <div class="psr-done">
+          <p class="psr-done-icon" aria-hidden="true">🎉</p>
+          <h3 class="psr-done-title">That's the last ${s(a)} in ${s(n)}.</h3>
+          <p class="psr-done-sub">You worked through ${d} of them.</p>
+          <div class="psr-nav">
+            <button type="button" class="btn btn--ghost" data-psr-back>← Back to the list</button>
+            ${y.indexOf(n)<y.length-1&&c.includes(y[y.indexOf(n)+1])?`<button type="button" class="btn btn--primary" data-psr-nextlevel>Try ${s(y[y.indexOf(n)+1])} →</button>`:""}
+          </div>
+        </div>
+      </div>`,(p=e.querySelector("[data-psr-back]"))==null||p.addEventListener("click",()=>{i=-1,m()}),(k=e.querySelector("[data-psr-nextlevel]"))==null||k.addEventListener("click",()=>{n=y[y.indexOf(n)+1],i=-1,m()})}return m(),{get level(){return n}}}const pe=new Set(["schedule","table","menu"]),z=/\s{2,}|\s+·\s+|\s+\|\s+/,J=/^\s*(\d+)[.)]\s+(.*)$/,V=/^\s*[-•*]\s+(.*)$/,K=/^\s*([A-Z][^:]{0,28}):\s+(.+)$/;function me(e){return String(e??"").replace(/\r\n/g,`
+`).split(/\n\s*\n/).map(t=>t.split(`
+`).filter(o=>o.trim().length)).filter(t=>t.length)}function ge(e){return`<ol class="vstim-ol">${e.map(t=>`<li>${s(t.replace(J,"$2"))}</li>`).join("")}</ol>`}function fe(e){return`<ul class="vstim-ul">${e.map(t=>`<li>${s(t.replace(V,"$1").trim())}</li>`).join("")}</ul>`}function ye(e){return`<dl class="vstim-dl">${e.map(t=>{const[,o,a]=t.match(K);return`<dt>${s(o)}</dt><dd>${s(a)}</dd>`}).join("")}</dl>`}function we(e){const t=e.map(i=>i.trim().split(z).map(h=>h.trim())),o=Math.max(...t.map(i=>i.length)),a=i=>[...i,...Array(o-i.length).fill("")],r=t[0],l=t.length>1&&r.length===o&&r.every(i=>i.length<=24&&!/\d{2}/.test(i)),c=l?`<thead><tr>${a(r).map(i=>`<th scope="col">${s(i)}</th>`).join("")}</tr></thead>`:"",n=l?t.slice(1):t;return`<table class="vstim-table">${c}<tbody>${n.map(i=>`<tr>${a(i).map(h=>`<td>${s(h)}</td>`).join("")}</tr>`).join("")}</tbody></table>`}function q(e,{tabular:t}){const o=[];let a=[],r=null;const l=n=>J.test(n)?"ol":V.test(n)?"ul":t&&z.test(n.trim())?"table":K.test(n)?"dl":"p",c=()=>{a.length&&(r==="ol"?o.push(ge(a)):r==="ul"?o.push(fe(a)):r==="dl"?o.push(ye(a)):r==="table"?o.push(we(a)):o.push(a.map(n=>`<p class="vstim-p">${s(n.trim())}</p>`).join("")),a=[])};for(const n of e){const i=l(n);i!==r&&(c(),r=i),a.push(n)}return c(),o.join("")}function be(e){const t=String((e==null?void 0:e.type)||"poster").toLowerCase(),o=me(e==null?void 0:e.poster);if(!o.length)return"";const a=pe.has(t),[r,...l]=o[0],c=o.slice(1);return`
+    <figure class="vstim vstim--${s(t)}">
+      <div class="vstim-sheet">
+        <p class="vstim-headline">${s(r.trim())}</p>
+        ${l.length?`<div class="vstim-standfirst">${q(l,{tabular:a})}</div>`:""}
+        ${c.map(n=>`<div class="vstim-block">${q(n,{tabular:a})}</div>`).join("")}
+      </div>
+      <figcaption class="vstim-caption">${s(ve(t))}</figcaption>
+    </figure>`}function ve(e){return{notice:"A notice",poster:"A poster",schedule:"A schedule",menu:"A menu",advertisement:"An advertisement",infographic:"An infographic",chart:"A chart",table:"A table",form:"A form"}[e]||"A visual text"}const Oe=Object.freeze(["visual-text","open-comprehension","synthesis","situational-writing","p1-practice-tests","p2-practice-tests","p3-practice-tests","p4-practice-tests","p5-practice-tests","p6-practice-tests"]);function ke(e){const t=ee[e];if(!t)return"";const o=Ae(e),a=t.related?`<p class="placeholder-related">Also useful: <button class="btn btn--ghost btn--sm" data-related="${t.related.target}">${t.related.label}</button>.</p>`:"";return`
+    <div class="primary-placeholder" data-kind="${e}" role="region" aria-label="${t.label}">
       <header class="placeholder-header">
-        <h2 class="placeholder-title">${e.icon} ${e.label}</h2>
-        <p class="placeholder-paper-link" aria-label="School-paper component">${e.paperLink}</p>
-        <p class="placeholder-blurb">${e.blurb}</p>
+        <h2 class="placeholder-title">${t.icon} ${t.label}</h2>
+        <p class="placeholder-paper-link" aria-label="School-paper component">${t.paperLink}</p>
+        <p class="placeholder-blurb">${t.blurb}</p>
       </header>
-      <div class="placeholder-body">${r}</div>
+      <div class="placeholder-body">${o}</div>
       ${a}
       <div class="sfq-actions">
         <button class="btn btn--ghost" data-placeholder-close>← Back to home</button>
       </div>
-    </div>`}function X(){const o=B,e=[...new Set(o.map(a=>a.level))].sort(),r=Object.fromEntries(e.map(a=>[a,o.filter(t=>t.level===a)]));return e.map(a=>`
+    </div>`}function Se(e){return`
+    <h4>${s(e.title)} <span class="module-level-badge">${s(e.type||"visual")}</span></h4>
+    ${be(e)}
+    <ol class="placeholder-questions">
+      ${(e.questions||[]).map((t,o)=>`
+        <li>
+          <p class="ptg-q-stem">${s(t.q)}</p>
+          ${C({id:`vt-${e.id||e.level}-${o}`,model:t.a,skill:"visualText"})}
+        </li>`).join("")}
+    </ol>`}function Te(e){return`
+    <h4>${s(e.title)}</h4>
+    <p class="placeholder-passage" style="white-space:pre-line">${s(e.passage)}</p>
+    <ol class="placeholder-questions">
+      ${(e.questions||[]).map((t,o)=>`
+        <li>
+          <p class="ptg-q-stem">${s(t.q)}</p>
+          ${C({id:`oc-${e.id||e.level}-${o}`,model:t.model,skill:"openComprehension"})}
+        </li>`).join("")}
+    </ol>`}function Ie(e){var t;return`
+    <h4>${s(e.title)} <span class="module-level-badge">${s(e.level)}</span></h4>
+    <p><strong>Format:</strong> ${s(e.format||"")}</p>
+    <p><strong>Audience:</strong> ${s(e.audience||"")}</p>
+    <p><strong>Purpose:</strong> ${s(e.purpose||"")}</p>
+    ${e.context?`<p class="placeholder-context">${s(e.context)}</p>`:""}
+    <p><strong>Include all 3 points:</strong></p>
+    <ul>${(e.bullets||[]).map(o=>`<li>${s(o)}</li>`).join("")}</ul>
+    <p class="ptg-note">Word count: ${s(e.wordCount||"100–120 words")}</p>
+    ${C({id:`sw-${e.id||e.title||"prompt"}`,model:e.modelAnswer||"",skill:"situationalWriting",placeholder:"Write your letter, email or diary entry here…"})}
+    ${(t=e.checklist)!=null&&t.length?`
+      <details>
+        <summary>Self-check list</summary>
+        <ul>${e.checklist.map(o=>`<li>${s(o)}</li>`).join("")}</ul>
+      </details>`:""}
+    ${e.modelAnswer?`
+      <details>
+        <summary>Show model answer</summary>
+        <p class="placeholder-model" style="white-space:pre-line">${s(e.modelAnswer)}</p>
+      </details>`:""}
+    ${e.rubric?`
+      <details>
+        <summary>Marking rubric</summary>
+        <table class="ptg-table"><tbody>
+          ${Object.entries(e.rubric).map(([o,a])=>`<tr><td><strong>${s(o)}</strong></td><td>${s(a)}</td></tr>`).join("")}
+        </tbody></table>
+      </details>`:""}`}const Q={"visual-text":{items:()=>re,unit:"poster",body:Se},"open-comprehension":{items:()=>te,unit:"passage",body:Te},"situational-writing":{items:()=>se,unit:"task",body:Ie}};function Pe(){const e=ae,t=[...new Set(e.map(a=>a.pattern||a.skill))],o=Object.fromEntries(t.map(a=>[a,e.filter(r=>(r.pattern||r.skill)===a)]));return t.map(a=>`
     <section class="placeholder-level-group">
-      <h3 class="placeholder-level-heading">${a} — ${r[a].length} items</h3>
-      ${r[a].map(t=>`
-        <article class="placeholder-card">
-          <h4>${i(t.title)} <span class="module-level-badge">${t.type||"visual"}</span></h4>
-          <pre class="placeholder-poster" aria-label="Visual text content">${i(t.poster)}</pre>
-          <ol class="placeholder-questions">
-            ${t.questions.map((s,n)=>`
-              <li>
-                <p class="ptg-q-stem">${i(s.q)}</p>
-                ${k({id:`vt-${t.id||a}-${n}`,model:s.a,skill:"visualText"})}
-              </li>`).join("")}
-          </ol>
-        </article>`).join("")}
-    </section>`).join("")}function Z(){const o=F,e=[...new Set(o.map(a=>a.level))].sort(),r=Object.fromEntries(e.map(a=>[a,o.filter(t=>t.level===a)]));return e.map(a=>`
-    <section class="placeholder-level-group">
-      <h3 class="placeholder-level-heading">${a} — ${r[a].length} passage${r[a].length>1?"s":""}</h3>
-      ${r[a].map(t=>`
-        <article class="placeholder-card">
-          <h4>${i(t.title)}</h4>
-          <p class="placeholder-passage" style="white-space:pre-line">${i(t.passage)}</p>
-          <ol class="placeholder-questions">
-            ${t.questions.map((s,n)=>`
-              <li>
-                <p class="ptg-q-stem">${i(s.q)}</p>
-                ${k({id:`oc-${t.id||a}-${n}`,model:s.model,skill:"openComprehension"})}
-              </li>`).join("")}
-          </ol>
-        </article>`).join("")}
-    </section>`).join("")}function ee(){const o=Y,e=[...new Set(o.map(a=>a.pattern||a.skill))],r=Object.fromEntries(e.map(a=>[a,o.filter(t=>(t.pattern||t.skill)===a)]));return e.map(a=>`
-    <section class="placeholder-level-group">
-      <h3 class="placeholder-level-heading">${i(a)}</h3>
+      <h3 class="placeholder-level-heading">${s(a)}</h3>
       <ol class="placeholder-questions">
-        ${r[a].map(t=>{var s;return`
+        ${o[a].map(r=>{var l;return`
           <li class="placeholder-card">
-            <p><strong>${i(t.skill)}</strong> <span class="module-level-badge">${t.level}</span></p>
-            <p>Rewrite: <em>${i(t.original)}</em></p>
-            ${t.stem?`<p>Begin with: <code>${i(t.stem)} …</code></p>`:""}
+            <p><strong>${s(r.skill)}</strong> <span class="module-level-badge">${r.level}</span></p>
+            <p>Rewrite: <em>${s(r.original)}</em></p>
+            ${r.stem?`<p>Begin with: <code>${s(r.stem)} …</code></p>`:""}
             <details>
               <summary>Show model answer</summary>
-              <p class="placeholder-answer">${i(t.answer)}</p>
-              ${t.explain?`<p class="placeholder-explain"><em>${i(t.explain)}</em></p>`:""}
-              ${(s=t.alternates)!=null&&s.length?`<p class="placeholder-explain">Also accepted: ${t.alternates.map(n=>`<em>${i(n)}</em>`).join(" / ")}</p>`:""}
+              <p class="placeholder-answer">${s(r.answer)}</p>
+              ${r.explain?`<p class="placeholder-explain"><em>${s(r.explain)}</em></p>`:""}
+              ${(l=r.alternates)!=null&&l.length?`<p class="placeholder-explain">Also accepted: ${r.alternates.map(c=>`<em>${s(c)}</em>`).join(" / ")}</p>`:""}
             </details>
           </li>`}).join("")}
       </ol>
-    </section>`).join("")}function te(){const o=j,e=[...new Set(o.map(a=>a.format))],r=Object.fromEntries(e.map(a=>[a,o.filter(t=>t.format===a)]));return e.map(a=>`
-    <section class="placeholder-level-group">
-      <h3 class="placeholder-level-heading">${i(a)}</h3>
-      ${r[a].map(t=>{var s;return`
-        <article class="placeholder-card">
-          <h4>${i(t.title)} <span class="module-level-badge">${t.level}</span></h4>
-          <p><strong>Audience:</strong> ${i(t.audience)}</p>
-          <p><strong>Purpose:</strong> ${i(t.purpose)}</p>
-          ${t.context?`<p class="placeholder-context">${i(t.context)}</p>`:""}
-          <p><strong>Include all 3 points:</strong></p>
-          <ul>${(t.bullets||[]).map(n=>`<li>${i(n)}</li>`).join("")}</ul>
-          <p class="ptg-note">Word count: ${i(t.wordCount||"100–120 words")}</p>
-          ${k({id:`sw-${t.id||t.title||"prompt"}`,model:t.modelAnswer||"",skill:"situationalWriting",placeholder:"Write your letter, email or diary entry here…"})}
-          ${(s=t.checklist)!=null&&s.length?`
-            <details>
-              <summary>Self-check list</summary>
-              <ul>${t.checklist.map(n=>`<li>${i(n)}</li>`).join("")}</ul>
-            </details>`:""}
-          ${t.modelAnswer?`
-            <details>
-              <summary>Show model answer</summary>
-              <pre class="placeholder-poster">${i(t.modelAnswer)}</pre>
-            </details>`:""}
-          ${t.rubric?`
-            <details>
-              <summary>Marking rubric</summary>
-              <table class="ptg-table"><tbody>
-                ${Object.entries(t.rubric).map(([n,l])=>`<tr><td><strong>${i(n)}</strong></td><td>${i(l)}</td></tr>`).join("")}
-              </tbody></table>
-            </details>`:""}
-        </article>`}).join("")}
-    </section>`).join("")}function ae(o){return o==="visual-text"?X():o==="open-comprehension"?Z():o==="synthesis"?ee():o==="situational-writing"?te():o==="p1-practice-tests"?g({level:"P1",papers:I.map(e=>P[e]).filter(Boolean),intro:"Pick a P1 paper to take the test interactively. Every section is scored — at the end you'll see which skills to drill."}):o==="p2-practice-tests"?g({level:"P2",papers:E.map(e=>A[e]).filter(Boolean),intro:"Pick a P2 paper to take the test interactively. Includes Sentence Combining and mixed-error Editing."}):o==="p3-practice-tests"?g({level:"P3",papers:C.map(e=>R[e]).filter(Boolean),intro:"Pick a P3 paper to take the test interactively. Only Terms 1–3 are in this bank (no T4). T3 includes open Comprehension Cloze and two passages."}):o==="p4-practice-tests"?g({level:"P4",papers:H.map(e=>M[e]).filter(Boolean),intro:"Pick a P4 paper to take the test interactively. Includes Synthesis & Transformation and longer Comprehension."}):o==="p5-practice-tests"?g({level:"P5",papers:q.map(e=>L[e]).filter(Boolean),intro:"Pick a P5 paper. Includes Situational Writing, Comprehension Cloze and evidence-based comprehension questions."}):o==="p6-practice-tests"?g({level:"P6",papers:O.map(e=>W[e]).filter(Boolean),intro:"Pick a P6 PSLE-format paper. Full Paper 1 + Paper 2 structure. Every wrong answer routes to the matching drill."}):""}function ue(o,e,{onClose:r,onRelated:a}={}){var n;if(!o)return;o.innerHTML=Q(e),(n=o.querySelector("[data-placeholder-close]"))==null||n.addEventListener("click",()=>r==null?void 0:r()),o.querySelectorAll("[data-related]").forEach(l=>{l.addEventListener("click",()=>a==null?void 0:a(l.dataset.related))}),K(o,{quest:e});const t=o.querySelectorAll(".ptg-mode-btn");t.forEach(l=>{l.addEventListener("click",()=>{t.forEach(d=>d.classList.remove("ptg-mode-btn--active")),l.classList.add("ptg-mode-btn--active")})});const s=o.querySelectorAll("[data-start-paper]");if(s.length){const l=oe(e);s.forEach(d=>{d.addEventListener("click",()=>{const f=d.getAttribute("data-start-paper"),c=l.find(p=>p.id===f);if(!c)return;const y=o.querySelector(".ptg-mode-btn--active"),h=(y==null?void 0:y.getAttribute("data-mode"))||"practice",u=document.createElement("div");u.className="primary-placeholder ptg-stage-wrap",o.innerHTML="",o.appendChild(u),_(u,c,{onClose:()=>r==null?void 0:r(),onPractiseSkill:p=>a==null?void 0:a(p),mode:h})})})}}function oe(o){return o==="p1-practice-tests"?I.map(e=>P[e]).filter(Boolean):o==="p2-practice-tests"?E.map(e=>A[e]).filter(Boolean):o==="p3-practice-tests"?C.map(e=>R[e]).filter(Boolean):o==="p4-practice-tests"?H.map(e=>M[e]).filter(Boolean):o==="p5-practice-tests"?q.map(e=>L[e]).filter(Boolean):o==="p6-practice-tests"?O.map(e=>W[e]).filter(Boolean):[]}export{ce as PRIMARY_PLACEHOLDER_KINDS,Q as buildPlaceholderHtml,ge as getPlaceholderMeta,ue as mountPlaceholderModule};
+    </section>`).join("")}function Ae(e){return Q[e]?"<div data-section-runner></div>":e==="synthesis"?Pe():e==="p1-practice-tests"?T({level:"P1",papers:L.map(t=>O[t]).filter(Boolean),intro:"Pick a P1 paper to take the test interactively. Every section is scored — at the end you'll see which skills to drill."}):e==="p2-practice-tests"?T({level:"P2",papers:x.map(t=>D[t]).filter(Boolean),intro:"Pick a P2 paper to take the test interactively. Includes Sentence Combining and mixed-error Editing."}):e==="p3-practice-tests"?T({level:"P3",papers:W.map(t=>N[t]).filter(Boolean),intro:"Pick a P3 paper to take the test interactively. Only Terms 1–3 are in this bank (no T4). T3 includes open Comprehension Cloze and two passages."}):e==="p4-practice-tests"?T({level:"P4",papers:F.map(t=>_[t]).filter(Boolean),intro:"Pick a P4 paper to take the test interactively. Includes Synthesis & Transformation and longer Comprehension."}):e==="p5-practice-tests"?T({level:"P5",papers:B.map(t=>Y[t]).filter(Boolean),intro:"Pick a P5 paper. Includes Situational Writing, Comprehension Cloze and evidence-based comprehension questions."}):e==="p6-practice-tests"?T({level:"P6",papers:G.map(t=>j[t]).filter(Boolean),intro:"Pick a P6 PSLE-format paper. Full Paper 1 + Paper 2 structure. Every wrong answer routes to the matching drill."}):""}function xe(e,t,{onClose:o,onRelated:a}={}){var i;if(!e)return;e.innerHTML=ke(t),(i=e.querySelector("[data-placeholder-close]"))==null||i.addEventListener("click",()=>o==null?void 0:o()),e.querySelectorAll("[data-related]").forEach(h=>{h.addEventListener("click",()=>a==null?void 0:a(h.dataset.related))}),H(e,{quest:t});const r=e.querySelector("[data-section-runner]"),l=Q[t];r&&l&&ue(r,{items:l.items(),kind:t,unit:l.unit,renderItem:l.body,onItemMounted:h=>H(h,{quest:t})});const c=e.querySelectorAll(".ptg-mode-btn");c.forEach(h=>{h.addEventListener("click",()=>{c.forEach(g=>g.classList.remove("ptg-mode-btn--active")),h.classList.add("ptg-mode-btn--active")})});const n=e.querySelectorAll("[data-start-paper]");if(n.length){const h=Ee(t);n.forEach(g=>{g.addEventListener("click",()=>{const v=g.getAttribute("data-start-paper"),w=h.find(f=>f.id===v);if(!w)return;const m=e.querySelector(".ptg-mode-btn--active"),S=(m==null?void 0:m.getAttribute("data-mode"))||"practice",b=document.createElement("div");b.className="primary-placeholder ptg-stage-wrap",e.innerHTML="",e.appendChild(b),oe(b,w,{onClose:()=>o==null?void 0:o(),onPractiseSkill:f=>a==null?void 0:a(f),mode:S})})})}}function Ee(e){return e==="p1-practice-tests"?L.map(t=>O[t]).filter(Boolean):e==="p2-practice-tests"?x.map(t=>D[t]).filter(Boolean):e==="p3-practice-tests"?W.map(t=>N[t]).filter(Boolean):e==="p4-practice-tests"?F.map(t=>_[t]).filter(Boolean):e==="p5-practice-tests"?B.map(t=>Y[t]).filter(Boolean):e==="p6-practice-tests"?G.map(t=>j[t]).filter(Boolean):[]}export{Oe as PRIMARY_PLACEHOLDER_KINDS,ke as buildPlaceholderHtml,Ne as getPlaceholderMeta,xe as mountPlaceholderModule};

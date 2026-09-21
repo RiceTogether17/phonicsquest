@@ -26,6 +26,8 @@ import { P5_PRACTICE_TESTS, P5_PRACTICE_TEST_TERMS } from '../data/p5PracticeTes
 import { P6_PRACTICE_TESTS, P6_PRACTICE_TEST_TERMS } from '../data/p6PracticeTests.js';
 import { mountPracticeTest, buildPaperLauncherHtml } from './primaryPracticeTest.js';
 import { renderOpenResponseHtml, attachOpenResponses } from './openResponse.js';
+import { mountSectionRunner } from './primarySectionRunner.js';
+import { renderVisualStimulus } from './visualStimulus.js';
 
 export const PRIMARY_PLACEHOLDER_KINDS = Object.freeze([
   'visual-text',
@@ -68,74 +70,116 @@ export function buildPlaceholderHtml(kind) {
     </div>`;
 }
 
-function _renderVisualText() {
-  const items = VISUAL_TEXT_ITEMS;
-  // Group by level for navigation
-  const levels = [...new Set(items.map((i) => i.level))].sort();
-  const byLevel = Object.fromEntries(levels.map((l) => [l, items.filter((i) => i.level === l)]));
-  return levels
-    .map(
-      (level) => `
-    <section class="placeholder-level-group">
-      <h3 class="placeholder-level-heading">${level} — ${byLevel[level].length} items</h3>
-      ${byLevel[level]
+/**
+ * One item's body, for the section runner.
+ *
+ * Audit 2026-09-19, finding 17: these three sections used to render every item
+ * of every grade into one page — 63 answer boxes for Visual Text, 107 for
+ * Open-ended Comprehension, 20 for Situational Writing, all starting at P1
+ * whatever grade the child is in. They now hand a single item to
+ * `mountSectionRunner`, which opens at the learner's own grade and shows one
+ * stimulus at a time.
+ */
+function _visualTextBody(item) {
+  return `
+    <h4>${escapeHtml(item.title)} <span class="module-level-badge">${escapeHtml(item.type || 'visual')}</span></h4>
+    ${renderVisualStimulus(item)}
+    <ol class="placeholder-questions">
+      ${(item.questions || [])
         .map(
-          (s) => `
-        <article class="placeholder-card">
-          <h4>${escapeHtml(s.title)} <span class="module-level-badge">${s.type || 'visual'}</span></h4>
-          <pre class="placeholder-poster" aria-label="Visual text content">${escapeHtml(s.poster)}</pre>
-          <ol class="placeholder-questions">
-            ${s.questions
-              .map(
-                (q, qi) => `
-              <li>
-                <p class="ptg-q-stem">${escapeHtml(q.q)}</p>
-                ${renderOpenResponseHtml({ id: `vt-${s.id || level}-${qi}`, model: q.a, skill: 'visualText' })}
-              </li>`,
-              )
-              .join('')}
-          </ol>
-        </article>`,
+          (q, qi) => `
+        <li>
+          <p class="ptg-q-stem">${escapeHtml(q.q)}</p>
+          ${renderOpenResponseHtml({ id: `vt-${item.id || item.level}-${qi}`, model: q.a, skill: 'visualText' })}
+        </li>`,
         )
         .join('')}
-    </section>`,
-    )
-    .join('');
+    </ol>`;
 }
 
-function _renderOpenComprehension() {
-  const items = OPEN_COMPREHENSION_PASSAGES;
-  const levels = [...new Set(items.map((i) => i.level))].sort();
-  const byLevel = Object.fromEntries(levels.map((l) => [l, items.filter((i) => i.level === l)]));
-  return levels
-    .map(
-      (level) => `
-    <section class="placeholder-level-group">
-      <h3 class="placeholder-level-heading">${level} — ${byLevel[level].length} passage${byLevel[level].length > 1 ? 's' : ''}</h3>
-      ${byLevel[level]
+function _openComprehensionBody(item) {
+  return `
+    <h4>${escapeHtml(item.title)}</h4>
+    <p class="placeholder-passage" style="white-space:pre-line">${escapeHtml(item.passage)}</p>
+    <ol class="placeholder-questions">
+      ${(item.questions || [])
         .map(
-          (s) => `
-        <article class="placeholder-card">
-          <h4>${escapeHtml(s.title)}</h4>
-          <p class="placeholder-passage" style="white-space:pre-line">${escapeHtml(s.passage)}</p>
-          <ol class="placeholder-questions">
-            ${s.questions
-              .map(
-                (q, qi) => `
-              <li>
-                <p class="ptg-q-stem">${escapeHtml(q.q)}</p>
-                ${renderOpenResponseHtml({ id: `oc-${s.id || level}-${qi}`, model: q.model, skill: 'openComprehension' })}
-              </li>`,
-              )
-              .join('')}
-          </ol>
-        </article>`,
+          (q, qi) => `
+        <li>
+          <p class="ptg-q-stem">${escapeHtml(q.q)}</p>
+          ${renderOpenResponseHtml({ id: `oc-${item.id || item.level}-${qi}`, model: q.model, skill: 'openComprehension' })}
+        </li>`,
         )
         .join('')}
-    </section>`,
-    )
-    .join('');
+    </ol>`;
 }
+
+function _situationalWritingBody(item) {
+  return `
+    <h4>${escapeHtml(item.title)} <span class="module-level-badge">${escapeHtml(item.level)}</span></h4>
+    <p><strong>Format:</strong> ${escapeHtml(item.format || '')}</p>
+    <p><strong>Audience:</strong> ${escapeHtml(item.audience || '')}</p>
+    <p><strong>Purpose:</strong> ${escapeHtml(item.purpose || '')}</p>
+    ${item.context ? `<p class="placeholder-context">${escapeHtml(item.context)}</p>` : ''}
+    <p><strong>Include all 3 points:</strong></p>
+    <ul>${(item.bullets || []).map((b) => `<li>${escapeHtml(b)}</li>`).join('')}</ul>
+    <p class="ptg-note">Word count: ${escapeHtml(item.wordCount || '100–120 words')}</p>
+    ${renderOpenResponseHtml({
+      id: `sw-${item.id || item.title || 'prompt'}`,
+      model: item.modelAnswer || '',
+      skill: 'situationalWriting',
+      placeholder: 'Write your letter, email or diary entry here…',
+    })}
+    ${
+      item.checklist?.length
+        ? `
+      <details>
+        <summary>Self-check list</summary>
+        <ul>${item.checklist.map((c) => `<li>${escapeHtml(c)}</li>`).join('')}</ul>
+      </details>`
+        : ''
+    }
+    ${
+      item.modelAnswer
+        ? `
+      <details>
+        <summary>Show model answer</summary>
+        <p class="placeholder-model" style="white-space:pre-line">${escapeHtml(item.modelAnswer)}</p>
+      </details>`
+        : ''
+    }
+    ${
+      item.rubric
+        ? `
+      <details>
+        <summary>Marking rubric</summary>
+        <table class="ptg-table"><tbody>
+          ${Object.entries(item.rubric)
+            .map(
+              ([k, v]) =>
+                `<tr><td><strong>${escapeHtml(k)}</strong></td><td>${escapeHtml(v)}</td></tr>`,
+            )
+            .join('')}
+        </tbody></table>
+      </details>`
+        : ''
+    }`;
+}
+
+/** The three sections the audit measured, by kind. */
+const RUNNER_SECTIONS = {
+  'visual-text': { items: () => VISUAL_TEXT_ITEMS, unit: 'poster', body: _visualTextBody },
+  'open-comprehension': {
+    items: () => OPEN_COMPREHENSION_PASSAGES,
+    unit: 'passage',
+    body: _openComprehensionBody,
+  },
+  'situational-writing': {
+    items: () => SITUATIONAL_WRITING_PROMPTS,
+    unit: 'task',
+    body: _situationalWritingBody,
+  },
+};
 
 function _renderSynthesis() {
   const items = SYNTHESIS_ITEMS;
@@ -240,10 +284,10 @@ function _renderSituationalWriting() {
 }
 
 function _renderBody(kind) {
-  if (kind === 'visual-text') return _renderVisualText();
-  if (kind === 'open-comprehension') return _renderOpenComprehension();
+  // The runner-driven sections paint themselves after mount, so the static
+  // body is just the host they mount into. Audit 2026-09-19, finding 17.
+  if (RUNNER_SECTIONS[kind]) return '<div data-section-runner></div>';
   if (kind === 'synthesis') return _renderSynthesis();
-  if (kind === 'situational-writing') return _renderSituationalWriting();
 
   if (kind === 'p1-practice-tests') {
     return buildPaperLauncherHtml({
@@ -309,6 +353,20 @@ export function mountPlaceholderModule(container, kind, { onClose, onRelated } =
 
   // The comprehension and writing libraries are answerable, not just readable.
   attachOpenResponses(container, { quest: kind });
+
+  // Catalogue-then-one-task sections paint themselves, and rewire their answer
+  // boxes on every navigation. Audit 2026-09-19, finding 17.
+  const runnerHost = container.querySelector('[data-section-runner]');
+  const section = RUNNER_SECTIONS[kind];
+  if (runnerHost && section) {
+    mountSectionRunner(runnerHost, {
+      items: section.items(),
+      kind,
+      unit: section.unit,
+      renderItem: section.body,
+      onItemMounted: (host) => attachOpenResponses(host, { quest: kind }),
+    });
+  }
 
   // Mode picker toggle (Practice / Test Mode).
   const modeBtns = container.querySelectorAll('.ptg-mode-btn');

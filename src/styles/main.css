@@ -15981,6 +15981,191 @@ textarea:hover {
   padding: 2px 8px;
   border-radius: 999px;
 }
+/* ── Visual Text stimulus ──────────────────────────────────────────────
+   Audit 2026-09-19, finding 18: posters were rendered in <pre>, so meaning
+   carried by layout — what is biggest, what is grouped, which column a row
+   belongs to — was not there to read. The sheet below gives a real hierarchy;
+   the markup underneath it is headings, lists and tables, so a screen-reader
+   user gets the same structure. */
+.vstim {
+  margin: 0 0 var(--space-4, 16px);
+}
+.vstim-sheet {
+  border: 2px solid var(--border, #e5e3fa);
+  border-radius: var(--radius-md, 10px);
+  background: var(--surface, #fff);
+  padding: var(--space-4, 16px);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
+}
+.vstim-headline {
+  margin: 0 0 var(--space-2, 8px);
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+.vstim-standfirst {
+  margin-bottom: var(--space-3, 12px);
+  padding-bottom: var(--space-3, 12px);
+  border-bottom: 1px solid var(--border, #e5e3fa);
+  text-align: center;
+  font-weight: 600;
+}
+.vstim-block + .vstim-block {
+  margin-top: var(--space-3, 12px);
+}
+.vstim-p {
+  margin: 0 0 var(--space-1, 4px);
+}
+.vstim-ol,
+.vstim-ul {
+  margin: 0;
+  padding-left: 1.4em;
+}
+.vstim-ol li,
+.vstim-ul li {
+  margin-bottom: 2px;
+}
+.vstim-dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px var(--space-3, 12px);
+  margin: 0;
+}
+.vstim-dl dt {
+  font-weight: 700;
+}
+.vstim-dl dd {
+  margin: 0;
+}
+.vstim-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.vstim-table th,
+.vstim-table td {
+  border: 1px solid var(--border, #e5e3fa);
+  padding: 4px 8px;
+  text-align: left;
+}
+.vstim-table th {
+  background: var(--surface-2, #f3f4f6);
+  font-weight: 700;
+}
+.vstim-caption {
+  margin-top: var(--space-1, 4px);
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+/* A menu and an advertisement should not look like a school notice. */
+.vstim--menu .vstim-headline,
+.vstim--advertisement .vstim-headline {
+  text-transform: uppercase;
+}
+.vstim--notice .vstim-sheet {
+  border-style: dashed;
+}
+
+/* ── Primary section runner ────────────────────────────────────────────
+   Catalogue, then one task at a time. Audit 2026-09-19, finding 17. */
+.psr-levelbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: var(--space-3, 12px);
+}
+.psr-level {
+  padding: 6px 12px;
+  border: 1px solid var(--border, #e5e3fa);
+  border-radius: 999px;
+  background: var(--surface, #fff);
+  color: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 44px;
+}
+.psr-level--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+.psr-level-mine {
+  font-weight: 400;
+  opacity: 0.85;
+}
+.psr-intro {
+  margin: 0 0 var(--space-3, 12px);
+  color: var(--color-text-muted);
+}
+.psr-catalogue {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.psr-open {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3, 12px);
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--border, #e5e3fa);
+  border-radius: var(--radius-md, 10px);
+  background: var(--surface, #fff);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.psr-open-title {
+  font-weight: 700;
+}
+.psr-open-meta {
+  flex-shrink: 0;
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--color-text-muted);
+}
+.psr-taskbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2, 8px);
+  margin-bottom: var(--space-3, 12px);
+}
+.psr-progress {
+  margin: 0;
+  font-weight: 700;
+}
+.psr-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3, 12px);
+  margin-top: var(--space-4, 16px);
+}
+.psr-nav .btn {
+  min-height: 44px;
+}
+.psr-done {
+  text-align: center;
+  padding: var(--space-5, 24px) var(--space-3, 12px);
+}
+.psr-done-icon {
+  font-size: 2.5rem;
+  margin: 0;
+}
+.psr-done-title {
+  margin: var(--space-2, 8px) 0 4px;
+}
+.psr-done-sub {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
 .placeholder-blurb {
   font-size: 0.92rem;
   color: var(--text-muted, #555);
