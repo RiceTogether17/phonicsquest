@@ -42,6 +42,7 @@ import { celebrateCorrect } from '../components/confettiHelper.js';
 import { mascot } from '../components/mascot.js';
 import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
 import { getUniqueWordVaultDone, recordWordVaultCompletion } from './clozeCompletionTracker.js';
+import { practiceSeedId, seedBreakdown, seedIdIndex } from '../data/practiceSeeds.js';
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { renderReadFirstScan } from './readFirstScan.js';
 import { buildScanTaskForPassage, renderScanTask } from './scanTask.js';
@@ -264,6 +265,13 @@ function _recordAffixAttempt(affix, correct) {
   store.set('clueStats', clueStats);
 }
 
+/**
+ * Distinct passages this child has met in a category, across every level.
+ *
+ * Audit finding 12: counted completion records before, and most records in a
+ * level are repeats of the same passage — P6 Context Inference offers 38
+ * passages built from ten bodies. Counted in seeds now.
+ */
 function _getUniquePassageCountForCategory(catKey, levels = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6']) {
   return levels.reduce(
     (sum, lv) =>
@@ -273,6 +281,7 @@ function _getUniquePassageCountForCategory(catKey, levels = ['p1', 'p2', 'p3', '
         level: lv,
         wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {},
         wvqCompleted: store.get('wvqCompleted') || {},
+        seedIndex: seedIdIndex((vocabPassages[catKey] || {})[lv] || []),
       }),
     0,
   );
@@ -360,15 +369,15 @@ function _renderCategoryBrowser() {
           level: lv,
           wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {},
           wvqCompleted: completed,
+          seedIndex: seedIdIndex((vocabPassages[key] || {})[lv] || []),
         }) > 0,
     ).length;
     const levelsForCat = Object.values(vocabPassages[key] || {});
     const totalLevels = levelsForCat.filter((arr) => (arr || []).length > 0).length;
-    const totalPassages = levelsForCat.reduce((sum, arr) => sum + (arr || []).length, 0);
-    const totalQuestions = levelsForCat.reduce(
-      (sum, arr) => sum + (arr || []).reduce((n, passage) => n + (passage.answers?.length || 0), 0),
-      0,
-    );
+    // Distinct passages and their questions — not the bank's shelf length.
+    const catBreakdown = levelsForCat.map((arr) => seedBreakdown(arr || []));
+    const totalPassages = catBreakdown.reduce((sum, b) => sum + b.seeds, 0);
+    const totalQuestions = catBreakdown.reduce((sum, b) => sum + b.seedQuestions, 0);
     const donePassages = _getUniquePassageCountForCategory(key);
     const perLevel = totalLevels ? Math.round(totalQuestions / totalLevels) : 0;
     const isRecommended = key === recommendedCat;
@@ -443,23 +452,16 @@ function _renderLevelBrowser(catKey) {
   for (const lv of levels) {
     const passages = catData[lv];
     const hasPassage = passages && passages.length > 0;
-    const isDone =
-      getUniqueWordVaultDone({
-        category: catKey,
-        level: lv,
-        wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {},
-        wvqCompleted: store.get('wvqCompleted') || {},
-      }) > 0;
     const uniqueDone = getUniqueWordVaultDone({
       category: catKey,
       level: lv,
       wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {},
       wvqCompleted: store.get('wvqCompleted') || {},
+      seedIndex: seedIdIndex(passages || []),
     });
-    const questionTotal = (passages || []).reduce(
-      (sum, passage) => sum + (passage.answers?.length || 0),
-      0,
-    );
+    const isDone = uniqueDone > 0;
+    const levelBreakdown = seedBreakdown(passages || []);
+    const questionTotal = levelBreakdown.seedQuestions;
 
     html += `
       <button class="wv-level-btn ${isDone ? 'wv-level-btn--done' : ''} ${!hasPassage ? 'wv-level-btn--locked' : ''}"
@@ -469,7 +471,7 @@ function _renderLevelBrowser(catKey) {
               aria-label="${LEVEL_LABELS[lv]}${isDone ? ' – completed' : ''}">
         <span class="wv-level-icon">${isDone ? renderSummaryStars(completed[lv]?.stars || 1) : LEVEL_ICONS[lv]}</span>
         <span class="wv-level-name">${LEVEL_LABELS[lv]}</span>
-        <span class="wv-level-count">${questionTotal} questions · ${uniqueDone}/${(passages || []).length} passages</span>
+        <span class="wv-level-count">${questionTotal} questions · ${Math.min(uniqueDone, levelBreakdown.seeds)}/${levelBreakdown.seeds} passages${levelBreakdown.variants ? ` · +${levelBreakdown.variants} revision rounds` : ''}</span>
       </button>`;
   }
 
@@ -1343,6 +1345,7 @@ function _checkPassage(passage) {
         category: _currentCat,
         level: _currentLevel,
         passageId: passage.id,
+        seedId: practiceSeedId(passage),
         stars,
         accuracy: accPercent,
         wvqCompletedByPassage: store.get('wvqCompletedByPassage') || {},

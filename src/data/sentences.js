@@ -755,6 +755,10 @@ function buildSentenceVariant(source, level, track, index, idSeq = index) {
     return {
       ...source,
       id: `sx-p${level}-${track}-${String(idSeq + 1).padStart(3, '0')}`,
+      // Audit finding 12: a framed sentence is the seed sentence again with a
+      // fronted phrase. Worth ordering a second time; not a second sentence.
+      seedId: source.seedId || source.id,
+      isVariant: true,
     };
   }
   const timeFramed = frame.startsWith('On ');
@@ -765,6 +769,8 @@ function buildSentenceVariant(source, level, track, index, idSeq = index) {
   return {
     ...source,
     id: `sx-p${level}-${track}-${String(idSeq + 1).padStart(3, '0')}`,
+    seedId: source.seedId || source.id,
+    isVariant: true,
     sentence,
     acceptableAnswers: (source.acceptableAnswers || []).map(answer =>
       timeFramed ? contextualizeSentence(answer, index) : applyFrame(answer, frame)),

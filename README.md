@@ -6,7 +6,7 @@ PhonicsQuest started as a phonics blender for early readers and now spans the fu
 
 - **🌱 Early Reading Quest** — phonics, blending, sight words, letter sounds, decodable Giri stories. K1–K2 / early P1.
 - **🏫 Primary English Quest** — Grammar MCQ, Vocabulary MCQ, Cloze Castle (Grammar Cloze), Word Vault (Vocabulary Cloze), Comprehension Cloze, Open-ended Comprehension, Visual Text Comprehension, Sentence Forge, Synthesis & Transformation, Editing Quest, Writing Quest and Situational Writing. P1–P6.
-- **📚 Deep practice banks** — every selectable grade/category or grade/track in Grammar MCQ, Vocabulary MCQ, Cloze Castle, Word Vault and Sentence Forge contains more than 100 questions, with varied formats and answer-integrity checks.
+- **📚 Practice banks, counted honestly** — sizes vary by module and are [listed below](#-practice-bank-sizes), checked against the live banks by a test. Every item carries answer-integrity checks.
 - **📋 Exam Practice Hub** — complete interactive P1–P6 term papers with **Practice Mode** and timed **Test Mode**, automatic scoring, weak-skill feedback and follow-up module recommendations.
 - **👨‍👩‍👧 Parent Dashboard** — a parent-friendly Report Card (Strengths · Needs Practice · Recent Mistakes · 10-min recommendation · Teacher's note), a one-click "Copy Parent Update" WhatsApp message, plus full CSV/JSON exports for advanced users.
 
@@ -65,6 +65,33 @@ The home screen is organised into four tabs so a child always lands on one clear
 - **👪 Grown-ups** — the **Learning Roadmap** (where the child is, what's locked and why, how to help this week — no PIN needed), the PIN-protected Parent Dashboard, and profile management.
 
 The last-used tab is remembered per profile within the day; every new day starts back on Today.
+
+### 📊 Practice bank sizes
+
+An earlier version of this file said every selectable scope in these five
+modules held "more than 100 questions". That was true of Sentence Forge and of
+nothing else. The MCQ banks were deduplicated to their real seeds and got much
+smaller; Cloze Castle and Word Vault reached the figure by re-presenting each
+authored passage with a new lead sentence — P1 Articles offers 27 passages built
+from four, and P6 Context Inference 38 built from ten.
+
+The repeats are worth doing, so they are still there. They are counted as
+revision rounds rather than as coverage, both in the app and here. The numbers
+below are the distinct material.
+
+<!-- practice-bank-sizes: checked against the live banks by practiceSeedCoverage.test.js -->
+
+| Module         | Selectable scopes  | Distinct items per scope    | Bank total                 |
+| -------------- | ------------------ | --------------------------- | -------------------------- |
+| Grammar MCQ    | 143 grade/category | 10–23 questions             | 2520 questions, no repeats |
+| Vocabulary MCQ | 132 grade/category | 8–20 questions              | 1928 questions, no repeats |
+| Cloze Castle   | 97 grade/category  | 3–11 passages, 9–33 blanks  | 529 passages, 3193 rounds  |
+| Word Vault     | 84 category/grade  | 6–14 passages, 18–42 blanks | 749 passages, 3101 rounds  |
+| Sentence Forge | 15 grade/track     | 101–111 sentences           | 1559 sentences, no repeats |
+
+"Rounds" is how many times a child could sit down to a passage in that module
+before running out; "passages" is how many different ones they would have read.
+Every module's on-screen progress counts the second number.
 
 ### 📋 Exam Practice Hub
 

@@ -86,8 +86,26 @@ function pick(level, idx, arr) {
   return arr[(idx + LEVELS.indexOf(level)) % arr.length];
 }
 
+/** The index `pick` would return for an array of this length. */
+function pickIndex(level, idx, length) {
+  return (idx + LEVELS.indexOf(level)) % length;
+}
+
+/**
+ * Build one passage body, and say which of the generator's fixed parts made it.
+ *
+ * Audit 2026-09-19, finding 12: the body is a template with a school context
+ * dropped into it, so two passages built from the same template and context
+ * are the same passage with a different lead sentence. P6 Context Inference
+ * reaches 38 passages that way, from ten distinct bodies. The returned
+ * `seedKey` is what makes the repeat visible to the counters — see
+ * `practiceSeeds.js`.
+ *
+ * @returns {{text: string, seedKey: string}}
+ */
 function makeText(category, level, idx) {
-  const context = pick(level, idx, CONTEXTS[level]);
+  const contextIdx = pickIndex(level, idx, CONTEXTS[level].length);
+  const context = CONTEXTS[level][contextIdx];
   const lead = `${passageLead(idx)} `;
   const variants = {
     0: `During ${context}, the path outside was ___. Mei opened her ___ before crossing the courtyard. She stayed under the walkway so her worksheet remained ___.`,
@@ -95,9 +113,15 @@ function makeText(category, level, idx) {
     2: `After good news in ${context}, Jia looked ___. The boy who cut the queue was ___. The teacher gave a ___ reminder before dismissal.`,
   };
 
-  if (category === 'definitionMatch') return lead + variants[1];
-  if (category === 'synonymContrast') return lead + variants[2];
-  if (category === 'contextInference') return lead + variants[0];
+  // These three categories have a single body template each, so their only
+  // source of distinct material is the school context.
+  const FIXED_TEMPLATE = { definitionMatch: 1, synonymContrast: 2, contextInference: 0 };
+  if (category in FIXED_TEMPLATE) {
+    return {
+      text: lead + variants[FIXED_TEMPLATE[category]],
+      seedKey: `t${FIXED_TEMPLATE[category]}c${contextIdx}`,
+    };
+  }
 
   const perCategory = {
     morphologicalAffix: [
@@ -157,7 +181,9 @@ function makeText(category, level, idx) {
     ],
   };
 
-  return lead + pick(level, idx, perCategory[category]);
+  const templates = perCategory[category];
+  const templateIdx = pickIndex(level, idx, templates.length);
+  return { text: lead + templates[templateIdx], seedKey: `t${templateIdx}c${contextIdx}` };
 }
 
 function buildLearningAids(text, category, answers) {
@@ -270,7 +296,7 @@ function buildLearningAids(text, category, answers) {
 
 function buildPassage(category, level, idx) {
   const core = CATEGORY_BANK[category];
-  const text = makeText(category, level, idx);
+  const { text, seedKey } = makeText(category, level, idx);
   const wordBank = [...core.answers, ...core.distractors];
   const learning = buildLearningAids(text, category, core.answers);
   const definitions = Object.fromEntries(wordBank.map((w) => [w, makeDefinition(w)]));
@@ -281,6 +307,9 @@ function buildPassage(category, level, idx) {
 
   return {
     id: `vxg-${short}-p${levelNum}-${String(idx + 1).padStart(2, '0')}`,
+    // Two passages sharing a seed share their body and their answers; only
+    // the lead sentence and the title differ.
+    seedId: `vxs-${short}-p${levelNum}-${seedKey}`,
     title: `${titleSeed} · ${contextualTitle(idx)} (${level.toUpperCase()})`,
     text,
     answers: [...core.answers],
@@ -304,7 +333,21 @@ export function buildExtraPassageBank(levels = []) {
     out[category] = {};
     for (const level of levels) {
       const passageCount = Math.ceil(MIN_QUESTIONS_PER_SCOPE / CATEGORY_BANK[category].answers.length);
-      out[category][level] = Array.from({ length: passageCount }, (_, i) => buildPassage(category, level, i));
+      const built = Array.from({ length: passageCount }, (_, i) => buildPassage(category, level, i));
+      // The first passage to present a body is that body's seed; the rest are
+      // re-presentations of it. Rewriting the first one's seedId to its own id
+      // keeps "is this a repeat?" answerable from the item alone.
+      const firstForSeed = new Map();
+      for (const passage of built) {
+        if (!firstForSeed.has(passage.seedId)) {
+          firstForSeed.set(passage.seedId, passage);
+          passage.seedId = passage.id;
+        } else {
+          passage.seedId = firstForSeed.get(passage.seedId).id;
+          passage.isVariant = true;
+        }
+      }
+      out[category][level] = built;
     }
   }
   return out;

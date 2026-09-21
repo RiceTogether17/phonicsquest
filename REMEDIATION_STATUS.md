@@ -8,17 +8,19 @@ Audited commit: `79dff37`. Findings: 26 (12 P1, 13 P2, 1 P3).
 
 ## Summary
 
-**All 12 P1 findings are addressed**, plus eight P2 findings: the four of the
+**All 12 P1 findings are addressed**, plus nine P2 findings: the four of the
 audit's work package 4 (the remaining ones that produce a number a parent or
-teacher reads), the accessibility failures, the timezone bug, and the two
-learning-experience findings. P1 is the audit's bar for "before assessment use or wider unsupervised
-rollout": incorrect marking or teaching, misleading assessment claims,
-cross-learner records, credential disclosure.
+teacher reads), the accessibility failures, the timezone bug, the two
+learning-experience findings, and the practice-bank counting. P1 is the audit's
+bar for "before assessment use or wider unsupervised rollout": incorrect
+marking or teaching, misleading assessment claims, cross-learner records,
+credential disclosure.
 
-Five P2 findings and the one P3 remain. They are real and several affect daily
-use.
+**Every figure the audit named as overstated is now correct or gone.** Four P2
+findings and the one P3 remain; none of them produces a number anyone reads.
+They are real and two affect daily use.
 
-Verification on the current head: 210 test files, 2,769 unit tests, 48 browser
+Verification on the current head: 212 test files, 2,790 unit tests, 48 browser
 tests, typecheck, lint (0 errors), formatting, scope/sequence check and bundle
 budget all pass.
 
@@ -63,10 +65,11 @@ produced a figure someone would read as a result.
 
 ## P2 — also done
 
-| #   | Finding                | What changed                                                                                                                                                                                                                                                  |
-| --- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 20  | Accessibility failures | Cloze level picker is real `<ul>`/`<li>` markup. `--color-primary-on-tint` per theme, computed to clear 5:1 (all four themes failed before, worst 1.88:1), with dark mode mapped to `--color-primary-light`. CI now scans the five primary sections: 42 → 48. |
-| 23  | Timezone day labels    | Day keys are learner-local throughout, from one shared helper used by the chart, the XP ledger and its cutoff. Calendar stepping replaces fixed 24-hour blocks. Verified under five zones.                                                                    |
+| #   | Finding                      | What changed                                                                                                                                                                                                                                                                                                        |
+| --- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 20  | Accessibility failures       | Cloze level picker is real `<ul>`/`<li>` markup. `--color-primary-on-tint` per theme, computed to clear 5:1 (all four themes failed before, worst 1.88:1), with dark mode mapped to `--color-primary-light`. CI now scans the five primary sections: 42 → 48.                                                       |
+| 23  | Timezone day labels          | Day keys are learner-local throughout, from one shared helper used by the chart, the XP ledger and its cutoff. Calendar stepping replaces fixed 24-hour blocks. Verified under five zones.                                                                                                                          |
+| 12  | Bank size overstates variety | Every generated item names the authored one it re-presents. Coverage counts those; repeats are shown as "revision rounds". P1 Articles reads "15 questions · 0 / 4 passages · +23 revision rounds" where it read "102 questions · 0 / 27 passages". README numbers now come from the live banks and a test says so. |
 
 ## Not done — P2 and P3
 
@@ -74,7 +77,6 @@ These are unaddressed. Nothing below has been started.
 
 | #   | Finding                               | Why it matters                                                                                                                                                            |
 | --- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 12  | Practice-bank size overstates variety | P1 Articles' 27 passages reduce to four unique bodies. README still promises 100+ per category against actual 8–23.                                                       |
 | 19  | Writing feedback uses shallow signals | `lower.includes()` credits connectors found inside other words. Partly mitigated: writingQuest's heuristic result is now recorded as guided, so it cannot become mastery. |
 | 22  | Offline support and recovery          | Service worker deletes every cache but its own; unopened modules are not guaranteed offline.                                                                              |
 | 24  | AI guardrails inconsistent            | Writing coaching and synthesis grading bypass the shared system policy.                                                                                                   |
@@ -102,35 +104,41 @@ the figures the audit verified and quoted. It is marked `isComplete: false` and
 current papers do **not** match, which is what finding 1 needed; it is not
 enough to certify that a rebuilt paper does. Completing it needs the PDF.
 
-## What is still not safe to show a parent
+## What a parent reads
 
 Per the brief's rule — a number a parent or teacher reads must be correct
-before it is shown, or not shown:
+before it is shown, or not shown — no figure on a parent-facing surface is now
+known to overstate what happened.
 
-- **Completion counters** still count surface variants as distinct coverage
-  (finding 12). A bank of 27 passages reducing to four unique bodies reports as
-  27 completions. This is now the **only** figure on a parent-facing surface
-  that overstates what happened.
-
-Fixed since the first pass: primary mastery percentages no longer merge unlike
-skills and now carry their sample size; the fluency figure says what it timed;
+Fixed across the passes: primary mastery percentages no longer merge unlike
+skills and carry their sample size; the fluency figure says what it timed;
 Blend It! confirmation is recorded as guided recognition rather than
-independent decoding. The P6 paper score says what it is.
+independent decoding; the P6 paper score says what it is; and completion
+counters count distinct passages, with repeats named as revision.
 
-Worth being plain about what "fixed" means for mastery: the numbers are now
-honest about their own basis, not that every skill has enough evidence behind
-it. A score labelled "early indication — 1 independent attempt" is doing its
-job by telling you not to lean on it.
+Two things to be plain about.
+
+**"Honest" is not "sufficient."** The mastery numbers are now honest about
+their own basis, not evidence that every skill has enough behind it. A score
+labelled "early indication — 1 independent attempt" is doing its job by telling
+you not to lean on it.
+
+**The banks got smaller when counted properly.** Cloze Castle holds 3–11
+distinct passages per grade/category and Word Vault 6–14, not the 27 and 38 the
+shelf length suggested. Nothing was deleted — that is what was always there.
+Whether it is enough material for a term is a curriculum question the audit
+did not answer and neither does this change.
 
 ## Suggested next step
 
 Work packages 1, 2 and 4 are complete, along with the parts of 3 and 5 the P1
 findings covered.
 
-Finding 12 is the one remaining correctness item on a parent-facing surface:
-completion counters still treat surface variants as distinct coverage, and the
-README still promises more than 100 questions per category against actual
-sizes of 8–23. It is partly content work and partly a counting change.
+Finding 12's counting half is done; its content half is not. The banks now
+report their real size, and that size is small in places — three distinct
+passages in the thinnest Cloze Castle scope. Authoring more passages is the
+only way to raise it, and the tests are written so that padding with copies
+cannot.
 
 Findings 22 and 24 are the next largest: the service worker deletes every
 cache but its own, which can remove another app's data on a shared origin, and

@@ -47,6 +47,7 @@ import { celebrateCorrect } from '../components/confettiHelper.js';
 import { mascot } from '../components/mascot.js';
 import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
 import { getUniqueClozeDone, recordClozeCompletion } from './clozeCompletionTracker.js';
+import { practiceSeedId, seedBreakdown, seedIdIndex } from '../data/practiceSeeds.js';
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { attachAskGiriButton } from '../components/askGiriButton.js';
 import { explainTeachBack } from '../modules/aiService.js';
@@ -155,16 +156,18 @@ function _renderBrowser() {
 
   for (const lv of levels) {
     const cats = Object.keys(passages[lv]);
-    const total = cats.reduce((sum, cat) => sum + passages[lv][cat].length, 0);
-    const questionTotal = cats.reduce(
-      (sum, cat) =>
-        sum + passages[lv][cat].reduce((n, passage) => n + (passage.answers?.length || 0), 0),
-      0,
-    );
+    // Audit finding 12: the bank holds far more passages than it holds
+    // distinct passages, so progress is measured against the distinct ones.
+    // The repeats are still there to practise — they are named as repeats.
+    const scope = cats.map((cat) => seedBreakdown(passages[lv][cat]));
+    const total = scope.reduce((sum, s) => sum + s.seeds, 0);
+    const questionTotal = scope.reduce((sum, s) => sum + s.seedQuestions, 0);
+    const revisionTotal = scope.reduce((sum, s) => sum + s.variants, 0);
     const done = getUniqueClozeDone({
       level: lv,
       ccqCompletedByPassage: store.get('ccqCompletedByPassage') || {},
       ccqCompleted: completed,
+      seedIndex: seedIdIndex(cats.flatMap((cat) => passages[lv][cat])),
     });
     const isDone = done >= total;
     const icon = CLOZE_LEVEL_ICONS[lv];
@@ -175,6 +178,7 @@ function _renderBrowser() {
         <span class="cloze-level-icon">${isDone ? '⭐' : icon}</span>
         <span class="cloze-level-name">${CLOZE_LEVEL_LABELS[lv]}</span>
         <span class="cloze-level-count">${cats.length} topics · ${questionTotal} questions · ${Math.min(done, total)} / ${total} passages done</span>
+        ${revisionTotal ? `<span class="cloze-level-revision">+ ${revisionTotal} revision rounds of the same passages</span>` : ''}
       </button>`;
   }
 
@@ -212,16 +216,15 @@ function _renderCategoryPicker(level) {
 
   for (const catKey of cats) {
     const cat = GRAMMAR_CATEGORIES[catKey] || { label: catKey, icon: '📝' };
-    const total = passages[level][catKey].length;
-    const questionTotal = passages[level][catKey].reduce(
-      (sum, passage) => sum + (passage.answers?.length || 0),
-      0,
-    );
+    const breakdown = seedBreakdown(passages[level][catKey]);
+    const total = breakdown.seeds;
+    const questionTotal = breakdown.seedQuestions;
     const done = getUniqueClozeDone({
       level,
       category: catKey,
       ccqCompletedByPassage: store.get('ccqCompletedByPassage') || {},
       ccqCatCompleted: completed,
+      seedIndex: seedIdIndex(passages[level][catKey]),
     });
     const isDone = done >= total;
     const isRecommended = catKey === recommendedCat;
@@ -231,7 +234,7 @@ function _renderCategoryPicker(level) {
               data-cat="${catKey}" aria-label="${cat.label}${isRecommended ? ' (recommended)' : ''}">
         <span class="cloze-cat-icon">${isDone ? '⭐' : cat.icon}</span>
         <span class="cloze-cat-label">${cat.label}</span>
-        <span class="cloze-cat-count">${questionTotal} questions · ${Math.min(done, total)} / ${total} passages${isRecommended ? ' · Recommended' : ''}</span>
+        <span class="cloze-cat-count">${questionTotal} questions · ${Math.min(done, total)} / ${total} passages${breakdown.variants ? ` · +${breakdown.variants} revision rounds` : ''}${isRecommended ? ' · Recommended' : ''}</span>
       </button>`;
   }
 
@@ -245,7 +248,8 @@ function _renderCategoryPicker(level) {
     <span class="cloze-mode-hint">${modeCfg.mode === 'practice' ? 'Learn as you go: hints, a warm-up read, and feedback after every passage.' : 'Just like the real paper: no hints, timed, and all feedback saved for the end.'}</span>
   </div>`;
 
-  const totalAll = cats.reduce((s, c) => s + passages[level][c].length, 0);
+  const totalAll = cats.reduce((s, c) => s + seedBreakdown(passages[level][c]).seeds, 0);
+  const revisionAll = cats.reduce((s, c) => s + seedBreakdown(passages[level][c]).variants, 0);
   const masteryGaps = getTopMasteryGaps({
     mode: 'clozeCastle',
     level,
@@ -278,7 +282,7 @@ function _renderCategoryPicker(level) {
     })
     .join('');
   html += `<div class="cloze-cat-actions">
-    <button class="btn btn--primary btn--lg" id="cloze-play-all">Play All (${totalAll} passages)</button>
+    <button class="btn btn--primary btn--lg" id="cloze-play-all">Play All (${totalAll} passages${revisionAll ? ' + revision' : ''})</button>
     <button class="btn btn--ghost btn--sm" id="cloze-mastery-review">Practise Recommended Topic</button>
     ${weakSkills.length ? `<ul class="cloze-mastery-list">${masteryRows}</ul>` : '<p class="cloze-cat-subtitle">Complete a few passages and the skills that need more practice will appear here.</p>'}
   </div>`;
@@ -316,9 +320,33 @@ function _renderCategoryPicker(level) {
 
 // ── Level flow ─────────────────────────────────────────────────────────────
 
+/**
+ * Shuffle a scope, then bring one passage per seed to the front.
+ *
+ * Audit finding 12: most of a scope is the same few passages re-presented. A
+ * plain shuffle can hand a child the same body three times before they have
+ * seen the second one. This keeps the shuffle but guarantees the distinct
+ * material comes first, with the repeats behind it for revision.
+ */
+function _seedFirstOrder(list) {
+  const shuffled = [...list].sort(() => Math.random() - 0.5);
+  const seen = new Set();
+  const first = [];
+  const repeats = [];
+  for (const passage of shuffled) {
+    const seed = practiceSeedId(passage);
+    if (seen.has(seed)) repeats.push(passage);
+    else {
+      seen.add(seed);
+      first.push(passage);
+    }
+  }
+  return [...first, ...repeats];
+}
+
 function _startCategory(level, catKey) {
   const raw = passages[level]?.[catKey] || [];
-  _levelPassages = [...raw].sort(() => Math.random() - 0.5);
+  _levelPassages = _seedFirstOrder(raw);
   _passageIdx = 0;
   _sessionCorrect = 0;
   _sessionTotal = 0;
@@ -343,7 +371,7 @@ function _startCategory(level, catKey) {
 function _startAllCategories(level) {
   const cats = Object.keys(passages[level] || {});
   const all = cats.flatMap((c) => passages[level][c]);
-  _levelPassages = [...all].sort(() => Math.random() - 0.5);
+  _levelPassages = _seedFirstOrder(all);
   _passageIdx = 0;
   _sessionCorrect = 0;
   _sessionTotal = 0;
@@ -1022,6 +1050,7 @@ function _checkPassage(passage) {
         level: _currentLevel,
         category: _currentCat,
         passageId: passage.id,
+        seedId: practiceSeedId(passage),
         accuracy: accPercent,
         ccqCompletedByPassage: store.get('ccqCompletedByPassage') || {},
         ccqCompleted: store.get('ccqCompleted') || {},
