@@ -1049,8 +1049,17 @@ class App {
           this._els.btnMic,
         ],
         maxLevel: store.get('difficulty') || 1,
+        // Audit 2026-09-19, finding 13: this committed EVIDENCE.INDEPENDENT.
+        // The app has just blended the word aloud and now shows it among three
+        // printed choices, which is evidence.js's own definition of `guided` --
+        // "the task supplies the answer in another channel (audio + printed
+        // options)". Identifying a just-seen, just-heard word is recognition,
+        // not cold decoding, so it cannot carry a decoding mastery claim.
+        //
+        // Still well above the bare "Yes! ✓" it replaced, which is exposure:
+        // the child performs something rather than claiming it.
         onDone: (confirmed, confirmMs) =>
-          this._commitResult(word, confirmed, confirmMs, EVIDENCE.INDEPENDENT),
+          this._commitResult(word, confirmed, confirmMs, EVIDENCE.GUIDED),
       });
       // _resultProcessing stays true so nothing else can commit meanwhile;
       // _startGame clears it when the next word loads.
