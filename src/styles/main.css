@@ -17360,6 +17360,14 @@ body.print-mode > *:not(.print-report-wrapper) > * {
     border-radius: 4px;
     min-width: 4px;
   }
+  /* Says how thin a reported percentage is. A score from one Quick Check
+     answer used to print identically to one from twenty attempts.
+     Audit 2026-09-19, finding 15. */
+  .print-report-early {
+    font-size: 10px;
+    font-style: italic;
+    color: #6b7280;
+  }
   .print-report-section {
     margin-bottom: 16px;
   }

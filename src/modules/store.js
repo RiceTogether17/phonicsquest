@@ -270,6 +270,16 @@ const DEFAULT_STATE = {
   // { [questKey]: { [skillKey]: { attempts, correct } } }
   questPractice: {},
 
+  // Independent-evidence sample counts behind each questMastery score.
+  //
+  // Audit 2026-09-19, finding 15: questMastery stored a bare exponential
+  // moving average with no item diversity or evidence metadata, so a score
+  // built from one Quick Check answer was indistinguishable from one built
+  // from twenty. With alpha 0.45 a single correct answer moves 0.5 to 0.725,
+  // which the printed parent report renders as "73%".
+  // { [questKey]: { [skillKey]: { attempts, correct } } }
+  questMasterySamples: {},
+
   // Attempt IDs already banked, so one committed response cannot be counted
   // twice by a repeated tap or a rerender. Stores the outcome applied, which
   // is what lets a changed self-mark REPLACE its predecessor rather than add
@@ -884,6 +894,19 @@ class Store {
     };
     next[questKey] = bucket;
     this.set('questPractice', next);
+  }
+
+  /** Bump the independent-sample counters behind a mastery score. */
+  updateQuestMasterySample(questKey, skillKey, correct, delta = 1) {
+    const next = { ...(this._state.questMasterySamples || {}) };
+    const bucket = { ...(next[questKey] || {}) };
+    const prev = bucket[skillKey] || { attempts: 0, correct: 0 };
+    bucket[skillKey] = {
+      attempts: Math.max(0, prev.attempts + delta),
+      correct: Math.max(0, prev.correct + (correct ? delta : 0)),
+    };
+    next[questKey] = bucket;
+    this.set('questMasterySamples', next);
   }
 
   /** The outcome already banked for an attempt ID, or null. */
