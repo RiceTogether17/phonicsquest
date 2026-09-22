@@ -202,7 +202,42 @@ for (const file of FILES) {
   }
 }
 
-// ── 4. Prototype pathways are removed, or named ─────────────────────────────
+// ── 4. No fabricated syllabus citation ──────────────────────────────────────
+
+// Audit 2026-09-19, finding 25. The Parent Dashboard printed
+// `Articles (LO-ENG-GR-04)` beside a link labelled "MOE syllabus", and a
+// section headed "Syllabus coverage" listing `LO 3.1`, `LO 4.2`, `LO 5.2`.
+// Twenty-six codes across two invented schemes, none of them an MOE
+// reference. A fabricated citation is worse than none: it claims an outside
+// authority checked this, and nobody did.
+//
+// An alignment claim may only come from `syllabusCrosswalk.js`, whose
+// validator refuses an entry without a verbatim quotation and a review date.
+const LO_CODE_LITERAL = /['"`]LO[- ][A-Z0-9][^'"`]*['"`]|\bloCode\b/;
+const CROSSWALK = join(SRC, 'data/syllabusCrosswalk.js');
+for (const file of FILES) {
+  if (file === CROSSWALK) continue;
+  const source = readFileSync(file, 'utf8');
+  let inBlockComment = false;
+  for (const [i, line] of source.split('\n').entries()) {
+    const trimmed = line.trim();
+    // Skip comments: the notes recording this fix quote the old codes.
+    if (trimmed.startsWith('/*')) inBlockComment = !trimmed.includes('*/');
+    else if (inBlockComment) {
+      if (trimmed.includes('*/')) inBlockComment = false;
+      continue;
+    }
+    if (inBlockComment || trimmed.startsWith('*') || trimmed.startsWith('//')) continue;
+    if (LO_CODE_LITERAL.test(line)) {
+      fail(
+        'alignment',
+        `${rel(file)}:${i + 1} carries a syllabus outcome code. Alignment claims come from data/syllabusCrosswalk.js, which requires an exact source (${trimmed.slice(0, 80)})`,
+      );
+    }
+  }
+}
+
+// ── 5. Prototype pathways are removed, or named ─────────────────────────────
 
 /**
  * Modules that no live entry point reaches.

@@ -8,17 +8,17 @@ Audited commit: `79dff37`. Findings: 26 (12 P1, 13 P2, 1 P3).
 
 ## Summary
 
-**Every finding that names a defect in the code is fixed** — all 12 P1, twelve
-of the thirteen P2, and the P3. P1 was the audit's bar for "before assessment
-use or wider unsupervised rollout": incorrect marking or teaching, misleading
-assessment claims, cross-learner records, credential disclosure.
+**All 26 findings are addressed.** P1 was the audit's bar for "before
+assessment use or wider unsupervised rollout": incorrect marking or teaching,
+misleading assessment claims, cross-learner records, credential disclosure.
 
-**Every figure the audit named as overstated is now correct or gone.** The only
-finding left open is 25, MOE alignment, which is not a code change: the audit
-could not retrieve the syllabus either, and `SCOPE_AND_SEQUENCE.md` already
-says plainly that the Learning Outcomes are the app's own.
+**Every figure and every claim the audit named as overstated is now correct or
+gone.** What remains is authoring and evidence work, not remediation: the
+syllabus crosswalk is built but empty, because the MOE document cannot be
+retrieved from here, and some practice banks are thin now that they report
+their real size.
 
-Verification on the current head: 215 test files, 2,849 unit tests, 51 browser
+Verification on the current head: 216 test files, 2,864 unit tests, 51 browser
 tests, typecheck, lint (0 errors), formatting, contract checks, scope/sequence
 check and bundle budget all pass.
 
@@ -73,11 +73,16 @@ produced a figure someone would read as a result.
 | 24  | AI guardrails inconsistent       | One `askStructured` boundary for every marking feature: shared policy in the system channel, the child's writing fenced with a per-request id, a declared reply schema, and validation that drops anything else. A quoted sentence must be in the draft. An AI verdict marks a synthesis answer right for the child but records guided evidence, so it cannot become mastery.                                                                                                                                                                                                                                                          |
 | 12  | Bank size overstates variety     | Every generated item names the authored one it re-presents. Coverage counts those; repeats are shown as "revision rounds". P1 Articles reads "15 questions · 0 / 4 passages · +23 revision rounds" where it read "102 questions · 0 / 27 passages". README numbers now come from the live banks and a test says so.                                                                                                                                                                                                                                                                                                                    |
 
-## Not done — the one finding left
+## What each open item needs
 
-| #   | Finding                       | Why it is open                                                                                                                                                                                                                                                                                      |
-| --- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 25  | MOE alignment not established | Not a code change. `SCOPE_AND_SEQUENCE.md` already states the Learning Outcomes are the app's own and that no external syllabus mapping exists, which is the honest position. Establishing alignment needs the MOE syllabus document, unreachable from this environment as it was from the audit's. |
+Nothing below is an unfixed defect. These are the pieces that need a document
+or an author rather than a change to the code.
+
+| #   | What is open            | What it needs                                                                                                                                                                                                                                                                                                |
+| --- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 25  | The crosswalk is empty  | The MOE English Language Syllabus (Primary). `moe.gov.sg` and the NIE library mirror are both refused by this environment's egress proxy, as they were during the audit. The structure, the validator and the build check are in place; entries are a teacher's data-entry job once the document is in hand. |
+| 12  | Some banks are thin     | Authoring. Three distinct passages in the thinnest Cloze Castle scope. The tests are written so padding with copies cannot raise the number.                                                                                                                                                                 |
+| 26  | `app.js` and `main.css` | A decomposition with real regression risk and no acceptance criterion attached. The audit warns against a cosmetic rewrite; `IMPROVEMENTS.md` #17 and #18 hold the plan.                                                                                                                                     |
 
 ## Two things the audit reported that could not be confirmed here
 
@@ -127,52 +132,41 @@ did not answer and neither does this change.
 
 ## Suggested next step
 
-Every work package the audit defined is complete, and every finding that named
-a defect in the code has been fixed. What is left is authoring and evidence
-work, not remediation.
+Every finding the audit raised has been addressed, and every work package it
+defined is complete.
 
-**Finding 12's content half.** The banks now report their real size, and that
-size is small in places: three distinct passages in the thinnest Cloze Castle
-scope. Only authoring more raises it, and the tests are written so padding with
-copies cannot.
+**Get the syllabus document.** It is the only thing standing between the
+crosswalk and a real alignment claim, and it is a download rather than a piece
+of engineering. `validateCrosswalkEntry` refuses anything without a verbatim
+quotation, a page reference, a retrieval date and a named reviewer, so the
+entries cannot be filled in from memory — which is how the codes this finding
+removed got there.
 
-**Finding 25.** Needs the MOE syllabus document. Until then the honest claim is
-the one the app already makes.
+**Author more passages** where the banks are thin (finding 12).
 
-**Finding 26's larger half is deliberately not done.** The audit is explicit:
-"Refactor by behavioural boundary rather than undertaking a cosmetic rewrite."
-`app.js` is still ~3,200 lines and `main.css` ~18,900. What this pass did was
-the part with a testable contract — the prototype, the registries, the
-durations — and `check-contracts.mjs` now fails the build on drift in each.
-Decomposing `app.js` is real work with real regression risk and no acceptance
-criterion attached; `IMPROVEMENTS.md` #17 and #18 hold the plan.
+**Then the accessibility work**, which is scanned but not certified: the five
+primary sections are covered at their landing state; task, feedback, modal and
+result states in each theme still need passes, as do keyboard and
+screen-reader checks on a real device. The review-surface colours renamed
+under finding 26 are still not theme-aware.
 
-**Three unwired scoring engines.** Sound Match, Picture First Sound and Blend
-Builder have tested scoring and hint engines that their live UIs do not call —
-those UIs score inline instead. Nothing is wrong today; the engines are the
-better-tested code, and adopting them would be a genuine improvement rather
-than a fix.
+Four limits worth restating before any wider rollout.
 
-Accessibility is scanned but not certified. The five primary sections are
-covered at their landing state; task, feedback, modal and result states in each
-theme still need passes, as do keyboard and screen-reader checks on a real
-device. The review-surface colours renamed under finding 26 are still not
-theme-aware — they render identically in all four themes, exactly as the
-hardcoded values they replaced did.
+**Alignment.** The app now says its sequence is its own. That is accurate and
+it is also a smaller claim than a tuition centre may want. Nothing here has
+been checked against the MOE syllabus by anyone.
 
-Three limits worth restating before any wider rollout.
+**AI.** The boundary makes prompt injection much harder and makes a malformed
+or redirected reply fail safely, but no test can prove a model will never
+comply with an instruction a child writes into their own composition. What is
+proved is that a reply which does not validate is discarded, and that no mark
+or score moves on AI text alone.
 
-The AI boundary makes prompt injection much harder and makes a malformed or
-redirected reply fail safely, but no test can prove a model will never comply
-with an instruction a child writes into their own composition. What is proved
-is that a reply which does not validate is discarded, and that no mark or score
-moves on AI text alone.
-
-Offline coverage is every activity and every sound, not every story
+**Offline.** Coverage is every activity and every sound, not every story
 illustration; that exclusion is recorded in the build manifest so the wording
 and the behaviour cannot drift apart.
 
-The writing evaluator is now accurate about what it counts, which is not the
+**Writing.** The evaluator is accurate about what it counts, which is not the
 same as being able to mark a composition. Whether a story is interesting,
 coherent or suited to its reader is still a teacher's judgement, and the app no
 longer implies otherwise.

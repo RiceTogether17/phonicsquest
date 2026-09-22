@@ -118,7 +118,7 @@ describe('literacy domains', () => {
   });
 });
 
-describe('clue insights, MOE mappings and recommendations', () => {
+describe('clue insights, syllabus crosswalk and recommendations', () => {
   it('produce usable shapes on empty state', async () => {
     setProfile();
     const insights = await import('../modules/dashboardInsights.js');
@@ -127,9 +127,15 @@ describe('clue insights, MOE mappings and recommendations', () => {
     expect(clue).toHaveProperty('questInsights');
     expect(clue).toHaveProperty('byType');
 
-    const moe = insights.getMoeOutcomeMappings();
-    expect(Array.isArray(moe)).toBe(true);
-    expect(moe.length).toBeGreaterThan(0);
+    // This used to require `getMoeOutcomeMappings()` to return rows, and it
+    // did: three hardcoded ones — LO 3.1, LO 4.2, LO 5.2 — under a heading
+    // reading "Syllabus coverage". They are not MOE references; they were
+    // invented here. Audit finding 25: an empty crosswalk must produce no
+    // rows rather than placeholder ones, so the test now requires the
+    // opposite of what it used to.
+    const rows = insights.getSyllabusCrosswalkRows();
+    expect(Array.isArray(rows)).toBe(true);
+    expect(rows).toEqual([]);
 
     expect(Array.isArray(insights.getRecommendedActions())).toBe(true);
   });

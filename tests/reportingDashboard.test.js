@@ -4,7 +4,8 @@ import {
   getVocabularyCategoryReport,
   getGrammarCategoryReport,
   getLatestQuestScoreboards,
-  getMoePriorityRecommendations,
+  getPracticePriorityRecommendations,
+  getAlignmentDisclosure,
   getLearningFunnelReport,
   getAdaptiveLessonQueue,
 } from '../src/modules/reporting.js';
@@ -27,12 +28,25 @@ describe('reporting module', () => {
     });
   });
 
-  it('returns vocabulary rows with LO codes and clue success', () => {
+  it('returns vocabulary rows with clue success and no invented syllabus code', () => {
+    // This used to assert `sci.loCode` matched /^LO-/. The codes it was
+    // checking — LO-ENG-VOC-07 and twenty-two others — were invented in
+    // reporting.js and rendered to parents beside a link labelled "MOE
+    // syllabus". Audit finding 25: an alignment claim needs an exact,
+    // reviewable source, and until the crosswalk exists there is none.
     const rows = getVocabularyCategoryReport();
     const sci = rows.find((r) => r.key === 'scienceTechTerms');
     expect(sci).toBeTruthy();
-    expect(sci.loCode).toMatch(/^LO-/);
     expect(sci.clueSuccess).toBeGreaterThan(0);
+    expect(sci.loCode).toBeUndefined();
+    expect(sci.alignment).toBeNull();
+  });
+
+  it('discloses that the sequence is the app’s own', () => {
+    const { statement, syllabusLink } = getAlignmentDisclosure();
+    expect(statement).toMatch(/PhonicsQuest’s own sequence/);
+    expect(statement).toMatch(/not mapped to the MOE syllabus/);
+    expect(syllabusLink).toContain('moe.gov.sg');
   });
 
   it('returns scoreboard snapshots for key quests', () => {
@@ -45,8 +59,10 @@ describe('reporting module', () => {
     expect(rows.find((r) => r.key === 'conditionals')).toBeTruthy();
   });
 
-  it('returns MOE-priority recommendations weighted by category priority', () => {
-    const rec = getMoePriorityRecommendations();
+  it('returns practice priorities weighted by the app’s own category weights', () => {
+    // Renamed from "MOE-priority": the weights are this app's editorial
+    // judgement and were never checked against a syllabus (finding 25).
+    const rec = getPracticePriorityRecommendations();
     expect(rec.vocab.length).toBeGreaterThan(0);
     expect(rec.grammar.length).toBeGreaterThan(0);
     expect(rec.grammar[0]).toHaveProperty('priorityScore');
