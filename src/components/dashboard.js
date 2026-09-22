@@ -16,7 +16,7 @@ import {
   getClueInsights,
   getRecommendedActions,
   getRecentPatternInsights,
-  getMoeOutcomeMappings,
+  getSyllabusCrosswalkRows,
   getParentCoachingCard,
   getStuckWords,
 } from '../modules/dashboardInsights.js';
@@ -25,7 +25,8 @@ import {
   getVocabularyCategoryReport,
   getGrammarCategoryReport,
   getLatestQuestScoreboards,
-  getMoePriorityRecommendations,
+  getPracticePriorityRecommendations,
+  getAlignmentDisclosure,
   getLearningFunnelReport,
   getAdaptiveLessonQueue,
 } from '../modules/reporting.js';
@@ -184,7 +185,7 @@ export function renderDashboard(container, opts = {}) {
   _renderPatternInsights();
   _renderTutorActivity();
   _renderCategoryReporting();
-  _renderMoeOutcomes();
+  _renderSyllabusAlignment();
 
   // Render existing sections
   _renderCurriculumMapSection();
@@ -590,7 +591,7 @@ function _renderCategoryReporting() {
     .sort((a, b) => a.accuracy - b.accuracy)
     .slice(0, 8);
   const scoreboards = getLatestQuestScoreboards();
-  const priorities = getMoePriorityRecommendations();
+  const priorities = getPracticePriorityRecommendations();
   const funnel = getLearningFunnelReport({ days: 7 });
   const lessonQueue = getAdaptiveLessonQueue({ limit: 6 });
   _markEmpty(container, !vocabRows.length && !grammarRows.length && !scoreboards.length);
@@ -602,11 +603,11 @@ function _renderCategoryReporting() {
         const cluePct = Math.round((r.clueSuccess || 0) * 100);
         return `<div class="dash-category-row" title="${r.tooltip}">
       <div class="dash-category-head">
-        <span><strong>${r.label}</strong> <small>(${r.loCode})</small></span>
+        <span><strong>${r.label}</strong></span>
         <span>${pct}%</span>
       </div>
       <div class="dash-mini-track"><div class="dash-mini-fill" style="width:${pct}%"></div></div>
-      <div class="dash-category-meta">Attempts: ${r.attempts} · Clue success: ${cluePct}% · <a href="${r.syllabusLink}" target="_blank" rel="noreferrer">MOE syllabus</a></div>
+      <div class="dash-category-meta">Attempts: ${r.attempts} · Clue success: ${cluePct}%</div>
     </div>`;
       })
       .join('');
@@ -618,11 +619,11 @@ function _renderCategoryReporting() {
         .map(
           (r) => `<div class="dash-category-row" title="${r.tooltip}">
         <div class="dash-category-head">
-          <span><strong>${r.label}</strong> <small>(${r.loCode})</small></span>
+          <span><strong>${r.label}</strong></span>
           <span>${Math.round((r.accuracy || 0) * 100)}%</span>
         </div>
         <div class="dash-mini-track"><div class="dash-mini-fill" style="width:${Math.round((r.accuracy || 0) * 100)}%"></div></div>
-        <div class="dash-category-meta">Priority score: ${r.priorityScore.toFixed(2)} · <a href="${r.syllabusLink}" target="_blank" rel="noreferrer">MOE syllabus</a></div>
+        <div class="dash-category-meta">Priority score: ${r.priorityScore.toFixed(2)}</div>
       </div>`,
         )
         .join('')}
@@ -659,21 +660,46 @@ function _renderCategoryReporting() {
     </div>
     <h4 class="dash-section-title" style="margin-top:16px">Suggested next lessons</h4>
     <ul class="dash-pattern-list">
-      ${lessonQueue.map((item) => `<li class="dash-pattern-item"><strong>${item.quest}</strong> · ${item.label} <small>(${item.loCode})</small><br>${item.reason}</li>`).join('')}
+      ${lessonQueue.map((item) => `<li class="dash-pattern-item"><strong>${item.quest}</strong> · ${item.label}<br>${item.reason}</li>`).join('')}
     </ul>
   `;
 }
 
-function _renderMoeOutcomes() {
+/**
+ * Syllabus alignment — what the app may and may not claim.
+ *
+ * Audit 2026-09-19, finding 25. This section was headed "Syllabus coverage"
+ * and listed `LO 3.1`, `LO 4.2`, `LO 5.2`; every category row above it
+ * carried a code like `(LO-ENG-GR-04)` beside a link labelled "MOE syllabus".
+ * None of those codes is an MOE reference — both schemes were invented in
+ * this codebase. `SCOPE_AND_SEQUENCE.md` has always said the outcomes are the
+ * app's own; this screen said otherwise to the one person most likely to act
+ * on it.
+ *
+ * It now states the position once, with the syllabus linked for a parent who
+ * wants to read it, and shows rows only when a teacher-reviewed crosswalk
+ * exists.
+ */
+function _renderSyllabusAlignment() {
   const container = document.getElementById('dash-moe-section');
   if (!container) return;
-  const rows = getMoeOutcomeMappings();
-  _markEmpty(container, !rows.length);
+  const rows = getSyllabusCrosswalkRows();
+  const { statement, syllabusLink } = getAlignmentDisclosure();
+  _markEmpty(container, false);
   container.innerHTML = `
-    <h3 class="dash-section-title" style="margin-top:24px">Syllabus coverage</h3>
-    <ul class="dash-pattern-list">
-      ${rows.map((r) => `<li class="dash-pattern-item"><strong>${r.code}</strong> · ${r.focus}</li>`).join('')}
-    </ul>`;
+    <h3 class="dash-section-title" style="margin-top:24px">Syllabus alignment</h3>
+    <p class="dash-category-meta">${escapeHtml(statement)}
+      <a href="${syllabusLink}" target="_blank" rel="noreferrer">Read the MOE syllabus</a></p>
+    ${
+      rows.length
+        ? `<ul class="dash-pattern-list">${rows
+            .map(
+              (r) =>
+                `<li class="dash-pattern-item"><strong>${escapeHtml(r.learningOutcome)}</strong> · ${escapeHtml(r.activity)}<br><small>${escapeHtml(r.syllabusVersion)} · reviewed by ${escapeHtml(r.reviewedBy)} on ${escapeHtml(r.reviewDate)}</small></li>`,
+            )
+            .join('')}</ul>`
+        : ''
+    }`;
 }
 
 // ── B1: Learner Summary ──────────────────────────────────────────────────────

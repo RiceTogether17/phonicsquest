@@ -945,7 +945,13 @@ function _checkPassage(passage) {
     quest: 'clozeCastle',
     skill: skillKey,
     correct: allCorrect,
-    responseMs: 2000,
+    // Audit finding 26: this was a literal 2000. A cloze passage is not one
+    // response — a child fills several blanks over a minute or more, with a
+    // read-first scan before it — so there is no per-attempt duration to
+    // report. The parent dashboard averages this field into "Avg response",
+    // so a made-up constant there is an observation about the child that
+    // never happened. `null` is the honest value; the report skips it.
+    responseMs: null,
     level: _currentLevel,
   });
   questMastery.updateSkill('clozeCastle', skillKey, allCorrect);
@@ -1039,7 +1045,9 @@ function _checkPassage(passage) {
 
   if (allCorrect) {
     _sessionCorrect++;
-    gamification.recordCorrect(2000, false);
+    // No measured duration (see the recordAttempt note above), so the speed
+    // bonus is not claimed either.
+    gamification.recordCorrect(null, false);
     if (getModeConfig(_sessionMode).confettiPerPassage) celebrateCorrect();
     audio.playSfx('correct');
     mascot.celebrate(false);

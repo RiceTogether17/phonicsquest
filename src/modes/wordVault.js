@@ -1333,7 +1333,9 @@ function _checkPassage(passage) {
 
   if (allCorrect) {
     _sessionCorrect++;
-    gamification.recordCorrect(2000, false);
+    // Audit finding 26: no measured duration for a multi-blank passage, so
+    // the speed bonus is not claimed. See the recordAttempt notes below.
+    gamification.recordCorrect(null, false);
     if (getModeConfig(_sessionMode).confettiPerPassage) celebrateCorrect();
     audio.playSfx('correct');
     mascot.celebrate(false);
@@ -1359,7 +1361,10 @@ function _checkPassage(passage) {
       quest: 'wordVault',
       skill: _currentCat,
       correct: true,
-      responseMs: 1500,
+      // Audit finding 26: was a literal 1500. A Word Vault passage is several
+      // blanks answered over time, not one response, and the parent
+      // dashboard averages this into "Avg response".
+      responseMs: null,
       level: _currentLevel,
     });
     questMastery.updateSkill('wordVault', _currentCat, true);
@@ -1402,7 +1407,8 @@ function _checkPassage(passage) {
       quest: 'wordVault',
       skill: _currentCat,
       correct: false,
-      responseMs: 2000,
+      // As above — was a literal 2000.
+      responseMs: null,
       level: _currentLevel,
     });
     questMastery.updateSkill('wordVault', _currentCat, false);

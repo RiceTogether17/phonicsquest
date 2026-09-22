@@ -24,9 +24,14 @@ import { store } from '../modules/store.js';
 import { progress } from '../modules/progress.js';
 import { WORDS, getWordsByLevel, getDistractors, shuffleArray } from '../data/words.js';
 import { scoreFluencySprint } from './scoring/fluencySprint.js';
+import { PHONICS_MODES } from './phonicsModes.js';
 
 const SPRINT_MS = 45000;
-const TARGET_WPM = 30; // matches PHONICS_MODES.fluencySprint.masteryCriteria
+// Audit 2026-09-19, finding 26: this was `const TARGET_WPM = 30;` with a
+// comment saying it matched `PHONICS_MODES.fluencySprint.masteryCriteria`.
+// Two copies of one number, kept in step by a comment — which is exactly the
+// parallel-registry drift the finding is about. Read it from the registry.
+const TARGET_WPM = PHONICS_MODES.fluencySprint.masteryCriteria.targetWpm;
 const MIN_POOL = 6;
 
 let _word = null;

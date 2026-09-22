@@ -137,7 +137,13 @@ class Gamification {
 
   /**
    * Record a correct answer. Returns the XP earned breakdown.
-   * @param {number} responseTimeMs  how fast the child answered
+   *
+   * @param {number|null} responseTimeMs  how long the child took, or `null`
+   *   when the mode did not measure it. Audit 2026-09-19, finding 26: modes
+   *   that cannot measure a single response used to pass an invented
+   *   constant. `null` must therefore mean "unknown", not "instant" —
+   *   `null < 3000` is true in JavaScript, so an unguarded comparison would
+   *   hand every unmeasured answer the speed bonus.
    * @param {boolean} isNewWord      first time seeing this word
    * @returns {{ xpEarned: number, reasons: string[] }}
    */
@@ -147,8 +153,9 @@ class Gamification {
     const reasons = [];
     let xpEarned = 0;
 
-    // Base XP
-    if (responseTimeMs < 3000) {
+    // Base XP. Only a measured, plausible duration can earn the speed bonus.
+    const measured = Number.isFinite(responseTimeMs) ? responseTimeMs : null;
+    if (measured !== null && measured < 3000) {
       xpEarned += XP_REWARDS.correct_fast;
       reasons.push('Quick answer!');
     } else {
