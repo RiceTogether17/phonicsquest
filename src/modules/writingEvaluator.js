@@ -15,6 +15,13 @@
  */
 
 import { computeNarrativeQuality } from './writingNarrativeHelpers.js';
+import {
+  containsAllTerms,
+  containsAnyPhrase,
+  countPhrases,
+  countTerms,
+  findPhrases,
+} from './textMatch.js';
 
 // Approximate word-count targets by level (guide, not strict cap)
 const LENGTH_TARGETS = { 1: 35, 2: 55, 3: 80, 4: 110, 5: 150, 6: 190 };
@@ -63,21 +70,37 @@ const FORMAL_CLOSINGS = [
   'i hope to',
 ];
 
-// Sensory / action words that signal show-don't-tell technique at upper primary
+// Sensory / action words that signal show-don't-tell technique at upper primary.
+//
+// Matched as whole words (audit finding 19: "rushed" used to be credited from
+// "brushed" and "froze" from "frozen"), so the forms a child actually writes
+// have to be listed rather than inferred. Past tense first, because these are
+// narrative words, with the present forms a P5 recount might use beside them.
 const SENSORY_WORDS = [
   'trembled',
+  'trembling',
   'heart pounded',
+  'tear',
   'tears',
   'gasped',
+  'gasping',
   'stared',
+  'staring',
   'whispered',
+  'whispering',
   'glistened',
+  'glistening',
   'clutched',
+  'clutching',
   'shivered',
+  'shivering',
   'rushed',
+  'rushing',
   'froze',
   'sweat',
+  'sweating',
   'gulp',
+  'gulped',
 ];
 
 // ── Raw Signal Extraction ─────────────────────────────────────────────────────
@@ -89,7 +112,6 @@ const SENSORY_WORDS = [
  */
 export function computeMetrics(item, text, level) {
   const t = (text || '').trim();
-  const lower = t.toLowerCase();
   const words = t ? t.split(/\s+/).length : 0;
 
   // Terminal-punctuation sentence count
@@ -99,11 +121,16 @@ export function computeMetrics(item, text, level) {
   // Paragraph count (separated by blank lines)
   const paragraphCount = Math.max(t.split(/\n\s*\n/).filter((p) => p.trim().length > 10).length, 1);
 
-  // Connector variety – count distinct matches per bank
+  // Connector variety – the distinct connectors actually used, per bank.
+  //
+  // Audit finding 19: this was `lower.includes(c)`, which credited "and" from
+  // "sandy", "or" from "forgot" and "as" from "was". Every past-tense
+  // narrative contains "was", so every story collected a free subordinate
+  // connector. Whole words only now — see textMatch.js.
   const connectorHits = {};
   let totalDistinct = 0;
   for (const [type, list] of Object.entries(CONNECTOR_BANKS)) {
-    connectorHits[type] = list.filter((c) => lower.includes(c));
+    connectorHits[type] = findPhrases(t, list);
     totalDistinct += connectorHits[type].length;
   }
 
@@ -111,13 +138,17 @@ export function computeMetrics(item, text, level) {
   // Falls back to neutral coverage when no checks defined (legacy prompts).
   const checks = item.requiredChecks || [];
   const checkResults = checks.map((check) => {
+    // Audit finding 19: substring matching marked a required point covered by
+    // any word containing it — a task asking the child to mention the "ball"
+    // was satisfied by "football" or "balloon". Required coverage feeds both
+    // the content and task-match scores, so this was the costliest instance.
     let hit = false;
     if (check.keywordsAny?.length) {
       const terms = [...check.keywordsAny, ...(check.synonyms || [])];
-      hit =
-        terms.filter((kw) => lower.includes(kw.toLowerCase())).length >= (check.minimumHits || 1);
+      const found = countTerms(t, terms);
+      hit = found >= (check.minimumHits || 1);
     } else if (check.keywordsAll?.length) {
-      hit = check.keywordsAll.every((kw) => lower.includes(kw.toLowerCase()));
+      hit = containsAllTerms(t, check.keywordsAll);
     }
     return { id: check.id, label: check.label, hit };
   });
@@ -147,13 +178,12 @@ export function computeMetrics(item, text, level) {
   );
   const hasResolutionSignal = /(in the end|finally|at last|eventually)/i.test(t);
   const hasReflectionSignal = /(i learned|i realised|i realized|next time|i promised)/i.test(t);
-  const chronologicalFlow = ['first', 'next', 'then', 'after that', 'finally'].filter((c) =>
-    lower.includes(c),
-  ).length;
+  // "after" used to be credited from "afternoon" and "then" from "when".
+  const chronologicalFlow = countPhrases(t, ['first', 'next', 'then', 'after that', 'finally']);
 
   // Formal register signals (relevant for situational writing)
-  const hasFormalOpening = FORMAL_OPENINGS.some((p) => lower.includes(p));
-  const hasFormalClosing = FORMAL_CLOSINGS.some((p) => lower.includes(p));
+  const hasFormalOpening = containsAnyPhrase(t, FORMAL_OPENINGS);
+  const hasFormalClosing = containsAnyPhrase(t, FORMAL_CLOSINGS);
 
   // Story structure signal (narrative tasks)
   const hasStoryStructure = item.storyPlan ? sentenceCount >= 5 && paragraphCount >= 2 : null; // null = not applicable
@@ -162,7 +192,8 @@ export function computeMetrics(item, text, level) {
   const emotionTellingCount = (
     t.match(/\b(I felt|I was (sad|happy|angry|scared)|I feel)\b/gi) || []
   ).length;
-  const sensoryHits = SENSORY_WORDS.filter((w) => lower.includes(w)).length;
+  const sensoryWordsUsed = findPhrases(t, SENSORY_WORDS);
+  const sensoryHits = sensoryWordsUsed.length;
 
   // Vocabulary variety proxies
   const wordList = t
@@ -206,6 +237,7 @@ export function computeMetrics(item, text, level) {
     chronologicalFlow,
     emotionTellingCount,
     sensoryHits,
+    sensoryWordsUsed,
     longWords,
     uniqueWords,
     lexicalDensity,
@@ -329,6 +361,9 @@ function _purposeAlignmentScore(item, m) {
       'mr',
       'ms',
       'mrs',
+      // Substring is right here: this reads the task's own authored audience
+      // field ("your form teacher"), not the child's writing. Finding 19 is
+      // about signals taken from what the child wrote.
     ].some((a) => aud.includes(a));
     if (isAdult) {
       return (m.hasFormalOpening ? 0.55 : 0.1) + (m.hasFormalClosing ? 0.45 : 0.15);
@@ -435,6 +470,85 @@ export function getDimensionBandLabel(dimensionScore) {
   return 'Needs work';
 }
 
+// ── Observation, separated from judgement ─────────────────────────────────────
+
+/**
+ * The things this evaluator can actually see.
+ *
+ * Audit 2026-09-19, finding 19: "separate observable mechanics from judgement
+ * about meaning, organisation and task fulfilment."
+ *
+ * Counting words, spotting a full stop and listing the connectors a child used
+ * are observations — a teacher would agree with every one of them. Deciding
+ * that the ideas are "well developed" or that the organisation is "Secure" is
+ * a judgement, and this module is a word counter. Both still ship, because
+ * the practice loop needs something to aim at; they are now different fields
+ * with different names, so a screen can show the facts without dressing the
+ * guesses up as facts too.
+ *
+ * `connectorsUsed` is the list, not the count, on purpose. A number can be
+ * quietly wrong; a list a child reads back is checkable — which is exactly how
+ * this finding would have been caught in use rather than in an audit.
+ *
+ * @param {ReturnType<typeof computeMetrics>} m
+ * @returns {object}
+ */
+export function observedFacts(m) {
+  const connectorsUsed = Object.values(m.connectorHits).flat();
+  return {
+    words: m.words,
+    target: m.target,
+    sentences: m.sentenceCount,
+    paragraphs: m.paragraphCount,
+    endsWithPunctuation: m.hasEndPunct,
+    sentencesStartingWithCapital: m.sentenceStartCapitals,
+    connectorsUsed,
+    sequenceWordsUsed: m.chronologicalFlow,
+    sensoryWordsUsed: m.sensoryWordsUsed || [],
+    hasDialogue: m.hasDialogue,
+    requiredPointsCovered: m.requiredHits,
+    requiredPointsTotal: m.requiredTotal,
+    coveredPoints: (m.checkResults || []).filter((c) => c.hit).map((c) => c.label),
+    missingPoints: (m.checkResults || []).filter((c) => !c.hit).map((c) => c.label),
+  };
+}
+
+/**
+ * One line naming what was counted, for a screen to print under the score.
+ *
+ * Deliberately short. The audit asks for "a small number of accurate revision
+ * suggestions over a pseudo-precise overall mark", and a wall of statistics is
+ * the same mistake in a different direction.
+ *
+ * @param {object} observed — from `observedFacts`
+ * @returns {string}
+ */
+export function describeObserved(observed) {
+  const parts = [`${observed.words} words in ${observed.sentences} sentences`];
+  if (observed.connectorsUsed.length) {
+    parts.push(`connectors you used: ${observed.connectorsUsed.join(', ')}`);
+  } else {
+    parts.push('no linking words found yet');
+  }
+  if (observed.requiredPointsTotal > 0) {
+    parts.push(
+      `${observed.requiredPointsCovered} of ${observed.requiredPointsTotal} required points found`,
+    );
+  }
+  return parts.join(' · ');
+}
+
+/**
+ * What this check does not look at, said plainly.
+ *
+ * Finding 19's acceptance asks that heuristic scores are not presented as
+ * composition marks. A band with no caveat beside it reads like one — the
+ * four-band Strong/Secure/Developing vocabulary is what Singapore composition
+ * rubrics use.
+ */
+export const HEURISTIC_CAVEAT =
+  'This is an automatic check of things a computer can count — length, punctuation, linking words and required points. It cannot judge whether your story is interesting, whether it makes sense, or whether it suits the reader. Your teacher decides that.';
+
 // ── Main Evaluation Export ────────────────────────────────────────────────────
 
 /**
@@ -456,9 +570,14 @@ export function evaluateWriting(item, text, level) {
     Object.entries(dimensions).map(([k, v]) => [k, getDimensionFeedback(k, v)]),
   );
 
+  const observed = observedFacts(metrics);
+
   return {
     metrics,
     dimensions,
+    observed,
+    observedSummary: describeObserved(observed),
+    caveat: HEURISTIC_CAVEAT,
     score,
     passed: score >= 0.72,
     stars: score >= 0.88 ? 3 : score >= 0.72 ? 2 : 1,
@@ -560,6 +679,24 @@ function _emptyResult() {
       firstSentence: '',
     },
     dimensions: { content: 0, organisation: 0, language: 0, taskFulfilment: 0 },
+    observed: {
+      words: 0,
+      target: 0,
+      sentences: 0,
+      paragraphs: 0,
+      endsWithPunctuation: false,
+      sentencesStartingWithCapital: 0,
+      connectorsUsed: [],
+      sequenceWordsUsed: 0,
+      sensoryWordsUsed: [],
+      hasDialogue: false,
+      requiredPointsCovered: 0,
+      requiredPointsTotal: 0,
+      coveredPoints: [],
+      missingPoints: [],
+    },
+    observedSummary: '',
+    caveat: HEURISTIC_CAVEAT,
     score: 0,
     passed: false,
     stars: 0,

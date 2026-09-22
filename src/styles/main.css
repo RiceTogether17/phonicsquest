@@ -9166,6 +9166,25 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 
 /*
+ * Audit finding 19: the draft check is a word counter, and the line under it
+ * says so. Set quiet and small — it is a standing caveat, not a second piece
+ * of feedback competing with the revision mission for a child's attention.
+ */
+.wq-observed {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin: 2px 0 0;
+}
+
+.wq-caveat {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  opacity: 0.9;
+  margin: 2px 0 8px;
+  line-height: 1.45;
+}
+
+/*
  * Audit finding 12: most of a scope is the same passages re-presented with a
  * new lead sentence. Progress counts the distinct ones; this line says plainly
  * how many revision rounds sit behind them, so nobody reads a practice count
