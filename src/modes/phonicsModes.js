@@ -1,5 +1,5 @@
 /**
- * Canonical phonics-mode registry.
+ * Phonics-mode educational metadata and scoring engines.
  *
  * The seven educational game modes children play in PhonicsQuest:
  *
@@ -26,9 +26,30 @@
  * result object. UI code calls them and renders the feedback; reporting
  * code calls them and rolls them into mastery stats.
  *
- * All seven canonical modes now have dedicated UIs that consume these
- * scoring/hint engines: wordSortMode.js, readAndTapMode.js,
- * fluencySprintMode.js and listenAndSpellMode.js.
+ * ## What this file is, and what it is not
+ *
+ * Audit 2026-09-19, finding 26 ("parallel registries"). This file used to call
+ * itself the *canonical* phonics-mode registry and claim that "all seven
+ * canonical modes now have dedicated UIs that consume these scoring/hint
+ * engines". Four do. Three do not: Sound Match, Picture First Sound and Blend
+ * Builder are played through the `hear`, `first` and `blend` entries in
+ * `modes/index.js`, which score inline and never call the engines here.
+ *
+ * Worse, until this commit the only importer of `PHONICS_MODES` anywhere in
+ * the app was the dormant Quest Journey prototype — so the registry that
+ * described itself as canonical was read by nothing a child could reach.
+ *
+ * The live registry of playable modes is `MODES` in `modes/index.js`. This
+ * file is the educational metadata (objectives, mastery criteria, error
+ * hints) and the pure scoring engines. `impl` is the bridge between them, and
+ * `scripts/check-contracts.mjs` fails the build if an `impl` does not resolve,
+ * if the two registries disagree on a mode's name, or if `SCORERS_WIRED_INTO_UI`
+ * below stops matching what the source actually imports.
+ *
+ * The three unwired engines are kept, not deleted: they are tested pedagogy
+ * (see `__tests__/phonicsModes.test.js`) that the existing UIs could adopt.
+ * They are declared unwired so nobody reads this registry as a description of
+ * what is running.
  *
  * `listenAndSpell` used to point at `classicBlend` as "the closest existing
  * UI". It was not close: Classic Blend is print → sound → word and Listen
@@ -45,6 +66,21 @@ import { scoreListenAndSpell, getListenAndSpellHint } from './scoring/listenAndS
 import { scoreFluencySprint, getFluencySprintHint } from './scoring/fluencySprint.js';
 
 const DEFAULT_MASTERY = Object.freeze({ accuracy: 0.8, minAttempts: 6 });
+
+/**
+ * The scoring engines a live mode UI actually imports.
+ *
+ * Derived by reading the source, not by assertion: `check-contracts.mjs`
+ * recomputes this from the imports under `src/modes/` and fails the build when
+ * the two disagree — in either direction, so wiring an engine up is also a
+ * prompt to correct this list. Audit 2026-09-19, finding 26.
+ */
+export const SCORERS_WIRED_INTO_UI = Object.freeze([
+  'fluencySprint',
+  'listenAndSpell',
+  'readAndTap',
+  'wordSort',
+]);
 
 /**
  * Required educational-metadata fields. Asserted in

@@ -9166,6 +9166,30 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 
 /*
+ * Review-surface colours.
+ *
+ * Audit finding 26. These were referenced 25 times as `var(--qj-…, #hex)` and
+ * defined nowhere: the `qj-` prefix came from the Quest Journey prototype,
+ * which has now been removed, and every call site was silently falling back to
+ * its hardcoded hex. Declaring them here changes no rendered pixel — the
+ * values are the fallbacks — but the review surfaces now read a token instead
+ * of a token that does not exist.
+ *
+ * Not yet theme-aware: there is no dark-mode or per-theme override below, so
+ * these render the same in all four themes, exactly as the hardcoded
+ * fallbacks did. Giving them proper per-theme values is a contrast decision
+ * that needs the same measurement pass finding 20 used, not a rename.
+ */
+:root {
+  --review-stroke: #ece9ff;
+  --review-feedback-correct: #dcfce7;
+  --review-feedback-correct-text: #14532d;
+  --review-feedback-wrong: #fef3c7;
+  --review-feedback-wrong-text: #78350f;
+  --review-badge-gold: #facc15;
+}
+
+/*
  * Audit finding 19: the draft check is a word counter, and the line under it
  * says so. Set quiet and small — it is a standing caveat, not a second piece
  * of feedback competing with the revision mission for a child's attention.
@@ -15302,7 +15326,7 @@ textarea:hover {
   padding: var(--space-3) var(--space-4);
   margin-bottom: var(--space-2);
   background: #ffffff;
-  border: 1px solid var(--qj-stroke, #ece9ff);
+  border: 1px solid var(--review-stroke, #ece9ff);
   border-radius: var(--radius-md, 12px);
   font-family: inherit;
   font-size: 1rem;
@@ -15329,8 +15353,8 @@ textarea:hover {
   color: var(--text-muted, #64748b);
 }
 .mistakes-den-row__count {
-  background: var(--qj-feedback-wrong, #fef3c7);
-  color: var(--qj-feedback-wrong-text, #78350f);
+  background: var(--review-feedback-wrong, #fef3c7);
+  color: var(--review-feedback-wrong-text, #78350f);
   font-size: 0.78rem;
   font-weight: 700;
   padding: 2px 8px;
@@ -15364,8 +15388,8 @@ textarea:hover {
   list-style: none;
   padding: var(--space-4);
   margin: 0 0 var(--space-5) 0;
-  background: var(--qj-feedback-correct, #dcfce7);
-  color: var(--qj-feedback-correct-text, #14532d);
+  background: var(--review-feedback-correct, #dcfce7);
+  color: var(--review-feedback-correct-text, #14532d);
   border-radius: var(--radius-md, 12px);
   display: flex;
   flex-direction: column;
@@ -15383,7 +15407,7 @@ textarea:hover {
 }
 .trophy-card {
   background: #ffffff;
-  border: 1px solid var(--qj-stroke, #ece9ff);
+  border: 1px solid var(--review-stroke, #ece9ff);
   border-radius: var(--radius-md, 12px);
   padding: var(--space-4);
   text-align: center;
@@ -15410,7 +15434,7 @@ textarea:hover {
   margin-top: var(--space-1);
 }
 .trophy-badges {
-  border-top: 1px solid var(--qj-stroke, #ece9ff);
+  border-top: 1px solid var(--review-stroke, #ece9ff);
   padding-top: var(--space-4);
 }
 .trophy-badges__title {
@@ -15428,7 +15452,7 @@ textarea:hover {
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: var(--qj-badge-gold, #facc15);
+  background: var(--review-badge-gold, #facc15);
   color: #78350f;
   border-radius: var(--radius-full, 999px);
   font-size: 0.85rem;
@@ -15500,16 +15524,16 @@ textarea:hover {
   margin-left: auto;
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--qj-badge-gold, #facc15) 24%, white),
+    color-mix(in srgb, var(--review-badge-gold, #facc15) 24%, white),
     white
   );
-  border-color: color-mix(in srgb, var(--qj-badge-gold, #facc15) 50%, transparent);
+  border-color: color-mix(in srgb, var(--review-badge-gold, #facc15) 50%, transparent);
 }
 .sb-friends-count {
   display: inline-block;
   margin-left: 6px;
   padding: 1px 8px;
-  background: var(--qj-badge-gold, #facc15);
+  background: var(--review-badge-gold, #facc15);
   color: #78350f;
   font-size: 0.75rem;
   font-weight: 800;
@@ -15545,7 +15569,7 @@ textarea:hover {
   gap: var(--space-1);
   padding: var(--space-3);
   background: #ffffff;
-  border: 1px solid var(--qj-stroke, #ece9ff);
+  border: 1px solid var(--review-stroke, #ece9ff);
   border-radius: var(--radius-md, 12px);
   font-family: inherit;
   text-align: center;
@@ -15565,7 +15589,7 @@ textarea:hover {
 .sf-tile--locked {
   cursor: default;
   opacity: 0.55;
-  background: color-mix(in srgb, var(--qj-stroke, #ece9ff) 50%, #ffffff);
+  background: color-mix(in srgb, var(--review-stroke, #ece9ff) 50%, #ffffff);
   filter: grayscale(0.4);
 }
 .sf-tile__emoji {
@@ -15606,7 +15630,7 @@ textarea:hover {
   margin: var(--space-6) auto;
   padding: var(--space-8);
   background: #ffffff;
-  border: 1px solid var(--qj-stroke, #ece9ff);
+  border: 1px solid var(--review-stroke, #ece9ff);
   border-radius: var(--radius-lg, 16px);
   box-shadow: var(--shadow-card, 0 6px 24px rgba(0, 0, 0, 0.06));
   text-align: center;
@@ -15636,8 +15660,8 @@ textarea:hover {
 .pqc-progress {
   display: inline-block;
   padding: 4px 12px;
-  background: var(--qj-feedback-correct, #dcfce7);
-  color: var(--qj-feedback-correct-text, #14532d);
+  background: var(--review-feedback-correct, #dcfce7);
+  color: var(--review-feedback-correct-text, #14532d);
   border-radius: var(--radius-full, 999px);
   font-weight: 700;
   font-size: 0.85rem;
@@ -15657,7 +15681,7 @@ textarea:hover {
   min-height: 48px;
   padding: var(--space-3) var(--space-4);
   background: #ffffff;
-  border: 2px solid var(--qj-stroke, #ece9ff);
+  border: 2px solid var(--review-stroke, #ece9ff);
   border-radius: var(--radius-md, 12px);
   font-family: inherit;
   font-size: 1rem;
@@ -15680,14 +15704,14 @@ textarea:hover {
   cursor: default;
 }
 .pqc-choice--correct {
-  background: var(--qj-feedback-correct, #dcfce7);
+  background: var(--review-feedback-correct, #dcfce7);
   border-color: var(--color-success, #22c55e);
-  color: var(--qj-feedback-correct-text, #14532d);
+  color: var(--review-feedback-correct-text, #14532d);
 }
 .pqc-choice--wrong {
-  background: var(--qj-feedback-wrong, #fef3c7);
+  background: var(--review-feedback-wrong, #fef3c7);
   border-color: #f59e0b;
-  color: var(--qj-feedback-wrong-text, #78350f);
+  color: var(--review-feedback-wrong-text, #78350f);
 }
 .pqc-feedback {
   min-height: 1.5em;
@@ -15696,12 +15720,12 @@ textarea:hover {
   font-size: 0.95rem;
 }
 .pqc-feedback--correct {
-  background: var(--qj-feedback-correct, #dcfce7);
-  color: var(--qj-feedback-correct-text, #14532d);
+  background: var(--review-feedback-correct, #dcfce7);
+  color: var(--review-feedback-correct-text, #14532d);
 }
 .pqc-feedback--wrong {
-  background: var(--qj-feedback-wrong, #fef3c7);
-  color: var(--qj-feedback-wrong-text, #78350f);
+  background: var(--review-feedback-wrong, #fef3c7);
+  color: var(--review-feedback-wrong-text, #78350f);
 }
 @media (max-width: 480px) {
   .pqc-card {
