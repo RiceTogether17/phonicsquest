@@ -2046,11 +2046,24 @@ function _normalizeGrammarClues() {
   }
 }
 
+/**
+ * Bring every scope up to the shared practice depth by re-presenting its
+ * authored passages with a new lead sentence and title.
+ *
+ * Audit 2026-09-19, finding 12: P1 Articles reaches 27 passages and 102 blanks
+ * from four authored bodies and four answer sequences. The repeats are kept —
+ * a child re-reading a passage they met last week is doing real work — but
+ * each one now names the seed it came from, so coverage can be counted in
+ * authored passages while practice volume is counted in attempts. See
+ * `practiceSeeds.js` for which number belongs on which screen.
+ */
 function _ensureGrammarPassageDepth(targetQuestions = MIN_QUESTIONS_PER_SCOPE) {
   for (const level of Object.keys(passages)) {
     const cats = passages[level] || {};
     for (const [category, bucket] of Object.entries(cats)) {
       if (!Array.isArray(bucket) || !bucket.length) continue;
+      // An authored passage is its own seed.
+      for (const passage of bucket) passage.seedId = passage.seedId || passage.id;
       const sources = [...bucket];
       let questionCount = bucket.reduce((sum, passage) => sum + (passage.answers?.length || 0), 0);
       let counter = 0;
@@ -2059,6 +2072,8 @@ function _ensureGrammarPassageDepth(targetQuestions = MIN_QUESTIONS_PER_SCOPE) {
         const variant = {
           ...src,
           id: `gxp-${level.toLowerCase()}-${category}-${String(counter + 1).padStart(3, '0')}`,
+          seedId: src.seedId || src.id,
+          isVariant: true,
           title: `${src.title} · ${contextualTitle(counter)}`,
           text: `${passageLead(counter)} ${src.text}`,
           clues: (src.clues || []).map(clue => ({ ...clue })),

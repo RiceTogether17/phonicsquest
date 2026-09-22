@@ -138,14 +138,16 @@ describe('audio.speakChunk (consecutive blending)', () => {
     expect(speakPhoneme).toHaveBeenCalledTimes(3);
   });
 
-  it('plays nothing when sfx is disabled', async () => {
-    store.set('sfxEnabled', false);
+  it('plays nothing when the teaching voice is disabled', async () => {
+    // Audit 2026-09-19 finding 8: instructional speech is muted by
+    // teachingAudioEnabled; sfxEnabled covers reward noises only.
+    store.set('teachingAudioEnabled', false);
     const speak = vi.spyOn(audio, '_speak').mockResolvedValue();
     const speakWord = vi.spyOn(audio, 'speakWord').mockResolvedValue();
     await audio.speakChunk(LIST, 2);
     expect(speak).not.toHaveBeenCalled();
     expect(speakWord).not.toHaveBeenCalled();
-    store.set('sfxEnabled', true);
+    store.set('teachingAudioEnabled', true);
   });
 });
 

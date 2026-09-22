@@ -4,6 +4,14 @@
 
 const BASE = import.meta.env.BASE_URL;
 
+/** Set once the worker reports every precached file stored. */
+let _offlineReady = false;
+
+/** Has the service worker finished saving everything for offline use? */
+export function isOfflineReady() {
+  return _offlineReady;
+}
+
 export function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
 
@@ -32,24 +40,34 @@ export function registerServiceWorker() {
     }
   });
 
-  // Listen for audio cache progress from service worker
+  // Offline-readiness progress from the service worker.
+  //
+  // Audit 2026-09-19, finding 22. This used to say "Ready offline" once the
+  // phoneme MP3s were cached, while every lazy module still needed the
+  // network — so a child who went offline and opened an activity they had
+  // never visited got a blank screen from an app that had told them it was
+  // ready. The worker now precaches every built chunk too, and this reports
+  // that whole job.
   navigator.serviceWorker.addEventListener('message', (event) => {
-    const { type, cached, total, failed } = event.data || {};
+    const { type, done, total, failed } = event.data || {};
     const indicator = document.getElementById('offline-indicator');
     if (!indicator) return;
 
-    if (type === 'audio-cache-progress') {
-      const pct = Math.round((cached / total) * 100);
+    if (type === 'offline-progress') {
+      const pct = total ? Math.round((done / total) * 100) : 100;
       indicator.hidden = false;
-      indicator.innerHTML = `<span class="offline-indicator__icon">⬇</span> Caching audio… ${pct}%`;
+      indicator.innerHTML = `<span class="offline-indicator__icon">⬇</span> Saving for offline… ${pct}%`;
       indicator.className = 'offline-indicator offline-indicator--loading';
-    } else if (type === 'audio-cache-complete') {
+    } else if (type === 'offline-ready') {
       indicator.hidden = false;
       if (failed === 0) {
-        indicator.innerHTML = '<span class="offline-indicator__icon">✓</span> Ready offline';
+        _offlineReady = true;
+        indicator.innerHTML =
+          '<span class="offline-indicator__icon">✓</span> Every activity works offline';
         indicator.className = 'offline-indicator offline-indicator--ready';
       } else {
-        indicator.innerHTML = `<span class="offline-indicator__icon">⚠</span> ${total - failed}/${total} audio cached`;
+        // Name the shortfall rather than rounding it up to "ready".
+        indicator.innerHTML = `<span class="offline-indicator__icon">⚠</span> ${total - failed} of ${total} files saved — some activities need the internet`;
         indicator.className = 'offline-indicator offline-indicator--partial';
       }
       setTimeout(() => {
@@ -132,7 +150,11 @@ function _updateNetworkStatus(isOnline) {
   if (!indicator) return;
   if (!isOnline) {
     indicator.hidden = false;
-    indicator.innerHTML = '<span class="offline-indicator__icon">⊘</span> Offline — audio cached';
+    // Say which of the two offline states this is. "Offline — audio cached"
+    // was true of the audio and silent about everything else.
+    indicator.innerHTML = _offlineReady
+      ? '<span class="offline-indicator__icon">⊘</span> Offline — everything still works'
+      : '<span class="offline-indicator__icon">⊘</span> Offline — activities you have not opened yet may not load';
     indicator.className = 'offline-indicator offline-indicator--offline';
   } else {
     indicator.hidden = true;

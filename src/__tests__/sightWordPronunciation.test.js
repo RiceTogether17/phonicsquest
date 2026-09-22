@@ -70,12 +70,14 @@ describe('audio.speakSightWord', () => {
     expect(ttsCalls).toEqual(['I']);
   });
 
-  it('does nothing when sfx is disabled', async () => {
-    store.set('sfxEnabled', false);
+  it('does nothing when the teaching voice is disabled', async () => {
+    // Audit 2026-09-19 finding 8: instructional speech is muted by
+    // teachingAudioEnabled; sfxEnabled covers reward noises only.
+    store.set('teachingAudioEnabled', false);
     await audio.speakSightWord('a');
     await audio.speakSightWord('the');
     expect(phonemeCalls).toEqual([]);
     expect(ttsCalls).toEqual([]);
-    store.set('sfxEnabled', true);
+    store.set('teachingAudioEnabled', true);
   });
 });

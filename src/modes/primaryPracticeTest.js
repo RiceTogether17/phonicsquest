@@ -587,8 +587,18 @@ function gradeInput(el) {
   if (qType === 'short') {
     const keywords = (el.getAttribute('data-keywords') || '').split('|').filter(Boolean);
     const requiredGroups = _parseRequiredGroups(el.getAttribute('data-required-groups'));
-    const result = gradeShortAnswer(value, { expected, accepts, keywords, requiredGroups });
-    return { fraction: result.fraction, trace: result.trace };
+    const marks = Number(el.getAttribute('data-marks')) || 1;
+    const result = gradeShortAnswer(value, {
+      expected,
+      accepts,
+      keywords,
+      requiredGroups,
+      marks,
+    });
+    // `needsReview` is carried through so the caller can keep the question out
+    // of the auto-graded total rather than banking a guess.
+    // Audit 2026-09-19, finding 2.
+    return { fraction: result.fraction, needsReview: result.needsReview, trace: result.trace };
   }
 
   if (qType === 'synthesis') {
@@ -770,11 +780,40 @@ function gradeSection(root, sectionKey, section) {
     }
     const marks =
       Number(el.getAttribute('data-marks')) || readSectionMarks(section, sectionKey, numGradable);
-    total += marks;
+
     // Short-answer grader can return a partial-credit object; everything
     // else returns boolean. Roll both into a single 0..1 fraction.
     const fraction =
       typeof grade === 'object' && grade !== null ? grade.fraction : grade === true ? 1 : 0;
+
+    // A question the grader cannot decide is excluded from the auto-graded
+    // total in both directions: it is not a zero the child has to argue
+    // against, and not a mark nobody earned. It goes to a teacher instead,
+    // carrying the automated suggestion. Audit 2026-09-19, finding 2.
+    const needsReview = typeof grade === 'object' && grade !== null && grade.needsReview === true;
+    if (needsReview) {
+      perKey.set(key, {
+        key,
+        marks,
+        correct: false,
+        partial: false,
+        earned: 0,
+        fraction,
+        needsReview: true,
+        suggestedFraction: fraction,
+        trace: grade.trace || null,
+        answered: !!String(el.value || '').trim(),
+        userValue: el.value || '',
+        expected: el.getAttribute('data-answer') || '',
+        stem: _stemForInput(el),
+        skill,
+        practise,
+        qType,
+      });
+      return;
+    }
+
+    total += marks;
     const earned = marks * fraction;
     scored += earned;
     const correct = fraction >= 1;
@@ -851,6 +890,10 @@ function buildSummaryHtml(paper, sectionResults) {
     if (r.selfAssessed) continue;
     for (const v of r.perKey.values()) {
       if (!v.skill) continue;
+      // An unmarked answer is not a wrong answer. Counting it as one would send
+      // a child to remedial practice for a question nobody graded.
+      // Audit 2026-09-19, finding 2.
+      if (v.needsReview) continue;
       const existing = weakSkills.get(v.skill) || { wrong: 0, total: 0, practise: v.practise };
       existing.total += 1;
       if (!v.correct) existing.wrong += 1;
@@ -899,11 +942,37 @@ function buildSummaryHtml(paper, sectionResults) {
       ? `<p class="ptg-summary-self"><em>Plus ${_fmtMark(selfMarks)} mark${selfMarks === 1 ? '' : 's'} of self-assessed writing — compare your response against the model answer in that section.</em></p>`
       : '';
 
+  // Questions the grader declined to mark, surfaced as a count rather than
+  // folded silently into the total. Audit 2026-09-19, finding 2.
+  let reviewCount = 0;
+  let reviewMarks = 0;
+  for (const r of sectionResults) {
+    if (r.selfAssessed) continue;
+    for (const v of r.perKey.values()) {
+      if (!v.needsReview) continue;
+      reviewCount += 1;
+      reviewMarks += v.marks || 0;
+    }
+  }
+  const reviewNote = reviewCount
+    ? `<p class="ptg-summary-review"><strong>Needs teacher review:</strong> ${reviewCount} question${reviewCount === 1 ? '' : 's'} (${_fmtMark(reviewMarks)} mark${reviewMarks === 1 ? '' : 's'}). These ask for an explanation in the child's own words, which this app cannot mark reliably, so they are left out of the total above rather than guessed either way.</p>`
+    : '';
+
+  // A total a parent or teacher reads must say what it is a total OF. Papers
+  // that are not in the official examination format carry that on the figure
+  // itself, not three screens away. Audit 2026-09-19, finding 1.
+  const alignmentNote =
+    paper.examAlignment && paper.examAlignment.matchesOfficialFormat === false
+      ? `<p class="ptg-summary-caveat"><em>${escapeHtml(paper.examAlignment.scoreCaveat)}</em></p>`
+      : '';
+
   return `
     <h3>📊 ${escapeHtml(paper.label)} — Summary</h3>
     <p class="ptg-summary-total"><strong>Auto-graded total:</strong> ${_fmtMark(autoScored)} / ${_fmtMark(autoTotal)}</p>
+    ${alignmentNote}
+    ${reviewNote}
     ${selfNote}
-    <p class="ptg-note"><em>Open-ended comprehension answers were graded with keyword matching — re-read the model answer if you're unsure.</em></p>
+    <p class="ptg-note"><em>Where an open-ended answer could be marked automatically, it was matched against authored meaning units — not the whole model answer. Anything less certain is listed above for a teacher.</em></p>
     <table class="ptg-summary-table">
       <thead><tr><th>Section</th><th>Score</th><th>%</th></tr></thead>
       <tbody>${perSection}</tbody>

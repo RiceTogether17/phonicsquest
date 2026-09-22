@@ -67,11 +67,13 @@ describe('stretched speech for phonemic awareness', () => {
     expect(speakSpy.mock.calls[0][0]).toBe('the');
   });
 
-  it('respects the sfx-disabled setting and skips audio entirely', async () => {
+  it('respects the teaching-voice setting and skips audio entirely', async () => {
     const { audio } = await import('../src/modules/audio.js');
     const { store } = await import('../src/modules/store.js');
     store.reset();
-    store.set('sfxEnabled', false);
+    // Audit 2026-09-19 finding 8: instructional speech is muted by
+    // teachingAudioEnabled; sfxEnabled covers reward noises only.
+    store.set('teachingAudioEnabled', false);
 
     const phonemeSpy = vi.spyOn(audio, 'speakPhoneme').mockResolvedValue();
     const speakSpy = vi.spyOn(audio, '_speak').mockResolvedValue();

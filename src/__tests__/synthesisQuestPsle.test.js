@@ -19,8 +19,13 @@ globalThis.speechSynthesis = _speechSynthesisStub;
 if (typeof window !== 'undefined') window.speechSynthesis = _speechSynthesisStub;
 
 const { SYNTHESIS_ITEMS } = await import('../data/synthesisItems.js');
-const { buildAcceptableAnswers, initSynthesisQuest, showSynthesisBrowser, cleanupSynthesisQuest } =
-  await import('../modes/synthesisQuest.js');
+const {
+  buildAcceptableAnswers,
+  checkTaskConstraints,
+  initSynthesisQuest,
+  showSynthesisBrowser,
+  cleanupSynthesisQuest,
+} = await import('../modes/synthesisQuest.js');
 
 function mountQuest() {
   document.body.innerHTML = '<div id="root"></div>';
@@ -74,18 +79,31 @@ describe('buildAcceptableAnswers — accepts both PSLE continuation and full-sen
     expect(accepts).toContain(item.answer);
   });
 
-  it('preserves alternates that DO NOT start with the stem (clause-reversed forms)', () => {
+  it('excludes clause-reversed forms, which do not complete the given stem', () => {
     const item = {
       id: 'fixture-2',
       stem: 'Although',
       answer: 'Although Siti was tired, she finished her work.',
       alternates: ['Siti finished her work although she was tired.'],
     };
+    const reversed = 'Siti finished her work although she was tired.';
     const accepts = buildAcceptableAnswers(item);
-    // The reversed-clause form must still appear in full — it doesn't start
-    // with "Although" so there's nothing to strip, but a student who types it
-    // anyway should still get credit.
-    expect(accepts).toContain('Siti finished her work although she was tired.');
+
+    // This test previously required the reversed form to be credited, on the
+    // reasoning that a student who types it anyway deserves the mark. Audit
+    // 2026-09-19 finding 9 reversed that: the task shows "Although ______" and
+    // asks what fills the blank, and substituting this form there produces
+    // "Although Siti finished her work although she was tired." Crediting it
+    // teaches that the instruction was decorative.
+    expect(accepts).not.toContain(reversed);
+
+    // It is not treated as simply wrong, though. The connector is correct and
+    // the child has the pattern; only its position is off, and the feedback
+    // says exactly that.
+    const check = checkTaskConstraints(reversed, item);
+    expect(check.ok).toBe(false);
+    expect(check.violation).toBe('connector-position');
+    expect(check.message).toMatch(/begin the sentence with it/);
   });
 
   it('de-duplicates entries that normalise to the same string', () => {
@@ -115,7 +133,14 @@ describe('P6 synthesis — PSLE-style partial credit via requiredGroups', () => 
     const { gradeShortAnswer } = await import('../modes/scoring/shortAnswerGrader.js');
     const offenders = [];
     for (const item of p6) {
-      const r = gradeShortAnswer(item.answer, { requiredGroups: item.requiredGroups });
+      // `expected` is passed because the mode passes it (data-answer). Without
+      // it the grader cannot know the mark scheme's polarity, and a correct
+      // negative answer such as "They would not have got drenched" fails its
+      // own meaning unit. Audit 2026-09-19, finding 2.
+      const r = gradeShortAnswer(item.answer, {
+        expected: item.answer,
+        requiredGroups: item.requiredGroups,
+      });
       if (r.fraction !== 1) {
         offenders.push(`${item.id}: ${r.fraction} (missed ${r.trace.misses.join(', ')})`);
       }
@@ -128,7 +153,10 @@ describe('P6 synthesis — PSLE-style partial credit via requiredGroups', () => 
     const offenders = [];
     for (const item of p6) {
       for (const alt of item.alternates || []) {
-        const r = gradeShortAnswer(alt, { requiredGroups: item.requiredGroups });
+        const r = gradeShortAnswer(alt, {
+          expected: item.answer,
+          requiredGroups: item.requiredGroups,
+        });
         if (r.fraction !== 1) {
           offenders.push(`${item.id} alt "${alt.slice(0, 40)}...": ${r.fraction}`);
         }
@@ -182,11 +210,36 @@ describe('Negation detector — PSLE fronted-inversion and not-only exemptions',
     expect(hasUnnegatedMatch('She was never afraid of speaking up.', 'afraid')).toBe(false);
   });
 
-  it('credits the conditional outcome after "would not have got X" (X is the outcome, not negated)', async () => {
-    const { hasUnnegatedMatch } = await import('../modes/scoring/shortAnswerGrader.js');
-    expect(hasUnnegatedMatch('They would not have got drenched in the rain.', 'drenched')).toBe(
-      true,
-    );
+  it('credits the conditional outcome in "would not have got X" against its own mark scheme', async () => {
+    const { gradeShortAnswer, matchPolarity } =
+      await import('../modes/scoring/shortAnswerGrader.js');
+    const model = 'They would not have got drenched in the rain.';
+
+    // This used to assert hasUnnegatedMatch(...) === true, which only held
+    // because the negation lookback was two words and never saw the "not".
+    // "drenched" here IS negated, and reporting otherwise is what let
+    // "It is not at all urgent" count as a hit for "urgent".
+    expect(matchPolarity(model, 'drenched')).toBe('negated');
+
+    // What matters is unchanged: the correct answer still scores full marks,
+    // because its polarity matches the mark scheme's.
+    const r = gradeShortAnswer(model, {
+      expected: model,
+      requiredGroups: [['drenched'], ['rain']],
+    });
+    expect(r.fraction).toBe(1);
+
+    // Polarity only ever rejects, it never requires a negation: an unnegated
+    // hit is accepted whatever the model does, because a correct paraphrase may
+    // carry the negation lexically ("avoided getting drenched") instead of
+    // grammatically. What it rejects is a denial of an affirmative model, which
+    // is the case the audit reported.
+    const denial = gradeShortAnswer('It is not at all urgent.', {
+      expected: 'It is urgent because the reefs are dying.',
+      keywords: ['urgent'],
+      marks: 1,
+    });
+    expect(denial.fraction).toBe(0);
   });
 });
 

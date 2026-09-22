@@ -6,7 +6,15 @@
  * without bloating the main evaluator module.
  *
  * All functions are deterministic and lightweight — no NLP libraries.
+ *
+ * Audit 2026-09-19, finding 19 names `writingEvaluator.js`, but these scores
+ * feed straight into it and carried the same defect: every list below was
+ * matched with `includes`, so "froze" was credited from "frozen", "found"
+ * from "foundation" and "day" from "Sunday". Matching is on word boundaries
+ * now — see `textMatch.js` for why, and for the choice not to stem.
  */
+
+import { containsPhrase, countPhrases, phraseIndex } from './textMatch.js';
 
 // ── Climax Detection ────────────────────────────────────────────────────────
 
@@ -56,9 +64,9 @@ const TENSION_PHRASES = [
  * Returns 0..1 where higher = stronger climax signal.
  */
 export function scoreClimaxPresence(lower) {
-  const markerHits = CLIMAX_MARKERS.filter((m) => lower.includes(m)).length;
-  const verbHits = TENSION_VERBS.filter((v) => lower.includes(v)).length;
-  const phraseHits = TENSION_PHRASES.filter((p) => lower.includes(p)).length;
+  const markerHits = countPhrases(lower, CLIMAX_MARKERS);
+  const verbHits = countPhrases(lower, TENSION_VERBS);
+  const phraseHits = countPhrases(lower, TENSION_PHRASES);
 
   // A real climax needs a marker + at least some tension language
   const markerScore = Math.min(markerHits, 2) * 0.3;
@@ -99,8 +107,8 @@ const RESOLUTION_ACTIONS = [
  * Returns 0..1.
  */
 export function scoreResolutionPresence(lower) {
-  const markerHits = RESOLUTION_MARKERS.filter((m) => lower.includes(m)).length;
-  const actionHits = RESOLUTION_ACTIONS.filter((a) => lower.includes(a)).length;
+  const markerHits = countPhrases(lower, RESOLUTION_MARKERS);
+  const actionHits = countPhrases(lower, RESOLUTION_ACTIONS);
 
   const markerScore = Math.min(markerHits, 2) * 0.35;
   const actionScore = Math.min(actionHits, 2) * 0.15;
@@ -140,8 +148,8 @@ export function scoreReflectionEnding(text) {
   const lastPortionStart = Math.floor(totalWords * 0.6);
   const lastPortion = words.slice(lastPortionStart).join(' ');
 
-  const markerInEnd = REFLECTION_MARKERS.filter((m) => lastPortion.includes(m)).length;
-  const markerAnywhere = REFLECTION_MARKERS.filter((m) => lower.includes(m)).length;
+  const markerInEnd = countPhrases(lastPortion, REFLECTION_MARKERS);
+  const markerAnywhere = countPhrases(lower, REFLECTION_MARKERS);
 
   // Reward markers near end more than markers at start
   if (markerInEnd > 0) return Math.min(0.5 + markerInEnd * 0.25, 1);
@@ -221,8 +229,7 @@ export function scoreNarrativeArc(text) {
     'walked',
     'sat',
   ];
-  const hasSetup =
-    setupWords.filter((w) => q1.includes(w)).length >= 2 || q1.split(/[.!?]/).length >= 2;
+  const hasSetup = countPhrases(q1, setupWords) >= 2 || q1.split(/[.!?]/).length >= 2;
 
   // Rising action — some tension or action in middle quarters
   const risingWords = [
@@ -235,13 +242,15 @@ export function scoreNarrativeArc(text) {
     'heard',
     'saw',
   ];
-  const hasRising = risingWords.some((w) => q2.includes(w) || q3.includes(w));
+  const hasRising = risingWords.some((w) => containsPhrase(q2, w) || containsPhrase(q3, w));
 
   // Climax — tension peak in second half
-  const hasClimax = CLIMAX_MARKERS.some((m) => q3.includes(m) || q2.includes(m));
+  const hasClimax = CLIMAX_MARKERS.some((m) => containsPhrase(q3, m) || containsPhrase(q2, m));
 
   // Resolution — in final quarter
-  const hasResolution = RESOLUTION_MARKERS.some((m) => q4.includes(m) || q3.includes(m));
+  const hasResolution = RESOLUTION_MARKERS.some(
+    (m) => containsPhrase(q4, m) || containsPhrase(q3, m),
+  );
 
   let score = 0;
   if (hasSetup) score += 0.25;
@@ -278,7 +287,7 @@ export function scoreChronologicalFlow(text) {
   for (const group of SEQUENCE_MARKERS_ORDERED) {
     let earliestPos = Infinity;
     for (const marker of group.markers) {
-      const idx = lower.indexOf(marker);
+      const idx = phraseIndex(lower, marker);
       if (idx >= 0 && idx < earliestPos) {
         earliestPos = idx;
       }

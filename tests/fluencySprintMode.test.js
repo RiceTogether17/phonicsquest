@@ -148,7 +148,7 @@ describe('Fluency Sprint mode', () => {
     expect([...cards].every((c) => !c.disabled)).toBe(true);
   });
 
-  it('a fast accurate run masters the sprint: onResult(true, ≥45s)', () => {
+  it('a fast accurate run hits the target pace: onResult(true, ≥45s)', () => {
     const els = makeEls();
     setupFluencySprint(CAT, els);
     document.getElementById('fs-start-btn').click();
@@ -159,7 +159,14 @@ describe('Fluency Sprint mode', () => {
 
     const summary = document.querySelector('.fs-summary');
     expect(summary).not.toBeNull();
-    expect(summary.textContent).toContain('words/min');
+    // Audit 2026-09-19 finding 14: this read "words/min" under a headline of
+    // "Sprint mastered!". The mode speaks the target and the child taps its
+    // printed match, so what is timed is auditory-to-print matching. Neither
+    // an oral reading rate nor mastery — the evidence layer caps this mode at
+    // `guided`, and the display now agrees with it.
+    expect(summary.textContent).toContain('words matched/min');
+    expect(summary.textContent).not.toMatch(/mastered/i);
+    expect(summary.textContent).toMatch(/not a reading-aloud speed/i);
     expect(summary.textContent).toContain('100%');
 
     document.querySelector('.vmcq-next-btn').click();

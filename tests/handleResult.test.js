@@ -263,7 +263,7 @@ describe('blend confirmation — a self-report is not evidence on its own', () =
     expect(document.querySelectorAll('.blend-confirm__card').length).toBe(3);
   });
 
-  it('records the confirmation as independent evidence when the child is right', async () => {
+  it('records the confirmation as guided evidence when the child is right', async () => {
     const { app, recordSpy } = await makeApp('blend');
 
     app._handleResult(true, 1500);
@@ -274,9 +274,16 @@ describe('blend confirmation — a self-report is not evidence on its own', () =
     expect(wordId).toBe('cat');
     expect(correct).toBe(true);
     expect(mode).toBe('blend');
-    // Not 'exposure' — the confirmation had no model and no audio, so this
-    // is the one thing a self-assessed mode can prove.
-    expect(evidence).toBe('independent');
+    // This required 'independent', reasoning that the confirmation screen
+    // itself had no model and no audio. True of the screen, but the app blended
+    // the word aloud moments earlier and now shows it among three printed
+    // choices — evidence.js's own definition of `guided`. Audit 2026-09-19
+    // finding 13: recognising a just-seen, just-heard word is not cold
+    // decoding, so it cannot carry a decoding mastery claim.
+    //
+    // Still two levels above the bare "Yes! ✓" it replaced, which is exposure:
+    // the child performs something rather than claiming it.
+    expect(evidence).toBe('guided');
   });
 
   it('records a wrong confirmation as a miss, however confident the child was', async () => {
@@ -288,7 +295,7 @@ describe('blend confirmation — a self-report is not evidence on its own', () =
     expect(recordSpy).toHaveBeenCalledTimes(1);
     const [, correct, , , evidence] = recordSpy.mock.calls[0];
     expect(correct).toBe(false);
-    expect(evidence).toBe('independent');
+    expect(evidence).toBe('guided');
   });
 
   it('does not interrupt "final" modes, which already assess objectively', async () => {

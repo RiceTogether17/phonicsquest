@@ -148,9 +148,16 @@ describe('gradeShortAnswer — empty / malformed input', () => {
     expect(r.trace.reason).toBe('empty');
   });
 
-  it('returns 0 when no grading information is provided', () => {
+  it('refers to a teacher when no marking key is provided', () => {
+    // This asserted fraction 0 / reason 'no-match'. Audit 2026-09-19 finding 2
+    // established that a confident zero here is wrong: 21 of the 29 P6
+    // comprehension questions have no marking key, and the only thing left to
+    // compare against is the prose model answer -- which scored "50%" as zero
+    // for a question whose answer is 50%. The grader now declines instead.
     const r = gradeShortAnswer('some answer', {});
+    expect(r.needsReview).toBe(true);
+    expect(r.trace.reason).toBe('no-marking-key');
+    // The advisory suggestion stays 0; the caller keeps it out of the total.
     expect(r.fraction).toBe(0);
-    expect(r.trace.reason).toBe('no-match');
   });
 });

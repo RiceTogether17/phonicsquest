@@ -1661,6 +1661,10 @@ function _clonePassage(seed, cat, level, idx) {
   return {
     ...seed,
     id: `${seed.id || `${cat}-${level}`}-practice-${n}`,
+    // Audit finding 12: this is the same passage again, word for word. Keep
+    // it as revision, but name the seed so it is not counted as new coverage.
+    seedId: seed.seedId || seed.id || `${cat}-${level}`,
+    isVariant: true,
     title: `${seed.title} (Practice ${n})`,
     clues: (seed.clues || []).map(c => ({ ...c })),
     hints: [...(seed.hints || [])],
@@ -1695,7 +1699,14 @@ function _ensureMinimumPassages() {
       const arr = vocabPassages[cat]?.[level] || [];
       while (arr.length < 3 && arr.length > 0) {
         const seed = arr[arr.length - 1];
-        arr.push({ ...seed, id: `${seed.id}-x${arr.length}`, title: `${seed.title} (Practice ${arr.length})` });
+        arr.push({
+          ...seed,
+          id: `${seed.id}-x${arr.length}`,
+          // Another literal copy — see _clonePassage above.
+          seedId: seed.seedId || seed.id,
+          isVariant: true,
+          title: `${seed.title} (Practice ${arr.length})`,
+        });
       }
       if (vocabPassages[cat]) vocabPassages[cat][level] = arr;
     }
@@ -1821,8 +1832,25 @@ function enrichVocabMetadata() {
 }
 
 
+/**
+ * Every passage names the authored passage its content comes from.
+ *
+ * The generator in `vocabPassagesExtra/` sets this as it builds; an authored
+ * passage is its own seed. Audit 2026-09-19, finding 12.
+ */
+function _assignVocabSeeds() {
+  for (const levels of Object.values(vocabPassages)) {
+    for (const list of Object.values(levels || {})) {
+      for (const passage of list || []) {
+        if (!passage.seedId) passage.seedId = passage.id;
+      }
+    }
+  }
+}
+
 enrichVocabPassages();
 
+_assignVocabSeeds();
 _ensureMinimumPassages();
 _ensurePracticeDepth();
 enrichVocabMetadata();

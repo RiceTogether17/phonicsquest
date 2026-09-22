@@ -83,9 +83,14 @@ export const PLACEHOLDER_META = {
   'p6-practice-tests': {
     icon: '🎓',
     label: 'Primary 6 Practice Tests',
+    // Audit 2026-09-19, finding 1: this said "Four full PSLE-format P6 papers
+    // ... Full Paper 1 + Paper 2 structure ... Get exam-ready." The papers are
+    // a single 95-mark hybrid with no Continuous Writing section, so none of
+    // that was true and "exam-ready" was not something these results could
+    // establish. The practice is still good; only the claim has changed.
     blurb:
-      'Four full PSLE-format P6 papers (T1–T4). Full Paper 1 + Paper 2 structure with the hardest synthesis patterns, inversion, and evidence-based comprehension. Get exam-ready.',
-    paperLink: 'P6 · Full PSLE format',
+      "Four P6 practice papers (T1–T4) with the hardest synthesis patterns, inversion, and evidence-based comprehension. PhonicsQuest's own mixed-component format — not the PSLE paper structure, and Continuous Writing is not covered.",
+    paperLink: 'P6 · Mixed-component practice',
   },
 };
 

@@ -227,8 +227,10 @@ describe('aiGuardrails', () => {
 
       const prompt = JSON.parse(fetchMock.mock.calls[0][1].body).contents[0].parts[0].text;
       expect(prompt).toContain('tense consistency');
-      expect(prompt).toContain('"packs"');
       expect(prompt).toContain('"packed"');
+      // Audit finding 24: the child's own answer is the one field they
+      // control, so it is fenced rather than quoted inline.
+      expect(prompt).toMatch(/---BEGIN PUPIL ANSWER [0-9a-z]+---\npacks\n---END PUPIL ANSWER/);
     });
 
     it('guarded helpers return null without a key', async () => {
@@ -281,7 +283,10 @@ describe('aiGuardrails', () => {
       );
       const { getWritingCoachFeedback } = await import('../modules/aiService.js');
 
-      const out = await getWritingCoachFeedback('draft', 2);
+      // The draft has to contain the quoted sentences now. Audit finding 24:
+      // a finding is dropped unless its quote is the child's own words, so a
+      // one-word stand-in draft would (correctly) reject both of these.
+      const out = await getWritingCoachFeedback('I like dogs. He run fast.', 2);
       expect(out.items).toHaveLength(2);
       expect(out.items[0].sentence).toBe('I like dogs');
       expect(out.items[0].sentence).not.toContain('<');
@@ -332,7 +337,9 @@ describe('aiGuardrails', () => {
     it('sanitises the feedback line', async () => {
       store.set('geminiApiKey', 'test-key');
       fetchMock.mockReturnValue(
-        geminiReply('PARTIAL\nAlmost — check <b>tense</b> at https://evil.example'),
+        geminiReply(
+          'VERDICT: PARTIAL\nFEEDBACK: Almost — check <b>tense</b> at https://evil.example',
+        ),
       );
       const { gradeSynthesisAnswer } = await import('../modules/aiService.js');
 

@@ -25,7 +25,7 @@
  * tests can pin behaviour one slice at a time.
  */
 
-const DAY_MS = 24 * 60 * 60 * 1000;
+import { startOfLocalDay, localDayKey, startOfLocalDayBefore } from '../utils/localDay.js';
 
 /** Default config — overridable by the caller. */
 const DEFAULTS = Object.freeze({
@@ -41,15 +41,21 @@ function _safeList(input) {
   return Array.isArray(input) ? input.filter((a) => a && typeof a === 'object') : [];
 }
 
-function _startOfDay(ts) {
-  const d = new Date(ts);
-  d.setHours(0, 0, 0, 0);
-  return d.getTime();
-}
-
-function _isoDay(ts) {
-  return new Date(_startOfDay(ts)).toISOString().slice(0, 10);
-}
+/**
+ * Day bucketing is LEARNER-LOCAL throughout this module.
+ *
+ * Audit 2026-09-19, finding 23: `_startOfDay` took local midnight and
+ * `_isoDay` then ran `.toISOString()` on it, which converts to UTC. In
+ * Singapore local midnight on the 21st is 16:00 UTC on the 20th, so every
+ * bucket was labelled with the previous day's date — a parent looking at
+ * "today" on the chart was reading yesterday.
+ *
+ * The keys come from `utils/localDay.js` so this module and the XP log cannot
+ * drift apart about what day it is.
+ */
+const _startOfDay = startOfLocalDay;
+const _isoDay = localDayKey;
+const _startOfDayBefore = startOfLocalDayBefore;
 
 // ── Per-stage / per-mode rollups ────────────────────────────────────────
 
@@ -173,10 +179,10 @@ export function getAttemptsOverTime(attempts, opts = {}) {
   const list = _safeList(attempts);
 
   const buckets = new Map();
-  const todayKey = _startOfDay(now);
   for (let i = historyDays - 1; i >= 0; i--) {
-    const dayMs = todayKey - i * DAY_MS;
-    buckets.set(_isoDay(dayMs), { date: _isoDay(dayMs), attempts: 0, correct: 0 });
+    const dayMs = _startOfDayBefore(now, i);
+    const key = _isoDay(dayMs);
+    buckets.set(key, { date: key, attempts: 0, correct: 0 });
   }
   for (const a of list) {
     if (typeof a.timestamp !== 'number') continue;

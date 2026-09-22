@@ -10,6 +10,13 @@
   --color-primary: #5a52e0;
   --color-primary-light: #ede9fe;
   --color-primary-dark: #4c46c8;
+  /* Text colour for a pill sitting on an 18%-primary tint.
+     Audit 2026-09-19, finding 20: .placeholder-paper-link used
+     --color-primary on that tint, which fails WCAG AA small-text 4.5:1 in
+     every theme (default 4.37, sky 2.19, green 1.88, orange 2.21).
+     --color-primary-dark was not enough either — it still failed in three of
+     the four. A token per theme, rather than a per-screen override. */
+  --color-primary-on-tint: #4e45de;
   --color-secondary: #ff6b8a;
   --color-success: #22c55e;
   --color-success-light: #dcfce7;
@@ -125,6 +132,7 @@
   --color-primary: #0ea5e9;
   --color-primary-light: #e0f2fe;
   --color-primary-dark: #0284c7;
+  --color-primary-on-tint: #096690;
   --bg: #f0f9ff;
   --surface-2: #e0f2fe;
   --border: #bae6fd;
@@ -137,6 +145,7 @@
   --color-primary: #22c55e;
   --color-primary-light: #dcfce7;
   --color-primary-dark: #16a34a;
+  --color-primary-on-tint: #137036;
   --bg: #f0fdf4;
   --surface-2: #dcfce7;
   --border: #bbf7d0;
@@ -149,6 +158,7 @@
   --color-primary: #f97316;
   --color-primary-light: #ffedd5;
   --color-primary-dark: #ea580c;
+  --color-primary-on-tint: #a04404;
   --bg: #fff7ed;
   --surface-2: #ffedd5;
   --border: #fed7aa;
@@ -233,6 +243,10 @@
   :root:not([data-theme='contrast']) {
     --bg: #0f0e1a;
     --surface: #1a1830;
+    /* The 18% tint is dark here, so the pill text flips light. Each theme's
+       existing --color-primary-light clears 11:1 on it.
+       Audit 2026-09-19, finding 20. */
+    --color-primary-on-tint: var(--color-primary-light);
     --surface-2: #252340;
     --border: #2d2b55;
     --text: #e8e6ff;
@@ -1667,6 +1681,16 @@ body.bedtime-on * {
   color: var(--color-warning-shadow);
 }
 
+/* Says what the timed figure actually measures, beside the figure itself.
+   Audit 2026-09-19, finding 14. */
+.fs-summary-scope {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
 /* ── Listen & Spell mode (encoding) ──────────────────────────────────── */
 .las-round {
   width: 100%;
@@ -2753,6 +2777,24 @@ body:has(#screen-stories.screen.active) .mascot-float {
   font-size: var(--font-size-base);
   font-weight: 600;
   cursor: pointer;
+}
+
+/* Sub-label under a toggle name, e.g. what "Teaching voice" actually controls.
+   Audit 2026-09-19 finding 8: an unexplained "Sound Effects" switch was
+   silencing the spoken stimulus, so each audio switch now says what it does. */
+.toggle-row > span:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding-right: var(--space-3);
+}
+
+.toggle-hint {
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--color-text-muted, #6b7280);
 }
 
 .toggle-wrap {
@@ -9121,6 +9163,38 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .cloze-level-count {
   font-size: var(--font-size-xs);
   color: var(--text-muted);
+}
+
+/*
+ * Audit finding 19: the draft check is a word counter, and the line under it
+ * says so. Set quiet and small — it is a standing caveat, not a second piece
+ * of feedback competing with the revision mission for a child's attention.
+ */
+.wq-observed {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin: 2px 0 0;
+}
+
+.wq-caveat {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  opacity: 0.9;
+  margin: 2px 0 8px;
+  line-height: 1.45;
+}
+
+/*
+ * Audit finding 12: most of a scope is the same passages re-presented with a
+ * new lead sentence. Progress counts the distinct ones; this line says plainly
+ * how many revision rounds sit behind them, so nobody reads a practice count
+ * as curriculum coverage. Set smaller and dimmer than the progress line —
+ * it is a footnote, not a second score.
+ */
+.cloze-level-revision {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  opacity: 0.8;
 }
 
 /* Category picker */
@@ -15935,10 +16009,195 @@ textarea:hover {
   display: inline-block;
   font-size: 0.78rem;
   background: color-mix(in srgb, var(--color-primary) 18%, transparent);
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   padding: 2px 8px;
   border-radius: 999px;
 }
+/* ── Visual Text stimulus ──────────────────────────────────────────────
+   Audit 2026-09-19, finding 18: posters were rendered in <pre>, so meaning
+   carried by layout — what is biggest, what is grouped, which column a row
+   belongs to — was not there to read. The sheet below gives a real hierarchy;
+   the markup underneath it is headings, lists and tables, so a screen-reader
+   user gets the same structure. */
+.vstim {
+  margin: 0 0 var(--space-4, 16px);
+}
+.vstim-sheet {
+  border: 2px solid var(--border, #e5e3fa);
+  border-radius: var(--radius-md, 10px);
+  background: var(--surface, #fff);
+  padding: var(--space-4, 16px);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
+}
+.vstim-headline {
+  margin: 0 0 var(--space-2, 8px);
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+.vstim-standfirst {
+  margin-bottom: var(--space-3, 12px);
+  padding-bottom: var(--space-3, 12px);
+  border-bottom: 1px solid var(--border, #e5e3fa);
+  text-align: center;
+  font-weight: 600;
+}
+.vstim-block + .vstim-block {
+  margin-top: var(--space-3, 12px);
+}
+.vstim-p {
+  margin: 0 0 var(--space-1, 4px);
+}
+.vstim-ol,
+.vstim-ul {
+  margin: 0;
+  padding-left: 1.4em;
+}
+.vstim-ol li,
+.vstim-ul li {
+  margin-bottom: 2px;
+}
+.vstim-dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px var(--space-3, 12px);
+  margin: 0;
+}
+.vstim-dl dt {
+  font-weight: 700;
+}
+.vstim-dl dd {
+  margin: 0;
+}
+.vstim-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.vstim-table th,
+.vstim-table td {
+  border: 1px solid var(--border, #e5e3fa);
+  padding: 4px 8px;
+  text-align: left;
+}
+.vstim-table th {
+  background: var(--surface-2, #f3f4f6);
+  font-weight: 700;
+}
+.vstim-caption {
+  margin-top: var(--space-1, 4px);
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+/* A menu and an advertisement should not look like a school notice. */
+.vstim--menu .vstim-headline,
+.vstim--advertisement .vstim-headline {
+  text-transform: uppercase;
+}
+.vstim--notice .vstim-sheet {
+  border-style: dashed;
+}
+
+/* ── Primary section runner ────────────────────────────────────────────
+   Catalogue, then one task at a time. Audit 2026-09-19, finding 17. */
+.psr-levelbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: var(--space-3, 12px);
+}
+.psr-level {
+  padding: 6px 12px;
+  border: 1px solid var(--border, #e5e3fa);
+  border-radius: 999px;
+  background: var(--surface, #fff);
+  color: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 44px;
+}
+.psr-level--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+.psr-level-mine {
+  font-weight: 400;
+  opacity: 0.85;
+}
+.psr-intro {
+  margin: 0 0 var(--space-3, 12px);
+  color: var(--color-text-muted);
+}
+.psr-catalogue {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.psr-open {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3, 12px);
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--border, #e5e3fa);
+  border-radius: var(--radius-md, 10px);
+  background: var(--surface, #fff);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.psr-open-title {
+  font-weight: 700;
+}
+.psr-open-meta {
+  flex-shrink: 0;
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--color-text-muted);
+}
+.psr-taskbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2, 8px);
+  margin-bottom: var(--space-3, 12px);
+}
+.psr-progress {
+  margin: 0;
+  font-weight: 700;
+}
+.psr-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3, 12px);
+  margin-top: var(--space-4, 16px);
+}
+.psr-nav .btn {
+  min-height: 44px;
+}
+.psr-done {
+  text-align: center;
+  padding: var(--space-5, 24px) var(--space-3, 12px);
+}
+.psr-done-icon {
+  font-size: 2.5rem;
+  margin: 0;
+}
+.psr-done-title {
+  margin: var(--space-2, 8px) 0 4px;
+}
+.psr-done-sub {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
 .placeholder-blurb {
   font-size: 0.92rem;
   color: var(--text-muted, #555);
@@ -16690,6 +16949,17 @@ textarea:hover {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 10px;
+  /* Real <ul>/<li> now, for the item count a screen reader announces.
+     Audit 2026-09-19, finding 20. */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cc-quest__level-item {
+  display: flex;
+}
+.cc-quest__level-item > .cc-quest__level-btn {
+  width: 100%;
 }
 .cc-quest__level-btn {
   display: flex;
@@ -17342,6 +17612,14 @@ body.print-mode > *:not(.print-report-wrapper) > * {
     border-radius: 4px;
     min-width: 4px;
   }
+  /* Says how thin a reported percentage is. A score from one Quick Check
+     answer used to print identically to one from twenty attempts.
+     Audit 2026-09-19, finding 15. */
+  .print-report-early {
+    font-size: 10px;
+    font-style: italic;
+    color: #6b7280;
+  }
   .print-report-section {
     margin-bottom: 16px;
   }
@@ -17545,6 +17823,32 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   border: 1px solid var(--border, #e5e3fa);
   border-radius: var(--radius-md, 10px);
 }
+/* Adult-facing note shown before cloud AI is enabled, saying what leaves the
+   device. Audit 2026-09-19, finding 6. */
+.ai-disclosure {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--color-warning);
+  border-radius: var(--radius-sm, 6px);
+  background: var(--color-warning-light);
+  /* The warning tint is a fixed light value, as it is everywhere else it is
+     used, so pin the text dark rather than inherit a dark-mode foreground
+     that would be unreadable on it. */
+  color: #422006;
+  font-size: var(--font-size-sm, 0.875rem);
+  line-height: 1.5;
+}
+.ai-disclosure a {
+  color: #7c3d00;
+  text-decoration: underline;
+}
+.ai-disclosure p {
+  margin: 0 0 0.5em;
+}
+.ai-disclosure p:last-child {
+  margin-bottom: 0;
+}
+
 .ai-option-head {
   display: flex;
   align-items: baseline;

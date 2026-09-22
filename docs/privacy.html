@@ -17,42 +17,99 @@
 </head>
 <body>
   <h1>PhonicsQuest – Privacy Policy</h1>
-  <p class="updated">Last updated: 13 June 2026</p>
+  <p class="updated">Last updated: 21 September 2026</p>
 
-  <p>PhonicsQuest is an educational English-learning app for children. We have designed it
-  to be safe for young learners. This policy explains, in plain language, what data the app
-  does and does not handle.</p>
+  <p>PhonicsQuest is an educational English-learning app for children. This policy explains,
+  in plain language, what the app does and does not send anywhere, so an adult can decide
+  what to switch on.</p>
 
   <h2>The short version</h2>
-  <p>PhonicsQuest does <strong>not</strong> collect, store, or transmit any personal
-  information to us or to any third party. There are no user accounts, no sign-in, no
-  advertising, and no analytics tracking of individuals.</p>
+  <p>By default, PhonicsQuest works entirely on your own device. There are no user accounts,
+  no sign-in, no advertising, and no analytics tracking of individuals. We do not operate a
+  server that receives your data, and we never receive a learner's work.</p>
+  <p><strong>There are optional features that do send text off the device</strong> — the AI
+  helper and, on some browsers, speech recognition. They are off unless an adult turns them
+  on. Each is described below. If you leave them off, nothing a child writes or says leaves
+  the device.</p>
 
   <h2>What is stored, and where</h2>
   <p>To remember a learner's progress (stars, levels, mastery, and the profile name and
-  avatar you choose), the app saves data <strong>only on your own device</strong> using the
-  browser's local storage (<code>localStorage</code>). This information:</p>
+  avatar you choose), the app saves data on your own device using the browser's local
+  storage (<code>localStorage</code>). This information:</p>
   <ul>
-    <li>never leaves the device;</li>
-    <li>is not sent to any server we control;</li>
+    <li>is not sent to any server we control — we have no copy of it;</li>
+    <li>stays in the browser you used, and is not synchronised to other devices;</li>
     <li>can be cleared at any time by clearing the app/browser data.</li>
   </ul>
   <p>A profile name is whatever you choose to type — we recommend a first name or nickname,
   not full names or other identifying details.</p>
 
+  <h3>Read-aloud recordings</h3>
+  <p>If a child records themselves reading a story, the audio is held in the page's memory
+  for playback and is <strong>not</strong> uploaded anywhere. It is discarded when the page
+  is closed. Only the resulting words-per-minute figures are saved on the device.</p>
+
+  <h3>Exporting progress</h3>
+  <p>You can export a learner's progress to a file to move it to another device or give it
+  to a teacher. You choose where that file goes; we never see it. Exported files deliberately
+  exclude any saved AI key and the parent PIN. Treat an export as you would a school report:
+  it contains a child's name and their learning record.</p>
+
+  <h2>Optional AI features — these do send data to a third party</h2>
+  <p>PhonicsQuest can use an external AI provider to give hints, coach writing and mark some
+  open-ended answers. This is <strong>off by default</strong>, and works only after an adult
+  enters their own API key for a provider in Settings. Turning it on means:</p>
+  <ul>
+    <li>Requests go directly from your device to the provider you chose — currently Google
+    (Gemini), Anthropic (Claude) or OpenAI. They do not pass through any server of ours.</li>
+    <li>The provider receives the text needed for that feature. For writing coaching and
+    essay feedback, <strong>that is the child's full composition draft</strong>. For hints and
+    explanations, it is the question, the answer options and the child's answer. For
+    synthesis marking, it is the sentence the child wrote. Some requests also include a short
+    summary of recent practice, such as the stage being worked on.</li>
+    <li>The app does not add the profile name or age to these requests. It cannot, however,
+    remove identifying details a child has written into their own composition — a story about
+    their family, school or address is sent as written. This is worth a word to the child
+    before the feature is used.</li>
+    <li>What the provider then does with that text is governed by <em>their</em> policy and
+    the terms of the account whose key you entered, not by this policy. Please read it before
+    enabling AI for a child, and check whether that account has training-on-your-data
+    switched off.</li>
+    <li>Your API key is stored on your device only, and is excluded from progress exports.</li>
+  </ul>
+  <p>Every AI feature has a working non-AI path. Leaving AI off costs you hints and automated
+  writing feedback; it does not lock any activity.</p>
+
+  <h2>Speech features</h2>
+  <p>Spoken words and letter sounds are produced by your browser's built-in speech engine.
+  Where the app <em>listens</em> — for example to check a word a child says — it uses the
+  browser's speech-recognition support. <strong>On several browsers, including Chrome, that
+  service sends the audio to the browser vendor's servers for processing.</strong> That
+  happens under the browser's own privacy policy and is outside our control. The microphone
+  is used only while a listening or recording activity is active, and the browser asks your
+  permission first.</p>
+
   <h2>Information we do not collect</h2>
   <ul>
-    <li>No names, emails, phone numbers, or addresses are sent to us.</li>
+    <li>We operate no server that receives learner data, so no names, emails, phone numbers
+    or addresses are sent to us.</li>
     <li>No location data.</li>
     <li>No advertising identifiers, and no behavioural or personalised advertising.</li>
     <li>No third-party analytics or tracking SDKs.</li>
   </ul>
 
   <h2>Children's privacy</h2>
-  <p>PhonicsQuest is intended for children and is designed to comply with the Children's
-  Online Privacy Protection Act (COPPA) and the EU GDPR provisions for children. Because the
-  app does not collect personal data, no parental consent mechanism is required for data
-  collection. We encourage parents and teachers to supervise young learners.</p>
+  <p>PhonicsQuest is intended for children, and is built so that the default configuration
+  collects nothing and sends nothing. We do not claim certification under any particular
+  regime; we have not sought a COPPA, GDPR or PDPA compliance assessment, and this policy
+  should not be read as one.</p>
+  <p>What we can tell you plainly is where the decisions sit. In the default offline
+  configuration there is no collection of personal data by us. If an adult enables the AI
+  features, text written by the child is sent to the provider they chose, and that transfer
+  is governed by that provider's terms — including whatever those terms say about children's
+  data. If your setting is a school or tuition centre, that choice may need to go through
+  whoever is responsible for data protection there. We encourage parents and teachers to
+  supervise young learners.</p>
 
   <h2>Third-party content</h2>
   <p>The app loads fonts from Google Fonts to display text. This may involve a standard web

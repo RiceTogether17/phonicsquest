@@ -1373,11 +1373,25 @@ function _renderPrintReport() {
       const color = _scoreColor(score);
       const label = categories[key]?.label || key;
       const barWidth = Math.max(pct, 4);
+
+      // A percentage on a printed report reads as a finding. One answer in the
+      // six-item Quick Check moves the score from 50% to about 73%, and until
+      // now it printed exactly like a score built from twenty attempts. Say
+      // how many it rests on. Audit 2026-09-19, finding 15.
+      const sample = questMastery.getSkillSample(questKey, key);
+      const early = questMastery.isEarlyIndication(questKey, key);
+      const note = early
+        ? `<span class="print-report-early">early indication — ${sample.attempts} independent ${
+            sample.attempts === 1 ? 'attempt' : 'attempts'
+          }</span>`
+        : '';
+
       rows.push(`
         <div class="print-report-skill-row">
           <div class="print-report-bar" style="width:${barWidth}px;background:${color};"></div>
           <span style="color:${color};font-weight:600;min-width:36px">${pct}%</span>
           <span>${escapeHtml(label)}</span>
+          ${note}
         </div>`);
     }
     return rows.join('') || '<p style="font-size:12px;color:#6b7280">No attempts recorded yet.</p>';
