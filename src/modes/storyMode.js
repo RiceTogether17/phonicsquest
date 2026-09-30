@@ -27,6 +27,8 @@ import { getBandReadiness, getRecommendedBand } from '../modules/storyGating.js'
 import { supportWords, storySupportLevel } from '../modules/decodability.js';
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 import { html } from '../utils/html.js';
+import { renderBlendLadder } from '../modules/blendLadder.js';
+import { deriveGraphemes, expandBlends } from '../modules/deriveGraphemes.js';
 import {
   soundColoredHtml,
   graphemeSounds,
@@ -1937,24 +1939,39 @@ async function _handleWordTap(wordBtn) {
     _applyTtsVoice(utt);
     window.speechSynthesis?.cancel();
     window.speechSynthesis?.speak(utt);
-  } else if (wordObj) {
-    // ── Decodable word from bank ──
-    _showDecodePanel({ type: 'decode', word: wordObj.word, wordObj });
-    await _speakPhonemes(wordObj);
   } else {
-    // ── Word not in bank → TTS only ──
-    _showDecodePanel({ type: 'tts', word: clean });
-    const utt = new SpeechSynthesisUtterance(clean);
-    utt.rate = 0.85;
-    _applyTtsVoice(utt);
-    window.speechSynthesis?.cancel();
-    window.speechSynthesis?.speak(utt);
+    // ── A word to sound out ──
+    // The panel opens on the first rung and waits. Playing the sounds here
+    // would take the blending back off the child, which is the whole thing
+    // the ladder exists to give them.
+    //
+    // A word outside the bank still gets a ladder: the split is derived
+    // (deriveGraphemes.js), because two thirds of story words are not bank
+    // entries and "cakes" is no less decodable than "cake". Only a word
+    // that cannot be split at all — a name — falls through to hearing it.
+    const shown = _showDecodePanel({
+      type: 'decode',
+      word: wordObj?.word ?? clean,
+      wordObj: wordObj ?? { word: clean },
+    });
+    if (!shown) {
+      _showDecodePanel({ type: 'tts', word: clean });
+      const utt = new SpeechSynthesisUtterance(clean);
+      utt.rate = 0.85;
+      _applyTtsVoice(utt);
+      window.speechSynthesis?.cancel();
+      window.speechSynthesis?.speak(utt);
+    }
   }
 }
 
+/**
+ * Fill the decode panel.
+ * @returns {boolean} false when a 'decode' word turned out to be unsplittable
+ */
 function _showDecodePanel({ type, word, wordObj }) {
   const inner = document.getElementById('decode-panel-inner');
-  if (!inner) return;
+  if (!inner) return false;
 
   if (type === 'hfw') {
     inner.innerHTML = /* html */ `
@@ -1971,7 +1988,7 @@ function _showDecodePanel({ type, word, wordObj }) {
       window.speechSynthesis?.cancel();
       window.speechSynthesis?.speak(utt);
     });
-    return;
+    return true;
   }
 
   if (type === 'tts') {
@@ -1988,59 +2005,60 @@ function _showDecodePanel({ type, word, wordObj }) {
       window.speechSynthesis?.cancel();
       window.speechSynthesis?.speak(utt);
     });
-    return;
+    return true;
   }
 
-  // type === 'decode' — colour each tile by the SOUND it makes, one language
-  // shared with the inline scaffold and the Word Detective card.
-  // `title` is a hover tooltip, which a tablet has no way to show — so the
-  // tile prints the sound's mark as well as taking its colour. One word at a
-  // time here, so the full mark set is a help rather than the noise it would
-  // be in running text.
-  const sounds = graphemeSounds(wordObj.word, wordObj.graphemes, wordObj.types);
-  const tilesHtml = wordObj.graphemes
-    .map((g, i) => {
-      const meta = SOUND_META[sounds[i]] ?? SOUND_META.consonant;
-      const mark = meta.mark ? ` data-mark="${escapeAttr(meta.mark)}"` : '';
-      return `<span class="dp-tile" data-idx="${i}"${mark} style="--tile-color:${meta.color}"
-                    title="${escapeAttr(meta.label)}" aria-label="${escapeAttr(`${g}, ${meta.label}`)}">${escapeHtml(g)}</span>`;
-    })
-    .join('');
-
-  inner.innerHTML = /* html */ `
-    <div class="dp-decode">
-      <div class="dp-tiles" id="dp-tiles">${tilesHtml}</div>
-      <span class="dp-word" id="dp-word-label">${wordObj.word}</span>
-      <button class="dp-hear-btn" id="dp-hear">🔊 Hear again</button>
-    </div>
-  `;
-
-  document.getElementById('dp-hear')?.addEventListener('click', async () => {
-    await _speakPhonemes(wordObj);
-  });
+  // type === 'decode' — the blend ladder: the child adds one sound at a time
+  // and holds the sounds so far (m → ma → map). This used to auto-play every
+  // phoneme and then say the word, which demonstrates blending rather than
+  // asking for it.
+  inner.innerHTML = '';
+  return _mountBlendLadder(inner, wordObj);
 }
 
-async function _speakPhonemes(wordObj) {
-  const tiles = document.querySelectorAll('.dp-tile');
-  for (let i = 0; i < wordObj.graphemes.length; i++) {
-    tiles.forEach((t, ti) => t.classList.toggle('dp-tile--active', ti === i));
-    const prevGrapheme = i > 0 ? wordObj.graphemes[i - 1] : null;
-    await audio.speakPhoneme(wordObj.graphemes[i], wordObj.types[i], {
-      word: wordObj.word,
-      prevGrapheme,
-    });
-    await _delay(200);
-  }
-  tiles.forEach((t) => t.classList.remove('dp-tile--active'));
-  await _delay(250);
-  // Blend: say the full word
-  const wordLabel = document.getElementById('dp-word-label');
-  if (wordLabel) wordLabel.classList.add('dp-word--blend');
-  try {
-    await audio.speakWord(wordObj.word);
-  } finally {
-    if (wordLabel) wordLabel.classList.remove('dp-word--blend');
-  }
+/**
+ * Put a blend ladder in `host`.
+ *
+ * The bank's split wins where it has the word; `deriveGraphemes` covers the
+ * rest, which is most of them — only a third of story word tokens are bank
+ * words, so without the fallback the ladder would appear on one tap in three
+ * and "here, listen" the other two, for plainly decodable words like
+ * "cakes" and "walked".
+ *
+ * Either way blend tiles are opened up: the bank groups "st" as a single
+ * tile, and a ladder that jumps from nothing to "st" skips the blending it
+ * exists to teach.
+ *
+ * `trusted` says the caller's split is the curated one. Word Detective hands
+ * back a letter-by-letter placeholder for words it cannot find, which looks
+ * like a split but is not one — taking it would have given "stayed" six rungs
+ * (s·t·a·y·e·d) instead of four (s·t·ay·-ed).
+ *
+ * @param {HTMLElement} host
+ * @param {{word:string, graphemes?:string[], types?:string[]}} wordObj
+ * @param {boolean} [trusted]
+ * @returns {boolean} false when the word cannot be split at all
+ */
+function _mountBlendLadder(host, wordObj, trusted = true) {
+  const source =
+    trusted && wordObj.graphemes?.length
+      ? { graphemes: wordObj.graphemes, types: wordObj.types }
+      : deriveGraphemes(wordObj.word);
+  if (!source) return false;
+
+  const { graphemes, types } = expandBlends(source.graphemes, source.types);
+  renderBlendLadder(host, {
+    word: wordObj.word,
+    graphemes,
+    types,
+    speakPhoneme: (g, t, ctx) =>
+      audio.speakPhoneme(g, t, {
+        word: wordObj.word,
+        prevGrapheme: ctx.index > 0 ? graphemes[ctx.index - 1] : null,
+      }),
+    speakWord: (w) => audio.speakWord(w),
+  });
+  return true;
 }
 
 function _flashChip(chip) {
@@ -2253,11 +2271,29 @@ function _openWordDetective(text) {
   host.innerHTML = _renderWordDetectiveCard(info);
   modalManager.open('modal-word-detective');
 
-  // The tap that opened this card also wanted to hear the word — say it.
-  try {
-    audio.speakWord(info.text);
-  } catch (_) {
-    /* ignore — no SFX */
+  // Tapping a word is one action, so it teaches one thing wherever it is
+  // tapped: the same blend ladder as Sound It Out mode. The card no longer
+  // says the word on open — being told the answer before you have looked at
+  // it is the opposite of sounding it out. "Just hear the word" is one tap
+  // away throughout.
+  const ladderHost = host.querySelector('[data-role="ladder"]');
+  const ladder =
+    ladderHost &&
+    _mountBlendLadder(
+      ladderHost,
+      { word: info.text, graphemes: info.graphemes, types: info.types },
+      info.foundInBank,
+    );
+  if (!ladder) {
+    // A proper noun or a name — nothing to split, so hearing it is all this
+    // card can honestly offer.
+    const fallback = host.querySelector('.wd-fallback');
+    if (fallback) fallback.hidden = false;
+    try {
+      audio.speakWord(info.text);
+    } catch (_) {
+      /* ignore — no SFX */
+    }
   }
 
   host.querySelector('[data-action="hear"]')?.addEventListener('click', () => {
@@ -2291,8 +2327,11 @@ function _renderWordDetectiveCard(info) {
   const escText = (s) =>
     String(s ?? '').replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c]);
 
-  // Colour tiles by the sound each grapheme makes — the same language as the
-  // inline "Sound colours" scaffold and the Decode panel.
+  // The blend ladder is mounted into the slot below by `_openWordDetective`,
+  // and brings its own tiles and its own "hear the word". The coloured tiles
+  // and the Hear button here are the fallback for a word that cannot be
+  // split at all — a name, usually — and are added by that branch, so they
+  // never sit above a ladder saying the same thing twice.
   const sounds = graphemeSounds(info.text, info.graphemes, info.types);
   const tilesHtml = info.graphemes
     .map((g, i) => {
@@ -2306,16 +2345,17 @@ function _renderWordDetectiveCard(info) {
     ? `<button class="btn btn--primary" type="button" data-action="add-review" ${info.alreadyTracked ? 'disabled' : ''}>
          ${info.alreadyTracked ? '✓ Already in your Review Lane' : '🎯 Add to my Review Lane'}
        </button>`
-    : `<p class="wd-note">This word isn't in the practice bank — but you can still hear its sounds.</p>`;
+    : '';
 
   return `
     <div class="wd-card">
       <p class="wd-word">${escText(info.text)}</p>
-      <div class="wd-tiles" aria-label="Sound breakdown">${tilesHtml}</div>
-      <div class="wd-actions">
+      <div data-role="ladder"></div>
+      <div class="wd-fallback" hidden>
+        ${tilesHtml ? `<div class="wd-tiles" aria-label="Sound breakdown">${tilesHtml}</div>` : ''}
         <button class="btn btn--ghost" type="button" data-action="hear">🔊 Hear it</button>
-        ${inBankBlock}
       </div>
+      <div class="wd-actions">${inBankBlock}</div>
     </div>`;
 }
 

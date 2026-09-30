@@ -5281,6 +5281,171 @@ details.story-tool-section[open] > .story-tool-summary::before {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   BLEND LADDER — "sound it out", one sound at a time
+
+   Tapping a word used to auto-play every sound and then say the word: a
+   demonstration of blending, not blending. The child now adds each sound and
+   holds the sounds so far (m → ma → map). Logic in src/modules/blendLadder.js.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.blend-ladder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+}
+.bl-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: center;
+}
+.bl-tile {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-target);
+  height: var(--touch-target);
+  padding: 0 var(--space-2);
+  background: color-mix(in srgb, var(--tile-color) 10%, transparent);
+  border: 2.5px solid color-mix(in srgb, var(--tile-color) 45%, transparent);
+  border-radius: var(--radius-lg);
+  color: var(--tile-color);
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  cursor: pointer;
+  /* Unlit until its sound has been added, so the ladder reads as progress
+     rather than as a word already broken up for you. */
+  opacity: 0.55;
+  transition:
+    opacity var(--dur-fast),
+    transform var(--dur-fast) var(--ease-bounce),
+    background var(--dur-fast);
+}
+.bl-tile[data-mark]:not([data-mark=''])::after {
+  content: attr(data-mark);
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 0.42em;
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0.8;
+  pointer-events: none;
+}
+.bl-tile.is-lit {
+  opacity: 1;
+  background: color-mix(in srgb, var(--tile-color) 18%, transparent);
+  border-color: var(--tile-color);
+}
+.bl-tile.is-current {
+  background: var(--tile-color);
+  color: #fff;
+  transform: scale(1.12) translateY(-3px);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--tile-color) 40%, transparent);
+}
+.bl-tile.is-tapped {
+  transform: scale(1.08);
+}
+.bl-tile--silent {
+  font-style: italic;
+  cursor: default;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bl-tile {
+    transition: opacity var(--dur-fast);
+  }
+  .bl-tile.is-current,
+  .bl-tile.is-tapped {
+    transform: none;
+  }
+}
+
+/* The ladder itself: m → ma → map. */
+.bl-steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 2.2em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.bl-steps li {
+  padding: 2px var(--space-2);
+  background: var(--color-surface-alt, rgb(0 0 0 / 4%));
+  border-radius: var(--radius);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+/* The arrow goes BEFORE each step after the first, so the closing line
+   ("now say the whole word…") never leaves the last rung pointing at it. */
+.bl-steps li + li:not(.bl-done)::before {
+  content: '→ ';
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+.bl-steps li.is-new {
+  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+  color: var(--color-primary-dark, var(--color-text));
+}
+.bl-steps li.bl-done {
+  flex: 1 0 100%;
+  background: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  text-align: center;
+}
+.bl-note {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.bl-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: center;
+}
+.bl-actions .btn {
+  min-height: var(--touch-target);
+}
+/* `.btn` sets display, which beats the browser default for [hidden] — so
+   "Add a sound" stayed on screen after the last rung. */
+.bl-actions .btn[hidden] {
+  display: none;
+}
+/* "Just hear the word" before blending is a quiet escape route, not a
+   competing call to action — a child stuck on one word must not be stuck in
+   the panel, but nor should the button invite skipping the work. */
+.bl-say--escape {
+  opacity: 0.75;
+  font-size: var(--font-size-sm);
+}
+.bl-help {
+  align-self: stretch;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.bl-help summary {
+  min-height: var(--touch-target);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.bl-help p {
+  margin: 0 0 var(--space-2);
+  line-height: 1.6;
+}
+
 /* ── The end of a story ──────────────────────────────────────────────────
    Finishing used to produce a disabled button and, for half the bank, a
    Quest card. A session needs an end: what you did, then again / next /
