@@ -5053,24 +5053,244 @@ details.story-tool-section[open] > .story-tool-summary::before {
    during TTS playback. Helps prevent eye-skipping and guessing.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.story-body.story-ruler-on .sline--active {
-  position: relative;
+/* ═══════════════════════════════════════════════════════════════════════════
+   READING RULER — the card a child holds under a line of print.
+
+   An overlay inside `.story-body`: veils cover the lines above and below, a
+   strip lights the current line (Window), a box points at the current word
+   (Word), and the ruler bar hangs under the line. Only the bar takes pointer
+   events, so tapping a word still reaches the word.
+
+   Logic in src/modules/readingRuler.js. What used to be here was a 3px
+   underline on `.sline--active` — a class only ever set while text-to-speech
+   is speaking, so the "ruler" did nothing when the child read by themselves.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.story-body.has-ruler .sline {
+  cursor: pointer;
 }
-.story-body.story-ruler-on .sline--active::after {
-  content: '';
+.ruler-layer {
+  /* No z-index: the lit strip must blend with the text underneath. */
   position: absolute;
-  left: 4px;
-  right: 4px;
-  bottom: 2px;
-  height: 3px;
-  background: var(--color-primary);
-  border-radius: 2px;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
   pointer-events: none;
 }
-.story-body.story-ruler-on .wf-word--active {
-  background: color-mix(in srgb, var(--color-primary) 18%, transparent);
-  border-radius: 4px;
-  padding: 0 2px;
+.ruler-layer > * {
+  position: absolute;
+  left: 0;
+  right: 0;
+  transition:
+    top var(--dur-fast) ease,
+    height var(--dur-fast) ease,
+    left var(--dur-fast) ease,
+    width var(--dur-fast) ease;
+}
+/* No animation while dragging (it would lag the finger) or while re-measuring
+   after a resize (it would slide across the page from the old layout). */
+.ruler-layer.no-anim > *,
+.ruler-layer.no-anim .ruler-bar::after,
+.ruler-layer.is-dragging > * {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ruler-layer > *,
+  .ruler-layer .ruler-bar::after {
+    transition: none;
+  }
+}
+
+/* The veils wash out what the child is not reading. Above is lighter than
+   below: the lines already read stay legible for a re-check, the lines still
+   to come are covered, which is the whole point of holding a card there. */
+.ruler-veil {
+  background: color-mix(in srgb, var(--color-bg) 82%, transparent);
+}
+.ruler-veil--above {
+  top: 0;
+  background: color-mix(in srgb, var(--color-bg) 55%, transparent);
+}
+.ruler-layer--window .ruler-veil {
+  background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+}
+
+.ruler-strip,
+.ruler-word {
+  display: none;
+  mix-blend-mode: multiply;
+}
+.ruler-layer--window .ruler-strip {
+  display: block;
+  background: var(--ruler-lit, #fff4bf);
+}
+.ruler-layer--word .ruler-word {
+  display: block;
+  right: auto;
+  border-radius: 8px;
+  background: var(--ruler-point, #ffe48a);
+}
+@media (prefers-color-scheme: dark) {
+  .ruler-strip,
+  .ruler-word {
+    mix-blend-mode: screen;
+  }
+  .ruler-layer--window .ruler-strip {
+    --ruler-lit: color-mix(in srgb, var(--color-primary) 22%, transparent);
+  }
+  .ruler-layer--word .ruler-word {
+    --ruler-point: color-mix(in srgb, var(--color-primary) 34%, transparent);
+  }
+}
+:root[data-theme='dark'] .ruler-strip,
+:root[data-theme='dark'] .ruler-word {
+  mix-blend-mode: screen;
+}
+:root[data-theme='dark'] .ruler-layer--window .ruler-strip {
+  --ruler-lit: color-mix(in srgb, var(--color-primary) 22%, transparent);
+}
+:root[data-theme='dark'] .ruler-layer--word .ruler-word {
+  --ruler-point: color-mix(in srgb, var(--color-primary) 34%, transparent);
+}
+
+.ruler-bar {
+  left: 6px;
+  right: 6px;
+  display: flex;
+  align-items: stretch;
+  border-top: 3px solid var(--color-primary);
+  border-radius: 3px 3px 6px 6px;
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--color-surface));
+  box-shadow: 0 3px 8px rgb(31 35 48 / 18%);
+  pointer-events: auto;
+  touch-action: none;
+  cursor: grab;
+}
+.ruler-layer.is-dragging .ruler-bar {
+  cursor: grabbing;
+  background: color-mix(in srgb, var(--color-primary) 24%, var(--color-surface));
+}
+.ruler-arrow {
+  display: grid;
+  place-items: center;
+  padding: 0 4px;
+  color: var(--color-primary);
+  font-size: 11px;
+}
+/* Ruler markings — the thing that makes it read as a ruler rather than a bar. */
+.ruler-ticks {
+  flex: 1;
+  background:
+    repeating-linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--color-primary) 70%, transparent) 0 2px,
+        transparent 2px 60px
+      )
+      0 0 / 100% 70% no-repeat,
+    repeating-linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--color-primary) 40%, transparent) 0 1px,
+        transparent 1px 12px
+      )
+      0 0 / 100% 38% no-repeat;
+}
+.ruler-grip {
+  display: grid;
+  place-items: center;
+  padding: 0 6px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1;
+}
+/* Word mode: a caret on the bar, under the word being pointed at. */
+.ruler-layer--word .ruler-bar::after {
+  content: '';
+  position: absolute;
+  top: -11px;
+  left: var(--x, 0);
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-bottom-color: var(--color-primary);
+  border-top: 0;
+  transition: left var(--dur-fast) ease;
+}
+.wf-word.is-pointed {
+  font-weight: 800;
+}
+
+/* ── The ruler's controls ────────────────────────────────────────────────
+   Directly under the text, and sticky, so Next is always under the thumb
+   without the child looking away from the line they are on. */
+.ruler-nav-slot:empty {
+  display: none;
+}
+.ruler-nav {
+  position: sticky;
+  bottom: 8px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 14px rgb(31 35 48 / 12%);
+}
+.ruler-style {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  padding: 0 var(--space-2);
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.ruler-style .rs-i {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.ruler-style small {
+  font-size: var(--font-size-xs);
+}
+.ruler-back {
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  cursor: pointer;
+}
+.ruler-back:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.ruler-pos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 4.5rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.2;
+}
+.ruler-pos b {
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+.ruler-next {
+  flex: 1;
+  min-height: var(--touch-target);
+}
+.ruler-next.is-end {
+  background: var(--color-success, #1a7f37);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

@@ -20,6 +20,7 @@ import { mapCharIndexToWord, isOffscreen } from '../modules/karaokeUtils.js';
 import { prefersReducedMotion } from '../utils/motion.js';
 import { lookupWord as lookupWordForDetective, addWordToReview } from '../modules/wordDetective.js';
 import { isReadAloudSupported, listenToLine, stopListening } from '../modules/readAloudListener.js';
+import { createRuler, scrollHost, RULER_MODES } from '../modules/readingRuler.js';
 import { store } from '../modules/store.js';
 import { getBandReadiness, getRecommendedBand } from '../modules/storyGating.js';
 import { supportWords, storySupportLevel } from '../modules/decodability.js';
@@ -136,12 +137,20 @@ let _fluencyRunning = false;
 
 const PREFS_GRAPHEMES_KEY = 'giri_show_graphemes';
 const PREFS_RULER_KEY = 'giri_show_ruler';
+const PREFS_RULER_MODE_KEY = 'giri_ruler_mode';
 const PREFS_FOLLOW_KEY = 'giri_follow_mode';
 const MEET_WORDS_KEY = 'giri_meet_words';
 const COMP_LOG_KEY = 'giri_comp_log';
 
 let _showGraphemes = _loadPref(PREFS_GRAPHEMES_KEY, true);
 let _showRuler = _loadPref(PREFS_RULER_KEY, false);
+
+// Live Reading Ruler (readingRuler.js) and the last position it reported.
+// 'line' is the default style: it is the card-under-the-line a teacher hands
+// a child, and it reads a whole line at a time rather than one word.
+let _ruler = null;
+let _rulerState = null;
+let _rulerModeId = _loadPref(PREFS_RULER_MODE_KEY, 'line');
 
 // Hydrate the karaoke follow-mode from prefs now that PREFS_FOLLOW_KEY is in
 // scope. Defaults to 'word' (declared above) so first-run users get karaoke
@@ -268,8 +277,10 @@ function _removeDecodePanel() {
 // ── Browser view ──────────────────────────────────────────────────────────
 
 function _renderBrowser() {
-  // Leaving the reader for the library — drop any lingering decode panel.
+  // Leaving the reader for the library — drop any lingering decode panel and
+  // tear the ruler down, or its ResizeObserver outlives the story it measured.
   _removeDecodePanel();
+  _destroyRuler();
 
   // ── Category tabs ──────────────────────────────────────────────────────
   const categoryTabsHtml = /* html */ `
@@ -616,6 +627,8 @@ function _renderMeetTheWordsGate(story) {
   const dynamic = document.getElementById('story-dynamic');
   if (!dynamic) return;
 
+  _destroyRuler();
+
   _currentStoryVocab = story.vocab ?? [];
   const hfwInStory = extractStoryHFW(story);
 
@@ -755,6 +768,9 @@ function _renderReadAloud(story) {
   const dynamic = document.getElementById('story-dynamic');
   if (!dynamic) return;
 
+  // This render replaces the story body the ruler measured and overlays.
+  _destroyRuler();
+
   // Decode mode parks its breakdown panel on <body>; clear it so a word
   // tapped in Decode mode doesn't stay on screen once Read Aloud opens.
   _removeDecodePanel();
@@ -816,7 +832,7 @@ function _renderReadAloud(story) {
       <div class="story-reader-toolbar" role="group" aria-label="Reading controls">
         <div class="reader-scaffold-bar" role="group" aria-label="Reading scaffolds">
           <button class="scaffold-toggle" id="btn-toggle-graphemes" aria-pressed="${_showGraphemes}" title="Colour each vowel by the sound it makes — short, long, schwa, bossy-r or sliding">🎨 Sound colours</button>
-          <button class="scaffold-toggle" id="btn-toggle-ruler" aria-pressed="${_showRuler}" title="Underline the line being read to keep your eyes on track">📏 Reading ruler</button>
+          <button class="scaffold-toggle" id="btn-toggle-ruler" aria-pressed="${_showRuler}" title="Cover the lines you are not reading, and move down one at a time">📏 Reading ruler</button>
         </div>
 
         <div class="follow-mode-toggle">
@@ -832,7 +848,13 @@ function _renderReadAloud(story) {
 
       ${_showGraphemes ? _soundLegendHtml() : ''}
 
-      <div class="story-body story-body--follow-${_followMode}${_showRuler ? ' story-ruler-on' : ''}" id="story-body" aria-live="polite">${linesHtml}</div>
+      <div class="story-body story-body--follow-${_followMode}" id="story-body" aria-live="polite">${linesHtml}</div>
+
+      <!-- The ruler's own controls. They live under the text, not in the
+           tools sidebar, because they are used continuously while reading
+           and a child should not have to look away from the line to press
+           Next. Filled in by _startRuler when the ruler is switched on. -->
+      <div class="ruler-nav-slot" id="ruler-nav-slot"></div>
       ${talkHtml}
     </div>
 
@@ -976,6 +998,10 @@ function _renderReadAloud(story) {
       const word = _plainWord(span);
       if (!word) return;
       ev.preventDefault();
+      // Tapping a word is also how you move the ruler to it — the same
+      // gesture, so a child never has to choose between "get help with this
+      // word" and "keep my place".
+      _ruler?.tap(ev.clientY ?? 0, span);
       _openWordDetective(word);
     };
     span.addEventListener('click', handle);
@@ -995,11 +1021,15 @@ function _renderReadAloud(story) {
   document.getElementById('btn-toggle-ruler')?.addEventListener('click', () => {
     _showRuler = !_showRuler;
     _persistPref(PREFS_RULER_KEY, _showRuler);
-    const btn = document.getElementById('btn-toggle-ruler');
-    const body = document.getElementById('story-body');
-    btn?.setAttribute('aria-pressed', String(_showRuler));
-    body?.classList.toggle('story-ruler-on', _showRuler);
+    document.getElementById('btn-toggle-ruler')?.setAttribute('aria-pressed', String(_showRuler));
+    _destroyRuler();
+    if (_showRuler) {
+      _startRuler();
+      document.getElementById('btn-ruler-next')?.focus({ preventScroll: true });
+    }
   });
+
+  if (_showRuler) requestAnimationFrame(() => _startRuler());
 
   document.getElementById('btn-story-play')?.addEventListener('click', () => _startTTS(story));
   document.getElementById('btn-story-stop')?.addEventListener('click', () => _stopTTS());
@@ -1034,6 +1064,138 @@ function _renderReadAloud(story) {
     });
   });
 }
+
+// ── Reading Ruler ─────────────────────────────────────────────────────────
+//
+// The toggle above used to set a class that underlined `.sline--active` —
+// and that class is only ever set while text-to-speech is speaking. So the
+// "ruler" drew a line under the sentence the app was reading aloud, and did
+// nothing when the child read by themselves, which is the only time a
+// reading ruler has a job. It is a real one now: see readingRuler.js.
+
+/**
+ * The band of screen the child can actually read in.
+ *
+ * Bounded by the scrolling pane, not the window: `#app` and `main` are
+ * `overflow: hidden`, so the story scrolls inside a pane whose bottom is well
+ * above the bottom of the browser window. Measuring against the window would
+ * tell the ruler a line was comfortably in view when it was in fact below the
+ * pane and invisible.
+ *
+ * Then trimmed by the sticky app header at the top and the ruler's own
+ * controls at the bottom — the two things that sit over the text.
+ */
+function _rulerSafeArea() {
+  const body = document.getElementById('story-body');
+  const pane = body ? scrollHost(body) : null;
+  const paneBox = pane?.getBoundingClientRect();
+  const header = document.querySelector('.app-header');
+  const nav = document.querySelector('.ruler-nav');
+
+  const top = Math.max(paneBox?.top ?? 0, header?.getBoundingClientRect().bottom ?? 0) + 12;
+  const floor = Math.min(paneBox?.bottom ?? window.innerHeight, window.innerHeight);
+  const bottom = (nav ? Math.min(nav.getBoundingClientRect().top, floor) : floor) - 12;
+  return { top: Math.max(0, top), bottom: Math.max(bottom, top + 120) };
+}
+
+function _rulerMode() {
+  return RULER_MODES.find((m) => m.id === _rulerModeId) ?? RULER_MODES[1];
+}
+
+function _rulerNavHtml() {
+  const m = _rulerMode();
+  return /* html */ `
+    <div class="ruler-nav" role="group" aria-label="Reading ruler">
+      <button class="ruler-style" type="button" id="btn-ruler-style"
+              aria-label="Ruler style: ${escapeAttr(m.label)}. Tap to change."
+              title="${escapeAttr(m.hint)}">
+        <span class="rs-i" aria-hidden="true">${m.icon}</span><small>${escapeHtml(m.label)}</small>
+      </button>
+      <button class="ruler-back" type="button" id="btn-ruler-back" aria-label="Back">◀</button>
+      <span class="ruler-pos"><small></small><b></b></span>
+      <button class="ruler-next btn btn--primary" type="button" id="btn-ruler-next">Next ▶</button>
+    </div>`;
+}
+
+function _startRuler(startWord = null) {
+  const storyEl = document.getElementById('story-body');
+  const slot = document.getElementById('ruler-nav-slot');
+  if (!storyEl || !slot) return;
+
+  slot.innerHTML = _rulerNavHtml();
+  const m = _rulerMode();
+  const posLabel = slot.querySelector('.ruler-pos small');
+  const posNum = slot.querySelector('.ruler-pos b');
+  const next = slot.querySelector('#btn-ruler-next');
+  const back = slot.querySelector('#btn-ruler-back');
+
+  _ruler = createRuler(storyEl, {
+    mode: m.id,
+    word: startWord,
+    wordSelector: '.wf-word',
+    safeArea: _rulerSafeArea,
+    onMove(s) {
+      _rulerState = s;
+      const byWord = m.id === 'word';
+      posLabel.textContent = byWord ? 'Word' : 'Line';
+      posNum.textContent = byWord ? `${s.word + 1} / ${s.words}` : `${s.line + 1} / ${s.lines}`;
+      back.disabled = byWord ? s.word === 0 : s.line === 0;
+      next.textContent = s.atEnd ? 'The end ✓' : byWord ? 'Next word ▶' : 'Next line ▶';
+      next.classList.toggle('is-end', s.atEnd);
+    },
+  });
+
+  back.addEventListener('click', () => _ruler?.prev());
+  next.addEventListener('click', () => {
+    if (!_rulerState?.atEnd) return _ruler?.next();
+    // Off the last line: the child has read the story, so point them at what
+    // comes next rather than leaving the button doing nothing.
+    const cta =
+      document.getElementById('story-quest-cta')?.hidden === false
+        ? document.getElementById('btn-launch-quest')
+        : document.getElementById('btn-story-play');
+    cta?.scrollIntoView({ behavior: _scrollBehavior(), block: 'center' });
+    cta?.focus({ preventScroll: true });
+  });
+  slot.querySelector('#btn-ruler-style').addEventListener('click', () => {
+    const at = _rulerState?.word ?? 0;
+    const i = RULER_MODES.indexOf(_rulerMode());
+    _rulerModeId = RULER_MODES[(i + 1) % RULER_MODES.length].id;
+    _persistPref(PREFS_RULER_MODE_KEY, _rulerModeId);
+    _destroyRuler();
+    _startRuler(at);
+    document.getElementById('btn-ruler-style')?.focus({ preventScroll: true });
+  });
+}
+
+function _destroyRuler() {
+  _ruler?.destroy();
+  _ruler = null;
+  _rulerState = null;
+  const slot = document.getElementById('ruler-nav-slot');
+  if (slot) slot.innerHTML = '';
+}
+
+/**
+ * Arrow keys move the ruler (↓↑ by line, →← by word in Word mode). Skipped
+ * while the focus is in a control that wants those keys for itself.
+ */
+function _onRulerKey(e) {
+  if (!_ruler || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  if (e.target?.closest?.('input, textarea, select, summary, [contenteditable="true"]')) return;
+  if (document.querySelector('.modal.active, .modal[open]')) return;
+  const byWord = _rulerMode().id === 'word';
+  const act = {
+    ArrowDown: () => _ruler.nextLine(),
+    ArrowUp: () => _ruler.prevLine(),
+    ArrowRight: () => (byWord ? _ruler.next() : _ruler.nextLine()),
+    ArrowLeft: () => (byWord ? _ruler.prev() : _ruler.prevLine()),
+  }[e.key];
+  if (!act) return;
+  e.preventDefault();
+  act();
+}
+document.addEventListener('keydown', _onRulerKey);
 
 // ── Read to Giri (line-by-line listening) ─────────────────────────────────
 //
@@ -1375,6 +1537,8 @@ function _plainWord(span) {
 function _renderDecodeMode(story) {
   const dynamic = document.getElementById('story-dynamic');
   if (!dynamic) return;
+
+  _destroyRuler();
 
   // Drop any prior body-level panel before this render creates a fresh one,
   // otherwise re-entering decode mode orphans a duplicate panel on <body>.
@@ -1825,7 +1989,11 @@ function _attachBoundaryListener(utt, lineIndex) {
     wordSpans.forEach((s) => s.classList.remove('wf-word--active'));
     const active = wordSpans[wordIdx];
     active.classList.add('wf-word--active');
-    _scrollIntoViewIfNeeded(active);
+    // With the ruler on it does the scrolling, and keeps its own place in
+    // step with the voice — so the child can take over mid-story without
+    // first hunting for where Giri got to.
+    if (_ruler) _ruler.follow(active);
+    else _scrollIntoViewIfNeeded(active);
   }
 
   function clearFallback() {
@@ -2039,7 +2207,11 @@ function _highlightLine(lineIndex) {
   const el = _container?.querySelector(`[data-line="${lineIndex}"]`);
   if (el) {
     el.classList.add('sline--active');
-    el.scrollIntoView({ behavior: _scrollBehavior(), block: 'nearest' });
+    // The ruler owns the scrolling when it is on, so it stays in step with
+    // the voice instead of fighting it for the scroll position.
+    const firstWord = el.querySelector('.wf-word');
+    if (_ruler && firstWord) _ruler.follow(firstWord);
+    else el.scrollIntoView({ behavior: _scrollBehavior(), block: 'nearest' });
   }
 }
 
