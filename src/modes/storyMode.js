@@ -759,9 +759,13 @@ function _renderReadAloud(story) {
   // tapped in Decode mode doesn't stay on screen once Read Aloud opens.
   _removeDecodePanel();
 
-  // Use word spans when follow mode is 'word'
-  const useWordSpans = _followMode === 'word';
-  const linesHtml = story.lines.map((line, i) => _lineHtml(line, i, useWordSpans, story)).join('');
+  // Word spans are always rendered, in both follow modes. They are what makes
+  // "👆 Tap a word to hear its sounds" true — that hint is printed
+  // unconditionally, and while the spans were built only in word-follow mode a
+  // child who chose "Whole line" was told to tap words that were not tappable.
+  // Line-follow highlighting is unaffected: it lights the `.sline`, and the
+  // per-word boundary listener is still only attached in word mode.
+  const linesHtml = story.lines.map((line, i) => _lineHtml(line, i, true, story)).join('');
   const hasQuest = !!story.comprehension?.length;
   const hasTalk = !!story.talkAboutIt?.length;
 
@@ -969,7 +973,7 @@ function _renderReadAloud(story) {
     span.setAttribute('role', 'button');
     span.setAttribute('tabindex', '0');
     const handle = (ev) => {
-      const word = (span.textContent || '').trim();
+      const word = _plainWord(span);
       if (!word) return;
       ev.preventDefault();
       _openWordDetective(word);
@@ -1113,10 +1117,7 @@ async function _rtgListen(story) {
   if (!lineEl || !listenBtn || listenBtn.disabled) return;
 
   const spans = Array.from(lineEl.querySelectorAll('.wf-word'));
-  const expectedText = spans
-    .map((s) => (s.textContent || '').trim())
-    .filter(Boolean)
-    .join(' ');
+  const expectedText = spans.map(_plainWord).filter(Boolean).join(' ');
   if (!expectedText) {
     _rtgAdvance(story);
     return;
@@ -1281,7 +1282,14 @@ function _soundLegendHtml() {
       <span class="sl-chip vs--${s.key}">${s.mark || '•'}</span>${s.label}
     </span>`,
   ).join('');
-  return `<div class="sound-legend" aria-label="What the vowel colours mean">${items}</div>`;
+  // Short and long also print their diacritic above the vowel in the story
+  // itself, so the two that turn up on every line are never told apart by
+  // colour alone. Saying so is what makes the marks readable rather than
+  // mysterious.
+  return `<div class="sound-legend" aria-label="What the vowel colours mean">
+      <span class="sl-lead">A short vowel wears <b class="vs--short">˘</b> and a long vowel wears <b class="vs--long">¯</b>:</span>
+      ${items}
+    </div>`;
 }
 
 /**
@@ -1293,6 +1301,14 @@ function _soundLegendHtml() {
  */
 function _lineHtml(line, i, wordSpans = false, story = null) {
   const baseText = line.text ?? '';
+  // "Problem:" / "Attempt:" / "Solution:" are the teacher's story-grammar
+  // frame, not text the child decodes. Running them through the sound-colour
+  // scaffold put a breve over "PRŎBLĔM" — phonics notation on a word that is
+  // there to label the shape of the story, and one no Primary 1 reader is
+  // being asked to sound out. They stay plain, and are not tappable.
+  if (line.type === 'label') {
+    return `<div class="sline sline--label" data-line="${i}">${escapeHtml(baseText)}</div>`;
+  }
   const highlighted = story
     ? _highlightGraphemes(baseText, story.targetGraphemes, story.band)
     : baseText;
@@ -1300,8 +1316,6 @@ function _lineHtml(line, i, wordSpans = false, story = null) {
   switch (line.type) {
     case 'chapter':
       return `<div class="sline sline--chapter"   data-line="${i}">📚 ${content}</div>`;
-    case 'label':
-      return `<div class="sline sline--label"     data-line="${i}">${content}</div>`;
     case 'beat':
       return `<p class="sline sline--beat"        data-line="${i}">${content}</p>`;
     case 'intro':
@@ -1317,7 +1331,23 @@ function _lineHtml(line, i, wordSpans = false, story = null) {
   }
 }
 
-/** Wrap each word in a data-word-idx span for word-follow highlighting. */
+/**
+ * Wrap each word in a span for word-follow highlighting and word taps.
+ *
+ * Two attributes matter beyond the index:
+ *
+ * `data-plain` is the word exactly as the story wrote it. The sound-colour
+ * scaffold wraps vowels in `.vs` spans and CSS prints a breve or macron above
+ * them from `data-cue`; on engines that expose pseudo-element content, reading
+ * this node back with `textContent` can pick that diacritic up. Three features
+ * read the word back out of the DOM — the tap handler, the karaoke
+ * word-duration fallback and Read to Giri's expected text — so they read
+ * `data-plain` and never have to trust the rendered text.
+ *
+ * `aria-label` is the same plain word. These spans are exposed as buttons, and
+ * a button's name comes from its contents unless labelled — so without this a
+ * screen reader could announce "cake" as "c ¯ a k e".
+ */
 function _wordSpanText(text, story = null) {
   if (!text) return '';
   const tokens = tokenise(text);
@@ -1328,11 +1358,16 @@ function _wordSpanText(text, story = null) {
         const inner = story
           ? _highlightGraphemes(tok.text, story.targetGraphemes, story.band)
           : tok.text;
-        return `<span class="wf-word" data-word-idx="${wordIdx++}">${inner}</span>`;
+        return `<span class="wf-word" data-word-idx="${wordIdx++}" data-plain="${escapeAttr(tok.text)}" aria-label="${escapeAttr(tok.text)}">${inner}</span>`;
       }
       return tok.text;
     })
     .join('');
+}
+
+/** The word a `.wf-word` span stands for, never the rendered diacritics. */
+function _plainWord(span) {
+  return (span?.dataset?.plain ?? span?.textContent ?? '').trim();
 }
 
 // ── DECODE mode ───────────────────────────────────────────────────────────
@@ -1643,11 +1678,17 @@ function _showDecodePanel({ type, word, wordObj }) {
 
   // type === 'decode' — colour each tile by the SOUND it makes, one language
   // shared with the inline scaffold and the Word Detective card.
+  // `title` is a hover tooltip, which a tablet has no way to show — so the
+  // tile prints the sound's mark as well as taking its colour. One word at a
+  // time here, so the full mark set is a help rather than the noise it would
+  // be in running text.
   const sounds = graphemeSounds(wordObj.word, wordObj.graphemes, wordObj.types);
   const tilesHtml = wordObj.graphemes
     .map((g, i) => {
       const meta = SOUND_META[sounds[i]] ?? SOUND_META.consonant;
-      return `<span class="dp-tile" data-idx="${i}" style="--tile-color:${meta.color}" title="${meta.label}">${g}</span>`;
+      const mark = meta.mark ? ` data-mark="${escapeAttr(meta.mark)}"` : '';
+      return `<span class="dp-tile" data-idx="${i}"${mark} style="--tile-color:${meta.color}"
+                    title="${escapeAttr(meta.label)}" aria-label="${escapeAttr(`${g}, ${meta.label}`)}">${escapeHtml(g)}</span>`;
     })
     .join('');
 
@@ -1809,7 +1850,7 @@ function _attachBoundaryListener(utt, lineIndex) {
     // Use the actual word spans' text for length — story renderer
     // splits on whitespace and punctuation, matching the highlight
     // grain we want.
-    const wordTexts = Array.from(wordSpans, (s) => (s.textContent || '').trim());
+    const wordTexts = Array.from(wordSpans, _plainWord);
     let offset = 0;
     for (let i = 0; i < wordSpans.length; i++) {
       const wordIdx = i;
@@ -1934,7 +1975,8 @@ function _renderWordDetectiveCard(info) {
   const tilesHtml = info.graphemes
     .map((g, i) => {
       const meta = SOUND_META[sounds[i]] ?? SOUND_META.consonant;
-      return `<span class="wd-tile vs--${sounds[i]}" style="--tile-color:${meta.color}" aria-label="${escText(g)}, ${escText(meta.label)}">${escText(g)}</span>`;
+      const mark = meta.mark ? ` data-mark="${escText(meta.mark)}"` : '';
+      return `<span class="wd-tile vs--${sounds[i]}"${mark} style="--tile-color:${meta.color}" aria-label="${escText(g)}, ${escText(meta.label)}">${escText(g)}</span>`;
     })
     .join('');
 

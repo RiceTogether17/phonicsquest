@@ -4892,8 +4892,12 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .vs--rcontrolled {
   --vs-color: #7c3aed;
 }
+/* Blue, not the orange it used to be: simulated against the short-vowel red
+   it came out at ΔE 14.8 under deuteranopia and 10.4 under tritanopia, both
+   below the ~15 where two colours stop being tellable apart. See SOUND_META
+   in phonemeColors.js — keep the two files in sync. */
 .vs--diphthong {
-  --vs-color: #ea580c;
+  --vs-color: #0072c0;
 }
 .vs--silent {
   --vs-color: #9aa3af;
@@ -4911,6 +4915,57 @@ details.story-tool-section[open] > .story-tool-summary::before {
   opacity: 0.72;
 }
 
+/* ── The breve and macron above short and long vowels ────────────────────
+   The two vowel sounds that appear on every line, and the two a phonics
+   workbook conventionally marks. They carry a printed diacritic as well as
+   a colour so they are never told apart by hue alone. Only these two: a
+   mark over every silent e and every schwa was tried and it buried the
+   story under notation. See SOUND_META in phonemeColors.js.
+
+   It is a pseudo-element on an attribute rather than a real element so the
+   span's `textContent` stays the story's own word: the word tap, the karaoke
+   word timing and Read to Giri all read the text back out of these nodes.
+   Absolutely positioned, so it adds no width and never changes where a line
+   wraps or where the reading ruler measures a line to be. */
+.vs[data-cue] {
+  position: relative;
+}
+.vs[data-cue]::after {
+  content: attr(data-cue);
+  position: absolute;
+  left: 50%;
+  bottom: 0.84em;
+  transform: translateX(-50%);
+  font-size: 0.78em;
+  font-weight: 700;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0.9;
+}
+/* The macron glyph sits near the top of its own em box while the breve sits
+   lower in its, so a single offset leaves the long-vowel mark floating a row
+   above the word. Drop it to sit the same distance off the letter. */
+.vs[data-cue='¯']::after {
+  bottom: 0.56em;
+}
+
+/* Room above each line so a diacritic is never clipped by the line above. */
+.story-body .sline {
+  padding-top: calc(var(--space-2) + 0.3em);
+  line-height: 1.85;
+}
+
+/* The diacritic is decoration for a sighted reader, and several engines do
+   expose pseudo-element `content` to the accessibility tree — where "cat"
+   would be announced as "c ˘ a t". CSS has no reliable way to suppress that
+   (`speak` is unimplemented), so the fix is on the markup side instead:
+   every word in the story body is wrapped in a `.wf-word` span carrying an
+   explicit `aria-label` of the plain word, which replaces its contents for
+   screen readers. See `_wordSpanText` in storyMode.js. */
+
 @media (prefers-color-scheme: dark) {
   .vs--schwa {
     --vs-color: #9aa3af;
@@ -4918,11 +4973,18 @@ details.story-tool-section[open] > .story-tool-summary::before {
   .vs--silent {
     --vs-color: #cbd2dc;
   }
+  /* Dark mode is where the breve and macron earn their keep: these two
+     lightened hues simulate to ΔE 9.4 apart under deuteranopia — further
+     from each other than the light-mode pair only on paper. The diacritics
+     are what actually separates them here. */
   .vs--short {
     --vs-color: #f87171;
   }
   .vs--long {
     --vs-color: #4ade80;
+  }
+  .vs--diphthong {
+    --vs-color: #60a5fa;
   }
 }
 :root[data-theme='dark'] .vs--schwa {
@@ -4937,6 +4999,9 @@ details.story-tool-section[open] > .story-tool-summary::before {
 :root[data-theme='dark'] .vs--long {
   --vs-color: #4ade80;
 }
+:root[data-theme='dark'] .vs--diphthong {
+  --vs-color: #60a5fa;
+}
 
 /* Legend under the reading toolbar — what each colour means. */
 .sound-legend {
@@ -4950,6 +5015,11 @@ details.story-tool-section[open] > .story-tool-summary::before {
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   font-size: var(--font-size-xs);
+}
+.sl-lead {
+  flex: 1 0 100%;
+  color: var(--color-text-muted);
+  font-weight: 600;
 }
 .sl-item {
   display: inline-flex;
@@ -5815,6 +5885,25 @@ details.story-tool-section[open] > .story-tool-summary::before {
   color: #fff;
   transform: scale(1.2) translateY(-4px);
   box-shadow: 0 4px 12px color-mix(in srgb, var(--tile-color) 40%, transparent);
+}
+/* The tile's diacritic, same second channel as the inline scaffold. `title`
+   alone was a hover tooltip — nothing a tablet can show. */
+.dp-tile[data-mark] {
+  position: relative;
+}
+.dp-tile[data-mark]::after {
+  content: attr(data-mark);
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 0.42em;
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0.8;
+  pointer-events: none;
+}
+.dp-tile--active[data-mark]::after {
+  color: #fff;
 }
 
 .dp-word {
@@ -15402,6 +15491,22 @@ textarea:hover {
   color: #fff;
   background: var(--tile-color, #2563eb);
   border-radius: var(--radius-md, 12px);
+}
+/* Word Detective tiles are solid-filled, so the diacritic sits in the corner
+   in white — a second channel for a child who cannot read the hue. */
+.wd-tile[data-mark] {
+  position: relative;
+}
+.wd-tile[data-mark]::after {
+  content: attr(data-mark);
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 0.5rem;
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0.85;
+  pointer-events: none;
 }
 .wd-actions {
   display: flex;

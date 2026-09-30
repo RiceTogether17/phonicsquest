@@ -11,10 +11,13 @@ import {
 /** Collapse coloured output into "letter:sound" tags for easy assertions. */
 function tag(word) {
   return soundColoredHtml(word).replace(
-    /<span class="vs vs--(\w+)">([^<]*)<\/span>/g,
+    /<span class="vs vs--(\w+)"(?: data-cue="[^"]*")?>([^<]*)<\/span>/g,
     (_m, sound, letters) => `[${letters}:${sound}]`,
   );
 }
+
+/** What a browser would report as the element's text, markup stripped. */
+const plainText = (html) => html.replace(/<[^>]+>/g, '');
 
 describe('vowel sound classifier', () => {
   it('distinguishes the three jobs of the same letter a', () => {
@@ -87,6 +90,34 @@ describe('vowel sound classifier', () => {
     expect(soundColoredHtml('the cat, sat.').replace(/<[^>]+>/g, '')).toBe('the cat, sat.');
   });
 
+  it('gives short and long vowels a printed diacritic', () => {
+    expect(soundColoredHtml('cat')).toContain('data-cue="˘"'); // breve
+    expect(soundColoredHtml('cake')).toContain('data-cue="¯"'); // macron
+  });
+
+  it('marks only short and long, so a page of text stays a page of text', () => {
+    // Marking all six was tried: a ∅ over every silent e and a ə over every
+    // "the" turned the story into a linguistics transcription. The other four
+    // are separated by colours that survive colour-blindness simulation.
+    const html = soundColoredHtml('The cake was in the pan for a bird.');
+    const cued = [...html.matchAll(/vs--(\w+)" data-cue=/g)].map((m) => m[1]);
+    expect(new Set(cued)).toEqual(new Set(['short', 'long']));
+    for (const key of ['schwa', 'silent', 'rcontrolled', 'diphthong']) {
+      expect(SOUND_META[key].cue, `${key} should not print a diacritic`).toBeUndefined();
+    }
+  });
+
+  it('never puts the diacritic in the text itself', () => {
+    // The story reader reads these nodes back as text in three places — the
+    // word tap, the karaoke word-duration fallback and Read to Giri's
+    // expected text. A mark rendered as content (rather than by CSS from the
+    // attribute) would turn "cat" into "căat" for all three.
+    for (const word of ['cat', 'cake', 'about', 'bird', 'coin', 'the']) {
+      expect(plainText(soundColoredHtml(word))).toBe(word);
+    }
+    expect(plainText(soundColoredHtml('The cat sat on a mat.'))).toBe('The cat sat on a mat.');
+  });
+
   it('vowelSegments returns null for skip words and sums to word length', () => {
     expect(vowelSegments('Giri')).toBeNull();
     const segs = vowelSegments('cake');
@@ -109,6 +140,83 @@ describe('shared palette + tile classifier', () => {
     expect(soundForType('dp')).toBe('diphthong');
     expect(soundForType('se')).toBe('silent');
     expect(soundForType('c')).toBe('consonant');
+  });
+
+  it('every vowel category has a distinct legend glyph', () => {
+    const marks = VOWEL_LEGEND.map((s) => SOUND_META[s.key].mark);
+    for (const [i, m] of marks.entries()) {
+      expect(m, `${VOWEL_LEGEND[i].key} has no legend glyph`).toBeTruthy();
+    }
+    expect(new Set(marks).size).toBe(marks.length);
+  });
+
+  it('no two vowel colours are confusable under colour blindness', () => {
+    // Viénot 1999 dichromat simulation, CIE76 ΔE. Under ~15 two colours stop
+    // being tellable apart — which is how the old orange diphthong was
+    // caught sitting at ΔE 14.8 from the short-vowel red.
+    //
+    // The floor is 15 for every pair EXCEPT schwa/silent, which are both
+    // deliberately grey (one is "lazy uh", the other is no sound at all) and
+    // land at ~18.8. They are separated further by silent letters rendering
+    // italic and faded — a second channel, not a colour.
+    const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
+    const lin = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+    const srgb = (c) => (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055);
+    const mul = (m, v) => m.map((r) => r[0] * v[0] + r[1] * v[1] + r[2] * v[2]);
+    const RGB2LMS = [
+      [17.8824, 43.5161, 4.11935],
+      [3.45565, 27.1554, 3.86714],
+      [0.0299566, 0.184309, 1.46709],
+    ];
+    const LMS2RGB = [
+      [0.0809444479, -0.130504409, 0.116721066],
+      [-0.0102485335, 0.0540193266, -0.113614708],
+      [-0.000365296938, -0.00412161469, 0.693511405],
+    ];
+    const SIM = {
+      deuter: [
+        [1, 0, 0],
+        [0.494207, 0, 1.24827],
+        [0, 0, 1],
+      ],
+      protan: [
+        [0, 2.02344, -2.52581],
+        [0, 1, 0],
+        [0, 0, 1],
+      ],
+      tritan: [
+        [1, 0, 0],
+        [0, 1, 0],
+        [-0.395913, 0.801109, 0],
+      ],
+    };
+    const sim = (h, k) =>
+      mul(LMS2RGB, mul(SIM[k], mul(RGB2LMS, hex(h).map(lin)))).map((c) =>
+        srgb(Math.max(0, Math.min(1, c))),
+      );
+    const lab = (rgb) => {
+      const [r, g, b] = rgb.map((c) => lin(Math.max(0, Math.min(1, c))));
+      let X = 0.4124 * r + 0.3576 * g + 0.1805 * b;
+      let Y = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      let Z = 0.0193 * r + 0.1192 * g + 0.9505 * b;
+      [X, Y, Z] = [X / 0.95047, Y, Z / 1.08883].map((t) =>
+        t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116,
+      );
+      return [116 * Y - 16, 500 * (X - Y), 200 * (Y - Z)];
+    };
+    const dE = (a, b) => Math.hypot(...lab(a).map((v, i) => v - lab(b)[i]));
+
+    const keys = VOWEL_LEGEND.map((s) => s.key);
+    for (const kind of Object.keys(SIM)) {
+      for (let i = 0; i < keys.length; i++) {
+        for (let j = i + 1; j < keys.length; j++) {
+          const pair = [keys[i], keys[j]].sort().join('/');
+          const floor = pair === 'schwa/silent' ? 17 : 15;
+          const d = dE(sim(SOUND_META[keys[i]].color, kind), sim(SOUND_META[keys[j]].color, kind));
+          expect(d, `${pair} under ${kind} is ΔE ${d.toFixed(1)}`).toBeGreaterThan(floor);
+        }
+      }
+    }
   });
 
   it('graphemeSounds colours tiles and overlays schwa', () => {
