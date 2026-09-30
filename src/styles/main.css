@@ -5218,6 +5218,100 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-weight: 800;
 }
 
+/* ── "Where you stopped" ─────────────────────────────────────────────────
+   Shown rather than silently jumped to: landing halfway down a story with no
+   explanation is disorienting, and a child who wants to start again has to
+   be able to say so. */
+.story-resume {
+  /* Sticky, because restoring the place scrolls the child past wherever the
+     banner started — and an explanation they cannot see explains nothing.
+     It is removed as soon as they scroll on their own, or after a few
+     seconds, so it never becomes furniture. */
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-primary) 28%, transparent);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 10px rgb(31 35 48 / 10%);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+.story-resume-pin {
+  font-size: 1.1em;
+}
+.story-resume .link-btn {
+  min-height: var(--touch-target);
+  padding: 0 var(--space-2);
+  background: none;
+  border: 0;
+  color: var(--color-primary);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* A brief mark on the word they were on, so "we have gone to where you
+   stopped" points at something rather than just scrolling. */
+.wf-word--resumed {
+  background: color-mix(in srgb, var(--color-primary) 22%, transparent);
+  border-radius: 4px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 22%, transparent);
+  animation: resumed-pulse 2.6s ease-out;
+}
+@keyframes resumed-pulse {
+  0%,
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.999;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wf-word--resumed {
+    animation: none;
+  }
+}
+
+/* ── The end of a story ──────────────────────────────────────────────────
+   Finishing used to produce a disabled button and, for half the bank, a
+   Quest card. A session needs an end: what you did, then again / next /
+   stop. */
+.story-ending {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  background: color-mix(in srgb, var(--color-success, #1a7f37) 8%, var(--color-surface));
+  border: 2px solid color-mix(in srgb, var(--color-success, #1a7f37) 30%, transparent);
+  border-radius: var(--radius-lg);
+}
+.story-ending-title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-lg);
+}
+.story-ending-facts {
+  margin: 0 0 var(--space-3);
+  padding-left: 1.2em;
+  color: var(--color-text);
+  line-height: 1.7;
+}
+.story-ending-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.story-ending-actions .btn {
+  min-height: var(--touch-target);
+  flex: 1 1 auto;
+}
+
 /* ── The ruler's controls ────────────────────────────────────────────────
    Directly under the text, and sticky, so Next is always under the thumb
    without the child looking away from the line they are on. */

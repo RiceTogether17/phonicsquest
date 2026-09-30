@@ -21,10 +21,12 @@ import { prefersReducedMotion } from '../utils/motion.js';
 import { lookupWord as lookupWordForDetective, addWordToReview } from '../modules/wordDetective.js';
 import { isReadAloudSupported, listenToLine, stopListening } from '../modules/readAloudListener.js';
 import { createRuler, scrollHost, RULER_MODES } from '../modules/readingRuler.js';
+import { savePlace, getPlace, clearPlace } from '../modules/storyPlace.js';
 import { store } from '../modules/store.js';
 import { getBandReadiness, getRecommendedBand } from '../modules/storyGating.js';
 import { supportWords, storySupportLevel } from '../modules/decodability.js';
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
+import { html } from '../utils/html.js';
 import {
   soundColoredHtml,
   graphemeSounds,
@@ -32,7 +34,12 @@ import {
   VOWEL_LEGEND,
 } from '../modules/phonemeColors.js';
 import { modalManager } from '../modules/modalManager.js';
-import { unlockFriend, getRosterSummary } from '../modules/storyFriends.js';
+import {
+  unlockFriend,
+  isFriendUnlocked,
+  friendFromStory,
+  getRosterSummary,
+} from '../modules/storyFriends.js';
 import {
   startRecording,
   stopRecording,
@@ -82,7 +89,10 @@ let _speaking = false;
 let _activeWord = null; // for decode panel
 let _decodePanelEl = null; // ref to the decode panel DOM node
 let _currentStoryVocab = []; // vocab words for current story (used in decode panel)
-let _currentStory = null; // story being read (for markStoryRead on TTS finish)
+// The story open in the reader. Set when the reader renders, not only when
+// text-to-speech starts, because the ruler and the place tracker need to
+// know which story they are in whether or not anything is being spoken.
+let _currentStory = null;
 
 // Word-follow highlighting mode for Read Aloud
 // Karaoke read-aloud follows individual words by default (rule 6 — accessibility
@@ -121,6 +131,9 @@ function markStoryRead(id) {
     read.push(id);
     localStorage.setItem(READ_KEY, JSON.stringify(read));
   }
+  // A finished story has no "where you stopped" — the next read is a
+  // re-read for fluency, and those start at the beginning.
+  clearPlace(id);
   // C3 — every story has a co-star. Finishing the story unlocks the
   // friend (a one-shot narrative reward; pure charter-safe collectible
   // since it's earned by reading, not bought).
@@ -151,6 +164,12 @@ let _showRuler = _loadPref(PREFS_RULER_KEY, false);
 let _ruler = null;
 let _rulerState = null;
 let _rulerModeId = _loadPref(PREFS_RULER_MODE_KEY, 'line');
+
+// Where the child stopped last time, restored once per open (storyPlace.js).
+// Null means "no saved place, or this story is already read".
+let _resumeWord = null;
+let _placeSaveTimer = 0;
+let _placeScrollHost = null;
 
 // Hydrate the karaoke follow-mode from prefs now that PREFS_FOLLOW_KEY is in
 // scope. Defaults to 'word' (declared above) so first-run users get karaoke
@@ -281,6 +300,8 @@ function _renderBrowser() {
   // tear the ruler down, or its ResizeObserver outlives the story it measured.
   _removeDecodePanel();
   _destroyRuler();
+  _unwirePlaceTracking();
+  _currentStory = null;
 
   // ── Category tabs ──────────────────────────────────────────────────────
   const categoryTabsHtml = /* html */ `
@@ -482,10 +503,16 @@ function _showReader(storyId) {
   const story = STORIES.find((s) => s.id === storyId);
   if (!story) return;
   _stopTTS();
+  // Read the saved place once per open, not on every re-render: switching
+  // follow mode or toggling a scaffold rebuilds the body, and a banner that
+  // reappeared each time would be nagging rather than helpful.
+  _resumeWord = getReadStories().includes(story.id) ? null : getPlace(story.id);
+  _wordsHelped.clear();
   _renderReader(story);
 }
 
 function _renderReader(story) {
+  _currentStory = story;
   const levelMeta =
     BAND_META.find((m) => m.band === story.band) ?? BAND_META[(story.level ?? 1) - 1];
 
@@ -848,6 +875,20 @@ function _renderReadAloud(story) {
 
       ${_showGraphemes ? _soundLegendHtml() : ''}
 
+      ${
+        // Where the child stopped last time. Shown rather than silently
+        // jumped to: landing halfway down a story with no explanation is
+        // disorienting, and a child who wants to start again must be able to.
+        _resumeWord !== null
+          ? /* html */ `
+        <p class="story-resume" id="story-resume" role="note">
+          <span class="story-resume-pin" aria-hidden="true">📍</span>
+          Welcome back! We have gone to where you stopped.
+          <button class="link-btn" type="button" id="btn-resume-restart">Start from the beginning</button>
+        </p>`
+          : ''
+      }
+
       <div class="story-body story-body--follow-${_followMode}" id="story-body" aria-live="polite">${linesHtml}</div>
 
       <!-- The ruler's own controls. They live under the text, not in the
@@ -1029,7 +1070,22 @@ function _renderReadAloud(story) {
     }
   });
 
-  if (_showRuler) requestAnimationFrame(() => _startRuler());
+  // ── Where the child stopped ────────────────────────────────────────────
+  // The ruler, when it is on, both restores the place and reports every
+  // move; without it the place is the first word below the top of the
+  // reading pane, sampled as the child scrolls.
+  if (_showRuler) requestAnimationFrame(() => _startRuler(_resumeWord));
+  else if (_resumeWord !== null) requestAnimationFrame(() => _goToWord(_resumeWord));
+  _wirePlaceTracking(story);
+
+  document.getElementById('btn-resume-restart')?.addEventListener('click', (e) => {
+    clearPlace(story.id);
+    _resumeWord = null;
+    e.currentTarget.closest('.story-resume')?.remove();
+    _goToWord(0);
+    if (_ruler) _ruler.goTo(0);
+  });
+  _wireResumeBannerDismiss();
 
   document.getElementById('btn-story-play')?.addEventListener('click', () => _startTTS(story));
   document.getElementById('btn-story-stop')?.addEventListener('click', () => _stopTTS());
@@ -1063,6 +1119,91 @@ function _renderReadAloud(story) {
       _renderBrowser();
     });
   });
+}
+
+// ── Where the child stopped ───────────────────────────────────────────────
+
+/** Bring a word into the calm upper part of the reading pane. */
+function _goToWord(i) {
+  const words = _container?.querySelectorAll('#story-body .wf-word');
+  const el = words?.[Math.max(0, Math.min((words?.length ?? 1) - 1, i))];
+  if (!el) return;
+  el.scrollIntoView({ behavior: _scrollBehavior(), block: 'center' });
+  // A brief mark, so the child can see WHERE they were rather than just
+  // finding themselves somewhere down the page.
+  el.classList.add('wf-word--resumed');
+  setTimeout(() => el.classList.remove('wf-word--resumed'), 2600);
+}
+
+/**
+ * Keep the saved place up to date while the child reads.
+ *
+ * Two sources, because there are two ways to read: with the ruler the place
+ * is wherever the ruler is, which is exact; without it, the best guess is
+ * the first word below the top of the reading pane, sampled after scrolling
+ * settles. A finished story stops recording — re-reading it for fluency
+ * should start at the top.
+ */
+function _wirePlaceTracking(story) {
+  _unwirePlaceTracking();
+  const body = document.getElementById('story-body');
+  if (!body) return;
+  const host = scrollHost(body);
+  if (!host) return;
+
+  _placeScrollHost = host;
+  _placeScrollHost._pqPlaceHandler = () => {
+    clearTimeout(_placeSaveTimer);
+    _placeSaveTimer = setTimeout(() => {
+      if (_ruler || getReadStories().includes(story.id)) return;
+      const box = body.getBoundingClientRect();
+      const safe = _rulerSafeArea();
+      // Reading the questions rather than the story: leave the place alone.
+      if (box.bottom < safe.top || box.top > safe.bottom) return;
+      const words = [...body.querySelectorAll('.wf-word')];
+      const i = words.findIndex((w) => w.getBoundingClientRect().top >= safe.top);
+      if (i >= 0) savePlace(story.id, i);
+    }, 500);
+  };
+  host.addEventListener('scroll', _placeScrollHost._pqPlaceHandler, { passive: true });
+}
+
+/**
+ * The welcome-back banner has done its job once the child has got their
+ * bearings, so it goes on their first scroll — or after a few seconds if
+ * they just sit and read. Without this a sticky note would ride down the
+ * whole story, covering the line they are on.
+ */
+function _wireResumeBannerDismiss() {
+  const banner = document.getElementById('story-resume');
+  if (!banner) return;
+  const host = scrollHost(banner);
+  let timer = 0;
+  const go = () => {
+    clearTimeout(timer);
+    host?.removeEventListener('scroll', onScroll);
+    banner.remove();
+  };
+  // Restoring the place scrolls the pane itself; ignore that one so the
+  // banner is not dismissed before it has been seen.
+  let settled = false;
+  setTimeout(() => {
+    settled = true;
+  }, 1200);
+  const onScroll = () => {
+    if (settled) go();
+  };
+  host?.addEventListener('scroll', onScroll, { passive: true });
+  timer = setTimeout(go, 9000);
+}
+
+function _unwirePlaceTracking() {
+  clearTimeout(_placeSaveTimer);
+  if (_placeScrollHost?._pqPlaceHandler) {
+    _placeScrollHost.removeEventListener('scroll', _placeScrollHost._pqPlaceHandler);
+    delete _placeScrollHost._pqPlaceHandler;
+  }
+  _placeScrollHost = null;
 }
 
 // ── Reading Ruler ─────────────────────────────────────────────────────────
@@ -1142,20 +1283,28 @@ function _startRuler(startWord = null) {
       back.disabled = byWord ? s.word === 0 : s.line === 0;
       next.textContent = s.atEnd ? 'The end ✓' : byWord ? 'Next word ▶' : 'Next line ▶';
       next.classList.toggle('is-end', s.atEnd);
+      // With the ruler on, the place is exactly where the ruler is.
+      clearTimeout(_placeSaveTimer);
+      _placeSaveTimer = setTimeout(() => {
+        if (!getReadStories().includes(_currentStory?.id ?? ''))
+          savePlace(_currentStory?.id, s.word);
+      }, 400);
     },
   });
 
   back.addEventListener('click', () => _ruler?.prev());
   next.addEventListener('click', () => {
     if (!_rulerState?.atEnd) return _ruler?.next();
-    // Off the last line: the child has read the story, so point them at what
-    // comes next rather than leaving the button doing nothing.
-    const cta =
-      document.getElementById('story-quest-cta')?.hidden === false
-        ? document.getElementById('btn-launch-quest')
-        : document.getElementById('btn-story-play');
-    cta?.scrollIntoView({ behavior: _scrollBehavior(), block: 'center' });
-    cta?.focus({ preventScroll: true });
+    // Tapping Next off the last line is the child saying they have finished.
+    // The ruler is the one place where the app knows they read every line
+    // themselves rather than listening to it.
+    const story = _currentStory;
+    if (!story) return;
+    markStoryRead(story.id);
+    const cta = document.getElementById('story-quest-cta');
+    if (cta) cta.hidden = false;
+    _showComprehensionCheck(story);
+    _showEnding(story);
   });
   slot.querySelector('#btn-ruler-style').addEventListener('click', () => {
     const at = _rulerState?.word ?? 0;
@@ -1746,6 +1895,7 @@ function _renderDecodeMode(story) {
     btn.classList.add('btn--success');
     // Surface a quick comprehension self-check after marking the story read
     _showComprehensionCheck(story);
+    _showEnding(story);
   });
 
   // Word tap → decode
@@ -1768,6 +1918,7 @@ async function _handleWordTap(wordBtn) {
 
   const rawWord = wordBtn.dataset.word;
   const clean = rawWord.toLowerCase().replace(/[^a-z]/g, '');
+  if (clean) _wordsHelped.add(clean);
   // Check word bank first — a word that can be decoded should never be shown
   // as a sight word, even if it also appears in the HFW list.
   const wordObj = lookupWord(rawWord);
@@ -2093,6 +2244,9 @@ function _attachBoundaryListener(utt, lineIndex) {
 function _openWordDetective(text) {
   const host = document.getElementById('word-detective-content');
   if (!host) return;
+  // Counted for the ending: "you worked out 3 words by sounding them out" is
+  // the one number a beginning reader can be proud of without it being a score.
+  _wordsHelped.add(text.toLowerCase().replace(/[^a-z']/g, ''));
   // Pause any karaoke so the child can focus on the breakdown card.
   _stopTTS();
   const info = lookupWordForDetective(text);
@@ -2264,6 +2418,106 @@ function _onTTSDone() {
   if (cta) cta.hidden = false;
   // Surface a quick comprehension self-check (once per session)
   if (_currentStory) _showComprehensionCheck(_currentStory);
+  // …then say what they did, and offer the three things anyone wants at the
+  // end of a story: again, the next one, or stop.
+  if (_currentStory) _showEnding(_currentStory);
+}
+
+// ── The end of a story ────────────────────────────────────────────────────
+//
+// Finishing used to produce a disabled button, or a Quest card for the 34 of
+// 69 stories that carry quest data. There was no "read it again", no next
+// story and no way to stop — so the session had no end, and a child who had
+// just read 150 words was told nothing about it.
+
+/** Words the child worked on with Sound It Out during this reading. */
+const _wordsHelped = new Set();
+
+/** The next unread story on the same shelf, else the next one along. */
+function _nextStory(story) {
+  const shelf = STORIES.filter(
+    (s) => s.band === story.band && s.category === story.category && s.id !== story.id,
+  );
+  const read = getReadStories();
+  return shelf.find((s) => !read.includes(s.id)) ?? shelf[0] ?? null;
+}
+
+/**
+ * What the child did, in things they can recognise — words read, words
+ * worked on, times through. Never a score, and never a speed: this is the
+ * end of a story, not a test result.
+ */
+function _endingFacts(story) {
+  const facts = [
+    html`You read <strong>${story.title}</strong> — ${_countStoryWords(story)} words.`,
+  ];
+  if (_wordsHelped.size) {
+    const n = _wordsHelped.size;
+    facts.push(
+      html`You worked out ${n} ${n === 1 ? 'word' : 'words'} by sounding
+      ${n === 1 ? 'it' : 'them'} out.`,
+    );
+  }
+  if (story.roles || story.talkAboutIt?.length) {
+    facts.push(html`You had a think about what happened.`);
+  }
+  const friend = isFriendUnlocked(story.id) ? friendFromStory(story)?.name : '';
+  // The co-star by name — "Bakes a Cake's friend" is not a name.
+  if (friend) facts.push(html`<strong>${friend}</strong> has joined your 🐾 Friends.`);
+  return facts;
+}
+
+function _showEnding(story) {
+  if (!story) return;
+  const host = _container?.querySelector('.story-content-wrap');
+  if (!host || host.querySelector('.story-ending')) return;
+
+  const next = _nextStory(story);
+  const panel = document.createElement('section');
+  panel.className = 'story-ending';
+  panel.setAttribute('aria-label', 'You finished the story');
+  panel.innerHTML = html`
+    <h3 class="story-ending-title">🌟 You read the whole story!</h3>
+    <ul class="story-ending-facts">
+      ${_endingFacts(story).map((f) => html`<li>${f}</li>`)}
+    </ul>
+    <div class="story-ending-actions">
+      <button class="btn btn--ghost" type="button" id="btn-ending-again">📖 Read it again</button>
+      ${
+        next
+          ? html`<button
+            class="btn btn--ghost"
+            type="button"
+            id="btn-ending-next"
+            data-story-id="${next.id}"
+          >
+            ➡️ Next: ${next.title}
+          </button>`
+          : ''
+      }
+      <button class="btn btn--primary" type="button" id="btn-ending-done">🏁 Finish for today</button>
+    </div>
+  `;
+  host.appendChild(panel);
+  panel.scrollIntoView({ behavior: _scrollBehavior(), block: 'nearest' });
+
+  panel.querySelector('#btn-ending-again')?.addEventListener('click', () => {
+    // A re-read starts at the top — that is what re-reading for fluency is.
+    _wordsHelped.clear();
+    clearPlace(story.id);
+    _resumeWord = null;
+    panel.remove();
+    _goToWord(0);
+    if (_ruler) _ruler.goTo(0);
+  });
+  panel.querySelector('#btn-ending-next')?.addEventListener('click', (e) => {
+    _stopTTS();
+    _showReader(e.currentTarget.dataset.storyId);
+  });
+  panel.querySelector('#btn-ending-done')?.addEventListener('click', () => {
+    _stopTTS();
+    _renderBrowser();
+  });
 }
 
 /**
