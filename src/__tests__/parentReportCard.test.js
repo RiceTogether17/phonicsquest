@@ -219,3 +219,47 @@ describe('buildWhatsAppMessage with exam risk', () => {
     expect(msg).not.toContain("Teacher's note");
   });
 });
+
+describe('the recommendation when nothing has been measured', () => {
+  // The weak-skill list comes from primary-school skill mastery, so a
+  // beginning reader almost always has none — and was told to do a P1–P6
+  // Grammar MCQ.
+  it('sends a beginning reader to a story, not to Grammar MCQ', () => {
+    const card = buildParentReportCard({
+      profile: { name: 'Mia', schoolLevel: 'preschool', readingBand: 'emerging-decoder' },
+    });
+    expect(card.recommendation.target).toBe('stories');
+    expect(card.recommendation.title).toMatch(/story/i);
+    expect(card.recommendation.title).not.toMatch(/Grammar/);
+  });
+
+  it('still starts a primary pupil on Grammar MCQ', () => {
+    const card = buildParentReportCard({
+      profile: { name: 'Ben', schoolLevel: 'primary', primaryGrade: 'P3' },
+    });
+    expect(card.recommendation.target).toBe('grammar-mcq');
+  });
+});
+
+describe('the week in a phrase', async () => {
+  const { describeWeekWork } = await import('../modules/parentReportCard.js');
+
+  it('says nothing was answered, rather than "0% accurate"', () => {
+    expect(describeWeekWork({ words: 0, accuracy: 0 })).toBe('no questions answered yet');
+    const msg = buildWhatsAppMessage(
+      buildParentReportCard({
+        profile: { name: 'Mia' },
+        weekly: { days: 0, words: 0, accuracy: 0 },
+      }),
+    );
+    expect(msg).toContain('no questions answered yet');
+    expect(msg).not.toMatch(/0% accura/);
+  });
+
+  it('reports accuracy once there is something to report', () => {
+    expect(describeWeekWork({ words: 24, accuracy: 0.8 })).toBe('24 questions, 80% accurate');
+    expect(describeWeekWork({ words: 1, accuracy: 1 }, { sep: ' · ', noun: 'accuracy' })).toBe(
+      '1 question · 100% accuracy',
+    );
+  });
+});

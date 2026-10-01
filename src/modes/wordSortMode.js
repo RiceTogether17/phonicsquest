@@ -33,7 +33,7 @@ let _els = null;
 let _queue = []; // [{ word, wordObj, expected }]
 let _idx = 0;
 let _placements = [];
-let _bins = []; // [{ group, scorerKey, label, icon, color, bg }]
+let _bins = []; // [{ group, scorerKey, label, anchor, icon, color, bg }]
 let _startTime = 0;
 let _timeouts = [];
 let _locked = false;
@@ -42,6 +42,46 @@ let _done = false;
 const SHORT_STAGE_RE = /^(?:cvc|ccvc|cvcc|ccvcc)-([aeiou])$/;
 const SHORT_GROUP_RE = /^short-([aeiou])$/;
 const LONG_STAGE_RE = /^long-([aeiou])-/;
+// "Long A · a_e (cake)" → spelling a_e, key word cake.
+const SPELLING_LABEL_RE = /·\s*(\S+)\s*\((\w+)\)/;
+
+/**
+ * What a child reads on a box: the sound or spelling, anchored to a word
+ * they know that has it — "a as in cat". The boxes used to carry the
+ * curriculum's name for the word family, "CVC – Short A", which a five-year-
+ * old cannot read and which names the wrong thing: every word in both boxes
+ * is CVC. What differs is the vowel, so that is what the label says.
+ *
+ * @returns {{ unit: string, kind: 'sound'|'spelling', keywords: string[] } | null}
+ */
+function _anchorFor(group, stage) {
+  const pool = () => progress.getWordsInGroup(group, null).map((w) => w.word);
+  const short = SHORT_STAGE_RE.exec(group) || SHORT_GROUP_RE.exec(group);
+  if (short) {
+    const keywords = stage?.sampleWords?.length ? stage.sampleWords : pool();
+    return keywords.length ? { unit: short[1], kind: 'sound', keywords } : null;
+  }
+  const spelled = SPELLING_LABEL_RE.exec(WORD_GROUPS[group]?.label || '');
+  if (spelled) {
+    return { unit: spelled[1], kind: 'spelling', keywords: [spelled[2], ...pool()] };
+  }
+  return null;
+}
+
+/**
+ * Feedback that teaches the contrast: which sound (or spelling) the word
+ * has, and a word it shares it with — never the word itself as its own
+ * example.
+ */
+function _explain(item, bin) {
+  const a = bin?.anchor;
+  if (!a) return null;
+  const like = a.keywords.find((k) => k.toLowerCase() !== item.word.toLowerCase());
+  const tail = like ? `, like “${like}”` : '';
+  return a.kind === 'sound'
+    ? `“${item.word}” has /${a.unit}/${tail}`
+    : `“${item.word}” is spelled with ${a.unit}${tail}`;
+}
 
 /**
  * @param {import('../data/words.js').Word} word
@@ -117,10 +157,14 @@ function _deriveBins(stageGroup, word) {
   const mk = (group, scorerKey) => {
     const meta = WORD_GROUPS[group] || {};
     const stage = CURRICULUM.find((s) => s.group === group || s.id === group);
+    const anchor = _anchorFor(group, stage);
     return {
       group,
       scorerKey,
-      label: meta.label || stage?.name || group,
+      anchor,
+      label: anchor
+        ? `${anchor.unit} as in ${anchor.keywords[0]}`
+        : meta.label || stage?.name || group,
       icon: meta.icon || stage?.icon || '📦',
       color: meta.color || 'var(--color-primary)',
       bg: meta.bg || 'var(--surface-2)',
@@ -247,9 +291,12 @@ function _onBinTap(bin, btn) {
   const status = document.getElementById('ws-status');
   if (status) {
     const rightBin = _bins.find((b) => b.scorerKey === item.expected);
+    const why = _explain(item, rightBin);
     status.textContent = correct
-      ? `✓ Yes! “${item.word}” goes in ${bin.label}.`
-      : `✗ “${item.word}” belongs in ${rightBin?.label ?? 'the other box'}.`;
+      ? `✓ Yes! ${why ?? `“${item.word}” goes in ${bin.label}`}.`
+      : why
+        ? `✗ Not this box — ${why}.`
+        : `✗ “${item.word}” belongs in ${rightBin?.label ?? 'the other box'}.`;
     status.className = `ws-status ${correct ? 'ws-status--yes' : 'ws-status--no'}`;
   }
 

@@ -31,7 +31,11 @@ import {
   getAdaptiveLessonQueue,
 } from '../modules/reporting.js';
 import { getWeakSkills } from '../modules/remediationRouter.js';
-import { buildParentReportCard, buildWhatsAppMessage } from '../modules/parentReportCard.js';
+import {
+  buildParentReportCard,
+  buildWhatsAppMessage,
+  describeWeekWork,
+} from '../modules/parentReportCard.js';
 import { confidenceLabel } from '../modules/evidence.js';
 import { getGraduatingSoon, getSlippingRecently } from '../modules/reviewScheduler.js';
 import { getClassSnapshot, hasClassToShow } from '../modules/classSnapshot.js';
@@ -311,7 +315,7 @@ function _renderParentReportCard() {
         <span class="parent-report-card__avatar" aria-hidden="true">${card.avatar}</span>
         <div>
           <h3 class="parent-report-card__title">📋 Report Card · ${escapeHtml(card.learnerName)}${card.grade ? ` <small>(${card.grade})</small>` : ''}</h3>
-          <p class="parent-report-card__sub">Parent-friendly snapshot · this week ${card.weekly.days} day${card.weekly.days === 1 ? '' : 's'}, ${card.weekly.words} questions, ${Math.round(card.weekly.accuracy * 100)}% accurate</p>
+          <p class="parent-report-card__sub">Parent-friendly snapshot · this week ${card.weekly.days} day${card.weekly.days === 1 ? '' : 's'}, ${describeWeekWork(card.weekly)}</p>
         </div>
         ${
           card.examRisk
@@ -1195,8 +1199,8 @@ function _renderWordHistory(stats) {
     const emoji = word?.emoji || '';
     const timeAgo = _timeAgo(h.timestamp);
     const result = h.correct
-      ? '<span style="color:var(--color-success)">✓</span>'
-      : '<span style="color:var(--color-error)">✗</span>';
+      ? '<span style="color:var(--color-success-text)">✓</span>'
+      : '<span style="color:var(--color-error-text)">✗</span>';
 
     return `<tr>
       <td>${emoji} ${h.wordId}</td>

@@ -66,6 +66,34 @@ export function composeTodaysLesson(now = new Date()) {
     : { band: 'early', steps: _composeEarly() };
 }
 
+/**
+ * One sentence saying what today's lesson is, built from the steps actually
+ * in it. The card used to promise "Warm up, learn something new, practise,
+ * review" whatever it held — and a child still on the listening steps gets
+ * no Learn step, while every early lesson ends on a Challenge, not a review.
+ *
+ * @param {Array<{kindLabel?: string}>} steps
+ * @returns {string}
+ */
+export function describeLessonSteps(steps) {
+  const PHRASE = {
+    'Warm-up': 'warm up',
+    Learn: 'learn something new',
+    Practice: 'practise',
+    Review: 'review',
+    Challenge: 'try the challenge',
+  };
+  const parts = [];
+  for (const s of steps || []) {
+    const p = PHRASE[s?.kindLabel];
+    if (p && parts[parts.length - 1] !== p) parts.push(p);
+  }
+  if (!parts.length) return 'One step at a time, like a real lesson.';
+  const cap = (t) => `${t[0].toUpperCase()}${t.slice(1)}`;
+  if (parts.length === 1) return `${cap(parts[0])} — one step today.`;
+  return `${cap(`${parts.slice(0, -1).join(', ')}, then ${parts.at(-1)}`)} — in order, like a real lesson.`;
+}
+
 /* ── Early reading (K1–P1) ───────────────────────────────────────── */
 
 function _composeEarly() {
