@@ -73,7 +73,7 @@ function _renderControls(els, word, stage) {
   }).join('');
 
   const dotsHtml = `
-    <div class="step-dots" aria-label="Progress: ${revealedCount} of ${total} sounds revealed">
+    <div class="step-dots" role="img" aria-label="Progress: ${revealedCount} of ${total} sounds revealed">
       ${dots}
     </div>
   `;

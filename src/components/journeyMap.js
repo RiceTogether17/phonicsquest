@@ -47,7 +47,7 @@ export function buildJourneyMapHtml({ avatar = '🦁' } = {}) {
   }).join('');
 
   return `
-    <div class="journey-map" role="list" aria-label="Your reading journey — six steps">
+    <div class="journey-map" role="list" tabindex="0" aria-label="Your reading journey — six steps">
       ${steps}
     </div>`;
 }

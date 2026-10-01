@@ -73,7 +73,7 @@ export function setupTrainCarriages(word, els) {
         <button class="train-replay" type="button" aria-label="Hear the target sound again">🔊</button>
         <span class="train-target-sound" aria-live="polite">/${_targetGrapheme}/</span>
       </div>
-      <div class="train-track" id="train-track" aria-label="Carriages collected so far">
+      <div class="train-track" id="train-track" role="list" aria-label="Carriages collected so far">
         <span class="train-engine" aria-hidden="true">🚂</span>
       </div>
       <div class="word-card-grid" id="train-grid" role="group" aria-label="Pick the words that start with the target sound"></div>
@@ -139,6 +139,7 @@ function _addCarriage(word) {
   if (!track) return;
   const carriage = document.createElement('span');
   carriage.className = 'train-carriage';
+  carriage.setAttribute('role', 'listitem');
   carriage.setAttribute('aria-label', word.word);
   carriage.innerHTML = `
     <span class="train-carriage-cargo" aria-hidden="true">${word.emoji ?? ''}</span>

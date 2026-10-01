@@ -34,6 +34,20 @@
      --color-primary-dark was not enough either — it still failed in three of
      the four. A token per theme, rather than a per-screen override. */
   --color-primary-on-tint: #4e45de;
+  /* Primary text on the white exam-paper cards, which stay white in dark
+     mode — so unlike on-tint, this never flips light. */
+  --color-primary-on-paper: #4e45de;
+  /* Text colours. The fills above (#22c55e and friends) are for buttons,
+     icons and bars; as text they measured 2.1–3.8:1. These clear 5:1 on the
+     page and on every light tint, and flip for dark mode below. */
+  --color-success-text: #166534;
+  --color-warning-text: #92400e;
+  --color-error-text: #b91c1c;
+  /* On a light tint box (--color-*-light). Those boxes stay light in dark
+     mode, so these do not flip. */
+  --color-success-on-tint: #166534;
+  --color-warning-on-tint: #92400e;
+  --color-error-on-tint: #b91c1c;
   --color-secondary: #ff6b8a;
   --color-success: #22c55e;
   --color-success-light: #dcfce7;
@@ -150,6 +164,7 @@
   --color-primary-light: #e0f2fe;
   --color-primary-dark: #0284c7;
   --color-primary-on-tint: #096690;
+  --color-primary-on-paper: #096690;
   --bg: #f0f9ff;
   --surface-2: #e0f2fe;
   --border: #bae6fd;
@@ -163,6 +178,7 @@
   --color-primary-light: #dcfce7;
   --color-primary-dark: #16a34a;
   --color-primary-on-tint: #137036;
+  --color-primary-on-paper: #137036;
   --bg: #f0fdf4;
   --surface-2: #dcfce7;
   --border: #bbf7d0;
@@ -176,6 +192,7 @@
   --color-primary-light: #ffedd5;
   --color-primary-dark: #ea580c;
   --color-primary-on-tint: #a04404;
+  --color-primary-on-paper: #a04404;
   --bg: #fff7ed;
   --surface-2: #ffedd5;
   --border: #fed7aa;
@@ -186,6 +203,7 @@
 }
 [data-theme='contrast'] {
   --color-primary: #000000;
+  --color-primary-on-paper: #000000;
   --color-primary-light: #f5f5f5;
   --color-primary-dark: #000000;
   --bg: #ffffff;
@@ -264,6 +282,11 @@
        existing --color-primary-light clears 11:1 on it.
        Audit 2026-09-19, finding 20. */
     --color-primary-on-tint: var(--color-primary-light);
+    /* --color-warning-shadow turns darker here, which is right for a shadow
+       and was 2.4:1 for the "Almost! Try again" feedback that used it. */
+    --color-success-text: #4ade80;
+    --color-warning-text: #fbbf24;
+    --color-error-text: #f87171;
     --surface-2: #252340;
     --border: #2d2b55;
     --text: #e8e6ff;
@@ -644,6 +667,13 @@ body.bedtime-on * {
   flex: 1;
   position: relative;
   overflow: hidden;
+  /* Clip, not just hide. A hidden-overflow box can still be scrolled by
+     script, and screens waiting to slide in are parked off to the side, so a
+     focus or scroll-into-view as an activity opened scrolled this 40px
+     sideways — cutting off the left of the game, answer choices included,
+     with no way for the child to scroll it back. The screens inside scroll;
+     this box never should. */
+  overflow: clip;
 }
 
 /* ── SCREENS ── */
@@ -828,7 +858,7 @@ body.bedtime-on * {
   border: 4px solid var(--color-primary);
   font-size: var(--font-size-sm);
   font-weight: 900;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   box-shadow: var(--shadow-md);
   transition:
     transform var(--dur-fast) var(--ease-bounce),
@@ -1286,7 +1316,7 @@ body.bedtime-on * {
   border: none;
   font-size: var(--font-size-base);
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   cursor: pointer;
   padding-right: var(--space-5);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b5cf6' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
@@ -1410,14 +1440,14 @@ body.bedtime-on * {
 }
 .choice-feedback--correct,
 .choice-feedback--reveal {
-  color: var(--color-success);
+  color: var(--color-success-text);
 }
 .choice-feedback--correct .choice-feedback-icon,
 .choice-feedback--reveal .choice-feedback-icon {
   background: var(--color-success);
 }
 .choice-feedback--retry {
-  color: var(--color-warning-shadow);
+  color: var(--color-warning-text);
 }
 .choice-feedback--retry .choice-feedback-icon {
   background: var(--color-error);
@@ -1523,10 +1553,10 @@ body.bedtime-on * {
   text-align: center;
 }
 .ws-status--yes {
-  color: var(--color-success);
+  color: var(--color-success-text);
 }
 .ws-status--no {
-  color: var(--color-warning-shadow);
+  color: var(--color-warning-text);
 }
 .ws-summary {
   width: 100%;
@@ -1555,7 +1585,7 @@ body.bedtime-on * {
 .ws-summary-hint {
   margin: var(--space-2) 0 0;
   font-weight: 700;
-  color: var(--color-warning-shadow);
+  color: var(--color-warning-text);
 }
 
 /* ── Read & Tap mode ──────────────────────────────────────────────────── */
@@ -1589,7 +1619,7 @@ body.bedtime-on * {
   min-height: 26px;
   font-size: var(--font-size-md);
   font-weight: 700;
-  color: var(--color-warning-shadow);
+  color: var(--color-warning-text);
   text-align: center;
 }
 
@@ -1630,18 +1660,18 @@ body.bedtime-on * {
   text-align: center;
   border: 3px solid var(--color-primary);
   border-radius: var(--radius-lg);
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   font-variant-numeric: tabular-nums;
 }
 .fs-timer--low {
   border-color: var(--color-error);
-  color: var(--color-error);
+  color: var(--color-error-text);
   animation: pulse-correct 0.6s var(--ease-bounce) infinite alternate;
 }
 .fs-score {
   font-size: var(--font-size-xl);
   font-weight: 900;
-  color: var(--color-success);
+  color: var(--color-success-text);
 }
 .fs-live {
   width: 100%;
@@ -1669,7 +1699,7 @@ body.bedtime-on * {
 .fs-status {
   min-height: 24px;
   font-weight: 800;
-  color: var(--color-warning-shadow);
+  color: var(--color-warning-text);
 }
 .fs-summary {
   width: 100%;
@@ -1695,7 +1725,7 @@ body.bedtime-on * {
 .fs-summary-hint {
   margin: var(--space-3) 0 0;
   font-weight: 700;
-  color: var(--color-warning-shadow);
+  color: var(--color-warning-text);
 }
 
 /* Says what the timed figure actually measures, beside the figure itself.
@@ -1810,10 +1840,10 @@ body.bedtime-on * {
   font-weight: 800;
 }
 .las-feedback--yes {
-  color: var(--color-success);
+  color: var(--color-success-text);
 }
 .las-feedback--coach {
-  color: var(--color-warning-shadow);
+  color: var(--color-warning-text);
 }
 .las-feedback--reveal {
   display: flex;
@@ -1828,12 +1858,12 @@ body.bedtime-on * {
   font-size: var(--font-size-2xl);
   font-weight: 900;
   letter-spacing: 0.08em;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 .las-reveal-hint {
   font-size: var(--font-size-sm);
   font-weight: 700;
-  color: var(--color-warning-shadow);
+  color: var(--color-warning-text);
 }
 
 /* ── Oral Blend mode: emoji-only choices ─────────────────────────────── */
@@ -2010,7 +2040,7 @@ body.bedtime-on * {
    child who missed the opening word cannot tell audio from silence. */
 .wc-replay.is-speaking {
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   animation: pulse-correct 0.9s var(--ease-bounce) infinite alternate;
 }
 
@@ -2366,6 +2396,18 @@ body.bedtime-on * {
   width: 28px;
   height: 28px;
 }
+/* In the game it sits in the page flow, under the action buttons, not
+   floating over them. Fixed to the corner of a phone it covered whatever was
+   at the bottom of the screen — which is where the feedback ("Almost! Try
+   again…"), Next, Check, Skip and Done appear, and in Count the Words one of
+   the answers. A self-check is never worth hiding the lesson for. */
+#screen-game .mic-btn {
+  position: static;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  margin-top: var(--space-3);
+}
 .mic-btn:hover {
   transform: scale(1.12);
   box-shadow: 0 6px 24px rgba(255, 107, 138, 0.5);
@@ -2463,14 +2505,14 @@ body.bedtime-on * {
 .result-word-display {
   font-size: var(--font-size-3xl);
   font-weight: 900;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   letter-spacing: 0.05em;
 }
 
 .result-xp {
   font-size: var(--font-size-xl);
   font-weight: 800;
-  color: var(--color-warning);
+  color: var(--color-warning-text);
   animation: pop 0.5s var(--ease-bounce) 0.4s both;
 }
 
@@ -2726,7 +2768,7 @@ body:has(#screen-stories.screen.active) .mascot-float {
 }
 .modal-close:hover {
   background: var(--color-error-light);
-  color: var(--color-error);
+  color: var(--color-error-on-tint);
   transform: rotate(90deg);
 }
 
@@ -2957,7 +2999,7 @@ body:has(#screen-stories.screen.active) .mascot-float {
 
 .pin-hint {
   font-size: var(--font-size-sm);
-  color: var(--color-error);
+  color: var(--color-error-text);
   min-height: 20px;
 }
 .pin-setup-hint {
@@ -2969,7 +3011,7 @@ body:has(#screen-stories.screen.active) .mascot-float {
 /* ── 15. DASHBOARD ── */
 .dash-stats-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-3);
   margin-bottom: var(--space-5);
 }
@@ -2984,7 +3026,7 @@ body:has(#screen-stories.screen.active) .mascot-float {
 .dash-stat-value {
   font-size: var(--font-size-2xl);
   font-weight: 900;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   display: block;
 }
 .dash-stat-label {
@@ -3178,11 +3220,11 @@ body:has(#screen-stories.screen.active) .mascot-float {
 }
 .dash-import-status--success {
   background: var(--color-success-light);
-  color: var(--color-success);
+  color: var(--color-success-on-tint);
 }
 .dash-import-status--error {
   background: var(--color-error-light);
-  color: var(--color-error);
+  color: var(--color-error-on-tint);
 }
 
 /* ── Offline / Audio Cache Indicator ── */
@@ -3236,7 +3278,7 @@ body:has(#screen-stories.screen.active) .mascot-float {
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  background: #fff;
+  background: var(--surface);
   border: 2px solid var(--color-primary);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
@@ -3264,7 +3306,7 @@ body:has(#screen-stories.screen.active) .mascot-float {
 }
 .install-banner__text strong {
   font-size: var(--font-size-base);
-  color: var(--color-primary-dark);
+  color: var(--color-primary-on-tint);
 }
 .install-banner__btn {
   flex-shrink: 0;
@@ -4170,7 +4212,7 @@ body:has(#screen-stories.screen.active) .mascot-float {
   position: fixed;
   font-size: var(--font-size-xl);
   font-weight: 900;
-  color: var(--color-warning);
+  color: var(--color-warning-text);
   pointer-events: none;
   z-index: 1000;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
@@ -4754,8 +4796,8 @@ details.story-tool-section[open] > .story-tool-summary::before {
     z-index: 25;
     background: linear-gradient(
       180deg,
-      color-mix(in srgb, var(--color-bg, #fff) 0%, transparent),
-      var(--color-bg, #fff) 30%
+      color-mix(in srgb, var(--color-bg, var(--surface)) 0%, transparent),
+      var(--color-bg, var(--surface)) 30%
     );
     padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom, 0));
     margin: 0 calc(var(--space-4) * -1);
@@ -4870,7 +4912,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   background: transparent;
   padding-left: 0;
   padding-top: var(--space-3);
@@ -4902,7 +4944,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .sline--end {
   font-size: var(--font-size-lg);
   font-weight: 800;
-  color: var(--color-success);
+  color: var(--color-success-text);
   background: color-mix(in srgb, var(--color-success) 10%, transparent);
   border: 2px solid color-mix(in srgb, var(--color-success) 30%, transparent);
   text-align: center;
@@ -4917,7 +4959,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
 }
 .sline--label.sline--active {
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   background: transparent !important;
   box-shadow: none;
   transform: none;
@@ -5233,7 +5275,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   display: grid;
   place-items: center;
   padding: 0 4px;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   font-size: 11px;
 }
 /* Ruler markings — the thing that makes it read as a ruler rather than a bar. */
@@ -5350,7 +5392,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   padding: 0 var(--space-2);
   background: none;
   border: 0;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   font: inherit;
   font-weight: 700;
   text-decoration: underline;
@@ -5493,7 +5535,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .bl-steps li.is-new {
   background: color-mix(in srgb, var(--color-primary) 16%, transparent);
-  color: var(--color-primary-dark, var(--color-text));
+  color: var(--color-primary-on-tint);
 }
 .bl-steps li.bl-done {
   flex: 1 0 100%;
@@ -5673,7 +5715,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   padding: 4px 10px;
   border-radius: 999px;
   border: 1.5px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
-  background: white;
+  background: var(--surface);
   cursor: pointer;
   transition:
     background 120ms,
@@ -5714,7 +5756,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .comp-check h4 {
   margin: 0 0 var(--space-3);
   font-size: var(--font-size-md, 16px);
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 .comp-check .comp-q {
   font-weight: 700;
@@ -5728,7 +5770,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .comp-check .comp-choice {
   padding: 10px 14px;
   border: 1.5px solid #cbd5e1;
-  background: white;
+  background: var(--surface);
   border-radius: 10px;
   text-align: left;
   font-size: var(--font-size-sm);
@@ -5764,7 +5806,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   border: 1px solid var(--color-primary, #4f46e5);
   border-radius: var(--radius-pill, 999px);
   background: transparent;
-  color: var(--color-primary, #4f46e5);
+  color: var(--color-primary-on-tint);
   font-weight: 700;
   cursor: pointer;
 }
@@ -5954,7 +5996,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   text-align: center;
 }
 .blend-blend-cta {
-  color: var(--color-success);
+  color: var(--color-success-text);
   font-size: var(--font-size-xl);
 }
 
@@ -6044,12 +6086,12 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .speed-btn:hover {
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 .speed-btn--active {
   border-color: var(--color-primary);
   background: color-mix(in srgb, var(--color-primary) 15%, transparent);
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -6171,7 +6213,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   align-items: flex-start;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
-  background: #fff;
+  background: var(--surface);
   border: 2px solid #a78bfa;
   border-radius: var(--radius-lg);
   cursor: pointer;
@@ -6249,7 +6291,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 
 .dp-word--blend {
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   animation: pop 0.4s var(--ease-bounce);
 }
 
@@ -6786,7 +6828,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 /* On unstudied quests, draw the eye to "Learn Words" first. */
 .sm-quest-card--new .sm-quest-action--learn {
   border-color: var(--color-primary);
-  color: var(--color-primary-dark);
+  color: var(--color-primary-on-tint);
   font-weight: 800;
 }
 /* Once completed, demote the Learn button visually (it's still available
@@ -7072,7 +7114,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .sl-quiz-step {
   font-size: var(--font-size-sm);
   font-weight: 800;
-  color: var(--color-primary-dark);
+  color: var(--color-primary-on-tint);
 }
 .sl-quiz-prompt {
   margin: 0;
@@ -7224,7 +7266,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-4);
-  background: linear-gradient(180deg, #f5f3ff 0%, #ffffff 100%);
+  background: linear-gradient(180deg, #f5f3ff 0%, var(--surface) 100%);
   border: 2px solid #8b5cf6;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
@@ -7369,7 +7411,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: var(--surface);
   border-radius: 6px 6px 0 0;
   text-transform: lowercase;
   transition: background 150ms;
@@ -7487,7 +7529,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   padding: 6px 10px;
   border-radius: 8px;
   border: 2px solid transparent;
-  background: white;
+  background: var(--surface);
   min-width: 36px;
 }
 .lscwc-check-slot.right {
@@ -7645,7 +7687,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .bp-rec-badge {
   font-size: var(--font-size-xs);
   font-weight: 700;
-  color: var(--color-success, #16a34a);
+  color: var(--color-success-text);
   background: none;
   padding: 0;
 }
@@ -7692,7 +7734,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   text-align: right;
 }
 .bp-stage-pct--mastered {
-  color: var(--color-success);
+  color: var(--color-success-text);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -7827,7 +7869,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .profile-active-badge {
   font-size: 0.7rem;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 
 .profile-delete-btn {
@@ -8319,7 +8361,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .follow-mode-btn:hover {
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 .follow-mode-btn.active {
   background: var(--color-primary);
@@ -8357,7 +8399,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   background: color-mix(in srgb, var(--color-primary) 25%, transparent) !important;
   /* Dark brand text on the light tint — the primary-on-primary-tint combo
      was ~3.4:1, below AA for the most important text during karaoke. */
-  color: var(--color-primary-dark);
+  color: var(--color-primary-on-tint);
   font-weight: 800;
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 45%, transparent);
   text-decoration: none;
@@ -8471,7 +8513,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   color: #059669;
 }
 .recording-status--playing {
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 .recording-status--error {
   color: #dc2626;
@@ -8921,7 +8963,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-size: 2.5rem;
   font-weight: 800;
   line-height: 1;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 .sq-score-denom {
   font-size: 1rem;
@@ -9198,7 +9240,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .mcq-mini-chip:hover {
   border-color: var(--color-primary);
-  color: var(--color-primary-dark);
+  color: var(--color-primary-on-tint);
 }
 @media (max-width: 560px) {
   .mcq-level-grid,
@@ -9239,7 +9281,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .sfq-xp-badge {
   font-size: var(--font-size-sm);
   font-weight: 800;
-  color: var(--color-warning);
+  color: var(--color-warning-text);
 }
 .sfq-instruction {
   font-size: var(--font-size-md);
@@ -9296,7 +9338,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   padding: 0 var(--space-1);
 }
 .sfq-section-label--answer {
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 .sfq-section-label--bank {
   color: var(--text-muted);
@@ -9337,7 +9379,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .sfq-word-chip {
   background: var(--surface);
   border-color: var(--color-primary);
-  color: var(--color-primary-dark);
+  color: var(--color-primary-on-tint);
   box-shadow: var(--shadow-sm);
 }
 .sfq-word-chip:hover {
@@ -9391,11 +9433,11 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .sfq-feedback--success {
   background: var(--color-success-light);
-  color: var(--color-success);
+  color: var(--color-success-on-tint);
 }
 .sfq-feedback--error {
   background: var(--color-error-light);
-  color: var(--color-error);
+  color: var(--color-error-on-tint);
 }
 
 /* Shake animation */
@@ -9513,7 +9555,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   cursor: pointer;
   font-size: var(--font-size-sm);
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   padding: var(--space-2) 0;
   text-align: left;
 }
@@ -9540,7 +9582,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .wq-dim-band--good {
   background: var(--color-success-light);
-  color: var(--color-success);
+  color: var(--color-success-on-tint);
 }
 .wq-dim-band--developing {
   background: #fff8e1;
@@ -9548,7 +9590,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .wq-dim-band--needs-work {
   background: var(--color-error-light);
-  color: var(--color-error);
+  color: var(--color-error-on-tint);
 }
 
 /* ============================================================
@@ -9759,7 +9801,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .cloze-xp-badge {
   font-size: var(--font-size-sm);
   font-weight: 800;
-  color: var(--color-warning);
+  color: var(--color-warning-text);
 }
 .cloze-title {
   font-size: var(--font-size-xl);
@@ -9807,7 +9849,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .cloze-blank:empty::before {
   content: '___';
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   opacity: 0.5;
 }
 .cloze-blank--filled {
@@ -9884,11 +9926,11 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .cloze-feedback--success {
   background: var(--color-success-light);
-  color: var(--color-success);
+  color: var(--color-success-on-tint);
 }
 .cloze-feedback--error {
   background: var(--color-error-light);
-  color: var(--color-error);
+  color: var(--color-error-on-tint);
 }
 
 /* Complete screen */
@@ -10345,11 +10387,11 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .wv-feedback--success {
   background: var(--color-success-light);
-  color: var(--color-success);
+  color: var(--color-success-on-tint);
 }
 .wv-feedback--error {
   background: var(--color-error-light);
-  color: var(--color-error);
+  color: var(--color-error-on-tint);
 }
 
 /* Complete screen */
@@ -10503,7 +10545,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   display: inline-block;
   border-bottom: 3px solid var(--color-primary);
   min-width: 3ch;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   font-weight: 700;
   padding: 0 2px;
 }
@@ -10546,7 +10588,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .clue-hunt-title {
   font-size: var(--font-size-sm);
   font-weight: 800;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -10765,7 +10807,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .clue-explanation-title {
   font-size: var(--font-size-lg);
   font-weight: 900;
-  color: var(--color-success);
+  color: var(--color-success-text);
   margin: 0;
 }
 
@@ -10828,7 +10870,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .wv-complete-clue,
 .sfq-complete-clue {
   font-size: var(--font-size-sm);
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   font-weight: 700;
   margin: 0;
 }
@@ -10858,7 +10900,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .clue-mission-title {
   font-size: var(--font-size-sm);
   font-weight: 800;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -11176,7 +11218,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   color: var(--text-muted);
 }
 .gj-plan-arrow {
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   font-size: 1.1rem;
   font-weight: 800;
 }
@@ -11439,7 +11481,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  background: white;
+  background: var(--surface);
   border: 1px solid #fed7aa;
   border-radius: var(--radius-full);
   padding: 4px 12px;
@@ -11601,6 +11643,28 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 
 /* B5: Pattern insights */
+/* The parent dashboard on a phone. It was only reachable there once the
+   header fitted, and nothing in it had been sized for 390px: the WhatsApp
+   and Import buttons, the curriculum map, the stat cards and the pattern
+   lists all ran off the right edge. Children of its grids and rows may
+   shrink, labels may wrap, and the file picker fits its column. */
+#modal-dashboard :is(.modal-body, .modal-panel) * {
+  min-width: 0;
+}
+/* Category names like "Demonstratives (this/that/these/those)" have no
+   break point a browser will use; let them break only when they must. */
+#modal-dashboard .modal-panel {
+  overflow-wrap: anywhere;
+}
+#modal-dashboard .btn {
+  white-space: normal;
+  max-width: 100%;
+  text-align: center;
+}
+#modal-dashboard input[type='file'] {
+  max-width: 100%;
+}
+
 .dash-pattern-list {
   list-style: none;
   padding: 0;
@@ -11891,7 +11955,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   padding: var(--space-2) var(--space-1);
   border: 2px solid var(--border, #e5e3fa);
   border-radius: var(--radius-lg, 14px);
-  background: var(--surface, #fff);
+  background: var(--surface, var(--surface));
   cursor: pointer;
   font-family: inherit;
   transition:
@@ -11914,10 +11978,10 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .home-tab--active,
 .home-tab[aria-selected='true'] {
   border-color: var(--color-primary, #5a52e0);
-  background: color-mix(in srgb, var(--color-primary, #5a52e0) 10%, var(--surface, #fff));
+  background: color-mix(in srgb, var(--color-primary, #5a52e0) 10%, var(--surface, var(--surface)));
 }
 .home-tab[aria-selected='true'] .home-tab__label {
-  color: var(--color-primary, #5a52e0);
+  color: var(--color-primary-on-tint);
 }
 .home-tab:focus-visible {
   outline: 3px solid var(--color-primary, #5a52e0);
@@ -12289,7 +12353,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   color: var(--text-muted);
 }
 .roadmap-arrow {
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   font-size: 1.1rem;
   font-weight: 800;
   flex-shrink: 0;
@@ -12409,10 +12473,10 @@ details.story-tool-section[open] > .story-tool-summary::before {
   color: var(--text-muted);
 }
 .journey-stage--current .journey-stage-name {
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 .journey-stage--done .journey-stage-name {
-  color: var(--color-success);
+  color: var(--color-success-text);
 }
 .journey-stage-connector {
   flex: 1;
@@ -12428,7 +12492,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   text-align: center;
 }
 .journey-next-goal strong {
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 
 /* ── DAILY GOAL (now standalone, not inside hero-zone) ────────── */
@@ -12517,7 +12581,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .parent-snapshot__value {
   font-size: var(--font-size-lg, 1.15rem);
   font-weight: 900;
-  color: var(--color-primary-dark, var(--color-primary));
+  color: var(--color-primary-on-tint);
 }
 .parent-snapshot__label {
   font-size: var(--font-size-xs, 0.75rem);
@@ -12597,7 +12661,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .home-parents-btn__arrow {
   font-size: 1.4rem;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   flex-shrink: 0;
 }
 @media (min-width: 600px) {
@@ -12968,7 +13032,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   background: color-mix(in srgb, var(--color-primary) 12%, transparent);
   border-radius: var(--radius-sm);
   padding: 3px 10px;
@@ -13008,7 +13072,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   display: inline-block;
   padding: 0 8px;
   border-bottom: 3px solid var(--color-primary);
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   font-weight: 800;
 }
 .pt-grammar-hint {
@@ -13081,7 +13145,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   padding: 2px var(--space-2);
   border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--color-warning, #f59e0b) 15%, var(--surface));
-  color: var(--color-warning, #f59e0b);
+  color: var(--color-warning-text);
   transition:
     transform 0.15s ease,
     background 0.15s ease;
@@ -13307,7 +13371,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .mcq-rule-example {
   margin: 0;
   font-style: italic;
-  color: var(--color-primary, #6366f1);
+  color: var(--color-primary-on-tint);
   font-size: var(--font-size-base, 1rem);
 }
 .mcq-rule-tip {
@@ -13323,7 +13387,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   background: none;
   border: 1.5px dashed var(--color-primary, #6366f1);
   border-radius: var(--radius-full, 999px);
-  color: var(--color-primary, #6366f1);
+  color: var(--color-primary-on-tint);
   font-size: 0.85rem;
   font-weight: 600;
   padding: 4px 14px;
@@ -13365,7 +13429,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   background: none;
   border: 1.5px dashed var(--color-primary, #6366f1);
   border-radius: var(--radius-full, 999px);
-  color: var(--color-primary, #6366f1);
+  color: var(--color-primary-on-tint);
   font-size: 0.85rem;
   font-weight: 600;
   padding: 4px 14px;
@@ -13454,7 +13518,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .mcq-focus-tip-eg {
   margin: 0 0 var(--space-1, 0.25rem);
   font-size: 0.9rem;
-  color: var(--color-primary, #6366f1);
+  color: var(--color-primary-on-tint);
 }
 .mcq-focus-tip-tip {
   margin: 0;
@@ -13494,7 +13558,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   padding: 3px var(--space-2);
   border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--color-primary) 10%, var(--surface));
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   font-weight: 600;
 }
 
@@ -13560,7 +13624,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   gap: 4px;
   font-size: var(--font-size-xs);
   font-weight: 700;
-  color: var(--color-warning);
+  color: var(--color-warning-on-tint);
   background: var(--color-warning-light);
   border-radius: var(--radius-full);
   padding: 2px 10px;
@@ -13595,13 +13659,13 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-weight: 700;
 }
 .pt-result-row__value--strong {
-  color: var(--color-success);
+  color: var(--color-success-text);
 }
 .pt-result-row__value--moderate {
-  color: var(--color-warning);
+  color: var(--color-warning-text);
 }
 .pt-result-row__value--weak {
-  color: var(--color-error);
+  color: var(--color-error-text);
 }
 
 /* ─── Parent-facing placement report (skill profile + gap callouts) ─── */
@@ -13609,7 +13673,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .pt-result-band {
   margin: 0;
   font-size: var(--font-size-lg);
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   font-weight: 800;
 }
 .pt-section-title {
@@ -14227,7 +14291,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   padding: var(--space-3);
   border: 2px solid var(--color-primary, #4f46e5);
   border-radius: var(--radius-md, 10px);
-  background: color-mix(in srgb, var(--color-primary, #4f46e5) 6%, var(--surface, #fff));
+  background: color-mix(in srgb, var(--color-primary, #4f46e5) 6%, var(--surface, var(--surface)));
 }
 .sfq-reveal-label {
   margin: 0 0 4px;
@@ -14239,7 +14303,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-size: 1.15rem;
   font-weight: 800;
   line-height: 1.4;
-  color: var(--color-primary, #4f46e5);
+  color: var(--color-primary-on-tint);
 }
 .sfq-reveal-yours {
   margin: 0 0 var(--space-2);
@@ -14295,7 +14359,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .sfq-tb-title {
   font-size: var(--font-lg);
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   margin: 0;
 }
 .sfq-tb-rule {
@@ -14562,7 +14626,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 
 .cm-phase-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
   gap: var(--space-3);
 }
 .cm-phase {
@@ -14674,7 +14738,6 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-size: var(--font-xs);
   font-weight: 600;
   color: var(--color-text-muted);
-  white-space: nowrap;
 }
 
 .cm-domain-grid {
@@ -14722,7 +14785,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .cm-domain-pct {
   font-size: var(--font-sm);
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 .cm-domain-desc {
   font-size: var(--font-xs);
@@ -14787,7 +14850,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .sq-level-badge {
   font-size: var(--font-size-xl);
   font-weight: 900;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 .sq-level-name {
   font-size: var(--font-size-sm);
@@ -14802,7 +14865,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .sq-level-progress {
   font-size: var(--font-size-xs);
-  color: var(--color-success);
+  color: var(--color-success-text);
   font-weight: 600;
 }
 
@@ -14966,7 +15029,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .sq-success-heading {
   font-size: var(--font-size-lg);
   font-weight: 800;
-  color: var(--color-success);
+  color: var(--color-success-text);
   margin: 0;
 }
 .sq-success-your-answer {
@@ -15016,7 +15079,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .sq-stat-val {
   font-size: var(--font-size-xl);
   font-weight: 900;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 .sq-stat-lbl {
   font-size: var(--font-size-xs);
@@ -15058,7 +15121,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .sq-skill-table-row--weak .sq-skill-name,
 .sq-skill-table-row--weak .sq-skill-pct {
-  color: var(--color-error);
+  color: var(--color-error-text);
   font-weight: 800;
 }
 .sq-skill-row {
@@ -15364,7 +15427,7 @@ body {
 .home-section-header--collapsible {
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--surface-2) 72%, white),
+    color-mix(in srgb, var(--surface-2) 72%, var(--surface)),
     var(--surface)
   );
   border: 1px solid var(--border);
@@ -15410,7 +15473,7 @@ textarea:hover {
   border: 2px solid color-mix(in srgb, var(--surface-2) 70%, #fff);
 }
 *::-webkit-scrollbar-track {
-  background: color-mix(in srgb, var(--surface-2) 80%, white);
+  background: color-mix(in srgb, var(--surface-2) 80%, var(--surface));
 }
 
 /* Better desktop ergonomics while preserving single-column pedagogy. */
@@ -15659,7 +15722,7 @@ textarea:hover {
   outline-offset: 2px;
 }
 .mission-step--done {
-  background: color-mix(in srgb, var(--color-success, #2e7d32) 12%, #fff);
+  background: color-mix(in srgb, var(--color-success, #2e7d32) 12%, var(--surface));
   border-color: color-mix(in srgb, var(--color-success, #2e7d32) 45%, var(--border));
 }
 .mission-step__num {
@@ -15795,7 +15858,7 @@ textarea:hover {
   border-radius: var(--radius-full, 999px);
 }
 .mistakes-den-row__arrow {
-  color: var(--color-primary, #5a52e0);
+  color: var(--color-primary-on-tint);
   font-weight: 700;
 }
 @media (max-width: 480px) {
@@ -15840,7 +15903,7 @@ textarea:hover {
   margin-bottom: var(--space-5);
 }
 .trophy-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--review-stroke, #ece9ff);
   border-radius: var(--radius-md, 12px);
   padding: var(--space-4);
@@ -15854,7 +15917,7 @@ textarea:hover {
 .trophy-card__value {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--color-primary, #5a52e0);
+  color: var(--color-primary-on-tint);
   margin-top: var(--space-2);
 }
 .trophy-card__label {
@@ -16077,8 +16140,8 @@ textarea:hover {
   margin-left: auto;
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--review-badge-gold, #facc15) 24%, white),
-    white
+    color-mix(in srgb, var(--review-badge-gold, #facc15) 24%, var(--surface)),
+    var(--surface)
   );
   border-color: color-mix(in srgb, var(--review-badge-gold, #facc15) 50%, transparent);
 }
@@ -16121,7 +16184,7 @@ textarea:hover {
   align-items: center;
   gap: var(--space-1);
   padding: var(--space-3);
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--review-stroke, #ece9ff);
   border-radius: var(--radius-md, 12px);
   font-family: inherit;
@@ -16142,7 +16205,7 @@ textarea:hover {
 .sf-tile--locked {
   cursor: default;
   opacity: 0.55;
-  background: color-mix(in srgb, var(--review-stroke, #ece9ff) 50%, #ffffff);
+  background: color-mix(in srgb, var(--review-stroke, #ece9ff) 50%, var(--surface));
   filter: grayscale(0.4);
 }
 .sf-tile__emoji {
@@ -16182,14 +16245,14 @@ textarea:hover {
   max-width: 640px;
   margin: var(--space-6) auto;
   padding: var(--space-8);
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--review-stroke, #ece9ff);
   border-radius: var(--radius-lg, 16px);
   box-shadow: var(--shadow-card, 0 6px 24px rgba(0, 0, 0, 0.06));
   text-align: center;
 }
 .pqc-eyebrow {
-  color: var(--color-primary, #5a52e0);
+  color: var(--color-primary-on-tint);
   font-weight: 700;
   margin: 0 0 var(--space-2) 0;
 }
@@ -16298,6 +16361,63 @@ textarea:hover {
   text-transform: uppercase;
 }
 
+/* The header has to fit. The tagline alone made the brand 431px wide in a
+   header block that does not shrink, so on phones, small tablets and most
+   laptop windows the streak, Switch player, Bedtime, Settings and the parent
+   dashboard were pushed off the right edge — unreachable — and the app was
+   nudged sideways to reveal them, cutting off the left of whatever screen
+   was open. The controls never give way. What does, as the room runs out:
+   the tagline, the XP chip (the level bar under the header shows the same
+   progress), the brand name (the owl is the brand mark), the player's name
+   beside their avatar, and the energy stars. */
+@media (max-width: 1199px) {
+  .app-brand-tag {
+    display: none;
+  }
+}
+@media (max-width: 899px) {
+  .header-stats .stat-chip:nth-child(3) {
+    display: none;
+  }
+}
+@media (max-width: 767px) {
+  .app-brand {
+    display: none;
+  }
+}
+@media (max-width: 599px) {
+  #profile-chip-name {
+    display: none;
+  }
+  .profile-chip {
+    padding: 4px 8px;
+  }
+}
+@media (max-width: 420px) {
+  #energy-chip {
+    display: none;
+  }
+}
+/* The smallest phones: tighter spacing, never smaller buttons. */
+@media (max-width: 360px) {
+  .app-header {
+    padding-inline: var(--space-2);
+    gap: 2px;
+  }
+  .app-header .header-actions {
+    gap: 2px;
+  }
+  .header-stats .stat-chip--streak {
+    padding-inline: 6px;
+  }
+}
+/* Last line of defence: anything added later clips the stats rather than
+   pushing the controls off-screen. */
+.app-header .header-stats {
+  min-width: 0;
+  overflow: hidden;
+}
+
 /* ── Exam Practice Hub ───────────────────────────────────────────────────── */
 .exam-hub-modes {
   display: grid;
@@ -16323,7 +16443,7 @@ textarea:hover {
   border-color: var(--color-primary);
 }
 .exam-hub-mode-btn--active {
-  background: color-mix(in srgb, var(--color-primary) 18%, #fff);
+  background: color-mix(in srgb, var(--color-primary) 18%, var(--surface));
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 30%, transparent);
 }
@@ -16363,7 +16483,7 @@ textarea:hover {
 }
 .paper-section-status--done {
   background: color-mix(in srgb, var(--color-success, #16a34a) 18%, transparent);
-  color: var(--color-success, #16a34a);
+  color: var(--color-success-text);
 }
 .paper-section-status--pending {
   background: color-mix(in srgb, var(--text-muted, #666) 18%, transparent);
@@ -16382,7 +16502,7 @@ textarea:hover {
 
 /* ── Parent Report Card ─────────────────────────────────────────────────── */
 .parent-report-card {
-  background: color-mix(in srgb, var(--color-primary) 8%, #fff);
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--surface));
   border: 2px solid color-mix(in srgb, var(--color-primary) 25%, var(--border));
   border-radius: 16px;
   padding: 16px;
@@ -16489,7 +16609,7 @@ textarea:hover {
   gap: 10px;
 }
 .parent-report-card__cell {
-  background: #fff;
+  background: var(--surface);
   border-radius: 12px;
   border: 1px solid var(--border);
   padding: 10px 12px;
@@ -16530,7 +16650,7 @@ textarea:hover {
   font-size: 0.85rem;
 }
 .parent-report-card__cell--cta {
-  background: color-mix(in srgb, var(--color-warning, #f59e0b) 10%, #fff);
+  background: color-mix(in srgb, var(--color-warning, #f59e0b) 10%, var(--surface));
 }
 .parent-report-card__detail {
   font-size: 0.8rem;
@@ -16539,7 +16659,7 @@ textarea:hover {
 }
 .parent-report-card__teacher {
   margin-top: 10px;
-  background: #fff;
+  background: var(--surface);
   border-radius: 12px;
   border: 1px solid var(--border);
   padding: 10px 12px;
@@ -16602,7 +16722,7 @@ textarea:hover {
 .vstim-sheet {
   border: 2px solid var(--border, #e5e3fa);
   border-radius: var(--radius-md, 10px);
-  background: var(--surface, #fff);
+  background: var(--surface, var(--surface));
   padding: var(--space-4, 16px);
   box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
 }
@@ -16866,7 +16986,7 @@ textarea:hover {
 }
 .open-response__idea--covered {
   background: color-mix(in srgb, var(--color-success) 16%, var(--surface));
-  color: var(--color-success);
+  color: var(--color-success-text);
 }
 .open-response__idea--missing {
   background: color-mix(in srgb, var(--color-warning, #f59e0b) 16%, var(--surface));
@@ -16952,10 +17072,10 @@ textarea:hover {
 }
 .primary-placeholder .p1pt-paper-toggle > summary,
 .primary-placeholder .placeholder-card details summary {
-  color: var(--color-primary);
+  color: var(--color-primary-on-paper);
 }
 .primary-placeholder .p1pt-paper-toggle h4 {
-  color: var(--color-primary-dark, var(--color-primary));
+  color: var(--color-primary-on-paper);
 }
 
 /* ── P1 Practice Tests ─────────────────────────────────────────────────── */
@@ -16968,13 +17088,13 @@ textarea:hover {
 .p1pt-paper-toggle > summary {
   cursor: pointer;
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   padding: 6px 0;
 }
 .p1pt-paper-toggle h4 {
   margin: 14px 0 6px;
   font-size: 0.98rem;
-  color: var(--color-primary-dark, var(--color-primary));
+  color: var(--color-primary-on-paper);
   border-bottom: 1px solid color-mix(in srgb, var(--color-primary) 18%, var(--border));
   padding-bottom: 3px;
 }
@@ -17017,11 +17137,11 @@ textarea:hover {
   display: inline-block;
   padding: 0 4px;
   border-bottom: 2px solid var(--color-primary);
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   font-weight: 700;
 }
 .p1pt-edit {
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   font-weight: 600;
 }
 .p1pt-cloze,
@@ -17047,7 +17167,7 @@ textarea:hover {
 /* ── Practice-test skill chips + practise-link buttons ──────────────────── */
 .ptest-skill-summary {
   font-size: 0.84rem;
-  background: color-mix(in srgb, var(--color-primary) 4%, #fff);
+  background: color-mix(in srgb, var(--color-primary) 4%, var(--surface));
   border-left: 3px solid color-mix(in srgb, var(--color-primary) 50%, var(--border));
   padding: 6px 10px;
   border-radius: 6px;
@@ -17094,7 +17214,7 @@ textarea:hover {
   list-style: decimal inside;
   margin: 4px 0;
   padding-left: 4px;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 6px 10px;
@@ -17183,7 +17303,7 @@ textarea:hover {
 }
 .ptg-timer--up {
   background: color-mix(in srgb, var(--color-error) 12%, #fff);
-  color: var(--color-error);
+  color: var(--color-error-on-tint);
   border-color: var(--color-error);
   animation: none;
 }
@@ -17206,7 +17326,7 @@ textarea:hover {
   padding: 8px 14px;
   border-radius: 8px;
   border: 2px solid var(--border);
-  background: #fff;
+  background: var(--surface);
   color: var(--text-muted, #555);
   font-weight: 600;
   font-size: 0.9rem;
@@ -17218,12 +17338,12 @@ textarea:hover {
 }
 .ptg-mode-btn:hover {
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 .ptg-mode-btn--active {
   border-color: var(--color-primary);
-  background: color-mix(in srgb, var(--color-primary) 12%, #fff);
-  color: var(--color-primary-dark, var(--color-primary));
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--surface));
+  color: var(--color-primary-on-tint);
 }
 .ptg-header h2 {
   margin: 0 0 4px;
@@ -17266,7 +17386,7 @@ textarea:hover {
 }
 .ptg-section-title {
   margin: 0 0 10px;
-  color: var(--color-primary-dark, var(--color-primary));
+  color: var(--color-primary-on-paper);
 }
 .ptg-instructions {
   font-size: 0.92rem;
@@ -17493,7 +17613,7 @@ textarea:hover {
   padding: 4px 0 12px;
 }
 .cc-quest__header {
-  background: color-mix(in srgb, var(--color-primary) 6%, #fff);
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--surface));
   border: 1px solid color-mix(in srgb, var(--color-primary) 22%, var(--border));
   border-radius: 12px;
   padding: 10px 14px;
@@ -17504,7 +17624,7 @@ textarea:hover {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--color-primary-dark, var(--color-primary));
+  color: var(--color-primary-on-tint);
 }
 .cc-quest__blurb {
   margin: 0;
@@ -17568,7 +17688,7 @@ textarea:hover {
 .cc-quest__level-name {
   font-size: 1.1rem;
   font-weight: 800;
-  color: var(--color-primary-dark, var(--color-primary));
+  color: var(--color-primary-on-tint);
 }
 .cc-quest__level-count {
   font-size: 0.78rem;
@@ -17577,7 +17697,7 @@ textarea:hover {
 
 /* passage view */
 .cc-quest__passage {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 14px 16px;
@@ -17608,7 +17728,7 @@ textarea:hover {
   border: 1px solid var(--border);
   border-bottom-width: 2px;
   border-radius: 4px;
-  background: color-mix(in srgb, var(--surface-2) 70%, #fff);
+  background: color-mix(in srgb, var(--surface-2) 70%, var(--surface));
 }
 .cc-quest__text {
   font-size: 1rem;
@@ -17628,12 +17748,17 @@ textarea:hover {
   font: inherit;
   /* iOS won't auto-zoom on focus when font-size >= 16px */
   font-size: max(1rem, 16px);
+  /* A width, not just limits: with none the browser's 20-character default
+     applied, and on a phone every blank wrapped onto a line of its own —
+     "visited the new community library / [ 1 ] / Saturday" — when a cloze is
+     answered by reading across the gap. One word fits in 6em. */
+  width: 6em;
   min-width: 5em;
   max-width: 12em;
   padding: 4px 10px;
   border: 2px solid color-mix(in srgb, var(--color-primary) 30%, var(--border));
   border-radius: 8px;
-  background: color-mix(in srgb, var(--color-primary) 6%, #fff);
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--surface));
   color: inherit;
   text-align: center;
   /* easy tap target on mobile */
@@ -17656,16 +17781,16 @@ textarea:hover {
 }
 .cc-quest__blank--correct {
   border-color: var(--color-success, #22c55e);
-  background: color-mix(in srgb, var(--color-success, #22c55e) 14%, #fff);
+  background: color-mix(in srgb, var(--color-success, #22c55e) 14%, var(--surface));
 }
 .cc-quest__blank--wrong {
   /* not harsh — amber/warning, not red */
   border-color: var(--color-warning, #f59e0b);
-  background: color-mix(in srgb, var(--color-warning, #f59e0b) 16%, #fff);
+  background: color-mix(in srgb, var(--color-warning, #f59e0b) 16%, var(--surface));
 }
 .cc-quest__blank--revealed {
   border-color: color-mix(in srgb, var(--color-primary) 70%, #4b5563);
-  background: color-mix(in srgb, var(--color-primary) 10%, #fff);
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--surface));
   cursor: default;
 }
 .cc-quest__blank-mark {
@@ -17676,7 +17801,7 @@ textarea:hover {
 }
 .cc-quest__blank--correct + .cc-quest__blank-mark,
 .cc-quest__blank-wrap:has(.cc-quest__blank--correct) .cc-quest__blank-mark {
-  color: var(--color-success, #22c55e);
+  color: var(--color-success-text);
 }
 .cc-quest__blank--wrong + .cc-quest__blank-mark,
 .cc-quest__blank-wrap:has(.cc-quest__blank--wrong) .cc-quest__blank-mark {
@@ -17705,7 +17830,7 @@ textarea:hover {
 /* hints + feedback panels */
 .cc-quest__hints,
 .cc-quest__feedback {
-  background: color-mix(in srgb, var(--color-primary) 5%, #fff);
+  background: color-mix(in srgb, var(--color-primary) 5%, var(--surface));
   border: 1px solid color-mix(in srgb, var(--color-primary) 18%, var(--border));
   border-radius: 12px;
   padding: 10px 14px;
@@ -17804,7 +17929,7 @@ textarea:hover {
 }
 .ptg-exam-note--warn {
   border-left-color: var(--color-warning, #f59e0b);
-  background: color-mix(in srgb, var(--color-warning, #f59e0b) 12%, #fff);
+  background: color-mix(in srgb, var(--color-warning, #f59e0b) 12%, var(--surface));
 }
 .ptg-scaffold-hint {
   margin: 0.75rem 0 0.25rem;
@@ -17954,7 +18079,7 @@ textarea:hover {
   justify-content: center;
   gap: 6px;
   padding: var(--space-3, 12px) var(--space-2, 8px);
-  background: var(--surface, #fff);
+  background: var(--surface, var(--surface));
   border: 2px solid var(--border, #e5e3fa);
   border-radius: 14px;
   cursor: pointer;
@@ -18226,10 +18351,10 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   font-weight: 700;
   font-size: 0.9em;
   margin-bottom: 6px;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 .wq-ai-good {
-  color: var(--color-success, #16a34a);
+  color: var(--color-success-text);
   font-weight: 600;
 }
 .wq-ai-list {
@@ -18367,7 +18492,7 @@ body.print-mode > *:not(.print-report-wrapper) > * {
 .read-aloud-btn:hover,
 .read-aloud-btn:focus-visible {
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 .read-aloud-btn[data-speaking='true'] {
   border-color: var(--color-primary);
@@ -18477,7 +18602,7 @@ body.print-mode > *:not(.print-report-wrapper) > * {
 }
 .lc-passage-card {
   padding: var(--space-3, 12px);
-  background: var(--surface, #fff);
+  background: var(--surface, var(--surface));
   border: 2px solid var(--border, #e5e3fa);
   border-radius: 14px;
   cursor: pointer;
@@ -18814,6 +18939,11 @@ body.print-mode > *:not(.print-report-wrapper) > * {
 .journey-map {
   -webkit-mask-image: linear-gradient(to right, #000 85%, transparent 100%);
   mask-image: linear-gradient(to right, #000 85%, transparent 100%);
+}
+/* Focusable so a keyboard can scroll it; this shows where focus is. */
+.journey-map:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
 }
 @media (min-width: 560px) {
   /* Wide enough for the whole path — no overflow, so no fade. */
@@ -19267,7 +19397,7 @@ body.print-mode > *:not(.print-report-wrapper) > * {
 
 .phoneme-tile--target .phoneme-label {
   font-weight: 800;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
 }
 
 /* ── Giri blending guide ──────────────────────────────────────────────────
@@ -19456,11 +19586,11 @@ body.print-mode > *:not(.print-report-wrapper) > * {
    reinforcement only (colour-blind / forced-colors safe). */
 .blend-confirm__card--yes {
   border-color: #2e7d32;
-  background: color-mix(in srgb, #2e7d32 14%, #fff);
+  background: color-mix(in srgb, #2e7d32 14%, var(--surface));
 }
 .blend-confirm__card--no {
   border-color: #c62828;
-  background: color-mix(in srgb, #c62828 12%, #fff);
+  background: color-mix(in srgb, #c62828 12%, var(--surface));
 }
 .blend-confirm__feedback {
   min-height: 1.5em;
@@ -19483,7 +19613,7 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   padding: 10px 12px;
   border-radius: 12px;
   border: 1px dashed var(--border);
-  background: color-mix(in srgb, #718096 6%, #fff);
+  background: color-mix(in srgb, #718096 6%, var(--surface));
 }
 .adult-verdict__legend {
   margin: 0 0 8px;
@@ -19684,10 +19814,10 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   font-weight: 800;
 }
 .story-meta-badge--supported {
-  color: var(--color-warning-shadow);
+  color: var(--color-warning-text);
 }
 .story-meta-badge--independent {
-  color: var(--color-success);
+  color: var(--color-success-text);
 }
 .story-card-support {
   display: inline-block;
@@ -19697,7 +19827,7 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   color: var(--text-2, #475569);
 }
 .story-card-support[data-support='adult'] {
-  color: var(--color-warning-shadow);
+  color: var(--color-warning-text);
 }
 
 /* ── Placement: nonword decoding probe ───────────────────────────────────
@@ -19709,7 +19839,7 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   font-weight: 900;
   letter-spacing: 0.12em;
   text-align: center;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   font-family: var(--font-reading, inherit);
 }
 .pt-item--pseudo .pt-grammar-hint {
@@ -19815,7 +19945,7 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   border: 2px solid var(--color-primary);
   border-radius: var(--radius-md);
   background: transparent;
-  color: var(--color-primary);
+  color: var(--color-primary-on-tint);
   font-family: inherit;
   font-size: 0.9rem;
   font-weight: 800;
