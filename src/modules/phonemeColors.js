@@ -32,16 +32,40 @@ import { PROPER_NOUNS } from './decodability.js';
 
 /**
  * Every sound category the reader colours, with an accessible hue, a child
- * label, and a diacritic/marker for the legend. Vowel categories are used
- * inline; consonant/blend/digraph/affix are only used by the full-breakdown
- * tile panels.
+ * label, and two different marks. Vowel categories are used inline;
+ * consonant/blend/digraph/affix are only used by the full-breakdown tile
+ * panels.
+ *
+ * ── `mark` vs `cue` ───────────────────────────────────────────────────────
+ * `mark` is the glyph for a legend chip or a tile corner — somewhere a child
+ * is looking at one thing at a time and can read `ă` as "the short-a one".
+ *
+ * `cue` is the bare diacritic CSS prints above the vowel in running story
+ * text, and only `short` and `long` carry one. Marking all six categories
+ * was tried and it buried the story: a `∅` over every silent e and a `ə`
+ * over every "the" turned a page of text into a linguistics transcription.
+ * Short and long are the two that appear on every line, the two a phonics
+ * workbook conventionally marks with a breve and a macron, and — measured
+ * below — the weakest of the high-frequency pairs under colour blindness.
+ *
+ * ── How the hues were checked ─────────────────────────────────────────────
+ * Simulated for deuteranopia, protanopia and tritanopia (Viénot 1999) and
+ * compared as CIE76 ΔE. The original orange diphthong failed outright: ΔE
+ * 14.8 against the short-vowel red under deuteranopia and 10.4 under
+ * tritanopia, where under ~15 means "cannot be told apart". It is now the
+ * blue below, whose worst distance against any other vowel colour under any
+ * of the three is ΔE 32, at contrast 5.0:1 on the story's white.
+ *
+ * Residual, stated rather than hidden: schwa and silent are both greys and
+ * sit at ΔE ~19 — close. They are separated by silent letters also being
+ * italic and faded, which is a second channel, not a colour.
  */
 export const SOUND_META = Object.freeze({
-  short:       { label: 'short vowel',   color: '#d62828', mark: 'ă' },
-  long:        { label: 'long vowel',    color: '#1a7f37', mark: 'ā' },
+  short:       { label: 'short vowel',   color: '#d62828', mark: 'ă',  cue: '˘' },
+  long:        { label: 'long vowel',    color: '#1a7f37', mark: 'ā',  cue: '¯' },
   schwa:       { label: 'schwa · lazy “uh”', color: '#6b7280', mark: 'ə' },
   rcontrolled: { label: 'bossy-r vowel', color: '#7c3aed', mark: 'ûr' },
-  diphthong:   { label: 'sliding vowel', color: '#ea580c', mark: 'oi' },
+  diphthong:   { label: 'sliding vowel', color: '#0072c0', mark: 'oi' },
   silent:      { label: 'silent letter', color: '#9aa3af', mark: '∅' },
   consonant:   { label: 'consonant',     color: '#2563eb', mark: '' },
   digraph:     { label: 'digraph',       color: '#0891b2', mark: '' },
@@ -414,6 +438,19 @@ export function vowelSegments(rawWord) {
  * boundaries are the only thing tokenised; punctuation and spacing pass
  * through untouched, and case is preserved. Consonants are left plain so the
  * scaffold reads as a vowel-sound highlighter, not a rainbow.
+ *
+ * ── Why the cue is an attribute, not an element ────────────────────────────
+ * A short or long vowel also carries `data-cue` — the breve or macron that
+ * CSS prints above it, so those two are never told apart by hue alone. See
+ * SOUND_META for why only those two are marked and how the hues were checked.
+ *
+ * It has to be an attribute rendered by a pseudo-element rather than a real
+ * `<sup>`, because three separate features read the rendered word back out of
+ * the DOM as text — the word tap (`storyMode` `.wf-word` handler), the
+ * karaoke word-duration estimate, and Read to Giri's expected-text builder.
+ * A cue letter inside the element would turn "cat" into "căat" for all three.
+ * `textContent` must stay exactly the story's own text.
+ *
  * @param {string} text plain story text (no markup)
  * @returns {string} HTML
  */
@@ -429,9 +466,12 @@ export function soundColoredHtml(text) {
     for (const { len, sound } of segs) {
       const slice = word.slice(pos, pos + len);
       pos += len;
-      out += sound
-        ? `<span class="vs vs--${sound}">${slice}</span>`
-        : slice;
+      if (!sound) {
+        out += slice;
+        continue;
+      }
+      const cue = SOUND_META[sound]?.cue;
+      out += `<span class="vs vs--${sound}"${cue ? ` data-cue="${cue}"` : ''}>${slice}</span>`;
     }
     // Any remainder (shouldn't happen, but be safe).
     if (pos < word.length) out += word.slice(pos);

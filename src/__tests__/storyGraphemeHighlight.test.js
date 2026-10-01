@@ -20,28 +20,45 @@ const { _highlightGraphemes } = await import('../modes/storyMode.js');
 // itself is covered exhaustively in phonemeColors.test.js — here we only
 // check the delegation and that non-letters pass through untouched.
 
+/**
+ * Which letters got which sound class, read out of the markup without
+ * depending on how the attributes happen to be ordered. Asserting on a raw
+ * attribute string is what made these break when the cue letter was added.
+ */
+function classOf(html, letters) {
+  const re = new RegExp(`<span class="vs vs--(\\w+)"[^>]*>${letters}</span>`);
+  return html.match(re)?.[1] ?? null;
+}
+
 describe('_highlightGraphemes (sound-colour scaffold)', () => {
   it('returns empty input untouched', () => {
     expect(_highlightGraphemes('')).toBe('');
   });
 
   it('colours a short vowel', () => {
-    expect(_highlightGraphemes('cat')).toContain('vs--short">a</span>');
+    expect(classOf(_highlightGraphemes('cat'), 'a')).toBe('short');
   });
 
   it('colours a long vowel and its silent e', () => {
     const out = _highlightGraphemes('cake');
-    expect(out).toContain('vs--long">a</span>');
-    expect(out).toContain('vs--silent">e</span>');
+    expect(classOf(out, 'a')).toBe('long');
+    expect(classOf(out, 'e')).toBe('silent');
   });
 
   it('marks the article "a" as schwa', () => {
-    expect(_highlightGraphemes('a')).toContain('vs--schwa">a</span>');
+    expect(classOf(_highlightGraphemes('a'), 'a')).toBe('schwa');
   });
 
   it('leaves consonants and spacing intact', () => {
     const out = _highlightGraphemes('the cat sat');
-    expect(out).toContain('vs--schwa">e</span>'); // schwa e in "the"
+    expect(classOf(out, 'e')).toBe('schwa'); // schwa e in "the"
     expect(out.replace(/<[^>]+>/g, '')).toBe('the cat sat'); // strip spans → original text
+  });
+
+  it('carries the diacritic through, so colour is never the only channel', () => {
+    // A child who cannot tell the short red from the long green still has the
+    // breve and the macron printed above the vowel.
+    expect(_highlightGraphemes('cat')).toContain('data-cue="˘"');
+    expect(_highlightGraphemes('cake')).toContain('data-cue="¯"');
   });
 });

@@ -15,6 +15,9 @@
  * @param {{ comprehension: Array<{q: string, options: string[], answer: number, type: string}>, vocab: Array<{word: string, meaning: string, icon: string}>, grammarSpotlight: Array<{pattern: string, example: string, tip: string}> }} story – the story object
  * @param {() => void}  onDone      – called when child presses "Back to Library"
  */
+import { clueForQuestion } from '../modules/storyClue.js';
+import { html } from '../utils/html.js';
+
 export function runStoryQuest(container, story, onDone) {
   if (!story.comprehension?.length) {
     // Story has no quest data – just go back
@@ -27,6 +30,10 @@ export function runStoryQuest(container, story, onDone) {
     qIndex: 0, // current comprehension question
     vocabIndex: 0, // current vocab card
     correct: 0, // correct comprehension answers
+    firstTry: 0, // right without needing the clue
+    withClue: 0, // right after being sent back to the sentence
+    hadClue: false, // this question has already shown its clue
+    clue: null, // the sentence that answers the current question
     total: story.comprehension.length,
     flipped: false, // for vocab card
   };
@@ -83,6 +90,11 @@ export function runStoryQuest(container, story, onDone) {
     const q = story.comprehension[state.qIndex];
     const qNum = state.qIndex + 1;
     const total = state.total;
+    // Found once per question so a wrong answer can send the child to the
+    // sentence rather than to the answer. Null for the handful of questions
+    // ("what does this story teach us?") whose answer is in no one sentence.
+    state.clue = clueForQuestion(story, q);
+    state.hadClue = false;
 
     container.innerHTML = /* html */ `
       <div class="sq-screen sq-comprehension">
@@ -121,25 +133,62 @@ export function runStoryQuest(container, story, onDone) {
     });
   }
 
+  /**
+   * A wrong answer used to end the question: every option locked and the
+   * right one revealed. That turns "I got it wrong" into a score rather
+   * than into a second go at reading for meaning, which is the skill the
+   * questions are for.
+   *
+   * It is now check → look at the clue → try again → and only then the
+   * answer, with the sentence that proves it. First-time-right and
+   * worked-out-with-a-clue are counted separately, because a teacher wants
+   * to know which it was.
+   */
   function _handleAnswer(btn, q) {
     const chosen = parseInt(btn.dataset.idx, 10);
     const correct = chosen === q.answer;
-    if (correct) state.correct++;
+    const feedback = document.getElementById('sq-feedback');
+    const clue = state.clue;
 
-    // Disable all options
+    if (!correct && !state.hadClue && clue) {
+      // First miss, and there is a sentence to send them to.
+      state.hadClue = true;
+      btn.disabled = true;
+      btn.classList.add('sq-option--wrong');
+      if (feedback) {
+        feedback.hidden = false;
+        feedback.className = 'sq-feedback sq-feedback--retry';
+        feedback.innerHTML = html`Not quite. The story says:
+          <q class="sq-clue">${clue.text}</q> Have another go.`;
+      }
+      return; // the other options stay live
+    }
+
+    if (correct) {
+      if (state.hadClue) state.withClue++;
+      else state.firstTry++;
+      state.correct++;
+    }
+
     document.querySelectorAll('.sq-option').forEach((b, i) => {
       b.disabled = true;
       if (i === q.answer) b.classList.add('sq-option--correct');
       if (i === chosen && !correct) b.classList.add('sq-option--wrong');
     });
 
-    const feedback = document.getElementById('sq-feedback');
     if (feedback) {
       feedback.hidden = false;
       feedback.className = `sq-feedback ${correct ? 'sq-feedback--correct' : 'sq-feedback--wrong'}`;
-      feedback.textContent = correct
-        ? '✅ Great thinking!'
-        : `✨ The answer is: ${q.options[q.answer]}`;
+      if (correct) {
+        feedback.textContent = state.hadClue ? '✅ You found it!' : '✅ Great thinking!';
+      } else {
+        // Showing the answer alone teaches nothing; showing the sentence it
+        // came from is what a child can use next time.
+        feedback.innerHTML = clue
+          ? html`The answer is <strong>${q.options[q.answer]}</strong>. The story says:
+              <q class="sq-clue">${clue.text}</q>`
+          : html`The answer is <strong>${q.options[q.answer]}</strong>.`;
+      }
     }
 
     const nextBtn = document.getElementById('sq-next');
@@ -346,6 +395,14 @@ export function runStoryQuest(container, story, onDone) {
             <span class="sq-xp-label">XP</span>
           </div>
         </div>
+        ${
+          // Right first time and right after looking it up are two different
+          // things, and a grown-up reading this wants to know which. Working
+          // it out from the text is a success, so it is phrased as one.
+          state.withClue
+            ? `<p class="sq-breakdown">${state.firstTry} right first time · ${state.withClue} worked out from the story</p>`
+            : ''
+        }
         <button class="btn btn--primary btn--xl" id="sq-back">
           ← Back to Library
         </button>

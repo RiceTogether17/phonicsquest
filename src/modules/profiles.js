@@ -330,6 +330,9 @@ const PROFILE_SCOPED_BASE_KEYS = [
   'giri_comp_log',
   'lscwc_stats',
   'phonicsquest_badges',
+  // Where the child stopped in each story (storyPlace.js) — scoped from the
+  // start, and listed so deleting a learner removes their bookmarks too.
+  'giri_story_place',
 ];
 
 /**

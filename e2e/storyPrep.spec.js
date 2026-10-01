@@ -82,16 +82,18 @@ test('opening a story lists the words it cannot be sounded out from', async ({ p
   // his, then. The old six-word panel showed fewer, and not these.
   await page.locator('.story-card').nth(3).click();
 
-  const prep = page.locator('.story-prep');
+  // These now live in the one warm-up, which replaced both this panel and
+  // the old gate (see oneReader.spec.js).
+  const prep = page.locator('.warm-up');
   await expect(prep).toBeVisible();
-  await expect(page.locator('#story-prep-title')).toContainText(/Words to know first/i);
+  await expect(prep).toContainText(/Words to know first/i);
 
-  const words = page.locator('.story-prep-word');
-  expect(await words.count()).toBeGreaterThan(6);
+  const words = prep.locator('.story-prep-word');
+  expect(await words.count()).toBe(10);
 
   // The pronoun prints as a capital — the classifier lowercases every token,
   // and a panel teaching sight recognition must not show the wrong shape.
-  const shown = await words.allTextContents();
+  const shown = (await words.allTextContents()).map((t) => t.trim());
   expect(shown).toContain('I');
   expect(shown).not.toContain('i');
 });
