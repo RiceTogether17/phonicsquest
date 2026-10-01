@@ -159,7 +159,7 @@ export function renderBlendLadder(
       list.insertAdjacentHTML(
         'beforeend',
         String(html`<li class="bl-done">
-          Now say the whole word, then tap 🔊 to check. Does it make sense in the sentence?
+          Say the word. Tap 🔊 to check. Then read its sentence again — does it make sense?
         </li>`),
       );
     }

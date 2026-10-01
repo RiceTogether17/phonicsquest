@@ -15860,6 +15860,109 @@ textarea:hover {
   justify-content: center;
   width: 100%;
 }
+/* ── Docked word panel ─────────────────────────────────────────────────
+   Tapping a word docks the blend ladder at the bottom of the screen instead
+   of covering the story, and the story scrolls the tapped word to just above
+   it — so "Does it make sense in the sentence?" can be answered by looking. */
+.word-panel {
+  position: fixed;
+  /* Over the sticky header (100) and the ruler bar; under real modals (1000). */
+  z-index: 900;
+  left: 50%;
+  bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  width: min(560px, calc(100vw - 2 * var(--space-4)));
+  /* Never more than ~60% of the screen: the point is the story above it. */
+  max-height: min(60vh, 60dvh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow:
+    0 -4px 24px rgb(31 35 48 / 16%),
+    0 18px 48px rgb(31 35 48 / 22%);
+  animation: word-panel-in var(--dur-base) ease-out;
+}
+@keyframes word-panel-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 24px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .word-panel {
+    animation: none;
+  }
+}
+.motion-reduced .word-panel {
+  animation: none;
+}
+.word-panel .wd-card {
+  position: relative;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-3);
+}
+.word-panel .wd-word {
+  font-size: 2rem;
+  /* Clear of the close button on a narrow phone. */
+  padding: 0 calc(var(--touch-target) + var(--space-1));
+  line-height: 1.2;
+}
+.wp-close {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: var(--touch-target);
+  height: var(--touch-target);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  color: var(--color-text);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.wp-close:hover {
+  background: color-mix(in srgb, var(--color-text) 14%, transparent);
+}
+.wp-close:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.word-panel .wd-actions {
+  gap: var(--space-2);
+}
+/* On a phone every line the panel takes is a line of story the child cannot
+   see, so it tightens up: the sentence around the word is the point. */
+@media (max-width: 480px) {
+  .word-panel {
+    bottom: calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
+    width: calc(100vw - 2 * var(--space-2));
+    max-height: min(55vh, 55dvh);
+  }
+  .word-panel .wd-card {
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-3) var(--space-2);
+  }
+  .word-panel .wd-word {
+    font-size: 1.6rem;
+  }
+  .word-panel .blend-ladder {
+    gap: var(--space-2);
+  }
+}
+/* The word the panel is about, marked in its sentence. A ring as well as a
+   tint, so it does not rely on colour alone — and distinct from the karaoke
+   highlight, which means "Giri is saying this one". */
+#story-body .wf-word.wf-word--looking {
+  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+  box-shadow: 0 0 0 3px var(--color-primary);
+  text-decoration: none;
+}
 .wd-note {
   font-size: 0.9rem;
   color: var(--text-muted, #475569);

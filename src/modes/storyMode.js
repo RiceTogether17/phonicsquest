@@ -66,6 +66,20 @@ let _activeBand = 'A'; // 'A' | 'B' | 'C' | 'D'
 let _bandAutoPicked = false; // pick the recommended shelf once per session
 let _activeTab = 'band'; // 'band' | 'singapore' | 'chapter'
 let _speaking = false;
+// The line the narration is on, so it can pick up there after a word break.
+let _ttsLine = 0;
+// Bumped on every start and stop of the narration. Its callbacks outlive it —
+// the pause timer between lines, the voice's end and error events (Chrome
+// fires "interrupted" on cancel), the karaoke fallback timers — and each one
+// checks it is still the run it belongs to before doing anything.
+let _ttsRun = 0;
+// The docked word panel: the panel, the word it is about (focus goes back
+// there), the pane given room to scroll, and the observer that keeps the
+// word in sight as the ladder grows.
+let _wordPanel = null;
+let _panelWord = null;
+let _panelRoomHost = null;
+let _panelObserver = null;
 // The story open in the reader. Set when the reader renders, not only when
 // text-to-speech starts, because the ruler and the place tracker need to
 // know which story they are in whether or not anything is being spoken.
@@ -248,6 +262,8 @@ export function showBrowser() {
 
 export function cleanupStoryMode() {
   _stopTTS();
+  // The panel lives on <body>, outside the screen being torn down.
+  _closeWordPanel({ restoreFocus: false });
   _stopFluencyTimer();
   cleanupRecording();
   _resetReadToGiri();
@@ -261,6 +277,7 @@ function _renderBrowser() {
   // Leaving the reader for the library — tear the ruler down, or its
   // ResizeObserver outlives the story it measured.
   _destroyRuler();
+  _closeWordPanel({ restoreFocus: false });
   _unwirePlaceTracking();
   _currentStory = null;
 
@@ -725,8 +742,10 @@ function _renderStory(story) {
   const dynamic = document.getElementById('story-dynamic');
   if (!dynamic) return;
 
-  // This render replaces the story body the ruler measured and overlays.
+  // This render replaces the story body the ruler measured and overlays —
+  // and the word the panel was keeping in sight.
   _destroyRuler();
+  _closeWordPanel({ restoreFocus: false });
 
   // Word spans are always rendered, in both follow modes. They are what makes
   // "👆 Tap a word to hear its sounds" true — that hint is printed
@@ -1041,7 +1060,7 @@ function _renderStory(story) {
       // gesture, so a child never has to choose between "get help with this
       // word" and "keep my place".
       _ruler?.tap(ev.clientY ?? 0, span);
-      _openWordDetective(word);
+      _openWordDetective(word, span);
     };
     span.addEventListener('click', handle);
     span.addEventListener('keydown', (ev) => {
@@ -1380,6 +1399,9 @@ function _onRulerKey(e) {
   if (!_ruler || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
   if (e.target?.closest?.('input, textarea, select, summary, [contenteditable="true"]')) return;
   if (document.querySelector('.modal.active, .modal[open]')) return;
+  // Arrows on the word panel's buttons must not slide the story out from
+  // under the word being worked on.
+  if (e.target?.closest?.('.word-panel')) return;
   const byWord = _rulerMode().id === 'word';
   const act = {
     ArrowDown: () => _ruler.nextLine(),
@@ -1805,25 +1827,37 @@ function _buildSegments(story) {
   return segments;
 }
 
-function _startTTS(story) {
+/**
+ * @param {object} story
+ * @param {number} [fromLine] start at this line instead of the top — used to
+ *   pick the narration back up after the child stopped to work out a word.
+ */
+function _startTTS(story, fromLine = 0) {
   if (!window.speechSynthesis) return;
   _stopTTS();
+  _closeWordPanel({ restoreFocus: false });
 
   _currentStory = story;
   _toggleTTSButtons(true);
   _speaking = true;
 
   const segments = _buildSegments(story);
-  _speakNext(segments, 0);
+  const start = segments.findIndex((s) => s.highlightIdx >= fromLine);
+  _speakNext(segments, Math.max(0, start));
 }
 
-function _speakNext(segments, idx) {
-  if (!_speaking || idx >= segments.length) {
+function _speakNext(segments, idx, run = _ttsRun) {
+  // Stopped, or superseded by a new start. This used to fall through to
+  // "done" — so a Stop pressed in the pause between two lines, or a word
+  // tapped there, finished the story: marked it read and showed the ending.
+  if (run !== _ttsRun || !_speaking) return;
+  if (idx >= segments.length) {
     _onTTSDone();
     return;
   }
 
   const seg = segments[idx];
+  _ttsLine = seg.highlightIdx;
   _highlightLine(seg.highlightIdx);
 
   const utt = new SpeechSynthesisUtterance(seg.text);
@@ -1837,10 +1871,15 @@ function _speakNext(segments, idx) {
   }
 
   utt.onend = () => {
+    if (run !== _ttsRun) return;
     _clearWordHighlight();
-    if (_speaking) setTimeout(() => _speakNext(segments, idx + 1), pauseMs);
+    setTimeout(() => _speakNext(segments, idx + 1, run), pauseMs);
   };
-  utt.onerror = () => _onTTSDone();
+  // Our own cancel arrives here as an "interrupted" error, and a real one
+  // means the voice failed — neither is the child finishing the story.
+  utt.onerror = () => {
+    if (run === _ttsRun) _stopTTS();
+  };
 
   window.speechSynthesis.speak(utt);
 }
@@ -1858,6 +1897,7 @@ function _attachBoundaryListener(utt, lineIndex) {
 
   const wordSpans = lineEl.querySelectorAll('.wf-word');
   if (wordSpans.length === 0) return;
+  const run = _ttsRun;
 
   const lineText = utt.text || '';
   let boundaryFired = false;
@@ -1866,6 +1906,9 @@ function _attachBoundaryListener(utt, lineIndex) {
   let fallbackStarted = false;
 
   function highlightWord(wordIdx) {
+    // A timer from a narration that has since stopped — lighting words and
+    // scrolling now would drag the story out from under the word panel.
+    if (run !== _ttsRun) return;
     if (wordIdx < 0 || wordIdx >= wordSpans.length) return;
     if (wordIdx === lastWordIdx) return;
     lastWordIdx = wordIdx;
@@ -1963,34 +2006,56 @@ function _attachBoundaryListener(utt, lineIndex) {
   fallbackTimers.push(safetyTimer);
 }
 
+// ── The docked word panel ─────────────────────────────────────────────────
+//
+// Tapping a word used to open a modal over the story. The ladder in it ends
+// "Does it make sense in the sentence?" — a question a child cannot answer
+// with the sentence hidden behind a dimmed overlay. Checking a decoded word
+// against its context is the habit that turns sounding-out into reading, so
+// the panel now docks at the bottom of the screen like a card held under the
+// line, and the story scrolls so the tapped word sits just above it, marked,
+// in its sentence. It is not modal: the story stays readable and tappable.
+
 /**
- * Open the Word Detective card for a tapped word. Looks up grapheme
- * breakdown via wordDetective.lookupWord, renders the card into the
- * shared modal body, then mounts the modal. Charter-safe: the "Add to
- * Review Lane" CTA only enables when the word is in the WORDS bank (no
- * stat pollution for story-only names).
+ * Open the panel for a tapped word: the blend ladder, or for a word that
+ * cannot be split (a name, usually) its tiles and a way to hear it.
+ * Charter-safe: the "Add to Review Lane" CTA only appears when the word is in
+ * the WORDS bank (no stat pollution for story-only names).
  *
  * @param {string} text — raw word text from the tapped span
+ * @param {HTMLElement} [span] — the tapped word; kept in sight and marked
+ *   while the panel is open, and given focus back when it closes
  * @private
  */
-function _openWordDetective(text) {
-  const host = document.getElementById('word-detective-content');
-  if (!host) return;
+function _openWordDetective(text, span) {
   // Counted for the ending: "you worked out 3 words by sounding them out" is
   // the one number a beginning reader can be proud of without it being a score.
   _wordsHelped.add(text.toLowerCase().replace(/[^a-z']/g, ''));
-  // Pause any karaoke so the child can focus on the breakdown card.
+  // Pause any karaoke so the child can focus on the word — but remember it
+  // was playing, so the way back can pick it up again at the same line.
+  const wasSpeaking = _speaking;
+  const resumeLine = _ttsLine;
   _stopTTS();
+  _closeWordPanel({ restoreFocus: false });
+
   const info = lookupWordForDetective(text);
-  host.innerHTML = _renderWordDetectiveCard(info);
-  modalManager.open('modal-word-detective');
+  const p = _ensureWordPanel();
+  p.setAttribute('aria-label', `Sound out the word ${info.text}`);
+  p.innerHTML = _renderWordDetectiveCard(info, { resume: wasSpeaking });
+  p.hidden = false;
+  document.body.classList.add('word-panel-open');
+
+  _panelWord = span?.isConnected ? span : null;
+  _panelWord?.classList.add('wf-word--looking');
+  _panelRoomHost = _panelWord
+    ? (_panelWord.closest('.stories-content') ?? scrollHost(_panelWord))
+    : null;
 
   // Tapping a word is one action, so it teaches one thing wherever it is
-  // tapped: the same blend ladder as Sound It Out mode. The card no longer
-  // says the word on open — being told the answer before you have looked at
-  // it is the opposite of sounding it out. "Just hear the word" is one tap
-  // away throughout.
-  const ladderHost = host.querySelector('[data-role="ladder"]');
+  // tapped: the blend ladder. The panel does not say the word on open —
+  // being told the answer before you have looked at it is the opposite of
+  // sounding it out. "Just hear the word" is one tap away throughout.
+  const ladderHost = p.querySelector('[data-role="ladder"]');
   const ladder =
     ladderHost &&
     _mountBlendLadder(
@@ -2000,8 +2065,8 @@ function _openWordDetective(text) {
     );
   if (!ladder) {
     // A proper noun or a name — nothing to split, so hearing it is all this
-    // card can honestly offer.
-    const fallback = host.querySelector('.wd-fallback');
+    // panel can honestly offer.
+    const fallback = p.querySelector('.wd-fallback');
     if (fallback) fallback.hidden = false;
     try {
       audio.speakWord(info.text);
@@ -2010,7 +2075,7 @@ function _openWordDetective(text) {
     }
   }
 
-  host.querySelector('[data-action="hear"]')?.addEventListener('click', () => {
+  p.querySelector('[data-action="hear"]')?.addEventListener('click', () => {
     try {
       audio.speakWord(info.text);
     } catch (_) {
@@ -2018,7 +2083,7 @@ function _openWordDetective(text) {
     }
   });
 
-  const addBtn = host.querySelector('[data-action="add-review"]');
+  const addBtn = p.querySelector('[data-action="add-review"]');
   addBtn?.addEventListener('click', () => {
     if (!info.word) return;
     const ok = addWordToReview(info.word.id);
@@ -2027,19 +2092,132 @@ function _openWordDetective(text) {
       addBtn.textContent = '✓ In your Review Lane';
     }
   });
+
+  p.querySelector('[data-action="close"]')?.addEventListener('click', () => _closeWordPanel());
+  p.querySelector('[data-action="back"]')?.addEventListener('click', () => {
+    _closeWordPanel();
+    if (wasSpeaking && _currentStory) _startTTS(_currentStory, resumeLine);
+  });
+
+  // Straight to the child's next move: the next sound, or for a name, hearing it.
+  const first =
+    p.querySelector('.bl-next:not([hidden])') ??
+    p.querySelector('[data-action="hear"]') ??
+    p.querySelector('[data-action="close"]');
+  first?.focus({ preventScroll: true });
+
+  _keepWordInSight();
+  // The ladder grows a rung at a time and can wrap onto another line, which
+  // makes the panel taller and would slide it up over the word. Re-check
+  // whenever it changes size (and on rotation, which resizes it too).
+  if (typeof ResizeObserver === 'function') {
+    _panelObserver = new ResizeObserver(() => _keepWordInSight());
+    _panelObserver.observe(p);
+  }
+}
+
+/** The panel is created once, on <body>: `#app` clips its overflow. */
+function _ensureWordPanel() {
+  if (_wordPanel?.isConnected) return _wordPanel;
+  const p = document.createElement('aside');
+  p.id = 'word-panel';
+  p.className = 'word-panel';
+  // A non-modal dialog: it has a name and Escape closes it, but the story
+  // behind it is not inert — the child reads the sentence while using it.
+  p.setAttribute('role', 'dialog');
+  p.hidden = true;
+  document.body.appendChild(p);
+  _wordPanel = p;
+  return p;
 }
 
 /**
- * Build the Word Detective card HTML. Pure — takes a lookup result, returns
- * an HTML string with grapheme tiles colour-coded via the existing
- * `.letter-tile--<family>` classes.
+ * Close the panel. Focus goes back to the word that opened it, so a keyboard
+ * or switch user carries on from exactly where they were in the story.
+ *
+ * @param {{restoreFocus?: boolean}} [opts] false when the story is being
+ *   re-rendered or left, and the word is no longer the place to be.
+ */
+function _closeWordPanel({ restoreFocus = true } = {}) {
+  _panelObserver?.disconnect();
+  _panelObserver = null;
+  if (_panelRoomHost) _panelRoomHost.style.paddingBottom = '';
+  _panelRoomHost = null;
+  document.body.classList.remove('word-panel-open');
+  document
+    .querySelectorAll('.wf-word--looking')
+    .forEach((el) => el.classList.remove('wf-word--looking'));
+  const word = _panelWord;
+  _panelWord = null;
+  if (!_wordPanel || _wordPanel.hidden) return;
+  try {
+    audio.cancelSpeech?.();
+  } catch (_) {
+    /* ignore */
+  }
+  _wordPanel.hidden = true;
+  _wordPanel.innerHTML = '';
+  if (restoreFocus && word?.isConnected) word.focus({ preventScroll: true });
+}
+
+/**
+ * Scroll the tapped word to just above the panel, if the panel is covering
+ * it. The pane is first given bottom padding the height of the panel, so a
+ * word on the last line can be lifted clear too.
+ * @private
+ */
+function _keepWordInSight() {
+  const p = _wordPanel;
+  const word = _panelWord;
+  if (!p || p.hidden || !word?.isConnected) return;
+  // Where the panel comes to rest, not where its slide-in has got to: the box
+  // is still easing up for a moment after it opens, and measuring that left
+  // the word tucked against the panel's edge.
+  const bottomGap = parseFloat(getComputedStyle(p).bottom) || 0;
+  const panelTop = window.innerHeight - bottomGap - p.offsetHeight;
+  const host = _panelRoomHost;
+  const hostRect = host?.getBoundingClientRect();
+  if (host && hostRect) {
+    host.style.paddingBottom = `${Math.max(0, Math.ceil(hostRect.bottom - panelTop) + 24)}px`;
+  }
+  const r = word.getBoundingClientRect();
+  const paneTop = hostRect?.top ?? 0;
+  let by = 0;
+  if (r.bottom > panelTop - 16) {
+    // Under the panel: lift it to just above, with breathing room — but never
+    // so far that the word itself goes up under the top of the pane.
+    by = Math.min(r.bottom - panelTop + 32, Math.max(0, r.top - paneTop - 8));
+  } else if (r.top < paneTop + 8) {
+    // Above the pane, which a rotation or a resize re-wrapping the story can
+    // do: bring it back down into the band between the top and the panel.
+    by = r.top - (paneTop + (panelTop - paneTop) * 0.4);
+  }
+  if (by) (host ?? window).scrollBy({ top: by, behavior: _scrollBehavior() });
+}
+
+// Escape closes the panel — unless a modal is open above it, which owns the key.
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape' || !_wordPanel || _wordPanel.hidden) return;
+  if (document.querySelector('.modal-overlay:not([hidden])')) return;
+  e.preventDefault();
+  _closeWordPanel();
+});
+
+/**
+ * Build the panel's HTML. Pure — takes a lookup result, returns an HTML
+ * string with grapheme tiles colour-coded via the shared sound palette.
  *
  * @param {ReturnType<import('../modules/wordDetective.js').lookupWord>} info
+ * @param {{resume?: boolean}} [opts] resume: narration was playing when the
+ *   word was tapped, so the way back offers to carry on listening.
  * @returns {string}
  */
-function _renderWordDetectiveCard(info) {
+function _renderWordDetectiveCard(info, { resume = false } = {}) {
   const escText = (s) =>
-    String(s ?? '').replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c]);
+    String(s ?? '').replace(
+      /[<>&"]/g,
+      (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' })[c],
+    );
 
   // The blend ladder is mounted into the slot below by `_openWordDetective`,
   // and brings its own tiles and its own "hear the word". The coloured tiles
@@ -2056,20 +2234,31 @@ function _renderWordDetectiveCard(info) {
     .join('');
 
   const inBankBlock = info.foundInBank
-    ? `<button class="btn btn--primary" type="button" data-action="add-review" ${info.alreadyTracked ? 'disabled' : ''}>
+    ? `<button class="btn btn--ghost btn--sm" type="button" data-action="add-review" ${info.alreadyTracked ? 'disabled' : ''}>
          ${info.alreadyTracked ? '✓ Already in your Review Lane' : '🎯 Add to my Review Lane'}
        </button>`
     : '';
 
+  // Ghost, not primary: the one filled button in the panel is the child's
+  // next move in the ladder, and two of them compete for the same tap.
+  // The way back says what the child was doing: reading by themselves, or
+  // listening to Giri — in which case it carries on from the same line, so
+  // they hear the word they just worked out in its sentence.
+  const backLabel = resume ? '▶ Keep listening' : '↩ Back to my story';
+
   return `
     <div class="wd-card">
+      <button class="wp-close" type="button" data-action="close" aria-label="Close">✕</button>
       <p class="wd-word">${escText(info.text)}</p>
       <div data-role="ladder"></div>
       <div class="wd-fallback" hidden>
         ${tilesHtml ? `<div class="wd-tiles" aria-label="Sound breakdown">${tilesHtml}</div>` : ''}
         <button class="btn btn--ghost" type="button" data-action="hear">🔊 Hear it</button>
       </div>
-      <div class="wd-actions">${inBankBlock}</div>
+      <div class="wd-actions">
+        <button class="btn btn--ghost btn--sm wp-back" type="button" data-action="back">${backLabel}</button>
+        ${inBankBlock}
+      </div>
     </div>`;
 }
 
@@ -2149,6 +2338,7 @@ function _applyTtsVoice(utt) {
 }
 
 function _stopTTS() {
+  _ttsRun++;
   _speaking = false;
   window.speechSynthesis?.cancel();
   _container
@@ -2159,6 +2349,7 @@ function _stopTTS() {
 }
 
 function _onTTSDone() {
+  _ttsRun++;
   _speaking = false;
   _container
     ?.querySelectorAll('.sline--active')
@@ -2178,6 +2369,7 @@ function _onTTSDone() {
  */
 function _finishStory(story) {
   if (!story) return;
+  _closeWordPanel({ restoreFocus: false });
   markStoryRead(story.id);
   const cta = document.getElementById('story-quest-cta');
   if (cta) cta.hidden = false;
@@ -2412,9 +2604,7 @@ function _renderFriendsCount() {
  * colour and locked friends as silhouettes (NEVER as a "buy with XP"
  * gate — friends are earned by reading, full stop).
  *
- * Reuses the global #modal-word-detective container by ID-mirroring
- * the pattern, but actually creates a fresh DOM node so we don't
- * collide with the Detective modal that lives elsewhere.
+ * Created on demand rather than kept in index.html.
  */
 function _openFriendsGallery() {
   // Lazy-create the modal element so we don't add markup to index.html

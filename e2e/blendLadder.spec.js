@@ -194,7 +194,7 @@ test('the ladder is the same wherever a word is tapped', async ({ page }) => {
     expect(await rungs(page), word).toEqual([]);
     await expect(page.locator('.bl-next')).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(page.locator('#modal-word-detective')).toBeHidden();
+    await expect(page.locator('#word-panel')).toBeHidden();
   }
 });
 
@@ -207,7 +207,7 @@ test('a name falls back to hearing it, rather than a made-up split', async ({ pa
     .locator('#story-body .wf-word', { hasText: /^Giri$/ })
     .first()
     .click();
-  await expect(page.locator('#modal-word-detective')).toBeVisible();
+  await expect(page.locator('#word-panel')).toBeVisible();
   await expect(page.locator('.blend-ladder')).toHaveCount(0);
   await expect(page.locator('.wd-fallback')).toBeVisible();
 });

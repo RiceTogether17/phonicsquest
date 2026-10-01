@@ -97,9 +97,9 @@ test('it says what the child did, in words and not a score', async ({ page }) =>
   // Work two words out with Sound It Out before finishing.
   for (const i of [3, 9]) {
     await page.locator('#story-body .wf-word').nth(i).click();
-    await expect(page.locator('#modal-word-detective')).toBeVisible();
+    await expect(page.locator('#word-panel')).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(page.locator('#modal-word-detective')).toBeHidden();
+    await expect(page.locator('#word-panel')).toBeHidden();
   }
   await readToTheEnd(page);
 

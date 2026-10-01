@@ -133,11 +133,11 @@ test('a word can be tapped in BOTH follow modes', async ({ page }) => {
     expect(await words.count(), `no tappable words in "${mode}" mode`).toBeGreaterThan(0);
 
     await words.first().click();
-    const modal = page.locator('#modal-word-detective');
-    await expect(modal, `tapping a word did nothing in "${mode}" mode`).toBeVisible();
-    await expect(modal.locator('.wd-tile').first()).toBeVisible();
+    const panel = page.locator('#word-panel');
+    await expect(panel, `tapping a word did nothing in "${mode}" mode`).toBeVisible();
+    await expect(panel.locator('.wd-tile, .bl-tile').first()).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(modal).toBeHidden();
+    await expect(panel).toBeHidden();
   }
 });
 
