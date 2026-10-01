@@ -24,9 +24,14 @@ import { store } from '../modules/store.js';
 import { progress } from '../modules/progress.js';
 import { WORDS, getWordsByLevel, getDistractors, shuffleArray } from '../data/words.js';
 import { scoreFluencySprint } from './scoring/fluencySprint.js';
+import { PHONICS_MODES } from './phonicsModes.js';
 
 const SPRINT_MS = 45000;
-const TARGET_WPM = 30; // matches PHONICS_MODES.fluencySprint.masteryCriteria
+// Audit 2026-09-19, finding 26: this was `const TARGET_WPM = 30;` with a
+// comment saying it matched `PHONICS_MODES.fluencySprint.masteryCriteria`.
+// Two copies of one number, kept in step by a comment — which is exactly the
+// parallel-registry drift the finding is about. Read it from the registry.
+const TARGET_WPM = PHONICS_MODES.fluencySprint.masteryCriteria.targetWpm;
 const MIN_POOL = 6;
 
 let _word = null;
@@ -245,13 +250,21 @@ function _finish() {
   const summary = document.createElement('div');
   summary.className = 'fs-summary';
   summary.setAttribute('role', 'status');
+  // Audit 2026-09-19, finding 14: this said "Sprint mastered!" and "words/min".
+  // The mode speaks the target and the child taps its printed match, so what is
+  // timed is auditory-to-print matching, not reading. The evidence layer already
+  // caps the mode at `guided` — the visible result was the part still claiming
+  // more than it measured, and "words/min" reads as an oral reading rate, which
+  // is a figure teachers compare against benchmarks.
   summary.innerHTML = `
-    <div class="fs-summary-headline">${result.correct ? '🏅 Sprint mastered!' : '⏱️ Time!'}</div>
+    <div class="fs-summary-headline">${result.correct ? '🏅 Target pace reached!' : '⏱️ Time!'}</div>
     <div class="fs-summary-stats">
-      <span class="fs-summary-stat"><strong>${wpm}</strong> words/min</span>
+      <span class="fs-summary-stat"><strong>${wpm}</strong> words matched/min</span>
       <span class="fs-summary-stat"><strong>${Math.round(accuracy * 100)}%</strong> accuracy</span>
       <span class="fs-summary-stat"><strong>${correct}/${total}</strong> correct</span>
     </div>
+    <p class="fs-summary-scope">This times how quickly you spot a word you have just
+    heard. It is not a reading-aloud speed.</p>
     ${result.hint ? `<p class="fs-summary-hint">💡 ${result.hint}</p>` : ''}
   `;
   area.querySelector('.fs-round')?.appendChild(summary);

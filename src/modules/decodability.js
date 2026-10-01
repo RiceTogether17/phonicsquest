@@ -108,6 +108,8 @@ export const STORY_PHASES = Object.freeze([
   // The 'digraphs' phase is the consonant-spelling stage: sh ch th wh
   // review (tier-1 code) plus the late spellings tch, dge and ph, taught by
   // the cons-tch-dge and cons-ph lessons at curriculum phase 8.
+  // `tch` and `dge` are trigraphs; the tier id is historical and is persisted
+  // in saved progress, so it is left alone. Audit 2026-09-19, finding 10.
   { id: 'digraphs', tier: 3, curriculumPhase: 8, graphemeBudget: ['tch', 'dge', 'ph'] },
   { id: 'suffixes', tier: 3, curriculumPhase: 9, graphemeBudget: [] },
   { id: 'diphthongs', tier: 4, curriculumPhase: 7, graphemeBudget: ['oi', 'oy', 'ou'] },

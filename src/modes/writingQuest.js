@@ -6,6 +6,7 @@ import {
 } from '../data/writingLessonPacks.js';
 import { store } from '../modules/store.js';
 import { questMastery } from '../modules/questMastery.js';
+import { EVIDENCE } from '../modules/evidence.js';
 import { getLevelInfo } from '../data/curriculum.js';
 import {
   evaluateWriting,
@@ -16,6 +17,8 @@ import {
   DIMENSION_EMOJIS,
   getRubricBand,
   getDimensionBandLabel,
+  describeObserved,
+  HEURISTIC_CAVEAT,
 } from '../modules/writingEvaluator.js';
 import { detectBadges, renderBadgeChips } from '../modules/writingBadges.js';
 import {
@@ -385,6 +388,26 @@ function _renderDimensionBreakdown(result) {
     .join('')}</ul>`;
 }
 
+/**
+ * The draft-check heading: what was counted, then what the count is worth.
+ *
+ * Audit 2026-09-19, finding 19. This line used to read "Writing Coach
+ * Feedback — 🌟 Band 4: Strong ⭐⭐⭐", which is the vocabulary a Singapore
+ * composition rubric uses and reads as a mark on the composition. It is a
+ * word counter's opinion. It now says so, and lists what it actually saw —
+ * including the connectors it found, so a child (or a teacher reading over
+ * their shoulder) can check them against the draft.
+ */
+function _renderDraftCheck(result) {
+  const rubric = getRubricBand(result.score || 0);
+  const observed =
+    result.observedSummary || (result.observed ? describeObserved(result.observed) : '');
+  return `
+    <p><strong>Draft check (automatic)</strong> — ${rubric.emoji} Band ${rubric.band}: ${rubric.label} ${'⭐'.repeat(result.stars || 0)}</p>
+    ${observed ? `<p class="wq-observed">What it counted: ${observed}</p>` : ''}
+    <p class="wq-caveat">${result.caveat || HEURISTIC_CAVEAT}</p>`;
+}
+
 function _renderAiCoachHtml(feedback) {
   // feedback is the sanitised structure from getWritingCoachFeedback, but the
   // model quotes the child's own draft back, so escape every field anyway —
@@ -452,9 +475,8 @@ async function _submitDraft(item, lessonForEval) {
   if (fb) {
     fb.hidden = false;
     fb.className = `sfq-feedback sfq-feedback--${result.passed ? 'success' : 'error'}`;
-    const rubric = getRubricBand(result.score);
     fb.innerHTML = `<p><strong>${result.encouragement}</strong></p>
-      <p><strong>Writing Coach Feedback</strong> — ${rubric.emoji} Band ${rubric.band}: ${rubric.label} ${'⭐'.repeat(result.stars)}</p>
+      ${_renderDraftCheck(result)}
       <p><strong>Mission Progress:</strong> ${missionHits}/${_lastMissionStatus.length || 0}</p>
       <p><strong>Revision Mission:</strong> ${_lastDraftRemediation.title}</p>
       ${_lastDraftRemediation.missingChecks.length ? `<p>Missing checkpoints: ${_lastDraftRemediation.missingChecks.join(' · ')}</p>` : ''}
@@ -505,7 +527,7 @@ function _renderRepair(item) {
     title: 'Polish your draft.',
   };
   const firstBand = _firstResult ? getRubricBand(_firstResult.score || 0) : null;
-  const firstScore = firstBand ? `Band ${firstBand.band} – ${firstBand.label}` : '?';
+  const firstScore = firstBand ? `draft check: Band ${firstBand.band} – ${firstBand.label}` : '?';
   const weakDim = remediation.weakestDimension || _firstResult?.weakest || 'content';
   const weakLabel = _dimensionLabel(weakDim);
   const weakFeedback = _firstResult?.feedback?.[weakDim] || getDimensionFeedback(weakDim, 0.4);
@@ -662,7 +684,13 @@ function _submitRevision(item) {
 
 function _awardLessonRewards(item, result, cmp, badges, missionStatus = []) {
   const skill = item.lessonType || item.mode || 'composition';
-  questMastery.updateSkill('writingQuest', skill, result.passed);
+  // `result.passed` comes from writingEvaluator's text heuristics — connector
+  // spotting, length, word variety. That file says plainly it is not
+  // authoritative assessment, so it is recorded as guided practice and cannot
+  // become a mastery claim. Audit 2026-09-19, findings 3 and 19.
+  questMastery.updateSkill('writingQuest', skill, result.passed, {
+    evidence: EVIDENCE.GUIDED,
+  });
   questMastery.recordAttempt({
     quest: 'writingQuest',
     skill,
@@ -702,10 +730,7 @@ function _renderLessonComplete(item) {
     const cmp = saved.revisionComparison;
     feedbackSummaryHtml = `<div class="wq-feedback-review-panel">
       <strong>Lesson Feedback Summary</strong>
-      ${(() => {
-        const rb = getRubricBand(r.score || 0);
-        return `<p>${rb.emoji} Band ${rb.band}: ${rb.label} ${'⭐'.repeat(r.stars || 0)}</p>`;
-      })()}
+      ${_renderDraftCheck(r)}
       <p>${r.encouragement || ''}</p>
       ${_renderDimensionBreakdown(r)}
       ${cmp?.netImproved ? `<p>📈 Revision improved your writing!</p>` : ''}
@@ -855,9 +880,8 @@ function _renderLegacyPrompt(item) {
     if (fb) {
       fb.hidden = false;
       fb.className = `sfq-feedback sfq-feedback--${result.passed ? 'success' : 'error'}`;
-      const legacyRubric = getRubricBand(result.score || 0);
       fb.innerHTML = `<p><strong>${result.encouragement || (result.passed ? 'Well done!' : 'Keep practising!')}</strong></p>
-        <p><strong>Writing Coach Feedback</strong> — ${legacyRubric.emoji} Band ${legacyRubric.band}: ${legacyRubric.label} ${'⭐'.repeat(result.stars || 0)}</p>
+        ${_renderDraftCheck(result)}
         ${_renderDimensionBreakdown(result)}
         <p style="font-size:0.85em;color:var(--text-muted);margin-top:6px">Review your feedback. Press Continue when ready.</p>
         <div class="sfq-actions" style="margin-top:8px"><button class="btn btn--primary" id="wq-legacy-continue">Continue</button></div>`;
@@ -909,10 +933,7 @@ function _renderFeedbackReviewPanel() {
     </button>
     <div class="wq-review-body" id="wq-review-body" hidden>
       <p><strong>${r.encouragement || ''}</strong></p>
-      ${(() => {
-        const rb = getRubricBand(r.score || 0);
-        return `<p>${rb.emoji} Band ${rb.band}: ${rb.label} ${'⭐'.repeat(r.stars || 0)}</p>`;
-      })()}
+      ${_renderDraftCheck(r)}
       <p>Mission Progress: ${ms.filter((m) => m.hit).length}/${ms.length}</p>
       ${rem?.title ? `<p>Revision Mission: ${rem.title}</p>` : ''}
       ${rem?.missingChecks?.length ? `<p>Missing: ${rem.missingChecks.join(' · ')}</p>` : ''}

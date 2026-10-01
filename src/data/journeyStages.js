@@ -1,3 +1,4 @@
+import { getProfileScopedKey } from '../modules/profiles.js';
 /**
  * PhonicsQuest – The Learning Journey (single source of truth)
  *
@@ -95,11 +96,20 @@ export function journeyStepForMode(modeKey) {
   return null;
 }
 
-const STORIES_READ_KEY = 'giri_stories_read';
+/*
+ * Audit 2026-09-19, finding 4: this key was global, so every child on a shared
+ * device saw the same records. Scoped per profile via getProfileScopedKey, the
+ * mechanism giri_friends_unlocked already used. profiles.js registers the base
+ * name so deleting a profile cleans it up.
+ */
+const STORIES_READ_KEY_BASE = 'giri_stories_read';
+function storiesReadKey() {
+  return getProfileScopedKey(STORIES_READ_KEY_BASE);
+}
 
 function _storiesReadCount() {
   try {
-    const raw = localStorage.getItem(STORIES_READ_KEY);
+    const raw = localStorage.getItem(storiesReadKey());
     const arr = raw ? JSON.parse(raw) : [];
     return Array.isArray(arr) ? arr.length : 0;
   } catch (_) {

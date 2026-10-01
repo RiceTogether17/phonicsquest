@@ -330,7 +330,9 @@ test.describe('while Giri is reading aloud', () => {
 
       await expect(page.locator('.story-ending')).toHaveCount(0);
       expect(
-        await page.evaluate(() => JSON.parse(localStorage.getItem('giri_stories_read') || '[]')),
+        await page.evaluate(() =>
+          JSON.parse(localStorage.getItem('giri_stories_read__p_panel') || '[]'),
+        ),
       ).not.toContain('core-b-01');
       // And it really did stop, rather than carrying on underneath.
       expect(await page.evaluate(() => window.__spoken.length)).toBe(spoken);

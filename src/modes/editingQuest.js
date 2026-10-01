@@ -11,13 +11,19 @@ import { escapeHtml } from '../utils/escapeHtml.js';
 
 // ── Error-specific teach-back content ────────────────────────────────────────
 // Keyed by error.rule (specific) then error.type (grammar|spelling) as fallback.
-const EDITING_TEACHBACK = {
+export const EDITING_TEACHBACK = {
   // Grammar rules
   svAgreement: {
     icon: '👥',
-    rule: 'Subject-verb agreement: singular subjects use singular verbs (adds -s); plural subjects use plural verbs.',
-    example: '"The dog runs fast." (singular) — "The dogs run fast." (plural)',
-    tip: 'Swap the subject with he/she/it — if that sounds right, the verb needs -s.',
+    // Audit 2026-09-19, finding 10: this said singular subjects take verbs
+    // ending in -s with no restriction on tense, which is only true of simple
+    // present lexical verbs. Unrestricted, it licenses "The dog runs yesterday"
+    // and "The dog cans swim", and it makes a child doubt correct past-tense
+    // and modal sentences.
+    rule: 'Subject-verb agreement: in the SIMPLE PRESENT, a singular subject takes a verb ending in -s; a plural subject takes the plain verb.',
+    example:
+      '"The dog runs fast." / "The dogs run fast." — but past tense does not change: "The dog ran." / "The dogs ran."',
+    tip: 'The -s test only applies to the simple present. Swap the subject with he/she/it: if "he ___" sounds right in the present, the verb needs -s. "Be" and "have" have their own forms (is/are, was/were, has/have), and modals never take -s: "she can", never "she cans".',
   },
   tense: {
     icon: '⏱️',
@@ -78,9 +84,13 @@ const EDITING_TEACHBACK = {
   },
   comparatives: {
     icon: '📏',
-    rule: 'Comparative adjectives compare two things. Short adjectives add -er; long ones use "more".',
-    example: '"taller than" · "more expensive than" · "better than" (irregular)',
-    tip: 'Two syllables or more? Use "more + adjective". One syllable? Add "-er". Check irregular forms: good → better, bad → worse.',
+    // Audit 2026-09-19, finding 10: the tip made syllable count an absolute
+    // rule -- "two syllables or more? use more". That marks "happier",
+    // "prettier", "simpler" and "cleverer" as errors, all of which are
+    // standard. Syllable count is a useful first guess, not the rule.
+    rule: 'Comparative adjectives compare two things. Most short adjectives add -er; most long ones use "more".',
+    example: '"taller than" · "happier than" · "more expensive than" · "better than" (irregular)',
+    tip: 'One syllable → add -er (tall → taller). Two syllables ending in -y → change y to i and add -er (happy → happier, easy → easier). Three or more syllables → "more" (more expensive). Two syllables otherwise can go either way, and both are correct: "cleverer" or "more clever", "simpler" or "more simple". Irregulars to learn: good → better, bad → worse, far → further.',
   },
   conjunctions: {
     icon: '🔗',

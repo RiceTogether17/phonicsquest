@@ -7,6 +7,7 @@
  */
 
 import { store } from './store.js';
+import { SYLLABUS_CROSSWALK } from '../data/syllabusCrosswalk.js';
 import { getActiveProfile } from './profiles.js';
 import { humaniseSkill } from './recommendations.js';
 import { WORDS } from '../data/words.js';
@@ -291,12 +292,24 @@ export function getClueInsights() {
   return { questInsights, byType };
 }
 
-export function getMoeOutcomeMappings() {
-  return [
-    { code: 'LO 3.1', focus: 'Decode and blend multi-syllabic words', target: 'blend' },
-    { code: 'LO 4.2', focus: 'Use grammar in context and editing', target: 'cloze-castle' },
-    { code: 'LO 5.2', focus: 'Synthesis and sentence transformation', target: 'sentence-forge' },
-  ];
+/**
+ * Teacher-reviewed syllabus crosswalk rows, if any exist.
+ *
+ * Audit 2026-09-19, finding 25. This used to return three hardcoded rows —
+ * `LO 3.1`, `LO 4.2`, `LO 5.2` — rendered under a heading reading "Syllabus
+ * coverage". Those codes are not MOE references; they were invented here, and
+ * a second, differently-shaped set was invented in `reporting.js`. A parent
+ * reading a code under that heading is being told an external authority
+ * vouched for the mapping.
+ *
+ * The crosswalk is empty until someone can read the syllabus document, so
+ * this returns nothing and the section says so instead. Renamed from
+ * `getMoeOutcomeMappings` because it no longer claims to be MOE's.
+ *
+ * @returns {Array<object>}
+ */
+export function getSyllabusCrosswalkRows() {
+  return SYLLABUS_CROSSWALK.isComplete ? [...SYLLABUS_CROSSWALK.entries] : [];
 }
 
 /**

@@ -120,15 +120,40 @@ export function classifyEvidence({
   hintUsed = false,
   wrongStrikes = 0,
   adultVerdict = null,
+  supportUsed = false,
 } = {}) {
   // An observing adult is the only source that can confirm the child did the
   // work rather than echoed it — including when they report needing help.
   if (adultVerdict === 'independent') return EVIDENCE.VERIFIED;
   if (adultVerdict === 'help' || adultVerdict === 'not-yet') return EVIDENCE.GUIDED;
 
-  const fromAttempt = hintUsed || wrongStrikes > 0 ? EVIDENCE.GUIDED : EVIDENCE.INDEPENDENT;
+  const fromAttempt =
+    hintUsed || wrongStrikes > 0 || supportUsed ? EVIDENCE.GUIDED : EVIDENCE.INDEPENDENT;
 
   return _min(ceiling, fromAttempt);
+}
+
+/**
+ * Modes whose task the `stretchedSpeech` setting makes materially easier.
+ *
+ * Audit 2026-09-19, finding 14: `soundCount` asks how many sounds a word has
+ * and keeps an `independent` ceiling, but with stretched speech on the app
+ * plays the word segmented — it hands the child the phoneme boundaries they
+ * were asked to find. `missingSound` is the same shape. The result was being
+ * classified identically whether or not that support was given.
+ *
+ * Modes that stretch unconditionally (`segment`, `oralSegment`) are absent:
+ * stretching is intrinsic to what they teach, and their ceilings already
+ * account for it. This set is only for support a setting turns on and off.
+ *
+ * The audit's acceptance criterion: the evidence recorded changes when the
+ * support changes.
+ */
+export const STRETCHED_SPEECH_SUPPORTED_MODES = Object.freeze(['soundCount', 'missingSound']);
+
+/** True when this mode's task is eased by stretched speech being on. */
+export function usesStretchedSpeechSupport(modeKey) {
+  return STRETCHED_SPEECH_SUPPORTED_MODES.includes(modeKey);
 }
 
 /**

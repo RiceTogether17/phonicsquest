@@ -336,7 +336,11 @@ const VOCAB_BUILDERS = {
       ['We need to ___ our best in every competition.', 'do', ['put', 'make', 'bring']],
       ['The children ___ a song at the National Day celebration.', 'sang', ['played', 'told', 'acted']],
       ['Could you ___ me a favour and pass the salt?', 'do', ['give', 'make', 'offer']],
-      ['The pupils have to ___ their homework before going home.', 'complete', ['finish off', 'end', 'close']],
+      // Audit 2026-09-19, finding 11: "finish off" was offered as a distractor
+      // and is a perfectly valid answer here, so a child choosing it was marked
+      // wrong for correct English. Replaced with "conclude", which looks
+      // plausible but is not an idiomatic collocation with "homework".
+      ['The pupils have to ___ their homework before going home.', 'complete', ['conclude', 'end', 'close']],
       ['She ___ a deep breath before stepping onto the stage.', 'took', ['made', 'inhaled', 'pulled']],
       ['We should ___ care of our belongings.', 'take', ['do', 'make', 'give']],
       ['The doctor asked the patient to ___ an appointment early.', 'make', ['take', 'put', 'keep']],
@@ -372,7 +376,7 @@ const VOCAB_BUILDERS = {
       { 'do': 'We "do our best" — the fixed collocation for giving maximum effort.', 'put': '"put our best" is incomplete — the idiom is "put our best foot forward", not "put our best".', 'make': '"make our best" is not standard; we "do our best".', 'bring': '"bring our best" is not a fixed collocation.' },
       { 'sang': 'We "sang a song" — the natural verb for performing a vocal piece.', 'played': '"played a song" is used for instruments, not singing.', 'told': '"told a song" is not English — we tell stories, not songs.', 'acted': '"acted a song" is not standard; acting applies to drama.' },
       { 'do': 'We "do a favour" — the fixed collocation; you cannot "give" or "make" a favour.', 'give': '"give a favour" is not the standard collocation.', 'make': '"make a favour" is not standard in English.', 'offer': '"offer a favour" suggests proposing, not the act itself.' },
-      { 'complete': 'We "complete homework" — the precise verb for finishing all required work.', 'finish off': '"finish off" is informal and suggests finishing the last part.', 'end': '"end homework" is not a natural collocation.', 'close': '"close homework" is not a real expression.' },
+      { 'complete': 'We "complete homework" — the standard verb for finishing all the required work.', 'conclude': '"Conclude" fits a speech or a meeting, not homework — we do not say "conclude your homework".', 'end': '"end homework" is not a natural collocation.', 'close': '"close homework" is not a real expression.' },
       { 'took': 'We "took a deep breath" — the fixed collocation for this action.', 'made': '"made a deep breath" is not a standard collocation.', 'inhaled': '"inhaled a deep breath" is redundant — inhaling is part of breathing.', 'pulled': '"pulled a deep breath" is not standard.' },
       { 'take': 'We "take care of" — the fixed phrase for looking after something.', 'do': '"do care of" is not correct.', 'make': '"make care of" is not a real collocation.', 'give': '"give care of" is not standard.' },
       { 'make': 'We "make an appointment" — the standard collocation for booking a time.', 'take': '"take an appointment" is not the standard phrase.', 'put': '"put an appointment" is not an English collocation.', 'keep': '"keep an appointment" means to not miss it — not to book one.' },

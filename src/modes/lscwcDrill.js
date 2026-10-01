@@ -1,3 +1,4 @@
+import { getProfileScopedKey } from '../modules/profiles.js';
 /**
  * PhonicsQuest – Spell-It Drill (Look, Say, Cover, Write, Check)
  *
@@ -31,7 +32,16 @@ import { audio } from '../modules/audio.js';
 
 // ── Persistence keys ──────────────────────────────────────────────────────
 
-const STATS_KEY = 'lscwc_stats';
+/*
+ * Audit 2026-09-19, finding 4: this key was global, so every child on a shared
+ * device saw the same records. Scoped per profile via getProfileScopedKey, the
+ * mechanism giri_friends_unlocked already used. profiles.js registers the base
+ * name so deleting a profile cleans it up.
+ */
+const STATS_KEY_BASE = 'lscwc_stats';
+function statsKey() {
+  return getProfileScopedKey(STATS_KEY_BASE);
+}
 const INPUT_MODE_KEY = 'lscwc_input_mode';
 const STATS_CAP = 200;
 
@@ -123,7 +133,7 @@ export function _shuffleLetters(word, rng = Math.random) {
 /** Append a single attempt for `word` to the stats log. */
 export function _logAttempt(word, correct) {
   try {
-    const raw = localStorage.getItem(STATS_KEY);
+    const raw = localStorage.getItem(statsKey());
     const stats = raw ? JSON.parse(raw) : {};
     const key = String(word).toLowerCase();
     if (!stats[key]) stats[key] = { attempts: 0, correct: 0, lastTs: 0 };
@@ -138,13 +148,13 @@ export function _logAttempt(word, correct) {
       const dropCount = keys.length - STATS_CAP;
       for (let i = 0; i < dropCount; i++) delete stats[sorted[i].k];
     }
-    localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+    localStorage.setItem(statsKey(), JSON.stringify(stats));
   } catch {}
 }
 
 export function _readStats() {
   try {
-    const raw = localStorage.getItem(STATS_KEY);
+    const raw = localStorage.getItem(statsKey());
     return raw ? JSON.parse(raw) : {};
   } catch {
     return {};

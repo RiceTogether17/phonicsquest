@@ -58,7 +58,14 @@ export function isStageHiddenForMode(group, mode) {
 const VOWEL_TYPES = new Set(['sv', 'lv', 'rc', 'dp']);
 
 /**
- * Does the word contain a digraph tile (sh, ch, th, wh, ck, ng, ph, tch, dge)?
+ * Does the word contain a multi-letter one-sound tile (sh, ch, th, wh, ck, ng,
+ * ph, and the trigraphs tch, dge)?
+ *
+ * Named "digraph" throughout for the internal stage it feeds, but tch and dge
+ * are trigraphs -- three letters, one sound. Audit 2026-09-19, finding 10
+ * flagged the same slip in the AI system prompt, where a child could read it.
+ * The child-facing curriculum is correct: Phase 4 "Consonant Digraphs" contains
+ * only sh, ch, th, wh, ck and ng, and tch/dge are taught in a later stage.
  *
  * Digraph words have their own curriculum stage, taught after the blend
  * stages. Counting a digraph as one sound (see getWordStructure) already

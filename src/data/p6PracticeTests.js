@@ -1,14 +1,38 @@
 /**
- * PhonicsQuest – Primary 6 Practice Test Papers
+ * PhonicsQuest – Primary 6 Mixed-Component Practice Papers
  *
- * Four full PSLE-format P6 English practice papers (Term 1–4).
- * These mirror the Singapore P6 Semestral Assessment / PSLE Preliminary
- * format used by mainstream primary schools. All prompts, passages and
- * cloze texts are ORIGINAL content written for PhonicsQuest — only the
- * paper format and skills tested follow the school-paper convention;
- * nothing is reproduced from any published or school paper.
+ * Four original P6 English practice papers (Term 1–4). All prompts, passages
+ * and cloze texts are written for PhonicsQuest; nothing is reproduced from any
+ * published or school paper.
  *
- * Section breakdown per paper (total 95 marks, 1 h 50 min):
+ * ## These are NOT PSLE-format papers
+ *
+ * They were labelled "full PSLE-format" with a "Full Paper 1 + Paper 2
+ * structure". Audit 2026-09-19, finding 1 established that they are not, and
+ * the label is now corrected rather than the papers deleted — the questions
+ * themselves are sound P6 practice, and there is no reason a child should
+ * stop using them. What was wrong was the claim attached to the score.
+ *
+ * Against the SEAB 2026 format (see `examBlueprints.js`):
+ *
+ *   - one 95-mark hybrid here, against Paper 1 (50 marks, 1 h 10 min) and
+ *     Paper 2 (90 marks, 1 h 50 min) there;
+ *   - Continuous Writing (36 marks) does not appear here at all;
+ *   - Situational Writing 15 here, 14 there;
+ *   - Vocabulary Cloze 10 here, 5 there;
+ *   - Comprehension Cloze 10 blanks here, 15 there;
+ *   - Open-ended Comprehension 15 marks / 7–8 questions here, 20 marks /
+ *     10 questions there;
+ *   - Visual Text Comprehension has no dedicated section here.
+ *
+ * So the timing practice and the section weighting rehearse a different
+ * paper, and a percentage from these papers is not a PSLE readiness figure.
+ * Each paper carries `examAlignment` saying so, and
+ * `p6BlueprintHonesty.test.js` fails if a "PSLE format" claim reappears
+ * without a paper that actually satisfies the blueprint.
+ *
+ * Section breakdown per paper (total 95 marks, 1 h 50 min — PhonicsQuest's
+ * own mixed-component structure, not an examination format):
  *   Section A — Grammar MCQ            10 items  10 marks
  *   Section B — Vocabulary MCQ          5 items   5 marks
  *   Section C — Grammar Cloze          10 blanks 10 marks
@@ -39,6 +63,34 @@
 
 import { checkMcqItems, checkSectionMarks, checkEditingErrors } from './practiceTestValidators.js';
 
+/**
+ * What these papers are, stated on every paper so no surface has to guess.
+ *
+ * `matchesOfficialFormat: false` is what stops a UI label, a report line or a
+ * readiness calculation treating a score here as an examination result.
+ * Audit 2026-09-19, finding 1.
+ */
+export const P6_EXAM_ALIGNMENT = Object.freeze({
+  format: 'phonicsquest-p6-mixed',
+  formatLabel: 'PhonicsQuest mixed-component practice',
+  matchesOfficialFormat: false,
+  comparedAgainst: 'SEAB-2026',
+  differences: Object.freeze([
+    'One 95-mark hybrid rather than Paper 1 (50 marks) and Paper 2 (90 marks)',
+    'No Continuous Writing section (36 marks in the examination)',
+    'No dedicated Visual Text Comprehension section',
+    'Situational Writing 15 marks rather than 14',
+    'Vocabulary Cloze 10 marks rather than 5',
+    'Comprehension Cloze 10 blanks rather than 15',
+    'Open-ended Comprehension 15 marks / 7-8 questions rather than 20 marks / 10 questions',
+  ]),
+  /** Shown wherever a score from these papers is reported. */
+  scoreCaveat:
+    'Practice score on PhonicsQuest\'s own paper. Section weighting and timing ' +
+    'differ from the PSLE, and Continuous Writing is not covered, so this is ' +
+    'not a PSLE readiness figure.',
+});
+
 export const P6_PRACTICE_TEST_TERMS = Object.freeze(['T1', 'T2', 'T3', 'T4']);
 
 export const P6_PRACTICE_TESTS = Object.freeze({
@@ -50,10 +102,11 @@ export const P6_PRACTICE_TESTS = Object.freeze({
     id: 'p6-test-term-1',
     term: 'T1',
     level: 'P6',
-    label: 'Term 1 Practice Test (PSLE Grammar Focus)',
+    label: 'Term 1 Practice Test (P6 Grammar Focus)',
     duration: '1 h 50 min',
     totalMarks: 95,
-    blurb: 'P6 Term 1 PSLE-format paper — inversion, causative "have something done", Type 3 conditionals, complex passive. Situational Writing: Formal Letter. Comprehension: coral reef conservation.',
+    examAlignment: P6_EXAM_ALIGNMENT,
+    blurb: 'P6 Term 1 mixed-component practice paper — inversion, causative "have something done", Type 3 conditionals, complex passive. Situational Writing: Formal Letter. Comprehension: coral reef conservation.',
 
     sectionA: {
       title: 'Section A: Grammar MCQ',
@@ -411,12 +464,27 @@ Alex Tan`,
           marks: 1,
           q: 'What percentage of the world\'s coral reefs have been lost since the 1950s?',
           model: 'Half (fifty percent / 50%) of the world\'s coral reefs.',
+          // Audit 2026-09-19, finding 2: a child who wrote "50%" scored zero,
+          // because the only thing to compare against was the whole model
+          // sentence. A one-mark factual answer needs the acceptable forms
+          // listed, not a paragraph.
+          acceptable: [
+            'half',
+            '50%',
+            '50 percent',
+            'fifty percent',
+            'about half',
+            'around half',
+            'half of them',
+            "half of the world's coral reefs",
+          ],
         },
         {
           type: 'vocabulary',
           marks: 1,
           q: 'Find a word in paragraph 2 that means "destroys completely and causes great damage to".',
           model: 'devastate (accept: devastates)',
+          acceptable: ['devastate', 'devastates', 'devastated', 'devastating'],
         },
         {
           type: 'evidence',
@@ -444,7 +512,25 @@ Alex Tan`,
           marks: 1,
           q: 'In paragraph 5, what does Dr Elaine Chong mean when she says the team is "swimming against the tide"?',
           model: 'She means they are working against a powerful opposing force — their efforts are likely to be overwhelmed by the ongoing problem of carbon emissions unless global action is taken.',
-          keywords: ['opposing force', 'overwhelmed', 'carbon emissions', 'tide', 'fighting'],
+          // Audit 2026-09-19, finding 2: "tide" alone scored full marks here.
+          // It was in the keyword list, but it is the idiom's own word --
+          // repeating it explains nothing, which is exactly what this question
+          // asks for. Dropped, and the remaining terms are grouped so the child
+          // has to express the opposing-force idea rather than echo the phrase.
+          requiredGroups: [
+            [
+              'opposing force',
+              'powerful force',
+              'overwhelmed',
+              'losing battle',
+              'uphill battle',
+              'too strong',
+              'outmatched',
+              'cannot keep up',
+              "can't keep up",
+              'working against',
+            ],
+          ],
         },
         {
           type: 'inference',
@@ -491,7 +577,8 @@ Alex Tan`,
     label: 'Term 2 Practice Test (PSLE Vocabulary Focus)',
     duration: '1 h 50 min',
     totalMarks: 95,
-    blurb: 'P6 Term 2 PSLE-format paper — reported speech with embedded questions, causative, inversion. Situational Writing: Email. Comprehension: social media and mental health.',
+    examAlignment: P6_EXAM_ALIGNMENT,
+    blurb: 'P6 Term 2 mixed-component practice paper — reported speech with embedded questions, causative, inversion. Situational Writing: Email. Comprehension: social media and mental health.',
 
     sectionA: {
       title: 'Section A: Grammar MCQ',
@@ -901,7 +988,8 @@ Jordan`,
     label: 'Term 3 Practice Test (PSLE Synthesis Focus)',
     duration: '1 h 50 min',
     totalMarks: 95,
-    blurb: 'P6 Term 3 PSLE-format paper — advanced conditionals, complex reported speech, participial phrases. Situational Writing: Diary Entry. Comprehension: Singapore\'s hawker culture and UNESCO recognition.',
+    examAlignment: P6_EXAM_ALIGNMENT,
+    blurb: 'P6 Term 3 mixed-component practice paper — advanced conditionals, complex reported speech, participial phrases. Situational Writing: Diary Entry. Comprehension: Singapore\'s hawker culture and UNESCO recognition.',
 
     sectionA: {
       title: 'Section A: Grammar MCQ',
@@ -1311,7 +1399,8 @@ Hui Min`,
     label: 'Term 4 Practice Test (Balanced PSLE Review)',
     duration: '1 h 50 min',
     totalMarks: 95,
-    blurb: 'P6 Term 4 comprehensive PSLE mock — full range of grammar structures, rich vocabulary, and complex comprehension. Situational Writing: Speech. Comprehension: climate change and youth activism.',
+    examAlignment: P6_EXAM_ALIGNMENT,
+    blurb: 'P6 Term 4 comprehensive review paper — full range of grammar structures, rich vocabulary, and complex comprehension. Situational Writing: Speech. Comprehension: climate change and youth activism.',
 
     sectionA: {
       title: 'Section A: Grammar MCQ',

@@ -17,6 +17,8 @@
 import { OPEN_COMPREHENSION_PASSAGES } from '../data/openComprehensionPassages.js';
 import { LISTENING_PASSAGES } from '../data/listeningPassages.js';
 import { store } from '../modules/store.js';
+import { questMastery } from '../modules/questMastery.js';
+import { EVIDENCE } from '../modules/evidence.js';
 import { escapeHtml } from '../utils/escapeHtml.js';
 import { attachMcqAnswerLadder } from './mcqFeedback.js';
 
@@ -29,6 +31,21 @@ let _currentPassage = null;
 let _hasListened = false;
 let _currentQ = 0;
 let _scores = [];
+
+/**
+ * Audit 2026-09-19, finding 16: `_scores` was module-local and never
+ * persisted, so a finished listening session left no record at all — the work
+ * disappeared on leaving the section and the daily plan could not know it had
+ * happened.
+ *
+ * Two things are tracked alongside it so the commit can be honest. Indices the
+ * child self-marked are separated from the ones the app marked, because a
+ * self-report is practice and never independent evidence (finding 3). And
+ * committed passage ids make the commit once-per-passage, so returning to the
+ * results screen cannot bank a second attempt.
+ */
+let _selfMarkedIdx = new Set();
+const _committedPassageIds = new Set();
 let _utterance = null;
 
 // ── Speech helpers ────────────────────────────────────────────────────────────
@@ -62,6 +79,7 @@ export function initListeningComp(container, onGoHome) {
   _hasListened = false;
   _currentQ = 0;
   _scores = [];
+  _selfMarkedIdx = new Set();
   _utterance = null;
 }
 
@@ -72,6 +90,7 @@ export function showListeningBrowser() {
   _hasListened = false;
   _currentQ = 0;
   _scores = [];
+  _selfMarkedIdx = new Set();
   _renderBrowser();
 }
 
@@ -254,6 +273,7 @@ function _renderPassageScreen() {
     _stopSpeaking();
     _currentQ = 0;
     _scores = [];
+    _selfMarkedIdx = new Set();
     _renderQuestionsScreen();
   });
 
@@ -447,6 +467,7 @@ function _renderAllQuestions() {
       const idx = parseInt(btn.dataset.qi, 10);
       const mark = btn.dataset.mark;
       _scores[idx] = mark === 'right' ? 1 : 0;
+      _selfMarkedIdx.add(idx);
       const markedEl = document.getElementById(`lc-marked-${idx}`);
       if (markedEl) {
         markedEl.style.display = '';
@@ -552,6 +573,86 @@ function _renderSingleQuestion(qIndex) {
   });
 }
 
+/**
+ * Record one completed listening passage, once.
+ *
+ * Auto-marked questions and self-marked ones are committed separately: the app
+ * marking an MCQ first attempt is independent evidence, while a child marking
+ * their own open answer is a self-report and stays `guided`, which is the rule
+ * finding 3 established for every self-assessed surface.
+ *
+ * Audit 2026-09-19, finding 16.
+ */
+function _commitListeningAttempt(passage, correct, total) {
+  if (!passage?.id || _committedPassageIds.has(passage.id)) return;
+  _committedPassageIds.add(passage.id);
+
+  const autoIdx = [];
+  for (let i = 0; i < total; i++) {
+    if (!_selfMarkedIdx.has(i)) autoIdx.push(i);
+  }
+
+  const autoRight = autoIdx.filter((i) => _scores[i] === 1).length;
+  const selfIdx = [..._selfMarkedIdx].filter((i) => i < total);
+  const selfRight = selfIdx.filter((i) => _scores[i] === 1).length;
+
+  if (autoIdx.length) {
+    questMastery.updateSkill(
+      'listeningComp',
+      'listeningComprehension',
+      autoRight === autoIdx.length,
+      {
+        evidence: EVIDENCE.INDEPENDENT,
+        attemptId: `lc:${passage.id}:auto`,
+      },
+    );
+  }
+
+  if (selfIdx.length) {
+    // Recorded as practice, never as proof.
+    questMastery.updateSkill(
+      'listeningComp',
+      'listeningComprehension',
+      selfRight === selfIdx.length,
+      {
+        evidence: EVIDENCE.GUIDED,
+        attemptId: `lc:${passage.id}:self`,
+      },
+    );
+  }
+
+  questMastery.recordAttempt({
+    quest: 'listeningComp',
+    skill: 'listeningComprehension',
+    correct: correct === total,
+    level: passage.level ?? null,
+  });
+
+  store.recordLearningEvent?.({
+    eventType: 'listening_passage_complete',
+    quest: 'listeningComp',
+    skill: 'listeningComprehension',
+    correct: correct === total,
+    level: passage.level ?? null,
+    meta: {
+      passageId: passage.id,
+      correct,
+      total,
+      autoMarked: autoIdx.length,
+      selfMarked: selfIdx.length,
+    },
+  });
+
+  // Persistent completion, so the section counts like the others.
+  try {
+    const done = { ...(store.get('listeningCompleted') || {}) };
+    done[passage.id] = new Date().toISOString();
+    store.set('listeningCompleted', done);
+  } catch (_) {
+    /* best effort — never block the child's results screen */
+  }
+}
+
 // ── Screen: Results ───────────────────────────────────────────────────────────
 
 function _renderResults() {
@@ -559,6 +660,8 @@ function _renderResults() {
   const p = _currentPassage;
   const total = (p.questions || []).length;
   const correct = _scores.filter((s) => s === 1).length;
+
+  _commitListeningAttempt(p, correct, total);
   const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
 
   let message;

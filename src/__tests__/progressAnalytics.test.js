@@ -174,13 +174,21 @@ describe('getCommonErrorTypes', () => {
 // ── Attempts over time ─────────────────────────────────────────────────
 
 describe('getAttemptsOverTime', () => {
+  // Audit 2026-09-19, finding 23: this fixture used Date.UTC for both `now`
+  // and the attempts. Buckets are learner-local, so in any non-UTC zone the
+  // two landed on different local calendar days and the test failed for
+  // reasons that had nothing to do with the logic — which is exactly how the
+  // real defect stayed hidden in a UTC CI box. Local construction states the
+  // intended timezone: these are all "the same local day the child practised".
+  const localNoon = (y, m, d, h = 12) => new Date(y, m, d, h, 0, 0, 0).getTime();
+
   it('buckets attempts into days and pads missing days', () => {
-    const now = Date.UTC(2026, 4, 19);
+    const now = localNoon(2026, 4, 19);
     const out = getAttemptsOverTime(
       [
-        a({ timestamp: Date.UTC(2026, 4, 19, 10) }),
-        a({ timestamp: Date.UTC(2026, 4, 19, 12), correct: false }),
-        a({ timestamp: Date.UTC(2026, 4, 17, 10) }),
+        a({ timestamp: localNoon(2026, 4, 19, 10) }),
+        a({ timestamp: localNoon(2026, 4, 19, 12), correct: false }),
+        a({ timestamp: localNoon(2026, 4, 17, 10) }),
       ],
       { historyDays: 5, now },
     );
@@ -191,6 +199,50 @@ describe('getAttemptsOverTime', () => {
     expect(out[out.length - 1].correct).toBe(1);
     expect(out[out.length - 2].attempts).toBe(0);
     expect(out[out.length - 3].attempts).toBe(1);
+  });
+
+  it('labels each bucket with the local calendar date, not the UTC one', () => {
+    // The defect itself. _isoDay took local midnight and ran toISOString on
+    // it: in Singapore local midnight on the 21st is 16:00 UTC on the 20th, so
+    // "today" on a parent's chart was labelled yesterday.
+    const now = localNoon(2026, 4, 19);
+    const out = getAttemptsOverTime([], { historyDays: 1, now });
+
+    const d = new Date(now);
+    const expected = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+      d.getDate(),
+    ).padStart(2, '0')}`;
+
+    expect(out[0].date).toBe(expected);
+  });
+
+  it('advances one calendar day at a time, including across a DST boundary', () => {
+    // Subtracting fixed 24-hour blocks skips or repeats a date wherever a local
+    // day is 23 or 25 hours. Late March covers the northern DST change; the
+    // assertion holds in every zone because it checks the sequence, not values.
+    const out = getAttemptsOverTime([], { historyDays: 10, now: localNoon(2026, 2, 31) });
+
+    expect(out).toHaveLength(10);
+    expect(new Set(out.map((b) => b.date)).size).toBe(10); // no repeats
+
+    for (let i = 1; i < out.length; i++) {
+      const prev = new Date(`${out[i - 1].date}T00:00:00Z`);
+      const cur = new Date(`${out[i].date}T00:00:00Z`);
+      const gapDays = Math.round((cur - prev) / 86400000);
+      expect(gapDays, `${out[i - 1].date} → ${out[i].date}`).toBe(1);
+    }
+  });
+
+  it('puts an attempt from late evening on that same local day', () => {
+    // 23:30 local is the case that flips to tomorrow under a UTC label east of
+    // Greenwich, and to yesterday west of it.
+    const now = localNoon(2026, 4, 19);
+    const out = getAttemptsOverTime([a({ timestamp: localNoon(2026, 4, 19, 23) })], {
+      historyDays: 3,
+      now,
+    });
+
+    expect(out[out.length - 1].attempts).toBe(1);
   });
 });
 

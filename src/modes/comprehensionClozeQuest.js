@@ -20,12 +20,31 @@ import {
 } from '../data/comprehensionClozePassages.js';
 import { diagnoseAnswer, stemForBlank } from '../modules/answerDiagnosis.js';
 import { recordMisconceptionsFromReview } from '../modules/teacherFeedback.js';
+import { questMastery } from '../modules/questMastery.js';
+import { store } from '../modules/store.js';
+import { EVIDENCE } from '../modules/evidence.js';
+import { recordClozeCompletion } from './clozeCompletionTracker.js';
 
 let _container = null;
 let _onClose = () => {};
 let _currentLevel = null;
 let _currentPassage = null;
 let _seenPassageIds = new Set();
+
+/**
+ * Audit 2026-09-19, finding 16. Two problems, one cause: nothing about a
+ * committed answer was persisted, and everything that DID fire ran again on
+ * every Check press.
+ *
+ * `_committedPassageIds` makes the commit once-per-passage, so pressing Check
+ * a second time to re-read the explanations cannot bank a second attempt or
+ * re-log the same mistake as a fresh one. `_hintsShown` and `_revealed` track
+ * the support given, so a score reached after hints or a reveal is not
+ * recorded as independent.
+ */
+let _committedPassageIds = new Set();
+let _hintsShown = false;
+let _revealed = false;
 
 /**
  * Mount the Comprehension Cloze quest into a container element.
@@ -39,6 +58,9 @@ export function initComprehensionClozeQuest(container, opts = {}) {
   _currentLevel = null;
   _currentPassage = null;
   _seenPassageIds = new Set();
+  _committedPassageIds = new Set();
+  _hintsShown = false;
+  _revealed = false;
   _renderShell();
   _renderLevelPicker();
 }
@@ -53,6 +75,9 @@ export function cleanupComprehensionClozeQuest() {
   _currentLevel = null;
   _currentPassage = null;
   _seenPassageIds = new Set();
+  _committedPassageIds = new Set();
+  _hintsShown = false;
+  _revealed = false;
 }
 
 // ── render: shell + level picker ────────────────────────────────────────────
@@ -79,15 +104,22 @@ function _renderLevelPicker() {
   const tiles = COMPREHENSION_CLOZE_LEVELS.map((lv) => {
     const count = getComprehensionClozePassages(lv).length;
     return `
-      <button class="cc-quest__level-btn" type="button" data-level="${lv}" aria-label="Open ${lv} comprehension cloze passages">
-        <span class="cc-quest__level-name">${lv}</span>
-        <span class="cc-quest__level-count">${count} passage${count === 1 ? '' : 's'}</span>
-      </button>`;
+      <li class="cc-quest__level-item">
+        <button class="cc-quest__level-btn" type="button" data-level="${lv}" aria-label="Open ${lv} comprehension cloze passages">
+          <span class="cc-quest__level-name">${lv}</span>
+          <span class="cc-quest__level-count">${count} passage${count === 1 ? '' : 's'}</span>
+        </button>
+      </li>`;
   }).join('');
+  // Audit 2026-09-19, finding 20: this was a <div role="list"> whose children
+  // were bare <button>s, which axe reports as a critical
+  // aria-required-children violation — a list that promises list items and has
+  // none leaves a screen-reader user with no item count and no way to navigate
+  // it as a list. Real <ul>/<li> markup with the buttons inside gives both.
   body.innerHTML = `
     <div class="cc-quest__picker">
-      <p class="cc-quest__picker-prompt">Choose a level to begin:</p>
-      <div class="cc-quest__levels" role="list">${tiles}</div>
+      <p class="cc-quest__picker-prompt" id="cc-quest-picker-prompt">Choose a level to begin:</p>
+      <ul class="cc-quest__levels" aria-labelledby="cc-quest-picker-prompt">${tiles}</ul>
     </div>`;
   body.querySelectorAll('[data-level]').forEach((btn) => {
     btn.addEventListener('click', () => _startLevel(btn.dataset.level));
@@ -121,6 +153,10 @@ function _pickNextPassage() {
 // ── render: passage with inputs + buttons ───────────────────────────────────
 
 function _renderPassage(passage) {
+  // Support is per passage, not per session.
+  _hintsShown = false;
+  _revealed = false;
+
   _currentPassage = passage;
   const body = _container?.querySelector('#cc-quest-body');
   if (!body) return;
@@ -196,6 +232,7 @@ function _toggleHints() {
     </ol>`;
   host.dataset.populated = 'true';
   host.hidden = false;
+  _hintsShown = true;
 }
 
 function _checkAnswers() {
@@ -235,16 +272,30 @@ function _checkAnswers() {
     rows.push({ blank, userValue, isCorrect, diagnosis });
   }
 
-  recordMisconceptionsFromReview(
-    rows.map(({ blank, isCorrect, diagnosis }) => ({
-      misconceptionId: diagnosis?.id || null,
-      status: isCorrect ? 'Correct' : 'Try again',
-      skillTag: blank.skill,
-    })),
-    { mode: 'comprehensionCloze' },
-  );
-
   const total = _currentPassage.blanks.length;
+
+  // ── Commit, once per passage ─────────────────────────────────────────────
+  // Audit 2026-09-19, finding 16: this module showed a score and logged
+  // misconceptions but recorded no quest attempt, no mastery and no persistent
+  // completion, so the work vanished on leaving the section and a daily plan
+  // could not know it had happened. Meanwhile the misconception log ran again
+  // on every Check press, turning one mistake into a repeat offence for a
+  // child who pressed Check twice to re-read the explanations.
+  if (!_committedPassageIds.has(_currentPassage.id)) {
+    _committedPassageIds.add(_currentPassage.id);
+
+    recordMisconceptionsFromReview(
+      rows.map(({ blank, isCorrect, diagnosis }) => ({
+        misconceptionId: diagnosis?.id || null,
+        status: isCorrect ? 'Correct' : 'Try again',
+        skillTag: blank.skill,
+      })),
+      { mode: 'comprehensionCloze' },
+    );
+
+    _commitPassageAttempt(rows, correct, total);
+  }
+
   const score = _container?.querySelector('#cc-quest-score');
   if (score) score.textContent = `Score: ${correct} / ${total} correct`;
 
@@ -287,8 +338,85 @@ function _checkAnswers() {
   return { correct, total };
 }
 
+/**
+ * Record one committed pass at a passage.
+ *
+ * Evidence is honest about the support that was given: hints shown or answers
+ * revealed make it `guided`, so a revealed answer can never become an
+ * independent success. Audit 2026-09-19, finding 16.
+ *
+ * @param {Array<{blank: object, isCorrect: boolean}>} rows
+ * @param {number} correct
+ * @param {number} total
+ */
+function _commitPassageAttempt(rows, correct, total) {
+  const supported = _hintsShown || _revealed;
+  const evidence = supported ? EVIDENCE.GUIDED : EVIDENCE.INDEPENDENT;
+
+  // One mastery update per skill this passage exercised, rather than one per
+  // blank, so a passage with four `preposition` blanks is one piece of
+  // evidence about prepositions and not four.
+  const bySkill = new Map();
+  for (const { blank, isCorrect } of rows) {
+    const skill = blank.skill || 'comprehensionCloze';
+    const acc = bySkill.get(skill) || { right: 0, seen: 0 };
+    acc.seen += 1;
+    if (isCorrect) acc.right += 1;
+    bySkill.set(skill, acc);
+  }
+
+  for (const [skill, acc] of bySkill) {
+    questMastery.updateSkill('comprehensionCloze', skill, acc.right === acc.seen, {
+      evidence,
+      attemptId: `ccq:${_currentPassage.id}:${skill}`,
+    });
+  }
+
+  questMastery.recordAttempt({
+    quest: 'comprehensionCloze',
+    skill: rows[0]?.blank?.skill || 'comprehensionCloze',
+    correct: correct === total,
+    level: _currentLevel,
+  });
+
+  store.recordLearningEvent?.({
+    eventType: 'comprehension_cloze_passage',
+    quest: 'comprehensionCloze',
+    level: _currentLevel,
+    correct: correct === total,
+    evidence,
+    meta: {
+      passageId: _currentPassage.id,
+      correct,
+      total,
+      hintsShown: _hintsShown,
+      revealed: _revealed,
+    },
+  });
+
+  // Persistent completion, through the tracker Cloze Castle and Word Vault
+  // already share, so the daily plan and the dashboard count this section the
+  // same way they count the others.
+  try {
+    const next = recordClozeCompletion({
+      level: _currentLevel,
+      category: 'comprehensionCloze',
+      passageId: _currentPassage.id,
+      ccqCompletedByPassage: store.get('ccqCompletedByPassage'),
+      ccqCompleted: store.get('ccqCompleted'),
+      ccqCatCompleted: store.get('ccqCatCompleted'),
+    });
+    store.set('ccqCompletedByPassage', next.nextByPassage);
+    store.set('ccqCompleted', next.nextCompleted);
+    store.set('ccqCatCompleted', next.nextCatCompleted);
+  } catch (_) {
+    /* completion tracking is best-effort; never block the child's feedback */
+  }
+}
+
 function _revealAnswers() {
   if (!_currentPassage) return;
+  _revealed = true;
   for (const blank of _currentPassage.blanks) {
     const input = _container?.querySelector(`.cc-quest__blank[data-num="${blank.num}"]`);
     if (!input) continue;

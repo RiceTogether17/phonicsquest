@@ -5,31 +5,19 @@
 import { store } from './store.js';
 import { VOCAB_CATEGORIES } from '../data/vocabPassages.js';
 import { GRAMMAR_CATEGORIES } from '../data/passages.js';
+import { alignmentFor, describeAlignmentStatus } from '../data/syllabusCrosswalk.js';
 
-const LO_CODE_MAP = {
-  connectorClue: 'LO-ENG-GR-03',
-  contextInference: 'LO-ENG-VOC-02',
-  synonymContrast: 'LO-ENG-VOC-03',
-  definitionMatch: 'LO-ENG-VOC-01',
-  idiomaticExpressions: 'LO-ENG-VOC-05',
-  proverbsSayings: 'LO-ENG-VOC-06',
-  scienceTechTerms: 'LO-ENG-VOC-07',
-  socialStudiesVocab: 'LO-ENG-VOC-08',
-  pronouns: 'LO-ENG-GR-04',
-  svAgreement: 'LO-ENG-GR-05',
-  conditionals: 'LO-ENG-GR-08',
-  passiveVoice: 'LO-ENG-GR-09',
-  reportedSpeech: 'LO-ENG-GR-10',
-  relativeClauses: 'LO-ENG-GR-11',
-  tenses: 'LO-ENG-GR-06',
-  modals: 'LO-ENG-GR-07',
-  morphologicalAffix: 'LO-ENG-VOC-04',
-  collocationCloze: 'LO-ENG-VOC-09',
-  grammaticalRole: 'LO-ENG-VOC-10',
-};
-
+/**
+ * How much a weak category counts when ranking what to practise next.
+ *
+ * Audit 2026-09-19, finding 25: this was headed "MOE/PSLE-heavy grammar
+ * focus", and the recommendation it produced was shown to parents as
+ * "MOE-priority grammar focus: …". These weights are PhonicsQuest's own
+ * editorial judgement about what is worth revisiting. Nobody checked them
+ * against a syllabus, so they may not borrow its authority.
+ */
 const PRIORITY_WEIGHTS = {
-  // MOE/PSLE-heavy grammar focus
+  // Grammar the app weights most heavily in revision.
   pronouns: 1.25,
   connectorClue: 1.2,
   conditionals: 1.2,
@@ -51,7 +39,14 @@ function _priorityScore(row) {
   return (1 - (row.accuracy || 0)) * w + attemptsPenalty;
 }
 
-const MOE_SYLLABUS_LINK = 'https://www.moe.gov.sg/primary/curriculum/syllabus';
+/**
+ * The syllabus index, for a parent who wants to read it themselves.
+ *
+ * It used to hang off every category row beside an invented outcome code,
+ * which read as "this category maps to that syllabus". It is now offered once,
+ * next to `describeAlignmentStatus()`, which says no mapping exists.
+ */
+export const MOE_SYLLABUS_LINK = 'https://www.moe.gov.sg/primary/curriculum/syllabus';
 
 function _accuracy(correct, total) {
   return total > 0 ? correct / total : 0;
@@ -89,9 +84,9 @@ export function getVocabularyCategoryReport() {
     ...r,
     label: VOCAB_CATEGORIES[r.key]?.label || r.key,
     tooltip: VOCAB_CATEGORIES[r.key]?.desc || 'Vocabulary development category',
-    loCode: LO_CODE_MAP[r.key] || 'LO-ENG-VOC',
+    // Null until a teacher-reviewed crosswalk entry exists. Audit finding 25.
+    alignment: alignmentFor(r.key),
     clueSuccess,
-    syllabusLink: MOE_SYLLABUS_LINK,
   }));
 }
 
@@ -111,13 +106,27 @@ export function getGrammarCategoryReport() {
     ...r,
     label: GRAMMAR_CATEGORIES[r.key]?.label || r.key,
     tooltip: `${GRAMMAR_CATEGORIES[r.key]?.label || r.key} mastery`,
-    loCode: LO_CODE_MAP[r.key] || 'LO-ENG-GR',
+    alignment: alignmentFor(r.key),
     clueSuccess,
-    syllabusLink: MOE_SYLLABUS_LINK,
   }));
 }
 
-export function getMoePriorityRecommendations() {
+/**
+ * The categories worth revisiting first, by this app's own weighting.
+ *
+ * Renamed from `getMoePriorityRecommendations` (audit finding 25): the
+ * priority is PhonicsQuest's, not MOE's.
+ */
+/**
+ * What the app may claim about syllabus alignment, and the link to read it.
+ *
+ * One place, one sentence. Audit finding 25.
+ */
+export function getAlignmentDisclosure() {
+  return { statement: describeAlignmentStatus(), syllabusLink: MOE_SYLLABUS_LINK };
+}
+
+export function getPracticePriorityRecommendations() {
   const vocab = getVocabularyCategoryReport()
     .map((r) => ({ ...r, priorityScore: _priorityScore(r) }))
     .sort((a, b) => b.priorityScore - a.priorityScore)
@@ -168,7 +177,7 @@ export function getLearningFunnelReport({ days = 7 } = {}) {
 }
 
 export function getAdaptiveLessonQueue({ limit = 6 } = {}) {
-  const { vocab, grammar } = getMoePriorityRecommendations();
+  const { vocab, grammar } = getPracticePriorityRecommendations();
   const funnel = getLearningFunnelReport({ days: 7 });
 
   const queue = [];
@@ -177,7 +186,7 @@ export function getAdaptiveLessonQueue({ limit = 6 } = {}) {
       quest: 'wordVault',
       skill: r.key,
       label: r.label,
-      loCode: r.loCode,
+      alignment: r.alignment,
       reason: `Low mastery (${Math.round(r.accuracy * 100)}%) in ${r.label}`,
       targetAccuracy: 0.85,
     });
@@ -187,8 +196,8 @@ export function getAdaptiveLessonQueue({ limit = 6 } = {}) {
       quest: 'clozeCastle',
       skill: r.key,
       label: r.label,
-      loCode: r.loCode,
-      reason: `MOE-priority grammar focus: ${r.label}`,
+      alignment: r.alignment,
+      reason: `Grammar we weight highly in revision: ${r.label}`,
       targetAccuracy: 0.85,
     });
   }
@@ -199,7 +208,6 @@ export function getAdaptiveLessonQueue({ limit = 6 } = {}) {
       quest: 'sentenceForge',
       skill: 'fluency',
       label: 'Sentence fluency sprint',
-      loCode: 'LO-ENG-FLUENCY',
       reason: `Average response time is ${funnel.avgResponseMs}ms (target < 3000ms).`,
       targetAccuracy: 0.8,
     });

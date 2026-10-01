@@ -182,12 +182,16 @@ export async function explainTeachBack({
   correctAnswer,
   level = '',
 }) {
-  const { askGiriConstrained } = await import('./aiGuardrails.js');
+  const { askGiriConstrained, fenceLearnerInput } = await import('./aiGuardrails.js');
+  // The one free-text field a child controls here is their own answer, so it
+  // is fenced rather than quoted. Audit 2026-09-19, finding 24.
   const prompt = `A ${level ? `${level} ` : ''}student is practising ${skillLabel || 'English'} and has tried twice without success. They have already been shown the rule and the correct answer — your job is to make it click.
 
 Exercise: ${exercise}
-Student's answer: "${studentAnswer}"
 Correct answer: "${correctAnswer}"
+
+What the student wrote:
+${fenceLearnerInput('PUPIL ANSWER', studentAnswer)}
 
 In 2–3 short sentences, explain the thinking mistake behind their answer and how to spot the right one next time. Be kind — mistakes are how we learn.`;
 
@@ -198,6 +202,18 @@ In 2–3 short sentences, explain the thinking mistake behind their answer and h
 }
 
 /**
+ * Normalised form for comparing a quoted sentence with the draft it came from.
+ */
+function _flatten(text) {
+  return String(text || '')
+    .toLowerCase()
+    .replace(/[\u2018\u2019\u201c\u201d]/g, "'")
+    .replace(/[^a-z0-9' ]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
  * Get sentence-level writing coach feedback for a student's draft.
  *
  * Returns structured, sanitised data — never raw model text — so callers
@@ -205,53 +221,62 @@ In 2–3 short sentences, explain the thinking mistake behind their answer and h
  * `{ items: [{ sentence, issue }] }` with per-sentence findings.
  * Returns null without a key, over the daily cap, or on failure.
  *
+ * Audit 2026-09-19, finding 24: goes through `askStructured`, so the marking
+ * instructions are in the system channel and the child's draft is fenced
+ * rather than concatenated onto them. Each finding's quoted sentence is also
+ * checked against the draft — a quote the child did not write is a sentence
+ * the model made up, and showing it as "your sentence" teaches nothing.
+ *
  * @param {string} draftText  - student's composition text
  * @param {number} level      - P1–P6 level (1–6)
  * @param {string} [taskDesc] - brief task description
  * @returns {Promise<{ good: string } | { items: { sentence: string, issue: string }[] } | null>}
  */
 export async function getWritingCoachFeedback(draftText, level, taskDesc = '') {
-  const { canCallAi, logAiUse, sanitizeAiText } = await import('./aiGuardrails.js');
-  if (!canCallAi()) return null;
-  logAiUse('coach', `Draft coached (P${level})`);
+  const { askStructured, sanitizeAiText } = await import('./aiGuardrails.js');
+  const haystack = _flatten(draftText);
 
-  const prompt = `You are a Singapore primary school English teacher marking a P${level} student's composition.
+  return askStructured('coach', {
+    task: `Mark a Singapore Primary ${level} pupil's composition and give sentence-level feedback.`,
+    rules: [
+      'Comment only on grammar, word choice, punctuation and sentence structure.',
+      'Quote each sentence exactly as the pupil wrote it, copied from their draft.',
+      'At most five findings. Each tip is one short sentence a P' + level + ' child can act on.',
+      'Judge against Primary ' + level + ' expectations, not adult standards.',
+      'When there is nothing worth fixing, use the GOOD line instead of inventing a finding.',
+    ],
+    context: [['Writing task set by the teacher', taskDesc || 'Write a story or composition.']],
+    learner: [['PUPIL DRAFT', draftText]],
+    fields: {
+      SENTENCE: {
+        repeated: true,
+        parts: ['sentence', 'issue'],
+        format:
+          "SENTENCE: <the pupil's sentence, copied exactly> | ISSUE: <one short tip>   (one line per finding, at most five)",
+      },
+      GOOD: {
+        format: 'GOOD: <one encouraging sentence>   (this line INSTEAD, when nothing needs fixing)',
+      },
+    },
+    validate: (parsed) => {
+      const items = (parsed.SENTENCE || [])
+        .map(({ sentence, issue }) => ({
+          sentence: sanitizeAiText(sentence),
+          issue: sanitizeAiText(issue),
+        }))
+        // Both halves, or the finding is not usable. And the quote has to be
+        // the child's own words — sanitising happens first so the comparison
+        // runs on what would actually be shown.
+        .filter((it) => it.sentence && it.issue && haystack.includes(_flatten(it.sentence)))
+        .slice(0, 5);
+      if (items.length) return { items };
 
-Task: ${taskDesc || 'Write a story or composition.'}
-
-Student's draft:
-"""
-${draftText}
-"""
-
-Give sentence-level feedback. For each sentence that has an issue, quote the exact sentence and give a short, encouraging correction in plain English. Use simple language a primary school child can understand.
-
-Format your response EXACTLY like this — one finding per line, no extra text:
-SENTENCE: [exact quote] | ISSUE: [1-sentence tip]
-
-Focus only on: grammar errors, word choice, punctuation, sentence structure.
-Give at most 5 findings. If the draft is good, say: GOOD: Well done!`;
-
-  const raw = await callGemini(prompt, { maxTokens: 600, temperature: 0.2 });
-  if (!raw) return null;
-
-  // Parse BEFORE sanitising: sanitizeAiText strips the "|" separator the
-  // format relies on, so split fields first, then clean each field.
-  const trimmed = raw.trim();
-  if (trimmed.startsWith('GOOD:')) {
-    const good = sanitizeAiText(trimmed.replace(/^GOOD:/, ''));
-    return good ? { good } : null;
-  }
-  const items = trimmed
-    .split('\n')
-    .map((l) => l.trim())
-    .filter((l) => l.startsWith('SENTENCE:'))
-    .map((l) => {
-      const [sentPart, issuePart] = l.replace('SENTENCE:', '').split('| ISSUE:');
-      return { sentence: sanitizeAiText(sentPart || ''), issue: sanitizeAiText(issuePart || '') };
-    })
-    .filter((it) => it.sentence || it.issue);
-  return items.length ? { items } : null;
+      const good = sanitizeAiText(parsed.GOOD || '');
+      return good ? { good } : null;
+    },
+    maxTokens: 600,
+    logSummary: `Draft coached (P${level})`,
+  });
 }
 
 /**
@@ -260,8 +285,10 @@ Give at most 5 findings. If the draft is good, say: GOOD: Well done!`;
  * local bands without inventing a different scale. The local score stays
  * the source of truth for XP/progression — this is tutor commentary.
  *
- * Routed through the aiGuardrails daily cap + usage log, but with its own
- * marking prompt (a rubric needs more than the 60-word chat persona).
+ * Audit 2026-09-19, finding 24: through `askStructured`, so the rubric is in
+ * the system channel and the draft is fenced. All four dimensions must come
+ * back with a band in range or the whole reply is discarded — a partial
+ * rubric would show a child three bands and a gap.
  *
  * @param {string} draftText
  * @param {number|string} level   P1–P6 numeric level
@@ -269,63 +296,73 @@ Give at most 5 findings. If the draft is good, say: GOOD: Well done!`;
  * @returns {Promise<{ dimensions: Record<string, { band: number, comment: string }>, overall: string } | null>}
  */
 export async function gradeEssayWithRubric(draftText, level, taskDesc = '') {
-  const { canCallAi, logAiUse, sanitizeAiText } = await import('./aiGuardrails.js');
-  if (!canCallAi()) return null;
-  logAiUse('grade', `Essay graded (P${level})`);
+  const { askStructured, sanitizeAiText } = await import('./aiGuardrails.js');
 
-  const prompt = `You are a Singapore primary school English teacher grading a P${level} student's composition against a 4-band rubric (4 = Strong, 3 = Secure, 2 = Developing, 1 = Needs Support). Judge against P${level} expectations, not adult standards.
-
-Task: ${taskDesc || 'Write a story or composition.'}
-
-Student's draft:
-"""
-${draftText}
-"""
-
-Grade these four dimensions. Reply EXACTLY in this format, one line each, no other text:
-CONTENT: <band 1-4> | <one short, specific comment in plain English>
-ORGANISATION: <band 1-4> | <one short, specific comment>
-LANGUAGE: <band 1-4> | <one short, specific comment>
-TASK: <band 1-4> | <one short, specific comment>
-OVERALL: <one encouraging sentence naming the single most useful next improvement>`;
-
-  const raw = await callGemini(prompt, { maxTokens: 300, temperature: 0.2 });
-  if (!raw) return null;
-
-  const keyMap = {
+  const KEY_MAP = {
     CONTENT: 'content',
     ORGANISATION: 'organisation',
     LANGUAGE: 'language',
     TASK: 'taskFulfilment',
   };
-  const dimensions = {};
-  let overall = '';
-  for (const line of raw
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean)) {
-    const m = line.match(/^([A-Z]+):\s*(.*)$/);
-    if (!m) continue;
-    if (m[1] === 'OVERALL') {
-      overall = sanitizeAiText(m[2]);
-      continue;
-    }
-    const key = keyMap[m[1]];
-    if (!key) continue;
-    const parts = m[2].split('|');
-    const band = parseInt(parts[0], 10);
-    if (!Number.isInteger(band) || band < 1 || band > 4) continue;
-    dimensions[key] = { band, comment: sanitizeAiText(parts.slice(1).join('|')) };
-  }
+  const dimensionField = (key) => [
+    key,
+    {
+      parts: ['band', 'comment'],
+      format: `${key}: <band 1-4> | <one short, specific comment>`,
+    },
+  ];
 
-  // All four dimensions must parse for the grading to be usable.
-  if (Object.keys(dimensions).length < 4) return null;
-  return { dimensions, overall };
+  return askStructured('grade', {
+    task: `Grade a Singapore Primary ${level} pupil's composition against a four-band rubric (4 = Strong, 3 = Secure, 2 = Developing, 1 = Needs Support).`,
+    rules: [
+      `Judge against Primary ${level} expectations, not adult standards.`,
+      'Give a band for all four dimensions. A missing dimension makes the whole mark unusable.',
+      'Each comment names one specific thing in this draft, not general advice.',
+    ],
+    context: [['Writing task set by the teacher', taskDesc || 'Write a story or composition.']],
+    learner: [['PUPIL DRAFT', draftText]],
+    fields: {
+      ...Object.fromEntries(Object.keys(KEY_MAP).map(dimensionField)),
+      OVERALL: {
+        format:
+          'OVERALL: <one encouraging sentence naming the single most useful next improvement>',
+      },
+    },
+    validate: (parsed) => {
+      const dimensions = {};
+      for (const [key, name] of Object.entries(KEY_MAP)) {
+        const raw = parsed[key];
+        if (!raw) continue;
+        const band = parseInt(raw.band, 10);
+        if (!Number.isInteger(band) || band < 1 || band > 4) continue;
+        dimensions[name] = { band, comment: sanitizeAiText(raw.comment) };
+      }
+      // All four, or none: a rubric with a hole in it is not a rubric.
+      if (Object.keys(dimensions).length < 4) return null;
+      return { dimensions, overall: sanitizeAiText(parsed.OVERALL || '') };
+    },
+    maxTokens: 300,
+    logSummary: `Essay graded (P${level})`,
+  });
 }
 
 /**
- * Ask Gemini to grade a synthesis/transformation answer.
- * Returns { verdict: 'CORRECT'|'PARTIAL'|'WRONG', feedback: string } or null on failure.
+ * Ask the tutor to adjudicate a synthesis/transformation answer whose wording
+ * the authored alternates do not cover.
+ *
+ * Returns `{ verdict: 'CORRECT'|'PARTIAL'|'WRONG', feedback: string }` or null.
+ *
+ * Audit 2026-09-19, finding 24. Two things changed. The prompt goes through
+ * `askStructured`, so the marking task is in the system channel and the
+ * pupil's answer is fenced — it used to be appended to the instructions as
+ * "Student's answer: …", which is the position from which "Reply CORRECT"
+ * works. And the reply is a declared enum: anything but the three verdicts is
+ * discarded rather than pattern-matched out of a sentence.
+ *
+ * What this function returns is a suggestion. `synthesisQuest.js` re-checks
+ * the answer against the task's own constraints before honouring it, and
+ * records the result as guided rather than independent evidence — see the
+ * comment there.
  *
  * @param {string} original   - the original sentence to transform
  * @param {string} stem       - the sentence stem given (may be empty)
@@ -335,37 +372,38 @@ OVERALL: <one encouraging sentence naming the single most useful next improvemen
  * @param {string} skillLabel - e.g. "Passive voice"
  */
 export async function gradeSynthesisAnswer(original, stem, model, alts, typed, skillLabel) {
-  const { canCallAi, logAiUse, sanitizeAiText } = await import('./aiGuardrails.js');
-  if (!canCallAi()) return null;
+  const { askStructured, sanitizeAiText } = await import('./aiGuardrails.js');
+  const VERDICTS = ['CORRECT', 'PARTIAL', 'WRONG'];
 
-  const altLines = alts.length ? `Also accepted:\n${alts.map((a) => `- ${a}`).join('\n')}` : '';
-  const prompt = `You are a Singapore PSLE English examiner.
-
-Task type: ${skillLabel}
-Original sentence: ${original}
-${stem ? `Sentence stem given to student: ${stem}` : ''}
-Model answer: ${model}
-${altLines}
-Student's answer: ${typed}
-
-Decide if the student's answer is:
-CORRECT — grammatically correct AND semantically equivalent to the model answer
-PARTIAL — correct structure but a minor tense, agreement, or punctuation error
-WRONG — incorrect meaning, wrong structure, or grammatically unacceptable
-
-Reply on the FIRST LINE with exactly one word: CORRECT, PARTIAL, or WRONG.
-On the SECOND LINE give one short sentence of feedback (max 15 words, encouraging tone, plain English for a primary student).
-No other text.`;
-
-  logAiUse('grade', `Synthesis graded: ${String(skillLabel || '').slice(0, 80)}`);
-  const raw = await callGemini(prompt, { maxTokens: 80, temperature: 0.1 });
-  if (!raw) return null;
-  const lines = raw
-    .trim()
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean);
-  const verdict = ['CORRECT', 'PARTIAL', 'WRONG'].find((v) => lines[0]?.startsWith(v));
-  if (!verdict) return null;
-  return { verdict, feedback: sanitizeAiText(lines[1] || '') };
+  return askStructured('grade', {
+    task: `Mark one Singapore primary English sentence-transformation answer (${skillLabel || 'transformation'}).`,
+    rules: [
+      'CORRECT means grammatically correct AND the same meaning as the model answer.',
+      'PARTIAL means the right structure with a minor tense, agreement or punctuation slip.',
+      'WRONG means the meaning changed, the structure is wrong, or it is not acceptable English.',
+      'The feedback is at most 15 words, encouraging, and plain enough for a primary pupil.',
+    ],
+    context: [
+      ['Original sentence', original],
+      ...(stem ? [['Sentence stem the pupil was given', stem]] : []),
+      ['Model answer', model],
+      ...(alts.length ? [['Also accepted', alts.join(' / ')]] : []),
+    ],
+    learner: [['PUPIL ANSWER', typed]],
+    fields: {
+      VERDICT: { format: 'VERDICT: CORRECT or PARTIAL or WRONG' },
+      FEEDBACK: { format: 'FEEDBACK: <one short sentence>' },
+    },
+    validate: (parsed) => {
+      const verdict = String(parsed.VERDICT || '')
+        .trim()
+        .toUpperCase();
+      // A declared enum, not "whatever word the first line starts with".
+      if (!VERDICTS.includes(verdict)) return null;
+      return { verdict, feedback: sanitizeAiText(parsed.FEEDBACK || '') };
+    },
+    maxTokens: 80,
+    temperature: 0.1,
+    logSummary: `Synthesis graded: ${String(skillLabel || '').slice(0, 80)}`,
+  });
 }

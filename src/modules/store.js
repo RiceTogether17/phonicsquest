@@ -4,6 +4,7 @@
  * No framework needed – subscribe to keys and get notified on change.
  */
 
+import { localDayKey, localDayKeyBefore } from '../utils/localDay.js';
 import { scheduleAttempt, seedFromLegacy } from './reviewScheduler.js';
 import { idbGet, idbSet, isAvailable as idbAvailable } from './idb.js';
 import {
@@ -43,6 +44,77 @@ const devWarn = (...args) => {
  */
 const DEEP_MERGE_KEYS = ['adaptiveConfig', 'questMastery', 'clueStats'];
 
+/**
+ * Keys that must never leave the device in a progress export.
+ *
+ * Audit 2026-09-19, finding 5: `exportProfile` serialised the whole saved
+ * state as `progressData`, so an ordinary "send my child's progress to the
+ * teacher" file carried the parent's AI provider credential and their PIN
+ * hash. Two categories are held back:
+ *
+ *   credentials / PIN   secrets. A progress file is routinely shared by
+ *                       email or chat; a key in it is a disclosed key.
+ *   provider config     which AI provider, model, spend and error history
+ *                       belong to the device and the bill-payer, not to the
+ *                       child's learning record. Carrying them between
+ *                       devices on import would silently reconfigure the
+ *                       destination.
+ */
+export const NON_EXPORTABLE_STATE_KEYS = Object.freeze([
+  'parentPin',
+  'geminiApiKey',
+  'aiProvider',
+  'aiApiKeys',
+  'aiModels',
+  'aiSpend',
+  'aiLastError',
+  'aiUsageLog',
+]);
+
+/**
+ * Second line of defence: anything key-, token-, secret-, PIN- or
+ * password-shaped is withheld even if nobody remembered to list it above.
+ *
+ * Why this exists rather than a plain allowlist of progress keys: roughly a
+ * third of a learner's record is written under keys that never appear in
+ * DEFAULT_STATE (`wvWeakSkills`, `ccqCompletedByPassage`, `masteryMap`,
+ * `paperMode` and ~20 more are created on first use). An allowlist derived
+ * from DEFAULT_STATE drops those on export, which is silent loss of a
+ * child's progress — the failure the audit's own acceptance criterion
+ * ("ordinary progress round-trips without loss") rules out. So progress is
+ * carried by default and secrecy is enforced by name, with
+ * `storeExportPolicy.test.js` requiring that every secret-shaped key in
+ * DEFAULT_STATE has been classified deliberately.
+ */
+const SECRET_KEY_PATTERN = /(api|secret|token|password|passcode|credential|pin\b|pinhash)/i;
+
+/** True when a state key must not appear in an export. */
+export function isNonExportableStateKey(key) {
+  return NON_EXPORTABLE_STATE_KEYS.includes(key) || SECRET_KEY_PATTERN.test(key);
+}
+
+/** The DEFAULT_STATE keys an export carries. */
+export function exportableStateKeys() {
+  return Object.keys(DEFAULT_STATE).filter((k) => !isNonExportableStateKey(k));
+}
+
+/**
+ * Copy a saved-state object minus anything withheld.
+ * Applied on the way out (export) and on the way in (import), so restoring
+ * an export written before this policy existed cannot reinstate a credential
+ * or silently repoint this device's AI provider.
+ * @param {object} state
+ * @returns {object}
+ */
+export function pickExportableState(state) {
+  if (!state || typeof state !== 'object') return {};
+  const out = {};
+  for (const key of Object.keys(state)) {
+    if (!isNonExportableStateKey(key)) out[key] = state[key];
+  }
+  return out;
+}
+
 /** Default application state */
 const DEFAULT_STATE = {
   /**
@@ -72,7 +144,20 @@ const DEFAULT_STATE = {
   // Settings
   theme: 'default',
   difficulty: 1, // 1 | 2 | 3
+  // Reward and interface noises only: the celebration chime, the tap click.
+  // Audit 2026-09-19, finding 8: this flag also gated every instructional
+  // voice method in audio.js, so a teacher turning off reward noises silenced
+  // the spoken stimulus that phonemic-awareness tasks require the child to
+  // hear before they can answer. Teaching audio has its own switch below.
   sfxEnabled: true,
+
+  // The spoken stimulus: phonemes, words, sentences, stretched and
+  // articulated speech. A child cannot answer "what sound does this start
+  // with?" without it, so it is deliberately separate from effects and
+  // defaults on. When it is off, audio-dependent assessment must not present
+  // itself as answerable -- see `isTeachingAudioAvailable` in audio.js.
+  teachingAudioEnabled: true,
+
   autoplay: true,
   voiceSpeed: 0.8,
   // When true, phonemic-awareness modes play the prompt word "stretched"
@@ -178,6 +263,34 @@ const DEFAULT_STATE = {
   },
   questAttempts: [], // recent quest attempts (capped)
   learningEvents: [], // fine-grained telemetry events (capped)
+
+  // Listening passages finished, so the section contributes to the same
+  // activity counts as the rest. Audit 2026-09-19, finding 16.
+  // { [passageId]: ISO timestamp }
+  listeningCompleted: {},
+
+  // Practice accuracy for work that did NOT meet the independent-evidence
+  // bar (self-marks, heuristic writing feedback, supported prompts). Kept
+  // apart from questMastery so a report can say "practised 12, 9 right"
+  // without that ever being readable as a mastery claim.
+  // { [questKey]: { [skillKey]: { attempts, correct } } }
+  questPractice: {},
+
+  // Independent-evidence sample counts behind each questMastery score.
+  //
+  // Audit 2026-09-19, finding 15: questMastery stored a bare exponential
+  // moving average with no item diversity or evidence metadata, so a score
+  // built from one Quick Check answer was indistinguishable from one built
+  // from twenty. With alpha 0.45 a single correct answer moves 0.5 to 0.725,
+  // which the printed parent report renders as "73%".
+  // { [questKey]: { [skillKey]: { attempts, correct } } }
+  questMasterySamples: {},
+
+  // Attempt IDs already banked, so one committed response cannot be counted
+  // twice by a repeated tap or a rerender. Stores the outcome applied, which
+  // is what lets a changed self-mark REPLACE its predecessor rather than add
+  // a second reflection. { [attemptId]: { quest, skill, correct } }
+  questAppliedAttempts: {},
 
   // Clue detection accuracy (separate from answer accuracy)
   // { attempted: number, strong: number, partial: number, weak: number }
@@ -518,20 +631,63 @@ class Store {
     }
   }
 
-  /** Show a user-visible warning when storage is persistently failing */
+  /**
+   * Show a user-visible warning when storage is persistently failing.
+   *
+   * Audit 2026-09-19, finding 22. The advice used to be "Device storage full
+   * — progress may not be saved. Try clearing browser data." Clearing browser
+   * data for this site is what deletes the child's progress: every profile,
+   * every mastery record and every badge lives in this device's localStorage
+   * and nowhere else. The app was telling a parent whose saves were already
+   * failing to destroy the saves that had worked.
+   *
+   * So the offer comes first. "Save a backup" writes the same
+   * credential-free export the dashboard produces (finding 5: no PIN, no AI
+   * key), after which clearing site data is a recoverable act rather than a
+   * final one. The toast stays until it is dismissed — an eight-second
+   * warning about losing a term's work is not a warning.
+   */
   _showStorageWarning() {
     const container = document.getElementById('toast-container');
     if (!container) return;
     // Only show once per session
     if (this._storageWarningShown) return;
     this._storageWarningShown = true;
+
     const toast = document.createElement('div');
     toast.className = 'toast toast--warning';
     toast.setAttribute('role', 'alert');
-    toast.textContent =
-      'Device storage full — progress may not be saved. Try clearing browser data.';
+
+    const label = document.createElement('span');
+    label.textContent =
+      'Device storage is full, so new progress is not being saved. ' +
+      "This app keeps progress on this device only — save a backup before clearing anything, or it's gone. ";
+
+    const save = document.createElement('button');
+    save.type = 'button';
+    save.className = 'btn btn--small';
+    save.textContent = 'Save a backup';
+    save.addEventListener('click', async () => {
+      // Imported here rather than at the top: profiles.js imports this
+      // module, so a static import would be a cycle.
+      try {
+        const { getActiveProfile, exportProfile } = await import('./profiles.js');
+        const active = getActiveProfile();
+        save.textContent = active && exportProfile(active.id) ? 'Backup saved' : 'Could not save';
+      } catch (_) {
+        save.textContent = 'Could not save';
+      }
+      save.disabled = true;
+    });
+
+    const dismiss = document.createElement('button');
+    dismiss.type = 'button';
+    dismiss.className = 'btn btn--small btn--ghost';
+    dismiss.textContent = 'Dismiss';
+    dismiss.addEventListener('click', () => toast.remove());
+
+    toast.append(label, save, dismiss);
     container.appendChild(toast);
-    setTimeout(() => toast.remove(), 8000);
   }
 
   /**
@@ -773,6 +929,55 @@ class Store {
   }
 
   /**
+   * Bump practice-accuracy counters for work below the independent-evidence
+   * bar. `delta` of -1 removes a previously banked reflection, which is how a
+   * changed self-mark replaces its predecessor instead of stacking on it.
+   */
+  updateQuestPractice(questKey, skillKey, correct, delta = 1) {
+    const next = { ...(this._state.questPractice || {}) };
+    const bucket = { ...(next[questKey] || {}) };
+    const prev = bucket[skillKey] || { attempts: 0, correct: 0 };
+    bucket[skillKey] = {
+      attempts: Math.max(0, prev.attempts + delta),
+      correct: Math.max(0, prev.correct + (correct ? delta : 0)),
+    };
+    next[questKey] = bucket;
+    this.set('questPractice', next);
+  }
+
+  /** Bump the independent-sample counters behind a mastery score. */
+  updateQuestMasterySample(questKey, skillKey, correct, delta = 1) {
+    const next = { ...(this._state.questMasterySamples || {}) };
+    const bucket = { ...(next[questKey] || {}) };
+    const prev = bucket[skillKey] || { attempts: 0, correct: 0 };
+    bucket[skillKey] = {
+      attempts: Math.max(0, prev.attempts + delta),
+      correct: Math.max(0, prev.correct + (correct ? delta : 0)),
+    };
+    next[questKey] = bucket;
+    this.set('questMasterySamples', next);
+  }
+
+  /** The outcome already banked for an attempt ID, or null. */
+  getAppliedAttempt(attemptId) {
+    return (this._state.questAppliedAttempts || {})[attemptId] || null;
+  }
+
+  /**
+   * Remember that an attempt ID has been banked. Capped at 200 entries: this
+   * is replay protection for a live session, not an audit log.
+   */
+  setAppliedAttempt(attemptId, record) {
+    const applied = { ...(this._state.questAppliedAttempts || {}) };
+    applied[attemptId] = record;
+    const keys = Object.keys(applied);
+    if (keys.length > 200) {
+      for (const stale of keys.slice(0, keys.length - 200)) delete applied[stale];
+    }
+    this.set('questAppliedAttempts', applied);
+  }
+
+  /**
    * Record quest attempt telemetry (capped at 300).
    * @param {{quest: string, skill: string, correct: boolean, responseMs?: number, level?: string|number}} entry
    */
@@ -869,9 +1074,16 @@ class Store {
     if (!amount || amount <= 0) return;
     this.set('sessionXpToday', (this._state.sessionXpToday || 0) + amount);
 
-    // Accumulate into rolling weekly log (one entry per calendar day)
-    const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
-    const cutoff = new Date(Date.now() - 8 * 86400000).toISOString().slice(0, 10);
+    // Accumulate into rolling weekly log (one entry per calendar day).
+    //
+    // Audit 2026-09-19, finding 23: "calendar day" was the UTC date. In
+    // Singapore a child playing before 8am local is filed under the previous
+    // day, so one local day splits across two entries and the week's XP is
+    // attributed to days the child did not play. Local keys, from the same
+    // helper the progress chart uses, so the two cannot disagree about what
+    // day it is.
+    const today = localDayKey();
+    const cutoff = localDayKeyBefore(Date.now(), 8);
     const log = (this._state.weeklyXpLog || []).filter((e) => e.date >= cutoff);
     const todayEntry = log.find((e) => e.date === today);
     if (todayEntry) {

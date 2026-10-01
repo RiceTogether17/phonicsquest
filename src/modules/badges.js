@@ -1,3 +1,4 @@
+import { getProfileScopedKey } from './profiles.js';
 /**
  * PhonicsQuest – Achievement Badges
  *
@@ -8,7 +9,16 @@
  * conflicts with the main store.
  */
 
-const STORAGE_KEY = 'phonicsquest_badges';
+/*
+ * Audit 2026-09-19, finding 4: this key was global, so every child on a shared
+ * device saw the same records. Scoped per profile via getProfileScopedKey, the
+ * mechanism giri_friends_unlocked already used. profiles.js registers the base
+ * name so deleting a profile cleans it up.
+ */
+const STORAGE_KEY_BASE = 'phonicsquest_badges';
+function storageKey() {
+  return getProfileScopedKey(STORAGE_KEY_BASE);
+}
 
 /** Dev-mode logging helper */
 const devWarn = (...args) => {
@@ -125,7 +135,7 @@ class BadgeManager {
   /** Load badge state from localStorage */
   _load() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(storageKey());
       if (raw) {
         const parsed = JSON.parse(raw);
         return {
@@ -152,7 +162,7 @@ class BadgeManager {
   _save() {
     try {
       localStorage.setItem(
-        STORAGE_KEY,
+        storageKey(),
         JSON.stringify({
           earned: [...this._state.earned],
           totalCorrect: this._state.totalCorrect,

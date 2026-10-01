@@ -10,13 +10,29 @@
  * This module adds the missing half. After the child self-reports, three
  * PRINTED words appear with no audio and no model — the target plus two
  * phonologically close distractors — and the child taps the one they just
- * read. That tap is real, independent evidence, recorded against the same
- * word so it feeds decoding accuracy and the progression gate.
+ * read. That tap is something the child performs rather than claims, so it is
+ * worth far more than the "Yes! ✓" it replaced.
+ *
+ * ## What it is NOT
+ *
+ * It is not independent decoding evidence, and it used to be recorded as such.
+ * Audit 2026-09-19, finding 13: the app blended this exact word aloud seconds
+ * earlier and is now showing it among three printed choices. That is
+ * evidence.js's own description of `guided` — "the task supplies the answer in
+ * another channel (audio + printed options)". Recognising a just-seen,
+ * just-heard word establishes neither cold decoding nor transfer.
+ *
+ * So it commits at `guided`: two levels above the bare self-report (exposure),
+ * and below the bar mastery requires. A child cannot master a decoding stage
+ * by recognising targets the app has just demonstrated.
+ *
+ * Decoding mastery needs an unmodelled equivalent word or a delayed retrieval
+ * probe. Neither exists yet; building one is follow-on work, and until it does
+ * the honest position is that this mode produces practice, not proof.
  *
  * The governing rule, from the instructional audit: the word used for
- * teaching should not be the only word used for assessment. Here the same
- * word is used, but the task changes from "did you get it?" to "which one
- * was it?" — recognition the child has to perform, not a claim they make.
+ * teaching should not be the only word used for assessment. Here the same word
+ * is still used — which is exactly why the evidence level is capped.
  *
  * Deliberately NOT a gate: getting the confirmation wrong doesn't punish the
  * child or block the round. It records what happened and moves on.

@@ -77,7 +77,12 @@ export const PHONEME_MOUTH = Object.freeze({
   '/v/': 'lips-teeth',
 
   // ── Dental: tongue between the teeth ───────────────────────────────────
+  // Unvoiced /θ/ (thin) and voiced /ð/ (that) share this mouth shape exactly —
+  // the tongue does the same thing and only the voice differs, which is why a
+  // picture cannot separate them and the audio has to. Audit 2026-09-19,
+  // finding 7.
   '/th/': 'tongue-teeth',
+  '/th_voiced/': 'tongue-teeth',
 
   // ── Alveolar: tongue tip at the ridge behind the top teeth ─────────────
   '/t/': 'tongue-ridge', '/tt/': 'tongue-ridge',

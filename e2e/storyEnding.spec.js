@@ -87,7 +87,7 @@ test('reading every line to the end finishes the story', async ({ page }) => {
   await expect(ending.locator('.story-ending-title')).toContainText(/whole story/i);
   // The ruler is the one place the app knows the child read it themselves.
   expect(
-    await page.evaluate(() => JSON.parse(localStorage.getItem('giri_stories_read'))),
+    await page.evaluate(() => JSON.parse(localStorage.getItem('giri_stories_read__p_end'))),
   ).toContain('core-b-01');
 });
 

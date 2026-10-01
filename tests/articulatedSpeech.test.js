@@ -75,7 +75,10 @@ describe('audio.speakWordArticulated', () => {
     const { audio } = await import('../src/modules/audio.js');
     const { store } = await import('../src/modules/store.js');
     store.reset();
-    store.set('sfxEnabled', false);
+    // Audit 2026-09-19 finding 8: the mute that governs instructional
+    // speech is teachingAudioEnabled. sfxEnabled covers reward noises
+    // only, so turning effects off no longer removes the stimulus.
+    store.set('teachingAudioEnabled', false);
 
     const speakSpy = vi.spyOn(audio, '_speak').mockResolvedValue();
     await audio.speakWordArticulated('cat');

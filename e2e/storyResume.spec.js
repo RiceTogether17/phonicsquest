@@ -43,7 +43,7 @@ async function seedLearner(page, { place = null, read = [] } = {}) {
           JSON.stringify({ [STORY]: { word: place, at: Date.now() } }),
         );
       }
-      if (read.length) localStorage.setItem('giri_stories_read', JSON.stringify(read));
+      if (read.length) localStorage.setItem(`giri_stories_read__${PROFILE}`, JSON.stringify(read));
     },
     { PROFILE, STORY, place, read },
   );

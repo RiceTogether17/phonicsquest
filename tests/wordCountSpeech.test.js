@@ -30,11 +30,13 @@ function stubAudioGlobals() {
   };
 }
 
-async function loadAudio({ voiceSpeed = 0.8, sfxEnabled = true } = {}) {
+// `teachingAudioEnabled` is the mute for instructional speech; `sfxEnabled`
+// governs reward noises only. Audit 2026-09-19, finding 8.
+async function loadAudio({ voiceSpeed = 0.8, teachingAudioEnabled = true } = {}) {
   const { audio } = await import('../src/modules/audio.js');
   const { store } = await import('../src/modules/store.js');
   store.reset();
-  store.set('sfxEnabled', sfxEnabled);
+  store.set('teachingAudioEnabled', teachingAudioEnabled);
   store.set('voiceSpeed', voiceSpeed);
   return { audio, store };
 }
@@ -89,8 +91,8 @@ describe('audio.speakSentenceWord', () => {
     expect(speakSpy).not.toHaveBeenCalled();
   });
 
-  it('stays silent when sound effects are off', async () => {
-    const { audio } = await loadAudio({ sfxEnabled: false });
+  it('stays silent when the teaching voice is off', async () => {
+    const { audio } = await loadAudio({ teachingAudioEnabled: false });
     const speakSpy = vi.spyOn(audio, '_speak').mockResolvedValue();
 
     await audio.speakSentenceWord('word');

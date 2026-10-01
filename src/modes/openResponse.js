@@ -169,8 +169,15 @@ export function attachOpenResponses(
 
           const skill = box.getAttribute('data-skill') || 'comprehension';
           // A self-mark is a self-report: it counts as practice, never as
-          // proof. `guided` is the ceiling, as with every self-assessed mode.
-          questMastery.updateSkill(quest, skill, mark.value >= 1);
+          // proof. `guided` is the ceiling, as with every self-assessed mode
+          // — and the mastery service now enforces that rather than leaving
+          // it to this comment. The attempt ID is the committed response, so
+          // clicking a mark ten times, or changing your mind, still leaves
+          // exactly one reflection on record.
+          questMastery.updateSkill(quest, skill, mark.value >= 1, {
+            evidence: EVIDENCE.GUIDED,
+            attemptId: `${quest}:${box.getAttribute('data-open-response') || ''}`,
+          });
           store.recordLearningEvent?.({
             eventType: 'open_response_self_mark',
             quest,

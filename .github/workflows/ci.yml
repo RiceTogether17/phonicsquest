@@ -49,6 +49,13 @@ jobs:
       - name: Scope & sequence is current
         run: npm run check:scope
 
+      # Contract checks: the registries agree, no module is unreachable without
+      # a recorded reason, and no mode invents a response duration. Audit
+      # finding 26 — these fail the build rather than warning, because drift
+      # here is cheap to introduce and expensive to notice.
+      - name: Contract checks
+        run: npm run check:contracts
+
       - name: Build
         run: npm run build
 

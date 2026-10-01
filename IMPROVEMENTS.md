@@ -75,13 +75,13 @@ correct shape.
 **Fix:** change to `e.correct === true`, `typeof e.responseMs === 'number'`,
 `e.responseMs`. Add a test asserting speed contributes for a realistic event.
 
-### 6. Sound Match rounds can omit the correct answer
+### 6. Sound Match rounds can omit the correct answer — RESOLVED BY REMOVAL
 
-`src/components/questJourney/rounds.js:43-48` — the non-vowel fallback in
-`buildSoundMatchRound` picks `choices` from a fixed pool `['a','e','i','o','u','s','t']`
-without forcing the correct grapheme in, so the child can face an unanswerable round. The
-vowel branch (line 52) guarantees inclusion.
-**Fix:** mirror the vowel branch — force the correct grapheme into the choice set. Add a test.
+The Quest Journey prototype was deleted (audit finding 26). Beyond the missing-answer bug
+recorded here, its non-vowel fallback took the "correct" grapheme from the sample word's
+first letter, so 38 of 58 stages prompted a sound and keyed a letter that does not spell it
+— the digraphs stage asked for sh /ʃ/ and marked **s** correct. Nothing imported it, so no
+child ever saw it; that is why it is gone rather than fixed.
 
 ### 7. Placement-test composites divide by fixed denominators
 
@@ -176,8 +176,9 @@ resolves.
 ### 17. Decompose the 3,436-line `src/app.js` God object
 
 One `App` class wires every screen's listeners inline. Extract by feature (auth/PIN, profile
-import, lesson finalization, quest routing) following the existing
-`src/components/questJourney/controller.js` pattern (small controller + pure render fns).
+import, lesson finalization, quest routing) following the small-controller-plus-pure-render
+pattern — `src/modes/primarySectionRunner.js` is the closest live example. (This used to
+point at `components/questJourney/controller.js`, which has since been deleted.)
 Also: `hashPin` (`app.js:108-114`) is unsalted SHA-256 with a `plain:${pin}` fallback — salt
 it while extracting auth.
 
@@ -189,11 +190,10 @@ call sites). `store.recordWordAttempt` (`store.js:400-401`) writes both new and 
 to keep them in sync. Pick `reviewScheduler` as source of truth, adapt the other consumers,
 and consolidate the ~5 duplicated YYYY-MM-DD date helpers into one shared util.
 
-### 19. Align duplicated mastery gates in questJourney
+### 19. Align duplicated mastery gates in questJourney — RESOLVED BY REMOVAL
 
-`src/components/questJourney/controller.js:249-273` reimplements mastery (0.8/6 attempts) and
-prerequisite gating inline, diverging from `PROGRESSION_GATE` (0.85 + 4 criteria) in
-`progression.js:44-53`. Extract a shared gate or document the intentional difference.
+The second gate lived in the Quest Journey prototype, deleted under audit finding 26.
+`PROGRESSION_GATE` in `progression.js` is now the only one.
 
 ### 20. Open issue #108 — expand Gate B placement item bank
 
@@ -227,9 +227,8 @@ and an `npm run lint` script wired into `.github/workflows/ci.yml`.
   it first (pairs with P0 #1).
 - Untested modules: `badges.js`, `dashboardInsights.js`, `pwa.js`, `sentenceSkills.js`,
   `srsScheduler.js`, `writingBadges.js`, `writingDraftStore.js`.
-- Untested components: `questJourney/rounds.js` and `controller.js` (both carry the P1 bugs
-  above — write their tests as part of those fixes), `wheel.js`, `dashboard.js`,
-  `sessionSummary.js`, `weeklyRecap.js`.
+- Untested components: `wheel.js`, `dashboard.js`, `sessionSummary.js`, `weeklyRecap.js`.
+  (`questJourney/` was listed here; it has been deleted — see #6 and #19.)
 - Suite quality is otherwise excellent (120 files / 1,669 tests, no skips, no assertion-free
   tests) — match its existing style.
 

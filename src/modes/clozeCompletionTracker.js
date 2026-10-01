@@ -1,17 +1,46 @@
+import { countCoveredSeeds } from '../data/practiceSeeds.js';
+
+/**
+ * How much of a scope a child has actually covered.
+ *
+ * Audit 2026-09-19, finding 12. This used to count completion records, and a
+ * completion record is one passage. But P1 Articles holds 27 passages built
+ * from four authored bodies, so a child who finished four of them could be
+ * shown "4 / 27 done" having met every distinct passage in the topic, or
+ * "4 / 27 done" having met one passage four times. The screen could not tell
+ * the difference and neither could a parent reading it.
+ *
+ * Coverage is now counted in seeds. Pass `seedIndex` (from
+ * `seedIdIndex(scopeItems)`) so records written before seeds existed can still
+ * be resolved.
+ *
+ * With no per-passage map at all — an install that last played before that key
+ * existed — the legacy counters are all there is. They count passages, and
+ * seeds are never more numerous than passages, so the caller's `Math.min`
+ * against the seed total is the closest honest reading available.
+ */
 export function getUniqueClozeDone({
   level,
   category,
   ccqCompletedByPassage,
   ccqCompleted,
   ccqCatCompleted,
+  seedIndex,
 }) {
   const byLevel = ccqCompletedByPassage?.[level] || {};
-  const categoryMap = byLevel?.[category] || {};
-  const unique = Object.keys(categoryMap).length;
-  if (unique > 0) return unique;
 
   if (category) {
+    const categoryMap = byLevel?.[category] || {};
+    if (Object.keys(categoryMap).length > 0) return countCoveredSeeds(categoryMap, seedIndex);
     return Number(ccqCatCompleted?.[`${level}-${category}`] || 0);
+  }
+
+  // Level view: seeds are unique within a category, so summing per category
+  // is the same as counting across the level, without needing one index that
+  // spans every category.
+  const categories = Object.values(byLevel);
+  if (categories.length) {
+    return categories.reduce((sum, map) => sum + countCoveredSeeds(map, seedIndex), 0);
   }
   return Number(ccqCompleted?.[level] || 0);
 }
@@ -20,6 +49,7 @@ export function recordClozeCompletion({
   level,
   category,
   passageId,
+  seedId,
   accuracy = 100,
   now = Date.now(),
   ccqCompletedByPassage = {},
@@ -36,6 +66,9 @@ export function recordClozeCompletion({
 
   nextByPassage[level][category][passageId] = {
     done: true,
+    // The authored passage this one re-presents, so coverage stays countable
+    // even if the bank is later regenerated with different variant ids.
+    seedId: String(seedId || prev?.seedId || passageId),
     bestAccuracy,
     lastCompletedAt: now,
   };
@@ -51,10 +84,15 @@ export function recordClozeCompletion({
   return { nextByPassage, nextCompleted, nextCatCompleted, isNew };
 }
 
-export function getUniqueWordVaultDone({ category, level, wvqCompletedByPassage, wvqCompleted }) {
+export function getUniqueWordVaultDone({
+  category,
+  level,
+  wvqCompletedByPassage,
+  wvqCompleted,
+  seedIndex,
+}) {
   const byCatLevel = wvqCompletedByPassage?.[category]?.[level] || {};
-  const unique = Object.keys(byCatLevel).length;
-  if (unique > 0) return unique;
+  if (Object.keys(byCatLevel).length > 0) return countCoveredSeeds(byCatLevel, seedIndex);
 
   const legacy = wvqCompleted?.[category]?.[level];
   if (legacy === true || legacy?.done) return 1;
@@ -65,6 +103,7 @@ export function recordWordVaultCompletion({
   category,
   level,
   passageId,
+  seedId,
   stars = 1,
   accuracy = 100,
   now = Date.now(),
@@ -75,8 +114,10 @@ export function recordWordVaultCompletion({
   if (!nextByPassage[category]) nextByPassage[category] = {};
   if (!nextByPassage[category][level]) nextByPassage[category][level] = {};
 
+  const prev = nextByPassage[category][level][passageId];
   nextByPassage[category][level][passageId] = {
     done: true,
+    seedId: String(seedId || prev?.seedId || passageId),
     stars,
     accuracy,
     lastCompletedAt: now,

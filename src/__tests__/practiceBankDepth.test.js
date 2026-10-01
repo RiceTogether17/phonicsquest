@@ -6,6 +6,7 @@ import { vocabPassages } from '../data/vocabPassages.js';
 import { allSentences } from '../data/sentences.js';
 import { MIN_QUESTIONS_PER_SCOPE } from '../data/practiceExpansion.js';
 import { classifySentenceTrack } from '../modules/sentenceForgeTracks.js';
+import { practiceSeedId, seedBreakdown } from '../data/practiceSeeds.js';
 
 const normalize = (value) =>
   String(value || '')
@@ -45,13 +46,65 @@ function expectMcqScopes(bank, label) {
   }
 }
 
+// Audit 2026-09-19, finding 12. This file used to certify each cloze scope as
+// holding "unique passages" by comparing whole passage texts — and the texts
+// differ, because the generator prepends a lead sentence ("Mei shared this
+// recount with the class."). Underneath, P1 Articles' 27 passages are four
+// bodies and four answer sequences; P6 Context Inference's 38 are ten bodies
+// and five sequences. The test was measuring the disguise.
+//
+// It now measures the material. `seedId` names the authored passage an item
+// re-presents, so a scope's real depth is its seed count. Measured floors on
+// this commit: Cloze Castle 3–11 seeds and 9–33 seed questions per scope,
+// Word Vault 6–14 and 18–42. Raise these by authoring passages, never by
+// generating more copies.
+const MIN_SEEDS_PER_CLOZE_SCOPE = 3;
+const MIN_SEED_QUESTIONS_PER_CLOZE_SCOPE = 9;
+
+/** A generated variant is its seed plus a lead sentence; strip it to compare. */
+const PASSAGE_LEAD =
+  /^[A-Z][a-z]+ shared this (?:story|recount|diary entry|report|news article) with the class\.\s*/;
+const passageBody = (text) => normalize(String(text || '').replace(PASSAGE_LEAD, ''));
+
 function expectClozeScope(passagesForScope, tag) {
-  const questionCount = passagesForScope.reduce((sum, passage) => sum + passage.answers.length, 0);
-  expect(questionCount, `${tag} question count`).toBeGreaterThan(100);
-  expect(
-    new Set(passagesForScope.map((passage) => normalize(passage.text))).size,
-    `${tag} unique passages`,
-  ).toBe(passagesForScope.length);
+  const breakdown = seedBreakdown(passagesForScope);
+
+  // Depth, counted in authored material rather than in copies.
+  expect(breakdown.seeds, `${tag} distinct passages`).toBeGreaterThanOrEqual(
+    MIN_SEEDS_PER_CLOZE_SCOPE,
+  );
+  expect(breakdown.seedQuestions, `${tag} distinct questions`).toBeGreaterThanOrEqual(
+    MIN_SEED_QUESTIONS_PER_CLOZE_SCOPE,
+  );
+
+  // Every seed points at a passage in this same scope, so a completion record
+  // can always be resolved to one.
+  const ids = new Set(passagesForScope.map((passage) => passage.id));
+  for (const passage of passagesForScope) {
+    expect(ids.has(practiceSeedId(passage)), `${passage.id} seed ${passage.seedId} in ${tag}`).toBe(
+      true,
+    );
+  }
+
+  // Seeds are distinct material, and items sharing a seed really are the same
+  // question — otherwise collapsing them into one unit of coverage would lose
+  // something a child was asked.
+  const bodyBySeed = new Map();
+  const answersBySeed = new Map();
+  for (const passage of passagesForScope) {
+    const seed = practiceSeedId(passage);
+    const body = passageBody(passage.text);
+    const answers = passage.answers.map(normalize).join('|');
+    if (!bodyBySeed.has(seed)) {
+      bodyBySeed.set(seed, body);
+      answersBySeed.set(seed, answers);
+      continue;
+    }
+    expect(bodyBySeed.get(seed), `${passage.id} body matches its seed`).toBe(body);
+    expect(answersBySeed.get(seed), `${passage.id} answers match its seed`).toBe(answers);
+  }
+  expect(new Set(bodyBySeed.values()).size, `${tag} distinct bodies`).toBe(bodyBySeed.size);
+
   for (const passage of passagesForScope) {
     expect(blankCount(passage.text), `${passage.id} blank count`).toBe(passage.answers.length);
     const bank = new Set(passage.wordBank.map(normalize));

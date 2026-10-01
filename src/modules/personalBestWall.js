@@ -1,3 +1,4 @@
+import { getProfileScopedKey } from './profiles.js';
 /**
  * PhonicsQuest – Personal Best Wall
  *
@@ -19,6 +20,7 @@
  *     stories localStorage key.
  */
 
+import { localDayKeyBefore } from '../utils/localDay.js';
 import { store } from './store.js';
 import { badges } from './badges.js';
 import { getActiveProfile } from './profiles.js';
@@ -26,7 +28,16 @@ import { getLevelInfo } from '../data/curriculum.js';
 import { GRADUATED_BOX } from './reviewScheduler.js';
 
 const DAY_MS = 86_400_000;
-const STORIES_READ_KEY = 'giri_stories_read';
+/*
+ * Audit 2026-09-19, finding 4: this key was global, so every child on a shared
+ * device saw the same records. Scoped per profile via getProfileScopedKey, the
+ * mechanism giri_friends_unlocked already used. profiles.js registers the base
+ * name so deleting a profile cleans it up.
+ */
+const STORIES_READ_KEY_BASE = 'giri_stories_read';
+function storiesReadKey() {
+  return getProfileScopedKey(STORIES_READ_KEY_BASE);
+}
 
 /**
  * Build the full Personal Best Wall snapshot for the current profile.
@@ -66,7 +77,10 @@ export function getPersonalBests(opts = {}) {
   const dailyChallengesEver = challengeCal.length;
 
   // ── XP this week (from rolling daily ledger) ─────────────────────────
-  const cutoff7Iso = new Date(now - 7 * DAY_MS).toISOString().slice(0, 10);
+  // The ledger is keyed by LOCAL calendar day (audit 2026-09-19, finding 23),
+  // so the cutoff has to be too — a UTC-derived bound against local keys is
+  // off by one day for part of every day east of Greenwich.
+  const cutoff7Iso = localDayKeyBefore(now, 7);
   const weeklyXpLog = Array.isArray(store.get('weeklyXpLog')) ? store.get('weeklyXpLog') : [];
   const xpThisWeek = weeklyXpLog
     .filter((e) => e?.date >= cutoff7Iso)
@@ -171,7 +185,7 @@ export function getPersonalBests(opts = {}) {
 
 function _safeReadStoriesRead() {
   try {
-    const raw = localStorage.getItem(STORIES_READ_KEY);
+    const raw = localStorage.getItem(storiesReadKey());
     const arr = raw ? JSON.parse(raw) : [];
     return Array.isArray(arr) ? arr : [];
   } catch (_) {
@@ -192,4 +206,4 @@ function _pickHighlights({ streakBest, wordsGraduated, storiesFinished, level })
   return lines;
 }
 
-export const __TEST__ = { STORIES_READ_KEY, _safeReadStoriesRead, _pickHighlights };
+export const __TEST__ = { storiesReadKey, _safeReadStoriesRead, _pickHighlights };

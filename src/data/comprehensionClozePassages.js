@@ -48,7 +48,11 @@ const P3 = [
     text:
       'Mei Ling visited the new community library {{1}} Saturday. She was excited {{2}} see the bright reading corner. The librarian {{3}} her how to use the new self-checkout machine. After choosing two books, she sat {{4}} a soft beanbag near the window. The afternoon passed {{5}} quickly that she barely noticed the sun setting.',
     blanks: [
-      { num: 1, answer: 'last', accept: [], hint: 'A time word that points to a recent past day.', explanation: '"last Saturday" tells us the visit happened on the most recent Saturday — a common past-time marker.', skill: 'tense' },
+      // Audit 2026-09-19, finding 11: "on Saturday" is as natural here as
+      // "last Saturday", and `accept` was empty, so a child writing "on" was
+      // marked wrong for correct English. Open cloze accepts every completion a
+      // teacher would.
+      { num: 1, answer: 'last', accept: ['on', 'that'], hint: 'A time word that says which Saturday, or a preposition before a day.', explanation: '"last Saturday" points to the most recent Saturday. "on Saturday" is equally correct here — the passage does not say which Saturday it was, so both are accepted.', skill: 'tense' },
       { num: 2, answer: 'to', accept: [], hint: 'Which short word follows "excited"?', explanation: '"excited to see" is the natural pattern; "excited" is followed by "to" + base verb.', skill: 'collocation' },
       { num: 3, answer: 'showed', accept: ['taught'], hint: 'A past-tense verb meaning "demonstrated".', explanation: 'The librarian "showed her how to use" the machine — past simple, meaning to demonstrate.', skill: 'tense' },
       { num: 4, answer: 'on', accept: [], hint: 'Which preposition fits when you sit on a soft surface?', explanation: 'You sit "on" a beanbag — the preposition for being on top of a surface.', skill: 'preposition' },
@@ -63,7 +67,10 @@ const P3 = [
       'Our class trained hard {{1}} the upcoming Sports Day. Coach Tan reminded us to drink water {{2}} every drill. Adam was tired but he kept running {{3}} of giving up. Mei broke her own record {{4}} the long jump. We were all proud {{5}} our effort that afternoon.',
     blanks: [
       { num: 1, answer: 'for', accept: [], hint: 'Which preposition shows the purpose of an action?', explanation: '"trained for Sports Day" shows the reason or goal — "for" links an action to its purpose.', skill: 'preposition' },
-      { num: 2, answer: 'after', accept: [], hint: 'A time word that means "following".', explanation: '"after every drill" tells us when they drank water — after each round of practice.', skill: 'preposition' },
+      // Audit 2026-09-19, finding 11: "before every drill" fits this context
+      // just as well, and so does "during". Nothing in the passage settles it,
+      // so all three are accepted rather than one being keyed arbitrarily.
+      { num: 2, answer: 'after', accept: ['before', 'during'], hint: 'A time word saying when they drank water.', explanation: 'Coach Tan\'s reminder works with "after", "before" or "during" every drill — the passage does not say which, so all three are accepted. Each is a correct time preposition.', skill: 'preposition' },
       { num: 3, answer: 'instead', accept: [], hint: 'Which word pairs with "of" to show a different choice?', explanation: '"instead of giving up" shows the alternative action — he chose to keep running.', skill: 'collocation' },
       { num: 4, answer: 'in', accept: ['at'], hint: 'Which preposition is used for the event itself?', explanation: '"in the long jump" names the event Mei competed in — Singaporean usage also accepts "at".', skill: 'preposition' },
       { num: 5, answer: 'of', accept: [], hint: 'Which short word follows "proud"?', explanation: '"proud of" is the fixed pair — proud always takes "of" before what causes the pride.', skill: 'collocation' },

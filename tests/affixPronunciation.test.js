@@ -93,12 +93,17 @@ describe('affix pronunciation', () => {
 
   // ── Consonant + le endings ──────────────────────────────────────────
 
-  it('plays -ble as phoneme sequence [b, l, ə] not raw TTS', async () => {
+  // Audit 2026-09-19, finding 7: these asserted [consonant, 'l', 'ə'], playing
+  // the /l/ before the schwa. "table" is /ˈteɪ.bəl/ and "little" is /ˈlɪt.əl/ --
+  // the vowel comes first and the /l/ closes the syllable, so the old order
+  // taught the ending backwards. The al/el rows in AFFIX_PRONUNCIATION always
+  // had it right, which is what made the inconsistency visible.
+  it('plays -ble as phoneme sequence [b, ə, l] not raw TTS', async () => {
     await audio.speakPhoneme('ble', 'sf');
     expect(audio._playPhonemeAudio).toHaveBeenCalledTimes(3);
     expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(1, 'b');
-    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(2, 'l');
-    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(3, 'ə');
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(2, 'ə');
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(3, 'l');
     expect(audio._speak).not.toHaveBeenCalled();
   });
 
@@ -106,70 +111,70 @@ describe('affix pronunciation', () => {
     await audio.speakPhoneme('-ble', 'sf');
     expect(audio._playPhonemeAudio).toHaveBeenCalledTimes(3);
     expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(1, 'b');
-    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(2, 'l');
-    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(3, 'ə');
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(2, 'ə');
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(3, 'l');
   });
 
-  it('plays -dle as [d, l, ə]', async () => {
+  it('plays -dle as [d, ə, l]', async () => {
     await audio.speakPhoneme('dle', 'sf');
     expect(audio._playPhonemeAudio).toHaveBeenCalledTimes(3);
     expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(1, 'd');
-    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(2, 'l');
-    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(3, 'ə');
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(2, 'ə');
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(3, 'l');
   });
 
-  it('plays -ple as [p, l, ə]', async () => {
+  it('plays -ple as [p, ə, l]', async () => {
     await audio.speakPhoneme('ple', 'sf');
     expect(audio._playPhonemeAudio).toHaveBeenCalledTimes(3);
     expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(1, 'p');
-    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(2, 'l');
-    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(3, 'ə');
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(2, 'ə');
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(3, 'l');
   });
 
-  it('plays -tle as [t, l, ə]', async () => {
+  it('plays -tle as [t, ə, l]', async () => {
     await audio.speakPhoneme('tle', 'sf');
     expect(audio._playPhonemeAudio).toHaveBeenCalledTimes(3);
     expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(1, 't');
-    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(2, 'l');
-    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(3, 'ə');
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(2, 'ə');
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(3, 'l');
   });
 
-  it('plays -cle as [c, l, ə] (c → /k/ sound)', async () => {
+  it('plays -cle as [c, ə, l] (c → /k/ sound)', async () => {
     await audio.speakPhoneme('cle', 'sf');
     expect(audio._playPhonemeAudio).toHaveBeenCalledTimes(3);
     expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(1, 'c');
-    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(2, 'l');
-    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(3, 'ə');
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(2, 'ə');
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(3, 'l');
   });
 
-  it('plays -fle as [f, l, ə]', async () => {
+  it('plays -fle as [f, ə, l]', async () => {
     await audio.speakPhoneme('fle', 'sf');
     expect(audio._playPhonemeAudio).toHaveBeenCalledTimes(3);
     expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(1, 'f');
   });
 
-  it('plays -gle as [g, l, ə]', async () => {
+  it('plays -gle as [g, ə, l]', async () => {
     await audio.speakPhoneme('gle', 'sf');
     expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(1, 'g');
   });
 
-  it('plays -kle as [k, l, ə]', async () => {
+  it('plays -kle as [k, ə, l]', async () => {
     await audio.speakPhoneme('kle', 'sf');
     expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(1, 'k');
   });
 
-  it('plays -zle as [z, l, ə]', async () => {
+  it('plays -zle as [z, ə, l]', async () => {
     await audio.speakPhoneme('zle', 'sf');
     expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(1, 'z');
   });
 
   // ── Bare -le suffix ────────────────────────────────────────────────
 
-  it('plays bare -le as [l, ə]', async () => {
+  it('plays bare -le as [ə, l]', async () => {
     await audio.speakPhoneme('le', 'sf');
     expect(audio._playPhonemeAudio).toHaveBeenCalledTimes(2);
-    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(1, 'l');
-    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(2, 'ə');
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(1, 'ə');
+    expect(audio._playPhonemeAudio).toHaveBeenNthCalledWith(2, 'l');
     expect(audio._speak).not.toHaveBeenCalled();
   });
 

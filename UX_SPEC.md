@@ -271,6 +271,13 @@ parent progress view (the data model is shipped, the UI is not).
 
 ### 4.2 Code organisation
 
+> **Removed.** The Quest Journey vertical slice described in §4.2–4.3 was built
+> as a prototype and never wired into the shell. It was deleted under audit
+> finding 26 (2026-09-19): its Sound Match builder derived the "correct"
+> grapheme from the sample word's first letter, so 38 of 58 stages keyed a
+> letter that does not spell the sound they prompted, and its Blend Builder
+> split "ship" into s-h-i-p. The sections below are kept as the design record.
+
 - `src/components/questJourney/` — one render-fn per screen + a tiny
   controller that maps state → screen.
 - `src/styles/journey.css` — screen-specific layout on top of the

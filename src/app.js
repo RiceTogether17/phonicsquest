@@ -28,7 +28,7 @@ import { audio } from './modules/audio.js';
 import { gamification } from './modules/gamification.js';
 import { badges } from './modules/badges.js';
 import { progress, isStageHiddenForMode } from './modules/progress.js';
-import { classifyEvidence, EVIDENCE } from './modules/evidence.js';
+import { classifyEvidence, EVIDENCE, usesStretchedSpeechSupport } from './modules/evidence.js';
 import { showBlendConfirm, cleanupBlendConfirm } from './modes/blendConfirm.js';
 import { renderAdultVerdictBar, removeAdultVerdictBar } from './components/adultVerdict.js';
 import {
@@ -1049,8 +1049,17 @@ class App {
           this._els.btnMic,
         ],
         maxLevel: store.get('difficulty') || 1,
+        // Audit 2026-09-19, finding 13: this committed EVIDENCE.INDEPENDENT.
+        // The app has just blended the word aloud and now shows it among three
+        // printed choices, which is evidence.js's own definition of `guided` --
+        // "the task supplies the answer in another channel (audio + printed
+        // options)". Identifying a just-seen, just-heard word is recognition,
+        // not cold decoding, so it cannot carry a decoding mastery claim.
+        //
+        // Still well above the bare "Yes! ✓" it replaced, which is exposure:
+        // the child performs something rather than claiming it.
         onDone: (confirmed, confirmMs) =>
-          this._commitResult(word, confirmed, confirmMs, EVIDENCE.INDEPENDENT),
+          this._commitResult(word, confirmed, confirmMs, EVIDENCE.GUIDED),
       });
       // _resultProcessing stays true so nothing else can commit meanwhile;
       // _startGame clears it when the next word loads.
@@ -1086,6 +1095,11 @@ class App {
         hintUsed: this._hintUsed,
         wrongStrikes: this._wrongStrikes,
         adultVerdict: this._adultVerdict,
+        // Stretched speech segments the word aloud, handing the child the
+        // phoneme boundaries that sound-counting asks them to find. That is
+        // support, so the result cannot be independent evidence while it is on.
+        // Audit 2026-09-19, finding 14.
+        supportUsed: usesStretchedSpeechSupport(this._mode) && !!store.get('stretchedSpeech'),
       });
     progress.recordAttempt(word.id, correct, this._mode, responseTime, evidence);
 

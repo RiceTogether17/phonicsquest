@@ -17,7 +17,30 @@ describe('derivePhonemes()', () => {
     it('treats sh/ch/th/ck/ng as a single phoneme', () => {
       expect(derivePhonemes(wordById('ship'))).toEqual(['/sh/', '/i/', '/p/']);
       expect(derivePhonemes(wordById('chin'))).toEqual(['/ch/', '/i/', '/n/']);
-      expect(derivePhonemes(wordById('that'))).toEqual(['/th/', '/a/', '/t/']);
+      // Still one phoneme, but now the right one: audit 2026-09-19 finding 7
+      // split voiced /ð/ from unvoiced /θ/, which had shared a single token.
+      expect(derivePhonemes(wordById('that'))).toEqual(['/th_voiced/', '/a/', '/t/']);
+    });
+
+    it('distinguishes voiced th from unvoiced th', () => {
+      // The curriculum names both /θ/ and /ð/. Before finding 7 the word data
+      // could not tell an activity which one a word actually contains.
+      expect(derivePhonemes(wordById('thin'))).toEqual(['/th/', '/i/', '/n/']);
+      expect(derivePhonemes(wordById('them'))).toEqual(['/th_voiced/', '/e/', '/m/']);
+      // Either way it stays one phoneme, so counting is unaffected.
+      expect(derivePhonemes(wordById('thin')).length).toBe(3);
+      expect(derivePhonemes(wordById('them')).length).toBe(3);
+    });
+
+    it('gives nk the velar nasal, not /n/', () => {
+      // "bank" was derived as /b/ /a/ /n/ /k/. The nasal before /k/ is /ŋ/:
+      // a child asked to find the /n/ in bank is hunting a sound that is not
+      // there. Twenty entries carry an nk tile. Audit finding 7.
+      expect(derivePhonemes(wordById('bank'))).toEqual(['/b/', '/a/', '/ng/', '/k/']);
+      expect(derivePhonemes(wordById('pink'))).toEqual(['/p/', '/i/', '/ng/', '/k/']);
+      expect(derivePhonemes(wordById('plank'))).toEqual(['/p/', '/l/', '/a/', '/ng/', '/k/']);
+      // The count was right all along, which is why count-based tests passed.
+      expect(derivePhonemes(wordById('bank')).length).toBe(4);
     });
   });
 

@@ -740,7 +740,10 @@ function _checkAnswer(entry, punct) {
       }
     }
 
-    const reward = gamification.recordCorrect(1200, false);
+    // Audit finding 26: was a literal 1200, which is inside the "quick
+    // answer" bracket, so every correct sentence collected the speed bonus.
+    // Sentence Forge keeps no start time, so there is nothing to report.
+    const reward = gamification.recordCorrect(null, false);
     _sessionXpEarned += reward?.xpEarned || 0;
     if (reward?.reasons?.includes('5 in a row!')) _sessionStreakBonus += 10;
     if (reward?.reasons?.includes('10 in a row!')) _sessionStreakBonus += 20;
