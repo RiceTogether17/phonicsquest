@@ -3,6 +3,23 @@
    Variables → Reset → Layout → Components → Modes → Themes → Animations
    ============================================================ */
 
+/* ── 0. `hidden` MEANS HIDDEN ──
+   The browser's default `[hidden] { display: none }` is a UA rule, so any
+   component that sets its own `display` silently beats it. `.btn` sets
+   `display: inline-flex`, which means every `<button class="btn" hidden>`
+   in the app was on screen — including Story Quest's "Next", so a child
+   could tap straight past every comprehension question without answering.
+
+   The codebase had been patching this one component at a time
+   (`.dash-group[hidden]`, `.gate-skip[hidden]`, `.offline-indicator[hidden]`
+   …). One rule is the fix; `!important` is needed because `[hidden]` and a
+   class have the same specificity and the class wins on source order.
+   Anything that genuinely needs a hidden-but-laid-out element should use a
+   class, not the `hidden` attribute. */
+[hidden] {
+  display: none !important;
+}
+
 /* ── 1. CSS CUSTOM PROPERTIES ── */
 :root {
   --bank-chip-scale: 1;
@@ -5218,6 +5235,46 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-weight: 800;
 }
 
+/* ── The clue sentence ───────────────────────────────────────────────────
+   Where a wrong answer sends the child: the sentence in the story that
+   holds the answer, lit up. Not the whole paragraph — a precise span is the
+   difference between "look again" and "look here". Located by
+   src/modules/storyClue.js. */
+.wf-word.is-clue {
+  background: color-mix(in srgb, var(--color-warning, #f59e0b) 30%, transparent);
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-warning, #f59e0b) 30%, transparent);
+}
+@media (prefers-color-scheme: dark) {
+  .wf-word.is-clue {
+    background: color-mix(in srgb, var(--color-warning, #f59e0b) 40%, transparent);
+  }
+}
+
+/* The clue quoted back inside a question, so the child does not have to
+   hold the sentence in their head while they choose again. */
+.sq-clue {
+  display: block;
+  margin: var(--space-2) 0;
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--color-warning, #f59e0b) 14%, transparent);
+  border-left: 3px solid var(--color-warning, #f59e0b);
+  border-radius: var(--radius);
+  font-style: italic;
+}
+/* A first miss is not a verdict — the question is still open, so this is
+   neither the green of right nor the red of wrong. */
+.sq-feedback--retry {
+  background: color-mix(in srgb, var(--color-warning, #f59e0b) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-warning, #f59e0b) 35%, transparent);
+  color: var(--color-text);
+}
+.sq-breakdown {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
 /* ── "Where you stopped" ─────────────────────────────────────────────────
    Shown rather than silently jumped to: landing halfway down a story with no
    explanation is disorienting, and a child who wants to start again has to
@@ -5417,11 +5474,6 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .bl-actions .btn {
   min-height: var(--touch-target);
-}
-/* `.btn` sets display, which beats the browser default for [hidden] — so
-   "Add a sound" stayed on screen after the last rung. */
-.bl-actions .btn[hidden] {
-  display: none;
 }
 /* "Just hear the word" before blending is a quiet escape route, not a
    competing call to action — a child stuck on one word must not be stuck in
@@ -8352,11 +8404,6 @@ details.story-tool-section[open] > .story-tool-summary::before {
   margin-top: var(--space-3);
   padding-top: var(--space-3);
   border-top: 1px solid var(--color-border);
-}
-/* An explicit `display` beats the browser default for [hidden], so without
-   this the form stayed on screen under its own result. */
-.fluency-form[hidden] {
-  display: none;
 }
 .fluency-field {
   display: flex;

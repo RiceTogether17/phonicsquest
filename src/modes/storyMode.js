@@ -27,9 +27,11 @@ import { getBandReadiness, getRecommendedBand } from '../modules/storyGating.js'
 import { supportWords, storySupportLevel } from '../modules/decodability.js';
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 import { html } from '../utils/html.js';
+import { tokenise } from '../utils/tokenise.js';
 import { renderBlendLadder } from '../modules/blendLadder.js';
 import { deriveGraphemes, expandBlends } from '../modules/deriveGraphemes.js';
 import { readingRate, describeFluency } from '../modules/fluencyNorms.js';
+import { findClue } from '../modules/storyClue.js';
 import { getActiveProfile } from '../modules/profiles.js';
 import {
   soundColoredHtml,
@@ -64,20 +66,6 @@ const BASE = import.meta.env.BASE_URL;
 function lookupWord(token) {
   const clean = token.toLowerCase().replace(/[^a-z]/g, '');
   return WORDS.find((w) => w.word === clean) ?? null;
-}
-
-/**
- * Tokenise a text string into word / punctuation / space chunks.
- * @returns {Array<{text:string, type:'word'|'punct'|'space'}>}
- */
-function tokenise(text) {
-  const parts = text.split(/(\s+|["""'',.!?;:()-]+)/);
-  return parts
-    .filter((p) => p.length > 0)
-    .map((p) => ({
-      text: p,
-      type: /^\s+$/.test(p) ? 'space' : /^[^a-zA-Z0-9]+$/.test(p) ? 'punct' : 'word',
-    }));
 }
 
 // ── Module state ──────────────────────────────────────────────────────────
@@ -1156,6 +1144,40 @@ function _renderReadAloud(story) {
       _renderBrowser();
     });
   });
+}
+
+// ── Sending a child back to the sentence ──────────────────────────────────
+//
+// What a teacher does with a wrong answer is not tell the child the answer.
+// It is point at the place in the text that holds it, so the wrong answer
+// becomes a second go at reading for meaning. The clue is located by
+// storyClue.js; this lights it up and brings it into view.
+
+/** The question "Show me where" is currently about. */
+let _currentCompQuestion = '';
+
+/**
+ * Light up a clue sentence in the story body.
+ * @param {{line:number, from:number, to:number}} clue
+ */
+function _highlightClue(clue) {
+  _clearClue();
+  const lineEl = _container?.querySelector(`#story-body [data-line="${clue.line}"]`);
+  if (!lineEl) return;
+  const words = [...lineEl.querySelectorAll('.wf-word')].filter((w) => {
+    const i = Number(w.dataset.wordIdx);
+    return i >= clue.from && i <= clue.to;
+  });
+  if (!words.length) return;
+  words.forEach((w) => w.classList.add('is-clue'));
+  // The ruler owns the scrolling when it is on, so it keeps its place in
+  // step rather than being left behind on another line.
+  if (_ruler) _ruler.follow(words[0]);
+  else words[0].scrollIntoView({ behavior: _scrollBehavior(), block: 'center' });
+}
+
+function _clearClue() {
+  _container?.querySelectorAll('.wf-word.is-clue').forEach((w) => w.classList.remove('is-clue'));
 }
 
 // ── Where the child stopped ───────────────────────────────────────────────
@@ -2617,6 +2639,9 @@ function _showComprehensionCheck(story) {
 
   _compShownSession.add(story.id);
   const question = story.talkAboutIt[0];
+  // Which question "Show me where" should look for — it changes when the
+  // child taps "one more question".
+  _currentCompQuestion = question;
   // Stories carry a retrieval question first and a thinking question second
   // (inference, vocabulary in context, or the story's message). Only one is
   // ever on screen — two at once is a lot for a young reader — but the second
@@ -2659,10 +2684,19 @@ function _showComprehensionCheck(story) {
         // If TTS is available, re-start the read-aloud for the same story
         setTimeout(() => _startTTS(story), 300);
       } else {
-        feedback.textContent = '💡 Look at the end of the story for clues.';
-        // Scroll the last text line into view to support the prompt
-        const lastLine = _container?.querySelector('.sline.sline--end, .sline:last-of-type');
-        lastLine?.scrollIntoView({ behavior: _scrollBehavior(), block: 'center' });
+        // The sentence that actually answers THIS question, located by word
+        // overlap (storyClue.js). This used to scroll to the last line of
+        // the story whatever was asked — a fixed guess dressed as help.
+        const clue = findClue(story, _currentCompQuestion || question);
+        if (clue) {
+          feedback.textContent = '💡 Have a look at the sentence we have lit up.';
+          _highlightClue(clue);
+        } else {
+          // Some questions ("what does this story teach us?") have no one
+          // sentence behind them. Saying so beats pointing somewhere wrong.
+          feedback.textContent =
+            '💭 This one is not written down in the story — it is for you to work out. Have a think, then tell someone your answer.';
+        }
       }
       feedback.hidden = false;
       // Offer the thinking question once the first one is answered.
@@ -2674,6 +2708,8 @@ function _showComprehensionCheck(story) {
   panel.querySelector('#comp-more')?.addEventListener('click', () => {
     const qEl = panel.querySelector('#comp-q');
     if (qEl) qEl.textContent = followUp;
+    _currentCompQuestion = followUp;
+    _clearClue();
     _logComprehensionAttempt({ storyId: story.id, question: followUp, response: 'followup' });
     panel.querySelector('#comp-more')?.remove();
     if (feedback) {
