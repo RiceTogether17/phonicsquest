@@ -1,3 +1,5 @@
+import { phonemeNotation } from '../data/words.js';
+
 /**
  * Where the first and last PHONEME of a word actually live.
  *
@@ -88,4 +90,22 @@ export function lastPhoneme(word) {
   // its own last sound — st→/t/, nd→/d/, mp→/p/, nk→/k/, ps→/s/ — so the
   // last letter needs no override table the way initial blends do.
   return { grapheme: grapheme[grapheme.length - 1], type: 'c', index };
+}
+
+/**
+ * The sound a choice shows — and so what two choices must differ in.
+ *
+ * Choice buttons are labelled by sound, not by letter: "c" and "k" both read
+ * /k/. Distractors used to be de-duplicated by letter, so a First Sound
+ * round for "cat" could offer /k/ twice, the "k" one counting as wrong — a
+ * child who heard the sound perfectly was marked wrong for it. The same held
+ * for ck/k, ss/s and ll/l at the end of a word and ai/ay/a_e in the middle.
+ * This is the same notation the buttons print, so "different" here means
+ * different on screen.
+ *
+ * @param {string} grapheme
+ * @param {string} type
+ */
+export function soundKey(grapheme, type) {
+  return phonemeNotation(grapheme, type).join('');
 }
