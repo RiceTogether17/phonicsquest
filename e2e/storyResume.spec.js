@@ -69,7 +69,7 @@ async function openStory(page) {
 
   await page.locator('.story-tab[data-band="D"]').click();
   await page.locator('.story-card').first().click();
-  const skip = page.locator('#gate-skip');
+  const skip = page.locator('#warm-up-skip');
   if (await skip.isVisible().catch(() => false)) await skip.click();
   await expect(page.locator('#story-body')).toBeVisible();
 }
@@ -149,8 +149,7 @@ test('finishing the story clears the place', async ({ page }) => {
   await openStory(page);
   await page.waitForTimeout(900);
 
-  await page.locator('#btn-mode-decode').click();
-  await page.locator('#btn-mark-read').click();
+  await page.locator('#btn-finish-story').click();
   await page.waitForTimeout(400);
   expect((await savedPlace(page))?.[STORY]).toBeUndefined();
 });

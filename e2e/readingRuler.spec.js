@@ -61,7 +61,7 @@ async function openStory(page) {
 
   await page.locator('.story-tab[data-band="C"]').click();
   await page.locator('.story-card').first().click();
-  const skip = page.locator('#gate-skip');
+  const skip = page.locator('#warm-up-skip');
   if (await skip.isVisible().catch(() => false)) await skip.click();
   await expect(page.locator('#story-body')).toBeVisible();
 }
@@ -225,7 +225,7 @@ test('turning it off removes it, and the choice is remembered', async ({ page })
   // And it comes back on its own when the story is reopened.
   await page.locator('#btn-reader-back').click();
   await page.locator('.story-card').first().click();
-  const skip = page.locator('#gate-skip');
+  const skip = page.locator('#warm-up-skip');
   if (await skip.isVisible().catch(() => false)) await skip.click();
   await expect(page.locator('.ruler-layer')).toBeAttached();
 });
@@ -234,10 +234,17 @@ test('leaving the story takes the ruler with it', async ({ page }) => {
   await openStory(page);
   await turnOnRuler(page);
 
-  // Switching mode rebuilds the story body the ruler was measuring. A ruler
-  // left behind keeps a ResizeObserver on a detached node.
-  await page.locator('#btn-mode-decode').click();
-  await expect(page.locator('.ruler-layer')).toHaveCount(0);
+  // Toggling a scaffold rebuilds the story body the ruler was measuring.
+  // The ruler is still switched on, so it comes back — but exactly once. A
+  // ruler that was not torn down first would leave a second layer, or a
+  // ResizeObserver watching a node that is no longer in the page.
+  await page.locator('#btn-toggle-graphemes').click();
+  await page.waitForTimeout(200);
+  await expect(page.locator('.ruler-layer')).toHaveCount(1);
+  await expect(page.locator('.ruler-nav')).toHaveCount(1);
+  expect(
+    await page.locator('.ruler-layer').evaluate((el) => el.closest('#story-body') !== null),
+  ).toBe(true);
 
   await page.locator('#btn-reader-back').click();
   await expect(page.locator('.story-card').first()).toBeVisible();

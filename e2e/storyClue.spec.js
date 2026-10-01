@@ -62,16 +62,14 @@ async function openStory(page) {
 
   await page.locator('.story-tab[data-band="C"]').click();
   await page.locator('.story-card').first().click();
-  const skip = page.locator('#gate-skip');
+  const skip = page.locator('#warm-up-skip');
   if (await skip.isVisible().catch(() => false)) await skip.click();
   await expect(page.locator('#story-body')).toBeVisible();
 }
 
 async function openQuest(page) {
   await openStory(page);
-  await page.locator('#btn-mode-decode').click();
-  await page.locator('#btn-mark-read').click();
-  await page.locator('#btn-mode-aloud').click();
+  await page.locator('#btn-finish-story').click();
   await expect(page.locator('#story-quest-cta')).toBeAttached();
   await page.evaluate(() => {
     const c = document.getElementById('story-quest-cta');

@@ -59,7 +59,7 @@ async function openStory(page) {
 
   await page.locator('.story-tab[data-band="B"]').click();
   await page.locator('.story-card').first().click();
-  const skip = page.locator('#gate-skip');
+  const skip = page.locator('#warm-up-skip');
   if (await skip.isVisible().catch(() => false)) await skip.click();
   await expect(page.locator('#story-body')).toBeVisible();
 }
@@ -183,18 +183,19 @@ test('a grown-up is told how to help', async ({ page }) => {
   await expect(help).toContainText(/let your child say it first/i);
 });
 
-test('Sound It Out mode shows the same ladder', async ({ page }) => {
+test('the ladder is the same wherever a word is tapped', async ({ page }) => {
   await openStory(page);
-  await page.locator('#btn-mode-decode').click();
 
-  // Tapping a word is one action, so it teaches one thing wherever it is
-  // tapped — the decode panel used to auto-play instead.
-  await page
-    .locator('.decode-word', { hasText: /^cake$/ })
-    .first()
-    .click();
-  await expect(page.locator('.decode-panel .blend-ladder')).toBeVisible();
-  expect(await rungs(page)).toEqual([]);
+  // There used to be two readers and two panels, and only one of them
+  // waited for the child. There is one reader now, so tapping a word in
+  // the story and tapping one in a different line must be the same thing.
+  for (const word of ['cake', 'flat']) {
+    await tapWord(page, word);
+    expect(await rungs(page), word).toEqual([]);
+    await expect(page.locator('.bl-next')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#modal-word-detective')).toBeHidden();
+  }
 });
 
 test('a name falls back to hearing it, rather than a made-up split', async ({ page }) => {

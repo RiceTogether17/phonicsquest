@@ -55,7 +55,7 @@ async function openStory(page, band = 'B', nth = 0) {
 
   await page.locator(`.story-tab[data-band="${band}"]`).click();
   await page.locator('.story-card').nth(nth).click();
-  const skip = page.locator('#gate-skip');
+  const skip = page.locator('#warm-up-skip');
   if (await skip.isVisible().catch(() => false)) await skip.click();
   await expect(page.locator('#story-body')).toBeVisible();
 }
@@ -154,12 +154,19 @@ test('"Finish for today" returns to the library', async ({ page }) => {
   await expect(page.locator('.story-card--read').first()).toBeVisible();
 });
 
-test('marking a story read in Sound It Out mode ends it too', async ({ page }) => {
+test('a child reading quietly can say they have finished', async ({ page }) => {
   await openStory(page);
-  await page.locator('#btn-mode-decode').click();
-  await page.locator('#btn-mark-read').click();
+
+  // Neither the read-aloud ending nor the ruler's last line fires for a
+  // child who simply reads the story — which is the point of the whole
+  // thing. This is their way to say so, and it ends the story like the
+  // other two routes.
+  const finish = page.locator('#btn-finish-story');
+  await expect(finish).toBeVisible();
+  await finish.click();
   await expect(page.locator('.story-ending')).toBeVisible();
   await expect(page.locator('#btn-ending-done')).toBeVisible();
+  await expect(finish).toBeDisabled();
 });
 
 test('the ending appears once, not once per tap', async ({ page }) => {

@@ -62,7 +62,7 @@ async function openPacePanel(page) {
 
   await page.locator('.story-tab[data-band="B"]').click();
   await page.locator('.story-card').first().click();
-  const skip = page.locator('#gate-skip');
+  const skip = page.locator('#warm-up-skip');
   if (await skip.isVisible().catch(() => false)) await skip.click();
   await expect(page.locator('#story-body')).toBeVisible();
 

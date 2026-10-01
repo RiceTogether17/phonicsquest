@@ -11,8 +11,6 @@
  */
 
 import { STORIES, BAND_META } from '../data/stories.js';
-import { isHFW, extractStoryHFW } from '../data/hfw.js';
-import { WORDS } from '../data/words.js';
 import { audio } from '../modules/audio.js';
 import { giriInline, giriImageEl } from '../components/mascot.js';
 import { runStoryQuest } from './storyQuest.js';
@@ -60,14 +58,6 @@ import {
 
 const BASE = import.meta.env.BASE_URL;
 
-// ── Helpers ───────────────────────────────────────────────────────────────
-
-/** Look up a word token in the word bank (case/punct insensitive). */
-function lookupWord(token) {
-  const clean = token.toLowerCase().replace(/[^a-z]/g, '');
-  return WORDS.find((w) => w.word === clean) ?? null;
-}
-
 // ── Module state ──────────────────────────────────────────────────────────
 
 let _container = null;
@@ -75,11 +65,7 @@ let _onGoHome = null;
 let _activeBand = 'A'; // 'A' | 'B' | 'C' | 'D'
 let _bandAutoPicked = false; // pick the recommended shelf once per session
 let _activeTab = 'band'; // 'band' | 'singapore' | 'chapter'
-let _readMode = 'aloud'; // 'aloud' | 'decode'
 let _speaking = false;
-let _activeWord = null; // for decode panel
-let _decodePanelEl = null; // ref to the decode panel DOM node
-let _currentStoryVocab = []; // vocab words for current story (used in decode panel)
 // The story open in the reader. Set when the reader renders, not only when
 // text-to-speech starts, because the ruler and the place tracker need to
 // know which story they are in whether or not anything is being spoken.
@@ -265,33 +251,15 @@ export function cleanupStoryMode() {
   _stopFluencyTimer();
   cleanupRecording();
   _resetReadToGiri();
-  _activeWord = null;
-  _removeDecodePanel();
   _echoLineIdx = -1;
   _echoStory = null;
-}
-
-/**
- * Remove the word-decode panel from the DOM and clear its reference.
- *
- * The panel is re-parented to <body> so it can escape #app's overflow
- * clipping (see _renderDecodeMode). Because it lives outside the story
- * container, re-rendering #story-dynamic does NOT remove it — so every
- * exit from decode mode (mode switch, back to library, leaving stories)
- * must call this explicitly or the panel lingers on screen over the next
- * view (e.g. a tapped "glad" breakdown still showing during Read Aloud).
- */
-function _removeDecodePanel() {
-  _decodePanelEl?.remove();
-  _decodePanelEl = null;
 }
 
 // ── Browser view ──────────────────────────────────────────────────────────
 
 function _renderBrowser() {
-  // Leaving the reader for the library — drop any lingering decode panel and
-  // tear the ruler down, or its ResizeObserver outlives the story it measured.
-  _removeDecodePanel();
+  // Leaving the reader for the library — tear the ruler down, or its
+  // ResizeObserver outlives the story it measured.
   _destroyRuler();
   _unwirePlaceTracking();
   _currentStory = null;
@@ -537,53 +505,6 @@ function _renderReader(story) {
       <!-- Title -->
       <h2 class="story-reader-title">${story.title}</h2>
 
-      ${(() => {
-        // The words this story cannot be sounded out from — shown BEFORE it
-        // is read, so an adult can pre-teach them and a child is not
-        // ambushed mid-sentence (VALIDITY_ROADMAP 1.4).
-        //
-        // This used to print `getSightWordsInStory`, which comes from the
-        // sight-word quest weave and is capped at six. That is a different
-        // set: across the bank it omitted 110 words children actually need
-        // while spending slots on decodable ones like "back" and "plan".
-        const prep = supportWords(story);
-        if (!prep.length) {
-          return `
-          <p class="story-prep story-prep--none">
-            ✅ You can sound out every word in this story.
-          </p>`;
-        }
-        const chips = prep
-          .map(
-            ({ word, display, status }) =>
-              `<button type="button" class="story-prep-word" data-prep-word="${escapeAttr(word)}"
-                       data-status="${escapeAttr(status)}" aria-label="Hear the word ${escapeAttr(display)}"
-                >${escapeHtml(display)}</button>`,
-          )
-          .join('');
-        return `
-          <div class="story-prep" aria-labelledby="story-prep-title">
-            <p class="story-prep-title" id="story-prep-title">
-              👀 Words to know first — tap to hear
-            </p>
-            <div class="story-prep-words">${chips}</div>
-          </div>`;
-      })()}
-
-      <!-- Mode toggle — plain-language labels so a grown-up knows which is
-           which: listen together, or tap words to sound them out. -->
-      <div class="story-mode-toggle" role="group" aria-label="Reading mode">
-        <button class="smode-btn${_readMode === 'aloud' ? ' active' : ''}" data-mode="aloud"  id="btn-mode-aloud">
-          <span class="smode-btn-title">📖 Listen &amp; Follow</span>
-          <span class="smode-btn-sub">Giri reads · you follow along</span>
-        </button>
-        <button class="smode-btn${_readMode === 'decode' ? ' active' : ''}" data-mode="decode" id="btn-mode-decode">
-          <span class="smode-btn-title">🔤 Sound It Out</span>
-          <span class="smode-btn-sub">Tap any word to decode it</span>
-        </button>
-      </div>
-
-      <!-- Dynamic content area (pre-teach + story body + controls) -->
       <div id="story-dynamic" class="story-dynamic"></div>
 
     </div>
@@ -594,170 +515,171 @@ function _renderReader(story) {
     _renderBrowser();
   });
 
-  // Pre-teach words speak on tap. These are the words that cannot be sounded
-  // out, so hearing one is the only way to meet it — reading it aloud IS the
-  // teaching step.
-  _container.querySelectorAll('[data-prep-word]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      audio.speakSightWord(btn.dataset.prepWord)?.catch?.(() => {});
-      btn.classList.add('story-prep-word--said');
-      setTimeout(() => btn.classList.remove('story-prep-word--said'), 600);
-    });
-  });
-
-  document.getElementById('btn-mode-aloud')?.addEventListener('click', () => {
-    _readMode = 'aloud';
-    _stopTTS();
-    _setModeToggle('aloud');
-    _renderModeOrGate(story);
-  });
-
-  document.getElementById('btn-mode-decode')?.addEventListener('click', () => {
-    _readMode = 'decode';
-    _stopTTS();
-    _setModeToggle('decode');
-    _renderModeOrGate(story);
-  });
-
-  // Render current mode — but first show Meet-the-Words gate if not done today.
-  // The gate teaches sight words + key vocabulary before any reading begins,
-  // so beginning readers can decode in context rather than guess at unfamiliar
-  // words. Once passed (today, this story), both modes load the reader directly.
-  _renderModeOrGate(story);
+  // One warm-up, then the story. There is no mode to pick: tapping a word
+  // sounds it out wherever you are, and listening is a button rather than a
+  // different reader. See the header comment on _renderStory.
+  _renderWarmUpOrStory(story);
 }
 
-function _renderModeOrGate(story) {
-  if (_isMeetWordsCompletedToday(story.id)) {
-    if (_readMode === 'aloud') _renderReadAloud(story);
-    else _renderDecodeMode(story);
-  } else {
-    _renderMeetTheWordsGate(story);
-  }
+function _renderWarmUpOrStory(story) {
+  if (_isMeetWordsCompletedToday(story.id)) _renderStory(story);
+  else _renderWarmUp(story);
 }
 
-function _setModeToggle(mode) {
-  document.querySelectorAll('.smode-btn').forEach((btn) => {
-    btn.classList.toggle('active', btn.dataset.mode === mode);
-  });
-}
-
-// ── MEET THE WORDS gate (pre-reading vocab + sight word introduction) ─────
-
-function _renderMeetTheWordsGate(story) {
+// ── The warm-up ───────────────────────────────────────────────────────────
+/**
+ * The one warm-up before reading.
+ *
+ * There used to be three pre-teach surfaces, and a child opening a story in
+ * Sound It Out met the same words up to three times before reading a line:
+ * a "Words to know first" panel above the fold, this gate, and a third copy
+ * inside the decode reader.
+ *
+ * Worse than the repetition was what the gate was teaching. It was built
+ * from `extractStoryHFW` — every word in the story that happens to be on
+ * the high-frequency list — and across the bank **1664 of its 1793 chips
+ * are words the child can sound out**. In a short-a story it was offering
+ * "sat", "ran", "at" and "can" to be memorised by sight, which is the exact
+ * habit a synthetic-phonics programme exists to prevent. The other panel
+ * had already been moved off that list for the same reason; the gate had
+ * not.
+ *
+ * So the warm-up is now built from `supportWords` — the words this story
+ * genuinely cannot be sounded out from — which is 133 chips across the whole
+ * bank rather than 1793. A child meets the words they actually need to be
+ * told, and sounds out the rest, which is the point of a decodable reader.
+ *
+ * Key vocabulary (`story.vocab`) stays: that is a different job. Those words
+ * ARE decodable; what the child needs is what they mean.
+ */
+function _renderWarmUp(story) {
   const dynamic = document.getElementById('story-dynamic');
   if (!dynamic) return;
 
   _destroyRuler();
 
-  _currentStoryVocab = story.vocab ?? [];
-  const hfwInStory = extractStoryHFW(story);
-
-  // Filter vocab to words actually appearing in the story text
+  const prep = supportWords(story);
   const storyText = story.lines
     .map((l) => l.text ?? '')
     .join(' ')
     .toLowerCase();
-  const vocabToPreteach = _currentStoryVocab.filter((v) => {
-    const firstWord = v.word.toLowerCase().split(/\s+/)[0];
-    return storyText.includes(firstWord);
-  });
+  const vocab = (story.vocab ?? []).filter((v) =>
+    storyText.includes(v.word.toLowerCase().split(/\s+/)[0]),
+  );
 
-  // Nothing to pre-teach? Skip the gate silently.
-  if (!hfwInStory.length && !vocabToPreteach.length) {
+  // Nothing a child has to be told? Then there is nothing to warm up, and
+  // saying so is better than a gate with no content behind it.
+  if (!prep.length && !vocab.length) {
     _setMeetWordsCompleted(story.id);
-    _renderModeOrGate(story);
+    _renderStory(story);
     return;
   }
 
-  const totalChips = hfwInStory.length + vocabToPreteach.length;
-  // Gate softening (audit fix #8): require a 3-tap warm-up rather than
-  // every chip, so the child gets to the story in seconds without losing
-  // the priming benefit. The skip button stays available for returning
-  // readers who already know all the words.
-  const WARMUP_TARGET = 3;
-  const targetTaps = Math.min(WARMUP_TARGET, totalChips);
+  // Three taps, not every chip: enough to prime, fast enough to get to the
+  // story. "I know these" stays for a returning reader.
+  const target = Math.min(3, prep.length + vocab.length);
   const tapped = new Set();
 
-  const hfwChipsHtml = hfwInStory
-    .map(
-      (w) => /* html */ `
-    <button class="hfw-chip" data-tap-id="hfw:${w}" data-word="${w}" aria-label="Hear sight word ${w}">
-      ⭐ ${w}
-    </button>
-  `,
-    )
-    .join('');
-
-  const vocabChipsHtml = vocabToPreteach
-    .map(
-      (v) => /* html */ `
-    <button class="vocab-chip" data-tap-id="vocab:${v.word}" data-word="${v.word}" aria-label="Key word: ${v.word}">
-      <span class="vocab-chip-icon">${v.icon}</span>
-      <span class="vocab-chip-word">${v.word}</span>
-      <span class="vocab-chip-meaning">${v.meaning}</span>
-    </button>
-  `,
-    )
-    .join('');
-
-  dynamic.innerHTML = /* html */ `
-    <div class="meet-words-gate" role="region" aria-labelledby="gate-title">
-      <h3 id="gate-title">🤝 Meet the Words</h3>
-      <p class="gate-hello">
-        Tap <strong>any ${targetTaps}</strong> to warm up — or skip if you already
-        know them. Then read <strong>${story.title}</strong>.
+  dynamic.innerHTML = html`
+    <section class="warm-up" aria-labelledby="warm-up-title">
+      <h3 id="warm-up-title">🤝 Meet the words</h3>
+      <p class="warm-up-lead">
+        ${
+          prep.length
+            ? html`These are the words in <strong>${story.title}</strong> you cannot sound out — so
+              here they are first. Tap any ${target} to warm up.`
+            : html`A few words worth knowing before you read
+              <strong>${story.title}</strong>. Tap any ${target} to warm up.`
+        }
       </p>
 
       ${
-        hfwChipsHtml
-          ? /* html */ `
-        <div class="gate-section">
-          <div class="gate-section-title">⭐ Sight words in this story</div>
-          <div class="hfw-chip-list">${hfwChipsHtml}</div>
-        </div>
-      `
+        prep.length
+          ? html`<div class="warm-up-section">
+            <div class="warm-up-section-title">👀 Words to know first — tap to hear</div>
+            <div class="warm-up-words">
+              ${prep.map(
+                ({ word, display, status }) => html`<button
+                  type="button"
+                  class="story-prep-word"
+                  data-tap-id="prep:${word}"
+                  data-prep-word="${word}"
+                  data-status="${status}"
+                  aria-label="Hear the word ${display}"
+                >
+                  ${display}
+                </button>`,
+              )}
+            </div>
+          </div>`
           : ''
       }
 
       ${
-        vocabChipsHtml
-          ? /* html */ `
-        <div class="gate-section">
-          <div class="gate-section-title">📚 Key words to know</div>
-          <div class="vocab-chip-list">${vocabChipsHtml}</div>
-        </div>
-      `
+        vocab.length
+          ? html`<div class="warm-up-section">
+            <div class="warm-up-section-title">📚 Key words — tap to hear what they mean</div>
+            <div class="vocab-chip-list">
+              ${vocab.map(
+                (v) => html`<button
+                  class="vocab-chip"
+                  type="button"
+                  data-tap-id="vocab:${v.word}"
+                  data-word="${v.word}"
+                  aria-label="Key word: ${v.word}. ${v.meaning}"
+                >
+                  <span class="vocab-chip-icon">${v.icon}</span>
+                  <span class="vocab-chip-word">${v.word}</span>
+                  <span class="vocab-chip-meaning">${v.meaning}</span>
+                </button>`,
+              )}
+            </div>
+          </div>`
           : ''
       }
 
-      <div class="gate-continue-row">
-        <span class="gate-progress" id="gate-progress" aria-live="polite">0 of ${targetTaps} tapped</span>
-        <button class="btn btn--ghost" id="gate-skip" type="button">I know these →</button>
-        <button class="btn btn--primary" id="gate-continue" type="button" disabled>Start Reading →</button>
+      <div class="warm-up-row">
+        <span class="warm-up-progress" id="warm-up-progress" aria-live="polite"
+          >0 of ${target} tapped</span
+        >
+        <button class="btn btn--ghost" id="warm-up-skip" type="button">I know these →</button>
+        <button class="btn btn--primary" id="warm-up-go" type="button" disabled>
+          Start reading →
+        </button>
       </div>
-    </div>
+    </section>
   `;
+
+  const progress = document.getElementById('warm-up-progress');
+  const go = document.getElementById('warm-up-go');
 
   function recordTap(chip) {
     const id = chip.dataset.tapId;
     if (tapped.has(id)) return;
     tapped.add(id);
     chip.setAttribute('data-tapped', 'true');
-    const progressEl = document.getElementById('gate-progress');
-    if (progressEl) {
-      progressEl.textContent =
-        tapped.size >= targetTaps
-          ? `✓ Warmed up (${tapped.size} tapped) — keep going or start the story`
-          : `${tapped.size} of ${targetTaps} tapped`;
+    if (progress) {
+      progress.textContent =
+        tapped.size >= target
+          ? `✓ Warmed up — start the story, or keep tapping`
+          : `${tapped.size} of ${target} tapped`;
     }
-    if (tapped.size >= targetTaps) {
-      const continueBtn = document.getElementById('gate-continue');
-      if (continueBtn) continueBtn.disabled = false;
+    if (tapped.size >= target && go) {
+      go.disabled = false;
+      go.focus({ preventScroll: true });
     }
   }
 
-  // Wire chip taps (HFW + vocab) — speak the word and mark as tapped.
-  dynamic.querySelectorAll('.hfw-chip, .vocab-chip').forEach((chip) => {
+  dynamic.querySelectorAll('[data-prep-word]').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      // These cannot be sounded out, so hearing one IS the teaching step.
+      audio.speakSightWord(chip.dataset.prepWord)?.catch?.(() => {});
+      chip.classList.add('story-prep-word--said');
+      setTimeout(() => chip.classList.remove('story-prep-word--said'), 600);
+      recordTap(chip);
+    });
+  });
+  dynamic.querySelectorAll('.vocab-chip').forEach((chip) => {
     chip.addEventListener('click', async () => {
       _flashChip(chip);
       try {
@@ -769,13 +691,13 @@ function _renderMeetTheWordsGate(story) {
 
   const proceed = () => {
     _setMeetWordsCompleted(story.id);
-    _renderModeOrGate(story);
+    _renderStory(story);
   };
-  document.getElementById('gate-skip')?.addEventListener('click', proceed);
-  document.getElementById('gate-continue')?.addEventListener('click', proceed);
+  document.getElementById('warm-up-skip')?.addEventListener('click', proceed);
+  go?.addEventListener('click', proceed);
 }
 
-// ── READ ALOUD mode ───────────────────────────────────────────────────────
+// ── The reader ────────────────────────────────────────────────────────────
 
 /** Count the words in a story's spoken text */
 function _countStoryWords(story) {
@@ -784,16 +706,27 @@ function _countStoryWords(story) {
     .reduce((acc, l) => acc + l.text.trim().split(/\s+/).length, 0);
 }
 
-function _renderReadAloud(story) {
+/**
+ * The story reader.
+ *
+ * There used to be two: "Listen & Follow" and "Sound It Out", chosen with a
+ * toggle. They had drifted into being two different apps over one story —
+ * Sound It Out had no Listen button, no Talk About It, no Story Quest and no
+ * ending, and laid its pre-teach words out differently. A child who chose it
+ * lost the model read and the comprehension work; a child who chose the
+ * other was told "tap a word to sound it out" by a reader that was not
+ * called Sound It Out.
+ *
+ * There is one reader now, because the thing that made them two modes is
+ * gone: tapping a word opens the blend ladder wherever it is tapped.
+ * Listening is a button on that one reader, not a different reader.
+ */
+function _renderStory(story) {
   const dynamic = document.getElementById('story-dynamic');
   if (!dynamic) return;
 
   // This render replaces the story body the ruler measured and overlays.
   _destroyRuler();
-
-  // Decode mode parks its breakdown panel on <body>; clear it so a word
-  // tapped in Decode mode doesn't stay on screen once Read Aloud opens.
-  _removeDecodePanel();
 
   // Word spans are always rendered, in both follow modes. They are what makes
   // "👆 Tap a word to hear its sounds" true — that hint is printed
@@ -872,6 +805,36 @@ function _renderReadAloud(story) {
 
       ${_showGraphemes ? _soundLegendHtml() : ''}
 
+      ${(() => {
+        // The warm-up words, still reachable while reading. They used to
+        // vanish once the warm-up was passed, so a child who met "said" at
+        // the start and hit it in the third line had nowhere to go — and
+        // "said" is precisely a word they cannot work out for themselves.
+        // Folded away, because it is a reference now rather than a step.
+        const prep = supportWords(story);
+        if (!prep.length) return '';
+        return String(html`
+          <details class="story-prep-strip">
+            <summary>
+              👀 ${prep.length} ${prep.length === 1 ? 'word' : 'words'} to know — tap to hear
+            </summary>
+            <div class="story-prep-words">
+              ${prep.map(
+                ({ word, display, status }) => html`<button
+                  type="button"
+                  class="story-prep-word"
+                  data-prep-word="${word}"
+                  data-status="${status}"
+                  aria-label="Hear the word ${display}"
+                >
+                  ${display}
+                </button>`,
+              )}
+            </div>
+          </details>
+        `);
+      })()}
+
       ${
         // Where the child stopped last time. Shown rather than silently
         // jumped to: landing halfway down a story with no explanation is
@@ -893,6 +856,17 @@ function _renderReadAloud(story) {
            and a child should not have to look away from the line to press
            Next. Filled in by _startRuler when the ruler is switched on. -->
       <div class="ruler-nav-slot" id="ruler-nav-slot"></div>
+
+      <!-- A child reading quietly to themselves needs a way to say they have
+           finished. The read-aloud running out and the ruler reaching the
+           last line both end the story, but neither happens when someone
+           simply reads it — which is the point of the whole thing. -->
+      <div class="story-finish">
+        <button class="btn btn--primary btn--xl" type="button" id="btn-finish-story">
+          ✓ I have read the story
+        </button>
+        <p class="story-finish-note">Tap this when you get to the end.</p>
+      </div>
       ${talkHtml}
     </div>
 
@@ -1049,7 +1023,7 @@ function _renderReadAloud(story) {
     btn.addEventListener('click', () => {
       _followMode = btn.dataset.follow;
       _persistPref(PREFS_FOLLOW_KEY, _followMode);
-      _renderReadAloud(story);
+      _renderStory(story);
     });
   });
 
@@ -1079,7 +1053,7 @@ function _renderReadAloud(story) {
   document.getElementById('btn-toggle-graphemes')?.addEventListener('click', () => {
     _showGraphemes = !_showGraphemes;
     _persistPref(PREFS_GRAPHEMES_KEY, _showGraphemes);
-    _renderReadAloud(story);
+    _renderStory(story);
   });
 
   // Reading-ruler toggle
@@ -1113,6 +1087,26 @@ function _renderReadAloud(story) {
 
   document.getElementById('btn-story-play')?.addEventListener('click', () => _startTTS(story));
   document.getElementById('btn-story-stop')?.addEventListener('click', () => _stopTTS());
+
+  // The folded strip of words that cannot be sounded out — hearing one is
+  // the only way to meet it, so a tap speaks it.
+  dynamic.querySelectorAll('.story-prep-strip [data-prep-word]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      audio.speakSightWord(btn.dataset.prepWord)?.catch?.(() => {});
+      btn.classList.add('story-prep-word--said');
+      setTimeout(() => btn.classList.remove('story-prep-word--said'), 600);
+    });
+  });
+
+  document.getElementById('btn-finish-story')?.addEventListener('click', (e) => {
+    _finishStory(story);
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    btn.textContent = '✓ Read — well done!';
+    const note = document.querySelector('.story-finish-note');
+    if (note)
+      note.textContent = story.comprehension?.length ? 'Now have a go at the questions.' : '';
+  });
 
   // Fluency timer controls
   const wordCount = _countStoryWords(story);
@@ -1357,13 +1351,7 @@ function _startRuler(startWord = null) {
     // Tapping Next off the last line is the child saying they have finished.
     // The ruler is the one place where the app knows they read every line
     // themselves rather than listening to it.
-    const story = _currentStory;
-    if (!story) return;
-    markStoryRead(story.id);
-    const cta = document.getElementById('story-quest-cta');
-    if (cta) cta.hidden = false;
-    _showComprehensionCheck(story);
-    _showEnding(story);
+    _finishStory(_currentStory);
   });
   slot.querySelector('#btn-ruler-style').addEventListener('click', () => {
     const at = _rulerState?.word ?? 0;
@@ -1420,7 +1408,7 @@ function _wireReadToGiriControls(story) {
   document.getElementById('btn-rtg-next')?.addEventListener('click', () => _rtgAdvance(story));
   document.getElementById('btn-rtg-exit')?.addEventListener('click', () => {
     _resetReadToGiri();
-    _renderReadAloud(story);
+    _renderStory(story);
   });
 }
 
@@ -1440,7 +1428,7 @@ function _startReadToGiri(story) {
   if (_followMode !== 'word') {
     _followMode = 'word';
     _persistPref(PREFS_FOLLOW_KEY, _followMode);
-    _renderReadAloud(story);
+    _renderStory(story);
     // Re-render collapses the tool drawers; reopen the grown-up drawer and
     // the Read-to-Giri section so the controls the child just started stay put.
     const drawer = document.getElementById('practice-drawer');
@@ -1741,337 +1729,6 @@ function _plainWord(span) {
 }
 
 // ── DECODE mode ───────────────────────────────────────────────────────────
-
-function _renderDecodeMode(story) {
-  const dynamic = document.getElementById('story-dynamic');
-  if (!dynamic) return;
-
-  _destroyRuler();
-
-  // Drop any prior body-level panel before this render creates a fresh one,
-  // otherwise re-entering decode mode orphans a duplicate panel on <body>.
-  _removeDecodePanel();
-
-  // Store vocab for decode-panel lookup
-  _currentStoryVocab = story.vocab ?? [];
-
-  const hfwInStory = extractStoryHFW(story);
-
-  // Pre-teach section — HFW chips
-  const hfwChipsHtml = hfwInStory
-    .map(
-      (w) => /* html */ `
-    <button class="hfw-chip" data-word="${w}" aria-label="Hear sight word ${w}">
-      ⭐ ${w}
-    </button>
-  `,
-    )
-    .join('');
-
-  // Pre-teach section — Vocab key-word chips (words that appear in story text)
-  const storyText = story.lines
-    .map((l) => l.text ?? '')
-    .join(' ')
-    .toLowerCase();
-  const vocabToPreteach = _currentStoryVocab.filter((v) => {
-    const firstWord = v.word.toLowerCase().split(/\s+/)[0];
-    return storyText.includes(firstWord);
-  });
-  const vocabChipsHtml = vocabToPreteach
-    .map(
-      (v) => /* html */ `
-    <button class="vocab-chip" data-word="${v.word}" aria-label="Key word: ${v.word}">
-      <span class="vocab-chip-icon">${v.icon}</span>
-      <span class="vocab-chip-word">${v.word}</span>
-      <span class="vocab-chip-meaning">${v.meaning}</span>
-    </button>
-  `,
-    )
-    .join('');
-
-  // Build clickable story body
-  const storyBodyHtml = story.lines
-    .map((line, lineIdx) => {
-      if (line.type === 'label') {
-        return `<div class="sline sline--label" data-line="${lineIdx}">${line.text}</div>`;
-      }
-      // All other types: tokenise into clickable words
-      const tokens = tokenise(line.text);
-      const tokenHtml = tokens
-        .map((tok) => {
-          if (tok.type === 'word') {
-            const cleanWord = tok.text.toLowerCase().replace(/[^a-z]/g, '');
-            const hfw = isHFW(cleanWord);
-            const inner = _highlightGraphemes(tok.text, story.targetGraphemes, story.band);
-            return `<button class="decode-word${hfw ? ' decode-hfw' : ''}"
-                         data-word="${tok.text}"
-                         aria-label="${hfw ? 'Sight word: ' : 'Decode: '}${tok.text}"
-                >${inner}</button>`;
-          }
-          return `<span class="decode-punct">${tok.text}</span>`;
-        })
-        .join('');
-
-      const cls =
-        {
-          intro: 'sline--intro',
-          beat: 'sline--beat',
-          end: 'sline--end',
-          text: 'sline--text',
-          paragraph: 'sline--paragraph',
-        }[line.type] ?? '';
-
-      return `<p class="sline ${cls} decode-line" data-line="${lineIdx}">${tokenHtml}</p>`;
-    })
-    .join('');
-
-  dynamic.innerHTML = /* html */ `
-    <!-- Story text column -->
-    <div class="story-content-wrap">
-      <!-- Reading scaffold toggles -->
-      <div class="reader-scaffold-bar" role="group" aria-label="Reading scaffolds">
-        <button class="scaffold-toggle" id="btn-toggle-graphemes-decode" aria-pressed="${_showGraphemes}" title="Colour each vowel by the sound it makes — short, long, schwa, bossy-r or sliding">🎨 Sound colours</button>
-      </div>
-      ${_showGraphemes ? _soundLegendHtml() : ''}
-
-      <!-- Sight word pre-teach -->
-      <div class="hfw-preteach" id="hfw-preteach">
-        <div class="hfw-preteach-header">
-          <span class="hfw-preteach-title">⭐ Sight Words in this story</span>
-          <button class="hfw-toggle-btn" id="btn-hfw-toggle" aria-expanded="true" aria-controls="hfw-chip-list">
-            Hide ▲
-          </button>
-        </div>
-        <div id="hfw-chip-list" class="hfw-chip-list">
-          ${
-            hfwChipsHtml.length
-              ? hfwChipsHtml
-              : '<span class="hfw-none">None — all words are fully decodable!</span>'
-          }
-          <p class="hfw-tip">Tap each word to hear it. These words are read aloud in the story.</p>
-        </div>
-      </div>
-
-      <!-- Key vocabulary pre-teach -->
-      ${
-        vocabChipsHtml.length
-          ? /* html */ `
-      <div class="vocab-preteach" id="vocab-preteach">
-        <div class="hfw-preteach-header">
-          <span class="hfw-preteach-title">📚 Key Words — tap to hear</span>
-          <button class="hfw-toggle-btn" id="btn-vocab-toggle" aria-expanded="true" aria-controls="vocab-chip-list">
-            Hide ▲
-          </button>
-        </div>
-        <div id="vocab-chip-list" class="vocab-chip-list">${vocabChipsHtml}</div>
-      </div>
-      `
-          : ''
-      }
-
-      <!-- Decode-mode story body -->
-      <div class="story-body decode-body" id="story-body" aria-live="polite">
-        ${storyBodyHtml}
-      </div>
-    </div>
-
-    <!-- Controls sidebar column -->
-    <div class="story-controls-wrap">
-      <!-- Mark as read bar -->
-      <div class="story-done-bar">
-        <button class="btn btn--primary" id="btn-mark-read">✓ Mark story as read</button>
-      </div>
-
-      <!-- Decode panel (slides up when a word is tapped) -->
-      <div class="decode-panel" id="decode-panel" aria-live="polite" hidden>
-        <div class="decode-panel-inner" id="decode-panel-inner">
-          <!-- filled dynamically -->
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Show-sounds toggle (target-grapheme highlighting) — re-renders this mode
-  document.getElementById('btn-toggle-graphemes-decode')?.addEventListener('click', () => {
-    _showGraphemes = !_showGraphemes;
-    _persistPref(PREFS_GRAPHEMES_KEY, _showGraphemes);
-    _renderDecodeMode(story);
-  });
-
-  // Collapse/expand HFW section
-  document.getElementById('btn-hfw-toggle')?.addEventListener('click', () => {
-    const list = document.getElementById('hfw-chip-list');
-    const btn = document.getElementById('btn-hfw-toggle');
-    const expanded = btn.getAttribute('aria-expanded') === 'true';
-    list.hidden = expanded;
-    btn.setAttribute('aria-expanded', String(!expanded));
-    btn.textContent = expanded ? 'Show ▼' : 'Hide ▲';
-  });
-
-  // Collapse/expand vocab section
-  document.getElementById('btn-vocab-toggle')?.addEventListener('click', () => {
-    const list = document.getElementById('vocab-chip-list');
-    const btn = document.getElementById('btn-vocab-toggle');
-    const expanded = btn.getAttribute('aria-expanded') === 'true';
-    list.hidden = expanded;
-    btn.setAttribute('aria-expanded', String(!expanded));
-    btn.textContent = expanded ? 'Show ▼' : 'Hide ▲';
-  });
-
-  // HFW chip taps → just read the word aloud
-  dynamic.querySelectorAll('.hfw-chip').forEach((chip) => {
-    chip.addEventListener('click', () => {
-      const w = chip.dataset.word;
-      _flashChip(chip);
-      const utt = new SpeechSynthesisUtterance(w);
-      utt.rate = 0.85;
-      _applyTtsVoice(utt);
-      window.speechSynthesis?.cancel();
-      window.speechSynthesis?.speak(utt);
-    });
-  });
-
-  // Vocab chip taps → read word aloud + expand meaning
-  dynamic.querySelectorAll('.vocab-chip').forEach((chip) => {
-    chip.addEventListener('click', () => {
-      const w = chip.dataset.word;
-      _flashChip(chip);
-      chip.classList.toggle('vocab-chip--expanded');
-      const utt = new SpeechSynthesisUtterance(w);
-      utt.rate = 0.85;
-      _applyTtsVoice(utt);
-      window.speechSynthesis?.cancel();
-      window.speechSynthesis?.speak(utt);
-    });
-  });
-
-  // Mark as read
-  document.getElementById('btn-mark-read')?.addEventListener('click', (e) => {
-    markStoryRead(story.id);
-    const btn = e.currentTarget;
-    btn.textContent = '✓ Read!';
-    btn.disabled = true;
-    btn.classList.add('btn--success');
-    // Surface a quick comprehension self-check after marking the story read
-    _showComprehensionCheck(story);
-    _showEnding(story);
-  });
-
-  // Word tap → decode
-  // Move decode panel to document.body so it escapes #app overflow:hidden
-  const inlinePanel = document.getElementById('decode-panel');
-  if (inlinePanel) {
-    inlinePanel.remove();
-    document.body.appendChild(inlinePanel);
-  }
-  _decodePanelEl = inlinePanel;
-  dynamic.querySelectorAll('.decode-word').forEach((btn) => {
-    btn.addEventListener('click', () => _handleWordTap(btn));
-  });
-}
-
-async function _handleWordTap(wordBtn) {
-  // Clear previous active
-  document.querySelectorAll('.decode-word.decoding').forEach((b) => b.classList.remove('decoding'));
-  wordBtn.classList.add('decoding');
-
-  const rawWord = wordBtn.dataset.word;
-  const clean = rawWord.toLowerCase().replace(/[^a-z]/g, '');
-  if (clean) _wordsHelped.add(clean);
-  // Check word bank first — a word that can be decoded should never be shown
-  // as a sight word, even if it also appears in the HFW list.
-  const wordObj = lookupWord(rawWord);
-  const hfw = !wordObj && isHFW(clean);
-
-  const panel = _decodePanelEl;
-  if (!panel) return;
-
-  panel.removeAttribute('hidden');
-
-  if (hfw) {
-    // ── Sight word ──
-    _showDecodePanel({ type: 'hfw', word: clean });
-    const utt = new SpeechSynthesisUtterance(clean);
-    utt.rate = 0.85;
-    _applyTtsVoice(utt);
-    window.speechSynthesis?.cancel();
-    window.speechSynthesis?.speak(utt);
-  } else {
-    // ── A word to sound out ──
-    // The panel opens on the first rung and waits. Playing the sounds here
-    // would take the blending back off the child, which is the whole thing
-    // the ladder exists to give them.
-    //
-    // A word outside the bank still gets a ladder: the split is derived
-    // (deriveGraphemes.js), because two thirds of story words are not bank
-    // entries and "cakes" is no less decodable than "cake". Only a word
-    // that cannot be split at all — a name — falls through to hearing it.
-    const shown = _showDecodePanel({
-      type: 'decode',
-      word: wordObj?.word ?? clean,
-      wordObj: wordObj ?? { word: clean },
-    });
-    if (!shown) {
-      _showDecodePanel({ type: 'tts', word: clean });
-      const utt = new SpeechSynthesisUtterance(clean);
-      utt.rate = 0.85;
-      _applyTtsVoice(utt);
-      window.speechSynthesis?.cancel();
-      window.speechSynthesis?.speak(utt);
-    }
-  }
-}
-
-/**
- * Fill the decode panel.
- * @returns {boolean} false when a 'decode' word turned out to be unsplittable
- */
-function _showDecodePanel({ type, word, wordObj }) {
-  const inner = document.getElementById('decode-panel-inner');
-  if (!inner) return false;
-
-  if (type === 'hfw') {
-    inner.innerHTML = /* html */ `
-      <div class="dp-hfw">
-        <span class="dp-sight-badge">⭐ Sight Word</span>
-        <span class="dp-word">${word}</span>
-        <button class="dp-hear-btn" id="dp-hear">🔊 Hear again</button>
-      </div>
-    `;
-    document.getElementById('dp-hear')?.addEventListener('click', () => {
-      const utt = new SpeechSynthesisUtterance(word);
-      utt.rate = 0.85;
-      _applyTtsVoice(utt);
-      window.speechSynthesis?.cancel();
-      window.speechSynthesis?.speak(utt);
-    });
-    return true;
-  }
-
-  if (type === 'tts') {
-    inner.innerHTML = /* html */ `
-      <div class="dp-tts">
-        <span class="dp-word">${word}</span>
-        <button class="dp-hear-btn" id="dp-hear">🔊 Hear again</button>
-      </div>
-    `;
-    document.getElementById('dp-hear')?.addEventListener('click', () => {
-      const utt = new SpeechSynthesisUtterance(word);
-      utt.rate = 0.85;
-      _applyTtsVoice(utt);
-      window.speechSynthesis?.cancel();
-      window.speechSynthesis?.speak(utt);
-    });
-    return true;
-  }
-
-  // type === 'decode' — the blend ladder: the child adds one sound at a time
-  // and holds the sounds so far (m → ma → map). This used to auto-play every
-  // phoneme and then say the word, which demonstrates blending rather than
-  // asking for it.
-  inner.innerHTML = '';
-  return _mountBlendLadder(inner, wordObj);
-}
 
 /**
  * Put a blend ladder in `host`.
@@ -2508,16 +2165,24 @@ function _onTTSDone() {
     .forEach((el) => el.classList.remove('sline--active'));
   _clearWordHighlight();
   _toggleTTSButtons(false);
-  // Mark story as read when TTS finishes
-  if (_currentStory) markStoryRead(_currentStory.id);
-  // Reveal Story Quest CTA if story has quest data
+  _finishStory(_currentStory);
+}
+
+/**
+ * The story is done — by whichever of the three routes got here.
+ *
+ * The read-aloud running out, the ruler reaching the last line, and the
+ * child tapping "I have read the story" all mean the same thing and all did
+ * the same four steps in three places. One path now, so a route can never
+ * quietly skip the ending or the quest.
+ */
+function _finishStory(story) {
+  if (!story) return;
+  markStoryRead(story.id);
   const cta = document.getElementById('story-quest-cta');
   if (cta) cta.hidden = false;
-  // Surface a quick comprehension self-check (once per session)
-  if (_currentStory) _showComprehensionCheck(_currentStory);
-  // …then say what they did, and offer the three things anyone wants at the
-  // end of a story: again, the next one, or stop.
-  if (_currentStory) _showEnding(_currentStory);
+  _showComprehensionCheck(story);
+  _showEnding(story);
 }
 
 // ── The end of a story ────────────────────────────────────────────────────
