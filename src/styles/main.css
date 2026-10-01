@@ -8298,7 +8298,7 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .fluency-result {
   margin-top: var(--space-3);
   padding-top: var(--space-3);
-  border-top: 1px solid #86efac;
+  border-top: 1px solid var(--color-border);
 }
 .fluency-result-inner {
   display: flex;
@@ -8311,18 +8311,88 @@ details.story-tool-section[open] > .story-tool-summary::before {
   color: #374151;
   font-size: 0.9rem;
 }
+/* Not green. The reading is a measurement for a grown-up, not a pass mark:
+   a green number invites reading it as "well done", which is how a child in
+   the bottom quarter of their year group ended up being congratulated. */
 .fluency-wcpm {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  color: #15803d;
+  color: var(--color-text);
 }
-.fluency-level {
-  font-size: 0.9rem;
+.fluency-acc {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
 }
-.fluency-tip {
-  font-size: 0.8rem;
-  color: #4b5563;
+.fluency-detail {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+}
+/* Which benchmark this is being compared against, named rather than
+   implied — a parent comparing their child to a number deserves to know
+   whose number it is. */
+.fluency-reference {
   margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+}
+.fluency-intro {
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+}
+.fluency-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+/* An explicit `display` beats the browser default for [hidden], so without
+   this the form stayed on screen under its own result. */
+.fluency-form[hidden] {
+  display: none;
+}
+.fluency-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 4px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+.fluency-field small {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+.fluency-field legend {
+  padding: 0;
+  font-weight: 600;
+}
+.fluency-field label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target);
+  font-weight: 400;
+}
+.fluency-field input[type='number'] {
+  min-height: var(--touch-target);
+  max-width: 8rem;
+  padding: 0 var(--space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font: inherit;
 }
 
 /* ── Fluency History ──────────────────────────────────────────────────── */

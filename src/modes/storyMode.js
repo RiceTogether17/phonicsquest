@@ -29,6 +29,8 @@ import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 import { html } from '../utils/html.js';
 import { renderBlendLadder } from '../modules/blendLadder.js';
 import { deriveGraphemes, expandBlends } from '../modules/deriveGraphemes.js';
+import { readingRate, describeFluency } from '../modules/fluencyNorms.js';
+import { getActiveProfile } from '../modules/profiles.js';
 import {
   soundColoredHtml,
   graphemeSounds,
@@ -52,7 +54,6 @@ import {
   getRecorderState,
   saveFluencyAttempt,
   getFluencyHistory,
-  getBestWcpm,
 } from '../modules/storyRecording.js';
 
 const BASE = import.meta.env.BASE_URL;
@@ -146,6 +147,8 @@ function markStoryRead(id) {
 let _fluencyTimer = null;
 let _fluencyStart = null;
 let _fluencyRunning = false;
+// Seconds from the last timing, held while the grown-up enters the error count.
+let _fluencySeconds = 0;
 
 // ── Structured-literacy preferences (per-device localStorage) ─────────────
 // Visual scaffolds — child/teacher can switch them off when no longer needed.
@@ -826,16 +829,16 @@ function _renderReadAloud(story) {
   `
     : '';
 
-  // Fluency history for this story
+  // Reading-pace history for this story. Each entry says which measure it
+  // is: an older attempt with no error count is words per minute, and
+  // printing that beside a words-correct-per-minute reading as if they were
+  // the same number is how the old display misled.
   const historyAttempts = getFluencyHistory(story.id);
-  const bestWcpm = getBestWcpm(story.id);
-  const historyHtml =
-    historyAttempts.length > 0
-      ? /* html */ `
+  const historyHtml = historyAttempts.length
+    ? /* html */ `
     <div class="fluency-history" id="fluency-history">
       <div class="fluency-history-header">
-        <span class="fluency-history-title">📊 Recent Attempts</span>
-        ${bestWcpm !== null ? `<span class="fluency-history-best">Best: <strong>${bestWcpm}</strong> wpm</span>` : ''}
+        <span class="fluency-history-title">📊 Recent timings</span>
       </div>
       <div class="fluency-history-list">
         ${historyAttempts
@@ -843,14 +846,18 @@ function _renderReadAloud(story) {
           .reverse()
           .map((a) => {
             const d = new Date(a.date);
-            const dateStr = `${d.getDate()}/${d.getMonth() + 1}`;
-            return `<span class="fluency-history-item">${dateStr}: <strong>${a.wcpm}</strong> wpm</span>`;
+            const when = `${d.getDate()}/${d.getMonth() + 1}`;
+            const counted = typeof a.wcpm === 'number' && a.errors != null;
+            const n = counted ? a.wcpm : (a.wpm ?? a.wcpm);
+            const unit = counted ? 'correct/min' : 'words/min';
+            const help = a.support === 'supported' ? ' · with help' : '';
+            return `<span class="fluency-history-item">${when}: <strong>${n}</strong> ${unit}${help}</span>`;
           })
           .join('')}
       </div>
     </div>
   `
-      : '';
+    : '';
 
   dynamic.innerHTML = /* html */ `
     <!-- Story text column -->
@@ -941,19 +948,46 @@ function _renderReadAloud(story) {
           <span class="practice-hint">Optional · for grown-ups</span>
         </summary>
         <div class="story-tool-body practice-drawer-body">
-          <!-- Fluency timer section (collapsible) -->
+          <!-- Reading pace. A grown-up tool, and never shown to the child as
+               a score: reading speed is a screening measure for a teacher,
+               and put in front of a six-year-old it teaches that reading
+               fast is the goal — the habit most likely to wreck
+               comprehension. It asks for the error count, because without
+               one the number is words per minute, which cannot be compared
+               to a words-CORRECT-per-minute benchmark. -->
           <details class="story-tool-section fluency-bar" id="fluency-bar">
             <summary class="story-tool-summary fluency-summary">
-              <span class="fluency-label">⏱ Fluency Read</span>
-              <span class="fluency-hint">Time your reading speed</span>
+              <span class="fluency-label">⏱ Reading pace</span>
+              <span class="fluency-hint">For grown-ups · not shown as a score</span>
             </summary>
             <div class="story-tool-body">
+              <p class="fluency-intro">
+                Time one read-aloud of the whole story (${_countStoryWords(story)} words).
+                The app can't hear mistakes, so count them yourself to get
+                <strong>words correct per minute</strong> — the measure the benchmarks use.
+              </p>
               <div class="fluency-controls">
-                <button class="btn btn--ghost" id="btn-fluency-start">▶ Start timer</button>
+                <button class="btn btn--ghost" id="btn-fluency-start">▶ Start timing</button>
                 <span class="fluency-clock" id="fluency-clock" aria-live="polite">0:00</span>
-                <button class="btn btn--primary" id="btn-fluency-done" disabled>✓ Done</button>
+                <button class="btn btn--primary" id="btn-fluency-done" disabled>✓ Stop</button>
               </div>
-              <div class="fluency-result" id="fluency-result" hidden></div>
+              <form class="fluency-form" id="fluency-form" hidden>
+                <p class="fluency-time" id="fluency-time"></p>
+                <label class="fluency-field">
+                  Words read wrongly <small>(skipped, guessed, or given to them)</small>
+                  <input type="number" name="errors" min="0" max="${_countStoryWords(story)}" inputmode="numeric" />
+                </label>
+                <fieldset class="fluency-field">
+                  <legend>How did they read it?</legend>
+                  <label><input type="radio" name="support" value="independent" checked /> On their own</label>
+                  <label><input type="radio" name="support" value="supported" /> With some help</label>
+                </fieldset>
+                <div class="fluency-controls">
+                  <button class="btn btn--primary btn--sm" type="submit">Save</button>
+                  <button class="btn btn--ghost btn--sm" type="button" id="btn-fluency-discard">Don't save</button>
+                </div>
+              </form>
+              <div class="fluency-result" id="fluency-result" hidden aria-live="polite"></div>
               ${historyHtml}
             </div>
           </details>
@@ -1100,6 +1134,7 @@ function _renderReadAloud(story) {
   document
     .getElementById('btn-fluency-done')
     ?.addEventListener('click', () => _stopFluencyTimer(wordCount, story));
+  _wireFluencyForm(wordCount, story);
 
   // Recording controls
   _wireRecordingControls(story);
@@ -3032,10 +3067,21 @@ function _startFluencyTimer() {
   }, 500);
 }
 
+const _clock = (s) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
+
 /**
- * Stop the fluency timer and display WCPM result.
- * @param {number} [wordCount] – total words in story; if omitted, skips WCPM display
- * @param {object} [story] – story object for saving fluency history
+ * Stop the timer and ask the grown-up for the error count.
+ *
+ * Nothing is reported or saved until they answer, because without an error
+ * count the number is words per minute, and words per minute cannot be
+ * compared to a words-CORRECT-per-minute benchmark. It used to print
+ * "🌟 Fluent reader!" at 60 with no grade and no errors counted — which is
+ * about the middle of Grade 1 at year's end and about the 10th percentile
+ * for Grade 2, so the child most in need of the timing was the one most
+ * likely to be congratulated by it.
+ *
+ * @param {number} [wordCount]
+ * @param {object} [story]
  */
 function _stopFluencyTimer(wordCount, story) {
   if (!_fluencyRunning && _fluencyTimer === null) return;
@@ -3043,48 +3089,84 @@ function _stopFluencyTimer(wordCount, story) {
   _fluencyTimer = null;
   _fluencyRunning = false;
 
-  document.getElementById('btn-fluency-start').disabled = false;
-  document.getElementById('btn-fluency-done').disabled = true;
+  const startBtn = document.getElementById('btn-fluency-start');
+  const doneBtn = document.getElementById('btn-fluency-done');
+  if (startBtn) startBtn.disabled = false;
+  if (doneBtn) doneBtn.disabled = true;
 
   if (!wordCount || !_fluencyStart) return;
-
-  const elapsedSec = (Date.now() - _fluencyStart) / 1000;
+  const seconds = (Date.now() - _fluencyStart) / 1000;
   _fluencyStart = null;
-  if (elapsedSec < 2) return; // Ignore accidental taps
-
-  const wcpm = Math.round((wordCount / elapsedSec) * 60);
-  const mins = Math.floor(elapsedSec / 60);
-  const secs = Math.round(elapsedSec % 60);
-
-  // Save to fluency history
-  if (story) {
-    saveFluencyAttempt({
-      storyId: story.id,
-      wcpm,
-      durationSec: elapsedSec,
-      wordCount,
-    });
-  }
-
-  // Benchmark guidance (Hasbrouck & Tindal norms, Grade 1 Spring ≈ 53 WCPM)
-  let level;
-  if (wcpm >= 60) level = '🌟 Fluent reader!';
-  else if (wcpm >= 40) level = '📈 Building fluency — great progress!';
-  else level = '📖 Keep practising — try reading it again!';
 
   const result = document.getElementById('fluency-result');
-  if (result) {
+  const form = document.getElementById('fluency-form');
+  if (seconds < 5) {
+    if (result) {
+      result.hidden = false;
+      result.textContent = 'That was very quick — start timing as the reading begins.';
+    }
+    return;
+  }
+  if (!form) return;
+
+  _fluencySeconds = seconds;
+  if (result) result.hidden = true;
+  form.hidden = false;
+  const timeEl = document.getElementById('fluency-time');
+  if (timeEl) timeEl.textContent = `${wordCount} words in ${_clock(seconds)}.`;
+  form.querySelector('input[name="errors"]')?.focus({ preventScroll: true });
+}
+
+/** Wire the error-count form that turns a timing into a reading. */
+function _wireFluencyForm(wordCount, story) {
+  const form = document.getElementById('fluency-form');
+  const result = document.getElementById('fluency-result');
+  if (!form || !result) return;
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const raw = form.querySelector('input[name="errors"]')?.value ?? '';
+    const errors = raw === '' ? null : Number(raw);
+    const support = form.querySelector('input[name="support"]:checked')?.value ?? null;
+    const { wpm, wcpm, accuracy } = readingRate(wordCount, _fluencySeconds, errors);
+
+    saveFluencyAttempt({
+      storyId: story.id,
+      wpm,
+      wcpm,
+      errors,
+      accuracy,
+      support,
+      durationSec: _fluencySeconds,
+      wordCount,
+    });
+
+    const read = describeFluency({
+      wpm,
+      wcpm,
+      primaryGrade: getActiveProfile()?.primaryGrade ?? null,
+    });
+
+    form.hidden = true;
+    form.reset();
     result.hidden = false;
-    result.innerHTML = /* html */ `
+    result.innerHTML = html`
       <div class="fluency-result-inner">
-        <span class="fluency-time">Time: ${mins}:${String(secs).padStart(2, '0')}</span>
-        <span class="fluency-wcpm"><strong>${wcpm}</strong> words/min</span>
-        <span class="fluency-level">${level}</span>
+        <span class="fluency-time">${_clock(_fluencySeconds)}</span>
+        <span class="fluency-wcpm">${read.headline}</span>
+        ${accuracy != null ? html`<span class="fluency-acc">${accuracy}% accurate</span>` : ''}
       </div>
-      <p class="fluency-tip">Tip: Read the story again to improve your speed!</p>
+      <p class="fluency-detail">${read.detail}</p>
+      ${read.reference ? html`<p class="fluency-reference">${read.reference}</p>` : ''}
     `;
-    // Show Quest CTA now too
     const cta = document.getElementById('story-quest-cta');
     if (cta) cta.hidden = false;
-  }
+  });
+
+  document.getElementById('btn-fluency-discard')?.addEventListener('click', () => {
+    form.hidden = true;
+    form.reset();
+    result.hidden = false;
+    result.textContent = 'Not saved.';
+  });
 }

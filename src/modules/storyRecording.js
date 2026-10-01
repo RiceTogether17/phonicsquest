@@ -241,10 +241,22 @@ export function cleanupRecording() {
 // ── Fluency history (localStorage) ───────────────────────────────────────
 
 /**
- * Save a fluency attempt for a story.
+ * Save a reading-pace timing for a story.
+ *
+ * `wpm` and `wcpm` are two different measures and both are kept. Words per
+ * minute counts everything the child said; words CORRECT per minute
+ * subtracts the ones they got wrong, and is what published benchmarks are
+ * expressed in. `wcpm` is null when nobody counted errors, which is the
+ * honest state — the old code stored plain words-per-minute under the name
+ * `wcpm`, so a history of fast guessing read as a history of fluency.
+ *
  * @param {object} entry
  * @param {string} entry.storyId
- * @param {number} entry.wcpm
+ * @param {number} entry.wpm
+ * @param {number|null} [entry.wcpm]
+ * @param {number|null} [entry.errors]
+ * @param {number|null} [entry.accuracy]
+ * @param {'independent'|'supported'|null} [entry.support]
  * @param {number} entry.durationSec
  * @param {number} entry.wordCount
  * @param {string} [entry.recordingId] – if a recording was made
@@ -254,7 +266,11 @@ export function saveFluencyAttempt(entry) {
   const storyHistory = history[entry.storyId] ?? [];
   storyHistory.push({
     date: new Date().toISOString(),
-    wcpm: entry.wcpm,
+    wpm: entry.wpm ?? entry.wcpm ?? null,
+    wcpm: entry.wcpm ?? null,
+    errors: entry.errors ?? null,
+    accuracy: entry.accuracy ?? null,
+    support: entry.support ?? null,
     durationSec: Math.round(entry.durationSec),
     wordCount: entry.wordCount,
     hasRecording: !!entry.recordingId,
@@ -268,9 +284,11 @@ export function saveFluencyAttempt(entry) {
 }
 
 /**
- * Get fluency history for a story.
+ * Get the reading-pace history for a story, oldest first.
  * @param {string} storyId
- * @returns {Array<{date:string, wcpm:number, durationSec:number, wordCount:number, hasRecording:boolean}>}
+ * @returns {Array<{date:string, wpm:number|null, wcpm:number|null, errors:number|null,
+ *   accuracy:number|null, support:string|null, durationSec:number, wordCount:number,
+ *   hasRecording:boolean}>}
  */
 export function getFluencyHistory(storyId) {
   const history = _getHistory();
@@ -278,14 +296,22 @@ export function getFluencyHistory(storyId) {
 }
 
 /**
- * Get the best WCPM for a story.
+ * The best words-CORRECT-per-minute recorded for a story, or null when no
+ * timing has had its errors counted.
+ *
+ * Entries saved before the error count existed carry `wcpm: undefined` and
+ * are skipped rather than counted: they are words per minute, and reporting
+ * a "best" that mixes the two measures is how the old display flattered a
+ * child who guessed quickly.
+ *
  * @param {string} storyId
  * @returns {number|null}
  */
 export function getBestWcpm(storyId) {
-  const attempts = getFluencyHistory(storyId);
-  if (attempts.length === 0) return null;
-  return Math.max(...attempts.map((a) => a.wcpm));
+  const counted = getFluencyHistory(storyId)
+    .map((a) => a.wcpm)
+    .filter((n) => typeof n === 'number');
+  return counted.length ? Math.max(...counted) : null;
 }
 
 // ── Private helpers ──────────────────────────────────────────────────────
