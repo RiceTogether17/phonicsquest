@@ -31,9 +31,7 @@ const STOP = new Set(
   `a an the and or but so to of in on at by for with from up down out over into is are was were be been am
    it its this that these those he she they we you i me my his her their our your him them us
    do does did not no yes what who where when why how which there here then than as if too very
-   can could will would should has have had just all some any one true false story about
-   said says say get got go goes going come came make made take took put
-   little big new old good bad first next last also more most many much`.split(/\s+/),
+   can could will would should has have had just some any true false story about also`.split(/\s+/),
 );
 
 /**

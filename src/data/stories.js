@@ -97,6 +97,10 @@ export const STORIES = [
       { type: 'text', text: 'Giri had a plan. Giri had ham.' },
       { type: 'end', text: 'The cat ran at the ham. Giri had the hat back.' },
     ],
+    comprehension: [
+      { q: 'What sat on Giri\'s hat?', options: ['The cat', 'The ham', 'The mat'], answer: 0, type: 'literal' },
+      { q: 'How did Giri get his hat back?', options: ['The cat ran at the ham', 'The cat sat on the mat', 'Giri sat on the hat'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['How did Giri get the hat back?'],
   },
 
@@ -121,6 +125,10 @@ export const STORIES = [
       { type: 'text', text: 'Giri sat. Then the cat sat.' },
       { type: 'text', text: 'The cat ran at the ham. Snap!' },
       { type: 'end', text: 'Giri sat back. Then the cat sat on his lap. A nap at last!' },
+    ],
+    comprehension: [
+      { q: 'What did Giri have in his bag?', options: ['Ham', 'A cat', 'A mat'], answer: 0, type: 'literal' },
+      { q: 'Why did the cat run at the bag?', options: ['The ham was in it', 'The mat was in it', 'Giri sat on it'], answer: 0, type: 'inferential' },
     ],
     talkAboutIt: ['Where did the cat nap at the end?'],
   },
@@ -147,6 +155,10 @@ export const STORIES = [
       { type: 'text', text: 'Giri had a fan. He can fan the ant.' },
       { type: 'end', text: 'The ant ran. So Giri had the jam and the ham.' },
     ],
+    comprehension: [
+      { q: 'What sat in the jam?', options: ['An ant', 'A cat', 'A pan'], answer: 0, type: 'literal' },
+      { q: 'What did Giri use to make the ant go?', options: ['A fan', 'A pan', 'The ham'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['How did Giri get the ant to go?'],
   },
 
@@ -171,6 +183,10 @@ export const STORIES = [
       { type: 'text', text: '"I can nap," said Giri.' },
       { type: 'text', text: 'Tap, tap! An ant ran at his hand.' },
       { type: 'end', text: 'Giri and the cat ran. Then a nap at last!' },
+    ],
+    comprehension: [
+      { q: 'What ran at Giri\'s hand?', options: ['An ant', 'A cat', 'A man'], answer: 0, type: 'literal' },
+      { q: 'Why did Giri and the cat run?', options: ['An ant ran at his hand', 'The cat ran at the mat', 'It was a day for a nap'], answer: 0, type: 'inferential' },
     ],
     talkAboutIt: ['What ran at Giri\'s hand?'],
   },
@@ -199,6 +215,10 @@ export const STORIES = [
       { type: 'text', text: 'The chick did not sit. It ran in a big net.' },
       { type: 'end', text: 'Giri did get it. All is well. One white chick!' },
     ],
+    comprehension: [
+      { q: 'What came out of the egg?', options: ['A chick', 'A hen', 'An egg'], answer: 0, type: 'literal' },
+      { q: 'Why did the egg wiggle?', options: ['A chick was in it', 'The hen sat on it', 'It fell in the net'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['What came out of the white egg?'],
   },
 
@@ -223,6 +243,10 @@ export const STORIES = [
       { type: 'text', text: 'The lid had a map. What can this be?' },
       { type: 'text', text: '"I will dig again!" So Giri did dig and dig.' },
       { type: 'end', text: 'A red gem! "Do it again!" Giri came back.' },
+    ],
+    comprehension: [
+      { q: 'What did Giri find first in the pit?', options: ['A tin lid', 'A red gem', 'A big pin'], answer: 0, type: 'literal' },
+      { q: 'Why did Giri dig again?', options: ['The lid had a map', 'The pit was big', 'He had a red gem'], answer: 0, type: 'inferential' },
     ],
     talkAboutIt: ['What did Giri dig up in the end?'],
   },
@@ -249,6 +273,10 @@ export const STORIES = [
       { type: 'text', text: 'A cat sat above the bed. An ant ran in.' },
       { type: 'end', text: 'There! The rip is hid. The bed is best!' },
     ],
+    comprehension: [
+      { q: 'What was wrong with the bed?', options: ['It had a rip', 'It had an ant in it', 'A cat sat in it'], answer: 0, type: 'literal' },
+      { q: 'How do we know Giri can fix things?', options: ['He hid the rip fast', 'He sat on the bed', 'A cat sat above it'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['How did Giri fix the rip in his bed?'],
   },
 
@@ -273,6 +301,10 @@ export const STORIES = [
       { type: 'text', text: 'A red hen ran in. She can tap!' },
       { type: 'text', text: 'Her taps and his taps were a hit.' },
       { type: 'end', text: 'Ding! Tap! "We are a band!" said Giri.' },
+    ],
+    comprehension: [
+      { q: 'What did Giri say the tin lid was?', options: ['A bell', 'A bed', 'A net'], answer: 0, type: 'literal' },
+      { q: 'What did Giri and the hen make?', options: ['A band', 'A nap', 'A map'], answer: 0, type: 'inferential' },
     ],
     talkAboutIt: ['What did Giri and the hen make with taps?'],
   },
@@ -301,6 +333,10 @@ export const STORIES = [
       { type: 'text', text: 'Many frogs hop up! Ten frogs sit on the hot pot.' },
       { type: 'end', text: '"This is their pot!" What a story!' },
     ],
+    comprehension: [
+      { q: 'Who sat on top of the hot pot?', options: ['A frog', 'A dog', 'A cat'], answer: 0, type: 'literal' },
+      { q: 'Whose pot was it in the end?', options: ['The frogs\'', 'Giri\'s', 'The log\'s'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['Whose pot was it in the end?'],
   },
 
@@ -326,6 +362,10 @@ export const STORIES = [
       { type: 'text', text: 'Rub, rub! The mud runs off. Fun!' },
       { type: 'end', text: 'The pup is not in the mud. Giri is also wet!' },
     ],
+    comprehension: [
+      { q: 'Where did the pup dig?', options: ['In the mud', 'In a tub', 'In the sun'], answer: 0, type: 'literal' },
+      { q: 'Why did Giri get wet as well?', options: ['Some suds got on him', 'He sat in the mud', 'He dug with the pup'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['What did Giri wash off the pup?'],
   },
 
@@ -350,6 +390,10 @@ export const STORIES = [
       { type: 'text', text: 'Giri got broth and a snug rug. The dog slept.' },
       { type: 'end', text: 'Not lost. The dog is with a pal.' },
     ],
+    comprehension: [
+      { q: 'What did Giri follow?', options: ['Mud dots', 'A log', 'A rug'], answer: 0, type: 'literal' },
+      { q: 'Why was the dog not lost at the end?', options: ['It was with a pal', 'It got off the log', 'It went dot to dot'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['How did Giri find the lost dog?'],
   },
 
@@ -373,6 +417,10 @@ export const STORIES = [
       { type: 'text', text: 'Mop, mop, mop! The spot is not wet.' },
       { type: 'text', text: 'Then the cat sat smack on that spot. Cats!' },
       { type: 'end', text: 'Next cup: not on the rug.' },
+    ],
+    comprehension: [
+      { q: 'What did Giri set on the rug?', options: ['A hot cup', 'A wet mop', 'A cat'], answer: 0, type: 'literal' },
+      { q: 'Why was the hot cup on the rug a bad plan?', options: ['The cup fell and the rug got wet', 'The cat sat on it', 'The mop got wet'], answer: 0, type: 'inferential' },
     ],
     talkAboutIt: ['Who took the clean spot at the end?'],
   },
@@ -400,6 +448,10 @@ export const STORIES = [
       { type: 'text', text: 'The legs? Ants! Six ants had the bun.' },
       { type: 'end', text: 'Giri splits the bun with the ants.' },
     ],
+    comprehension: [
+      { q: 'What made the bun run?', options: ['Six ants', 'The cat', 'The hen'], answer: 0, type: 'literal' },
+      { q: 'What did Giri do with the bun at the end?', options: ['He split it with the ants', 'He ran with it', 'He put it on the rug'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['What were the bun’s "legs" really?'],
   },
 
@@ -425,6 +477,10 @@ export const STORIES = [
       { type: 'end', text: 'Wet, then dry. The sun wins.' },
     ],
     pretaught: ['dry'],
+    comprehension: [
+      { q: 'Where did Giri sit to get dry?', options: ['On a hot mat', 'In the tub', 'On a rug'], answer: 0, type: 'literal' },
+      { q: 'What was the sun\'s job?', options: ['To get Giri dry', 'To fill the tub', 'To drip on his legs'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['What was the sun’s job in this story?'],
   },
 
@@ -450,6 +506,10 @@ export const STORIES = [
       { type: 'end', text: 'A box can hold a big shock!' },
     ],
     pretaught: ['bite'],
+    comprehension: [
+      { q: 'What was in the big tan box?', options: ['A red bug', 'A bell', 'A jet'], answer: 0, type: 'literal' },
+      { q: 'Why did the box buzz?', options: ['A bug was in it', 'A bell was in it', 'A jet went past'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['What did Giri guess before opening the box?'],
   },
 
@@ -473,6 +533,10 @@ export const STORIES = [
       { type: 'text', text: 'The pond! Giri got in. Splash! The pup got in. Splash!' },
       { type: 'text', text: 'In the end, the pond won.' },
       { type: 'end', text: 'The best end to a run is a splash.' },
+    ],
+    comprehension: [
+      { q: 'Where did Giri and the pup end up?', options: ['In the pond', 'In the sun', 'On a mat'], answer: 0, type: 'literal' },
+      { q: 'Who won the big run?', options: ['The pond', 'Giri', 'The pup'], answer: 0, type: 'inferential' },
     ],
     talkAboutIt: ['Who won the big run?'],
   },
@@ -508,6 +572,11 @@ export const STORIES = [
       { type: 'beat',    text: 'He did not wait. He got the flat cake out and made a stack: cake, jam, cake, jam!' },
       { type: 'end',     text: 'Jay ate it by the lake. "Make me two, Giri!" That flat cake was the best.' },
     ],
+    comprehension: [
+      { q: 'Who was Giri baking the cakes for?', options: ['His pal Jay', 'The cat', 'His mother'], answer: 0, type: 'literal' },
+      { q: 'What went wrong with the cake?', options: ['It stayed flat', 'It was too hot', 'It fell in the lake'], answer: 0, type: 'literal' },
+      { q: 'How did Giri turn the flat cake into a great one?', options: ['He made a stack with jam', 'He baked it again', 'He gave it to Jay'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['How did Giri turn a flat cake into a great cake?'],
   },
 
@@ -535,6 +604,11 @@ export const STORIES = [
       { type: 'label',   text: 'Solution:' },
       { type: 'beat',    text: '"Take this home, toad!" Giri made it a moss home on the stone.' },
       { type: 'end',     text: 'The toad hopped off. The boat rose and rode the foam home!' },
+    ],
+    comprehension: [
+      { q: 'Why did the boat sit so low?', options: ['A toad had made it a home', 'It had a hole', 'The stream was slow'], answer: 0, type: 'literal' },
+      { q: 'Where did Giri make the toad a new home?', options: ['On the stone', 'In the boat', 'In the foam'], answer: 0, type: 'literal' },
+      { q: 'What happened once the toad had gone?', options: ['The boat rose and rode home', 'The boat still sat low', 'The stream got slow'], answer: 0, type: 'inferential' },
     ],
     talkAboutIt: ['Why was the boat sitting so low in the water?'],
   },
@@ -564,6 +638,11 @@ export const STORIES = [
       { type: 'beat',    text: 'He set the bee on a green leaf. "This should reach the tree," said Giri.' },
       { type: 'end',     text: 'The bee sped up to see its nest. A good deed, and a good day!' },
     ],
+    comprehension: [
+      { q: 'What was wrong with the bee?', options: ['It was too weak', 'It was wet', 'It had lost its nest'], answer: 0, type: 'literal' },
+      { q: 'What did Giri use to help the bee?', options: ['A green leaf', 'A tree', 'A nest'], answer: 0, type: 'literal' },
+      { q: 'Why did Giri think a leaf would help?', options: ['It could lift the bee up', 'It was green', 'The bee could eat it'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['How did the bee get up to its tree?'],
   },
 
@@ -591,6 +670,11 @@ export const STORIES = [
       { type: 'label',   text: 'Solution:' },
       { type: 'beat',    text: 'His run made the wind rise! The kite went up high, across the bright sky.' },
       { type: 'end',     text: 'By the water, Giri sat with a smile. "Come and see my kite fly!"' },
+    ],
+    comprehension: [
+      { q: 'Why would the kite not fly?', options: ['There was no wind', 'It had no tail', 'The line was too long'], answer: 0, type: 'literal' },
+      { q: 'What did Giri do to make the wind?', options: ['He ran', 'He sat still', 'He went up the hill'], answer: 0, type: 'literal' },
+      { q: 'What does this show about Giri?', options: ['He made the wind himself', 'He gave up fast', 'He did not like his kite'], answer: 0, type: 'inferential' },
     ],
     talkAboutIt: ['How did Giri make his own wind?'],
   },
@@ -620,6 +704,11 @@ export const STORIES = [
       { type: 'beat',    text: 'The snail slid to a safe spot, out of the cold rain. Giri waited all the way.' },
       { type: 'end',     text: 'The snail waved its tail. "I love this snail," said Giri. "It may take all day!"' },
     ],
+    comprehension: [
+      { q: 'Where was the snail sitting?', options: ['In the way of a drain', 'On a safe spot', 'Off the trail'], answer: 0, type: 'literal' },
+      { q: 'How did Giri move the snail?', options: ['With a soft push', 'He let the rain take it', 'He put it in his hand'], answer: 0, type: 'literal' },
+      { q: 'Why did it take Giri all day?', options: ['A snail is small and takes its time', 'The rain was cold', 'He had to wait for May'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['Why did Giri have to wait so long?'],
   },
 
@@ -647,6 +736,11 @@ export const STORIES = [
       { type: 'label',   text: 'Solution:' },
       { type: 'beat',    text: 'He cut one white stripe, then the other, and tied both tight to the kite.' },
       { type: 'end',     text: 'Now the kite had a fine tail! Once upon a time it rose high, white as salt in the sky.' },
+    ],
+    comprehension: [
+      { q: 'What did the kite need to fly?', options: ['A tail', 'Tight strings', 'A high hill'], answer: 0, type: 'literal' },
+      { q: 'What did Giri make the tail from?', options: ['Two white stripes', 'A green leaf', 'His kite plan'], answer: 0, type: 'literal' },
+      { q: 'Why did the kite fall on its side at first?', options: ['It had no tail', 'Its strings were cut', 'It was made of salt'], answer: 0, type: 'inferential' },
     ],
     talkAboutIt: ['What did the kite need to fly?'],
   },
@@ -676,6 +770,11 @@ export const STORIES = [
       { type: 'beat',    text: 'He rode on until he felt fine. Then he went back to give the lane a fix.' },
       { type: 'end',     text: 'Giri rolled the wide rock off the side. "Now the lane is safe to ride!"' },
     ],
+    comprehension: [
+      { q: 'What did the bike hit?', options: ['A rock', 'A pup', 'A tree'], answer: 0, type: 'literal' },
+      { q: 'What did Giri do at the end?', options: ['He rolled the rock off the lane', 'He went home', 'He fixed his bike'], answer: 0, type: 'literal' },
+      { q: 'Why did Giri roll the rock off the lane?', options: ['So no one else would fall', 'He wanted to keep it', 'It was in his way home'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['Why did Giri roll the stone off the lane?'],
   },
 
@@ -703,6 +802,11 @@ export const STORIES = [
       { type: 'label',   text: 'Solution:' },
       { type: 'beat',    text: 'The goat gave up the coat and chose to chomp on the tasty oats.' },
       { type: 'end',     text: 'Giri went home with his coat. The goat ran to its mother and brother.' },
+    ],
+    comprehension: [
+      { q: 'What did the goat bite?', options: ['Giri\'s soft coat', 'A pile of oats', 'The road'], answer: 0, type: 'literal' },
+      { q: 'What did Giri hold out to the goat?', options: ['A big pile of oats', 'His coat', 'A hot bun'], answer: 0, type: 'literal' },
+      { q: 'Why did the goat stop eating the coat?', options: ['The oats were tasty', 'It had to go home', 'The coat was too soft'], answer: 0, type: 'inferential' },
     ],
     talkAboutIt: ['Why did the goat stop eating the coat?'],
   },
@@ -732,6 +836,11 @@ export const STORIES = [
       { type: 'beat',    text: 'Then the wave went back. "It is tag with the sea!" They all leaped in and back.' },
       { type: 'end',     text: 'They had a sweet peach treat. What a day at the sea!' },
     ],
+    comprehension: [
+      { q: 'Who came to the beach too?', options: ['A girl and a boy', 'His mother', 'No one'], answer: 0, type: 'literal' },
+      { q: 'What treat did they eat?', options: ['A sweet peach', 'A green bean', 'Sea weed'], answer: 0, type: 'literal' },
+      { q: 'What game did Giri play with the sea?', options: ['Tag', 'Hide and seek', 'Leap frog'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['What game did Giri play with the sea?'],
   },
 
@@ -759,6 +868,11 @@ export const STORIES = [
       { type: 'label',   text: 'Solution:' },
       { type: 'beat',    text: 'The rain stopped. Giri made big mud prints all the way home. Stamp, stamp!' },
       { type: 'end',     text: 'Giri saw his trail of prints. "Where the rain fell, I had fun!"' },
+    ],
+    comprehension: [
+      { q: 'Where did Giri hide from the rain?', options: ['In a cave', 'At home', 'On the trail'], answer: 0, type: 'literal' },
+      { q: 'What did Giri make on the way home?', options: ['Big mud prints', 'A rain trail', 'A mud cave'], answer: 0, type: 'literal' },
+      { q: 'How did Giri feel about the rain in the end?', options: ['He had fun', 'He was cross', 'He was sad'], answer: 0, type: 'inferential' },
     ],
     talkAboutIt: ['What did Giri make with his feet on the muddy trail?'],
   },
@@ -788,6 +902,11 @@ export const STORIES = [
       { type: 'beat',    text: 'He let it feel the heat of the sun. At last, a green leaf reached up!' },
       { type: 'end',     text: 'The seed has a friend in Giri. Maybe it will be a tree!' },
     ],
+    comprehension: [
+      { q: 'What did the seed need?', options: ['A deep drink each day', 'A deep hole', 'A tall tree'], answer: 0, type: 'literal' },
+      { q: 'Who told Giri what the seed needed?', options: ['His friend', 'His mother', 'A bee'], answer: 0, type: 'literal' },
+      { q: 'How do we know the seed had woken up?', options: ['A green leaf reached up', 'It gave a nod', 'It was in the heat'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['What did the seed need to grow?'],
   },
 
@@ -815,6 +934,11 @@ export const STORIES = [
       { type: 'label',   text: 'Solution:' },
       { type: 'beat',    text: 'He made the hole a note slot and let a note go down to the mole.' },
       { type: 'end',     text: 'Now Giri and the mole have a way to chat. Notes go to and fro!' },
+    ],
+    comprehension: [
+      { q: 'Who dug the hole in the stone wall?', options: ['A nosy mole', 'Giri', 'An old oak'], answer: 0, type: 'literal' },
+      { q: 'What did Giri turn the hole into?', options: ['A note slot', 'A home for the mole', 'A way to the oak'], answer: 0, type: 'literal' },
+      { q: 'Why did Giri not fill the hole in?', options: ['He made it of use', 'He was too old', 'The mole dug it again'], answer: 0, type: 'inferential' },
     ],
     talkAboutIt: ['What did Giri turn the hole into?'],
   },
@@ -846,6 +970,11 @@ export const STORIES = [
       { type: 'beat',    text: 'Soon the flute played the same sweet tune as before. The notes came out true.' },
       { type: 'end',     text: 'By the green tree, people sat to see him play. "Play the same tune!" they did say.' },
     ],
+    comprehension: [
+      { q: 'Why did the flute stop making a tune?', options: ['It was full of grit and dust', 'It had a crack', 'Giri lost it'], answer: 0, type: 'literal' },
+      { q: 'What did Giri clean the flute with?', options: ['Soap and suds', 'A brush', 'Cool shade'], answer: 0, type: 'literal' },
+      { q: 'What happened when Giri played again?', options: ['People sat to see him play', 'The flute broke', 'No tune came out'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['Why did the flute stop making a tune?'],
   },
 
@@ -874,6 +1003,11 @@ export const STORIES = [
       { type: 'beat',    text: '"Is your kite pretty?" asked his pal. "It is! And each bit is blue," said Giri, happy.' },
       { type: 'end',     text: 'The new kite flew up, up! "Please fly!" Giri felt so happy. "The best kite yet!"' },
     ],
+    comprehension: [
+      { q: 'What happened to the old kite?', options: ['It got stuck in a tree', 'It broke in two', 'It blew away'], answer: 0, type: 'literal' },
+      { q: 'What colour was each bit of the new kite?', options: ['Blue', 'White', 'Green'], answer: 0, type: 'literal' },
+      { q: 'What did Giri do when the old kite got stuck?', options: ['He made a new one', 'He gave up', 'He climbed the tree'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['What did Giri do when his old kite got stuck?'],
   },
 
@@ -901,6 +1035,11 @@ export const STORIES = [
       { type: 'label',   text: 'Solution:' },
       { type: 'beat',    text: 'Soon the mist swept away. The moon came back, bright as the moon on the sea.' },
       { type: 'end',     text: 'This night, this moon, this pool — Giri will keep these in mind. Time to leave!' },
+    ],
+    comprehension: [
+      { q: 'What hid the moon?', options: ['A grey mist', 'The trees', 'The pool'], answer: 0, type: 'literal' },
+      { q: 'What did Giri do while he waited?', options: ['He ate a snack', 'He went home', 'He swam in the pool'], answer: 0, type: 'literal' },
+      { q: 'Why did Giri keep still and wait?', options: ['To see the moon come back', 'To see the flies zoom', 'To keep the pool dim'], answer: 0, type: 'inferential' },
     ],
     talkAboutIt: ['What hid the moon for a little while?'],
   },
@@ -932,6 +1071,11 @@ export const STORIES = [
       { type: 'beat',    text: 'He put the shells back in the box. A moth did fly off with a flick!' },
       { type: 'end',     text: 'The man was so glad. This shop was his life! He held up a shell to the light.' },
     ],
+    comprehension: [
+      { q: 'What fell off the shelf?', options: ['A big box of shells', 'A brush', 'A moth'], answer: 0, type: 'literal' },
+      { q: 'What did Giri use to clean up?', options: ['A brush and a bin', 'A mop', 'Just his hands'], answer: 0, type: 'literal' },
+      { q: 'How did the man feel at the end?', options: ['Glad', 'Cross', 'Sad'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['How did Giri help at the shell shop?'],
   },
 
@@ -959,6 +1103,11 @@ export const STORIES = [
       { type: 'label',   text: 'Solution:' },
       { type: 'beat',    text: 'He sang high and long. The song was fine! Clap, click, sing along!' },
       { type: 'end',     text: 'Then the song was a hit! His pals sang along, strong and long.' },
+    ],
+    comprehension: [
+      { q: 'What went wrong at the test run?', options: ['Giri got stuck', 'No one came', 'He lost his song'], answer: 0, type: 'literal' },
+      { q: 'What did Giri do to start again?', options: ['He shut an eye and sang from the top', 'He got a pal to sing', 'He did quit'], answer: 0, type: 'literal' },
+      { q: 'What does this story show about Giri?', options: ['He did not quit', 'He sang best with his pals', 'He got it wrong at the test'], answer: 0, type: 'inferential' },
     ],
     talkAboutIt: ['What did Giri do when the song went wrong?'],
   },
@@ -989,6 +1138,11 @@ export const STORIES = [
       { type: 'beat',    text: '"So... one bun is for me?" "Yes!" Out came Mole. No coat. No hat.' },
       { type: 'end',     text: '"See? It is fun out here." "The bun is why I came. But yes — also the fun."' },
     ],
+    comprehension: [
+      { q: 'Why did Mole not want to go out?', options: ['It was cold', 'He was tired', 'He had no coat'], answer: 0, type: 'literal' },
+      { q: 'What made Mole come out?', options: ['A hot bun', 'A trip to the lake', 'A game'], answer: 0, type: 'literal' },
+      { q: 'Was Mole glad he came out?', options: ['Yes, he liked the fun too', 'No, he went back home', 'He did not say'], answer: 0, type: 'inferential' },
+    ],
     talkAboutIt: ['What made Mole come out of his hole in the end?'],
   },
 
@@ -1015,6 +1169,11 @@ export const STORIES = [
       { type: 'label',   text: 'Solution:' },
       { type: 'beat',    text: 'The bee sat still on a green stem. "Take a deep sniff." Sweet! A bed of mint!' },
       { type: 'end',     text: '"Great find! You and me — we make a fine team." "Yes," said the bee. "Buzz!"' },
+    ],
+    comprehension: [
+      { q: 'What were Giri and the bee looking for?', options: ['The sweet spot', 'A green tree', 'The way home'], answer: 0, type: 'literal' },
+      { q: 'What did they find?', options: ['A bed of mint', 'A bee nest', 'A green leaf'], answer: 0, type: 'literal' },
+      { q: 'How did the bee show Giri the spot?', options: ['It sat still and said to sniff', 'It went from tree to tree', 'It did a big buzz'], answer: 0, type: 'inferential' },
     ],
     talkAboutIt: ['How did the bee help Giri find the sweet spot?'],
   },
@@ -1132,7 +1291,7 @@ export const STORIES = [
     ],
     comprehension: [
       { q: 'What had Giri lost?', options: ['His shell necklace', 'His star chart', 'His hat', 'His bag'], answer: 0, type: 'literal' },
-      { q: 'How did the thrush help?', options: ['It pecked at the necklace to show Giri', 'It sang a song', 'It flew away', 'It brought food'], answer: 0, type: 'literal' },
+      { q: 'How did the thrush help?', options: ['It pecked at the necklace to show Giri', 'It sang a song', 'It flew away', 'It gave him food'], answer: 0, type: 'literal' },
       { q: 'What does this story teach us?', options: ['Help can come from unexpected places', 'Birds are always helpful', 'Necklaces are easy to find', 'Bushes are the best hiding spots'], answer: 0, type: 'inferential' },
     ],
     vocab: [
@@ -1260,7 +1419,7 @@ export const STORIES = [
     comprehension: [
       { q: 'Who knocked at the door?', options: ['Mrs Tan', 'A park ranger', 'His mum', 'A postman'], answer: 0, type: 'literal' },
       { q: 'What did Mrs Tan need help with?', options: ['Changing a light bulb', 'Finding her keys', 'Cooking food', 'Carrying bags'], answer: 0, type: 'literal' },
-      { q: 'What can we learn from Giri in this story?', options: ['Helping neighbours is kind and clever', 'Step stools always break', 'Shelves are too high', 'Do not answer the door'], answer: 0, type: 'inferential' },
+      { q: 'What can we learn from Giri in this story?', options: ['Helping a neighbour is kind and clever', 'Step stools always break', 'Shelves are too high', 'Do not answer the door'], answer: 0, type: 'inferential' },
     ],
     vocab: [
       { word: 'neighbour', meaning: 'Someone who lives close to you', icon: '🏠' },
@@ -1387,7 +1546,7 @@ export const STORIES = [
     comprehension: [
       { q: 'Where was the baby turtle stuck?', options: ['In a dip in the sand', 'In the surf', 'Under a rock', 'In a net'], answer: 0, type: 'literal' },
       { q: 'What did Giri do first?', options: ['He dug the sand away from the shell', 'He picked the turtle up', 'He called for help', 'He splashed water on it'], answer: 0, type: 'literal' },
-      { q: 'Why did the turtle need help quickly?', options: ['The hot sun was burning the sand', 'It was getting dark', 'The tide was coming in', 'A bird was near'], answer: 0, type: 'inferential' },
+      { q: 'Why did the turtle need help quickly?', options: ['The hot sun was burning the sand', 'It was getting dark', 'The tide was coming in', 'A bird was there'], answer: 0, type: 'inferential' },
     ],
     vocab: [
       { word: 'flippers', meaning: 'The flat arms a turtle uses to swim', icon: '🐢' },
@@ -1429,7 +1588,7 @@ export const STORIES = [
     comprehension: [
       { q: 'Where was Giri\'s garden plot?', options: ['By the void deck', 'On a farm', 'At school', 'By the beach'], answer: 0, type: 'literal' },
       { q: 'What came up after the big rain?', options: ['Tiny turnip tops', 'A row of corn', 'Red flowers', 'Long beans'], answer: 0, type: 'literal' },
-      { q: 'How do we know Giri did not give up?', options: ['He watered the seeds every morning and kept waiting', 'He bought new seeds', 'He asked Mrs Tan to help', 'He dug up the plot'], answer: 0, type: 'inferential' },
+      { q: 'How do we know Giri did not give up?', options: ['He watered the seeds every morning and kept waiting', 'He planted new seeds', 'He asked Mrs Tan to help', 'He dug up the plot'], answer: 0, type: 'inferential' },
     ],
     vocab: [
       { word: 'void deck', meaning: 'The open space under an HDB block', icon: '🏢' },
@@ -1512,8 +1671,8 @@ export const STORIES = [
       { type: 'end',       text: '"The bird had it right," said Giri. "Could, would, should — you think hard first!" "Yes," said the bird. "That is why I am a smart bird."' },
     ],
     comprehension: [
-      { q: 'Why did the bird not want to fly to the barn?', options: ['A storm was near', 'She was tired', 'She was scared of Giri', 'It was too dark'], answer: 0, type: 'literal' },
-      { q: 'Where did Giri and the bird hide?', options: ['Under the cart', 'In the barn', 'Up a tree', 'In the house'], answer: 0, type: 'literal' },
+      { q: 'Why did the bird not want to fly to the barn?', options: ['A storm was coming', 'She was tired', 'She was scared of Giri', 'It was too dark'], answer: 0, type: 'literal' },
+      { q: 'Where did Giri and the bird hide?', options: ['Under the cart', 'In the barn', 'Up a tree', 'In the yard'], answer: 0, type: 'literal' },
       { q: 'What lesson did Giri learn?', options: ['Think hard before you act', 'Run fast in the rain', 'Birds cannot fly', 'Storms are fun'], answer: 0, type: 'inferential' },
     ],
     talkAboutIt: [
@@ -1718,8 +1877,8 @@ export const STORIES = [
       { type: 'end',       text: 'His team did not win a trophy, but they won something better — the loudest cheer of the day. Giri felt proud. Courage, he decided, was not about never falling down. It was about getting up and carrying on.' },
     ],
     comprehension: [
-      { q: 'What caused Giri to fall?', options: ['His foot caught a mound of soil', 'He tripped on the baton', 'Another runner pushed him', 'He slipped on wet grass'], answer: 0, type: 'literal' },
-      { q: 'What encouraged Giri to get back up?', options: ['The crowd cheering for him', 'His coach told him to', 'He wanted a trophy', 'He was not hurt'], answer: 0, type: 'inferential' },
+      { q: 'What caused Giri to fall?', options: ['His foot hit a mound of soil', 'He tripped on the baton', 'Another runner pushed him', 'He slipped on wet grass'], answer: 0, type: 'literal' },
+      { q: 'What encouraged Giri to get back up?', options: ['The crowd roaring for him', 'His coach told him to', 'He wanted a trophy', 'He was not hurt'], answer: 0, type: 'inferential' },
       { q: 'What did Giri learn about courage?', options: ['It is about getting up when you fall', 'It means winning every race', 'It means never being scared', 'It means being the fastest'], answer: 0, type: 'inferential' },
     ],
     vocab: [
