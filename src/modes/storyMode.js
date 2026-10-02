@@ -81,6 +81,8 @@ let _wordPanel = null;
 let _panelWord = null;
 let _panelRoomHost = null;
 let _panelObserver = null;
+// Cancels the one re-check scheduled for when scrolling settles.
+let _panelSettle = null;
 // The story open in the reader. Set when the reader renders, not only when
 // text-to-speech starts, because the ruler and the place tracker need to
 // know which story they are in whether or not anything is being spoken.
@@ -727,10 +729,17 @@ function _renderWarmUp(story) {
   dynamic.querySelectorAll('.vocab-chip').forEach((chip) => {
     chip.addEventListener('click', async () => {
       _flashChip(chip);
+      // "Key words — tap to hear what they mean". These words are decodable;
+      // what a child needs is the meaning, and the warm-up used to say only
+      // the word while the meaning stayed hidden. Show it and say it — the
+      // definition is usually harder to read than the story itself.
+      chip.classList.add('vocab-chip--expanded');
+      recordTap(chip);
+      const meaning = chip.querySelector('.vocab-chip-meaning')?.textContent?.trim();
       try {
         await audio.speakWord(chip.dataset.word);
+        if (meaning) await audio.speakText(meaning);
       } catch {}
-      recordTap(chip);
     });
   });
 
@@ -2135,6 +2144,22 @@ function _openWordDetective(text, span) {
   first?.focus({ preventScroll: true });
 
   _keepWordInSight();
+  // Check again once scrolling has finished. Layout can shift underneath a
+  // smooth scroll — the page itself clamping its own scroll as the screen
+  // settles moved the word 26px after it had been placed, leaving it 6px
+  // above the panel. _keepWordInSight re-sizes the pane's room each time, so
+  // a second pass absorbs the shift. scrollend where supported, a timer
+  // where not; whichever comes first, and cancelled if the panel closes.
+  _panelSettle = new AbortController();
+  const { signal } = _panelSettle;
+  const settle = () => {
+    if (signal.aborted) return;
+    _keepWordInSight();
+  };
+  (_panelRoomHost ?? window).addEventListener('scrollend', settle, { once: true, signal });
+  window.addEventListener('scrollend', settle, { once: true, signal });
+  const settleTimer = setTimeout(settle, 700);
+  signal.addEventListener('abort', () => clearTimeout(settleTimer));
   // The ladder grows a rung at a time and can wrap onto another line, which
   // makes the panel taller and would slide it up over the word. Re-check
   // whenever it changes size (and on rotation, which resizes it too).
@@ -2169,6 +2194,8 @@ function _ensureWordPanel() {
 function _closeWordPanel({ restoreFocus = true } = {}) {
   _panelObserver?.disconnect();
   _panelObserver = null;
+  _panelSettle?.abort();
+  _panelSettle = null;
   if (_panelRoomHost) _panelRoomHost.style.paddingBottom = '';
   _panelRoomHost = null;
   document.body.classList.remove('word-panel-open');

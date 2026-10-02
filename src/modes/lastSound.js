@@ -18,7 +18,7 @@ import { createChoiceRound } from './choiceRound.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { WORDS, shuffleArray } from '../data/words.js';
-import { lastPhoneme, soundKey } from './phonemePosition.js';
+import { lastPhoneme, soundDistinctPicker } from './phonemePosition.js';
 
 /**
  * Common phoneme confusion pairs — especially relevant for final consonants
@@ -177,16 +177,8 @@ function _poolPhoneme(word, position) {
  */
 function _getDistractors(correctGrapheme, position, maxLevel = 3, targetType = null) {
   // Keyed by the sound each choice shows, not the letter — k and ck, s and
-  // se, ll and l are one sound each. See soundKey.
-  const seen = new Set([soundKey(correctGrapheme, targetType ?? 'c')]);
-  const distractors = [];
-  const add = (grapheme, type) => {
-    const key = soundKey(grapheme, type);
-    if (seen.has(key)) return false;
-    seen.add(key);
-    distractors.push({ grapheme, type });
-    return true;
-  };
+  // se, ll and l are one sound each. See soundKeys.
+  const { add, distractors } = soundDistinctPicker(correctGrapheme, targetType ?? 'c');
 
   // Tier 1: confusion-pair phonemes
   const confusionTargets = CONFUSION_MAP[correctGrapheme.toLowerCase()] ?? [];

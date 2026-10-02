@@ -1,4 +1,5 @@
 import { phonemeNotation } from '../data/words.js';
+import { phonemeAudioFile } from '../modules/audio.js';
 
 /**
  * Where the first and last PHONEME of a word actually live.
@@ -93,19 +94,47 @@ export function lastPhoneme(word) {
 }
 
 /**
- * The sound a choice shows — and so what two choices must differ in.
+ * Keys under which two choices count as the same sound. Two choices clash if
+ * they share ANY key.
  *
- * Choice buttons are labelled by sound, not by letter: "c" and "k" both read
- * /k/. Distractors used to be de-duplicated by letter, so a First Sound
- * round for "cat" could offer /k/ twice, the "k" one counting as wrong — a
- * child who heard the sound perfectly was marked wrong for it. The same held
- * for ck/k, ss/s and ll/l at the end of a word and ai/ay/a_e in the middle.
- * This is the same notation the buttons print, so "different" here means
- * different on screen.
+ * Choice buttons are labelled by sound, not letter: "c" and "k" both read
+ * /k/. Distractors used to be de-duplicated by letter, so a First Sound round
+ * for "cat" could offer /k/ twice, one counting as wrong — a child who heard
+ * the sound perfectly was marked wrong for it. Neither normalisation catches
+ * everything on its own: the printed notation keeps the spelling for long
+ * vowels (a / ai / ay), and the recordings keep c and k apart. So both:
+ *   - n: what the button prints (c ≡ k ≡ ck, soft g ≡ j);
+ *   - a: the recording the child hears (ai ≡ ay ≡ a_e, ir ≡ ur ≡ er, oy ≡ oi).
  *
  * @param {string} grapheme
  * @param {string} type
+ * @returns {string[]}
  */
-export function soundKey(grapheme, type) {
-  return phonemeNotation(grapheme, type).join('');
+export function soundKeys(grapheme, type) {
+  const keys = [`n:${phonemeNotation(grapheme, type).join('')}`];
+  const file = phonemeAudioFile(grapheme, type);
+  if (file) keys.push(`a:${file}`);
+  return keys;
+}
+
+/**
+ * A distractor picker that never repeats a sound or offers the answer's.
+ *
+ * @param {string} answerGrapheme
+ * @param {string} answerType
+ * @returns {{ add: (g: string, t: string) => boolean, distractors: {grapheme: string, type: string}[] }}
+ */
+export function soundDistinctPicker(answerGrapheme, answerType) {
+  const seen = new Set(soundKeys(answerGrapheme, answerType));
+  const distractors = [];
+  return {
+    distractors,
+    add(grapheme, type) {
+      const keys = soundKeys(grapheme, type);
+      if (keys.some((k) => seen.has(k))) return false;
+      keys.forEach((k) => seen.add(k));
+      distractors.push({ grapheme, type });
+      return true;
+    },
+  };
 }
