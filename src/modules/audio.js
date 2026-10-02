@@ -95,6 +95,42 @@ const PHONEME_FILES = {
 };
 
 /**
+ * The phoneme key a grapheme plays under — the normalisation speakPhoneme
+ * applies before choosing a recording. Pure, so the choice builders can ask
+ * "do these two spellings make the same sound?" of the same source of truth
+ * the child's ears get.
+ *
+ * @param {string} grapheme
+ * @param {string} type
+ */
+export function phonemeAudioKey(grapheme, type) {
+  let key = String(grapheme ?? '').toLowerCase();
+  if (type === 'lv') key = `long_${key.replace('ee', 'e').replace('ay', 'a')}`;
+  // 'oo' typed as a SHORT vowel is the /ʊ/ pattern (book, look, good) —
+  // distinct from the long /uː/ team (moon) which is typed 'lv'.
+  if (type === 'sv' && key === 'oo') key = 'short_oo';
+  if (type === 'soft_c') key = 'soft_c';
+  if (type === 'soft_g') key = 'soft_g';
+  // Diphthongs share one recording each: oy→oi, ou→ow, au→aw.
+  if (type === 'dp') key = { oy: 'oi', ou: 'ow', au: 'aw' }[key] ?? key;
+  return key;
+}
+
+/**
+ * The recording a grapheme plays, or null when it is not one sound (silent
+ * e, an affix, a blend or a prefix played as a sequence). Two spellings that
+ * share a recording — ai/ay/a_e, ir/ur/er, oy/oi — are one sound to a child.
+ *
+ * @param {string} grapheme
+ * @param {string} type
+ */
+export function phonemeAudioFile(grapheme, type) {
+  if (type === 'se' || type === 'sf' || type === 'bl' || type === 'p') return null;
+  const key = phonemeAudioKey(grapheme, type);
+  return PHONEME_FILES[key] ?? key;
+}
+
+/**
  * Phoneme keys whose audio is a STAND-IN for a different sound.
  *
  * Audit 2026-09-19, finding 7. The schwa plays the short-u clip "as closest
@@ -441,14 +477,8 @@ class AudioManager {
   async speakPhoneme(grapheme, type, opts = {}) {
     if (!store.get('teachingAudioEnabled')) return;
 
-    // Map grapheme + type to audio key
-    let key = grapheme.toLowerCase();
-    if (type === 'lv') key = `long_${grapheme.toLowerCase().replace('ee','e').replace('ay','a')}`;
-    // 'oo' typed as a SHORT vowel is the /ʊ/ pattern (book, look, good) —
-    // distinct from the long /uː/ team (moon) which is typed 'lv'.
-    if (type === 'sv' && key === 'oo') key = 'short_oo';
-    if (type === 'soft_c') key = 'soft_c';
-    if (type === 'soft_g') key = 'soft_g';
+    // Map grapheme + type to audio key (shared with the choice builders).
+    let key = phonemeAudioKey(grapheme, type);
     if (type === 'se') return; // silent-e: no sound
 
     // Ensure hard /g/ for consonant 'g' — always use 'g' (hard g) audio.
@@ -462,12 +492,8 @@ class AudioManager {
       key = 'th_voiced';
     }
 
-    // Diphthong: normalise oy→oi, ou→ow, au→aw so they share one audio file each
-    if (type === 'dp') {
-      const dipMap = { oy: 'oi', ou: 'ow', au: 'aw' };
-      key = dipMap[grapheme.toLowerCase()] ?? grapheme.toLowerCase();
-      return this._playPhonemeAudio(key);
-    }
+    // Diphthong: phonemeAudioKey has already normalised oy→oi, ou→ow, au→aw.
+    if (type === 'dp') return this._playPhonemeAudio(key);
 
     // Suffix / affix tile (-ing, -ed, -er, -est, -ble, -tion, etc.)
     // For -ed: pronunciation depends on the final sound of the base word:

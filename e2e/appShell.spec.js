@@ -126,6 +126,30 @@ test.describe('the header', () => {
   }
 });
 
+test('the page fits the screen, so the app cannot wobble', async ({ page }) => {
+  // The frame was 100dvh tall inside a padded body: the page was 32–48px
+  // taller than the screen, the whole app could scroll by that much, the
+  // bottom of every pane sat below the edge, and the page clamping that
+  // scroll moved a tapped word back under the word panel.
+  await seed(page);
+  for (const [width, height] of [
+    [320, 568],
+    [390, 844],
+    [768, 1024],
+    [1280, 800],
+  ]) {
+    await page.setViewportSize({ width, height });
+    await home(page);
+    const m = await page.evaluate(() => ({
+      doc: document.documentElement.scrollHeight,
+      view: innerHeight,
+      appBottom: document.getElementById('app').getBoundingClientRect().bottom,
+    }));
+    expect(m.doc, `${width}x${height}`).toBeLessThanOrEqual(m.view);
+    expect(m.appBottom, `${width}x${height}`).toBeLessThanOrEqual(m.view);
+  }
+});
+
 test.describe('opening an activity on a phone', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
@@ -209,6 +233,30 @@ test.describe('dark mode, past the landing screen', () => {
     await page.locator('.cc-quest__level-btn').first().click();
     await expect(page.locator('.cc-quest__blank').first()).toBeVisible();
     expect(await contrast(page)).toEqual([]);
+  });
+
+  test('a story warm-up’s key-word chips are readable', async ({ page }) => {
+    // The chips are a light component with fixed dark-purple text; moving
+    // their background to the dark surface left the word and its meaning at
+    // 1.9:1 and 2.4:1. Caught in review on #330.
+    await seed(page);
+    await home(page);
+    await page.locator('#home-tab-learn').click();
+    await page.locator('#btn-stories').scrollIntoViewIfNeeded();
+    await page.locator('#btn-stories').click();
+    await page.locator('.story-tab[data-band="C"]').click();
+    await page.locator('.story-card').first().click();
+    const chip = page.locator('.warm-up .vocab-chip').first();
+    await expect(chip).toBeVisible();
+    await chip.click(); // shows the meaning too
+    await expect(chip.locator('.vocab-chip-meaning')).toBeVisible();
+    await page.mouse.move(1, 1);
+    await page.waitForTimeout(400);
+    const r = await new AxeBuilder({ page })
+      .include('.warm-up .vocab-chip-list')
+      .withRules(['color-contrast'])
+      .analyze();
+    expect(r.violations.flatMap((v) => v.nodes.map((n) => n.target.join(' ')))).toEqual([]);
   });
 
   test('the practice-paper cards keep their headings', async ({ page }) => {

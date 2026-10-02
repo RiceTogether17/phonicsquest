@@ -21,7 +21,7 @@ import { createChoiceRound } from './choiceRound.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { WORDS, shuffleArray } from '../data/words.js';
-import { firstPhoneme, soundKey } from './phonemePosition.js';
+import { firstPhoneme, soundDistinctPicker } from './phonemePosition.js';
 
 /**
  * Common phoneme confusion pairs for initial consonants and short vowels.
@@ -192,16 +192,8 @@ function _revealAnswer(word, els, firstGrapheme, firstType) {
 export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel = 3) {
   // Keyed by the SOUND each choice shows, not the letter: c and k are both
   // /k/, and a soft g is /j/. Letter keys let a round show /k/ twice, one of
-  // them "wrong". See soundKey.
-  const seen = new Set([soundKey(correctGrapheme, correctType)]);
-  const distractors = [];
-  const add = (grapheme, type) => {
-    const key = soundKey(grapheme, type);
-    if (seen.has(key)) return false;
-    seen.add(key);
-    distractors.push({ grapheme, type });
-    return true;
-  };
+  // them "wrong". See soundKeys.
+  const { add, distractors } = soundDistinctPicker(correctGrapheme, correctType);
 
   // Tier 1: confusion-pair phonemes — the most instructionally useful distractors
   const confusionTargets = CONFUSION_MAP[correctGrapheme.toLowerCase()] ?? [];

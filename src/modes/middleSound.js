@@ -22,7 +22,7 @@ import { renderPhonemeChoiceGrid, cancelChoicePreviews } from '../components/pho
 import { createChoiceRound } from './choiceRound.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
-import { soundKey } from './phonemePosition.js';
+import { soundDistinctPicker } from './phonemePosition.js';
 import { WORDS, shuffleArray } from '../data/words.js';
 
 const VOWEL_TYPES = new Set(['sv', 'lv', 'rc', 'dp']);
@@ -179,16 +179,8 @@ function _getMiddleVowelIdx(word) {
  */
 function _getVowelDistractors(correctGrapheme, maxLevel = 3, targetType = null) {
   // Keyed by the sound each choice shows, not the spelling — ai, ay and a_e
-  // are one long-a sound. See soundKey.
-  const seen = new Set([soundKey(correctGrapheme, targetType ?? 'sv')]);
-  const distractors = [];
-  const add = (grapheme, type) => {
-    const key = soundKey(grapheme, type);
-    if (seen.has(key)) return false;
-    seen.add(key);
-    distractors.push({ grapheme, type });
-    return true;
-  };
+  // are one long-a sound. See soundKeys.
+  const { add, distractors } = soundDistinctPicker(correctGrapheme, targetType ?? 'sv');
 
   // At level 1 restrict to short vowels so beginners compare a/e/i/o/u only
   const allowedVowelTypes = maxLevel <= 1 ? SHORT_VOWEL_TYPES : VOWEL_TYPES;

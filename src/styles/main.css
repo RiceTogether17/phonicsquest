@@ -6213,7 +6213,10 @@ details.story-tool-section[open] > .story-tool-summary::before {
   align-items: flex-start;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
-  background: var(--surface);
+  /* A light chip in every theme: its word and meaning are set in fixed
+     dark purples below, so following the dark surface left them at
+     1.9:1 and 2.4:1. Caught in review on #330. */
+  background: #fff;
   border: 2px solid #a78bfa;
   border-radius: var(--radius-lg);
   cursor: pointer;
@@ -15361,7 +15364,20 @@ body {
       transparent 40%
     ),
     var(--bg);
-  padding: var(--space-4);
+  padding: var(--shell-gutter-y) var(--space-4);
+}
+
+/* The app frame fills the screen exactly. It was 100dvh tall inside a body
+   with padding round it, so the page was 32–48px taller than the screen at
+   every size: the whole app — sticky header included — could wobble by that
+   much, and at rest the bottom of every pane sat below the screen edge. The
+   page clamping that wobble mid-scroll also slid a tapped word back under
+   the word panel. Panes inside the frame scroll; the page never should. */
+:root {
+  --shell-gutter-y: var(--space-4);
+}
+#app {
+  min-height: calc(100dvh - 2 * var(--shell-gutter-y));
 }
 
 #app {
@@ -15490,8 +15506,12 @@ textarea:hover {
     --content-half: calc(min(96vw, 1000px) / 2);
   }
 
+  :root {
+    --shell-gutter-y: var(--space-6);
+  }
+
   body {
-    padding: var(--space-6);
+    padding: var(--shell-gutter-y) var(--space-6);
   }
 
   #app {
@@ -15515,7 +15535,7 @@ textarea:hover {
   }
 
   body {
-    padding: var(--space-6) var(--space-8);
+    padding: var(--shell-gutter-y) var(--space-8);
   }
 
   #app {
@@ -19599,10 +19619,10 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   text-align: center;
 }
 .blend-confirm__feedback--yes {
-  color: #1f7a3a;
+  color: var(--color-success-text);
 }
 .blend-confirm__feedback--no {
-  color: #a3271a;
+  color: var(--color-error-text);
 }
 
 /* ─── Grown-up verdict bar ────────────────────────────────────────────────

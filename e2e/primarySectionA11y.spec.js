@@ -85,6 +85,13 @@ for (const [label, btnId] of SECTIONS) {
     // Wait for the section itself to paint before scanning. Comprehension
     // Cloze renders its own quest shell; the rest render a placeholder header.
     await expect(page.locator('.placeholder-header, .cc-quest__picker').first()).toBeVisible();
+    // ...and for the screen to finish fading in. Scanning mid-fade measured
+    // text at part opacity, so .placeholder-paper-link intermittently read
+    // 4.43:1 against a background it never has at rest (where it passes in
+    // both themes). The header is "visible" from the first frame of the fade.
+    await page.waitForFunction(
+      () => getComputedStyle(document.querySelector('.screen.active')).opacity === '1',
+    );
 
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     const blocking = results.violations.filter(
