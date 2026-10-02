@@ -110,6 +110,7 @@ import {
   finalizeLessonIfComplete,
   LESSON_BONUS_XP,
 } from './modules/lessonRunner.js';
+import { describeLessonSteps } from './modules/lessonComposer.js';
 import { CURRICULUM, PHASES, PHASE_LABELS } from './data/curriculum.js';
 import { getStagesForMode, usesStagePicker } from './modules/phonicsProgression.js';
 import {
@@ -1177,13 +1178,15 @@ class App {
     if (correct) {
       this._els.resultBadge.textContent = '🌟';
       this._els.resultMessage.textContent = mascot.getCheer();
-      this._els.resultMessage.style.color = 'var(--color-success)';
+      this._els.resultMessage.style.color = 'var(--color-success-text)';
       this._els.resultXp.textContent = reward ? `+${reward.xpEarned} XP` : '+10 XP';
       this._els.resultXp.style.display = '';
     } else {
       this._els.resultBadge.textContent = '💪';
       this._els.resultMessage.textContent = mascot.getEncouragement();
-      this._els.resultMessage.style.color = 'var(--color-error)';
+      // Not red: this is encouragement, and the Mistakes Den's own charter is
+      // never to mark a child's miss with a red flash.
+      this._els.resultMessage.style.color = 'var(--color-primary-on-tint)';
       this._els.resultXp.style.display = 'none';
     }
 
@@ -2053,7 +2056,7 @@ class App {
       : `${giriInline('whiteboard', 18)}Today's Lesson · ${lesson.done}/${lesson.total} done`;
     const sub = lesson.complete
       ? `Every step done — +${LESSON_BONUS_XP} bonus XP earned.`
-      : 'Warm up, learn something new, practise, review — in order, like a real lesson.';
+      : describeLessonSteps(lesson.steps);
 
     host.style.display = '';
     host.innerHTML = `

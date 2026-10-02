@@ -199,3 +199,42 @@ describe('lessonRunner — session state', () => {
     expect(history[0].band).toBe('primary');
   });
 });
+
+describe('describeLessonSteps', async () => {
+  const { describeLessonSteps } = await import('../modules/lessonComposer.js');
+
+  it('describes the steps the lesson actually has, in order', () => {
+    // An early learner on the listening steps gets no Learn step, and the
+    // early lesson ends on the Daily Challenge — not "review".
+    expect(
+      describeLessonSteps([
+        { kindLabel: 'Warm-up' },
+        { kindLabel: 'Practice' },
+        { kindLabel: 'Challenge' },
+      ]),
+    ).toBe('Warm up, practise, then try the challenge — in order, like a real lesson.');
+  });
+
+  it('names the Learn step when there is one', () => {
+    expect(
+      describeLessonSteps([
+        { kindLabel: 'Warm-up' },
+        { kindLabel: 'Learn' },
+        { kindLabel: 'Practice' },
+        { kindLabel: 'Challenge' },
+      ]),
+    ).toBe(
+      'Warm up, learn something new, practise, then try the challenge — in order, like a real lesson.',
+    );
+  });
+
+  it('copes with one step, repeats and unknown kinds', () => {
+    expect(describeLessonSteps([{ kindLabel: 'Learn' }])).toBe(
+      'Learn something new — one step today.',
+    );
+    expect(describeLessonSteps([{ kindLabel: 'Practice' }, { kindLabel: 'Practice' }])).toBe(
+      'Practise — one step today.',
+    );
+    expect(describeLessonSteps([])).toBe('One step at a time, like a real lesson.');
+  });
+});

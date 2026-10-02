@@ -21,7 +21,7 @@ import { createChoiceRound } from './choiceRound.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { WORDS, shuffleArray } from '../data/words.js';
-import { firstPhoneme } from './phonemePosition.js';
+import { firstPhoneme, soundKey } from './phonemePosition.js';
 
 /**
  * Common phoneme confusion pairs for initial consonants and short vowels.
@@ -190,23 +190,26 @@ function _revealAnswer(word, els, firstGrapheme, firstType) {
  *   3. Any phoneme from the word list (fallback).
  */
 export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel = 3) {
-  const seen = new Set([correctGrapheme]);
+  // Keyed by the SOUND each choice shows, not the letter: c and k are both
+  // /k/, and a soft g is /j/. Letter keys let a round show /k/ twice, one of
+  // them "wrong". See soundKey.
+  const seen = new Set([soundKey(correctGrapheme, correctType)]);
   const distractors = [];
+  const add = (grapheme, type) => {
+    const key = soundKey(grapheme, type);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    distractors.push({ grapheme, type });
+    return true;
+  };
 
   // Tier 1: confusion-pair phonemes — the most instructionally useful distractors
   const confusionTargets = CONFUSION_MAP[correctGrapheme.toLowerCase()] ?? [];
   for (const cg of confusionTargets) {
-    if (seen.has(cg)) continue;
-    // Find this grapheme in the word list to get its type
+    // Find this grapheme in the word list to get its type; otherwise the
+    // answer's type is a reasonable approximation.
     const match = WORDS.find((w) => w.level <= maxLevel && firstPhoneme(w).grapheme === cg);
-    if (match) {
-      seen.add(cg);
-      distractors.push({ grapheme: cg, type: firstPhoneme(match).type });
-    } else {
-      // Use the correct type as a reasonable approximation
-      seen.add(cg);
-      distractors.push({ grapheme: cg, type: correctType });
-    }
+    add(cg, match ? firstPhoneme(match).type : correctType);
     if (distractors.length >= 3) break;
   }
 
@@ -214,11 +217,7 @@ export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel 
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter((w) => w.level <= maxLevel))) {
       const { grapheme: g, type: t } = firstPhoneme(word);
-      if (!seen.has(g) && t === correctType) {
-        seen.add(g);
-        distractors.push({ grapheme: g, type: t });
-        if (distractors.length >= 6) break;
-      }
+      if (t === correctType && add(g, t) && distractors.length >= 6) break;
     }
   }
 
@@ -226,11 +225,7 @@ export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel 
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter((w) => w.level <= maxLevel))) {
       const { grapheme: g, type: t } = firstPhoneme(word);
-      if (!seen.has(g)) {
-        seen.add(g);
-        distractors.push({ grapheme: g, type: t });
-        if (distractors.length >= 6) break;
-      }
+      if (add(g, t) && distractors.length >= 6) break;
     }
   }
 
@@ -239,9 +234,7 @@ export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel 
   // mastery all the same.
   if (distractors.length < 3) {
     for (const g of ['s', 't', 'm', 'p', 'n', 'd']) {
-      if (seen.has(g)) continue;
-      seen.add(g);
-      distractors.push({ grapheme: g, type: 'c' });
+      add(g, 'c');
       if (distractors.length >= 3) break;
     }
   }

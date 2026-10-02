@@ -18,7 +18,7 @@ import { createChoiceRound } from './choiceRound.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { WORDS, shuffleArray } from '../data/words.js';
-import { lastPhoneme } from './phonemePosition.js';
+import { lastPhoneme, soundKey } from './phonemePosition.js';
 
 /**
  * Common phoneme confusion pairs — especially relevant for final consonants
@@ -176,18 +176,24 @@ function _poolPhoneme(word, position) {
  *   3. Any final phoneme (fallback).
  */
 function _getDistractors(correctGrapheme, position, maxLevel = 3, targetType = null) {
-  const seen = new Set([correctGrapheme]);
+  // Keyed by the sound each choice shows, not the letter — k and ck, s and
+  // se, ll and l are one sound each. See soundKey.
+  const seen = new Set([soundKey(correctGrapheme, targetType ?? 'c')]);
   const distractors = [];
+  const add = (grapheme, type) => {
+    const key = soundKey(grapheme, type);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    distractors.push({ grapheme, type });
+    return true;
+  };
 
   // Tier 1: confusion-pair phonemes
   const confusionTargets = CONFUSION_MAP[correctGrapheme.toLowerCase()] ?? [];
   for (const cg of confusionTargets) {
-    if (seen.has(cg)) continue;
     const levelWords = WORDS.filter((w) => w.level <= maxLevel);
     const match = levelWords.find((w) => _poolPhoneme(w, position).grapheme === cg);
-    const type = match ? _poolPhoneme(match, position).type : (targetType ?? 'c');
-    seen.add(cg);
-    distractors.push({ grapheme: cg, type });
+    add(cg, match ? _poolPhoneme(match, position).type : (targetType ?? 'c'));
     if (distractors.length >= 3) break;
   }
 
@@ -195,11 +201,7 @@ function _getDistractors(correctGrapheme, position, maxLevel = 3, targetType = n
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter((w) => w.level <= maxLevel))) {
       const { grapheme: g, type: t } = _poolPhoneme(word, position);
-      if (!seen.has(g) && (!targetType || t === targetType)) {
-        seen.add(g);
-        distractors.push({ grapheme: g, type: t });
-        if (distractors.length >= 6) break;
-      }
+      if ((!targetType || t === targetType) && add(g, t) && distractors.length >= 6) break;
     }
   }
 
@@ -207,11 +209,7 @@ function _getDistractors(correctGrapheme, position, maxLevel = 3, targetType = n
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter((w) => w.level <= maxLevel))) {
       const { grapheme: g, type: t } = _poolPhoneme(word, position);
-      if (!seen.has(g)) {
-        seen.add(g);
-        distractors.push({ grapheme: g, type: t });
-        if (distractors.length >= 6) break;
-      }
+      if (add(g, t) && distractors.length >= 6) break;
     }
   }
 
@@ -228,3 +226,5 @@ export function cleanup() {
   round = null;
   cancelChoicePreviews();
 }
+
+export { _getDistractors as getLastSoundDistractors };

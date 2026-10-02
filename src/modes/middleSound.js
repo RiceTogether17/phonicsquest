@@ -22,6 +22,7 @@ import { renderPhonemeChoiceGrid, cancelChoicePreviews } from '../components/pho
 import { createChoiceRound } from './choiceRound.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
+import { soundKey } from './phonemePosition.js';
 import { WORDS, shuffleArray } from '../data/words.js';
 
 const VOWEL_TYPES = new Set(['sv', 'lv', 'rc', 'dp']);
@@ -177,8 +178,17 @@ function _getMiddleVowelIdx(word) {
  *   3. Any vowel (fallback).
  */
 function _getVowelDistractors(correctGrapheme, maxLevel = 3, targetType = null) {
-  const seen = new Set([correctGrapheme]);
+  // Keyed by the sound each choice shows, not the spelling — ai, ay and a_e
+  // are one long-a sound. See soundKey.
+  const seen = new Set([soundKey(correctGrapheme, targetType ?? 'sv')]);
   const distractors = [];
+  const add = (grapheme, type) => {
+    const key = soundKey(grapheme, type);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    distractors.push({ grapheme, type });
+    return true;
+  };
 
   // At level 1 restrict to short vowels so beginners compare a/e/i/o/u only
   const allowedVowelTypes = maxLevel <= 1 ? SHORT_VOWEL_TYPES : VOWEL_TYPES;
@@ -186,15 +196,13 @@ function _getVowelDistractors(correctGrapheme, maxLevel = 3, targetType = null) 
   // Tier 1: confusion-pair vowels
   const confusionTargets = VOWEL_CONFUSION_MAP[correctGrapheme.toLowerCase()] ?? [];
   for (const cg of confusionTargets) {
-    if (seen.has(cg)) continue;
     // Only include if this vowel type is allowed at this level
     const match = WORDS.find(
       (w) => w.graphemes.includes(cg) && allowedVowelTypes.has(w.types[w.graphemes.indexOf(cg)]),
     );
     const type = match ? match.types[match.graphemes.indexOf(cg)] : 'sv';
     if (!allowedVowelTypes.has(type)) continue;
-    seen.add(cg);
-    distractors.push({ grapheme: cg, type });
+    add(cg, type);
     if (distractors.length >= 3) break;
   }
 
@@ -204,9 +212,7 @@ function _getVowelDistractors(correctGrapheme, maxLevel = 3, targetType = null) 
       for (let i = 0; i < word.graphemes.length; i++) {
         const g = word.graphemes[i];
         const t = word.types[i];
-        if (!seen.has(g) && allowedVowelTypes.has(t) && (!targetType || t === targetType)) {
-          seen.add(g);
-          distractors.push({ grapheme: g, type: t });
+        if (allowedVowelTypes.has(t) && (!targetType || t === targetType) && add(g, t)) {
           if (distractors.length >= 6) break;
         }
       }
@@ -220,9 +226,7 @@ function _getVowelDistractors(correctGrapheme, maxLevel = 3, targetType = null) 
       for (let i = 0; i < word.graphemes.length; i++) {
         const g = word.graphemes[i];
         const t = word.types[i];
-        if (!seen.has(g) && VOWEL_TYPES.has(t)) {
-          seen.add(g);
-          distractors.push({ grapheme: g, type: t });
+        if (VOWEL_TYPES.has(t) && add(g, t)) {
           if (distractors.length >= 6) break;
         }
       }
@@ -243,3 +247,5 @@ export function cleanup() {
   round = null;
   cancelChoicePreviews();
 }
+
+export { _getVowelDistractors as getMiddleSoundDistractors };

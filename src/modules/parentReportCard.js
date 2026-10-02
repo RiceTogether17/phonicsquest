@@ -228,7 +228,44 @@ export function buildParentReportCard(input) {
   };
 }
 
+/**
+ * Is this learner on the primary (P1–P6) pathway? The same test as
+ * lessonComposer's isPrimaryPathway, kept local so this module stays light.
+ */
+function _isPrimaryLearner(profile) {
+  const band = store.get('placementProfile')?.readingBand || profile?.readingBand || null;
+  return !!profile?.primaryGrade || profile?.schoolLevel === 'primary' || band === 'reader';
+}
+
+/**
+ * The week in a phrase. With no questions answered there is no accuracy to
+ * report — "0% accurate" read as a child who got everything wrong.
+ *
+ * @param {{ words: number, accuracy: number }} weekly
+ * @param {{ sep?: string, noun?: string }} [opts]
+ */
+export function describeWeekWork(weekly, { sep = ', ', noun = 'accurate' } = {}) {
+  const n = weekly?.words || 0;
+  if (!n) return 'no questions answered yet';
+  const pct = Math.round((weekly.accuracy || 0) * 100);
+  return `${n} question${n === 1 ? '' : 's'}${sep}${pct}% ${noun}`;
+}
+
 function _buildRecommendation(topWeak, profile) {
+  if (!topWeak && profile && !_isPrimaryLearner(profile)) {
+    // The weak-skill list is built from primary-school skill mastery, so a
+    // beginning reader almost always lands here — and used to be sent to a
+    // P1–P6 Grammar MCQ. For a child learning to decode, the best ten
+    // minutes a grown-up can give is a decodable story read together.
+    return {
+      title: '10 minutes: read a Giri story together',
+      detail:
+        'Pick a short story and let your child sound out each word before you help. ' +
+        'Tap a word in the story for its sounds.',
+      target: 'stories',
+      targetLabel: '📚 Giri Stories',
+    };
+  }
   if (!topWeak) {
     return {
       title: '10-minute warm-up: Grammar MCQ',
@@ -449,7 +486,7 @@ export function buildWhatsAppMessage(card) {
   const lines = [];
   lines.push(`📚 ${card.learnerName}'s English update${card.grade ? ` (${card.grade})` : ''}`);
   lines.push(
-    `This week: ${card.weekly.days} active days · ${card.weekly.words} questions · ${Math.round(card.weekly.accuracy * 100)}% accuracy`,
+    `This week: ${card.weekly.days} active days · ${describeWeekWork(card.weekly, { sep: ' · ', noun: 'accuracy' })}`,
   );
   if (card.strengths?.[0]?.pct) {
     lines.push(`✅ Strength: ${card.strengths[0].label} (${card.strengths[0].pct}%)`);

@@ -133,6 +133,34 @@ describe('Word Sort mode', () => {
     expect(document.getElementById('ws-progress').textContent).toMatch(/Word 1 of \d+/);
   });
 
+  it('labels each box with its sound and a word that has it, not a curriculum code', () => {
+    // The boxes said "CVC – Short A" and "CVC – Short E": a code a five-year-
+    // old cannot read, naming the one thing both boxes share.
+    setupWordSort(CAT, makeEls());
+    const labels = [...document.querySelectorAll('.ws-bin-label')].map((l) => l.textContent.trim());
+    for (const label of labels) {
+      expect(label).not.toMatch(/CVC|Short/);
+      expect(label).toMatch(/^[aeiou] as in [a-z]+$/);
+    }
+    expect(labels).toContain('a as in cat');
+  });
+
+  it('feedback names the sound and a different word that shares it', () => {
+    vi.useFakeTimers();
+    try {
+      setupWordSort(CAT, makeEls());
+      const word = document.querySelector('.ws-card-word').textContent;
+      tapBin({ correct: false });
+      const status = document.getElementById('ws-status').textContent;
+      // "✗ Not this box — “cat” has /a/, like “hat”." — the contrast is the
+      // lesson, and a word is never offered as its own example.
+      expect(status).toMatch(/^✗ Not this box — “[a-z]+” has \/[aeiou]\/, like “[a-z]+”\.$/);
+      expect(status).not.toContain(`like “${word}”`);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('hides the shell Say-It button and restores it on cleanup', () => {
     const els = makeEls();
     setupWordSort(CAT, els);

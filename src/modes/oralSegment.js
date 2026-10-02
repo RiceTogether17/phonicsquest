@@ -57,7 +57,8 @@ export function setupOralSegment(word, els) {
 
   els.modeArea.innerHTML = /* html */ `
     <div class="oral-segment">
-      <div class="sound-dots" id="os-dots" aria-live="polite" aria-label="Sounds tapped so far"></div>
+      <div class="sound-dots" id="os-dots" role="img" aria-label="No sounds tapped yet"></div>
+      <p class="visually-hidden" id="os-count" role="status"></p>
       <button class="clap-button" id="os-tap" type="button" aria-label="Tap a sound">
         <span class="clap-button-emoji" aria-hidden="true">🥁</span>
         <span class="clap-button-label">Tap a sound</span>
@@ -75,6 +76,15 @@ export function setupOralSegment(word, els) {
   const resetBtn = els.modeArea.querySelector('#os-reset');
   const doneBtn = els.modeArea.querySelector('#os-done');
   const feedback = els.modeArea.querySelector('#os-feedback');
+  // The dots are the count, so a screen reader is told the count — the dots
+  // themselves have no text, and the live region they used to sit in had
+  // nothing to announce.
+  const countEl = els.modeArea.querySelector('#os-count');
+  const sayCount = (n) => {
+    const text = n === 0 ? 'No sounds tapped yet' : `${n} sound${n === 1 ? '' : 's'} tapped`;
+    dotsEl.setAttribute('aria-label', text);
+    if (countEl) countEl.textContent = text;
+  };
 
   const setFeedback = (kind, text) => {
     feedback.className = `choice-feedback choice-feedback--${kind}`;
@@ -93,6 +103,7 @@ export function setupOralSegment(word, els) {
   const resetDots = () => {
     _taps = 0;
     dotsEl.innerHTML = '';
+    sayCount(0);
   };
 
   tapBtn.addEventListener('click', () => {
@@ -102,6 +113,7 @@ export function setupOralSegment(word, els) {
     dot.className = 'sound-dot sound-dot--filled';
     dot.setAttribute('aria-hidden', 'true');
     dotsEl.appendChild(dot);
+    sayCount(_taps);
     audio.playSfx('pop');
   });
 

@@ -84,13 +84,19 @@ const CHEERS = [
   'So proud of you!',
 ];
 
+/*
+ * Shown on the result screen after a miss, whose only button is "Next Word".
+ * "Try again!" and "Let's try once more!" promised a retry the screen does not
+ * offer. What does happen is true and worth saying: the word comes back —
+ * missed words stay in the Mistakes Den for a week and the picker favours
+ * them. Short sentences; this is read by five-year-olds.
+ */
 const WRONG_ENCOURAGEMENT = [
-  'Almost there!',
-  'Try again!',
-  'You can do it!',
-  'Keep trying!',
-  'So close!',
-  "Let's try once more!",
+  'Good try! That one was tricky.',
+  "Good try! You'll see this word again soon.",
+  'Tricky one! We will practise it again.',
+  'Nice effort! On to the next one.',
+  'That was a hard one. Good try!',
 ];
 
 class Mascot {
