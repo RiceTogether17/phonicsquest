@@ -254,7 +254,7 @@ release; the budget is the teaching stage inside it.
 | A | 25–45 words | tier 1 | 16 |
 | B | 45–80 words | tier 2 | 30 |
 | C | 80–140 words | tier 3 | 14 |
-| D | 140–250 words | tier 3 | 17 |
+| D | 140–250 words | tier 3 | 18 |
 | E | 250–450 words | tier 3 | 4 |
 
 **The guarantee:** every word in every story is readable by some taught

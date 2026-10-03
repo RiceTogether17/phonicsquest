@@ -2580,6 +2580,59 @@ export const STORIES = [
     ],
   },
 
+  {
+    id: 'howto-d-01',
+    band: 'D', level: 4, phase: 'advanced-vowel',
+    title: 'How to Make Kaya Toast',
+    emoji: '\ud83c\udf5e',
+    mascotState: 'whiteboard',
+    illustration: 'giri_level01_story03_jam.jpg',
+    targetGraphemes: ['oa', 'oi', 'oy', 'ow', 'au'],
+    allowedHFWTier: 3,
+    targetWordCount: 0,
+    actualWordCount: 200,
+    decodableRatio: 1.00,
+    textType: 'bridge-reader',
+    refrainCount: 0,
+    lines: [
+      { type: 'intro', text: 'Kaya toast is a breakfast that lots of people in Singapore love. Kaya is a sweet, thick jam made from coconut milk, eggs, sugar and pandan leaves. This is how Giri and his mum make kaya toast at home.' },
+      { type: 'label', text: 'You will need' },
+      { type: 'text', text: 'Two slices of white bread, a jar of kaya, a cold block of butter, a toaster, a knife and a plate.' },
+      { type: 'label', text: 'What to do' },
+      { type: 'text', text: 'First, ask a grown-up to help you toast the bread until it is golden brown and crunchy.' },
+      { type: 'text', text: 'Next, while the toast is still warm, spread a thick layer of kaya on one slice. Go right to the edges.' },
+      { type: 'text', text: 'Then cut a thin slice of cold butter and lay it on top of the kaya. Do not spread it out. The cold butter is the best part!' },
+      { type: 'text', text: 'After that, put the other slice of toast on top and press down gently.' },
+      { type: 'text', text: 'Last of all, cut your kaya toast in half, so it is easy to hold and dip.' },
+      { type: 'label', text: 'Giri\'s top tip' },
+      { type: 'end', text: 'Eat your toast with two soft-boiled eggs, a splash of dark soy sauce and a pinch of pepper. Dip the toast into the runny eggs. Giri says the crunchy, sweet and salty mix is the best way to start the day!' },
+    ],
+    comprehension: [
+      { q: 'What is kaya made from?', options: ['Coconut milk, eggs, sugar and pandan leaves', 'Butter and bread', 'Soy sauce and pepper', 'Milk and toast'], answer: 0, type: 'literal' },
+      { q: 'Why does the recipe say to ask a grown-up to help with the toast?', options: ['The toaster gets very hot', 'The bread is too heavy', 'Grown-ups like toast', 'The kaya is hard to find'], answer: 0, type: 'inferential' },
+      { q: 'Why do you cut the kaya toast in half?', options: ['So it is easy to hold and dip', 'So the butter melts', 'So you can share it with Giri', 'So it gets crunchy'], answer: 0, type: 'literal' },
+      { kind: 'tf', q: 'You should spread the butter out over the kaya.', options: ['True', 'False', 'The story does not say'], answer: 1, type: 'literal' },
+      { kind: 'gap', q: 'Then cut a thin slice of cold butter and ___ it on top of the kaya.', options: ['lay', 'spread', 'dip'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'Why do you think each step starts with a word like First, Next or Then?', sampleAnswer: 'They tell you the order of the steps. If you put the butter on before you toast the bread, it would go wrong.', markingGuide: 'A good answer says these words tell you which step comes first and which comes next.' },
+    ],
+    vocab: [
+      { word: 'pandan', meaning: 'A long green leaf that makes food smell sweet', icon: '🌿' },
+      { word: 'layer', meaning: 'A flat covering of something', icon: '🥪' },
+      { word: 'edges', meaning: 'The outside lines of something', icon: '🔲' },
+      { word: 'gently', meaning: 'Softly, without pressing hard', icon: '🤲' },
+      { word: 'pinch', meaning: 'A tiny bit you hold between your finger and thumb', icon: '🤏' },
+    ],
+    grammarSpotlight: [
+      { pattern: 'Bossy verbs', example: '"Toast", "spread", "cut", "put", "dip"', tip: 'A recipe tells you what to do, so its sentences start with a bossy verb. Words like First, Next and Last of all keep the steps in order.' },
+    ],
+    talkAboutIt: [
+      'What do you eat for breakfast? Could you tell someone the steps to make it?',
+      'Why is it a good idea to read all the steps before you start cooking?',
+    ],
+  },
+
   // ╔══════════════════════════════════════════════════════════════════════════╗
   // ║  BAND E — Longer Reads  (4 books)                                     ║
   // ║  250–450 words: a journal serial and a "how" tale                     ║

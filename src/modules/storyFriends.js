@@ -54,6 +54,7 @@ const NAME_OVERRIDES = Object.freeze({
   'core-b-19': 'Lime Pie', // Who Took the Lime Pie?
   'core-b-20': 'Loose Tooth', // Mei Ling's Loose Tooth
   'core-b-21': 'The Goose', // Shoo, Goose, Shoo!
+  'howto-d-01': 'Kaya Toast', // How to Make Kaya Toast
   'journal-penang-1': 'Grandpa', // Giri's Week in Penang: Day 1
   'journal-penang-2': 'The Trishaw', // Giri's Week in Penang: Day 2
   'journal-penang-3': 'The Monkey', // Giri's Week in Penang: Day 3
