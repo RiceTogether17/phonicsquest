@@ -40,20 +40,45 @@ r-colouring starts after that, where F3 falls to ~2000 Hz. That steady part,
 slowed to a natural vowel length (0.2 s), is now `aw.mp3`: a recorded /aw/
 in the same voice, with no r. Measured: F1 543, F2 971, F3 2913 Hz.
 
+## The two oo sounds
+
+`long_oo.mp3` and `short_oo.mp3` were a different, lower voice (≈ 98 Hz)
+from every other clip (≈ 175–260 Hz), so a child sounding out "book" heard
+the speaker change on the vowel. They are now cut from the main voice's
+`long_u` clip ("you"), which glides y → a fronted u → a steady back /uː/ →
+a laxer /ʊ/ as it trails off:
+
+| New clip   | Taken from          | Measured F1 / F2 | Pitch  | Length | Textbook (adult female) |
+| ---------- | ------------------- | ---------------- | ------ | ------ | ----------------------- |
+| `long_oo`  | long_u 0.69–0.825 s | 362 / 968 Hz     | 191 Hz | 0.37 s | /uː/ ≈ 460 / 1100 Hz    |
+| `short_oo` | long_u 0.85–0.975 s | 457 / 1097 Hz    | 157 Hz | 0.24 s | /ʊ/ ≈ 520 / 1225 Hz     |
+
+Both are back, rounded vowels with no trace of the "y" (no frame of
+`long_oo` has F2 above 1300 Hz), and /ʊ/ is more open than /uː/, as it
+should be. Each is slowed to a natural vowel length and matched in
+loudness to the other vowels (mean ≈ −19 dB).
+
+## The schwa
+
+There was no /ə/ recording; it played the short-u clip, so the "-le" in
+"table" and the "a" in "about" sounded like the stressed /ʌ/ of "cup".
+`schwa.mp3` is the opening of the main voice's short-u clip (0–0.08 s),
+where the vowel is still mid-central (F1 ≈ 600, F2 ≈ 1475 Hz) before it
+opens further. It is kept short (0.16 s) and about 4 dB softer than the
+other vowels, because a schwa is the weak, unstressed "uh".
+`APPROXIMATE_PHONEME_AUDIO` is now empty: no sound plays a stand-in.
+
+`aw.mp3` was also 7 dB louder than the other vowels; it now matches them.
+
 ## Rebuilding
 
 `scripts/audio/fix-phoneme-clips.sh` reads the ORIGINAL clips from a fixed
 commit and rewrites the trimmed ones, so it can be re-run safely. To undo a
 trim, restore that file from the commit named in the script.
 
-## Still open — needs a new recording
+## Still open
 
-- **Two voices.** `long_oo.mp3` and `short_oo.mp3` are a different, lower
-  voice (≈ 98 Hz) from every other clip (≈ 175–260 Hz). A child sounding out
-  "book" hears the speaker change on the vowel. Pitch-shifting would not make
-  it the same person, so this needs the two vowels re-recorded by the main
-  voice.
-- **Schwa.** There is still no /ə/ recording; it plays the short-u clip, as
-  `APPROXIMATE_PHONEME_AUDIO` declares.
-- These measurements are acoustic. A listen on a real device by a teacher is
-  still the final check, especially for b and g, which are now short.
+- These clips are made from existing recordings, not recorded fresh. They
+  measure right, but a teacher should listen on a real device, especially
+  to b and g (now short) and the three new vowels. A fresh recording of
+  the oo sounds and the schwa by the main speaker would still be better.
