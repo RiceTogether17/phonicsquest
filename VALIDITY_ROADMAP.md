@@ -220,8 +220,8 @@ graphemic, not phonemic, so `was` parses w-a-s and counts as decodable.
 
 > **2026-10:** every phoneme clip was measured (see `AUDIO_QA.md`). b, g,
 > j/soft g, y, w and q carried an "uh" and were trimmed; the rest are clean.
-> /aw/ now has a recording. Still open: the two oo clips are a different
-> voice, there is no schwa recording, and a teacher should listen on a
+> /aw/ now has a recording, the two oo clips are in the main voice, and
+> the schwa has its own clip. Still open: a teacher should listen on a
 > real device.
 
 Originally: not yet verified in this pass. `tests/shortVowelPurity.test.js` and

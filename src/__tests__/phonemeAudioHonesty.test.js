@@ -34,7 +34,7 @@ globalThis.SpeechSynthesisUtterance = class {
 };
 
 const { WORDS, derivePhonemes, TH_VOICED_WORDS } = await import('../data/words.js');
-const { APPROXIMATE_PHONEME_AUDIO, isApproximatePhonemeAudio } =
+const { APPROXIMATE_PHONEME_AUDIO, isApproximatePhonemeAudio, phonemeAudioFile } =
   await import('../modules/audio.js');
 const { PHONEME_MOUTH } = await import('../data/articulation.js');
 
@@ -87,12 +87,12 @@ describe('phoneme identity is separate from audio asset (audit finding 7)', () =
     expect(isApproximatePhonemeAudio('th_voiced')).toBe(false);
   });
 
-  it('declares the schwa substitution instead of making it silently', () => {
-    // There is no schwa recording. The short-u clip is still played, but it is
-    // now declared so a discrimination task can decline to use it.
-    expect(isApproximatePhonemeAudio('ə')).toBe(true);
-    expect(APPROXIMATE_PHONEME_AUDIO['ə']).toMatch(/short-u/i);
-    expect(APPROXIMATE_PHONEME_AUDIO['ə']).toMatch(/no schwa recording exists/i);
+  it('plays the schwa from its own recording, not short u', () => {
+    // It used to borrow the short-u clip and was declared approximate. It now
+    // has schwa.mp3, so nothing is a stand-in any more.
+    expect(isApproximatePhonemeAudio('ə')).toBe(false);
+    expect(Object.keys(APPROXIMATE_PHONEME_AUDIO)).toEqual([]);
+    expect(phonemeAudioFile('ə', 'c')).toBe('schwa');
   });
 
   it('claims no approximation for sounds that have their own recording', () => {

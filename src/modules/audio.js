@@ -86,8 +86,9 @@ const PHONEME_FILES = {
   oi: 'oi', ow: 'ow', aw: 'aw',
   // Soft consonants (used only when explicitly tagged in word data)
   soft_g: 'soft_g', soft_c: 'soft_c',
-  // Schwa (used in affix phoneme sequences). See APPROXIMATE_PHONEME_AUDIO.
-  'ə': 'u',
+  // Schwa (used in affix phoneme sequences): its own short, unstressed clip
+  // in the main voice — see AUDIO_QA.md. It used to borrow short u.
+  'ə': 'schwa',
   // NOTE: `th_voiced` is deliberately absent. There is only one th.mp3, and it
   // is the unvoiced /θ/. Pointing voiced th at it would play the wrong sound;
   // leaving it out routes it to the TTS fallback below, which says "the" and
@@ -133,24 +134,17 @@ export function phonemeAudioFile(grapheme, type) {
 /**
  * Phoneme keys whose audio is a STAND-IN for a different sound.
  *
- * Audit 2026-09-19, finding 7. The schwa plays the short-u clip "as closest
- * match": /ə/ is shorter and unstressed, and a child hearing /ʌ/ is not
- * hearing a schwa. There is no schwa recording to use instead.
+ * Audit 2026-09-19, finding 7. Any substitution must be declared here, so
+ * `isApproximatePhonemeAudio` lets an activity that DEPENDS on the
+ * distinction — minimal pairs, "which sound do you hear", sound sorting —
+ * decline to present itself rather than mark a child wrong for failing to
+ * hear a difference that was never played.
  *
- * Recording one is a content task. What is fixed here is the silence about it:
- * the substitution is declared, and `isApproximatePhonemeAudio` lets an
- * activity that DEPENDS on the distinction — minimal pairs, "which sound do
- * you hear", sound sorting — decline to present itself rather than mark a
- * child wrong for failing to hear a difference that was never played.
- *
- * Voiced th used to be on this list. It is not any more: rather than play the
- * unvoiced clip, it now falls through to TTS, which says the word "the" and
- * produces an actual /ð/. That is a real sound rather than a near miss, so the
- * distinction the curriculum teaches between thin and that is now audible.
+ * The list is empty. The schwa used to play the short-u clip; it now has a
+ * recording of its own (schwa.mp3, AUDIO_QA.md). Voiced th falls through to
+ * TTS, which says "the" and produces an actual /ð/ rather than a near miss.
  */
-export const APPROXIMATE_PHONEME_AUDIO = Object.freeze({
-  'ə': 'Plays the short-u clip. A true schwa is shorter and unstressed, and no schwa recording exists.',
-});
+export const APPROXIMATE_PHONEME_AUDIO = Object.freeze({});
 
 /** True when this phoneme's audio is a stand-in rather than the sound itself. */
 export function isApproximatePhonemeAudio(key) {

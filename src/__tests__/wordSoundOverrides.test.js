@@ -43,9 +43,9 @@ const RECORDINGS = new Set(
     f.replace(/\.mp3$/, ''),
   ),
 );
-// The schwa plays the short-u clip (declared in APPROXIMATE_PHONEME_AUDIO);
-// every other key has a recording of its own name. /aw/ used to be missing
-// and fell back to the device voice — see AUDIO_QA.md.
+// The schwa key is 'ə' but its recording is schwa.mp3; every other key has
+// a recording of its own name. /aw/ used to be missing and fell back to the
+// device voice — see AUDIO_QA.md.
 const PLAYABLE_WITHOUT_OWN_FILE = new Set(['ə']);
 
 describe('per-word sound overrides (data)', () => {

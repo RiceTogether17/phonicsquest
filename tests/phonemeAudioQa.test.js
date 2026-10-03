@@ -25,3 +25,19 @@ describe('phoneme clips without a trailing vowel', () => {
     expect(size('aw')).toBeGreaterThan(2000);
   });
 });
+
+describe('vowel clips made from the main voice (AUDIO_QA.md)', () => {
+  // long_oo and short_oo used to be a different, lower speaker (~98 Hz), and
+  // ran 0.5-0.6 s (8-10 kB). The main-voice versions are 0.37 s and 0.24 s.
+  it('the oo clips are the main-voice versions, not the old second speaker', () => {
+    expect(size('long_oo')).toBeLessThan(7500);
+    expect(size('short_oo')).toBeLessThan(5000);
+    expect(size('short_oo')).toBeLessThan(size('long_oo'));
+  });
+
+  it('the schwa has its own recording, shorter than the stressed short u', () => {
+    expect(existsSync(resolve(DIR, 'schwa.mp3'))).toBe(true);
+    expect(size('schwa')).toBeGreaterThan(1500);
+    expect(size('schwa')).toBeLessThan(size('u'));
+  });
+});
