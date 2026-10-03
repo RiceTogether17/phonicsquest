@@ -473,8 +473,8 @@ describe('grapheme phase budget', () => {
 describe('phase ↔ curriculum alignment', () => {
   it('points each phase at the lesson phase that actually teaches it', () => {
     const expected = {
-      'r-controlled': 8, // phase-8-advanced: ar, or, er/ir/ur
-      diphthongs: 7, // phase-7-diphthongs: oi/oy, ou/ow, aw/au
+      'r-controlled': 7, // phase-7-bossy-r: ar, or, er/ir/ur
+      diphthongs: 8, // phase-8-diphthongs: oi/oy, ou/ow, aw/au
       suffixes: 9, // phase-9-suffixes: -ing, -ed, -er, -est
     };
     for (const [id, phase] of Object.entries(expected)) {

@@ -10,8 +10,8 @@
  * Band → phonics readiness:
  *   A  Core Decodable Minis   — short vowels (Phase 1). Always open.
  *   B  Decodable Story Readers — long-vowel patterns (Phase 6).
- *   C  Fluency Readers         — r-controlled + digraphs (Phases 4/8).
- *   D  Bridge Readers          — diphthongs (Phase 7).
+ *   C  Fluency Readers         — r-controlled + digraphs (Phases 4/7).
+ *   D  Bridge Readers          — diphthongs (Phase 8).
  */
 
 import { store } from './store.js';
@@ -24,6 +24,14 @@ function _masteredFraction(phases) {
   if (!stages.length) return 0;
   const mastered = stages.filter((s) => (gm[s.group] ?? 0) >= 0.8).length;
   return mastered / stages.length;
+}
+
+/** True when any of the named stages has been practised at all. */
+function _stagesTouched(ids) {
+  const gm = store.get('groupMastery') || {};
+  return CURRICULUM.some(
+    (s) => ids.includes(s.id) && typeof gm[s.group] === 'number' && gm[s.group] > 0,
+  );
 }
 
 /** True when any stage in the given phases has been practised at all. */
@@ -41,15 +49,17 @@ function _phaseTouched(phases) {
 export function getBandReadiness() {
   const earlyMastered = _masteredFraction([1, 2, 3, 4, 5]);
   const longVowelsStarted = _phaseTouched([6]);
-  const rControlledStarted = _phaseTouched([8]);
-  const diphthongsStarted = _phaseTouched([7]);
+  // By stage, not phase: phase 7 also holds the blends review and tch/dge,
+  // which say nothing about whether Bossy R has been taught.
+  const rControlledStarted = _stagesTouched(['rc-ar-or', 'rc-er-ir-ur']);
+  const diphthongsStarted = _stagesTouched(['dip-oi', 'dip-ou', 'dip-aw']);
 
   // Band C is the Bossy-R band: its stories are written in ar, or, er, ir
-  // and ur. It used to open on solid long vowels alone, which in this
-  // curriculum is a whole phase before Bossy-R is taught (phase 7 is
-  // diphthongs, phase 8 Bossy-R), so a child was recommended stories full
-  // of "farm" and "bird" they had never been shown how to read. Band D's
-  // code includes Bossy-R too (story tiers are cumulative), so it needs both.
+  // and ur. It used to open on solid long vowels alone, before Bossy R had
+  // been taught, so a child was recommended stories full of "farm" and
+  // "bird" they had never been shown how to read. Band D's code includes
+  // Bossy R too (story tiers are cumulative), so it needs both — which is
+  // also the order the curriculum now teaches them in (phase 7, then 8).
   const bReady = earlyMastered >= 0.6 || longVowelsStarted;
   const cReady = bReady && rControlledStarted;
   const dReady = cReady && diphthongsStarted;
@@ -57,11 +67,8 @@ export function getBandReadiness() {
   return {
     A: { ready: true, hint: '' },
     B: { ready: bReady, hint: bReady ? '' : 'Best after starting Phase 6 — Long Vowels' },
-    C: { ready: cReady, hint: cReady ? '' : 'Best after starting Phase 8 — Bossy R (ar, or, er)' },
-    D: {
-      ready: dReady,
-      hint: dReady ? '' : 'Best after Phase 7 — Diphthongs — and Bossy R practice',
-    },
+    C: { ready: cReady, hint: cReady ? '' : 'Best after starting Phase 7 — Bossy R (ar, or, er)' },
+    D: { ready: dReady, hint: dReady ? '' : 'Best after starting Phase 8 — Diphthongs' },
   };
 }
 

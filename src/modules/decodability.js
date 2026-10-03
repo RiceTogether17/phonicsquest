@@ -26,16 +26,17 @@
  *                          (Band B story prose is past tense throughout).
  *   Tier 3  R-controlled   ar or er ir ur, plus tch dge ph (the latter
  *                          three released by the 'digraphs' phase, which
- *                          curriculum.js teaches at phase 8 via the
+ *                          curriculum.js teaches at phase 7 via the
  *                          cons-tch-dge and cons-ph lessons).
  *   Tier 4  Diphthongs     oi oy ou aw au (ow /aʊ/ shares its spelling
  *                          with tier-2 ow /oʊ/, so ow words under-require).
  *   Tier 5  Advanced       air are ear eer ere.
  *
  * Tier order follows the BAND ladder the stories ship on (Band C is
- * r-controlled, Band D is diphthongs), which is not the order the lesson
- * curriculum teaches them in (phase 7 diphthongs, phase 8 r-controlled).
- * These are two independent axes and both are honest: `tier` says what code
+ * r-controlled, Band D is diphthongs), which is also the order the lesson
+ * curriculum teaches them in (phase 7 r-controlled, phase 8 diphthongs) —
+ * the curriculum used to run the other way round. The two remain
+ * independent axes: `tier` says what code
  * a reader at this point in the STORY bank has met, `curriculumPhase` says
  * which LESSON phase the phase's content belongs to and is used only as the
  * tricky-word cutoff. Do not derive one from the other — they were once
@@ -102,17 +103,17 @@ export const STORY_PHASES = Object.freeze([
   {
     id: 'r-controlled',
     tier: 3,
-    curriculumPhase: 8,
+    curriculumPhase: 7,
     graphemeBudget: ['ar', 'or', 'er', 'ir', 'ur'],
   },
   // The 'digraphs' phase is the consonant-spelling stage: sh ch th wh
   // review (tier-1 code) plus the late spellings tch, dge and ph, taught by
-  // the cons-tch-dge and cons-ph lessons at curriculum phase 8.
+  // the cons-tch-dge and cons-ph lessons at curriculum phase 7.
   // `tch` and `dge` are trigraphs; the tier id is historical and is persisted
   // in saved progress, so it is left alone. Audit 2026-09-19, finding 10.
-  { id: 'digraphs', tier: 3, curriculumPhase: 8, graphemeBudget: ['tch', 'dge', 'ph'] },
+  { id: 'digraphs', tier: 3, curriculumPhase: 7, graphemeBudget: ['tch', 'dge', 'ph'] },
   { id: 'suffixes', tier: 3, curriculumPhase: 9, graphemeBudget: [] },
-  { id: 'diphthongs', tier: 4, curriculumPhase: 7, graphemeBudget: ['oi', 'oy', 'ou'] },
+  { id: 'diphthongs', tier: 4, curriculumPhase: 8, graphemeBudget: ['oi', 'oy', 'ou'] },
   {
     id: 'advanced-vowel',
     tier: 5,

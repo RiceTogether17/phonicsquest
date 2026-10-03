@@ -1321,7 +1321,7 @@ export const WORDS = [
   { id:'alphabet', word:'alphabet', graphemes:['a','l','ph','a','b','e','t'], types:['sv','c','d','sv','c','sv','c'], pattern:'digraph', group:'cons-ph', level:2, emoji:'🔠' },
   { id:'trophy',   word:'trophy',   graphemes:['t','r','o','ph','y'],         types:['bl','bl','lv','d','lv'],    pattern:'digraph', group:'cons-ph', level:2, emoji:'🏆', phonemeKeys:{4:'long_e'} },
   { id:'phonics',  word:'phonics',  graphemes:['ph','o','n','i','c','s'],     types:['d','sv','c','sv','c','c'],  pattern:'digraph', group:'cons-ph', level:2, emoji:'🔤' },
-  // ── Soft c and soft g (Phase 8) ────────────────────────────────────────
+  // ── Soft c and soft g (Phase 7) ────────────────────────────────────────
   // c and g say /s/ and /j/ before e, i and y. Until now these words were
   // scattered — "gem" sat in the short-e CVC set and "gist" in a blend set,
   // where a child reading them by the rule they had just been taught (c says

@@ -50,7 +50,8 @@ describe('story band readiness', () => {
     expect(r.D.ready).toBe(false);
     // Soft gating means a hint explaining when the band suits them.
     expect(r.B.hint).toMatch(/Phase 6/i);
-    expect(r.D.hint).toMatch(/Phase 7/i);
+    expect(r.C.hint).toMatch(/Phase 7/i);
+    expect(r.D.hint).toMatch(/Phase 8/i);
   });
 
   it('opens Band B once early phases are mostly mastered', async () => {
@@ -69,9 +70,9 @@ describe('story band readiness', () => {
   });
 
   it('requires B before C, and C before D', async () => {
-    // Diphthongs started but no earlier progress: D must stay closed
-    // because readiness is cumulative.
-    await masterPhases([7], 0.5);
+    // Bossy R and diphthongs started but no earlier progress: C and D must
+    // stay closed because readiness is cumulative.
+    await masterPhases([7, 8], 0.5);
     const { getBandReadiness } = await import('../modules/storyGating.js');
     const r = getBandReadiness();
     expect(r.B.ready).toBe(false);
@@ -80,16 +81,24 @@ describe('story band readiness', () => {
   });
 
   it('keeps the Bossy-R band closed until Bossy R has been taught', async () => {
-    // Long vowels solid and diphthongs started is phase 7. Bossy R is phase
-    // 8, so Band C's "farm" and "bird" are code this child has not met.
+    // Long vowels solid is the end of phase 6. Band C's "farm" and "bird"
+    // need Bossy R, which phase 7 teaches.
+    await masterPhases([1, 2, 3, 4, 5]);
+    await masterPhases([6]);
+    const { getBandReadiness } = await import('../modules/storyGating.js');
+    const r = getBandReadiness();
+    expect(r.C.ready).toBe(false);
+    expect(r.C.hint).toMatch(/Phase 7/);
+    expect(r.D.ready).toBe(false);
+  });
+
+  it('opens C on Bossy R, and D once the sliding vowels start too', async () => {
     await masterPhases([1, 2, 3, 4, 5]);
     await masterPhases([6]);
     await masterPhases([7], 0.4);
     const { getBandReadiness } = await import('../modules/storyGating.js');
-    const r = getBandReadiness();
-    expect(r.C.ready).toBe(false);
-    expect(r.C.hint).toMatch(/Phase 8/);
-    expect(r.D.ready).toBe(false);
+    expect(getBandReadiness().C.ready).toBe(true);
+    expect(getBandReadiness().D.ready).toBe(false);
   });
 
   it('opens D only when B, C and diphthongs are all in play', async () => {

@@ -302,7 +302,7 @@ export const MASTERY_LEVEL = Object.freeze({
  *   stage: object|null,
  * }}
  */
-export function getStageReadiness(stageId, snapshot = {}) {
+export function getStageReadiness(stageId, snapshot = {}, prerequisiteId = undefined) {
   const stage = CURRICULUM.find((s) => s.id === stageId);
   if (!stage) {
     return {
@@ -315,7 +315,8 @@ export function getStageReadiness(stageId, snapshot = {}) {
       checks: { stage: { pass: false, reason: 'unknown-stage' } },
     };
   }
-  if (!stage.prerequisite) {
+  const prerequisite = prerequisiteId ?? stage.prerequisite;
+  if (!prerequisite) {
     // A root stage is open by definition — that says nothing about mastery.
     return {
       unlocked: true,
@@ -327,7 +328,7 @@ export function getStageReadiness(stageId, snapshot = {}) {
       checks: { rootStage: { pass: true, reason: 'no-prerequisite' } },
     };
   }
-  const prereq = CURRICULUM.find((s) => s.id === stage.prerequisite);
+  const prereq = CURRICULUM.find((s) => s.id === prerequisite);
   if (!prereq) {
     return {
       unlocked: false,
@@ -400,8 +401,10 @@ export function getUnlockedStages(snapshot = buildProgressionSnapshot()) {
     changed = false;
     for (const stage of CURRICULUM) {
       if (unlocked.has(stage.id)) continue;
-      if (stage.prerequisite && !unlocked.has(stage.prerequisite)) continue;
-      const ok = !stage.prerequisite || getStageReadiness(stage.id, snapshot).unlocked;
+      const viaCurrent =
+        !stage.prerequisite ||
+        (unlocked.has(stage.prerequisite) && getStageReadiness(stage.id, snapshot).unlocked);
+      const ok = viaCurrent || _openUnderLegacyOrder(stage, unlocked, snapshot);
       if (ok) {
         unlocked.add(stage.id);
         changed = true;
@@ -409,6 +412,22 @@ export function getUnlockedStages(snapshot = buildProgressionSnapshot()) {
     }
   }
   return CURRICULUM.filter((s) => unlocked.has(s.id)).map((s) => s.id);
+}
+
+/**
+ * A stage whose place in the sequence moved stays open for a child who
+ * could already open it before the move, and has started it.
+ *
+ * Bossy R now comes before the sliding vowels, so dip-oi follows
+ * cons-soft-cg instead of long-u-oo. Without this, a child part-way
+ * through oi/oy, ou/ow and aw would find those stages locked again behind
+ * work they have not done. A stage that has never been practised follows
+ * the new order like everyone else's.
+ */
+function _openUnderLegacyOrder(stage, unlocked, snapshot) {
+  if (!stage.legacyPrerequisite || !unlocked.has(stage.legacyPrerequisite)) return false;
+  const practised = typeof snapshot.groupMastery?.[stage.group] === 'number';
+  return practised && getStageReadiness(stage.id, snapshot, stage.legacyPrerequisite).unlocked;
 }
 
 /**

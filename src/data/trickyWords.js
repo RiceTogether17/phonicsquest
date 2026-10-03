@@ -61,13 +61,13 @@ export const TRICKY_WORDS = [
   { word: 'have', phase: 2, regular: ['h','v'],    tricky: ['a','e'],     category: 'partial',         note: 'looks like a_e but says /hăv/' },
   { word: 'from', phase: 2, regular: ['fr','m'],   tricky: ['o'],         category: 'partial',         note: '"o" sounds more like /ŭ/' },
   { word: 'of',   phase: 2, regular: [],           tricky: ['o','f'],     category: 'fully-irregular', note: '"o" /ŭ/ and "f" /v/ — totally odd' },
-  { word: 'for',  phase: 2, regular: ['f'],        tricky: ['or'],        category: 'decodable-soon',  note: '"or" is r-controlled — taught in phase 8',  decodableInPhase: 8 },
+  { word: 'for',  phase: 2, regular: ['f'],        tricky: ['or'],        category: 'decodable-soon',  note: '"or" is r-controlled — taught in phase 7',  decodableInPhase: 7 },
   { word: 'by',   phase: 2, regular: ['b'],        tricky: ['y'],         category: 'decodable-soon',  note: 'final-y as /ī/, same pattern as "my"', decodableInPhase: 6 },
   { word: 'too',  phase: 2, regular: ['t'],        tricky: ['oo'],        category: 'decodable-soon',  note: '"oo" makes /oo/ — taught in Vowel team /oo/ · oo', decodableInPhase: 6 },
 
   // ── Phase 3 (CVCC final blends) ──────────────────────────────────────
   { word: 'are',  phase: 3, regular: [],           tricky: ['are'],       category: 'partial',         note: 'whole word /ar/ — silent "e"' },
-  { word: 'out',  phase: 3, regular: ['t'],        tricky: ['ou'],        category: 'decodable-soon',  note: '"ou" is a diphthong — taught in phase 7', decodableInPhase: 7 },
+  { word: 'out',  phase: 3, regular: ['t'],        tricky: ['ou'],        category: 'decodable-soon',  note: '"ou" is a diphthong — taught in phase 8', decodableInPhase: 8 },
   { word: 'were', phase: 3, regular: ['w'],        tricky: ['ere'],       category: 'partial',         note: '"ere" makes /er/' },
   { word: 'do',   phase: 3, regular: ['d'],        tricky: ['o'],         category: 'partial',         note: '"o" /oo/' },
 
@@ -88,12 +88,12 @@ export const TRICKY_WORDS = [
   { word: 'come', phase: 6, regular: ['c','m'],    tricky: ['o','e'],     category: 'partial',         note: 'looks like o_e but says /kŭm/' },
   { word: 'one',  phase: 6, regular: [],           tricky: ['one'],       category: 'fully-irregular', note: 'whole word /wŭn/ — totally irregular' },
 
-  // ── Phase 7 (diphthongs) ─────────────────────────────────────────────
+  // ── Phase 7 ──────────────────────────────────────────────────────────
   { word: 'could',  phase: 7, regular: ['c','d'],    tricky: ['oul'],     category: 'partial',         note: '"oul" makes /ʊ/ (short oo)' },
   { word: 'would',  phase: 7, regular: ['w','d'],    tricky: ['oul'],     category: 'partial',         note: '"oul" makes /ʊ/' },
   { word: 'should', phase: 7, regular: ['sh','d'],   tricky: ['oul'],     category: 'partial',         note: '"oul" makes /ʊ/ — pattern shared with could/would' },
 
-  // ── Phase 8 (advanced) ───────────────────────────────────────────────
+  // ── Phase 8 ──────────────────────────────────────────────────────────
   { word: 'friend', phase: 8, regular: ['fr','n','d'], tricky: ['ie'],    category: 'fully-irregular', note: '"ie" makes /ĕ/, "i" is silent' },
   { word: 'people', phase: 8, regular: ['p','p','l'],  tricky: ['eo','e'],category: 'fully-irregular', note: '"eo" /ē/, final "e" silent' },
   { word: 'because',phase: 8, regular: ['b'],          tricky: ['e','cau','se'], category: 'partial',  note: 'tricky middle /kŏz/ — exceptional /au/' },

@@ -200,20 +200,25 @@ describe('micro-stage pedagogical ordering', () => {
     expect(order('dip-ou')).toBeLessThan(order('dip-aw'));
   });
 
-  it('All micro-stages sit in phase 6 (long vowels) or phase 7 (diphthongs)', () => {
+  it('All micro-stages sit in phase 6 (long vowels) or phase 8 (diphthongs)', () => {
     for (const stage of CURRICULUM) {
       if (stage.id.startsWith('long-')) expect(stage.phase).toBe(6);
-      if (stage.id.startsWith('dip-')) expect(stage.phase).toBe(7);
+      if (stage.id.startsWith('dip-')) expect(stage.phase).toBe(8);
+      if (stage.id.startsWith('rc-')) expect(stage.phase).toBe(7);
     }
   });
 
-  it('Phase 6 ends with the short-oo contrast stage; phase 7 starts with dip-oi', () => {
+  it('Phase 6 ends with the short-oo contrast stage; Bossy R comes before the sliding vowels', () => {
     const phase6 = CURRICULUM.filter((s) => s.phase === 6);
-    const phase7 = CURRICULUM.filter((s) => s.phase === 7);
+    const phase8 = CURRICULUM.filter((s) => s.phase === 8);
+    const at = (id) => CURRICULUM.findIndex((s) => s.id === id);
     // short-oo (book /ʊ/) deliberately follows long-u-oo (moon /uː/) so the
     // two sounds of oo are taught back-to-back as a contrast pair.
     expect(phase6.at(-1).id).toBe('short-oo');
     expect(phase6.at(-2).id).toBe('long-u-oo');
-    expect(phase7[0].id).toBe('dip-oi');
+    // Story code runs r-controlled (tier 3) before diphthongs (tier 4); the
+    // lessons now run in the same order.
+    expect(at('rc-er-ir-ur')).toBeLessThan(at('dip-oi'));
+    expect(phase8[0].id).toBe('dip-oi');
   });
 });
