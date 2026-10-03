@@ -712,3 +712,21 @@ describe('allowance hygiene (R12) — the validator\u2019s one unbounded escape'
     }
   });
 });
+
+describe('could, would and should', () => {
+  it('are never decodable: their "oul" is a spelling no phase teaches', () => {
+    // Split c·ou·ld as the diphthong of "out", "could" counted as a
+    // sound-it-out word in every Band D story.
+    for (const word of ['could', 'would', 'should']) {
+      for (const phase of STORY_PHASES) {
+        expect(isWordDecodable(word, phase.id), `${word} at ${phase.id}`).toBe(false);
+      }
+    }
+  });
+
+  it('reach a Band D story by the high-frequency route instead', () => {
+    const scout = STORIES.find((s) => s.id === 'core-d-09');
+    expect(scout.lines.some((l) => /\bCould\b/.test(l.text))).toBe(true);
+    expect(supportWords(scout).map((w) => w.word)).toContain('could');
+  });
+});

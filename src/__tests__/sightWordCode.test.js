@@ -3,7 +3,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { SIGHT_QUESTS } from '../data/sightwords.js';
-import { SIGHT_WORD_CODE, getSightWordCode } from '../data/sightWordCode.js';
+import { SIGHT_WORD_CODE, getSightWordCode, sightWordTip } from '../data/sightWordCode.js';
 import { TRICKY_WORDS } from '../data/trickyWords.js';
 
 const readingWords = [
@@ -52,6 +52,36 @@ describe('sight word code', () => {
     expect(getSightWordCode('for').decodableAt).toBe(7); // Bossy R
     expect(getSightWordCode('out').decodableAt).toBe(8); // ou
     expect(getSightWordCode('story').decodableAt).toBe(10); // two beats
+  });
+
+  it('names the pattern a word waits on, not a letter the child already knows', () => {
+    // "Once you know “e”" told a child who knows e that they could read
+    // "white". It is Magic E they are waiting for.
+    expect(sightWordTip(getSightWordCode('white'))).toBe(
+      'No tricky part — you can sound it out once you know Magic E makes “i” say its name.',
+    );
+    expect(getSightWordCode('white').waitsOn).toBe('i_e');
+    expect(sightWordTip(getSightWordCode('cold'))).toContain('“o” can say its name');
+    expect(sightWordTip(getSightWordCode('place'))).toContain('“c” can say /s/');
+    expect(sightWordTip(getSightWordCode('page'))).toContain('“g” can say /j/');
+    expect(sightWordTip(getSightWordCode('now'))).toContain('as in “cow”');
+    expect(sightWordTip(getSightWordCode('good'))).toContain('as in “book”');
+    expect(sightWordTip(getSightWordCode('fly'))).toContain('“y” can say /igh/');
+    expect(sightWordTip(getSightWordCode('day'))).toContain('once you know “ay”.');
+    expect(sightWordTip(getSightWordCode('going'))).toContain('the ending “-ing”');
+    // An unstressed vowel waits on the word's length, not on a letter.
+    expect(getSightWordCode('about').waitsOn).toBeNull();
+    expect(sightWordTip(getSightWordCode('about'))).toBe(
+      'No tricky part — clap the parts, then sound it out.',
+    );
+  });
+
+  it('never tells a child to wait for a single letter they already know', () => {
+    for (const code of Object.values(SIGHT_WORD_CODE)) {
+      if (!code.waitsOnTip) continue;
+      expect(code.waitsOnTip, code.word).not.toMatch(/^“[aeiou]”$/);
+      expect(code.waitsOn, code.word).not.toBe('e');
+    }
   });
 
   it('most "sight words" are not irregular at all', () => {

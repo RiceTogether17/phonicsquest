@@ -35,3 +35,7 @@ src/modes/letterSounds.js
 # compared byte-for-byte by scopeSequence.test.js — reformatting it here
 # would make the staleness guard fail on a file nobody edited.
 SCOPE_AND_SEQUENCE.md
+
+# Generated from the story data by scripts/export-reader-prompts.mjs. The
+# prompts sit in fenced blocks meant to be pasted as they are.
+readers/[0-9]-*.md

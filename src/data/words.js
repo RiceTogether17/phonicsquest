@@ -1934,8 +1934,8 @@ export const WORDS = [
   { id:'their', word:'their', graphemes:['th','eir'], types:['d','lv'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'👥' },
   { id:'because', word:'because', graphemes:['be','cau','se'], types:['sv','dp','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'❓' },
   { id:'enough', word:'enough', graphemes:['e','nough'], types:['sv','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'✅' },
-  { id:'should', word:'should', graphemes:['sh','ou','ld'], types:['d','dp','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'🧠' },
-  { id:'could', word:'could', graphemes:['c','ou','ld'], types:['c','dp','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'💡' },
+  { id:'should', word:'should', graphemes:['sh','oul','d'], types:['d','sv','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'🧠', irregularVowel:true, phonemeKeys:{1:'short_oo'} },
+  { id:'could', word:'could', graphemes:['c','oul','d'], types:['c','sv','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'💡', irregularVowel:true, phonemeKeys:{1:'short_oo'} },
 
   /* ══════════════════════════════════════
      PHONEMIC AWARENESS — VOWEL-INITIAL DEPTH
@@ -2159,7 +2159,7 @@ export const WORDS = [
   { id:'insect', word:'insect', graphemes:['i','n','s','e','c','t'], types:['sv','c','c','sv','c','c'], pattern:'multisyllable', group:'multisyllable', level:2, emoji:'🐞' },
 
   // ── High-frequency sight words (stage sight-highfreq) ──────────────────
-  { id:'would', word:'would', graphemes:['w','ould'],   types:['c','lv'],      pattern:'sight', group:'sight-highfreq', level:2, emoji:'🙏' },
+  { id:'would', word:'would', graphemes:['w','oul','d'], types:['c','sv','c'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🙏', irregularVowel:true, phonemeKeys:{1:'short_oo'} },
   { id:'said',  word:'said',  graphemes:['s','ai','d'], types:['c','sv','c'],  pattern:'sight', group:'sight-highfreq', level:2, emoji:'💬', irregularVowel:true, phonemeKeys:{1:'e'} },
   { id:'come',  word:'come',  graphemes:['c','o','m','e'], types:['c','sv','c','se'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'👋', irregularVowel:true, phonemeKeys:{1:'u'} },
   { id:'some',  word:'some',  graphemes:['s','o','m','e'], types:['c','sv','c','se'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🍪', irregularVowel:true, phonemeKeys:{1:'u'} },

@@ -485,6 +485,45 @@ function _markedPhase(base, marker) {
 }
 
 const VOWELS = /[aeiouy]/;
+const SINGLE_VOWEL = /^[aeiou]$/;
+
+/** What a marked (~) letter group says, in a child's words. */
+const LATER_SOUND = Object.freeze({
+  c: '“c” can say /s/',
+  g: '“g” can say /j/',
+  ow: '“ow” can say /ow/, as in “cow”',
+  oo: '“oo” can say /oo/, as in “book”',
+  y: '“y” can say /igh/',
+});
+
+/**
+ * The letter group a regular word waits on, and how to say it to a child.
+ *
+ * The bare letters mislead for exactly the groups the spec marks: the "e"
+ * of "white" is Magic E, not the e of "hen", and the "o" of "cold" says its
+ * name, not the o of "hot". "Once you know “e”" tells a child who already
+ * knows e that they should be able to read "white", and they can't.
+ * Unstressed vowels (@) wait on the word's length, not on a letter group,
+ * so they return null and the tip says to clap the parts.
+ *
+ * @returns {{ waitsOn: string, tip: string }|null}
+ */
+function _waitsOn(base, shown, marker, isSuffix, earlier) {
+  if (isSuffix) return { waitsOn: `-${shown}`, tip: `the ending “-${shown}”` };
+  if (marker === '@') return null;
+  if (base === 'e_') {
+    const vowel = [...earlier].reverse().find((s) => SINGLE_VOWEL.test(s.text.toLowerCase()));
+    if (!vowel) return { waitsOn: 'e', tip: 'Magic E' };
+    const v = vowel.text.toLowerCase();
+    return { waitsOn: `${v}_e`, tip: `Magic E makes “${v}” say its name` };
+  }
+  if (marker === '~') {
+    if (LATER_SOUND[base]) return { waitsOn: base, tip: LATER_SOUND[base] };
+    if (SINGLE_VOWEL.test(base)) return { waitsOn: base, tip: `“${base}” can say its name` };
+  }
+  const group = shown.toLowerCase();
+  return { waitsOn: group, tip: `“${group}”` };
+}
 
 /**
  * @typedef {object} SightWordCode
@@ -496,8 +535,10 @@ const VOWELS = /[aeiouy]/;
  * @property {number|null} decodableAt  the phase from which a decodable word
  *   can be sounded out in full; null for heart words
  * @property {string|null} waitsOn  for a decodable word, the latest letter
- *   group it needs ("ay" in day); null when it is the word's length (two or
- *   more beats) that waits for phase 10, or when nothing does
+ *   group it needs ("ay" in day, "i_e" in white); null when it is the word's
+ *   length (two or more beats) that waits for phase 10, or when nothing does
+ * @property {string|null} waitsOnTip  waitsOn as a child is told it: "Magic E
+ *   makes “i” say its name", "“c” can say /s/", "“ay”"
  */
 
 /** @param {string} word @param {string} spec @returns {SightWordCode} */
@@ -505,7 +546,8 @@ function _parse(word, spec) {
   const [groups, note = ''] = spec.split('|').map((x) => x.trim());
   const segments = [];
   let phase = 1;
-  let waitsOn = null;
+  /** @type {{ waitsOn: string, tip: string }|null} */
+  let waits = null;
   let vowelBeats = 0;
   let tricky = false;
   for (const raw of groups.split(/\s+/)) {
@@ -515,12 +557,13 @@ function _parse(word, spec) {
     const shown = text.replace(/_$/, ''); // e_ is written as e
     const base = text.toLowerCase();
     if (marker === '*') tricky = true;
+    const earlier = [...segments];
     segments.push({ text: shown, tricky: marker === '*' });
     if (marker === '*') continue;
     const p = isSuffix ? 9 : (_markedPhase(base, marker) ?? GRAPHEME_PHASE[base] ?? 1);
     if (p > phase) {
       phase = p;
-      waitsOn = p > 1 ? (isSuffix ? `-${shown}` : shown.toLowerCase()) : null;
+      waits = p > 1 ? _waitsOn(base, shown, marker, isSuffix, earlier) : null;
     }
     const consonantY = base === 'y' && marker !== '~';
     if (!isSuffix && base !== 'e_' && base !== 'qu' && !consonantY && VOWELS.test(base)) {
@@ -529,7 +572,7 @@ function _parse(word, spec) {
   }
   if (vowelBeats >= 2 && phase < 10) {
     phase = 10; // longer words are phase 10's multisyllable work
-    waitsOn = null;
+    waits = null;
   }
   return {
     word,
@@ -537,7 +580,8 @@ function _parse(word, spec) {
     segments,
     note: tricky ? note : '',
     decodableAt: tricky ? null : phase,
-    waitsOn: tricky ? null : waitsOn,
+    waitsOn: tricky ? null : (waits?.waitsOn ?? null),
+    waitsOnTip: tricky ? null : (waits?.tip ?? null),
   };
 }
 
@@ -550,16 +594,15 @@ export const SIGHT_WORD_CODE = Object.freeze(Object.fromEntries(_CODE));
  * One line for the child about how to read the word.
  *   heart:      "❤️ ai says /e/"
  *   decodable:  "No tricky part — sound it out!" (code from phases 1–4),
- *               or "… once you know ay" / "… clap the parts" for later code
+ *               or "… once you know “ay”" / "… clap the parts" for later code
  * @param {SightWordCode} code
  */
 export function sightWordTip(code) {
   if (!code) return '';
   if (code.category === 'heart') return `❤️ Tricky part: ${code.note}`;
   if (code.decodableAt <= 4) return 'No tricky part — sound it out!';
-  if (!code.waitsOn) return 'No tricky part — clap the parts, then sound it out.';
-  const what = code.waitsOn.startsWith('-') ? `the ending “${code.waitsOn}”` : `“${code.waitsOn}”`;
-  return `No tricky part — you can sound it out once you know ${what}.`;
+  if (!code.waitsOnTip) return 'No tricky part — clap the parts, then sound it out.';
+  return `No tricky part — you can sound it out once you know ${code.waitsOnTip}.`;
 }
 
 /**

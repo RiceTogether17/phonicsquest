@@ -1,6 +1,6 @@
 # PhonicsQuest 🎯
 
-**English learning adventure for K1–P6 — Early Reading Quest, Primary English Quest, and Exam Practice Hub. Free, open-source, runs in any browser.**
+**English learning adventure for K1–P6 — Early Reading Quest, Primary English Quest, and Exam Practice Hub. Free to use, runs in any browser.**
 
 PhonicsQuest started as a phonics blender for early readers and now spans the full primary-school English journey, all the way to PSLE-style paper practice. Two clearly-separated learning pathways live in the same app:
 
@@ -298,20 +298,26 @@ Vanilla JS + ES modules. No UI framework.
 
 ---
 
-## 🤝 Contributing
+## 🤝 Feedback
 
-Pull requests welcome. Please:
-
-1. Fork and create a feature branch (`git checkout -b feature/my-thing`)
-2. Run `npm run dev` and verify your changes
-3. Run `npm test` and `npm run build` before opening the PR
-4. Open a PR describing what changed and why
+PhonicsQuest is not an open-source project, so pull requests can't be
+accepted. If you spot a bug or a teaching mistake, please open an issue.
 
 ---
 
-## 📄 License
+## 📄 Copyright
 
-[Apache 2.0](LICENSE) — open source, free to use, modify, and distribute. Audio files are included for educational demonstration purposes.
+© 2026 Kingston Chua (RiceTogether). All rights reserved.
+
+You're welcome to use the app at the link above for your own child's or
+class's learning. The code, stories, word lists, practice questions,
+illustrations, audio and the Giri character are not licensed for reuse:
+please don't copy, modify, redistribute or sell any part of PhonicsQuest
+without written permission. To ask, get in touch through
+[nas.com/ricetogether](https://nas.com/ricetogether).
+
+The third-party libraries PhonicsQuest uses (GSAP, Chart.js,
+canvas-confetti) remain under their own licences.
 
 ---
 
