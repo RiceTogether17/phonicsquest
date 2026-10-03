@@ -32,6 +32,7 @@ import { getCurrentJourneyStep } from '../data/journeyStages.js';
 import { getMissionSteps } from './missionToday.js';
 import { getRemediationPlan } from './remediationRouter.js';
 import { getRecommendedStage } from './progression.js';
+import { childStageName } from '../data/curriculum.js';
 import { getGrammarTip } from '../data/grammarTips.js';
 import { GRAMMAR_CATEGORIES } from '../data/grammarCategories.js';
 import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
@@ -167,7 +168,7 @@ function _earlyTeachStep() {
     kind: 'teach',
     kindLabel: 'Learn',
     icon: stage.icon || '🦉',
-    title: `Giri teaches: ${stage.name}`,
+    title: `Giri teaches: ${childStageName(stage)}`,
     detail: 'A 1-minute lesson, then try one together.',
     done: false, // lessonRunner overrides from its teachDone flag
     progressLabel: 'Start',

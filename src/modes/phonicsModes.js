@@ -228,7 +228,8 @@ export const PHONICS_MODES = Object.freeze({
       'silent-e-missing': 'The vowel says its name. Add a silent e at the end.',
       'plausible-spelling':
         'Great sounding out! Every sound is right — this word just uses a different spelling.',
-      default: 'Say the word slowly. Tap one letter for each sound you hear.',
+      default:
+        'Say the word slowly. Tap one tile for each sound — sh, ck and ee are one sound each.',
     },
     masteryCriteria: DEFAULT_MASTERY,
     score: scoreListenAndSpell,

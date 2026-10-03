@@ -7952,6 +7952,15 @@ button.sst-word:hover,
   margin-top: 2px;
 }
 
+/* The curriculum's own name for the stage ("CCVC – Short A"), for the grown-up
+   beside the child. The child reads the plain name above it. */
+.bp-stage-tech {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
 /* Strict-gate explanation shown under a locked stage so the parent can see
  * which criterion blocks unlock (decoding %, unique words, sessions, etc.). */
 .bp-stage-lock-reason {

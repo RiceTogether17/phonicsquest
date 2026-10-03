@@ -122,7 +122,10 @@ export const PRE_PHASES = Object.freeze([
     icon: '🔡',
     description: 'Matching each letter to the sound it makes — s says /s/, a says /ă/ — so sounds can be read from print.',
     learningOutcome: 'Say the most common sound for each single letter quickly and pick the letter that matches a spoken sound.',
-    targetSounds: ['s /s/', 'a /ă/', 't /t/', 'p /p/', 'i /ĭ/', 'n /n/', 'm /m/', 'd /d/', 'g /g/', 'o /ŏ/', 'c /k/', 'k /k/', 'e /ĕ/', 'u /ŭ/', 'r /r/', 'h /h/', 'b /b/', 'f /f/', 'l /l/'],
+    // Every single letter, in the usual teaching order. The list used to stop
+    // at l, but phase 1 words use the rest straight away (jam, van, web, fox,
+    // yes, zip), so a child finishing this step had not met them.
+    targetSounds: ['s /s/', 'a /ă/', 't /t/', 'p /p/', 'i /ĭ/', 'n /n/', 'm /m/', 'd /d/', 'g /g/', 'o /ŏ/', 'c /k/', 'k /k/', 'e /ĕ/', 'u /ŭ/', 'r /r/', 'h /h/', 'b /b/', 'f /f/', 'l /l/', 'j /j/', 'v /v/', 'w /w/', 'x /ks/', 'y /y/', 'z /z/', 'qu /kw/'],
     sampleWords: ['s → sun', 'a → apple', 't → top', 'p → pig', 'i → ink', 'n → net'],
     sentenceExamples: ['Which letter says /sss/?', 'Tap the letter that starts "map".'],
     recommendedModes: ['letterSounds', 'soundHunt', 'hear'],
@@ -175,8 +178,8 @@ export const PHASES = Object.freeze([
     description: 'Two consonants at the end after the vowel (band, belt, gift, song, jump).',
     learningOutcome: 'Decode and spell short-vowel words that end in a consonant blend.',
     targetSounds: ['-nd', '-nt', '-mp', '-st', '-lt', '-lk', '-lp', '-sk', '-ft', '-nk', '-ng'],
-    sampleWords: ['band', 'bank', 'belt', 'gift', 'milk', 'song', 'lost', 'jump', 'dust', 'lamp'],
-    sentenceExamples: ['Hand me the lamp.', 'I jump in the dust.'],
+    sampleWords: ['band', 'bank', 'belt', 'gift', 'milk', 'pond', 'lost', 'jump', 'dust', 'lamp'],
+    sentenceExamples: ['Hand him the lamp.', 'I jump in the dust.'],
     recommendedModes: ['blend', 'classicBlend', 'hear', 'first', 'last', 'middle', 'missing', 'soundCount', 'oralBlend', 'oralSegment', 'oddOneOut', 'soundHunt', 'train', 'wordCount', 'segment', 'listenAndSpell', 'wordSort', 'readAndTap', 'fluencySprint'],
     sightWords: ['was', 'you', 'they', 'all', 'are'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
@@ -191,7 +194,7 @@ export const PHASES = Object.freeze([
     learningOutcome: 'Recognise that two letters can make one sound, and decode digraph words in connected text.',
     targetSounds: ['sh /ʃ/', 'ch /tʃ/', 'th /θ/', 'th /ð/', 'wh /w/', 'ck /k/', 'ng /ŋ/'],
     sampleWords: ['ship', 'chip', 'that', 'when', 'sing', 'lock', 'fish', 'chop', 'this', 'whip'],
-    sentenceExamples: ['The ship has a chip.', 'Wash the dish in the sink.'],
+    sentenceExamples: ['The ship has a chip.', 'Chop the fish on the dish.'],
     recommendedModes: ['blend', 'classicBlend', 'hear', 'first', 'last', 'middle', 'missing', 'soundCount', 'oralBlend', 'oralSegment', 'oddOneOut', 'soundHunt', 'train', 'wordCount', 'segment', 'listenAndSpell', 'wordSort', 'readAndTap', 'fluencySprint'],
     sightWords: ['my', 'her', 'said', 'have', 'like'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
@@ -206,7 +209,7 @@ export const PHASES = Object.freeze([
     learningOutcome: 'Decode and spell short-vowel words with blends at both the start and the end.',
     targetSounds: ['stCC-', 'plCC-', 'brCC-', 'spCC-', 'sprCC-', '-mp', '-nd', '-nt', '-st'],
     sampleWords: ['stamp', 'blend', 'print', 'stomp', 'stump', 'plank', 'crest', 'drink', 'frost', 'trust'],
-    sentenceExamples: ['Print the brand on the stamp.', 'I trust the stump will hold.'],
+    sentenceExamples: ['Print the brand on the stamp.', 'The stump is stuck in the sand.'],
     recommendedModes: ['blend', 'classicBlend', 'hear', 'first', 'last', 'middle', 'missing', 'soundCount', 'oralBlend', 'oralSegment', 'oddOneOut', 'soundHunt', 'train', 'wordCount', 'segment', 'listenAndSpell', 'wordSort', 'readAndTap', 'fluencySprint'],
     sightWords: ['so', 'do', 'some', 'come', 'were'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
@@ -265,7 +268,7 @@ export const PHASES = Object.freeze([
     description: '-ing, -ed, -er and -est on familiar base words.',
     learningOutcome: 'Read and spell words with -ing, -ed, -er and -est, hearing the suffix as a separate chunk.',
     targetSounds: ['-ing /ɪŋ/', '-ed /d/, /t/, /ɪd/', '-er /ɚ/', '-est /ɪst/'],
-    sampleWords: ['running', 'jumped', 'grander', 'tallest', 'helped', 'biggest', 'playing', 'sitting', 'slower', 'eating'],
+    sampleWords: ['running', 'jumped', 'faster', 'tallest', 'helped', 'biggest', 'playing', 'sitting', 'slower', 'eating'],
     sentenceExamples: ['He was running faster than me.', 'The biggest cat jumped highest.'],
     recommendedModes: ['classicBlend', 'blend', 'hear', 'segment', 'listenAndSpell', 'readAndTap', 'fluencySprint'],
     sightWords: ['because', 'once', 'please', 'thought'],
@@ -308,6 +311,81 @@ export function getSightWordsThroughPhase(phase) {
 export const PHASE_LABELS = Object.freeze(
   PHASES.reduce((acc, p) => { acc[p.phase] = p.label; return acc; }, {})
 );
+
+/**
+ * What a CHILD reads for each phase and stage.
+ *
+ * The stage names ("CCVCC – Short O", "Diphthong · oi/oy") are the
+ * curriculum's names, right for a teacher's report and unreadable to a
+ * five-year-old choosing what to play. VALIDITY_ROADMAP.md 2.2: child-facing
+ * copy says what the words sound like, with a word to anchor it, and keeps
+ * the technical term as a quiet second line for the grown-up beside them.
+ */
+export const CHILD_PHASE_LABELS = Object.freeze({
+  1: 'Phase 1 · Three-sound words',
+  2: 'Phase 2 · Two sounds at the start',
+  3: 'Phase 3 · Two sounds at the end',
+  4: 'Phase 4 · Two letters, one sound',
+  5: 'Phase 5 · Two sounds at both ends',
+  6: 'Phase 6 · Vowels that say their name',
+  7: 'Phase 7 · Sliding vowels',
+  8: 'Phase 8 · Bossy R and tricky letters',
+  9: 'Phase 9 · Word endings',
+  10: 'Phase 10 · Big words and tricky words',
+});
+
+const CHILD_SHAPE_NAMES = Object.freeze({
+  cvc: 'Three-sound words',
+  ccvc: 'Two sounds at the start',
+  cvcc: 'Two sounds at the end',
+  ccvcc: 'Two sounds at both ends',
+});
+
+const CHILD_STAGE_NAMES = Object.freeze({
+  digraphs: 'Two letters, one sound · sh, ch, th',
+  'long-u-uue': 'ue as in blue and cue',
+  'long-u-ew': 'ew as in flew and few',
+  'long-u-oo': 'oo as in moon',
+  'short-oo': 'oo as in book',
+  'dip-oi': 'oi and oy · coin, boy',
+  'dip-ou': 'ou and ow · out, cow',
+  'dip-aw': 'aw as in paw',
+  'blends-review': 'Blends review',
+  'rc-ar-or': 'Bossy R · car, fork',
+  'rc-er-ir-ur': 'Bossy R · her, bird, fur',
+  'cons-tch-dge': 'tch and dge · catch, badge',
+  'cons-ph': 'ph as in phone',
+  'cons-soft-cg': 'Soft c and g · ice, gem',
+  'suffix-ing': 'Endings · -ing as in jumping',
+  'suffix-ed': 'Endings · -ed as in jumped',
+  'suffix-er': 'Endings · -er as in faster',
+  'suffix-est': 'Endings · -est as in fastest',
+  prefixes: 'Beginnings · re- and un-',
+  'suffixes-advanced': 'Longer endings · -tion, -able',
+  multisyllable: 'Long words · clap the parts',
+  'sight-highfreq': 'Tricky words',
+});
+
+/**
+ * The name a child reads for a stage: "Three-sound words · a as in cat",
+ * "ai as in rain", "Bossy R · car, fork".
+ * @param {{ id: string, name: string, sampleWords?: string[] }} stage
+ * @returns {string}
+ */
+export function childStageName(stage) {
+  if (!stage) return '';
+  if (CHILD_STAGE_NAMES[stage.id]) return CHILD_STAGE_NAMES[stage.id];
+  const key = stage.sampleWords?.[0];
+  const shape = /^(cvc|ccvc|cvcc|ccvcc)-([aeiou]|mixed)$/.exec(stage.id);
+  if (shape) {
+    const tail = shape[2] === 'mixed' ? 'all five vowels' : `${shape[2]} as in ${key}`;
+    return `${CHILD_SHAPE_NAMES[shape[1]]} · ${tail}`;
+  }
+  // Long-vowel stages: "Long A · a_e" → "a_e as in cake".
+  const spelling = /·\s*(\S+)\s*$/.exec(stage.name)?.[1];
+  if (/^long-/.test(stage.id) && spelling && key) return `${spelling} as in ${key}`;
+  return stage.name;
+}
 
 /**
  * Curriculum stages in learning order.
@@ -407,7 +485,7 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'cvc-mixed',
     learningOutcome: 'Decode short-A words with an initial l-, r- or s-blend without skipping the second consonant.',
     targetSounds: ['bl', 'cl', 'fl', 'pl', 'sl', 'br', 'cr', 'dr', 'fr', 'gr', 'pr', 'tr', 'sk', 'sm', 'sn', 'sp', 'st', 'sw'],
-    sampleWords: ['flat', 'clap', 'trap', 'plan', 'snap', 'flag', 'grab', 'stab'],
+    sampleWords: ['flat', 'clap', 'trap', 'plan', 'snap', 'flag', 'grab', 'crab'],
     sentenceExamples: ['I clap and tap.', 'A frog is in a trap.'],
     recommendedModes: ['blend', 'classicBlend', 'segment', 'soundCount'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
@@ -420,8 +498,8 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'ccvc-a',
     learningOutcome: 'Decode short-E words with an initial consonant blend.',
     targetSounds: ['st-', 'fr-', 'sl-', 'sp-', 'sw-'],
-    sampleWords: ['step', 'fret', 'sled', 'fled', 'spell', 'swept', 'stem', 'sped'],
-    sentenceExamples: ['Step on the sled.', 'I fell off the sled.'],
+    sampleWords: ['step', 'fret', 'sled', 'fled', 'bred', 'trek', 'stem', 'sped'],
+    sentenceExamples: ['Step on the sled.', 'The sled sped and I fled.'],
     recommendedModes: ['blend', 'classicBlend', 'segment', 'missing'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
@@ -459,7 +537,7 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'ccvc-o',
     learningOutcome: 'Decode short-U words with an initial consonant blend.',
     targetSounds: ['dr-', 'sl-', 'st-', 'pl-', 'bl-'],
-    sampleWords: ['drum', 'slug', 'stub', 'plum', 'blur', 'club', 'snug', 'crust'],
+    sampleWords: ['drum', 'slug', 'stub', 'plum', 'plug', 'club', 'snug', 'grub'],
     sentenceExamples: ['Drum on the drum.', 'A snug slug hid in the mud.'],
     recommendedModes: ['blend', 'classicBlend', 'segment', 'missing'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
@@ -473,7 +551,7 @@ export const CURRICULUM = [
     learningOutcome: 'Decode initial-blend words across all five short vowels without the set hinting at the vowel.',
     targetSounds: ['short a /ă/', 'short e /ĕ/', 'short i /ĭ/', 'short o /ŏ/', 'short u /ŭ/'],
     sampleWords: ['slam', 'bled', 'slim', 'clog', 'stud', 'slap', 'clip', 'scrub'],
-    sentenceExamples: ['I clip the slim twig.', 'Scrub the clog off the step.'],
+    sentenceExamples: ['I clip the slim twig.', 'Scrub the mud from the step.'],
     recommendedModes: ['middle', 'first', 'last', 'soundCount', 'segment', 'hear'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
@@ -501,7 +579,7 @@ export const CURRICULUM = [
     learningOutcome: 'Decode short-E words ending in a consonant blend.',
     targetSounds: ['-lt', '-st', '-nd', '-nt', '-lp'],
     sampleWords: ['belt', 'best', 'bend', 'melt', 'vent', 'help', 'kept', 'left'],
-    sentenceExamples: ['The best belt is here.', 'Help me melt the wax.'],
+    sentenceExamples: ['The best belt is red.', 'Help him melt the wax.'],
     recommendedModes: ['classicBlend', 'segment', 'last', 'missing'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
@@ -526,8 +604,8 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'cvcc-i',
     learningOutcome: 'Decode short-O words ending in a consonant blend.',
     targetSounds: ['-nd', '-ng', '-st', '-nk'],
-    sampleWords: ['bond', 'song', 'lost', 'long', 'cost', 'pond', 'gong', 'honk'],
-    sentenceExamples: ['I sing a long song.', 'The pond is lost in fog.'],
+    sampleWords: ['bond', 'pond', 'lost', 'cost', 'soft', 'loft', 'romp', 'honk'],
+    sentenceExamples: ['A frog sat on a log in the pond.', 'Mom lost the soft hat.'],
     recommendedModes: ['classicBlend', 'segment', 'last', 'missing'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
@@ -539,7 +617,7 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'cvcc-o',
     learningOutcome: 'Decode short-U words ending in a consonant blend.',
     targetSounds: ['-mp', '-st', '-ng', '-nt'],
-    sampleWords: ['jump', 'dust', 'lung', 'hunt', 'dump', 'rust', 'sung', 'bunt'],
+    sampleWords: ['jump', 'dust', 'must', 'hunt', 'dump', 'rust', 'bump', 'bunt'],
     sentenceExamples: ['Jump in the dust.', 'The hunt was fun.'],
     recommendedModes: ['classicBlend', 'segment', 'last', 'missing'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
@@ -553,7 +631,7 @@ export const CURRICULUM = [
     learningOutcome: 'Decode final-blend words across all five short vowels without the set hinting at the vowel.',
     targetSounds: ['short a /ă/', 'short e /ĕ/', 'short i /ĭ/', 'short o /ŏ/', 'short u /ŭ/'],
     sampleWords: ['land', 'lend', 'fist', 'fond', 'gust', 'damp', 'mint', 'just'],
-    sentenceExamples: ['A gust hit the damp land.', 'I just held a mint in my fist.'],
+    sentenceExamples: ['A gust hit the damp land.', 'Tim held a mint in his fist.'],
     recommendedModes: ['middle', 'first', 'last', 'soundCount', 'segment', 'hear'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
@@ -568,7 +646,7 @@ export const CURRICULUM = [
     learningOutcome: 'Treat sh, ch, th, wh, ck and ng as single phonemes when decoding and segmenting.',
     targetSounds: ['sh /ʃ/', 'ch /tʃ/', 'th /θ/', 'th /ð/', 'wh /w/', 'ck /k/', 'ng /ŋ/'],
     sampleWords: ['ship', 'chip', 'that', 'when', 'sing', 'lock', 'fish', 'chop', 'this', 'whip'],
-    sentenceExamples: ['The ship has a chip.', 'Wash the dish in the sink.'],
+    sentenceExamples: ['The ship has a chip.', 'Chop the fish on the dish.'],
     recommendedModes: ['hear', 'blend', 'segment', 'missing', 'soundCount'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
@@ -595,8 +673,8 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'ccvcc-a',
     learningOutcome: 'Decode short-E words with blends at both ends.',
     targetSounds: ['blCC-nd', 'trCC-nd', 'crCC-st', 'spCC-nt'],
-    sampleWords: ['blend', 'trend', 'crest', 'spent', 'swept', 'crept', 'shelf', 'flesh'],
-    sentenceExamples: ['I blend and trend.', 'The crest of the hill swept down.'],
+    sampleWords: ['blend', 'trend', 'crest', 'spent', 'swept', 'crept', 'slept', 'drench'],
+    sentenceExamples: ['I slept in the tent.', 'The frost crept in and I slept.'],
     recommendedModes: ['classicBlend', 'segment', 'missing', 'soundCount'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
@@ -622,8 +700,8 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'ccvcc-i',
     learningOutcome: 'Decode short-O words with blends at both ends.',
     targetSounds: ['stCC-mp', 'prCC-ng', 'frCC-st', 'flCC-ss'],
-    sampleWords: ['stomp', 'prong', 'blond', 'frost', 'floss', 'cross', 'gloss', 'strong'],
-    sentenceExamples: ['Stomp on the frost.', 'The frost is on the prong.'],
+    sampleWords: ['stomp', 'blond', 'frost', 'flops', 'clomp', 'plonk', 'prompt', 'crops'],
+    sentenceExamples: ['Stomp on the frost.', 'The blond dog can stomp.'],
     recommendedModes: ['classicBlend', 'segment', 'missing', 'soundCount'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
@@ -635,7 +713,7 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'ccvcc-o',
     learningOutcome: 'Decode short-U words with blends at both ends.',
     targetSounds: ['stCC-mp', 'clCC-mp', 'blCC-nt', 'grCC-nt'],
-    sampleWords: ['stump', 'clump', 'blunt', 'grunt', 'trust', 'thump', 'crust', 'crunch'],
+    sampleWords: ['stump', 'clump', 'blunt', 'grunt', 'trust', 'plump', 'crust', 'crunch'],
     sentenceExamples: ['Trust the blunt stump.', 'I crunch the crust and grunt.'],
     recommendedModes: ['classicBlend', 'segment', 'missing', 'soundCount'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
@@ -823,25 +901,25 @@ export const CURRICULUM = [
   },
   {
     id: 'long-u-uue', phase: 6,
-    name: 'Vowel team /oo/ · ue',
-    description: 'Vowel team ue (different from u_e): blue, true, glue, clue.',
+    name: 'Vowel team ue · /oo/ or /yoo/',
+    description: 'Vowel team ue (different from u_e): mostly /oo/ — blue, true, glue — and /yoo/ in cue and rescue.',
     icon: '💙', group: 'long-u-uue', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-u-ue',
-    learningOutcome: 'Read and spell /uː/ words with the ue vowel-team pattern.',
-    targetSounds: ['ue /uː/'],
-    sampleWords: ['blue', 'true', 'glue', 'clue', 'sue', 'due', 'value', 'rescue'],
+    learningOutcome: 'Read and spell words with the ue vowel team, which says /uː/ (blue) or /juː/ (cue).',
+    targetSounds: ['ue /uː/', 'ue /juː/'],
+    sampleWords: ['blue', 'true', 'glue', 'clue', 'due', 'cue', 'value', 'rescue'],
     sentenceExamples: ['The blue glue is true.', 'The clue is in the rescue.'],
     recommendedModes: ['classicBlend', 'hear', 'segment'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     id: 'long-u-ew', phase: 6,
-    name: 'Vowel team /oo/ · ew',
-    description: 'Word-end ew: new, few, drew, blew, flew, grew…',
+    name: 'Vowel team ew · /oo/ or /yoo/',
+    description: 'Word-end ew: mostly /oo/ — drew, blew, flew, grew — and /yoo/ in few.',
     icon: '🆕', group: 'long-u-ew', level: 2,
     requiredMastery: 0.70, prerequisite: 'long-u-uue',
-    learningOutcome: 'Read and spell /uː/ words ending in -ew.',
-    targetSounds: ['ew /uː/'],
+    learningOutcome: 'Read and spell words ending in -ew, which says /uː/ (flew) or /juː/ (few).',
+    targetSounds: ['ew /uː/', 'ew /juː/'],
     sampleWords: ['new', 'few', 'drew', 'blew', 'flew', 'grew', 'chew', 'stew'],
     sentenceExamples: ['I drew a new boat.', 'A few birds flew over the stew.'],
     recommendedModes: ['classicBlend', 'hear', 'segment'],
@@ -924,7 +1002,7 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'dip-aw',
     learningOutcome: 'Read mixed-blend words fluently in continuous text without sounding each one out.',
     targetSounds: ['initial blends', 'final blends', 'both-end blends', 'tri-consonant blends (spr-, str-, scr-)'],
-    sampleWords: ['float', 'crisp', 'blend', 'sprint', 'plank', 'scrap', 'twist', 'shrink'],
+    sampleWords: ['strip', 'crisp', 'blend', 'sprint', 'plank', 'scrap', 'twist', 'shrink'],
     sentenceExamples: ['Sprint and stamp until the drums thump.', 'Twist the lid and stash the snack.'],
     recommendedModes: ['classicBlend', 'hear', 'soundCount'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
@@ -1019,7 +1097,7 @@ export const CURRICULUM = [
     learningOutcome: 'Read and spell base + -ed words and recognise the three pronunciations /d/, /t/, /ɪd/.',
     targetSounds: ['-ed /d/', '-ed /t/', '-ed /ɪd/'],
     sampleWords: ['jumped', 'helped', 'picked', 'played', 'walked', 'wanted', 'landed', 'rested'],
-    sentenceExamples: ['She picked and packed.', 'I walked and wanted to rest.'],
+    sentenceExamples: ['She picked and packed.', 'I jumped and then I rested.'],
     recommendedModes: ['classicBlend', 'hear', 'segment'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
@@ -1031,7 +1109,7 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'suffix-ed',
     learningOutcome: 'Read and spell comparative -er adjectives, including doubled-consonant forms.',
     targetSounds: ['-er /ɚ/'],
-    sampleWords: ['grander', 'taller', 'bigger', 'smaller', 'slower', 'longer', 'higher', 'softer'],
+    sampleWords: ['faster', 'bigger', 'softer', 'longer', 'slower', 'higher', 'smaller', 'taller'],
     sentenceExamples: ['Faster than a snail.', 'The taller tree is older.'],
     recommendedModes: ['classicBlend', 'hear', 'segment'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
@@ -1044,8 +1122,8 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'suffix-er',
     learningOutcome: 'Read and spell superlative -est adjectives, including doubled-consonant forms.',
     targetSounds: ['-est /ɪst/'],
-    sampleWords: ['grandest', 'tallest', 'biggest', 'smallest', 'slowest', 'longest', 'softest', 'kindest'],
-    sentenceExamples: ['The fastest is the best.', 'Kindest words win the longest friends.'],
+    sampleWords: ['fastest', 'biggest', 'softest', 'longest', 'slowest', 'smallest', 'tallest', 'kindest'],
+    sentenceExamples: ['The fastest is the best.', 'The kindest dog has the longest tail.'],
     recommendedModes: ['classicBlend', 'hear', 'segment'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
@@ -1122,60 +1200,11 @@ export function getStagesInPhase(phaseNumber) {
   return CURRICULUM.filter(s => s.phase === phaseNumber);
 }
 
-/**
- * Returns which curriculum stages are unlocked based on mastery scores.
- * @param {Record<string, number>} groupMastery - map of group -> accuracy (0-1)
- * @returns {string[]} array of unlocked stage IDs
- */
-export function getUnlockedStages(groupMastery) {
-  const unlocked = [];
-
-  for (const stage of CURRICULUM) {
-    if (!stage.prerequisite) { unlocked.push(stage.id); continue; }
-
-    const prereq = CURRICULUM.find(s => s.id === stage.prerequisite);
-    if (!prereq) continue;
-    if (!unlocked.includes(prereq.id)) continue;
-
-    const prereqAccuracy = getStageAccuracy(prereq, groupMastery);
-    if (prereqAccuracy >= stage.requiredMastery) {
-      unlocked.push(stage.id);
-    }
-  }
-
-  return unlocked;
-}
-
-/**
- * Average accuracy across all groups in a stage.
- * @param {object} stage
- * @param {Record<string, number>} groupMastery
- * @returns {number} 0-1
- */
-function getStageAccuracy(stage, groupMastery) {
-  const groups = stage.groups ?? [stage.group];
-  if (!groups.length) return 0;
-  const scores = groups.map(g => groupMastery[g] ?? 0);
-  return scores.reduce((a, b) => a + b, 0) / scores.length;
-}
-
-/**
- * Get the recommended next stage for the child based on current progress.
- * @param {Record<string, number>} groupMastery
- * @returns {object|null} curriculum stage
- */
-export function getRecommendedStage(groupMastery) {
-  const unlocked = getUnlockedStages(groupMastery);
-
-  for (const id of unlocked) {
-    const stage = CURRICULUM.find(s => s.id === id);
-    const accuracy = getStageAccuracy(stage, groupMastery);
-    if (accuracy < MASTERY_THRESHOLD) return stage;
-  }
-
-  const lastId = unlocked[unlocked.length - 1];
-  return CURRICULUM.find(s => s.id === lastId) ?? null;
-}
+// Stage unlocking and the recommended next stage live in modules/progression.js,
+// which applies the full gate (independent accuracy, spelling, word variety,
+// separate days, vowel confusion). The accuracy-only versions that used to sit
+// here were retired once nothing called them: an unlock rule in two places is
+// one more than the curriculum can keep consistent. VALIDITY_ROADMAP.md 1.2.
 
 /**
  * XP rewards by action.

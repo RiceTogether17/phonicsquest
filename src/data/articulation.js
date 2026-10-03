@@ -127,7 +127,7 @@ export const PHONEME_MOUTH = Object.freeze({
   // ── Vowels: close front, lips spread ───────────────────────────────────
   '/i/':   'vowel-smile', '/ɪ/': 'vowel-smile',
   '/ee/':  'vowel-smile', '/ea/': 'vowel-smile', '/ē/': 'vowel-smile',
-  '/ay/':  'vowel-smile', '/ai/': 'vowel-smile',
+  '/ay/':  'vowel-smile', '/ai/': 'vowel-smile', '/ā/': 'vowel-smile',
   '/ie/':  'vowel-smile', '/igh/': 'vowel-smile', '/ī/': 'vowel-smile',
 
   // ── Vowels: back, lips rounded ─────────────────────────────────────────
@@ -137,6 +137,8 @@ export const PHONEME_MOUTH = Object.freeze({
 
   // ── Diphthongs: the mouth visibly travels ──────────────────────────────
   '/oi/':  'glide', '/oy/': 'glide',
+  // /juː/ "you" — the y glide into oo (few, cue, cube)
+  '/ū/':   'glide',
   '/ou/':  'glide', '/ow/': 'glide',
   '/air/': 'glide',
 });

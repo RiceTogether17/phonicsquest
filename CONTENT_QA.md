@@ -59,15 +59,16 @@ sounds — confusing and wrong.
 **What we guarantee.** Every `sampleWords` entry matches the broad
 pattern its stage advertises:
 
-| Stage prefix                    | Test                                                             |
-| ------------------------------- | ---------------------------------------------------------------- |
-| `cvc-X`                         | 3 letters · vowel matches X · no blend/digraph at the boundaries |
-| `ccvc-X`                        | Starts with 2 consonants · vowel matches X                       |
-| `cvcc-X`                        | Ends with 2 consonants · vowel matches X                         |
-| `digraphs`                      | Contains one of sh / ch / th / wh / ck / ng                      |
-| `long-a-ae`                     | Has the `a_e` split-digraph pattern                              |
-| `long-a-ai`                     | Contains `ai`                                                    |
-| `dip-oi`                        | Contains `oi` or `oy`                                            |
+| Stage prefix                    | Test                                                              |
+| ------------------------------- | ----------------------------------------------------------------- |
+| `cvc-X`                         | 3 letters · vowel matches X · no blend/digraph at the boundaries  |
+| `ccvc-X`                        | 2+ consonant SOUNDS, vowel X, then 1 — no digraph, no r-vowel     |
+| `cvcc-X`                        | 1 consonant sound, vowel X, then 2+ — "song" fails: ng is 1 sound |
+| `ccvcc-X`                       | 2+ consonant sounds at both ends — "floss" and "flesh" fail       |
+| `digraphs`                      | Contains one of sh / ch / th / wh / ck / ng                       |
+| `long-a-ae`                     | Has the `a_e` split-digraph pattern                               |
+| `long-a-ai`                     | Contains `ai`                                                     |
+| `dip-oi`                        | Contains `oi` or `oy`                                             |
 | (… similar checks for the rest) |
 
 The rules are conservative — they don't claim phonological perfection,
@@ -79,6 +80,13 @@ pattern')`).
 
 **Why it matters.** A misclassified sample word becomes a misclassified
 hint becomes a child who thinks "feet" is a short-E word.
+
+Structural stages are counted in **sounds**, not letters. A letter count
+called "song" CVCC (n, g) when ng is one sound the child meets in phase 4,
+and "blur" CCVC when ur is an r-controlled vowel from phase 8. The phase
+1–3 example sentences are checked the same way, against the code taught so
+far plus the Quest 1–10 sight words, because they are printed on the
+child's practice sheet.
 
 ---
 

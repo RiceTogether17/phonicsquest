@@ -138,7 +138,11 @@ function confirmSegment(word, els) {
 
     const i = segmentsFound.length - 1;
     const prevGrapheme = i > 0 ? word.graphemes[i - 1] : null;
-    audio.speakPhoneme(word.graphemes[i], word.types[i], { word: word.word, prevGrapheme });
+    audio.speakPhoneme(word.graphemes[i], word.types[i], {
+      index: i,
+      word: word.word,
+      prevGrapheme,
+    });
 
     selectedLetters = [];
 

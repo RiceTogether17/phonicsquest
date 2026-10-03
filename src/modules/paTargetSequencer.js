@@ -84,32 +84,46 @@ export function paPositionForMode(mode) {
  * vowel slots, so this just stays consistent with how that mode picks
  * the target tile (see middleSound.js `_findMidIdx`).
  */
-function targetGraphemeOf(word, position) {
+function targetIndexOf(word, position) {
   const gs = word.graphemes;
-  if (position === 'first') return gs[0];
-  if (position === 'last') return gs[gs.length - 1];
-  // middle — prefer the leftmost vowel; if no type info, fall back to centre.
-  if (Array.isArray(word.types)) {
-    const vowelIdx = word.types.findIndex(
-      (t) => t === 'sv' || t === 'lv' || t === 'rc' || t === 'dp',
-    );
-    if (vowelIdx >= 0) return gs[vowelIdx];
+  const types = Array.isArray(word.types) ? word.types : [];
+  if (position === 'first') return 0;
+  if (position === 'last') {
+    // The last tile that makes a sound: "cake" ends in /k/, not a silent e.
+    for (let i = gs.length - 1; i >= 0; i--) if (types[i] !== 'se') return i;
+    return gs.length - 1;
   }
-  return gs[Math.floor((gs.length - 1) / 2)];
+  // middle — prefer the leftmost vowel; if no type info, fall back to centre.
+  const vowelIdx = types.findIndex((t) => t === 'sv' || t === 'lv' || t === 'rc' || t === 'dp');
+  if (vowelIdx >= 0) return vowelIdx;
+  return Math.floor((gs.length - 1) / 2);
+}
+
+function targetGraphemeOf(word, position) {
+  return word.graphemes[targetIndexOf(word, position)];
 }
 
 /**
  * Build the candidate pool from the master word list, honouring group +
  * level filters. Words must have at least 2 graphemes to be eligible (no
  * single-grapheme sight words in a PA exercise).
+ *
+ * A word whose target tile does not make its spelling's usual sound is left
+ * out. The answer buttons are labelled and voiced by spelling, so the middle
+ * of "bush" would be a "u" button playing the u of "bus", and the middle of
+ * "rule" a "u" button saying "you" beside an "oo" distractor that is the
+ * sound the child actually heard. Tricky (sight) words are left out for the
+ * same reason: "who" does not start with the /w/ its "wh" button plays.
  */
-function buildPool(wordList, group, maxLevel) {
+function buildPool(wordList, group, maxLevel, position) {
   return wordList.filter(
     (w) =>
       (!group || w.group === group) &&
       (typeof maxLevel !== 'number' || (w.level ?? 1) <= maxLevel) &&
       Array.isArray(w.graphemes) &&
-      w.graphemes.length >= 2,
+      w.graphemes.length >= 2 &&
+      w.group !== 'sight-highfreq' &&
+      !w.phonemeKeys?.[targetIndexOf(w, position)],
   );
 }
 
@@ -144,7 +158,7 @@ export function nextPaWord(state, { mode, group, maxLevel, wordList }) {
     state.key = key;
   }
 
-  const pool = buildPool(wordList, group, maxLevel);
+  const pool = buildPool(wordList, group, maxLevel, position);
   if (pool.length === 0) return null;
 
   if (!state.targets) {

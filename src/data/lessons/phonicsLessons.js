@@ -104,7 +104,7 @@ export const PHONICS_LESSONS = {
       'Now blend the whole word: f… l… a… g — flag! Don\'t skip the second sound.',
     ],
     weDoWord: 'flag',
-    confusions: ['The most common slip is skipping the second sound — "fag" instead of "flag". Say BOTH.'],
+    confusions: ['The most common slip is skipping the second sound — "fat" instead of "flat". Say BOTH.'],
   },
   'ccvc-e': {
     headline: 'Blends with short E',
@@ -248,11 +248,14 @@ export const PHONICS_LESSONS = {
     script: [
       'Sometimes two letters team up to make ONE brand-new sound.',
       '"s" and "h" together say /sh/ — the quiet sound: "shhh!".',
-      '"c" and "h" say /ch/ like a train. "t" and "h" say /th/ — tongue between your teeth!',
+      '"c" and "h" say /ch/ like a train. "t" and "h" say /th/ — tongue out: quiet in "thin", buzzy in "this"!',
       'When you see these teams, say ONE sound, not two: sh… i… p — ship!',
     ],
     weDoWord: 'ship',
-    confusions: ['/sh/ (quiet) and /ch/ (train) feel similar. /ch/ pops; /sh/ flows.'],
+    confusions: [
+      '/sh/ (quiet) and /ch/ (train) feel similar. /ch/ pops; /sh/ flows.',
+      '"ng" is one sound, hummed in your nose: si-ng, lo-ng. Not /n/ then /g/.',
+    ],
   },
 
   /* ── Phase 5 · CCVCC both-end blends ────────────────────────────── */
@@ -343,8 +346,8 @@ export const PHONICS_LESSONS = {
     headline: 'The AI team says /ā/',
     soundChips: [{ g: 'ai', type: 'lv', label: 'ai' }],
     script: [
-      'The letters "a" and "i" walk together and say ONE sound: /ā/.',
-      'Remember: when two vowels go walking, the first one does the talking!',
+      'The letters "a" and "i" are a team. Together they say ONE sound: /ā/.',
+      'When you see ai, say /ā/ — not /a/ then /i/.',
       'Try it: r… ai… n — rain!',
     ],
     weDoWord: 'rain',
@@ -376,12 +379,15 @@ export const PHONICS_LESSONS = {
     headline: 'The EA team also says /ē/',
     soundChips: [{ g: 'ea', type: 'lv', label: 'ea' }],
     script: [
-      '"e" and "a" walk together — and the first one does the talking: /ē/.',
+      '"e" and "a" are a team too. Together they say /ē/.',
       '"ee" and "ea" make the SAME sound: see the sea!',
       'Try it: s… ea — sea!',
     ],
     weDoWord: 'sea',
-    confusions: ['Two spellings, one sound: "feet" uses ee, "seat" uses ea. Both say /ē/.'],
+    confusions: [
+      'Two spellings, one sound: "feet" uses ee, "seat" uses ea. Both say /ē/.',
+      'ea can also say /e/, as in "head". If /ē/ does not make a word, try /e/.',
+    ],
   },
   'long-i-ie': {
     headline: 'Magic E makes I say its name',
@@ -406,15 +412,15 @@ export const PHONICS_LESSONS = {
     confusions: [],
   },
   'long-i-y': {
-    headline: 'Y the pretender says /ī/',
+    headline: 'Y at the end says /ī/',
     soundChips: [{ g: 'y', type: 'lv', label: 'y → ī' }],
     script: [
-      'At the end of short words, "y" pretends to be a vowel and says /ī/.',
+      'At the end of a short word with no other vowel, "y" works as a vowel and says /ī/.',
       'cry, fly, sky — hear the /ī/ at the end?',
       'Try it: c… r… y — cry!',
     ],
     weDoWord: 'cry',
-    confusions: [],
+    confusions: ['In longer words y at the end says /ē/: happy, sunny. In short ones like cry it says /ī/.'],
   },
   'long-o-oe': {
     headline: 'Magic E makes O say its name',
@@ -431,7 +437,7 @@ export const PHONICS_LESSONS = {
     headline: 'The OA team says /ō/',
     soundChips: [{ g: 'oa', type: 'lv', label: 'oa' }],
     script: [
-      '"o" and "a" walk together; the first one does the talking: /ō/.',
+      '"o" and "a" are a team. Together they say one sound: /ō/.',
       'Try it: b… oa… t — boat!',
       'Boat, coat, road — the oa team loves the middle of words.',
     ],
@@ -456,31 +462,35 @@ export const PHONICS_LESSONS = {
       'Magic E makes "u" say its name: /ū/, like in "cube".',
       'Look: c-u-b-e. Silent e, and u says its name.',
       'Try it: c… ū… b — cube!',
+      'After r, l or j, u_e just says /oo/: rule, flute, June.',
     ],
     weDoWord: 'cube',
-    confusions: ['"Cub" has short /u/. Add Magic E — "cube" — and u says its name!'],
+    confusions: [
+      '"Cub" has short /u/. Add Magic E — "cube" — and u says its name!',
+      '"Rule" is not "r-you-l". After r, the u_e says /oo/ — rule.',
+    ],
   },
   'long-u-uue': {
-    headline: 'The UE team says /oo/',
+    headline: 'The UE team says /oo/ — and sometimes /yoo/',
     soundChips: [{ g: 'ue', type: 'lv', label: 'ue' }],
     script: [
       '"u" and "e" together at the end say /oo/: blue, true, glue.',
       'Try it: b… l… ue — blue!',
-      'Stretch the sound like sticky glue: "blu-u-ue".',
+      'Sometimes ue says /yoo/, like the word "you": cue, rescue.',
     ],
     weDoWord: 'blue',
-    confusions: [],
+    confusions: ['If /oo/ does not make a word, try /yoo/: "c-oo" is not a word, "cue" is!'],
   },
   'long-u-ew': {
-    headline: 'The EW team says /oo/',
+    headline: 'The EW team says /oo/ — and sometimes /yoo/',
     soundChips: [{ g: 'ew', type: 'lv', label: 'ew' }],
     script: [
-      '"e" and "w" team up to say /oo/: new, flew, grew.',
-      'Try it: n… ew — new!',
-      'Same sound as "ue" in blue — English likes to spell one sound many ways!',
+      '"e" and "w" team up to say /oo/: flew, grew, chew.',
+      'Try it: fl… ew — flew!',
+      'In "few" it says /yoo/, like the word "you" — the same two sounds "ue" makes.',
     ],
-    weDoWord: 'new',
-    confusions: [],
+    weDoWord: 'flew',
+    confusions: ['If /oo/ does not make a word, try /yoo/: "f-oo" is not a word, "few" is!'],
   },
   'long-u-oo': {
     headline: 'The OO team says /oo/ — like the moon',
@@ -502,7 +512,7 @@ export const PHONICS_LESSONS = {
       'Book, look, good, foot — short /ʊ/. Moon and food keep the long /oo/. Listen for the difference!',
     ],
     weDoWord: 'book',
-    confusions: ['long-u-oo'],
+    confusions: ['oo has two sounds. If the long /oo/ of "moon" does not make a word, try the short one of "book".'],
   },
 
   /* ── Phase 7 · Diphthongs ───────────────────────────────────────── */
@@ -543,14 +553,14 @@ export const PHONICS_LESSONS = {
   /* ── Phase 8 · Blends review ────────────────────────────────────── */
   'blends-review': {
     headline: 'Blend champion: mixed review',
-    soundChips: [{ g: 'spr', type: 'bl', label: 'spr' }, { g: 'str', type: 'bl', label: 'str' }],
+    soundChips: [{ g: 'str', type: 'bl', label: 'str' }, { g: 'spr', type: 'bl', label: 'spr' }],
     script: [
       'You know start blends, end blends, and both-end blends. Time to mix them!',
-      'Some words even have THREE consonant friends: spr… i… nt — sprint!',
+      'Some words even have THREE consonant friends: s… t… r… i… p — strip!',
       'The trick never changes: say every sound, in order, then glue them together.',
     ],
-    weDoWord: 'crisp',
-    confusions: ['Three-letter blends hide a middle sound: "spint" is missing the /r/ in "sprint".'],
+    weDoWord: 'strip',
+    confusions: ['Three-letter blends hide a middle sound: "stip" is missing the /r/ in "strip".'],
   },
   'rc-ar-or': {
     headline: 'Bossy R: ar and or',
@@ -641,23 +651,23 @@ export const PHONICS_LESSONS = {
     headline: 'The -er ending: comparing two things',
     soundChips: [{ g: 'er', type: 'sf', label: '-er' }],
     script: [
-      'Add "-er" to compare two things: tall → taller, big → bigger.',
-      'Read the base word first, then the ending: tall + er — taller!',
-      'Try it: t… a… ll + er — taller!',
+      'Add "-er" to compare two things: fast → faster, big → bigger.',
+      'Read the base word first, then the ending: fast + er — faster!',
+      'Try it: f… a… s… t + er — faster!',
     ],
-    weDoWord: 'taller',
+    weDoWord: 'faster',
     confusions: [],
   },
   'suffix-est': {
     headline: 'The -est ending: the MOST of all',
     soundChips: [{ g: 'est', type: 'sf', label: '-est' }],
     script: [
-      'Add "-est" for the most of all: tall → tallest — nobody is taller!',
-      '-er compares two; -est compares everyone: taller than Sam, but the tallest in class.',
-      'Try it: t… a… ll + est — tallest!',
+      'Add "-est" for the most of all: fast → fastest — nobody is faster!',
+      '-er compares two; -est compares everyone: faster than Sam, but the fastest in class.',
+      'Try it: f… a… s… t + est — fastest!',
     ],
-    weDoWord: 'tallest',
-    confusions: ['-er = comparing two. -est = the champion of all. "Taller" vs "tallest".'],
+    weDoWord: 'fastest',
+    confusions: ['-er = comparing two. -est = the champion of all. "Faster" vs "fastest".'],
   },
 
   /* ── Phase 10 · Morphology ──────────────────────────────────────── */
@@ -688,22 +698,24 @@ export const PHONICS_LESSONS = {
     soundChips: [],
     script: [
       'Long words are just small chunks holding hands: mar + ket — market!',
-      'Clap the beats to find the chunks: "ju-ngle" has two claps.',
+      'Clap the beats to find the chunks: "jun-gle" has two claps.',
       'Read each chunk, then join them: mar + ket — market!',
     ],
     weDoWord: 'market',
     confusions: ['Don\'t rush — find the chunks first. Every chunk has one vowel sound.'],
   },
   'sight-highfreq': {
-    headline: 'Sight words: tricky words to know by heart',
+    headline: 'Tricky words: find the tricky part',
     soundChips: [],
     script: [
-      'Some words don\'t follow the rules — like "because" and "friend".',
-      'These are sight words: we learn to know them on sight, like a friend\'s face.',
-      'Look at the shape, say it, spell it out loud, then say it again!',
+      'Most of a tricky word still follows the rules. Usually just ONE part is tricky.',
+      'In "said", s and d say their usual sounds, but "ai" says /e/. Learn that part by heart.',
+      'Say it, spell it out loud, then write it without looking!',
     ],
     weDoWord: 'because',
-    confusions: ['Don\'t sound these out letter by letter — the spelling plays tricks. Learn the whole word.'],
+    confusions: [
+      'Don\'t guess from the first letter. Sound out the parts that follow the rules, then remember the tricky part.',
+    ],
   },
 };
 

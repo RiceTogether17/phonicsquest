@@ -282,6 +282,10 @@ const WORDS_BY_WORD = new Map(WORDS.map((w) => [w.word.toLowerCase(), w]));
  * @returns {number}
  */
 function curatedGraphemeTier(g, type) {
+  // A silent e is split-digraph knowledge whatever letter spells it. Looked
+  // up by spelling alone, the "e" of s|o|m|e reads as the tier-1 short e and
+  // a tricky word passes as decodable in a first story.
+  if (type === 'se') return 2;
   const fromTable = GRAPHEME_TIERS[g.toLowerCase()];
   if (fromTable !== undefined) return fromTable;
   if (g.length === 1) {

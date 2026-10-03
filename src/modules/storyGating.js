@@ -41,19 +41,27 @@ function _phaseTouched(phases) {
 export function getBandReadiness() {
   const earlyMastered = _masteredFraction([1, 2, 3, 4, 5]);
   const longVowelsStarted = _phaseTouched([6]);
-  const longVowelsSolid = _masteredFraction([6]) >= 0.5;
   const rControlledStarted = _phaseTouched([8]);
   const diphthongsStarted = _phaseTouched([7]);
 
+  // Band C is the Bossy-R band: its stories are written in ar, or, er, ir
+  // and ur. It used to open on solid long vowels alone, which in this
+  // curriculum is a whole phase before Bossy-R is taught (phase 7 is
+  // diphthongs, phase 8 Bossy-R), so a child was recommended stories full
+  // of "farm" and "bird" they had never been shown how to read. Band D's
+  // code includes Bossy-R too (story tiers are cumulative), so it needs both.
   const bReady = earlyMastered >= 0.6 || longVowelsStarted;
-  const cReady = bReady && (longVowelsSolid || rControlledStarted);
+  const cReady = bReady && rControlledStarted;
   const dReady = cReady && diphthongsStarted;
 
   return {
     A: { ready: true, hint: '' },
     B: { ready: bReady, hint: bReady ? '' : 'Best after starting Phase 6 — Long Vowels' },
-    C: { ready: cReady, hint: cReady ? '' : 'Best after Phase 6 and Bossy-R practice' },
-    D: { ready: dReady, hint: dReady ? '' : 'Best after starting Phase 7 — Diphthongs' },
+    C: { ready: cReady, hint: cReady ? '' : 'Best after starting Phase 8 — Bossy R (ar, or, er)' },
+    D: {
+      ready: dReady,
+      hint: dReady ? '' : 'Best after Phase 7 — Diphthongs — and Bossy R practice',
+    },
   };
 }
 

@@ -210,6 +210,7 @@ function _revealAnswer(word, dotsEl) {
         dots[i].classList.add('sound-dot--lit');
         const prevGrapheme = i > 0 ? word.graphemes[i - 1] : null;
         await audio.speakPhoneme(word.graphemes[i], word.types[i], {
+          index: i,
           word: word.word,
           prevGrapheme,
         });

@@ -79,10 +79,24 @@ describe('story band readiness', () => {
     expect(r.D.ready).toBe(false);
   });
 
+  it('keeps the Bossy-R band closed until Bossy R has been taught', async () => {
+    // Long vowels solid and diphthongs started is phase 7. Bossy R is phase
+    // 8, so Band C's "farm" and "bird" are code this child has not met.
+    await masterPhases([1, 2, 3, 4, 5]);
+    await masterPhases([6]);
+    await masterPhases([7], 0.4);
+    const { getBandReadiness } = await import('../modules/storyGating.js');
+    const r = getBandReadiness();
+    expect(r.C.ready).toBe(false);
+    expect(r.C.hint).toMatch(/Phase 8/);
+    expect(r.D.ready).toBe(false);
+  });
+
   it('opens D only when B, C and diphthongs are all in play', async () => {
     await masterPhases([1, 2, 3, 4, 5]);
     await masterPhases([6]);
     await masterPhases([7], 0.4);
+    await masterPhases([8], 0.2);
     const { getBandReadiness } = await import('../modules/storyGating.js');
     const r = getBandReadiness();
     expect(r.C.ready).toBe(true);

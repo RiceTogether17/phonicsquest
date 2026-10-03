@@ -8,8 +8,8 @@
  *   1. Explicit `word.syllables` field wins — for the rare cases where
  *      the heuristic would be wrong, the bank entry can pin the count.
  *   2. Otherwise count vowel-bearing chunks across the word's
- *      `graphemes` + `types`. Each grapheme contributes 0 or 1
- *      syllable; the silent-e split digraph subtracts 1.
+ *      `graphemes` + `types`. Each grapheme contributes its beats
+ *      (usually 0 or 1); a silent e contributes none.
  *
  * The heuristic mirrors the structure phonics teachers use when
  * counting beats: "every vowel sound is a syllable; the silent e on
@@ -62,6 +62,12 @@ const SYLLABIC_SUFFIXES = new Set([
   'zle',
 ]);
 
+/**
+ * Suffix tiles that carry more than one beat: -able is a-ble, two claps
+ * ("wash-a-ble"), where -ing or -tion is one.
+ */
+const SUFFIX_BEATS = Object.freeze({ able: 2, ible: 2 });
+
 /** Letters that signal a prefix chunk contributes its own syllable. */
 const VOWEL_LETTERS = /[aeiouy]/;
 
@@ -104,7 +110,7 @@ export function getSyllableCount(word) {
     if (type === 'sf') {
       const bare = g.replace(/^-/, '');
       if (SYLLABIC_SUFFIXES.has(bare)) {
-        count++;
+        count += SUFFIX_BEATS[bare] ?? 1;
         continue;
       }
       // Context-sensitive -ed: only a syllable after /t/ or /d/
@@ -119,11 +125,9 @@ export function getSyllableCount(word) {
     }
   }
 
-  // Silent-e split digraph marker ('se' type) sits on the trailing
-  // <e> that lengthens the prior vowel without adding a beat. Don't
-  // dip below 1 — even a CVCe word has at least one syllable.
-  if (types[types.length - 1] === 'se' && count > 1) count--;
-
+  // A silent e ('se') adds no beat, and it was never counted above: it is
+  // not a vowel type. Subtracting one for it took a real beat away, so
+  // "unsafe" and "dislike" clapped once.
   return Math.max(1, count);
 }
 

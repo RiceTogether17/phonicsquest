@@ -10,7 +10,7 @@
  */
 
 import { store } from './store.js';
-import { TH_VOICED_WORDS } from '../data/words.js';
+import { TH_VOICED_WORDS, phonemeKeyFor, splitBlend } from '../data/words.js';
 
 /** Dev-mode logging helper */
 const devWarn = (...args) => {
@@ -472,10 +472,19 @@ class AudioManager {
    * @param {string} type      phoneme type ('sv'|'lv'|'c'|'d'|'bl'|'se')
    * @param {object} [opts]    optional context
    * @param {string} [opts.word] the full word (for context-dependent sounds)
+   * @param {number} [opts.index] the tile's position in the word, so a
+   *   per-word sound override finds the right tile
    * @returns {Promise<void>}
    */
   async speakPhoneme(grapheme, type, opts = {}) {
     if (!store.get('teachingAudioEnabled')) return;
+
+    // A word can say a tile differently from its spelling's default: the u
+    // in "bush", the u_e in "rule", the s in "noise". The word data names
+    // the real recording; honour it here so every mode plays it, not only
+    // the ones that remember to check.
+    const wordKey = phonemeKeyFor(opts.word, opts.index, grapheme);
+    if (wordKey) return this._playPhonemeAudio(wordKey);
 
     // Map grapheme + type to audio key (shared with the choice builders).
     let key = phonemeAudioKey(grapheme, type);
@@ -554,11 +563,13 @@ class AudioManager {
       return this._speak(suffix, 0.9);
     }
 
-    // Blend components — speak each letter separately (handles 2- and 3-letter blends)
+    // Blend components — speak each sound separately (handles 2- and 3-sound
+    // blends, and a digraph inside one: "shr" is /sh/ /r/, never /s/ /h/ /r/)
     if (type === 'bl') {
-      for (let i = 0; i < grapheme.length; i++) {
+      const parts = splitBlend(grapheme);
+      for (let i = 0; i < parts.length; i++) {
         if (i > 0) await this._delay(80);
-        await this._playPhonemeAudio(grapheme[i]);
+        await this._playPhonemeAudio(parts[i]);
       }
       return;
     }

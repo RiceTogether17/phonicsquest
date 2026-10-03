@@ -61,7 +61,7 @@ Hearing sounds in spoken words — first, last and middle sounds, clapping sylla
 Matching each letter to the sound it makes — s says /s/, a says /ă/ — so sounds can be read from print.
 
 - **Learning outcome:** Say the most common sound for each single letter quickly and pick the letter that matches a spoken sound.
-- **Targets:** s /s/, a /ă/, t /t/, p /p/, i /ĭ/, n /n/, m /m/, d /d/, … (19 total)
+- **Targets:** s /s/, a /ă/, t /t/, p /p/, i /ĭ/, n /n/, m /m/, d /d/, … (26 total)
 - **Examples:** s → sun, a → apple, t → top, p → pig, i → ink, n → net
 - **Modes:** letterSounds, soundHunt, hear
 - **Mastery bar:** 80% over 6 attempts
@@ -94,10 +94,10 @@ Two consonants at the start before the vowel (flat, step, drip, drum).
 | Stage | Name | Target sounds | Sample words | Mastery to pass | Prerequisite |
 | --- | --- | --- | --- | --- | --- |
 | `ccvc-a` | CCVC – Short A | bl, cl, fl, pl, … (18 total) | flat, clap, trap, plan, snap, … (8 total) | 70% | `cvc-mixed` |
-| `ccvc-e` | CCVC – Short E | st-, fr-, sl-, sp-, … (5 total) | step, fret, sled, fled, spell, … (8 total) | 70% | `ccvc-a` |
+| `ccvc-e` | CCVC – Short E | st-, fr-, sl-, sp-, … (5 total) | step, fret, sled, fled, bred, … (8 total) | 70% | `ccvc-a` |
 | `ccvc-i` | CCVC – Short I | fl-, tr-, dr-, sl-, … (6 total) | flip, trip, drip, slip, swim, … (8 total) | 70% | `ccvc-e` |
 | `ccvc-o` | CCVC – Short O | fl-, dr-, st-, sl-, … (5 total) | flop, drop, stop, slot, plot, … (8 total) | 70% | `ccvc-i` |
-| `ccvc-u` | CCVC – Short U | dr-, sl-, st-, pl-, … (5 total) | drum, slug, stub, plum, blur, … (8 total) | 70% | `ccvc-o` |
+| `ccvc-u` | CCVC – Short U | dr-, sl-, st-, pl-, … (5 total) | drum, slug, stub, plum, plug, … (8 total) | 70% | `ccvc-o` |
 | `ccvc-mixed` | CCVC – Mixed Vowels | short a /ă/, short e /ĕ/, short i /ĭ/, short o /ŏ/, … (5 total) | slam, bled, slim, clog, stud, … (8 total) | 70% | `ccvc-u` |
 
 ### Phase 3 — CVCC
@@ -111,8 +111,8 @@ Two consonants at the end after the vowel (band, belt, gift, song, jump).
 | `cvcc-a` | CVCC – Short A | -nd, -st, -mp, -nk, … (6 total) | band, bank, camp, hand, sand, … (8 total) | 70% | `ccvc-mixed` |
 | `cvcc-e` | CVCC – Short E | -lt, -st, -nd, -nt, … (5 total) | belt, best, bend, melt, vent, … (8 total) | 70% | `cvcc-a` |
 | `cvcc-i` | CVCC – Short I | -ft, -lk, -st, -nt, … (5 total) | gift, milk, list, hint, lift, … (8 total) | 70% | `cvcc-e` |
-| `cvcc-o` | CVCC – Short O | -nd, -ng, -st, -nk | bond, song, lost, long, cost, … (8 total) | 70% | `cvcc-i` |
-| `cvcc-u` | CVCC – Short U | -mp, -st, -ng, -nt | jump, dust, lung, hunt, dump, … (8 total) | 70% | `cvcc-o` |
+| `cvcc-o` | CVCC – Short O | -nd, -ng, -st, -nk | bond, pond, lost, cost, soft, … (8 total) | 70% | `cvcc-i` |
+| `cvcc-u` | CVCC – Short U | -mp, -st, -ng, -nt | jump, dust, must, hunt, dump, … (8 total) | 70% | `cvcc-o` |
 | `cvcc-mixed` | CVCC – Mixed Vowels | short a /ă/, short e /ĕ/, short i /ĭ/, short o /ŏ/, … (5 total) | land, lend, fist, fond, gust, … (8 total) | 70% | `cvcc-u` |
 
 ### Phase 4 — Digraphs
@@ -136,7 +136,7 @@ Blends at both ends of the word (stamp, blend, print, stomp, stump).
 | `ccvcc-a` | CCVCC – Short A | stCC-mp, clCC-, blCC-st, brCC-nd | stamp, clamp, plank, brand, prank, … (8 total) | 70% | `digraphs` |
 | `ccvcc-e` | CCVCC – Short E | blCC-nd, trCC-nd, crCC-st, spCC-nt | blend, trend, crest, spent, swept, … (8 total) | 70% | `ccvcc-a` |
 | `ccvcc-i` | CCVCC – Short I | blCC-nk, drCC-nk, prCC-nt, swCC-ft | blink, drink, print, swift, sprint, … (8 total) | 70% | `ccvcc-e` |
-| `ccvcc-o` | CCVCC – Short O | stCC-mp, prCC-ng, frCC-st, flCC-ss | stomp, prong, blond, frost, floss, … (8 total) | 70% | `ccvcc-i` |
+| `ccvcc-o` | CCVCC – Short O | stCC-mp, prCC-ng, frCC-st, flCC-ss | stomp, blond, frost, flops, clomp, … (8 total) | 70% | `ccvcc-i` |
 | `ccvcc-u` | CCVCC – Short U | stCC-mp, clCC-mp, blCC-nt, grCC-nt | stump, clump, blunt, grunt, trust, … (8 total) | 70% | `ccvcc-o` |
 | `ccvcc-mixed` | CCVCC – Mixed Vowels | short a /ă/, short e /ĕ/, short i /ĭ/, short o /ŏ/, … (5 total) | bland, spend, clink, frond, slump, … (8 total) | 70% | `ccvcc-u` |
 
@@ -160,8 +160,8 @@ Long vowel patterns — split digraphs (a_e), vowel teams (ai, ee, oa) and word-
 | `long-o-oa` | Long O · oa | oa /oʊ/ | boat, coat, road, soap, toad, … (8 total) | 70% | `long-o-oe` |
 | `long-o-ow` | Long O · ow | ow /oʊ/ | snow, slow, low, mow, grow, … (8 total) | 70% | `long-o-oa` |
 | `long-u-ue` | Long U · u_e | u_e /juː/, u_e /uː/ | cube, tube, rule, mule, cute, … (8 total) | 70% | `long-o-ow` |
-| `long-u-uue` | Vowel team /oo/ · ue | ue /uː/ | blue, true, glue, clue, sue, … (8 total) | 70% | `long-u-ue` |
-| `long-u-ew` | Vowel team /oo/ · ew | ew /uː/ | new, few, drew, blew, flew, … (8 total) | 70% | `long-u-uue` |
+| `long-u-uue` | Vowel team ue · /oo/ or /yoo/ | ue /uː/, ue /juː/ | blue, true, glue, clue, due, … (8 total) | 70% | `long-u-ue` |
+| `long-u-ew` | Vowel team ew · /oo/ or /yoo/ | ew /uː/, ew /juː/ | new, few, drew, blew, flew, … (8 total) | 70% | `long-u-uue` |
 | `long-u-oo` | Vowel team /oo/ · oo | oo /uː/ | moon, food, pool, room, soon, … (8 total) | 70% | `long-u-ew` |
 | `short-oo` | Short oo /ʊ/ · oo | oo /ʊ/ | book, look, cook, hook, foot, … (8 total) | 70% | `long-u-oo` |
 
@@ -185,7 +185,7 @@ Mixed-blend review, r-controlled vowels (ar, or, er, ir, ur) and the late conson
 
 | Stage | Name | Target sounds | Sample words | Mastery to pass | Prerequisite |
 | --- | --- | --- | --- | --- | --- |
-| `blends-review` | Blends Review | initial blends, final blends, both-end blends, tri-consonant blends (spr-, str-, scr-) | float, crisp, blend, sprint, plank, … (8 total) | 70% | `dip-aw` |
+| `blends-review` | Blends Review | initial blends, final blends, both-end blends, tri-consonant blends (spr-, str-, scr-) | strip, crisp, blend, sprint, plank, … (8 total) | 70% | `dip-aw` |
 | `rc-ar-or` | Bossy R · ar & or | ar /ɑr/, or /ɔr/ | car, star, farm, park, corn, … (8 total) | 70% | `blends-review` |
 | `rc-er-ir-ur` | Bossy R · er, ir & ur | er /ɜr/, ir /ɜr/, ur /ɜr/ | her, fern, bird, girl, turn, … (8 total) | 70% | `rc-ar-or` |
 | `cons-tch-dge` | tch and dge | tch /tʃ/, dge /dʒ/ | catch, match, patch, fetch, pitch, … (8 total) | 70% | `rc-er-ir-ur` |
@@ -202,8 +202,8 @@ Mixed-blend review, r-controlled vowels (ar, or, er, ir, ur) and the late conson
 | --- | --- | --- | --- | --- | --- |
 | `suffix-ing` | -ing Words | -ing /ɪŋ/ | running, jumping, sitting, eating, playing, … (8 total) | 70% | `cons-soft-cg` |
 | `suffix-ed` | -ed Words | -ed /d/, -ed /t/, -ed /ɪd/ | jumped, helped, picked, played, walked, … (8 total) | 70% | `suffix-ing` |
-| `suffix-er` | -er Words | -er /ɚ/ | grander, taller, bigger, smaller, slower, … (8 total) | 70% | `suffix-ed` |
-| `suffix-est` | -est Words | -est /ɪst/ | grandest, tallest, biggest, smallest, slowest, … (8 total) | 70% | `suffix-er` |
+| `suffix-er` | -er Words | -er /ɚ/ | faster, bigger, softer, longer, slower, … (8 total) | 70% | `suffix-ed` |
+| `suffix-est` | -est Words | -est /ɪst/ | fastest, biggest, softest, longest, slowest, … (8 total) | 70% | `suffix-er` |
 
 ### Phase 10 — Morphology & Fluency
 
