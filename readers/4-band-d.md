@@ -156,7 +156,7 @@ _A good answer:_ He had learnt a new skill, fixing a chair with a dowel, and the
 
 ## Giri and the Joyful Noise
 
-`core-d-02` · Band D · 149 words · sounds: oi, oy, ou, ow
+`core-d-02` · Band D · 169 words · sounds: oi, oy, ou, ow
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -185,7 +185,7 @@ THE STORY
 Page 1: Giri was walking through town when he heard a loud, joyful sound coming from the community hall. He followed the noise and found a crowd of people singing and clapping. A woman in a brown coat was leading the group.
 Page 2: "Come and join!" she called out. Giri felt a bit shy. He sat on a stool by the window and listened. The voices bounced around the room — high, low, loud, and soft. The sound made him feel warm inside.
 Page 3: At last, Giri stood up and joined in. His voice was small at first, but it grew louder with each note. Soon it rang out loud and proud, bouncing round the hall. The woman gave him a proud nod. The whole group swayed and sang until the sun went down.
-Page 4: Giri walked home humming the tune. He had found something that brought him joy — the power of voices joined together.
+Page 4: As the crowd went out, Giri stopped by the door. "Can I come back next week?" he asked. The woman in the brown coat smiled. "We sing here every Monday," she said. Giri hummed the tune all the way home.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -225,7 +225,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 4. Square.
-Words on this page: Giri walked home humming the tune. He had found something that brought him joy — the power of voices joined together.
+Words on this page: As the crowd went out, Giri stopped by the door. "Can I come back next week?" he asked. The woman in the brown coat smiled. "We sing here every Monday," she said. Giri hummed the tune all the way home.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -235,7 +235,7 @@ _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
 - **oi** — noise, join, voices, joined, voice
-- **oy** — joyful, joy
+- **oy** — joyful
 - **ou** — loud, out, louder, round
 - **ow** — town, brown, down
 
@@ -256,8 +256,12 @@ _For the back page of the book._
 - **his** — ❤️ tricky part: s says /z/
 - **small** — ❤️ tricky part: a says /aw/
 - **whole** — ❤️ tricky part: wh says /h/
-- **something** — ❤️ tricky part: o says /u/ and the first e is silent
-- **brought** — ❤️ tricky part: ough says /aw/
+- **door** — ❤️ tricky part: oor says /or/
+- **I** — ❤️ tricky part: always a capital, and it says its name
+- **we** — ❤️ tricky part: e says its name, /ē/
+- **monday** — ❤️ tricky part: o says /u/
+- **said** — ❤️ tricky part: ai says /e/
+- **all** — ❤️ tricky part: a says /aw/
 
 **Word meanings** — talk about these before reading:
 - **community** — A group of people who live or meet in the same area
@@ -434,7 +438,7 @@ _A good answer:_ It was old and worn. The seat was bare and the armrest had a te
 
 ## Giri Hears a Cheer
 
-`core-d-04` · Band D · 161 words · sounds: ear, eer, ere
+`core-d-04` · Band D · 159 words · sounds: ear, eer, ere
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -463,7 +467,7 @@ THE STORY
 Page 1: It was the last day of the school year. Giri sat near the window, feeling a small knot of fear in his chest. His friends were moving to different classes next year. Would he still see them? Would they forget about him?
 Page 2: The bell rang and Giri walked out to the field. The grass was clear and green in the sunshine. Then, from behind the canteen, he heard a cheer. "Giri! Over here!" He ran towards the sound and saw all his friends gathered under the old rain tree.
 Page 3: They had set up a small farewell party — sandwiches, lemon cordial, and a hand-drawn card with each friend's name. "We will always be near, even if we are not in the same room," said Mei Ling.
-Page 4: Giri felt a tear of happiness on his cheek. He looked around at the smiling faces. This was not an ending — it was the beginning of something dear that would last for years to come.
+Page 4: Giri felt a tear on his cheek, but it was a happy one. He looked at the card, then at his dear friends. "Same tree next year?" he asked. "Same tree!" they cheered.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -503,7 +507,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 4. Square.
-Words on this page: Giri felt a tear of happiness on his cheek. He looked around at the smiling faces. This was not an ending — it was the beginning of something dear that would last for years to come.
+Words on this page: Giri felt a tear on his cheek, but it was a happy one. He looked at the card, then at his dear friends. "Same tree next year?" he asked. "Same tree!" they cheered.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -512,7 +516,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **eer** — cheer
+- **eer** — cheer, cheered
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **was** — ❤️ tricky part: a says /o/ and s says /z/
@@ -539,8 +543,7 @@ _For the back page of the book._
 - **be** — ❤️ tricky part: e says its name, /ē/
 - **are** — ❤️ tricky part: the e is silent
 - **said** — ❤️ tricky part: ai says /e/
-- **something** — ❤️ tricky part: o says /u/ and the first e is silent
-- **come** — ❤️ tricky part: o says /u/ and the e is silent
+- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
 
 **Word meanings** — talk about these before reading:
 - **farewell** — A way of saying goodbye
@@ -561,12 +564,12 @@ _For the back page of the book._
 5. They had set up a small ___ party.  
    farewell ✓ · cordial · beginning
 
-**Write about it:** Why did Giri think this was not an ending but a beginning?  
-_A good answer:_ His friends showed they would stay his friends even in different classes, so it was the start of a friendship that would last.
+**Write about it:** Why did Giri ask his friends to meet at the same tree next year?  
+_A good answer:_ He wanted to keep meeting his friends under the rain tree, even when they are in different classes. He knew they would still be friends.
 
 **Talk about it:**
 - Why did Giri feel a knot of fear at the start of the day?
-- Giri decided this was not an ending. What did he think it was instead?
+- Giri had a tear on his cheek, but it was a happy one. How can a happy person cry?
 
 **Spot it: Vowel patterns (ear, eer, ere)** — "fear", "hear", "near", "cheer", "year", "dear", "tear", "here". ear and eer can say the /ear/ sound: hear, cheer, near, dear.
 

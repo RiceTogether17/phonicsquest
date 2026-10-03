@@ -14,6 +14,8 @@ import { describe, it, expect } from 'vitest';
 import { STORIES, BAND_META } from '../data/stories.js';
 import {
   analyzeStory,
+  classifyWord,
+  cleanToken,
   getStoryPhase,
   getStoryRules,
   countFocusGrapheme,
@@ -262,6 +264,29 @@ describe('refrains (R6)', () => {
       const { computed } = analyses.get(s.id);
       expect(s.refrainCount, `${s.id}: refrainCount`).toBe(computed.refrainCount);
     }
+  });
+
+  it('a refrain is made of words the child can already read', () => {
+    // Refrains sit outside the word count, so the count's checks never see
+    // them. The child reads a refrain more often than any other line, so it
+    // is held to the same code: "who took my lime pie?" got into a long-i
+    // story with "took", whose oo is not taught until long-u. A word that is
+    // readable only with support must also be in the counted text, which is
+    // where the words-to-meet list finds it before the story starts.
+    const bad = [];
+    for (const s of STORIES) {
+      const counted = new Set(extractCountableTokens(s));
+      for (const line of s.lines.filter((l) => l.type === 'refrain')) {
+        for (const raw of line.text.split(/[\s–—-]+/)) {
+          const word = cleanToken(raw);
+          if (!word) continue;
+          const { status } = classifyWord(word, s);
+          if (status === 'stretch' || (status !== 'decodable' && !counted.has(word)))
+            bad.push(`${s.id}: "${word}" (${status})`);
+        }
+      }
+    }
+    expect(bad).toEqual([]);
   });
 });
 

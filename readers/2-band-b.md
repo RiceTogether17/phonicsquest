@@ -1059,7 +1059,7 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Jay made a lime pie for his mum. He set it on the side and went to ride his bike.
 Page 2: When he came back, a big slice was missing! "Why?" he cried. "Who did this?"
-Page 3: Lime pie, lime pie, who took my lime pie?
+Page 3: Lime pie, lime pie, who had a bite?
 Page 4: Not Giri. He was asleep. Not the cat. She did not like lime.
 Page 5: Then Jay spied Mum, with a bright smile and a bit of pie on the chin.
 Page 6: "I had to try it," said Mum. Jay grinned. "That is fine. It was for you!"
@@ -1094,7 +1094,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 6. Square.
-Words on this page: Lime pie, lime pie, who took my lime pie?
+Words on this page: Lime pie, lime pie, who had a bite?
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1152,7 +1152,7 @@ _For the back page of the book._
    His mum ✓ · Giri · The cat
 2. What did Jay do while the pie sat on the side?  
    He went to ride his bike ✓ · He went to sleep · He fed the cat
-3. Who took the slice of pie?  
+3. Who ate the missing slice?  
    Mum ✓ · Giri · The cat
 4. Then Jay spied Mum, with a ___ smile and a bit of pie on the chin.  
    bright ✓ · brick · brim

@@ -20,7 +20,7 @@ _Print this on the inside cover of every book in the set._
 
 ## Giri and the Big Storm
 
-`core-c-01` · Band C · 114 words · sounds: ar, or
+`core-c-01` · Band C · 133 words · sounds: ar, or
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -48,7 +48,7 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Giri was at the farm when dark skies came over the barn. The storm burst with a crash. The barn door banged hard in the wind. His own star chart, which he wrote out by hand, blew off the wall and landed in a puddle by the yard.
 Page 2: Giri ran to the barn. The door was stuck. He pushed and pulled with all his might. At last, the door swung open. Giri grabbed the star chart and ran back in. The storm passed and the sun lit the yard once more.
-Page 3: Giri hung the chart to dry. He was not going to buy a new one. He felt glad he had not given up.
+Page 3: Giri hung the chart to dry. Some of the stars were blurred, but he was not going to buy a new one. That night, he sat out in the yard and spotted every star on his chart, up in the dark sky.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -80,7 +80,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 3. Square.
-Words on this page: Giri hung the chart to dry. He was not going to buy a new one. He felt glad he had not given up.
+Words on this page: Giri hung the chart to dry. Some of the stars were blurred, but he was not going to buy a new one. That night, he sat out in the yard and spotted every star on his chart, up in the dark sky.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -105,6 +105,9 @@ _For the back page of the book._
 - **pulled** — ❤️ tricky part: u says /oo/, as in "book"
 - **all** — ❤️ tricky part: a says /aw/
 - **once** — ❤️ tricky part: it says "wunce": o makes /w/ and /u/
+- **some** — ❤️ tricky part: o says /u/ and the e is silent
+- **of** — ❤️ tricky part: o says /u/ and f says /v/
+- **were** — ❤️ tricky part: ere says /er/
 - **buy** — ❤️ tricky part: the u is silent and y says /ī/
 - **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
 
@@ -120,8 +123,8 @@ _For the back page of the book._
    At the farm ✓ · At the park · At school · At the market
 2. What blew off the wall?  
    His star chart ✓ · His hat · A picture · A clock
-3. Why did Giri feel proud at the end?  
-   He did not give up ✓ · He won a prize · He ran the fastest · The storm stopped
+3. How did Giri feel when he spotted every star on his chart?  
+   Proud and happy ✓ · Cross with the storm · Sad and wet · Scared of the dark
 4. True or false? The barn door swung open at the first push.  
    True · False ✓ · The story does not say
 5. Put these in the order they happened.  
@@ -132,7 +135,7 @@ _A good answer:_ He wrote the star chart out by hand, so it mattered to him. He 
 
 **Talk about it:**
 - Why did Giri run back into the barn during the storm?
-- Giri was glad he had not given up. What does that tell you about him?
+- The story does not say how Giri felt at the end. What clues tell you?
 
 **Spot it: r-controlled vowels (ar, or)** — "farm", "dark", "barn", "hard", "yard", "storm", "door", "more". When r comes after a vowel, the vowel sound changes: a+r = /ar/, o+r = /or/.
 
@@ -520,7 +523,7 @@ _A good answer:_ Yes. It was a perfect red pepper, good to eat, and it helped tu
 
 ## Giri and the Blue Bin
 
-`core-c-05` · Band C · 125 words · sounds: sh, ch, th, wh
+`core-c-05` · Band C · 135 words · sounds: sh, ch, th, wh
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -548,7 +551,7 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Giri walked home from school and stopped by the blue bin. The bin was full of tins and sheets of paper. Giri had a juice box in his bag. He knew it should be saved, but was not really sure whether it should go in the blue bin.
 Page 2: He checked the chart on the bin. "Juice boxes — yes!" it said. Giri tried to crush the box flat to make it fit. The box sprang back and bumped his chin. After a few more tries, with both hands, the box went flat with a crunch.
-Page 3: Giri pushed the flat box in through the slot. The bin made a clang, like a note of music! Giri walked home and felt glad he had done the right thing.
+Page 3: Giri pushed the flat box in through the slot. The bin made a clang, like a note of music! The next day, Giri came back with three more juice boxes, and this time he did not need to check the chart.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -580,7 +583,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 3. Square.
-Words on this page: Giri pushed the flat box in through the slot. The bin made a clang, like a note of music! Giri walked home and felt glad he had done the right thing.
+Words on this page: Giri pushed the flat box in through the slot. The bin made a clang, like a note of music! The next day, Giri came back with three more juice boxes, and this time he did not need to check the chart.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -590,8 +593,8 @@ _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
 - **sh** — sheets, crush, pushed
-- **ch** — checked, chart, chin, crunch
-- **th** — whether, with, both, thing
+- **ch** — checked, chart, chin, crunch, check
+- **th** — whether, with, both, three, this
 - **wh** — whether
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
@@ -612,7 +615,6 @@ _For the back page of the book._
 - **to** — ❤️ tricky part: o says /oo/
 - **through** — ❤️ tricky part: ough says /oo/
 - **music** — ❤️ tricky part: s says /z/
-- **done** — ❤️ tricky part: o says /u/ and the e is silent
 
 **Word meanings** — talk about these before reading:
 - **recycle** — To use something again instead of throwing it away
@@ -638,7 +640,7 @@ _A good answer:_ He was not sure whether a juice box could go in the blue bin, s
 
 **Talk about it:**
 - How did Giri find out that juice boxes could go in the blue bin?
-- The box was hard to flatten. Why was Giri still glad at the end?
+- Why did Giri not need to check the chart the next day?
 
 **Spot it: Digraphs (ch, sh, th, wh)** — "checked", "chart", "chin", "sheets", "pushed", "this", "whether". Two letters, one sound: ch, sh, th, wh are all digraphs.
 
@@ -648,7 +650,7 @@ _A good answer:_ He was not sure whether a juice box could go in the blue bin, s
 
 ## Giri Helps a Neighbour
 
-`core-c-06` · Band C · 123 words · sounds: er, ir, ur
+`core-c-06` · Band C · 130 words · sounds: er, ir, ur
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -675,9 +677,9 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Giri heard a knock at the door. It was Mrs Tan from the flat next door. Her light bulb had burnt out and her step stool was broken. She could not reach the top of the shelf, which was very high.
+Page 1: Giri heard a knock at the door. It was Mrs Tan, his neighbour from the flat next door. Her light bulb had burnt out and her step stool was broken. She could not reach the top of the shelf, which was very high.
 Page 2: Giri offered to help. First he stood on his tiptoes, but he was not quite tall. Then he hurried to his flat and brought back a firm step stool. He set it in place inside her door, climbed up, turned the old bulb out, and put a new one in. He did not move until the light burst on!
-Page 3: Mrs Tan clapped and gave Giri a warm kueh to say thank you. Giri felt glad he had helped a neighbour in need.
+Page 3: Mrs Tan clapped and gave Giri a warm kueh to say thank you. "Keep my stool for now," said Giri, "in case the next bulb burns out too!"
 ```
 
 ### 2. Pictures — paste one at a time
@@ -693,7 +695,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 3. Square.
-Words on this page: Giri heard a knock at the door. It was Mrs Tan from the flat next door. Her light bulb had burnt out and her step stool was broken. She could not reach the top of the shelf, which was very high.
+Words on this page: Giri heard a knock at the door. It was Mrs Tan, his neighbour from the flat next door. Her light bulb had burnt out and her step stool was broken. She could not reach the top of the shelf, which was very high.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -709,7 +711,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 3. Square.
-Words on this page: Mrs Tan clapped and gave Giri a warm kueh to say thank you. Giri felt glad he had helped a neighbour in need.
+Words on this page: Mrs Tan clapped and gave Giri a warm kueh to say thank you. "Keep my stool for now," said Giri, "in case the next bulb burns out too!"
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -720,7 +722,7 @@ _For the back page of the book._
 **Sounds in this book** — say the sound, then read these words from the story:
 - **er** — her
 - **ir** — first, firm
-- **ur** — burnt, turned, burst
+- **ur** — burnt, turned, burst, burns
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **heard** — ❤️ tricky part: ear says /er/
@@ -728,6 +730,8 @@ _For the back page of the book._
 - **the** — ❤️ tricky part: e says /uh/
 - **door** — ❤️ tricky part: oor says /or/
 - **was** — ❤️ tricky part: a says /o/ and s says /z/
+- **his** — ❤️ tricky part: s says /z/
+- **neighbour** — Someone who lives close to you
 - **from** — ❤️ tricky part: o says /u/
 - **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
 - **she** — ❤️ tricky part: e says its name, /ē/
@@ -735,13 +739,12 @@ _For the back page of the book._
 - **of** — ❤️ tricky part: o says /u/ and f says /v/
 - **to** — ❤️ tricky part: o says /oo/
 - **he** — ❤️ tricky part: e says its name, /ē/
-- **his** — ❤️ tricky part: s says /z/
 - **brought** — ❤️ tricky part: ough says /aw/
 - **put** — ❤️ tricky part: u says /oo/, as in "book"
 - **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
 - **move** — ❤️ tricky part: o says /oo/ and the e is silent
 - **you** — ❤️ tricky part: ou says /oo/
-- **neighbour** — Someone who lives close to you
+- **said** — ❤️ tricky part: ai says /e/
 
 **Word meanings** — talk about these before reading:
 - **offered** — Said you would do something to help
@@ -776,7 +779,7 @@ _A good answer:_ Mrs Tan's step stool was broken, and Giri was not tall enough o
 
 ## Giri at the Farm
 
-`core-c-07` · Band C · 115 words · sounds: sh, ch, ar
+`core-c-07` · Band C · 120 words · sounds: sh, ch, ar
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -804,7 +807,7 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Giri spent the morning at the farm with his grandfather. The chickens scratched in the yard and the sheep sheltered under a large shed. Giri always helped to fetch fresh water from the well and fill the bucket for the horse. It was hard work, but he liked it.
 Page 2: After lunch, a chicken got out at a gap in the fence. Giri set off after it, past the barn and behind the shed. At last, he got it by the cherry tree, just as his aunty waved from the shed. He carefully shut the gap with a thick branch.
-Page 3: Grandfather smiled. "Sharp thinking, Giri," he said. Giri felt glad to be a real farm helper.
+Page 3: Grandfather smiled. "Sharp thinking, Giri," he said. Then he took off his old farm cap and put it on Giri's head.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -836,7 +839,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 3. Square.
-Words on this page: Grandfather smiled. "Sharp thinking, Giri," he said. Giri felt glad to be a real farm helper.
+Words on this page: Grandfather smiled. "Sharp thinking, Giri," he said. Then he took off his old farm cap and put it on Giri's head.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -865,7 +868,8 @@ _For the back page of the book._
 - **aunty** — ❤️ tricky part: au says /ar/
 - **carefully** — In a way that avoids mistakes or danger
 - **said** — ❤️ tricky part: ai says /e/
-- **be** — ❤️ tricky part: e says its name, /ē/
+- **put** — ❤️ tricky part: u says /oo/, as in "book"
+- **head** — ❤️ tricky part: ea says /e/
 
 **Word meanings** — talk about these before reading:
 - **scratched** — Used claws to dig at the ground
@@ -890,7 +894,7 @@ _A good answer:_ So that no more chickens could get out through the gap in the f
 
 **Talk about it:**
 - How did Giri stop the chicken from getting out again?
-- Grandfather said "Sharp thinking". What did Giri do that was sharp thinking?
+- Why do you think Grandfather put his own cap on Giri's head?
 
 **Spot it: Digraphs (sh, ch)** — "sheep", "shed", "sheltered", "shut", "chickens", "chased", "cherry", "branch". sh says /sh/ as in sheep. ch says /ch/ as in chicken.
 

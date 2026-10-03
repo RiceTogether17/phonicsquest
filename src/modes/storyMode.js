@@ -1767,6 +1767,8 @@ export function _lineHtml(line, i, wordSpans = false, story = null) {
       return `<p class="sline sline--beat"        data-line="${i}">${content}</p>`;
     case 'intro':
       return `<p class="sline sline--intro"       data-line="${i}">${content}</p>`;
+    case 'refrain':
+      return `<p class="sline sline--refrain"     data-line="${i}">${content}</p>`;
     case 'end':
       return `<p class="sline sline--end"         data-line="${i}">${content}</p>`;
     case 'text':

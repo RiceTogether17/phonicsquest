@@ -599,8 +599,10 @@ const COUNTABLE_LINE_TYPES = new Set(['text', 'intro', 'beat', 'paragraph', 'end
 /**
  * The decodable-text tokens of a story: words from countable lines split
  * on whitespace, hyphens and dashes, cleaned of punctuation/possessives.
- * Refrains (pre-taught as a unit), labels and chapter headings are
- * scaffolding and excluded.
+ * Labels and chapter headings are scaffolding and excluded. Refrains are
+ * excluded from the count too, because a chant said three times would pad
+ * a story's length and ratio with the same few words; the refrains test
+ * (R6) holds their words to the story's code instead.
  * @param {object} story
  * @returns {string[]}
  */

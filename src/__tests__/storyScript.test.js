@@ -98,3 +98,18 @@ describe('every play in the bank', () => {
     }
   });
 });
+
+describe('a refrain', () => {
+  it('is set apart from the story, so a child knows to join in', () => {
+    // The refrain style was in main.css with nothing rendering it: the
+    // branch went when the old 🫧 lines did, and refrains came back later.
+    const story = STORIES.find((s) => s.lines.some((l) => l.type === 'refrain'));
+    const i = story.lines.findIndex((l) => l.type === 'refrain');
+    const el = document.createElement('div');
+    el.innerHTML = _lineHtml(story.lines[i], i, true, story);
+    const line = el.querySelector('.sline--refrain');
+    expect(line).not.toBeNull();
+    // Its words are still tappable, like any other line the child reads.
+    expect(line.querySelectorAll('[data-plain]').length).toBeGreaterThan(0);
+  });
+});
