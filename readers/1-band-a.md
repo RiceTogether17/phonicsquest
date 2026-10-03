@@ -495,10 +495,10 @@ RULES FOR EVERY PICTURE
 
 THE STORY
 Page 1: A white hen sat on ten eggs.
-Page 2: One egg did wiggle. Then a big wiggle!
+Page 2: One egg had a wiggle. Then a big wiggle!
 Page 3: Crack! Now a wet chick! It is pink.
 Page 4: The chick did not sit. It ran in a big net.
-Page 5: Giri did get it. All is well. One white chick!
+Page 5: Giri held it. All is well. One white chick!
 ```
 
 ### 2. Pictures — paste one at a time
@@ -522,7 +522,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 5. Square.
-Words on this page: One egg did wiggle. Then a big wiggle!
+Words on this page: One egg had a wiggle. Then a big wiggle!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -546,7 +546,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: Giri did get it. All is well. One white chick!
+Words on this page: Giri held it. All is well. One white chick!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -556,7 +556,7 @@ _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
 - **e** — hen, ten, eggs, egg, then, wet
-- **i** — did, wiggle, big, chick, it, pink
+- **i** — wiggle, big, chick, it, pink, did
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **a** — ❤️ tricky part: on its own, a says /uh/
@@ -582,7 +582,7 @@ _For the back page of the book._
 
 ## Giri's Big Dig
 
-`core-a-06` · Band A · 45 words · sounds: i
+`core-a-06` · Band A · 44 words · sounds: i
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -608,10 +608,10 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Giri did dig a pit. Dig, dig, dig!
+Page 1: Giri had a big dig. Dig, dig, dig!
 Page 2: Clink! What is in the pit? A tin lid!
 Page 3: The lid had a map. What can this be?
-Page 4: "I will dig again!" So Giri did dig and dig.
+Page 4: "I will dig again!" Dig, dig, dig went Giri.
 Page 5: A red gem! "Do it again!" Giri came back.
 ```
 
@@ -628,7 +628,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 5. Square.
-Words on this page: Giri did dig a pit. Dig, dig, dig!
+Words on this page: Giri had a big dig. Dig, dig, dig!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -652,7 +652,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: "I will dig again!" So Giri did dig and dig.
+Words on this page: "I will dig again!" Dig, dig, dig went Giri.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -669,7 +669,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **i** — did, dig, pit, clink, in, tin
+- **i** — big, dig, clink, in, pit, tin
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **a** — ❤️ tricky part: on its own, a says /uh/
@@ -679,7 +679,6 @@ _For the back page of the book._
 - **be** — ❤️ tricky part: e says its name, /ē/
 - **I** — ❤️ tricky part: always a capital, and it says its name
 - **again** — ❤️ tricky part: ai says /e/
-- **so** — ❤️ tricky part: o says its name, /ō/
 - **do** — ❤️ tricky part: o says /oo/
 - **came** — no tricky part; your child can sound it out once they know Magic E makes “a” say its name. Read it together for now
 
@@ -696,7 +695,7 @@ _For the back page of the book._
 
 ## Giri and the Bed
 
-`core-a-07` · Band A · 45 words · sounds: e, i
+`core-a-07` · Band A · 44 words · sounds: e, i
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -723,7 +722,7 @@ RULES FOR EVERY PICTURE
 
 THE STORY
 Page 1: Giri had a rip in his red bed.
-Page 2: "I know I can fix it!" He did get a pin.
+Page 2: "I know I can fix it!" He had a pin.
 Page 3: When did he fix it? Fast, fast!
 Page 4: A cat sat above the bed. An ant ran in.
 Page 5: There! The rip is hid. The bed is best!
@@ -750,7 +749,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 5. Square.
-Words on this page: "I know I can fix it!" He did get a pin.
+Words on this page: "I know I can fix it!" He had a pin.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -783,8 +782,8 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **e** — red, bed, get, when, best
-- **i** — rip, in, fix, it, did, pin
+- **e** — red, bed, when, best
+- **i** — rip, in, fix, it, pin, did
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **a** — ❤️ tricky part: on its own, a says /uh/
@@ -950,11 +949,11 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Giri had a hot pot on the log.
-Page 2: The pot did not stop. "What is this about?"
-Page 3: A frog sat on top. It has a name: Fizz.
-Page 4: Many frogs hop up! Ten frogs sit on the hot pot.
-Page 5: "This is their pot!" What a story!
+Page 1: Giri had a pot on a log.
+Page 2: Plop! A frog hid in it. Its name was Fizz.
+Page 3: Ten frogs hid in it! "What is this about?"
+Page 4: Many frogs sat on the rim of the pot.
+Page 5: "It is their pot!" Giri had a story to tell.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -970,7 +969,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 5. Square.
-Words on this page: Giri had a hot pot on the log.
+Words on this page: Giri had a pot on a log.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -978,7 +977,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 5. Square.
-Words on this page: The pot did not stop. "What is this about?"
+Words on this page: Plop! A frog hid in it. Its name was Fizz.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -986,7 +985,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: A frog sat on top. It has a name: Fizz.
+Words on this page: Ten frogs hid in it! "What is this about?"
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -994,7 +993,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: Many frogs hop up! Ten frogs sit on the hot pot.
+Words on this page: Many frogs sat on the rim of the pot.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1002,7 +1001,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: "This is their pot!" What a story!
+Words on this page: "It is their pot!" Giri had a story to tell.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1011,23 +1010,25 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **o** — hot, pot, on, log, not, stop
+- **o** — pot, on, log, plop, frog, frogs
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **a** — ❤️ tricky part: on its own, a says /uh/
-- **the** — ❤️ tricky part: e says /uh/
+- **name** — no tricky part; your child can sound it out once they know Magic E makes “a” say its name. Read it together for now
+- **was** — ❤️ tricky part: a says /o/ and s says /z/
 - **what** — ❤️ tricky part: a says /o/
 - **is** — ❤️ tricky part: s says /z/
 - **about** — no tricky part; clap the parts, then sound it out together
-- **has** — ❤️ tricky part: s says /z/
-- **name** — no tricky part; your child can sound it out once they know Magic E makes “a” say its name. Read it together for now
 - **many** — ❤️ tricky part: a says /e/
+- **the** — ❤️ tricky part: e says /uh/
+- **of** — ❤️ tricky part: o says /u/ and f says /v/
 - **their** — ❤️ tricky part: eir says /air/
 - **story** — no tricky part; clap the parts, then sound it out together
+- **to** — ❤️ tricky part: o says /oo/
 
 **After reading — check understanding** (answer ticked):
-1. Who sat on top of the hot pot?  
-   A frog ✓ · A dog · A cat
+1. Who hid in the pot first?  
+   Fizz the frog ✓ · A dog · A cat
 2. Whose pot was it in the end?  
    The frogs' ✓ · Giri's · The log's
 
@@ -1616,7 +1617,7 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: The big tan box did buzz. Buzz, buzz!
+Page 1: The big tan box went buzz, buzz, buzz!
 Page 2: Is it a bell? Is it a jet? Giri did a check.
 Page 3: A red bug! It sat on his hand. It did not bite.
 Page 4: Zip! The bug flit off.
@@ -1636,7 +1637,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 5. Square.
-Words on this page: The big tan box did buzz. Buzz, buzz!
+Words on this page: The big tan box went buzz, buzz, buzz!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1678,8 +1679,8 @@ _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
 - **a** — sat, hand, can
-- **e** — bell, jet, check, red
-- **i** — big, did, it, zip, flit
+- **e** — went, bell, jet, check, red
+- **i** — big, it, did, zip, flit
 - **o** — box, on, not, off, shock
 - **u** — buzz, bug
 

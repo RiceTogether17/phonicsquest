@@ -169,9 +169,9 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Giri had a small boat. He hoped to row home while the stream was slow.
 Page 2: But the boat did not float! It sat low by a big stone. "What is in here?"
-Page 3: Giri gave it a shove. No go! Then he did find a toad. They had made it a home!
-Page 4: "Take this home, toad!" Giri made it a moss home on the stone.
-Page 5: The toad hopped off. The boat rose and rode the foam home!
+Page 3: Giri gave it a shove. No go! What did he find? Two toads! They had made it a home!
+Page 4: "Take this home, toads!" Giri made them a moss home on the stone.
+Page 5: The toads hopped off. The boat rose and rode the foam home!
 ```
 
 ### 2. Pictures — paste one at a time
@@ -203,7 +203,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: Giri gave it a shove. No go! Then he did find a toad. They had made it a home!
+Words on this page: Giri gave it a shove. No go! What did he find? Two toads! They had made it a home!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -211,7 +211,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: "Take this home, toad!" Giri made it a moss home on the stone.
+Words on this page: "Take this home, toads!" Giri made them a moss home on the stone.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -219,7 +219,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: The toad hopped off. The boat rose and rode the foam home!
+Words on this page: The toads hopped off. The boat rose and rode the foam home!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -228,7 +228,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **oa** — boat, float, toad, foam
+- **oa** — boat, float, toads, foam
 - **o-e** — hoped, home, stone, rose, rode
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
@@ -242,14 +242,15 @@ _For the back page of the book._
 - **is** — ❤️ tricky part: s says /z/
 - **no** — ❤️ tricky part: o says its name, /ō/
 - **go** — ❤️ tricky part: o says its name, /ō/
+- **two** — ❤️ tricky part: the w is silent and o says /oo/
 - **they** — ❤️ tricky part: ey says /ay/
 
 **After reading — check understanding** (answer ticked):
 1. Why did the boat sit so low?  
-   A toad had made it a home ✓ · It had a hole · The stream was slow
-2. Where did Giri make the toad a new home?  
+   Two toads had made it a home ✓ · It had a hole · The stream was slow
+2. Where did Giri make the toads a new home?  
    On the stone ✓ · In the boat · In the foam
-3. What happened once the toad had gone?  
+3. What happened once the toads had gone?  
    The boat rose and rode home ✓ · The boat still sat low · The stream got slow
 
 **Talk about it:**
@@ -618,7 +619,7 @@ _For the back page of the book._
 
 ## Giri Makes a Kite
 
-`core-b-06` · Band B · 80 words · sounds: i-e, igh
+`core-b-06` · Band B · 79 words · sounds: i-e, igh
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -644,11 +645,11 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Giri had a fine plan to make a kite. He had made kites once before.
+Page 1: Once upon a time, Giri had a fine plan to make a kite. He had made kites before.
 Page 2: He tied the strings tight, but the kite fell on its side. It had no tail!
 Page 3: Giri sighed. "This kite will not fly because it has no tail," he said.
 Page 4: He cut one white stripe, then the other, and tied both tight to the kite.
-Page 5: Now the kite had a fine tail! Once upon a time it rose high, white as salt in the sky.
+Page 5: Now the kite had a fine tail! It rose high, white as salt in the sky.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -664,7 +665,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 5. Square.
-Words on this page: Giri had a fine plan to make a kite. He had made kites once before.
+Words on this page: Once upon a time, Giri had a fine plan to make a kite. He had made kites before.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -696,7 +697,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: Now the kite had a fine tail! Once upon a time it rose high, white as salt in the sky.
+Words on this page: Now the kite had a fine tail! It rose high, white as salt in the sky.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -705,14 +706,14 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **i-e** — fine, kite, kites, side, white, stripe
+- **i-e** — time, fine, kite, kites, side, white
 - **igh** — tight, sighed, high
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
+- **once** — ❤️ tricky part: it says "wunce": o makes /w/ and /u/
 - **a** — ❤️ tricky part: on its own, a says /uh/
 - **to** — ❤️ tricky part: o says /oo/
 - **he** — ❤️ tricky part: e says its name, /ē/
-- **once** — ❤️ tricky part: it says "wunce": o makes /w/ and /u/
 - **before** — no tricky part; clap the parts, then sound it out together
 - **the** — ❤️ tricky part: e says /uh/
 - **no** — ❤️ tricky part: o says its name, /ō/
@@ -1461,7 +1462,7 @@ _For the back page of the book._
 
 ## Giri and the Flute
 
-`core-b-13` · Band B · 80 words · sounds: u-e, ue, oo
+`core-b-13` · Band B · 79 words · sounds: u-e, ue, oo
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -1489,9 +1490,9 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Giri had a flute. He liked to play a tune in the cool shade.
 Page 2: One day the flute made no tune. It had been full of grit and dust.
-Page 3: Giri used a cube of soap and a tub of suds. "This will make it new," he did say.
+Page 3: Giri used a cube of soap and a tub of suds. "This will make it new," he said.
 Page 4: Soon the flute played the same sweet tune as before. The notes came out true.
-Page 5: By the green tree, people sat to see him play. "Play the same tune!" they did say.
+Page 5: By the green tree, people sat to see him play. "Play the same tune!" they would say.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -1523,7 +1524,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: Giri used a cube of soap and a tub of suds. "This will make it new," he did say.
+Words on this page: Giri used a cube of soap and a tub of suds. "This will make it new," he said.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1539,7 +1540,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: By the green tree, people sat to see him play. "Play the same tune!" they did say.
+Words on this page: By the green tree, people sat to see him play. "Play the same tune!" they would say.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1561,9 +1562,11 @@ _For the back page of the book._
 - **no** — ❤️ tricky part: o says its name, /ō/
 - **of** — ❤️ tricky part: o says /u/ and f says /v/
 - **used** — ❤️ tricky part: s says /z/
+- **said** — ❤️ tricky part: ai says /e/
 - **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
 - **people** — ❤️ tricky part: eo says /ee/
 - **they** — ❤️ tricky part: ey says /ay/
+- **would** — ❤️ tricky part: oul says /oo/, as in "book"
 
 **After reading — check understanding** (answer ticked):
 1. Why did the flute stop making a tune?  
@@ -1699,7 +1702,7 @@ _For the back page of the book._
 
 ## Giri and the Moon Pool
 
-`core-b-15` · Band B · 78 words · sounds: oo, i-e
+`core-b-15` · Band B · 75 words · sounds: oo, i-e
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -1727,8 +1730,8 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: One night Giri went to the pool to see the moon shine like a plate.
 Page 2: A grey mist hid the moon. "Do not leave!" Giri said to the moon. The pool went dim.
-Page 3: Giri sat to keep still. Two flies did zoom by. He ate a snack.
-Page 4: Soon the mist swept away. The moon came back, bright as the moon on the sea.
+Page 3: Giri sat to keep still. Two flies zoomed by. He ate a snack.
+Page 4: Soon the mist swept away. The moon came back and lit up the sea.
 Page 5: This night, this moon, this pool — Giri will keep these in mind. Time to leave!
 ```
 
@@ -1761,7 +1764,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: Giri sat to keep still. Two flies did zoom by. He ate a snack.
+Words on this page: Giri sat to keep still. Two flies zoomed by. He ate a snack.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1769,7 +1772,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: Soon the mist swept away. The moon came back, bright as the moon on the sea.
+Words on this page: Soon the mist swept away. The moon came back and lit up the sea.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1845,7 +1848,7 @@ THE STORY
 Page 1: Giri went to the shell shop. Shells sat in a big box on a shelf.
 Page 2: Bash! The box fell off the shelf. Shells slid across the shop.
 Page 3: "I can fix this myself!" It did not take much time. He got a brush and a bin.
-Page 4: He put the shells back in the box. A moth did fly off with a flick!
+Page 4: He put the shells back in the box. Flick! A moth in it began to fly.
 Page 5: The man was so glad. This shop was his life! He held up a shell to the light.
 ```
 
@@ -1886,7 +1889,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: He put the shells back in the box. A moth did fly off with a flick!
+Words on this page: He put the shells back in the box. Flick! A moth in it began to fly.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1904,7 +1907,7 @@ _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
 - **sh** — shell, shop, shells, shelf, bash, brush
-- **th** — this, moth, with
+- **th** — this, moth
 - **ck** — back, flick
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
