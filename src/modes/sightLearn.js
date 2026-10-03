@@ -31,6 +31,7 @@
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 import { startLscwcDrill, cleanupLscwcDrill } from './lscwcDrill.js';
+import { getSightWordCode, sightWordTip } from '../data/sightWordCode.js';
 
 // ── Module state ───────────────────────────────────────────────────────────
 
@@ -197,18 +198,35 @@ function _renderLearn() {
   });
 }
 
+/**
+ * The word with its tricky part marked, heart-word style: the child sounds
+ * out the plain letters and learns the marked part by heart. Plain text
+ * when the word has no description (the hard spelling tier).
+ */
+function _wordWithHeart(word) {
+  const code = getSightWordCode(word);
+  if (!code) return _escape(word);
+  return code.segments
+    .map((seg) =>
+      seg.tricky ? `<span class="sl-heart">${_escape(seg.text)}</span>` : _escape(seg.text),
+    )
+    .join('');
+}
+
 function _renderWordCard(word, index) {
   const isMet = _met.has(word);
   const isRecalled = _recalled.has(word);
   const safe = _escape(word);
+  const tip = sightWordTip(getSightWordCode(word));
   return `
     <div class="sl-word-card ${isMet ? 'sl-word-card--met' : ''} ${isRecalled ? 'sl-word-card--recalled' : ''}"
          data-word="${safe}" data-index="${index}"
          role="listitem"
          tabindex="0"
-         aria-label="Sight word ${safe}${isRecalled ? ', remembered' : isMet ? ', heard' : ''}, tap to hear it">
+         aria-label="Sight word ${safe}${isRecalled ? ', remembered' : isMet ? ', heard' : ''}, tap to hear it${tip ? `. ${_escape(tip)}` : ''}">
       <span class="sl-word-check" aria-hidden="true">${isRecalled ? '✓' : isMet ? '♪' : ''}</span>
-      <span class="sl-word-text">${safe}</span>
+      <span class="sl-word-text">${_wordWithHeart(word)}</span>
+      ${tip ? `<span class="sl-word-tip" aria-hidden="true">${_escape(tip)}</span>` : ''}
       <span class="sl-word-hear" aria-hidden="true">
         <span class="sl-speaker-icon">🔊</span>
         <span class="sl-hear-label">Hear</span>

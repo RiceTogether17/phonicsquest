@@ -6931,6 +6931,33 @@ details.story-tool-section[open] > .story-tool-summary::before {
   cursor: pointer;
   line-height: 1.2;
 }
+/* Heart words: the part to learn by heart is marked; the child sounds out
+   the rest. Underline as well as colour, so it reads without colour too. */
+.sst-heart,
+.sl-heart {
+  color: var(--color-error-text);
+  text-decoration: underline wavy;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.15em;
+}
+/* The intro tile stays pale yellow in both themes, so its heart letters keep
+   the light-theme red rather than dark mode's lighter one. */
+.sst-intro-word .sst-heart {
+  color: #b91c1c;
+}
+.sst-word-tip,
+.sl-word-tip {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.3;
+}
+.sl-word-tip {
+  font-size: var(--font-size-xs);
+  margin-top: 2px;
+}
+
 .sst-intro-tip {
   color: var(--text-muted);
   font-size: var(--font-size-base);

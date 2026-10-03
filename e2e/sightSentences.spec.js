@@ -51,6 +51,12 @@ for (const scheme of ['light', 'dark']) {
     await page.emulateMedia({ colorScheme: scheme });
     await openSentenceStars(page);
     if (SHOTS) await page.screenshot({ path: `${SHOTS}/intro-${scheme}.png` });
+    // The heart-marked letter on the star word must be readable too.
+    const intro = await new AxeBuilder({ page })
+      .include('.sst-intro')
+      .withRules(['color-contrast'])
+      .analyze();
+    expect(intro.violations.flatMap((v) => v.nodes.map((n) => n.target))).toEqual([]);
 
     await page.locator('#sst-btn-go').click();
     const sentence = (await page.locator('#sst-sentence').innerText()).replace(/\s+/g, ' ').trim();

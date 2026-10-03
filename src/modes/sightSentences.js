@@ -36,6 +36,7 @@
 
 import { SIGHT_QUESTS } from '../data/sightwords.js';
 import { getSentencesForWord, questHasSentences } from '../data/sightSentences.js';
+import { getSightWordCode, sightWordTip } from '../data/sightWordCode.js';
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 
@@ -234,12 +235,21 @@ function _renderRound() {
 
 function _renderIntro(round) {
   const n = getSentencesForWord(round.word).length;
+  const code = getSightWordCode(round.word);
+  // The tricky part is marked heart-word style; the rest is sounded out.
+  const wordHtml = code
+    ? code.segments
+        .map((seg) =>
+          seg.tricky ? `<span class="sst-heart">${_escape(seg.text)}</span>` : _escape(seg.text),
+        )
+        .join('')
+    : _escape(round.word);
+  const tip = sightWordTip(code);
   _container.innerHTML = _shellHtml(`
     <div class="sst-intro">
       <p class="sst-kicker">⭐ Star word</p>
-      <button class="sst-intro-word" id="sst-intro-word" aria-label="Hear the word ${_escape(round.word)}">
-        ${_escape(round.word)}
-      </button>
+      <button class="sst-intro-word" id="sst-intro-word" aria-label="Hear the word ${_escape(round.word)}">${wordHtml}</button>
+      ${tip ? `<p class="sst-word-tip">${_escape(tip)}</p>` : ''}
       <p class="sst-intro-tip">Tap the word to hear it. Say it with me!<br>
         Now find <strong>${_escape(round.word)}</strong> in ${n} sentences.</p>
       <button class="btn btn--primary" id="sst-btn-go">Let's read! →</button>

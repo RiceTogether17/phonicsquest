@@ -74,7 +74,7 @@ export const TRICKY_WORDS = [
   // ── Phase 4 (digraphs) ───────────────────────────────────────────────
   { word: 'they', phase: 4, regular: ['th'],       tricky: ['ey'],        category: 'partial',         note: '"ey" makes /ā/' },
   { word: 'what', phase: 4, regular: ['wh','t'],   tricky: ['a'],         category: 'partial',         note: '"a" makes /ŏ/ (after "wh")' },
-  { word: 'where',phase: 4, regular: ['wh'],       tricky: ['ere'],       category: 'partial',         note: '"ere" /er/, same as in "were"' },
+  { word: 'where',phase: 4, regular: ['wh'],       tricky: ['ere'],       category: 'partial',         note: '"ere" says /air/, as in "there" — not the /er/ of "were"' },
 
   // ── Phase 5 (CCVCC) ──────────────────────────────────────────────────
   // These become FULLY decodable by phase 5 — reinforce that the patterns
