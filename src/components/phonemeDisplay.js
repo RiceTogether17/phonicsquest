@@ -157,6 +157,11 @@ export function renderWordImage(word, emojiEl, show = true) {
       wrap.setAttribute('aria-hidden', 'false');
       wrap.setAttribute('aria-label', `Picture of ${word.word}`);
       wrap.setAttribute('role', 'img');
+    } else {
+      // Don't leave the previous word's label on a hidden picture.
+      wrap.setAttribute('aria-hidden', 'true');
+      wrap.removeAttribute('aria-label');
+      wrap.removeAttribute('role');
     }
   }
 }

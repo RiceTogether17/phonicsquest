@@ -66,7 +66,15 @@ pattern — there is no bulk rewrite and no data loss.
 
 ## Priority 1 — Unify the phonics system
 
-### 1.1 One authoritative grapheme-code sequence
+### 1.1 One authoritative grapheme-code sequence — order ✅ FIXED
+
+> **2026-10:** the inversion below is fixed. The curriculum now teaches Bossy R
+> (phase 7, with tch/dge, ph and soft c/g) before the sliding vowels (phase 8),
+> matching `decodability.js` and `storyGating.js` (Band C waits on the Bossy R
+> stages, Band D on the diphthong stages). Children who already opened the
+> diphthongs under the old order keep them (`legacyPrerequisite` in
+> `progression.js`). The seven sequences still exist; the single codebook
+> below is still the proposed next step.
 
 There are currently **seven parallel sequences** with no single source of truth:
 curriculum phases (`src/data/curriculum.js:138`), curriculum stages
@@ -103,7 +111,15 @@ Legacy accuracy-only (`curriculum.js:1038`, `:1075`) and the strict gate
 (`progression.js:261`, `:291`) are both exported and both reachable. Retire the
 legacy pair.
 
-### 1.3 Reclassify the sight-word bank
+### 1.3 Reclassify the sight-word bank ✅ DONE
+
+> **2026-10:** `src/data/sightWordCode.js` describes every sight word (420)
+> as letter groups, marking only the genuinely tricky part. Each word's
+> "decodable at phase" is computed from the grapheme it waits on, not typed:
+> 262 words turn out decodable once their code is taught, 158 keep a heart
+> part. Sight Learn and Sentence Stars underline the heart letters and tell
+> the child either "Tricky part: …" or "No tricky part — sound it out!".
+> Tests check it agrees with `trickyWords.js`.
 
 95 quests, 474 word slots, 470 unique (`src/data/sightwords.js`). Entries are
 **bare strings** inside quest arrays — no per-word metadata at all. Many early
@@ -200,9 +216,15 @@ words _before_ the story rather than only inside the validator.
 `decodability.js:37-43` already documents a related limitation: the check is
 graphemic, not phonemic, so `was` parses w-a-s and counts as decodable.
 
-### 1.5 Audit phoneme audio for schwa intrusion
+### 1.5 Audit phoneme audio for schwa intrusion ✅ DONE (acoustic)
 
-Not yet verified in this pass. `tests/shortVowelPurity.test.js` and
+> **2026-10:** every phoneme clip was measured (see `AUDIO_QA.md`). b, g,
+> j/soft g, y, w and q carried an "uh" and were trimmed; the rest are clean.
+> /aw/ now has a recording. Still open: the two oo clips are a different
+> voice, there is no schwa recording, and a teacher should listen on a
+> real device.
+
+Originally: not yet verified in this pass. `tests/shortVowelPurity.test.js` and
 `tests/articulatedSpeech.test.js` are the existing hooks.
 
 ### 1.6 Build a true Listen and Spell mode ✅ DONE

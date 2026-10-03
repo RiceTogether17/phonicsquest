@@ -63,7 +63,6 @@ import {
   cleanupSightMatch,
   startSightMatchQuest,
 } from './modes/sightMatch.js';
-import { initSightLearn, showSightLearn, cleanupSightLearn } from './modes/sightLearn.js';
 import { getPlaceholderMeta } from './modes/placeholderMeta.js';
 import { lazyModule } from './modes/lazy.js';
 
@@ -78,6 +77,8 @@ const roadmapMod = lazyModule(() => import('./components/roadmap.js'));
 const storyModeMod = lazyModule(() => import('./modes/storyMode.js'));
 const sentenceForgeMod = lazyModule(() => import('./modes/sentenceForge.js'));
 const sightSentencesMod = lazyModule(() => import('./modes/sightSentences.js'));
+// Sight Learn carries the per-word tricky-part table (sightWordCode.js).
+const sightLearnMod = lazyModule(() => import('./modes/sightLearn.js'));
 const clozeCastleMod = lazyModule(() => import('./modes/clozeCastle.js'));
 const wordVaultMod = lazyModule(() => import('./modes/wordVault.js'));
 const grammarMcqMod = lazyModule(() => import('./modes/grammarMcq.js'));
@@ -411,7 +412,7 @@ class App {
     const sightContainer = () => document.getElementById('sight-match-content');
 
     const enterSightBrowser = () => {
-      cleanupSightLearn();
+      sightLearnMod.get()?.cleanupSightLearn();
       sightSentencesMod.get()?.cleanupSightSentences();
       initSightMatch(sightContainer(), goHomeFromSight, openSightLearn, openSightSentences);
       showSightBrowser();
@@ -428,24 +429,25 @@ class App {
       mascot.setState('celebrate');
     };
 
-    const openSightLearn = (quest) => {
+    const openSightLearn = async (quest) => {
+      const m = await sightLearnMod.load();
       cleanupSightMatch();
-      initSightLearn(sightContainer(), {
+      m.initSightLearn(sightContainer(), {
         onGoHome: goHomeFromSight,
         onBackToBrowser: enterSightBrowser,
         onStartMatch: (q) => {
-          cleanupSightLearn();
+          m.cleanupSightLearn();
           initSightMatch(sightContainer(), goHomeFromSight, openSightLearn, openSightSentences);
           startSightMatchQuest(q);
         },
       });
-      showSightLearn(quest);
+      m.showSightLearn(quest);
       mascot.setState('celebrate');
     };
 
     const goHomeFromSight = () => {
       cleanupSightMatch();
-      cleanupSightLearn();
+      sightLearnMod.get()?.cleanupSightLearn();
       sightSentencesMod.get()?.cleanupSightSentences();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');

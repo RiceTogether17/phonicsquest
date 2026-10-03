@@ -15,6 +15,19 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 async function seedLearner(page) {
+  // Record what is handed to the device voice, so a test can learn the
+  // target word the way the child does — by hearing it.
+  await page.addInitScript(() => {
+    const Utterance = window.SpeechSynthesisUtterance;
+    if (!Utterance) return;
+    window.__spoken = [];
+    window.SpeechSynthesisUtterance = class extends Utterance {
+      constructor(text) {
+        super(text);
+        window.__spoken.push(String(text ?? ''));
+      }
+    };
+  });
   await page.addInitScript(() => {
     const profile = {
       id: 'p_spell',
@@ -91,16 +104,16 @@ async function openListenAndSpell(page) {
   await expect(page.locator('#las-counts .las-count').first()).toBeVisible();
 }
 
-/** The target word, read off the picture's accessible name. */
+/**
+ * The target word, as the child hears it: press "hear it again" and read the
+ * text handed to the device voice. Not the picture's label — words with no
+ * faithful picture (NO_FAITHFUL_PICTURE) show none.
+ */
 async function targetWord(page) {
-  const label = await page
-    .locator('#screen-game [aria-label^="Picture of"]')
-    .first()
-    .getAttribute('aria-label');
-  return label
-    .replace(/^Picture of\s+/, '')
-    .trim()
-    .toLowerCase();
+  await page.locator('#las-replay').click();
+  const spoken = await page.evaluate(() => window.__spoken?.at(-1) ?? '');
+  expect(spoken, 'the replay button should speak the word').not.toBe('');
+  return spoken.trim().toLowerCase();
 }
 
 /** Move past the count step by picking the option the mode marks correct. */
