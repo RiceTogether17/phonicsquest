@@ -152,6 +152,8 @@ function _renderControls(els, word, stage) {
       });
     });
   } else if (stage === 'blend') {
+    // "Next Sound" is gone by now; the instruction has to say what to do.
+    els.modeInstruction.textContent = 'You heard every sound. Now blend them into a word!';
     els.modeArea.innerHTML = /* html */ `
       <div class="blend-guided-wrap">
         <div class="blend-blend-cta" id="blend-cta" aria-live="polite">
@@ -172,6 +174,7 @@ function _renderControls(els, word, stage) {
       _doBlend(word, els);
     });
   } else if (stage === 'assess') {
+    els.modeInstruction.textContent = 'Listen, look at the picture, and check your word.';
     els.modeArea.innerHTML = /* html */ `
       <div class="blend-guided-wrap">
         <div class="blend-assess-prompt">Did you say the same word?</div>

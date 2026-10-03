@@ -13,7 +13,7 @@ import { CURRICULUM, PHASES } from '../data/curriculum.js';
 
 const UNSUITABLE = {
   'vulgar slang': ['cock', 'shag', 'gob', 'bust'],
-  'drugs or alcohol': ['bong', 'rum', 'pub', 'beer', 'wine', 'gin'],
+  'drugs or alcohol': ['bong', 'rum', 'pub', 'keg', 'beer', 'wine', 'gin'],
   'weapons or injury': ['gash', 'stab', 'drub', 'lash', 'gun', 'kill'],
   disease: ['pus', 'pox'],
   insults: ['slur', 'brat', 'runt'],
@@ -34,8 +34,8 @@ describe('word bank suitability', () => {
     expect(samples.filter((w) => BLOCKED.has(w))).toEqual([]);
   });
 
-  it('no word is drawn with a weapon or alcohol emoji', () => {
-    const DISALLOWED_EMOJI = ['🗡️', '🔫', '🍺', '🍹', '🍷', '🍸', '🫦', '🚬'];
+  it('no word is drawn with a weapon, alcohol or gambling emoji', () => {
+    const DISALLOWED_EMOJI = ['🗡️', '🔫', '🍺', '🍹', '🍷', '🍸', '🫦', '🚬', '🎰'];
     const found = WORDS.filter((w) => DISALLOWED_EMOJI.includes(w.emoji)).map(
       (w) => `${w.word} ${w.emoji}`,
     );

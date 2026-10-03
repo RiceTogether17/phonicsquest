@@ -837,7 +837,7 @@ export const WORDS = [
   { id:'rap',  word:'rap',  graphemes:['r','a','p'],   types:['c','sv','c'],  pattern:'CVC', group:'short-a', level:1, emoji:'🎤' },
   { id:'sap',  word:'sap',  graphemes:['s','a','p'],   types:['c','sv','c'],  pattern:'CVC', group:'short-a', level:1, emoji:'🍁' },
   { id:'wag',  word:'wag',  graphemes:['w','a','g'],   types:['c','sv','c'],  pattern:'CVC', group:'short-a', level:1, emoji:'🐶' },
-  { id:'rag',  word:'rag',  graphemes:['r','a','g'],   types:['c','sv','c'],  pattern:'CVC', group:'short-a', level:1, emoji:'🧹' },
+  { id:'rag',  word:'rag',  graphemes:['r','a','g'],   types:['c','sv','c'],  pattern:'CVC', group:'short-a', level:1, emoji:'🧽' },
   { id:'lag',  word:'lag',  graphemes:['l','a','g'],   types:['c','sv','c'],  pattern:'CVC', group:'short-a', level:1, emoji:'🐌' },
   { id:'nag',  word:'nag',  graphemes:['n','a','g'],   types:['c','sv','c'],  pattern:'CVC', group:'short-a', level:1, emoji:'🐎' },
   { id:'cab',  word:'cab',  graphemes:['c','a','b'],   types:['c','sv','c'],  pattern:'CVC', group:'short-a', level:1, emoji:'🚕' },
@@ -897,7 +897,7 @@ export const WORDS = [
   { id:'pin',  word:'pin',  graphemes:['p','i','n'],   types:['c','sv','c'],  pattern:'CVC', group:'short-i', level:1, emoji:'📍' },
   { id:'tin',  word:'tin',  graphemes:['t','i','n'],   types:['c','sv','c'],  pattern:'CVC', group:'short-i', level:1, emoji:'🥫' },
   { id:'win',  word:'win',  graphemes:['w','i','n'],   types:['c','sv','c'],  pattern:'CVC', group:'short-i', level:1, emoji:'🏆' },
-  { id:'bit',  word:'bit',  graphemes:['b','i','t'],   types:['c','sv','c'],  pattern:'CVC', group:'short-i', level:1, emoji:'🪲' },
+  { id:'bit',  word:'bit',  graphemes:['b','i','t'],   types:['c','sv','c'],  pattern:'CVC', group:'short-i', level:1, emoji:'🦷' },
   { id:'fit',  word:'fit',  graphemes:['f','i','t'],   types:['c','sv','c'],  pattern:'CVC', group:'short-i', level:1, emoji:'💪' },
   { id:'hit',  word:'hit',  graphemes:['h','i','t'],   types:['c','sv','c'],  pattern:'CVC', group:'short-i', level:1, emoji:'🎯' },
   { id:'kit',  word:'kit',  graphemes:['k','i','t'],   types:['c','sv','c'],  pattern:'CVC', group:'short-i', level:1, emoji:'🧰' },
@@ -944,7 +944,7 @@ export const WORDS = [
   { id:'dot',  word:'dot',  graphemes:['d','o','t'],   types:['c','sv','c'],  pattern:'CVC', group:'short-o', level:1, emoji:'⚫' },
   { id:'got',  word:'got',  graphemes:['g','o','t'],   types:['c','sv','c'],  pattern:'CVC', group:'short-o', level:1, emoji:'🎁' },
   { id:'hot',  word:'hot',  graphemes:['h','o','t'],   types:['c','sv','c'],  pattern:'CVC', group:'short-o', level:1, emoji:'🌶️' },
-  { id:'lot',  word:'lot',  graphemes:['l','o','t'],   types:['c','sv','c'],  pattern:'CVC', group:'short-o', level:1, emoji:'🎰' },
+  { id:'lot',  word:'lot',  graphemes:['l','o','t'],   types:['c','sv','c'],  pattern:'CVC', group:'short-o', level:1, emoji:'🧮' },
   { id:'pot',  word:'pot',  graphemes:['p','o','t'],   types:['c','sv','c'],  pattern:'CVC', group:'short-o', level:1, emoji:'🍲' },
   { id:'box',  word:'box',  graphemes:['b','o','x'],   types:['c','sv','c'],  pattern:'CVC', group:'short-o', level:1, emoji:'📦' },
   { id:'fox',  word:'fox',  graphemes:['f','o','x'],   types:['c','sv','c'],  pattern:'CVC', group:'short-o', level:1, emoji:'🦊' },
@@ -998,7 +998,7 @@ export const WORDS = [
   { id:'hub',  word:'hub',  graphemes:['h','u','b'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'🔵' },
   { id:'sub',  word:'sub',  graphemes:['s','u','b'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'🥪' },
   { id:'bud',  word:'bud',  graphemes:['b','u','d'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'🌱' },
-  { id:'mud',  word:'mud',  graphemes:['m','u','d'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'💧' },
+  { id:'mud',  word:'mud',  graphemes:['m','u','d'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'🟫' },
   { id:'dud',  word:'dud',  graphemes:['d','u','d'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'💣' },
   { id:'pun',  word:'pun',  graphemes:['p','u','n'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'😄' },
   { id:'nun',  word:'nun',  graphemes:['n','u','n'],   types:['c','sv','c'],  pattern:'CVC', group:'short-u', level:1, emoji:'⛪' },
@@ -1892,20 +1892,17 @@ export const WORDS = [
   { id:'nab',  word:'nab',  graphemes:['n','a','b'],   types:['c','sv','c'], pattern:'CVC',     group:'short-a', level:1, emoji:'🖐️' },
 
   // --- Short-E new ---
-  { id:'keg',  word:'keg',  graphemes:['k','e','g'],   types:['c','sv','c'], pattern:'CVC',     group:'short-e', level:1, emoji:'🪣' },
   { id:'yep',  word:'yep',  graphemes:['y','e','p'],   types:['c','sv','c'], pattern:'CVC',     group:'short-e', level:1, emoji:'✅' },
   { id:'rep',  word:'rep',  graphemes:['r','e','p'],   types:['c','sv','c'], pattern:'CVC',     group:'short-e', level:1, emoji:'🧑‍💼' },
   { id:'met', word:'met', graphemes:['m','e','t'], types:['c','sv','c'], pattern:'CVC', group:'short-e', level:1, emoji:'🤝' },
   { id:'led', word:'led', graphemes:['l','e','d'], types:['c','sv','c'], pattern:'CVC', group:'short-e', level:1, emoji:'🚩' },
   { id:'wed', word:'wed', graphemes:['w','e','d'], types:['c','sv','c'], pattern:'CVC', group:'short-e', level:1, emoji:'💍' },
   { id:'yet', word:'yet', graphemes:['y','e','t'], types:['c','sv','c'], pattern:'CVC', group:'short-e', level:1, emoji:'⏳' },
-  { id:'fez', word:'fez', graphemes:['f','e','z'], types:['c','sv','c'], pattern:'CVC', group:'short-e', level:1, emoji:'🎩' },
 
   // --- Short-I new ---
   { id:'gig',  word:'gig',  graphemes:['g','i','g'],   types:['c','sv','c'], pattern:'CVC',     group:'short-i', level:1, emoji:'🎸' },
   { id:'kip',  word:'kip',  graphemes:['k','i','p'],   types:['c','sv','c'], pattern:'CVC',     group:'short-i', level:1, emoji:'😴' },
   { id:'kin',  word:'kin',  graphemes:['k','i','n'],   types:['c','sv','c'], pattern:'CVC',     group:'short-i', level:1, emoji:'👨‍👩‍👧' },
-  { id:'nit',  word:'nit',  graphemes:['n','i','t'],   types:['c','sv','c'], pattern:'CVC',     group:'short-i', level:1, emoji:'🔍' },
 
   // --- Short-O new ---
   { id:'bob',  word:'bob',  graphemes:['b','o','b'],   types:['c','sv','c'], pattern:'CVC',     group:'short-o', level:1, emoji:'🪀' },
@@ -1913,7 +1910,7 @@ export const WORDS = [
 
   // --- Short-U new ---
   { id:'nub',  word:'nub',  graphemes:['n','u','b'],   types:['c','sv','c'], pattern:'CVC',     group:'short-u', level:1, emoji:'📍' },
-  { id:'rub',  word:'rub',  graphemes:['r','u','b'],   types:['c','sv','c'], pattern:'CVC',     group:'short-u', level:1, emoji:'🧹' },
+  { id:'rub',  word:'rub',  graphemes:['r','u','b'],   types:['c','sv','c'], pattern:'CVC',     group:'short-u', level:1, emoji:'🧼' },
   { id:'cud',  word:'cud',  graphemes:['c','u','d'],   types:['c','sv','c'], pattern:'CVC',     group:'short-u', level:1, emoji:'🐄' },
   { id:'dub',  word:'dub',  graphemes:['d','u','b'],   types:['c','sv','c'], pattern:'CVC',     group:'short-u', level:1, emoji:'🎵' },
 

@@ -36,7 +36,7 @@
  */
 
 /** Replaced at build time with a content hash of the build. */
-const BUILD_ID = '62bbeaa8370e';
+const BUILD_ID = '4d9db25eaec2';
 
 /** Every cache this app owns starts with this, and nothing else may be touched. */
 const CACHE_PREFIX = 'phonicsquest-';
