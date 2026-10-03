@@ -96,11 +96,13 @@ export const WORD_GROUPS = {
   'long-o-oa':  { label: 'Long O · oa (boat)',  color: '#f59e0b', bg: '#fef3c7', icon: '🚤', audioFile: 'long_o' },
   'long-o-ow':  { label: 'Long O · ow (snow)',  color: '#f59e0b', bg: '#fef3c7', icon: '❄️', audioFile: 'long_o' },
   'long-u-ue':  { label: 'Long U · u_e (cube)', color: '#6366f1', bg: '#e0e7ff', icon: '🎲', audioFile: 'long_u' },
-  // NOTE: ue/ew/oo below make the /uː/ of "moon", a different phoneme from
-  // true long-U /juː/ in "cube" — labelled as vowel teams, not "Long U".
+  // NOTE: ue/ew/oo below mostly make the /uː/ of "moon", a different phoneme
+  // from true long-U /juː/ in "cube" — labelled as vowel teams, not "Long U".
+  // ue and ew also say /juː/ in a few words (cue, rescue, few), and those
+  // words carry phonemeKeys so they are heard that way; the labels say both.
   // Keys stay unchanged: stored mastery is keyed by these strings.
-  'long-u-uue': { label: 'Vowel team /oo/ · ue (blue)', color: '#6366f1', bg: '#e0e7ff', icon: '💙', audioFile: null },
-  'long-u-ew':  { label: 'Vowel team /oo/ · ew (new)',  color: '#6366f1', bg: '#e0e7ff', icon: '🆕', audioFile: null },
+  'long-u-uue': { label: 'Vowel team /oo/ or /yoo/ · ue (blue)', color: '#6366f1', bg: '#e0e7ff', icon: '💙', audioFile: null },
+  'long-u-ew':  { label: 'Vowel team /oo/ or /yoo/ · ew (new)',  color: '#6366f1', bg: '#e0e7ff', icon: '🆕', audioFile: null },
   'long-u-oo':  { label: 'Vowel team /oo/ · oo (moon)', color: '#6366f1', bg: '#e0e7ff', icon: '🌙', audioFile: null },
   // Short /ʊ/ — the OTHER sound of oo (book, look, good). Its own set so
   // children learn oo says two sounds; paired with the short_oo recording.

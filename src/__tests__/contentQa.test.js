@@ -9,6 +9,7 @@
  */
 import { beforeAll, describe, expect, it } from 'vitest';
 import { CURRICULUM, PHASES, getStagesInPhase } from '../data/curriculum.js';
+import { SIGHT_QUESTS } from '../data/sightwords.js';
 
 beforeAll(() => {
   globalThis.speechSynthesis = globalThis.speechSynthesis || {
@@ -101,6 +102,36 @@ function _hasSingleShortVowel(w, vowel) {
   return !!m && m[0] === vowel;
 }
 
+// The structural stages are named for consonant SOUNDS, not letters: CVCC is
+// one sound, a vowel, then two sounds. A letter count calls "song" CVCC (n,
+// g) when ng is one sound, a digraph the child meets in phase 4, and calls
+// "blur" CCVC when ur is an r-controlled vowel from phase 8. Count sounds.
+const ONE_SOUND_SPELLINGS = /tch|dge|sh|ch|th|wh|ck|ng|ph|(.)\1/g;
+function _consonantSounds(cluster) {
+  return cluster.replace(ONE_SOUND_SPELLINGS, 'D').length;
+}
+const CODE_BEFORE_DIGRAPHS = (w) => !/sh|ch|th|wh|ck|ng|ph|tch|dge|(.)\1$/.test(w);
+const NO_R_CONTROLLED = (w) => !/[aeiou]r/.test(w);
+/**
+ * Does the word have the named shape, counted in sounds?
+ * @param {string} w
+ * @param {'CVC'|'CCVC'|'CVCC'|'CCVCC'} shape
+ */
+function _fitsStructure(w, shape) {
+  if (_vowelRuns(w) !== 1 || !NO_R_CONTROLLED(w)) return false;
+  const onset = _consonantSounds((w.match(/^[^aeiou]*/) || [''])[0].replace(/x/g, 'ks'));
+  const coda = _consonantSounds((w.match(/[^aeiou]*$/) || [''])[0].replace(/x/g, 'ks'));
+  const want = { CVC: [1, 1], CCVC: [2, 1], CVCC: [1, 2], CCVCC: [2, 2] }[shape];
+  // CVC words with x (fox, six) are taught with cat and hat; x is one letter.
+  if (shape === 'CVC') return onset === 1 && (coda === 1 || /x$/.test(w));
+  return (
+    onset >= want[0] &&
+    coda >= want[1] &&
+    (want[0] === 2 || onset === 1) &&
+    (want[1] === 2 || coda === 1)
+  );
+}
+
 // A small library of pattern predicates. Each returns true if the word is
 // at least plausibly a member of the declared family — the bar is "would a
 // phonics teacher object?" not "is this perfectly classified."
@@ -108,19 +139,26 @@ const PATTERN_CHECKS = [
   // CVC — strict: 3 letters, middle is the named vowel, no other vowels
   {
     match: /^cvc-([aeiou])$/,
-    test: (w, [vowel]) => /^[a-z]{3}$/.test(w) && w[1] === vowel && _hasSingleShortVowel(w, vowel),
+    test: (w, [vowel]) =>
+      /^[a-z]{3}$/.test(w) &&
+      w[1] === vowel &&
+      _hasSingleShortVowel(w, vowel) &&
+      CODE_BEFORE_DIGRAPHS(w) &&
+      _fitsStructure(w, 'CVC'),
   },
 
   // CCVC — exactly one short-vowel run = named vowel, ≥ 2 leading consonants
   {
     match: /^ccvc-([aeiou])$/,
-    test: (w, [vowel]) => _hasSingleShortVowel(w, vowel) && /^[^aeiou]{2,3}[aeiou]/.test(w),
+    test: (w, [vowel]) =>
+      _hasSingleShortVowel(w, vowel) && CODE_BEFORE_DIGRAPHS(w) && _fitsStructure(w, 'CCVC'),
   },
 
   // CVCC — exactly one short-vowel run = named vowel, ≥ 2 trailing consonants
   {
     match: /^cvcc-([aeiou])$/,
-    test: (w, [vowel]) => _hasSingleShortVowel(w, vowel) && /[aeiou][^aeiou]{2,3}$/.test(w),
+    test: (w, [vowel]) =>
+      _hasSingleShortVowel(w, vowel) && CODE_BEFORE_DIGRAPHS(w) && _fitsStructure(w, 'CVCC'),
   },
 
   // Digraphs — contain at least one of the canonical digraphs
@@ -129,8 +167,9 @@ const PATTERN_CHECKS = [
   // CCVCC — exactly one short-vowel run = named vowel; cluster both ends
   {
     match: /^ccvcc-([aeiou])$/,
-    test: (w, [vowel]) =>
-      _hasSingleShortVowel(w, vowel) && /^[^aeiou]{2,3}/.test(w) && /[^aeiou]{2,3}$/.test(w),
+    // Phase 5 follows digraphs, so "crunch" and "shrink" are fair — but each
+    // end still needs two consonant SOUNDS: "flesh" and "floss" are CCVC.
+    test: (w, [vowel]) => _hasSingleShortVowel(w, vowel) && _fitsStructure(w, 'CCVCC'),
   },
 
   // Long A: a_e — has a vowel-consonant-e pattern with a
@@ -201,7 +240,10 @@ const PATTERN_CHECKS = [
   // than one, or the set still telegraphs the answer it exists to hide.
   {
     match: /^(cvc|ccvc|cvcc|ccvcc)-mixed$/,
-    test: (w) => _vowelRuns(w) === 1 && /^[a-z]+$/.test(w),
+    test: (w, [shape]) =>
+      /^[a-z]+$/.test(w) &&
+      _fitsStructure(w, shape.toUpperCase()) &&
+      (shape === 'ccvcc' || CODE_BEFORE_DIGRAPHS(w)),
   },
 
   // Stages we accept on faith (mixed-review, multi-syllabic, sight)
@@ -230,6 +272,52 @@ describe('mixed-vowel stages really are mixed', () => {
         ),
       );
       expect(vowels.size, `${stage.id} vowels: ${[...vowels]}`).toBeGreaterThanOrEqual(4);
+    });
+  }
+});
+
+describe('phase examples use only the code taught by that phase', () => {
+  // The phase card lists ten examples; for the structural phases they must
+  // be words a child at that phase can decode.
+  const SHAPES = { 1: 'CVC', 2: 'CCVC', 3: 'CVCC', 5: 'CCVCC' };
+  for (const [phase, shape] of Object.entries(SHAPES)) {
+    it(`phase ${phase} examples are all ${shape} in sounds`, () => {
+      const p = PHASES.find((x) => x.phase === Number(phase));
+      const bad = p.sampleWords.filter(
+        (w) => !_fitsStructure(w, shape) || (shape !== 'CCVCC' && !CODE_BEFORE_DIGRAPHS(w)),
+      );
+      expect(bad).toEqual([]);
+    });
+  }
+});
+
+describe('early example sentences use only taught code', () => {
+  // Phases 1–3 are short vowels and blends. Their example sentences reach a
+  // child on the printable practice sheet, so every word must be one they
+  // can decode — or a sight word from Quests 1–10, which they learn first.
+  // "I sing a long song" was the CVCC short-o example: every word but "I"
+  // used the ng digraph from phase 4.
+  const EARLY_SIGHT = new Set(
+    SIGHT_QUESTS.filter((q) => q.tier === 'easy').flatMap((q) =>
+      q.words.map((w) => w.toLowerCase()),
+    ),
+  );
+  const decodableEarly = (w) =>
+    EARLY_SIGHT.has(w) ||
+    (_vowelRuns(w) === 1 &&
+      CODE_BEFORE_DIGRAPHS(w) &&
+      NO_R_CONTROLLED(w) &&
+      !/[aeiou][^aeiou]e$/.test(w));
+  const early = [
+    ...PHASES.filter((p) => p.phase <= 3),
+    ...CURRICULUM.filter((st) => st.phase <= 3),
+  ];
+  for (const unit of early) {
+    it(`${unit.id} — example sentences are decodable at that point`, () => {
+      const bad = (unit.sentenceExamples ?? []).flatMap((sentence) =>
+        (sentence.toLowerCase().match(/[a-z']+/g) ?? []).filter((w) => !decodableEarly(w)),
+      );
+      expect(bad).toEqual([]);
     });
   }
 });
