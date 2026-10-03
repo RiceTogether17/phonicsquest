@@ -6,13 +6,17 @@
  * matched pairs stay face-up. Complete all 5 pairs to win.
  *
  * Public API:
- *   initSightMatch(container, onGoHome, onLearnQuest?) – attach to DOM container
+ *   initSightMatch(container, onGoHome, onLearnQuest?, onSentenceQuest?)
+ *                                                      – attach to DOM container
  *   showSightBrowser()                                 – render quest picker
  *   startSightMatchQuest(quest)                        – jump straight into game
  *   cleanupSightMatch()                                – remove event listeners
  *
  * Browser shows two actions per quest: "Learn Words" (calls `onLearnQuest`
  * with the quest object) and "Play Match" (starts the matching game). Quests
+ * 1–10 (the easy tier) have a third, "Sentence Stars" (calls
+ * `onSentenceQuest`), which reads the words in short decodable sentences —
+ * see sightSentences.js. Quests
  * also display a status badge: Not started / Studied / Completed.
  */
 
@@ -33,6 +37,7 @@ const BASE = import.meta.env.BASE_URL;
 let _container = null;
 let _onGoHome = null;
 let _onLearnQuest = null; // called when child taps "Learn Words" in browser
+let _onSentenceQuest = null; // called when child taps "Sentence Stars" in browser
 
 let _activeQuest = null; // current SIGHT_QUESTS entry
 let _flipped = []; // indices of currently face-up (unmatched) cards
@@ -43,10 +48,11 @@ let _fullscreenListener = null;
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
-export function initSightMatch(container, onGoHome, onLearnQuest) {
+export function initSightMatch(container, onGoHome, onLearnQuest, onSentenceQuest) {
   _container = container;
   _onGoHome = onGoHome;
   _onLearnQuest = onLearnQuest || null;
+  _onSentenceQuest = onSentenceQuest || null;
 }
 
 export function showSightBrowser() {
@@ -86,6 +92,7 @@ async function _renderBrowser() {
 
   const completedQuests = store.get('sightQuestsCompleted') || {};
   const studiedQuests = store.get('sightQuestsStudied') || {};
+  const sentenceQuests = store.get('sightSentencesCompleted') || {};
 
   const tiers = ['easy', 'medium', 'hard'];
   let html = '<div class="sm-browser">';
@@ -124,6 +131,10 @@ async function _renderBrowser() {
           : { cls: 'sm-quest-card--new', label: '✨ Not started' };
 
       const preview = quest.words.slice(0, 3).join(' · ');
+      // Every easy quest has sentences (pinned by sightSentences.test.js);
+      // checked by tier so the sentence bank stays out of this bundle.
+      const hasSentences = Boolean(_onSentenceQuest) && quest.tier === 'easy';
+      const sentencesDone = Boolean(sentenceQuests[quest.id]);
       const linkedStory = getStoryForQuest(quest);
       const ariaQuest = `${quest.name} – words: ${quest.words.join(', ')} – ${status.label.replace(/^\W+\s*/, '')}`;
 
@@ -147,6 +158,15 @@ async function _renderBrowser() {
                     aria-label="${ariaQuest} – Play matching game">
               🃏 Play Match
             </button>
+            ${
+              hasSentences
+                ? `<button class="btn btn--ghost btn--sm sm-quest-action sm-quest-action--sentences"
+                    data-quest="${quest.id}" data-action="sentences"
+                    aria-label="${ariaQuest} – Read the words in sentences${sentencesDone ? ' – done' : ''}">
+              ${sentencesDone ? '🌟' : '⭐'} Sentence Stars${sentencesDone ? ' ✓' : ''}
+            </button>`
+                : ''
+            }
           </div>
         </div>`;
     }
@@ -166,7 +186,9 @@ async function _renderBrowser() {
       e.stopPropagation();
       const quest = SIGHT_QUESTS.find((q) => q.id === btn.dataset.quest);
       if (!quest) return;
-      if (btn.dataset.action === 'learn') {
+      if (btn.dataset.action === 'sentences') {
+        _onSentenceQuest?.(quest);
+      } else if (btn.dataset.action === 'learn') {
         if (_onLearnQuest) _onLearnQuest(quest);
         else _startQuest(quest); // graceful fallback if learn isn't wired
       } else {
