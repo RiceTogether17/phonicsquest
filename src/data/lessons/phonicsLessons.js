@@ -515,7 +515,7 @@ export const PHONICS_LESSONS = {
     confusions: ['oo has two sounds. If the long /oo/ of "moon" does not make a word, try the short one of "book".'],
   },
 
-  /* ── Phase 7 · Diphthongs ───────────────────────────────────────── */
+  /* ── Phase 8 · Diphthongs (after Bossy R) ───────────────────────── */
   'dip-oi': {
     headline: 'OI and OY — the sliding /oy/ sound',
     soundChips: [{ g: 'oi', type: 'dp', label: 'oi' }, { g: 'oy', type: 'dp', label: 'oy' }],
@@ -550,7 +550,7 @@ export const PHONICS_LESSONS = {
     confusions: [],
   },
 
-  /* ── Phase 8 · Blends review ────────────────────────────────────── */
+  /* ── Phase 7 · Blends review and Bossy R ────────────────────────── */
   'blends-review': {
     headline: 'Blend champion: mixed review',
     soundChips: [{ g: 'str', type: 'bl', label: 'str' }, { g: 'spr', type: 'bl', label: 'spr' }],

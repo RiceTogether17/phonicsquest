@@ -131,9 +131,16 @@ test('Giri presents the word with its picture', async ({ page }) => {
 
   // The picture is the accessible subject; Giri is decorative.
   const picture = card.locator('.giri-word-card__picture');
+  await expect(card.locator('.giri-word-card__giri')).toHaveAttribute('aria-hidden', 'true');
+  if (await picture.evaluate((el) => el.classList.contains('giri-word-card__picture--none'))) {
+    // A word with no faithful picture (NO_FAITHFUL_PICTURE) shows none, and
+    // must not announce one.
+    await expect(picture).toHaveAttribute('aria-hidden', 'true');
+    await expect(picture).not.toHaveAttribute('role', 'img');
+    return;
+  }
   await expect(picture).toHaveAttribute('role', 'img');
   await expect(picture).toHaveAttribute('aria-label', /^Picture of \w+/);
-  await expect(card.locator('.giri-word-card__giri')).toHaveAttribute('aria-hidden', 'true');
 });
 
 test('the word picture is shown exactly once', async ({ page }) => {
@@ -143,7 +150,8 @@ test('the word picture is shown exactly once', async ({ page }) => {
   // picture — otherwise the same emoji would appear twice on screen, and a
   // screen reader would announce "Picture of cat" twice.
   const pictures = page.locator('#screen-game [aria-label^="Picture of"]:visible');
-  await expect(pictures).toHaveCount(1);
+  const noPicture = await page.locator('#segment-giri-card .giri-word-card__picture--none').count();
+  await expect(pictures).toHaveCount(noPicture ? 0 : 1);
   await expect(page.locator('#word-image-wrap')).toBeHidden();
 });
 

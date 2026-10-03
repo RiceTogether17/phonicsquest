@@ -45,7 +45,7 @@ const PHONEME_FILES = {
   mm: 'm',   // "mm" makes the /m/ sound (doubled consonant)
   rr: 'r',   // "rr" makes the /r/ sound (doubled consonant)
   se: 's',   // "se" makes the /s/ sound
-  // Late consonant spellings (Phase 8: cons-tch-dge, cons-ph). Each is an
+  // Late consonant spellings (Phase 7: cons-tch-dge, cons-ph). Each is an
   // alias for a sound already recorded, so they need no new MP3 — but
   // WITHOUT the alias the key falls through to _speak('tch'), and TTS
   // reads the letters out ("tee-see-aitch") instead of saying /ch/.

@@ -48,8 +48,13 @@ export function setupTrainCarriages(word, els) {
 
   // Build the round pool from the same stage. Drop sight-only words —
   // they don't carry a phoneme tag and confuse the first-sound game.
+  // Picture cards: each needs a picture of its own word (NO_FAITHFUL_PICTURE).
   const stagePool = WORDS.filter(
-    (w) => w.group === word.group && Array.isArray(w.graphemes) && w.graphemes.length >= 2,
+    (w) =>
+      w.group === word.group &&
+      Array.isArray(w.graphemes) &&
+      w.graphemes.length >= 2 &&
+      !w.noPicture,
   );
   const round = pickTrainRound(_targetGrapheme, _targetType, stagePool, {
     cardCount: ROUND_CARD_COUNT,

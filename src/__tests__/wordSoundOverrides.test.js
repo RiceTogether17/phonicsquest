@@ -43,10 +43,10 @@ const RECORDINGS = new Set(
     f.replace(/\.mp3$/, ''),
   ),
 );
-// Keys that play without a file of their own name: the schwa is the short-u
-// clip (declared in APPROXIMATE_PHONEME_AUDIO) and /aw/ has no recording yet,
-// so the device voice says it.
-const PLAYABLE_WITHOUT_OWN_FILE = new Set(['ə', 'aw']);
+// The schwa plays the short-u clip (declared in APPROXIMATE_PHONEME_AUDIO);
+// every other key has a recording of its own name. /aw/ used to be missing
+// and fell back to the device voice — see AUDIO_QA.md.
+const PLAYABLE_WITHOUT_OWN_FILE = new Set(['ə']);
 
 describe('per-word sound overrides (data)', () => {
   const overridden = WORDS.filter((w) => w.phonemeKeys);
@@ -135,6 +135,16 @@ describe('speakPhoneme plays the word-specific sound for every caller', () => {
   it('sounds "shr" as sh then r', async () => {
     await audio.speakPhoneme('shr', 'bl', { word: 'shred', index: 0 });
     expect(played).toEqual(['sh', 'r']);
+  });
+
+  it('Tap the Sounds: "shred" is four sounds, sounded sh, r, e, d', async () => {
+    // Reported from Tap the Sounds: shred was counted and played as s, h, r,
+    // e, d. The mode's answer is word.phonemes.length and its reveal is the
+    // stretched word, so both are pinned here.
+    vi.spyOn(audio, '_speak').mockResolvedValue(undefined);
+    expect(byId('shred').phonemes).toHaveLength(4);
+    await audio.speakWordStretched(byId('shred'));
+    expect(played).toEqual(['sh', 'r', 'e', 'd']);
   });
 
   it('a sounded-out word plays its override on every tile path', async () => {

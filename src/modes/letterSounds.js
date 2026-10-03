@@ -9,7 +9,7 @@
  */
 
 import { audio } from '../modules/audio.js';
-import { WORDS } from '../data/words.js';
+import { WORDS, wordPicture } from '../data/words.js';
 
 
 // ── Phoneme-type metadata ─────────────────────────────────────────────────
@@ -57,7 +57,7 @@ function buildCardMap() {
       // of "bush", the ew of "few" — would teach the wrong example.
       if (word.phonemeKeys?.[i]) continue;
       if (card.examples.length < 3) {
-        card.examples.push({ word: word.word, emoji: word.emoji });
+        card.examples.push({ word: word.word, emoji: wordPicture(word) });
       }
     }
   }

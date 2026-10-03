@@ -1321,7 +1321,7 @@ export const WORDS = [
   { id:'alphabet', word:'alphabet', graphemes:['a','l','ph','a','b','e','t'], types:['sv','c','d','sv','c','sv','c'], pattern:'digraph', group:'cons-ph', level:2, emoji:'🔠' },
   { id:'trophy',   word:'trophy',   graphemes:['t','r','o','ph','y'],         types:['bl','bl','lv','d','lv'],    pattern:'digraph', group:'cons-ph', level:2, emoji:'🏆', phonemeKeys:{4:'long_e'} },
   { id:'phonics',  word:'phonics',  graphemes:['ph','o','n','i','c','s'],     types:['d','sv','c','sv','c','c'],  pattern:'digraph', group:'cons-ph', level:2, emoji:'🔤' },
-  // ── Soft c and soft g (Phase 8) ────────────────────────────────────────
+  // ── Soft c and soft g (Phase 7) ────────────────────────────────────────
   // c and g say /s/ and /j/ before e, i and y. Until now these words were
   // scattered — "gem" sat in the short-e CVC set and "gist" in a blend set,
   // where a child reading them by the rule they had just been taught (c says
@@ -1649,7 +1649,7 @@ export const WORDS = [
   { id:'south', word:'south', graphemes:['s','ou','th'],     types:['c','dp','d'],   pattern:'other', group:'diphthongs', level:3, emoji:'🧭' },
 
   // aw
-  { id:'saw',   word:'saw',   graphemes:['s','aw'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'🔨' },
+  { id:'saw',   word:'saw',   graphemes:['s','aw'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'🪚' },
   { id:'jaw',   word:'jaw',   graphemes:['j','aw'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'💪' },
   { id:'paw',   word:'paw',   graphemes:['p','aw'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'🐾' },
   { id:'raw',   word:'raw',   graphemes:['r','aw'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'🥩' },
@@ -2173,6 +2173,67 @@ export const WORDS = [
   { id:'who', word:'who', graphemes:['wh','o'], types:['d','lv'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🕵️', irregularVowel:true, phonemeKeys:{0:'h', 1:'long_oo'} },
 ];
 
+/**
+ * Words with no faithful picture.
+ *
+ * Every word carries an emoji, but for about four in ten no emoji shows the
+ * word itself, only something next to it: hop is a frog 🐸, big an elephant
+ * 🐘, jam a strawberry 🍓, taller a giraffe 🦒, lap a chair 🪑. A child
+ * names what they see, so the picture taught the wrong word — and in the
+ * picture-choice games (Odd One Out, Train Carriages, Oral Blend) it made
+ * the right answer look like a different word with a different first sound.
+ *
+ * These words show no picture (wordPicture returns ''), and the
+ * picture-choice games leave them out. Their emoji stays on the entry for
+ * the parent dashboard and reports, which label it with the word.
+ */
+export const NO_FAITHFUL_PICTURE = Object.freeze(new Set([
+  'mat', 'sat', 'had', 'jam', 'ham', 'dam', 'gap', 'lap', 'nap', 'rap', 'sap', 'wag', 'rag',
+  'lag', 'nag', 'jab', 'tab', 'pad', 'lad', 'tax', 'wax', 'fed', 'beg', 'peg', 'den', 'bet',
+  'get', 'let', 'pet', 'set', 'wet', 'vet', 'hem', 'pep', 'hex', 'vex', 'big', 'fig', 'jig',
+  'wig', 'fin', 'bit', 'fit', 'hit', 'sit', 'lid', 'him', 'dim', 'rim', 'vim', 'dip', 'hip',
+  'nip', 'rip', 'tip', 'did', 'rid', 'bid', 'mix', 'fix', 'mob', 'rob', 'cod', 'nod', 'cot',
+  'got', 'lot', 'hop', 'mop', 'lob', 'mod', 'rot', 'tot', 'dug', 'rug', 'tug', 'but', 'gut',
+  'rut', 'gum', 'hum', 'sup', 'hub', 'dud', 'pun', 'nun', 'lug', 'make', 'take', 'came', 'same',
+  'tame', 'gave', 'tail', 'bail', 'nail', 'main', 'gain', 'paid', 'maid', 'bait', 'way', 'bay',
+  'may', 'ray', 'lay', 'stay', 'sway', 'wail', 'say', 'pay', 'feed', 'need', 'deep', 'lean',
+  'dean', 'feat', 'neat', 'lead', 'each', 'reach', 'meet', 'like', 'vine', 'line', 'side',
+  'dine', 'site', 'mile', 'wipe', 'pipe', 'might', 'tight', 'my', 'by', 'try', 'fine', 'bite',
+  'high', 'sigh', 'right', 'sight', 'why', 'give', 'live', 'zone', 'pole', 'mode', 'woke',
+  'wove', 'load', 'loan', 'mow', 'tow', 'sow', 'know', 'tone', 'mole', 'low', 'huge', 'muse',
+  'use', 'duke', 'Luke', 'fluke', 'few', 'drew', 'grew', 'tune', 'June', 'hood', 'room', 'took',
+  'soot', 'shook', 'soon', 'catch', 'patch', 'fetch', 'ditch', 'edge', 'hedge', 'dodge', 'cage',
+  'large', 'hinge', 'change', 'chin', 'shut', 'them', 'then', 'thin', 'that', 'much', 'wish',
+  'rush', 'such', 'with', 'whip', 'when', 'whiz', 'back', 'hack', 'jack', 'lack', 'rack',
+  'sack', 'beck', 'nick', 'tick', 'pock', 'mock', 'muck', 'tuck', 'crack', 'stuck', 'pluck',
+  'gang', 'rang', 'sang', 'ding', 'long', 'sung', 'hung', 'hang', 'gong', 'fell', 'sell',
+  'tell', 'well', 'yell', 'fill', 'till', 'will', 'dull', 'full', 'lull', 'mull', 'pull',
+  'gill', 'hull', 'fang', 'dash', 'gush', 'mush', 'lush', 'cloth', 'neck', 'peck', 'flat',
+  'flip', 'flop', 'slam', 'slim', 'plan', 'play', 'glob', 'trip', 'trim', 'grip', 'brag',
+  'brim', 'spot', 'step', 'stem', 'snap', 'skin', 'skim', 'skid', 'skip', 'span', 'sped',
+  'stub', 'stud', 'cram', 'prim', 'prop', 'prod', 'split', 'scrap', 'strip', 'drag', 'drab',
+  'clog', 'hint', 'tilt', 'gist', 'sift', 'bond', 'fond', 'lost', 'cost', 'soft', 'loft',
+  'dust', 'just', 'must', 'rust', 'funk', 'hulk', 'flint', 'grind', 'brink', 'floss', 'prong',
+  'strong', 'clump', 'slump', 'blunt', 'stunk', 'clunk', 'flunk', 'now', 'how', 'out', 'jaw',
+  'raw', 'law', 'far', 'tar', 'harm', 'bark', 'mark', 'hard', 'yard', 'part', 'start', 'smart',
+  'march', 'term', 'verb', 'sir', 'firm', 'for', 'nor', 'born', 'worn', 'torn', 'form', 'ford',
+  'lord', 'sort', 'short', 'fur', 'turn', 'hurl', 'bend', 'lend', 'mend', 'dent', 'went',
+  'damp', 'bump', 'dump', 'felt', 'belt', 'grand', 'blend', 'crest', 'chest', 'swift', 'prank',
+  'trust', 'grunt', 'brand', 'cramp', 'drift', 'brisk', 'grander', 'grandest', 'longer',
+  'longest', 'bigger', 'biggest', 'boldest', 'kindest', 'sitting', 'wishing', 'blending',
+  'helping', 'helped', 'helper', 'dashing', 'dashed', 'bumping', 'bumped', 'lifted', 'taller',
+  'tallest', 'softer', 'softest', 'dampest', 'freshest', 'deeper', 'deepest', 'strongest',
+  'proudest', 'smartest', 'neatest', 'handed', 'rented', 'fresher', 'sender', 'pal', 'gal',
+  'zap', 'nab', 'yep', 'rep', 'met', 'led', 'yet', 'gig', 'kip', 'kin', 'bob', 'nub', 'cud',
+  'dub', 'thud', 'whim', 'chug', 'than', 'untie', 'redo', 'unable', 'readable', 'nation',
+  'energy', 'their', 'because', 'enough', 'should', 'could', 'would', 'ate', 'age', 'aim',
+  'eel', 'joint', 'fled', 'bled', 'snug', 'club', 'swept', 'crept', 'spent', 'spelt', 'smelt',
+  'theft', 'twist', 'sly', 'sue', 'due', 'hue', 'flue', 'rue', 'chew', 'brew', 'cool', 'crawl',
+  'dusted', 'unfit', 'refill', 'rerun', 'reset', 'distrust', 'preheat', 'pretest', 'retell',
+  'fiction', 'motion', 'section', 'mention', 'lovable', 'washable', 'caption', 'helpful',
+  'restless', 'endless', 'kindness', 'softly', 'picnic',
+]));
+
 // Attach `phonemes`, `spellingPattern`, `flags`, and `decodableStage` to
 // every word at load time, so consumers don't need to call the derivers
 // every time. phonemes.length is the true sound count (graphemes.length
@@ -2186,6 +2247,18 @@ for (const w of WORDS) {
   if (typeof w.spellingPattern === 'undefined')    w.spellingPattern = deriveSpellingPattern(w);
   if (!Array.isArray(w.flags))                     w.flags           = deriveFlags(w);
   if (typeof w.decodableStage === 'undefined')     w.decodableStage  = deriveDecodableStage(w);
+  if (NO_FAITHFUL_PICTURE.has(w.word))             w.noPicture       = true;
+}
+
+/**
+ * The picture to show a child for a word: its emoji, or '' when no emoji
+ * shows the word itself (see NO_FAITHFUL_PICTURE).
+ * @param {Word|null|undefined} word
+ * @returns {string}
+ */
+export function wordPicture(word) {
+  if (!word || word.noPicture) return '';
+  return word.emoji ?? '';
 }
 
 /**
@@ -2253,10 +2326,13 @@ export function getWordsByLevel(level) {
  */
 export function getDistractors(word, count = 3, opts = {}) {
   const maxLevel = Number(opts.maxLevel ?? word.level ?? 3);
+  // opts.requirePicture: for picture choices, only words whose picture
+  // shows the word itself (see NO_FAITHFUL_PICTURE).
+  const source = opts.requirePicture ? WORDS.filter(w => !w.noPicture) : WORDS;
 
   // Prefer same-group + same pattern distractors within the learner's level,
   // then relax constraints gradually.
-  let pool = WORDS.filter(w =>
+  let pool = source.filter(w =>
     w.id !== word.id
     && w.group === word.group
     && w.pattern === word.pattern
@@ -2264,7 +2340,7 @@ export function getDistractors(word, count = 3, opts = {}) {
   );
 
   if (pool.length < count) {
-    pool = WORDS.filter(w =>
+    pool = source.filter(w =>
       w.id !== word.id
       && w.group === word.group
       && w.level <= maxLevel
@@ -2272,7 +2348,7 @@ export function getDistractors(word, count = 3, opts = {}) {
   }
 
   if (pool.length < count) {
-    pool = WORDS.filter(w => w.id !== word.id && w.level <= maxLevel);
+    pool = source.filter(w => w.id !== word.id && w.level <= maxLevel);
   }
 
   return shuffleArray(pool).slice(0, count);

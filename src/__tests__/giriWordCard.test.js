@@ -79,6 +79,17 @@ describe('rendering', () => {
     renderGiriWordCard({ word: 'zzz', graphemes: ['z'] }, host);
     expect(host.querySelector('.giri-word-card__picture').textContent).toBe('');
   });
+
+  it('a word with no faithful picture shows an empty frame, not a picture of something else', () => {
+    renderGiriWordCard(
+      { word: 'mat', graphemes: ['m', 'a', 't'], emoji: '🧘', noPicture: true },
+      host,
+    );
+    const pic = host.querySelector('.giri-word-card__picture');
+    expect(pic.textContent).toBe('');
+    expect(pic.getAttribute('role')).toBeNull();
+    expect(pic.getAttribute('aria-hidden')).toBe('true');
+  });
 });
 
 describe('listening-first modes', () => {

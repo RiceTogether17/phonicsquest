@@ -19,8 +19,16 @@
  *   Phase 4  Digraphs          sh, ch, th, wh, ck, ng
  *   Phase 5  CCVCC             both-end blends
  *   Phase 6  Long Vowels       split-digraph / vowel-team / word-end patterns
- *   Phase 7  Diphthongs        oi/oy, ou/ow, aw
- *   Phase 8  Advanced          mixed-blends review
+ *   Phase 7  Bossy R           blends review, ar/or, er/ir/ur, tch/dge, ph, soft c/g
+ *   Phase 8  Diphthongs        oi/oy, ou/ow, aw
+ *
+ * Bossy R comes before the sliding vowels. It used to be the other way
+ * round, while the decodable stories were written to the opposite order
+ * (r-controlled is story code tier 3, diphthongs tier 4), so a child was
+ * either sent to stories in code they had not been taught or held back
+ * from stories they could read. R-controlled words are also the more
+ * frequent (her, for, car, girl, first), which is why most systematic
+ * programmes teach them first.
  *   Phase 9  Suffixes          -ing, -ed, -er, -est
  *   Phase 10 Morphology        prefixes, advanced suffixes, multisyllabic, sight
  *
@@ -231,30 +239,30 @@ export const PHASES = Object.freeze([
   },
   {
     phase: 7,
-    id: 'phase-7-diphthongs',
-    title: 'Diphthongs',
-    label: 'Phase 7 — Diphthongs',
-    icon: '🌊',
-    description: 'Sliding vowel sounds — oi/oy, ou/ow and the aw pattern.',
-    learningOutcome: 'Decode and spell words with diphthong vowel patterns and discriminate them by sound.',
-    targetSounds: ['oi /ɔɪ/', 'oy /ɔɪ/', 'ou /aʊ/', 'ow /aʊ/', 'aw /ɔː/', 'au /ɔː/'],
-    sampleWords: ['coin', 'boy', 'out', 'cow', 'paw', 'jaw', 'loud', 'joy', 'town', 'dawn'],
-    sentenceExamples: ['The boy found a coin.', 'I saw a paw on the lawn.'],
+    id: 'phase-7-bossy-r',
+    title: 'Bossy R & Tricky Spellings',
+    label: 'Phase 7 — Bossy R',
+    icon: '🚀',
+    description: 'Mixed-blend review, r-controlled vowels (ar, or, er, ir, ur) and the late consonant spellings tch, dge, ph and soft c/g.',
+    learningOutcome: 'Read mixed-blend words fluently and decode words where r changes the vowel sound.',
+    targetSounds: ['multi-blend review', 'ar /ɑr/', 'or /ɔr/', 'er/ir/ur /ɜr/', 'tch /tʃ/', 'dge /dʒ/', 'ph /f/', 'soft c /s/', 'soft g /dʒ/'],
+    sampleWords: ['sprint', 'strip', 'car', 'fork', 'her', 'bird', 'turn', 'catch', 'phone', 'rice'],
+    sentenceExamples: ['The girl spots a bird in the fern.', 'Catch the ball by the bridge.'],
     recommendedModes: ['blend', 'classicBlend', 'hear', 'first', 'last', 'middle', 'missing', 'soundCount', 'oralBlend', 'oralSegment', 'oddOneOut', 'soundHunt', 'train', 'wordCount', 'segment', 'listenAndSpell', 'wordSort', 'readAndTap', 'fluencySprint'],
     sightWords: ['oh', 'their', 'people', 'looked', 'out'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
     phase: 8,
-    id: 'phase-8-advanced',
-    title: 'Advanced Blends & Bossy R',
-    label: 'Phase 8 — Advanced',
-    icon: '🚀',
-    description: 'Mixed-blend review, r-controlled vowels (ar, or, er, ir, ur) and the late consonant spellings tch, dge and ph.',
-    learningOutcome: 'Read mixed-blend words fluently and decode words where r changes the vowel sound.',
-    targetSounds: ['CCV', 'CVCC', 'CCVCC', 'multi-blend review', 'ar /ɑr/', 'or /ɔr/', 'er/ir/ur /ɜr/', 'tch /tʃ/', 'dge /dʒ/', 'ph /f/'],
-    sampleWords: ['float', 'crisp', 'blend', 'sprint', 'plank', 'scrap', 'twist', 'shrink', 'sprout', 'thrust'],
-    sentenceExamples: ['Sprint and stamp until the drums thump.', 'The girl saw a bird in the fern.'],
+    id: 'phase-8-diphthongs',
+    title: 'Diphthongs',
+    label: 'Phase 8 — Diphthongs',
+    icon: '🌊',
+    description: 'Sliding vowel sounds — oi/oy, ou/ow and the aw pattern.',
+    learningOutcome: 'Decode and spell words with diphthong vowel patterns and discriminate them by sound.',
+    targetSounds: ['oi /ɔɪ/', 'oy /ɔɪ/', 'ou /aʊ/', 'ow /aʊ/', 'aw /ɔː/', 'au /ɔː/'],
+    sampleWords: ['coin', 'boy', 'out', 'cow', 'paw', 'jaw', 'loud', 'joy', 'town', 'dawn'],
+    sentenceExamples: ['The boy found a coin.', 'I saw a paw on the lawn.'],
     recommendedModes: ['blend', 'classicBlend', 'hear', 'first', 'last', 'middle', 'missing', 'soundCount', 'oralBlend', 'oralSegment', 'oddOneOut', 'soundHunt', 'train', 'wordCount', 'segment', 'listenAndSpell', 'wordSort', 'readAndTap', 'fluencySprint'],
     sightWords: ['called', 'asked', 'could', 'should', 'would'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
@@ -328,8 +336,8 @@ export const CHILD_PHASE_LABELS = Object.freeze({
   4: 'Phase 4 · Two letters, one sound',
   5: 'Phase 5 · Two sounds at both ends',
   6: 'Phase 6 · Vowels that say their name',
-  7: 'Phase 7 · Sliding vowels',
-  8: 'Phase 8 · Bossy R and tricky letters',
+  7: 'Phase 7 · Bossy R and tricky letters',
+  8: 'Phase 8 · Sliding vowels',
   9: 'Phase 9 · Word endings',
   10: 'Phase 10 · Big words and tricky words',
 });
@@ -952,54 +960,13 @@ export const CURRICULUM = [
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 
-  /* ── Phase 7: Diphthongs (split by spelling pattern) ─────────────── */
+  /* ── Phase 7: Bossy R — blends review, r-controlled, late consonants ── */
   {
-    id: 'dip-oi', phase: 7,
-    name: 'Diphthong · oi/oy',
-    description: 'Same /ɔɪ/ sound: coin, boy, soil, joy…',
-    icon: '🪙', group: 'dip-oi', level: 3,
-    requiredMastery: 0.70, prerequisite: 'long-u-oo',
-    learningOutcome: 'Read and spell oi/oy words and choose oi inside a word vs oy at word-end.',
-    targetSounds: ['oi /ɔɪ/', 'oy /ɔɪ/'],
-    sampleWords: ['coin', 'boy', 'soil', 'joy', 'boil', 'toy', 'point', 'enjoy'],
-    sentenceExamples: ['The boy has a coin.', 'Joy is in the soil.'],
-    recommendedModes: ['classicBlend', 'hear', 'middle', 'missing'],
-    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
-  },
-  {
-    id: 'dip-ou', phase: 7,
-    name: 'Diphthong · ou/ow',
-    description: 'Same /aʊ/ sound: out, cow, loud, town…',
-    icon: '🐄', group: 'dip-ou', level: 3,
-    requiredMastery: 0.70, prerequisite: 'dip-oi',
-    learningOutcome: 'Read and spell ou/ow words and discriminate /aʊ/ from /oʊ/ in similar spellings.',
-    targetSounds: ['ou /aʊ/', 'ow /aʊ/'],
-    sampleWords: ['out', 'cow', 'loud', 'town', 'found', 'now', 'down', 'house'],
-    sentenceExamples: ['The cow is loud in town.', 'I found a house down the road.'],
-    recommendedModes: ['classicBlend', 'hear', 'middle', 'missing'],
-    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
-  },
-  {
-    id: 'dip-aw', phase: 7,
-    name: '/aw/ pattern',
-    description: 'Separate from oi/ou: paw, jaw, saw, dawn…',
-    icon: '🐾', group: 'dip-aw', level: 3,
-    requiredMastery: 0.70, prerequisite: 'dip-ou',
-    learningOutcome: 'Read and spell words with the aw / au /ɔː/ pattern.',
-    targetSounds: ['aw /ɔː/', 'au /ɔː/'],
-    sampleWords: ['paw', 'jaw', 'saw', 'dawn', 'lawn', 'draw', 'yawn', 'crawl'],
-    sentenceExamples: ['I saw a paw on the lawn.', 'Draw a yawn at dawn.'],
-    recommendedModes: ['classicBlend', 'hear', 'segment'],
-    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
-  },
-
-  /* ── Phase 8: Advanced — mixed-blends review ─────────────────────── */
-  {
-    id: 'blends-review', phase: 8,
+    id: 'blends-review', phase: 7,
     name: 'Blends Review',
     description: 'float, crisp, blend, sprint…',
     icon: '🚀', group: 'blends', level: 3,
-    requiredMastery: 0.70, prerequisite: 'dip-aw',
+    requiredMastery: 0.70, prerequisite: 'long-u-oo',
     learningOutcome: 'Read mixed-blend words fluently in continuous text without sounding each one out.',
     targetSounds: ['initial blends', 'final blends', 'both-end blends', 'tri-consonant blends (spr-, str-, scr-)'],
     sampleWords: ['strip', 'crisp', 'blend', 'sprint', 'plank', 'scrap', 'twist', 'shrink'],
@@ -1008,7 +975,7 @@ export const CURRICULUM = [
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
-    id: 'rc-ar-or', phase: 8,
+    id: 'rc-ar-or', phase: 7,
     name: 'Bossy R · ar & or',
     description: 'The r changes the vowel: car, star, corn, fork…',
     icon: '⭐', group: 'rc-ar-or', level: 3,
@@ -1021,7 +988,7 @@ export const CURRICULUM = [
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
-    id: 'rc-er-ir-ur', phase: 8,
+    id: 'rc-er-ir-ur', phase: 7,
     name: 'Bossy R · er, ir & ur',
     description: 'Three spellings, one sound: her, bird, turn…',
     icon: '🐦', group: 'rc-er-ir-ur', level: 3,
@@ -1035,7 +1002,7 @@ export const CURRICULUM = [
   },
 
   {
-    id: 'cons-tch-dge', phase: 8,
+    id: 'cons-tch-dge', phase: 7,
     name: 'tch and dge',
     description: 'catch, match, badge, bridge…',
     icon: '🪝', group: 'cons-tch-dge', level: 2,
@@ -1048,7 +1015,7 @@ export const CURRICULUM = [
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
-    id: 'cons-ph', phase: 8,
+    id: 'cons-ph', phase: 7,
     name: 'ph says /f/',
     description: 'phone, graph, dolphin…',
     icon: '📱', group: 'cons-ph', level: 2,
@@ -1061,7 +1028,7 @@ export const CURRICULUM = [
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
   {
-    id: 'cons-soft-cg', phase: 8,
+    id: 'cons-soft-cg', phase: 7,
     name: 'Soft c and soft g',
     description: 'c says /s/ and g says /j/ before e, i, y: rice, cent, page…',
     icon: '🧊', group: 'cons-soft-cg', level: 3,
@@ -1074,13 +1041,58 @@ export const CURRICULUM = [
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
   },
 
+  /* ── Phase 8: Diphthongs (split by spelling pattern) ─────────────── */
+  {
+    id: 'dip-oi', phase: 8,
+    name: 'Diphthong · oi/oy',
+    description: 'Same /ɔɪ/ sound: coin, boy, soil, joy…',
+    icon: '🪙', group: 'dip-oi', level: 3,
+    requiredMastery: 0.70, prerequisite: 'cons-soft-cg',
+    // Before Bossy R moved ahead of the sliding vowels this stage followed
+    // long-u-oo. A child who could open it then keeps it — see
+    // progression.getUnlockedStages.
+    legacyPrerequisite: 'long-u-oo',
+    learningOutcome: 'Read and spell oi/oy words and choose oi inside a word vs oy at word-end.',
+    targetSounds: ['oi /ɔɪ/', 'oy /ɔɪ/'],
+    sampleWords: ['coin', 'boy', 'soil', 'joy', 'boil', 'toy', 'point', 'enjoy'],
+    sentenceExamples: ['The boy has a coin.', 'Joy is in the soil.'],
+    recommendedModes: ['classicBlend', 'hear', 'middle', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+  {
+    id: 'dip-ou', phase: 8,
+    name: 'Diphthong · ou/ow',
+    description: 'Same /aʊ/ sound: out, cow, loud, town…',
+    icon: '🐄', group: 'dip-ou', level: 3,
+    requiredMastery: 0.70, prerequisite: 'dip-oi',
+    learningOutcome: 'Read and spell ou/ow words and discriminate /aʊ/ from /oʊ/ in similar spellings.',
+    targetSounds: ['ou /aʊ/', 'ow /aʊ/'],
+    sampleWords: ['out', 'cow', 'loud', 'town', 'found', 'now', 'down', 'house'],
+    sentenceExamples: ['The cow is loud in town.', 'I found a house down the road.'],
+    recommendedModes: ['classicBlend', 'hear', 'middle', 'missing'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+  {
+    id: 'dip-aw', phase: 8,
+    name: '/aw/ pattern',
+    description: 'Separate from oi/ou: paw, jaw, saw, dawn…',
+    icon: '🐾', group: 'dip-aw', level: 3,
+    requiredMastery: 0.70, prerequisite: 'dip-ou',
+    learningOutcome: 'Read and spell words with the aw / au /ɔː/ pattern.',
+    targetSounds: ['aw /ɔː/', 'au /ɔː/'],
+    sampleWords: ['paw', 'jaw', 'saw', 'dawn', 'lawn', 'draw', 'yawn', 'crawl'],
+    sentenceExamples: ['I saw a paw on the lawn.', 'Draw a yawn at dawn.'],
+    recommendedModes: ['classicBlend', 'hear', 'segment'],
+    masteryCriteria: DEFAULT_MASTERY_CRITERIA,
+  },
+
   /* ── Phase 9: Suffixes ──────────────────────────────────────────── */
   {
     id: 'suffix-ing', phase: 9,
     name: '-ing Words',
     description: 'running, jumping, sitting…',
     icon: '🏃', group: 'suffix-ing', level: 2,
-    requiredMastery: 0.70, prerequisite: 'cons-soft-cg',
+    requiredMastery: 0.70, prerequisite: 'dip-aw',
     learningOutcome: 'Read and spell base + -ing words, including doubled-consonant forms (running, sitting).',
     targetSounds: ['-ing /ɪŋ/'],
     sampleWords: ['running', 'jumping', 'sitting', 'eating', 'playing', 'singing', 'reading', 'going'],

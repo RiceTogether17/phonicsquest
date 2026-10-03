@@ -513,3 +513,33 @@ describe('mastery level separates advancing from demonstrating', () => {
     expect(r.masteryLevel).toBe('ready-to-explore');
   });
 });
+
+describe('Bossy R before the sliding vowels', () => {
+  // The curriculum used to teach oi/oy, ou/ow and aw (phase 7) before Bossy
+  // R (phase 8). The order is now Bossy R first, matching the story bank.
+  const throughLongVowels = () => {
+    const gm = {};
+    for (const s of CURRICULUM) if (s.phase <= 6) gm[s.group] = 0.95;
+    return gm;
+  };
+
+  it('after the long vowels, the next stage is the blends review, not oi/oy', () => {
+    const unlocked = getUnlockedStages({ groupMastery: throughLongVowels() });
+    expect(unlocked).toContain('blends-review');
+    expect(unlocked).not.toContain('dip-oi');
+  });
+
+  it('a child already working on oi/oy keeps it open', () => {
+    // Under the old order dip-oi followed long-u-oo. Re-locking a stage a
+    // child is part-way through would be the move breaking their progress.
+    const unlocked = getUnlockedStages({
+      groupMastery: { ...throughLongVowels(), 'dip-oi': 0.5 },
+    });
+    expect(unlocked).toContain('dip-oi');
+  });
+
+  it('only stages that moved carry a legacy prerequisite', () => {
+    const moved = CURRICULUM.filter((s) => s.legacyPrerequisite).map((s) => s.id);
+    expect(moved).toEqual(['dip-oi']);
+  });
+});

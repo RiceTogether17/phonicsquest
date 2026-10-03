@@ -165,7 +165,22 @@ Long vowel patterns — split digraphs (a_e), vowel teams (ai, ee, oa) and word-
 | `long-u-oo` | Vowel team /oo/ · oo | oo /uː/ | moon, food, pool, room, soon, … (8 total) | 70% | `long-u-ew` |
 | `short-oo` | Short oo /ʊ/ · oo | oo /ʊ/ | book, look, cook, hook, foot, … (8 total) | 70% | `long-u-oo` |
 
-### Phase 7 — Diphthongs
+### Phase 7 — Bossy R
+
+Mixed-blend review, r-controlled vowels (ar, or, er, ir, ur) and the late consonant spellings tch, dge, ph and soft c/g.
+
+**Learning outcome.** Read mixed-blend words fluently and decode words where r changes the vowel sound.
+
+| Stage | Name | Target sounds | Sample words | Mastery to pass | Prerequisite |
+| --- | --- | --- | --- | --- | --- |
+| `blends-review` | Blends Review | initial blends, final blends, both-end blends, tri-consonant blends (spr-, str-, scr-) | strip, crisp, blend, sprint, plank, … (8 total) | 70% | `long-u-oo` |
+| `rc-ar-or` | Bossy R · ar & or | ar /ɑr/, or /ɔr/ | car, star, farm, park, corn, … (8 total) | 70% | `blends-review` |
+| `rc-er-ir-ur` | Bossy R · er, ir & ur | er /ɜr/, ir /ɜr/, ur /ɜr/ | her, fern, bird, girl, turn, … (8 total) | 70% | `rc-ar-or` |
+| `cons-tch-dge` | tch and dge | tch /tʃ/, dge /dʒ/ | catch, match, patch, fetch, pitch, … (8 total) | 70% | `rc-er-ir-ur` |
+| `cons-ph` | ph says /f/ | ph /f/ | phone, graph, photo, dolphin, elephant, … (8 total) | 70% | `cons-tch-dge` |
+| `cons-soft-cg` | Soft c and soft g | soft c /s/, soft g /dʒ/ | rice, cent, face, space, page, … (8 total) | 70% | `cons-ph` |
+
+### Phase 8 — Diphthongs
 
 Sliding vowel sounds — oi/oy, ou/ow and the aw pattern.
 
@@ -173,24 +188,9 @@ Sliding vowel sounds — oi/oy, ou/ow and the aw pattern.
 
 | Stage | Name | Target sounds | Sample words | Mastery to pass | Prerequisite |
 | --- | --- | --- | --- | --- | --- |
-| `dip-oi` | Diphthong · oi/oy | oi /ɔɪ/, oy /ɔɪ/ | coin, boy, soil, joy, boil, … (8 total) | 70% | `long-u-oo` |
+| `dip-oi` | Diphthong · oi/oy | oi /ɔɪ/, oy /ɔɪ/ | coin, boy, soil, joy, boil, … (8 total) | 70% | `cons-soft-cg` |
 | `dip-ou` | Diphthong · ou/ow | ou /aʊ/, ow /aʊ/ | out, cow, loud, town, found, … (8 total) | 70% | `dip-oi` |
 | `dip-aw` | /aw/ pattern | aw /ɔː/, au /ɔː/ | paw, jaw, saw, dawn, lawn, … (8 total) | 70% | `dip-ou` |
-
-### Phase 8 — Advanced
-
-Mixed-blend review, r-controlled vowels (ar, or, er, ir, ur) and the late consonant spellings tch, dge and ph.
-
-**Learning outcome.** Read mixed-blend words fluently and decode words where r changes the vowel sound.
-
-| Stage | Name | Target sounds | Sample words | Mastery to pass | Prerequisite |
-| --- | --- | --- | --- | --- | --- |
-| `blends-review` | Blends Review | initial blends, final blends, both-end blends, tri-consonant blends (spr-, str-, scr-) | strip, crisp, blend, sprint, plank, … (8 total) | 70% | `dip-aw` |
-| `rc-ar-or` | Bossy R · ar & or | ar /ɑr/, or /ɔr/ | car, star, farm, park, corn, … (8 total) | 70% | `blends-review` |
-| `rc-er-ir-ur` | Bossy R · er, ir & ur | er /ɜr/, ir /ɜr/, ur /ɜr/ | her, fern, bird, girl, turn, … (8 total) | 70% | `rc-ar-or` |
-| `cons-tch-dge` | tch and dge | tch /tʃ/, dge /dʒ/ | catch, match, patch, fetch, pitch, … (8 total) | 70% | `rc-er-ir-ur` |
-| `cons-ph` | ph says /f/ | ph /f/ | phone, graph, photo, dolphin, elephant, … (8 total) | 70% | `cons-tch-dge` |
-| `cons-soft-cg` | Soft c and soft g | soft c /s/, soft g /dʒ/ | rice, cent, face, space, page, … (8 total) | 70% | `cons-ph` |
 
 ### Phase 9 — Suffixes
 
@@ -200,7 +200,7 @@ Mixed-blend review, r-controlled vowels (ar, or, er, ir, ur) and the late conson
 
 | Stage | Name | Target sounds | Sample words | Mastery to pass | Prerequisite |
 | --- | --- | --- | --- | --- | --- |
-| `suffix-ing` | -ing Words | -ing /ɪŋ/ | running, jumping, sitting, eating, playing, … (8 total) | 70% | `cons-soft-cg` |
+| `suffix-ing` | -ing Words | -ing /ɪŋ/ | running, jumping, sitting, eating, playing, … (8 total) | 70% | `dip-aw` |
 | `suffix-ed` | -ed Words | -ed /d/, -ed /t/, -ed /ɪd/ | jumped, helped, picked, played, walked, … (8 total) | 70% | `suffix-ing` |
 | `suffix-er` | -er Words | -er /ɚ/ | faster, bigger, softer, longer, slower, … (8 total) | 70% | `suffix-ed` |
 | `suffix-est` | -est Words | -est /ɪst/ | fastest, biggest, softest, longest, slowest, … (8 total) | 70% | `suffix-er` |
@@ -238,10 +238,10 @@ release; the budget is the teaching stage inside it.
 | `long-i` | 2 | i_e, igh, ie, y | 6 |
 | `long-o` | 2 | o_e, oa, ow | 6 |
 | `long-u` | 2 | u_e, ue, ew, oo | 6 |
-| `r-controlled` | 3 | ar, or, er, ir, ur | 8 |
-| `digraphs` | 3 | tch, dge, ph | 8 |
+| `r-controlled` | 3 | ar, or, er, ir, ur | 7 |
+| `digraphs` | 3 | tch, dge, ph | 7 |
 | `suffixes` | 3 |  | 9 |
-| `diphthongs` | 4 | oi, oy, ou | 7 |
+| `diphthongs` | 4 | oi, oy, ou | 8 |
 | `advanced-vowel` | 5 | aw, au, air, are, ear, eer, ere | 9 |
 | `chapter` | 5 | — (full tier) | 10 |
 | `extension-sg` | 5 | — (full tier) | 10 |
