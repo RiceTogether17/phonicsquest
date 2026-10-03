@@ -64,7 +64,7 @@ const BASE = import.meta.env.BASE_URL;
 
 let _container = null;
 let _onGoHome = null;
-let _activeBand = 'A'; // 'A' | 'B' | 'C' | 'D'
+let _activeBand = 'A'; // 'A' | 'B' | 'C' | 'D' | 'E'
 let _bandAutoPicked = false; // pick the recommended shelf once per session
 let _activeTab = 'band'; // 'band' | 'singapore' | 'chapter'
 let _speaking = false;

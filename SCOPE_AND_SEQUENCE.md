@@ -243,6 +243,7 @@ release; the budget is the teaching stage inside it.
 | `suffixes` | 3 |  | 9 |
 | `diphthongs` | 4 | oi, oy, ou | 8 |
 | `advanced-vowel` | 5 | aw, au, air, are, ear, eer, ere | 9 |
+| `bridge` | 5 |  | 10 |
 | `chapter` | 5 | — (full tier) | 10 |
 | `extension-sg` | 5 | — (full tier) | 10 |
 
@@ -254,6 +255,7 @@ release; the budget is the teaching stage inside it.
 | B | 45–80 words | tier 2 | 30 |
 | C | 80–140 words | tier 3 | 14 |
 | D | 140–250 words | tier 3 | 17 |
+| E | 250–450 words | tier 3 | 4 |
 
 **The guarantee:** every word in every story is readable by some taught
 route — decodable at the story's phase, a high-frequency word within its

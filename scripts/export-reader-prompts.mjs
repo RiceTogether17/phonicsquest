@@ -109,6 +109,13 @@ const PACKS = [
     ages: '7–9',
     test: (s) => s.textType === 'chapter-reader',
   },
+  {
+    file: '7-band-e.md',
+    title: 'Set 7 · Band E — Longer Reads',
+    ages: '8–10',
+    band: 'E',
+    test: (s) => s.band === 'E' && s.textType === 'longer-read',
+  },
 ];
 
 // ── Pages ────────────────────────────────────────────────────────────────

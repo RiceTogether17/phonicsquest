@@ -53,7 +53,7 @@ export function getHFWTier(word) {
 
 /**
  * Get all HFW words permitted at a given band.
- * @param {'A'|'B'|'C'|'D'} band
+ * @param {'A'|'B'|'C'|'D'|'E'} band
  * @returns {string[]}
  */
 export function getAllowedHFW(band) {
@@ -62,6 +62,7 @@ export function getAllowedHFW(band) {
     case 'B': return [...HFW_TIER_1, ...HFW_TIER_2];
     case 'C': return [...HFW_TIER_1, ...HFW_TIER_2, ...HFW_TIER_3];
     case 'D': return [...HFW_TIER_1, ...HFW_TIER_2, ...HFW_TIER_3]; // flexible
+    case 'E': return [...HFW_TIER_1, ...HFW_TIER_2, ...HFW_TIER_3];
     default:  return [...HFW_TIER_1];
   }
 }

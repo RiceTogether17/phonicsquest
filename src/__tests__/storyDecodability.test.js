@@ -40,7 +40,7 @@ import { CURRICULUM } from '../data/curriculum.js';
  * post-audit corpus (empirical minimums: A .850, B .918, C .944, D .993).
  * New stories may not drag a band below its floor.
  */
-const RATIO_FLOORS = { A: 0.84, B: 0.9, C: 0.93, D: 0.95 };
+const RATIO_FLOORS = { A: 0.84, B: 0.9, C: 0.93, D: 0.95, E: 0.95 };
 
 /**
  * Floors for the phases that carry a short-vowel budget, keyed by how many
@@ -95,7 +95,7 @@ function cumulativeBudget(phase) {
 }
 
 /** Most stretch words a single story may pre-teach via `pretaught`. */
-const PRETAUGHT_CAPS = { A: 2, B: 3, C: 3, D: 3 };
+const PRETAUGHT_CAPS = { A: 2, B: 3, C: 3, D: 3, E: 3 };
 
 const VALID_LINE_TYPES = new Set([
   'text',
@@ -133,6 +133,7 @@ const STORY_SUFFICIENCY_TARGETS = [
   { band: 'D', phase: 'diphthongs', min: 4 },
   { band: 'D', phase: 'advanced-vowel', min: 7 },
   { band: 'D', phase: 'chapter', min: 5 },
+  { band: 'E', phase: 'bridge', min: 4 },
 ];
 
 const analyses = new Map(STORIES.map((s) => [s.id, analyzeStory(s)]));
@@ -510,7 +511,7 @@ describe('comprehension questions', () => {
 
   it('longer bands carry a follow-up thinking question, not just retrieval', () => {
     const thin = STORIES.filter(
-      (s) => (s.band === 'C' || s.band === 'D') && (s.talkAboutIt || []).length < 2,
+      (s) => ['C', 'D', 'E'].includes(s.band) && (s.talkAboutIt || []).length < 2,
     ).map((s) => s.id);
     expect(thin, thin.join(', ')).toEqual([]);
   });

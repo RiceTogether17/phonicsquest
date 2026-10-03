@@ -120,6 +120,10 @@ export const STORY_PHASES = Object.freeze([
     curriculumPhase: 9,
     graphemeBudget: ['aw', 'au', 'air', 'are', 'ear', 'eer', 'ere'],
   },
+  // Band E. Nothing new to release — every spelling is already in by
+  // advanced-vowel — so its budget adds nothing, as suffixes' does. What it
+  // asks of a reader is length, longer words and longer sentences.
+  { id: 'bridge', tier: 5, curriculumPhase: 10, graphemeBudget: [] },
   { id: 'chapter', tier: 5, curriculumPhase: 10 },
   { id: 'extension-sg', tier: 5, curriculumPhase: 10 },
 ]);
@@ -710,6 +714,9 @@ export const BAND_RULES = Object.freeze({
   B: Object.freeze({ min: 45, max: 80, hfwCap: 2, level: 2 }),
   C: Object.freeze({ min: 80, max: 140, hfwCap: 3, level: 3 }),
   D: Object.freeze({ min: 140, max: 250, hfwCap: 3, level: 4 }),
+  // Band E bridges into ordinary books and the Primary English passages:
+  // the whole code, and two to three times the length of Band D.
+  E: Object.freeze({ min: 250, max: 450, hfwCap: 3, level: 5 }),
 });
 
 /**

@@ -62,6 +62,14 @@ export const BAND_META = [
     mascotState: 'trophy',
     wordRange: '140\u2013250', sentenceRange: '15\u201330',
   },
+  {
+    band: 'E', level: 5,
+    label: 'Longer Reads',
+    targetSounds: 'All the code \u00b7 longer words and sentences',
+    prop: '\ud83c\udf0f Big World', color: '#1d4ed8', bg: '#dbeafe',
+    mascotState: 'whiteboard',
+    wordRange: '250\u2013450', sentenceRange: '20\u201335',
+  },
 ];
 
 // ── Stories ───────────────────────────────────────────────────────────────────
@@ -2569,6 +2577,209 @@ export const STORIES = [
     talkAboutIt: [
       'How did Giri feel when he first heard the noise? Which words tell you?',
       'Why do you think Scout did not bark at the box?',
+    ],
+  },
+
+  // ╔══════════════════════════════════════════════════════════════════════════╗
+  // ║  BAND E — Longer Reads  (4 books)                                     ║
+  // ║  250–450 words: a journal serial and a "how" tale                     ║
+  // ╚══════════════════════════════════════════════════════════════════════════╝
+
+  {
+    id: 'journal-penang-1',
+    band: 'E', level: 5, phase: 'bridge',
+    chapterOf: 'penang-journal',
+    chapterNum: 1,
+    title: 'Giri\'s Week in Penang: Day 1',
+    emoji: '\u2708\ufe0f',
+    mascotState: 'celebrate',
+    illustration: 'giri_sg_hawker.jpg',
+    targetGraphemes: ['ar', 'ow', 'ay', 'ed', 'ing'],
+    allowedHFWTier: 3,
+    targetWordCount: 0,
+    actualWordCount: 284,
+    decodableRatio: 1.00,
+    textType: 'longer-read',
+    refrainCount: 0,
+    lines: [
+      { type: 'chapter', text: 'Day 1: Monday' },
+      { type: 'paragraph', text: 'Today Mum, Grandpa and I flew from Singapore to Penang. It was my first time on a plane, and I held the arm of my seat all the way up. Then I looked out of the window and forgot to be scared. The clouds looked like a field of white cotton.' },
+      { type: 'paragraph', text: 'When we landed, the air was hot and sticky, just like home. We took a taxi over a long bridge that went across the sea. Grandpa pointed at the water. "When I was a boy, there was no bridge," he said. "We took a slow ferry, and I was sick the whole way."' },
+      { type: 'paragraph', text: 'Penang is where Grandpa grew up. In the afternoon, we walked down the street where his family had a shop. The old shophouses were painted pink, green and yellow. Grandpa stopped in front of a blue door and was quiet for a long time. "This was our shop," he said at last. "My father sold rice and sugar here." Now it sells cold drinks and ice cream, so we had some.' },
+      { type: 'paragraph', text: 'For dinner, we went to a busy hawker centre by the sea. Grandpa ordered a plate of char kway teow for me. The noodles were dark and smoky, with prawns and bean sprouts on top. The cook tossed them in a huge pan over a roaring fire. It was the best thing I have ever eaten, even though it made my tongue tingle.' },
+      { type: 'end', text: 'Now I am in bed, and Grandpa is snoring in the next room. Before he went to sleep, he winked and said, "Tomorrow, we go hunting." I asked him what we were going to hunt, but he just smiled. I will find out in the morning.' },
+    ],
+    comprehension: [
+      { q: 'How did Grandpa get to Penang when he was a boy?', options: ['On a slow ferry', 'On a plane', 'In a taxi', 'Over the bridge'], answer: 0, type: 'literal' },
+      { q: 'What did Grandpa\'s father sell in the shop?', options: ['Rice and sugar', 'Cold drinks and ice cream', 'Char kway teow', 'Blue paint'], answer: 0, type: 'literal' },
+      { q: 'Why was Grandpa quiet for a long time in front of the blue door?', options: ['It was his old family shop', 'He was lost', 'He was too hot to talk', 'He wanted ice cream'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri was still scared when he looked out of the window.', options: ['True', 'False', 'The story does not say'], answer: 1, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri flew on a plane for the first time.', 'They took a taxi over a long bridge.', 'Grandpa stopped in front of a blue door.', 'Giri ate char kway teow by the sea.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'Why do you think Grandpa wanted to show Giri the street where he grew up?', sampleAnswer: 'The shop was where his family worked when he was a boy, so it was special to him. He wanted Giri to see it and know about his family.', markingGuide: 'A good answer gives a reason and uses something from the story, like the blue door or the shop.' },
+    ],
+    vocab: [
+      { word: 'sticky', meaning: 'Hot and damp, so things stick to you', icon: '🥵' },
+      { word: 'ferry', meaning: 'A boat that carries people across water', icon: '⛴️' },
+      { word: 'shophouses', meaning: 'Old buildings with a shop below and a home above', icon: '🏘️' },
+      { word: 'hawker centre', meaning: 'A place with lots of small food stalls', icon: '🍜' },
+      { word: 'tingle', meaning: 'A light, prickly feeling', icon: '✨' },
+    ],
+    grammarSpotlight: [
+      { pattern: 'Writing a journal', example: '"Today Mum, Grandpa and I flew..." / "Now I am in bed..."', tip: 'A journal tells what happened to you. It uses "I" and "we", and it tells things in the order they happened.' },
+    ],
+    talkAboutIt: [
+      'Have you ever done something for the first time, like Giri on the plane? How did you feel?',
+      'Grandpa says, "Tomorrow, we go hunting." What do you think they will hunt?',
+    ],
+  },
+
+  {
+    id: 'journal-penang-2',
+    band: 'E', level: 5, phase: 'bridge',
+    chapterOf: 'penang-journal',
+    chapterNum: 2,
+    title: 'Giri\'s Week in Penang: Day 2',
+    emoji: '\ud83d\uddfa\ufe0f',
+    mascotState: 'thinking',
+    illustration: 'giri_level04_story06_treasure-map.jpg',
+    targetGraphemes: ['aw', 'ur', 'ou', 'ing'],
+    allowedHFWTier: 3,
+    targetWordCount: 0,
+    actualWordCount: 277,
+    decodableRatio: 1.00,
+    textType: 'longer-read',
+    refrainCount: 0,
+    lines: [
+      { type: 'chapter', text: 'Day 2: Tuesday' },
+      { type: 'paragraph', text: 'Now I know what Grandpa meant. We went hunting for paintings! In George Town, artists have painted pictures on the walls of old buildings, and you can walk around and find them. Grandpa gave me a paper map with little red dots on it. Each dot was a painting.' },
+      { type: 'paragraph', text: 'We started early, before it got too hot. The first painting was a boy on a swing, reaching up to the sky. The second was a cat so big that it covered the whole side of a house. I had to stand far back to see all of it. My favourite was two children riding a real bicycle that was fixed to the wall. I sat on the bicycle seat, and Mum took a photo of me.' },
+      { type: 'paragraph', text: 'By lunchtime, my legs were tired, so Grandpa waved down a trishaw. A trishaw is a bicycle with a seat for two people at the front. The rider pedalled us slowly through the narrow lanes while I held the map. Every time I spotted a painting, I shouted, and he rang his bell.' },
+      { type: 'paragraph', text: 'In the afternoon, we cooled down with a bowl of cendol. It has green jelly noodles, red beans, coconut milk and lots of shaved ice. Grandpa says it tastes the same as when he was small. I believe him, because he finished his bowl before I had eaten half of mine.' },
+      { type: 'end', text: 'Back at the hotel, I counted the red dots I had crossed out. Eleven! Grandpa only found nine, but he says he walked down these lanes every day as a boy, so his dots count twice. I said that is not how counting works. He just laughed.' },
+    ],
+    comprehension: [
+      { q: 'What did the red dots on Grandpa\'s map show?', options: ['Where each painting was', 'Where to eat', 'Where the hotel was', 'Where the trishaw stopped'], answer: 0, type: 'literal' },
+      { q: 'What is a trishaw?', options: ['A bicycle with a seat for two people', 'A small boat', 'A kind of bus', 'A kind of map'], answer: 0, type: 'literal' },
+      { q: 'Why did Grandpa wave down a trishaw?', options: ['Giri\'s legs were tired', 'They were lost', 'It started to rain', 'Grandpa wanted to ring the bell'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'The trishaw rider was a friend of Grandpa.', options: ['True', 'False', 'The story does not say'], answer: 2, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Grandpa gave Giri a paper map.', 'Giri sat on the bicycle seat for a photo.', 'They rode through the lanes in a trishaw.', 'Giri counted the red dots at the hotel.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'Did Grandpa really think his dots counted twice? How do you know?', sampleAnswer: 'No, he was joking. When Giri said that is not how counting works, Grandpa just laughed.', markingGuide: 'A good answer says Grandpa was joking or teasing, and gives a clue from the story, like his laugh.' },
+    ],
+    vocab: [
+      { word: 'artists', meaning: 'People who make paintings and other art', icon: '🎨' },
+      { word: 'trishaw', meaning: 'A bicycle with seats for people to ride in', icon: '🛺' },
+      { word: 'pedalled', meaning: 'Pushed the pedals of a bike round with your feet', icon: '🚲' },
+      { word: 'narrow', meaning: 'Not wide', icon: '↔️' },
+      { word: 'shaved ice', meaning: 'Ice cut into tiny, thin bits', icon: '🧊' },
+    ],
+    grammarSpotlight: [
+      { pattern: 'Explaining a new word', example: '"A trishaw is a bicycle with a seat for two people at the front."', tip: 'When a writer uses a word you may not know, they sometimes stop and tell you what it means. Look for "is a" just after the new word.' },
+    ],
+    talkAboutIt: [
+      'Which painting in the story would you most like to find? Why?',
+      'Why do you think Giri crossed out each dot he found?',
+    ],
+  },
+
+  {
+    id: 'journal-penang-3',
+    band: 'E', level: 5, phase: 'bridge',
+    chapterOf: 'penang-journal',
+    chapterNum: 3,
+    title: 'Giri\'s Week in Penang: Day 3',
+    emoji: '\ud83d\udc12',
+    mascotState: 'clap',
+    illustration: 'giri_sg_gardens.jpg',
+    targetGraphemes: ['ee', 'ou', 'er', 'air'],
+    allowedHFWTier: 3,
+    targetWordCount: 0,
+    actualWordCount: 282,
+    decodableRatio: 0.99,
+    textType: 'longer-read',
+    refrainCount: 0,
+    lines: [
+      { type: 'chapter', text: 'Day 3: Wednesday' },
+      { type: 'paragraph', text: 'Today we went up Penang Hill. There is a special train that climbs straight up the side of the hill. It is so steep that the seats are built like steps. When the train started to move, I pressed my nose to the glass and watched the town get smaller and smaller below us.' },
+      { type: 'paragraph', text: 'At the top, the air was cool and fresh, and it smelled of trees and rain. We walked along a path in the forest. The trees were so tall that I could not see the tops of them. Mum showed me a tiny lizard on a branch. It was the same green as the leaves, and it did not move once.' },
+      { type: 'paragraph', text: 'Then we came to a lookout point. From there, I could see the whole island: the bridge we drove over on Monday, the old town with its red roofs, and the sea all around, shining in the sun. Grandpa put his hand on my shoulder. "When I was your age, I came up here with my father," he said. "Now I am here with you." I did not know what to say, so I just held his hand.' },
+      { type: 'paragraph', text: 'We were sitting on a bench to eat our snacks when a monkey jumped down from a tree. Before anyone could move, it grabbed the bag of peanuts out of Grandpa\'s lap and ran back up the trunk. It sat on a branch above us, eating our peanuts one by one, and looked very pleased with itself.' },
+      { type: 'end', text: 'Grandpa says the monkey must be a relative of mine, because it also eats too fast. Tomorrow we go to the beach. I am going to keep my snacks in my pocket.' },
+    ],
+    comprehension: [
+      { q: 'Why are the seats on the train built like steps?', options: ['The hill is so steep', 'So more people can sit', 'So Giri can see the sea', 'The train is old'], answer: 0, type: 'literal' },
+      { q: 'What could Giri see from the lookout point?', options: ['The whole island', 'Only trees', 'Singapore', 'The hotel'], answer: 0, type: 'literal' },
+      { q: 'Why did Giri just hold Grandpa\'s hand at the lookout?', options: ['He did not know what to say', 'He was scared of the monkey', 'He was tired', 'He wanted to go down'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'When Grandpa was a boy, he came up the hill with his father.', options: ['True', 'False', 'The story does not say'], answer: 0, type: 'inferential' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['They rode a train up the hill.', 'Mum showed Giri a tiny lizard.', 'They came to a lookout point.', 'A monkey grabbed the peanuts.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'Why does Grandpa say the monkey must be a relative of Giri?', sampleAnswer: 'He is joking. The monkey eats too fast, and Giri eats too fast too, so Grandpa says they must be family.', markingGuide: 'A good answer says Grandpa is joking, and links it to eating too fast.' },
+    ],
+    vocab: [
+      { word: 'steep', meaning: 'Going up very sharply', icon: '⛰️' },
+      { word: 'lizard', meaning: 'A small animal with scaly skin and a long tail', icon: '🦎' },
+      { word: 'lookout', meaning: 'A high place where you can see far', icon: '🔭' },
+      { word: 'trunk', meaning: 'The thick main part of a tree', icon: '🌳' },
+      { word: 'relative', meaning: 'Someone in your family', icon: '👪' },
+    ],
+    grammarSpotlight: [
+      { pattern: 'Writing a journal', example: '"Today Mum, Grandpa and I flew..." / "Now I am in bed..."', tip: 'A journal tells what happened to you. It uses "I" and "we", and it tells things in the order they happened.' },
+    ],
+    talkAboutIt: [
+      'Grandpa said, "Now I am here with you." Why was that special to him?',
+      'What would you do if a monkey took your snack?',
+    ],
+  },
+
+  {
+    id: 'tale-e-01',
+    band: 'E', level: 5, phase: 'bridge',
+    title: 'How the Kingfisher Got Its Blue Coat',
+    emoji: '\ud83d\udc26',
+    mascotState: 'whiteboard',
+    illustration: 'giri_level03_story03_clever-bird.png.jpg',
+    targetGraphemes: ['ng', 'ue', 'oa', 'ur'],
+    allowedHFWTier: 3,
+    targetWordCount: 0,
+    actualWordCount: 297,
+    decodableRatio: 0.99,
+    textType: 'longer-read',
+    refrainCount: 0,
+    lines: [
+      { type: 'paragraph', text: 'Long ago, when the world was new, the kingfisher was a plain little bird. His feathers were the colour of mud, and nobody looked at him twice. The other birds had bright coats. The parrot was red and green, the sunbird was yellow, and the peacock had a tail full of eyes. The kingfisher sat on his branch by the river and wished that he could shine like them.' },
+      { type: 'paragraph', text: 'One morning, the Sky leaned down to look at herself in the river. As she bent over, a blue bead fell from her necklace and dropped into the water. It sank down, down, down, to the bottom of the deep, dark river. The Sky cried out. "My bead! Who will bring back my bead?"' },
+      { type: 'paragraph', text: 'The parrot said, "I cannot swim." The sunbird said, "The water is too cold." The peacock said, "My tail would get wet." Only the little brown kingfisher said nothing. He stood on his branch, took a deep breath, and dived straight into the river like an arrow.' },
+      { type: 'paragraph', text: 'It was dark and cold under the water, and he could not see. But he kept going, kicking with his feet, until his beak touched something smooth and round. He grabbed the bead and shot back up into the sunlight, dripping and shivering, and placed it in the Sky\'s hand.' },
+      { type: 'paragraph', text: 'The Sky was so pleased that she gave him a coat of bright blue, the colour of her own morning. The setting sun saw what he had done, and painted his chest a warm orange to match.' },
+      { type: 'end', text: 'That is why the kingfisher is blue and orange today. And that is why, even now, he still sits by the river and dives into the water again and again. He is checking that nobody else has dropped a bead.' },
+    ],
+    comprehension: [
+      { q: 'What colour was the kingfisher at the start?', options: ['The colour of mud', 'Bright blue', 'Red and green', 'Yellow'], answer: 0, type: 'literal' },
+      { q: 'How did the bead get into the river?', options: ['It fell from the Sky\'s necklace', 'The parrot dropped it', 'The kingfisher threw it', 'The sun painted it'], answer: 0, type: 'literal' },
+      { q: 'Why did the Sky give the kingfisher a blue coat?', options: ['He brought back her bead', 'He asked for one', 'He was the biggest bird', 'He sang for her'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'The kingfisher could see the bead under the water.', options: ['True', 'False', 'The story does not say'], answer: 1, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['A blue bead fell into the river.', 'The peacock said his tail would get wet.', 'The kingfisher dived into the river.', 'The sun painted his chest orange.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'The other birds had bright coats already. Why did the kingfisher get a new coat, and not them?', sampleAnswer: 'The kingfisher was the only bird who was brave enough to help the Sky. The others just made excuses.', markingGuide: 'A good answer says the kingfisher helped when the other birds would not.' },
+    ],
+    vocab: [
+      { word: 'plain', meaning: 'Not fancy or bright', icon: '🤎' },
+      { word: 'necklace', meaning: 'Beads on a string that you wear round your neck', icon: '📿' },
+      { word: 'arrow', meaning: 'A thin, sharp stick shot from a bow', icon: '🏹' },
+      { word: 'shivering', meaning: 'Shaking because you are cold', icon: '🥶' },
+      { word: 'setting sun', meaning: 'The sun going down in the evening', icon: '🌅' },
+    ],
+    grammarSpotlight: [
+      { pattern: 'How and why tales', example: '"That is why the kingfisher is blue and orange today."', tip: 'A "how" tale is a made-up story that explains something real. It often ends with "That is why..."' },
+    ],
+    talkAboutIt: [
+      'The story says the kingfisher dives to check for beads. What do you think is the real reason a kingfisher dives?',
+      'If you wrote a "how" tale, which animal would you pick, and what would it explain?',
     ],
   },
 

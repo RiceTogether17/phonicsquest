@@ -215,7 +215,8 @@ describe('the other kinds of question', () => {
     // Band B: a word-bank gap on the story's sound, and the story in order.
     // Band C: true or false, the story in order, and something to write.
     // Band D: true or false, a word in its sentence, and something to write.
-    const plan = { B: ['gap', 'order'], C: ['tf', 'order'], D: ['tf', 'gap'] };
+    // Band E: true or false, the events in order, and something to write.
+    const plan = { B: ['gap', 'order'], C: ['tf', 'order'], D: ['tf', 'gap'], E: ['tf', 'order'] };
     for (const story of STORIES.filter((s) => plan[s.band])) {
       const kinds = new Set(story.comprehension.map((q) => q.kind));
       for (const kind of plan[story.band])
