@@ -2,11 +2,23 @@
  * Blend It! — Sequential Guided Mode  (ideal for beginners / new decoders)
  *
  * Step-by-step sound reveal with explicit scaffolding:
- * 1. Show word image + tip prompt
+ * 1. Tip prompt — no picture yet (see below)
  * 2. Child presses "Next Sound" to reveal each phoneme one at a time
  * 3. Visual step-dots track progress
- * 4. After all sounds: explicit "Blend it!" call-to-action plays the word
- * 5. Self-assess
+ * 4. After all sounds: "Your turn!" — the child says the word FIRST, with
+ *    as long as they need. Nothing auto-advances here.
+ * 5. "Check my word" models the blend, says the word and shows the picture
+ * 6. Self-assess: did you say the same word?
+ *
+ * Why the picture waits: shown up front it is a second route to the answer
+ * — a child sees 🐱 and says "cat" without reading a letter, and a screen
+ * reader announced "Picture of cat" before the first sound. As the last
+ * step it confirms the word instead of replacing the decoding.
+ *
+ * Why the child goes first: the app used to blend the word itself half a
+ * second after the last sound (with autoplay on) and then ask "Did you
+ * blend it right?". The child never had to blend. Teacher-led blending runs
+ * I do → you do → check, and the "you do" is the part that builds the skill.
  *
  * Designed for parents and teachers introducing blending to new readers.
  */
@@ -41,7 +53,8 @@ export function setupBlend(word, els) {
   isRevealing = false;
   _blendStyle = store.get('blendStyle') || 'simultaneous';
 
-  renderWordImage(word, els.wordEmoji, true);
+  // Hidden until the word has been blended and heard — see the header.
+  renderWordImage(word, els.wordEmoji, false);
   els.wordDisplay.innerHTML = '';
 
   els.modeInstruction.textContent = 'Press "Next Sound" to hear each sound — then blend!';
@@ -141,28 +154,27 @@ function _renderControls(els, word, stage) {
   } else if (stage === 'blend') {
     els.modeArea.innerHTML = /* html */ `
       <div class="blend-guided-wrap">
-        <div class="blend-blend-cta" id="blend-cta">
-          🔗 Now put them together!
+        <div class="blend-blend-cta" id="blend-cta" aria-live="polite">
+          🗣️ Your turn! Say the sounds fast. What's the word?
         </div>
         ${dotsHtml}
         <button class="btn btn--success btn--xl" id="btn-blend-now"
-                aria-label="Blend all sounds together">
-          🔊 Blend it!
+                aria-label="Check my word: hear the sounds blended together">
+          🔊 Check my word
         </button>
       </div>
     `;
 
+    // No autoplay here, even with autoplay on: this pause is the child's
+    // turn to blend. Playing the word for them is the step that used to
+    // make the whole round a listening exercise.
     document.getElementById('btn-blend-now')?.addEventListener('click', () => {
       _doBlend(word, els);
     });
-
-    if (store.get('autoplay')) {
-      setTimeout(() => _doBlend(word, els), 500);
-    }
   } else if (stage === 'assess') {
     els.modeArea.innerHTML = /* html */ `
       <div class="blend-guided-wrap">
-        <div class="blend-assess-prompt">Did you blend it right?</div>
+        <div class="blend-assess-prompt">Did you say the same word?</div>
         ${dotsHtml}
         <div class="blend-assess-btns">
           <button class="btn btn--success btn--xl" id="btn-self-yes">Yes! ✓</button>
@@ -246,8 +258,10 @@ async function _doBlend(word, els) {
   // Build word animation
   buildWordAnimation(word, els.wordDisplay);
 
-  // Brief pause then say the blended word
+  // Brief pause then say the blended word — and only now show the picture,
+  // as confirmation of the word the child has already said.
   await _delay(300);
+  renderWordImage(word, els.wordEmoji, true);
   await audio.speakWord(word.word);
 
   els.btnSayIt.style.display = '';

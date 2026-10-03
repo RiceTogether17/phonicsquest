@@ -310,6 +310,81 @@ export const PHASE_LABELS = Object.freeze(
 );
 
 /**
+ * What a CHILD reads for each phase and stage.
+ *
+ * The stage names ("CCVCC – Short O", "Diphthong · oi/oy") are the
+ * curriculum's names, right for a teacher's report and unreadable to a
+ * five-year-old choosing what to play. VALIDITY_ROADMAP.md 2.2: child-facing
+ * copy says what the words sound like, with a word to anchor it, and keeps
+ * the technical term as a quiet second line for the grown-up beside them.
+ */
+export const CHILD_PHASE_LABELS = Object.freeze({
+  1: 'Phase 1 · Three-sound words',
+  2: 'Phase 2 · Two sounds at the start',
+  3: 'Phase 3 · Two sounds at the end',
+  4: 'Phase 4 · Two letters, one sound',
+  5: 'Phase 5 · Two sounds at both ends',
+  6: 'Phase 6 · Vowels that say their name',
+  7: 'Phase 7 · Sliding vowels',
+  8: 'Phase 8 · Bossy R and tricky letters',
+  9: 'Phase 9 · Word endings',
+  10: 'Phase 10 · Big words and tricky words',
+});
+
+const CHILD_SHAPE_NAMES = Object.freeze({
+  cvc: 'Three-sound words',
+  ccvc: 'Two sounds at the start',
+  cvcc: 'Two sounds at the end',
+  ccvcc: 'Two sounds at both ends',
+});
+
+const CHILD_STAGE_NAMES = Object.freeze({
+  digraphs: 'Two letters, one sound · sh, ch, th',
+  'long-u-uue': 'ue as in blue and cue',
+  'long-u-ew': 'ew as in flew and few',
+  'long-u-oo': 'oo as in moon',
+  'short-oo': 'oo as in book',
+  'dip-oi': 'oi and oy · coin, boy',
+  'dip-ou': 'ou and ow · out, cow',
+  'dip-aw': 'aw as in paw',
+  'blends-review': 'Blends review',
+  'rc-ar-or': 'Bossy R · car, fork',
+  'rc-er-ir-ur': 'Bossy R · her, bird, fur',
+  'cons-tch-dge': 'tch and dge · catch, badge',
+  'cons-ph': 'ph as in phone',
+  'cons-soft-cg': 'Soft c and g · ice, gem',
+  'suffix-ing': 'Endings · -ing as in jumping',
+  'suffix-ed': 'Endings · -ed as in jumped',
+  'suffix-er': 'Endings · -er as in faster',
+  'suffix-est': 'Endings · -est as in fastest',
+  prefixes: 'Beginnings · re- and un-',
+  'suffixes-advanced': 'Longer endings · -tion, -able',
+  multisyllable: 'Long words · clap the parts',
+  'sight-highfreq': 'Tricky words',
+});
+
+/**
+ * The name a child reads for a stage: "Three-sound words · a as in cat",
+ * "ai as in rain", "Bossy R · car, fork".
+ * @param {{ id: string, name: string, sampleWords?: string[] }} stage
+ * @returns {string}
+ */
+export function childStageName(stage) {
+  if (!stage) return '';
+  if (CHILD_STAGE_NAMES[stage.id]) return CHILD_STAGE_NAMES[stage.id];
+  const key = stage.sampleWords?.[0];
+  const shape = /^(cvc|ccvc|cvcc|ccvcc)-([aeiou]|mixed)$/.exec(stage.id);
+  if (shape) {
+    const tail = shape[2] === 'mixed' ? 'all five vowels' : `${shape[2]} as in ${key}`;
+    return `${CHILD_SHAPE_NAMES[shape[1]]} · ${tail}`;
+  }
+  // Long-vowel stages: "Long A · a_e" → "a_e as in cake".
+  const spelling = /·\s*(\S+)\s*$/.exec(stage.name)?.[1];
+  if (/^long-/.test(stage.id) && spelling && key) return `${spelling} as in ${key}`;
+  return stage.name;
+}
+
+/**
  * Curriculum stages in learning order.
  * `group` maps to a WORD_GROUPS key or a structural-vowel key (e.g. 'cvc-a').
  *
@@ -1122,60 +1197,11 @@ export function getStagesInPhase(phaseNumber) {
   return CURRICULUM.filter(s => s.phase === phaseNumber);
 }
 
-/**
- * Returns which curriculum stages are unlocked based on mastery scores.
- * @param {Record<string, number>} groupMastery - map of group -> accuracy (0-1)
- * @returns {string[]} array of unlocked stage IDs
- */
-export function getUnlockedStages(groupMastery) {
-  const unlocked = [];
-
-  for (const stage of CURRICULUM) {
-    if (!stage.prerequisite) { unlocked.push(stage.id); continue; }
-
-    const prereq = CURRICULUM.find(s => s.id === stage.prerequisite);
-    if (!prereq) continue;
-    if (!unlocked.includes(prereq.id)) continue;
-
-    const prereqAccuracy = getStageAccuracy(prereq, groupMastery);
-    if (prereqAccuracy >= stage.requiredMastery) {
-      unlocked.push(stage.id);
-    }
-  }
-
-  return unlocked;
-}
-
-/**
- * Average accuracy across all groups in a stage.
- * @param {object} stage
- * @param {Record<string, number>} groupMastery
- * @returns {number} 0-1
- */
-function getStageAccuracy(stage, groupMastery) {
-  const groups = stage.groups ?? [stage.group];
-  if (!groups.length) return 0;
-  const scores = groups.map(g => groupMastery[g] ?? 0);
-  return scores.reduce((a, b) => a + b, 0) / scores.length;
-}
-
-/**
- * Get the recommended next stage for the child based on current progress.
- * @param {Record<string, number>} groupMastery
- * @returns {object|null} curriculum stage
- */
-export function getRecommendedStage(groupMastery) {
-  const unlocked = getUnlockedStages(groupMastery);
-
-  for (const id of unlocked) {
-    const stage = CURRICULUM.find(s => s.id === id);
-    const accuracy = getStageAccuracy(stage, groupMastery);
-    if (accuracy < MASTERY_THRESHOLD) return stage;
-  }
-
-  const lastId = unlocked[unlocked.length - 1];
-  return CURRICULUM.find(s => s.id === lastId) ?? null;
-}
+// Stage unlocking and the recommended next stage live in modules/progression.js,
+// which applies the full gate (independent accuracy, spelling, word variety,
+// separate days, vowel confusion). The accuracy-only versions that used to sit
+// here were retired once nothing called them: an unlock rule in two places is
+// one more than the curriculum can keep consistent. VALIDITY_ROADMAP.md 1.2.
 
 /**
  * XP rewards by action.

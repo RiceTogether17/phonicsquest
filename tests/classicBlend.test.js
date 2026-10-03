@@ -108,6 +108,32 @@ describe('setupClassicBlend', () => {
     expect(els.wordDisplay.innerHTML).toBe('');
     // Only the current word is on screen: 3 phoneme tiles (l · i · st).
     expect(els.phonemeRow.querySelectorAll('.phoneme-tile').length).toBe(3);
-    expect(els.wordEmoji.textContent).toBe('📋');
+  });
+
+  it('shows the picture only after the word has been heard', async () => {
+    // Shown with the tiles, the picture lets a child name it instead of
+    // reading: 📋 → "list" without decoding l-i-st.
+    const { audio } = await import('../src/modules/audio.js');
+    vi.spyOn(audio, 'speakPhoneme').mockResolvedValue(undefined);
+    const speakWord = vi.spyOn(audio, 'speakWord').mockResolvedValue(undefined);
+    vi.useFakeTimers();
+    try {
+      const els = makeEls();
+      setupClassicBlend(LIST, els);
+      expect(els.wordEmoji.textContent).toBe('');
+
+      document.getElementById('btn-classic-play').click();
+      // Think time: the child is asked for the word before the app says it.
+      await vi.advanceTimersByTimeAsync(1200);
+      expect(els.modeInstruction.textContent).toMatch(/What's the word/);
+      expect(speakWord).not.toHaveBeenCalled();
+
+      await vi.runAllTimersAsync();
+      expect(speakWord).toHaveBeenCalledWith('list');
+      expect(els.wordEmoji.textContent).toBe('📋');
+    } finally {
+      vi.useRealTimers();
+      vi.restoreAllMocks();
+    }
   });
 });

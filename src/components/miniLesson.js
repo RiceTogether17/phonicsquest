@@ -18,7 +18,7 @@
 
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
-import { CURRICULUM } from '../data/curriculum.js';
+import { CURRICULUM, childStageName } from '../data/curriculum.js';
 import { WORDS } from '../data/words.js';
 import { renderPhonemes } from './phonemeDisplay.js';
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
@@ -119,7 +119,7 @@ export function showMiniLesson({ stage, lesson, onDone }) {
   overlay.className = 'mini-lesson-overlay';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
-  overlay.setAttribute('aria-label', `Lesson: ${stage.name}`);
+  overlay.setAttribute('aria-label', `Lesson: ${childStageName(stage)}`);
   document.body.appendChild(overlay);
   document.addEventListener('keydown', _onKeydown);
 
@@ -223,7 +223,7 @@ function _renderTeachStep(overlay, stage, lesson, onNext) {
       <div class="mini-lesson-step-tag">Lesson · Step 1 of 2</div>
       <div class="mini-lesson-mascot" aria-hidden="true">${giriInline('whiteboard', 56)}</div>
       <h2 class="mini-lesson-headline">${escapeHtml(lesson.headline)}</h2>
-      <p class="mini-lesson-stage">${escapeHtml(stage.name)}</p>
+      <p class="mini-lesson-stage">${escapeHtml(childStageName(stage))}</p>
       ${chips ? `<div class="mini-lesson-chips" role="group" aria-label="Tap to hear the sounds">${chips}</div>` : ''}
       <ol class="mini-lesson-script">${scriptLines}</ol>
       ${confusions}
@@ -270,7 +270,7 @@ function _renderWeDoStep(overlay, stage, lesson, onDone) {
       <div class="mini-lesson-step-tag">Lesson · Step 2 of 2</div>
       <div class="mini-lesson-mascot" aria-hidden="true">${giriInline('holdCard', 56)}</div>
       <h2 class="mini-lesson-headline">Let's read one together!</h2>
-      <p class="mini-lesson-stage">${escapeHtml(stage.name)}</p>
+      <p class="mini-lesson-stage">${escapeHtml(childStageName(stage))}</p>
       <div class="mini-lesson-word">
         ${word?.emoji ? `<span class="mini-lesson-emoji" aria-hidden="true">${word.emoji}</span>` : ''}
         <div class="mini-lesson-tiles phoneme-row" id="mini-lesson-tiles" role="list" aria-label="Sounds in ${escapeAttr(lesson.weDoWord)}"></div>

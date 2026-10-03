@@ -233,6 +233,35 @@ describe('Blend It! — cumulative reveal', () => {
     };
   }
 
+  it('waits for the child to blend before saying the word or showing the picture', async () => {
+    // The app used to blend the word itself 0.5 s after the last sound and
+    // then ask "Did you blend it right?" — the child never had to blend.
+    store.set('blendStyle', 'simultaneous');
+    store.set('autoplay', true);
+    const { setupBlend, cleanup: blendCleanup } = await import('../src/modes/blend.js');
+    blendCleanup();
+    vi.spyOn(audio, 'speakPhoneme').mockResolvedValue();
+    const speakWord = vi.spyOn(audio, 'speakWord').mockResolvedValue();
+
+    const els = makeEls();
+    setupBlend(LIST, els);
+    expect(els.wordEmoji.textContent).toBe('');
+
+    // Autoplay reveals every sound, then hands over to the child.
+    await vi.waitFor(
+      () => expect(document.getElementById('blend-cta')?.textContent).toMatch(/Your turn/),
+      { timeout: 6000 },
+    );
+    await new Promise((r) => setTimeout(r, 1200));
+    expect(speakWord).not.toHaveBeenCalled();
+    expect(els.wordEmoji.textContent).toBe('');
+
+    document.getElementById('btn-blend-now').click();
+    await vi.waitFor(() => expect(speakWord).toHaveBeenCalledWith('list'), { timeout: 6000 });
+    expect(els.wordEmoji.textContent).toBe('📋');
+    blendCleanup();
+  }, 15000);
+
   it('shows the blend-style toggle before the first reveal', async () => {
     store.set('blendStyle', 'simultaneous');
     const { setupBlend, cleanup: blendCleanup } = await import('../src/modes/blend.js');

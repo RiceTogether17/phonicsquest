@@ -112,7 +112,7 @@ import {
   LESSON_BONUS_XP,
 } from './modules/lessonRunner.js';
 import { describeLessonSteps } from './modules/lessonComposer.js';
-import { CURRICULUM, PHASES, PHASE_LABELS } from './data/curriculum.js';
+import { CURRICULUM, PHASES, CHILD_PHASE_LABELS, childStageName } from './data/curriculum.js';
 import { getStagesForMode, usesStagePicker } from './modules/phonicsProgression.js';
 import {
   buildProgressionSnapshot,
@@ -2802,7 +2802,8 @@ class App {
 
     let stagesHtml = '';
     for (const [phaseNum, stages] of Object.entries(byPhase)) {
-      const phaseLabel = PHASE_LABELS[phaseNum] || `Phase ${phaseNum}`;
+      // Child-facing headers; the technical term rides on each stage below.
+      const phaseLabel = CHILD_PHASE_LABELS[phaseNum] || `Phase ${phaseNum}`;
       stagesHtml += `<div class="bp-phase-header">${phaseLabel}</div><div class="bp-phase-stages">`;
 
       for (const stage of stages) {
@@ -2820,12 +2821,13 @@ class App {
           <button class="bp-stage ${lockedCls} ${recCls}"
                   data-group="${stage.group}"
                   ${isUnlocked ? '' : 'disabled aria-disabled="true"'}
-                  aria-label="${stage.name}${isRec ? ' – Recommended' : ''}${!isUnlocked ? ' – Locked' : ''}">
+                  aria-label="${childStageName(stage)} (${stage.name})${isRec ? ' – Recommended' : ''}${!isUnlocked ? ' – Locked' : ''}">
             <span class="bp-stage-icon">${isUnlocked ? stage.icon : '🔒'}</span>
             <div class="bp-stage-info">
               <div class="bp-stage-name">
-                ${stage.name}${isRec ? '<span class="bp-rec-badge">★ Next</span>' : ''}
+                ${childStageName(stage)}${isRec ? '<span class="bp-rec-badge">★ Next</span>' : ''}
               </div>
+              <div class="bp-stage-tech">${stage.name}</div>
               <div class="bp-stage-desc">${stage.description}</div>
               ${
                 isUnlocked

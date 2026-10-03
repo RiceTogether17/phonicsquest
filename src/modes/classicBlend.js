@@ -9,6 +9,11 @@
  *  • Category selector — pick any word group freely
  *  • Speed control — Slow / Normal / Fast playback
  *  • Self-assessment after first play
+ *  • Think time: after the last sound, a short pause asks the child to say
+ *    the word before the app does
+ *
+ * The picture appears once the word has been heard, never before: shown
+ * with the tiles it lets a child name the picture instead of reading them.
  *
  * For step-by-step guided blending use "Blend It!" instead.
  */
@@ -29,6 +34,10 @@ let isPlaying = false;
 let startTime = 0;
 let _speed = 'normal'; // 'slow' | 'normal' | 'fast'
 let _blendStyle = 'simultaneous'; // 'simultaneous' | 'cumulative'
+let _heardOnce = false; // has the child heard this word blended yet?
+
+/** Pause after the last sound for the child to say the word themselves. */
+const THINK_TIME_MS = 1800;
 
 /** Inter-phoneme delay (ms) per speed setting */
 const SPEED_DELAY = { slow: 600, normal: 320, fast: 120 };
@@ -41,10 +50,12 @@ const SPEED_DELAY = { slow: 600, normal: 320, fast: 120 };
 export function setupClassicBlend(word, els) {
   currentWord = word;
   isPlaying = false;
+  _heardOnce = false;
   startTime = Date.now();
   _blendStyle = store.get('blendStyle') || 'simultaneous';
 
-  renderWordImage(word, els.wordEmoji, true);
+  // The picture is the answer; it waits until the word has been heard.
+  renderWordImage(word, els.wordEmoji, false);
 
   // Clear the assembled-word tiles. This mode shows only the emoji + the
   // labelled phoneme row; it never populates #word-display itself. Without
@@ -280,10 +291,20 @@ async function _playSounds(word, els) {
 
     tiles.forEach((t) => t.classList.remove('active'));
 
-    await _delay(Math.min(delay, 300));
+    // Think time: the child says the word before hearing it. Only on the
+    // first play — a replay is for checking, and waiting again just stalls.
+    if (!_heardOnce) {
+      els.modeInstruction.textContent = "🗣️ What's the word? Say it!";
+      await _delay(THINK_TIME_MS);
+      els.modeInstruction.textContent = 'Listen to each sound — then blend!';
+    } else {
+      await _delay(Math.min(delay, 300));
+    }
     await audio.speakWord(word.word);
   }
 
+  _heardOnce = true;
+  renderWordImage(word, els.wordEmoji, true);
   isPlaying = false;
 
   _renderControls(els, word, true);
