@@ -50,6 +50,10 @@ const NAME_OVERRIDES = Object.freeze({
   'play-b-01': 'Mole', // No. No. Also No. (A Play)
   'review-c-01': 'Mei Ling', // The Missing Badge
   'review-d-01': 'The Kittens', // Who Is on the Stairs?
+  'core-b-18': 'The White Kite', // Mrs Tan Flies a Kite
+  'core-b-19': 'Lime Pie', // Who Took the Lime Pie?
+  'core-b-20': 'Loose Tooth', // Mei Ling's Loose Tooth
+  'core-b-21': 'The Goose', // Shoo, Goose, Shoo!
 });
 
 /**
