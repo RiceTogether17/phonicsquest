@@ -590,7 +590,7 @@ export function cleanToken(token) {
 }
 
 /** Line types whose words a child is asked to decode. */
-const COUNTABLE_LINE_TYPES = new Set(['text', 'intro', 'beat', 'paragraph', 'end']);
+const COUNTABLE_LINE_TYPES = new Set(['text', 'intro', 'beat', 'paragraph', 'end', 'script']);
 
 /**
  * The decodable-text tokens of a story: words from countable lines split

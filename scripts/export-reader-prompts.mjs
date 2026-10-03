@@ -132,6 +132,20 @@ function pagesOf(story) {
       heading = line.text;
       continue;
     }
+    if (line.type === 'script') {
+      // A line in a play keeps its speaker, so the page says who talks, and
+      // three lines share a page: one picture per line would be a picture
+      // for "Yes!".
+      const said = `${line.role}: ${line.text}`;
+      const last = pages.at(-1);
+      if (last?.lines && last.lines < 3) {
+        last.text += ` / ${said}`;
+        last.lines += 1;
+      } else {
+        pages.push({ text: said, lines: 1 });
+      }
+      continue;
+    }
     pages.push({ text: line.text, ...(tag && { tag }), ...(heading && { heading }) });
     tag = undefined;
     heading = undefined;

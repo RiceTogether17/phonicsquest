@@ -106,6 +106,7 @@ const VALID_LINE_TYPES = new Set([
   'beat',
   'paragraph',
   'chapter',
+  'script', // a line in a play, with its speaker in `role`
 ]);
 
 /**
@@ -121,16 +122,16 @@ const STORY_SUFFICIENCY_TARGETS = [
   { band: 'B', phase: 'long-a', min: 3 },
   { band: 'B', phase: 'long-e', min: 3 },
   { band: 'B', phase: 'long-i', min: 3 },
-  { band: 'B', phase: 'long-o', min: 3 },
-  { band: 'B', phase: 'long-u', min: 3 },
+  { band: 'B', phase: 'long-o', min: 4 },
+  { band: 'B', phase: 'long-u', min: 4 },
   { band: 'B', phase: 'short-digraphs', min: 2 },
   { band: 'B', phase: 'extension-sg', min: 5 },
   { band: 'C', phase: 'r-controlled', min: 7 },
   { band: 'C', phase: 'digraphs', min: 3 },
-  { band: 'C', phase: 'suffixes', min: 1 },
+  { band: 'C', phase: 'suffixes', min: 2 },
   { band: 'C', phase: 'extension-sg', min: 1 },
   { band: 'D', phase: 'diphthongs', min: 4 },
-  { band: 'D', phase: 'advanced-vowel', min: 6 },
+  { band: 'D', phase: 'advanced-vowel', min: 7 },
   { band: 'D', phase: 'chapter', min: 5 },
 ];
 

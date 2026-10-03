@@ -1182,6 +1182,55 @@ export const STORIES = [
     talkAboutIt: ['What made Mole come out of his hole in the end?'],
   },
 
+  // ── Plays: a story told in parts, to read aloud together ──────────────
+  // A play is a favourite story rewritten as lines for parts, for a child to
+  // read with a sibling or a grown-up. Each line names its speaker in `role`;
+  // the reader shows the name as a label, not as words to decode, and the
+  // cast note invites readers to swap parts for a second read.
+
+  {
+    id: 'play-b-01',
+    band: 'B', level: 2, phase: 'long-o',
+    title: 'No. No. Also No. (A Play)',
+    emoji: '\ud83c\udfad',
+    mascotState: 'encourage',
+    illustration: 'giri_level02_story23_mole-no.jpg',
+    targetGraphemes: ['o_e', 'oa'],
+    allowedHFWTier: 2,
+    targetWordCount: 79,
+    actualWordCount: 79,
+    decodableRatio: 0.94,
+    textType: 'story-reader',
+    refrainCount: 0,
+    roles: ['Narrator', 'Giri', 'Mole'],
+    lines: [
+      { type: 'script', role: 'Narrator', text: 'Mole was at home, under a big stone.' },
+      { type: 'script', role: 'Giri',     text: 'Come and play, Mole!' },
+      { type: 'script', role: 'Mole',     text: 'No. It is cold. I will stay home.' },
+      { type: 'script', role: 'Giri',     text: 'We can float a boat on the lake!' },
+      { type: 'script', role: 'Mole',     text: 'No. Also no. Still no.' },
+      { type: 'script', role: 'Narrator', text: 'Giri held up two hot buns.' },
+      { type: 'script', role: 'Giri',     text: 'Does Mole want one?' },
+      { type: 'script', role: 'Narrator', text: 'A pink nose came out.' },
+      { type: 'script', role: 'Mole',     text: 'So... one bun is for me?' },
+      { type: 'script', role: 'Giri',     text: 'Yes!' },
+      { type: 'script', role: 'Narrator', text: 'Out came Mole. No coat. No hat.' },
+      { type: 'script', role: 'Giri',     text: 'See? It is fun out here.' },
+      { type: 'script', role: 'Mole',     text: 'The bun is why I came. But yes — also the fun.' },
+    ],
+    comprehension: [
+      { q: 'Where was Mole at the start?', options: ['At home, under a big stone', 'At the lake', 'In a boat'], answer: 0, type: 'literal' },
+      { q: 'What did Giri hold up?', options: ['Two hot buns', 'A boat', 'A coat'], answer: 0, type: 'literal' },
+      { q: 'Why did Mole come out in the end?', options: ['He wanted a bun', 'He liked the cold', 'He wanted to float a boat'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'We can float a ___ on the lake!', options: ['boat', 'bat', 'bit'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Mole said he will stay home.', 'Giri held up two hot buns.', 'Out came Mole.'], type: 'sequence' },
+    ],
+    talkAboutIt: [
+      'Mole says "No" again and again. How should you read his lines to show how he feels?',
+      'Why do you think Mole said the bun was why he came?',
+    ],
+  },
+
   {
     id: 'core-b-sw-02',
     band: 'B', level: 2, phase: 'long-e',
@@ -1214,6 +1263,46 @@ export const STORIES = [
       { kind: 'order', q: 'Put these in the order they happened.', events: ['The bee went from tree to tree.', 'The bee sat still on a green stem.', 'It was a bed of mint!'], type: 'sequence' },
     ],
     talkAboutIt: ['How did the bee help Giri find the sweet spot?'],
+  },
+
+  // ── Review readers: every sound the band has taught, in one story ─────
+  // Like a workbook's check-out lesson: after a band's sets, one story that
+  // mixes all of its spellings, so a child meets them side by side.
+
+  {
+    id: 'review-b-01',
+    band: 'B', level: 2, phase: 'long-u',
+    title: 'The Snail Race',
+    emoji: '\ud83d\udc0c',
+    mascotState: 'celebrate',
+    illustration: 'giri_level02_story05_snail.jpg',
+    targetGraphemes: ['a_e', 'ai', 'ay', 'ee', 'ea', 'i_e', 'igh', 'ow', 'ue', 'oo'],
+    allowedHFWTier: 2,
+    targetWordCount: 78,
+    actualWordCount: 78,
+    decodableRatio: 0.97,
+    textType: 'story-reader',
+    refrainCount: 2,
+    lines: [
+      { type: 'intro',   text: 'Jay had a snail named Blue. Giri had a snail named Pine. Today was race day by the lake.' },
+      { type: 'refrain', text: 'Slow and low, go, snail, go!' },
+      { type: 'label',   text: 'Problem:' },
+      { type: 'beat',    text: 'Pine shot off fast. Blue was slow, slow, slow. Jay gave a sigh.' },
+      { type: 'label',   text: 'Attempt:' },
+      { type: 'beat',    text: '"Keep going, Blue!" said Jay. Then Pine stopped to eat a green leaf. And another. And another!' },
+      { type: 'refrain', text: 'Slow and low, go, snail, go!' },
+      { type: 'label',   text: 'Solution:' },
+      { type: 'beat',    text: 'Blue crept on, inch by inch, past the leaf and past the line.' },
+      { type: 'end',     text: 'The winner was Blue! "Soon Pine will need a nap," said Giri, "on a full tummy!"' },
+    ],
+    comprehension: [
+      { q: 'What was Jay\'s snail called?', options: ['Blue', 'Pine', 'Green'], answer: 0, type: 'literal' },
+      { q: 'What did Pine stop to do?', options: ['Eat a green leaf', 'Take a nap', 'Go home'], answer: 0, type: 'literal' },
+      { q: 'Why did Blue win the race?', options: ['Pine stopped to eat', 'Blue was fast', 'Jay gave Blue a ride'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'Jay gave a ___.', options: ['sigh', 'sag', 'sip'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Pine shot off fast.', 'Pine stopped to eat a green leaf.', 'Blue crept past the line.'], type: 'sequence' },
+    ],
+    talkAboutIt: ['Pine was fast, but Blue won. Why do you think that happened?'],
   },
 
   // ╔══════════════════════════════════════════════════════════════════════════╗
@@ -1779,6 +1868,51 @@ export const STORIES = [
     ],
   },
 
+  {
+    id: 'review-c-01',
+    band: 'C', level: 3, phase: 'suffixes',
+    title: 'The Missing Badge',
+    emoji: '\ud83d\udcdb',
+    mascotState: 'thinking',
+    illustration: 'giri_sg_school.jpg',
+    targetGraphemes: ['ar', 'or', 'ir', 'ur', 'tch', 'dge', 'ph', 'ed', 'ing'],
+    allowedHFWTier: 3,
+    targetWordCount: 127,
+    actualWordCount: 127,
+    decodableRatio: 0.98,
+    textType: 'fluency-reader',
+    refrainCount: 0,
+    lines: [
+      { type: 'paragraph', text: 'It was the morning of the school march. Mei Ling had a purple badge for her shirt, but now it was missing. "I had it in the first lesson!" she cried.' },
+      { type: 'paragraph', text: 'Giri helped her hunt for it. They checked under the bench, behind the hedge and in the kitchen. They looked in the porch and by the sports shed. Giri even turned out his own bag. No badge!' },
+      { type: 'paragraph', text: 'Then Mr Lim stepped up with his phone to take a photo of the class. "Smile, Mei Ling!" he said. Mei Ling turned to face him, and Giri burst out giggling.' },
+      { type: 'end',       text: '"Look — the badge!" said Giri. It was pinned to the back of her hat the whole time. Mei Ling went pink, then marched off with a big grin.' },
+    ],
+    comprehension: [
+      { q: 'What did Mei Ling lose?', options: ['Her purple badge', 'Her hat', 'Her bag', 'Her phone'], answer: 0, type: 'literal' },
+      { q: 'Where did Giri and Mei Ling look first?', options: ['Under the bench', 'In the porch', 'By the sports shed', 'In his bag'], answer: 0, type: 'literal' },
+      { q: 'Why did Giri burst out giggling?', options: ['The badge was on the back of her hat', 'Mr Lim told a joke', 'Mei Ling fell over', 'The photo was funny'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'They found the badge when they checked the kitchen.', options: ['True', 'False', 'The story does not say'], answer: 1, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['They checked under the bench.', 'Mr Lim stepped up with his phone.', 'Mei Ling marched off with a big grin.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'Why do you think Mei Ling went pink at the end?', sampleAnswer: 'She felt a bit silly, because the badge had been on her own hat the whole time while everyone hunted for it.', markingGuide: 'A good answer says she felt silly or shy, and says where the badge was.' },
+    ],
+    vocab: [
+      { word: 'badge', meaning: 'A small sign you pin on your clothes', icon: '\ud83d\udcdb' },
+      { word: 'porch', meaning: 'A covered space just outside a door', icon: '\ud83d\udeaa' },
+      { word: 'giggling', meaning: 'Laughing in a light, silly way', icon: '\ud83e\udd2d' },
+      { word: 'pinned', meaning: 'Held in place with a pin', icon: '\ud83d\udccc' },
+    ],
+    grammarSpotlight: [
+      { pattern: 'Past tense -ed', example: '"checked", "looked", "turned", "stepped", "pinned", "marched"', tip: 'Adding -ed shows it already happened. Some words double their last letter first: step → stepped, pin → pinned.' },
+    ],
+    talkAboutIt: [
+      'Where was the badge the whole time? How did the photo help them find it?',
+      'Why do you think nobody saw the badge on her hat?',
+    ],
+  },
+
   // ╔══════════════════════════════════════════════════════════════════════════╗
   // ║  BAND D — Bridge Readers  (6 books)                                   ║
   // ║  140–250 words · multi-paragraph · no fixed refrain · Tier flexible   ║
@@ -2253,6 +2387,53 @@ export const STORIES = [
     talkAboutIt: [
       "What was Giri saving his coins for at the start?",
       "Why did Giri change his mind about the robot?",
+    ],
+  },
+
+  {
+    id: 'review-d-01',
+    band: 'D', level: 4, phase: 'advanced-vowel',
+    title: 'Who Is on the Stairs?',
+    emoji: '\ud83d\udc08',
+    mascotState: 'thinking',
+    illustration: 'giri_level04_story09_scout.jpg',
+    targetGraphemes: ['ow', 'ou', 'oi', 'oy', 'aw', 'au', 'air', 'are', 'ear', 'eer', 'ere'],
+    allowedHFWTier: 3,
+    targetWordCount: 205,
+    actualWordCount: 205,
+    decodableRatio: 1.00,
+    textType: 'bridge-reader',
+    refrainCount: 0,
+    lines: [
+      { type: 'paragraph', text: 'Mrs Tan was away for the night, so Scout was staying with Giri. At bedtime, Scout would not settle. He sat by the door with his ears up and let out a low growl.' },
+      { type: 'paragraph', text: 'Then Giri heard it too: a scratch, a thump, and a soft little noise from the stairs. His heart pounded. Was it a thief? He grabbed his torch, took a deep breath, and crept out to the stairwell with Scout.' },
+      { type: 'paragraph', text: 'There, on the stair below, sat an old cardboard box. Giri shone his torch inside, and his jaw dropped. A mother cat lay curled up in the box, and beside her were four tiny kittens, no bigger than a sock.' },
+      { type: 'paragraph', text: 'Scout did not bark. He lay down near the box and gave a soft whine, as if to say, "Careful. They are scared." Giri paused, then gave a quiet cheer. His brave, loyal dog had not been growling at a thief at all. He had been guarding them.' },
+      { type: 'end',       text: 'Giri brought out a bowl of water and an old towel for the box. In the morning, Mrs Tan came home and found a happy surprise: her dog had a new job. Scout was a kitten guard, and he was proud of it.' },
+    ],
+    comprehension: [
+      { q: 'Why was Scout staying with Giri?', options: ['Mrs Tan was away for the night', 'Scout was lost', 'Giri wanted a dog', 'Scout was sick'], answer: 0, type: 'literal' },
+      { q: 'What was in the cardboard box?', options: ['A mother cat and four kittens', 'A thief', 'A lost sock', 'Scout\'s toys'], answer: 0, type: 'literal' },
+      { q: 'Why did Scout growl at bedtime?', options: ['He heard the cats on the stairs', 'He was hungry', 'He missed Mrs Tan', 'He wanted to play'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Scout barked at the kittens in the box.', options: ['True', 'False', 'The story does not say'], answer: 1, type: 'literal' },
+      { kind: 'gap', q: 'He sat by the door with his ears up and let out a low ___.', options: ['growl', 'whine', 'thief'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'Was Scout a good guard dog? Why?', sampleAnswer: 'Yes. He growled to warn Giri about the noise, but when he saw the scared kittens he did not bark. He kept them safe.', markingGuide: 'A good answer says yes or no, and uses what Scout did in the story.' },
+    ],
+    vocab: [
+      { word: 'settle', meaning: 'To get calm and comfortable', icon: '\ud83d\udecf\ufe0f' },
+      { word: 'growl', meaning: 'A low, angry sound a dog makes', icon: '\ud83d\udc15' },
+      { word: 'thief', meaning: 'Someone who takes things that are not theirs', icon: '\ud83d\udd75\ufe0f' },
+      { word: 'whine', meaning: 'A soft, high, sad sound', icon: '\ud83e\udd7a' },
+      { word: 'guarding', meaning: 'Keeping something safe from harm', icon: '\ud83d\udee1\ufe0f' },
+    ],
+    grammarSpotlight: [
+      { pattern: 'Sound words', example: '"growl", "scratch", "thump", "whine", "cheer"', tip: 'Writers use words for sounds so you can hear the story as you read it.' },
+    ],
+    talkAboutIt: [
+      'How did Giri feel when he first heard the noise? Which words tell you?',
+      'Why do you think Scout did not bark at the box?',
     ],
   },
 

@@ -251,9 +251,9 @@ release; the budget is the teaching stage inside it.
 | Band | Length | High-frequency word cap | Stories |
 | --- | --- | --- | --- |
 | A | 25–45 words | tier 1 | 16 |
-| B | 45–80 words | tier 2 | 24 |
-| C | 80–140 words | tier 3 | 13 |
-| D | 140–250 words | tier 3 | 16 |
+| B | 45–80 words | tier 2 | 26 |
+| C | 80–140 words | tier 3 | 14 |
+| D | 140–250 words | tier 3 | 17 |
 
 **The guarantee:** every word in every story is readable by some taught
 route — decodable at the story's phase, a high-frequency word within its
