@@ -16,6 +16,7 @@
  * @param {() => void}  onDone      – called when child presses "Back to Library"
  */
 import { clueForQuestion } from '../modules/storyClue.js';
+import { shuffleArray } from '../data/words.js';
 import { html } from '../utils/html.js';
 
 export function runStoryQuest(container, story, onDone) {
@@ -95,6 +96,12 @@ export function runStoryQuest(container, story, onDone) {
     // ("what does this story teach us?") whose answer is in no one sentence.
     state.clue = clueForQuestion(story, q);
     state.hadClue = false;
+    // The story bank stores every right answer first. Shown in that order, a
+    // child could tap A every time and score full marks without reading a
+    // word, so the options are shuffled once per question. Each button keeps
+    // its option's index in the data, which is what the answer is checked
+    // against.
+    const order = shuffleArray(q.options.map((_, i) => i));
 
     container.innerHTML = /* html */ `
       <div class="sq-screen sq-comprehension">
@@ -109,12 +116,12 @@ export function runStoryQuest(container, story, onDone) {
         </div>
 
         <div class="sq-options" id="sq-options">
-          ${q.options
+          ${order
             .map(
-              (opt, i) => /* html */ `
-            <button class="sq-option" data-idx="${i}" aria-label="${opt}">
-              <span class="sq-option-letter">${String.fromCharCode(65 + i)}</span>
-              <span class="sq-option-text">${opt}</span>
+              (idx, pos) => /* html */ `
+            <button class="sq-option" data-idx="${idx}" aria-label="${q.options[idx]}">
+              <span class="sq-option-letter">${String.fromCharCode(65 + pos)}</span>
+              <span class="sq-option-text">${q.options[idx]}</span>
             </button>
           `,
             )
@@ -170,10 +177,11 @@ export function runStoryQuest(container, story, onDone) {
       state.correct++;
     }
 
-    document.querySelectorAll('.sq-option').forEach((b, i) => {
+    document.querySelectorAll('.sq-option').forEach((b) => {
+      const idx = parseInt(b.dataset.idx, 10);
       b.disabled = true;
-      if (i === q.answer) b.classList.add('sq-option--correct');
-      if (i === chosen && !correct) b.classList.add('sq-option--wrong');
+      if (idx === q.answer) b.classList.add('sq-option--correct');
+      if (idx === chosen && !correct) b.classList.add('sq-option--wrong');
     });
 
     if (feedback) {
