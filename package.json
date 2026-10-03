@@ -23,7 +23,8 @@
     "prepare": "simple-git-hooks || true",
     "gen:scope": "node scripts/gen-scope-sequence.mjs",
     "gen:sw": "node scripts/gen-sw-manifest.mjs",
-    "check:scope": "node scripts/gen-scope-sequence.mjs --check"
+    "check:scope": "node scripts/gen-scope-sequence.mjs --check",
+    "export:readers": "node scripts/export-reader-prompts.mjs"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.2",
