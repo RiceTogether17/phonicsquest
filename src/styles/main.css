@@ -5359,6 +5359,46 @@ details.story-tool-section[open] > .story-tool-summary::before {
   font-size: var(--font-size-sm);
 }
 
+/* Story Quest question kinds: true or false, fill the gap, put in order. */
+.sq-kind-label {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+.sq-gap {
+  display: inline-block;
+  min-width: 4em;
+  margin: 0 0.15em;
+  border-bottom: 3px solid var(--color-primary);
+  text-align: center;
+}
+.sq-gap--filled {
+  color: var(--color-success-text);
+}
+.sq-order-event--picked,
+.sq-order-event--shown {
+  border-color: var(--color-primary);
+}
+.sq-order-event--picked .sq-option-letter {
+  background: var(--color-primary);
+  color: #fff;
+}
+.sq-written {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.sq-written-model summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.sq-written-check {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
 /* ── "Where you stopped" ─────────────────────────────────────────────────
    Shown rather than silently jumped to: landing halfway down a story with no
    explanation is disorienting, and a child who wants to start again has to

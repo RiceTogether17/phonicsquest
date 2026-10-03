@@ -3,21 +3,58 @@
  *
  * Flow:
  *   1. Intro card  – "Story Quest! Let's check what you know."
- *   2. Comprehension (3 MCQ, one at a time)
- *   3. Vocab Explorer (5 flip cards: word → meaning + emoji)
- *   4. Grammar Spotlight (1–2 patterns with example & tip)
- *   5. Done screen  – score badge + stars earned
+ *   2. Questions, one at a time (see the kinds below)
+ *   3. Written answers (`openEnded`), if the story has any
+ *   4. Vocab Explorer (flip cards: word → meaning + emoji)
+ *   5. Grammar Spotlight (1–2 patterns with example & tip)
+ *   6. Done screen  – score badge + stars earned
+ *
+ * Question kinds in `story.comprehension`:
+ *   (none)  multiple choice   { q, options, answer, type }
+ *   'tf'    true or false     { kind, q: a statement, options: ['True', 'False', NOT_SAID?], answer, type }
+ *   'gap'   fill the gap      { kind, q: a sentence with ___, options: the word bank, answer, type }
+ *   'order' put in order      { kind, q: the instruction, events: [first, …, last], type }
+ * `answer` is an index into `options`; `events` are stored in story order.
  *
  * Launched from storyMode.js after the reader finishes.
  * Renders inside the same `container` element as the story reader.
  *
  * @param {HTMLElement} container   – the stories-content div
- * @param {{ comprehension: Array<{q: string, options: string[], answer: number, type: string}>, vocab: Array<{word: string, meaning: string, icon: string}>, grammarSpotlight: Array<{pattern: string, example: string, tip: string}> }} story – the story object
+ * @param {{ comprehension: Array<{q: string, kind?: string, options?: string[], answer?: number, events?: string[], type: string}>, openEnded?: Array<{q: string, sampleAnswer: string, markingGuide: string}>, vocab: Array<{word: string, meaning: string, icon: string}>, grammarSpotlight: Array<{pattern: string, example: string, tip: string}> }} story – the story object
  * @param {() => void}  onDone      – called when child presses "Back to Library"
  */
 import { clueForQuestion } from '../modules/storyClue.js';
 import { shuffleArray } from '../data/words.js';
 import { html } from '../utils/html.js';
+
+/** The gap in a fill-the-gap sentence. */
+const GAP = '___';
+
+/** The option for a statement nothing in the story answers. */
+export const NOT_SAID = 'The story does not say';
+
+/** Is "the story does not say" the right answer? */
+const answersNotSaid = (q) => q.options?.[q.answer] === NOT_SAID;
+
+/**
+ * The order to show a question's options in, as indices into q.options.
+ *
+ * The story bank stores every right answer first. Shown in that order, a
+ * child could tap A every time and score full marks without reading a word,
+ * so options are shuffled once per question. True or false keeps its fixed
+ * True, False order, which is what a child expects, and "the story does not
+ * say" always comes last, where a child looks for it. Each button keeps its
+ * option's index in the data, which is what the answer is checked against.
+ *
+ * @param {{ kind?: string, options: string[] }} q
+ * @returns {number[]}
+ */
+export function displayOrder(q) {
+  const idx = q.options.map((_, i) => i);
+  const last = idx.filter((i) => q.options[i] === NOT_SAID);
+  const rest = idx.filter((i) => q.options[i] !== NOT_SAID);
+  return [...(q.kind === 'tf' ? rest : shuffleArray(rest)), ...last];
+}
 
 export function runStoryQuest(container, story, onDone) {
   if (!story.comprehension?.length) {
@@ -87,51 +124,63 @@ export function runStoryQuest(container, story, onDone) {
 
   // ── Comprehension ──────────────────────────────────────────────────────
 
+  function _progressHtml() {
+    const qNum = state.qIndex + 1;
+    return html`
+      <div class="sq-progress-bar">
+        <div class="sq-progress-fill" style="width:${(qNum / state.total) * 100}%"></div>
+      </div>
+      <p class="sq-phase-label">❓ Question ${qNum} of ${state.total}</p>
+    `;
+  }
+
+  /** The question card: a question, a true-or-false statement, or a sentence with a gap. */
+  function _questionHtml(q) {
+    if (q.kind === 'tf') {
+      return html`<p class="sq-kind-label">True or false?</p>
+        <p class="sq-question-text">${q.q}</p>`;
+    }
+    if (q.kind === 'gap') {
+      const [before, after = ''] = q.q.split(GAP);
+      return html`<p class="sq-kind-label">Pick the word that fits.</p>
+        <p class="sq-question-text">
+          ${before}<span class="sq-gap" id="sq-gap"><span class="visually-hidden">blank</span></span>${after}
+        </p>`;
+    }
+    return html`<p class="sq-question-text">${q.q}</p>
+      ${q.type === 'inferential' && html`<span class="sq-infer-badge">🤔 Think about it…</span>`}`;
+  }
+
   function _renderComprehension() {
     const q = story.comprehension[state.qIndex];
-    const qNum = state.qIndex + 1;
-    const total = state.total;
+    if (q.kind === 'order') return _renderOrder(q);
     // Found once per question so a wrong answer can send the child to the
     // sentence rather than to the answer. Null for the handful of questions
-    // ("what does this story teach us?") whose answer is in no one sentence.
-    state.clue = clueForQuestion(story, q);
+    // ("what does this story teach us?") whose answer is in no one sentence,
+    // and for "the story does not say", where pointing at a sentence would
+    // tell the child the opposite of the answer.
+    state.clue = answersNotSaid(q) ? null : clueForQuestion(story, q);
     state.hadClue = false;
-    // The story bank stores every right answer first. Shown in that order, a
-    // child could tap A every time and score full marks without reading a
-    // word, so the options are shuffled once per question. Each button keeps
-    // its option's index in the data, which is what the answer is checked
-    // against.
-    const order = shuffleArray(q.options.map((_, i) => i));
+    const order = displayOrder(q);
 
-    container.innerHTML = /* html */ `
+    container.innerHTML = html`
       <div class="sq-screen sq-comprehension">
-        <div class="sq-progress-bar">
-          <div class="sq-progress-fill" style="width:${(qNum / total) * 100}%"></div>
-        </div>
-        <p class="sq-phase-label">❓ Question ${qNum} of ${total}</p>
-
-        <div class="sq-question-card">
-          <p class="sq-question-text">${q.q}</p>
-          ${q.type === 'inferential' ? '<span class="sq-infer-badge">🤔 Think about it…</span>' : ''}
-        </div>
+        ${_progressHtml()}
+        <div class="sq-question-card">${_questionHtml(q)}</div>
 
         <div class="sq-options" id="sq-options">
-          ${order
-            .map(
-              (idx, pos) => /* html */ `
-            <button class="sq-option" data-idx="${idx}" aria-label="${q.options[idx]}">
-              <span class="sq-option-letter">${String.fromCharCode(65 + pos)}</span>
-              <span class="sq-option-text">${q.options[idx]}</span>
-            </button>
-          `,
-            )
-            .join('')}
+          ${order.map(
+            (idx, pos) => html`
+              <button class="sq-option" data-idx="${idx}" aria-label="${q.options[idx]}">
+                <span class="sq-option-letter">${String.fromCharCode(65 + pos)}</span>
+                <span class="sq-option-text">${q.options[idx]}</span>
+              </button>
+            `,
+          )}
         </div>
 
-        <div class="sq-feedback" id="sq-feedback" hidden></div>
-        <button class="btn btn--primary btn--xl sq-next-btn" id="sq-next" hidden>
-          Next →
-        </button>
+        <div class="sq-feedback" id="sq-feedback" aria-live="polite" hidden></div>
+        <button class="btn btn--primary btn--xl sq-next-btn" id="sq-next" hidden>Next →</button>
       </div>
     `;
 
@@ -156,17 +205,21 @@ export function runStoryQuest(container, story, onDone) {
     const correct = chosen === q.answer;
     const feedback = document.getElementById('sq-feedback');
     const clue = state.clue;
+    const notSaid = answersNotSaid(q);
 
-    if (!correct && !state.hadClue && clue) {
-      // First miss, and there is a sentence to send them to.
+    if (!correct && !state.hadClue && (clue || notSaid)) {
+      // First miss, and there is somewhere to send them: the sentence, or
+      // the story itself when the answer is that it never says.
       state.hadClue = true;
       btn.disabled = true;
       btn.classList.add('sq-option--wrong');
       if (feedback) {
         feedback.hidden = false;
         feedback.className = 'sq-feedback sq-feedback--retry';
-        feedback.innerHTML = html`Not quite. The story says:
-          <q class="sq-clue">${clue.text}</q> Have another go.`;
+        feedback.innerHTML = clue
+          ? html`Not quite. The story says: <q class="sq-clue">${clue.text}</q> Have another go.`
+          : html`Not quite. Look back at the story: can you find a sentence that says this? Have
+              another go.`;
       }
       return; // the other options stay live
     }
@@ -184,11 +237,25 @@ export function runStoryQuest(container, story, onDone) {
       if (idx === chosen && !correct) b.classList.add('sq-option--wrong');
     });
 
+    // The finished sentence is worth seeing whichever way the child got there.
+    const gap = document.getElementById('sq-gap');
+    if (gap) {
+      gap.textContent = q.options[q.answer];
+      gap.classList.add('sq-gap--filled');
+    }
+
     if (feedback) {
       feedback.hidden = false;
       feedback.className = `sq-feedback ${correct ? 'sq-feedback--correct' : 'sq-feedback--wrong'}`;
       if (correct) {
-        feedback.textContent = state.hadClue ? '✅ You found it!' : '✅ Great thinking!';
+        feedback.textContent = notSaid
+          ? '✅ Good checking — the story never says that.'
+          : state.hadClue
+            ? '✅ You found it!'
+            : '✅ Great thinking!';
+      } else if (notSaid) {
+        feedback.innerHTML = html`The answer is <strong>${NOT_SAID}</strong>. Nothing in it tells us
+          that.`;
       } else {
         // Showing the answer alone teaches nothing; showing the sentence it
         // came from is what a child can use next time.
@@ -199,27 +266,163 @@ export function runStoryQuest(container, story, onDone) {
       }
     }
 
-    const nextBtn = document.getElementById('sq-next');
-    if (nextBtn) {
-      nextBtn.hidden = false;
-      nextBtn.addEventListener('click', () => {
-        state.qIndex++;
-        if (state.qIndex < state.total) {
-          render();
-        } else {
-          // Move to vocab or grammar or done
-          state.phase = story.openEnded?.length
-            ? 'openEnded'
-            : story.vocab?.length
-              ? 'vocab'
-              : story.grammarSpotlight?.length
-                ? 'grammar'
-                : 'done';
-          state.vocabIndex = 0;
-          render();
-        }
+    _showNext();
+  }
+
+  /**
+   * Put the story's events in order. The child taps them first to last;
+   * each tap numbers the event, and Undo takes the last one back. A wrong
+   * order gets one more go, then the story's order is shown.
+   */
+  function _renderOrder(q) {
+    state.clue = null;
+    state.hadClue = false;
+    const picked = [];
+    let shown = shuffleArray(q.events.map((_, i) => i));
+    // Already in order would be no question at all.
+    if (shown.every((v, i) => v === i)) shown = [...shown.slice(1), shown[0]];
+
+    container.innerHTML = html`
+      <div class="sq-screen sq-comprehension">
+        ${_progressHtml()}
+        <div class="sq-question-card">
+          <p class="sq-kind-label">Tap them from first to last.</p>
+          <p class="sq-question-text">${q.q}</p>
+        </div>
+
+        <div class="sq-options" id="sq-options">
+          ${shown.map(
+            (idx) => html`
+              <button class="sq-option sq-order-event" data-idx="${idx}">
+                <span class="sq-option-letter" aria-hidden="true">?</span>
+                <span class="sq-option-text">${q.events[idx]}</span>
+              </button>
+            `,
+          )}
+        </div>
+        <button class="btn btn--ghost" id="sq-order-undo" disabled>↩ Undo</button>
+
+        <div class="sq-feedback" id="sq-feedback" aria-live="polite" hidden></div>
+        <button class="btn btn--primary btn--xl sq-next-btn" id="sq-next" hidden>Next →</button>
+      </div>
+    `;
+
+    const buttons = [...document.querySelectorAll('.sq-order-event')];
+    const undo = document.getElementById('sq-order-undo');
+    const feedback = document.getElementById('sq-feedback');
+    const label = (b, text) => {
+      b.querySelector('.sq-option-letter').textContent = text;
+    };
+    const describe = (b) => {
+      const n = picked.indexOf(Number(b.dataset.idx));
+      const text = b.querySelector('.sq-option-text').textContent.trim();
+      b.setAttribute('aria-label', n >= 0 ? `${n + 1}: ${text}` : text);
+    };
+    const reset = () => {
+      picked.length = 0;
+      buttons.forEach((b) => {
+        b.disabled = false;
+        b.classList.remove('sq-order-event--picked');
+        label(b, '?');
+        describe(b);
       });
+      undo.disabled = true;
+    };
+
+    buttons.forEach((b) => {
+      describe(b);
+      b.addEventListener('click', () => {
+        picked.push(Number(b.dataset.idx));
+        b.disabled = true;
+        b.classList.add('sq-order-event--picked');
+        label(b, String(picked.length));
+        describe(b);
+        undo.disabled = false;
+        if (feedback) feedback.hidden = true;
+        if (picked.length === q.events.length) check();
+      });
+    });
+
+    undo.addEventListener('click', () => {
+      const last = picked.pop();
+      const b = buttons.find((x) => Number(x.dataset.idx) === last);
+      if (b) {
+        b.disabled = false;
+        b.classList.remove('sq-order-event--picked');
+        label(b, '?');
+        describe(b);
+      }
+      undo.disabled = picked.length === 0;
+    });
+
+    function check() {
+      const right = picked.every((idx, pos) => idx === pos);
+      if (!right && !state.hadClue) {
+        state.hadClue = true;
+        reset();
+        if (feedback) {
+          feedback.hidden = false;
+          feedback.className = 'sq-feedback sq-feedback--retry';
+          feedback.textContent =
+            'Not quite. Think about what happened first in the story, then try again.';
+        }
+        return;
+      }
+
+      if (right) {
+        if (state.hadClue) state.withClue++;
+        else state.firstTry++;
+        state.correct++;
+      }
+
+      // Show the story's order either way, numbered.
+      const host = document.getElementById('sq-options');
+      [...buttons]
+        .sort((a, b) => Number(a.dataset.idx) - Number(b.dataset.idx))
+        .forEach((b) => {
+          host.appendChild(b);
+          b.disabled = true;
+          b.classList.remove('sq-order-event--picked');
+          label(b, String(Number(b.dataset.idx) + 1));
+          b.classList.add(right ? 'sq-option--correct' : 'sq-order-event--shown');
+        });
+      undo.hidden = true;
+
+      if (feedback) {
+        feedback.hidden = false;
+        feedback.className = `sq-feedback ${right ? 'sq-feedback--correct' : 'sq-feedback--wrong'}`;
+        feedback.textContent = right
+          ? state.hadClue
+            ? '✅ You worked it out!'
+            : '✅ That is the order it happened in!'
+          : 'This is the order it happened in the story.';
+      }
+      _showNext();
     }
+  }
+
+  /** Reveal Next, which moves to the next question or on to the next part. */
+  function _showNext() {
+    const nextBtn = document.getElementById('sq-next');
+    if (!nextBtn) return;
+    nextBtn.hidden = false;
+    nextBtn.addEventListener('click', () => {
+      state.qIndex++;
+      if (state.qIndex < state.total) {
+        render();
+      } else {
+        // Move to vocab or grammar or done
+        state.phase = story.openEnded?.length
+          ? 'openEnded'
+          : story.vocab?.length
+            ? 'vocab'
+            : story.grammarSpotlight?.length
+              ? 'grammar'
+              : 'done';
+        state.vocabIndex = 0;
+        render();
+      }
+    });
   }
 
   function _renderOpenEnded() {
@@ -234,24 +437,34 @@ export function runStoryQuest(container, story, onDone) {
       return;
     }
 
-    container.innerHTML = /* html */ `
+    // Written first, compared after: the good answer sits behind a tap so a
+    // child tries in their own words before seeing one. Nothing is marked —
+    // the check line says what a good answer does, for the child or a
+    // grown-up to look for.
+    container.innerHTML = html`
       <div class="sq-screen sq-comprehension">
-        <p class="sq-phase-label">🗣️ Open-ended response</p>
-        ${prompts
-          .map(
-            (p, i) => `
-          <div class="sq-question-card" style="margin-bottom:12px">
-            <p class="sq-question-text">${i + 1}. ${p.q}</p>
-            <textarea class="cp-name-input" rows="3" placeholder="Type your answer..."></textarea>
-            <details style="margin-top:8px"><summary>Show sample and marking guide</summary>
-              <p><strong>Sample:</strong> ${p.sampleAnswer}</p>
-              <p><strong>Guide:</strong> ${p.markingGuide}</p>
-            </details>
-          </div>`,
-          )
-          .join('')}
+        <p class="sq-phase-label">✍️ Your turn to write</p>
+        ${prompts.map(
+          (p, i) => html`
+            <div class="sq-question-card sq-written">
+              <label class="sq-question-text" for="sq-written-${i}">${p.q}</label>
+              <textarea
+                class="cp-name-input sq-written-input"
+                id="sq-written-${i}"
+                rows="3"
+                placeholder="Write your answer here…"
+              ></textarea>
+              <details class="sq-written-model">
+                <summary>See a good answer</summary>
+                <p>${p.sampleAnswer}</p>
+                <p class="sq-written-check">✅ ${p.markingGuide}</p>
+              </details>
+            </div>
+          `,
+        )}
         <button class="btn btn--primary btn--xl" id="sq-open-next">Continue →</button>
-      </div>`;
+      </div>
+    `;
 
     document.getElementById('sq-open-next')?.addEventListener('click', () => {
       state.phase = story.vocab?.length

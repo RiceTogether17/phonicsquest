@@ -436,10 +436,20 @@ function readingTogether(story) {
   if (story.comprehension?.length) {
     out.push('**After reading — check understanding** (answer ticked):');
     story.comprehension.forEach((q, i) => {
+      if (q.kind === 'order') {
+        // Events are stored in story order, which is the answer.
+        out.push(`${i + 1}. ${q.q}  `, `   ${q.events.map((e, j) => `(${j + 1}) ${e}`).join(' ')}`);
+        return;
+      }
+      const prompt = q.kind === 'tf' ? `True or false? ${q.q}` : q.q;
       const options = q.options.map((o, j) => (j === q.answer ? `${o} ✓` : o)).join(' · ');
-      out.push(`${i + 1}. ${q.q}  `, `   ${options}`);
+      out.push(`${i + 1}. ${prompt}  `, `   ${options}`);
     });
     out.push('');
+  }
+
+  for (const w of story.openEnded ?? []) {
+    out.push(`**Write about it:** ${w.q}  `, `_A good answer:_ ${w.sampleAnswer}`, '');
   }
 
   if (story.talkAboutIt?.length) {

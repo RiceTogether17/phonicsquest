@@ -42,7 +42,7 @@ async function seedLearner(page) {
   });
 }
 
-/** Open a Band C story — those all carry a three-question Story Quest. */
+/** Open a Band C story — those all carry a five-question Story Quest. */
 async function openStory(page) {
   await page.goto('./');
   await expect(page.locator('#screen-home')).toHaveClass(/active/);
@@ -81,13 +81,14 @@ async function openQuest(page) {
   await expect(page.locator('.sq-option').first()).toBeVisible();
 }
 
+// Options are shuffled on screen, but each button keeps its option's index
+// in the data, and every story's first question stores its answer first.
+const rightOption = (page) => page.locator('.sq-option[data-idx="0"]');
+const wrongOptions = (page) => page.locator('.sq-option:not([data-idx="0"]):not([disabled])');
+
 /** Click an option that is not the right one. */
 async function answerWrong(page) {
-  const options = page.locator('.sq-option');
-  const n = await options.count();
-  // The quest's first Band C question is "Where was Giri…" with the answer
-  // first, so the last option is reliably wrong.
-  await options.nth(n - 1).click();
+  await wrongOptions(page).first().click();
 }
 
 test.beforeEach(async ({ page }) => {
@@ -132,7 +133,7 @@ test('the clue quotes a real sentence from this story', async ({ page }) => {
 test('getting it right after the clue is counted as working it out', async ({ page }) => {
   await openQuest(page);
   await answerWrong(page);
-  await page.locator('.sq-option').first().click(); // the right one
+  await rightOption(page).click();
 
   await expect(page.locator('#sq-feedback')).toContainText(/You found it/i);
   await expect(page.locator('#sq-next')).toBeVisible();
@@ -142,7 +143,7 @@ test('a second wrong answer shows the answer WITH its sentence', async ({ page }
   await openQuest(page);
   await answerWrong(page);
   // Another wrong one: the clue has been given, so now the answer comes.
-  await page.locator('.sq-option').nth(1).click();
+  await wrongOptions(page).first().click();
 
   const feedback = page.locator('#sq-feedback');
   await expect(feedback).toContainText(/The answer is/i);
@@ -154,33 +155,32 @@ test('a second wrong answer shows the answer WITH its sentence', async ({ page }
 
 test('the summary separates right-first-time from worked-out', async ({ page }) => {
   await openQuest(page);
-  // Q1 the slow way, then answer the rest however they land.
+  // Q1 the slow way, then answer the rest however they land: tap options
+  // (an order question takes a tap per event), move on with Next, and skip
+  // past the written answer and the word cards.
   await answerWrong(page);
-  await page.locator('.sq-option').first().click();
+  await rightOption(page).click();
   await page.locator('#sq-next').click();
 
-  for (let i = 0; i < 4; i++) {
-    const opts = page.locator('.sq-option:not([disabled])');
-    if (!(await opts.count())) break;
-    await opts.first().click();
-    const next = page.locator('#sq-next');
-    if (await next.isVisible()) await next.click();
-    else await opts.first().click(); // retry path
-    if (
-      await page
-        .locator('.sq-done')
-        .isVisible()
-        .catch(() => false)
-    )
-      break;
+  const visible = (sel) =>
+    page
+      .locator(sel)
+      .first()
+      .isVisible()
+      .catch(() => false);
+  for (let i = 0; i < 40; i++) {
+    if (await visible('.sq-done')) break;
+    if (await visible('#sq-next')) await page.locator('#sq-next').click();
+    else if (await visible('#sq-open-next')) await page.locator('#sq-open-next').click();
+    else if (await visible('#sq-vocab-skip')) await page.locator('#sq-vocab-skip').click();
+    else if (await visible('#sq-grammar-done')) await page.locator('#sq-grammar-done').click();
+    else await page.locator('.sq-option:not([disabled])').first().click();
   }
 
-  // Whenever the run ends, a clue-assisted answer must be reported as its
-  // own thing — a teacher wants to know which kind of right it was.
-  const done = page.locator('.sq-done');
-  if (await done.isVisible().catch(() => false)) {
-    await expect(page.locator('.sq-breakdown')).toContainText(/worked out from the story/i);
-  }
+  // A clue-assisted answer must be reported as its own thing — a teacher
+  // wants to know which kind of right it was.
+  await expect(page.locator('.sq-done')).toBeVisible();
+  await expect(page.locator('.sq-breakdown')).toContainText(/worked out from the story/i);
 });
 
 test('"Show me where" lights up the sentence, not the end of the story', async ({ page }) => {
