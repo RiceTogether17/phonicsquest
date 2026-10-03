@@ -1322,7 +1322,7 @@ _For the back page of the book._
 
 ## Could You? Would You? Should You?
 
-`core-c-sw-01` · Band C · 133 words · sounds: ar, or, ir
+`core-c-sw-01` · Band C · 132 words · sounds: ar, or, ir
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -1349,9 +1349,9 @@ RULES FOR EVERY PICTURE
 
 THE STORY
 Page 1: A small bird sat on the fence and did not stir. "Could we fly to the barn?" said Giri. "I could," said the bird, "but should I? A storm is coming. I can smell the rain."
-Page 2: "Would she come if I marched along?" said Giri. "She could ride on my arm." The bird looked at the dark sky. "We should not go far," she said. "We should get under cover first."
+Page 2: "Would she come if I marched along?" said Giri. "She could ride on my arm." The bird looked at the dark sky. "We should not go far," she said. "Let us get under cover first."
 Page 3: Big drops of water started to fall. Giri and the bird darted under the cart by the farm. The storm passed over them with a roar. Then the sun came back and lit up the yard.
-Page 4: "The bird had it right," said Giri. "Could, would, should — you think hard first!" "Yes," said the bird. "That is why I am a smart bird."
+Page 4: "The bird had it right," said Giri. "Could, would, should — think hard first!" "Yes," said the bird. "That is why I am a smart bird."
 ```
 
 ### 2. Pictures — paste one at a time
@@ -1375,7 +1375,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 4. Square.
-Words on this page: "Would she come if I marched along?" said Giri. "She could ride on my arm." The bird looked at the dark sky. "We should not go far," she said. "We should get under cover first."
+Words on this page: "Would she come if I marched along?" said Giri. "She could ride on my arm." The bird looked at the dark sky. "We should not go far," she said. "Let us get under cover first."
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1391,7 +1391,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 4. Square.
-Words on this page: "The bird had it right," said Giri. "Could, would, should — you think hard first!" "Yes," said the bird. "That is why I am a smart bird."
+Words on this page: "The bird had it right," said Giri. "Could, would, should — think hard first!" "Yes," said the bird. "That is why I am a smart bird."
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1422,7 +1422,6 @@ _For the back page of the book._
 - **of** — ❤️ tricky part: o says /u/ and f says /v/
 - **water** — ❤️ tricky part: a says /aw/
 - **fall** — ❤️ tricky part: a says /aw/
-- **you** — ❤️ tricky part: ou says /oo/
 
 **After reading — check understanding** (answer ticked):
 1. Why did the bird not want to fly to the barn?  
@@ -1434,4 +1433,4 @@ _For the back page of the book._
 
 **Talk about it:**
 - Why did the bird say they should not go far?
-- What did Giri mean by "Could, would, should — you think hard first"?
+- What did Giri mean by "Could, would, should — think hard first"?

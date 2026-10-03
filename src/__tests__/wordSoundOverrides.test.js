@@ -96,6 +96,17 @@ describe('per-word sound overrides (data)', () => {
     expect(phonemeKeyFor('bus', 1, 'u')).toBeNull();
   });
 
+  it('could, would and should say the /oo/ of "book", not the /ow/ of "out"', () => {
+    // They were split c·ou·ld and typed as the diphthong of "out".
+    for (const id of ['could', 'would', 'should']) {
+      const w = byId(id);
+      expect(w.graphemes.join(''), id).toBe(id);
+      expect(w.types, id).not.toContain('dp');
+      expect(w.phonemes[1], id).toBe('/oo/');
+      expect(phonemeKeyFor(id, 1, 'oul'), id).toBe('short_oo');
+    }
+  });
+
   it('strongest is not a soft-g word (ng + -est)', () => {
     expect(byId('strongest').flags).not.toContain('soft-g');
   });
@@ -145,6 +156,15 @@ describe('speakPhoneme plays the word-specific sound for every caller', () => {
     expect(byId('shred').phonemes).toHaveLength(4);
     await audio.speakWordStretched(byId('shred'));
     expect(played).toEqual(['sh', 'r', 'e', 'd']);
+  });
+
+  it('a child tapping "could" in a story hears /k/ /oo/ /d/, not "cowld"', async () => {
+    // The story word panel sounds each tile with the word but no index.
+    const could = byId('could');
+    for (const [i, g] of could.graphemes.entries()) {
+      await audio.speakPhoneme(g, could.types[i], { word: 'could' });
+    }
+    expect(played).toEqual(['c', 'short_oo', 'd']);
   });
 
   it('a sounded-out word plays its override on every tile path', async () => {

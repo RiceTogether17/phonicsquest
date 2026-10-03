@@ -129,6 +129,19 @@ const PHASE_BY_ID = new Map(STORY_PHASES.map((p) => [p.id, p]));
 /** The highest tier any phase grants. */
 export const MAX_TIER = 5;
 
+/** The tier of a spelling no phase releases: above every phase, so never decodable. */
+const NEVER_TIER = MAX_TIER + 1;
+
+/**
+ * Spellings in curated words.js entries that no code tier teaches. The "oul"
+ * of could, would and should says /oo/ as in "book"; no phase teaches it as
+ * a pattern, so these words reach a story only as high-frequency or tricky
+ * words. They used to be split c·ou·ld, typed as the diphthong of "out",
+ * which made "could" a decodable tier-4 word in Band D and played /ow/ when
+ * a child tapped it.
+ */
+const UNRELEASED_GRAPHEMES = new Set(['oul']);
+
 /** Get the STORY_PHASES descriptor for a story phase id, or null. */
 export function getStoryPhase(phaseId) {
   return PHASE_BY_ID.get(phaseId) ?? null;
@@ -287,6 +300,7 @@ function curatedGraphemeTier(g, type) {
   // up by spelling alone, the "e" of s|o|m|e reads as the tier-1 short e and
   // a tricky word passes as decodable in a first story.
   if (type === 'se') return 2;
+  if (UNRELEASED_GRAPHEMES.has(g.toLowerCase())) return NEVER_TIER;
   const fromTable = GRAPHEME_TIERS[g.toLowerCase()];
   if (fromTable !== undefined) return fromTable;
   if (g.length === 1) {
@@ -447,7 +461,8 @@ export function stripSuffix(word) {
  * else the pattern scan — trying the word whole and suffix-stripped, and
  * keeping whichever needs the lower tier.
  * @param {string} word  raw token; cleaned internally
- * @returns {number} 1–5
+ * @returns {number} 1–5, or 6 for a word spelled with an unreleased
+ *   grapheme (see UNRELEASED_GRAPHEMES), which no phase makes decodable
  */
 export function requiredTier(word) {
   const clean = cleanToken(word);

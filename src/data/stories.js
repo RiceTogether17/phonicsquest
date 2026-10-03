@@ -657,7 +657,7 @@ export const STORIES = [
     allowedHFWTier: 2,
     targetWordCount: 70,
     actualWordCount: 79,
-    decodableRatio: 0.96,
+    decodableRatio: 0.95,
     textType: 'story-reader',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-b-04'),
@@ -855,7 +855,7 @@ export const STORIES = [
     allowedHFWTier: 2,
     targetWordCount: 65,
     actualWordCount: 77,
-    decodableRatio: 0.87,
+    decodableRatio: 0.86,
     textType: 'story-reader',
     refrainCount: 0,
     sightWords: getIntroducedSightWords('core-b-10'),
@@ -1660,15 +1660,15 @@ export const STORIES = [
     targetGraphemes: ['ar', 'or', 'ir'],
     allowedHFWTier: 3,
     targetWordCount: 115,
-    actualWordCount: 133,
+    actualWordCount: 132,
     decodableRatio: 0.93,
     textType: 'fluency-reader',
     refrainCount: 0,
     lines: [
       { type: 'paragraph', text: 'A small bird sat on the fence and did not stir. "Could we fly to the barn?" said Giri. "I could," said the bird, "but should I? A storm is coming. I can smell the rain."' },
-      { type: 'paragraph', text: '"Would she come if I marched along?" said Giri. "She could ride on my arm." The bird looked at the dark sky. "We should not go far," she said. "We should get under cover first."' },
+      { type: 'paragraph', text: '"Would she come if I marched along?" said Giri. "She could ride on my arm." The bird looked at the dark sky. "We should not go far," she said. "Let us get under cover first."' },
       { type: 'paragraph', text: 'Big drops of water started to fall. Giri and the bird darted under the cart by the farm. The storm passed over them with a roar. Then the sun came back and lit up the yard.' },
-      { type: 'end',       text: '"The bird had it right," said Giri. "Could, would, should — you think hard first!" "Yes," said the bird. "That is why I am a smart bird."' },
+      { type: 'end',       text: '"The bird had it right," said Giri. "Could, would, should — think hard first!" "Yes," said the bird. "That is why I am a smart bird."' },
     ],
     comprehension: [
       { q: 'Why did the bird not want to fly to the barn?', options: ['A storm was coming', 'She was tired', 'She was scared of Giri', 'It was too dark'], answer: 0, type: 'literal' },
@@ -1677,7 +1677,7 @@ export const STORIES = [
     ],
     talkAboutIt: [
       "Why did the bird say they should not go far?",
-      "What did Giri mean by \"Could, would, should — you think hard first\"?",
+      "What did Giri mean by \"Could, would, should — think hard first\"?",
     ],
   },
 
@@ -1698,7 +1698,7 @@ export const STORIES = [
     allowedHFWTier: 3,
     targetWordCount: 170,
     actualWordCount: 145,
-    decodableRatio: 1.00,
+    decodableRatio: 0.99,
     textType: 'bridge-reader',
     refrainCount: 0,
     lines: [
@@ -1783,7 +1783,7 @@ export const STORIES = [
     allowedHFWTier: 3,
     targetWordCount: 170,
     actualWordCount: 158,
-    decodableRatio: 1.00,
+    decodableRatio: 0.99,
     textType: 'bridge-reader',
     refrainCount: 0,
     lines: [
@@ -1825,7 +1825,7 @@ export const STORIES = [
     allowedHFWTier: 3,
     targetWordCount: 180,
     actualWordCount: 161,
-    decodableRatio: 1.00,
+    decodableRatio: 0.98,
     textType: 'bridge-reader',
     refrainCount: 0,
     lines: [
@@ -1909,7 +1909,7 @@ export const STORIES = [
     allowedHFWTier: 3,
     targetWordCount: 185,
     actualWordCount: 171,
-    decodableRatio: 1.00,
+    decodableRatio: 0.99,
     textType: 'bridge-reader',
     refrainCount: 0,
     lines: [
@@ -2035,7 +2035,7 @@ export const STORIES = [
     allowedHFWTier: 3,
     targetWordCount: 160,
     actualWordCount: 157,
-    decodableRatio: 1.00,
+    decodableRatio: 0.99,
     textType: 'bridge-reader',
     refrainCount: 0,
     lines: [
@@ -2491,7 +2491,7 @@ export const STORIES = [
     allowedHFWTier: 3,
     targetWordCount: 155,
     actualWordCount: 94,
-    decodableRatio: 1.00,
+    decodableRatio: 0.99,
     textType: 'chapter-reader',
     refrainCount: 0,
     lines: [
@@ -2536,7 +2536,7 @@ export const STORIES = [
     allowedHFWTier: 3,
     targetWordCount: 160,
     actualWordCount: 97,
-    decodableRatio: 1.00,
+    decodableRatio: 0.97,
     textType: 'chapter-reader',
     refrainCount: 0,
     lines: [
