@@ -21,7 +21,7 @@ import { celebrateCorrect } from '../components/confettiHelper.js';
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 import { progress } from '../modules/progress.js';
-import { WORD_GROUPS, shuffleArray } from '../data/words.js';
+import { WORD_GROUPS, shuffleArray, wordPicture } from '../data/words.js';
 import { CURRICULUM } from '../data/curriculum.js';
 import { buildWordSortRound, scoreWordSort } from './scoring/wordSort.js';
 
@@ -257,7 +257,7 @@ function _renderCurrent() {
   const card = document.getElementById('ws-card');
   if (card) {
     card.innerHTML = `
-      <span class="ws-card-emoji" aria-hidden="true">${item.wordObj?.emoji ?? ''}</span>
+      <span class="ws-card-emoji" aria-hidden="true">${wordPicture(item.wordObj)}</span>
       <span class="ws-card-word">${item.word}</span>
       <button class="ws-card-speak" type="button" aria-label="Hear the word ${item.word}">🔊</button>
     `;

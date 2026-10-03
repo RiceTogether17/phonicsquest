@@ -4,7 +4,7 @@
  * Renders the color-coded phoneme tiles with diacritics below the word display.
  */
 
-import { DIACRITICS } from '../data/words.js';
+import { DIACRITICS, wordPicture } from '../data/words.js';
 
 /**
  * Map phoneme type codes to CSS class names.
@@ -145,7 +145,10 @@ export function renderPhonemes(word, container, opts = {}) {
  */
 export function renderWordImage(word, emojiEl, show = true) {
   if (!emojiEl) return;
-  emojiEl.textContent = show ? word.emoji : '';
+  // No picture is better than a picture of something else: a frog for
+  // "hop" gets named "frog". See NO_FAITHFUL_PICTURE.
+  if (!wordPicture(word)) show = false;
+  emojiEl.textContent = show ? wordPicture(word) : '';
   // Add accessible label so screen readers describe the illustration
   const wrap = emojiEl.closest('.word-image-wrap');
   if (wrap) {

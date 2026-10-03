@@ -125,7 +125,7 @@ import {
   nextPaWord,
   paPositionForMode,
 } from './modules/paTargetSequencer.js';
-import { WORDS } from './data/words.js';
+import { WORDS, wordPicture } from './data/words.js';
 import { pickSyllableWord } from './data/syllableWords.js';
 import { SCREENS, QUEST_THRESHOLDS } from './constants.js';
 import { modalManager } from './modules/modalManager.js';
@@ -1204,7 +1204,7 @@ class App {
       this._els.resultXp.style.display = 'none';
     }
 
-    this._els.resultWord.textContent = word.emoji + ' ' + word.word;
+    this._els.resultWord.textContent = `${wordPicture(word)} ${word.word}`.trim();
     this._els.btnNext.focus();
   }
 

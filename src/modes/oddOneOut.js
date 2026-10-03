@@ -38,10 +38,20 @@ export function setupOddOneOut(word, els) {
 
   // Same-stage pool, phoneme-tagged words only (sight words carry no
   // usable first-sound information).
+  // The cards are pictures, so every card needs one that shows its word:
+  // a frog for "hop" would be named "frog" and judged on /f/.
   const stagePool = WORDS.filter(
-    (w) => w.group === word.group && Array.isArray(w.graphemes) && w.graphemes.length >= 2,
+    (w) =>
+      w.group === word.group &&
+      Array.isArray(w.graphemes) &&
+      w.graphemes.length >= 2 &&
+      !w.noPicture,
   );
-  const roundData = pickOddOneOutRound(word, stagePool, WORDS);
+  const roundData = pickOddOneOutRound(
+    word,
+    stagePool,
+    WORDS.filter((w) => !w.noPicture),
+  );
   if (!roundData) {
     // Vanishingly rare (a first grapheme with no second exemplar in the
     // whole bank). Don't strand the child on a blank screen — record

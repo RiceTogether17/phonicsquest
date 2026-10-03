@@ -115,7 +115,10 @@ function targetGraphemeOf(word, position) {
  * sound the child actually heard. Tricky (sight) words are left out for the
  * same reason: "who" does not start with the /w/ its "wh" button plays.
  */
-function buildPool(wordList, group, maxLevel, position) {
+/** Games whose answer choices are pictures: every word needs a true one. */
+const PICTURE_CHOICE_MODES = new Set(['oddOneOut', 'train']);
+
+function buildPool(wordList, group, maxLevel, position, mode) {
   return wordList.filter(
     (w) =>
       (!group || w.group === group) &&
@@ -123,7 +126,8 @@ function buildPool(wordList, group, maxLevel, position) {
       Array.isArray(w.graphemes) &&
       w.graphemes.length >= 2 &&
       w.group !== 'sight-highfreq' &&
-      !w.phonemeKeys?.[targetIndexOf(w, position)],
+      !w.phonemeKeys?.[targetIndexOf(w, position)] &&
+      !(PICTURE_CHOICE_MODES.has(mode) && w.noPicture),
   );
 }
 
@@ -158,7 +162,7 @@ export function nextPaWord(state, { mode, group, maxLevel, wordList }) {
     state.key = key;
   }
 
-  const pool = buildPool(wordList, group, maxLevel, position);
+  const pool = buildPool(wordList, group, maxLevel, position, mode);
   if (pool.length === 0) return null;
 
   if (!state.targets) {

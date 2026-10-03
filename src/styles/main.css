@@ -19657,6 +19657,11 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   opacity: 0.55;
 }
 
+/* No faithful picture for this word: show nothing rather than a wrong one. */
+.giri-word-card__picture--none {
+  display: none;
+}
+
 .giri-word-card__caption {
   margin: 0;
   font-size: var(--font-size-sm);

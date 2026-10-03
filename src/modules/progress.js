@@ -122,6 +122,9 @@ export function hasInteriorVowel(word) {
 
 // Groups that should not appear in phonemic-awareness activities because their
 // words are irregular, multisyllabic, or non-decodable at the phoneme level.
+/** Modes whose answer choices are pictures (see NO_FAITHFUL_PICTURE). */
+const PICTURE_CHOICE_MODES = new Set(['oralBlend', 'oddOneOut', 'train']);
+
 const PA_EXCLUDED_GROUPS = new Set([
   'sight-highfreq',
   'multisyllable',
@@ -346,6 +349,13 @@ class Progress {
       pool = pool.filter(
         (word) => !NON_DECODABLE_GROUPS.has(word.group) && word.pattern !== 'sight',
       );
+    }
+
+    // Games whose choices are pictures need a picture that shows the word —
+    // a frog for "hop" would be named, and judged, as "frog".
+    if (PICTURE_CHOICE_MODES.has(opts.mode)) {
+      const pictured = pool.filter((word) => !word.noPicture);
+      if (pictured.length) pool = pictured;
     }
 
     if (PHONEMIC_AWARENESS_MODES.has(opts.mode)) {

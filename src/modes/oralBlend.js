@@ -34,7 +34,8 @@ export function setupOralBlend(word, els) {
 
   els.modeInstruction.textContent = 'Listen to the sounds… which word is it?';
 
-  const distractors = getDistractors(word, 3, { maxLevel: word.level });
+  // The choices are pictures, so each must show its own word.
+  const distractors = getDistractors(word, 3, { maxLevel: word.level, requirePicture: true });
   const choices = shuffleArray([word, ...distractors]);
 
   // Render choice buttons: large emoji + word label (hidden until reveal)

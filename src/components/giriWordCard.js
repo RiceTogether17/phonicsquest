@@ -27,6 +27,7 @@
  */
 
 import { STATES } from './mascot.js';
+import { wordPicture } from '../data/words.js';
 
 /**
  * Context → Giri pose. Keys are what the *mode* is doing, so call sites read
@@ -84,10 +85,18 @@ export function renderGiriWordCard(word, host, opts = {}) {
   const frame = document.createElement('div');
   frame.className = 'giri-word-card__frame';
 
-  if (showEmoji) {
+  if (showEmoji && !wordPicture(word)) {
+    // No faithful picture for this word (see NO_FAITHFUL_PICTURE): an empty,
+    // decorative frame — not a "?", which reads as a puzzle to solve, and not
+    // a role="img" labelled with a picture that isn't there.
+    const empty = document.createElement('span');
+    empty.className = 'giri-word-card__picture giri-word-card__picture--none';
+    empty.setAttribute('aria-hidden', 'true');
+    frame.appendChild(empty);
+  } else if (showEmoji) {
     const picture = document.createElement('span');
     picture.className = 'giri-word-card__picture';
-    picture.textContent = word.emoji || '';
+    picture.textContent = wordPicture(word);
     picture.setAttribute('role', 'img');
     picture.setAttribute('aria-label', `Picture of ${word.word}`);
     frame.appendChild(picture);

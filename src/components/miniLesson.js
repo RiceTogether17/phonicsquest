@@ -19,7 +19,7 @@
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 import { CURRICULUM, childStageName } from '../data/curriculum.js';
-import { WORDS } from '../data/words.js';
+import { WORDS, wordPicture } from '../data/words.js';
 import { renderPhonemes } from './phonemeDisplay.js';
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 import { giriInline } from './mascot.js';
@@ -272,7 +272,7 @@ function _renderWeDoStep(overlay, stage, lesson, onDone) {
       <h2 class="mini-lesson-headline">Let's read one together!</h2>
       <p class="mini-lesson-stage">${escapeHtml(childStageName(stage))}</p>
       <div class="mini-lesson-word">
-        ${word?.emoji ? `<span class="mini-lesson-emoji" aria-hidden="true">${word.emoji}</span>` : ''}
+        ${wordPicture(word) ? `<span class="mini-lesson-emoji" aria-hidden="true">${wordPicture(word)}</span>` : ''}
         <div class="mini-lesson-tiles phoneme-row" id="mini-lesson-tiles" role="list" aria-label="Sounds in ${escapeAttr(lesson.weDoWord)}"></div>
       </div>
       <p class="mini-lesson-prompt">Giri says each sound — say them with Giri, then say the whole word!</p>
