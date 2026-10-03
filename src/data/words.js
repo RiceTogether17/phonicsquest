@@ -333,6 +333,35 @@ const GRAPHEME_PHONEME_OVERRIDES = Object.freeze({
 });
 
 /**
+ * Consonant digraphs that can open a blend tile: "shr" is sh + r, "thr" is
+ * th + r, "sch" is s + ch. Read letter by letter they become three sounds
+ * (/s/ /h/ /r/), and "h" is not a sound in "shred".
+ */
+const BLEND_DIGRAPHS = Object.freeze(['sh', 'th', 'ch', 'ph', 'wh']);
+
+/**
+ * The single-sound parts of a blend tile, in order: 'fl' → ['f','l'],
+ * 'shr' → ['sh','r'], 'spl' → ['s','p','l'].
+ * @param {string} grapheme
+ * @returns {string[]}
+ */
+export function splitBlend(grapheme) {
+  const out = [];
+  const g = String(grapheme ?? '');
+  for (let i = 0; i < g.length; ) {
+    const two = g.slice(i, i + 2).toLowerCase();
+    if (BLEND_DIGRAPHS.includes(two)) {
+      out.push(two);
+      i += 2;
+    } else {
+      out.push(g[i]);
+      i += 1;
+    }
+  }
+  return out;
+}
+
+/**
  * Phonemes contributed by a single grapheme of the given type.
  * @param {string} grapheme
  * @param {string} type
@@ -364,8 +393,9 @@ function _phonemesForGrapheme(grapheme, type, wordText = '') {
     // per-letter if the prefix isn't curated.
     case 'p':  return PREFIX_PHONEMES[grapheme.toLowerCase()]
                   || [...grapheme].map(ch => `/${ch}/`);
-    // Blend: each letter is its own sound — and "cl" opens with /k/, not /c/.
-    case 'bl': return [...grapheme].map(ch => `/${CONSONANT_SOUNDS[ch] ?? ch}/`);
+    // Blend: each part is its own sound — "cl" opens with /k/, not /c/, and
+    // "shr" is /sh/ /r/, not three letters.
+    case 'bl': return splitBlend(grapheme).map(ch => `/${CONSONANT_SOUNDS[ch] ?? ch}/`);
     case 'c':  return grapheme === 'x'
                   ? ['/k/', '/s/']
                   : [`/${CONSONANT_SOUNDS[grapheme] ?? grapheme}/`];
@@ -381,6 +411,23 @@ function _phonemesForGrapheme(grapheme, type, wordText = '') {
     default:   return [`/${grapheme}/`];
   }
 }
+
+/**
+ * How a per-word sound override (`phonemeKeys`, an audio key) is written.
+ * Each key is one sound, so an override never changes a word's sound count.
+ */
+const PHONEME_KEY_NOTATION = Object.freeze({
+  short_oo: '/oo/', // /ʊ/ — written as "book" writes it
+  long_oo: '/oo/', //  /uː/ — written as "moon" writes it
+  long_u: '/ū/', //    /juː/ — "you"
+  long_a: '/ā/',
+  long_e: '/ē/',
+  long_i: '/ī/',
+  long_o: '/ō/',
+  aw: '/aw/',
+  er: '/er/',
+  'ə': '/ə/',
+});
 
 /**
  * The English `-ed` suffix is pronounced /ɪd/ (2 phonemes) after a stem
@@ -409,6 +456,13 @@ export function derivePhonemes(word) {
   const result    = [];
   const n = Math.min(graphemes.length, types.length);
   for (let i = 0; i < n; i++) {
+    // A per-word sound override names the recording the tile really plays
+    // (the u in "bush" is /ʊ/); the printed sound has to agree with it.
+    const key = word.phonemeKeys?.[i];
+    if (key) {
+      result.push(PHONEME_KEY_NOTATION[key] ?? `/${key}/`);
+      continue;
+    }
     let chunk = _phonemesForGrapheme(graphemes[i], types[i], word.word);
     if (graphemes[i] === '-ed' && types[i] === 'sf') {
       chunk = _adjustEdSuffix(chunk, result[result.length - 1]);
@@ -595,6 +649,8 @@ const HARD_G_EXCEPTIONS = Object.freeze(new Set([
   'tiger', 'target', 'again', 'begin', 'finger', 'anger', 'linger',
   'hunger', 'singer', 'longer', 'longest', 'bigger', 'biggest',
   'ringing', 'singing', 'forget', 'forgive', 'together',
+  // "ng" + e is the ng digraph before a suffix, not a soft g.
+  'strongest',
 ]));
 
 /** Graphemes that represent a doubled consonant producing one sound
@@ -1131,7 +1187,7 @@ export const WORDS = [
   { id:'nose',  word:'nose',  graphemes:['n','o','s','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-o', level:2, emoji:'👃' },
   { id:'rose',  word:'rose',  graphemes:['r','o','s','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-o', level:2, emoji:'🌹' },
   { id:'pose',  word:'pose',  graphemes:['p','o','s','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-o', level:2, emoji:'📸' },
-  { id:'dove',  word:'dove',  graphemes:['d','o','v','e'],  types:['c','sv','c','se'], pattern:'CVCe', group:'sight-highfreq', level:2, emoji:'🕊️' },
+  { id:'dove',  word:'dove',  graphemes:['d','o','v','e'],  types:['c','sv','c','se'], pattern:'CVCe', group:'sight-highfreq', level:2, emoji:'🕊️', irregularVowel:true, phonemeKeys:{1:'u'} },
   { id:'woke',  word:'woke',  graphemes:['w','o','k','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-o', level:2, emoji:'⏰' },
   { id:'joke',  word:'joke',  graphemes:['j','o','k','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-o', level:2, emoji:'😄' },
   { id:'poke',  word:'poke',  graphemes:['p','o','k','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-o', level:2, emoji:'👉' },
@@ -1176,17 +1232,17 @@ export const WORDS = [
   { id:'tune',  word:'tune',  graphemes:['t','u','n','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-u', level:2, emoji:'🎵' },
   { id:'cute',  word:'cute',  graphemes:['c','u','t','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-u', level:2, emoji:'🥰' },
   { id:'mule',  word:'mule',  graphemes:['m','u','l','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-u', level:2, emoji:'🫏' },
-  { id:'rule',  word:'rule',  graphemes:['r','u','l','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-u', level:2, emoji:'📏' },
+  { id:'rule',  word:'rule',  graphemes:['r','u','l','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-u', level:2, emoji:'📏', phonemeKeys:{1:'long_oo'} },
   { id:'huge',  word:'huge',  graphemes:['h','u','g','e'],  types:['c','lv','soft_g','se'], pattern:'CVCe', group:'long-u', level:2, emoji:'🐋' },
   { id:'dune',  word:'dune',  graphemes:['d','u','n','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-u', level:2, emoji:'🏜️' },
-  { id:'June',  word:'June',  graphemes:['j','u','n','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-u', level:2, emoji:'📅' },
+  { id:'June',  word:'June',  graphemes:['j','u','n','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-u', level:2, emoji:'📅', phonemeKeys:{1:'long_oo'} },
   { id:'fuse',  word:'fuse',  graphemes:['f','u','s','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-u', level:2, emoji:'💥' },
   { id:'muse',  word:'muse',  graphemes:['m','u','s','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-u', level:2, emoji:'💭' },
   { id:'use',   word:'use',   graphemes:['u','s','e'],      types:['lv','c','se'],     pattern:'CVCe', group:'long-u', level:2, emoji:'✅' },
   { id:'duke',  word:'duke',  graphemes:['d','u','k','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-u', level:2, emoji:'👑' },
-  { id:'Luke',  word:'Luke',  graphemes:['l','u','k','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-u', level:2, emoji:'🌟' },
-  { id:'flute', word:'flute', graphemes:['fl','u','t','e'], types:['bl','lv','c','se'],pattern:'CVCe', group:'long-u', level:2, emoji:'🪈' },
-  { id:'fluke', word:'fluke', graphemes:['fl','u','k','e'], types:['bl','lv','c','se'],pattern:'CVCe', group:'long-u', level:3, emoji:'🎲' },
+  { id:'Luke',  word:'Luke',  graphemes:['l','u','k','e'],  types:['c','lv','c','se'], pattern:'CVCe', group:'long-u', level:2, emoji:'🌟', phonemeKeys:{1:'long_oo'} },
+  { id:'flute', word:'flute', graphemes:['fl','u','t','e'], types:['bl','lv','c','se'],pattern:'CVCe', group:'long-u', level:2, emoji:'🪈', phonemeKeys:{1:'long_oo'} },
+  { id:'fluke', word:'fluke', graphemes:['fl','u','k','e'], types:['bl','lv','c','se'],pattern:'CVCe', group:'long-u', level:3, emoji:'🎲', phonemeKeys:{1:'long_oo'} },
 
   /* ── Long-U · ue (vowel team, distinct from u_e split-digraph) ─────── */
   { id:'blue', word:'blue', graphemes:['bl','ue'], types:['bl','lv'], pattern:'other', group:'long-u', level:2, emoji:'💙' },
@@ -1196,7 +1252,7 @@ export const WORDS = [
 
   /* ── Long-U · ew (word-end pattern, /ū/ or /uː/) ───────────────────── */
   { id:'new',  word:'new',  graphemes:['n','ew'],   types:['c','lv'],   pattern:'other', group:'long-u', level:2, emoji:'🆕' },
-  { id:'few',  word:'few',  graphemes:['f','ew'],   types:['c','lv'],   pattern:'other', group:'long-u', level:2, emoji:'✋' },
+  { id:'few',  word:'few',  graphemes:['f','ew'],   types:['c','lv'],   pattern:'other', group:'long-u', level:2, emoji:'✋', phonemeKeys:{1:'long_u'} },
   { id:'dew',  word:'dew',  graphemes:['d','ew'],   types:['c','lv'],   pattern:'other', group:'long-u', level:3, emoji:'💧' },
   { id:'drew', word:'drew', graphemes:['dr','ew'],  types:['bl','lv'],  pattern:'other', group:'long-u', level:2, emoji:'🎨' },
   { id:'blew', word:'blew', graphemes:['bl','ew'],  types:['bl','lv'],  pattern:'other', group:'long-u', level:2, emoji:'💨' },
@@ -1265,7 +1321,7 @@ export const WORDS = [
   { id:'dolphin',  word:'dolphin',  graphemes:['d','o','l','ph','i','n'],     types:['c','sv','c','d','sv','c'],  pattern:'digraph', group:'cons-ph', level:2, emoji:'🐬' },
   { id:'elephant', word:'elephant', graphemes:['e','l','e','ph','a','n','t'], types:['sv','c','sv','d','sv','c','c'], pattern:'digraph', group:'cons-ph', level:2, emoji:'🐘' },
   { id:'alphabet', word:'alphabet', graphemes:['a','l','ph','a','b','e','t'], types:['sv','c','d','sv','c','sv','c'], pattern:'digraph', group:'cons-ph', level:2, emoji:'🔠' },
-  { id:'trophy',   word:'trophy',   graphemes:['t','r','o','ph','y'],         types:['bl','bl','lv','d','lv'],    pattern:'digraph', group:'cons-ph', level:2, emoji:'🏆' },
+  { id:'trophy',   word:'trophy',   graphemes:['t','r','o','ph','y'],         types:['bl','bl','lv','d','lv'],    pattern:'digraph', group:'cons-ph', level:2, emoji:'🏆', phonemeKeys:{4:'long_e'} },
   { id:'phonics',  word:'phonics',  graphemes:['ph','o','n','i','c','s'],     types:['d','sv','c','sv','c','c'],  pattern:'digraph', group:'cons-ph', level:2, emoji:'🔤' },
   // ── Soft c and soft g (Phase 8) ────────────────────────────────────────
   // c and g say /s/ and /j/ before e, i and y. Until now these words were
@@ -1886,9 +1942,9 @@ export const WORDS = [
 
   // ── Morphology + multisyllabic + high-frequency sight words ─────────────
   { id:'untie', word:'untie', graphemes:['un','t','ie'], types:['p','c','lv'], pattern:'prefix', group:'prefixes', level:2, emoji:'🎀' },
-  { id:'redo', word:'redo', graphemes:['re','d','o'], types:['p','c','lv'], pattern:'prefix', group:'prefixes', level:2, emoji:'🔁' },
-  { id:'unable', word:'unable', graphemes:['un','a','b','le'], types:['p','sv','c','sf'], pattern:'prefix-suffix', group:'suffixes-advanced', level:3, emoji:'🚫' },
-  { id:'readable', word:'readable', graphemes:['r','ea','d','a','ble'], types:['c','lv','c','sv','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'📘' },
+  { id:'redo', word:'redo', graphemes:['re','d','o'], types:['p','c','lv'], pattern:'prefix', group:'prefixes', level:2, emoji:'🔁', phonemeKeys:{2:'long_oo'} },
+  { id:'unable', word:'unable', graphemes:['un','a','b','le'], types:['p','sv','c','sf'], pattern:'prefix-suffix', group:'suffixes-advanced', level:3, emoji:'🚫', phonemeKeys:{1:'long_a'} },
+  { id:'readable', word:'readable', graphemes:['r','ea','d','able'], types:['c','lv','c','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'📘' },
   { id:'action', word:'action', graphemes:['a','c','tion'], types:['sv','c','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🎬' },
   { id:'nation', word:'nation', graphemes:['n','a','tion'], types:['c','lv','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🇸🇬' },
   { id:'science', word:'science', graphemes:['sci','en','ce'], types:['c','sv','c'], pattern:'multisyllable', group:'multisyllable', level:3, emoji:'🔬' },
@@ -1948,7 +2004,7 @@ export const WORDS = [
   // have more than the original ~30 words to draw from.
   { id:'point', word:'point', graphemes:['p','oi','n','t'], types:['c','dp','c','c'],      pattern:'other', group:'diphthongs', level:3, emoji:'👉' },
   { id:'joint', word:'joint', graphemes:['j','oi','n','t'], types:['c','dp','c','c'],      pattern:'other', group:'diphthongs', level:3, emoji:'🦴' },
-  { id:'noise', word:'noise', graphemes:['n','oi','se'],    types:['c','dp','d'],          pattern:'other', group:'diphthongs', level:3, emoji:'🔊' },
+  { id:'noise', word:'noise', graphemes:['n','oi','se'],    types:['c','dp','d'],          pattern:'other', group:'diphthongs', level:3, emoji:'🔊', phonemeKeys:{2:'z'} },
   { id:'voice', word:'voice', graphemes:['v','oi','c','e'], types:['c','dp','soft_c','se'],pattern:'other', group:'diphthongs', level:3, emoji:'🎤' },
   { id:'crown', word:'crown', graphemes:['cr','ow','n'],    types:['bl','dp','c'],         pattern:'other', group:'diphthongs', level:3, emoji:'👑' },
   { id:'brown', word:'brown', graphemes:['br','ow','n'],    types:['bl','dp','c'],         pattern:'other', group:'diphthongs', level:3, emoji:'🟫' },
@@ -2001,11 +2057,11 @@ export const WORDS = [
   // ── Vowel team /oo/ · ue (stage long-u-uue) ─────────────────────────────────────
   { id:'sue',    word:'sue',    graphemes:['s','ue'],          types:['c','lv'],         pattern:'other', group:'long-u', level:2, emoji:'⚖️' },
   { id:'due',    word:'due',    graphemes:['d','ue'],          types:['c','lv'],         pattern:'other', group:'long-u', level:2, emoji:'📅' },
-  { id:'cue',    word:'cue',    graphemes:['c','ue'],          types:['c','lv'],         pattern:'other', group:'long-u', level:2, emoji:'🎱' },
-  { id:'hue',    word:'hue',    graphemes:['h','ue'],          types:['c','lv'],         pattern:'other', group:'long-u', level:2, emoji:'🎨' },
+  { id:'cue',    word:'cue',    graphemes:['c','ue'],          types:['c','lv'],         pattern:'other', group:'long-u', level:2, emoji:'🎱', phonemeKeys:{1:'long_u'} },
+  { id:'hue',    word:'hue',    graphemes:['h','ue'],          types:['c','lv'],         pattern:'other', group:'long-u', level:2, emoji:'🎨', phonemeKeys:{1:'long_u'} },
   { id:'flue',   word:'flue',   graphemes:['fl','ue'],         types:['bl','lv'],        pattern:'other', group:'long-u', level:2, emoji:'🏭' },
   { id:'rue',    word:'rue',    graphemes:['r','ue'],          types:['c','lv'],         pattern:'other', group:'long-u', level:2, emoji:'😔' },
-  { id:'rescue', word:'rescue', graphemes:['r','e','s','c','ue'], types:['c','sv','c','c','lv'], pattern:'other', group:'long-u', level:3, emoji:'🛟' },
+  { id:'rescue', word:'rescue', graphemes:['r','e','s','c','ue'], types:['c','sv','c','c','lv'], pattern:'other', group:'long-u', level:3, emoji:'🛟', phonemeKeys:{4:'long_u'} },
   { id:'statue', word:'statue', graphemes:['st','a','t','ue'], types:['bl','sv','c','lv'], pattern:'other', group:'long-u', level:3, emoji:'🗽' },
 
   // ── Vowel team /oo/ · ew (stage long-u-ew) ──────────────────────────────────────
@@ -2037,7 +2093,7 @@ export const WORDS = [
   { id:'snacked', word:'snacked', graphemes:['sn','a','ck','-ed'], types:['bl','sv','d','sf'], pattern:'suffix', group:'suffix-ed', level:3, emoji:'🍿' },
 
   // ── -er words (stage suffix-er) ────────────────────────────────────────
-  { id:'taller', word:'taller', graphemes:['t','a','ll','-er'], types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-er', level:3, emoji:'🦒' },
+  { id:'taller', word:'taller', graphemes:['t','a','ll','-er'], types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-er', level:3, emoji:'🦒', irregularVowel:true, phonemeKeys:{1:'aw'} },
   { id:'helper', word:'helper', graphemes:['h','e','lp','-er'], types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-er', level:3, emoji:'🤝' },
   { id:'softer', word:'softer', graphemes:['s','o','ft','-er'], types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-er', level:3, emoji:'🧸' },
   { id:'camper', word:'camper', graphemes:['c','a','mp','-er'], types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-er', level:3, emoji:'⛺' },
@@ -2051,7 +2107,7 @@ export const WORDS = [
   { id:'kicker', word:'kicker', graphemes:['k','i','ck','-er'], types:['c','sv','d','sf'], pattern:'suffix', group:'suffix-er', level:3, emoji:'⚽' },
 
   // ── -est words (stage suffix-est) ──────────────────────────────────────
-  { id:'tallest',  word:'tallest',  graphemes:['t','a','ll','-est'], types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-est', level:3, emoji:'🦒' },
+  { id:'tallest',  word:'tallest',  graphemes:['t','a','ll','-est'], types:['c','sv','c','sf'],  pattern:'suffix', group:'suffix-est', level:3, emoji:'🦒', irregularVowel:true, phonemeKeys:{1:'aw'} },
   { id:'softest',  word:'softest',  graphemes:['s','o','ft','-est'], types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'🧸' },
   { id:'dampest',  word:'dampest',  graphemes:['d','a','mp','-est'], types:['c','sv','bl','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'💧' },
   { id:'freshest', word:'freshest', graphemes:['fr','e','sh','-est'],types:['bl','sv','d','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'🌿' },
@@ -2065,7 +2121,7 @@ export const WORDS = [
   { id:'neatest', word:'neatest', graphemes:['n','ea','t','-est'], types:['c','lv','c','sf'], pattern:'suffix', group:'suffix-est', level:3, emoji:'✨' },
 
   // ── Prefix words (stage prefixes) ──────────────────────────────────────
-  { id:'undo',   word:'undo',   graphemes:['un','d','o'],     types:['p','c','lv'],      pattern:'prefix', group:'prefixes', level:2, emoji:'↩️' },
+  { id:'undo',   word:'undo',   graphemes:['un','d','o'],     types:['p','c','lv'],      pattern:'prefix', group:'prefixes', level:2, emoji:'↩️', phonemeKeys:{2:'long_oo'} },
   { id:'unzip',  word:'unzip',  graphemes:['un','z','i','p'], types:['p','c','sv','c'],  pattern:'prefix', group:'prefixes', level:2, emoji:'🤐' },
   { id:'unpack', word:'unpack', graphemes:['un','p','a','ck'],types:['p','c','sv','d'],  pattern:'prefix', group:'prefixes', level:2, emoji:'📦' },
   { id:'unlock', word:'unlock', graphemes:['un','l','o','ck'],types:['p','c','sv','d'],  pattern:'prefix', group:'prefixes', level:2, emoji:'🔓' },
@@ -2090,8 +2146,8 @@ export const WORDS = [
   { id:'motion',   word:'motion',   graphemes:['m','o','tion'],      types:['c','lv','sf'],      pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🎞️' },
   { id:'section',  word:'section',  graphemes:['s','e','c','tion'],  types:['c','sv','c','sf'],  pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'📑' },
   { id:'mention',  word:'mention',  graphemes:['m','e','n','tion'],  types:['c','sv','c','sf'],  pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'💬' },
-  { id:'lovable',  word:'lovable',  graphemes:['l','o','v','able'],  types:['c','sv','c','sf'],  pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🥰' },
-  { id:'washable', word:'washable', graphemes:['w','a','sh','able'], types:['c','sv','d','sf'],  pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🧼' },
+  { id:'lovable',  word:'lovable',  graphemes:['l','o','v','able'],  types:['c','sv','c','sf'],  pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🥰', irregularVowel:true, phonemeKeys:{1:'u'} },
+  { id:'washable', word:'washable', graphemes:['w','a','sh','able'], types:['c','sv','d','sf'],  pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🧼', irregularVowel:true, phonemeKeys:{1:'o'} },
   { id:'lotion',   word:'lotion',   graphemes:['l','o','tion'],      types:['c','lv','sf'],      pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🧴' },
   { id:'potion', word:'potion', graphemes:['p','o','tion'], types:['c','lv','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🧪' },
   { id:'caption', word:'caption', graphemes:['c','a','p','tion'], types:['c','sv','c','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'💬' },
@@ -2123,17 +2179,17 @@ export const WORDS = [
 
   // ── High-frequency sight words (stage sight-highfreq) ──────────────────
   { id:'would', word:'would', graphemes:['w','ould'],   types:['c','lv'],      pattern:'sight', group:'sight-highfreq', level:2, emoji:'🙏' },
-  { id:'said',  word:'said',  graphemes:['s','ai','d'], types:['c','sv','c'],  pattern:'sight', group:'sight-highfreq', level:2, emoji:'💬' },
-  { id:'come',  word:'come',  graphemes:['c','o','me'], types:['c','sv','se'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'👋' },
-  { id:'some',  word:'some',  graphemes:['s','o','me'], types:['c','sv','se'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🍪' },
-  { id:'what', word:'what', graphemes:['wh','a','t'], types:['d','sv','c'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'❓', irregularVowel:true },
-  { id:'were', word:'were', graphemes:['w','ere'], types:['c','rc'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'⏳' },
-  { id:'want', word:'want', graphemes:['w','a','nt'], types:['c','sv','bl'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🙋', irregularVowel:true },
-  { id:'does', word:'does', graphemes:['d','oe','s'], types:['c','sv','c'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'❔' },
-  { id:'done', word:'done', graphemes:['d','o','ne'], types:['c','sv','se'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🏁' },
+  { id:'said',  word:'said',  graphemes:['s','ai','d'], types:['c','sv','c'],  pattern:'sight', group:'sight-highfreq', level:2, emoji:'💬', irregularVowel:true, phonemeKeys:{1:'e'} },
+  { id:'come',  word:'come',  graphemes:['c','o','m','e'], types:['c','sv','c','se'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'👋', irregularVowel:true, phonemeKeys:{1:'u'} },
+  { id:'some',  word:'some',  graphemes:['s','o','m','e'], types:['c','sv','c','se'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🍪', irregularVowel:true, phonemeKeys:{1:'u'} },
+  { id:'what', word:'what', graphemes:['wh','a','t'], types:['d','sv','c'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'❓', irregularVowel:true, phonemeKeys:{1:'o'} },
+  { id:'were', word:'were', graphemes:['w','ere'], types:['c','rc'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'⏳', phonemeKeys:{1:'er'} },
+  { id:'want', word:'want', graphemes:['w','a','nt'], types:['c','sv','bl'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🙋', irregularVowel:true, phonemeKeys:{1:'o'} },
+  { id:'does', word:'does', graphemes:['d','oe','s'], types:['c','sv','c'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'❔', irregularVowel:true, phonemeKeys:{1:'u', 2:'z'} },
+  { id:'done', word:'done', graphemes:['d','o','n','e'], types:['c','sv','c','se'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🏁', irregularVowel:true, phonemeKeys:{1:'u'} },
   { id:'once', word:'once', graphemes:['o','n','ce'], types:['sv','c','c'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'1️⃣' },
-  { id:'again', word:'again', graphemes:['a','g','ai','n'], types:['sv','c','sv','c'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🔁' },
-  { id:'who', word:'who', graphemes:['wh','o'], types:['d','lv'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🕵️' },
+  { id:'again', word:'again', graphemes:['a','g','ai','n'], types:['sv','c','sv','c'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🔁', irregularVowel:true, phonemeKeys:{0:'ə', 2:'e'} },
+  { id:'who', word:'who', graphemes:['wh','o'], types:['d','lv'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🕵️', irregularVowel:true, phonemeKeys:{0:'h', 1:'long_oo'} },
 ];
 
 // Attach `phonemes`, `spellingPattern`, `flags`, and `decodableStage` to
@@ -2149,6 +2205,42 @@ for (const w of WORDS) {
   if (typeof w.spellingPattern === 'undefined')    w.spellingPattern = deriveSpellingPattern(w);
   if (!Array.isArray(w.flags))                     w.flags           = deriveFlags(w);
   if (typeof w.decodableStage === 'undefined')     w.decodableStage  = deriveDecodableStage(w);
+}
+
+/**
+ * Per-word sound overrides, by lowercase word text.
+ *
+ * Most tiles sound the way their spelling and type say, but a few words
+ * break the rule: the u in "bush" is /ʊ/, not the u of "bus"; the u_e in
+ * "rule" is /oo/, not the "you" of "cube". The word entry names the
+ * recording in `phonemeKeys`. Built once, so every mode that sounds a word
+ * out — not only the ones that remember to look — plays the real sound.
+ */
+const PHONEME_KEYS_BY_WORD = new Map(
+  WORDS.filter((w) => w.phonemeKeys).map((w) => [
+    w.word.toLowerCase(),
+    { graphemes: w.graphemes, keys: w.phonemeKeys },
+  ]),
+);
+
+/**
+ * The recording a word's tile must play instead of its spelling's default,
+ * or null when the default is right.
+ *
+ * @param {string} wordText  the whole word
+ * @param {number|undefined} index  the tile's position, when the caller knows it
+ * @param {string} grapheme  the tile's spelling, to confirm the match
+ * @returns {string|null}
+ */
+export function phonemeKeyFor(wordText, index, grapheme) {
+  const entry = PHONEME_KEYS_BY_WORD.get(String(wordText ?? '').toLowerCase());
+  if (!entry) return null;
+  if (Number.isInteger(index)) {
+    return entry.graphemes[index] === grapheme ? (entry.keys[index] ?? null) : null;
+  }
+  // No index: accept the grapheme only when it names exactly one overridden tile.
+  const hits = Object.keys(entry.keys).filter((i) => entry.graphemes[i] === grapheme);
+  return hits.length === 1 ? entry.keys[hits[0]] : null;
 }
 
 /**

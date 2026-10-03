@@ -202,6 +202,7 @@ async function _revealNext(word, els) {
     await audio.speakChunk(word, idx);
     await _delay(150);
     await audio.speakPhoneme(word.graphemes[idx], word.types[idx], {
+      index: idx,
       word: word.word,
       prevGrapheme: word.graphemes[idx - 1],
     });
@@ -210,6 +211,7 @@ async function _revealNext(word, els) {
   } else {
     const prevGrapheme = idx > 0 ? word.graphemes[idx - 1] : null;
     await audio.speakPhoneme(word.graphemes[idx], word.types[idx], {
+      index: idx,
       word: word.word,
       prevGrapheme,
     });
@@ -275,7 +277,7 @@ async function _animateBlendSweep(phonemeRow, word) {
     if (tiles.length < 2) {
       tiles[0].classList.add('blend-highlight');
       moveGuideTo(phonemeRow, 0);
-      await audio.speakPhoneme(word.graphemes[0], word.types[0], { word: word.word });
+      await audio.speakPhoneme(word.graphemes[0], word.types[0], { index: 0, word: word.word });
       await _delay(perTile);
     } else {
       for (let i = 1; i < tiles.length; i++) {
@@ -286,6 +288,7 @@ async function _animateBlendSweep(phonemeRow, word) {
         tiles.forEach((t, ti) => t.classList.toggle('blend-highlight', ti === i));
         moveGuideTo(phonemeRow, i);
         await audio.speakPhoneme(word.graphemes[i], word.types[i], {
+          index: i,
           word: word.word,
           prevGrapheme: word.graphemes[i - 1],
         });
@@ -304,6 +307,7 @@ async function _animateBlendSweep(phonemeRow, word) {
       moveGuideTo(phonemeRow, i);
       const prev = i > 0 ? word.graphemes[i - 1] : null;
       await audio.speakPhoneme(word.graphemes[i], word.types[i], {
+        index: i,
         word: word.word,
         prevGrapheme: prev,
       });

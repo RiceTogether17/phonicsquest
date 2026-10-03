@@ -145,6 +145,7 @@ function _revealAnswer(word, els) {
   setTimeout(async () => {
     const prevGrapheme = missingIndex > 0 ? word.graphemes[missingIndex - 1] : null;
     await audio.speakPhoneme(word.graphemes[missingIndex], word.types[missingIndex], {
+      index: missingIndex,
       word: word.word,
       prevGrapheme,
     });
