@@ -77,6 +77,7 @@ const dashboardMod = lazyModule(() => import('./components/dashboard.js'));
 const roadmapMod = lazyModule(() => import('./components/roadmap.js'));
 const storyModeMod = lazyModule(() => import('./modes/storyMode.js'));
 const sentenceForgeMod = lazyModule(() => import('./modes/sentenceForge.js'));
+const sightSentencesMod = lazyModule(() => import('./modes/sightSentences.js'));
 const clozeCastleMod = lazyModule(() => import('./modes/clozeCastle.js'));
 const wordVaultMod = lazyModule(() => import('./modes/wordVault.js'));
 const grammarMcqMod = lazyModule(() => import('./modes/grammarMcq.js'));
@@ -403,16 +404,28 @@ class App {
       this._startDailyChallenge();
     });
 
-    // Sight Words: the container hosts both the Match mode (browser + card
-    // game) and the Learn mode (study screen). The two are wired together via
-    // callbacks so the child can hop between Learn → Match → Browser without
-    // leaving the Sight Words screen.
+    // Sight Words: the container hosts the Match mode (browser + card game),
+    // the Learn mode (study screen) and Sentence Stars (the words read in
+    // sentences). They are wired together via callbacks so the child can hop
+    // between them and the browser without leaving the Sight Words screen.
     const sightContainer = () => document.getElementById('sight-match-content');
 
     const enterSightBrowser = () => {
       cleanupSightLearn();
-      initSightMatch(sightContainer(), goHomeFromSight, openSightLearn);
+      sightSentencesMod.get()?.cleanupSightSentences();
+      initSightMatch(sightContainer(), goHomeFromSight, openSightLearn, openSightSentences);
       showSightBrowser();
+    };
+
+    const openSightSentences = async (quest) => {
+      const m = await sightSentencesMod.load();
+      cleanupSightMatch();
+      m.initSightSentences(sightContainer(), {
+        onGoHome: goHomeFromSight,
+        onBackToBrowser: enterSightBrowser,
+      });
+      m.showSightSentences(quest);
+      mascot.setState('celebrate');
     };
 
     const openSightLearn = (quest) => {
@@ -422,7 +435,7 @@ class App {
         onBackToBrowser: enterSightBrowser,
         onStartMatch: (q) => {
           cleanupSightLearn();
-          initSightMatch(sightContainer(), goHomeFromSight, openSightLearn);
+          initSightMatch(sightContainer(), goHomeFromSight, openSightLearn, openSightSentences);
           startSightMatchQuest(q);
         },
       });
@@ -433,6 +446,7 @@ class App {
     const goHomeFromSight = () => {
       cleanupSightMatch();
       cleanupSightLearn();
+      sightSentencesMod.get()?.cleanupSightSentences();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     };
