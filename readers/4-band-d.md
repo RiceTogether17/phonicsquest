@@ -136,6 +136,13 @@ _For the back page of the book._
    A wooden chair ✓ · A stall · A toy · A table
 3. What does "a fair hand" mean in this story?  
    A natural talent or skill ✓ · A clean hand · A large hand · A fair deal
+4. True or false? Giri bought popcorn at the fair.  
+   True · False · The story does not say ✓
+5. Giri took the ___ and gave the dowel one careful tap.  
+   mallet ✓ · dowel · carpenter
+
+**Write about it:** Why did Giri feel proud as he walked home?  
+_A good answer:_ He had learnt a new skill, fixing a chair with a dowel, and the carpenter said he had a fair hand for the work.
 
 **Talk about it:**
 - What was wrong with the wooden chair at the stall?
@@ -266,6 +273,13 @@ _For the back page of the book._
    He felt shy ✓ · He was tired · He did not like music · He could not find the hall
 3. What is the main message of this story?  
    Joining in can bring unexpected joy ✓ · Singing is only for adults · You should always sit by the window · Loud noises are bad
+4. True or false? Giri joined in at once, as soon as he got there.  
+   True · False ✓ · The story does not say
+5. The voices ___ around the room — high, low, loud, and soft.  
+   bounced ✓ · swayed · humming
+
+**Write about it:** How did Giri change from the start of the singing to the end?  
+_A good answer:_ At first he felt shy, so he only sat and listened. By the end he sang loud and proud with the whole group.
 
 **Talk about it:**
 - How did Giri's voice change from the start of the singing to the end?
@@ -400,6 +414,13 @@ _For the back page of the book._
    Sandpaper, glue, and a plank ✓ · A hammer and nails · Paint and a brush · A saw and tape
 3. What does "something shared" mean at the end?  
    Something everyone can enjoy ✓ · Something expensive · Something Giri kept for himself · Something broken
+4. True or false? Giri sanded the seat until it was smooth.  
+   True ✓ · False · The story does not say
+5. "This is the best seat in the block," she ___.  
+   declared ✓ · beamed · spare
+
+**Write about it:** Why do you think no one had cared about the old chair before Giri?  
+_A good answer:_ It was old and worn. The seat was bare and the armrest had a tear, so people just walked past it.
 
 **Talk about it:**
 - What three things did Giri do to repair the chair?
@@ -535,6 +556,13 @@ _For the back page of the book._
    A farewell party ✓ · A football match · A school play · A treasure hunt
 3. What did Mei Ling mean by "we will always be near"?  
    True friends stay close in heart even when apart ✓ · They would be in the same class · They lived next door · They would call every day
+4. True or false? Mei Ling made the hand-drawn card.  
+   True · False · The story does not say ✓
+5. They had set up a small ___ party.  
+   farewell ✓ · cordial · beginning
+
+**Write about it:** Why did Giri think this was not an ending but a beginning?  
+_A good answer:_ His friends showed they would stay his friends even in different classes, so it was the start of a friendship that would last.
 
 **Talk about it:**
 - Why did Giri feel a knot of fear at the start of the day?
@@ -663,6 +691,13 @@ _For the back page of the book._
    The crowd roaring for him ✓ · His coach told him to · He wanted a trophy · He was not hurt
 3. What did Giri learn about courage?  
    It is about getting up when you fall ✓ · It means winning every race · It means never being scared · It means being the fastest
+4. True or false? Giri's team won a trophy.  
+   True · False ✓ · The story does not say
+5. He ___, fell, and felt the grit sting his knee.  
+   stumbled ✓ · sprinted · bounced
+
+**Write about it:** What did Giri decide courage is? Do you agree?  
+_A good answer:_ He decided courage is not about never falling down, but about getting up and carrying on. I agree, because he got up and finished the race.
 
 **Talk about it:**
 - What happened to Giri halfway round the bend?
@@ -793,6 +828,13 @@ _For the back page of the book._
    A photo, earrings, and a letter ✓ · Gold coins · Jewels and gems · Old books
 3. Why is the real treasure not gold or jewels?  
    The real treasure is the family connection and memories ✓ · Gold is too heavy · Jewels are not real · The box was too small
+4. True or false? Giri's grandmother was at home when he found the map.  
+   True · False · The story does not say ✓
+5. Giri sat back on his heels, ___.  
+   awed ✓ · canal · compass
+
+**Write about it:** Why did Giri carry the box home with the greatest care?  
+_A good answer:_ It held his grandmother's photo, her earrings and her letter. They were a memory of someone he loved, so they mattered more than gold.
 
 **Talk about it:**
 - What did Giri actually find inside the wooden box?
@@ -920,6 +962,13 @@ _For the back page of the book._
    A paper windmill ✓ · A round bun · A cold drink · A toy mouse
 3. Why did Giri pick the windmill over the other things?  
    It would keep spinning and turning all day ✓ · It was the cheapest · The man asked him to · His mum chose it
+4. True or false? The windmill made a loud little clack as it turned.  
+   True ✓ · False · The story does not say
+5. So many ___!  
+   choices ✓ · crowds · doubt
+
+**Write about it:** Was the windmill money well spent? Why?  
+_A good answer:_ Yes. Giri can enjoy it every day, because a windmill turns all day, but a bun is gone after a few bites.
 
 **Talk about it:**
 - What did Giri choose to spend his two dollars on?
@@ -1046,6 +1095,13 @@ _For the back page of the book._
    A hawk ✓ · A kite · A plane · A crow
 3. What did Giri mean by "the part most people never saw"?  
    Most people are still asleep at dawn ✓ · The drawing was hidden · The lawn was private · The hawk flew too fast
+4. True or false? Giri woke up after the sun came up.  
+   True · False ✓ · The story does not say
+5. A hawk ___ past on wide, still wings.  
+   soared ✓ · caught · streaks
+
+**Write about it:** What would you draw if you woke up before dawn? Why?  
+_A good answer:_ I would draw the birds waking up in the trees, because they sing loudest early in the morning.
 
 **Talk about it:**
 - Why did Giri go out to the lawn before the sun came up?
@@ -1178,6 +1234,13 @@ _For the back page of the book._
    Curled up beside Giri and slept ✓ · Ran away · Barked all day · Dug up the plants
 3. What did Giri learn about caring for a pet?  
    It is hard work but worth it ✓ · It is always easy · Dogs do not need walks · Pets like being alone
+4. True or false? Scout slept in Giri's bed at night.  
+   True · False · The story does not say ✓
+5. Scout was her small brown dog with one ___ ear.  
+   floppy ✓ · proud · weekend
+
+**Write about it:** What was hard about looking after Scout, and what was good about it?  
+_A good answer:_ It was hard because Scout needed food, water and two walks, and he barked and chased his tail. It was good when he curled up and fell asleep beside Giri.
 
 **Talk about it:**
 - What jobs did Giri have to do to take care of Scout?
@@ -1308,6 +1371,13 @@ _For the back page of the book._
    A pot of orchids at the flower shop ✓ · A red robot · A coin jar · A new dress
 3. Why did Giri stop saving for the robot?  
    He wanted to buy the orchids for his mum instead ✓ · He lost his coins · The robot was sold out · He stopped liking robots
+4. True or false? Mum looked at the price and bought the flowers.  
+   True · False ✓ · The story does not say
+5. Her mouth fell open, then ___ into the widest smile.  
+   curved ✓ · counted · dropped
+
+**Write about it:** Why do you think Giri chose the orchids instead of the robot?  
+_A good answer:_ He saw how much his mum liked the orchids, and making her happy mattered more to him than a toy.
 
 **Talk about it:**
 - What was Giri saving his coins for at the start?
@@ -1435,6 +1505,13 @@ _For the back page of the book._
    A crowd of kids ✓ · Smoke · Dust from a truck · Rain
 3. What did Giri learn about scary things?  
    They feel smaller when you find out about them ✓ · They always go away · You should hide first · You should shout at them
+4. True or false? Giri counted his steps out loud to stay brave.  
+   True ✓ · False · The story does not say
+5. It was not a cloud at all! It was a ___.  
+   crowd ✓ · cloud · crown
+
+**Write about it:** What did Giri do to stay brave, and why did it help?  
+_A good answer:_ He counted his steps out loud. It gave him something to think about, so he kept walking instead of running away.
 
 **Talk about it:**
 - What did Giri think the brown cloud was, and what was it really?

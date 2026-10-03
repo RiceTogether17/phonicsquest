@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { findClue, clueForQuestion, sentences, keywords, MIN_SCORE } from '../modules/storyClue.js';
 import { STORIES } from '../data/stories.js';
+import { NOT_SAID } from '../modes/storyQuest.js';
 import { words } from '../utils/tokenise.js';
 
 const story = {
@@ -86,7 +87,11 @@ describe('finding the clue', () => {
 
 describe('measured against every authored question', () => {
   const withQuests = STORIES.filter((s) => s.comprehension?.length);
-  const all = withQuests.flatMap((s) => s.comprehension.map((q) => ({ s, q })));
+  // Put-in-order questions have no single sentence, and a statement the
+  // story never makes must not be pointed at one; neither asks for a clue.
+  const all = withQuests
+    .flatMap((s) => s.comprehension.map((q) => ({ s, q })))
+    .filter(({ q }) => q.kind !== 'order' && q.options[q.answer] !== NOT_SAID);
 
   it('finds a clue for every literal question in the bank', () => {
     // A literal question is one whose answer is stated in the text, so

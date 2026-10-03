@@ -133,6 +133,10 @@ _For the back page of the book._
    It stayed flat ✓ · It was too hot · It fell in the lake
 3. How did Giri turn the flat cake into a great one?  
    He made a stack with jam ✓ · He baked it again · He gave it to Jay
+4. Jay ate it by the ___.  
+   lake ✓ · lack · lick
+5. Put these in the order they happened.  
+   (1) The cake stayed flat in the pan. (2) Giri gave the pan a brave shake. (3) Giri made a stack of cake and jam.
 
 **Talk about it:**
 - How did Giri turn a flat cake into a great cake?
@@ -252,6 +256,10 @@ _For the back page of the book._
    On the stone ✓ · In the boat · In the foam
 3. What happened once the toads had gone?  
    The boat rose and rode home ✓ · The boat still sat low · The stream got slow
+4. But the boat did not ___!  
+   float ✓ · flat · flit
+5. Put these in the order they happened.  
+   (1) The boat sat low by a big stone. (2) Giri made the toads a moss home. (3) The boat rode the foam home.
 
 **Talk about it:**
 - Why was the boat sitting so low in the water?
@@ -372,6 +380,10 @@ _For the back page of the book._
    A green leaf ✓ · A tree · A nest
 3. Why did Giri think a leaf would help?  
    It could lift the bee up ✓ · It was green · The bee could eat it
+4. It was too ___ to see its way home.  
+   weak ✓ · wake · wick
+5. Put these in the order they happened.  
+   (1) Giri met a weak bee by a green tree. (2) He set the bee on a green leaf. (3) The bee sped up to see its nest.
 
 **Talk about it:**
 - How did the bee get up to its tree?
@@ -490,6 +502,10 @@ _For the back page of the book._
    He ran ✓ · He sat still · He went up the hill
 3. What does this show about Giri?  
    He made the wind himself ✓ · He gave up fast · He did not like his kite
+4. Giri climbed a high hill with his bright ___.  
+   kite ✓ · kit · cat
+5. Put these in the order they happened.  
+   (1) The kite fell to the side. (2) Giri ran to make the wind. (3) The kite went up high.
 
 **Talk about it:**
 - How did Giri make his own wind?
@@ -611,6 +627,10 @@ _For the back page of the book._
    With a soft push ✓ · He let the rain take it · He put it in his hand
 3. Why did it take Giri all day?  
    A snail is small and takes its time ✓ · The rain was cold · He had to wait for May
+4. Cold ___ fell fast on the trail.  
+   rain ✓ · ran · rim
+5. Put these in the order they happened.  
+   (1) Giri met a small snail on the trail. (2) Giri gave the snail a soft push. (3) The snail waved its tail.
 
 **Talk about it:**
 - Why did Giri have to wait so long?
@@ -732,6 +752,10 @@ _For the back page of the book._
    Two white stripes ✓ · A green leaf · His kite plan
 3. Why did the kite fall on its side at first?  
    It had no tail ✓ · Its strings were cut · It was made of salt
+4. He cut one white ___.  
+   stripe ✓ · strip · strap
+5. Put these in the order they happened.  
+   (1) The kite fell on its side. (2) Giri cut one white stripe, then the other. (3) The kite rose high in the sky.
 
 **Talk about it:**
 - What did the kite need to fly?
@@ -850,6 +874,10 @@ _For the back page of the book._
    He rolled the rock off the lane ✓ · He went home · He fixed his bike
 3. Why did Giri roll the rock off the lane?  
    So no one else would fall ✓ · He wanted to keep it · It was in his way home
+4. He rode on until he felt ___.  
+   fine ✓ · fin · fun
+5. Put these in the order they happened.  
+   (1) The bike hit a rock. (2) A young pup came by. (3) Giri rolled the rock off the side.
 
 **Talk about it:**
 - Why did Giri roll the stone off the lane?
@@ -972,6 +1000,10 @@ _For the back page of the book._
    A big pile of oats ✓ · His coat · A hot bun
 3. Why did the goat stop eating the coat?  
    The oats were tasty ✓ · It had to go home · The coat was too soft
+4. The goat had a bite of Giri's soft ___!  
+   coat ✓ · cot · cat
+5. Put these in the order they happened.  
+   (1) The goat had a bite of Giri's coat. (2) Giri held out a big pile of oats. (3) The goat ran to its mother and brother.
 
 **Talk about it:**
 - Why did the goat stop eating the coat?
@@ -1094,6 +1126,10 @@ _For the back page of the book._
    A sweet peach ✓ · A green bean · Sea weed
 3. What game did Giri play with the sea?  
    Tag ✓ · Hide and seek · Leap frog
+4. They had a sweet ___ treat.  
+   peach ✓ · peck · pick
+5. Put these in the order they happened.  
+   (1) A wave reached his feet. (2) They all ran up the beach. (3) They had a sweet peach treat.
 
 **Talk about it:**
 - What game did Giri play with the sea?
@@ -1217,6 +1253,10 @@ _For the back page of the book._
    Big mud prints ✓ · A rain trail · A mud cave
 3. How did Giri feel about the rain in the end?  
    He had fun ✓ · He was cross · He was sad
+4. Giri was on a long gray ___.  
+   trail ✓ · trap · trip
+5. Put these in the order they happened.  
+   (1) A big rain came fast. (2) Giri hid in a cave to watch the rain. (3) Giri made big mud prints all the way home.
 
 **Talk about it:**
 - What did Giri make with his feet on the muddy trail?
@@ -1337,6 +1377,10 @@ _For the back page of the book._
    His friend ✓ · His mother · A bee
 3. How do we know the seed had woken up?  
    A green leaf reached up ✓ · It gave a nod · It was in the heat
+4. Giri had a green ___.  
+   seed ✓ · sad · set
+5. Put these in the order they happened.  
+   (1) The seed did not seem to wake. (2) Giri gave it a drink each day. (3) A green leaf reached up.
 
 **Talk about it:**
 - What did the seed need to grow?
@@ -1454,6 +1498,10 @@ _For the back page of the book._
    A note slot ✓ · A home for the mole · A way to the oak
 3. Why did Giri not fill the hole in?  
    He made it of use ✓ · He was too old · The mole dug it again
+4. A nosy mole dug a deep ___ in the stone wall.  
+   hole ✓ · hill · hut
+5. Put these in the order they happened.  
+   (1) Giri went to make a home in a stone cave. (2) A nosy mole dug a hole in the wall. (3) Giri made the hole a note slot.
 
 **Talk about it:**
 - What did Giri turn the hole into?
@@ -1575,6 +1623,10 @@ _For the back page of the book._
    Soap and suds ✓ · A brush · Cool shade
 3. What happened when Giri played again?  
    People sat to see him play ✓ · The flute broke · No tune came out
+4. He liked to play a ___ in the cool shade.  
+   tune ✓ · tin · tan
+5. Put these in the order they happened.  
+   (1) The flute made no tune. (2) Giri used a cube of soap and a tub of suds. (3) People sat to see him play.
 
 **Talk about it:**
 - Why did the flute stop making a tune?
@@ -1694,6 +1746,10 @@ _For the back page of the book._
    Blue ✓ · White · Green
 3. What did Giri do when the old kite got stuck?  
    He made a new one ✓ · He gave up · He climbed the tree
+4. Giri drew a plan for a new kite with a deep ___ pen.  
+   blue ✓ · black · block
+5. Put these in the order they happened.  
+   (1) The old kite flew into a tree and got stuck. (2) Giri glued the frame of the new kite. (3) The new kite flew up, up!
 
 **Talk about it:**
 - What did Giri do when his old kite got stuck?
@@ -1811,6 +1867,10 @@ _For the back page of the book._
    He ate a snack ✓ · He went home · He swam in the pool
 3. Why did Giri keep still and wait?  
    To see the moon come back ✓ · To see the flies zoom · To keep the pool dim
+4. One night Giri went to the pool to see the ___ shine like a plate.  
+   moon ✓ · man · map
+5. Put these in the order they happened.  
+   (1) A grey mist hid the moon. (2) Two flies zoomed by. (3) The moon came back and lit up the sea.
 
 **Talk about it:**
 - What hid the moon for a little while?
@@ -1934,6 +1994,10 @@ _For the back page of the book._
    A brush and a bin ✓ · A mop · Just his hands
 3. How did the man feel at the end?  
    Glad ✓ · Cross · Sad
+4. Shells sat in a big box on a ___.  
+   shelf ✓ · self · elf
+5. Put these in the order they happened.  
+   (1) The box fell off the shelf. (2) Giri got a brush and a bin. (3) A moth in the box began to fly.
 
 **Talk about it:**
 - How did Giri help at the shell shop?
@@ -2056,6 +2120,10 @@ _For the back page of the book._
    He shut an eye and sang from the top ✓ · He got a pal to sing · He did quit
 3. What does this story show about Giri?  
    He did not quit ✓ · He sang best with his pals · He got it wrong at the test
+4. He sang it with a ___ clap and a click.  
+   quick ✓ · kick · sick
+5. Put these in the order they happened.  
+   (1) At the test run, the song went wrong. (2) Giri shut an eye and sang from the top. (3) His pals sang along.
 
 **Talk about it:**
 - What did Giri do when the song went wrong?
@@ -2184,6 +2252,10 @@ _For the back page of the book._
    A hot bun ✓ · A trip to the lake · A game
 3. Was Mole glad he came out?  
    Yes, he liked the fun too ✓ · No, he went back home · He did not say
+4. I have two buns from ___.  
+   home ✓ · hum · ham
+5. Put these in the order they happened.  
+   (1) Mole did not want to go out. (2) Giri said he had two buns from home. (3) Out came Mole.
 
 **Talk about it:**
 - What made Mole come out of his hole in the end?
@@ -2305,6 +2377,10 @@ _For the back page of the book._
    A bed of mint ✓ · A bee nest · A green leaf
 3. How did the bee show Giri the spot?  
    It sat still and said to sniff ✓ · It went from tree to tree · It did a big buzz
+4. I see a ___!  
+   bee ✓ · bed · bat
+5. Put these in the order they happened.  
+   (1) The bee went from tree to tree. (2) The bee sat still on a green stem. (3) It was a bed of mint!
 
 **Talk about it:**
 - How did the bee help Giri find the sweet spot?

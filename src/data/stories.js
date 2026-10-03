@@ -576,6 +576,8 @@ export const STORIES = [
       { q: 'Who was Giri baking the cakes for?', options: ['His pal Jay', 'The cat', 'His mother'], answer: 0, type: 'literal' },
       { q: 'What went wrong with the cake?', options: ['It stayed flat', 'It was too hot', 'It fell in the lake'], answer: 0, type: 'literal' },
       { q: 'How did Giri turn the flat cake into a great one?', options: ['He made a stack with jam', 'He baked it again', 'He gave it to Jay'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'Jay ate it by the ___.', options: ['lake', 'lack', 'lick'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['The cake stayed flat in the pan.', 'Giri gave the pan a brave shake.', 'Giri made a stack of cake and jam.'], type: 'sequence' },
     ],
     talkAboutIt: ['How did Giri turn a flat cake into a great cake?'],
   },
@@ -609,6 +611,8 @@ export const STORIES = [
       { q: 'Why did the boat sit so low?', options: ['Two toads had made it a home', 'It had a hole', 'The stream was slow'], answer: 0, type: 'literal' },
       { q: 'Where did Giri make the toads a new home?', options: ['On the stone', 'In the boat', 'In the foam'], answer: 0, type: 'literal' },
       { q: 'What happened once the toads had gone?', options: ['The boat rose and rode home', 'The boat still sat low', 'The stream got slow'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'But the boat did not ___!', options: ['float', 'flat', 'flit'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['The boat sat low by a big stone.', 'Giri made the toads a moss home.', 'The boat rode the foam home.'], type: 'sequence' },
     ],
     talkAboutIt: ['Why was the boat sitting so low in the water?'],
   },
@@ -642,6 +646,8 @@ export const STORIES = [
       { q: 'What was wrong with the bee?', options: ['It was too weak', 'It was wet', 'It had lost its nest'], answer: 0, type: 'literal' },
       { q: 'What did Giri use to help the bee?', options: ['A green leaf', 'A tree', 'A nest'], answer: 0, type: 'literal' },
       { q: 'Why did Giri think a leaf would help?', options: ['It could lift the bee up', 'It was green', 'The bee could eat it'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'It was too ___ to see its way home.', options: ['weak', 'wake', 'wick'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri met a weak bee by a green tree.', 'He set the bee on a green leaf.', 'The bee sped up to see its nest.'], type: 'sequence' },
     ],
     talkAboutIt: ['How did the bee get up to its tree?'],
   },
@@ -675,6 +681,8 @@ export const STORIES = [
       { q: 'Why would the kite not fly?', options: ['There was no wind', 'It had no tail', 'The line was too long'], answer: 0, type: 'literal' },
       { q: 'What did Giri do to make the wind?', options: ['He ran', 'He sat still', 'He went up the hill'], answer: 0, type: 'literal' },
       { q: 'What does this show about Giri?', options: ['He made the wind himself', 'He gave up fast', 'He did not like his kite'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'Giri climbed a high hill with his bright ___.', options: ['kite', 'kit', 'cat'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['The kite fell to the side.', 'Giri ran to make the wind.', 'The kite went up high.'], type: 'sequence' },
     ],
     talkAboutIt: ['How did Giri make his own wind?'],
   },
@@ -708,6 +716,8 @@ export const STORIES = [
       { q: 'Where was the snail sitting?', options: ['In the way of a drain', 'On a safe spot', 'Off the trail'], answer: 0, type: 'literal' },
       { q: 'How did Giri move the snail?', options: ['With a soft push', 'He let the rain take it', 'He put it in his hand'], answer: 0, type: 'literal' },
       { q: 'Why did it take Giri all day?', options: ['A snail is small and takes its time', 'The rain was cold', 'He had to wait for May'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'Cold ___ fell fast on the trail.', options: ['rain', 'ran', 'rim'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri met a small snail on the trail.', 'Giri gave the snail a soft push.', 'The snail waved its tail.'], type: 'sequence' },
     ],
     talkAboutIt: ['Why did Giri have to wait so long?'],
   },
@@ -741,6 +751,8 @@ export const STORIES = [
       { q: 'What did the kite need to fly?', options: ['A tail', 'Tight strings', 'A high hill'], answer: 0, type: 'literal' },
       { q: 'What did Giri make the tail from?', options: ['Two white stripes', 'A green leaf', 'His kite plan'], answer: 0, type: 'literal' },
       { q: 'Why did the kite fall on its side at first?', options: ['It had no tail', 'Its strings were cut', 'It was made of salt'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'He cut one white ___.', options: ['stripe', 'strip', 'strap'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['The kite fell on its side.', 'Giri cut one white stripe, then the other.', 'The kite rose high in the sky.'], type: 'sequence' },
     ],
     talkAboutIt: ['What did the kite need to fly?'],
   },
@@ -774,6 +786,8 @@ export const STORIES = [
       { q: 'What did the bike hit?', options: ['A rock', 'A pup', 'A tree'], answer: 0, type: 'literal' },
       { q: 'What did Giri do at the end?', options: ['He rolled the rock off the lane', 'He went home', 'He fixed his bike'], answer: 0, type: 'literal' },
       { q: 'Why did Giri roll the rock off the lane?', options: ['So no one else would fall', 'He wanted to keep it', 'It was in his way home'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'He rode on until he felt ___.', options: ['fine', 'fin', 'fun'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['The bike hit a rock.', 'A young pup came by.', 'Giri rolled the rock off the side.'], type: 'sequence' },
     ],
     talkAboutIt: ['Why did Giri roll the stone off the lane?'],
   },
@@ -807,6 +821,8 @@ export const STORIES = [
       { q: 'What did the goat bite?', options: ['Giri\'s soft coat', 'A pile of oats', 'The road'], answer: 0, type: 'literal' },
       { q: 'What did Giri hold out to the goat?', options: ['A big pile of oats', 'His coat', 'A hot bun'], answer: 0, type: 'literal' },
       { q: 'Why did the goat stop eating the coat?', options: ['The oats were tasty', 'It had to go home', 'The coat was too soft'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'The goat had a bite of Giri\'s soft ___!', options: ['coat', 'cot', 'cat'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['The goat had a bite of Giri\'s coat.', 'Giri held out a big pile of oats.', 'The goat ran to its mother and brother.'], type: 'sequence' },
     ],
     talkAboutIt: ['Why did the goat stop eating the coat?'],
   },
@@ -840,6 +856,8 @@ export const STORIES = [
       { q: 'Who came to the beach too?', options: ['A girl and a boy', 'His mother', 'No one'], answer: 0, type: 'literal' },
       { q: 'What treat did they eat?', options: ['A sweet peach', 'A green bean', 'Sea weed'], answer: 0, type: 'literal' },
       { q: 'What game did Giri play with the sea?', options: ['Tag', 'Hide and seek', 'Leap frog'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'They had a sweet ___ treat.', options: ['peach', 'peck', 'pick'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['A wave reached his feet.', 'They all ran up the beach.', 'They had a sweet peach treat.'], type: 'sequence' },
     ],
     talkAboutIt: ['What game did Giri play with the sea?'],
   },
@@ -873,6 +891,8 @@ export const STORIES = [
       { q: 'Where did Giri hide from the rain?', options: ['In a cave', 'At home', 'On the trail'], answer: 0, type: 'literal' },
       { q: 'What did Giri make on the way home?', options: ['Big mud prints', 'A rain trail', 'A mud cave'], answer: 0, type: 'literal' },
       { q: 'How did Giri feel about the rain in the end?', options: ['He had fun', 'He was cross', 'He was sad'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'Giri was on a long gray ___.', options: ['trail', 'trap', 'trip'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['A big rain came fast.', 'Giri hid in a cave to watch the rain.', 'Giri made big mud prints all the way home.'], type: 'sequence' },
     ],
     talkAboutIt: ['What did Giri make with his feet on the muddy trail?'],
   },
@@ -906,6 +926,8 @@ export const STORIES = [
       { q: 'What did the seed need?', options: ['A deep drink each day', 'A deep hole', 'A tall tree'], answer: 0, type: 'literal' },
       { q: 'Who told Giri what the seed needed?', options: ['His friend', 'His mother', 'A bee'], answer: 0, type: 'literal' },
       { q: 'How do we know the seed had woken up?', options: ['A green leaf reached up', 'It gave a nod', 'It was in the heat'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'Giri had a green ___.', options: ['seed', 'sad', 'set'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['The seed did not seem to wake.', 'Giri gave it a drink each day.', 'A green leaf reached up.'], type: 'sequence' },
     ],
     talkAboutIt: ['What did the seed need to grow?'],
   },
@@ -939,6 +961,8 @@ export const STORIES = [
       { q: 'Who dug the hole in the stone wall?', options: ['A nosy mole', 'Giri', 'An old oak'], answer: 0, type: 'literal' },
       { q: 'What did Giri turn the hole into?', options: ['A note slot', 'A home for the mole', 'A way to the oak'], answer: 0, type: 'literal' },
       { q: 'Why did Giri not fill the hole in?', options: ['He made it of use', 'He was too old', 'The mole dug it again'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'A nosy mole dug a deep ___ in the stone wall.', options: ['hole', 'hill', 'hut'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri went to make a home in a stone cave.', 'A nosy mole dug a hole in the wall.', 'Giri made the hole a note slot.'], type: 'sequence' },
     ],
     talkAboutIt: ['What did Giri turn the hole into?'],
   },
@@ -974,6 +998,8 @@ export const STORIES = [
       { q: 'Why did the flute stop making a tune?', options: ['It was full of grit and dust', 'It had a crack', 'Giri lost it'], answer: 0, type: 'literal' },
       { q: 'What did Giri clean the flute with?', options: ['Soap and suds', 'A brush', 'Cool shade'], answer: 0, type: 'literal' },
       { q: 'What happened when Giri played again?', options: ['People sat to see him play', 'The flute broke', 'No tune came out'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'He liked to play a ___ in the cool shade.', options: ['tune', 'tin', 'tan'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['The flute made no tune.', 'Giri used a cube of soap and a tub of suds.', 'People sat to see him play.'], type: 'sequence' },
     ],
     talkAboutIt: ['Why did the flute stop making a tune?'],
   },
@@ -1007,6 +1033,8 @@ export const STORIES = [
       { q: 'What happened to the old kite?', options: ['It got stuck in a tree', 'It broke in two', 'It blew away'], answer: 0, type: 'literal' },
       { q: 'What colour was each bit of the new kite?', options: ['Blue', 'White', 'Green'], answer: 0, type: 'literal' },
       { q: 'What did Giri do when the old kite got stuck?', options: ['He made a new one', 'He gave up', 'He climbed the tree'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'Giri drew a plan for a new kite with a deep ___ pen.', options: ['blue', 'black', 'block'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['The old kite flew into a tree and got stuck.', 'Giri glued the frame of the new kite.', 'The new kite flew up, up!'], type: 'sequence' },
     ],
     talkAboutIt: ['What did Giri do when his old kite got stuck?'],
   },
@@ -1040,6 +1068,8 @@ export const STORIES = [
       { q: 'What hid the moon?', options: ['A grey mist', 'The trees', 'The pool'], answer: 0, type: 'literal' },
       { q: 'What did Giri do while he waited?', options: ['He ate a snack', 'He went home', 'He swam in the pool'], answer: 0, type: 'literal' },
       { q: 'Why did Giri keep still and wait?', options: ['To see the moon come back', 'To see the flies zoom', 'To keep the pool dim'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'One night Giri went to the pool to see the ___ shine like a plate.', options: ['moon', 'man', 'map'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['A grey mist hid the moon.', 'Two flies zoomed by.', 'The moon came back and lit up the sea.'], type: 'sequence' },
     ],
     talkAboutIt: ['What hid the moon for a little while?'],
   },
@@ -1075,6 +1105,8 @@ export const STORIES = [
       { q: 'What fell off the shelf?', options: ['A big box of shells', 'A brush', 'A moth'], answer: 0, type: 'literal' },
       { q: 'What did Giri use to clean up?', options: ['A brush and a bin', 'A mop', 'Just his hands'], answer: 0, type: 'literal' },
       { q: 'How did the man feel at the end?', options: ['Glad', 'Cross', 'Sad'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'Shells sat in a big box on a ___.', options: ['shelf', 'self', 'elf'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['The box fell off the shelf.', 'Giri got a brush and a bin.', 'A moth in the box began to fly.'], type: 'sequence' },
     ],
     talkAboutIt: ['How did Giri help at the shell shop?'],
   },
@@ -1108,6 +1140,8 @@ export const STORIES = [
       { q: 'What went wrong at the test run?', options: ['Giri got stuck', 'No one came', 'He lost his song'], answer: 0, type: 'literal' },
       { q: 'What did Giri do to start again?', options: ['He shut an eye and sang from the top', 'He got a pal to sing', 'He did quit'], answer: 0, type: 'literal' },
       { q: 'What does this story show about Giri?', options: ['He did not quit', 'He sang best with his pals', 'He got it wrong at the test'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'He sang it with a ___ clap and a click.', options: ['quick', 'kick', 'sick'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['At the test run, the song went wrong.', 'Giri shut an eye and sang from the top.', 'His pals sang along.'], type: 'sequence' },
     ],
     talkAboutIt: ['What did Giri do when the song went wrong?'],
   },
@@ -1142,6 +1176,8 @@ export const STORIES = [
       { q: 'Why did Mole not want to go out?', options: ['It was cold', 'He was tired', 'He had no coat'], answer: 0, type: 'literal' },
       { q: 'What made Mole come out?', options: ['A hot bun', 'A trip to the lake', 'A game'], answer: 0, type: 'literal' },
       { q: 'Was Mole glad he came out?', options: ['Yes, he liked the fun too', 'No, he went back home', 'He did not say'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'I have two buns from ___.', options: ['home', 'hum', 'ham'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Mole did not want to go out.', 'Giri said he had two buns from home.', 'Out came Mole.'], type: 'sequence' },
     ],
     talkAboutIt: ['What made Mole come out of his hole in the end?'],
   },
@@ -1174,6 +1210,8 @@ export const STORIES = [
       { q: 'What were Giri and the bee looking for?', options: ['The sweet spot', 'A green tree', 'The way home'], answer: 0, type: 'literal' },
       { q: 'What did they find?', options: ['A bed of mint', 'A bee nest', 'A green leaf'], answer: 0, type: 'literal' },
       { q: 'How did the bee show Giri the spot?', options: ['It sat still and said to sniff', 'It went from tree to tree', 'It did a big buzz'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'I see a ___!', options: ['bee', 'bed', 'bat'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['The bee went from tree to tree.', 'The bee sat still on a green stem.', 'It was a bed of mint!'], type: 'sequence' },
     ],
     talkAboutIt: ['How did the bee help Giri find the sweet spot?'],
   },
@@ -1208,6 +1246,11 @@ export const STORIES = [
       { q: 'Where was Giri when the storm came?', options: ['At the farm', 'At the park', 'At school', 'At the market'], answer: 0, type: 'literal' },
       { q: 'What blew off the wall?', options: ['His star chart', 'His hat', 'A picture', 'A clock'], answer: 0, type: 'literal' },
       { q: 'Why did Giri feel proud at the end?', options: ['He did not give up', 'He won a prize', 'He ran the fastest', 'The storm stopped'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'The barn door swung open at the first push.', options: ['True', 'False', 'The story does not say'], answer: 1, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['The storm burst with a crash.', 'Giri pushed and pulled the barn door.', 'Giri hung the chart to dry.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'Why did Giri run out into the storm for his star chart?', sampleAnswer: 'He wrote the star chart out by hand, so it mattered to him. He did not want to lose it or buy a new one.', markingGuide: 'A good answer says Giri made the chart himself, and uses a clue from the story.' },
     ],
     vocab: [
       { word: 'storm', meaning: 'Very bad weather with strong wind and rain', icon: '⛈️' },
@@ -1251,6 +1294,11 @@ export const STORIES = [
       { q: 'Where did the star land?', options: ['Near the river', 'On the farm', 'In the barn', 'On a tree'], answer: 0, type: 'literal' },
       { q: 'What was the star stuck under?', options: ['A fern', 'A rock', 'A log', 'Some mud'], answer: 0, type: 'literal' },
       { q: 'How do you think Giri felt when he found the star?', options: ['Happy and excited', 'Sad and cold', 'Angry and tired', 'Bored and sleepy'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri took the star home to show his mother.', options: ['True', 'False', 'The story does not say'], answer: 2, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['A large bright star fell near the river.', 'The star was stuck under a fern.', 'Giri held the star close and walked home.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'How do you think Giri felt when he held the star? Why?', sampleAnswer: 'He felt happy and proud. The story says he walked home with a warm glow in his heart.', markingGuide: 'A good answer names a feeling and uses words from the story to show it.' },
     ],
     vocab: [
       { word: 'fern', meaning: 'A green plant with feathery leaves', icon: '🌿' },
@@ -1293,6 +1341,11 @@ export const STORIES = [
       { q: 'What had Giri lost?', options: ['His shell necklace', 'His star chart', 'His hat', 'His bag'], answer: 0, type: 'literal' },
       { q: 'How did the thrush help?', options: ['It pecked at the necklace to show Giri', 'It sang a song', 'It flew away', 'It gave him food'], answer: 0, type: 'literal' },
       { q: 'What does this story teach us?', options: ['Help can come from unexpected places', 'Birds are always helpful', 'Necklaces are easy to find', 'Bushes are the best hiding spots'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'The thrush pecked at something shiny.', options: ['True', 'False', 'The story does not say'], answer: 0, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri lost his shell necklace on the path.', 'The thrush pecked at something shiny.', 'Giri clipped the shell necklace on.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'Why do you think the thrush helped Giri?', sampleAnswer: 'Maybe the thrush saw Giri searching so hard and wanted to help. It had seen the shiny necklace in the grass.', markingGuide: 'A good answer gives a reason and backs it up with something from the story.' },
     ],
     vocab: [
       { word: 'thrush', meaning: 'A type of songbird with a speckled chest', icon: '🐦' },
@@ -1335,6 +1388,11 @@ export const STORIES = [
       { q: 'What did Giri go to the market to get?', options: ['A jar of honey', 'A bag of corn', 'Some flowers', 'A red hat'], answer: 0, type: 'literal' },
       { q: 'Where was the honey stall?', options: ['Between a flower cart and a butter stall', 'By the door', 'At the far end', 'Next to the herbs'], answer: 0, type: 'literal' },
       { q: 'Why did Giri also buy a pepper?', options: ['He thought his mother would like it', 'It was free', 'The trader asked him to', 'He was very hungry'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'The honey stall was tucked between a corn cart and a butter stall.', options: ['True', 'False', 'The story does not say'], answer: 1, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['A trader called out.', 'Giri picked out a large jar.', 'Giri gave the jar and the pepper to his mother.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'Giri bought a pepper as well as the honey. Was that a good idea? Why?', sampleAnswer: 'Yes. It was a perfect red pepper, good to eat, and it helped turn his mother\'s frown into a big smile.', markingGuide: 'A good answer says yes or no, and gives a reason from the story.' },
     ],
     vocab: [
       { word: 'trader', meaning: 'A person who buys and sells things', icon: '🧑‍💼' },
@@ -1377,6 +1435,11 @@ export const STORIES = [
       { q: 'What was Giri trying to put in the bin?', options: ['A juice box', 'A tin can', 'A bag', 'A book'], answer: 0, type: 'literal' },
       { q: 'How did Giri find out the box could go in?', options: ['He read the chart on the bin', 'His mum told him', 'A friend said so', 'He guessed'], answer: 0, type: 'literal' },
       { q: 'What is the main message of this story?', options: ['We should recycle the right things', 'Bins are too small', 'Juice boxes are rubbish', 'Walking home is fun'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri put some tins in the blue bin too.', options: ['True', 'False', 'The story does not say'], answer: 2, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri checked the chart on the bin.', 'The box sprang back and bumped his chin.', 'Giri pushed the flat box in through the slot.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'Why did Giri check the chart on the bin first?', sampleAnswer: 'He was not sure whether a juice box could go in the blue bin, so he checked the chart to find out.', markingGuide: 'A good answer says Giri was not sure, and that the chart told him juice boxes could go in.' },
     ],
     vocab: [
       { word: 'recycle', meaning: 'To use something again instead of throwing it away', icon: '♻️' },
@@ -1420,6 +1483,11 @@ export const STORIES = [
       { q: 'Who knocked at the door?', options: ['Mrs Tan', 'A park ranger', 'His mum', 'A postman'], answer: 0, type: 'literal' },
       { q: 'What did Mrs Tan need help with?', options: ['Changing a light bulb', 'Finding her keys', 'Cooking food', 'Carrying bags'], answer: 0, type: 'literal' },
       { q: 'What can we learn from Giri in this story?', options: ['Helping a neighbour is kind and clever', 'Step stools always break', 'Shelves are too high', 'Do not answer the door'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri climbed up on a chair and turned the old bulb out.', options: ['True', 'False', 'The story does not say'], answer: 1, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri heard a knock at the door.', 'Giri brought back a firm step stool.', 'The light burst on.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'Why did Giri go back to his flat for a step stool?', sampleAnswer: 'Mrs Tan\'s step stool was broken, and Giri was not tall enough on his tiptoes, so he needed a firm stool to reach the light.', markingGuide: 'A good answer says her stool was broken or that Giri was not tall enough.' },
     ],
     vocab: [
       { word: 'neighbour', meaning: 'Someone who lives close to you', icon: '🏠' },
@@ -1462,6 +1530,11 @@ export const STORIES = [
       { q: 'What did Giri help with first?', options: ['Fetching water from the well', 'Catching a chicken', 'Feeding the sheep', 'Picking cherries'], answer: 0, type: 'literal' },
       { q: 'How did the chicken get out?', options: ['Through a gap in the wire', 'Over the fence', 'Under the barn', 'Through the door'], answer: 0, type: 'literal' },
       { q: 'Why did Grandfather say "sharp thinking"?', options: ['Giri solved the problem by himself', 'Giri ran the fastest', 'The chicken was clever', 'The branch was sharp'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri rode the horse after lunch.', options: ['True', 'False', 'The story does not say'], answer: 2, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri filled the bucket for the horse.', 'A chicken got out at a gap in the fence.', 'Giri shut the gap with a thick branch.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'Why did Giri shut the gap with a branch after he got the chicken back?', sampleAnswer: 'So that no more chickens could get out through the gap in the fence.', markingGuide: 'A good answer says the branch stops the chickens getting out again.' },
     ],
     vocab: [
       { word: 'scratched', meaning: 'Used claws to dig at the ground', icon: '🐔' },
@@ -1505,6 +1578,11 @@ export const STORIES = [
       { q: 'What did Giri need to buy?', options: ['Butter and yoghurt', 'Bread and milk', 'Eggs and jam', 'Honey and tea'], answer: 0, type: 'literal' },
       { q: 'Who helped Giri find the yoghurt?', options: ['A helper in a purple shirt', 'His mother', 'A friend', 'The shop owner'], answer: 0, type: 'literal' },
       { q: 'Why was this errand special for Giri?', options: ['It was his first time going on his own', 'He got free sweets', 'He met a new friend', 'The shop was far away'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'A helper in a purple shirt led Giri to the yoghurt.', options: ['True', 'False', 'The story does not say'], answer: 0, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri walked to the corner shop.', 'A helper led him to the third shelf.', 'Giri handed the bag to his mother.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'How did Giri feel at the start of the errand, and how did he feel at the end?', sampleAnswer: 'At the start he felt nervous, because nerves ran through his body. At the end he felt proud and happy, and he grinned from ear to ear.', markingGuide: 'A good answer names a feeling for the start and one for the end, with a clue from the story for each.' },
     ],
     vocab: [
       { word: 'errand', meaning: 'A short trip to do a task, like buying something', icon: '🏃' },
@@ -1547,6 +1625,11 @@ export const STORIES = [
       { q: 'Where was the baby turtle stuck?', options: ['In a dip in the sand', 'In the surf', 'Under a rock', 'In a net'], answer: 0, type: 'literal' },
       { q: 'What did Giri do first?', options: ['He dug the sand away from the shell', 'He picked the turtle up', 'He called for help', 'He splashed water on it'], answer: 0, type: 'literal' },
       { q: 'Why did the turtle need help quickly?', options: ['The hot sun was burning the sand', 'It was getting dark', 'The tide was coming in', 'A bird was there'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri tried to carry the turtle to the water.', options: ['True', 'False', 'The story does not say'], answer: 1, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri spotted a baby turtle stuck in the sand.', 'Giri turned the turtle to face the water.', 'The turtle swam off into the surf.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'Why do you think Giri stood and stared until the turtle was just a dot?', sampleAnswer: 'He wanted to see that the turtle was safe in the sea. It was his first rescue, and he was proud of it.', markingGuide: 'A good answer gives a reason, such as checking that the turtle was safe.' },
     ],
     vocab: [
       { word: 'flippers', meaning: 'The flat arms a turtle uses to swim', icon: '🐢' },
@@ -1589,6 +1672,11 @@ export const STORIES = [
       { q: 'Where was Giri\'s garden plot?', options: ['By the void deck', 'On a farm', 'At school', 'By the beach'], answer: 0, type: 'literal' },
       { q: 'What came up after the big rain?', options: ['Tiny turnip tops', 'A row of corn', 'Red flowers', 'Long beans'], answer: 0, type: 'literal' },
       { q: 'How do we know Giri did not give up?', options: ['He watered the seeds every morning and kept waiting', 'He planted new seeds', 'He asked Mrs Tan to help', 'He dug up the plot'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri\'s mum helped him plant the seeds.', options: ['True', 'False', 'The story does not say'], answer: 2, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri planted a row of seeds.', 'After a big rain, Giri spotted something green.', 'Giri pulled up ten firm turnips.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'Giri felt glum when nothing came up. What would you tell him?', sampleAnswer: 'Keep giving the seeds a drink of water and wait, because seeds can take weeks to come up.', markingGuide: 'A good answer gives Giri some advice and a reason for it.' },
     ],
     vocab: [
       { word: 'void deck', meaning: 'The open space under an HDB block', icon: '🏢' },
@@ -1631,6 +1719,11 @@ export const STORIES = [
       { q: 'What did Giri start with in the morning?', options: ['The dishes', 'The shopping', 'The plants', 'The blocks'], answer: 0, type: 'literal' },
       { q: 'How did Giri help Mrs Tan?', options: ['He carried a shopping bag up the steps', 'He watered her plants', 'He folded her clothes', 'He washed her dishes'], answer: 0, type: 'literal' },
       { q: 'How did Giri feel about helping, even when he was tired?', options: ['He still liked it and kept smiling', 'He wanted to stop', 'He felt cross', 'He felt bored'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri carried the lightest bag up the steps.', options: ['True', 'False', 'The story does not say'], answer: 0, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri washed and stacked the dishes.', 'Giri watered all eight plants.', 'Mum said he was the kindest helper in the city.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'Which of Giri\'s jobs would you like to help with, and why?', sampleAnswer: 'I would like to water the plants, because it is fun to see them grow.', markingGuide: 'A good answer picks a job from the story and gives a reason.' },
     ],
     vocab: [
       { word: 'stacking', meaning: 'Putting things neatly on top of each other', icon: '🥞' },
@@ -1674,6 +1767,11 @@ export const STORIES = [
       { q: 'Why did the bird not want to fly to the barn?', options: ['A storm was coming', 'She was tired', 'She was scared of Giri', 'It was too dark'], answer: 0, type: 'literal' },
       { q: 'Where did Giri and the bird hide?', options: ['Under the cart', 'In the barn', 'Up a tree', 'In the yard'], answer: 0, type: 'literal' },
       { q: 'What lesson did Giri learn?', options: ['Think hard before you act', 'Run fast in the rain', 'Birds cannot fly', 'Storms are fun'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'The bird had a nest in the barn.', options: ['True', 'False', 'The story does not say'], answer: 2, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri asked the bird to fly to the barn.', 'Big drops of water started to fall.', 'The sun came back and lit up the yard.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'Was the bird right not to fly to the barn? Why?', sampleAnswer: 'Yes. A storm was coming, and big drops of rain started to fall soon after.', markingGuide: 'A good answer says yes or no, and uses what happened in the story to show it.' },
     ],
     talkAboutIt: [
       "Why did the bird say they should not go far?",
@@ -1711,6 +1809,11 @@ export const STORIES = [
       { q: 'What were the clowns doing at the fair?', options: ['Juggling on the stage', 'Selling popcorn', 'Riding horses', 'Painting faces'], answer: 0, type: 'literal' },
       { q: 'What was the carpenter repairing?', options: ['A wooden chair', 'A stall', 'A toy', 'A table'], answer: 0, type: 'literal' },
       { q: 'What does "a fair hand" mean in this story?', options: ['A natural talent or skill', 'A clean hand', 'A large hand', 'A fair deal'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri bought popcorn at the fair.', options: ['True', 'False', 'The story does not say'], answer: 2, type: 'literal' },
+      { kind: 'gap', q: 'Giri took the ___ and gave the dowel one careful tap.', options: ['mallet', 'dowel', 'carpenter'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'Why did Giri feel proud as he walked home?', sampleAnswer: 'He had learnt a new skill, fixing a chair with a dowel, and the carpenter said he had a fair hand for the work.', markingGuide: 'A good answer says what Giri learnt or what the carpenter said to him.' },
     ],
     vocab: [
       { word: 'annual', meaning: 'Happening once every year', icon: '📅' },
@@ -1754,6 +1857,11 @@ export const STORIES = [
       { q: 'Where was the singing happening?', options: ['In the community hall', 'At the park', 'At school', "In Giri's flat"], answer: 0, type: 'literal' },
       { q: 'Why did Giri not join in at first?', options: ['He felt shy', 'He was tired', 'He did not like music', 'He could not find the hall'], answer: 0, type: 'inferential' },
       { q: 'What is the main message of this story?', options: ['Joining in can bring unexpected joy', 'Singing is only for adults', 'You should always sit by the window', 'Loud noises are bad'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri joined in at once, as soon as he got there.', options: ['True', 'False', 'The story does not say'], answer: 1, type: 'literal' },
+      { kind: 'gap', q: 'The voices ___ around the room — high, low, loud, and soft.', options: ['bounced', 'swayed', 'humming'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'How did Giri change from the start of the singing to the end?', sampleAnswer: 'At first he felt shy, so he only sat and listened. By the end he sang loud and proud with the whole group.', markingGuide: 'A good answer says how Giri felt at first and what he did by the end.' },
     ],
     vocab: [
       { word: 'community', meaning: 'A group of people who live or meet in the same area', icon: '🏘️' },
@@ -1796,6 +1904,11 @@ export const STORIES = [
       { q: 'Where was the old chair?', options: ['In the stairwell', "In Giri's flat", 'At the market', 'In the park'], answer: 0, type: 'literal' },
       { q: 'What tools did Giri find?', options: ['Sandpaper, glue, and a plank', 'A hammer and nails', 'Paint and a brush', 'A saw and tape'], answer: 0, type: 'literal' },
       { q: 'What does "something shared" mean at the end?', options: ['Something everyone can enjoy', 'Something expensive', 'Something Giri kept for himself', 'Something broken'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri sanded the seat until it was smooth.', options: ['True', 'False', 'The story does not say'], answer: 0, type: 'literal' },
+      { kind: 'gap', q: '"This is the best seat in the block," she ___.', options: ['declared', 'beamed', 'spare'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'Why do you think no one had cared about the old chair before Giri?', sampleAnswer: 'It was old and worn. The seat was bare and the armrest had a tear, so people just walked past it.', markingGuide: 'A good answer gives a reason using what the chair looked like in the story.' },
     ],
     vocab: [
       { word: 'stairwell', meaning: 'The part of a building that holds the stairs', icon: '🏢' },
@@ -1838,6 +1951,11 @@ export const STORIES = [
       { q: 'Why was Giri feeling worried?', options: ['His friends were moving to different classes', 'He had lost his bag', 'He failed a test', 'The school was closing'], answer: 0, type: 'literal' },
       { q: 'What did his friends prepare?', options: ['A farewell party', 'A football match', 'A school play', 'A treasure hunt'], answer: 0, type: 'literal' },
       { q: 'What did Mei Ling mean by "we will always be near"?', options: ['True friends stay close in heart even when apart', 'They would be in the same class', 'They lived next door', 'They would call every day'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Mei Ling made the hand-drawn card.', options: ['True', 'False', 'The story does not say'], answer: 2, type: 'literal' },
+      { kind: 'gap', q: 'They had set up a small ___ party.', options: ['farewell', 'cordial', 'beginning'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'Why did Giri think this was not an ending but a beginning?', sampleAnswer: 'His friends showed they would stay his friends even in different classes, so it was the start of a friendship that would last.', markingGuide: 'A good answer says the friendship would go on, and uses something his friends did or said.' },
     ],
     vocab: [
       { word: 'farewell', meaning: 'A way of saying goodbye', icon: '👋' },
@@ -1880,6 +1998,11 @@ export const STORIES = [
       { q: 'What caused Giri to fall?', options: ['His foot hit a mound of soil', 'He tripped on the baton', 'Another runner pushed him', 'He slipped on wet grass'], answer: 0, type: 'literal' },
       { q: 'What encouraged Giri to get back up?', options: ['The crowd roaring for him', 'His coach told him to', 'He wanted a trophy', 'He was not hurt'], answer: 0, type: 'inferential' },
       { q: 'What did Giri learn about courage?', options: ['It is about getting up when you fall', 'It means winning every race', 'It means never being scared', 'It means being the fastest'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri\'s team won a trophy.', options: ['True', 'False', 'The story does not say'], answer: 1, type: 'literal' },
+      { kind: 'gap', q: 'He ___, fell, and felt the grit sting his knee.', options: ['stumbled', 'sprinted', 'bounced'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'What did Giri decide courage is? Do you agree?', sampleAnswer: 'He decided courage is not about never falling down, but about getting up and carrying on. I agree, because he got up and finished the race.', markingGuide: 'A good answer says what Giri decided, then gives your own view with a reason.' },
     ],
     vocab: [
       { word: 'relay', meaning: 'A race where team members take turns running', icon: '🏃' },
@@ -1922,6 +2045,11 @@ export const STORIES = [
       { q: 'Where did Giri find the map?', options: ["In a drawer at his grandmother's house", 'At school', 'In the park', 'At the market'], answer: 0, type: 'literal' },
       { q: 'What was inside the box?', options: ['A photo, earrings, and a letter', 'Gold coins', 'Jewels and gems', 'Old books'], answer: 0, type: 'literal' },
       { q: 'Why is the real treasure not gold or jewels?', options: ['The real treasure is the family connection and memories', 'Gold is too heavy', 'Jewels are not real', 'The box was too small'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri\'s grandmother was at home when he found the map.', options: ['True', 'False', 'The story does not say'], answer: 2, type: 'literal' },
+      { kind: 'gap', q: 'Giri sat back on his heels, ___.', options: ['awed', 'canal', 'compass'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'Why did Giri carry the box home with the greatest care?', sampleAnswer: 'It held his grandmother\'s photo, her earrings and her letter. They were a memory of someone he loved, so they mattered more than gold.', markingGuide: 'A good answer says what was in the box and why it mattered to Giri.' },
     ],
     vocab: [
       { word: 'parchment', meaning: 'Thick old paper, often used for maps or letters', icon: '📜' },
@@ -1964,6 +2092,11 @@ export const STORIES = [
       { q: 'How much money did Mum give Giri to spend?', options: ['Two dollars', 'Ten dollars', 'Five cents', 'One coin'], answer: 0, type: 'literal' },
       { q: 'What did Giri buy in the end?', options: ['A paper windmill', 'A round bun', 'A cold drink', 'A toy mouse'], answer: 0, type: 'literal' },
       { q: 'Why did Giri pick the windmill over the other things?', options: ['It would keep spinning and turning all day', 'It was the cheapest', 'The man asked him to', 'His mum chose it'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'The windmill made a loud little clack as it turned.', options: ['True', 'False', 'The story does not say'], answer: 0, type: 'literal' },
+      { kind: 'gap', q: 'So many ___!', options: ['choices', 'crowds', 'doubt'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'Was the windmill money well spent? Why?', sampleAnswer: 'Yes. Giri can enjoy it every day, because a windmill turns all day, but a bun is gone after a few bites.', markingGuide: 'A good answer says yes or no, and gives a reason.' },
     ],
     vocab: [
       { word: 'crowds', meaning: 'Big groups of people in one place', icon: '👥' },
@@ -2006,6 +2139,11 @@ export const STORIES = [
       { q: 'When did Giri go out to draw?', options: ['Before dawn, while it was still dark', 'After breakfast', 'At noon', 'At bedtime'], answer: 0, type: 'literal' },
       { q: 'What soared past on wide, still wings?', options: ['A hawk', 'A kite', 'A plane', 'A crow'], answer: 0, type: 'literal' },
       { q: 'What did Giri mean by "the part most people never saw"?', options: ['Most people are still asleep at dawn', 'The drawing was hidden', 'The lawn was private', 'The hawk flew too fast'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri woke up after the sun came up.', options: ['True', 'False', 'The story does not say'], answer: 1, type: 'literal' },
+      { kind: 'gap', q: 'A hawk ___ past on wide, still wings.', options: ['soared', 'caught', 'streaks'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'What would you draw if you woke up before dawn? Why?', sampleAnswer: 'I would draw the birds waking up in the trees, because they sing loudest early in the morning.', markingGuide: 'A good answer picks something to draw and gives a reason.' },
     ],
     vocab: [
       { word: 'dawn', meaning: 'The time when the sun first comes up', icon: '🌅' },
@@ -2048,6 +2186,11 @@ export const STORIES = [
       { q: 'Why did Giri look after Scout?', options: ['Mrs Tan was going away for the weekend', 'Scout was lost', 'Giri found him at the park', 'Scout was sick'], answer: 0, type: 'literal' },
       { q: 'What did Scout do on the second day?', options: ['Curled up beside Giri and slept', 'Ran away', 'Barked all day', 'Dug up the plants'], answer: 0, type: 'literal' },
       { q: 'What did Giri learn about caring for a pet?', options: ['It is hard work but worth it', 'It is always easy', 'Dogs do not need walks', 'Pets like being alone'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Scout slept in Giri\'s bed at night.', options: ['True', 'False', 'The story does not say'], answer: 2, type: 'literal' },
+      { kind: 'gap', q: 'Scout was her small brown dog with one ___ ear.', options: ['floppy', 'proud', 'weekend'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'What was hard about looking after Scout, and what was good about it?', sampleAnswer: 'It was hard because Scout needed food, water and two walks, and he barked and chased his tail. It was good when he curled up and fell asleep beside Giri.', markingGuide: 'A good answer gives one hard thing and one good thing from the story.' },
     ],
     vocab: [
       { word: 'weekend', meaning: 'Saturday and Sunday', icon: '📅' },
@@ -2090,6 +2233,11 @@ export const STORIES = [
       { q: 'What was Giri saving his coins for at first?', options: ['A big red robot', 'A pot of orchids', 'A bus ride', 'A book'], answer: 0, type: 'literal' },
       { q: 'What did Giri see his mum looking at?', options: ['A pot of orchids at the flower shop', 'A red robot', 'A coin jar', 'A new dress'], answer: 0, type: 'literal' },
       { q: 'Why did Giri stop saving for the robot?', options: ['He wanted to buy the orchids for his mum instead', 'He lost his coins', 'The robot was sold out', 'He stopped liking robots'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Mum looked at the price and bought the flowers.', options: ['True', 'False', 'The story does not say'], answer: 1, type: 'literal' },
+      { kind: 'gap', q: 'Her mouth fell open, then ___ into the widest smile.', options: ['curved', 'counted', 'dropped'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'Why do you think Giri chose the orchids instead of the robot?', sampleAnswer: 'He saw how much his mum liked the orchids, and making her happy mattered more to him than a toy.', markingGuide: 'A good answer gives a reason that shows Giri cared about his mum.' },
     ],
     vocab: [
       { word: 'saving', meaning: 'Keeping money to use later', icon: '🪙' },
@@ -2142,6 +2290,8 @@ export const STORIES = [
       { q: 'What did Giri get on?', options: ['MRT', 'bus', 'boat', 'car'], answer: 0, type: 'literal' },
       { q: 'What did Giri hold on to?', options: ['rod', 'mat', 'bag', 'hat'], answer: 0, type: 'literal' },
       { q: 'How did the kind man help Giri?', options: ['Let Giri sit', 'Gave Giri a bag', 'Ran with Giri', 'Got Giri a drink'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'Giri held on to the ___ and did not slip.', options: ['rod', 'red', 'rid'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['The MRT was full.', 'A kind man let Giri sit in his seat.', 'Giri got off at his stop.'], type: 'sequence' },
     ],
     vocab: [
       { word: 'MRT', meaning: 'A fast train that runs around Singapore', icon: '🚆' },
@@ -2189,6 +2339,8 @@ export const STORIES = [
       { q: 'What could Giri not find?', options: ['His peg', 'His bag', 'His hat', 'His book'], answer: 0, type: 'literal' },
       { q: 'What room did Giri go into?', options: ['The wrong room', 'His own room', 'The big room', 'The wet room'], answer: 0, type: 'literal' },
       { q: 'How do you think Giri felt at the start of school?', options: ['Worried and lost', 'Very happy', 'Very sleepy', 'Very hungry'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'He had a big red ___.', options: ['bag', 'bug', 'beg'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri lost his peg.', 'A kind pal led Giri to his peg.', 'Giri sat at his desk.'], type: 'sequence' },
     ],
     vocab: [
       { word: 'peg', meaning: 'A hook on a wall to hang your bag or coat', icon: '🪝' },
@@ -2236,6 +2388,8 @@ export const STORIES = [
       { q: 'Why did Giri go to the hawker centre?', options: ['To get a treat for his mum', 'To play', 'To get a toy', 'To take a nap'], answer: 0, type: 'literal' },
       { q: 'Who helped Giri find the stall?', options: ['A nice auntie', 'A kind man', 'His mum', 'The chef'], answer: 0, type: 'literal' },
       { q: 'How do you think Giri felt when he was lost?', options: ['Worried and confused', 'Happy and excited', 'Hungry and tired', 'Bored and sleepy'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'Giri gave a wave and ___.', options: ['paid', 'pad', 'pod'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri got lost in the maze of lanes.', 'A nice auntie led him to the noodle stall.', 'Giri went home with the noodles.'], type: 'sequence' },
     ],
     vocab: [
       { word: 'hawker centre', meaning: 'An open-air place with many food stalls in Singapore', icon: '🏪' },
@@ -2283,6 +2437,8 @@ export const STORIES = [
       { q: 'What made the lane look bright?', options: ['Red lights and gold flags', 'A big cake', 'White stars', 'Blue lamps'], answer: 0, type: 'literal' },
       { q: 'What did Giri do when he got lost?', options: ['Called out to his mum', 'Sat down and cried', 'Ran home', 'Went to sleep'], answer: 0, type: 'literal' },
       { q: 'What helped Giri find his mum in the end?', options: ['He saw her wave from the stall', 'She called his name', 'He asked a stranger', 'He found her bag'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'The lane was full of red ___ and gold flags.', options: ['lights', 'lots', 'lids'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri lost his mum in the big crowd.', 'Giri spied the red light of the stall.', 'They sat and ate sweet kueh.'], type: 'sequence' },
     ],
     vocab: [
       { word: 'crowd', meaning: 'A large group of people all in one place', icon: '👥' },
@@ -2330,6 +2486,8 @@ export const STORIES = [
       { q: 'What went out in the wind?', options: ["Giri's oil lamp", "Giri's candle", "Giri's torch", "Giri's star"], answer: 0, type: 'literal' },
       { q: 'What did Giri do to save the flame?', options: ['Cupped his hands', 'Ran inside', 'Got a new lamp', 'Blew on it'], answer: 0, type: 'literal' },
       { q: 'Why is Deepavali called the Festival of Lights?', options: ['People light lamps all around', 'People fly kites', 'People eat sweet treats', 'People sing songs'], answer: 0, type: 'inferential' },
+      { kind: 'gap', q: 'The street had ___ oil lamps and gold clay pots.', options: ['bright', 'brick', 'brim'], answer: 0, type: 'vocabulary' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['Giri\'s oil lamp went out in the wind.', 'A kind auntie lit the lamp.', 'Giri ate a sweet treat.'], type: 'sequence' },
     ],
     vocab: [
       { word: 'Deepavali', meaning: 'A festival of lights celebrated by Indian families in Singapore and around the world', icon: '🪔' },
@@ -2377,6 +2535,11 @@ export const STORIES = [
       { q: 'Where did Giri go?', options: ['Gardens by the Bay', 'The market', 'The MRT', 'His school'], answer: 0, type: 'literal' },
       { q: 'What was stuck in the net?', options: ['A small bird', 'A bat', 'A kite', 'A cat'], answer: 0, type: 'literal' },
       { q: 'What can we learn from Giri here?', options: ['Help when you can, even if it is hard', 'Always wait for a ranger', 'Never go to a garden', 'Birds can look after themselves'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri used a long net to help the bird get free.', options: ['True', 'False', 'The story does not say'], answer: 1, type: 'literal' },
+      { kind: 'order', q: 'Put these in the order they happened.', events: ['A small bird got stuck in the garden net.', 'Giri called for a park ranger to help.', 'The bird flew up with a chirp.'], type: 'sequence' },
+    ],
+    openEnded: [
+      { q: 'How did Giri feel at the end, and why?', sampleAnswer: 'He felt happy and proud, with a warm glow in his heart, because he had helped the bird get free.', markingGuide: 'A good answer names a feeling and gives a reason from the story.' },
     ],
     vocab: [
       { word: 'Supertrees', meaning: 'Tall tree-shaped structures at Gardens by the Bay in Singapore', icon: '🌳' },
@@ -2420,6 +2583,11 @@ export const STORIES = [
       { q: 'What did Giri think was coming down the hill?', options: ['A big brown cloud', 'A truck', 'A storm', 'A dog'], answer: 0, type: 'literal' },
       { q: 'What was the cloud really?', options: ['A crowd of kids', 'Smoke', 'Dust from a truck', 'Rain'], answer: 0, type: 'literal' },
       { q: 'What did Giri learn about scary things?', options: ['They feel smaller when you find out about them', 'They always go away', 'You should hide first', 'You should shout at them'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri counted his steps out loud to stay brave.', options: ['True', 'False', 'The story does not say'], answer: 0, type: 'literal' },
+      { kind: 'gap', q: 'It was not a cloud at all! It was a ___.', options: ['crowd', 'cloud', 'crown'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'What did Giri do to stay brave, and why did it help?', sampleAnswer: 'He counted his steps out loud. It gave him something to think about, so he kept walking instead of running away.', markingGuide: 'A good answer says Giri counted his steps and gives a reason it helped.' },
     ],
     talkAboutIt: [
       "What did Giri think the brown cloud was, and what was it really?",
@@ -2459,6 +2627,11 @@ export const STORIES = [
       { q: 'Where did Giri find the key?', options: ['On the path at the park', 'In his pocket', 'At school', 'At the hawker centre'], answer: 0, type: 'literal' },
       { q: 'What did Giri do with the key?', options: ['Put it in his pocket and asked the ranger', 'Left it on the ground', 'Took it home', 'Threw it away'], answer: 0, type: 'literal' },
       { q: 'Why was it a good idea not to leave the key?', options: ['Someone might need it to get home', 'Keys are pretty', 'Giri wanted to keep it', 'The ranger asked him to'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Giri put the key in his shirt pocket.', options: ['True', 'False', 'The story does not say'], answer: 0, type: 'literal' },
+      { kind: 'gap', q: 'He looked around the park to see if anyone was searching, but the path was ___ and no one was near.', options: ['empty', 'shiny', 'pocket'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'What would you have done if you found the key? Why?', sampleAnswer: 'I would take it to the ranger hut too, because the owner might come back to the park to look for it.', markingGuide: 'A good answer says what you would do and why.' },
     ],
     vocab: [
       { word: 'shiny', meaning: 'Bright and gleaming, like polished metal', icon: '✨' },
@@ -2504,6 +2677,11 @@ export const STORIES = [
       { q: 'What did the ranger put on the board?', options: ['A note about the found key', 'A picture of the key', 'A list of names', 'A map of the park'], answer: 0, type: 'literal' },
       { q: 'What did the boy try to do?', options: ['Grab the key and run', 'Help find the owner', 'Ask if it was his', 'Leave the park'], answer: 0, type: 'literal' },
       { q: 'Why was it important for Giri to speak up?', options: ['To stop someone taking something that was not theirs', 'To scare the boy', 'To show off', 'Because he wanted the key'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'The boy did not give back the key.', options: ['True', 'False', 'The story does not say'], answer: 1, type: 'literal' },
+      { kind: 'gap', q: 'A boy tried to ___ the key and run.', options: ['grab', 'check', 'board'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'Why did Giri and the ranger check each person one by one?', sampleAnswer: 'To make sure the key went to its real owner, and not to someone who just wanted a key.', markingGuide: 'A good answer says they wanted the key to go to the right person.' },
     ],
     vocab: [
       { word: 'board', meaning: 'A flat surface on a wall where notices can be put up', icon: '📋' },
@@ -2549,6 +2727,11 @@ export const STORIES = [
       { q: 'What could the old man not find?', options: ['The key to his flat', 'His bag', 'His hat', 'His glasses'], answer: 0, type: 'literal' },
       { q: 'How did they find out it was the right key?', options: ['It fit the lock', 'The man remembered it', 'It had his name', 'The ranger said so'], answer: 0, type: 'literal' },
       { q: 'What does "a kind act is never too small" mean?', options: ['Even small kind acts make a big difference', 'Big acts are the only ones that matter', 'Keys are small things', 'Giri was a small boy'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'The old man could not remember what his key looked like.', options: ['True', 'False', 'The story does not say'], answer: 0, type: 'literal' },
+      { kind: 'gap', q: 'The old man gave a shout of ___.', options: ['joy', 'pride', 'act'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'How did they find out the key was the old man\'s?', sampleAnswer: 'His eyes were not clear and he could not remember the key, so they tried it in his lock, and it fit.', markingGuide: 'A good answer says they tried the key in his lock and it fit.' },
     ],
     vocab: [
       { word: 'joy', meaning: 'A feeling of great happiness', icon: '😊' },
@@ -2599,6 +2782,11 @@ export const STORIES = [
       { q: 'What came to Giri\'s street one evening?', options: ['The night market', 'A circus', 'A storm', 'A new bus stop'], answer: 0, type: 'literal' },
       { q: 'What hung between the lamp posts by sunset?', options: ['Strings of little lights', 'Long flags', 'Paper kites', 'Wet clothes'], answer: 0, type: 'literal' },
       { q: 'What do you think Giri will do next?', options: ['Go and find out who is crying', 'Go home to sleep', 'Buy a snack', 'Ring the bell'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'Smoke curled up from a satay grill.', options: ['True', 'False', 'The story does not say'], answer: 0, type: 'literal' },
+      { kind: 'gap', q: 'Stalls sold cold drinks, warm kueh, and ___ snacks.', options: ['sizzling', 'curled', 'satay'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'What do you think Giri will do when he finds who is crying? Why?', sampleAnswer: 'I think he will help, because Giri always stops to help someone who needs it.', markingGuide: 'A good answer makes a guess and gives a reason for it.' },
     ],
     vocab: [
       { word: 'stalls', meaning: 'Small open shops at a market', icon: '🛖' },
@@ -2645,6 +2833,11 @@ export const STORIES = [
       { q: 'Why was the girl crying?', options: ['She had lost her father in the crowd', 'She dropped her snack', 'She was scared of the dark', 'She hurt her knee'], answer: 0, type: 'literal' },
       { q: 'Who helped call out to the crowd?', options: ['The satay man', 'A police officer', 'Mrs Tan', 'The bus driver'], answer: 0, type: 'literal' },
       { q: 'Why did Giri know how the girl felt?', options: ['He remembered being lost once himself', 'He read about it', 'The satay man told him', 'He was lost right then too'], answer: 0, type: 'inferential' },
+      { kind: 'tf', q: 'The satay man lifted Giri up high.', options: ['True', 'False', 'The story does not say'], answer: 1, type: 'literal' },
+      { kind: 'gap', q: '"I turned round and he was gone," she ___.', options: ['sobbed', 'waved', 'burst'], answer: 0, type: 'vocabulary' },
+    ],
+    openEnded: [
+      { q: 'Why was the small hand the best part of Giri\'s night?', sampleAnswer: 'Holding her hand meant he had helped the girl find her father, and that made him happier than anything at the market.', markingGuide: 'A good answer links the small hand to helping the girl find her father.' },
     ],
     vocab: [
       { word: 'sobbed', meaning: 'Cried with big, shaking breaths', icon: '😢' },

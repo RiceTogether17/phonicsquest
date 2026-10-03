@@ -122,6 +122,13 @@ _For the back page of the book._
    His star chart ✓ · His hat · A picture · A clock
 3. Why did Giri feel proud at the end?  
    He did not give up ✓ · He won a prize · He ran the fastest · The storm stopped
+4. True or false? The barn door swung open at the first push.  
+   True · False ✓ · The story does not say
+5. Put these in the order they happened.  
+   (1) The storm burst with a crash. (2) Giri pushed and pulled the barn door. (3) Giri hung the chart to dry.
+
+**Write about it:** Why did Giri run out into the storm for his star chart?  
+_A good answer:_ He wrote the star chart out by hand, so it mattered to him. He did not want to lose it or buy a new one.
 
 **Talk about it:**
 - Why did Giri run back into the barn during the storm?
@@ -240,6 +247,13 @@ _For the back page of the book._
    A fern ✓ · A rock · A log · Some mud
 3. How do you think Giri felt when he found the star?  
    Happy and excited ✓ · Sad and cold · Angry and tired · Bored and sleepy
+4. True or false? Giri took the star home to show his mother.  
+   True · False · The story does not say ✓
+5. Put these in the order they happened.  
+   (1) A large bright star fell near the river. (2) The star was stuck under a fern. (3) Giri held the star close and walked home.
+
+**Write about it:** How do you think Giri felt when he held the star? Why?  
+_A good answer:_ He felt happy and proud. The story says he walked home with a warm glow in his heart.
 
 **Talk about it:**
 - How did Giri feel as he walked home? Which words in the story tell you?
@@ -361,6 +375,13 @@ _For the back page of the book._
    It pecked at the necklace to show Giri ✓ · It sang a song · It flew away · It gave him food
 3. What does this story teach us?  
    Help can come from unexpected places ✓ · Birds are always helpful · Necklaces are easy to find · Bushes are the best hiding spots
+4. True or false? The thrush pecked at something shiny.  
+   True ✓ · False · The story does not say
+5. Put these in the order they happened.  
+   (1) Giri lost his shell necklace on the path. (2) The thrush pecked at something shiny. (3) Giri clipped the shell necklace on.
+
+**Write about it:** Why do you think the thrush helped Giri?  
+_A good answer:_ Maybe the thrush saw Giri searching so hard and wanted to help. It had seen the shiny necklace in the grass.
 
 **Talk about it:**
 - How did the thrush help Giri find his necklace?
@@ -479,6 +500,13 @@ _For the back page of the book._
    Between a flower cart and a butter stall ✓ · By the door · At the far end · Next to the herbs
 3. Why did Giri also buy a pepper?  
    He thought his mother would like it ✓ · It was free · The trader asked him to · He was very hungry
+4. True or false? The honey stall was tucked between a corn cart and a butter stall.  
+   True · False ✓ · The story does not say
+5. Put these in the order they happened.  
+   (1) A trader called out. (2) Giri picked out a large jar. (3) Giri gave the jar and the pepper to his mother.
+
+**Write about it:** Giri bought a pepper as well as the honey. Was that a good idea? Why?  
+_A good answer:_ Yes. It was a perfect red pepper, good to eat, and it helped turn his mother's frown into a big smile.
 
 **Talk about it:**
 - Why did his mother's frown become a big smile?
@@ -600,6 +628,13 @@ _For the back page of the book._
    He read the chart on the bin ✓ · His mum told him · A friend said so · He guessed
 3. What is the main message of this story?  
    We should recycle the right things ✓ · Bins are too small · Juice boxes are rubbish · Walking home is fun
+4. True or false? Giri put some tins in the blue bin too.  
+   True · False · The story does not say ✓
+5. Put these in the order they happened.  
+   (1) Giri checked the chart on the bin. (2) The box sprang back and bumped his chin. (3) Giri pushed the flat box in through the slot.
+
+**Write about it:** Why did Giri check the chart on the bin first?  
+_A good answer:_ He was not sure whether a juice box could go in the blue bin, so he checked the chart to find out.
 
 **Talk about it:**
 - How did Giri find out that juice boxes could go in the blue bin?
@@ -721,6 +756,13 @@ _For the back page of the book._
    Changing a light bulb ✓ · Finding her keys · Cooking food · Carrying bags
 3. What can we learn from Giri in this story?  
    Helping a neighbour is kind and clever ✓ · Step stools always break · Shelves are too high · Do not answer the door
+4. True or false? Giri climbed up on a chair and turned the old bulb out.  
+   True · False ✓ · The story does not say
+5. Put these in the order they happened.  
+   (1) Giri heard a knock at the door. (2) Giri brought back a firm step stool. (3) The light burst on.
+
+**Write about it:** Why did Giri go back to his flat for a step stool?  
+_A good answer:_ Mrs Tan's step stool was broken, and Giri was not tall enough on his tiptoes, so he needed a firm stool to reach the light.
 
 **Talk about it:**
 - Why could Mrs Tan not change the light bulb herself?
@@ -838,6 +880,13 @@ _For the back page of the book._
    Through a gap in the wire ✓ · Over the fence · Under the barn · Through the door
 3. Why did Grandfather say "sharp thinking"?  
    Giri solved the problem by himself ✓ · Giri ran the fastest · The chicken was clever · The branch was sharp
+4. True or false? Giri rode the horse after lunch.  
+   True · False · The story does not say ✓
+5. Put these in the order they happened.  
+   (1) Giri filled the bucket for the horse. (2) A chicken got out at a gap in the fence. (3) Giri shut the gap with a thick branch.
+
+**Write about it:** Why did Giri shut the gap with a branch after he got the chicken back?  
+_A good answer:_ So that no more chickens could get out through the gap in the fence.
 
 **Talk about it:**
 - How did Giri stop the chicken from getting out again?
@@ -957,6 +1006,13 @@ _For the back page of the book._
    A helper in a purple shirt ✓ · His mother · A friend · The shop owner
 3. Why was this errand special for Giri?  
    It was his first time going on his own ✓ · He got free sweets · He met a new friend · The shop was far away
+4. True or false? A helper in a purple shirt led Giri to the yoghurt.  
+   True ✓ · False · The story does not say
+5. Put these in the order they happened.  
+   (1) Giri walked to the corner shop. (2) A helper led him to the third shelf. (3) Giri handed the bag to his mother.
+
+**Write about it:** How did Giri feel at the start of the errand, and how did he feel at the end?  
+_A good answer:_ At the start he felt nervous, because nerves ran through his body. At the end he felt proud and happy, and he grinned from ear to ear.
 
 **Talk about it:**
 - Why was Giri nervous at the start of the story?
@@ -1069,6 +1125,13 @@ _For the back page of the book._
    He dug the sand away from the shell ✓ · He picked the turtle up · He called for help · He splashed water on it
 3. Why did the turtle need help quickly?  
    The hot sun was burning the sand ✓ · It was getting dark · The tide was coming in · A bird was there
+4. True or false? Giri tried to carry the turtle to the water.  
+   True · False ✓ · The story does not say
+5. Put these in the order they happened.  
+   (1) Giri spotted a baby turtle stuck in the sand. (2) Giri turned the turtle to face the water. (3) The turtle swam off into the surf.
+
+**Write about it:** Why do you think Giri stood and stared until the turtle was just a dot?  
+_A good answer:_ He wanted to see that the turtle was safe in the sea. It was his first rescue, and he was proud of it.
 
 **Talk about it:**
 - Why did Giri turn the turtle round instead of carrying it?
@@ -1191,6 +1254,13 @@ _For the back page of the book._
    Tiny turnip tops ✓ · A row of corn · Red flowers · Long beans
 3. How do we know Giri did not give up?  
    He watered the seeds every morning and kept waiting ✓ · He planted new seeds · He asked Mrs Tan to help · He dug up the plot
+4. True or false? Giri's mum helped him plant the seeds.  
+   True · False · The story does not say ✓
+5. Put these in the order they happened.  
+   (1) Giri planted a row of seeds. (2) After a big rain, Giri spotted something green. (3) Giri pulled up ten firm turnips.
+
+**Write about it:** Giri felt glum when nothing came up. What would you tell him?  
+_A good answer:_ Keep giving the seeds a drink of water and wait, because seeds can take weeks to come up.
 
 **Talk about it:**
 - Why did Giri feel glum before the big rain?
@@ -1309,6 +1379,13 @@ _For the back page of the book._
    He carried a shopping bag up the steps ✓ · He watered her plants · He folded her clothes · He washed her dishes
 3. How did Giri feel about helping, even when he was tired?  
    He still liked it and kept smiling ✓ · He wanted to stop · He felt cross · He felt bored
+4. True or false? Giri carried the lightest bag up the steps.  
+   True ✓ · False · The story does not say
+5. Put these in the order they happened.  
+   (1) Giri washed and stacked the dishes. (2) Giri watered all eight plants. (3) Mum said he was the kindest helper in the city.
+
+**Write about it:** Which of Giri's jobs would you like to help with, and why?  
+_A good answer:_ I would like to water the plants, because it is fun to see them grow.
 
 **Talk about it:**
 - Which two jobs did Giri do after lunch?
@@ -1430,6 +1507,13 @@ _For the back page of the book._
    Under the cart ✓ · In the barn · Up a tree · In the yard
 3. What lesson did Giri learn?  
    Think hard before you act ✓ · Run fast in the rain · Birds cannot fly · Storms are fun
+4. True or false? The bird had a nest in the barn.  
+   True · False · The story does not say ✓
+5. Put these in the order they happened.  
+   (1) Giri asked the bird to fly to the barn. (2) Big drops of water started to fall. (3) The sun came back and lit up the yard.
+
+**Write about it:** Was the bird right not to fly to the barn? Why?  
+_A good answer:_ Yes. A storm was coming, and big drops of rain started to fall soon after.
 
 **Talk about it:**
 - Why did the bird say they should not go far?
