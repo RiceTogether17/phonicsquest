@@ -222,7 +222,7 @@ _For the back page of the book._
 - **on** — no tricky part; sound it out together
 - **in** — no tricky part; sound it out together
 - **his** — ❤️ tricky part: s says /z/
-- **then** — no tricky part, but it uses “th”, which comes later; read it together
+- **then** — no tricky part; sound it out together
 - **the** — ❤️ tricky part: e says /uh/
 
 **After reading — check understanding** (answer ticked):
@@ -331,7 +331,7 @@ _For the back page of the book._
 - **a** — ❤️ tricky part: on its own, a says /uh/
 - **of** — ❤️ tricky part: o says /u/ and f says /v/
 - **is** — ❤️ tricky part: s says /z/
-- **for** — no tricky part, but it uses “or”, which comes later; read it together
+- **for** — no tricky part; your child can sound it out once they know “or”. Read it together for now
 - **the** — ❤️ tricky part: e says /uh/
 - **he** — ❤️ tricky part: e says its name, /ē/
 - **said** — ❤️ tricky part: ai says /e/
@@ -445,15 +445,15 @@ _For the back page of the book._
 - **it** — no tricky part; sound it out together
 - **was** — ❤️ tricky part: a says /o/ and s says /z/
 - **a** — ❤️ tricky part: on its own, a says /uh/
-- **day** — no tricky part, but it uses “ay”, which comes later; read it together
-- **for** — no tricky part, but it uses “or”, which comes later; read it together
+- **day** — no tricky part; your child can sound it out once they know “ay”. Read it together for now
+- **for** — no tricky part; your child can sound it out once they know “or”. Read it together for now
 - **on** — no tricky part; sound it out together
 - **the** — ❤️ tricky part: e says /uh/
-- **too** — no tricky part, but it uses “oo”, which comes later; read it together
+- **too** — no tricky part; your child can sound it out once they know “oo”. Read it together for now
 - **I** — ❤️ tricky part: always a capital, and it says its name
 - **said** — ❤️ tricky part: ai says /e/
 - **his** — ❤️ tricky part: s says /z/
-- **then** — no tricky part, but it uses “th”, which comes later; read it together
+- **then** — no tricky part; sound it out together
 
 **After reading — check understanding** (answer ticked):
 1. What ran at Giri's hand?  
@@ -560,10 +560,10 @@ _For the back page of the book._
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **a** — ❤️ tricky part: on its own, a says /uh/
-- **white** — no tricky part, but it uses the i-e pattern, which comes later; read it together
+- **white** — no tricky part; your child can sound it out once they know Magic E makes “i” say its name. Read it together for now
 - **on** — no tricky part; sound it out together
 - **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **now** — no tricky part, but it uses “ow” as in “cow”, which comes later; read it together
+- **now** — no tricky part; your child can sound it out once they know “ow” can say /ow/, as in “cow”. Read it together for now
 - **is** — ❤️ tricky part: s says /z/
 - **the** — ❤️ tricky part: e says /uh/
 - **not** — no tricky part; sound it out together
@@ -681,7 +681,7 @@ _For the back page of the book._
 - **again** — ❤️ tricky part: ai says /e/
 - **so** — ❤️ tricky part: o says its name, /ō/
 - **do** — ❤️ tricky part: o says /oo/
-- **came** — no tricky part, but it uses the a-e pattern, which comes later; read it together
+- **came** — no tricky part; your child can sound it out once they know Magic E makes “a” say its name. Read it together for now
 
 **After reading — check understanding** (answer ticked):
 1. What did Giri find first in the pit?  
@@ -904,7 +904,7 @@ _For the back page of the book._
 - **is** — ❤️ tricky part: s says /z/
 - **a** — ❤️ tricky part: on its own, a says /uh/
 - **she** — ❤️ tricky part: e says its name, /ē/
-- **her** — no tricky part, but it uses “er”, which comes later; read it together
+- **her** — no tricky part; your child can sound it out once they know “er”. Read it together for now
 - **his** — ❤️ tricky part: s says /z/
 - **were** — ❤️ tricky part: ere says /er/
 - **we** — ❤️ tricky part: e says its name, /ē/
@@ -1018,9 +1018,9 @@ _For the back page of the book._
 - **the** — ❤️ tricky part: e says /uh/
 - **what** — ❤️ tricky part: a says /o/
 - **is** — ❤️ tricky part: s says /z/
-- **about** — no tricky part, but it uses a quiet "uh" sound spelt “a”, which comes later; read it together
+- **about** — no tricky part; clap the parts, then sound it out together
 - **has** — ❤️ tricky part: s says /z/
-- **name** — no tricky part, but it uses the a-e pattern, which comes later; read it together
+- **name** — no tricky part; your child can sound it out once they know Magic E makes “a” say its name. Read it together for now
 - **many** — ❤️ tricky part: a says /e/
 - **their** — ❤️ tricky part: eir says /air/
 - **story** — no tricky part; clap the parts, then sound it out together
@@ -1130,7 +1130,7 @@ _For the back page of the book._
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **a** — ❤️ tricky part: on its own, a says /uh/
 - **the** — ❤️ tricky part: e says /uh/
-- **how** — no tricky part, but it uses “ow” as in “cow”, which comes later; read it together
+- **how** — no tricky part; your child can sound it out once they know “ow” can say /ow/, as in “cow”. Read it together for now
 - **does** — ❤️ tricky part: oe says /u/ and s says /z/
 - **want** — ❤️ tricky part: a says /o/
 - **of** — ❤️ tricky part: o says /u/ and f says /v/

@@ -385,34 +385,18 @@ function wordsToKnow(story) {
   return out;
 }
 
-/** The later code a regular sight word waits on, said for a grown-up. */
-function laterCode({ waitsOn, segments, decodableAt }) {
-  // sightWordCode writes the silent e of a split digraph as plain "e".
-  if (waitsOn === 'e') {
-    const vowel = segments.at(-3)?.text;
-    return vowel ? `the ${vowel}-e pattern` : 'a silent-e pattern';
-  }
-  if (decodableAt === 10 && /^[aeiou]$/.test(waitsOn)) {
-    return `a quiet "uh" sound spelt “${waitsOn}”`;
-  }
-  if (waitsOn === 'y') return '“y” saying /igh/, as in “my”';
-  if (waitsOn === 'ow') return '“ow” as in “cow”';
-  return waitsOn.startsWith('-') ? `the ending “${waitsOn}”` : `“${waitsOn}”`;
-}
-
 /** One line for each word the child should meet before reading. */
 function wordToKnow(story, { word, display, status }) {
   const vocab = (story.vocab ?? []).find((v) => v.word.toLowerCase() === word);
   if (vocab) return `**${display}** — ${vocab.meaning}`;
   const code = getSightWordCode(word);
   if (code?.category === 'heart') return `**${display}** — ❤️ tricky part: ${code.note}`;
-  if (code?.waitsOn) {
-    return `**${display}** — no tricky part, but it uses ${laterCode(code)}, which comes later; read it together`;
+  if (code && code.decodableAt <= 4)
+    return `**${display}** — no tricky part; sound it out together`;
+  if (code?.waitsOnTip) {
+    return `**${display}** — no tricky part; your child can sound it out once they know ${code.waitsOnTip}. Read it together for now`;
   }
-  if (code?.decodableAt === 10) {
-    return `**${display}** — no tricky part; clap the parts, then sound it out together`;
-  }
-  if (code) return `**${display}** — no tricky part; sound it out together`;
+  if (code) return `**${display}** — no tricky part; clap the parts, then sound it out together`;
   if (status === 'proper') return `**${display}** — a name; read it to your child`;
   return `**${display}** — read it to your child for now`;
 }

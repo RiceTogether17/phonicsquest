@@ -23,7 +23,8 @@ import { createRuler, scrollHost, RULER_MODES } from '../modules/readingRuler.js
 import { savePlace, getPlace, clearPlace } from '../modules/storyPlace.js';
 import { store } from '../modules/store.js';
 import { getBandReadiness, getRecommendedBand } from '../modules/storyGating.js';
-import { supportWords, storySupportLevel } from '../modules/decodability.js';
+import { storySupportLevel } from '../modules/decodability.js';
+import { wordsToMeet } from '../modules/wordsToMeet.js';
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 import { html } from '../utils/html.js';
 import { tokenise } from '../utils/tokenise.js';
@@ -494,7 +495,7 @@ function _storyCardHtml(story, levelMeta, isChapter = false, isRead = false) {
           storySupportLevel(story) === 'adult-supported'
             ? '<span class="story-card-support" data-support="adult">🧑‍🏫 With a grown-up</span>'
             : (() => {
-                const n = supportWords(story).length;
+                const n = wordsToMeet(story).length;
                 return n
                   ? `<span class="story-card-support" data-support="independent">👀 ${n} new ${n === 1 ? 'word' : 'words'}</span>`
                   : '<span class="story-card-support" data-support="independent">🙋 Read by myself</span>';
@@ -591,10 +592,13 @@ function _renderWarmUpOrStory(story) {
  * had already been moved off that list for the same reason; the gate had
  * not.
  *
- * So the warm-up is now built from `supportWords` — the words this story
- * genuinely cannot be sounded out from — which is 133 chips across the whole
+ * So the warm-up is now built from `wordsToMeet` — the words this story
+ * genuinely cannot be sounded out from — which is 299 chips across the whole
  * bank rather than 1793. A child meets the words they actually need to be
  * told, and sounds out the rest, which is the point of a decodable reader.
+ * (It was 133 until heart words whose spelling passes the code check, like
+ * "said" and "was", joined in the band where they first appear; see
+ * wordsToMeet.js.)
  *
  * Key vocabulary (`story.vocab`) stays: that is a different job. Those words
  * ARE decodable; what the child needs is what they mean.
@@ -605,7 +609,7 @@ function _renderWarmUp(story) {
 
   _destroyRuler();
 
-  const prep = supportWords(story);
+  const prep = wordsToMeet(story);
   const storyText = story.lines
     .map((l) => l.text ?? '')
     .join(' ')
@@ -867,7 +871,7 @@ function _renderStory(story) {
         // the start and hit it in the third line had nowhere to go — and
         // "said" is precisely a word they cannot work out for themselves.
         // Folded away, because it is a reference now rather than a step.
-        const prep = supportWords(story);
+        const prep = wordsToMeet(story);
         if (!prep.length) return '';
         return String(html`
           <details class="story-prep-strip">

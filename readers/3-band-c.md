@@ -100,7 +100,7 @@ _For the back page of the book._
 - **his** — ❤️ tricky part: s says /z/
 - **he** — ❤️ tricky part: e says its name, /ē/
 - **wrote** — ❤️ tricky part: the w is silent
-- **out** — no tricky part, but it uses “ou”, which comes later; read it together
+- **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
 - **to** — ❤️ tricky part: o says /oo/
 - **pulled** — ❤️ tricky part: u says /oo/, as in "book"
 - **all** — ❤️ tricky part: a says /aw/
@@ -216,7 +216,7 @@ _For the back page of the book._
 - **clear** — read it to your child for now
 - **a** — ❤️ tricky part: on its own, a says /uh/
 - **above** — ❤️ tricky part: o says /u/ and the e is silent
-- **near** — no tricky part, but it uses “ear”, which comes later; read it together
+- **near** — no tricky part; your child can sound it out once they know “ear”. Read it together for now
 - **though** — ❤️ tricky part: ough says /ō/
 - **he** — ❤️ tricky part: e says its name, /ē/
 - **to** — ❤️ tricky part: o says /oo/
@@ -456,7 +456,7 @@ _For the back page of the book._
 - **mother** — ❤️ tricky part: o says /u/
 - **were** — ❤️ tricky part: ere says /er/
 - **called** — ❤️ tricky part: a says /aw/
-- **out** — no tricky part, but it uses “ou”, which comes later; read it together
+- **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
 - **could** — ❤️ tricky part: oul says /oo/, as in "book"
 - **he** — ❤️ tricky part: e says its name, /ē/
 - **there** — ❤️ tricky part: ere says /air/
@@ -694,7 +694,7 @@ _For the back page of the book._
 - **door** — ❤️ tricky part: oor says /or/
 - **was** — ❤️ tricky part: a says /o/ and s says /z/
 - **from** — ❤️ tricky part: o says /u/
-- **out** — no tricky part, but it uses “ou”, which comes later; read it together
+- **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
 - **she** — ❤️ tricky part: e says its name, /ē/
 - **could** — ❤️ tricky part: oul says /oo/, as in "book"
 - **of** — ❤️ tricky part: o says /u/ and f says /v/
@@ -819,7 +819,7 @@ _For the back page of the book._
 - **was** — ❤️ tricky part: a says /o/ and s says /z/
 - **work** — ❤️ tricky part: after w, or says /er/
 - **he** — ❤️ tricky part: e says its name, /ē/
-- **out** — no tricky part, but it uses “ou”, which comes later; read it together
+- **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
 - **aunty** — ❤️ tricky part: au says /ar/
 - **carefully** — In a way that avoids mistakes or danger
 - **said** — ❤️ tricky part: ai says /e/
@@ -941,7 +941,7 @@ _For the back page of the book._
 - **she** — ❤️ tricky part: e says its name, /ē/
 - **said** — ❤️ tricky part: ai says /e/
 - **from** — ❤️ tricky part: o says /u/
-- **ear** — no tricky part, but it uses “ear”, which comes later; read it together
+- **ear** — no tricky part; your child can sound it out once they know “ear”. Read it together for now
 
 **Word meanings** — talk about these before reading:
 - **errand** — A short trip to do a task, like buying something
