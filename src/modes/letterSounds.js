@@ -53,6 +53,9 @@ function buildCardMap() {
         map.set(key, { grapheme: g, type: t, examples: [] });
       }
       const card = map.get(key);
+      // A word whose tile makes a different sound from the card's — the u
+      // of "bush", the ew of "few" — would teach the wrong example.
+      if (word.phonemeKeys?.[i]) continue;
       if (card.examples.length < 3) {
         card.examples.push({ word: word.word, emoji: word.emoji });
       }

@@ -143,3 +143,44 @@ describe('per-choice explanations cover the full banks', () => {
     }
   });
 });
+
+describe('phonics mini-lesson content is accurate and fit for a child', () => {
+  const allText = (lesson) => [lesson.headline, ...lesson.script, ...lesson.confusions];
+
+  it('no "watch out" tip is a bare id instead of a sentence', () => {
+    // short-oo's only tip used to read "long-u-oo" — a stage id, shown to
+    // the child as the warning.
+    for (const [id, lesson] of Object.entries(PHONICS_LESSONS)) {
+      for (const tip of lesson.confusions) {
+        expect(tip, id).toMatch(/\s/);
+        expect(
+          CURRICULUM.some((s) => s.id === tip),
+          `${id}: "${tip}"`,
+        ).toBe(false);
+      }
+    }
+  });
+
+  it('does not teach "when two vowels go walking"', () => {
+    // The rule holds for fewer than half of English vowel-team words
+    // (bread, said, chief, soup, great…). Teach each team as one sound.
+    for (const [id, lesson] of Object.entries(PHONICS_LESSONS)) {
+      expect(allText(lesson).join(' '), id).not.toMatch(/two vowels go walking|does the talking/i);
+    }
+  });
+
+  it('does not teach word-shape memorising for tricky words', () => {
+    const tricky = PHONICS_LESSONS['sight-highfreq'];
+    expect(allText(tricky).join(' ')).not.toMatch(/shape/i);
+    expect(allText(tricky).join(' ')).toMatch(/tricky part/i);
+  });
+
+  it('says nothing a parent would not want read aloud', () => {
+    // A "say both sounds" tip once gave a slur as the example of a dropped
+    // sound. Any example of a misreading has to land on a harmless word.
+    const BLOCKED = /\b(fag|fags|cock|shag|slut|bitch|damn|crap|piss|tit|tits)\b/i;
+    for (const [id, lesson] of Object.entries(PHONICS_LESSONS)) {
+      expect(allText(lesson).join(' '), id).not.toMatch(BLOCKED);
+    }
+  });
+});

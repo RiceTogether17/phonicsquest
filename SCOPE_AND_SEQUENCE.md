@@ -61,7 +61,7 @@ Hearing sounds in spoken words — first, last and middle sounds, clapping sylla
 Matching each letter to the sound it makes — s says /s/, a says /ă/ — so sounds can be read from print.
 
 - **Learning outcome:** Say the most common sound for each single letter quickly and pick the letter that matches a spoken sound.
-- **Targets:** s /s/, a /ă/, t /t/, p /p/, i /ĭ/, n /n/, m /m/, d /d/, … (19 total)
+- **Targets:** s /s/, a /ă/, t /t/, p /p/, i /ĭ/, n /n/, m /m/, d /d/, … (26 total)
 - **Examples:** s → sun, a → apple, t → top, p → pig, i → ink, n → net
 - **Modes:** letterSounds, soundHunt, hear
 - **Mastery bar:** 80% over 6 attempts
@@ -185,7 +185,7 @@ Mixed-blend review, r-controlled vowels (ar, or, er, ir, ur) and the late conson
 
 | Stage | Name | Target sounds | Sample words | Mastery to pass | Prerequisite |
 | --- | --- | --- | --- | --- | --- |
-| `blends-review` | Blends Review | initial blends, final blends, both-end blends, tri-consonant blends (spr-, str-, scr-) | float, crisp, blend, sprint, plank, … (8 total) | 70% | `dip-aw` |
+| `blends-review` | Blends Review | initial blends, final blends, both-end blends, tri-consonant blends (spr-, str-, scr-) | strip, crisp, blend, sprint, plank, … (8 total) | 70% | `dip-aw` |
 | `rc-ar-or` | Bossy R · ar & or | ar /ɑr/, or /ɔr/ | car, star, farm, park, corn, … (8 total) | 70% | `blends-review` |
 | `rc-er-ir-ur` | Bossy R · er, ir & ur | er /ɜr/, ir /ɜr/, ur /ɜr/ | her, fern, bird, girl, turn, … (8 total) | 70% | `rc-ar-or` |
 | `cons-tch-dge` | tch and dge | tch /tʃ/, dge /dʒ/ | catch, match, patch, fetch, pitch, … (8 total) | 70% | `rc-er-ir-ur` |
@@ -202,8 +202,8 @@ Mixed-blend review, r-controlled vowels (ar, or, er, ir, ur) and the late conson
 | --- | --- | --- | --- | --- | --- |
 | `suffix-ing` | -ing Words | -ing /ɪŋ/ | running, jumping, sitting, eating, playing, … (8 total) | 70% | `cons-soft-cg` |
 | `suffix-ed` | -ed Words | -ed /d/, -ed /t/, -ed /ɪd/ | jumped, helped, picked, played, walked, … (8 total) | 70% | `suffix-ing` |
-| `suffix-er` | -er Words | -er /ɚ/ | grander, taller, bigger, smaller, slower, … (8 total) | 70% | `suffix-ed` |
-| `suffix-est` | -est Words | -est /ɪst/ | grandest, tallest, biggest, smallest, slowest, … (8 total) | 70% | `suffix-er` |
+| `suffix-er` | -er Words | -er /ɚ/ | faster, bigger, softer, longer, slower, … (8 total) | 70% | `suffix-ed` |
+| `suffix-est` | -est Words | -est /ɪst/ | fastest, biggest, softest, longest, slowest, … (8 total) | 70% | `suffix-er` |
 
 ### Phase 10 — Morphology & Fluency
 
