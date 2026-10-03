@@ -407,7 +407,7 @@ export const CURRICULUM = [
     requiredMastery: 0.70, prerequisite: 'cvc-mixed',
     learningOutcome: 'Decode short-A words with an initial l-, r- or s-blend without skipping the second consonant.',
     targetSounds: ['bl', 'cl', 'fl', 'pl', 'sl', 'br', 'cr', 'dr', 'fr', 'gr', 'pr', 'tr', 'sk', 'sm', 'sn', 'sp', 'st', 'sw'],
-    sampleWords: ['flat', 'clap', 'trap', 'plan', 'snap', 'flag', 'grab', 'stab'],
+    sampleWords: ['flat', 'clap', 'trap', 'plan', 'snap', 'flag', 'grab', 'crab'],
     sentenceExamples: ['I clap and tap.', 'A frog is in a trap.'],
     recommendedModes: ['blend', 'classicBlend', 'segment', 'soundCount'],
     masteryCriteria: DEFAULT_MASTERY_CRITERIA,
