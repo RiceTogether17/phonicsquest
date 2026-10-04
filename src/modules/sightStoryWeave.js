@@ -67,7 +67,7 @@ export function getSightWordsInStory(storyOrId, limit = 6) {
 export function getStoryForQuest(quest, minHits = 2) {
   if (!quest?.words?.length) return null;
   const target = new Set(quest.words.map((w) => w.toLowerCase()));
-  const bands = ['A', 'B', 'C', 'D'];
+  const bands = ['A', 'B', 'C', 'D', 'E'];
   const candidates = STORIES.filter(
     (s) => bands.includes(s.band) && (!quest.storyBand || s.band === quest.storyBand),
   );

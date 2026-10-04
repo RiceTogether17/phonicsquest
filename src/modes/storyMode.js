@@ -64,7 +64,7 @@ const BASE = import.meta.env.BASE_URL;
 
 let _container = null;
 let _onGoHome = null;
-let _activeBand = 'A'; // 'A' | 'B' | 'C' | 'D'
+let _activeBand = 'A'; // 'A' | 'B' | 'C' | 'D' | 'E'
 let _bandAutoPicked = false; // pick the recommended shelf once per session
 let _activeTab = 'band'; // 'band' | 'singapore' | 'chapter'
 let _speaking = false;
@@ -909,6 +909,7 @@ function _renderStory(story) {
           : ''
       }
 
+      ${_castNoteHtml(story)}
       <div class="story-body story-body--follow-${_followMode}" id="story-body" aria-live="polite">${linesHtml}</div>
 
       <!-- The ruler's own controls. They live under the text, not in the
@@ -1714,13 +1715,31 @@ function _soundLegendHtml() {
 }
 
 /**
+ * A play's parts, and how to read it together. A play is for reading aloud
+ * with someone: each reader takes a part, and swapping parts for a second
+ * read is where the fluency practice comes from.
+ * @param {object} story
+ */
+export function _castNoteHtml(story) {
+  if (!story?.roles?.length) return '';
+  return html`<p class="story-cast" role="note">
+    🎭 <strong>A play to read together.</strong> The parts:
+    ${story.roles.map(
+      (role, i) =>
+        html`<span class="story-cast-part" data-part="${i}">${role}</span>${i < story.roles.length - 1 ? ', ' : '.'}`,
+    )}
+    Pick a part each and read your lines with feeling. Then swap parts and read it again!
+  </p>`;
+}
+
+/**
  * Build HTML for a story line.
  * @param {object} line
  * @param {number} i – line index
  * @param {boolean} [wordSpans=false] – if true, wrap each word in a span for word-follow highlighting
  * @param {object}  [story]            – the current story (for grapheme highlighting)
  */
-function _lineHtml(line, i, wordSpans = false, story = null) {
+export function _lineHtml(line, i, wordSpans = false, story = null) {
   const baseText = line.text ?? '';
   // "Problem:" / "Attempt:" / "Solution:" are the teacher's story-grammar
   // frame, not text the child decodes. Running them through the sound-colour
@@ -1734,6 +1753,13 @@ function _lineHtml(line, i, wordSpans = false, story = null) {
     ? _highlightGraphemes(baseText, story.targetGraphemes, story.band)
     : baseText;
   const content = wordSpans ? _wordSpanText(baseText, story) : highlighted;
+  if (line.type === 'script') {
+    // A line in a play. The speaker's name tells whoever reads that part when
+    // it is their turn; like "Problem:" it is not text to decode, so it sits
+    // outside the word spans and the word numbering a clue relies on.
+    const part = Math.max(0, (story?.roles ?? []).indexOf(line.role));
+    return `<p class="sline sline--script" data-line="${i}" data-part="${part}"><span class="sline-role">${escapeHtml(line.role ?? '')}:</span> ${content}</p>`;
+  }
   switch (line.type) {
     case 'chapter':
       return `<div class="sline sline--chapter"   data-line="${i}">📚 ${content}</div>`;
@@ -1741,6 +1767,8 @@ function _lineHtml(line, i, wordSpans = false, story = null) {
       return `<p class="sline sline--beat"        data-line="${i}">${content}</p>`;
     case 'intro':
       return `<p class="sline sline--intro"       data-line="${i}">${content}</p>`;
+    case 'refrain':
+      return `<p class="sline sline--refrain"     data-line="${i}">${content}</p>`;
     case 'end':
       return `<p class="sline sline--end"         data-line="${i}">${content}</p>`;
     case 'text':

@@ -109,6 +109,13 @@ const PACKS = [
     ages: '7–9',
     test: (s) => s.textType === 'chapter-reader',
   },
+  {
+    file: '7-band-e.md',
+    title: 'Set 7 · Band E — Longer Reads',
+    ages: '8–10',
+    band: 'E',
+    test: (s) => s.band === 'E' && s.textType === 'longer-read',
+  },
 ];
 
 // ── Pages ────────────────────────────────────────────────────────────────
@@ -130,6 +137,20 @@ function pagesOf(story) {
     }
     if (line.type === 'chapter') {
       heading = line.text;
+      continue;
+    }
+    if (line.type === 'script') {
+      // A line in a play keeps its speaker, so the page says who talks, and
+      // three lines share a page: one picture per line would be a picture
+      // for "Yes!".
+      const said = `${line.role}: ${line.text}`;
+      const last = pages.at(-1);
+      if (last?.lines && last.lines < 3) {
+        last.text += ` / ${said}`;
+        last.lines += 1;
+      } else {
+        pages.push({ text: said, lines: 1 });
+      }
       continue;
     }
     pages.push({ text: line.text, ...(tag && { tag }), ...(heading && { heading }) });
@@ -436,10 +457,20 @@ function readingTogether(story) {
   if (story.comprehension?.length) {
     out.push('**After reading — check understanding** (answer ticked):');
     story.comprehension.forEach((q, i) => {
+      if (q.kind === 'order') {
+        // Events are stored in story order, which is the answer.
+        out.push(`${i + 1}. ${q.q}  `, `   ${q.events.map((e, j) => `(${j + 1}) ${e}`).join(' ')}`);
+        return;
+      }
+      const prompt = q.kind === 'tf' ? `True or false? ${q.q}` : q.q;
       const options = q.options.map((o, j) => (j === q.answer ? `${o} ✓` : o)).join(' · ');
-      out.push(`${i + 1}. ${q.q}  `, `   ${options}`);
+      out.push(`${i + 1}. ${prompt}  `, `   ${options}`);
     });
     out.push('');
+  }
+
+  for (const w of story.openEnded ?? []) {
+    out.push(`**Write about it:** ${w.q}  `, `_A good answer:_ ${w.sampleAnswer}`, '');
   }
 
   if (story.talkAboutIt?.length) {

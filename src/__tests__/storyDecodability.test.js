@@ -14,6 +14,8 @@ import { describe, it, expect } from 'vitest';
 import { STORIES, BAND_META } from '../data/stories.js';
 import {
   analyzeStory,
+  classifyWord,
+  cleanToken,
   getStoryPhase,
   getStoryRules,
   countFocusGrapheme,
@@ -40,7 +42,7 @@ import { CURRICULUM } from '../data/curriculum.js';
  * post-audit corpus (empirical minimums: A .850, B .918, C .944, D .993).
  * New stories may not drag a band below its floor.
  */
-const RATIO_FLOORS = { A: 0.84, B: 0.9, C: 0.93, D: 0.95 };
+const RATIO_FLOORS = { A: 0.84, B: 0.9, C: 0.93, D: 0.95, E: 0.95 };
 
 /**
  * Floors for the phases that carry a short-vowel budget, keyed by how many
@@ -95,7 +97,7 @@ function cumulativeBudget(phase) {
 }
 
 /** Most stretch words a single story may pre-teach via `pretaught`. */
-const PRETAUGHT_CAPS = { A: 2, B: 3, C: 3, D: 3 };
+const PRETAUGHT_CAPS = { A: 2, B: 3, C: 3, D: 3, E: 3 };
 
 const VALID_LINE_TYPES = new Set([
   'text',
@@ -106,6 +108,7 @@ const VALID_LINE_TYPES = new Set([
   'beat',
   'paragraph',
   'chapter',
+  'script', // a line in a play, with its speaker in `role`
 ]);
 
 /**
@@ -120,18 +123,19 @@ const STORY_SUFFICIENCY_TARGETS = [
   { band: 'A', phase: 'mixed-short', min: 4 },
   { band: 'B', phase: 'long-a', min: 3 },
   { band: 'B', phase: 'long-e', min: 3 },
-  { band: 'B', phase: 'long-i', min: 3 },
-  { band: 'B', phase: 'long-o', min: 3 },
-  { band: 'B', phase: 'long-u', min: 3 },
+  { band: 'B', phase: 'long-i', min: 5 },
+  { band: 'B', phase: 'long-o', min: 4 },
+  { band: 'B', phase: 'long-u', min: 6 },
   { band: 'B', phase: 'short-digraphs', min: 2 },
   { band: 'B', phase: 'extension-sg', min: 5 },
   { band: 'C', phase: 'r-controlled', min: 7 },
   { band: 'C', phase: 'digraphs', min: 3 },
-  { band: 'C', phase: 'suffixes', min: 1 },
+  { band: 'C', phase: 'suffixes', min: 2 },
   { band: 'C', phase: 'extension-sg', min: 1 },
   { band: 'D', phase: 'diphthongs', min: 4 },
-  { band: 'D', phase: 'advanced-vowel', min: 6 },
+  { band: 'D', phase: 'advanced-vowel', min: 7 },
   { band: 'D', phase: 'chapter', min: 5 },
+  { band: 'E', phase: 'bridge', min: 4 },
 ];
 
 const analyses = new Map(STORIES.map((s) => [s.id, analyzeStory(s)]));
@@ -260,6 +264,29 @@ describe('refrains (R6)', () => {
       const { computed } = analyses.get(s.id);
       expect(s.refrainCount, `${s.id}: refrainCount`).toBe(computed.refrainCount);
     }
+  });
+
+  it('a refrain is made of words the child can already read', () => {
+    // Refrains sit outside the word count, so the count's checks never see
+    // them. The child reads a refrain more often than any other line, so it
+    // is held to the same code: "who took my lime pie?" got into a long-i
+    // story with "took", whose oo is not taught until long-u. A word that is
+    // readable only with support must also be in the counted text, which is
+    // where the words-to-meet list finds it before the story starts.
+    const bad = [];
+    for (const s of STORIES) {
+      const counted = new Set(extractCountableTokens(s));
+      for (const line of s.lines.filter((l) => l.type === 'refrain')) {
+        for (const raw of line.text.split(/[\s–—-]+/)) {
+          const word = cleanToken(raw);
+          if (!word) continue;
+          const { status } = classifyWord(word, s);
+          if (status === 'stretch' || (status !== 'decodable' && !counted.has(word)))
+            bad.push(`${s.id}: "${word}" (${status})`);
+        }
+      }
+    }
+    expect(bad).toEqual([]);
   });
 });
 
@@ -509,7 +536,7 @@ describe('comprehension questions', () => {
 
   it('longer bands carry a follow-up thinking question, not just retrieval', () => {
     const thin = STORIES.filter(
-      (s) => (s.band === 'C' || s.band === 'D') && (s.talkAboutIt || []).length < 2,
+      (s) => ['C', 'D', 'E'].includes(s.band) && (s.talkAboutIt || []).length < 2,
     ).map((s) => s.id);
     expect(thin, thin.join(', ')).toEqual([]);
   });

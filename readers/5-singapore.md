@@ -134,6 +134,10 @@ _For the back page of the book._
    rod ✓ · mat · bag · hat
 3. How did the kind man help Giri?  
    Let Giri sit ✓ · Gave Giri a bag · Ran with Giri · Got Giri a drink
+4. Giri held on to the ___ and did not slip.  
+   rod ✓ · red · rid
+5. Put these in the order they happened.  
+   (1) The MRT was full. (2) A kind man let Giri sit in his seat. (3) Giri got off at his stop.
 
 **Talk about it:**
 - Why did Giri hold on to the rod?
@@ -267,6 +271,10 @@ _For the back page of the book._
    The wrong room ✓ · His own room · The big room · The wet room
 3. How do you think Giri felt at the start of school?  
    Worried and lost ✓ · Very happy · Very sleepy · Very hungry
+4. He had a big red ___.  
+   bag ✓ · bug · beg
+5. Put these in the order they happened.  
+   (1) Giri lost his peg. (2) A kind pal led Giri to his peg. (3) Giri sat at his desk.
 
 **Talk about it:**
 - Why did Giri run to look in each room?
@@ -396,6 +404,10 @@ _For the back page of the book._
    A nice auntie ✓ · A kind man · His mum · The chef
 3. How do you think Giri felt when he was lost?  
    Worried and confused ✓ · Happy and excited · Hungry and tired · Bored and sleepy
+4. Giri gave a wave and ___.  
+   paid ✓ · pad · pod
+5. Put these in the order they happened.  
+   (1) Giri got lost in the maze of lanes. (2) A nice auntie led him to the noodle stall. (3) Giri went home with the noodles.
 
 **Talk about it:**
 - How did the auntie help Giri?
@@ -526,6 +538,10 @@ _For the back page of the book._
    Called out to his mum ✓ · Sat down and cried · Ran home · Went to sleep
 3. What helped Giri find his mum in the end?  
    He saw her wave from the stall ✓ · She called his name · He asked a stranger · He found her bag
+4. The lane was full of red ___ and gold flags.  
+   lights ✓ · lots · lids
+5. Put these in the order they happened.  
+   (1) Giri lost his mum in the big crowd. (2) Giri spied the red light of the stall. (3) They sat and ate sweet kueh.
 
 **Talk about it:**
 - How did Giri find his mum again?
@@ -654,6 +670,10 @@ _For the back page of the book._
    Cupped his hands ✓ · Ran inside · Got a new lamp · Blew on it
 3. Why is Deepavali called the Festival of Lights?  
    People light lamps all around ✓ · People fly kites · People eat sweet treats · People sing songs
+4. The street had ___ oil lamps and gold clay pots.  
+   bright ✓ · brick · brim
+5. Put these in the order they happened.  
+   (1) Giri's oil lamp went out in the wind. (2) A kind auntie lit the lamp. (3) Giri ate a sweet treat.
 
 **Talk about it:**
 - Why did Giri cup his hands around the lamp?
@@ -781,6 +801,13 @@ _For the back page of the book._
    A small bird ✓ · A bat · A kite · A cat
 3. What can we learn from Giri here?  
    Help when you can, even if it is hard ✓ · Always wait for a ranger · Never go to a garden · Birds can look after themselves
+4. True or false? Giri used a long net to help the bird get free.  
+   True · False ✓ · The story does not say
+5. Put these in the order they happened.  
+   (1) A small bird got stuck in the garden net. (2) Giri called for a park ranger to help. (3) The bird flew up with a chirp.
+
+**Write about it:** How did Giri feel at the end, and why?  
+_A good answer:_ He felt happy and proud, with a warm glow in his heart, because he had helped the bird get free.
 
 **Talk about it:**
 - How did Giri help the bird get free?

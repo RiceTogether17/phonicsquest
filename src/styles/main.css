@@ -4965,6 +4965,39 @@ details.story-tool-section[open] > .story-tool-summary::before {
   transform: none;
 }
 
+/* A play: each part has its own colour, on the speaker's name and the
+   line's edge, so a reader can find their next line at a glance. The name
+   is also printed, so colour is never the only cue. */
+.sline--script {
+  --part-color: var(--color-primary-on-tint);
+  border-left: 4px solid var(--part-color);
+  padding-left: var(--space-3);
+}
+.sline--script[data-part='1'] {
+  --part-color: var(--color-success-text);
+}
+.sline--script[data-part='2'] {
+  --part-color: var(--color-warning-text);
+}
+.sline--script[data-part='3'] {
+  --part-color: var(--color-error-text);
+}
+.sline-role {
+  color: var(--part-color);
+  font-weight: 800;
+}
+.story-cast {
+  margin: 0 0 var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  background: var(--color-primary-light);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+.story-cast-part {
+  font-weight: 800;
+}
+
 /* TTS bar */
 .story-tts-bar {
   display: flex;
@@ -5355,6 +5388,46 @@ details.story-tool-section[open] > .story-tool-summary::before {
 }
 .sq-breakdown {
   margin: var(--space-2) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* Story Quest question kinds: true or false, fill the gap, put in order. */
+.sq-kind-label {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+.sq-gap {
+  display: inline-block;
+  min-width: 4em;
+  margin: 0 0.15em;
+  border-bottom: 3px solid var(--color-primary);
+  text-align: center;
+}
+.sq-gap--filled {
+  color: var(--color-success-text);
+}
+.sq-order-event--picked,
+.sq-order-event--shown {
+  border-color: var(--color-primary);
+}
+.sq-order-event--picked .sq-option-letter {
+  background: var(--color-primary);
+  color: #fff;
+}
+.sq-written {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.sq-written-model summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.sq-written-check {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
 }

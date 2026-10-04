@@ -181,6 +181,13 @@ _For the back page of the book._
    Put it in his pocket and asked the ranger ✓ · Left it on the ground · Took it home · Threw it away
 3. Why was it a good idea not to leave the key?  
    Someone might need it to get home ✓ · Keys are pretty · Giri wanted to keep it · The ranger asked him to
+4. True or false? Giri put the key in his shirt pocket.  
+   True ✓ · False · The story does not say
+5. He looked around the park to see if anyone was searching, but the path was ___ and no one was near.  
+   empty ✓ · shiny · pocket
+
+**Write about it:** What would you have done if you found the key? Why?  
+_A good answer:_ I would take it to the ranger hut too, because the owner might come back to the park to look for it.
 
 **Talk about it:**
 - Why did Giri take the key to the ranger hut?
@@ -232,6 +239,13 @@ _For the back page of the book._
    Grab the key and run ✓ · Help find the owner · Ask if it was his · Leave the park
 3. Why was it important for Giri to speak up?  
    To stop someone taking something that was not theirs ✓ · To scare the boy · To show off · Because he wanted the key
+4. True or false? The boy did not give back the key.  
+   True · False ✓ · The story does not say
+5. A boy tried to ___ the key and run.  
+   grab ✓ · check · board
+
+**Write about it:** Why did Giri and the ranger check each person one by one?  
+_A good answer:_ To make sure the key went to its real owner, and not to someone who just wanted a key.
 
 **Talk about it:**
 - Why did Giri stop the boy who tried to grab the key?
@@ -281,6 +295,13 @@ _For the back page of the book._
    It fit the lock ✓ · The man remembered it · It had his name · The ranger said so
 3. What does "a kind act is never too small" mean?  
    Even small kind acts make a big difference ✓ · Big acts are the only ones that matter · Keys are small things · Giri was a small boy
+4. True or false? The old man could not remember what his key looked like.  
+   True ✓ · False · The story does not say
+5. The old man gave a shout of ___.  
+   joy ✓ · pride · act
+
+**Write about it:** How did they find out the key was the old man's?  
+_A good answer:_ His eyes were not clear and he could not remember the key, so they tried it in his lock, and it fit.
 
 **Talk about it:**
 - How did they know the key belonged to the old man?
@@ -438,6 +459,13 @@ _For the back page of the book._
    Strings of little lights ✓ · Long flags · Paper kites · Wet clothes
 3. What do you think Giri will do next?  
    Go and find out who is crying ✓ · Go home to sleep · Buy a snack · Ring the bell
+4. True or false? Smoke curled up from a satay grill.  
+   True ✓ · False · The story does not say
+5. Stalls sold cold drinks, warm kueh, and ___ snacks.  
+   sizzling ✓ · curled · satay
+
+**Write about it:** What do you think Giri will do when he finds who is crying? Why?  
+_A good answer:_ I think he will help, because Giri always stops to help someone who needs it.
 
 **Talk about it:**
 - What did Giri hear near the last stall?
@@ -494,6 +522,13 @@ _For the back page of the book._
    The satay man ✓ · A police officer · Mrs Tan · The bus driver
 3. Why did Giri know how the girl felt?  
    He remembered being lost once himself ✓ · He read about it · The satay man told him · He was lost right then too
+4. True or false? The satay man lifted Giri up high.  
+   True · False ✓ · The story does not say
+5. "I turned round and he was gone," she ___.  
+   sobbed ✓ · waved · burst
+
+**Write about it:** Why was the small hand the best part of Giri's night?  
+_A good answer:_ Holding her hand meant he had helped the girl find her father, and that made him happier than anything at the market.
 
 **Talk about it:**
 - How did Giri and the satay man help the girl find her father?

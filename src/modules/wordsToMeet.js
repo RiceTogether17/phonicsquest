@@ -21,7 +21,7 @@ import { STORIES } from '../data/stories.js';
 import { getSightWordCode } from '../data/sightWordCode.js';
 import { extractCountableTokens, supportWords } from './decodability.js';
 
-const BAND_ORDER = ['A', 'B', 'C', 'D'];
+const BAND_ORDER = ['A', 'B', 'C', 'D', 'E'];
 
 /** @type {Map<string, string>|null} heart word → band that first uses it */
 let _firstBand = null;

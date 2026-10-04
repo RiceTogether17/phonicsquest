@@ -46,6 +46,19 @@ const NAME_OVERRIDES = Object.freeze({
   'core-b-04': 'Sun Day', // Giri's Big Day
   'core-a-06': 'Shovel', // Giri's Big Dig
   'core-a-04': 'Pillow', // Giri's Nap
+  'review-b-01': 'Blue the Snail', // The Snail Race
+  'play-b-01': 'Mole', // No. No. Also No. (A Play)
+  'review-c-01': 'Mei Ling', // The Missing Badge
+  'review-d-01': 'The Kittens', // Who Is on the Stairs?
+  'core-b-18': 'The White Kite', // Mrs Tan Flies a Kite
+  'core-b-19': 'Lime Pie', // Who Took the Lime Pie?
+  'core-b-20': 'Loose Tooth', // Mei Ling's Loose Tooth
+  'core-b-21': 'The Goose', // Shoo, Goose, Shoo!
+  'howto-d-01': 'Kaya Toast', // How to Make Kaya Toast
+  'journal-penang-1': 'Grandpa', // Giri's Week in Penang: Day 1
+  'journal-penang-2': 'The Trishaw', // Giri's Week in Penang: Day 2
+  'journal-penang-3': 'The Monkey', // Giri's Week in Penang: Day 3
+  'tale-e-01': 'The Kingfisher', // How the Kingfisher Got Its Blue Coat
 });
 
 /**
