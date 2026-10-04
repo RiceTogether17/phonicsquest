@@ -1,22 +1,24 @@
 # Giri Readers — picture kit
 
-Everything needed to turn the 73 Giri stories into printed picture books:
+Everything needed to turn the 82 Giri stories into printed picture books:
 the words for every page, a ChatGPT prompt for every picture, and a
 "reading together" page for the grown-up.
 
 | File                                            | Books | Pictures (with covers) | Ages |
 | ----------------------------------------------- | ----: | ---------------------: | ---- |
-| [1-band-a.md](1-band-a.md) — short vowels       |    16 |                     96 | 4–6  |
-| [2-band-b.md](2-band-b.md) — long vowels        |    21 |                    128 | 5–7  |
+| [1-band-a.md](1-band-a.md) — short vowels       |    16 |                    102 | 4–6  |
+| [2-band-b.md](2-band-b.md) — long vowels        |    25 |                    155 | 5–7  |
 | [3-band-c.md](3-band-c.md) — ar, or, er, ir, ur |    13 |                     54 | 6–8  |
-| [4-band-d.md](4-band-d.md) — oi, ou, air, aw…   |    12 |                     61 | 7–9  |
+| [4-band-d.md](4-band-d.md) — oi, ou, air, aw…   |    13 |                     70 | 7–9  |
 | [5-singapore.md](5-singapore.md)                |     6 |                     36 | 5–8  |
 | [6-chapter-books.md](6-chapter-books.md)        |     2 |                     18 | 7–9  |
-| **Total**                                       |    70 |                    393 |      |
+| [7-band-e.md](7-band-e.md) — longer reads       |     2 |                     23 | 8–10 |
+| **Total**                                       |    77 |                    458 |      |
 
-The two chapter books hold five chapters between them, so 73 stories make
-70 books. [pictures.csv](pictures.csv) lists every picture with
-its file name and a `done` column to tick off as you go.
+The two chapter books hold five chapters between them, and Giri's Week in
+Penang holds three days, so 82 stories make 77 books.
+[pictures.csv](pictures.csv) lists every picture with its file name and a
+`done` column to tick off as you go.
 
 Start with **Set 1**. It is the smallest, and Band A is where a child starts
 reading.
@@ -34,9 +36,9 @@ reading.
 
    Save the result as `giri-sheet.png`. From now on, attach this sheet in
    every book's chat. One clear reference is what keeps Giri looking the
-   same across 393 pictures.
+   same across 458 pictures.
 
-3. For books with **Mrs Tan** (Sets 3 and 4), also attach
+3. For books with **Mrs Tan** (Sets 2, 3 and 4), also attach
    `public/images/stories/giri_level03_story06_neighbour.jpg`, which shows
    her as the app already draws her.
 

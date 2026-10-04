@@ -78,8 +78,10 @@ test('library cards say how many words need meeting first', async ({ page }) => 
 test('opening a story lists the words it cannot be sounded out from', async ({ page }) => {
   await openLibrary(page);
 
-  // Giri's Nap (core-a-04) needs ten: it, day, for, on, the, too, I, said,
-  // his, then. The old six-word panel showed fewer, and not these.
+  // Giri's Nap (core-a-04) needs twelve: it, was, a, day, for, on, the, too,
+  // I, said, his, then. "was" and "a" are heart words the spelling check
+  // passes, listed because Band A is where the bank first uses them (see
+  // wordsToMeet.js). The old six-word panel showed fewer, and not these.
   await page.locator('.story-card').nth(3).click();
 
   // These now live in the one warm-up, which replaced both this panel and
@@ -89,7 +91,7 @@ test('opening a story lists the words it cannot be sounded out from', async ({ p
   await expect(prep).toContainText(/Words to know first/i);
 
   const words = prep.locator('.story-prep-word');
-  expect(await words.count()).toBe(10);
+  expect(await words.count()).toBe(12);
 
   // The pronoun prints as a capital — the classifier lowercases every token,
   // and a panel teaching sight recognition must not show the wrong shape.
