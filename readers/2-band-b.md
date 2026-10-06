@@ -48,7 +48,7 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Giri had a grand plan. He wanted to bake two cakes for his pal Jay.
 Page 2: But the cake stayed flat in the pan. It did not lift a bit!
-Page 3: "Wake up, cake!" Giri gave the pan a brave shake. He saw it stay flat. "Oh no!"
+Page 3: "Wake up, cake!" Giri gave the pan a brave shake. He saw it stay flat. "No, no!"
 Page 4: He did not wait. He got the flat cake out and made a stack: cake, jam, cake, jam!
 Page 5: Jay ate it by the lake. "Make me two, Giri!" That flat cake was the best.
 ```
@@ -82,7 +82,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: "Wake up, cake!" Giri gave the pan a brave shake. He saw it stay flat. "Oh no!"
+Words on this page: "Wake up, cake!" Giri gave the pan a brave shake. He saw it stay flat. "No, no!"
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -112,23 +112,17 @@ _For the back page of the book._
 - **ay** — stayed, stay
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **to** — ❤️ tricky part: o says /oo/
+- **wanted** — read it to your child for now
 - **two** — ❤️ tricky part: the w is silent and o says /oo/
-- **for** — no tricky part; your child can sound it out once they know “or”. Read it together for now
-- **his** — ❤️ tricky part: s says /z/
-- **the** — ❤️ tricky part: e says /uh/
 - **saw** — no tricky part; your child can sound it out once they know “aw”. Read it together for now
 - **no** — ❤️ tricky part: o says its name, /ō/
 - **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
 - **by** — no tricky part; your child can sound it out once they know “y” can say /igh/. Read it together for now
 - **me** — ❤️ tricky part: e says its name, /ē/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
 
 **After reading — check understanding** (answer ticked):
 1. Who was Giri baking the cakes for?  
-   His pal Jay ✓ · The cat · His mother
+   His pal Jay ✓ · The cat · His mum
 2. What went wrong with the cake?  
    It stayed flat ✓ · It was too hot · It fell in the lake
 3. How did Giri turn the flat cake into a great one?  
@@ -173,9 +167,9 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Giri had a small boat. He hoped to row home while the stream was slow.
 Page 2: But the boat did not float! It sat low by a big stone. "What is in here?"
-Page 3: Giri gave it a shove. No go! What did he find? Two toads! They had made it a home!
+Page 3: Giri gave it a poke. No go! What did he find? Two toads! They had made it a home!
 Page 4: "Take this home, toads!" Giri made them a moss home on the stone.
-Page 5: The toads hopped off. The boat rose and rode the foam home!
+Page 5: The toads hopped off. The boat bobbed and rode the foam home!
 ```
 
 ### 2. Pictures — paste one at a time
@@ -207,7 +201,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: Giri gave it a shove. No go! What did he find? Two toads! They had made it a home!
+Words on this page: Giri gave it a poke. No go! What did he find? Two toads! They had made it a home!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -223,7 +217,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: The toads hopped off. The boat rose and rode the foam home!
+Words on this page: The toads hopped off. The boat bobbed and rode the foam home!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -233,17 +227,10 @@ _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
 - **oa** — boat, float, toads, foam
-- **o-e** — hoped, home, stone, rose, rode
+- **o-e** — hoped, home, stone, poke, rode
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
 - **small** — ❤️ tricky part: a says /aw/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **to** — ❤️ tricky part: o says /oo/
-- **the** — ❤️ tricky part: e says /uh/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **what** — ❤️ tricky part: a says /o/
-- **is** — ❤️ tricky part: s says /z/
 - **no** — ❤️ tricky part: o says its name, /ō/
 - **go** — ❤️ tricky part: o says its name, /ō/
 - **two** — ❤️ tricky part: the w is silent and o says /oo/
@@ -255,7 +242,7 @@ _For the back page of the book._
 2. Where did Giri make the toads a new home?  
    On the stone ✓ · In the boat · In the foam
 3. What happened once the toads had gone?  
-   The boat rose and rode home ✓ · The boat still sat low · The stream got slow
+   The boat bobbed and rode home ✓ · The boat still sat low · The stream got slow
 4. But the boat did not ___!  
    float ✓ · flat · flit
 5. Put these in the order they happened.  
@@ -359,18 +346,10 @@ _For the back page of the book._
 - **ea** — reach
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
 - **by** — no tricky part; your child can sound it out once they know “y” can say /igh/. Read it together for now
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **too** — no tricky part; your child can sound it out once they know “oo”. Read it together for now
-- **to** — ❤️ tricky part: o says /oo/
-- **the** — ❤️ tricky part: e says /uh/
 - **could** — ❤️ tricky part: oul says /oo/, as in "book"
-- **I** — ❤️ tricky part: always a capital, and it says its name
 - **good** — no tricky part; your child can sound it out once they know “oo” can say /oo/, as in “book”. Read it together for now
-- **said** — ❤️ tricky part: ai says /e/
 - **you** — ❤️ tricky part: ou says /oo/
-- **he** — ❤️ tricky part: e says its name, /ē/
 - **should** — ❤️ tricky part: oul says /oo/, as in "book"
 
 **After reading — check understanding** (answer ticked):
@@ -392,7 +371,7 @@ _For the back page of the book._
 
 ## Giri's Big Day
 
-`core-b-04` · Band B · 79 words · sounds: i-e, igh
+`core-b-04` · Band B · 80 words · sounds: i-e, igh
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -421,7 +400,7 @@ THE STORY
 Page 1: Giri climbed a high hill with his bright kite. He would fly it across the wide sky.
 Page 2: But the sky was still. No wind! The kite fell to the side. "Come on, wind!" he sighed.
 Page 3: Giri held the line tight. "I will run to make the wind!" And he did.
-Page 4: His run made the wind rise! The kite went up high, across the bright sky.
+Page 4: His run made the wind pick up! The kite went up high, across the bright sky.
 Page 5: By the water, Giri sat with a smile. "Come and see my kite fly!"
 ```
 
@@ -462,7 +441,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: His run made the wind rise! The kite went up high, across the bright sky.
+Words on this page: His run made the wind pick up! The kite went up high, across the bright sky.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -479,20 +458,13 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **i-e** — kite, wide, side, line, rise, smile
+- **i-e** — kite, wide, side, line, smile
 - **igh** — high, bright, sighed, tight
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **his** — ❤️ tricky part: s says /z/
-- **he** — ❤️ tricky part: e says its name, /ē/
 - **would** — ❤️ tricky part: oul says /oo/, as in "book"
-- **the** — ❤️ tricky part: e says /uh/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
 - **no** — ❤️ tricky part: o says its name, /ō/
-- **to** — ❤️ tricky part: o says /oo/
 - **come** — ❤️ tricky part: o says /u/ and the e is silent
-- **I** — ❤️ tricky part: always a capital, and it says its name
 - **water** — ❤️ tricky part: a says /aw/
 
 **After reading — check understanding** (answer ticked):
@@ -501,7 +473,7 @@ _For the back page of the book._
 2. What did Giri do to make the wind?  
    He ran ✓ · He sat still · He went up the hill
 3. What does this show about Giri?  
-   He made the wind himself ✓ · He gave up fast · He did not like his kite
+   He made the wind himself ✓ · He gave up · He did not like his kite
 4. Giri climbed a high hill with his bright ___.  
    kite ✓ · kit · cat
 5. Put these in the order they happened.  
@@ -514,7 +486,7 @@ _For the back page of the book._
 
 ## Giri and the Snail
 
-`core-b-05` · Band B · 78 words · sounds: ai, ay
+`core-b-05` · Band B · 77 words · sounds: ai, ay
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -541,7 +513,7 @@ RULES FOR EVERY PICTURE
 
 THE STORY
 Page 1: Giri met a small snail on the trail one wet day in May.
-Page 2: The snail sat in the way of a drain. Cold rain fell fast on the trail.
+Page 2: The snail sat in the way of a drain. Cold rain fell on the trail.
 Page 3: "Wait, snail!" Giri put out his hand and gave it a soft push, off the trail.
 Page 4: The snail slid to a safe spot, out of the cold rain. Giri waited all the way.
 Page 5: The snail waved its tail. "I love this snail," said Giri. "It may take all day!"
@@ -568,7 +540,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 5. Square.
-Words on this page: The snail sat in the way of a drain. Cold rain fell fast on the trail.
+Words on this page: The snail sat in the way of a drain. Cold rain fell on the trail.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -605,20 +577,11 @@ _For the back page of the book._
 - **ay** — day, way
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
 - **small** — ❤️ tricky part: a says /aw/
-- **the** — ❤️ tricky part: e says /uh/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
 - **put** — ❤️ tricky part: u says /oo/, as in "book"
 - **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
-- **his** — ❤️ tricky part: s says /z/
 - **push** — ❤️ tricky part: u says /oo/, as in "book"
-- **to** — ❤️ tricky part: o says /oo/
-- **all** — ❤️ tricky part: a says /aw/
-- **I** — ❤️ tricky part: always a capital, and it says its name
 - **love** — ❤️ tricky part: o says /u/; words never end in v, so an e comes after it
-- **said** — ❤️ tricky part: ai says /e/
 
 **After reading — check understanding** (answer ticked):
 1. Where was the snail sitting?  
@@ -627,7 +590,7 @@ _For the back page of the book._
    With a soft push ✓ · He let the rain take it · He put it in his hand
 3. Why did it take Giri all day?  
    A snail is small and takes its time ✓ · The rain was cold · He had to wait for May
-4. Cold ___ fell fast on the trail.  
+4. Cold ___ fell on the trail.  
    rain ✓ · ran · rim
 5. Put these in the order they happened.  
    (1) Giri met a small snail on the trail. (2) Giri gave the snail a soft push. (3) The snail waved its tail.
@@ -639,7 +602,7 @@ _For the back page of the book._
 
 ## Giri Makes a Kite
 
-`core-b-06` · Band B · 79 words · sounds: i-e, igh
+`core-b-06` · Band B · 80 words · sounds: i-e, igh
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -669,7 +632,7 @@ Page 1: Once upon a time, Giri had a fine plan to make a kite. He had made kites
 Page 2: He tied the strings tight, but the kite fell on its side. It had no tail!
 Page 3: Giri sighed. "This kite will not fly because it has no tail," he said.
 Page 4: He cut one white stripe, then the other, and tied both tight to the kite.
-Page 5: Now the kite had a fine tail! It rose high, white as salt in the sky.
+Page 5: Now the kite had a fine tail! It went up high, white as salt in the sky.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -717,7 +680,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: Now the kite had a fine tail! It rose high, white as salt in the sky.
+Words on this page: Now the kite had a fine tail! It went up high, white as salt in the sky.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -731,18 +694,12 @@ _For the back page of the book._
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **once** — ❤️ tricky part: it says "wunce": o makes /w/ and /u/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **to** — ❤️ tricky part: o says /oo/
-- **he** — ❤️ tricky part: e says its name, /ē/
 - **before** — no tricky part; clap the parts, then sound it out together
-- **the** — ❤️ tricky part: e says /uh/
 - **no** — ❤️ tricky part: o says its name, /ō/
 - **because** — ❤️ tricky part: au says /o/, s says /z/ and the e is silent
 - **has** — ❤️ tricky part: s says /z/
-- **said** — ❤️ tricky part: ai says /e/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
 - **other** — ❤️ tricky part: o says /u/
-- **now** — no tricky part; your child can sound it out once they know “ow” can say /ow/, as in “cow”. Read it together for now
+- **as** — ❤️ tricky part: s says /z/
 - **salt** — ❤️ tricky part: a says /aw/
 
 **After reading — check understanding** (answer ticked):
@@ -755,7 +712,7 @@ _For the back page of the book._
 4. He cut one white ___.  
    stripe ✓ · strip · strap
 5. Put these in the order they happened.  
-   (1) The kite fell on its side. (2) Giri cut one white stripe, then the other. (3) The kite rose high in the sky.
+   (1) The kite fell on its side. (2) Giri cut one white stripe, then the other. (3) The kite went up high in the sky.
 
 **Talk about it:**
 - What did the kite need to fly?
@@ -792,7 +749,7 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Giri went on a bike ride along a wide white lane in the sun.
 Page 2: The bike hit a rock! Giri slid off and bumped his side. "Who left this here?"
-Page 3: A young pup came by. "Are you sad?" Giri wiped his face.
+Page 3: A young pup came by. "Are you sad?" Giri gave a sniff.
 Page 4: He rode on until he felt fine. Then he went back to give the lane a fix.
 Page 5: Giri rolled the wide rock off the side. "Now the lane is safe to ride!"
 ```
@@ -826,7 +783,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: A young pup came by. "Are you sad?" Giri wiped his face.
+Words on this page: A young pup came by. "Are you sad?" Giri gave a sniff.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -851,21 +808,13 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **i-e** — bike, ride, wide, white, side, wiped
+- **i-e** — bike, ride, wide, white, side, fine
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **the** — ❤️ tricky part: e says /uh/
-- **his** — ❤️ tricky part: s says /z/
 - **who** — ❤️ tricky part: wh says /h/ and o says /oo/
 - **young** — ❤️ tricky part: ou says /u/
-- **are** — ❤️ tricky part: the e is silent
 - **you** — ❤️ tricky part: ou says /oo/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **to** — ❤️ tricky part: o says /oo/
 - **give** — ❤️ tricky part: words never end in v, so an e comes after it — the i stays short
-- **now** — no tricky part; your child can sound it out once they know “ow” can say /ow/, as in “cow”. Read it together for now
-- **is** — ❤️ tricky part: s says /z/
 
 **After reading — check understanding** (answer ticked):
 1. What did the bike hit?  
@@ -873,7 +822,7 @@ _For the back page of the book._
 2. What did Giri do at the end?  
    He rolled the rock off the lane ✓ · He went home · He fixed his bike
 3. Why did Giri roll the rock off the lane?  
-   So no one else would fall ✓ · He wanted to keep it · It was in his way home
+   So no kid can trip on it ✓ · He wanted to keep it · It was in his way home
 4. He rode on until he felt ___.  
    fine ✓ · fin · fun
 5. Put these in the order they happened.  
@@ -886,7 +835,7 @@ _For the back page of the book._
 
 ## Mrs Tan Flies a Kite
 
-`core-b-18` · Band B · 80 words · sounds: i-e, igh, y
+`core-b-18` · Band B · 79 words · sounds: i-e, igh, y
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -916,10 +865,10 @@ THE STORY
 Page 1: Mrs Tan had a white kite. "I made it when I was nine," she said.
 Page 2: "Can you still fly it?" said Jay.
 Page 3: Up, up, high in the sky!
-Page 4: Jay held his line tight. His kite dipped. Giri ran fast. His kite fell on its side.
+Page 4: Jay held his line tight. His kite dipped. Giri ran and ran. His kite fell flat.
 Page 5: Mrs Tan did not run. She let the line out bit by bit, and waited for the wind.
 Page 6: Up, up, high in the sky!
-Page 7: The white kite rose up and up, highest of all. "I am not nine," said Mrs Tan, "but the wind is the same!"
+Page 7: The white kite went up and up, highest of all. "I am not nine," said Mrs Tan, "but the wind is the same!"
 ```
 
 ### 2. Pictures — paste one at a time
@@ -959,7 +908,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 7. Square.
-Words on this page: Jay held his line tight. His kite dipped. Giri ran fast. His kite fell on its side.
+Words on this page: Jay held his line tight. His kite dipped. Giri ran and ran. His kite fell flat.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -983,7 +932,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 7 of 7. Square.
-Words on this page: The white kite rose up and up, highest of all. "I am not nine," said Mrs Tan, "but the wind is the same!"
+Words on this page: The white kite went up and up, highest of all. "I am not nine," said Mrs Tan, "but the wind is the same!"
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -992,36 +941,25 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **i-e** — white, kite, nine, line, side
+- **i-e** — white, kite, nine, line
 - **igh** — tight, highest
 - **y** — fly, by
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **I** — ❤️ tricky part: always a capital, and it says its name
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **she** — ❤️ tricky part: e says its name, /ē/
-- **said** — ❤️ tricky part: ai says /e/
 - **you** — ❤️ tricky part: ou says /oo/
-- **his** — ❤️ tricky part: s says /z/
-- **the** — ❤️ tricky part: e says /uh/
 - **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
-- **for** — no tricky part; your child can sound it out once they know “or”. Read it together for now
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **all** — ❤️ tricky part: a says /aw/
-- **is** — ❤️ tricky part: s says /z/
 
 **After reading — check understanding** (answer ticked):
 1. When did Mrs Tan make her kite?  
-   When she was nine ✓ · When she was ten · Last week
+   When she was nine ✓ · When she was ten · When she was six
 2. What did Mrs Tan do while Jay and Giri ran?  
-   She let the line out bit by bit ✓ · She ran fast · She sat on the side
+   She let the line out bit by bit ✓ · She ran and ran · She sat on the side
 3. Why did Mrs Tan's kite fly the highest?  
    She waited for the wind ✓ · The kite was the biggest · Jay held the line
 4. Jay held his line ___.  
    tight ✓ · tip · tin
 5. Put these in the order they happened.  
-   (1) Jay held his line tight. (2) Giri ran fast. (3) The white kite rose up and up.
+   (1) Jay held his line tight. (2) Giri ran and ran. (3) The white kite went up and up.
 
 **Talk about it:**
 - Mrs Tan said the wind is the same. What do you think she meant?
@@ -1058,7 +996,7 @@ RULES FOR EVERY PICTURE
 
 THE STORY
 Page 1: Jay made a lime pie for his mum. He set it on the side and went to ride his bike.
-Page 2: When he came back, a big slice was missing! "Why?" he cried. "Who did this?"
+Page 2: When he came back, a big bite was missing! "Why?" he cried. "Who did this?"
 Page 3: Lime pie, lime pie, who had a bite?
 Page 4: Not Giri. He was asleep. Not the cat. She did not like lime.
 Page 5: Then Jay spied Mum, with a bright smile and a bit of pie on the chin.
@@ -1086,7 +1024,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 6. Square.
-Words on this page: When he came back, a big slice was missing! "Why?" he cried. "Who did this?"
+Words on this page: When he came back, a big bite was missing! "Why?" he cried. "Who did this?"
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1127,24 +1065,12 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **i-e** — lime, side, ride, bike, slice, like
+- **i-e** — lime, side, ride, bike, bite, like
 - **igh** — bright
 - **y** — why, cried, spied, try
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **for** — no tricky part; your child can sound it out once they know “or”. Read it together for now
-- **his** — ❤️ tricky part: s says /z/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **the** — ❤️ tricky part: e says /uh/
-- **to** — ❤️ tricky part: o says /oo/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
 - **who** — ❤️ tricky part: wh says /h/ and o says /oo/
-- **she** — ❤️ tricky part: e says its name, /ē/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **I** — ❤️ tricky part: always a capital, and it says its name
-- **said** — ❤️ tricky part: ai says /e/
-- **is** — ❤️ tricky part: s says /z/
 - **you** — ❤️ tricky part: ou says /oo/
 
 **After reading — check understanding** (answer ticked):
@@ -1157,7 +1083,7 @@ _For the back page of the book._
 4. Then Jay spied Mum, with a ___ smile and a bit of pie on the chin.  
    bright ✓ · brick · brim
 5. Put these in the order they happened.  
-   (1) Jay made a lime pie. (2) A big slice was missing. (3) Jay spied Mum with pie on the chin.
+   (1) Jay made a lime pie. (2) A big bite was missing. (3) Jay spied Mum with pie on the chin.
 
 **Talk about it:**
 - Why was Jay not cross with Mum at the end?
@@ -1195,7 +1121,7 @@ THE STORY
 Page 1: One day, Giri met a goat on a road. It had left its mother and brother.
 Page 2: The goat had a bite of Giri's soft coat! "That is not something to eat!"
 Page 3: "Hold on, friend! Do not become a wolf!" Giri held out a big pile of oats.
-Page 4: The goat gave up the coat and chose to chomp on the tasty oats.
+Page 4: The goat gave up the coat and went to chomp on the tasty oats.
 Page 5: Giri went home with his coat. The goat ran to its mother and brother.
 ```
 
@@ -1236,7 +1162,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: The goat gave up the coat and chose to chomp on the tasty oats.
+Words on this page: The goat gave up the coat and went to chomp on the tasty oats.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1254,24 +1180,16 @@ _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
 - **oa** — goat, road, coat, oats
-- **o-e** — chose, home
+- **o-e** — home
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **a** — ❤️ tricky part: on its own, a says /uh/
 - **mother** — ❤️ tricky part: o says /u/
 - **brother** — ❤️ tricky part: o says /u/
-- **the** — ❤️ tricky part: e says /uh/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **is** — ❤️ tricky part: s says /z/
 - **something** — ❤️ tricky part: o says /u/ and the first e is silent
-- **to** — ❤️ tricky part: o says /oo/
 - **friend** — ❤️ tricky part: ie says /e/
-- **do** — ❤️ tricky part: o says /oo/
 - **become** — ❤️ tricky part: o says /u/ and the e is silent
 - **wolf** — ❤️ tricky part: o says /oo/, as in "book"
 - **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
-- **his** — ❤️ tricky part: s says /z/
 
 **After reading — check understanding** (answer ticked):
 1. What did the goat bite?  
@@ -1383,25 +1301,13 @@ _For the back page of the book._
 - **ee** — see, green, feet, sweet
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **to** — ❤️ tricky part: o says /oo/
-- **the** — ❤️ tricky part: e says /uh/
-- **a** — ❤️ tricky part: on its own, a says /uh/
 - **girl** — no tricky part; your child can sound it out once they know “ir”. Read it together for now
 - **boy** — no tricky part; your child can sound it out once they know “oy”. Read it together for now
-- **too** — no tricky part; your child can sound it out once they know “oo”. Read it together for now
-- **his** — ❤️ tricky part: s says /z/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **we** — ❤️ tricky part: e says its name, /ē/
-- **from** — ❤️ tricky part: o says /u/
-- **is** — ❤️ tricky part: s says /z/
 - **they** — ❤️ tricky part: ey says /ay/
-- **all** — ❤️ tricky part: a says /aw/
-- **what** — ❤️ tricky part: a says /o/
 
 **After reading — check understanding** (answer ticked):
 1. Who came to the beach too?  
-   A girl and a boy ✓ · His mother · No one
+   A girl and a boy ✓ · His mum · No one
 2. What treat did they eat?  
    A sweet peach ✓ · A green bean · Sea weed
 3. What game did Giri play with the sea?  
@@ -1418,7 +1324,7 @@ _For the back page of the book._
 
 ## Giri and the Rain
 
-`core-b-10` · Band B · 77 words · sounds: ai, ay
+`core-b-10` · Band B · 76 words · sounds: ai, ay
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -1444,7 +1350,7 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Giri was on a long gray trail one calm day in May. He said it would stay hot all day.
+Page 1: Giri was on a long gray trail one day in May. He said it would stay hot all day.
 Page 2: A big rain came fast! "Where can I hide?" Giri got wet on the trail.
 Page 3: "Wait it out!" He hid in a cave to watch the rain. Drip, drip, drip.
 Page 4: The rain stopped. Giri made big mud prints all the way home. Stamp, stamp!
@@ -1464,7 +1370,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 5. Square.
-Words on this page: Giri was on a long gray trail one calm day in May. He said it would stay hot all day.
+Words on this page: Giri was on a long gray trail one day in May. He said it would stay hot all day.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1509,22 +1415,12 @@ _For the back page of the book._
 - **ay** — gray, day, stay, way
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **said** — ❤️ tricky part: ai says /e/
 - **would** — ❤️ tricky part: oul says /oo/, as in "book"
-- **all** — ❤️ tricky part: a says /aw/
+- **fast** — no tricky part; your child can sound it out once they know “a” can say /ar/, as in “fast”. Read it together for now
 - **where** — ❤️ tricky part: ere says /air/, as in "there"
-- **I** — ❤️ tricky part: always a capital, and it says its name
-- **the** — ❤️ tricky part: e says /uh/
 - **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
-- **to** — ❤️ tricky part: o says /oo/
 - **watch** — ❤️ tricky part: a says /o/
 - **saw** — no tricky part; your child can sound it out once they know “aw”. Read it together for now
-- **his** — ❤️ tricky part: s says /z/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
 
 **After reading — check understanding** (answer ticked):
 1. Where did Giri hide from the rain?  
@@ -1545,7 +1441,7 @@ _For the back page of the book._
 
 ## Giri's Green Seed
 
-`core-b-11` · Band B · 80 words · sounds: ee, ea
+`core-b-11` · Band B · 79 words · sounds: ee, ea
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -1571,10 +1467,10 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Giri had a green seed. "Maybe it will be a tall tree," he said.
+Page 1: Giri had a green seed. "Maybe it will be a big tree," he said.
 Page 2: But the seed did not seem to wake. Giri gave it a nod of his head and waited.
 Page 3: His friend came by. "A seed may need a deep drink each day." So Giri gave it a drink.
-Page 4: He let it feel the heat of the sun. At last, a green leaf reached up!
+Page 4: He let it feel the heat of the sun. Then, a green leaf reached up!
 Page 5: The seed has a friend in Giri. Maybe it will be a tree!
 ```
 
@@ -1591,7 +1487,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 5. Square.
-Words on this page: Giri had a green seed. "Maybe it will be a tall tree," he said.
+Words on this page: Giri had a green seed. "Maybe it will be a big tree," he said.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1615,7 +1511,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: He let it feel the heat of the sun. At last, a green leaf reached up!
+Words on this page: He let it feel the heat of the sun. Then, a green leaf reached up!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1636,25 +1532,16 @@ _For the back page of the book._
 - **ea** — each, heat, reached
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **be** — ❤️ tricky part: e says its name, /ē/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **said** — ❤️ tricky part: ai says /e/
-- **the** — ❤️ tricky part: e says /uh/
-- **to** — ❤️ tricky part: o says /oo/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **his** — ❤️ tricky part: s says /z/
 - **head** — ❤️ tricky part: ea says /e/
 - **friend** — ❤️ tricky part: ie says /e/
 - **by** — no tricky part; your child can sound it out once they know “y” can say /igh/. Read it together for now
-- **so** — ❤️ tricky part: o says its name, /ō/
 - **has** — ❤️ tricky part: s says /z/
 
 **After reading — check understanding** (answer ticked):
 1. What did the seed need?  
-   A deep drink each day ✓ · A deep hole · A tall tree
+   A deep drink each day ✓ · A deep hole · A big tree
 2. Who told Giri what the seed needed?  
-   His friend ✓ · His mother · A bee
+   His friend ✓ · His mum · A bee
 3. How do we know the seed had woken up?  
    A green leaf reached up ✓ · It gave a nod · It was in the heat
 4. Giri had a green ___.  
@@ -1669,7 +1556,7 @@ _For the back page of the book._
 
 ## Giri's Cosy Home
 
-`core-b-12` · Band B · 80 words · sounds: o-e, oa
+`core-b-12` · Band B · 74 words · sounds: o-e, oa
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -1695,11 +1582,11 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Giri went to make a cosy home in a stone cave by an old oak tree.
-Page 2: A nosy mole dug a deep hole in the stone wall. It ate its way right in!
-Page 3: Giri went to fill it. "A hole can be of use! Do not throw it away."
+Page 1: Giri went to make a snug home in a stone cave by an old oak tree.
+Page 2: A mole dug a deep hole in the stone. It ate its way right in!
+Page 3: Giri went to fill it. "Hold on! Let it be!" said the mole.
 Page 4: He made the hole a note slot and let a note go down to the mole.
-Page 5: Now Giri and the mole have a way to chat. Notes go to and fro!
+Page 5: Now Giri and the mole have a way to chat. Notes go both ways!
 ```
 
 ### 2. Pictures — paste one at a time
@@ -1715,7 +1602,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 5. Square.
-Words on this page: Giri went to make a cosy home in a stone cave by an old oak tree.
+Words on this page: Giri went to make a snug home in a stone cave by an old oak tree.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1723,7 +1610,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 5. Square.
-Words on this page: A nosy mole dug a deep hole in the stone wall. It ate its way right in!
+Words on this page: A mole dug a deep hole in the stone. It ate its way right in!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1731,7 +1618,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: Giri went to fill it. "A hole can be of use! Do not throw it away."
+Words on this page: Giri went to fill it. "Hold on! Let it be!" said the mole.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1747,7 +1634,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: Now Giri and the mole have a way to chat. Notes go to and fro!
+Words on this page: Now Giri and the mole have a way to chat. Notes go both ways!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1760,28 +1647,21 @@ _For the back page of the book._
 - **oa** — oak
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **to** — ❤️ tricky part: o says /oo/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **the** — ❤️ tricky part: e says /uh/
-- **be** — ❤️ tricky part: e says its name, /ē/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **use** — ❤️ tricky part: s says /z/
-- **do** — ❤️ tricky part: o says /oo/
-- **he** — ❤️ tricky part: e says its name, /ē/
 - **go** — ❤️ tricky part: o says its name, /ō/
+- **down** — no tricky part; your child can sound it out once they know “ow” can say /ow/, as in “cow”. Read it together for now
 - **have** — ❤️ tricky part: words never end in v, so an e comes after it — the a stays short
 
 **After reading — check understanding** (answer ticked):
-1. Who dug the hole in the stone wall?  
-   A nosy mole ✓ · Giri · An old oak
+1. Who dug the hole in the stone?  
+   A mole ✓ · Giri · An old oak
 2. What did Giri turn the hole into?  
    A note slot ✓ · A home for the mole · A way to the oak
-3. Why did Giri not fill the hole in?  
-   He made it of use ✓ · He was too old · The mole dug it again
-4. A nosy mole dug a deep ___ in the stone wall.  
+3. Why did the mole want the hole to stay?  
+   It was a way to chat with Giri ✓ · It was too cold · It liked to dig
+4. A mole dug a deep ___ in the stone.  
    hole ✓ · hill · hut
 5. Put these in the order they happened.  
-   (1) Giri went to make a home in a stone cave. (2) A nosy mole dug a hole in the wall. (3) Giri made the hole a note slot.
+   (1) Giri went to make a home in a stone cave. (2) A mole dug a hole in the stone. (3) Giri made the hole a note slot.
 
 **Talk about it:**
 - What did Giri turn the hole into?
@@ -1818,7 +1698,7 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Giri had a flute. He liked to play a tune in the cool shade.
 Page 2: One day the flute made no tune. It had been full of grit and dust.
-Page 3: Giri used a cube of soap and a tub of suds. "This will make it new," he said.
+Page 3: Giri got a cube of soap and a tub of suds. "This will make it new," he said.
 Page 4: Soon the flute played the same sweet tune as before. The notes came out true.
 Page 5: By the green tree, people sat to see him play. "Play the same tune!" they would say.
 ```
@@ -1852,7 +1732,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: Giri used a cube of soap and a tub of suds. "This will make it new," he said.
+Words on this page: Giri got a cube of soap and a tub of suds. "This will make it new," he said.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1882,15 +1762,9 @@ _For the back page of the book._
 - **oo** — cool, soon
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **to** — ❤️ tricky part: o says /oo/
-- **the** — ❤️ tricky part: e says /uh/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
 - **no** — ❤️ tricky part: o says its name, /ō/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **used** — ❤️ tricky part: s says /z/
-- **said** — ❤️ tricky part: ai says /e/
+- **full** — ❤️ tricky part: u says /oo/, as in "book"
+- **as** — ❤️ tricky part: s says /z/
 - **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
 - **people** — ❤️ tricky part: eo says /ee/
 - **they** — ❤️ tricky part: ey says /ay/
@@ -1906,7 +1780,7 @@ _For the back page of the book._
 4. He liked to play a ___ in the cool shade.  
    tune ✓ · tin · tan
 5. Put these in the order they happened.  
-   (1) The flute made no tune. (2) Giri used a cube of soap and a tub of suds. (3) People sat to see him play.
+   (1) The flute made no tune. (2) Giri got a cube of soap and a tub of suds. (3) People sat to see him play.
 
 **Talk about it:**
 - Why did the flute stop making a tune?
@@ -1944,7 +1818,7 @@ THE STORY
 Page 1: Giri drew a plan for a new kite with a deep blue pen.
 Page 2: The wind blew and blew. His old kite flew into a tree and got stuck. "Please help!"
 Page 3: Giri made the new kite. He glued the frame and tied each stick tight.
-Page 4: "Is your kite pretty?" asked his pal. "It is! And each bit is blue," said Giri, happy.
+Page 4: "Is your kite pretty?" said his pal. "It is! And each bit is blue," said Giri, happy.
 Page 5: The new kite flew up, up! "Please fly!" Giri felt so happy. "The best kite yet!"
 ```
 
@@ -1985,7 +1859,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: "Is your kite pretty?" asked his pal. "It is! And each bit is blue," said Giri, happy.
+Words on this page: "Is your kite pretty?" said his pal. "It is! And each bit is blue," said Giri, happy.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -2006,18 +1880,10 @@ _For the back page of the book._
 - **ue** — blue, glued
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **for** — no tricky part; your child can sound it out once they know “or”. Read it together for now
-- **the** — ❤️ tricky part: e says /uh/
-- **his** — ❤️ tricky part: s says /z/
 - **into** — ❤️ tricky part: o says /oo/, like in "to"
 - **please** — ❤️ tricky part: s says /z/ and the e is silent
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **is** — ❤️ tricky part: s says /z/
 - **your** — ❤️ tricky part: our says /or/
 - **pretty** — ❤️ tricky part: e says /i/
-- **said** — ❤️ tricky part: ai says /e/
-- **so** — ❤️ tricky part: o says its name, /ō/
 
 **After reading — check understanding** (answer ticked):
 1. What happened to the old kite?  
@@ -2065,7 +1931,7 @@ RULES FOR EVERY PICTURE
 
 THE STORY
 Page 1: One night Giri went to the pool to see the moon shine like a plate.
-Page 2: A grey mist hid the moon. "Do not leave!" Giri said to the moon. The pool went dim.
+Page 2: A cool mist hid the moon. "Do not leave!" Giri said to the moon. The pool went dim.
 Page 3: Giri sat to keep still. Two flies zoomed by. He ate a snack.
 Page 4: Soon the mist swept away. The moon came back and lit up the sea.
 Page 5: This night, this moon, this pool — Giri will keep these in mind. Time to leave!
@@ -2092,7 +1958,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 5. Square.
-Words on this page: A grey mist hid the moon. "Do not leave!" Giri said to the moon. The pool went dim.
+Words on this page: A cool mist hid the moon. "Do not leave!" Giri said to the moon. The pool went dim.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -2125,24 +1991,17 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **oo** — pool, moon, soon
+- **oo** — pool, moon, cool, soon
 - **i-e** — shine, like, time
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **to** — ❤️ tricky part: o says /oo/
-- **the** — ❤️ tricky part: e says /uh/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **do** — ❤️ tricky part: o says /oo/
 - **leave** — ❤️ tricky part: words never end in v, so an e comes after it
-- **said** — ❤️ tricky part: ai says /e/
 - **two** — ❤️ tricky part: the w is silent and o says /oo/
-- **he** — ❤️ tricky part: e says its name, /ē/
 - **these** — ❤️ tricky part: s says /z/
 
 **After reading — check understanding** (answer ticked):
 1. What hid the moon?  
-   A grey mist ✓ · The trees · The pool
+   A cool mist ✓ · The trees · The pool
 2. What did Giri do while he waited?  
    He ate a snack ✓ · He went home · He swam in the pool
 3. Why did Giri keep still and wait?  
@@ -2150,7 +2009,7 @@ _For the back page of the book._
 4. One night Giri went to the pool to see the ___ shine like a plate.  
    moon ✓ · man · map
 5. Put these in the order they happened.  
-   (1) A grey mist hid the moon. (2) Two flies zoomed by. (3) The moon came back and lit up the sea.
+   (1) A cool mist hid the moon. (2) Two flies zoomed by. (3) The moon came back and lit up the sea.
 
 **Talk about it:**
 - What hid the moon for a little while?
@@ -2159,7 +2018,7 @@ _For the back page of the book._
 
 ## Mei Ling's Loose Tooth
 
-`core-b-20` · Band B · 74 words · sounds: oo, ue, ew, u-e
+`core-b-20` · Band B · 75 words · sounds: oo, ue, ew, u-e
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -2185,11 +2044,11 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Mei Ling had a loose tooth. It was at the front, and it went wiggle, wiggle, wiggle.
+Page 1: Mei Ling had a loose tooth. It was at the top, and it went wiggle, wiggle, wiggle.
 Page 2: She tried to pull it. No. She tried to push it with a spoon. No. She chewed and chewed.
 Page 3: Wiggle, wiggle, will it go? Not yet, no!
-Page 4: At lunch, she had a huge bowl of noodles. Giri pulled a funny face, and she had to giggle.
-Page 5: Plop! Into the noodles went the tooth. "It is true," said Mei Ling. "A new smile, just in time!"
+Page 4: At lunch, she had a big bowl of noodles. Giri told a funny joke, and she had to giggle.
+Page 5: Plop! Into the noodles went the tooth. "It is true," said Mei Ling. "A cute new smile, just in time!"
 ```
 
 ### 2. Pictures — paste one at a time
@@ -2205,7 +2064,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 5. Square.
-Words on this page: Mei Ling had a loose tooth. It was at the front, and it went wiggle, wiggle, wiggle.
+Words on this page: Mei Ling had a loose tooth. It was at the top, and it went wiggle, wiggle, wiggle.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -2229,7 +2088,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: At lunch, she had a huge bowl of noodles. Giri pulled a funny face, and she had to giggle.
+Words on this page: At lunch, she had a big bowl of noodles. Giri told a funny joke, and she had to giggle.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -2237,7 +2096,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: Plop! Into the noodles went the tooth. "It is true," said Mei Ling. "A new smile, just in time!"
+Words on this page: Plop! Into the noodles went the tooth. "It is true," said Mei Ling. "A cute new smile, just in time!"
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -2249,35 +2108,26 @@ _For the back page of the book._
 - **oo** — spoon
 - **ue** — true
 - **ew** — chewed, new
-- **u-e** — huge
+- **u-e** — cute
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **the** — ❤️ tricky part: e says /uh/
-- **front** — ❤️ tricky part: o says /u/
-- **she** — ❤️ tricky part: e says its name, /ē/
-- **to** — ❤️ tricky part: o says /oo/
 - **pull** — ❤️ tricky part: u says /oo/, as in "book"
 - **no** — ❤️ tricky part: o says its name, /ō/
 - **push** — ❤️ tricky part: u says /oo/, as in "book"
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **pulled** — ❤️ tricky part: u says /oo/, as in "book"
+- **go** — ❤️ tricky part: o says its name, /ō/
 - **into** — ❤️ tricky part: o says /oo/, like in "to"
-- **is** — ❤️ tricky part: s says /z/
-- **said** — ❤️ tricky part: ai says /e/
 
 **After reading — check understanding** (answer ticked):
 1. Where was Mei Ling's loose tooth?  
-   At the front ✓ · At the back · In the noodles
+   At the top ✓ · At the back · In the noodles
 2. What did Mei Ling have for lunch?  
-   A huge bowl of noodles ✓ · A lime pie · A bun
+   A big bowl of noodles ✓ · A lime pie · A bun
 3. What made the tooth come out in the end?  
    She had to giggle ✓ · She pulled it · She chewed a spoon
 4. Mei Ling had a loose ___.  
    tooth ✓ · teeth · tent
 5. Put these in the order they happened.  
-   (1) She tried to push the tooth with a spoon. (2) Giri pulled a funny face. (3) The tooth went into the noodles.
+   (1) She tried to push the tooth with a spoon. (2) Giri told a funny joke. (3) The tooth went into the noodles.
 
 **Talk about it:**
 - How do you think Mei Ling felt when the tooth fell into the noodles?
@@ -2312,10 +2162,10 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Jay went to feed the ducks at the pool. Soon a huge goose came up to him.
-Page 2: Jay went home. The goose went too. Jay ran down the road. The goose flew after him!
+Page 1: Jay went to feed the ducks at the pool. Soon a big, rude goose came up to him.
+Page 2: Jay went home. The goose went too. Jay ran up the road. The goose flew behind him!
 Page 3: Shoo, goose, shoo! What do you want me to do?
-Page 4: Jay ran to his room and shut the door. Tap, tap, tap! The goose was at the window.
+Page 4: Jay ran to his room and shut it. Tap, tap, tap! The goose was at the window.
 Page 5: Then Jay spotted the crumbs. They fell from the hood of his blue coat. "So that is the food you want!" he said, and gave it a snack.
 ```
 
@@ -2332,7 +2182,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 5. Square.
-Words on this page: Jay went to feed the ducks at the pool. Soon a huge goose came up to him.
+Words on this page: Jay went to feed the ducks at the pool. Soon a big, rude goose came up to him.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -2340,7 +2190,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 5. Square.
-Words on this page: Jay went home. The goose went too. Jay ran down the road. The goose flew after him!
+Words on this page: Jay went home. The goose went too. Jay ran up the road. The goose flew behind him!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -2356,7 +2206,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: Jay ran to his room and shut the door. Tap, tap, tap! The goose was at the window.
+Words on this page: Jay ran to his room and shut it. Tap, tap, tap! The goose was at the window.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -2376,24 +2226,12 @@ _For the back page of the book._
 - **oo** — pool, soon, room, food
 - **ew** — flew
 - **ue** — blue
-- **u-e** — huge
+- **u-e** — rude
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **to** — ❤️ tricky part: o says /oo/
-- **the** — ❤️ tricky part: e says /uh/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **his** — ❤️ tricky part: s says /z/
-- **door** — ❤️ tricky part: oor says /or/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **they** — ❤️ tricky part: ey says /ay/
-- **from** — ❤️ tricky part: o says /u/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **so** — ❤️ tricky part: o says its name, /ō/
-- **is** — ❤️ tricky part: s says /z/
 - **you** — ❤️ tricky part: ou says /oo/
-- **want** — ❤️ tricky part: a says /o/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **said** — ❤️ tricky part: ai says /e/
+- **me** — ❤️ tricky part: e says its name, /ē/
+- **they** — ❤️ tricky part: ey says /ay/
 
 **After reading — check understanding** (answer ticked):
 1. Where did Jay go to feed the ducks?  
@@ -2402,10 +2240,10 @@ _For the back page of the book._
    At the window ✓ · In his room · On the road
 3. Why did the goose follow Jay home?  
    It wanted the crumbs in his hood ✓ · It was lost · It liked his blue coat
-4. Soon a huge ___ came up to him.  
+4. Soon a big, rude ___ came up to him.  
    goose ✓ · geese · gas
 5. Put these in the order they happened.  
-   (1) A huge goose came up to Jay. (2) The goose was at the window. (3) Jay gave the goose a snack.
+   (1) A big goose came up to Jay. (2) The goose was at the window. (3) Jay gave the goose a snack.
 
 **Talk about it:**
 - Was the goose rude, or just hungry? What do you think?
@@ -2414,7 +2252,7 @@ _For the back page of the book._
 
 ## Giri and the Shell Shop
 
-`core-b-16` · Band B · 79 words · sounds: sh, th, ck
+`core-b-16` · Band B · 78 words · sounds: sh, th, ck
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -2443,7 +2281,7 @@ THE STORY
 Page 1: Giri went to the shell shop. Shells sat in a big box on a shelf.
 Page 2: Bash! The box fell off the shelf. Shells slid across the shop.
 Page 3: "I can fix this myself!" It did not take much time. He got a brush and a bin.
-Page 4: He put the shells back in the box. Flick! A moth in it began to fly.
+Page 4: He put the shells back in the box. Flick! A moth in it shot off.
 Page 5: The man was so glad. This shop was his life! He held up a shell to the light.
 ```
 
@@ -2484,7 +2322,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: He put the shells back in the box. Flick! A moth in it began to fly.
+Words on this page: He put the shells back in the box. Flick! A moth in it shot off.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -2506,19 +2344,10 @@ _For the back page of the book._
 - **ck** — back, flick
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **to** — ❤️ tricky part: o says /oo/
-- **the** — ❤️ tricky part: e says /uh/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **I** — ❤️ tricky part: always a capital, and it says its name
 - **myself** — no tricky part; clap the parts, then sound it out together
 - **take** — no tricky part; your child can sound it out once they know Magic E makes “a” say its name. Read it together for now
 - **time** — no tricky part; your child can sound it out once they know Magic E makes “i” say its name. Read it together for now
-- **he** — ❤️ tricky part: e says its name, /ē/
 - **put** — ❤️ tricky part: u says /oo/, as in "book"
-- **fly** — no tricky part; your child can sound it out once they know “y” can say /igh/. Read it together for now
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **so** — ❤️ tricky part: o says its name, /ō/
-- **his** — ❤️ tricky part: s says /z/
 - **life** — no tricky part; your child can sound it out once they know Magic E makes “i” say its name. Read it together for now
 - **light** — no tricky part; your child can sound it out once they know “igh”. Read it together for now
 
@@ -2532,7 +2361,7 @@ _For the back page of the book._
 4. Shells sat in a big box on a ___.  
    shelf ✓ · self · elf
 5. Put these in the order they happened.  
-   (1) The box fell off the shelf. (2) Giri got a brush and a bin. (3) A moth in the box began to fly.
+   (1) The box fell off the shelf. (2) Giri got a brush and a bin. (3) A moth in the box shot off.
 
 **Talk about it:**
 - How did Giri help at the shell shop?
@@ -2541,7 +2370,7 @@ _For the back page of the book._
 
 ## Giri Sings a Long Song
 
-`core-b-17` · Band B · 78 words · sounds: ng, qu, ck
+`core-b-17` · Band B · 79 words · sounds: ng, qu, ck
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -2567,8 +2396,8 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Giri had a song to sing in class. He sang it with a quick clap and a click.
-Page 2: At the test run, Giri got stuck. The song went wrong. Nothing at all!
+Page 1: Giri had a song to sing with his pals. He sang it with a quick clap and a click.
+Page 2: At the test run, Giri got stuck. The song fell flat. Nothing at all!
 Page 3: He did not quit. "Why did I stop?" He shut an eye and sang from the top, big and strong.
 Page 4: He sang high and long. The song was fine! Clap, click, sing along!
 Page 5: Then the song was a hit! His pals sang along, strong and long.
@@ -2587,7 +2416,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 5. Square.
-Words on this page: Giri had a song to sing in class. He sang it with a quick clap and a click.
+Words on this page: Giri had a song to sing with his pals. He sang it with a quick clap and a click.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -2595,7 +2424,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 5. Square.
-Words on this page: At the test run, Giri got stuck. The song went wrong. Nothing at all!
+Words on this page: At the test run, Giri got stuck. The song fell flat. Nothing at all!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -2628,25 +2457,16 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **ng** — song, sing, sang, wrong, strong, long
+- **ng** — song, sing, sang, strong, long, along
 - **qu** — quick, quit
 - **ck** — quick, click, stuck
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **to** — ❤️ tricky part: o says /oo/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **the** — ❤️ tricky part: e says /uh/
 - **nothing** — ❤️ tricky part: o says /u/
-- **all** — ❤️ tricky part: a says /aw/
 - **why** — no tricky part; your child can sound it out once they know “y” can say /igh/. Read it together for now
-- **I** — ❤️ tricky part: always a capital, and it says its name
 - **eye** — ❤️ tricky part: the whole word says /ī/ — one to know by heart
-- **from** — ❤️ tricky part: o says /u/
 - **high** — no tricky part; your child can sound it out once they know “igh”. Read it together for now
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
 - **fine** — no tricky part; your child can sound it out once they know Magic E makes “i” say its name. Read it together for now
-- **his** — ❤️ tricky part: s says /z/
 
 **After reading — check understanding** (answer ticked):
 1. What went wrong at the test run?  
@@ -2654,11 +2474,11 @@ _For the back page of the book._
 2. What did Giri do to start again?  
    He shut an eye and sang from the top ✓ · He got a pal to sing · He did quit
 3. What does this story show about Giri?  
-   He did not quit ✓ · He sang best with his pals · He got it wrong at the test
+   He did not quit ✓ · He sang best with his pals · It fell flat at the test
 4. He sang it with a ___ clap and a click.  
    quick ✓ · kick · sick
 5. Put these in the order they happened.  
-   (1) At the test run, the song went wrong. (2) Giri shut an eye and sang from the top. (3) His pals sang along.
+   (1) At the test run, the song fell flat. (2) Giri shut an eye and sang from the top. (3) His pals sang along.
 
 **Talk about it:**
 - What did Giri do when the song went wrong?
@@ -2695,7 +2515,7 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Mole did not want to go out. "No. It is cold. I will stay home."
 Page 2: "Come and play," said Giri. "We can jog to the lake." "No. Also no. Still no."
-Page 3: "Does Mole want a hot bun? I have two buns from home." A pink nose came out.
+Page 3: "Does Mole want a hot bun? I have two buns from home." A pink toe came out.
 Page 4: "So... one bun is for me?" "Yes!" Out came Mole. No coat. No hat.
 Page 5: "See? It is fun out here." "The bun is why I came. But yes — also the fun."
 ```
@@ -2729,7 +2549,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: "Does Mole want a hot bun? I have two buns from home." A pink nose came out.
+Words on this page: "Does Mole want a hot bun? I have two buns from home." A pink toe came out.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -2754,30 +2574,16 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **o-e** — mole, home, nose
+- **o-e** — mole, home
 - **oa** — coat
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **want** — ❤️ tricky part: a says /o/
-- **to** — ❤️ tricky part: o says /oo/
 - **go** — ❤️ tricky part: o says its name, /ō/
 - **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
 - **no** — ❤️ tricky part: o says its name, /ō/
-- **is** — ❤️ tricky part: s says /z/
-- **I** — ❤️ tricky part: always a capital, and it says its name
 - **come** — ❤️ tricky part: o says /u/ and the e is silent
-- **said** — ❤️ tricky part: ai says /e/
-- **we** — ❤️ tricky part: e says its name, /ē/
-- **the** — ❤️ tricky part: e says /uh/
-- **also** — ❤️ tricky part: a says /aw/
-- **does** — ❤️ tricky part: oe says /u/ and s says /z/
-- **a** — ❤️ tricky part: on its own, a says /uh/
 - **have** — ❤️ tricky part: words never end in v, so an e comes after it — the a stays short
 - **two** — ❤️ tricky part: the w is silent and o says /oo/
-- **from** — ❤️ tricky part: o says /u/
-- **so** — ❤️ tricky part: o says its name, /ō/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **for** — no tricky part; your child can sound it out once they know “or”. Read it together for now
 - **me** — ❤️ tricky part: e says its name, /ē/
 
 **After reading — check understanding** (answer ticked):
@@ -2827,7 +2633,7 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Narrator: Mole was at home, under a big stone. / Giri: Come and play, Mole! / Mole: No. It is cold. I will stay home.
 Page 2: Giri: We can float a boat on the lake! / Mole: No. Also no. Still no. / Narrator: Giri held up two hot buns.
-Page 3: Giri: Does Mole want one? / Narrator: A pink nose came out. / Mole: So... one bun is for me?
+Page 3: Giri: Does Mole want one? / Narrator: A pink toe came out. / Mole: So... one bun is for me?
 Page 4: Giri: Yes! / Narrator: Out came Mole. No coat. No hat. / Giri: See? It is fun out here.
 Page 5: Mole: The bun is why I came. But yes — also the fun.
 ```
@@ -2861,7 +2667,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: Giri: Does Mole want one? / Narrator: A pink nose came out. / Mole: So... one bun is for me?
+Words on this page: Giri: Does Mole want one? / Narrator: A pink toe came out. / Mole: So... one bun is for me?
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -2886,26 +2692,14 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **o-e** — mole, home, stone, nose
+- **o-e** — mole, home, stone
 - **oa** — float, boat, coat
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **a** — ❤️ tricky part: on its own, a says /uh/
 - **come** — ❤️ tricky part: o says /u/ and the e is silent
 - **no** — ❤️ tricky part: o says its name, /ō/
-- **is** — ❤️ tricky part: s says /z/
-- **I** — ❤️ tricky part: always a capital, and it says its name
-- **we** — ❤️ tricky part: e says its name, /ē/
-- **the** — ❤️ tricky part: e says /uh/
-- **also** — ❤️ tricky part: a says /aw/
 - **two** — ❤️ tricky part: the w is silent and o says /oo/
-- **does** — ❤️ tricky part: oe says /u/ and s says /z/
-- **want** — ❤️ tricky part: a says /o/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
 - **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
-- **so** — ❤️ tricky part: o says its name, /ō/
-- **for** — no tricky part; your child can sound it out once they know “or”. Read it together for now
 - **me** — ❤️ tricky part: e says its name, /ē/
 
 **After reading — check understanding** (answer ticked):
@@ -2958,7 +2752,7 @@ Page 1: "I see a bee!" said Giri. "And the bee sees me!"
 Page 2: The bee went from tree to tree. "Wait for me! I want to see what you can see."
 Page 3: "Then keep up! We need to find the sweet spot." Giri did not see it. "Here? Is it here?"
 Page 4: The bee sat still on a green stem. "Take a deep sniff." Sweet! A bed of mint!
-Page 5: "Great find! You and me — we make a fine team." "Yes," said the bee. "Buzz!"
+Page 5: "Neat find! You and me — we make a fine team." "Yes," said the bee. "Buzz!"
 ```
 
 ### 2. Pictures — paste one at a time
@@ -3006,7 +2800,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: "Great find! You and me — we make a fine team." "Yes," said the bee. "Buzz!"
+Words on this page: "Neat find! You and me — we make a fine team." "Yes," said the bee. "Buzz!"
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -3016,23 +2810,11 @@ _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
 - **ee** — see, bee, sees, tree, keep, need
+- **ea** — neat
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **I** — ❤️ tricky part: always a capital, and it says its name
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **said** — ❤️ tricky part: ai says /e/
-- **the** — ❤️ tricky part: e says /uh/
 - **me** — ❤️ tricky part: e says its name, /ē/
-- **from** — ❤️ tricky part: o says /u/
-- **to** — ❤️ tricky part: o says /oo/
-- **for** — no tricky part; your child can sound it out once they know “or”. Read it together for now
-- **want** — ❤️ tricky part: a says /o/
-- **what** — ❤️ tricky part: a says /o/
 - **you** — ❤️ tricky part: ou says /oo/
-- **we** — ❤️ tricky part: e says its name, /ē/
-- **is** — ❤️ tricky part: s says /z/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **great** — ❤️ tricky part: ea says /ay/
 
 **After reading — check understanding** (answer ticked):
 1. What were Giri and the bee looking for?  
@@ -3053,7 +2835,7 @@ _For the back page of the book._
 
 ## The Snail Race
 
-`review-b-01` · Band B · 78 words · sounds: a-e, ai, ay, ee, ea, i-e, igh, ow, ue, oo
+`review-b-01` · Band B · 79 words · sounds: a-e, ai, ay, ee, ea, i-e, igh, ow, ue, oo
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -3081,10 +2863,10 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Jay had a snail named Blue. Giri had a snail named Pine. Today was race day by the lake.
 Page 2: Slow and low, go, snail, go!
-Page 3: Pine shot off fast. Blue was slow, slow, slow. Jay gave a sigh.
-Page 4: "Keep going, Blue!" said Jay. Then Pine stopped to eat a green leaf. And another. And another!
+Page 3: Pine shot off. Blue was slow, slow, slow. Jay gave a sigh.
+Page 4: "Keep going, Blue!" said Jay. Then Pine stopped to eat a green leaf. And a bud! And a stem!
 Page 5: Slow and low, go, snail, go!
-Page 6: Blue crept on, inch by inch, past the leaf and past the line.
+Page 6: Blue crept on, inch by inch, by the leaf and over the line.
 Page 7: The winner was Blue! "Soon Pine will need a nap," said Giri, "on a full tummy!"
 ```
 
@@ -3117,7 +2899,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 7. Square.
-Words on this page: Pine shot off fast. Blue was slow, slow, slow. Jay gave a sigh.
+Words on this page: Pine shot off. Blue was slow, slow, slow. Jay gave a sigh.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -3125,7 +2907,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 7. Square.
-Words on this page: "Keep going, Blue!" said Jay. Then Pine stopped to eat a green leaf. And another. And another!
+Words on this page: "Keep going, Blue!" said Jay. Then Pine stopped to eat a green leaf. And a bud! And a stem!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -3141,7 +2923,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 6 of 7. Square.
-Words on this page: Blue crept on, inch by inch, past the leaf and past the line.
+Words on this page: Blue crept on, inch by inch, by the leaf and over the line.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -3158,7 +2940,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **a-e** — named, race, lake, gave
+- **a-e** — named, lake, gave
 - **ai** — snail
 - **ay** — today, day
 - **ee** — keep, green, need
@@ -3170,12 +2952,9 @@ _For the back page of the book._
 - **oo** — soon
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **the** — ❤️ tricky part: e says /uh/
-- **said** — ❤️ tricky part: ai says /e/
-- **to** — ❤️ tricky part: o says /oo/
-- **another** — ❤️ tricky part: o says /u/
+- **race** — read it to your child for now
+- **go** — ❤️ tricky part: o says its name, /ō/
+- **full** — ❤️ tricky part: u says /oo/, as in "book"
 
 **After reading — check understanding** (answer ticked):
 1. What was Jay's snail called?  
@@ -3183,11 +2962,11 @@ _For the back page of the book._
 2. What did Pine stop to do?  
    Eat a green leaf ✓ · Take a nap · Go home
 3. Why did Blue win the race?  
-   Pine stopped to eat ✓ · Blue was fast · Jay gave Blue a ride
+   Pine stopped to eat ✓ · Blue was quick · Jay gave Blue a ride
 4. Jay gave a ___.  
    sigh ✓ · sag · sip
 5. Put these in the order they happened.  
-   (1) Pine shot off fast. (2) Pine stopped to eat a green leaf. (3) Blue crept past the line.
+   (1) Pine shot off. (2) Pine stopped to eat a green leaf. (3) Blue crept over the line.
 
 **Talk about it:**
 - Pine was fast, but Blue won. Why do you think that happened?

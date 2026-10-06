@@ -6,12 +6,23 @@
  * Mode the app reads them aloud immediately with a ⭐ Sight Word badge.
  *
  * HFW Tiers (aligned with the 4-band decodable story system):
- *   Tier 1: the, a, and, is, it, to, in, on, my           → Band A
- *   Tier 2: was, said, we, he, she, they, of, for, with,  → Band B
- *           went
+ *   Tier 1: the, a, and, is, it, to, in, on, my, and the   → Band A
+ *           little heart words a first sentence needs: his,
+ *           has, as, he, she, we, me, be, no, go, so, of
+ *   Tier 2: was, said, they, for, with, went, and the      → Band B
+ *           common heart words of the long-vowel stories
  *   Tier 3: could, would, should, there, where, one, some, → Band C
- *           were
+ *           were, and the everyday heart words of the
+ *           longer stories (water, school, door, walk…)
  *   Band D uses flexible HFW (all tiers + extras).
+ *
+ * A heart word is one with a part that never follows the code: the s of
+ * "his" says /z/, the a of "all" says /aw/. The decodability checker does
+ * not count these as sounded out (see decodability.js), so a story can use
+ * one only once its tier is open here, or through another route. The words
+ * below were added for exactly that reason, at the band where the story
+ * bank first needs them, and each is among the most frequent words a young
+ * reader meets.
  *
  * STORY_HFW — legacy alias for Tier 1 (backward compat).
  * HFW_TIERS — the authoritative tiered word lists.
@@ -22,16 +33,28 @@
 /** Tier 1 — permitted in Band A (earliest decodables) */
 export const HFW_TIER_1 = [
   'the', 'a', 'and', 'is', 'it', 'to', 'in', 'on', 'my',
+  'his', 'has', 'as', 'he', 'she', 'we', 'me', 'be', 'no', 'go', 'so', 'of',
 ];
 
 /** Tier 2 — permitted in Band B (story readers) */
 export const HFW_TIER_2 = [
-  'was', 'said', 'we', 'he', 'she', 'they', 'of', 'for', 'with', 'went',
+  'was', 'said', 'they', 'for', 'with', 'went',
+  'all', 'also', 'two', 'into', 'do', 'does', 'who', 'you', 'your', 'want',
+  'put', 'push', 'pull', 'full', 'come', 'once', 'friend', 'small', 'are',
+  'have', 'what', 'here',
 ];
 
 /** Tier 3 — permitted in Band C (fluency readers) */
 export const HFW_TIER_3 = [
   'could', 'would', 'should', 'there', 'where', 'one', 'some', 'were',
+  'walk', 'talk', 'call', 'wall', 'tall', 'ball', 'fall', 'water', 'warm',
+  'school', 'door', 'floor', 'whole', 'key', 'work', 'word', 'world', 'through',
+  'something', 'nothing', 'anyone', 'someone', 'any', 'many', 'again', 'other',
+  'another', 'mother', 'brother', 'know', 'knew', 'heard', 'done', 'gone',
+  'field', 'sure', 'says', 'four', 'house', 'great', 'move', 'love', 'give',
+  'their', 'eye', 'busy', 'half', 'always', 'people', 'because', 'only',
+  // Singapore everyday word: every hawker centre is rows of stalls.
+  'stall',
 ];
 
 /** Combined tier lookup: word → tier number (1, 2, or 3) */

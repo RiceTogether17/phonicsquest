@@ -162,6 +162,15 @@ Stories are validated against a cumulative grapheme release, so a text can
 never ask for a spelling the child has not met. \`tier\` is the coarse
 release; the budget is the teaching stage inside it.
 
+A word counts as decodable only when its **sounds** have been taught as well
+as its letters. Heart words — "the", "was", "his", "said", where a part does
+not make the sound its letters were taught to make — never count; they reach
+a story as high-frequency or sight words and are shown before reading. A
+regular sound taught after its letters waits for its lesson: a saying /ar/ in
+"fast" and "path" (with ar, phase 7, as Singapore and British English say
+them), soft c and g (phase 7), ow as in "cow" (phase 8). A plural or verb -s
+that says /z/ ("dogs") stays decodable.
+
 | Story phase | Tier | Budget it adds | Tricky-word cutoff (curriculum phase) |
 | --- | --- | --- | --- |
 ${rows}

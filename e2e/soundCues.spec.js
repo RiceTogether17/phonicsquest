@@ -172,7 +172,8 @@ test('the colour key explains the marks, not only the colours', async ({ page })
   const legend = page.locator('.sound-legend');
   await expect(legend).toBeVisible();
   await expect(legend.locator('.sl-lead')).toContainText(/short vowel wears/i);
+  await expect(legend.locator('.sl-lead')).toContainText(/heart part wears/i);
   // Every category still names itself in words, for anyone the colour and
-  // the mark both fail.
-  await expect(legend.locator('.sl-item')).toHaveCount(6);
+  // the mark both fail: six vowel sounds and the heart part.
+  await expect(legend.locator('.sl-item')).toHaveCount(7);
 });

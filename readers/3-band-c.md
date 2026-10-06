@@ -93,23 +93,12 @@ _For the back page of the book._
 - **or** — storm
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **the** — ❤️ tricky part: e says /uh/
-- **a** — ❤️ tricky part: on its own, a says /uh/
 - **door** — ❤️ tricky part: oor says /or/
-- **his** — ❤️ tricky part: s says /z/
-- **he** — ❤️ tricky part: e says its name, /ē/
 - **wrote** — ❤️ tricky part: the w is silent
-- **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
-- **to** — ❤️ tricky part: o says /oo/
+- **wall** — ❤️ tricky part: a says /aw/
+- **pushed** — read it to your child for now
 - **pulled** — ❤️ tricky part: u says /oo/, as in "book"
-- **all** — ❤️ tricky part: a says /aw/
-- **once** — ❤️ tricky part: it says "wunce": o makes /w/ and /u/
-- **some** — ❤️ tricky part: o says /u/ and the e is silent
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **were** — ❤️ tricky part: ere says /er/
 - **buy** — ❤️ tricky part: the u is silent and y says /ī/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
 
 **Word meanings** — talk about these before reading:
 - **storm** — Very bad weather with strong wind and rain
@@ -122,7 +111,7 @@ _For the back page of the book._
 1. Where was Giri when the storm came?  
    At the farm ✓ · At the park · At school · At the market
 2. What blew off the wall?  
-   His star chart ✓ · His hat · A picture · A clock
+   His star chart ✓ · His hat · A map · A clock
 3. How did Giri feel when he spotted every star on his chart?  
    Proud and happy ✓ · Cross with the storm · Sad and wet · Scared of the dark
 4. True or false? The barn door swung open at the first push.  
@@ -173,7 +162,7 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Not long ago, Giri walked far from the farm one night. The sky was very dark and clear. A large bright star fell from above and landed near the river, though he was the only one to see it. Giri hurried over to find it.
 Page 2: The star was stuck under a fern by the water. Giri bent down and picked it up. It was warm and gave off a soft glow. A bird chirped from a branch as if to say well done.
-Page 3: Giri held the star close and walked home with a warm glow in his heart.
+Page 3: Giri held the star tight and walked home with a warm glow in his heart.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -205,7 +194,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 3. Square.
-Words on this page: Giri held the star close and walked home with a warm glow in his heart.
+Words on this page: Giri held the star tight and walked home with a warm glow in his heart.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -219,22 +208,13 @@ _For the back page of the book._
 - **er** — river, over, under, fern
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **from** — ❤️ tricky part: o says /u/
-- **the** — ❤️ tricky part: e says /uh/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
+- **walked** — read it to your child for now
 - **clear** — read it to your child for now
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **above** — ❤️ tricky part: o says /u/ and the e is silent
 - **near** — no tricky part; your child can sound it out once they know “ear”. Read it together for now
 - **though** — ❤️ tricky part: ough says /ō/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **to** — ❤️ tricky part: o says /oo/
-- **water** — ❤️ tricky part: a says /aw/
+- **warm** — ❤️ tricky part: ar says /or/
 - **done** — ❤️ tricky part: o says /u/ and the e is silent
-- **close** — ❤️ tricky part: s says /z/
-- **his** — ❤️ tricky part: s says /z/
-- **heart** — read it to your child for now
+- **heart** — ❤️ tricky part: ear says /ar/
 
 **Word meanings** — talk about these before reading:
 - **fern** — A green plant with feathery leaves
@@ -253,7 +233,7 @@ _For the back page of the book._
 4. True or false? Giri took the star home to show his mother.  
    True · False · The story does not say ✓
 5. Put these in the order they happened.  
-   (1) A large bright star fell near the river. (2) The star was stuck under a fern. (3) Giri held the star close and walked home.
+   (1) A large bright star fell near the river. (2) The star was stuck under a fern. (3) Giri held the star tight and walked home.
 
 **Write about it:** How do you think Giri felt when he held the star? Why?  
 _A good answer:_ He felt happy and proud. The story says he walked home with a warm glow in his heart.
@@ -270,7 +250,7 @@ _A good answer:_ He felt happy and proud. The story says he walked home with a w
 
 ## Giri and the Clever Bird
 
-`core-c-03` · Band C · 112 words · sounds: sh, ch, th
+`core-c-03` · Band C · 113 words · sounds: sh, ch, th
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -296,7 +276,7 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: A thrush sat on a branch and watched Giri from above. Giri had lost his shell necklace on the path. He searched in the thick bushes and checked behind each rock, but did not find any of it.
+Page 1: A thrush sat on a branch and looked at Giri from above. Giri had lost his shell necklace on the path. He searched in the thick shrubs and checked behind each rock, but did not find any of it.
 Page 2: The thrush gave a sharp chirp. It hopped to a patch of grass and pecked at something shiny. Giri rushed over. There was his shell necklace, half hidden under a thin leaf. Giri picked it up. "I don't know how you knew!" he thanked the clever bird.
 Page 3: Giri clipped the shell necklace on. Both he and the thrush felt glad. The thrush goes where it likes, and Giri set off home into the sunshine.
 ```
@@ -314,7 +294,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 3. Square.
-Words on this page: A thrush sat on a branch and watched Giri from above. Giri had lost his shell necklace on the path. He searched in the thick bushes and checked behind each rock, but did not find any of it.
+Words on this page: A thrush sat on a branch and looked at Giri from above. Giri had lost his shell necklace on the path. He searched in the thick shrubs and checked behind each rock, but did not find any of it.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -339,31 +319,17 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **sh** — thrush, shell, bushes, sharp, shiny, rushed
+- **sh** — thrush, shell, shrubs, sharp, shiny, rushed
 - **ch** — branch, checked, each, chirp
 - **th** — thrush, path, thick, thin, thanked, both
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **from** — ❤️ tricky part: o says /u/
-- **above** — ❤️ tricky part: o says /u/ and the e is silent
-- **his** — ❤️ tricky part: s says /z/
-- **the** — ❤️ tricky part: e says /uh/
-- **he** — ❤️ tricky part: e says its name, /ē/
+- **necklace** — ❤️ tricky part: ace says /iss/
 - **searched** — Looked carefully to find something
 - **any** — ❤️ tricky part: a says /e/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **to** — ❤️ tricky part: o says /oo/
-- **something** — ❤️ tricky part: o says /u/ and the first e is silent
-- **there** — ❤️ tricky part: ere says /air/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
 - **half** — ❤️ tricky part: a says /ar/ and the l is silent
-- **I** — ❤️ tricky part: always a capital, and it says its name
-- **know** — ❤️ tricky part: the k is silent
-- **you** — ❤️ tricky part: ou says /oo/
+- **dont** — ❤️ tricky part: o says its name, /ō/
 - **knew** — ❤️ tricky part: the k is silent
-- **where** — ❤️ tricky part: ere says /air/, as in "there"
-- **into** — ❤️ tricky part: o says /oo/, like in "to"
 
 **Word meanings** — talk about these before reading:
 - **thrush** — A type of songbird with a speckled chest
@@ -377,7 +343,7 @@ _For the back page of the book._
 2. How did the thrush help?  
    It pecked at the necklace to show Giri ✓ · It sang a song · It flew away · It gave him food
 3. What does this story teach us?  
-   Help can come from unexpected places ✓ · Birds are always helpful · Necklaces are easy to find · Bushes are the best hiding spots
+   Help can come from unexpected places ✓ · Birds are always helpful · Lost things are not hard to find · Shrubs are the best hiding spots
 4. True or false? The thrush pecked at something shiny.  
    True ✓ · False · The story does not say
 5. Put these in the order they happened.  
@@ -390,7 +356,7 @@ _A good answer:_ Maybe the thrush saw Giri searching so hard and wanted to help.
 - How did the thrush help Giri find his necklace?
 - Why does the story call the bird clever? Do you agree?
 
-**Spot it: Digraphs (sh, ch, th)** — "shell", "sharp", "bushes", "checked", "chirp", "thrush", "thick", "thin", "thanked". Two letters that make one sound: sh = /sh/, ch = /ch/, th = /th/.
+**Spot it: Digraphs (sh, ch, th)** — "shell", "sharp", "shrubs", "checked", "chirp", "thrush", "thick", "thin", "thanked". Two letters that make one sound: sh = /sh/, ch = /ch/, th = /th/.
 
 **Spot it: Varied sentence openings** — The thrush gave a chirp. It hopped to a patch. Giri rushed over.. Start sentences with different words to make your writing more interesting.
 
@@ -398,7 +364,7 @@ _A good answer:_ Maybe the thrush saw Giri searching so hard and wanted to help.
 
 ## Giri at the Market
 
-`core-c-04` · Band C · 118 words · sounds: ar, er, or
+`core-c-04` · Band C · 119 words · sounds: ar, er, or
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -426,7 +392,7 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Giri walked to the market to get a jar of honey for his mother. The stalls were bright with herbs, berries, and fresh corn. A trader called out, "Best herbs here!" The market began to get busy, but Giri could not see the honey stall.
 Page 2: He turned a corner and there it was, tucked between a herb cart and a butter stall. Giri picked out a large jar and paid the farmer with his change. On the way home he spotted a perfect red pepper, good to eat, and got that as well.
-Page 3: Giri gave the jar and the pepper to his mother. Her frown became a big smile. "You begin to shop like a pro!" she said.
+Page 3: Giri gave the jar and the pepper to his mother. Her sad look became a big smile. "You begin to shop like an expert!" she said.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -458,7 +424,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 3. Square.
-Words on this page: Giri gave the jar and the pepper to his mother. Her frown became a big smile. "You begin to shop like a pro!" she said.
+Words on this page: Giri gave the jar and the pepper to his mother. Her sad look became a big smile. "You begin to shop like an expert!" she said.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -468,26 +434,13 @@ _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
 - **ar** — jar, cart, large, farmer
-- **er** — herbs, trader, herb, perfect, her
+- **er** — herbs, trader, herb, perfect, her, expert
 - **or** — for, corn, corner
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **to** — ❤️ tricky part: o says /oo/
-- **the** — ❤️ tricky part: e says /uh/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **his** — ❤️ tricky part: s says /z/
-- **mother** — ❤️ tricky part: o says /u/
-- **were** — ❤️ tricky part: ere says /er/
-- **called** — ❤️ tricky part: a says /aw/
-- **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
-- **could** — ❤️ tricky part: oul says /oo/, as in "book"
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **there** — ❤️ tricky part: ere says /air/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **you** — ❤️ tricky part: ou says /oo/
-- **she** — ❤️ tricky part: e says its name, /ē/
-- **said** — ❤️ tricky part: ai says /e/
+- **walked** — read it to your child for now
+- **honey** — ❤️ tricky part: o says /u/ and ey says /ee/
+- **busy** — ❤️ tricky part: u says /i/ and s says /z/
 
 **Word meanings** — talk about these before reading:
 - **trader** — A person who buys and sells things
@@ -498,9 +451,9 @@ _For the back page of the book._
 
 **After reading — check understanding** (answer ticked):
 1. What did Giri go to the market to get?  
-   A jar of honey ✓ · A bag of corn · Some flowers · A red hat
+   A jar of honey ✓ · A bag of corn · A bunch of herbs · A red hat
 2. Where was the honey stall?  
-   Between a flower cart and a butter stall ✓ · By the door · At the far end · Next to the herbs
+   Between a herb cart and a butter stall ✓ · By the door · At the far end · Next to the corn
 3. Why did Giri also buy a pepper?  
    He thought his mother would like it ✓ · It was free · The trader asked him to · He was very hungry
 4. True or false? The honey stall was tucked between a corn cart and a butter stall.  
@@ -515,7 +468,7 @@ _A good answer:_ Yes. It was a perfect red pepper, good to eat, and it helped tu
 - Why did his mother's frown become a big smile?
 - What does "You begin to shop like a pro" mean?
 
-**Spot it: r-controlled vowels (er, ar, or)** — "her", "corner", "farmer", "market", "jar", "corn", "flowers". The er, ar, and or sounds appear in many everyday words.
+**Spot it: r-controlled vowels (er, ar, or)** — "her", "corner", "farmer", "market", "jar", "corn", "trader". The er, ar, and or sounds appear in many everyday words.
 
 **Spot it: Speech marks for direct speech** — "Best herbs here!" the trader called.. Use speech marks to show the exact words someone says out loud.
 
@@ -592,27 +545,17 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **sh** — sheets, crush, pushed
+- **sh** — sheets, crush
 - **ch** — checked, chart, chin, crunch, check
 - **th** — whether, with, both, three, this
 - **wh** — whether
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **from** — ❤️ tricky part: o says /u/
-- **school** — ❤️ tricky part: ch says /k/
-- **the** — ❤️ tricky part: e says /uh/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **his** — ❤️ tricky part: s says /z/
-- **he** — ❤️ tricky part: e says its name, /ē/
+- **walked** — read it to your child for now
+- **juice** — ❤️ tricky part: ui says /oo/ and the e is silent
 - **knew** — ❤️ tricky part: the k is silent
-- **should** — ❤️ tricky part: oul says /oo/, as in "book"
-- **be** — ❤️ tricky part: e says its name, /ē/
 - **sure** — ❤️ tricky part: s says /sh/ and ure says /or/
-- **go** — ❤️ tricky part: o says its name, /ō/
-- **said** — ❤️ tricky part: ai says /e/
-- **to** — ❤️ tricky part: o says /oo/
+- **pushed** — read it to your child for now
 - **through** — ❤️ tricky part: ough says /oo/
 - **music** — ❤️ tricky part: s says /z/
 
@@ -677,7 +620,7 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Giri heard a knock at the door. It was Mrs Tan, his neighbour from the flat next door. Her light bulb had burnt out and her step stool was broken. She could not reach the top of the shelf, which was very high.
+Page 1: Giri heard a tap at the door. It was Mrs Tan, his neighbour from the flat next door. Her light bulb had burnt out and her step stool was broken. She could not reach the top of the shelf, which was very high.
 Page 2: Giri offered to help. First he stood on his tiptoes, but he was not quite tall. Then he hurried to his flat and brought back a firm step stool. He set it in place inside her door, climbed up, turned the old bulb out, and put a new one in. He did not move until the light burst on!
 Page 3: Mrs Tan clapped and gave Giri a warm kueh to say thank you. "Keep my stool for now," said Giri, "in case the next bulb burns out too!"
 ```
@@ -695,7 +638,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 3. Square.
-Words on this page: Giri heard a knock at the door. It was Mrs Tan, his neighbour from the flat next door. Her light bulb had burnt out and her step stool was broken. She could not reach the top of the shelf, which was very high.
+Words on this page: Giri heard a tap at the door. It was Mrs Tan, his neighbour from the flat next door. Her light bulb had burnt out and her step stool was broken. She could not reach the top of the shelf, which was very high.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -726,25 +669,12 @@ _For the back page of the book._
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **heard** — ❤️ tricky part: ear says /er/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **the** — ❤️ tricky part: e says /uh/
 - **door** — ❤️ tricky part: oor says /or/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **his** — ❤️ tricky part: s says /z/
 - **neighbour** — Someone who lives close to you
-- **from** — ❤️ tricky part: o says /u/
-- **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
-- **she** — ❤️ tricky part: e says its name, /ē/
-- **could** — ❤️ tricky part: oul says /oo/, as in "book"
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **to** — ❤️ tricky part: o says /oo/
-- **he** — ❤️ tricky part: e says its name, /ē/
+- **tall** — ❤️ tricky part: a says /aw/
 - **brought** — ❤️ tricky part: ough says /aw/
-- **put** — ❤️ tricky part: u says /oo/, as in "book"
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
 - **move** — ❤️ tricky part: o says /oo/ and the e is silent
-- **you** — ❤️ tricky part: ou says /oo/
-- **said** — ❤️ tricky part: ai says /e/
+- **warm** — ❤️ tricky part: ar says /or/
 
 **Word meanings** — talk about these before reading:
 - **offered** — Said you would do something to help
@@ -758,11 +688,11 @@ _For the back page of the book._
 2. What did Mrs Tan need help with?  
    Changing a light bulb ✓ · Finding her keys · Cooking food · Carrying bags
 3. What can we learn from Giri in this story?  
-   Helping a neighbour is kind and clever ✓ · Step stools always break · Shelves are too high · Do not answer the door
+   Helping a neighbour is kind and clever ✓ · Step stools always break · Shelves are too high · Do not open the door
 4. True or false? Giri climbed up on a chair and turned the old bulb out.  
    True · False ✓ · The story does not say
 5. Put these in the order they happened.  
-   (1) Giri heard a knock at the door. (2) Giri brought back a firm step stool. (3) The light burst on.
+   (1) Giri heard a tap at the door. (2) Giri brought back a firm step stool. (3) The light burst on.
 
 **Write about it:** Why did Giri go back to his flat for a step stool?  
 _A good answer:_ Mrs Tan's step stool was broken, and Giri was not tall enough on his tiptoes, so he needed a firm stool to reach the light.
@@ -771,7 +701,7 @@ _A good answer:_ Mrs Tan's step stool was broken, and Giri was not tall enough o
 - Why could Mrs Tan not change the light bulb herself?
 - Giri stood on his tiptoes before he fetched the stool. What does that show about him?
 
-**Spot it: r-controlled vowels (er, ir, ur)** — "her", "turned", "returned", "first", "firm", "burnt", "burst". The sounds er, ir, and ur often sound the same: her, bird, turn.
+**Spot it: r-controlled vowels (er, ir, ur)** — "her", "turned", "first", "firm", "burnt", "burst". The sounds er, ir, and ur often sound the same: her, bird, turn.
 
 **Spot it: Sequence words** — First he stood. Then he hurried.. Words like first, then, next, and at last show the order of events.
 
@@ -853,23 +783,11 @@ _For the back page of the book._
 - **ar** — farm, yard, large, hard, barn, sharp
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **the** — ❤️ tricky part: e says /uh/
-- **his** — ❤️ tricky part: s says /z/
-- **a** — ❤️ tricky part: on its own, a says /uh/
 - **always** — ❤️ tricky part: a says /aw/
-- **to** — ❤️ tricky part: o says /oo/
-- **water** — ❤️ tricky part: a says /aw/
-- **from** — ❤️ tricky part: o says /u/
 - **horse** — ❤️ tricky part: the e is silent
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
 - **work** — ❤️ tricky part: after w, or says /er/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
 - **aunty** — ❤️ tricky part: au says /ar/
 - **carefully** — In a way that avoids mistakes or danger
-- **said** — ❤️ tricky part: ai says /e/
-- **put** — ❤️ tricky part: u says /oo/, as in "book"
-- **head** — ❤️ tricky part: ea says /e/
 
 **Word meanings** — talk about these before reading:
 - **scratched** — Used claws to dig at the ground
@@ -896,7 +814,7 @@ _A good answer:_ So that no more chickens could get out through the gap in the f
 - How did Giri stop the chicken from getting out again?
 - Why do you think Grandfather put his own cap on Giri's head?
 
-**Spot it: Digraphs (sh, ch)** — "sheep", "shed", "sheltered", "shut", "chickens", "chased", "cherry", "branch". sh says /sh/ as in sheep. ch says /ch/ as in chicken.
+**Spot it: Digraphs (sh, ch)** — "sheep", "shed", "sheltered", "shut", "chickens", "cherry", "branch". sh says /sh/ as in sheep. ch says /ch/ as in chicken.
 
 **Spot it: Time connectives** — After lunch, a chicken got out. At last, he caught it.. Words like after, at last, and then show when things happened.
 
@@ -978,22 +896,8 @@ _For the back page of the book._
 - **ur** — turning, curb, purple
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **mother** — ❤️ tricky part: o says /u/
-- **to** — ❤️ tricky part: o says /oo/
-- **go** — ❤️ tricky part: o says its name, /ō/
-- **the** — ❤️ tricky part: e says /uh/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **his** — ❤️ tricky part: s says /z/
-- **he** — ❤️ tricky part: e says its name, /ē/
 - **through** — ❤️ tricky part: ough says /oo/
-- **could** — ❤️ tricky part: oul says /oo/, as in "book"
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **put** — ❤️ tricky part: u says /oo/, as in "book"
-- **above** — ❤️ tricky part: o says /u/ and the e is silent
-- **she** — ❤️ tricky part: e says its name, /ē/
-- **said** — ❤️ tricky part: ai says /e/
-- **from** — ❤️ tricky part: o says /u/
+- **walked** — read it to your child for now
 - **ear** — no tricky part; your child can sound it out once they know “ear”. Read it together for now
 
 **Word meanings** — talk about these before reading:
@@ -1005,7 +909,7 @@ _For the back page of the book._
 
 **After reading — check understanding** (answer ticked):
 1. What did Giri need to buy?  
-   Butter and yoghurt ✓ · Bread and milk · Eggs and jam · Honey and tea
+   Butter and yoghurt ✓ · Rice and milk · Eggs and jam · Jam and tea
 2. Who helped Giri find the yoghurt?  
    A helper in a purple shirt ✓ · His mother · A friend · The shop owner
 3. Why was this errand special for Giri?  
@@ -1056,8 +960,8 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Giri was at the beach one morning when he spotted a baby turtle stuck in a dip in the sand. The turtle had turned the wrong way. It was far from the water, and the hot sun had made the sand burn below its flippers.
-Page 2: Giri worked fast. First, he dug the sand away from the shell. He did not try to carry it; instead he turned the little turtle to face the water. The turtle began to stir. It pushed with its flippers, slid along the wet sand, and swam off into the surf.
+Page 1: Giri was at the beach one morning when he spotted a baby turtle stuck in a dip in the sand. The turtle had turned the other way. It was far from the water, and the hot sun had made the sand burn below its flippers.
+Page 2: Giri worked fast. First, he dug the sand away from the shell. He did not try to carry it; he just turned the little turtle to face the water. The turtle began to stir. It pushed with its flippers, slid along the wet sand, and swam off into the surf.
 Page 3: Giri stood and stared until the turtle was finally just a dot in the sea. His first rescue! He walked home with a warm glow inside.
 ```
 
@@ -1074,7 +978,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 3. Square.
-Words on this page: Giri was at the beach one morning when he spotted a baby turtle stuck in a dip in the sand. The turtle had turned the wrong way. It was far from the water, and the hot sun had made the sand burn below its flippers.
+Words on this page: Giri was at the beach one morning when he spotted a baby turtle stuck in a dip in the sand. The turtle had turned the other way. It was far from the water, and the hot sun had made the sand burn below its flippers.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1082,7 +986,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 3. Square.
-Words on this page: Giri worked fast. First, he dug the sand away from the shell. He did not try to carry it; instead he turned the little turtle to face the water. The turtle began to stir. It pushed with its flippers, slid along the wet sand, and swam off into the surf.
+Words on this page: Giri worked fast. First, he dug the sand away from the shell. He did not try to carry it; he just turned the little turtle to face the water. The turtle began to stir. It pushed with its flippers, slid along the wet sand, and swam off into the surf.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1104,16 +1008,10 @@ _For the back page of the book._
 - **er** — flippers
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **the** — ❤️ tricky part: e says /uh/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **from** — ❤️ tricky part: o says /u/
-- **water** — ❤️ tricky part: a says /aw/
-- **to** — ❤️ tricky part: o says /oo/
-- **into** — ❤️ tricky part: o says /oo/, like in "to"
-- **his** — ❤️ tricky part: s says /z/
+- **worked** — read it to your child for now
+- **pushed** — read it to your child for now
+- **walked** — read it to your child for now
+- **warm** — ❤️ tricky part: ar says /or/
 
 **Word meanings** — talk about these before reading:
 - **flippers** — The flat arms a turtle uses to swim
@@ -1141,7 +1039,7 @@ _A good answer:_ He wanted to see that the turtle was safe in the sea. It was hi
 - Why did Giri turn the turtle round instead of carrying it?
 - What might have happened to the turtle if Giri had not stopped?
 
-**Spot it: r-controlled vowels (ur, ir, er)** — "turtle", "turned", "burn", "surf", "first", "stir", "under", "flippers". When "r" follows a vowel, they team up to make a new sound: ur, ir, and er all say /er/.
+**Spot it: r-controlled vowels (ur, ir, er)** — "turtle", "turned", "burn", "surf", "first", "stir", "flippers". When "r" follows a vowel, they team up to make a new sound: ur, ir, and er all say /er/.
 
 **Spot it: Time-order words** — First, he dug the sand away. Then he turned the turtle.. Words like "first" and "then" show the order things happen in.
 
@@ -1179,7 +1077,7 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Giri had a little garden plot by the void deck. He planted a row of seeds between two stones and stirred the dirt with a small fork. It was not easy, but he often gave the seeds a drink of water and waited.
 Page 2: Weeks went past, but nothing came up. Giri felt glum. Then, after a big rain, he spotted something green. A funny little turnip top! Soon ten green tops stood in a perfect line. Giri turned the dirt and let them grow bigger and bigger.
-Page 3: At last, Giri pulled up ten firm turnips. He gave three to Mrs Tan, and when his work was done, his mum cooked the rest for dinner. His first harvest was the best surprise.
+Page 3: At last, Giri pulled up ten firm turnips. He gave three to Mrs Tan, and when his work was done, his mum cooked the rest for dinner. His first harvest was the best treat.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -1211,7 +1109,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 3. Square.
-Words on this page: At last, Giri pulled up ten firm turnips. He gave three to Mrs Tan, and when his work was done, his mum cooked the rest for dinner. His first harvest was the best surprise.
+Words on this page: At last, Giri pulled up ten firm turnips. He gave three to Mrs Tan, and when his work was done, his mum cooked the rest for dinner. His first harvest was the best treat.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1221,26 +1119,14 @@ _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
 - **ir** — dirt, firm, first
-- **ur** — turnip, turned, turnips, surprise
+- **ur** — turnip, turned, turnips
 - **er** — after, perfect, dinner
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **the** — ❤️ tricky part: e says /uh/
 - **void** — read it to your child for now
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **two** — ❤️ tricky part: the w is silent and o says /oo/
-- **small** — ❤️ tricky part: a says /aw/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
 - **easy** — ❤️ tricky part: s says /z/
 - **often** — ❤️ tricky part: the t is silent
-- **water** — ❤️ tricky part: a says /aw/
-- **nothing** — ❤️ tricky part: o says /u/
-- **something** — ❤️ tricky part: o says /u/ and the first e is silent
 - **pulled** — ❤️ tricky part: u says /oo/, as in "book"
-- **to** — ❤️ tricky part: o says /oo/
-- **his** — ❤️ tricky part: s says /z/
 - **work** — ❤️ tricky part: after w, or says /er/
 - **done** — ❤️ tricky part: o says /u/ and the e is silent
 
@@ -1255,7 +1141,7 @@ _For the back page of the book._
 1. Where was Giri's garden plot?  
    By the void deck ✓ · On a farm · At school · By the beach
 2. What came up after the big rain?  
-   Tiny turnip tops ✓ · A row of corn · Red flowers · Long beans
+   Tiny turnip tops ✓ · A row of corn · Red berries · Long beans
 3. How do we know Giri did not give up?  
    He watered the seeds every morning and kept waiting ✓ · He planted new seeds · He asked Mrs Tan to help · He dug up the plot
 4. True or false? Giri's mum helped him plant the seeds.  
@@ -1306,7 +1192,7 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: On Sunday, Giri helped all day long. In the morning he started with the dishes, washing and stacking them in a shining row. Then he dusted the shelf and folded the clean clothes.
+Page 1: On Sunday, Giri helped all day long. In the morning he started with the dishes, drying and stacking them in a shining row. Then he dusted the shelf and folded the clean clothes.
 Page 2: After lunch, Giri kept helping. He watered all eight plants and picked up the blocks. Mrs Tan needed a hand with her shopping bags, so Giri carried the lightest one up the steps. He could feel his feet getting tired, but he kept smiling.
 Page 3: At dinner, Mum smiled and said, "You helped all day. You must be the kindest helper in the city!" Helping, Giri decided, was a great kind of fun.
 ```
@@ -1324,7 +1210,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 3. Square.
-Words on this page: On Sunday, Giri helped all day long. In the morning he started with the dishes, washing and stacking them in a shining row. Then he dusted the shelf and folded the clean clothes.
+Words on this page: On Sunday, Giri helped all day long. In the morning he started with the dishes, drying and stacking them in a shining row. Then he dusted the shelf and folded the clean clothes.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1349,25 +1235,13 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **ed** — helped, started, dusted, folded, watered, picked
-- **ing** — morning, washing, stacking, shining, helping, shopping
+- **ed** — helped, started, dusted, folded, picked, needed
+- **ing** — morning, drying, stacking, shining, helping, shopping
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **all** — ❤️ tricky part: a says /aw/
-- **the** — ❤️ tricky part: e says /uh/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **a** — ❤️ tricky part: on its own, a says /uh/
+- **watered** — read it to your child for now
 - **eight** — ❤️ tricky part: eigh says /ay/
-- **so** — ❤️ tricky part: o says its name, /ō/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **could** — ❤️ tricky part: oul says /oo/, as in "book"
-- **his** — ❤️ tricky part: s says /z/
-- **said** — ❤️ tricky part: ai says /e/
-- **you** — ❤️ tricky part: ou says /oo/
-- **be** — ❤️ tricky part: e says its name, /ē/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
 - **great** — ❤️ tricky part: ea says /ay/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
 
 **Word meanings** — talk about these before reading:
 - **stacking** — Putting things neatly on top of each other
@@ -1380,13 +1254,13 @@ _For the back page of the book._
 1. What did Giri start with in the morning?  
    The dishes ✓ · The shopping · The plants · The blocks
 2. How did Giri help Mrs Tan?  
-   He carried a shopping bag up the steps ✓ · He watered her plants · He folded her clothes · He washed her dishes
+   He carried a shopping bag up the steps ✓ · He watered her plants · He folded her clothes · He dried her dishes
 3. How did Giri feel about helping, even when he was tired?  
    He still liked it and kept smiling ✓ · He wanted to stop · He felt cross · He felt bored
 4. True or false? Giri carried the lightest bag up the steps.  
    True ✓ · False · The story does not say
 5. Put these in the order they happened.  
-   (1) Giri washed and stacked the dishes. (2) Giri watered all eight plants. (3) Mum said he was the kindest helper in the city.
+   (1) Giri dried and stacked the dishes. (2) Giri watered all eight plants. (3) Mum said he was the kindest helper in the city.
 
 **Write about it:** Which of Giri's jobs would you like to help with, and why?  
 _A good answer:_ I would like to water the plants, because it is fun to see them grow.
@@ -1397,13 +1271,13 @@ _A good answer:_ I would like to water the plants, because it is fun to see them
 
 **Spot it: Past tense -ed** — "helped", "started", "dusted", "folded", "watered", "carried", "decided". Adding -ed to an action word shows it already happened.
 
-**Spot it: Present action -ing** — "washing", "stacking", "helping", "getting", "smiling". Adding -ing shows an action that is happening right now.
+**Spot it: Present action -ing** — "drying", "stacking", "helping", "getting", "smiling". Adding -ing shows an action that is happening right now.
 
 ---
 
 ## Could You? Would You? Should You?
 
-`core-c-sw-01` · Band C · 132 words · sounds: ar, or, ir
+`core-c-sw-01` · Band C · 133 words · sounds: ar, or, ir
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -1430,7 +1304,7 @@ RULES FOR EVERY PICTURE
 
 THE STORY
 Page 1: A small bird sat on the fence and did not stir. "Could we fly to the barn?" said Giri. "I could," said the bird, "but should I? A storm is coming. I can smell the rain."
-Page 2: "Would she come if I marched along?" said Giri. "She could ride on my arm." The bird looked at the dark sky. "We should not go far," she said. "Let us get under cover first."
+Page 2: "Would she come if I marched along?" said Giri. "She could ride on my arm." The bird looked at the dark sky. "We should not go far," she said. "Let us find a dry spot first."
 Page 3: Big drops of water started to fall. Giri and the bird darted under the cart by the farm. The storm passed over them with a roar. Then the sun came back and lit up the yard.
 Page 4: "The bird had it right," said Giri. "Could, would, should — think hard first!" "Yes," said the bird. "That is why I am a smart bird."
 ```
@@ -1456,7 +1330,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 4. Square.
-Words on this page: "Would she come if I marched along?" said Giri. "She could ride on my arm." The bird looked at the dark sky. "We should not go far," she said. "Let us get under cover first."
+Words on this page: "Would she come if I marched along?" said Giri. "She could ride on my arm." The bird looked at the dark sky. "We should not go far," she said. "Let us find a dry spot first."
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1486,22 +1360,7 @@ _For the back page of the book._
 - **ir** — bird, stir, first
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **small** — ❤️ tricky part: a says /aw/
-- **the** — ❤️ tricky part: e says /uh/
-- **could** — ❤️ tricky part: oul says /oo/, as in "book"
-- **we** — ❤️ tricky part: e says its name, /ē/
-- **to** — ❤️ tricky part: o says /oo/
-- **said** — ❤️ tricky part: ai says /e/
-- **I** — ❤️ tricky part: always a capital, and it says its name
-- **should** — ❤️ tricky part: oul says /oo/, as in "book"
-- **is** — ❤️ tricky part: s says /z/
-- **would** — ❤️ tricky part: oul says /oo/, as in "book"
-- **she** — ❤️ tricky part: e says its name, /ē/
-- **come** — ❤️ tricky part: o says /u/ and the e is silent
-- **go** — ❤️ tricky part: o says its name, /ō/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **water** — ❤️ tricky part: a says /aw/
+- **coming** — read it to your child for now
 - **fall** — ❤️ tricky part: a says /aw/
 
 **After reading — check understanding** (answer ticked):
@@ -1616,20 +1475,6 @@ _For the back page of the book._
 - **ing** — morning, missing, giggling
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **the** — ❤️ tricky part: e says /uh/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **school** — ❤️ tricky part: ch says /k/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **I** — ❤️ tricky part: always a capital, and it says its name
-- **she** — ❤️ tricky part: e says its name, /ē/
-- **they** — ❤️ tricky part: ey says /ay/
-- **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
-- **his** — ❤️ tricky part: s says /z/
-- **no** — ❤️ tricky part: o says its name, /ō/
-- **to** — ❤️ tricky part: o says /oo/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **said** — ❤️ tricky part: ai says /e/
 - **whole** — ❤️ tricky part: wh says /h/
 
 **Word meanings** — talk about these before reading:

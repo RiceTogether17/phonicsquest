@@ -174,7 +174,7 @@ Mixed-blend review, r-controlled vowels (ar, or, er, ir, ur) and the late conson
 | Stage | Name | Target sounds | Sample words | Mastery to pass | Prerequisite |
 | --- | --- | --- | --- | --- | --- |
 | `blends-review` | Blends Review | initial blends, final blends, both-end blends, tri-consonant blends (spr-, str-, scr-) | strip, crisp, blend, sprint, plank, … (8 total) | 70% | `long-u-oo` |
-| `rc-ar-or` | Bossy R · ar & or | ar /ɑr/, or /ɔr/ | car, star, farm, park, corn, … (8 total) | 70% | `blends-review` |
+| `rc-ar-or` | Bossy R · ar & or | ar /ɑr/, or /ɔr/, a /ɑr/ (fast, path) | car, star, farm, park, corn, … (8 total) | 70% | `blends-review` |
 | `rc-er-ir-ur` | Bossy R · er, ir & ur | er /ɜr/, ir /ɜr/, ur /ɜr/ | her, fern, bird, girl, turn, … (8 total) | 70% | `rc-ar-or` |
 | `cons-tch-dge` | tch and dge | tch /tʃ/, dge /dʒ/ | catch, match, patch, fetch, pitch, … (8 total) | 70% | `rc-er-ir-ur` |
 | `cons-ph` | ph says /f/ | ph /f/ | phone, graph, photo, dolphin, elephant, … (8 total) | 70% | `cons-tch-dge` |
@@ -225,6 +225,15 @@ Prefixes, advanced suffixes, multi-syllabic words and high-frequency irregular s
 Stories are validated against a cumulative grapheme release, so a text can
 never ask for a spelling the child has not met. `tier` is the coarse
 release; the budget is the teaching stage inside it.
+
+A word counts as decodable only when its **sounds** have been taught as well
+as its letters. Heart words — "the", "was", "his", "said", where a part does
+not make the sound its letters were taught to make — never count; they reach
+a story as high-frequency or sight words and are shown before reading. A
+regular sound taught after its letters waits for its lesson: a saying /ar/ in
+"fast" and "path" (with ar, phase 7, as Singapore and British English say
+them), soft c and g (phase 7), ow as in "cow" (phase 8). A plural or verb -s
+that says /z/ ("dogs") stays decodable.
 
 | Story phase | Tier | Budget it adds | Tricky-word cutoff (curriculum phase) |
 | --- | --- | --- | --- |

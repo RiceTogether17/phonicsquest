@@ -23,7 +23,8 @@ describe('vowel sound classifier', () => {
   it('distinguishes the three jobs of the same letter a', () => {
     expect(tag('cat')).toBe('c[a:short]t'); // short
     expect(tag('cake')).toBe('c[a:long]k[e:silent]'); // long + silent e
-    expect(tag('a')).toBe('[a:schwa]'); // schwa (the article)
+    expect(tag('about')).toBe('[a:schwa]b[ou:diphthong]t'); // schwa
+    expect(tag('a')).toBe('[a:heart]'); // the article: says /uh/ on its own, a heart word
   });
 
   it('handles every vowel-sound family', () => {
@@ -33,45 +34,48 @@ describe('vowel sound classifier', () => {
     expect(tag('bright')).toBe('br[igh:long]t'); // igh, longest-match
   });
 
-  it('marks the a- schwa prefix and "the"', () => {
+  it('marks the a- schwa prefix, and the heart part of "the" and "again"', () => {
     expect(tag('about')).toBe('[a:schwa]b[ou:diphthong]t');
-    expect(tag('the')).toBe('th[e:schwa]');
-    expect(tag('again')).toBe('[a:schwa]g[ai:long]n');
+    expect(tag('the')).toBe('th[e:heart]');
+    expect(tag('again')).toBe('[a:schwa]g[ai:heart]n');
   });
 
-  it('handles open-syllable long vowels and final y', () => {
-    expect(tag('he')).toBe('h[e:long]');
-    expect(tag('go')).toBe('g[o:long]');
+  it('handles open-syllable vowels and final y', () => {
+    // A vowel saying its name at the end of "he" and "go" is never taught as
+    // a rule, so the two are heart words.
+    expect(tag('he')).toBe('h[e:heart]');
+    expect(tag('go')).toBe('g[o:heart]');
     expect(tag('my')).toBe('m[y:long]');
   });
 
-  it('respects silent-e irregulars (have, one, there)', () => {
-    expect(tag('have')).toBe('h[a:short]v[e:silent]');
-    expect(tag('one')).toBe('[o:short]n[e:silent]');
-    expect(tag('there')).toBe('th[er:rcontrolled][e:silent]');
+  it('marks the heart parts of silent-e irregulars (have, one, there)', () => {
+    expect(tag('have')).toBe('h[a:short]v[e:heart]');
+    expect(tag('one')).toBe('[o:heart]n[e:heart]');
+    expect(tag('there')).toBe('th[ere:heart]');
   });
 
   it('marks second-syllable / final schwa (rules)', () => {
     expect(tag('sofa')).toBe('s[o:short]f[a:schwa]'); // final consonant+a
     expect(tag('panda')).toBe('p[a:short]nd[a:schwa]');
-    expect(tag('animal')).toBe('[a:short]n[i:short]m[a:schwa]l'); // -al
+    // -al; the word code also marks the unstressed middle i (an·i·mal)
+    expect(tag('animal')).toBe('[a:short]n[i:schwa]m[a:schwa]l');
     expect(tag('total')).toBe('t[o:short]t[a:schwa]l');
   });
 
   it('silences -le, silent-final-e after teams, and regular -ed', () => {
     expect(tag('little')).toBe('l[i:short]ttl[e:silent]'); // -le
-    expect(tag('leave')).toBe('l[ea:long]v[e:silent]'); // team + silent e
-    expect(tag('please')).toBe('pl[ea:long]s[e:silent]');
-    expect(tag('house')).toBe('h[ou:diphthong]s[e:silent]'); // bank grouped ending, split
+    expect(tag('leave')).toBe('l[ea:long]v[e:heart]'); // e with no job: a heart part
+    expect(tag('please')).toBe('pl[ea:long][se:heart]'); // s says /z/
+    expect(tag('house')).toBe('h[ou:diphthong]s[e:heart]'); // bank grouped ending, split
     expect(tag('reached')).toBe('r[ea:long]ch[e:silent]d'); // past-tense -ed
     expect(tag('sled')).toBe('sl[e:short]d'); // NOT a suffix — e stays short
   });
 
   it('applies team exceptions, tolerant of inflections', () => {
-    expect(tag('head')).toBe('h[ea:short]d');
+    expect(tag('head')).toBe('h[ea:heart]d');
     expect(tag('been')).toBe('b[ee:short]n');
-    expect(tag('friend')).toBe('fr[ie:short]nd');
-    expect(tag('know')).toBe('kn[ow:long]');
+    expect(tag('friend')).toBe('fr[ie:heart]nd');
+    expect(tag('know')).toBe('[k:heart]n[ow:long]');
     expect(tag('now')).toBe('n[ow:diphthong]'); // stays a diphthong
     expect(tag('slowly')).toBe('sl[ow:long]l[y:long]'); // slow + ly
     expect(tag('showed')).toBe('sh[ow:long][e:silent]d');
@@ -80,7 +84,22 @@ describe('vowel sound classifier', () => {
 
   it('does not colour proper nouns', () => {
     expect(soundColoredHtml('Giri')).toBe('Giri');
-    expect(tag('Giri had a hat')).toBe('Giri h[a:short]d [a:schwa] h[a:short]t');
+    expect(tag('Giri had a hat')).toBe('Giri h[a:short]d [a:heart] h[a:short]t');
+  });
+
+  it('shows what the letters really say in "his", "fast" and "cold"', () => {
+    // The s of "his" says /z/: a heart part, not a plain s to sound out.
+    expect(tag('his')).toBe('h[i:short][s:heart]');
+    expect(soundColoredHtml('his')).toContain('data-cue="♥');
+    // In Singapore and British English the a of "fast" says /ar/, as in
+    // "car" — not the short a of "cat", so no breve.
+    expect(tag('fast')).toBe('f[a:rcontrolled]st');
+    expect(tag('planted')).toContain('pl[a:rcontrolled]');
+    // A vowel saying its name on its own is long, not short.
+    expect(tag('cold')).toBe('c[o:long]ld');
+    expect(tag('find')).toBe('f[i:long]nd');
+    // An ending keeps the base word's heart part.
+    expect(tag('pushed')).toBe('p[u:heart]sh[e:silent]d');
   });
 
   it('preserves case and passes punctuation/spacing through', () => {
@@ -95,13 +114,15 @@ describe('vowel sound classifier', () => {
     expect(soundColoredHtml('cake')).toContain('data-cue="¯"'); // macron
   });
 
-  it('marks only short and long, so a page of text stays a page of text', () => {
-    // Marking all six was tried: a ∅ over every silent e and a ə over every
-    // "the" turned the story into a linguistics transcription. The other four
-    // are separated by colours that survive colour-blindness simulation.
+  it('marks only short, long and heart parts, so a page of text stays a page of text', () => {
+    // Marking all six vowel sounds was tried: a ∅ over every silent e and a ə
+    // over every schwa turned the story into a linguistics transcription. The
+    // other four are separated by colours that survive colour-blindness
+    // simulation. A heart part carries the classroom ♥, because the one
+    // thing a child must not do with it is sound it out.
     const html = soundColoredHtml('The cake was in the pan for a bird.');
     const cued = [...html.matchAll(/vs--(\w+)" data-cue=/g)].map((m) => m[1]);
-    expect(new Set(cued)).toEqual(new Set(['short', 'long']));
+    expect(new Set(cued)).toEqual(new Set(['short', 'long', 'heart']));
     for (const key of ['schwa', 'silent', 'rcontrolled', 'diphthong']) {
       expect(SOUND_META[key].cue, `${key} should not print a diacritic`).toBeUndefined();
     }

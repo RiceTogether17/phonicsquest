@@ -21,6 +21,8 @@ import {
   countFocusGrapheme,
   findUnknownCapitalised,
   extractCountableTokens,
+  extractReadTokens,
+  wordSoundCode,
   GRAPHEME_TIERS,
   SUFFIX_TIERS,
   STORY_PHASES,
@@ -36,64 +38,29 @@ import {
 } from '../modules/decodability.js';
 import { getHFWTier } from '../data/hfw.js';
 import { CURRICULUM } from '../data/curriculum.js';
+import { wordsToMeet } from '../modules/wordsToMeet.js';
 
 /**
- * Regression floors for the computed decodable ratio, pinned from the
- * post-audit corpus (empirical minimums: A .850, B .918, C .944, D .993).
+ * Regression floors for the computed decodable ratio, pinned from the corpus
+ * (empirical minimums: A .513, B .481, C .586, D .557, E .611).
  * New stories may not drag a band below its floor.
- */
-const RATIO_FLOORS = { A: 0.84, B: 0.9, C: 0.93, D: 0.95, E: 0.95 };
-
-/**
- * Floors for the phases that carry a short-vowel budget, keyed by how many
- * vowels the phase has released.
  *
- * These are lower than the band floor for a structural reason, not a
- * slackening of standards. English function words — the, is, of, to, on, in,
- * he, said — carry mostly non-/a/ vowels, so until their vowel is taught they
- * can only reach the page through the sight-word route, where they count as
- * `sight` rather than `decodable`. Function words are roughly 40% of running
- * text, so an honest single-vowel story cannot exceed about 0.67 however it is
- * written; the band floor of 0.84 was pinned when cross-vowel words such as
- * "top" and "wind" still counted as decodable at short-a.
+ * They were .84–.95 until the checker learned sounds as well as letters.
+ * The ratio counts only words a child can sound out with the code taught so
+ * far, and a heart word never qualifies: "the", "said", "to", "was", "his",
+ * "of", "he" have a part that does not say what its letters were taught to
+ * say. Those words are 35–45% of any English sentence, so an honest ratio
+ * sits between .5 and .7 in every band; the old figures counted "was" as
+ * w-a-s and "last" as a short-a word. Nothing about the stories got harder.
  *
- * The guarantee that actually protects the reader is unchanged and stricter
- * than before: "no story contains stretch words outside its allowances" above,
- * which means every word is readable by some legitimate route.
+ * The guarantee that actually protects the reader is the stretch test above:
+ * every word is readable by some taught route — sounded out, a heart word
+ * from the HFW tiers or the sight-word quests, or pre-taught by the story.
  */
-const VOWEL_BUDGET_FLOORS = { 1: 0.55, 3: 0.8 };
-
-/**
- * The same idea above tier 1. A phase may only use the spellings its own
- * teaching stage has reached, so an early long-a story cannot borrow "high"
- * or "cool" to lift its ratio; the words it loses go to the sight-word route
- * instead. The earlier the stage, the fewer spellings are available, so the
- * floor rises as the budget fills. Keyed by budget size; sizes not listed
- * here fall through to the band floor, which those phases do clear.
- */
-const GRAPHEME_BUDGET_FLOORS = { 3: 0.84, 6: 0.85 };
+const RATIO_FLOORS = { A: 0.5, B: 0.47, C: 0.58, D: 0.55, E: 0.6 };
 
 function ratioFloorFor(story) {
-  const phase = getStoryPhase(story.phase);
-  const budget = phase?.shortVowels?.length;
-  if (budget && VOWEL_BUDGET_FLOORS[budget] !== undefined) return VOWEL_BUDGET_FLOORS[budget];
-  const graphemeBudget = cumulativeBudget(phase)?.size;
-  if (graphemeBudget && GRAPHEME_BUDGET_FLOORS[graphemeBudget] !== undefined) {
-    return GRAPHEME_BUDGET_FLOORS[graphemeBudget];
-  }
   return RATIO_FLOORS[story.band];
-}
-
-/** Everything a budgeted phase has been taught, including earlier stages. */
-function cumulativeBudget(phase) {
-  if (!phase?.graphemeBudget) return null;
-  const out = new Set();
-  for (const p of STORY_PHASES) {
-    if (!p.graphemeBudget) continue;
-    for (const g of p.graphemeBudget) out.add(g);
-    if (p.id === phase.id) return out;
-  }
-  return out;
 }
 
 /** Most stretch words a single story may pre-teach via `pretaught`. */
@@ -244,18 +211,6 @@ describe('decodable ratios (R5)', () => {
       ).toBeGreaterThanOrEqual(floor);
     }
   });
-
-  it('still holds full-vowel Band A stories to the band floor', () => {
-    // Only the budgeted phases get the structural allowance; once all five
-    // short vowels are released there is no excuse for a low ratio.
-    const fullVowel = STORIES.filter(
-      (s) => s.band === 'A' && getStoryPhase(s.phase)?.shortVowels === 'aeiou',
-    );
-    expect(fullVowel.length).toBeGreaterThan(0);
-    for (const s of fullVowel) {
-      expect(analyses.get(s.id).computed.decodableRatio).toBeGreaterThanOrEqual(RATIO_FLOORS.A);
-    }
-  });
 });
 
 describe('refrains (R6)', () => {
@@ -271,18 +226,18 @@ describe('refrains (R6)', () => {
     // them. The child reads a refrain more often than any other line, so it
     // is held to the same code: "who took my lime pie?" got into a long-i
     // story with "took", whose oo is not taught until long-u. A word that is
-    // readable only with support must also be in the counted text, which is
-    // where the words-to-meet list finds it before the story starts.
+    // readable only with support must be on the story's support list, which
+    // is where the words-to-meet panel finds it before the story starts.
     const bad = [];
     for (const s of STORIES) {
-      const counted = new Set(extractCountableTokens(s));
+      const support = new Set(supportWords(s).map((w) => w.word));
       for (const line of s.lines.filter((l) => l.type === 'refrain')) {
         for (const raw of line.text.split(/[\s–—-]+/)) {
           const word = cleanToken(raw);
           if (!word) continue;
           const { status } = classifyWord(word, s);
-          if (status === 'stretch' || (status !== 'decodable' && !counted.has(word)))
-            bad.push(`${s.id}: "${word}" (${status})`);
+          const listed = status === 'decodable' || ONOMATOPOEIA.has(word) || support.has(word);
+          if (status === 'stretch' || !listed) bad.push(`${s.id}: "${word}" (${status})`);
         }
       }
     }
@@ -443,8 +398,9 @@ describe('grapheme phase budget', () => {
     expect(isWordDecodable('high', 'long-i')).toBe(true);
     expect(isWordDecodable('cool', 'long-o')).toBe(false);
     expect(isWordDecodable('cool', 'long-u')).toBe(true);
-    expect(isWordDecodable('caught', 'diphthongs')).toBe(false);
-    expect(isWordDecodable('caught', 'advanced-vowel')).toBe(true);
+    // ("caught" made this point once, but its gh is silent: a heart word.)
+    expect(isWordDecodable('haul', 'diphthongs')).toBe(false);
+    expect(isWordDecodable('haul', 'advanced-vowel')).toBe(true);
     // Cumulative: a later phase keeps everything the earlier ones taught.
     expect(isWordDecodable('rain', 'long-u')).toBe(true);
     expect(isWordDecodable('rain', 'diphthongs')).toBe(true);
@@ -485,8 +441,8 @@ describe('grapheme phase budget', () => {
   });
 
   it('leaves the teacher-supported formats on the full code', () => {
-    expect(isWordDecodable('caught', 'chapter')).toBe(true);
-    expect(isWordDecodable('caught', 'extension-sg')).toBe(true);
+    expect(isWordDecodable('haul', 'chapter')).toBe(true);
+    expect(isWordDecodable('haul', 'extension-sg')).toBe(true);
   });
 });
 
@@ -631,9 +587,12 @@ describe('pre-teach words (R10) — what a child must know before reading alone'
     }
   });
 
-  it('keeps the list short enough for a child to meet in one sitting', () => {
+  it('keeps the list shown before reading short enough for one sitting', () => {
+    // supportWords is the whole truth, and since the checker learned that
+    // "the" and "said" are heart words it runs to thirty in a Band D story.
+    // The panel shows the words new to the band (see wordsToMeet.js).
     for (const story of STORIES) {
-      expect(supportWords(story).length, `${story.id}`).toBeLessThanOrEqual(12);
+      expect(wordsToMeet(story).length, `${story.id}`).toBeLessThanOrEqual(12);
     }
   });
 });
@@ -755,5 +714,95 @@ describe('could, would and should', () => {
     const scout = STORIES.find((s) => s.id === 'core-d-09');
     expect(scout.lines.some((l) => /\bCould\b/.test(l.text))).toBe(true);
     expect(supportWords(scout).map((w) => w.word)).toContain('could');
+  });
+});
+
+/**
+ * The checker used to read letters only. Every letter of "was", "his" and
+ * "last" is taught in Band A, and none of the three says what those letters
+ * were taught to say: a child sounding them out reads "wass", "hiss" and
+ * "lasst" (in Singapore and British English the a of "last" says /ar/).
+ * A word now counts as sounded out only when its sounds have been taught.
+ */
+describe('sounds as well as letters (R13)', () => {
+  const PHASES = STORY_PHASES.map((p) => p.id);
+
+  it('never counts a heart word as sounded out, at any phase', () => {
+    for (const word of ['the', 'was', 'his', 'is', 'as', 'said', 'to', 'all', 'want', 'push']) {
+      for (const phase of PHASES) {
+        expect(isWordDecodable(word, phase), `${word} at ${phase}`).toBe(false);
+      }
+    }
+  });
+
+  it('waits for the ar lesson before "a" can say /ar/', () => {
+    for (const word of ['last', 'fast', 'path', 'grass', 'after', 'father']) {
+      expect(isWordDecodable(word, 'long-a'), `${word} at long-a`).toBe(false);
+      expect(isWordDecodable(word, 'r-controlled'), `${word} at r-controlled`).toBe(true);
+    }
+    // The short a of "cat" is unaffected, and so is a word that looks alike.
+    expect(isWordDecodable('ant', 'short-a')).toBe(true);
+    expect(isWordDecodable('pant', 'short-a')).toBe(true);
+  });
+
+  it('waits for soft c, soft g and ow as in "cow"', () => {
+    expect(isWordDecodable('gem', 'short-ei')).toBe(false);
+    expect(isWordDecodable('gem', 'r-controlled')).toBe(true);
+    expect(isWordDecodable('get', 'short-ei')).toBe(true); // a hard g
+    expect(isWordDecodable('rice', 'long-i')).toBe(false);
+    expect(isWordDecodable('rice', 'r-controlled')).toBe(true);
+    expect(isWordDecodable('brown', 'long-o')).toBe(false);
+    expect(isWordDecodable('brown', 'diphthongs')).toBe(true);
+    expect(isWordDecodable('snow', 'long-o')).toBe(true); // ow says its name
+  });
+
+  it('keeps a plural or verb -s decodable when it says /z/', () => {
+    // A child blending d-o-g-s says "dogz" without being taught to.
+    expect(isWordDecodable('dogs', 'short-ou')).toBe(true);
+    expect(isWordDecodable('pins', 'short-ei')).toBe(true);
+    expect(isWordDecodable('runs', 'mixed-short')).toBe(true);
+  });
+
+  it('reads a word with an ending through its base word', () => {
+    expect(wordSoundCode('pushed')?.category).toBe('heart');
+    expect(wordSoundCode('planted')?.soundPhase).toBe(7);
+    expect(wordSoundCode('afternoons')?.soundPhase).toBe(7);
+    expect(wordSoundCode('classes')?.soundPhase).toBe(7);
+    // "toes" is toe + s, not "to" + es.
+    expect(isWordDecodable('toes', 'long-o')).toBe(true);
+  });
+
+  /**
+   * Guards for the next story. A new word that fits one of these spelling
+   * patterns needs an entry in sightWordCode.js saying what it says, or a
+   * place on the list below of words whose letters say what they look like.
+   */
+  const vocabulary = () => [...new Set(STORIES.flatMap((s) => extractReadTokens(s)))];
+
+  it('knows what every "a" before s, th, f, n or l says in the bank', () => {
+    const SHORT_A = new Set([
+      'ant',
+      'ants',
+      'pant',
+      'canteen',
+      'gathered',
+      'tastes',
+      'toast',
+      'toaster',
+    ]);
+    const BROAD_A_SPELLING = /a(st|sk|sp|ss|th|ft|nce|nch|nt|lf|lm)/;
+    const unknown = vocabulary().filter(
+      (w) => BROAD_A_SPELLING.test(w) && !wordSoundCode(w) && !SHORT_A.has(w),
+    );
+    expect(unknown, 'say in sightWordCode.js whether the a says /ar/').toEqual([]);
+  });
+
+  it('knows what every "s" between vowels says in the bank', () => {
+    const S_SAYS_S = new Set(['base', 'beside', 'case', 'chased', 'goose', 'loose', 'mouse']);
+    const Z_SPELLING = /[aeiou]s[aeiouy]|[aeiou]se$|[aeiou]ses$|[aeiou]sed$/;
+    const unknown = vocabulary().filter(
+      (w) => Z_SPELLING.test(w) && !wordSoundCode(w) && !S_SAYS_S.has(w),
+    );
+    expect(unknown, 'say in sightWordCode.js whether the s says /z/').toEqual([]);
   });
 });

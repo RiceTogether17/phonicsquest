@@ -20,7 +20,7 @@ _Print this on the inside cover of every book in the set._
 
 ## Giri's Week in Penang: Day 1
 
-`penang-journal` · Band E · 843 words · sounds: ar, ow, ay, ed, ing
+`penang-journal` · Band E · 857 words · sounds: ar, ow, ay, ed, ing
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -51,22 +51,22 @@ THE STORY
 Day 1: Monday
 Page 1: Today Mum, Grandpa and I flew from Singapore to Penang. It was my first time on a plane, and I held the arm of my seat all the way up. Then I looked out of the window and forgot to be scared. The clouds looked like a field of white cotton.
 Page 2: When we landed, the air was hot and sticky, just like home. We took a taxi over a long bridge that went across the sea. Grandpa pointed at the water. "When I was a boy, there was no bridge," he said. "We took a slow ferry, and I was sick the whole way."
-Page 3: Penang is where Grandpa grew up. In the afternoon, we walked down the street where his family had a shop. The old shophouses were painted pink, green and yellow. Grandpa stopped in front of a blue door and was quiet for a long time. "This was our shop," he said at last. "My father sold rice and sugar here." Now it sells cold drinks and ice cream, so we had some.
-Page 4: For dinner, we went to a busy hawker centre by the sea. Grandpa ordered a plate of char kway teow for me. The noodles were dark and smoky, with prawns and bean sprouts on top. The cook tossed them in a huge pan over a roaring fire. It was the best thing I have ever eaten, even though it made my tongue tingle.
+Page 3: Penang is where Grandpa grew up. In the afternoon, we walked down the street where his family had a shop. The old shophouses were painted pink, green and yellow. Grandpa stopped at a blue door and was quiet for a long time. "This was our shop," he said at last. "My father sold rice and oil here." Now it sells cold drinks and ice cream, so we had some.
+Page 4: For dinner, we went to a busy hawker centre by the sea. Grandpa ordered a plate of char kway teow for me. The noodles were dark and smoky, with prawns and bean sprouts on top. The cook tossed them in a huge pan over a roaring fire. It was the best thing I have ever eaten, even though it made my lips tingle.
 Page 5: Now I am in bed, and Grandpa is snoring in the next room. Before he went to sleep, he winked and said, "Tomorrow, we go hunting." I asked him what we were going to hunt, but he just smiled. I will find out in the morning.
 
 Day 2: Tuesday
-Page 1: Now I know what Grandpa meant. We went hunting for paintings! In George Town, artists have painted pictures on the walls of old buildings, and you can walk around and find them. Grandpa gave me a paper map with little red dots on it. Each dot was a painting.
-Page 2: We started early, before it got too hot. The first painting was a boy on a swing, reaching up to the sky. The second was a cat so big that it covered the whole side of a house. I had to stand far back to see all of it. My favourite was two children riding a real bicycle that was fixed to the wall. I sat on the bicycle seat, and Mum took a photo of me.
-Page 3: By lunchtime, my legs were tired, so Grandpa waved down a trishaw. A trishaw is a bicycle with a seat for two people at the front. The rider pedalled us slowly through the narrow lanes while I held the map. Every time I spotted a painting, I shouted, and he rang his bell.
-Page 4: In the afternoon, we cooled down with a bowl of cendol. It has green jelly noodles, red beans, coconut milk and lots of shaved ice. Grandpa says it tastes the same as when he was small. I believe him, because he finished his bowl before I had eaten half of mine.
-Page 5: Back at the hotel, I counted the red dots I had crossed out. Eleven! Grandpa only found nine, but he says he walked down these lanes every day as a boy, so his dots count twice. I said that is not how counting works. He just laughed.
+Page 1: Now I know what Grandpa had in mind. We went hunting for paintings! In George Town, artists have painted on the walls of old shops and homes, and you can walk around and find them. Grandpa gave me a paper map with little red dots on it. Each dot was a painting.
+Page 2: We set off in the morning, before it got too hot. The first painting was a boy on a swing, reaching up to the sky. The second was a cat so big that it filled the whole side of a house. I had to stand far back to see all of it. The best one was two children riding a real bicycle that was fixed to the wall. I sat on the bicycle seat, and Mum took a photo of me.
+Page 3: By lunchtime, my legs were tired, so Grandpa waved down a trishaw. A trishaw is a bicycle with a seat for two people, and the rider sits behind. The rider pedalled us slowly through the narrow lanes while I held the map. Every time I spotted a painting, I shouted, and he turned and rang his bell.
+Page 4: In the afternoon, we cooled down with a bowl of cendol. It has green jelly noodles, red beans, coconut milk and lots of shaved ice. Grandpa says it tastes the same as when he was small. I think he is right, because he finished his bowl before I had eaten half of mine.
+Page 5: Back at the hotel, I counted the red dots I had crossed out. Eleven! Grandpa only found nine, but he says he walked down these lanes every day as a boy, so his dots count twice. I said that is not how counting works. He just grinned.
 
 Day 3: Wednesday
-Page 1: Today we went up Penang Hill. There is a special train that climbs straight up the side of the hill. It is so steep that the seats are built like steps. When the train started to move, I pressed my nose to the glass and watched the town get smaller and smaller below us.
+Page 1: Today we went up Penang Hill. There is a funny little train that climbs right up the side of the hill. It is so steep that the seats are set out like steps. When the train started to move, I pressed my face to the glass and looked at the town get smaller and smaller below us.
 Page 2: At the top, the air was cool and fresh, and it smelled of trees and rain. We walked along a path in the forest. The trees were so tall that I could not see the tops of them. Mum showed me a tiny lizard on a branch. It was the same green as the leaves, and it did not move once.
-Page 3: Then we came to a lookout point. From there, I could see the whole island: the bridge we drove over on Monday, the old town with its red roofs, and the sea all around, shining in the sun. Grandpa put his hand on my shoulder. "When I was your age, I came up here with my father," he said. "Now I am here with you." I did not know what to say, so I just held his hand.
-Page 4: We were sitting on a bench to eat our snacks when a monkey jumped down from a tree. Before anyone could move, it grabbed the bag of peanuts out of Grandpa's lap and ran back up the trunk. It sat on a branch above us, eating our peanuts one by one, and looked very pleased with itself.
+Page 3: Then we came to a lookout point. From there, I could see the whole island: the long bridge from the first day, the old town with its red roofs, and the sea all around, shining in the sun. Grandpa put his hand on my shoulder. "When I was your age, I came up here with my father," he said. "Now I am here with you." I did not know what to say, so I just held his hand.
+Page 4: We were sitting on a bench to eat our snacks when a monkey jumped down from a tree. Before anyone could move, it grabbed the bag of peanuts out of Grandpa's lap and ran back up the trunk. It sat on a branch above us, eating our peanuts one by one, and looked very happy with itself.
 Page 5: Grandpa says the monkey must be a relative of mine, because it also eats too fast. Tomorrow we go to the beach. I am going to keep my snacks in my pocket.
 ```
 
@@ -99,7 +99,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for Chapter 1, page 3 of 5. Square.
-Words on this page: Penang is where Grandpa grew up. In the afternoon, we walked down the street where his family had a shop. The old shophouses were painted pink, green and yellow. Grandpa stopped in front of a blue door and was quiet for a long time. "This was our shop," he said at last. "My father sold rice and sugar here." Now it sells cold drinks and ice cream, so we had some.
+Words on this page: Penang is where Grandpa grew up. In the afternoon, we walked down the street where his family had a shop. The old shophouses were painted pink, green and yellow. Grandpa stopped at a blue door and was quiet for a long time. "This was our shop," he said at last. "My father sold rice and oil here." Now it sells cold drinks and ice cream, so we had some.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -107,7 +107,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for Chapter 1, page 4 of 5. Square.
-Words on this page: For dinner, we went to a busy hawker centre by the sea. Grandpa ordered a plate of char kway teow for me. The noodles were dark and smoky, with prawns and bean sprouts on top. The cook tossed them in a huge pan over a roaring fire. It was the best thing I have ever eaten, even though it made my tongue tingle.
+Words on this page: For dinner, we went to a busy hawker centre by the sea. Grandpa ordered a plate of char kway teow for me. The noodles were dark and smoky, with prawns and bean sprouts on top. The cook tossed them in a huge pan over a roaring fire. It was the best thing I have ever eaten, even though it made my lips tingle.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -123,7 +123,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for Chapter 2, page 1 of 5. Square.
-Words on this page: Now I know what Grandpa meant. We went hunting for paintings! In George Town, artists have painted pictures on the walls of old buildings, and you can walk around and find them. Grandpa gave me a paper map with little red dots on it. Each dot was a painting.
+Words on this page: Now I know what Grandpa had in mind. We went hunting for paintings! In George Town, artists have painted on the walls of old shops and homes, and you can walk around and find them. Grandpa gave me a paper map with little red dots on it. Each dot was a painting.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -131,7 +131,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for Chapter 2, page 2 of 5. Square.
-Words on this page: We started early, before it got too hot. The first painting was a boy on a swing, reaching up to the sky. The second was a cat so big that it covered the whole side of a house. I had to stand far back to see all of it. My favourite was two children riding a real bicycle that was fixed to the wall. I sat on the bicycle seat, and Mum took a photo of me.
+Words on this page: We set off in the morning, before it got too hot. The first painting was a boy on a swing, reaching up to the sky. The second was a cat so big that it filled the whole side of a house. I had to stand far back to see all of it. The best one was two children riding a real bicycle that was fixed to the wall. I sat on the bicycle seat, and Mum took a photo of me.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -139,7 +139,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for Chapter 2, page 3 of 5. Square.
-Words on this page: By lunchtime, my legs were tired, so Grandpa waved down a trishaw. A trishaw is a bicycle with a seat for two people at the front. The rider pedalled us slowly through the narrow lanes while I held the map. Every time I spotted a painting, I shouted, and he rang his bell.
+Words on this page: By lunchtime, my legs were tired, so Grandpa waved down a trishaw. A trishaw is a bicycle with a seat for two people, and the rider sits behind. The rider pedalled us slowly through the narrow lanes while I held the map. Every time I spotted a painting, I shouted, and he turned and rang his bell.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -147,7 +147,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for Chapter 2, page 4 of 5. Square.
-Words on this page: In the afternoon, we cooled down with a bowl of cendol. It has green jelly noodles, red beans, coconut milk and lots of shaved ice. Grandpa says it tastes the same as when he was small. I believe him, because he finished his bowl before I had eaten half of mine.
+Words on this page: In the afternoon, we cooled down with a bowl of cendol. It has green jelly noodles, red beans, coconut milk and lots of shaved ice. Grandpa says it tastes the same as when he was small. I think he is right, because he finished his bowl before I had eaten half of mine.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -155,7 +155,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for Chapter 2, page 5 of 5. Square.
-Words on this page: Back at the hotel, I counted the red dots I had crossed out. Eleven! Grandpa only found nine, but he says he walked down these lanes every day as a boy, so his dots count twice. I said that is not how counting works. He just laughed.
+Words on this page: Back at the hotel, I counted the red dots I had crossed out. Eleven! Grandpa only found nine, but he says he walked down these lanes every day as a boy, so his dots count twice. I said that is not how counting works. He just grinned.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -163,7 +163,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for Chapter 3, page 1 of 5. Square.
-Words on this page: Today we went up Penang Hill. There is a special train that climbs straight up the side of the hill. It is so steep that the seats are built like steps. When the train started to move, I pressed my nose to the glass and watched the town get smaller and smaller below us.
+Words on this page: Today we went up Penang Hill. There is a funny little train that climbs right up the side of the hill. It is so steep that the seats are set out like steps. When the train started to move, I pressed my face to the glass and looked at the town get smaller and smaller below us.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -179,7 +179,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for Chapter 3, page 3 of 5. Square.
-Words on this page: Then we came to a lookout point. From there, I could see the whole island: the bridge we drove over on Monday, the old town with its red roofs, and the sea all around, shining in the sun. Grandpa put his hand on my shoulder. "When I was your age, I came up here with my father," he said. "Now I am here with you." I did not know what to say, so I just held his hand.
+Words on this page: Then we came to a lookout point. From there, I could see the whole island: the long bridge from the first day, the old town with its red roofs, and the sea all around, shining in the sun. Grandpa put his hand on my shoulder. "When I was your age, I came up here with my father," he said. "Now I am here with you." I did not know what to say, so I just held his hand.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -187,7 +187,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for Chapter 3, page 4 of 5. Square.
-Words on this page: We were sitting on a bench to eat our snacks when a monkey jumped down from a tree. Before anyone could move, it grabbed the bag of peanuts out of Grandpa's lap and ran back up the trunk. It sat on a branch above us, eating our peanuts one by one, and looked very pleased with itself.
+Words on this page: We were sitting on a bench to eat our snacks when a monkey jumped down from a tree. Before anyone could move, it grabbed the bag of peanuts out of Grandpa's lap and ran back up the trunk. It sat on a branch above us, eating our peanuts one by one, and looked very happy with itself.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -207,46 +207,15 @@ _For the back page of the book._
 - **ar** — arm, char, dark
 - **ow** — slow
 - **ay** — today, way, kway
-- **ed** — looked, scared, landed, pointed, walked, painted
+- **ed** — looked, scared, landed, pointed, painted, stopped
 - **ing** — roaring, snoring, hunting, going, morning
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **I** — ❤️ tricky part: always a capital, and it says its name
-- **from** — ❤️ tricky part: o says /u/
-- **to** — ❤️ tricky part: o says /oo/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **the** — ❤️ tricky part: e says /uh/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **all** — ❤️ tricky part: a says /aw/
-- **be** — ❤️ tricky part: e says its name, /ē/
-- **field** — ❤️ tricky part: ie says /ee/
-- **we** — ❤️ tricky part: e says its name, /ē/
-- **water** — ❤️ tricky part: a says /aw/
-- **there** — ❤️ tricky part: ere says /air/
-- **no** — ❤️ tricky part: o says its name, /ō/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **said** — ❤️ tricky part: ai says /e/
-- **whole** — ❤️ tricky part: wh says /h/
-- **is** — ❤️ tricky part: s says /z/
-- **where** — ❤️ tricky part: ere says /air/, as in "there"
-- **his** — ❤️ tricky part: s says /z/
-- **were** — ❤️ tricky part: ere says /er/
-- **front** — ❤️ tricky part: o says /u/
-- **door** — ❤️ tricky part: oor says /or/
-- **father** — ❤️ tricky part: a says /ar/
-- **so** — ❤️ tricky part: o says its name, /ō/
-- **some** — ❤️ tricky part: o says /u/ and the e is silent
-- **me** — ❤️ tricky part: e says its name, /ē/
-- **have** — ❤️ tricky part: words never end in v, so an e comes after it — the a stays short
-- **though** — ❤️ tricky part: ough says /ō/
-- **go** — ❤️ tricky part: o says its name, /ō/
-- **what** — ❤️ tricky part: a says /o/
+- **shophouses** — Old buildings with a shop below and a home above
 
 **Word meanings** — talk about these before reading:
 - **sticky** — Hot and damp, so things stick to you
 - **ferry** — A boat that carries people across water
-- **shophouses** — Old buildings with a shop below and a home above
 - **hawker centre** — A place with lots of small food stalls
 - **tingle** — A light, prickly feeling
 
@@ -254,13 +223,13 @@ _For the back page of the book._
 1. How did Grandpa get to Penang when he was a boy?  
    On a slow ferry ✓ · On a plane · In a taxi · Over the bridge
 2. What did Grandpa's father sell in the shop?  
-   Rice and sugar ✓ · Cold drinks and ice cream · Char kway teow · Blue paint
+   Rice and oil ✓ · Cold drinks and ice cream · Char kway teow · Blue paint
 3. Why was Grandpa quiet for a long time in front of the blue door?  
    It was his old family shop ✓ · He was lost · He was too hot to talk · He wanted ice cream
 4. True or false? Giri was still scared when he looked out of the window.  
    True · False ✓ · The story does not say
 5. Put these in the order they happened.  
-   (1) Giri flew on a plane for the first time. (2) They took a taxi over a long bridge. (3) Grandpa stopped in front of a blue door. (4) Giri ate char kway teow by the sea.
+   (1) Giri flew on a plane for the first time. (2) They took a taxi over a long bridge. (3) Grandpa stopped at a blue door. (4) Giri ate char kway teow by the sea.
 
 **Write about it:** Why do you think Grandpa wanted to show Giri the street where he grew up?  
 _A good answer:_ The shop was where his family worked when he was a boy, so it was special to him. He wanted Giri to see it and know about his family.
@@ -277,43 +246,15 @@ _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
 - **aw** — trishaw
+- **ur** — turned
 - **ou** — shouted, counted, out, count, counting
-- **ing** — hunting, painting, reaching, riding, counting
+- **ing** — hunting, painting, morning, reaching, riding, counting
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **I** — ❤️ tricky part: always a capital, and it says its name
-- **know** — ❤️ tricky part: the k is silent
-- **what** — ❤️ tricky part: a says /o/
-- **we** — ❤️ tricky part: e says its name, /ē/
-- **have** — ❤️ tricky part: words never end in v, so an e comes after it — the a stays short
-- **the** — ❤️ tricky part: e says /uh/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **you** — ❤️ tricky part: ou says /oo/
-- **walk** — ❤️ tricky part: a says /aw/ and the l is silent
-- **me** — ❤️ tricky part: e says its name, /ē/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **early** — ❤️ tricky part: ear says /er/
-- **to** — ❤️ tricky part: o says /oo/
-- **so** — ❤️ tricky part: o says its name, /ō/
-- **covered** — ❤️ tricky part: o says /u/
-- **whole** — ❤️ tricky part: wh says /h/
-- **house** — ❤️ tricky part: the e is silent
-- **all** — ❤️ tricky part: a says /aw/
-- **two** — ❤️ tricky part: the w is silent and o says /oo/
-- **were** — ❤️ tricky part: ere says /er/
-- **is** — ❤️ tricky part: s says /z/
-- **people** — ❤️ tricky part: eo says /ee/
-- **front** — ❤️ tricky part: o says /u/
-- **through** — ❤️ tricky part: ough says /oo/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **his** — ❤️ tricky part: s says /z/
-- **has** — ❤️ tricky part: s says /z/
-- **small** — ❤️ tricky part: a says /aw/
-- **because** — ❤️ tricky part: au says /o/, s says /z/ and the e is silent
-- **half** — ❤️ tricky part: a says /ar/ and the l is silent
-- **these** — ❤️ tricky part: s says /z/
-- **said** — ❤️ tricky part: ai says /e/
+- **walls** — read it to your child for now
+- **bicycle** — ❤️ tricky part: y says /i/
+- **cendol** — ❤️ tricky part: in Malay, c says /ch/
+- **works** — read it to your child for now
 
 **Word meanings** — talk about these before reading:
 - **artists** — People who make paintings and other art
@@ -341,7 +282,7 @@ _A good answer:_ No, he was joking. When Giri said that is not how counting work
 - Which painting in the story would you most like to find? Why?
 - Why do you think Giri crossed out each dot he found?
 
-**Spot it: Explaining a new word** — "A trishaw is a bicycle with a seat for two people at the front.". When a writer uses a word you may not know, they sometimes stop and tell you what it means. Look for "is a" just after the new word.
+**Spot it: Explaining a new word** — "A trishaw is a bicycle with a seat for two people, and the rider sits behind.". When a writer uses a word you may not know, they sometimes stop and tell you what it means. Look for "is a" just after the new word.
 
 ### 3. Reading together — Giri's Week in Penang: Day 3
 
@@ -350,45 +291,14 @@ _For the back page of the book._
 **Sounds in this book** — say the sound, then read these words from the story:
 - **ee** — steep, trees, see, green, tree, keep
 - **ou** — out
-- **er** — smaller, over
+- **er** — father
 - **air** — air
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **we** — ❤️ tricky part: e says its name, /ē/
-- **there** — ❤️ tricky part: ere says /air/
-- **is** — ❤️ tricky part: s says /z/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **the** — ❤️ tricky part: e says /uh/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **so** — ❤️ tricky part: o says its name, /ō/
-- **are** — ❤️ tricky part: the e is silent
-- **to** — ❤️ tricky part: o says /oo/
-- **move** — ❤️ tricky part: o says /oo/ and the e is silent
-- **I** — ❤️ tricky part: always a capital, and it says its name
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **were** — ❤️ tricky part: ere says /er/
-- **could** — ❤️ tricky part: oul says /oo/, as in "book"
-- **me** — ❤️ tricky part: e says its name, /ē/
-- **once** — ❤️ tricky part: it says "wunce": o makes /w/ and /u/
-- **from** — ❤️ tricky part: o says /u/
-- **whole** — ❤️ tricky part: wh says /h/
-- **monday** — ❤️ tricky part: o says /u/
-- **all** — ❤️ tricky part: a says /aw/
-- **put** — ❤️ tricky part: u says /oo/, as in "book"
-- **his** — ❤️ tricky part: s says /z/
-- **your** — ❤️ tricky part: our says /or/
-- **father** — ❤️ tricky part: a says /ar/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **said** — ❤️ tricky part: ai says /e/
-- **you** — ❤️ tricky part: ou says /oo/
-- **know** — ❤️ tricky part: the k is silent
-- **what** — ❤️ tricky part: a says /o/
-- **above** — ❤️ tricky part: o says /u/ and the e is silent
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **be** — ❤️ tricky part: e says its name, /ē/
-- **because** — ❤️ tricky part: au says /o/, s says /z/ and the e is silent
-- **also** — ❤️ tricky part: a says /aw/
-- **go** — ❤️ tricky part: o says its name, /ō/
+- **smaller** — read it to your child for now
+- **island** — ❤️ tricky part: the s is silent
+- **shoulder** — ❤️ tricky part: ou says /oa/
+- **monkey** — ❤️ tricky part: o says /u/ and ey says /ee/
 
 **Word meanings** — talk about these before reading:
 - **steep** — Going up very sharply
@@ -398,7 +308,7 @@ _For the back page of the book._
 - **relative** — Someone in your family
 
 **After reading — check understanding** (answer ticked):
-1. Why are the seats on the train built like steps?  
+1. Why are the seats on the train set out like steps?  
    The hill is so steep ✓ · So more people can sit · So Giri can see the sea · The train is old
 2. What could Giri see from the lookout point?  
    The whole island ✓ · Only trees · Singapore · The hotel
@@ -422,7 +332,7 @@ _A good answer:_ He is joking. The monkey eats too fast, and Giri eats too fast 
 
 ## How the Kingfisher Got Its Blue Coat
 
-`tale-e-01` · Band E · 297 words · sounds: ng, ue, oa, ur
+`tale-e-01` · Band E · 301 words · sounds: ng, ue, oa, ur
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -449,11 +359,11 @@ RULES FOR EVERY PICTURE
 
 THE STORY
 Page 1: Long ago, when the world was new, the kingfisher was a plain little bird. His feathers were the colour of mud, and nobody looked at him twice. The other birds had bright coats. The parrot was red and green, the sunbird was yellow, and the peacock had a tail full of eyes. The kingfisher sat on his branch by the river and wished that he could shine like them.
-Page 2: One morning, the Sky leaned down to look at herself in the river. As she bent over, a blue bead fell from her necklace and dropped into the water. It sank down, down, down, to the bottom of the deep, dark river. The Sky cried out. "My bead! Who will bring back my bead?"
-Page 3: The parrot said, "I cannot swim." The sunbird said, "The water is too cold." The peacock said, "My tail would get wet." Only the little brown kingfisher said nothing. He stood on his branch, took a deep breath, and dived straight into the river like an arrow.
-Page 4: It was dark and cold under the water, and he could not see. But he kept going, kicking with his feet, until his beak touched something smooth and round. He grabbed the bead and shot back up into the sunlight, dripping and shivering, and placed it in the Sky's hand.
-Page 5: The Sky was so pleased that she gave him a coat of bright blue, the colour of her own morning. The setting sun saw what he had done, and painted his chest a warm orange to match.
-Page 6: That is why the kingfisher is blue and orange today. And that is why, even now, he still sits by the river and dives into the water again and again. He is checking that nobody else has dropped a bead.
+Page 2: One morning, the Sky leaned down to look at herself in the river. As she bent over, a blue bead fell from her necklace and dropped into the water. It sank down, down, down, to the dark earth at the bottom of the river. The Sky cried out. "My bead! Who will bring back my bead?"
+Page 3: The parrot said, "I cannot swim." The sunbird said, "The water is too cold." The peacock said, "My tail would get wet." Only the little brown kingfisher said nothing. He stood on his branch, took a big gulp of air, and dived right into the river like an arrow.
+Page 4: It was dark and cold under the water, and he could not see. But he kept going, kicking with his feet, until his beak hit something smooth and round. He grabbed the bead and shot back up into the sunlight, dripping and shivering, and placed it in the Sky's hand.
+Page 5: The Sky was so happy that she gave him a coat of bright blue, the colour of her own morning. The setting sun saw what he had done, and painted his chest a warm orange to match.
+Page 6: That is why the kingfisher is blue and orange today. And that is why, even now, he still sits by the river and dives into the water again and again. He is checking that no one has dropped another bead.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -477,7 +387,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 6. Square.
-Words on this page: One morning, the Sky leaned down to look at herself in the river. As she bent over, a blue bead fell from her necklace and dropped into the water. It sank down, down, down, to the bottom of the deep, dark river. The Sky cried out. "My bead! Who will bring back my bead?"
+Words on this page: One morning, the Sky leaned down to look at herself in the river. As she bent over, a blue bead fell from her necklace and dropped into the water. It sank down, down, down, to the dark earth at the bottom of the river. The Sky cried out. "My bead! Who will bring back my bead?"
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -485,7 +395,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 6. Square.
-Words on this page: The parrot said, "I cannot swim." The sunbird said, "The water is too cold." The peacock said, "My tail would get wet." Only the little brown kingfisher said nothing. He stood on his branch, took a deep breath, and dived straight into the river like an arrow.
+Words on this page: The parrot said, "I cannot swim." The sunbird said, "The water is too cold." The peacock said, "My tail would get wet." Only the little brown kingfisher said nothing. He stood on his branch, took a big gulp of air, and dived right into the river like an arrow.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -493,7 +403,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 6. Square.
-Words on this page: It was dark and cold under the water, and he could not see. But he kept going, kicking with his feet, until his beak touched something smooth and round. He grabbed the bead and shot back up into the sunlight, dripping and shivering, and placed it in the Sky's hand.
+Words on this page: It was dark and cold under the water, and he could not see. But he kept going, kicking with his feet, until his beak hit something smooth and round. He grabbed the bead and shot back up into the sunlight, dripping and shivering, and placed it in the Sky's hand.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -501,7 +411,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 6. Square.
-Words on this page: The Sky was so pleased that she gave him a coat of bright blue, the colour of her own morning. The setting sun saw what he had done, and painted his chest a warm orange to match.
+Words on this page: The Sky was so happy that she gave him a coat of bright blue, the colour of her own morning. The setting sun saw what he had done, and painted his chest a warm orange to match.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -509,7 +419,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 6 of 6. Square.
-Words on this page: That is why the kingfisher is blue and orange today. And that is why, even now, he still sits by the river and dives into the water again and again. He is checking that nobody else has dropped a bead.
+Words on this page: That is why the kingfisher is blue and orange today. And that is why, even now, he still sits by the river and dives into the water again and again. He is checking that no one has dropped another bead.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -523,39 +433,15 @@ _For the back page of the book._
 - **oa** — coats, coat
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **the** — ❤️ tricky part: e says /uh/
 - **world** — ❤️ tricky part: after w, or says /er/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **his** — ❤️ tricky part: s says /z/
-- **were** — ❤️ tricky part: ere says /er/
+- **feathers** — read it to your child for now
 - **colour** — ❤️ tricky part: o says /u/ and our says /er/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **other** — ❤️ tricky part: o says /u/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **could** — ❤️ tricky part: oul says /oo/, as in "book"
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **to** — ❤️ tricky part: o says /oo/
-- **she** — ❤️ tricky part: e says its name, /ē/
-- **from** — ❤️ tricky part: o says /u/
-- **into** — ❤️ tricky part: o says /oo/, like in "to"
-- **water** — ❤️ tricky part: a says /aw/
-- **who** — ❤️ tricky part: wh says /h/ and o says /oo/
-- **said** — ❤️ tricky part: ai says /e/
-- **I** — ❤️ tricky part: always a capital, and it says its name
-- **is** — ❤️ tricky part: s says /z/
-- **would** — ❤️ tricky part: oul says /oo/, as in "book"
-- **nothing** — ❤️ tricky part: o says /u/
-- **something** — ❤️ tricky part: o says /u/ and the first e is silent
-- **so** — ❤️ tricky part: o says its name, /ō/
-- **what** — ❤️ tricky part: a says /o/
-- **done** — ❤️ tricky part: o says /u/ and the e is silent
-- **again** — ❤️ tricky part: ai says /e/
-- **has** — ❤️ tricky part: s says /z/
+- **necklace** — Beads on a string that you wear round your neck
+- **earth** — ❤️ tricky part: ear says /er/
+- **another** — ❤️ tricky part: o says /u/
 
 **Word meanings** — talk about these before reading:
 - **plain** — Not fancy or bright
-- **necklace** — Beads on a string that you wear round your neck
 - **arrow** — A thin, sharp stick shot from a bow
 - **shivering** — Shaking because you are cold
 - **setting sun** — The sun going down in the evening

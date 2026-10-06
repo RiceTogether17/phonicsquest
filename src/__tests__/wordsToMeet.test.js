@@ -1,44 +1,48 @@
 /**
- * The words shown before a story: supportWords plus the heart words its
- * spelling check lets through, in the band where they are new.
+ * The words shown before a story: supportWords, less the shared heart and
+ * sight words the bank first needed in an earlier band.
  */
 import { describe, expect, it } from 'vitest';
 import { STORIES } from '../data/stories.js';
-import { getSightWordCode } from '../data/sightWordCode.js';
 import {
   MASCOT_NAME,
   ONOMATOPOEIA,
   isWordDecodable,
   supportWords,
 } from '../modules/decodability.js';
-import { heartWordFirstBand, wordsToMeet } from '../modules/wordsToMeet.js';
+import { sharedWordFirstBand, wordsToMeet } from '../modules/wordsToMeet.js';
 
 const byId = (id) => STORIES.find((s) => s.id === id);
+const SHARED = new Set(['hfw', 'tricky', 'sight']);
 
 describe('wordsToMeet', () => {
-  it('shows a heart word the spelling check would let a child sound out wrongly', () => {
-    // "was" parses as w-a-s, inside a short-a story's code, so supportWords
-    // never listed it — and a child sounding it out says "wass".
+  it('shows a heart word that a child would sound out wrongly', () => {
+    // "was" parses as w-a-s, every letter inside a short-a story's code, and
+    // a child sounding it out says "wass". It used to count as decodable.
     const nap = byId('core-a-04');
-    expect(isWordDecodable('was', nap.phase)).toBe(true);
-    expect(supportWords(nap).map((w) => w.word)).not.toContain('was');
-    expect(wordsToMeet(nap)).toContainEqual({ word: 'was', display: 'was', status: 'heart' });
+    expect(isWordDecodable('was', nap.phase)).toBe(false);
+    expect(wordsToMeet(nap).map((w) => w.word)).toContain('was');
   });
 
-  it('keeps every word supportWords lists, with its status', () => {
+  it('shows the words that belong to the story every time', () => {
+    // A pre-taught word or a name is this story's own homework.
     for (const story of STORIES) {
       const meet = wordsToMeet(story);
-      for (const w of supportWords(story)) expect(meet, story.id).toContainEqual(w);
+      for (const w of supportWords(story).filter((x) => !SHARED.has(x.status))) {
+        expect(meet, story.id).toContainEqual(w);
+      }
     }
   });
 
-  it('adds only heart words, and only in the band that first uses them', () => {
+  it('shows a shared heart or sight word only in the band that first needs it', () => {
     for (const story of STORIES) {
-      for (const w of wordsToMeet(story).filter((x) => x.status === 'heart')) {
-        expect(getSightWordCode(w.word)?.category, `${story.id}: ${w.word}`).toBe('heart');
-        expect(heartWordFirstBand(w.word), `${story.id}: ${w.word}`).toBe(story.band);
+      for (const w of wordsToMeet(story).filter((x) => SHARED.has(x.status))) {
+        expect(sharedWordFirstBand(w.word), `${story.id}: ${w.word}`).toBe(story.band);
       }
     }
+    // "the" is new in Band A, and a Band D reader has met it hundreds of times.
+    expect(sharedWordFirstBand('the')).toBe('A');
+    expect(wordsToMeet(byId('core-d-01')).map((w) => w.word)).not.toContain('the');
   });
 
   it('lists the words in the order the child meets them, once each', () => {
@@ -48,6 +52,13 @@ describe('wordsToMeet', () => {
     }
     const nap = wordsToMeet(byId('core-a-04')).map((w) => w.word);
     expect(nap.indexOf('was')).toBeLessThan(nap.indexOf('said'));
+  });
+
+  it('includes the words of a refrain', () => {
+    // "Wiggle, wiggle, will it go? Not yet, no!" — the story text never says
+    // "go", so a list built from the counted text alone missed it.
+    const tooth = byId('core-b-20');
+    expect(supportWords(tooth).map((w) => w.word)).toContain('go');
   });
 
   it('still fits in one sitting', () => {

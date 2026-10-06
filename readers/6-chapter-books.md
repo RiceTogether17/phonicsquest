@@ -20,7 +20,7 @@ _Print this on the inside cover of every book in the set._
 
 ## The Lost Key
 
-`chapter-lost-key` · Band D · 295 words · sounds: ar, ir, er
+`chapter-lost-key` · Band D · 296 words · sounds: ar, ir, er
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -48,12 +48,12 @@ RULES FOR EVERY PICTURE
 THE STORY
 
 Chapter 1: Giri Finds the Key
-Page 1: Giri was at the park when he saw a shiny key on the path. The key had no name on it. He looked around the park to see if anyone was searching, but the path was empty and no one was near.
+Page 1: Giri was at the park when he saw a shiny key on the path. The key had no name on it. He looked around the park to see if anyone was looking, but the path was empty and no one was near.
 Page 2: Giri picked up the key and put it in his shirt pocket. He walked to the ranger hut and showed it to the park ranger. "I will help find the owner," said the ranger. He pinned a note on the park board.
 Page 3: Giri felt glad he had not left the key on the ground. Someone out there needed it to get home.
 
 Chapter 2: The Search
-Page 1: The ranger put up a paper on the park board: "Found: one key. Ask at the hut." Many people came to ask, but none had the right key. Giri and the ranger checked each person one by one.
+Page 1: The ranger put up a paper on the park board: "Found: one key. Ask at the hut." Many people came to ask, but no one had the right key. Giri and the ranger checked each person one by one.
 Page 2: A boy tried to grab the key and run. Giri called out, "Stop! That is not yours!" The boy gave back the key. Giri felt firm and fair. It was important to make sure the key went to the right person.
 Page 3: Giri and the ranger went on looking. They were sure the right owner would come.
 
@@ -76,7 +76,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for Chapter 1, page 1 of 3. Square.
-Words on this page: Giri was at the park when he saw a shiny key on the path. The key had no name on it. He looked around the park to see if anyone was searching, but the path was empty and no one was near.
+Words on this page: Giri was at the park when he saw a shiny key on the path. The key had no name on it. He looked around the park to see if anyone was looking, but the path was empty and no one was near.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -100,7 +100,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for Chapter 2, page 1 of 3. Square.
-Words on this page: The ranger put up a paper on the park board: "Found: one key. Ask at the hut." Many people came to ask, but none had the right key. Giri and the ranger checked each person one by one.
+Words on this page: The ranger put up a paper on the park board: "Found: one key. Ask at the hut." Many people came to ask, but no one had the right key. Giri and the ranger checked each person one by one.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -154,18 +154,9 @@ _For the back page of the book._
 - **er** — owner
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **the** — ❤️ tricky part: e says /uh/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **no** — ❤️ tricky part: o says its name, /ō/
-- **to** — ❤️ tricky part: o says /oo/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **put** — ❤️ tricky part: u says /oo/, as in "book"
-- **his** — ❤️ tricky part: s says /z/
-- **I** — ❤️ tricky part: always a capital, and it says its name
-- **said** — ❤️ tricky part: ai says /e/
-- **there** — ❤️ tricky part: ere says /air/
+- **key** — ❤️ tricky part: ey says /ee/
+- **anyone** — ❤️ tricky part: a says /e/, and "one" says "wun"
+- **someone** — ❤️ tricky part: o says /u/, and "one" says "wun"
 
 **Word meanings** — talk about these before reading:
 - **shiny** — Bright and gleaming, like polished metal
@@ -183,7 +174,7 @@ _For the back page of the book._
    Someone might need it to get home ✓ · Keys are pretty · Giri wanted to keep it · The ranger asked him to
 4. True or false? Giri put the key in his shirt pocket.  
    True ✓ · False · The story does not say
-5. He looked around the park to see if anyone was searching, but the path was ___ and no one was near.  
+5. He looked around the park to see if anyone was looking, but the path was ___ and no one was near.  
    empty ✓ · shiny · pocket
 
 **Write about it:** What would you have done if you found the key? Why?  
@@ -209,21 +200,8 @@ _For the back page of the book._
 - **er** — paper, person, owner
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **the** — ❤️ tricky part: e says /uh/
-- **put** — ❤️ tricky part: u says /oo/, as in "book"
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **many** — ❤️ tricky part: a says /e/
-- **people** — ❤️ tricky part: eo says /ee/
-- **to** — ❤️ tricky part: o says /oo/
-- **called** — ❤️ tricky part: a says /aw/
-- **is** — ❤️ tricky part: s says /z/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **sure** — ❤️ tricky part: s says /sh/ and ure says /or/
-- **they** — ❤️ tricky part: ey says /ay/
-- **were** — ❤️ tricky part: ere says /er/
-- **would** — ❤️ tricky part: oul says /oo/, as in "book"
-- **come** — ❤️ tricky part: o says /u/ and the e is silent
+- **key** — ❤️ tricky part: ey says /ee/
+- **yours** — read it to your child for now
 
 **Word meanings** — talk about these before reading:
 - **board** — A flat surface on a wall where notices can be put up
@@ -234,7 +212,7 @@ _For the back page of the book._
 
 **After reading — check understanding** (answer ticked):
 1. What did the ranger put on the board?  
-   A note about the found key ✓ · A picture of the key · A list of names · A map of the park
+   A note about the found key ✓ · A drawing of the key · A list of names · A map of the park
 2. What did the boy try to do?  
    Grab the key and run ✓ · Help find the owner · Ask if it was his · Leave the park
 3. Why was it important for Giri to speak up?  
@@ -265,21 +243,7 @@ _For the back page of the book._
 - **oy** — joy, boy
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **the** — ❤️ tricky part: e says /uh/
-- **to** — ❤️ tricky part: o says /oo/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **said** — ❤️ tricky part: ai says /e/
-- **could** — ❤️ tricky part: oul says /oo/, as in "book"
-- **his** — ❤️ tricky part: s says /z/
-- **they** — ❤️ tricky part: ey says /ay/
-- **what** — ❤️ tricky part: a says /o/
-- **were** — ❤️ tricky part: ere says /er/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **you** — ❤️ tricky part: ou says /oo/
-- **are** — ❤️ tricky part: the e is silent
-- **is** — ❤️ tricky part: s says /z/
-- **small** — ❤️ tricky part: a says /aw/
+- **key** — ❤️ tricky part: ey says /ee/
 
 **Word meanings** — talk about these before reading:
 - **joy** — A feeling of great happiness
@@ -317,7 +281,7 @@ _Read this one together: it uses some words and sentences beyond the sounds your
 
 ## The Night Market
 
-`chapter-night-market` · Band D · 238 words · sounds: igh, ur, ou
+`chapter-night-market` · Band D · 240 words · sounds: igh, ur, ou
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -346,12 +310,12 @@ THE STORY
 
 Chapter 1: Lights in the Dark
 Page 1: One evening, Giri's street began to change. Vans pulled up, and stalls grew along the road like mushrooms after rain. By sunset, strings of little lights hung between the lamp posts. The night market had come to town.
-Page 2: Giri walked through the market with wide eyes. Stalls sold cold drinks, warm kueh, and sizzling snacks. Smoke curled up from a satay grill, and somewhere a bell rang again and again.
-Page 3: Then, near the last stall, Giri heard a sound that made him stop and turn. Somewhere close by, someone small was crying.
+Page 2: Giri walked through the market with wide eyes. Stalls sold cold drinks, warm kueh, and sizzling snacks. Smoke curled up from a satay grill, and far off, a bell rang again and again.
+Page 3: Then, near the last stall, Giri heard a sound that made him stop and turn. Not far off, someone small was crying.
 
 Chapter 2: The Lost Girl
 Page 1: Behind the last stall stood a small girl with tears on her cheeks. She had lost her father in the crowd. "I turned round and he was gone," she sobbed. "I cannot find him."
-Page 2: Giri remembered being lost once, and how scary it had felt. "Hold my hand," he said. "We will find him together." They walked to the satay man, who lifted the girl up high and called out in a booming voice, "Whose girl is this?"
+Page 2: Giri remembered being lost once, and how scary it had felt. "Hold my hand," he said. "We will find him together." They walked to the satay man, who lifted the girl up high and called out in a booming voice, "Who has lost this girl?"
 Page 3: A man burst out of the crowd with wide, worried eyes. He hugged the girl tight and shook hands with Giri again and again. As they rode away on the bus, the girl waved at Giri through the window.
 Page 4: Giri walked home under the strings of lights. The market was loud and bright, but the best part of the night was the small hand that had held his.
 ```
@@ -377,7 +341,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for Chapter 1, page 2 of 3. Square.
-Words on this page: Giri walked through the market with wide eyes. Stalls sold cold drinks, warm kueh, and sizzling snacks. Smoke curled up from a satay grill, and somewhere a bell rang again and again.
+Words on this page: Giri walked through the market with wide eyes. Stalls sold cold drinks, warm kueh, and sizzling snacks. Smoke curled up from a satay grill, and far off, a bell rang again and again.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -385,7 +349,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for Chapter 1, page 3 of 3. Square.
-Words on this page: Then, near the last stall, Giri heard a sound that made him stop and turn. Somewhere close by, someone small was crying.
+Words on this page: Then, near the last stall, Giri heard a sound that made him stop and turn. Not far off, someone small was crying.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -401,7 +365,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for Chapter 2, page 2 of 4. Square.
-Words on this page: Giri remembered being lost once, and how scary it had felt. "Hold my hand," he said. "We will find him together." They walked to the satay man, who lifted the girl up high and called out in a booming voice, "Whose girl is this?"
+Words on this page: Giri remembered being lost once, and how scary it had felt. "Hold my hand," he said. "We will find him together." They walked to the satay man, who lifted the girl up high and called out in a booming voice, "Who has lost this girl?"
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -430,20 +394,7 @@ _For the back page of the book._
 - **ur** — curled, turn
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **to** — ❤️ tricky part: o says /oo/
-- **pulled** — ❤️ tricky part: u says /oo/, as in "book"
-- **the** — ❤️ tricky part: e says /uh/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **come** — ❤️ tricky part: o says /u/ and the e is silent
-- **through** — ❤️ tricky part: ough says /oo/
-- **from** — ❤️ tricky part: o says /u/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **again** — ❤️ tricky part: ai says /e/
-- **heard** — ❤️ tricky part: ear says /er/
-- **close** — ❤️ tricky part: s says /z/
-- **small** — ❤️ tricky part: a says /aw/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
+- **someone** — ❤️ tricky part: o says /u/, and "one" says "wun"
 
 **Word meanings** — talk about these before reading:
 - **stalls** — Small open shops at a market
@@ -473,7 +424,7 @@ _A good answer:_ I think he will help, because Giri always stops to help someone
 
 **Spot it: Similes with "like"** — Stalls grew along the road like mushrooms after rain.. A simile compares two things using "like" to paint a picture.
 
-**Spot it: Cliffhanger endings** — Somewhere close by, someone small was crying.. A chapter can end on a mystery so you want to read the next one!
+**Spot it: Cliffhanger endings** — Not far off, someone small was crying.. A chapter can end on a mystery so you want to read the next one!
 
 _Read this one together: it uses some words and sentences beyond the sounds your child has been taught._
 
@@ -487,37 +438,18 @@ _For the back page of the book._
 - **ow** — how
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **the** — ❤️ tricky part: e says /uh/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **small** — ❤️ tricky part: a says /aw/
-- **she** — ❤️ tricky part: e says its name, /ē/
-- **father** — ❤️ tricky part: a says /ar/
-- **I** — ❤️ tricky part: always a capital, and it says its name
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **once** — ❤️ tricky part: it says "wunce": o makes /w/ and /u/
-- **said** — ❤️ tricky part: ai says /e/
-- **we** — ❤️ tricky part: e says its name, /ē/
-- **they** — ❤️ tricky part: ey says /ay/
-- **to** — ❤️ tricky part: o says /oo/
-- **who** — ❤️ tricky part: wh says /h/ and o says /oo/
-- **called** — ❤️ tricky part: a says /aw/
-- **is** — ❤️ tricky part: s says /z/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **again** — ❤️ tricky part: ai says /e/
-- **through** — ❤️ tricky part: ough says /oo/
-- **his** — ❤️ tricky part: s says /z/
+- **gone** — ❤️ tricky part: o says /o/, as in "hot", and the e is silent
+- **worried** — Feeling afraid something bad happened
 
 **Word meanings** — talk about these before reading:
 - **sobbed** — Cried with big, shaking breaths
 - **booming** — Very loud and deep
 - **burst** — Came out suddenly and fast
-- **worried** — Feeling afraid something bad happened
 - **waved** — Moved a hand to say hello or goodbye
 
 **After reading — check understanding** (answer ticked):
 1. Why was the girl crying?  
-   She had lost her father in the crowd ✓ · She dropped her snack · She was scared of the dark · She hurt her knee
+   She had lost her father in the crowd ✓ · She dropped her snack · She was scared of the dark · She hurt her leg
 2. Who helped call out to the crowd?  
    The satay man ✓ · A police officer · Mrs Tan · The bus driver
 3. Why did Giri know how the girl felt?  

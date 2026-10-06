@@ -48,16 +48,39 @@
  * longest-match pattern scan with suffix stripping. A word is decodable at
  * a story's phase when requiredTier(word) <= tier(phase).
  *
- * KNOWN LIMITATION (by design): the check is graphemic, not phonemic. A
- * letter-plain irregular like "was" (/wŏz/) parses as w-a-s and counts
- * decodable; that gap is exactly what the HFW tiers (hfw.js) and tricky
- * words (trickyWords.js) exist for, and both are still enforced as the
- * only legal routes for words ABOVE the story's tier.
+ * SOUNDS, NOT ONLY LETTERS. Letters alone over-count: "was" parses as
+ * w-a-s, "his" as h-i-s and "last" as l-a-s-t, all letters a Band A reader
+ * knows, and all three say something else (/wŏz/, /hiz/, /larst/ in
+ * Singapore and British English). A child sounding them out with the sounds
+ * they were taught reads the wrong word. So a word is decodable only when
+ * its letters are taught AND each of them makes the sound it was taught to
+ * make by this point (`soundPhase`):
+ *
+ *   - A heart word — one with a part that never follows the code (the e of
+ *     "the", the s of "his", the a of "was") — is never decodable. It
+ *     reaches a story through the HFW tiers, the tricky-word schedule, the
+ *     quest sight words or pre-teaching, and so it is on the list of words
+ *     to meet before the story.
+ *   - A regular word whose sound is taught later than its letters is
+ *     decodable from that lesson: a says /ar/ in "fast" (with ar, phase 7),
+ *     soft c and g in "rice" and "gem" (phase 7), ow as in "cow" (phase 8),
+ *     a long vowel on its own in "cold" (phase 6), -tion (phase 10).
+ *
+ * What each word says comes from sightWordCode.js (`getWordCode`), which
+ * describes every sight word and every story word whose spelling does not
+ * give its sounds away, and from a few spelling rules that need no list
+ * (`soundRulePhase`). The tier gate is about letters and uses `tier`; the
+ * sound gate is about lessons and uses `curriculumPhase`.
+ *
+ * A plural or verb -s that says /z/ ("dogs", "runs") stays decodable: a
+ * child blending d-o-g-s says "dogz" without being taught to, and -s is
+ * taught as an ending, not as a letter sound.
  */
 
 import { WORDS } from '../data/words.js';
 import { getHFWTier } from '../data/hfw.js';
 import { getTrickyWord } from '../data/trickyWords.js';
+import { getWordCode } from '../data/sightWordCode.js';
 
 // ── Story phases ─────────────────────────────────────────────────────────
 
@@ -459,6 +482,170 @@ export function stripSuffix(word) {
   return null;
 }
 
+// ── Sounds ───────────────────────────────────────────────────────────────
+
+/**
+ * Words where ow says its name (/ō/, snow) rather than /ow/ (cow). The two
+ * share a spelling, and only the first is taught with the long vowels; the
+ * second waits for the diphthongs. Shared with the sound colours.
+ */
+export const OW_LONG = Object.freeze(
+  new Set([
+    'snow',
+    'show',
+    'shown',
+    'low',
+    'below',
+    'grow',
+    'grown',
+    'blow',
+    'blown',
+    'glow',
+    'flow',
+    'slow',
+    'throw',
+    'thrown',
+    'own',
+    'owned',
+    'owner',
+    'know',
+    'known',
+    'yellow',
+    'follow',
+    'window',
+    'arrow',
+    'narrow',
+    'elbow',
+    'rainbow',
+    'bowl',
+    'sparrow',
+    'pillow',
+    'shadow',
+    'meadow',
+    'borrow',
+    'tomorrow',
+    'row',
+    'mow',
+    'sow',
+    'bow',
+    'crow',
+    'flown',
+    'growth',
+    'teow',
+  ]),
+);
+
+/** Inflections stripped before an OW_LONG lookup ("showed" → "show"). */
+const OW_INFLECT = ['ing', 'ed', 'ly', 'es', 's', 'n'];
+
+/** Does ow say its name (/ō/) in this word? */
+export function owSaysItsName(word) {
+  if (OW_LONG.has(word)) return true;
+  return OW_INFLECT.some(
+    (suf) =>
+      word.endsWith(suf) &&
+      word.length - suf.length >= 2 &&
+      OW_LONG.has(word.slice(0, -suf.length)),
+  );
+}
+
+/**
+ * Words where g before e, i or y keeps its hard /g/ sound. Everywhere else
+ * that g is soft (/j/: gem, huge, large), which is taught at phase 7.
+ */
+const HARD_G = new Set([
+  'get',
+  'gets',
+  'getting',
+  'give',
+  'gives',
+  'giving',
+  'gift',
+  'gifts',
+  'girl',
+  'girls',
+  'giggle',
+  'giggles',
+  'giggled',
+  'giggling',
+  'begin',
+  'begins',
+  'beginning',
+  'forget',
+  'forgets',
+  'forgetting',
+  'together',
+  'tiger',
+  'tigers',
+  'finger',
+  'fingers',
+  'target',
+  'gear',
+  'geese',
+  'gecko',
+  'giri',
+  'hunger',
+  'hungry',
+  'anger',
+  'angry',
+  'eager',
+]);
+
+/** Does this word have a soft g (/j/) — g before e, i or y that is not hard? */
+function hasSoftG(word) {
+  if (!/g[eiy]/.test(word) || HARD_G.has(word)) return false;
+  const st = stripSuffix(word);
+  if (st && HARD_G.has(st.base)) return false;
+  // gg is hard (bigger, hugged); so is the ng of a word with an ending
+  // (singing, banged, longer), where the g belongs to the base word.
+  const rest = word.replace(/gg/g, '');
+  if (!/g[eiy]/.test(rest)) return false;
+  if (st && /ng$/.test(st.base) && !/g[eiy]/.test(st.base)) return false;
+  return true;
+}
+
+/**
+ * The phase from which spelling rules alone say a word's sounds are taught,
+ * for words with no entry in sightWordCode.js: soft c (rice) and soft g
+ * (gem) at 7, ow as in cow at 8, -tion and -sion at 10. 1 when none apply.
+ */
+export function soundRulePhase(word) {
+  let p = 1;
+  if (/c[eiy]/.test(word) || hasSoftG(word)) p = 7;
+  if (word.includes('ow') && !owSaysItsName(word)) p = Math.max(p, 8);
+  if (/[ts]ion/.test(word)) p = 10;
+  return p;
+}
+
+/**
+ * What a word says, letter group by letter group, when its spelling does not
+ * give that away: its own entry in sightWordCode.js, or its base word's
+ * ("pushed" → "push"). Null when every letter makes its taught sound.
+ * @param {string} clean  cleaned token
+ */
+export function wordSoundCode(clean) {
+  const code = getWordCode(clean);
+  if (code) return code;
+  const st = stripSuffix(clean);
+  if (!st) return null;
+  // stripSuffix's guesses at a dropped e or a doubled letter misread some
+  // words ("afternoons" → "afternoone", "classes" → "clas"), so the base as
+  // written is tried as well.
+  return getWordCode(st.base) ?? getWordCode(clean.slice(0, -st.suffix.length));
+}
+
+/**
+ * The curriculum phase from which every sound in the word has been taught —
+ * Infinity for a heart word, which is never sounded out in full.
+ * @param {string} clean  cleaned token
+ * @returns {number}
+ */
+export function soundPhase(clean) {
+  const code = wordSoundCode(clean);
+  if (code) return code.category === 'heart' ? Infinity : code.soundPhase;
+  return soundRulePhase(clean);
+}
+
 /**
  * The lowest code tier at which a word is decodable.
  * Uses the curated words.js entry when one exists (accurate segmentation),
@@ -579,7 +766,8 @@ export function isWordDecodable(word, phaseId) {
   return (
     requiredTier(clean) <= phase.tier &&
     withinVowelBudget(phase, clean) &&
-    withinGraphemeBudget(phase, clean)
+    withinGraphemeBudget(phase, clean) &&
+    soundPhase(clean) <= phase.curriculumPhase
   );
 }
 
@@ -610,6 +798,26 @@ export function extractCountableTokens(story) {
   const tokens = [];
   for (const line of story.lines ?? []) {
     if (!COUNTABLE_LINE_TYPES.has(line.type) || !line.text) continue;
+    for (const raw of line.text.split(/[\s–—-]+/)) {
+      const clean = cleanToken(raw);
+      if (clean) tokens.push(clean);
+    }
+  }
+  return tokens;
+}
+
+/**
+ * Every word the child reads, in order: the counted lines and the refrains.
+ * A refrain is left out of the count (see above) but not out of the reading,
+ * so a word a child cannot sound out in a refrain belongs on the list of
+ * words to meet as much as one in the story.
+ * @param {object} story
+ * @returns {string[]}
+ */
+export function extractReadTokens(story) {
+  const tokens = [];
+  for (const line of story.lines ?? []) {
+    if ((!COUNTABLE_LINE_TYPES.has(line.type) && line.type !== 'refrain') || !line.text) continue;
     for (const raw of line.text.split(/[\s–—-]+/)) {
       const clean = cleanToken(raw);
       if (clean) tokens.push(clean);
@@ -655,6 +863,28 @@ function sightWordSet(story) {
 }
 
 /**
+ * A high-frequency word with an ending the child has been taught: a reader
+ * who knows "walk" by heart reads "walked" as walk + -ed. The ending has to
+ * be within the story's tier, or the word is no easier than any other.
+ * @returns {number|null} the base word's HFW tier
+ */
+function hfwTierWithEnding(clean, phase) {
+  const st = stripSuffix(clean);
+  if (!st || !phase || (SUFFIX_TIERS[st.suffix] ?? Infinity) > phase.tier) return null;
+  // stripSuffix undoes a doubled letter ("running" → "run"), which turns
+  // "called" into "cal"; the base as written is tried too.
+  return getHFWTier(st.base) ?? getHFWTier(clean.slice(0, -st.suffix.length));
+}
+
+/** A quest sight word with an ending the child has been taught ("watched"). */
+function sightWithEnding(clean, phase, sight) {
+  if (!sight.size) return false;
+  const st = stripSuffix(clean);
+  if (!st || !phase || (SUFFIX_TIERS[st.suffix] ?? Infinity) > phase.tier) return false;
+  return sight.has(st.base) || sight.has(clean.slice(0, -st.suffix.length));
+}
+
+/**
  * Classify one cleaned token against a story's allowances.
  *
  * Order matters: graphemic decodability at the story's tier comes first
@@ -690,20 +920,21 @@ export function classifyWord(
     phase &&
     tier <= phase.tier &&
     withinVowelBudget(phase, clean) &&
-    withinGraphemeBudget(phase, clean)
+    withinGraphemeBudget(phase, clean) &&
+    soundPhase(clean) <= phase.curriculumPhase
   ) {
     return make('decodable');
   }
   if (PROPER_NOUNS.has(clean)) return make('proper');
   if (ONOMATOPOEIA.has(clean)) return make('onomatopoeia');
 
-  const hfwTier = getHFWTier(clean);
+  const hfwTier = getHFWTier(clean) ?? hfwTierWithEnding(clean, phase);
   if (hfwTier !== null && hfwTier <= (story.allowedHFWTier ?? 0)) return make('hfw');
 
   const tricky = getTrickyWord(clean);
   if (tricky && phase && tricky.phase <= phase.curriculumPhase) return make('tricky');
 
-  if (sight.has(clean)) return make('sight');
+  if (sight.has(clean) || sightWithEnding(clean, phase, sight)) return make('sight');
   if (pretaught.has(clean)) return make('pretaught');
   return make('stretch');
 }
@@ -911,7 +1142,7 @@ export function supportWords(story) {
   const phase = getStoryPhase(story.phase);
   /** @type {Map<string, string>} word → status, first occurrence wins */
   const seen = new Map();
-  for (const token of extractCountableTokens(story)) {
+  for (const token of extractReadTokens(story)) {
     const c = classifyWord(token, story, pretaught, sight);
     if (seen.has(c.word)) continue;
     if (SUPPORT_STATUSES.has(c.status)) {

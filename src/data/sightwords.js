@@ -147,6 +147,16 @@ export function getIntroducedSightWords(storyId) {
   return ALIGNED_QUESTS.slice(0, idx + 1).flatMap(q => q.words.map(w => w.toLowerCase()));
 }
 
+/**
+ * Every sight word the story-aligned quests teach. A story read after the
+ * last aligned one (core-c-11) — Band D, Band E, the chapter books — comes
+ * after the whole course, so a reader there knows all of these.
+ * @returns {string[]}  lowercased words, quest order
+ */
+export function getAllAlignedSightWords() {
+  return ALIGNED_QUESTS.flatMap(q => q.words.map(w => w.toLowerCase()));
+}
+
 /** Lookup quest by id */
 export function getQuestById(id) {
   return SIGHT_QUESTS.find(q => q.id === id) ?? null;

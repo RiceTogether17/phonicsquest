@@ -1,41 +1,44 @@
 /**
  * PhonicsQuest – the words a child meets before a story
  *
- * `supportWords` (decodability.js) lists the words a story uses that are
- * legal by a route other than sounding out. By construction it cannot list
- * the heart words its own spelling check passes: "said" is s-ai-d and "the"
- * is th-e, both inside Band B's code, so no Band B story ever showed them
- * before reading, and a child sounding out "said" says "sayd". The check is
- * graphemic on purpose (see KNOWN LIMITATION in decodability.js), so the
- * gap is closed here, in the list the child sees, rather than in the
- * validator.
+ * `supportWords` (decodability.js) lists every word a story uses that the
+ * child cannot sound out by this point: the heart words ("the", "said",
+ * "his"), words whose sound comes in a later lesson ("fast" before a can
+ * say /ar/), and the story's own pre-taught words and names. That is the
+ * honest list of what a child needs, and in a Band D story it runs to
+ * thirty words, most of them met in every story since Band A.
  *
- * A heart word joins the list in the band where the story bank first uses
- * it, because that is where it is new. Listing it in every later story as
- * well would put 26 words in front of one Band D story and push 38 stories
- * past the twelve a child can meet in one sitting, for words they have
- * already met many times.
+ * So the list shown before reading keeps two kinds of word apart:
+ *
+ *   - A word that belongs to this story (pre-taught, a name) is always shown.
+ *   - A word the whole bank shares — a heart word or sight word, legal
+ *     through the HFW tiers, the tricky-word schedule or the sight-word
+ *     quests — is shown in the band where the story bank first needs it,
+ *     because that is where it is new. Listing it in every later story would
+ *     put twenty-odd words in front of one Band D story, for words the child
+ *     has already met many times.
  */
 
 import { STORIES } from '../data/stories.js';
-import { getSightWordCode } from '../data/sightWordCode.js';
-import { extractCountableTokens, supportWords } from './decodability.js';
+import { supportWords } from './decodability.js';
 
 const BAND_ORDER = ['A', 'B', 'C', 'D', 'E'];
 
-/** @type {Map<string, string>|null} heart word → band that first uses it */
+/** Statuses of words every story shares, taught once and met everywhere. */
+const SHARED = new Set(['hfw', 'tricky', 'sight']);
+
+/** @type {Map<string, string>|null} shared word → band that first needs it */
 let _firstBand = null;
 
-/** The band in which the story bank first uses a heart word, else null. */
-export function heartWordFirstBand(word) {
+/** The band in which the story bank first needs a shared word, else null. */
+export function sharedWordFirstBand(word) {
   if (!_firstBand) {
     _firstBand = new Map();
     for (const band of BAND_ORDER) {
       for (const story of STORIES) {
         if (story.band !== band) continue;
-        for (const token of extractCountableTokens(story)) {
-          if (_firstBand.has(token)) continue;
-          if (getSightWordCode(token)?.category === 'heart') _firstBand.set(token, band);
+        for (const w of supportWords(story)) {
+          if (SHARED.has(w.status) && !_firstBand.has(w.word)) _firstBand.set(w.word, band);
         }
       }
     }
@@ -44,27 +47,15 @@ export function heartWordFirstBand(word) {
 }
 
 /**
- * The words to show before a story: `supportWords`, plus the heart words
- * that are new in this story's band, in the order the child meets them.
- *
- * `status` is supportWords' status, or 'heart' for a word added here.
+ * The words to show before a story, in the order the child meets them:
+ * `supportWords`, less the shared words first needed in an earlier band.
  *
  * @param {object} story
  * @returns {Array<{ word: string, display: string, status: string }>}
  */
 export function wordsToMeet(story) {
   if (!story) return [];
-  const support = new Map(supportWords(story).map((w) => [w.word, w]));
-  const out = [];
-  const seen = new Set();
-  for (const token of extractCountableTokens(story)) {
-    if (seen.has(token)) continue;
-    seen.add(token);
-    if (support.has(token)) {
-      out.push(support.get(token));
-    } else if (heartWordFirstBand(token) === story.band) {
-      out.push({ word: token, display: token === 'i' ? 'I' : token, status: 'heart' });
-    }
-  }
-  return out;
+  return supportWords(story).filter(
+    (w) => !SHARED.has(w.status) || sharedWordFirstBand(w.word) === story.band,
+  );
 }
