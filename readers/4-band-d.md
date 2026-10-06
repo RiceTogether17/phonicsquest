@@ -104,30 +104,14 @@ _For the back page of the book._
 - **are** — careful
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **the** — ❤️ tricky part: e says /uh/
-- **whole** — ❤️ tricky part: wh says /h/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **into** — ❤️ tricky part: o says /oo/, like in "to"
-- **would** — ❤️ tricky part: oul says /oo/, as in "book"
-- **you** — ❤️ tricky part: ou says /oo/
-- **to** — ❤️ tricky part: o says /oo/
-- **have** — ❤️ tricky part: words never end in v, so an e comes after it — the a stays short
-- **work** — ❤️ tricky part: after w, or says /er/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **said** — ❤️ tricky part: ai says /e/
-- **through** — ❤️ tricky part: ough says /oo/
-- **friend** — ❤️ tricky part: ie says /e/
-- **all** — ❤️ tricky part: a says /aw/
+- **watched** — read it to your child for now
+- **discovered** — Found out something new for the first time
 
 **Word meanings** — talk about these before reading:
 - **annual** — Happening once every year
 - **carpenter** — A person who makes and repairs things from wood
 - **dowel** — A small round wooden peg used to hold pieces together
 - **mallet** — A type of hammer, often with a wooden head
-- **discovered** — Found out something new for the first time
 
 **After reading — check understanding** (answer ticked):
 1. What were the clowns doing at the fair?  
@@ -156,7 +140,7 @@ _A good answer:_ He had learnt a new skill, fixing a chair with a dowel, and the
 
 ## Giri and the Joyful Noise
 
-`core-d-02` · Band D · 169 words · sounds: oi, oy, ou, ow
+`core-d-02` · Band D · 172 words · sounds: oi, oy, ou, ow
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -182,10 +166,10 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Giri was walking through town when he heard a loud, joyful sound coming from the community hall. He followed the noise and found a crowd of people singing and clapping. A woman in a brown coat was leading the group.
-Page 2: "Come and join!" she called out. Giri felt a bit shy. He sat on a stool by the window and listened. The voices bounced around the room — high, low, loud, and soft. The sound made him feel warm inside.
+Page 1: Giri was walking through town when he heard a loud, joyful sound coming from the community hall. He followed the sound and found a crowd of people singing and clapping. A woman in a brown coat was leading the group.
+Page 2: "Come and join!" she called out. Giri felt a bit shy. He sat on a stool by the window and took it all in. The voices bounced around the room — high, low, loud, and soft. The sound made him feel warm inside.
 Page 3: At last, Giri stood up and joined in. His voice was small at first, but it grew louder with each note. Soon it rang out loud and proud, bouncing round the hall. The woman gave him a proud nod. The whole group swayed and sang until the sun went down.
-Page 4: As the crowd went out, Giri stopped by the door. "Can I come back next week?" he asked. The woman in the brown coat smiled. "We sing here every Monday," she said. Giri hummed the tune all the way home.
+Page 4: As the crowd went out, Giri stopped by the door. "Can I come back next week?" he asked. The woman in the brown coat smiled. "We sing here each week," she said. Giri hummed the tune all the way home.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -201,7 +185,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 4. Square.
-Words on this page: Giri was walking through town when he heard a loud, joyful sound coming from the community hall. He followed the noise and found a crowd of people singing and clapping. A woman in a brown coat was leading the group.
+Words on this page: Giri was walking through town when he heard a loud, joyful sound coming from the community hall. He followed the sound and found a crowd of people singing and clapping. A woman in a brown coat was leading the group.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -209,7 +193,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 4. Square.
-Words on this page: "Come and join!" she called out. Giri felt a bit shy. He sat on a stool by the window and listened. The voices bounced around the room — high, low, loud, and soft. The sound made him feel warm inside.
+Words on this page: "Come and join!" she called out. Giri felt a bit shy. He sat on a stool by the window and took it all in. The voices bounced around the room — high, low, loud, and soft. The sound made him feel warm inside.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -225,7 +209,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 4. Square.
-Words on this page: As the crowd went out, Giri stopped by the door. "Can I come back next week?" he asked. The woman in the brown coat smiled. "We sing here every Monday," she said. Giri hummed the tune all the way home.
+Words on this page: As the crowd went out, Giri stopped by the door. "Can I come back next week?" he asked. The woman in the brown coat smiled. "We sing here each week," she said. Giri hummed the tune all the way home.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -234,34 +218,16 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **oi** — noise, join, voices, joined, voice
+- **oi** — join, voices, joined, voice
 - **oy** — joyful
 - **ou** — loud, out, louder, round
 - **ow** — town, brown, down
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **through** — ❤️ tricky part: ough says /oo/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **heard** — ❤️ tricky part: ear says /er/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **from** — ❤️ tricky part: o says /u/
-- **the** — ❤️ tricky part: e says /uh/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **people** — ❤️ tricky part: eo says /ee/
+- **walking** — read it to your child for now
+- **hall** — ❤️ tricky part: a says /aw/
+- **woman** — ❤️ tricky part: o says /oo/, as in "book"
 - **group** — ❤️ tricky part: ou says /oo/
-- **come** — ❤️ tricky part: o says /u/ and the e is silent
-- **she** — ❤️ tricky part: e says its name, /ē/
-- **called** — ❤️ tricky part: a says /aw/
-- **his** — ❤️ tricky part: s says /z/
-- **small** — ❤️ tricky part: a says /aw/
-- **whole** — ❤️ tricky part: wh says /h/
-- **door** — ❤️ tricky part: oor says /or/
-- **I** — ❤️ tricky part: always a capital, and it says its name
-- **we** — ❤️ tricky part: e says its name, /ē/
-- **monday** — ❤️ tricky part: o says /u/
-- **said** — ❤️ tricky part: ai says /e/
-- **all** — ❤️ tricky part: a says /aw/
 
 **Word meanings** — talk about these before reading:
 - **community** — A group of people who live or meet in the same area
@@ -274,9 +240,9 @@ _For the back page of the book._
 1. Where was the singing happening?  
    In the community hall ✓ · At the park · At school · In Giri's flat
 2. Why did Giri not join in at first?  
-   He felt shy ✓ · He was tired · He did not like music · He could not find the hall
+   He felt shy ✓ · He was tired · He did not like singing · He could not find the hall
 3. What is the main message of this story?  
-   Joining in can bring unexpected joy ✓ · Singing is only for adults · You should always sit by the window · Loud noises are bad
+   Joining in can bring unexpected joy ✓ · Singing is only for adults · You should always sit by the window · Loud sounds are bad
 4. True or false? Giri joined in at once, as soon as he got there.  
    True · False ✓ · The story does not say
 5. The voices ___ around the room — high, low, loud, and soft.  
@@ -324,9 +290,9 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: An old rocking chair sat in the stairwell of Giri's block. It had been there for as long as anyone could remember. The seat was bare, the armrest had a tear, and the paint was wearing thin. No one seemed to care about it any more.
-Page 2: Giri decided to repair the chair. He searched his grandfather's workshop and found sandpaper, glue, and a spare plank. First he glued the cracked armrest. Then he sanded the seat until it was smooth. Finally he cut the plank to replace the broken slat at the back.
-Page 3: It took two afternoons of careful work. When the chair was done, Giri placed a small cushion on the seat and set it by the corridor window where the air was fresh.
+Page 1: An old rocking chair sat in the stairwell of Giri's block. It had been there for as long as anyone could remember. The seat was bare, the armrest had a tear, and the paint was flaking. No one seemed to care about it any more.
+Page 2: Giri decided to repair the chair. He looked in his grandfather's shed and found sandpaper, glue, and a spare plank. First he glued the cracked armrest. Then he sanded the seat until it was smooth. Finally he cut the plank to replace the broken slat at the back.
+Page 3: It took two afternoons of careful work. When the chair was done, Giri placed a small pillow on the seat and set it by the corridor window where the air was fresh.
 Page 4: Mrs Tan from next door sat down and sighed with happiness. "This is the best seat in the block," she declared. Giri beamed. A little care had turned something forgotten into something shared.
 ```
 
@@ -343,7 +309,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 4. Square.
-Words on this page: An old rocking chair sat in the stairwell of Giri's block. It had been there for as long as anyone could remember. The seat was bare, the armrest had a tear, and the paint was wearing thin. No one seemed to care about it any more.
+Words on this page: An old rocking chair sat in the stairwell of Giri's block. It had been there for as long as anyone could remember. The seat was bare, the armrest had a tear, and the paint was flaking. No one seemed to care about it any more.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -351,7 +317,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 4. Square.
-Words on this page: Giri decided to repair the chair. He searched his grandfather's workshop and found sandpaper, glue, and a spare plank. First he glued the cracked armrest. Then he sanded the seat until it was smooth. Finally he cut the plank to replace the broken slat at the back.
+Words on this page: Giri decided to repair the chair. He looked in his grandfather's shed and found sandpaper, glue, and a spare plank. First he glued the cracked armrest. Then he sanded the seat until it was smooth. Finally he cut the plank to replace the broken slat at the back.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -359,7 +325,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 4. Square.
-Words on this page: It took two afternoons of careful work. When the chair was done, Giri placed a small cushion on the seat and set it by the corridor window where the air was fresh.
+Words on this page: It took two afternoons of careful work. When the chair was done, Giri placed a small pillow on the seat and set it by the corridor window where the air was fresh.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -380,29 +346,7 @@ _For the back page of the book._
 - **are** — careful, declared, shared
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **the** — ❤️ tricky part: e says /uh/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **there** — ❤️ tricky part: ere says /air/
-- **could** — ❤️ tricky part: oul says /oo/, as in "book"
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **no** — ❤️ tricky part: o says its name, /ō/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **to** — ❤️ tricky part: o says /oo/
-- **any** — ❤️ tricky part: a says /e/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **his** — ❤️ tricky part: s says /z/
-- **two** — ❤️ tricky part: the w is silent and o says /oo/
-- **work** — ❤️ tricky part: after w, or says /er/
-- **done** — ❤️ tricky part: o says /u/ and the e is silent
-- **small** — ❤️ tricky part: a says /aw/
-- **where** — ❤️ tricky part: ere says /air/, as in "there"
-- **from** — ❤️ tricky part: o says /u/
-- **door** — ❤️ tricky part: oor says /or/
-- **is** — ❤️ tricky part: s says /z/
-- **she** — ❤️ tricky part: e says its name, /ē/
-- **something** — ❤️ tricky part: o says /u/ and the first e is silent
-- **into** — ❤️ tricky part: o says /oo/, like in "to"
+- **anyone** — ❤️ tricky part: a says /e/, and "one" says "wun"
 
 **Word meanings** — talk about these before reading:
 - **stairwell** — The part of a building that holds the stairs
@@ -430,7 +374,7 @@ _A good answer:_ It was old and worn. The seat was bare and the armrest had a te
 - What three things did Giri do to repair the chair?
 - "A little care had turned something forgotten into something shared." What does that mean?
 
-**Spot it: Vowel patterns (air, are, ear)** — "chair", "repair", "stairwell", "air", "bare", "care", "spare", "declared", "wearing". air, are, and ear can all say the /air/ sound: chair, bare, wearing.
+**Spot it: Vowel patterns (air, are, ear)** — "chair", "repair", "stairwell", "air", "bare", "care", "spare", "declared". air and are both say the /air/ sound: chair, bare, spare.
 
 **Spot it: Sequence markers** — First he glued. Then he sanded. Finally he cut.. Use first, then, next, finally to put events in order.
 
@@ -464,8 +408,8 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: It was the last day of the school year. Giri sat near the window, feeling a small knot of fear in his chest. His friends were moving to different classes next year. Would he still see them? Would they forget about him?
-Page 2: The bell rang and Giri walked out to the field. The grass was clear and green in the sunshine. Then, from behind the canteen, he heard a cheer. "Giri! Over here!" He ran towards the sound and saw all his friends gathered under the old rain tree.
+Page 1: It was the last day of the school year. Giri sat near the window, feeling a small flutter of fear in his chest. His friends were moving to different classes next year. Would he still see them? Would they forget about him?
+Page 2: The bell rang and Giri walked out to the field. The grass was clear and green in the sunshine. Then, from behind the canteen, he heard a cheer. "Giri! Over here!" He ran to the sound and saw all his friends gathered under the old rain tree.
 Page 3: They had set up a small farewell party — sandwiches, lemon cordial, and a hand-drawn card with each friend's name. "We will always be near, even if we are not in the same room," said Mei Ling.
 Page 4: Giri felt a tear on his cheek, but it was a happy one. He looked at the card, then at his dear friends. "Same tree next year?" he asked. "Same tree!" they cheered.
 ```
@@ -483,7 +427,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 4. Square.
-Words on this page: It was the last day of the school year. Giri sat near the window, feeling a small knot of fear in his chest. His friends were moving to different classes next year. Would he still see them? Would they forget about him?
+Words on this page: It was the last day of the school year. Giri sat near the window, feeling a small flutter of fear in his chest. His friends were moving to different classes next year. Would he still see them? Would they forget about him?
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -491,7 +435,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 4. Square.
-Words on this page: The bell rang and Giri walked out to the field. The grass was clear and green in the sunshine. Then, from behind the canteen, he heard a cheer. "Giri! Over here!" He ran towards the sound and saw all his friends gathered under the old rain tree.
+Words on this page: The bell rang and Giri walked out to the field. The grass was clear and green in the sunshine. Then, from behind the canteen, he heard a cheer. "Giri! Over here!" He ran to the sound and saw all his friends gathered under the old rain tree.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -519,31 +463,9 @@ _For the back page of the book._
 - **eer** — cheer, cheered
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **the** — ❤️ tricky part: e says /uh/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **school** — ❤️ tricky part: ch says /k/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **small** — ❤️ tricky part: a says /aw/
-- **his** — ❤️ tricky part: s says /z/
 - **friends** — ❤️ tricky part: ie says /e/
-- **were** — ❤️ tricky part: ere says /er/
-- **to** — ❤️ tricky part: o says /oo/
-- **would** — ❤️ tricky part: oul says /oo/, as in "book"
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **they** — ❤️ tricky part: ey says /ay/
+- **moving** — read it to your child for now
 - **field** — ❤️ tricky part: ie says /ee/
-- **from** — ❤️ tricky part: o says /u/
-- **heard** — ❤️ tricky part: ear says /er/
-- **towards** — ❤️ tricky part: ar says /or/
-- **all** — ❤️ tricky part: a says /aw/
-- **friend** — ❤️ tricky part: ie says /e/
-- **we** — ❤️ tricky part: e says its name, /ē/
-- **always** — ❤️ tricky part: a says /aw/
-- **be** — ❤️ tricky part: e says its name, /ē/
-- **are** — ❤️ tricky part: the e is silent
-- **said** — ❤️ tricky part: ai says /e/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
 
 **Word meanings** — talk about these before reading:
 - **farewell** — A way of saying goodbye
@@ -554,11 +476,11 @@ _For the back page of the book._
 
 **After reading — check understanding** (answer ticked):
 1. Why was Giri feeling worried?  
-   His friends were moving to different classes ✓ · He had lost his bag · He failed a test · The school was closing
+   His friends were moving to different classes ✓ · He had lost his bag · He failed a test · The school was moving
 2. What did his friends prepare?  
-   A farewell party ✓ · A football match · A school play · A treasure hunt
+   A farewell party ✓ · A football match · A school play · A sports day
 3. What did Mei Ling mean by "we will always be near"?  
-   True friends stay close in heart even when apart ✓ · They would be in the same class · They lived next door · They would call every day
+   True friends stay friends even when apart ✓ · They would be in the same class · They were next door · They would call every day
 4. True or false? Mei Ling made the hand-drawn card.  
    True · False · The story does not say ✓
 5. They had set up a small ___ party.  
@@ -579,7 +501,7 @@ _A good answer:_ He wanted to keep meeting his friends under the rain tree, even
 
 ## Giri's Sports Day
 
-`core-d-05` · Band D · 180 words · sounds: ou, ow, oi, oy
+`core-d-05` · Band D · 182 words · sounds: ou, ow, oi, oy
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -605,10 +527,10 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: It was Sports Day. The whole school poured out onto the field. Flags snapped in the wind, and the crowd on the bleachers made a joyful roar. Giri was in the relay team. He bounced on his toes at the starting point, trying to shake off the doubt in his stomach.
-Page 2: The whistle blew. The first two runners sprinted down the track. When the baton reached Giri, he gripped it and ran with all his power. Halfway round the bend, his foot hit a mound of soil. He stumbled, fell, and felt the grit sting his knee.
-Page 3: For a moment the noise around him seemed to fade away. Then the crowd found their voice. "Go, Giri! Get up!" Giri pushed himself to his feet and ran on. He was not the fastest, but he crossed the line with the baton held high.
-Page 4: His team did not win a trophy, but they won something better — the loudest cheer of the day. Giri felt proud. Courage, he decided, was not about never falling down. It was about getting up and carrying on.
+Page 1: It was Sports Day. The whole school ran out to the field. Flags snapped in the wind, and the crowd on the bleachers made a joyful roar. Giri was in the relay team. He bounced on his toes at the starting point, trying to shake off the butterflies in his tummy.
+Page 2: Bang! The race began. The first two runners sprinted down the track. When the baton reached Giri, he gripped it and ran with all his power. Part way round the bend, his foot hit a mound of soil. He stumbled, fell, and felt the grit sting his leg.
+Page 3: For a moment the roar around him seemed to fade away. Then the crowd found their voice. "Go, Giri! Get up!" Giri pushed himself to his feet and ran on. He was not the fastest, but he crossed the line with the baton held high.
+Page 4: His team did not win a trophy, but they got something better — the loudest cheer of the day. Giri felt proud. Courage, he decided, was not about never falling down. It was about getting up and carrying on.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -624,7 +546,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 4. Square.
-Words on this page: It was Sports Day. The whole school poured out onto the field. Flags snapped in the wind, and the crowd on the bleachers made a joyful roar. Giri was in the relay team. He bounced on his toes at the starting point, trying to shake off the doubt in his stomach.
+Words on this page: It was Sports Day. The whole school ran out to the field. Flags snapped in the wind, and the crowd on the bleachers made a joyful roar. Giri was in the relay team. He bounced on his toes at the starting point, trying to shake off the butterflies in his tummy.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -632,7 +554,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 4. Square.
-Words on this page: The whistle blew. The first two runners sprinted down the track. When the baton reached Giri, he gripped it and ran with all his power. Halfway round the bend, his foot hit a mound of soil. He stumbled, fell, and felt the grit sting his knee.
+Words on this page: Bang! The race began. The first two runners sprinted down the track. When the baton reached Giri, he gripped it and ran with all his power. Part way round the bend, his foot hit a mound of soil. He stumbled, fell, and felt the grit sting his leg.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -640,7 +562,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 4. Square.
-Words on this page: For a moment the noise around him seemed to fade away. Then the crowd found their voice. "Go, Giri! Get up!" Giri pushed himself to his feet and ran on. He was not the fastest, but he crossed the line with the baton held high.
+Words on this page: For a moment the roar around him seemed to fade away. Then the crowd found their voice. "Go, Giri! Get up!" Giri pushed himself to his feet and ran on. He was not the fastest, but he crossed the line with the baton held high.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -648,7 +570,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 4. Square.
-Words on this page: His team did not win a trophy, but they won something better — the loudest cheer of the day. Giri felt proud. Courage, he decided, was not about never falling down. It was about getting up and carrying on.
+Words on this page: His team did not win a trophy, but they got something better — the loudest cheer of the day. Giri felt proud. Courage, he decided, was not about never falling down. It was about getting up and carrying on.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -659,32 +581,18 @@ _For the back page of the book._
 **Sounds in this book** — say the sound, then read these words from the story:
 - **ou** — out, round, loudest
 - **ow** — down
-- **oi** — point, soil, noise, voice
+- **oi** — point, soil, voice
 - **oy** — joyful
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **the** — ❤️ tricky part: e says /uh/
-- **whole** — ❤️ tricky part: wh says /h/
-- **school** — ❤️ tricky part: ch says /k/
 - **field** — ❤️ tricky part: ie says /ee/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **his** — ❤️ tricky part: s says /z/
-- **to** — ❤️ tricky part: o says /oo/
-- **two** — ❤️ tricky part: the w is silent and o says /oo/
-- **all** — ❤️ tricky part: a says /aw/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **their** — ❤️ tricky part: eir says /air/
-- **go** — ❤️ tricky part: o says its name, /ō/
-- **they** — ❤️ tricky part: ey says /ay/
-- **something** — ❤️ tricky part: o says /u/ and the first e is silent
+- **courage** — Being brave enough to do something difficult or scary
+- **falling** — read it to your child for now
 
 **Word meanings** — talk about these before reading:
 - **relay** — A race where team members take turns running
 - **stumbled** — Nearly fell; lost balance while moving
 - **baton** — A stick passed between runners in a relay race
-- **courage** — Being brave enough to do something difficult or scary
 - **trophy** — A prize given to a winner, often a cup or medal
 
 **After reading — check understanding** (answer ticked):
@@ -694,9 +602,9 @@ _For the back page of the book._
    The crowd roaring for him ✓ · His coach told him to · He wanted a trophy · He was not hurt
 3. What did Giri learn about courage?  
    It is about getting up when you fall ✓ · It means winning every race · It means never being scared · It means being the fastest
-4. True or false? Giri's team won a trophy.  
+4. True or false? Giri's team got a trophy.  
    True · False ✓ · The story does not say
-5. He ___, fell, and felt the grit sting his knee.  
+5. He ___, fell, and felt the grit sting his leg.  
    stumbled ✓ · sprinted · bounced
 
 **Write about it:** What did Giri decide courage is? Do you agree?  
@@ -706,7 +614,7 @@ _A good answer:_ He decided courage is not about never falling down, but about g
 - What happened to Giri halfway round the bend?
 - Giri decided courage was about getting up and carrying on. Do you agree? Why?
 
-**Spot it: Diphthongs (ou, ow, oi, oy)** — "poured", "crowd", "found", "mound", "around", "soil", "voice", "joyful", "doubt", "power". ou/ow = /ow/ sound. oi/oy = /oy/ sound. Listen for them as you read.
+**Spot it: Diphthongs (ou, ow, oi, oy)** — "crowd", "found", "mound", "around", "soil", "voice", "joyful", "power". ou/ow = /ow/ sound. oi/oy = /oy/ sound. Listen for them as you read.
 
 **Spot it: Theme statement** — Courage was not about never falling down. It was about getting up.. A theme statement tells the big idea of the story in one or two sentences.
 
@@ -714,7 +622,7 @@ _A good answer:_ He decided courage is not about never falling down, but about g
 
 ## Giri and the Treasure Map
 
-`core-d-06` · Band D · 171 words · sounds: aw, air, ear
+`core-d-06` · Band D · 172 words · sounds: aw, air, ear
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -740,10 +648,10 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Giri found an old piece of parchment stuffed inside a drawer at his grandmother's house. It was a hand-drawn map with a dotted line, a compass, and one word: "Treasure." Giri's jaw dropped. Could this be real?
-Page 2: He followed the map across the lawn, past a pair of palm trees, and down a narrow stairway to the canal path. The trail led to an old wall covered in crawling vines. Near the base, a small wooden box was half-buried in the earth.
-Page 3: Giri knelt and carefully pried the lid open. Inside he found a faded photograph of his grandmother as a girl, a pair of pearl earrings, and a short letter. "To the one who finds this," it read, "you have the same spirit of adventure that I had. Take care of it."
-Page 4: Giri sat back on his heels, awed. The treasure was not gold or jewels — it was a story, a memory, and a connection to someone he loved. He carried the box home with the greatest care.
+Page 1: Giri found an old sheet of parchment stuffed inside a drawer at his grandmother's house. It was a hand-drawn map with a dotted line, a compass, and one word: "Treasure." Giri's jaw dropped. Could this be real?
+Page 2: He followed the map across the lawn, past a pair of tall trees, and down a narrow stairway to the canal path. The trail led to an old wall thick with crawling vines. Near the base, a small wooden box was sticking out of the soil.
+Page 3: Giri bent down and carefully pried the lid open. Inside he found a faded photograph of his grandmother as a girl, a pair of shiny earrings, and a short letter. "To the one who finds this," it read, "you have the same spirit of adventure that I had. Take care of it."
+Page 4: Giri sat back on his heels, awed. The treasure was not gold or jewels — it was a story, a memory, and a link to someone he loved. He carried the box home with the greatest care.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -759,7 +667,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 4. Square.
-Words on this page: Giri found an old piece of parchment stuffed inside a drawer at his grandmother's house. It was a hand-drawn map with a dotted line, a compass, and one word: "Treasure." Giri's jaw dropped. Could this be real?
+Words on this page: Giri found an old sheet of parchment stuffed inside a drawer at his grandmother's house. It was a hand-drawn map with a dotted line, a compass, and one word: "Treasure." Giri's jaw dropped. Could this be real?
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -767,7 +675,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 4. Square.
-Words on this page: He followed the map across the lawn, past a pair of palm trees, and down a narrow stairway to the canal path. The trail led to an old wall covered in crawling vines. Near the base, a small wooden box was half-buried in the earth.
+Words on this page: He followed the map across the lawn, past a pair of tall trees, and down a narrow stairway to the canal path. The trail led to an old wall thick with crawling vines. Near the base, a small wooden box was sticking out of the soil.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -775,7 +683,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 4. Square.
-Words on this page: Giri knelt and carefully pried the lid open. Inside he found a faded photograph of his grandmother as a girl, a pair of pearl earrings, and a short letter. "To the one who finds this," it read, "you have the same spirit of adventure that I had. Take care of it."
+Words on this page: Giri bent down and carefully pried the lid open. Inside he found a faded photograph of his grandmother as a girl, a pair of shiny earrings, and a short letter. "To the one who finds this," it read, "you have the same spirit of adventure that I had. Take care of it."
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -783,7 +691,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 4. Square.
-Words on this page: Giri sat back on his heels, awed. The treasure was not gold or jewels — it was a story, a memory, and a connection to someone he loved. He carried the box home with the greatest care.
+Words on this page: Giri sat back on his heels, awed. The treasure was not gold or jewels — it was a story, a memory, and a link to someone he loved. He carried the box home with the greatest care.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -796,30 +704,18 @@ _For the back page of the book._
 - **air** — pair, stairway
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **piece** — ❤️ tricky part: ie says /ee/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **his** — ❤️ tricky part: s says /z/
+- **grandmother** — ❤️ tricky part: o says /u/
 - **house** — ❤️ tricky part: the e is silent
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **could** — ❤️ tricky part: oul says /oo/, as in "book"
-- **be** — ❤️ tricky part: e says its name, /ē/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **the** — ❤️ tricky part: e says /uh/
-- **to** — ❤️ tricky part: o says /oo/
-- **covered** — ❤️ tricky part: o says /u/
-- **small** — ❤️ tricky part: a says /aw/
-- **half** — ❤️ tricky part: a says /ar/ and the l is silent
-- **earth** — ❤️ tricky part: ear says /er/
-- **who** — ❤️ tricky part: wh says /h/ and o says /oo/
-- **you** — ❤️ tricky part: ou says /oo/
-- **have** — ❤️ tricky part: words never end in v, so an e comes after it — the a stays short
-- **I** — ❤️ tricky part: always a capital, and it says its name
+- **compass** — A tool that shows direction (north, south, east, west)
+- **word** — ❤️ tricky part: or says /er/
+- **treasure** — ❤️ tricky part: ea says /e/, s says /zh/ and ure says /er/
+- **adventure** — ❤️ tricky part: t says /ch/ and ure says /er/
+- **someone** — ❤️ tricky part: o says /u/, and "one" says "wun"
+- **loved** — read it to your child for now
+- **greatest** — read it to your child for now
 
 **Word meanings** — talk about these before reading:
 - **parchment** — Thick old paper, often used for maps or letters
-- **compass** — A tool that shows direction (north, south, east, west)
 - **canal** — A man-made waterway for boats or drainage
 - **awed** — Filled with wonder and amazement
 - **spirit** — A special quality of enthusiasm and energy
@@ -830,7 +726,7 @@ _For the back page of the book._
 2. What was inside the box?  
    A photo, earrings, and a letter ✓ · Gold coins · Jewels and gems · Old books
 3. Why is the real treasure not gold or jewels?  
-   The real treasure is the family connection and memories ✓ · Gold is too heavy · Jewels are not real · The box was too small
+   The real treasure is the link to his family ✓ · Gold is too heavy · Jewels are not real · The box was too small
 4. True or false? Giri's grandmother was at home when he found the map.  
    True · False · The story does not say ✓
 5. Giri sat back on his heels, ___.  
@@ -878,10 +774,10 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: On Saturday, Giri took the bus to town with his mum. The town was loud and busy. Crowds moved up and down the street, and the smell of fresh bread drifted out of a baker's shop.
-Page 2: Mum gave Giri two dollars to spend. He counted the coins in his palm and looked round the stalls. So many choices! A round bun? A cold drink? A small brown mouse toy with a long tail?
+Page 1: On Saturday, Giri took the bus to town with his mum. The town was loud and busy. Crowds moved up and down the street, and the smell of fresh buns drifted out of a baker's shop.
+Page 2: Mum gave Giri two dollars to spend. He counted the coins in his hand and looked round the stalls. So many choices! A round bun? A cold drink? A small brown mouse toy with a long tail?
 Page 3: Then Giri spotted an old man selling paper windmills that spun round and round in the wind. One windmill was painted gold and brown, with a loud little clack as it turned. Giri handed over his coins without a doubt.
-Page 4: On the bus home, Giri held his windmill up high and let it spin. Round and round it flew! A windmill that turns all day, he decided, was money well spent.
+Page 4: On the bus home, Giri held his windmill up high and let it spin. Round and round it flew! A windmill that turns all day, he decided, was cash well spent.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -897,7 +793,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 4. Square.
-Words on this page: On Saturday, Giri took the bus to town with his mum. The town was loud and busy. Crowds moved up and down the street, and the smell of fresh bread drifted out of a baker's shop.
+Words on this page: On Saturday, Giri took the bus to town with his mum. The town was loud and busy. Crowds moved up and down the street, and the smell of fresh buns drifted out of a baker's shop.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -905,7 +801,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 4. Square.
-Words on this page: Mum gave Giri two dollars to spend. He counted the coins in his palm and looked round the stalls. So many choices! A round bun? A cold drink? A small brown mouse toy with a long tail?
+Words on this page: Mum gave Giri two dollars to spend. He counted the coins in his hand and looked round the stalls. So many choices! A round bun? A cold drink? A small brown mouse toy with a long tail?
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -921,7 +817,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 4. Square.
-Words on this page: On the bus home, Giri held his windmill up high and let it spin. Round and round it flew! A windmill that turns all day, he decided, was money well spent.
+Words on this page: On the bus home, Giri held his windmill up high and let it spin. Round and round it flew! A windmill that turns all day, he decided, was cash well spent.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -936,27 +832,14 @@ _For the back page of the book._
 - **oy** — toy
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **the** — ❤️ tricky part: e says /uh/
-- **to** — ❤️ tricky part: o says /oo/
-- **his** — ❤️ tricky part: s says /z/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **two** — ❤️ tricky part: the w is silent and o says /oo/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **so** — ❤️ tricky part: o says its name, /ō/
-- **many** — ❤️ tricky part: a says /e/
-- **small** — ❤️ tricky part: a says /aw/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **all** — ❤️ tricky part: a says /aw/
-- **money** — ❤️ tricky part: o says /u/ and ey says /ee/
+- **moved** — read it to your child for now
+- **doubt** — A feeling of not being sure
 
 **Word meanings** — talk about these before reading:
 - **crowds** — Big groups of people in one place
 - **counted** — Said numbers to find how many
 - **choices** — Different things you can pick from
 - **windmill** — A toy with sails that spin in the wind
-- **doubt** — A feeling of not being sure
 
 **After reading — check understanding** (answer ticked):
 1. How much money did Mum give Giri to spend?  
@@ -964,7 +847,7 @@ _For the back page of the book._
 2. What did Giri buy in the end?  
    A paper windmill ✓ · A round bun · A cold drink · A toy mouse
 3. Why did Giri pick the windmill over the other things?  
-   It would keep spinning and turning all day ✓ · It was the cheapest · The man asked him to · His mum chose it
+   It would keep spinning and turning all day ✓ · It was the cheapest · The man asked him to · His mum picked it
 4. True or false? The windmill made a loud little clack as it turned.  
    True ✓ · False · The story does not say
 5. So many ___!  
@@ -985,7 +868,7 @@ _A good answer:_ Yes. Giri can enjoy it every day, because a windmill turns all 
 
 ## Giri Draws at Dawn
 
-`core-d-08` · Band D · 149 words · sounds: aw, au
+`core-d-08` · Band D · 150 words · sounds: aw, au
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -1015,7 +898,7 @@ THE STORY
 Page 1: Giri woke up before dawn one morning. The sky was still dark, and the air was cool. He took his pencils and paper down to the lawn, sat on the damp grass, and waited for the sun.
 Page 2: Slowly, the sky began to change. Streaks of pink and gold crawled over the rooftops. A hawk soared past on wide, still wings. Giri drew it all — the dawn light, the yawning town, the small black cat creeping along the wall.
 Page 3: His hand moved fast. He drew the lawn, the lamp posts, and the last pale star before it faded. When he looked down at his paper, the whole morning was caught there in pencil lines.
-Page 4: At breakfast, Giri showed the drawing to his mum. "You saw all that at dawn?" she said, in awe. Giri nodded. The best part of the day, he decided, was the part most people never saw.
+Page 4: Later, at home, Giri showed the drawing to his mum. "You saw all that at dawn?" she said, in awe. Giri nodded. The best part of the day, he decided, was the part most people never saw.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -1055,7 +938,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 4. Square.
-Words on this page: At breakfast, Giri showed the drawing to his mum. "You saw all that at dawn?" she said, in awe. Giri nodded. The best part of the day, he decided, was the part most people never saw.
+Words on this page: Later, at home, Giri showed the drawing to his mum. "You saw all that at dawn?" she said, in awe. Giri nodded. The best part of the day, he decided, was the part most people never saw.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1067,33 +950,18 @@ _For the back page of the book._
 - **aw** — dawn, lawn, crawled, hawk, yawning, drawing
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **the** — ❤️ tricky part: e says /uh/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **his** — ❤️ tricky part: s says /z/
-- **to** — ❤️ tricky part: o says /oo/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **all** — ❤️ tricky part: a says /aw/
-- **small** — ❤️ tricky part: a says /aw/
-- **whole** — ❤️ tricky part: wh says /h/
-- **there** — ❤️ tricky part: ere says /air/
-- **you** — ❤️ tricky part: ou says /oo/
-- **she** — ❤️ tricky part: e says its name, /ē/
-- **said** — ❤️ tricky part: ai says /e/
-- **people** — ❤️ tricky part: eo says /ee/
+- **moved** — read it to your child for now
+- **caught** — Held or trapped something
 
 **Word meanings** — talk about these before reading:
 - **dawn** — The time when the sun first comes up
 - **streaks** — Long thin lines of colour or light
 - **soared** — Flew high without flapping
-- **caught** — Held or trapped something
 - **awe** — A feeling of great wonder
 
 **After reading — check understanding** (answer ticked):
 1. When did Giri go out to draw?  
-   Before dawn, while it was still dark ✓ · After breakfast · At noon · At bedtime
+   Before dawn, while it was still dark ✓ · After lunch · At noon · At bedtime
 2. What soared past on wide, still wings?  
    A hawk ✓ · A kite · A plane · A crow
 3. What did Giri mean by "the part most people never saw"?  
@@ -1148,7 +1016,7 @@ THE STORY
 Page 1: Mrs Tan from next door was going away for the weekend. "Could you take care of Scout for two days?" she asked Giri. Scout was her small brown dog with one floppy ear and a tail that never stopped wagging.
 Page 2: Taking care of a dog turned out to be real work. Scout needed fresh food and clean water, a walk in the morning, and a walk at night. He barked at the lift and chased his tail on the stairs. Giri had to keep him away from Mrs Tan's plants!
 Page 3: But on the second day, something changed. Scout curled up beside Giri while he read his book, one ear up, fast asleep. Giri scratched the soft fur behind it and smiled.
-Page 4: When Mrs Tan came home, Scout ran to meet her. "He looks so happy and well cared for!" she said. Giri felt proud. Caring for a pet was hard work — and worth every minute of it.
+Page 4: When Mrs Tan came home, Scout ran to meet her. "He looks so happy and well cared for!" she said. Giri felt proud. Caring for a pet was hard work — and worth every bit of it.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -1188,7 +1056,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 4. Square.
-Words on this page: When Mrs Tan came home, Scout ran to meet her. "He looks so happy and well cared for!" she said. Giri felt proud. Caring for a pet was hard work — and worth every minute of it.
+Words on this page: When Mrs Tan came home, Scout ran to meet her. "He looks so happy and well cared for!" she said. Giri felt proud. Caring for a pet was hard work — and worth every bit of it.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1200,35 +1068,14 @@ _For the back page of the book._
 - **air** — stairs
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **from** — ❤️ tricky part: o says /u/
-- **door** — ❤️ tricky part: oor says /or/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **the** — ❤️ tricky part: e says /uh/
-- **could** — ❤️ tricky part: oul says /oo/, as in "book"
-- **you** — ❤️ tricky part: ou says /oo/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **two** — ❤️ tricky part: the w is silent and o says /oo/
-- **she** — ❤️ tricky part: e says its name, /ē/
-- **small** — ❤️ tricky part: a says /aw/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **to** — ❤️ tricky part: o says /oo/
-- **be** — ❤️ tricky part: e says its name, /ē/
-- **work** — ❤️ tricky part: after w, or says /er/
-- **water** — ❤️ tricky part: a says /aw/
 - **walk** — ❤️ tricky part: a says /aw/ and the l is silent
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **his** — ❤️ tricky part: s says /z/
-- **something** — ❤️ tricky part: o says /u/ and the first e is silent
-- **so** — ❤️ tricky part: o says its name, /ō/
-- **said** — ❤️ tricky part: ai says /e/
+- **worth** — Good enough to deserve the effort
 
 **Word meanings** — talk about these before reading:
 - **weekend** — Saturday and Sunday
 - **floppy** — Soft and hanging down loosely
 - **curled up** — Lay down in a small round shape
 - **proud** — Feeling glad about something you did well
-- **worth** — Good enough to deserve the effort
 
 **After reading — check understanding** (answer ticked):
 1. Why did Giri look after Scout?  
@@ -1284,7 +1131,7 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Giri kept a coin jar on his desk. Every day he dropped in the coins left in his pocket, and the jar grew heavier month by month. He was saving up for a big red robot from the toy shop in town.
+Page 1: Giri kept a coin jar on his desk. Every day he dropped in the coins left in his pocket, and the jar grew heavier week by week. He was saving up for a big red robot from the toy shop in town.
 Page 2: Every Sunday, he counted his coins out loud. "A dollar. Two dollars. Three dollars and twenty cents!" He was proud of every coin in that jar.
 Page 3: Then one day, walking home past the school, Giri spotted his mum outside the flower shop. She was looking at a pot of orchids. She smiled at the flowers, then looked at the price and walked on. That night, Giri stopped counting his coins for the robot. He had found something better to buy.
 Page 4: On Sunday, Giri proudly handed his mum the pot of orchids. Her mouth fell open, then curved into the widest smile. "My boy!" she said. Some things, Giri decided, count more than any toy.
@@ -1303,7 +1150,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 4. Square.
-Words on this page: Giri kept a coin jar on his desk. Every day he dropped in the coins left in his pocket, and the jar grew heavier month by month. He was saving up for a big red robot from the toy shop in town.
+Words on this page: Giri kept a coin jar on his desk. Every day he dropped in the coins left in his pocket, and the jar grew heavier week by week. He was saving up for a big red robot from the toy shop in town.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1341,29 +1188,12 @@ _For the back page of the book._
 - **ow** — town
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **his** — ❤️ tricky part: s says /z/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **the** — ❤️ tricky part: e says /uh/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **from** — ❤️ tricky part: o says /u/
-- **two** — ❤️ tricky part: the w is silent and o says /oo/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **school** — ❤️ tricky part: ch says /k/
-- **she** — ❤️ tricky part: e says its name, /ē/
-- **something** — ❤️ tricky part: o says /u/ and the first e is silent
-- **to** — ❤️ tricky part: o says /oo/
-- **buy** — ❤️ tricky part: the u is silent and y says /ī/
-- **into** — ❤️ tricky part: o says /oo/, like in "to"
-- **said** — ❤️ tricky part: ai says /e/
-- **some** — ❤️ tricky part: o says /u/ and the e is silent
-- **any** — ❤️ tricky part: a says /e/
+- **heavier** — Weighing more than before
+- **walking** — read it to your child for now
+- **orchids** — Bright flowers — the national flower of Singapore is one!
 
 **Word meanings** — talk about these before reading:
 - **saving** — Keeping money to use later
-- **heavier** — Weighing more than before
-- **orchids** — Bright flowers — the national flower of Singapore is one!
 - **price** — How much money something costs
 - **curved** — Bent into a smooth round shape
 
@@ -1373,7 +1203,7 @@ _For the back page of the book._
 2. What did Giri see his mum looking at?  
    A pot of orchids at the flower shop ✓ · A red robot · A coin jar · A new dress
 3. Why did Giri stop saving for the robot?  
-   He wanted to buy the orchids for his mum instead ✓ · He lost his coins · The robot was sold out · He stopped liking robots
+   He wanted to get the orchids for his mum ✓ · He lost his coins · The robot was sold out · He stopped liking robots
 4. True or false? Mum looked at the price and bought the flowers.  
    True · False ✓ · The story does not say
 5. Her mouth fell open, then ___ into the widest smile.  
@@ -1394,7 +1224,7 @@ _A good answer:_ He saw how much his mum liked the orchids, and making her happy
 
 ## Who Is on the Stairs?
 
-`review-d-01` · Band D · 205 words · sounds: ow, ou, oi, oy, aw, au, air, are, ear, eer, ere
+`review-d-01` · Band D · 207 words · sounds: ow, ou, oi, oy, aw, au, air, are, ear, eer, ere
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -1422,10 +1252,10 @@ RULES FOR EVERY PICTURE
 
 THE STORY
 Page 1: Mrs Tan was away for the night, so Scout was staying with Giri. At bedtime, Scout would not settle. He sat by the door with his ears up and let out a low growl.
-Page 2: Then Giri heard it too: a scratch, a thump, and a soft little noise from the stairs. His heart pounded. Was it a thief? He grabbed his torch, took a deep breath, and crept out to the stairwell with Scout.
-Page 3: There, on the stair below, sat an old cardboard box. Giri shone his torch inside, and his jaw dropped. A mother cat lay curled up in the box, and beside her were four tiny kittens, no bigger than a sock.
-Page 4: Scout did not bark. He lay down near the box and gave a soft whine, as if to say, "Careful. They are scared." Giri paused, then gave a quiet cheer. His brave, loyal dog had not been growling at a thief at all. He had been guarding them.
-Page 5: Giri brought out a bowl of water and an old towel for the box. In the morning, Mrs Tan came home and found a happy surprise: her dog had a new job. Scout was a kitten guard, and he was proud of it.
+Page 2: Then Giri heard it too: a scratch, a thump, and a soft little squeak from the stairs. His heart pounded. Was it a thief? He grabbed his torch, took a big gulp of air, and crept out to the stairwell with Scout.
+Page 3: There, on the stair below, sat an old cardboard box. Giri pointed his torch inside, and his jaw dropped. A mother cat lay curled up in the box, and beside her were four tiny kittens, no bigger than a sock.
+Page 4: Scout did not bark. He lay down near the box and gave a soft whine, as if to say, "Careful. They are scared." Giri stopped, then gave a quiet cheer. His brave, loyal dog had not been growling at a thief at all. He had been guarding them.
+Page 5: Giri hauled out a bowl of water and an old towel for the box. In the morning, Mrs Tan came home and found a happy sight: her dog had a new job. Scout was a kitten keeper, and he was proud of it.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -1449,7 +1279,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 5. Square.
-Words on this page: Then Giri heard it too: a scratch, a thump, and a soft little noise from the stairs. His heart pounded. Was it a thief? He grabbed his torch, took a deep breath, and crept out to the stairwell with Scout.
+Words on this page: Then Giri heard it too: a scratch, a thump, and a soft little squeak from the stairs. His heart pounded. Was it a thief? He grabbed his torch, took a big gulp of air, and crept out to the stairwell with Scout.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1457,7 +1287,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: There, on the stair below, sat an old cardboard box. Giri shone his torch inside, and his jaw dropped. A mother cat lay curled up in the box, and beside her were four tiny kittens, no bigger than a sock.
+Words on this page: There, on the stair below, sat an old cardboard box. Giri pointed his torch inside, and his jaw dropped. A mother cat lay curled up in the box, and beside her were four tiny kittens, no bigger than a sock.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1465,7 +1295,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: Scout did not bark. He lay down near the box and gave a soft whine, as if to say, "Careful. They are scared." Giri paused, then gave a quiet cheer. His brave, loyal dog had not been growling at a thief at all. He had been guarding them.
+Words on this page: Scout did not bark. He lay down near the box and gave a soft whine, as if to say, "Careful. They are scared." Giri stopped, then gave a quiet cheer. His brave, loyal dog had not been growling at a thief at all. He had been guarding them.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1473,7 +1303,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: Giri brought out a bowl of water and an old towel for the box. In the morning, Mrs Tan came home and found a happy surprise: her dog had a new job. Scout was a kitten guard, and he was proud of it.
+Words on this page: Giri hauled out a bowl of water and an old towel for the box. In the morning, Mrs Tan came home and found a happy sight: her dog had a new job. Scout was a kitten keeper, and he was proud of it.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1484,44 +1314,24 @@ _For the back page of the book._
 **Sounds in this book** — say the sound, then read these words from the story:
 - **ow** — down
 - **ou** — out
-- **oi** — noise
+- **oi** — pointed
 - **oy** — loyal
 - **aw** — jaw
-- **au** — paused
-- **air** — stairs, stairwell, stair
+- **au** — hauled
+- **air** — stairs, air, stairwell, stair
 - **are** — careful
 - **eer** — cheer
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **the** — ❤️ tricky part: e says /uh/
-- **so** — ❤️ tricky part: o says its name, /ō/
-- **would** — ❤️ tricky part: oul says /oo/, as in "book"
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **door** — ❤️ tricky part: oor says /or/
-- **his** — ❤️ tricky part: s says /z/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **heard** — ❤️ tricky part: ear says /er/
-- **from** — ❤️ tricky part: o says /u/
-- **to** — ❤️ tricky part: o says /oo/
-- **there** — ❤️ tricky part: ere says /air/
-- **mother** — ❤️ tricky part: o says /u/
-- **were** — ❤️ tricky part: ere says /er/
+- **heart** — ❤️ tricky part: ear says /ar/
+- **thief** — Someone who takes things that are not theirs
 - **four** — ❤️ tricky part: our says /or/
-- **no** — ❤️ tricky part: o says its name, /ō/
-- **they** — ❤️ tricky part: ey says /ay/
-- **are** — ❤️ tricky part: the e is silent
-- **all** — ❤️ tricky part: a says /aw/
-- **brought** — ❤️ tricky part: ough says /aw/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **water** — ❤️ tricky part: a says /aw/
+- **guarding** — Keeping something safe from harm
 
 **Word meanings** — talk about these before reading:
 - **settle** — To get calm and comfortable
 - **growl** — A low, angry sound a dog makes
-- **thief** — Someone who takes things that are not theirs
 - **whine** — A soft, high, sad sound
-- **guarding** — Keeping something safe from harm
 
 **After reading — check understanding** (answer ticked):
 1. Why was Scout staying with Giri?  
@@ -1548,7 +1358,7 @@ _A good answer:_ Yes. He growled to warn Giri about the noise, but when he saw t
 
 ## How to Make Kaya Toast
 
-`howto-d-01` · Band D · 200 words · sounds: oa, oi, oy, ow, au
+`howto-d-01` · Band D · 201 words · sounds: oa, oi, oy, ow, au
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -1575,14 +1385,14 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Kaya toast is a breakfast that lots of people in Singapore love. Kaya is a sweet, thick jam made from coconut milk, eggs, sugar and pandan leaves. This is how Giri and his mum make kaya toast at home.
+Page 1: Kaya toast is a morning meal that lots of people in Singapore love. Kaya is a sweet, thick jam made from coconut milk, eggs, sugar and pandan leaves. This is how Giri and his mum make kaya toast at home.
 Page 2: Two slices of white bread, a jar of kaya, a cold block of butter, a toaster, a knife and a plate.
 Page 3: First, ask a grown-up to help you toast the bread until it is golden brown and crunchy.
 Page 4: Next, while the toast is still warm, spread a thick layer of kaya on one slice. Go right to the edges.
 Page 5: Then cut a thin slice of cold butter and lay it on top of the kaya. Do not spread it out. The cold butter is the best part!
 Page 6: After that, put the other slice of toast on top and press down gently.
 Page 7: Last of all, cut your kaya toast in half, so it is easy to hold and dip.
-Page 8: Eat your toast with two soft-boiled eggs, a splash of dark soy sauce and a pinch of pepper. Dip the toast into the runny eggs. Giri says the crunchy, sweet and salty mix is the best way to start the day!
+Page 8: Eat your toast with two soft-boiled eggs, a splash of dark soy sauce and a pinch of pepper. Dip the toast into the runny eggs. Giri says the mix of crunchy and sweet is the best way to start the day!
 ```
 
 ### 2. Pictures — paste one at a time
@@ -1598,7 +1408,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 8. Square.
-Words on this page: Kaya toast is a breakfast that lots of people in Singapore love. Kaya is a sweet, thick jam made from coconut milk, eggs, sugar and pandan leaves. This is how Giri and his mum make kaya toast at home.
+Words on this page: Kaya toast is a morning meal that lots of people in Singapore love. Kaya is a sweet, thick jam made from coconut milk, eggs, sugar and pandan leaves. This is how Giri and his mum make kaya toast at home.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1654,7 +1464,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 8 of 8. Square.
-Words on this page: Eat your toast with two soft-boiled eggs, a splash of dark soy sauce and a pinch of pepper. Dip the toast into the runny eggs. Giri says the crunchy, sweet and salty mix is the best way to start the day!
+Words on this page: Eat your toast with two soft-boiled eggs, a splash of dark soy sauce and a pinch of pepper. Dip the toast into the runny eggs. Giri says the mix of crunchy and sweet is the best way to start the day!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1670,28 +1480,11 @@ _For the back page of the book._
 - **au** — sauce
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **is** — ❤️ tricky part: s says /z/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **people** — ❤️ tricky part: eo says /ee/
-- **love** — ❤️ tricky part: o says /u/; words never end in v, so an e comes after it
-- **from** — ❤️ tricky part: o says /u/
-- **his** — ❤️ tricky part: s says /z/
-- **two** — ❤️ tricky part: the w is silent and o says /oo/
-- **to** — ❤️ tricky part: o says /oo/
-- **you** — ❤️ tricky part: ou says /oo/
-- **the** — ❤️ tricky part: e says /uh/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **go** — ❤️ tricky part: o says its name, /ō/
-- **do** — ❤️ tricky part: o says /oo/
-- **put** — ❤️ tricky part: u says /oo/, as in "book"
-- **other** — ❤️ tricky part: o says /u/
-- **all** — ❤️ tricky part: a says /aw/
-- **your** — ❤️ tricky part: our says /or/
-- **half** — ❤️ tricky part: a says /ar/ and the l is silent
-- **so** — ❤️ tricky part: o says its name, /ō/
-- **easy** — ❤️ tricky part: s says /z/
-- **into** — ❤️ tricky part: o says /oo/, like in "to"
+- **sugar** — ❤️ tricky part: s says /sh/, u says /oo/ and ar says /er/
+- **bread** — ❤️ tricky part: ea says /e/
+- **knife** — A tool for cutting and spreading food
+- **spread** — ❤️ tricky part: ea says /e/
+- **says** — ❤️ tricky part: ay says /e/ and s says /z/
 
 **Word meanings** — talk about these before reading:
 - **pandan** — A long green leaf that makes food smell sweet
@@ -1702,9 +1495,9 @@ _For the back page of the book._
 
 **After reading — check understanding** (answer ticked):
 1. What is kaya made from?  
-   Coconut milk, eggs, sugar and pandan leaves ✓ · Butter and bread · Soy sauce and pepper · Milk and toast
+   Coconut milk, eggs, sugar and pandan leaves ✓ · Butter and jam · Soy sauce and pepper · Milk and toast
 2. Why does the recipe say to ask a grown-up to help with the toast?  
-   The toaster gets very hot ✓ · The bread is too heavy · Grown-ups like toast · The kaya is hard to find
+   The toaster gets very hot ✓ · The toast is too thick · Grown-ups like toast · The kaya is hard to find
 3. Why do you cut the kaya toast in half?  
    So it is easy to hold and dip ✓ · So the butter melts · So you can share it with Giri · So it gets crunchy
 4. True or false? You should spread the butter out over the kaya.  
@@ -1808,29 +1601,8 @@ _For the back page of the book._
 - **oi** — join, joined
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **from** — ❤️ tricky part: o says /u/
-- **to** — ❤️ tricky part: o says /oo/
-- **the** — ❤️ tricky part: e says /uh/
-- **where** — ❤️ tricky part: ere says /air/, as in "there"
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **his** — ❤️ tricky part: s says /z/
-- **what** — ❤️ tricky part: a says /o/
-- **is** — ❤️ tricky part: s says /z/
-- **do** — ❤️ tricky part: o says /oo/
-- **I** — ❤️ tricky part: always a capital, and it says its name
-- **said** — ❤️ tricky part: ai says /e/
-- **one** — ❤️ tricky part: it says "wun": o makes /w/ and /u/, and the e is silent
-- **two** — ❤️ tricky part: the w is silent and o says /oo/
 - **four** — ❤️ tricky part: our says /or/
-- **all** — ❤️ tricky part: a says /aw/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **they** — ❤️ tricky part: ey says /ay/
 - **ball** — ❤️ tricky part: a says /aw/
-- **come** — ❤️ tricky part: o says /u/ and the e is silent
-- **so** — ❤️ tricky part: o says its name, /ō/
-- **you** — ❤️ tricky part: ou says /oo/
 
 **After reading — check understanding** (answer ticked):
 1. What did Giri think was coming down the hill?  

@@ -14,9 +14,9 @@
  *
  * The reading-together page is read out of the same code the app uses:
  * practice words are the story's own decodable words that contain its
- * target sounds, and "words to know first" is decodability.supportWords —
- * the words a child cannot yet sound out at this point — with the tricky
- * part of each from sightWordCode.js.
+ * target sounds, and "words to know first" is the list the app shows before
+ * the story (wordsToMeet.js) — the words a child cannot yet sound out at
+ * this point — with the tricky part of each from sightWordCode.js.
  *
  * Usage:  node scripts/export-reader-prompts.mjs
  * Writes readers/<n>-<set>.md and readers/pictures.csv. Re-run it whenever
@@ -34,9 +34,9 @@ import {
   scanWord,
   stripSuffix,
   storySupportLevel,
-  supportWords,
 } from '../src/modules/decodability.js';
-import { getSightWordCode } from '../src/data/sightWordCode.js';
+import { getWordCode } from '../src/data/sightWordCode.js';
+import { wordsToMeet } from '../src/modules/wordsToMeet.js';
 import { WORDS } from '../src/data/words.js';
 
 const OUT_DIR = fileURLToPath(new URL('../readers/', import.meta.url));
@@ -366,7 +366,7 @@ function practiceWords(story, grapheme) {
     if (seen.has(word) || out.length >= 6) continue;
     seen.add(word);
     if (word.length < 2 || word === MASCOT_NAME || PROPER_NOUNS.has(word)) continue;
-    if (getSightWordCode(word)?.category === 'heart') continue;
+    // Heart words ("was" is not a short-a word) are never decodable.
     if (classifyWord(word, story).status !== 'decodable') continue;
 
     const stripped = realSuffix(word);
@@ -386,31 +386,19 @@ function practiceWords(story, grapheme) {
 }
 
 /**
- * The words to read together before the story: supportWords (what the app
- * shows before a story), plus any heart word the story uses that the
- * validator counts as decodable. Its check is by spelling, so "a" and "was"
- * pass as sound-out-able; a child sounding out "was" says "wass".
+ * The words to read together before the story: the same list the app shows
+ * before it (wordsToMeet) — every word the child cannot sound out yet that
+ * is new at this band, and the story's own pre-taught words and names.
  */
 function wordsToKnow(story) {
-  const support = new Map(supportWords(story).map((w) => [w.word, w]));
-  const out = [];
-  const seen = new Set();
-  for (const word of extractCountableTokens(story)) {
-    if (seen.has(word)) continue;
-    seen.add(word);
-    if (support.has(word)) out.push(support.get(word));
-    else if (getSightWordCode(word)?.category === 'heart') {
-      out.push({ word, display: word === 'i' ? 'I' : word, status: 'heart' });
-    }
-  }
-  return out;
+  return wordsToMeet(story);
 }
 
 /** One line for each word the child should meet before reading. */
 function wordToKnow(story, { word, display, status }) {
   const vocab = (story.vocab ?? []).find((v) => v.word.toLowerCase() === word);
   if (vocab) return `**${display}** — ${vocab.meaning}`;
-  const code = getSightWordCode(word);
+  const code = getWordCode(word);
   if (code?.category === 'heart') return `**${display}** — ❤️ tricky part: ${code.note}`;
   if (code && code.decodableAt <= 4)
     return `**${display}** — no tricky part; sound it out together`;

@@ -3,7 +3,13 @@
  */
 import { describe, expect, it } from 'vitest';
 import { SIGHT_QUESTS } from '../data/sightwords.js';
-import { SIGHT_WORD_CODE, getSightWordCode, sightWordTip } from '../data/sightWordCode.js';
+import {
+  SIGHT_WORD_CODE,
+  STORY_WORD_CODE,
+  getSightWordCode,
+  getWordCode,
+  sightWordTip,
+} from '../data/sightWordCode.js';
 import { TRICKY_WORDS } from '../data/trickyWords.js';
 
 const readingWords = [
@@ -90,5 +96,48 @@ describe('sight word code', () => {
     const all = Object.values(SIGHT_WORD_CODE);
     const decodable = all.filter((c) => c.category === 'decodable').length;
     expect(decodable / all.length).toBeGreaterThan(0.5);
+  });
+});
+
+describe('a says /ar/', () => {
+  it('marks the a of fast, last and father as a later sound, taught with ar', () => {
+    for (const word of ['fast', 'last', 'after', 'ask', 'father', 'plant']) {
+      const code = getSightWordCode(word);
+      expect(code.category, word).toBe('decodable');
+      expect(code.soundPhase, word).toBe(7);
+    }
+    expect(sightWordTip(getSightWordCode('ask'))).toContain('“a” can say /ar/');
+  });
+
+  it('finds a story word with its apostrophe cleaned off', () => {
+    expect(getWordCode('cant')).toBe(getSightWordCode("can't"));
+  });
+});
+
+describe('story word code', () => {
+  const codes = Object.values(STORY_WORD_CODE);
+
+  it('spells each word exactly with its letter groups', () => {
+    for (const code of codes) {
+      expect(
+        code.segments
+          .map((s) => s.text)
+          .join('')
+          .toLowerCase(),
+        code.word,
+      ).toBe(code.word.toLowerCase());
+    }
+  });
+
+  it('describes nothing the sight-word bank already describes', () => {
+    expect(codes.filter((c) => SIGHT_WORD_CODE[c.word]).map((c) => c.word)).toEqual([]);
+  });
+
+  it('every heart word names its tricky part, and only heart words do', () => {
+    for (const code of codes) {
+      const hasTricky = code.segments.some((s) => s.tricky);
+      expect(code.category === 'heart', code.word).toBe(hasTricky);
+      if (hasTricky) expect(code.note.length, code.word).toBeGreaterThan(8);
+    }
   });
 });

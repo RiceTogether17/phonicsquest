@@ -128,7 +128,7 @@ _For the back page of the book._
 
 ## Giri and the Cat
 
-`core-a-02` · Band A · 40 words · sounds: a
+`core-a-02` · Band A · 39 words · sounds: a
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -158,7 +158,7 @@ Page 1: A tan cat sat on Giri's mat.
 Page 2: Giri had ham in his bag.
 Page 3: Giri sat. Then the cat sat.
 Page 4: The cat ran at the ham. Snap!
-Page 5: Giri sat back. Then the cat sat on his lap. A nap at last!
+Page 5: Giri sat back. Then the cat sat on his lap. A cat nap!
 ```
 
 ### 2. Pictures — paste one at a time
@@ -206,7 +206,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: Giri sat back. Then the cat sat on his lap. A nap at last!
+Words on this page: Giri sat back. Then the cat sat on his lap. A cat nap!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -382,7 +382,7 @@ Page 1: It was a day for a nap.
 Page 2: Giri sat on a mat. The cat sat too.
 Page 3: "I can nap," said Giri.
 Page 4: Tap, tap! An ant ran at his hand.
-Page 5: Giri and the cat ran. Then a nap at last!
+Page 5: Giri and the cat ran and ran. Then a nap!
 ```
 
 ### 2. Pictures — paste one at a time
@@ -430,7 +430,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: Giri and the cat ran. Then a nap at last!
+Words on this page: Giri and the cat ran and ran. Then a nap!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -612,7 +612,7 @@ Page 1: Giri had a big dig. Dig, dig, dig!
 Page 2: Clink! What is in the pit? A tin lid!
 Page 3: The lid had a map. What can this be?
 Page 4: "I will dig again!" Dig, dig, dig went Giri.
-Page 5: A red gem! "Do it again!" Giri came back.
+Page 5: A big chest! "Do it again!" Giri came back.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -660,7 +660,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: A red gem! "Do it again!" Giri came back.
+Words on this page: A big chest! "Do it again!" Giri came back.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -684,9 +684,9 @@ _For the back page of the book._
 
 **After reading — check understanding** (answer ticked):
 1. What did Giri find first in the pit?  
-   A tin lid ✓ · A red gem · A big pin
+   A tin lid ✓ · A big chest · A big pin
 2. Why did Giri dig again?  
-   The lid had a map ✓ · The pit was big · He had a red gem
+   The lid had a map ✓ · The pit was big · He had a big chest
 
 **Talk about it:**
 - What did Giri dig up in the end?
@@ -723,7 +723,7 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Giri had a rip in his red bed.
 Page 2: "I know I can fix it!" He had a pin.
-Page 3: When did he fix it? Fast, fast!
+Page 3: When did he fix it? Snip, snip!
 Page 4: A cat sat above the bed. An ant ran in.
 Page 5: There! The rip is hid. The bed is best!
 ```
@@ -757,7 +757,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: When did he fix it? Fast, fast!
+Words on this page: When did he fix it? Snip, snip!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -800,7 +800,7 @@ _For the back page of the book._
 1. What was wrong with the bed?  
    It had a rip ✓ · It had an ant in it · A cat sat in it
 2. How do we know Giri can fix things?  
-   He hid the rip fast ✓ · He sat on the bed · A cat sat above it
+   He hid the rip with a pin ✓ · He sat on the bed · A cat sat above it
 
 **Talk about it:**
 - How did Giri fix the rip in his bed?
@@ -1066,7 +1066,7 @@ RULES FOR EVERY PICTURE
 
 THE STORY
 Page 1: A pup dug in the mud. "How much mud!"
-Page 2: "Does the pup want a bath?"
+Page 2: "Does the pup want a dip?"
 Page 3: Giri got a tub of suds. Some got on the pup!
 Page 4: Rub, rub! The mud runs off. Fun!
 Page 5: The pup is not in the mud. Giri is also wet!
@@ -1093,7 +1093,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 5. Square.
-Words on this page: "Does the pup want a bath?"
+Words on this page: "Does the pup want a dip?"
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1178,7 +1178,7 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Drip, drip. Mud dots on the path.
+Page 1: Drip, drip. Mud dots on the track.
 Page 2: Giri went dot to dot. Dot, dot, dot.
 Page 3: At the end sat a lost dog on a log. Pant, pant!
 Page 4: Giri got broth and a snug rug. The dog slept.
@@ -1198,7 +1198,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 5. Square.
-Words on this page: Drip, drip. Mud dots on the path.
+Words on this page: Drip, drip. Mud dots on the track.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1396,9 +1396,9 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Giri met a bun on a rug. The bun had legs!
 Page 2: Run, bun, run!
-Page 3: It ran past the cat. It ran past the hen.
+Page 3: It ran from the cat. It ran from the hen.
 Page 4: Run, bun, run!
-Page 5: Snap! Giri got the bun at last.
+Page 5: Snap! Got it! Giri had the bun.
 Page 6: The legs? Ants! Six ants had the bun.
 Page 7: Giri splits the bun with the ants.
 ```
@@ -1432,7 +1432,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 7. Square.
-Words on this page: It ran past the cat. It ran past the hen.
+Words on this page: It ran from the cat. It ran from the hen.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1448,7 +1448,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 7. Square.
-Words on this page: Snap! Giri got the bun at last.
+Words on this page: Snap! Got it! Giri had the bun.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1473,7 +1473,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **a** — had, ran, past, cat, snap, at
+- **a** — had, ran, cat, snap, ants
 - **e** — met, legs, hen
 - **i** — it, six, splits, with
 - **o** — on, got
@@ -1482,12 +1482,13 @@ _For the back page of the book._
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **a** — ❤️ tricky part: on its own, a says /uh/
 - **the** — ❤️ tricky part: e says /uh/
+- **from** — ❤️ tricky part: o says /u/
 
 **After reading — check understanding** (answer ticked):
 1. What made the bun run?  
    Six ants ✓ · The cat · The hen
 2. What did Giri do with the bun at the end?  
-   He split it with the ants ✓ · He ran with it · He put it on the rug
+   He split it with the ants ✓ · He ran with it · He hid it in a bag
 
 **Talk about it:**
 - What were the bun’s "legs" really?
@@ -1609,7 +1610,7 @@ _For the back page of the book._
 
 ## Giri and the Box
 
-`core-a-15` · Band A · 44 words · sounds: a, e, i, o, u
+`core-a-15` · Band A · 43 words · sounds: a, e, i, o, u
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -1641,7 +1642,7 @@ Page 3: Is it a bell? Is it a jet? Giri did a check.
 Page 4: A red bug! It sat on his hand. It did not bite.
 Page 5: Zip! Off went the bug.
 Page 6: Buzz, buzz, buzz!
-Page 7: A box can hold a big shock!
+Page 7: A big shock in a box!
 ```
 
 ### 2. Pictures — paste one at a time
@@ -1705,7 +1706,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 7 of 7. Square.
-Words on this page: A box can hold a big shock!
+Words on this page: A big shock in a box!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1714,9 +1715,9 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **a** — sat, mat, hand, can
+- **a** — sat, mat, hand
 - **e** — bell, jet, check, red, went
-- **i** — big, it, did, zip
+- **i** — big, it, did, zip, in
 - **o** — box, on, not, off, shock
 - **u** — bug
 
@@ -1731,7 +1732,7 @@ _For the back page of the book._
 1. What was in the big tan box?  
    A red bug ✓ · A bell · A jet
 2. Why did the box buzz?  
-   A bug was in it ✓ · A bell was in it · A jet went past
+   A bug was in it ✓ · A bell was in it · A jet was on it
 
 **Talk about it:**
 - What did Giri guess before opening the box?
@@ -1768,10 +1769,10 @@ RULES FOR EVERY PICTURE
 THE STORY
 Page 1: Giri ran. The pup ran. A big run in the hot sun!
 Page 2: Pant, pant! Run, run, run!
-Page 3: Up the hill. Past the hut.
+Page 3: Up the hill and back.
 Page 4: Pant, pant! Run, run, run!
 Page 5: The pond! Giri got in. Splash! The pup got in. Splash!
-Page 6: In the end, the pond won.
+Page 6: In the end, the pond got them.
 Page 7: The best end to a run is a splash.
 ```
 
@@ -1804,7 +1805,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 7. Square.
-Words on this page: Up the hill. Past the hut.
+Words on this page: Up the hill and back.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1828,7 +1829,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 6 of 7. Square.
-Words on this page: In the end, the pond won.
+Words on this page: In the end, the pond got them.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -1845,11 +1846,11 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **a** — ran, past, splash
-- **e** — end, best
+- **a** — ran, and, back, splash
+- **e** — end, them, best
 - **i** — big, in, hill
 - **o** — hot, pond, got
-- **u** — pup, run, sun, up, hut
+- **u** — pup, run, sun, up
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **the** — ❤️ tricky part: e says /uh/
@@ -1860,8 +1861,8 @@ _For the back page of the book._
 **After reading — check understanding** (answer ticked):
 1. Where did Giri and the pup end up?  
    In the pond ✓ · In the sun · On a mat
-2. Who won the big run?  
-   The pond ✓ · Giri · The pup
+2. Why did Giri and the pup get in the pond?  
+   It was a hot run ✓ · The pup fell in · Giri was sad
 
 **Talk about it:**
-- Who won the big run?
+- Why is a splash the best end to a run?

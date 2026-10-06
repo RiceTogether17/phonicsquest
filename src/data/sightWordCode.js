@@ -18,6 +18,10 @@
  *   token~     a regular but later sound: a long vowel on its own (go, find),
  *              soft c / g (city, page), ow as in cow, short oo (book), y as
  *              a vowel (fly, happy)
+ *   a^         a saying /ar/ (fast, last, path, father). In Singapore and
+ *              British English these are not the short a of "cat", and a
+ *              child who sounds them out with it says "fasst". It is taught
+ *              beside ar, so these words wait for that lesson
  *   token@     an unstressed "uh" vowel in a longer word (a·bout)
  *   e_         the silent e of a split digraph (m·a·d·e_)
  *   -token     a suffix (-ing, -ed, -s, -ly)
@@ -134,7 +138,7 @@ const SPECS = {
   boy: 'b oy',
   where: 'wh ere* | ere says /air/, as in "there"',
   thought: 'th ough* t | ough says /aw/',
-  fast: 'f a s t',
+  fast: 'f a^ s t',
   down: 'd ow~ n',
   watch: 'w a* tch | a says /o/',
   head: 'h ea* d | ea says /e/',
@@ -202,7 +206,7 @@ const SPECS = {
   brought: 'b r ough* t | ough says /aw/',
   inside: 'i n s i d e_',
   which: 'wh i ch',
-  after: 'a f t er',
+  after: 'a^ f t er',
   always: 'a* l w ay -s | a says /aw/',
   aunty: 'au* n t y~ | au says /ar/',
   work: 'w or* k | after w, or says /er/',
@@ -235,7 +239,7 @@ const SPECS = {
   nice: 'n i c~ e_',
   once: 'o* n c~ e_ | it says "wunce": o makes /w/ and /u/',
   rain: 'r ai n',
-  "can't": "c a n ' t",
+  "can't": "c a^ n ' t",
   catch: 'c a tch',
   children: 'ch i l d r e@ n',
   "couldn't": "c oul* d n ' t | oul says /oo/, as in \"book\"",
@@ -252,12 +256,12 @@ const SPECS = {
   hard: 'h ar d',
   start: 's t ar t',
   part: 'p ar t',
-  last: 'l a s t',
+  last: 'l a^ s t',
   laugh: 'l augh* | augh says /arf/',
   car: 'c ar',
   half: 'h a* l* f | a says /ar/ and the l is silent',
-  ask: 'a s k',
-  father: 'f a* th er | a says /ar/',
+  ask: 'a^ s k',
+  father: 'f a^ th er',
   air: 'air',
   little: 'l i tt le',
   every: 'e v e@ r y~',
@@ -358,7 +362,7 @@ const SPECS = {
   add: 'a dd',
   food: 'f oo d',
   country: 'c ou* n t r y~ | ou says /u/',
-  plant: 'p l a n t',
+  plant: 'p l a^ n t',
   school: 's ch* oo l | ch says /k/',
   tree: 't r ee',
   close: 'c l o s* e_ | s says /z/',
@@ -428,7 +432,7 @@ const SPECS = {
   himself: 'h i m s e l f',
   towards: 't o@ w ar* d -s | ar says /or/',
   five: 'f i v e_',
-  passed: 'p a ss -ed',
+  passed: 'p a^ ss -ed',
   vowel: 'v ow~ e@ l',
   true: 't r ue',
   hundred: 'h u n d r e@ d',
@@ -460,6 +464,161 @@ const SPECS = {
 };
 
 /**
+ * Story words outside the sight-word bank, described the same way.
+ *
+ * The decodability checker reads letters: it knows a child has been taught
+ * s, a and t, so it passed "last" in the first Band A story, and "his" from
+ * the second short-vowel phase on. But the a in "last" says /ar/ and the s in
+ * "his" says /z/, and neither sound is what those letters were taught to
+ * make. These entries tell the checker and the sound colours what each word
+ * actually says, for every story word whose spelling does not give it away.
+ * A word with an ending ("planted", "pushed") is found through its base.
+ *
+ * Some describe words the stories no longer use — they were rewritten when
+ * the checker learned sounds — and stay so that the next story to use "nose"
+ * or "bath" is checked properly too.
+ */
+const STORY_SPECS = {
+  // ── a says /ar/ (taught beside ar) ──────────────────────────────────────
+  past: 'p a^ s t',
+  path: 'p a^ th',
+  bath: 'b a^ th',
+  grass: 'g r a^ ss',
+  glass: 'g l a^ ss',
+  class: 'c l a^ ss',
+  pass: 'p a^ ss',
+  branch: 'b r a^ n ch',
+  nasty: 'n a^ s t y~',
+  afternoon: 'a^ f t er n oo n',
+  grandfather: 'g r a n d f a^ th er',
+  grandpa: 'g r a n d p a^',
+  halfway: 'h a* l* f w ay | a says /ar/ and the l is silent',
+  calm: 'c a* l* m | a says /ar/ and the l is silent',
+  palm: 'p a* l* m | a says /ar/ and the l is silent',
+  auntie: 'au* n t ie* | au says /ar/ and ie says /ee/',
+
+  // ── s says /z/ ──────────────────────────────────────────────────────────
+  as: 'a s* | s says /z/',
+  says: 's ay* s* | ay says /e/ and s says /z/',
+  nose: 'n o s* e_ | s says /z/',
+  rose: 'r o s* e_ | s says /z/',
+  chose: 'ch o s* e_ | s says /z/',
+  rise: 'r i s* e_ | s says /z/',
+  surprise: 's ur p r i s* e_ | s says /z/',
+  cosy: 'c o~ s* y~ | s says /z/',
+  nosy: 'n o~ s* y~ | s says /z/',
+  busy: 'b u* s* y~ | u says /i/ and s says /z/',
+  noise: 'n oi s* e* | s says /z/ and the e is silent',
+  pause: 'p au s* e* | s says /z/ and the e is silent',
+  whose: 'wh* o* s* e* | it says "hooz": w is silent, o says /oo/ and s says /z/',
+  treasure: 't r ea* s* ure* | ea says /e/, s says /zh/ and ure says /er/',
+  shophouses: 'sh o p h ou s* -es | s says /z/ before -es',
+
+  // ── o, u and a that say another sound ──────────────────────────────────
+  cover: 'c o* v er | o says /u/',
+  discovered: 'd i s c o* v er -ed | o says /u/',
+  honey: 'h o* n ey* | o says /u/ and ey says /ee/',
+  monkey: 'm o* n k ey* | o says /u/ and ey says /ee/',
+  month: 'm o* n th | o says /u/',
+  none: 'n o* n e* | o says /u/ and the e is silent',
+  won: 'w o* n | o says /u/',
+  grandmother: 'g r a n d m o* th er | o says /u/',
+  anyone: 'a* n y~ o* n e* | a says /e/, and "one" says "wun"',
+  someone: 's o* m e* o* n e* | o says /u/, and "one" says "wun"',
+  somewhere: 's o* m e* wh ere* | o says /u/ and ere says /air/',
+  stomach: 's t o* m a@ ch* | o says /u/ and ch says /k/',
+  tongue: 't o* n gue* | o says /u/ and gue says /g/',
+  shove: 'sh o* v e* | o says /u/ and the e is silent',
+  shone: 'sh o* n e* | o says /o/, as in "hot", and the e is silent',
+  gone: 'g o* n e* | o says /o/, as in "hot", and the e is silent',
+  onto: 'o n t o* | o says /oo/, like in "to"',
+  woman: 'w o* m a@ n | o says /oo/, as in "book"',
+  fro: 'f r o* | o says its name, /ō/',
+  pro: 'p r o* | o says its name, /ō/',
+  oh: 'o* h* | o says its name and the h is silent',
+  full: 'f u* ll | u says /oo/, as in "book"',
+  bush: 'b u* sh | u says /oo/, as in "book"',
+  cushion: 'c u* sh io* n | u says /oo/ and io says /uh/',
+  sugar: 's* u* g ar* | s says /sh/, u says /oo/ and ar says /er/',
+  bury: 'b u* r y~ | u says /e/',
+  compass: 'c o* m p a@ ss | o says /u/',
+  tasty: 't a~ s t y~',
+  minute: 'm i n u* t e* | u says /i/ and the e is silent',
+  wash: 'w a* sh | a says /o/',
+  hall: 'h a* ll | a says /aw/',
+  stall: 's t a* ll | a says /aw/',
+  tall: 't a* ll | a says /aw/',
+  wall: 'w a* ll | a says /aw/',
+  salty: 's a* l t y~ | a says /aw/',
+  warm: 'w ar* m | ar says /or/',
+  word: 'w or* d | or says /er/',
+  workshop: 'w or* k sh o p | or says /er/',
+  worth: 'w or* th | or says /er/',
+  worry: 'w o* rr y~ | o says /u/',
+
+  // ── vowel teams that say another sound ─────────────────────────────────
+  bread: 'b r ea* d | ea says /e/',
+  breakfast: 'b r ea* k f a@ s t | ea says /e/',
+  breath: 'b r ea* th | ea says /e/',
+  feather: 'f ea* th er | ea says /e/',
+  heavier: 'h ea* v i@ er | ea says /e/',
+  instead: 'i n s t ea* d | ea says /e/',
+  meant: 'm ea* n t | ea says /e/',
+  spread: 's p r ea* d | ea says /e/',
+  heart: 'h ear* t | ear says /ar/',
+  pearl: 'p ear* l | ear says /er/',
+  search: 's ear* ch | ear says /er/',
+  wearing: 'w ear* -ing | ear says /air/',
+  leaves: 'l ea v -es',
+  toes: 't oe -s',
+  courage: 'c ou* r a* g~ e_ | ou says /u/ and a says /i/',
+  favourite: 'f a v ou* r i* t e* | ou says /uh/, i says /i/ and the e is silent',
+  pour: 'p our* | our says /or/',
+  shoulder: 'sh ou* l d er | ou says /oa/',
+  touch: 't ou* ch | ou says /u/',
+  doubt: 'd ou b* t | the b is silent',
+  believe: 'b e@ l ie* v e* | ie says /ee/ and the e is silent',
+  thief: 'th ie* f | ie says /ee/',
+  grey: 'g r ey* | ey says /ay/',
+  key: 'k ey* | ey says /ee/',
+  built: 'b ui* l t | ui says /i/',
+  building: 'b ui* l d -ing | ui says /i/',
+  juice: 'j ui* c~ e* | ui says /oo/ and the e is silent',
+  caught: 'c augh* t | augh says /aw/',
+  straight: 's t r aigh* t | aigh says /ay/',
+  guard: 'g u* ar d | the u is silent',
+  kueh: 'k ueh* | it says "kway"',
+  cendol: 'c* e n d o l | in Malay, c says /ch/',
+
+  // ── silent letters ─────────────────────────────────────────────────────
+  knee: 'k* n ee | the k is silent',
+  knelt: 'k* n e l t | the k is silent',
+  knife: 'k* n i f e_ | the k is silent',
+  knock: 'k* n o ck | the k is silent',
+  knot: 'k* n o t | the k is silent',
+  wrong: 'w* r o ng | the w is silent',
+  whistle: 'wh i s t* le | the t is silent',
+  island: 'i~ s* l a@ n d | the s is silent',
+  yoghurt: 'y o g h* ur t | the h is silent',
+  else: 'e l s e* | the e is silent',
+  orchids: 'or ch* i d -s | ch says /k/',
+  mrs: 'm* r* s* | Mrs is short for a longer word: say "missiz"',
+  mr: 'm* r* | Mr is short for "mister"',
+  mrt: 'm* r* t* | say the letter names: M, R, T',
+
+  // ── endings and the long vowel on its own ──────────────────────────────
+  adventure: 'a d v e n t* ure* | t says /ch/ and ure says /er/',
+  special: 's p e c* ia* l | c says /sh/ and ia says /uh/',
+  necklace: 'n e ck l a* c e* | ace says /iss/',
+  bicycle: 'b i~ c~ y* c le | y says /i/',
+  fold: 'f o~ l d',
+  gold: 'g o~ l d',
+  sold: 's o~ l d',
+  mind: 'm i~ n d',
+  post: 'p o~ s t',
+};
+
+/**
  * The phase that teaches each regular letter group. Single letters and
  * short vowels are phase 1 and need no entry.
  */
@@ -476,6 +635,7 @@ const GRAPHEME_PHASE = Object.freeze({
 /** A token's phase when it carries a marker. */
 function _markedPhase(base, marker) {
   if (marker === '@') return 10; // unstressed vowel: met in the multisyllable stage
+  if (marker === '^') return 7; // a says /ar/: taught beside ar
   if (marker === '~') {
     if (base === 'c' || base === 'g') return 7; // soft c / soft g
     if (base === 'ow') return 8; // ow as in cow
@@ -511,6 +671,7 @@ const LATER_SOUND = Object.freeze({
 function _waitsOn(base, shown, marker, isSuffix, earlier) {
   if (isSuffix) return { waitsOn: `-${shown}`, tip: `the ending “-${shown}”` };
   if (marker === '@') return null;
+  if (marker === '^') return { waitsOn: 'a^', tip: '“a” can say /ar/, as in “fast”' };
   if (base === 'e_') {
     const vowel = [...earlier].reverse().find((s) => SINGLE_VOWEL.test(s.text.toLowerCase()));
     if (!vowel) return { waitsOn: 'e', tip: 'Magic E' };
@@ -539,6 +700,11 @@ function _waitsOn(base, shown, marker, isSuffix, earlier) {
  *   length (two or more beats) that waits for phase 10, or when nothing does
  * @property {string|null} waitsOnTip  waitsOn as a child is told it: "Magic E
  *   makes “i” say its name", "“c” can say /s/", "“ay”"
+ * @property {number} soundPhase  the phase that teaches the latest SOUND the
+ *   word's letters make, counting only the marked groups (~ and ^): the
+ *   letters themselves are the decodability checker's business, and a word
+ *   of two beats is not harder to sound out for being long. 1 when no group
+ *   is marked; for a heart word, the regular parts only.
  */
 
 /** @param {string} word @param {string} spec @returns {SightWordCode} */
@@ -550,16 +716,20 @@ function _parse(word, spec) {
   let waits = null;
   let vowelBeats = 0;
   let tricky = false;
+  let soundPhase = 1;
   for (const raw of groups.split(/\s+/)) {
     const isSuffix = raw.startsWith('-');
-    const marker = /[*~@]$/.exec(raw)?.[0] ?? '';
-    const text = raw.replace(/^-/, '').replace(/[*~@]$/, '');
+    const marker = /[*~@^]$/.exec(raw)?.[0] ?? '';
+    const text = raw.replace(/^-/, '').replace(/[*~@^]$/, '');
     const shown = text.replace(/_$/, ''); // e_ is written as e
     const base = text.toLowerCase();
     if (marker === '*') tricky = true;
     const earlier = [...segments];
-    segments.push({ text: shown, tricky: marker === '*' });
+    segments.push({ text: shown, tricky: marker === '*', mark: marker });
     if (marker === '*') continue;
+    if (marker === '~' || marker === '^') {
+      soundPhase = Math.max(soundPhase, _markedPhase(base, marker));
+    }
     const p = isSuffix ? 9 : (_markedPhase(base, marker) ?? GRAPHEME_PHASE[base] ?? 1);
     if (p > phase) {
       phase = p;
@@ -582,13 +752,26 @@ function _parse(word, spec) {
     decodableAt: tricky ? null : phase,
     waitsOn: tricky ? null : (waits?.waitsOn ?? null),
     waitsOnTip: tricky ? null : (waits?.tip ?? null),
+    soundPhase,
   };
 }
 
 const _CODE = new Map(Object.entries(SPECS).map(([w, spec]) => [w.toLowerCase(), _parse(w, spec)]));
+const _STORY_CODE = new Map(
+  Object.entries(STORY_SPECS).map(([w, spec]) => [w.toLowerCase(), _parse(w, spec)]),
+);
+/** Stories are read with their apostrophes cleaned off: "cant" is "can't". */
+const _BY_LETTERS = new Map(
+  [..._CODE, ..._STORY_CODE]
+    .filter(([w]) => /[^a-z]/.test(w))
+    .map(([w, code]) => [w.replace(/[^a-z]/g, ''), code]),
+);
 
 /** Every described sight word, for tests and reports. */
 export const SIGHT_WORD_CODE = Object.freeze(Object.fromEntries(_CODE));
+
+/** Every described story word outside the sight-word bank. */
+export const STORY_WORD_CODE = Object.freeze(Object.fromEntries(_STORY_CODE));
 
 /**
  * One line for the child about how to read the word.
@@ -613,4 +796,16 @@ export function sightWordTip(code) {
  */
 export function getSightWordCode(word) {
   return _CODE.get(String(word ?? '').toLowerCase()) ?? null;
+}
+
+/**
+ * How any described word is built — a sight word, or a story word whose
+ * spelling does not give its sounds away. Null for a word whose letters
+ * all make the sound they were taught to make.
+ * @param {string} word
+ * @returns {SightWordCode|null}
+ */
+export function getWordCode(word) {
+  const key = String(word ?? '').toLowerCase();
+  return _CODE.get(key) ?? _STORY_CODE.get(key) ?? _BY_LETTERS.get(key) ?? null;
 }

@@ -113,12 +113,8 @@ _For the back page of the book._
 - **o** — got, on, rod, not, off, stop
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **the** — ❤️ tricky part: e says /uh/
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
+- **full** — ❤️ tricky part: u says /oo/, as in "book"
 - **no** — ❤️ tricky part: o says its name, /ō/
-- **to** — ❤️ tricky part: o says /oo/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **his** — ❤️ tricky part: s says /z/
 
 **Word meanings** — talk about these before reading:
 - **MRT** — A fast train that runs around Singapore
@@ -247,14 +243,8 @@ _For the back page of the book._
 - **u** — hung, up
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
 - **school** — ❤️ tricky part: ch says /k/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **his** — ❤️ tricky part: s says /z/
-- **know** — ❤️ tricky part: the k is silent
 - **where** — ❤️ tricky part: ere says /air/, as in "there"
-- **to** — ❤️ tricky part: o says /oo/
 - **put** — ❤️ tricky part: u says /oo/, as in "book"
 
 **Word meanings** — talk about these before reading:
@@ -270,7 +260,7 @@ _For the back page of the book._
 2. What room did Giri go into?  
    The wrong room ✓ · His own room · The big room · The wet room
 3. How do you think Giri felt at the start of school?  
-   Worried and lost ✓ · Very happy · Very sleepy · Very hungry
+   Sad and lost ✓ · Very happy · Very sleepy · Very hungry
 4. He had a big red ___.  
    bag ✓ · bug · beg
 5. Put these in the order they happened.  
@@ -382,19 +372,13 @@ _For the back page of the book._
 - **ai** — paid
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **to** — ❤️ tricky part: o says /oo/
-- **the** — ❤️ tricky part: e says /uh/
-- **his** — ❤️ tricky part: s says /z/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **from** — ❤️ tricky part: o says /u/
+- **stalls** — read it to your child for now
+- **stall** — A small stand that sells food or things
 
 **Word meanings** — talk about these before reading:
 - **hawker centre** — An open-air place with many food stalls in Singapore
 - **maze** — A set of paths that is hard to find your way through
 - **lane** — A narrow path or street
-- **stall** — A small stand that sells food or things
 - **auntie** — A friendly word for an older woman in Singapore
 
 **After reading — check understanding** (answer ticked):
@@ -403,7 +387,7 @@ _For the back page of the book._
 2. Who helped Giri find the stall?  
    A nice auntie ✓ · A kind man · His mum · The chef
 3. How do you think Giri felt when he was lost?  
-   Worried and confused ✓ · Happy and excited · Hungry and tired · Bored and sleepy
+   Lost and upset ✓ · Happy and excited · Hungry and tired · Bored and sleepy
 4. Giri gave a wave and ___.  
    paid ✓ · pad · pod
 5. Put these in the order they happened.  
@@ -515,13 +499,9 @@ _For the back page of the book._
 - **igh** — lights, light
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **the** — ❤️ tricky part: e says /uh/
-- **of** — ❤️ tricky part: o says /u/ and f says /v/
-- **his** — ❤️ tricky part: s says /z/
+- **full** — ❤️ tricky part: u says /oo/, as in "book"
 - **called** — ❤️ tricky part: a says /aw/
-- **he** — ❤️ tricky part: e says its name, /ē/
-- **to** — ❤️ tricky part: o says /oo/
+- **stall** — ❤️ tricky part: a says /aw/
 - **they** — ❤️ tricky part: ey says /ay/
 
 **Word meanings** — talk about these before reading:
@@ -586,7 +566,7 @@ THE STORY
 Page 1: It was Deepavali. The street had bright oil lamps and gold clay pots.
 Page 2: Giri's oil lamp went out in the wind.
 Page 3: Giri cupped his hands to keep the flame safe.
-Page 4: A kind auntie came and lit the lamp. The lane shone bright once more.
+Page 4: A kind auntie came and lit the lamp. The lane was bright once more.
 Page 5: Giri sat and ate a sweet treat. He felt glad.
 ```
 
@@ -627,7 +607,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: A kind auntie came and lit the lamp. The lane shone bright once more.
+Words on this page: A kind auntie came and lit the lamp. The lane was bright once more.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -648,13 +628,7 @@ _For the back page of the book._
 - **igh** — bright
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **was** — ❤️ tricky part: a says /o/ and s says /z/
-- **the** — ❤️ tricky part: e says /uh/
-- **his** — ❤️ tricky part: s says /z/
-- **to** — ❤️ tricky part: o says /oo/
-- **a** — ❤️ tricky part: on its own, a says /uh/
 - **once** — ❤️ tricky part: it says "wunce": o makes /w/ and /u/
-- **he** — ❤️ tricky part: e says its name, /ē/
 
 **Word meanings** — talk about these before reading:
 - **Deepavali** — A festival of lights celebrated by Indian families in Singapore and around the world
@@ -689,7 +663,7 @@ _Read this one together: it uses some words and sentences beyond the sounds your
 
 ## Giri at Gardens by the Bay
 
-`sg-gardens` · Band C · 62 words · sounds: ar, ir, er
+`sg-gardens` · Band C · 60 words · sounds: ar, ir, er
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -719,7 +693,7 @@ Page 1: Giri went to the Gardens by the Bay to see the tall Supertrees.
 Page 2: A small bird got stuck in the garden net.
 Page 3: Giri called for a park ranger to help.
 Page 4: Giri got a long stick and helped the bird get free. The bird flew up with a chirp.
-Page 5: Giri looked up at the stars and felt a warm glow in his heart.
+Page 5: Giri looked up at the stars and felt a warm glow inside.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -767,7 +741,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: Giri looked up at the stars and felt a warm glow in his heart.
+Words on this page: Giri looked up at the stars and felt a warm glow inside.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -780,12 +754,8 @@ _For the back page of the book._
 - **ir** — bird, chirp
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **to** — ❤️ tricky part: o says /oo/
-- **the** — ❤️ tricky part: e says /uh/
-- **a** — ❤️ tricky part: on its own, a says /uh/
-- **small** — ❤️ tricky part: a says /aw/
-- **called** — ❤️ tricky part: a says /aw/
-- **his** — ❤️ tricky part: s says /z/
+- **tall** — ❤️ tricky part: a says /aw/
+- **warm** — ❤️ tricky part: ar says /or/
 
 **Word meanings** — talk about these before reading:
 - **Supertrees** — Tall tree-shaped structures at Gardens by the Bay in Singapore
@@ -813,7 +783,7 @@ _A good answer:_ He felt happy and proud, with a warm glow in his heart, because
 - How did Giri help the bird get free?
 - Why did Giri call the park ranger before he used the stick?
 
-**Spot it: r-controlled vowels (ar, ir, er)** — "garden", "bird", "ranger", "far", "her". When "r" comes after a vowel, the vowel sound changes. These are called r-controlled vowels.
+**Spot it: r-controlled vowels (ar, ir, er)** — "garden", "bird", "ranger". When "r" comes after a vowel, the vowel sound changes. These are called r-controlled vowels.
 
 **Spot it: Conjunctions (joining words)** — The ranger was far away and could not hear.. "And" joins two ideas in one sentence.
 
