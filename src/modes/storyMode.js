@@ -1706,10 +1706,10 @@ function _soundLegendHtml() {
   ).join('');
   // Short and long also print their diacritic above the vowel in the story
   // itself, so the two that turn up on every line are never told apart by
-  // colour alone. Saying so is what makes the marks readable rather than
-  // mysterious.
+  // colour alone, and a heart part prints a ♥. Saying so is what makes the
+  // marks readable rather than mysterious.
   return `<div class="sound-legend" aria-label="What the vowel colours mean">
-      <span class="sl-lead">A short vowel wears <b class="vs--short">˘</b> and a long vowel wears <b class="vs--long">¯</b>:</span>
+      <span class="sl-lead">A short vowel wears <b class="vs--short">˘</b>, a long vowel wears <b class="vs--long">¯</b>, and a heart part wears <b class="vs--heart">♥&#xFE0E;</b> — learn that bit by heart:</span>
       ${items}
     </div>`;
 }

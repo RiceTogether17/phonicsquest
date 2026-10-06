@@ -26,7 +26,7 @@
  */
 
 import { WORDS } from '../data/words.js';
-import { PROPER_NOUNS } from './decodability.js';
+import { OW_LONG, PROPER_NOUNS, wordSoundCode } from './decodability.js';
 
 // ── Canonical palette ──────────────────────────────────────────────────────
 
@@ -64,9 +64,15 @@ export const SOUND_META = Object.freeze({
   short:       { label: 'short vowel',   color: '#d62828', mark: 'ă',  cue: '˘' },
   long:        { label: 'long vowel',    color: '#1a7f37', mark: 'ā',  cue: '¯' },
   schwa:       { label: 'schwa · lazy “uh”', color: '#6b7280', mark: 'ə' },
-  rcontrolled: { label: 'bossy-r vowel', color: '#7c3aed', mark: 'ûr' },
+  rcontrolled: { label: 'bossy-r sound (car, her)', color: '#7c3aed', mark: 'ûr' },
   diphthong:   { label: 'sliding vowel', color: '#0072c0', mark: 'oi' },
   silent:      { label: 'silent letter', color: '#9aa3af', mark: '∅' },
+  // A heart part: letters that do not make the sound the child was taught
+  // for them (the s of "his", the a of "was"), so the word is learned by
+  // heart. The ♥ printed above is the classroom "heart word" mark, and like
+  // the breve and macron it keeps the category from resting on colour alone.
+  // U+FE0E asks for the plain glyph, not a red emoji.
+  heart:       { label: 'heart part · learn by heart', color: '#86198f', mark: '♥', cue: '♥\uFE0E' },
   consonant:   { label: 'consonant',     color: '#2563eb', mark: '' },
   digraph:     { label: 'digraph',       color: '#0891b2', mark: '' },
   blend:       { label: 'blend',         color: '#d97706', mark: '' },
@@ -75,7 +81,7 @@ export const SOUND_META = Object.freeze({
 
 /** Categories a child sees when the inline "Sound colours" scaffold is on. */
 export const VOWEL_LEGEND = Object.freeze(
-  ['short', 'long', 'schwa', 'rcontrolled', 'diphthong', 'silent']
+  ['short', 'long', 'schwa', 'rcontrolled', 'diphthong', 'silent', 'heart']
     .map(key => ({ key, ...SOUND_META[key] }))
 );
 
@@ -166,13 +172,9 @@ const EA_SHORT = new Set([                                   // ea → short /ɛ
 ]);
 const EE_SHORT = new Set(['been']);                          // ee → short /ɪ/
 const IE_SHORT = new Set(['friend', 'friends']);             // ie → short /ɛ/
-const OW_LONG = new Set([                                    // ow → long /oʊ/
-  'snow', 'show', 'shown', 'low', 'below', 'grow', 'grown', 'blow', 'blown',
-  'glow', 'flow', 'slow', 'throw', 'thrown', 'own', 'owned', 'know', 'known',
-  'yellow', 'follow', 'window', 'arrow', 'narrow', 'elbow', 'rainbow', 'bowl',
-  'sparrow', 'pillow', 'shadow', 'meadow', 'borrow', 'tomorrow', 'below',
-  'row', 'mow', 'sow', 'bow', 'crow', 'flown', 'growth',
-]);
+// OW_LONG (ow saying its name, as in snow) is shared with the decodability
+// checker, which needs it to know when ow is taught.
+
 
 // Inflectional suffixes stripped before a set lookup, so "showed"/"slowly"
 // inherit "show"/"slow". 'er'/'en' are deliberately excluded — they would
@@ -410,7 +412,51 @@ export function vowelSegments(rawWord) {
   const word = rawWord.toLowerCase().replace(/[^a-z]/g, '');
   if (!word) return null;
   if (PROPER_NOUNS.has(word)) return null;
+  return withWordCode(word, spellingSegments(word));
+}
 
+/** What a word's letter groups say in sightWordCode.js, as sound categories. */
+const MARKED_SOUND = Object.freeze({ '*': 'heart', '^': 'rcontrolled', '@': 'schwa' });
+
+/**
+ * Lay what sightWordCode.js knows about a word over what its spelling
+ * suggests. The spelling rules cannot see that the s of "his" says /z/ or
+ * that the a of "fast" says /ar/; the word code can. A heart part is
+ * coloured as one, a says /ar/ takes the ar colour, and a vowel saying its
+ * name on its own ("cold", "find") is long, not short.
+ *
+ * A word met with an ending ("pushed") uses its base word's code, as far as
+ * the two are spelled the same ("coming" keeps the o of "come", not its e).
+ */
+function withWordCode(word, segs) {
+  const code = wordSoundCode(word);
+  if (!code) return segs;
+  const letters = [];
+  for (const { len, sound } of segs) for (let k = 0; k < len; k++) letters.push(sound);
+  let idx = 0;
+  for (const seg of code.segments) {
+    const text = seg.text.toLowerCase();
+    if (word.slice(idx, idx + text.length) !== text) break;
+    let sound = MARKED_SOUND[seg.mark];
+    if (seg.mark === '~') {
+      if (/^[aeiou]$/.test(text)) sound = 'long';
+      else if (text === 'oo') sound = 'short';
+      else if (text === 'ow') sound = 'diphthong';
+    }
+    if (sound) for (let k = idx; k < idx + text.length; k++) letters[k] = sound;
+    idx += text.length;
+  }
+  const out = [];
+  for (const sound of letters) {
+    const last = out[out.length - 1];
+    if (last && last.sound === sound) last.len += 1;
+    else out.push({ len: 1, sound });
+  }
+  return out;
+}
+
+/** Segments from spelling alone: the curated tables, the bank, the rules. */
+function spellingSegments(word) {
   const irregular = IRREGULAR.get(word);
   if (irregular) {
     // Coalesce the per-letter array into runs.

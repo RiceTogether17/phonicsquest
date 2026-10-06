@@ -45,13 +45,14 @@ describe('_highlightGraphemes (sound-colour scaffold)', () => {
     expect(classOf(out, 'e')).toBe('silent');
   });
 
-  it('marks the article "a" as schwa', () => {
-    expect(classOf(_highlightGraphemes('a'), 'a')).toBe('schwa');
+  it('marks the article "a" as a heart word', () => {
+    // On its own, a says /uh/ — a sound no rule has taught the letter yet.
+    expect(classOf(_highlightGraphemes('a'), 'a')).toBe('heart');
   });
 
   it('leaves consonants and spacing intact', () => {
     const out = _highlightGraphemes('the cat sat');
-    expect(classOf(out, 'e')).toBe('schwa'); // schwa e in "the"
+    expect(classOf(out, 'e')).toBe('heart'); // the heart part of "the"
     expect(out.replace(/<[^>]+>/g, '')).toBe('the cat sat'); // strip spans → original text
   });
 

@@ -5036,6 +5036,13 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .vs--silent {
   --vs-color: #9aa3af;
 }
+/* A heart part: the letters of a heart word that do not make their taught
+   sound (the s of "his"), with a ♥ printed above like the breve. A deep
+   magenta: ΔE 19.8 or more from every other vowel colour and the body text
+   under all three colour-blindness simulations (see phonemeColors.js). */
+.vs--heart {
+  --vs-color: #86198f;
+}
 
 /* Inline vowel spans inside running story text — colour + weight only, so
    the line still reads as words, not tiles. Silent letters fade back. */
@@ -5085,6 +5092,11 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .vs[data-cue='¯']::after {
   bottom: 0.56em;
 }
+/* The heart is a full-height glyph: smaller, and set just above the letter. */
+.vs.vs--heart[data-cue]::after {
+  font-size: 0.6em;
+  bottom: 1.05em;
+}
 
 /* Room above each line so a diacritic is never clipped by the line above. */
 .story-body .sline {
@@ -5120,6 +5132,12 @@ details.story-tool-section[open] > .story-tool-summary::before {
   .vs--diphthong {
     --vs-color: #60a5fa;
   }
+  .vs--heart {
+    --vs-color: #f0abfc;
+  }
+}
+:root[data-theme='dark'] .vs--heart {
+  --vs-color: #f0abfc;
 }
 :root[data-theme='dark'] .vs--schwa {
   --vs-color: #9aa3af;
