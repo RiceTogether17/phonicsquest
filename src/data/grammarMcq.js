@@ -915,16 +915,16 @@ const GRAMMAR_BUILDERS = {
   },
   svAgreement(level, i) {
     const rows = [
-      ['The captain of the team ___ early every day.', 'arrives', ['arrive', 'arrived', 'arriving'], {
+      ['The captain of the team ___ early every day.', 'arrives', ['arrive', 'are arriving', 'arriving'], {
         'arrives': '"Arrives" is correct because the true subject is "the captain" (singular), not "the team".',
         'arrive': '"Arrive" is for plural subjects, but the true subject here is "the captain" (singular).',
-        'arrived': '"Arrived" is simple past, but the sentence describes a current routine.',
+        'are arriving': '"Are" goes with a plural subject, but the true subject "the captain" is singular.',
         'arriving': '"Arriving" alone cannot be the main verb — it needs a helper like "is".',
       }],
-      ['My cousins ___ badminton after school.', 'play', ['plays', 'played', 'is playing'], {
+      ['My cousins ___ badminton after school.', 'play', ['plays', 'has played', 'is playing'], {
         'play': '"Play" is correct because "cousins" is plural, so the base form without -s is used.',
         'plays': '"Plays" is for a singular subject (he/she/it), but "cousins" is plural.',
-        'played': '"Played" is simple past, but the sentence describes a present routine.',
+        'has played': '"Has" goes with a singular subject (he/she/it), but "cousins" is plural.',
         'is playing': '"Is playing" uses a singular auxiliary "is", but "cousins" is plural.',
       }],
       ['There ___ two packets of rice on the shelf.', 'are', ['is', 'was', 'has'], {
@@ -939,10 +939,10 @@ const GRAMMAR_BUILDERS = {
         'was': '"Was" is singular past tense, but the sentence is in the present.',
         'be': '"Be" is a base form and cannot be used as a main verb without a helper.',
       }],
-      ['Each student ___ a name tag for the camp.', 'has', ['have', 'had', 'having'], {
+      ['Each student ___ a name tag for the camp.', 'has', ['have', 'are having', 'having'], {
         'has': '"Has" is correct because "each" always takes a singular verb.',
         'have': '"Have" is for plural subjects; "each student" is always treated as singular.',
-        'had': '"Had" is simple past or past perfect, but the sentence is in the present.',
+        'are having': '"Are" goes with plural subjects, but "each student" is always singular.',
         'having': '"Having" alone cannot be the main verb — it needs a helper like "is".',
       }],
       ['One of the pupils ___ a birthday today.', 'has', ['have', 'had', 'having'], {
@@ -955,16 +955,16 @@ const GRAMMAR_BUILDERS = {
       // principal ___ the new timetable." with both "support" and "supported"
       // offered and no time context to choose between them. "supported" was
       // marked wrong for a defensible answer. The clause now fixes the time.
-      ['Both the teacher and the principal ___ the new timetable, which begins this Monday.', 'support', ['supports', 'supported', 'is supporting'], {
-        'support': '"Support" is correct because "both...and" joins two people, making the subject plural — and "begins this Monday" places the sentence in the present.',
+      ['Both the teacher and the principal ___ the new timetable, which begins this Monday.', 'support', ['supports', 'has supported', 'is supporting'], {
+        'support': '"Support" is correct because "both...and" joins two people, making the subject plural.',
         'supports': '"Supports" is for singular subjects, but "both the teacher and the principal" is plural.',
-        'supported': '"Supported" is simple past, but "which begins this Monday" is still ahead of us.',
+        'has supported': '"Has" goes with a singular subject, but "both the teacher and the principal" is plural.',
         'is supporting': '"Is supporting" uses a singular auxiliary "is", but the subject is plural.',
       }],
-      ['A box of crayons ___ been left in the art room.', 'has', ['have', 'had', 'having'], {
+      ['A box of crayons ___ been left in the art room.', 'has', ['have', 'are', 'having'], {
         'has': '"Has" is correct because the true subject is "a box" (singular), not "crayons".',
         'have': '"Have" is for plural subjects, but the true subject "a box" is singular.',
-        'had': '"Had" forms past perfect, but the context calls for present perfect with "has".',
+        'are': '"Are" is plural, and "are been" is not a verb form English uses.',
         'having': '"Having" alone cannot be the main verb — it needs a helper like "is".',
       }],
       ['Either the twins or their older sister ___ staying to help.', 'is', ['are', 'were', 'be'], {
@@ -976,10 +976,10 @@ const GRAMMAR_BUILDERS = {
       // Audit 2026-09-19, finding 11: "is" and "was" were both offered with no
       // tense clue in the stem, so "was" was a defensible answer marked wrong.
       // "we leave on Friday" now settles it.
-      ['The news about the school trip ___ very exciting — we leave on Friday!', 'is', ['are', 'was', 'be'], {
-        'is': '"Is" is correct because "news" is an uncountable noun that is always singular, and "we leave on Friday" shows this is happening now.',
+      ['The news about the school trip ___ very exciting — we leave on Friday!', 'is', ['are', 'were', 'be'], {
+        'is': '"Is" is correct because "news" is an uncountable noun that is always singular, even though it ends in -s.',
         'are': '"Are" is for plural subjects, but "news" is always singular even though it ends in -s.',
-        'was': '"Was" is past tense, but the trip is still to come — "we leave on Friday".',
+        'were': '"Were" is the plural past form, but "news" is always singular.',
         'be': '"Be" is a base form and cannot be used as a main verb without a helper.',
       }],
       ['Not a single pupil ___ absent on Picture Day.', 'was', ['were', 'is', 'are'], {
@@ -988,10 +988,10 @@ const GRAMMAR_BUILDERS = {
         'is': '"Is" is present singular, but Picture Day is described as a past event.',
         'are': '"Are" is present plural, but the sentence refers to a past event with a singular subject.',
       }],
-      ['Mathematics ___ her favourite subject at school.', 'is', ['are', 'was', 'be'], {
+      ['Mathematics ___ her favourite subject at school.', 'is', ['are', 'were', 'be'], {
         'is': '"Is" is correct because subjects ending in -ics (Mathematics, Physics) are treated as singular.',
         'are': '"Are" is for plural subjects, but Mathematics is treated as a singular subject.',
-        'was': '"Was" is past tense, but the sentence describes a present fact.',
+        'were': '"Were" is the plural past form, but Mathematics is treated as a singular subject.',
         'be': '"Be" is a base form and cannot be used as a main verb without a helper.',
       }],
       ['The pair of scissors ___ on the craft table.', 'is', ['are', 'were', 'be'], {
@@ -1000,10 +1000,10 @@ const GRAMMAR_BUILDERS = {
         'were': '"Were" is plural past tense, but the sentence describes a present situation.',
         'be': '"Be" is a base form and cannot be used as a main verb without a helper.',
       }],
-      ['Everyone on the bus ___ to arrive by seven.', 'needs', ['need', 'needed', 'needing'], {
+      ['Everyone on the bus ___ to arrive by seven.', 'needs', ['need', 'have needed', 'needing'], {
         'needs': '"Needs" is correct because "everyone" is always treated as singular.',
         'need': '"Need" is for plural subjects or I/you, but "everyone" is always singular.',
-        'needed': '"Needed" is simple past, but the sentence is in the present.',
+        'have needed': '"Have" goes with plural subjects, but "everyone" is always singular.',
         'needing': '"Needing" alone cannot be the main verb — it needs a helper like "is".',
       }],
       ['The committee ___ its decision after a long discussion.', 'made', ['make', 'makes', 'making'], {
@@ -1018,10 +1018,10 @@ const GRAMMAR_BUILDERS = {
         'were': '"Were" is plural past, but "the number" is singular and the sentence is present.',
         'have been': '"Have been" is for plural subjects, but "the number" is singular.',
       }],
-      ['A group of boys ___ playing catching in the school field.', 'is', ['are', 'were', 'have'], {
-        'is': '"Is" is correct because "a group" is a singular collective noun.',
+      ['Right now, a group of boys ___ playing football in the school field.', 'is', ['are', 'were', 'have'], {
+        'is': '"Is" is correct because "a group" is a singular collective noun, and "right now" needs the present.',
         'are': '"Are" is for plural subjects, but "a group" is treated as one unit.',
-        'were': '"Were" is plural past, but the sentence is present continuous.',
+        'were': '"Were" is plural past, but "right now" tells us the action is happening at present.',
         'have': '"Have" is for plural subjects in perfect tense, which does not fit this sentence.',
       }],
       ['Physics ___ my favourite subject this year.', 'is', ['are', 'were', 'have been'], {
@@ -1030,17 +1030,17 @@ const GRAMMAR_BUILDERS = {
         'were': '"Were" is plural past, but the sentence is in the present.',
         'have been': '"Have been" is for plural subjects in perfect tense, but Physics is singular.',
       }],
-      ['The audience ___ clapping loudly after the school concert ended.', 'was', ['were', 'is', 'are'], {
+      ['The audience ___ clapping loudly after the school concert ended.', 'was', ['be', 'is', 'are'], {
         'was': '"Was" is correct because "the audience" is a singular collective noun in a past context.',
-        'were': '"Were" would need "audience members" (plural) to be correct.',
+        'be': '"Be" is the base form; it cannot follow the subject directly as the main verb.',
         'is': '"Is" is present tense, but the concert has already ended.',
         'are': '"Are" is present plural, but the sentence describes a past event.',
       }],
-      ['None of the students ___ submitted their project on time.', 'has', ['have', 'had', 'were'], {
-        'has': '"Has" is correct because "none" here means "not one", so it takes a singular verb.',
-        'have': '"Have" treats "none" as plural, which is less precise when "none" means "not one".',
-        'had': '"Had" forms past perfect, but this sentence uses present perfect.',
-        'were': '"Were" is a linking verb and cannot combine with "submitted" to form present perfect.',
+      ['None of the birthday cake ___ been eaten yet.', 'has', ['have', 'are', 'were'], {
+        'has': '"Has" is correct because "cake" here is an uncountable amount, so "none of the cake" is singular.',
+        'have': '"Have" is for plural subjects, but "none of the cake" is a single, uncountable amount.',
+        'are': '"Are" is plural, and "are been" is not a verb form English uses.',
+        'were': '"Were" is plural past, and "were been" is not a verb form English uses.',
       }],
       ['Ali is the top scorer in his class. Each of his test papers ___ a mark above ninety.', 'has', ['have', 'had', 'having'], {
         'has': '"Has" is correct because "each" takes a singular verb, regardless of the noun that follows.',
@@ -1099,7 +1099,7 @@ const GRAMMAR_BUILDERS = {
       ['Everyone ___ when the magician pulled the rabbit from the hat.', 'clapped', ['clap', 'claps', 'clapping']],
       ['The coach ___ the team captain after the final whistle.', 'congratulated', ['congratulate', 'congratulates', 'congratulating']],
       ['It ___ raining suddenly during our outdoor lesson last Thursday.', 'started', ['start', 'starts', 'is starting']],
-      ['The puppy ___ at the door the whole time we were out yesterday.', 'waited', ['wait', 'waits', 'was waiting']],
+      ['The puppy ___ at the door the whole time we were out yesterday.', 'waited', ['wait', 'waits', 'is waiting']],
     ];
     const upperRows = [
       ['Yesterday, we ___ the art display before lunch.', 'visited', ['visit', 'visits', 'visiting'], {
@@ -1356,17 +1356,17 @@ const GRAMMAR_BUILDERS = {
         'with': '"With" expresses accompaniment, not location in an area.',
         'below': '"Below" shows something is lower down; shade is an area you are inside, not below.',
       }],
-      ['My bag is ___ the table next to my books.', 'on', ['in', 'under', 'between'], {
+      ['My bag is ___ the table, on top of the tabletop next to my books.', 'on', ['in', 'into', 'between'], {
         'on': '"On" is correct because the bag rests on the surface of the table.',
         'in': '"In" is for enclosed spaces; the table is a surface, not a container.',
-        'under': '"Under" means below the table; the bag is on top of it.',
+        'into': '"Into" shows movement entering something; the bag is resting still.',
         'between': '"Between" refers to position between two things; the bag is on the table surface.',
       }],
-      ['The cat is hiding ___ the chair. I cannot see it.', 'under', ['above', 'across', 'behind'], {
-        'under': '"Under" is correct because the cat is below the chair and out of sight.',
+      ['The cat is hiding ___ the chair, below the seat.', 'under', ['above', 'across', 'into'], {
+        'under': '"Under" is correct because the cat is below the chair — "below the seat" tells us so.',
         'above': '"Above" means higher than the chair; the cat is hidden below it.',
         'across': '"Across" means on the other side of or over a distance; the cat is directly below.',
-        'behind': '"Behind" could also work, but "under" better explains why the cat cannot be seen easily.',
+        'into': '"Into" shows movement entering something; the cat is staying still below the seat.',
       }],
       ['The children ran ___ the playground after the bell rang.', 'to', ['at', 'on', 'in'], {
         'to': '"To" is correct because the children are moving in the direction of the playground.',
@@ -1404,21 +1404,21 @@ const GRAMMAR_BUILDERS = {
         'in': '"In" is for enclosed spaces; a branch is a surface, not a container.',
         'under': '"Under" would mean the bird is below the branch; it is sitting on top of it.',
       }],
-      ['She waited ___ the bus stop for almost twenty minutes.', 'at', ['in', 'on', 'by'], {
+      ['She waited ___ the bus stop for almost twenty minutes.', 'at', ['in', 'on', 'into'], {
         'at': '"At" is correct because a bus stop is a fixed point or location.',
         'in': '"In" is for enclosed spaces; a bus stop is an open point, not an enclosure.',
         'on': '"On" is for surfaces; a bus stop is a location, not a surface.',
-        'by': '"By" means beside; while possible, "at the bus stop" is the standard expression.',
+        'into': '"Into" shows movement entering something; she was standing still while she waited.',
       }],
-      ['The dog sat ___ the two children in the photograph.', 'between', ['among', 'beside', 'behind'], {
+      ['The dog sat ___ the two children in the photograph, with one child on each side of it.', 'between', ['among', 'beside', 'behind'], {
         'between': '"Between" is correct because it is used when something is in the middle of exactly two things.',
         'among': '"Among" is for being in the middle of three or more things; only two children are mentioned.',
         'beside': '"Beside" means next to one side; "between" means in the middle of both children.',
         'behind': '"Behind" means at the back; the dog is in the middle of the two children.',
       }],
-      ['The kitten is sleeping ___ the void deck bench.', 'under', ['on', 'above', 'into'], {
-        'under': '"Under" is correct because the kitten is below the bench.',
-        'on': '"On" would mean the kitten is resting on top of the bench, not below it.',
+      ['The kitten is sleeping ___ the void deck bench, in the shade below the seat.', 'under', ['through', 'above', 'into'], {
+        'under': '"Under" is correct because the kitten is below the bench — "below the seat" tells us so.',
+        'through': '"Through" means passing from one side to the other; the kitten is lying still.',
         'above': '"Above" means higher than the bench; the kitten is below it.',
         'into': '"Into" shows movement entering something; the kitten is stationary below the bench.',
       }],
@@ -1434,13 +1434,13 @@ const GRAMMAR_BUILDERS = {
         'at': '"At" shows a location or point; it cannot be used to describe storage inside a container.',
         'under': '"Under" means below; the glasses are inside the purse, not beneath it.',
       }],
-      ['The ball landed ___ the two flowerpots.', 'between', ['above', 'behind', 'beside'], {
+      ['The ball landed ___ the two flowerpots, right in the gap in the middle.', 'between', ['above', 'behind', 'beside'], {
         'between': '"Between" is correct because the ball is in the middle space of exactly two flowerpots.',
         'above': '"Above" means higher than both pots; the ball landed at ground level between them.',
         'behind': '"Behind" means at the back of the pots; the ball landed in the middle space between them.',
         'beside': '"Beside" means next to one pot; "between" means in the middle of both.',
       }],
-      ['My little brother sat ___ me on the MRT.', 'beside', ['above', 'into', 'behind'], {
+      ['My little brother sat ___ me on the MRT, so we could share my storybook.', 'beside', ['above', 'into', 'behind'], {
         'beside': '"Beside" is correct because it means next to someone, on one side.',
         'above': '"Above" would mean he floated above; he is seated next to the speaker.',
         'into': '"Into" shows movement entering; they are already seated and stationary.',
@@ -1472,10 +1472,10 @@ const GRAMMAR_BUILDERS = {
         'over': '"Over" implies going above the road; you cross a road by going "across" it.',
         'through': '"Through" means passing inside something; you go "across" a road, not through it.',
       }],
-      ['Emily wandered ___ a street she did not recognise.', 'down', ['off', 'around', 'among'], {
+      ['Emily wandered ___ a street she did not recognise.', 'down', ['off', 'between', 'among'], {
         'down': '"Down" is correct because you walk along the length of a street (go down the street).',
         'off': '"Off" means away from something, not along a street.',
-        'around': '"Around" means moving in a circular direction; here Emily is going along the street.',
+        'between': '"Between" needs two things on either side; one street cannot be walked "between".',
         'among': '"Among" is for being in the middle of a group of things; it does not describe movement along a street.',
       }],
       ['Tall buildings stood all ___ her.', 'around', ['beside', 'across', 'towards'], {
@@ -1508,9 +1508,9 @@ const GRAMMAR_BUILDERS = {
         'over': '"Over" means passing above the box; the cat entered and sat inside it.',
         'through': '"Through" means passing all the way inside and out the other side; the cat stayed inside.',
       }],
-      ['We walked ___ the busy road carefully, watching out for traffic.', 'along', ['across', 'through', 'around'], {
-        'along': '"Along" is correct because you walk beside and in the same direction as the road.',
-        'across': '"Across" means crossing from one side to the other; here you are walking parallel to the road.',
+      ['We walked ___ the pavement beside the busy road, all the way to the bus stop.', 'along', ['into', 'through', 'around'], {
+        'along': '"Along" is correct because you walk the length of the pavement, in the same direction as the road.',
+        'into': '"Into" means entering something; the pavement is a path you follow, not a place you enter.',
         'through': '"Through" means passing inside something; you walk "along" a road.',
         'around': '"Around" means in a circular path; you walk in a straight line along the road.',
       }],
@@ -1528,13 +1528,13 @@ const GRAMMAR_BUILDERS = {
         'under': '"Under" would mean below the desk; it should be placed on top.',
         'between': '"Between" refers to position between two objects; the file goes on the desk surface.',
       }],
-      ['We reached school ___ 7.20 a.m. today.', 'at', ['on', 'in', 'by'], {
+      ['We reached school ___ 7.20 a.m. today.', 'at', ['on', 'in', 'for'], {
         'at': '"At" is correct because it is used with specific clock times.',
         'on': '"On" is used with days or dates, not clock times.',
         'in': '"In" is used with months or years, not specific clock times.',
-        'by': '"By" means not later than 7.20 a.m.; "at" states the exact time of arrival.',
+        'for': '"For" tells how long something lasts ("for ten minutes"), not the time it happens.',
       }],
-      ['The football rolled ___ the bench.', 'under', ['above', 'across', 'toward'], {
+      ['The football rolled ___ the bench, so we had to crawl below it to get it back.', 'under', ['above', 'across', 'toward'], {
         'under': '"Under" is correct because the ball rolled below and beneath the bench.',
         'above': '"Above" means higher than the bench; the ball rolled below it.',
         'across': '"Across" means from one side to the other; the ball rolled below the bench.',
@@ -1576,7 +1576,7 @@ const GRAMMAR_BUILDERS = {
         'at': '"At" is for clock times or locations, not deadlines.',
         'on': '"On Friday" states the day; "by Friday" sets a deadline — these have different meanings.',
       }],
-      ['The class chairperson stood ___ the principal and the vice-principal during the photograph.', 'between', ['among', 'beside', 'with'], {
+      ['The class chairperson stood ___ the principal and the vice-principal during the photograph, with one on each side.', 'between', ['among', 'beside', 'with'], {
         'between': '"Between" is correct because the chairperson is in the middle of exactly two people.',
         'among': '"Among" is for being in the middle of three or more people; only two people are mentioned.',
         'beside': '"Beside" means next to one person; "between" means in the middle of both.',
@@ -1727,11 +1727,11 @@ const GRAMMAR_BUILDERS = {
         'him': '"Him" is an object pronoun, not a possessive adjective.',
         'himself': '"Himself" is a reflexive pronoun, not a possessive adjective.',
       }],
-      ['The red pencil case on the floor is not ___ — mine is blue.', 'hers', ['her', 'she', 'herself'], {
-        'hers': '"Hers" is correct because it is a possessive pronoun that stands alone — no noun follows.',
-        'her': '"Her" is a possessive adjective used before a noun (e.g. "her pencil case"), but no noun follows here.',
-        'she': '"She" is a subject pronoun, not used to show ownership.',
-        'herself': '"Herself" is a reflexive pronoun, not a possessive pronoun.',
+      ['The red pencil case on the floor is not Mei\'s. ___ is blue, and it is still in her bag.', 'Hers', ['Her', 'She', 'Herself'], {
+        'Hers': '"Hers" is correct because it is a possessive pronoun that stands alone — it means "her pencil case".',
+        'Her': '"Her" is a possessive adjective used before a noun (e.g. "her pencil case"), but no noun follows here.',
+        'She': '"She" is a subject pronoun, not used to show ownership.',
+        'Herself': '"Herself" is a reflexive pronoun, not a possessive pronoun.',
       }],
       ['My classmates finished ___ project before the deadline.', 'their', ['theirs', 'them', 'they'], {
         'their': '"Their" is correct because it is a possessive adjective coming before the noun "project".',
@@ -1763,10 +1763,10 @@ const GRAMMAR_BUILDERS = {
         'much': '"No much" is not grammatical — "much" is used with "not" (not much), not "no".',
         'many': '"No many" is not grammatical, and soup is uncountable so "many" does not fit anyway.',
       }],
-      ['After a tiring day, Mother had ___ rest when she came home.', 'some', ['any', 'little', 'few'], {
-        'some': '"Some" is correct because Mother did get a small amount of rest — it is a positive statement.',
+      ['After a tiring day, Mother had ___ rest when she came home.', 'some', ['any', 'many', 'few'], {
+        'some': '"Some" is correct because Mother did get an amount of rest — it is a positive statement.',
         'any': '"Any" is used in questions or negatives; the sentence is a positive statement.',
-        'little': '"Little" (without "a") means almost no rest at all, which is not what the sentence implies.',
+        'many': '"Many" is for countable nouns; rest is uncountable.',
         'few': '"Few" is for countable nouns; rest is uncountable.',
       }],
       ['There wasn\'t ___ juice left. I only had half a glass of it.', 'much', ['some', 'little', 'few'], {
@@ -1793,11 +1793,11 @@ const GRAMMAR_BUILDERS = {
         'many': '"Many" is for countable nouns; time is uncountable.',
         'much': '"Much" is used in questions or negatives; the sentence is a positive statement.',
       }],
-      ['There are ___ children waiting outside — about twenty of them.', 'many', ['much', 'a little', 'some'], {
-        'many': '"Many" is correct because children are countable and approximately twenty of them is a large number.',
+      ['There are ___ children waiting outside — about twenty of them.', 'many', ['much', 'a little', 'a lot'], {
+        'many': '"Many" is correct because children are countable and about twenty of them is a large number.',
         'much': '"Much" is for uncountable nouns; children are countable.',
         'a little': '"A little" is for uncountable nouns; children are countable.',
-        'some': '"Some" is vague and does not convey the large number suggested by "about twenty".',
+        'a lot': '"A lot" needs "of" before a noun — we say "a lot of children".',
       }],
       ['I drank ___ water after the long run because I was very thirsty.', 'some', ['any', 'many', 'much'], {
         'some': '"Some" is correct because it is a positive statement about an unspecified amount of water.',
@@ -1829,9 +1829,9 @@ const GRAMMAR_BUILDERS = {
         'much': '"Much" is for uncountable nouns; biscuits are countable.',
         'a little': '"A little" is for uncountable nouns; biscuits are countable.',
       }],
-      ['Would you like ___ more rice from the canteen?', 'some', ['any', 'much', 'many'], {
+      ['Would you like ___ more rice from the canteen?', 'some', ['a few', 'much', 'many'], {
         'some': '"Some" is correct in polite offers and requests, even though the sentence is a question.',
-        'any': '"Any" is for general questions; "some" is the natural choice in a polite offer.',
+        'a few': '"A few" is for countable nouns; rice is uncountable.',
         'much': '"Much" suggests asking about a large amount; "some" is the polite, natural phrasing.',
         'many': '"Many" is for countable nouns; rice is uncountable.',
       }],
@@ -1847,15 +1847,15 @@ const GRAMMAR_BUILDERS = {
         'a few': '"A few" is for countable nouns; time is uncountable.',
         'some': '"Some" is for positive statements; after "do not have", "much" is the correct choice.',
       }],
-      ['She drank ___ water because she was very thirsty.', 'a little', ['a few', 'many', 'much'], {
-        'a little': '"A little" is correct because water is uncountable and "a little" means a small but present amount.',
+      ['She was not very thirsty, so she drank only ___ water.', 'a little', ['a few', 'many', 'much'], {
+        'a little': '"A little" is correct because water is uncountable and "a little" means a small amount — she was not very thirsty.',
         'a few': '"A few" is for countable nouns; water is uncountable.',
         'many': '"Many" is for countable nouns; water is uncountable.',
-        'much': '"Much" is used in questions or negatives; the sentence is a positive statement.',
+        'much': '"Only much" is not English; "much" is mostly used in questions and negatives.',
       }],
-      ['Are there ___ seats left on the MRT?', 'any', ['some', 'much', 'a little'], {
+      ['Are there ___ seats left on the MRT?', 'any', ['a lot', 'much', 'a little'], {
         'any': '"Any" is correct because this is a question about countable seats.',
-        'some': '"Some" is used in positive statements or polite offers, not in neutral questions.',
+        'a lot': '"A lot" needs "of" before a noun — we say "a lot of seats".',
         'much': '"Much" is for uncountable nouns; seats are countable.',
         'a little': '"A little" is for uncountable nouns; seats are countable.',
       }],
@@ -1982,11 +1982,11 @@ const GRAMMAR_BUILDERS = {
         'and': '"And" adds both options together; "or" presents them as alternatives.',
         'but': '"But" contrasts two ideas; walking and taking the bus are simply two choices, not contrasts.',
       }],
-      ['We took off our coats ___ it was warm inside the building.', 'as', ['so', 'but', 'when'], {
+      ['We took off our coats ___ it was warm inside the building.', 'as', ['so', 'but', 'or'], {
         'as': '"As" is correct because it gives the reason (it was warm) for taking off the coats.',
         'so': '"So" shows result — it would mean the warmth caused something else, reversing the logic.',
         'but': '"But" contrasts two ideas; the warmth is the reason for removing coats, not a contrast.',
-        'when': '"When" indicates time; here the warmth is the reason, not simply the time when it happened.',
+        'or': '"Or" offers a choice between two things; the warmth is the reason, not an alternative.',
       }],
       ['The fire broke out ___ the store was just about to open.', 'when', ['so', 'but', 'because'], {
         'when': '"When" is correct because it links two events happening at the same time.',
@@ -2243,11 +2243,11 @@ const GRAMMAR_BUILDERS = {
         'rained': '"Rained" is simple past; the sentence is about what might happen later today.',
         'is raining': '"Is raining" is present continuous; it is not raining now — this is a prediction for later.',
       }],
-      ['The coach says we ___ extra drills next week.', 'will have', ['have', 'had', 'are having'], {
+      ['The coach says we ___ extra drills next week.', 'will have', ['have', 'had', 'having'], {
         'will have': '"Will have" is correct because "next week" signals a future event.',
         'have': '"Have" is simple present; "next week" tells us this has not happened yet.',
         'had': '"Had" is simple past; "next week" is in the future.',
-        'are having': '"Are having" is present continuous; while possible for a fixed plan, "will have" is the more natural future form here.',
+        'having': '"Having" alone cannot be the main verb — it needs a helper like "are".',
       }],
       ['Do not worry. I ___ you after CCA.', 'will call', ['call', 'called', 'am calling'], {
         'will call': '"Will call" is correct because this is a spontaneous promise made at the moment of speaking.',
@@ -2255,11 +2255,11 @@ const GRAMMAR_BUILDERS = {
         'called': '"Called" is simple past; this is a future promise, not a past action.',
         'am calling': '"Am calling" is for an action happening right now; the call will happen after CCA.',
       }],
-      ['Next term, the new student ___ our table-tennis team.', 'will join', ['joins', 'joined', 'is joining'], {
+      ['Next term, the new student ___ our table-tennis team.', 'will join', ['has joined', 'joined', 'joining'], {
         'will join': '"Will join" is correct because "next term" signals a future event.',
-        'joins': '"Joins" is simple present for routines; "next term" tells us this is a future plan.',
+        'has joined': '"Has joined" means it has already happened; "next term" is still to come.',
         'joined': '"Joined" is simple past; "next term" is in the future.',
-        'is joining': '"Is joining" is present continuous for a fixed arrangement; "will join" is more natural for a term that has not started.',
+        'joining': '"Joining" alone cannot be the main verb — it needs a helper like "is".',
       }],
       ['"___ you help me carry these books, please?" asked Mrs Lim.', 'Will', ['Did', 'Are', 'Do'], {
         'Will': '"Will" is correct because "will you…?" is used for polite requests about a future action.',
@@ -2267,9 +2267,9 @@ const GRAMMAR_BUILDERS = {
         'Are': '"Are" forms a present continuous question about what someone is doing; the request is about a future action.',
         'Do': '"Do" forms a simple present question about habits; the request is about a future action.',
       }],
-      ['Mum says we ___ for dinner at Grandpa\'s on Sunday.', 'will go', ['go', 'went', 'have gone'], {
+      ['Mum says we ___ for dinner at Grandpa\'s on Sunday.', 'will go', ['going', 'went', 'have gone'], {
         'will go': '"Will go" is correct because "on Sunday" signals a future event and "will" expresses this plan.',
-        'go': '"Go" is simple present; "on Sunday" tells us the action is in the future.',
+        'going': '"Going" alone cannot be the main verb — it needs a helper like "are".',
         'went': '"Went" is simple past; "on Sunday" is a future time.',
         'have gone': '"Have gone" is present perfect for a completed action; "on Sunday" is in the future.',
       }],
@@ -2285,8 +2285,8 @@ const GRAMMAR_BUILDERS = {
         'opened': '"Opened" is simple past; the action will happen in a moment, not in the past.',
         'am opening': '"Am opening" is for an action already in progress; the opening will happen in a moment.',
       }],
-      ['By tomorrow morning, my brother ___ his last exam paper.', 'will finish', ['finishes', 'finished', 'has finished'], {
-        'will finish': '"Will finish" is correct because "by tomorrow morning" signals a future completion.',
+      ['By tomorrow morning, my brother ___ his last exam paper.', 'will have finished', ['finishes', 'finished', 'has finished'], {
+        'will have finished': '"Will have finished" is correct because "by tomorrow morning" means the paper will be done before that future time — the future perfect.',
         'finishes': '"Finishes" is simple present; "by tomorrow morning" points to a future event.',
         'finished': '"Finished" is simple past; "by tomorrow morning" is in the future.',
         'has finished': '"Has finished" is present perfect for past-linked completion; the exam ends in the future.',
@@ -2297,11 +2297,11 @@ const GRAMMAR_BUILDERS = {
         'cooked': '"Cooked" is simple past; Sam is planning to cook tonight.',
         'will cooking': '"Will cooking" is not grammatical — "will" is always followed by the base form of the verb.',
       }],
-      ['The cinema doors ___ at seven o\'clock tomorrow evening.', 'will open', ['open', 'opened', 'are opening'], {
-        'will open': '"Will open" is correct because "tomorrow evening" signals a future event.',
-        'open': '"Open" is simple present for schedules, which can also work, but "will open" is the primary future form here.',
-        'opened': '"Opened" is simple past; "tomorrow evening" is in the future.',
-        'are opening': '"Are opening" is present continuous for a fixed plan; "will open" is more natural for a scheduled event.',
+      ['I think the cinema doors ___ a little late tomorrow because of the long queue.', 'will open', ['have opened', 'opened', 'opening'], {
+        'will open': '"Will open" is correct because "I think" introduces a prediction about tomorrow.',
+        'have opened': '"Have opened" is present perfect for something already done; tomorrow has not come yet.',
+        'opened': '"Opened" is simple past; "tomorrow" is in the future.',
+        'opening': '"Opening" alone cannot be the main verb — it needs a helper like "are".',
       }],
       ['Look at that enormous wave — it ___ the sandcastle!', 'is going to knock over', ['knocks over', 'knocked over', 'has knocked over'], {
         'is going to knock over': '"Is going to knock over" is correct because we can see the approaching wave — clear evidence of an imminent event.',
@@ -2315,9 +2315,9 @@ const GRAMMAR_BUILDERS = {
         'kept': '"Kept" is simple past; the promise is about future behaviour.',
         'am keeping': '"Am keeping" is present continuous; the promise refers to future action.',
       }],
-      ['We ___ our family in Penang during the June school holidays.', 'are visiting', ['visit', 'visited', 'have visited'], {
-        'are visiting': '"Are visiting" is correct because it signals a fixed future arrangement already planned.',
-        'visit': '"Visit" is simple present for habits; "during the June school holidays" signals a planned future trip.',
+      ['Next month, we ___ our family in Penang during the June school holidays.', 'are visiting', ['visit', 'visited', 'have visited'], {
+        'are visiting': '"Are visiting" is correct because "next month" shows a future trip that is already arranged.',
+        'visit': '"Visit" is simple present for habits; "next month" signals one planned future trip.',
         'visited': '"Visited" is simple past; the holidays are in the future.',
         'have visited': '"Have visited" is present perfect for past experience; the holidays have not happened yet.',
       }],
@@ -2327,23 +2327,23 @@ const GRAMMAR_BUILDERS = {
         'Do': '"Do" forms a present habit question; the teacher is asking about a future plan.',
         'Are': '"Are" forms a present continuous question; "will" is the more natural form when asking about future decisions.',
       }],
-      ['The school canteen ___ a new section for healthy snacks next month.', 'is going to have', ['has', 'had', 'is having'], {
+      ['The school canteen ___ a new section for healthy snacks next month.', 'is going to have', ['has', 'had', 'having'], {
         'is going to have': '"Is going to have" is correct because "next month" signals a future plan, and "going to" suggests a decision or plan is in place.',
         'has': '"Has" is simple present or present perfect auxiliary; "next month" is in the future.',
         'had': '"Had" is simple past; "next month" is in the future.',
-        'is having': '"Is having" is present continuous for a current or near-immediate action; "next month" is further away.',
+        'having': '"Having" alone cannot be the main verb — it needs a helper like "is".',
       }],
-      ['My flight ___ at six in the morning, so I need to wake up very early.', 'departs', ['will depart', 'departed', 'is departing'], {
+      ['My flight ___ at six in the morning, so I need to wake up very early.', 'departs', ['has departed', 'departed', 'departing'], {
         'departs': '"Departs" is correct because scheduled timetable events (flights, trains) use simple present even for the future.',
-        'will depart': '"Will depart" is also grammatically correct but less natural for fixed timetable schedules.',
+        'has departed': '"Has departed" means the flight has already left; she still needs to wake up early for it.',
         'departed': '"Departed" is simple past; the flight has not happened yet.',
-        'is departing': '"Is departing" is present continuous for an imminent action; for fixed schedules, simple present is preferred.',
+        'departing': '"Departing" alone cannot be the main verb — it needs a helper like "is".',
       }],
-      ['By next year, the new community centre ___ its doors to the public.', 'will open', ['opens', 'opened', 'is opening'], {
-        'will open': '"Will open" is correct because "by next year" signals a future event.',
-        'opens': '"Opens" is simple present; "by next year" tells us this is a future event.',
+      ['By next year, the new community centre ___ its doors to the public.', 'will have opened', ['opens', 'opened', 'has opened'], {
+        'will have opened': '"Will have opened" is correct because "by next year" means the opening will be finished before that future time — the future perfect.',
+        'opens': '"Opens" is simple present; "by next year" points to something completed before a future time.',
         'opened': '"Opened" is simple past; the community centre has not opened yet.',
-        'is opening': '"Is opening" is present continuous for an imminent or arranged event; "by next year" is a longer-range future deadline.',
+        'has opened': '"Has opened" means it is already open now; "by next year" looks ahead to the future.',
       }],
       ['I already told Mrs Tan — we ___ the performance for her birthday celebration next Friday.', 'are performing', ['perform', 'performed', 'will performing'], {
         'are performing': '"Are performing" is correct because "already told" and "next Friday" signal a fixed, pre-arranged future event.',
@@ -2485,11 +2485,11 @@ const GRAMMAR_BUILDERS = {
         'on the other hand': '"On the other hand" introduces an alternative viewpoint; the sentence shows cause and effect.',
         'nonetheless': '"Nonetheless" introduces a contrast; having to stand at the back is the expected result of the hall being packed.',
       }],
-      ['The first plan failed. ___, the team drafted a revised proposal overnight.', 'Subsequently', ['Nevertheless', 'Furthermore', 'Consequently'], {
+      ['The first plan failed. ___, the team drafted a revised proposal overnight.', 'Subsequently', ['Nevertheless', 'Furthermore', 'Similarly'], {
         'Subsequently': '"Subsequently" is correct because it shows the revised proposal came after the failure — a time sequence.',
         'Nevertheless': '"Nevertheless" introduces a contrast; drafting a new proposal follows naturally from the failure.',
         'Furthermore': '"Furthermore" adds more supporting information on the same side; the sentence shows two events in sequence.',
-        'Consequently': '"Consequently" shows a logical result; "subsequently" better captures the time sequence here.',
+        'Similarly': '"Similarly" compares two alike things; the second sentence follows on from the first rather than matching it.',
       }],
       ['The campsite looked beautiful; ___, it was far too remote for young children.', 'however', ['therefore', 'furthermore', 'subsequently'], {
         'however': '"However" is correct because it introduces a contrast — beauty versus being too remote.',
@@ -2642,13 +2642,13 @@ const GRAMMAR_BUILDERS = {
         'heaviest': '"Heaviest" is the superlative; only the bag on Fridays versus other days is implied.',
         'more heavy': '"More heavy" is incorrect — adjectives ending in -y use -ier (heavier), not "more".',
       }],
-      ['We should be ___ when handling the science equipment.', 'more careful', ['careful', 'most careful', 'more carefully'], {
+      ['We should be ___ with the science equipment than we were last week.', 'more careful', ['careful', 'most careful', 'more carefully'], {
         'more careful': '"More careful" is correct because "careful" is a long adjective — use "more" to compare.',
         'careful': '"Careful" is the base form, not the comparative — long adjectives need "more" before them.',
         'most careful': '"Most careful" is the superlative for three or more comparisons.',
         'more carefully': '"More carefully" is an adverb describing an action; an adjective is needed after "be".',
       }],
-      ['After joining the debate club, Priya became ___ when speaking in front of the class.', 'more confident', ['confident', 'most confident', 'more confidently'], {
+      ['After joining the debate club, Priya became ___ than before when speaking in front of the class.', 'more confident', ['confident', 'most confident', 'more confidently'], {
         'more confident': '"More confident" is correct because "confident" is a long adjective — use "more" to compare.',
         'confident': '"Confident" is the base form, not the comparative — long adjectives need "more" before them.',
         'most confident': '"Most confident" is the superlative for three or more; this compares Priya before and after joining.',
@@ -2702,10 +2702,10 @@ const GRAMMAR_BUILDERS = {
         'goodest': '"Goodest" is not a real word — "good" has an irregular superlative: "best".',
         'most good': '"Most good" is not correct — "good" has an irregular form: "best".',
       }],
-      ['This is the ___ part of the journey — we are nearly there.', 'easiest', ['easier', 'easy', 'most easy'], {
-        'easiest': '"Easiest" is correct because "easy" ends in consonant + y — change y to i and add -est.',
-        'easier': '"Easier" is a comparative for two things; the journey has many parts.',
-        'easy': '"Easy" is the base form; a superlative is needed to compare among all parts.',
+      ['Of all the parts of the journey, this is the ___ — we are nearly there.', 'easiest', ['easier', 'most easiest', 'most easy'], {
+        'easiest': '"Easiest" is correct because "of all the parts" compares every part — and "easy" changes y to i before -est.',
+        'easier': '"Easier" is a comparative for two things; "of all the parts" compares many.',
+        'most easiest': '"Most easiest" uses two superlatives at once; "easiest" already means "most easy".',
         'most easy': '"Most easy" is not correct — adjectives ending in -y use -iest for superlatives.',
       }],
       ['The blue whale is the ___ animal that has ever lived.', 'largest', ['larger', 'large', 'more large'], {
@@ -2714,11 +2714,11 @@ const GRAMMAR_BUILDERS = {
         'large': '"Large" is the base form; a superlative is needed.',
         'more large': '"More large" is not correct — short adjectives use -est for superlatives.',
       }],
-      ['Mrs Lee is the ___ teacher I have met — she greets every pupil by name.', 'kindest', ['kinder', 'kind', 'most kind'], {
+      ['Mrs Lee is the ___ teacher I have met — she greets every pupil by name.', 'kindest', ['kinder', 'kind', 'most kindest'], {
         'kindest': '"Kindest" is correct because it is the superlative of "kind" — comparing her to all teachers met.',
         'kinder': '"Kinder" is a comparative for two people; the speaker has met more than two teachers.',
         'kind': '"Kind" is the base form; a superlative is needed to compare across all teachers.',
-        'most kind': '"Most kind" is not correct — short adjectives use -est for superlatives.',
+        'most kindest': '"Most kindest" uses two superlatives at once; "kindest" already means "most kind".',
       }],
       ['Among the three brothers, Tom is the ___.', 'tallest', ['taller', 'tall', 'most tall'], {
         'tallest': '"Tallest" is correct because it is the superlative of "tall" — comparing among three brothers.',
@@ -2762,7 +2762,7 @@ const GRAMMAR_BUILDERS = {
   },
   modals(level, i) {
     const lowerRows = [
-      ['You ___ submit the form by Friday.', 'must', ['might', 'could', 'would'], {
+      ['You ___ submit the form by Friday — late forms will not be accepted.', 'must', ['might', 'could', 'would'], {
         'must': '"Must" is correct because there is a strong obligation — the form has a deadline.',
         'might': '"Might" suggests possibility, not a strong obligation.',
         'could': '"Could" suggests ability or a mild possibility, not a requirement.',
@@ -2798,16 +2798,16 @@ const GRAMMAR_BUILDERS = {
         'might': '"Might" suggests possibility, not a firm requirement.',
         'would': '"Would" is for willingness or hypotheticals, not external obligation.',
       }],
-      ['Children ___ not cross the road without an adult.', 'must', ['can', 'may', 'will'], {
-        'must': '"Must" is correct because it creates a strong prohibition — crossing without an adult is dangerous.',
-        'can': '"Can" is about ability; "must not" is needed for a strong rule.',
-        'may': '"May" relates to permission; the sentence is a strong safety rule, not permission.',
-        'will': '"Will" is about future actions; the sentence is about a rule, not the future.',
+      ['Young children ___ hold an adult\'s hand when they cross a busy road — it is the rule.', 'must', ['might', 'would', 'did'], {
+        'must': '"Must" is correct because the sentence states a rule that has to be followed.',
+        'might': '"Might" only says there is a chance; a rule says it has to happen.',
+        'would': '"Would" is for imagined or polite situations, not for a rule.',
+        'did': '"Did" is past tense; a rule like this applies every time, now.',
       }],
-      ['It looks cloudy — it ___ rain later in the afternoon.', 'might', ['must', 'will', 'should'], {
-        'might': '"Might" is correct because cloudy skies suggest rain is possible but not certain.',
-        'must': '"Must" expresses logical certainty; clouds suggest possibility, not certainty.',
-        'will': '"Will" expresses certainty about the future; clouds only suggest the possibility of rain.',
+      ['It looks a little cloudy, but I am not sure — it ___ rain later in the afternoon.', 'might', ['must', 'can', 'should'], {
+        'might': '"Might" is correct because "I am not sure" tells us rain is possible but not certain.',
+        'must': '"Must" expresses logical certainty; "I am not sure" shows the speaker is uncertain.',
+        'can': '"Can" is about ability or what is generally possible, not a guess about this afternoon.',
         'should': '"Should" gives advice or expectation; the sentence expresses possibility, not advice.',
       }],
       ['You ___ be tired after such a long walk. Sit down for a while.', 'must', ['can', 'might', 'will'], {
@@ -2902,11 +2902,11 @@ const GRAMMAR_BUILDERS = {
         'could': '"Could not have" expresses past impossibility; the sentence is about doing the wrong thing.',
         'might': '"Might not have" suggests uncertainty; the sentence firmly states the action was wrong.',
       }],
-      ['They ___ arrived already — the bus was supposed to leave an hour ago.', 'should have', ['must have', 'could have', 'would'], {
-        'should have': '"Should have" is correct because it expresses an expectation about a past event — they were expected to arrive.',
-        'must have': '"Must have" expresses logical certainty; "should have" is better for expressing expectation.',
-        'could have': '"Could have" expresses past possibility; "should have" expresses expectation.',
-        'would': '"Would" is present willingness; the sentence needs a past modal form.',
+      ['They ___ arrived already, but their bus is still stuck in traffic.', 'should have', ['must have', 'should', 'would'], {
+        'should have': '"Should have" is correct because they were expected to arrive by now, but they have not — the bus is stuck.',
+        'must have': '"Must have" means you are sure it happened; but the bus is still stuck, so they have not arrived.',
+        'should': '"Should arrived" is not English; "should" needs "have" before a past participle.',
+        'would': '"Would arrived" is not English; "would" needs "have" before a past participle.',
       }],
       ['I ___ have imagined it — the lights really did flicker on their own.', 'could not', ['must not', 'should not', 'would not'], {
         'could not': '"Could not have" is correct because it means it was impossible for the speaker to have imagined the flickering.',
@@ -2914,9 +2914,9 @@ const GRAMMAR_BUILDERS = {
         'should not': '"Should not have" expresses moral reproach; the sentence is about whether imagining was possible.',
         'would not': '"Would not have" expresses unwillingness in the past; the sentence is about impossibility.',
       }],
-      ['He ___ have known about the change in the timetable; he was absent that day.', 'might not', ['must not', 'should not', 'could'], {
+      ['He ___ have known about the change in the timetable; he was absent that day.', 'might not', ['need not', 'should not', 'could'], {
         'might not': '"Might not have" is correct because being absent suggests it is possible he did not know — expressing uncertainty.',
-        'must not': '"Must not have" expresses prohibition in the past; the sentence is about possibility.',
+        'need not': '"Need not have" means something was done but was unnecessary; it does not guess at what he knew.',
         'should not': '"Should not have" expresses moral reproach; the sentence speculates about what he knew.',
         'could': '"Could" is present ability; the sentence needs a past modal form.',
       }],
@@ -3096,9 +3096,9 @@ const GRAMMAR_BUILDERS = {
         'have revised': '"Have revised" is present perfect; the sentence describes what was happening at a specific past moment.',
         'are revising': '"Are revising" is present continuous; "at 8 p.m." signals a past time, not now.',
       }],
-      ['While I was washing dishes, my brother ___ the floor.', 'was mopping', ['mopped', 'has mopped', 'is mopping'], {
+      ['While I was washing dishes, my brother ___ the floor.', 'was mopping', ['were mopping', 'has mopped', 'is mopping'], {
         'was mopping': '"Was mopping" is correct because two actions were in progress at the same past time.',
-        'mopped': '"Mopped" is simple past for a completed action; "while" with another past continuous shows simultaneous actions.',
+        'were mopping': '"Were" goes with plural subjects, but "my brother" is one person — use "was mopping".',
         'has mopped': '"Has mopped" is present perfect; the sentence describes simultaneous past actions.',
         'is mopping': '"Is mopping" is present continuous; "while I was washing" sets the scene in the past.',
       }],
@@ -3132,9 +3132,9 @@ const GRAMMAR_BUILDERS = {
         'have bought': '"Have bought" is present perfect; the sentence places the action at a specific past time.',
         'are buying': '"Are buying" is present continuous; "yesterday" signals the action is in the past.',
       }],
-      ['While the coach ___ the strategy, the team listened carefully.', 'was explaining', ['explained', 'has explained', 'is explaining'], {
-        'was explaining': '"Was explaining" is correct because two actions occurred simultaneously in the past.',
-        'explained': '"Explained" is simple past; "while" signals two actions happening at the same time in the past.',
+      ['While the coach ___ the strategy, the team listened carefully.', 'was explaining', ['were explaining', 'has explained', 'is explaining'], {
+        'was explaining': '"Was explaining" is correct because the explaining was in progress while the team listened.',
+        'were explaining': '"Were" goes with plural subjects, but "the coach" is one person — use "was explaining".',
         'has explained': '"Has explained" is present perfect; the sentence describes simultaneous past actions.',
         'is explaining': '"Is explaining" is present continuous; "the team listened" signals a past context.',
       }],
@@ -3156,9 +3156,9 @@ const GRAMMAR_BUILDERS = {
         'have slept': '"Have slept" is present perfect; the sentence describes a past scene.',
         'are sleeping': '"Are sleeping" is present continuous; "when I found them" sets the scene in the past.',
       }],
-      ['While Father ___ the car, Mother prepared lunch.', 'was washing', ['washed', 'has washed', 'is washing'], {
-        'was washing': '"Was washing" is correct because two actions were happening simultaneously in the past.',
-        'washed': '"Washed" is simple past; "while" signals two actions occurring at the same time.',
+      ['While Father ___ the car, Mother prepared lunch.', 'was washing', ['were washing', 'has washed', 'is washing'], {
+        'was washing': '"Was washing" is correct because the washing was in progress while Mother prepared lunch.',
+        'were washing': '"Were" goes with plural subjects, but "Father" is one person — use "was washing".',
         'has washed': '"Has washed" is present perfect; the sentence describes simultaneous past actions.',
         'is washing': '"Is washing" is present continuous; "Mother prepared lunch" sets the scene in the past.',
       }],
@@ -3174,9 +3174,9 @@ const GRAMMAR_BUILDERS = {
         'has prepared': '"Has prepared" is present perfect; the sentence describes a past interruption.',
         'is preparing': '"Is preparing" is present continuous; "when the guests arrived" sets the scene in the past.',
       }],
-      ['The pupils ___ their projects while the principal observed the lesson.', 'were presenting', ['presented', 'have presented', 'are presenting'], {
-        'were presenting': '"Were presenting" is correct because two actions were happening simultaneously in the past.',
-        'presented': '"Presented" is simple past; "while" signals two actions occurring at the same time.',
+      ['The pupils ___ their projects while the principal observed the lesson.', 'were presenting', ['was presenting', 'have presented', 'are presenting'], {
+        'were presenting': '"Were presenting" is correct because the presenting was in progress while the principal watched.',
+        'was presenting': '"Was" goes with a singular subject, but "the pupils" is plural — use "were presenting".',
         'have presented': '"Have presented" is present perfect; the sentence describes simultaneous past actions.',
         'are presenting': '"Are presenting" is present continuous; "while the principal observed" sets the scene in the past.',
       }],
@@ -3204,9 +3204,9 @@ const GRAMMAR_BUILDERS = {
         'has cycled': '"Has cycled" is present perfect; the sentence describes a past interruption.',
         'is cycling': '"Is cycling" is present continuous; "when he spotted" sets the scene in the past.',
       }],
-      ['The toddlers ___ while their parents attended the school briefing.', 'were napping', ['napped', 'have napped', 'are napping'], {
-        'were napping': '"Were napping" is correct because two actions were happening simultaneously in the past.',
-        'napped': '"Napped" is simple past; "while" signals two actions occurring at the same time.',
+      ['The toddlers ___ while their parents attended the school briefing.', 'were napping', ['was napping', 'have napped', 'are napping'], {
+        'were napping': '"Were napping" is correct because the napping was in progress while the parents attended.',
+        'was napping': '"Was" goes with a singular subject, but "the toddlers" is plural — use "were napping".',
         'have napped': '"Have napped" is present perfect; the sentence describes simultaneous past actions.',
         'are napping': '"Are napping" is present continuous; "while their parents attended" sets the scene in the past.',
       }],
@@ -3438,9 +3438,9 @@ const GRAMMAR_BUILDERS = {
         'is training': '"Is training" is present continuous; "last weekend" tells us the action is done.',
         'has trained': '"Has trained" links a past action to the present, but "last weekend" pins it to a specific past time.',
       }],
-      ['When the alarm rang, the children ___ in the corridor.', 'were playing', ['played', 'play', 'have played'], {
+      ['When the alarm rang, the children ___ in the corridor.', 'were playing', ['are playing', 'play', 'have played'], {
         'were playing': '"Were playing" is correct because it shows an action that was already in progress when another past event happened.',
-        'played': '"Played" is simple past, but the sentence suggests the playing was ongoing when the alarm interrupted.',
+        'are playing': '"Are playing" is present continuous; "when the alarm rang" sets the scene in the past.',
         'play': '"Play" is simple present; the sentence is set in the past with "when the alarm rang".',
         'have played': '"Have played" is present perfect, but the sentence describes a past scene set off by "when the alarm rang".',
       }],
@@ -3456,11 +3456,11 @@ const GRAMMAR_BUILDERS = {
         'is walking': '"Is walking" is for an action happening right now, not a regular evening routine.',
         'will walk': '"Will walk" is future tense; "every evening" points to an established present habit.',
       }],
-      ['Tomorrow, our class ___ the science centre.', 'will visit', ['visits', 'visited', 'is visiting'], {
+      ['Tomorrow, our class ___ the science centre.', 'will visit', ['visiting', 'visited', 'has visited'], {
         'will visit': '"Will visit" is correct because "tomorrow" signals a future action.',
-        'visits': '"Visits" is simple present; "tomorrow" tells us the action has not happened yet.',
+        'visiting': '"Visiting" alone cannot be the main verb — it needs a helper like "is".',
         'visited': '"Visited" is simple past; "tomorrow" tells us the action is in the future.',
-        'is visiting': '"Is visiting" could work for a fixed plan, but "will visit" is the clearest future form here.',
+        'has visited': '"Has visited" means it has already happened; "tomorrow" is still to come.',
       }],
       ['Look! Those sparrows ___ at the crumbs near the canteen.', 'are pecking', ['peck', 'pecked', 'have pecked'], {
         'are pecking': '"Are pecking" is correct because "Look!" signals an action happening at this very moment.',
@@ -3480,10 +3480,10 @@ const GRAMMAR_BUILDERS = {
         'is moving': '"Is moving" is present continuous; "two years ago" tells us the move is over.',
         'has moved': '"Has moved" is present perfect, which cannot be used with a finished past time like "two years ago".',
       }],
-      ['The pupils ___ their books away when the visitor walked in.', 'were packing', ['pack', 'packed', 'have packed'], {
+      ['The pupils ___ their books away when the visitor walked in.', 'were packing', ['pack', 'are packing', 'have packed'], {
         'were packing': '"Were packing" is correct because the packing was already in progress when the visitor walked in.',
         'pack': '"Pack" is simple present; "walked in" sets the scene in the past.',
-        'packed': '"Packed" is simple past, but it does not show the packing was ongoing when the visitor arrived.',
+        'are packing': '"Are packing" is present continuous; "walked in" sets the scene in the past.',
         'have packed': '"Have packed" is present perfect; both events here happened in the past.',
       }],
       ['My uncle ___ in that bakery since it opened five years ago.', 'has worked', ['works', 'worked', 'is working'], {
@@ -3518,11 +3518,11 @@ const GRAMMAR_BUILDERS = {
         'is performing': '"Is performing" is for an action happening right now, not a regular habit.',
         'has performed': '"Has performed" links a past action to now, but "usually" signals a routine habit.',
       }],
-      ['We ___ for twenty minutes before the rain stopped.', 'had been waiting', ['have waited', 'are waiting', 'waited'], {
+      ['We ___ for twenty minutes before the rain stopped.', 'had been waiting', ['have waited', 'are waiting', 'have been waiting'], {
         'had been waiting': '"Had been waiting" is correct because it shows an action that continued up to another past event.',
-        'have waited': '"Have waited" is present perfect; both events are in the past, so past perfect continuous is needed.',
+        'have waited': '"Have waited" is present perfect; the rain stopping is a finished past event.',
         'are waiting': '"Are waiting" is present continuous; the sentence describes a past scene before the rain stopped.',
-        'waited': '"Waited" is simple past, but it does not show the duration of waiting leading up to the rain stopping.',
+        'have been waiting': '"Have been waiting" reaches up to now; the waiting ended in the past, when the rain stopped.',
       }],
       ['Next month, they ___ the same project for a year.', 'will have done', ['have done', 'did', 'do'], {
         'will have done': '"Will have done" is correct because "next month" is future, and the action will be completed by then.',
@@ -3592,10 +3592,10 @@ const GRAMMAR_BUILDERS = {
         'have reached': '"Have reached" is present perfect; both events are in the past, so simple past is needed here.',
         'are reaching': '"Are reaching" is present continuous; the sentence is set entirely in the past.',
       }],
-      ['She ___ her notes before the quiz began.', 'had revised', ['has revised', 'revised', 'was revising'], {
-        'had revised': '"Had revised" is correct because revising was completed before the earlier past event of the quiz beginning.',
+      ['She ___ her notes before the quiz began.', 'had revised', ['has revised', 'revises', 'was revising'], {
+        'had revised': '"Had revised" is correct because revising was completed before the quiz began. ("She revised her notes before the quiz began" is also correct English.)',
         'has revised': '"Has revised" is present perfect; both events are in the past.',
-        'revised': '"Revised" is simple past; "had revised" is needed to show the revision happened before the quiz.',
+        'revises': '"Revises" is simple present; "the quiz began" sets the scene in the past.',
         'was revising': '"Was revising" shows ongoing action; "before the quiz began" suggests the revision was completed first.',
       }],
       ['By 6 p.m., they ___ all the banners.', 'had hung', ['have hung', 'hung', 'were hanging'], {
@@ -3604,10 +3604,10 @@ const GRAMMAR_BUILDERS = {
         'hung': '"Hung" is simple past; "by 6 p.m." signals completion before a past deadline, needing past perfect.',
         'were hanging': '"Were hanging" shows an action in progress; "by 6 p.m." suggests completion before that time.',
       }],
-      ['He was hungry because he ___ breakfast.', 'had skipped', ['has skipped', 'skipped', 'is skipping'], {
+      ['He was hungry because he ___ breakfast.', 'had skipped', ['has skipped', 'skips', 'is skipping'], {
         'had skipped': '"Had skipped" is correct because skipping breakfast happened before the past state of being hungry.',
         'has skipped': '"Has skipped" is present perfect; both events are in the past.',
-        'skipped': '"Skipped" is simple past; "had skipped" is needed to show the skipping happened earlier.',
+        'skips': '"Skips" is simple present; "he was hungry" sets the scene in the past.',
         'is skipping': '"Is skipping" is present continuous; the sentence is set entirely in the past.',
       }],
       ['When I switched on the television, the news ___ already.', 'had ended', ['has ended', 'ended', 'was ending'], {
@@ -3652,10 +3652,10 @@ const GRAMMAR_BUILDERS = {
         'was sold': '"Was sold" is simple past passive; "had been sold" is needed to show it happened before the explanation.',
         'is being sold': '"Is being sold" is present continuous passive; the sentence is set entirely in the past.',
       }],
-      ['Once the storm ___, we went outside to check the garden.', 'had passed', ['has passed', 'passed', 'is passing'], {
-        'had passed': '"Had passed" is correct because the storm ending is the earlier past event before we went outside.',
+      ['Once the storm ___, we went outside to check the garden.', 'had passed', ['has passed', 'passes', 'is passing'], {
+        'had passed': '"Had passed" is correct because the storm ending is the earlier past event before we went outside. ("Once the storm passed" is also correct English.)',
         'has passed': '"Has passed" is present perfect; both events are in the past.',
-        'passed': '"Passed" is simple past; "had passed" is needed to show the storm ended before we went out.',
+        'passes': '"Passes" is simple present; "we went outside" sets the scene in the past.',
         'is passing': '"Is passing" is present continuous; the sentence is set entirely in the past.',
       }],
       ['By the time we got to the stall, the char kway teow ___ out.', 'had sold', ['has sold', 'sold', 'was selling'], {
@@ -3682,10 +3682,10 @@ const GRAMMAR_BUILDERS = {
         'took': '"Took" is simple past; "had taken" is needed to show the earlier past action.',
         'was taking': '"Was taking" shows action in progress; the past perfect shows the taking was already done.',
       }],
-      ['After the pupils ___ their essays, the teacher collected the booklets.', 'had completed', ['have completed', 'completed', 'are completing'], {
-        'had completed': '"Had completed" is correct because completing the essays is the earlier past action before the teacher collected them.',
+      ['After the pupils ___ their essays, the teacher collected the booklets.', 'had completed', ['have completed', 'complete', 'are completing'], {
+        'had completed': '"Had completed" is correct because completing the essays is the earlier past action before the teacher collected them. ("After the pupils completed" is also correct English.)',
         'have completed': '"Have completed" is present perfect; both events are in the past.',
-        'completed': '"Completed" is simple past; "had completed" is needed to show the earlier past action.',
+        'complete': '"Complete" is simple present; "the teacher collected" sets the scene in the past.',
         'are completing': '"Are completing" is present continuous; the sentence is set entirely in the past.',
       }],
       ['He could not board the bus because he ___ his EZ-Link card at home.', 'had left', ['has left', 'left', 'is leaving'], {
@@ -3742,7 +3742,7 @@ const GRAMMAR_BUILDERS = {
         'had worked': '"Had worked" is past perfect; the tiredness exists now, so present perfect continuous is needed.',
         'was working': '"Was working" is past continuous; "since dawn" shows an action still continuing to the present.',
       }],
-      ['They ___ in this neighbourhood for ten years.', 'have been living', ['lived', 'had lived', 'are living'], {
+      ['They ___ in this neighbourhood for ten years now.', 'have been living', ['lived', 'had lived', 'are living'], {
         'have been living': '"Have been living" is correct because "for ten years" shows an action that started in the past and continues now.',
         'lived': '"Lived" is simple past for a completed action; "for ten years" shows they still live there.',
         'had lived': '"Had lived" is past perfect for something before another past event; they still live there now.',
@@ -3760,10 +3760,10 @@ const GRAMMAR_BUILDERS = {
         'had read': '"Had read" is past perfect; the reading is still continuing now.',
         'was reading': '"Was reading" is past continuous; "for three days" shows ongoing duration to the present.',
       }],
-      ['The children ___ in the rain for an hour before their mother called them in.', 'had been playing', ['have been playing', 'played', 'are playing'], {
+      ['The children ___ in the rain for an hour before their mother called them in.', 'had been playing', ['have been playing', 'has been playing', 'are playing'], {
         'had been playing': '"Had been playing" is correct because the playing was ongoing for an hour before the past event of the mother calling them.',
-        'have been playing': '"Have been playing" is present perfect continuous; both events are in the past.',
-        'played': '"Played" is simple past; it does not show the one-hour duration before the mother called.',
+        'have been playing': '"Have been playing" reaches up to now; the playing ended in the past, when their mother called.',
+        'has been playing': '"Has" goes with a singular subject, and the playing ended in the past anyway.',
         'are playing': '"Are playing" is present continuous; the sentence describes a past scene.',
       }],
       ['By the time the concert ends tonight, the band ___ for nearly four hours.', 'will have been performing', ['has performed', 'performed', 'will perform'], {
@@ -3856,10 +3856,10 @@ const GRAMMAR_BUILDERS = {
   },
   conditionals(level, i) {
     const rows = [
-      ['If you heat ice, it ___ into water.', 'melts', ['melted', 'will melt', 'has melted'], {
+      ['If you heat ice, it ___ into water.', 'melts', ['melted', 'would melt', 'has melted'], {
         'melts': '"Melts" is correct because this is a zero conditional — a scientific fact, using simple present in both clauses.',
         'melted': '"Melted" is simple past; facts and natural laws use simple present in zero conditionals.',
-        'will melt': '"Will melt" is first conditional for likely future events, but this is a timeless fact.',
+        'would melt': '"Would melt" belongs with an imagined "if" clause in the past tense ("If you heated ice…"); here the "if" clause is present.',
         'has melted': '"Has melted" is present perfect, which does not fit a general scientific truth.',
       }],
       ['If it rains this afternoon, we ___ indoors.', 'will stay', ['stayed', 'stay', 'have stayed'], {
@@ -3880,10 +3880,10 @@ const GRAMMAR_BUILDERS = {
         'wrote': '"Wrote" is simple past; the second conditional result clause needs "would + base verb".',
         'will write': '"Will write" is first conditional for real future possibilities; "if I were" signals an imaginary scenario.',
       }],
-      ['If plants do not get sunlight, they ___ poorly.', 'grow', ['grew', 'will grow', 'have grown'], {
+      ['If plants do not get sunlight, they ___ poorly.', 'grow', ['grew', 'would grow', 'have grown'], {
         'grow': '"Grow" is correct because this is a zero conditional — a general truth about nature.',
         'grew': '"Grew" is simple past; zero conditionals use simple present for timeless facts.',
-        'will grow': '"Will grow" is first conditional for likely future events, but this is a general truth.',
+        'would grow': '"Would grow" belongs with an imagined "if" clause in the past tense ("If plants did not get…"); here the "if" clause is present.',
         'have grown': '"Have grown" is present perfect, which does not fit a general scientific truth.',
       }],
       ['If we finish the exam early, we ___ at our answers carefully.', 'will look', ['looked', 'look', 'have looked'], {
@@ -3910,10 +3910,10 @@ const GRAMMAR_BUILDERS = {
         'will heat': '"Will heat" is first conditional for future possibilities; this is a fixed scientific truth.',
         'have heated': '"Have heated" is present perfect, which does not fit a general scientific truth.',
       }],
-      ['If the band practises every weekend, they ___ steady progress.', 'will make', ['made', 'make', 'have made'], {
+      ['If the band practises every weekend, they ___ steady progress.', 'will make', ['made', 'would make', 'have made'], {
         'will make': '"Will make" is correct because this is a first conditional — a real future outcome if the condition is met.',
         'made': '"Made" is simple past; the first conditional result clause needs "will + base verb".',
-        'make': '"Make" alone fits zero conditionals (facts), but this realistic future scenario needs "will".',
+        'would make': '"Would make" belongs with an imagined "if" clause in the past tense ("If the band practised…"); here the "if" clause is present.',
         'have made': '"Have made" is present perfect, which does not fit a future consequence.',
       }],
       ['If we had not missed the train, we ___ the concert.', 'would have caught', ['will catch', 'catch', 'are catching'], {
@@ -3928,10 +3928,10 @@ const GRAMMAR_BUILDERS = {
         'will be': '"Will be" is future; the second conditional if-clause uses "were" for imaginary present situations.',
         'has been': '"Has been" is present perfect; the second conditional if-clause needs "were".',
       }],
-      ['If metal gets wet, it ___ to rust over time.', 'starts', ['started', 'will start', 'has started'], {
+      ['If metal gets wet, it ___ to rust over time.', 'starts', ['started', 'would start', 'has started'], {
         'starts': '"Starts" is correct because this is a zero conditional — a general truth about metal.',
         'started': '"Started" is simple past; zero conditionals use simple present for timeless facts.',
-        'will start': '"Will start" is first conditional for likely future events; this is a general truth.',
+        'would start': '"Would start" belongs with an imagined "if" clause in the past tense ("If metal got wet…"); here the "if" clause is present.',
         'has started': '"Has started" is present perfect, which does not fit a general scientific truth.',
       }],
       ['If I study hard this term, I ___ my grade in Mathematics.', 'will improve', ['improve', 'improved', 'have improved'], {
@@ -3958,17 +3958,17 @@ const GRAMMAR_BUILDERS = {
         'will be': '"Will be" is future; the second conditional if-clause uses "were" for unreal present situations.',
         'has been': '"Has been" is present perfect; the second conditional if-clause needs "were".',
       }],
-      ['If you freeze water, it ___ into ice.', 'turns', ['turned', 'will turn', 'has turned'], {
+      ['If you freeze water, it ___ into ice.', 'turns', ['turned', 'would turn', 'has turned'], {
         'turns': '"Turns" is correct because this is a zero conditional — a scientific fact using simple present.',
         'turned': '"Turned" is simple past; zero conditionals use simple present for timeless facts.',
-        'will turn': '"Will turn" is first conditional for likely future events; this is a fixed scientific truth.',
+        'would turn': '"Would turn" belongs with an imagined "if" clause in the past tense ("If you froze water…"); here the "if" clause is present.',
         'has turned': '"Has turned" is present perfect, which does not fit a general scientific truth.',
       }],
-      ['If I ___ taller, I would join the basketball team without hesitation.', 'were', ['am', 'will be', 'was'], {
+      ['If I ___ taller, I would join the basketball team without hesitation.', 'were', ['am', 'will be', 'had'], {
         'were': '"Were" is correct because this is a second conditional — an imaginary present wish (I am not taller).',
         'am': '"Am" is simple present; "I would join" in the result clause signals an imaginary scenario needing "were".',
         'will be': '"Will be" is future; the second conditional if-clause uses "were" for imaginary present situations.',
-        'was': '"Was" is simple past singular; the second conditional prefers "were" for all subjects to show it is imaginary.',
+        'had': '"Had" needs a noun after it ("If I had a ball"); with an adjective like "taller" we need a form of "be".',
       }],
       ['If the team had trained harder, they ___ the inter-school finals.', 'would have reached', ['will reach', 'reach', 'have reached'], {
         'would have reached': '"Would have reached" is correct because this is a third conditional — a past opportunity that was missed.',
@@ -4061,11 +4061,11 @@ const GRAMMAR_BUILDERS = {
         'has been': '"Has been" is present perfect; "last Saturday" pins the action to a specific past time.',
         'were': '"Were" is plural past; "the new community centre" is singular.',
       }],
-      ['All textbooks ___ collected by the form teacher at the end of the year.', 'are', ['is', 'were', 'have been'], {
-        'are': '"Are" is correct because the textbooks receive the action (passive: are + collected) as a regular present practice.',
-        'is': '"Is" is singular; "all textbooks" is plural.',
-        'were': '"Were" is past; the sentence describes a regular ongoing practice.',
-        'have been': '"Have been" forms present perfect; the present passive "are collected" is needed for a routine.',
+      ['Every year, all our textbooks ___ collected by the form teacher in November.', 'are', ['is', 'was', 'be'], {
+        'are': '"Are" is correct because the textbooks receive the action (passive: are + collected), and "every year" is a routine.',
+        'is': '"Is" is singular; "all our textbooks" is plural.',
+        'was': '"Was" is singular, but "all our textbooks" is plural.',
+        'be': '"Be" is the base form; it cannot follow the subject directly as the main verb.',
       }],
       ['The injured stray cat ___ rescued by a group of volunteers near Toa Payoh.', 'was', ['is', 'were', 'had been'], {
         'was': '"Was" is correct because the cat received the action (passive simple past: was + rescued).',
@@ -4073,7 +4073,7 @@ const GRAMMAR_BUILDERS = {
         'were': '"Were" is plural past; "the injured stray cat" is singular.',
         'had been': '"Had been" is past perfect passive; a simple past passive is more natural here.',
       }],
-      ['The prize-winners ___ announced after the closing ceremony.', 'were', ['was', 'are', 'have been'], {
+      ['The prize-winners ___ announced after the closing ceremony last Friday.', 'were', ['was', 'are', 'have been'], {
         'were': '"Were" is correct because the prize-winners received the action (passive simple past: were + announced) after the ceremony.',
         'was': '"Was" is singular past; "the prize-winners" is plural.',
         'are': '"Are" is present; the announcement was a completed past event.',
@@ -4236,16 +4236,16 @@ const GRAMMAR_BUILDERS = {
   reportedSpeech(level, i) {
     const rows = [
       ['Mum said that she ___ home late that evening.', 'would be', ['is', 'was', 'has been']],
-      ['The coach told us that we ___ to bring water bottles.', 'had to', ['have to', 'must', 'are having to']],
+      ['The coach told us that we ___ to bring water bottles.', 'had to', ['having to', 'has to', 'are having to']],
       ['Alicia said that she ___ the worksheet already.', 'had finished', ['has finished', 'finished', 'is finishing']],
-      ['He asked whether I ___ the notice.', 'had read', ['have read', 'read', 'am reading']],
+      ['He asked whether I ___ the notice.', 'had read', ['have read', 'reading', 'am reading']],
       ['The principal announced that the school ___ a charity drive the following week.', 'would hold', ['will hold', 'holds', 'has held']],
-      ['Tom said that his sister ___ to swim when she was four.', 'had learnt', ['has learnt', 'learnt', 'was learning']],
-      ['The librarian reminded us that the books ___ by Friday.', 'had to be returned', ['must be returned', 'are returned', 'were returning']],
-      ['Mei explained that she ___ the new dance steps every morning.', 'was practising', ['practises', 'has practised', 'will practise']],
-      ['Father told the children that they ___ noise after 9 p.m.', 'should not make', ['must not make', 'do not make', 'have not made']],
+      ['Tom said that his sister ___ to swim when she was four.', 'had learnt', ['has learnt', 'learns', 'was learning']],
+      ['The librarian reminded us that the books ___ by Friday.', 'had to be returned', ['have returned', 'are returned', 'were returning']],
+      ['Mei explained that she ___ the new dance steps every morning.', 'practised', ['practising', 'has practised', 'will practise']],
+      ['Father told the children that they ___ noise after 9 p.m.', 'should not make', ['will not make', 'do not make', 'have not made']],
       ['The guide warned us that the path ___ very slippery after the rain.', 'was', ['is', 'has been', 'will be']],
-      ['The doctor said that I ___ plenty of water every day.', 'should drink', ['must drink', 'drink', 'have drunk']],
+      ['The doctor said that I ___ plenty of water every day.', 'should drink', ['drinking', 'will drink', 'have drunk']],
       ['She asked me where I ___ the spare key.', 'had hidden', ['have hidden', 'hid', 'am hiding']],
       ['The teacher asked me what I ___ in my project report.', 'had written', ['have written', 'wrote', 'was writing']],
       ['She told me that she ___ the trophy on the shelf in her room.', 'had kept', ['has kept', 'kept', 'was keeping']],
@@ -4323,11 +4323,11 @@ const GRAMMAR_BUILDERS = {
         'there': '"There" is a place word; it does not replace "they are".',
         'theirs': '"Theirs" is a possessive pronoun showing ownership; it cannot replace "they are".',
       }],
-      ['Place the books over ___, next to the reading corner.', 'there', ['their', 'they\'re', 'here'], {
+      ['Place the books over ___, next to the reading corner.', 'there', ['their', 'they\'re', 'hear'], {
         'there': '"There" is correct because it refers to a specific place (next to the reading corner).',
         'their': '"Their" is a possessive adjective; it cannot indicate a location.',
         'they\'re': '"They\'re" means "they are" — not a place word.',
-        'here': '"Here" means near the speaker; "over there" indicates a place away from the speaker.',
+        'hear': '"Hear" is what you do with your ears; it sounds like "here" but is not a place word.',
       }],
       ['___ a long way from here to the community library.', 'It\'s', ['Its', 'It\'ll', 'There\'s'], {
         'It\'s': '"It\'s" is correct because it means "it is" — "it is a long way".',
@@ -4625,7 +4625,7 @@ const GRAMMAR_BUILDERS = {
       ['The lost kitten ___ to its owner after a kind passer-by called the number on the collar.', 'was returned', ['returned', 'has returned', 'is returning']],
       ['Should it ___ tomorrow, the outdoor lesson will move to the hall.', 'rain', ['rains', 'rained', 'is raining']],
       ['The book ___ I was reading at lunch belongs to my elder sister.', 'that', ['who', 'whose', 'whom']],
-      ['Mei said that she ___ how to swim before she turned six.', 'had learnt', ['has learnt', 'learnt', 'is learning']],
+      ['Mei said that she ___ how to swim before she turned six.', 'had learnt', ['has learnt', 'learns', 'is learning']],
     ];
     const [q, answer, ds] = rotate(rows, i);
     return { subskill: 'exam_mix', q, choices: buildChoices(answer, ds), answer, explain: 'Use all sentence clues to choose the most accurate grammar form.' };

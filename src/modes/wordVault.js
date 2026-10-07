@@ -29,6 +29,7 @@ import {
   clearClozeRound,
   createClozeRound,
   fillNextBlank,
+  isBlankAnswerCorrect,
   renderClozePassage,
 } from './clozeEngine.js';
 import {
@@ -1164,7 +1165,7 @@ function _buildVocabReviewRows(passage, userAnswers) {
     const meta = getBlankSkillMeta(passage, idx);
     const skillTag = normaliseSkillTag(meta.primarySkill || passage.skillTag || fallbackSkill);
     const chosen = userAnswers[idx] || '';
-    const isWrong = chosen !== correctAnswer;
+    const isWrong = !isBlankAnswerCorrect(passage, idx, chosen);
     const why = isWrong
       ? buildWhyWrongExplanation({
           meta,
@@ -1232,7 +1233,7 @@ function _checkPassage(passage) {
       })
     : buildUserAnswers(_blankFills, _bankWords);
 
-  const blankCorrect = userAnswers.filter((ans, i) => ans === passage.answers[i]).length;
+  const blankCorrect = userAnswers.filter((ans, i) => isBlankAnswerCorrect(passage, i, ans)).length;
   const blankTotal = passage.answers.length;
   const allCorrect = blankCorrect === blankTotal;
   const modeCfg = getModeConfig(_sessionMode);
@@ -1299,7 +1300,7 @@ function _checkPassage(passage) {
   store.set('masteryMap', masteryMap);
 
   userAnswers.forEach((ans, i) =>
-    _recordVocabPerformance(passage.answers[i], ans === passage.answers[i]),
+    _recordVocabPerformance(passage.answers[i], isBlankAnswerCorrect(passage, i, ans)),
   );
 
   if (modeCfg.showFinalReviewOnly) {
@@ -1414,7 +1415,7 @@ function _checkPassage(passage) {
     questMastery.updateSkill('wordVault', _currentCat, false);
     document.querySelectorAll('.wv-blank--filled').forEach((b, i) => {
       const ans = userAnswers[i] || '';
-      b.classList.toggle('wv-blank--wrong', ans !== passage.answers[i]);
+      b.classList.toggle('wv-blank--wrong', !isBlankAnswerCorrect(passage, i, ans));
     });
     mascot.encourage();
     _passageWrongCount++;

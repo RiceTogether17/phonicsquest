@@ -22,6 +22,7 @@
 export { GRAMMAR_CATEGORIES } from './grammarCategories.js';
 import { passagesExtra } from './passagesExtra/index.js';
 import { MIN_QUESTIONS_PER_SCOPE, passageLead, contextualTitle } from './practiceExpansion.js';
+import { GRAMMAR_CLOZE_ACCEPTABLE_ANSWERS, attachAcceptableAnswers } from './clozeAcceptableAnswers.js';
 
 export const CLOZE_LEVEL_LABELS = {
   P1: 'Primary 1',
@@ -174,7 +175,7 @@ const basePassages = {
     prepositions: [
       {
         id: 'g-p1-pre-01', title: 'Where Is It?',
-        text: 'The ball is ___ the table. The cat is ___ the chair. The shoes are ___ the door.',
+        text: 'The ball is ___ the table, next to the cups. The cat is hiding ___ the chair, below the seat. The shoes are ___ the door, just a step away from it.',
         answers: ['on', 'under', 'near'],
         wordBank: ['on', 'under', 'near', 'in', 'behind', 'above'],
         xp: 20,
@@ -569,7 +570,7 @@ const basePassages = {
       },
       {
         id: 'g-p2-conj-02', title: 'Weather',
-        text: 'It was raining ___ we stayed indoors. We played games ___ watched TV. The rain stopped ___ we went outside.',
+        text: 'It was raining, ___ we stayed indoors. We played games ___ watched TV. The rain stopped, and ___ we went outside.',
         answers: ['so', 'and', 'then'],
         wordBank: ['so', 'and', 'then', 'but', 'or', 'because'],
         xp: 25,
@@ -1207,7 +1208,7 @@ const basePassages = {
     countableUncountable: [
       {
         id: 'g-p4-cu-01', title: 'Setting Up the Classroom',
-        text: 'There are ___ chairs in the hall, but there is ___ space for more. We have ___ information about the event so far.',
+        text: 'There are ___ chairs in the hall, and there is ___ space for more. We have ___ information about the event so far.',
         answers: ['few', 'little', 'little'],
         wordBank: ['few', 'little', 'little', 'a few', 'a little', 'a little'],
         xp: 35,
@@ -1479,7 +1480,7 @@ const basePassages = {
     countableUncountable: [
       {
         id: 'g-p5-cu-01', title: 'Checking the Equipment',
-        text: 'There were ___ bottles of water in the storeroom, but there was ___ equipment for the relay race. The teacher said we had ___ supplies to manage.',
+        text: 'There were ___ bottles of water in the storeroom, but there was ___ equipment for the relay race. Luckily, we had ___ time to borrow more.',
         answers: ['too many', 'too little', 'plenty of'],
         wordBank: ['too many', 'too little', 'plenty of', 'too much', 'fewer', 'enough'],
         xp: 40,
@@ -1509,7 +1510,7 @@ const basePassages = {
       },
       {
         id: 'g-p5-cu-04', title: 'Planning the Camp',
-        text: 'We need ___ luggage space on the bus. There are ___ sleeping bags, but we have ___ food for everyone.',
+        text: 'We need ___ luggage space on the bus. There are ___ sleeping bags than campers, but we have ___ food for everyone.',
         answers: ['enough', 'fewer', 'plenty of'],
         wordBank: ['enough', 'fewer', 'plenty of', 'less', 'too many', 'too much'],
         xp: 40,
@@ -1536,12 +1537,12 @@ const basePassages = {
     presentPerfect: [
       {
         id: 'g-p5-pp-01', title: 'The STEM Project',
-        text: 'Our team ___ completed the prototype since last Wednesday. Each member ___ contributed at least two ideas. The teacher ___ not given us the final brief yet.',
+        text: 'Our team ___ completed the prototype at last. Each member ___ contributed at least two ideas. The teacher ___ not given us the final brief yet.',
         answers: ['has', 'has', 'has'],
         wordBank: ['has', 'has', 'has', 'have', 'had', 'have'],
         xp: 40,
         clues: [
-          { blankIndex: 0, prompt: 'Look for the time marker that tells you this action started in the past and connects to now.', acceptableSpans: ['since'], partialSpans: ['Wednesday'], clueType: 'time-marker', explanation: '"Since" signals present perfect tense. "Our team" is treated as singular: has completed.' },
+          { blankIndex: 0, prompt: 'Look for the words that tell you the work is finished now.', acceptableSpans: ['at last'], partialSpans: ['completed'], clueType: 'time-marker', explanation: '"At last" tells us the work is finished now, which the present perfect shows. "Our team" is treated as singular: has completed.' },
         ],
       },
       {
@@ -1753,11 +1754,11 @@ const basePassages = {
       {
         id: 'g-p6-cu-02', title: 'School Improvement Plan',
         text: 'The committee reviewed ___ resources before making a decision. ___ opportunities were available for students to volunteer. The principal noted that ___ progress had been made this term.',
-        answers: ['a large amount of', 'Very few', 'a great deal of'],
-        wordBank: ['a large amount of', 'Very few', 'a great deal of', 'a large number of', 'Very little', 'many'],
+        answers: ['a large number of', 'Very few', 'a great deal of'],
+        wordBank: ['a large number of', 'Very few', 'a great deal of', 'a large amount of', 'Very little', 'many'],
         xp: 50,
         clues: [
-          { blankIndex: 0, prompt: 'Can you count resources in this context? Think about whether "resources" means materials or money.', acceptableSpans: ['resources'], partialSpans: ['decision'], clueType: 'mass-noun-clue', explanation: 'In this context, "resources" refers to funding and materials collectively (uncountable sense). "A large amount of" fits.' },
+          { blankIndex: 0, prompt: 'Can you count resources? Look at the end of the word.', acceptableSpans: ['resources'], partialSpans: ['decision'], clueType: 'noun-countable', explanation: '"Resources" ends in -s: it is a plural countable noun, so it takes "a large number of". "Amount" is for uncountable nouns like "progress".' },
           { blankIndex: 1, prompt: 'Can you count opportunities?', acceptableSpans: ['opportunities'], partialSpans: ['students'], clueType: 'noun-countable', explanation: '"Opportunities" is countable. "Very few" is used with countable nouns to mean almost none.' },
         ],
       },
@@ -1839,7 +1840,7 @@ const basePassages = {
         id: 'g-p6-mix-02', title: 'Preparing for PSLE',
         text: 'The students ___ been revising since March. Each pupil ___ given a revision booklet by the teachers. If they ___ hard, they ___ do well in the exam.',
         answers: ['have', 'was', 'study', 'will'],
-        wordBank: ['have', 'was', 'study', 'will', 'has', 'were', 'studied', 'would'],
+        wordBank: ['have', 'was', 'study', 'will', 'has', 'were', 'studying', 'did'],
         xp: 55,
         grammarNotes: ['Present perfect continuous: have been revising (since March).', 'Passive voice: Each pupil was given (by the teachers).', 'Type 1 conditional: If + present tense, will + base verb.'],
       },
@@ -1896,10 +1897,10 @@ const GRAMMARMASTER_EXPANSION = {
     { title: 'CCA Afternoon', text: 'Our coach ___ instructions, the players ___ quickly, and Mei ___ the timing sheet.', answers: ['gives', 'respond', 'updates'], wordBank: ['gives', 'respond', 'updates', 'give', 'responds', 'update'], notes: ['Coach is singular so gives.', 'Players is plural so respond.', 'Mei is singular so updates.'] },
   ],
   perfectContinuousTenses: [
-    { title: 'Project Progress', text: 'By noon, we ___ finished the poster, and Kai ___ been checking the labels since recess before we ___ presenting.', answers: ['had', 'has', 'started'], wordBank: ['had', 'has', 'started', 'have', 'had been', 'start'], clues: [
+    { title: 'Project Progress', text: 'By noon, we ___ finished the poster. Since then, Kai ___ been checking the labels, and he ___ the last page a few minutes ago.', answers: ['had', 'has', 'started'], wordBank: ['had', 'has', 'started', 'have', 'had been', 'start'], clues: [
       { blankIndex: 0, prompt: 'Tap the time phrase that shows completion before another past point.', acceptableSpans: ['By noon'], partialSpans: ['noon'], clueType: 'time-marker', explanation: '"By noon" signals past perfect: had finished.' },
       { blankIndex: 1, prompt: 'Tap the subject before blank 2.', acceptableSpans: ['Kai'], partialSpans: ['labels'], clueType: 'subject-clue', explanation: 'Kai is singular, so "has been" is correct.' },
-      { blankIndex: 2, prompt: 'Tap the word after blank 3 that completes the verb phrase.', acceptableSpans: ['presenting'], partialSpans: ['before'], clueType: 'tense-helper', explanation: 'After "before we", past simple "started" fits the sequence.' },
+      { blankIndex: 2, prompt: 'Tap the time phrase that says exactly when this happened.', acceptableSpans: ['a few minutes ago'], partialSpans: ['ago'], clueType: 'time-marker', explanation: '"A few minutes ago" names a finished past time, so the simple past "started" fits.' },
     ], notes: ['Use had + past participle for past perfect.', 'Use has/have been + -ing for perfect continuous.', 'Time markers help choose tense.'] },
     { title: 'Training Week', text: 'The team ___ been practising daily, and by Friday they ___ improved a lot while the coach ___ reviewing each drill.', answers: ['has', 'had', 'was'], wordBank: ['has', 'had', 'was', 'have', 'were', 'has been'], notes: ['Singular collective noun can take has in this context.', 'By + time marker often triggers had + past participle.', 'Was reviewing shows an action in progress in the past.'] },
     { title: 'Reading Log', text: 'Since January, I ___ been recording my books, and I ___ completed ten entries when we ___ discussing the novel.', answers: ['have', 'had', 'were'], wordBank: ['have', 'had', 'were', 'has', 'have had', 'was'], notes: ['I takes have been in present perfect continuous.', 'Had completed marks an earlier completed action.', 'Were discussing is past continuous with we.'] },
@@ -2091,3 +2092,4 @@ function _ensureGrammarPassageDepth(targetQuestions = MIN_QUESTIONS_PER_SCOPE) {
 
 _normalizeGrammarClues();
 _ensureGrammarPassageDepth();
+attachAcceptableAnswers(passages, GRAMMAR_CLOZE_ACCEPTABLE_ANSWERS);

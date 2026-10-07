@@ -29,6 +29,25 @@ export function clearClozeRound(bankWords, blankFills) {
   blankFills.fill(null);
 }
 
+/**
+ * Is this word right for this blank?
+ *
+ * Each blank has one keyed answer, but English often allows a second: "although"
+ * where the passage has "even though", "which" for "that" in a defining clause,
+ * "should" for "must" in a rule. A child who picks one of those has not made a
+ * mistake, and marking it wrong teaches them to distrust a correct instinct.
+ * Such alternatives are listed per blank in `passage.acceptableAnswers`.
+ *
+ * @param {{answers: string[], acceptableAnswers?: (string[]|undefined)[]}} passage
+ * @param {number} idx
+ * @param {string} answer
+ */
+export function isBlankAnswerCorrect(passage, idx, answer) {
+  if (answer === passage.answers[idx]) return true;
+  const alternatives = passage.acceptableAnswers?.[idx];
+  return Array.isArray(alternatives) && alternatives.includes(answer);
+}
+
 export function buildUserAnswers(blankFills, bankWords) {
   return blankFills.map((id) => bankWords.find((w) => w.id === id)?.word || '');
 }

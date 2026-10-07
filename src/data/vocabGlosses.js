@@ -67,6 +67,8 @@ export const WORD_GLOSSES = {
   sighed: 'let out a long breath showing tiredness or relief',
   squawk: 'the loud, harsh cry of a startled bird',
   squeaked: 'made the tiny, high sound of a mouse',
+  mooing: 'making the long, low call of a cow',
+  snored: 'breathed noisily while asleep',
   squeal: 'a long, high-pitched cry',
   yowled: 'made the long, wailing cry of an unhappy cat',
 
@@ -255,6 +257,8 @@ export const WORD_GLOSSES = {
 
   // verb distinctions (direction / exchange / speech / perception)
   borrow: 'to take something for a while and return it later',
+  borrowed: 'took something for a while, to give it back later',
+  borrows: 'takes something for a while, to give it back later',
   bring: 'to carry something towards the speaker or to where they will be',
   brings: 'carries something towards the speaker or to where they will be',
   brought: 'carried something (or someone) along to a place',
@@ -425,6 +429,7 @@ export const WORD_GLOSSES = {
   'tidy up': 'to make a place neat',
   'turn down': 'to reduce the volume, or refuse',
   'turn in': 'to submit work, or go to bed',
+  'give back': 'to return something to its owner',
   'turn off': 'to stop a device completely',
   'turn out': 'to end up a certain way, or attend',
   'turn over': 'to flip to the other side',
@@ -485,6 +490,7 @@ export const WORD_GLOSSES = {
   'wound on': 'not an English expression',
   'wound over': 'not an English expression',
   'wound up': 'brought to an end and closed down',
+  'wound in': 'pulled back in by turning, like a fishing line',
 };
 
 // ── Proverb meanings ──────────────────────────────────────────────────────

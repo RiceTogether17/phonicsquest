@@ -33,6 +33,7 @@ import {
   clearClozeRound,
   createClozeRound,
   fillNextBlank,
+  isBlankAnswerCorrect,
   renderClozeBank,
   renderClozePassage,
 } from './clozeEngine.js';
@@ -881,7 +882,7 @@ function _buildReviewRows(passage, userAnswers) {
     const studentAnswer = userAnswers[idx] || '';
     const meta = getBlankSkillMeta(passage, idx);
     const skillTag = normaliseSkillTag(meta.primarySkill || inferredSkill);
-    const isWrong = studentAnswer !== correctAnswer;
+    const isWrong = !isBlankAnswerCorrect(passage, idx, studentAnswer);
     // Diagnose against the blank's own sentence, with sibling blanks filled in,
     // so the detectors can see the subject and the time words around the gap.
     const why = isWrong
@@ -928,8 +929,8 @@ function _checkPassage(passage) {
 
   const userAnswers = buildUserAnswers(_blankFills, _bankWords);
   _lastUserAnswers = [...userAnswers];
-  const allCorrect = userAnswers.every((ans, i) => ans === passage.answers[i]);
-  const blankCorrect = userAnswers.filter((ans, i) => ans === passage.answers[i]).length;
+  const allCorrect = userAnswers.every((ans, i) => isBlankAnswerCorrect(passage, i, ans));
+  const blankCorrect = userAnswers.filter((ans, i) => isBlankAnswerCorrect(passage, i, ans)).length;
   const modeCfg = getModeConfig(_sessionMode);
   const skillKey = _currentCat === '__all__' ? 'mixed' : _currentCat;
   const normalisedSkills = passage.answers.map((_, idx) =>
@@ -938,7 +939,7 @@ function _checkPassage(passage) {
     ),
   );
   const wrongSkillSet = new Set(
-    normalisedSkills.filter((skill, idx) => userAnswers[idx] !== passage.answers[idx]),
+    normalisedSkills.filter((skill, idx) => !isBlankAnswerCorrect(passage, idx, userAnswers[idx])),
   );
 
   questMastery.recordAttempt({
@@ -1100,7 +1101,7 @@ function _checkPassage(passage) {
 
     document.querySelectorAll('.cloze-blank--filled').forEach((b, i) => {
       const userAns = _bankWords.find((w) => w.id === _blankFills[i])?.word || '';
-      b.classList.toggle('cloze-blank--wrong', userAns !== passage.answers[i]);
+      b.classList.toggle('cloze-blank--wrong', !isBlankAnswerCorrect(passage, i, userAns));
     });
 
     mascot.encourage();
