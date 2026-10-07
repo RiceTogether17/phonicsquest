@@ -9,6 +9,7 @@ import { inferQuestionContextType } from './mcqItemMetadata.js';
 import { CLUE_CATEGORIES, deriveClueWords, deriveMcqDifficulty, mcqSeedKey } from './mcqItemFeatures.js';
 import { makeFallbackOptionExplanations } from './mcqOptionExplanations.js';
 import { GRAMMAR_TIPS } from './grammarTips.js';
+import { P1_PRONOUN_EXPLANATIONS, makeSimplePastExplanations } from './earlyGrammarExplanations.js';
 import { getStrandLevel } from './spiralGrammar.js';
 import { MIN_QUESTIONS_PER_SCOPE, contextualizeMcqQuestion, varyMcqNames } from './practiceExpansion.js';
 
@@ -4665,6 +4666,22 @@ function dedupeBySeed(items) {
   }));
 }
 
+/**
+ * Give the early-years items that had no per-option feedback their own: P1
+ * pronouns name the word the pronoun stands for; simple past names the time
+ * clue and what each other verb form is. Applied before name variation.
+ */
+function withEarlyExplanations(spec, category) {
+  if (spec.optionExplanations) return spec;
+  if (category === 'pronouns' && P1_PRONOUN_EXPLANATIONS[spec.q]) {
+    return { ...spec, optionExplanations: P1_PRONOUN_EXPLANATIONS[spec.q] };
+  }
+  if (category === 'simplePast') {
+    return { ...spec, optionExplanations: makeSimplePastExplanations(spec) };
+  }
+  return spec;
+}
+
 function buildLevel(level) {
   const categories = LEVEL_CATEGORY_PLAN[level];
   const items = [];
@@ -4673,7 +4690,7 @@ function buildLevel(level) {
   for (const category of categories) {
     for (let localOffset = 0; localOffset < MIN_QUESTIONS_PER_SCOPE; localOffset += 1) {
       const localIndex = sessionSeed + localOffset;
-      const spec = varyMcqNames(GRAMMAR_BUILDERS[category](level, localIndex), localOffset);
+      const spec = varyMcqNames(withEarlyExplanations(GRAMMAR_BUILDERS[category](level, localIndex), category), localOffset);
       const variant = contextualizeMcqQuestion(spec.q);
       const item = {
         id: `g-${level.toLowerCase()}-${category}-${String(localOffset + 1).padStart(3, '0')}`,

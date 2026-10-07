@@ -290,3 +290,40 @@ export function clueResultFeedback(result) {
       };
   }
 }
+
+// ── Which blanks get a clue hunt ─────────────────────────────────────────────
+
+/**
+ * The clue a child hunts for on this blank, or null when there is none.
+ *
+ * Only clues a person wrote are hunted. Clues marked `generated` were derived
+ * mechanically — the few words after the blank — and usually point away from
+ * the real evidence: for "Tom is my friend. ___ likes to play" the generated
+ * clue was "likes to play", so a child who tapped "Tom" was told it was weak.
+ * Generated clues stay on the passage for reporting; they are just not asked.
+ */
+export function huntableClue(passage, blankIndex) {
+  const clue = (passage?.clues || []).find((c) => c.blankIndex === blankIndex);
+  return clue && !clue.generated ? clue : null;
+}
+
+/** Does this passage ask for any clue hunt at all? */
+export function hasClueHunt(passage) {
+  return (passage?.clues || []).some((c) => !c.generated);
+}
+
+/**
+ * The blank whose clue hunt should run now, or -1 to leave the bank open.
+ *
+ * Words always go into the next empty blank, so the hunt that matters is that
+ * blank's — and only if it has an authored clue not yet hunted.
+ *
+ * @param {object} passage
+ * @param {(number|null)[]} blankFills
+ * @param {Record<number, string>} clueResults
+ */
+export function nextClueHuntBlank(passage, blankFills, clueResults = {}) {
+  const next = blankFills.findIndex((fill) => fill === null);
+  if (next === -1 || Object.hasOwn(clueResults, next)) return -1;
+  return huntableClue(passage, next) ? next : -1;
+}

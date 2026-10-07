@@ -2015,6 +2015,9 @@ function _deriveGrammarClues(text, answers = []) {
       acceptableSpans: [span],
       partialSpans: span.split(/\s+/).slice(0, 2),
       clueType: 'context-clue',
+      // Derived from the words beside the blank, not written by a person:
+      // shown in reports, but never asked for in the clue hunt.
+      generated: true,
       explanation: `The phrase "${span}" gives a clue for the correct grammar form.`,
     };
   });
@@ -2039,6 +2042,7 @@ function _normalizeGrammarClues() {
               partialSpans: Array.isArray(c.partialSpans) && c.partialSpans.length ? c.partialSpans : fallback.partialSpans,
               clueType: String(c.clueType || fallback.clueType),
               explanation: String(c.explanation || fallback.explanation),
+              ...(c.generated ? { generated: true } : {}),
             };
           });
         }

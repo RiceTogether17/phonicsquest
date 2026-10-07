@@ -288,6 +288,7 @@ function buildLearningAids(text, category, answers) {
         acceptableSpans: [span],
         partialSpans: span.split(/\s+/).slice(0, 2),
         clueType: aid.clueType,
+        generated: true,
         explanation: `${aid.explanation} The phrase "${span}" is the key textual evidence.`,
       },
     };

@@ -1651,6 +1651,7 @@ function _deriveClues(passage, catKey = '') {
       acceptableSpans: [span],
       partialSpans: span.split(/\s+/).slice(0, 2),
       clueType: aid.clueType,
+      generated: true,
       explanation: `${aid.explanation} The phrase "${span}" is the direct textual evidence.`,
     };
   });
@@ -1805,6 +1806,7 @@ function enrichVocabMetadata() {
               partialSpans: Array.isArray(c.partialSpans) && c.partialSpans.length ? c.partialSpans : derivedClues[idx].partialSpans,
               clueType: String(c.clueType || derivedClues[idx].clueType),
               explanation: String(c.explanation || derivedClues[idx].explanation),
+              ...(c.generated ? { generated: true } : {}),
             };
           });
         }

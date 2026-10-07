@@ -150,21 +150,24 @@ asked"_, _"Aunt Arjun asked"_ and _"Among the three brothers, Nurul is the
 tallest"_. _Aunt_ is now a title, and _brothers, sisters, boys, girls, sons,
 daughters, mother, father, aunt, uncle, nephew, niece_ count as gendered.
 
-### Open — needs a decision (not changed here)
+### Teaching-design issues (D1, D2 and D4 partly addressed in a follow-up)
 
-**D1. The clue hunt teaches the wrong evidence on generated clues.** Before
-choosing a word, the child must tap "the clue word" for each blank. For 52% of
-Cloze Castle clues and 68% of Word Vault clues there is no authored clue. The
-code takes the 3–5 words to the _right_ of the blank as the "strong" clue, and
-the explanation says only _"The phrase X gives a clue for the correct grammar
-form."_ For _Tom is my friend. ___ likes to play_ the strong clue is _likes to
-play_, so a child who taps **Tom**, the real clue, is told it is weak. For
-_the path outside was ___. Mei opened her…_ the strong clue is _". Mei opened
-her"_, punctuation included. Options, best first: (a) skip the clue step for
-blanks with no authored clue, (b) derive clues per category (antecedent for
-pronouns, subject for agreement, time words for tense, next word's sound for
-articles), or (c) accept any word in the blank's sentence as a strong clue.
-Option (a) is a small change and stops the harm today.
+**D1. The clue hunt taught the wrong evidence on generated clues — done
+(follow-up).** Before choosing a word, the child had to tap "the clue word" for
+each blank. Where no person wrote a clue, the code used the few words to the
+_right_ of the blank as the "strong" clue. For _Tom is my friend. ___ likes to
+play_ that was _likes to play_, so a child who tapped **Tom**, the real clue,
+was told it was weak. Measured properly, this covered about 93% of Cloze
+Castle blanks at P1–P3 and nearly every Word Vault blank: only 6 Word Vault
+passages have a clue written by a person. Generated clues are now flagged
+`generated: true` at all five places they are made, and the clue hunt
+(`huntableClue` / `nextClueHuntBlank` in `clueEngine.js`) asks only for
+authored ones. The flagged clues stay on the passage for reports. Cloze
+Castle now hunts on 6–11% of blanks, every one of them a real clue.
+Checked in the browser: P1 Articles and Simple Past go straight to filling,
+and the gm Pronouns passage still asks "Tap the pronoun that replaces
+Alicia". The better long-term fix is still to author clues per category
+(the antecedent for pronouns, the subject for agreement, time words for tense).
 
 **D2. Word Vault is mostly a template generator, identical at every level.**
 504 of 749 "distinct" passages come from `vocabPassagesExtra/generator.js`.
@@ -175,6 +178,12 @@ categories at any level. The language errors are fixed (W2). The design
 problem stands: the generator adds volume, not vocabulary. Recommend replacing
 it with authored passages per level (even 4–6 per category would be more
 teaching), or at minimum using different answer sets per level band.
+
+_Follow-up:_ Word Vault now deals hand-written passages first
+(`wordVaultPool.js`). Until each has been completed, no template passage is
+dealt. After that, template material joins as one passage per distinct body
+rather than 34 near-copies. Before this, a new learner drew a template passage
+about 89% of the time. The authoring work remains.
 
 **D3. Year levels are barely differentiated.** 344 of 887 Grammar MCQ seeds are
 served at four or more levels. Vocabulary uses two tiers (P1–P2 and P3–P6), so
@@ -189,6 +198,11 @@ Grammar item, and every Connector Clue, Action Verb and Manner Adverb item: the
 P5–P6 topics where a child most needs to know _why_. Authoring per-option
 explanations for these ~200 items is the highest-value writing task in these
 modules.
+
+_Follow-up:_ P1 and P2 are now fully explained (`earlyGrammarExplanations.js`).
+The 20 P1 pronoun items name the word the pronoun stands for, and the 31 P1–P2
+simple-past items name the time clue and what each other verb form is. P5–P6
+Grammar (84 items) and the Vocabulary categories above still need writing.
 
 **D5. Judgement calls left as they were.** Each of these is defensible in a
 Singapore exam context, but each should be a deliberate choice, and the
@@ -205,9 +219,9 @@ feedback should say "both are used; in exams, choose X":
 
 ## Verification
 
-- Unit tests: 235 files, 3,159 tests pass, including 40 new tests in
-  `secondReaderReview.test.js` and the two updated tests in
-  `ambiguousItems.test.js`.
+- Unit tests: 236 files, 3,169 tests pass, including 40 new tests in
+  `secondReaderReview.test.js`, 10 in `teachingFlowFixes.test.js` for the
+  follow-up, and the two updated tests in `ambiguousItems.test.js`.
 - `npm run build` (contracts check, bundle, service-worker manifest) passes;
   typecheck passes; lint has 0 errors; scope/sequence check is up to date.
 - Browser tests: smoke, app shell, full session and primary-section
@@ -217,11 +231,12 @@ feedback should say "both are used; in exams, choose X":
 
 ## Suggested next steps, in order
 
-1. D1 option (a): skip the clue step where the clue was generated. This is a
-   small change that stops active mis-teaching.
-2. D4: author per-option explanations for Reported Speech, Inversion, Mixed
-   Grammar, Connector Clue, Action Verbs and Manner Adverbs.
-3. D2: author Word Vault passages per level and retire or demote the generator.
-4. D3: give each category a P1→P6 difficulty spine.
+1. D4: author per-option explanations for P5–P6 Reported Speech, Inversion and
+   Mixed Grammar, and for Connector Clue, Action Verbs and Manner Adverbs.
+2. D1, properly: author clues per category, so the clue hunt can return where
+   it teaches something.
+3. D2: author Word Vault passages per level and retire the generator.
+4. D3: give each category a P1→P6 difficulty spine, starting with a P2→P3
+   vocabulary bridge.
 5. Keep `secondReaderReview.test.js`'s pattern. When a new item is authored,
    complete it with every option before release. A validator cannot do this.

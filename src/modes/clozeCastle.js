@@ -43,6 +43,9 @@ import {
   getClueHint,
   clueResultFeedback,
   clueResultToScore,
+  hasClueHunt,
+  huntableClue,
+  nextClueHuntBlank,
 } from './clueEngine.js';
 import { celebrateCorrect } from '../components/confettiHelper.js';
 import { mascot } from '../components/mascot.js';
@@ -410,15 +413,9 @@ function _initPassage(passage) {
   _passageWrongCount = 0; // reset per-passage wrong counter for teach-back
 
   // Determine starting mode
-  if (passage.clues && passage.clues.length > 0) {
-    // Start with the first blank's clue hunt
-    const firstClue = [...passage.clues].sort((a, b) => a.blankIndex - b.blankIndex)[0];
-    _activeBlankIndex = firstClue?.blankIndex ?? -1;
-    _bankLocked = true;
-  } else {
-    _activeBlankIndex = -1;
-    _bankLocked = false;
-  }
+  // Start with the first blank's clue hunt, if a person wrote a clue for it.
+  _activeBlankIndex = nextClueHuntBlank(passage, _blankFills, _clueResults);
+  _bankLocked = _activeBlankIndex !== -1;
 
   _readFirstAcknowledged = false;
   _scanTaskCompleted = false;
@@ -437,7 +434,7 @@ function _renderPassage(passage) {
       ? `${GRAMMAR_CATEGORIES[_currentCat].icon} ${GRAMMAR_CATEGORIES[_currentCat].label}`
       : 'All Topics';
 
-  const hasClues = passage.clues && passage.clues.length > 0;
+  const hasClues = hasClueHunt(passage);
   const inClueMode = hasClues && _bankLocked;
   const modeCfg = getModeConfig(_sessionMode);
 
@@ -837,15 +834,10 @@ function _renderBankWords(passage) {
       audio.playSfx('pop');
 
       // After filling a blank, activate clue-hunt for the next unfilled clue target.
-      const nextClue = (passage.clues || [])
-        .slice()
-        .sort((a, b) => a.blankIndex - b.blankIndex)
-        .find(
-          (c) => _blankFills[c.blankIndex] === null && !Object.hasOwn(_clueResults, c.blankIndex),
-        );
+      const nextHunt = nextClueHuntBlank(passage, _blankFills, _clueResults);
 
-      if (nextClue) {
-        _activeBlankIndex = nextClue.blankIndex;
+      if (nextHunt !== -1) {
+        _activeBlankIndex = nextHunt;
         _bankLocked = true;
         _hintLevel = 0;
         _weakAttempts = 0;
@@ -1079,7 +1071,7 @@ function _checkPassage(passage) {
       title: 'Answer Review',
       rows: _buildReviewRows(passage, userAnswers),
       onContinue: () => {
-        if (passage.clues && passage.clues.length > 0) {
+        if (hasClueHunt(passage)) {
           _showClueExplanation(passage, () =>
             setTimeout(() => {
               _passageIdx++;
@@ -1288,7 +1280,7 @@ function _showClueExplanation(passage, onContinue) {
 
   const lines = passage.answers
     .map((answer, idx) => {
-      const clue = (passage.clues || []).find((c) => c.blankIndex === idx);
+      const clue = huntableClue(passage, idx);
       const result = _clueResults[idx] || 'weak';
       const feedback = clueResultFeedback(result);
       const score = clueResultToScore(result);
@@ -1301,7 +1293,7 @@ function _showClueExplanation(passage, onContinue) {
       return `
       <div class="clue-explanation-item">
         <p><strong>Blank ${idx + 1}:</strong> ${escapeHtml(answer)}</p>
-        <p>Clue chosen: <span class="clue-result-badge ${feedback.cssClass}">${escapeHtml(selected)}</span> · Score ${Math.round(score * 100)}%</p>
+        ${clue ? `<p>Clue chosen: <span class="clue-result-badge ${feedback.cssClass}">${escapeHtml(selected)}</span> · Score ${Math.round(score * 100)}%</p>` : ''}
         <p class="clue-explanation-text">${escapeHtml(note)}</p>
       </div>`;
     })

@@ -10,6 +10,9 @@ function deriveClues(text, answers) {
       acceptableSpans: [span],
       partialSpans: span.split(/\s+/).slice(0, 2),
       clueType: 'grammar-context-clue',
+      // Derived from the words beside the blank, not written by a person:
+      // shown in reports, but never asked for in the clue hunt.
+      generated: true,
       explanation: `The phrase "${span}" signals the grammar form that fits here.`,
     };
   });
