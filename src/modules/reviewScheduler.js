@@ -63,11 +63,11 @@ function dayMs(days) {
 /**
  * Compute the new box/dueAt for a word after an attempt.
  *
- * `promote` exists because the box ladder measures RETENTION, and a word the
- * app just blended aloud tests nothing. When an attempt is correct but its
- * evidence level is below `independent` (see modules/evidence.js), the box
- * holds where it is and the existing due date is kept — so the word stays due
- * for a real review instead of being pushed out by a modelled answer.
+ * `promote` exists because the box ladder measures RETENTION, and a bare
+ * "I read it" tests nothing. When an attempt is correct but the child
+ * performed nothing (exposure, see modules/evidence.js and
+ * store.recordWordAttempt), the box holds where it is and the existing due
+ * date is kept — so the word stays due for a real review.
  * Wrong answers demote regardless: getting it wrong with help is still
  * getting it wrong.
  *

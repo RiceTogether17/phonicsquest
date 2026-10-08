@@ -10,7 +10,7 @@
 
 import { store } from './store.js';
 import { WORDS, getWordsByLevel, getWordStructure, getShortVowelLetter } from '../data/words.js';
-import { MASTERY_THRESHOLD, MIN_ATTEMPTS_FOR_MASTERY } from '../data/curriculum.js';
+import { CURRICULUM, MASTERY_THRESHOLD, MIN_ATTEMPTS_FOR_MASTERY } from '../data/curriculum.js';
 import { normalizeAdaptiveConfig, getWordWeight } from './adaptiveSelection.js';
 import { getDueItems, countDueItems } from './reviewScheduler.js';
 import { evidenceCeilingForMode } from './evidence.js';
@@ -474,7 +474,34 @@ class Progress {
     if (word) {
       this._updateGroupMastery(word.group);
       this._updateStructuralGroupMastery(word);
+      // Every other stage that serves this word. Mixed-review stages
+      // (struct-cvc, rc-ar-or, …) are not any word's own group, so without
+      // this their score was never written and the stages after them could
+      // not unlock.
+      for (const group of this._stageGroupsForWord(wordId)) {
+        if (group !== word.group) this._updateGroupMastery(group);
+      }
     }
+  }
+
+  /**
+   * Curriculum stage groups whose word set includes `wordId`. Built once,
+   * since resolving all ~60 stage groups costs a pass over WORDS each.
+   * @param {string} wordId
+   * @returns {string[]}
+   */
+  _stageGroupsForWord(wordId) {
+    if (!this._wordStageGroups) {
+      const map = new Map();
+      for (const group of new Set(CURRICULUM.map((s) => s.group))) {
+        for (const w of this._filterByGroup(group)) {
+          if (!map.has(w.id)) map.set(w.id, []);
+          map.get(w.id).push(group);
+        }
+      }
+      this._wordStageGroups = map;
+    }
+    return this._wordStageGroups.get(wordId) || [];
   }
 
   /** Recalculate mastery for a word group (by group key or structural-vowel key) */

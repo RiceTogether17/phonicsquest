@@ -382,7 +382,11 @@ describe('explainLockReason', () => {
   it('summarises every failing check for a locked stage', () => {
     const snapshot = {
       groupMastery: { 'cvc-a': 0.5 }, // below decoding threshold
-      wordStats: seedWordStats(CVCA_WORDS.slice(0, 3), 4), // not enough unique words
+      // 3 words × 4 attempts, half right: below the decoding target, and
+      // not enough unique words.
+      wordStats: Object.fromEntries(
+        CVCA_WORDS.slice(0, 3).map((id) => [id, { attempts: 4, correct: 2 }]),
+      ),
       learningEvents: seedLearningEvents(CVCA_WORDS.slice(0, 3), ['2026-05-01']), // 1 day
       wordSkillStats: {},
     };
@@ -490,7 +494,8 @@ describe('mastery level separates advancing from demonstrating', () => {
     // …but the grown-up view must not call this mastery.
     expect(r.masteryLevel).toBe('ready-to-explore');
     expect(r.checks.decodingAccuracy.provisional).toBe(true);
-    expect(r.checks.decodingAccuracy.fallback).toBe('cross-skill');
+    // Records with no evidence buckets backfill as guided ("supported").
+    expect(r.checks.decodingAccuracy.fallback).toBe('decoding-supported');
     expect(r.independentAttempts).toBe(0);
     expect(r.confidence).toBe('none');
   });
