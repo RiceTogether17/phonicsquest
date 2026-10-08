@@ -74,6 +74,7 @@ export function buildProgressionSnapshot() {
     wordSkillStats: store.get('wordSkillStats') || {},
     learningEvents: store.get('learningEvents') || [],
     stagesUnlocked: store.get('stagesUnlocked') || [],
+    placementPhase: store.get('placementProfile')?.phase ?? null,
     // Marks a snapshot read from the live store, so getUnlockedStages may
     // remember newly unlocked stages. Hand-built snapshots never write.
     live: true,
@@ -462,6 +463,26 @@ export function getUnlockedStages(snapshot = buildProgressionSnapshot()) {
   return ids;
 }
 
+/**
+ * Stages a placement result opens: every stage in the phases below the one
+ * the child read, and their placed phase up to the group they start on.
+ * A phase-1 placement (which is also the result when no reading was tested)
+ * opens nothing beyond the usual first stage.
+ * @param {{ phase?: number, startGroup?: string }|null} placement
+ * @returns {string[]}
+ */
+export function stagesOpenedByPlacement(placement) {
+  const phase = Number(placement?.phase) || 1;
+  if (phase <= 1) return [];
+  const ids = [];
+  for (const stage of CURRICULUM) {
+    if (stage.phase > phase) break;
+    ids.push(stage.id);
+    if (stage.phase === phase && stage.group === placement.startGroup) break;
+  }
+  return ids;
+}
+
 /** Persist newly unlocked stages so they stay open. */
 function _rememberUnlocked(ids, stored) {
   const prev = new Set(Array.isArray(stored) ? stored : []);
@@ -494,8 +515,12 @@ function _openUnderLegacyOrder(stage, unlocked, snapshot) {
 export function getRecommendedStage(snapshot = buildProgressionSnapshot()) {
   const unlocked = getUnlockedStages(snapshot);
   const gm = snapshot.groupMastery || {};
+  // Stages below the phase the placement check showed the child can read
+  // are open but not recommended, so a placed reader starts at their level.
+  const fromPhase = Number(snapshot.placementPhase) || 1;
   for (const id of unlocked) {
     const stage = CURRICULUM.find((s) => s.id === id);
+    if (stage.phase < fromPhase) continue;
     const score = gm[stage.group] ?? 0;
     if (score < PROGRESSION_GATE.MIN_DECODING_ACCURACY) return stage;
   }

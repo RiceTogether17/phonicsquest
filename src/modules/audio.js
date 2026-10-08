@@ -717,6 +717,35 @@ class AudioManager {
   }
 
   /**
+   * Speak an instruction that contains speech sounds, e.g.
+   * ['Which picture starts with', { sound: 'm' }]. Text goes through the
+   * voice; each `sound` plays its recording, so the child hears /m/ and not
+   * the letter name or a whole word that gives the answer away.
+   *
+   * Stops early if anything else speaks or cancelSpeech runs meanwhile.
+   *
+   * @param {Array<string|{sound: string}>} parts
+   * @returns {Promise<void>}
+   */
+  async speakWithSounds(parts) {
+    if (!store.get('teachingAudioEnabled')) return;
+    let expected = ++this._speakGeneration;
+    for (const part of parts) {
+      if (this._speakGeneration !== expected) return;
+      if (typeof part === 'string') {
+        const spoken = this.speakText(part);
+        expected = this._speakGeneration;
+        await spoken;
+      } else if (part?.sound) {
+        await this._delay(150);
+        if (this._speakGeneration !== expected) return;
+        await this._playPhonemeAudio(part.sound);
+        await this._delay(150);
+      }
+    }
+  }
+
+  /**
    * The classroom "say it twice" model for phonemic-awareness prompts:
    * once slow and fully articulated, a beat of silence, then again at a
    * gentler near-natural rate so the child hears the word both ways

@@ -121,6 +121,7 @@ import {
   getUnlockedStages,
   getRecommendedStage,
   explainLockReason,
+  stagesOpenedByPlacement,
 } from './modules/progression.js';
 import {
   createPaSequencerState,
@@ -2617,6 +2618,13 @@ class App {
         }
         if (result.startGroup) {
           store.set('currentGroup', result.startGroup);
+        }
+        // Open the stages the child showed they can read, so a strong reader
+        // starts at their level rather than at CVC short a.
+        const placed = stagesOpenedByPlacement(result);
+        if (placed.length) {
+          const prev = store.get('stagesUnlocked') || [];
+          store.set('stagesUnlocked', [...new Set([...prev, ...placed])]);
         }
         store.set('placementProfile', result);
         store.set('placementComplete', true);
