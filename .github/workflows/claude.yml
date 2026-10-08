@@ -23,14 +23,24 @@ jobs:
       contents: read
       pull-requests: write
       issues: write
+    # Without the secret the action falls back to OIDC, which this job is not
+    # set up for, and fails every PR. Skip it until the secret is added.
+    env:
+      HAS_ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
 
     steps:
+      - name: Skip when ANTHROPIC_API_KEY is not set
+        if: env.HAS_ANTHROPIC_KEY != 'true'
+        run: echo "::notice::ANTHROPIC_API_KEY secret is not set, so the Claude review is skipped."
+
       - name: Checkout repository
+        if: env.HAS_ANTHROPIC_KEY == 'true'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Run Claude Code
+        if: env.HAS_ANTHROPIC_KEY == 'true'
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
