@@ -46,7 +46,8 @@ import { getTrickyWordsForPhase } from '../data/trickyWords.js';
 import { store } from './store.js';
 import { progress } from './progress.js';
 import { isTeacherUnlockActive } from './teacherUnlock.js';
-import { confidenceFor } from './evidence.js';
+import { confidenceFor, countAtLeast, ensureEvidenceBuckets, EVIDENCE } from './evidence.js';
+import { localYmd } from '../utils/dates.js';
 import { PROGRESSION_GATE } from './progressionGate.js';
 
 // ── Public configuration ────────────────────────────────────────────────────
@@ -72,6 +73,10 @@ export function buildProgressionSnapshot() {
     wordStats: store.get('wordStats') || {},
     wordSkillStats: store.get('wordSkillStats') || {},
     learningEvents: store.get('learningEvents') || [],
+    stagesUnlocked: store.get('stagesUnlocked') || [],
+    // Marks a snapshot read from the live store, so getUnlockedStages may
+    // remember newly unlocked stages. Hand-built snapshots never write.
+    live: true,
   };
 }
 
@@ -123,28 +128,58 @@ function _checkDecodingAccuracy(prereqStage, snapshot) {
       };
     }
   }
-  // Fall back to the cross-skill groupMastery. This is what keeps existing
-  // learners — and children who have only played self-assessed modes — from
-  // being locked out mid-journey. It is explicitly PROVISIONAL: it can
-  // unlock the next stage, but it cannot support a mastery claim, because
-  // nothing in it distinguishes decoding from a tap after a modelled blend.
+  // Next best: decoding answers given with support (e.g. picking the word
+  // after the app blended it). Every phonics reading game is capped at
+  // `guided`, so without this step no child could pass the gate unaided.
+  // Exposure (a bare "I read it") is left out: the child performed nothing.
+  // PROVISIONAL, like everything below: it may unlock the next stage but
+  // cannot support a mastery claim.
+  if (snapshot.wordSkillStats) {
+    let attempts = 0,
+      correct = 0;
+    for (const id of wordIds) {
+      const s = snapshot.wordSkillStats?.[id]?.decoding;
+      if (!s) continue;
+      const c = countAtLeast(ensureEvidenceBuckets(s), EVIDENCE.GUIDED);
+      attempts += c.attempts;
+      correct += c.correct;
+    }
+    if (attempts >= PROGRESSION_GATE.MIN_DECODING_ATTEMPTS) {
+      return _provisionalDecoding(correct / attempts, 'decoding-supported', attempts);
+    }
+  }
+  // Then every attempt on the stage's words, across all games. Computed from
+  // wordStats rather than read from groupMastery, because groupMastery is
+  // only written for groups the child has played since that key existed.
+  if (snapshot.wordStats) {
+    const all = _accuracyOver(snapshot.wordStats, wordIds);
+    if (all.attempts >= PROGRESSION_GATE.MIN_DECODING_ATTEMPTS) {
+      return _provisionalDecoding(all.accuracy, 'cross-skill', all.attempts);
+    }
+  }
+  // Last: a stored group score with no per-word data behind it (older saves,
+  // and snapshots built by hand).
   if (snapshot.groupMastery && typeof snapshot.groupMastery[prereqStage.group] === 'number') {
-    const actual = snapshot.groupMastery[prereqStage.group];
-    const required = PROGRESSION_GATE.MIN_DECODING_ACCURACY;
-    return {
-      pass: actual >= required,
-      reason: actual >= required ? 'meets-target-cross-skill' : 'below-decoding-target',
-      actual,
-      required,
-      fallback: 'cross-skill',
-      provisional: true,
-      independentAttempts: 0,
-    };
+    return _provisionalDecoding(snapshot.groupMastery[prereqStage.group], 'cross-skill');
   }
   return {
     pass: false,
     reason: 'no-decoding-data',
     required: PROGRESSION_GATE.MIN_DECODING_ACCURACY,
+  };
+}
+
+function _provisionalDecoding(actual, fallback, attempts = undefined) {
+  const required = PROGRESSION_GATE.MIN_DECODING_ACCURACY;
+  return {
+    pass: actual >= required,
+    reason: actual >= required ? 'meets-target-cross-skill' : 'below-decoding-target',
+    actual,
+    required,
+    attempts,
+    fallback,
+    provisional: true,
+    independentAttempts: 0,
   };
 }
 
@@ -214,7 +249,10 @@ function _checkSessionDays(prereqStage, snapshot) {
     if (e.eventType !== 'word_attempt') continue;
     if (!wordIds.has(e.meta?.wordId)) continue;
     if (!e.timestamp) continue;
-    days.add(e.timestamp.slice(0, 10)); // YYYY-MM-DD
+    // The child's own calendar day, not UTC: in Singapore a UTC day starts
+    // at 8am, so 7am and 9am on one morning used to count as two days.
+    const at = new Date(e.timestamp);
+    if (!Number.isNaN(at.getTime())) days.add(localYmd(at));
   }
   return {
     pass: days.size >= required,
@@ -392,10 +430,18 @@ export function getUnlockedStages(snapshot = buildProgressionSnapshot()) {
   // Teacher master unlock: every curriculum stage is available at once.
   if (isTeacherUnlockActive()) return CURRICULUM.map((s) => s.id);
 
+  // A stage stays open once it has opened. The gate reads accuracy over the
+  // stage's words, so one tired review session on cvc-a words used to lock
+  // every stage after it again. Slips belong in review, not behind a lock.
+  const known = new Set(CURRICULUM.map((s) => s.id));
+  const unlocked = new Set(
+    (Array.isArray(snapshot.stagesUnlocked) ? snapshot.stagesUnlocked : []).filter((id) =>
+      known.has(id),
+    ),
+  );
   // Iterate to a fixpoint rather than assuming CURRICULUM is topologically
   // ordered: a stage defined before its prerequisite still unlocks once the
   // prerequisite does.
-  const unlocked = new Set();
   let changed = true;
   while (changed) {
     changed = false;
@@ -411,7 +457,16 @@ export function getUnlockedStages(snapshot = buildProgressionSnapshot()) {
       }
     }
   }
-  return CURRICULUM.filter((s) => unlocked.has(s.id)).map((s) => s.id);
+  const ids = CURRICULUM.filter((s) => unlocked.has(s.id)).map((s) => s.id);
+  if (snapshot.live) _rememberUnlocked(ids, snapshot.stagesUnlocked);
+  return ids;
+}
+
+/** Persist newly unlocked stages so they stay open. */
+function _rememberUnlocked(ids, stored) {
+  const prev = new Set(Array.isArray(stored) ? stored : []);
+  if (ids.every((id) => prev.has(id))) return;
+  store.set('stagesUnlocked', [...new Set([...prev, ...ids])]);
 }
 
 /**

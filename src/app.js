@@ -13,6 +13,7 @@
 
 import { store } from './modules/store.js';
 import { escapeHtml } from './utils/escapeHtml.js';
+import { localYmd } from './utils/dates.js';
 import { getWeeklyActivity } from './modules/weeklyActivity.js';
 import { getMisconceptionSummary } from './modules/teacherFeedback.js';
 import * as homeBanners from './modules/homeBanners.js';
@@ -2946,6 +2947,7 @@ class App {
     if (type === 'dailyChallenge') {
       this._updateDailyBanner();
     } else if (type === 'review') {
+      store.set('reviewDoneDate', localYmd());
       this._updateReviewBanner();
     } else if (type === 'wordWorkout') {
       this._workoutWord = null;

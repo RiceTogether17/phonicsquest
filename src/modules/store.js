@@ -12,6 +12,8 @@ import {
   isMasteryEvidence,
   ensureEvidenceBuckets,
   addEvidenceCount,
+  EVIDENCE,
+  EVIDENCE_RANK,
 } from './evidence.js';
 
 /**
@@ -218,6 +220,15 @@ const DEFAULT_STATE = {
 
   // Group mastery (per group accuracy)
   groupMastery: {}, // { [group]: accuracy 0-1 }
+
+  // Phonics stages that have ever unlocked (progression.js). A stage stays
+  // open once reached, so a bad day doesn't lock earlier work away again.
+  stagesUnlocked: [], // [stageId]
+
+  // Local day ('YYYY-MM-DD') the child last finished a Review Lane session.
+  // A session is capped (10 or 20 words), so a backlog bigger than that can't
+  // reach zero in one day; finishing today's session ticks the plan step.
+  reviewDoneDate: null,
 
   // Explicit-instruction tracking: which mini-lessons / rule cards have been
   // taught to this profile. Keys are namespaced lesson ids, e.g.
@@ -796,14 +807,15 @@ class Store {
    * Update per-word stats after an attempt.
    *
    * Each call rides the Leitner box ladder from reviewScheduler:
-   *   correct + independent evidence → advance one box (Graduated at box 6)
-   *   correct + weaker evidence      → hold the box, keep the existing due date
-   *   wrong                          → drop one box (graduated drops to box 3)
+   *   correct + guided or better → advance one box (Graduated at box 6)
+   *   correct + exposure only    → hold the box, keep the existing due date
+   *   wrong                      → drop one box (graduated drops to box 3)
    *
-   * The evidence gate matters: the box ladder is a retention measure, and a
-   * word the app blended aloud before the child tapped "Yes" has not been
-   * retrieved from memory. Such answers still count as attempts and still
-   * earn XP — they just can't push the word further down the review queue.
+   * Exposure ("I read it", with nothing performed) can't push a word down
+   * the review queue. Guided answers can: every phonics reading game,
+   * Review Lane included, records at most `guided`, so holding the box on
+   * guided answers meant no word ever left box 0 and the lane never cleared.
+   * Mastery claims are unaffected — they still require independent evidence.
    *
    * Legacy `reviewInterval` / `nextReviewDate` fields are kept as derived
    * views of the new `box` / `dueAt` so the existing weighted-pick logic in
@@ -833,7 +845,7 @@ class Store {
     // matching the seedFromLegacy pattern above.
     const byEvidence = addEvidenceCount(ensureEvidenceBuckets(existing), evidence, correct);
     const sched = scheduleAttempt(existing, correct, Date.now(), {
-      promote: isMasteryEvidence(evidence),
+      promote: (EVIDENCE_RANK[evidence] ?? -1) >= EVIDENCE_RANK[EVIDENCE.GUIDED],
     });
 
     stats[wordId] = {

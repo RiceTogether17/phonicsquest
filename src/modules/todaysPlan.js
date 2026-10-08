@@ -12,7 +12,8 @@
  * Completion is derived from existing signals — no new event plumbing —
  * so step ticks update the moment the child completes the underlying task:
  *
- *   • Review Lane: due-count === 0 (queue empty)
+ *   • Review Lane: due-count === 0 (queue empty), or today's capped review
+ *     session finished (a backlog bigger than the cap waits for tomorrow)
  *   • Daily Challenge: isDailyChallengeComplete()
  *   • Warm-up: sessionWordsToday.length >= WARMUP_TARGET (3 unique words today)
  *
@@ -26,6 +27,7 @@ import { isDailyChallengeComplete, DAILY_BONUS_XP } from './dailyChallenge.js';
 import { estimateMinutes } from './reviewScheduler.js';
 import { getRecommendation, getDailyPlan } from './recommendations.js';
 import { getCurrentJourneyStep } from '../data/journeyStages.js';
+import { localYmd } from '../utils/dates.js';
 
 /** Number of unique words the child needs to play today to complete the warm-up. */
 export const WARMUP_TARGET = 3;
@@ -50,7 +52,8 @@ export function getEarlyReadingPlan() {
   const sessionWordsToday = (store.get('sessionWordsToday') || []).length;
 
   // Step 1 — Giri's Review Lane
-  const reviewDone = dueCount === 0;
+  const reviewedToday = store.get('reviewDoneDate') === localYmd();
+  const reviewDone = dueCount === 0 || reviewedToday;
   const reviewMins = estimateMinutes(dueCount);
   const reviewStep = {
     id: 'review',
@@ -58,9 +61,11 @@ export function getEarlyReadingPlan() {
     icon: '🌟',
     title: "Giri's Review Lane",
     detail:
-      dueCount > 0
-        ? `${dueCount} word${dueCount === 1 ? '' : 's'} due · about ${reviewMins} min`
-        : 'All caught up — nice work!',
+      dueCount === 0
+        ? 'All caught up — nice work!'
+        : reviewedToday
+          ? `Done for today — ${dueCount} saved for tomorrow`
+          : `${dueCount} word${dueCount === 1 ? '' : 's'} due · about ${reviewMins} min`,
     target: 'review',
     done: reviewDone,
     progressLabel: reviewDone ? '✓' : 'Start',
