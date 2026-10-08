@@ -93,7 +93,7 @@ const baseVocabPassages = {
             acceptableSpans: ['sandwich', 'took out'],
             partialSpans: ['opened'],
             clueType: 'action-clue',
-            explanation: 'He "opened" a container and found a "sandwich" — this describes opening a "lunchbox", not a pencilcase.',
+            explanation: 'He "opened" a container and found a "sandwich" — this describes opening a "lunchbox", not a pencil case.',
           },
         ],
       },
@@ -1419,7 +1419,7 @@ const EXTRA_VOCAB_CONTENT = {
     p3: [
       { id: 'prov-p3-01', title: 'Finish Early', text: 'Grandma says, "A stitch in ___ saves ___." She means solving a problem early prevents bigger trouble.', answers: ['time', 'nine'], wordBank: ['time', 'nine', 'line', 'mine', 'ten'], xp: 32, clues: [
         { blankIndex: 0, prompt: 'Tap the phrase that means doing something early.', acceptableSpans: ['early prevents bigger trouble'], partialSpans: ['problem early'], clueType: 'context-clue', explanation: 'The proverb begins with "in time".' },
-        { blankIndex: 1, prompt: 'Tap the final number in the proverb meaning many future problems.', acceptableSpans: ['bigger trouble'], partialSpans: ['prevents'], clueType: 'context-clue', explanation: '"Saves nine" means you avoid many later fixes.' },
+        { blankIndex: 1, prompt: 'Tap the words that tell you what fixing a problem early saves you from.', acceptableSpans: ['bigger trouble'], partialSpans: ['prevents'], clueType: 'context-clue', explanation: '"Saves nine" means you avoid many later fixes.' },
       ] },
       { id: 'prov-p3-02', title: 'Practice Advice', text: 'Coach reminded us, "Practice makes ___." She explained that regular training helps us improve steadily.', answers: ['perfect'], wordBank: ['perfect', 'progress', 'late', 'tired'], xp: 32 },
     ],
@@ -1792,7 +1792,9 @@ function enrichVocabMetadata() {
         }
 
         const derivedClues = _deriveClues(passage, catKey);
-        if (!Array.isArray(passage.clues) || passage.clues.length !== answers.length) {
+        // Merge by blank whenever any clue exists, so a passage with a clue on
+        // only some blanks keeps it; derive the rest.
+        if (!Array.isArray(passage.clues) || !passage.clues.length) {
           passage.clues = derivedClues;
         } else {
           const byBlank = new Map(passage.clues.map(c => [c.blankIndex, c]));
@@ -1803,7 +1805,8 @@ function enrichVocabMetadata() {
               blankIndex: idx,
               prompt: String(c.prompt || derivedClues[idx].prompt),
               acceptableSpans: Array.isArray(c.acceptableSpans) && c.acceptableSpans.length ? c.acceptableSpans : derivedClues[idx].acceptableSpans,
-              partialSpans: Array.isArray(c.partialSpans) && c.partialSpans.length ? c.partialSpans : derivedClues[idx].partialSpans,
+              // An authored clue keeps its own partial spans, even none.
+              partialSpans: Array.isArray(c.partialSpans) && (c.partialSpans.length || !c.generated) ? c.partialSpans : derivedClues[idx].partialSpans,
               clueType: String(c.clueType || derivedClues[idx].clueType),
               explanation: String(c.explanation || derivedClues[idx].explanation),
               ...(c.generated ? { generated: true } : {}),

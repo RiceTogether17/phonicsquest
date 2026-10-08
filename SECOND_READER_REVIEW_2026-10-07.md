@@ -169,6 +169,58 @@ and the gm Pronouns passage still asks "Tap the pronoun that replaces
 Alicia". The better long-term fix is still to author clues per category
 (the antecedent for pronouns, the subject for agreement, time words for tense).
 
+_Second follow-up (2026-10-08) — P1–P3 authored._ `src/data/clozeClues.js`
+holds clues a person wrote, keyed by seed id so revision rounds inherit them,
+one per blank:
+
+- **Pronouns:** the person or thing the pronoun stands for.
+- **Agreement:** the subject.
+- **Tenses:** the time words.
+- **a / an:** the next word, with an explanation of its first sound.
+- **the:** the earlier mention that makes the noun known.
+
+At P1–P3, 224 of the 280 blanks in those categories now have a clue, and the
+first blank of every passage does. The other 56 are left un-hunted on purpose:
+they are later blanks whose time word was already hunted, or blanks with two
+right answers. Across Cloze Castle, authored clues rose from 6.5% to 23.7% of
+blanks.
+
+Writing the clues was another second reading. It found passages where no single
+word decided the blank, and therefore more than one answer was right:
+
+- No time word: _After school, I **walk** home_ and _The pupils **stand** in straight lines_.
+- A pronoun with no antecedent: _before **we** moved it outside_.
+- A gender the passage never states: _Coach praised **her**… Later, **he** thanked our class_.
+- A timetable present: _We **submit** the draft tomorrow_.
+
+Each now gives the time word or names the person, or accepts both answers.
+
+It also found faults in the clue machinery itself. All are fixed:
+
+- **Clues silently discarded.** Both normalizers threw away every authored clue
+  on a passage that did not have one on every blank, so 39 passages (34 in
+  Cloze Castle, 5 in Word Vault) had never hunted the clues written for them.
+  Each of those clues was re-read before it was allowed to return.
+- **Generated part credit.** An authored clue with no partial spans was given
+  the generated ones, so tapping **the** in _Tom ___ on the slide_ earned part
+  credit.
+- **Little words counted.** A span such as _By the time_ made every **the** in
+  the passage strong. Little words inside a phrase are now skipped
+  (`spanKeyWords`).
+- **Wrong taps gave the answer away.** A weak tap showed the explanation, which
+  names both the clue and the answer. A weak tap now repeats the question.
+- **Clues pointing at the wrong evidence.** Seven authored clues did this:
+  **we** as a "result clause marker", **she** as a "reporting signal", **lab**
+  as a "rule word", **after dinner** as proof of the past, "the teacher is
+  male in this sentence" (it never said), and two clues whose evidence was the
+  missing word itself (_more delicious_, and _nine_ in a proverb).
+
+Checked in the browser: P1 Pronouns hunts the person. A wrong tap repeats the
+question. Tapping _Mr Tan_ unlocks the bank with "Mr Tan is one man… so we use
+'He'". Word Vault's grammar categories come from the template generator, so
+their clues are written with the hand-written passages under D2. Next: the
+P4–P6 categories, and prepositions and connectors at P1–P3.
+
 **D2. Word Vault is mostly a template generator, identical at every level.**
 504 of 749 "distinct" passages come from `vocabPassagesExtra/generator.js`.
 Each category uses the same three answers at every level, so a P6 child doing

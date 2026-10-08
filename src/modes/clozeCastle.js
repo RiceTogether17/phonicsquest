@@ -695,7 +695,13 @@ function _handleClueWordTap(tappedWord, passage) {
   if (fbEl) {
     const clueLabel = getClueTypeLabel(clueData.clueType);
     const skillLabel = getSkillLabel(skillTag);
-    const whyLine = clueData.explanation || 'Use the clue to choose the best-fitting word.';
+    // The explanation names the clue and the answer, so it is the reward for
+    // finding the clue. After a weak tap, repeat the question instead —
+    // otherwise any tap reveals both and the hunt teaches nothing.
+    const whyLine =
+      result === 'weak'
+        ? clueData.prompt || 'Look near the blank.'
+        : clueData.explanation || 'Use the clue to choose the best-fitting word.';
     fbEl.textContent = `${clueLabel} · ${skillLabel}. ${feedback.message} ${whyLine}`;
     fbEl.className = `clue-hunt-feedback ${feedback.cssClass}`;
   }

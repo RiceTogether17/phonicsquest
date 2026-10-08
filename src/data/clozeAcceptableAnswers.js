@@ -34,6 +34,10 @@ export const GRAMMAR_CLOZE_ACCEPTABLE_ANSWERS = {
   'g-p2-pos-02': [['his'], ['mine'], []],
   'g-p2-pos-03': [['their'], ['theirs'], []], // a group can take "their" in British usage
 
+  // ── Articles ───────────────────────────────────────────────────────
+  'g-p1-art-03': [[], [], ['A'], []], // "A whiteboard is on the wall" — a first mention
+  'gx-p2-articles-31': [[], [], ['the']], // the race's trophy is a known one
+
   // ── Prepositions ───────────────────────────────────────────────────────
   'g-p1-pre-02': [[], [], ['by']], // "The bus stops by my house."
   'g-p1-pre-03': [['under'], [], []], // "My bed is under the window."
@@ -56,7 +60,7 @@ export const GRAMMAR_CLOZE_ACCEPTABLE_ANSWERS = {
   'g-p1-sp-01': [['walked', 'ran'], [], []], // "Yesterday, I walked to school early."
   'g-p1-sp-02': [['made'], [], []], // "Mum made a cake."
   'g-p1-sp-03': [['ran'], [], []], // "I ran home quickly."
-  'g-p1-ta-02': [[], ['read'], []], // "Last week, she read us a story."
+  'g-p1-ta-02': [[], ['read'], ['read']], // "Last week, she read us a story." / "we read the pledge"
   'g-p2-sva-05': [['was'], [], []],
   'g-p2-conj-02': [[], [], ['so']], // "…and so we went outside."
   'g-p3-aux-02': [[], [], ['Has']], // "Has everyone brought their lunch?"
@@ -81,7 +85,7 @@ export const GRAMMAR_CLOZE_ACCEPTABLE_ANSWERS = {
   'g-p5-mod-04': [['could'], ['should', 'might'], ['could']],
   'g-p5-mod-05': [['could'], ['should'], ['could']],
   'g-p5-mod-06': [['could'], ['should', 'might'], ['could']],
-  ...atLevels(LEVELS, 'modals-1', [['should'], ['must not'], ['could']]),
+  ...atLevels(LEVELS, 'modals-1', [['should'], ['must not'], ['could', 'can']]), // "but can ask for help"
   ...atLevels(LEVELS, 'modals-2', [['could', 'may'], ['must'], ['should']]),
   ...atLevels(LEVELS, 'modals-3', [['must'], ['should not'], ['could']]),
 
@@ -91,7 +95,8 @@ export const GRAMMAR_CLOZE_ACCEPTABLE_ANSWERS = {
   'g-p6-rs-01': [[], ['must'], []],
   'g-p6-rs-04': [[], ['must'], ['must']],
   'gx-p6-reportedSpeech-02': [['must'], ['should'], []],
-  ...atLevels(['p5', 'p6'], 'reportedSpeech-1', [[], ['must'], []]),
+  // Nothing pins the quiz in the past, so an unshifted "will" is also right.
+  ...atLevels(['p5', 'p6'], 'reportedSpeech-1', [['will'], ['must'], ['will']]),
   ...atLevels(['p5', 'p6'], 'reportedSpeech-2', [[], ['were'], []]),
   ...atLevels(['p5', 'p6'], 'reportedSpeech-3', [['could'], ['must'], ['would']]),
 
