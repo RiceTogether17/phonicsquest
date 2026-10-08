@@ -67,10 +67,12 @@ export function collectDrillAnswers(container, drillCount) {
     if (radio) return radio.value;
 
     // Check for arrange-sequence answer
+    // The child numbers the items by tapping them, so the answer is the
+    // tap order, not the (shuffled) order they appear on screen.
     const sequenceContainer = container.querySelector(`[data-arrange-drill="${idx}"]`);
     if (sequenceContainer) {
-      const items = sequenceContainer.querySelectorAll('.arrange-item');
-      return Array.from(items)
+      return Array.from(sequenceContainer.querySelectorAll('.arrange-item[data-pick]'))
+        .sort((a, b) => Number(a.dataset.pick) - Number(b.dataset.pick))
         .map((el) => Number(el.dataset.origIndex))
         .join(',');
     }
@@ -156,13 +158,13 @@ function _renderArrangeSequence(drill, index) {
         .map(
           (
             item,
-          ) => `<div class="arrange-item" data-orig-index="${item.origIndex}" style="padding:6px 10px;margin:4px 0;border:1px solid var(--border);border-radius:6px;cursor:pointer;background:var(--bg-card)">
+          ) => `<button type="button" class="arrange-item" data-orig-index="${item.origIndex}" aria-pressed="false" style="display:block;width:100%;text-align:left;padding:6px 10px;margin:4px 0;border:1px solid var(--border);border-radius:6px;cursor:pointer;background:var(--bg-card);color:inherit;font:inherit">
         <span class="arrange-number" style="font-weight:bold;margin-right:6px">?</span> ${item.text}
-      </div>`,
+      </button>`,
         )
         .join('')}
     </div>
-    <p style="font-size:0.85em;color:var(--text-muted)">Click items in order (1st, 2nd, 3rd...) to number them.</p>
+    <p style="font-size:0.85em;color:var(--text-muted)">Tap the sentences in order: first, second, third… Tap a numbered sentence again to undo it.</p>
   </div>`;
 }
 
@@ -198,6 +200,39 @@ function _gradeArrangeSequence(drill, answer) {
   return { type: drill.type, correct };
 }
 
+/**
+ * Wire up tap-to-number for every arrange-sequence drill inside `container`.
+ * Tapping an unnumbered sentence gives it the next number; tapping a numbered
+ * one removes its number and every number after it, so a child can back up
+ * without starting over.
+ */
+export function bindArrangeDrills(container) {
+  container?.querySelectorAll('[data-arrange-drill]').forEach((group) => {
+    const items = Array.from(group.querySelectorAll('.arrange-item'));
+    const paint = () =>
+      items.forEach((el) => {
+        const pick = el.dataset.pick;
+        el.querySelector('.arrange-number').textContent = pick ? String(Number(pick) + 1) : '?';
+        el.setAttribute('aria-pressed', pick ? 'true' : 'false');
+      });
+    items.forEach((el) =>
+      el.addEventListener('click', () => {
+        if (el.dataset.pick !== undefined) {
+          const removed = Number(el.dataset.pick);
+          items.forEach((other) => {
+            if (other.dataset.pick !== undefined && Number(other.dataset.pick) >= removed) {
+              delete other.dataset.pick;
+            }
+          });
+        } else {
+          el.dataset.pick = String(items.filter((o) => o.dataset.pick !== undefined).length);
+        }
+        paint();
+      }),
+    );
+  });
+}
+
 // ── Choose Best Revision Drill ──────────────────────────────────────────────
 // Shows an original passage and two revised versions. Student picks the better one.
 
@@ -220,6 +255,38 @@ function _renderDialogueImprove(drill, index) {
     <p>Pick the dialogue that best moves the story forward:</p>
     ${drill.options.map((opt, oi) => `<label style="display:block;margin:4px 0"><input type="radio" name="drill-${index}" value="${oi}"/> ${opt}</label>`).join('')}
   </div>`;
+}
+
+// ── Teaching feedback ───────────────────────────────────────────────────────
+
+/**
+ * What to tell the child about one drill after they submit.
+ *
+ * A wrong answer before the child has passed gets the `hint` (the rule, not
+ * the answer), so a retry is still practice. Once the round is passed, every
+ * drill shows the right answer and the `why`, so a lucky guess still teaches.
+ */
+export function describeDrillResult(drill, result, { reveal = false } = {}) {
+  const correct = Boolean(result?.correct);
+  let answer = '';
+  if (drill.type === 'arrange_sequence') {
+    const order = drill.correctOrder || drill.sentences?.map((_, i) => i) || [];
+    answer = order.map((i, n) => `${n + 1}. ${drill.sentences?.[i] ?? ''}`).join(' ');
+  } else if (Array.isArray(drill.options)) {
+    answer = drill.options[drill.correctIndex] ?? '';
+  }
+  if (correct) {
+    return { correct, title: 'Correct!', answer: '', why: drill.why || '' };
+  }
+  if (reveal) {
+    return { correct, title: 'Not quite.', answer, why: drill.why || '' };
+  }
+  return {
+    correct,
+    title: 'Not yet. Try this one again.',
+    answer: '',
+    why: drill.hint || 'Look back at the teaching cards on the Learn page.',
+  };
 }
 
 // ── Exported for testing ────────────────────────────────────────────────────

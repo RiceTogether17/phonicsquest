@@ -1,8 +1,7 @@
 /**
  * Sound Hunt Mode  (Phonics — Sound-to-Letter Recognition)
  *
- * Digital adaptation of the Foundations "Sound/Letter Recognition"
- * grapheme-chart activity: the teacher says "The sound is /r/" and the
+ * A sound/letter recognition grapheme-chart activity: the teacher says "The sound is /r/" and the
  * child places a counter on the letter that makes it. Here the app
  * plays the target phoneme and the child taps the matching letter card.
  *

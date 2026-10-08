@@ -1,6 +1,5 @@
 /**
- * Tests for the three classroom-inspired PA games added from the
- * Foundations material: Odd One Out, Count the Words, and Sound Hunt's
+ * Tests for the three classroom-style PA games: Odd One Out, Count the Words, and Sound Hunt's
  * registry wiring.
  */
 import { describe, it, expect, beforeAll } from 'vitest';
