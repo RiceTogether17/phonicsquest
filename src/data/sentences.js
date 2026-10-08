@@ -1,6 +1,7 @@
 import { MIN_QUESTIONS_PER_SCOPE, contextualizeSentence, expansionContext } from './practiceExpansion.js';
 import { AUTHORED_SENTENCES } from './sentencesAuthored/index.js';
 import { classifySentenceTrack } from '../modules/sentenceForgeTracks.js';
+import { withAlternativeOrders } from './sentenceForgeAlternatives.js';
 
 /**
  * PhonicsQuest – Sentence Forge Quest Data
@@ -902,9 +903,9 @@ const SIGHT_EXPOSURE_SENTENCES = [
   { id: 'ssw076', sentence: 'Fill in the form with your name and class.', level: 2, sentenceSkills: ['word_order', 'sight_word_exposure'], focusLabel: 'Phrasal verb “fill in”', grammarNote: '“Fill in” is a two-part verb that means complete.' },
 ];
 
-export const allSentences = expandSentenceScopes([
+export const allSentences = expandSentenceScopes(withAlternativeOrders([
   ...baseSentences,
   ...AUTHORED_SENTENCES,
   ...P4_SYNTHESIS_SEEDS,
   ...SIGHT_EXPOSURE_SENTENCES,
-]);
+]));

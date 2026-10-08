@@ -33,6 +33,7 @@ import {
   clearClozeRound,
   createClozeRound,
   fillNextBlank,
+  isBlankAnswerCorrect,
   renderClozeBank,
   renderClozePassage,
 } from './clozeEngine.js';
@@ -42,6 +43,9 @@ import {
   getClueHint,
   clueResultFeedback,
   clueResultToScore,
+  hasClueHunt,
+  huntableClue,
+  nextClueHuntBlank,
 } from './clueEngine.js';
 import { celebrateCorrect } from '../components/confettiHelper.js';
 import { mascot } from '../components/mascot.js';
@@ -409,15 +413,9 @@ function _initPassage(passage) {
   _passageWrongCount = 0; // reset per-passage wrong counter for teach-back
 
   // Determine starting mode
-  if (passage.clues && passage.clues.length > 0) {
-    // Start with the first blank's clue hunt
-    const firstClue = [...passage.clues].sort((a, b) => a.blankIndex - b.blankIndex)[0];
-    _activeBlankIndex = firstClue?.blankIndex ?? -1;
-    _bankLocked = true;
-  } else {
-    _activeBlankIndex = -1;
-    _bankLocked = false;
-  }
+  // Start with the first blank's clue hunt, if a person wrote a clue for it.
+  _activeBlankIndex = nextClueHuntBlank(passage, _blankFills, _clueResults);
+  _bankLocked = _activeBlankIndex !== -1;
 
   _readFirstAcknowledged = false;
   _scanTaskCompleted = false;
@@ -436,7 +434,7 @@ function _renderPassage(passage) {
       ? `${GRAMMAR_CATEGORIES[_currentCat].icon} ${GRAMMAR_CATEGORIES[_currentCat].label}`
       : 'All Topics';
 
-  const hasClues = passage.clues && passage.clues.length > 0;
+  const hasClues = hasClueHunt(passage);
   const inClueMode = hasClues && _bankLocked;
   const modeCfg = getModeConfig(_sessionMode);
 
@@ -697,7 +695,13 @@ function _handleClueWordTap(tappedWord, passage) {
   if (fbEl) {
     const clueLabel = getClueTypeLabel(clueData.clueType);
     const skillLabel = getSkillLabel(skillTag);
-    const whyLine = clueData.explanation || 'Use the clue to choose the best-fitting word.';
+    // The explanation names the clue and the answer, so it is the reward for
+    // finding the clue. After a weak tap, repeat the question instead —
+    // otherwise any tap reveals both and the hunt teaches nothing.
+    const whyLine =
+      result === 'weak'
+        ? clueData.prompt || 'Look near the blank.'
+        : clueData.explanation || 'Use the clue to choose the best-fitting word.';
     fbEl.textContent = `${clueLabel} · ${skillLabel}. ${feedback.message} ${whyLine}`;
     fbEl.className = `clue-hunt-feedback ${feedback.cssClass}`;
   }
@@ -836,15 +840,10 @@ function _renderBankWords(passage) {
       audio.playSfx('pop');
 
       // After filling a blank, activate clue-hunt for the next unfilled clue target.
-      const nextClue = (passage.clues || [])
-        .slice()
-        .sort((a, b) => a.blankIndex - b.blankIndex)
-        .find(
-          (c) => _blankFills[c.blankIndex] === null && !Object.hasOwn(_clueResults, c.blankIndex),
-        );
+      const nextHunt = nextClueHuntBlank(passage, _blankFills, _clueResults);
 
-      if (nextClue) {
-        _activeBlankIndex = nextClue.blankIndex;
+      if (nextHunt !== -1) {
+        _activeBlankIndex = nextHunt;
         _bankLocked = true;
         _hintLevel = 0;
         _weakAttempts = 0;
@@ -881,7 +880,7 @@ function _buildReviewRows(passage, userAnswers) {
     const studentAnswer = userAnswers[idx] || '';
     const meta = getBlankSkillMeta(passage, idx);
     const skillTag = normaliseSkillTag(meta.primarySkill || inferredSkill);
-    const isWrong = studentAnswer !== correctAnswer;
+    const isWrong = !isBlankAnswerCorrect(passage, idx, studentAnswer);
     // Diagnose against the blank's own sentence, with sibling blanks filled in,
     // so the detectors can see the subject and the time words around the gap.
     const why = isWrong
@@ -928,8 +927,8 @@ function _checkPassage(passage) {
 
   const userAnswers = buildUserAnswers(_blankFills, _bankWords);
   _lastUserAnswers = [...userAnswers];
-  const allCorrect = userAnswers.every((ans, i) => ans === passage.answers[i]);
-  const blankCorrect = userAnswers.filter((ans, i) => ans === passage.answers[i]).length;
+  const allCorrect = userAnswers.every((ans, i) => isBlankAnswerCorrect(passage, i, ans));
+  const blankCorrect = userAnswers.filter((ans, i) => isBlankAnswerCorrect(passage, i, ans)).length;
   const modeCfg = getModeConfig(_sessionMode);
   const skillKey = _currentCat === '__all__' ? 'mixed' : _currentCat;
   const normalisedSkills = passage.answers.map((_, idx) =>
@@ -938,7 +937,7 @@ function _checkPassage(passage) {
     ),
   );
   const wrongSkillSet = new Set(
-    normalisedSkills.filter((skill, idx) => userAnswers[idx] !== passage.answers[idx]),
+    normalisedSkills.filter((skill, idx) => !isBlankAnswerCorrect(passage, idx, userAnswers[idx])),
   );
 
   questMastery.recordAttempt({
@@ -1078,7 +1077,7 @@ function _checkPassage(passage) {
       title: 'Answer Review',
       rows: _buildReviewRows(passage, userAnswers),
       onContinue: () => {
-        if (passage.clues && passage.clues.length > 0) {
+        if (hasClueHunt(passage)) {
           _showClueExplanation(passage, () =>
             setTimeout(() => {
               _passageIdx++;
@@ -1100,7 +1099,7 @@ function _checkPassage(passage) {
 
     document.querySelectorAll('.cloze-blank--filled').forEach((b, i) => {
       const userAns = _bankWords.find((w) => w.id === _blankFills[i])?.word || '';
-      b.classList.toggle('cloze-blank--wrong', userAns !== passage.answers[i]);
+      b.classList.toggle('cloze-blank--wrong', !isBlankAnswerCorrect(passage, i, userAns));
     });
 
     mascot.encourage();
@@ -1287,7 +1286,7 @@ function _showClueExplanation(passage, onContinue) {
 
   const lines = passage.answers
     .map((answer, idx) => {
-      const clue = (passage.clues || []).find((c) => c.blankIndex === idx);
+      const clue = huntableClue(passage, idx);
       const result = _clueResults[idx] || 'weak';
       const feedback = clueResultFeedback(result);
       const score = clueResultToScore(result);
@@ -1300,7 +1299,7 @@ function _showClueExplanation(passage, onContinue) {
       return `
       <div class="clue-explanation-item">
         <p><strong>Blank ${idx + 1}:</strong> ${escapeHtml(answer)}</p>
-        <p>Clue chosen: <span class="clue-result-badge ${feedback.cssClass}">${escapeHtml(selected)}</span> · Score ${Math.round(score * 100)}%</p>
+        ${clue ? `<p>Clue chosen: <span class="clue-result-badge ${feedback.cssClass}">${escapeHtml(selected)}</span> · Score ${Math.round(score * 100)}%</p>` : ''}
         <p class="clue-explanation-text">${escapeHtml(note)}</p>
       </div>`;
     })

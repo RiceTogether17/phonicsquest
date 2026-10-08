@@ -45,22 +45,25 @@ describe('items with more than one defensible answer (audit finding 11)', () => 
   });
 
   describe('grammar MCQ: context now forces the keyed answer', () => {
-    it('gives "Both the teacher and the principal ___" a time context', () => {
+    // The first fix added a time phrase and kept the past-tense distractor.
+    // That was not enough: "Both … supported the new timetable, which begins
+    // this Monday" and "The news … was very exciting — we leave on Friday!" are
+    // both correct English. These are agreement items, so the past form is
+    // replaced by a wrong-agreement form, which is what they set out to test.
+    it('no longer offers "supported" against "Both the teacher and the principal ___"', () => {
       const item = findStem(grammar, 'Both the teacher and the principal');
       expect(item).toBeTruthy();
       expect(item.answer).toBe('support');
-
-      // "supported" is still offered, and is now defensibly wrong.
-      expect(item.choices).toContain('supported');
-      expect(item.q).toMatch(/begins this Monday/);
+      expect(item.choices).not.toContain('supported');
+      expect(item.choices).toContain('supports');
     });
 
-    it('gives "The news about the school trip ___" a tense clue', () => {
+    it('no longer offers "was" against "The news about the school trip ___"', () => {
       const item = findStem(grammar, 'The news about the school trip');
       expect(item).toBeTruthy();
       expect(item.answer).toBe('is');
-      expect(item.choices).toContain('was');
-      expect(item.q).toMatch(/we leave on Friday/);
+      expect(item.choices).not.toContain('was');
+      expect(item.choices).toContain('are');
     });
 
     it('makes the ruler indefinite, so "the" is no longer possible', () => {

@@ -127,7 +127,7 @@ const handwritten = {
       {
         id: 'vxp-dm-p1-03',
         title: 'Classroom Tools',
-        text: 'We use a ___ to erase pencil marks. We write with a ___. We cut paper with ___.',
+        text: 'We use an ___ to erase pencil marks. We write with a ___. We cut paper with ___.',
         answers: ['eraser', 'pencil', 'scissors'],
         wordBank: ['eraser', 'pencil', 'scissors', 'ladder', 'hammer', 'pillow'],
         xp: 20,
@@ -153,7 +153,7 @@ const handwritten = {
       {
         id: 'vxp-dm-p2-02',
         title: 'Transport Meanings',
-        text: 'A ___ carries many passengers on roads. A ___ travels on tracks. A ___ flies people to other countries.',
+        text: 'A ___ carries many passengers on roads. A ___ travels on tracks. An ___ flies people to other countries.',
         answers: ['bus', 'train', 'aeroplane'],
         wordBank: ['bus', 'train', 'aeroplane', 'raft', 'bicycle', 'scooter'],
         xp: 25,
@@ -195,7 +195,7 @@ const handwritten = {
       {
         id: 'vxp-dm-p3-03',
         title: 'Map Skills',
-        text: 'A drawing that shows roads and places is a ___. The top, bottom, left and right directions are shown by a ___. A symbol list is called a ___.',
+        text: 'A drawing that shows roads and places is a ___. The directions north, south, east and west are shown by a ___. A symbol list is called a ___.',
         answers: ['map', 'compass', 'legend'],
         wordBank: ['map', 'compass', 'legend', 'poster', 'ruler', 'caption'],
         xp: 30,

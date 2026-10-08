@@ -446,7 +446,7 @@ export const GENERATED_BANKS = {
           ],
         },
         {
-          body: 'Although the {context} session was stressful, Amir stayed ___ and kept practising. His friends were chatting nearby, yet he stayed ___ on his revision cards. Since the queue moved slowly, the class had to remain ___.',
+          body: 'Although the work before {context} was stressful, Amir stayed ___ and kept practising. His friends were chatting nearby, yet he stayed ___ on his revision cards. Since the queue moved slowly, the class had to remain ___.',
           clues: [
             clue(['Although', 'kept practising'], ['stressful'], '"Although" sets up a contrast: it was stressful, yet he kept practising. He stayed determined.'),
             clue(['yet', 'revision cards'], ['chatting'], '"Yet" signals a contrast: his friends were chatting, but he kept his attention on his cards. He stayed focused, not distracted.'),

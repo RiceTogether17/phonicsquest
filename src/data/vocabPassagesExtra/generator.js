@@ -23,12 +23,12 @@ function bankFor(category, level) {
 }
 
 const CONTEXTS = {
-  p1: ['recess', 'reading corner', 'morning assembly', 'class duty', 'playground break', 'library period'],
-  p2: ['science lesson', 'school garden', 'PE period', 'music rehearsal', 'lunch queue', 'bus ride home'],
-  p3: ['group project', 'show-and-tell', 'museum trip', 'CCA training', 'community visit', 'art workshop'],
-  p4: ['inquiry task', 'service-learning day', 'debate practice', 'camp briefing', 'lab activity', 'journal writing'],
-  p5: ['exam revision', 'leadership camp', 'heritage project', 'STEM challenge', 'presentation prep', 'peer coaching'],
-  p6: ['PSLE revision', 'research forum', 'class leadership meeting', 'science consultation', 'community proposal', 'study clinic'],
+  p1: ['recess', 'reading time', 'morning assembly', 'class duty', 'the PE lesson', 'library time'],
+  p2: ['the science lesson', 'gardening club', 'the PE lesson', 'music rehearsal', 'lunch', 'the bus ride home'],
+  p3: ['the group project', 'show-and-tell', 'the museum trip', 'CCA training', 'the community visit', 'the art workshop'],
+  p4: ['the inquiry task', 'service-learning day', 'debate practice', 'the camp briefing', 'the lab activity', 'journal writing'],
+  p5: ['exam revision', 'leadership camp', 'the heritage project', 'the STEM challenge', 'presentation practice', 'peer coaching'],
+  p6: ['PSLE revision', 'the research forum', 'the class leadership meeting', 'the science consultation', 'the community proposal meeting', 'study clinic'],
 };
 
 const TITLE_SEEDS = {

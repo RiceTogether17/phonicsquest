@@ -12,7 +12,7 @@ import { describe, expect, it } from 'vitest';
 import { vocabPassages } from '../data/vocabPassages.js';
 import { GENERATED_BANKS } from '../data/vocabPassagesExtra/authored.js';
 import { LEXICON } from '../data/vocabPassagesExtra/lexicon.js';
-import { evaluateClueSelection } from '../modes/clueEngine.js';
+import { evaluateClueSelection, hasClueHunt, spanKeyWords } from '../modes/clueEngine.js';
 
 const generated = Object.entries(vocabPassages).flatMap(([category, levels]) =>
   Object.entries(levels).flatMap(([level, list]) =>
@@ -65,11 +65,20 @@ describe('generated Word Vault passages', () => {
         for (const span of [...clue.acceptableSpans, ...clue.partialSpans]) {
           for (const w of words(span)) expect(present.has(w), `${p.id}: "${w}"`).toBe(true);
         }
-        // A strong tap on the first clue word is graded strong by the engine.
-        expect(evaluateClueSelection(words(clue.acceptableSpans[0])[0], clue)).toBe('strong');
+        // Every span has a word worth tapping, and tapping it is graded strong.
+        for (const span of clue.acceptableSpans) {
+          const [key] = spanKeyWords(span);
+          expect(key, `${p.id}: "${span}" has no key word`).toBeTruthy();
+          expect(evaluateClueSelection(key, clue)).toBe('strong');
+        }
+        expect(clue.generated, `${p.id} clue is authored, not derived`).toBeUndefined();
         expect(clue.explanation, p.id).not.toMatch(/key textual evidence/);
       });
     }
+  });
+
+  it('get the clue hunt back, now that their clues are authored', () => {
+    for (const { p } of generated) expect(hasClueHunt(p), p.id).toBe(true);
   });
 
   it('no longer marks the words after the blank as the clue for muddy', () => {
