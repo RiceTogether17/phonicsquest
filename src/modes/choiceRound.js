@@ -13,6 +13,12 @@
  *                     attempt — the child always finishes the question,
  *                     but a second-try save doesn't inflate mastery.
  *
+ * When the mode passes `diagnose`, the wrong-tap lines name the child's
+ * actual slip instead (see modules/phonicsDiagnosis.js): the first miss
+ * gets a cue that points at the evidence without giving the answer, and
+ * the reveal says which two sounds were mixed up. `onReveal` then receives
+ * the wrong choice so the mode can play the two sounds side by side.
+ *
  * Feedback is text + ✓/✗ glyphs inside a `role="status"` live region, so
  * right/wrong never relies on colour or animation alone (colour-blind,
  * reduced-motion, and forced-colors users all get the same signal).
@@ -22,6 +28,25 @@
  */
 
 import { cancelChoicePreviews } from '../components/phonemeChoice.js';
+import { audio } from '../modules/audio.js';
+
+/**
+ * Play the sound the child wrongly chose, then a short gap, so the reveal
+ * can follow it with the right one: "/e/ … /a/ … bad". Hearing the two side
+ * by side is how a teacher fixes a mix-up; the reveal alone only plays the
+ * answer. Resolves immediately when there is no mistake to contrast.
+ *
+ * @param {{ grapheme?: string, type?: string }|null} mistake
+ */
+export async function playMistakeSound(mistake) {
+  if (!mistake?.grapheme) return;
+  try {
+    await audio.speakPhoneme(mistake.grapheme, mistake.type);
+  } catch {
+    return; // no audio for it: go straight to the answer
+  }
+  await new Promise((r) => setTimeout(r, 450));
+}
 
 /**
  * @param {object} opts
@@ -30,8 +55,12 @@ import { cancelChoicePreviews } from '../components/phonemeChoice.js';
  * @param {(correct: boolean, responseTime: number) => void} opts.onResult
  * @param {string}   [opts.retryHint]  mode-specific coaching line shown after "Almost! Try again."
  * @param {() => void} [opts.onRetry]  replay the prompt audio on the first miss
- * @param {() => void} [opts.onReveal] mode-specific reveal (word animation, phoneme tiles, audio)
- * @returns {{ handleTap: (isCorrect: boolean, btn: HTMLButtonElement) => void, isDone: () => boolean }}
+ * @param {(choice: any) => ({ cue: string, reveal: string }|null)} [opts.diagnose]
+ *   names the slip behind a wrong choice; null falls back to `retryHint`
+ * @param {(info: { mistake: any }) => void} [opts.onReveal] mode-specific reveal
+ *   (word animation, phoneme tiles, audio). `mistake` is the wrong choice the
+ *   round ended on, or null when the child finished on a right answer.
+ * @returns {{ handleTap: (isCorrect: boolean, btn: HTMLButtonElement, choice?: any) => void, isDone: () => boolean }}
  */
 export function createChoiceRound({
   modeArea,
@@ -40,6 +69,7 @@ export function createChoiceRound({
   retryHint = '',
   onRetry = null,
   onReveal = null,
+  diagnose = null,
 }) {
   const startTime = Date.now();
   let firstTryWrong = false;
@@ -77,14 +107,24 @@ export function createChoiceRound({
     }
   }
 
-  function finish(finalCorrect) {
+  function diagnosisFor(choice) {
+    if (!diagnose || choice === undefined) return null;
+    try {
+      return diagnose(choice);
+    } catch {
+      // A diagnosis is a nicety; a bad lookup must never block the round.
+      return null;
+    }
+  }
+
+  function finish(finalCorrect, mistake = null) {
     finished = true;
     grid.querySelectorAll('.choice-btn').forEach((b) => {
       b.disabled = true;
       if (b.dataset.correct === 'true') markBtn(b, true);
     });
 
-    onReveal?.();
+    onReveal?.({ mistake });
 
     const wrap = document.createElement('div');
     wrap.className = 'vmcq-next-wrap';
@@ -105,7 +145,7 @@ export function createChoiceRound({
     nextBtn.focus();
   }
 
-  function handleTap(isCorrect, btn) {
+  function handleTap(isCorrect, btn, choice) {
     if (finished || btn?.disabled) return;
     // The child has committed — stop any option previews still queued.
     cancelChoicePreviews();
@@ -118,12 +158,16 @@ export function createChoiceRound({
       firstTryWrong = true;
       markBtn(btn, false);
       btn.disabled = true;
-      setFeedback('retry', retryHint ? `Almost! Try again. ${retryHint}` : 'Almost! Try again.');
+      const cue = diagnosisFor(choice)?.cue;
+      if (cue) setFeedback('retry', `Almost! ${cue}`);
+      else
+        setFeedback('retry', retryHint ? `Almost! Try again. ${retryHint}` : 'Almost! Try again.');
       onRetry?.();
     } else {
       markBtn(btn, false);
-      setFeedback('reveal', 'Good try! Here’s the answer.');
-      finish(false);
+      const reveal = diagnosisFor(choice)?.reveal;
+      setFeedback('reveal', reveal ? `Good try! ${reveal}` : 'Good try! Here’s the answer.');
+      finish(false, choice ?? null);
     }
   }
 
