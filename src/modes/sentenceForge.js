@@ -763,11 +763,23 @@ function _checkAnswer(entry, punct) {
     store.set('sfqCompletedBySentence', nextBySentence);
     store.set('sfqCompleted', nextCompleted);
 
-    _showFeedback('✅ Perfect! Well done!', true);
-    setTimeout(() => {
-      _sentenceIdx++;
-      _showSentence();
-    }, 1500);
+    // A second accepted order is right, and showing the keyed order beside
+    // it teaches that English allowed both — so it stays up long enough to read.
+    const usedOtherOrder = constructed !== entry.sentence;
+    _showFeedback(
+      usedOtherOrder
+        ? `✅ Correct! You could also say: “${entry.sentence}”`
+        : '✅ Perfect! Well done!',
+      true,
+      usedOtherOrder ? 3200 : 1400,
+    );
+    setTimeout(
+      () => {
+        _sentenceIdx++;
+        _showSentence();
+      },
+      usedOtherOrder ? 3300 : 1500,
+    );
   } else {
     if (isFirstAttempt) {
       for (const skill of skills) {
@@ -950,7 +962,7 @@ function _recordSessionSkill(skill, correct) {
   if (correct) _sessionSkillAttempts[skill].correct++;
 }
 
-function _showFeedback(msg, success) {
+function _showFeedback(msg, success, visibleMs = 1400) {
   const el = document.getElementById('sfq-feedback');
   if (!el) return;
   el.textContent = msg;
@@ -959,7 +971,7 @@ function _showFeedback(msg, success) {
   if (success)
     setTimeout(() => {
       el.hidden = true;
-    }, 1400);
+    }, visibleMs);
 }
 
 // ── Complete screen ───────────────────────────────────────────────────────────

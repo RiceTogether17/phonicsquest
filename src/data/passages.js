@@ -22,6 +22,8 @@
 export { GRAMMAR_CATEGORIES } from './grammarCategories.js';
 import { passagesExtra } from './passagesExtra/index.js';
 import { MIN_QUESTIONS_PER_SCOPE, passageLead, contextualTitle } from './practiceExpansion.js';
+import { GRAMMAR_CLOZE_ACCEPTABLE_ANSWERS, attachAcceptableAnswers } from './clozeAcceptableAnswers.js';
+import { GRAMMAR_CLOZE_CLUES, attachAuthoredClues } from './clozeClues.js';
 
 export const CLOZE_LEVEL_LABELS = {
   P1: 'Primary 1',
@@ -102,7 +104,7 @@ const basePassages = {
     pronouns: [
       {
         id: 'g-p1-pro-01', title: 'My Friends',
-        text: 'Tom is my friend. ___ likes to play. Sara is nice too. ___ shares her toys. ___ play together every day.',
+        text: 'Tom is my friend. ___ likes to play. Sara is my friend too. ___ shares her toys. Tom, Sara and I are in the same class, so ___ play together every day.',
         answers: ['He', 'She', 'We'],
         wordBank: ['He', 'She', 'We', 'It', 'They', 'I'],
         xp: 20,
@@ -174,7 +176,7 @@ const basePassages = {
     prepositions: [
       {
         id: 'g-p1-pre-01', title: 'Where Is It?',
-        text: 'The ball is ___ the table. The cat is ___ the chair. The shoes are ___ the door.',
+        text: 'The ball is ___ the table, next to the cups. The cat is hiding ___ the chair, below the seat. The shoes are ___ the door, just a step away from it.',
         answers: ['on', 'under', 'near'],
         wordBank: ['on', 'under', 'near', 'in', 'behind', 'above'],
         xp: 20,
@@ -202,7 +204,7 @@ const basePassages = {
         wordBank: ['went', 'played', 'ate', 'go', 'play', 'eat', 'walked', 'ran'],
         xp: 20,
         clues: [
-          { blankIndex: 0, prompt: 'Tap the time word that tells us this happened before today.', acceptableSpans: ['Yesterday'], partialSpans: ['early'], clueType: 'time-marker', explanation: '"Yesterday" tells us to use past tense. Go becomes went.' },
+          { blankIndex: 0, prompt: 'Tap the time word that tells us this happened before today.', acceptableSpans: ['Yesterday'], partialSpans: [], clueType: 'time-marker', explanation: '"Yesterday" tells us to use past tense. Go becomes went.' },
         ],
       },
       {
@@ -214,7 +216,7 @@ const basePassages = {
       },
       {
         id: 'g-p1-sp-03', title: 'After School',
-        text: 'After school, I ___ home quickly. I ___ my homework. Then I ___ TV with my sister.',
+        text: 'Yesterday, after school, I ___ home quickly. I ___ my homework. Then I ___ TV with my sister.',
         answers: ['walked', 'did', 'watched'],
         wordBank: ['walked', 'did', 'watched', 'walk', 'do', 'watch', 'ran', 'played'],
         xp: 20,
@@ -228,7 +230,7 @@ const basePassages = {
         wordBank: ['and', 'but', 'because', 'or', 'so', 'then'],
         xp: 20,
         clues: [
-          { blankIndex: 2, prompt: 'Tap the word that shows a reason is coming.', acceptableSpans: ['cute'], partialSpans: ['love'], clueType: 'connector-clue', explanation: '"Because" introduces a reason: I love them because they are cute.' },
+          { blankIndex: 2, prompt: 'Tap the word that gives the reason I love them.', acceptableSpans: ['cute'], partialSpans: ['love'], clueType: 'connector-clue', explanation: '"Because" introduces a reason: I love them because they are cute.' },
         ],
       },
       {
@@ -260,7 +262,7 @@ const basePassages = {
       },
       {
         id: 'g-p1-ta-02', title: 'School Day',
-        text: 'Today, my teacher ___ kind. Last week, she ___ us a story. Every morning, we ___ the pledge.',
+        text: 'Look! My teacher ___ at the door. Last week, she ___ us a story. Every morning, we ___ the pledge.',
         answers: ['is', 'told', 'say'],
         wordBank: ['is', 'told', 'say', 'was', 'tells', 'said', 'are', 'read'],
         xp: 20,
@@ -401,7 +403,7 @@ const basePassages = {
             blankIndex: 1,
             prompt: 'The tense clue from the first sentence still applies. Can you find it?',
             acceptableSpans: ['Last Sunday'],
-            partialSpans: ['Sunday', 'went'],
+            partialSpans: ['Sunday'],
             clueType: 'time-marker',
             explanation: '"Last Sunday" earlier in the passage tells us to keep using simple past tense throughout.',
           },
@@ -409,7 +411,7 @@ const basePassages = {
             blankIndex: 2,
             prompt: 'Same passage, same time. Which word earlier gives you the tense clue?',
             acceptableSpans: ['Last Sunday'],
-            partialSpans: ['went', 'saw'],
+            partialSpans: ['Sunday'],
             clueType: 'time-marker',
             explanation: 'The whole passage is about last Sunday, so "swung" (simple past of "swing") is correct.',
           },
@@ -417,28 +419,10 @@ const basePassages = {
       },
       {
         id: 'g-p2-sp-02', title: 'Helping Mother',
-        text: 'After dinner, Tom ___ the dishes. He also ___ the floor. His mother ___ very pleased.',
+        text: 'Last night, after dinner, Tom ___ the dishes. He also ___ the floor. His mother ___ very pleased.',
         answers: ['washed', 'swept', 'was'],
         wordBank: ['washed', 'swept', 'was', 'washes', 'sweeps', 'is'],
         xp: 25,
-        clues: [
-          {
-            blankIndex: 0,
-            prompt: 'Find the time phrase that tells you when Tom did this.',
-            acceptableSpans: ['After dinner'],
-            partialSpans: ['dinner', 'After'],
-            clueType: 'time-marker',
-            explanation: '"After dinner" is a completed past action — it signals that simple past tense ("washed") is needed.',
-          },
-          {
-            blankIndex: 1,
-            prompt: 'The same time clue from earlier still applies. Where is it?',
-            acceptableSpans: ['After dinner'],
-            partialSpans: ['washed', 'dinner'],
-            clueType: 'time-marker',
-            explanation: 'All actions in this passage happened after dinner (past), so "swept" is correct.',
-          },
-        ],
       },
       {
         id: 'g-p2-sp-03', title: 'The Birthday Party',
@@ -459,7 +443,7 @@ const basePassages = {
       },
       { id: 'g-p2-sp-04', title: 'Class Clean-Up', text: 'Yesterday, the class ___ the notice board. Mei ___ old worksheets. The prefect ___ the floor after school.', answers: ['decorated', 'removed', 'swept'], wordBank: ['decorated', 'removed', 'swept', 'decorate', 'remove', 'sweep'], xp: 25 },
       { id: 'g-p2-sp-05', title: 'Visit to Grandmother', text: 'Last weekend, we ___ Grandma at her flat. She ___ us warm soup. We ___ stories after dinner.', answers: ['visited', 'served', 'shared'], wordBank: ['visited', 'served', 'shared', 'visit', 'serves', 'share'], xp: 25 },
-      { id: 'g-p2-sp-06', title: 'School Excursion', text: 'On Tuesday, our class ___ to the museum. We ___ notes about old photographs. The guide ___ our questions clearly.', answers: ['walked', 'wrote', 'answered'], wordBank: ['walked', 'wrote', 'answered', 'walk', 'write', 'answer'], xp: 25 },
+      { id: 'g-p2-sp-06', title: 'School Excursion', text: 'Last Tuesday, our class ___ to the museum. We ___ notes about old photographs. The guide ___ our questions clearly.', answers: ['walked', 'wrote', 'answered'], wordBank: ['walked', 'wrote', 'answered', 'walk', 'write', 'answer'], xp: 25 },
     ],
     presentCont: [
       {
@@ -489,7 +473,7 @@ const basePassages = {
       },
       {
         id: 'g-p2-pc-02', title: 'Recess Time',
-        text: 'The bell has rung. The children ___ in the canteen. Some boys ___ football. The teacher ___ them.',
+        text: 'The bell has rung. Now the children ___ in the canteen. Some boys ___ football. The teacher ___ them.',
         answers: ['are eating', 'are playing', 'is watching'],
         wordBank: ['are eating', 'are playing', 'is watching', 'eat', 'play', 'watches'],
         xp: 25,
@@ -511,8 +495,8 @@ const basePassages = {
           },
         ],
       },
-      { id: 'g-p2-pc-04', title: 'Morning Assembly', text: 'The pupils ___ in straight lines. The teacher ___ the announcements. Two prefects ___ the latecomers.', answers: ['are standing', 'is reading', 'are recording'], wordBank: ['are standing', 'is reading', 'are recording', 'stand', 'reads', 'record'], xp: 25 },
-      { id: 'g-p2-pc-05', title: 'Art Room', text: 'I ___ a poster for Earth Day. My friend ___ the title neatly. We ___ coloured paper on the board.', answers: ['am making', 'is writing', 'are placing'], wordBank: ['am making', 'is writing', 'are placing', 'make', 'writes', 'place'], xp: 25 },
+      { id: 'g-p2-pc-04', title: 'Morning Assembly', text: 'Right now, the pupils ___ in straight lines. The teacher ___ the announcements. Two prefects ___ the latecomers.', answers: ['are standing', 'is reading', 'are recording'], wordBank: ['are standing', 'is reading', 'are recording', 'stand', 'reads', 'record'], xp: 25 },
+      { id: 'g-p2-pc-05', title: 'Art Room', text: 'At the moment, I ___ a poster for Earth Day. My friend ___ the title neatly. We ___ coloured paper on the board.', answers: ['am making', 'is writing', 'are placing'], wordBank: ['am making', 'is writing', 'are placing', 'make', 'writes', 'place'], xp: 25 },
       { id: 'g-p2-pc-06', title: 'At the Canteen', text: 'The vendor ___ noodle soup now. Parents ___ near the tables. My brother ___ for his drink.', answers: ['is serving', 'are waiting', 'is queuing'], wordBank: ['is serving', 'are waiting', 'is queuing', 'serves', 'wait', 'queue'], xp: 25 },
     ],
     svAgreement: [
@@ -569,7 +553,7 @@ const basePassages = {
       },
       {
         id: 'g-p2-conj-02', title: 'Weather',
-        text: 'It was raining ___ we stayed indoors. We played games ___ watched TV. The rain stopped ___ we went outside.',
+        text: 'It was raining, ___ we stayed indoors. We played games ___ watched TV. The rain stopped, and ___ we went outside.',
         answers: ['so', 'and', 'then'],
         wordBank: ['so', 'and', 'then', 'but', 'or', 'because'],
         xp: 25,
@@ -1207,7 +1191,7 @@ const basePassages = {
     countableUncountable: [
       {
         id: 'g-p4-cu-01', title: 'Setting Up the Classroom',
-        text: 'There are ___ chairs in the hall, but there is ___ space for more. We have ___ information about the event so far.',
+        text: 'There are ___ chairs in the hall, and there is ___ space for more. We have ___ information about the event so far.',
         answers: ['few', 'little', 'little'],
         wordBank: ['few', 'little', 'little', 'a few', 'a little', 'a little'],
         xp: 35,
@@ -1292,9 +1276,6 @@ const basePassages = {
         answers: ['larger', 'more delicious', 'quieter'],
         wordBank: ['larger', 'more delicious', 'quieter', 'more large', 'deliciouser', 'more quiet'],
         xp: 35,
-        clues: [
-          { blankIndex: 1, prompt: '"Delicious" is a long adjective (3 syllables). How do we form its comparative?', acceptableSpans: ['delicious'], partialSpans: ['food'], clueType: 'comparative-clue', explanation: 'Long adjectives use "more" + adjective: more delicious (not "deliciouser").' },
-        ],
       },
       {
         id: 'g-p4-comp-02', title: 'Sports Comparison',
@@ -1479,7 +1460,7 @@ const basePassages = {
     countableUncountable: [
       {
         id: 'g-p5-cu-01', title: 'Checking the Equipment',
-        text: 'There were ___ bottles of water in the storeroom, but there was ___ equipment for the relay race. The teacher said we had ___ supplies to manage.',
+        text: 'There were ___ bottles of water in the storeroom, but there was ___ equipment for the relay race. Luckily, we had ___ time to borrow more.',
         answers: ['too many', 'too little', 'plenty of'],
         wordBank: ['too many', 'too little', 'plenty of', 'too much', 'fewer', 'enough'],
         xp: 40,
@@ -1509,7 +1490,7 @@ const basePassages = {
       },
       {
         id: 'g-p5-cu-04', title: 'Planning the Camp',
-        text: 'We need ___ luggage space on the bus. There are ___ sleeping bags, but we have ___ food for everyone.',
+        text: 'We need ___ luggage space on the bus. There are ___ sleeping bags than campers, but we have ___ food for everyone.',
         answers: ['enough', 'fewer', 'plenty of'],
         wordBank: ['enough', 'fewer', 'plenty of', 'less', 'too many', 'too much'],
         xp: 40,
@@ -1536,12 +1517,12 @@ const basePassages = {
     presentPerfect: [
       {
         id: 'g-p5-pp-01', title: 'The STEM Project',
-        text: 'Our team ___ completed the prototype since last Wednesday. Each member ___ contributed at least two ideas. The teacher ___ not given us the final brief yet.',
+        text: 'Our team ___ completed the prototype at last. Each member ___ contributed at least two ideas. The teacher ___ not given us the final brief yet.',
         answers: ['has', 'has', 'has'],
         wordBank: ['has', 'has', 'has', 'have', 'had', 'have'],
         xp: 40,
         clues: [
-          { blankIndex: 0, prompt: 'Look for the time marker that tells you this action started in the past and connects to now.', acceptableSpans: ['since'], partialSpans: ['Wednesday'], clueType: 'time-marker', explanation: '"Since" signals present perfect tense. "Our team" is treated as singular: has completed.' },
+          { blankIndex: 0, prompt: 'Look for the words that tell you the work is finished now.', acceptableSpans: ['at last'], partialSpans: ['completed'], clueType: 'time-marker', explanation: '"At last" tells us the work is finished now, which the present perfect shows. "Our team" is treated as singular: has completed.' },
         ],
       },
       {
@@ -1753,11 +1734,11 @@ const basePassages = {
       {
         id: 'g-p6-cu-02', title: 'School Improvement Plan',
         text: 'The committee reviewed ___ resources before making a decision. ___ opportunities were available for students to volunteer. The principal noted that ___ progress had been made this term.',
-        answers: ['a large amount of', 'Very few', 'a great deal of'],
-        wordBank: ['a large amount of', 'Very few', 'a great deal of', 'a large number of', 'Very little', 'many'],
+        answers: ['a large number of', 'Very few', 'a great deal of'],
+        wordBank: ['a large number of', 'Very few', 'a great deal of', 'a large amount of', 'Very little', 'many'],
         xp: 50,
         clues: [
-          { blankIndex: 0, prompt: 'Can you count resources in this context? Think about whether "resources" means materials or money.', acceptableSpans: ['resources'], partialSpans: ['decision'], clueType: 'mass-noun-clue', explanation: 'In this context, "resources" refers to funding and materials collectively (uncountable sense). "A large amount of" fits.' },
+          { blankIndex: 0, prompt: 'Can you count resources? Look at the end of the word.', acceptableSpans: ['resources'], partialSpans: ['decision'], clueType: 'noun-countable', explanation: '"Resources" ends in -s: it is a plural countable noun, so it takes "a large number of". "Amount" is for uncountable nouns like "progress".' },
           { blankIndex: 1, prompt: 'Can you count opportunities?', acceptableSpans: ['opportunities'], partialSpans: ['students'], clueType: 'noun-countable', explanation: '"Opportunities" is countable. "Very few" is used with countable nouns to mean almost none.' },
         ],
       },
@@ -1839,7 +1820,7 @@ const basePassages = {
         id: 'g-p6-mix-02', title: 'Preparing for PSLE',
         text: 'The students ___ been revising since March. Each pupil ___ given a revision booklet by the teachers. If they ___ hard, they ___ do well in the exam.',
         answers: ['have', 'was', 'study', 'will'],
-        wordBank: ['have', 'was', 'study', 'will', 'has', 'were', 'studied', 'would'],
+        wordBank: ['have', 'was', 'study', 'will', 'has', 'were', 'studying', 'did'],
         xp: 55,
         grammarNotes: ['Present perfect continuous: have been revising (since March).', 'Passive voice: Each pupil was given (by the teachers).', 'Type 1 conditional: If + present tense, will + base verb.'],
       },
@@ -1861,29 +1842,29 @@ const GRAMMARMASTER_EXPANSION = {
   pronouns: [
     {
       title: 'Class Helpers',
-      text: 'Alicia packed the crayons, and ___ gave ___ to the art teacher before ___ started class.',
+      text: 'Alicia packed the crayons, and ___ gave ___ to Mr Lee before ___ began his art lesson.',
       answers: ['she', 'them', 'he'],
       wordBank: ['she', 'them', 'he', 'her', 'they', 'him'],
       clues: [
-        { blankIndex: 0, prompt: 'Tap the pronoun that replaces Alicia.', acceptableSpans: ['Alicia'], partialSpans: ['crayons'], clueType: 'subject-clue', explanation: 'Alicia is one girl, so we use "she".' },
-        { blankIndex: 1, prompt: 'Tap the noun that tells what was handed over.', acceptableSpans: ['crayons'], partialSpans: ['packed'], clueType: 'pronoun-object', explanation: 'The object pronoun "them" replaces crayons.' },
-        { blankIndex: 2, prompt: 'Tap the noun that the final pronoun replaces.', acceptableSpans: ['teacher'], partialSpans: ['class'], clueType: 'subject-clue', explanation: 'The teacher is singular male in this sentence, so "he" fits.' },
+        { blankIndex: 0, prompt: 'Who gave the crayons? Tap that person.', acceptableSpans: ['Alicia'], partialSpans: [], clueType: 'antecedent', explanation: 'Alicia is one girl, so we use "she".' },
+        { blankIndex: 1, prompt: 'What did Alicia give? Tap that thing.', acceptableSpans: ['crayons'], partialSpans: [], clueType: 'antecedent', explanation: 'The crayons are more than one thing, and they come after "gave", so we use "them".' },
+        { blankIndex: 2, prompt: 'Who began the lesson? Tap that person.', acceptableSpans: ['Mr Lee'], partialSpans: ['his'], clueType: 'antecedent', explanation: 'Mr Lee is one man, and it was his lesson, so we use "he".' },
       ],
       notes: ['Use subject pronouns for who does the action.', 'Use object pronouns for what receives the action.', 'Match pronouns with the noun they replace.'],
     },
     {
       title: 'Family Plans',
-      text: 'My cousins visited us, and ___ brought snacks. Mum thanked ___ warmly while ___ set the table.',
-      answers: ['they', 'them', 'we'],
-      wordBank: ['they', 'them', 'we', 'he', 'him', 'us'],
-      notes: ['Plural nouns take plural pronouns like they.', 'Object position needs them, not they.', 'Use we when the speaker is in the group.'],
+      text: 'My cousins visited my sister and me, and ___ brought snacks for ___. Mum thanked ___ warmly.',
+      answers: ['they', 'us', 'them'],
+      wordBank: ['they', 'us', 'them', 'we', 'he', 'him'],
+      notes: ['Plural nouns take plural pronouns like they.', 'After a doing word or "for", use us or them, not we or they.', 'Use we and us when the speaker is in the group.'],
     },
     {
       title: 'Science Team',
-      text: 'Mr Tan checked the model, and ___ said ___ was ready before ___ moved it outside.',
-      answers: ['he', 'it', 'we'],
-      wordBank: ['he', 'it', 'we', 'they', 'him', 'them'],
-      notes: ['He replaces Mr Tan.', 'It replaces one thing (the model).', 'We refers to the speaker and teammates.'],
+      text: 'Mr Tan checked our model and smiled. ___ said ___ was ready. My partner and I were so proud that ___ carried it outside together.',
+      answers: ['He', 'it', 'we'],
+      wordBank: ['He', 'it', 'we', 'they', 'him', 'them'],
+      notes: ['He replaces Mr Tan.', 'It replaces one thing (the model).', 'We replaces "my partner and I".'],
     },
   ],
   svAgreement: [
@@ -1896,19 +1877,19 @@ const GRAMMARMASTER_EXPANSION = {
     { title: 'CCA Afternoon', text: 'Our coach ___ instructions, the players ___ quickly, and Mei ___ the timing sheet.', answers: ['gives', 'respond', 'updates'], wordBank: ['gives', 'respond', 'updates', 'give', 'responds', 'update'], notes: ['Coach is singular so gives.', 'Players is plural so respond.', 'Mei is singular so updates.'] },
   ],
   perfectContinuousTenses: [
-    { title: 'Project Progress', text: 'By noon, we ___ finished the poster, and Kai ___ been checking the labels since recess before we ___ presenting.', answers: ['had', 'has', 'started'], wordBank: ['had', 'has', 'started', 'have', 'had been', 'start'], clues: [
+    { title: 'Project Progress', text: 'By noon, we ___ finished the poster. Since then, Kai ___ been checking the labels, and he ___ the last page a few minutes ago.', answers: ['had', 'has', 'started'], wordBank: ['had', 'has', 'started', 'have', 'had been', 'start'], clues: [
       { blankIndex: 0, prompt: 'Tap the time phrase that shows completion before another past point.', acceptableSpans: ['By noon'], partialSpans: ['noon'], clueType: 'time-marker', explanation: '"By noon" signals past perfect: had finished.' },
       { blankIndex: 1, prompt: 'Tap the subject before blank 2.', acceptableSpans: ['Kai'], partialSpans: ['labels'], clueType: 'subject-clue', explanation: 'Kai is singular, so "has been" is correct.' },
-      { blankIndex: 2, prompt: 'Tap the word after blank 3 that completes the verb phrase.', acceptableSpans: ['presenting'], partialSpans: ['before'], clueType: 'tense-helper', explanation: 'After "before we", past simple "started" fits the sequence.' },
+      { blankIndex: 2, prompt: 'Tap the time phrase that says exactly when this happened.', acceptableSpans: ['a few minutes ago'], partialSpans: ['ago'], clueType: 'time-marker', explanation: '"A few minutes ago" names a finished past time, so the simple past "started" fits.' },
     ], notes: ['Use had + past participle for past perfect.', 'Use has/have been + -ing for perfect continuous.', 'Time markers help choose tense.'] },
     { title: 'Training Week', text: 'The team ___ been practising daily, and by Friday they ___ improved a lot while the coach ___ reviewing each drill.', answers: ['has', 'had', 'was'], wordBank: ['has', 'had', 'was', 'have', 'were', 'has been'], notes: ['Singular collective noun can take has in this context.', 'By + time marker often triggers had + past participle.', 'Was reviewing shows an action in progress in the past.'] },
     { title: 'Reading Log', text: 'Since January, I ___ been recording my books, and I ___ completed ten entries when we ___ discussing the novel.', answers: ['have', 'had', 'were'], wordBank: ['have', 'had', 'were', 'has', 'have had', 'was'], notes: ['I takes have been in present perfect continuous.', 'Had completed marks an earlier completed action.', 'Were discussing is past continuous with we.'] },
   ],
   modals: [
     { title: 'Safety Rules', text: 'Students ___ wear goggles in the lab, and they ___ run indoors but ___ ask for help politely.', answers: ['must', 'cannot', 'should'], wordBank: ['must', 'cannot', 'should', 'can', 'must not', 'could'], clues: [
-      { blankIndex: 0, prompt: 'Tap the rule word showing strong obligation.', acceptableSpans: ['lab'], partialSpans: ['goggles'], clueType: 'modal-clue', explanation: '"Must" shows a compulsory rule.' },
-      { blankIndex: 1, prompt: 'Tap the action that is not allowed.', acceptableSpans: ['run'], partialSpans: ['indoors'], clueType: 'modal-clue', explanation: 'Prohibition takes "cannot" + base verb.' },
-      { blankIndex: 2, prompt: 'Tap the polite action clue.', acceptableSpans: ['politely'], partialSpans: ['help'], clueType: 'modal-clue', explanation: 'Advice uses "should".' },
+      { blankIndex: 0, prompt: 'Tap the thing that shows this is a safety rule.', acceptableSpans: ['goggles'], partialSpans: ['lab'], clueType: 'modal-clue', explanation: 'Wearing goggles in the lab is a safety rule, so we need a rule word such as "must".' },
+      { blankIndex: 1, prompt: 'Tap the place where running is not allowed.', acceptableSpans: ['indoors'], partialSpans: [], clueType: 'modal-clue', explanation: 'Running indoors is not allowed, so we need a "no" word: "cannot" or "must not".' },
+      { blankIndex: 2, prompt: 'Tap the word that tells you how to ask.', acceptableSpans: ['politely'], partialSpans: ['but'], clueType: 'modal-clue', explanation: '"But" turns from what is not allowed to what is: asking politely for help is allowed and wise, so "should" or "can" fits.' },
     ], notes: ['Must expresses obligation.', 'Cannot expresses prohibition.', 'Should expresses advice.'] },
     { title: 'Teamwork Reminder', text: 'You ___ share your files, but you ___ check details first and you ___ submit by Friday.', answers: ['can', 'should', 'must'], wordBank: ['can', 'should', 'must', 'could', 'may', 'would'], notes: ['Can shows ability or permission.', 'Should gives recommended action.', 'Must sets a requirement.'] },
     { title: 'Assembly Prep', text: 'We ___ line up quietly, we ___ push anyone, and monitors ___ guide younger pupils.', answers: ['should', 'must not', 'can'], wordBank: ['should', 'must not', 'can', 'could', 'should not', 'must'], notes: ['Should for expected behaviour.', 'Must not for strict prohibition.', 'Can for permission/ability.'] },
@@ -1916,8 +1897,8 @@ const GRAMMARMASTER_EXPANSION = {
   conditionals: [
     { title: 'Rainy Plan', text: 'If it ___ after recess, we ___ in class, and if the floor dries we ___ outside later.', answers: ['rains', 'will stay', 'can go'], wordBank: ['rains', 'will stay', 'can go', 'rain', 'stayed', 'go'], clues: [
       { blankIndex: 0, prompt: 'Tap the if-clause marker.', acceptableSpans: ['If'], partialSpans: ['recess'], clueType: 'connector-clue', explanation: 'Type 1 conditionals use present tense after if.' },
-      { blankIndex: 1, prompt: 'Tap the result clause marker near blank 2.', acceptableSpans: ['we'], partialSpans: ['class'], clueType: 'condition-clue', explanation: 'Main clause takes will + verb in Type 1.' },
-      { blankIndex: 2, prompt: 'Tap the second if-clause indicator.', acceptableSpans: ['if'], partialSpans: ['later'], clueType: 'condition-clue', explanation: 'Possible result can use can + base verb.' },
+      { blankIndex: 1, prompt: 'This blank is the result. Tap the word that starts its condition.', acceptableSpans: ['If'], partialSpans: ['recess'], clueType: 'condition-clue', explanation: '"If it rains after recess" is a real possibility, so its result uses "will": we will stay in class.' },
+      { blankIndex: 2, prompt: 'Tap the verb in the second condition.', acceptableSpans: ['dries'], partialSpans: ['if'], clueType: 'condition-clue', explanation: '"If the floor dries" is a real possibility, so its result uses a helper such as "can": we can go outside.' },
     ], notes: ['If-clause usually takes present tense in real conditions.', 'Result clause often uses will/can + base verb.', 'Condition and result must match logically.'] },
     { title: 'Exam Choices', text: 'If you ___ your notes, you ___ calmer, but if you panic you ___ marks.', answers: ['review', 'will feel', 'may lose'], wordBank: ['review', 'will feel', 'may lose', 'reviewed', 'feel', 'lose'], notes: ['Present simple in if-clause.', 'Will + base verb for likely result.', 'May + base verb for possible result.'] },
     { title: 'Eco Actions', text: 'If each class ___ reusable bottles, the school ___ less waste and we ___ more resources.', answers: ['uses', 'will produce', 'can save'], wordBank: ['uses', 'will produce', 'can save', 'use', 'produces', 'saved'], notes: ['Singular subject each class takes uses.', 'Future result uses will + verb.', 'Can save shows possible positive outcome.'] },
@@ -1934,8 +1915,8 @@ const GRAMMARMASTER_EXPANSION = {
   reportedSpeech: [
     { title: 'Teacher Briefing', text: 'Ms Lim said that the quiz ___ start at ten, and she told us that we ___ bring calculators because she ___ check them first.', answers: ['would', 'should', 'would'], wordBank: ['would', 'should', 'would', 'will', 'must', 'can'], clues: [
       { blankIndex: 0, prompt: 'Tap the reporting verb clue.', acceptableSpans: ['said'], partialSpans: ['quiz'], clueType: 'reported-speech', explanation: 'After past reporting verbs, will often shifts to would.' },
-      { blankIndex: 1, prompt: 'Tap the phrase that gives advice.', acceptableSpans: ['told'], partialSpans: ['bring'], clueType: 'reported-speech', explanation: 'Advice in reported speech commonly uses should.' },
-      { blankIndex: 2, prompt: 'Tap the second reporting signal.', acceptableSpans: ['she'], partialSpans: ['check'], clueType: 'reported-speech', explanation: 'Future action from a past viewpoint shifts to would.' },
+      { blankIndex: 1, prompt: 'Tap the thing Ms Lim wanted us to bring.', acceptableSpans: ['calculators'], partialSpans: ['bring'], clueType: 'reported-speech', explanation: 'Bringing calculators was her instruction, and an instruction is reported with "should" (or "must").' },
+      { blankIndex: 2, prompt: 'Tap the reporting verb in this part of the sentence.', acceptableSpans: ['told'], partialSpans: ['said'], clueType: 'reported-speech', explanation: 'She told us this in the past, so her words "I will check them" usually become "she would check them".' },
     ], notes: ['Reported speech often shifts tense back.', 'Would commonly replaces will after said/told.', 'Keep pronouns and time references consistent.'] },
     { title: 'Group Reflection', text: 'Ben said that he ___ completed his part, Jia reported that they ___ rehearsing earlier, and I replied that we ___ improve tonight.', answers: ['had', 'had been', 'would'], wordBank: ['had', 'had been', 'would', 'has', 'were', 'will'], notes: ['Past perfect reports an earlier completed action.', 'Had been + -ing reports ongoing past action.', 'Would is common in reported future plans.'] },
     { title: 'Parent Message', text: 'Dad told me that he ___ arrive late, Mum said I ___ start dinner first, and they added that we ___ eat together later.', answers: ['would', 'should', 'could'], wordBank: ['would', 'should', 'could', 'will', 'must', 'can'], notes: ['Would reports future from past viewpoint.', 'Should reports advice.', 'Could reports possibility/ability.'] },
@@ -2014,6 +1995,9 @@ function _deriveGrammarClues(text, answers = []) {
       acceptableSpans: [span],
       partialSpans: span.split(/\s+/).slice(0, 2),
       clueType: 'context-clue',
+      // Derived from the words beside the blank, not written by a person:
+      // shown in reports, but never asked for in the clue hunt.
+      generated: true,
       explanation: `The phrase "${span}" gives a clue for the correct grammar form.`,
     };
   });
@@ -2023,7 +2007,9 @@ function _normalizeGrammarClues() {
   for (const level of Object.keys(passages)) {
     for (const arr of Object.values(passages[level] || {})) {
       for (const p of arr || []) {
-        if (!Array.isArray(p.clues) || p.clues.length !== (p.answers || []).length) {
+        // Merge by blank whenever any clue exists, so a passage with a clue on
+        // only some blanks keeps it; derive the rest.
+        if (!Array.isArray(p.clues) || !p.clues.length) {
           p.clues = _deriveGrammarClues(p.text, p.answers || []);
         } else {
           const byBlank = new Map(p.clues.map(c => [c.blankIndex, c]));
@@ -2035,9 +2021,13 @@ function _normalizeGrammarClues() {
               blankIndex: idx,
               prompt: String(c.prompt || fallback.prompt),
               acceptableSpans: Array.isArray(c.acceptableSpans) && c.acceptableSpans.length ? c.acceptableSpans : fallback.acceptableSpans,
-              partialSpans: Array.isArray(c.partialSpans) && c.partialSpans.length ? c.partialSpans : fallback.partialSpans,
+              // An authored clue keeps its own partial spans, even none: the
+              // derived ones are the words beside the blank, which would give
+              // part credit for tapping "on the" in "Tom ___ on the slide".
+              partialSpans: Array.isArray(c.partialSpans) && (c.partialSpans.length || !c.generated) ? c.partialSpans : fallback.partialSpans,
               clueType: String(c.clueType || fallback.clueType),
               explanation: String(c.explanation || fallback.explanation),
+              ...(c.generated ? { generated: true } : {}),
             };
           });
         }
@@ -2089,5 +2079,7 @@ function _ensureGrammarPassageDepth(targetQuestions = MIN_QUESTIONS_PER_SCOPE) {
   }
 }
 
+attachAuthoredClues(passages, GRAMMAR_CLOZE_CLUES);
 _normalizeGrammarClues();
 _ensureGrammarPassageDepth();
+attachAcceptableAnswers(passages, GRAMMAR_CLOZE_ACCEPTABLE_ANSWERS);

@@ -88,15 +88,48 @@ function norm(w) {
   return w.toLowerCase().replace(/^[^a-z]+|[^a-z]+$/g, '');
 }
 
+// Little words that never decide a blank on their own. Inside a phrase such as
+// "By the time" or "At the moment" they are skipped, so tapping any "the" in
+// the passage is not mistaken for finding the clue.
+const SPAN_FILLER = new Set([
+  'a',
+  'an',
+  'the',
+  'and',
+  'of',
+  'to',
+  'at',
+  'in',
+  'on',
+  'is',
+  'are',
+  'was',
+  'were',
+]);
+
 /**
- * Check whether normWord appears in any word of the supplied span strings.
- * e.g. span "Last Sunday" → ['last', 'sunday']
+ * The words in a clue span that count when tapped.
+ * e.g. "Last Sunday" → ['last', 'sunday'];  "By the time" → ['by', 'time']
+ * A one-word span always counts, whatever the word.
+ * @param {string} span
+ * @returns {string[]}
+ */
+export function spanKeyWords(span) {
+  const words = String(span || '')
+    .split(/\s+/)
+    .map(norm)
+    .filter(Boolean);
+  return words.length > 1 ? words.filter((w) => !SPAN_FILLER.has(w)) : words;
+}
+
+/**
+ * Check whether normWord is a key word of any of the supplied span strings.
  * @param {string}   normWord
  * @param {string[]} spans
  * @returns {boolean}
  */
 function wordInSpans(normWord, spans) {
-  return (spans || []).some((span) => span.split(/\s+/).some((w) => norm(w) === normWord));
+  return (spans || []).some((span) => spanKeyWords(span).includes(normWord));
 }
 
 /**
@@ -221,6 +254,10 @@ export function getClueHint(hintLevel, clueData) {
         'cause-clue': 'Find the word that shows a reason.',
         'description-clue': 'Find a describing word near the blank.',
         'collocation-clue': 'Look for a word that often pairs with the answer.',
+        antecedent: 'Which person or thing has the passage already named?',
+        'next-word-sound':
+          'Say the word right after the blank out loud. Listen to its first sound.',
+        'known-noun': 'Look back. Has the passage already told you about this thing?',
       };
       return {
         message: typeHints[clueData.clueType] || 'Look for the key word in the sentence.',
@@ -289,4 +326,41 @@ export function clueResultFeedback(result) {
         cssClass: 'clue-feedback--weak',
       };
   }
+}
+
+// ── Which blanks get a clue hunt ─────────────────────────────────────────────
+
+/**
+ * The clue a child hunts for on this blank, or null when there is none.
+ *
+ * Only clues a person wrote are hunted. Clues marked `generated` were derived
+ * mechanically — the few words after the blank — and usually point away from
+ * the real evidence: for "Tom is my friend. ___ likes to play" the generated
+ * clue was "likes to play", so a child who tapped "Tom" was told it was weak.
+ * Generated clues stay on the passage for reporting; they are just not asked.
+ */
+export function huntableClue(passage, blankIndex) {
+  const clue = (passage?.clues || []).find((c) => c.blankIndex === blankIndex);
+  return clue && !clue.generated ? clue : null;
+}
+
+/** Does this passage ask for any clue hunt at all? */
+export function hasClueHunt(passage) {
+  return (passage?.clues || []).some((c) => !c.generated);
+}
+
+/**
+ * The blank whose clue hunt should run now, or -1 to leave the bank open.
+ *
+ * Words always go into the next empty blank, so the hunt that matters is that
+ * blank's — and only if it has an authored clue not yet hunted.
+ *
+ * @param {object} passage
+ * @param {(number|null)[]} blankFills
+ * @param {Record<number, string>} clueResults
+ */
+export function nextClueHuntBlank(passage, blankFills, clueResults = {}) {
+  const next = blankFills.findIndex((fill) => fill === null);
+  if (next === -1 || Object.hasOwn(clueResults, next)) return -1;
+  return huntableClue(passage, next) ? next : -1;
 }

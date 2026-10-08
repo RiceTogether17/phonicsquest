@@ -11,6 +11,7 @@
 // Category definitions are shared with Vocabulary MCQ — single source of truth.
 export { VOCAB_CATEGORIES } from './vocabCategories.js';
 import { vocabPassagesExtra } from './vocabPassagesExtra/index.js';
+import { VOCAB_CLOZE_ACCEPTABLE_ANSWERS, attachAcceptableAnswers } from './clozeAcceptableAnswers.js';
 
 function mergeVocabPassageBanks(baseMap = {}, extraMap = {}) {
   const merged = {};
@@ -75,7 +76,7 @@ const baseVocabPassages = {
         title: 'Lunchtime',
         text: 'It was time to eat. Tom was very ___. He opened his ___ and took out a sandwich. The food was ___.',
         answers: ['hungry', 'lunchbox', 'yummy'],
-        wordBank: ['hungry', 'lunchbox', 'yummy', 'sleepy', 'pencilcase', 'ugly'],
+        wordBank: ['hungry', 'lunchbox', 'yummy', 'sleepy', 'pencil case', 'ugly'],
         xp: 20,
         clues: [
           {
@@ -92,7 +93,7 @@ const baseVocabPassages = {
             acceptableSpans: ['sandwich', 'took out'],
             partialSpans: ['opened'],
             clueType: 'action-clue',
-            explanation: 'He "opened" a container and found a "sandwich" — this describes opening a "lunchbox", not a pencilcase.',
+            explanation: 'He "opened" a container and found a "sandwich" — this describes opening a "lunchbox", not a pencil case.',
           },
         ],
       },
@@ -367,7 +368,7 @@ const baseVocabPassages = {
       {
         id: 'dm-p4-02',
         title: 'Geography Terms',
-        text: 'A ___ is a piece of land completely surrounded by water. A ___ is a large body of fresh water. A ___ is a tall landform with steep sides and a peak.',
+        text: 'An ___ is a piece of land completely surrounded by water. A ___ is a large body of fresh water. A ___ is a tall landform with steep sides and a peak.',
         answers: ['island', 'lake', 'mountain'],
         wordBank: ['island', 'lake', 'mountain', 'peninsula', 'river', 'valley'],
         xp: 35,
@@ -429,7 +430,7 @@ const baseVocabPassages = {
         title: 'Community and Helping Others',
         text: 'Someone who gives their time freely to help others is a ___. An organised effort to raise awareness about a cause is a ___. A person who runs or plans an event is called an ___.',
         answers: ['volunteer', 'campaign', 'organiser'],
-        wordBank: ['volunteer', 'campaign', 'organiser', 'helper', 'project', 'leader'],
+        wordBank: ['volunteer', 'campaign', 'organiser', 'customer', 'project', 'leader'],
         xp: 50,
       },
     ],
@@ -1186,7 +1187,7 @@ const baseVocabPassages = {
         title: 'Because and Although',
         text: 'Sam stayed at home ___ he was feeling ill. ___ he was sick, he still wanted to play. ___ resting, he felt better.',
         answers: ['because', 'Although', 'After'],
-        wordBank: ['because', 'Although', 'After', 'although', 'Because', 'Before'],
+        wordBank: ['because', 'Although', 'After', 'unless', 'Before', 'So'],
         xp: 25,
         clues: [
           {
@@ -1210,17 +1211,17 @@ const baseVocabPassages = {
       {
         id: 'con-p2-02',
         title: 'Before and After',
-        text: '___ we eat, we must wash our hands. ___ dinner, we help to clear the table. We brush our teeth ___ we go to bed.',
-        answers: ['Before', 'After', 'before'],
-        wordBank: ['Before', 'After', 'before', 'When', 'Then', 'after'],
+        text: '___ we eat, we must wash our hands. ___ dinner, we help to clear the table. We brush our teeth ___ we get ready for bed.',
+        answers: ['Before', 'After', 'when'],
+        wordBank: ['Before', 'After', 'when', 'Then', 'until', 'because'],
         xp: 25,
       },
       {
         id: 'con-p2-03',
         title: 'When and While',
         text: '___ the bell rang, everyone stood up. ___ the teacher was talking, the students listened. They clapped ___ the song ended.',
-        answers: ['When', 'While', 'when'],
-        wordBank: ['When', 'While', 'when', 'Because', 'After', 'before'],
+        answers: ['When', 'While', 'after'],
+        wordBank: ['When', 'While', 'after', 'Because', 'unless', 'Then'],
         xp: 25,
       },
       { id: 'con-p2-04', title: 'Sports Time', text: '___ the whistle blew, we started running. I was tired, ___ I finished the lap. ___ resting, I drank some water.', answers: ['When', 'but', 'After'], wordBank: ['When', 'but', 'After', 'Because', 'so', 'Before'], xp: 25 },
@@ -1265,8 +1266,8 @@ const baseVocabPassages = {
         id: 'con-p4-02',
         title: 'Although and Despite',
         text: '___ the heavy rain, the match continued. ___ it was cold, the fans stayed in their seats. The team won ___ all the challenges they faced.',
-        answers: ['Despite', 'Although', 'despite'],
-        wordBank: ['Despite', 'Although', 'despite', 'Because of', 'Since', 'due to'],
+        answers: ['Despite', 'Although', 'in spite of'],
+        wordBank: ['Despite', 'Although', 'in spite of', 'Because of', 'Since', 'due to'],
         xp: 35,
       },
       {
@@ -1293,7 +1294,7 @@ const baseVocabPassages = {
         title: 'While and Whereas',
         text: '___ some students excel in sciences, others prefer the arts. The urban campus is modern, ___ the rural one is more traditional. ___ both have strengths, they serve different needs.',
         answers: ['While', 'whereas', 'Although'],
-        wordBank: ['While', 'whereas', 'Although', 'Because', 'since', 'Since'],
+        wordBank: ['While', 'whereas', 'Although', 'Because', 'since', 'Unless'],
         xp: 40,
       },
       {
@@ -1334,8 +1335,8 @@ const baseVocabPassages = {
         id: 'con-p6-03',
         title: 'Balancing Views',
         text: '___ some pupils prefer outdoor activities, others enjoy quiet reading time. ___, both groups agree that free time is important. ___, the school decided to offer both options during recess.',
-        answers: ['While', 'Nonetheless', 'However'],
-        wordBank: ['While', 'Nonetheless', 'However', 'Because', 'Therefore', 'Furthermore'],
+        answers: ['While', 'Nonetheless', 'Therefore'],
+        wordBank: ['While', 'Nonetheless', 'Therefore', 'Because', 'However', 'Unless'],
         xp: 50,
       },
       {
@@ -1367,9 +1368,9 @@ const baseVocabPassages = {
       {
         id: 'ga-p2-01',
         title: 'A, An, The',
-        text: 'I saw ___ owl near ___ old tree. ___ owl flew away quickly.',
-        answers: ['an', 'an', 'The'],
-        wordBank: ['an', 'an', 'The', 'a', 'the', 'A'],
+        text: 'I saw ___ owl near ___ tall tree. ___ owl flew away quickly.',
+        answers: ['an', 'a', 'The'],
+        wordBank: ['an', 'a', 'The', 'some', 'any', 'much'],
         xp: 25,
       },
     ],
@@ -1418,7 +1419,7 @@ const EXTRA_VOCAB_CONTENT = {
     p3: [
       { id: 'prov-p3-01', title: 'Finish Early', text: 'Grandma says, "A stitch in ___ saves ___." She means solving a problem early prevents bigger trouble.', answers: ['time', 'nine'], wordBank: ['time', 'nine', 'line', 'mine', 'ten'], xp: 32, clues: [
         { blankIndex: 0, prompt: 'Tap the phrase that means doing something early.', acceptableSpans: ['early prevents bigger trouble'], partialSpans: ['problem early'], clueType: 'context-clue', explanation: 'The proverb begins with "in time".' },
-        { blankIndex: 1, prompt: 'Tap the final number in the proverb meaning many future problems.', acceptableSpans: ['bigger trouble'], partialSpans: ['prevents'], clueType: 'context-clue', explanation: '"Saves nine" means you avoid many later fixes.' },
+        { blankIndex: 1, prompt: 'Tap the words that tell you what fixing a problem early saves you from.', acceptableSpans: ['bigger trouble'], partialSpans: ['prevents'], clueType: 'context-clue', explanation: '"Saves nine" means you avoid many later fixes.' },
       ] },
       { id: 'prov-p3-02', title: 'Practice Advice', text: 'Coach reminded us, "Practice makes ___." She explained that regular training helps us improve steadily.', answers: ['perfect'], wordBank: ['perfect', 'progress', 'late', 'tired'], xp: 32 },
     ],
@@ -1650,6 +1651,7 @@ function _deriveClues(passage, catKey = '') {
       acceptableSpans: [span],
       partialSpans: span.split(/\s+/).slice(0, 2),
       clueType: aid.clueType,
+      generated: true,
       explanation: `${aid.explanation} The phrase "${span}" is the direct textual evidence.`,
     };
   });
@@ -1718,23 +1720,30 @@ function enrichVocabMetadata() {
     for (const passages of Object.values(levels || {})) {
       for (const passage of passages || []) {
         const blankCount = (String(passage.text || '').match(/___/g) || []).length;
-        const rawAnswers = Array.isArray(passage.answers) ? passage.answers : [];
-        const answerSeen = new Set();
-        let answers = rawAnswers.filter((a) => {
-          const key = String(a || '').trim().toLowerCase();
-          if (!key || answerSeen.has(key)) return false;
-          answerSeen.add(key);
-          return true;
-        });
+        // A passage may need the same word twice ("an owl near an old tree",
+        // "Before we eat … before we go to bed"), so answers are kept exactly
+        // as authored. This used to drop repeats case-insensitively and refill
+        // the gap from the word bank, which keyed a distractor as the answer:
+        // ga-p2-01 then required "near The old tree. a owl flew away".
+        let answers = (Array.isArray(passage.answers) ? passage.answers : [])
+          .filter((a) => String(a || '').trim());
+        const answerSeen = new Set(answers.map((a) => String(a).trim().toLowerCase()));
 
-        const rawWordBank = Array.isArray(passage.wordBank) ? passage.wordBank : [];
-        const bankSeen = new Set();
-        const wordBank = rawWordBank.filter((w) => {
-          const key = String(w || '').trim().toLowerCase();
-          if (!key || bankSeen.has(key)) return false;
-          bankSeen.add(key);
+        // Tiles are used up as they are placed, so the bank keeps one tile per
+        // blank that needs it: an exact repeat is dropped only once it is
+        // surplus to what the answers require. "Before" and "before" are two
+        // different tiles.
+        const needed = new Map();
+        for (const a of answers) needed.set(a, (needed.get(a) || 0) + 1);
+        const kept = new Map();
+        const wordBank = (Array.isArray(passage.wordBank) ? passage.wordBank : []).filter((w) => {
+          if (!String(w || '').trim()) return false;
+          const count = (kept.get(w) || 0) + 1;
+          if (count > Math.max(1, needed.get(w) || 0)) return false;
+          kept.set(w, count);
           return true;
         });
+        const bankSeen = new Set(wordBank.map((w) => String(w).trim().toLowerCase()));
 
         if (answers.length < blankCount) {
           const bankCandidates = wordBank.filter((w) => !answerSeen.has(String(w).trim().toLowerCase()));
@@ -1751,11 +1760,12 @@ function enrichVocabMetadata() {
         }
         answers = answers.slice(0, blankCount);
 
-        for (const ans of answers) {
-          const key = String(ans).trim().toLowerCase();
-          if (!bankSeen.has(key)) {
+        const finalNeeded = new Map();
+        for (const a of answers) finalNeeded.set(a, (finalNeeded.get(a) || 0) + 1);
+        for (const [ans, count] of finalNeeded) {
+          for (let have = kept.get(ans) || 0; have < count; have += 1) {
             wordBank.push(ans);
-            bankSeen.add(key);
+            bankSeen.add(String(ans).trim().toLowerCase());
           }
         }
         const defaultDistractors = ['careful', 'garden', 'teacher', 'warm', 'quietly', 'window', 'bridge', 'healthy'];
@@ -1782,7 +1792,9 @@ function enrichVocabMetadata() {
         }
 
         const derivedClues = _deriveClues(passage, catKey);
-        if (!Array.isArray(passage.clues) || passage.clues.length !== answers.length) {
+        // Merge by blank whenever any clue exists, so a passage with a clue on
+        // only some blanks keeps it; derive the rest.
+        if (!Array.isArray(passage.clues) || !passage.clues.length) {
           passage.clues = derivedClues;
         } else {
           const byBlank = new Map(passage.clues.map(c => [c.blankIndex, c]));
@@ -1793,9 +1805,11 @@ function enrichVocabMetadata() {
               blankIndex: idx,
               prompt: String(c.prompt || derivedClues[idx].prompt),
               acceptableSpans: Array.isArray(c.acceptableSpans) && c.acceptableSpans.length ? c.acceptableSpans : derivedClues[idx].acceptableSpans,
-              partialSpans: Array.isArray(c.partialSpans) && c.partialSpans.length ? c.partialSpans : derivedClues[idx].partialSpans,
+              // An authored clue keeps its own partial spans, even none.
+              partialSpans: Array.isArray(c.partialSpans) && (c.partialSpans.length || !c.generated) ? c.partialSpans : derivedClues[idx].partialSpans,
               clueType: String(c.clueType || derivedClues[idx].clueType),
               explanation: String(c.explanation || derivedClues[idx].explanation),
+              ...(c.generated ? { generated: true } : {}),
             };
           });
         }
@@ -1854,3 +1868,4 @@ _assignVocabSeeds();
 _ensureMinimumPassages();
 _ensurePracticeDepth();
 enrichVocabMetadata();
+attachAcceptableAnswers(vocabPassages, VOCAB_CLOZE_ACCEPTABLE_ANSWERS);

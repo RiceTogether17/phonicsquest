@@ -60,6 +60,12 @@ const CLUE_LABELS = {
   collocationClue: 'Collocation clue',
   pronounReferenceClue: 'Pronoun reference clue',
   connectorClue: 'Connector clue',
+  // Clue types written on the passages themselves.
+  'time-marker': 'Time clue',
+  'subject-clue': 'Subject clue',
+  antecedent: 'Pronoun reference clue',
+  'next-word-sound': 'Sound clue',
+  'known-noun': 'Already-named clue',
 };
 
 const REVIEW_PROMPTS = {

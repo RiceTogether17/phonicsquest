@@ -38,10 +38,12 @@ const ALL_SWAP_NAMES = [...GIRL_NAMES, ...BOY_NAMES];
 // Kai, Wei and Sam read as either gender, so they only take part in swaps
 // when the item has no gendered pronouns that could contradict the change.
 const GENDER_AMBIGUOUS = new Set(['Kai', 'Wei', 'Sam']);
-const GENDERED_WORDS = /\b(he|she|his|her|him|hers|himself|herself|boy|girl|brother|sister)\b/i;
+// Plurals count too: "Among the three brothers, Tom is the tallest" must not
+// become "…, Nurul is the tallest".
+const GENDERED_WORDS = /\b(he|she|his|her|him|hers|himself|herself|boys?|girls?|brothers?|sisters?|sons?|daughters?|mother|father|aunt|uncle|nephew|niece|kings?|queens?)\b/i;
 // Titles carry gender and honorific conventions a plain name swap can break
 // ("Mdm Siti" must never become "Mdm Omar"), so titled names are left alone.
-const TITLE_WORDS = '(?:Mr|Mrs|Ms|Mdm|Madam|Miss|Master|Cikgu|Uncle|Auntie|Aunty)';
+const TITLE_WORDS = '(?:Mr|Mrs|Ms|Mdm|Madam|Miss|Master|Cikgu|Uncle|Aunt|Auntie|Aunty)';
 
 function collectSpecText(spec) {
   return [

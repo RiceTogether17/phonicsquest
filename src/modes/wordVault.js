@@ -29,6 +29,7 @@ import {
   clearClozeRound,
   createClozeRound,
   fillNextBlank,
+  isBlankAnswerCorrect,
   renderClozePassage,
 } from './clozeEngine.js';
 import {
@@ -37,12 +38,15 @@ import {
   getClueHint,
   clueResultFeedback,
   clueResultToScore,
+  hasClueHunt,
+  nextClueHuntBlank,
 } from './clueEngine.js';
 import { celebrateCorrect } from '../components/confettiHelper.js';
 import { mascot } from '../components/mascot.js';
 import { escapeAttr, escapeHtml } from '../utils/escapeHtml.js';
 import { getUniqueWordVaultDone, recordWordVaultCompletion } from './clozeCompletionTracker.js';
 import { practiceSeedId, seedBreakdown, seedIdIndex } from '../data/practiceSeeds.js';
+import { wordVaultDealPool } from './wordVaultPool.js';
 import { showAnswerReviewPanel } from './clozeReviewPanel.js';
 import { renderReadFirstScan } from './readFirstScan.js';
 import { buildScanTaskForPassage, renderScanTask } from './scanTask.js';
@@ -515,8 +519,13 @@ function _startPassage(catKey, level) {
   _sessionReviewRows = [];
   _infoPanelOpen = false;
 
+  // Hand-written passages first; template passages only once those are done.
+  const doneHere = store.get('wvqCompletedByPassage')?.[catKey]?.[level] || {};
+  const doneSeeds = Object.entries(doneHere).map(([id, rec]) => rec?.seedId || id);
+  const pool = wordVaultDealPool(passageList, doneSeeds, practiceSeedId);
+
   const perf = store.get('wvqWordPerformance') || {};
-  const weighted = passageList.map((p) => {
+  const weighted = pool.map((p) => {
     const avg =
       (p.answers || []).reduce((acc, ans) => {
         const st = perf[String(ans || '').toLowerCase()] || { attempts: 0, correct: 0 };
@@ -578,14 +587,9 @@ function _initPassage(passage) {
   _hintLevel = 0;
   _weakAttempts = 0;
 
-  if (passage.clues && passage.clues.length > 0) {
-    const firstClue = [...passage.clues].sort((a, b) => a.blankIndex - b.blankIndex)[0];
-    _activeBlankIndex = firstClue?.blankIndex ?? -1;
-    _bankLocked = true;
-  } else {
-    _activeBlankIndex = -1;
-    _bankLocked = false;
-  }
+  // Start with the first blank's clue hunt, if a person wrote a clue for it.
+  _activeBlankIndex = nextClueHuntBlank(passage, _blankFills, _clueResults);
+  _bankLocked = _activeBlankIndex !== -1;
 
   _readFirstAcknowledged = false;
   _scanTaskCompleted = false;
@@ -659,7 +663,7 @@ function _renderPassage(passage) {
 
   const meta = VOCAB_CATEGORIES[_currentCat];
   const lv = _currentLevel;
-  const inClueMode = passage.clues && passage.clues.length > 0 && _bankLocked;
+  const inClueMode = hasClueHunt(passage) && _bankLocked;
   const showLegend = _currentCat === 'grammaticalRole';
   const modeCfg = getModeConfig(_sessionMode);
 
@@ -1099,15 +1103,10 @@ function _renderBank(passage) {
         );
       }
 
-      const nextClue = (passage.clues || [])
-        .slice()
-        .sort((a, b) => a.blankIndex - b.blankIndex)
-        .find(
-          (c) => _blankFills[c.blankIndex] === null && !Object.hasOwn(_clueResults, c.blankIndex),
-        );
+      const nextHunt = nextClueHuntBlank(passage, _blankFills, _clueResults);
 
-      if (nextClue) {
-        _activeBlankIndex = nextClue.blankIndex;
+      if (nextHunt !== -1) {
+        _activeBlankIndex = nextHunt;
         _bankLocked = true;
         _hintLevel = 0;
         _weakAttempts = 0;
@@ -1164,7 +1163,7 @@ function _buildVocabReviewRows(passage, userAnswers) {
     const meta = getBlankSkillMeta(passage, idx);
     const skillTag = normaliseSkillTag(meta.primarySkill || passage.skillTag || fallbackSkill);
     const chosen = userAnswers[idx] || '';
-    const isWrong = chosen !== correctAnswer;
+    const isWrong = !isBlankAnswerCorrect(passage, idx, chosen);
     const why = isWrong
       ? buildWhyWrongExplanation({
           meta,
@@ -1232,7 +1231,7 @@ function _checkPassage(passage) {
       })
     : buildUserAnswers(_blankFills, _bankWords);
 
-  const blankCorrect = userAnswers.filter((ans, i) => ans === passage.answers[i]).length;
+  const blankCorrect = userAnswers.filter((ans, i) => isBlankAnswerCorrect(passage, i, ans)).length;
   const blankTotal = passage.answers.length;
   const allCorrect = blankCorrect === blankTotal;
   const modeCfg = getModeConfig(_sessionMode);
@@ -1299,7 +1298,7 @@ function _checkPassage(passage) {
   store.set('masteryMap', masteryMap);
 
   userAnswers.forEach((ans, i) =>
-    _recordVocabPerformance(passage.answers[i], ans === passage.answers[i]),
+    _recordVocabPerformance(passage.answers[i], isBlankAnswerCorrect(passage, i, ans)),
   );
 
   if (modeCfg.showFinalReviewOnly) {
@@ -1396,7 +1395,7 @@ function _checkPassage(passage) {
           return _showSynonymReview(passage, () => setTimeout(() => _advanceToComplete(), 300));
         if (_currentCat === 'collocationCloze')
           return _showCollocationReview(passage, () => setTimeout(() => _advanceToComplete(), 300));
-        if (passage.clues && passage.clues.length > 0)
+        if (hasClueHunt(passage))
           return _showClueExplanation(passage, () => setTimeout(() => _advanceToComplete(), 400));
         _advanceToComplete();
       },
@@ -1414,7 +1413,7 @@ function _checkPassage(passage) {
     questMastery.updateSkill('wordVault', _currentCat, false);
     document.querySelectorAll('.wv-blank--filled').forEach((b, i) => {
       const ans = userAnswers[i] || '';
-      b.classList.toggle('wv-blank--wrong', ans !== passage.answers[i]);
+      b.classList.toggle('wv-blank--wrong', !isBlankAnswerCorrect(passage, i, ans));
     });
     mascot.encourage();
     _passageWrongCount++;
@@ -1546,7 +1545,7 @@ function _showVaultTeachBackOverlay(passage) {
 function _showClueExplanation(passage, onContinue) {
   if (!_container) return;
 
-  const primaryClue = passage.clues[0];
+  const primaryClue = passage.clues.find((c) => !c.generated);
   const clueSpan = (primaryClue.acceptableSpans || [])[0] || '';
   const playerResult = _clueResults[primaryClue.blankIndex] || 'weak';
   const { cssClass } = clueResultFeedback(playerResult);
