@@ -211,6 +211,8 @@ function _renderTeachStep(overlay, stage, lesson, onNext) {
     )
     .join('');
 
+  const spellingRule = _renderSpellingRule(lesson.spellingRule);
+
   const confusions = (lesson.confusions || [])
     .map(
       (c) => `
@@ -226,6 +228,7 @@ function _renderTeachStep(overlay, stage, lesson, onNext) {
       <p class="mini-lesson-stage">${escapeHtml(childStageName(stage))}</p>
       ${chips ? `<div class="mini-lesson-chips" role="group" aria-label="Tap to hear the sounds">${chips}</div>` : ''}
       <ol class="mini-lesson-script">${scriptLines}</ol>
+      ${spellingRule}
       ${confusions}
       <div class="mini-lesson-actions">
         <button class="btn btn--ghost" id="mini-lesson-listen">🔊 Read it to me</button>
@@ -242,7 +245,7 @@ function _renderTeachStep(overlay, stage, lesson, onNext) {
   });
 
   overlay.querySelector('#mini-lesson-listen')?.addEventListener('click', async () => {
-    for (const line of lesson.script) {
+    for (const line of [...lesson.script, ..._spellingRuleNarration(lesson.spellingRule)]) {
       // Narration stops if the overlay was closed mid-read.
       if (!document.getElementById(OVERLAY_ID)) return;
       await audio.speakText(line);
@@ -258,6 +261,41 @@ function _renderTeachStep(overlay, stage, lesson, onNext) {
   });
 
   overlay.querySelector('#mini-lesson-next')?.focus();
+}
+
+/**
+ * Worked "word sum" card: run + ing → running, with the reason the
+ * spelling changed. Shown so the child SEES the doubled letter or the
+ * dropped e instead of only hearing about it.
+ */
+function _renderSpellingRule(rule) {
+  if (!rule?.examples?.length) return '';
+  const rows = rule.examples
+    .map((ex) => {
+      const sum = `${ex.parts.join(' + ')} → ${ex.result}`;
+      const spoken = `${ex.parts.join(' plus ')} makes ${ex.result}`;
+      return `
+      <li class="mini-lesson-sum">
+        <span class="mini-lesson-sum-eq"><span aria-hidden="true">${escapeHtml(sum)}</span><span class="visually-hidden">${escapeHtml(spoken)}</span></span>
+        <span class="mini-lesson-sum-note">${escapeHtml(ex.note)}</span>
+      </li>`;
+    })
+    .join('');
+  return `
+    <section class="mini-lesson-rule" aria-label="Spelling rule">
+      <p class="mini-lesson-rule-text">📏 ${escapeHtml(rule.rule)}</p>
+      <ul class="mini-lesson-sums">${rows}</ul>
+    </section>`;
+}
+
+/**
+ * Lines Giri reads for the spelling-rule card. Word parts like "ing" or
+ * "ger" are left out because device voices mangle them on their own;
+ * the whole word plus the reason is what the child needs to hear.
+ */
+function _spellingRuleNarration(rule) {
+  if (!rule?.examples?.length) return [];
+  return [rule.rule, ...rule.examples.map((ex) => `${ex.result}. ${ex.note}`)];
 }
 
 /* ── Step 2: We do (blend one word together) ─────────────────────── */
