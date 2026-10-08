@@ -93,9 +93,8 @@ const REVISION_CORE_DRILLS = [
 ];
 
 // ── P3 Term 1 teaching cards ────────────────────────────────────────────────
-// Modelled on the skills a Singapore P3 creative-writing term covers (five
-// senses, show-not-tell, speech tags, story starters, plot planning,
-// three-step conclusions, sound words). All examples are written for this app.
+// Skills taught across the term: five senses, show-not-tell, speech tags,
+// story starters, plot planning, three-step conclusions and sound words.
 
 const FIVE_SENSES_CARD = {
   title: 'Use your 5 senses',
