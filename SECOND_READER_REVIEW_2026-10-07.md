@@ -204,6 +204,35 @@ The 20 P1 pronoun items name the word the pronoun stands for, and the 31 P1–P2
 simple-past items name the time clue and what each other verb form is. P5–P6
 Grammar (84 items) and the Vocabulary categories above still need writing.
 
+_Second follow-up (2026-10-08) — done._ Every option at every level is now
+explained; no item in either bank uses the generic line. The 52 Reported
+Speech, Inversion and Mixed Grammar rows and the 100 Connector Clue, Action
+Verb and Manner Adverb rows carry per-option text that says why that word
+fails in that sentence: _"'Have hidden' cannot go with a finished time like
+'the day before'"_, _"'Heavily' means with a loud thud. Judges take marks off
+for a heavy landing."_ P1–P2 vocabulary feedback is written for a six-year-old.
+
+Writing the explanations was itself a second reading, and it found about 40
+more distractors that were also correct English. They were invisible while
+the feedback said only "does not fit". Each was replaced, or the stem gained
+the clue that rules it out:
+
+| Pattern                                                      | Example and fix                                                                                        |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| Reported speech offers a past form beside a past-perfect key | _She asked me where I **hid** the spare key_ is correct; **hid** replaced with **hidden**              |
+| Reported speech offers an unshifted form with no time pinned | _The pupils asked when the lab **will be** ready_; stem now adds _and it finally opened a month later_ |
+| Inversion distractor that is itself a correct inversion      | _Seldom **is** Mr Lim as generous as he was last weekend_; replaced with **were Mr Lim**               |
+| Active verb that works intransitively                        | _The lost kitten **returned** to its owner_; stem now says _by a kind passer-by_                       |
+| Connector constrains the verb, not the blank                 | _Although it was raining, the children played **quietly** outside_; stem rewritten                     |
+| Manner adverb that describes a real variant of the action    | _The kitten purred **loudly**_, _the dog growled **softly**_, _the gymnast landed **heavily**_         |
+| Near-synonym action verb                                     | _Gail **mopped** the table with a cloth_, _the monkey **crawled** from branch to branch_               |
+
+Reported speech follows one rule now, stated in the builder: moving the tense
+back is optional while what was said is still true, so an unshifted option is
+only wrong when the sentence says the words were spoken at a time that is now
+over, and no row offers the simple past beside a past-perfect key. Pinned by
+`secondReaderFollowUp.test.js`.
+
 **D5. Judgement calls left as they were.** Each of these is defensible in a
 Singapore exam context, but each should be a deliberate choice, and the
 feedback should say "both are used; in exams, choose X":

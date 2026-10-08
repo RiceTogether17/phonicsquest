@@ -448,45 +448,209 @@ const VOCAB_BUILDERS = {
     return { category: 'grammaticalRole', subskill: 'word_form', q, choices: buildChoices(answer, ds), answer, explain: 'Pick the word form that fits the grammar slot.' };
   },
   connectorClue(level, i) {
+    // Review 2026-10-08: every option explained. Where the connector only
+    // constrained the verb, not the blank ("Although it was raining, the
+    // children played ___ outside" took any adverb), the stem was rewritten
+    // so the connector decides the blank.
     const p1p2Rows = [
-      ['Although the backpack looked small, it was surprisingly ___.', 'heavy', ['empty', 'gentle', 'silent']],
-      ['Because the lights went out suddenly, the hall became ___.', 'dark', ['tiny', 'modern', 'spacious']],
-      ['She was nervous, yet her voice remained ___.', 'steady', ['crooked', 'dusty', 'fragile']],
-      ['The toy was old; however, it was still ___.', 'working', ['broken', 'missing', 'rusted']],
-      ['He ate a big breakfast, so he was not ___ by lunchtime.', 'hungry', ['sleepy', 'angry', 'wet']],
-      ['Although it was raining, the children played ___ outside.', 'happily', ['sadly', 'lazily', 'quietly']],
-      ['She practised hard; therefore, she performed ___ on stage.', 'well', ['badly', 'slowly', 'silently']],
-      ['The shop was far; however, Mum walked there ___.', 'anyway', ['never', 'slowly', 'reluctantly']],
-      ['Because the sun was bright, everyone wore ___.', 'sunglasses', ['mittens', 'boots', 'scarves']],
-      ['He forgot his umbrella, so he got ___ in the rain.', 'wet', ['lost', 'cold', 'scared']],
-      ['Despite the cold, Mei wore only a ___ jacket outside.', 'thin', ['thick', 'warm', 'heavy']],
-      ['Because he dropped his tray, the food got ___.', 'dirty', ['tasty', 'hot', 'fresh']],
-      ['The bag was full, so Mum had to carry it ___.', 'carefully', ['lightly', 'lazily', 'quickly']],
-      ['She had not eaten all day, yet she still looked ___.', 'cheerful', ['hungry', 'weak', 'tired']],
-      ['Although the homework was long, Ali finished it ___.', 'quickly', ['slowly', 'badly', 'late']],
-      ['He left his water bottle behind; however, he was not ___ at all.', 'thirsty', ['happy', 'sleepy', 'bored']],
+      ['Although the backpack looked small, it was surprisingly ___.', 'heavy', ['empty', 'gentle', 'silent'], {
+        'heavy': '"Heavy" is right — "Although" and "surprisingly" tell us something unexpected: the bag looked small but weighed a lot.',
+        'empty': '"Empty" means nothing inside. A small bag being empty is not a surprise, but "surprisingly" tells us something unexpected comes next.',
+        'gentle': '"Gentle" means soft and kind. We use it for people or touches, not for a backpack.',
+        'silent': '"Silent" means making no sound. A backpack does not make a sound anyway, so that is no surprise.',
+      }],
+      ['Because the lights went out suddenly, the hall became ___.', 'dark', ['tiny', 'modern', 'spacious'], {
+        'dark': '"Dark" is right — "Because" tells us why: with no lights, there was no light, so the hall became dark.',
+        'tiny': '"Tiny" means very small. Lights going out does not make a hall smaller.',
+        'modern': '"Modern" means new and up to date. Lights going out does not make a hall new.',
+        'spacious': '"Spacious" means having lots of room. Lights going out does not change how big the hall is.',
+      }],
+      ['She was nervous, yet her voice remained ___.', 'steady', ['crooked', 'dusty', 'fragile'], {
+        'steady': '"Steady" is right — it means firm and not shaking. "Yet" tells us something unexpected: she was nervous, but her voice did not shake.',
+        'crooked': '"Crooked" means bent, like a crooked line. A voice cannot be bent.',
+        'dusty': '"Dusty" means covered in dust. A voice cannot be dusty.',
+        'fragile': '"Fragile" means easy to break. A nervous voice might sound fragile, but "yet" tells us her voice did the opposite.',
+      }],
+      ['The toy was old; however, it was still ___.', 'working', ['broken', 'missing', 'rusted'], {
+        'working': '"Working" is right — "however" tells us something unexpected: the toy was old, but it still worked.',
+        'broken': '"Broken" is what we might expect from an old toy. "However" tells us the opposite happened.',
+        'missing': '"Missing" means lost. The sentence is about what the old toy was like, not where it was.',
+        'rusted': '"Rusted" is what we might expect from an old toy. "However" tells us the opposite happened.',
+      }],
+      ['He ate a big breakfast, so he was not ___ by lunchtime.', 'hungry', ['sleepy', 'angry', 'wet'], {
+        'hungry': '"Hungry" is right — "so" tells us what happened because of the big breakfast: it filled him up.',
+        'sleepy': '"Sleepy" means needing sleep. A big breakfast fills your tummy; it does not stop you feeling sleepy.',
+        'angry': '"Angry" means cross. Eating breakfast is not why he was not cross.',
+        'wet': '"Wet" means covered in water. Breakfast has nothing to do with being wet.',
+      }],
+      ['It was raining, but the children did not mind. They played ___ in the puddles.', 'happily', ['sadly', 'angrily', 'grumpily'], {
+        'happily': '"Happily" is right — "but" and "did not mind" tell us the rain did not spoil their fun.',
+        'sadly': '"Sadly" means in an unhappy way. "Did not mind" tells us the rain did not upset them.',
+        'angrily': '"Angrily" means in a cross way. "Did not mind" tells us the rain did not upset them.',
+        'grumpily': '"Grumpily" means in a bad mood. "Did not mind" tells us they were in a good mood.',
+      }],
+      ['She practised hard; therefore, she performed ___ on stage.', 'well', ['badly', 'slowly', 'silently'], {
+        'well': '"Well" is right — "therefore" tells us what happened because she practised: hard practice helps you do well.',
+        'badly': '"Badly" is the opposite of what hard practice does.',
+        'slowly': '"Slowly" is about speed, not about how good she was. Practice makes you better, not slower.',
+        'silently': '"Silently" means without a sound. Practising hard does not make you silent.',
+      }],
+      ['The shop was far; however, Mum said the walk was ___.', 'easy', ['long', 'tiring', 'hard'], {
+        'easy': '"Easy" is right — "however" tells us something unexpected: the shop was far, but the walk was easy.',
+        'long': '"Long" is what we expect when a shop is far. "However" tells us something unexpected comes next.',
+        'tiring': '"Tiring" is what we expect from a far walk. "However" tells us the opposite.',
+        'hard': '"Hard" is what we expect from a far walk. "However" tells us the opposite.',
+      }],
+      ['Because the sun was bright, everyone wore ___.', 'sunglasses', ['mittens', 'boots', 'scarves'], {
+        'sunglasses': '"Sunglasses" is right — "Because" gives the reason: bright sun hurts our eyes, and sunglasses protect them.',
+        'mittens': '"Mittens" keep your hands warm on a cold day. They do not help with bright sun.',
+        'boots': '"Boots" keep your feet dry. They do not help with bright sun.',
+        'scarves': '"Scarves" keep your neck warm. They do not help with bright sun.',
+      }],
+      ['He forgot his umbrella, so he got ___ in the rain.', 'wet', ['lost', 'hungry', 'sleepy'], {
+        'wet': '"Wet" is right — "so" tells us what happened next: with no umbrella, the rain fell on him.',
+        'lost': '"Lost" means not knowing where you are. Forgetting an umbrella does not make you lost.',
+        'hungry': '"Hungry" means needing food. Forgetting an umbrella does not make you hungry.',
+        'sleepy': '"Sleepy" means needing sleep. Forgetting an umbrella does not make you sleepy.',
+      }],
+      ['Despite the cold, Mei wore only a ___ jacket outside.', 'thin', ['thick', 'warm', 'heavy'], {
+        'thin': '"Thin" is right — "Despite" and "only" tell us something unexpected: it was cold, but her jacket was thin.',
+        'thick': '"Thick" is what we expect on a cold day. "Despite" tells us she did something unexpected.',
+        'warm': '"Warm" is what we expect on a cold day. "Only" tells us her jacket was not enough.',
+        'heavy': '"Heavy" is what we expect on a cold day. "Despite" tells us she did something unexpected.',
+      }],
+      ['Because he dropped his tray, the food got ___.', 'dirty', ['tasty', 'hot', 'fresh'], {
+        'dirty': '"Dirty" is right — "Because" gives the reason: the food fell on the floor.',
+        'tasty': '"Tasty" means good to eat. Food on the floor does not become tasty.',
+        'hot': '"Hot" means very warm. Dropping food does not heat it up.',
+        'fresh': '"Fresh" means just made and clean. Food on the floor is the opposite of fresh.',
+      }],
+      ['The bag was full, so Mum had to carry it ___.', 'carefully', ['lightly', 'lazily', 'quickly'], {
+        'carefully': '"Carefully" is right — "so" tells us what the full bag made Mum do: things might fall out, so she took care.',
+        'lightly': '"Lightly" means with little weight. A full bag is heavy, not light.',
+        'lazily': '"Lazily" means without trying. A full bag needs more effort, not less.',
+        'quickly': '"Quickly" is about speed. A full bag is a reason to go carefully, not fast.',
+      }],
+      ['She had not eaten all day, yet she still looked ___.', 'cheerful', ['hungry', 'weak', 'tired'], {
+        'cheerful': '"Cheerful" is right — "yet" tells us something unexpected: she had not eaten, but she still looked happy.',
+        'hungry': '"Hungry" is what we expect when someone has not eaten. "Yet" tells us the opposite.',
+        'weak': '"Weak" is what we expect when someone has not eaten. "Yet" tells us the opposite.',
+        'tired': '"Tired" is what we expect when someone has not eaten. "Yet" tells us the opposite.',
+      }],
+      ['Although the homework was long, Ali finished it ___.', 'quickly', ['slowly', 'badly', 'late'], {
+        'quickly': '"Quickly" is right — "Although" tells us something unexpected: long homework usually takes a long time, but Ali was fast.',
+        'slowly': '"Slowly" is what we expect with long homework. "Although" tells us the opposite happened.',
+        'badly': '"Badly" is about how good the work was. "Although" needs a surprise about time: long homework, finished fast.',
+        'late': '"Late" is what we expect with long homework. "Although" tells us the opposite happened.',
+      }],
+      ['He left his water bottle behind; however, he was not ___ at all.', 'thirsty', ['happy', 'sleepy', 'bored'], {
+        'thirsty': '"Thirsty" is right — "however" tells us something unexpected: he had no water, but he did not need a drink.',
+        'happy': '"Happy" does not go with the water bottle. Leaving water behind is about needing a drink.',
+        'sleepy': '"Sleepy" means needing sleep. A water bottle is about drinking, not sleeping.',
+        'bored': '"Bored" means having nothing fun to do. A water bottle is about drinking.',
+      }],
     ];
     const upperRows = [
-      ['The map was clear; however, the route was still ___.', 'confusing', ['tidy', 'famous', 'silent']],
-      ['Despite the setback, the team remained ___ and continued their work.', 'determined', ['discouraged', 'confused', 'impatient']],
-      ['Although the experiment failed, the scientists gained ___ insights.', 'valuable', ['negative', 'useless', 'obvious']],
-      ['The evidence was limited; nevertheless, the judge reached a ___ verdict.', 'reasonable', ['hasty', 'unfair', 'random']],
-      ['She had rehearsed for months; consequently, her performance was ___.', 'outstanding', ['average', 'poor', 'rushed']],
-      ['Unless the budget is increased, the project will remain ___.', 'incomplete', ['ambitious', 'approved', 'successful']],
-      ['The policy was popular; however, its implementation was ___.', 'challenging', ['swift', 'celebrated', 'clear']],
-      ['While the report was detailed, the recommendations were surprisingly ___.', 'vague', ['thorough', 'accepted', 'decisive']],
-      ['He prepared thoroughly; therefore, he answered the questions ___.', 'confidently', ['nervously', 'carelessly', 'reluctantly']],
-      ['Even though the task seemed impossible, the team completed it ___.', 'successfully', ['poorly', 'reluctantly', 'hastily']],
-      ['Because of the heavy traffic, the convoy arrived ___ at the venue.', 'late', ['early', 'quietly', 'ahead']],
-      ['The solution was elegant; furthermore, it was ___ to implement.', 'practical', ['costly', 'difficult', 'controversial']],
-      ['Despite being the youngest member, she contributed ___ to the group.', 'significantly', ['minimally', 'carelessly', 'grudgingly']],
-      ['The data was incomplete; as a result, the conclusions were ___.', 'unreliable', ['precise', 'final', 'convincing']],
-      ['He was nervous before the interview; nonetheless, he performed ___.', 'admirably', ['terribly', 'forgetfully', 'quietly']],
-      ['Since the deadline was moved forward, the team had to work ___.', 'faster', ['later', 'individually', 'silently']],
+      ['The map was clear; however, the route was still ___.', 'confusing', ['tidy', 'famous', 'silent'], {
+        'confusing': '"Confusing" is right — "however" signals a contrast: a clear map should make the route easy, but it was still hard to follow.',
+        'tidy': '"Tidy" means neat. A route is not neat or messy, and "tidy" does not contrast with a clear map.',
+        'famous': '"Famous" means well known. It says nothing about whether the route was easy to follow.',
+        'silent': '"Silent" means without sound. A route is not quiet or loud.',
+      }],
+      ['Despite the setback, the team remained ___ and continued their work.', 'determined', ['discouraged', 'confused', 'impatient'], {
+        'determined': '"Determined" is right — "Despite" signals a contrast: a setback could have stopped them, but they kept going.',
+        'discouraged': '"Discouraged" means losing hope — what a setback usually causes. "Despite" and "continued their work" show the opposite.',
+        'confused': '"Confused" means not understanding. It does not explain why they kept working after a setback.',
+        'impatient': '"Impatient" means unwilling to wait. It does not contrast with the setback or explain why they kept working.',
+      }],
+      ['Although the experiment failed, the scientists gained ___ insights.', 'valuable', ['negative', 'useless', 'obvious'], {
+        'valuable': '"Valuable" is right — "Although" signals a contrast: the experiment failed, yet they learnt something worthwhile.',
+        'negative': '"Negative" means bad or unhelpful. It matches the failure instead of contrasting with it.',
+        'useless': '"Useless" matches a failed experiment, so there is no contrast. "Although" needs something good to come out of the failure.',
+        'obvious': '"Obvious" means already easy to see. It does not give the good surprise that "Although" sets up.',
+      }],
+      ['The evidence was limited; nevertheless, the judge reached a ___ verdict.', 'reasonable', ['hasty', 'unfair', 'random'], {
+        'reasonable': '"Reasonable" is right — "nevertheless" signals a contrast: with little evidence, a sensible verdict is a surprise.',
+        'hasty': '"Hasty" means rushed. Limited evidence might lead to a rushed verdict, so there is no contrast.',
+        'unfair': '"Unfair" is what limited evidence might cause. "Nevertheless" needs the opposite.',
+        'random': '"Random" means without reason. Limited evidence might cause that, and "nevertheless" needs the opposite.',
+      }],
+      ['She had rehearsed for months; consequently, her performance was ___.', 'outstanding', ['average', 'poor', 'rushed'], {
+        'outstanding': '"Outstanding" is right — "consequently" means "as a result", and months of rehearsal result in an excellent performance.',
+        'average': '"Average" means ordinary. Months of rehearsal should lead to more than an ordinary result.',
+        'poor': '"Poor" is the opposite of what months of rehearsal would produce.',
+        'rushed': '"Rushed" means done too quickly. Someone who rehearsed for months had no need to rush.',
+      }],
+      ['Unless the budget is increased, the project will remain ___.', 'incomplete', ['ambitious', 'approved', 'successful'], {
+        'incomplete': '"Incomplete" is right — "Unless" means "if not": if there is no more money, the work cannot be finished.',
+        'ambitious': '"Ambitious" means aiming high. A lack of money is not what keeps a project ambitious.',
+        'approved': '"Approved" means agreed to. "Unless the budget is increased" warns of a problem, not an approval.',
+        'successful': '"Successful" is the opposite of the warning. "Unless" tells us something goes wrong without more money.',
+      }],
+      ['The policy was popular; however, its implementation was ___.', 'challenging', ['swift', 'celebrated', 'clear'], {
+        'challenging': '"Challenging" is right — "however" signals a contrast: people liked the policy, but carrying it out was difficult.',
+        'swift': '"Swift" means fast — a good thing that agrees with "popular", so there is no contrast.',
+        'celebrated': '"Celebrated" agrees with "popular" instead of contrasting with it.',
+        'clear': '"Clear" is a good thing, like "popular". "However" needs a difficulty.',
+      }],
+      ['While the report was detailed, the recommendations were surprisingly ___.', 'vague', ['thorough', 'accepted', 'decisive'], {
+        'vague': '"Vague" is right — it means unclear. "While" and "surprisingly" set up a contrast with "detailed".',
+        'thorough': '"Thorough" means careful and complete — the same idea as "detailed", so it is no surprise.',
+        'accepted': '"Accepted" means agreed to. It does not contrast with "detailed".',
+        'decisive': '"Decisive" means firm and clear. That matches a detailed report, so it is no surprise.',
+      }],
+      ['He prepared thoroughly; therefore, he answered the questions ___.', 'confidently', ['nervously', 'carelessly', 'reluctantly'], {
+        'confidently': '"Confidently" is right — "therefore" shows the result: careful preparation makes you sure of your answers.',
+        'nervously': '"Nervously" is the opposite of what good preparation gives you.',
+        'carelessly': '"Carelessly" means without care. Someone who prepared thoroughly would answer with care.',
+        'reluctantly': '"Reluctantly" means unwillingly. Being well prepared would make him willing, not unwilling.',
+      }],
+      ['Even though the task seemed impossible, the team found it surprisingly ___.', 'manageable', ['overwhelming', 'exhausting', 'daunting'], {
+        'manageable': '"Manageable" is right — it means possible to deal with. "Even though" and "surprisingly" set up a contrast with "impossible".',
+        'overwhelming': '"Overwhelming" means too much to cope with. It agrees with "impossible", so there is no surprise.',
+        'exhausting': '"Exhausting" means very tiring — just what an impossible-seeming task would be, so there is no surprise.',
+        'daunting': '"Daunting" means scary to begin. That is the same idea as "seemed impossible", so there is no contrast.',
+      }],
+      ['Because of the heavy traffic, the convoy arrived ___ at the venue.', 'late', ['early', 'quietly', 'ahead'], {
+        'late': '"Late" is right — "Because of" gives the cause: heavy traffic slows vehicles down.',
+        'early': '"Early" is the opposite of what heavy traffic causes.',
+        'quietly': '"Quietly" is about sound. Heavy traffic affects time, not noise.',
+        'ahead': '"Ahead" (of time) is the opposite of what heavy traffic causes.',
+      }],
+      ['The solution was elegant; furthermore, it was ___ to implement.', 'practical', ['costly', 'difficult', 'controversial'], {
+        'practical': '"Practical" is right — "furthermore" adds another good point to "elegant", and "practical to implement" means easy to put into use.',
+        'costly': '"Costly" means expensive — a drawback. "Furthermore" adds another good point, not a problem.',
+        'difficult': '"Difficult" is a drawback. "Furthermore" adds a second good point to "elegant".',
+        'controversial': '"Controversial" means causing disagreement — a drawback. "Furthermore" adds a good point.',
+      }],
+      ['Despite being the youngest member, she contributed ___ to the group.', 'significantly', ['minimally', 'carelessly', 'grudgingly'], {
+        'significantly': '"Significantly" is right — "Despite" signals a contrast: we might expect the youngest to give little, but she gave a lot.',
+        'minimally': '"Minimally" means very little — what we might expect from the youngest, so there is no contrast.',
+        'carelessly': '"Carelessly" means without care. It does not contrast with being the youngest.',
+        'grudgingly': '"Grudgingly" means unwillingly. It does not contrast with being the youngest.',
+      }],
+      ['The data was incomplete; as a result, the conclusions were ___.', 'unreliable', ['precise', 'final', 'convincing'], {
+        'unreliable': '"Unreliable" is right — "as a result" shows cause and effect: missing data leads to conclusions you cannot trust.',
+        'precise': '"Precise" means exact. Incomplete data cannot produce exact conclusions.',
+        'final': '"Final" means settled. With data missing, the conclusions could not be settled.',
+        'convincing': '"Convincing" is the opposite of what incomplete data produces.',
+      }],
+      ['He was nervous before the interview; nonetheless, he performed ___.', 'admirably', ['terribly', 'forgetfully', 'quietly'], {
+        'admirably': '"Admirably" is right — it means very well. "Nonetheless" signals a contrast with "nervous".',
+        'terribly': '"Terribly" is what nerves might cause, so there is no contrast.',
+        'forgetfully': '"Forgetfully" is what nerves might cause, so there is no contrast.',
+        'quietly': '"Quietly" describes his voice, not how well he did. "Nonetheless" needs a contrast with being nervous.',
+      }],
+      ['Since the deadline was moved forward, the team had to work ___.', 'faster', ['more slowly', 'individually', 'silently'], {
+        'faster': '"Faster" is right — "Since" gives the reason: an earlier deadline means less time, so they had to speed up.',
+        'more slowly': '"More slowly" is the opposite of what an earlier deadline demands.',
+        'individually': '"Individually" means alone. An earlier deadline is about time, not about working alone.',
+        'silently': '"Silently" means without talking. An earlier deadline is about time, not noise.',
+      }],
     ];
     const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : upperRows;
-    const [q, answer, ds] = rotate(rows, i);
-    return { category: 'connectorClue', subskill: 'connector_inference', q, choices: buildChoices(answer, ds), answer, explain: 'Use the connector to infer the missing meaning word.' };
+    const [q, answer, ds, optionExplanations] = rotate(rows, i);
+    return { category: 'connectorClue', subskill: 'connector_inference', q, choices: buildChoices(answer, ds), answer, explain: 'The linking word tells you what kind of word comes next: "because" and "so" point to a cause or result; "although", "yet" and "however" point to a surprise.', optionExplanations };
   },
   wordParts(level, i) {
     const p1p2Rows = [
@@ -861,45 +1025,210 @@ const VOCAB_BUILDERS = {
     return { category: 'placeNouns', subskill: 'place_name', q, choices: buildChoices(answer, ds), answer, explain: 'Each place has a special name that tells us what people do there.' };
   },
   actionVerbs(level, i) {
+    // Review 2026-10-08: every option explained. Distractors that also made
+    // a true sentence were replaced ("mopped the table with a cloth", "the
+    // monkey crawled from branch to branch", "the professor marched into the
+    // wrong hall"), or the stem gained the clue that rules them out ("as if
+    // they were skating", "through the air", "slowly").
     const p1p2Rows = [
-      ['Our pet dog ___ its tail excitedly when it sees us.', 'wags', ['flaps', 'waves', 'shakes']],
-      ['Gail ___ the dirty table with a cloth.', 'wiped', ['sliced', 'mopped', 'stacked']],
-      ['No one saw the burglar ___ into the house when night fell.', 'sneaking', ['crawling', 'strolling', 'marching']],
-      ['"Look at that caterpillar ___ on the branch!" Joe said.', 'crawling', ['sliding', 'trotting', 'travelling']],
-      ['Betsy let out a scream when the snake ___ towards her.', 'slithered', ['hopped', 'galloped', 'waddled']],
-      ['Little Sophie went missing as she had ___ off on her own.', 'wandered', ['marched', 'galloped', 'travelled']],
-      ['The vase ___ when it hit the floor.', 'shattered', ['exploded', 'burst', 'crashed']],
-      ['The chef ___ the eggs in a bowl before pouring them into the pan.', 'whisked', ['poured', 'sliced', 'fried']],
-      ['Anna ___ a cup of hot tea slowly so as not to burn her tongue.', 'sipped', ['gulped', 'chewed', 'spilled']],
-      ['The puppy ___ at the ball and knocked it across the room.', 'pounced', ['yawned', 'snapped', 'dashed']],
-      ['He ___ the wet shirt on the bamboo pole to dry.', 'hung', ['ironed', 'folded', 'dropped']],
-      ['She ___ the heavy bag over her shoulders before setting off.', 'hoisted', ['emptied', 'unzipped', 'dropped']],
-      ['Tom ___ the crumpled paper into the bin from across the room.', 'tossed', ['lifted', 'carried', 'pushed']],
-      ['The baby ___ the toy tightly and would not let go.', 'clutched', ['tapped', 'patted', 'poked']],
-      ['Mum ___ the pancake high into the air with the frying pan.', 'flipped', ['rolled', 'stirred', 'spread']],
-      ['The children ___ across the icy floor in their socks.', 'slid', ['hopped', 'stamped', 'marched']],
-      ['She ___ the stamps carefully onto the envelope.', 'stuck', ['drew', 'wrote', 'clipped']],
-      ['The monkey ___ from branch to branch high above us.', 'swung', ['crawled', 'waddled', 'slithered']],
-      ['Grandpa ___ the seeds evenly over the freshly dug soil.', 'scattered', ['piled', 'buried', 'stacked']],
-      ['The goalkeeper ___ across the goal to stop the ball.', 'dived', ['stepped', 'walked', 'turned']],
+      ['Our pet dog ___ its tail excitedly when it sees us.', 'wags', ['flaps', 'waves', 'shakes'], {
+        'wags': '"Wags" is right — a dog wags its tail when it moves it quickly from side to side because it is happy.',
+        'flaps': '"Flaps" is for wings or a flag moving up and down. A dog\'s tail wags.',
+        'waves': 'We wave our hands to say hello. For a dog\'s tail, we say "wags".',
+        'shakes': 'A dog shakes its whole body to dry off. For the tail, we say "wags".',
+      }],
+      ['Gail ___ the dirty table with a cloth.', 'wiped', ['sliced', 'poured', 'stacked'], {
+        'wiped': '"Wiped" is right — you wipe a table when you rub it with a cloth to clean it.',
+        'sliced': '"Sliced" means cut with a knife. You cannot clean a table by slicing it.',
+        'poured': '"Poured" is for water or juice coming out of a jug. You cannot pour a table.',
+        'stacked': '"Stacked" means put things on top of each other. That does not clean a table.',
+      }],
+      ['No one saw the burglar ___ into the house when night fell.', 'sneaking', ['stomping', 'strolling', 'marching'], {
+        'sneaking': '"Sneaking" is right — it means moving quietly so no one sees you, just what a burglar does.',
+        'stomping': '"Stomping" means walking with loud, heavy steps. That would wake everyone up.',
+        'strolling': '"Strolling" means walking slowly for fun, like in a park. A burglar is trying to hide.',
+        'marching': '"Marching" means walking with big, loud steps, like soldiers. A burglar wants to be quiet.',
+      }],
+      ['"Look at that caterpillar ___ on the branch!" Joe said.', 'crawling', ['sliding', 'trotting', 'flying'], {
+        'crawling': '"Crawling" is right — a caterpillar moves slowly along on its many little legs.',
+        'sliding': '"Sliding" means moving smoothly over something slippery, like ice. A caterpillar walks with its legs.',
+        'trotting': '"Trotting" is how a horse runs. A caterpillar is far too small and slow.',
+        'flying': '"Flying" needs wings. A caterpillar has no wings yet — it gets them when it becomes a butterfly.',
+      }],
+      ['Betsy let out a scream when the snake ___ towards her.', 'slithered', ['hopped', 'galloped', 'waddled'], {
+        'slithered': '"Slithered" is right — a snake has no legs, so it slides along the ground by twisting its body.',
+        'hopped': '"Hopped" means jumped along, like a rabbit. A snake has no legs.',
+        'galloped': '"Galloped" is how a horse runs fast. A snake has no legs.',
+        'waddled': '"Waddled" is how a duck walks, rocking from side to side. A snake has no legs.',
+      }],
+      ['Little Sophie went missing as she had ___ off on her own.', 'wandered', ['galloped', 'travelled', 'slithered'], {
+        'wandered': '"Wandered" is right — it means walked about without knowing where you are going. That is how a child gets lost.',
+        'galloped': '"Galloped" is how a horse runs fast. A little girl walks.',
+        'travelled': '"Travelled" means went on a journey, like to another country. A child who gets lost has wandered off.',
+        'slithered': '"Slithered" is how a snake moves. A little girl walks.',
+      }],
+      ['The vase ___ when it hit the floor.', 'shattered', ['exploded', 'burst', 'melted'], {
+        'shattered': '"Shattered" is right — it means broke into many small pieces, like a vase does when it falls.',
+        'exploded': '"Exploded" means blew apart with a loud bang, like fireworks. A vase does not do that.',
+        'burst': '"Burst" is what a balloon or a bubble does when it pops. A vase breaks.',
+        'melted': '"Melted" means turned soft and runny from heat, like ice cream. Hitting the floor does not melt a vase.',
+      }],
+      ['The chef ___ the eggs in a bowl before pouring them into the pan.', 'whisked', ['poured', 'sliced', 'fried'], {
+        'whisked': '"Whisked" is right — it means stirred very fast to mix, which is what you do to eggs in a bowl.',
+        'poured': 'The pouring comes later ("before pouring them"). First the chef did something else to the eggs.',
+        'sliced': '"Sliced" means cut into pieces with a knife. You cannot slice runny eggs.',
+        'fried': '"Fried" means cooked in a hot pan. These eggs were still in a bowl, not in the pan yet.',
+      }],
+      ['Anna ___ a cup of hot tea slowly so as not to burn her tongue.', 'sipped', ['gulped', 'chewed', 'spilled'], {
+        'sipped': '"Sipped" is right — it means drank in tiny amounts, which stops you burning your tongue.',
+        'gulped': '"Gulped" means drank quickly in big mouthfuls. That is the opposite of "slowly".',
+        'chewed': '"Chewed" is what you do with food, not with a drink.',
+        'spilled': '"Spilled" means let it fall out of the cup by mistake. Then she would not be drinking it.',
+      }],
+      ['The puppy ___ at the ball and knocked it across the room.', 'pounced', ['yawned', 'sniffed', 'blinked'], {
+        'pounced': '"Pounced" is right — it means jumped on something suddenly. That is how the puppy knocked the ball away.',
+        'yawned': '"Yawned" means opened its mouth wide because it was tired. That would not knock a ball.',
+        'sniffed': '"Sniffed" means smelled something. Smelling a ball would not knock it across the room.',
+        'blinked': '"Blinked" means shut and opened its eyes quickly. That would not move a ball.',
+      }],
+      ['He ___ the wet shirt on the bamboo pole to dry.', 'hung', ['ironed', 'folded', 'dropped'], {
+        'hung': '"Hung" is right — we hang wet clothes up on a pole or line so they can dry.',
+        'ironed': '"Ironed" means made smooth with a hot iron. We iron clothes after they are dry.',
+        'folded': '"Folded" means made into a neat pile. A folded wet shirt would not dry well.',
+        'dropped': '"Dropped" means let it fall by accident. That would not help it dry.',
+      }],
+      ['She ___ the heavy bag over her shoulders before setting off.', 'hoisted', ['emptied', 'unzipped', 'dropped'], {
+        'hoisted': '"Hoisted" is right — it means lifted something heavy up, here onto her shoulders.',
+        'emptied': '"Emptied" means took everything out. Then the bag would not be heavy.',
+        'unzipped': '"Unzipped" means opened the zip. That does not put a bag over your shoulders.',
+        'dropped': '"Dropped" means let it fall. That is the opposite of lifting it onto her shoulders.',
+      }],
+      ['Tom ___ the crumpled paper into the bin from across the room.', 'tossed', ['lifted', 'folded', 'pushed'], {
+        'tossed': '"Tossed" is right — it means threw lightly. "From across the room" tells us the paper flew through the air.',
+        'lifted': '"Lifted" means picked up. It cannot get the paper into a bin far away.',
+        'folded': '"Folded" means bent into a smaller shape. It does not move the paper into the bin.',
+        'pushed': '"Pushed" means moved it with your hand. From across the room, Tom could not reach the bin.',
+      }],
+      ['The baby ___ the toy tightly and would not let go.', 'clutched', ['tapped', 'patted', 'poked'], {
+        'clutched': '"Clutched" is right — it means held on very tightly, just like "would not let go".',
+        'tapped': '"Tapped" means touched quickly and lightly. That is not holding on.',
+        'patted': '"Patted" means touched gently with a flat hand. That is not holding on.',
+        'poked': '"Poked" means pushed with a finger. That is not holding on.',
+      }],
+      ['Mum ___ the pancake high into the air with the frying pan.', 'flipped', ['rolled', 'stirred', 'spread'], {
+        'flipped': '"Flipped" is right — it means made it jump up and turn over, which is how you cook the other side of a pancake.',
+        'rolled': '"Rolled" means turned over and over along a flat place. It would not go high into the air.',
+        'stirred': '"Stirred" means moved a spoon round and round in a pot. You cannot stir a pancake into the air.',
+        'spread': '"Spread" means made something flat and thin, like butter on bread. It would not go into the air.',
+      }],
+      ['The children ___ across the icy floor in their socks, as if they were skating.', 'slid', ['hopped', 'stamped', 'marched'], {
+        'slid': '"Slid" is right — it means moved smoothly over something slippery. "As if they were skating" tells us their feet glided.',
+        'hopped': '"Hopped" means jumped along. Skating is smooth, not bouncy.',
+        'stamped': '"Stamped" means put feet down hard and loud. Skating is smooth and gliding.',
+        'marched': '"Marched" means walked with big steps, like soldiers. Skating is smooth and gliding.',
+      }],
+      ['She ___ the stamps carefully onto the envelope.', 'stuck', ['wrote', 'clipped', 'folded'], {
+        'stuck': '"Stuck" is right — stamps have glue on the back, so you stick them onto an envelope.',
+        'wrote': '"Wrote" is for words, like the address. You do not write stamps.',
+        'clipped': '"Clipped" means held with a clip. Stamps are sticky, so they do not need a clip.',
+        'folded': '"Folded" means bent over. You do not fold stamps onto an envelope.',
+      }],
+      ['The monkey ___ from branch to branch high above us.', 'swung', ['swam', 'waddled', 'slithered'], {
+        'swung': '"Swung" is right — a monkey holds a branch with its arms and moves through the air to the next one.',
+        'swam': '"Swam" means moved through water. The monkey was up in the trees.',
+        'waddled': '"Waddled" is how a duck walks. A monkey high in the trees swings.',
+        'slithered': '"Slithered" is how a snake moves. A monkey uses its arms to swing.',
+      }],
+      ['Grandpa ___ the seeds evenly over the freshly dug soil.', 'scattered', ['piled', 'buried', 'stacked'], {
+        'scattered': '"Scattered" is right — it means threw them so they landed all over. "Evenly over the soil" tells us they spread out.',
+        'piled': '"Piled" means put them all in one heap. That is not "evenly over" the soil.',
+        'buried': '"Buried" means put under the ground. "Over" the soil tells us the seeds were on top.',
+        'stacked': '"Stacked" means put them neatly on top of each other. Seeds spread "evenly over" the soil are not stacked.',
+      }],
+      ['The goalkeeper ___ through the air across the goal to stop the ball.', 'dived', ['stepped', 'walked', 'turned'], {
+        'dived': '"Dived" is right — it means jumped forward through the air, which is how a goalkeeper reaches the ball.',
+        'stepped': '"Stepped" means moved one foot. You cannot step "through the air".',
+        'walked': '"Walked" keeps your feet on the ground. "Through the air" tells us the goalkeeper jumped.',
+        'turned': '"Turned" means faced another way. It does not carry you through the air across the goal.',
+      }],
     ];
     const p3UpperRows = [
-      ['The golden retriever ___ its tail so vigorously when it recognises its owner\'s car in the driveway that its whole body shakes.', 'wags', ['flaps', 'waves', 'shakes']],
-      ['After the experiment, the laboratory assistant carefully ___ the bench clean with a damp cloth so that no chemicals were left behind.', 'wiped', ['sliced', 'mopped', 'stacked']],
-      ['Security footage showed a figure ___ through the emergency exit while the guard was occupied at the front desk.', 'sneaking', ['crawling', 'strolling', 'marching']],
-      ['The nature photographer spent three hours flat on the ground, watching a caterpillar ___ along the underside of a broad leaf.', 'crawling', ['sliding', 'trotting', 'travelling']],
-      ['The python ___ through the underbrush with barely a rustle, keeping its eyes fixed on the unsuspecting prey ahead.', 'slithered', ['hopped', 'galloped', 'waddled']],
-      ['The elderly professor ___ into the wrong lecture hall and had begun speaking for several minutes before anyone dared to interrupt.', 'wandered', ['marched', 'galloped', 'travelled']],
-      ['The ancient vase ___ when it fell from the display case, scattering fragments across the polished museum floor.', 'shattered', ['exploded', 'burst', 'crashed']],
-      ['The pastry chef ___ the egg whites until they formed stiff peaks, then folded them gently into the cake mixture.', 'whisked', ['poured', 'sliced', 'fried']],
-      ['She ___ her chamomile tea in silence, reading through the final draft of her speech one last time before the ceremony.', 'sipped', ['gulped', 'chewed', 'spilled']],
-      ['The cheetah ___ on the gazelle with breathtaking speed, ending a chase that had stretched nearly four hundred metres across the plain.', 'pounced', ['yawned', 'snapped', 'dashed']],
-      ['Workers ___ the elaborate festival decorations across the entire length of the street, transforming it in preparation for the night\'s celebration.', 'hung', ['buried', 'swept', 'dropped']],
-      ['The mountaineers ___ their packs onto their backs and began the steep ascent before sunrise, hoping to reach the summit by noon before the clouds moved in.', 'hoisted', ['emptied', 'unzipped', 'dropped']],
+      ['The golden retriever ___ its tail so vigorously when it recognises its owner\'s car in the driveway that its whole body shakes.', 'wags', ['flaps', 'waves', 'shakes'], {
+        'wags': '"Wags" is right — it is the precise verb for a dog moving its tail quickly from side to side.',
+        'flaps': '"Flaps" is for wings or a flag moving up and down. A tail wags.',
+        'waves': 'We wave a hand or a flag. The precise verb for a dog\'s tail is "wags".',
+        'shakes': '"Shakes" is already used later in the sentence for the whole body. The tail itself wags.',
+      }],
+      ['After the experiment, the laboratory assistant carefully ___ the bench clean with a damp cloth so that no chemicals were left behind.', 'wiped', ['sliced', 'poured', 'stacked'], {
+        'wiped': '"Wiped" is right — you wipe a surface clean by rubbing it with a cloth.',
+        'sliced': '"Sliced" means cut with a knife. It does not clean a bench.',
+        'poured': '"Poured" is for a liquid flowing out of a container. You cannot pour a bench clean with a cloth.',
+        'stacked': '"Stacked" means piled things up. It does not clean a bench.',
+      }],
+      ['Security footage showed a figure ___ through the emergency exit while the guard was occupied at the front desk.', 'sneaking', ['stomping', 'strolling', 'marching'], {
+        'sneaking': '"Sneaking" is right — it means moving secretly. "While the guard was occupied" shows the figure waited until no one was watching.',
+        'stomping': '"Stomping" means walking with loud, heavy steps — the opposite of trying not to be noticed.',
+        'strolling': '"Strolling" means walking in a relaxed way. Waiting until the guard was busy shows the figure was trying to hide.',
+        'marching': '"Marching" means walking with firm, regular steps, like a soldier. It does not suggest secrecy.',
+      }],
+      ['The nature photographer spent three hours flat on the ground, watching a caterpillar ___ along the underside of a broad leaf.', 'crawling', ['sliding', 'trotting', 'flying'], {
+        'crawling': '"Crawling" is right — a caterpillar moves slowly on its many short legs, close to the surface.',
+        'sliding': '"Sliding" means gliding over a slippery surface without stepping. A caterpillar grips with its legs.',
+        'trotting': '"Trotting" is a horse\'s quick, bouncing run. A caterpillar is small and slow.',
+        'flying': '"Flying" needs wings. A caterpillar only gets wings after it becomes a butterfly or a moth.',
+      }],
+      ['The python ___ through the underbrush with barely a rustle, keeping its eyes fixed on the unsuspecting prey ahead.', 'slithered', ['hopped', 'galloped', 'waddled'], {
+        'slithered': '"Slithered" is right — it means slid along by twisting the body, the way a legless snake moves.',
+        'hopped': '"Hopped" means jumped along on legs, like a rabbit. A python has no legs.',
+        'galloped': '"Galloped" is a horse\'s fastest run. A python has no legs.',
+        'waddled': '"Waddled" means walked with short, rocking steps, like a duck. A python has no legs.',
+      }],
+      ['The elderly professor ___ into the wrong lecture hall and had begun speaking for several minutes before anyone dared to interrupt.', 'wandered', ['slithered', 'galloped', 'travelled'], {
+        'wandered': '"Wandered" is right — it means walked without a clear purpose, which explains how he ended up in the wrong hall.',
+        'slithered': '"Slithered" is how a snake moves. A professor walks.',
+        'galloped': '"Galloped" is a horse\'s fastest run. It does not describe a person walking into a room.',
+        'travelled': '"Travelled" means made a journey, often a long one. Walking into a room is not a journey.',
+      }],
+      ['The ancient vase ___ when it fell from the display case, scattering fragments across the polished museum floor.', 'shattered', ['exploded', 'burst', 'melted'], {
+        'shattered': '"Shattered" is right — it means broke suddenly into many pieces, and "scattering fragments" confirms it.',
+        'exploded': '"Exploded" means blew apart from a force inside, like fireworks. A falling vase breaks from the impact.',
+        'burst': '"Burst" means split open from pressure inside, like a balloon or a pipe. A vase breaks from hitting the floor.',
+        'melted': '"Melted" means turned to liquid in heat. A fall does not melt a vase.',
+      }],
+      ['The pastry chef ___ the egg whites until they formed stiff peaks, then folded them gently into the cake mixture.', 'whisked', ['poured', 'sliced', 'fried'], {
+        'whisked': '"Whisked" is right — beating egg whites fast with a whisk traps air until they form stiff peaks.',
+        'poured': '"Poured" makes a liquid flow out. Pouring egg whites would never make stiff peaks.',
+        'sliced': '"Sliced" means cut into thin pieces. Raw egg whites are runny and cannot be sliced.',
+        'fried': '"Fried" means cooked in hot oil. Fried egg whites could not be folded into a cake mixture.',
+      }],
+      ['She slowly ___ her chamomile tea in silence, reading through the final draft of her speech one last time before the ceremony.', 'sipped', ['gulped', 'chewed', 'spilled'], {
+        'sipped': '"Sipped" is right — it means drank in small mouthfuls, which suits "slowly" and her quiet, careful mood.',
+        'gulped': '"Gulped" means swallowed quickly in large mouthfuls — the opposite of "slowly".',
+        'chewed': '"Chewed" is for food. Tea is a drink.',
+        'spilled': '"Spilled" means let it fall out by accident. Then she would not be drinking it.',
+      }],
+      ['The cheetah ___ on the gazelle with breathtaking speed, ending a chase that had stretched nearly four hundred metres across the plain.', 'pounced', ['yawned', 'snapped', 'dashed'], {
+        'pounced': '"Pounced" is right — it means sprang suddenly onto prey. We say a hunter "pounced on" its prey.',
+        'yawned': '"Yawned" means opened its mouth wide from tiredness. It does not end a chase.',
+        'snapped': '"Snapped" means bit quickly with its jaws. We say "snapped at", not "snapped on", and it is not a leap.',
+        'dashed': '"Dashed" means ran quickly, but we say "dashed towards", not "dashed on". The leap that ends a chase is "pounced on".',
+      }],
+      ['Workers ___ the elaborate festival decorations across the entire length of the street, transforming it in preparation for the night\'s celebration.', 'hung', ['buried', 'swept', 'dropped'], {
+        'hung': '"Hung" is right — decorations are hung up high so they stretch across the street.',
+        'buried': '"Buried" means put under the ground. Buried decorations could not transform the street.',
+        'swept': '"Swept" means cleaned with a broom. You do not sweep decorations into place.',
+        'dropped': '"Dropped" means let fall. Dropped decorations would not stretch across the street.',
+      }],
+      ['The mountaineers ___ their packs onto their backs and began the steep ascent before sunrise, hoping to reach the summit by noon before the clouds moved in.', 'hoisted', ['emptied', 'unzipped', 'dropped'], {
+        'hoisted': '"Hoisted" is right — it means lifted something heavy up, here onto their backs.',
+        'emptied': '"Emptied" means took everything out. That does not put a pack on your back.',
+        'unzipped': '"Unzipped" means opened the zip. That does not put a pack on your back.',
+        'dropped': '"Dropped" means let fall — the opposite of lifting a pack onto your back.',
+      }],
     ];
     const rows = (level === 'P1' || level === 'P2') ? p1p2Rows : p3UpperRows;
-    const [q, answer, ds] = rotate(rows, i);
-    return { category: 'actionVerbs', subskill: 'action_verb', q, choices: buildChoices(answer, ds), answer, explain: 'Each action has a precise verb — pick the one that matches the movement, speed and surface.' };
+    const [q, answer, ds, optionExplanations] = rotate(rows, i);
+    return { category: 'actionVerbs', subskill: 'action_verb', q, choices: buildChoices(answer, ds), answer, explain: 'Each action has a precise verb — pick the one that matches the movement, speed and surface.', optionExplanations };
   },
   soundVerbs(level, i) {
     const p1p2Rows = [
@@ -1026,53 +1355,237 @@ const VOCAB_BUILDERS = {
   },
   mannerAdverbs(level, i) {
     // P1–P2: everyday -ly adverbs with an obvious scene clue.
+    // Review 2026-10-08: every option explained. A kitten can purr loudly, a
+    // dog can growl softly and a gymnast can land heavily, so those
+    // distractors were replaced or the stem now says which it was ("and the
+    // judges gave her top marks", "without a trace of fear").
     const lower = [
-      ['The pupils sat ___ during the silent reading lesson.', 'quietly', ['loudly', 'roughly', 'wildly']],
-      ['The old man walked ___ down the road, leaning on his stick.', 'slowly', ['quickly', 'wildly', 'roughly']],
-      ['She thanked the volunteer ___ for helping her cross the road.', 'politely', ['rudely', 'angrily', 'wildly']],
-      ['She carried the tray of glasses ___ across the crowded room.', 'carefully', ['carelessly', 'roughly', 'wildly']],
-      ['The boys clapped ___ when their team scored the winning goal.', 'loudly', ['quietly', 'softly', 'sadly']],
-      ['The librarian spoke ___ so as not to disturb the readers.', 'softly', ['loudly', 'harshly', 'rudely']],
-      ['The children cheered ___ when the extra holiday was announced.', 'happily', ['sadly', 'quietly', 'angrily']],
-      ['The runner crossed the finish line ___ and won the race.', 'quickly', ['slowly', 'lazily', 'sadly']],
-      ['He shut the gate ___ behind him so the dog could not escape.', 'firmly', ['loosely', 'lazily', 'softly']],
-      ['The kitten purred ___ as the girl stroked its fur.', 'gently', ['roughly', 'angrily', 'loudly']],
-      ['The boy answered ___ because he did not know the answer.', 'quietly', ['proudly', 'loudly', 'firmly']],
-      ['She waited ___ in line even though the queue was very long.', 'patiently', ['angrily', 'rudely', 'noisily']],
+      ['The pupils sat ___ during the silent reading lesson.', 'quietly', ['loudly', 'roughly', 'wildly'], {
+        'quietly': '"Quietly" is right — it means without making noise. A "silent reading lesson" needs quiet.',
+        'loudly': '"Loudly" means with lots of noise. That is the opposite of "silent".',
+        'roughly': '"Roughly" means in a hard, not gentle way. It does not fit sitting and reading.',
+        'wildly': '"Wildly" means in a crazy, out-of-control way. Pupils reading in silence sit still.',
+      }],
+      ['The old man walked ___ down the road, leaning on his stick.', 'slowly', ['quickly', 'wildly', 'roughly'], {
+        'slowly': '"Slowly" is right — someone who leans on a stick walks slowly and carefully.',
+        'quickly': '"Quickly" means fast. Leaning on a stick tells us he could not walk fast.',
+        'wildly': '"Wildly" means in a crazy, out-of-control way. Leaning on his stick, he walked steadily.',
+        'roughly': '"Roughly" means in a hard, not gentle way. It does not describe how an old man walks with a stick.',
+      }],
+      ['She thanked the volunteer ___ for helping her cross the road.', 'politely', ['rudely', 'angrily', 'wildly'], {
+        'politely': '"Politely" is right — it means with good manners. Saying thank you is polite.',
+        'rudely': '"Rudely" means with bad manners. You do not thank someone rudely for helping you.',
+        'angrily': '"Angrily" means in a cross way. Someone had helped her, so she was not cross.',
+        'wildly': '"Wildly" means in a crazy, out-of-control way. Saying thank you is calm and kind.',
+      }],
+      ['She carried the tray of glasses ___ across the crowded room.', 'carefully', ['carelessly', 'roughly', 'wildly'], {
+        'carefully': '"Carefully" is right — glasses can break, and a crowded room has people to walk around.',
+        'carelessly': '"Carelessly" means without care. The glasses might fall and break.',
+        'roughly': '"Roughly" means in a hard, not gentle way. The glasses might break.',
+        'wildly': '"Wildly" means in a crazy, out-of-control way. The glasses would fall.',
+      }],
+      ['The boys clapped ___ when their team scored the winning goal.', 'loudly', ['quietly', 'softly', 'sadly'], {
+        'loudly': '"Loudly" is right — when your team wins, you clap with lots of noise.',
+        'quietly': '"Quietly" means with little noise. Fans clap loudly for a winning goal.',
+        'softly': '"Softly" means gently and quietly. A winning goal makes fans clap hard and loud.',
+        'sadly': '"Sadly" means in an unhappy way. Their team won, so they were happy.',
+      }],
+      ['The librarian spoke ___ so as not to disturb the readers.', 'softly', ['loudly', 'harshly', 'rudely'], {
+        'softly': '"Softly" is right — it means gently and quietly, so the readers are not disturbed.',
+        'loudly': '"Loudly" means with lots of noise. That would disturb the readers.',
+        'harshly': '"Harshly" means in a hard, unkind voice. A harsh voice would disturb the readers.',
+        'rudely': '"Rudely" is about bad manners, not about how loud she was. "So as not to disturb" is about keeping quiet.',
+      }],
+      ['The children cheered ___ when the extra holiday was announced.', 'happily', ['sadly', 'quietly', 'angrily'], {
+        'happily': '"Happily" is right — an extra holiday is good news, so the children were happy.',
+        'sadly': '"Sadly" means in an unhappy way. An extra holiday is good news.',
+        'quietly': '"Quietly" means with little noise. Cheering is loud.',
+        'angrily': '"Angrily" means in a cross way. Nobody is cross about an extra holiday.',
+      }],
+      ['The runner crossed the finish line ___ and won the race.', 'quickly', ['slowly', 'lazily', 'sadly'], {
+        'quickly': '"Quickly" is right — to win a race, you must be fast.',
+        'slowly': '"Slowly" means not fast. A slow runner does not win the race.',
+        'lazily': '"Lazily" means without trying. You have to try hard to win a race.',
+        'sadly': '"Sadly" means in an unhappy way. Winning a race makes you happy.',
+      }],
+      ['He shut the gate ___ behind him so the dog could not escape.', 'firmly', ['loosely', 'lazily', 'carelessly'], {
+        'firmly': '"Firmly" is right — it means tightly and strongly, so the gate stays shut and the dog stays in.',
+        'loosely': '"Loosely" means not tightly. The gate might swing open and the dog could escape.',
+        'lazily': '"Lazily" means without trying. The gate might not close properly.',
+        'carelessly': '"Carelessly" means without care. The gate might not close, and the dog could escape.',
+      }],
+      ['The kitten purred ___ as the girl stroked its fur.', 'gently', ['roughly', 'angrily', 'fiercely'], {
+        'gently': '"Gently" is right — a purr is the soft, happy sound a kitten makes when it is stroked.',
+        'roughly': '"Roughly" means in a hard, not gentle way. A happy purr is soft.',
+        'angrily': '"Angrily" means in a cross way. A kitten purrs when it is happy, not cross.',
+        'fiercely': '"Fiercely" means in a wild, scary way. A kitten being stroked is calm and happy.',
+      }],
+      ['The boy answered ___ because he was not sure he was right.', 'quietly', ['proudly', 'loudly', 'firmly'], {
+        'quietly': '"Quietly" is right — when you are not sure, you often speak in a small, soft voice.',
+        'proudly': '"Proudly" means feeling pleased with yourself. He was not sure he was right, so he was not proud.',
+        'loudly': '"Loudly" means in a big voice. People who are not sure usually speak softly.',
+        'firmly': '"Firmly" means in a strong, sure way. He was not sure, so he did not speak firmly.',
+      }],
+      ['She waited ___ in line even though the queue was very long.', 'patiently', ['angrily', 'rudely', 'noisily'], {
+        'patiently': '"Patiently" is right — it means calmly, without getting upset. "Even though" tells us the long queue did not bother her.',
+        'angrily': '"Angrily" is how someone might feel in a long queue, but "even though" tells us she stayed calm.',
+        'rudely': '"Rudely" means with bad manners. "Even though" tells us the long queue did not upset her.',
+        'noisily': '"Noisily" means making lots of noise. "Even though" tells us she stayed calm about the long queue.',
+      }],
     ];
     // P3–P4: adverbs that name a mood or intensity, not just volume or speed.
     const middle = [
-      ['It was so difficult to wake Ian as he was sleeping so ___.', 'soundly', ['drowsily', 'noisily', 'calmly']],
-      ['The dog growled ___ when the stranger walked past the gate.', 'fiercely', ['kindly', 'lazily', 'softly']],
-      ['The ambulance sped ___ through the traffic to reach the patient.', 'swiftly', ['calmly', 'lazily', 'carefully']],
-      ['The boys cheered ___ when their team scored in the last minute.', 'wildly', ['quietly', 'gently', 'softly']],
-      ['She answered the teacher\'s question ___ without hesitation.', 'confidently', ['shyly', 'reluctantly', 'vaguely']],
-      ['The baby slept ___ in her mother\'s arms throughout the journey.', 'peacefully', ['restlessly', 'noisily', 'alertly']],
-      ['The gymnast landed ___ on the mat after her somersault.', 'gracefully', ['clumsily', 'heavily', 'roughly']],
-      ['The children cheered ___ when the extra holiday was announced.', 'joyfully', ['sadly', 'quietly', 'bitterly']],
-      ['The knight fought ___ to defend the castle gates.', 'bravely', ['fearfully', 'weakly', 'timidly']],
-      ['He accepted the prize ___, thanking everyone who had helped him.', 'modestly', ['boastfully', 'rudely', 'angrily']],
-      ['The lost child looked around ___ for a familiar face.', 'anxiously', ['calmly', 'cheerfully', 'lazily']],
-      ['She tore open the envelope and read the letter ___, smiling at every line.', 'eagerly', ['reluctantly', 'lazily', 'rudely']],
+      ['It was so difficult to wake Ian as he was sleeping so ___.', 'soundly', ['drowsily', 'noisily', 'calmly'], {
+        'soundly': '"Soundly" is right — it means deeply. Someone sleeping soundly is very hard to wake.',
+        'drowsily': '"Drowsily" means in a half-asleep way. A drowsy person is easy to wake.',
+        'noisily': '"Noisily" means making lots of noise. Snoring does not make someone hard to wake.',
+        'calmly': '"Calmly" means peacefully. It does not say how deep his sleep was, and that is why he was hard to wake.',
+      }],
+      ['The dog growled ___ when the stranger walked past the gate.', 'fiercely', ['kindly', 'lazily', 'cheerfully'], {
+        'fiercely': '"Fiercely" is right — it means in an angry, threatening way. A growl is a warning to a stranger.',
+        'kindly': '"Kindly" means in a friendly way. A growl is a warning, not a friendly sound.',
+        'lazily': '"Lazily" means without any effort. A dog warning off a stranger is alert, not lazy.',
+        'cheerfully': '"Cheerfully" means happily. A growl is an angry sound.',
+      }],
+      ['The ambulance moved ___ through the traffic to reach the patient in time.', 'swiftly', ['lazily', 'slowly', 'aimlessly'], {
+        'swiftly': '"Swiftly" is right — it means very quickly. "To reach the patient in time" tells us there was no time to lose.',
+        'lazily': '"Lazily" means without effort. An ambulance rushing to a patient is not lazy.',
+        'slowly': '"Slowly" is the opposite of what an emergency needs.',
+        'aimlessly': '"Aimlessly" means without a goal. The ambulance had a clear goal: to reach the patient.',
+      }],
+      ['The boys cheered ___ when their team scored in the last minute.', 'wildly', ['quietly', 'gently', 'softly'], {
+        'wildly': '"Wildly" is right — it means with lots of uncontrolled excitement, just right for a last-minute goal.',
+        'quietly': '"Quietly" means with little noise. Cheering for a last-minute goal is loud.',
+        'gently': '"Gently" means softly and calmly. A last-minute goal causes great excitement.',
+        'softly': '"Softly" means with little noise. Cheering for a last-minute goal is loud.',
+      }],
+      ['She answered the teacher\'s question ___ without hesitation.', 'confidently', ['shyly', 'reluctantly', 'hesitantly'], {
+        'confidently': '"Confidently" is right — it means feeling sure of yourself. "Without hesitation" means she did not pause or doubt.',
+        'shyly': '"Shyly" means nervously, as if afraid to speak. "Without hesitation" tells us she did not hold back.',
+        'reluctantly': '"Reluctantly" means unwillingly. "Without hesitation" tells us she was ready to answer.',
+        'hesitantly': '"Hesitantly" means pausing because you are unsure. It is the opposite of "without hesitation".',
+      }],
+      ['The baby slept ___ in her mother\'s arms and did not stir once during the journey.', 'peacefully', ['restlessly', 'alertly', 'wakefully'], {
+        'peacefully': '"Peacefully" is right — it means calmly and quietly. "Did not stir once" tells us she slept without moving.',
+        'restlessly': '"Restlessly" means moving about and not settling. "Did not stir once" tells us the opposite.',
+        'alertly': '"Alertly" means watching carefully, wide awake. A sleeping baby is not alert.',
+        'wakefully': '"Wakefully" means staying awake. The baby was asleep.',
+      }],
+      ['The gymnast landed ___ on the mat after her somersault, and the judges gave her top marks.', 'gracefully', ['clumsily', 'heavily', 'roughly'], {
+        'gracefully': '"Gracefully" is right — it means smoothly and beautifully. "Top marks" tells us her landing was excellent.',
+        'clumsily': '"Clumsily" means awkwardly, as if about to fall. Judges do not give top marks for that.',
+        'heavily': '"Heavily" means with a loud thud. Judges take marks off for a heavy landing.',
+        'roughly': '"Roughly" means in a hard, uncontrolled way. Judges do not give top marks for that.',
+      }],
+      ['The children cheered ___ when the extra holiday was announced.', 'joyfully', ['sadly', 'quietly', 'bitterly'], {
+        'joyfully': '"Joyfully" is right — it means with great happiness. An extra holiday is good news.',
+        'sadly': '"Sadly" means unhappily. An extra holiday is good news.',
+        'quietly': '"Quietly" means with little noise. Cheering is loud.',
+        'bitterly': '"Bitterly" means with anger or hurt. Nobody is upset about an extra holiday.',
+      }],
+      ['The knight fought ___, without a trace of fear, to defend the castle gates.', 'bravely', ['fearfully', 'timidly', 'nervously'], {
+        'bravely': '"Bravely" is right — it means with courage. "Without a trace of fear" tells us he was brave.',
+        'fearfully': '"Fearfully" means full of fear. The sentence says "without a trace of fear".',
+        'timidly': '"Timidly" means shyly, like a mouse. Someone "without a trace of fear" is not timid.',
+        'nervously': '"Nervously" means feeling worried. Someone "without a trace of fear" is not nervous.',
+      }],
+      ['He accepted the prize ___, thanking everyone who had helped him.', 'modestly', ['boastfully', 'rudely', 'angrily'], {
+        'modestly': '"Modestly" is right — it means without showing off. Thanking everyone who helped shows he did not take all the credit.',
+        'boastfully': '"Boastfully" means showing off. Thanking others is the opposite of boasting.',
+        'rudely': '"Rudely" means with bad manners. Thanking people is polite.',
+        'angrily': '"Angrily" means in a cross way. Someone thanking the people who helped him is not cross.',
+      }],
+      ['The lost child looked around ___ for a familiar face, her lip trembling.', 'anxiously', ['calmly', 'cheerfully', 'lazily'], {
+        'anxiously': '"Anxiously" is right — it means in a worried way. A lost child with a trembling lip is worried.',
+        'calmly': '"Calmly" means without worry. "Her lip trembling" tells us she was upset.',
+        'cheerfully': '"Cheerfully" means happily. A lost child with a trembling lip is not happy.',
+        'lazily': '"Lazily" means without effort. A lost child searching for help is not lazy.',
+      }],
+      ['She tore open the envelope and read the letter ___, smiling at every line.', 'eagerly', ['reluctantly', 'lazily', 'rudely'], {
+        'eagerly': '"Eagerly" is right — it means keenly, wanting to know more. Tearing open the envelope and smiling show she could not wait.',
+        'reluctantly': '"Reluctantly" means unwillingly. Tearing the envelope open shows she could not wait.',
+        'lazily': '"Lazily" means without effort. Tearing open the envelope shows she was keen.',
+        'rudely': '"Rudely" means with bad manners. Reading your own letter is not rude, and she was smiling.',
+      }],
     ];
     // P5–P6: adverbs whose neighbours are all plausible until the clue is weighed.
     const upper = [
-      ['The thief moved ___ through the dark corridor so as not to make a sound.', 'stealthily', ['boldly', 'noisily', 'carelessly']],
-      ['The wounded soldier crawled ___ towards the shelter.', 'painfully', ['comfortably', 'swiftly', 'playfully']],
-      ['He practised the piano ___ every evening until he mastered the piece.', 'diligently', ['casually', 'lazily', 'reluctantly']],
-      ['The detective examined the footprints ___ before drawing any conclusions.', 'meticulously', ['briefly', 'blindly', 'loosely']],
-      ['The witness answered ___, avoiding any detail that might identify her.', 'evasively', ['candidly', 'bluntly', 'eagerly']],
-      ['He apologised ___, clearly meaning every word of it.', 'sincerely', ['grudgingly', 'mockingly', 'carelessly']],
-      ['The chairman spoke ___, refusing to soften the bad news.', 'bluntly', ['tactfully', 'evasively', 'timidly']],
-      ['She agreed to help ___, having already refused twice.', 'grudgingly', ['eagerly', 'sincerely', 'joyfully']],
-      ['The old scholar explained the theory ___ so no one was left behind.', 'patiently', ['hastily', 'carelessly', 'curtly']],
-      ['He glanced at the report ___ and missed the error entirely.', 'cursorily', ['meticulously', 'anxiously', 'diligently']],
-      ['The volunteers worked ___ through the night to fill the sandbags.', 'tirelessly', ['lazily', 'cursorily', 'grudgingly']],
-      ['She declined the invitation ___, so as not to cause offence.', 'tactfully', ['bluntly', 'rudely', 'mockingly']],
+      ['The thief moved ___ through the dark corridor so as not to make a sound.', 'stealthily', ['boldly', 'noisily', 'carelessly'], {
+        'stealthily': '"Stealthily" is right — it means quietly and secretly, to avoid being noticed. "So as not to make a sound" confirms it.',
+        'boldly': '"Boldly" means confidently, without fear of being seen. A thief avoiding any sound is being careful, not bold.',
+        'noisily': '"Noisily" contradicts "so as not to make a sound".',
+        'carelessly': '"Carelessly" means without thought. Trying not to make a sound takes great care.',
+      }],
+      ['The wounded soldier crawled ___ towards the shelter.', 'painfully', ['comfortably', 'effortlessly', 'playfully'], {
+        'painfully': '"Painfully" is right — "wounded" tells us every movement hurt.',
+        'comfortably': '"Comfortably" means without discomfort. A wounded soldier crawling is not comfortable.',
+        'effortlessly': '"Effortlessly" means with no effort at all. A wound makes crawling a struggle.',
+        'playfully': '"Playfully" means in a fun, light-hearted way. It does not suit a wounded soldier seeking shelter.',
+      }],
+      ['He practised the piano ___ every evening until he mastered the piece.', 'diligently', ['casually', 'lazily', 'carelessly'], {
+        'diligently': '"Diligently" is right — it means with steady, careful effort, the kind it takes to practise every evening until you master a piece.',
+        'casually': '"Casually" means in a relaxed, not serious way. Mastering a piece takes serious effort.',
+        'lazily': '"Lazily" means with little effort. Lazy practice would not lead to mastery.',
+        'carelessly': '"Carelessly" means without attention. Mastering a piece needs careful practice.',
+      }],
+      ['The detective examined the footprints ___ before drawing any conclusions.', 'meticulously', ['carelessly', 'blindly', 'loosely'], {
+        'meticulously': '"Meticulously" is right — it means with great attention to every detail, which is what a detective does before deciding anything.',
+        'carelessly': '"Carelessly" means without attention. "Before drawing any conclusions" shows he was being careful.',
+        'blindly': '"Blindly" means without thinking or looking. Examining clues means looking closely.',
+        'loosely': '"Loosely" means not exactly. It does not describe a close examination.',
+      }],
+      ['The witness answered ___, avoiding any detail that might identify her.', 'evasively', ['candidly', 'bluntly', 'eagerly'], {
+        'evasively': '"Evasively" is right — it means avoiding giving a direct answer. "Avoiding any detail" is exactly that.',
+        'candidly': '"Candidly" means openly and honestly. She was hiding details, not sharing them.',
+        'bluntly': '"Bluntly" means very directly. She was avoiding details, not stating them plainly.',
+        'eagerly': '"Eagerly" means keenly. Someone avoiding details is holding back, not eager.',
+      }],
+      ['He apologised ___, clearly meaning every word of it.', 'sincerely', ['grudgingly', 'mockingly', 'carelessly'], {
+        'sincerely': '"Sincerely" is right — it means honestly, meaning what you say. "Clearly meaning every word" says exactly that.',
+        'grudgingly': '"Grudgingly" means unwillingly. Someone who means every word is not apologising against his will.',
+        'mockingly': '"Mockingly" means making fun. A mocking apology does not mean what it says.',
+        'carelessly': '"Carelessly" means without thought. Meaning every word shows careful thought.',
+      }],
+      ['The chairman spoke ___, refusing to soften the bad news.', 'bluntly', ['tactfully', 'evasively', 'timidly'], {
+        'bluntly': '"Bluntly" is right — it means saying something directly, without making it gentler. "Refusing to soften" says the same.',
+        'tactfully': '"Tactfully" means carefully, so as not to upset anyone. That is softening the news.',
+        'evasively': '"Evasively" means avoiding the point. He stated the bad news directly.',
+        'timidly': '"Timidly" means shyly and nervously. Refusing to soften bad news takes firmness.',
+      }],
+      ['She agreed to help ___, having already refused twice.', 'grudgingly', ['eagerly', 'instantly', 'joyfully'], {
+        'grudgingly': '"Grudgingly" is right — it means unwillingly. Refusing twice shows she did not want to help.',
+        'eagerly': '"Eagerly" means keenly. Someone who refused twice was not keen.',
+        'instantly': '"Instantly" means at once. She had already refused twice, so she did not agree at once.',
+        'joyfully': '"Joyfully" means happily. Refusing twice shows she was not happy to help.',
+      }],
+      ['The old scholar explained the theory ___ so no one was left behind.', 'patiently', ['hastily', 'carelessly', 'curtly'], {
+        'patiently': '"Patiently" is right — it means calmly, taking as long as needed. "So no one was left behind" shows he waited for everyone.',
+        'hastily': '"Hastily" means in a rush. Rushing would leave some people behind.',
+        'carelessly': '"Carelessly" means without attention. A careless explanation would leave people confused.',
+        'curtly': '"Curtly" means rudely short. A short, abrupt explanation would leave people behind.',
+      }],
+      ['He glanced at the report ___ and missed the error entirely.', 'cursorily', ['meticulously', 'thoroughly', 'diligently'], {
+        'cursorily': '"Cursorily" is right — it means quickly and without attention to detail. "Glanced" and "missed the error" both point to that.',
+        'meticulously': '"Meticulously" means with great care. A careful check would have found the error.',
+        'thoroughly': '"Thoroughly" means completely and carefully. A thorough check would have found the error.',
+        'diligently': '"Diligently" means with steady effort. A diligent reader would have found the error, and a glance is not diligent.',
+      }],
+      ['The volunteers worked ___ through the night to fill the sandbags.', 'tirelessly', ['lazily', 'cursorily', 'idly'], {
+        'tirelessly': '"Tirelessly" is right — it means without stopping or tiring. Working "through the night" shows that.',
+        'lazily': '"Lazily" means with little effort. Working through the night takes great effort.',
+        'cursorily': '"Cursorily" means quickly and without attention. It describes a quick look, not long, hard work.',
+        'idly': '"Idly" means without doing anything useful. They were filling sandbags all night.',
+      }],
+      ['She declined the invitation ___, so as not to cause offence.', 'tactfully', ['bluntly', 'rudely', 'mockingly'], {
+        'tactfully': '"Tactfully" is right — it means carefully, so as not to upset anyone. "So as not to cause offence" says exactly that.',
+        'bluntly': '"Bluntly" means very directly, without softening. That risks causing offence.',
+        'rudely': '"Rudely" means with bad manners. That would cause offence.',
+        'mockingly': '"Mockingly" means making fun. That would certainly cause offence.',
+      }],
     ];
     const rows = bandRows(level, { lower, middle, upper });
-    const [q, answer, ds] = rotate(rows, i);
-    return { category: 'mannerAdverbs', subskill: 'adverb_manner', q, choices: buildChoices(answer, ds), answer, explain: 'An adverb of manner describes HOW an action is done — match the adverb to the mood and intensity of the scene.' };
+    const [q, answer, ds, optionExplanations] = rotate(rows, i);
+    return { category: 'mannerAdverbs', subskill: 'adverb_manner', q, choices: buildChoices(answer, ds), answer, explain: 'An adverb of manner describes HOW an action is done — match the adverb to the mood and intensity of the scene.', optionExplanations };
   },
   phrasalVerbs(level, i) {
     // P1–P2: everyday phrasal verbs from home and classroom routines.

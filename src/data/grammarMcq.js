@@ -4235,56 +4235,265 @@ const GRAMMAR_BUILDERS = {
     return { subskill: 'relative_pronouns', q, choices: buildChoices(answer, ds), answer, explain: 'who = person as subject; whom = person as object or after preposition; whose = possession; which = thing (non-restrictive); that = thing or person (restrictive).', optionExplanations };
   },
   reportedSpeech(level, i) {
+    // Review 2026-10-08. Moving the tense back is optional when what was said
+    // is still true ("She said she has finished" can be fine), and a past
+    // tense need not become past perfect ("She asked where I hid it" is
+    // correct). So an unshifted distractor is only wrong when the sentence
+    // pins the time — each stem now carries that clue ("the day before",
+    // "yesterday afternoon", "a month later") — and no row offers the simple
+    // past beside a past-perfect key.
     const rows = [
-      ['Mum said that she ___ home late that evening.', 'would be', ['is', 'was', 'has been']],
-      ['The coach told us that we ___ to bring water bottles.', 'had to', ['having to', 'has to', 'are having to']],
-      ['Alicia said that she ___ the worksheet already.', 'had finished', ['has finished', 'finished', 'is finishing']],
-      ['He asked whether I ___ the notice.', 'had read', ['have read', 'reading', 'am reading']],
-      ['The principal announced that the school ___ a charity drive the following week.', 'would hold', ['will hold', 'holds', 'has held']],
-      ['Tom said that his sister ___ to swim when she was four.', 'had learnt', ['has learnt', 'learns', 'was learning']],
-      ['The librarian reminded us that the books ___ by Friday.', 'had to be returned', ['have returned', 'are returned', 'were returning']],
-      ['Mei explained that she ___ the new dance steps every morning.', 'practised', ['practising', 'has practised', 'will practise']],
-      ['Father told the children that they ___ noise after 9 p.m.', 'should not make', ['will not make', 'do not make', 'have not made']],
-      ['The guide warned us that the path ___ very slippery after the rain.', 'was', ['is', 'has been', 'will be']],
-      ['The doctor said that I ___ plenty of water every day.', 'should drink', ['drinking', 'will drink', 'have drunk']],
-      ['She asked me where I ___ the spare key.', 'had hidden', ['have hidden', 'hid', 'am hiding']],
-      ['The teacher asked me what I ___ in my project report.', 'had written', ['have written', 'wrote', 'was writing']],
-      ['She told me that she ___ the trophy on the shelf in her room.', 'had kept', ['has kept', 'kept', 'was keeping']],
-      ['The coach asked us what time ___ the next day.', 'we were leaving', ['are we leaving', 'we left', 'we will leave']],
-      ['Mrs Tan told the class ___ the hall quietly after the performance.', 'to leave', ['leaving', 'that leaving', 'leave']],
-      ['He mentioned that his father ___ him to the airport that morning.', 'had driven', ['has driven', 'drove', 'was driving']],
-      ['The pupils asked when the new science lab ___ ready.', 'would be', ['will be', 'is', 'has been']],
-      ['The prefect told the younger pupils ___ in the corridor during recess.', 'not to run', ['not run', 'do not run', 'to not running']],
-      ['My brother said that he ___ the reply email before dinner.', 'would send', ['will send', 'sends', 'has sent']],
+      ['At lunchtime, Mum phoned to say that she ___ home late that evening.', 'would be', ['is', 'was', 'has been'], {
+        'would be': '"Would be" is correct: Mum said "I will be home late this evening". She was talking about later that day, so when we report it, "will" becomes "would".',
+        'is': '"Is" talks about now, but Mum meant later — she phoned at lunchtime, before the evening came.',
+        'was': '"Was" says she had already been home late, but she phoned at lunchtime, before the evening came.',
+        'has been': '"Has been" says it has already happened, but Mum was talking about later that evening.',
+      }],
+      ['The coach told us that we ___ to bring water bottles.', 'had to', ['having to', 'has to', 'are having to'], {
+        'had to': '"Had to" is correct: the coach said "You have to bring water bottles". After "told us", "have to" moves back to "had to".',
+        'having to': '"Having to" is not a complete verb — "we having to" needs a helper. Use "had to".',
+        'has to': '"Has to" goes with he, she or it. The subject here is "we".',
+        'are having to': '"Are having to" describes something going on for a short while right now. The coach was giving an instruction, and "have to" becomes "had to" after "told us".',
+      }],
+      ['During Maths yesterday, Alicia said that she ___ the worksheet already.', 'had finished', ['has finished', 'will finish', 'is finishing'], {
+        'had finished': '"Had finished" is correct: Alicia said "I have finished". We are reporting it a day later, so "have finished" moves back to "had finished".',
+        'has finished': '"Has finished" is what Alicia said at the time, but she said it yesterday. After "said", it moves back to "had finished".',
+        'will finish': '"Will finish" is about the future, but "already" tells us the worksheet was done.',
+        'is finishing': '"Is finishing" means still working on it, but "already" tells us it was done.',
+      }],
+      ['At last Monday\'s meeting, he asked whether I ___ the notice.', 'had read', ['have read', 'reading', 'am reading'], {
+        'had read': '"Had read" is correct: his question was "Have you read the notice?" Because he asked it last Monday, "have read" moves back to "had read".',
+        'have read': '"Have read" is the tense of his original question. He asked it last Monday, so after "asked" it moves back to "had read".',
+        'reading': '"Reading" cannot be the verb on its own — "I reading" needs a helper such as "had" or "was".',
+        'am reading': '"Am reading" means right now, but the question was asked at last Monday\'s meeting.',
+      }],
+      ['The principal announced that the school ___ a charity drive the following week.', 'would hold', ['will hold', 'holds', 'has held'], {
+        'would hold': '"Would hold" is correct: the principal said "We will hold a charity drive next week". Reported, "will" becomes "would" and "next week" becomes "the following week".',
+        'will hold': '"Will hold" is what the principal said, but "the following week" shows we are reporting it later. "Will" moves back to "would".',
+        'holds': '"Holds" is for now or every time. The drive was planned for one future week, so the reported form is "would hold".',
+        'has held': '"Has held" says the drive is already over, but it was planned for "the following week".',
+      }],
+      ['Tom said that his sister ___ to swim when she was four.', 'had learnt', ['has learnt', 'learns', 'is learning'], {
+        'had learnt': '"Had learnt" is correct: she learnt long before Tom told us, so we use the past perfect. ("Tom said that his sister learnt to swim" is also correct English.)',
+        'has learnt': '"Has learnt" cannot go with a finished time like "when she was four".',
+        'learns': '"Learns" is for now or every day, but "when she was four" is in the past.',
+        'is learning': '"Is learning" means she is learning now, but "when she was four" is in the past.',
+      }],
+      ['The librarian reminded us that the books ___ by Friday.', 'had to be returned', ['have returned', 'are returned', 'were returning'], {
+        'had to be returned': '"Had to be returned" is correct: the rule was "The books must be returned by Friday". People return books, so we need "be returned", and after "reminded us", "must" becomes "had to".',
+        'have returned': '"Have returned" makes the books do the returning, as if they walked back. People return books, so we need "be returned".',
+        'are returned': '"Are returned" says what usually happens, not what we must do. The librarian was giving a rule.',
+        'were returning': '"Were returning" makes the books move back on their own. People return books.',
+      }],
+      ['Mei explained that she ___ the dance steps every morning before last week\'s concert.', 'had practised', ['has practised', 'practising', 'will practise'], {
+        'had practised': '"Had practised" is correct: the practising happened before the concert, and the concert was over when Mei explained. ("Mei explained that she practised…" is also correct English.)',
+        'has practised': '"Has practised" reaches up to now, but the practising stopped before last week\'s concert.',
+        'practising': '"Practising" cannot be the verb on its own — "she practising" needs a helper.',
+        'will practise': '"Will practise" is about the future, but the concert was last week. It is already over.',
+      }],
+      ['Father told the children that they ___ noise after 9 p.m.', 'should not make', ['should not making', 'should not to make', 'not to make'], {
+        'should not make': '"Should not make" is correct: after a helping verb like "should", we use the base verb "make".',
+        'should not making': 'After "should", the verb stays in its base form: "should not make", not "making".',
+        'should not to make': '"Should" is never followed by "to". We say "should not make".',
+        'not to make': '"Not to make" fits straight after "told the children" ("Father told the children not to make noise"). After "that they", the sentence needs a full verb such as "should not make".',
+      }],
+      ['On yesterday\'s hike, the guide warned us that the path ___ very slippery because it had rained all morning.', 'was', ['were', 'is', 'will be'], {
+        'was': '"Was" is correct: the guide was warning us about the path during yesterday\'s hike, so after "warned us" we use the past tense.',
+        'were': '"Were" goes with more than one. "The path" is one path, so it takes "was".',
+        'is': '"Is" talks about the path today, but the warning was about the path during yesterday\'s hike.',
+        'will be': '"Will be" points to later, but the rain had already fallen, so the path was slippery right then.',
+      }],
+      ['The doctor said that I ___ plenty of water every day.', 'should drink', ['drinking', 'will drink', 'have drunk'], {
+        'should drink': '"Should drink" is correct: the doctor was giving advice, and "should" is the word for advice.',
+        'drinking': '"Drinking" cannot be the verb on its own — "I drinking" needs a helper.',
+        'will drink': '"Will drink" turns it into a guess about what I will do. The doctor was giving advice, which needs "should".',
+        'have drunk': '"Have drunk" says it is already done, but advice is about what to do "every day".',
+      }],
+      ['She asked me where I ___ the spare key the day before.', 'had hidden', ['have hidden', 'hidden', 'am hiding'], {
+        'had hidden': '"Had hidden" is correct: the hiding happened "the day before" she asked, so it is the earlier of two past times.',
+        'have hidden': '"Have hidden" cannot go with a finished time like "the day before".',
+        'hidden': '"Hidden" needs a helper — "I hidden" is not a sentence. Use "had hidden".',
+        'am hiding': '"Am hiding" means right now, but the hiding happened the day before.',
+      }],
+      ['The teacher asked me what I ___ in my project report the week before.', 'had written', ['have written', 'had wrote', 'am writing'], {
+        'had written': '"Had written" is correct: the writing happened "the week before" the teacher asked, so it is the earlier past action.',
+        'have written': '"Have written" cannot go with a finished time like "the week before".',
+        'had wrote': '"Wrote" is the simple past. After "had", we need the past participle "written".',
+        'am writing': '"Am writing" means right now, but the writing was done the week before.',
+      }],
+      ['When I visited my aunt last year, she told me that she ___ the trophy on her shelf ever since she won it.', 'had kept', ['has kept', 'kept', 'was keeping'], {
+        'had kept': '"Had kept" is correct: "ever since" needs a perfect tense, and she told me during last year\'s visit, so we use "had kept".',
+        'has kept': '"Has kept" reaches up to today, but she told me this during last year\'s visit. After "told me", it moves back to "had kept".',
+        'kept': '"Ever since" needs a perfect tense, with "has" or "had". "Kept" on its own cannot go with "ever since".',
+        'was keeping': '"Ever since" needs a perfect tense. "Was keeping" describes one moment, not a time stretching from the win to the visit.',
+      }],
+      ['The coach asked us what time ___ the next day.', 'we were leaving', ['are we leaving', 'were we leaving', 'we will leave'], {
+        'we were leaving': '"We were leaving" is correct: a reported question is not a real question any more, so the subject comes first ("we were"), and "the next day" tells us the tense moves back.',
+        'are we leaving': '"Are we leaving" is the order for a real question. In a reported question, the subject comes first: "we were leaving".',
+        'were we leaving': '"Were we leaving" has the right tense but question order. In a reported question, the subject comes first: "we were leaving".',
+        'we will leave': '"Will" goes with "tomorrow". "The next day" shows we are reporting the question later, so "will" cannot stay.',
+      }],
+      ['Mrs Tan told the class ___ the hall quietly after the performance.', 'to leave', ['leaving', 'that leaving', 'leave'], {
+        'to leave': '"To leave" is correct: to report an instruction, we use "told" + the person + "to" + verb ("told the class to leave").',
+        'leaving': 'After "told the class", an instruction takes "to leave", not "leaving".',
+        'that leaving': '"That" would need a full clause with a subject and a verb ("that they should leave"). "That leaving" is not a sentence.',
+        'leave': 'After "told the class", we need "to" before the verb: "told the class to leave".',
+      }],
+      ['He mentioned that his father ___ him to the airport that morning.', 'had driven', ['has driven', 'had drove', 'drives'], {
+        'had driven': '"Had driven" is correct: the drive happened that morning, before he mentioned it. ("…his father drove him…" is also correct English.)',
+        'has driven': '"Has driven" cannot go with a finished time like "that morning".',
+        'had drove': '"Drove" is the simple past. After "had", we need the past participle "driven".',
+        'drives': '"Drives" is for now or every day, but "that morning" is in the past.',
+      }],
+      ['The pupils asked when the new science lab ___ ready, and it finally opened a month later.', 'would be', ['will be', 'is', 'has been'], {
+        'would be': '"Would be" is correct: the pupils asked "When will the lab be ready?" The lab has since opened, so we look back and "will" becomes "would".',
+        'will be': '"Will be" points to the future, but the lab already opened a month later. Looking back, "will" becomes "would".',
+        'is': '"Is" talks about now, but the pupils were asking about a time that was still to come.',
+        'has been': '"Has been" says the lab was already ready when they asked, but it only opened a month later.',
+      }],
+      ['The prefect told the younger pupils ___ in the corridor during recess.', 'not to run', ['not run', 'do not run', 'to not running'], {
+        'not to run': '"Not to run" is correct: the prefect said "Don\'t run!", and a reported "don\'t" becomes "not to".',
+        'not run': 'An instruction after "told the younger pupils" needs "to": "not to run".',
+        'do not run': '"Do not run" is what the prefect actually said. Without quotation marks, it becomes "told them not to run".',
+        'to not running': 'After "to" we use the base verb "run", not "running", and "not" comes before "to": "not to run".',
+      }],
+      ['Yesterday afternoon, my brother said that he ___ the reply email before dinner.', 'would send', ['will send', 'sends', 'has sent'], {
+        'would send': '"Would send" is correct: he said "I will send it before dinner". He said it yesterday, so "will" moves back to "would".',
+        'will send': '"Will send" points to the future, but he said this yesterday afternoon and that dinner is over. "Will" moves back to "would".',
+        'sends': '"Sends" is for now or every day, but he was talking about one email before one dinner.',
+        'has sent': '"Has sent" says it was already done, but he was talking about sending it later, before dinner.',
+      }],
     ];
-    const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'speech_reporting', q, choices: buildChoices(answer, ds), answer, explain: 'Reported speech usually shifts tense and pronouns.' };
+    const [q, answer, ds, optionExplanations] = rotate(rows, i);
+    return { subskill: 'speech_reporting', q, choices: buildChoices(answer, ds), answer, explain: 'When we report what someone said, the tense usually moves one step back: will → would, have → had, is → was. Time words like "the day before" and "that evening" show the words are being reported later.', optionExplanations };
   },
   inversion(level, i) {
+    // Review 2026-10-08: "has she noticed", "is Mr Lim" and "has she been"
+    // made correct sentences, so each was replaced with a form that is wrong.
     const rows = [
-      ['Rarely ___ such a neat project display.', 'have we seen', ['we have seen', 'we saw', 'had we see']],
-      ['Not only ___ the plan clear, but it was practical too.', 'was', ['is', 'were', 'has']],
-      ['Hardly ___ when the bell rang.', 'had we sat down', ['we had sat down', 'we sit down', 'have we sat down']],
-      ['Only after checking the data ___ the error.', 'did she notice', ['she noticed', 'has she noticed', 'she notices']],
-      ['Never ___ such a vivid double rainbow before that afternoon.', 'had I seen', ['I had seen', 'I saw', 'have I see']],
-      ['Seldom ___ as generous to the volunteers as he was last weekend.', 'was Mr Lim', ['Mr Lim was', 'is Mr Lim', 'has Mr Lim']],
-      ['No sooner ___ the door than the cat darted out.', 'had I opened', ['I had opened', 'I opened', 'have I opened']],
-      ['Under no circumstances ___ the laboratory unsupervised.', 'should pupils enter', ['pupils should enter', 'pupils enter', 'pupils entered']],
-      ['Little ___ that the surprise party was for him.', 'did Daniel know', ['Daniel knew', 'Daniel did know', 'Daniel has known']],
-      ['So loud ___ that I had to cover my ears immediately.', 'was the thunder', ['the thunder was', 'the thunder is', 'thunder had been']],
-      ['Only when the rain stopped ___ to head home.', 'did we decide', ['we decided', 'we had decided', 'we decide']],
-      ['Not until the last student left ___ to lock up the classroom.', 'did the teacher begin', ['the teacher began', 'the teacher begins', 'began the teacher']],
-      ['So exhausted ___ after the hike that she fell asleep at the dinner table.', 'was Priya', ['Priya was', 'Priya is', 'Priya had been']],
-      ['Only after finishing her corrections ___ allowed to go for recess.', 'was she', ['she was', 'she is', 'has she been']],
-      ['No sooner ___ our seats than the lights in the hall went out.', 'had we taken', ['we had taken', 'we took', 'have we taken']],
-      ['Not only ___ the speech well, but she also received a standing ovation.', 'did she deliver', ['she delivered', 'she did deliver', 'has she delivered']],
-      ['Seldom ___ the canteen as quiet as it was during the examination period.', 'have I found', ['I have found', 'I found', 'I find']],
-      ['Under no circumstances ___ the examination hall once the paper has begun.', 'are pupils to re-enter', ['pupils are to re-enter', 'pupils re-enter', 'pupils should re-enter']],
-      ['Hardly ___ my eyes when the alarm went off again.', 'had I closed', ['I had closed', 'I closed', 'have I closed']],
-      ['Only when the last volunteer had left ___ how much work had been done.', 'did we appreciate', ['we appreciated', 'we did appreciate', 'have we appreciated']],
+      ['Rarely ___ such a neat project display.', 'have we seen', ['we have seen', 'we saw', 'had we see'], {
+        'have we seen': '"Have we seen" is correct: when a sentence starts with "Rarely", the helping verb comes before the subject, as in a question.',
+        'we have seen': 'The tense is right, but after "Rarely" at the start, "have" must come before "we": "have we seen".',
+        'we saw': '"We saw" keeps the normal order. After "Rarely" at the start, we need a helper before the subject: "have we seen".',
+        'had we see': 'After "had", the verb must be the past participle "seen", not "see".',
+      }],
+      ['Not only ___ the plan clear, but it was practical too.', 'was', ['is', 'were', 'has'], {
+        'was': '"Was" is correct: after "Not only", "was" comes before "the plan", and it matches "it was practical" in the second half.',
+        'is': '"Is" is present, but the second half says "it was practical", so both halves need the past.',
+        'were': '"Were" goes with more than one. "The plan" is one thing, so it takes "was".',
+        'has': '"Has the plan clear" is not a complete idea. The sentence describes the plan, so it needs "was".',
+      }],
+      ['Hardly ___ when the bell rang.', 'had we sat down', ['we had sat down', 'we sit down', 'have we sat down'], {
+        'had we sat down': '"Had we sat down" is correct: "Hardly … when" uses the past perfect, and after "Hardly" the helper "had" comes before "we".',
+        'we had sat down': 'The tense is right, but after "Hardly" at the start, "had" must come before "we": "had we sat down".',
+        'we sit down': '"Sit" is present, but the bell "rang" in the past. "Hardly … when" needs "had we sat down".',
+        'have we sat down': '"Have" makes the present perfect, but the bell "rang" in the past. The earlier past action needs "had".',
+      }],
+      ['Only after checking the data ___ the error.', 'did she notice', ['she noticed', 'did she noticed', 'she notices'], {
+        'did she notice': '"Did she notice" is correct: after "Only after …" at the start, we use question order, so "did" comes before "she".',
+        'she noticed': '"She noticed" keeps the normal order. After "Only after …" at the start, we need "did she notice".',
+        'did she noticed': 'After "did", the verb goes back to its base form: "did she notice", not "noticed".',
+        'she notices': '"She notices" is present and keeps the normal order. The sentence needs "did she notice".',
+      }],
+      ['Never ___ such a vivid double rainbow before that afternoon.', 'had I seen', ['I had seen', 'I saw', 'have I see'], {
+        'had I seen': '"Had I seen" is correct: "before that afternoon" means up to a past moment, so we need "had", and after "Never" it comes before "I".',
+        'I had seen': 'The tense is right, but after "Never" at the start, "had" must come before "I": "had I seen".',
+        'I saw': '"I saw" keeps the normal order. After "Never" at the start, we need a helper before "I", and "before that afternoon" needs "had seen".',
+        'have I see': 'After "have", the verb must be "seen", not "see". And "before that afternoon" needs "had", not "have".',
+      }],
+      ['Seldom ___ as generous to the volunteers as he was last weekend.', 'was Mr Lim', ['Mr Lim was', 'were Mr Lim', 'has Mr Lim'], {
+        'was Mr Lim': '"Was Mr Lim" is correct: after "Seldom" at the start, the verb "was" comes before the subject "Mr Lim".',
+        'Mr Lim was': 'After "Seldom" at the start, the verb must come before the subject: "was Mr Lim".',
+        'were Mr Lim': '"Were" goes with more than one. Mr Lim is one person, so we need "was".',
+        'has Mr Lim': '"Has Mr Lim as generous" is missing a verb, so it does not make a sentence. We need "was Mr Lim".',
+      }],
+      ['No sooner ___ the door than the cat darted out.', 'had I opened', ['I had opened', 'I opened', 'have I opened'], {
+        'had I opened': '"Had I opened" is correct: "No sooner … than" uses the past perfect, and after "No sooner" the helper "had" comes before "I".',
+        'I had opened': 'The tense is right, but after "No sooner" at the start, "had" must come before "I".',
+        'I opened': '"No sooner … than" needs the past perfect with the helper first: "had I opened".',
+        'have I opened': '"Have" makes the present perfect, but the cat "darted" out in the past. The earlier past action needs "had".',
+      }],
+      ['Under no circumstances ___ the laboratory unsupervised.', 'should pupils enter', ['pupils should enter', 'pupils enter', 'pupils entered'], {
+        'should pupils enter': '"Should pupils enter" is correct: after "Under no circumstances" at the start, the helper "should" comes before the subject "pupils".',
+        'pupils should enter': 'The words are right but in the wrong order. After "Under no circumstances", "should" must come before "pupils".',
+        'pupils enter': 'After "Under no circumstances" at the start, we need a helper before the subject, such as "should pupils enter".',
+        'pupils entered': '"Pupils entered" is past and keeps the normal order. This is a rule, and it needs "should pupils enter".',
+      }],
+      ['Little ___ that the surprise party was for him.', 'did Daniel know', ['Daniel knew', 'Daniel did know', 'Daniel has known'], {
+        'did Daniel know': '"Did Daniel know" is correct: "Little" at the start means "not at all", and it needs question order: "did Daniel know".',
+        'Daniel knew': '"Daniel knew" keeps the normal order. After "Little" at the start, we need "did Daniel know".',
+        'Daniel did know': 'The words are right but in the wrong order. After "Little", "did" must come before "Daniel".',
+        'Daniel has known': '"Has known" is present perfect and keeps the normal order. The party "was" in the past, so we need "did Daniel know".',
+      }],
+      ['So loud ___ that I had to cover my ears immediately.', 'was the thunder', ['the thunder was', 'the thunder is', 'thunder had been'], {
+        'was the thunder': '"Was the thunder" is correct: when "So" + a describing word starts the sentence, the verb comes before the subject.',
+        'the thunder was': 'After "So loud" at the start, the verb must come before the subject: "was the thunder".',
+        'the thunder is': '"Is" is present, but "I had to cover my ears" is past. The order is also wrong after "So loud".',
+        'thunder had been': 'After "So loud" at the start, the verb must come before the subject, and "thunder" needs "the" here.',
+      }],
+      ['Only when the rain stopped ___ to head home.', 'did we decide', ['we decided', 'we had decided', 'we decide'], {
+        'did we decide': '"Did we decide" is correct: after "Only when …" at the start, the main part of the sentence uses question order.',
+        'we decided': '"We decided" keeps the normal order. After "Only when …" at the start, we need "did we decide".',
+        'we had decided': 'This keeps the normal order, and "had decided" would put the deciding before the rain stopped.',
+        'we decide': '"Decide" is present, but the rain "stopped" in the past. The order is also wrong.',
+      }],
+      ['Not until the last student left ___ to lock up the classroom.', 'did the teacher begin', ['the teacher began', 'the teacher begins', 'began the teacher'], {
+        'did the teacher begin': '"Did the teacher begin" is correct: after "Not until …" at the start, we use question order with "did".',
+        'the teacher began': '"The teacher began" keeps the normal order. After "Not until …" at the start, we need "did the teacher begin".',
+        'the teacher begins': '"Begins" is present, but the student "left" in the past. The order is also wrong.',
+        'began the teacher': 'An ordinary verb like "began" cannot jump in front of the subject. We use "did" instead: "did the teacher begin".',
+      }],
+      ['So exhausted ___ after the hike that she fell asleep at the dinner table.', 'was Priya', ['Priya was', 'Priya is', 'Priya had been'], {
+        'was Priya': '"Was Priya" is correct: when "So" + a describing word starts the sentence, "was" comes before the subject.',
+        'Priya was': 'After "So exhausted" at the start, the verb must come before the subject: "was Priya".',
+        'Priya is': '"Is" is present, but she "fell asleep" in the past. The order is also wrong.',
+        'Priya had been': 'After "So exhausted" at the start, the helper must come before the subject. "Priya had been" keeps the normal order.',
+      }],
+      ['Only after finishing her corrections ___ allowed to go for recess.', 'was she', ['she was', 'she is', 'she has been'], {
+        'was she': '"Was she" is correct: after "Only after …" at the start, the verb comes before the subject.',
+        'she was': 'After "Only after …" at the start, the verb must come before the subject: "was she".',
+        'she is': '"She is" keeps the normal order. After "Only after …", the verb must come first.',
+        'she has been': '"She has been" keeps the normal order. After "Only after …", the helper must come before "she".',
+      }],
+      ['No sooner ___ our seats than the lights in the hall went out.', 'had we taken', ['we had taken', 'we took', 'have we taken'], {
+        'had we taken': '"Had we taken" is correct: "No sooner … than" uses the past perfect, with "had" before "we".',
+        'we had taken': 'The tense is right, but after "No sooner" at the start, "had" must come before "we".',
+        'we took': '"No sooner … than" needs the past perfect with the helper first: "had we taken".',
+        'have we taken': '"Have" makes the present perfect, but the lights "went out" in the past. We need "had".',
+      }],
+      ['Not only ___ the speech well, but she also received a standing ovation.', 'did she deliver', ['she delivered', 'she did deliver', 'has she delivered'], {
+        'did she deliver': '"Did she deliver" is correct: after "Not only" at the start, we use question order with "did".',
+        'she delivered': '"She delivered" keeps the normal order. After "Not only" at the start, we need "did she deliver".',
+        'she did deliver': 'The words are right but in the wrong order. "Did" must come before "she".',
+        'has she delivered': '"Has" makes the present perfect, but she "received" the ovation in the past. Both halves need the past.',
+      }],
+      ['Seldom ___ the canteen as quiet as it was during the examination period.', 'have I found', ['I have found', 'I found', 'I find'], {
+        'have I found': '"Have I found" is correct: after "Seldom" at the start, the helper "have" comes before "I".',
+        'I have found': 'The tense is right, but after "Seldom" at the start, "have" must come before "I".',
+        'I found': '"I found" keeps the normal order. After "Seldom" at the start, we need a helper before the subject.',
+        'I find': '"I find" keeps the normal order. After "Seldom" at the start, we need a helper before the subject.',
+      }],
+      ['Under no circumstances ___ the examination hall once the paper has begun.', 'are pupils to re-enter', ['pupils are to re-enter', 'pupils re-enter', 'pupils should re-enter'], {
+        'are pupils to re-enter': '"Are pupils to re-enter" is correct: after "Under no circumstances" at the start, "are" comes before "pupils". "Are to" here means "must".',
+        'pupils are to re-enter': 'The words are right but in the wrong order. After "Under no circumstances", "are" must come before "pupils".',
+        'pupils re-enter': 'After "Under no circumstances" at the start, we need a helper before the subject.',
+        'pupils should re-enter': '"Should" would work, but it must come before "pupils": "should pupils re-enter".',
+      }],
+      ['Hardly ___ my eyes when the alarm went off again.', 'had I closed', ['I had closed', 'I closed', 'have I closed'], {
+        'had I closed': '"Had I closed" is correct: "Hardly … when" uses the past perfect, with "had" before "I".',
+        'I had closed': 'The tense is right, but after "Hardly" at the start, "had" must come before "I".',
+        'I closed': '"Hardly … when" needs the past perfect with the helper first: "had I closed".',
+        'have I closed': '"Have" makes the present perfect, but the alarm "went off" in the past. We need "had".',
+      }],
+      ['Only when the last volunteer had left ___ how much work had been done.', 'did we appreciate', ['we appreciated', 'we did appreciate', 'have we appreciated'], {
+        'did we appreciate': '"Did we appreciate" is correct: after "Only when …" at the start, we use question order with "did".',
+        'we appreciated': '"We appreciated" keeps the normal order. After "Only when …", we need "did we appreciate".',
+        'we did appreciate': 'The words are right but in the wrong order. "Did" must come before "we".',
+        'have we appreciated': '"Have" makes the present perfect, but the volunteer "had left" in the past. We need "did".',
+      }],
     ];
-    const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'inversion_patterns', q, choices: buildChoices(answer, ds), answer, explain: 'Certain fronted phrases trigger inversion in formal structures.' };
+    const [q, answer, ds, optionExplanations] = rotate(rows, i);
+    return { subskill: 'inversion_patterns', q, choices: buildChoices(answer, ds), answer, explain: 'When a sentence starts with a "not" or "only" word (Never, Rarely, Seldom, Hardly, No sooner, Only when, Not only), put the helping verb before the subject, as in a question.', optionExplanations };
   },
   homophones(level, i) {
     const rows = [
@@ -4615,21 +4824,84 @@ const GRAMMAR_BUILDERS = {
   },
   mixedGrammar(level, i) {
     const rows = [
-      ['Neither the prefect nor the players ___ responsible for the delay.', 'were', ['was', 'is', 'has']],
-      ['By next June, she ___ this school for six years.', 'will have attended', ['has attended', 'attended', 'attends']],
-      ['The worksheet, ___ was printed yesterday, is already outdated.', 'which', ['who', 'whom', 'whose']],
-      ['If they had checked the map earlier, they ___ lost.', 'would not have got', ['do not get', 'will not get', 'have not got']],
-      ['Hardly anyone ___ that the old library would close so suddenly.', 'expected', ['expects', 'has expected', 'is expecting']],
-      ['The athletes, most of ___ are still teenagers, set a new national record.', 'whom', ['who', 'which', 'whose']],
-      ['Either Lisa or her brothers ___ going to lead the orientation tour.', 'are', ['is', 'was', 'has']],
-      ['By the time the festival ends tonight, the dancers ___ for nearly five hours.', 'will have been performing', ['have performed', 'performed', 'will perform']],
-      ['The lost kitten ___ to its owner after a kind passer-by called the number on the collar.', 'was returned', ['returned', 'has returned', 'is returning']],
-      ['Should it ___ tomorrow, the outdoor lesson will move to the hall.', 'rain', ['rains', 'rained', 'is raining']],
-      ['The book ___ I was reading at lunch belongs to my elder sister.', 'that', ['who', 'whose', 'whom']],
-      ['Mei said that she ___ how to swim before she turned six.', 'had learnt', ['has learnt', 'learns', 'is learning']],
+      ['Neither the prefect nor the players ___ responsible for the delay.', 'were', ['was', 'is', 'has'], {
+        'were': '"Were" is correct: with "neither … nor", the verb agrees with the nearer subject, "the players", which is plural.',
+        'was': '"Was" would agree with "the prefect", but the verb follows the nearer subject, "the players".',
+        'is': '"Is" is for one, but the nearer subject, "the players", is more than one.',
+        'has': '"Has responsible" is not English. We need a form of "be": "were responsible".',
+      }],
+      ['By next June, she ___ this school for six years.', 'will have attended', ['has attended', 'attended', 'attends'], {
+        'will have attended': '"Will have attended" is correct: "By next June" looks ahead to a future point and counts the years up to it.',
+        'has attended': '"Has attended" counts up to now, but "By next June" points to the future.',
+        'attended': '"Attended" is past, but "next June" is in the future.',
+        'attends': '"Attends" is for now or every day. "By next June … for six years" needs "will have attended".',
+      }],
+      ['The worksheet, ___ was printed yesterday, is already outdated.', 'which', ['who', 'whom', 'whose'], {
+        'which': '"Which" is correct: it stands for the worksheet, a thing, and it begins the extra information between the commas.',
+        'who': '"Who" is for people, but a worksheet is a thing.',
+        'whom': '"Whom" is for people, but a worksheet is a thing.',
+        'whose': '"Whose" shows belonging and needs a noun after it, like "whose pages". Here the word stands for the worksheet itself.',
+      }],
+      ['If they had checked the map earlier, they ___ lost.', 'would not have got', ['do not get', 'will not get', 'have not got'], {
+        'would not have got': '"Would not have got" is correct: "If they had checked" imagines a past that did not happen, so the result is "would have" + past participle.',
+        'do not get': '"Do not get" is present, but "If they had checked" is about the past.',
+        'will not get': '"Will not get" is for a real future. This sentence imagines a past that did not happen.',
+        'have not got': '"Have not got" describes now. After "If they had …", the result needs "would not have got".',
+      }],
+      ['Hardly anyone ___ that the old library would close so suddenly.', 'expected', ['expects', 'has expected', 'is expecting'], {
+        'expected': '"Expected" is correct: "would close" shows the sentence looks back at the past, so the main verb is past too. ("had expected" would also be correct.)',
+        'expects': '"Expects" is present, but "would close" shows the sentence looks back at the past.',
+        'has expected': '"Has expected" reaches up to now, which does not match "would close". Looking back, we use "expected".',
+        'is expecting': '"Is expecting" is about now, but "would close" looks back at the past.',
+      }],
+      ['The athletes, most of ___ are still teenagers, set a new national record.', 'whom', ['who', 'which', 'whose'], {
+        'whom': '"Whom" is correct: it stands for the athletes, who are people, and it comes straight after the word "of".',
+        'who': 'Straight after a word like "of", we use "whom", not "who": "most of whom".',
+        'which': '"Which" is for things, but athletes are people.',
+        'whose': '"Whose" shows belonging and needs a noun after it, like "whose coach". There is no noun here.',
+      }],
+      ['Either Lisa or her brothers ___ going to lead the orientation tour.', 'are', ['is', 'was', 'has'], {
+        'are': '"Are" is correct: with "either … or", the verb agrees with the nearer subject, "her brothers", which is plural.',
+        'is': '"Is" would agree with "Lisa", but the verb follows the nearer subject, "her brothers".',
+        'was': '"Was" is for one, but the nearer subject, "her brothers", is more than one.',
+        'has': '"Has going" is not English. "Going to" needs a form of "be": "are going".',
+      }],
+      ['By the time the festival ends tonight, the dancers ___ for nearly five hours.', 'will have been performing', ['have performed', 'performed', 'will perform'], {
+        'will have been performing': '"Will have been performing" is correct: "By the time … tonight" looks ahead, and "for nearly five hours" counts how long they keep going up to then.',
+        'have performed': '"Have performed" counts up to now, but the festival ends tonight, in the future.',
+        'performed': '"Performed" is past, but the festival ends tonight, in the future.',
+        'will perform': '"Will perform" says what will happen. "By the time" and "for nearly five hours" need a form that counts up to that point: "will have been performing".',
+      }],
+      // Review 2026-10-08: "The lost kitten returned to its owner" is correct
+      // English (the kitten can go back by itself). "by a kind passer-by"
+      // names who did it, which makes the passive necessary.
+      ['The lost kitten ___ to its owner by a kind passer-by who read the number on its collar.', 'was returned', ['returned', 'has returned', 'is returning'], {
+        'was returned': '"Was returned" is correct: "by a kind passer-by" tells us someone else did the returning, so we need the passive "was returned".',
+        'returned': '"Returned" would mean the kitten went back by itself, but "by a kind passer-by" shows someone else took it back.',
+        'has returned': '"Has returned" makes the kitten do the action. "By a kind passer-by" needs the passive "was returned".',
+        'is returning': '"Is returning" is about now, and it makes the kitten do the action. "By a kind passer-by" needs "was returned".',
+      }],
+      ['Should it ___ tomorrow, the outdoor lesson will move to the hall.', 'rain', ['rains', 'rained', 'is raining'], {
+        'rain': '"Rain" is correct: "Should it rain" means "If it rains". After "should", the verb stays in its base form.',
+        'rains': 'After "should", the verb has no -s: "should it rain".',
+        'rained': 'After "should", the verb stays in its base form: "rain", not "rained".',
+        'is raining': 'After "should", we use the base verb "rain", not "is raining".',
+      }],
+      ['The book ___ I was reading at lunch belongs to my elder sister.', 'that', ['who', 'whose', 'whom'], {
+        'that': '"That" is correct: it stands for the book, a thing. ("Which" would also be correct here.)',
+        'who': '"Who" is for people, but a book is a thing.',
+        'whose': '"Whose" shows belonging and needs a noun after it. Here the word stands for the book itself.',
+        'whom': '"Whom" is for people, but a book is a thing.',
+      }],
+      ['Mei said that she ___ how to swim before she turned six.', 'had learnt', ['has learnt', 'learns', 'is learning'], {
+        'had learnt': '"Had learnt" is correct: she learnt before she turned six, long before she said it, so we use the past perfect. ("Mei said that she learnt…" is also correct English.)',
+        'has learnt': '"Has learnt" cannot go with a finished time like "before she turned six".',
+        'learns': '"Learns" is for now or every day, but "before she turned six" is in the past.',
+        'is learning': '"Is learning" means now, but "before she turned six" is in the past.',
+      }],
     ];
-    const [q, answer, ds] = rotate(rows, i);
-    return { subskill: 'exam_mix', q, choices: buildChoices(answer, ds), answer, explain: 'Use all sentence clues to choose the most accurate grammar form.' };
+    const [q, answer, ds, optionExplanations] = rotate(rows, i);
+    return { subskill: 'exam_mix', q, choices: buildChoices(answer, ds), answer, explain: 'Use every clue in the sentence — the subject, the time words and the linking words — to choose the right form.', optionExplanations };
   },
 };
 
