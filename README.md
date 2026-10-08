@@ -81,13 +81,13 @@ below are the distinct material.
 
 <!-- practice-bank-sizes: checked against the live banks by practiceSeedCoverage.test.js -->
 
-| Module         | Selectable scopes  | Distinct items per scope    | Bank total                 |
-| -------------- | ------------------ | --------------------------- | -------------------------- |
-| Grammar MCQ    | 143 grade/category | 10–23 questions             | 2520 questions, no repeats |
-| Vocabulary MCQ | 132 grade/category | 8–20 questions              | 1928 questions, no repeats |
-| Cloze Castle   | 97 grade/category  | 3–11 passages, 9–33 blanks  | 529 passages, 3193 rounds  |
-| Word Vault     | 84 category/grade  | 6–14 passages, 18–42 blanks | 749 passages, 3101 rounds  |
-| Sentence Forge | 15 grade/track     | 101–111 sentences           | 1559 sentences, no repeats |
+| Module         | Selectable scopes  | Distinct items per scope     | Bank total                 |
+| -------------- | ------------------ | ---------------------------- | -------------------------- |
+| Grammar MCQ    | 143 grade/category | 10–23 questions              | 2520 questions, no repeats |
+| Vocabulary MCQ | 132 grade/category | 8–20 questions               | 1928 questions, no repeats |
+| Cloze Castle   | 97 grade/category  | 3–11 passages, 9–33 blanks   | 529 passages, 3193 rounds  |
+| Word Vault     | 84 category/grade  | 18–26 passages, 54–78 blanks | 1757 passages, 3101 rounds |
+| Sentence Forge | 15 grade/track     | 101–111 sentences            | 1559 sentences, no repeats |
 
 "Rounds" is how many times a child could sit down to a passage in that module
 before running out; "passages" is how many different ones they would have read.
