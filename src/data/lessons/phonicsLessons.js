@@ -12,6 +12,11 @@
  *   script     – 2–4 short teaching lines Giri reads aloud (≤ 140 chars each)
  *   weDoWord   – the guided-practice word (must exist in words.js — the
  *                child and Giri blend it together before independent work)
+ *   spellingRule – optional { rule, examples: [{ parts, result, note }] }:
+ *                a worked "word sum" card for stages whose words change
+ *                spelling (run + ing → running) or split into syllables
+ *                (mag + net → magnet). parts must join to result unless a
+ *                spelling change happens, which the note must explain.
  *   confusions – 0–2 "watch out" pointers shown under the script
  *
  * Stage name, sample words, and sentence examples are NOT duplicated here;
@@ -626,15 +631,27 @@ export const PHONICS_LESSONS = {
 
   /* ── Phase 9 · Suffixes ─────────────────────────────────────────── */
   'suffix-ing': {
-    headline: 'The -ing ending: action happening NOW',
+    headline: 'The -ing ending: an action that keeps going',
     soundChips: [{ g: 'ing', type: 'sf', label: '-ing' }],
     script: [
-      'The ending "-ing" means the action is happening right now: run → running!',
+      'The ending "-ing" shows an action going on: I am jumping. I was running yesterday.',
       'Read the base word first, then add the ending: jump + ing — jumping!',
-      'Try it: r… u… n + ing — running!',
+      'Short vowel and ONE last consonant? Double it before -ing: run → running.',
+      'Silent e at the end? Drop the e, then add the ending: make → making.',
     ],
+    spellingRule: {
+      rule: 'Look at the end of the base word before you add -ing.',
+      examples: [
+        { parts: ['jump', 'ing'], result: 'jumping', note: 'Two consonants at the end: just add -ing.' },
+        { parts: ['run', 'ing'], result: 'running', note: 'Short u, one n: double the n.' },
+        { parts: ['make', 'ing'], result: 'making', note: 'Silent e: drop the e first.' },
+      ],
+    },
     weDoWord: 'running',
-    confusions: ['Some short base words double their last letter first: run → running, sit → sitting.'],
+    confusions: [
+      'Why double? "runing" would say a long u, like "rune". Two n\'s keep the u short.',
+      'Only double after ONE short vowel letter: eat → eating, read → reading. No double!',
+    ],
   },
   'suffix-ed': {
     headline: 'The -ed ending: it already happened',
@@ -643,7 +660,16 @@ export const PHONICS_LESSONS = {
       'The ending "-ed" means the action already happened: jump → jumped.',
       'Sneaky fact: -ed has THREE sounds! /t/ in "jumped", /d/ in "played", /id/ in "wanted".',
       'Read the base word, add the ending, then check which -ed sound fits.',
+      'The -ing spelling rules work here too: stop → stopped, hope → hoped.',
     ],
+    spellingRule: {
+      rule: 'Same checks as -ing: double after a short vowel, drop a silent e.',
+      examples: [
+        { parts: ['jump', 'ed'], result: 'jumped', note: 'Two consonants at the end: just add -ed.' },
+        { parts: ['stop', 'ed'], result: 'stopped', note: 'Short o, one p: double the p.' },
+        { parts: ['hope', 'ed'], result: 'hoped', note: 'Silent e: drop the e, then add -ed.' },
+      ],
+    },
     weDoWord: 'jumped',
     confusions: ['Don\'t say "jump-ed" as two beats — in "jumped" the -ed is just a quick /t/.'],
   },
@@ -651,12 +677,24 @@ export const PHONICS_LESSONS = {
     headline: 'The -er ending: comparing two things',
     soundChips: [{ g: 'er', type: 'sf', label: '-er' }],
     script: [
-      'Add "-er" to compare two things: fast → faster, big → bigger.',
+      'Add "-er" to compare two things: a cat is fast, but a cheetah is faster.',
       'Read the base word first, then the ending: fast + er — faster!',
-      'Try it: f… a… s… t + er — faster!',
+      'Short vowel and ONE last consonant? Double it: big → bigger, hot → hotter.',
+      'Silent e at the end? Drop the e, then add -er: nice → nicer.',
     ],
+    spellingRule: {
+      rule: 'Look at the end of the base word before you add -er.',
+      examples: [
+        { parts: ['fast', 'er'], result: 'faster', note: 'Two consonants at the end: just add -er.' },
+        { parts: ['big', 'er'], result: 'bigger', note: 'Short i, one g: double the g.' },
+        { parts: ['nice', 'er'], result: 'nicer', note: 'Silent e: drop the e first.' },
+      ],
+    },
     weDoWord: 'faster',
-    confusions: [],
+    confusions: [
+      'The -er ending sounds just like Bossy R "er" in "her". You already know this sound!',
+      '-er can also mean "a person who": teach → teacher, farm → farmer.',
+    ],
   },
   'suffix-est': {
     headline: 'The -est ending: the MOST of all',
@@ -664,8 +702,17 @@ export const PHONICS_LESSONS = {
     script: [
       'Add "-est" for the most of all: fast → fastest — nobody is faster!',
       '-er compares two; -est compares everyone: faster than Sam, but the fastest in class.',
+      'Same spelling rules as -er: big → biggest (double the g), nice → nicest (drop the e).',
       'Try it: f… a… s… t + est — fastest!',
     ],
+    spellingRule: {
+      rule: 'Look at the end of the base word before you add -est.',
+      examples: [
+        { parts: ['fast', 'est'], result: 'fastest', note: 'Two consonants at the end: just add -est.' },
+        { parts: ['big', 'est'], result: 'biggest', note: 'Short i, one g: double the g.' },
+        { parts: ['nice', 'est'], result: 'nicest', note: 'Silent e: drop the e first.' },
+      ],
+    },
     weDoWord: 'fastest',
     confusions: ['-er = comparing two. -est = the champion of all. "Faster" vs "fastest".'],
   },
@@ -694,15 +741,28 @@ export const PHONICS_LESSONS = {
     confusions: ['"-tion" looks like "tee-on" but always says /shun/. Nation, station, action.'],
   },
   'multisyllable': {
-    headline: 'Big words: read them chunk by chunk',
+    headline: 'Big words: split them into chunks',
     soundChips: [],
     script: [
-      'Long words are just small chunks holding hands: mar + ket — market!',
-      'Clap the beats to find the chunks: "jun-gle" has two claps.',
-      'Read each chunk, then join them: mar + ket — market!',
+      'Every chunk (syllable) has one vowel sound. Find the vowels first, then split.',
+      'Two consonants between the vowels? Split between them: mag | net, mar | ket.',
+      'One consonant? Split before it: ti | ger. If that sounds wrong, split after: plan | et.',
+      'Ends in a consonant + le? That consonant joins the le: jun | gle, puz | zle.',
     ],
+    spellingRule: {
+      rule: 'Spot the vowels, look at the consonants between them, then split.',
+      examples: [
+        { parts: ['mag', 'net'], result: 'magnet', note: 'Two consonants: split between them.' },
+        { parts: ['ti', 'ger'], result: 'tiger', note: 'Open chunk "ti" ends in a vowel, so i says its name.' },
+        { parts: ['plan', 'et'], result: 'planet', note: 'Closed chunk "plan" ends in a consonant, so a is short.' },
+        { parts: ['jun', 'gle'], result: 'jungle', note: 'Consonant + le makes the last chunk.' },
+      ],
+    },
     weDoWord: 'market',
-    confusions: ['Don\'t rush — find the chunks first. Every chunk has one vowel sound.'],
+    confusions: [
+      'Don\'t rush. Split the word, read each chunk, then join them: mar + ket — market!',
+      'Count the vowel sounds to count the chunks: fam | i | ly has three.',
+    ],
   },
   'sight-highfreq': {
     headline: 'Tricky words: find the tricky part',
