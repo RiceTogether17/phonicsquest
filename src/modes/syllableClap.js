@@ -1,7 +1,7 @@
 /**
  * Clap the Syllables Mode  (Phonemic Awareness — Syllable Counting)
  *
- * Inspired by "Let's All Clap" from Foundations phonics: hear a word,
+ * A clapping game: hear a word,
  * clap once per syllable (don-key = 2 claps), then pick the count.
  * Distinct from Sound Count, which counts *phonemes*. Syllables are
  * the wider beat — a CVC word has 3 phonemes but 1 syllable.

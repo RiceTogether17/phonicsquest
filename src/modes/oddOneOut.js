@@ -1,7 +1,7 @@
 /**
  * Odd One Out Mode  (Phonemic Awareness — Initial-Phoneme Discrimination)
  *
- * Digital adaptation of the Foundations "Which Doesn't Belong?" activity:
+ * A "Which Doesn't Belong?" activity:
  * three picture cards share the same first sound and one distractor does
  * not — the child works out which one doesn't belong.
  *

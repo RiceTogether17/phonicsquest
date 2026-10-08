@@ -1,8 +1,7 @@
 /**
  * Count the Words Mode  (Phonological Awareness — Word Counting)
  *
- * Digital adaptation of the Foundations "Word Counting / Finger Counting"
- * activity: the teacher says a sentence, the children repeat it while
+ * A word counting / finger counting activity: the teacher says a sentence, the children repeat it while
  * counting each word on their fingers, then answer "how many words?".
  * Word counting develops spoken fluency and implicitly teaches sentence
  * structure — the earliest level of phonological awareness, before

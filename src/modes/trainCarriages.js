@@ -1,8 +1,7 @@
 /**
  * Train Carriages Mode  (Phonemic Awareness — Initial Phoneme Collection)
  *
- * Inspired by the "Train Carriages" classroom activity from Foundations
- * phonics: a target initial sound is announced, 4–6 picture cards are
+ * A classroom-style activity: a target initial sound is announced, 4–6 picture cards are
  * laid out, and the child taps every card that starts with the target
  * sound. Each correct tap "joins" the card to a growing train as a
  * new carriage. Round ends when all matching cards are collected;
