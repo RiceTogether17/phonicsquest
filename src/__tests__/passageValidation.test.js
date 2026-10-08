@@ -13,6 +13,7 @@ const POS_VALUES = new Set([
   'article/determiner',
   'determiner',
   'preposition',
+  'conjunction',
 ]);
 
 function buildAffixParts(answer, hint = '') {

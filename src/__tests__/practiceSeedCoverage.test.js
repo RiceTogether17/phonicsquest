@@ -80,9 +80,12 @@ describe('the audit’s measurements still hold (finding 12)', () => {
     expect(m).toEqual({ shown: 27, blanks: 102, bodies: 4, sequences: 4 });
   });
 
-  it('P6 Context Inference is 38 passages and 114 blanks built from ten bodies', () => {
+  it('P6 Context Inference is 38 passages and 114 blanks, now built from 22 bodies', () => {
+    // The audit found ten. The generator now gives P4–P6 their own three
+    // bodies and pairs every body with every school context, instead of
+    // moving body and context in step.
     const m = measure(vocabPassages.contextInference.p6);
-    expect(m).toEqual({ shown: 38, blanks: 114, bodies: 10, sequences: 5 });
+    expect(m).toEqual({ shown: 38, blanks: 114, bodies: 22, sequences: 5 });
   });
 
   it('seed ids collapse each scope to exactly the material it holds', () => {
