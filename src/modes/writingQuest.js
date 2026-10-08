@@ -1,6 +1,7 @@
 import { WRITING_LEVELS, writingPrompts } from '../data/writingPrompts.js';
 import {
   WRITING_TRACKS,
+  PLAN_GUIDE,
   getTracksForLevel,
   getLessonsForTrack,
 } from '../data/writingLessonPacks.js';
@@ -27,7 +28,13 @@ import {
   getRemediationPath,
   getParagraphMissionStatus,
 } from '../modules/writingLessonEngine.js';
-import { renderDrill, collectDrillAnswers, gradeDrills } from '../modules/writingReviseDrills.js';
+import {
+  renderDrill,
+  collectDrillAnswers,
+  gradeDrills,
+  bindArrangeDrills,
+  describeDrillResult,
+} from '../modules/writingReviseDrills.js';
 import {
   getTrackProgress,
   setTrackProgress,
@@ -227,8 +234,11 @@ function _renderLearn(item) {
     ${resumeHtml}
     <div class="dash-pattern-item"><strong>Skill focus:</strong> ${item.skillFocus.join(' · ')}</div>
     <ul class="dash-pattern-item">${(item.introTeaching || []).map((line) => `<li>${line}</li>`).join('')}</ul>
+    ${(item.teachCards || []).map(_renderTeachCard).join('')}
     ${item.storyStarterChoices?.length ? `<div class="dash-pattern-item"><strong>Story Starter Cards</strong>${item.storyStarterChoices.map((s, i) => `<label style="display:block;margin:6px 0"><input type="radio" name="starter" value="${i}" ${i === 0 ? 'checked' : ''}/> ${s}</label>`).join('')}</div>` : ''}
     <div class="sfq-actions"><button class="btn btn--primary" id="wq-next">Next: Revise Drills</button><button class="btn btn--ghost btn--sm" id="wq-menu">Menu</button></div></div>`;
+
+  _bindReadAloud(item.teachCards || []);
 
   // Resume button: restore saved state and jump to saved phase
   document.getElementById('wq-resume')?.addEventListener('click', () => {
@@ -264,28 +274,112 @@ function _renderLearn(item) {
   });
 }
 
+/**
+ * A worked-example card on the Learn page: the rule in kid language, then a
+ * "telling" vs "showing" pair and/or labelled examples, so the child sees the
+ * skill used before being asked to use it.
+ */
+function _renderTeachCard(card, idx) {
+  return `<section class="dash-pattern-item wq-teach-card" aria-labelledby="wq-teach-${idx}">
+    <h4 id="wq-teach-${idx}" style="margin:0 0 4px">${card.title}
+      <button type="button" class="btn btn--ghost btn--sm" data-read-card="${idx}" aria-label="Read “${card.title}” aloud">🔊</button></h4>
+    ${card.explain ? `<p>${card.explain}</p>` : ''}
+    ${card.tell ? `<p><strong>❌ Weaker:</strong> ${card.tell}</p>` : ''}
+    ${card.show ? `<p><strong>✅ Stronger:</strong> ${card.show}</p>` : ''}
+    ${card.steps?.length ? `<ol>${card.steps.map((s) => `<li>${s}</li>`).join('')}</ol>` : ''}
+    ${card.examples?.length ? `<ul>${card.examples.map((e) => `<li><strong>${e.label}:</strong> ${e.text}</li>`).join('')}</ul>` : ''}
+    ${card.tip ? `<p>💡 ${card.tip}</p>` : ''}
+  </section>`;
+}
+
+function _teachCardSpeech(card) {
+  return [
+    card.title,
+    card.explain,
+    card.tell && `Weaker: ${card.tell}`,
+    card.show && `Stronger: ${card.show}`,
+    ...(card.steps || []),
+    ...(card.examples || []).map((e) => `${e.label}: ${e.text}`),
+    card.tip,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .replace(/·/g, ',');
+}
+
+function _bindReadAloud(cards) {
+  _container.querySelectorAll('[data-read-card]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const card = cards[Number(btn.dataset.readCard)];
+      if (!card) return;
+      // Loaded on first tap: the audio module sets up speech synthesis when it
+      // is imported, which nothing else in Writing Quest needs.
+      const { audio } = await import('../modules/audio.js');
+      audio.cancelSpeech?.();
+      audio.speakText(_teachCardSpeech(card));
+    });
+  });
+}
+
+/** Vocabulary with meanings and an example, falling back to the bare list. */
+function _renderWordBucket(item) {
+  if (!item.wordBucket?.length) {
+    return `<div class="dash-pattern-item"><strong>Vocabulary:</strong> ${(item.vocabRevision || []).join(', ')}</div>`;
+  }
+  return `<div class="dash-pattern-item"><strong>🪣 Word bucket</strong><ul>${item.wordBucket
+    .map((w) => `<li><strong>${w.word}</strong>: ${w.meaning}. <em>${w.example}</em></li>`)
+    .join('')}</ul></div>`;
+}
+
 function _renderRevisePrep(item) {
   const drills = item.reviseDrills || [];
   _container.innerHTML = `<div class="sfq-game"><h3 class="cloze-title">Revise: Toolbox Drills</h3>
-    <div class="dash-pattern-item"><strong>Vocabulary:</strong> ${item.vocabRevision.join(', ')}</div>
+    ${_renderWordBucket(item)}
     <div class="dash-pattern-item"><strong>Spelling:</strong> ${item.spellingRevision.join(', ')}</div>
-    ${drills.map((drill, idx) => renderDrill(drill, idx)).join('')}
-    <div class="sfq-actions"><button class="btn btn--primary" id="wq-drill-submit">Submit Drills</button></div>
-    <div id="wq-drill-msg" class="dash-pattern-item">Pass at least 60% to unlock planning.</div></div>`;
+    ${drills.map((drill, idx) => `<div class="wq-drill" data-drill-index="${idx}">${renderDrill(drill, idx)}<div class="wq-drill-why" id="wq-drill-why-${idx}" aria-live="polite" hidden></div></div>`).join('')}
+    <div class="sfq-actions"><button class="btn btn--primary" id="wq-drill-submit">Check My Answers</button><button class="btn btn--primary" id="wq-to-plan" hidden>Next: Plan My Story</button></div>
+    <div id="wq-drill-msg" class="dash-pattern-item" aria-live="polite">Get at least 60% right to unlock planning.</div></div>`;
+
+  bindArrangeDrills(_container);
 
   document.getElementById('wq-drill-submit')?.addEventListener('click', () => {
     const answers = collectDrillAnswers(_container, drills.length);
     const result = gradeDrills(drills, answers);
+    // Every drill gets feedback. Before a pass, wrong answers get a hint (the
+    // rule) so the retry is still practice; after a pass, each drill shows the
+    // right answer and why, so a lucky guess still teaches something.
+    drills.forEach((drill, idx) => {
+      const box = document.getElementById(`wq-drill-why-${idx}`);
+      if (!box) return;
+      const fb = describeDrillResult(drill, result.results[idx], { reveal: result.passed });
+      box.hidden = false;
+      // Plain text, not the big success/error banner: this is a note to read.
+      box.className = 'wq-drill-why dash-pattern-item';
+      box.style.borderLeft = `4px solid ${fb.correct ? 'var(--success, #2e7d32)' : 'var(--warning, #ed6c02)'}`;
+      const lines = [
+        `${fb.correct ? '✅' : '💡'} ${fb.title}`,
+        fb.answer && `Answer: ${fb.answer}`,
+        fb.why,
+      ].filter(Boolean);
+      box.replaceChildren(
+        ...lines.map((text) => Object.assign(document.createElement('p'), { textContent: text })),
+      );
+    });
     const msg = document.getElementById('wq-drill-msg');
     if (!result.passed) {
       if (msg)
-        msg.textContent = `You scored ${result.correctCount}/${result.total}. Try again to unlock planning.`;
+        msg.textContent = `You got ${result.correctCount}/${result.total}. Read the hints, change your answers and check again.`;
       return;
     }
-    if (msg) msg.textContent = `Great! ${result.correctCount}/${result.total}. Planning unlocked.`;
-    _phase = 'plan';
-    if (_track) updatePhase(_track.id, _idx, 'plan');
-    setTimeout(_render, 500);
+    if (msg)
+      msg.textContent = `Great! ${result.correctCount}/${result.total}. Read why each answer is right, then plan your story.`;
+    document.getElementById('wq-drill-submit')?.setAttribute('disabled', 'true');
+    document.getElementById('wq-to-plan')?.removeAttribute('hidden');
+    document.getElementById('wq-to-plan')?.addEventListener('click', () => {
+      _phase = 'plan';
+      if (_track) updatePhase(_track.id, _idx, 'plan');
+      _render();
+    });
   });
   document.getElementById('wq-menu')?.addEventListener('click', () => {
     cleanupWritingQuest();
@@ -302,8 +396,13 @@ function _renderPlan(item) {
     'conclusion',
   ];
   _container.innerHTML = `<div class="sfq-game"><h3 class="cloze-title">Plan: Plot Builder</h3>
-    <p class="sfq-instruction">Fill every core box before drafting.</p>
-    <div class="dash-pattern-item">${fields.map((field) => `<label style="display:block;margin:8px 0"><strong>${field}</strong><textarea data-plan="${field}" class="cp-name-input" rows="2" placeholder="Plan this part..."></textarea></label>`).join('')}</div>
+    <p class="sfq-instruction">Answer each question in a few words. Notes are fine. You do not need full sentences yet.</p>
+    <div class="dash-pattern-item">${fields
+      .map((field) => {
+        const guide = PLAN_GUIDE[field] || { label: field, ask: 'Plan this part.' };
+        return `<label style="display:block;margin:8px 0"><strong>${guide.label}</strong><span style="display:block;font-size:0.9em;color:var(--text-muted)">${guide.ask}</span><textarea data-plan="${field}" class="cp-name-input" rows="2" placeholder="My notes..."></textarea></label>`;
+      })
+      .join('')}</div>
     <div class="sfq-actions"><button class="btn btn--primary" id="wq-plan-next">Unlock Draft</button></div>
     <div id="wq-plan-msg" class="dash-pattern-item">All core plot boxes need at least one short sentence.</div></div>`;
   // Restore saved plan values if resuming
@@ -343,6 +442,7 @@ function _renderDraft(item) {
     <div class="dash-pattern-item"><strong>Paragraph Missions</strong><ul id="wq-mission-list">${(item.paragraphMissions || []).map((m) => `<li>${typeof m === 'string' ? m : m.text}</li>`).join('')}</ul></div>
     <div class="dash-pattern-item"><strong>Checkpoints:</strong><ul>${(lessonForEval.requiredChecks || []).map((c) => `<li>${c.label}</li>`).join('')}</ul></div>
     <p class="dash-pattern-item">🧰 Support words: ${(item.supportWords || []).join(', ')}</p>
+    ${item.wordBucket?.length ? `<p class="dash-pattern-item">🪣 Word bucket: ${item.wordBucket.map((w) => w.word).join(', ')}</p>` : ''}
     <textarea id="wq-text" class="cp-name-input" rows="9" placeholder="Write your draft...">${_escapeHtml(restoredText)}</textarea>
     <div class="sfq-actions"><button class="btn btn--primary" id="wq-submit">Submit Draft</button></div>
     <div class="dash-pattern-item" id="wq-live-detector">Start typing to see instant writing feedback.</div>
@@ -773,10 +873,12 @@ function _renderBossQuiz(item) {
   document.getElementById('wq-boss-form')?.addEventListener('submit', (e) => {
     e.preventDefault();
     let score = 0;
+    const missed = [];
     // Grade MCQ questions
-    quiz.questions.forEach((q) => {
+    quiz.questions.forEach((q, idx) => {
       const val = Number(_container.querySelector(`input[name="${q.id}"]:checked`)?.value);
       if (val === q.answer) score++;
+      else missed.push({ num: idx + 1, q });
     });
     // Grade constructed-response items
     (quiz.constructedItems || []).forEach((ci) => {
@@ -790,6 +892,7 @@ function _renderBossQuiz(item) {
       fb.hidden = false;
       fb.className = `sfq-feedback sfq-feedback--${passed ? 'success' : 'error'}`;
       fb.innerHTML = `<p>${passed ? 'Boss defeated!' : 'Boss is still standing — review and retry!'} ${score}/${totalItems}</p>
+      ${_renderBossReview(missed, passed)}
       <button class="btn btn--primary" id="wq-boss-next" style="margin-top:8px">${passed ? 'Finish Track' : 'Retry Boss Check'}</button>`;
     }
     document.getElementById('wq-boss-next')?.addEventListener('click', () => {
@@ -797,6 +900,24 @@ function _renderBossQuiz(item) {
       _render();
     });
   });
+}
+
+/**
+ * Questions the child got wrong. After a pass they see the answer and why;
+ * before a pass they see why without the answer, so the retry still asks
+ * them to think.
+ */
+function _renderBossReview(missed, passed) {
+  if (!missed.length) return '';
+  return `<div class="wq-boss-review"><p><strong>Learn from these:</strong></p><ul>${missed
+    .map(({ num, q }) => {
+      const answer = passed ? ` Answer: ${q.options[q.answer]}.` : '';
+      const why = passed
+        ? q.why || ''
+        : 'Look back at what this question is testing and try again.';
+      return `<li>Q${num}.${answer} ${why}</li>`;
+    })
+    .join('')}</ul></div>`;
 }
 
 function _renderBossConstructedItem(ci, displayIdx) {

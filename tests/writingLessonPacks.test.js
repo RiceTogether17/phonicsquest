@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   writingLessonPacks,
   WRITING_TRACKS,
+  PLAN_GUIDE,
   getLessonsForTrack,
   getTracksForLevel,
   validateLessonPackSchema,
@@ -19,7 +20,14 @@ import {
   _splitIntoSections,
   _inferMissionSection,
 } from '../src/modules/writingLessonEngine.js';
-import { renderDrill, gradeDrills, DRILL_RENDERERS } from '../src/modules/writingReviseDrills.js';
+import {
+  renderDrill,
+  gradeDrills,
+  collectDrillAnswers,
+  bindArrangeDrills,
+  describeDrillResult,
+  DRILL_RENDERERS,
+} from '../src/modules/writingReviseDrills.js';
 import { store } from '../src/modules/store.js';
 import {
   getTrackProgress,
@@ -505,5 +513,136 @@ describe('boss check data', () => {
     const totalItems =
       boss1.bossQuiz.questions.length + (boss1.bossQuiz.constructedItems?.length || 0);
     expect(boss1.bossQuiz.passMark).toBeLessThanOrEqual(totalItems);
+  });
+});
+
+// ── P3 Term 1 teaching content ──────────────────────────────────────────────
+
+describe('P3 Term 1 teaching content', () => {
+  const t1 = getLessonsForTrack('p3t1Creative');
+  const t1Lessons = t1.filter((p) => p.lessonType !== 'bossQuiz');
+
+  it('teaches each lesson with worked-example cards before asking for writing', () => {
+    t1Lessons.forEach((pack) => {
+      expect(pack.teachCards?.length, pack.id).toBeGreaterThan(0);
+      pack.teachCards.forEach((card) => {
+        expect(card.title).toBeTruthy();
+        expect(card.explain).toBeTruthy();
+        // A card must model the skill, not just describe it.
+        expect(Boolean(card.show || card.examples?.length || card.steps?.length)).toBe(true);
+      });
+    });
+  });
+
+  it('gives every word-bucket word a meaning and an example that uses it', () => {
+    t1Lessons.forEach((pack) => {
+      expect(pack.wordBucket?.length, pack.id).toBeGreaterThan(0);
+      pack.wordBucket.forEach((w) => {
+        expect(w.meaning).toBeTruthy();
+        expect(w.example.toLowerCase()).toContain(w.word.toLowerCase());
+      });
+    });
+  });
+
+  it('explains every revise drill with a hint and a why', () => {
+    t1Lessons.forEach((pack) => {
+      pack.reviseDrills.forEach((drill) => {
+        expect(drill.hint, `${pack.id}: ${drill.question}`).toBeTruthy();
+        expect(drill.why, `${pack.id}: ${drill.question}`).toBeTruthy();
+      });
+    });
+  });
+
+  it('has answer keys that point at a real option', () => {
+    Object.values(writingLessonPacks).forEach((pack) => {
+      (pack.reviseDrills || []).forEach((drill) => {
+        if (drill.type === 'arrange_sequence') {
+          const sorted = [...drill.correctOrder].sort((a, b) => a - b);
+          expect(sorted).toEqual(drill.sentences.map((_, i) => i));
+        } else if (drill.options) {
+          expect(drill.options[drill.correctIndex], drill.question).toBeDefined();
+        }
+      });
+      (pack.bossQuiz?.questions || []).forEach((q) => {
+        expect(q.options[q.answer], q.q).toBeDefined();
+      });
+    });
+  });
+
+  it('explains every T1 boss question', () => {
+    writingLessonPacks['p3-boss-quiz'].bossQuiz.questions.forEach((q) => {
+      expect(q.why, q.q).toBeTruthy();
+    });
+  });
+
+  it('has a child-friendly label and question for every plan box', () => {
+    const fields = new Set(
+      Object.values(writingLessonPacks).flatMap((p) => p.plotPlanTemplate || []),
+    );
+    fields.forEach((field) => {
+      expect(PLAN_GUIDE[field]?.label, field).toBeTruthy();
+      expect(PLAN_GUIDE[field]?.ask, field).toBeTruthy();
+    });
+  });
+});
+
+describe('drill feedback', () => {
+  const drill = {
+    type: 'vocab_mcq',
+    options: ['creaked', 'sizzled'],
+    correctIndex: 0,
+    hint: 'Think of an old door.',
+    why: 'Old doors creak.',
+  };
+
+  it('gives a hint, not the answer, while the child is still trying', () => {
+    const fb = describeDrillResult(drill, { correct: false });
+    expect(fb.answer).toBe('');
+    expect(fb.why).toBe('Think of an old door.');
+  });
+
+  it('shows the answer and why once the round is passed', () => {
+    const fb = describeDrillResult(drill, { correct: false }, { reveal: true });
+    expect(fb.answer).toBe('creaked');
+    expect(fb.why).toBe('Old doors creak.');
+  });
+
+  it('explains a correct answer too', () => {
+    expect(describeDrillResult(drill, { correct: true }).why).toBe('Old doors creak.');
+  });
+});
+
+describe('arrange-sequence drill interaction', () => {
+  const drill = {
+    type: 'arrange_sequence',
+    sentences: ['First.', 'Second.', 'Third.'],
+    correctOrder: [0, 1, 2],
+  };
+
+  function mount() {
+    const root = document.createElement('div');
+    root.innerHTML = renderDrill(drill, 0);
+    bindArrangeDrills(root);
+    const byText = (t) =>
+      Array.from(root.querySelectorAll('.arrange-item')).find((el) => el.textContent.includes(t));
+    return { root, byText };
+  }
+
+  it('records the order the child taps, not the shuffled screen order', () => {
+    const { root, byText } = mount();
+    ['First.', 'Second.', 'Third.'].forEach((t) => byText(t).click());
+    const answers = collectDrillAnswers(root, 1);
+    expect(answers[0]).toBe('0,1,2');
+    expect(gradeDrills([drill], answers).correctCount).toBe(1);
+    expect(byText('Third.').querySelector('.arrange-number').textContent).toBe('3');
+  });
+
+  it('lets the child undo a tap and everything after it', () => {
+    const { root, byText } = mount();
+    byText('Second.').click();
+    byText('First.').click();
+    byText('Second.').click(); // undo: clears Second (1st) and First (2nd)
+    ['First.', 'Second.', 'Third.'].forEach((t) => byText(t).click());
+    expect(collectDrillAnswers(root, 1)[0]).toBe('0,1,2');
   });
 });
