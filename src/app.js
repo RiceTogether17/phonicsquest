@@ -26,6 +26,7 @@ import * as mistakesDenPanel from './components/panels/mistakesDenPanel.js';
 import * as trophyRoomPanel from './components/panels/trophyRoomPanel.js';
 import { html, raw } from './utils/html.js';
 import { audio } from './modules/audio.js';
+import { LISTENING_MODES, spokenInstructionFor } from './modules/spokenInstructions.js';
 import { gamification } from './modules/gamification.js';
 import { badges } from './modules/badges.js';
 import { progress, isStageHiddenForMode } from './modules/progress.js';
@@ -198,6 +199,10 @@ class App {
     this._workoutWord = null;
     /** @type {number} words completed in current session */
     this._sessionWordCount = 0;
+    /** @type {Set<string>} games whose spoken instruction already played this visit */
+    this._introsPlayed = new Set();
+    /** Bumped by every _startGame so a late intro can't set up a stale round. */
+    this._startToken = 0;
 
     /** @type {boolean} hint used for current word (no heart loss on 1st wrong if unused) */
     this._hintUsed = false;
@@ -289,6 +294,7 @@ class App {
       wordEmoji: document.getElementById('word-emoji'),
       phonemeRow: document.getElementById('phoneme-row'),
       modeInstruction: document.getElementById('mode-instruction'),
+      btnHearInstruction: document.getElementById('btn-hear-instruction'),
       modeArea: document.getElementById('mode-area'),
 
       btnCheck: document.getElementById('btn-check'),
@@ -347,6 +353,8 @@ class App {
 
     this._els.btnBack?.addEventListener('click', () => {
       this._cleanupMode();
+      audio.cancelSpeech();
+      this._introsPlayed.clear();
       this._sessionWordCount = 0;
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
@@ -687,6 +695,7 @@ class App {
     });
 
     this._els.btnSayIt?.addEventListener('click', () => this._handleSayIt());
+    this._els.btnHearInstruction?.addEventListener('click', () => this._speakModeInstruction());
 
     this._els.btnHint?.addEventListener('click', () => {
       this._giveHint();
@@ -951,16 +960,50 @@ class App {
       this._maybeRenderAdultVerdict();
     };
 
+    // A child who can't read yet needs to hear what the game wants. The
+    // first word of each game opens with Giri saying the instruction; the
+    // word's own audio waits until that line has finished. If the child
+    // leaves or a new round starts while Giri is talking, the stale setup
+    // is dropped.
+    const startToken = ++this._startToken;
+    const introThenSetup = () => {
+      if (this._introsPlayed.has(this._mode)) {
+        setupMode();
+        return;
+      }
+      this._introsPlayed.add(this._mode);
+      const line = spokenInstructionFor(this._mode);
+      if (this._els.modeInstruction) this._els.modeInstruction.textContent = line;
+      const spoken = line ? audio.speakText(line) : Promise.resolve();
+      const go = () => {
+        if (startToken !== this._startToken || this._screen !== SCREENS.GAME) return;
+        setupMode();
+      };
+      spoken.then(go, go);
+    };
+
     // Explicit instruction first: the first time a child practises a
     // curriculum stage, Giri teaches it (mini-lesson overlay) before
     // independent practice begins. Wheel "free play" groups (short-a, …)
-    // don't map to a stage and start immediately.
-    const lessonStage = this._sessionType === 'normal' && group ? findStageForGroup(group) : null;
+    // don't map to a stage and start immediately. Listening games skip the
+    // lesson: it teaches reading a printed pattern, which those games never
+    // ask for, so it waits until the child plays a reading game.
+    const lessonStage =
+      this._sessionType === 'normal' && group && !LISTENING_MODES.has(this._mode)
+        ? findStageForGroup(group)
+        : null;
     if (lessonStage && !hasSeenLesson(`phonics:${lessonStage.id}`)) {
-      maybeShowStageLesson(group).then(setupMode, setupMode);
+      maybeShowStageLesson(group).then(introThenSetup, introThenSetup);
     } else {
-      setupMode();
+      introThenSetup();
     }
+  }
+
+  /** Say the current game's instruction again ("What do I do?" button). */
+  _speakModeInstruction() {
+    const shown = this._els.modeInstruction?.textContent || '';
+    const line = spokenInstructionFor(this._mode, shown);
+    if (line) audio.speakText(line);
   }
 
   /**
@@ -1061,6 +1104,7 @@ class App {
           this._els.wordDisplay,
           this._els.wordEmoji,
           this._els.modeInstruction,
+          this._els.btnHearInstruction,
           this._els.btnSayIt,
           this._els.btnHint,
           this._els.btnCheck,
@@ -2781,18 +2825,7 @@ class App {
     // Listening-first modes don't require decoding, so the strict decoding
     // gate would lock out exactly the pre-readers these games exist for.
     // Every stage stays open; word difficulty still rises stage by stage.
-    const ORAL_MODES = new Set([
-      'first',
-      'last',
-      'middle',
-      'oralBlend',
-      'soundCount',
-      'oralSegment',
-      'oddOneOut',
-      'train',
-      'wordCount',
-    ]);
-    const isOralMode = ORAL_MODES.has(mode);
+    const isOralMode = LISTENING_MODES.has(mode);
     const unlocked = isOralMode ? stagesForMode.map((s) => s.id) : getUnlockedStages(snapshot);
     const recommended = getRecommendedStage(snapshot);
 
