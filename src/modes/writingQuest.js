@@ -21,6 +21,8 @@ import {
   describeObserved,
   HEURISTIC_CAVEAT,
 } from '../modules/writingEvaluator.js';
+import { findGrammarSlips } from '../modules/writingChecks.js';
+import { containsAnyPhrase } from '../modules/textMatch.js';
 import { detectBadges, renderBadgeChips } from '../modules/writingBadges.js';
 import {
   isPlanReady,
@@ -103,8 +105,8 @@ export function showWritingBrowser() {
  */
 function _getLevelProgress(level, tracks) {
   if (tracks.length) {
-    // Ensure migration has run for all tracks at this level
-    tracks.forEach((t) => migrateLegacyWritingCompleted([t.id], t.lessonIds.length, level));
+    // Ensure migration has run for the tracks that replaced old prompt progress
+    _migrateLegacy(tracks, level);
     const total = tracks.reduce((sum, t) => sum + t.lessonIds.length, 0);
     const done = tracks.reduce((sum, t) => sum + (getTrackProgress(t.id).completedLessons || 0), 0);
     return { done, total };
@@ -119,18 +121,24 @@ function _getLevelProgress(level, tracks) {
 function _chooseLevel(level) {
   _level = level;
   _tracksForLevel = getTracksForLevel(level);
-  if (_tracksForLevel.length > 1) {
-    return _renderTrackBrowser(level);
-  }
-  if (_tracksForLevel.length === 1) {
-    return _startTrack(_tracksForLevel[0].id);
-  }
+  if (_tracksForLevel.length) return _renderTrackBrowser(level);
   return _startLegacyLevel(level);
+}
+
+/**
+ * Old prompt progress carries over only to the tracks that replaced those
+ * prompts. Tracks added later start at lesson 1: free-practice prompts done
+ * before do not mean their lessons were learnt.
+ */
+function _migrateLegacy(tracks, level) {
+  tracks
+    .filter((t) => t.migrateLegacyProgress)
+    .forEach((t) => migrateLegacyWritingCompleted([t.id], t.lessonIds.length, level));
 }
 
 function _renderTrackBrowser(level) {
   // Migrate before reading progress so counts are up-to-date
-  _tracksForLevel.forEach((t) => migrateLegacyWritingCompleted([t.id], t.lessonIds.length, level));
+  _migrateLegacy(_tracksForLevel, level);
 
   // Sort tracks by term order (T1 before T2, etc.)
   const sortedTracks = [..._tracksForLevel].sort((a, b) => {
@@ -140,7 +148,7 @@ function _renderTrackBrowser(level) {
   });
 
   _container.innerHTML = `<div class="sfq-game"><h3 class="cloze-title">Choose your writing track</h3>
-  <p class="sfq-instruction">${WRITING_LEVELS[level]} has multiple term tracks.</p>
+  <p class="sfq-instruction">Lessons teach one skill at a time. Free practice gives you more topics to write about.</p>
   <div class="sfq-browser-grid">${sortedTracks
     .map((track) => {
       const progress = getTrackProgress(track.id);
@@ -149,17 +157,25 @@ function _renderTrackBrowser(level) {
       const statusLabel = completed >= total ? ' (Complete)' : '';
       return `<button class="sfq-level-btn" data-track="${track.id}"><span class="sfq-level-icon">📚</span><span class="sfq-level-name">${track.track}${statusLabel}</span><span class="sfq-level-count">${completed}/${total}</span></button>`;
     })
-    .join('')}</div>
+    .join('')}
+    ${writingPrompts[level]?.length ? `<button class="sfq-level-btn" id="wq-free-practice"><span class="sfq-level-icon">✏️</span><span class="sfq-level-name">Free practice: ${WRITING_LEVELS[level]}</span><span class="sfq-level-count">${writingPrompts[level].length} topics</span></button>` : ''}</div>
   <div class="sfq-actions" style="margin-top:10px"><button class="btn btn--ghost btn--sm" id="wq-level-back">Back</button></div></div>`;
   _container
     .querySelectorAll('[data-track]')
     .forEach((btn) => btn.addEventListener('click', () => _startTrack(btn.dataset.track)));
+  document
+    .getElementById('wq-free-practice')
+    ?.addEventListener('click', () => _startLegacyLevel(level));
   document.getElementById('wq-level-back')?.addEventListener('click', showWritingBrowser);
 }
 
 function _startTrack(trackId) {
   _track = WRITING_TRACKS[trackId] || null;
-  _idx = 0;
+  _list = getLessonsForTrack(trackId);
+  // Pick up at the first lesson not yet finished (a finished track replays
+  // from the start), instead of always going back to lesson 1.
+  const done = getTrackProgress(trackId).completedLessons || 0;
+  _idx = done < _list.length ? done : 0;
   _phase = 'learn';
   _firstResult = null;
   _firstDraftText = '';
@@ -167,7 +183,6 @@ function _startTrack(trackId) {
   _selectedStarter = '';
   _lastDraftRemediation = null;
   _lastMissionStatus = [];
-  _list = getLessonsForTrack(trackId);
 
   // Resume from saved draft if one exists for the current lesson
   _tryRestoreFromDraft(trackId, _idx);
@@ -235,7 +250,8 @@ function _renderLearn(item) {
     <div class="dash-pattern-item"><strong>Skill focus:</strong> ${item.skillFocus.join(' · ')}</div>
     <ul class="dash-pattern-item">${(item.introTeaching || []).map((line) => `<li>${line}</li>`).join('')}</ul>
     ${(item.teachCards || []).map(_renderTeachCard).join('')}
-    ${item.storyStarterChoices?.length ? `<div class="dash-pattern-item"><strong>Story Starter Cards</strong>${item.storyStarterChoices.map((s, i) => `<label style="display:block;margin:6px 0"><input type="radio" name="starter" value="${i}" ${i === 0 ? 'checked' : ''}/> ${s}</label>`).join('')}</div>` : ''}
+    ${_renderTaskBrief(item)}
+    ${item.storyStarterChoices?.length ? `<div class="dash-pattern-item"><strong>${item.starterLabel || 'Story Starter Cards'}</strong>${item.storyStarterChoices.map((s, i) => `<label style="display:block;margin:6px 0"><input type="radio" name="starter" value="${i}" ${i === 0 ? 'checked' : ''}/> ${s}</label>`).join('')}</div>` : ''}
     <div class="sfq-actions"><button class="btn btn--primary" id="wq-next">Next: Revise Drills</button><button class="btn btn--ghost btn--sm" id="wq-menu">Menu</button></div></div>`;
 
   _bindReadAloud(item.teachCards || []);
@@ -321,6 +337,24 @@ function _bindReadAloud(cards) {
   });
 }
 
+/**
+ * The task a child is answering, for lessons that set one (a situational
+ * email or a picture composition): the situation, then the points to cover.
+ */
+function _renderTaskBrief(item) {
+  const brief = item.taskBrief;
+  if (!brief) return '';
+  const points = (brief.points || []).map((p) => `<li>${p}</li>`).join('');
+  const pac = item.pac
+    ? `<ul><li><strong>Purpose:</strong> ${item.pac.purpose}</li><li><strong>Audience:</strong> ${item.pac.audience}</li><li><strong>Context:</strong> ${item.pac.context}</li></ul>`
+    : '';
+  return `<div class="dash-pattern-item"><strong>📋 Your task</strong>
+    ${brief.situation ? `<p>${brief.situation}</p>` : ''}
+    ${pac}
+    ${points ? `<p>Include all of these:</p><ul>${points}</ul>` : ''}
+    ${brief.wordCount ? `<p>Length: ${brief.wordCount}</p>` : ''}</div>`;
+}
+
 /** Vocabulary with meanings and an example, falling back to the bare list. */
 function _renderWordBucket(item) {
   if (!item.wordBucket?.length) {
@@ -337,7 +371,7 @@ function _renderRevisePrep(item) {
     ${_renderWordBucket(item)}
     <div class="dash-pattern-item"><strong>Spelling:</strong> ${item.spellingRevision.join(', ')}</div>
     ${drills.map((drill, idx) => `<div class="wq-drill" data-drill-index="${idx}">${renderDrill(drill, idx)}<div class="wq-drill-why" id="wq-drill-why-${idx}" aria-live="polite" hidden></div></div>`).join('')}
-    <div class="sfq-actions"><button class="btn btn--primary" id="wq-drill-submit">Check My Answers</button><button class="btn btn--primary" id="wq-to-plan" hidden>Next: Plan My Story</button></div>
+    <div class="sfq-actions"><button class="btn btn--primary" id="wq-drill-submit">Check My Answers</button><button class="btn btn--primary" id="wq-to-plan" hidden>Next: Plan My Writing</button></div>
     <div id="wq-drill-msg" class="dash-pattern-item" aria-live="polite">Get at least 60% right to unlock planning.</div></div>`;
 
   bindArrangeDrills(_container);
@@ -372,7 +406,7 @@ function _renderRevisePrep(item) {
       return;
     }
     if (msg)
-      msg.textContent = `Great! ${result.correctCount}/${result.total}. Read why each answer is right, then plan your story.`;
+      msg.textContent = `Great! ${result.correctCount}/${result.total}. Read why each answer is right, then plan your writing.`;
     document.getElementById('wq-drill-submit')?.setAttribute('disabled', 'true');
     document.getElementById('wq-to-plan')?.removeAttribute('hidden');
     document.getElementById('wq-to-plan')?.addEventListener('click', () => {
@@ -439,6 +473,7 @@ function _renderDraft(item) {
 
   _container.innerHTML = `<div class="sfq-game"><h3 class="cloze-title">Draft: ${item.lessonTitle}</h3>
     <p class="sfq-instruction">Starter: ${_selectedStarter || item.storyStarterChoices?.[0] || 'Create your own opening.'}</p>
+    ${_renderTaskBrief(item)}
     <div class="dash-pattern-item"><strong>Paragraph Missions</strong><ul id="wq-mission-list">${(item.paragraphMissions || []).map((m) => `<li>${typeof m === 'string' ? m : m.text}</li>`).join('')}</ul></div>
     <div class="dash-pattern-item"><strong>Checkpoints:</strong><ul>${(lessonForEval.requiredChecks || []).map((c) => `<li>${c.label}</li>`).join('')}</ul></div>
     <p class="dash-pattern-item">🧰 Support words: ${(item.supportWords || []).join(', ')}</p>
@@ -477,6 +512,34 @@ function _renderDraft(item) {
     .getElementById('wq-submit')
     ?.addEventListener('click', () => _submitDraft(item, lessonForEval));
   _bindFeedbackReviewToggle();
+}
+
+/**
+ * What most needs fixing, said plainly: a draft that is off-topic or not yet
+ * sentences, and each grammar slip with its correct form beside it.
+ */
+function _renderProblemAndSlips(result) {
+  const problem = result.problemMessage
+    ? `<p><strong>⚠️ ${escapeHtml(result.problemMessage)}</strong></p>`
+    : '';
+  const slips = (result.grammarSlips || []).slice(0, 5);
+  const slipList = slips.length
+    ? `<div class="wq-slips"><p><strong>✏️ Grammar to fix:</strong></p><ul>${slips
+        .map(
+          (sl) =>
+            `<li>“${escapeHtml(sl.found)}” → “${escapeHtml(sl.fix)}”. <span style="color:var(--text-muted)">${escapeHtml(sl.rule)}</span></li>`,
+        )
+        .join('')}</ul></div>`
+    : '';
+  return problem + slipList;
+}
+
+/** The model answer, hidden behind a tap so the child compares after writing. */
+function _renderModelAnswer(item, label = 'Compare with a model answer') {
+  if (!item.sampleAnswer) return '';
+  return `<details class="dash-pattern-item wq-model"><summary><strong>📖 ${label}</strong></summary>
+    <p style="white-space:pre-line;margin-top:6px">${escapeHtml(item.sampleAnswer)}</p>
+    <p style="font-size:0.85em;color:var(--text-muted)">Look for one thing this writer did that you could try in your own words. Don’t copy it.</p></details>`;
 }
 
 function _renderDimensionBreakdown(result) {
@@ -580,6 +643,7 @@ async function _submitDraft(item, lessonForEval) {
       <p><strong>Mission Progress:</strong> ${missionHits}/${_lastMissionStatus.length || 0}</p>
       <p><strong>Revision Mission:</strong> ${_lastDraftRemediation.title}</p>
       ${_lastDraftRemediation.missingChecks.length ? `<p>Missing checkpoints: ${_lastDraftRemediation.missingChecks.join(' · ')}</p>` : ''}
+      ${_renderProblemAndSlips(result)}
       ${_renderDimensionBreakdown(result)}
       <div>${renderBadgeChips(badges)}</div>
       <p style="font-size:0.85em;color:var(--text-muted);margin-top:6px">Take your time to read the feedback above. Press Continue when you are ready.</p>
@@ -634,7 +698,13 @@ function _renderRepair(item) {
 
   // Build checklist items from missing checks + narrative prompts
   const checklistItems = [
+    ...(remediation.problemMessage ? [{ text: remediation.problemMessage, type: 'problem' }] : []),
     ...remediation.missingChecks.map((c) => ({ text: c, type: 'checkpoint' })),
+    ...(remediation.grammarSlips || []).map((sl) => ({
+      text: `Change “${sl.found}” to “${sl.fix}”`,
+      type: 'slip',
+      found: sl.found,
+    })),
     ...remediation.narrativePrompts.map((p) => ({ text: p, type: 'narrative' })),
   ];
   if (checklistItems.length === 0) {
@@ -658,6 +728,7 @@ function _renderRepair(item) {
       <ul id="wq-repair-checklist">${checklistItems.map((c, i) => `<li id="repair-check-${i}">❌ ${c.text}</li>`).join('')}</ul>
     </div>
     <p class="sfq-instruction">${remediation.title}</p>
+    ${_renderModelAnswer(item)}
     <textarea id="wq-revision-text" class="cp-name-input" rows="9" placeholder="Write improved draft...">${_firstDraftText}</textarea>
     <div id="wq-repair-live" class="dash-pattern-item" style="font-size:0.9em">Start editing to see live repair progress.</div>
     <div class="sfq-actions"><button class="btn btn--primary" id="wq-submit-revision">Submit Revision</button></div>
@@ -689,6 +760,13 @@ function _renderRepair(item) {
       if (!el) return;
       if (c.type === 'checkpoint') {
         el.textContent = missingNow.has(c.text) ? `❌ ${c.text}` : `✅ ${c.text}`;
+      } else if (c.type === 'slip') {
+        const still = findGrammarSlips(text).some(
+          (sl) => sl.found.toLowerCase() === c.found.toLowerCase(),
+        );
+        el.textContent = still ? `❌ ${c.text}` : `✅ ${c.text}`;
+      } else if (c.type === 'problem') {
+        el.textContent = currentResult.problem ? `❌ ${c.text}` : `✅ ${c.text}`;
       } else if (c.type === 'narrative') {
         // Re-evaluate narrative quality for narrative prompts
         const nq = currentResult.metrics?.narrativeQuality || {};
@@ -840,6 +918,7 @@ function _renderLessonComplete(item) {
 
   _container.innerHTML = `<div class="sfq-game"><h3>✅ Lesson complete: ${item.lessonTitle}</h3>
     ${feedbackSummaryHtml}
+    ${_renderModelAnswer(item, 'Read a model answer')}
     <p><strong>Collection:</strong> ${collectibles.slice(-6).join(' · ') || 'None yet'}</p>
     <div class="sfq-actions"><button class="btn btn--primary" id="wq-next-lesson">Next Lesson</button></div></div>`;
   document.getElementById('wq-next-lesson')?.addEventListener('click', () => {
@@ -947,7 +1026,8 @@ function _gradeBossConstructedItem(ci, response) {
     // Check that response contains at least one required signal
     const signals = ci.requiredSignals || [];
     if (signals.length === 0) return response.length >= 8;
-    return signals.some((s) => lower.includes(s.toLowerCase()));
+    // Whole words only: "window" must not count as "wind".
+    return containsAnyPhrase(response, signals);
   }
 
   if (ci.type === 'mini_revision') {
@@ -957,29 +1037,58 @@ function _gradeBossConstructedItem(ci, response) {
     // Check for improvement signals
     const signals = ci.improvementSignals || [];
     if (signals.length === 0) return response.length > original.length;
-    return signals.some((s) => lower.includes(s.toLowerCase()));
+    return containsAnyPhrase(response, signals);
   }
 
   return false;
 }
 
+/**
+ * Free-practice prompt. It now shows everything the prompt was written with:
+ * who it is for (P-A-C), the points to cover, a story plan, helpful words and
+ * what a good answer does. The model answer appears only after a first try,
+ * and the child moves on after passing or after a second try.
+ */
 function _renderLegacyPrompt(item) {
   // Restore saved legacy draft if available
   const savedLegacy = loadLegacyDraft(_level, _idx);
   const restoredText = savedLegacy?.draftText || '';
+  let attempts = savedLegacy?.attempts || 0;
+  const promptText = String(item.prompt || '').replace(/\s*\(Practice [A-C]:[^)]*\)\s*$/, '');
+  const nudge = (String(item.prompt || '').match(/\(Practice [A-C]: ([^)]*)\)/) || [])[1];
+  const plan = item.storyPlan
+    ? `<div class="dash-pattern-item"><strong>🗺️ Story plan</strong><ol>${Object.entries(
+        item.storyPlan,
+      )
+        .map(
+          ([k, v]) =>
+            `<li><strong>${(PLAN_GUIDE[k] || { label: k }).label}:</strong> ${escapeHtml(v)}</li>`,
+        )
+        .join('')}</ol></div>`
+    : '';
+  const pac = item.pac
+    ? `<div class="dash-pattern-item"><strong>🎯 Who and why</strong><ul><li><strong>Purpose:</strong> ${escapeHtml(item.pac.purpose)}</li><li><strong>Audience:</strong> ${escapeHtml(item.pac.audience)}</li><li><strong>Context:</strong> ${escapeHtml(item.pac.context)}</li></ul></div>`
+    : '';
 
-  _container.innerHTML = `<div class="sfq-game"><h3 class="cloze-title">Writing Quest (${item.textType})</h3>
-    <p class="sfq-instruction">${item.prompt}</p>
-    <p class="dash-pattern-item">Legacy prompt mode remains available for this level.</p>
-    <textarea id="wq-text" class="cp-name-input" rows="9" placeholder="Write your response here...">${_escapeHtml(restoredText)}</textarea>
-    <div class="sfq-actions"><button class="btn btn--primary" id="wq-submit">Submit</button></div><div class="sfq-feedback" id="wq-feedback" hidden></div></div>`;
+  _container.innerHTML = `<div class="sfq-game"><div class="sfq-header"><span class="sfq-badge">✏️ Free practice</span><span class="sfq-progress">${_idx + 1}/${_list.length}</span></div>
+    <h3 class="cloze-title">Writing Quest: ${escapeHtml(item.textType || 'writing')}</h3>
+    <p class="sfq-instruction">${escapeHtml(promptText)}</p>
+    ${nudge ? `<p class="dash-pattern-item">💡 Focus for this try: ${escapeHtml(nudge)}</p>` : ''}
+    ${pac}
+    ${item.requiredPoints?.length ? `<div class="dash-pattern-item"><strong>✅ Points to cover</strong><ul>${item.requiredPoints.map((pt) => `<li>${escapeHtml(pt)}</li>`).join('')}</ul></div>` : ''}
+    ${plan}
+    ${item.supportWords?.length ? `<p class="dash-pattern-item">🧰 Helpful words: ${item.supportWords.map(escapeHtml).join(', ')}</p>` : ''}
+    ${item.rubric?.length ? `<details class="dash-pattern-item"><summary><strong>What a good answer does</strong></summary><ul>${item.rubric.map((r) => `<li>${escapeHtml(r)}</li>`).join('')}</ul></details>` : ''}
+    <label for="wq-text" class="visually-hidden">Your writing</label>
+    <textarea id="wq-text" class="cp-name-input" rows="10" placeholder="Write your response here...">${_escapeHtml(restoredText)}</textarea>
+    <div class="sfq-actions"><button class="btn btn--primary" id="wq-submit">Check My Writing</button></div><div class="sfq-feedback" id="wq-feedback" hidden aria-live="polite"></div></div>`;
 
   // Auto-save legacy draft
   let _legacySaveTimer = null;
   document.getElementById('wq-text')?.addEventListener('input', (e) => {
     clearTimeout(_legacySaveTimer);
     _legacySaveTimer = setTimeout(() => {
-      saveLegacyDraft(_level, _idx, { draftText: e.target.value || '', phase: 'draft' });
+      saveLegacyDraft(_level, _idx, { draftText: e.target.value || '', phase: 'draft', attempts });
     }, 2000);
   });
 
@@ -987,27 +1096,47 @@ function _renderLegacyPrompt(item) {
     const text = document.getElementById('wq-text')?.value?.trim() || '';
     if (!text) return;
     const result = evaluateWriting(item, text, _level);
-    _awardLessonRewards(item, result, null, []);
+    attempts += 1;
+    if (result.passed || attempts === 1) _awardLessonRewards(item, result, null, []);
+    const canMoveOn = result.passed || attempts >= 2;
 
     // Persist legacy feedback
     saveLegacyDraft(_level, _idx, {
       draftText: text,
-      firstDraftText: text,
+      firstDraftText: savedLegacy?.firstDraftText || text,
       feedbackResult: result,
-      phase: 'complete',
+      attempts,
+      phase: canMoveOn ? 'complete' : 'draft',
     });
 
+    const missing = result.observed?.missingPoints || [];
     const fb = document.getElementById('wq-feedback');
     if (fb) {
       fb.hidden = false;
       fb.className = `sfq-feedback sfq-feedback--${result.passed ? 'success' : 'error'}`;
       fb.innerHTML = `<p><strong>${result.encouragement || (result.passed ? 'Well done!' : 'Keep practising!')}</strong></p>
         ${_renderDraftCheck(result)}
+        ${_renderProblemAndSlips(result)}
+        ${missing.length ? `<p><strong>Points still missing:</strong></p><ul>${missing.map((m) => `<li>${escapeHtml(m)}</li>`).join('')}</ul>` : ''}
         ${_renderDimensionBreakdown(result)}
-        <p style="font-size:0.85em;color:var(--text-muted);margin-top:6px">Review your feedback. Press Continue when ready.</p>
-        <div class="sfq-actions" style="margin-top:8px"><button class="btn btn--primary" id="wq-legacy-continue">Continue</button></div>`;
+        ${_renderModelAnswer(item)}
+        <p style="font-size:0.85em;color:var(--text-muted);margin-top:6px">${
+          result.passed
+            ? 'Read your feedback, then continue.'
+            : canMoveOn
+              ? 'Compare your writing with the model answer, then continue. You can come back to this topic later.'
+              : 'Fix one thing from the feedback above, then check again.'
+        }</p>
+        <div class="sfq-actions" style="margin-top:8px">${
+          canMoveOn
+            ? '<button class="btn btn--primary" id="wq-legacy-continue">Continue</button>'
+            : '<button class="btn btn--primary" id="wq-legacy-revise">Revise My Writing</button>'
+        }</div>`;
     }
     fb?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    document.getElementById('wq-legacy-revise')?.addEventListener('click', () => {
+      document.getElementById('wq-text')?.focus();
+    });
     document.getElementById('wq-legacy-continue')?.addEventListener('click', () => {
       clearLegacyDraft(_level, _idx);
       _idx++;
@@ -1029,7 +1158,7 @@ function _renderDone() {
   _container.innerHTML = `<div class="sfq-game"><h3>🎉 Writing Quest complete</h3><p>${_track ? `Track cleared: ${_track.track}.` : 'Level complete.'}</p>
     <div class="sfq-actions"><button class="btn btn--primary" id="wq-back">Back to Levels</button></div></div>`;
   document.getElementById('wq-back')?.addEventListener('click', () => {
-    if (_tracksForLevel.length > 1) return _renderTrackBrowser(_level);
+    if (_tracksForLevel.length) return _renderTrackBrowser(_level);
     showWritingBrowser();
   });
 }

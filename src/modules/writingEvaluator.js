@@ -16,6 +16,14 @@
 
 import { computeNarrativeQuality } from './writingNarrativeHelpers.js';
 import {
+  topicRelevance,
+  topicLabel,
+  englishShape,
+  connectorLoad,
+  findGrammarSlips,
+  isNarrativeTask,
+} from './writingChecks.js';
+import {
   containsAllTerms,
   containsAnyPhrase,
   countPhrases,
@@ -154,7 +162,15 @@ export function computeMetrics(item, text, level) {
   });
   const requiredHits = checkResults.filter((r) => r.hit).length;
   const requiredTotal = checks.length;
-  const requiredCoverage = requiredTotal > 0 ? requiredHits / requiredTotal : 0.6;
+  // With no points written for a task, coverage used to be a flat 0.6, so an
+  // off-topic draft scored the same as an on-topic one. It is now how much of
+  // the draft uses the task's own words.
+  const relevance = topicRelevance(item, t);
+  const requiredCoverage = requiredTotal > 0 ? requiredHits / requiredTotal : relevance.score;
+  const shape = englishShape(t);
+  const connectors = connectorLoad(t);
+  const grammarSlips = findGrammarSlips(t);
+  const narrative = isNarrativeTask(item);
 
   // Length band scoring (80–140 % of target = full credit)
   const target = getLengthTarget(level);
@@ -166,10 +182,15 @@ export function computeMetrics(item, text, level) {
   const hasEndPunct = /[.!?]$/.test(t);
   const sentenceStartCapitals = (t.match(/(?:^|[.!?]\s+)[A-Z]/g) || []).length;
 
-  // Dialogue detection (requires speech marks AND a reporting verb)
+  // Dialogue detection (requires speech marks AND a reporting verb). Single
+  // quotes count only as a pair around words, so the apostrophe in "didn't"
+  // is not mistaken for speech.
   const hasDialogue =
-    /["'""\u2018\u2019\u201c\u201d]/.test(t) &&
-    / said| asked| replied| whispered| explained/i.test(t);
+    /["\u201c\u201d]|(?:^|\s)['\u2018][^'\u2018\u2019\n]{2,}['\u2019](?=\s|[.,!?]|$)/.test(t) &&
+    // The lessons teach many ways to say "said", so any of them counts.
+    /\b(?:said|asked|replied|whispered|explained|shouted|cried|yelled|called|screamed|exclaimed|muttered|mumbled|answered|laughed|gasped|sobbed|cheered|squeaked|groaned|grumbled|begged|added)\b/i.test(
+      t,
+    );
   const dialoguePunctOk = hasDialogue && /["“”][^"\n]{3,}[.!?,]["”]/.test(t);
   const purposefulDialogue =
     hasDialogue && /(let's|we should|we can|help|run|quick|plan|careful)/i.test(t);
@@ -243,6 +264,13 @@ export function computeMetrics(item, text, level) {
     lexicalDensity,
     firstSentence,
     narrativeQuality,
+    relevance,
+    englishRatio: shape.ratio,
+    looksLikeEnglish: shape.looksLikeEnglish,
+    connectorRatio: connectors.ratio,
+    connectorStuffed: connectors.stuffed,
+    grammarSlips,
+    isNarrative: narrative,
   };
 }
 
@@ -260,11 +288,13 @@ function _scoreContent(item, m) {
 // Now also incorporates narrative arc and chronology from narrative helpers.
 function _scoreOrganisation(item, m, level) {
   const bankDiversity = Object.values(m.connectorHits).filter((hits) => hits.length > 0).length;
-  const connectorScore = Math.min(
-    (m.totalDistinct / (level <= 2 ? 3 : 5)) *
-      (bankDiversity / Object.keys(CONNECTOR_BANKS).length),
-    1,
-  );
+  // Linking words earn credit for joining ideas. Piled up, they earn little.
+  const connectorScore =
+    Math.min(
+      (m.totalDistinct / (level <= 2 ? 3 : 5)) *
+        (bankDiversity / Object.keys(CONNECTOR_BANKS).length),
+      1,
+    ) * (m.connectorStuffed ? 0.3 : 1);
   const sentTarget = level <= 2 ? 4 : level <= 4 ? 6 : 8;
   const sentScore = Math.min(m.sentenceCount / sentTarget, 1);
   // Upper primary: paragraphs matter; lower primary: sentence count proxies structure
@@ -275,11 +305,7 @@ function _scoreOrganisation(item, m, level) {
   const nq = m.narrativeQuality || {};
   const chronologyScore = nq.chronology ?? Math.min(m.chronologicalFlow / 2, 1);
   // Narrative arc bonus for continuous/narrative modes
-  const mode = item.mode || 'guided';
-  const arcBonus =
-    mode === 'continuous' || item.lessonType === 'narrative' || item.lessonType === 'bootcamp'
-      ? (nq.arc || 0) * 0.1
-      : 0;
+  const arcBonus = m.isNarrative ? (nq.arc || 0) * 0.1 : 0;
 
   return Math.min(
     1,
@@ -301,20 +327,26 @@ function _scoreLanguage(item, m) {
   const sentCount = Math.max(m.sentenceCount, 1);
   const varietyScore = Math.min(m.sentenceStartCapitals / (sentCount - 0.5), 1);
 
-  // Use deeper narrative quality signals instead of flat boolean checks
+  // Story craft (climax, resolution, dialogue) only counts for stories. For
+  // a recount, email or notice that weight goes to the genre pattern.
   const nq = m.narrativeQuality || {};
-  const narrativeCraft =
-    (nq.climax || 0) * 0.22 +
-    (nq.resolution || 0) * 0.22 +
-    (nq.reflection || 0) * 0.22 +
-    (nq.dialogue || 0) * 0.34;
-  return Math.min(
-    1,
-    punctScore * 0.22 +
-      vocabScore * 0.22 +
-      genreScore * 0.18 +
-      varietyScore * 0.14 +
-      narrativeCraft * 0.24,
+  const craft = m.isNarrative
+    ? (nq.climax || 0) * 0.22 +
+      (nq.resolution || 0) * 0.22 +
+      (nq.reflection || 0) * 0.22 +
+      (nq.dialogue || 0) * 0.34
+    : genreScore;
+  // Each grammar slip ("we seen", "they was") costs a little, up to 40%.
+  const slipFactor = Math.max(0.6, 1 - 0.08 * (m.grammarSlips?.length || 0));
+  return (
+    Math.min(
+      1,
+      punctScore * 0.22 +
+        vocabScore * 0.22 +
+        genreScore * 0.18 +
+        varietyScore * 0.14 +
+        craft * 0.24,
+    ) * slipFactor
   );
 }
 
@@ -322,10 +354,14 @@ function _scoreLanguage(item, m) {
 // Arc bonus now uses graduated narrative quality scores instead of binary flags.
 function _scoreTaskFulfilment(item, m) {
   const nq = m.narrativeQuality || {};
-  const arcBonus = ((nq.climax || 0) + (nq.resolution || 0) + (nq.reflection || 0)) * 0.1;
+  // Stories earn the last part from their shape; other kinds of writing from
+  // staying on the task's topic.
+  const shapeBonus = m.isNarrative
+    ? Math.min(((nq.climax || 0) + (nq.resolution || 0) + (nq.reflection || 0)) * 0.1, 0.3)
+    : (m.relevance?.score ?? 1) * 0.15 + (m.hasEndPunct ? 0.1 : 0);
   return Math.min(
     1,
-    m.requiredCoverage * 0.55 + _purposeAlignmentScore(item, m) * 0.3 + Math.min(arcBonus, 0.3),
+    m.requiredCoverage * 0.55 + _purposeAlignmentScore(item, m) * 0.3 + shapeBonus,
   );
 }
 
@@ -346,7 +382,7 @@ function _genrePatternScore(item, m) {
     return Math.min(formal + struct, 1);
   }
   // guided / default
-  return m.sentenceCount >= 4 ? 0.75 : 0.5;
+  return m.sentenceCount >= 4 ? 0.85 : 0.5;
 }
 
 // Purpose/audience alignment – checks formal register for adult audience
@@ -510,6 +546,7 @@ export function observedFacts(m) {
     requiredPointsTotal: m.requiredTotal,
     coveredPoints: (m.checkResults || []).filter((c) => c.hit).map((c) => c.label),
     missingPoints: (m.checkResults || []).filter((c) => !c.hit).map((c) => c.label),
+    grammarSlips: m.grammarSlips || [],
   };
 }
 
@@ -564,11 +601,16 @@ export function evaluateWriting(item, text, level) {
     language: _scoreLanguage(item, metrics),
     taskFulfilment: _scoreTaskFulfilment(item, metrics),
   };
+  const gate = _gate(item, metrics);
+  if (gate.cap < 1) {
+    for (const k of Object.keys(dimensions)) dimensions[k] = Math.min(dimensions[k], gate.cap);
+  }
   const score = _weightedScore(dimensions);
   const { strongest, weakest } = _findStrongWeak(dimensions);
   const feedback = Object.fromEntries(
     Object.entries(dimensions).map(([k, v]) => [k, getDimensionFeedback(k, v)]),
   );
+  if (gate.message) feedback[weakest] = gate.message;
 
   const observed = observedFacts(metrics);
 
@@ -587,8 +629,51 @@ export function evaluateWriting(item, text, level) {
     encouragement: getEncouragement(score),
     requiredCoverage: metrics.requiredCoverage,
     checkResults: metrics.checkResults,
+    grammarSlips: metrics.grammarSlips,
+    problem: gate.problem,
+    problemMessage: gate.message,
     feedback,
   };
+}
+
+/**
+ * Problems that make the counted features meaningless: text that is not
+ * English sentences, text that is not about the task, and linking words
+ * piled up with little in between. Each caps every dimension and says why.
+ */
+function _gate(item, m) {
+  if (m.words >= 6 && !m.looksLikeEnglish) {
+    return {
+      cap: 0.3,
+      problem: 'notSentences',
+      message:
+        'This does not read like English sentences yet. Write real sentences that tell the reader what happened.',
+    };
+  }
+  if (m.words >= 15 && m.relevance?.applicable && m.relevance.score < 0.3) {
+    return {
+      cap: 0.45,
+      problem: 'offTopic',
+      message: `Your writing does not seem to be about the task yet. Re-read it: ${topicLabel(item)}`,
+    };
+  }
+  if ((m.grammarSlips?.length || 0) >= 3) {
+    return {
+      cap: 0.6,
+      problem: 'grammarSlips',
+      message:
+        'Fix the grammar slips listed below, then check again. Each one has the correct form beside it.',
+    };
+  }
+  if (m.connectorStuffed) {
+    return {
+      cap: 0.6,
+      problem: 'connectorStuffing',
+      message:
+        'Linking words only help when they join two real ideas. Keep the ones that do and add what happened in between.',
+    };
+  }
+  return { cap: 1, problem: null, message: '' };
 }
 
 /**
@@ -654,6 +739,7 @@ export function evaluateWritingSubmission(item, text, level) {
     dimensions: r.dimensions,
     score: r.score,
     passed: r.passed,
+    problem: r.problem,
   };
 }
 
@@ -694,6 +780,7 @@ function _emptyResult() {
       requiredPointsTotal: 0,
       coveredPoints: [],
       missingPoints: [],
+      grammarSlips: [],
     },
     observedSummary: '',
     caveat: HEURISTIC_CAVEAT,
@@ -706,6 +793,9 @@ function _emptyResult() {
     encouragement: 'Start writing — feedback appears once you have typed a response.',
     requiredCoverage: 0,
     checkResults: [],
+    grammarSlips: [],
+    problem: null,
+    problemMessage: '',
     feedback: {},
   };
 }

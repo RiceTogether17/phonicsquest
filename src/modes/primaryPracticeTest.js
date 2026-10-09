@@ -29,6 +29,7 @@ import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
 import { gradeShortAnswer } from './scoring/shortAnswerGrader.js';
 import { diagnoseAnswer } from '../modules/answerDiagnosis.js';
 import { recordMisconceptionsFromReview } from '../modules/teacherFeedback.js';
+import { checkSituationalPoints } from '../modules/situationalChecks.js';
 
 function shuffle(arr) {
   const a = [...arr];
@@ -302,15 +303,9 @@ function renderSituationalWritingSection(section, sectionKey) {
   const rubricTable = rubricRows
     ? `<details class="ptg-rubric"><summary>Marking rubric</summary><table class="ptg-table"><tbody>${rubricRows}</tbody></table></details>`
     : '';
-  const learningSupport =
-    _currentMode === 'test'
-      ? ''
-      : `
-      <details class="ptg-model-answer">
-        <summary>Show model answer</summary>
-        <pre class="ptg-sw-model">${escapeHtml(section.modelAnswer || '')}</pre>
-      </details>
-      ${rubricTable}`;
+  // The model answer is shown only after the response is checked: open next
+  // to an empty box, it turns the task into copying.
+  const learningSupport = _currentMode === 'test' ? '' : rubricTable;
   return `
     <div class="ptg-situational-writing">
       <div class="ptg-sw-brief">
@@ -321,7 +316,7 @@ function renderSituationalWritingSection(section, sectionKey) {
         <ul class="ptg-sw-bullets">${bullets}</ul>
       </div>
       <p class="ptg-instructions">Write your response in the box below. Check format, tone and that all 3 points are covered.</p>
-      <textarea class="ptg-input ptg-input--writing" rows="8"
+      <textarea class="ptg-input ptg-input--writing" rows="12"
                 data-q-key="${sectionKey}/0"
                 data-q-type="writing"
                 data-skill="situationalWriting"
@@ -878,6 +873,35 @@ function _markingGuideHtml(info) {
   return `<ul class="ptg-marking-guide">${hitsHtml}${missHtml}</ul>`;
 }
 
+/**
+ * Feedback on a situational writing response: which required points it
+ * covers, then the model answer to compare against. Shown only once the
+ * response is locked.
+ */
+function _situationalReviewHtml(paper, section, response) {
+  if (!section?.bullets) return '';
+  const check = checkSituationalPoints(
+    { id: paper?.id, bullets: section.bullets, format: section.format },
+    response,
+  );
+  const tick = (ok, text, hint = '') =>
+    `<li class="${ok ? 'ptg-mark-hit' : 'ptg-mark-miss'}">${ok ? '✓' : '✗'} ${escapeHtml(text)}${!ok && hint ? ` <em>${escapeHtml(hint)}</em>` : ''}</li>`;
+  const points =
+    check && String(response || '').trim()
+      ? `<p><strong>Required points: ${check.covered} of ${check.total} covered</strong></p>
+        <ul class="ptg-marking-guide">
+          ${check.points.map((pt) => tick(pt.covered, pt.bullet, pt.hint)).join('')}
+          ${check.format.map((f) => tick(f.ok, f.label)).join('')}
+        </ul>
+        <p class="ptg-note"><em>This is a word check: read your answer and the model to decide if each point is really there.</em></p>`
+      : '';
+  return `${points}
+    <details class="ptg-model-answer">
+      <summary>Show model answer</summary>
+      <pre class="ptg-sw-model">${escapeHtml(section.modelAnswer || '')}</pre>
+    </details>`;
+}
+
 function buildSummaryHtml(paper, sectionResults) {
   const autoScored = sectionResults.reduce((a, r) => a + (r.selfAssessed ? 0 : r.scored), 0);
   const autoTotal = sectionResults.reduce((a, r) => a + (r.selfAssessed ? 0 : r.total), 0);
@@ -939,8 +963,15 @@ function buildSummaryHtml(paper, sectionResults) {
 
   const selfNote =
     selfMarks > 0
-      ? `<p class="ptg-summary-self"><em>Plus ${_fmtMark(selfMarks)} mark${selfMarks === 1 ? '' : 's'} of self-assessed writing — compare your response against the model answer in that section.</em></p>`
+      ? `<p class="ptg-summary-self"><em>Plus ${_fmtMark(selfMarks)} mark${selfMarks === 1 ? '' : 's'} of self-assessed writing. Compare your response with the model answer below.</em></p>`
       : '';
+  const writingReview = sectionResults
+    .filter((r) => r.selfAssessed && paper[r.key]?.bullets)
+    .map((r) => {
+      const response = [...(r.perKey?.values() || [])][0]?.userValue || '';
+      return `<section class="ptg-summary-writing"><h4>${escapeHtml(r.title)}</h4>${_situationalReviewHtml(paper, paper[r.key], response)}</section>`;
+    })
+    .join('');
 
   // Questions the grader declined to mark, surfaced as a count rather than
   // folded silently into the total. Audit 2026-09-19, finding 2.
@@ -972,6 +1003,7 @@ function buildSummaryHtml(paper, sectionResults) {
     ${alignmentNote}
     ${reviewNote}
     ${selfNote}
+    ${writingReview}
     <p class="ptg-note"><em>Where an open-ended answer could be marked automatically, it was matched against authored meaning units — not the whole model answer. Anything less certain is listed above for a teacher.</em></p>
     <table class="ptg-summary-table">
       <thead><tr><th>Section</th><th>Score</th><th>%</th></tr></thead>
@@ -1122,8 +1154,10 @@ export function mountPracticeTest(
       fb.hidden = false;
       if (info.selfAssess) {
         fb.className = 'ptg-feedback ptg-feedback--info';
+        const sectionData = paper[String(baseKey).split('/')[0]];
         fb.innerHTML =
-          '<span>📝 Self-assess: compare your response to the model answer above. Check format, tone, and that all 3 bullet points are covered.</span>';
+          '<span>📝 Self-assess: check format, tone, and that every point is covered.</span>' +
+          _situationalReviewHtml(paper, sectionData, info.userValue);
         return;
       }
       const markingGuide = _markingGuideHtml(info);
