@@ -27,6 +27,30 @@ import { narrationParts } from '../modules/lessonNarration.js';
 
 const OVERLAY_ID = 'mini-lesson-overlay';
 
+/** Bumped whenever narration should stop: a new step, a chip tap, close. */
+let _narration = 0;
+
+/**
+ * Read lines aloud one after another. A child who can't read yet hears the
+ * lesson without having to find a button first. Stops as soon as anything
+ * bumps `_narration` or the overlay closes.
+ * @param {string[]} lines
+ */
+async function _narrate(lines, lesson = null) {
+  const token = ++_narration;
+  for (const line of lines) {
+    if (token !== _narration || !document.getElementById(OVERLAY_ID)) return;
+    // Sounds in a lesson line ("c… a… t", "/ā/") play their recordings; read
+    // as text, the voice would say the letter names instead.
+    if (lesson) await audio.speakWithSounds(narrationParts(line, lesson));
+    else await audio.speakText(line);
+  }
+}
+
+function _stopNarration() {
+  _narration++;
+}
+
 /** Find the curriculum stage for a word-group key (stage.group or stage.id). */
 export function findStageForGroup(group) {
   if (!group) return null;
@@ -48,6 +72,7 @@ export function markLessonSeen(lessonKey) {
 }
 
 function _removeOverlay() {
+  _stopNarration();
   document.getElementById(OVERLAY_ID)?.remove();
   document.removeEventListener('keydown', _onKeydown);
   try {
@@ -241,21 +266,20 @@ function _renderTeachStep(overlay, stage, lesson, onNext) {
   overlay.querySelectorAll('[data-chip]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const chip = lesson.soundChips[Number(btn.dataset.chip)];
-      if (chip) audio.speakPhoneme(chip.g, chip.type);
+      if (!chip) return;
+      _stopNarration();
+      audio.speakPhoneme(chip.g, chip.type);
     });
   });
 
-  overlay.querySelector('#mini-lesson-listen')?.addEventListener('click', async () => {
-    for (const line of [...lesson.script, ..._spellingRuleNarration(lesson.spellingRule)]) {
-      // Narration stops if the overlay was closed mid-read.
-      if (!document.getElementById(OVERLAY_ID)) return;
-      // Sounds in the line ("c… a… t", "/ā/") play their recordings; read
-      // as text, the voice would say the letter names instead.
-      await audio.speakWithSounds(narrationParts(line, lesson));
-    }
+  overlay.querySelector('#mini-lesson-listen')?.addEventListener('click', () => {
+    _narrate([...lesson.script, ..._spellingRuleNarration(lesson.spellingRule)], lesson);
   });
 
-  overlay.querySelector('#mini-lesson-next')?.addEventListener('click', onNext);
+  overlay.querySelector('#mini-lesson-next')?.addEventListener('click', () => {
+    _stopNarration();
+    onNext();
+  });
   overlay.querySelector('#mini-lesson-skip')?.addEventListener('click', () => {
     const cb = _onDismiss;
     _onDismiss = null;
@@ -264,6 +288,12 @@ function _renderTeachStep(overlay, stage, lesson, onNext) {
   });
 
   overlay.querySelector('#mini-lesson-next')?.focus();
+
+  // Giri reads the lesson straight away; "Read it to me" plays it again.
+  _narrate(
+    [lesson.headline, ...lesson.script, ..._spellingRuleNarration(lesson.spellingRule)],
+    lesson,
+  );
 }
 
 /**
@@ -333,6 +363,7 @@ function _renderWeDoStep(overlay, stage, lesson, onDone) {
 
   const doneBtn = overlay.querySelector('#mini-lesson-done');
   overlay.querySelector('#mini-lesson-blend')?.addEventListener('click', async () => {
+    _stopNarration();
     if (word) {
       await audio.speakWordStretched(word);
     } else {
@@ -347,4 +378,9 @@ function _renderWeDoStep(overlay, stage, lesson, onDone) {
   doneBtn?.addEventListener('click', onDone);
   overlay.querySelector('#mini-lesson-skip2')?.addEventListener('click', onDone);
   overlay.querySelector('#mini-lesson-blend')?.focus();
+
+  _narrate([
+    "Let's read one together!",
+    'Tap Blend it with Giri. Say each sound with Giri, then say the whole word.',
+  ]);
 }

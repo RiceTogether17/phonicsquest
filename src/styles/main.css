@@ -1268,6 +1268,15 @@ body.bedtime-on * {
   border-left: 4px solid var(--color-primary);
 }
 
+/* "What do I do?" — says the instruction aloud for children who can't read
+   it yet. Sits tight under the line it reads. */
+.mode-instruction-hear {
+  margin-top: calc(-1 * var(--space-2));
+}
+.mode-instruction:empty + .mode-instruction-hear {
+  display: none;
+}
+
 /* ── 7. MODE AREA ── */
 .mode-area {
   width: 100%;
