@@ -40,6 +40,11 @@ const BASE_PROMPTS = {
         'Who was with you (use is/am/are correctly)',
         'How you felt (use because)',
       ],
+      requiredChecks: [
+        { id: 'what-did', label: 'Say what you did', keywordsAny: ['went', 'played', 'ran', 'climbed', 'slid', 'jumped', 'swung', 'sat', 'ate', 'had', 'rode', 'kicked', 'threw', 'caught', 'raced'] },
+        { id: 'who-with', label: 'Say who was with you', keywordsAny: ['with', 'friend', 'friends', 'classmate', 'classmates', 'brother', 'sister', 'mum', 'dad', 'mother', 'father', 'teacher', 'cousin', 'alone'] },
+        { id: 'feeling-because', label: 'Say how you felt and why, using because', keywordsAny: ['because'] },
+      ],
       supportWords: ['I went', 'because', 'and', 'but', 'is', 'are'],
       rubric: [
         'Uses simple past correctly (e.g. went, played, ate)',
@@ -65,6 +70,11 @@ const BASE_PROMPTS = {
         'Who you helped (use correct pronoun)',
         'What you did (use past tense)',
         'Join two ideas with and, but, or because',
+      ],
+      requiredChecks: [
+        { id: 'who-helped', label: 'Say who you helped', keywordsAny: ['helped', 'classmate', 'friend', 'teacher', 'him', 'her', 'boy', 'girl'] },
+        { id: 'what-did', label: 'Say what you did', keywordsAny: ['carried', 'picked', 'gave', 'showed', 'held', 'lent', 'shared', 'cleaned', 'found', 'opened', 'tied', 'helped'] },
+        { id: 'join', label: 'Join two ideas with and, but or because', keywordsAny: ['because', 'but', 'and'] },
       ],
       supportWords: ['I went', 'because', 'and', 'but', 'is', 'are'],
       rubric: [
@@ -96,6 +106,11 @@ const BASE_PROMPTS = {
         'Sequence of events using first/then/after that',
         'What you enjoyed most and why',
       ],
+      requiredChecks: [
+        { id: 'where-when', label: 'Say where and when you went', keywordsAny: ['zoo'] },
+        { id: 'sequence', label: 'Put events in order with first, then, after that', keywordsAny: ['first', 'then', 'after that', 'next', 'finally'], minimumHits: 2 },
+        { id: 'favourite', label: 'Say what you enjoyed most and why', keywordsAny: ['fun', 'enjoy', 'favourite', 'best', 'enjoyed', 'loved', 'liked'] },
+      ],
       supportWords: ['after', 'then', 'first', 'bought', 'brought'],
       rubric: [
         'Uses simple past consistently throughout the recount',
@@ -121,6 +136,11 @@ const BASE_PROMPTS = {
         'What event you prepared for (simple past)',
         'Steps you took in order (first, then, after that)',
         'How you felt at the end',
+      ],
+      requiredChecks: [
+        { id: 'event', label: 'Say what event you prepared for', keywordsAny: ['event', 'concert', 'party', 'fair', 'sports', 'carnival', 'performance', 'celebration', 'day'] },
+        { id: 'steps', label: 'Put the steps in order with first, then, after that', keywordsAny: ['first', 'then', 'after that', 'next', 'finally'], minimumHits: 2 },
+        { id: 'feeling-end', label: 'Say how you felt at the end', keywordsAny: ['felt', 'proud', 'happy', 'tired', 'excited', 'glad', 'relieved'] },
       ],
       supportWords: ['after', 'then', 'first', 'bought', 'brought'],
       rubric: [
@@ -151,6 +171,11 @@ const BASE_PROMPTS = {
         'What you lost and where (simple past)',
         'Steps you took to find it (use when, while, because)',
         'How the situation was resolved',
+      ],
+      requiredChecks: [
+        { id: 'what-lost', label: 'Say what you lost and where', keywordsAny: ['lost', 'missing'] },
+        { id: 'search', label: 'Say what you did to find it', keywordsAny: ['searched', 'looked', 'checked', 'asked', 'retraced'] },
+        { id: 'resolved', label: 'Say how it was solved', keywordsAny: ['found', 'returned', 'finally', 'in the end', 'at last'] },
       ],
       supportWords: ['when', 'while', 'because', 'although', 'each'],
       rubric: [
@@ -183,6 +208,11 @@ const BASE_PROMPTS = {
         'What notes or homework you need',
         'Polite closing with a thank you',
       ],
+      requiredChecks: [
+        { id: 'reason', label: 'Say why you were absent', keywordsAny: ['absent', 'sick', 'ill', 'fever', 'missed'] },
+        { id: 'notes', label: 'Say which notes or homework you need', keywordsAny: ['notes', 'homework', 'worksheet', 'worksheets', 'assignment'] },
+        { id: 'thanks', label: 'End politely with a thank you', keywordsAny: ['thank', 'thanks'] },
+      ],
       supportWords: ['when', 'while', 'because', 'although', 'each'],
       rubric: [
         'Maintains past tense consistency when recounting absence',
@@ -208,6 +238,11 @@ const BASE_PROMPTS = {
         'What the project was about (past tense)',
         'What happened during the work (use while/when)',
         'How your group solved a problem (use because/although)',
+      ],
+      requiredChecks: [
+        { id: 'project', label: 'Say what the project was about', keywordsAny: ['project', 'group', 'model', 'poster', 'presentation'] },
+        { id: 'during', label: 'Say what happened while you worked (while, when)', keywordsAny: ['while', 'when'] },
+        { id: 'solved', label: 'Say how your group solved a problem', keywordsAny: ['solved', 'fixed', 'decided', 'agreed', 'although'] },
       ],
       supportWords: ['when', 'while', 'because', 'although', 'each'],
       rubric: [
@@ -244,6 +279,11 @@ const BASE_PROMPTS = {
         'Plan to catch up (future tense with will)',
         'Use although or if to show mature reasoning',
       ],
+      requiredChecks: [
+        { id: 'reason', label: 'Give the reason you missed practice', keywordsAny: ['fever', 'clinic', 'doctor', 'missed', 'absent', 'sick', 'ill', 'appointment', 'because'] },
+        { id: 'catch-up', label: 'Say how you will catch up (will)', keywordsAny: ['will'] },
+        { id: 'reasoning', label: 'Use although or if to explain', keywordsAny: ['although', 'if'] },
+      ],
       supportWords: ['although', 'if', 'will', 'during', 'the team'],
       rubric: [
         'Uses past and future tense appropriately in different parts',
@@ -275,6 +315,11 @@ const BASE_PROMPTS = {
         'Describe tasks to do (use will for future plans)',
         'Use although to address a possible challenge',
       ],
+      requiredChecks: [
+        { id: 'idea', label: 'Suggest an event idea (use if)', keywordsAny: ['if', 'suggest', 'propose'] },
+        { id: 'tasks', label: 'Describe the tasks (will)', keywordsAny: ['will'] },
+        { id: 'challenge', label: 'Use although to deal with a possible problem', keywordsAny: ['although'] },
+      ],
       supportWords: ['although', 'if', 'will', 'during', 'the team'],
       rubric: [
         'Appropriate mix of past tense (background) and future tense (plans)',
@@ -305,6 +350,11 @@ const BASE_PROMPTS = {
         'Confirm attendance (future tense)',
         'Explain why you want to attend (use although/because)',
         'Polite formal closing',
+      ],
+      requiredChecks: [
+        { id: 'confirm', label: 'Confirm that you will attend', keywordsAny: ['will attend', 'attend', 'confirm', 'pleased to'] },
+        { id: 'why', label: 'Say why you want to attend', keywordsAny: ['because', 'although'] },
+        { id: 'closing', label: 'End with a polite formal closing', keywordsAny: ['thank you', 'yours sincerely', 'regards'] },
       ],
       supportWords: ['although', 'if', 'will', 'during', 'the team'],
       rubric: [
@@ -343,6 +393,11 @@ const BASE_PROMPTS = {
         'Team response using complex sentence structures',
         'Reflection at end with present perfect for lasting impact',
       ],
+      requiredChecks: [
+        { id: 'problem-shown', label: 'Show the problem through actions and feelings', keywordsAny: ['trembled', 'gasped', 'heart', 'froze', 'panicked', 'stared', 'shouted', 'panic'] },
+        { id: 'team', label: 'Show the team working together', keywordsAny: ['together', 'team', 'teamwork', 'everyone', 'helped'] },
+        { id: 'reflection', label: 'Reflect with the present perfect (have learnt, has taught)', keywordsAny: ['has been', 'has taught', 'have become', 'have learnt', 'have learned', 'have realised', 'have realized', 'since then', 'never forget', 'will never forget'] },
+      ],
       supportWords: ['despite', 'not only', 'has been', 'should have'],
       rubric: [
         'Uses past tense accurately with complex clause structures (because/although/when)',
@@ -375,6 +430,11 @@ const BASE_PROMPTS = {
         'Specific activity described with past tense control',
         'Challenge and action using complex connectors',
         'Reflection using present perfect for ongoing impact',
+      ],
+      requiredChecks: [
+        { id: 'activity', label: 'Describe the activity', keywordsAny: ['volunteer', 'volunteered', 'community', 'elderly', 'cleaned', 'donated', 'visited', 'helped'] },
+        { id: 'challenge', label: 'Show a challenge with a linking word', keywordsAny: ['although', 'however', 'despite', 'nevertheless', 'but'] },
+        { id: 'reflection', label: 'Reflect with the present perfect (have learnt, has changed)', keywordsAny: ['has been', 'has taught', 'has changed', 'since that day', 'have learnt', 'have learned', 'have realised', 'have realized', 'since then', 'changed'] },
       ],
       supportWords: ['despite', 'not only', 'has been', 'should have'],
       rubric: [
@@ -409,6 +469,11 @@ const BASE_PROMPTS = {
         'Dialogue at climax with correct punctuation',
         'Lesson learned using present perfect and advanced connectors',
       ],
+      requiredChecks: [
+        { id: 'cause', label: 'Show what caused the misunderstanding', keywordsAny: ['misunderstanding', 'thought', 'assumed', 'ignored', 'avoided', 'upset', 'misunderstood'] },
+        { id: 'dialogue', label: 'Use speech at the climax', keywordsAny: ['said', 'asked', 'replied', 'whispered', 'explained', 'admitted'] },
+        { id: 'lesson', label: 'Say what you learnt', keywordsAny: ['has taught', 'taught me', 'learnt', 'learned', 'realised', 'realized', 'honest', 'since then'] },
+      ],
       supportWords: ['despite', 'not only', 'has been', 'should have'],
       rubric: [
         'Past tense control is accurate throughout complex sentences',
@@ -430,45 +495,38 @@ const BASE_PROMPTS = {
   6: [
     {
       id: 'wq-p6-01',
-      mode: 'hybrid',
-      textType: 'situational + continuous',
+      mode: 'situational',
+      textType: 'email report',
       prompt:
-        'Choose one: (A) Write a formal report about a school recycling campaign, OR (B) Write a narrative from a picture prompt about helping a stranger.',
+        'Your class ran a two-week recycling campaign. Write an email to your principal, Mrs Tan, to report how it went and suggest what the school should do next.',
       pac: {
-        purpose: 'Inform / persuade with clear organisation',
-        audience: 'School leaders or general readers',
-        context: 'PSLE-style writing response',
-      },
-      storyPlan: {
-        introduction: 'Set context quickly with precise tense control.',
-        risingAction: 'Build challenge or issue with rising tension.',
-        climax: 'Show key turning point with advanced grammar.',
-        fallingAction: 'Describe response/outcome with formal transitions.',
-        resolution: 'Close with reflection using past perfect and modals.',
+        purpose: 'Report results and make a suggestion',
+        audience: 'Mrs Tan, the principal',
+        context: 'End of a class recycling campaign',
       },
       requiredPoints: [
-        'Clear opening with tense control',
-        'Development using formal connectors and complex structures',
-        'Strong ending with reflection (past perfect, modals)',
+        'What the campaign did and when it ran',
+        'One result, with a number if you can',
+        'One suggestion for next term, with a reason',
       ],
-      supportWords: [
-        'consequently',
-        'furthermore',
-        'had already',
-        'nevertheless',
+      requiredChecks: [
+        { id: 'campaign', label: 'Say what the campaign did and when', keywordsAny: ['campaign', 'recycling', 'recycle', 'collected', 'bins', 'weeks'] },
+        { id: 'result', label: 'Give one result', keywordsAny: ['collected', 'increased', 'reduced', 'kilograms', 'kg', 'more than', 'twice', 'result', 'results'] },
+        { id: 'suggestion', label: 'Suggest what to do next, with a reason', keywordsAny: ['suggest', 'propose', 'recommend', 'hope', 'could', 'would like', 'next term'] },
       ],
+      supportWords: ['I am writing to', 'As a result', 'Furthermore', 'I would like to suggest', 'Yours sincerely'],
       rubric: [
-        'All grammar strands controlled: tense, SVA, connectors, pronouns',
-        'Formal connectors (consequently, furthermore, nevertheless) used accurately',
-        'Past perfect (had already) used correctly to sequence events',
-        'Pronoun-antecedent clarity maintained in complex sentences',
+        'All three points covered clearly',
+        'Polite, formal tone that suits the principal',
+        'Results stated with facts, not just feelings',
+        'Clear paragraphs: purpose, results, suggestion, closing',
       ],
       sampleAnswer:
-        'The school recycling campaign had already been running for two weeks when the committee noticed a drop in participation. Consequently, we held an emergency meeting to discuss new strategies. Furthermore, we invited a guest speaker who shared her experience working with environmental organisations. Nevertheless, some students remained sceptical. The committee — which had already prepared backup plans — launched a poster competition. By the end of the term, recycling rates had improved by forty percent. The project taught us that persistence and clear communication are essential for lasting change.',
+        'Dear Mrs Tan,\n\nI am writing to report on the recycling campaign that Primary 6 Courage ran from 3 to 14 March. We placed recycling bins for paper, cans and plastic bottles outside every classroom on Level 3, and class monitors emptied them each afternoon.\n\nThe campaign went well. In two weeks, we collected 48 kilograms of paper and more than 300 cans. Furthermore, the amount of rubbish in our class bins was reduced by about half, according to the cleaners.\n\nI would like to suggest that the school places recycling bins on every level next term. Many pupils from other classes asked where they could recycle, so I believe the whole school would take part.\n\nThank you for supporting our campaign.\n\nYours sincerely,\nAisyah Rahman\nClass Monitor, P6 Courage',
       xp: 60,
       tryThis: [
-        'Tier 1: Add one sentence using "nevertheless" to show contrast.',
-        'Tier 2: Revise your draft to improve one weak paragraph using COLM criteria (Content, Organisation, Language, Mechanics).',
+        'Tier 1: Add one fact or number to your result paragraph.',
+        'Tier 2: Give your suggestion a reason that the principal would care about.',
       ],
     },
     {
@@ -489,6 +547,11 @@ const BASE_PROMPTS = {
         'Moral dilemma developed with advanced connectors',
         'Reflection using modal precision (would, need not, had better)',
       ],
+      requiredChecks: [
+        { id: 'dilemma', label: 'Show the choice you faced', keywordsAny: ['hide', 'admit', 'admitted', 'truth', 'tempted', 'hesitated', 'whether', 'should', 'could have', 'could hide'] },
+        { id: 'connectors', label: 'Link ideas with advanced connectors', keywordsAny: ['nevertheless', 'however', 'although', 'despite', 'consequently', 'furthermore'] },
+        { id: 'reflection', label: 'Reflect with would, need not or had', keywordsAny: ['would', 'need not', 'had learnt', 'had learned', 'realised', 'realized', 'learnt'] },
+      ],
       supportWords: [
         'consequently',
         'furthermore',
@@ -502,7 +565,7 @@ const BASE_PROMPTS = {
         'Modal verbs used with precision (would, need not, had better)',
       ],
       sampleAnswer:
-        'I had already stuffed the torn test paper into my bag when Mrs Lee asked us to return our scripts. My heart pounded. Nevertheless, I raised my hand and walked to the front. "I accidentally tore my paper," I admitted, my voice barely a whisper. Furthermore, I explained that I had not intended to hide it. Consequently, Mrs Lee gave me a new copy and thanked me for being honest. She said I need not worry about the tear and that honesty had better be valued more than a perfect paper. That evening, I reflected on how I would handle such moments in the future — I now understood that the truth, however uncomfortable, is always the right path.',
+        'I had already stuffed the torn test paper into my bag when Mrs Lee asked us to return our scripts. My heart pounded. Nevertheless, I raised my hand and walked to the front. "I accidentally tore my paper," I admitted, my voice barely a whisper. Furthermore, I explained that I had not intended to hide it. Consequently, Mrs Lee gave me a new copy and thanked me for being honest. She said I need not worry about the tear, and that she valued honesty far more than a perfect paper. That evening, I reflected on how I would handle such moments in the future — I now understood that the truth, however uncomfortable, is always the right path.',
       xp: 62,
       tryThis: [
         'Tier 1: Add one sentence using "had already" to show a past-before-past event.',
@@ -512,37 +575,37 @@ const BASE_PROMPTS = {
     {
       id: 'wq-p6-03',
       mode: 'situational',
-      textType: 'formal argumentative essay',
+      textType: 'formal letter',
       prompt:
-        'Write a formal argumentative essay on whether school rules help or limit students. Use clear examples and a balanced conclusion.',
+        'Some pupils want to be allowed to use mobile phones during recess. Write a letter to your principal, Mr Lim, giving your view and suggesting a fair rule.',
       pac: {
-        purpose: 'Argue and persuade with balanced reasoning',
-        audience: 'School leaders and teachers',
-        context: 'PSLE-style formal writing',
+        purpose: 'Give a view politely and suggest a rule',
+        audience: 'Mr Lim, the principal',
+        context: 'A school discussion about phones at recess',
       },
       requiredPoints: [
-        'Clear thesis with supporting examples',
-        'Counter-argument addressed using formal connectors',
-        'Balanced conclusion with modal precision',
+        'Your view, with one reason',
+        'One worry others may have, and your answer to it',
+        'A fair rule you suggest',
       ],
-      supportWords: [
-        'consequently',
-        'furthermore',
-        'had already',
-        'nevertheless',
+      requiredChecks: [
+        { id: 'view', label: 'Give your view with a reason', keywordsAny: ['believe', 'think', 'feel', 'view', 'opinion', 'because'] },
+        { id: 'worry', label: 'Answer one worry others may have', keywordsAny: ['however', 'worry', 'worried', 'concern', 'although', 'some teachers', 'some parents', 'nevertheless'] },
+        { id: 'rule', label: 'Suggest a fair rule', keywordsAny: ['suggest', 'propose', 'rule', 'allowed', 'only', 'could'] },
       ],
+      supportWords: ['I am writing to', 'I believe', 'However', 'I would like to suggest', 'Yours sincerely'],
       rubric: [
-        'All grammar strands demonstrate PSLE-level control',
-        'Formal connectors (consequently, furthermore, nevertheless, moreover) structure the argument',
-        'Tense control is accurate: present for general truths, past for examples, past perfect for sequences',
-        'Subject-verb agreement maintained with complex subjects throughout',
+        'All three points covered clearly',
+        'Polite, formal tone that suits the principal',
+        'The worry is answered fairly, not ignored',
+        'The rule is specific and practical',
       ],
       sampleAnswer:
-        'School rules are often seen as restrictive, but they serve an important purpose. Furthermore, rules such as punctuality create a calm and structured learning environment. Consequently, students learn discipline and responsibility from a young age. Nevertheless, some argue that excessive regulations limit creativity and independence. A student who had already shown leadership qualities, for example, might feel constrained by rules that do not allow student-led initiatives. In conclusion, school rules are most effective when they are fair, clearly communicated, and regularly reviewed. Leaders would do well to involve students in the rule-making process, as this fosters both respect and ownership.',
+        'Dear Mr Lim,\n\nI am writing to share my view on whether pupils should be allowed to use mobile phones during recess. I believe a limited rule would help, because many of us need to message our parents about after-school plans.\n\nHowever, I understand that some teachers are worried that pupils will play games instead of eating or talking to friends. This is a fair concern. Nevertheless, I think it can be managed if the rule is clear.\n\nI would like to suggest that phones may be used only in the last ten minutes of recess, and only for calls and messages. Pupils who break the rule could have their phones kept by the form teacher until the end of the day.\n\nThank you for considering my suggestion.\n\nYours sincerely,\nDaniel Koh\nP6 Integrity',
       xp: 64,
       tryThis: [
-        'Tier 1: Add one counter-argument sentence using "nevertheless".',
-        'Tier 2: Improve cohesion by adding formal linkers (furthermore, consequently) between paragraphs.',
+        'Tier 1: Make your rule more exact: when, where and for what?',
+        'Tier 2: Add one sentence that shows you understand the other side.',
       ],
     },
   ],

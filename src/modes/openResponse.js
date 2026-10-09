@@ -55,6 +55,11 @@ export const SELF_MARKS = Object.freeze([
  * @param {string} params.model   the model answer, revealed only after commit
  * @param {string} [params.skill] skill tag recorded with the self-mark
  * @param {string} [params.placeholder]
+ * @param {number} [params.rows]      height of the answer box
+ * @param {string} [params.pointsId]  when set, "Check" first lists which
+ *   required points the answer covers (via `attachOpenResponses`'
+ *   `pointCheck`) and keeps the answer editable; the model is revealed only
+ *   when the child chooses to finish
  * @returns {string}
  */
 export function renderOpenResponseHtml({
@@ -62,17 +67,67 @@ export function renderOpenResponseHtml({
   model,
   skill = '',
   placeholder = 'Write your answer…',
+  rows = 3,
+  pointsId = '',
 }) {
   const key = escapeAttr(id);
+  const points = pointsId ? ` data-or-points="${escapeAttr(pointsId)}"` : '';
   return `
-    <div class="open-response" data-open-response="${key}" data-model="${escapeAttr(model)}" data-skill="${escapeAttr(skill)}">
+    <div class="open-response" data-open-response="${key}" data-model="${escapeAttr(model)}" data-skill="${escapeAttr(skill)}"${points}>
       <label class="open-response__label" for="or-input-${key}">Your answer</label>
-      <textarea id="or-input-${key}" class="open-response__input" rows="3"
+      <textarea id="or-input-${key}" class="open-response__input" rows="${Number(rows) || 3}"
                 placeholder="${escapeAttr(placeholder)}"></textarea>
       <div class="open-response__actions">
-        <button type="button" class="btn btn--primary btn--sm" data-or-check>Check my answer</button>
+        <button type="button" class="btn btn--primary btn--sm" data-or-check>${pointsId ? 'Check my points' : 'Check my answer'}</button>
       </div>
       <div class="open-response__result" data-or-result hidden aria-live="polite"></div>
+    </div>`;
+}
+
+/**
+ * Which required points the answer covers, with a hint for each one missing.
+ *
+ * @param {{points: {bullet: string, covered: boolean, hint: string}[],
+ *   covered: number, total: number, format?: {label: string, ok: boolean}[]}} check
+ * @param {boolean} finished  the answer is locked and the model is showing
+ */
+function _pointsHtml(check, finished) {
+  const all = check.covered === check.total;
+  const rows = check.points
+    .map(
+      (p) => `
+        <li class="open-response__point open-response__point--${p.covered ? 'covered' : 'missing'}">
+          <span aria-hidden="true">${p.covered ? '✓' : '•'}</span>
+          <span class="visually-hidden">${p.covered ? 'Covered:' : 'Missing:'}</span>
+          ${escapeHtml(p.bullet)}
+          ${p.covered || !p.hint ? '' : `<span class="open-response__point-hint">${escapeHtml(p.hint)}</span>`}
+        </li>`,
+    )
+    .join('');
+  const format = (check.format || [])
+    .map(
+      (f) => `
+        <li class="open-response__point open-response__point--${f.ok ? 'covered' : 'missing'}">
+          <span aria-hidden="true">${f.ok ? '✓' : '•'}</span>
+          <span class="visually-hidden">${f.ok ? 'Done:' : 'Missing:'}</span>
+          ${escapeHtml(f.label)}
+        </li>`,
+    )
+    .join('');
+  let note;
+  if (finished) {
+    note = `You covered ${check.covered} of ${check.total} points.`;
+  } else if (all) {
+    note = `All ${check.total} points are there. Read it once more for full stops and spelling, then finish to see the model answer.`;
+  } else {
+    note = `You covered ${check.covered} of ${check.total} points. Add the missing ${check.total - check.covered === 1 ? 'point' : 'points'}, then check again. In the exam, a missing point costs marks.`;
+  }
+  return `
+    <div class="open-response__points">
+      <p class="open-response__ideas-title">Required points</p>
+      <ul class="open-response__point-list">${rows}${format}</ul>
+      <p class="open-response__ideas-note">${escapeHtml(note)}</p>
+      ${finished ? '' : '<button type="button" class="btn btn--ghost btn--sm" data-or-finish>I am finished. Show the model answer</button>'}
     </div>`;
 }
 
@@ -124,10 +179,12 @@ function _resultHtml(given, model) {
  * @param {string} [opts.quest]  quest key recorded against the self-mark
  * @param {string} [opts.level]
  * @param {(result: {id: string, mark: string, value: number, skill: string}) => void} [opts.onMark]
+ * @param {(pointsId: string, text: string) => object|null} [opts.pointCheck]
+ *   point checker for boxes rendered with `pointsId`
  */
 export function attachOpenResponses(
   container,
-  { quest = 'openResponse', level = null, onMark } = {},
+  { quest = 'openResponse', level = null, onMark, pointCheck } = {},
 ) {
   if (!container) return;
 
@@ -139,11 +196,35 @@ export function attachOpenResponses(
     const checkBtn = box.querySelector('[data-or-check]');
     if (!input || !result || !checkBtn) continue;
 
-    checkBtn.addEventListener('click', () => {
+    const pointsId = box.getAttribute('data-or-points') || '';
+    const checkPoints = (text) => (pointsId && pointCheck ? pointCheck(pointsId, text) : null);
+
+    // A point check keeps the answer editable: the child is told which
+    // required point is missing and can add it before seeing the model.
+    if (checkPoints('') !== null) {
+      checkBtn.addEventListener('click', () => {
+        const given = input.value.trim();
+        result.hidden = false;
+        if (!given) {
+          result.innerHTML = _resultHtml(given, '');
+          input.focus();
+          return;
+        }
+        result.innerHTML = _pointsHtml(checkPoints(given), false);
+        checkBtn.textContent = 'Check again';
+        result.querySelector('[data-or-finish]')?.addEventListener('click', () => reveal(true));
+      });
+    } else {
+      checkBtn.addEventListener('click', () => reveal(false));
+    }
+
+    function reveal(withPoints) {
       const given = input.value.trim();
       const model = box.getAttribute('data-model') || '';
       result.hidden = false;
-      result.innerHTML = _resultHtml(given, model);
+      result.innerHTML =
+        (withPoints && given ? _pointsHtml(checkPoints(given), true) : '') +
+        _resultHtml(given, model);
 
       if (!given) {
         input.focus();
@@ -196,6 +277,6 @@ export function attachOpenResponses(
           });
         });
       }
-    });
+    }
   }
 }

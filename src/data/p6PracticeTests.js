@@ -782,7 +782,7 @@ Alex Tan`,
         'Encourage Jordan positively and offer to help him set up his privacy settings',
       ],
       wordCount: '150–200 words',
-      modelAnswer: `To: sam@example.com
+      modelAnswer: `To: jordan@example.com
 Subject: Staying Safe on Your New Social Media App
 
 Hi Jordan,
@@ -798,7 +798,7 @@ I know it can all feel a bit overwhelming at first, but you will get the hang of
 Looking forward to seeing your posts!
 
 Best,
-Jordan`,
+Sam`,
       rubric: {
         taskFulfillment: 'Covers all three bullets; uses correct email format (subject line, greeting, sign-off); tone is friendly and supportive.',
         language: 'Appropriate informal register; varied vocabulary; minimal grammar errors.',

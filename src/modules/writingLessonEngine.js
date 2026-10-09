@@ -5,6 +5,8 @@
  * paragraph mission checking (now section-aware), and remediation routing.
  */
 
+import { PLAN_GUIDE } from '../data/writingLessonPacks.js';
+
 const STOPWORDS = new Set([
   'the',
   'and',
@@ -163,7 +165,7 @@ export function createPlanChecks(plan) {
       const expandedKeywords = _expandWithSynonyms(extracted.words);
       return {
         id: `plan-${key}`,
-        label: `Planned ${key} appears in draft`,
+        label: `Use your plan for “${PLAN_GUIDE[key]?.label || key}” in your writing`,
         keywordsAny: expandedKeywords.slice(0, 8),
         _phrases: extracted.phrases,
         _sectionKey: key,
@@ -373,18 +375,27 @@ export function getRemediationPath(result) {
   // Generate targeted prompts for each weak dimension
   const nq = result?.metrics?.narrativeQuality || {};
   const narrativePrompts = [];
-  if (nq.climax !== undefined && nq.climax < 0.3) {
+  // Story advice (turning point, resolution) is only for stories. A correct
+  // email or recount used to be told to add "suddenly".
+  const isNarrative = result?.metrics?.isNarrative !== false;
+
+  if (isNarrative && nq.climax !== undefined && nq.climax < 0.3) {
     narrativePrompts.push(
       'Add a clear turning point with a surprise marker (e.g. "suddenly", "just then").',
     );
   }
-  if (nq.resolution !== undefined && nq.resolution < 0.3) {
+  if (isNarrative && nq.resolution !== undefined && nq.resolution < 0.3) {
     narrativePrompts.push('Show how the problem was solved at the end.');
   }
-  if (nq.reflection !== undefined && nq.reflection < 0.3) {
+  if (isNarrative && nq.reflection !== undefined && nq.reflection < 0.3) {
     narrativePrompts.push('End with what the character learned or felt.');
   }
-  if (nq.dialogue !== undefined && nq.dialogue < 0.3 && result?.metrics?.hasDialogue) {
+  if (
+    isNarrative &&
+    nq.dialogue !== undefined &&
+    nq.dialogue < 0.3 &&
+    result?.metrics?.hasDialogue
+  ) {
     narrativePrompts.push('Make dialogue show a decision or feeling, not just greetings.');
   }
 
@@ -392,6 +403,8 @@ export function getRemediationPath(result) {
     title: missionByWeakness[weak] || missionByWeakness.content,
     missingChecks,
     narrativePrompts,
+    grammarSlips: result?.grammarSlips || [],
+    problemMessage: result?.problemMessage || '',
     weakestDimension: weak,
   };
 }

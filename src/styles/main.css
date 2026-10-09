@@ -17390,6 +17390,42 @@ textarea:hover {
   background: color-mix(in srgb, var(--color-warning, #f59e0b) 16%, var(--surface));
   color: color-mix(in srgb, var(--color-warning, #f59e0b) 75%, #000);
 }
+.open-response__points {
+  margin-bottom: var(--space-2, 8px);
+}
+.open-response__point-list {
+  list-style: none;
+  margin: 4px 0;
+  padding: 0;
+}
+.open-response__point {
+  display: grid;
+  grid-template-columns: 1.2em 1fr;
+  column-gap: 4px;
+  margin: 0 0 4px;
+}
+.open-response__point--covered > span:first-child {
+  color: var(--color-success-text);
+  font-weight: 700;
+}
+.open-response__point--missing > span:first-child {
+  color: color-mix(in srgb, var(--color-warning, #f59e0b) 75%, #000);
+  font-weight: 700;
+}
+.open-response__points .btn {
+  max-width: 100%;
+  white-space: normal;
+  text-align: left;
+}
+.open-response--checked .open-response__yours,
+.open-response--checked .open-response__model {
+  white-space: pre-line;
+}
+.open-response__point-hint {
+  grid-column: 2;
+  font-size: var(--font-size-xs, 0.78rem);
+  color: var(--text-muted, #555);
+}
 .open-response__mark {
   margin: var(--space-2, 8px) 0 0;
   padding: 0;

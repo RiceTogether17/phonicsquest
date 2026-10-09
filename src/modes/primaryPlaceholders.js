@@ -26,6 +26,7 @@ import { P5_PRACTICE_TESTS, P5_PRACTICE_TEST_TERMS } from '../data/p5PracticeTes
 import { P6_PRACTICE_TESTS, P6_PRACTICE_TEST_TERMS } from '../data/p6PracticeTests.js';
 import { mountPracticeTest, buildPaperLauncherHtml } from './primaryPracticeTest.js';
 import { renderOpenResponseHtml, attachOpenResponses } from './openResponse.js';
+import { checkSituationalPoints } from '../modules/situationalChecks.js';
 import { mountSectionRunner } from './primarySectionRunner.js';
 import { renderVisualStimulus } from './visualStimulus.js';
 
@@ -114,6 +115,12 @@ function _openComprehensionBody(item) {
     </ol>`;
 }
 
+/** Point checks for situational boxes, looked up by prompt id. */
+function _situationalPointCheck(id, text) {
+  const item = SITUATIONAL_WRITING_PROMPTS.find((p) => p.id === id);
+  return item ? checkSituationalPoints(item, text) : null;
+}
+
 function _situationalWritingBody(item) {
   return `
     <h4>${escapeHtml(item.title)} <span class="module-level-badge">${escapeHtml(item.level)}</span></h4>
@@ -129,6 +136,8 @@ function _situationalWritingBody(item) {
       model: item.modelAnswer || '',
       skill: 'situationalWriting',
       placeholder: 'Write your letter, email or diary entry here…',
+      rows: 12,
+      pointsId: item.id,
     })}
     ${
       item.checklist?.length
@@ -136,15 +145,6 @@ function _situationalWritingBody(item) {
       <details>
         <summary>Self-check list</summary>
         <ul>${item.checklist.map((c) => `<li>${escapeHtml(c)}</li>`).join('')}</ul>
-      </details>`
-        : ''
-    }
-    ${
-      item.modelAnswer
-        ? `
-      <details>
-        <summary>Show model answer</summary>
-        <p class="placeholder-model" style="white-space:pre-line">${escapeHtml(item.modelAnswer)}</p>
       </details>`
         : ''
     }
@@ -240,6 +240,8 @@ function _renderSituationalWriting() {
             model: s.modelAnswer || '',
             skill: 'situationalWriting',
             placeholder: 'Write your letter, email or diary entry here…',
+            rows: 12,
+            pointsId: s.id,
           })}
           ${
             s.checklist?.length
@@ -247,15 +249,6 @@ function _renderSituationalWriting() {
             <details>
               <summary>Self-check list</summary>
               <ul>${s.checklist.map((c) => `<li>${escapeHtml(c)}</li>`).join('')}</ul>
-            </details>`
-              : ''
-          }
-          ${
-            s.modelAnswer
-              ? `
-            <details>
-              <summary>Show model answer</summary>
-              <pre class="placeholder-poster">${escapeHtml(s.modelAnswer)}</pre>
             </details>`
               : ''
           }
@@ -352,7 +345,7 @@ export function mountPlaceholderModule(container, kind, { onClose, onRelated } =
   });
 
   // The comprehension and writing libraries are answerable, not just readable.
-  attachOpenResponses(container, { quest: kind });
+  attachOpenResponses(container, { quest: kind, pointCheck: _situationalPointCheck });
 
   // Catalogue-then-one-task sections paint themselves, and rewire their answer
   // boxes on every navigation. Audit 2026-09-19, finding 17.
@@ -364,7 +357,8 @@ export function mountPlaceholderModule(container, kind, { onClose, onRelated } =
       kind,
       unit: section.unit,
       renderItem: section.body,
-      onItemMounted: (host) => attachOpenResponses(host, { quest: kind }),
+      onItemMounted: (host) =>
+        attachOpenResponses(host, { quest: kind, pointCheck: _situationalPointCheck }),
     });
   }
 
