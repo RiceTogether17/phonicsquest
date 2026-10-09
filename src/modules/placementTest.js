@@ -266,7 +266,7 @@ export const GATE_A_ITEMS = [
     kind: 'picture-choice',
     title: 'Known vocabulary',
     prompt: 'Tap something you eat.',
-    speak: 'something you eat',
+    say: ['Tap something you eat.'],
     correct: 'banana',
     options: [
       { id: 'banana', emoji: '🍌', label: 'Banana' },
@@ -283,7 +283,7 @@ export const GATE_A_ITEMS = [
     kind: 'picture-choice',
     title: 'Known vocabulary',
     prompt: 'Tap someone who is running.',
-    speak: 'running',
+    say: ['Tap someone who is running.'],
     correct: 'runner',
     options: [
       { id: 'runner', emoji: '🏃', label: 'Running' },
@@ -300,7 +300,7 @@ export const GATE_A_ITEMS = [
     kind: 'picture-choice',
     title: 'Known vocabulary',
     prompt: 'Tap something that is hot.',
-    speak: 'hot',
+    say: ['Tap something that is hot.'],
     correct: 'fire',
     options: [
       { id: 'fire', emoji: '🔥', label: 'Fire' },
@@ -317,7 +317,7 @@ export const GATE_A_ITEMS = [
     kind: 'picture-choice',
     title: 'Known vocabulary',
     prompt: 'Tap the helper who treats sick people.',
-    speak: 'doctor',
+    say: ['Tap the helper who treats sick people.'],
     correct: 'doctor',
     options: [
       { id: 'doctor', emoji: '🧑‍⚕️', label: 'Doctor' },
@@ -339,7 +339,7 @@ export const GATE_A_ITEMS = [
     kind: 'picture-choice',
     title: 'First sound',
     prompt: 'Which picture starts with /m/?',
-    speak: 'moon',
+    say: ['Which picture starts with', { sound: 'm' }],
     correct: 'moon',
     options: [
       { id: 'moon', emoji: '🌙', label: 'Moon' },
@@ -356,7 +356,7 @@ export const GATE_A_ITEMS = [
     kind: 'picture-choice',
     title: 'First sound',
     prompt: 'Which picture starts with /s/?',
-    speak: 'sock',
+    say: ['Which picture starts with', { sound: 's' }],
     correct: 'sock',
     options: [
       { id: 'sock', emoji: '🧦', label: 'Sock' },
@@ -373,7 +373,7 @@ export const GATE_A_ITEMS = [
     kind: 'picture-choice',
     title: 'First sound',
     prompt: 'Which picture starts with /b/?',
-    speak: 'ball',
+    say: ['Which picture starts with', { sound: 'b' }],
     correct: 'ball',
     options: [
       { id: 'ball', emoji: '⚽', label: 'Ball' },
@@ -390,12 +390,12 @@ export const GATE_A_ITEMS = [
     kind: 'picture-choice',
     title: 'Last sound',
     prompt: 'Which picture ends with /t/?',
-    speak: 'cat',
+    say: ['Which picture ends with', { sound: 't' }],
     correct: 'cat',
     options: [
       { id: 'cat', emoji: '🐱', label: 'Cat' },
       { id: 'bee', emoji: '🐝', label: 'Bee' },
-      { id: 'goat', emoji: '🐐', label: 'Goat' },
+      { id: 'fish', emoji: '🐟', label: 'Fish' },
       { id: 'shoe', emoji: '👟', label: 'Shoe' },
     ],
   },
@@ -407,7 +407,7 @@ export const GATE_A_ITEMS = [
     kind: 'picture-choice',
     title: 'Last sound',
     prompt: 'Which picture ends with /g/?',
-    speak: 'dog',
+    say: ['Which picture ends with', { sound: 'g' }],
     correct: 'dog',
     options: [
       { id: 'dog', emoji: '🐶', label: 'Dog' },
@@ -424,7 +424,7 @@ export const GATE_A_ITEMS = [
     kind: 'picture-choice',
     title: 'Last sound',
     prompt: 'Which picture ends with /n/?',
-    speak: 'sun',
+    say: ['Which picture ends with', { sound: 'n' }],
     correct: 'sun',
     options: [
       { id: 'sun', emoji: '☀️', label: 'Sun' },
@@ -441,7 +441,7 @@ export const GATE_A_ITEMS = [
     kind: 'picture-choice',
     title: 'Middle sound',
     prompt: 'Which picture has /a/ in the middle?',
-    speak: 'cat',
+    say: ['Which picture has', { sound: 'a' }, 'in the middle?'],
     correct: 'cat',
     options: [
       { id: 'cat', emoji: '🐱', label: 'Cat' },
@@ -458,7 +458,7 @@ export const GATE_A_ITEMS = [
     kind: 'picture-choice',
     title: 'Middle sound',
     prompt: 'Which picture has /i/ in the middle?',
-    speak: 'pig',
+    say: ['Which picture has', { sound: 'i' }, 'in the middle?'],
     correct: 'pig',
     options: [
       { id: 'pig', emoji: '🐷', label: 'Pig' },
@@ -475,7 +475,7 @@ export const GATE_A_ITEMS = [
     kind: 'picture-choice',
     title: 'Middle sound',
     prompt: 'Which picture has /o/ in the middle?',
-    speak: 'dog',
+    say: ['Which picture has', { sound: 'o' }, 'in the middle?'],
     correct: 'dog',
     options: [
       { id: 'dog', emoji: '🐶', label: 'Dog' },
@@ -522,7 +522,7 @@ export const GATE_A_ITEMS = [
     kind: 'picture-choice',
     title: 'Oral blending',
     prompt: 'Listen: /c/ /a/ /t/. Tap the word.',
-    speak: 'cat',
+    say: ['Listen.', { sound: 'c' }, { sound: 'a' }, { sound: 't' }, 'Tap the word.'],
     correct: 'cat',
     sourceGroup: 'cvc-a',
     options: [
@@ -540,7 +540,7 @@ export const GATE_A_ITEMS = [
     kind: 'picture-choice',
     title: 'Oral blending',
     prompt: 'Listen: /d/ /o/ /g/. Tap the word.',
-    speak: 'dog',
+    say: ['Listen.', { sound: 'd' }, { sound: 'o' }, { sound: 'g' }, 'Tap the word.'],
     correct: 'dog',
     sourceGroup: 'cvc-o',
     options: [
@@ -558,7 +558,7 @@ export const GATE_A_ITEMS = [
     kind: 'picture-choice',
     title: 'Oral blending',
     prompt: 'Listen: /s/ /u/ /n/. Tap the word.',
-    speak: 'sun',
+    say: ['Listen.', { sound: 's' }, { sound: 'u' }, { sound: 'n' }, 'Tap the word.'],
     correct: 'sun',
     sourceGroup: 'cvc-u',
     options: [
@@ -1287,7 +1287,7 @@ const GATE_C_ITEMS = [
     section: 'connectedReading',
     kind: 'word-choice',
     title: 'Decodable reading',
-    prompt: 'Tap: jump',
+    prompt: 'Listen, then tap the word you hear.',
     speak: 'jump',
     correct: 'jump',
     options: ['jump', 'lump', 'lamp', 'hump'],
@@ -1299,7 +1299,7 @@ const GATE_C_ITEMS = [
     section: 'connectedReading',
     kind: 'word-choice',
     title: 'Decodable reading',
-    prompt: 'Tap: help',
+    prompt: 'Listen, then tap the word you hear.',
     speak: 'help',
     correct: 'help',
     options: ['help', 'held', 'heap', 'helm'],
@@ -1368,7 +1368,7 @@ const GATE_C_ITEMS = [
     kind: 'picture-choice',
     title: 'Comprehension',
     prompt: 'Listen: "Sam had a red cap." Tap what Sam had.',
-    speak: 'red cap',
+    say: ['Sam had a red cap. Tap what Sam had.'],
     correct: 'cap',
     options: [
       { id: 'cap', emoji: '🧢', label: 'Cap' },
@@ -1385,7 +1385,7 @@ const GATE_C_ITEMS = [
     kind: 'picture-choice',
     title: 'Comprehension',
     prompt: 'Listen: "The frog sat on a log." Where did the frog sit?',
-    speak: 'log',
+    say: ['The frog sat on a log. Where did the frog sit?'],
     correct: 'log',
     options: [
       { id: 'log', emoji: '🪵', label: 'Log' },
@@ -1953,6 +1953,7 @@ const BAND_DESCRIPTION = {
 };
 
 export {
+  GATE_C_ITEMS,
   _computeStageScores,
   _computeSkillGaps,
   _severityFor,
@@ -2442,6 +2443,17 @@ export function getNextGateToAppend(baseResult, existingSequence = []) {
 /**
  * Render the placement test into `container`.
  */
+/**
+ * Play an item's spoken prompt. `say` is the question, with speech sounds
+ * as recordings (see audio.speakWithSounds); `speak` is a single word to
+ * listen for. The spoken prompt must never name the answer unless hearing
+ * the word IS the task (Gate B, "tap the word you hear").
+ */
+function playPrompt(item) {
+  if (item.say) return audio.speakWithSounds(item.say);
+  if (item.speak) return audio.speakWord(item.speak);
+}
+
 export function showPlacementTest({ container, profile, onComplete }) {
   if (!container) return;
 
@@ -2521,11 +2533,9 @@ export function showPlacementTest({ container, profile, onComplete }) {
       });
     });
 
-    container.querySelector('#pt-listen')?.addEventListener('click', () => {
-      if (item.speak) audio.speakWord(item.speak);
-    });
+    container.querySelector('#pt-listen')?.addEventListener('click', () => playPrompt(item));
 
-    if (item.speak) setTimeout(() => audio.speakWord(item.speak), 200);
+    if (item.say || item.speak) setTimeout(() => playPrompt(item), 200);
   }
 
   function renderIntake() {
@@ -2669,7 +2679,7 @@ export function showPlacementTest({ container, profile, onComplete }) {
     renderFrame(`
       <div class="pt-item">
         <div class="pt-phase-tag">Gate ${item.gate} · ${item.title}</div>
-        ${item.speak ? '<button class="pt-listen-btn" id="pt-listen">🔊 Hear prompt</button>' : ''}
+        ${item.say || item.speak ? '<button class="pt-listen-btn" id="pt-listen">🔊 Hear prompt</button>' : ''}
         <p class="pt-question">${item.prompt}</p>
         ${item.sentence ? `<p class="pt-question pt-question--grammar">${item.sentence}</p>` : ''}
         <div class="pt-choices" role="group">
