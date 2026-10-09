@@ -15,9 +15,11 @@
  *      (a Promise) so the target-word audio plays in full before the choice
  *      previews start — overlapping the two confuses young listeners.
  *
- * Tap = commit. To re-hear an option, the user can use the existing "Say it"
- * button (which repeats the target word). Mouseenter previews on desktop for
- * keyboard/mouse users; this is silently ignored on touch.
+ * Tap = commit. A child who can't read the "/k/" labels has to remember
+ * every sound from the single preview, so a "Hear the sounds again" button
+ * above the grid replays all of them in order, with the same highlight.
+ * Mouseenter previews on desktop for keyboard/mouse users; this is silently
+ * ignored on touch.
  */
 
 import { audio } from '../modules/audio.js';
@@ -66,6 +68,7 @@ export function cancelChoicePreviews() {
  * @param {Promise<void>|null} [opts.autoPlayAfter=null] - if provided, defer the
  *   auto-play preview until this promise resolves (e.g. wait for the target
  *   word audio to finish so the two don't overlap)
+ * @param {boolean} [opts.replayButton=true] - show "Hear the sounds again"
  * @returns {HTMLButtonElement[]} the rendered buttons in render order
  */
 export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
@@ -75,6 +78,7 @@ export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
     autoPlayDelay = 400,
     autoPlayStride = 650,
     autoPlayAfter = null,
+    replayButton = true,
   } = opts;
 
   // A new grid supersedes any previews still queued from the previous round.
@@ -82,6 +86,14 @@ export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
 
   container.innerHTML = '<div class="choice-grid choice-grid--phoneme"></div>';
   const grid = container.querySelector('.choice-grid');
+
+  if (replayButton) {
+    const replay = document.createElement('button');
+    replay.type = 'button';
+    replay.className = 'btn btn--ghost btn--sm choice-replay';
+    replay.textContent = '🔊 Hear the sounds again';
+    container.insertBefore(replay, grid);
+  }
 
   const buttons = choices.map((choice) => {
     const btn = document.createElement('button');
@@ -124,6 +136,11 @@ export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
 
     grid.appendChild(btn);
     return btn;
+  });
+
+  container.querySelector('.choice-replay')?.addEventListener('click', () => {
+    cancelChoicePreviews();
+    _previewChoicesInOrder(buttons, choices, 150, autoPlayStride);
   });
 
   if (autoPlay) {
