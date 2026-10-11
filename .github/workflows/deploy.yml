@@ -118,7 +118,7 @@ jobs:
 
       # -- Publish ---------------------------------------------------------
       - name: Setup GitHub Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v6
 
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
