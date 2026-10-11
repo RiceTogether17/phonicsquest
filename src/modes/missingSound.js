@@ -13,7 +13,8 @@ import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 import { WORDS, shuffleArray } from '../data/words.js';
-import { createChoiceRound } from './choiceRound.js';
+import { createChoiceRound, playMistakeSound } from './choiceRound.js';
+import { diagnosePhonicsSlip } from '../modules/phonicsDiagnosis.js';
 
 let currentWord = null;
 let missingIndex = -1;
@@ -104,7 +105,7 @@ export function setupMissingSound(word, els) {
     btn.textContent = choice.grapheme;
     btn.dataset.correct = choice.correct;
     btn.setAttribute('aria-label', `Choose ${choice.grapheme}`);
-    btn.addEventListener('click', () => round?.handleTap(choice.correct, btn));
+    btn.addEventListener('click', () => round?.handleTap(choice.correct, btn, choice));
     grid.appendChild(btn);
   }
 
@@ -113,13 +114,20 @@ export function setupMissingSound(word, els) {
     grid,
     onResult: els.onResult,
     retryHint: 'Say the word — which sound fills the gap?',
+    diagnose: (choice) =>
+      diagnosePhonicsSlip({
+        word,
+        position: 'missing',
+        target: { grapheme: correctGrapheme, type: correctType },
+        chosen: choice,
+      }),
     onRetry: () => {
       setTimeout(() => {
         if (store.get('stretchedSpeech')) audio.speakWordStretched(word);
         else audio.speakWord(word.word);
       }, 200);
     },
-    onReveal: () => _revealAnswer(word, els),
+    onReveal: ({ mistake }) => _revealAnswer(word, els, mistake),
   });
 
   // Buttons
@@ -135,7 +143,7 @@ export function setupMissingSound(word, els) {
 }
 
 /** Reveal the full word + play the missing phoneme, then the word. */
-function _revealAnswer(word, els) {
+function _revealAnswer(word, els, mistake = null) {
   buildWordAnimation(word, els.wordDisplay);
   renderPhonemes(word, els.phonemeRow, {
     showDiacritics: true,
@@ -143,6 +151,7 @@ function _revealAnswer(word, els) {
   });
 
   setTimeout(async () => {
+    await playMistakeSound(mistake);
     const prevGrapheme = missingIndex > 0 ? word.graphemes[missingIndex - 1] : null;
     await audio.speakPhoneme(word.graphemes[missingIndex], word.types[missingIndex], {
       index: missingIndex,

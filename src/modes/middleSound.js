@@ -19,7 +19,8 @@
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
 import { renderRevealMouthCue, clearRevealMouthCue } from '../components/mouthCue.js';
 import { renderPhonemeChoiceGrid, cancelChoicePreviews } from '../components/phonemeChoice.js';
-import { createChoiceRound } from './choiceRound.js';
+import { createChoiceRound, playMistakeSound } from './choiceRound.js';
+import { diagnosePhonicsSlip } from '../modules/phonicsDiagnosis.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { soundDistinctPicker } from './phonemePosition.js';
@@ -83,7 +84,7 @@ export function setupMiddleSound(word, els) {
   const wordPlayed = _waitForWordAudio(word);
 
   renderPhonemeChoiceGrid(els.modeArea, choices, {
-    onChoose: (choice, btn) => round?.handleTap(choice.correct, btn),
+    onChoose: (choice, btn) => round?.handleTap(choice.correct, btn, choice),
     autoPlayAfter: wordPlayed,
     autoPlayDelay: 600,
     autoPlayStride: 800,
@@ -94,10 +95,17 @@ export function setupMiddleSound(word, els) {
     grid: els.modeArea.querySelector('.choice-grid'),
     onResult: els.onResult,
     retryHint: 'Say it slowly yourself — what is in the MIDDLE?',
+    diagnose: (choice) =>
+      diagnosePhonicsSlip({
+        word,
+        position: 'middle',
+        target: { grapheme: midGrapheme, type: midType },
+        chosen: choice,
+      }),
     onRetry: () => {
       audio.speakWordArticulated(word.word).catch(() => {});
     },
-    onReveal: () => _revealAnswer(word, els, midIdx),
+    onReveal: ({ mistake }) => _revealAnswer(word, els, midIdx, mistake),
   });
 
   els.btnCheck.style.display = 'none';
@@ -124,7 +132,7 @@ function _waitForWordAudio(wordData) {
 }
 
 /** Reveal the full word: animation + labelled phoneme tiles + audio. */
-function _revealAnswer(word, els, midIdx) {
+function _revealAnswer(word, els, midIdx, mistake = null) {
   buildWordAnimation(word, els.wordDisplay);
   // Ring the middle tile: the child identified a sound *and* a position,
   // and without this the reveal shows every tile equally.
@@ -137,6 +145,7 @@ function _revealAnswer(word, els, midIdx) {
   renderRevealMouthCue(word, midIdx, els);
 
   setTimeout(async () => {
+    await playMistakeSound(mistake);
     const prevGrapheme = midIdx > 0 ? word.graphemes[midIdx - 1] : null;
     await audio.speakPhoneme(word.graphemes[midIdx], word.types[midIdx], {
       index: midIdx,

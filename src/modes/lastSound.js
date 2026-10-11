@@ -14,7 +14,8 @@
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
 import { renderRevealMouthCue, clearRevealMouthCue } from '../components/mouthCue.js';
 import { renderPhonemeChoiceGrid, cancelChoicePreviews } from '../components/phonemeChoice.js';
-import { createChoiceRound } from './choiceRound.js';
+import { createChoiceRound, playMistakeSound } from './choiceRound.js';
+import { diagnosePhonicsSlip } from '../modules/phonicsDiagnosis.js';
 import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { WORDS, shuffleArray } from '../data/words.js';
@@ -91,7 +92,7 @@ export function setupLastSound(word, els) {
   const wordPlayed = _waitForWordAudio(word);
 
   renderPhonemeChoiceGrid(els.modeArea, choices, {
-    onChoose: (choice, btn) => round?.handleTap(choice.correct, btn),
+    onChoose: (choice, btn) => round?.handleTap(choice.correct, btn, choice),
     autoPlayAfter: wordPlayed,
     autoPlayDelay: 600,
     autoPlayStride: 800,
@@ -102,10 +103,17 @@ export function setupLastSound(word, els) {
     grid: els.modeArea.querySelector('.choice-grid'),
     onResult: els.onResult,
     retryHint: 'Listen right to the END of the word.',
+    diagnose: (choice) =>
+      diagnosePhonicsSlip({
+        word,
+        position: 'last',
+        target: { grapheme: lastGrapheme, type: lastType },
+        chosen: choice,
+      }),
     onRetry: () => {
       audio.speakWordArticulated(word.word).catch(() => {});
     },
-    onReveal: () => _revealAnswer(word, els, lastIdx, lastGrapheme, lastType),
+    onReveal: ({ mistake }) => _revealAnswer(word, els, lastIdx, lastGrapheme, lastType, mistake),
   });
 
   els.btnCheck.style.display = 'none';
@@ -132,7 +140,7 @@ function _waitForWordAudio(wordData) {
 }
 
 /** Reveal the full word: animation + labelled phoneme tiles + audio. */
-function _revealAnswer(word, els, lastIdx, lastGrapheme, lastType) {
+function _revealAnswer(word, els, lastIdx, lastGrapheme, lastType, mistake = null) {
   buildWordAnimation(word, els.wordDisplay);
   // Ring the final TILE — for "clamp" that is "mp", which is genuinely the
   // chunk carrying the /p/ the child just named, and showing it tells them
@@ -146,6 +154,7 @@ function _revealAnswer(word, els, lastIdx, lastGrapheme, lastType) {
   renderRevealMouthCue(word, lastIdx, els, { phoneme: lastGrapheme });
 
   setTimeout(async () => {
+    await playMistakeSound(mistake);
     const prevGrapheme = lastIdx > 0 ? word.graphemes[lastIdx - 1] : null;
     await audio.speakPhoneme(lastGrapheme, lastType, { word: word.word, prevGrapheme });
     await new Promise((r) => setTimeout(r, 300));
