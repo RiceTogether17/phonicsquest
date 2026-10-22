@@ -177,7 +177,7 @@ describe('no report reads an invented duration as learner speed (finding 26)', (
   });
 });
 
-describe('an unmeasured answer does not earn the speed bonus (finding 26)', () => {
+describe('an unmeasured answer earns no bonus (finding 26)', () => {
   let gamification;
 
   beforeEach(async () => {
@@ -187,19 +187,14 @@ describe('an unmeasured answer does not earn the speed bonus (finding 26)', () =
   });
 
   it('null means unknown, not instant', () => {
-    // `null < 3000` is true in JavaScript, so passing null to the old
-    // comparison would have handed every unmeasured answer the fast bonus —
-    // the opposite of the fix.
     const unmeasured = gamification.recordCorrect(null, false);
-    expect(unmeasured.reasons).not.toContain('Quick answer!');
-    expect(unmeasured.reasons).toContain('Correct!');
+    expect(unmeasured.reasons).toEqual(['Correct!']);
   });
 
-  it('a genuinely fast measured answer still earns it', () => {
-    expect(gamification.recordCorrect(900, false).reasons).toContain('Quick answer!');
-  });
-
-  it('a slow measured answer does not', () => {
-    expect(gamification.recordCorrect(9000, false).reasons).not.toContain('Quick answer!');
+  it('speed alone earns nothing extra; reading unaided does', () => {
+    expect(gamification.recordCorrect(900, false).reasons).toEqual(['Correct!']);
+    expect(gamification.recordCorrect(9000, false, { unaided: true }).reasons).toContain(
+      'All by yourself!',
+    );
   });
 });

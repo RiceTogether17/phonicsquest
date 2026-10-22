@@ -1124,15 +1124,17 @@ class App {
     progress.recordAttempt(word.id, correct, this._mode, responseTime, evidence);
 
     // First-attempt success = decoded without any wrong strikes or hint use.
-    if (correct && this._wrongStrikes === 0 && !this._hintUsed) {
+    const unaided = correct && this._wrongStrikes === 0 && !this._hintUsed;
+    if (unaided) {
       store.set('sessionFirstTryToday', (store.get('sessionFirstTryToday') || 0) + 1);
     }
 
     if (correct) {
-      const reward = gamification.recordCorrect(responseTime, isNew);
+      const reward = gamification.recordCorrect(responseTime, isNew, { unaided });
 
       const newBadges = badges.onCorrect({
-        fast: responseTime < 3000,
+        // A quick answer only counts when it was not a retry after a miss.
+        fast: unaided && responseTime < 3000,
         sessionStreak: gamification.getSessionStats().correct,
         level: reward.newLevel,
         dayStreak: store.get('streak'),

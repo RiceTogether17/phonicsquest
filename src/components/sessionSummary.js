@@ -11,6 +11,7 @@
  */
 
 import { store } from '../modules/store.js';
+import { gamification } from '../modules/gamification.js';
 import { getActiveProfile } from '../modules/profiles.js';
 import { escapeHtml } from '../utils/escapeHtml.js';
 import { WORDS } from '../data/words.js';
@@ -85,6 +86,14 @@ export function showSessionSummary({
          <span class="ss-streak-label">day streak${streak > 1 ? '' : ''}</span>
          ${streak === bestStreak && streak > 1 ? '<span class="ss-best-badge">Best!</span>' : ''}
        </div>`
+      : '';
+
+  // After a break the streak starts again, but the days already learned
+  // still count, so the child sees how far they have come.
+  const learningDays = gamification.getLearningDays();
+  const learningDaysHtml =
+    learningDays > streak
+      ? `<p class="ss-kept">📅 <strong>${learningDays}</strong> learning days in all!</p>`
       : '';
 
   const badgesHtml = newBadges.length
@@ -166,6 +175,7 @@ export function showSessionSummary({
       ${statsHtml}
       ${wordsHtml}
       ${streakHtml}
+      ${learningDaysHtml}
       ${badgesHtml}
       ${nextHtml}
 

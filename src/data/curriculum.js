@@ -1223,7 +1223,7 @@ export function getStagesInPhase(phaseNumber) {
  */
 export const XP_REWARDS = {
   correct:      10,
-  correct_fast: 15,  // answered in < 3 seconds
+  correct_unaided: 15, // read with no hint and no wrong try
   streak_5:     20,  // 5 in a row
   streak_10:    40,  // 10 in a row
   daily_goal:   50,  // completed daily goal

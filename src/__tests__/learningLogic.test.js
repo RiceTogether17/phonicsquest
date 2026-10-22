@@ -104,11 +104,11 @@ describe('gamification rewards', () => {
   it('applies daily-goal bonus XP when goal is reached', () => {
     store.patch({ xp: 0, dailyGoal: 1, dailyDone: 0 });
 
-    const result = gamification.recordCorrect(2500, false);
+    const result = gamification.recordCorrect(2500, false, { unaided: true });
 
     expect(result.dailyComplete).toBe(true);
-    expect(result.xpEarned).toBe(XP_REWARDS.correct_fast + XP_REWARDS.daily_goal);
-    expect(store.get('xp')).toBe(XP_REWARDS.correct_fast + XP_REWARDS.daily_goal);
+    expect(result.xpEarned).toBe(XP_REWARDS.correct_unaided + XP_REWARDS.daily_goal);
+    expect(store.get('xp')).toBe(XP_REWARDS.correct_unaided + XP_REWARDS.daily_goal);
   });
 });
 

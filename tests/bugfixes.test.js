@@ -62,17 +62,29 @@ describe('Streak logic (gamification._checkStreak)', () => {
     expect(store.get('streak')).toBe(3);
   });
 
-  it('resets streak when 2+ days are missed and no freeze available', () => {
+  it('keeps the streak over up to two rest days, without spending a freeze', () => {
+    for (const ago of [2, 3]) {
+      // 2 days ago = 1 skipped, 3 days ago = 2 skipped (a weekend)
+      store.set('streak', 5);
+      store.set('lastPlayDate', daysAgo(ago));
+      store.set('streakFreezes', 1);
+      gamification._checkStreak();
+      expect(store.get('streak')).toBe(5);
+      expect(store.get('streakFreezes')).toBe(1);
+    }
+  });
+
+  it('resets streak when 3+ days are missed and no freeze available', () => {
     store.set('streak', 5);
-    store.set('lastPlayDate', daysAgo(3)); // 3 days ago = 2 skipped
+    store.set('lastPlayDate', daysAgo(4)); // 4 days ago = 3 skipped
     store.set('streakFreezes', 0);
     gamification._checkStreak();
     expect(store.get('streak')).toBe(0);
   });
 
-  it('uses freeze token when exactly 1 day is skipped', () => {
+  it('uses freeze token when exactly 3 days are skipped', () => {
     store.set('streak', 5);
-    store.set('lastPlayDate', daysAgo(2)); // 2 days ago = 1 skipped
+    store.set('lastPlayDate', daysAgo(4)); // 4 days ago = 3 skipped
     store.set('streakFreezes', 1);
     gamification._checkStreak();
     expect(store.get('streak')).toBe(5); // preserved
@@ -80,13 +92,25 @@ describe('Streak logic (gamification._checkStreak)', () => {
     expect(gamification.wasFreezeUsed()).toBe(true);
   });
 
-  it('does NOT use freeze when 2+ days are skipped', () => {
+  it('does NOT use freeze when 4+ days are skipped', () => {
     store.set('streak', 5);
-    store.set('lastPlayDate', daysAgo(4)); // 4 days ago = 3 skipped
+    store.set('lastPlayDate', daysAgo(5)); // 5 days ago = 4 skipped
     store.set('streakFreezes', 1);
     gamification._checkStreak();
     expect(store.get('streak')).toBe(0); // reset
     expect(store.get('streakFreezes')).toBe(1); // token NOT consumed
+  });
+
+  it('counts learning days, which never go down when a streak resets', () => {
+    store.set('bestStreak', 6); // older save: seeded from the best streak
+    store.set('streak', 0);
+    store.set('lastPlayDate', daysAgo(10));
+    gamification._checkStreak();
+    gamification.recordCorrect(5000, false);
+    expect(store.get('streak')).toBe(1);
+    expect(gamification.getLearningDays()).toBe(7);
+    gamification.recordCorrect(5000, false); // same day: no double count
+    expect(gamification.getLearningDays()).toBe(7);
   });
 
   it('checkDailyReset does NOT overwrite lastPlayDate (streak reads original)', () => {
