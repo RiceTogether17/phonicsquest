@@ -14406,6 +14406,87 @@ button.sst-word:hover,
   color: var(--color-text-muted);
   margin: 0;
 }
+.ss-quality-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-primary-on-tint);
+  margin: 0;
+  text-align: center;
+}
+.ss-learned,
+.ss-next {
+  width: 100%;
+  background: var(--surface-2);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  text-align: center;
+}
+.ss-learned-title,
+.ss-next-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin: 0 0 var(--space-2);
+}
+.ss-word-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ss-word-chip {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: 999px;
+  padding: 2px 12px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.ss-word-chip--more {
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+.ss-kept {
+  margin: var(--space-2) 0 0;
+  font-size: 0.875rem;
+}
+.ss-next-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-primary-on-tint);
+  margin: 0;
+}
+
+/* Focus break (#modal-focus-break) */
+.fb-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+  max-width: 400px;
+  padding: var(--space-5) var(--space-4);
+}
+.fb-emoji {
+  font-size: 4rem;
+}
+.fb-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+}
+.fb-move {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+.fb-timer {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    WEEKLY RECAP  (#modal-weekly-recap)
