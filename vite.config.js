@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite';
+import { basePath } from './scripts/base-path.mjs';
 
 export default defineConfig({
-  base: '/phonicsquest/',
+  // '/phonicsquest/' for GitHub Pages; set BASE_PATH to host anywhere else.
+  base: basePath(),
   build: {
     outDir: 'docs',
     assetsDir: 'assets',

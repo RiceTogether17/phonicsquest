@@ -192,6 +192,9 @@ npm run preview     # preview the production build locally
 
 GitHub Actions deploys `docs/` to GitHub Pages on push to `main`.
 
+To host it anywhere else (Netlify, Cloudflare, your own domain), see
+[SELF_HOSTING.md](SELF_HOSTING.md).
+
 ---
 
 ## 🧪 Running tests
