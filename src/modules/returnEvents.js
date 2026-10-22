@@ -106,6 +106,7 @@ export function showComebackModal(daysAway, handlers = {}) {
   const name = profile?.name?.split(' ')[0] || 'there';
   const dayLabel = daysAway === 1 ? 'yesterday' : `${daysAway} days ago`;
   const streak = store.get('streak') || 0;
+  const learningDays = gamification.getLearningDays();
 
   const modal = _makeModal('modal-comeback', 'Welcome back');
   modal.innerHTML = html`
@@ -113,7 +114,13 @@ export function showComebackModal(daysAway, handlers = {}) {
       <div class="cb-icon" aria-hidden="true">👋</div>
       <h2 class="cb-title">Welcome back, ${name}!</h2>
       <p class="cb-body">You last played ${dayLabel}. Let's warm up with a quick 5-question round before diving in.</p>
-      ${streak > 0 ? html`<p class="cb-streak">🔥 Your streak is at <strong>${streak} days</strong> — keep it going!</p>` : ''}
+      ${
+        streak > 0
+          ? html`<p class="cb-streak">🔥 Your streak is at <strong>${streak} days</strong>. Keep it going!</p>`
+          : learningDays > 0
+            ? html`<p class="cb-streak">📅 You have learned on <strong>${learningDays} days</strong> so far!</p>`
+            : ''
+      }
       <div class="cb-actions">
         <button class="btn btn--primary btn--xl" id="cb-warm-up">Start warm-up →</button>
         <button class="btn btn--ghost" id="cb-skip">Skip, go to home</button>

@@ -14,6 +14,13 @@ import { store } from './store.js';
 import { getLevelInfo, XP_REWARDS } from '../data/curriculum.js';
 import { isBedtimeActive } from './bedtimeMode.js';
 
+/**
+ * Days a child can miss without losing their streak. Two covers a weekend,
+ * so a child who learns on school days keeps going. The weekly freeze
+ * token covers one day more.
+ */
+export const REST_DAYS = 2;
+
 class Gamification {
   constructor() {
     this._sessionCorrect = 0;
@@ -52,8 +59,11 @@ class Gamification {
     const calendarGap = this._daysBetween(last, today); // e.g. Mon→Wed = 2
     const skippedDays = calendarGap - 1; // days actually missed
 
-    // Apply a freeze token if exactly 1 day was skipped and a token is available.
-    if (skippedDays === 1 && freezes > 0) {
+    // Rest days are free: a streak is about coming back, not never stopping.
+    if (skippedDays <= REST_DAYS) return;
+
+    // Apply a freeze token for one day beyond the rest days.
+    if (skippedDays === REST_DAYS + 1 && freezes > 0) {
       store.patch({
         streakFreezes: freezes - 1,
         // Do NOT reset streak — the freeze bridges the gap.
@@ -90,6 +100,17 @@ class Gamification {
     const from = new Date(fromDateStr).getTime();
     const to = new Date(toDateStr).getTime();
     return Math.round(Math.abs(to - from) / 86400000);
+  }
+
+  /**
+   * Every day the child has learned. Older saves never counted this, so
+   * their best streak stands in: those were all learning days.
+   * @returns {number}
+   */
+  getLearningDays() {
+    const days = store.get('learningDays');
+    if (typeof days === 'number' && Number.isFinite(days)) return days;
+    return Math.max(store.get('bestStreak') || 0, store.get('streak') || 0);
   }
 
   /**
@@ -138,26 +159,28 @@ class Gamification {
   /**
    * Record a correct answer. Returns the XP earned breakdown.
    *
+   * The bonus goes to reading a word independently, not to answering fast.
+   * A speed bonus pays a beginner to tap before decoding, and in a
+   * two-choice game a fast guess is right half the time.
+   *
    * @param {number|null} responseTimeMs  how long the child took, or `null`
-   *   when the mode did not measure it. Audit 2026-09-19, finding 26: modes
-   *   that cannot measure a single response used to pass an invented
-   *   constant. `null` must therefore mean "unknown", not "instant" —
-   *   `null < 3000` is true in JavaScript, so an unguarded comparison would
-   *   hand every unmeasured answer the speed bonus.
+   *   when the mode did not measure it. Kept for callers; it no longer earns
+   *   XP.
    * @param {boolean} isNewWord      first time seeing this word
+   * @param {{ unaided?: boolean }} [opts]  unaided: read on the first try
+   *   with no hint. Modes that cannot tell leave it out and earn base XP.
    * @returns {{ xpEarned: number, reasons: string[] }}
    */
-  recordCorrect(responseTimeMs = 5000, isNewWord = false) {
+  recordCorrect(responseTimeMs = 5000, isNewWord = false, { unaided = false } = {}) {
     this._sessionCorrect++;
     this._sessionStreak++;
     const reasons = [];
     let xpEarned = 0;
 
-    // Base XP. Only a measured, plausible duration can earn the speed bonus.
-    const measured = Number.isFinite(responseTimeMs) ? responseTimeMs : null;
-    if (measured !== null && measured < 3000) {
-      xpEarned += XP_REWARDS.correct_fast;
-      reasons.push('Quick answer!');
+    // Base XP, or the bonus for reading it all by yourself.
+    if (unaided) {
+      xpEarned += XP_REWARDS.correct_unaided;
+      reasons.push('All by yourself!');
     } else {
       xpEarned += XP_REWARDS.correct;
       reasons.push('Correct!');
@@ -200,6 +223,7 @@ class Gamification {
       store.patch({
         lastPlayDate: today,
         streak: store.get('streak') + 1,
+        learningDays: this.getLearningDays() + 1,
       });
       const newStreak = store.get('streak');
       if (newStreak > store.get('bestStreak')) {

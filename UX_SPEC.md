@@ -25,7 +25,8 @@ doubt — instructions, layout, button hierarchy — defer to this document.
 4. **Progress is visible.** Stars / dots / phase bar on every screen so a
    child can see "I'm getting closer."
 5. **Reward learning, not speed.** Mastery is accuracy + repeated practice,
-   not first-try speed. Speed bonuses exist but never penalise slow.
+   not first-try speed. The XP bonus is for reading a word with no hint and
+   no wrong try, never for answering fast.
 6. **Tablet-first, laptop-fine.** Touch targets ≥ 48 × 48 px, layout works
    1024 × 768 → 1440 × 900. Keyboard navigation supported everywhere.
 7. **Instructions ≤ 15 words.** Plain English. Verbs the child knows.

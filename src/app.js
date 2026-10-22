@@ -18,6 +18,7 @@ import { getWeeklyActivity } from './modules/weeklyActivity.js';
 import { getMisconceptionSummary } from './modules/teacherFeedback.js';
 import * as homeBanners from './modules/homeBanners.js';
 import * as returnEvents from './modules/returnEvents.js';
+import { focusTimer, showFocusBreak } from './modules/focusBreak.js';
 import * as onboardingController from './modules/onboardingController.js';
 import * as navigationRouter from './modules/navigationRouter.js';
 import * as sessionStarters from './modules/sessionStarters.js';
@@ -1123,15 +1124,17 @@ class App {
     progress.recordAttempt(word.id, correct, this._mode, responseTime, evidence);
 
     // First-attempt success = decoded without any wrong strikes or hint use.
-    if (correct && this._wrongStrikes === 0 && !this._hintUsed) {
+    const unaided = correct && this._wrongStrikes === 0 && !this._hintUsed;
+    if (unaided) {
       store.set('sessionFirstTryToday', (store.get('sessionFirstTryToday') || 0) + 1);
     }
 
     if (correct) {
-      const reward = gamification.recordCorrect(responseTime, isNew);
+      const reward = gamification.recordCorrect(responseTime, isNew, { unaided });
 
       const newBadges = badges.onCorrect({
-        fast: responseTime < 3000,
+        // A quick answer only counts when it was not a retry after a miss.
+        fast: unaided && responseTime < 3000,
         sessionStreak: gamification.getSessionStats().correct,
         level: reward.newLevel,
         dayStreak: store.get('streak'),
@@ -1161,6 +1164,20 @@ class App {
 
       this._showResultScreen(true, word, reward);
       this._adjustModeDifficulty();
+
+      // After a long stretch of play, offer a short movement break — on a
+      // correct answer, so the pause comes on a win. Not while the summary
+      // screen is about to take over.
+      if (focusTimer.noteAnswer() && !reward.dailyComplete) {
+        setTimeout(
+          () =>
+            showFocusBreak({
+              calm: isBedtimeActive(),
+              speak: (t) => audio.speakText(t),
+            }),
+          900,
+        );
+      }
     } else {
       // Wrong — shake the phoneme row before transitioning
       const phonemeRow = document.getElementById('phoneme-row');
@@ -1180,8 +1197,11 @@ class App {
       this._showResultScreen(false, word, null);
       this._adjustModeDifficulty();
 
+      focusTimer.noteAnswer();
       if (result.needsRest) {
-        this._showToast('Take a short break — Giri needs rest! ⭐', 'warning');
+        // Mistakes are how reading grows, so they are never framed as
+        // something to rest from. Giri's stars refill straight away.
+        this._showToast('Tricky words make your brain stronger! Giri’s stars are back ⭐', 'info');
         setTimeout(() => gamification.resetEnergy(), 2000);
       }
     }

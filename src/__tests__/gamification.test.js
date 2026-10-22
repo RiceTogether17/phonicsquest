@@ -44,10 +44,15 @@ describe('Gamification', () => {
       expect(store.get('xp')).toBeGreaterThan(0);
     });
 
-    it('awards fast XP for quick answers (< 3s)', () => {
-      const result = gamification.recordCorrect(2000, false);
-      expect(result.reasons).toContain('Quick answer!');
-      expect(result.xpEarned).toBe(15); // XP_REWARDS.correct_fast
+    it('awards the bonus for reading a word unaided', () => {
+      const result = gamification.recordCorrect(5000, false, { unaided: true });
+      expect(result.reasons).toContain('All by yourself!');
+      expect(result.xpEarned).toBe(15); // XP_REWARDS.correct_unaided
+    });
+
+    it('does not pay extra for speed alone', () => {
+      const result = gamification.recordCorrect(800, false);
+      expect(result.xpEarned).toBe(10); // XP_REWARDS.correct
     });
 
     it('awards new word bonus', () => {

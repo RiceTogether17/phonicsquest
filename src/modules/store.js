@@ -139,6 +139,10 @@ const DEFAULT_STATE = {
   energy: 3,
   streak: 0,
   bestStreak: 0,
+  // Every day the child has learned, ever. Unlike the streak it never goes
+  // down, so a child back from a long break still sees how far they came.
+  // null = not yet counted (older saves); seeded from bestStreak.
+  learningDays: null,
   lastPlayDate: null,
   dailyGoal: 10,
   dailyDone: 0,

@@ -11,8 +11,26 @@
  */
 
 import { store } from '../modules/store.js';
+import { gamification } from '../modules/gamification.js';
 import { getActiveProfile } from '../modules/profiles.js';
 import { escapeHtml } from '../utils/escapeHtml.js';
+import { WORDS } from '../data/words.js';
+import {
+  wordsReadToday,
+  wordsKeptToday,
+  nextAdventure,
+  effortMessage,
+  MAX_WORDS_SHOWN,
+} from '../modules/sessionWins.js';
+
+const getAudio = () => import('../modules/audio.js').then((m) => m.audio);
+
+/** id → written word, built once on first use. */
+let _wordText = null;
+function wordText(id) {
+  if (!_wordText) _wordText = new Map(WORDS.map((w) => [w.id, w.word]));
+  return _wordText.get(id);
+}
 
 /**
  * Show the session summary screen.
@@ -50,10 +68,15 @@ export function showSessionSummary({
   const messages = [
     `You did it, ${firstName}! 🎉`,
     `Brilliant work today, ${firstName}!`,
-    `${firstName} is on a roll! Keep going! 🚀`,
+    `${firstName} is on a roll! 🚀`,
     `That was amazing, ${firstName}! 🌟`,
   ];
   const heading = messages[Math.floor(Math.random() * messages.length)];
+
+  // What the child learned, not just what they scored.
+  const readWords = wordsReadToday(store.get('wordHistory') || [], wordText);
+  const keptWords = wordsKeptToday(store.get('wordStats') || {}, wordText);
+  const next = nextAdventure(store.get('currentGroup'), store.get('groupMastery') || {});
 
   const streakHtml =
     streak > 0
@@ -63,6 +86,14 @@ export function showSessionSummary({
          <span class="ss-streak-label">day streak${streak > 1 ? '' : ''}</span>
          ${streak === bestStreak && streak > 1 ? '<span class="ss-best-badge">Best!</span>' : ''}
        </div>`
+      : '';
+
+  // After a break the streak starts again, but the days already learned
+  // still count, so the child sees how far they have come.
+  const learningDays = gamification.getLearningDays();
+  const learningDaysHtml =
+    learningDays > streak
+      ? `<p class="ss-kept">📅 <strong>${learningDays}</strong> learning days in all!</p>`
       : '';
 
   const badgesHtml = newBadges.length
@@ -82,15 +113,33 @@ export function showSessionSummary({
        </div>`
     : '';
 
-  // First-try rate: colour-code as a quality signal
-  const firstTryPct = wordsCount > 0 ? Math.round((firstTryCount / wordsCount) * 100) : 0;
-  const firstTryColour = firstTryPct >= 70 ? '#22c55e' : firstTryPct >= 50 ? '#f59e0b' : '#ef4444';
-  const firstTryLabel =
-    firstTryPct >= 70
-      ? 'Decoded independently'
-      : firstTryPct >= 50
-        ? 'Mostly independent'
-        : 'Needs more practice';
+  // Praise for effort, never a red grade: a child who needed help still
+  // worked hard, and the tricky words come back on their own to practise.
+  const firstTryLabel = effortMessage(firstTryCount, wordsCount);
+
+  const shown = readWords.slice(0, MAX_WORDS_SHOWN);
+  const more = readWords.length - shown.length;
+  const wordsHtml = shown.length
+    ? `<div class="ss-learned" aria-label="Words you read today">
+         <p class="ss-learned-title">📖 Words you read today</p>
+         <ul class="ss-word-chips">
+           ${shown.map((w) => `<li class="ss-word-chip">${escapeHtml(w)}</li>`).join('')}
+           ${more > 0 ? `<li class="ss-word-chip ss-word-chip--more">+${more} more</li>` : ''}
+         </ul>
+         ${
+           keptWords.length
+             ? `<p class="ss-kept">🧠 ${keptWords.length === 1 ? `<strong>${escapeHtml(keptWords[0])}</strong> is` : `<strong>${keptWords.length} words</strong> are`} now yours for keeps!</p>`
+             : ''
+         }
+       </div>`
+    : '';
+
+  const nextHtml = next
+    ? `<div class="ss-next" aria-label="Next time">
+         <p class="ss-next-title">${next.kind === 'next' ? '🗝️ You unlocked something new for next time:' : "🎯 Next time, let's make this one strong:"}</p>
+         <p class="ss-next-name">${escapeHtml(next.name)}</p>
+       </div>`
+    : '';
 
   const statsHtml = `
     <div class="ss-stats" aria-label="Today's stats">
@@ -104,10 +153,10 @@ export function showSessionSummary({
         <span class="ss-stat-value">${wordsCount}</span>
         <span class="ss-stat-label">word${wordsCount !== 1 ? 's' : ''} decoded</span>
       </div>
-      <div class="ss-stat ss-stat--quality" aria-label="${firstTryLabel}: ${firstTryCount} of ${wordsCount} words">
+      <div class="ss-stat ss-stat--quality" aria-label="${firstTryCount} of ${wordsCount} words read by yourself">
         <span class="ss-stat-icon" aria-hidden="true">🎯</span>
-        <span class="ss-stat-value" style="color:${firstTryColour}">${firstTryCount}/${wordsCount}</span>
-        <span class="ss-stat-label">first try</span>
+        <span class="ss-stat-value">${firstTryCount}/${wordsCount}</span>
+        <span class="ss-stat-label">by yourself</span>
       </div>
       <div class="ss-stat">
         <span class="ss-stat-icon" aria-hidden="true">🏆</span>
@@ -115,7 +164,7 @@ export function showSessionSummary({
         <span class="ss-stat-label">current level</span>
       </div>
     </div>
-    <p class="ss-quality-label" style="color:${firstTryColour};font-size:0.75rem;font-weight:700;margin:0 0 12px;text-align:center;">${firstTryLabel}</p>`;
+    <p class="ss-quality-label">${firstTryLabel}</p>`;
 
   container.innerHTML = `
     <div class="ss-wrapper" role="main" aria-label="Session complete">
@@ -124,8 +173,11 @@ export function showSessionSummary({
       <p class="ss-subheading">Reading session complete — ${wordsCount} word${wordsCount !== 1 ? 's' : ''} practised today!</p>
 
       ${statsHtml}
+      ${wordsHtml}
       ${streakHtml}
+      ${learningDaysHtml}
       ${badgesHtml}
+      ${nextHtml}
 
       <div class="ss-actions">
         <button class="btn btn--primary btn--xl" id="ss-keep-going">
@@ -136,11 +188,26 @@ export function showSessionSummary({
         </button>
       </div>
 
-      <p class="ss-footer">Come back tomorrow to keep your streak! 🔥</p>
+      <p class="ss-footer">See you tomorrow${profile?.name ? `, ${firstName}` : ''}! 👋</p>
     </div>`;
 
   // Focus the primary action
   setTimeout(() => container.querySelector('#ss-keep-going')?.focus(), 100);
+
+  // Said aloud, so a child who cannot read the screen yet still hears what
+  // they achieved and what is coming next.
+  const spoken = [
+    `You read ${wordsCount} word${wordsCount !== 1 ? 's' : ''} today.`,
+    firstTryLabel,
+    next ? (next.kind === 'next' ? 'Next time, something new!' : 'See you tomorrow!') : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+  getAudio()
+    .then((audio) => audio.speakText(spoken))
+    .catch(() => {
+      /* silence is an acceptable outcome */
+    });
 
   container.querySelector('#ss-keep-going')?.addEventListener('click', () => {
     onClose({ continueSession: true });
