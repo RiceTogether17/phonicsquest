@@ -115,9 +115,7 @@ _For the back page of the book._
 - **wanted** — read it to your child for now
 - **two** — ❤️ tricky part: the w is silent and o says /oo/
 - **saw** — no tricky part; your child can sound it out once they know “aw”. Read it together for now
-- **no** — ❤️ tricky part: o says its name, /ō/
 - **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
-- **by** — no tricky part; your child can sound it out once they know “y” can say /igh/. Read it together for now
 - **me** — ❤️ tricky part: e says its name, /ē/
 
 **After reading — check understanding** (answer ticked):
@@ -231,8 +229,6 @@ _For the back page of the book._
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **small** — ❤️ tricky part: a says /aw/
-- **no** — ❤️ tricky part: o says its name, /ō/
-- **go** — ❤️ tricky part: o says its name, /ō/
 - **two** — ❤️ tricky part: the w is silent and o says /oo/
 - **they** — ❤️ tricky part: ey says /ay/
 
@@ -346,10 +342,8 @@ _For the back page of the book._
 - **ea** — reach
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **by** — no tricky part; your child can sound it out once they know “y” can say /igh/. Read it together for now
 - **could** — ❤️ tricky part: oul says /oo/, as in "book"
 - **good** — no tricky part; your child can sound it out once they know “oo” can say /oo/, as in “book”. Read it together for now
-- **you** — ❤️ tricky part: ou says /oo/
 - **should** — ❤️ tricky part: oul says /oo/, as in "book"
 
 **After reading — check understanding** (answer ticked):
@@ -463,7 +457,6 @@ _For the back page of the book._
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **would** — ❤️ tricky part: oul says /oo/, as in "book"
-- **no** — ❤️ tricky part: o says its name, /ō/
 - **come** — ❤️ tricky part: o says /u/ and the e is silent
 - **water** — ❤️ tricky part: a says /aw/
 
@@ -695,9 +688,7 @@ _For the back page of the book._
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **once** — ❤️ tricky part: it says "wunce": o makes /w/ and /u/
 - **before** — no tricky part; clap the parts, then sound it out together
-- **no** — ❤️ tricky part: o says its name, /ō/
 - **because** — ❤️ tricky part: au says /o/, s says /z/ and the e is silent
-- **has** — ❤️ tricky part: s says /z/
 - **other** — ❤️ tricky part: o says /u/
 - **as** — ❤️ tricky part: s says /z/
 - **salt** — ❤️ tricky part: a says /aw/
@@ -813,7 +804,6 @@ _For the back page of the book._
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **who** — ❤️ tricky part: wh says /h/ and o says /oo/
 - **young** — ❤️ tricky part: ou says /u/
-- **you** — ❤️ tricky part: ou says /oo/
 - **give** — ❤️ tricky part: words never end in v, so an e comes after it — the i stays short
 
 **After reading — check understanding** (answer ticked):
@@ -946,7 +936,6 @@ _For the back page of the book._
 - **y** — fly, by
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **you** — ❤️ tricky part: ou says /oo/
 - **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
 
 **After reading — check understanding** (answer ticked):
@@ -1071,7 +1060,6 @@ _For the back page of the book._
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **who** — ❤️ tricky part: wh says /h/ and o says /oo/
-- **you** — ❤️ tricky part: ou says /oo/
 
 **After reading — check understanding** (answer ticked):
 1. Who did Jay make the pie for?  
@@ -1534,8 +1522,6 @@ _For the back page of the book._
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **head** — ❤️ tricky part: ea says /e/
 - **friend** — ❤️ tricky part: ie says /e/
-- **by** — no tricky part; your child can sound it out once they know “y” can say /igh/. Read it together for now
-- **has** — ❤️ tricky part: s says /z/
 
 **After reading — check understanding** (answer ticked):
 1. What did the seed need?  
@@ -1647,7 +1633,6 @@ _For the back page of the book._
 - **oa** — oak
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **go** — ❤️ tricky part: o says its name, /ō/
 - **down** — no tricky part; your child can sound it out once they know “ow” can say /ow/, as in “cow”. Read it together for now
 - **have** — ❤️ tricky part: words never end in v, so an e comes after it — the a stays short
 
@@ -1762,7 +1747,6 @@ _For the back page of the book._
 - **oo** — cool, soon
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **no** — ❤️ tricky part: o says its name, /ō/
 - **full** — ❤️ tricky part: u says /oo/, as in "book"
 - **as** — ❤️ tricky part: s says /z/
 - **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
@@ -1880,7 +1864,6 @@ _For the back page of the book._
 - **ue** — blue, glued
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **into** — ❤️ tricky part: o says /oo/, like in "to"
 - **please** — ❤️ tricky part: s says /z/ and the e is silent
 - **your** — ❤️ tricky part: our says /or/
 - **pretty** — ❤️ tricky part: e says /i/
@@ -2112,10 +2095,7 @@ _For the back page of the book._
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **pull** — ❤️ tricky part: u says /oo/, as in "book"
-- **no** — ❤️ tricky part: o says its name, /ō/
 - **push** — ❤️ tricky part: u says /oo/, as in "book"
-- **go** — ❤️ tricky part: o says its name, /ō/
-- **into** — ❤️ tricky part: o says /oo/, like in "to"
 
 **After reading — check understanding** (answer ticked):
 1. Where was Mei Ling's loose tooth?  
@@ -2229,7 +2209,6 @@ _For the back page of the book._
 - **u-e** — rude
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **you** — ❤️ tricky part: ou says /oo/
 - **me** — ❤️ tricky part: e says its name, /ē/
 - **they** — ❤️ tricky part: ey says /ay/
 
@@ -2578,9 +2557,7 @@ _For the back page of the book._
 - **oa** — coat
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **go** — ❤️ tricky part: o says its name, /ō/
 - **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
-- **no** — ❤️ tricky part: o says its name, /ō/
 - **come** — ❤️ tricky part: o says /u/ and the e is silent
 - **have** — ❤️ tricky part: words never end in v, so an e comes after it — the a stays short
 - **two** — ❤️ tricky part: the w is silent and o says /oo/
@@ -2697,7 +2674,6 @@ _For the back page of the book._
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **come** — ❤️ tricky part: o says /u/ and the e is silent
-- **no** — ❤️ tricky part: o says its name, /ō/
 - **two** — ❤️ tricky part: the w is silent and o says /oo/
 - **out** — no tricky part; your child can sound it out once they know “ou”. Read it together for now
 - **me** — ❤️ tricky part: e says its name, /ē/
@@ -2814,7 +2790,6 @@ _For the back page of the book._
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **me** — ❤️ tricky part: e says its name, /ē/
-- **you** — ❤️ tricky part: ou says /oo/
 
 **After reading — check understanding** (answer ticked):
 1. What were Giri and the bee looking for?  
@@ -2953,7 +2928,6 @@ _For the back page of the book._
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **race** — read it to your child for now
-- **go** — ❤️ tricky part: o says its name, /ō/
 - **full** — ❤️ tricky part: u says /oo/, as in "book"
 
 **After reading — check understanding** (answer ticked):
