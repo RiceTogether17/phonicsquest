@@ -42,10 +42,13 @@ stories. They work with very few words, so the same tools work inside a
    five-year-old, change it.
 2. Check the code and counts with `node scripts/audit-stories.mjs <storyId>`,
    then `node scripts/audit-stories.mjs --fix` to update the declared counts.
-3. Run the story tests: `npx vitest run src/__tests__/storyDecodability.test.js
-src/__tests__/wordsToMeet.test.js src/__tests__/storyQuestions.test.js`.
-   They catch words above the story's code, too many words to pre-teach, and
-   questions whose answer is not in the text.
+3. Run the story tests. They catch words above the story's code, too many
+   words to pre-teach, and questions whose answer is not in the text.
+
+   ```bash
+   npx vitest run src/__tests__/storyDecodability.test.js src/__tests__/wordsToMeet.test.js src/__tests__/storyQuestions.test.js
+   ```
+
 4. Keep the premise of the cover picture (`illustration`), so the picture
    still matches the story.
 5. Regenerate the picture-book kit with `npm run export:readers`.
