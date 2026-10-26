@@ -93,7 +93,6 @@ _For the back page of the book._
 - **or** — storm
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **door** — ❤️ tricky part: oor says /or/
 - **wrote** — ❤️ tricky part: the w is silent
 - **wall** — ❤️ tricky part: a says /aw/
 - **pushed** — read it to your child for now
@@ -327,9 +326,7 @@ _For the back page of the book._
 - **necklace** — ❤️ tricky part: ace says /iss/
 - **searched** — Looked carefully to find something
 - **any** — ❤️ tricky part: a says /e/
-- **half** — ❤️ tricky part: a says /ar/ and the l is silent
 - **dont** — ❤️ tricky part: o says its name, /ō/
-- **knew** — ❤️ tricky part: the k is silent
 
 **Word meanings** — talk about these before reading:
 - **thrush** — A type of songbird with a speckled chest
@@ -440,7 +437,9 @@ _For the back page of the book._
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **walked** — read it to your child for now
 - **honey** — ❤️ tricky part: o says /u/ and ey says /ee/
+- **called** — ❤️ tricky part: a says /aw/
 - **busy** — ❤️ tricky part: u says /i/ and s says /z/
+- **stall** — ❤️ tricky part: a says /aw/
 
 **Word meanings** — talk about these before reading:
 - **trader** — A person who buys and sells things
@@ -553,7 +552,6 @@ _For the back page of the book._
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **walked** — read it to your child for now
 - **juice** — ❤️ tricky part: ui says /oo/ and the e is silent
-- **knew** — ❤️ tricky part: the k is silent
 - **sure** — ❤️ tricky part: s says /sh/ and ure says /or/
 - **pushed** — read it to your child for now
 - **through** — ❤️ tricky part: ough says /oo/
@@ -669,7 +667,6 @@ _For the back page of the book._
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **heard** — ❤️ tricky part: ear says /er/
-- **door** — ❤️ tricky part: oor says /or/
 - **neighbour** — Someone who lives close to you
 - **tall** — ❤️ tricky part: a says /aw/
 - **brought** — ❤️ tricky part: ough says /aw/
@@ -788,6 +785,7 @@ _For the back page of the book._
 - **work** — ❤️ tricky part: after w, or says /er/
 - **aunty** — ❤️ tricky part: au says /ar/
 - **carefully** — In a way that avoids mistakes or danger
+- **head** — ❤️ tricky part: ea says /e/
 
 **Word meanings** — talk about these before reading:
 - **scratched** — Used claws to dig at the ground
@@ -1124,6 +1122,7 @@ _For the back page of the book._
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **void** — read it to your child for now
+- **small** — ❤️ tricky part: a says /aw/
 - **easy** — ❤️ tricky part: s says /z/
 - **often** — ❤️ tricky part: the t is silent
 - **pulled** — ❤️ tricky part: u says /oo/, as in "book"
@@ -1360,6 +1359,7 @@ _For the back page of the book._
 - **ir** — bird, stir, first
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
+- **small** — ❤️ tricky part: a says /aw/
 - **coming** — read it to your child for now
 - **fall** — ❤️ tricky part: a says /aw/
 
@@ -1473,9 +1473,6 @@ _For the back page of the book._
 - **ph** — phone, photo
 - **ed** — cried, helped, checked, looked, turned, stepped
 - **ing** — morning, missing, giggling
-
-**Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **whole** — ❤️ tricky part: wh says /h/
 
 **Word meanings** — talk about these before reading:
 - **badge** — A small sign you pin on your clothes
