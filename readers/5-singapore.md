@@ -114,7 +114,6 @@ _For the back page of the book._
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **full** — ❤️ tricky part: u says /oo/, as in "book"
-- **no** — ❤️ tricky part: o says its name, /ō/
 
 **Word meanings** — talk about these before reading:
 - **MRT** — A fast train that runs around Singapore
