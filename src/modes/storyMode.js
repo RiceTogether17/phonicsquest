@@ -1741,11 +1741,10 @@ export function _castNoteHtml(story) {
  */
 export function _lineHtml(line, i, wordSpans = false, story = null) {
   const baseText = line.text ?? '';
-  // "Problem:" / "Attempt:" / "Solution:" are the teacher's story-grammar
-  // frame, not text the child decodes. Running them through the sound-colour
-  // scaffold put a breve over "PRŎBLĔM" — phonics notation on a word that is
-  // there to label the shape of the story, and one no Primary 1 reader is
-  // being asked to sound out. They stay plain, and are not tappable.
+  // Section headings in a how-to text ("You will need", "What to do") are
+  // not text the child decodes. Running them through the sound-colour
+  // scaffold put breves over words no Primary 1 reader is being asked to
+  // sound out. They stay plain, and are not tappable.
   if (line.type === 'label') {
     return `<div class="sline sline--label" data-line="${i}">${escapeHtml(baseText)}</div>`;
   }
@@ -1755,7 +1754,7 @@ export function _lineHtml(line, i, wordSpans = false, story = null) {
   const content = wordSpans ? _wordSpanText(baseText, story) : highlighted;
   if (line.type === 'script') {
     // A line in a play. The speaker's name tells whoever reads that part when
-    // it is their turn; like "Problem:" it is not text to decode, so it sits
+    // it is their turn; like a how-to heading it is not text to decode, so it sits
     // outside the word spans and the word numbering a clue relies on.
     const part = Math.max(0, (story?.roles ?? []).indexOf(line.role));
     return `<p class="sline sline--script" data-line="${i}" data-part="${part}"><span class="sline-role">${escapeHtml(line.role ?? '')}:</span> ${content}</p>`;

@@ -70,7 +70,7 @@ Words on this page: Giri got on the MRT. "My stop is the next one," he said. "I 
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `sg-mrt-p02.png`
+**Page 2** → `sg-mrt-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -78,7 +78,7 @@ Words on this page: But the window was so much fun! He saw the sea. He saw big f
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `sg-mrt-p03.png`
+**Page 3** → `sg-mrt-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -86,7 +86,7 @@ Words on this page: The train went on. Giri had missed his stop! At the next sto
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `sg-mrt-p04.png`
+**Page 4** → `sg-mrt-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -199,7 +199,7 @@ Words on this page: It was Giri's first day at school. His tummy felt like a bag
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `sg-school-p02.png`
+**Page 2** → `sg-school-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -207,7 +207,7 @@ Words on this page: He did not know where to put his bag. He did not know where 
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `sg-school-p03.png`
+**Page 3** → `sg-school-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -215,7 +215,7 @@ Words on this page: He sat at a desk by the window and held his bun tight. Then 
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `sg-school-p04.png`
+**Page 4** → `sg-school-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -335,7 +335,7 @@ Words on this page: Mum gave Giri five dollars. "Get me one thing from the hawke
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `sg-hawker-p02.png`
+**Page 2** → `sg-hawker-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -343,7 +343,7 @@ Words on this page: But there were so many stalls! Chicken rice smelled so nice.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `sg-hawker-p03.png`
+**Page 3** → `sg-hawker-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -351,7 +351,7 @@ Words on this page: "Just one thing," said Giri. He got chicken rice. Then noodl
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `sg-hawker-p04.png`
+**Page 4** → `sg-hawker-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -469,7 +469,7 @@ Words on this page: It was New Year. The night was bright with red lights. Bang!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `sg-cny-p02.png`
+**Page 2** → `sg-cny-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -477,7 +477,7 @@ Words on this page: The lion went to every shop. Snap! It ate a green lettuce by
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `sg-cny-p03.png`
+**Page 3** → `sg-cny-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -485,7 +485,7 @@ Words on this page: Then it came to Giri. It looked at his bun. Snap, snap! Giri
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `sg-cny-p04.png`
+**Page 4** → `sg-cny-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -597,7 +597,7 @@ Words on this page: It was Deepavali. Auntie next door was making a rangoli by h
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `sg-deepavali-p02.png`
+**Page 2** → `sg-deepavali-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -605,7 +605,7 @@ Words on this page: Giri helped. A ring of red. A ring of gold. A ring of green.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `sg-deepavali-p03.png`
+**Page 3** → `sg-deepavali-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -613,7 +613,7 @@ Words on this page: "Shoo!" said Giri. The bird hopped away. Then it came back w
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `sg-deepavali-p04.png`
+**Page 4** → `sg-deepavali-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -725,7 +725,7 @@ Words on this page: Giri went to the Gardens by the Bay to see the tall Supertre
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `sg-gardens-p02.png`
+**Page 2** → `sg-gardens-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -733,7 +733,7 @@ Words on this page: A small bird got stuck in the garden net.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `sg-gardens-p03.png`
+**Page 3** → `sg-gardens-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -741,7 +741,7 @@ Words on this page: Giri called for a park ranger to help.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `sg-gardens-p04.png`
+**Page 4** → `sg-gardens-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
