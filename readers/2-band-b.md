@@ -79,7 +79,7 @@ Words on this page: Bake, cake, bake!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Problem)_ → `core-b-01-p03.png`
+**Page 3** → `core-b-01-p03.png`
 
 ```text
 Picture for page 3 of 6. Square.
@@ -87,7 +87,7 @@ Words on this page: The cake got big. As big as a gate!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Attempt)_ → `core-b-01-p04.png`
+**Page 4** → `core-b-01-p04.png`
 
 ```text
 Picture for page 4 of 6. Square.
@@ -95,7 +95,7 @@ Words on this page: Giri gave it a tug. Jay gave it a shake. Stuck!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 5** _(Solution)_ → `core-b-01-p05.png`
+**Page 5** → `core-b-01-p05.png`
 
 ```text
 Picture for page 5 of 6. Square.
@@ -196,7 +196,7 @@ Words on this page: Giri and Jay got in a boat. "Row, row," said Giri. "Slow and
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-02-p02.png`
+**Page 2** → `core-b-02-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -204,7 +204,7 @@ Words on this page: "Slow?" said Jay. "No! I want to zip!"
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-02-p03.png`
+**Page 3** → `core-b-02-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -212,7 +212,7 @@ Words on this page: They rowed and rowed. The boat went slow, slow, slow.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-02-p04.png`
+**Page 4** → `core-b-02-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -309,7 +309,7 @@ Words on this page: A bee sat on Giri's hand. "I need my nest. I can not see it.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-03-p02.png`
+**Page 2** → `core-b-03-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -317,7 +317,7 @@ Words on this page: "Is it in this tree?" "No." "That tree?" "No." "The green tr
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-03-p03.png`
+**Page 3** → `core-b-03-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -325,7 +325,7 @@ Words on this page: "We should keep seeking," said Giri. They could not see a ne
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-03-p04.png`
+**Page 4** → `core-b-03-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -426,7 +426,7 @@ Words on this page: Giri and Jay came to the big rides. Jay had a pie in each ha
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-04-p02.png`
+**Page 2** → `core-b-04-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -434,7 +434,7 @@ Words on this page: Jay liked the big wheel. Giri did not. "I will not ride," he
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-04-p03.png`
+**Page 3** → `core-b-04-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -442,7 +442,7 @@ Words on this page: "Shut your eyes. Hold my hand," said Jay. "You will be fine.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-04-p04.png`
+**Page 4** → `core-b-04-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -540,7 +540,7 @@ Words on this page: A snail was on the trail, on its way from the cold shade to 
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-05-p02.png`
+**Page 2** → `core-b-05-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -548,7 +548,7 @@ Words on this page: But the snail crept and crept. "It will take all day!" said 
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-05-p03.png`
+**Page 3** → `core-b-05-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -556,7 +556,7 @@ Words on this page: "Wait! I can help." Giri put the snail on his hand and ran i
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-05-p04.png`
+**Page 4** → `core-b-05-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -653,7 +653,7 @@ Words on this page: Once upon a time, Giri made a kite. It was white with five r
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-06-p02.png`
+**Page 2** → `core-b-06-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -661,7 +661,7 @@ Words on this page: He ran. The kite went up, spun and fell flat. No tail!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-06-p03.png`
+**Page 3** → `core-b-06-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -669,7 +669,7 @@ Words on this page: He tied on a bag of salt. Flop! He tied on his sock. Flop! "
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-06-p04.png`
+**Page 4** → `core-b-06-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -770,7 +770,7 @@ Words on this page: Giri had a red bike. He did not like to ride it.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-07-p02.png`
+**Page 2** → `core-b-07-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -778,7 +778,7 @@ Words on this page: "I will tip!" he cried. Tip! Flop! "I will slide!" Slide! Fl
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-07-p03.png`
+**Page 3** → `core-b-07-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -786,7 +786,7 @@ Words on this page: "I will hold the back," said Jay. "Ride until you get to the
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-07-p04.png`
+**Page 4** → `core-b-07-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -1136,7 +1136,7 @@ Words on this page: A goat came up the road with a big smile.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-08-p02.png`
+**Page 2** → `core-b-08-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -1144,7 +1144,7 @@ Words on this page: Munch! It ate Giri's note. Munch! It ate his rope. Munch! It
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-08-p03.png`
+**Page 3** → `core-b-08-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -1152,7 +1152,7 @@ Words on this page: "Stop!" said Giri. "That is not something to eat! Go home to
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-08-p04.png`
+**Page 4** → `core-b-08-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -1252,7 +1252,7 @@ Words on this page: Giri went to the beach with a girl and a boy. They made a sa
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-09-p02.png`
+**Page 2** → `core-b-09-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -1260,7 +1260,7 @@ Words on this page: Swish! The sea made it flat. They made a bigger heap. Swish!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-09-p03.png`
+**Page 3** → `core-b-09-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -1268,7 +1268,7 @@ Words on this page: They made the biggest heap. Swish! Flat, flat, flat.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-09-p04.png`
+**Page 4** → `core-b-09-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -1367,7 +1367,7 @@ Words on this page: Giri wanted to play. But the rain came down. Drip, drip, dri
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-10-p02.png`
+**Page 2** → `core-b-10-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -1375,7 +1375,7 @@ Words on this page: He sat by the gate to watch. "Rain, stop!" It rained. "Rain,
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-10-p03.png`
+**Page 3** → `core-b-10-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -1383,7 +1383,7 @@ Words on this page: Giri thought and thought. Then he got his big umbrella and h
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-10-p04.png`
+**Page 4** → `core-b-10-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -1486,7 +1486,7 @@ Words on this page: Giri set a green seed deep in a pot of mud.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-11-p02.png`
+**Page 2** → `core-b-11-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -1494,7 +1494,7 @@ Words on this page: Each day he peeked. The seed did not seem to wake. Still no 
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-11-p03.png`
+**Page 3** → `core-b-11-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -1502,7 +1502,7 @@ Words on this page: He sang to it. He read to it. He did a seed jig.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-11-p04.png`
+**Page 4** → `core-b-11-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -1600,7 +1600,7 @@ Words on this page: Giri made a home in a stone cave, with a rug and a lamp. "Sn
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-12-p02.png`
+**Page 2** → `core-b-12-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -1608,7 +1608,7 @@ Words on this page: A toad came to stay. A mole came to stay. A goat came to sta
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-12-p03.png`
+**Page 3** → `core-b-12-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -1616,7 +1616,7 @@ Words on this page: The goat ate the rug. The toad sat on the lamp. The mole dug
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-12-p04.png`
+**Page 4** → `core-b-12-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -1714,7 +1714,7 @@ Words on this page: Giri had a flute. He played a tune in the shade of a green t
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-13-p02.png`
+**Page 2** → `core-b-13-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -1722,7 +1722,7 @@ Words on this page: One day, the flute made no tune. Just a puff of dust. It had
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-13-p03.png`
+**Page 3** → `core-b-13-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -1730,7 +1730,7 @@ Words on this page: Giri gave the flute a dunk in a tub of suds. Scrub, scrub!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-13-p04.png`
+**Page 4** → `core-b-13-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -1828,7 +1828,7 @@ Words on this page: Giri drew a plan for a new kite. Blue, with a long tail. "Pr
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-14-p02.png`
+**Page 2** → `core-b-14-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -1836,7 +1836,7 @@ Words on this page: He made each bit just like the plan. He ran. It fell. "Pleas
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-14-p03.png`
+**Page 3** → `core-b-14-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -1844,7 +1844,7 @@ Words on this page: "It is too pretty to fly," said Jay. Giri sat on the hill, n
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-14-p04.png`
+**Page 4** → `core-b-14-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -1941,7 +1941,7 @@ Words on this page: One night, Giri saw the moon in the pool. "It fell in!"
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-15-p02.png`
+**Page 2** → `core-b-15-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -1949,7 +1949,7 @@ Words on this page: "It must go back in the sky." He got a scoop. Splash! The mo
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-15-p03.png`
+**Page 3** → `core-b-15-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -1957,7 +1957,7 @@ Words on this page: He got a net. Swish! Bits. He got a cup. Plop! Bits.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-15-p04.png`
+**Page 4** → `core-b-15-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -2287,7 +2287,7 @@ Words on this page: Giri went to the shell shop. A crab ran the shop. "Shells! F
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-16-p02.png`
+**Page 2** → `core-b-16-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -2295,7 +2295,7 @@ Words on this page: Giri had to get the best shell. "This one?" A chip. "That on
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-16-p03.png`
+**Page 3** → `core-b-16-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -2303,7 +2303,7 @@ Words on this page: Then he spotted a pink shell. "That one!"
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-16-p04.png`
+**Page 4** → `core-b-16-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -2401,7 +2401,7 @@ Words on this page: Giri had a song for his pals. A long, long song.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-17-p02.png`
+**Page 2** → `core-b-17-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -2409,7 +2409,7 @@ Words on this page: He sang of a fish. Then a ship, a shop, a chimp and a chick.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-17-p03.png`
+**Page 3** → `core-b-17-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -2417,7 +2417,7 @@ Words on this page: His pals sat and sat. Six kids shut an eye. Nothing could st
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-17-p04.png`
+**Page 4** → `core-b-17-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -2518,7 +2518,7 @@ Words on this page: Mole did not want to go out. "No. It is cold. I will stay ho
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-sw-01-p02.png`
+**Page 2** → `core-b-sw-01-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -2526,7 +2526,7 @@ Words on this page: "Come and play," said Giri. "We can jog to the lake." "No. A
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-sw-01-p03.png`
+**Page 3** → `core-b-sw-01-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -2534,7 +2534,7 @@ Words on this page: "Does Mole want a hot bun? I have two buns from home." A pin
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-sw-01-p04.png`
+**Page 4** → `core-b-sw-01-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -2750,7 +2750,7 @@ Words on this page: "I see a bee!" said Giri. "And the bee sees me!"
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 2** _(Problem)_ → `core-b-sw-02-p02.png`
+**Page 2** → `core-b-sw-02-p02.png`
 
 ```text
 Picture for page 2 of 5. Square.
@@ -2758,7 +2758,7 @@ Words on this page: The bee went from tree to tree. "Wait for me! I want to see 
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Attempt)_ → `core-b-sw-02-p03.png`
+**Page 3** → `core-b-sw-02-p03.png`
 
 ```text
 Picture for page 3 of 5. Square.
@@ -2766,7 +2766,7 @@ Words on this page: "Then keep up! We need to find the sweet spot." Giri did not
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Solution)_ → `core-b-sw-02-p04.png`
+**Page 4** → `core-b-sw-02-p04.png`
 
 ```text
 Picture for page 4 of 5. Square.
@@ -2872,7 +2872,7 @@ Words on this page: Slow and low, go, snail, go!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 3** _(Problem)_ → `review-b-01-p03.png`
+**Page 3** → `review-b-01-p03.png`
 
 ```text
 Picture for page 3 of 7. Square.
@@ -2880,7 +2880,7 @@ Words on this page: Pine shot off. Blue was slow, slow, slow. Jay gave a sigh.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 4** _(Attempt)_ → `review-b-01-p04.png`
+**Page 4** → `review-b-01-p04.png`
 
 ```text
 Picture for page 4 of 7. Square.
@@ -2896,7 +2896,7 @@ Words on this page: Slow and low, go, snail, go!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
-**Page 6** _(Solution)_ → `review-b-01-p06.png`
+**Page 6** → `review-b-01-p06.png`
 
 ```text
 Picture for page 6 of 7. Square.

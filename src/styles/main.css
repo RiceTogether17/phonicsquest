@@ -4897,13 +4897,14 @@ details.story-tool-section[open] > .story-tool-summary::before {
   }
 }
 
-/* Intro — plain large text */
-.sline--intro {
+/* Intro, beats and ending read as one story: plain text, no boxes, so the
+   last line lands as part of the story rather than as a caption under it. */
+.sline--intro,
+.sline--beat,
+.sline--end {
   font-size: var(--font-size-lg);
   font-weight: 600;
   color: var(--color-text);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
 }
 
 /* Structural label */
@@ -4919,16 +4920,6 @@ details.story-tool-section[open] > .story-tool-summary::before {
   padding-bottom: 0;
 }
 
-/* Beat text following a label */
-.sline--beat {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--color-text);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  margin-top: var(--space-1);
-}
-
 /* Signature refrain */
 .sline--refrain {
   font-size: var(--font-size-xl);
@@ -4938,16 +4929,6 @@ details.story-tool-section[open] > .story-tool-summary::before {
   border: 2px solid #d8b4fe;
   text-align: center;
   letter-spacing: 0.02em;
-}
-
-/* Ending line */
-.sline--end {
-  font-size: var(--font-size-lg);
-  font-weight: 800;
-  color: var(--color-success-text);
-  background: color-mix(in srgb, var(--color-success) 10%, transparent);
-  border: 2px solid color-mix(in srgb, var(--color-success) 30%, transparent);
-  text-align: center;
 }
 
 /* Active / highlighted line during TTS. No transform here: a scale on a
