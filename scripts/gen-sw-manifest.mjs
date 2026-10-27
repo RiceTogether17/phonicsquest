@@ -28,10 +28,11 @@
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
+import { basePath } from './base-path.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const OUT_DIR = join(ROOT, 'docs');
-const BASE = '/phonicsquest/';
+const BASE = basePath();
 
 /** Where the manifest itself is written, and what the worker fetches. */
 const MANIFEST_FILE = join(OUT_DIR, 'sw-manifest.json');

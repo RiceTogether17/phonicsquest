@@ -44,7 +44,9 @@ const CACHE_PREFIX = 'phonicsquest-';
 const SHELL_CACHE = `${CACHE_PREFIX}shell-${BUILD_ID}`;
 const ASSET_CACHE = `${CACHE_PREFIX}assets-${BUILD_ID}`;
 
-const BASE = '/phonicsquest/';
+// The worker is served from the app's base path, so its own URL says where
+// the app lives — '/phonicsquest/' on GitHub Pages, '/' on a custom domain.
+const BASE = new URL('./', self.location).pathname;
 const MANIFEST_URL = `${BASE}sw-manifest.json`;
 
 /** Minimum shell, used when the manifest cannot be read. */
