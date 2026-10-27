@@ -254,6 +254,7 @@ _For the back page of the book._
 - **walls** — read it to your child for now
 - **bicycle** — ❤️ tricky part: y says /i/
 - **cendol** — ❤️ tricky part: in Malay, c says /ch/
+- **because** — ❤️ tricky part: au says /o/, s says /z/ and the e is silent
 - **works** — read it to your child for now
 
 **Word meanings** — talk about these before reading:
@@ -299,6 +300,7 @@ _For the back page of the book._
 - **island** — ❤️ tricky part: the s is silent
 - **shoulder** — ❤️ tricky part: ou says /oa/
 - **monkey** — ❤️ tricky part: o says /u/ and ey says /ee/
+- **because** — ❤️ tricky part: au says /o/, s says /z/ and the e is silent
 
 **Word meanings** — talk about these before reading:
 - **steep** — Going up very sharply

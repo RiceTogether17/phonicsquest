@@ -345,9 +345,6 @@ _For the back page of the book._
 - **air** — chair, stairwell, repair, air
 - **are** — careful, declared, shared
 
-**Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **anyone** — ❤️ tricky part: a says /e/, and "one" says "wun"
-
 **Word meanings** — talk about these before reading:
 - **stairwell** — The part of a building that holds the stairs
 - **sandpaper** — Rough paper used to make wood smooth
@@ -463,7 +460,6 @@ _For the back page of the book._
 - **eer** — cheer, cheered
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **friends** — ❤️ tricky part: ie says /e/
 - **moving** — read it to your child for now
 - **field** — ❤️ tricky part: ie says /ee/
 

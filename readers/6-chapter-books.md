@@ -155,7 +155,6 @@ _For the back page of the book._
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **key** — ❤️ tricky part: ey says /ee/
-- **anyone** — ❤️ tricky part: a says /e/, and "one" says "wun"
 - **someone** — ❤️ tricky part: o says /u/, and "one" says "wun"
 
 **Word meanings** — talk about these before reading:

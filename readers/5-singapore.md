@@ -20,7 +20,7 @@ _Print this on the inside cover of every book in the set._
 
 ## Giri Rides the MRT
 
-`sg-mrt` · Band B · 54 words · sounds: a, e, i, o, u
+`sg-mrt` · Band B · 98 words · sounds: a, e, i, o, u
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -46,11 +46,11 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Giri got on the big red MRT. The MRT was fast.
-Page 2: The MRT was full. Giri had no seat.
-Page 3: Giri held on to the rod and did not slip.
-Page 4: A kind man let Giri sit in his seat. Giri sat and felt glad.
-Page 5: Giri got off at his stop and gave a big grin.
+Page 1: Giri got on the MRT. "My stop is the next one," he said. "I must not miss it."
+Page 2: But the window was so much fun! He saw the sea. He saw big flats. He saw a green park.
+Page 3: The train went on. Giri had missed his stop! At the next stop, he looked out of the window, and he missed it once more.
+Page 4: So Giri sat and waited. The train went round and round the loop.
+Page 5: "Next stop..." said the voice. Giri jumped up. It was his stop! "A long way round," he said, "but I got here."
 ```
 
 ### 2. Pictures — paste one at a time
@@ -66,7 +66,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 5. Square.
-Words on this page: Giri got on the big red MRT. The MRT was fast.
+Words on this page: Giri got on the MRT. "My stop is the next one," he said. "I must not miss it."
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -74,7 +74,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 5. Square.
-Words on this page: The MRT was full. Giri had no seat.
+Words on this page: But the window was so much fun! He saw the sea. He saw big flats. He saw a green park.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -82,7 +82,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: Giri held on to the rod and did not slip.
+Words on this page: The train went on. Giri had missed his stop! At the next stop, he looked out of the window, and he missed it once more.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -90,7 +90,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: A kind man let Giri sit in his seat. Giri sat and felt glad.
+Words on this page: So Giri sat and waited. The train went round and round the loop.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -98,7 +98,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: Giri got off at his stop and gave a big grin.
+Words on this page: "Next stop..." said the voice. Giri jumped up. It was his stop! "A long way round," he said, "but I got here."
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -107,40 +107,41 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **a** — fast, had, and, man, sat, glad
-- **e** — red, held, let, felt
-- **i** — big, did, slip, sit, in, grin
-- **o** — got, on, rod, not, off, stop
+- **a** — flats, had, at, and, sat
+- **e** — next, went, missed
+- **i** — miss, it, window, big, missed
+- **o** — got, on, stop, not, long
+- **u** — must, but, much, fun, jumped, up
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **full** — ❤️ tricky part: u says /oo/, as in "book"
+- **once** — ❤️ tricky part: it says "wunce": o makes /w/ and /u/
 
 **Word meanings** — talk about these before reading:
 - **MRT** — A fast train that runs around Singapore
-- **rod** — A long bar you hold on to for balance
-- **slip** — To slide by mistake and lose your balance
-- **kind** — Caring and helpful to others
-- **grin** — A big happy smile
+- **window** — A glass gap in a wall or a train that you can see out of
+- **flats** — Tall buildings with many homes inside
+- **loop** — A path that goes round and comes back to where it started
+- **missed** — Did not get to something in time
 
 **After reading — check understanding** (answer ticked):
-1. What did Giri get on?  
-   MRT ✓ · bus · boat · car
-2. What did Giri hold on to?  
-   rod ✓ · mat · bag · hat
-3. How did the kind man help Giri?  
-   Let Giri sit ✓ · Gave Giri a bag · Ran with Giri · Got Giri a drink
-4. Giri held on to the ___ and did not slip.  
-   rod ✓ · red · rid
+1. What did Giri see from the window?  
+   The sea ✓ · A goat · A ship
+2. How did the train go?  
+   Round and round the loop ✓ · Up a hill · Into the sea
+3. Why did Giri miss his stop?  
+   He was looking out of the window ✓ · He was asleep · The train did not stop
+4. Giri had ___ his stop!  
+   missed ✓ · mixed · messed
 5. Put these in the order they happened.  
-   (1) The MRT was full. (2) A kind man let Giri sit in his seat. (3) Giri got off at his stop.
+   (1) Giri got on the MRT. (2) Giri missed his stop. (3) Giri got to his stop.
 
 **Talk about it:**
 - Why did Giri hold on to the rod?
 - How did the kind man help Giri?
 
-**Spot it: Adjectives (describing words)** — The big red MRT was fast.. "Big" and "red" describe the MRT. These are adjectives!
+**Spot it: Past-tense verbs** — Giri had missed his stop! Giri jumped up.. Adding -ed to "jump" and "miss" tells us it happened in the past.
 
-**Spot it: Past-tense verbs** — Giri held on to the rod. He slid on the mat.. Words like "held" and "slid" tell us what happened in the past.
+**Spot it: Speech marks** — "I must not miss it," he said.. Speech marks go around the words someone says.
 
 _Read this one together: it uses some words and sentences beyond the sounds your child has been taught._
 
@@ -148,7 +149,7 @@ _Read this one together: it uses some words and sentences beyond the sounds your
 
 ## Giri's First Day at School
 
-`sg-school` · Band B · 54 words · sounds: a, e, i, o, u
+`sg-school` · Band B · 107 words · sounds: a, e, i, o, u
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -174,11 +175,11 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: It was Giri's first day at school. He had a big red bag.
-Page 2: Giri lost his peg. He did not know where to put his bag.
-Page 3: Giri ran to look in each room.
-Page 4: A kind pal led Giri to his peg. Giri hung his bag up.
-Page 5: Giri sat at his desk and felt glad.
+Page 1: It was Giri's first day at school. His tummy felt like a bag of jumping frogs.
+Page 2: He did not know where to put his bag. He did not know where to sit. He did not know anyone at all.
+Page 3: He sat at a desk by the window and held his bun tight. Then a girl sat next to him. Her hands shook.
+Page 4: "Is it your first day too?" said Giri. The girl gave a nod. "Then we can be new together."
+Page 5: At recess, they shared his bun. By the end of the day, Giri knew one name in the class. It was the best name of all.
 ```
 
 ### 2. Pictures — paste one at a time
@@ -194,7 +195,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 5. Square.
-Words on this page: It was Giri's first day at school. He had a big red bag.
+Words on this page: It was Giri's first day at school. His tummy felt like a bag of jumping frogs.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -202,7 +203,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 5. Square.
-Words on this page: Giri lost his peg. He did not know where to put his bag.
+Words on this page: He did not know where to put his bag. He did not know where to sit. He did not know anyone at all.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -210,7 +211,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: Giri ran to look in each room.
+Words on this page: He sat at a desk by the window and held his bun tight. Then a girl sat next to him. Her hands shook.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -218,7 +219,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: A kind pal led Giri to his peg. Giri hung his bag up.
+Words on this page: "Is it your first day too?" said Giri. The girl gave a nod. "Then we can be new together."
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -226,7 +227,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: Giri sat at his desk and felt glad.
+Words on this page: At recess, they shared his bun. By the end of the day, Giri knew one name in the class. It was the best name of all.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -235,43 +236,47 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **a** — at, had, bag, ran, pal, sat
-- **e** — red, peg, led, desk, felt
-- **i** — it, big, did, in
-- **o** — lost, not
-- **u** — hung, up
+- **a** — at, bag, sat, and, hands, can
+- **e** — felt, desk, held, then, next, together
+- **i** — it, did, sit, window, him, in
+- **o** — frogs, not, nod, together
+- **u** — tummy, jumping, bun
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **school** — ❤️ tricky part: ch says /k/
 - **where** — ❤️ tricky part: ere says /air/, as in "there"
 - **put** — ❤️ tricky part: u says /oo/, as in "book"
+- **anyone** — ❤️ tricky part: a says /e/, and "one" says "wun"
+- **your** — ❤️ tricky part: our says /or/
+- **they** — ❤️ tricky part: ey says /ay/
+- **knew** — ❤️ tricky part: the k is silent
 
 **Word meanings** — talk about these before reading:
-- **peg** — A hook on a wall to hang your bag or coat
 - **desk** — A table used for doing school work
-- **room** — A part of a building inside four walls
-- **wrong** — Not correct; not the right one
-- **kind** — Friendly and helpful to others
+- **recess** — A short break in the school day for eating and playing
+- **nod** — To move your head up and down to say yes
+- **together** — With each other
+- **shared** — Gave part of something to someone else
 
 **After reading — check understanding** (answer ticked):
-1. What could Giri not find?  
-   His peg ✓ · His bag · His hat · His book
-2. What room did Giri go into?  
-   The wrong room ✓ · His own room · The big room · The wet room
-3. How do you think Giri felt at the start of school?  
-   Sad and lost ✓ · Very happy · Very sleepy · Very hungry
-4. He had a big red ___.  
-   bag ✓ · bug · beg
+1. What did Giri hold tight?  
+   His bun ✓ · His bag · A pen
+2. What did they share at recess?  
+   Giri's bun ✓ · A drink · A book
+3. Why did the girl's hands shake?  
+   It was her first day too ✓ · She was cold · She was late
+4. He sat at a desk by the window and held his ___ tight.  
+   bun ✓ · bin · ban
 5. Put these in the order they happened.  
-   (1) Giri lost his peg. (2) A kind pal led Giri to his peg. (3) Giri sat at his desk.
+   (1) Giri sat by the window. (2) A girl sat next to Giri. (3) They shared the bun at recess.
 
 **Talk about it:**
 - Why did Giri run to look in each room?
 - How did Giri feel once his bag was hung up?
 
-**Spot it: Nouns (naming words)** — Giri had a big red bag, a peg, and a desk.. "Bag", "peg", and "desk" are nouns. Nouns name people, places, or things.
+**Spot it: Similes** — His tummy felt like a bag of jumping frogs.. "Like" compares two things to help us picture how Giri felt.
 
-**Spot it: Plurals with -s** — pegs, rooms, bags, desks. Add -s to most nouns to show more than one: bag → bags, room → rooms.
+**Spot it: Questions** — "Is it your first day too?" said Giri.. A question ends with a question mark.
 
 _Read this one together: it uses some words and sentences beyond the sounds your child has been taught._
 
@@ -279,7 +284,7 @@ _Read this one together: it uses some words and sentences beyond the sounds your
 
 ## Giri at the Hawker Centre
 
-`sg-hawker` · Band B · 63 words · sounds: a-e, ai
+`sg-hawker` · Band B · 93 words · sounds: a-e, ai
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -306,11 +311,11 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: Giri came to the hawker centre to get his mum a treat.
-Page 2: He got lost in the maze of lanes and stalls.
-Page 3: Giri went from lane to lane and looked at each stall.
-Page 4: A nice auntie smiled and led him to the noodle stall. Giri gave a wave and paid.
-Page 5: Giri went home with the noodles. His mum gave him a huge smile.
+Page 1: Mum gave Giri five dollars. "Get me one thing from the hawker centre," she said.
+Page 2: But there were so many stalls! Chicken rice smelled so nice. Noodles went sizzle. Satay smoked on the grill. Giri could not wait.
+Page 3: "Just one thing," said Giri. He got chicken rice. Then noodles. Then satay. Then a cold drink.
+Page 4: He came home with his arms full. "Mum! I got your one thing!" "Which one?" said Mum.
+Page 5: They put it all on the table and asked the whole block to come. "Next time," said Mum, "I will go."
 ```
 
 ### 2. Pictures — paste one at a time
@@ -326,7 +331,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 5. Square.
-Words on this page: Giri came to the hawker centre to get his mum a treat.
+Words on this page: Mum gave Giri five dollars. "Get me one thing from the hawker centre," she said.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -334,7 +339,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 5. Square.
-Words on this page: He got lost in the maze of lanes and stalls.
+Words on this page: But there were so many stalls! Chicken rice smelled so nice. Noodles went sizzle. Satay smoked on the grill. Giri could not wait.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -342,7 +347,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: Giri went from lane to lane and looked at each stall.
+Words on this page: "Just one thing," said Giri. He got chicken rice. Then noodles. Then satay. Then a cold drink.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -350,7 +355,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: A nice auntie smiled and led him to the noodle stall. Giri gave a wave and paid.
+Words on this page: He came home with his arms full. "Mum! I got your one thing!" "Which one?" said Mum.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -358,7 +363,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: Giri went home with the noodles. His mum gave him a huge smile.
+Words on this page: They put it all on the table and asked the whole block to come. "Next time," said Mum, "I will go."
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -367,38 +372,46 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **a-e** — came, maze, lanes, lane, gave, wave
-- **ai** — paid
+- **a-e** — gave, came
+- **ai** — wait
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
+- **me** — ❤️ tricky part: e says its name, /ē/
 - **stalls** — read it to your child for now
-- **stall** — A small stand that sells food or things
+- **could** — ❤️ tricky part: oul says /oo/, as in "book"
+- **full** — ❤️ tricky part: u says /oo/, as in "book"
+- **your** — ❤️ tricky part: our says /or/
+- **they** — ❤️ tricky part: ey says /ay/
+- **put** — ❤️ tricky part: u says /oo/, as in "book"
+- **whole** — ❤️ tricky part: wh says /h/
+- **come** — ❤️ tricky part: o says /u/ and the e is silent
 
 **Word meanings** — talk about these before reading:
 - **hawker centre** — An open-air place with many food stalls in Singapore
-- **maze** — A set of paths that is hard to find your way through
-- **lane** — A narrow path or street
-- **auntie** — A friendly word for an older woman in Singapore
+- **stall** — A small stand that sells food or things
+- **satay** — Small bits of meat on sticks, cooked on a grill
+- **sizzle** — The hissing sound food makes when it cooks in hot oil
+- **block** — A big building of flats, or the people who live in it
 
 **After reading — check understanding** (answer ticked):
-1. Why did Giri go to the hawker centre?  
-   To get a treat for his mum ✓ · To play · To get a toy · To take a nap
-2. Who helped Giri find the stall?  
-   A nice auntie ✓ · A kind man · His mum · The chef
-3. How do you think Giri felt when he was lost?  
-   Lost and upset ✓ · Happy and excited · Hungry and tired · Bored and sleepy
-4. Giri gave a wave and ___.  
-   paid ✓ · pad · pod
+1. How much did Mum give Giri?  
+   Five dollars ✓ · One dollar · Ten dollars
+2. What did Giri get first?  
+   Chicken rice ✓ · Noodles · Satay
+3. Why did Mum say she would go next time?  
+   Giri got too much ✓ · Giri got lost · The food was cold
+4. He ___ home with his arms full.  
+   came ✓ · come · cane
 5. Put these in the order they happened.  
-   (1) Giri got lost in the maze of lanes. (2) A nice auntie led him to the noodle stall. (3) Giri went home with the noodles.
+   (1) Mum gave Giri five dollars. (2) Giri got chicken rice. (3) They asked the whole block to come.
 
 **Talk about it:**
 - How did the auntie help Giri?
 - Why did his mum give him a huge smile?
 
-**Spot it: Past tense with -ed** — The auntie smiled and led him to the stall. Giri waved and paid.. Add -ed to show something happened in the past: smile → smiled, wave → waved.
+**Spot it: Sound words** — Noodles went sizzle.. "Sizzle" sounds like the thing it names. Sound words make a story easy to hear.
 
-**Spot it: Nouns in a list** — He saw lanes, stalls, and treats at the hawker centre.. Use commas to list nouns, and add "and" before the last one.
+**Spot it: Time words** — He got chicken rice. Then noodles. Then satay.. "Then" tells us what came next.
 
 _Read this one together: it uses some words and sentences beyond the sounds your child has been taught._
 
@@ -406,7 +419,7 @@ _Read this one together: it uses some words and sentences beyond the sounds your
 
 ## Giri and the New Year
 
-`sg-cny` · Band B · 55 words · sounds: a-e, igh
+`sg-cny` · Band B · 100 words · sounds: a-e, igh
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -417,7 +430,6 @@ BOOK: "Giri and the New Year" — a cover and 5 pages.
 
 CHARACTERS
 - Giri (the main character, "he"): a small, fluffy white rice-ball creature speckled with little brown grains. He wears a light bamboo dim-sum steamer basket as a hat, tied on with red string, unless the story gives him a different hat. His ears are two little golden dumplings. He has thick dark seaweed-strip eyebrows, black oval eyes, a small friendly smile, a round yellow pineapple-bun tummy with a criss-cross pattern, short arms and stubby feet. Use the attached Giri picture and keep him exactly like it.
-- Mum (Giri's mum): a rice-ball creature like Giri but a little taller, with no steamer hat and a soft pink apron.
 - Anyone else: design them from the story the first time they appear, then keep them the same.
 
 STYLE
@@ -433,11 +445,11 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: It was the New Year. The lane was full of red lights and gold flags.
-Page 2: Giri lost his mum in the big crowd.
-Page 3: Giri called out, "Mum! Mum!" He ran up the lane.
-Page 4: Giri spied the red light of the stall. His mum waved to him.
-Page 5: They sat and ate sweet kueh. Giri felt glad.
+Page 1: It was New Year. The night was bright with red lights. Bang! Bang! A big red lion came dancing up the street.
+Page 2: The lion went to every shop. Snap! It ate a green lettuce by a door. Snap! It ate a bunch of oranges.
+Page 3: Then it came to Giri. It looked at his bun. Snap, snap! Giri held his bun tight. "Not my bun!"
+Page 4: The lion blinked its big eyes. Then it lifted its face, and there was Jay!
+Page 5: "Sorry, Giri," said Jay, red in the face. "Dancing makes me hungry." Giri gave him half the bun. Happy New Year!
 ```
 
 ### 2. Pictures — paste one at a time
@@ -453,7 +465,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 5. Square.
-Words on this page: It was the New Year. The lane was full of red lights and gold flags.
+Words on this page: It was New Year. The night was bright with red lights. Bang! Bang! A big red lion came dancing up the street.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -461,7 +473,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 5. Square.
-Words on this page: Giri lost his mum in the big crowd.
+Words on this page: The lion went to every shop. Snap! It ate a green lettuce by a door. Snap! It ate a bunch of oranges.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -469,7 +481,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: Giri called out, "Mum! Mum!" He ran up the lane.
+Words on this page: Then it came to Giri. It looked at his bun. Snap, snap! Giri held his bun tight. "Not my bun!"
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -477,7 +489,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: Giri spied the red light of the stall. His mum waved to him.
+Words on this page: The lion blinked its big eyes. Then it lifted its face, and there was Jay!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -485,7 +497,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: They sat and ate sweet kueh. Giri felt glad.
+Words on this page: "Sorry, Giri," said Jay, red in the face. "Dancing makes me hungry." Giri gave him half the bun. Happy New Year!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -494,41 +506,40 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **a-e** — lane, waved, ate
-- **igh** — lights, light
+- **a-e** — came, ate, face, makes, gave
+- **igh** — night, bright, lights, tight
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **full** — ❤️ tricky part: u says /oo/, as in "book"
-- **called** — ❤️ tricky part: a says /aw/
-- **stall** — ❤️ tricky part: a says /aw/
-- **they** — ❤️ tricky part: ey says /ay/
+- **door** — ❤️ tricky part: oor says /or/
+- **me** — ❤️ tricky part: e says its name, /ē/
+- **half** — ❤️ tricky part: a says /ar/ and the l is silent
 
 **Word meanings** — talk about these before reading:
-- **crowd** — A large group of people all in one place
-- **lane** — A narrow street or path
-- **lost** — Not knowing where you are or where to go
-- **kueh** — A sweet snack popular in Singapore
-- **wave** — To move your hand to greet or say goodbye
+- **lion dance** — A New Year dance where dancers move inside a big lion costume
+- **lettuce** — A green leafy plant. In the lion dance it means good luck
+- **oranges** — Round fruit given at New Year for good luck
+- **hungry** — Wanting to eat
+- **bright** — Full of light
 
 **After reading — check understanding** (answer ticked):
-1. What made the lane look bright?  
-   Red lights and gold flags ✓ · A big cake · White stars · Blue lamps
-2. What did Giri do when he got lost?  
-   Called out to his mum ✓ · Sat down and cried · Ran home · Went to sleep
-3. What helped Giri find his mum in the end?  
-   He saw her wave from the stall ✓ · She called his name · He asked a stranger · He found her bag
-4. The lane was full of red ___ and gold flags.  
-   lights ✓ · lots · lids
+1. What did the lion eat by a door?  
+   A green lettuce ✓ · A bun · A drum
+2. Who was inside the lion?  
+   Jay ✓ · Mum · Giri
+3. Why did the lion snap at Giri's bun?  
+   Jay was hungry ✓ · It was a real lion · It was cold
+4. The night was ___ with red lights.  
+   bright ✓ · brick · brim
 5. Put these in the order they happened.  
-   (1) Giri lost his mum in the big crowd. (2) Giri spied the red light of the stall. (3) They sat and ate sweet kueh.
+   (1) The lion ate a green lettuce. (2) The lion looked at Giri's bun. (3) Jay lifted the lion's face.
 
 **Talk about it:**
 - How did Giri find his mum again?
 - Why was the lane so full of people?
 
-**Spot it: Exclamation marks (!)** — "Mum! Mum!" Giri called out.. Use ! when someone shouts or feels something strongly.
+**Spot it: Exclamation marks (!)** — Bang! Bang! "Not my bun!". Use ! for a loud sound or when someone feels something strongly.
 
-**Spot it: Adjectives before nouns** — the big crowd, the red light, the sweet kueh. Adjectives go right before the noun they describe.
+**Spot it: Adjectives before nouns** — a big red lion, a green lettuce. Adjectives go right before the noun they describe.
 
 _Read this one together: it uses some words and sentences beyond the sounds your child has been taught._
 
@@ -536,7 +547,7 @@ _Read this one together: it uses some words and sentences beyond the sounds your
 
 ## Giri at Deepavali
 
-`sg-deepavali` · Band B · 54 words · sounds: a-e, igh
+`sg-deepavali` · Band B · 102 words · sounds: a-e, igh
 
 ### 1. Setup — paste once at the start of a new chat, with the Giri picture attached
 
@@ -562,11 +573,11 @@ RULES FOR EVERY PICTURE
 6. Square picture (1:1). Keep everything important away from the edges so nothing is lost when it is printed.
 
 THE STORY
-Page 1: It was Deepavali. The street had bright oil lamps and gold clay pots.
-Page 2: Giri's oil lamp went out in the wind.
-Page 3: Giri cupped his hands to keep the flame safe.
-Page 4: A kind auntie came and lit the lamp. The lane was bright once more.
-Page 5: Giri sat and ate a sweet treat. He felt glad.
+Page 1: It was Deepavali. Auntie next door was making a rangoli by her gate, with rice in bright red, gold and green.
+Page 2: Giri helped. A ring of red. A ring of gold. A ring of green. Then a bird came. Peck! It ate some red.
+Page 3: "Shoo!" said Giri. The bird hopped away. Then it came back with two friends. Peck, peck, peck!
+Page 4: "Let them eat," said Auntie, with a smile. "Rice by the door is for sharing."
+Page 5: So Giri let the birds eat. That night, Auntie lit little lamps all round the rangoli. "Light for everyone," she said, "and rice for the birds."
 ```
 
 ### 2. Pictures — paste one at a time
@@ -582,7 +593,7 @@ Keep the top quarter calm and plain (sky, wall or floor) so the title can be pri
 
 ```text
 Picture for page 1 of 5. Square.
-Words on this page: It was Deepavali. The street had bright oil lamps and gold clay pots.
+Words on this page: It was Deepavali. Auntie next door was making a rangoli by her gate, with rice in bright red, gold and green.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -590,7 +601,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 2 of 5. Square.
-Words on this page: Giri's oil lamp went out in the wind.
+Words on this page: Giri helped. A ring of red. A ring of gold. A ring of green. Then a bird came. Peck! It ate some red.
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -598,7 +609,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 3 of 5. Square.
-Words on this page: Giri cupped his hands to keep the flame safe.
+Words on this page: "Shoo!" said Giri. The bird hopped away. Then it came back with two friends. Peck, peck, peck!
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -606,7 +617,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 4 of 5. Square.
-Words on this page: A kind auntie came and lit the lamp. The lane was bright once more.
+Words on this page: "Let them eat," said Auntie, with a smile. "Rice by the door is for sharing."
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -614,7 +625,7 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 
 ```text
 Picture for page 5 of 5. Square.
-Words on this page: Giri sat and ate a sweet treat. He felt glad.
+Words on this page: So Giri let the birds eat. That night, Auntie lit little lamps all round the rangoli. "Light for everyone," she said, "and rice for the birds."
 Draw this moment only. Keep Giri exactly like the reference. No words or letters in the picture.
 ```
 
@@ -623,38 +634,40 @@ Draw this moment only. Keep Giri exactly like the reference. No words or letters
 _For the back page of the book._
 
 **Sounds in this book** — say the sound, then read these words from the story:
-- **a-e** — flame, safe, came, lane, ate
-- **igh** — bright
+- **a-e** — making, gate, came, ate, sharing
+- **igh** — bright, night, light
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
-- **once** — ❤️ tricky part: it says "wunce": o makes /w/ and /u/
+- **door** — ❤️ tricky part: oor says /or/
+- **two** — ❤️ tricky part: the w is silent and o says /oo/
+- **friends** — ❤️ tricky part: ie says /e/
 
 **Word meanings** — talk about these before reading:
 - **Deepavali** — A festival of lights celebrated by Indian families in Singapore and around the world
-- **oil lamp** — A small dish with oil and a wick that gives light when lit
-- **flame** — The bright, glowing part of a fire
-- **bright** — Giving out a lot of light; not dark
-- **celebrate** — To do something fun and special for a happy occasion
+- **rangoli** — A bright pattern made on the ground with coloured rice, sand or flowers
+- **lamp** — A small dish with oil and a wick that gives light
+- **sharing** — Giving some of what you have to others
+- **peck** — When a bird picks up food with its beak
 
 **After reading — check understanding** (answer ticked):
-1. What went out in the wind?  
-   Giri's oil lamp ✓ · Giri's candle · Giri's torch · Giri's star
-2. What did Giri do to save the flame?  
-   Cupped his hands ✓ · Ran inside · Got a new lamp · Blew on it
-3. Why is Deepavali called the Festival of Lights?  
-   People light lamps all around ✓ · People fly kites · People eat sweet treats · People sing songs
-4. The street had ___ oil lamps and gold clay pots.  
-   bright ✓ · brick · brim
+1. What did Auntie make the rangoli with?  
+   Rice ✓ · Sand · Paper
+2. What ate the rice?  
+   A bird ✓ · A cat · A goat
+3. Why did Auntie let the birds eat?  
+   The rice is for sharing ✓ · She did not like the rangoli · She was sleepy
+4. "___ for everyone," she said.  
+   Light ✓ · Lit · Lot
 5. Put these in the order they happened.  
-   (1) Giri's oil lamp went out in the wind. (2) A kind auntie lit the lamp. (3) Giri ate a sweet treat.
+   (1) Giri helped make the rangoli. (2) A bird came back with two friends. (3) Auntie lit the little lamps.
 
 **Talk about it:**
 - Why did Giri cup his hands around the lamp?
 - How did the auntie help?
 
-**Spot it: Verbs (doing words)** — Giri cupped his hands. The auntie lit the lamp. The lane shone bright.. "Cupped", "lit", and "shone" are verbs. They tell us what someone or something does.
+**Spot it: Repeating for effect** — A ring of red. A ring of gold. A ring of green.. Saying the same thing three times builds a pattern the reader can hear.
 
-**Spot it: "And" and "but" (joining words)** — The street was bright and busy, but the lamp went out.. "And" joins ideas that go together. "But" joins ideas that are different.
+**Spot it: Speech marks** — "Let them eat," said Auntie.. Speech marks go around the words someone says.
 
 _Read this one together: it uses some words and sentences beyond the sounds your child has been taught._
 
@@ -754,6 +767,8 @@ _For the back page of the book._
 
 **Words to know first** — read each one together before the story. For a ❤️ word, point to the tricky part; the rest of the word sounds out as normal:
 - **tall** — ❤️ tricky part: a says /aw/
+- **small** — ❤️ tricky part: a says /aw/
+- **called** — ❤️ tricky part: a says /aw/
 - **warm** — ❤️ tricky part: ar says /or/
 
 **Word meanings** — talk about these before reading:
