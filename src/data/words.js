@@ -174,7 +174,7 @@ export const WORD_GROUPS = {
 //   • silent-e ('se')         → 0 phonemes (the 'e' is silent in 'cake')
 //   • blends ('bl')           → one phoneme per letter ('fl' → /f/+/l/, 'spl' → 3)
 //   • single 'x' (consonant)  → 2 phonemes (/k/+/s/) in 'tax', 'fox', 'six'
-//   • silent-letter blends    → handled via PHONEME_OVERRIDES ('kn' → /n/ only)
+//   • silent-letter digraphs  → handled via PHONEME_OVERRIDES ('kn' → /n/ only)
 //   • multi-phoneme suffixes  → handled via SUFFIX_PHONEMES ('-ing' → /i/+/ng/)
 //
 // Anywhere that needs a sound count MUST read `word.phonemes.length`, never
@@ -1219,7 +1219,7 @@ export const WORDS = [
   { id:'blow',  word:'blow',  graphemes:['bl','ow'],        types:['bl','lv'],     pattern:'blend', group:'long-o', level:2, emoji:'💨' },
   { id:'grow',  word:'grow',  graphemes:['gr','ow'],        types:['bl','lv'],     pattern:'blend', group:'long-o', level:2, emoji:'🌱' },
   { id:'show',  word:'show',  graphemes:['sh','ow'],        types:['d','lv'],      pattern:'other', group:'long-o', level:2, emoji:'🎭' },
-  { id:'know',  word:'know',  graphemes:['kn','ow'],        types:['bl','lv'],     pattern:'other', group:'long-o', level:2, emoji:'🧠' },
+  { id:'know',  word:'know',  graphemes:['kn','ow'],        types:['d','lv'],      pattern:'other', group:'long-o', level:2, emoji:'🧠' },
   { id:'crow',  word:'crow',  graphemes:['cr','ow'],        types:['bl','lv'],     pattern:'blend', group:'long-o', level:2, emoji:'🐦‍⬛' },
 
   /* ══════════════════════════════════════

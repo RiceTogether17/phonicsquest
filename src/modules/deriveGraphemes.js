@@ -202,8 +202,17 @@ export function deriveGraphemes(raw) {
     }
   }
 
-  const segs = vowelSegments(stem);
-  if (!segs) return null; // a proper noun, or nothing to split
+  const marked = vowelSegments(stem);
+  if (!marked) return null; // a proper noun, or nothing to split
+  // The colour scaffold marks the silent k of "knee" as a heart letter. It
+  // is not a vowel: hand it back to the consonants, so splitConsonants can
+  // find "kn" and the ladder says /n/ instead of a k tile plus an n tile.
+  let at = 0;
+  const segs = marked.map((seg) => {
+    const letters = stem.slice(at, at + seg.len);
+    at += seg.len;
+    return seg.sound && !hasVowel(letters) ? { ...seg, sound: null } : seg;
+  });
 
   const graphemes = [];
   const types = [];
