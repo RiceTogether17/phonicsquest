@@ -37,6 +37,7 @@ const { WORDS, derivePhonemes, TH_VOICED_WORDS } = await import('../data/words.j
 const { APPROXIMATE_PHONEME_AUDIO, isApproximatePhonemeAudio, phonemeAudioFile } =
   await import('../modules/audio.js');
 const { PHONEME_MOUTH } = await import('../data/articulation.js');
+const { deriveGraphemes } = await import('../modules/deriveGraphemes.js');
 
 const byId = (id) => WORDS.find((w) => w.id === id);
 
@@ -106,6 +107,26 @@ describe('phoneme identity is separate from audio asset (audit finding 7)', () =
     // picture cannot separate them — which is exactly why the audio must.
     expect(PHONEME_MOUTH['/th_voiced/']).toBe(PHONEME_MOUTH['/th/']);
     expect(PHONEME_MOUTH['/th_voiced/']).toBe('tongue-teeth');
+  });
+
+  it('plays a silent-letter digraph as the one sound it makes', () => {
+    // "kn" used to reach TTS as the literal text "kn", which reads the
+    // letters out, and "know" typed its kn as a blend, which played /k/
+    // then /n/. Both teach that the k is sounded.
+    expect(phonemeAudioFile('kn', 'c')).toBe('n');
+    expect(phonemeAudioFile('kn', 'd')).toBe('n');
+    expect(phonemeAudioFile('gn', 'c')).toBe('n');
+    expect(phonemeAudioFile('wr', 'c')).toBe('r');
+    expect(byId('know').types[0]).not.toBe('bl');
+    expect(phonemeAudioFile(byId('know').graphemes[0], byId('know').types[0])).toBe('n');
+  });
+
+  it('keeps kn as one tile when a story word is split for the ladder', () => {
+    // The colour scaffold marks the silent k as a heart letter, and the
+    // splitter used to take that for a vowel: k and n came out as two tiles.
+    for (const word of ['knee', 'knot', 'knock', 'know']) {
+      expect(deriveGraphemes(word).graphemes[0], word).toBe('kn');
+    }
   });
 
   it('maps every derived phoneme to a mouth shape', () => {

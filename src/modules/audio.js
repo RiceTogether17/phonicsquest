@@ -52,6 +52,11 @@ const PHONEME_FILES = {
   tch: 'ch',  // "tch" makes the /ch/ sound (catch, fetch, pitch)
   dge: 'j',   // "dge" makes the /j/ sound (badge, bridge, judge)
   ph: 'f',    // "ph" makes the /f/ sound (phone, graph, dolphin)
+  // Silent-letter digraphs. Without these the key falls through to TTS,
+  // which reads the letters ("k... n") — the opposite of the lesson.
+  kn: 'n',    // "kn" makes the /n/ sound (knee, knot, know) — silent k
+  gn: 'n',    // "gn" makes the /n/ sound (gnat, gnome) — silent g
+  wr: 'r',    // "wr" makes the /r/ sound (wrap, write) — silent w
   // R-controlled vowels
   ar: 'ar', or: 'or', er: 'er',
   ir: 'er',  // ir = same /ɜr/ sound as er
@@ -259,6 +264,7 @@ const PHONEME_TTS = {
   th_voiced: 'the',
   wh: 'wuh',  ck: 'kuh',  ll: 'lll',  se: 'sss',
   tch: 'chuh', dge: 'juh', ph: 'fff',
+  kn: 'nnn',  gn: 'nnn',  wr: 'rrr',
   ss: 'sss',  tt: 'tuh',  nn: 'nnn',  gg: 'guh',
   ff: 'fff',  dd: 'duh',  zz: 'zzz',  bb: 'buh',
   pp: 'puh',  mm: 'mmm',  rr: 'rrr',
