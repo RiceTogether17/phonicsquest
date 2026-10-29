@@ -128,7 +128,7 @@ export const VOCAB_CATEGORIES = {
     desc: 'Select the right article (a, an, the)',
     rule: 'Use "a" before consonant sounds, "an" before vowel sounds, "the" for something specific or already mentioned, and "some" for quantities of uncountable or plural nouns.',
     example: '"She bought ___ orange from the fruit stall." — "an" is correct because "orange" starts with a vowel sound.',
-    tip: 'Say the next word aloud — if it starts with a vowel sound, use "an"; if it starts with a consonant sound, use "a".',
+    tip: 'Say the next word aloud and listen to its first sound, not its first letter. "A useful tip" (u sounds like "you"), "an hour" (the h is silent).',
   },
   grammarSVA: {
     label: 'Subject-Verb Agreement',

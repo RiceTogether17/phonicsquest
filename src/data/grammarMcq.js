@@ -50,37 +50,37 @@ const GRAMMAR_BUILDERS = {
   articles(level, i) {
     const rows = [
       ['___ hour had passed, but the team had not given up.', 'An', ['A', 'The', 'Some'], {
-        'An': '"An" is correct because "hour" starts with a vowel sound /aʊ/, even though it is spelled with "h".',
+        'An': '"An" is correct. The "h" in "hour" is silent, so the word starts with a vowel sound. It sounds just like "our".',
         'A': '"A" is used before consonant sounds, but "hour" starts with a vowel sound because the "h" is silent.',
         'The': '"The" is for a specific noun already known to both speaker and listener, not a first mention.',
         'Some': '"Some" is for plural or uncountable nouns, not a single countable hour.',
       }],
       ['Priya found ___ umbrella leaning against the classroom door.', 'an', ['a', 'the', 'some'], {
-        'an': '"An" is correct because "umbrella" starts with the vowel sound /ʌ/.',
+        'an': '"An" is correct because "umbrella" starts with a vowel sound, the "u" in "up".',
         'a': '"A" is used before consonant sounds, but "umbrella" starts with a vowel sound.',
         'the': '"The" would mean a specific umbrella already known to the listener, but this is a first mention.',
         'some': '"Some" is for plural or uncountable nouns, not a single umbrella.',
       }],
       ['The coach shared ___ useful tip just before the match began.', 'a', ['an', 'the', 'some'], {
-        'a': '"A" is correct because "useful" starts with the consonant sound /j/ (like "you"), not a vowel sound.',
-        'an': '"An" is used before vowel sounds, but "useful" starts with the /j/ consonant sound.',
+        'a': '"A" is correct. "Useful" is spelled with a "u", but say it out loud: it starts with a "you" sound. That is a consonant sound, so we use "a".',
+        'an': '"An" goes before vowel sounds. Say "useful" out loud: it starts with a "you" sound, which is a consonant sound, so "an" does not fit.',
         'the': '"The" would suggest a specific tip already known, but this is new advice.',
         'some': '"Some" is for plural or uncountable nouns, not a single tip.',
       }],
       ['I saw ___ eagle gliding slowly above the field.', 'an', ['a', 'the', 'some'], {
-        'an': '"An" is correct because "eagle" starts with the vowel sound /iː/.',
+        'an': '"An" is correct because "eagle" starts with a vowel sound, the "ee" in "eat".',
         'a': '"A" is used before consonant sounds, but "eagle" begins with a vowel sound.',
         'the': '"The" would mean a specific eagle already mentioned, but this is a first sighting.',
         'some': '"Some" is for plural or uncountable nouns, not one eagle.',
       }],
       ['That was ___ excellent answer — the class was impressed.', 'an', ['a', 'the', 'some'], {
-        'an': '"An" is correct because "excellent" starts with the vowel sound /ɛ/.',
+        'an': '"An" is correct because "excellent" starts with a vowel sound, the "e" in "egg".',
         'a': '"A" is used before consonant sounds, but "excellent" starts with a vowel sound.',
         'the': '"The" would point to a specific answer already known to both speaker and listener.',
         'some': '"Some" is for plural or uncountable nouns, not a single answer.',
       }],
       ['Mum left ___ orange on the counter as a snack.', 'an', ['a', 'the', 'some'], {
-        'an': '"An" is correct because "orange" starts with the vowel sound /ɒ/.',
+        'an': '"An" is correct because "orange" starts with a vowel sound, the "o" in "on".',
         'a': '"A" is used before consonant sounds, but "orange" starts with a vowel sound.',
         'the': '"The" would mean a specific orange already known to both speaker and listener.',
         'some': '"Some" is for plural or uncountable nouns, not one orange.',
@@ -89,61 +89,61 @@ const GRAMMAR_BUILDERS = {
       // nothing established whether a specific ruler was meant. "any ruler will
       // do" makes it indefinite.
       ['Please pass me ___ ruler — any ruler will do — so I can draw a margin.', 'a', ['an', 'the', 'some'], {
-        'a': '"A" is correct: "any ruler will do" means no particular ruler, and "ruler" starts with the consonant sound /r/.',
-        'an': '"An" is used before vowel sounds, but "ruler" begins with the consonant /r/.',
+        'a': '"A" is correct: "any ruler will do" means no particular ruler, and "ruler" starts with the consonant sound "r".',
+        'an': '"An" is used before vowel sounds, but "ruler" begins with the consonant sound "r".',
         'the': '"The" would point to one specific ruler, but "any ruler will do" says it does not matter which.',
         'some': '"Some" is for plural or uncountable nouns, not one ruler.',
       }],
       ['___ uniform with the school crest hung in the display case.', 'A', ['An', 'The', 'Some'], {
-        'A': '"A" is correct because "uniform" starts with the consonant sound /j/ (like "you"), not a vowel sound.',
-        'An': '"An" is used before vowel sounds, but "uniform" starts with the /j/ consonant sound.',
+        'A': '"A" is correct. "Uniform" is spelled with a "u", but say it out loud: it starts with a "you" sound. That is a consonant sound, so we use "a".',
+        'An': '"An" goes before vowel sounds. Say "uniform" out loud: it starts with a "you" sound, which is a consonant sound, so "an" does not fit.',
         'The': '"The" would mean a specific uniform already known to everyone, but this is a first mention.',
         'Some': '"Some" is for plural or uncountable nouns, not a single uniform.',
       }],
       ['She gave ___ honest answer to a tricky question.', 'an', ['a', 'the', 'some'], {
-        'an': '"An" is correct because "honest" has a silent "h", so it begins with the vowel sound /ɒ/.',
+        'an': '"An" is correct. The "h" in "honest" is silent, so the first sound you hear is the vowel "o", as in "on".',
         'a': '"A" is used before consonant sounds, but the "h" in "honest" is silent, making it start with a vowel sound.',
         'the': '"The" would point to a specific answer already known to both speaker and listener.',
         'some': '"Some" is for plural or uncountable nouns, not one answer.',
       }],
       ['He found ___ empty seat near the library window.', 'an', ['a', 'the', 'some'], {
-        'an': '"An" is correct because "empty" starts with the vowel sound /ɛ/.',
+        'an': '"An" is correct because "empty" starts with a vowel sound, the "e" in "egg".',
         'a': '"A" is used before consonant sounds, but "empty" begins with a vowel sound.',
         'the': '"The" would suggest a specific seat already known, but this is a first mention.',
         'some': '"Some" is for plural or uncountable nouns, not one seat.',
       }],
       ['The class planted ___ mango seedling in the school garden.', 'a', ['an', 'the', 'some'], {
-        'a': '"A" is correct because "mango" starts with the consonant sound /m/.',
-        'an': '"An" is used before vowel sounds, but "mango" begins with the consonant /m/.',
+        'a': '"A" is correct because "mango" starts with the consonant sound "m".',
+        'an': '"An" is used before vowel sounds, but "mango" begins with the consonant sound "m".',
         'the': '"The" would mean a specific seedling already mentioned, but this is a new one.',
         'some': '"Some" is for plural or uncountable nouns, not a single seedling.',
       }],
       ['We heard ___ unusual noise coming from the storeroom.', 'an', ['a', 'the', 'some'], {
-        'an': '"An" is correct because "unusual" starts with the vowel sound /ʌ/.',
+        'an': '"An" is correct because "unusual" starts with a vowel sound, the "u" in "up".',
         'a': '"A" is used before consonant sounds, but "unusual" begins with a vowel sound.',
         'the': '"The" would mean a specific noise already known, but this is an unexpected new sound.',
         'some': '"Some" is for plural or uncountable nouns, not one noise.',
       }],
       ['Jake slipped ___ extra pen into his pencil case just in case.', 'an', ['a', 'the', 'some'], {
-        'an': '"An" is correct because "extra" starts with the vowel sound /ɛ/.',
+        'an': '"An" is correct because "extra" starts with a vowel sound, the "e" in "egg".',
         'a': '"A" is used before consonant sounds, but "extra" begins with a vowel sound.',
         'the': '"The" would point to a specific pen already known, but Jake is just adding one more.',
         'some': '"Some" is for plural or uncountable nouns, not one pen.',
       }],
       ['Each pupil received ___ ice-cream treat after Sports Day.', 'an', ['a', 'the', 'some'], {
-        'an': '"An" is correct because "ice-cream" starts with the vowel sound /aɪ/.',
+        'an': '"An" is correct because "ice-cream" starts with a vowel sound, the long "i" that sounds like "eye".',
         'a': '"A" is used before consonant sounds, but "ice-cream" begins with a vowel sound.',
         'the': '"The" would mean a specific treat already known to everyone, but this is simply one treat per pupil.',
         'some': '"Some" is for plural or uncountable nouns, not a single treat.',
       }],
       ['The new pupil gave ___ interesting talk about her home country.', 'an', ['a', 'the', 'some'], {
-        'an': '"An" is correct because "interesting" starts with the vowel sound /ɪ/.',
+        'an': '"An" is correct because "interesting" starts with a vowel sound, the "i" in "in".',
         'a': '"A" is used before consonant sounds, but "interesting" begins with a vowel sound.',
         'the': '"The" would mean a specific talk already known, but this is simply one talk she gave.',
         'some': '"Some" is for plural or uncountable nouns, not one talk.',
       }],
       ['The principal made ___ announcement about the upcoming camp.', 'an', ['a', 'the', 'some'], {
-        'an': '"An" is correct because "announcement" starts with the vowel sound /ə/.',
+        'an': '"An" is correct because "announcement" starts with a vowel sound, a soft "uh" like the "a" in "about".',
         'a': '"A" is used before consonant sounds, but "announcement" begins with a vowel sound.',
         'the': '"The" would mean a specific announcement already known, but this is new information.',
         'some': '"Some" is for plural or uncountable nouns, not one announcement.',
@@ -155,7 +155,7 @@ const GRAMMAR_BUILDERS = {
         'Some': '"Some" is for plural or uncountable nouns; the Sun is a unique singular noun.',
       }],
       ['My father is ___ engineer who works in Jurong Island.', 'an', ['a', 'the', 'some'], {
-        'an': '"An" is correct because "engineer" starts with the vowel sound /ɛ/.',
+        'an': '"An" is correct because "engineer" starts with a vowel sound, the "e" in "egg".',
         'a': '"A" is used before consonant sounds, but "engineer" begins with a vowel sound.',
         'the': '"The" would mean a specific, unique engineer already known, but this is just introducing his job.',
         'some': '"Some" is for plural or uncountable nouns, not one engineer.',
@@ -163,7 +163,7 @@ const GRAMMAR_BUILDERS = {
       ['Mdm Siti is ___ principal of our school this year.', 'the', ['a', 'an', 'some'], {
         'the': '"The" is correct because there is only one principal of the school, making it a unique role.',
         'a': '"A" would suggest one of several principals, but a school has only one principal at a time.',
-        'an': '"An" is used before vowel sounds, but "principal" starts with /p/, and there is only one anyway.',
+        'an': '"An" is used before vowel sounds, but "principal" starts with the consonant sound "p", and there is only one principal anyway.',
         'some': '"Some" is for plural or uncountable nouns, not a unique role like school principal.',
       }],
       ['Would you like ___ ice-cold water after your PE lesson?', 'some', ['a', 'an', 'the'], {
@@ -179,7 +179,7 @@ const GRAMMAR_BUILDERS = {
       q,
       choices: buildChoices(answer, ds),
       answer,
-      explain: 'Use "a" before consonant sounds and "an" before vowel sounds — including silent-h words like "hour" and "honest".',
+      explain: 'Use "a" before a consonant sound and "an" before a vowel sound. Listen to the first sound, not the first letter: "a useful tip" (u sounds like "you") and "an hour" (the h is silent).',
       optionExplanations,
     };
   },

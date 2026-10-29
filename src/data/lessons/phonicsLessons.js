@@ -504,12 +504,12 @@ export const PHONICS_LESSONS = {
     confusions: [],
   },
   'short-oo': {
-    headline: 'OO has a second sound — the short /ʊ/ in book',
+    headline: 'OO has a second sound — the short oo in book',
     soundChips: [{ g: 'oo', type: 'sv', label: 'oo' }],
     script: [
-      'The oo team has TWO sounds. This one is short and bouncy: /ʊ/ — like in book.',
+      'The oo team has TWO sounds. This one is short and bouncy, like in book.',
       'Try it: b… oo… k — book! Your lips barely pucker.',
-      'Book, look, good, foot — short /ʊ/. Moon and food keep the long /oo/. Listen for the difference!',
+      'Book, look, good, foot — the short oo. Moon and food keep the long /oo/. Listen for the difference!',
     ],
     weDoWord: 'book',
     confusions: ['oo has two sounds. If the long /oo/ of "moon" does not make a word, try the short one of "book".'],
