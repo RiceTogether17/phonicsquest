@@ -34,9 +34,9 @@ export const EDITING_TEACHBACK = {
   },
   articles: {
     icon: '📖',
-    rule: 'Use "a" before consonant sounds and "an" before vowel sounds (a, e, i, o, u).',
-    example: '"a cat" · "a house" · "an egg" · "an umbrella"',
-    tip: 'Say the next word out loud. Does it start with a vowel SOUND? Use "an". Otherwise use "a".',
+    rule: 'Use "a" before a consonant sound and "an" before a vowel sound. Listen to the first sound of the next word, not its first letter.',
+    example: '"a cat" · "an egg" · "an umbrella" · "a useful tip" · "an hour"',
+    tip: 'Say the next word out loud and listen to its first sound. Careful: "useful" starts with a "you" sound and "one" starts with a "w" sound, so we say "a useful tip" and "a one-day trip". The h in "hour" is silent, so we say "an hour".',
   },
   prepositions: {
     icon: '📍',
