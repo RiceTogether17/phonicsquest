@@ -250,12 +250,12 @@ const PHONEME_OVERRIDES = Object.freeze({
   come:    ['/c/', '/u/', '/m/'],    // /kʌm/ — irregular o, silent e
   some:    ['/s/', '/u/', '/m/'],    // /sʌm/ — irregular o, silent e
 
-  // Multisyllable words whose syllable graphemes ('mar', 'sci', 'gy',
-  // 'nough') don't decompose under the standard deriver. These are level
-  // 3 and rely on TTS for the whole-word read; the phoneme list here is
-  // for sound-count accuracy and parent-facing displays.
+  // Multisyllable words with spellings the standard deriver reads wrongly
+  // (sc says /s/, the e in "science" is a schwa). Their tiles are one sound
+  // each, so every tile plays a recording; this list keeps the printed
+  // sounds exact for sound counts and parent-facing displays.
   science: ['/s/', '/ī/', '/ə/', '/n/', '/s/'],
-  energy:  ['/e/', '/n/', '/er/', '/j/', '/i/'],
+  energy:  ['/e/', '/n/', '/er/', '/j/', '/ē/'],
   market:  ['/m/', '/ar/', '/k/', '/i/', '/t/'],
 
   // New high-frequency sight words — irregular spellings the structural
@@ -430,6 +430,15 @@ const PHONEME_KEY_NOTATION = Object.freeze({
   er: '/er/',
   'ə': '/ə/',
 });
+
+/**
+ * How one sound, named by its recording key ('long_oo', 'air'), is written.
+ * @param {string} key
+ * @returns {string}
+ */
+export function soundKeyNotation(key) {
+  return PHONEME_KEY_NOTATION[key] ?? `/${key}/`;
+}
 
 /**
  * The English `-ed` suffix is pronounced /ɪd/ (2 phonemes) after a stem
@@ -1928,12 +1937,12 @@ export const WORDS = [
   { id:'readable', word:'readable', graphemes:['r','ea','d','able'], types:['c','lv','c','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'📘' },
   { id:'action', word:'action', graphemes:['a','c','tion'], types:['sv','c','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🎬' },
   { id:'nation', word:'nation', graphemes:['n','a','tion'], types:['c','lv','sf'], pattern:'suffix', group:'suffixes-advanced', level:3, emoji:'🇸🇬' },
-  { id:'science', word:'science', graphemes:['sci','en','ce'], types:['c','sv','c'], pattern:'multisyllable', group:'multisyllable', level:3, emoji:'🔬' },
-  { id:'energy', word:'energy', graphemes:['en','er','gy'], types:['sv','rc','c'], pattern:'multisyllable', group:'multisyllable', level:3, emoji:'⚡' },
-  { id:'market', word:'market', graphemes:['mar','k','et'], types:['rc','c','sv'], pattern:'multisyllable', group:'multisyllable', level:2, emoji:'🛍️' },
-  { id:'their', word:'their', graphemes:['th','eir'], types:['d','lv'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'👥' },
-  { id:'because', word:'because', graphemes:['be','cau','se'], types:['sv','dp','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'❓' },
-  { id:'enough', word:'enough', graphemes:['e','nough'], types:['sv','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'✅' },
+  { id:'science', word:'science', graphemes:['sc','i','e','n','ce'], types:['c','lv','sv','c','soft_c'], phonemeKeys:{0:'s', 2:'ə'}, pattern:'multisyllable', group:'multisyllable', level:3, emoji:'🔬' },
+  { id:'energy', word:'energy', graphemes:['e','n','er','g','y'], types:['sv','c','rc','soft_g','lv'], phonemeKeys:{4:'long_e'}, pattern:'multisyllable', group:'multisyllable', level:3, emoji:'⚡' },
+  { id:'market', word:'market', graphemes:['m','ar','k','e','t'], types:['c','rc','c','sv','c'], phonemeKeys:{3:'i'}, pattern:'multisyllable', group:'multisyllable', level:2, emoji:'🛍️' },
+  { id:'their', word:'their', graphemes:['th','eir'], types:['d','rc'], phonemeKeys:{1:'air'}, pattern:'sight', group:'sight-highfreq', level:2, emoji:'👥' },
+  { id:'because', word:'because', graphemes:['b','e','c','au','se'], types:['c','sv','c','dp','c'], phonemeKeys:{1:'i', 4:'z'}, pattern:'sight', group:'sight-highfreq', level:3, emoji:'❓' },
+  { id:'enough', word:'enough', graphemes:['e','n','ou','gh'], types:['sv','c','sv','c'], phonemeKeys:{0:'i', 2:'u', 3:'f'}, pattern:'sight', group:'sight-highfreq', level:3, emoji:'✅' },
   { id:'should', word:'should', graphemes:['sh','oul','d'], types:['d','sv','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'🧠', irregularVowel:true, phonemeKeys:{1:'short_oo'} },
   { id:'could', word:'could', graphemes:['c','oul','d'], types:['c','sv','c'], pattern:'sight', group:'sight-highfreq', level:3, emoji:'💡', irregularVowel:true, phonemeKeys:{1:'short_oo'} },
 
@@ -2168,7 +2177,7 @@ export const WORDS = [
   { id:'want', word:'want', graphemes:['w','a','nt'], types:['c','sv','bl'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🙋', irregularVowel:true, phonemeKeys:{1:'o'} },
   { id:'does', word:'does', graphemes:['d','oe','s'], types:['c','sv','c'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'❔', irregularVowel:true, phonemeKeys:{1:'u', 2:'z'} },
   { id:'done', word:'done', graphemes:['d','o','n','e'], types:['c','sv','c','se'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🏁', irregularVowel:true, phonemeKeys:{1:'u'} },
-  { id:'once', word:'once', graphemes:['o','n','ce'], types:['sv','c','c'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'1️⃣' },
+  { id:'once', word:'once', graphemes:['o','n','ce'], types:['sv','c','soft_c'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'1️⃣' },
   { id:'again', word:'again', graphemes:['a','g','ai','n'], types:['sv','c','sv','c'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🔁', irregularVowel:true, phonemeKeys:{0:'ə', 2:'e'} },
   { id:'who', word:'who', graphemes:['wh','o'], types:['d','lv'], pattern:'sight', group:'sight-highfreq', level:2, emoji:'🕵️', irregularVowel:true, phonemeKeys:{0:'h', 1:'long_oo'} },
 ];
@@ -2276,6 +2285,30 @@ const PHONEME_KEYS_BY_WORD = new Map(
     { graphemes: w.graphemes, keys: w.phonemeKeys },
   ]),
 );
+
+/**
+ * Bank words by their exact tiles, for `isBankWordTiles`.
+ */
+const WORD_BY_TILES = new Map(
+  WORDS.filter((w) => Array.isArray(w.graphemes) && !w.phonemeKeys).map((w) => [
+    `${w.graphemes.join('|')}#${(w.types || []).join('|')}`,
+    w,
+  ]),
+);
+
+/**
+ * True when these tiles spell a bank word with exactly these sounds: "plan"
+ * at the start of "planet", "mag" is not. A building-up step can then be said
+ * as a whole word by the voice; any other part-word has to be played as
+ * recorded sounds, because the voice reads a string it does not know by its
+ * letter names ("picn" comes out as "P I C N").
+ *
+ * @param {string[]} graphemes
+ * @param {string[]} types
+ */
+export function isBankWordTiles(graphemes, types) {
+  return WORD_BY_TILES.has(`${graphemes.join('|')}#${types.join('|')}`);
+}
 
 /**
  * The recording a word's tile must play instead of its spelling's default,

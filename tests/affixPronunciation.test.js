@@ -196,10 +196,10 @@ describe('affix pronunciation', () => {
 
   // ── TTS overrides ─────────────────────────────────────────────────
 
-  it('speaks -tion as "shun" via TTS override', async () => {
+  it('plays -tion as recorded /sh/ /ə/ /n/ ("shun")', async () => {
     await audio.speakPhoneme('tion', 'sf');
-    expect(audio._speak).toHaveBeenCalledWith('shun', 0.9);
-    expect(audio._playPhonemeAudio).not.toHaveBeenCalled();
+    expect(audio._playPhonemeAudio.mock.calls.map((c) => c[0])).toEqual(['sh', 'ə', 'n']);
+    expect(audio._speak).not.toHaveBeenCalled();
   });
 
   it('speaks -sion as "zhun" via TTS override', async () => {
@@ -209,20 +209,21 @@ describe('affix pronunciation', () => {
 
   // ── Existing suffix behavior preserved ─────────────────────────────
 
-  it('still speaks -ing via TTS fallback', async () => {
-    await audio.speakPhoneme('-ing', 'sf');
-    expect(audio._speak).toHaveBeenCalledWith('ing', 0.9);
-    expect(audio._playPhonemeAudio).not.toHaveBeenCalled();
-  });
-
-  it('still speaks -er via TTS fallback', async () => {
-    await audio.speakPhoneme('-er', 'sf');
-    expect(audio._speak).toHaveBeenCalledWith('er', 0.9);
-  });
-
-  it('still speaks -est via TTS fallback', async () => {
-    await audio.speakPhoneme('-est', 'sf');
-    expect(audio._speak).toHaveBeenCalledWith('est', 0.9);
+  // Handed to the voice as text, short endings come out as letter names
+  // ("est" → "E S T"), so each plays its recorded sounds instead.
+  it.each([
+    ['-ing', ['i', 'ng']],
+    ['-er', ['er']],
+    ['-est', ['e', 's', 't']],
+    ['-ly', ['l', 'long_e']],
+    ['-ful', ['f', 'ə', 'l']],
+    ['-less', ['l', 'e', 's']],
+    ['-ness', ['n', 'ə', 's']],
+    ['able', ['ə', 'b', 'ə', 'l']],
+  ])('plays %s as recorded sounds, never through the voice', async (suffix, keys) => {
+    await audio.speakPhoneme(suffix, 'sf');
+    expect(audio._playPhonemeAudio.mock.calls.map((c) => c[0])).toEqual(keys);
+    expect(audio._speak).not.toHaveBeenCalled();
   });
 
   it('still handles -ed after voiceless consonant as /t/', async () => {
@@ -262,10 +263,10 @@ describe('affix pronunciation', () => {
     expect(audio._playPhonemeAudio).toHaveBeenCalledWith('d');
   });
 
-  it('falls back to TTS "ed" when no context at all is available', async () => {
+  it('plays a plain /d/ when no context at all is available, never the voice', async () => {
     await audio.speakPhoneme('-ed', 'sf');
-    expect(audio._speak).toHaveBeenCalledWith('ed', 0.9);
-    expect(audio._playPhonemeAudio).not.toHaveBeenCalled();
+    expect(audio._playPhonemeAudio).toHaveBeenCalledWith('d');
+    expect(audio._speak).not.toHaveBeenCalled();
   });
 
   // ── Phoneme delay between sequence items ───────────────────────────

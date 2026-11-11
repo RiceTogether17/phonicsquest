@@ -103,23 +103,40 @@ describe('audio.speakChunk (consecutive blending)', () => {
     expect(speakPhoneme).toHaveBeenCalledTimes(2);
   });
 
-  it('uses TTS for a chunk ending in a consonant with no pending magic-e', async () => {
+  it('uses TTS for a chunk that is itself a bank word with the same sounds', async () => {
     const speak = vi.spyOn(audio, '_speak').mockResolvedValue();
-    // Build a word where the 2-grapheme chunk ends in a consonant: "lis" of list?
-    // 'l'+'i' ends in sv; use a VC-start word instead.
-    const AND = {
-      id: 'and',
-      word: 'and',
-      graphemes: ['a', 'n', 'd'],
-      types: ['sv', 'c', 'c'],
-      pattern: 'VCC',
-      group: 'cvc-a',
-      level: 1,
-      emoji: '➕',
+    const PLANET = {
+      id: 'planet',
+      word: 'planet',
+      graphemes: ['pl', 'a', 'n', 'e', 't'],
+      types: ['bl', 'sv', 'c', 'sv', 'c'],
+      pattern: 'multisyllable',
+      group: 'multisyllable',
+      level: 2,
+      emoji: '🪐',
     };
-    await audio.speakChunk(AND, 2); // "an" ends in a consonant → TTS
+    await audio.speakChunk(PLANET, 3); // "plan" is a real word → voice
     expect(speak).toHaveBeenCalled();
-    expect(speak.mock.calls[0][0]).toBe('an');
+    expect(speak.mock.calls[0][0]).toBe('plan');
+  });
+
+  it('plays recorded sounds for a part-word the voice would spell out', async () => {
+    const speak = vi.spyOn(audio, '_speak').mockResolvedValue();
+    const speakPhoneme = vi.spyOn(audio, 'speakPhoneme').mockResolvedValue();
+    const MAGNET = {
+      id: 'magnet',
+      word: 'magnet',
+      graphemes: ['m', 'a', 'g', 'n', 'e', 't'],
+      types: ['c', 'sv', 'c', 'c', 'sv', 'c'],
+      pattern: 'multisyllable',
+      group: 'multisyllable',
+      level: 2,
+      emoji: '🧲',
+    };
+    // "magn" is not a word: the voice reads it as letter names.
+    await audio.speakChunk(MAGNET, 4);
+    expect(speak).not.toHaveBeenCalled();
+    expect(speakPhoneme).toHaveBeenCalledTimes(4);
   });
 
   it('falls back to phoneme playback when the chunk ends in a short vowel', async () => {

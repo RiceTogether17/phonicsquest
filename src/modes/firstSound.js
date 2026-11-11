@@ -79,9 +79,14 @@ export function setupFirstSound(word, els) {
 
   // The first PHONEME, not the first tile: "clamp" is stored cl|a|mp, but
   // a blend is two sounds, so the FIRST sound is /k/ — not /kl/.
-  const { grapheme: firstGrapheme, type: firstType } = firstPhoneme(word);
+  const { grapheme: firstGrapheme, type: firstType, sound: firstSound } = firstPhoneme(word);
 
-  const distractorGraphemes = getFirstSoundDistractors(firstGrapheme, firstType, word.level);
+  const distractorGraphemes = getFirstSoundDistractors(
+    firstGrapheme,
+    firstType,
+    word.level,
+    firstSound,
+  );
   const distractors = shuffleArray(distractorGraphemes).slice(0, 3);
 
   // Early-stage learners (Phase 1–2 words) get the choices in alphabetical
@@ -89,7 +94,7 @@ export function setupFirstSound(word, els) {
   // the child has a stable scanning frame. From Phase 3 onward we shuffle
   // so finding the answer is a genuine auditory discrimination task again.
   const baseChoices = [
-    { grapheme: firstGrapheme, type: firstType, correct: true },
+    { grapheme: firstGrapheme, type: firstType, sound: firstSound, correct: true },
     ...distractors.map((g) => ({ grapheme: g.grapheme, type: g.type, correct: false })),
   ];
   const choices =
@@ -175,7 +180,7 @@ function _revealAnswer(word, els, firstGrapheme, firstType) {
   renderRevealMouthCue(word, 0, els, { phoneme: firstGrapheme });
 
   setTimeout(async () => {
-    await audio.speakPhoneme(firstGrapheme, firstType);
+    await audio.speakPhoneme(firstGrapheme, firstType, { word: word.word, index: 0 });
     await new Promise((r) => setTimeout(r, 300));
     await audio.speakWord(word.word);
   }, 300);
@@ -189,11 +194,16 @@ function _revealAnswer(word, els, firstGrapheme, firstType) {
  *   2. Other phonemes of the same type from the word list.
  *   3. Any phoneme from the word list (fallback).
  */
-export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel = 3) {
+export function getFirstSoundDistractors(
+  correctGrapheme,
+  correctType,
+  maxLevel = 3,
+  correctSound = null,
+) {
   // Keyed by the SOUND each choice shows, not the letter: c and k are both
   // /k/, and a soft g is /j/. Letter keys let a round show /k/ twice, one of
   // them "wrong". See soundKeys.
-  const { add, distractors } = soundDistinctPicker(correctGrapheme, correctType);
+  const { add, distractors } = soundDistinctPicker(correctGrapheme, correctType, correctSound);
 
   // Tier 1: confusion-pair phonemes — the most instructionally useful distractors
   const confusionTargets = CONFUSION_MAP[correctGrapheme.toLowerCase()] ?? [];
@@ -208,16 +218,16 @@ export function getFirstSoundDistractors(correctGrapheme, correctType, maxLevel 
   // Tier 2: same-type phonemes from the word list
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter((w) => w.level <= maxLevel))) {
-      const { grapheme: g, type: t } = firstPhoneme(word);
-      if (t === correctType && add(g, t) && distractors.length >= 6) break;
+      const { grapheme: g, type: t, sound } = firstPhoneme(word);
+      if (t === correctType && add(g, t, sound) && distractors.length >= 6) break;
     }
   }
 
   // Tier 3: any phoneme (fallback)
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter((w) => w.level <= maxLevel))) {
-      const { grapheme: g, type: t } = firstPhoneme(word);
-      if (add(g, t) && distractors.length >= 6) break;
+      const { grapheme: g, type: t, sound } = firstPhoneme(word);
+      if (add(g, t, sound) && distractors.length >= 6) break;
     }
   }
 

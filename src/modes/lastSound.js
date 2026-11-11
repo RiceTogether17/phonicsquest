@@ -70,14 +70,19 @@ export function setupLastSound(word, els) {
 
   // The last PHONEME, which is not always the last tile: "cake" ends in a
   // silent e, and "clamp" ends in a two-sound blend whose last sound is /p/.
-  const { grapheme: lastGrapheme, type: lastType, index: lastIdx } = lastPhoneme(word);
+  const {
+    grapheme: lastGrapheme,
+    type: lastType,
+    index: lastIdx,
+    sound: lastSound,
+  } = lastPhoneme(word);
 
-  const distractors = _getDistractors(lastGrapheme, 'last', word.level, lastType);
+  const distractors = _getDistractors(lastGrapheme, 'last', word.level, lastType, lastSound);
   // Phase 1–2 words → alphabetical order (predictable for the teacher, lower
   // load for the child). Phase 3+ → shuffled so the answer can't be located
   // by remembered position. See firstSound.js for the rationale.
   const baseChoices = [
-    { grapheme: lastGrapheme, type: lastType, correct: true },
+    { grapheme: lastGrapheme, type: lastType, sound: lastSound, correct: true },
     ...distractors.slice(0, 3).map((g) => ({ ...g, correct: false })),
   ];
   const choices =
@@ -147,7 +152,11 @@ function _revealAnswer(word, els, lastIdx, lastGrapheme, lastType) {
 
   setTimeout(async () => {
     const prevGrapheme = lastIdx > 0 ? word.graphemes[lastIdx - 1] : null;
-    await audio.speakPhoneme(lastGrapheme, lastType, { word: word.word, prevGrapheme });
+    await audio.speakPhoneme(lastGrapheme, lastType, {
+      word: word.word,
+      index: lastIdx,
+      prevGrapheme,
+    });
     await new Promise((r) => setTimeout(r, 300));
     await audio.speakWord(word.word);
   }, 300);
@@ -164,7 +173,12 @@ function _revealAnswer(word, els, lastIdx, lastGrapheme, lastType) {
 function _poolPhoneme(word, position) {
   return position === 'last'
     ? lastPhoneme(word)
-    : { grapheme: word.graphemes[0], type: word.types[0], index: 0 };
+    : {
+        grapheme: word.graphemes[0],
+        type: word.types[0],
+        index: 0,
+        sound: word.phonemeKeys?.[0] ?? null,
+      };
 }
 
 /**
@@ -175,10 +189,20 @@ function _poolPhoneme(word, position) {
  *   2. Same-type phonemes from words at this level.
  *   3. Any final phoneme (fallback).
  */
-function _getDistractors(correctGrapheme, position, maxLevel = 3, targetType = null) {
+function _getDistractors(
+  correctGrapheme,
+  position,
+  maxLevel = 3,
+  targetType = null,
+  correctSound = null,
+) {
   // Keyed by the sound each choice shows, not the letter — k and ck, s and
   // se, ll and l are one sound each. See soundKeys.
-  const { add, distractors } = soundDistinctPicker(correctGrapheme, targetType ?? 'c');
+  const { add, distractors } = soundDistinctPicker(
+    correctGrapheme,
+    targetType ?? 'c',
+    correctSound,
+  );
 
   // Tier 1: confusion-pair phonemes
   const confusionTargets = CONFUSION_MAP[correctGrapheme.toLowerCase()] ?? [];
@@ -192,16 +216,16 @@ function _getDistractors(correctGrapheme, position, maxLevel = 3, targetType = n
   // Tier 2: same-type phonemes from word list
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter((w) => w.level <= maxLevel))) {
-      const { grapheme: g, type: t } = _poolPhoneme(word, position);
-      if ((!targetType || t === targetType) && add(g, t) && distractors.length >= 6) break;
+      const { grapheme: g, type: t, sound } = _poolPhoneme(word, position);
+      if ((!targetType || t === targetType) && add(g, t, sound) && distractors.length >= 6) break;
     }
   }
 
   // Tier 3: any final phoneme (fallback)
   if (distractors.length < 3) {
     for (const word of shuffleArray(WORDS.filter((w) => w.level <= maxLevel))) {
-      const { grapheme: g, type: t } = _poolPhoneme(word, position);
-      if (add(g, t) && distractors.length >= 6) break;
+      const { grapheme: g, type: t, sound } = _poolPhoneme(word, position);
+      if (add(g, t, sound) && distractors.length >= 6) break;
     }
   }
 

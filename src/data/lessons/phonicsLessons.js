@@ -100,7 +100,7 @@ export const PHONICS_LESSONS = {
     soundChips: [{ g: 'fl', type: 'bl', label: 'fl' }, { g: 'a', type: 'sv', label: 'ă' }],
     script: [
       'Some words start with TWO consonant friends. You can hear both sounds!',
-      'Say them quickly together: f…l → "fl", like in "flag".',
+      'Say them quickly together: f… l… then fast: fl… like the start of "flag".',
       'Now blend the whole word: f… l… a… g — flag! Don\'t skip the second sound.',
     ],
     weDoWord: 'flag',
@@ -183,7 +183,7 @@ export const PHONICS_LESSONS = {
     script: [
       'Short E in the middle, two consonant friends at the end.',
       'Try this one: b… e… l… t — belt!',
-      'Say the ending slowly first: /l/… /t/. Then speed it up: "lt".',
+      'Say the ending slowly first: /l/… /t/. Then speed it up: lt…',
     ],
     weDoWord: 'belt',
     confusions: [],
@@ -601,7 +601,7 @@ export const PHONICS_LESSONS = {
     soundChips: [{ g: 'ph', type: 'd', label: 'ph' }],
     script: [
       'When p and h stand together they say /f/, not /p/ and not /h/.',
-      'ph\u2026 o\u2026 n\u2026 e \u2014 phone. g\u2026 r\u2026 a\u2026 ph \u2014 graph.',
+      'ph… ō… n — phone. g… r… a… ph — graph.',
       'Look for ph at the start, the middle or the end of a word.',
     ],
     weDoWord: 'phone',

@@ -1,5 +1,10 @@
-import { phonemeNotation } from '../data/words.js';
-import { phonemeAudioFile } from '../modules/audio.js';
+import { phonemeNotation, soundKeyNotation } from '../data/words.js';
+import {
+  phonemeAudioFile,
+  phonemeAudioKey,
+  phonemeKeyFile,
+  hasPhonemeRecording,
+} from '../modules/audio.js';
 
 /**
  * Where the first and last PHONEME of a word actually live.
@@ -39,7 +44,20 @@ const INITIAL_BLEND_ONSETS = {
  * @property {string} grapheme  the phoneme's own spelling ('p', not 'mp')
  * @property {string} type      phoneme type, for audio + tile rendering
  * @property {number} index     index of the TILE that contains it
+ * @property {string|null} sound the recording this word's tile really plays
+ *   when it differs from the spelling's usual sound (the u in "rule" says
+ *   /oo/, not "you"); null when the usual sound is right
  */
+
+/**
+ * The word's own sound for a whole tile, when it overrides the spelling.
+ * @param {import('../data/words.js').Word} word
+ * @param {number} index
+ * @returns {string|null}
+ */
+function tileSound(word, index) {
+  return word?.phonemeKeys?.[index] ?? null;
+}
 
 /**
  * Index of the last grapheme that actually MAKES a sound.
@@ -70,10 +88,10 @@ export function lastSoundedIdx(word) {
 export function firstPhoneme(word) {
   const grapheme = word?.graphemes?.[0] ?? '';
   const type = word?.types?.[0] ?? 'c';
-  if (type !== 'bl') return { grapheme, type, index: 0 };
+  if (type !== 'bl') return { grapheme, type, index: 0, sound: tileSound(word, 0) };
 
   const onset = INITIAL_BLEND_ONSETS[grapheme.toLowerCase()] ?? grapheme[0];
-  return { grapheme: onset, type: 'c', index: 0 };
+  return { grapheme: onset, type: 'c', index: 0, sound: null };
 }
 
 /**
@@ -85,12 +103,12 @@ export function lastPhoneme(word) {
   const index = lastSoundedIdx(word);
   const grapheme = word?.graphemes?.[index] ?? '';
   const type = word?.types?.[index] ?? 'c';
-  if (type !== 'bl') return { grapheme, type, index };
+  if (type !== 'bl') return { grapheme, type, index, sound: tileSound(word, index) };
 
   // Every final blend in the bank ends in a plain consonant letter that is
   // its own last sound — st→/t/, nd→/d/, mp→/p/, nk→/k/, ps→/s/ — so the
   // last letter needs no override table the way initial blends do.
-  return { grapheme: grapheme[grapheme.length - 1], type: 'c', index };
+  return { grapheme: grapheme[grapheme.length - 1], type: 'c', index, sound: null };
 }
 
 /**
@@ -110,7 +128,10 @@ export function lastPhoneme(word) {
  * @param {string} type
  * @returns {string[]}
  */
-export function soundKeys(grapheme, type) {
+export function soundKeys(grapheme, type, sound = null) {
+  // A word's own sound (the u in "rule" is /oo/) is what the button plays
+  // and prints, so it is what has to be kept apart from the other choices.
+  if (sound) return [`n:${soundKeyNotation(sound)}`, `a:${phonemeKeyFile(sound) ?? sound}`];
   const keys = [`n:${phonemeNotation(grapheme, type).join('')}`];
   const file = phonemeAudioFile(grapheme, type);
   if (file) keys.push(`a:${file}`);
@@ -118,18 +139,38 @@ export function soundKeys(grapheme, type) {
 }
 
 /**
+ * True when this spelling plays a recorded sound on its own, without any
+ * word around it. A choice button has no word around it, so a spelling with
+ * no recording ("eir", "oul", "et") would be handed to the device voice,
+ * which reads the letters out by name.
+ *
+ * @param {string} grapheme
+ * @param {string} type
+ */
+export function hasRecordedSound(grapheme, type) {
+  return hasPhonemeRecording(phonemeAudioKey(grapheme, type));
+}
+
+/**
  * A distractor picker that never repeats a sound or offers the answer's.
+ *
+ * A wrong option is only taken when its spelling plays a recording on its
+ * own, and never from a word whose tile says something other than its
+ * spelling (`sound` set): out of its word, the "oul" of "could" or the "u"
+ * of "rule" would play the wrong sound, or no recording at all.
  *
  * @param {string} answerGrapheme
  * @param {string} answerType
- * @returns {{ add: (g: string, t: string) => boolean, distractors: {grapheme: string, type: string}[] }}
+ * @param {string|null} [answerSound]  the answer word's own sound, if overridden
+ * @returns {{ add: (g: string, t: string, sound?: string|null) => boolean, distractors: {grapheme: string, type: string}[] }}
  */
-export function soundDistinctPicker(answerGrapheme, answerType) {
-  const seen = new Set(soundKeys(answerGrapheme, answerType));
+export function soundDistinctPicker(answerGrapheme, answerType, answerSound = null) {
+  const seen = new Set(soundKeys(answerGrapheme, answerType, answerSound));
   const distractors = [];
   return {
     distractors,
-    add(grapheme, type) {
+    add(grapheme, type, sound = null) {
+      if (sound || !hasRecordedSound(grapheme, type)) return false;
       const keys = soundKeys(grapheme, type);
       if (keys.some((k) => seen.has(k))) return false;
       keys.forEach((k) => seen.add(k));
