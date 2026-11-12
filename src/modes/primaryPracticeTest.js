@@ -30,6 +30,8 @@ import { gradeShortAnswer } from './scoring/shortAnswerGrader.js';
 import { diagnoseAnswer } from '../modules/answerDiagnosis.js';
 import { recordMisconceptionsFromReview } from '../modules/teacherFeedback.js';
 import { checkSituationalPoints } from '../modules/situationalChecks.js';
+import { hasApiKey, gradeSituationalWriting } from '../modules/aiService.js';
+import { html } from '../utils/html.js';
 
 function shuffle(arr) {
   const a = [...arr];
@@ -902,6 +904,54 @@ function _situationalReviewHtml(paper, section, response) {
     </details>`;
 }
 
+const _aiSituationalMarks = new Map(); // `${paper id}|${response}` → Promise
+
+/**
+ * With a tutor set up, add PSLE-style marks under the word check: Task
+ * fulfilment out of 6 and Language and organisation out of 8. P5 and P6 only,
+ * the levels sitting this format. The marks are shown, never added to the
+ * paper's score: the section stays self-assessed.
+ */
+async function _appendAiSituationalMarks(fb, paper, section, response) {
+  const level = parseInt(String(paper?.level || '').replace(/\D/g, ''), 10);
+  if (!(level >= 5) || !section?.bullets || !String(response || '').trim()) return;
+
+  const box = document.createElement('div');
+  box.className = 'ptg-ai-marks';
+  box.innerHTML = '<p class="ptg-note"><em>✨ AI coach is marking your response…</em></p>';
+  fb.appendChild(box);
+
+  // Going back to a marked section shows the feedback again; one request
+  // per response is enough, and it counts against the daily cap.
+  const cacheKey = `${paper?.id}|${response}`;
+  if (!_aiSituationalMarks.has(cacheKey)) {
+    _aiSituationalMarks.set(
+      cacheKey,
+      gradeSituationalWriting(response, level, {
+        situation: [section.context, section.purpose].filter(Boolean).join(' '),
+        points: section.bullets,
+        format: section.format,
+        audience: section.audience,
+      }),
+    );
+  }
+  const graded = await _aiSituationalMarks.get(cacheKey);
+  if (!graded) _aiSituationalMarks.delete(cacheKey); // let a later visit try again
+  if (!box.isConnected) return;
+  if (!graded) {
+    box.remove(); // don't leave the loading line stuck on failure
+    return;
+  }
+  const rows = Object.values(graded.parts).map(
+    (p) =>
+      html`<li><strong>${p.label}</strong>: ${p.mark} / ${p.max}${p.comment ? ` — ${p.comment}` : ''}</li>`,
+  );
+  box.innerHTML = html`<p><strong>✨ AI coach, PSLE-style marks: ${graded.total} / ${graded.max}</strong></p>
+    <ul class="ptg-marking-guide">${rows}</ul>
+    ${graded.overall ? html`<p>${graded.overall}</p>` : ''}
+    <p class="ptg-note"><em>An AI estimate to guide practice, not an official mark.</em></p>`;
+}
+
 function buildSummaryHtml(paper, sectionResults) {
   const autoScored = sectionResults.reduce((a, r) => a + (r.selfAssessed ? 0 : r.scored), 0);
   const autoTotal = sectionResults.reduce((a, r) => a + (r.selfAssessed ? 0 : r.total), 0);
@@ -1158,6 +1208,7 @@ export function mountPracticeTest(
         fb.innerHTML =
           '<span>📝 Self-assess: check format, tone, and that every point is covered.</span>' +
           _situationalReviewHtml(paper, sectionData, info.userValue);
+        if (hasApiKey()) _appendAiSituationalMarks(fb, paper, sectionData, info.userValue);
         return;
       }
       const markingGuide = _markingGuideHtml(info);

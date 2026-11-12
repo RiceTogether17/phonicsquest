@@ -54,7 +54,13 @@ import {
   clearLegacyDraft,
   getDraftSummary,
 } from '../modules/writingDraftStore.js';
-import { hasApiKey, getWritingCoachFeedback, gradeEssayWithRubric } from '../modules/aiService.js';
+import {
+  hasApiKey,
+  getWritingCoachFeedback,
+  gradeEssayWithRubric,
+  gradePsleComposition,
+  gradeSituationalWriting,
+} from '../modules/aiService.js';
 import { escapeHtml } from '../utils/escapeHtml.js';
 
 let _container = null;
@@ -613,6 +619,63 @@ function _renderAiRubricHtml(graded) {
   </div>`;
 }
 
+function _renderAiPsleHtml(graded) {
+  const rows = Object.values(graded.parts)
+    .map(
+      (p) => `
+    <li class="wq-ai-item"><strong>${escapeHtml(p.label)}</strong>: ${p.mark} / ${p.max}${p.comment ? `<span class="wq-ai-tip">${escapeHtml(p.comment)}</span>` : ''}</li>`,
+    )
+    .join('');
+  return `<div class="wq-ai-feedback-wrap">
+    <p class="wq-ai-heading">✨ AI Coach — PSLE-style marks: ${graded.total} / ${graded.max}</p>
+    <ul class="wq-ai-list">${rows}</ul>
+    ${graded.overall ? `<p class="wq-ai-good">${escapeHtml(graded.overall)}</p>` : ''}
+    <p class="wq-caveat">An AI estimate to guide practice, not an official mark.</p>
+  </div>`;
+}
+
+/**
+ * P5 and P6 are marked on the PSLE scale their exam uses: situational
+ * writing out of 14, compositions out of 36. Younger levels keep the
+ * four-band rubric, which suits writing that is not yet exam-shaped.
+ */
+async function _aiMarkHtml(item, text, taskDesc) {
+  const level = Number(_level);
+  if (level >= 5 && item?.kind === 'situational') {
+    const brief = item.taskBrief || {};
+    const graded = await gradeSituationalWriting(text, level, {
+      situation: brief.situation || taskDesc,
+      points: brief.points || item.requiredPoints || [],
+      format: item.textType,
+      audience: item.pac?.audience,
+    });
+    return graded ? _renderAiPsleHtml(graded) : '';
+  }
+  if (level >= 5) {
+    const graded = await gradePsleComposition(text, level, taskDesc);
+    return graded ? _renderAiPsleHtml(graded) : '';
+  }
+  const graded = await gradeEssayWithRubric(text, level, taskDesc);
+  return graded ? _renderAiRubricHtml(graded) : '';
+}
+
+/**
+ * Without a tutor set up, say so once when this device can run one for free.
+ * A family with no budget should not have to discover Settings on their own.
+ */
+async function _offerFreeAiMarking(fb) {
+  const { getProvider } = await import('../modules/aiProviders.js');
+  const available = await getProvider('chrome')
+    ?.available()
+    .catch(() => false);
+  if (!available || !fb.isConnected) return;
+  const note = document.createElement('p');
+  note.className = 'wq-caveat';
+  note.textContent =
+    'Free AI marking can run on this device, with nothing sent online. A parent can turn it on in Settings.';
+  fb.appendChild(note);
+}
+
 async function _submitDraft(item, lessonForEval) {
   const text = document.getElementById('wq-text')?.value?.trim() || '';
   const fb = document.getElementById('wq-feedback');
@@ -666,15 +729,16 @@ async function _submitDraft(item, lessonForEval) {
       else aiSection.remove(); // don't leave the loading message stuck on failure
     });
 
-    // AI rubric grading next to the local bands. Commentary only — the
-    // local score above remains the source of truth for XP/progression.
+    // AI marks next to the local bands. Commentary only — the local score
+    // above remains the source of truth for XP/progression.
     const rubricSection = document.createElement('div');
     rubricSection.className = 'wq-ai-feedback';
     fb.appendChild(rubricSection);
-    gradeEssayWithRubric(text, _level, taskDesc).then((graded) => {
-      if (!graded || !rubricSection.isConnected) return;
-      rubricSection.innerHTML = _renderAiRubricHtml(graded);
+    _aiMarkHtml(item, text, taskDesc).then((html) => {
+      if (html && rubricSection.isConnected) rubricSection.innerHTML = html;
     });
+  } else if (fb) {
+    _offerFreeAiMarking(fb);
   }
 
   document.getElementById('wq-go-revise')?.addEventListener('click', () => {
