@@ -105,6 +105,21 @@ describe('vocabulary level banding', () => {
     expect(shared, shared.join('\n')).toEqual([]);
   });
 
+  it('no category serves the same seeds to P3 and P6', () => {
+    // P3 used to share one pool with P6 in fifteen categories, so a P3 child
+    // met "legislature" and a P6 child was asked for "bakery".
+    const categories = new Set(VOCAB_MCQ_ITEMS.P3.map((i) => i.category));
+    const shared = [];
+    for (const category of categories) {
+      const p3 = seedsFor('P3', category);
+      const p6 = seedsFor('P6', category);
+      if (!p3.size || !p6.size) continue;
+      const overlap = [...p3].filter((s) => p6.has(s)).length;
+      if (overlap / p3.size > 0.5) shared.push(`${category}: ${overlap}/${p3.size} shared`);
+    }
+    expect(shared, shared.join('\n')).toEqual([]);
+  });
+
   it('upper primary tests what a proverb means, not a memorised ending', () => {
     for (const level of ['P5', 'P6']) {
       const items = VOCAB_MCQ_ITEMS[level].filter((i) => i.category === 'proverbsSayings');
