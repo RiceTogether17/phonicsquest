@@ -1,7 +1,7 @@
 {
   "name": "phonicsquest",
   "version": "2.0.0",
-  "description": "PhonicsQuest \u2013 production-grade phonics learning adventure for early readers",
+  "description": "PhonicsQuest – production-grade phonics learning adventure for early readers",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -24,7 +24,8 @@
     "gen:scope": "node scripts/gen-scope-sequence.mjs",
     "gen:sw": "node scripts/gen-sw-manifest.mjs",
     "check:scope": "node scripts/gen-scope-sequence.mjs --check",
-    "export:readers": "node scripts/export-reader-prompts.mjs"
+    "export:readers": "node scripts/export-reader-prompts.mjs",
+    "check:writing-marker": "vitest run src/__tests__/writingMarker.test.js"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.2",

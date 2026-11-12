@@ -2,9 +2,9 @@
   "name": "PhonicsQuest – Early Reading & Primary English",
   "short_name": "PhonicsQuest",
   "description": "The phonics learning adventure for early readers. Practice blending, segmenting, and identifying sounds.",
-  "id": "/phonicsquest/",
-  "start_url": "/phonicsquest/",
-  "scope": "/phonicsquest/",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait",
@@ -15,25 +15,25 @@
   "lang": "en",
   "icons": [
     {
-      "src": "/phonicsquest/icons/icon-192.png",
+      "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/phonicsquest/icons/icon-512.png",
+      "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/phonicsquest/icons/icon-192.png",
+      "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/phonicsquest/icons/icon-512.png",
+      "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -46,8 +46,8 @@
       "name": "Blend It!",
       "short_name": "Blend",
       "description": "Start a blending session",
-      "url": "/phonicsquest/?mode=blend",
-      "icons": [{ "src": "/phonicsquest/icons/icon-192.png", "sizes": "192x192" }]
+      "url": "./?mode=blend",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

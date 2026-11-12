@@ -347,6 +347,147 @@ export async function gradeEssayWithRubric(draftText, level, taskDesc = '') {
 }
 
 /**
+ * The two PSLE Paper 1 parts, marked the way the 2025 format marks them:
+ * Continuous Writing out of 36 (Content 18, Language 18) and Situational
+ * Writing out of 14 (Task fulfilment 6, Language and organisation 8).
+ */
+export const PSLE_WRITING_SCALES = {
+  continuous: [
+    { key: 'CONTENT', name: 'content', label: 'Content', max: 18 },
+    { key: 'LANGUAGE', name: 'language', label: 'Language', max: 18 },
+  ],
+  situational: [
+    { key: 'TASK', name: 'taskFulfilment', label: 'Task fulfilment', max: 6 },
+    { key: 'LANGUAGE', name: 'languageOrganisation', label: 'Language and organisation', max: 8 },
+  ],
+};
+
+/**
+ * Ask for marks on one of the PSLE scales and keep them only if every part
+ * comes back as a whole number inside its range. A mark of 19/18 or "about
+ * twelve" is a model that did not follow the scale, and a child should not
+ * see it.
+ */
+async function _gradeOnPsleScale(kind, scale, { task, rules, context, learner, logSummary }) {
+  const { askStructured, sanitizeAiText } = await import('./aiGuardrails.js');
+  const fields = Object.fromEntries(
+    scale.map((c) => [
+      c.key,
+      {
+        parts: ['mark', 'comment'],
+        format: `${c.key}: <whole number from 0 to ${c.max}> | <one short, specific comment>`,
+      },
+    ]),
+  );
+  fields.OVERALL = {
+    format: 'OVERALL: <one encouraging sentence naming the single most useful next improvement>',
+  };
+
+  return askStructured(kind, {
+    task,
+    rules,
+    context,
+    learner,
+    fields,
+    validate: (parsed) => {
+      const parts = {};
+      for (const c of scale) {
+        const raw = parsed[c.key];
+        // "14" and "14/18" are both a mark; anything else is not.
+        const match = String(raw?.mark ?? '').match(/^(\d{1,2})(?:\s*\/\s*\d{1,2})?$/);
+        if (!match) return null;
+        const mark = Number(match[1]);
+        if (mark > c.max) return null;
+        parts[c.name] = {
+          label: c.label,
+          mark,
+          max: c.max,
+          comment: sanitizeAiText(raw.comment),
+        };
+      }
+      const all = Object.values(parts);
+      return {
+        parts,
+        total: all.reduce((sum, p) => sum + p.mark, 0),
+        max: all.reduce((sum, p) => sum + p.max, 0),
+        overall: sanitizeAiText(parsed.OVERALL || ''),
+      };
+    },
+    maxTokens: 300,
+    logSummary,
+  });
+}
+
+/**
+ * Mark a P5–P6 composition on the PSLE Continuous Writing scale.
+ *
+ * Like gradeEssayWithRubric this is an estimate for the child and their
+ * tutor, never the source of truth for XP or progression. The rules spell
+ * out the failure the local marker had (padding scored as "Secure"), and the
+ * samples in tests/fixtures/writingMarkerSamples.js check it stays fixed.
+ *
+ * @param {string} draftText
+ * @param {number|string} level   5 or 6
+ * @param {string} [taskDesc]
+ * @returns {Promise<{ parts: Record<string, { label: string, mark: number, max: number, comment: string }>, total: number, max: number, overall: string } | null>}
+ */
+export async function gradePsleComposition(draftText, level, taskDesc = '') {
+  return _gradeOnPsleScale('grade', PSLE_WRITING_SCALES.continuous, {
+    task: `Mark a Singapore Primary ${level} pupil's composition the way the PSLE Continuous Writing paper is marked: Content out of 18 and Language out of 18.`,
+    rules: [
+      'Content: how well the composition answers the topic, how fully the main events and ideas are developed, and whether they are interesting and believable.',
+      'Language: grammar, spelling, punctuation, vocabulary, sentence variety, and how clearly the paragraphs and events are organised.',
+      'Use the whole range. A strong PSLE composition scores 15 or more in a part. A clear story with some errors scores about 10 to 14. Frequent errors, or thin and undeveloped ideas, score below 10.',
+      'Length is not quality. Padding, repeated sentences, strings of linking words, or writing that does not answer the topic scores low in Content however long it is.',
+      'The PSLE asks for at least 150 words. Under 100 words the ideas cannot be developed, so Content is 6 or below.',
+      `Judge as a PSLE marker would for a Primary ${level} pupil, not by adult standards.`,
+      "Each comment names one specific thing in this composition, quoting a few of the pupil's words where it helps.",
+    ],
+    context: [['Writing task set by the teacher', taskDesc || 'Write a story or composition.']],
+    learner: [['PUPIL DRAFT', draftText]],
+    logSummary: `Composition marked on PSLE scale (P${level})`,
+  });
+}
+
+/**
+ * Mark situational writing on the PSLE scale: Task fulfilment out of 6,
+ * Language and organisation out of 8. The required points go to the model as
+ * authored context, so a missing point costs marks the way it would in the
+ * exam.
+ *
+ * @param {string} text
+ * @param {number|string} level
+ * @param {object} task
+ * @param {string} [task.situation]  what the pupil was asked to write
+ * @param {string[]} [task.points]   the required points
+ * @param {string} [task.format]     e.g. 'Formal Letter', 'Email'
+ * @param {string} [task.audience]
+ * @returns {ReturnType<typeof gradePsleComposition>}
+ */
+export async function gradeSituationalWriting(text, level, task = {}) {
+  const context = [['Situation', task.situation || 'Write a short functional text.']];
+  if (task.format) context.push(['Format', task.format]);
+  if (task.audience) context.push(['Written to', task.audience]);
+  if (task.points?.length) {
+    context.push(['Required points', task.points.map((p, i) => `(${i + 1}) ${p}`).join(' ')]);
+  }
+
+  return _gradeOnPsleScale('grade', PSLE_WRITING_SCALES.situational, {
+    task: `Mark a Singapore Primary ${level} pupil's situational writing the way the PSLE paper marks it: Task fulfilment out of 6 and Language and organisation out of 8.`,
+    rules: [
+      'Task fulfilment: every required point is there and accurate to the situation, and the purpose and tone suit the person it is written to.',
+      'Each required point that is missing or wrong costs Task fulfilment marks. With half the points missing, Task fulfilment is 3 or below.',
+      'Language and organisation: grammar, spelling and punctuation, points in a sensible order, the right format, and a suitable tone.',
+      `Judge as a PSLE marker would for a Primary ${level} pupil, not by adult standards.`,
+      "Each comment names one specific thing in this response, such as the point that is missing, quoting a few of the pupil's words where it helps.",
+    ],
+    context,
+    learner: [['PUPIL RESPONSE', text]],
+    logSummary: `Situational writing marked on PSLE scale (P${level})`,
+  });
+}
+
+/**
  * Ask the tutor to adjudicate a synthesis/transformation answer whose wording
  * the authored alternates do not cover.
  *
