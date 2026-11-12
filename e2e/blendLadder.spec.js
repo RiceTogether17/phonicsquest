@@ -122,26 +122,27 @@ test('a tap always moves, even before a sound has finished playing', async ({ pa
 test('it reaches words the curated bank does not hold', async ({ page }) => {
   await openStory(page);
 
-  // "stayed" is not a bank word. Two thirds of story words are not, so a
+  // "ducks" is not a bank word. Two thirds of story words are not, so a
   // ladder that only worked for bank entries would be a ladder one tap in
-  // three — and "stayed" is no less decodable than "stay".
-  await tapWord(page, 'stayed');
+  // three — and "ducks" is no less decodable than "duck".
+  await tapWord(page, 'ducks');
   const next = page.locator('.bl-next');
   for (let i = 0; i < 6; i++) {
     if (!(await next.isVisible())) break;
     await next.click();
   }
-  expect(await rungs(page)).toEqual(['s', 'st', 'stay', 'stayed']);
+  expect(await rungs(page)).toEqual(['d', 'du', 'duck', 'ducks']);
 });
 
 test('a blend is two sounds, a digraph is one', async ({ page }) => {
   await openStory(page);
-  await tapWord(page, 'stayed');
+  await tapWord(page, 'Stuck');
 
   // The bank groups "st" as one tile. In a ladder that skips the blending
-  // step the ladder exists to teach, so the tiles open it up.
+  // step the ladder exists to teach, so the tiles open it up — while "ck",
+  // two letters for one sound, stays together.
   const tiles = await page.locator('.bl-tile').allTextContents();
-  expect(tiles.map((t) => t.trim())).toEqual(['s', 't', 'ay', '-ed']);
+  expect(tiles.map((t) => t.trim())).toEqual(['s', 't', 'u', 'ck']);
 });
 
 test('"Start again" clears the ladder back to nothing', async ({ page }) => {
@@ -189,7 +190,7 @@ test('the ladder is the same wherever a word is tapped', async ({ page }) => {
   // There used to be two readers and two panels, and only one of them
   // waited for the child. There is one reader now, so tapping a word in
   // the story and tapping one in a different line must be the same thing.
-  for (const word of ['cake', 'flat']) {
+  for (const word of ['cake', 'gate']) {
     await tapWord(page, word);
     expect(await rungs(page), word).toEqual([]);
     await expect(page.locator('.bl-next')).toBeVisible();
