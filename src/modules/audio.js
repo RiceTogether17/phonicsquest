@@ -540,6 +540,9 @@ class AudioManager {
       this._ttsVoice = voices[0] ?? all[0] ?? null;
     };
 
+    // Some browsers and in-app web views have no speech engine at all. The
+    // app must still start there; spoken words are simply skipped.
+    if (typeof speechSynthesis === 'undefined' || !speechSynthesis) return;
     if (speechSynthesis.getVoices().length) load();
     else speechSynthesis.addEventListener('voiceschanged', load);
   }
