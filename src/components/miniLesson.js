@@ -23,6 +23,7 @@ import { WORDS, wordPicture } from '../data/words.js';
 import { renderPhonemes } from './phonemeDisplay.js';
 import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 import { giriInline } from './mascot.js';
+import { narrationParts } from '../modules/lessonNarration.js';
 
 const OVERLAY_ID = 'mini-lesson-overlay';
 
@@ -245,7 +246,9 @@ function _renderTeachStep(overlay, stage, lesson, onNext) {
     for (const line of lesson.script) {
       // Narration stops if the overlay was closed mid-read.
       if (!document.getElementById(OVERLAY_ID)) return;
-      await audio.speakText(line);
+      // Sounds in the line ("c… a… t", "/ā/") play their recordings; read
+      // as text, the voice would say the letter names instead.
+      await audio.speakWithSounds(narrationParts(line, lesson));
     }
   });
 

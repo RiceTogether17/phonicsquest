@@ -63,13 +63,16 @@ export function setupMiddleSound(word, els) {
   const midIdx = _getMiddleVowelIdx(word);
   const midGrapheme = word.graphemes[midIdx];
   const midType = word.types[midIdx];
+  // The word's own sound for this tile when it differs from the spelling:
+  // the u in "rule" says /oo/, so the answer button must play /oo/ too.
+  const midSound = word.phonemeKeys?.[midIdx] ?? null;
 
-  const distractors = _getVowelDistractors(midGrapheme, word.level, midType);
+  const distractors = _getVowelDistractors(midGrapheme, word.level, midType, midSound);
   // Phase 1–2 words → vowels in alphabetical order (a, e, i, o, u feel),
   // so the teacher can sweep through middle sounds systematically. Phase 3+
   // → shuffled. See firstSound.js for the rationale.
   const baseChoices = [
-    { grapheme: midGrapheme, type: midType, correct: true },
+    { grapheme: midGrapheme, type: midType, sound: midSound, correct: true },
     ...distractors.slice(0, 3).map((g) => ({ ...g, correct: false })),
   ];
   const choices =
@@ -178,10 +181,19 @@ function _getMiddleVowelIdx(word) {
  *   2. Other vowels of the same type from the word list.
  *   3. Any vowel (fallback).
  */
-function _getVowelDistractors(correctGrapheme, maxLevel = 3, targetType = null) {
+function _getVowelDistractors(
+  correctGrapheme,
+  maxLevel = 3,
+  targetType = null,
+  correctSound = null,
+) {
   // Keyed by the sound each choice shows, not the spelling — ai, ay and a_e
   // are one long-a sound. See soundKeys.
-  const { add, distractors } = soundDistinctPicker(correctGrapheme, targetType ?? 'sv');
+  const { add, distractors } = soundDistinctPicker(
+    correctGrapheme,
+    targetType ?? 'sv',
+    correctSound,
+  );
 
   // At level 1 restrict to short vowels so beginners compare a/e/i/o/u only
   const allowedVowelTypes = maxLevel <= 1 ? SHORT_VOWEL_TYPES : VOWEL_TYPES;
@@ -205,7 +217,8 @@ function _getVowelDistractors(correctGrapheme, maxLevel = 3, targetType = null) 
       for (let i = 0; i < word.graphemes.length; i++) {
         const g = word.graphemes[i];
         const t = word.types[i];
-        if (allowedVowelTypes.has(t) && (!targetType || t === targetType) && add(g, t)) {
+        const sound = word.phonemeKeys?.[i] ?? null;
+        if (allowedVowelTypes.has(t) && (!targetType || t === targetType) && add(g, t, sound)) {
           if (distractors.length >= 6) break;
         }
       }
@@ -219,7 +232,7 @@ function _getVowelDistractors(correctGrapheme, maxLevel = 3, targetType = null) 
       for (let i = 0; i < word.graphemes.length; i++) {
         const g = word.graphemes[i];
         const t = word.types[i];
-        if (VOWEL_TYPES.has(t) && add(g, t)) {
+        if (VOWEL_TYPES.has(t) && add(g, t, word.phonemeKeys?.[i] ?? null)) {
           if (distractors.length >= 6) break;
         }
       }

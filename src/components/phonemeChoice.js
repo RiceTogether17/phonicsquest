@@ -21,7 +21,7 @@
  */
 
 import { audio } from '../modules/audio.js';
-import { phonemeNotation } from '../data/words.js';
+import { phonemeNotation, soundKeyNotation } from '../data/words.js';
 
 /** Pending auto-play preview timer ids, so a new round (or the child's first
  *  tap) can cancel previews that haven't fired yet. Without this, timers from
@@ -51,7 +51,23 @@ export function cancelChoicePreviews() {
  * @property {string}  grapheme   - the spelling unit, used to look up audio
  * @property {string}  type       - phoneme type ('c', 'sv', 'lv', 'd', etc.)
  * @property {boolean} correct    - whether this is the right answer
+ * @property {string|null} [sound] - the recording to play when the answer
+ *   word says this spelling differently (the u in "rule" is /oo/, not "you")
  */
+
+/** The sound a choice button prints, e.g. "/oo/". */
+function _choiceLabel(choice) {
+  return choice.sound
+    ? soundKeyNotation(choice.sound)
+    : phonemeNotation(choice.grapheme, choice.type).join('');
+}
+
+/** Play the sound a choice button stands for. */
+function _playChoice(choice) {
+  return choice.sound
+    ? audio.playSound(choice.sound)
+    : audio.speakPhoneme(choice.grapheme, choice.type);
+}
 
 /**
  * Render a sound-first phoneme-choice grid into `container`.
@@ -88,10 +104,7 @@ export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
     btn.className = 'choice-btn choice-btn--phoneme';
     btn.dataset.correct = String(!!choice.correct);
     btn.dataset.grapheme = choice.grapheme;
-    btn.setAttribute(
-      'aria-label',
-      `Sound option ${phonemeNotation(choice.grapheme, choice.type).join(' ')}. Tap to choose.`,
-    );
+    btn.setAttribute('aria-label', `Sound option ${_choiceLabel(choice)}. Tap to choose.`);
 
     const speaker = document.createElement('span');
     speaker.className = 'choice-btn-speaker';
@@ -104,7 +117,7 @@ export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
     // is a claim about sound: "/g/" on the answer to "gem" tells the child
     // that g says /g/ there, when the button they are about to hear says
     // /j/. Same for /ck/, /tch/, /dge/, /ph/.
-    label.textContent = phonemeNotation(choice.grapheme, choice.type).join('');
+    label.textContent = _choiceLabel(choice);
 
     btn.appendChild(speaker);
     btn.appendChild(label);
@@ -115,7 +128,7 @@ export function renderPhonemeChoiceGrid(container, choices, opts = {}) {
     // pointing device using the hover media query.
     if (_hasRealHover()) {
       btn.addEventListener('mouseenter', () => {
-        audio.speakPhoneme(choice.grapheme, choice.type);
+        _playChoice(choice);
       });
     }
     btn.addEventListener('click', () => {
@@ -165,7 +178,7 @@ function _previewChoicesInOrder(buttons, choices, initialDelay, stride) {
         }
         btn.classList.add('previewing');
         try {
-          await audio.speakPhoneme(choices[i].grapheme, choices[i].type);
+          await _playChoice(choices[i]);
         } catch (_) {
           /* audio failures are non-fatal */
         }

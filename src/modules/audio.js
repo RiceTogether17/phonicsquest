@@ -10,7 +10,7 @@
  */
 
 import { store } from './store.js';
-import { TH_VOICED_WORDS, phonemeKeyFor, splitBlend } from '../data/words.js';
+import { TH_VOICED_WORDS, phonemeKeyFor, splitBlend, isBankWordTiles } from '../data/words.js';
 
 /** Dev-mode logging helper */
 const devWarn = (...args) => {
@@ -52,6 +52,7 @@ const PHONEME_FILES = {
   tch: 'ch',  // "tch" makes the /ch/ sound (catch, fetch, pitch)
   dge: 'j',   // "dge" makes the /j/ sound (badge, bridge, judge)
   ph: 'f',    // "ph" makes the /f/ sound (phone, graph, dolphin)
+  qu: 'q',    // "qu" makes the /kw/ sound (quick, queen) — q.mp3 is /kw/
   // Silent-letter digraphs. Without these the key falls through to TTS,
   // which reads the letters ("k... n") — the opposite of the lesson.
   kn: 'n',    // "kn" makes the /n/ sound (knee, knot, know) — silent k
@@ -137,6 +138,25 @@ export function phonemeAudioFile(grapheme, type) {
 }
 
 /**
+ * True when this phoneme key plays one of the recorded sounds. A key without
+ * a recording falls back to the device voice, which reads letters by their
+ * NAMES ("et" becomes "E T"), so nothing that teaches a sound may rely on it.
+ *
+ * @param {string} key
+ */
+export function hasPhonemeRecording(key) {
+  return Object.prototype.hasOwnProperty.call(PHONEME_FILES, String(key ?? ''));
+}
+
+/**
+ * The recording file a phoneme key plays ('long_ai' → 'long_a'), or null.
+ * @param {string} key
+ */
+export function phonemeKeyFile(key) {
+  return PHONEME_FILES[key] ?? null;
+}
+
+/**
  * Phoneme keys whose audio is a STAND-IN for a different sound.
  *
  * Audit 2026-09-19, finding 7. Any substitution must be declared here, so
@@ -204,6 +224,22 @@ const AFFIX_PRONUNCIATION = {
   // Schwa-reduced endings
   al: ['ə', 'l'],
   el: ['ə', 'l'],
+  // Common word endings. Handed to the voice as text, short spellings like
+  // "est" or "ly" come out as letter names ("E S T"), so each ending plays
+  // its recorded sounds — the same sounds SUFFIX_PHONEMES in words.js counts.
+  ing:  ['i', 'ng'],
+  er:   ['er'],
+  est:  ['e', 's', 't'],
+  ly:   ['l', 'long_e'],
+  ful:  ['f', 'ə', 'l'],
+  less: ['l', 'e', 's'],
+  ness: ['n', 'ə', 's'],
+  ment: ['m', 'ə', 'n', 't'],
+  able: ['ə', 'b', 'ə', 'l'],
+  ible: ['ə', 'b', 'ə', 'l'],
+  tion: ['sh', 'ə', 'n'],
+  ture: ['ch', 'er'],
+  ous:  ['ə', 's'],
 };
 
 /**
@@ -228,11 +264,10 @@ const SIGHT_WORD_PRONUNCIATIONS = {
  * but where raw text produces the wrong pronunciation.
  */
 const AFFIX_TTS_OVERRIDES = {
-  tion: 'shun',
+  // Only endings with a sound that has no recording (/zh/) stay here; the
+  // rest play recorded sounds from AFFIX_PRONUNCIATION.
   sion: 'zhun',
-  ous:  'uss',
   ious: 'ee-uss',
-  ture: 'chur',
 };
 
 /**
@@ -292,6 +327,50 @@ const PHONEME_TTS = {
   // Schwa (reduced unstressed vowel in affixes)
   'ə': 'uh',
 };
+
+/**
+ * The recorded sounds one tile plays, in order, as speakPhoneme would play
+ * them: ['f', 'l'] for the blend "fl", ['ə', 'b', 'ə', 'l'] for "able",
+ * [] for a silent e. Returns null when the tile has no recording and would
+ * be handed to the device voice instead.
+ *
+ * @param {string} grapheme
+ * @param {string} type
+ * @param {{word?: string, index?: number, prevGrapheme?: string|null}} [ctx]
+ * @returns {string[]|null}
+ */
+export function tileSoundKeys(grapheme, type, ctx = {}) {
+  const wordKey = phonemeKeyFor(ctx.word, ctx.index, grapheme);
+  if (wordKey) return [wordKey];
+  if (type === 'se') return [];
+  const g = String(grapheme ?? '');
+  let keys;
+  if (type === 'sf') {
+    const suffix = g.replace(/^-/, '').toLowerCase();
+    if (AFFIX_PRONUNCIATION[suffix]) keys = [...AFFIX_PRONUNCIATION[suffix]];
+    else if (suffix === 'ed') {
+      let prev = ctx.prevGrapheme?.toLowerCase() ?? null;
+      if (!prev && ctx.word) prev = ctx.word.toLowerCase().replace(/ed$/, '').slice(-2) || null;
+      const last = prev ? prev[prev.length - 1] : '';
+      if (last === 't' || last === 'd') keys = ['i', 'd'];
+      else if (['p', 'k', 'f', 's', 'x'].includes(last) ||
+               ['sh', 'ch', 'th', 'ck', 'ss', 'tch'].includes(prev)) keys = ['t'];
+      else keys = ['d'];
+    } else return null;
+  } else if (type === 'bl') {
+    keys = splitBlend(g);
+  } else if (type === 'p') {
+    keys = PREFIX_PRONUNCIATION[g.toLowerCase()] ?? [...g];
+  } else {
+    let key = phonemeAudioKey(g, type);
+    if (key === 'th' && ctx.word && TH_VOICED_WORDS.has(String(ctx.word).toLowerCase())) {
+      key = 'th_voiced';
+    }
+    keys = [key];
+  }
+  // Voiced th has no recording on purpose: the voice says "the", a real /ð/.
+  return keys.every((k) => k === 'th_voiced' || hasPhonemeRecording(k)) ? keys : null;
+}
 
 /** Sound effect file names */
 const _SFX = {
@@ -539,7 +618,10 @@ class AudioManager {
           const base = opts.word.toLowerCase().replace(/ed$/, '');
           if (base) prev = base.slice(-2);
         }
-        if (prev) {
+        // With no word to go on (a lesson's sound button), play the plain
+        // /d/ rather than hand "ed" to the voice, which may spell it.
+        if (!prev) return this._playPhonemeAudio('d');
+        {
           const lastChar = prev[prev.length - 1];
           // /ɪd/ after t or d (landed, melted) — an extra syllable, played
           // as cached short-i + d phonemes so every voice says it the same
@@ -559,7 +641,16 @@ class AudioManager {
         }
       }
 
-      // 4) Fallback: let TTS pronounce the suffix text directly
+      // 4) Fallback: an ending with no entry plays each letter's sound when
+      // every letter has a recording, so the voice never spells it out.
+      const letters = [...suffix.toLowerCase()];
+      if (letters.length && letters.every((ch) => hasPhonemeRecording(ch))) {
+        for (let i = 0; i < letters.length; i++) {
+          if (i > 0) await this._delay(80);
+          await this._playPhonemeAudio(letters[i]);
+        }
+        return;
+      }
       return this._speak(suffix, 0.9);
     }
 
@@ -612,6 +703,18 @@ class AudioManager {
     // TTS fallback – use phonetic text so TTS speaks the sound, not the letter name
     const ttsText = PHONEME_TTS[key] ?? key;
     return this._speak(ttsText, 0.9);
+  }
+
+  /**
+   * Play one recorded sound by its phoneme key ('long_oo', 'sh').
+   * For callers that already know the exact sound, such as a choice button
+   * built from a word whose tile says something other than its spelling.
+   * @param {string} key
+   * @returns {Promise<void>}
+   */
+  async playSound(key) {
+    if (!store.get('teachingAudioEnabled')) return;
+    return this._playPhonemeAudio(key);
   }
 
   /**
@@ -727,10 +830,11 @@ class AudioManager {
    * ['Which picture starts with', { sound: 'm' }]. Text goes through the
    * voice; each `sound` plays its recording, so the child hears /m/ and not
    * the letter name or a whole word that gives the answer away.
+   * `{ sounds: ['m', 'ar'] }` plays a short run of sounds as one chunk.
    *
    * Stops early if anything else speaks or cancelSpeech runs meanwhile.
    *
-   * @param {Array<string|{sound: string}>} parts
+   * @param {Array<string|{sound?: string, sounds?: string[]}>} parts
    * @returns {Promise<void>}
    */
   async speakWithSounds(parts) {
@@ -742,10 +846,15 @@ class AudioManager {
         const spoken = this.speakText(part);
         expected = this._speakGeneration;
         await spoken;
-      } else if (part?.sound) {
+      } else if (part?.sound || part?.sounds?.length) {
+        // One sound, or a short run of them said as one chunk ("mar").
+        const run = part.sounds ?? [part.sound];
         await this._delay(150);
-        if (this._speakGeneration !== expected) return;
-        await this._playPhonemeAudio(part.sound);
+        for (let i = 0; i < run.length; i++) {
+          if (this._speakGeneration !== expected) return;
+          if (i > 0) await this._delay(60);
+          await this._playPhonemeAudio(run[i]);
+        }
         await this._delay(150);
       }
     }
@@ -856,12 +965,12 @@ class AudioManager {
    * `endIndexExclusive` graphemes spoken as ONE blended unit at a
    * stretched rate, so "ca" sounds blended rather than spelled.
    *
-   * TTS reads some partial spellings with the wrong vowel, which would
-   * contradict the sound the child just learned:
-   *   • open syllables ending in a short vowel ("li" → "lie")
-   *   • magic-e words whose silent-e isn't in the chunk yet ("cak" → /kak/)
-   * Those chunks fall back to tight-gap phoneme playback (the
-   * speakWordStretched model) — each phoneme is already the correct sound.
+   * The voice only says the chunk when it is a real bank word with the
+   * same sounds ("plan" in "planet"). Every other part-word falls back to
+   * tight-gap phoneme playback (the speakWordStretched model), because the
+   * voice reads a string it doesn't know by its letter names ("picn",
+   * "br"), with the wrong vowel ("li" → "lie"), or ignoring a magic e that
+   * isn't in the chunk yet ("cak").
    *
    * @param {import('../data/words.js').Word} wordData
    * @param {number} endIndexExclusive  number of leading graphemes in the chunk
@@ -890,11 +999,18 @@ class AudioManager {
     const override = CHUNK_TTS_OVERRIDES[chunk];
     if (override) return this._speak(override, slowRate);
 
-    const lastType         = wordData.types?.[end - 1];
-    const endsInShortVowel = lastType === 'sv';
-    const pendingSilentE   = (wordData.types || []).slice(end).includes('se');
+    // The voice may say the part-word only when it is itself a real word
+    // with the same sounds ("plan" in "planet"). Any other part-word ("magn",
+    // "picn", "br") is read by its letter NAMES, so it plays as recorded
+    // sounds instead. The same goes for open syllables ("li" → "lie") and
+    // words whose magic e is not in the chunk yet ("cak").
+    const types            = wordData.types || [];
+    const overridden       = Object.keys(wordData.phonemeKeys || {}).some((i) => Number(i) < end);
+    const isRealWord       = !overridden && isBankWordTiles(graphemes.slice(0, end), types.slice(0, end));
+    const endsInShortVowel = types[end - 1] === 'sv';
+    const pendingSilentE   = types.slice(end).includes('se');
 
-    if (!endsInShortVowel && !pendingSilentE && window.speechSynthesis) {
+    if (isRealWord && !endsInShortVowel && !pendingSilentE && window.speechSynthesis) {
       return this._speak(chunk, slowRate);
     }
 

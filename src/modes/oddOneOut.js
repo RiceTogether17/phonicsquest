@@ -155,7 +155,7 @@ function _revealAnswer(oddWord, els) {
     await new Promise((r) => setTimeout(r, 300));
     // The contrast is the odd word's first SOUND — /k/ for "crab", not /kr/.
     const { grapheme, type } = firstPhoneme(oddWord);
-    await audio.speakPhoneme(grapheme, type);
+    await audio.speakPhoneme(grapheme, type, { word: oddWord.word, index: 0 });
   }, 300);
 }
 
