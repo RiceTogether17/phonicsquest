@@ -109,7 +109,8 @@ test('the reading names its measure and shows accuracy', async ({ page }) => {
   const result = page.locator('#fluency-result');
   await expect(result).toBeVisible();
   await expect(result).toContainText(/words correct per minute/i);
-  await expect(result).toContainText(/93% accurate/);
+  // The story is 75 words: 69 right out of 75 rounds to 92%.
+  await expect(result).toContainText(/92% accurate/);
   // And the form gets out of the way rather than sitting under its answer.
   await expect(page.locator('#fluency-form')).toBeHidden();
 });
@@ -165,7 +166,7 @@ test('a saved timing keeps both measures apart', async ({ page }) => {
   // both are kept, so a history can never mix the two silently.
   expect(entry.wpm).toBeGreaterThan(entry.wcpm);
   expect(entry.errors).toBe(8);
-  expect(entry.accuracy).toBe(90);
+  expect(entry.accuracy).toBe(89);
   expect(entry.support).toBe('supported');
 });
 

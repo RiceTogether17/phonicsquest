@@ -45,8 +45,11 @@ async function seedLearner(page) {
   });
 }
 
-/** Open a Band B story — long vowels, so ă and ā land on the same page. */
-async function openStory(page) {
+/**
+ * Open a Band B story — long vowels, so ă and ā land on the same page.
+ * Pass a band and title to open one particular story instead.
+ */
+async function openStory(page, { band = 'B', title = null } = {}) {
   await page.goto('./');
   await expect(page.locator('#screen-home')).toHaveClass(/active/);
 
@@ -63,8 +66,9 @@ async function openStory(page) {
   await banner.click();
   await expect(page.locator('.story-card').first()).toBeVisible();
 
-  await page.locator('.story-tab[data-band="B"]').click();
-  await page.locator('.story-card').first().click();
+  await page.locator(`.story-tab[data-band="${band}"]`).click();
+  const cards = page.locator('.story-card');
+  await (title ? cards.filter({ hasText: title }) : cards).first().click();
 
   const skip = page.locator('#warm-up-skip');
   if (await skip.isVisible().catch(() => false)) await skip.click();
@@ -155,12 +159,12 @@ test('a screen reader is given the word, not the word plus its marks', async ({ 
   expect(label).toMatch(/^[A-Za-z][A-Za-z'’-]*$/);
 });
 
-test('the story-grammar labels are not run through the phonics scaffold', async ({ page }) => {
-  await openStory(page);
+test('section headings are not run through the phonics scaffold', async ({ page }) => {
+  await openStory(page, { band: 'D', title: 'How to Make Kaya Toast' });
 
-  // "Problem:" / "Attempt:" / "Solution:" name the shape of the story for a
-  // grown-up. Colouring them put a breve over "PRŎBLĔM" — phonics notation
-  // on a word no Primary 1 reader is being asked to sound out.
+  // The how-to text has headings ("You will need", "What to do") that name
+  // its sections. Colouring them put breves over words no Primary 1 reader
+  // is being asked to sound out, so they stay plain and are not tappable.
   const labels = page.locator('#story-body .sline--label');
   expect(await labels.count()).toBeGreaterThan(0);
   expect(await labels.locator('.vs').count()).toBe(0);
