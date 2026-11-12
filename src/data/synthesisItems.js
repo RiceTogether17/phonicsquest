@@ -324,7 +324,10 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     original: '"What a beautiful painting this is!" exclaimed the judge.',
     stem: 'The judge exclaimed that',
     answer: 'The judge exclaimed that it was a very beautiful painting.',
-    alternates: ['The judge exclaimed that the painting was very beautiful.'],
+    alternates: [
+      'The judge exclaimed that the painting was very beautiful.',
+      'The judge exclaimed that it was such a beautiful painting.',
+    ],
     requiredGroups: [
       ['very beautiful', 'a beautiful', 'so beautiful'],
       ['painting', 'piece of art', 'artwork'],
@@ -636,7 +639,7 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     answer: 'Never had the champion lost a match in his entire career.',
     alternates: [],
     requiredGroups: [
-      ['had the champion lost', 'had he lost', 'had they lost', 'champion lost'],
+      ['had the champion lost', 'had he lost', 'had they lost'],
       ['match', 'career', 'entire career'],
     ],
     explain: 'Fronting "never" gives the sentence greater emphasis. Use past perfect after "never" when the original sentence is also past perfect: "had never lost" → "Never had he lost".',
@@ -797,7 +800,7 @@ export const SYNTHESIS_ITEMS = Object.freeze([
     answer: 'It was at the science fair that they first met in 2019.',
     alternates: ['It was in 2019 that they first met at the science fair.'],
     requiredGroups: [
-      ['that they first met', 'that they met', 'they first met'],
+      ['that they first met', 'that they met'],
       ['2019'],
     ],
     explain: 'Cleft sentences can emphasise a time or place by fronting it: "It was at [place] that…" The rest of the sentence follows "that" in normal word order.',

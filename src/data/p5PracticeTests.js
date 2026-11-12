@@ -691,7 +691,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           alternates: ['Ms Wong asked Julian if he had remembered to submit his portfolio before the deadline.'],
           requiredGroups: [
             ["whether", "if"],
-            ["had remembered", "remembered to submit"],
+            ["had remembered"],
           ],
           skill: 'reportedSpeech',
           explain: 'Reported yes/no question: "asked + whether/if + subject + had + past participle".',
@@ -738,7 +738,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           answer: 'Not only does Maya read widely, but she has also scored highly in English every year.',
           alternates: ['Not only has Maya read widely, but she has also scored highly in English every year.'],
           requiredGroups: [
-            ["read widely", "reads widely"],
+            ["read widely"],
             ["scored highly", "achieved high"],
           ],
           skill: 'conjunctions',
@@ -1092,7 +1092,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           alternates: [],
           requiredGroups: [
             ["respected", "followed", "observed"],
-            ["would not have been", "would not be", "would have been preserved"],
+            ["would not have been", "would have been preserved"],
           ],
           skill: 'conditionals',
           explain: 'Type 3 conditional inversion: "Had + subject + past participle" replaces "If + subject + had + past participle".',
@@ -1104,7 +1104,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           alternates: ['The journalist asked the historian when the district first received conservation status.'],
           requiredGroups: [
             ["when the district", "when the area"],
-            ["received conservation status", "received the status", "had first received"],
+            ["had first received", "had received", "first received"],
           ],
           skill: 'reportedSpeech',
           explain: 'Reported wh-question: "asked + when/what/where + subject + verb (backshifted)".',
@@ -1139,7 +1139,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           answer: 'The museum attracted such a large number of visitors that the curators extended the exhibition by another month.',
           alternates: ['The museum attracted such crowds that the curators extended the exhibition by another month.'],
           requiredGroups: [
-            ["such a large number", "such crowds", "such many visitors"],
+            ["such a large number", "such crowds", "such large crowds"],
             ["extended", "lengthened", "prolonged"],
           ],
           skill: 'conjunctions',
