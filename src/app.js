@@ -76,6 +76,8 @@ import { lazyModule } from './modes/lazy.js';
 // Cleanup paths use `.get()?.fn()` so a feature that was never opened is a
 // safe no-op.
 const dashboardMod = lazyModule(() => import('./components/dashboard.js'));
+// Only shown once a day's goal is reached, so it stays out of the startup chunk.
+const sessionSummaryMod = lazyModule(() => import('./components/sessionSummary.js'));
 const roadmapMod = lazyModule(() => import('./components/roadmap.js'));
 const storyModeMod = lazyModule(() => import('./modes/storyMode.js'));
 const sentenceForgeMod = lazyModule(() => import('./modes/sentenceForge.js'));
@@ -153,7 +155,6 @@ import {
   tryTeacherUnlock,
   lockTeacherMode,
 } from './modules/teacherUnlock.js';
-import { showSessionSummary } from './components/sessionSummary.js';
 
 class App {
   constructor() {
@@ -2773,7 +2774,15 @@ class App {
    * Called from _handleResult when dailyComplete is true.
    * @param {{ xpEarned: number }} reward
    */
-  _showSessionSummaryScreen(reward) {
+  async _showSessionSummaryScreen(reward) {
+    let showSessionSummary;
+    try {
+      ({ showSessionSummary } = await sessionSummaryMod.load());
+    } catch (_) {
+      // The summary is a nicety; never leave the child stranded without it.
+      this._showScreen(SCREENS.HOME);
+      return;
+    }
     const wordsToday = (store.get('sessionWordsToday') || []).length;
     const firstTryCount = store.get('sessionFirstTryToday') || 0;
     const streak = store.get('streak') || 0;
