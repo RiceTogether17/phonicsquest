@@ -32,6 +32,8 @@ async function seedLearner(page) {
     localStorage.setItem('phonicsquest_profiles', JSON.stringify([profile]));
     localStorage.setItem('phonicsquest_active_profile', profile.id);
     localStorage.setItem('phonicsquest_legacy_migrated_to_profiles', '1');
+    // Stories open plain; these tests are about the scaffold once it is on.
+    localStorage.setItem('giri_show_graphemes', 'true');
     localStorage.setItem(
       `phonicsquest_profile_${profile.id}`,
       JSON.stringify({

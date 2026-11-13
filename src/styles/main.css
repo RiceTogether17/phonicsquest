@@ -5691,6 +5691,15 @@ details.story-tool-section[open] > .story-tool-summary::before {
 .ruler-nav-slot:empty {
   display: none;
 }
+/* The slot is what sticks. The bar inside it used to carry the sticky
+   position, but a sticky box can only travel inside its parent, and the slot
+   is exactly the bar's own size — so the bar never moved, and Next sat under
+   the last line of the story where it had to be scrolled to. */
+.ruler-nav-slot {
+  position: sticky;
+  bottom: 8px;
+  z-index: 4;
+}
 .ruler-nav {
   position: sticky;
   bottom: 8px;
@@ -20513,4 +20522,68 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   .phoneme-row--speed {
     zoom: 2;
   }
+}
+
+/* ── Story class view ─────────────────────────────────────────────────────
+   For a teacher leading a class from one screen. Everything that is not the
+   story or the ruler is put away, and the text is sized to be read from the
+   back of a room. */
+.class-view-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+
+.class-view-title {
+  flex: 1 1 auto;
+  font-weight: 800;
+  font-size: var(--font-size-lg);
+  color: var(--text);
+}
+
+body.story-class-view .app-header,
+body.story-class-view .level-bar-wrapper,
+body.story-class-view .stories-screen-header,
+body.story-class-view .story-illo,
+body.story-class-view .story-meta-bar,
+body.story-class-view .story-reader-title,
+body.story-class-view .story-reader-toolbar,
+body.story-class-view .story-prep-strip,
+body.story-class-view .story-resume,
+body.story-class-view .story-finish,
+body.story-class-view .story-talk,
+body.story-class-view .story-controls-wrap {
+  display: none !important;
+}
+
+body.story-class-view .story-dynamic,
+body.story-class-view .story-content-wrap {
+  display: block;
+  max-width: none;
+  width: 100%;
+}
+
+body.story-class-view .story-body .sline {
+  font-size: clamp(1.6rem, 3.4vw, 3.25rem);
+  line-height: 1.7;
+}
+
+body.story-class-view .ruler-nav-slot {
+  bottom: 0;
+}
+
+body.story-class-view .class-view-bar {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  padding: var(--space-2) 0;
+  background: var(--color-surface);
+}
+
+body.story-class-view .ruler-nav .ruler-next,
+body.story-class-view .ruler-nav .ruler-back {
+  min-height: 56px;
+  font-size: var(--font-size-lg);
 }

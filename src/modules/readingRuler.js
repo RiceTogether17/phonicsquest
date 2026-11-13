@@ -108,16 +108,22 @@ export function scrollHost(el) {
  * @param {number|null} [opts.word] word index to start on (null = first line on screen)
  * @param {string} [opts.wordSelector] which spans count as words
  * @param {() => {top:number, bottom:number}} opts.safeArea viewport band not covered by bars
- * @param {(state:{word:number,line:number,lines:number,words:number,atEnd:boolean}) => void} [opts.onMove]
+ * @param {(state:{word:number,line:number,lines:number,words:number,atEnd:boolean,whole:boolean}) => void} [opts.onMove]
+ * @param {boolean} [opts.repeatLine]  Word mode: show the whole line after its last word
  */
 export function createRuler(
   storyEl,
-  { mode, word = null, wordSelector = '.wf-word', safeArea, onMove },
+  { mode, word = null, wordSelector = '.wf-word', safeArea, onMove, repeatLine = false },
 ) {
   const words = [...storyEl.querySelectorAll(wordSelector)];
   let lines = [];
   let wordIdx = 0;
   let lineIdx = 0;
+  // Word mode with `repeatLine`: after the last word of a line the pointer
+  // steps back and the whole line is shown, so a class that has worked out
+  // each word reads the line through once before moving on.
+  let whole = false;
+  const repeats = () => repeatLine && mode === 'word';
 
   const layer = document.createElement('div');
   layer.className = `ruler-layer ruler-layer--${mode}`;
@@ -202,7 +208,11 @@ export function createRuler(
       pointer.style.height = `${r.height + 4}px`;
       bar.style.setProperty('--x', `${r.left - base.left + r.width / 2}px`);
     }
-    words.forEach((w, i) => w.classList.toggle('is-pointed', mode === 'word' && i === wordIdx));
+    pointer.style.display = whole ? 'none' : '';
+    layer.classList.toggle('ruler-layer--whole', whole);
+    words.forEach((w, i) =>
+      w.classList.toggle('is-pointed', mode === 'word' && !whole && i === wordIdx),
+    );
   }
 
   function report() {
@@ -211,7 +221,11 @@ export function createRuler(
       line: lineIdx,
       lines: lines.length,
       words: words.length,
-      atEnd: mode === 'word' ? wordIdx >= words.length - 1 : lineIdx >= lines.length - 1,
+      atEnd:
+        mode === 'word'
+          ? wordIdx >= words.length - 1 && (!repeats() || whole)
+          : lineIdx >= lines.length - 1,
+      whole,
     });
   }
 
@@ -231,6 +245,7 @@ export function createRuler(
   }
 
   function goLine(k, { scroll = true } = {}) {
+    whole = false;
     lineIdx = Math.max(0, Math.min(lines.length - 1, k));
     wordIdx = lines[lineIdx]?.first ?? 0;
     draw();
@@ -239,6 +254,7 @@ export function createRuler(
   }
 
   function goWord(i, { scroll = true } = {}) {
+    whole = false;
     wordIdx = Math.max(0, Math.min(words.length - 1, i));
     lineIdx = lineOf(wordIdx);
     draw();
@@ -326,12 +342,25 @@ export function createRuler(
 
   return {
     next() {
-      if (mode === 'word') goWord(wordIdx + 1);
-      else goLine(lineIdx + 1);
+      if (mode !== 'word') return goLine(lineIdx + 1);
+      if (repeats() && !whole && wordIdx === (lines[lineIdx]?.last ?? -1)) {
+        whole = true;
+        draw();
+        report();
+        return undefined;
+      }
+      return goWord(wordIdx + 1);
     },
     prev() {
-      if (mode === 'word') goWord(wordIdx - 1);
-      else goLine(lineIdx - 1);
+      if (mode !== 'word') return goLine(lineIdx - 1);
+      if (whole) {
+        // Back from the whole line to its last word.
+        whole = false;
+        draw();
+        report();
+        return undefined;
+      }
+      return goWord(wordIdx - 1);
     },
     nextLine: () => goLine(lineIdx + 1),
     prevLine: () => goLine(lineIdx - 1),
