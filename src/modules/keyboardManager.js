@@ -71,14 +71,24 @@ export const keyboardManager = {
           case ' ':
           case 'Enter':
             e.preventDefault();
-            // Primary action: reveal next phoneme / check answer.
+            // Primary action: next word in a Blend It speed round, otherwise
+            // reveal the next phoneme / check the answer.
             (
-              document.getElementById('btn-reveal-next') || document.getElementById('btn-check')
+              document.getElementById('btn-speed-next') ||
+              document.getElementById('btn-reveal-next') ||
+              document.getElementById('btn-check')
             )?.click();
             break;
+          case 'ArrowRight':
+            // Speed round only: a presenter clicker sends the arrow keys.
+            if (document.getElementById('btn-speed-next')) {
+              e.preventDefault();
+              document.getElementById('btn-speed-next')?.click();
+            }
+            break;
           case 's':
-            // "Say it" – hear the whole word.
-            els.btnSayIt?.click();
+            // "Say it" – hear the whole word (or its sounds, in a speed round).
+            (document.getElementById('btn-speed-sounds') || els.btnSayIt)?.click();
             break;
           case 'h':
             // Hint – play the first phoneme.
