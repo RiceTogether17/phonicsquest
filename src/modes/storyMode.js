@@ -157,6 +157,7 @@ let _fluencySeconds = 0;
 const PREFS_GRAPHEMES_KEY = 'giri_show_graphemes';
 const PREFS_RULER_KEY = 'giri_show_ruler';
 const PREFS_RULER_MODE_KEY = 'giri_ruler_mode';
+const PREFS_CLASS_VIEW_KEY = 'giri_class_view';
 const PREFS_FOLLOW_KEY = 'giri_follow_mode';
 /*
  * Audit 2026-09-19, finding 4: this key was global, so every child on a shared
@@ -179,7 +180,19 @@ function compLogKey() {
   return getProfileScopedKey(COMP_LOG_KEY_BASE);
 }
 
-let _showGraphemes = _loadPref(PREFS_GRAPHEMES_KEY, true);
+// Sound colours start off. They are a teaching overlay for a grown-up to
+// switch on when a lesson is about vowel sounds; left on by default they put
+// seven colours and three kinds of mark over every line a child reads.
+let _showGraphemes = _loadPref(PREFS_GRAPHEMES_KEY, false);
+// Class view: the story for a teacher leading a class from one screen. Big
+// text, the ruler, and nothing else — no header, cover, legend or tools to
+// scroll past. Word-by-word ruler steps end each line with the whole line.
+let _classView = _loadPref(PREFS_CLASS_VIEW_KEY, false);
+const _rulerOn = () => _showRuler || _classView;
+
+function _applyClassView(on) {
+  document.body.classList.toggle('story-class-view', !!on);
+}
 let _showRuler = _loadPref(PREFS_RULER_KEY, false);
 
 // Live Reading Ruler (readingRuler.js) and the last position it reported.
@@ -292,6 +305,7 @@ export function showBrowser() {
 }
 
 export function cleanupStoryMode() {
+  _applyClassView(false);
   _stopTTS();
   // The panel lives on <body>, outside the screen being torn down.
   _closeWordPanel({ restoreFocus: false });
@@ -305,6 +319,7 @@ export function cleanupStoryMode() {
 // ── Browser view ──────────────────────────────────────────────────────────
 
 function _renderBrowser() {
+  _applyClassView(false);
   // Leaving the reader for the library — tear the ruler down, or its
   // ResizeObserver outlives the story it measured.
   _destroyRuler();
@@ -604,6 +619,7 @@ function _renderWarmUpOrStory(story) {
  * ARE decodable; what the child needs is what they mean.
  */
 function _renderWarmUp(story) {
+  _applyClassView(false);
   const dynamic = document.getElementById('story-dynamic');
   if (!dynamic) return;
 
@@ -787,6 +803,7 @@ function _renderStory(story) {
   // and the word the panel was keeping in sight.
   _destroyRuler();
   _closeWordPanel({ restoreFocus: false });
+  _applyClassView(_classView);
 
   // Word spans are always rendered, in both follow modes. They are what makes
   // "👆 Tap a word to hear its sounds" true — that hint is printed
@@ -850,6 +867,7 @@ function _renderStory(story) {
         <div class="reader-scaffold-bar" role="group" aria-label="Reading scaffolds">
           <button class="scaffold-toggle" id="btn-toggle-graphemes" aria-pressed="${_showGraphemes}" title="Colour each vowel by the sound it makes — short, long, schwa, bossy-r or sliding">🎨 Sound colours</button>
           <button class="scaffold-toggle" id="btn-toggle-ruler" aria-pressed="${_showRuler}" title="Cover the lines you are not reading, and move down one at a time">📏 Reading ruler</button>
+          <button class="scaffold-toggle" id="btn-toggle-class" aria-pressed="${_classView}" title="For teaching a class from one screen: big text and the ruler, with everything else put away">🖥 Class view</button>
         </div>
 
         <div class="follow-mode-toggle">
@@ -862,6 +880,17 @@ function _renderStory(story) {
 
         <span class="reader-tap-hint" title="Tap any word in the story to hear it and see its sounds">👆 Tap a word to hear its sounds</span>
       </div>
+
+      ${
+        _classView
+          ? /* html */ `
+      <div class="class-view-bar" role="group" aria-label="Class view">
+        <span class="class-view-title">${escapeHtml(story.title)}</span>
+        <button class="scaffold-toggle" id="btn-class-colours" aria-pressed="${_showGraphemes}">🎨 Sound colours</button>
+        <button class="scaffold-toggle" id="btn-class-exit" aria-keyshortcuts="Escape">✕ Exit class view</button>
+      </div>`
+          : ''
+      }
 
       ${_showGraphemes ? _soundLegendHtml() : ''}
 
@@ -1117,6 +1146,32 @@ function _renderStory(story) {
     _renderStory(story);
   });
 
+  // Class view
+  const setClassView = (on) => {
+    // Keep the place if the ruler was already on a word; otherwise start at
+    // the top, since the layout the pane was scrolled for no longer exists.
+    const at = _rulerState?.word ?? null;
+    _classView = on;
+    _persistPref(PREFS_CLASS_VIEW_KEY, _classView);
+    _renderStory(story);
+    const body = document.getElementById('story-body');
+    const pane = body ? scrollHost(body) : null;
+    if (pane && at === null) pane.scrollTop = 0;
+    requestAnimationFrame(() => {
+      if (at !== null) requestAnimationFrame(() => _ruler?.goTo(at));
+      document
+        .getElementById(on ? 'btn-ruler-next' : 'btn-toggle-class')
+        ?.focus({ preventScroll: true });
+    });
+  };
+  document.getElementById('btn-toggle-class')?.addEventListener('click', () => setClassView(true));
+  document.getElementById('btn-class-exit')?.addEventListener('click', () => setClassView(false));
+  document.getElementById('btn-class-colours')?.addEventListener('click', () => {
+    _showGraphemes = !_showGraphemes;
+    _persistPref(PREFS_GRAPHEMES_KEY, _showGraphemes);
+    _renderStory(story);
+  });
+
   // Reading-ruler toggle
   document.getElementById('btn-toggle-ruler')?.addEventListener('click', () => {
     _showRuler = !_showRuler;
@@ -1133,7 +1188,7 @@ function _renderStory(story) {
   // The ruler, when it is on, both restores the place and reports every
   // move; without it the place is the first word below the top of the
   // reading pane, sampled as the child scrolls.
-  if (_showRuler) requestAnimationFrame(() => _startRuler(_resumeWord));
+  if (_rulerOn()) requestAnimationFrame(() => _startRuler(_resumeWord));
   else if (_resumeWord !== null) requestAnimationFrame(() => _goToWord(_resumeWord));
   _wirePlaceTracking(story);
 
@@ -1389,13 +1444,15 @@ function _startRuler(startWord = null) {
     word: startWord,
     wordSelector: '.wf-word',
     safeArea: _rulerSafeArea,
+    repeatLine: _classView,
     onMove(s) {
       _rulerState = s;
       const byWord = m.id === 'word';
-      posLabel.textContent = byWord ? 'Word' : 'Line';
-      posNum.textContent = byWord ? `${s.word + 1} / ${s.words}` : `${s.line + 1} / ${s.lines}`;
-      back.disabled = byWord ? s.word === 0 : s.line === 0;
-      next.textContent = s.atEnd ? 'The end ✓' : byWord ? 'Next word ▶' : 'Next line ▶';
+      posLabel.textContent = s.whole ? 'Whole line' : byWord ? 'Word' : 'Line';
+      posNum.textContent =
+        byWord && !s.whole ? `${s.word + 1} / ${s.words}` : `${s.line + 1} / ${s.lines}`;
+      back.disabled = byWord ? s.word === 0 && !s.whole : s.line === 0;
+      next.textContent = s.atEnd ? 'The end ✓' : byWord && !s.whole ? 'Next word ▶' : 'Next line ▶';
       next.classList.toggle('is-end', s.atEnd);
       // With the ruler on, the place is exactly where the ruler is.
       clearTimeout(_placeSaveTimer);
@@ -1438,6 +1495,12 @@ function _destroyRuler() {
  * while the focus is in a control that wants those keys for itself.
  */
 function _onRulerKey(e) {
+  if (e.key === 'Escape' && _classView && document.getElementById('btn-class-exit')) {
+    if (document.querySelector('.word-panel:not([hidden]), .modal-overlay:not([hidden])')) return;
+    e.preventDefault();
+    document.getElementById('btn-class-exit').click();
+    return;
+  }
   if (!_ruler || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
   if (e.target?.closest?.('input, textarea, select, summary, [contenteditable="true"]')) return;
   if (document.querySelector('.modal.active, .modal[open]')) return;
@@ -1445,7 +1508,18 @@ function _onRulerKey(e) {
   // under the word being worked on.
   if (e.target?.closest?.('.word-panel')) return;
   const byWord = _rulerMode().id === 'word';
+  // A presenter clicker sends Page Down / Page Up, and Space is the natural
+  // "next" at a keyboard. Only in class view, where nothing else wants them.
+  const onControl = e.target?.closest?.('button, a, [role="button"]');
+  const clicker = _classView
+    ? {
+        PageDown: () => _ruler.next(),
+        PageUp: () => _ruler.prev(),
+        ...(onControl ? {} : { ' ': () => _ruler.next() }),
+      }
+    : {};
   const act = {
+    ...clicker,
     ArrowDown: () => _ruler.nextLine(),
     ArrowUp: () => _ruler.prevLine(),
     ArrowRight: () => (byWord ? _ruler.next() : _ruler.nextLine()),
@@ -2508,6 +2582,7 @@ function _endingFacts(story) {
 }
 
 function _showEnding(story) {
+  _applyClassView(false);
   if (!story) return;
   const host = _container?.querySelector('.story-content-wrap');
   if (!host || host.querySelector('.story-ending')) return;

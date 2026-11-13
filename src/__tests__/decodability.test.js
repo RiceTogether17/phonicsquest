@@ -125,13 +125,31 @@ describe('requiredTier', () => {
 
 describe('isWordDecodable', () => {
   it('respects the cumulative phase tiers', () => {
-    expect(isWordDecodable('flat', 'short-a')).toBe(true);
+    expect(isWordDecodable('mat', 'short-a')).toBe(true);
+    // Blends wait for the phase that teaches them.
+    expect(isWordDecodable('flat', 'short-a')).toBe(false);
+    expect(isWordDecodable('flat', 'mixed-short')).toBe(true);
     expect(isWordDecodable('cake', 'short-a')).toBe(false);
     expect(isWordDecodable('cake', 'long-a')).toBe(true);
     expect(isWordDecodable('dark', 'long-a')).toBe(false);
     expect(isWordDecodable('dark', 'r-controlled')).toBe(true);
     expect(isWordDecodable('chair', 'diphthongs')).toBe(false);
     expect(isWordDecodable('chair', 'advanced-vowel')).toBe(true);
+  });
+
+  it('holds the first stories to three-sound words', () => {
+    // The lessons teach cat, hen and pig for a whole phase before the first
+    // blend or digraph, so those are not yet words a child can sound out.
+    for (const word of ['cat', 'at', 'ran', 'cats', 'hats']) {
+      expect(isWordDecodable(word, 'short-a'), word).toBe(true);
+    }
+    for (const word of ['black', 'snack', 'hand', 'plan', 'ant', 'that']) {
+      expect(isWordDecodable(word, 'short-a'), word).toBe(false);
+      expect(isWordDecodable(word, 'mixed-short'), word).toBe(true);
+    }
+    expect(isWordDecodable('chick', 'short-ei')).toBe(false);
+    expect(isWordDecodable('frog', 'short-ou')).toBe(false);
+    expect(isWordDecodable('hops', 'short-ou')).toBe(true);
   });
 
   it('rejects unknown phases', () => {
@@ -243,7 +261,7 @@ describe('findUnknownCapitalised', () => {
       band: 'A',
       phase: 'short-a',
       allowedHFWTier: 1,
-      lines: [{ type: 'text', text: 'The cat and Pike ran on Sand Hill.' }],
+      lines: [{ type: 'text', text: 'The cat and Pike ran on Tan Hill.' }],
     };
     expect(findUnknownCapitalised(story)).toEqual(['pike', 'hill']);
   });

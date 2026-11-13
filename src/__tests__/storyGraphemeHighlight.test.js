@@ -10,12 +10,14 @@ vi.hoisted(() => {
     speak: () => {},
     cancel: () => {},
   };
+  // Stories open plain, so switch the scaffold on the way a teacher would.
+  localStorage.setItem('giri_show_graphemes', 'true');
 });
 
 const { _highlightGraphemes } = await import('../modes/storyMode.js');
 
 // _highlightGraphemes is now a thin gate over the shared phonemeColors
-// classifier: when the "Sound colours" scaffold is on (default), it wraps
+// classifier: when the "Sound colours" scaffold is switched on, it wraps
 // each vowel in a span coloured by the SOUND it makes. The colour logic
 // itself is covered exhaustively in phonemeColors.test.js — here we only
 // check the delegation and that non-letters pass through untouched.
