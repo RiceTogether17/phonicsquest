@@ -27,6 +27,7 @@ import * as mistakesDenPanel from './components/panels/mistakesDenPanel.js';
 import * as trophyRoomPanel from './components/panels/trophyRoomPanel.js';
 import { html, raw } from './utils/html.js';
 import { audio } from './modules/audio.js';
+import { LISTENING_MODES, spokenInstructionFor } from './modules/spokenInstructions.js';
 import { gamification } from './modules/gamification.js';
 import { badges } from './modules/badges.js';
 import { progress, isStageHiddenForMode } from './modules/progress.js';
@@ -75,6 +76,8 @@ import { lazyModule } from './modes/lazy.js';
 // Cleanup paths use `.get()?.fn()` so a feature that was never opened is a
 // safe no-op.
 const dashboardMod = lazyModule(() => import('./components/dashboard.js'));
+// Only shown once a day's goal is reached, so it stays out of the startup chunk.
+const sessionSummaryMod = lazyModule(() => import('./components/sessionSummary.js'));
 const roadmapMod = lazyModule(() => import('./components/roadmap.js'));
 const storyModeMod = lazyModule(() => import('./modes/storyMode.js'));
 const sentenceForgeMod = lazyModule(() => import('./modes/sentenceForge.js'));
@@ -92,6 +95,7 @@ const synthesisQuestMod = lazyModule(() => import('./modes/synthesisQuest.js'));
 const placeholdersMod = lazyModule(() => import('./modes/primaryPlaceholders.js'));
 const comprehensionClozeMod = lazyModule(() => import('./modes/comprehensionClozeQuest.js'));
 const listeningCompMod = lazyModule(() => import('./modes/listeningComp.js'));
+const oralPracticeMod = lazyModule(() => import('./modes/oralPractice.js'));
 import {
   getProfiles,
   createProfile,
@@ -152,7 +156,6 @@ import {
   tryTeacherUnlock,
   lockTeacherMode,
 } from './modules/teacherUnlock.js';
-import { showSessionSummary } from './components/sessionSummary.js';
 
 class App {
   constructor() {
@@ -199,6 +202,10 @@ class App {
     this._workoutWord = null;
     /** @type {number} words completed in current session */
     this._sessionWordCount = 0;
+    /** @type {Set<string>} games whose spoken instruction already played this visit */
+    this._introsPlayed = new Set();
+    /** Bumped by every _startGame so a late intro can't set up a stale round. */
+    this._startToken = 0;
 
     /** @type {boolean} hint used for current word (no heart loss on 1st wrong if unused) */
     this._hintUsed = false;
@@ -290,6 +297,7 @@ class App {
       wordEmoji: document.getElementById('word-emoji'),
       phonemeRow: document.getElementById('phoneme-row'),
       modeInstruction: document.getElementById('mode-instruction'),
+      btnHearInstruction: document.getElementById('btn-hear-instruction'),
       modeArea: document.getElementById('mode-area'),
 
       btnCheck: document.getElementById('btn-check'),
@@ -348,6 +356,8 @@ class App {
 
     this._els.btnBack?.addEventListener('click', () => {
       this._cleanupMode();
+      audio.cancelSpeech();
+      this._introsPlayed.clear();
       this._sessionWordCount = 0;
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
@@ -668,6 +678,7 @@ class App {
       ['btn-p5-practice-tests', 'p5-practice-tests'],
       ['btn-p6-practice-tests', 'p6-practice-tests'],
       ['btn-listening-comp', 'listening-comp'],
+      ['btn-oral-practice', 'oral-practice'],
     ];
     placeholderHandlers.forEach(([btnId, kind]) => {
       document.getElementById(btnId)?.addEventListener('click', () => {
@@ -678,6 +689,7 @@ class App {
       comprehensionClozeMod.get()?.cleanupComprehensionClozeQuest();
       synthesisQuestMod.get()?.cleanupSynthesisQuest();
       listeningCompMod.get()?.cleanupListeningComp();
+      oralPracticeMod.get()?.cleanupOralPractice();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
@@ -688,6 +700,7 @@ class App {
     });
 
     this._els.btnSayIt?.addEventListener('click', () => this._handleSayIt());
+    this._els.btnHearInstruction?.addEventListener('click', () => this._speakModeInstruction());
 
     this._els.btnHint?.addEventListener('click', () => {
       this._giveHint();
@@ -952,16 +965,50 @@ class App {
       this._maybeRenderAdultVerdict();
     };
 
+    // A child who can't read yet needs to hear what the game wants. The
+    // first word of each game opens with Giri saying the instruction; the
+    // word's own audio waits until that line has finished. If the child
+    // leaves or a new round starts while Giri is talking, the stale setup
+    // is dropped.
+    const startToken = ++this._startToken;
+    const introThenSetup = () => {
+      if (this._introsPlayed.has(this._mode)) {
+        setupMode();
+        return;
+      }
+      this._introsPlayed.add(this._mode);
+      const line = spokenInstructionFor(this._mode);
+      if (this._els.modeInstruction) this._els.modeInstruction.textContent = line;
+      const spoken = line ? audio.speakText(line) : Promise.resolve();
+      const go = () => {
+        if (startToken !== this._startToken || this._screen !== SCREENS.GAME) return;
+        setupMode();
+      };
+      spoken.then(go, go);
+    };
+
     // Explicit instruction first: the first time a child practises a
     // curriculum stage, Giri teaches it (mini-lesson overlay) before
     // independent practice begins. Wheel "free play" groups (short-a, …)
-    // don't map to a stage and start immediately.
-    const lessonStage = this._sessionType === 'normal' && group ? findStageForGroup(group) : null;
+    // don't map to a stage and start immediately. Listening games skip the
+    // lesson: it teaches reading a printed pattern, which those games never
+    // ask for, so it waits until the child plays a reading game.
+    const lessonStage =
+      this._sessionType === 'normal' && group && !LISTENING_MODES.has(this._mode)
+        ? findStageForGroup(group)
+        : null;
     if (lessonStage && !hasSeenLesson(`phonics:${lessonStage.id}`)) {
-      maybeShowStageLesson(group).then(setupMode, setupMode);
+      maybeShowStageLesson(group).then(introThenSetup, introThenSetup);
     } else {
-      setupMode();
+      introThenSetup();
     }
+  }
+
+  /** Say the current game's instruction again ("What do I do?" button). */
+  _speakModeInstruction() {
+    const shown = this._els.modeInstruction?.textContent || '';
+    const line = spokenInstructionFor(this._mode, shown);
+    if (line) audio.speakText(line);
   }
 
   /**
@@ -1062,6 +1109,7 @@ class App {
           this._els.wordDisplay,
           this._els.wordEmoji,
           this._els.modeInstruction,
+          this._els.btnHearInstruction,
           this._els.btnSayIt,
           this._els.btnHint,
           this._els.btnCheck,
@@ -1578,22 +1626,27 @@ class App {
 
   async _openPrimaryPlaceholder(kind) {
     const meta = getPlaceholderMeta(kind);
-    // listening-comp manages its own header text inside the container
-    if (!meta && kind !== 'listening-comp') return;
+    // listening-comp and oral-practice manage their own header text
+    const selfTitled = {
+      'listening-comp': ['Listening Comprehension', '👂'],
+      'oral-practice': ['Oral Practice', '🎤'],
+    };
+    if (!meta && !selfTitled[kind]) return;
     const titleEl = document.getElementById('primary-placeholder-title');
     const iconEl = document.getElementById('primary-placeholder-icon');
     if (meta) {
       if (titleEl) titleEl.textContent = meta.label;
       if (iconEl) iconEl.textContent = meta.icon;
     } else {
-      if (titleEl) titleEl.textContent = 'Listening Comprehension';
-      if (iconEl) iconEl.textContent = '👂';
+      if (titleEl) titleEl.textContent = selfTitled[kind][0];
+      if (iconEl) iconEl.textContent = selfTitled[kind][1];
     }
     const container = document.getElementById('primary-placeholder-content');
     const goHome = () => {
       comprehensionClozeMod.get()?.cleanupComprehensionClozeQuest();
       synthesisQuestMod.get()?.cleanupSynthesisQuest();
       listeningCompMod.get()?.cleanupListeningComp();
+      oralPracticeMod.get()?.cleanupOralPractice();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     };
@@ -1608,6 +1661,10 @@ class App {
       const m = await listeningCompMod.load();
       m.initListeningComp(container, goHome);
       m.showListeningBrowser();
+    } else if (kind === 'oral-practice') {
+      const m = await oralPracticeMod.load();
+      m.initOralPractice(container, goHome);
+      m.showOralBrowser();
     } else {
       const m = await placeholdersMod.load();
       m.mountPlaceholderModule(container, kind, {
@@ -2729,7 +2786,15 @@ class App {
    * Called from _handleResult when dailyComplete is true.
    * @param {{ xpEarned: number }} reward
    */
-  _showSessionSummaryScreen(reward) {
+  async _showSessionSummaryScreen(reward) {
+    let showSessionSummary;
+    try {
+      ({ showSessionSummary } = await sessionSummaryMod.load());
+    } catch (_) {
+      // The summary is a nicety; never leave the child stranded without it.
+      this._showScreen(SCREENS.HOME);
+      return;
+    }
     const wordsToday = (store.get('sessionWordsToday') || []).length;
     const firstTryCount = store.get('sessionFirstTryToday') || 0;
     const streak = store.get('streak') || 0;
@@ -2801,18 +2866,7 @@ class App {
     // Listening-first modes don't require decoding, so the strict decoding
     // gate would lock out exactly the pre-readers these games exist for.
     // Every stage stays open; word difficulty still rises stage by stage.
-    const ORAL_MODES = new Set([
-      'first',
-      'last',
-      'middle',
-      'oralBlend',
-      'soundCount',
-      'oralSegment',
-      'oddOneOut',
-      'train',
-      'wordCount',
-    ]);
-    const isOralMode = ORAL_MODES.has(mode);
+    const isOralMode = LISTENING_MODES.has(mode);
     const unlocked = isOralMode ? stagesForMode.map((s) => s.id) : getUnlockedStages(snapshot);
     const recommended = getRecommendedStage(snapshot);
 

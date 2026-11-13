@@ -93,10 +93,27 @@ function targetIndexOf(word, position) {
     for (let i = gs.length - 1; i >= 0; i--) if (types[i] !== 'se') return i;
     return gs.length - 1;
   }
-  // middle — prefer the leftmost vowel; if no type info, fall back to centre.
-  const vowelIdx = types.findIndex((t) => t === 'sv' || t === 'lv' || t === 'rc' || t === 'dp');
+  // middle — prefer the leftmost vowel between the first and last sounds,
+  // then any vowel; if no type info, fall back to centre.
+  const interior = types.findIndex((t, i) => i > 0 && i < types.length - 1 && VOWEL_TYPES.has(t));
+  if (interior >= 0) return interior;
+  const vowelIdx = types.findIndex((t) => VOWEL_TYPES.has(t));
   if (vowelIdx >= 0) return vowelIdx;
   return Math.floor((gs.length - 1) / 2);
+}
+
+const VOWEL_TYPES = new Set(['sv', 'lv', 'rc', 'dp']);
+
+/**
+ * Middle Sound only makes sense when a vowel sits between the first and last
+ * sounds. "ash" is a-sh: its vowel IS the first sound, so asking for the
+ * middle of a two-sound word quizzes First Sound under the wrong name.
+ * Mirrors hasInteriorVowel in progress.js, which the adaptive picker uses.
+ */
+function hasInteriorVowel(word) {
+  const types = Array.isArray(word.types) ? word.types : [];
+  if (types.length <= 2) return false;
+  return types.slice(1, -1).some((t) => VOWEL_TYPES.has(t));
 }
 
 function targetGraphemeOf(word, position) {
@@ -126,6 +143,7 @@ function buildPool(wordList, group, maxLevel, position, mode) {
       Array.isArray(w.graphemes) &&
       w.graphemes.length >= 2 &&
       w.group !== 'sight-highfreq' &&
+      (position !== 'middle' || hasInteriorVowel(w)) &&
       !w.phonemeKeys?.[targetIndexOf(w, position)] &&
       !(PICTURE_CHOICE_MODES.has(mode) && w.noPicture),
   );

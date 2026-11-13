@@ -88,6 +88,49 @@ describe('phonics mini-lessons', () => {
     expect(lesson.confusions.length).toBeLessThanOrEqual(2);
   });
 
+  // Word sums on the spelling-rule card must be spelled the way their
+  // note says: a plain join, a doubled last consonant, or a dropped e.
+  it.each(Object.entries(PHONICS_LESSONS).filter(([, l]) => l.spellingRule))(
+    'lesson %s spelling rule examples are correct',
+    (stageId, lesson) => {
+      const { rule, examples } = lesson.spellingRule;
+      expect(rule.length).toBeGreaterThan(10);
+      expect(rule.length).toBeLessThanOrEqual(140);
+      expect(examples.length).toBeGreaterThanOrEqual(2);
+      expect(examples.length).toBeLessThanOrEqual(4);
+      for (const ex of examples) {
+        expect(ex.parts.length).toBeGreaterThanOrEqual(2);
+        expect(ex.note.length).toBeLessThanOrEqual(80);
+        const [base, ending] = ex.parts;
+        const joined = ex.parts.join('');
+        if (ex.result === joined) {
+          expect(ex.note, `${ex.result}: a plain join needs no change note`).not.toMatch(
+            /double|drop/i,
+          );
+        } else if (ex.result === base + base.at(-1) + ending) {
+          expect(ex.note, `${ex.result}: doubling must be explained`).toMatch(/double/i);
+        } else if (base.endsWith('e') && ex.result === base.slice(0, -1) + ending) {
+          expect(ex.note, `${ex.result}: dropping e must be explained`).toMatch(/drop the e/i);
+        } else {
+          throw new Error(`${stageId}: ${ex.parts.join(' + ')} does not make ${ex.result}`);
+        }
+      }
+    },
+  );
+
+  it('suffix and multisyllable lessons teach their spelling rules', () => {
+    for (const id of ['suffix-ing', 'suffix-ed', 'suffix-er', 'suffix-est']) {
+      const notes = PHONICS_LESSONS[id].spellingRule.examples.map((e) => e.note).join(' ');
+      expect(notes, `${id} should show doubling`).toMatch(/double/i);
+      expect(notes, `${id} should show dropping e`).toMatch(/drop the e/i);
+    }
+    const splits = PHONICS_LESSONS.multisyllable.spellingRule.examples.map((e) => e.note).join(' ');
+    expect(splits).toMatch(/split between/i);
+    expect(splits).toMatch(/open/i);
+    expect(splits).toMatch(/closed/i);
+    expect(splits).toMatch(/consonant \+ le/i);
+  });
+
   it('getPhonicsLesson returns null for unknown stages', () => {
     expect(getPhonicsLesson('not-a-stage')).toBeNull();
     expect(getPhonicsLesson('cvc-a')).toBe(PHONICS_LESSONS['cvc-a']);

@@ -264,6 +264,8 @@ const DEFAULT_STATE = {
   // named misconception rather than per attempt, so the log stays small
   // enough for localStorage: it is what lets the feedback say "that is the
   // third time this fortnight" instead of treating every slip as new.
+  // Pairs of sounds the child mixes up in the phonics games (soundConfusions.js).
+  soundConfusions: {},
   misconceptionLog: {}, // { [misconceptionId]: { count, skills, modes, firstSeen, lastSeen, cleanStreak } }
 
   // Quest mastery + telemetry
@@ -286,6 +288,8 @@ const DEFAULT_STATE = {
   // activity counts as the rest. Audit 2026-09-19, finding 16.
   // { [passageId]: ISO timestamp }
   listeningCompleted: {},
+  // Oral Practice sets finished, with the child's own check of each part.
+  oralCompleted: {},
 
   // Practice accuracy for work that did NOT meet the independent-evidence
   // bar (self-marks, heuristic writing feedback, supported prompts). Kept

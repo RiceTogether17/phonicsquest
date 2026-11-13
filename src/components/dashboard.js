@@ -21,6 +21,7 @@ import {
   getStuckWords,
 } from '../modules/dashboardInsights.js';
 import { renderCurriculumMap } from './curriculumMap.js';
+import { buildWeakSpots, weakSpotsText } from '../modules/weakSpots.js';
 import {
   getVocabularyCategoryReport,
   getGrammarCategoryReport,
@@ -68,6 +69,7 @@ export function renderDashboard(container, opts = {}) {
          the first of 24 stacked sections in a 13,298 px page — 15.8 phone
          screens, every one of them reading "No data yet" on a new profile. -->
     <div id="dash-parent-report-card"></div>
+    <div id="dash-weak-spots"></div>
     <div id="dash-actions-section"></div>
     <div id="dash-stuck-words"></div>
     <div id="dash-class-snapshot"></div>
@@ -179,6 +181,7 @@ export function renderDashboard(container, opts = {}) {
 
   // Render new insight sections
   _renderParentReportCard();
+  _renderWeakSpots();
   _renderParentCoachingCard();
   _renderLearnerSummary();
   _renderRecommendedActions();
@@ -977,6 +980,49 @@ function _renderClassSnapshot() {
 }
 
 // ── Stuck Words Alert ────────────────────────────────────────────────────────
+
+/**
+ * "What to work on next": at most five lines for a parent or tutor, each
+ * with what goes wrong, how the app knows, and what to do about it.
+ */
+function _weakSpotsHtml(spots) {
+  const rows = spots
+    .map(
+      (s) => `
+      <li class="weak-spot weak-spot--${s.kind}">
+        <strong class="weak-spot__title">${escapeHtml(s.title)}</strong>
+        <span class="weak-spot__evidence">${escapeHtml(s.evidence)}</span>
+        <span class="weak-spot__action">👉 ${escapeHtml(s.action)}</span>
+      </li>`,
+    )
+    .join('');
+  return `
+    <section class="weak-spots" aria-label="What to work on next">
+      <div class="weak-spots__head">
+        <h3 class="dash-section-title" style="margin:0">🎯 What to work on next</h3>
+        <button class="btn btn--ghost weak-spots__copy" type="button" id="btn-weak-spots-copy">Copy for a tutor</button>
+      </div>
+      <ol class="weak-spots__list">${rows}</ol>
+      <p class="weak-spots__status" id="weak-spots-status" role="status"></p>
+    </section>`;
+}
+
+function _renderWeakSpots() {
+  const container = document.getElementById('dash-weak-spots');
+  if (!container) return;
+  const spots = buildWeakSpots();
+  if (!spots.length) return;
+  container.innerHTML = _weakSpotsHtml(spots);
+  container.querySelector('#btn-weak-spots-copy')?.addEventListener('click', async () => {
+    const status = container.querySelector('#weak-spots-status');
+    try {
+      await navigator.clipboard.writeText(weakSpotsText(spots, getActiveProfile()?.name || ''));
+      if (status) status.textContent = 'Copied. Paste it into a message.';
+    } catch (_) {
+      if (status) status.textContent = 'Could not copy on this device.';
+    }
+  });
+}
 
 function _renderStuckWords() {
   const container = document.getElementById('dash-stuck-words');
