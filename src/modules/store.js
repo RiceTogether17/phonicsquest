@@ -175,6 +175,9 @@ const DEFAULT_STATE = {
   //   'cumulative'   — successive blending: each new sound is blended with
   //                    everything so far (/c/ → "ca" → "cat")
   blendStyle: 'simultaneous',
+  // Blend It as a class read-along: the whole word at once and one press for
+  // the next word, with nothing scored. Chosen on the Blend It screen.
+  blendSpeedRound: false,
   parentPin: null, // hashed PIN
   geminiApiKey: null, // legacy single-provider key; still read as the Google fallback
   // Bring-your-own-key AI tutor. The parent picks a provider and pastes

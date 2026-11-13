@@ -215,3 +215,53 @@ describe('keyboardManager', () => {
     expect(spy).not.toHaveBeenCalled();
   });
 });
+
+describe('Blend It speed round shortcuts', () => {
+  function mount(ids) {
+    const clicks = [];
+    for (const id of ids) {
+      const b = document.createElement('button');
+      b.id = id;
+      b.addEventListener('click', () => clicks.push(id));
+      document.body.appendChild(b);
+    }
+    return clicks;
+  }
+
+  function press(key) {
+    document.body.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+  }
+
+  beforeEach(() => {
+    keyboardManager.init({
+      getScreen: () => 'screen-game',
+      els: {},
+      modalManager: { anyOpen: () => false },
+    });
+  });
+
+  afterEach(() => {
+    keyboardManager.destroy();
+    document.body.innerHTML = '';
+  });
+
+  it('Space, Enter and the right arrow each bring the next word', () => {
+    const clicks = mount(['btn-speed-next', 'btn-check']);
+    press(' ');
+    press('Enter');
+    press('ArrowRight');
+    expect(clicks).toEqual(['btn-speed-next', 'btn-speed-next', 'btn-speed-next']);
+  });
+
+  it('S plays the sounds', () => {
+    const clicks = mount(['btn-speed-sounds']);
+    press('s');
+    expect(clicks).toEqual(['btn-speed-sounds']);
+  });
+
+  it('the right arrow does nothing outside a speed round', () => {
+    const clicks = mount(['btn-reveal-next']);
+    press('ArrowRight');
+    expect(clicks).toEqual([]);
+  });
+});

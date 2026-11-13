@@ -21,6 +21,14 @@
  * I do → you do → check, and the "you do" is the part that builds the skill.
  *
  * Designed for parents and teachers introducing blending to new readers.
+ *
+ * Speed round: a teacher leading a class from one screen does not want a tap
+ * per sound, a self-check and a word to choose for every word — the class
+ * reads aloud and the teacher judges by ear. In the "speed" style the whole
+ * word is shown at once and one press (button, Space, Enter or →) brings the
+ * next word. "Sounds" (or S) models the blend when the class is stuck.
+ * Nothing is scored: a class reading in chorus is not evidence about the one
+ * child whose profile is open.
  */
 
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
@@ -38,7 +46,57 @@ let currentWord = null;
 let revealedCount = 0;
 let blendStart = 0;
 let isRevealing = false;
+// Bumped each time a word is set up. A reveal or blend that is still playing
+// for an earlier set-up checks it and stops, so it cannot draw its controls
+// over a round the teacher has since switched to.
+let _round = 0;
 let _blendStyle = 'simultaneous'; // 'simultaneous' | 'cumulative'
+let _speedRound = false;
+let _recentSpeedWords = [];
+let _speedPasses = 0;
+
+const STYLE_LABELS = { simultaneous: '🔤 Sound by Sound', cumulative: '🔗 Build It Up' };
+const STYLE_DESCRIPTIONS = {
+  simultaneous: 'Play each sound on its own, then the word',
+  cumulative: 'Blend each new sound with the ones before it',
+};
+const SPEED_DESCRIPTION =
+  'Show the whole word. One press brings the next word. For reading together as a class.';
+
+function _speedButton() {
+  return `<button class="speed-btn ${_speedRound ? 'speed-btn--active' : ''}" data-blend-speed aria-pressed="${_speedRound}" aria-label="${SPEED_DESCRIPTION}" title="${SPEED_DESCRIPTION}">⚡ Speed round</button>`;
+}
+
+function _styleButtons() {
+  const styles = Object.keys(STYLE_LABELS)
+    .map((s) => {
+      const on = !_speedRound && _blendStyle === s;
+      return `<button class="speed-btn ${on ? 'speed-btn--active' : ''}" data-blend-style="${s}" aria-pressed="${on}" aria-label="${STYLE_DESCRIPTIONS[s]}" title="${STYLE_DESCRIPTIONS[s]}">${STYLE_LABELS[s]}</button>`;
+    })
+    .join('');
+  return styles + _speedButton();
+}
+
+/**
+ * Wire the style buttons. Choosing a style or the speed round can change the
+ * whole layout of the round, so the word is simply set up again.
+ */
+function _bindStyleButtons(els, word) {
+  els.modeArea.querySelectorAll('[data-blend-style]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const next = /** @type {HTMLElement} */ (btn).dataset.blendStyle;
+      if (!_speedRound && next === _blendStyle) return;
+      store.set('blendStyle', next);
+      store.set('blendSpeedRound', false);
+      setupBlend(word, els);
+    });
+  });
+  els.modeArea.querySelector('[data-blend-speed]')?.addEventListener('click', () => {
+    if (_speedRound) return;
+    store.set('blendSpeedRound', true);
+    setupBlend(word, els);
+  });
+}
 
 // ── Setup ─────────────────────────────────────────────────────────────────
 
@@ -51,11 +109,19 @@ export function setupBlend(word, els) {
   revealedCount = 0;
   blendStart = Date.now();
   isRevealing = false;
+  const round = ++_round;
   _blendStyle = store.get('blendStyle') || 'simultaneous';
+  _speedRound = !!store.get('blendSpeedRound');
+  els.phonemeRow.classList.remove('phoneme-row--speed');
 
   // Hidden until the word has been blended and heard — see the header.
   renderWordImage(word, els.wordEmoji, false);
   els.wordDisplay.innerHTML = '';
+
+  if (_speedRound) {
+    _setupSpeedRound(word, els);
+    return;
+  }
 
   els.modeInstruction.textContent = 'Press "Next Sound" to hear each sound — then blend!';
 
@@ -69,7 +135,9 @@ export function setupBlend(word, els) {
   els.btnSkip.style.display = '';
 
   if (store.get('autoplay')) {
-    setTimeout(() => _revealNext(word, els), 700);
+    setTimeout(() => {
+      if (round === _round) _revealNext(word, els);
+    }, 700);
   }
 }
 
@@ -96,20 +164,9 @@ function _renderControls(els, word, stage) {
     const btnLabel =
       revealedCount === 0 ? '▶ First Sound' : remaining === 1 ? '▶ Last Sound' : '▶ Next Sound';
 
-    const styleBtns =
-      revealedCount === 0
-        ? ['simultaneous', 'cumulative']
-            .map((s) => {
-              const label = { simultaneous: '🔤 Sound by Sound', cumulative: '🔗 Build It Up' }[s];
-              const desc = {
-                simultaneous: 'Play each sound on its own, then the word',
-                cumulative: 'Blend each new sound with the ones before it',
-              }[s];
-              const active = _blendStyle === s ? 'speed-btn--active' : '';
-              return `<button class="speed-btn ${active}" data-blend-style="${s}" aria-label="${desc}" title="${desc}">${label}</button>`;
-            })
-            .join('')
-        : '';
+    // The style can only change before the first sound; the speed round can
+    // be switched on at any point, so a teacher never has to wait for it.
+    const styleBtns = revealedCount === 0 ? _styleButtons() : _speedButton();
 
     els.modeArea.innerHTML = /* html */ `
       <div class="blend-guided-wrap">
@@ -142,15 +199,7 @@ function _renderControls(els, word, stage) {
       _revealNext(word, els);
     });
 
-    els.modeArea.querySelectorAll('[data-blend-style]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        _blendStyle = btn.dataset.blendStyle;
-        store.set('blendStyle', _blendStyle);
-        els.modeArea.querySelectorAll('[data-blend-style]').forEach((b) => {
-          b.classList.toggle('speed-btn--active', b.dataset.blendStyle === _blendStyle);
-        });
-      });
-    });
+    _bindStyleButtons(els, word);
   } else if (stage === 'blend') {
     // "Next Sound" is gone by now; the instruction has to say what to do.
     els.modeInstruction.textContent = 'You heard every sound. Now blend them into a word!';
@@ -164,8 +213,10 @@ function _renderControls(els, word, stage) {
                 aria-label="Check my word: hear the sounds blended together">
           🔊 Check my word
         </button>
+        <div class="speed-row"><div class="speed-btns">${_speedButton()}</div></div>
       </div>
     `;
+    _bindStyleButtons(els, word);
 
     // No autoplay here, even with autoplay on: this pause is the child's
     // turn to blend. Playing the word for them is the step that used to
@@ -183,8 +234,10 @@ function _renderControls(els, word, stage) {
           <button class="btn btn--success btn--xl" id="btn-self-yes">Yes! ✓</button>
           <button class="btn btn--ghost btn--xl"   id="btn-self-no">Not yet</button>
         </div>
+        <div class="speed-row"><div class="speed-btns">${_speedButton()}</div></div>
       </div>
     `;
+    _bindStyleButtons(els, word);
 
     document.getElementById('btn-self-yes')?.addEventListener('click', () => {
       els.onResult(true, Date.now() - blendStart);
@@ -195,11 +248,90 @@ function _renderControls(els, word, stage) {
   }
 }
 
+// ── Speed round ───────────────────────────────────────────────────────────
+
+function _setupSpeedRound(word, els) {
+  // Nothing is scored in a speed round, so the word picker learns nothing
+  // from it and can offer the same word again straight away. Pass over a
+  // word the class has just read (a bounded number of times, in case the
+  // stage only has a handful of words).
+  if (_recentSpeedWords.includes(word.word) && _speedPasses < 3) {
+    _speedPasses++;
+    queueMicrotask(() => els.btnSkip.click());
+    return;
+  }
+  _speedPasses = 0;
+  _recentSpeedWords = [..._recentSpeedWords, word.word].slice(-4);
+
+  els.modeInstruction.textContent = 'Read the word together.';
+
+  // The whole word at once, with its sound marks. No picture: it would give
+  // the word away before anyone has read it.
+  renderPhonemes(word, els.phonemeRow, { showDiacritics: true, revealedIndices: null });
+  // Large enough to read from the back of a classroom.
+  els.phonemeRow.classList.add('phoneme-row--speed');
+
+  els.btnCheck.style.display = 'none';
+  els.btnSayIt.style.display = 'none';
+  els.btnSkip.style.display = 'none';
+
+  els.modeArea.innerHTML = /* html */ `
+    <div class="blend-guided-wrap blend-speed-wrap">
+      <div class="blend-speed-actions">
+        <button class="btn btn--ghost btn--xl" id="btn-speed-sounds"
+                aria-label="Hear the sounds and the word" aria-keyshortcuts="S">
+          🔊 Sounds
+        </button>
+        <button class="btn btn--primary btn--xl blend-next-btn" id="btn-speed-next"
+                aria-label="Next word" aria-keyshortcuts="ArrowRight">
+          Next word ▶
+        </button>
+      </div>
+      <p class="blend-speed-keys">Keyboard: Space or → for the next word, S for the sounds.</p>
+      <div class="speed-row" role="group" aria-label="Blending style">
+        <span class="speed-label">Blend:</span>
+        <div class="speed-btns" id="blend-speed-styles"></div>
+      </div>
+    </div>
+  `;
+  const styles = document.getElementById('blend-speed-styles');
+  if (styles) styles.innerHTML = _styleButtons();
+
+  const next = () => {
+    // The shell's own "skip" moves to the next word without recording a
+    // result, which is exactly what a chorus read should do.
+    els.btnSkip.click();
+  };
+  const sounds = async () => {
+    if (isRevealing) return;
+    isRevealing = true;
+    const round = _round;
+    try {
+      await _animateBlendSweep(els.phonemeRow, word);
+      if (round !== _round) return;
+      renderWordImage(word, els.wordEmoji, true);
+      await audio.speakWord(word.word);
+    } finally {
+      if (round === _round) isRevealing = false;
+    }
+  };
+
+  const nextBtn = document.getElementById('btn-speed-next');
+  nextBtn?.addEventListener('click', next);
+  document.getElementById('btn-speed-sounds')?.addEventListener('click', sounds);
+  _bindStyleButtons(els, word);
+
+  // Keyboard shortcuts live in keyboardManager.js with the game screen's
+  // others. Focus here so a screen reader lands on the main action.
+  nextBtn?.focus({ preventScroll: true });
+}
+
 // ── Reveal logic ──────────────────────────────────────────────────────────
 
 async function _revealNext(word, els) {
   if (isRevealing || revealedCount >= word.graphemes.length) return;
   isRevealing = true;
+  const round = _round;
 
   revealedCount++;
   const idx = revealedCount - 1;
@@ -232,6 +364,7 @@ async function _revealNext(word, els) {
     });
   }
   await _delay(200);
+  if (round !== _round) return;
 
   isRevealing = false;
 
@@ -242,12 +375,13 @@ async function _revealNext(word, els) {
     _renderControls(els, word, 'revealing');
     if (store.get('autoplay')) {
       await _delay(400);
-      _revealNext(word, els);
+      if (round === _round) _revealNext(word, els);
     }
   }
 }
 
 async function _doBlend(word, els) {
+  const round = _round;
   // Show all tiles with labels
   renderPhonemes(word, els.phonemeRow, {
     showDiacritics: true,
@@ -257,6 +391,7 @@ async function _doBlend(word, els) {
 
   // Animated sweep: highlight each phoneme tile in sequence
   await _animateBlendSweep(els.phonemeRow, word);
+  if (round !== _round) return;
 
   // Build word animation
   buildWordAnimation(word, els.wordDisplay);
@@ -266,6 +401,7 @@ async function _doBlend(word, els) {
   await _delay(300);
   renderWordImage(word, els.wordEmoji, true);
   await audio.speakWord(word.word);
+  if (round !== _round) return;
 
   els.btnSayIt.style.display = '';
 
@@ -349,6 +485,8 @@ export function getCurrentWord() {
 }
 
 export function cleanup() {
+  _round++;
+  document.getElementById('phoneme-row')?.classList.remove('phoneme-row--speed');
   unmountBlendGuide(document.getElementById('phoneme-row'));
   currentWord = null;
   revealedCount = 0;
