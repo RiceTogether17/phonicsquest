@@ -138,7 +138,9 @@ describe('hearing the sound choices again', () => {
 
     speak.mockClear();
     container.querySelector('.choice-replay').click();
-    await vi.runAllTimersAsync();
+    // A fixed stretch of time, not "run every timer": once an earlier test
+    // has started an animation, its frame loop reschedules itself for ever.
+    await vi.advanceTimersByTimeAsync(5000);
 
     // Only this grid's sounds: a timer left running by an earlier lesson test
     // can still play one of its own while this one waits.
