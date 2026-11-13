@@ -30,6 +30,7 @@ const { SPOKEN_INSTRUCTIONS, LISTENING_MODES, spokenInstructionFor } =
 const { audio } = await import('../modules/audio.js');
 const { renderPhonemeChoiceGrid } = await import('../components/phonemeChoice.js');
 const { showMiniLesson } = await import('../components/miniLesson.js');
+const { narrationParts } = await import('../modules/lessonNarration.js');
 const { getPhonicsLesson } = await import('../data/lessons/phonicsLessons.js');
 const { CURRICULUM } = await import('../data/curriculum.js');
 const { WORDS } = await import('../data/words.js');
@@ -81,11 +82,14 @@ describe('mini-lesson narration', () => {
   });
 
   it('reads the lesson aloud as soon as it opens', async () => {
+    // Each line goes through speakWithSounds, so the sounds written in a
+    // line play their recordings instead of being read as letter names.
+    const lines = vi.spyOn(audio, 'speakWithSounds').mockResolvedValue(undefined);
     showMiniLesson({ stage, lesson, onDone: () => {} });
     for (let i = 0; i < lesson.script.length + 2; i++) await flush();
 
-    const spoken = audio.speakText.mock.calls.map((c) => c[0]);
-    expect(spoken).toEqual([lesson.headline, ...lesson.script]);
+    expect(lines).toHaveBeenCalledTimes(1 + lesson.script.length);
+    expect(lines.mock.calls[0][0]).toEqual(narrationParts(lesson.headline, lesson));
   });
 
   it('stops reading when the child taps a sound chip', async () => {
