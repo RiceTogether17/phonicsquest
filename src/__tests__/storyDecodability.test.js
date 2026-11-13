@@ -741,8 +741,8 @@ describe('sounds as well as letters (R13)', () => {
       expect(isWordDecodable(word, 'r-controlled'), `${word} at r-controlled`).toBe(true);
     }
     // The short a of "cat" is unaffected, and so is a word that looks alike.
-    expect(isWordDecodable('ant', 'short-a')).toBe(true);
-    expect(isWordDecodable('pant', 'short-a')).toBe(true);
+    expect(isWordDecodable('ant', 'mixed-short')).toBe(true);
+    expect(isWordDecodable('pant', 'mixed-short')).toBe(true);
   });
 
   it('waits for soft c, soft g and ow as in "cow"', () => {

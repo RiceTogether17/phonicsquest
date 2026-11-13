@@ -35,7 +35,7 @@ PhonicsQuest started as a phonics blender for early readers and now spans the fu
 | **First / Last / Middle Sound** | Phonemic awareness drills                                                      |
 | **Sight Words**                 | 35 high-frequency word matching games                                          |
 | **Letter Sounds**               | Tap any grapheme to hear it (consonants, vowels, digraphs, blends, diphthongs) |
-| **Giri Stories**                | 16 decodable phonics stories in Read-Aloud + Decode mode                       |
+| **Giri Stories**                | 82 decodable stories in five bands, Read-Aloud + Decode mode                   |
 
 ### 🏫 Primary English Quest (P1–P6)
 

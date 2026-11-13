@@ -102,9 +102,17 @@ export const STORY_PHASES = Object.freeze([
   // is cumulative and enforced per phase. Only tier-1 phases carry it: above
   // tier 1 vowels come in teams and split digraphs, where a letter-level
   // check would misread "rain" as needing both /a/ and /i/.
-  { id: 'short-a', tier: 1, curriculumPhase: 2, shortVowels: 'a' },
-  { id: 'short-ei', tier: 1, curriculumPhase: 2, shortVowels: 'aei' },
-  { id: 'short-ou', tier: 1, curriculumPhase: 2, shortVowels: 'aeiou' },
+  //
+  // `shape: 'cvc'` is the second sub-gate inside tier 1. The lessons teach
+  // three-sound words (cat, hen, pig) for a whole phase before the first
+  // consonant blend, and digraphs later still, so the first twelve stories
+  // may only ask a child to sound out a word of that shape: at most one
+  // consonant letter on each side of one short vowel, with or without a
+  // final -s (cats, digs). "black", "snack" and "chick" are tier-1 code but
+  // not yet readable. See withinShape.
+  { id: 'short-a', tier: 1, curriculumPhase: 2, shortVowels: 'a', shape: 'cvc' },
+  { id: 'short-ei', tier: 1, curriculumPhase: 2, shortVowels: 'aei', shape: 'cvc' },
+  { id: 'short-ou', tier: 1, curriculumPhase: 2, shortVowels: 'aeiou', shape: 'cvc' },
   { id: 'mixed-short', tier: 1, curriculumPhase: 4, shortVowels: 'aeiou' },
   { id: 'short-digraphs', tier: 1, curriculumPhase: 4, shortVowels: 'aeiou' },
   // `graphemeBudget` is the SUB-GATE for tiers 2 and up: a cumulative list of
@@ -753,6 +761,22 @@ export function withinVowelBudget(phase, clean) {
   return true;
 }
 
+const CVC_SHAPE = /^[^aeiou]?[aeiou][^aeiou]?$/;
+
+/**
+ * Does this word keep to the word shape its phase has taught? Only the
+ * phases that declare `shape: 'cvc'` are held to it: one short vowel with
+ * at most one consonant letter before and after, plus an optional final -s
+ * on a full three-letter word. Everything else passes.
+ * @param {object|null} phase
+ * @param {string} clean
+ */
+export function withinShape(phase, clean) {
+  if (phase?.shape !== 'cvc') return true;
+  if (CVC_SHAPE.test(clean)) return true;
+  return clean.length === 4 && clean.endsWith('s') && CVC_SHAPE.test(clean.slice(0, -1));
+}
+
 /**
  * Is the word decodable at this story phase?
  * @param {string} word
@@ -766,6 +790,7 @@ export function isWordDecodable(word, phaseId) {
   return (
     requiredTier(clean) <= phase.tier &&
     withinVowelBudget(phase, clean) &&
+    withinShape(phase, clean) &&
     withinGraphemeBudget(phase, clean) &&
     soundPhase(clean) <= phase.curriculumPhase
   );
@@ -920,6 +945,7 @@ export function classifyWord(
     phase &&
     tier <= phase.tier &&
     withinVowelBudget(phase, clean) &&
+    withinShape(phase, clean) &&
     withinGraphemeBudget(phase, clean) &&
     soundPhase(clean) <= phase.curriculumPhase
   ) {
