@@ -126,6 +126,9 @@ describe('hearing the sound choices again', () => {
   ];
 
   it('replays every option in order without choosing one', async () => {
+    // A lesson left open by an earlier test would still be narrating, and
+    // its sound chips share this spy. Clear the page so only this grid speaks.
+    document.body.innerHTML = '';
     vi.useFakeTimers();
     const speak = vi.spyOn(audio, 'speakPhoneme').mockResolvedValue(undefined);
     const onChoose = vi.fn();
@@ -133,10 +136,14 @@ describe('hearing the sound choices again', () => {
     document.body.appendChild(container);
     renderPhonemeChoiceGrid(container, choices, { onChoose, autoPlay: false });
 
+    speak.mockClear();
     container.querySelector('.choice-replay').click();
     await vi.runAllTimersAsync();
 
-    expect(speak.mock.calls.map((c) => c[0])).toEqual(['k', 'm', 's']);
+    // Only this grid's sounds: a timer left running by an earlier lesson test
+    // can still play one of its own while this one waits.
+    const mine = new Set(choices.map((c) => c.grapheme));
+    expect(speak.mock.calls.map((c) => c[0]).filter((g) => mine.has(g))).toEqual(['k', 'm', 's']);
     expect(onChoose).not.toHaveBeenCalled();
   });
 

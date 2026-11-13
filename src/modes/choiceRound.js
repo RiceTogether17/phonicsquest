@@ -29,6 +29,7 @@
 
 import { cancelChoicePreviews } from '../components/phonemeChoice.js';
 import { audio } from '../modules/audio.js';
+import { recordSoundConfusion } from '../modules/soundConfusions.js';
 
 /**
  * Play the sound the child wrongly chose, then a short gap, so the reveal
@@ -158,7 +159,11 @@ export function createChoiceRound({
       firstTryWrong = true;
       markBtn(btn, false);
       btn.disabled = true;
-      const cue = diagnosisFor(choice)?.cue;
+      const diagnosis = diagnosisFor(choice);
+      // The first miss is the honest one: log which two sounds were mixed up
+      // so the adult can see the pattern later.
+      if (diagnosis?.slip) recordSoundConfusion(diagnosis.slip);
+      const cue = diagnosis?.cue;
       if (cue) setFeedback('retry', `Almost! ${cue}`);
       else
         setFeedback('retry', retryHint ? `Almost! Try again. ${retryHint}` : 'Almost! Try again.');

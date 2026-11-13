@@ -187,7 +187,23 @@ export function lessonNoteFor(word, targetGrapheme, targetLabel, chosenLabel) {
  * @returns {PhonicsDiagnosis|null}  null when nothing more useful than the
  *   game's own hint can be said
  */
-export function diagnosePhonicsSlip({ word, position, target, chosen, lead, heard }) {
+export function diagnosePhonicsSlip(args) {
+  const diagnosis = _diagnosePhonicsSlip(args);
+  // "That sound is in the word, just elsewhere" is a slip of position, not
+  // two sounds being confused, so it carries no pair.
+  if (!diagnosis || diagnosis.id === 'sound-elsewhere') return diagnosis;
+  const { word, target, chosen } = args;
+  return {
+    ...diagnosis,
+    slip: {
+      target: notation(target.grapheme, target.type, word.word ?? ''),
+      chosen: notation(chosen.grapheme, chosen.type),
+      word: word.word ?? '',
+    },
+  };
+}
+
+function _diagnosePhonicsSlip({ word, position, target, chosen, lead, heard }) {
   if (!word || !target || !chosen) return null;
   const wordText = word.word ?? '';
   const t = notation(target.grapheme, target.type, wordText);

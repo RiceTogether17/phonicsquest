@@ -20812,3 +20812,42 @@ body.story-class-view .ruler-nav .ruler-back {
   border-radius: 12px;
   font-size: 1.1rem;
 }
+
+/* ── Dashboard: what to work on next ───────────────────────────────────── */
+.weak-spots {
+  margin: 16px 0;
+  padding: 14px 16px;
+  border: 2px solid var(--border, #e5e3fa);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.weak-spots__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.weak-spots__copy {
+  min-height: 44px;
+}
+.weak-spots__list {
+  margin: 10px 0 0;
+  padding-left: 1.4em;
+  display: grid;
+  gap: 12px;
+}
+.weak-spot__title,
+.weak-spot__evidence,
+.weak-spot__action {
+  display: block;
+}
+.weak-spot__evidence {
+  color: var(--text-muted, #6b7280);
+  font-size: 0.9rem;
+}
+.weak-spots__status {
+  margin: 8px 0 0;
+  min-height: 1.2em;
+  font-size: 0.9rem;
+}

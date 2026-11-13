@@ -264,6 +264,8 @@ const DEFAULT_STATE = {
   // named misconception rather than per attempt, so the log stays small
   // enough for localStorage: it is what lets the feedback say "that is the
   // third time this fortnight" instead of treating every slip as new.
+  // Pairs of sounds the child mixes up in the phonics games (soundConfusions.js).
+  soundConfusions: {},
   misconceptionLog: {}, // { [misconceptionId]: { count, skills, modes, firstSeen, lastSeen, cleanStreak } }
 
   // Quest mastery + telemetry
