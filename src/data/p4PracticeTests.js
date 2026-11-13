@@ -196,12 +196,12 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in the blanks with a suitable word from the box. Each word may only be used once. There is one extra word that you will not need.',
       wordBank: ['since', 'although', 'were', 'being', 'are', 'had'],
       text:
-        'Every year, the residents’ committee organises a Harvest Morning at the community garden. Helpers {{1}} divided into teams and assigned different plots to tend. ' +
-        '{{2}} the work was tiring, everyone pitched in cheerfully. Some helpers {{3}} seen trimming the herbs along the fence, while others raked the paths. ' +
-        'The programme {{4}} been running for five years and has become a favourite event. ' +
-        '{{5}} that time, the garden has won three community awards.',
-      answers: ['were', 'Although', 'were', 'had', 'Since'],
-      leftOver: ['being', 'are'],
+        'Every year, the residents’ committee organises a Harvest Morning at the community garden. Helpers {{1}} divided into teams and given different plots to tend. ' +
+        '{{2}} the work is tiring, everyone pitches in cheerfully. Last year, some helpers {{3}} seen trimming the herbs along the fence long after the event had ended. ' +
+        'By the time the garden won its first award, the programme {{4}} already been running for three years. ' +
+        '{{5}} it began, the garden has won three community awards.',
+      answers: ['are', 'Although', 'were', 'had', 'Since'],
+      leftOver: ['being'],
       skill: 'passiveVoice',
       practiseTarget: 'cloze-castle',
     },
@@ -467,7 +467,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
         },
         {
           q: 'You ______________ have called me earlier — I would have helped you carry the groceries.',
-          choices: ['must', 'would', 'could', 'should'],
+          choices: ['must', 'would', 'could', 'can'],
           answer: 'could',
           skill: 'modals',
           practiseTarget: 'grammar-mcq',
@@ -483,19 +483,19 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       items: [
         {
           q: 'The puppy ______________ under the bench, shaking from nose to tail.',
-          choices: ['shivered', 'trembled', 'quivered', 'shuddered'],
+          choices: ['strutted', 'trembled', 'pranced', 'lounged'],
           answer: 'trembled',
           skill: 'synonymContrast',
           practiseTarget: 'vocab-mcq',
-          explain: '"Trembled" describes sustained, noticeable shaking — the most natural fit for a frightened animal. "Shivered" is usually from cold; "quivered" is a fine vibration; "shuddered" is a sudden jolt.',
+          explain: '"Trembled" means shook with fear — it matches "shaking from nose to tail". The other words describe confident or relaxed movement.',
         },
         {
-          q: 'After the quarrel, the two cousins ______________ friends again and forgave each other.',
-          choices: ['made', 'became', 'turned', 'went'],
-          answer: 'made',
+          q: 'After the quarrel, the two cousins decided to ______________ amends and forgave each other.',
+          choices: ['make', 'do', 'take', 'give'],
+          answer: 'make',
           skill: 'collocationCloze',
           practiseTarget: 'vocab-mcq',
-          explain: '"Made friends" is the correct collocation — you "make" friends, not "became" or "went" friends.',
+          explain: '"Make amends" is the correct collocation — it means to do something to put right a wrong.',
         },
         {
           q: 'Mei always ______________ the midnight oil the week before her recitals.',
@@ -534,9 +534,9 @@ export const P4_PRACTICE_TESTS = Object.freeze({
         '{{2}} he had fixed the date, he designed bright flyers and pinned them up around the estate. ' +
         'On the morning itself, the team arrived early and set out their buckets {{3}} the first cars drove in. ' +
         'They scrubbed and rinsed right through the morning {{4}} every booked slot was done. ' +
-        'Iqbal said he would run the event again {{5}} the support from the neighbourhood stayed this strong.',
-      answers: ['if', 'After', 'before', 'until', 'if'],
-      leftOver: ['unless', 'when'],
+        'Iqbal said he would not run the event again {{5}} the neighbourhood supported it as strongly as it had this time.',
+      answers: ['if', 'After', 'before', 'until', 'unless'],
+      leftOver: ['when'],
       skill: 'conditionals',
       practiseTarget: 'cloze-castle',
     },
@@ -771,7 +771,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"Unless" means "if not" — the fair will be called off if the condition (a hundred tickets sold) is not met.',
         },
         {
-          q: 'Not only ______________ she top the level in Mathematics, but she also won the art prize.',
+          q: 'Not only ______________ top the level in Mathematics, but she also won the art prize.',
           choices: ['she did', 'did she', 'she has', 'has she'],
           answer: 'did she',
           skill: 'connectors',
@@ -780,7 +780,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
         },
         {
           q: 'The scouts ______________ their knot drill twice before they finally passed the test.',
-          choices: ['repeat', 'had repeated', 'have repeated', 'repeated'],
+          choices: ['repeat', 'had repeated', 'have repeated', 'repeating'],
           answer: 'had repeated',
           skill: 'pastPerfect',
           practiseTarget: 'grammar-mcq',
@@ -788,11 +788,11 @@ export const P4_PRACTICE_TESTS = Object.freeze({
         },
         {
           q: '______________ soaked after the storm, the campers still pitched the tents.',
-          choices: ['Despite being', 'Although being', 'Unless being', 'Even though'],
+          choices: ['Despite being', 'Although being', 'Unless being', 'Because of'],
           answer: 'Despite being',
           skill: 'relativeClauses',
           practiseTarget: 'grammar-mcq',
-          explain: '"Despite + -ing" is a participial phrase showing contrast — the campers were soaked but still helped.',
+          explain: '"Despite + -ing" shows contrast — the campers were soaked but still pitched the tents.',
         },
         {
           q: 'You may borrow the telescope ______________ you handle it with care.',
@@ -828,11 +828,11 @@ export const P4_PRACTICE_TESTS = Object.freeze({
         },
         {
           q: 'The sprinter ______________ a new national record at the trials last month.',
-          choices: ['made', 'broke', 'set', 'did'],
+          choices: ['made', 'took', 'set', 'did'],
           answer: 'set',
           skill: 'collocationCloze',
           practiseTarget: 'vocab-mcq',
-          explain: '"Set a record" is the correct collocation — you "set" a new record (though "broke" fits for surpassing an existing one; here "new national record" makes "set" the best choice).',
+          explain: '"Set a record" is the correct collocation — an athlete sets a new record.',
         },
         {
           q: 'After the quarrel, Imran realised he had spoken too harshly. He decided to ______________ the hatchet and apologise.',
@@ -869,11 +869,11 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       text:
         'Jia Hui had been looking forward to the school Science Fair for weeks. By the day of the event, she {{1}} built three working models, each one more intricate than the last. ' +
         '{{2}} her careful preparation, she felt jittery as she set up her booth. ' +
-        'She {{3}} not seen any of her competitors\' projects. When she finally did, she was impressed — everyone had created something clever. ' +
+        'She had not {{3}} seen any of her competitors\' projects. When she finally did, she was impressed — everyone had created something clever. ' +
         '{{4}} the other booths were dazzling, Jia Hui reminded herself to focus on presenting her own best work. ' +
-        'The judges {{5}} spent twenty minutes questioning each participant before making their decision.',
-      answers: ['had', 'Despite', 'had', 'Although', 'had'],
-      leftOver: ['already', 'since', 'yet'],
+        'The judges had {{5}} spent twenty minutes questioning the first participant when Jia Hui\'s turn came.',
+      answers: ['had', 'Despite', 'yet', 'Although', 'already'],
+      leftOver: ['since'],
       skill: 'pastPerfect',
       practiseTarget: 'cloze-castle',
     },
@@ -1068,12 +1068,12 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Choose the best answer and write its letter in the brackets provided.',
       items: [
         {
-          q: 'The results ______________ before we reached the noticeboard.',
+          q: 'The announcement ______________ before we reached the noticeboard.',
           choices: ['was made', 'had been made', 'has been made', 'is made'],
           answer: 'had been made',
           skill: 'pastPerfect',
           practiseTarget: 'grammar-mcq',
-          explain: 'The results were released before we reached the noticeboard — use past perfect passive "had been made".',
+          explain: 'The announcement was made before we reached the noticeboard — use past perfect passive "had been made".',
         },
         {
           q: 'Siti reported that the situation ______________ under control.',
@@ -1132,7 +1132,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
           explain: '"Should" gives advice — carrying a raincoat is advisable given the heavy clouds.',
         },
         {
-          q: 'Not only ______________ the scouts finish the trail early, but they also helped the younger group.',
+          q: 'Not only ______________ finish the trail early, but they also helped the younger group.',
           choices: ['they did', 'did they', 'have they', 'they had'],
           answer: 'did they',
           skill: 'connectors',
@@ -1165,7 +1165,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
         },
         {
           q: 'The committee ______________ a decision after a lengthy discussion.',
-          choices: ['made', 'took', 'did', 'got'],
+          choices: ['made', 'gave', 'did', 'got'],
           answer: 'made',
           skill: 'collocationCloze',
           practiseTarget: 'vocab-mcq',
@@ -1173,7 +1173,7 @@ export const P4_PRACTICE_TESTS = Object.freeze({
         },
         {
           q: 'After weeks of daily practice, Devi felt she had finally ______________ her stride.',
-          choices: ['found', 'hit', 'caught', 'made'],
+          choices: ['held', 'hit', 'caught', 'made'],
           answer: 'hit',
           skill: 'idiomaticExpressions',
           practiseTarget: 'vocab-mcq',
@@ -1204,13 +1204,13 @@ export const P4_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in the blanks with a suitable word from the box. Each word may only be used once. There is one extra word that you will not need.',
       wordBank: ['had', 'would', 'although', 'despite', 'been', 'if'],
       text:
-        'The school Games Carnival {{1}} been postponed twice due to the wet weather earlier in the term. ' +
+        'The school Games Carnival had {{1}} postponed twice due to the wet weather earlier in the term. ' +
         'When the day finally arrived, the pupils were overjoyed, {{2}} they knew the events ahead would be demanding. ' +
         'Danish {{3}} trained every morning for two months and was determined to give his all in the sprint relay. ' +
         'He told his teammates that he {{4}} run flat out for their sake. ' +
         '{{5}} the pressure, the team stayed calm and composed at the starting line.',
-      answers: ['had', 'although', 'had', 'would', 'Despite'],
-      leftOver: ['been', 'if'],
+      answers: ['been', 'although', 'had', 'would', 'Despite'],
+      leftOver: ['if'],
       skill: 'pastPerfect',
       practiseTarget: 'cloze-castle',
     },

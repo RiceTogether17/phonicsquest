@@ -93,7 +93,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           explain: 'Reported command: "told/asked + object + to-infinitive".',
         },
         {
-          q: 'The scientist ___ the rare orchid discovered in the nature reserve.',
+          q: 'The scientist ___ the rare orchid won an international award.',
           choices: ['whom studied', 'which studied', 'who studied', 'whose studied'],
           answer: 'who studied',
           skill: 'relativeClauses',
@@ -118,7 +118,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         },
         {
           q: '___ finished her field research, Dr Lim compiled her findings.',
-          choices: ['Have', 'Having', 'She had', 'After she'],
+          choices: ['Have', 'Having', 'She had', 'Had'],
           answer: 'Having',
           skill: 'mixedGrammar',
           practiseTarget: 'grammar-mcq',
@@ -156,7 +156,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       marks: 5,
       items: [
         {
-          q: 'After years of bitter rivalry, the two companies finally ___ their differences and signed a joint partnership agreement.',
+          q: 'After years of bitter rivalry, the two companies finally ___ the hatchet and signed a joint partnership agreement.',
           choices: ['sorted out', 'buried', 'burned', 'settled'],
           answer: 'buried',
           skill: 'idiomaticExpressions',
@@ -164,12 +164,12 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           explain: '"Bury the hatchet" means to end a quarrel and make peace.',
         },
         {
-          q: 'Her colleagues noticed that Amanda was stressed, but her cheerful smile was ___ — it was actually a sign that she was coping well.',
-          choices: ['a blessing in disguise', 'the last straw', 'a piece of cake', 'a silver lining'],
+          q: 'Losing the match was disappointing, but there was ___ — the team had finally learnt to work together.',
+          choices: ['a wild goose chase', 'the last straw', 'a piece of cake', 'a silver lining'],
           answer: 'a silver lining',
           skill: 'idiomaticExpressions',
           practiseTarget: 'vocab-mcq',
-          explain: '"A silver lining" — a positive or hopeful aspect of an otherwise difficult situation. Her cheerful smile was the encouraging sign within a stressful period.',
+          explain: '"A silver lining" is a hopeful side to a bad situation. Here the good side of losing is that the team learnt to work together.',
         },
         {
           q: 'The loss of the rainforest is not just an environmental disaster — it is a ___ wound on the planet\'s ecological system.',
@@ -181,7 +181,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         },
         {
           q: 'The government pledged to ___ a major campaign to protect coastal wetlands before the end of the year.',
-          choices: ['launch', 'mount', 'raise', 'lift'],
+          choices: ['climb', 'mount', 'raise', 'lift'],
           answer: 'mount',
           skill: 'collocationCloze',
           practiseTarget: 'vocab-mcq',
@@ -204,14 +204,14 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       instructions: 'Fill in each blank with ONE suitable word from the word bank. Each word may be used only once. Two words will be left over.',
       wordBank: ['although', 'has', 'been', 'which', 'were', 'being', 'unless', 'their', 'as', 'more', 'whose', 'despite'],
       text:
-        'The mangrove forests of Singapore {{1}} long recognised as one of the most ecologically significant habitats on the island. ' +
+        'The mangrove forests of Singapore have long {{1}} recognised as one of the most ecologically significant habitats on the island. ' +
         'These forests, {{2}} roots form a dense network above the mud, protect coastal areas from erosion and storm surges. ' +
         'For decades, large stretches of mangrove land {{3}} cleared to make way for development. ' +
         '{{4}} their small size, Singapore\'s remaining mangrove patches support an astonishing variety of wildlife. ' +
         'Migratory birds use these forests {{5}} stopover points during their long journeys across Asia. ' +
         'Researchers warn that {{6}} immediate conservation steps are taken, several mangrove-dependent species may disappear within a generation. ' +
         'The situation is {{7}} urgent today than it was twenty years ago. ' +
-        'Young people are now encouraged to get involved, {{8}} {{9}} role as marine stewards allows them to help replant and monitor the forests. ' +
+        'Young people are now {{8}} encouraged to get involved, and {{9}} role as marine stewards allows them to help replant and monitor the forests. ' +
         'Conservation groups have noted that the number of volunteers {{10}} grown steadily over the past five years.',
       answers: ['been', 'whose', 'were', 'Despite', 'as', 'unless', 'more', 'being', 'their', 'has'],
       leftOver: ['although', 'which'],
@@ -482,12 +482,12 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           explain: 'Reported yes/no question: "asked + if/whether + subject + verb".',
         },
         {
-          q: 'None of the students ___ able to answer the final question in the competition.',
+          q: 'Both of the students ___ able to answer the final question in the competition.',
           choices: ['was', 'were', 'has been', 'is'],
           answer: 'were',
           skill: 'svAgreement',
           practiseTarget: 'grammar-mcq',
-          explain: '"None of + plural noun" takes a plural verb when emphasising individuals.',
+          explain: '"Both of + plural noun" always takes a plural verb, and the competition is over, so the verb is "were".',
         },
         {
           q: 'The notice on the door read: "Entry is restricted to authorised personnel. All visitors ___ be accompanied by a staff member."',
@@ -507,7 +507,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         },
         {
           q: 'The books ___ on the shelves should have been sorted by topic, not by title.',
-          choices: ['arranged', 'arranging', 'which arranged', 'that were arranged'],
+          choices: ['that arranged', 'arranging', 'which arranged', 'that were arranged'],
           answer: 'that were arranged',
           skill: 'relativeClauses',
           practiseTarget: 'grammar-mcq',
@@ -515,19 +515,19 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         },
         {
           q: 'She admitted ___ forgotten to return the library book before the due date.',
-          choices: ['to have', 'having', 'to having', 'have'],
+          choices: ['to have', 'having', 'had', 'have'],
           answer: 'having',
           skill: 'mixedGrammar',
           practiseTarget: 'grammar-mcq',
           explain: '"Admit + gerund (verb-ing)" — perfect gerund "having + past participle" for a past action.',
         },
         {
-          q: 'The report ___ presented to the town council last Monday contained several inaccuracies.',
-          choices: ['was', 'being', 'been', 'having been'],
-          answer: 'being',
+          q: 'The report ___ to the town council last Monday contained several inaccuracies.',
+          choices: ['was presented', 'presented', 'presenting', 'been presented'],
+          answer: 'presented',
           skill: 'mixedGrammar',
           practiseTarget: 'grammar-mcq',
-          explain: '"Being + past participle" — a present participial phrase indicating an ongoing process.',
+          explain: '"Presented to the town council last Monday" is a shortened relative clause: "The report (that was) presented ...". "Was presented" would give the sentence two main verbs.',
         },
         {
           q: '"You ___ left your umbrella at the community centre — you were there just this morning," Dad said.',
@@ -561,7 +561,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       marks: 5,
       items: [
         {
-          q: 'Mr Tan could tell from Maya\'s careful choice of words that she was clearly ___ the lines — there was a hidden message in her speech.',
+          q: 'Maya chose her words carefully, but Mr Tan found the hidden message in her speech by ___ the lines.',
           choices: ['looking between', 'thinking between', 'reading between', 'speaking between'],
           answer: 'reading between',
           skill: 'idiomaticExpressions',
@@ -578,19 +578,19 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         },
         {
           q: 'The committee agreed to ___ the renovation project to the most experienced contractor in the district.',
-          choices: ['render', 'entrust', 'pass', 'award'],
+          choices: ['render', 'reward', 'pass', 'award'],
           answer: 'award',
           skill: 'collocationCloze',
           practiseTarget: 'vocab-mcq',
           explain: '"Award a contract/project" is the standard collocation for formally granting a contract.',
         },
         {
-          q: 'The director used several ___ forms of the word "create": creation, creative, and creativity all appeared in the same paragraph.',
-          choices: ['derived', 'related', 'linked', 'connected'],
+          q: 'The words creation, creative and creativity are all ___ from the word "create".',
+          choices: ['derived', 'deprived', 'described', 'delivered'],
           answer: 'derived',
           skill: 'morphologicalAffix',
           practiseTarget: 'vocab-mcq',
-          explain: '"Derived forms" are words created from the same root by adding prefixes or suffixes.',
+          explain: 'A word that is "derived from" another is formed from it, usually by adding a prefix or suffix.',
         },
         {
           q: '"Slim" and "slender" are near-synonyms, but "slim" often carries a neutral or positive tone, while "slender" sounds more ___.',
@@ -610,13 +610,13 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       wordBank: ['whenever', 'had', 'so', 'which', 'being', 'however', 'their', 'have', 'whether', 'one', 'though', 'despite'],
       text:
         'The Queenstown Community Library has been a beloved gathering place for residents for more than forty years. ' +
-        '{{1}} the library opened its doors in 1982, it quickly became a focal point for the neighbourhood. ' +
+        'It opened its doors in 1982 and quickly became a focal point for the neighbourhood. {{1}} it held a storytelling session in those early years, the hall was packed with children. ' +
         'Over the decades, the collection grew steadily, and new sections were added to cater to readers of all ages. ' +
         '{{2}}, by 2020 the building\'s ageing infrastructure was in desperate need of repair. ' +
         'Several sections of the roof {{3}} begun to leak, and the air-conditioning system {{4}} been unreliable for years. ' +
         'The library board proposed a two-year renovation, {{5}} divided residents: some welcomed the upgrade while others feared the long closure. ' +
         'Residents were surveyed on {{6}} they preferred a full closure or a phased renovation. ' +
-        'The majority voted for a phased approach, {{7}} disruptive it might be to daily operations. ' +
+        'The majority voted for a phased approach, even {{7}} it would disrupt daily operations for longer. ' +
         'Volunteers from local schools offered {{8}} help to move thousands of books into temporary storage. ' +
         'Today, {{9}} year into the renovation, the library has already reopened its ground floor. ' +
         'Residents say the improved lighting and new reading pods have made the space {{10}} inviting that they visit far more often than before.',
@@ -691,7 +691,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           alternates: ['Ms Wong asked Julian if he had remembered to submit his portfolio before the deadline.'],
           requiredGroups: [
             ["whether", "if"],
-            ["had remembered", "remembered to submit"],
+            ["had remembered"],
           ],
           skill: 'reportedSpeech',
           explain: 'Reported yes/no question: "asked + whether/if + subject + had + past participle".',
@@ -738,7 +738,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           answer: 'Not only does Maya read widely, but she has also scored highly in English every year.',
           alternates: ['Not only has Maya read widely, but she has also scored highly in English every year.'],
           requiredGroups: [
-            ["read widely", "reads widely"],
+            ["read widely"],
             ["scored highly", "achieved high"],
           ],
           skill: 'conjunctions',
@@ -894,19 +894,19 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         },
         {
           q: 'The conserved shophouses ___ had been repurposed into boutique hotels attracted many tourists.',
-          choices: ['that', 'whom', 'whose', 'which'],
+          choices: ['that', 'whom', 'whose', 'who'],
           answer: 'that',
           skill: 'relativeClauses',
           practiseTarget: 'grammar-mcq',
           explain: '"That had been repurposed" — restrictive relative clause; "that" for things in a defining clause.',
         },
         {
-          q: '___ the residents had signed the petition ___ the building received conservation status.',
-          choices: ['No sooner had / than', 'Scarcely did / when', 'No sooner did / than', 'Hardly had / when'],
+          q: '___ the residents signed the petition ___ the building received conservation status.',
+          choices: ['No sooner had / than', 'Scarcely did / when', 'No sooner did / than', 'Hardly had / than'],
           answer: 'No sooner had / than',
           skill: 'conjunctions',
           practiseTarget: 'grammar-mcq',
-          explain: '"No sooner had + subject + past participle ... than ..." — formal inverted structure.',
+          explain: '"No sooner had + subject + past participle ... than ..." — formal inverted structure. "Hardly" and "scarcely" pair with "when", not "than".',
         },
         {
           q: 'The guide, ___ enthusiasm impressed every visitor, had lived in the district all his life.',
@@ -942,11 +942,11 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         },
         {
           q: 'This ceramic vase ___ have originated in the Ming dynasty — the style and glaze are consistent with that era.',
-          choices: ['may', 'should', 'must', 'would'],
+          choices: ['may', 'should', 'can', 'would'],
           answer: 'may',
           skill: 'modals',
           practiseTarget: 'grammar-mcq',
-          explain: '"May have + past participle" expresses possibility about the past; "must" would imply certainty.',
+          explain: '"May have + past participle" expresses possibility about the past.',
         },
         {
           q: 'The museum is ___ large ___ you can spend an entire day without seeing every exhibit.',
@@ -1013,16 +1013,16 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       wordBank: ['had', 'been', 'which', 'whose', 'were', 'having', 'although', 'such', 'where', 'that', 'with', 'once'],
       text:
         'The kampong, {{1}} name derived from the Malay word for "village", was once the dominant form of settlement in Singapore. ' +
-        'These villages, {{2}} surrounded by rubber plantations and vegetable farms, were tightly knit communities ' +
+        'These villages, {{2}} were surrounded by rubber plantations and vegetable farms, were tightly knit communities ' +
         '{{3}} residents shared resources, celebrated festivals together, and looked out for one another\'s children. ' +
         'By the 1980s, most kampongs {{4}} been cleared to make way for modern public housing. ' +
-        'Residents {{5}} been relocated to HDB flats found that life in the high-rises was comfortable but less communal. ' +
+        '{{5}} been relocated to HDB flats, residents found that life in the high-rises was comfortable but less communal. ' +
         '{{6}} the kampong way of life had all but disappeared, the spirit it embodied — helpfulness, neighbourliness, and shared hardship — endured. ' +
-        'This spirit is {{7}} deeply embedded in Singaporean identity that it has its own name: the kampong spirit. ' +
+        '{{7}} is the strength of this spirit in Singaporean identity that it has its own name: the kampong spirit. ' +
         'Today, community groups organise events {{8}} replicate that atmosphere of togetherness. ' +
         'New estates are designed {{9}} communal kitchens and shared garden plots to bring neighbours together. ' +
         '{{10}} a new community space opens, it is this kampong spirit that residents hope to carry forward.',
-      answers: ['whose', 'which', 'where', 'had', 'having', 'Although', 'such', 'that', 'with', 'Once'],
+      answers: ['whose', 'which', 'where', 'had', 'Having', 'Although', 'Such', 'that', 'with', 'Once'],
       leftOver: ['been', 'were'],
       skill: 'mixedGrammar',
       practiseTarget: 'cloze-castle',
@@ -1092,7 +1092,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           alternates: [],
           requiredGroups: [
             ["respected", "followed", "observed"],
-            ["would not have been", "would not be", "would have been preserved"],
+            ["would not have been", "would have been preserved"],
           ],
           skill: 'conditionals',
           explain: 'Type 3 conditional inversion: "Had + subject + past participle" replaces "If + subject + had + past participle".',
@@ -1104,7 +1104,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           alternates: ['The journalist asked the historian when the district first received conservation status.'],
           requiredGroups: [
             ["when the district", "when the area"],
-            ["received conservation status", "received the status", "had first received"],
+            ["had first received", "had received", "first received"],
           ],
           skill: 'reportedSpeech',
           explain: 'Reported wh-question: "asked + when/what/where + subject + verb (backshifted)".',
@@ -1139,7 +1139,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           answer: 'The museum attracted such a large number of visitors that the curators extended the exhibition by another month.',
           alternates: ['The museum attracted such crowds that the curators extended the exhibition by another month.'],
           requiredGroups: [
-            ["such a large number", "such crowds", "such many visitors"],
+            ["such a large number", "such crowds", "such large crowds"],
             ["extended", "lengthened", "prolonged"],
           ],
           skill: 'conjunctions',
@@ -1290,10 +1290,10 @@ export const P5_PRACTICE_TESTS = Object.freeze({
         {
           q: 'The coach ___ not have trained the team properly — they lost all five matches last season.',
           choices: ['could', 'would', 'should', 'must'],
-          answer: 'should',
+          answer: 'could',
           skill: 'modals',
           practiseTarget: 'grammar-mcq',
-          explain: '"Should not have + past participle" expresses criticism or regret about a past action — the coach ought to have trained them better.',
+          explain: '"Could not have + past participle" is a conclusion about the past: losing every match shows it is not possible that the coach trained the team properly.',
         },
         {
           q: 'The new gaming centre, ___ opened last month, is already fully booked for the next three weeks.',
@@ -1320,12 +1320,12 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           explain: 'Type 3 conditional: "If + past perfect (had + past participle) → would have + past participle".',
         },
         {
-          q: '___ the match results announced, the stadium erupted in deafening cheers.',
-          choices: ['With', 'Once', 'Upon', 'Having'],
+          q: '___ the announcement of the match results, the stadium erupted in deafening cheers.',
+          choices: ['While', 'Once', 'Upon', 'Having'],
           answer: 'Upon',
           skill: 'mixedGrammar',
           practiseTarget: 'grammar-mcq',
-          explain: '"Upon + gerund/noun" — a formal participial construction meaning "immediately after".',
+          explain: '"Upon + noun" is a formal way of saying "immediately after".',
         },
         {
           q: 'Not only ___ the highest score in the tournament, but she also set a new national record.',
@@ -1336,16 +1336,16 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           explain: '"Not only" at the start of a clause triggers subject-auxiliary inversion.',
         },
         {
-          q: 'The amount of hours young gamers spend online ___ a growing concern for health experts.',
+          q: 'The number of hours young gamers spend online ___ a growing concern for health experts.',
           choices: ['are', 'were', 'is', 'have been'],
           answer: 'is',
           skill: 'svAgreement',
           practiseTarget: 'grammar-mcq',
-          explain: '"The amount of + uncountable noun" takes a singular verb.',
+          explain: '"The number of + plural noun" takes a singular verb, because the subject is "the number".',
         },
         {
           q: 'The team ___ enjoyed competing had to withdraw after two of its members fell ill.',
-          choices: ['who', 'that', 'whom', 'which'],
+          choices: ['who', 'that', 'whom', 'whose'],
           answer: 'that',
           skill: 'relativeClauses',
           practiseTarget: 'grammar-mcq',
@@ -1367,7 +1367,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       marks: 5,
       items: [
         {
-          q: 'By leaving the company without handing over his responsibilities, the director had effectively ___ any chance of returning.',
+          q: 'By leaving the company without handing over his responsibilities, the director had effectively ___ and lost any chance of returning.',
           choices: ['read between the lines', 'burned his bridges', 'taken a back seat', 'turned over a new leaf'],
           answer: 'burned his bridges',
           skill: 'idiomaticExpressions',
@@ -1375,28 +1375,28 @@ export const P5_PRACTICE_TESTS = Object.freeze({
           explain: '"Burn your bridges" means to do something that destroys your chances of going back.',
         },
         {
-          q: 'The coach called the final training session before the championship "the last piece of the puzzle" — he meant it was the ___ preparation needed.',
-          choices: ['last', 'final', 'missing', 'only'],
-          answer: 'missing',
+          q: 'The coach called the final training session before the championship "the last piece of the puzzle" — he meant it was ___.',
+          choices: ['a game played for fun', 'the first step of a long plan', 'the final thing needed to be fully ready', 'a problem nobody could solve'],
+          answer: 'the final thing needed to be fully ready',
           skill: 'similes',
           practiseTarget: 'vocab-mcq',
-          explain: '"Last piece of the puzzle" is a metaphor; here it means the missing element that completes preparation.',
+          explain: '"The last piece of the puzzle" is a metaphor for the final thing needed to complete something.',
         },
         {
           q: 'The technology company\'s breakthrough in battery design ___ a new era in electric vehicle travel.',
-          choices: ['announced', 'marked', 'opened', 'ushered in'],
+          choices: ['ushered out', 'handed in', 'filled in', 'ushered in'],
           answer: 'ushered in',
           skill: 'collocationCloze',
           practiseTarget: 'vocab-mcq',
           explain: '"Usher in a new era" is the standard collocation for marking the start of a new period.',
         },
         {
-          q: 'The word "compete" gives us ___ forms: competition (noun), competitive (adjective), and competitor (person noun).',
-          choices: ['root', 'derived', 'base', 'connected'],
-          answer: 'derived',
+          q: 'Competition, competitive and competitor all share the same ___ word: compete.',
+          choices: ['root', 'branch', 'leaf', 'seed'],
+          answer: 'root',
           skill: 'morphologicalAffix',
           practiseTarget: 'vocab-mcq',
-          explain: '"Derived forms" are words formed from a root by adding affixes.',
+          explain: 'The "root word" is the word that other words are built from by adding prefixes and suffixes.',
         },
         {
           q: '"Confident" and "arrogant" are related in meaning but differ: a confident person believes in themselves, while an arrogant person ___.',
@@ -1417,7 +1417,7 @@ export const P5_PRACTICE_TESTS = Object.freeze({
       text:
         'Esports — competitive video gaming — has grown from a niche hobby into a global industry worth billions of dollars. ' +
         'Professional gamers, {{1}} practise up to twelve hours a day, compete for prize pools {{2}} sometimes rival those of traditional sports championships. ' +
-        'Singapore has {{3}} been slow to recognise this shift. The Singapore Esports Association was established to formalise {{4}} efforts to develop local talent. ' +
+        'Singapore has {{3}} been slow to recognise this shift. Local clubs welcomed the Singapore Esports Association, which was set up to support {{4}} efforts to develop local talent. ' +
         '{{5}} opponents of esports claim it promotes unhealthy screen habits, supporters argue that gaming develops teamwork, strategic thinking, and lightning-fast reflexes. ' +
         'The debate over {{6}} esports should be classified as a legitimate sport remains unresolved. ' +
         'What is clear is that more young Singaporeans are choosing to pursue gaming {{7}} a career aspiration, {{8}} just a pastime. ' +

@@ -20456,3 +20456,24 @@ body.print-mode > *:not(.print-report-wrapper) > * {
   background: var(--color-primary);
   color: #fff;
 }
+
+/* Editing Quest: the word being fixed, and words already fixed */
+.eq-passage {
+  line-height: 2;
+}
+
+.eq-target {
+  background: var(--color-warning-light, #fff3bf);
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+.eq-fixed {
+  color: var(--color-success-text, #166534);
+  font-weight: 700;
+}

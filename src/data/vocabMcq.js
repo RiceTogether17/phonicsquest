@@ -5,6 +5,7 @@
  * contextual stems for upper-primary practice.
  */
 
+import { MIDDLE_ROWS, UPPER_ROWS, explanationsFromWhy } from './vocabMcqBands.js';
 import { inferQuestionContextType } from './mcqItemMetadata.js';
 import { deriveMcqDifficulty, mcqSeedKey } from './mcqItemFeatures.js';
 import { makeFallbackOptionExplanations } from './mcqOptionExplanations.js';
@@ -1757,6 +1758,30 @@ function dedupeBySeed(items) {
   }));
 }
 
+/**
+ * A question from the level's own banded pool, when the category has one.
+ *
+ * The category's builder still supplies the category name, subskill and rule
+ * line, so a banded question is filed and explained like its neighbours.
+ */
+function bandedSpec(baseCat, level, i) {
+  let pool = null;
+  if (level === 'P3' || level === 'P4') pool = MIDDLE_ROWS[baseCat];
+  else if (level === 'P5' || level === 'P6') pool = UPPER_ROWS[baseCat];
+  if (!pool) return null;
+  const { category, subskill, explain } = VOCAB_BUILDERS[baseCat](level, i);
+  const [q, answer, wrong, why] = rotate(pool, i);
+  return {
+    category,
+    subskill,
+    explain,
+    q,
+    answer,
+    choices: buildChoices(answer, wrong),
+    optionExplanations: explanationsFromWhy(answer, wrong, why),
+  };
+}
+
 function buildLevel(level) {
   const cats = LEVEL_CATEGORY_PLAN[level];
   const items = [];
@@ -1765,7 +1790,10 @@ function buildLevel(level) {
   for (const baseCat of cats) {
     for (let localOffset = 0; localOffset < MIN_QUESTIONS_PER_SCOPE; localOffset += 1) {
       const localIndex = sessionSeed + localOffset;
-      const spec = varyMcqNames(VOCAB_BUILDERS[baseCat](level, localIndex), localOffset);
+      const spec = varyMcqNames(
+        bandedSpec(baseCat, level, localIndex) || VOCAB_BUILDERS[baseCat](level, localIndex),
+        localOffset,
+      );
       const variant = contextualizeMcqQuestion(spec.q);
       const item = {
         id: `v-${level.toLowerCase()}-${baseCat}-${String(localOffset + 1).padStart(3, '0')}`,

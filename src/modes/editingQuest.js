@@ -1,7 +1,7 @@
 import { EDITING_LEVELS, editingPassages } from '../data/editingPassages.js';
 import { attachAskGiriButton } from '../components/askGiriButton.js';
 import { explainTeachBack } from '../modules/aiService.js';
-import { diagnoseAnswer, stemAroundToken } from '../modules/answerDiagnosis.js';
+import { diagnoseAnswer, stemForBlank } from '../modules/answerDiagnosis.js';
 import { recordMisconception } from '../modules/teacherFeedback.js';
 import { store } from '../modules/store.js';
 import { questMastery } from '../modules/questMastery.js';
@@ -98,6 +98,20 @@ export const EDITING_TEACHBACK = {
     example: '"She was tired, so she rested." — "Although it rained, they played."',
     tip: 'The conjunction shows the logical link: reason (because), contrast (although/but), result (so), addition (and).',
   },
+  wordForm: {
+    icon: '🧩',
+    rule: 'One word family has different forms for different jobs: a noun names a thing, a verb shows an action, an adjective describes a noun, and an adverb describes a verb.',
+    example:
+      '"She gave a quick answer." (adjective) — "She answered quickly." (adverb) — "Her success made us proud." (noun) — "She was successful." (adjective)',
+    tip: 'Ask what job the word does in this sentence. If it tells you HOW something is done, it usually needs -ly. If it comes after "a", "the" or "his/her", it is usually a noun.',
+  },
+  plurals: {
+    icon: '👫',
+    rule: 'A plural noun names more than one. Most add -s or -es, but some change their spelling and some never take -s at all.',
+    example:
+      '"two boxes" · "three children" · "many leaves" · "a lot of furniture" (never "furnitures")',
+    tip: 'Look for a number or a word like "many", "several" or "these" before the noun. Then check: is it a regular plural, an irregular one (child → children), or a noun we cannot count (information, luggage)?',
+  },
   // Fallbacks by type
   grammar: {
     icon: '📘',
@@ -106,6 +120,64 @@ export const EDITING_TEACHBACK = {
     tip: 'Read the sentence aloud slowly. If one part sounds wrong, that is usually the grammar error.',
   },
 };
+
+/** Child-friendly names for the rule keys, used on the summary screen. */
+const RULE_LABELS = {
+  svAgreement: 'Subject-verb agreement',
+  tense: 'Tenses',
+  articles: 'A, an and the',
+  prepositions: 'Prepositions',
+  pronouns: 'Pronouns',
+  modals: 'Modal verbs',
+  connectors: 'Connectors',
+  conjunctions: 'Conjunctions',
+  doubling: 'Doubling letters',
+  spelling: 'Spelling',
+  quantifiers: 'Much, many, few, little',
+  comparatives: 'Comparing words',
+  wordForm: 'Word form',
+  plurals: 'Plurals',
+  grammar: 'Grammar',
+};
+
+/**
+ * The passage as the child should see it at one step: the word being worked
+ * on is underlined, words already dealt with show their correction, and words
+ * still to come are left as printed. A word such as "was" can appear several
+ * times in a passage, so each error is placed by its position, not by search.
+ *
+ * @param {{paragraph: string, errors: Array<{token: string, correction: string, index: number}>}} item
+ * @param {number} current  index of the error being worked on
+ * @returns {string} HTML
+ */
+export function renderEditingPassage(item, current) {
+  let html = '';
+  let last = 0;
+  item.errors.forEach((error, i) => {
+    if (i > current) return;
+    html += escapeHtml(item.paragraph.slice(last, error.index));
+    html +=
+      i === current
+        ? `<mark class="eq-target">${escapeHtml(error.token)}</mark>`
+        : `<span class="eq-fixed">${escapeHtml(error.correction)}</span>`;
+    last = error.index + error.token.length;
+  });
+  return html + escapeHtml(item.paragraph.slice(last));
+}
+
+/**
+ * The sentence an error sits in, with that word turned into a blank.
+ *
+ * @param {string} paragraph
+ * @param {{token: string, index: number}} error
+ * @returns {string}
+ */
+export function editingStem(paragraph, error) {
+  const text = String(paragraph ?? '');
+  if (!Number.isInteger(error?.index)) return text.trim();
+  const blanked = `${text.slice(0, error.index)}___${text.slice(error.index + error.token.length)}`;
+  return stemForBlank(blanked, 0, []);
+}
 
 let _container = null;
 let _onGoHome = null;
@@ -218,14 +290,14 @@ function _renderErrorStep() {
         <span class="sfq-badge">✏️ ${EDITING_LEVELS[_level]}</span>
         <span class="sfq-progress">Passage ${_idx + 1} / ${_list.length}</span>
       </div>
-      <h3 class="cloze-title">${item.title}</h3>
-      <p class="sq-phase-label">PSLE-style editing: item ${_errorIndex + 1} of ${totalErrors}</p>
+      <h3 class="cloze-title">${escapeHtml(item.title)}</h3>
+      <p class="sq-phase-label">Mistake ${_errorIndex + 1} of ${totalErrors}. The underlined word is wrong. Fix it.</p>
       <div class="sq-progress-bar"><div class="sq-progress-fill" style="width:${progressPct}%"></div></div>
-      <p class="cloze-passage"><strong>${item.paragraph}</strong></p>
+      <p class="cloze-passage eq-passage">${renderEditingPassage(item, _errorIndex)}</p>
 
       <div class="sq-question-card">
-        <p class="sq-question-text">Target word: <strong>${error.token}</strong></p>
-        <p class="dash-pattern-item">Step 1: Choose error type</p>
+        <p class="sq-question-text">Underlined word: <strong>${escapeHtml(error.token)}</strong></p>
+        <p class="dash-pattern-item">Step 1: Is it a grammar mistake or a spelling mistake?</p>
         <div class="sfq-bank" id="eq-type-bank">
           <button class="sfq-word-chip" data-type="grammar">Grammar</button>
           <button class="sfq-word-chip" data-type="spelling">Spelling</button>
@@ -233,12 +305,12 @@ function _renderErrorStep() {
       </div>
 
       <div id="eq-correction-wrap" hidden>
-        <p class="dash-pattern-item">Step 2: Enter correction</p>
-        <input id="eq-correction-input" class="cp-name-input" placeholder="Type corrected word/phrase" />
+        <label class="dash-pattern-item" for="eq-correction-input">Step 2: Type the correct word</label>
+        <input id="eq-correction-input" class="cp-name-input" placeholder="Type the correct word" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
         <div class="sfq-actions" style="margin-top:8px">
-          <button class="btn btn--primary" id="eq-submit-correction">Submit correction</button>
+          <button class="btn btn--primary" id="eq-submit-correction">Check</button>
           <button class="btn btn--ghost btn--sm" id="eq-hint">Hint</button>
-          <button class="btn btn--ghost btn--sm" id="eq-reveal">Reveal</button>
+          <button class="btn btn--ghost btn--sm" id="eq-reveal">Show answer</button>
         </div>
       </div>
 
@@ -252,8 +324,8 @@ function _renderErrorStep() {
       </details>
 
       <div class="sfq-feedback" id="eq-feedback" role="status" aria-live="polite" hidden></div>
-      <div class="dash-pattern-item">💡 Try This! Tier 1: ${item.tryThis?.[0] || 'Write one corrected sentence.'}</div>
-      <div class="dash-pattern-item">🚀 Try This! Tier 2: ${item.tryThis?.[1] || 'Explain one rule to a classmate.'}</div>
+      <div class="dash-pattern-item">💡 Try this: ${escapeHtml(item.tryThis?.[0] || 'Write one corrected sentence.')}</div>
+      <div class="dash-pattern-item">🚀 Stretch: ${escapeHtml(item.tryThis?.[1] || 'Explain one rule to a classmate.')}</div>
 
       <div class="sfq-actions">
         <button class="btn btn--ghost btn--sm" id="eq-quit">Menu</button>
@@ -298,12 +370,12 @@ function _renderErrorStep() {
     this.removeEventListener('click', handler);
     this.disabled = true;
     _sessionStats.revealsUsed++;
-    _showFeedback(`🧩 Reveal: ${error.correction}. ${error.explanation}`, false);
+    _showFeedback(`🧩 The answer is "${error.correction}". ${error.explanation}`, false);
     _registerAttempt(error, false, true);
     setTimeout(() => {
       _errorIndex++;
       _renderErrorStep();
-    }, 900);
+    }, 3500);
   });
 
   document.getElementById('eq-quit')?.addEventListener('click', () => {
@@ -315,16 +387,16 @@ function _renderErrorStep() {
 /**
  * What the child's correction got wrong, in the feedback system's terms.
  *
- * Editing Quest works on a token inside a paragraph, so the sentence around
- * that token becomes the stem the detectors read.
+ * Editing Quest works on a word inside a paragraph, so the sentence around
+ * that word becomes the stem the detectors read.
  *
- * @param {object} error   the error entry ({ token, correction, type, rule })
+ * @param {object} error   the error entry ({ token, correction, type, rule, index })
  * @param {string} typed   the child's correction
  * @param {string} paragraph
  */
 function _diagnoseCorrection(error, typed, paragraph) {
   return diagnoseAnswer({
-    stem: stemAroundToken(paragraph, error.token),
+    stem: editingStem(paragraph, error),
     given: typed,
     correct: error.correction,
     skill: error.rule || error.type,
@@ -377,7 +449,7 @@ function _registerAttempt(error, correct, forcedAdvance = false) {
 
 function _submitError(item, error, selectedType, typedCorrection) {
   if (!selectedType || !typedCorrection) {
-    _showFeedback('Choose error type and enter a correction first.', false);
+    _showFeedback('Choose grammar or spelling, then type the correct word.', false);
     return;
   }
 
@@ -390,12 +462,13 @@ function _submitError(item, error, selectedType, typedCorrection) {
   _registerAttempt(error, correct);
 
   if (correct) {
-    _showFeedback(`✅ Correct (${error.type}). ${error.explanation}`, true);
+    _showFeedback(`✅ Correct. ${error.explanation}`, true);
     audio.playSfx('correct');
+    // Long enough to read why the fix is right before the next word appears.
     setTimeout(() => {
       _errorIndex++;
       _renderErrorStep();
-    }, 850);
+    }, 2200);
     return;
   }
 
@@ -476,8 +549,8 @@ function _showEditingTeachBackOverlay(error, onContinue, typed = '', paragraph =
   if (typed) {
     attachAskGiriButton(overlay.querySelector('.eq-teachback-card'), () =>
       explainTeachBack({
-        skillLabel: error.rule || error.type,
-        exercise: `Fix the ${error.type} error in the word "${error.token}"`,
+        skillLabel: RULE_LABELS[error.rule] || error.rule || error.type,
+        exercise: `Fix the ${error.type} error in the word "${error.token}" in: ${editingStem(paragraph, error)}`,
         studentAnswer: typed,
         correctAnswer: error.correction,
         level: _level ? `P${_level}` : '',
@@ -562,7 +635,8 @@ function _renderComplete() {
       const score = questMastery.getSkillScore('editingQuest', rule) ?? 0.5;
       const pct = Math.round(score * 100);
       const tb = EDITING_TEACHBACK[rule];
-      const label = tb ? `${tb.icon} ${rule}` : rule;
+      const name = RULE_LABELS[rule] || rule;
+      const label = tb ? `${tb.icon} ${name}` : name;
       const barColour =
         pct >= 70
           ? 'var(--color-success)'

@@ -12,7 +12,7 @@ import { store } from '../modules/store.js';
 import { questMastery } from '../modules/questMastery.js';
 import { audio } from '../modules/audio.js';
 import { getLevelInfo } from '../data/curriculum.js';
-import { gradeShortAnswer } from './scoring/shortAnswerGrader.js';
+import { gradeTransformation } from './scoring/transformationGrader.js';
 import { hasApiKey, gradeSynthesisAnswer, explainTeachBack } from '../modules/aiService.js';
 import { diagnoseWrittenAnswer } from '../modules/answerDiagnosis.js';
 import { recordMisconception } from '../modules/teacherFeedback.js';
@@ -536,11 +536,14 @@ export function buildAcceptableAnswers(item) {
 }
 
 function _grade(typed, item) {
-  const accepts = buildAcceptableAnswers(item);
-  return gradeShortAnswer(typed, {
-    expected: accepts[0] || '',
-    accepts: accepts.slice(1),
-    // Per-item authored partial-credit support (not used yet — opt-in).
+  const offTask = new Set(offTaskAlternates(item).map((x) => _normalise(x)));
+  return gradeTransformation(typed, {
+    stem: item.stem,
+    answer: item.answer,
+    alternates: (item.alternates || []).filter((x) => !offTask.has(_normalise(x))),
+    accepts: buildAcceptableAnswers(item),
+    // Meaning units alone never earn full marks: the answer must also use the
+    // construction the item tests. See transformationGrader.js.
     requiredGroups: Array.isArray(item.requiredGroups) ? item.requiredGroups : null,
   });
 }

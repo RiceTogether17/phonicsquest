@@ -27,6 +27,7 @@ import { escapeHtml, escapeAttr } from '../utils/escapeHtml.js';
 import { GRAMMAR_CATEGORIES } from '../data/grammarCategories.js';
 import { VOCAB_CATEGORIES } from '../data/vocabCategories.js';
 import { gradeShortAnswer } from './scoring/shortAnswerGrader.js';
+import { gradeTransformation } from './scoring/transformationGrader.js';
 import { diagnoseAnswer } from '../modules/answerDiagnosis.js';
 import { recordMisconceptionsFromReview } from '../modules/teacherFeedback.js';
 import { checkSituationalPoints } from '../modules/situationalChecks.js';
@@ -279,6 +280,7 @@ function renderSynthesisSection(section, sectionKey) {
         <textarea class="ptg-input ptg-input--area" rows="2"
                   data-q-key="${sectionKey}/${i}"
                   data-q-type="synthesis"
+                  data-stem="${escapeAttr(item.stem || '')}"
                   data-answer="${escapeAttr(item.answer)}"
                   data-accept="${escapeAttr(alts)}"
                   data-required-groups="${escapeAttr(requiredGroupsAttr)}"
@@ -599,12 +601,18 @@ function gradeInput(el) {
   }
 
   if (qType === 'synthesis') {
-    // PSLE Synthesis & Transformation: full-credit on exact-match OR an
-    // accepted alternate; partial credit (1/2) when requiredGroups
-    // captures only one of the two meaning units — mirroring the marker's
-    // structure-vs-content split.
+    // PSLE Synthesis & Transformation: full credit for an exact match with
+    // the answer or an accepted alternate, or for every meaning unit written
+    // in the construction the question tests. The right content in the wrong
+    // construction earns half, mirroring the marker's structure-vs-content
+    // split. See transformationGrader.js.
     const requiredGroups = _parseRequiredGroups(el.getAttribute('data-required-groups'));
-    const result = gradeShortAnswer(value, { expected, accepts, requiredGroups });
+    const result = gradeTransformation(value, {
+      stem: el.getAttribute('data-stem') || '',
+      answer: expected,
+      alternates: accepts,
+      requiredGroups,
+    });
     return { fraction: result.fraction, trace: result.trace };
   }
 
