@@ -95,6 +95,7 @@ const synthesisQuestMod = lazyModule(() => import('./modes/synthesisQuest.js'));
 const placeholdersMod = lazyModule(() => import('./modes/primaryPlaceholders.js'));
 const comprehensionClozeMod = lazyModule(() => import('./modes/comprehensionClozeQuest.js'));
 const listeningCompMod = lazyModule(() => import('./modes/listeningComp.js'));
+const oralPracticeMod = lazyModule(() => import('./modes/oralPractice.js'));
 import {
   getProfiles,
   createProfile,
@@ -677,6 +678,7 @@ class App {
       ['btn-p5-practice-tests', 'p5-practice-tests'],
       ['btn-p6-practice-tests', 'p6-practice-tests'],
       ['btn-listening-comp', 'listening-comp'],
+      ['btn-oral-practice', 'oral-practice'],
     ];
     placeholderHandlers.forEach(([btnId, kind]) => {
       document.getElementById(btnId)?.addEventListener('click', () => {
@@ -687,6 +689,7 @@ class App {
       comprehensionClozeMod.get()?.cleanupComprehensionClozeQuest();
       synthesisQuestMod.get()?.cleanupSynthesisQuest();
       listeningCompMod.get()?.cleanupListeningComp();
+      oralPracticeMod.get()?.cleanupOralPractice();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
@@ -1623,22 +1626,27 @@ class App {
 
   async _openPrimaryPlaceholder(kind) {
     const meta = getPlaceholderMeta(kind);
-    // listening-comp manages its own header text inside the container
-    if (!meta && kind !== 'listening-comp') return;
+    // listening-comp and oral-practice manage their own header text
+    const selfTitled = {
+      'listening-comp': ['Listening Comprehension', '👂'],
+      'oral-practice': ['Oral Practice', '🎤'],
+    };
+    if (!meta && !selfTitled[kind]) return;
     const titleEl = document.getElementById('primary-placeholder-title');
     const iconEl = document.getElementById('primary-placeholder-icon');
     if (meta) {
       if (titleEl) titleEl.textContent = meta.label;
       if (iconEl) iconEl.textContent = meta.icon;
     } else {
-      if (titleEl) titleEl.textContent = 'Listening Comprehension';
-      if (iconEl) iconEl.textContent = '👂';
+      if (titleEl) titleEl.textContent = selfTitled[kind][0];
+      if (iconEl) iconEl.textContent = selfTitled[kind][1];
     }
     const container = document.getElementById('primary-placeholder-content');
     const goHome = () => {
       comprehensionClozeMod.get()?.cleanupComprehensionClozeQuest();
       synthesisQuestMod.get()?.cleanupSynthesisQuest();
       listeningCompMod.get()?.cleanupListeningComp();
+      oralPracticeMod.get()?.cleanupOralPractice();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     };
@@ -1653,6 +1661,10 @@ class App {
       const m = await listeningCompMod.load();
       m.initListeningComp(container, goHome);
       m.showListeningBrowser();
+    } else if (kind === 'oral-practice') {
+      const m = await oralPracticeMod.load();
+      m.initOralPractice(container, goHome);
+      m.showOralBrowser();
     } else {
       const m = await placeholdersMod.load();
       m.mountPlaceholderModule(container, kind, {

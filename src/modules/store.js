@@ -286,6 +286,8 @@ const DEFAULT_STATE = {
   // activity counts as the rest. Audit 2026-09-19, finding 16.
   // { [passageId]: ISO timestamp }
   listeningCompleted: {},
+  // Oral Practice sets finished, with the child's own check of each part.
+  oralCompleted: {},
 
   // Practice accuracy for work that did NOT meet the independent-evidence
   // bar (self-marks, heuristic writing feedback, supported prompts). Kept
