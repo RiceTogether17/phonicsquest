@@ -13,6 +13,7 @@ import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { getDistractors, shuffleArray } from '../data/words.js';
 import { createChoiceRound } from './choiceRound.js';
+import { diagnoseWordSlip } from '../modules/phonicsDiagnosis.js';
 
 let currentWord = null;
 let round = null;
@@ -45,7 +46,7 @@ export function setupHearChoose(word, els) {
     btn.dataset.correct = String(choice.id === word.id);
     btn.setAttribute('aria-label', `Choose ${choice.word}`);
 
-    btn.addEventListener('click', () => round?.handleTap(choice.id === word.id, btn));
+    btn.addEventListener('click', () => round?.handleTap(choice.id === word.id, btn, choice));
     grid.appendChild(btn);
   }
 
@@ -54,10 +55,11 @@ export function setupHearChoose(word, els) {
     grid,
     onResult: els.onResult,
     retryHint: 'Listen one more time, then pick the word.',
+    diagnose: (choice) => diagnoseWordSlip(word, choice),
     onRetry: () => {
       setTimeout(() => audio.speakWord(word.word), 200);
     },
-    onReveal: () => _revealAnswer(word, els),
+    onReveal: ({ mistake }) => _revealAnswer(word, els, mistake),
   });
 
   els.btnSayIt.style.display = '';
@@ -67,13 +69,27 @@ export function setupHearChoose(word, els) {
   setTimeout(() => audio.speakWord(word.word), 400);
 }
 
-/** Reveal: image + word animation + phoneme tiles + correct-word audio. */
-function _revealAnswer(target, els) {
+/**
+ * Reveal: image + word animation + phoneme tiles + correct-word audio. After
+ * a wrong pick the two words play back to back ("bed … bad") so the child
+ * hears the one sound that differs.
+ */
+function _revealAnswer(target, els, mistake = null) {
   renderWordImage(target, els.wordEmoji, true);
   buildWordAnimation(target, els.wordDisplay);
   renderPhonemes(target, els.phonemeRow, { showDiacritics: true });
 
-  setTimeout(() => audio.speakWord(target.word), 500);
+  setTimeout(async () => {
+    if (mistake?.word) {
+      try {
+        await audio.speakWord(mistake.word);
+      } catch {
+        /* non-fatal: still play the right word */
+      }
+      await new Promise((r) => setTimeout(r, 450));
+    }
+    await audio.speakWord(target.word);
+  }, 500);
 }
 
 export function getCurrentWord() {

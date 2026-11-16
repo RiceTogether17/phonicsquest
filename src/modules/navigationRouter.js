@@ -75,6 +75,8 @@ export const PLACEHOLDER_TARGETS = Object.freeze(
     'synthesis',
     'situational-writing',
     'listening-comp',
+    'oral-practice',
+    'class-lesson',
     'p1-practice-tests',
     'p2-practice-tests',
     'p3-practice-tests',

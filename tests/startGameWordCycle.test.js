@@ -102,6 +102,9 @@ describe('_startGame — non-PA modes pick a fresh word every round', () => {
     };
 
     app._showScreen = vi.fn();
+    // Second round: Giri has already said this game's instruction, so the
+    // mode sets up straight away instead of waiting for the spoken intro.
+    app._introsPlayed.add('segment');
 
     app._startGame('short-a');
 
