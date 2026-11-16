@@ -1278,48 +1278,70 @@ export const PSEUDOWORD_ITEMS = Object.freeze([
   },
 ]);
 
+/**
+ * Connected reading. Every child-facing item here is print -> meaning: the
+ * word or sentence is PRINTED and never spoken, and the answers are pictures
+ * with no visible caption, so the only way to the right picture is to read.
+ *
+ * (Earlier versions spoke the target word, read the comprehension sentence
+ * aloud and captioned each picture with the sentence's own words, so a child
+ * could pass by listening or by matching letter shapes.)
+ *
+ * The sentence items pair two animals with two things so that both nouns
+ * have to be read; the comprehension items speak only the question.
+ */
 const GATE_C_ITEMS = [
-  // ── Decodable word reading ────────────────────────────────────────────────
+  // ── Read a word, find its picture ─────────────────────────────────────────
   {
     id: 'c-word-1',
     gate: 'C',
     stage: 'reading',
     section: 'connectedReading',
-    kind: 'word-choice',
-    title: 'Decodable reading',
-    prompt: 'Listen, then tap the word you hear.',
-    speak: 'jump',
-    correct: 'jump',
-    options: ['jump', 'lump', 'lamp', 'hump'],
+    kind: 'read-choice',
+    title: 'Word reading',
+    sentence: 'frog',
+    prompt: 'Read the word. Tap its picture.',
+    correct: 'frog',
+    options: [
+      { id: 'frog', emoji: '🐸', label: 'Frog' },
+      { id: 'fish', emoji: '🐟', label: 'Fish' },
+      { id: 'fox', emoji: '🦊', label: 'Fox' },
+      { id: 'flag', emoji: '🚩', label: 'Flag' },
+    ],
   },
   {
     id: 'c-word-2',
     gate: 'C',
     stage: 'reading',
     section: 'connectedReading',
-    kind: 'word-choice',
-    title: 'Decodable reading',
-    prompt: 'Listen, then tap the word you hear.',
-    speak: 'help',
-    correct: 'help',
-    options: ['help', 'held', 'heap', 'helm'],
+    kind: 'read-choice',
+    title: 'Word reading',
+    sentence: 'tent',
+    prompt: 'Read the word. Tap its picture.',
+    correct: 'tent',
+    options: [
+      { id: 'tent', emoji: '⛺', label: 'Tent' },
+      { id: 'ten', emoji: '🔟', label: 'Ten' },
+      { id: 'net', emoji: '🥅', label: 'Net' },
+      { id: 'nest', emoji: '🪺', label: 'Nest' },
+    ],
   },
-  // ── Sentence reading ──────────────────────────────────────────────────────
+  // ── Read a sentence, find its picture ─────────────────────────────────────
   {
     id: 'c-sentence-1',
     gate: 'C',
     stage: 'reading',
     section: 'connectedReading',
-    kind: 'sentence-choice',
+    kind: 'read-choice',
     title: 'Sentence reading',
-    sentence: 'The cat can hop.',
-    prompt: 'Read and choose the matching picture.',
-    correct: 'cat-hop',
+    sentence: 'The cat is on the bed.',
+    prompt: 'Read the sentence. Tap its picture.',
+    correct: 'cat-bed',
     options: [
-      { id: 'cat-hop', emoji: '🐱↗️', label: 'Cat can hop' },
-      { id: 'dog-run', emoji: '🐶🏃', label: 'Dog can run' },
-      { id: 'pig-sit', emoji: '🐷🪑', label: 'Pig can sit' },
-      { id: 'hen-fly', emoji: '🐔🪽', label: 'Hen can fly' },
+      { id: 'cat-bed', emoji: '🐱🛏️', label: 'Cat on a bed' },
+      { id: 'dog-bed', emoji: '🐶🛏️', label: 'Dog on a bed' },
+      { id: 'cat-box', emoji: '🐱📦', label: 'Cat on a box' },
+      { id: 'dog-box', emoji: '🐶📦', label: 'Dog on a box' },
     ],
   },
   {
@@ -1327,16 +1349,50 @@ const GATE_C_ITEMS = [
     gate: 'C',
     stage: 'reading',
     section: 'connectedReading',
-    kind: 'sentence-choice',
+    kind: 'read-choice',
     title: 'Sentence reading',
-    sentence: 'The dog sat on the rug.',
-    prompt: 'Read and choose the matching picture.',
-    correct: 'dog-rug',
+    sentence: 'A hen sat in a van.',
+    prompt: 'Read the sentence. Tap its picture.',
+    correct: 'hen-van',
     options: [
-      { id: 'dog-rug', emoji: '🐶🟫', label: 'Dog on rug' },
-      { id: 'cat-bed', emoji: '🐱🛏️', label: 'Cat on bed' },
-      { id: 'hen-box', emoji: '🐔📦', label: 'Hen on box' },
-      { id: 'pig-mud', emoji: '🐷💧', label: 'Pig in mud' },
+      { id: 'hen-van', emoji: '🐔🚐', label: 'Hen in a van' },
+      { id: 'hen-bus', emoji: '🐔🚌', label: 'Hen in a bus' },
+      { id: 'pig-van', emoji: '🐷🚐', label: 'Pig in a van' },
+      { id: 'pig-bus', emoji: '🐷🚌', label: 'Pig in a bus' },
+    ],
+  },
+  {
+    id: 'c-sentence-3',
+    gate: 'C',
+    stage: 'reading',
+    section: 'connectedReading',
+    kind: 'read-choice',
+    title: 'Sentence reading',
+    sentence: 'The frog has a drum.',
+    prompt: 'Read the sentence. Tap its picture.',
+    correct: 'frog-drum',
+    options: [
+      { id: 'frog-drum', emoji: '🐸🥁', label: 'Frog with a drum' },
+      { id: 'frog-hat', emoji: '🐸🎩', label: 'Frog with a hat' },
+      { id: 'fish-drum', emoji: '🐟🥁', label: 'Fish with a drum' },
+      { id: 'fish-hat', emoji: '🐟🎩', label: 'Fish with a hat' },
+    ],
+  },
+  {
+    id: 'c-sentence-4',
+    gate: 'C',
+    stage: 'reading',
+    section: 'connectedReading',
+    kind: 'read-choice',
+    title: 'Sentence reading',
+    sentence: 'A fox is in the tent.',
+    prompt: 'Read the sentence. Tap its picture.',
+    correct: 'fox-tent',
+    options: [
+      { id: 'fox-tent', emoji: '🦊⛺', label: 'Fox in a tent' },
+      { id: 'fox-nest', emoji: '🦊🪺', label: 'Fox in a nest' },
+      { id: 'duck-tent', emoji: '🦆⛺', label: 'Duck in a tent' },
+      { id: 'duck-nest', emoji: '🦆🪺', label: 'Duck in a nest' },
     ],
   },
   // ── Read aloud readiness (teacher-scale) ──────────────────────────────────
@@ -1359,16 +1415,17 @@ const GATE_C_ITEMS = [
     prompt:
       'Teacher score: learner reads short sentences without heavy sounding-out on every word.',
   },
-  // ── Comprehension ─────────────────────────────────────────────────────────
+  // ── Comprehension: read it yourself, then answer a spoken question ────────
   {
     id: 'c-comp-1',
     gate: 'C',
     stage: 'reading',
     section: 'comprehension',
-    kind: 'picture-choice',
+    kind: 'read-choice',
     title: 'Comprehension',
-    prompt: 'Listen: "Sam had a red cap." Tap what Sam had.',
-    say: ['Sam had a red cap. Tap what Sam had.'],
+    sentence: 'Sam had a red cap.',
+    prompt: 'What did Sam have?',
+    say: ['What did Sam have?'],
     correct: 'cap',
     options: [
       { id: 'cap', emoji: '🧢', label: 'Cap' },
@@ -1382,10 +1439,11 @@ const GATE_C_ITEMS = [
     gate: 'C',
     stage: 'reading',
     section: 'comprehension',
-    kind: 'picture-choice',
+    kind: 'read-choice',
     title: 'Comprehension',
-    prompt: 'Listen: "The frog sat on a log." Where did the frog sit?',
-    say: ['The frog sat on a log. Where did the frog sit?'],
+    sentence: 'The frog sat on a log.',
+    prompt: 'Where did the frog sit?',
+    say: ['Where did the frog sit?'],
     correct: 'log',
     options: [
       { id: 'log', emoji: '🪵', label: 'Log' },
@@ -1394,10 +1452,46 @@ const GATE_C_ITEMS = [
       { id: 'hat', emoji: '🎩', label: 'Hat' },
     ],
   },
+  {
+    id: 'c-comp-3',
+    gate: 'C',
+    stage: 'reading',
+    section: 'comprehension',
+    kind: 'read-choice',
+    title: 'Comprehension',
+    sentence: 'Tim got a big fish. He put it in a pot.',
+    prompt: 'Where did Tim put the fish?',
+    say: ['Where did Tim put the fish?'],
+    correct: 'pot',
+    options: [
+      { id: 'pot', emoji: '🍲', label: 'Pot' },
+      { id: 'net', emoji: '🥅', label: 'Net' },
+      { id: 'box', emoji: '📦', label: 'Box' },
+      { id: 'bed', emoji: '🛏️', label: 'Bed' },
+    ],
+  },
+  {
+    id: 'c-comp-4',
+    gate: 'C',
+    stage: 'reading',
+    section: 'comprehension',
+    kind: 'read-choice',
+    title: 'Comprehension',
+    sentence: 'Mum ran to the bus. She left her bag on the bench.',
+    prompt: 'What did Mum leave on the bench?',
+    say: ['What did Mum leave on the bench?'],
+    correct: 'bag',
+    options: [
+      { id: 'bag', emoji: '👜', label: 'Bag' },
+      { id: 'bus', emoji: '🚌', label: 'Bus' },
+      { id: 'cap', emoji: '🧢', label: 'Cap' },
+      { id: 'cup', emoji: '🥤', label: 'Cup' },
+    ],
+  },
 ];
 
 const GATE_D_ITEMS = [
-  // ── Sentence building (2 items) ───────────────────────────────────────────
+  // ── Sentence building (3 items) ───────────────────────────────────────────
   {
     id: 'd-sentence-1',
     gate: 'D',
@@ -1425,7 +1519,34 @@ const GATE_D_ITEMS = [
     ],
     correct: 'The boy kicked the ball.',
   },
-  // ── Grammar cloze (2 items) ───────────────────────────────────────────────
+  {
+    id: 'd-sentence-3',
+    gate: 'D',
+    stage: 'grammar-vocab',
+    section: 'sentenceReady',
+    kind: 'word-choice',
+    title: 'Sentence building',
+    prompt: 'Pick the best sentence:',
+    options: [
+      'My mother made a cake.',
+      'Made my mother a cake.',
+      'A cake my mother made.',
+      'Mother my a cake made.',
+    ],
+    correct: 'My mother made a cake.',
+  },
+  // ── Grammar cloze (3 items) ───────────────────────────────────────────────
+  {
+    id: 'd-grammar-3',
+    gate: 'D',
+    stage: 'grammar-vocab',
+    section: 'grammarReady',
+    kind: 'word-choice',
+    title: 'Grammar cloze',
+    prompt: 'The children ___ playing in the park now.',
+    options: ['is', 'are', 'was', 'be'],
+    correct: 'are',
+  },
   {
     id: 'd-grammar-1',
     gate: 'D',
@@ -1448,7 +1569,7 @@ const GATE_D_ITEMS = [
     options: ['has', 'have', 'having', 'had'],
     correct: 'has',
   },
-  // ── Vocabulary in context (2 items) ───────────────────────────────────────
+  // ── Vocabulary in context (3 items) ───────────────────────────────────────
   {
     id: 'd-vocab-1',
     gate: 'D',
@@ -1470,6 +1591,17 @@ const GATE_D_ITEMS = [
     prompt: 'I was thirsty, so I drank some ___.',
     options: ['water', 'bread', 'paper', 'stone'],
     correct: 'water',
+  },
+  {
+    id: 'd-vocab-3',
+    gate: 'D',
+    stage: 'grammar-vocab',
+    section: 'vocabularyReady',
+    kind: 'word-choice',
+    title: 'Vocabulary in context',
+    prompt: 'It was raining, so I opened my ___.',
+    options: ['umbrella', 'pencil', 'pillow', 'ladder'],
+    correct: 'umbrella',
   },
 ];
 
@@ -2242,6 +2374,7 @@ export function renderPlacementReportHtml(result) {
       <h2 class="pt-result-title">Placement complete</h2>
       <p class="pt-result-band"><strong>${_escapeHtml(band)}</strong></p>
       <p class="pt-result-desc">${_escapeHtml(desc)}</p>
+      <p class="pt-result-estimate">This is a starting estimate from a short check, not a final level. The app adjusts as your child practises, and a grown-up can move them up or down at any time.</p>
 
       <section class="pt-profile" aria-label="Skill profile">
         <h3 class="pt-section-title">Skill profile</h3>
@@ -2674,6 +2807,35 @@ export function showPlacementTest({ container, profile, onComplete }) {
     bindChoice(item, item.correct);
   }
 
+  /**
+   * Read the printed word or sentence, then tap its picture. The text is
+   * never spoken (only a comprehension question is), and the pictures carry
+   * no visible caption, so the answer cannot be heard or letter-matched.
+   */
+  function renderReadChoice(item) {
+    const opts = _shuffle(item.options);
+    renderFrame(`
+      <div class="pt-item pt-item--read">
+        <div class="pt-phase-tag">Gate ${item.gate} · ${item.title}</div>
+        ${item.say ? '<button class="pt-listen-btn" id="pt-listen">🔊 Hear the question</button>' : ''}
+        <p class="pt-read-text" lang="en">${_escapeHtml(item.sentence)}</p>
+        <p class="pt-question">${_escapeHtml(item.prompt)}</p>
+        <div class="pt-choices" role="group" aria-label="Picture choices">
+          ${opts
+            .map(
+              (o) => `
+            <button class="pt-choice-btn" data-choice="${o.id}" aria-label="${_escapeHtml(o.label)}">
+              <span>${o.emoji || ''}</span>
+            </button>
+          `,
+            )
+            .join('')}
+        </div>
+      </div>
+    `);
+    bindChoice(item, item.correct);
+  }
+
   function renderWordChoice(item) {
     const opts = _shuffle(item.options);
     renderFrame(`
@@ -2703,6 +2865,7 @@ export function showPlacementTest({ container, profile, onComplete }) {
     if (item.kind === 'teacher-scale') return renderTeacherScale(item);
     if (item.kind === 'pseudoword') return renderPseudoword(item);
     if (item.kind === 'picture-choice') return renderPictureChoice(item);
+    if (item.kind === 'read-choice') return renderReadChoice(item);
     return renderWordChoice(item);
   }
 

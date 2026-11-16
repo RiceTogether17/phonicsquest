@@ -14,7 +14,7 @@
  */
 import { describe, it, expect, afterEach, beforeAll, beforeEach, vi } from 'vitest';
 
-let showPlacementTest, GATE_A_ITEMS, GATE_B_ITEMS, PSEUDOWORD_ITEMS;
+let showPlacementTest, GATE_A_ITEMS, GATE_B_ITEMS, GATE_C_ITEMS, PSEUDOWORD_ITEMS;
 
 beforeAll(async () => {
   const synth = {
@@ -36,7 +36,7 @@ beforeAll(async () => {
     globalThis.window.SpeechSynthesisUtterance =
       globalThis.window.SpeechSynthesisUtterance || Utterance;
   }
-  ({ showPlacementTest, GATE_A_ITEMS, GATE_B_ITEMS, PSEUDOWORD_ITEMS } =
+  ({ showPlacementTest, GATE_A_ITEMS, GATE_B_ITEMS, GATE_C_ITEMS, PSEUDOWORD_ITEMS } =
     await import('../modules/placementTest.js'));
 });
 
@@ -166,5 +166,49 @@ describe('the probe in the live screener', () => {
       cursor += 1;
     }
     throw new Error('never reached the nonword probe');
+  });
+
+  it('prints the connected-reading text, never speaks it, and shows pictures with no caption', () => {
+    showPlacementTest({ container, profile: { schoolLevel: 'primary' }, onComplete: () => {} });
+
+    const order = [...expectedOrder(), ...GATE_C_ITEMS];
+    const seen = [];
+    let cursor = 0;
+    for (let step = 0; step < 300; step++) {
+      if (container.querySelector('#pt-start-btn')) break;
+      const item = order[cursor];
+      const read = container.querySelector('.pt-read-text');
+      if (read) {
+        expect(item.kind).toBe('read-choice');
+        expect(read.textContent).toBe(item.sentence);
+        // Only a comprehension question may be heard; the text itself never is.
+        expect(!!container.querySelector('#pt-listen')).toBe(item.section === 'comprehension');
+        const buttons = [...container.querySelectorAll('[data-choice]')];
+        expect(buttons).toHaveLength(4);
+        for (const b of buttons) {
+          expect(b.getAttribute('aria-label')).toBeTruthy();
+          expect(b.textContent).not.toMatch(/[a-z]/i);
+        }
+        seen.push(item.id);
+      }
+      const intakeNext = container.querySelector('#pt-intake-next');
+      if (intakeNext) {
+        intakeNext.click();
+      } else {
+        const scored = [...container.querySelectorAll('[data-score]')];
+        if (scored.length) {
+          scored.at(-1).click();
+        } else {
+          const choices = [...container.querySelectorAll('[data-choice]')];
+          (choices.find((b) => b.dataset.choice === item?.correct) ?? choices[0])?.click();
+        }
+      }
+      flush();
+      cursor += 1;
+    }
+    expect(seen).toEqual(GATE_C_ITEMS.filter((i) => i.kind === 'read-choice').map((i) => i.id));
+    expect(container.querySelector('.pt-result-estimate')?.textContent).toMatch(
+      /starting estimate/,
+    );
   });
 });
