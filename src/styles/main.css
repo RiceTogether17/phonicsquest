@@ -21143,3 +21143,24 @@ body.class-lesson-on .app-header,
 body.class-lesson-on .level-bar-wrapper {
   display: none;
 }
+
+/* Placement: the word or sentence the child reads unaided before answering */
+.pt-read-text {
+  margin: var(--space-3) 0;
+  font-size: clamp(1.6rem, 6vw, 2.6rem);
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--text);
+  font-family: var(--font-reading, inherit);
+}
+.pt-item--read .pt-choice-btn span {
+  font-size: clamp(2rem, 8vw, 3rem);
+  line-height: 1.2;
+}
+.pt-result-estimate {
+  margin: var(--space-2) auto 0;
+  max-width: 36rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}

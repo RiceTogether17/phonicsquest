@@ -84,9 +84,38 @@ describe('Gate C', () => {
     }
   });
 
-  it('comprehension items speak the whole sentence and question', () => {
-    for (const item of GATE_C_ITEMS.filter((i) => i.section === 'comprehension')) {
-      expect(spokenText(item).split(' ').length, item.id).toBeGreaterThan(5);
+  it('never speaks the text the child is asked to read', () => {
+    const read = GATE_C_ITEMS.filter((i) => i.kind === 'read-choice');
+    expect(read.length).toBeGreaterThanOrEqual(10);
+    for (const item of read) {
+      expect(item.speak, item.id).toBeUndefined();
+      const spoken = spokenText(item).toLowerCase();
+      expect(spoken, item.id).not.toContain(item.sentence.toLowerCase());
+      for (const part of item.sentence.split(/(?<=\.)\s+/)) {
+        expect(spoken, item.id).not.toContain(part.toLowerCase());
+      }
+    }
+  });
+
+  it('speaks only the question for comprehension, and the answer is in the text', () => {
+    const comp = GATE_C_ITEMS.filter((i) => i.section === 'comprehension');
+    expect(comp.length).toBeGreaterThanOrEqual(4);
+    for (const item of comp) {
+      expect(spokenText(item), item.id).toBe(item.prompt.toLowerCase());
+      expect(item.prompt, item.id).toMatch(/\?$/);
+      expect(item.sentence.toLowerCase(), item.id).toContain(item.correct);
+    }
+  });
+
+  it('offers the right picture once, among four with spoken labels', () => {
+    for (const item of GATE_C_ITEMS.filter((i) => i.kind === 'read-choice')) {
+      expect(item.options, item.id).toHaveLength(4);
+      expect(
+        item.options.filter((o) => o.id === item.correct),
+        item.id,
+      ).toHaveLength(1);
+      expect(new Set(item.options.map((o) => o.emoji)).size, item.id).toBe(4);
+      for (const o of item.options) expect(o.label, item.id).toBeTruthy();
     }
   });
 });
