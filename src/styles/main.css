@@ -20851,3 +20851,295 @@ body.story-class-view .ruler-nav .ruler-back {
   min-height: 1.2em;
   font-size: 0.9rem;
 }
+
+/* ── Class Lesson: one card at a time for a shared screen ─────────────────── */
+.class-lesson-browser {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 12px);
+  max-width: 860px;
+  margin: 0 auto;
+}
+.class-lesson-browser > .btn {
+  align-self: flex-start;
+}
+.class-lesson-heading {
+  margin: 0;
+}
+.class-lesson-note {
+  margin: 0;
+  color: var(--text-muted);
+}
+.class-lesson-browser kbd,
+.class-lesson-stage kbd {
+  font: inherit;
+  font-size: 0.8em;
+  padding: 1px 6px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  opacity: 0.85;
+}
+.class-lesson-kinds {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: var(--space-3, 12px);
+}
+.class-lesson-kind {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 84px;
+  padding: 14px 16px;
+  text-align: left;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 2px solid var(--border-control);
+  border-radius: 16px;
+  cursor: pointer;
+}
+.class-lesson-kind:hover,
+.class-lesson-kind:focus-visible {
+  border-color: var(--color-primary);
+}
+.class-lesson-kind-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+.class-lesson-kind-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.class-lesson-kind-title {
+  font-weight: 800;
+  font-size: 1.15rem;
+}
+.class-lesson-kind-blurb {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+.class-lesson-levels,
+.class-lesson-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.class-lesson-level,
+.class-lesson-chip {
+  min-height: 48px;
+  padding: 8px 16px;
+  font: inherit;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--surface);
+  border: 2px solid var(--border-control);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.class-lesson-level[aria-pressed='true'],
+.class-lesson-chip--mixed {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+.class-lesson-chip:hover,
+.class-lesson-chip:focus-visible,
+.class-lesson-level:hover,
+.class-lesson-level:focus-visible {
+  border-color: var(--color-primary);
+}
+
+/* The lesson itself covers the whole window: top strip, the card, and the
+   controls pinned to the bottom so they never need scrolling to reach. */
+.class-lesson-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  background: var(--bg);
+  color: var(--text);
+}
+body.class-lesson-on {
+  overflow: hidden;
+}
+.class-lesson-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px clamp(12px, 3vw, 32px);
+  border-bottom: 1px solid var(--border);
+}
+.class-lesson-deck {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.class-lesson-count {
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.class-lesson-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: safe center;
+  gap: clamp(10px, 2.5vh, 28px);
+  padding: clamp(12px, 3vh, 40px) clamp(16px, 5vw, 80px);
+  overflow-y: auto;
+  text-align: center;
+}
+.class-lesson-big {
+  margin: 0;
+  font-weight: 800;
+  line-height: 1.25;
+  font-size: clamp(2rem, 6vw, 5.5rem);
+  text-wrap: balance;
+}
+.class-lesson-big--question {
+  font-size: clamp(1.5rem, 3.6vw, 3.25rem);
+}
+.class-lesson-tag {
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: clamp(0.95rem, 1.6vw, 1.4rem);
+  background: #fef3c7;
+  color: #78350f;
+}
+.class-lesson-prompt {
+  margin: 0;
+  font-weight: 700;
+  font-size: clamp(1.3rem, 3vw, 2.6rem);
+  color: var(--text);
+}
+.class-lesson-prompt--solo {
+  font-size: clamp(1.6rem, 4vw, 3.5rem);
+  color: var(--text);
+  text-wrap: balance;
+}
+.class-lesson-answer {
+  margin: 0;
+  padding: 0.3em 0.8em;
+  border-radius: 16px;
+  font-weight: 800;
+  font-size: clamp(1.4rem, 3.4vw, 3rem);
+  background: #dcfce7;
+  color: #14532d;
+}
+.class-lesson-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(8px, 1.5vw, 20px);
+  width: min(100%, 1200px);
+}
+.class-lesson-option {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: 56px;
+  padding: 0.45em 0.8em;
+  font: inherit;
+  font-weight: 700;
+  font-size: clamp(1.15rem, 2.6vw, 2.4rem);
+  text-align: left;
+  color: var(--text);
+  background: var(--surface);
+  border: 3px solid var(--border-control);
+  border-radius: 16px;
+  cursor: pointer;
+}
+.class-lesson-option-key {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 1.7em;
+  height: 1.7em;
+  border-radius: 50%;
+  font-size: 0.8em;
+  background: var(--surface-2);
+}
+.class-lesson-option.is-picked {
+  border-color: #5a52e0;
+  background: #ede9fe;
+  color: #1e1b4b;
+}
+.class-lesson-option.is-right {
+  border-color: #16a34a;
+  background: #dcfce7;
+  color: #14532d;
+}
+.class-lesson-option.is-wrong {
+  border-color: #b91c1c;
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+.class-lesson-option.is-picked .class-lesson-option-key,
+.class-lesson-option.is-right .class-lesson-option-key,
+.class-lesson-option.is-wrong .class-lesson-option-key {
+  background: #fff;
+  color: #1e1b4b;
+}
+.class-lesson-why {
+  margin: 0;
+  max-width: 1100px;
+  font-size: clamp(1rem, 2vw, 1.7rem);
+  color: var(--text);
+}
+.class-lesson-passage {
+  align-self: stretch;
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: left;
+  font-size: clamp(1.15rem, 2.3vw, 2.1rem);
+  line-height: 1.6;
+}
+.class-lesson-passage p {
+  margin: 0 0 0.8em;
+}
+.class-lesson-passage-title {
+  margin: 0 0 0.5em;
+  font-size: 1.15em;
+}
+.class-lesson-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px clamp(12px, 3vw, 32px) calc(10px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.class-lesson-bar {
+  flex-wrap: wrap;
+}
+.class-lesson-bar .btn {
+  min-height: 52px;
+  min-width: 0;
+  flex: 0 1 auto;
+}
+.class-lesson-next {
+  margin-left: auto;
+  min-width: min(40vw, 260px);
+  font-size: 1.15rem;
+}
+@media (max-width: 560px) {
+  .class-lesson-options {
+    grid-template-columns: 1fr;
+  }
+  .class-lesson-top kbd,
+  .class-lesson-bar kbd {
+    display: none;
+  }
+}
+body.class-lesson-on .app-header,
+body.class-lesson-on .level-bar-wrapper {
+  display: none;
+}

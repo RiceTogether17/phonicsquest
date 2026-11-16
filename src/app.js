@@ -96,6 +96,7 @@ const placeholdersMod = lazyModule(() => import('./modes/primaryPlaceholders.js'
 const comprehensionClozeMod = lazyModule(() => import('./modes/comprehensionClozeQuest.js'));
 const listeningCompMod = lazyModule(() => import('./modes/listeningComp.js'));
 const oralPracticeMod = lazyModule(() => import('./modes/oralPractice.js'));
+const classLessonMod = lazyModule(() => import('./modes/classLesson.js'));
 import {
   getProfiles,
   createProfile,
@@ -679,6 +680,7 @@ class App {
       ['btn-p6-practice-tests', 'p6-practice-tests'],
       ['btn-listening-comp', 'listening-comp'],
       ['btn-oral-practice', 'oral-practice'],
+      ['btn-class-lesson', 'class-lesson'],
     ];
     placeholderHandlers.forEach(([btnId, kind]) => {
       document.getElementById(btnId)?.addEventListener('click', () => {
@@ -690,6 +692,7 @@ class App {
       synthesisQuestMod.get()?.cleanupSynthesisQuest();
       listeningCompMod.get()?.cleanupListeningComp();
       oralPracticeMod.get()?.cleanupOralPractice();
+      classLessonMod.get()?.cleanupClassLesson();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     });
@@ -1630,6 +1633,7 @@ class App {
     const selfTitled = {
       'listening-comp': ['Listening Comprehension', '👂'],
       'oral-practice': ['Oral Practice', '🎤'],
+      'class-lesson': ['Class Lesson', '🖥'],
     };
     if (!meta && !selfTitled[kind]) return;
     const titleEl = document.getElementById('primary-placeholder-title');
@@ -1647,6 +1651,7 @@ class App {
       synthesisQuestMod.get()?.cleanupSynthesisQuest();
       listeningCompMod.get()?.cleanupListeningComp();
       oralPracticeMod.get()?.cleanupOralPractice();
+      classLessonMod.get()?.cleanupClassLesson();
       this._showScreen(SCREENS.HOME);
       mascot.setHomeState('holdCard');
     };
@@ -1665,6 +1670,10 @@ class App {
       const m = await oralPracticeMod.load();
       m.initOralPractice(container, goHome);
       m.showOralBrowser();
+    } else if (kind === 'class-lesson') {
+      const m = await classLessonMod.load();
+      m.initClassLesson(container, goHome);
+      m.showClassLessonBrowser();
     } else {
       const m = await placeholdersMod.load();
       m.mountPlaceholderModule(container, kind, {
