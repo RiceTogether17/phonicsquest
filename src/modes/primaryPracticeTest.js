@@ -33,6 +33,7 @@ import { recordMisconceptionsFromReview } from '../modules/teacherFeedback.js';
 import { checkSituationalPoints } from '../modules/situationalChecks.js';
 import { hasApiKey, gradeSituationalWriting } from '../modules/aiService.js';
 import { html } from '../utils/html.js';
+import { renderVisualStimulus } from './visualStimulus.js';
 
 function shuffle(arr) {
   const a = [...arr];
@@ -161,7 +162,27 @@ function renderMcqSection(section, sectionKey) {
       </li>`;
     })
     .join('');
-  return `<ol class="ptg-mcq">${items}</ol>`;
+  const instructions = section.instructions
+    ? `<p class="ptg-instructions">${escapeHtml(section.instructions)}</p>`
+    : '';
+  return `${instructions}${_renderStimulus(section.stimulus)}<ol class="ptg-mcq">${items}</ol>`;
+}
+
+/**
+ * Something a whole multiple-choice section refers to: a short passage with
+ * numbered, underlined words (vocabulary cloze) or a visual text.
+ */
+function _renderStimulus(stimulus) {
+  if (!stimulus) return '';
+  if (stimulus.kind === 'visual') return renderVisualStimulus(stimulus.item);
+  if (stimulus.kind === 'passage') {
+    const text = escapeHtml(stimulus.text).replace(
+      /\{\{(\d+):([^}]+)\}\}/g,
+      (_, n, word) => `<u class="ptg-tested-word">${word}</u><sup>(${n})</sup>`,
+    );
+    return `<p class="ptg-passage ptg-passage--stimulus">${text}</p>`;
+  }
+  return '';
 }
 
 function renderClozeSection(section, sectionKey) {
@@ -185,7 +206,7 @@ function renderClozeSection(section, sectionKey) {
 
   // Section C (Grammar Cloze) has no word bank in the real PSLE exam.
   // In test mode hide it entirely; in practice mode show it with an exam note.
-  const isGrammarCloze = sectionKey === 'sectionC';
+  const isGrammarCloze = section.grammarCloze ?? sectionKey === 'sectionC';
   const hideBank = isGrammarCloze && _currentMode === 'test';
   const bankNote = isGrammarCloze
     ? _currentMode === 'test'
@@ -208,8 +229,11 @@ function renderOpenClozeSection(section, sectionKey) {
   const text = escapeHtml(section.text).replace(/\{\{(\d+)\}\}/g, (_, n) => {
     const idx = Number(n) - 1;
     const blank = section.blanks?.[idx];
-    const answer = blank?.answer || '';
-    const accepts = (blank?.accept || []).join('|');
+    // Upper-primary papers keep the answers in parallel `answers` / `accept`
+    // lists rather than a `blanks` list; without this they had no answer to
+    // mark against and every blank came back wrong.
+    const answer = blank?.answer || section.answers?.[idx] || '';
+    const accepts = (blank?.accept || section.accept?.[idx] || []).join('|');
     return `<input type="text" class="ptg-input ptg-input--cloze" data-q-key="${sectionKey}/${idx}"
             data-answer="${escapeAttr(answer)}" data-accept="${escapeAttr(accepts)}"
             data-skill="${escapeAttr(section.skill || '')}"
@@ -536,8 +560,8 @@ function _dispatchSection(s, k) {
 const SECTION_RENDERERS = {
   sectionA: (s, k) => renderMcqSection(s, k),
   sectionB: (s, k) => renderMcqSection(s, k),
-  sectionC: (s, k) => renderClozeSection(s, k),
-  sectionD: (s, k) => renderClozeSection(s, k),
+  sectionC: (s, k) => (s.wordBank ? renderClozeSection(s, k) : _dispatchSection(s, k)),
+  sectionD: (s, k) => (s.wordBank ? renderClozeSection(s, k) : _dispatchSection(s, k)),
   sectionE: (s, k) => _dispatchSection(s, k),
   sectionF: (s, k) => _dispatchSection(s, k),
   sectionG: (s, k) => _dispatchSection(s, k),
@@ -1179,9 +1203,8 @@ export function mountPracticeTest(
     const key = sectionKeys[idx];
     const section = paper[key];
     const renderer = SECTION_RENDERERS[key];
-    const timeHint = SECTION_TIME_GUIDE[key]
-      ? ` <span class="ptg-time-hint">⏱ ${SECTION_TIME_GUIDE[key]}</span>`
-      : '';
+    const guide = section.timeGuide || SECTION_TIME_GUIDE[key];
+    const timeHint = guide ? ` <span class="ptg-time-hint">⏱ ${guide}</span>` : '';
     const title = `<h3 class="ptg-section-title">${escapeHtml(section.title)} <small>(${section.marks} marks)</small>${timeHint}</h3>`;
     const body = renderer ? renderer(section, key) : '<p>Unsupported section.</p>';
     stageEl.innerHTML = `${title}${body}`;
@@ -1245,6 +1268,42 @@ export function mountPracticeTest(
         fb.innerHTML = `<span>❌ Correct answer: <strong>${escapeHtml(info.expected || '')}</strong></span>${slip}${nextTime}${markingGuide}${skillRow}`;
       }
     });
+    showBlankFeedback(perKey);
+  }
+
+  // Passages with blanks have one feedback block for the whole passage.
+  // Colour each blank, give the count right, and list the answers missed.
+  function showBlankFeedback(perKey) {
+    const fb = stageEl.querySelector('[data-feedback-for$="/all"]');
+    if (!fb) return;
+    const entries = [...perKey.entries()].filter(([, info]) => !info.selfAssess);
+    if (!entries.length) return;
+    const missed = [];
+    entries.forEach(([key, info]) => {
+      const el = stageEl.querySelector(`[data-q-key="${cssEscape(key)}"]`);
+      if (el) el.classList.add(info.correct ? 'ptg-input--right' : 'ptg-input--wrong');
+      if (!info.correct) missed.push([Number(String(key).split('/')[1]) + 1, info.expected || '']);
+    });
+    const right = entries.length - missed.length;
+    fb.hidden = false;
+    fb.className = `ptg-feedback ptg-feedback--${missed.length ? (right ? 'partial' : 'no') : 'ok'}`;
+    fb.textContent = '';
+    const head = document.createElement('span');
+    const mark = missed.length ? (right ? '◐' : '❌') : '✅';
+    head.textContent = `${mark} ${right} / ${entries.length} blanks correct.`;
+    fb.appendChild(head);
+    if (!missed.length) return;
+    const list = document.createElement('ul');
+    list.className = 'ptg-blank-answers';
+    missed.forEach(([n, expected]) => {
+      const li = document.createElement('li');
+      li.append(`(${n}) `);
+      const strong = document.createElement('strong');
+      strong.textContent = expected;
+      li.appendChild(strong);
+      list.appendChild(li);
+    });
+    fb.appendChild(list);
   }
 
   function onCheck() {

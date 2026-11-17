@@ -21164,3 +21164,29 @@ body.class-lesson-on .level-bar-wrapper {
   color: var(--text-muted);
   font-size: 0.95rem;
 }
+
+/* Practice papers: a short passage a whole multiple-choice section refers to */
+.ptg-passage--stimulus {
+  white-space: normal;
+  line-height: 1.9;
+}
+.ptg-tested-word {
+  font-weight: 700;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.ptg-input--right {
+  border-color: var(--success, #1a7f37);
+}
+.ptg-input--wrong {
+  border-color: var(--danger, #b42318);
+}
+.ptg-blank-answers {
+  margin: 0.4rem 0 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  list-style: none;
+}
