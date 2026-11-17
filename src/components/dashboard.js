@@ -21,7 +21,7 @@ import {
   getStuckWords,
 } from '../modules/dashboardInsights.js';
 import { renderCurriculumMap } from './curriculumMap.js';
-import { buildWeakSpots, weakSpotsText } from '../modules/weakSpots.js';
+import { buildWeakSpots, weakSpotsText, tonightWhenAllIsWell } from '../modules/weakSpots.js';
 import {
   getVocabularyCategoryReport,
   getGrammarCategoryReport,
@@ -993,6 +993,7 @@ function _weakSpotsHtml(spots) {
         <strong class="weak-spot__title">${escapeHtml(s.title)}</strong>
         <span class="weak-spot__evidence">${escapeHtml(s.evidence)}</span>
         <span class="weak-spot__action">👉 ${escapeHtml(s.action)}</span>
+        <span class="weak-spot__tonight"><strong>Try this tonight:</strong> ${escapeHtml(s.tonight)}</span>
       </li>`,
     )
     .join('');
@@ -1007,11 +1008,23 @@ function _weakSpotsHtml(spots) {
     </section>`;
 }
 
+/** Nothing has gone wrong often enough to list: still give one thing to do. */
+function _tonightOnlyHtml(tip) {
+  return `
+    <section class="weak-spots" aria-label="Try this tonight">
+      <h3 class="dash-section-title" style="margin:0">🌙 Try this tonight</h3>
+      <p class="weak-spots__tonight-only">${escapeHtml(tip)}</p>
+    </section>`;
+}
+
 function _renderWeakSpots() {
   const container = document.getElementById('dash-weak-spots');
   if (!container) return;
   const spots = buildWeakSpots();
-  if (!spots.length) return;
+  if (!spots.length) {
+    container.innerHTML = _tonightOnlyHtml(tonightWhenAllIsWell(getActiveProfile()));
+    return;
+  }
   container.innerHTML = _weakSpotsHtml(spots);
   container.querySelector('#btn-weak-spots-copy')?.addEventListener('click', async () => {
     const status = container.querySelector('#weak-spots-status');

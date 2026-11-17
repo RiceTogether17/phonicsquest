@@ -16,7 +16,8 @@ vi.hoisted(() => {
 
 const { store } = await import('../modules/store.js');
 const { recordSoundConfusion, getSoundConfusions } = await import('../modules/soundConfusions.js');
-const { buildWeakSpots, weakSpotsText, MAX_WEAK_SPOTS } = await import('../modules/weakSpots.js');
+const { buildWeakSpots, weakSpotsText, tonightWhenAllIsWell, MAX_WEAK_SPOTS } =
+  await import('../modules/weakSpots.js');
 const { diagnosePhonicsSlip } = await import('../modules/phonicsDiagnosis.js');
 const { createChoiceRound } = await import('../modes/choiceRound.js');
 const { WORDS } = await import('../data/words.js');
@@ -130,6 +131,39 @@ describe('buildWeakSpots', () => {
     expect(spots.length).toBeLessThanOrEqual(MAX_WEAK_SPOTS);
     expect(spots.filter((s) => s.kind === 'sounds').length).toBe(2);
     expect(spots.find((s) => s.kind === 'oral').title).toMatch(/reason and an example/);
+  });
+
+  it('gives every weak spot something to try at home, away from the screen', () => {
+    for (const word of ['bad', 'bed']) recordSoundConfusion({ target: '/a/', chosen: '/e/', word });
+    store.set('oralCompleted', { one: { at: '2026-02-01T00:00:00.000Z', nextStep: 'pace' } });
+    const spots = buildWeakSpots();
+    expect(spots.length).toBeGreaterThanOrEqual(2);
+    for (const s of spots) {
+      expect(s.tonight.length, s.kind).toBeGreaterThan(40);
+      expect(s.tonight, s.kind).not.toBe(s.action);
+      // Home activities need no app: the screen-based step is the action line.
+      expect(s.tonight, s.kind).not.toMatch(
+        /Blend It|First Sound|Middle Sound|\bplay\b.*\bagain\b/,
+      );
+    }
+    const sounds = spots.find((s) => s.kind === 'sounds');
+    expect(sounds.tonight).toContain('"bed" and "bad"');
+    expect(sounds.tonight).toContain('/a/ or /e/');
+    expect(spots.find((s) => s.kind === 'oral').tonight).toMatch(/comma and full stop/);
+    expect(weakSpotsText(spots)).toContain('Try this tonight: ');
+  });
+
+  it('has a tip for a child with no weak spots, pitched at how far along they are', () => {
+    const early = tonightWhenAllIsWell({ schoolLevel: 'preschool' });
+    const stillDecoding = tonightWhenAllIsWell({
+      schoolLevel: 'primary',
+      readingBand: 'emerging-decoder',
+    });
+    const reader = tonightWhenAllIsWell({ schoolLevel: 'primary', readingBand: 'reader' });
+    expect(early).toMatch(/taking turns/);
+    expect(stillDecoding).toBe(early);
+    expect(reader).toMatch(/three sentences/);
+    expect(tonightWhenAllIsWell(null)).toBe(early);
   });
 
   it('can be copied as a short numbered note', () => {
