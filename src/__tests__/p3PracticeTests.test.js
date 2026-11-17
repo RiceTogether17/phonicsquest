@@ -167,10 +167,11 @@ describe('P3 Practice Test launcher', () => {
     expect(html.toLowerCase()).toMatch(/no t4|t1.{0,4}t3 only|only terms 1.{0,4}3/i);
   });
 
-  it('upper-primary launchers honestly show 4 papers available', () => {
+  it('upper-primary launchers honestly show how many papers are available', () => {
     for (const kind of ['p4-practice-tests', 'p5-practice-tests', 'p6-practice-tests']) {
       const html = buildPlaceholderHtml(kind);
-      expect(html, kind).toMatch(/4 papers available/);
+      const count = kind === 'p6-practice-tests' ? 8 : 4;
+      expect(html, kind).toContain(`${count} papers available`);
     }
   });
 });

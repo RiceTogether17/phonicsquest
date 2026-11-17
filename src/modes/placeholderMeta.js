@@ -89,7 +89,7 @@ export const PLACEHOLDER_META = {
     // that was true and "exam-ready" was not something these results could
     // establish. The practice is still good; only the claim has changed.
     blurb:
-      "Four P6 practice papers (T1–T4) with the hardest synthesis patterns, inversion, and evidence-based comprehension. PhonicsQuest's own mixed-component format — not the PSLE paper structure, and Continuous Writing is not covered.",
+      "Eight P6 practice papers. Four are laid out like Paper 2 (two booklets, nine sections, 90 marks, 1 h 50 min). Four are PhonicsQuest's own mixed-component term papers, which are not the PSLE paper structure. Continuous Writing is not covered in either set.",
     paperLink: 'P6 · Mixed-component practice',
   },
 };

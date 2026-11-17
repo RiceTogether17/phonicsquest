@@ -24,6 +24,7 @@ import { P3_PRACTICE_TESTS, P3_PRACTICE_TEST_TERMS } from '../data/p3PracticeTes
 import { P4_PRACTICE_TESTS, P4_PRACTICE_TEST_TERMS } from '../data/p4PracticeTests.js';
 import { P5_PRACTICE_TESTS, P5_PRACTICE_TEST_TERMS } from '../data/p5PracticeTests.js';
 import { P6_PRACTICE_TESTS, P6_PRACTICE_TEST_TERMS } from '../data/p6PracticeTests.js';
+import { getP6Paper2Tests } from '../data/p6Paper2Tests.js';
 import { mountPracticeTest, buildPaperLauncherHtml } from './primaryPracticeTest.js';
 import { renderOpenResponseHtml, attachOpenResponses } from './openResponse.js';
 import { checkSituationalPoints } from '../modules/situationalChecks.js';
@@ -325,9 +326,9 @@ function _renderBody(kind) {
   if (kind === 'p6-practice-tests') {
     return buildPaperLauncherHtml({
       level: 'P6',
-      papers: P6_PRACTICE_TEST_TERMS.map((t) => P6_PRACTICE_TESTS[t]).filter(Boolean),
+      papers: _p6Papers(),
       intro:
-        'Pick a P6 PSLE-format paper. Full Paper 1 + Paper 2 structure. Every wrong answer routes to the matching drill.',
+        'The first four papers are laid out like Paper 2: two booklets, nine sections, 90 marks. The term papers after them are our own mixed practice. Every wrong answer routes to the matching drill.',
     });
   }
   return '';
@@ -407,7 +408,14 @@ function _lookupPaperBank(kind) {
     return P4_PRACTICE_TEST_TERMS.map((t) => P4_PRACTICE_TESTS[t]).filter(Boolean);
   if (kind === 'p5-practice-tests')
     return P5_PRACTICE_TEST_TERMS.map((t) => P5_PRACTICE_TESTS[t]).filter(Boolean);
-  if (kind === 'p6-practice-tests')
-    return P6_PRACTICE_TEST_TERMS.map((t) => P6_PRACTICE_TESTS[t]).filter(Boolean);
+  if (kind === 'p6-practice-tests') return _p6Papers();
   return [];
+}
+
+/** P6: the four Paper 2 layout papers, then the four mixed term papers. */
+function _p6Papers() {
+  return [
+    ...getP6Paper2Tests(),
+    ...P6_PRACTICE_TEST_TERMS.map((t) => P6_PRACTICE_TESTS[t]).filter(Boolean),
+  ];
 }
