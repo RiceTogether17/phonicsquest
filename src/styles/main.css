@@ -20839,8 +20839,19 @@ body.story-class-view .ruler-nav .ruler-back {
 }
 .weak-spot__title,
 .weak-spot__evidence,
-.weak-spot__action {
+.weak-spot__action,
+.weak-spot__tonight {
   display: block;
+}
+.weak-spot__tonight {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--surface-2, rgba(90, 82, 224, 0.08));
+  color: var(--text);
+}
+.weak-spots__tonight-only {
+  margin: 8px 0 0;
 }
 .weak-spot__evidence {
   color: var(--text-muted, #6b7280);
