@@ -12,6 +12,7 @@ import { makeFallbackOptionExplanations } from './mcqOptionExplanations.js';
 import { makeVocabTeachingExplanations } from './vocabGlosses.js';
 import { MIN_QUESTIONS_PER_SCOPE, contextualizeMcqQuestion, varyMcqNames } from './practiceExpansion.js';
 import { VOCAB_CATEGORIES } from './vocabCategories.js';
+import { extraVocabSpecs } from './vocabMcqExtra/index.js';
 
 export const VOCAB_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 
@@ -1823,6 +1824,33 @@ function buildLevel(level) {
       // Context type reflects the seed sentence, not the presentation wrapper.
       item.contextType = inferQuestionContextType(spec.q);
       items.push(item);
+    }
+
+    // Hand-written extra questions for this category and level. The builder
+    // still supplies the category, subskill and rule line.
+    const extras = extraVocabSpecs(baseCat, level);
+    if (extras.length) {
+      const { category, subskill, explain } = VOCAB_BUILDERS[baseCat](level, 0);
+      const canonical = toCanonicalCategory(category);
+      extras.forEach((extra, k) => {
+        const choices = buildChoices(extra.answer, extra.distractors);
+        const variant = contextualizeMcqQuestion(extra.q);
+        items.push({
+          id: `v-${level.toLowerCase()}-${baseCat}-${String(MIN_QUESTIONS_PER_SCOPE + k + 1).padStart(3, '0')}`,
+          level,
+          category: canonical,
+          subskill,
+          difficulty: deriveMcqDifficulty({ q: extra.q, answer: extra.answer, choices, level }),
+          seedId: `v:${mcqSeedKey({ q: extra.q, category: canonical, answer: extra.answer })}`,
+          q: variant.question,
+          questionType: variant.questionType,
+          choices,
+          answer: extra.answer,
+          explain,
+          optionExplanations: extra.optionExplanations,
+          contextType: inferQuestionContextType(extra.q),
+        });
+      });
     }
   }
 

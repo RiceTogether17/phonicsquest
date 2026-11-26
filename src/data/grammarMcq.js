@@ -12,6 +12,7 @@ import { GRAMMAR_TIPS } from './grammarTips.js';
 import { P1_PRONOUN_EXPLANATIONS, makeSimplePastExplanations } from './earlyGrammarExplanations.js';
 import { getStrandLevel } from './spiralGrammar.js';
 import { MIN_QUESTIONS_PER_SCOPE, contextualizeMcqQuestion, varyMcqNames } from './practiceExpansion.js';
+import { extraGrammarSpecs } from './grammarMcqExtra/index.js';
 
 export const GRAMMAR_MCQ_LEVELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
 
@@ -4959,53 +4960,75 @@ function buildLevel(level) {
   const items = [];
   const sessionSeed = Math.floor(Math.random() * 10);
 
+  const makeItem = (category, spec, localOffset) => {
+    const variant = contextualizeMcqQuestion(spec.q);
+    const item = {
+      id: `g-${level.toLowerCase()}-${category}-${String(localOffset + 1).padStart(3, '0')}`,
+      level,
+      category,
+      subskill: spec.subskill,
+      // Difficulty comes from the seed's own demands (choice closeness,
+      // reading load) — never from its position in the rotation.
+      difficulty: deriveMcqDifficulty({ q: spec.q, answer: spec.answer, choices: spec.choices, level }),
+      // One identity per seed question: wrapper frames and pupil-name swaps
+      // do not create a "new" question for review scheduling or analytics.
+      seedId: `g:${mcqSeedKey({ q: spec.q, category, answer: spec.answer })}`,
+      q: variant.question,
+      questionType: variant.questionType,
+      choices: spec.choices,
+      answer: spec.answer,
+      explain: spec.explain,
+    };
+    // Prefer builder-authored per-choice explanations; otherwise fall back to
+    // generic ones built from the category rule so every wrong answer teaches.
+    item.optionExplanations = spec.optionExplanations
+      || makeFallbackOptionExplanations(item.answer, item.choices, GRAMMAR_TIPS[category]);
+    if (spec.clueWords) {
+      item.clueWords = spec.clueWords;
+    } else if (CLUE_CATEGORIES.has(category)) {
+      // Derive the evidence words a teacher would underline (time markers,
+      // quantity words, comparison signals) for guided mode and cues.
+      const derived = deriveClueWords(spec.q);
+      if (derived.length) item.clueWords = derived;
+    }
+    if (spec.reasoning) item.reasoning = spec.reasoning;
+    // A strand like Simple Past spans six years of teaching points. Tag the
+    // item with the spiral step it actually belongs to, so a P4 pupil is
+    // taught "Simple Past vs Past Continuous" rather than the P1 intro rule.
+    const step = getStrandLevel(category, level);
+    if (step) {
+      item.spiralStep = `${category}:${level}`;
+      item.spiralLabel = step.label;
+    }
+    // Context type reflects the seed sentence, not the presentation wrapper
+    // (some wrappers add a sentence of their own).
+    item.contextType = inferQuestionContextType(spec.q);
+    return item;
+  };
+
   for (const category of categories) {
     for (let localOffset = 0; localOffset < MIN_QUESTIONS_PER_SCOPE; localOffset += 1) {
       const localIndex = sessionSeed + localOffset;
       const spec = varyMcqNames(withEarlyExplanations(GRAMMAR_BUILDERS[category](level, localIndex), category), localOffset);
-      const variant = contextualizeMcqQuestion(spec.q);
-      const item = {
-        id: `g-${level.toLowerCase()}-${category}-${String(localOffset + 1).padStart(3, '0')}`,
-        level,
-        category,
-        subskill: spec.subskill,
-        // Difficulty comes from the seed's own demands (choice closeness,
-        // reading load) — never from its position in the rotation.
-        difficulty: deriveMcqDifficulty({ q: spec.q, answer: spec.answer, choices: spec.choices, level }),
-        // One identity per seed question: wrapper frames and pupil-name swaps
-        // do not create a "new" question for review scheduling or analytics.
-        seedId: `g:${mcqSeedKey({ q: spec.q, category, answer: spec.answer })}`,
-        q: variant.question,
-        questionType: variant.questionType,
-        choices: spec.choices,
-        answer: spec.answer,
-        explain: spec.explain,
-      };
-      // Prefer builder-authored per-choice explanations; otherwise fall back to
-      // generic ones built from the category rule so every wrong answer teaches.
-      item.optionExplanations = spec.optionExplanations
-        || makeFallbackOptionExplanations(item.answer, item.choices, GRAMMAR_TIPS[category]);
-      if (spec.clueWords) {
-        item.clueWords = spec.clueWords;
-      } else if (CLUE_CATEGORIES.has(category)) {
-        // Derive the evidence words a teacher would underline (time markers,
-        // quantity words, comparison signals) for guided mode and cues.
-        const derived = deriveClueWords(spec.q);
-        if (derived.length) item.clueWords = derived;
-      }
-      if (spec.reasoning) item.reasoning = spec.reasoning;
-      // A strand like Simple Past spans six years of teaching points. Tag the
-      // item with the spiral step it actually belongs to, so a P4 pupil is
-      // taught "Simple Past vs Past Continuous" rather than the P1 intro rule.
-      const step = getStrandLevel(category, level);
-      if (step) {
-        item.spiralStep = `${category}:${level}`;
-        item.spiralLabel = step.label;
-      }
-      // Context type reflects the seed sentence, not the presentation wrapper
-      // (some wrappers add a sentence of their own).
-      item.contextType = inferQuestionContextType(spec.q);
-      items.push(item);
+      items.push(makeItem(category, spec, localOffset));
+    }
+    // Extra hand-written rows for this skill and level. They share the
+    // builder's subskill and rule explanation, and carry their own feedback
+    // for every choice.
+    const extras = extraGrammarSpecs(category, level);
+    if (extras.length) {
+      const { subskill, explain } = GRAMMAR_BUILDERS[category](level, 0);
+      extras.forEach((extra, k) => {
+        const spec = {
+          subskill,
+          q: extra.q,
+          choices: buildChoices(extra.answer, extra.distractors),
+          answer: extra.answer,
+          explain,
+          optionExplanations: extra.optionExplanations,
+        };
+        items.push(makeItem(category, spec, MIN_QUESTIONS_PER_SCOPE + k));
+      });
     }
   }
 

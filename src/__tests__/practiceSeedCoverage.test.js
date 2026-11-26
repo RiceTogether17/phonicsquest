@@ -96,14 +96,18 @@ describe('the audit’s measurements still hold (finding 12)', () => {
     }
   });
 
-  it('Grammar and Vocabulary MCQ scopes are 8–23 questions, as the audit found', () => {
-    const sizes = [GRAMMAR_MCQ_ITEMS, VOCAB_MCQ_ITEMS].flatMap((bank) =>
-      Object.values(bank).flatMap((items) =>
-        Object.values(Object.groupBy(items, (item) => item.category)).map((list) => list.length),
-      ),
+  it('Vocabulary MCQ scopes have grown from 8–20 to at least 30 questions each', () => {
+    const sizes = Object.values(VOCAB_MCQ_ITEMS).flatMap((items) =>
+      Object.values(Object.groupBy(items, (item) => item.category)).map((list) => list.length),
     );
-    expect(Math.min(...sizes)).toBe(8);
-    expect(Math.max(...sizes)).toBe(23);
+    expect(Math.min(...sizes)).toBeGreaterThanOrEqual(30);
+  });
+
+  it('Grammar MCQ scopes have grown from 10–23 to at least 30 questions each', () => {
+    const sizes = Object.values(GRAMMAR_MCQ_ITEMS).flatMap((items) =>
+      Object.values(Object.groupBy(items, (item) => item.category)).map((list) => list.length),
+    );
+    expect(Math.min(...sizes)).toBeGreaterThanOrEqual(30);
   });
 });
 
