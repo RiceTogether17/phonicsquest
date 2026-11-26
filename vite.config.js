@@ -20,6 +20,15 @@ export default defineConfig({
           // child on first paint whether or not they ever opened a story.
           // Naming it keeps it a chunk of its own, fetched on demand.
           stories: ['./src/data/stories.js'],
+          // The extra grammar MCQ rows would push the grammar bank's chunk
+          // past the lazy-chunk budget, so they get a chunk of their own.
+          // It is only fetched alongside the grammar bank.
+          grammarMcqExtra: [
+            './src/data/grammarMcqExtra/index.js',
+            './src/data/grammarMcqExtra/early.js',
+            './src/data/grammarMcqExtra/middle.js',
+            './src/data/grammarMcqExtra/upper.js',
+          ],
         },
       },
     },

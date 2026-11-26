@@ -83,7 +83,7 @@ below are the distinct material.
 
 | Module         | Selectable scopes  | Distinct items per scope     | Bank total                 |
 | -------------- | ------------------ | ---------------------------- | -------------------------- |
-| Grammar MCQ    | 143 grade/category | 10–23 questions              | 2520 questions, no repeats |
+| Grammar MCQ    | 143 grade/category | 30–40 questions              | 4422 questions, no repeats |
 | Vocabulary MCQ | 132 grade/category | 8–20 questions               | 1870 questions, no repeats |
 | Cloze Castle   | 97 grade/category  | 3–11 passages, 9–33 blanks   | 529 passages, 3193 rounds  |
 | Word Vault     | 84 category/grade  | 18–26 passages, 54–78 blanks | 1757 passages, 3101 rounds |
