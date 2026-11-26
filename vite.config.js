@@ -29,6 +29,13 @@ export default defineConfig({
             './src/data/grammarMcqExtra/middle.js',
             './src/data/grammarMcqExtra/upper.js',
           ],
+          // Same for the extra vocabulary MCQ rows.
+          vocabMcqExtra: [
+            './src/data/vocabMcqExtra/index.js',
+            './src/data/vocabMcqExtra/lower.js',
+            './src/data/vocabMcqExtra/upperWords.js',
+            './src/data/vocabMcqExtra/upperTopics.js',
+          ],
         },
       },
     },
